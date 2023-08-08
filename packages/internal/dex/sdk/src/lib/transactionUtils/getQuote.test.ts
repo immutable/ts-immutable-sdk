@@ -1,15 +1,15 @@
 import { ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
-import { getAmountWithSlippageImpact } from './getQuote';
+import { applySlippage } from './getQuote';
 
 const DEFAULT_SLIPPAGE = 0.1;
 
-describe('getAmountWithSlippageImpact', () => {
+describe('applySlippage', () => {
   describe('when trade type is EXACT_INPUT', () => {
     it('should return a minimum expected amount out', () => {
       const amountInWei = ethers.utils.parseEther('100');
 
-      const result = getAmountWithSlippageImpact(
+      const result = applySlippage(
         TradeType.EXACT_INPUT,
         amountInWei,
         DEFAULT_SLIPPAGE,
@@ -17,7 +17,7 @@ describe('getAmountWithSlippageImpact', () => {
 
       const formattedResult = ethers.utils.formatEther(result);
 
-      expect(formattedResult).toEqual('99.9');
+      expect(formattedResult).toEqual('99.900099900099900099');
     });
 
     describe('AND slippage percent is 0', () => {
@@ -25,7 +25,7 @@ describe('getAmountWithSlippageImpact', () => {
         const amountInWei = ethers.utils.parseEther('100');
         const ZERO_PERCENT = 0;
 
-        const result = getAmountWithSlippageImpact(
+        const result = applySlippage(
           TradeType.EXACT_INPUT,
           amountInWei,
           ZERO_PERCENT,
@@ -42,7 +42,7 @@ describe('getAmountWithSlippageImpact', () => {
     it('should return a maximum possible amount in', () => {
       const amountOutWei = ethers.utils.parseEther('100');
 
-      const result = getAmountWithSlippageImpact(
+      const result = applySlippage(
         TradeType.EXACT_OUTPUT,
         amountOutWei,
         DEFAULT_SLIPPAGE,
@@ -58,7 +58,7 @@ describe('getAmountWithSlippageImpact', () => {
         const amountOutWei = ethers.utils.parseEther('100');
         const ZERO_PERCENT = 0;
 
-        const result = getAmountWithSlippageImpact(
+        const result = applySlippage(
           TradeType.EXACT_OUTPUT,
           amountOutWei,
           ZERO_PERCENT,

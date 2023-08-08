@@ -53,19 +53,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: lts/*
-
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
-
-      - name: Cache node modules
-        uses: actions/cache@v3
-        id: yarn-cache
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+          cache: 'yarn'
 
       - name: Workout next version string
         run: |
@@ -130,4 +118,4 @@ jobs:
 
       - name: Release
         if: contains(github.event.inputs.release_type, 'release')
-        run: yarn release --ci --no-increment --no-npm --no-git.push --no-git.commit $( ${{ github.event.inputs.dry_run }} && echo "--dry-run" || echo "") --github.tokenRef=${{ secrets.PLATFORM_SA_GITHUB_TOKEN }}
+        run: yarn release --ci --no-increment -c .release-it.json $( ${{ github.event.inputs.dry_run }} && echo "--dry-run" || echo "") --github.tokenRef=${{ secrets.PLATFORM_SA_GITHUB_TOKEN }}

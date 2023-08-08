@@ -5,7 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] - YYYY-MM-DD
+## [Unreleased]
+
+### Added
+
+### Fixed
+
+- @imtbl/passport: Fixed a bug where the guardian popup was not closing if pre-requisite API calls failed.
+
+### Changed
+
+- Modules are now exported under their own namespaces instead of being flattened
+
+### Removed
+
+### Deprecated
+
+## [0.4.4] - 2023-08-04
+
+### Added
+
+- @imtbl/passport: Added `isPassport` property to Passport zkEVM provider
+
+## [0.4.3] - 2023-08-04
+
+### Added
+
+- @imtbl/passport: Added zkEVM Support, see the [zkEVM Passport documentation](https://docs.immutable.com/docs/zkevm/products/passport/) for more information.
+- Fixed an issue where the API version was appended to the header twice in every API call
+
+## [0.4.2] - 2023-07-31
 
 ### Added
 
@@ -14,8 +43,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - @imtbl/immutablex_client: Updated to use core-sdk v2.0.2 with grind key fixes.
-- Fixed an issue where the API version was appended to the header twice in every API call
-- @imtbl/passport: Fixed a bug where the guardian popup was not closing if pre-requisite API calls failed.
 
 ### Changed
 

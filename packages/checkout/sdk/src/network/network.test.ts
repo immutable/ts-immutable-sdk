@@ -22,6 +22,7 @@ import { createProvider } from '../provider';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { CheckoutConfiguration } from '../config';
 import { RemoteConfigFetcher } from '../config/remoteConfigFetcher';
+import { getUnderlyingChainId } from '../provider/getUnderlyingProvider';
 
 let windowSpy: any;
 const providerMock = {
@@ -52,6 +53,8 @@ jest.mock('@ethersproject/providers', () => ({
 }));
 
 jest.mock('../config/remoteConfigFetcher');
+
+jest.mock('../provider/getUnderlyingProvider');
 
 describe('network functions', () => {
   let testCheckoutConfiguration: CheckoutConfiguration;
@@ -208,52 +211,85 @@ describe('network functions', () => {
           request: jest
             .fn()
             .mockResolvedValueOnce({})
-            .mockRejectedValue(new Error()),
+            .mockRejectedValue({
+              message: 'Provider error',
+            }),
         },
         removeEventListener: () => {},
       }));
 
       const { provider } = await createProvider(WalletProviderName.METAMASK);
 
-      await expect(
-        switchWalletNetwork(
+      try {
+        await switchWalletNetwork(
           testCheckoutConfiguration,
           provider,
           ChainId.IMTBL_ZKEVM_TESTNET,
-        ),
-      ).rejects.toThrow(
-        new CheckoutError(
-          'User cancelled switch network request',
-          CheckoutErrorType.USER_REJECTED_REQUEST_ERROR,
-        ),
-      );
+        );
+      } catch (err: any) {
+        expect(err.message).toEqual('User cancelled switch network request');
+        expect(err.type).toEqual(CheckoutErrorType.USER_REJECTED_REQUEST_ERROR);
+      }
     });
 
-    it('should throw an error if the provider does not have a request function', async () => {
-      windowSpy.mockImplementation(() => ({
-        ethereum: {
-          request: jest.fn().mockResolvedValueOnce({}),
+    it('should throw an error if the user rejects the add network request', async () => {
+      (Web3Provider as unknown as jest.Mock).mockReturnValue({
+        provider: {
+          request: jest
+            .fn()
+            .mockRejectedValue({
+              message: 'Provider error',
+              code: 4902,
+            }),
         },
-        removeEventListener: () => {},
-      }));
+        getNetwork: async () => ethNetworkInfo,
+        network: {
+          chainId: ethNetworkInfo.chainId,
+        },
+      });
 
       const { provider } = await createProvider(WalletProviderName.METAMASK);
 
-      // remove request function from provider
-      delete provider.provider.request;
-
-      await expect(
-        switchWalletNetwork(
+      try {
+        await switchWalletNetwork(
           testCheckoutConfiguration,
           provider,
           ChainId.IMTBL_ZKEVM_TESTNET,
-        ),
-      ).rejects.toThrow(
-        new CheckoutError(
-          'User cancelled switch network request',
-          CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR,
-        ),
-      );
+        );
+      } catch (err: any) {
+        expect(err.message).toEqual('User cancelled add network request');
+        expect(err.type).toEqual(CheckoutErrorType.USER_REJECTED_REQUEST_ERROR);
+      }
+    });
+
+    it('should throw an error if user rejects request and non-4902 code', async () => {
+      (Web3Provider as unknown as jest.Mock).mockReturnValue({
+        provider: {
+          request: jest
+            .fn()
+            .mockRejectedValue({
+              message: 'Provider error',
+              code: 4000,
+            }),
+        },
+        getNetwork: async () => ethNetworkInfo,
+        network: {
+          chainId: ethNetworkInfo.chainId,
+        },
+      });
+
+      const { provider } = await createProvider(WalletProviderName.METAMASK);
+
+      try {
+        await switchWalletNetwork(
+          testCheckoutConfiguration,
+          provider,
+          ChainId.IMTBL_ZKEVM_TESTNET,
+        );
+      } catch (err: any) {
+        expect(err.message).toEqual('User cancelled switch network request');
+        expect(err.type).toEqual(CheckoutErrorType.USER_REJECTED_REQUEST_ERROR);
+      }
     });
 
     it('should request the user to add a new network if their wallet does not already have it', async () => {
@@ -369,6 +405,25 @@ describe('network functions', () => {
         chainId: 3,
         name: 'ropsten',
         isSupported: false,
+      });
+    });
+
+    it('should get underlying chain id if get network errors', async () => {
+      const getNetworkMock = jest.fn().mockRejectedValue({});
+      const mockProvider = {
+        getNetwork: getNetworkMock,
+      };
+
+      (getUnderlyingChainId as jest.Mock).mockReturnValue(ChainId.SEPOLIA);
+
+      const result = await getNetworkInfo(
+        testCheckoutConfiguration,
+        mockProvider as unknown as Web3Provider,
+      );
+
+      expect(result).toEqual({
+        chainId: ChainId.SEPOLIA,
+        isSupported: true,
       });
     });
   });

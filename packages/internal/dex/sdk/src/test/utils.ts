@@ -1,19 +1,22 @@
 import {
   Currency,
-  Fraction,
-  Percent,
+  CurrencyAmount,
   Token,
   TradeType,
 } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
 import JSBI from 'jsbi';
 import { Pool, Route, TickMath } from '@uniswap/v3-sdk';
+import { SwapRouter } from '@uniswap/router-sdk';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { slippageToFraction } from 'lib/transactionUtils/slippage';
+import { SecondaryFee__factory } from 'contracts/types';
+import { IV3SwapRouter } from 'contracts/types/SecondaryFee';
 import {
   QuoteTradeInfo,
   Router,
+  RoutingContracts,
   SecondaryFee,
+  toBigNumber,
 } from '../lib';
 
 export const TEST_GAS_PRICE = ethers.BigNumber.from('1500000000'); // 1.5 gwei or 1500000000 wei
@@ -25,7 +28,7 @@ export const TEST_RPC_URL = 'https://0.net';
 export const TEST_FROM_ADDRESS = '0x94fC2BcA2E71e26D874d7E937d89ce2c9113af6e';
 export const TEST_FEE_RECIPIENT = '0xe3ece548F1DD4B1536Eb6eE188fE35350bc1dd16';
 
-export const TEST_MAX_FEE_BASIS_POINTS = 1000;
+export const TEST_MAX_FEE_BASIS_POINTS = 1000; // 10%
 
 export const TEST_MULTICALL_ADDRESS = '0x66d0aB680ACEe44308edA2062b910405CC51A190';
 export const TEST_V3_CORE_FACTORY_ADDRESS = '0x23490b262829ACDAD3EF40e555F23d77D1B69e4e';
@@ -35,6 +38,14 @@ export const TEST_V3_MIGRATOR_ADDRESSES = '0x0Df0d2d5Cf4739C0b579C33Fdb3d8B04Bee
 export const TEST_NONFUNGIBLE_POSITION_MANAGER_ADDRESSES = '0x446c78D97b1E78bC35864FC49AcE1f7404F163F6';
 export const TEST_TICK_LENS_ADDRESSES = '0x3aC4F8094b21A6c5945453007d9c52B7e15340c0';
 export const TEST_SECONDARY_FEE_ADDRESS = '0x8dBE1f0900C5e92ad87A54521902a33ba1598C51';
+
+export const TEST_ROUTING_CONTRACTS: RoutingContracts = {
+  factoryAddress: TEST_V3_CORE_FACTORY_ADDRESS,
+  quoterAddress: TEST_QUOTER_ADDRESS,
+  peripheryRouterAddress: TEST_PERIPHERY_ROUTER_ADDRESS,
+  secondaryFeeAddress: TEST_SECONDARY_FEE_ADDRESS,
+  multicallAddress: TEST_MULTICALL_ADDRESS,
+};
 
 export const IMX_TEST_TOKEN = new Token(
   TEST_CHAIN_ID,
@@ -67,28 +78,6 @@ export const FUN_TEST_TOKEN = new Token(
   'FUN',
   'The Fungibles Token',
 );
-
-const exactInputOutputSingleParamTypes = [
-  'address',
-  'address',
-  'uint24',
-  'address',
-  'uint256',
-  'uint256',
-  'uint160',
-];
-
-const exactInputOutputSingleWithFeesParamTypes = [
-  '(address,uint16)[]',
-  '(address,address,uint24,address,uint256,uint256,uint160)',
-];
-
-const exactInputOutWithFeesParamTypes = [
-  '(address,uint16)[]',
-  '(bytes,address,uint256,uint256)',
-];
-
-const multicallParamTypes = ['uint256', 'bytes[]'];
 
 export const TEST_IMMUTABLE_CONFIGURATION: ImmutableConfiguration = new ImmutableConfiguration({
   environment: Environment.SANDBOX,
@@ -131,27 +120,6 @@ export type SwapTest = {
   inputToken: string;
   outputToken: string;
   intermediaryToken: string | undefined;
-  amountIn: ethers.BigNumberish;
-  amountOut: ethers.BigNumberish;
-  minAmountOut: ethers.BigNumberish;
-  maxAmountIn: ethers.BigNumberish;
-};
-
-type ExactInputOutputSingleParams = {
-  tokenIn: string;
-  tokenOut: string;
-  fee: number;
-  recipient: string;
-  firstAmount: ethers.BigNumber;
-  secondAmount: ethers.BigNumber;
-  sqrtPriceLimitX96: ethers.BigNumber;
-};
-
-type ExactInputOutputParams = {
-  path: string;
-  recipient: string;
-  amountIn: ethers.BigNumber;
-  amountOut: ethers.BigNumber;
 };
 
 // uniqBy returns the unique items in an array using the given comparator
@@ -170,7 +138,7 @@ export function uniqBy<K, T extends string | number>(
   return Object.values(uniqArr);
 }
 
-export function decodePath(path: string) {
+export function decodePathForExactInput(path: string) {
   return {
     inputToken: path.substring(0, 42),
     firstPoolFee: ethers.BigNumber.from(parseInt(`0x${path.substring(42, 48)}`, 16)),
@@ -180,111 +148,154 @@ export function decodePath(path: string) {
   };
 }
 
-function decodeParams(calldata: ethers.utils.BytesLike, paramTypes: string[]) {
-  // eslint-disable-next-line no-param-reassign
-  const data = ethers.utils.hexDataSlice(calldata, 4);
-
-  const topLevelParams = ethers.utils.defaultAbiCoder.decode(
-    multicallParamTypes,
-    data,
-  );
-
-  const decodedParams = ethers.utils.defaultAbiCoder
-    .decode(paramTypes, ethers.utils.hexDataSlice(topLevelParams[1][0], 4));
-
-  return { topLevelParams, decodedParams };
+export function decodePathForExactOutput(path: string) {
+  return {
+    outputToken: path.substring(0, 42),
+    firstPoolFee: ethers.BigNumber.from(parseInt(`0x${path.substring(42, 48)}`, 16)),
+    intermediaryToken: `0x${path.substring(48, 88)}`,
+    secondPoolFee: ethers.BigNumber.from(parseInt(`0x${path.substring(88, 94)}`, 16)),
+    inputToken: `0x${path.substring(94, 134)}`,
+  };
 }
 
-export function decodeMulticallExactInputOutputWithFees(data: ethers.utils.BytesLike) {
-  const { topLevelParams, decodedParams } = decodeParams(data, exactInputOutWithFeesParamTypes);
+type SecondaryFeeFunctionName = 'exactInputSingleWithServiceFee' |
+'exactOutputSingleWithServiceFee' |
+'exactInputWithServiceFee' |
+'exactOutputWithServiceFee';
 
-  const secondaryFeeParams: SecondaryFee[] = [];
+type SwapRouterFunctionName = 'exactInputSingle' | 'exactOutputSingle';
 
-  for (let i = 0; i < decodedParams[0].length; i++) {
-    secondaryFeeParams.push({
-      feeRecipient: decodedParams[0][i][0],
-      feeBasisPoints: decodedParams[0][i][1],
-    });
-  }
+function decodeSecondaryFeeCall(calldata: ethers.utils.BytesLike, functionName: SecondaryFeeFunctionName) {
+  const iface = SecondaryFee__factory.createInterface();
+  const topLevelParams = iface.decodeFunctionData('multicall(uint256,bytes[])', calldata);
 
-  const multiPoolSwapParams: ExactInputOutputParams = {
+  return iface.decodeFunctionData(
+    functionName,
+    topLevelParams.data[0],
+  );
+}
+
+function decodeSwapRouterCall(calldata: ethers.utils.BytesLike, functionName: SwapRouterFunctionName) {
+  const iface = SwapRouter.INTERFACE;
+  const topLevelParams = iface.decodeFunctionData('multicall(uint256,bytes[])', calldata);
+
+  return iface.decodeFunctionData(
+    functionName,
+    topLevelParams.data[0],
+  );
+}
+
+export function decodeMulticallExactInputWithFees(data: ethers.utils.BytesLike) {
+  const decodedParams = decodeSecondaryFeeCall(data, 'exactInputWithServiceFee');
+
+  const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map((x: [string, number]) => ({
+    feeRecipient: x[0],
+    feeBasisPoints: x[1],
+  }));
+
+  const swapParams: IV3SwapRouter.ExactInputParamsStruct = {
     path: decodedParams[1][0],
     recipient: decodedParams[1][1],
     amountIn: decodedParams[1][2],
-    amountOut: decodedParams[1][3],
+    amountOutMinimum: decodedParams[1][3],
   };
 
-  return { topLevelParams, secondaryFeeParams, swapParams: multiPoolSwapParams };
+  return { secondaryFeeParams, swapParams };
 }
 
-export function decodeMulticallExactInputOutputSingleWithFees(data: ethers.utils.BytesLike) {
-  const { topLevelParams, decodedParams } = decodeParams(data, exactInputOutputSingleWithFeesParamTypes);
+export function decodeMulticallExactOutputWithFees(data: ethers.utils.BytesLike) {
+  const decodedParams = decodeSecondaryFeeCall(data, 'exactOutputWithServiceFee');
 
-  const secondaryFeeParams: SecondaryFee[] = [];
+  const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map((x: [string, number]) => ({
+    feeRecipient: x[0],
+    feeBasisPoints: x[1],
+  }));
 
-  for (let i = 0; i < decodedParams[0].length; i++) {
-    secondaryFeeParams.push({
-      feeRecipient: decodedParams[0][i][0],
-      feeBasisPoints: decodedParams[0][i][1],
-    });
-  }
+  const swapParams: IV3SwapRouter.ExactOutputParamsStruct = {
+    path: decodedParams[1][0],
+    recipient: decodedParams[1][1],
+    amountOut: decodedParams[1][2],
+    amountInMaximum: decodedParams[1][3],
+  };
 
-  const singlePoolSwapParams: ExactInputOutputSingleParams = {
+  return { secondaryFeeParams, swapParams };
+}
+
+export function decodeMulticallExactInputSingleWithFees(data: ethers.utils.BytesLike) {
+  const decodedParams = decodeSecondaryFeeCall(data, 'exactInputSingleWithServiceFee');
+
+  const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map((x: [string, number]) => ({
+    feeRecipient: x[0],
+    feeBasisPoints: x[1],
+  }));
+
+  const swapParams: IV3SwapRouter.ExactInputSingleParamsStruct = {
     tokenIn: decodedParams[1][0],
     tokenOut: decodedParams[1][1],
     fee: decodedParams[1][2],
     recipient: decodedParams[1][3],
-    firstAmount: decodedParams[1][4],
-    secondAmount: decodedParams[1][5],
+    amountIn: decodedParams[1][4],
+    amountOutMinimum: decodedParams[1][5],
     sqrtPriceLimitX96: decodedParams[1][6],
   };
 
-  return { topLevelParams, secondaryFeeParams, swapParams: singlePoolSwapParams };
+  return { secondaryFeeParams, swapParams };
 }
 
-export function decodeMulticallExactInputOutputSingleWithoutFees(data: ethers.utils.BytesLike) {
-  const { topLevelParams, decodedParams } = decodeParams(data, exactInputOutputSingleParamTypes);
+export function decodeMulticallExactOutputSingleWithFees(data: ethers.utils.BytesLike) {
+  const decodedParams = decodeSecondaryFeeCall(data, 'exactOutputSingleWithServiceFee');
 
-  const swapParams: ExactInputOutputSingleParams = {
-    tokenIn: decodedParams[0],
-    tokenOut: decodedParams[1],
-    fee: decodedParams[2],
-    recipient: decodedParams[3],
-    firstAmount: decodedParams[4],
-    secondAmount: decodedParams[5],
-    sqrtPriceLimitX96: decodedParams[6],
+  const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map((x: [string, number]) => ({
+    feeRecipient: x[0],
+    feeBasisPoints: x[1],
+  }));
+
+  const swapParams: IV3SwapRouter.ExactOutputSingleParamsStruct = {
+    tokenIn: decodedParams[1][0],
+    tokenOut: decodedParams[1][1],
+    fee: decodedParams[1][2],
+    recipient: decodedParams[1][3],
+    amountOut: decodedParams[1][4],
+    amountInMaximum: decodedParams[1][5],
+    sqrtPriceLimitX96: decodedParams[1][6],
   };
 
-  return { topLevelParams, swapParams };
+  return { secondaryFeeParams, swapParams };
 }
 
-export function getMinimumAmountOut(
-  slippageTolerance: Percent,
-  amountOut: ethers.BigNumber,
-): ethers.BigNumber {
-  const amountOutJsbi = JSBI.BigInt(amountOut.toString());
-  // amountOut / (1 + slippagePercentage)
-  const slippageAdjustedAmountOut = new Fraction(JSBI.BigInt(1))
-    .add(slippageTolerance)
-    .invert()
-    .multiply(amountOutJsbi).quotient;
-  return ethers.BigNumber.from(slippageAdjustedAmountOut.toString());
+export function decodeMulticallExactInputSingleWithoutFees(data: ethers.utils.BytesLike) {
+  const decodedParams = decodeSwapRouterCall(data, 'exactInputSingle');
+
+  const swapParams: IV3SwapRouter.ExactInputSingleParamsStruct = {
+    tokenIn: decodedParams[0][0],
+    tokenOut: decodedParams[0][1],
+    fee: decodedParams[0][2],
+    recipient: decodedParams[0][3],
+    amountIn: decodedParams[0][4],
+    amountOutMinimum: decodedParams[0][5],
+    sqrtPriceLimitX96: decodedParams[0][6],
+  };
+
+  return { swapParams };
 }
 
-export function getMaximumAmountIn(
-  slippageTolerance: Percent,
-  amountIn: ethers.BigNumber,
-): ethers.BigNumber {
-  const amountInJsbi = JSBI.BigInt(amountIn.toString());
-  // (1 + slippagePercent) * amount
-  const slippageAdjustedAmountIn = new Fraction(JSBI.BigInt(1))
-    .add(slippageTolerance)
-    .multiply(amountInJsbi).quotient;
-  return ethers.BigNumber.from(slippageAdjustedAmountIn.toString());
+export function decodeMulticallExactOutputSingleWithoutFees(data: ethers.utils.BytesLike) {
+  const decodedParams = decodeSwapRouterCall(data, 'exactOutputSingle');
+
+  const swapParams: IV3SwapRouter.ExactOutputSingleParamsStruct = {
+    tokenIn: decodedParams[0][0],
+    tokenOut: decodedParams[0][1],
+    fee: decodedParams[0][2],
+    recipient: decodedParams[0][3],
+    amountOut: decodedParams[0][4],
+    amountInMaximum: decodedParams[0][5],
+    sqrtPriceLimitX96: decodedParams[0][6],
+  };
+
+  return { swapParams };
 }
 
-export function setupSwapTxTest(slippage: number, multiPoolSwap: boolean = false): SwapTest {
-  const slippageFraction = slippageToFraction(slippage);
+export function setupSwapTxTest(multiPoolSwap: boolean = false): SwapTest {
   const fromAddress = TEST_FROM_ADDRESS;
 
   const arbitraryTick = 100;
@@ -294,12 +305,6 @@ export function setupSwapTxTest(slippage: number, multiPoolSwap: boolean = false
   const tokenIn: Token = new Token(TEST_CHAIN_ID, IMX_TEST_TOKEN.address, 18);
   const intermediaryToken: Token = new Token(TEST_CHAIN_ID, FUN_TEST_TOKEN.address, 18);
   const tokenOut: Token = new Token(TEST_CHAIN_ID, WETH_TEST_TOKEN.address, 18);
-
-  const amountIn = ethers.utils.parseEther('0.0000123');
-  const amountOut = ethers.utils.parseEther('10000');
-
-  const minAmountOut = getMinimumAmountOut(slippageFraction, amountOut);
-  const maxAmountIn = getMaximumAmountIn(slippageFraction, amountIn);
 
   const fee = 10000;
 
@@ -349,49 +354,72 @@ export function setupSwapTxTest(slippage: number, multiPoolSwap: boolean = false
     inputToken: tokenIn.address,
     intermediaryToken: multiPoolSwap ? intermediaryToken.address : undefined,
     outputToken: tokenOut.address,
-    amountIn,
-    amountOut,
-    minAmountOut,
-    maxAmountIn,
   };
 }
 
-export function mockRouterImplementation(
-  params: SwapTest,
-  tradeType: TradeType,
-) {
+type MockParams = {
+  chainId: number;
+  inputToken: string;
+  outputToken: string;
+  pools: Pool[];
+  exchangeRate?: number;
+};
+
+export function mockRouterImplementation(params: MockParams) {
+  const exchangeRate = params.exchangeRate ?? 10;
+  const findOptimalRoute = jest.fn((
+    amountSpecified: CurrencyAmount<Currency>,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    otherCurrency: Currency,
+    tradeType: TradeType,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    secondaryFees: SecondaryFee[],
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    maxHops: number,
+  ) => {
+    const tokenIn: Token = new Token(params.chainId, params.inputToken, 18);
+    const tokenOut: Token = new Token(
+      params.chainId,
+      params.outputToken,
+      18,
+    );
+
+    const route = new Route(
+      params.pools,
+      tokenIn,
+      tokenOut,
+    );
+
+    const amountIn = tradeType === TradeType.EXACT_INPUT
+      ? toBigNumber(amountSpecified) : toBigNumber(amountSpecified).div(exchangeRate);
+
+    const amountOut = tradeType === TradeType.EXACT_INPUT
+      ? toBigNumber(amountSpecified).mul(exchangeRate) : toBigNumber(amountSpecified);
+
+    const trade: QuoteTradeInfo = {
+      route,
+      amountIn,
+      tokenIn,
+      amountOut,
+      tokenOut,
+      tradeType,
+      gasEstimate: TEST_TRANSACTION_GAS_USAGE,
+    };
+
+    return trade;
+  });
+
   (Router as unknown as jest.Mock).mockImplementationOnce(() => ({
-    routingContracts: {
-      peripheryRouterAddress: TEST_PERIPHERY_ROUTER_ADDRESS,
-      secondaryFeeAddress: TEST_SECONDARY_FEE_ADDRESS,
-    },
-    findOptimalRoute: () => {
-      const tokenIn: Token = new Token(params.chainId, params.inputToken, 18);
-      const tokenOut: Token = new Token(
-        params.chainId,
-        params.outputToken,
-        18,
-      );
-
-      const route: Route<Currency, Currency> = new Route(
-        params.pools,
-        tokenIn,
-        tokenOut,
-      );
-
-      const trade: QuoteTradeInfo = {
-        route,
-        amountIn: ethers.BigNumber.from(params.amountIn),
-        tokenIn,
-        amountOut: ethers.BigNumber.from(params.amountOut),
-        tokenOut,
-        tradeType,
-        gasEstimate: TEST_TRANSACTION_GAS_USAGE,
-      };
-
-      return {
-        trade,
-      };
-    },
+    routingContracts: TEST_ROUTING_CONTRACTS,
+    findOptimalRoute,
   }));
+
+  return findOptimalRoute;
+}
+
+// expectToBeDefined ensures that a variable is not null or undefined, while
+// also narrowing its type.
+export function expectToBeDefined <T>(x: T): asserts x is NonNullable<T> {
+  expect(x).toBeDefined();
+  expect(x).not.toBeNull();
 }
