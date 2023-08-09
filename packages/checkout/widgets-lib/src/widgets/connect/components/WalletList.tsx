@@ -1,4 +1,4 @@
-import { Box } from '@biom3/react';
+import { Box, Button } from '@biom3/react';
 import {
   WalletFilterTypes,
   WalletFilter,
@@ -6,6 +6,7 @@ import {
   WalletProviderName,
 } from '@imtbl/checkout-sdk';
 import { useContext, useState, useEffect } from 'react';
+import { Web3Provider } from '@ethersproject/providers';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { ConnectContext, ConnectActions } from '../context/ConnectContext';
 import { WalletItem } from './WalletItem';
@@ -24,7 +25,7 @@ export function WalletList(props: WalletListProps) {
   const { walletFilterTypes, excludeWallets } = props;
   const {
     connectDispatch,
-    connectState: { checkout },
+    connectState: { checkout, passport },
   } = useContext(ConnectContext);
   const { viewDispatch } = useContext(ViewContext);
   const [wallets, setWallets] = useState<WalletInfo[]>([]);
@@ -76,6 +77,31 @@ export function WalletList(props: WalletListProps) {
     }
   };
 
+  const connectWithPassport = () => {
+    if (!passport) return;
+    // @ts-ignore TODO ID-926 Remove once method is public
+    const passportZkEvmProvider = passport?.connectEvm();
+    const passportWeb3Provider = new Web3Provider(passportZkEvmProvider);
+    connectDispatch({
+      payload: {
+        type: ConnectActions.SET_PROVIDER,
+        provider: passportWeb3Provider,
+      },
+    });
+    connectDispatch({
+      payload: {
+        type: ConnectActions.SET_WALLET_PROVIDER_NAME,
+        walletProviderName: 'passport' as WalletProviderName,
+      },
+    });
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: { type: ConnectWidgetViews.READY_TO_CONNECT },
+      },
+    });
+  };
+
   return (
     <Box
       testId="wallet-list"
@@ -87,6 +113,7 @@ export function WalletList(props: WalletListProps) {
         alignItems: 'flex-start',
       }}
     >
+      {passport && <Button onClick={connectWithPassport}>CONNECT WITH PASSPORT</Button>}
       {wallets.map((wallet) => (
         <WalletItem
           onWalletClick={onWalletClick}

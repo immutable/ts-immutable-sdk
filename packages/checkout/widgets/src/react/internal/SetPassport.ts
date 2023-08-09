@@ -1,13 +1,12 @@
-import { Web3Provider } from '@ethersproject/providers';
 import { CheckoutWidgetTagNames } from '../../definitions/types';
 
-export function SetProvider(
+export function SetPassport(
   tagName: CheckoutWidgetTagNames,
-  provider: Web3Provider | null,
+  passport: any,
 ) {
-  if (!provider) {
+  if (!passport) {
     // eslint-disable-next-line no-console
-    console.error('no provider parsed');
+    console.error('no passport');
     return;
   }
   if (window === undefined) {
@@ -20,23 +19,22 @@ export function SetProvider(
   const maxAttempts = 10;
   let timer: number;
 
-  const attemptToSetProvider = () => {
+  const attemptToSetPassport = () => {
     try {
       const elements = document.getElementsByTagName(tagName);
       const widget = elements[0] as unknown as ImmutableWebComponent;
-      console.log('widget for SetProvider', widget);
-      widget.setProvider(provider);
+      widget.setPassport(passport);
       window.clearInterval(timer);
     } catch (err) {
       attempts++;
       if (attempts >= maxAttempts) {
         window.clearInterval(timer);
         // eslint-disable-next-line no-console
-        console.error('failed to set the provider');
+        console.error('failed to set the passport');
       }
     }
   };
 
-  timer = window.setInterval(attemptToSetProvider, 10);
-  attemptToSetProvider();
+  timer = window.setInterval(attemptToSetPassport, 10);
+  attemptToSetPassport();
 }

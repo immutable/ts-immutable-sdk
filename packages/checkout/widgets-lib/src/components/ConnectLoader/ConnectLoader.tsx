@@ -46,6 +46,7 @@ export interface ConnectLoaderParams {
   targetLayer?: ConnectTargetLayer;
   walletProvider?: WalletProviderName;
   web3Provider?: Web3Provider;
+  passport?: any;
   allowedChains: ChainId[];
 }
 
@@ -66,7 +67,9 @@ export function ConnectLoader({
   const {
     connectionStatus, deepLink, checkout, provider,
   } = connectLoaderState;
-  const { targetLayer, walletProvider, allowedChains } = params;
+  const {
+    targetLayer, walletProvider, allowedChains, passport,
+  } = params;
   const networkToSwitchTo = targetLayer ?? ConnectTargetLayer.LAYER2;
 
   const biomeTheme: BaseTokens = widgetConfig.theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
@@ -174,7 +177,8 @@ export function ConnectLoader({
 
     (async () => {
       if (!checkout) return;
-      if (!walletProvider && !provider) {
+      const walletName = undefined;
+      if (!walletName && !provider) {
         connectLoaderDispatch({
           payload: {
             type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
@@ -186,9 +190,9 @@ export function ConnectLoader({
       }
 
       try {
-        if (!provider && walletProvider) {
+        if (!provider && walletName) {
           const createProviderResult = await checkout.createProvider({
-            walletProvider,
+            walletProvider: walletName,
           });
           connectLoaderDispatch({
             payload: {
@@ -332,7 +336,9 @@ export function ConnectLoader({
         || connectionStatus === ConnectionStatus.CONNECTED_WRONG_NETWORK) && (
           <ConnectWidget
             config={widgetConfig}
-            params={{ ...params, targetLayer: networkToSwitchTo, web3Provider: provider }}
+            params={{
+              ...params, targetLayer: networkToSwitchTo, web3Provider: provider, passport,
+            }}
             deepLink={deepLink}
             sendCloseEventOverride={closeEvent}
           />

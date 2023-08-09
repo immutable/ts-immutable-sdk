@@ -6,7 +6,7 @@ import {
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../../components/Footer/FooterButton';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
-import { MetamaskConnectHero } from '../../../components/Hero/MetamaskConnectHero';
+import { PassportConnectHero } from '../../../components/Hero/PassportConnectHero';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { text } from '../../../resources/text/textConfig';
@@ -15,6 +15,7 @@ import {
   ViewContext,
   ViewActions,
 } from '../../../context/view-context/ViewContext';
+import { MetamaskConnectHero } from '../../../components/Hero/MetamaskConnectHero';
 
 export interface ReadyToConnectProps {
   targetChainId: ChainId;
@@ -27,6 +28,10 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
   const { viewState: { history }, viewDispatch } = useContext(ViewContext);
   const { body, footer } = text.views[ConnectWidgetViews.READY_TO_CONNECT];
   const [footerButtonText, setFooterButtonText] = useState(footer.buttonText1);
+  const isPassport = useMemo(() => (provider?.provider as any)?.isPassport, [provider]);
+
+  const headingContent = isPassport ? 'Login with Passport' : body.heading;
+  const bodyContent = isPassport ? 'Follow the prompts in the Passport popup to connect' : body.content;
 
   function isConnectWidgetView(view:string) {
     return Object.values(ConnectWidgetViews).includes(view as ConnectWidgetViews);
@@ -97,7 +102,7 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
         />
       )}
       floatHeader
-      heroContent={<MetamaskConnectHero />}
+      heroContent={isPassport ? <PassportConnectHero /> : <MetamaskConnectHero />}
       footer={(
         <FooterButton
           actionText={footerButtonText}
@@ -105,7 +110,7 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
         />
       )}
     >
-      <SimpleTextBody heading={body.heading}>{body.content}</SimpleTextBody>
+      <SimpleTextBody heading={headingContent}>{bodyContent}</SimpleTextBody>
     </SimpleLayout>
   );
 }

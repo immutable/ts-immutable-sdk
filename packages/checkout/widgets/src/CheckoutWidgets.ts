@@ -83,7 +83,9 @@ export function CheckoutWidgets(config?: CheckoutWidgetsConfig) {
   checkoutWidgetJS.setAttribute('src', cdnUrl);
 
   document.head.appendChild(checkoutWidgetJS);
+
   window.ImtblCheckoutWidgetConfig = JSON.stringify(config);
+  // window.ImtblCheckoutWidgetConfig = config;
 }
 
 /**
@@ -99,6 +101,7 @@ export function UpdateConfig(config: CheckoutWidgetsConfig) {
     console.error('missing document object: please run Checkout client side');
     return;
   }
-
   window.ImtblCheckoutWidgetConfig = JSON.stringify(config);
+
+  // window.ImtblCheckoutWidgetConfig = config;
 }

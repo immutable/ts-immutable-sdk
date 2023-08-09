@@ -3,6 +3,7 @@ import { WalletProviderName } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { SetProvider } from './internal/SetProvider';
 import { CheckoutWidgetTagNames } from '../definitions/types';
+import { SetPassport } from './internal/SetPassport';
 
 /**
  * Interface representing the props for the Wallet Widget component.
@@ -13,6 +14,7 @@ import { CheckoutWidgetTagNames } from '../definitions/types';
 export interface WalletReactProps {
   walletProvider?: WalletProviderName;
   provider?: Web3Provider;
+  passport?: any
 }
 
 /**
@@ -24,13 +26,17 @@ export function WalletReact(props: WalletReactProps): JSX.Element {
   const {
     walletProvider,
     provider,
+    passport,
   } = props;
 
   useEffect(() => {
     if (provider) {
       SetProvider(CheckoutWidgetTagNames.WALLET, provider);
     }
-  }, [provider]);
+    if (passport) {
+      SetPassport(CheckoutWidgetTagNames.WALLET, passport);
+    }
+  }, [provider, passport]);
 
   const config = window.ImtblCheckoutWidgetConfig;
 

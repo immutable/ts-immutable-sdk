@@ -152,6 +152,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
       setActionDisabled(false);
       setShowSwapTxnStep(true);
     } catch (err: any) {
+      console.log(err);
       setApprovalTxnLoading(false);
       setActionDisabled(false);
       if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {

@@ -34,6 +34,7 @@ export class ImmutableWallet extends ImmutableWebComponent {
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER2,
       walletProvider: this.walletProvider,
+      passport: this.passport,
       web3Provider: this.provider,
       allowedChains: [
         getL1ChainId(this.checkout!.config),

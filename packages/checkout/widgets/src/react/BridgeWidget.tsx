@@ -3,6 +3,7 @@ import { WalletProviderName } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { SetProvider } from './internal/SetProvider';
 import { CheckoutWidgetTagNames } from '../definitions/types';
+import { SetPassport } from './internal/SetPassport';
 
 /**
  * Interface representing the props for the Bridge Widget component.
@@ -17,6 +18,7 @@ export interface BridgeReactProps {
   provider?: Web3Provider;
   fromContractAddress?: string;
   amount?: string;
+  passport?: any;
 }
 
 /**
@@ -30,13 +32,17 @@ export function BridgeReact(props: BridgeReactProps): JSX.Element {
     fromContractAddress,
     amount,
     provider,
+    passport,
   } = props;
 
   useEffect(() => {
     if (provider) {
       SetProvider(CheckoutWidgetTagNames.BRIDGE, provider);
     }
-  }, [provider]);
+    if (passport) {
+      SetPassport(CheckoutWidgetTagNames.BRIDGE, passport);
+    }
+  }, [provider, passport]);
 
   const config = window.ImtblCheckoutWidgetConfig;
 

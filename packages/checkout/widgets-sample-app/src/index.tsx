@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
@@ -11,6 +11,8 @@ import BridgeUI from './components/ui/bridge/bridge';
 import { Marketplace } from './components/ui/marketplace-orchestrator';
 import { BiomeCombinedProviders } from '@biom3/react';
 import { onDarkBase } from '@biom3/design-tokens';
+import { LoginCallback } from './components/ui/marketplace-orchestrator/LoginCallback';
+import { WidgetProvider } from './components/ui/marketplace-orchestrator/WidgetProvider';
 
 const router = createBrowserRouter([
   {
@@ -37,6 +39,10 @@ const router = createBrowserRouter([
     path: '/marketplace-orchestrator',
     element: <BiomeCombinedProviders theme={{base: onDarkBase}}><Marketplace /></BiomeCombinedProviders>,
   },
+  {
+    path: '/marketplace-orchestrator/login/callback',
+    element: <LoginCallback />
+  },
 ]);
 
 const root = ReactDOM.createRoot(
@@ -44,7 +50,7 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+      <RouterProvider router={router} />
   </React.StrictMode>
 );
 

@@ -56,5 +56,5 @@ export function useConnectWidget(setWeb3Provider: (val: Web3Provider) => void) {
         handleConnectEvent
       );
     };
-  }, [showConnect, showWallet, showBridge, showSwap]);
+  }, [showConnect, showWallet, showBridge, showSwap, setWeb3Provider]);
 }
