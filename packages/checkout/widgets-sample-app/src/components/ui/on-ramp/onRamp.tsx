@@ -28,18 +28,23 @@ export function OnRampUI() {
   // },[]);
 
   useEffect(() => {
-    const domIframe:HTMLIFrameElement = document.getElementsByTagName("iframe")[0];
+    const domIframe:HTMLIFrameElement = document.getElementById("transak-iframe") as HTMLIFrameElement;
 
     if(domIframe == undefined) return;
 
-    console.log('useeffect passed check for iframe domElement');
-    window.addEventListener("message", function(event) {
+    const handler = (event: any) => {
       if (event.source === domIframe.contentWindow) {
         if (event.origin === "https://global-stg.transak.com") {
           console.log('TRANSAK event listener: ',event.data);
         }
       }
-    });
+    };
+    
+    console.log('useeffect passed check for iframe domElement');
+    window.addEventListener("message", handler);
+    return ()=>{
+      window.removeEventListener("message", handler)
+    }
   }, []);
 
 
