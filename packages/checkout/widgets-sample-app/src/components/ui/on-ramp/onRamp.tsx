@@ -35,13 +35,18 @@ export function OnRampUI() {
     const handler = (event: any) => {
       if (event.source === domIframe.contentWindow) {
         if (event.origin === "https://global-stg.transak.com") {
-          console.log('TRANSAK event listener: ',event.data);
+          console.log('TRANSAK event data: ',event.data);
         }
       }
     };
     
     console.log('useeffect passed check for iframe domElement');
     window.addEventListener("message", handler);
+
+    window.addEventListener("blur", (event) => {
+      console.log('event:',event);
+    });
+
     return ()=>{
       window.removeEventListener("message", handler)
     }
@@ -50,7 +55,7 @@ export function OnRampUI() {
 
   return (
     <BiomeCombinedProviders theme={{ base: onDarkBase }}>
-      <Box style={{position: 'relative', width: '500px', height: '80dvh',
+      <Box style={{position: 'relative', width: '400px', height: '500px',
         boxShadow: '0 0 15px #1461db', borderRadius: '15px', overflow: 'hidden'}}>
         <iframe id="transak-iframe"
           src="https://global-stg.transak.com?apiKey=41ad2da7-ed5a-4d89-a90b-c751865effc2&environment=staging"
