@@ -34,5 +34,5 @@ jobs:
         run: yarn docs:build
 
       - name: Create SDK Docs PR
-        run: ./.github/scripts/push-docs-pr.sh
+        run: GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} ./.github/scripts/push-docs-pr.sh
         shell: bash
