@@ -20,7 +20,7 @@ CLONE_DIR=$(mktemp -d)
 echo "CLONE_DIR: $CLONE_DIR"
 
 echo "Cloning destination git repository"
-git clone "https://$GITHUB_TOKEN@github.com/$INPUT_DESTINATION_REPO.git" "$CLONE_DIR"
+git clone "https://github.com/$INPUT_DESTINATION_REPO.git" "$CLONE_DIR"
 
 echo "Copying contents to git repo"
 mkdir -p $CLONE_DIR/$INPUT_DESTINATION_FOLDER/
