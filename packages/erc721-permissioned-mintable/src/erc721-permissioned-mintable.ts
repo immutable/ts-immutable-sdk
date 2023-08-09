@@ -11,7 +11,16 @@ import {
   ImmutableERC721PermissionedMintable,
   ImmutableERC721PermissionedMintable__factory,
 } from '@imtbl/contracts';
+import {
+  ImmutableERC721Base,
+} from '@imtbl/contracts/dist/typechain/types/ImmutableERC721PermissionedMintable';
 import { PromiseOrValue } from '@imtbl/contracts/dist/typechain/types/common';
+
+// Struct for specifying token IDs to mint to an address.
+export type IDMint = ImmutableERC721Base.IDMintStruct;
+
+// Struct for transferring multiple tokens between two addresses.
+export type TransferRequest = ImmutableERC721Base.TransferRequestStruct;
 
 export class ERC721PermissionedMintable {
   private readonly contract: ImmutableERC721PermissionedMintable;
@@ -221,31 +230,6 @@ export class ERC721PermissionedMintable {
   }
 
   /**
-   * @returns a token ID at a given index of all the tokens stored by the contract.
-   */
-  public async tokenByIndex(
-    provider: Provider,
-    index: PromiseOrValue<BigNumberish>,
-    overrides: CallOverrides = {},
-  ): Promise<BigNumber> {
-    return await this.contract.connect(provider).tokenByIndex(index, overrides);
-  }
-
-  /**
-   * @returns a token ID owned by owner at a given index of its token list.
-   */
-  public async tokenOfOwnerByIndex(
-    provider: Provider,
-    owner: PromiseOrValue<string>,
-    index: PromiseOrValue<BigNumberish>,
-    overrides: CallOverrides = {},
-  ): Promise<BigNumber> {
-    return await this.contract
-      .connect(provider)
-      .tokenOfOwnerByIndex(owner, index, overrides);
-  }
-
-  /**
    * @returns the Uniform Resource Identifier (URI) for tokenId token.
    */
   public async tokenURI(
@@ -300,6 +284,18 @@ export class ERC721PermissionedMintable {
   }
 
   /**
+   * @returns a populated transaction for the batch burn contract function
+   */
+  public async populateBurnBatch(
+    tokenIds: PromiseOrValue<BigNumberish>[],
+    overrides: Overrides & {
+      from?: PromiseOrValue<string>;
+    } = {},
+  ): Promise<PopulatedTransaction> {
+    return await this.contract.populateTransaction.burnBatch(tokenIds, overrides);
+  }
+
+  /**
    * @returns a populated transaction for the grantMinterRole contract function
    */
   public async populateGrantMinterRole(
@@ -336,12 +332,24 @@ export class ERC721PermissionedMintable {
    */
   public async populateMint(
     to: PromiseOrValue<string>,
-    amount: PromiseOrValue<BigNumberish>,
+    tokenId: PromiseOrValue<BigNumberish>,
     overrides: Overrides & {
       from?: PromiseOrValue<string>;
     } = {},
   ): Promise<PopulatedTransaction> {
-    return await this.contract.populateTransaction.mint(to, amount, overrides);
+    return await this.contract.populateTransaction.mint(to, tokenId, overrides);
+  }
+
+  /**
+   * @returns a populated transaction for the batch mint contract function
+   */
+  public async populateSafeMintBatch(
+    mints: IDMint[],
+    overrides: Overrides & {
+      from?: PromiseOrValue<string>;
+    } = {},
+  ): Promise<PopulatedTransaction> {
+    return await this.contract.populateTransaction.safeMintBatch(mints, overrides);
   }
 
   /**
@@ -391,6 +399,18 @@ export class ERC721PermissionedMintable {
       account,
       overrides,
     );
+  }
+
+  /**
+   * @returns a populated transaction for the batch save transfer from function
+   */
+  public async populateSafeTransferFromBatch(
+    transfers: TransferRequest,
+    overrides: Overrides & {
+      from?: PromiseOrValue<string>;
+    } = {},
+  ): Promise<PopulatedTransaction> {
+    return await this.contract.populateTransaction.safeTransferFromBatch(transfers, overrides);
   }
 
   /**
@@ -469,6 +489,61 @@ export class ERC721PermissionedMintable {
   ): Promise<PopulatedTransaction> {
     return await this.contract.populateTransaction.setContractURI(
       _contractURI,
+      overrides,
+    );
+  }
+
+  /**
+   * @returns a populated transaction for the setDefaultRoyaltyReceiver contract function
+   */
+  public async populateSetDefaultRoyaltyReceiver(
+    receiver: PromiseOrValue<string>,
+    feeNumerator: PromiseOrValue<BigNumberish>,
+    overrides: Overrides & {
+      from?: PromiseOrValue<string>;
+    } = {},
+  ): Promise<PopulatedTransaction> {
+    return await this.contract.populateTransaction.setDefaultRoyaltyReceiver(
+      receiver,
+      feeNumerator,
+      overrides,
+    );
+  }
+
+  /**
+   * @returns a populated transaction for the setNFTRoyaltyReceiver contract function
+   */
+  public async populateSetNFTRoyaltyReceiver(
+    tokenId: PromiseOrValue<BigNumberish>,
+    receiver: PromiseOrValue<string>,
+    feeNumerator: PromiseOrValue<BigNumberish>,
+    overrides: Overrides & {
+      from?: PromiseOrValue<string>;
+    } = {},
+  ): Promise<PopulatedTransaction> {
+    return await this.contract.populateTransaction.setNFTRoyaltyReceiver(
+      tokenId,
+      receiver,
+      feeNumerator,
+      overrides,
+    );
+  }
+
+  /**
+   * @returns a populated transaction for the setNFTRoyaltyReceiverBatch contract function
+   */
+  public async populateSetNFTRoyaltyReceiverBatch(
+    tokenIds: PromiseOrValue<BigNumberish>[],
+    receiver: PromiseOrValue<string>,
+    feeNumerator: PromiseOrValue<BigNumberish>,
+    overrides: Overrides & {
+      from?: PromiseOrValue<string>;
+    } = {},
+  ): Promise<PopulatedTransaction> {
+    return await this.contract.populateTransaction.setNFTRoyaltyReceiverBatch(
+      tokenIds,
+      receiver,
+      feeNumerator,
       overrides,
     );
   }
