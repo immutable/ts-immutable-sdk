@@ -45,11 +45,9 @@ then
   echo "Pushing git commit"
   git push -u origin HEAD:$INPUT_DESTINATION_HEAD_BRANCH
   echo "Creating a pull request"
-  gh pr create -t $INPUT_DESTINATION_HEAD_BRANCH \
-               -b $INPUT_DESTINATION_HEAD_BRANCH \
-               -B $INPUT_DESTINATION_BASE_BRANCH \
-               -H $INPUT_DESTINATION_HEAD_BRANCH \
-               -r $GITHUB_ACTOR
+  gh pr create --title "Release SDK reference docs $VERSION" \
+               --body "Released from ts-immutable-sdk" \
+               --reviewer "$GITHUB_ACTOR"
 else
   echo "No changes detected"
 fi
