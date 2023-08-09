@@ -39,15 +39,5 @@ jobs:
           echo "DOCS_VERSION=$(jq -r .version package.json)" >> $GITHUB_ENV
 
       - name: Create SDK Docs PR
-        uses: CodeSchwert/action-pull-request-another-repo:0.0.1
-        env:
-          API_TOKEN_GITHUB: ${{ secrets.PLATFORM_SA_GITHUB_TOKEN }}
-        with:
-          source_folder: './docs/'
-          destination_repo: 'immutable/imx-docs'
-          destination_folder: 'api-docs/sdk-references/ts-immutable-sdk/${{ env.DOCS_VERSION }}'
-          destination_base_branch: 'main'
-          destination_head_branch: 'ts-immutable-sdk-docs-${{ env.DOCS_VERSION }}'
-          user_email: '${GITHUB_ACTOR}@users.noreply.github.com'
-          user_name: '${GITHUB_ACTOR}'
-          pull_request_reviewers: 'CodeSchwert,carleeto'
+        run: ./.github/scripts/push-docs-pr.sh
+        shell: bash
