@@ -23,6 +23,11 @@ jobs:
           path: imx-docs
           ref: main
 
+      - name: Setup environment variables
+        run: |
+          echo "VERSION=$(cat package.json | jq -r .version)" >> $GITHUB_ENV
+          echo "CLONE_DIR=./imx-docs" >> $GITHUB_ENV
+
       - name: Pending release check
         run: ./.github/scripts/check-pending-release.sh
         shell: bash

@@ -3,8 +3,18 @@
 set -e
 set -x
 
-VERSION=$(cat package.json | jq -r '.version')
-CLONE_DIR="./imx-docs"
+if [ -z "VERSION" ]
+then
+  echo "VERSION is not set"
+  exit 1
+fi
+
+if [ -z "$CLONE_DIR" ]
+then
+  echo "CLONE_DIR is not set"
+  exit 1
+fi
+
 INPUT_DESTINATION_HEAD_BRANCH="ts-immutable-sdk-docs-$VERSION"
 
 cd "$CLONE_DIR"
