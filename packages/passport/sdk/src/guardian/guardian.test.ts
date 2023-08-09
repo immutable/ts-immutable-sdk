@@ -129,4 +129,56 @@ describe('guardian', () => {
       );
     });
   });
+
+  describe('withConfirmationScreenTask', () => {
+    const guardianClient = new GuardianClient({
+      accessToken: mockAccessToken,
+      imxPublicApiDomain: mockImxPublicApiDomain,
+      confirmationScreen: mockConfirmationScreen,
+      imxEtherAddress: mockEtherAddress,
+    });
+
+    it('should call the task and close the confirmation screen if the task fails', async () => {
+      const mockTask = jest.fn().mockRejectedValueOnce(new Error('Task failed'));
+      await expect(guardianClient.withConfirmationScreenTask()(mockTask)()).rejects.toThrow('Task failed');
+      expect(mockConfirmationScreen.closeWindow).toBeCalledTimes(1);
+    });
+
+    it('should call the task and return the result if the task succeeds', async () => {
+      const mockTask = jest.fn().mockResolvedValueOnce('result');
+      const wrappedTask = guardianClient.withConfirmationScreenTask()(mockTask);
+      await expect(wrappedTask()).resolves.toEqual('result');
+      expect(mockConfirmationScreen.closeWindow).toBeCalledTimes(0);
+    });
+
+    describe('withConfirmationScreen', () => {
+      it('should call the task and close the confirmation screen if the task fails', async () => {
+        const mockTask = jest.fn().mockRejectedValueOnce(new Error('Task failed'));
+        await expect(guardianClient.withConfirmationScreen()(mockTask)).rejects.toThrow('Task failed');
+        expect(mockConfirmationScreen.closeWindow).toBeCalledTimes(1);
+      });
+
+      it('should call the task and return the result if the task succeeds', async () => {
+        const mockTask = jest.fn().mockResolvedValueOnce('result');
+        const promise = guardianClient.withConfirmationScreen()(mockTask);
+        await expect(promise).resolves.toEqual('result');
+        expect(mockConfirmationScreen.closeWindow).toBeCalledTimes(0);
+      });
+    });
+
+    describe('withDefaultConfirmationScreenTask', () => {
+      it('should call the task and close the confirmation screen if the task fails', async () => {
+        const mockTask = jest.fn().mockRejectedValueOnce(new Error('Task failed'));
+        await expect(guardianClient.withDefaultConfirmationScreenTask(mockTask)()).rejects.toThrow('Task failed');
+        expect(mockConfirmationScreen.closeWindow).toBeCalledTimes(1);
+      });
+
+      it('should call the task and return the result if the task succeeds', async () => {
+        const mockTask = jest.fn().mockResolvedValueOnce('result');
+        const wrappedTask = guardianClient.withDefaultConfirmationScreenTask(mockTask);
+        await expect(wrappedTask()).resolves.toEqual('result');
+        expect(mockConfirmationScreen.closeWindow).toBeCalledTimes(0);
+      });
+    });
+  });
 });
