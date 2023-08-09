@@ -17,11 +17,6 @@ else
   PULL_REQUEST_REVIEWERS='-r '$INPUT_PULL_REQUEST_REVIEWERS
 fi
 
-# echo "CLONE_DIR: $CLONE_DIR"
-# echo "Cloning destination git repository"
-# # git clone "https://github.com/$INPUT_DESTINATION_REPO.git" "$CLONE_DIR"
-# git clone "https://oauth2:$GITHUB_TOKEN@github.com/$INPUT_DESTINATION_REPO.git" "$CLONE_DIR"
-
 echo "Copying contents to git repo"
 mkdir -p $INPUT_DESTINATION_FOLDER
 
