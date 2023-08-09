@@ -9,9 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- @imtbl/erc721-permissioned-mintable: Preset contract changes: Added `safeMintBatch` and `burnBatch` to support batch operations.
+
 ### Fixed
 
 ### Changed
+
+- @imtbl/erc721-permissioned-mintable: Preset contract changes: Modified mint method to specify token IDs instead of number of tokens to mint.
+- Modules are now exported under their own namespaces instead of being flattened
 
 ### Removed
 
