@@ -17,6 +17,17 @@ export default function App() {
           streamlined experience for your digital asset needs.
         </MenuItem.Caption>
       </MenuItem>
+      <MenuItem
+        renderContainer={(props) => <a {...props} href="/smart-checkout" />}
+        emphasized
+        size="medium"
+      >
+        <MenuItem.IntentIcon icon="ArrowForward" />
+        <MenuItem.Label>Smart Checkout</MenuItem.Label>
+        <MenuItem.Caption>
+          Test smart checkout functionality.
+        </MenuItem.Caption>
+      </MenuItem>
     </>
   );
 }

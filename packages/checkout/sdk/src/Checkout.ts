@@ -10,6 +10,7 @@ import * as wallet from './wallet';
 import * as network from './network';
 import * as transaction from './transaction';
 import * as gasEstimatorService from './gasEstimate';
+import * as buy from './buy';
 import {
   ChainId,
   CheckConnectionParams,
@@ -42,6 +43,7 @@ import {
 } from './types';
 import { CheckoutConfiguration } from './config';
 import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
+import { BuyParams } from './types/buy';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
@@ -256,6 +258,18 @@ export class Checkout {
       } as ValidateProviderOptions,
     );
     return await network.getNetworkInfo(this.config, web3Provider);
+  }
+
+  public async buy(
+    params: BuyParams,
+  ): Promise<any> {
+    console.warn('This endpoint is currently under construction.');
+
+    const web3Provider = await provider.validateProvider(
+      this.config,
+      params.provider,
+    );
+    return await buy.buy(web3Provider, params.orderId);
   }
 
   /**
