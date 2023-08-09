@@ -8,7 +8,7 @@ CLONE_DIR="./imx-docs"
 INPUT_SOURCE_FOLDER="./docs/"
 INPUT_DESTINATION_REPO="immutable/imx-docs"
 INPUT_DESTINATION_HEAD_BRANCH="ts-immutable-sdk-docs-$VERSION"
-INPUT_DESTINATION_FOLDER="imx-docs/api-docs/sdk-references/ts-immutable-sdk/$VERSION"
+INPUT_DESTINATION_FOLDER="$CLONE_DIR/api-docs/sdk-references/ts-immutable-sdk/$VERSION"
 
 if [ -z "$INPUT_PULL_REQUEST_REVIEWERS" ]
 then
@@ -16,7 +16,6 @@ then
 else
   PULL_REQUEST_REVIEWERS='-r '$INPUT_PULL_REQUEST_REVIEWERS
 fi
-
 
 # echo "CLONE_DIR: $CLONE_DIR"
 # echo "Cloning destination git repository"
