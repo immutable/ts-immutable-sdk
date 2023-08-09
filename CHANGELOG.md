@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- @imtbl/passport: Fixed a bug where the guardian popup was not closing if pre-requisite API calls failed.
+
 ### Changed
 
 - @imtbl/erc721-permissioned-mintable: Preset contract changes: Modified mint method to specify token IDs instead of number of tokens to mint.
