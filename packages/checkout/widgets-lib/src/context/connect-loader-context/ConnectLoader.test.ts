@@ -1,7 +1,12 @@
 import { describe, expect } from '@jest/globals';
+import { Web3Provider } from '@ethersproject/providers';
+import { Checkout } from '@imtbl/checkout-sdk';
+import { Environment } from '@imtbl/config';
 import {
   ConnectLoaderActions,
   ConnectionStatus,
+  SetCheckoutPayload,
+  SetProviderPayload,
   UpdateConnectionStatusPayload,
   connectLoaderReducer,
   initialConnectLoaderState,
@@ -24,5 +29,31 @@ describe('connect-loader-context', () => {
     expect(state).toEqual({
       connectionStatus: ConnectionStatus.CONNECTED_WITH_NETWORK,
     });
+  });
+
+  it('should update state with checkout when reducer called with SET_CHECKOUT action', () => {
+    const setCheckoutPayload: SetCheckoutPayload = {
+      type: ConnectLoaderActions.SET_CHECKOUT,
+      checkout: new Checkout({
+        baseConfig: { environment: Environment.SANDBOX },
+      }),
+    };
+    expect(initialConnectLoaderState.checkout).toBeUndefined();
+    const { checkout } = connectLoaderReducer(initialConnectLoaderState, {
+      payload: setCheckoutPayload,
+    });
+    expect(checkout).toBeInstanceOf(Checkout);
+  });
+
+  it('should update state with provider when reducer called with SET_PROVIDER action', () => {
+    const setProviderPayload: SetProviderPayload = {
+      type: ConnectLoaderActions.SET_PROVIDER,
+      provider: {} as Web3Provider,
+    };
+    expect(initialConnectLoaderState.provider).toBeUndefined();
+    const { provider } = connectLoaderReducer(initialConnectLoaderState, {
+      payload: setProviderPayload,
+    });
+    expect(provider).toBeDefined();
   });
 });

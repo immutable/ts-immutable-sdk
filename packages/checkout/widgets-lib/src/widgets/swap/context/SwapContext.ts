@@ -1,6 +1,4 @@
-import { Web3Provider } from '@ethersproject/providers';
 import {
-  Checkout,
   WalletProviderName,
   GetBalanceResult,
   NetworkInfo,
@@ -10,9 +8,7 @@ import { Exchange } from '@imtbl/dex-sdk';
 import { createContext } from 'react';
 
 export interface SwapState {
-  checkout: Checkout | null;
   exchange: Exchange | null;
-  provider: Web3Provider | null;
   walletProvider: WalletProviderName | null;
   network: NetworkInfo | null;
   tokenBalances: GetBalanceResult[];
@@ -27,9 +23,7 @@ export interface TopUpFeature {
 }
 
 export const initialSwapState: SwapState = {
-  checkout: null,
   exchange: null,
-  provider: null,
   walletProvider: null,
   network: null,
   tokenBalances: [],
@@ -47,9 +41,7 @@ export interface SwapAction {
 }
 
 type ActionPayload =
-  | SetCheckoutPayload
   | SetExchangePayload
-  | SetProviderPayload
   | SetWalletProviderPayload
   | SetNetworkPayload
   | SetSupportedTopUpPayload
@@ -57,9 +49,7 @@ type ActionPayload =
   | SetAllowedTokensPayload;
 
 export enum SwapActions {
-  SET_CHECKOUT = 'SET_CHECKOUT',
   SET_EXCHANGE = 'SET_EXCHANGE',
-  SET_PROVIDER = 'SET_PROVIDER',
   SET_WALLET_PROVIDER = 'SET_WALLET_PROVIDER',
   SET_NETWORK = 'SET_NETWORK',
   SET_SUPPORTED_TOP_UPS = 'SET_SUPPORTED_TOP_UPS',
@@ -67,19 +57,9 @@ export enum SwapActions {
   SET_ALLOWED_TOKENS = 'SET_ALLOWED_TOKENS',
 }
 
-export interface SetCheckoutPayload {
-  type: SwapActions.SET_CHECKOUT;
-  checkout: Checkout;
-}
-
 export interface SetExchangePayload {
   type: SwapActions.SET_EXCHANGE;
   exchange: Exchange;
-}
-
-export interface SetProviderPayload {
-  type: SwapActions.SET_PROVIDER;
-  provider: Web3Provider;
 }
 
 export interface SetWalletProviderPayload {
@@ -122,20 +102,10 @@ export const swapReducer: Reducer<SwapState, SwapAction> = (
   action: SwapAction,
 ) => {
   switch (action.payload.type) {
-    case SwapActions.SET_CHECKOUT:
-      return {
-        ...state,
-        checkout: action.payload.checkout,
-      };
     case SwapActions.SET_EXCHANGE:
       return {
         ...state,
         exchange: action.payload.exchange,
-      };
-    case SwapActions.SET_PROVIDER:
-      return {
-        ...state,
-        provider: action.payload.provider,
       };
     case SwapActions.SET_WALLET_PROVIDER:
       return {

@@ -4,15 +4,19 @@ import {
 import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { BiomeCombinedProviders } from '@biom3/react';
-import { Web3Provider } from '@ethersproject/providers';
-import { Environment } from '@imtbl/config';
 import { BigNumber } from 'ethers';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
+import { Web3Provider } from '@ethersproject/providers';
+import { Environment } from '@imtbl/config';
 import { WalletBalances } from './WalletBalances';
 import { WalletContext, WalletState } from '../context/WalletContext';
 import { cyIntercept, cySmartGet } from '../../../lib/testUtils';
 import { WalletWidgetTestComponent } from '../test-components/WalletWidgetTestComponent';
 import { orchestrationEvents } from '../../../lib/orchestrationEvents';
+import { ConnectionStatus } from '../../../context/connect-loader-context/ConnectLoaderContext';
+import {
+  ConnectLoaderTestComponent,
+} from '../../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
 
 describe('WalletBalances', () => {
   beforeEach(() => {
@@ -20,27 +24,25 @@ describe('WalletBalances', () => {
     cyIntercept();
   });
 
-  const checkout = new Checkout({
-    baseConfig: { environment: Environment.SANDBOX },
-  });
-
-  const provider = {
-    getSigner: () => ({
-      getAddress: async () => Promise.resolve(''),
+  const connectLoaderState = {
+    checkout: new Checkout({
+      baseConfig: { environment: Environment.SANDBOX },
     }),
     provider: {
-      request: async () => null,
-    },
-  } as unknown as Web3Provider;
+      getSigner: () => ({
+        getAddress: async () => Promise.resolve(''),
+      }),
+    } as Web3Provider,
+    connectionStatus: ConnectionStatus.CONNECTED_WITH_NETWORK,
+  };
+
   const baseWalletState: WalletState = {
-    checkout,
     network: {
       chainId: ChainId.IMTBL_ZKEVM_TESTNET,
       name: ChainName.IMTBL_ZKEVM_TESTNET,
       nativeCurrency: {} as unknown as TokenInfo,
       isSupported: true,
     },
-    provider,
     walletProvider: WalletProviderName.METAMASK,
     tokenBalances: [],
     supportedTopUps: null,
@@ -78,9 +80,13 @@ describe('WalletBalances', () => {
         });
 
       mount(
-        <WalletWidgetTestComponent initialStateOverride={baseWalletState}>
-          <WalletBalances />
-        </WalletWidgetTestComponent>,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <WalletWidgetTestComponent initialStateOverride={baseWalletState}>
+            <WalletBalances />
+          </WalletWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('balance-item-IMX').should('exist');
@@ -93,9 +99,13 @@ describe('WalletBalances', () => {
         .rejects({});
 
       mount(
-        <WalletWidgetTestComponent initialStateOverride={baseWalletState}>
-          <WalletBalances />
-        </WalletWidgetTestComponent>,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <WalletWidgetTestComponent initialStateOverride={baseWalletState}>
+            <WalletBalances />
+          </WalletWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('no-tokens-found').should('exist');
@@ -105,14 +115,12 @@ describe('WalletBalances', () => {
   describe('move coins gas check', () => {
     it('should show not enough gas drawer when trying to bridge to L2 with 0 eth balance', () => {
       const walletState: WalletState = {
-        checkout,
         network: {
           chainId: ChainId.SEPOLIA,
           name: 'Sepolia',
           nativeCurrency: {} as unknown as TokenInfo,
           isSupported: true,
         },
-        provider,
         walletProvider: WalletProviderName.METAMASK,
         tokenBalances: [
           {
@@ -128,11 +136,15 @@ describe('WalletBalances', () => {
       };
       mount(
         <BiomeCombinedProviders>
-          <WalletContext.Provider
-            value={{ walletState, walletDispatch: () => {} }}
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <WalletBalances />
-          </WalletContext.Provider>
+            <WalletContext.Provider
+              value={{ walletState, walletDispatch: () => {} }}
+            >
+              <WalletBalances />
+            </WalletContext.Provider>
+          </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
       );
       cySmartGet('token-menu').click();
@@ -155,14 +167,12 @@ describe('WalletBalances', () => {
         });
 
       const walletState: WalletState = {
-        checkout,
         network: {
           chainId: ChainId.SEPOLIA,
           name: 'Sepolia',
           nativeCurrency: {} as unknown as TokenInfo,
           isSupported: true,
         },
-        provider,
         walletProvider: WalletProviderName.METAMASK,
         tokenBalances: [
           {
@@ -178,11 +188,15 @@ describe('WalletBalances', () => {
       };
       mount(
         <BiomeCombinedProviders>
-          <WalletContext.Provider
-            value={{ walletState, walletDispatch: () => {} }}
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <WalletBalances />
-          </WalletContext.Provider>
+            <WalletContext.Provider
+              value={{ walletState, walletDispatch: () => {} }}
+            >
+              <WalletBalances />
+            </WalletContext.Provider>
+          </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
       );
       cySmartGet('token-menu').click();
@@ -206,14 +220,12 @@ describe('WalletBalances', () => {
         });
 
       const walletState: WalletState = {
-        checkout,
         network: {
           chainId: ChainId.SEPOLIA,
           name: 'Sepolia',
           nativeCurrency: {} as unknown as TokenInfo,
           isSupported: true,
         },
-        provider,
         walletProvider: WalletProviderName.METAMASK,
         tokenBalances: [
           {
@@ -230,11 +242,15 @@ describe('WalletBalances', () => {
       };
       mount(
         <BiomeCombinedProviders>
-          <WalletContext.Provider
-            value={{ walletState, walletDispatch: () => {} }}
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <WalletBalances />
-          </WalletContext.Provider>
+            <WalletContext.Provider
+              value={{ walletState, walletDispatch: () => {} }}
+            >
+              <WalletBalances />
+            </WalletContext.Provider>
+          </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
       );
       cySmartGet('token-menu').click();
@@ -281,11 +297,15 @@ describe('WalletBalances', () => {
         };
         mount(
           <BiomeCombinedProviders>
-            <WalletContext.Provider
-              value={{ walletState: testWalletState, walletDispatch: () => {} }}
+            <ConnectLoaderTestComponent
+              initialStateOverride={connectLoaderState}
             >
-              <WalletBalances />
-            </WalletContext.Provider>
+              <WalletContext.Provider
+                value={{ walletState: testWalletState, walletDispatch: () => {} }}
+              >
+                <WalletBalances />
+              </WalletContext.Provider>
+            </ConnectLoaderTestComponent>
           </BiomeCombinedProviders>,
         );
         cySmartGet('add-coins').should('exist');
@@ -303,11 +323,15 @@ describe('WalletBalances', () => {
       };
       mount(
         <BiomeCombinedProviders>
-          <WalletContext.Provider
-            value={{ walletState: testWalletState, walletDispatch: () => {} }}
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <WalletBalances />
-          </WalletContext.Provider>
+            <WalletContext.Provider
+              value={{ walletState: testWalletState, walletDispatch: () => {} }}
+            >
+              <WalletBalances />
+            </WalletContext.Provider>
+          </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
       );
       cySmartGet('add-coins').should('not.exist');
@@ -315,14 +339,12 @@ describe('WalletBalances', () => {
 
     it('should NOT show add coins button on Sepolia', () => {
       const walletState: WalletState = {
-        checkout,
         network: {
           chainId: ChainId.SEPOLIA,
           name: 'Sepolia',
           nativeCurrency: {} as unknown as TokenInfo,
           isSupported: true,
         },
-        provider,
         walletProvider: WalletProviderName.METAMASK,
         tokenBalances: [],
         supportedTopUps: {
@@ -333,11 +355,15 @@ describe('WalletBalances', () => {
       };
       mount(
         <BiomeCombinedProviders>
-          <WalletContext.Provider
-            value={{ walletState, walletDispatch: () => {} }}
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <WalletBalances />
-          </WalletContext.Provider>
+            <WalletContext.Provider
+              value={{ walletState, walletDispatch: () => {} }}
+            >
+              <WalletBalances />
+            </WalletContext.Provider>
+          </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
       );
       cySmartGet('add-coins').should('not.exist');

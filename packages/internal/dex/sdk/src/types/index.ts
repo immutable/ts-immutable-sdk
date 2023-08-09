@@ -94,10 +94,10 @@ export interface ExchangeOverrides {
   exchangeContracts: ExchangeContracts;
   commonRoutingTokens: TokenInfo[];
   nativeToken: TokenInfo;
-  secondaryFees?: SecondaryFee[];
 }
 
 export interface ExchangeModuleConfiguration
   extends ModuleConfiguration<ExchangeOverrides> {
   chainId: number;
+  secondaryFees?: SecondaryFee[];
 }

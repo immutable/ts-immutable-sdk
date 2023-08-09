@@ -12,11 +12,13 @@
     "eslint": "^8.40.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-typescript": "^17.0.0",
+    "http-server": "^14.1.1",
     "husky": "^8.0.3",
     "lint-staged": "^13.2.0",
     "node-gyp": "^9.3.1",
     "release-it": "^15.10.1",
     "syncpack": "^9.8.4",
+    "typedoc": "^0.24.8",
     "wsrun": "^5.2.4"
   },
   "engines": {
@@ -28,7 +30,7 @@
     "*": "yarn scan:secrets",
     "*.{js,jsx,ts,tsx}": "eslint"
   },
-  "packageManager": "yarn@3.5.0",
+  "packageManager": "yarn@3.6.1",
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "resolutions": {
@@ -37,6 +39,8 @@
   "scripts": {
     "build": "wsrun -p @imtbl/sdk -p @imtbl/checkout-widgets-lib -e -r --serial build && yarn syncpack:format && yarn wsrun -p @imtbl/sdk -a -m copyBrowserBundles",
     "build:onlysdk": "wsrun -y 4 --stages build && yarn syncpack:format",
+    "docs:build": "typedoc",
+    "docs:serve": "http-server ./docs --cors -p 8080 -c-1",
     "lint": "wsrun --exclude-missing -e lint --no-error-on-unmatched-pattern",
     "lint:ci": "./lint-ci.sh",
     "postinstall": "husky install; ./.husky/install_gitleaks.sh",
@@ -46,6 +50,9 @@
     "syncpack:fix": "yarn syncpack fix-mismatches",
     "syncpack:format": "yarn syncpack format",
     "test": "wsrun --exclude-missing -e test",
+    "test:checkout:cypress": "wsrun -p @imtbl/checkout-widgets-lib --exclude-missing -e test:cypress",
+    "test:checkout:sdk:coverage": "wsrun -p @imtbl/checkout-sdk --exclude-missing -e test:coverage",
+    "test:vpn": "RUN_VPN_TESTS=1 wsrun --exclude-missing -e test",
     "typecheck": "wsrun --exclude-missing typecheck"
   },
   "workspaces": [

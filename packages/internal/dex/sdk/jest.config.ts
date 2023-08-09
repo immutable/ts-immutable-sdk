@@ -9,6 +9,7 @@ const config: Config = {
   transform: {
     '^.+\\.(t|j)sx?$': '@swc/jest',
   },
+  coveragePathIgnorePatterns:['node_modules', 'src/contracts/', 'src/test/'],
   transformIgnorePatterns: [],
 };
 

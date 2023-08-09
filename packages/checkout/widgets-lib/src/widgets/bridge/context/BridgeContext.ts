@@ -1,7 +1,5 @@
-import { Web3Provider } from '@ethersproject/providers';
 import { TokenBridge } from '@imtbl/bridge-sdk';
 import {
-  Checkout,
   WalletProviderName,
   GetBalanceResult,
   NetworkInfo,
@@ -10,8 +8,6 @@ import {
 import { createContext } from 'react';
 
 export interface BridgeState {
-  checkout: Checkout | null;
-  provider: Web3Provider | null;
   walletProvider: WalletProviderName | null;
   tokenBridge: TokenBridge | null;
   network: NetworkInfo | null;
@@ -21,8 +17,6 @@ export interface BridgeState {
 }
 
 export const initialBridgeState: BridgeState = {
-  checkout: null,
-  provider: null,
   walletProvider: null,
   tokenBridge: null,
   network: null,
@@ -41,8 +35,6 @@ export interface BridgeAction {
 }
 
 type ActionPayload =
-  | SetCheckoutPayload
-  | SetProviderPayload
   | SetWalletProviderPayload
   | SetTokenBridgePayload
   | SetNetworkPayload
@@ -51,24 +43,12 @@ type ActionPayload =
   | SetAllowedTokensPayload;
 
 export enum BridgeActions {
-  SET_CHECKOUT = 'SET_CHECKOUT',
-  SET_PROVIDER = 'SET_PROVIDER',
   SET_WALLET_PROVIDER = 'SET_WALLET_PROVIDER',
   SET_TOKEN_BRIDGE = 'SET_TOKEN_BRIDGE',
   SET_NETWORK = 'SET_NETWORK',
   SET_TO_NETWORK = 'SET_TO_NETWORK',
   SET_TOKEN_BALANCES = 'SET_TOKEN_BALANCES',
   SET_ALLOWED_TOKENS = 'SET_ALLOWED_TOKENS',
-}
-
-export interface SetCheckoutPayload {
-  type: BridgeActions.SET_CHECKOUT;
-  checkout: Checkout;
-}
-
-export interface SetProviderPayload {
-  type: BridgeActions.SET_PROVIDER;
-  provider: Web3Provider;
 }
 
 export interface SetWalletProviderPayload {
@@ -116,16 +96,6 @@ export const bridgeReducer: Reducer<BridgeState, BridgeAction> = (
   action: BridgeAction,
 ) => {
   switch (action.payload.type) {
-    case BridgeActions.SET_CHECKOUT:
-      return {
-        ...state,
-        checkout: action.payload.checkout,
-      };
-    case BridgeActions.SET_PROVIDER:
-      return {
-        ...state,
-        provider: action.payload.provider,
-      };
     case BridgeActions.SET_WALLET_PROVIDER:
       return {
         ...state,

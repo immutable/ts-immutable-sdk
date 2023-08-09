@@ -16,6 +16,8 @@ Table of contents
   - [How to guides](#how-to-guides)
     - [Adding your project](#adding-your-project)
     - [Link packages to each other](#link-packages-to-each-other)
+    - [Generate OpenAPI clients](#generate-openapi-clients)
+    - [Generate SDK Reference Documentation](#generate-sdk-reference-documentation)
     - [Building](#building)
     - [Linting](#linting)
       - [ESLint Tooling](#eslint-tooling)
@@ -32,6 +34,7 @@ Table of contents
         - [**Run test suites specific to a package**](#run-test-suites-specific-to-a-package)
       - [Writing tests](#writing-tests)
     - [Versioning \& Changelog](#versioning--changelog)
+  - [Disclaimer for Alpha Releases](#disclaimer-for-alpha-releases)
 
 ## How to guides
 
@@ -95,6 +98,19 @@ In order to regenerate these clients with updated spec files, follow the steps b
 
 1. If all good, commit the code and create PR, get review from the code-owners of the corresponding APIs.
 
+### Generate SDK Reference Documentation
+
+From a clean checkout, run:
+
+```
+
+yarn
+yarn build
+yarn docs:build
+
+```
+
+To view the docs locally, run: `yarn docs:serve`
 
 ### Building
 
@@ -187,8 +203,11 @@ yarn
 # Build
 yarn build
 
-# Runs ALL tests
+# Runs all tests, but skip the ones that require a VPN
 yarn test
+
+# Run all tests, including the ones that require a VPN
+yarn test:vpn
 ```
 
 Or,

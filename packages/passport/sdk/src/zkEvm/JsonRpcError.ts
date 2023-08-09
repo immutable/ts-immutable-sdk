@@ -15,6 +15,7 @@ export enum RpcErrorCode {
   INVALID_PARAMS = -32602,
   INTERNAL_ERROR = -32603,
   PARSE_ERROR = -32700,
+  USER_REJECTED_REQUEST = -32003,
 }
 
 export class JsonRpcError extends Error {

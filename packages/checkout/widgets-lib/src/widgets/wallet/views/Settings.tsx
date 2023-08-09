@@ -4,16 +4,16 @@ import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { text } from '../../../resources/text/textConfig';
-import { WalletContext } from '../context/WalletContext';
 import { sendDisconnectWalletEvent, sendWalletWidgetCloseEvent } from '../WalletWidgetEvents';
 import { WalletWidgetViews } from '../../../context/view-context/WalletViewContextTypes';
 import { WalletAddress } from '../components/WalletAddress/WalletAddress';
 import { settingsBoxStyle, settingsDisconnectButtonStyle } from './SettingsStyles';
+import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 
 export function Settings() {
-  const { walletState } = useContext(WalletContext);
+  const { connectLoaderState } = useContext(ConnectLoaderContext);
+  const { provider } = connectLoaderState;
   const { header, disconnectButton } = text.views[WalletWidgetViews.SETTINGS];
-  const { provider } = walletState;
 
   return (
     <SimpleLayout

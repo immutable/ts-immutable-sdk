@@ -9,14 +9,27 @@ import {
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { BigNumber } from 'ethers';
+import { Web3Provider } from '@ethersproject/providers';
 import { TopUpView } from './TopUpView';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { orchestrationEvents } from '../../lib/orchestrationEvents';
 import { WalletWidgetTestComponent } from '../../widgets/wallet/test-components/WalletWidgetTestComponent';
 import { WalletState } from '../../widgets/wallet/context/WalletContext';
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
+import { ConnectionStatus } from '../../context/connect-loader-context/ConnectLoaderContext';
+import {
+  ConnectLoaderTestComponent,
+} from '../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
 
 describe('Top Up View', () => {
+  const connectLoaderState = {
+    checkout: new Checkout({
+      baseConfig: { environment: Environment.SANDBOX },
+    }),
+    provider: {} as Web3Provider,
+    connectionStatus: ConnectionStatus.CONNECTED_WITH_NETWORK,
+  };
+
   beforeEach(() => {
     cy.viewport('ipad-2');
   });
@@ -25,13 +38,17 @@ describe('Top Up View', () => {
     it('should render the top up view', () => {
       mount(
         <BiomeCombinedProviders>
-          <TopUpView
-            showOnrampOption
-            showSwapOption
-            showBridgeOption
-            widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
-            onCloseButtonClick={() => {}}
-          />
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <TopUpView
+              showOnrampOption
+              showSwapOption
+              showBridgeOption
+              widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
+              onCloseButtonClick={() => {}}
+            />
+          </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
       );
       cySmartGet('menu-item-onramp').should('exist');
@@ -42,13 +59,17 @@ describe('Top Up View', () => {
     it('should hide onramp option', () => {
       mount(
         <BiomeCombinedProviders>
-          <TopUpView
-            showOnrampOption={false}
-            showSwapOption
-            showBridgeOption
-            widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
-            onCloseButtonClick={() => {}}
-          />
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <TopUpView
+              showOnrampOption={false}
+              showSwapOption
+              showBridgeOption
+              widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
+              onCloseButtonClick={() => {}}
+            />
+          </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
       );
       cySmartGet('menu-item-onramp').should('not.exist');
@@ -59,13 +80,17 @@ describe('Top Up View', () => {
     it('should hide swap option', () => {
       mount(
         <BiomeCombinedProviders>
-          <TopUpView
-            showOnrampOption
-            showSwapOption={false}
-            showBridgeOption
-            widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
-            onCloseButtonClick={() => {}}
-          />
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <TopUpView
+              showOnrampOption
+              showSwapOption={false}
+              showBridgeOption
+              widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
+              onCloseButtonClick={() => {}}
+            />
+          </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
       );
       cySmartGet('menu-item-onramp').should('exist');
@@ -76,13 +101,17 @@ describe('Top Up View', () => {
     it('should hide bridge option', () => {
       mount(
         <BiomeCombinedProviders>
-          <TopUpView
-            showOnrampOption
-            showSwapOption
-            showBridgeOption={false}
-            widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
-            onCloseButtonClick={() => {}}
-          />
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <TopUpView
+              showOnrampOption
+              showSwapOption
+              showBridgeOption={false}
+              widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
+              onCloseButtonClick={() => {}}
+            />
+          </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
       );
       cySmartGet('menu-item-onramp').should('exist');
@@ -94,13 +123,17 @@ describe('Top Up View', () => {
       const closeFunction = cy.stub().as('closeFunction');
       mount(
         <BiomeCombinedProviders>
-          <TopUpView
-            showOnrampOption
-            showSwapOption
-            showBridgeOption
-            widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
-            onCloseButtonClick={closeFunction}
-          />
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <TopUpView
+              showOnrampOption
+              showSwapOption
+              showBridgeOption
+              widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
+              onCloseButtonClick={closeFunction}
+            />
+          </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
       );
       cySmartGet('menu-item-onramp').should('exist');
@@ -115,15 +148,19 @@ describe('Top Up View', () => {
 
       mount(
         <BiomeCombinedProviders>
-          <TopUpView
-            showOnrampOption
-            showSwapOption
-            showBridgeOption
-            widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
-            tokenAddress="0x123"
-            amount="10"
-            onCloseButtonClick={() => {}}
-          />
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <TopUpView
+              showOnrampOption
+              showSwapOption
+              showBridgeOption
+              widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
+              tokenAddress="0x123"
+              amount="10"
+              onCloseButtonClick={() => {}}
+            />
+          </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
       );
 
@@ -142,15 +179,19 @@ describe('Top Up View', () => {
 
       mount(
         <BiomeCombinedProviders>
-          <TopUpView
-            showOnrampOption
-            showSwapOption
-            showBridgeOption
-            widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
-            tokenAddress="0x123"
-            amount="10"
-            onCloseButtonClick={() => {}}
-          />
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <TopUpView
+              showOnrampOption
+              showSwapOption
+              showBridgeOption
+              widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
+              tokenAddress="0x123"
+              amount="10"
+              onCloseButtonClick={() => {}}
+            />
+          </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
       );
 
@@ -170,15 +211,19 @@ describe('Top Up View', () => {
 
       mount(
         <BiomeCombinedProviders>
-          <TopUpView
-            showOnrampOption
-            showSwapOption
-            showBridgeOption
-            widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
-            tokenAddress="0x123"
-            amount="10"
-            onCloseButtonClick={() => {}}
-          />
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <TopUpView
+              showOnrampOption
+              showSwapOption
+              showBridgeOption
+              widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
+              tokenAddress="0x123"
+              amount="10"
+              onCloseButtonClick={() => {}}
+            />
+          </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
       );
 
@@ -196,11 +241,7 @@ describe('Top Up View', () => {
 
   describe('Fee display', () => {
     const baseWalletState: WalletState = {
-      checkout: new Checkout({
-        baseConfig: { environment: Environment.SANDBOX },
-      }),
       network: null,
-      provider: null,
       walletProvider: WalletProviderName.METAMASK,
       tokenBalances: [],
       supportedTopUps: null,
@@ -248,15 +289,19 @@ describe('Top Up View', () => {
 
       mount(
         <CryptoFiatProvider environment={Environment.SANDBOX}>
-          <WalletWidgetTestComponent initialStateOverride={baseWalletState}>
-            <TopUpView
-              showOnrampOption
-              showSwapOption
-              showBridgeOption
-              widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
-              onCloseButtonClick={() => {}}
-            />
-          </WalletWidgetTestComponent>
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <WalletWidgetTestComponent initialStateOverride={baseWalletState}>
+              <TopUpView
+                showOnrampOption
+                showSwapOption
+                showBridgeOption
+                widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
+                onCloseButtonClick={() => {}}
+              />
+            </WalletWidgetTestComponent>
+          </ConnectLoaderTestComponent>
         </CryptoFiatProvider>,
       );
 

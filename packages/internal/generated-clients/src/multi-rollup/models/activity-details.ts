@@ -1,7 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Immutable X API
+ * Immutable zkEVM API
  * Immutable Multi Rollup API
  *
  * The version of the OpenAPI document: 1.0.0
@@ -15,10 +15,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { ActivityNFT } from './activity-nft';
+import { ActivityAsset } from './activity-asset';
 // May contain unused imports in some cases
 // @ts-ignore
 import { Burn } from './burn';
+// May contain unused imports in some cases
+// @ts-ignore
+import { Deposit } from './deposit';
 // May contain unused imports in some cases
 // @ts-ignore
 import { Mint } from './mint';
@@ -31,12 +34,15 @@ import { SalePayment } from './sale-payment';
 // May contain unused imports in some cases
 // @ts-ignore
 import { Transfer } from './transfer';
+// May contain unused imports in some cases
+// @ts-ignore
+import { Withdrawal } from './withdrawal';
 
 /**
  * @type ActivityDetails
  * The activity details
  * @export
  */
-export type ActivityDetails = Burn | Mint | NFTSale | Transfer;
+export type ActivityDetails = Burn | Deposit | Mint | NFTSale | Transfer | Withdrawal;
 
 

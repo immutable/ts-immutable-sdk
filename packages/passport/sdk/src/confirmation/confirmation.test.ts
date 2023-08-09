@@ -1,6 +1,7 @@
 /**
  * @jest-environment jsdom
  */
+import { TransactionApprovalRequestChainTypeEnum } from '@imtbl/guardian';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import ConfirmationScreen from './confirmation';
 import { Transaction, TransactionTypes } from './types';
@@ -66,6 +67,7 @@ describe('confirmation', () => {
       const res = await confirmationScreen.startGuardianTransaction(
         transactionId,
         mockEtherAddress,
+        TransactionApprovalRequestChainTypeEnum.Starkex,
       );
       confirmationScreen.loading();
 

@@ -6,10 +6,11 @@ import MagicAdapter from './magicAdapter';
 import { PassportImxProviderFactory } from './starkEx';
 import { PassportConfiguration } from './config';
 import {
-  PassportModuleConfiguration,
-  UserProfile,
   DeviceConnectResponse,
   DeviceTokenResponse,
+  Networks,
+  PassportModuleConfiguration,
+  UserProfile,
 } from './types';
 import { ConfirmationScreen } from './confirmation';
 import { ZkEvmProvider } from './zkEvm';
@@ -69,6 +70,14 @@ export class Passport {
     return this.passportImxProviderFactory.getProviderWithDeviceFlow(deviceCode, interval, timeoutMs);
   }
 
+  getPKCEAuthorizationUrl(): string {
+    return this.authManager.getPKCEAuthorizationUrl();
+  }
+
+  public async connectImxPKCEFlow(authorizationCode: string, state: string): Promise<IMXProvider | null> {
+    return this.passportImxProviderFactory.getProviderWithPKCEFlow(authorizationCode, state);
+  }
+
   /**
    * @returns {boolean} the stored device flow credentials if they exist
    */
@@ -80,8 +89,11 @@ export class Passport {
     return this.passportImxProviderFactory.getProviderWithCredentials(tokenResponse);
   }
 
-  // TODO ID-926 Make method public once development has been finalised
-  protected connectEvm(): Provider {
+  public connectEvm(): Provider {
+    if (this.config.network === Networks.PRODUCTION) {
+      throw new Error('EVM is not supported on production network');
+    }
+
     return new ZkEvmProvider({
       authManager: this.authManager,
       magicAdapter: this.magicAdapter,

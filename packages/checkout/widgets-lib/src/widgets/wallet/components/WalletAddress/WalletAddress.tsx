@@ -6,7 +6,7 @@ import {
 } from './WalletAddressStyles';
 import { CopyButton } from './CopyButton';
 
-export function WalletAddress({ provider }: { provider: Web3Provider | null }) {
+export function WalletAddress({ provider }: { provider?: Web3Provider }) {
   const [walletAddress, setWalletAddress] = useState<string>('');
 
   useEffect(() => {

@@ -12,6 +12,9 @@ import {
   mswHandlers,
 } from './mocks/zkEvm/msw';
 import { JsonRpcError, RpcErrorCode } from './zkEvm/JsonRpcError';
+import GuardianClient from './guardian/guardian';
+
+jest.mock('./guardian/guardian');
 
 jest.mock('magic-sdk');
 jest.mock('oidc-client-ts');
@@ -50,7 +53,6 @@ const getZkEvmProvider = () => {
     scope: 'openid offline_access profile email transact',
   });
 
-  // @ts-ignore TODO ID-926 Remove once method is public
   return passport.connectEvm();
 };
 
@@ -67,6 +69,10 @@ describe('Passport', () => {
       signinPopup: mockSigninPopup,
       signinSilent: mockSigninSilent,
       getUser: mockGetUser,
+    }));
+    (GuardianClient as jest.Mock).mockImplementation(() => ({
+      validateEVMTransaction: jest.fn(),
+      withConfirmationScreen: () => (task: () => void) => task(),
     }));
     (Magic as jest.Mock).mockImplementation(() => ({
       openid: {

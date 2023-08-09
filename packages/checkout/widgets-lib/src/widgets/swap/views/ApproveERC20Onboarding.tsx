@@ -19,12 +19,15 @@ import { ImmutableNetworkHero } from '../../../components/Hero/ImmutableNetworkH
 import { SwapContext } from '../context/SwapContext';
 import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { LoadingView } from '../../../views/loading/LoadingView';
+import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 
 export interface ApproveERC20Props {
   data: ApproveERC20SwapData;
 }
 export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
-  const { swapState: { checkout, provider, allowedTokens } } = useContext(SwapContext);
+  const { swapState: { allowedTokens } } = useContext(SwapContext);
+  const { connectLoaderState } = useContext(ConnectLoaderContext);
+  const { checkout, provider } = connectLoaderState;
   const { viewDispatch } = useContext(ViewContext);
   const { approveSpending, approveSwap } = text.views[SwapWidgetViews.APPROVE_ERC20];
 

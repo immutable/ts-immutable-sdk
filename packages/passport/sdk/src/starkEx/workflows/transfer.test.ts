@@ -2,11 +2,18 @@ import { TransfersApi, UnsignedTransferRequest } from '@imtbl/core-sdk';
 import { PassportError, PassportErrorType } from '../../errors/passportError';
 import { mockErrorMessage, mockStarkSignature, mockUserImx } from '../../test/mocks';
 import { batchNftTransfer, transfer } from './transfer';
-import GuardianClient from '../guardian';
+import GuardianClient from '../../guardian/guardian';
 
-jest.mock('../guardian');
+jest.mock('../../guardian/guardian');
 
 describe('transfer', () => {
+  const mockGuardianClient = new GuardianClient({} as any);
+
+  beforeEach(() => {
+    (mockGuardianClient.withDefaultConfirmationScreenTask as jest.Mock).mockImplementation((task) => task);
+    (mockGuardianClient.withConfirmationScreenTask as jest.Mock).mockImplementation(() => (task: any) => task);
+  });
+
   afterEach(jest.resetAllMocks);
 
   const mockStarkSigner = {
@@ -29,7 +36,6 @@ describe('transfer', () => {
       tokenAddress,
       receiver: mockReceiver,
     };
-    const mockGuardianClient = new GuardianClient({} as any);
 
     beforeEach(() => {
       getSignableTransferV1Mock = jest.fn();
@@ -104,7 +110,7 @@ describe('transfer', () => {
         guardianClient: mockGuardianClient,
       });
 
-      expect(mockGuardianClient.loading).toBeCalled();
+      expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
       expect(getSignableTransferV1Mock).toBeCalledWith(mockSignableTransferRequest, mockHeader);
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
       expect(mockGuardianClient.validate).toBeCalledWith({ payloadHash: mockPayloadHash });
@@ -165,7 +171,6 @@ describe('transfer', () => {
     let getSignableTransferMock: jest.Mock;
     let createTransferMock: jest.Mock;
     let transferApiMock: TransfersApi;
-    const mockGuardianClient = new GuardianClient({} as any);
 
     const transferRequest = [
       {
@@ -262,7 +267,7 @@ describe('transfer', () => {
         },
       }, mockHeader);
       expect(mockStarkSigner.signMessage).toHaveBeenCalled();
-      expect(mockGuardianClient.loading).toBeCalledWith(popupOptions);
+      expect(mockGuardianClient.withConfirmationScreenTask).toBeCalledWith(popupOptions);
       expect(mockGuardianClient.validate).toBeCalledWith({
         payloadHash: payload_hash,
       });

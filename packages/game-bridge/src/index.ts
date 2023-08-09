@@ -15,6 +15,8 @@ const keyData = 'data';
 const PASSPORT_FUNCTIONS = {
   init: 'init',
   connect: 'connect',
+  getPKCEAuthUrl: 'getPKCEAuthUrl',
+  connectPKCE: 'connectPKCE',
   confirmCode: 'confirmCode',
   connectWithCredentials: 'connectWithCredentials',
   getAddress: 'getAddress',
@@ -79,15 +81,17 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
 
     switch (fxName) {
       case PASSPORT_FUNCTIONS.init: {
+        const request = JSON.parse(data);
+        const redirect: string | null = request?.redirectUri;
         if (!passportClient) {
           const passportConfig = {
             baseConfig: new config.ImmutableConfiguration({
               environment: config.Environment.SANDBOX,
             }),
-            clientId: data,
+            clientId: request.clientId,
             scope,
             audience,
-            redirectUri,
+            redirectUri: (redirect ?? redirectUri),
             logoutRedirectUri,
           };
           passportClient = new passport.Passport(passportConfig);
@@ -109,6 +113,27 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
           deviceCode: response.deviceCode,
           url: response.url,
           interval: response.interval,
+        });
+        break;
+      }
+      case PASSPORT_FUNCTIONS.getPKCEAuthUrl: {
+        const response = passportClient?.getPKCEAuthorizationUrl();
+        callbackToGame({
+          responseFor: fxName,
+          requestId,
+          success: true,
+          result: response,
+        });
+        break;
+      }
+      case PASSPORT_FUNCTIONS.connectPKCE: {
+        const request = JSON.parse(data);
+        const passportProvider = await passportClient?.connectImxPKCEFlow(request.authorizationCode, request.state);
+        setProvider(passportProvider);
+        callbackToGame({
+          responseFor: fxName,
+          requestId,
+          success: true,
         });
         break;
       }

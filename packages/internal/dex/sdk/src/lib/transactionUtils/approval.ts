@@ -3,8 +3,15 @@ import { BigNumber } from '@ethersproject/bignumber';
 import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
 import { ApproveError, AlreadyApprovedError } from 'errors';
 import { ethers } from 'ethers';
-import { TokenInfo, TransactionDetails } from '../../types';
+import { TradeType } from '@uniswap/sdk-core';
+import { RoutingContracts } from 'lib/router';
+import { SecondaryFee, TokenInfo, TransactionDetails } from '../../types';
 import { calculateGasFee } from './gas';
+
+type PreparedApproval = {
+  spender: string;
+  amount: BigNumber;
+};
 
 /**
  * Get the amount of an ERC20 token that needs to be approved by
@@ -74,6 +81,22 @@ const getUnsignedERC20ApproveTransaction = (
   };
 };
 
+export const prepareApproval = (
+  tradeType: TradeType,
+  amountSpecified: ethers.BigNumber,
+  amountWithSlippage: ethers.BigNumber,
+  routingContracts: RoutingContracts,
+  secondaryFees: SecondaryFee[],
+): PreparedApproval => {
+  const amount = tradeType === TradeType.EXACT_INPUT ? amountSpecified : amountWithSlippage;
+
+  const spender = secondaryFees.length === 0
+    ? routingContracts.peripheryRouterAddress
+    : routingContracts.secondaryFeeAddress;
+
+  return { spender, amount };
+};
+
 /**
  * Get an unsigned approval transaction if needed
  *
@@ -134,23 +157,22 @@ export const getApproval = async (
   provider: JsonRpcProvider,
   ownerAddress: string,
   tokenAddress: string,
-  tokenAmount: BigNumber,
-  spenderAddress: string,
+  preparedApproval: PreparedApproval,
   gasPrice: ethers.BigNumber | null,
 ): Promise<TransactionDetails | null> => {
   const approveTransaction = await getApproveTransaction(
     provider,
     ownerAddress,
     tokenAddress,
-    tokenAmount,
-    spenderAddress,
+    preparedApproval.amount,
+    preparedApproval.spender,
   );
 
   if (!approveTransaction) {
     return null;
   }
 
-  const gasEstimate = await getApproveGasEstimate(provider, ownerAddress, spenderAddress, tokenAddress);
+  const gasEstimate = await getApproveGasEstimate(provider, ownerAddress, preparedApproval.spender, tokenAddress);
 
   const gasFeeEstimate = gasPrice ? {
     token: nativeToken,

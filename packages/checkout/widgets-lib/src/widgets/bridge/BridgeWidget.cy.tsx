@@ -21,6 +21,10 @@ import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { WidgetTheme } from '../../lib';
 import { text } from '../../resources/text/textConfig';
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
+import { ConnectionStatus } from '../../context/connect-loader-context/ConnectLoaderContext';
+import {
+  ConnectLoaderTestComponent,
+} from '../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
 
 describe('Bridge Widget tests', () => {
   const { header, content } = text.views[BridgeWidgetViews.BRIDGE];
@@ -50,6 +54,14 @@ describe('Bridge Widget tests', () => {
       request: async () => null,
     },
   } as unknown as Web3Provider;
+
+  const connectLoaderState = {
+    checkout: new Checkout({
+      baseConfig: { environment: Environment.SANDBOX },
+    }),
+    provider: mockProvider,
+    connectionStatus: ConnectionStatus.CONNECTED_WITH_NETWORK,
+  };
 
   beforeEach(() => {
     cy.viewport('ipad-2');
@@ -203,11 +215,14 @@ describe('Bridge Widget tests', () => {
     it('should show bridge widget on mount', () => {
       const params = {} as BridgeWidgetParams;
       mount(
-        <BridgeWidget
-          config={config}
-          params={params}
-          web3Provider={mockProvider}
-        />,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <BridgeWidget
+            config={config}
+            params={params}
+          />
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('bridge-view').should('exist');
@@ -220,11 +235,14 @@ describe('Bridge Widget tests', () => {
     it('should set up bridge widget on mount', () => {
       const params = {} as BridgeWidgetParams;
       mount(
-        <BridgeWidget
-          config={config}
-          params={params}
-          web3Provider={mockProvider}
-        />,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <BridgeWidget
+            config={config}
+            params={params}
+          />
+        </ConnectLoaderTestComponent>,
       );
       cySmartGet('@getAllBalancesStub').should('have.been.called');
       cySmartGet('@getTokenAllowListStub').should('have.been.called');
@@ -233,7 +251,7 @@ describe('Bridge Widget tests', () => {
 
   describe('Bridge Submit', () => {
     beforeEach(() => {
-      cy.stub(TokenBridge.prototype, 'getUnsignedApproveBridgeTx').as('getUnsignedApproveBridgeTxStub')
+      cy.stub(TokenBridge.prototype, 'getUnsignedApproveDepositBridgeTx').as('getUnsignedApproveDepositBridgeTxStub')
         .resolves({
           required: true,
           unsignedTx: {},
@@ -292,17 +310,20 @@ describe('Bridge Widget tests', () => {
         }));
 
       mount(
-        <BridgeWidget
-          config={{
-            environment: Environment.SANDBOX,
-            theme: WidgetTheme.DARK,
-            isBridgeEnabled: true,
-            isSwapEnabled: true,
-            isOnRampEnabled: true,
-          }}
-          params={params}
-          web3Provider={mockProvider}
-        />,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <BridgeWidget
+            config={{
+              environment: Environment.SANDBOX,
+              theme: WidgetTheme.DARK,
+              isBridgeEnabled: true,
+              isSwapEnabled: true,
+              isOnRampEnabled: true,
+            }}
+            params={params}
+          />
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('bridge-token-select__target').click();
@@ -312,7 +333,7 @@ describe('Bridge Widget tests', () => {
       cySmartGet('bridge-amount-text__input').blur();
       cySmartGet('bridge-form-button').click();
 
-      cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');
+      cySmartGet('@getUnsignedApproveDepositBridgeTxStub').should('have.been.calledOnce');
       cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce');
 
       cySmartGet('simple-text-body__heading').should('have.text', approveSpending.content.heading);
@@ -368,17 +389,20 @@ describe('Bridge Widget tests', () => {
 
       mount(
         <BiomeCombinedProviders>
-          <BridgeWidget
-            config={{
-              environment: Environment.SANDBOX,
-              theme: WidgetTheme.DARK,
-              isBridgeEnabled: true,
-              isSwapEnabled: true,
-              isOnRampEnabled: true,
-            }}
-            params={params}
-            web3Provider={mockProvider}
-          />
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <BridgeWidget
+              config={{
+                environment: Environment.SANDBOX,
+                theme: WidgetTheme.DARK,
+                isBridgeEnabled: true,
+                isSwapEnabled: true,
+                isOnRampEnabled: true,
+              }}
+              params={params}
+            />
+          </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
       );
 
@@ -389,7 +413,7 @@ describe('Bridge Widget tests', () => {
       cySmartGet('bridge-amount-text__input').blur();
       cySmartGet('bridge-form-button').click();
 
-      cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');
+      cySmartGet('@getUnsignedApproveDepositBridgeTxStub').should('have.been.calledOnce');
       cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce');
 
       cySmartGet('footer-button').click();
@@ -416,17 +440,20 @@ describe('Bridge Widget tests', () => {
 
       mount(
         <BiomeCombinedProviders>
-          <BridgeWidget
-            config={{
-              environment: Environment.SANDBOX,
-              theme: WidgetTheme.DARK,
-              isBridgeEnabled: true,
-              isSwapEnabled: true,
-              isOnRampEnabled: true,
-            }}
-            params={params}
-            web3Provider={mockProvider}
-          />
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <BridgeWidget
+              config={{
+                environment: Environment.SANDBOX,
+                theme: WidgetTheme.DARK,
+                isBridgeEnabled: true,
+                isSwapEnabled: true,
+                isOnRampEnabled: true,
+              }}
+              params={params}
+            />
+          </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
       );
 
@@ -437,7 +464,7 @@ describe('Bridge Widget tests', () => {
       cySmartGet('bridge-amount-text__input').blur();
       cySmartGet('bridge-form-button').click();
 
-      cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');
+      cySmartGet('@getUnsignedApproveDepositBridgeTxStub').should('have.been.calledOnce');
       cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce');
 
       cySmartGet('footer-button').click();
@@ -470,17 +497,20 @@ describe('Bridge Widget tests', () => {
 
       mount(
         <BiomeCombinedProviders>
-          <BridgeWidget
-            config={{
-              environment: Environment.SANDBOX,
-              theme: WidgetTheme.DARK,
-              isBridgeEnabled: true,
-              isSwapEnabled: true,
-              isOnRampEnabled: true,
-            }}
-            params={params}
-            web3Provider={mockProvider}
-          />
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <BridgeWidget
+              config={{
+                environment: Environment.SANDBOX,
+                theme: WidgetTheme.DARK,
+                isBridgeEnabled: true,
+                isSwapEnabled: true,
+                isOnRampEnabled: true,
+              }}
+              params={params}
+            />
+          </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
       );
 
@@ -491,7 +521,7 @@ describe('Bridge Widget tests', () => {
       cySmartGet('bridge-amount-text__input').blur();
       cySmartGet('bridge-form-button').click();
 
-      cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');
+      cySmartGet('@getUnsignedApproveDepositBridgeTxStub').should('have.been.calledOnce');
       cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce');
 
       cySmartGet('footer-button').click();
@@ -521,17 +551,20 @@ describe('Bridge Widget tests', () => {
 
       mount(
         <BiomeCombinedProviders>
-          <BridgeWidget
-            config={{
-              environment: Environment.SANDBOX,
-              theme: WidgetTheme.DARK,
-              isBridgeEnabled: true,
-              isSwapEnabled: true,
-              isOnRampEnabled: true,
-            }}
-            params={params}
-            web3Provider={mockProvider}
-          />
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <BridgeWidget
+              config={{
+                environment: Environment.SANDBOX,
+                theme: WidgetTheme.DARK,
+                isBridgeEnabled: true,
+                isSwapEnabled: true,
+                isOnRampEnabled: true,
+              }}
+              params={params}
+            />
+          </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
       );
 
@@ -542,7 +575,7 @@ describe('Bridge Widget tests', () => {
       cySmartGet('bridge-amount-text__input').blur();
       cySmartGet('bridge-form-button').click();
 
-      cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');
+      cySmartGet('@getUnsignedApproveDepositBridgeTxStub').should('have.been.calledOnce');
       cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce');
       cySmartGet('footer-button').click();
       cySmartGet('@sendTransactionStub').should('have.been.calledOnce');
@@ -572,17 +605,20 @@ describe('Bridge Widget tests', () => {
 
       mount(
         <BiomeCombinedProviders>
-          <BridgeWidget
-            config={{
-              environment: Environment.SANDBOX,
-              theme: WidgetTheme.DARK,
-              isBridgeEnabled: true,
-              isSwapEnabled: true,
-              isOnRampEnabled: true,
-            }}
-            params={params}
-            web3Provider={mockProvider}
-          />
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <BridgeWidget
+              config={{
+                environment: Environment.SANDBOX,
+                theme: WidgetTheme.DARK,
+                isBridgeEnabled: true,
+                isSwapEnabled: true,
+                isOnRampEnabled: true,
+              }}
+              params={params}
+            />
+          </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
       );
 
@@ -593,7 +629,7 @@ describe('Bridge Widget tests', () => {
       cySmartGet('bridge-amount-text__input').blur();
       cySmartGet('bridge-form-button').click();
 
-      cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');
+      cySmartGet('@getUnsignedApproveDepositBridgeTxStub').should('have.been.calledOnce');
       cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce');
       cySmartGet('footer-button').click();
       cySmartGet('@sendTransactionStub').should('have.been.calledOnce');

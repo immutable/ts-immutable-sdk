@@ -1,22 +1,23 @@
 import { ethers } from 'ethers';
-import { CurrencyAmount, Token, TradeType } from '@uniswap/sdk-core';
+import {
+  CurrencyAmount, Token, TradeType,
+} from '@uniswap/sdk-core';
 import assert from 'assert';
 import {
   DuplicateAddressesError, InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError,
 } from 'errors';
 import { fetchGasPrice } from 'lib/transactionUtils/gas';
-import { getApproval } from 'lib/transactionUtils/approval';
-import { getQuote } from 'lib/transactionUtils/getQuote';
+import { getApproval, prepareApproval } from 'lib/transactionUtils/approval';
+import { getOurQuoteReqAmount, prepareUserQuote } from 'lib/transactionUtils/getQuote';
 import {
   DEFAULT_DEADLINE, DEFAULT_MAX_HOPS, DEFAULT_SLIPPAGE, MAX_MAX_HOPS, MIN_MAX_HOPS,
 } from './constants';
-
 import { Router } from './lib/router';
 import { getERC20Decimals, isValidNonZeroAddress } from './lib/utils';
 import {
   ExchangeModuleConfiguration, SecondaryFee, TokenInfo, TransactionResponse,
 } from './types';
-import { getSwap } from './lib/transactionUtils/swap';
+import { getSwap, prepareSwap } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
 
 export class Exchange {
@@ -35,12 +36,11 @@ export class Exchange {
 
     this.chainId = config.chain.chainId;
     this.nativeToken = config.chain.nativeToken;
+    this.secondaryFees = config.secondaryFees;
 
     this.provider = new ethers.providers.JsonRpcProvider(
       config.chain.rpcUrl,
     );
-
-    this.secondaryFees = config.secondaryFees;
 
     this.router = new Router(
       this.provider,
@@ -50,6 +50,7 @@ export class Exchange {
         factoryAddress: config.chain.contracts.coreFactory,
         quoterAddress: config.chain.contracts.quoterV2,
         peripheryRouterAddress: config.chain.contracts.peripheryRouter,
+        secondaryFeeAddress: config.chain.contracts.secondaryFee,
       },
     );
   }
@@ -75,7 +76,7 @@ export class Exchange {
     fromAddress: string,
     tokenInAddress: string,
     tokenOutAddress: string,
-    amount: ethers.BigNumberish,
+    amount: ethers.BigNumber,
     slippagePercent: number,
     maxHops: number,
     deadline: number,
@@ -111,8 +112,10 @@ export class Exchange {
       otherToken = tokenIn;
     }
 
-    const routeAndQuote = await this.router.findOptimalRoute(
-      amountSpecified,
+    const ourQuoteReqAmount = getOurQuoteReqAmount(amountSpecified, this.secondaryFees, tradeType);
+
+    const ourQuote = await this.router.findOptimalRoute(
+      ourQuoteReqAmount,
       otherToken,
       tradeType,
       maxHops,
@@ -121,33 +124,44 @@ export class Exchange {
     // get gas details
     const gasPrice = await fetchGasPrice(this.provider);
 
+    const adjustedQuote = prepareSwap(ourQuote, amount, this.secondaryFees);
+
+    const swap = getSwap(
+      this.nativeToken,
+      adjustedQuote,
+      fromAddress,
+      slippagePercent,
+      deadline,
+      this.router.routingContracts.peripheryRouterAddress,
+      this.router.routingContracts.secondaryFeeAddress,
+      gasPrice,
+      this.secondaryFees,
+    );
+
+    const userQuote = prepareUserQuote(otherToken, adjustedQuote, slippagePercent);
+
+    const preparedApproval = prepareApproval(
+      tradeType,
+      amount,
+      userQuote.amountWithMaxSlippage.value,
+      this.router.routingContracts,
+      this.secondaryFees,
+    );
+
     // we always use the tokenIn address because we are always selling the tokenIn
     const approval = await getApproval(
       this.nativeToken,
       this.provider,
       fromAddress,
       tokenInAddress,
-      ethers.BigNumber.from(amount),
-      this.router.routingContracts.peripheryRouterAddress,
+      preparedApproval,
       gasPrice,
     );
-
-    const swap = getSwap(
-      this.nativeToken,
-      routeAndQuote,
-      fromAddress,
-      slippagePercent,
-      deadline,
-      this.router.routingContracts.peripheryRouterAddress,
-      gasPrice,
-    );
-
-    const quote = getQuote(otherToken, tradeType, routeAndQuote.trade, slippagePercent);
 
     return {
       approval,
       swap,
-      quote,
+      quote: userQuote,
     };
   }
 
@@ -177,7 +191,7 @@ export class Exchange {
       fromAddress,
       tokenInAddress,
       tokenOutAddress,
-      amountIn,
+      ethers.BigNumber.from(amountIn),
       slippagePercent,
       maxHops,
       deadline,
@@ -211,15 +225,11 @@ export class Exchange {
       fromAddress,
       tokenInAddress,
       tokenOutAddress,
-      amountOut,
+      ethers.BigNumber.from(amountOut),
       slippagePercent,
       maxHops,
       deadline,
       TradeType.EXACT_OUTPUT,
     );
-  }
-
-  private thereAreSecondaryFees(): boolean {
-    return this.secondaryFees.length > 0;
   }
 }

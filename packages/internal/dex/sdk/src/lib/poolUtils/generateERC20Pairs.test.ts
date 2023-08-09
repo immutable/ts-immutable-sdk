@@ -6,7 +6,7 @@ import {
   USDC_TEST_TOKEN,
   WETH_TEST_TOKEN,
   uniqBy,
-} from '../../utils/testUtils';
+} from '../../test/utils';
 import { ensureCorrectERC20AddressOrder } from './computePoolAddress';
 
 // TI TO [] = [TI / TO]

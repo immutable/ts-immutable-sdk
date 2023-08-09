@@ -2,12 +2,11 @@ import {
   BiomeCombinedProviders,
 } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
-import { Web3Provider } from '@ethersproject/providers';
 import {
-  Checkout,
   NetworkFilterTypes,
 } from '@imtbl/checkout-sdk';
 import {
+  useContext,
   useEffect, useMemo, useReducer,
 } from 'react';
 import { ImmutableConfiguration } from '@imtbl/config';
@@ -44,11 +43,11 @@ import { text } from '../../resources/text/textConfig';
 import { ErrorView } from '../../views/error/ErrorView';
 import { ApproveERC20BridgeOnboarding } from './views/ApproveERC20Bridge';
 import { getBridgeTokensAndBalances } from './functions/getBridgeTokens';
+import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 
 export interface BridgeWidgetProps {
   params: BridgeWidgetParams;
   config: StrongCheckoutWidgetsConfig
-  web3Provider?: Web3Provider;
 }
 
 export interface BridgeWidgetParams {
@@ -57,7 +56,7 @@ export interface BridgeWidgetParams {
 }
 
 export function BridgeWidget(props: BridgeWidgetProps) {
-  const { params, config, web3Provider } = props;
+  const { params, config } = props;
   const { environment, theme } = config;
   const successText = text.views[BridgeWidgetViews.SUCCESS];
   const failText = text.views[BridgeWidgetViews.FAIL];
@@ -67,9 +66,9 @@ export function BridgeWidget(props: BridgeWidgetProps) {
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
 
   const viewReducerValues = useMemo(() => ({ viewState, viewDispatch }), [viewState, viewDispatch]);
-
+  const { connectLoaderState } = useContext(ConnectLoaderContext);
+  const { checkout, provider } = connectLoaderState;
   const [bridgeState, bridgeDispatch] = useReducer(bridgeReducer, initialBridgeState);
-  const { checkout, provider } = bridgeState;
   const bridgeReducerValues = useMemo(() => ({ bridgeState, bridgeDispatch }), [bridgeState, bridgeDispatch]);
 
   const {
@@ -79,28 +78,6 @@ export function BridgeWidget(props: BridgeWidgetProps) {
   const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
     : onDarkBase;
-
-  /* Sets the provider in BridgeState from passed in web3Provider */
-  useEffect(() => {
-    if (!web3Provider) return;
-    bridgeDispatch({
-      payload: {
-        type: BridgeActions.SET_PROVIDER,
-        provider: web3Provider,
-      },
-    });
-  }, [web3Provider]);
-
-  useEffect(() => {
-    bridgeDispatch({
-      payload: {
-        type: BridgeActions.SET_CHECKOUT,
-        checkout: new Checkout({
-          baseConfig: { environment },
-        }),
-      },
-    });
-  }, [environment]);
 
   useEffect(() => {
     const bridgetWidgetSetup = async () => {

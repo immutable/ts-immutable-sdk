@@ -16,7 +16,9 @@ import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fi
 import {
   calculateCryptoToFiat, formatZeroAmount, isNativeToken, tokenValueFormat,
 } from '../../../lib/utils';
-import { DEFAULT_TOKEN_DECIMALS, DEFAULT_QUOTE_REFRESH_INTERVAL, NATIVE } from '../../../lib';
+import {
+  DEFAULT_TOKEN_DECIMALS, DEFAULT_QUOTE_REFRESH_INTERVAL, NATIVE, IMX_ADDRESS_ZKEVM,
+} from '../../../lib';
 import { quotesProcessor } from '../functions/FetchQuote';
 import { SelectInput } from '../../../components/FormComponents/SelectInput/SelectInput';
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
@@ -34,6 +36,7 @@ import { useInterval } from '../../../lib/hooks/useInterval';
 import { NotEnoughImx } from '../../../components/NotEnoughImx/NotEnoughImx';
 import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { UnableToSwap } from './UnableToSwap';
+import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 
 enum SwapDirection {
   FROM = 'FROM',
@@ -88,11 +91,13 @@ export function SwapForm({ data }: SwapFromProps) {
   const {
     swapState: {
       allowedTokens,
-      provider,
       exchange,
       tokenBalances,
+      network,
     },
   } = useContext(SwapContext);
+  const { connectLoaderState } = useContext(ConnectLoaderContext);
+  const { provider } = connectLoaderState;
 
   const formatTokenOptionsId = useCallback((symbol: string, address?: string) => {
     if (!address) return symbol.toLowerCase();
@@ -134,6 +139,7 @@ export function SwapForm({ data }: SwapFromProps) {
 
   useEffect(() => {
     if (tokenBalances.length === 0) return;
+    if (!network) return;
     const fromOptions = tokenBalances
       .filter((b) => b.balance.gt(0))
       .map(
@@ -162,14 +168,15 @@ export function SwapForm({ data }: SwapFromProps) {
       if (data?.fromContractAddress) {
         setFromToken(
           allowedTokens.find((t) => (
-            isNativeToken(t.address) && data?.fromContractAddress?.toLocaleUpperCase() === NATIVE
+            isNativeToken(t.address, network.chainId) && data?.fromContractAddress?.toLocaleUpperCase() === NATIVE
           )
           || (t.address?.toLowerCase() === data?.fromContractAddress?.toLowerCase())),
         );
         setFromBalance(
           tokenBalances.find(
             (t) => (
-              isNativeToken(t.token.address) && data?.fromContractAddress?.toLocaleUpperCase() === NATIVE)
+              isNativeToken(t.token.address, network.chainId)
+                && data?.fromContractAddress?.toLocaleUpperCase() === NATIVE)
               || (t.token.address?.toLowerCase() === data?.fromContractAddress?.toLowerCase()),
           )?.formattedBalance ?? '',
         );
@@ -177,7 +184,7 @@ export function SwapForm({ data }: SwapFromProps) {
 
       if (shouldSetToAddress(data?.toContractAddress, data?.fromContractAddress)) {
         setToToken(allowedTokens.find((t) => (
-          isNativeToken(t.address) && data?.toContractAddress?.toLocaleUpperCase() === NATIVE
+          isNativeToken(t.address, network.chainId) && data?.toContractAddress?.toLocaleUpperCase() === NATIVE
         ) || (t.address?.toLowerCase() === data?.toContractAddress?.toLowerCase())));
       }
     }
@@ -194,6 +201,7 @@ export function SwapForm({ data }: SwapFromProps) {
     setTokensOptionsForm,
     formatTokenOptionsId,
     formatZeroAmount,
+    network,
   ]);
 
   const tokensOptionsTo = useMemo(() => allowedTokens
@@ -431,11 +439,10 @@ export function SwapForm({ data }: SwapFromProps) {
   // 2. If the swap from token is also IMX, include the additional amount into the calc
   //    as user will need enough imx for the swap amount and the gas
   const insufficientFundsForGas = useMemo(() => {
-    const imxBalance = tokenBalances.find((b) => !b.token.address || b.token.address === 'NATIVE');
+    const imxBalance = tokenBalances.find((b) => b.token.address === IMX_ADDRESS_ZKEVM);
     if (!imxBalance) return true;
 
-    // need to double check if the is going to be how to identify IMX on zkEVM
-    const fromTokenIsImx = !fromToken?.address || fromToken.address === 'NATIVE';
+    const fromTokenIsImx = fromToken?.address === IMX_ADDRESS_ZKEVM;
     const gasAmount = parseEther(gasFeeValue.length !== 0 ? gasFeeValue : '0');
     const additionalAmount = fromTokenIsImx && !Number.isNaN(parseFloat(fromAmount))
       ? parseUnits(fromAmount, fromToken?.decimals || 18)
@@ -691,7 +698,7 @@ export function SwapForm({ data }: SwapFromProps) {
       />
       <NotEnoughImx
         visible={showNotEnoughImxDrawer}
-        showAdjustAmount={!fromToken?.address || fromToken.address === 'NATIVE'}
+        showAdjustAmount={fromToken?.address === IMX_ADDRESS_ZKEVM}
         hasZeroImx={false}
         onAddCoinsClick={() => {
           viewDispatch({

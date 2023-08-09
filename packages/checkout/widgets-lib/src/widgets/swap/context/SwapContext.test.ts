@@ -1,9 +1,5 @@
-import { ChainId, Checkout } from '@imtbl/checkout-sdk';
-import { Web3Provider } from '@ethersproject/providers';
-import { Environment } from '@imtbl/config';
+import { ChainId } from '@imtbl/checkout-sdk';
 import {
-  SetCheckoutPayload,
-  SetProviderPayload,
   SetNetworkPayload,
   SwapActions,
   initialSwapState,
@@ -14,32 +10,6 @@ import {
 } from './SwapContext';
 
 describe('WalletContext', () => {
-  it('should update state with checkout when reducer called with SET_CHECKOUT action', () => {
-    const setCheckoutPayload: SetCheckoutPayload = {
-      type: SwapActions.SET_CHECKOUT,
-      checkout: new Checkout({
-        baseConfig: { environment: Environment.PRODUCTION },
-      }),
-    };
-    expect(initialSwapState.checkout).toBeNull();
-    const { checkout } = swapReducer(initialSwapState, {
-      payload: setCheckoutPayload,
-    });
-    expect(checkout).toBeInstanceOf(Checkout);
-  });
-
-  it('should update state with provider when reducer called with SET_PROVIDER action', () => {
-    const setProviderPayload: SetProviderPayload = {
-      type: SwapActions.SET_PROVIDER,
-      provider: {} as Web3Provider,
-    };
-    expect(initialSwapState.provider).toBeNull();
-    const { provider } = swapReducer(initialSwapState, {
-      payload: setProviderPayload,
-    });
-    expect(provider).not.toBeNull();
-  });
-
   it('should update state with network info when reducer called with SET_NETWORK action', () => {
     const setNetworkPayload: SetNetworkPayload = {
       type: SwapActions.SET_NETWORK,

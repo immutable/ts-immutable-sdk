@@ -12,10 +12,14 @@ import { Web3Provider } from '@ethersproject/providers';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { SwapWidget, SwapWidgetParams } from './SwapWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { WidgetTheme } from '../../lib';
+import { IMX_ADDRESS_ZKEVM, WidgetTheme } from '../../lib';
 import { quotesProcessor } from './functions/FetchQuote';
 import { text } from '../../resources/text/textConfig';
 import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
+import { ConnectionStatus } from '../../context/connect-loader-context/ConnectLoaderContext';
+import {
+  ConnectLoaderTestComponent,
+} from '../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
 
 describe('SwapWidget tests', () => {
   const mockProvider = {
@@ -30,6 +34,14 @@ describe('SwapWidget tests', () => {
       request: async () => null,
     },
   } as unknown as Web3Provider;
+
+  const connectLoaderState = {
+    checkout: new Checkout({
+      baseConfig: { environment: Environment.SANDBOX },
+    }),
+    provider: mockProvider,
+    connectionStatus: ConnectionStatus.CONNECTED_WITH_NETWORK,
+  };
 
   beforeEach(() => {
     cy.viewport('ipad-2');
@@ -46,6 +58,7 @@ describe('SwapWidget tests', () => {
             name: 'IMX',
             symbol: 'IMX',
             decimals: 18,
+            address: IMX_ADDRESS_ZKEVM,
           },
         },
       });
@@ -73,7 +86,7 @@ describe('SwapWidget tests', () => {
             name: 'ImmutableX',
             symbol: 'IMX',
             decimals: 18,
-            address: 'NATIVE',
+            address: IMX_ADDRESS_ZKEVM,
           },
         ],
       });
@@ -101,18 +114,21 @@ describe('SwapWidget tests', () => {
                 name: 'ImmutableX',
                 symbol: 'IMX',
                 decimals: 18,
-                address: '',
+                address: IMX_ADDRESS_ZKEVM,
               },
             },
           ],
         });
 
       mount(
-        <SwapWidget
-          params={params}
-          config={config}
-          web3Provider={mockProvider}
-        />,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <SwapWidget
+            params={params}
+            config={config}
+          />
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('not-enough-gas-bottom-sheet').should('be.visible');
@@ -136,18 +152,21 @@ describe('SwapWidget tests', () => {
                 name: 'ImmutableX',
                 symbol: 'IMX',
                 decimals: 18,
-                address: '',
+                address: IMX_ADDRESS_ZKEVM,
               },
             },
           ],
         });
 
       mount(
-        <SwapWidget
-          params={params}
-          config={config}
-          web3Provider={mockProvider}
-        />,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <SwapWidget
+            params={params}
+            config={config}
+          />
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('not-enough-gas-bottom-sheet').should('be.visible');
@@ -171,18 +190,21 @@ describe('SwapWidget tests', () => {
                 name: 'ImmutableX',
                 symbol: 'IMX',
                 decimals: 18,
-                address: '',
+                address: IMX_ADDRESS_ZKEVM,
               },
             },
           ],
         });
 
       mount(
-        <SwapWidget
-          params={params}
-          config={config}
-          web3Provider={mockProvider}
-        />,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <SwapWidget
+            params={params}
+            config={config}
+          />
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('not-enough-gas-bottom-sheet').should('not.exist');
@@ -212,7 +234,7 @@ describe('SwapWidget tests', () => {
                 name: 'ImmutableX',
                 symbol: 'IMX',
                 decimals: 18,
-                address: 'NATIVE',
+                address: IMX_ADDRESS_ZKEVM,
               },
             },
             {
@@ -231,11 +253,14 @@ describe('SwapWidget tests', () => {
 
     it('should show swap widget on mount', () => {
       mount(
-        <SwapWidget
-          params={params}
-          config={config}
-          web3Provider={mockProvider}
-        />,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <SwapWidget
+            params={params}
+            config={config}
+          />
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').should('be.visible');
@@ -245,19 +270,21 @@ describe('SwapWidget tests', () => {
     });
 
     it('should set fromTokens to user balances filtered by the token allow list', () => {
-      cyIntercept();
       mount(
-        <SwapWidget
-          config={config}
-          params={params}
-          web3Provider={mockProvider}
-        />,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <SwapWidget
+            config={config}
+            params={params}
+          />
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
       cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
         .should('exist');
-      cySmartGet('fromTokenInputs-select-form-coin-selector__option-imx-native')
+      cySmartGet(`fromTokenInputs-select-form-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`)
         .should('exist');
       cySmartGet('fromTokenInputs-select-form-USDC-USDCoin').should('not.exist');
     });
@@ -272,16 +299,16 @@ describe('SwapWidget tests', () => {
               decimals: 18,
               address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
             },
-            value: BigNumber.from('112300000000000012'),
+            value: BigNumber.from('100000000000000000'),
           },
           amountWithMaxSlippage: {
             token: {
               name: 'ImmutableX',
               symbol: 'IMX',
               decimals: 18,
-              address: '',
+              address: IMX_ADDRESS_ZKEVM,
             },
-            value: BigNumber.from('112300000000000032'),
+            value: BigNumber.from('10000000000000000'),
           },
           slippage: 10,
         },
@@ -291,9 +318,9 @@ describe('SwapWidget tests', () => {
               name: 'ImmutableX',
               symbol: 'IMX',
               decimals: 18,
-              address: '',
+              address: IMX_ADDRESS_ZKEVM,
             },
-            value: BigNumber.from('112300000000000045'),
+            value: BigNumber.from('10000000000000000'),
           },
           transaction: {
             to: 'toSwapAddress',
@@ -306,9 +333,9 @@ describe('SwapWidget tests', () => {
               name: 'ImmutableX',
               symbol: 'IMX',
               decimals: 18,
-              address: '',
+              address: IMX_ADDRESS_ZKEVM,
             },
-            value: BigNumber.from('112300000000000045'),
+            value: BigNumber.from('10000000000000000'),
           },
           transaction: {
             to: 'toApprovalAddress',
@@ -324,7 +351,11 @@ describe('SwapWidget tests', () => {
 
         mount(
           <BiomeCombinedProviders>
-            <SwapWidget params={params} config={config} web3Provider={mockProvider} />
+            <ConnectLoaderTestComponent
+              initialStateOverride={connectLoaderState}
+            >
+              <SwapWidget params={params} config={config} />
+            </ConnectLoaderTestComponent>
           </BiomeCombinedProviders>,
         );
       });
@@ -353,8 +384,7 @@ describe('SwapWidget tests', () => {
             .click();
 
           cySmartGet('toTokenInputs-select-form-select__target').click();
-          // eslint-disable-next-line max-len
-          cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
+          cySmartGet(`toTokenInputs-select-form-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).click();
 
           cySmartGet('fromTokenInputs-text-form-text__input').type('0.1');
           cySmartGet('fromTokenInputs-text-form-text__input').blur();
@@ -392,7 +422,7 @@ describe('SwapWidget tests', () => {
 
           cySmartGet('toTokenInputs-select-form-select__target').click();
           // eslint-disable-next-line max-len
-          cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
+          cySmartGet(`toTokenInputs-select-form-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).click();
 
           cySmartGet('fromTokenInputs-text-form-text__input').type('0.1');
           cySmartGet('fromTokenInputs-text-form-text__input').blur();
@@ -443,7 +473,7 @@ describe('SwapWidget tests', () => {
 
           cySmartGet('toTokenInputs-select-form-select__target').click();
           // eslint-disable-next-line max-len
-          cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
+          cySmartGet(`toTokenInputs-select-form-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).click();
 
           cySmartGet('fromTokenInputs-text-form-text__input').type('0.1');
           cySmartGet('fromTokenInputs-text-form-text__input').blur();
@@ -524,7 +554,7 @@ describe('SwapWidget tests', () => {
 
           cySmartGet('toTokenInputs-select-form-select__target').click();
           // eslint-disable-next-line max-len
-          cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
+          cySmartGet(`toTokenInputs-select-form-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).click();
 
           cySmartGet('fromTokenInputs-text-form-text__input').type('0.1');
           cySmartGet('fromTokenInputs-text-form-text__input').blur();

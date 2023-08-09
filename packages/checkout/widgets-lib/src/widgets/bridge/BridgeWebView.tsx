@@ -8,7 +8,10 @@ function BridgeWebView() {
   };
 
   return (
-    <imtbl-bridge widgetConfig={JSON.stringify(config)} walletProvider="metamask" />
+    <imtbl-bridge
+      widgetConfig={JSON.stringify(config)}
+      walletProvider="metamask"
+    />
   );
 }
 

@@ -14,21 +14,31 @@ import {
 } from '../../../context/view-context/SwapViewContextTypes';
 import { SwapState } from '../context/SwapContext';
 import { SwapWidgetTestComponent } from '../test-components/SwapWidgetTestComponent';
+import { ConnectLoaderState, ConnectionStatus } from '../../../context/connect-loader-context/ConnectLoaderContext';
+import {
+  ConnectLoaderTestComponent,
+} from '../../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
 
 describe('Approve ERC20 Onboarding', () => {
-  let initialSwapState:SwapState;
+  let initialSwapState: SwapState;
+  let connectLoaderState: ConnectLoaderState;
   let mockApproveERC20Swap: ApproveERC20SwapData;
   let sendTransactionStub;
+
   beforeEach(() => {
     cy.viewport('ipad-2');
     sendTransactionStub = cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub');
 
-    initialSwapState = {
+    connectLoaderState = {
       checkout: {
         sendTransaction: sendTransactionStub,
       } as unknown as Checkout,
-      exchange: null,
       provider: {} as Web3Provider,
+      connectionStatus: ConnectionStatus.CONNECTED_WITH_NETWORK,
+    };
+
+    initialSwapState = {
+      exchange: null,
       walletProvider: null,
       network: null,
       tokenBalances: [
@@ -80,9 +90,13 @@ describe('Approve ERC20 Onboarding', () => {
   describe('Approve Spending Step', () => {
     it('should request user to approve spending transaction on button click', () => {
       mount(
-        <SwapWidgetTestComponent initialStateOverride={initialSwapState}>
-          <ApproveERC20Onboarding data={mockApproveERC20Swap} />
-        </SwapWidgetTestComponent>,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <SwapWidgetTestComponent initialStateOverride={initialSwapState}>
+            <ApproveERC20Onboarding data={mockApproveERC20Swap} />
+          </SwapWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('footer-button').click();
@@ -102,9 +116,13 @@ describe('Approve ERC20 Onboarding', () => {
       });
       const { approveSwap, approveSpending } = text.views[SwapWidgetViews.APPROVE_ERC20];
       mount(
-        <SwapWidgetTestComponent initialStateOverride={initialSwapState}>
-          <ApproveERC20Onboarding data={mockApproveERC20Swap} />
-        </SwapWidgetTestComponent>,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <SwapWidgetTestComponent initialStateOverride={initialSwapState}>
+            <ApproveERC20Onboarding data={mockApproveERC20Swap} />
+          </SwapWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
       );
 
       // assert approve spending copy
@@ -124,9 +142,13 @@ describe('Approve ERC20 Onboarding', () => {
 
     it('should show correct approval spending hint (amount and symbol) in body', () => {
       mount(
-        <SwapWidgetTestComponent initialStateOverride={initialSwapState}>
-          <ApproveERC20Onboarding data={mockApproveERC20Swap} />
-        </SwapWidgetTestComponent>,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <SwapWidgetTestComponent initialStateOverride={initialSwapState}>
+            <ApproveERC20Onboarding data={mockApproveERC20Swap} />
+          </SwapWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('simple-text-body__body').should('include.text', '0.5 IMX');
@@ -136,9 +158,13 @@ describe('Approve ERC20 Onboarding', () => {
       sendTransactionStub.rejects({ type: CheckoutErrorType.USER_REJECTED_REQUEST_ERROR });
       const { footer } = text.views[SwapWidgetViews.APPROVE_ERC20].approveSpending;
       mount(
-        <SwapWidgetTestComponent initialStateOverride={initialSwapState}>
-          <ApproveERC20Onboarding data={mockApproveERC20Swap} />
-        </SwapWidgetTestComponent>,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <SwapWidgetTestComponent initialStateOverride={initialSwapState}>
+            <ApproveERC20Onboarding data={mockApproveERC20Swap} />
+          </SwapWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
       );
       cySmartGet('footer-button').should('have.text', footer.buttonText);
 
@@ -154,9 +180,13 @@ describe('Approve ERC20 Onboarding', () => {
         transactionResponse: { wait: () => Promise.resolve({ status: 1 }) },
       });
       mount(
-        <SwapWidgetTestComponent initialStateOverride={initialSwapState}>
-          <ApproveERC20Onboarding data={mockApproveERC20Swap} />
-        </SwapWidgetTestComponent>,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <SwapWidgetTestComponent initialStateOverride={initialSwapState}>
+            <ApproveERC20Onboarding data={mockApproveERC20Swap} />
+          </SwapWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('footer-button').click();

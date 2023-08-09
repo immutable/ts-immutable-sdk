@@ -20,6 +20,7 @@ import { RelayerClient } from './relayerClient';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';
 import { loginZkEvmUser } from './user';
 import { sendTransaction } from './sendTransaction';
+import GuardianClient from '../guardian/guardian';
 
 export type ZkEvmProviderInput = {
   authManager: AuthManager;
@@ -32,6 +33,8 @@ export type ZkEvmProviderInput = {
 type LoggedInZkEvmProvider = {
   magicProvider: ExternalProvider;
   user: UserZkEvm;
+  relayerClient: RelayerClient;
+  guardianClient: GuardianClient;
 };
 
 export class ZkEvmProvider implements Provider {
@@ -43,8 +46,6 @@ export class ZkEvmProvider implements Provider {
 
   private readonly magicAdapter: MagicAdapter;
 
-  private readonly relayerClient: RelayerClient;
-
   private readonly transactionAPI: guardian.TransactionsApi;
 
   private readonly multiRollupApiClients: MultiRollupApiClients;
@@ -52,6 +53,10 @@ export class ZkEvmProvider implements Provider {
   private readonly jsonRpcProvider: JsonRpcProvider; // Used for read
 
   private readonly eventEmitter: TypedEventEmitter<ProviderEventMap>;
+
+  protected guardianClient?: GuardianClient;
+
+  protected relayerClient?: RelayerClient;
 
   protected magicProvider?: ExternalProvider; // Used for signing
 
@@ -68,7 +73,6 @@ export class ZkEvmProvider implements Provider {
     this.magicAdapter = magicAdapter;
     this.config = config;
     this.confirmationScreen = confirmationScreen;
-    this.relayerClient = new RelayerClient({ config });
     this.transactionAPI = new guardian.TransactionsApi(
       new guardian.Configuration({
         basePath: this.config.imxPublicApiDomain,
@@ -79,8 +83,13 @@ export class ZkEvmProvider implements Provider {
     this.eventEmitter = new TypedEventEmitter<ProviderEventMap>();
   }
 
+  public isPassport: boolean = true;
+
   private isLoggedIn(): this is LoggedInZkEvmProvider {
-    return this.magicProvider !== undefined && this.user !== undefined;
+    return this.magicProvider !== undefined
+      && this.user !== undefined
+      && this.relayerClient !== undefined
+      && this.guardianClient !== undefined;
   }
 
   private async performRequest(request: RequestArguments): Promise<any> {
@@ -98,6 +107,16 @@ export class ZkEvmProvider implements Provider {
 
         this.user = user;
         this.magicProvider = magicProvider;
+        this.relayerClient = new RelayerClient({
+          config: this.config,
+          user: this.user,
+        });
+        this.guardianClient = new GuardianClient({
+          imxPublicApiDomain: this.config.imxPublicApiDomain,
+          accessToken: this.user.accessToken,
+          confirmationScreen: this.confirmationScreen,
+          imxEtherAddress: this.user.zkEvm.ethAddress,
+        });
 
         this.eventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, [this.user.zkEvm.ethAddress]);
 
@@ -111,7 +130,7 @@ export class ZkEvmProvider implements Provider {
         return sendTransaction({
           params: request.params || [],
           magicProvider: this.magicProvider,
-          transactionAPI: this.transactionAPI,
+          guardianClient: this.guardianClient,
           jsonRpcProvider: this.jsonRpcProvider,
           config: this.config,
           relayerClient: this.relayerClient,
