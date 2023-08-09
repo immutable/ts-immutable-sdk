@@ -9,12 +9,6 @@ INPUT_DESTINATION_REPO="immutable/imx-docs"
 INPUT_DESTINATION_HEAD_BRANCH="ts-immutable-sdk-docs-$VERSION"
 INPUT_DESTINATION_FOLDER="api-docs/sdk-references/ts-immutable-sdk/$VERSION"
 
-if [ $INPUT_DESTINATION_HEAD_BRANCH == "main" ] || [ $INPUT_DESTINATION_HEAD_BRANCH == "master"]
-then
-  echo "Destination head branch cannot be 'main' nor 'master'"
-  return -1
-fi
-
 if [ -z "$INPUT_PULL_REQUEST_REVIEWERS" ]
 then
   PULL_REQUEST_REVIEWERS=$INPUT_PULL_REQUEST_REVIEWERS

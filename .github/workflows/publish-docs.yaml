@@ -33,11 +33,6 @@ jobs:
       - name: Build SDK Docs
         run: yarn docs:build
 
-      - name: Get next version string
-        id: version
-        run: |
-          echo "DOCS_VERSION=$(jq -r .version package.json)" >> $GITHUB_ENV
-
       - name: Create SDK Docs PR
-        run: ./.github/scripts/push-docs-pr.sh
+        run: GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} ./.github/scripts/push-docs-pr.sh
         shell: bash
