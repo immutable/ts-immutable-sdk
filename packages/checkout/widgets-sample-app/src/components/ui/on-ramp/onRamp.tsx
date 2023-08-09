@@ -1,56 +1,57 @@
 import { BiomeCombinedProviders, Body, Box } from "@biom3/react";
 import { onDarkBase } from "@biom3/design-tokens";
-import { RampInstantSDK } from '@ramp-network/ramp-instant-sdk';
+// import transakSDK from "@transak/transak-sdk";
 import { useEffect, useRef } from "react";
 
-export function OnRampUI() {
-  let domElement: HTMLElement | undefined;
-  let ramp: RampInstantSDK | undefined;
-  const firstRender = useRef(true);
+// const transakSDKModule = require('@transak/transak-sdk');
 
-  useEffect(()=>{
-    domElement = document.getElementById('ramp-container') || undefined;
-    ramp = new RampInstantSDK({
-      hostAppName: 'Immutable',
-      hostLogoUrl: 'https://assets.ramp.network/misc/test-logo.png',
-      hostApiKey: 'onr7tgoqgx8jxzggsc52ud9xx3hm9gkzf7czw93x',
-      url: 'https://app.demo.ramp.network',
-      variant: 'embedded-mobile',
-      containerNode: domElement,
-      enabledFlows: ['ONRAMP'],
-      userAddress: '0xDaA1842cF7E43B45385F956b89Ae814C0fE4BD20',
-      fiatCurrency: 'USD',
-      fiatValue: '20',
-      swapAmount: '200000000000000000',
-      swapAsset: 'SEPOLIA_*',
-      defaultAsset: 'SEPOLIA_ETH',
-    });
-    // const iframeElement = ramp?.domNodes?.iframe;
-    // if(iframeElement) {
-    //   iframeElement.height = '600px';
-    // }
-  },[]);
+export function OnRampUI() {
+  const firstRender = useRef(true);
+  const settings = {
+    apiKey: '41ad2da7-ed5a-4d89-a90b-c751865effc2',  // Your API Key
+    environment: "STAGING", // STAGING/PRODUCTION
+    defaultCryptoCurrency: 'ETH',
+    themeColor: '000000', // App theme color
+    widgetHeight: "580px",
+    widgetWidth: "400px",
+  }
+
+  // useEffect(()=>{
+  //   const transak = new transakSDK(settings);
+  //   transak.init();
+  //     transak.on(transak.ALL_EVENTS, (data: any) => {
+  //       console.log(data);
+  //       if(data.eventName == 'TRANSAK_WIDGET_CLOSE'){
+  //         console.log('closde the widget')
+  //       }
+  //     });
+  // },[]);
+
   useEffect(() => {
-    if(!ramp) return;
-    console.log('iframe domeNodes: ',ramp.domNodes)
-    if(firstRender.current) {
-      ramp.on('*', (event) => console.log(event))
-        .show();
-    }
-    firstRender.current = false;
-    console.log('is it rendering twice!')
-  }, [ramp, domElement]);
+    const domIframe:HTMLIFrameElement = document.getElementsByTagName("iframe")[0];
+
+    if(domIframe == undefined) return;
+
+    console.log('useeffect passed check for iframe domElement');
+    window.addEventListener("message", function(event) {
+      if (event.source === domIframe.contentWindow) {
+        if (event.origin === "https://global-stg.transak.com") {
+          console.log('TRANSAK event listener: ',event.data);
+        }
+      }
+    });
+  }, []);
+
 
   return (
     <BiomeCombinedProviders theme={{ base: onDarkBase }}>
-      <Box style={{ height: '630px', width: '430px' }}>
-        <Body>OnRampWidget with iframe</Body>
-        <iframe style={{ height: '600px', width: '430px' }}
-                src="https://app.demo.ramp.network/?hostAppName=Immutable&hostLogoUrl=https%3A%2F%2Fassets.ramp.network%2Fmisc%2Ftest-logo.png&hostApiKey=onr7tgoqgx8jxzggsc52ud9xx3hm9gkzf7czw93x&enabledFlows=ONRAMP&userAddress=0xDaA1842cF7E43B45385F956b89Ae814C0fE4BD20&fiatCurrency=USD&fiatValue=20&sdkType=WEB&sdkVersion=4.0.4&hostUrl=http%3A%2F%2Flocalhost%3A3000"></iframe>
-      </Box>
-
-      <Box id="ramp-container" style={{ height: '667px', width: '430px' }} >
-        embedded widget
+      <Box style={{position: 'relative', width: '500px', height: '80dvh',
+        boxShadow: '0 0 15px #1461db', borderRadius: '15px', overflow: 'hidden'}}>
+        <iframe id="transak-iframe"
+          src="https://global-stg.transak.com?apiKey=41ad2da7-ed5a-4d89-a90b-c751865effc2&environment=staging"
+          allow="camera;microphone;fullscreen;payment"
+          style={{height: '100%', width: '100%', border: 'none'}}>
+        </iframe>
       </Box>
     </BiomeCombinedProviders>
   );
