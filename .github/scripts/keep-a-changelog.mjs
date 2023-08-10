@@ -61,7 +61,7 @@ class ImmutableKeepAChangeLog extends KeepAChangelog {
     // stage, commit, and push the changelog only
     // the workspaces plugin also updates the versions in the package.json 
     // files but we don't commit them
-    await this.exec(`git add CHANGELOG.md`)
+    await this.exec(`git add CHANGELOG.md package.json`)
     await this.exec(`git commit -m "release-it: update changelog"`);
     await this.exec(`git push`);
     return;
