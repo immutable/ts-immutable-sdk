@@ -12,7 +12,7 @@ import { ethers } from 'ethers';
 import { SecondaryFee__factory } from 'contracts/types';
 import { ISecondaryFee, SecondaryFeeInterface } from 'contracts/types/SecondaryFee';
 import { QuoteTradeInfo } from 'lib/router';
-import { calculateFees } from 'lib/fees';
+import { Fees } from 'lib/fees';
 import {
   SecondaryFee,
   TokenInfo, TransactionDetails,
@@ -243,27 +243,29 @@ export function getSwap(
 export function prepareSwap(
   ourQuote: QuoteTradeInfo,
   amountSpecified: ethers.BigNumber,
-  secondaryFees: SecondaryFee[],
+  fees: Fees,
 ): QuoteTradeInfo {
-  const fees = ourQuote.tradeType === TradeType.EXACT_INPUT
-    ? ethers.BigNumber.from(0) // no fees on exact input
-    : calculateFees(ourQuote.amountIn, secondaryFees);
+  if (ourQuote.tradeType === TradeType.EXACT_OUTPUT) {
+    fees.addAmount(ourQuote.amountIn);
 
-  const amountIn = ourQuote.tradeType === TradeType.EXACT_INPUT
-    ? amountSpecified
-    : ourQuote.amountIn.add(fees);
-
-  const amountOut = ourQuote.tradeType === TradeType.EXACT_INPUT
-    ? ourQuote.amountOut
-    : amountSpecified;
+    return {
+      gasEstimate: ourQuote.gasEstimate,
+      route: ourQuote.route,
+      tokenIn: ourQuote.tokenIn,
+      tokenOut: ourQuote.tokenOut,
+      amountIn: fees.amountWithFeesApplied(),
+      amountOut: amountSpecified,
+      tradeType: ourQuote.tradeType,
+    };
+  }
 
   return {
     gasEstimate: ourQuote.gasEstimate,
     route: ourQuote.route,
     tokenIn: ourQuote.tokenIn,
     tokenOut: ourQuote.tokenOut,
-    amountIn,
-    amountOut,
+    amountIn: amountSpecified,
+    amountOut: ourQuote.amountOut,
     tradeType: ourQuote.tradeType,
   };
 }

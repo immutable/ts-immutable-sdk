@@ -1,7 +1,7 @@
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { Contract } from '@ethersproject/contracts';
 import { BigNumber } from '@ethersproject/bignumber';
-import { SecondaryFee } from 'lib';
+import { SecondaryFee, uniswapTokenToTokenInfo } from 'lib';
 import { ethers } from 'ethers';
 import { ERC20__factory } from 'contracts/types';
 import { Exchange } from './exchange';
@@ -19,6 +19,8 @@ import {
   decodeMulticallExactOutputWithFees,
   expectToBeDefined,
   decodePathForExactOutput,
+  makeAddr,
+  IMX_TEST_TOKEN,
 } from './test/utils';
 
 jest.mock('@ethersproject/providers');
@@ -160,6 +162,46 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       const spenderAddress: string = decodedResults[0].toString();
 
       expect(spenderAddress).toEqual(TEST_SECONDARY_FEE_ADDRESS);
+    });
+
+    it('returns valid swap quote', async () => {
+      const params = setupSwapTxTest();
+      mockRouterImplementation(params);
+
+      const secondaryFees: SecondaryFee[] = [
+        { feeRecipient: makeAddr('recipienta'), feeBasisPoints: 200 }, // 2% fee
+        { feeRecipient: makeAddr('recipientb'), feeBasisPoints: 400 }, // 4% fee
+      ];
+
+      const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
+
+      const { quote } = await exchange.getUnsignedSwapTxFromAmountOut(
+        params.fromAddress,
+        params.inputToken,
+        params.outputToken,
+        ethers.utils.parseEther('1000'),
+      );
+
+      const tokenIn = { ...uniswapTokenToTokenInfo(IMX_TEST_TOKEN), name: undefined, symbol: undefined };
+
+      expect(quote.fees).toEqual([
+        {
+          feeRecipient: makeAddr('recipienta'),
+          feeBasisPoints: 200,
+          amount: {
+            token: tokenIn,
+            value: ethers.utils.parseEther('2'),
+          },
+        },
+        {
+          feeRecipient: makeAddr('recipientb'),
+          feeBasisPoints: 400,
+          amount: {
+            token: tokenIn,
+            value: ethers.utils.parseEther('4'),
+          },
+        },
+      ]);
     });
   });
 

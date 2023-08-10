@@ -9,11 +9,12 @@ import {
 import { fetchGasPrice } from 'lib/transactionUtils/gas';
 import { getApproval, prepareApproval } from 'lib/transactionUtils/approval';
 import { getOurQuoteReqAmount, prepareUserQuote } from 'lib/transactionUtils/getQuote';
+import { Fees } from 'lib/fees';
 import {
   DEFAULT_DEADLINE, DEFAULT_MAX_HOPS, DEFAULT_SLIPPAGE, MAX_MAX_HOPS, MIN_MAX_HOPS,
 } from './constants';
 import { Router } from './lib/router';
-import { getERC20Decimals, isValidNonZeroAddress } from './lib/utils';
+import { getERC20Decimals, isValidNonZeroAddress, uniswapTokenToTokenInfo } from './lib/utils';
 import {
   ExchangeModuleConfiguration, SecondaryFee, TokenInfo, TransactionResponse,
 } from './types';
@@ -112,7 +113,9 @@ export class Exchange {
       otherToken = tokenIn;
     }
 
-    const ourQuoteReqAmount = getOurQuoteReqAmount(amountSpecified, this.secondaryFees, tradeType);
+    const fees = new Fees(this.secondaryFees, uniswapTokenToTokenInfo(tokenIn));
+
+    const ourQuoteReqAmount = getOurQuoteReqAmount(amountSpecified, fees, tradeType);
 
     const ourQuote = await this.router.findOptimalRoute(
       ourQuoteReqAmount,
@@ -124,7 +127,7 @@ export class Exchange {
     // get gas details
     const gasPrice = await fetchGasPrice(this.provider);
 
-    const adjustedQuote = prepareSwap(ourQuote, amount, this.secondaryFees);
+    const adjustedQuote = prepareSwap(ourQuote, amount, fees);
 
     const swap = getSwap(
       this.nativeToken,
@@ -138,7 +141,7 @@ export class Exchange {
       this.secondaryFees,
     );
 
-    const userQuote = prepareUserQuote(otherToken, adjustedQuote, slippagePercent);
+    const userQuote = prepareUserQuote(otherToken, adjustedQuote, slippagePercent, fees);
 
     const preparedApproval = prepareApproval(
       tradeType,

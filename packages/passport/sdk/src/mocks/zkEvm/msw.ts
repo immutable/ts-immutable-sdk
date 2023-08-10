@@ -5,7 +5,7 @@ import { RelayerTransactionRequest } from '../../zkEvm/relayerClient';
 import { JsonRpcRequestPayload } from '../../zkEvm/types';
 
 export const relayerId = '0x745';
-export const chainId = '13372';
+export const chainId = '13472';
 export const transactionHash = '0x867';
 
 const mandatoryHandlers = [
