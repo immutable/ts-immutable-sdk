@@ -1,12 +1,17 @@
 name: Publish SDK Reference Docs
 
 on:
-  push:
+  push: # just while WIP
+  # workflow_run:
+  #   workflows: ["Publish to NPM"]
+  #   types:
+  #     - completed
 
 jobs:
   PublishDocs:
     name: Publish SDK Reference Docs
     runs-on: ubuntu-latest
+    # if: ${{ github.event.workflow_run.conclusion == 'success' }}
     env:
       GH_TOKEN: ${{ secrets.PLATFORM_SA_GITHUB_TOKEN }}
     steps:
