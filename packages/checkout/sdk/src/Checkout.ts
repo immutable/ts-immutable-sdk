@@ -269,7 +269,7 @@ export class Checkout {
       this.config,
       params.provider,
     );
-    return await buy.buy(web3Provider, params.orderId);
+    return await buy.buy(this.config, web3Provider, params.orderId);
   }
 
   /**

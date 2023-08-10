@@ -23,12 +23,14 @@ type ERC20Item = {
   type: ItemType.ERC20;
   contractAddress: string;
   amount: BigNumber;
+  approvalContractAddress: string,
 };
 
 type ERC721Item = {
   type: ItemType.ERC721;
   contractAddress: string;
   amount: BigNumber;
+  approvalContractAddress: string,
 };
 
 export enum GasTokenType {
