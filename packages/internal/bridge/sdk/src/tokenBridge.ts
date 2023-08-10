@@ -784,14 +784,13 @@ export class TokenBridge {
 
     // Call our recursive function and wait for it to find the StateSyncResult event
     const childDepositEvent = await checkForChildDepositEvent();
-
     // Perform some error checking on the event:
     // - If there's no event, throw an error
     // - If the event doesn't have arguments, throw an error
     // - If the event's arguments don't include a status, throw an error
     if (!childDepositEvent) throw new Error('failed to find child deposit event');
     if (!childDepositEvent.args) throw new Error('child deposit event has no args');
-    if (!childDepositEvent.args.status) throw new Error('child deposit event has no status');
+    if (childDepositEvent.args.status == null) throw new Error('child deposit event has no status');
 
     // If the event's status argument is present, we consider that the state sync operation was successful
     if (childDepositEvent.args.status) {

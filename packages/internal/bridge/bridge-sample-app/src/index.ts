@@ -18,6 +18,7 @@ import {
   WaitForWithdrawalResponse,
   ExitRequest,
   ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+  ETH_SEPOLIA_TO_ZKEVM_TESTNET,
 } from '@imtbl/bridge-sdk';
 
 /**
@@ -82,7 +83,7 @@ async function depositAndWithdraw() {
     baseConfig: new ImmutableConfiguration({
       environment: Environment.SANDBOX,
     }),
-    bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+    bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
     rootProvider: rootChainProvider,
     childProvider: childChainProvider,
   });
@@ -95,6 +96,7 @@ async function depositAndWithdraw() {
   const bridgeFeeResponse: BridgeFeeResponse = await tokenBridge.getFee(
     bridgeFeeReq,
   );
+  console.log(`Deposit token is ${process.env.TOKEN_ADDRESS}`)
 
   // Calculate the total deposit amount required to ensure the user gets the amount they expect on L2
   const depositAmount = bridgeFeeResponse.feeAmount.add(depositAmountBeforeFee);
