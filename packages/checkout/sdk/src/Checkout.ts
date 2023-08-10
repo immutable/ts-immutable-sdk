@@ -263,6 +263,7 @@ export class Checkout {
   public async buy(
     params: BuyParams,
   ): Promise<BuyResponse> {
+    // eslint-disable-next-line no-console
     console.warn('This endpoint is currently under construction.');
 
     const web3Provider = await provider.validateProvider(
