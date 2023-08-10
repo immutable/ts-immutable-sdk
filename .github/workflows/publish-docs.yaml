@@ -57,6 +57,9 @@ jobs:
       - name: Build SDK Docs
         run: yarn docs:build
 
+      - name: Update version link
+        run: ./.github/scripts/update-docs-link.sh
+
       - name: Create SDK Docs PR
         run: ./.github/scripts/push-docs-pr.sh
         shell: bash
