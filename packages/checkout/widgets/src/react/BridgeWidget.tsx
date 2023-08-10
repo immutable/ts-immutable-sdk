@@ -17,7 +17,7 @@ import { SetPassport } from './internal/SetPassport';
 export interface BridgeReactProps {
   walletProvider?: WalletProviderName;
   provider?: Web3Provider;
-  passport: Passport;
+  passport?: Passport;
   fromContractAddress?: string;
   amount?: string;
 }

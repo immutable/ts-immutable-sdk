@@ -86,7 +86,6 @@ export function ConnectWidget(props: ConnectWidgetProps) {
 
   useEffect(() => {
     if (!passport) return;
-    console.log('[ConnectWidget]: passport ', passport);
 
     connectDispatch({
       payload: {
