@@ -5,6 +5,7 @@ import { BiomeCombinedProviders } from '@biom3/react';
 import { Checkout } from '@imtbl/checkout-sdk';
 import { useEffect, useReducer } from 'react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
+import { Passport } from '@imtbl/passport';
 import {
   sendCloseWidgetEvent,
   sendConnectFailedEvent,
@@ -49,11 +50,12 @@ export interface ConnectWidgetProps {
 export interface ConnectWidgetParams {
   targetLayer?: ConnectTargetLayer
   web3Provider?: Web3Provider;
+  passport?: Passport;
 }
 
 export function ConnectWidget(props: ConnectWidgetProps) {
   const { config, sendCloseEventOverride, params } = props;
-  const { targetLayer, web3Provider } = params ?? {}; // nullish operator handles if params is undefined
+  const { targetLayer, web3Provider, passport } = params ?? {}; // nullish operator handles if params is undefined
   const { deepLink = ConnectWidgetViews.CONNECT_WALLET } = props;
   const { environment, theme } = config;
   const errorText = text.views[SharedViews.ERROR_VIEW].actionText;
@@ -83,29 +85,39 @@ export function ConnectWidget(props: ConnectWidgetProps) {
   }, [web3Provider]);
 
   useEffect(() => {
-    setTimeout(() => {
-      connectDispatch({
-        payload: {
-          type: ConnectActions.SET_CHECKOUT,
-          checkout,
-        },
-      });
+    if (!passport) return;
+    console.log('[ConnectWidget]: passport ', passport);
 
-      connectDispatch({
-        payload: {
-          type: ConnectActions.SET_SEND_CLOSE_EVENT,
-          sendCloseEvent: sendCloseEventOverride ?? sendCloseWidgetEvent,
-        },
-      });
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: deepLink,
-          } as ConnectWidgetView,
-        },
-      });
-    }, 200);
+    connectDispatch({
+      payload: {
+        type: ConnectActions.SET_PASSPORT,
+        passport,
+      },
+    });
+  }, [passport]);
+
+  useEffect(() => {
+    connectDispatch({
+      payload: {
+        type: ConnectActions.SET_CHECKOUT,
+        checkout,
+      },
+    });
+
+    connectDispatch({
+      payload: {
+        type: ConnectActions.SET_SEND_CLOSE_EVENT,
+        sendCloseEvent: sendCloseEventOverride ?? sendCloseWidgetEvent,
+      },
+    });
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: deepLink,
+        } as ConnectWidgetView,
+      },
+    });
   }, [deepLink, sendCloseEventOverride, environment]);
 
   useEffect(() => {

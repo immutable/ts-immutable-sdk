@@ -1,6 +1,7 @@
 import ReactDOM from 'react-dom/client';
 import { Web3Provider } from '@ethersproject/providers';
 import { Checkout } from '@imtbl/checkout-sdk';
+import { Passport } from '@imtbl/passport';
 import { StrongCheckoutWidgetsConfig, withDefaultWidgetConfigs } from '../lib/withDefaultWidgetConfig';
 
 export abstract class ImmutableWebComponent extends HTMLElement {
@@ -12,12 +13,19 @@ export abstract class ImmutableWebComponent extends HTMLElement {
 
   checkout: Checkout | undefined;
 
+  passport: Passport | undefined;
+
   static get observedAttributes() {
     return ['widgetConfig'];
   }
 
   setProvider(provider: Web3Provider): void {
     this.provider = provider;
+    this.renderWidget();
+  }
+
+  setPassport(passport: Passport): void {
+    this.passport = passport;
     this.renderWidget();
   }
 
