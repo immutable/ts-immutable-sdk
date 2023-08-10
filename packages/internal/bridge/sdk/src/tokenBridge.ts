@@ -1,3 +1,4 @@
+import { L2_STATE_SENDER_ADDRESS, NATIVE_TOKEN_BRIDGE_KEY } from 'constants/bridges';
 import { BridgeConfiguration } from 'config';
 import { ethers } from 'ethers';
 import {
@@ -30,7 +31,6 @@ import { getBlockNumberClosestToTimestamp } from 'lib/getBlockCloseToTimestamp';
 import { CHILD_ERC20_PREDICATE } from 'contracts/ABIs/ChildERC20Predicate';
 import { CHECKPOINT_MANAGER } from 'contracts/ABIs/CheckpointManager';
 import { decodeExtraData } from 'lib/decodeExtraData';
-import { L2_STATE_SENDER_ADDRESS, NATIVE_TOKEN_BRIDGE_KEY } from 'constants/bridges';
 import { L2_STATE_SENDER } from 'contracts/ABIs/L2StateSender';
 import { EXIT_HELPER } from 'contracts/ABIs/ExitHelper';
 import { CHILD_ERC20 } from 'contracts/ABIs/ChildERC20';
@@ -406,7 +406,7 @@ export class TokenBridge {
     // Validate the request token address
     if (!ethers.utils.isAddress(reqTokenAddress)) {
       throw new BridgeError(
-        `recipient address ${reqTokenAddress} is not a valid address`,
+        `token address ${reqTokenAddress} is not a valid address`,
         BridgeErrorType.INVALID_ADDRESS,
       );
     }
@@ -419,10 +419,10 @@ export class TokenBridge {
           ROOT_ERC20_PREDICATE,
           this.config.rootProvider,
         );
-        return await rootERC20Predicate.getChildToken(reqTokenAddress);
+        return await rootERC20Predicate.rootTokenToChildToken(reqTokenAddress);
       },
       BridgeErrorType.PROVIDER_ERROR,
-      'failed to query getChildToken mapping',
+      'failed to query rootTokenToChildToken mapping',
     );
 
     // Return the child token address
