@@ -43,7 +43,7 @@ import {
 } from './types';
 import { CheckoutConfiguration } from './config';
 import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
-import { BuyParams } from './types/buy';
+import { BuyParams, BuyResponse } from './types/buy';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
@@ -262,13 +262,14 @@ export class Checkout {
 
   public async buy(
     params: BuyParams,
-  ): Promise<any> {
+  ): Promise<BuyResponse> {
     console.warn('This endpoint is currently under construction.');
 
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
     );
+
     return await buy.buy(this.config, web3Provider, params.orderId);
   }
 

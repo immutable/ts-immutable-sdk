@@ -28,6 +28,8 @@ import * as network from './network';
 import { createProvider, isWeb3Provider, validateProvider } from './provider';
 import { getTokenAllowList } from './tokens';
 import { getWalletAllowList } from './wallet';
+import { buy } from './buy';
+import { GasTokenType, ItemType } from './types/buy';
 
 jest.mock('./connect');
 jest.mock('./network');
@@ -38,6 +40,7 @@ jest.mock('./readOnlyProviders/readOnlyProvider');
 jest.mock('./provider');
 jest.mock('./tokens');
 jest.mock('./wallet');
+jest.mock('./buy');
 
 describe('Connect', () => {
   let providerMock: ExternalProvider;
@@ -406,6 +409,38 @@ describe('Connect', () => {
     expect(getNetworkInfo).toBeCalledTimes(1);
     expect(getNetworkInfo).toBeCalledWith(checkout.config, provider);
     expect(result).toEqual(networkInfoResult);
+  });
+
+  it('should call buy function', async () => {
+    const provider = new Web3Provider(providerMock, ChainId.SEPOLIA);
+    const buyResult = {
+      requirements: [
+        {
+          type: ItemType.NATIVE,
+          amount: BigNumber.from('1'),
+        },
+      ],
+      gas: {
+        type: GasTokenType.NATIVE,
+        limit: BigNumber.from('1'),
+      },
+    };
+
+    (validateProvider as jest.Mock).mockResolvedValue(provider);
+    (buy as jest.Mock).mockResolvedValue(buyResult);
+
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.SANDBOX },
+    });
+
+    const result = await checkout.buy({
+      provider,
+      orderId: '1',
+    });
+
+    expect(buy).toBeCalledTimes(1);
+    expect(buy).toBeCalledWith(checkout.config, provider, '1');
+    expect(result).toEqual(buyResult);
   });
 
   it('should call isWeb3Provider', async () => {
