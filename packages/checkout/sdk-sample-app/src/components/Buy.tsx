@@ -45,7 +45,6 @@ export default function Buy(props: BuyProps) {
   }
 
   useEffect(() => {
-    // reset state wehn checkout changes from environment switch
     setResult(undefined);
     setError(null);
     setLoading(false);

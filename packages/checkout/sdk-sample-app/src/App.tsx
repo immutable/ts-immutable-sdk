@@ -25,7 +25,7 @@ export default function App() {
         <MenuItem.IntentIcon icon="ArrowForward" />
         <MenuItem.Label>Smart Checkout</MenuItem.Label>
         <MenuItem.Caption>
-          Test smart checkout functionality.
+          Smart checkout flows such as buy, sell and cancel.
         </MenuItem.Caption>
       </MenuItem>
     </>

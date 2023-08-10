@@ -27,7 +27,7 @@ export default function SmartCheckout() {
     <div>
       <Heading>Smart Checkout</Heading>
       <Body>
-        Test out smart checkout.
+        Smart checkout flows such as buy, sell and cancel.
       </Body>
 
       <Divider
