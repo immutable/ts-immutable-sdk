@@ -7,6 +7,7 @@ import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../../components/Footer/FooterButton';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { MetamaskConnectHero } from '../../../components/Hero/MetamaskConnectHero';
+import { PassportConnectHero } from '../../../components/Hero/PassportConnectHero';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { text } from '../../../resources/text/textConfig';
@@ -25,12 +26,25 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
     connectDispatch,
   } = useContext(ConnectContext);
   const { viewState: { history }, viewDispatch } = useContext(ViewContext);
-  const { body, footer } = text.views[ConnectWidgetViews.READY_TO_CONNECT_METAMASK];
-  const [footerButtonText, setFooterButtonText] = useState(footer.buttonText1);
 
-  function isConnectWidgetView(view:string) {
-    return Object.values(ConnectWidgetViews).includes(view as ConnectWidgetViews);
-  }
+  const isPassport = useMemo(() => (provider?.provider as any)?.isPassport, [provider]);
+
+  const textView = () => {
+    if (isPassport) {
+      return text.views[ConnectWidgetViews.READY_TO_CONNECT].passport;
+    }
+    return text.views[ConnectWidgetViews.READY_TO_CONNECT].default;
+  };
+  const { body, footer } = textView();
+  const [footerButtonText, setFooterButtonText] = useState(footer.buttonText1);
+  const heroContent = () => {
+    if (isPassport) {
+      return <PassportConnectHero />;
+    }
+    return <MetamaskConnectHero />;
+  };
+
+  const isConnectWidgetView = (view:string) => Object.values(ConnectWidgetViews).includes(view as ConnectWidgetViews);
 
   const showBackButton = useMemo(() => {
     if (history.length <= 1) return false;
@@ -97,7 +111,7 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
         />
       )}
       floatHeader
-      heroContent={<MetamaskConnectHero />}
+      heroContent={heroContent()}
       footer={(
         <FooterButton
           actionText={footerButtonText}

@@ -18,13 +18,31 @@ export const text = {
       },
     },
     [ConnectWidgetViews.READY_TO_CONNECT]: {
-      body: {
-        heading: 'Check for the pop-up from MetaMask',
-        content: 'Follow the prompts in the MetaMask popup to connect',
+      default: {
+        body: {
+          heading: 'Check for the pop-up from MetaMask',
+          content: 'Follow the prompts in the MetaMask popup to connect',
+        },
+        footer: {
+          buttonText1: 'Ready to connect',
+          buttonText2: 'Try again',
+        },
+        heroContent: {
+          component: '<MetamaskConnectHero />',
+        },
       },
-      footer: {
-        buttonText1: 'Ready to connect',
-        buttonText2: 'Try again',
+      passport: {
+        body: {
+          heading: 'Connect with Immutable Passport',
+          content: 'Follow the prompts to connect with Immutable Passport',
+        },
+        footer: {
+          buttonText1: 'Continue',
+          buttonText2: 'Try again',
+        },
+        heroContent: {
+          component: '<PassportConnectHero />',
+        },
       },
     },
     [ConnectWidgetViews.SWITCH_NETWORK]: {
@@ -145,7 +163,10 @@ export const text = {
       approveSpending: {
         content: {
           heading: "You'll be asked to set a spending cap for this transaction",
-          body: ['Input at least', 'for this transaction and future transactions, then follow the prompts.'],
+          body: [
+            'Input at least',
+            'for this transaction and future transactions, then follow the prompts.',
+          ],
         },
         footer: {
           buttonText: 'Got it',
@@ -184,8 +205,7 @@ export const text = {
     [BridgeWidgetViews.IN_PROGRESS]: {
       heading: 'Move in progress',
       body1: (symbol: string) => `Less than 3 mins until your ${symbol} lands on zkEVM.`,
-      body2:
-        'You can close this window, the transaction will be reflected in your wallet once complete.',
+      body2: 'You can close this window, the transaction will be reflected in your wallet once complete.',
     },
     [BridgeWidgetViews.APPROVE_ERC20]: {
       approveBridge: {
@@ -201,7 +221,10 @@ export const text = {
       approveSpending: {
         content: {
           heading: "You'll be asked to set a spending cap for this transaction",
-          body: ['Input at least', 'for this transaction and future transactions, then follow the prompts.'],
+          body: [
+            'Input at least',
+            'for this transaction and future transactions, then follow the prompts.',
+          ],
         },
         footer: {
           buttonText: 'Got it',
