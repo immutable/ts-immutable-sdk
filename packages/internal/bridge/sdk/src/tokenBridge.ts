@@ -1,3 +1,4 @@
+import { L2_STATE_SENDER_ADDRESS, NATIVE_TOKEN_BRIDGE_KEY } from 'constants/bridges';
 import { BridgeConfiguration } from 'config';
 import { ethers } from 'ethers';
 import {
@@ -30,7 +31,6 @@ import { getBlockNumberClosestToTimestamp } from 'lib/getBlockCloseToTimestamp';
 import { CHILD_ERC20_PREDICATE } from 'contracts/ABIs/ChildERC20Predicate';
 import { CHECKPOINT_MANAGER } from 'contracts/ABIs/CheckpointManager';
 import { decodeExtraData } from 'lib/decodeExtraData';
-import { L2_STATE_SENDER_ADDRESS, NATIVE_TOKEN_BRIDGE_KEY } from 'constants/bridges';
 import { L2_STATE_SENDER } from 'contracts/ABIs/L2StateSender';
 import { EXIT_HELPER } from 'contracts/ABIs/ExitHelper';
 import { CHILD_ERC20 } from 'contracts/ABIs/ChildERC20';
@@ -406,7 +406,7 @@ export class TokenBridge {
     // Validate the request token address
     if (!ethers.utils.isAddress(reqTokenAddress)) {
       throw new BridgeError(
-        `recipient address ${reqTokenAddress} is not a valid address`,
+        `token address ${reqTokenAddress} is not a valid address`,
         BridgeErrorType.INVALID_ADDRESS,
       );
     }
@@ -419,10 +419,10 @@ export class TokenBridge {
           ROOT_ERC20_PREDICATE,
           this.config.rootProvider,
         );
-        return await rootERC20Predicate.getChildToken(reqTokenAddress);
+        return await rootERC20Predicate.rootTokenToChildToken(reqTokenAddress);
       },
       BridgeErrorType.PROVIDER_ERROR,
-      'failed to query getChildToken mapping',
+      'failed to query rootTokenToChildToken mapping',
     );
 
     // Return the child token address
@@ -784,14 +784,13 @@ export class TokenBridge {
 
     // Call our recursive function and wait for it to find the StateSyncResult event
     const childDepositEvent = await checkForChildDepositEvent();
-
     // Perform some error checking on the event:
     // - If there's no event, throw an error
     // - If the event doesn't have arguments, throw an error
     // - If the event's arguments don't include a status, throw an error
     if (!childDepositEvent) throw new Error('failed to find child deposit event');
     if (!childDepositEvent.args) throw new Error('child deposit event has no args');
-    if (!childDepositEvent.args.status) throw new Error('child deposit event has no status');
+    if (childDepositEvent.args.status == null) throw new Error('child deposit event has no status');
 
     // If the event's status argument is present, we consider that the state sync operation was successful
     if (childDepositEvent.args.status) {
