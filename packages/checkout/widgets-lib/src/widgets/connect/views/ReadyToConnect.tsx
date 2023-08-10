@@ -25,7 +25,7 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
     connectDispatch,
   } = useContext(ConnectContext);
   const { viewState: { history }, viewDispatch } = useContext(ViewContext);
-  const { body, footer } = text.views[ConnectWidgetViews.READY_TO_CONNECT];
+  const { body, footer } = text.views[ConnectWidgetViews.READY_TO_CONNECT_METAMASK];
   const [footerButtonText, setFooterButtonText] = useState(footer.buttonText1);
 
   function isConnectWidgetView(view:string) {
@@ -91,7 +91,7 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
       header={(
         <HeaderNavigation
           showBack={showBackButton}
-          title=""
+          title="Connect"
           transparent
           onCloseButtonClick={sendCloseEvent}
         />
