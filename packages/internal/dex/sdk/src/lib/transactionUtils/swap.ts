@@ -247,23 +247,25 @@ export function prepareSwap(
 ): QuoteTradeInfo {
   if (ourQuote.tradeType === TradeType.EXACT_OUTPUT) {
     fees.addAmount(ourQuote.amountIn);
+
+    return {
+      gasEstimate: ourQuote.gasEstimate,
+      route: ourQuote.route,
+      tokenIn: ourQuote.tokenIn,
+      tokenOut: ourQuote.tokenOut,
+      amountIn: fees.amountWithFeesApplied(),
+      amountOut: amountSpecified,
+      tradeType: ourQuote.tradeType,
+    };
   }
-
-  const amountIn = ourQuote.tradeType === TradeType.EXACT_INPUT
-    ? amountSpecified
-    : fees.amountWithFeesApplied();
-
-  const amountOut = ourQuote.tradeType === TradeType.EXACT_INPUT
-    ? ourQuote.amountOut
-    : amountSpecified;
 
   return {
     gasEstimate: ourQuote.gasEstimate,
     route: ourQuote.route,
     tokenIn: ourQuote.tokenIn,
     tokenOut: ourQuote.tokenOut,
-    amountIn,
-    amountOut,
+    amountIn: amountSpecified,
+    amountOut: ourQuote.amountOut,
     tradeType: ourQuote.tradeType,
   };
 }
