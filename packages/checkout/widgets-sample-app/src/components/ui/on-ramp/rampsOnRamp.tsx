@@ -3,7 +3,7 @@ import { onDarkBase } from "@biom3/design-tokens";
 import { RampInstantSDK } from '@ramp-network/ramp-instant-sdk';
 import { useEffect, useRef } from "react";
 
-export function OnRampUI() {
+export function RampOnRampUI() {
   let domElement: HTMLElement | undefined;
   let ramp: RampInstantSDK | undefined;
   const firstRender = useRef(true);

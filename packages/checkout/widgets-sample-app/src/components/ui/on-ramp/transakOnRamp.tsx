@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 
 // const transakSDKModule = require('@transak/transak-sdk');
 
-export function OnRampUI() {
+export function TransakOnRampUI() {
   const firstRender = useRef(true);
   const settings = {
     apiKey: '41ad2da7-ed5a-4d89-a90b-c751865effc2',  // Your API Key
