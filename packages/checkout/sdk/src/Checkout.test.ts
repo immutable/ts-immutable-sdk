@@ -433,14 +433,13 @@ describe('Connect', () => {
       baseConfig: { environment: Environment.SANDBOX },
     });
 
-    const result = await checkout.buy({
+    await checkout.buy({
       provider,
       orderId: '1',
     });
 
     expect(buy).toBeCalledTimes(1);
     expect(buy).toBeCalledWith(checkout.config, provider, '1');
-    expect(result).toEqual(buyResult);
   });
 
   it('should call isWeb3Provider', async () => {

@@ -12,7 +12,6 @@ interface BuyProps {
 export default function Buy(props: BuyProps) {
   const { checkout, provider } = props;
 
-  const [result, setResult] = useState<any>();
   const [error, setError] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -28,11 +27,10 @@ export default function Buy(props: BuyProps) {
     setError(null);
     setLoading(true);
     try {
-      const resp = await checkout.buy({
+      await checkout.buy({
         provider,
         orderId: '0189d7cc-5bf6-94b2-29ab-af73aa8ab24d',
       });
-      setResult(resp);
       setLoading(false);
     } catch (err: any) {
       setError(err);
@@ -45,21 +43,16 @@ export default function Buy(props: BuyProps) {
   }
 
   useEffect(() => {
-    setResult(undefined);
     setError(null);
     setLoading(false);
   }, [checkout]);
-
-  useEffect(() => {
-    if (result) console.log('result', result);
-  }, [result]);
 
   return (
     <div>
       <LoadingButton onClick={buyClick} loading={loading}>
         Buy
       </LoadingButton>
-      {result && !error && <SuccessMessage>Buy success.</SuccessMessage>}
+      {!error && <SuccessMessage>Buy success.</SuccessMessage>}
       {error && (
         <ErrorMessage>
           {error.message}. Check console logs for more details.

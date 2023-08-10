@@ -43,7 +43,7 @@ import {
 } from './types';
 import { CheckoutConfiguration } from './config';
 import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
-import { BuyParams, BuyResponse } from './types/buy';
+import { BuyParams } from './types/buy';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
@@ -260,9 +260,13 @@ export class Checkout {
     return await network.getNetworkInfo(this.config, web3Provider);
   }
 
+  /**
+   * Determines the requirements for performing a buy.
+   * @param {BuyParams} params - The parameters for the buy.
+  */
   public async buy(
     params: BuyParams,
-  ): Promise<BuyResponse> {
+  ): Promise<void> {
     // eslint-disable-next-line no-console
     console.warn('This endpoint is currently under construction.');
 
@@ -271,7 +275,7 @@ export class Checkout {
       params.provider,
     );
 
-    return await buy.buy(this.config, web3Provider, params.orderId);
+    await buy.buy(this.config, web3Provider, params.orderId);
   }
 
   /**
