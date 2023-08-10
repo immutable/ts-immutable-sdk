@@ -3,6 +3,7 @@ import { TradeType, Currency } from '@uniswap/sdk-core';
 import { QuoteTradeInfo } from 'lib';
 import { FUN_TEST_TOKEN, IMX_TEST_TOKEN, TEST_FEE_RECIPIENT } from 'test/utils';
 import { Pool, Route } from '@uniswap/v3-sdk';
+import { Fees } from 'lib/fees';
 import { prepareSwap } from './swap';
 
 const testPool = new Pool(
@@ -30,7 +31,7 @@ describe('prepareSwap', () => {
         tradeType: TradeType.EXACT_INPUT,
       };
 
-      const preparedSwap = prepareSwap(quote, amountSpecified, []);
+      const preparedSwap = prepareSwap(quote, amountSpecified, new Fees([], IMX_TEST_TOKEN));
 
       expect(preparedSwap.amountIn.toString()).toEqual(amountSpecified.toString());
     });
@@ -49,7 +50,7 @@ describe('prepareSwap', () => {
         tradeType: TradeType.EXACT_INPUT,
       };
 
-      const preparedSwap = prepareSwap(quote, amountSpecified, []);
+      const preparedSwap = prepareSwap(quote, amountSpecified, new Fees([], IMX_TEST_TOKEN));
 
       expect(preparedSwap.amountOut.toString()).toEqual(quotedAmount.toString());
     });
@@ -72,7 +73,7 @@ describe('prepareSwap', () => {
         const preparedSwap = prepareSwap(
           quote,
           amountSpecified,
-          [{ feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: 1000 }], // 1% fee
+          new Fees([{ feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: 1000 }], IMX_TEST_TOKEN), // 1% fee
         );
 
         expect(preparedSwap.amountIn.toString()).toEqual(amountSpecified.toString());
@@ -96,7 +97,7 @@ describe('prepareSwap', () => {
         tradeType: TradeType.EXACT_OUTPUT,
       };
 
-      const preparedSwap = prepareSwap(quote, amountSpecified, []);
+      const preparedSwap = prepareSwap(quote, amountSpecified, new Fees([], IMX_TEST_TOKEN));
 
       expect(preparedSwap.amountIn.toString()).toEqual(quotedAmount.toString());
     });
@@ -115,7 +116,7 @@ describe('prepareSwap', () => {
         tradeType: TradeType.EXACT_OUTPUT,
       };
 
-      const preparedSwap = prepareSwap(quote, amountSpecified, []);
+      const preparedSwap = prepareSwap(quote, amountSpecified, new Fees([], IMX_TEST_TOKEN));
 
       expect(preparedSwap.amountOut.toString()).toEqual(amountSpecified.toString());
     });
@@ -138,7 +139,7 @@ describe('prepareSwap', () => {
         const preparedSwap = prepareSwap(
           quote,
           amountSpecified,
-          [{ feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: 1000 }], // 1% fee
+          new Fees([{ feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: 1000 }], IMX_TEST_TOKEN), // 1% fee
         );
 
         expect(preparedSwap.amountIn.toString()).toEqual('22000000000'); // quotedAmount + 1% fee
