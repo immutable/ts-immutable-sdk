@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - @imtbl/erc721-permissioned-mintable: Preset contract changes: Modified mint method to specify token IDs instead of number of tokens to mint.
 - Modules are now exported under their own namespaces instead of being flattened
+- @imtbl/passport: Updated testnet (sandbox) zkEvmChainId
 
 ### Removed
 
