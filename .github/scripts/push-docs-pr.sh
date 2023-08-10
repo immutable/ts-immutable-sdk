@@ -50,6 +50,12 @@ then
   git commit --message "Update from https://github.com/$GITHUB_REPOSITORY/commit/$GITHUB_SHA"
   echo "Pushing git commit"
   git push -u origin HEAD:$INPUT_DESTINATION_HEAD_BRANCH
+
+  # Without this sleep, the checks on the imx-docs repo fail
+  # but pass on a re-run from within Netlify
+  echo "Waiting for 1 minute to allow Netlify to catch up"
+  sleep 60
+
   echo "Creating a pull request"
   gh pr create --title "Release SDK reference docs $VERSION" \
                --body "Released from ts-immutable-sdk" \
@@ -57,3 +63,4 @@ then
 else
   echo "No changes detected"
 fi
+
