@@ -12,6 +12,7 @@ import {
   signMessage,
   TestToken,
   waitForOrderToBeOfStatus,
+  getLocalConfigFromEnv,
 } from './helpers';
 
 async function deployAndMintNftContract(wallet: Wallet): Promise<TestToken> {
@@ -42,17 +43,13 @@ describe('', () => {
     // Deploy an NFT contract and mint a token for the offerer
     const nftContract = await deployAndMintNftContract(offerer);
 
-    // Instantiate the order book SDK. Once environments stabilise there will be default values so
-    // that end users will just be able to do `new Orderbook()` in most cases
+    const configOverrides = getLocalConfigFromEnv();
     const sdk = new Orderbook({
       baseConfig: {
         environment: Environment.SANDBOX,
       },
-
       overrides: {
-        // Replace overrides with devnet values if needed
-        // values can be found here https://immutable.atlassian.net/wiki/spaces/TRAD/pages/2192573143/zkEVM+orderbook+deployment+addresses
-        provider,
+        ...configOverrides,
       },
     });
 
