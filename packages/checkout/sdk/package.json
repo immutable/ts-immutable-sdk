@@ -40,7 +40,6 @@
   "scripts": {
     "build": "parcel build",
     "build:dev": "CHECKOUT_DEV_MODE=true parcel build --no-source-maps",
-    "build:local": "LOCAL_DEVELOPMENT=true parcel build --no-source-maps",
     "docs": "typedoc --plugin typedoc-plugin-markdown --skipErrorChecking --disableSources --out docs src/index.ts",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "lint:fix": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0 --fix",
