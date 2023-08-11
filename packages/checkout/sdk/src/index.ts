@@ -11,6 +11,7 @@ export {
 } from './types';
 export type {
   AllowedNetworkConfig,
+  BuyParams,
   CheckConnectionParams,
   CheckConnectionResult,
   CheckoutModuleConfiguration,

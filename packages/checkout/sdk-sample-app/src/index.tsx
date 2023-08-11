@@ -7,6 +7,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import ConnectWidget from './pages/ConnectWidget';
 import { onLightBase } from '@biom3/design-tokens';
 import { BiomeCombinedProviders, Box } from '@biom3/react';
+import SmartCheckout from './pages/SmartCheckout';
 
 const router = createBrowserRouter([
   {
@@ -16,6 +17,10 @@ const router = createBrowserRouter([
   {
     path: '/connect',
     element: <ConnectWidget />,
+  },
+  {
+    path: '/smart-checkout',
+    element: <SmartCheckout />,
   },
 ]);
 
