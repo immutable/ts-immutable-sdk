@@ -424,6 +424,8 @@ export function expectToBeDefined <T>(x: T): asserts x is NonNullable<T> {
   expect(x).not.toBeNull();
 }
 
+// expectInstanceOf ensurance that a variable is an instance of a class, while
+// also narrowing its type.
 export function expectInstanceOf <T>(className: { new(...args: any[]): T }, x: unknown): asserts x is T {
   expect(x).toBeInstanceOf(className);
 }
