@@ -1,10 +1,12 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { createContext } from 'react';
 import { Checkout, WalletProviderName } from '@imtbl/checkout-sdk';
+import { Passport } from '@imtbl/passport';
 
 export interface ConnectState {
   checkout: Checkout | null;
   provider: Web3Provider | null;
+  passport: Passport | null;
   walletProviderName: WalletProviderName | null;
   sendCloseEvent: () => void;
 }
@@ -12,6 +14,7 @@ export interface ConnectState {
 export const initialConnectState: ConnectState = {
   checkout: null,
   provider: null,
+  passport: null,
   walletProviderName: null,
   sendCloseEvent: () => {},
 };
@@ -28,12 +31,14 @@ export interface ConnectAction {
 type ActionPayload =
   | SetCheckoutPayload
   | SetProviderPayload
+  | SetPassportPayload
   | SetProviderNamePayload
   | SetSendCloseEventPayload;
 
 export enum ConnectActions {
   SET_CHECKOUT = 'SET_CHECKOUT',
   SET_PROVIDER = 'SET_PROVIDER',
+  SET_PASSPORT = 'SET_PASSPORT',
   SET_WALLET_PROVIDER_NAME = 'SET_WALLET_PROVIDER_NAME',
   SET_SEND_CLOSE_EVENT = 'SET_SEND_CLOSE_EVENT',
 }
@@ -46,6 +51,11 @@ export interface SetCheckoutPayload {
 export interface SetProviderPayload {
   type: ConnectActions.SET_PROVIDER;
   provider: Web3Provider;
+}
+
+export interface SetPassportPayload {
+  type: ConnectActions.SET_PASSPORT;
+  passport: Passport;
 }
 
 export interface SetProviderNamePayload {
@@ -82,6 +92,11 @@ export const connectReducer: Reducer<ConnectState, ConnectAction> = (
       return {
         ...state,
         provider: action.payload.provider,
+      };
+    case ConnectActions.SET_PASSPORT:
+      return {
+        ...state,
+        passport: action.payload.passport,
       };
     case ConnectActions.SET_WALLET_PROVIDER_NAME:
       return {

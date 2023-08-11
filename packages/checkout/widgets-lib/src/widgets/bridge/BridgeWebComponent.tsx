@@ -53,6 +53,7 @@ export class ImmutableBridge extends ImmutableWebComponent {
       targetLayer: ConnectTargetLayer.LAYER1,
       walletProvider: this.walletProvider,
       web3Provider: this.provider,
+      passport: this.passport,
       allowedChains: [
         getL1ChainId(this.checkout!.config),
       ],
