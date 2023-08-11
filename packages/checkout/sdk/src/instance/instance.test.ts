@@ -2,8 +2,9 @@ import { Environment } from '@imtbl/config';
 import { Exchange, SUPPORTED_CHAIN_IDS_FOR_ENVIRONMENT } from '@imtbl/dex-sdk';
 import { ethers } from 'ethers';
 import { TokenBridge } from '@imtbl/bridge-sdk';
+import { Orderbook } from '@imtbl/orderbook';
 import { ChainId } from '../types';
-import { createBridgeInstance, createExchangeInstance } from './instance';
+import { createBridgeInstance, createExchangeInstance, createOrderbookInstance } from './instance';
 import { CheckoutConfiguration } from '../config';
 import { RemoteConfigFetcher } from '../config/remoteConfigFetcher';
 
@@ -91,6 +92,14 @@ describe('instance', () => {
         config,
       );
       expect(exchange).toBeInstanceOf(Exchange);
+    });
+  });
+
+  describe('createOrderbookInstance', () => {
+    it('should create an instance of Orderbook', async () => {
+      expect(await createOrderbookInstance(
+        config,
+      )).toBeInstanceOf(Orderbook);
     });
   });
 });
