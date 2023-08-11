@@ -49,6 +49,7 @@ describe('getSwap', () => {
   describe('without fees', () => {
     it('subtracts inverted slippage to calculate the amountOutMinimum', () => {
       const quote = buildExactInputQuote();
+      quote.amountOut = utils.parseEther('990');
 
       const swap = getSwap(
         IMX_TEST_TOKEN,
@@ -96,6 +97,7 @@ describe('getSwap', () => {
   describe('with fees', () => {
     it('subtracts inverted slippage to calculate the amountOutMinimum', () => {
       const quote = buildExactInputQuote();
+      quote.amountOut = utils.parseEther('990');
 
       const swap = getSwap(
         IMX_TEST_TOKEN,
