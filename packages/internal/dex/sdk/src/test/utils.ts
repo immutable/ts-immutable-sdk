@@ -423,3 +423,11 @@ export function expectToBeDefined <T>(x: T): asserts x is NonNullable<T> {
   expect(x).toBeDefined();
   expect(x).not.toBeNull();
 }
+
+/**
+ * Takes an arbitrary string and turns it into a valid ethereum address
+ * @param str Arbitrary string to create the address from
+ */
+export function makeAddr(str: string): string {
+  return ethers.utils.keccak256(ethers.utils.toUtf8Bytes(str)).slice(0, 42);
+}
