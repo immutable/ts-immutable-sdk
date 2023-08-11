@@ -5,7 +5,7 @@ import { getLocalhostProvider } from './provider';
 
 dotenv.config();
 
-export function getLocalConfigFromEnv(): OrderbookModuleConfiguration {
+export function getConfigFromEnv(): OrderbookModuleConfiguration {
   if (
     !process.env.ORDERBOOK_MR_API_URL
     || !process.env.SEAPORT_CONTRACT_ADDRESS

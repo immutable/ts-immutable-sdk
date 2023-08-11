@@ -12,7 +12,7 @@ import {
   signMessage,
   TestToken,
   waitForOrderToBeOfStatus,
-  getLocalConfigFromEnv,
+  getConfigFromEnv,
 } from './helpers';
 
 async function deployAndMintNftContract(wallet: Wallet): Promise<TestToken> {
@@ -43,7 +43,7 @@ describe('', () => {
     // Deploy an NFT contract and mint a token for the offerer
     const nftContract = await deployAndMintNftContract(offerer);
 
-    const configOverrides = getLocalConfigFromEnv();
+    const configOverrides = getConfigFromEnv();
     const sdk = new Orderbook({
       baseConfig: {
         environment: Environment.SANDBOX,
