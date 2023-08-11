@@ -127,7 +127,6 @@ describe('config', () => {
         if (overrideDev) process.env = { CHECKOUT_DEV_MODE: 'true' };
 
         const checkout = new Checkout(testCheckoutConfig);
-        console.log(getL2ChainId(checkout.config));
         expect(getL2ChainId(checkout.config)).toEqual(chainId);
       });
     });
