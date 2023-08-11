@@ -8,6 +8,7 @@ import {
 import { ImmutableConfiguration } from '@imtbl/config';
 import { ethers } from 'ethers';
 import { Exchange } from '@imtbl/dex-sdk';
+import { Orderbook } from '@imtbl/orderbook';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { ChainId, DexConfig } from '../types';
 import { CheckoutConfiguration } from '../config';
@@ -62,5 +63,15 @@ export async function createExchangeInstance(
       environment: config.environment,
     }),
     overrides: dexConfig?.overrides,
+  });
+}
+
+export async function createOrderbookInstance(
+  config: CheckoutConfiguration,
+): Promise<Orderbook> {
+  return new Orderbook({
+    baseConfig: {
+      environment: config.environment,
+    },
   });
 }
