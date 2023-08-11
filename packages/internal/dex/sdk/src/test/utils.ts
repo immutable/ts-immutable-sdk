@@ -424,6 +424,10 @@ export function expectToBeDefined <T>(x: T): asserts x is NonNullable<T> {
   expect(x).not.toBeNull();
 }
 
+export function expectInstanceOf <T>(className: { new(...args: any[]): T }, x: unknown): asserts x is T {
+  expect(x).toBeInstanceOf(className);
+}
+
 /**
  * Takes an arbitrary string and turns it into a valid ethereum address
  * @param str Arbitrary string to create the address from
