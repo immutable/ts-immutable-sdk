@@ -17,7 +17,7 @@ describe('ImmutableWebComponent', () => {
     mount(
       <imtbl-connect ref={reference} />,
     ).then(() => {
-      (document.getElementsByTagName('imtbl-connect')[0] as ImmutableConnect)?.setPassport(testPassportInstance);
+      (document.getElementsByTagName('imtbl-connect')[0] as ImmutableConnect)?.addPassportOption(testPassportInstance);
     }).then(() => {
       expect(
         (document.getElementsByTagName('imtbl-connect')[0] as ImmutableConnect).passport,

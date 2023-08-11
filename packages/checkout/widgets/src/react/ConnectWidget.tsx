@@ -1,7 +1,7 @@
 import { Passport } from '@imtbl/passport';
 import React, { useEffect } from 'react';
 import { CheckoutWidgetTagNames } from '../definitions/types';
-import { SetPassport } from './internal/SetPassport';
+import { AddPassportOption } from './internal/AddPassportOption';
 
 /**
  * A React functional component that renders the Checkout Connect Widget.
@@ -17,7 +17,7 @@ export function ConnectReact({ passport }: ConnectReactProps): JSX.Element {
 
   useEffect(() => {
     if (passport) {
-      SetPassport(CheckoutWidgetTagNames.CONNECT, passport);
+      AddPassportOption(CheckoutWidgetTagNames.CONNECT, passport);
     }
   }, [passport]);
 

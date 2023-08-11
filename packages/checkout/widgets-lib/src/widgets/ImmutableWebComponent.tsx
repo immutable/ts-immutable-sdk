@@ -24,7 +24,7 @@ export abstract class ImmutableWebComponent extends HTMLElement {
     this.renderWidget();
   }
 
-  setPassport(passport: Passport): void {
+  addPassportOption(passport: Passport): void {
     this.passport = passport;
     this.renderWidget();
   }

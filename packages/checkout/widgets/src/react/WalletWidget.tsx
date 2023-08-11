@@ -4,7 +4,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import { Passport } from '@imtbl/passport';
 import { SetProvider } from './internal/SetProvider';
 import { CheckoutWidgetTagNames } from '../definitions/types';
-import { SetPassport } from './internal/SetPassport';
+import { AddPassportOption } from './internal/AddPassportOption';
 
 /**
  * Interface representing the props for the Wallet Widget component.
@@ -35,7 +35,7 @@ export function WalletReact(props: WalletReactProps): JSX.Element {
       SetProvider(CheckoutWidgetTagNames.WALLET, provider);
     }
     if (passport) {
-      SetPassport(CheckoutWidgetTagNames.WALLET, passport);
+      AddPassportOption(CheckoutWidgetTagNames.WALLET, passport);
     }
   }, [provider, passport]);
 

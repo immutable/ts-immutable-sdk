@@ -1,7 +1,7 @@
 import { Passport } from '@imtbl/passport';
 import { CheckoutWidgetTagNames } from '../../definitions/types';
 
-export function SetPassport(
+export function AddPassportOption(
   tagName: CheckoutWidgetTagNames,
   passport: Passport | null,
 ) {
@@ -20,11 +20,11 @@ export function SetPassport(
   const maxAttempts = 10;
   let timer: number;
 
-  const attemptToSetPassport = () => {
+  const attemptToAddPassport = () => {
     try {
       const elements = document.getElementsByTagName(tagName);
       const widget = elements[0] as unknown as ImmutableWebComponent;
-      widget.setPassport(passport);
+      widget.addPassportOption(passport);
       window.clearInterval(timer);
     } catch (err) {
       attempts++;
@@ -36,6 +36,6 @@ export function SetPassport(
     }
   };
 
-  timer = window.setInterval(attemptToSetPassport, 10);
-  attemptToSetPassport();
+  timer = window.setInterval(attemptToAddPassport, 10);
+  attemptToAddPassport();
 }
