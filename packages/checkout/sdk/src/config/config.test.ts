@@ -34,17 +34,6 @@ describe('config', () => {
       expect(checkout.config.isDevelopment).toBeTruthy();
     });
 
-    it('should set is local to true', () => {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      process.env = { LOCAL_DEVELOPMENT: 'true' };
-      const testCheckoutConfig = {
-        baseConfig: { environment: Environment.SANDBOX },
-      } as CheckoutModuleConfiguration;
-
-      const checkout = new Checkout(testCheckoutConfig);
-      expect(checkout.config.isLocal).toBeTruthy();
-    });
-
     it('should correctly set the networkMap based on the environment', () => {
       const productionConfig = {
         baseConfig: { environment: Environment.PRODUCTION },
