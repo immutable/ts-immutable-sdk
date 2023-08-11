@@ -6,11 +6,16 @@ import { ConnectAccount } from './ConnectAccount';
 import { getTokenSymbol } from '../utils/getTokenSymbol';
 import { AmountInput } from './AmountInput';
 import { SecondaryFeeInput } from './SecondaryFeeInput';
+import { FeeBreakdown } from './FeeBreakdown';
+
+type mapping = {
+  [address: string]: string;
+};
 
 export function Example() {
   // Instead of hard-coding these tokens, you can optionally retrieve available tokens from the user's wallet
   const TEST_IMX_TOKEN = '0x0000000000000000000000000000000000001010';
-  const ZKCATS_TOKEN = '0x1836E16b2036088490C2CFe4d11970Fc8e5884C4';
+  const ZKCATS_TOKEN = '0xaC953a0d7B67Fae17c87abf79f09D0f818AC66A2';
 
   const [ethereumAccount, setEthereumAccount] = useState<string | null>(null);
   const [isFetching, setIsFetching] = useState(false);
@@ -43,10 +48,6 @@ export function Example() {
   if (ethereumAccount === null) {
     return <ConnectAccount setAccount={setEthereumAccount} />;
   }
-
-  type mapping = {
-    [address: string]: string;
-  };
 
   const getQuote = async () => {
     setIsFetching(true);
@@ -176,9 +177,13 @@ export function Example() {
               ]
             }`}
           </h3>
+
           <h3>Slippage: {result.quote.slippage}%</h3>
           {result.approval && <h3>Approval Gas Estimate: {showGasEstimate(result.approval)}</h3>}
           <h3>Swap Gas estimate: {showGasEstimate(result.swap)}</h3>
+
+          <FeeBreakdown fees={result.quote.fees} addressMap={addressToSymbolMapping} />
+
             <>
               <button
                 className="disabled:opacity-50 mt-2 py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"

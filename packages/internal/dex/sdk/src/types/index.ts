@@ -30,6 +30,19 @@ export type SecondaryFee = {
 };
 
 /**
+ * Interface representing the fees returned in the quote
+ * @property {string} feeRecipient - The fee recipient address
+ * @property {number} feeBasisPoints - The fee percentage in basis points
+ * @property {Amount} amount - The amount of the fee
+ * @example 100 basis points = 1% = 1 IMX
+ */
+export type Fee = {
+  feeRecipient: string;
+  feeBasisPoints: number;
+  amount: Amount;
+};
+
+/**
  * Interface representing an amount with the token information
  * @property {TokenInfo} token - The token information
  * @property {ethers.BigNumber} value - The amount
@@ -49,6 +62,7 @@ export type Quote = {
   amount: Amount;
   amountWithMaxSlippage: Amount;
   slippage: number;
+  fees: Fee[];
 };
 
 /**
