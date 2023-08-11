@@ -24,6 +24,9 @@ export class ImmutableConnect extends ImmutableWebComponent {
       <React.StrictMode>
         <ConnectWidget
           config={this.widgetConfig!}
+          params={{
+            passport: this.passport,
+          }}
         />
       </React.StrictMode>,
     );

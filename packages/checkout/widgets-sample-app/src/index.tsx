@@ -11,6 +11,7 @@ import BridgeUI from './components/ui/bridge/bridge';
 import { Marketplace } from './components/ui/marketplace-orchestrator';
 import { BiomeCombinedProviders } from '@biom3/react';
 import { onDarkBase } from '@biom3/design-tokens';
+import { PassportLoginCallback } from './components/ui/marketplace-orchestrator/PassportLoginCallback';
 
 const router = createBrowserRouter([
   {
@@ -36,6 +37,10 @@ const router = createBrowserRouter([
   {
     path: '/marketplace-orchestrator',
     element: <BiomeCombinedProviders theme={{base: onDarkBase}}><Marketplace /></BiomeCombinedProviders>,
+  },
+  {
+    path: '/marketplace-orchestrator/login/callback',
+    element: <PassportLoginCallback />
   },
 ]);
 
