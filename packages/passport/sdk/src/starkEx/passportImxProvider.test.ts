@@ -46,15 +46,18 @@ describe('PassportImxProvider', () => {
     getAddress: jest.fn(),
   };
 
-  const imxPublicApiDomain = 'http://imxPublicApiDomain';
-
   beforeEach(() => {
     passportImxProvider = new PassportImxProvider({
       user: mockUserImx,
       starkSigner: mockStarkSigner,
       confirmationScreen,
       immutableXClient,
-      imxPublicApiDomain,
+      config: new PassportConfiguration({
+        baseConfig: {} as ImmutableConfiguration,
+        clientId: 'client123',
+        logoutRedirectUri: 'http://localhost:3000/logout',
+        redirectUri: 'http://localhost:3000/redirect',
+      }),
     });
   });
 
