@@ -52,9 +52,12 @@ export class PassportConfiguration {
 
   readonly multiRollupConfig: MultiRollupAPIConfiguration;
 
+  readonly crossSdkBridgeEnabled: boolean;
+
   constructor({
     baseConfig,
     overrides,
+    crossSdkBridgeEnabled,
     ...oidcConfiguration
   }: PassportModuleConfiguration) {
     validateConfiguration(oidcConfiguration, [
@@ -64,6 +67,8 @@ export class PassportConfiguration {
     ]);
     this.oidcConfiguration = oidcConfiguration;
     this.baseConfig = baseConfig;
+    this.crossSdkBridgeEnabled = crossSdkBridgeEnabled || false;
+
     if (overrides) {
       validateConfiguration(
         overrides,
