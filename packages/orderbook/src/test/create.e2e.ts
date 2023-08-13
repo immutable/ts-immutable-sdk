@@ -40,7 +40,7 @@ describe('prepareListing and createOrder e2e', () => {
     });
 
     await signAndSubmitTx(
-      listing.unsignedApprovalTransaction!,
+      (await listing.actions[0].buildTransaction()),
       offerer,
       provider,
     );

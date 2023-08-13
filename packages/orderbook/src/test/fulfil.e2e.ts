@@ -41,7 +41,7 @@ describe('fulfil order', () => {
     });
 
     await signAndSubmitTx(
-      listing.unsignedApprovalTransaction!,
+      (await listing.actions[0].buildTransaction()),
       offerer,
       provider,
     );
@@ -60,11 +60,15 @@ describe('fulfil order', () => {
 
     await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.ACTIVE);
 
-    const { unsignedFulfillmentTransaction } = await sdk.fulfillOrder(
+    const fulfillment = await sdk.fulfillOrder(
       orderId,
       fulfiller.address,
     );
-    await signAndSubmitTx(unsignedFulfillmentTransaction, fulfiller, provider);
+    await signAndSubmitTx(
+      (await fulfillment.actions[0].buildTransaction()),
+      fulfiller,
+      provider,
+    );
 
     await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.FILLED);
   }, 60_000);

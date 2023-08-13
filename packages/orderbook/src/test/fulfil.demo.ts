@@ -1,6 +1,7 @@
 import { Environment } from '@imtbl/config';
 import { Wallet } from 'ethers';
 import { log } from 'console';
+import { TransactionType } from 'types';
 import { OrderStatus } from '../openapi/sdk/index';
 import { Orderbook } from '../orderbook';
 import {
@@ -69,8 +70,14 @@ describe('', () => {
       orderExpiry: new Date(Date.now() + 1000000 * 30),
     });
 
+    const approvalAction = validListing.actions.find((a) => a.transactionType === 'APPROVAL');
+    if (!approvalAction) {
+      throw new Error('No approval action found');
+    }
+    const unsignedApprovalTransaction = await approvalAction.buildTransaction();
+
     await signAndSubmitTx(
-      validListing.unsignedApprovalTransaction!,
+      unsignedApprovalTransaction,
       offerer,
       provider,
     );
@@ -94,11 +101,30 @@ describe('', () => {
     await waitForOrderToBeOfStatus(sdk, orderId2, OrderStatus.ACTIVE);
     log(`Listing ${orderId2} is now ACTIVE, fulfilling order...`);
 
-    const { unsignedFulfillmentTransaction } = await sdk.fulfillOrder(
+    const { actions } = await sdk.fulfillOrder(
       orderId2,
       fulfiller.address,
     );
-    await signAndSubmitTx(unsignedFulfillmentTransaction, fulfiller, provider);
+
+    // The approval action must be built and submitted before the fulfillment action,
+    // if an approval is required
+    const fulfillApprovalAction = actions.find(
+      (a) => a.transactionType === TransactionType.APPROVAL,
+    );
+    const fulfillOrderAction = actions.find(
+      (a) => a.transactionType === TransactionType.FULFILL_ORDER,
+    );
+
+    if (fulfillApprovalAction) {
+      const unsignedFulfillApprovalTransaction = await fulfillApprovalAction.buildTransaction();
+      await signAndSubmitTx(unsignedFulfillApprovalTransaction, fulfiller, provider);
+    }
+
+    if (fulfillOrderAction) {
+      const unsignedFulfillmentTransaction = await fulfillOrderAction.buildTransaction();
+      await signAndSubmitTx(unsignedFulfillmentTransaction, fulfiller, provider);
+    }
+
     log(
       `Fulfilment transaction sent, waiting for listing ${orderId2} to become FILLED`,
     );
