@@ -6,7 +6,7 @@ import {
   PopulatedTransaction, providers,
 } from 'ethers';
 import {
-  ERC20Item, ERC721Item, FulfillOrderResponse, NativeItem, PrepareListingResponse, RoyaltyInfo,
+  ERC20Item, ERC721Item, FulfillOrderResponse, NativeItem, PrepareListingResponse,
 } from 'types';
 import { Order } from 'openapi/sdk';
 import {
@@ -33,7 +33,6 @@ export class Seaport {
     offerer: string,
     listingItem: ERC721Item,
     considerationItem: ERC20Item | NativeItem,
-    royaltyInfo: RoyaltyInfo,
     orderStart: Date,
     orderExpiry: Date,
   ): Promise<PrepareListingResponse> {
@@ -41,7 +40,6 @@ export class Seaport {
       offerer,
       listingItem,
       considerationItem,
-      royaltyInfo,
       orderStart,
       orderExpiry,
     );
@@ -74,7 +72,7 @@ export class Seaport {
   }
 
   async fulfilOrder(order: Order, account: string): Promise<FulfillOrderResponse> {
-    const orderComponents = await this.mapImmutableOrderToSeaportOrderComponents(order);
+    const orderComponents = this.mapImmutableOrderToSeaportOrderComponents(order);
     const seaportLib = this.getSeaportLib(order);
 
     const { actions } = await seaportLib.fulfillOrders({
@@ -134,7 +132,6 @@ export class Seaport {
     offerer: string,
     listingItem: ERC721Item,
     considerationItem: ERC20Item | NativeItem,
-    royaltyInfo: RoyaltyInfo,
     orderStart: Date,
     orderExpiry: Date,
   ): Promise<OrderUseCase<CreateOrderAction>> {
@@ -153,11 +150,6 @@ export class Seaport {
           token: considerationItem.type === 'ERC20' ? considerationItem.contractAddress : undefined,
           amount: considerationItem.amount,
           recipient: offerer,
-        },
-        {
-          token: considerationItem.type === 'ERC20' ? considerationItem.contractAddress : undefined,
-          amount: royaltyInfo.amountRequired,
-          recipient: royaltyInfo.recipient,
         },
       ],
       startTime: (orderStart.getTime() / 1000).toFixed(0),

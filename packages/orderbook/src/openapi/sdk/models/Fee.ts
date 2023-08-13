@@ -24,6 +24,7 @@ export namespace Fee {
    */
   export enum fee_type {
     ROYALTY = 'ROYALTY',
+    MAKER = 'MAKER'
   }
 
 

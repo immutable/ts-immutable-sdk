@@ -1,6 +1,6 @@
 import { OrderComponents } from '@opensea/seaport-js/lib/types';
 import { PopulatedTransaction, TypedDataDomain, TypedDataField } from 'ethers';
-import { OrdersService } from 'openapi/sdk';
+import { Fee, OrdersService } from 'openapi/sdk';
 
 export interface ERC721Item {
   type: 'ERC721';
@@ -46,6 +46,7 @@ export interface CreateListingParams {
   orderComponents: OrderComponents;
   orderHash: string;
   orderSignature: string;
+  fees?: Array<Fee>
 }
 
 // Expose the list order filtering and ordering directly from the openAPI SDK, except

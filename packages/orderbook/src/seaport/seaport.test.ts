@@ -10,7 +10,7 @@ import {
   TransactionMethods,
 } from '@opensea/seaport-js/lib/types';
 import {
-  ERC20Item, ERC721Item, NativeItem, RoyaltyInfo,
+  ERC20Item, ERC721Item, NativeItem,
 } from 'types';
 import { BigNumber, PopulatedTransaction, providers } from 'ethers';
 import { CreateOrderProtocolData, Order, OrderStatus } from 'openapi/sdk';
@@ -56,11 +56,6 @@ describe('Seaport', () => {
         type: 'ERC20',
       };
 
-      const royaltyInfo: RoyaltyInfo = {
-        amountRequired: '10',
-        recipient: randomAddress(),
-      };
-
       const orderStart = new Date();
       const orderExpiry = new Date();
       const orderHash = randomAddress();
@@ -104,11 +99,6 @@ describe('Seaport', () => {
                   amount: considerationItem.amount,
                   recipient: offerer,
                 },
-                {
-                  token: considerationItem.contractAddress,
-                  amount: royaltyInfo.amountRequired,
-                  recipient: royaltyInfo.recipient,
-                },
               ],
               startTime: (orderStart.getTime() / 1000).toFixed(0),
               endTime: (orderExpiry.getTime() / 1000).toFixed(0),
@@ -137,7 +127,6 @@ describe('Seaport', () => {
           offerer,
           listingItem,
           considerationItem,
-          royaltyInfo,
           orderStart,
           orderExpiry,
         );
@@ -149,7 +138,6 @@ describe('Seaport', () => {
           offerer,
           listingItem,
           considerationItem,
-          royaltyInfo,
           orderStart,
           orderExpiry,
         );
@@ -172,7 +160,6 @@ describe('Seaport', () => {
           offerer,
           listingItem,
           considerationItem,
-          royaltyInfo,
           orderStart,
           orderExpiry,
         );
@@ -184,7 +171,6 @@ describe('Seaport', () => {
           offerer,
           listingItem,
           considerationItem,
-          royaltyInfo,
           orderStart,
           orderExpiry,
         );
@@ -215,11 +201,6 @@ describe('Seaport', () => {
       const considerationItem: NativeItem = {
         amount: '100',
         type: 'NATIVE',
-      };
-
-      const royaltyInfo: RoyaltyInfo = {
-        amountRequired: '20',
-        recipient: randomAddress(),
       };
 
       const orderStart = new Date();
@@ -282,11 +263,6 @@ describe('Seaport', () => {
                   amount: considerationItem.amount,
                   recipient: offerer,
                 },
-                {
-                  token: undefined,
-                  amount: royaltyInfo.amountRequired,
-                  recipient: royaltyInfo.recipient,
-                },
               ],
               startTime: (orderStart.getTime() / 1000).toFixed(0),
               endTime: (orderExpiry.getTime() / 1000).toFixed(0),
@@ -315,7 +291,6 @@ describe('Seaport', () => {
           offerer,
           listingItem,
           considerationItem,
-          royaltyInfo,
           orderStart,
           orderExpiry,
         );
@@ -334,7 +309,6 @@ describe('Seaport', () => {
           offerer,
           listingItem,
           considerationItem,
-          royaltyInfo,
           orderStart,
           orderExpiry,
         );
@@ -357,7 +331,6 @@ describe('Seaport', () => {
           offerer,
           listingItem,
           considerationItem,
-          royaltyInfo,
           orderStart,
           orderExpiry,
         );
@@ -369,7 +342,6 @@ describe('Seaport', () => {
           offerer,
           listingItem,
           considerationItem,
-          royaltyInfo,
           orderStart,
           orderExpiry,
         );
