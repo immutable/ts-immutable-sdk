@@ -44,6 +44,7 @@ const abi = [
     type: "function",
   },
 ];
+
 const erc20Abi = [
   {
     inputs: [
@@ -60,7 +61,6 @@ const erc20Abi = [
 ];
 
 const erc721Interface = new ethers.utils.Interface(abi);
-const erc20Interface = new ethers.utils.Interface(erc20Abi);
 
 export function encodeIsApprovedAll(owner: string, operator: string) {
   return erc721Interface.encodeFunctionData("isApprovedForAll", [
@@ -76,7 +76,3 @@ export function encodeSetApprovalForAll(operator: string, approved: boolean) {
   ]);
 }
 
-export function encodeApprove(spender: string, value: string) {
-  const amount = ethers.utils.parseEther(value); // 0.1 eth
-  return erc20Interface.encodeFunctionData("approve", [spender, amount]);
-}

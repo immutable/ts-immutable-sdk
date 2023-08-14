@@ -1,252 +1,111 @@
-import React from "react";
-import { Box, Heading, Body, Banner, ButtCon } from "@biom3/react";
-import { usePassportProvider } from "../context/PassportProvider";
-import { useData } from "../context/DataProvider";
-import { useMulticaller } from "../context/MulticallerProvider";
-import ItemCards from "../components/ItemCards";
-import { NFT } from "@imtbl/generated-clients/dist/multi-rollup";
+import { useCallback, useEffect, useState } from "react";
+import axios from "axios";
+import { Box, Heading, Body, Banner, Button } from "@biom3/react";
+
 import { Grid, Row, Col } from "react-flexbox-grid";
-import CraftingBox from "../components/crafting/CraftingBox";
-import CraftingConfig from "../components/crafting/CraftingConfig";
-import { v4 as uuidv4 } from "uuid";
-import CraftingApprovalConfirmation from "../components/crafting/CraftingApprovalConfirmation";
-import {
-  encodeApprove,
-  encodeIsApprovedAll,
-  encodeSetApprovalForAll,
-} from "../contracts/erc721";
 
-const refreshingTime = 2;
-const wallet = "0x05d1f8d5cac26584f2506307dfff3ea19684d16b";
+import { encodeApprove } from "../contracts/erc20";
+import { useMetamaskProvider } from "../MetamaskProvider";
 
-function PrimarySale() {
-  const [nfts, setNFTs] = React.useState<Array<NFT>>([]);
-  const [selected, setSelected] = React.useState<Map<string, NFT>>(new Map());
-  const [loading, setLoading] = React.useState<boolean>(false);
-  const [approvalConfirmationVisible, setApprovalConfirmationVisible] =
-    React.useState<boolean>(false);
-  const [collectionAddress, setCollectionAddress] = React.useState<string>(
-    "0x073E8D9Ca35EE06CC895baefA7Bdd063eCEe2C33"
-  );
-  const [multicallerAddress, setMulticallerAddress] = React.useState<string>(
-    "0xaDEbf4f05E45568F90a57443264fc6079F6A4554"
-  );
-  const [gameProjectId, setGameProjectId] = React.useState<string>("1");
-  const [successMessages, setSuccessMessages] = React.useState<
-    Map<string, string>
-  >(new Map());
+const useMint = () => {
+  const [response, setResponse] = useState(null);
+  const [error, setError] = useState(null);
 
-  const { sendTx, call, getUserInfo } = usePassportProvider();
-  const { getNFTs } = useData();
-  const { sign } = useMulticaller();
+  const mint = useCallback(async () => {
+    const data = {
+      recipient_address: "0x21B51Ec6fB7654B7e59e832F9e9687f29dF94Fb8",
+      items: [
+        {
+          collection_address: "0x21B51Ec6fB7654B7e59e832F9e9687f29dF94Fb8",
+          qty: 1,
+        },
+      ],
+    };
 
-  React.useEffect(() => {
-    const timer = setInterval(async () => {
-      await getNFTsAsync(collectionAddress);
-    }, refreshingTime * 1000);
-    return () => clearInterval(timer);
+    try {
+      const response = await fetch("http://localhost:3001/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const json = await response.json();
+      setResponse(json);
+    } catch (error) {
+      setError(error as any);
+    }
   }, []);
 
-  const getNFTsAsync = async (collectionAddress: string) => {
-    if (collectionAddress === "") {
-      return;
-    }
-    const res = await getNFTs(
-      wallet,
-      collectionAddress
-      // "0x64f387f90466751fdd080c056d92ad544bc1a1c8"
-    );
-    setNFTs(res?.result || []);
-  };
+  return { mint, response, error };
+};
 
-  const onItemCardClick = (nft: NFT) => {
-    const key = `${nft.contract_address}-${nft.token_id}`;
-    const newSelected = new Map(selected);
-    if (newSelected.has(key)) {
-      newSelected.delete(key);
-    } else {
-      newSelected.set(key, nft);
-    }
-    setSelected(newSelected);
-  };
+function PrimarySale() {
+  const { mm_connect, mm_sendTransaction } = useMetamaskProvider();
 
-  const isSelected = (nft: NFT) =>
-    selected.has(`${nft.contract_address}-${nft.token_id}`);
-
-  const onCraftClick = async () => {
-    console.log("🚀 ~ file: Crafting.tsx:91 ~ onCraftClick ~ onCraftClick:")
-    await setApprove();
-    // if (selected.size === 0) {
-    //   return;
-    // }
-    // setLoading(true);
-    // const approved = await isApproved();
-    // console.log(`Approved: ${approved}`);
-    // if (!approved) {
-    //   setApprovalConfirmationVisible(true);
-    // } else {
-    //   await craft();
-    //   setLoading(false);
-    // }
-  };
+  const { mint, response, error } = useMint();
 
   const setApprove = async (): Promise<boolean> => {
-    const erc20Address = "0xb95B75B4E4c09F04d5DA6349861BF1b6F163D78c";
-    const txData = encodeApprove(erc20Address, "0.01");
-    console.log("🚀 ~ file: PrimarySale.tsx:96 ~ setApprove ~ txData:", txData)
-    const multicallerAddress = "0xfd2490b22365853e0b4fb416c5b1598223125167";
-    const approved = await sendTx(multicallerAddress, txData);
-    console.log("🚀 ~ file: PrimarySale.tsx:99 ~ setApprove ~ approved:", approved)
-    return parseInt(approved, 16) === 1;
-  };
-
-  const isApproved = async (): Promise<boolean> => {
-    // const txData = encodeIsApprovedAll(wallet, multicallerAddress);
-    // const approved = await call(collectionAddress, txData);
-    // return parseInt(approved, 16) === 1;
-    return false;
-  };
-
-  const onApproval = async () => {
-    setApprovalConfirmationVisible(false);
-    const txData = encodeSetApprovalForAll(multicallerAddress, true);
-    const txHash = await sendTx(collectionAddress, txData);
-    console.log(txHash);
-    addSuccessMessage(txHash, `Approval transaction ${txHash}`);
-    await craft();
-    setLoading(false);
-  };
-
-  const onApprovalReject = () => {
-    setApprovalConfirmationVisible(false);
-    setLoading(false);
-  };
-
-  const craft = async () => {
     try {
-      const calls = Array.from(selected.values()).map((nft) => ({
-        address: nft.contract_address,
-        functionSignature: "burn(uint256)",
-        functionArgs: [nft.token_id],
-      }));
-      calls.push({
-        address: collectionAddress,
-        functionSignature: "mint(address,uint256)",
-        functionArgs: [wallet, "1"],
-      });
-      const ref = uuidv4().replace(/-/g, "");
-      const signResponse = await sign(gameProjectId, ref, calls);
-      console.log(signResponse);
+      const usdcAddress = "0x21B51Ec6fB7654B7e59e832F9e9687f29dF94Fb8";
+      const multicallerAddress = "0x6f740c978Fb04CA025b3319FFB6B55D10BF498cE";
 
-      if (signResponse !== undefined) {
-        const txHash = await sendTx(
-          signResponse.multicallerAddress,
-          `0x${signResponse.txData}`
-        );
-        console.log(txHash);
-        addSuccessMessage(txHash, `Crafting transaction ${txHash}`);
-        setSelected(new Map());
-      }
+      const txData = encodeApprove(multicallerAddress, "1", 6);
+      const approved = await mm_sendTransaction(usdcAddress, txData);
+      return approved;
     } catch (error) {
       console.log(error);
+      return false;
     }
-  };
-
-  const onCollectionAddressChange = async (collectionAddress: string) => {
-    setCollectionAddress(collectionAddress);
-    await getNFTsAsync(collectionAddress);
-  };
-
-  const addSuccessMessage = (key: string, message: string) => {
-    const newSuccessMessages = new Map(successMessages);
-    newSuccessMessages.set(key, message);
-    setSuccessMessages(newSuccessMessages);
-  };
-
-  const removeSuccessMessage = (key: string) => {
-    const newSuccessMessages = new Map(successMessages);
-    newSuccessMessages.delete(key);
-    setSuccessMessages(newSuccessMessages);
   };
 
   return (
     <Box sx={{ padding: "base.spacing.x8" }}>
       <Grid fluid>
-        {loading && (
-          <Banner variant="guidance" sx={{ marginBottom: "base.spacing.x4" }}>
-            <Banner.Title>Crafting...</Banner.Title>
-          </Banner>
-        )}
-        {Array.from(successMessages.keys()).map((key) => (
-          <Banner
-            key={key}
-            variant="success"
-            sx={{ marginBottom: "base.spacing.x4" }}
-          >
-            <Banner.Title>{successMessages.get(key)}</Banner.Title>
-            <Banner.RightHandButtons>
-              <ButtCon
-                icon="CloseWithCircle"
-                onClick={() => {
-                  removeSuccessMessage(key);
-                }}
-              />
-            </Banner.RightHandButtons>
-          </Banner>
-        ))}
-        <Row>
-          <Col xs={12} md={3}>
-            <Box sx={{ marginBottom: "base.spacing.x8" }}>
-              <Heading>Config</Heading>
-            </Box>
-            <CraftingConfig
-              collectionAddress={collectionAddress}
-              onCollectionAddressChange={onCollectionAddressChange}
-              multicallerAddress={multicallerAddress}
-              onMulticallerAddressChange={setMulticallerAddress}
-              gameProjectId={gameProjectId}
-              onGameProjectIdChange={setGameProjectId}
-            />
-            <Box
-              sx={{
-                marginBottom: "base.spacing.x8",
-                marginTop: "base.spacing.x8",
-              }}
-            >
-              <Heading>Crafting</Heading>
-            </Box>
-            <CraftingBox loading={loading} onCraftClick={onCraftClick} />
-          </Col>
-          <Col xs={12} mdOffset={1} md={8}>
-            <Box sx={{ marginBottom: "base.spacing.x8" }}>
-              <Row>
-                <Col xs={6}>
-                  <Heading>Web3 Inventory</Heading>
-                </Col>
-                <Col xs={6}>
-                  <Box sx={{ textAlign: "right" }}>
-                    <Body sx={{ color: "base.color.text.secondary" }}>
-                      Refereshing every {refreshingTime} seconds
-                    </Body>
-                  </Box>
-                </Col>
-              </Row>
-            </Box>
-            <ItemCards
-              nfts={nfts}
-              onClick={onItemCardClick}
-              isSelected={isSelected}
-            />
-          </Col>
-        </Row>
+        <Banner variant="guidance" sx={{ marginBottom: "base.spacing.x4" }}>
+          <Banner.Title>Connecting...</Banner.Title>
+        </Banner>
+        <Button
+          size={"large"}
+          sx={{ background: "base.gradient.1" }}
+          onClick={() => {
+            mm_connect();
+          }}
+        >
+          <Button.Icon
+            icon="WalletConnect"
+            iconVariant="bold"
+            sx={{
+              mr: "base.spacing.x1",
+              ml: "0",
+              width: "base.icon.size.400",
+            }}
+          />
+          Connect
+        </Button>
+        <Button
+          size={"large"}
+          sx={{ background: "base.gradient.1" }}
+          onClick={async () => {
+            const approved = await setApprove();
+            if (approved) {
+              mint();
+            }
+          }}
+        >
+          <Button.Icon
+            icon="Minting"
+            iconVariant="bold"
+            sx={{
+              mr: "base.spacing.x1",
+              ml: "0",
+              width: "base.icon.size.400",
+            }}
+          />
+          Approve
+        </Button>
       </Grid>
-      <CraftingApprovalConfirmation
-        gameName="Economy Mechanics Playground"
-        visible={approvalConfirmationVisible}
-        onConfirm={onApproval}
-        onReject={onApprovalReject}
-        onCloseModal={() => {}}
-      />
     </Box>
   );
 }

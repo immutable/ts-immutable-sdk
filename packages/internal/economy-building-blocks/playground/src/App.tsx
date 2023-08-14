@@ -10,12 +10,14 @@ import Crafting from "./pages/Crafting";
 import PrimarySale from "./pages/PrimarySale";
 import Login from "./pages/Login";
 import { MulticallerProvider } from "./context/MulticallerProvider";
+import { MetamaskProvider } from "./MetamaskProvider";
 
 function App() {
   return (
     <BrowserRouter>
       <DataProvider>
         <MulticallerProvider>
+          <MetamaskProvider>
           <PassportProvider>
             <BiomeCombinedProviders>
               <BiomeThemeProvider theme={{ base: onDarkBase }}>
@@ -32,6 +34,7 @@ function App() {
               </BiomeThemeProvider>
             </BiomeCombinedProviders>
           </PassportProvider>
+          </MetamaskProvider>
         </MulticallerProvider>
       </DataProvider>
     </BrowserRouter>
