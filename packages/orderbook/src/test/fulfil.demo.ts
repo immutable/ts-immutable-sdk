@@ -13,6 +13,7 @@ import {
   signMessage,
   TestToken,
   waitForOrderToBeOfStatus,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getConfigFromEnv,
 } from './helpers';
 
@@ -46,13 +47,15 @@ describe('', () => {
     // Deploy an NFT contract and mint a token for the offerer
     const nftContract = await deployAndMintNftContract(offerer);
 
-    const configOverrides = getConfigFromEnv();
+    // uncomment the overrides and set variables in
+    // .env to run on environments other than testnet (e.g. devnet)
+    // const configOverrides = getConfigFromEnv();
     const sdk = new Orderbook({
       baseConfig: {
         environment: Environment.SANDBOX,
       },
       overrides: {
-        ...configOverrides,
+        // ...configOverrides,
       },
     });
 
