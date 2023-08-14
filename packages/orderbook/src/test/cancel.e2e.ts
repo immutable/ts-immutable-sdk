@@ -4,9 +4,10 @@ import { Orderbook } from 'orderbook';
 import { getLocalhostProvider } from './helpers/provider';
 import { getOffererWallet } from './helpers/signers';
 import { deployTestToken } from './helpers/erc721';
-import { signAndSubmitTx, signMessage } from './helpers/sign-and-submit';
+import { signAndSubmitTx } from './helpers/sign-and-submit';
 import { waitForOrderToBeOfStatus } from './helpers/order';
 import { getConfigFromEnv } from './helpers';
+import { actionAll } from './helpers/actions';
 
 describe('cancel order', () => {
   it('should cancel the order', async () => {
@@ -39,22 +40,14 @@ describe('cancel order', () => {
       },
     });
 
-    await signAndSubmitTx(
-      listing.unsignedApprovalTransaction!,
-      offerer,
-      provider,
-    );
-    const signature = await signMessage(
-      listing.typedOrderMessageForSigning,
-      offerer,
-    );
+    const signatures = await actionAll(listing.actions, offerer, provider);
 
     const {
       result: { id: orderId },
     } = await sdk.createListing({
       orderComponents: listing.orderComponents,
       orderHash: listing.orderHash,
-      orderSignature: signature,
+      orderSignature: signatures[0],
     });
 
     await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.ACTIVE);

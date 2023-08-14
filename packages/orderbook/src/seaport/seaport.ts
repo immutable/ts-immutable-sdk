@@ -6,7 +6,18 @@ import {
   PopulatedTransaction, providers,
 } from 'ethers';
 import {
-  ERC20Item, ERC721Item, FulfillOrderResponse, NativeItem, PrepareListingResponse, RoyaltyInfo,
+  Action,
+  ActionType,
+  ERC20Item,
+  ERC721Item,
+  FulfillOrderResponse,
+  NativeItem,
+  PrepareListingResponse,
+  RoyaltyInfo,
+  SignableAction,
+  SignablePurpose,
+  TransactionAction,
+  TransactionPurpose,
 } from 'types';
 import { Order } from 'openapi/sdk';
 import {
@@ -37,7 +48,7 @@ export class Seaport {
     orderStart: Date,
     orderExpiry: Date,
   ): Promise<PrepareListingResponse> {
-    const { actions } = await this.createSeaportOrder(
+    const { actions: seaportActions } = await this.createSeaportOrder(
       offerer,
       listingItem,
       considerationItem,
@@ -46,16 +57,20 @@ export class Seaport {
       orderExpiry,
     );
 
-    let approvalTransaction: PopulatedTransaction | undefined;
+    const listingActions: Action[] = [];
 
-    const approvalAction = actions
+    const approvalAction = seaportActions
       .find((action) => action.type === 'approval') as ApprovalAction | undefined;
 
     if (approvalAction) {
-      approvalTransaction = await prepareTransaction(approvalAction.transactionMethods);
+      listingActions.push({
+        type: ActionType.TRANSACTION,
+        purpose: TransactionPurpose.APPROVAL,
+        buildTransaction: prepareTransaction(approvalAction.transactionMethods),
+      });
     }
 
-    const createAction: CreateOrderAction | undefined = actions
+    const createAction: CreateOrderAction | undefined = seaportActions
       .find((action) => action.type === 'create') as CreateOrderAction | undefined;
 
     if (!createAction) {
@@ -65,19 +80,24 @@ export class Seaport {
     const orderMessageToSign = await createAction.getMessageToSign();
     const orderComponents = getOrderComponentsFromMessage(orderMessageToSign);
 
+    listingActions.push({
+      type: ActionType.SIGNABLE,
+      purpose: SignablePurpose.CREATE_LISTING,
+      message: await this.getTypedDataFromOrderComponents(orderComponents),
+    });
+
     return {
-      unsignedApprovalTransaction: approvalTransaction,
-      typedOrderMessageForSigning: await this.getTypedDataFromOrderComponents(orderComponents),
+      actions: listingActions,
       orderComponents,
       orderHash: this.getSeaportLib().getOrderHash(orderComponents),
     };
   }
 
-  async fulfilOrder(order: Order, account: string): Promise<FulfillOrderResponse> {
+  async fulfillOrder(order: Order, account: string): Promise<FulfillOrderResponse> {
     const orderComponents = await this.mapImmutableOrderToSeaportOrderComponents(order);
     const seaportLib = this.getSeaportLib(order);
 
-    const { actions } = await seaportLib.fulfillOrders({
+    const { actions: seaportActions } = await seaportLib.fulfillOrders({
       accountAddress: account,
       fulfillOrderDetails: [{
         order: {
@@ -88,28 +108,33 @@ export class Seaport {
       }],
     });
 
-    let approvalTransaction: PopulatedTransaction | undefined;
+    const fulfillmentActions: TransactionAction[] = [];
 
-    const approvalAction = actions
+    const approvalAction = seaportActions
       .find((action) => action.type === 'approval') as ApprovalAction | undefined;
 
     if (approvalAction) {
-      approvalTransaction = await prepareTransaction(approvalAction.transactionMethods);
+      fulfillmentActions.push({
+        type: ActionType.TRANSACTION,
+        buildTransaction: prepareTransaction(approvalAction.transactionMethods),
+        purpose: TransactionPurpose.APPROVAL,
+      });
     }
 
-    const fulfillmentAction: ExchangeAction | undefined = actions
+    const fulfilOrderAction: ExchangeAction | undefined = seaportActions
       .find((action) => action.type === 'exchange') as ExchangeAction | undefined;
 
-    if (!fulfillmentAction) {
+    if (!fulfilOrderAction) {
       throw new Error('No exchange action found');
     }
 
-    const fulfillmentTransaction = await prepareTransaction(fulfillmentAction.transactionMethods);
+    fulfillmentActions.push({
+      type: ActionType.TRANSACTION,
+      buildTransaction: prepareTransaction(fulfilOrderAction.transactionMethods),
+      purpose: TransactionPurpose.FULFILL_ORDER,
+    });
 
-    return {
-      unsignedApprovalTransaction: approvalTransaction,
-      unsignedFulfillmentTransaction: fulfillmentTransaction,
-    };
+    return { actions: fulfillmentActions };
   }
 
   async cancelOrder(order: Order, account: string): Promise<PopulatedTransaction> {
@@ -118,7 +143,7 @@ export class Seaport {
 
     const cancellationTransaction = await seaportLib.cancelOrders([orderComponents], account);
 
-    return prepareTransaction(cancellationTransaction);
+    return prepareTransaction(cancellationTransaction)();
   }
 
   private mapImmutableOrderToSeaportOrderComponents(order: Order): OrderComponents {
@@ -169,7 +194,7 @@ export class Seaport {
 
   private async getTypedDataFromOrderComponents(
     orderComponents: OrderComponents,
-  ): Promise<PrepareListingResponse['typedOrderMessageForSigning']> {
+  ): Promise<SignableAction['message']> {
     const { chainId } = await this.provider.getNetwork();
 
     const domainData = {

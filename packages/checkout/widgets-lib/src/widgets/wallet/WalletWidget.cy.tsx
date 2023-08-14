@@ -1,10 +1,10 @@
-import { ChainId, Checkout } from '@imtbl/checkout-sdk';
+import { ChainId, ChainName, Checkout } from '@imtbl/checkout-sdk';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import {
   describe, it, cy,
 } from 'local-cypress';
 import { mount } from 'cypress/react18';
-import { Web3Provider } from '@ethersproject/providers';
+import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { CryptoFiat } from '@imtbl/cryptofiat';
@@ -167,13 +167,13 @@ describe('WalletWidget tests', () => {
               getAddress: () => Promise.resolve('dss'),
             }),
             getNetwork: async () => ({
-              chainId: ChainId.IMTBL_ZKEVM_DEVNET,
-              name: 'Immutable zkEVM devnet',
+              chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+              name: ChainName.IMTBL_ZKEVM_TESTNET,
             }),
           },
           network: {
-            chainId: ChainId.IMTBL_ZKEVM_DEVNET,
-            name: 'Immutable zkEVM devnet',
+            chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+            name: ChainName.IMTBL_ZKEVM_TESTNET,
             nativeCurrency: {
               name: 'IMX',
               symbol: 'IMX',
@@ -197,8 +197,8 @@ describe('WalletWidget tests', () => {
         .resolves({
           networks: [
             {
-              name: 'Immutable zkEVM devnet',
-              chainId: ChainId.IMTBL_ZKEVM_DEVNET,
+              name: 'Immutable zkEVM testnet',
+              chainId: ChainId.IMTBL_ZKEVM_TESTNET,
             },
             {
               name: 'Sepolia',
@@ -246,8 +246,8 @@ describe('WalletWidget tests', () => {
         .as('switchNetworkStub')
         .resolves({
           network: {
-            chainId: ChainId.IMTBL_ZKEVM_DEVNET,
-            name: 'Immutable zkEVM devnet',
+            chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+            name: 'Immutable zkEVM testnet',
             nativeCurrency: {
               name: 'IMX',
               symbol: 'IMX',
@@ -471,6 +471,48 @@ describe('WalletWidget tests', () => {
         cy.get('body').contains(body);
         cy.get('body').contains(heading);
         cySmartGet('back-button').should('be.visible');
+      });
+    });
+
+    describe('Passport Wallet Widget', () => {
+      const mockPassportProvider = {
+        getSigner: () => ({
+          getAddress: () => Promise.resolve('0xwalletAddress'),
+        }),
+        provider: {
+          isPassport: true,
+        } as ExternalProvider,
+      } as Web3Provider;
+
+      const passportConnectLoaderState = {
+        checkout: new Checkout({
+          baseConfig: { environment: Environment.SANDBOX },
+        }),
+        provider: mockPassportProvider,
+        connectionStatus: ConnectionStatus.CONNECTED_WITH_NETWORK,
+      };
+
+      it('should not show Network Menu when provider is passport', () => {
+        const widgetConfig = {
+          theme: WidgetTheme.DARK,
+          environment: Environment.SANDBOX,
+          isBridgeEnabled: false,
+          isSwapEnabled: false,
+          isOnRampEnabled: false,
+        } as StrongCheckoutWidgetsConfig;
+
+        mount(
+          <ConnectLoaderTestComponent
+            initialStateOverride={passportConnectLoaderState}
+          >
+            <WalletWidget
+              config={widgetConfig}
+            />
+          </ConnectLoaderTestComponent>,
+        );
+
+        cySmartGet('wallet-balances').should('exist');
+        cySmartGet('network-menu').should('not.exist');
       });
     });
   });
