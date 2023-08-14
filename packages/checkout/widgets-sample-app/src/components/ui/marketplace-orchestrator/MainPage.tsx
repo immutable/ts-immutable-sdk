@@ -4,15 +4,26 @@ import { useWalletWidget } from "./useWalletWidget";
 import { Box, Button, Card, GridBox, Heading } from "@biom3/react";
 import { useSwapWidget } from "./useSwapWidget";
 import { useBridgeWidget } from "./useBridgeWidget";
-import { useCallback, useContext, useMemo, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { WidgetContext, hideAllWidgets } from "./WidgetProvider";
 import { ImtblWidgets } from "./ImtblWidgets";
+import { Passport } from '@imtbl/passport';
+import { passportConfig } from './passportConfig';
 
 export const MainPage = () => {
   
   // local state for enabling/disabling and changing buttons
   const [doneSwap, setDoneSwap] = useState<boolean>(false);
   const [web3Provider, setWeb3Provider] = useState<Web3Provider|undefined>(undefined);
+
+  const passport = useMemo(() => new Passport(passportConfig), [passportConfig]);
+
+  const setPassportProvider = useCallback(() => {
+    if(passport) {
+      const passportzkEVMProvider = passport?.connectEvm();
+      setWeb3Provider(new Web3Provider(passportzkEVMProvider));
+    }
+  }, [passport]);
 
   // widget context state for showing/hiding widgets
   const {showWidgets: {
@@ -43,6 +54,10 @@ export const MainPage = () => {
 
   const cardKeys = useMemo(() => [140142,241916,345112,205410],[]);
 
+  const logout = useCallback(async () => {
+    await passport.logout();
+  },[passport])
+
   return(
     <Box sx={{minWidth: '100vw', minHeight: '100vh', width: '100%', height: '100%', backgroundColor: 'base.color.brand.6'}}>
       <Box sx={{width: '100%',padding: 'base.spacing.x4', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
@@ -53,6 +68,8 @@ export const MainPage = () => {
       {web3Provider && (
         <Button onClick={openWalletWidget}>My Wallet</Button>
       )}
+      <Button onClick={setPassportProvider}>Set Passport Provider</Button>
+      {passport && web3Provider && (web3Provider.provider as any)?.isPassport && <Button onClick={logout}>Passport Logout</Button>}
       </Box>
       <Box sx={{paddingX: 'base.spacing.x4'}}>
         <GridBox minColumnWidth="40%">

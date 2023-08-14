@@ -10,6 +10,10 @@ import {
 
 describe('config', () => {
   describe('CheckoutConfiguration class', () => {
+    beforeEach(() => {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      process.env = { CHECKOUT_DEV_MODE: undefined };
+    });
     it('should set the environment in the constructor to SANDBOX or PRODUCTION', () => {
       const envs = [Environment.SANDBOX, Environment.PRODUCTION];
       envs.forEach((env) => {
@@ -34,28 +38,7 @@ describe('config', () => {
       expect(checkout.config.isDevelopment).toBeTruthy();
     });
 
-    it('should set is local to true', () => {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      process.env = { LOCAL_DEVELOPMENT: 'true' };
-      const testCheckoutConfig = {
-        baseConfig: { environment: Environment.SANDBOX },
-      } as CheckoutModuleConfiguration;
-
-      const checkout = new Checkout(testCheckoutConfig);
-      expect(checkout.config.isLocal).toBeTruthy();
-    });
-
-    it('should correctly set the networkMap based on the environment', () => {
-      const productionConfig = {
-        baseConfig: { environment: Environment.PRODUCTION },
-      } as CheckoutModuleConfiguration;
-
-      const checkoutProd = new Checkout(productionConfig);
-      expect(checkoutProd).toBeInstanceOf(Checkout);
-      expect(checkoutProd.config.networkMap).toBe(
-        PRODUCTION_CHAIN_ID_NETWORK_MAP,
-      );
-
+    it('should correctly set the networkMap for sandbox', () => {
       const sandboxConfig = {
         baseConfig: { environment: Environment.SANDBOX },
       } as CheckoutModuleConfiguration;
@@ -64,6 +47,18 @@ describe('config', () => {
       expect(checkoutSandbox).toBeInstanceOf(Checkout);
       expect(checkoutSandbox.config.networkMap).toBe(
         SANDBOX_CHAIN_ID_NETWORK_MAP,
+      );
+    });
+
+    it('should correctly set the networkMap for prod', () => {
+      const productionConfig = {
+        baseConfig: { environment: Environment.PRODUCTION },
+      } as CheckoutModuleConfiguration;
+
+      const checkoutProd = new Checkout(productionConfig);
+      expect(checkoutProd).toBeInstanceOf(Checkout);
+      expect(checkoutProd.config.networkMap).toBe(
+        PRODUCTION_CHAIN_ID_NETWORK_MAP,
       );
     });
 
@@ -82,6 +77,10 @@ describe('config', () => {
   });
 
   describe('get layer chain id', () => {
+    beforeEach(() => {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      process.env = { CHECKOUT_DEV_MODE: undefined };
+    });
     it('should get the L1 chain id for environment', () => {
       const envs = [
         {
