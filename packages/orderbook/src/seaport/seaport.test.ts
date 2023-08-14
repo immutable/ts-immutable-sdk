@@ -10,7 +10,7 @@ import {
   TransactionMethods,
 } from '@opensea/seaport-js/lib/types';
 import {
-  ERC20Item, ERC721Item, NativeItem, RoyaltyInfo,
+  ERC20Item, ERC721Item, NativeItem, RoyaltyInfo, TransactionType,
 } from 'types';
 import { BigNumber, PopulatedTransaction, providers } from 'ethers';
 import { CreateOrderProtocolData, Order, OrderStatus } from 'openapi/sdk';
@@ -133,7 +133,7 @@ describe('Seaport', () => {
       });
 
       it('returns unsignedApprovalTransaction as undefined', async () => {
-        const { unsignedApprovalTransaction } = await sut.prepareSeaportOrder(
+        const { actions } = await sut.prepareSeaportOrder(
           offerer,
           listingItem,
           considerationItem,
@@ -141,7 +141,7 @@ describe('Seaport', () => {
           orderStart,
           orderExpiry,
         );
-        expect(unsignedApprovalTransaction).toBeUndefined();
+        expect(actions.length).toBe(0);
       });
 
       it('returns the expected typedOrderMessageForSigning', async () => {
@@ -311,7 +311,7 @@ describe('Seaport', () => {
       });
 
       it('returns the expected unsignedApprovalTransaction', async () => {
-        const { unsignedApprovalTransaction } = await sut.prepareSeaportOrder(
+        const { actions } = await sut.prepareSeaportOrder(
           offerer,
           listingItem,
           considerationItem,
@@ -319,7 +319,9 @@ describe('Seaport', () => {
           orderStart,
           orderExpiry,
         );
-        expect(unsignedApprovalTransaction).toBeTruthy();
+        expect(actions.length).toBe(1);
+        expect(actions[0].transactionType).toEqual(TransactionType.APPROVAL);
+        const unsignedApprovalTransaction = await actions[0].buildTransaction();
         expect(unsignedApprovalTransaction!.from).toEqual(
           approvalTransaction.from,
         );
@@ -499,11 +501,15 @@ describe('Seaport', () => {
       });
 
       it('returns the expected unsignedApprovalTransaction', async () => {
-        const { unsignedApprovalTransaction } = await sut.fulfilOrder(
+        const { actions } = await sut.fulfillOrder(
           immutableOrder,
           fulfiller,
         );
-        expect(unsignedApprovalTransaction).toBeTruthy();
+        const approvalAction = actions.find(
+          (action) => action.transactionType === TransactionType.APPROVAL,
+        );
+        expect(approvalAction).toBeTruthy();
+        const unsignedApprovalTransaction = await approvalAction!.buildTransaction();
         expect(unsignedApprovalTransaction!.from).toEqual(
           approvalTransaction.from,
         );
@@ -514,10 +520,14 @@ describe('Seaport', () => {
       });
 
       it('returns the expected unsignedFulfillmentTransaction', async () => {
-        const { unsignedFulfillmentTransaction } = await sut.fulfilOrder(
+        const { actions } = await sut.fulfillOrder(
           immutableOrder,
           fulfiller,
         );
+        const fulfillmentAction = actions.find(
+          (action) => action.transactionType === TransactionType.FULFILL_ORDER,
+        );
+        const unsignedFulfillmentTransaction = await fulfillmentAction!.buildTransaction();
         expect(unsignedFulfillmentTransaction).toBeTruthy();
         expect(unsignedFulfillmentTransaction!.from).toEqual(
           approvalTransaction.from,
