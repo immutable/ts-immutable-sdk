@@ -1,6 +1,4 @@
-import {
-  FeeAmount, Pool, Route, TickMath,
-} from '@uniswap/v3-sdk';
+import { FeeAmount, Pool, TickMath } from '@uniswap/v3-sdk';
 import { Token } from '@uniswap/sdk-core';
 import { generateAllAcyclicPaths } from '../router';
 
@@ -73,7 +71,7 @@ describe('generateAllAcyclicPaths', () => {
         ),
       );
 
-      const routes: Route<Token, Token>[] = generateAllAcyclicPaths(
+      const routes = generateAllAcyclicPaths(
         token0,
         token3,
         pools,
@@ -156,7 +154,7 @@ describe('generateAllAcyclicPaths', () => {
         ),
       );
 
-      const routes: Route<Token, Token>[] = generateAllAcyclicPaths(
+      const routes = generateAllAcyclicPaths(
         token0,
         token3,
         pools,
@@ -235,7 +233,7 @@ describe('generateAllAcyclicPaths', () => {
         ),
       );
 
-      const routes: Route<Token, Token>[] = generateAllAcyclicPaths(
+      const routes = generateAllAcyclicPaths(
         token0,
         token3,
         pools,
