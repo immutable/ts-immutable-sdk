@@ -44,6 +44,7 @@ export abstract class ImmutableWebComponent extends HTMLElement {
   }
 
   connectedCallback() {
+    console.log('super connectedCallback');
     const widgetConfig = this.getAttribute('widgetConfig') || undefined;
     this.widgetConfig = this.parseWidgetConfig(widgetConfig);
     this.updateCheckout();
