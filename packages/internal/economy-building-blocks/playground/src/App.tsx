@@ -7,6 +7,7 @@ import { DataProvider } from "./context/DataProvider";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Container from "./components/Container";
 import Crafting from "./pages/Crafting";
+import PrimarySale from "./pages/PrimarySale";
 import Login from "./pages/Login";
 import { MulticallerProvider } from "./context/MulticallerProvider";
 
@@ -22,7 +23,8 @@ function App() {
                   <Container>
                     <Header />
                     <Routes>
-                      <Route path="/" element={<Crafting />} />
+                      <Route path="/sale" element={<PrimarySale />} />
+                      <Route path="/crafting" element={<Crafting />} />
                       <Route path="/login" element={<Login />} />
                     </Routes>
                   </Container>
