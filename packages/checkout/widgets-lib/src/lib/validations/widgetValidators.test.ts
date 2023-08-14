@@ -15,7 +15,7 @@ describe('widget validators', () => {
 
     it('should return true for undefined', () => {
       const result = isValidWalletProvider(undefined);
-      expect(result).toBeFalsy();
+      expect(result).toBeTruthy();
     });
 
     it('should return false for "metramask" ', () => {
