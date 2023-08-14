@@ -1,11 +1,10 @@
 name: Publish SDK Reference Docs
 
 on:
-  push: # just while WIP
-  # workflow_run:
-  #   workflows: ["Publish to NPM"]
-  #   types:
-  #     - completed
+  workflow_run:
+    workflows: ["Publish to NPM"]
+    types:
+      - completed
 
 jobs:
   PublishDocs:
