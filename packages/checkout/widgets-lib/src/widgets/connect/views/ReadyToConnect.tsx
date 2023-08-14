@@ -33,8 +33,9 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
     if (isPassport) {
       return text.views[ConnectWidgetViews.READY_TO_CONNECT].passport;
     }
-    return text.views[ConnectWidgetViews.READY_TO_CONNECT].default;
+    return text.views[ConnectWidgetViews.READY_TO_CONNECT].metamask;
   };
+  const { header } = text.views[ConnectWidgetViews.READY_TO_CONNECT];
   const { body, footer } = textView();
   const [footerButtonText, setFooterButtonText] = useState(footer.buttonText1);
   const [loading, setLoading] = useState(false);
@@ -109,7 +110,7 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
       header={(
         <HeaderNavigation
           showBack={showBackButton}
-          title="Connect"
+          title={header.title}
           transparent
           onCloseButtonClick={sendCloseEvent}
         />

@@ -18,7 +18,10 @@ export const text = {
       },
     },
     [ConnectWidgetViews.READY_TO_CONNECT]: {
-      default: {
+      header: {
+        title: 'Connect',
+      },
+      metamask: {
         body: {
           heading: 'Check for the pop-up from MetaMask',
           content: 'Follow the prompts in the MetaMask popup to connect',
@@ -26,9 +29,6 @@ export const text = {
         footer: {
           buttonText1: 'Ready to connect',
           buttonText2: 'Try again',
-        },
-        heroContent: {
-          component: '<MetamaskConnectHero />',
         },
       },
       passport: {
@@ -39,9 +39,6 @@ export const text = {
         footer: {
           buttonText1: 'Continue',
           buttonText2: 'Try again',
-        },
-        heroContent: {
-          component: '<PassportConnectHero />',
         },
       },
     },
