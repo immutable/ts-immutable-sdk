@@ -35,12 +35,12 @@ export function applySlippage(
 }
 
 export function prepareUserQuote(
-  otherCurrency: Token,
+  otherToken: Token,
   tradeInfo: QuoteTradeInfo,
   slippage: number,
   fees: Fees,
 ): Quote {
-  const resultToken: Token = otherCurrency.wrapped;
+  const resultToken: Token = otherToken.wrapped;
   const tokenInfo: TokenInfo = {
     chainId: resultToken.chainId,
     address: resultToken.address,

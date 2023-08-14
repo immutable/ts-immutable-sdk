@@ -46,14 +46,14 @@ export class Router {
 
   public async findOptimalRoute(
     amountSpecified: CurrencyAmount<Token>,
-    otherCurrency: Token,
+    otherToken: Token,
     tradeType: TradeType,
     maxHops: number = 2,
   ): Promise<QuoteTradeInfo> {
     const [currencyIn, currencyOut] = this.determineERC20InAndERC20Out(
       tradeType,
       amountSpecified,
-      otherCurrency,
+      otherToken,
     );
 
     const multicallContract = Multicall__factory.connect(
@@ -194,12 +194,12 @@ export class Router {
   private determineERC20InAndERC20Out(
     tradeType: TradeType,
     amountSpecified: CurrencyAmount<Token>,
-    otherCurrency: Token,
+    otherToken: Token,
   ): [Token, Token] {
     // If the trade type is EXACT INPUT then we have specified the amount for the tokenIn
     return tradeType === TradeType.EXACT_INPUT
-      ? [amountSpecified?.currency, otherCurrency]
-      : [otherCurrency, amountSpecified?.currency];
+      ? [amountSpecified?.currency, otherToken]
+      : [otherToken, amountSpecified?.currency];
   }
 }
 

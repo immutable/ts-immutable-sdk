@@ -369,7 +369,7 @@ export function mockRouterImplementation(params: MockParams) {
   const findOptimalRoute = jest.fn((
     amountSpecified: CurrencyAmount<Token>,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    otherCurrency: Token,
+    otherToken: Token,
     tradeType: TradeType,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     secondaryFees: SecondaryFee[],
