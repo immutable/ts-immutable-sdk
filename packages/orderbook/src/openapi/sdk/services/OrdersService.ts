@@ -3,6 +3,8 @@
 /* eslint-disable */
 import type { ChainName } from '../models/ChainName';
 import type { CreateListingRequestBody } from '../models/CreateListingRequestBody';
+import type { FulfillmentDataRequest } from '../models/FulfillmentDataRequest';
+import type { FulfillmentDataResult } from '../models/FulfillmentDataResult';
 import type { ListingResult } from '../models/ListingResult';
 import type { ListListingsResult } from '../models/ListListingsResult';
 import type { OrderStatus } from '../models/OrderStatus';
@@ -143,6 +145,37 @@ export class OrdersService {
         'chain_name': chainName,
         'listing_id': listingId,
       },
+      errors: {
+        400: `Bad Request (400)`,
+        404: `The specified resource was not found (404)`,
+        500: `Internal Server Error (500)`,
+      },
+    });
+  }
+
+  /**
+   * Retrieve fulfillment data for orders
+   * Retrieve signed fulfillment data based on the list of order IDs and corresponding fees.
+   * @returns any Successful response
+   * @throws ApiError
+   */
+  public fulfillmentData({
+    chainName,
+    requestBody,
+  }: {
+    chainName: ChainName,
+    requestBody: Array<FulfillmentDataRequest>,
+  }): CancelablePromise<{
+    result: Array<FulfillmentDataResult>;
+  }> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/v1/chains/{chain_name}/orders/fulfillment-data',
+      path: {
+        'chain_name': chainName,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
       errors: {
         400: `Bad Request (400)`,
         404: `The specified resource was not found (404)`,

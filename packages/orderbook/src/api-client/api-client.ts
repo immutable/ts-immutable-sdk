@@ -6,6 +6,8 @@ import {
   OrdersService,
 } from 'openapi/sdk';
 import { CreateListingParams, ListListingsParams } from 'types';
+import { FulfillmentDataResult } from 'openapi/sdk/models/FulfillmentDataResult';
+import { FulfillmentDataRequest } from 'openapi/sdk/models/FulfillmentDataRequest';
 import { ItemType, SEAPORT_CONTRACT_VERSION_V1_4 } from '../seaport';
 
 export class ImmutableApiClient {
@@ -14,6 +16,14 @@ export class ImmutableApiClient {
     private readonly chainName: string,
     private readonly seaportAddress: string,
   ) {}
+
+  async fulfillmentData(requests: Array<FulfillmentDataRequest>):
+  Promise<{ result: FulfillmentDataResult[] }> {
+    return this.orderbookService.fulfillmentData({
+      chainName: this.chainName,
+      requestBody: requests,
+    });
+  }
 
   async getListing(listingId: string): Promise<ListingResult> {
     return this.orderbookService.getListing({

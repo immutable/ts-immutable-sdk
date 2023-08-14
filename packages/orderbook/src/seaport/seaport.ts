@@ -83,7 +83,11 @@ export class Seaport {
     };
   }
 
-  async fulfillOrder(order: Order, account: string): Promise<FulfillOrderResponse> {
+  async fulfillOrder(
+    order: Order,
+    account: string,
+    extraData: string,
+  ): Promise<FulfillOrderResponse> {
     const orderComponents = await this.mapImmutableOrderToSeaportOrderComponents(order);
     const seaportLib = this.getSeaportLib(order);
 
@@ -94,7 +98,7 @@ export class Seaport {
           parameters: orderComponents,
           signature: order.signature,
         },
-        extraData: order.protocol_data.operator_signature,
+        extraData,
       }],
     });
 
