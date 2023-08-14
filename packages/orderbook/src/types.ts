@@ -32,7 +32,7 @@ export interface PrepareListingParams {
 }
 
 export interface PrepareListingResponse {
-  unsignedApprovalTransaction?: PopulatedTransaction;
+  actions: TransactionAction[];
   typedOrderMessageForSigning: {
     domain: TypedDataDomain;
     types: Record<string, TypedDataField[]>;
@@ -55,9 +55,20 @@ Parameters<typeof OrdersService.prototype.listListings>[0],
 'chainName'
 >;
 
+export enum TransactionType {
+  APPROVAL = 'APPROVAL',
+  FULFILL_ORDER = 'FULFILL_ORDER',
+}
+
+export type TransactionBuilder = () => Promise<PopulatedTransaction>;
+
+export interface TransactionAction {
+  transactionType: TransactionType;
+  buildTransaction: TransactionBuilder;
+}
+
 export interface FulfillOrderResponse {
-  unsignedApprovalTransaction?: PopulatedTransaction;
-  unsignedFulfillmentTransaction: PopulatedTransaction;
+  actions: TransactionAction[];
 }
 
 export interface CancelOrderResponse {
