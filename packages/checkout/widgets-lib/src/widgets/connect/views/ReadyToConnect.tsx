@@ -37,6 +37,7 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
   };
   const { body, footer } = textView();
   const [footerButtonText, setFooterButtonText] = useState(footer.buttonText1);
+  const [loading, setLoading] = useState(false);
   const heroContent = () => {
     if (isPassport) {
       return <PassportConnectHero />;
@@ -80,6 +81,8 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
   };
 
   const onConnectClick = useCallback(async () => {
+    if (loading) return;
+    setLoading(true);
     if (checkout && provider) {
       try {
         const connectResult = await checkout.connect({
@@ -94,6 +97,7 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
         });
         handleConnectViewUpdate(checkout, provider);
       } catch (err: any) {
+        setLoading(false);
         setFooterButtonText(footer.buttonText2);
       }
     }
@@ -114,6 +118,7 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
       heroContent={heroContent()}
       footer={(
         <FooterButton
+          loading={loading}
           actionText={footerButtonText}
           onActionClick={onConnectClick}
         />
