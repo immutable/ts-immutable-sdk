@@ -119,7 +119,7 @@ export function NetworkMenu({ setBalancesLoading }: NetworkMenuProps) {
   }, [checkout]);
 
   return (
-    <Box sx={networkMenuStyles}>
+    <Box testId="network-menu" sx={networkMenuStyles}>
       <Body testId="network-heading" size="medium" sx={networkHeadingStyle}>
         {networkStatus.heading}
       </Body>
