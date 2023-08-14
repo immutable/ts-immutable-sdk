@@ -97,5 +97,12 @@ export const newAmount = (amount: ethers.BigNumber, token: TokenInfo): Amount =>
   token,
 });
 
-export const addAmount = (a: Amount, b: Amount) => ({ value: a.value.add(b.value), token: a.token });
-export const subtractAmount = (a: Amount, b: Amount) => ({ value: a.value.sub(b.value), token: a.token });
+export const addAmount = (a: Amount, b: Amount) => {
+  if (a.token.address !== b.token.address) throw new Error('Token mismatch');
+  return { value: a.value.add(b.value), token: a.token };
+};
+
+export const subtractAmount = (a: Amount, b: Amount) => {
+  if (a.token.address !== b.token.address) throw new Error('Token mismatch');
+  return { value: a.value.sub(b.value), token: a.token };
+};
