@@ -38,8 +38,7 @@ export async function createOrder({
   ordersApi,
   guardianClient,
 }: CreateOrderParams): Promise<CreateOrderResponse> {
-  return withPassportError<CreateOrderResponse>(async () => {
-    guardianClient.loading();
+  return withPassportError<CreateOrderResponse>(guardianClient.withDefaultConfirmationScreenTask(async () => {
     const { ethAddress } = user.imx;
     const amountSell = request.sell.type === ERC721 ? '1' : request.sell.amount;
     const amountBuy = request.buy.type === ERC721 ? '1' : request.buy.amount;
@@ -101,7 +100,7 @@ export async function createOrder({
     return {
       ...createOrderResponse.data,
     };
-  }, PassportErrorType.CREATE_ORDER_ERROR);
+  }), PassportErrorType.CREATE_ORDER_ERROR);
 }
 
 export async function cancelOrder({
@@ -111,8 +110,7 @@ export async function cancelOrder({
   ordersApi,
   guardianClient,
 }: CancelOrderParams): Promise<CancelOrderResponse> {
-  return withPassportError<CancelOrderResponse>(async () => {
-    guardianClient.loading();
+  return withPassportError<CancelOrderResponse>(guardianClient.withDefaultConfirmationScreenTask(async () => {
     const getSignableCancelOrderRequest: GetSignableCancelOrderRequest = {
       order_id: request.order_id,
     };
@@ -148,5 +146,5 @@ export async function cancelOrder({
       order_id: cancelOrderResponse.data.order_id,
       status: cancelOrderResponse.data.status,
     };
-  }, PassportErrorType.CANCEL_ORDER_ERROR);
+  }), PassportErrorType.CANCEL_ORDER_ERROR);
 }

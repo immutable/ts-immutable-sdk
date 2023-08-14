@@ -63,6 +63,7 @@ export class ImmutableSwap extends ImmutableWebComponent {
       targetLayer: ConnectTargetLayer.LAYER2,
       walletProvider: this.walletProvider,
       web3Provider: this.provider,
+      passport: this.passport,
       allowedChains: [
         getL2ChainId(this.checkout!.config),
       ],

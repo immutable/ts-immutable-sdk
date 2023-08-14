@@ -33,7 +33,7 @@ export function getOrderbookConfig(
         apiEndpoint: 'https://order-book-mr.sandbox.imtbl.com',
         chainName: TESTNET_CHAIN_NAME,
         provider: new providers.JsonRpcProvider(
-          'https://zkevm-rpc.sandbox.x.immutable.com',
+          'https://rpc.testnet.immutable.com',
         ),
       };
     // not yet deployed
@@ -41,10 +41,10 @@ export function getOrderbookConfig(
       return {
         seaportContractAddress: '',
         zoneContractAddress: '',
-        apiEndpoint: 'https://order-book-mr.imtbl.com',
+        apiEndpoint: 'https://api.immutable.com',
         chainName: MAINNET_CHAIN_NAME,
         provider: new providers.JsonRpcProvider(
-          'https://zkevm-rpc.x.immutable.com',
+          'https://rpc.immutable.com',
         ),
       };
     default:

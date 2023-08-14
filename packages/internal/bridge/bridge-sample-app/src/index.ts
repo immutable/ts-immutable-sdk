@@ -18,6 +18,7 @@ import {
   WaitForWithdrawalResponse,
   ExitRequest,
   ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+  ETH_SEPOLIA_TO_ZKEVM_TESTNET,
 } from '@imtbl/bridge-sdk';
 
 /**
@@ -82,7 +83,7 @@ async function depositAndWithdraw() {
     baseConfig: new ImmutableConfiguration({
       environment: Environment.SANDBOX,
     }),
-    bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+    bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
     rootProvider: rootChainProvider,
     childProvider: childChainProvider,
   });
@@ -95,6 +96,7 @@ async function depositAndWithdraw() {
   const bridgeFeeResponse: BridgeFeeResponse = await tokenBridge.getFee(
     bridgeFeeReq,
   );
+  console.log(`Deposit token is ${process.env.TOKEN_ADDRESS}`)
 
   // Calculate the total deposit amount required to ensure the user gets the amount they expect on L2
   const depositAmount = bridgeFeeResponse.feeAmount.add(depositAmountBeforeFee);
@@ -167,7 +169,7 @@ async function depositAndWithdraw() {
 
   console.log(`Starting WITHDRAWAL`);
   console.log(`Approving Bridge`);
-  const withdrawResponse = await tokenBridge.rootTokenToChildToken({ rootToken: process.env.TOKEN_ADDRESS});
+  const withdrawResponse = await tokenBridge.getChildToken({ rootToken: process.env.TOKEN_ADDRESS});
   console.log(`Deposit token was ${process.env.TOKEN_ADDRESS}, withdrawal token is ${withdrawResponse.childToken}`);
 
   const withdrawlReq: BridgeWithdrawRequest = {
@@ -182,7 +184,6 @@ async function depositAndWithdraw() {
   const txWithdrawReceipt = await txWithdraw.wait(1);
   console.log(`Withdrawal tx hash: ${txWithdrawReceipt.transactionHash}`)
 
-  // TODO: Given a tx hash, wait till next epoch
   const withdrawalRequest: WaitForWithdrawalRequest = {
     transactionHash: txWithdrawReceipt.transactionHash,
   }
@@ -190,7 +191,6 @@ async function depositAndWithdraw() {
   const waitForWithdrawalResp: WaitForWithdrawalResponse = await tokenBridge.waitForWithdrawal(withdrawalRequest);
   console.log(waitForWithdrawalResp)
 
-  // TODO: Exit on Layer 1
   console.log(`Exiting on Layer 1`)
   const exitRequest: ExitRequest = {
     transactionHash: txWithdrawReceipt.transactionHash,

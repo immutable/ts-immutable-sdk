@@ -1,4 +1,5 @@
 import { Dispatch, SetStateAction, PropsWithChildren } from 'react';
+import { RequestArguments } from '@imtbl/passport';
 
 export enum EnvironmentNames {
   DEV = 'dev',
@@ -37,4 +38,9 @@ export interface OrderProps {
 export interface RequestProps {
   showRequest: boolean;
   setShowRequest: Dispatch<SetStateAction<boolean>>;
+}
+
+export interface RequestExampleProps {
+  handleExampleSubmitted: (request: RequestArguments) => Promise<void>;
+  disabled: boolean;
 }

@@ -7,6 +7,12 @@ import { cancelOrder, createOrder } from './order';
 jest.mock('../../guardian/guardian');
 
 describe('order', () => {
+  const mockGuardianClient = new GuardianClient({} as any);
+
+  beforeEach(() => {
+    (mockGuardianClient.withDefaultConfirmationScreenTask as jest.Mock).mockImplementation((task) => task);
+  });
+
   afterEach(jest.resetAllMocks);
 
   const mockStarkSigner = {
@@ -19,7 +25,6 @@ describe('order', () => {
     let createOrderMock: jest.Mock;
     let ordersApiMock: OrdersApi;
 
-    const mockGuardianClient = new GuardianClient({} as any);
     const buy = { type: 'ETH', amount: '2' } as ETHAmount;
     const sell = { type: 'ERC721', tokenId: '123', tokenAddress: '0x9999' };
     const expiration_timestamp = 1334302;
@@ -121,7 +126,7 @@ describe('order', () => {
         mockSignableOrderRequest,
         mockHeader,
       );
-      expect(mockGuardianClient.loading).toBeCalled();
+      expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
       expect(mockGuardianClient.validate).toBeCalledWith({ payloadHash: mockSignableOrderResponse.data.payload_hash });
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
       expect(createOrderMock).toBeCalledWith(
@@ -149,6 +154,7 @@ describe('order', () => {
     });
 
     it('should return error if transfer is rejected by user', async () => {
+      getSignableCreateOrderMock.mockRejectedValue(new Error(mockErrorMessage));
       const mockSignableOrderResponse = {
         data: {
           payload_hash: '123123',
@@ -180,7 +186,7 @@ describe('order', () => {
         `${PassportErrorType.CREATE_ORDER_ERROR}: Transaction rejected by user`,
         PassportErrorType.CREATE_ORDER_ERROR,
       ));
-      expect(mockGuardianClient.loading).toBeCalled();
+      expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
       expect(mockGuardianClient.validate).toBeCalledWith({ payloadHash: mockSignableOrderResponse.data.payload_hash });
     });
   });
@@ -193,7 +199,6 @@ describe('order', () => {
     const cancelOrderRequest = {
       order_id: orderId,
     };
-    const mockGuardianClient = new GuardianClient({} as any);
 
     beforeEach(() => {
       getSignableCancelOrderMock = jest.fn();
@@ -259,7 +264,7 @@ describe('order', () => {
         mockHeader,
       );
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
-      expect(mockGuardianClient.loading).toBeCalled();
+      expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
       expect(mockGuardianClient.validate).toBeCalledWith({ payloadHash: mockPayloadHash });
       expect(cancelOrderMock).toBeCalledWith(
         mockCancelOrderRequest,

@@ -1,5 +1,8 @@
 import * as guardian from '@imtbl/guardian';
-import { TransactionApprovalRequestChainTypeEnum, TransactionEvaluationResponse } from '@imtbl/guardian';
+import {
+  TransactionApprovalRequestChainTypeEnum,
+  TransactionEvaluationResponse,
+} from '@imtbl/guardian';
 import { BigNumber, ethers } from 'ethers';
 import { ConfirmationScreen } from '../confirmation';
 import { retryWithDelay } from '../network/retry';
@@ -19,15 +22,19 @@ export type GuardianValidateParams = {
 };
 
 type GuardianEVMValidationParams = {
-  chainId: string,
-  nonce: string,
-  user: UserZkEvm,
-  metaTransactions: MetaTransaction[],
+  chainId: string;
+  nonce: string;
+  user: UserZkEvm;
+  metaTransactions: MetaTransaction[];
 };
 
-export const convertBigNumberishToString = (value: ethers.BigNumberish): string => BigNumber.from(value).toString();
+export const convertBigNumberishToString = (
+  value: ethers.BigNumberish,
+): string => BigNumber.from(value).toString();
 
-const transformGuardianTransactions = (txs: MetaTransaction[]): guardian.MetaTransaction[] => {
+const transformGuardianTransactions = (
+  txs: MetaTransaction[],
+): guardian.MetaTransaction[] => {
   try {
     return txs.map((t) => ({
       delegateCall: t.delegateCall === true,
@@ -35,10 +42,10 @@ const transformGuardianTransactions = (txs: MetaTransaction[]): guardian.MetaTra
       gasLimit: t.gasLimit ? convertBigNumberishToString(t.gasLimit) : '0',
       target: t.to ?? ethers.constants.AddressZero,
       value: t.value ? convertBigNumberishToString(t.value) : '0',
-      data: t.data ? t.data.toString() : '0x00',
+      data: t.data ? t.data.toString() : '0x',
     }));
   } catch (error) {
-    const errorMessage = (error instanceof Error) ? error.message : String(error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
     throw new JsonRpcError(
       RpcErrorCode.INVALID_PARAMS,
       `Transaction failed to parsing: ${errorMessage}`,
@@ -47,14 +54,18 @@ const transformGuardianTransactions = (txs: MetaTransaction[]): guardian.MetaTra
 };
 
 export default class GuardianClient {
-  private transactionAPI: guardian.TransactionsApi;
+  private readonly transactionAPI: guardian.TransactionsApi;
 
-  private confirmationScreen: ConfirmationScreen;
+  private readonly confirmationScreen: ConfirmationScreen;
 
-  private imxEtherAddress: string;
+  // TODO: ID-977, make this rollup agnostic
+  private readonly imxEtherAddress: string;
 
   constructor({
-    imxPublicApiDomain, accessToken, confirmationScreen, imxEtherAddress,
+    imxPublicApiDomain,
+    accessToken,
+    confirmationScreen,
+    imxEtherAddress,
   }: GuardianClientParams) {
     this.confirmationScreen = confirmationScreen;
     this.transactionAPI = new guardian.TransactionsApi(
@@ -66,8 +77,36 @@ export default class GuardianClient {
     this.imxEtherAddress = imxEtherAddress;
   }
 
-  public loading(popupWindowSize?: { width: number; height: number }) {
-    this.confirmationScreen.loading(popupWindowSize);
+  /**
+   * Open confirmation screen and close it automatically if the
+   * underlying task fails.
+   */
+  public withConfirmationScreen(popupWindowSize?: {
+    width: number;
+    height: number;
+  }) {
+    return <T>(task: () => Promise<T>): Promise<T> => this.withConfirmationScreenTask(popupWindowSize)(task)();
+  }
+
+  public withConfirmationScreenTask(popupWindowSize?: {
+    width: number;
+    height: number;
+  }) {
+    return <T>(task: () => Promise<T>): (() => Promise<T>) => async () => {
+      this.confirmationScreen.loading(popupWindowSize);
+
+      try {
+        const result = await task();
+        return result;
+      } catch (err) {
+        this.confirmationScreen.closeWindow();
+        throw err;
+      }
+    };
+  }
+
+  public withDefaultConfirmationScreenTask<T>(task: () => Promise<T>): (() => Promise<T>) {
+    return this.withConfirmationScreenTask()(task);
   }
 
   public async validate({ payloadHash }: GuardianValidateParams) {
@@ -75,10 +114,13 @@ export default class GuardianClient {
       this.confirmationScreen.closeWindow();
     };
 
-    const transactionRes = await retryWithDelay(async () => this.transactionAPI.getTransactionByID({
-      transactionID: payloadHash,
-      chainType: 'starkex',
-    }), { finallyFn });
+    const transactionRes = await retryWithDelay(
+      async () => this.transactionAPI.getTransactionByID({
+        transactionID: payloadHash,
+        chainType: 'starkex',
+      }),
+      { finallyFn },
+    );
 
     if (!transactionRes.data.id) {
       throw new Error("Transaction doesn't exists");
@@ -114,25 +156,26 @@ export default class GuardianClient {
     metaTransactions,
   }: GuardianEVMValidationParams): Promise<TransactionEvaluationResponse> {
     const headers = { Authorization: `Bearer ${user.accessToken}` };
-    const guardianTransactions = transformGuardianTransactions(
-      metaTransactions,
-    );
+    const guardianTransactions = transformGuardianTransactions(metaTransactions);
     try {
-      const transactionEvaluationResponseAxiosResponse = await this.transactionAPI.evaluateTransaction({
-        id: 'evm',
-        transactionEvaluationRequest: {
-          chainType: 'evm',
-          chainId,
-          transactionData: {
-            nonce,
-            userAddress: user.zkEvm.ethAddress,
-            metaTransactions: guardianTransactions,
+      const transactionEvaluationResponseAxiosResponse = await this.transactionAPI.evaluateTransaction(
+        {
+          id: 'evm',
+          transactionEvaluationRequest: {
+            chainType: 'evm',
+            chainId,
+            transactionData: {
+              nonce,
+              userAddress: user.zkEvm.ethAddress,
+              metaTransactions: guardianTransactions,
+            },
           },
         },
-      }, { headers });
+        { headers },
+      );
       return transactionEvaluationResponseAxiosResponse.data;
     } catch (error) {
-      const errorMessage = (error instanceof Error) ? error.message : String(error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
       throw new JsonRpcError(
         RpcErrorCode.INTERNAL_ERROR,
         `Transaction failed to validate with error: ${errorMessage}`,

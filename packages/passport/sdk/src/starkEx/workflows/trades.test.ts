@@ -62,6 +62,11 @@ const mockStarkSigner = {
 
 describe('trades', () => {
   const mockGuardianClient = new GuardianClient({} as any);
+
+  beforeEach(() => {
+    (mockGuardianClient.withDefaultConfirmationScreenTask as jest.Mock).mockImplementation((task) => task);
+  });
+
   describe('createTrade', () => {
     afterEach(jest.resetAllMocks);
 
@@ -90,7 +95,7 @@ describe('trades', () => {
 
       expect(getSignableTradeMock).toBeCalledWith(mockSignableTradeRequest, mockHeader);
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
-      expect(mockGuardianClient.loading).toBeCalled();
+      expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
       expect(mockGuardianClient.validate).toBeCalledWith({ payloadHash: mockPayloadHash });
       expect(createTradeMock).toBeCalledWith(
         mockCreateTradeRequest,
@@ -109,7 +114,7 @@ describe('trades', () => {
         request: mockSignableTradeRequest.getSignableTradeRequest,
         guardianClient: mockGuardianClient,
       })).rejects.toThrowError('Transaction rejected by user');
-      expect(mockGuardianClient.loading).toBeCalled();
+      expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
       expect(mockGuardianClient.validate).toBeCalledWith({ payloadHash: mockPayloadHash });
     });
 

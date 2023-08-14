@@ -2,6 +2,7 @@ node_modules/
 
 # build folders
 dist/
+docs/
 
 # sample apps
 **sample-app**/

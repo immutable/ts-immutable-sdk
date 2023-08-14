@@ -1,9 +1,9 @@
-import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import {
   ETH_MAINNET_TO_ZKEVM_MAINNET,
   ETH_SEPOLIA_TO_ZKEVM_DEVNET,
   ETH_SEPOLIA_TO_ZKEVM_TESTNET,
 } from 'constants/bridges';
+import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { ethers } from 'ethers';
 import {
   BridgeContracts,
@@ -44,10 +44,10 @@ const CONTRACTS_FOR_BRIDGE = new Map<BridgeInstance, BridgeContracts>()
     childChainStateReceiver: '0x0000000000000000000000000000000000001001',
   })
   .set(ETH_SEPOLIA_TO_ZKEVM_TESTNET, {
-    rootChainERC20Predicate: '0x0C15a8359865867CdCC44f98b2F3fd5DF098C7E0',
-    rootChainStateSender: '0x4C80001188db53dbc2eaAb32d5ef825feEedECA5',
-    rootChainCheckpointManager: '0x0F3157bc91f66C350f87172bBB28d9417167074F',
-    rootChainExitHelper: '0xB057A6C4e951a315E9f2DAe6d28B83cD0480e873',
+    rootChainERC20Predicate: '0x1118Cc83780d07ef99F84fD1C0E10CEd49AF3613',
+    rootChainStateSender: '0x41716a0DD85ae257DD011A97cE1470F609871270',
+    rootChainCheckpointManager: '0xfD69e3FCd72C6374623eeb156dd2C4159eBa7327',
+    rootChainExitHelper: '0x270D2B290c8183De23eCD17C7DaAE59fd084fE70',
     childChainERC20Predicate: '0x0000000000000000000000000000000000001004',
     childChainStateReceiver: '0x0000000000000000000000000000000000001001',
   })
@@ -119,7 +119,8 @@ export class BridgeConfiguration {
     this.pollInterval = 5 * 1000; // 5 seconds
     // The upper bound of the block range we poll for StateSync events
     this.maxDepositBlockDelay = 250;
-    // Assume that the clock timestamp is at most 900 seconds inaccurate, see for more -> https://github.com/ethereum/wiki/blob/c02254611f218f43cbb07517ca8e5d00fd6d6d75/Block-Protocol-2.0.md
+    // Assume that the clock timestamp is at most 900 seconds inaccurate, see for more ->
+    // https://github.com/ethereum/wiki/blob/c02254611f218f43cbb07517ca8e5d00fd6d6d75/Block-Protocol-2.0.md
     this.clockInaccuracy = 900;
     // How many blocks to wait for on the root chain before accepting rootchain finality
     this.rootChainFinalityBlocks = 3;

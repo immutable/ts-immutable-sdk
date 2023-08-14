@@ -12,6 +12,7 @@ import GuardianClient from '../guardian/guardian';
 jest.mock('@ethersproject/providers');
 jest.mock('./walletHelpers');
 jest.mock('../network/retry');
+const withConfirmationScreenStub = jest.fn();
 
 describe('sendTransaction', () => {
   const signedTransaction = 'signedTransaction123';
@@ -33,12 +34,13 @@ describe('sendTransaction', () => {
   };
   const guardianClient = {
     validateEVMTransaction: jest.fn(),
+    withConfirmationScreen: jest.fn(() => (task: () => void) => task()),
     loading: jest.fn(),
   };
 
   const nonce = '5';
   const config: Partial<PassportConfiguration> = {
-    zkEvmChainId: 'eip155:13372',
+    zkEvmChainId: 'eip155:13472',
   };
 
   const imxFeeOption = {
@@ -60,6 +62,8 @@ describe('sendTransaction', () => {
       signedTransactions,
     );
     relayerClient.ethSendTransaction.mockResolvedValue(relayerTransactionId);
+    withConfirmationScreenStub.mockImplementation(() => (task: () => void) => task());
+    guardianClient.withConfirmationScreen = withConfirmationScreenStub;
   });
 
   it('calls relayerClient.ethSendTransaction with the correct arguments', async () => {
