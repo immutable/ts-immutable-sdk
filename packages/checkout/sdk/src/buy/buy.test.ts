@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
-import { ItemType } from '../types/buy';
 import {
-  SEAPORT_CONTRACT_ADDRESS, getBuyItem, buy, GAS_LIMIT,
+  SEAPORT_CONTRACT_ADDRESS, getItemRequirement, buy, GAS_LIMIT,
 } from './buy';
 import { createOrderbookInstance } from '../instance';
 import { CheckoutConfiguration } from '../config';
 import { CheckoutErrorType } from '../errors';
+import { ItemType } from '../types/smartCheckout';
 
 jest.mock('../instance');
 
@@ -46,13 +46,13 @@ describe('buy', () => {
 
       expect(result).toEqual(
         {
-          requirements: [
+          itemRequirements: [
             {
               type: ItemType.NATIVE,
               amount: BigNumber.from('2'),
             },
           ],
-          gas: {
+          gasToken: {
             type: 'NATIVE',
             limit: BigNumber.from(GAS_LIMIT),
           },
@@ -86,7 +86,7 @@ describe('buy', () => {
 
       expect(result).toEqual(
         {
-          requirements: [
+          itemRequirements: [
             {
               type: ItemType.ERC20,
               amount: BigNumber.from('2'),
@@ -94,7 +94,7 @@ describe('buy', () => {
               approvalContractAddress: SEAPORT_CONTRACT_ADDRESS,
             },
           ],
-          gas: {
+          gasToken: {
             type: 'NATIVE',
             limit: BigNumber.from(GAS_LIMIT),
           },
@@ -109,7 +109,7 @@ describe('buy', () => {
             buy: [
               {
                 item_type: 'ERC721',
-                start_amount: '1',
+                token_id: '1',
                 contract_address: '0x123',
               },
             ],
@@ -128,15 +128,15 @@ describe('buy', () => {
 
       expect(result).toEqual(
         {
-          requirements: [
+          itemRequirements: [
             {
               type: ItemType.ERC721,
-              amount: BigNumber.from('2'),
+              id: '1',
               contractAddress: '0x123',
               approvalContractAddress: SEAPORT_CONTRACT_ADDRESS,
             },
           ],
-          gas: {
+          gasToken: {
             type: 'NATIVE',
             limit: BigNumber.from(GAS_LIMIT),
           },
@@ -196,12 +196,13 @@ describe('buy', () => {
     });
   });
 
-  describe('getBuyItem', () => {
+  describe('getItemRequirement', () => {
     it('should return type of native and amount', () => {
       const type = ItemType.NATIVE;
       const amount = BigNumber.from('1');
       const contractAddress = '';
-      const result = getBuyItem(type, amount, contractAddress);
+      const id = '';
+      const result = getItemRequirement(type, contractAddress, amount, id);
       expect(result).toEqual({
         type,
         amount,
@@ -212,7 +213,8 @@ describe('buy', () => {
       const type = ItemType.ERC20;
       const amount = BigNumber.from('1');
       const contractAddress = '0x123';
-      const result = getBuyItem(type, amount, contractAddress);
+      const id = '';
+      const result = getItemRequirement(type, contractAddress, amount, id);
       expect(result).toEqual({
         type,
         amount,
@@ -225,10 +227,11 @@ describe('buy', () => {
       const type = ItemType.ERC721;
       const amount = BigNumber.from('1');
       const contractAddress = '0x123';
-      const result = getBuyItem(type, amount, contractAddress);
+      const id = '1';
+      const result = getItemRequirement(type, contractAddress, amount, id);
       expect(result).toEqual({
         type,
-        amount,
+        id,
         contractAddress,
         approvalContractAddress: SEAPORT_CONTRACT_ADDRESS,
       });
@@ -237,7 +240,8 @@ describe('buy', () => {
     it('should return type of native and amount for default case', () => {
       const amount = BigNumber.from('1');
       const contractAddress = '';
-      const result = getBuyItem('default' as ItemType, amount, contractAddress);
+      const id = '';
+      const result = getItemRequirement('default' as ItemType, contractAddress, amount, id);
       expect(result).toEqual({
         type: ItemType.NATIVE,
         amount,

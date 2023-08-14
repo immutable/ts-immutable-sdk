@@ -18,6 +18,10 @@ import {
   NetworkFilterTypes,
   TokenFilterTypes,
   WalletFilterTypes,
+  GasTokenType,
+  ItemType,
+  FulfilmentDetailsType,
+  SmartCheckoutParams,
 } from './types';
 import { getAllBalances, getBalance, getERC20Balance } from './balances';
 import { sendTransaction } from './transaction';
@@ -29,7 +33,7 @@ import { createProvider, isWeb3Provider, validateProvider } from './provider';
 import { getTokenAllowList } from './tokens';
 import { getWalletAllowList } from './wallet';
 import { buy } from './buy';
-import { GasTokenType, ItemType } from './types/buy';
+import { smartCheckout } from './smartCheckout';
 
 jest.mock('./connect');
 jest.mock('./network');
@@ -41,6 +45,7 @@ jest.mock('./provider');
 jest.mock('./tokens');
 jest.mock('./wallet');
 jest.mock('./buy');
+jest.mock('./smartCheckout');
 
 describe('Connect', () => {
   let providerMock: ExternalProvider;
@@ -440,6 +445,34 @@ describe('Connect', () => {
 
     expect(buy).toBeCalledTimes(1);
     expect(buy).toBeCalledWith(checkout.config, provider, '1');
+  });
+
+  it('should call smartCheckout function', async () => {
+    const provider = new Web3Provider(providerMock, ChainId.SEPOLIA);
+    const smartCheckoutResult = {};
+
+    (validateProvider as jest.Mock).mockResolvedValue(provider);
+    (smartCheckout as jest.Mock).mockResolvedValue(smartCheckoutResult);
+
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.SANDBOX },
+    });
+
+    const params: SmartCheckoutParams = {
+      provider,
+      itemRequirements: [],
+      fulfilmentDetails: {
+        type: FulfilmentDetailsType.GAS,
+        gasToken: {
+          type: GasTokenType.NATIVE,
+          limit: BigNumber.from('1'),
+        },
+      },
+    };
+    await checkout.smartCheckout(params);
+
+    expect(smartCheckout).toBeCalledTimes(1);
+    expect(smartCheckout).toBeCalledWith(params.provider, params.itemRequirements, params.fulfilmentDetails);
   });
 
   it('should call isWeb3Provider', async () => {

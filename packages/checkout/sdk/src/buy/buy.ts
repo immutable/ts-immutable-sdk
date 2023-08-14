@@ -1,22 +1,34 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import {
-  BuyItem, BuyResponse, GasTokenType, ItemType,
+  BuyResult,
 } from '../types/buy';
 import * as instance from '../instance';
 import { CheckoutConfiguration } from '../config';
 import { CheckoutError, CheckoutErrorType } from '../errors';
+import { ItemType, ItemRequirement, GasTokenType } from '../types/smartCheckout';
 
 export const GAS_LIMIT = 300000;
 export const SEAPORT_CONTRACT_ADDRESS = '0x474989C4D25DD41B0B9b1ECb4643B9Fe25f83B19';
 
-export const getBuyItem = (type: ItemType, amount: BigNumber, contractAddress: string): BuyItem => {
+export const getItemRequirement = (
+  type: ItemType,
+  contractAddress: string,
+  amount: BigNumber,
+  id: string,
+): ItemRequirement => {
   switch (type) {
     case ItemType.ERC20:
-    case ItemType.ERC721:
       return {
         type,
         amount,
+        contractAddress,
+        approvalContractAddress: SEAPORT_CONTRACT_ADDRESS,
+      };
+    case ItemType.ERC721:
+      return {
+        type,
+        id,
         contractAddress,
         approvalContractAddress: SEAPORT_CONTRACT_ADDRESS,
       };
@@ -33,7 +45,7 @@ export const buy = async (
   config: CheckoutConfiguration,
   provider: Web3Provider, // will be used by smart checkout
   orderId: string,
-): Promise<BuyResponse> => {
+): Promise<BuyResult> => {
   let order;
   try {
     const orderbook = await instance.createOrderbookInstance(config);
@@ -50,6 +62,7 @@ export const buy = async (
   }
 
   let amount = BigNumber.from('0');
+  let id = '';
   let type: ItemType = ItemType.NATIVE;
   let contractAddress = '';
 
@@ -66,6 +79,7 @@ export const buy = async (
       case 'ERC721':
         type = ItemType.ERC721;
         contractAddress = buyArray[0].contract_address;
+        id = buyArray[0].token_id;
         break;
       default:
         throw new CheckoutError(
@@ -79,21 +93,23 @@ export const buy = async (
   }
 
   buyArray.forEach((item: any) => {
-    amount = amount.add(BigNumber.from(item.start_amount));
+    if (item.item_type !== ItemType.ERC721) {
+      amount = amount.add(BigNumber.from(item.start_amount));
+    }
   });
 
   const feeArray = order.result.fees;
-  feeArray.forEach((item: any) => {
+  feeArray.forEach((item: any) => { // If the buy array contains one ERC721 what will the fee token be in?
     amount = amount.add(BigNumber.from(item.amount));
   });
 
-  const requirements: BuyItem[] = [
-    getBuyItem(type, amount, contractAddress),
+  const itemRequirements: ItemRequirement[] = [
+    getItemRequirement(type, contractAddress, amount, id),
   ];
 
   return {
-    requirements,
-    gas: {
+    itemRequirements,
+    gasToken: {
       type: GasTokenType.NATIVE,
       limit: BigNumber.from(GAS_LIMIT),
     },
