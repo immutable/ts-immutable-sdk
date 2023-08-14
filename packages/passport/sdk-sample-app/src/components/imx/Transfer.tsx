@@ -5,10 +5,11 @@ import {
 } from 'react-bootstrap';
 import { Heading } from '@biom3/react';
 import { Asset, UnsignedTransferRequest } from '@imtbl/core-sdk';
-import { TransferProps } from '@/types';
+import { ModalProps } from '@/types';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { useStatusProvider } from '@/context/StatusProvider';
 import { usePassportProvider } from '@/context/PassportProvider';
+import EthBalance from '@/components/imx/EthBalance';
 
 enum TokenType {
   ERC721Token = 'ERC721',
@@ -16,9 +17,8 @@ enum TokenType {
   ETHToken = 'ETH',
 }
 
-function Transfer({ showTransfer, setShowTransfer }: TransferProps) {
+function Transfer({ showModal, setShowModal }: ModalProps) {
   const [token, setToken] = useState<TokenType>(TokenType.ERC721Token);
-  const [ethBalance, setEthBalance] = useState<string>('0');
   const [receiver, setReceiver] = useState<string>('');
   const [tokenAddress, setTokenAddress] = useState<string>('');
   const [tokenId, setTokenId] = useState<string>('');
@@ -26,7 +26,6 @@ function Transfer({ showTransfer, setShowTransfer }: TransferProps) {
   const [isInvalid, setInvalid] = useState<boolean | undefined>(undefined);
   const [loadingTransfer, setLoadingTransfer] = useState<boolean>(false);
   const [loadingAssets, setLoadingAssets] = useState<boolean>(false);
-  const [loadingEthBalance, setLoadingEthBalance] = useState<boolean>(false);
   const [assets, setAssets] = useState<Asset[]>([]);
 
   const { addMessage } = useStatusProvider();
@@ -35,27 +34,19 @@ function Transfer({ showTransfer, setShowTransfer }: TransferProps) {
 
   useEffect(() => {
     setLoadingAssets(true);
-    setLoadingEthBalance(true);
     const getAssets = async () => {
       const imxWalletAddress = await imxProvider?.getAddress();
       const result = await coreSdkClient.listAssets({ user: imxWalletAddress });
       setAssets(result.result);
       setLoadingAssets(false);
     };
-    const getEthBalance = async () => {
-      const owner = await imxProvider?.getAddress() || '';
-      const balances = await coreSdkClient.getBalance({ owner, address: 'ETH' });
-      setEthBalance(utils.formatEther(balances.balance));
-      setLoadingEthBalance(false);
-    };
     getAssets().catch(console.log);
-    getEthBalance().catch(console.log);
   }, [coreSdkClient, imxProvider]);
 
   useEffect(() => {
     (async () => {
       setLoadingAssets(true);
-      if (showTransfer) {
+      if (showModal) {
         setAssets([]);
 
         const imxWalletAddress = await imxProvider?.getAddress();
@@ -64,7 +55,7 @@ function Transfer({ showTransfer, setShowTransfer }: TransferProps) {
         setLoadingAssets(false);
       }
     })();
-  }, [showTransfer, coreSdkClient, imxProvider]);
+  }, [showModal, coreSdkClient, imxProvider]);
 
   const resetForm = () => {
     setToken(TokenType.ERC721Token);
@@ -78,7 +69,7 @@ function Transfer({ showTransfer, setShowTransfer }: TransferProps) {
   const handleClose = () => {
     resetForm();
     setLoadingTransfer(false);
-    setShowTransfer(false);
+    setShowModal(false);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -150,7 +141,7 @@ function Transfer({ showTransfer, setShowTransfer }: TransferProps) {
 
   return (
     <Offcanvas
-      show={showTransfer}
+      show={showModal}
       onHide={handleClose}
       backdrop="static"
       placement="end"
@@ -297,16 +288,9 @@ function Transfer({ showTransfer, setShowTransfer }: TransferProps) {
             )}
         { (token === TokenType.ERC721Token && !loadingAssets && assets?.length === 0)
             && <Alert variant="info">You have no assets available to transfer</Alert>}
-        { (token === TokenType.ETHToken)
-          && (
-          <Alert variant="info">
-            Eth Balance:
-            {' '}
-            {ethBalance}
-          </Alert>
-          )}
+        { (token === TokenType.ETHToken) && <EthBalance /> }
         {
-          ((token === TokenType.ERC721Token && loadingAssets) || (token === TokenType.ETHToken && loadingEthBalance))
+          (token === TokenType.ERC721Token && loadingAssets)
           && <Spinner />
         }
       </Offcanvas.Body>
