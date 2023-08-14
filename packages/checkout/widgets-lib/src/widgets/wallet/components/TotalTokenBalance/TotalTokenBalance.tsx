@@ -3,6 +3,7 @@ import {
 } from '@biom3/react';
 import { useContext } from 'react';
 import {
+  coinInfoButtonStyle,
   totalTokenBalanceStyle,
   totalTokenBalanceValueStyle,
 } from './TotalTokenBalanceStyles';
@@ -30,13 +31,7 @@ export function TotalTokenBalance(props: TotalTokenBalanceProps) {
             testId="coin-info-icon"
             variant="tertiary"
             icon="Information"
-            sx={{
-              width: 'base.icon.size.250',
-              height: 'base.icon.size.250',
-              fill: 'base.color.accent.4',
-              cursor: 'pointer',
-              borderRadius: '50%',
-            }}
+            sx={coinInfoButtonStyle}
             onClick={() => viewDispatch({
               payload: {
                 type: ViewActions.UPDATE_VIEW,
