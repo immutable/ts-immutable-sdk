@@ -16,6 +16,7 @@ export class Fees {
   }
 
   addAmount(amount: Amount): void {
+    if (amount.token.address !== this.amount.token.address) throw new Error('Token mismatch');
     this.amount = addAmount(this.amount, amount);
   }
 
