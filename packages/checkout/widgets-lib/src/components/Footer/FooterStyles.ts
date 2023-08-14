@@ -5,6 +5,8 @@ export const footerButtonStyles = {
   justifyContent: 'flex-end',
   alignItems: 'center',
   padding: 'base.spacing.x3',
+  paddingRight: 'base.spacing.x8',
+  paddingBottom: 'base.spacing.x10',
 };
 
 export const footerLogoStyles = {
