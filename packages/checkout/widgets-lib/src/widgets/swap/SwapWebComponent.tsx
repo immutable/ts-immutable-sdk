@@ -12,7 +12,7 @@ import { ConnectTargetLayer, getL2ChainId } from '../../lib';
 import { isValidAddress, isValidAmount, isValidWalletProvider } from '../../lib/validations/widgetValidators';
 
 export class ImmutableSwap extends ImmutableWebComponent {
-  walletProvider = WalletProviderName.METAMASK;
+  walletProvider: WalletProviderName | undefined = undefined;
 
   amount = '';
 
@@ -24,7 +24,7 @@ export class ImmutableSwap extends ImmutableWebComponent {
     super.connectedCallback();
     this.walletProvider = this.getAttribute(
       'walletProvider',
-    )?.toLowerCase() as WalletProviderName ?? WalletProviderName.METAMASK;
+    )?.toLowerCase() as WalletProviderName;
     this.amount = this.getAttribute('amount') ?? '';
     this.fromContractAddress = this.getAttribute('fromContractAddress')?.toLowerCase() ?? '';
     this.toContractAddress = this.getAttribute('toContractAddress')?.toLowerCase() ?? '';
@@ -35,7 +35,7 @@ export class ImmutableSwap extends ImmutableWebComponent {
     if (!isValidWalletProvider(this.walletProvider)) {
       // eslint-disable-next-line no-console
       console.warn('[IMTBL]: invalid "walletProvider" widget input');
-      this.walletProvider = WalletProviderName.METAMASK;
+      this.walletProvider = undefined;
     }
 
     if (!isValidAmount(this.amount)) {
