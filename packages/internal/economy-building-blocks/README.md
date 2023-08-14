@@ -1,1 +1,1 @@
-# economy-mechanics
+# economy-building-blocks

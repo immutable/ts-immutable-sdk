@@ -3328,9 +3328,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/economy-mechanics-playground@workspace:packages/internal/economy-mechanics/playground":
+"@imtbl/economy-building-blocks-playground@workspace:packages/internal/economy-building-blocks/playground":
   version: 0.0.0-use.local
-  resolution: "@imtbl/economy-mechanics-playground@workspace:packages/internal/economy-mechanics/playground"
+  resolution: "@imtbl/economy-building-blocks-playground@workspace:packages/internal/economy-building-blocks/playground"
   dependencies:
     "@biom3/design-tokens": ^0.2.2-beta
     "@biom3/react": ^0.8.1-beta

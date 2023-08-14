@@ -258,4 +258,4 @@ function PrimarySale() {
   );
 }
 
-export default Crafting;
+export default PrimarySale;
