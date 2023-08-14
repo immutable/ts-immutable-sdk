@@ -492,7 +492,7 @@ describe('WalletWidget tests', () => {
         connectionStatus: ConnectionStatus.CONNECTED_WITH_NETWORK,
       };
 
-      it.only('should not show Network Menu when provider is passport', () => {
+      it('should not show Network Menu when provider is passport', () => {
         const widgetConfig = {
           theme: WidgetTheme.DARK,
           environment: Environment.SANDBOX,
