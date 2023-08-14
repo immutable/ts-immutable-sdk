@@ -16,11 +16,6 @@ export const CHECKOUT_API_BASE_URL = {
   [Environment.PRODUCTION]: 'https://checkout-api.immutable.com',
 };
 
-export const INTERNAL_RPC_URL = {
-  [Environment.SANDBOX]: 'https://zkevm-rpc.sandbox.imtbl.com',
-  [Environment.PRODUCTION]: 'https://zkevm-rpc.imtbl.com',
-};
-
 type NetworkDetails = {
   chainIdHex: string;
   chainName: string;
