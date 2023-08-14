@@ -10,7 +10,7 @@ export function PassportConnectHero() {
         <Logo
           testId="passport-connect-hero-logo"
           logo="PassportSymbolOutlined"
-          sx={{ width: '120px' }}
+          sx={{ width: 'base.spacing.x30' }}
         />
       </Box>
     </Box>
