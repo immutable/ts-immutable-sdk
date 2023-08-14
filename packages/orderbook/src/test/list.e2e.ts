@@ -31,11 +31,13 @@ async function createListing(
     },
   });
 
-  await signAndSubmitTx(
-    (await listing.actions[0].buildTransaction()),
-    offerer,
-    provider,
-  );
+  if (listing.actions.length) {
+    await signAndSubmitTx(
+      (await listing.actions[0].buildTransaction()),
+      offerer,
+      provider,
+    );
+  }
 
   const signature = await signMessage(
     listing.typedOrderMessageForSigning,

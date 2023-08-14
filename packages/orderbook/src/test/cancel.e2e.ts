@@ -40,7 +40,7 @@ describe('cancel order', () => {
     });
 
     await signAndSubmitTx(
-      listing.unsignedApprovalTransaction!,
+      (await listing.actions[0].buildTransaction()),
       offerer,
       provider,
     );

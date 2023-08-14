@@ -18,8 +18,10 @@ import {
 
 async function deployAndMintNftContract(wallet: Wallet): Promise<TestToken> {
   const { contract } = await deployTestToken(wallet);
+  log('contract deployed');
   const receipt = await contract.safeMint(wallet.address);
   await receipt.wait();
+  log('token minted');
   return contract;
 }
 
