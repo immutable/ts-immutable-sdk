@@ -16,3 +16,7 @@ export const footerLogoStyles = {
   paddingTop: 'base.spacing.x4',
   paddingBottom: 'base.spacing.x5',
 };
+
+export const footerButtonIconLoadingStyle = {
+  width: 'base.icon.size.400',
+};

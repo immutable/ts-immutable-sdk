@@ -55,4 +55,25 @@ describe('Footer Button', () => {
     cySmartGet('footer-button-container').should('exist');
     cySmartGet('footer-button').should('not.exist');
   });
+
+  it('should show loading icon when configured', () => {
+    mount(
+      <BiomeCombinedProviders theme={{ base: onDarkBase }}>
+        <SimpleLayout
+          footer={(
+            <FooterButton
+              loading
+              actionText="Let's go"
+              // eslint-disable-next-line no-console
+              onActionClick={() => console.log('test click')}
+            />
+          )}
+        />
+      </BiomeCombinedProviders>,
+    );
+
+    cySmartGet('footer-button-container').should('exist');
+    cySmartGet('footer-button').should('exist');
+    cySmartGet('footer-button__icon').should('have.attr', 'data-icon', 'Loading');
+  });
 });
