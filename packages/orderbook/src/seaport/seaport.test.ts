@@ -10,7 +10,14 @@ import {
   TransactionMethods,
 } from '@opensea/seaport-js/lib/types';
 import {
-  ERC20Item, ERC721Item, NativeItem, RoyaltyInfo, TransactionType,
+  ActionType,
+  TransactionAction,
+  ERC20Item,
+  ERC721Item,
+  NativeItem,
+  RoyaltyInfo,
+  SignableAction,
+  TransactionPurpose,
 } from 'types';
 import { BigNumber, PopulatedTransaction, providers } from 'ethers';
 import { CreateOrderProtocolData, Order, OrderStatus } from 'openapi/sdk';
@@ -141,11 +148,14 @@ describe('Seaport', () => {
           orderStart,
           orderExpiry,
         );
-        expect(actions.length).toBe(0);
+        const approvalAction = actions.find(
+          (a): a is TransactionAction => a.type === ActionType.TRANSACTION,
+        );
+        expect(approvalAction).toBeUndefined();
       });
 
       it('returns the expected typedOrderMessageForSigning', async () => {
-        const { typedOrderMessageForSigning } = await sut.prepareSeaportOrder(
+        const { actions } = await sut.prepareSeaportOrder(
           offerer,
           listingItem,
           considerationItem,
@@ -160,7 +170,10 @@ describe('Seaport', () => {
           verifyingContract: seaportContractAddress,
         };
 
-        expect(typedOrderMessageForSigning).toEqual({
+        const signableAction = actions.find(
+          (a): a is SignableAction => a.type === ActionType.SIGNABLE,
+        )!;
+        expect(signableAction.message).toEqual({
           domain: domainData,
           types: EIP_712_ORDER_TYPE,
           value: orderComponentsWithHexSalt,
@@ -319,9 +332,11 @@ describe('Seaport', () => {
           orderStart,
           orderExpiry,
         );
-        expect(actions.length).toBe(1);
-        expect(actions[0].transactionType).toEqual(TransactionType.APPROVAL);
-        const unsignedApprovalTransaction = await actions[0].buildTransaction();
+        const approvalAction = actions.find(
+          (a): a is TransactionAction => a.type === ActionType.TRANSACTION,
+        )!;
+        expect(approvalAction.purpose).toEqual(TransactionPurpose.APPROVAL);
+        const unsignedApprovalTransaction = await approvalAction.buildTransaction();
         expect(unsignedApprovalTransaction!.from).toEqual(
           approvalTransaction.from,
         );
@@ -332,7 +347,7 @@ describe('Seaport', () => {
       });
 
       it('returns the expected typedOrderMessageForSigning', async () => {
-        const { typedOrderMessageForSigning } = await sut.prepareSeaportOrder(
+        const { actions } = await sut.prepareSeaportOrder(
           offerer,
           listingItem,
           considerationItem,
@@ -347,7 +362,11 @@ describe('Seaport', () => {
           verifyingContract: seaportContractAddress,
         };
 
-        expect(typedOrderMessageForSigning).toEqual({
+        const signableAction = actions.find(
+          (a): a is SignableAction => a.type === ActionType.SIGNABLE,
+        )!;
+
+        expect(signableAction.message).toEqual({
           domain: domainData,
           types: EIP_712_ORDER_TYPE,
           value: orderComponentsWithHexSalt,
@@ -506,7 +525,7 @@ describe('Seaport', () => {
           fulfiller,
         );
         const approvalAction = actions.find(
-          (action) => action.transactionType === TransactionType.APPROVAL,
+          (a): a is TransactionAction => a.purpose === TransactionPurpose.APPROVAL,
         );
         expect(approvalAction).toBeTruthy();
         const unsignedApprovalTransaction = await approvalAction!.buildTransaction();
@@ -525,7 +544,7 @@ describe('Seaport', () => {
           fulfiller,
         );
         const fulfillmentAction = actions.find(
-          (action) => action.transactionType === TransactionType.FULFILL_ORDER,
+          (a): a is TransactionAction => a.purpose === TransactionPurpose.FULFILL_ORDER,
         );
         const unsignedFulfillmentTransaction = await fulfillmentAction!.buildTransaction();
         expect(unsignedFulfillmentTransaction).toBeTruthy();
