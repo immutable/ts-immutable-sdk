@@ -10,9 +10,10 @@ export const text = {
   views: {
     [ConnectWidgetViews.CONNECT_WALLET]: {
       header: {
-        title: 'Connect a wallet',
+        title: 'Connect',
       },
       body: {
+        heading: 'Connect a wallet',
         content:
           "You'll need to connect or create a digital wallet to buy, sell, trade and store your coins and collectibles.",
       },
