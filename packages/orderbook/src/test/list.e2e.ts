@@ -31,9 +31,9 @@ async function createListing(
     },
   });
 
-  if (listing.unsignedApprovalTransaction) {
+  if (listing.actions.length) {
     await signAndSubmitTx(
-      listing.unsignedApprovalTransaction,
+      (await listing.actions[0].buildTransaction()),
       offerer,
       provider,
     );
