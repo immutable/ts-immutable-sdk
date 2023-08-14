@@ -8,11 +8,10 @@ import {
   getFulfillerWallet,
   getLocalhostProvider,
   getOffererWallet,
-  signAndSubmitTx,
-  signMessage,
   TestToken,
   waitForOrderToBeOfStatus,
 } from './helpers';
+import { actionAll } from './helpers/actions';
 
 async function deployAndMintNftContract(wallet: Wallet): Promise<TestToken> {
   const { contract } = await deployTestToken(wallet);
@@ -70,20 +69,11 @@ describe('', () => {
     });
 
     log('Signing and submitting approval transaction...');
-    // Sign and submit the approval transaction for the offerer
-    await signAndSubmitTx(
-      (await soonToExpireListing.actions[0].buildTransaction()),
-      offerer,
-      provider,
-    );
-
+    // Sign and submit the approval transaction for the offerer &
     // Sign the EIP712 order message for the offerer. This is the signature that the order book API
     // stores and allows the fulfiller to fulfil the order, as long as they also have a valid
     // operator signature
-    const signature = await signMessage(
-      soonToExpireListing.typedOrderMessageForSigning,
-      offerer,
-    );
+    const signatures = await actionAll(soonToExpireListing.actions, offerer, provider);
 
     log('Submitting order to orderbook API...');
     // Submit the order creation request to the order book API
@@ -92,7 +82,7 @@ describe('', () => {
     } = await sdk.createListing({
       orderComponents: soonToExpireListing.orderComponents,
       orderHash: soonToExpireListing.orderHash,
-      orderSignature: signature,
+      orderSignature: signatures[0],
     });
     log('Submitted order to orderbook API with expiry time set in the future');
 
