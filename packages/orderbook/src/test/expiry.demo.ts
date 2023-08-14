@@ -72,7 +72,7 @@ describe('', () => {
     log('Signing and submitting approval transaction...');
     // Sign and submit the approval transaction for the offerer
     await signAndSubmitTx(
-      soonToExpireListing.unsignedApprovalTransaction!,
+      (await soonToExpireListing.actions[0].buildTransaction()),
       offerer,
       provider,
     );

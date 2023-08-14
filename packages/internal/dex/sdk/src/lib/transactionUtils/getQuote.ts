@@ -4,9 +4,9 @@ import {
 import { ethers } from 'ethers';
 import { QuoteTradeInfo } from 'lib/router';
 import { toBigNumber } from 'lib/utils';
-import { calculateFees } from 'lib/fees';
+import { Fees } from 'lib/fees';
 import {
-  Amount, Quote, SecondaryFee, TokenInfo,
+  Amount, Quote, TokenInfo,
 } from '../../types';
 import { slippageToFraction } from './slippage';
 
@@ -40,6 +40,7 @@ export function prepareUserQuote(
   otherCurrency: Currency,
   tradeInfo: QuoteTradeInfo,
   slippage: number,
+  fees: Fees,
 ): Quote {
   const resultToken: Token = otherCurrency.wrapped;
   const tokenInfo: TokenInfo = {
@@ -60,12 +61,13 @@ export function prepareUserQuote(
       value: amountWithSlippage,
     },
     slippage,
+    fees: fees.withAmounts(),
   };
 }
 
 export function getOurQuoteReqAmount(
   amount: CurrencyAmount<Token>,
-  secondaryFees: SecondaryFee[],
+  fees: Fees,
   tradeType: TradeType,
 ) {
   if (tradeType === TradeType.EXACT_OUTPUT) {
@@ -73,9 +75,7 @@ export function getOurQuoteReqAmount(
     return amount;
   }
 
-  const totalFees = calculateFees(toBigNumber(amount), secondaryFees);
-  const totalFeesCurrencyAmount = CurrencyAmount.fromRawAmount(amount.currency, totalFees.toString());
+  fees.addAmount(toBigNumber(amount));
 
-  // Subtract the fee amount from the given amount
-  return amount.subtract(totalFeesCurrencyAmount);
+  return CurrencyAmount.fromRawAmount(amount.currency, fees.amountLessFees().toString());
 }

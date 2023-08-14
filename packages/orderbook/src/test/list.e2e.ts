@@ -8,7 +8,7 @@ import { deployTestToken } from './helpers/erc721';
 import { signAndSubmitTx, signMessage } from './helpers/sign-and-submit';
 import { TestToken } from './helpers/test-token';
 import { waitForOrderToBeOfStatus } from './helpers/order';
-import { getLocalConfigFromEnv } from './helpers';
+import { getConfigFromEnv } from './helpers';
 
 async function createListing(
   sdk: Orderbook,
@@ -31,9 +31,9 @@ async function createListing(
     },
   });
 
-  if (listing.unsignedApprovalTransaction) {
+  if (listing.actions.length) {
     await signAndSubmitTx(
-      listing.unsignedApprovalTransaction,
+      (await listing.actions[0].buildTransaction()),
       offerer,
       provider,
     );
@@ -59,7 +59,7 @@ describe('listListings e2e', () => {
   const provider = getLocalhostProvider();
   const offerer = getOffererWallet(provider);
 
-  const localConfigOverrides = getLocalConfigFromEnv();
+  const localConfigOverrides = getConfigFromEnv();
   const sdk = new Orderbook({
     baseConfig: {
       environment: Environment.SANDBOX,

@@ -30,6 +30,7 @@ declare global {
   }
   interface ImmutableWebComponent {
     setProvider: Function;
+    addPassportOption: Function;
     setAttribute: Function;
   }
 }

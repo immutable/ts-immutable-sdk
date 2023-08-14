@@ -6,14 +6,14 @@ import { getOffererWallet } from './helpers/signers';
 import { deployTestToken } from './helpers/erc721';
 import { signAndSubmitTx, signMessage } from './helpers/sign-and-submit';
 import { waitForOrderToBeOfStatus } from './helpers/order';
-import { getLocalConfigFromEnv } from './helpers';
+import { getConfigFromEnv } from './helpers';
 
 describe('prepareListing and createOrder e2e', () => {
   it('should create the order', async () => {
     const provider = getLocalhostProvider();
     const offerer = getOffererWallet(provider);
 
-    const localConfigOverrides = getLocalConfigFromEnv();
+    const localConfigOverrides = getConfigFromEnv();
     const sdk = new Orderbook({
       baseConfig: {
         environment: Environment.SANDBOX,
@@ -40,7 +40,7 @@ describe('prepareListing and createOrder e2e', () => {
     });
 
     await signAndSubmitTx(
-      listing.unsignedApprovalTransaction!,
+      (await listing.actions[0].buildTransaction()),
       offerer,
       provider,
     );

@@ -423,3 +423,17 @@ export function expectToBeDefined <T>(x: T): asserts x is NonNullable<T> {
   expect(x).toBeDefined();
   expect(x).not.toBeNull();
 }
+
+// expectInstanceOf ensurance that a variable is an instance of a class, while
+// also narrowing its type.
+export function expectInstanceOf <T>(className: { new(...args: any[]): T }, x: unknown): asserts x is T {
+  expect(x).toBeInstanceOf(className);
+}
+
+/**
+ * Takes an arbitrary string and turns it into a valid ethereum address
+ * @param str Arbitrary string to create the address from
+ */
+export function makeAddr(str: string): string {
+  return ethers.utils.keccak256(ethers.utils.toUtf8Bytes(str)).slice(0, 42);
+}

@@ -6,7 +6,7 @@ import { getFulfillerWallet, getOffererWallet } from './helpers/signers';
 import { deployTestToken } from './helpers/erc721';
 import { signAndSubmitTx, signMessage } from './helpers/sign-and-submit';
 import { waitForOrderToBeOfStatus } from './helpers/order';
-import { getLocalConfigFromEnv } from './helpers';
+import { getConfigFromEnv } from './helpers';
 
 describe('fulfil order', () => {
   it('should fulfil the order', async () => {
@@ -14,7 +14,7 @@ describe('fulfil order', () => {
     const offerer = getOffererWallet(provider);
     const fulfiller = getFulfillerWallet(provider);
 
-    const localConfigOverrides = getLocalConfigFromEnv();
+    const localConfigOverrides = getConfigFromEnv();
     const sdk = new Orderbook({
       baseConfig: {
         environment: Environment.SANDBOX,
@@ -41,7 +41,7 @@ describe('fulfil order', () => {
     });
 
     await signAndSubmitTx(
-      listing.unsignedApprovalTransaction!,
+      (await listing.actions[0].buildTransaction()),
       offerer,
       provider,
     );
@@ -60,11 +60,15 @@ describe('fulfil order', () => {
 
     await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.ACTIVE);
 
-    const { unsignedFulfillmentTransaction } = await sdk.fulfillOrder(
+    const fulfillment = await sdk.fulfillOrder(
       orderId,
       fulfiller.address,
     );
-    await signAndSubmitTx(unsignedFulfillmentTransaction, fulfiller, provider);
+    await signAndSubmitTx(
+      (await fulfillment.actions[0].buildTransaction()),
+      fulfiller,
+      provider,
+    );
 
     await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.FILLED);
   }, 60_000);

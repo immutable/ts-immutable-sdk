@@ -1,6 +1,7 @@
 import { Environment } from '@imtbl/config';
 import { Wallet } from 'ethers';
 import { log } from 'console';
+import { TransactionType } from 'types';
 import { OrderStatus } from '../openapi/sdk/index';
 import { Orderbook } from '../orderbook';
 import {
@@ -12,12 +13,15 @@ import {
   signMessage,
   TestToken,
   waitForOrderToBeOfStatus,
+  getConfigFromEnv,
 } from './helpers';
 
 async function deployAndMintNftContract(wallet: Wallet): Promise<TestToken> {
   const { contract } = await deployTestToken(wallet);
+  log('contract deployed');
   const receipt = await contract.safeMint(wallet.address);
   await receipt.wait();
+  log('token minted');
   return contract;
 }
 
@@ -42,17 +46,13 @@ describe('', () => {
     // Deploy an NFT contract and mint a token for the offerer
     const nftContract = await deployAndMintNftContract(offerer);
 
-    // Instantiate the order book SDK. Once environments stabilise there will be default values so
-    // that end users will just be able to do `new Orderbook()` in most cases
+    const configOverrides = getConfigFromEnv();
     const sdk = new Orderbook({
       baseConfig: {
         environment: Environment.SANDBOX,
       },
-
       overrides: {
-        // Replace overrides with devnet values if needed
-        // values can be found here https://immutable.atlassian.net/wiki/spaces/TRAD/pages/2192573143/zkEVM+orderbook+deployment+addresses
-        provider,
+        ...configOverrides,
       },
     });
 
@@ -72,8 +72,14 @@ describe('', () => {
       orderExpiry: new Date(Date.now() + 1000000 * 30),
     });
 
+    const approvalAction = validListing.actions.find((a) => a.transactionType === 'APPROVAL');
+    if (!approvalAction) {
+      throw new Error('No approval action found');
+    }
+    const unsignedApprovalTransaction = await approvalAction.buildTransaction();
+
     await signAndSubmitTx(
-      validListing.unsignedApprovalTransaction!,
+      unsignedApprovalTransaction,
       offerer,
       provider,
     );
@@ -97,11 +103,30 @@ describe('', () => {
     await waitForOrderToBeOfStatus(sdk, orderId2, OrderStatus.ACTIVE);
     log(`Listing ${orderId2} is now ACTIVE, fulfilling order...`);
 
-    const { unsignedFulfillmentTransaction } = await sdk.fulfillOrder(
+    const { actions } = await sdk.fulfillOrder(
       orderId2,
       fulfiller.address,
     );
-    await signAndSubmitTx(unsignedFulfillmentTransaction, fulfiller, provider);
+
+    // The approval action must be built and submitted before the fulfillment action,
+    // if an approval is required
+    const fulfillApprovalAction = actions.find(
+      (a) => a.transactionType === TransactionType.APPROVAL,
+    );
+    const fulfillOrderAction = actions.find(
+      (a) => a.transactionType === TransactionType.FULFILL_ORDER,
+    );
+
+    if (fulfillApprovalAction) {
+      const unsignedFulfillApprovalTransaction = await fulfillApprovalAction.buildTransaction();
+      await signAndSubmitTx(unsignedFulfillApprovalTransaction, fulfiller, provider);
+    }
+
+    if (fulfillOrderAction) {
+      const unsignedFulfillmentTransaction = await fulfillOrderAction.buildTransaction();
+      await signAndSubmitTx(unsignedFulfillmentTransaction, fulfiller, provider);
+    }
+
     log(
       `Fulfilment transaction sent, waiting for listing ${orderId2} to become FILLED`,
     );

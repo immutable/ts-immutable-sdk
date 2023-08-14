@@ -7,6 +7,7 @@
   "dependencies": {
     "@imtbl/checkout-sdk": "0.0.0",
     "@imtbl/config": "0.0.0",
+    "@imtbl/passport": "0.0.0",
     "ethers": "^5.7.2"
   },
   "devDependencies": {

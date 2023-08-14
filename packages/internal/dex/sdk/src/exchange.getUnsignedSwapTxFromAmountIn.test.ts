@@ -24,7 +24,7 @@ import {
   decodeMulticallExactInputSingleWithoutFees,
   expectToBeDefined,
 } from './test/utils';
-import { Router, SecondaryFee } from './lib';
+import { Router, SecondaryFee, uniswapTokenToTokenInfo } from './lib';
 
 jest.mock('@ethersproject/providers');
 jest.mock('@ethersproject/contracts');
@@ -240,6 +240,37 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(swapParams.recipient).toBe(params.fromAddress); // recipient of swap
       expect(swapParams.amountIn.toString()).toBe('100000000000000000000'); // 100
       expect(swapParams.amountOutMinimum.toString()).toBe('899100899100899100899'); // 899 includes slippage and fees
+    });
+
+    it('returns a quote', async () => {
+      const params = setupSwapTxTest(true);
+      mockRouterImplementation(params);
+
+      const secondaryFees: SecondaryFee[] = [
+        { feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: TEST_MAX_FEE_BASIS_POINTS },
+      ];
+
+      const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
+
+      const { quote } = await exchange.getUnsignedSwapTxFromAmountIn(
+        params.fromAddress,
+        params.inputToken,
+        params.outputToken,
+        ethers.utils.parseEther('100'),
+      );
+
+      const tokenIn = { ...uniswapTokenToTokenInfo(IMX_TEST_TOKEN), name: undefined, symbol: undefined };
+
+      expect(quote.fees).toEqual([
+        {
+          feeRecipient: TEST_FEE_RECIPIENT,
+          feeBasisPoints: TEST_MAX_FEE_BASIS_POINTS,
+          amount: {
+            token: tokenIn,
+            value: ethers.utils.parseEther('10'),
+          },
+        },
+      ]);
     });
   });
 

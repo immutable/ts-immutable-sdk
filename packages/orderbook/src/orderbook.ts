@@ -145,7 +145,7 @@ export class Orderbook {
       );
     }
 
-    return this.seaport.fulfilOrder(orderResult.result, takerAddress);
+    return this.seaport.fulfillOrder(orderResult.result, takerAddress);
   }
 
   /**
