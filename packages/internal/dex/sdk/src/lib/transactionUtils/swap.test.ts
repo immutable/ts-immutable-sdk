@@ -1,5 +1,5 @@
 import { BigNumber, utils } from 'ethers';
-import { TradeType, Currency } from '@uniswap/sdk-core';
+import { TradeType, Token } from '@uniswap/sdk-core';
 import {
   FUN_TEST_TOKEN, IMX_TEST_TOKEN, TEST_FEE_RECIPIENT,
   decodeMulticallExactInputSingleWithFees, decodeMulticallExactInputSingleWithoutFees,
@@ -20,7 +20,7 @@ const testPool = new Pool(
 );
 
 const buildExactInputQuote = () => {
-  const route: Route<Currency, Currency> = new Route([testPool], IMX_TEST_TOKEN, FUN_TEST_TOKEN);
+  const route: Route<Token, Token> = new Route([testPool], IMX_TEST_TOKEN, FUN_TEST_TOKEN);
   return {
     gasEstimate: BigNumber.from(0),
     route,
@@ -33,7 +33,7 @@ const buildExactInputQuote = () => {
 };
 
 const buildExactOutputQuote = () => {
-  const route: Route<Currency, Currency> = new Route([testPool], IMX_TEST_TOKEN, FUN_TEST_TOKEN);
+  const route: Route<Token, Token> = new Route([testPool], IMX_TEST_TOKEN, FUN_TEST_TOKEN);
   return {
     gasEstimate: BigNumber.from(0),
     route,

@@ -3,7 +3,7 @@ import {
 } from '@uniswap/v3-sdk';
 import { SwapRouter } from '@uniswap/router-sdk';
 import {
-  Currency,
+  Token,
   CurrencyAmount,
   Percent,
   TradeType,
@@ -31,8 +31,8 @@ const multicallWithDeadlineFunctionSignature = 'multicall(uint256,bytes[])';
 
 function buildSwapParametersForSinglePoolSwap(
   fromAddress: string,
-  trade: Trade<Currency, Currency, TradeType>,
-  route: Route<Currency, Currency>,
+  trade: Trade<Token, Token, TradeType>,
+  route: Route<Token, Token>,
   amountIn: string,
   amountOut: string,
   secondaryFees: SecondaryFee[],
@@ -68,8 +68,8 @@ function buildSwapParametersForSinglePoolSwap(
 
 function buildSwapParametersForMultiPoolSwap(
   fromAddress: string,
-  trade: Trade<Currency, Currency, TradeType>,
-  route: Route<Currency, Currency>,
+  trade: Trade<Token, Token, TradeType>,
+  route: Route<Token, Token>,
   amountIn: string,
   amountOut: string,
   secondaryFees: SecondaryFee[],
@@ -109,7 +109,7 @@ function buildSwapParametersForMultiPoolSwap(
  */
 function buildSwapParameters(
   fromAddress: string,
-  trade: Trade<Currency, Currency, TradeType>,
+  trade: Trade<Token, Token, TradeType>,
   options: SwapOptions,
   secondaryFees: SecondaryFee[],
   secondaryFeeContract: SecondaryFeeInterface,
@@ -146,7 +146,7 @@ function buildSwapParameters(
 }
 
 function createSwapCallParametersWithFees(
-  trade: Trade<Currency, Currency, TradeType>,
+  trade: Trade<Token, Token, TradeType>,
   fromAddress: string,
   swapOptions: SwapOptions,
   secondaryFees: SecondaryFee[],
@@ -246,14 +246,17 @@ export function prepareSwap(
   fees: Fees,
 ): QuoteTradeInfo {
   if (ourQuote.tradeType === TradeType.EXACT_OUTPUT) {
-    fees.addAmount(ourQuote.amountIn);
+    fees.addAmount({
+      token: ourQuote.tokenIn,
+      value: ourQuote.amountIn,
+    });
 
     return {
       gasEstimate: ourQuote.gasEstimate,
       route: ourQuote.route,
       tokenIn: ourQuote.tokenIn,
       tokenOut: ourQuote.tokenOut,
-      amountIn: fees.amountWithFeesApplied(),
+      amountIn: fees.amountWithFeesApplied().value,
       amountOut: amountSpecified,
       tradeType: ourQuote.tradeType,
     };

@@ -1,9 +1,7 @@
-import {
-  Currency, CurrencyAmount, Token, TradeType,
-} from '@uniswap/sdk-core';
+import { CurrencyAmount, Token, TradeType } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
 import { QuoteTradeInfo } from 'lib/router';
-import { toBigNumber } from 'lib/utils';
+import { toAmount } from 'lib/utils';
 import { Fees } from 'lib/fees';
 import {
   Amount, Quote, TokenInfo,
@@ -37,7 +35,7 @@ export function applySlippage(
 }
 
 export function prepareUserQuote(
-  otherCurrency: Currency,
+  otherCurrency: Token,
   tradeInfo: QuoteTradeInfo,
   slippage: number,
   fees: Fees,
@@ -75,7 +73,7 @@ export function getOurQuoteReqAmount(
     return amount;
   }
 
-  fees.addAmount(toBigNumber(amount));
+  fees.addAmount(toAmount(amount));
 
-  return CurrencyAmount.fromRawAmount(amount.currency, fees.amountLessFees().toString());
+  return CurrencyAmount.fromRawAmount(amount.currency, fees.amountLessFees().value.toString());
 }
