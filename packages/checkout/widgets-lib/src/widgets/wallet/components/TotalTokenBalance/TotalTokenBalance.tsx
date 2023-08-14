@@ -1,4 +1,6 @@
-import { Body, Box, Icon } from '@biom3/react';
+import {
+  Body, Box, ButtCon,
+} from '@biom3/react';
 import { useContext } from 'react';
 import {
   totalTokenBalanceStyle,
@@ -23,11 +25,18 @@ export function TotalTokenBalance(props: TotalTokenBalanceProps) {
     <Box sx={totalTokenBalanceStyle}>
       <Box sx={totalTokenBalanceValueStyle}>
         <Body size="medium">{totalTokenBalance.heading}</Body>
-        <Box>
-          <Icon
+        <Box sx={{ pl: 'base.spacing.x1' }}>
+          <ButtCon
             testId="coin-info-icon"
-            icon="InformationCircle"
-            sx={{ width: 'base.icon.size.100', fill: 'base.color.brand.4', cursor: 'pointer' }}
+            variant="tertiary"
+            icon="Information"
+            sx={{
+              width: 'base.icon.size.250',
+              height: 'base.icon.size.250',
+              fill: 'base.color.accent.4',
+              cursor: 'pointer',
+              borderRadius: '50%',
+            }}
             onClick={() => viewDispatch({
               payload: {
                 type: ViewActions.UPDATE_VIEW,
