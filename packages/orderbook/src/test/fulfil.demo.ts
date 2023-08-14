@@ -1,7 +1,6 @@
 import { Environment } from '@imtbl/config';
 import { Wallet } from 'ethers';
 import { log } from 'console';
-import { TransactionType } from 'types';
 import { OrderStatus } from '../openapi/sdk/index';
 import { Orderbook } from '../orderbook';
 import {
@@ -9,12 +8,11 @@ import {
   getFulfillerWallet,
   getOffererWallet,
   getLocalhostProvider,
-  signAndSubmitTx,
-  signMessage,
   TestToken,
   waitForOrderToBeOfStatus,
   getConfigFromEnv,
 } from './helpers';
+import { actionAll } from './helpers/actions';
 
 async function deployAndMintNftContract(wallet: Wallet): Promise<TestToken> {
   const { contract } = await deployTestToken(wallet);
@@ -72,24 +70,8 @@ describe('', () => {
       orderExpiry: new Date(Date.now() + 1000000 * 30),
     });
 
-    const approvalAction = validListing.actions.find((a) => a.transactionType === 'APPROVAL');
-    if (!approvalAction) {
-      throw new Error('No approval action found');
-    }
-    const unsignedApprovalTransaction = await approvalAction.buildTransaction();
-
-    await signAndSubmitTx(
-      unsignedApprovalTransaction,
-      offerer,
-      provider,
-    );
-
-    const signature2 = await signMessage(
-      validListing.typedOrderMessageForSigning,
-      offerer,
-    );
-
-    log('Cretaing new listing to be fulfilled...');
+    const signatures = await actionAll(validListing.actions, offerer, provider);
+    log('Creating new listing to be fulfilled...');
 
     // Submit the order creation request to the order book API
     const {
@@ -97,7 +79,7 @@ describe('', () => {
     } = await sdk.createListing({
       orderComponents: validListing.orderComponents,
       orderHash: validListing.orderHash,
-      orderSignature: signature2,
+      orderSignature: signatures[0],
     });
 
     await waitForOrderToBeOfStatus(sdk, orderId2, OrderStatus.ACTIVE);
@@ -108,24 +90,7 @@ describe('', () => {
       fulfiller.address,
     );
 
-    // The approval action must be built and submitted before the fulfillment action,
-    // if an approval is required
-    const fulfillApprovalAction = actions.find(
-      (a) => a.transactionType === TransactionType.APPROVAL,
-    );
-    const fulfillOrderAction = actions.find(
-      (a) => a.transactionType === TransactionType.FULFILL_ORDER,
-    );
-
-    if (fulfillApprovalAction) {
-      const unsignedFulfillApprovalTransaction = await fulfillApprovalAction.buildTransaction();
-      await signAndSubmitTx(unsignedFulfillApprovalTransaction, fulfiller, provider);
-    }
-
-    if (fulfillOrderAction) {
-      const unsignedFulfillmentTransaction = await fulfillOrderAction.buildTransaction();
-      await signAndSubmitTx(unsignedFulfillmentTransaction, fulfiller, provider);
-    }
+    await actionAll(actions, fulfiller, provider);
 
     log(
       `Fulfilment transaction sent, waiting for listing ${orderId2} to become FILLED`,
