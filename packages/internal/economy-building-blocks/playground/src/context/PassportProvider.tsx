@@ -89,7 +89,7 @@ const getPassportConfig = (
             },
           }),
           zkEvmRpcUrl: "https://zkevm-rpc.dev.x.immutable.com",
-          zkEvmChainId: "eip155:13423",
+          zkEvmChainId: "eip155:13433",
           relayerUrl: "https://api.dev.immutable.com/relayer-mr",
           indexerMrBasePath: "https://indexer-mr.dev.imtbl.com",
           orderBookMrBasePath: "https://order-book-mr.dev.imtbl.com",

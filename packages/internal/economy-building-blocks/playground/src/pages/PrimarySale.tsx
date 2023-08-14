@@ -93,17 +93,10 @@ function PrimarySale() {
   const setApprove = async (): Promise<boolean> => {
     const erc20Address = "0xb95B75B4E4c09F04d5DA6349861BF1b6F163D78c";
     const txData = encodeApprove(erc20Address, "0.01");
-    console.log("🚀 ~ file: Crafting.tsx:96 ~ setApprove ~ txData:", txData)
-
+    console.log("🚀 ~ file: PrimarySale.tsx:96 ~ setApprove ~ txData:", txData)
     const multicallerAddress = "0xfd2490b22365853e0b4fb416c5b1598223125167";
-    // set loading
-    const approved = await call(multicallerAddress, txData);
-    // unset loading
-
-    console.log(
-      "🚀 ~ file: Crafting.tsx:96 ~ setApprove ~ approved:",
-      approved
-    );
+    const approved = await sendTx(multicallerAddress, txData);
+    console.log("🚀 ~ file: PrimarySale.tsx:99 ~ setApprove ~ approved:", approved)
     return parseInt(approved, 16) === 1;
   };
 
