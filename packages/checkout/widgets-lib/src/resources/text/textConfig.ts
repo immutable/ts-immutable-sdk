@@ -265,6 +265,11 @@ export const text = {
     },
   },
   wallets: {
+    [WalletProviderName.PASSPORT]: {
+      heading: 'Immutable Passport',
+      description:
+        'digital wallet and identity',
+    },
     [WalletProviderName.METAMASK]: {
       heading: 'MetaMask',
       description:

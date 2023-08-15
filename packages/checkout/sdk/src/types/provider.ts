@@ -4,8 +4,8 @@ import { Web3Provider } from '@ethersproject/providers';
  * Enum representing the names of different wallet providers.
  */
 export enum WalletProviderName {
-  METAMASK = 'metamask',
   PASSPORT = 'passport',
+  METAMASK = 'metamask',
 }
 
 /**
