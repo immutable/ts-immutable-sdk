@@ -1,7 +1,5 @@
 import { ethers } from 'ethers';
-import {
-  Currency, CurrencyAmount, TradeType,
-} from '@uniswap/sdk-core';
+import { CurrencyAmount, Token, TradeType } from '@uniswap/sdk-core';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import { NoRoutesAvailableError } from 'errors';
 import { TokenInfo } from 'types';
@@ -20,11 +18,11 @@ export type RoutingContracts = {
 };
 
 export type QuoteTradeInfo = {
-  route: Route<Currency, Currency>;
+  route: Route<Token, Token>;
   amountIn: ethers.BigNumber;
-  tokenIn: Currency;
+  tokenIn: Token;
   amountOut: ethers.BigNumber;
-  tokenOut: Currency;
+  tokenOut: Token;
   tradeType: TradeType;
   gasEstimate: ethers.BigNumber
 };
@@ -47,15 +45,15 @@ export class Router {
   }
 
   public async findOptimalRoute(
-    amountSpecified: CurrencyAmount<Currency>,
-    otherCurrency: Currency,
+    amountSpecified: CurrencyAmount<Token>,
+    otherToken: Token,
     tradeType: TradeType,
     maxHops: number = 2,
   ): Promise<QuoteTradeInfo> {
     const [currencyIn, currencyOut] = this.determineERC20InAndERC20Out(
       tradeType,
       amountSpecified,
-      otherCurrency,
+      otherToken,
     );
 
     const multicallContract = Multicall__factory.connect(
@@ -118,12 +116,12 @@ export class Router {
 
   private async getBestQuoteFromRoutes(
     multicallContract: Multicall,
-    routes: Route<Currency, Currency>[],
-    amountSpecified: CurrencyAmount<Currency>,
+    routes: Route<Token, Token>[],
+    amountSpecified: CurrencyAmount<Token>,
     tradeType: TradeType,
   ): Promise<
     {
-      route: Route<Currency, Currency>,
+      route: Route<Token, Token>,
       amountIn: ethers.BigNumber,
       amountOut: ethers.BigNumber,
       gasEstimate: ethers.BigNumber
@@ -195,25 +193,25 @@ export class Router {
   // eslint-disable-next-line class-methods-use-this
   private determineERC20InAndERC20Out(
     tradeType: TradeType,
-    amountSpecified: CurrencyAmount<Currency>,
-    otherCurrency: Currency,
-  ): [Currency, Currency] {
+    amountSpecified: CurrencyAmount<Token>,
+    otherToken: Token,
+  ): [Token, Token] {
     // If the trade type is EXACT INPUT then we have specified the amount for the tokenIn
     return tradeType === TradeType.EXACT_INPUT
-      ? [amountSpecified?.currency, otherCurrency]
-      : [otherCurrency, amountSpecified?.currency];
+      ? [amountSpecified?.currency, otherToken]
+      : [otherToken, amountSpecified?.currency];
   }
 }
 
 export const generateAllAcyclicPaths = (
-  currencyIn: Currency, // the currency we start with
-  currencyOut: Currency, // the currency we want to end up with
+  currencyIn: Token, // the currency we start with
+  currencyOut: Token, // the currency we want to end up with
   pools: Pool[], // list of all available pools
   maxHops: number, // the maximum number of pools that can be traversed
   currentRoute: Pool[] = [], // list of pools already traversed
-  routes: Route<Currency, Currency>[] = [], // list of all routes found so far
-  startCurrencyIn: Currency = currencyIn, // the currency we started with
-): Route<Currency, Currency>[] => {
+  routes: Route<Token, Token>[] = [], // list of all routes found so far
+  startCurrencyIn: Token = currencyIn, // the currency we started with
+): Route<Token, Token>[] => {
   const tokenIn = currencyIn.wrapped;
 
   const tokenOut = currencyOut.wrapped;
