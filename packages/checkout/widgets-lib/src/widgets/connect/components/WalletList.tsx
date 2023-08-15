@@ -25,16 +25,28 @@ export function WalletList(props: WalletListProps) {
   const { walletFilterTypes, excludeWallets } = props;
   const {
     connectDispatch,
-    connectState: { checkout },
+    connectState: { checkout, passport },
   } = useContext(ConnectContext);
   const { viewDispatch } = useContext(ViewContext);
   const [wallets, setWallets] = useState<WalletInfo[]>([]);
+
+  const excludedWallets = () => {
+    const passportWalletProvider = { walletProvider: WalletProviderName.PASSPORT };
+    if (!excludeWallets && !passport) {
+      return [passportWalletProvider];
+    }
+    if (excludeWallets && !passport) {
+      excludeWallets.push(passportWalletProvider);
+      return excludeWallets;
+    }
+    return excludeWallets;
+  };
 
   useEffect(() => {
     const getAllowedWallets = async () => {
       const allowedWallets = await checkout?.getWalletAllowList({
         type: walletFilterTypes ?? WalletFilterTypes.ALL,
-        exclude: excludeWallets,
+        exclude: excludedWallets(),
       });
       setWallets(allowedWallets?.wallets || []);
     };
