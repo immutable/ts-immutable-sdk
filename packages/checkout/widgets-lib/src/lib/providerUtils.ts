@@ -1,9 +1,9 @@
 import { Web3Provider } from '@ethersproject/providers';
 
-export function isPassport(provider: Web3Provider) {
+export function isPassportProvider(provider?: Web3Provider | null) {
   return (provider?.provider as any)?.isPassport === true;
 }
 
-export function isMetaMask(provider: Web3Provider) {
+export function isMetaMaskProvider(provider?: Web3Provider | null) {
   return provider?.provider?.isMetaMask === true;
 }

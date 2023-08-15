@@ -1,5 +1,5 @@
 import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
-import { isMetaMask, isPassport } from './providerUtils';
+import { isMetaMaskProvider, isPassportProvider } from './providerUtils';
 
 describe('providerUtils', () => {
   const mockPassportWeb3Provider = { provider: { isPassport: true } as ExternalProvider } as Web3Provider;
@@ -7,25 +7,45 @@ describe('providerUtils', () => {
 
   describe('isPassport', () => {
     it('should return true when provider is valid and passport flag is true', () => {
-      const result = isPassport(mockPassportWeb3Provider);
-      expect(result).toBeTruthy();
+      const result = isPassportProvider(mockPassportWeb3Provider);
+      expect(result).toBe(true);
     });
 
     it('should return false when provider is valid and passport flag is missing', () => {
-      const result = isPassport(mockMetaMaskWeb3Provider);
-      expect(result).toBeFalsy();
+      const result = isPassportProvider(mockMetaMaskWeb3Provider);
+      expect(result).toBe(false);
+    });
+
+    it('should return false when provider is undefined ', () => {
+      const result = isPassportProvider(undefined);
+      expect(result).toBe(false);
+    });
+
+    it('should return false when provider is null ', () => {
+      const result = isPassportProvider(undefined);
+      expect(result).toBe(false);
     });
   });
 
   describe('isMetaMask', () => {
     it('should return true when provider is valid and metamask flag is true', () => {
-      const result = isMetaMask(mockMetaMaskWeb3Provider);
-      expect(result).toBeTruthy();
+      const result = isMetaMaskProvider(mockMetaMaskWeb3Provider);
+      expect(result).toBe(true);
     });
 
     it('should return false when provider is valid and metamask flag is missing', () => {
-      const result = isMetaMask(mockPassportWeb3Provider);
-      expect(result).toBeFalsy();
+      const result = isMetaMaskProvider(mockPassportWeb3Provider);
+      expect(result).toBe(false);
+    });
+
+    it('should return false when provider is undefined ', () => {
+      const result = isMetaMaskProvider(undefined);
+      expect(result).toBe(false);
+    });
+
+    it('should return false when provider is null ', () => {
+      const result = isMetaMaskProvider(undefined);
+      expect(result).toBe(false);
     });
   });
 });

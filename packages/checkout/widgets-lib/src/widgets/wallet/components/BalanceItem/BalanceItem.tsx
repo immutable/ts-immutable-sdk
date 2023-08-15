@@ -8,7 +8,7 @@ import {
   PriceDisplay,
 } from '@biom3/react';
 import {
-  useContext, useEffect, useMemo, useState,
+  useContext, useEffect, useState,
 } from 'react';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import {
@@ -25,6 +25,7 @@ import {
 import { getL1ChainId, getL2ChainId } from '../../../../lib/networkUtils';
 import { formatZeroAmount, tokenValueFormat } from '../../../../lib/utils';
 import { ConnectLoaderContext } from '../../../../context/connect-loader-context/ConnectLoaderContext';
+import { isPassportProvider } from '../../../../lib/providerUtils';
 
 export interface BalanceItemProps {
   balanceInfo: BalanceInfo;
@@ -41,7 +42,7 @@ export function BalanceItem({ balanceInfo, bridgeToL2OnClick }: BalanceItemProps
   const [isBridgeEnabled, setIsBridgeEnabled] = useState<boolean>();
   const [isSwapEnabled, setIsSwapEnabled] = useState<boolean>();
 
-  const isPassport = useMemo(() => (provider?.provider as any)?.isPassport, [provider]);
+  const isPassport = isPassportProvider(provider);
 
   useEffect(() => {
     if (!network || !supportedTopUps || !checkout) return;
@@ -62,7 +63,7 @@ export function BalanceItem({ balanceInfo, bridgeToL2OnClick }: BalanceItemProps
 
   return (
     <Box
-      testId={`balance-item-${balanceInfo.symbol}`}
+      testId={`balance-item-${balanceInfo.symbol}-${balanceInfo.address}`}
       sx={balanceItemContainerStyle}
     >
       <Box sx={balanceItemCoinBoxStyle}>

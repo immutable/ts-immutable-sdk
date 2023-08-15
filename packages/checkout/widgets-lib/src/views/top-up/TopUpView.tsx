@@ -5,7 +5,7 @@ import {
   IMTBLWidgetEvents,
 } from '@imtbl/checkout-widgets';
 import {
-  ReactNode, useContext, useEffect, useMemo, useState,
+  ReactNode, useContext, useEffect, useState,
 } from 'react';
 import { GasEstimateBridgeToL2Result, GasEstimateSwapResult, GasEstimateType } from '@imtbl/checkout-sdk';
 import { FooterLogo } from '../../components/Footer/FooterLogo';
@@ -23,6 +23,7 @@ import { CryptoFiatActions, CryptoFiatContext } from '../../context/crypto-fiat-
 import { useInterval } from '../../lib/hooks/useInterval';
 import { DEFAULT_TOKEN_SYMBOLS } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
+import { isPassportProvider } from '../../lib/providerUtils';
 
 interface TopUpViewProps {
   widgetEvent: IMTBLWidgetEvents,
@@ -60,7 +61,7 @@ export function TopUpView({
   const [loadingSwapFees, setLoadingSwapFees] = useState(false);
   const [loadingBridgeFees, setLoadingBridgeFees] = useState(false);
 
-  const isPassport = useMemo(() => (provider?.provider as any)?.isPassport, []);
+  const isPassport = isPassportProvider(provider);
 
   useEffect(() => {
     if (!checkout) return;
