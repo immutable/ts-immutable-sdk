@@ -9,10 +9,10 @@ import {
 export const smartCheckout = async (
   provider: Web3Provider,
   itemRequirements: ItemRequirement[],
-  txnOrGasAmount: FulfilmentTransaction | GasAmount,
+  transactionOrGasAmount: FulfilmentTransaction | GasAmount,
 ): Promise<SmartCheckoutResult> => {
   // eslint-disable-next-line no-console
-  console.log(provider, itemRequirements, txnOrGasAmount);
+  console.log(provider, itemRequirements, transactionOrGasAmount);
   return {
     sufficient: true,
     transactionRequirements: [{

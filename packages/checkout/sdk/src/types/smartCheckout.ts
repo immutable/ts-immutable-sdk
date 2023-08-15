@@ -6,12 +6,12 @@ import { TokenInfo } from './tokenInfo';
  * Interface representing the parameters for {@link Checkout.smartCheckout}
  * @property {Web3Provider} provider - The provider to use for smart checkout.
  * @property {ItemRequirement[]} itemRequirements - The item requirements for the transaction.
- * @property {FulfilmentDetails} fulfilmentDetails - The fulfilment details containing either the transaction or the gas amount.
+ * @property {FulfilmentTransaction | GasAmount} transactionOrGasAmount - The transaction or gas amount.
  */
 export interface SmartCheckoutParams {
   provider: Web3Provider;
   itemRequirements: ItemRequirement[];
-  txnOrGasAmount: FulfilmentTransaction | GasAmount,
+  transactionOrGasAmount: FulfilmentTransaction | GasAmount,
 }
 
 /**
@@ -72,33 +72,33 @@ type ERC721Item = {
 };
 
 /**
- * An enum representing the fulfilment details types
+ * An enum representing transaction or gas types
  * @enum {string}
- * @property {string} TRANSACTION - If the fulfilment details contains a transaction.
- * @property {string} GAS - If the fulfilment details contains the gas amount.
+ * @property {string} TRANSACTION - If the type is a transaction
+ * @property {string} GAS - If the type is the gas amount
  */
-export enum FulfilmentDetailsType {
+export enum TransactionOrGasType {
   TRANSACTION = 'TRANSACTION',
   GAS = 'GAS',
 }
 
 /**
  * The fulfilment transaction which contains the transaction to send.
- * @property {FulfilmentDetailsType} type - The type to indicate this is a fulfilment transaction.
+ * @property {TransactionOrGasType} type - The type to indicate this is a fulfilment transaction.
  * @property {TransactionRequest} transaction - The transaction to send.
  */
 export type FulfilmentTransaction = {
-  type: FulfilmentDetailsType.TRANSACTION;
+  type: TransactionOrGasType.TRANSACTION;
   transaction: TransactionRequest;
 };
 
 /**
  * The gas amount which contains the gas token and the gas limit.
- * @property {FulfilmentDetailsType} type - The type to indicate this is a gas amount.
+ * @property {TransactionOrGasType} type - The type to indicate this is a gas amount.
  * @property {GasToken} gasToken - The gas token.
  */
 export type GasAmount = {
-  type: FulfilmentDetailsType.GAS;
+  type: TransactionOrGasType.GAS;
   gasToken: GasToken;
 };
 

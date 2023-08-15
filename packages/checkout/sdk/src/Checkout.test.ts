@@ -20,7 +20,7 @@ import {
   WalletFilterTypes,
   GasTokenType,
   ItemType,
-  FulfilmentDetailsType,
+  TransactionOrGasType,
   SmartCheckoutParams,
 } from './types';
 import { getAllBalances, getBalance, getERC20Balance } from './balances';
@@ -461,8 +461,8 @@ describe('Connect', () => {
     const params: SmartCheckoutParams = {
       provider,
       itemRequirements: [],
-      txnOrGasAmount: {
-        type: FulfilmentDetailsType.GAS,
+      transactionOrGasAmount: {
+        type: TransactionOrGasType.GAS,
         gasToken: {
           type: GasTokenType.NATIVE,
           limit: BigNumber.from('1'),
@@ -472,7 +472,7 @@ describe('Connect', () => {
     await checkout.smartCheckout(params);
 
     expect(smartCheckout).toBeCalledTimes(1);
-    expect(smartCheckout).toBeCalledWith(params.provider, params.itemRequirements, params.txnOrGasAmount);
+    expect(smartCheckout).toBeCalledWith(params.provider, params.itemRequirements, params.transactionOrGasAmount);
   });
 
   it('should call isWeb3Provider', async () => {
