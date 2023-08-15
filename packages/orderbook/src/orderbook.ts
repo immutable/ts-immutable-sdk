@@ -70,6 +70,14 @@ export class Orderbook {
   }
 
   /**
+   * Return the configuration for the orderbook module.
+   * @return {OrderbookModuleConfiguration} The configuration for the orderbook module.
+   */
+  config(): OrderbookModuleConfiguration {
+    return this.orderbookConfig;
+  }
+
+  /**
    * Get an order by ID
    * @param {string} listingId - The listingId to find.
    * @return {ListingResult} The returned order result.
