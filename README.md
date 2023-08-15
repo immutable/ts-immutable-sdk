@@ -32,9 +32,15 @@ Table of contents
         - [**Run ALL test suites (mimicking what our CI workflow does)**](#run-all-test-suites-mimicking-what-our-ci-workflow-does)
         - [**Run test suites specific to a package**](#run-test-suites-specific-to-a-package)
       - [Writing tests](#writing-tests)
-    - [Generate SDK Reference Documentation](#generate-sdk-reference-documentation)
+    - [Documentation](#documentation)
+      - [Writing documentation](#writing-documentation)
+      - [Generate SDK Reference Documentation](#generate-sdk-reference-documentation)
     - [Releasing](#releasing)
-    - [Versioning \& Changelog](#versioning--changelog)
+      - [Dry Run](#dry-run)
+      - [Versioning](#versioning)
+      - [Alpha Versioning](#alpha-versioning)
+      - [Updated SDK Reference Documentation](#updated-sdk-reference-documentation)
+      - [Changelog](#changelog)
   - [Disclaimer for Alpha Releases](#disclaimer-for-alpha-releases)
 
 ## How to guides
@@ -223,7 +229,18 @@ We are currently not enforcing a preference for testing practices. It is complet
 
 The root [`package.json`](package.json) is the entry point for all CI testing purposes. Therefore, if you wish to write tests for an existing or new package, please ensure that a `"test"` script exists in the associated `package.json` file so that it is picked up by the [`root "test" command.`](package.json#L19)
 
-### Generate SDK Reference Documentation
+### Documentation
+
+Documentation is automatically generated from [TSDoc](https://tsdoc.org/) style comments.
+
+#### Writing documentation
+
+A good rule of thumb is to ensure anything that is exported has TSDoc comments created for it.
+The best way to get a feel for how TSDoc works is to play with it [here](https://microsoft.github.io/tsdoc/)
+
+This repository uses [TypeDoc](https://typedoc.org/) to convert TSDoc comments into the SDK reference docs you see [here](https://docs.immutable.com/docs/zkEVM/sdks/typescript)
+
+#### Generate SDK Reference Documentation
 
 From a clean checkout, run:
 
@@ -281,7 +298,7 @@ Look for a PR with the title `Release SDK reference docs vX.X.X` in the [imx-doc
 
 Note, the docs will only be updated if the `Publish to NPM` workflow is run with a `Release Type` of `release`.
 
-### Changelog
+#### Changelog
 
 Add your changes to the [CHANGELOG.md](CHANGELOG.md) file under the `[Unreleased]` section under the appropriate subheading:
 
