@@ -235,10 +235,11 @@ Documentation is automatically generated from [TSDoc](https://tsdoc.org/) style 
 
 #### Writing documentation
 
-A good rule of thumb is to ensure anything that is exported has TSDoc comments created for it.
-The best way to get a feel for how TSDoc works is to play with it [here](https://microsoft.github.io/tsdoc/)
-
 This repository uses [TypeDoc](https://typedoc.org/) to convert TSDoc comments into the SDK reference docs you see [here](https://docs.immutable.com/docs/zkEVM/sdks/typescript)
+
+A good rule of thumb is to ensure anything that is exported has TSDoc comments created for it. The best way to get a feel for how TSDoc works is to play with it [here](https://microsoft.github.io/tsdoc/)
+
+At a minimum, aim to have `@param`, `@returns` and `@description` for functions. If the function is quite complex, provide an `@example` too, like [this](https://github.com/immutable/ts-immutable-sdk/blob/2336b6f050627fe9ba3eabf0d0efdb296c04fc9d/packages/internal/bridge/sdk/src/tokenBridge.ts#L77-L105)
 
 #### Generate SDK Reference Documentation
 
