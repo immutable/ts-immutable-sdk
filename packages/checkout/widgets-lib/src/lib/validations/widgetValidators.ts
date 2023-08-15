@@ -4,7 +4,7 @@ import { amountInputValidation } from './amountInputValidations';
 import { NATIVE } from '../constants';
 
 export function isValidWalletProvider(walletProvider: string | undefined) {
-  if (walletProvider === undefined) return false;
+  if (walletProvider === undefined) return true; // allow undefined as it may not be defined
   if (walletProvider === '') return false;
   return Object.values(WalletProviderName).includes(walletProvider as WalletProviderName);
 }

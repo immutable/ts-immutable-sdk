@@ -13,7 +13,7 @@ export class ImmutableBridge extends ImmutableWebComponent {
 
   amount = '';
 
-  walletProvider: WalletProviderName = WalletProviderName.METAMASK;
+  walletProvider: WalletProviderName | undefined = undefined;
 
   connectedCallback() {
     super.connectedCallback();
@@ -21,7 +21,7 @@ export class ImmutableBridge extends ImmutableWebComponent {
     this.amount = this.getAttribute('amount') ?? '';
     this.walletProvider = this.getAttribute(
       'walletProvider',
-    )?.toLowerCase() as WalletProviderName ?? WalletProviderName.METAMASK;
+    )?.toLowerCase() as WalletProviderName;
 
     this.renderWidget();
   }
@@ -30,7 +30,7 @@ export class ImmutableBridge extends ImmutableWebComponent {
     if (!isValidWalletProvider(this.walletProvider)) {
       // eslint-disable-next-line no-console
       console.warn('[IMTBL]: invalid "walletProvider" widget input');
-      this.walletProvider = WalletProviderName.METAMASK;
+      this.walletProvider = undefined;
     }
 
     if (!isValidAmount(this.amount)) {
