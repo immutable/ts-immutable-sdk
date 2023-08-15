@@ -20,10 +20,9 @@ const contractInterface = new ethers.utils.Interface(abi);
 export function encodeApprove(
   spender: string,
   value: string,
-  decimals: number
+  decimals = 6
 ) {
   // take amount as string, convert to number with decimals
   const amount = ethers.utils.parseUnits(value, decimals).toString();
-  console.log("🚀 ~ file: erc20.ts:27 ~ amount:", amount)
   return contractInterface.encodeFunctionData("approve", [spender, amount]);
 }
