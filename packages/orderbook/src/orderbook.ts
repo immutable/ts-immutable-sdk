@@ -7,6 +7,7 @@ import {
 } from 'config/config';
 import { ERC721Factory } from 'erc721';
 import {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   Fee, ListingResult, ListListingsResult, OrderStatus,
 } from 'openapi/sdk';
 import { Seaport } from 'seaport';
@@ -146,11 +147,13 @@ export class Orderbook {
   async fulfillOrder(
     listingId: string,
     takerAddress: string,
-    takerFee?: Fee,
+    // TODO: Allow taker fee when backend support is available
+    // takerFee?: Fee,
   ): Promise<FulfillOrderResponse> {
     const fulfillmentDataRes = await this.apiClient.fulfillmentData([{
       order_id: listingId,
-      fee: takerFee,
+      // fee: takerFee,
+      fee: undefined,
     }]);
 
     if (fulfillmentDataRes.result.length !== 0) {
