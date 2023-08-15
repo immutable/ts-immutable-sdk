@@ -5,7 +5,7 @@ import {
   IMTBLWidgetEvents,
 } from '@imtbl/checkout-widgets';
 import {
-  ReactNode, useContext, useEffect, useState,
+  ReactNode, useContext, useEffect, useMemo, useState,
 } from 'react';
 import { GasEstimateBridgeToL2Result, GasEstimateSwapResult, GasEstimateType } from '@imtbl/checkout-sdk';
 import { FooterLogo } from '../../components/Footer/FooterLogo';
@@ -48,7 +48,7 @@ export function TopUpView({
   onBackButtonClick,
 }: TopUpViewProps) {
   const { connectLoaderState } = useContext(ConnectLoaderContext);
-  const { checkout } = connectLoaderState;
+  const { checkout, provider } = connectLoaderState;
   const { header, topUpOptions } = text.views[SharedViews.TOP_UP_VIEW];
   const { onramp, swap, bridge } = topUpOptions;
   const { viewDispatch } = useContext(ViewContext);
@@ -59,6 +59,8 @@ export function TopUpView({
   const [bridgeFeesInFiat, setBridgeFeesInFiat] = useState('-.--');
   const [loadingSwapFees, setLoadingSwapFees] = useState(false);
   const [loadingBridgeFees, setLoadingBridgeFees] = useState(false);
+
+  const isPassport = useMemo(() => (provider?.provider as any)?.isPassport, []);
 
   useEffect(() => {
     if (!checkout) return;
@@ -252,7 +254,7 @@ export function TopUpView({
             onClickSwap,
             () => renderFees(swapFeesInFiat, loadingSwapFees),
           )}
-          {showBridgeOption && renderMenuItem(
+          {showBridgeOption && !isPassport && renderMenuItem(
             'bridge',
             'Minting',
             bridge.heading,
