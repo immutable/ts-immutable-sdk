@@ -175,7 +175,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(quote.amountWithMaxSlippage.value.toString()).toEqual('961165048543689320388'); // userQuoteRes.amountOutMinimum = swapReq.amountOutMinimum
 
       const ourQuoteReqAmountIn = findOptimalRouteMock.mock.calls[0][0];
-      expect(ourQuoteReqAmountIn.toExact()).toEqual('99'); // ourQuoteReq.amountIn = the amount specified less the fee
+      expect(ourQuoteReqAmountIn.value.toString()).toEqual('99000000000000000000'); // ourQuoteReq.amountIn = the amount specified less the fee
 
       const data = swap.transaction.data.toString();
 

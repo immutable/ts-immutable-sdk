@@ -1,7 +1,5 @@
 import { ethers } from 'ethers';
-import {
-  CurrencyAmount, Token, TradeType,
-} from '@uniswap/sdk-core';
+import { Token, TradeType } from '@uniswap/sdk-core';
 import assert from 'assert';
 import {
   DuplicateAddressesError, InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError,
@@ -14,9 +12,11 @@ import {
   DEFAULT_DEADLINE, DEFAULT_MAX_HOPS, DEFAULT_SLIPPAGE, MAX_MAX_HOPS, MIN_MAX_HOPS,
 } from './constants';
 import { Router } from './lib/router';
-import { getERC20Decimals, isValidNonZeroAddress, uniswapTokenToTokenInfo } from './lib/utils';
 import {
-  ExchangeModuleConfiguration, SecondaryFee, TokenInfo, TransactionResponse,
+  getERC20Decimals, isValidNonZeroAddress, newAmount, uniswapTokenToTokenInfo,
+} from './lib/utils';
+import {
+  Amount, ExchangeModuleConfiguration, SecondaryFee, TokenInfo, TransactionResponse,
 } from './types';
 import { getSwap, prepareSwap } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
@@ -103,13 +103,13 @@ export class Exchange {
     );
 
     // determine which amount was specified for the swap from the TradeType
-    let amountSpecified: CurrencyAmount<Token>;
+    let amountSpecified: Amount;
     let otherToken: Token;
     if (tradeType === TradeType.EXACT_INPUT) {
-      amountSpecified = CurrencyAmount.fromRawAmount(tokenIn, amount.toString());
+      amountSpecified = newAmount(amount, tokenIn);
       otherToken = tokenOut;
     } else {
-      amountSpecified = CurrencyAmount.fromRawAmount(tokenOut, amount.toString());
+      amountSpecified = newAmount(amount, tokenOut);
       otherToken = tokenIn;
     }
 
@@ -127,7 +127,7 @@ export class Exchange {
     // get gas details
     const gasPrice = await fetchGasPrice(this.provider);
 
-    const adjustedQuote = prepareSwap(ourQuote, amount, fees);
+    const adjustedQuote = prepareSwap(ourQuote, amountSpecified, fees);
 
     const swap = getSwap(
       this.nativeToken,

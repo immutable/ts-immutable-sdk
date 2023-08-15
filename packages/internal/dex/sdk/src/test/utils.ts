@@ -1,8 +1,4 @@
-import {
-  CurrencyAmount,
-  Token,
-  TradeType,
-} from '@uniswap/sdk-core';
+import { Token, TradeType } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
 import JSBI from 'jsbi';
 import { Pool, Route, TickMath } from '@uniswap/v3-sdk';
@@ -11,11 +7,12 @@ import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { SecondaryFee__factory } from 'contracts/types';
 import { IV3SwapRouter } from 'contracts/types/SecondaryFee';
 import {
+  Amount,
   QuoteTradeInfo,
   Router,
   RoutingContracts,
   SecondaryFee,
-  toBigNumber,
+  uniswapTokenToTokenInfo,
 } from '../lib';
 
 export const TEST_GAS_PRICE = ethers.BigNumber.from('1500000000'); // 1.5 gwei or 1500000000 wei
@@ -367,7 +364,7 @@ type MockParams = {
 export function mockRouterImplementation(params: MockParams) {
   const exchangeRate = params.exchangeRate ?? 10;
   const findOptimalRoute = jest.fn((
-    amountSpecified: CurrencyAmount<Token>,
+    amountSpecified: Amount,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     otherToken: Token,
     tradeType: TradeType,
@@ -390,17 +387,15 @@ export function mockRouterImplementation(params: MockParams) {
     );
 
     const amountIn = tradeType === TradeType.EXACT_INPUT
-      ? toBigNumber(amountSpecified) : toBigNumber(amountSpecified).div(exchangeRate);
+      ? amountSpecified : { token: uniswapTokenToTokenInfo(tokenIn), value: amountSpecified.value.div(exchangeRate) };
 
     const amountOut = tradeType === TradeType.EXACT_INPUT
-      ? toBigNumber(amountSpecified).mul(exchangeRate) : toBigNumber(amountSpecified);
+      ? { token: uniswapTokenToTokenInfo(tokenOut), value: amountSpecified.value.mul(exchangeRate) } : amountSpecified;
 
     const trade: QuoteTradeInfo = {
       route,
       amountIn,
-      tokenIn,
       amountOut,
-      tokenOut,
       tradeType,
       gasEstimate: TEST_TRANSACTION_GAS_USAGE,
     };

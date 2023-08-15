@@ -2,18 +2,15 @@ import {
   Trade, toHex, encodeRouteToPath, Route,
 } from '@uniswap/v3-sdk';
 import { SwapRouter } from '@uniswap/router-sdk';
-import {
-  Token,
-  CurrencyAmount,
-  Percent,
-  TradeType,
-} from '@uniswap/sdk-core';
+import { Token, Percent, TradeType } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
 import { SecondaryFee__factory } from 'contracts/types';
 import { ISecondaryFee, SecondaryFeeInterface } from 'contracts/types/SecondaryFee';
 import { QuoteTradeInfo } from 'lib/router';
 import { Fees } from 'lib/fees';
+import { toCurrencyAmount } from 'lib/utils';
 import {
+  Amount,
   SecondaryFee,
   TokenInfo, TransactionDetails,
 } from '../../types';
@@ -177,14 +174,8 @@ function createSwapParameters(
   // Create an unchecked trade to be used in generating swap parameters.
   const uncheckedTrade = Trade.createUncheckedTrade({
     route: adjustedQuote.route,
-    inputAmount: CurrencyAmount.fromRawAmount(
-      adjustedQuote.tokenIn,
-      adjustedQuote.amountIn.toString(),
-    ),
-    outputAmount: CurrencyAmount.fromRawAmount(
-      adjustedQuote.tokenOut,
-      adjustedQuote.amountOut.toString(),
-    ),
+    inputAmount: toCurrencyAmount(adjustedQuote.amountIn),
+    outputAmount: toCurrencyAmount(adjustedQuote.amountOut),
     tradeType: adjustedQuote.tradeType,
   });
 
@@ -242,21 +233,16 @@ export function getSwap(
 
 export function prepareSwap(
   ourQuote: QuoteTradeInfo,
-  amountSpecified: ethers.BigNumber,
+  amountSpecified: Amount,
   fees: Fees,
 ): QuoteTradeInfo {
   if (ourQuote.tradeType === TradeType.EXACT_OUTPUT) {
-    fees.addAmount({
-      token: ourQuote.tokenIn,
-      value: ourQuote.amountIn,
-    });
+    fees.addAmount(ourQuote.amountIn);
 
     return {
       gasEstimate: ourQuote.gasEstimate,
       route: ourQuote.route,
-      tokenIn: ourQuote.tokenIn,
-      tokenOut: ourQuote.tokenOut,
-      amountIn: fees.amountWithFeesApplied().value,
+      amountIn: fees.amountWithFeesApplied(),
       amountOut: amountSpecified,
       tradeType: ourQuote.tradeType,
     };
@@ -265,8 +251,6 @@ export function prepareSwap(
   return {
     gasEstimate: ourQuote.gasEstimate,
     route: ourQuote.route,
-    tokenIn: ourQuote.tokenIn,
-    tokenOut: ourQuote.tokenOut,
     amountIn: amountSpecified,
     amountOut: ourQuote.amountOut,
     tradeType: ourQuote.tradeType,

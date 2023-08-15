@@ -8,6 +8,7 @@ import {
 } from 'test/utils';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import { Fees } from 'lib/fees';
+import { QuoteTradeInfo, newAmount } from 'lib';
 import { getSwap, prepareSwap } from './swap';
 
 const testPool = new Pool(
@@ -19,28 +20,24 @@ const testPool = new Pool(
   100,
 );
 
-const buildExactInputQuote = () => {
+const buildExactInputQuote = (): QuoteTradeInfo => {
   const route = new Route([testPool], IMX_TEST_TOKEN, FUN_TEST_TOKEN);
   return {
     gasEstimate: BigNumber.from(0),
     route,
-    tokenIn: route.input,
-    tokenOut: route.output,
-    amountIn: utils.parseEther('99'),
-    amountOut: utils.parseEther('990'),
+    amountIn: newAmount(utils.parseEther('99'), route.input),
+    amountOut: newAmount(utils.parseEther('990'), route.output),
     tradeType: TradeType.EXACT_INPUT,
   };
 };
 
-const buildExactOutputQuote = () => {
+const buildExactOutputQuote = (): QuoteTradeInfo => {
   const route = new Route([testPool], IMX_TEST_TOKEN, FUN_TEST_TOKEN);
   return {
     gasEstimate: BigNumber.from(0),
     route,
-    tokenIn: route.input,
-    tokenOut: route.output,
-    amountIn: utils.parseEther('100'),
-    amountOut: utils.parseEther('1000'),
+    amountIn: newAmount(utils.parseEther('100'), route.input),
+    amountOut: newAmount(utils.parseEther('9910000'), route.output),
     tradeType: TradeType.EXACT_OUTPUT,
   };
 };
@@ -49,7 +46,7 @@ describe('getSwap', () => {
   describe('without fees', () => {
     it('subtracts inverted slippage to calculate the amountOutMinimum', () => {
       const quote = buildExactInputQuote();
-      quote.amountOut = utils.parseEther('990');
+      quote.amountOut.value = utils.parseEther('990');
 
       const swap = getSwap(
         IMX_TEST_TOKEN,
@@ -72,7 +69,7 @@ describe('getSwap', () => {
 
     it('adds non-inverted slippage to calculate the amountInMaximum', () => {
       const quote = buildExactOutputQuote();
-      quote.amountIn = utils.parseEther('100');
+      quote.amountIn.value = utils.parseEther('100');
 
       const swap = getSwap(
         IMX_TEST_TOKEN,
@@ -97,7 +94,7 @@ describe('getSwap', () => {
   describe('with fees', () => {
     it('subtracts inverted slippage to calculate the amountOutMinimum', () => {
       const quote = buildExactInputQuote();
-      quote.amountOut = utils.parseEther('990');
+      quote.amountOut.value = utils.parseEther('990');
 
       const swap = getSwap(
         IMX_TEST_TOKEN,
@@ -120,7 +117,7 @@ describe('getSwap', () => {
 
     it('adds non-inverted slippage to calculate the amountInMaximum', () => {
       const quote = buildExactOutputQuote();
-      quote.amountIn = utils.parseEther('100');
+      quote.amountIn.value = utils.parseEther('100');
 
       const swap = getSwap(
         IMX_TEST_TOKEN,
@@ -197,7 +194,7 @@ describe('prepareSwap', () => {
     describe('with fees', () => {
       it('applies fees to the quoted amount', async () => {
         const quote = buildExactOutputQuote();
-        quote.amountOut = utils.parseEther('100');
+        quote.amountOut.value = utils.parseEther('100');
 
         const preparedSwap = prepareSwap(
           quote,
@@ -205,7 +202,7 @@ describe('prepareSwap', () => {
           new Fees([{ feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: 1000 }], IMX_TEST_TOKEN), // 1% fee
         );
 
-        expect(utils.formatEther(preparedSwap.amountIn)).toEqual('110.0'); // quotedAmount + 1% fee
+        expect(utils.formatEther(preparedSwap.amountIn.value)).toEqual('110.0'); // quotedAmount + 1% fee
         expect(preparedSwap.amountOut.toString()).toEqual(quote.amountOut.toString());
       });
     });

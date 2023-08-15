@@ -1,9 +1,10 @@
 import { Route, SwapQuoter } from '@uniswap/v3-sdk';
-import { TradeType, CurrencyAmount, Token } from '@uniswap/sdk-core';
+import { TradeType, Token } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
 import { ProviderCallError } from 'errors';
+import { Amount } from 'lib';
 import { multicallMultipleCallDataSingContract, MulticallResponse } from './multicall';
-import { quoteReturnMapping, toBigNumber } from './utils';
+import { quoteReturnMapping, toCurrencyAmount } from './utils';
 import { Multicall } from '../contracts/types';
 
 const amountIndex = 0;
@@ -12,19 +13,19 @@ const gasEstimateIndex = 3;
 export type QuoteResult = {
   route: Route<Token, Token>;
   gasEstimate: ethers.BigNumber
-  amountIn: ethers.BigNumber;
-  amountOut: ethers.BigNumber;
+  amountIn: Amount;
+  amountOut: Amount;
 };
 
 export async function getQuotesForRoutes(
   multicallContract: Multicall,
   quoterContractAddress: string,
   routes: Route<Token, Token>[],
-  amountSpecified: CurrencyAmount<Token>,
+  amountSpecified: Amount,
   tradeType: TradeType,
 ): Promise<QuoteResult[]> {
   const callData = routes.map(
-    (route) => SwapQuoter.quoteCallParameters(route, amountSpecified, tradeType, {
+    (route) => SwapQuoter.quoteCallParameters(route, toCurrencyAmount(amountSpecified), tradeType, {
       useQuoterV2: true,
     }).calldata,
   );
@@ -70,17 +71,14 @@ export async function getQuotesForRoutes(
       // and continue processing
     }
 
-    // TODO: ideally this is already a big number as we don't need a CurrencyAmount at this level
-    const amountSpecifiedBigNumber = toBigNumber(amountSpecified);
-
     if (decodedQuoteResult) {
       // The 0th element in each decoded data is going to be the amountOut or amountIn.
       const quoteAmount = decodedQuoteResult[amountIndex];
 
       decodedQuoteResults.push({
         route: routes[i],
-        amountIn: tradeType === TradeType.EXACT_INPUT ? amountSpecifiedBigNumber : quoteAmount,
-        amountOut: tradeType === TradeType.EXACT_INPUT ? quoteAmount : amountSpecifiedBigNumber,
+        amountIn: tradeType === TradeType.EXACT_INPUT ? amountSpecified : quoteAmount, // TODO: why no error?
+        amountOut: tradeType === TradeType.EXACT_INPUT ? quoteAmount : amountSpecified,
         gasEstimate: ethers.BigNumber.from(decodedQuoteResult[gasEstimateIndex]),
       });
     }

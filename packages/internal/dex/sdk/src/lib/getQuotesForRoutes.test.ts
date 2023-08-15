@@ -1,8 +1,10 @@
 import {
   FeeAmount, Pool, Route, TickMath,
 } from '@uniswap/v3-sdk';
-import { Token, CurrencyAmount, TradeType } from '@uniswap/sdk-core';
-import { Contract, ethers, providers } from 'ethers';
+import { Token, TradeType } from '@uniswap/sdk-core';
+import {
+  BigNumber, Contract, providers, utils,
+} from 'ethers';
 import { ProviderCallError } from 'errors';
 import { getQuotesForRoutes } from './getQuotesForRoutes';
 import {
@@ -14,6 +16,7 @@ import {
   WETH_TEST_TOKEN,
 } from '../test/utils';
 import { Multicall__factory } from '../contracts/types';
+import { newAmount } from './utils';
 
 jest.mock('@ethersproject/contracts');
 
@@ -63,10 +66,7 @@ describe('getQuotesForRoutes', () => {
       dummyRoutes.push(new Route([pool0], WETH_TEST_TOKEN, IMX_TEST_TOKEN));
       dummyRoutes.push(new Route([pool0], WETH_TEST_TOKEN, IMX_TEST_TOKEN));
 
-      const amount: CurrencyAmount<Token> = CurrencyAmount.fromRawAmount(
-        WETH_TEST_TOKEN,
-        '123123',
-      );
+      const amount = newAmount(BigNumber.from('123123'), WETH_TEST_TOKEN);
 
       await expect(getQuotesForRoutes(
         multicallContract,
@@ -80,10 +80,10 @@ describe('getQuotesForRoutes', () => {
 
   describe('with one quote', () => {
     it('returns the only quote', async () => {
-      const expectedAmountOut = ethers.utils.parseEther('1000');
+      const expectedAmountOut = utils.parseEther('1000');
       const expectedGasEstimate = '100000';
 
-      const encoded = ethers.utils.defaultAbiCoder.encode(types, [
+      const encoded = utils.defaultAbiCoder.encode(types, [
         expectedAmountOut,
         '100',
         '1',
@@ -130,10 +130,7 @@ describe('getQuotesForRoutes', () => {
         provider,
       );
 
-      const amount: CurrencyAmount<Token> = CurrencyAmount.fromRawAmount(
-        WETH_TEST_TOKEN,
-        '123123',
-      );
+      const amount = newAmount(BigNumber.from('123123'), WETH_TEST_TOKEN);
       const amountOutReceived = await getQuotesForRoutes(
         multicallContract,
         TEST_QUOTER_ADDRESS,
@@ -149,18 +146,18 @@ describe('getQuotesForRoutes', () => {
 
   describe('with multiple quotes', () => {
     it('returns all quotes', async () => {
-      const expectedAmountOut1 = ethers.utils.parseEther('1000');
-      const expectedAmountOut2 = ethers.utils.parseEther('2000');
+      const expectedAmountOut1 = utils.parseEther('1000');
+      const expectedAmountOut2 = utils.parseEther('2000');
       const expectedGasEstimate1 = '100000';
       const expectedGasEstimate2 = '200000';
 
-      const encoded1 = ethers.utils.defaultAbiCoder.encode(types, [
+      const encoded1 = utils.defaultAbiCoder.encode(types, [
         expectedAmountOut1,
         '100',
         '1',
         expectedGasEstimate1,
       ]);
-      const encoded2 = ethers.utils.defaultAbiCoder.encode(types, [
+      const encoded2 = utils.defaultAbiCoder.encode(types, [
         expectedAmountOut2,
         '100',
         '1',
@@ -211,10 +208,7 @@ describe('getQuotesForRoutes', () => {
         provider,
       );
 
-      const amount: CurrencyAmount<Token> = CurrencyAmount.fromRawAmount(
-        WETH_TEST_TOKEN,
-        '123123',
-      );
+      const amount = newAmount(BigNumber.from('123123'), WETH_TEST_TOKEN);
       const amountOutReceived = await getQuotesForRoutes(
         multicallContract,
         TEST_QUOTER_ADDRESS,

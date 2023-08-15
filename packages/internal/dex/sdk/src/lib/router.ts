@@ -1,8 +1,8 @@
 import { ethers } from 'ethers';
-import { CurrencyAmount, Token, TradeType } from '@uniswap/sdk-core';
+import { Token, TradeType } from '@uniswap/sdk-core';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import { NoRoutesAvailableError } from 'errors';
-import { TokenInfo } from 'types';
+import { Amount, TokenInfo } from 'types';
 import { poolEquals } from './utils';
 import { getQuotesForRoutes, QuoteResult } from './getQuotesForRoutes';
 import { fetchValidPools } from './poolUtils/fetchValidPools';
@@ -19,10 +19,8 @@ export type RoutingContracts = {
 
 export type QuoteTradeInfo = {
   route: Route<Token, Token>;
-  amountIn: ethers.BigNumber;
-  tokenIn: Token;
-  amountOut: ethers.BigNumber;
-  tokenOut: Token;
+  amountIn: Amount;
+  amountOut: Amount;
   tradeType: TradeType;
   gasEstimate: ethers.BigNumber
 };
@@ -45,7 +43,7 @@ export class Router {
   }
 
   public async findOptimalRoute(
-    amountSpecified: CurrencyAmount<Token>,
+    amountSpecified: Amount,
     otherToken: Token,
     tradeType: TradeType,
     maxHops: number = 2,
@@ -60,7 +58,7 @@ export class Router {
       this.routingContracts.multicallAddress,
       this.provider,
     );
-    const erc20Pair: ERC20Pair = [currencyIn.wrapped, currencyOut.wrapped];
+    const erc20Pair: ERC20Pair = [currencyIn, currencyOut];
 
     // Get all pools and use these to get all possible routes.
     const pools = await fetchValidPools(
@@ -106,9 +104,7 @@ export class Router {
     return {
       route,
       amountIn,
-      tokenIn: currencyIn,
       amountOut,
-      tokenOut: currencyOut,
       tradeType,
       gasEstimate,
     };
@@ -117,13 +113,13 @@ export class Router {
   private async getBestQuoteFromRoutes(
     multicallContract: Multicall,
     routes: Route<Token, Token>[],
-    amountSpecified: CurrencyAmount<Token>,
+    amountSpecified: Amount,
     tradeType: TradeType,
   ): Promise<
     {
       route: Route<Token, Token>,
-      amountIn: ethers.BigNumber,
-      amountOut: ethers.BigNumber,
+      amountIn: Amount,
+      amountOut: Amount,
       gasEstimate: ethers.BigNumber
     }> {
     const quotes = await getQuotesForRoutes(
@@ -169,7 +165,7 @@ export class Router {
     let bestQuote = quotes[0];
 
     for (let i = 1; i < quotes.length; i++) {
-      if (quotes[i].amountOut.gt(bestQuote.amountOut)) {
+      if (quotes[i].amountOut.value.gt(bestQuote.amountOut.value)) {
         bestQuote = quotes[i];
       }
     }
@@ -182,7 +178,7 @@ export class Router {
     let bestQuote = quotes[0];
 
     for (let i = 1; i < quotes.length; i++) {
-      if (quotes[i].amountIn.lt(bestQuote.amountIn)) {
+      if (quotes[i].amountIn.value.lt(bestQuote.amountIn.value)) {
         bestQuote = quotes[i];
       }
     }
@@ -193,42 +189,41 @@ export class Router {
   // eslint-disable-next-line class-methods-use-this
   private determineERC20InAndERC20Out(
     tradeType: TradeType,
-    amountSpecified: CurrencyAmount<Token>,
-    otherToken: Token,
-  ): [Token, Token] {
+    amountSpecified: Amount,
+    otherToken: TokenInfo,
+  ): [TokenInfo, TokenInfo] {
     // If the trade type is EXACT INPUT then we have specified the amount for the tokenIn
     return tradeType === TradeType.EXACT_INPUT
-      ? [amountSpecified?.currency, otherToken]
-      : [otherToken, amountSpecified?.currency];
+      ? [amountSpecified.token, otherToken]
+      : [otherToken, amountSpecified.token];
   }
 }
 
 export const generateAllAcyclicPaths = (
-  currencyIn: Token, // the currency we start with
-  currencyOut: Token, // the currency we want to end up with
+  tokenIn: TokenInfo, // the currency we start with
+  tokenOut: TokenInfo, // the currency we want to end up with
   pools: Pool[], // list of all available pools
   maxHops: number, // the maximum number of pools that can be traversed
   currentRoute: Pool[] = [], // list of pools already traversed
   routes: Route<Token, Token>[] = [], // list of all routes found so far
-  startCurrencyIn: Token = currencyIn, // the currency we started with
+  startTokenIn: TokenInfo = tokenIn, // the currency we started with
 ): Route<Token, Token>[] => {
-  const tokenIn = currencyIn.wrapped;
-
-  const tokenOut = currencyOut.wrapped;
-
+  const currencyIn = new Token(tokenIn.chainId, tokenIn.address, tokenIn.decimals);
+  const currencyOut = new Token(tokenOut.chainId, tokenOut.address, tokenOut.decimals);
+  const startCurrencyIn = new Token(startTokenIn.chainId, startTokenIn.address, startTokenIn.decimals);
   for (const pool of pools) {
     // if the pool doesn't have the tokenIn or if it has already been traversed,
     // skip to the next pool
-    const poolHasTokenIn = pool.involvesToken(tokenIn);
+    const poolHasTokenIn = pool.involvesToken(currencyIn);
     const poolHasCycle = currentRoute.find((pathPool) => poolEquals(pool, pathPool));
     // eslint-disable-next-line no-continue
     if (!poolHasTokenIn || poolHasCycle) continue;
 
     // get the output token of the pool
-    const outputToken = pool.token0.equals(tokenIn) ? pool.token1 : pool.token0;
+    const outputToken = pool.token0.equals(currencyIn) ? pool.token1 : pool.token0;
 
     // if we have found a route to the target currency, add it to the list of routes
-    const routeFound = outputToken.equals(tokenOut);
+    const routeFound = outputToken.equals(currencyOut);
     if (routeFound) {
       routes.push(
         new Route([...currentRoute, pool], startCurrencyIn, currencyOut),
@@ -238,12 +233,12 @@ export const generateAllAcyclicPaths = (
       // recursively call this function with the output token as the new starting currency
       generateAllAcyclicPaths(
         outputToken,
-        currencyOut,
+        tokenOut,
         pools,
         maxHops - 1,
         [...currentRoute, pool],
         routes,
-        startCurrencyIn,
+        startTokenIn,
       );
     }
   }
