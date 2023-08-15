@@ -8,7 +8,7 @@ import {
 import { CreateListingParams, ListListingsParams } from 'types';
 import { FulfillmentDataResult } from 'openapi/sdk/models/FulfillmentDataResult';
 import { FulfillmentDataRequest } from 'openapi/sdk/models/FulfillmentDataRequest';
-import { ItemType, SEAPORT_CONTRACT_VERSION_V1_4 } from '../seaport';
+import { ItemType, SEAPORT_CONTRACT_VERSION_V1_5 } from '../seaport';
 
 export class ImmutableApiClient {
   constructor(
@@ -95,7 +95,7 @@ export class ImmutableApiClient {
           order_type: CreateOrderProtocolData.order_type.FULL_RESTRICTED,
           zone_address: orderComponents.zone,
           seaport_address: this.seaportAddress,
-          seaport_version: SEAPORT_CONTRACT_VERSION_V1_4,
+          seaport_version: SEAPORT_CONTRACT_VERSION_V1_5,
           counter: orderComponents.counter.toString(),
         },
         salt: orderComponents.salt,

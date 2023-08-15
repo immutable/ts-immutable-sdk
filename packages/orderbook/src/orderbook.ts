@@ -164,7 +164,7 @@ export class Orderbook {
       fee: undefined,
     }]);
 
-    if (fulfillmentDataRes.result.length !== 0) {
+    if (fulfillmentDataRes.result.length !== 1) {
       throw new Error('unexpected fulfillment data result length');
     }
 
