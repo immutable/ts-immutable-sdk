@@ -128,7 +128,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       expectToBeDefined(approval?.transaction.data);
 
       const decodedResults = erc20ContractInterface.decodeFunctionData('approve', approval.transaction.data);
-      const approvalAmount: string = decodedResults[1].toString();
+      const approvalAmount: unknown = decodedResults[1].toString();
 
       expect(approvalAmount).toEqual('104030000000000000000'); // want 104.3
       expect(approval.transaction.to).toEqual(params.inputToken);
@@ -159,7 +159,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       expectToBeDefined(approval?.transaction.data);
 
       const decodedResults = erc20ContractInterface.decodeFunctionData('approve', approval.transaction.data);
-      const spenderAddress: string = decodedResults[0].toString();
+      const spenderAddress: unknown = decodedResults[0].toString();
 
       expect(spenderAddress).toEqual(TEST_SECONDARY_FEE_ADDRESS);
     });
@@ -280,7 +280,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       expectToBeDefined(approval?.transaction.data);
 
       const decodedResults = erc20ContractInterface.decodeFunctionData('approve', approval.transaction.data);
-      const spenderAddress: string = decodedResults[0].toString();
+      const spenderAddress: unknown = decodedResults[0].toString();
 
       expect(spenderAddress).toEqual(TEST_PERIPHERY_ROUTER_ADDRESS);
     });

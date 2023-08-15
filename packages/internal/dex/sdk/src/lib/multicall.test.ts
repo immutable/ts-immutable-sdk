@@ -99,11 +99,11 @@ describe('multicallSingleCallDataMultipleContracts', () => {
 
       const encodedToken0First = result.returnData[0].returnData;
       const encodedToken0Second = result.returnData[1].returnData;
-      const decodedToken0First = ethers.utils.defaultAbiCoder.decode(
+      const decodedToken0First: unknown = ethers.utils.defaultAbiCoder.decode(
         ['address'],
         encodedToken0First,
       )[0];
-      const decodedToken0Second = ethers.utils.defaultAbiCoder.decode(
+      const decodedToken0Second: unknown = ethers.utils.defaultAbiCoder.decode(
         ['address'],
         encodedToken0Second,
       )[0];
