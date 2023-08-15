@@ -6,14 +6,18 @@ import {
   PopulatedTransaction, providers,
 } from 'ethers';
 import {
+  Action,
+  ActionType,
   ERC20Item,
   ERC721Item,
   FulfillOrderResponse,
   NativeItem,
   PrepareListingResponse,
   RoyaltyInfo,
+  SignableAction,
+  SignablePurpose,
   TransactionAction,
-  TransactionType,
+  TransactionPurpose,
 } from 'types';
 import { Order } from 'openapi/sdk';
 import {
@@ -44,7 +48,7 @@ export class Seaport {
     orderStart: Date,
     orderExpiry: Date,
   ): Promise<PrepareListingResponse> {
-    const { actions } = await this.createSeaportOrder(
+    const { actions: seaportActions } = await this.createSeaportOrder(
       offerer,
       listingItem,
       considerationItem,
@@ -53,19 +57,20 @@ export class Seaport {
       orderExpiry,
     );
 
-    const listingActions: TransactionAction[] = [];
+    const listingActions: Action[] = [];
 
-    const approvalAction = actions
+    const approvalAction = seaportActions
       .find((action) => action.type === 'approval') as ApprovalAction | undefined;
 
     if (approvalAction) {
       listingActions.push({
+        type: ActionType.TRANSACTION,
+        purpose: TransactionPurpose.APPROVAL,
         buildTransaction: prepareTransaction(approvalAction.transactionMethods),
-        transactionType: TransactionType.APPROVAL,
       });
     }
 
-    const createAction: CreateOrderAction | undefined = actions
+    const createAction: CreateOrderAction | undefined = seaportActions
       .find((action) => action.type === 'create') as CreateOrderAction | undefined;
 
     if (!createAction) {
@@ -75,9 +80,14 @@ export class Seaport {
     const orderMessageToSign = await createAction.getMessageToSign();
     const orderComponents = getOrderComponentsFromMessage(orderMessageToSign);
 
+    listingActions.push({
+      type: ActionType.SIGNABLE,
+      purpose: SignablePurpose.CREATE_LISTING,
+      message: await this.getTypedDataFromOrderComponents(orderComponents),
+    });
+
     return {
       actions: listingActions,
-      typedOrderMessageForSigning: await this.getTypedDataFromOrderComponents(orderComponents),
       orderComponents,
       orderHash: this.getSeaportLib().getOrderHash(orderComponents),
     };
@@ -91,7 +101,7 @@ export class Seaport {
     const orderComponents = await this.mapImmutableOrderToSeaportOrderComponents(order);
     const seaportLib = this.getSeaportLib(order);
 
-    const { actions } = await seaportLib.fulfillOrders({
+    const { actions: seaportActions } = await seaportLib.fulfillOrders({
       accountAddress: account,
       fulfillOrderDetails: [{
         order: {
@@ -104,17 +114,18 @@ export class Seaport {
 
     const fulfillmentActions: TransactionAction[] = [];
 
-    const approvalAction = actions
+    const approvalAction = seaportActions
       .find((action) => action.type === 'approval') as ApprovalAction | undefined;
 
     if (approvalAction) {
       fulfillmentActions.push({
+        type: ActionType.TRANSACTION,
         buildTransaction: prepareTransaction(approvalAction.transactionMethods),
-        transactionType: TransactionType.APPROVAL,
+        purpose: TransactionPurpose.APPROVAL,
       });
     }
 
-    const fulfilOrderAction: ExchangeAction | undefined = actions
+    const fulfilOrderAction: ExchangeAction | undefined = seaportActions
       .find((action) => action.type === 'exchange') as ExchangeAction | undefined;
 
     if (!fulfilOrderAction) {
@@ -122,8 +133,9 @@ export class Seaport {
     }
 
     fulfillmentActions.push({
+      type: ActionType.TRANSACTION,
       buildTransaction: prepareTransaction(fulfilOrderAction.transactionMethods),
-      transactionType: TransactionType.FULFILL_ORDER,
+      purpose: TransactionPurpose.FULFILL_ORDER,
     });
 
     return { actions: fulfillmentActions };
@@ -186,7 +198,7 @@ export class Seaport {
 
   private async getTypedDataFromOrderComponents(
     orderComponents: OrderComponents,
-  ): Promise<PrepareListingResponse['typedOrderMessageForSigning']> {
+  ): Promise<SignableAction['message']> {
     const { chainId } = await this.provider.getNetwork();
 
     const domainData = {

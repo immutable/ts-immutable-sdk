@@ -1,54 +1,53 @@
 import { BASIS_POINT_PRECISION } from 'constants/router';
-import { ethers } from 'ethers';
+import { BigNumber } from 'ethers';
 import {
-  Fee, SecondaryFee, TokenInfo, newAmount,
+  Amount,
+  Fee, SecondaryFee, TokenInfo, addAmount, newAmount, subtractAmount,
 } from 'lib';
 
 export class Fees {
   private secondaryFees: SecondaryFee[];
 
-  private token: TokenInfo;
-
-  private amount: ethers.BigNumber = ethers.BigNumber.from(0);
+  private amount: Amount;
 
   constructor(secondaryFees: SecondaryFee[], token: TokenInfo) {
     this.secondaryFees = secondaryFees;
-    this.token = token;
+    this.amount = { token, value: BigNumber.from(0) };
   }
 
-  addAmount(amount: ethers.BigNumber): void {
-    this.amount = this.amount.add(amount);
+  addAmount(amount: Amount): void {
+    this.amount = addAmount(this.amount, amount);
   }
 
-  amountWithFeesApplied(): ethers.BigNumber {
-    return this.amount.add(this.total());
+  amountWithFeesApplied(): Amount {
+    return addAmount(this.amount, this.total());
   }
 
-  amountLessFees(): ethers.BigNumber {
-    return this.amount.sub(this.total());
+  amountLessFees(): Amount {
+    return subtractAmount(this.amount, this.total());
   }
 
   withAmounts(): Fee[] {
     return this.secondaryFees.map((fee) => {
-      const feeAmount = this.amount
+      const feeAmount = this.amount.value
         .mul(fee.feeBasisPoints)
         .div(BASIS_POINT_PRECISION);
 
       return {
         ...fee,
-        amount: newAmount(feeAmount, this.token),
+        amount: newAmount(feeAmount, this.amount.token),
       };
     });
   }
 
-  private total(): ethers.BigNumber {
-    let totalFees = ethers.BigNumber.from(0);
+  private total(): Amount {
+    let totalFees = newAmount(BigNumber.from(0), this.amount.token);
 
-    for (let i = 0; i < this.secondaryFees.length; i++) {
-      const feeAmount = this.amount
-        .mul(this.secondaryFees[i].feeBasisPoints)
+    for (const fee of this.secondaryFees) {
+      const feeAmount = this.amount.value
+        .mul(fee.feeBasisPoints)
         .div(BASIS_POINT_PRECISION);
-      totalFees = totalFees.add(feeAmount);
+      totalFees = addAmount(totalFees, newAmount(feeAmount, this.amount.token));
     }
 
     return totalFees;

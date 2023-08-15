@@ -1,5 +1,5 @@
 import { Route, SwapQuoter } from '@uniswap/v3-sdk';
-import { Currency, TradeType, CurrencyAmount } from '@uniswap/sdk-core';
+import { TradeType, CurrencyAmount, Token } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
 import { ProviderCallError } from 'errors';
 import { multicallMultipleCallDataSingContract, MulticallResponse } from './multicall';
@@ -10,7 +10,7 @@ const amountIndex = 0;
 const gasEstimateIndex = 3;
 
 export type QuoteResult = {
-  route: Route<Currency, Currency>;
+  route: Route<Token, Token>;
   gasEstimate: ethers.BigNumber
   amountIn: ethers.BigNumber;
   amountOut: ethers.BigNumber;
@@ -19,8 +19,8 @@ export type QuoteResult = {
 export async function getQuotesForRoutes(
   multicallContract: Multicall,
   quoterContractAddress: string,
-  routes: Route<Currency, Currency>[],
-  amountSpecified: CurrencyAmount<Currency>,
+  routes: Route<Token, Token>[],
+  amountSpecified: CurrencyAmount<Token>,
   tradeType: TradeType,
 ): Promise<QuoteResult[]> {
   const callData = routes.map(

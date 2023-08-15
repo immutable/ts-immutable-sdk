@@ -1,12 +1,13 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { ChainId, Checkout } from '@imtbl/checkout-sdk';
+import { ChainId, Checkout, WalletProviderName } from '@imtbl/checkout-sdk';
 import {
-  useContext, useState, useCallback, useMemo,
+  useContext, useState, useCallback, useMemo, useEffect,
 } from 'react';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../../components/Footer/FooterButton';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { MetamaskConnectHero } from '../../../components/Hero/MetamaskConnectHero';
+import { PassportConnectHero } from '../../../components/Hero/PassportConnectHero';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { text } from '../../../resources/text/textConfig';
@@ -25,12 +26,49 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
     connectDispatch,
   } = useContext(ConnectContext);
   const { viewState: { history }, viewDispatch } = useContext(ViewContext);
-  const { body, footer } = text.views[ConnectWidgetViews.READY_TO_CONNECT];
-  const [footerButtonText, setFooterButtonText] = useState(footer.buttonText1);
 
-  function isConnectWidgetView(view:string) {
-    return Object.values(ConnectWidgetViews).includes(view as ConnectWidgetViews);
-  }
+  const isPassport = useMemo(() => (provider?.provider as any)?.isPassport, [provider]);
+  const isMetaMask = useMemo(() => provider?.provider?.isMetaMask, [provider]);
+
+  // make sure wallet provider name is set if coming directly to this screen
+  // and not through the wallet list
+  useEffect(() => {
+    if (isPassport) {
+      connectDispatch({
+        payload: {
+          type: ConnectActions.SET_WALLET_PROVIDER_NAME,
+          walletProviderName: WalletProviderName.PASSPORT,
+        },
+      });
+    }
+    if (isMetaMask) {
+      connectDispatch({
+        payload: {
+          type: ConnectActions.SET_WALLET_PROVIDER_NAME,
+          walletProviderName: WalletProviderName.METAMASK,
+        },
+      });
+    }
+  }, [isPassport, isMetaMask]);
+
+  const textView = () => {
+    if (isPassport) {
+      return text.views[ConnectWidgetViews.READY_TO_CONNECT].passport;
+    }
+    return text.views[ConnectWidgetViews.READY_TO_CONNECT].metamask;
+  };
+  const { header } = text.views[ConnectWidgetViews.READY_TO_CONNECT];
+  const { body, footer } = textView();
+  const [footerButtonText, setFooterButtonText] = useState(footer.buttonText1);
+  const [loading, setLoading] = useState(false);
+  const heroContent = () => {
+    if (isPassport) {
+      return <PassportConnectHero />;
+    }
+    return <MetamaskConnectHero />;
+  };
+
+  const isConnectWidgetView = (view:string) => Object.values(ConnectWidgetViews).includes(view as ConnectWidgetViews);
 
   const showBackButton = useMemo(() => {
     if (history.length <= 1) return false;
@@ -66,6 +104,8 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
   };
 
   const onConnectClick = useCallback(async () => {
+    if (loading) return;
+    setLoading(true);
     if (checkout && provider) {
       try {
         const connectResult = await checkout.connect({
@@ -80,6 +120,7 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
         });
         handleConnectViewUpdate(checkout, provider);
       } catch (err: any) {
+        setLoading(false);
         setFooterButtonText(footer.buttonText2);
       }
     }
@@ -91,15 +132,16 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
       header={(
         <HeaderNavigation
           showBack={showBackButton}
-          title=""
+          title={header.title}
           transparent
           onCloseButtonClick={sendCloseEvent}
         />
       )}
       floatHeader
-      heroContent={<MetamaskConnectHero />}
+      heroContent={heroContent()}
       footer={(
         <FooterButton
+          loading={loading}
           actionText={footerButtonText}
           onActionClick={onConnectClick}
         />
