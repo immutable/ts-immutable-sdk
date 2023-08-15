@@ -1,5 +1,5 @@
 import { Token, TradeType } from '@uniswap/sdk-core';
-import { ethers } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 import JSBI from 'jsbi';
 import { Pool, Route, TickMath } from '@uniswap/v3-sdk';
 import { SwapRouter } from '@uniswap/router-sdk';
@@ -15,8 +15,8 @@ import {
   uniswapTokenToTokenInfo,
 } from '../lib';
 
-export const TEST_GAS_PRICE = ethers.BigNumber.from('1500000000'); // 1.5 gwei or 1500000000 wei
-export const TEST_TRANSACTION_GAS_USAGE = ethers.BigNumber.from('200000'); // 200,000 gas units
+export const TEST_GAS_PRICE = BigNumber.from('1500000000'); // 1.5 gwei or 1500000000 wei
+export const TEST_TRANSACTION_GAS_USAGE = BigNumber.from('200000'); // 200,000 gas units
 
 export const TEST_CHAIN_ID = 999;
 export const TEST_RPC_URL = 'https://0.net';
@@ -137,9 +137,9 @@ export function uniqBy<K, T extends string | number>(
 export function decodePathForExactInput(path: string) {
   return {
     inputToken: path.substring(0, 42),
-    firstPoolFee: ethers.BigNumber.from(parseInt(`0x${path.substring(42, 48)}`, 16)),
+    firstPoolFee: BigNumber.from(parseInt(`0x${path.substring(42, 48)}`, 16)),
     intermediaryToken: `0x${path.substring(48, 88)}`,
-    secondPoolFee: ethers.BigNumber.from(parseInt(`0x${path.substring(88, 94)}`, 16)),
+    secondPoolFee: BigNumber.from(parseInt(`0x${path.substring(88, 94)}`, 16)),
     outputToken: `0x${path.substring(94, 134)}`,
   };
 }
@@ -147,9 +147,9 @@ export function decodePathForExactInput(path: string) {
 export function decodePathForExactOutput(path: string) {
   return {
     outputToken: path.substring(0, 42),
-    firstPoolFee: ethers.BigNumber.from(parseInt(`0x${path.substring(42, 48)}`, 16)),
+    firstPoolFee: BigNumber.from(parseInt(`0x${path.substring(42, 48)}`, 16)),
     intermediaryToken: `0x${path.substring(48, 88)}`,
-    secondPoolFee: ethers.BigNumber.from(parseInt(`0x${path.substring(88, 94)}`, 16)),
+    secondPoolFee: BigNumber.from(parseInt(`0x${path.substring(88, 94)}`, 16)),
     inputToken: `0x${path.substring(94, 134)}`,
   };
 }
@@ -161,7 +161,7 @@ type SecondaryFeeFunctionName = 'exactInputSingleWithServiceFee' |
 
 type SwapRouterFunctionName = 'exactInputSingle' | 'exactOutputSingle';
 
-function decodeSecondaryFeeCall(calldata: ethers.utils.BytesLike, functionName: SecondaryFeeFunctionName) {
+function decodeSecondaryFeeCall(calldata: utils.BytesLike, functionName: SecondaryFeeFunctionName) {
   const iface = SecondaryFee__factory.createInterface();
   const topLevelParams = iface.decodeFunctionData('multicall(uint256,bytes[])', calldata);
 
@@ -171,7 +171,7 @@ function decodeSecondaryFeeCall(calldata: ethers.utils.BytesLike, functionName: 
   );
 }
 
-function decodeSwapRouterCall(calldata: ethers.utils.BytesLike, functionName: SwapRouterFunctionName) {
+function decodeSwapRouterCall(calldata: utils.BytesLike, functionName: SwapRouterFunctionName) {
   const iface = SwapRouter.INTERFACE;
   const topLevelParams = iface.decodeFunctionData('multicall(uint256,bytes[])', calldata);
 
@@ -181,7 +181,7 @@ function decodeSwapRouterCall(calldata: ethers.utils.BytesLike, functionName: Sw
   );
 }
 
-export function decodeMulticallExactInputWithFees(data: ethers.utils.BytesLike) {
+export function decodeMulticallExactInputWithFees(data: utils.BytesLike) {
   const decodedParams = decodeSecondaryFeeCall(data, 'exactInputWithServiceFee');
 
   const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map((x: [string, number]) => ({
@@ -199,7 +199,7 @@ export function decodeMulticallExactInputWithFees(data: ethers.utils.BytesLike) 
   return { secondaryFeeParams, swapParams };
 }
 
-export function decodeMulticallExactOutputWithFees(data: ethers.utils.BytesLike) {
+export function decodeMulticallExactOutputWithFees(data: utils.BytesLike) {
   const decodedParams = decodeSecondaryFeeCall(data, 'exactOutputWithServiceFee');
 
   const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map((x: [string, number]) => ({
@@ -217,7 +217,7 @@ export function decodeMulticallExactOutputWithFees(data: ethers.utils.BytesLike)
   return { secondaryFeeParams, swapParams };
 }
 
-export function decodeMulticallExactInputSingleWithFees(data: ethers.utils.BytesLike) {
+export function decodeMulticallExactInputSingleWithFees(data: utils.BytesLike) {
   const decodedParams = decodeSecondaryFeeCall(data, 'exactInputSingleWithServiceFee');
 
   const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map((x: [string, number]) => ({
@@ -238,7 +238,7 @@ export function decodeMulticallExactInputSingleWithFees(data: ethers.utils.Bytes
   return { secondaryFeeParams, swapParams };
 }
 
-export function decodeMulticallExactOutputSingleWithFees(data: ethers.utils.BytesLike) {
+export function decodeMulticallExactOutputSingleWithFees(data: utils.BytesLike) {
   const decodedParams = decodeSecondaryFeeCall(data, 'exactOutputSingleWithServiceFee');
 
   const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map((x: [string, number]) => ({
@@ -259,7 +259,7 @@ export function decodeMulticallExactOutputSingleWithFees(data: ethers.utils.Byte
   return { secondaryFeeParams, swapParams };
 }
 
-export function decodeMulticallExactInputSingleWithoutFees(data: ethers.utils.BytesLike) {
+export function decodeMulticallExactInputSingleWithoutFees(data: utils.BytesLike) {
   const decodedParams = decodeSwapRouterCall(data, 'exactInputSingle');
 
   const swapParams: IV3SwapRouter.ExactInputSingleParamsStruct = {
@@ -275,7 +275,7 @@ export function decodeMulticallExactInputSingleWithoutFees(data: ethers.utils.By
   return { swapParams };
 }
 
-export function decodeMulticallExactOutputSingleWithoutFees(data: ethers.utils.BytesLike) {
+export function decodeMulticallExactOutputSingleWithoutFees(data: utils.BytesLike) {
   const decodedParams = decodeSwapRouterCall(data, 'exactOutputSingle');
 
   const swapParams: IV3SwapRouter.ExactOutputSingleParamsStruct = {
@@ -429,5 +429,9 @@ export function expectInstanceOf <T>(className: { new(...args: any[]): T }, x: u
  * @param str Arbitrary string to create the address from
  */
 export function makeAddr(str: string): string {
-  return ethers.utils.keccak256(ethers.utils.toUtf8Bytes(str)).slice(0, 42);
+  return utils.keccak256(utils.toUtf8Bytes(str)).slice(0, 42);
+}
+
+export function formatAmount(amount: Amount): string {
+  return utils.formatUnits(amount.value, amount.token.decimals);
 }

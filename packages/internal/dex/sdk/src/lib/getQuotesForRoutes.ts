@@ -1,10 +1,10 @@
 import { Route, SwapQuoter } from '@uniswap/v3-sdk';
 import { TradeType, Token } from '@uniswap/sdk-core';
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import { ProviderCallError } from 'errors';
 import { Amount } from 'lib';
 import { multicallMultipleCallDataSingContract, MulticallResponse } from './multicall';
-import { quoteReturnMapping, toCurrencyAmount } from './utils';
+import { newAmount, quoteReturnMapping, toCurrencyAmount } from './utils';
 import { Multicall } from '../contracts/types';
 
 const amountIndex = 0;
@@ -74,11 +74,12 @@ export async function getQuotesForRoutes(
     if (decodedQuoteResult) {
       // The 0th element in each decoded data is going to be the amountOut or amountIn.
       const quoteAmount = decodedQuoteResult[amountIndex];
+      if (!(quoteAmount instanceof BigNumber)) throw new Error('');
 
       decodedQuoteResults.push({
         route: routes[i],
-        amountIn: tradeType === TradeType.EXACT_INPUT ? amountSpecified : quoteAmount, // TODO: why no error?
-        amountOut: tradeType === TradeType.EXACT_INPUT ? quoteAmount : amountSpecified,
+        amountIn: tradeType === TradeType.EXACT_INPUT ? amountSpecified : newAmount(quoteAmount, routes[i].input),
+        amountOut: tradeType === TradeType.EXACT_INPUT ? newAmount(quoteAmount, routes[i].output) : amountSpecified,
         gasEstimate: ethers.BigNumber.from(decodedQuoteResult[gasEstimateIndex]),
       });
     }

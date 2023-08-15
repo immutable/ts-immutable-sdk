@@ -14,6 +14,7 @@ import {
   TEST_QUOTER_ADDRESS,
   TEST_RPC_URL,
   WETH_TEST_TOKEN,
+  formatAmount,
 } from '../test/utils';
 import { Multicall__factory } from '../contracts/types';
 import { newAmount } from './utils';
@@ -139,7 +140,8 @@ describe('getQuotesForRoutes', () => {
         TradeType.EXACT_INPUT,
       );
       expect(amountOutReceived.length).toEqual(1);
-      expect(amountOutReceived[0].amountOut.toString()).toEqual(expectedAmountOut.toString());
+      expect(formatAmount(amountOutReceived[0].amountOut)).toEqual(utils.formatEther(expectedAmountOut));
+      expect(formatAmount(amountOutReceived[0].amountIn)).toEqual('0.000000000000123123');
       expect(amountOutReceived[0].gasEstimate.toString()).toEqual(expectedGasEstimate);
     });
   });
@@ -217,12 +219,12 @@ describe('getQuotesForRoutes', () => {
         TradeType.EXACT_INPUT,
       );
       expect(amountOutReceived.length).toBe(2);
-      expect(amountOutReceived[0].amountOut.toString()).toBe(
-        expectedAmountOut1.toString(),
+      expect(formatAmount(amountOutReceived[0].amountOut)).toBe(
+        utils.formatEther(expectedAmountOut1),
       );
       expect(amountOutReceived[0].gasEstimate.toString()).toEqual(expectedGasEstimate1);
-      expect(amountOutReceived[1].amountOut.toString()).toBe(
-        expectedAmountOut2.toString(),
+      expect(formatAmount(amountOutReceived[1].amountOut)).toBe(
+        utils.formatEther(expectedAmountOut2),
       );
       expect(amountOutReceived[1].gasEstimate.toString()).toEqual(expectedGasEstimate2);
     });
