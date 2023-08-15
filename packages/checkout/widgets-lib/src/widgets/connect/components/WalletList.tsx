@@ -6,6 +6,7 @@ import {
   WalletProviderName,
 } from '@imtbl/checkout-sdk';
 import { useContext, useState, useEffect } from 'react';
+import { Web3Provider } from '@ethersproject/providers';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { ConnectContext, ConnectActions } from '../context/ConnectContext';
 import { WalletItem } from './WalletItem';
@@ -43,14 +44,20 @@ export function WalletList(props: WalletListProps) {
   const onWalletClick = async (walletProviderName: WalletProviderName) => {
     if (checkout) {
       try {
-        const { provider } = await checkout.createProvider({
-          walletProvider: walletProviderName,
-        });
+        let web3Provider;
+        if (passport && walletProviderName === WalletProviderName.PASSPORT) {
+          const passportzkEVMProvider = passport?.connectEvm();
+          web3Provider = new Web3Provider(passportzkEVMProvider);
+        } else {
+          web3Provider = await checkout.createProvider({
+            walletProvider: walletProviderName,
+          });
+        }
 
         connectDispatch({
           payload: {
             type: ConnectActions.SET_PROVIDER,
-            provider,
+            provider: web3Provider,
           },
         });
         connectDispatch({
