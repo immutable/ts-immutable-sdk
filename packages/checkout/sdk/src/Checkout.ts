@@ -269,7 +269,7 @@ export class Checkout {
   public async buy(
     params: BuyParams,
   ): Promise<void> {
-    if (this.config.environment === Environment.PRODUCTION) {
+    if (this.config.isProduction) {
       throw new Error('This endpoint is not currently available.');
     }
 
@@ -291,7 +291,7 @@ export class Checkout {
   public async smartCheckout(
     params: SmartCheckoutParams,
   ): Promise<void> {
-    if (this.config.environment === Environment.PRODUCTION) {
+    if (this.config.isProduction) {
       throw new Error('This endpoint is not currently available.');
     }
 
