@@ -17,7 +17,6 @@ Table of contents
     - [Adding your project](#adding-your-project)
     - [Link packages to each other](#link-packages-to-each-other)
     - [Generate OpenAPI clients](#generate-openapi-clients)
-    - [Generate SDK Reference Documentation](#generate-sdk-reference-documentation)
     - [Building](#building)
     - [Linting](#linting)
       - [ESLint Tooling](#eslint-tooling)
@@ -33,6 +32,8 @@ Table of contents
         - [**Run ALL test suites (mimicking what our CI workflow does)**](#run-all-test-suites-mimicking-what-our-ci-workflow-does)
         - [**Run test suites specific to a package**](#run-test-suites-specific-to-a-package)
       - [Writing tests](#writing-tests)
+    - [Generate SDK Reference Documentation](#generate-sdk-reference-documentation)
+    - [Releasing](#releasing)
     - [Versioning \& Changelog](#versioning--changelog)
   - [Disclaimer for Alpha Releases](#disclaimer-for-alpha-releases)
 
@@ -97,20 +98,6 @@ In order to regenerate these clients with updated spec files, follow the steps b
     ```
 
 1. If all good, commit the code and create PR, get review from the code-owners of the corresponding APIs.
-
-### Generate SDK Reference Documentation
-
-From a clean checkout, run:
-
-```
-
-yarn
-yarn build
-yarn docs:build
-
-```
-
-To view the docs locally, run: `yarn docs:serve`
 
 ### Building
 
@@ -236,7 +223,76 @@ We are currently not enforcing a preference for testing practices. It is complet
 
 The root [`package.json`](package.json) is the entry point for all CI testing purposes. Therefore, if you wish to write tests for an existing or new package, please ensure that a `"test"` script exists in the associated `package.json` file so that it is picked up by the [`root "test" command.`](package.json#L19)
 
-### Versioning & Changelog
+### Generate SDK Reference Documentation
+
+From a clean checkout, run:
+
+```sh
+yarn
+yarn build
+yarn docs:build
+```
+
+To view the docs locally, run: `yarn docs:serve`
+
+### Releasing
+
+To release a new version of the SDK, you can use the `Publish to NPM` [GitHub Action](https://github.com/immutable/ts-immutable-sdk/actions/workflows/publish.yaml). This will publish the SDK to NPM, and also create a new GitHub release/tag.
+
+To use this action, you will need to:
+  - Go to the [GitHub Actions Workflow](https://github.com/immutable/ts-immutable-sdk/actions/workflows/publish.yaml) page for this repo
+  - Click on the `Run workflow` button
+  - Select the branch you want to release from (usually `main`)
+    - `alpha` releases can be done from any branch, but `release`s must be done from `main`
+  - Select the `Release Type` (either `alpha`, or `release`)
+  - Select the `Upgrade Type` (either `none`, `patch`, `minor`, or `major`)
+    - See [Versioning](#versioning) for more information on this
+  - Click the green `Run workflow` button
+
+#### Dry Run
+
+You can optionally do a dry run by checking the `Dry run` checkbox. This will run the workflow, but not publish the SDK to NPM, or create a new GitHub release/tag. This is useful to see what the workflow will tag the next release version as, before actually releasing it.
+
+#### Versioning
+
+When releasing a new version of the SDK, you will need to specify the `Upgrade Type` (either `none`, `patch`, `minor`, or `major`). This will determine what the next version of the SDK will be based off the existing [tags in the repo](https://github.com/immutable/ts-immutable-sdk/tags).
+
+The `Publish to NPM` workflow will update the version in the top level `package.json` and push it back to the `main` branch.
+
+Selecting `Release Type` of `release` and an `Upgrade Type` other than `none` will bump the chosen version of the SDK. Note, if the previous version is an `alpha` version, the next version will be based off the alpha version.
+
+For example, given the latest tag of `0.8.0-alpha` and selecting patch as the `Upgrade Type`: `0.8.0-alpha` -> `0.9.0`
+
+#### Alpha Versioning
+
+Selecting `alpha` and a `Upgrade Type` other than `none` will create a new `alpha` release and bump the version.
+
+For example, create a minor alpha release selecting a `Upgrade Type` of `minor`: `0.8.0` -> `0.9.0-alpha`
+
+Use the `none` upgrade type to bump an alpha: `0.8.0-alpha` -> `0.8.0-alpha.1`
+
+#### Updated SDK Reference Documentation
+
+When the `Publish to NPM` workflow successfully runs, it will trigger the `Publish SDK Reference Docs` GitHub Action. This will build the SDK reference documentation, similar to the steps in [Generate SDK Reference Documentation](#generate-sdk-reference-documentation), and push the changes to the `imx-docs` repo and create a PR for you to review.
+
+The PR will add the user that initated the `Publish to NPM` workflow as a reviewer, so you can review the changes and merge the PR.
+
+Look for a PR with the title `Release SDK reference docs vX.X.X` in the [imx-docs repo](https://github.com/immutable/imx-docs/pulls)
+
+Note, the docs will only be updated if the `Publish to NPM` workflow is run with a `Release Type` of `release`.
+
+### Changelog
+
+Add your changes to the [CHANGELOG.md](CHANGELOG.md) file under the `[Unreleased]` section under the appropriate subheading:
+
+- `### [Added]` - for new features
+- `### [Changed]` - for changes in existing functionality
+- `### [Deprecated]` - for soon-to-be removed features
+- `### [Removed]` - for now removed features
+- `### [Fixed]` - for any bug fixes
+- `### [Security]` - in case of vulnerabilities
+
+The `[Unreleased]` title will be updated by the `Publish to NPM` workflow to the next version number and pushed back to the `main` branch.
 
 ## Disclaimer for Alpha Releases
 
