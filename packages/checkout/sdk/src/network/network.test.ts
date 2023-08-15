@@ -28,6 +28,10 @@ let windowSpy: any;
 const providerMock = {
   request: jest.fn(),
 };
+const passportProviderMock = {
+  ...providerMock,
+  isPassport: true,
+};
 const ethNetworkInfo = {
   name: ChainName.ETHEREUM,
   chainId: ChainId.ETHEREUM,
@@ -345,6 +349,19 @@ describe('network functions', () => {
           },
         ],
       });
+    });
+
+    it('should throw an error when switch network is called with a passport provider', async () => {
+      try {
+        await switchWalletNetwork(
+          testCheckoutConfiguration,
+          { provider: passportProviderMock } as unknown as Web3Provider,
+          ChainId.SEPOLIA,
+        );
+      } catch (err: any) {
+        expect(err.message).toBe('Switching networks with Passport provider is not supported');
+        expect(err.type).toBe(CheckoutErrorType.SWITCH_NETWORK_UNSUPPORTED);
+      }
     });
   });
 
