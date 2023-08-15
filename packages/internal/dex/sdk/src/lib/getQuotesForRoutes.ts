@@ -59,29 +59,28 @@ export async function getQuotesForRoutes(
       continue;
     }
 
-    let decodedQuoteResult: ethers.utils.Result | undefined;
     try {
-      decodedQuoteResult = ethers.utils.defaultAbiCoder.decode(
+      const decodedQuoteResult = ethers.utils.defaultAbiCoder.decode(
         returnTypes,
         quoteResults.returnData[i].returnData,
       );
+
+      if (decodedQuoteResult) {
+        // The 0th element in each decoded data is going to be the amountOut or amountIn.
+        const quoteAmount = decodedQuoteResult[amountIndex];
+        if (!(quoteAmount instanceof BigNumber)) throw new Error('Expected BigNumber');
+
+        decodedQuoteResults.push({
+          route: routes[i],
+          amountIn: tradeType === TradeType.EXACT_INPUT ? amountSpecified : newAmount(quoteAmount, routes[i].input),
+          amountOut: tradeType === TradeType.EXACT_INPUT ? newAmount(quoteAmount, routes[i].output) : amountSpecified,
+          gasEstimate: ethers.BigNumber.from(decodedQuoteResult[gasEstimateIndex]),
+        });
+      }
     } catch {
       // Failed to get the quote for this particular route
       // Other quotes for routes may still succeed, so do nothing
       // and continue processing
-    }
-
-    if (decodedQuoteResult) {
-      // The 0th element in each decoded data is going to be the amountOut or amountIn.
-      const quoteAmount = decodedQuoteResult[amountIndex];
-      if (!(quoteAmount instanceof BigNumber)) throw new Error('');
-
-      decodedQuoteResults.push({
-        route: routes[i],
-        amountIn: tradeType === TradeType.EXACT_INPUT ? amountSpecified : newAmount(quoteAmount, routes[i].input),
-        amountOut: tradeType === TradeType.EXACT_INPUT ? newAmount(quoteAmount, routes[i].output) : amountSpecified,
-        gasEstimate: ethers.BigNumber.from(decodedQuoteResult[gasEstimateIndex]),
-      });
     }
   }
 

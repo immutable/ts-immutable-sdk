@@ -164,21 +164,19 @@ type SwapRouterFunctionName = 'exactInputSingle' | 'exactOutputSingle';
 function decodeSecondaryFeeCall(calldata: utils.BytesLike, functionName: SecondaryFeeFunctionName) {
   const iface = SecondaryFee__factory.createInterface();
   const topLevelParams = iface.decodeFunctionData('multicall(uint256,bytes[])', calldata);
+  const data = topLevelParams.data[0];
+  if (typeof data !== 'string') throw new Error();
 
-  return iface.decodeFunctionData(
-    functionName,
-    topLevelParams.data[0],
-  );
+  return iface.decodeFunctionData(functionName, data);
 }
 
 function decodeSwapRouterCall(calldata: utils.BytesLike, functionName: SwapRouterFunctionName) {
   const iface = SwapRouter.INTERFACE;
   const topLevelParams = iface.decodeFunctionData('multicall(uint256,bytes[])', calldata);
+  const data = topLevelParams.data[0];
+  if (typeof data !== 'string') throw new Error();
 
-  return iface.decodeFunctionData(
-    functionName,
-    topLevelParams.data[0],
-  );
+  return iface.decodeFunctionData(functionName, data);
 }
 
 export function decodeMulticallExactInputWithFees(data: utils.BytesLike) {
