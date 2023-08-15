@@ -219,6 +219,12 @@ describe('balances', () => {
             symbol: 'MATIC',
             decimals: '18',
           },
+          {
+            name: 'NoAddress',
+            address: '',
+            symbol: 'NA',
+            decimals: 18,
+          } as TokenInfo,
         ],
       } as GetTokenAllowListResult);
       (tokens.getTokenAllowList as jest.Mock).mockImplementation(
@@ -244,11 +250,13 @@ describe('balances', () => {
       nameMock = jest
         .fn()
         .mockResolvedValueOnce('Immutable X')
-        .mockResolvedValueOnce('Matic');
+        .mockResolvedValueOnce('Matic')
+        .mockResolvedValueOnce('NoAddress');
       symbolMock = jest
         .fn()
         .mockResolvedValueOnce('IMX')
-        .mockResolvedValueOnce('MATIC');
+        .mockResolvedValueOnce('MATIC')
+        .mockResolvedValueOnce('NA');
       (Contract as unknown as jest.Mock).mockReturnValue({
         balanceOf: balanceOfMock,
         decimals: decimalsMock,

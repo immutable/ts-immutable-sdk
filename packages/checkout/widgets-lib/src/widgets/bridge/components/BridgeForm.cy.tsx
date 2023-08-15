@@ -16,6 +16,7 @@ import { ConnectionStatus } from '../../../context/connect-loader-context/Connec
 import {
   ConnectLoaderTestComponent,
 } from '../../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
+import { NATIVE } from '../../../lib';
 
 describe('Bridge Form', () => {
   let bridgeState;
@@ -158,25 +159,24 @@ describe('Bridge Form', () => {
     cySmartGet(`bridge-token-coin-selector__option-imx-${imxAddress}`).should('exist');
   });
 
-  // Uncomment when NATIVE supported as part of bridge
-  // it('should set token to the native token when native passed in as from token', () => {
-  //   mount(
-  //     <BridgeWidgetTestComponent
-  //       initialStateOverride={bridgeState}
-  //       cryptoConversionsOverride={cryptoConversions}
-  //     >
-  //       <BridgeForm
-  //         testId="bridge-form"
-  //         defaultFromContractAddress="NATIVE"
-  //       />
-  //     </BridgeWidgetTestComponent>,
-  //   );
+  it('should set token to the native token when native passed in as from token', () => {
+    mount(
+      <BridgeWidgetTestComponent
+        initialStateOverride={bridgeState}
+        cryptoConversionsOverride={cryptoConversions}
+      >
+        <BridgeForm
+          testId="bridge-form"
+          defaultFromContractAddress={NATIVE}
+        />
+      </BridgeWidgetTestComponent>,
+    );
 
-  //   cySmartGet('bridge-token-select__target__controlledLabel').should('have.text', 'ETH');
-  // });
+    cySmartGet('bridge-token-select__target__controlledLabel').should('have.text', 'ETH');
+  });
 
   it('should set defaults when provided and ignore casing on token address', () => {
-    cy.stub(TokenBridge.prototype, 'getUnsignedApproveBridgeTx').as('getUnsignedApproveBridgeTxStub')
+    cy.stub(TokenBridge.prototype, 'getUnsignedApproveDepositBridgeTx').as('getUnsignedApproveDepositBridgeTxStub')
       .resolves({
         required: true,
         unsignedTx: {},
@@ -204,8 +204,8 @@ describe('Bridge Form', () => {
   });
 
   describe('Bridge Form submit', () => {
-    it('should submit bridge and make required sdk calls', () => {
-      cy.stub(TokenBridge.prototype, 'getUnsignedApproveBridgeTx').as('getUnsignedApproveBridgeTxStub')
+    it('should submit bridge and make required sdk calls for erc20', () => {
+      cy.stub(TokenBridge.prototype, 'getUnsignedApproveDepositBridgeTx').as('getUnsignedApproveDepositBridgeTxStub')
         .resolves({
           required: true,
           unsignedTx: {},
@@ -260,11 +260,94 @@ describe('Bridge Form', () => {
 
       cySmartGet('bridge-form-button').click();
 
-      // assert on viewDispatch to have dispatched an action for BridgeWidgetViews.APPROVE_ERC20
+      cySmartGet('@getUnsignedApproveDepositBridgeTxStub').should('have.been.calledOnce')
+        .should('have.been.calledWith', {
+          depositorAddress: '0x123',
+          token: imxAddress,
+          depositAmount: utils.parseUnits('0.1', 18),
+        });
+
+      cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce').should('have.been.calledWith', {
+        depositorAddress: '0x123',
+        recipientAddress: '0x123',
+        token: imxAddress,
+        depositAmount: utils.parseUnits('0.1', 18),
+      });
+    });
+
+    it('should submit bridge and make required sdk calls for native token', () => {
+      cy.stub(TokenBridge.prototype, 'getUnsignedApproveDepositBridgeTx').as('getUnsignedApproveDepositBridgeTxStub')
+        .resolves({
+          required: true,
+          unsignedTx: {},
+        });
+
+      cy.stub(TokenBridge.prototype, 'getUnsignedDepositTx').as('getUnsignedDepositTxStub')
+        .resolves({
+          required: true,
+          unsignedTx: {},
+        });
+
+      cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub')
+        .onFirstCall()
+        .resolves({
+          transactionResponse: {
+            wait: () => ({
+              status: 1,
+            }),
+          },
+        })
+        .onSecondCall()
+        .resolves({
+          transactionResponse: {
+            wait: () => ({
+              status: 1,
+            }),
+          },
+        });
+
+      mount(
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <BridgeWidgetTestComponent
+            initialStateOverride={bridgeState}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <BridgeForm
+              testId="bridge-form"
+            />
+          </BridgeWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
+      );
+
+      cySmartGet('bridge-token-select__target').click();
+      cySmartGet('bridge-token-coin-selector__option-eth').click();
+      cySmartGet('bridge-amount-text__input').type('0.1');
+      cySmartGet('bridge-amount-text__input').blur();
+
+      cySmartGet('@gasEstimateStub').should('have.been.called');
+      cy.wait(1000);
+
+      cySmartGet('bridge-form-button').click();
+
+      cySmartGet('@getUnsignedApproveDepositBridgeTxStub').should('have.been.calledOnce')
+        .should('have.been.calledWith', {
+          depositorAddress: '0x123',
+          token: NATIVE,
+          depositAmount: utils.parseUnits('0.1', 18),
+        });
+
+      cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce').should('have.been.calledWith', {
+        depositorAddress: '0x123',
+        recipientAddress: '0x123',
+        token: NATIVE,
+        depositAmount: utils.parseUnits('0.1', 18),
+      });
     });
 
     it('should submit bridge and skip approval if not required', () => {
-      cy.stub(TokenBridge.prototype, 'getUnsignedApproveBridgeTx').as('getUnsignedApproveBridgeTxStub')
+      cy.stub(TokenBridge.prototype, 'getUnsignedApproveDepositBridgeTx').as('getUnsignedApproveDepositBridgeTxStub')
         .resolves({
           required: false,
         });
@@ -305,11 +388,12 @@ describe('Bridge Form', () => {
       cySmartGet('bridge-amount-text__input').blur();
       cySmartGet('bridge-form-button').click();
 
-      cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce').should('have.been.calledWith', {
-        depositorAddress: '0x123',
-        token: imxAddress,
-        depositAmount: utils.parseUnits('0.1', 18),
-      });
+      cySmartGet('@getUnsignedApproveDepositBridgeTxStub').should('have.been.calledOnce')
+        .should('have.been.calledWith', {
+          depositorAddress: '0x123',
+          token: imxAddress,
+          depositAmount: utils.parseUnits('0.1', 18),
+        });
 
       cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce').should('have.been.calledWith', {
         depositorAddress: '0x123',
@@ -328,7 +412,7 @@ describe('Bridge Form', () => {
 
     describe('when approval transaction is not required and user rejected signing the bridge transaction', () => {
       beforeEach(() => {
-        cy.stub(TokenBridge.prototype, 'getUnsignedApproveBridgeTx').as('getUnsignedApproveBridgeTxStub')
+        cy.stub(TokenBridge.prototype, 'getUnsignedApproveDepositBridgeTx').as('getUnsignedApproveDepositBridgeTxStub')
           .resolves({
             required: false,
           });
@@ -367,11 +451,12 @@ describe('Bridge Form', () => {
         cySmartGet('bridge-amount-text__input').blur();
         cySmartGet('bridge-form-button').click();
 
-        cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce').should('have.been.calledWith', {
-          depositorAddress: '0x123',
-          token: imxAddress,
-          depositAmount: utils.parseUnits('0.1', 18),
-        });
+        cySmartGet('@getUnsignedApproveDepositBridgeTxStub').should('have.been.calledOnce')
+          .should('have.been.calledWith', {
+            depositorAddress: '0x123',
+            token: imxAddress,
+            depositAmount: utils.parseUnits('0.1', 18),
+          });
 
         cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce').should('have.been.calledWith', {
           depositorAddress: '0x123',
@@ -419,7 +504,7 @@ describe('Bridge Form', () => {
             }],
         };
 
-        cy.stub(TokenBridge.prototype, 'getUnsignedApproveBridgeTx').as('getUnsignedApproveBridgeTxStub')
+        cy.stub(TokenBridge.prototype, 'getUnsignedApproveDepositBridgeTx').as('getUnsignedApproveDepositBridgeTxStub')
           .resolves({
             required: false,
           });
@@ -493,7 +578,7 @@ describe('Bridge Form', () => {
       //       }],
       //   };
 
-      //   cy.stub(TokenBridge.prototype, 'getUnsignedApproveBridgeTx').as('getUnsignedApproveBridgeTxStub')
+      //   cy.stub(TokenBridge.prototype, 'getUnsignedApproveDepositBridgeTx').as('getUnsignedApproveDepositBridgeTxStub')
       //     .resolves({
       //       required: false,
       //     });

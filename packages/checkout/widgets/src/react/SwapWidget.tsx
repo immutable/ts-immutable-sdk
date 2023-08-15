@@ -2,8 +2,10 @@
 import { WalletProviderName } from '@imtbl/checkout-sdk';
 import React, { useEffect } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
+import { Passport } from '@imtbl/passport';
 import { SetProvider } from './internal/SetProvider';
 import { CheckoutWidgetTagNames } from '../definitions/types';
+import { AddPassportOption } from './internal/AddPassportOption';
 
 /**
  * Interface representing the props for the Swap Widget component.
@@ -17,6 +19,7 @@ import { CheckoutWidgetTagNames } from '../definitions/types';
 export interface SwapReactProps {
   walletProvider?: WalletProviderName;
   provider?: Web3Provider;
+  passport?: Passport;
   fromContractAddress?: string;
   amount?: string;
   toContractAddress?: string;
@@ -34,13 +37,17 @@ export function SwapReact(props: SwapReactProps): JSX.Element {
     amount,
     toContractAddress,
     provider,
+    passport,
   } = props;
 
   useEffect(() => {
     if (provider) {
       SetProvider(CheckoutWidgetTagNames.SWAP, provider);
     }
-  }, [provider]);
+    if (passport) {
+      AddPassportOption(CheckoutWidgetTagNames.SWAP, passport);
+    }
+  }, [provider, passport]);
 
   const config = window.ImtblCheckoutWidgetConfig;
 

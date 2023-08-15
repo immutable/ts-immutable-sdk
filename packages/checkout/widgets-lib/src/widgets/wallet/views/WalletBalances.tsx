@@ -57,6 +57,7 @@ export function WalletBalances() {
   const [showNotEnoughGasDrawer, setShowNotEnoughGasDrawer] = useState(false);
   const [walletAddress, setWalletAddress] = useState('');
   const [insufficientFundsForBridgeToL2Gas, setInsufficientFundsForBridgeToL2Gas] = useState(false);
+  const isPassport = useMemo(() => (provider?.provider as any)?.isPassport, [provider]);
 
   useEffect(() => {
     (async () => {
@@ -112,19 +113,23 @@ export function WalletBalances() {
         return;
       }
 
-      const { gasFee } = await checkout.gasEstimate({
-        gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-        isSpendingCapApprovalRequired: false,
-      });
+      try {
+        const { gasFee } = await checkout.gasEstimate({
+          gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+          isSpendingCapApprovalRequired: false,
+        });
 
-      if (!gasFee.estimatedAmount) {
+        if (!gasFee.estimatedAmount) {
+          setInsufficientFundsForBridgeToL2Gas(false);
+          return;
+        }
+
+        setInsufficientFundsForBridgeToL2Gas(
+          gasFee.estimatedAmount.gt(utils.parseUnits(ethBalance.balance, DEFAULT_TOKEN_DECIMALS)),
+        );
+      } catch {
         setInsufficientFundsForBridgeToL2Gas(false);
-        return;
       }
-
-      setInsufficientFundsForBridgeToL2Gas(
-        gasFee.estimatedAmount.gt(utils.parseUnits(ethBalance.balance, DEFAULT_TOKEN_DECIMALS)),
-      );
     };
     bridgeToL2GasCheck();
   }, [tokenBalances, checkout, network]);
@@ -205,7 +210,7 @@ export function WalletBalances() {
         sx={walletBalanceOuterContainerStyles}
       >
         <Box sx={walletBalanceContainerStyles}>
-          <NetworkMenu setBalancesLoading={setBalancesLoading} />
+          {!isPassport && <NetworkMenu setBalancesLoading={setBalancesLoading} />}
           <TotalTokenBalance totalBalance={totalFiatAmount} />
           <Box
             sx={WalletBalanceItemStyle(

@@ -28,12 +28,12 @@ export function getOrderbookConfig(
   switch (environment) {
     case Environment.SANDBOX:
       return {
-        seaportContractAddress: '0x474989C4D25DD41B0B9b1ECb4643B9Fe25f83B19',
-        zoneContractAddress: '0x6FeDb4949E5b452700A8a8956999a7E05B6770F3',
+        seaportContractAddress: '0x410000346E270aDbC89b2b688177d3AE76348dE9',
+        zoneContractAddress: '0x979C2aCA989A56554Eb63E01e576E3179Cdad5A0',
         apiEndpoint: 'https://order-book-mr.sandbox.imtbl.com',
         chainName: TESTNET_CHAIN_NAME,
         provider: new providers.JsonRpcProvider(
-          'https://zkevm-rpc.sandbox.x.immutable.com',
+          'https://rpc.testnet.immutable.com',
         ),
       };
     // not yet deployed
@@ -41,10 +41,10 @@ export function getOrderbookConfig(
       return {
         seaportContractAddress: '',
         zoneContractAddress: '',
-        apiEndpoint: 'https://order-book-mr.imtbl.com',
+        apiEndpoint: 'https://api.immutable.com',
         chainName: MAINNET_CHAIN_NAME,
         provider: new providers.JsonRpcProvider(
-          'https://zkevm-rpc.x.immutable.com',
+          'https://rpc.immutable.com',
         ),
       };
     default:

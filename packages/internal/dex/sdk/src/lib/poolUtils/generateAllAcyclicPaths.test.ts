@@ -1,7 +1,5 @@
-import {
-  FeeAmount, Pool, Route, TickMath,
-} from '@uniswap/v3-sdk';
-import { Token, Currency } from '@uniswap/sdk-core';
+import { FeeAmount, Pool, TickMath } from '@uniswap/v3-sdk';
+import { Token } from '@uniswap/sdk-core';
 import { generateAllAcyclicPaths } from '../router';
 
 const token0 = new Token(
@@ -73,14 +71,14 @@ describe('generateAllAcyclicPaths', () => {
         ),
       );
 
-      const routes: Route<Currency, Currency>[] = generateAllAcyclicPaths(
+      const routes = generateAllAcyclicPaths(
         token0,
         token3,
         pools,
+        maxHops,
         [],
         [],
         token0,
-        maxHops,
       );
 
       // There are two routes of maxHops = 3 that go from token0 to token3.
@@ -156,14 +154,14 @@ describe('generateAllAcyclicPaths', () => {
         ),
       );
 
-      const routes: Route<Currency, Currency>[] = generateAllAcyclicPaths(
+      const routes = generateAllAcyclicPaths(
         token0,
         token3,
         pools,
+        maxHops,
         [],
         [],
         token0,
-        maxHops,
       );
 
       // There is one route of maxHops = 2 that goes from token0 to token3.
@@ -235,14 +233,14 @@ describe('generateAllAcyclicPaths', () => {
         ),
       );
 
-      const routes: Route<Currency, Currency>[] = generateAllAcyclicPaths(
+      const routes = generateAllAcyclicPaths(
         token0,
         token3,
         pools,
+        maxHops,
         [],
         [],
         token0,
-        maxHops,
       );
 
       // There are five route of maxHops = 4 that goes from token0 to token3.

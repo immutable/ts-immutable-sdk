@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import {
-  Button, Form, Offcanvas, Spinner, Stack,
+  Form, Offcanvas, Spinner, Stack,
 } from 'react-bootstrap';
-import { Heading } from '@biom3/react';
-import { RequestProps } from '@/types';
+import { Divider, Heading } from '@biom3/react';
+import { RequestExampleProps, RequestProps } from '@/types';
 import { useStatusProvider } from '@/context/StatusProvider';
 import { usePassportProvider } from '@/context/PassportProvider';
+import { RequestArguments } from '@imtbl/passport';
+import WorkflowButton from '@/components/WorkflowButton';
+import EthSendTransactionExamples from './EthSendTransactionExamples';
 
 enum EthereumParamType {
   string = 'string',
@@ -22,6 +25,7 @@ interface EthereumParam {
 interface EthereumMethod {
   name: string;
   params?: Array<EthereumParam>;
+  exampleComponent?: React.ComponentType<RequestExampleProps>;
 }
 
 const EthereumMethods: EthereumMethod[] = [
@@ -32,6 +36,7 @@ const EthereumMethods: EthereumMethod[] = [
     params: [
       { name: 'transaction', type: EthereumParamType.object },
     ],
+    exampleComponent: EthSendTransactionExamples,
   },
   { name: 'eth_gasPrice' },
   {
@@ -117,39 +122,54 @@ function Request({ showRequest, setShowRequest }: RequestProps) {
     setShowRequest(false);
   };
 
+  const performRequest = async (request: RequestArguments) => {
+    setInvalid(false);
+    setLoadingRequest(true);
+    try {
+      const result = await zkEvmProvider?.request(request);
+      setLoadingRequest(false);
+      addMessage(selectedEthMethod?.name, result);
+      handleClose();
+    } catch (err) {
+      addMessage('Request', err);
+      handleClose();
+    }
+  };
+
+  const handleExampleSubmitted = async (request: RequestArguments) => {
+    if (request.params) {
+      const newParams = params;
+      request.params.forEach((param, i) => {
+        newParams[i] = JSON.stringify(param);
+      });
+      setParams(newParams);
+    }
+    await performRequest(request);
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     e.stopPropagation();
 
     const form = e.currentTarget;
     if (form.checkValidity()) {
-      setInvalid(false);
-      setLoadingRequest(true);
-      try {
-        const result = await zkEvmProvider?.request({
-          method: selectedEthMethod?.name || '',
-          params: params.map((param, i) => {
-            switch (selectedEthMethod.params![i].type) {
-              case EthereumParamType.flag: {
-                return param === 'true';
-              }
-              case EthereumParamType.object: {
-                console.log(param);
-                return JSON.parse(param);
-              }
-              default: {
-                return param;
-              }
+      await performRequest({
+        method: selectedEthMethod?.name || '',
+        params: params.map((param, i) => {
+          switch (selectedEthMethod.params![i].type) {
+            case EthereumParamType.flag: {
+              return param === 'true';
             }
-          }),
-        });
-        setLoadingRequest(false);
-        addMessage(selectedEthMethod?.name, result);
-        handleClose();
-      } catch (err) {
-        addMessage('Request', err);
-        handleClose();
-      }
+            case EthereumParamType.object: {
+              console.log(param);
+              return JSON.parse(param);
+            }
+            default: {
+              return param;
+            }
+          }
+        }),
+      });
     } else {
       setInvalid(true);
     }
@@ -181,7 +201,10 @@ function Request({ showRequest, setShowRequest }: RequestProps) {
         <Form noValidate validated={isInvalid} onSubmit={handleSubmit} className="mb-4">
           <Form.Group className="mb-3">
             <Form.Label>Ethereum Method</Form.Label>
-            <Form.Select onChange={handleSetEthMethod}>
+            <Form.Select
+              disabled={loadingRequest}
+              onChange={handleSetEthMethod}
+            >
               {
                 EthereumMethods.map((method) => (
                   <option key={method.name} value={method.name}>{method.name}</option>
@@ -195,9 +218,10 @@ function Request({ showRequest, setShowRequest }: RequestProps) {
                 <div key={param.name}>
                   <Form.Label>{param.name}</Form.Label>
                   <Form.Control
+                    disabled={loadingRequest}
                     key={param.name}
                     type="text"
-                    value={param.default}
+                    value={params[index]}
                     onChange={(e) => {
                       const newParams = [...params];
                       newParams[index] = e.target.value;
@@ -208,22 +232,31 @@ function Request({ showRequest, setShowRequest }: RequestProps) {
               ))
             }
           </Form.Group>
-          { !loadingRequest
-              && (
-              <Button variant="dark" type="submit">
-                Submit
-              </Button>
-              )}
-          { loadingRequest
-              && (
-              <Stack direction="horizontal" gap={3}>
-                <Button disabled variant="dark" type="submit" style={{ opacity: '0.5' }}>
-                  Submit
-                </Button>
-                <Spinner />
-              </Stack>
-              )}
+          <Stack direction="horizontal" gap={3}>
+            <WorkflowButton
+              disabled={loadingRequest}
+              type="submit"
+            >
+              Submit
+            </WorkflowButton>
+            { loadingRequest && <Spinner /> }
+          </Stack>
         </Form>
+        { selectedEthMethod?.exampleComponent && (
+          <Stack gap={3} style={{ marginTop: '24px' }}>
+            <Divider />
+            <Heading
+              as="h2"
+              size="medium"
+            >
+              Example transactions
+            </Heading>
+            { React.createElement(selectedEthMethod.exampleComponent, {
+              handleExampleSubmitted,
+              disabled: loadingRequest,
+            }) }
+          </Stack>
+        )}
       </Offcanvas.Body>
     </Offcanvas>
   );

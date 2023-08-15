@@ -1,8 +1,8 @@
 import { Pool } from '@uniswap/v3-sdk';
-import { Token } from '@uniswap/sdk-core';
+import { CurrencyAmount, Token } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
 import { ProviderCallError } from 'errors';
-import { TokenInfo } from '../types';
+import { Amount, TokenInfo } from '../types';
 
 export const quoteReturnMapping: { [signature: string]: string[] } = {
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -74,3 +74,35 @@ export const tokenInfoToUniswapToken = (tokenInfo: TokenInfo): Token => new Toke
   tokenInfo.symbol,
   tokenInfo.name,
 );
+
+export const uniswapTokenToTokenInfo = (token: Token): TokenInfo => ({
+  chainId: token.chainId,
+  address: token.address,
+  decimals: token.decimals,
+  symbol: token.symbol,
+  name: token.name,
+});
+
+export const toBigNumber = (amount: CurrencyAmount<Token>): ethers.BigNumber => (
+  ethers.BigNumber.from(amount.multiply(amount.decimalScale).toExact())
+);
+
+export const toAmount = (amount: CurrencyAmount<Token>): Amount => ({
+  token: uniswapTokenToTokenInfo(amount.currency),
+  value: toBigNumber(amount),
+});
+
+export const newAmount = (amount: ethers.BigNumber, token: TokenInfo): Amount => ({
+  value: amount,
+  token,
+});
+
+export const addAmount = (a: Amount, b: Amount) => {
+  if (a.token.address !== b.token.address) throw new Error('Token mismatch');
+  return { value: a.value.add(b.value), token: a.token };
+};
+
+export const subtractAmount = (a: Amount, b: Amount) => {
+  if (a.token.address !== b.token.address) throw new Error('Token mismatch');
+  return { value: a.value.sub(b.value), token: a.token };
+};

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "includeVersion": false,
+  "readme": "none",
+  "sort": [
+    "kind"
+  ],
+  "kindSortOrder": [
+    "Class",
+    "Interface",
+    "Enum",
+    "TypeAlias",
+    "Variable",
+    "Function",
+    "ObjectLiteral",
+    "Property",
+    "Constructor",
+    "Method",
+  ]
+}

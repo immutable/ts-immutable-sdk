@@ -9,9 +9,10 @@ import {
 } from '../../components/ConnectLoader/ConnectLoader';
 import { sendSwapWidgetCloseEvent } from './SwapWidgetEvents';
 import { ConnectTargetLayer, getL2ChainId } from '../../lib';
+import { isValidAddress, isValidAmount, isValidWalletProvider } from '../../lib/validations/widgetValidators';
 
 export class ImmutableSwap extends ImmutableWebComponent {
-  walletProvider = WalletProviderName.METAMASK;
+  walletProvider: WalletProviderName | undefined = undefined;
 
   amount = '';
 
@@ -23,20 +24,48 @@ export class ImmutableSwap extends ImmutableWebComponent {
     super.connectedCallback();
     this.walletProvider = this.getAttribute(
       'walletProvider',
-    ) as WalletProviderName;
-    this.amount = this.getAttribute('amount') as string;
-    this.fromContractAddress = this.getAttribute('fromContractAddress') as string;
-    this.toContractAddress = this.getAttribute('toContractAddress') as string;
+    )?.toLowerCase() as WalletProviderName;
+    this.amount = this.getAttribute('amount') ?? '';
+    this.fromContractAddress = this.getAttribute('fromContractAddress')?.toLowerCase() ?? '';
+    this.toContractAddress = this.getAttribute('toContractAddress')?.toLowerCase() ?? '';
     this.renderWidget();
   }
 
+  validateInputs(): void {
+    if (!isValidWalletProvider(this.walletProvider)) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "walletProvider" widget input');
+      this.walletProvider = undefined;
+    }
+
+    if (!isValidAmount(this.amount)) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "amount" widget input');
+      this.amount = '';
+    }
+
+    if (!isValidAddress(this.fromContractAddress)) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "fromContractAddress" widget input');
+      this.fromContractAddress = '';
+    }
+
+    if (!isValidAddress(this.toContractAddress)) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "toContractAddress" widget input');
+      this.toContractAddress = '';
+    }
+  }
+
   renderWidget() {
+    this.validateInputs();
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER2,
       walletProvider: this.walletProvider,
       web3Provider: this.provider,
+      passport: this.passport,
       allowedChains: [
-        getL2ChainId(this.checkoutConfig!),
+        getL2ChainId(this.checkout!.config),
       ],
     };
 

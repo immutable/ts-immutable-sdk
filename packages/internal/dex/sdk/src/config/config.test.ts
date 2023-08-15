@@ -1,6 +1,6 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { ChainNotSupportedError, InvalidConfigurationError } from 'errors';
-import * as test from 'utils/testUtils';
+import * as test from 'test/utils';
 import { ExchangeModuleConfiguration, ExchangeOverrides, TokenInfo } from '../types';
 import { ExchangeConfiguration, ExchangeContracts } from './index';
 import { IMMUTABLE_TESTNET_CHAIN_ID } from '../constants/chains';
@@ -24,6 +24,7 @@ describe('ExchangeConfiguration', () => {
     coreFactory: test.TEST_V3_CORE_FACTORY_ADDRESS,
     quoterV2: test.TEST_QUOTER_ADDRESS,
     peripheryRouter: test.TEST_PERIPHERY_ROUTER_ADDRESS,
+    secondaryFee: test.TEST_SECONDARY_FEE_ADDRESS,
   };
 
   describe('when given sandbox environment with supported chain id', () => {
@@ -107,12 +108,12 @@ describe('ExchangeConfiguration', () => {
         exchangeContracts: contractOverrides,
         commonRoutingTokens,
         nativeToken: test.IMX_TEST_TOKEN,
-        secondaryFees,
       };
 
       const config = new ExchangeConfiguration({
-        chainId,
         baseConfig: immutableConfig,
+        chainId,
+        secondaryFees,
         overrides,
       });
 
@@ -155,6 +156,7 @@ describe('ExchangeConfiguration', () => {
         coreFactory: test.TEST_V3_CORE_FACTORY_ADDRESS,
         quoterV2: test.TEST_QUOTER_ADDRESS,
         peripheryRouter: test.TEST_PERIPHERY_ROUTER_ADDRESS,
+        secondaryFee: test.TEST_SECONDARY_FEE_ADDRESS,
       };
 
       const rpcURL = 'https://anrpcurl.net';
@@ -212,12 +214,12 @@ describe('ExchangeConfiguration', () => {
         exchangeContracts: contractOverrides,
         commonRoutingTokens: commonRoutingTokensSingle,
         nativeToken: test.IMX_TEST_TOKEN,
-        secondaryFees,
       };
 
       expect(() => new ExchangeConfiguration({
-        chainId,
         baseConfig: immutableConfig,
+        chainId,
+        secondaryFees,
         overrides,
       })).toThrow(new InvalidConfigurationError(
         `Invalid secondary fee recipient address: ${secondaryFees[0].feeRecipient}`,
@@ -231,10 +233,25 @@ describe('ExchangeConfiguration', () => {
         environment: Environment.SANDBOX,
       }); // environment isn't used because we override all of the config values
 
-      const secondaryFees = [
+      const secondaryFeesOneRecipient = [
         {
           feeRecipient: dummyFeeRecipient,
           feeBasisPoints: 10001,
+        },
+      ];
+
+      const secondaryFeesMultipleRecipients = [
+        {
+          feeRecipient: dummyFeeRecipient,
+          feeBasisPoints: 5000,
+        },
+        {
+          feeRecipient: dummyFeeRecipient,
+          feeBasisPoints: 5000,
+        },
+        {
+          feeRecipient: dummyFeeRecipient,
+          feeBasisPoints: 1000,
         },
       ];
 
@@ -244,15 +261,24 @@ describe('ExchangeConfiguration', () => {
         exchangeContracts: contractOverrides,
         commonRoutingTokens: commonRoutingTokensSingle,
         nativeToken: test.IMX_TEST_TOKEN,
-        secondaryFees,
       };
 
       expect(() => new ExchangeConfiguration({
-        chainId,
         baseConfig: immutableConfig,
+        chainId,
+        secondaryFees: secondaryFeesOneRecipient,
         overrides,
       })).toThrow(new InvalidConfigurationError(
-        `Invalid secondary fee percentage: ${secondaryFees[0].feeBasisPoints}`,
+        `Invalid secondary fee basis points: ${secondaryFeesOneRecipient[0].feeBasisPoints}`,
+      ));
+
+      expect(() => new ExchangeConfiguration({
+        baseConfig: immutableConfig,
+        chainId,
+        secondaryFees: secondaryFeesMultipleRecipients,
+        overrides,
+      })).toThrow(new InvalidConfigurationError(
+        'Invalid total secondary fee basis points: 11000',
       ));
     });
 

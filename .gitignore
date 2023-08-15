@@ -1,5 +1,6 @@
 node_modules/
 dist/
+coverage/
 .idea/
 .DS_Store
 .vscode
@@ -22,3 +23,5 @@ dist/
 yalc.lock
 
 package-lock.json
+
+docs/
