@@ -15,7 +15,6 @@ export const getItemRequirement = (
   type: ItemType,
   contractAddress: string,
   amount: BigNumber,
-  id: string,
 ): ItemRequirement => {
   switch (type) {
     case ItemType.ERC20:
@@ -23,14 +22,7 @@ export const getItemRequirement = (
         type,
         amount,
         contractAddress,
-        approvalContractAddress: SEAPORT_CONTRACT_ADDRESS,
-      };
-    case ItemType.ERC721:
-      return {
-        type,
-        id,
-        contractAddress,
-        approvalContractAddress: SEAPORT_CONTRACT_ADDRESS,
+        spenderAddress: SEAPORT_CONTRACT_ADDRESS,
       };
     case ItemType.NATIVE:
     default:
@@ -62,7 +54,6 @@ export const buy = async (
   }
 
   let amount = BigNumber.from('0');
-  let id = '';
   let type: ItemType = ItemType.NATIVE;
   let contractAddress = '';
 
@@ -75,11 +66,6 @@ export const buy = async (
       case 'ERC20':
         type = ItemType.ERC20;
         contractAddress = buyArray[0].contract_address;
-        break;
-      case 'ERC721':
-        type = ItemType.ERC721;
-        contractAddress = buyArray[0].contract_address;
-        id = buyArray[0].token_id;
         break;
       default:
         throw new CheckoutError(
@@ -104,7 +90,7 @@ export const buy = async (
   });
 
   const itemRequirements: ItemRequirement[] = [
-    getItemRequirement(type, contractAddress, amount, id),
+    getItemRequirement(type, contractAddress, amount),
   ];
 
   return {

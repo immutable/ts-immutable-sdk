@@ -461,7 +461,7 @@ describe('Connect', () => {
     const params: SmartCheckoutParams = {
       provider,
       itemRequirements: [],
-      fulfilmentDetails: {
+      txnOrGasAmount: {
         type: FulfilmentDetailsType.GAS,
         gasToken: {
           type: GasTokenType.NATIVE,
@@ -472,7 +472,7 @@ describe('Connect', () => {
     await checkout.smartCheckout(params);
 
     expect(smartCheckout).toBeCalledTimes(1);
-    expect(smartCheckout).toBeCalledWith(params.provider, params.itemRequirements, params.fulfilmentDetails);
+    expect(smartCheckout).toBeCalledWith(params.provider, params.itemRequirements, params.txnOrGasAmount);
   });
 
   it('should call isWeb3Provider', async () => {

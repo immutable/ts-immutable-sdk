@@ -11,7 +11,7 @@ import { TokenInfo } from './tokenInfo';
 export interface SmartCheckoutParams {
   provider: Web3Provider;
   itemRequirements: ItemRequirement[];
-  fulfilmentDetails: FulfilmentDetails;
+  txnOrGasAmount: FulfilmentTransaction | GasAmount,
 }
 
 /**
@@ -48,13 +48,13 @@ type NativeItem = {
  * @property {ItemType} type - The type to indicate this is an ERC20 item.
  * @property {string} contractAddress - The contract address of the ERC20.
  * @property {BigNumber} amount - The amount of the item.
- * @property {string} approvalContractAddress - The contract address of the approver.
+ * @property {string} spenderAddress - The contract address of the approver.
  */
 type ERC20Item = {
   type: ItemType.ERC20;
   contractAddress: string;
   amount: BigNumber;
-  approvalContractAddress: string,
+  spenderAddress: string,
 };
 
 /**
@@ -62,19 +62,14 @@ type ERC20Item = {
  * @property {ItemType} type - The type to indicate this is an ERC721 item.
  * @property {string} contractAddress - The contract address of the ERC721.
  * @property {string} id - The ID of this ERC721 in the collection.
- * @property {string} approvalContractAddress - The contract address of the approver.
+ * @property {string} spenderAddress - The contract address of the approver.
  */
 type ERC721Item = {
   type: ItemType.ERC721;
   contractAddress: string;
   id: string;
-  approvalContractAddress: string,
+  spenderAddress: string,
 };
-
-/**
- * Represents the fulfilment details for a transaction which is either contains details about the fulfilment transaction or the gas amount.
- */
-export type FulfilmentDetails = FulfilmentTransaction | GasAmount;
 
 /**
  * An enum representing the fulfilment details types

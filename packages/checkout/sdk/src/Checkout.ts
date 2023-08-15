@@ -306,7 +306,7 @@ export class Checkout {
     await smartCheckout.smartCheckout(
       web3Provider,
       params.itemRequirements,
-      params.fulfilmentDetails,
+      params.txnOrGasAmount,
     );
   }
 

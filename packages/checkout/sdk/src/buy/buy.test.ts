@@ -91,7 +91,7 @@ describe('buy', () => {
               type: ItemType.ERC20,
               amount: BigNumber.from('2'),
               contractAddress: '0x123',
-              approvalContractAddress: SEAPORT_CONTRACT_ADDRESS,
+              spenderAddress: SEAPORT_CONTRACT_ADDRESS,
             },
           ],
           gasToken: {
@@ -102,7 +102,7 @@ describe('buy', () => {
       );
     });
 
-    it('should return type of erc721 and amount', async () => {
+    it('should throw error if orderbook returns erc721', async () => {
       (createOrderbookInstance as jest.Mock).mockResolvedValue({
         getListing: jest.fn().mockResolvedValue({
           result: {
@@ -124,24 +124,14 @@ describe('buy', () => {
 
       const provider = {} as any;
       const orderId = '1';
-      const result = await buy(config, provider, orderId);
 
-      expect(result).toEqual(
-        {
-          itemRequirements: [
-            {
-              type: ItemType.ERC721,
-              id: '1',
-              contractAddress: '0x123',
-              approvalContractAddress: SEAPORT_CONTRACT_ADDRESS,
-            },
-          ],
-          gasToken: {
-            type: 'NATIVE',
-            limit: BigNumber.from(GAS_LIMIT),
-          },
-        },
-      );
+      try {
+        await buy(config, provider, orderId);
+      } catch (err: any) {
+        expect(err.message).toEqual('Purchasing token type is unsupported');
+        expect(err.type).toEqual(CheckoutErrorType.UNSUPPORTED_TOKEN_TYPE_ERROR);
+        expect(err.data).toEqual({ orderId: '1' });
+      }
     });
 
     it('should throw error if orderbook returns unsupported item type', async () => {
@@ -201,8 +191,7 @@ describe('buy', () => {
       const type = ItemType.NATIVE;
       const amount = BigNumber.from('1');
       const contractAddress = '';
-      const id = '';
-      const result = getItemRequirement(type, contractAddress, amount, id);
+      const result = getItemRequirement(type, contractAddress, amount);
       expect(result).toEqual({
         type,
         amount,
@@ -213,35 +202,30 @@ describe('buy', () => {
       const type = ItemType.ERC20;
       const amount = BigNumber.from('1');
       const contractAddress = '0x123';
-      const id = '';
-      const result = getItemRequirement(type, contractAddress, amount, id);
+      const result = getItemRequirement(type, contractAddress, amount);
       expect(result).toEqual({
         type,
         amount,
         contractAddress,
-        approvalContractAddress: SEAPORT_CONTRACT_ADDRESS,
+        spenderAddress: SEAPORT_CONTRACT_ADDRESS,
       });
     });
 
-    it('should return type of erc721 and amount', () => {
+    it('should return type of native and amount if erc721', () => {
       const type = ItemType.ERC721;
       const amount = BigNumber.from('1');
       const contractAddress = '0x123';
-      const id = '1';
-      const result = getItemRequirement(type, contractAddress, amount, id);
+      const result = getItemRequirement(type, contractAddress, amount);
       expect(result).toEqual({
-        type,
-        id,
-        contractAddress,
-        approvalContractAddress: SEAPORT_CONTRACT_ADDRESS,
+        type: ItemType.NATIVE,
+        amount,
       });
     });
 
     it('should return type of native and amount for default case', () => {
       const amount = BigNumber.from('1');
       const contractAddress = '';
-      const id = '';
-      const result = getItemRequirement('default' as ItemType, contractAddress, amount, id);
+      const result = getItemRequirement('default' as ItemType, contractAddress, amount);
       expect(result).toEqual({
         type: ItemType.NATIVE,
         amount,

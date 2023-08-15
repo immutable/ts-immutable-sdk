@@ -1,16 +1,18 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import {
-  FulfilmentDetails, ItemRequirement, SmartCheckoutResult, TransactionRequirementType,
+  FulfilmentTransaction,
+  GasAmount,
+  ItemRequirement, SmartCheckoutResult, TransactionRequirementType,
 } from '../types/smartCheckout';
 
 export const smartCheckout = async (
   provider: Web3Provider,
   itemRequirements: ItemRequirement[],
-  fulfilmentDetails: FulfilmentDetails,
+  txnOrGasAmount: FulfilmentTransaction | GasAmount,
 ): Promise<SmartCheckoutResult> => {
   // eslint-disable-next-line no-console
-  console.log(provider, itemRequirements, fulfilmentDetails);
+  console.log(provider, itemRequirements, txnOrGasAmount);
   return {
     sufficient: true,
     transactionRequirements: [{
