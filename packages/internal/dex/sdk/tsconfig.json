@@ -19,7 +19,7 @@
     "noEmit": true,
     "declaration": true
   },
-  "include": ["src", ".eslintrc.cjs"],
+  "include": ["src"],
   "exclude": ["node_modules", "dist"],
   "references": [{ "path": "../../../config" }]
 }
