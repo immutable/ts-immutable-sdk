@@ -4,8 +4,8 @@ module.exports = {
   ignorePatterns: ['jest.config.*', 'rollup.config.*'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    project: './tsconfig.json',
-    tsconfigRootDir: __dirname,
+    project: true,
+    EXPERIMENTAL_useSourceOfProjectReferenceRedirect: true,
   },
   rules: {
     '@typescript-eslint/no-unsafe-assignment': 'error',
