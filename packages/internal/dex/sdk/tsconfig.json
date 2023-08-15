@@ -21,6 +21,6 @@
     "noEmit": true,
     "declaration": true
   },
-  "include": ["src"],
+  "include": ["src", ".eslintrc.cjs"],
   "exclude": ["node_modules", "dist"]
 }

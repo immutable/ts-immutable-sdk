@@ -1,6 +1,6 @@
 import { Route, SwapQuoter } from '@uniswap/v3-sdk';
 import { TradeType, CurrencyAmount, Token } from '@uniswap/sdk-core';
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import { ProviderCallError } from 'errors';
 import { multicallMultipleCallDataSingContract, MulticallResponse } from './multicall';
 import { quoteReturnMapping, toBigNumber } from './utils';
@@ -75,7 +75,8 @@ export async function getQuotesForRoutes(
 
     if (decodedQuoteResult) {
       // The 0th element in each decoded data is going to be the amountOut or amountIn.
-      const quoteAmount = decodedQuoteResult[amountIndex];
+      const quoteAmount: unknown = decodedQuoteResult[amountIndex];
+      if (!(quoteAmount instanceof BigNumber)) throw new Error('quoteAmount is not a BigNumber');
 
       decodedQuoteResults.push({
         route: routes[i],

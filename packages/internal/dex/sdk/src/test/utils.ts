@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   CurrencyAmount,
   Token,
@@ -167,21 +168,19 @@ type SwapRouterFunctionName = 'exactInputSingle' | 'exactOutputSingle';
 function decodeSecondaryFeeCall(calldata: ethers.utils.BytesLike, functionName: SecondaryFeeFunctionName) {
   const iface = SecondaryFee__factory.createInterface();
   const topLevelParams = iface.decodeFunctionData('multicall(uint256,bytes[])', calldata);
+  const data: unknown = topLevelParams.data[0];
+  if (typeof data !== 'string') throw new Error();
 
-  return iface.decodeFunctionData(
-    functionName,
-    topLevelParams.data[0],
-  );
+  return iface.decodeFunctionData(functionName, data);
 }
 
 function decodeSwapRouterCall(calldata: ethers.utils.BytesLike, functionName: SwapRouterFunctionName) {
   const iface = SwapRouter.INTERFACE;
   const topLevelParams = iface.decodeFunctionData('multicall(uint256,bytes[])', calldata);
+  const data: unknown = topLevelParams.data[0];
+  if (typeof data !== 'string') throw new Error();
 
-  return iface.decodeFunctionData(
-    functionName,
-    topLevelParams.data[0],
-  );
+  return iface.decodeFunctionData(functionName, data);
 }
 
 export function decodeMulticallExactInputWithFees(data: ethers.utils.BytesLike) {

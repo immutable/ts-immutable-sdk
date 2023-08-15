@@ -1,4 +1,5 @@
 import { Token } from '@uniswap/sdk-core';
+import { uniswapTokenToTokenInfo } from 'lib/utils';
 import { generateERC20Pairs, ERC20Pair } from './generateERC20Pairs';
 import {
   FUN_TEST_TOKEN,
@@ -129,33 +130,28 @@ describe('generateERC20Pairs', () => {
     it('should create one pair', () => {
       // We expect...
       // TI TO [TI] = [TI / TO]
-      const tokenPair: ERC20Pair = [IMX_TEST_TOKEN, USDC_TEST_TOKEN];
+      const tokenPair: ERC20Pair = [uniswapTokenToTokenInfo(IMX_TEST_TOKEN), uniswapTokenToTokenInfo(USDC_TEST_TOKEN)];
 
       // Create a copy of the Token object so that we do not have the same
       // instance of the object in the tokenPair and commonRoutingTokens
-      const usdc = Object.assign(USDC_TEST_TOKEN);
-      const commonRoutingTokens: Token[] = [usdc];
+      const commonRoutingTokens = [uniswapTokenToTokenInfo(USDC_TEST_TOKEN)];
 
       const tokenPairs = generateERC20Pairs(tokenPair, commonRoutingTokens);
       expect(tokenPairs.length).toEqual(1);
       expect(tokenPairs).toMatchInlineSnapshot(`
         [
           [
-            Token {
+            {
               "address": "0x72958b06abdF2701AcE6ceb3cE0B8B1CE11E0851",
               "chainId": 999,
               "decimals": 18,
-              "isNative": false,
-              "isToken": true,
               "name": "Immutable X",
               "symbol": "IMX",
             },
-            Token {
+            {
               "address": "0x93733225CCc07Ba02b1449aA3379418Ddc37F6EC",
               "chainId": 999,
               "decimals": 6,
-              "isNative": false,
-              "isToken": true,
               "name": "USD Coin",
               "symbol": "USDC",
             },
