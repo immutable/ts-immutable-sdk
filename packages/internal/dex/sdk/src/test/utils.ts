@@ -1,11 +1,12 @@
 import { Token, TradeType } from '@uniswap/sdk-core';
-import { BigNumber, utils } from 'ethers';
+import { BigNumber, BigNumberish, utils } from 'ethers';
 import JSBI from 'jsbi';
 import { Pool, Route, TickMath } from '@uniswap/v3-sdk';
 import { SwapRouter } from '@uniswap/router-sdk';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { SecondaryFee__factory } from 'contracts/types';
 import { IV3SwapRouter } from 'contracts/types/SecondaryFee';
+import { PromiseOrValue } from 'contracts/types/common';
 import {
   Amount,
   QuoteTradeInfo,
@@ -432,4 +433,11 @@ export function makeAddr(str: string): string {
 
 export function formatAmount(amount: Amount): string {
   return utils.formatUnits(amount.value, amount.token.decimals);
+}
+
+export function formatEther(bn: PromiseOrValue<BigNumberish>): string {
+  if (BigNumber.isBigNumber(bn)) {
+    return utils.formatEther(bn);
+  }
+  throw new Error('formatEther: bn is not a BigNumber');
 }

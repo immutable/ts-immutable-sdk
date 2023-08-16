@@ -5,7 +5,7 @@ import {
   InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError, NoRoutesAvailableError,
 } from 'errors';
 import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
-import { ethers } from 'ethers';
+import { constants, utils } from 'ethers';
 import { Exchange } from './exchange';
 import {
   mockRouterImplementation,
@@ -23,6 +23,8 @@ import {
   decodeMulticallExactInputWithFees,
   decodeMulticallExactInputSingleWithoutFees,
   expectToBeDefined,
+  formatAmount,
+  formatEther,
 } from './test/utils';
 import { Router, SecondaryFee, uniswapTokenToTokenInfo } from './lib';
 
@@ -37,7 +39,7 @@ jest.mock('./lib/utils', () => ({
 }));
 
 const HIGHER_SLIPPAGE = 0.2;
-const APPROVED_AMOUNT = BigNumber.from('1000000000000000000');
+const APPROVED_AMOUNT = utils.parseEther('1');
 const APPROVE_GAS_ESTIMATE = BigNumber.from('100000');
 
 describe('getUnsignedSwapTxFromAmountIn', () => {
@@ -70,7 +72,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
-      const amountIn = APPROVED_AMOUNT.add(BigNumber.from('1000000000000000000'));
+      const amountIn = APPROVED_AMOUNT.add(utils.parseEther('1'));
       const tx = await exchange.getUnsignedSwapTxFromAmountIn(
         params.fromAddress,
         params.inputToken,
@@ -96,7 +98,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
-      const amountIn = APPROVED_AMOUNT.add(BigNumber.from('1000000000000000000'));
+      const amountIn = APPROVED_AMOUNT.add(utils.parseEther('1'));
       const tx = await exchange.getUnsignedSwapTxFromAmountIn(
         params.fromAddress,
         params.inputToken,
@@ -147,7 +149,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        ethers.utils.parseEther('100'),
+        utils.parseEther('100'),
       )).rejects.toThrow(new NoRoutesAvailableError());
     });
   });
@@ -166,16 +168,16 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        ethers.utils.parseEther('100'),
+        utils.parseEther('100'),
         3, // 3% Slippage
       );
 
       expectToBeDefined(swap.transaction.data);
 
-      expect(quote.amountWithMaxSlippage.value.toString()).toEqual('961165048543689320388'); // userQuoteRes.amountOutMinimum = swapReq.amountOutMinimum
+      expect(formatAmount(quote.amountWithMaxSlippage)).toEqual('961.165048543689320388'); // userQuoteRes.amountOutMinimum = swapReq.amountOutMinimum
 
       const ourQuoteReqAmountIn = findOptimalRouteMock.mock.calls[0][0];
-      expect(ourQuoteReqAmountIn.value.toString()).toEqual('99000000000000000000'); // ourQuoteReq.amountIn = the amount specified less the fee
+      expect(formatAmount(ourQuoteReqAmountIn)).toEqual('99.0'); // ourQuoteReq.amountIn = the amount specified less the fee
 
       const data = swap.transaction.data.toString();
 
@@ -188,8 +190,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(swapParams.tokenOut).toBe(params.outputToken);
       expect(swapParams.fee).toBe(10000);
       expect(swapParams.recipient).toBe(params.fromAddress);
-      expect(swapParams.amountIn.toString()).toBe('100000000000000000000'); // 100: swap.amountIn = userQuoteReq.amountIn
-      expect(swapParams.amountOutMinimum.toString()).toBe('961165048543689320388'); // 961.2: swap.amountOutMinimum = ourQuoteRes.amountOut - slippage
+      expect(formatEther(swapParams.amountIn)).toBe('100.0'); // 100: swap.amountIn = userQuoteReq.amountIn
+      expect(formatEther(swapParams.amountOutMinimum)).toBe('961.165048543689320388'); // 961.2: swap.amountOutMinimum = ourQuoteRes.amountOut - slippage
       expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0');
 
       expect(swap.transaction.to).toBe(TEST_SECONDARY_FEE_ADDRESS);
@@ -213,7 +215,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        ethers.utils.parseEther('100'),
+        utils.parseEther('100'),
       );
 
       expectToBeDefined(swap.transaction.data);
@@ -231,15 +233,15 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(swap.transaction.from).toBe(params.fromAddress); // from address
       expect(swap.transaction.value).toBe('0x00'); // refers to 0 amount of the native token
 
-      expect(ethers.utils.getAddress(decodedPath.inputToken)).toBe(params.inputToken);
-      expect(ethers.utils.getAddress(decodedPath.intermediaryToken)).toBe(params.intermediaryToken);
-      expect(ethers.utils.getAddress(decodedPath.outputToken)).toBe(params.outputToken);
+      expect(utils.getAddress(decodedPath.inputToken)).toBe(params.inputToken);
+      expect(utils.getAddress(decodedPath.intermediaryToken)).toBe(params.intermediaryToken);
+      expect(utils.getAddress(decodedPath.outputToken)).toBe(params.outputToken);
       expect(decodedPath.firstPoolFee.toString()).toBe('10000');
       expect(decodedPath.secondPoolFee.toString()).toBe('10000');
 
       expect(swapParams.recipient).toBe(params.fromAddress); // recipient of swap
-      expect(swapParams.amountIn.toString()).toBe('100000000000000000000'); // 100
-      expect(swapParams.amountOutMinimum.toString()).toBe('899100899100899100899'); // 899 includes slippage and fees
+      expect(formatEther(swapParams.amountIn)).toBe('100.0'); // 100
+      expect(formatEther(swapParams.amountOutMinimum)).toBe('899.100899100899100899'); // 899 includes slippage and fees
     });
 
     it('returns a quote', async () => {
@@ -256,7 +258,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        ethers.utils.parseEther('100'),
+        utils.parseEther('100'),
       );
 
       const tokenIn = { ...uniswapTokenToTokenInfo(IMX_TEST_TOKEN), name: undefined, symbol: undefined };
@@ -267,7 +269,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           feeBasisPoints: TEST_MAX_FEE_BASIS_POINTS,
           amount: {
             token: tokenIn,
-            value: ethers.utils.parseEther('10'),
+            value: utils.parseEther('10'),
           },
         },
       ]);
@@ -286,7 +288,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        ethers.utils.parseEther('100'),
+        utils.parseEther('100'),
       );
 
       expectToBeDefined(swap.transaction.data);
@@ -302,8 +304,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(swap.transaction.to).toBe(TEST_PERIPHERY_ROUTER_ADDRESS); // to address
       expect(swap.transaction.from).toBe(params.fromAddress); // from address
       expect(swap.transaction.value).toBe('0x00'); // refers to 0ETH
-      expect(swapParams.amountIn.toString()).toBe('100000000000000000000'); // amount in (100)
-      expect(swapParams.amountOutMinimum.toString()).toBe('999000999000999000999'); // min amount out (999 includes slippage)
+      expect(formatEther(swapParams.amountIn)).toBe('100.0'); // amount in
+      expect(formatEther(swapParams.amountOutMinimum)).toBe('999.000999000999000999'); // min amount out (includes slippage)
       expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
     });
 
@@ -318,7 +320,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        ethers.utils.parseEther('100'),
+        utils.parseEther('100'),
       );
 
       expectToBeDefined(tx.swap.gasFeeEstimate);
@@ -342,19 +344,15 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        ethers.utils.parseEther('100'),
+        utils.parseEther('100'),
       );
 
       expect(quote).not.toBe(undefined);
       expect(quote.amount.token.address).toEqual(params.outputToken);
       expect(quote.slippage).toBe(0.1);
-      expect(quote.amount.value.toString()).toEqual('1000000000000000000000'); // 1,000
-      expect(quote.amountWithMaxSlippage.token.address).toEqual(
-        params.outputToken,
-      );
-      expect(quote.amountWithMaxSlippage.value.toString()).toEqual(
-        '999000999000999000999', // 999 includes slippage
-      );
+      expect(formatAmount(quote.amount)).toEqual('1000.0');
+      expect(quote.amountWithMaxSlippage.token.address).toEqual(params.outputToken);
+      expect(formatAmount(quote.amountWithMaxSlippage)).toEqual('999.000999000999000999'); // includes slippage
     });
   });
 
@@ -369,7 +367,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        ethers.utils.parseEther('100'),
+        utils.parseEther('100'),
         HIGHER_SLIPPAGE,
       );
 
@@ -386,8 +384,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(swap.transaction.to).toBe(TEST_PERIPHERY_ROUTER_ADDRESS); // to address
       expect(swap.transaction.from).toBe(params.fromAddress); // from address
       expect(swap.transaction.value).toBe('0x00'); // refers to 0ETH
-      expect(swapParams.amountIn.toString()).toBe('100000000000000000000'); // amount in (100)
-      expect(swapParams.amountOutMinimum.toString()).toBe('998003992015968063872'); // min amount out (998 includes 0.2% slippage)
+      expect(formatEther(swapParams.amountIn)).toBe('100.0'); // amount in
+      expect(formatEther(swapParams.amountOutMinimum)).toBe('998.003992015968063872'); // min amount out (includes 0.2% slippage)
       expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
     });
 
@@ -401,20 +399,16 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        ethers.utils.parseEther('100'),
+        utils.parseEther('100'),
         HIGHER_SLIPPAGE,
       );
 
       expect(quote).not.toBe(undefined);
       expect(quote.amount.token.address).toEqual(params.outputToken);
       expect(quote.slippage).toBe(0.2);
-      expect(quote.amount.value.toString()).toEqual('1000000000000000000000'); // 1000
-      expect(quote.amountWithMaxSlippage.token.address).toEqual(
-        params.outputToken,
-      );
-      expect(quote.amountWithMaxSlippage.value.toString()).toEqual(
-        '998003992015968063872', // 998 includes 0.2% slippage
-      );
+      expect(formatAmount(quote.amount)).toEqual('1000.0');
+      expect(quote.amountWithMaxSlippage.token.address).toEqual(params.outputToken);
+      expect(formatAmount(quote.amountWithMaxSlippage)).toEqual('998.003992015968063872'); // includes 0.2% slippage
     });
   });
 
@@ -424,14 +418,14 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
-      const invalidAddress = ethers.constants.AddressZero;
+      const invalidAddress = constants.AddressZero;
 
       await expect(
         exchange.getUnsignedSwapTxFromAmountIn(
           invalidAddress,
           params.inputToken,
           params.outputToken,
-          ethers.utils.parseEther('100'),
+          utils.parseEther('100'),
           HIGHER_SLIPPAGE,
         ),
       ).rejects.toThrow(
@@ -443,7 +437,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           params.fromAddress,
           invalidAddress,
           params.outputToken,
-          ethers.utils.parseEther('100'),
+          utils.parseEther('100'),
           HIGHER_SLIPPAGE,
         ),
       ).rejects.toThrow(new InvalidAddressError('Error: invalid token in address'));
@@ -453,7 +447,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           params.fromAddress,
           params.inputToken,
           invalidAddress,
-          ethers.utils.parseEther('100'),
+          utils.parseEther('100'),
           HIGHER_SLIPPAGE,
         ),
       ).rejects.toThrow(new InvalidAddressError('Error: invalid token out address'));
@@ -473,7 +467,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           invalidAddress,
           params.inputToken,
           params.outputToken,
-          ethers.utils.parseEther('100'),
+          utils.parseEther('100'),
           HIGHER_SLIPPAGE,
         ),
       ).rejects.toThrow(
@@ -485,7 +479,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           params.fromAddress,
           invalidAddress,
           params.outputToken,
-          ethers.utils.parseEther('100'),
+          utils.parseEther('100'),
           HIGHER_SLIPPAGE,
         ),
       ).rejects.toThrow(new InvalidAddressError('Error: invalid token in address'));
@@ -495,7 +489,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           params.fromAddress,
           params.inputToken,
           invalidAddress,
-          ethers.utils.parseEther('100'),
+          utils.parseEther('100'),
           HIGHER_SLIPPAGE,
         ),
       ).rejects.toThrow(new InvalidAddressError('Error: invalid token out address'));
@@ -514,7 +508,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           params.fromAddress,
           params.inputToken,
           params.outputToken,
-          ethers.utils.parseEther('100'),
+          utils.parseEther('100'),
           HIGHER_SLIPPAGE,
           11,
         ),
@@ -534,7 +528,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           params.fromAddress,
           params.inputToken,
           params.outputToken,
-          ethers.utils.parseEther('100'),
+          utils.parseEther('100'),
           HIGHER_SLIPPAGE,
           0,
         ),
@@ -554,7 +548,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           params.fromAddress,
           params.inputToken,
           params.outputToken,
-          ethers.utils.parseEther('100'),
+          utils.parseEther('100'),
           100,
           2,
         ),
@@ -574,7 +568,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           params.fromAddress,
           params.inputToken,
           params.outputToken,
-          ethers.utils.parseEther('100'),
+          utils.parseEther('100'),
           -5,
           2,
         ),
