@@ -4,7 +4,7 @@ import {
   FUN_TEST_TOKEN, IMX_TEST_TOKEN, TEST_FEE_RECIPIENT,
   decodeMulticallExactInputSingleWithFees, decodeMulticallExactInputSingleWithoutFees,
   decodeMulticallExactOutputSingleWithFees, decodeMulticallExactOutputSingleWithoutFees,
-  expectInstanceOf, expectToBeDefined, makeAddr,
+  expectInstanceOf, expectToBeDefined, makeAddr, formatAmount,
 } from 'test/utils';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import { Fees } from 'lib/fees';
@@ -147,7 +147,7 @@ describe('prepareSwap', () => {
 
       const preparedSwap = prepareSwap(quote, quote.amountIn, new Fees([], IMX_TEST_TOKEN));
 
-      expect(preparedSwap.amountIn.toString()).toEqual(quote.amountIn.toString());
+      expect(formatAmount(preparedSwap.amountIn)).toEqual(formatAmount(quote.amountIn));
     });
 
     it('should use the quoted amount for the amountOut', async () => {
@@ -155,7 +155,7 @@ describe('prepareSwap', () => {
 
       const preparedSwap = prepareSwap(quote, quote.amountIn, new Fees([], IMX_TEST_TOKEN));
 
-      expect(preparedSwap.amountOut.toString()).toEqual(quote.amountOut.toString());
+      expect(formatAmount(preparedSwap.amountOut)).toEqual(formatAmount(quote.amountOut));
     });
 
     describe('with fees', () => {
@@ -168,8 +168,8 @@ describe('prepareSwap', () => {
           new Fees([{ feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: 1000 }], IMX_TEST_TOKEN), // 1% fee
         );
 
-        expect(preparedSwap.amountIn.toString()).toEqual(quote.amountIn.toString());
-        expect(preparedSwap.amountOut.toString()).toEqual(quote.amountOut.toString());
+        expect(formatAmount(preparedSwap.amountIn)).toEqual(formatAmount(quote.amountIn));
+        expect(formatAmount(preparedSwap.amountOut)).toEqual(formatAmount(quote.amountOut));
       });
     });
   });
@@ -180,7 +180,7 @@ describe('prepareSwap', () => {
 
       const preparedSwap = prepareSwap(quote, quote.amountOut, new Fees([], IMX_TEST_TOKEN));
 
-      expect(preparedSwap.amountIn.toString()).toEqual(quote.amountIn.toString());
+      expect(formatAmount(preparedSwap.amountIn)).toEqual(formatAmount(quote.amountIn));
     });
 
     it('should use the specified amount for the amountOut', async () => {
@@ -188,7 +188,7 @@ describe('prepareSwap', () => {
 
       const preparedSwap = prepareSwap(quote, quote.amountOut, new Fees([], IMX_TEST_TOKEN));
 
-      expect(preparedSwap.amountOut.toString()).toEqual(quote.amountOut.toString());
+      expect(formatAmount(preparedSwap.amountOut)).toEqual(formatAmount(quote.amountOut));
     });
 
     describe('with fees', () => {
@@ -202,8 +202,8 @@ describe('prepareSwap', () => {
           new Fees([{ feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: 1000 }], IMX_TEST_TOKEN), // 1% fee
         );
 
-        expect(utils.formatEther(preparedSwap.amountIn.value)).toEqual('110.0'); // quotedAmount + 1% fee
-        expect(preparedSwap.amountOut.toString()).toEqual(quote.amountOut.toString());
+        expect(formatAmount(preparedSwap.amountIn)).toEqual('110.0'); // quotedAmount + 1% fee
+        expect(formatAmount(preparedSwap.amountOut)).toEqual(formatAmount(quote.amountOut));
       });
     });
   });
