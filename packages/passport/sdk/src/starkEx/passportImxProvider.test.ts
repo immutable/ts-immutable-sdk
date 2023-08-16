@@ -13,7 +13,7 @@ import {
   UnsignedOrderRequest,
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
-import { mockUserImx } from '../test/mocks';
+import { mockUserImx, testConfig } from '../test/mocks';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import { PassportImxProvider } from './passportImxProvider';
 import {
@@ -52,12 +52,7 @@ describe('PassportImxProvider', () => {
       starkSigner: mockStarkSigner,
       confirmationScreen,
       immutableXClient,
-      config: new PassportConfiguration({
-        baseConfig: {} as ImmutableConfiguration,
-        clientId: 'client123',
-        logoutRedirectUri: 'http://localhost:3000/logout',
-        redirectUri: 'http://localhost:3000/redirect',
-      }),
+      config: testConfig,
     });
   });
 
