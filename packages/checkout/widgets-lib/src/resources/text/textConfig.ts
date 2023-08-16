@@ -275,6 +275,7 @@ export const text = {
   wallets: {
     [WalletProviderName.PASSPORT]: {
       heading: 'Immutable Passport',
+      accentText: 'Recommended',
       description:
         'digital wallet and identity',
     },

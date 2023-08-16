@@ -112,7 +112,6 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
         const connectResult = await checkout.connect({
           provider,
         });
-
         connectDispatch({
           payload: {
             type: ConnectActions.SET_PROVIDER,
