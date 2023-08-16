@@ -1,4 +1,4 @@
-import { Web3Provider } from '@ethersproject/providers';
+import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
 import { BigNumber, Contract } from 'ethers';
 import { ERC20ABI, ItemRequirement, ItemType } from '../types';
 import { CheckoutError, CheckoutErrorType } from '../errors';
@@ -25,6 +25,24 @@ export const erc20Allowance = async (
   }
 };
 
+export const getERC20ApprovalTransaction = async (
+  provider: Web3Provider,
+  contractAddress: string,
+  spenderAddress: string,
+  amount: BigNumber,
+): Promise<TransactionRequest | undefined> => {
+  try {
+    const contract = new Contract(
+      contractAddress,
+      JSON.stringify(ERC20ABI),
+      provider,
+    );
+    return await contract.populateTransaction.approve(spenderAddress, amount);
+  } catch {
+    return undefined;
+  }
+};
+
 type SufficientAllowance = {
   sufficient: true,
   itemRequirement: ItemRequirement,
@@ -33,6 +51,7 @@ type SufficientAllowance = {
   sufficient: false,
   delta: BigNumber,
   itemRequirement: ItemRequirement,
+  transaction: TransactionRequest | undefined,
 };
 
 export const hasERC20Allowances = async (
@@ -67,6 +86,13 @@ export const hasERC20Allowances = async (
       sufficient: false,
       delta: itemRequirement.amount.sub(allowance),
       itemRequirement,
+      // eslint-disable-next-line no-await-in-loop
+      transaction: await getERC20ApprovalTransaction(
+        provider,
+        itemRequirement.contractAddress,
+        itemRequirement.spenderAddress,
+        itemRequirement.amount,
+      ),
     });
 
     // eslint-disable-next-line no-console
