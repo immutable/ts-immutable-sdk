@@ -77,14 +77,9 @@ export class Checkout {
   public async createProvider(
     params: CreateProviderParams,
   ): Promise<CreateProviderResult> {
-    if (params.passport !== null) {
-      return await provider.createProvider(
-        params.walletProvider,
-        params.passport,
-      );
-    }
     return await provider.createProvider(
       params.walletProvider,
+      params.passport,
     );
   }
 

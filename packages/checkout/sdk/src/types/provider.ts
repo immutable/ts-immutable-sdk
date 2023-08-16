@@ -17,7 +17,7 @@ export enum WalletProviderName {
  */
 export interface CreateProviderParams {
   walletProvider: WalletProviderName;
-  passport: Passport | null;
+  passport: Passport | undefined;
 }
 
 /**
