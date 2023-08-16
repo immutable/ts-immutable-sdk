@@ -14,7 +14,7 @@ type mapping = {
 
 export function Example() {
   // Instead of hard-coding these tokens, you can optionally retrieve available tokens from the user's wallet
-  const TEST_IMX_TOKEN = '0xb95B75B4E4c09F04d5DA6349861BF1b6F163D78c';
+  const TEST_IMX_TOKEN = '0x0000000000000000000000000000000000001010';
   const ZKCATS_TOKEN = '0xaC953a0d7B67Fae17c87abf79f09D0f818AC66A2';
 
   const [ethereumAccount, setEthereumAccount] = useState<string | null>(null);
