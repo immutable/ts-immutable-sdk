@@ -1,13 +1,13 @@
 import { TradeType } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
-import { QuoteTradeInfo } from 'lib/router';
 import { Fees } from 'lib/fees';
+import { QuoteResult } from 'lib/getQuotesForRoutes';
 import {
   Amount, Quote, TokenInfo,
 } from '../../types';
 import { slippageToFraction } from './slippage';
 
-function getQuoteAmountFromTradeType(tradeInfo: QuoteTradeInfo): Amount {
+function getQuoteAmountFromTradeType(tradeInfo: QuoteResult): Amount {
   if (tradeInfo.tradeType === TradeType.EXACT_INPUT) {
     return tradeInfo.amountOut;
   }
@@ -29,7 +29,7 @@ export function applySlippage(
 
 export function prepareUserQuote(
   otherToken: TokenInfo,
-  tradeInfo: QuoteTradeInfo,
+  tradeInfo: QuoteResult,
   slippage: number,
   fees: Fees,
 ): Quote {

@@ -3,7 +3,7 @@ import { Token, TradeType } from '@uniswap/sdk-core';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import { NoRoutesAvailableError } from 'errors';
 import { Amount, TokenInfo } from 'types';
-import { poolEquals } from './utils';
+import { poolEquals, tokenInfoToUniswapToken } from './utils';
 import { getQuotesForRoutes, QuoteResult } from './getQuotesForRoutes';
 import { fetchValidPools } from './poolUtils/fetchValidPools';
 import { ERC20Pair } from './poolUtils/generateERC20Pairs';
@@ -15,14 +15,6 @@ export type RoutingContracts = {
   quoterAddress: string;
   peripheryRouterAddress: string;
   secondaryFeeAddress: string;
-};
-
-export type QuoteTradeInfo = {
-  route: Route<Token, Token>;
-  amountIn: Amount;
-  amountOut: Amount;
-  tradeType: TradeType;
-  gasEstimate: ethers.BigNumber
 };
 
 export class Router {
@@ -47,7 +39,7 @@ export class Router {
     otherToken: TokenInfo,
     tradeType: TradeType,
     maxHops: number = 2,
-  ): Promise<QuoteTradeInfo> {
+  ): Promise<QuoteResult> {
     const [tokenIn, tokenOut] = this.determineERC20InAndERC20Out(
       tradeType,
       amountSpecified,
@@ -92,22 +84,12 @@ export class Router {
     }
 
     // Get the best quote from all of the given routes
-    const {
-      amountIn, amountOut, gasEstimate, route,
-    } = await this.getBestQuoteFromRoutes(
+    return await this.getBestQuoteFromRoutes(
       multicallContract,
       routes,
       amountSpecified,
       tradeType,
     );
-
-    return {
-      route,
-      amountIn,
-      amountOut,
-      tradeType,
-      gasEstimate,
-    };
   }
 
   private async getBestQuoteFromRoutes(
@@ -115,13 +97,7 @@ export class Router {
     routes: Route<Token, Token>[],
     amountSpecified: Amount,
     tradeType: TradeType,
-  ): Promise<
-    {
-      route: Route<Token, Token>,
-      amountIn: Amount,
-      amountOut: Amount,
-      gasEstimate: ethers.BigNumber
-    }> {
+  ): Promise<QuoteResult> {
     const quotes = await getQuotesForRoutes(
       multicallContract,
       this.routingContracts.quoterAddress,
@@ -135,26 +111,12 @@ export class Router {
 
     // We want to maximise the amountOut for the EXACT_INPUT type
     if (tradeType === TradeType.EXACT_INPUT) {
-      const bestQuote = this.bestQuoteForAmountIn(quotes);
-
-      return {
-        route: bestQuote.route,
-        amountIn: bestQuote.amountIn,
-        amountOut: bestQuote.amountOut,
-        gasEstimate: bestQuote.gasEstimate,
-      };
+      return this.bestQuoteForAmountIn(quotes);
     }
 
     // We want to minimise the amountIn for the EXACT_OUTPUT type
     if (tradeType === TradeType.EXACT_OUTPUT) {
-      const bestQuote = this.bestQuoteForAmountOut(quotes);
-
-      return {
-        route: bestQuote.route,
-        amountIn: bestQuote.amountIn,
-        amountOut: bestQuote.amountOut,
-        gasEstimate: bestQuote.gasEstimate,
-      };
+      return this.bestQuoteForAmountOut(quotes);
     }
 
     throw new Error('Invalid trade type');
@@ -208,9 +170,10 @@ export const generateAllAcyclicPaths = (
   routes: Route<Token, Token>[] = [], // list of all routes found so far
   startTokenIn: TokenInfo = tokenIn, // the currency we started with
 ): Route<Token, Token>[] => {
-  const currencyIn = new Token(tokenIn.chainId, tokenIn.address, tokenIn.decimals);
-  const currencyOut = new Token(tokenOut.chainId, tokenOut.address, tokenOut.decimals);
-  const startCurrencyIn = new Token(startTokenIn.chainId, startTokenIn.address, startTokenIn.decimals);
+  const currencyIn = tokenInfoToUniswapToken(tokenIn);
+  const currencyOut = tokenInfoToUniswapToken(tokenOut);
+  const startCurrencyIn = tokenInfoToUniswapToken(startTokenIn);
+
   for (const pool of pools) {
     // if the pool doesn't have the tokenIn or if it has already been traversed,
     // skip to the next pool

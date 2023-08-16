@@ -7,9 +7,9 @@ import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { SecondaryFee__factory } from 'contracts/types';
 import { IV3SwapRouter } from 'contracts/types/SecondaryFee';
 import { PromiseOrValue } from 'contracts/types/common';
+import { QuoteResult } from 'lib/getQuotesForRoutes';
 import {
   Amount,
-  QuoteTradeInfo,
   Router,
   RoutingContracts,
   SecondaryFee,
@@ -391,7 +391,7 @@ export function mockRouterImplementation(params: MockParams) {
     const amountOut = tradeType === TradeType.EXACT_INPUT
       ? { token: uniswapTokenToTokenInfo(tokenOut), value: amountSpecified.value.mul(exchangeRate) } : amountSpecified;
 
-    const trade: QuoteTradeInfo = {
+    const trade: QuoteResult = {
       route,
       amountIn,
       amountOut,

@@ -15,6 +15,7 @@ export type QuoteResult = {
   gasEstimate: ethers.BigNumber
   amountIn: Amount;
   amountOut: Amount;
+  tradeType: TradeType;
 };
 
 export async function getQuotesForRoutes(
@@ -75,6 +76,7 @@ export async function getQuotesForRoutes(
           amountIn: tradeType === TradeType.EXACT_INPUT ? amountSpecified : newAmount(quoteAmount, routes[i].input),
           amountOut: tradeType === TradeType.EXACT_INPUT ? newAmount(quoteAmount, routes[i].output) : amountSpecified,
           gasEstimate: ethers.BigNumber.from(decodedQuoteResult[gasEstimateIndex]),
+          tradeType,
         });
       }
     } catch {
