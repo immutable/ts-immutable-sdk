@@ -10,6 +10,7 @@
     "@ethersproject/providers": "^5.7.2",
     "@imtbl/config": "0.0.0",
     "@imtbl/core-sdk": "^2.0.2",
+    "@imtbl/generated-clients": "0.0.0",
     "@imtbl/guardian": "0.0.0",
     "@imtbl/immutablex-client": "0.0.0",
     "@imtbl/provider": "0.0.0",
