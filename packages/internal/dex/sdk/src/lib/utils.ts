@@ -111,7 +111,3 @@ export const subtractAmount = (a: Amount, b: Amount) => {
   if (a.token.address !== b.token.address) throw new Error('Token mismatch');
   return { value: a.value.sub(b.value), token: a.token };
 };
-
-// export const multiplyAmount = (a: Amount, b: number) => ({ value: a.value.mul(b), token: a.token });
-
-// export const divideAmount = (a: Amount, b: number) => ({ value: a.value.div(b), token: a.token });
