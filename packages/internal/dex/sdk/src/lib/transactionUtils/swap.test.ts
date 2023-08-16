@@ -37,7 +37,7 @@ const buildExactOutputQuote = (): QuoteTradeInfo => {
     gasEstimate: BigNumber.from(0),
     route,
     amountIn: newAmount(utils.parseEther('100'), route.input),
-    amountOut: newAmount(utils.parseEther('9910000'), route.output),
+    amountOut: newAmount(utils.parseEther('1000'), route.output),
     tradeType: TradeType.EXACT_OUTPUT,
   };
 };
