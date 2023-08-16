@@ -97,8 +97,8 @@ describe('ExchangeConfiguration', () => {
 
       const secondaryFees = [
         {
-          feeRecipient: dummyFeeRecipient,
-          feeBasisPoints: 100,
+          recipient: dummyFeeRecipient,
+          basisPoints: 100,
         },
       ];
 
@@ -140,10 +140,10 @@ describe('ExchangeConfiguration', () => {
         // This should never happen
         throw new Error('Secondary fees should be defined');
       }
-      expect(config.secondaryFees[0].feeRecipient.toLowerCase())
+      expect(config.secondaryFees[0].recipient.toLowerCase())
         .toEqual(dummyFeeRecipient.toLowerCase());
-      expect(config.secondaryFees[0].feeBasisPoints.toString())
-        .toEqual(secondaryFees[0].feeBasisPoints.toString());
+      expect(config.secondaryFees[0].basisPoints.toString())
+        .toEqual(secondaryFees[0].basisPoints.toString());
     });
 
     it('should throw when missing configuration', () => {
@@ -203,8 +203,8 @@ describe('ExchangeConfiguration', () => {
 
       const secondaryFees = [
         {
-          feeRecipient: invalidFeeRecipient,
-          feeBasisPoints: 100,
+          recipient: invalidFeeRecipient,
+          basisPoints: 100,
         },
       ];
 
@@ -222,7 +222,7 @@ describe('ExchangeConfiguration', () => {
         secondaryFees,
         overrides,
       })).toThrow(new InvalidConfigurationError(
-        `Invalid secondary fee recipient address: ${secondaryFees[0].feeRecipient}`,
+        `Invalid secondary fee recipient address: ${secondaryFees[0].recipient}`,
       ));
     });
 
@@ -235,23 +235,23 @@ describe('ExchangeConfiguration', () => {
 
       const secondaryFeesOneRecipient = [
         {
-          feeRecipient: dummyFeeRecipient,
-          feeBasisPoints: 10001,
+          recipient: dummyFeeRecipient,
+          basisPoints: 10001,
         },
       ];
 
       const secondaryFeesMultipleRecipients = [
         {
-          feeRecipient: dummyFeeRecipient,
-          feeBasisPoints: 5000,
+          recipient: dummyFeeRecipient,
+          basisPoints: 5000,
         },
         {
-          feeRecipient: dummyFeeRecipient,
-          feeBasisPoints: 5000,
+          recipient: dummyFeeRecipient,
+          basisPoints: 5000,
         },
         {
-          feeRecipient: dummyFeeRecipient,
-          feeBasisPoints: 1000,
+          recipient: dummyFeeRecipient,
+          basisPoints: 1000,
         },
       ];
 
@@ -269,7 +269,7 @@ describe('ExchangeConfiguration', () => {
         secondaryFees: secondaryFeesOneRecipient,
         overrides,
       })).toThrow(new InvalidConfigurationError(
-        `Invalid secondary fee basis points: ${secondaryFeesOneRecipient[0].feeBasisPoints}`,
+        `Invalid secondary fee basis points: ${secondaryFeesOneRecipient[0].basisPoints}`,
       ));
 
       expect(() => new ExchangeConfiguration({
