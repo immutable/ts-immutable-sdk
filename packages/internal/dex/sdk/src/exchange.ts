@@ -150,15 +150,16 @@ export class Exchange {
     const fees = new Fees(secondaryFees, uniswapTokenToTokenInfo(tokenIn));
     const ourQuoteReqAmount = getOurQuoteReqAmount(amountSpecified, fees, tradeType);
 
-    const ourQuote = await this.router.findOptimalRoute(
-      ourQuoteReqAmount,
-      otherToken,
-      tradeType,
-      maxHops,
-    );
-
-    // get gas details
-    const gasPrice = await fetchGasPrice(this.provider);
+    // get quote and gas details
+    const [ourQuote, gasPrice] = await Promise.all([
+      this.router.findOptimalRoute(
+        ourQuoteReqAmount,
+        otherToken,
+        tradeType,
+        maxHops,
+      ),
+      fetchGasPrice(this.provider),
+    ]);
 
     const adjustedQuote = prepareSwap(ourQuote, amountSpecified, fees);
 
