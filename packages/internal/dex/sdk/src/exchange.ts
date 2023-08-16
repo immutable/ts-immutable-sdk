@@ -118,12 +118,11 @@ export class Exchange {
   ): Promise<TransactionResponse> {
     Exchange.validate(tokenInAddress, tokenOutAddress, maxHops, slippagePercent, fromAddress);
 
-    const secondaryFees = await this.getSecondaryFees();
-
     // get the decimals of the tokens that will be swapped
-    const [tokenInDecimals, tokenOutDecimals] = await Promise.all([
+    const [tokenInDecimals, tokenOutDecimals, secondaryFees] = await Promise.all([
       getERC20Decimals(tokenInAddress, this.provider),
       getERC20Decimals(tokenOutAddress, this.provider),
+      this.getSecondaryFees(),
     ]);
 
     const tokenIn: Token = new Token(
