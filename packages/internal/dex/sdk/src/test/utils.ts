@@ -436,7 +436,7 @@ export function formatAmount(amount: Amount): string {
 }
 
 export function formatEther(bn: PromiseOrValue<BigNumberish>): string {
-  if (BigNumber.isBigNumber(bn)) {
+  if (BigNumber.isBigNumber(bn) || typeof bn === 'string') {
     return utils.formatEther(bn);
   }
   throw new Error('formatEther: bn is not a BigNumber');
