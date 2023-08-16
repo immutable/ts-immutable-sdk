@@ -1,5 +1,5 @@
 import { WalletProviderName, WalletInfo } from '@imtbl/checkout-sdk';
-import { MenuItem } from '@biom3/react';
+import { Box, MenuItem } from '@biom3/react';
 import { text } from '../../../resources/text/textConfig';
 
 export interface WalletProps {
@@ -12,6 +12,7 @@ export function WalletItem(props: WalletProps) {
 
   const walletText = wallets[wallet.walletProvider];
   const logo = {
+    [WalletProviderName.PASSPORT]: 'PassportSymbolOutlined',
     [WalletProviderName.METAMASK]: 'MetaMaskSymbol',
   };
 
@@ -27,12 +28,14 @@ export function WalletItem(props: WalletProps) {
           size="medium"
           emphasized
           onClick={() => onWalletClick(wallet.walletProvider)}
+          sx={{ marginBottom: 'base.spacing.x1' }}
         >
           <MenuItem.FramedLogo
             logo={logo[wallet.walletProvider] as any}
             sx={{
-              width: 'base.icon.size.500',
-              backgroundColor: 'base.color.translucent.emphasis.200',
+              minWidth: 'base.icon.size.500',
+              padding: 'base.spacing.x1',
+              backgroundColor: 'base.color.translucent.standard.100',
               borderRadius: 'base.borderRadius.x2',
             }}
           />
@@ -41,6 +44,12 @@ export function WalletItem(props: WalletProps) {
           </MenuItem.Label>
           <MenuItem.IntentIcon />
           <MenuItem.Caption>
+            {wallet.walletProvider === WalletProviderName.PASSPORT ? (
+              <Box as="span" sx={{ c: 'base.gradient.1' }}>
+                Recommended
+              </Box>
+            ) : null}
+            {' '}
             {wallets[wallet.walletProvider].description}
           </MenuItem.Caption>
         </MenuItem>

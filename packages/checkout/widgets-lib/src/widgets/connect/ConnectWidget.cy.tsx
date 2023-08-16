@@ -6,7 +6,8 @@ import {
 import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { Environment } from '@imtbl/config';
-import { Web3Provider } from '@ethersproject/providers';
+import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
+import { Passport } from '@imtbl/passport';
 import { cySmartGet } from '../../lib/testUtils';
 import { ConnectWidget, ConnectWidgetParams } from './ConnectWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
@@ -38,6 +39,44 @@ describe('ConnectWidget tests', () => {
     cySmartGet('wallet-list-metamask').click();
   };
 
+  const mockPassportProvider = (request: 'reject' | 'resolve') => {
+    if (request === 'reject') {
+      return {
+        isPassport: true,
+        request: cy.stub().as('requestStub').rejects({}),
+      } as any as ExternalProvider;
+    }
+    if (request === 'resolve') {
+      return {
+        isPassport: true,
+        request: cy.stub().as('requestStub').resolves({}),
+      } as any as ExternalProvider;
+    }
+    return {};
+  };
+
+  const mountConnectWidgetWithPassport = (passportProviderRequest: 'reject' | 'resolve') => {
+    const passportProvider = mockPassportProvider(passportProviderRequest);
+    const testPassportInstance = {
+      connectEvm: cy.stub().as('connectEvmStub').returns(passportProvider),
+    } as any as Passport;
+    const passportParams = {
+      passport: testPassportInstance,
+    } as ConnectWidgetParams;
+
+    mount(
+      <ConnectWidget
+        params={passportParams}
+        config={config}
+      />,
+    );
+  };
+
+  const mountConnectWidgetWithPassportAndGoToReadyToConnect = (passportProviderRequest: 'reject' | 'resolve') => {
+    mountConnectWidgetWithPassport(passportProviderRequest);
+    cySmartGet('wallet-list-passport').click();
+  };
+
   beforeEach(() => {
     cy.viewport('ipad-2');
   });
@@ -48,6 +87,13 @@ describe('ConnectWidget tests', () => {
 
       cySmartGet('wallet-list').should('exist');
       cySmartGet('wallet-list-metamask').should('be.visible');
+    });
+
+    it('should show Passport wallet option on desktop if passport instance is passed in', () => {
+      mountConnectWidgetWithPassport('resolve');
+
+      cySmartGet('wallet-list').should('exist');
+      cySmartGet('wallet-list-passport').should('be.visible');
     });
 
     it('should show the Immutable Logo in the footer', () => {
@@ -68,64 +114,139 @@ describe('ConnectWidget tests', () => {
 
       cySmartGet('wallet-list-metamask').click();
       cySmartGet('ready-to-connect').should('be.visible');
+      cySmartGet('metamask-connect-hero').should('be.visible');
+    });
+
+    it('should update the view to Ready to Connect screen when Passport is clicked', () => {
+      mountConnectWidgetWithPassport('resolve');
+
+      cySmartGet('wallet-list-passport').click();
+      cySmartGet('ready-to-connect').should('be.visible');
+      cySmartGet('passport-connect-hero').should('be.visible');
     });
   });
 
   describe('Ready to connect screen', () => {
-    beforeEach(() => {
-      cy.stub(Checkout.prototype, 'createProvider')
-        .as('createProviderStub')
-        .resolves({
-          provider: {} as Web3Provider,
-        });
+    describe('Passport', () => {
+      it('should show Passport logo in Hero content', () => {
+        mountConnectWidgetWithPassportAndGoToReadyToConnect('resolve');
+
+        cySmartGet('ready-to-connect').should('be.visible');
+        cySmartGet('passport-connect-hero').should('be.visible');
+        cySmartGet('passport-connect-hero-logo').should('be.visible');
+      });
+
+      it('should call connectEvm on passport instance when Continue is clicked', () => {
+        mountConnectWidgetWithPassportAndGoToReadyToConnect('resolve');
+
+        cySmartGet('ready-to-connect').should('be.visible');
+        cySmartGet('footer-button').should('have.text', 'Continue');
+        cySmartGet('footer-button').click();
+        cySmartGet('@connectEvmStub').should('have.been.called');
+      });
+
+      it('should update footer button text to Try again when user rejects connection request', () => {
+        mountConnectWidgetWithPassportAndGoToReadyToConnect('reject');
+
+        cySmartGet('ready-to-connect').should('be.visible');
+        cySmartGet('footer-button').should('have.text', 'Continue');
+        cySmartGet('footer-button').click();
+        cySmartGet('@requestStub').should('have.been.called');
+        cySmartGet('@connectEvmStub').should('have.been.called');
+        cySmartGet('footer-button').should('have.text', 'Try again');
+      });
+
+      it('should call request when Try again is clicked', () => {
+        const provider = mockPassportProvider('reject');
+        cy.stub(Checkout.prototype, 'connect').as('connectStub').onFirstCall().rejects({})
+          .onSecondCall()
+          .resolves({ provider: { provider } as Web3Provider, walletProvider: 'passport' });
+        cy.stub(Checkout.prototype, 'getNetworkInfo')
+          .as('getNetworkInfoStub')
+          .resolves({});
+
+        mountConnectWidgetWithPassportAndGoToReadyToConnect('reject');
+
+        cySmartGet('ready-to-connect').should('be.visible');
+        cySmartGet('footer-button').should('have.text', 'Continue');
+        cySmartGet('footer-button').click();
+        cySmartGet('@requestStub').should('have.been.called');
+        cySmartGet('@connectEvmStub').should('have.been.called');
+        cySmartGet('footer-button').should('have.text', 'Try again');
+        cySmartGet('footer-button').click();
+        cySmartGet('@connectStub').should('have.been.calledTwice');
+      });
+
+      it('should go back to Connect A Wallet screen when back is clicked', () => {
+        mountConnectWidgetWithPassportAndGoToReadyToConnect('resolve');
+
+        cySmartGet('back-button').click();
+        cySmartGet('ready-to-connect').should('not.exist');
+        cySmartGet('connect-wallet').should('be.visible');
+      });
     });
 
-    it('should show MetaMask logo in Hero content', () => {
-      mountConnectWidgetAndGoToReadyToConnect();
-      cySmartGet('ready-to-connect').should('be.visible');
-      cySmartGet('metamask-connect-hero').should('be.visible');
-      cySmartGet('metamask-connect-hero-logo').should('be.visible');
-    });
+    describe('Metamask', () => {
+      beforeEach(() => {
+        cy.stub(Checkout.prototype, 'createProvider')
+          .as('createProviderStub')
+          .resolves({
+            provider: {} as Web3Provider,
+          });
+      });
 
-    it('should call checkout.connect() when Ready to connect is clicked', () => {
-      cy.stub(Checkout.prototype, 'connect').as('connectStub').resolves({});
-      cy.stub(Checkout.prototype, 'getNetworkInfo')
-        .as('getNetworkInfoStub')
-        .resolves({});
-      mountConnectWidgetAndGoToReadyToConnect();
-      cySmartGet('ready-to-connect').should('be.visible');
-      cySmartGet('footer-button').should('have.text', 'Ready to connect');
-      cySmartGet('footer-button').click();
-      cySmartGet('@connectStub').should('have.been.calledWith', { provider: {} as Web3Provider });
-    });
+      it('should show MetaMask logo in Hero content', () => {
+        mountConnectWidgetAndGoToReadyToConnect();
 
-    it('should update footer button text to Try again when user rejects connection request', () => {
-      cy.stub(Checkout.prototype, 'connect').as('connectStub').rejects({});
-      mountConnectWidgetAndGoToReadyToConnect();
-      cySmartGet('ready-to-connect').should('be.visible');
-      cySmartGet('footer-button').should('have.text', 'Ready to connect');
-      cySmartGet('footer-button').click();
-      cySmartGet('@connectStub').should('have.been.called');
-      cySmartGet('footer-button').should('have.text', 'Try again');
-    });
+        cySmartGet('ready-to-connect').should('be.visible');
+        cySmartGet('metamask-connect-hero').should('be.visible');
+        cySmartGet('metamask-connect-hero-logo').should('be.visible');
+      });
 
-    it('should call checkout.connect() when Try again is clicked', () => {
-      cy.stub(Checkout.prototype, 'connect').as('connectStub').rejects({});
-      mountConnectWidgetAndGoToReadyToConnect();
-      cySmartGet('ready-to-connect').should('be.visible');
-      cySmartGet('footer-button').should('have.text', 'Ready to connect');
-      cySmartGet('footer-button').click();
-      cySmartGet('@connectStub').should('have.been.called');
-      cySmartGet('footer-button').should('have.text', 'Try again');
-      cySmartGet('footer-button').click();
-      cySmartGet('@connectStub').should('have.been.calledTwice');
-    });
+      it('should call checkout.connect() when Ready to connect is clicked', () => {
+        cy.stub(Checkout.prototype, 'connect').as('connectStub').resolves({});
+        cy.stub(Checkout.prototype, 'getNetworkInfo')
+          .as('getNetworkInfoStub')
+          .resolves({});
+        mountConnectWidgetAndGoToReadyToConnect();
 
-    it('should go back to Connect A Wallet screen when back is clicked', () => {
-      mountConnectWidgetAndGoToReadyToConnect();
-      cySmartGet('back-button').click();
-      cySmartGet('ready-to-connect').should('not.exist');
-      cySmartGet('connect-wallet').should('be.visible');
+        cySmartGet('ready-to-connect').should('be.visible');
+        cySmartGet('footer-button').should('have.text', 'Ready to connect');
+        cySmartGet('footer-button').click();
+        cySmartGet('@connectStub').should('have.been.calledWith', { provider: { provider: {} as Web3Provider } });
+      });
+
+      it('should update footer button text to Try again when user rejects connection request', () => {
+        cy.stub(Checkout.prototype, 'connect').as('connectStub').rejects({});
+        mountConnectWidgetAndGoToReadyToConnect();
+
+        cySmartGet('ready-to-connect').should('be.visible');
+        cySmartGet('footer-button').should('have.text', 'Ready to connect');
+        cySmartGet('footer-button').click();
+        cySmartGet('@connectStub').should('have.been.called');
+        cySmartGet('footer-button').should('have.text', 'Try again');
+      });
+
+      it('should call checkout.connect() when Try again is clicked', () => {
+        cy.stub(Checkout.prototype, 'connect').as('connectStub').rejects({});
+        mountConnectWidgetAndGoToReadyToConnect();
+
+        cySmartGet('ready-to-connect').should('be.visible');
+        cySmartGet('footer-button').should('have.text', 'Ready to connect');
+        cySmartGet('footer-button').click();
+        cySmartGet('@connectStub').should('have.been.called');
+        cySmartGet('footer-button').should('have.text', 'Try again');
+        cySmartGet('footer-button').click();
+        cySmartGet('@connectStub').should('have.been.calledTwice');
+      });
+
+      it('should go back to Connect A Wallet screen when back is clicked', () => {
+        mountConnectWidgetAndGoToReadyToConnect();
+
+        cySmartGet('back-button').click();
+        cySmartGet('ready-to-connect').should('not.exist');
+        cySmartGet('connect-wallet').should('be.visible');
+      });
     });
   });
 
