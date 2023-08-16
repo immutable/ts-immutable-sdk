@@ -12,7 +12,7 @@ export class Fees {
 
   constructor(secondaryFees: SecondaryFee[], token: TokenInfo) {
     this.secondaryFees = secondaryFees;
-    this.amount = { token, value: BigNumber.from(0) };
+    this.amount = newAmount(BigNumber.from(0), token);
   }
 
   addAmount(amount: Amount): void {

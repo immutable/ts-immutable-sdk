@@ -44,7 +44,7 @@ export class Router {
 
   public async findOptimalRoute(
     amountSpecified: Amount,
-    otherToken: Token,
+    otherToken: TokenInfo,
     tradeType: TradeType,
     maxHops: number = 2,
   ): Promise<QuoteTradeInfo> {
