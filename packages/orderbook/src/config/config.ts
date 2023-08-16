@@ -28,8 +28,8 @@ export function getOrderbookConfig(
   switch (environment) {
     case Environment.SANDBOX:
       return {
-        seaportContractAddress: '0x410000346E270aDbC89b2b688177d3AE76348dE9',
-        zoneContractAddress: '0x979C2aCA989A56554Eb63E01e576E3179Cdad5A0',
+        seaportContractAddress: '0x7Fb7Da6De152597830eD16361633e362A2F59410',
+        zoneContractAddress: '0x63441cBfBd15Dd8f5E92598E535661Ac5aCB808E',
         apiEndpoint: 'https://order-book-mr.sandbox.imtbl.com',
         chainName: TESTNET_CHAIN_NAME,
         provider: new providers.JsonRpcProvider(

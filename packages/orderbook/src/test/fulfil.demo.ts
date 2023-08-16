@@ -47,13 +47,13 @@ describe('', () => {
 
     // uncomment the overrides and set variables in
     // .env to run on environments other than testnet (e.g. devnet)
-    const configOverrides = getConfigFromEnv();
+    // const configOverrides = getConfigFromEnv();
     const sdk = new Orderbook({
       baseConfig: {
         environment: Environment.SANDBOX,
       },
       overrides: {
-        ...configOverrides,
+        // ...configOverrides,
       },
     });
 
