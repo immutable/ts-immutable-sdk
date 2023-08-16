@@ -25,7 +25,7 @@ import {
   EIP_712_ORDER_TYPE,
   ItemType,
   SEAPORT_CONTRACT_NAME,
-  SEAPORT_CONTRACT_VERSION_V1_4,
+  SEAPORT_CONTRACT_VERSION_V1_5,
 } from './constants';
 import { Seaport } from './seaport';
 import { SeaportLibFactory } from './seaport-lib-factory';
@@ -165,7 +165,7 @@ describe('Seaport', () => {
         );
         const domainData = {
           name: SEAPORT_CONTRACT_NAME,
-          version: SEAPORT_CONTRACT_VERSION_V1_4,
+          version: SEAPORT_CONTRACT_VERSION_V1_5,
           chainId: network,
           verifyingContract: seaportContractAddress,
         };
@@ -357,7 +357,7 @@ describe('Seaport', () => {
         );
         const domainData = {
           name: SEAPORT_CONTRACT_NAME,
-          version: SEAPORT_CONTRACT_VERSION_V1_4,
+          version: SEAPORT_CONTRACT_VERSION_V1_5,
           chainId: network,
           verifyingContract: seaportContractAddress,
         };
@@ -433,7 +433,7 @@ describe('Seaport', () => {
           zone_address: randomAddress(),
           operator_signature: randomAddress(),
           seaport_address: randomAddress(),
-          seaport_version: SEAPORT_CONTRACT_VERSION_V1_4,
+          seaport_version: SEAPORT_CONTRACT_VERSION_V1_5,
           counter: '0',
         },
         salt: '1',
@@ -523,6 +523,7 @@ describe('Seaport', () => {
         const { actions } = await sut.fulfillOrder(
           immutableOrder,
           fulfiller,
+          '',
         );
         const approvalAction = actions.find(
           (a): a is TransactionAction => a.purpose === TransactionPurpose.APPROVAL,
@@ -542,6 +543,7 @@ describe('Seaport', () => {
         const { actions } = await sut.fulfillOrder(
           immutableOrder,
           fulfiller,
+          '',
         );
         const fulfillmentAction = actions.find(
           (a): a is TransactionAction => a.purpose === TransactionPurpose.FULFILL_ORDER,
