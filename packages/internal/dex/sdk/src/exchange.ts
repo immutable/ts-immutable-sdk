@@ -88,6 +88,24 @@ export class Exchange {
     assert(slippagePercent >= 0, new InvalidSlippageError('slippage percent must be greater than or equal to 0'));
   }
 
+  private async getSecondaryFees() {
+    if (this.secondaryFees.length === 0) {
+      return [];
+    }
+
+    const secondaryFeeContract = SecondaryFee__factory.connect(
+      this.router.routingContracts.secondaryFeeAddress,
+      this.provider,
+    );
+
+    if (await secondaryFeeContract.paused()) {
+      // Do not use secondary fees if the contract is paused
+      return [];
+    }
+
+    return this.secondaryFees;
+  }
+
   private async getUnsignedSwapTx(
     fromAddress: string,
     tokenInAddress: string,
@@ -100,17 +118,7 @@ export class Exchange {
   ): Promise<TransactionResponse> {
     Exchange.validate(tokenInAddress, tokenOutAddress, maxHops, slippagePercent, fromAddress);
 
-    if (this.secondaryFees.length > 0) {
-      const secondaryFeeContract = SecondaryFee__factory.connect(
-        this.router.routingContracts.secondaryFeeAddress,
-        this.provider,
-      );
-
-      if (await secondaryFeeContract.paused()) {
-        // Do not use secondary fees if the contract is paused
-        this.secondaryFees = [];
-      }
-    }
+    const secondaryFees = await this.getSecondaryFees();
 
     // get the decimals of the tokens that will be swapped
     const [tokenInDecimals, tokenOutDecimals] = await Promise.all([
@@ -140,7 +148,7 @@ export class Exchange {
       otherToken = tokenIn;
     }
 
-    const fees = new Fees(this.secondaryFees, uniswapTokenToTokenInfo(tokenIn));
+    const fees = new Fees(secondaryFees, uniswapTokenToTokenInfo(tokenIn));
     const ourQuoteReqAmount = getOurQuoteReqAmount(amountSpecified, fees, tradeType);
 
     const ourQuote = await this.router.findOptimalRoute(
@@ -164,7 +172,7 @@ export class Exchange {
       this.router.routingContracts.peripheryRouterAddress,
       this.router.routingContracts.secondaryFeeAddress,
       gasPrice,
-      this.secondaryFees,
+      secondaryFees,
     );
 
     const userQuote = prepareUserQuote(otherToken, adjustedQuote, slippagePercent, fees);
@@ -174,7 +182,7 @@ export class Exchange {
       amount,
       userQuote.amountWithMaxSlippage.value,
       this.router.routingContracts,
-      this.secondaryFees,
+      secondaryFees,
     );
 
     // we always use the tokenIn address because we are always selling the tokenIn
