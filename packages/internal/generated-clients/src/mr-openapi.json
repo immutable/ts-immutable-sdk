@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.2",
   "info": {
-    "title": "Immutable X API",
+    "title": "Immutable zkEVM API",
     "version": "1.0.0",
     "description": "Immutable Multi Rollup API",
     "contact": {
@@ -79,12 +79,6 @@
     }
   ],
   "servers": [
-    {
-      "url": "https://indexer-mr.sandbox.imtbl.com"
-    },
-    {
-      "url": "https://order-book-mr.dev.imtbl.com"
-    },
     {
       "url": "https://api.sandbox.immutable.com"
     }
@@ -1123,6 +1117,90 @@
         }
       }
     },
+    "/v1/chains/{chain_name}/orders/fulfillment_data": {
+      "post": {
+        "tags": [
+          "orders"
+        ],
+        "summary": "Retrieve fulfillment data for orders",
+        "description": "Retrieve signed fulfillment data based on the list of order IDs and corresponding fees.",
+        "operationId": "fulfillment_data",
+        "parameters": [
+          {
+            "name": "chain_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "orderId": {
+                      "type": "string"
+                    },
+                    "fee": {
+                      "$ref": "#/components/schemas/Fee"
+                    }
+                  },
+                  "required": [
+                    "orderId"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "extraData": {
+                            "type": "string"
+                          },
+                          "order": {
+                            "$ref": "#/components/schemas/Order"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "result"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
     "/passport-mr/v1/counterfactual-address": {
       "post": {
         "summary": "Create a counterfactual address",
@@ -1328,7 +1406,9 @@
           "mint",
           "burn",
           "transfer",
-          "sale"
+          "sale",
+          "deposit",
+          "withdrawal"
         ]
       },
       "ActivityNFT": {
@@ -1404,7 +1484,30 @@
           }
         },
         "required": [
-          "activity_type",
+          "to",
+          "amount",
+          "asset"
+        ]
+      },
+      "Deposit": {
+        "type": "object",
+        "description": "The deposit activity details",
+        "properties": {
+          "to": {
+            "description": "The account address the asset was deposited to",
+            "type": "string",
+            "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
+          },
+          "amount": {
+            "description": "The deposited amount",
+            "type": "string",
+            "example": "1"
+          },
+          "asset": {
+            "$ref": "#/components/schemas/ActivityAsset"
+          }
+        },
+        "required": [
           "to",
           "amount",
           "asset"
@@ -1429,7 +1532,30 @@
           }
         },
         "required": [
-          "activity_type",
+          "from",
+          "amount",
+          "asset"
+        ]
+      },
+      "Withdrawal": {
+        "description": "The withdrawal activity details",
+        "type": "object",
+        "properties": {
+          "from": {
+            "description": "The account address the asset was withdrawn from",
+            "type": "string",
+            "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
+          },
+          "amount": {
+            "description": "The amount of assets withdrawn",
+            "type": "string",
+            "example": "1"
+          },
+          "asset": {
+            "$ref": "#/components/schemas/ActivityAsset"
+          }
+        },
+        "required": [
           "from",
           "amount",
           "asset"
@@ -1579,7 +1705,6 @@
           }
         },
         "required": [
-          "activity_type",
           "order_id",
           "to",
           "from",
@@ -1601,6 +1726,12 @@
           },
           {
             "$ref": "#/components/schemas/NFTSale"
+          },
+          {
+            "$ref": "#/components/schemas/Deposit"
+          },
+          {
+            "$ref": "#/components/schemas/Withdrawal"
           }
         ]
       },
@@ -2185,26 +2316,38 @@
             "$ref": "#/components/schemas/Chain"
           },
           "contract_address": {
-            "type": "string"
+            "type": "string",
+            "description": "The address of token contract",
+            "example": "0xc344c05eef8876e517072f879dae8905aa2b956b"
           },
           "root_contract_address": {
             "type": "string",
+            "description": "The address of root token contract",
+            "example": "0x43e60b30d5bec48c0f5890e3d1e9f1b1296bb4aa",
             "nullable": true
           },
           "symbol": {
             "type": "string",
+            "description": "The symbol of token",
+            "example": "AAA",
             "nullable": true
           },
           "decimals": {
             "type": "integer",
+            "description": "The decimals of token",
+            "example": 18,
             "nullable": true
           },
           "image_url": {
             "type": "string",
+            "description": "The image url of token",
+            "example": "https://some-url",
             "nullable": true
           },
           "name": {
             "type": "string",
+            "description": "The name of token",
+            "example": "Token A",
             "nullable": true
           }
         },
@@ -3031,7 +3174,6 @@
         "required": [
           "order_type",
           "counter",
-          "order_type",
           "zone_address",
           "seaport_address",
           "seaport_version"

@@ -1,7 +1,7 @@
 import { TokenInfo } from '@imtbl/checkout-sdk';
 import { TransactionResponse } from '@ethersproject/providers';
 import { useContext, useEffect } from 'react';
-import { CompletionStatus, WaitForResponse } from '@imtbl/bridge-sdk';
+import { CompletionStatus, WaitForDepositResponse } from '@imtbl/bridge-sdk';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { BridgeHero } from '../../../components/Hero/BridgeHero';
@@ -36,7 +36,7 @@ export function MoveInProgress({ token, transactionResponse, bridgeForm }: MoveI
         const receipt = await transactionResponse.wait();
 
         if (receipt.status === 1) {
-          const bridgeResult: WaitForResponse = await tokenBridge.waitForDeposit({
+          const bridgeResult: WaitForDepositResponse = await tokenBridge.waitForDeposit({
             transactionHash: receipt.transactionHash,
           });
 

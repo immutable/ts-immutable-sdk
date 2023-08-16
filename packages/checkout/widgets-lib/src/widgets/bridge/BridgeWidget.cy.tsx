@@ -251,7 +251,7 @@ describe('Bridge Widget tests', () => {
 
   describe('Bridge Submit', () => {
     beforeEach(() => {
-      cy.stub(TokenBridge.prototype, 'getUnsignedApproveBridgeTx').as('getUnsignedApproveBridgeTxStub')
+      cy.stub(TokenBridge.prototype, 'getUnsignedApproveDepositBridgeTx').as('getUnsignedApproveDepositBridgeTxStub')
         .resolves({
           required: true,
           unsignedTx: {},
@@ -333,7 +333,7 @@ describe('Bridge Widget tests', () => {
       cySmartGet('bridge-amount-text__input').blur();
       cySmartGet('bridge-form-button').click();
 
-      cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');
+      cySmartGet('@getUnsignedApproveDepositBridgeTxStub').should('have.been.calledOnce');
       cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce');
 
       cySmartGet('simple-text-body__heading').should('have.text', approveSpending.content.heading);
@@ -413,7 +413,7 @@ describe('Bridge Widget tests', () => {
       cySmartGet('bridge-amount-text__input').blur();
       cySmartGet('bridge-form-button').click();
 
-      cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');
+      cySmartGet('@getUnsignedApproveDepositBridgeTxStub').should('have.been.calledOnce');
       cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce');
 
       cySmartGet('footer-button').click();
@@ -464,7 +464,7 @@ describe('Bridge Widget tests', () => {
       cySmartGet('bridge-amount-text__input').blur();
       cySmartGet('bridge-form-button').click();
 
-      cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');
+      cySmartGet('@getUnsignedApproveDepositBridgeTxStub').should('have.been.calledOnce');
       cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce');
 
       cySmartGet('footer-button').click();
@@ -521,7 +521,7 @@ describe('Bridge Widget tests', () => {
       cySmartGet('bridge-amount-text__input').blur();
       cySmartGet('bridge-form-button').click();
 
-      cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');
+      cySmartGet('@getUnsignedApproveDepositBridgeTxStub').should('have.been.calledOnce');
       cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce');
 
       cySmartGet('footer-button').click();
@@ -575,7 +575,7 @@ describe('Bridge Widget tests', () => {
       cySmartGet('bridge-amount-text__input').blur();
       cySmartGet('bridge-form-button').click();
 
-      cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');
+      cySmartGet('@getUnsignedApproveDepositBridgeTxStub').should('have.been.calledOnce');
       cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce');
       cySmartGet('footer-button').click();
       cySmartGet('@sendTransactionStub').should('have.been.calledOnce');
@@ -629,7 +629,7 @@ describe('Bridge Widget tests', () => {
       cySmartGet('bridge-amount-text__input').blur();
       cySmartGet('bridge-form-button').click();
 
-      cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');
+      cySmartGet('@getUnsignedApproveDepositBridgeTxStub').should('have.been.calledOnce');
       cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce');
       cySmartGet('footer-button').click();
       cySmartGet('@sendTransactionStub').should('have.been.calledOnce');

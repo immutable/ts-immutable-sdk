@@ -29,6 +29,7 @@ import { WidgetTheme } from '../../lib';
 import { CoinInfo } from './views/CoinInfo';
 import { TopUpView } from '../../views/top-up/TopUpView';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
+import { text } from '../../resources/text/textConfig';
 
 export interface WalletWidgetProps {
   config: StrongCheckoutWidgetsConfig,
@@ -36,6 +37,8 @@ export interface WalletWidgetProps {
 
 export function WalletWidget(props: WalletWidgetProps) {
   const { config } = props;
+  const errorActionText = text.views[SharedViews.ERROR_VIEW].actionText;
+  const loadingText = text.views[SharedViews.LOADING_VIEW].text;
 
   const {
     environment, theme, isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
@@ -76,10 +79,10 @@ export function WalletWidget(props: WalletWidgetProps) {
     });
   }, [isBridgeEnabled, isSwapEnabled, isOnRampEnabled, environment]);
 
-  useEffect(() => {
-    (async () => {
-      if (!checkout || !provider) return;
+  const initialiseWallet = async () => {
+    if (!checkout || !provider) return;
 
+    try {
       const network = await checkout.getNetworkInfo({
         provider,
       });
@@ -103,13 +106,34 @@ export function WalletWidget(props: WalletWidgetProps) {
           view: { type: WalletWidgetViews.WALLET_BALANCES },
         },
       });
+    } catch (error: any) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SharedViews.ERROR_VIEW,
+            error,
+          },
+        },
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (!checkout || !provider) return;
+    (async () => {
+      initialiseWallet();
     })();
   }, [checkout, provider]);
 
-  const errorAction = () => {
-    // TODO: please remove or if necessary keep the eslint ignore
-    // eslint-disable-next-line no-console
-    console.log('Something went wrong');
+  const errorAction = async () => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: { type: WalletWidgetViews.WALLET_BALANCES },
+      },
+    });
+    await initialiseWallet();
   };
 
   return (
@@ -118,7 +142,7 @@ export function WalletWidget(props: WalletWidgetProps) {
         <CryptoFiatProvider environment={environment}>
           <WalletContext.Provider value={walletReducerValues}>
             {viewState.view.type === SharedViews.LOADING_VIEW && (
-            <LoadingView loadingText="Loading" />
+            <LoadingView loadingText={loadingText} />
             )}
             {viewState.view.type === WalletWidgetViews.WALLET_BALANCES && (
             <WalletBalances />
@@ -129,7 +153,7 @@ export function WalletWidget(props: WalletWidgetProps) {
             )}
             {viewState.view.type === SharedViews.ERROR_VIEW && (
             <ErrorView
-              actionText="Try again"
+              actionText={errorActionText}
               onActionClick={errorAction}
               onCloseClick={sendWalletWidgetCloseEvent}
             />

@@ -8,7 +8,7 @@ function SwapWebView() {
   };
 
   return (
-    <imtbl-swap widgetConfig={JSON.stringify(config)} walletProvider="metamask" />
+    <imtbl-swap widgetConfig={JSON.stringify(config)} />
   );
 }
 

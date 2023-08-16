@@ -15,9 +15,8 @@ import {
   TEST_V3_CORE_FACTORY_ADDRESS,
   USDC_TEST_TOKEN,
   WETH_TEST_TOKEN,
-} from '../utils/testUtils';
+} from '../test/utils';
 import { Multicall__factory } from '../contracts/types';
-import { DEFAULT_GAS_QUOTE } from './getQuotesForRoutes';
 
 const token0 = 'token0';
 const POOL_INIT_CODE_HASH = '0xe34f199b19b2b4f47f68442619d555527d244f78a3297ea89325f843f87b8b54';
@@ -181,7 +180,6 @@ describe('multicallMultipleCallDataSingContract', () => {
         multicallContract,
         testCallData,
         addrToken0,
-        { gasRequired: DEFAULT_GAS_QUOTE },
       );
 
       expect(result.returnData.length).toBe(2);

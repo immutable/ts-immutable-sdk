@@ -23,6 +23,7 @@ import { CryptoFiatActions, CryptoFiatContext } from '../../context/crypto-fiat-
 import { useInterval } from '../../lib/hooks/useInterval';
 import { DEFAULT_TOKEN_SYMBOLS } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
+import { isPassportProvider } from '../../lib/providerUtils';
 
 interface TopUpViewProps {
   widgetEvent: IMTBLWidgetEvents,
@@ -48,7 +49,7 @@ export function TopUpView({
   onBackButtonClick,
 }: TopUpViewProps) {
   const { connectLoaderState } = useContext(ConnectLoaderContext);
-  const { checkout } = connectLoaderState;
+  const { checkout, provider } = connectLoaderState;
   const { header, topUpOptions } = text.views[SharedViews.TOP_UP_VIEW];
   const { onramp, swap, bridge } = topUpOptions;
   const { viewDispatch } = useContext(ViewContext);
@@ -59,6 +60,8 @@ export function TopUpView({
   const [bridgeFeesInFiat, setBridgeFeesInFiat] = useState('-.--');
   const [loadingSwapFees, setLoadingSwapFees] = useState(false);
   const [loadingBridgeFees, setLoadingBridgeFees] = useState(false);
+
+  const isPassport = isPassportProvider(provider);
 
   useEffect(() => {
     if (!checkout) return;
@@ -252,7 +255,7 @@ export function TopUpView({
             onClickSwap,
             () => renderFees(swapFeesInFiat, loadingSwapFees),
           )}
-          {showBridgeOption && renderMenuItem(
+          {showBridgeOption && !isPassport && renderMenuItem(
             'bridge',
             'Minting',
             bridge.heading,

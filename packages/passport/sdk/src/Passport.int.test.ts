@@ -53,7 +53,6 @@ const getZkEvmProvider = () => {
     scope: 'openid offline_access profile email transact',
   });
 
-  // @ts-ignore TODO ID-926 Remove once method is public
   return passport.connectEvm();
 };
 
@@ -72,8 +71,8 @@ describe('Passport', () => {
       getUser: mockGetUser,
     }));
     (GuardianClient as jest.Mock).mockImplementation(() => ({
-      loading: jest.fn(),
       validateEVMTransaction: jest.fn(),
+      withConfirmationScreen: () => (task: () => void) => task(),
     }));
     (Magic as jest.Mock).mockImplementation(() => ({
       openid: {

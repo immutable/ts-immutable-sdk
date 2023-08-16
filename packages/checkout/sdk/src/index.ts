@@ -11,6 +11,7 @@ export {
 } from './types';
 export type {
   AllowedNetworkConfig,
+  BuyParams,
   CheckConnectionParams,
   CheckConnectionResult,
   CheckoutModuleConfiguration,
@@ -37,6 +38,7 @@ export type {
   RemoteConfiguration,
   SendTransactionParams,
   SendTransactionResult,
+  SmartCheckoutParams,
   SwitchNetworkParams,
   SwitchNetworkResult,
   TokenFilter,

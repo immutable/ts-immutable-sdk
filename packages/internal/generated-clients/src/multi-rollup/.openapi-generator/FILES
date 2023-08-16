@@ -46,9 +46,13 @@ models/create-counterfactual-address-request.ts
 models/create-counterfactual-address-res.ts
 models/create-listing-request-body.ts
 models/create-order-protocol-data.ts
+models/deposit.ts
 models/erc20-item.ts
 models/erc721-item.ts
 models/fee.ts
+models/fulfillment-data-request-inner.ts
+models/fulfillment-data200-response-result-inner.ts
+models/fulfillment-data200-response.ts
 models/get-activity-result.ts
 models/get-collection-result.ts
 models/get-nftresult.ts
@@ -85,3 +89,4 @@ models/sale-payment.ts
 models/token-contract-type.ts
 models/token.ts
 models/transfer.ts
+models/withdrawal.ts

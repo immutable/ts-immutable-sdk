@@ -18,7 +18,7 @@ get-imx-openapi:
 get-mr-openapi:
 	rm -f src/mr-openapi.json && touch src/mr-openapi.json && \
 	curl -H "Accept: application/json+v3" \
-    https://imx-openapiv3-mr-dev.s3.us-east-2.amazonaws.com/openapi.json \
+    https://imx-openapiv3-mr-sandbox.s3.us-east-2.amazonaws.com/openapi.json \
     -o src/mr-openapi.json
 
 .PHONY: generate-imx-api-client

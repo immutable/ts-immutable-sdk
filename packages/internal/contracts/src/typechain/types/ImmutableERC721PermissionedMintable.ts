@@ -27,15 +27,42 @@ import type {
   PromiseOrValue,
 } from "./common";
 
+export declare namespace ImmutableERC721Base {
+  export type IDMintStruct = {
+    to: PromiseOrValue<string>;
+    tokenIds: PromiseOrValue<BigNumberish>[];
+  };
+
+  export type IDMintStructOutput = [string, BigNumber[]] & {
+    to: string;
+    tokenIds: BigNumber[];
+  };
+
+  export type TransferRequestStruct = {
+    from: PromiseOrValue<string>;
+    tos: PromiseOrValue<string>[];
+    tokenIds: PromiseOrValue<BigNumberish>[];
+  };
+
+  export type TransferRequestStructOutput = [string, string[], BigNumber[]] & {
+    from: string;
+    tos: string[];
+    tokenIds: BigNumber[];
+  };
+}
+
 export interface ImmutableERC721PermissionedMintableInterface
   extends utils.Interface {
   functions: {
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
     "MINTER_ROLE()": FunctionFragment;
+    "_burnedTokens(uint256)": FunctionFragment;
+    "_totalSupply()": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "baseURI()": FunctionFragment;
     "burn(uint256)": FunctionFragment;
+    "burnBatch(uint256[])": FunctionFragment;
     "contractURI()": FunctionFragment;
     "getAdmins()": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
@@ -54,16 +81,20 @@ export interface ImmutableERC721PermissionedMintableInterface
     "revokeRole(bytes32,address)": FunctionFragment;
     "royaltyAllowlist()": FunctionFragment;
     "royaltyInfo(uint256,uint256)": FunctionFragment;
+    "safeMint(address,uint256)": FunctionFragment;
+    "safeMintBatch((address,uint256[])[])": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256,bytes)": FunctionFragment;
+    "safeTransferFromBatch((address,address[],uint256[]))": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
     "setBaseURI(string)": FunctionFragment;
     "setContractURI(string)": FunctionFragment;
+    "setDefaultRoyaltyReceiver(address,uint96)": FunctionFragment;
+    "setNFTRoyaltyReceiver(uint256,address,uint96)": FunctionFragment;
+    "setNFTRoyaltyReceiverBatch(uint256[],address,uint96)": FunctionFragment;
     "setRoyaltyAllowlistRegistry(address)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "symbol()": FunctionFragment;
-    "tokenByIndex(uint256)": FunctionFragment;
-    "tokenOfOwnerByIndex(address,uint256)": FunctionFragment;
     "tokenURI(uint256)": FunctionFragment;
     "totalSupply()": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
@@ -73,10 +104,13 @@ export interface ImmutableERC721PermissionedMintableInterface
     nameOrSignatureOrTopic:
       | "DEFAULT_ADMIN_ROLE"
       | "MINTER_ROLE"
+      | "_burnedTokens"
+      | "_totalSupply"
       | "approve"
       | "balanceOf"
       | "baseURI"
       | "burn"
+      | "burnBatch"
       | "contractURI"
       | "getAdmins"
       | "getApproved"
@@ -95,16 +129,20 @@ export interface ImmutableERC721PermissionedMintableInterface
       | "revokeRole"
       | "royaltyAllowlist"
       | "royaltyInfo"
+      | "safeMint"
+      | "safeMintBatch"
       | "safeTransferFrom(address,address,uint256)"
       | "safeTransferFrom(address,address,uint256,bytes)"
+      | "safeTransferFromBatch"
       | "setApprovalForAll"
       | "setBaseURI"
       | "setContractURI"
+      | "setDefaultRoyaltyReceiver"
+      | "setNFTRoyaltyReceiver"
+      | "setNFTRoyaltyReceiverBatch"
       | "setRoyaltyAllowlistRegistry"
       | "supportsInterface"
       | "symbol"
-      | "tokenByIndex"
-      | "tokenOfOwnerByIndex"
       | "tokenURI"
       | "totalSupply"
       | "transferFrom"
@@ -119,6 +157,14 @@ export interface ImmutableERC721PermissionedMintableInterface
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "_burnedTokens",
+    values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "_totalSupply",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "approve",
     values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
   ): string;
@@ -130,6 +176,10 @@ export interface ImmutableERC721PermissionedMintableInterface
   encodeFunctionData(
     functionFragment: "burn",
     values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "burnBatch",
+    values: [PromiseOrValue<BigNumberish>[]]
   ): string;
   encodeFunctionData(
     functionFragment: "contractURI",
@@ -198,6 +248,14 @@ export interface ImmutableERC721PermissionedMintableInterface
     values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
+    functionFragment: "safeMint",
+    values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "safeMintBatch",
+    values: [ImmutableERC721Base.IDMintStruct[]]
+  ): string;
+  encodeFunctionData(
     functionFragment: "safeTransferFrom(address,address,uint256)",
     values: [
       PromiseOrValue<string>,
@@ -215,6 +273,10 @@ export interface ImmutableERC721PermissionedMintableInterface
     ]
   ): string;
   encodeFunctionData(
+    functionFragment: "safeTransferFromBatch",
+    values: [ImmutableERC721Base.TransferRequestStruct]
+  ): string;
+  encodeFunctionData(
     functionFragment: "setApprovalForAll",
     values: [PromiseOrValue<string>, PromiseOrValue<boolean>]
   ): string;
@@ -227,6 +289,26 @@ export interface ImmutableERC721PermissionedMintableInterface
     values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
+    functionFragment: "setDefaultRoyaltyReceiver",
+    values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setNFTRoyaltyReceiver",
+    values: [
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<string>,
+      PromiseOrValue<BigNumberish>
+    ]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setNFTRoyaltyReceiverBatch",
+    values: [
+      PromiseOrValue<BigNumberish>[],
+      PromiseOrValue<string>,
+      PromiseOrValue<BigNumberish>
+    ]
+  ): string;
+  encodeFunctionData(
     functionFragment: "setRoyaltyAllowlistRegistry",
     values: [PromiseOrValue<string>]
   ): string;
@@ -235,14 +317,6 @@ export interface ImmutableERC721PermissionedMintableInterface
     values: [PromiseOrValue<BytesLike>]
   ): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "tokenByIndex",
-    values: [PromiseOrValue<BigNumberish>]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "tokenOfOwnerByIndex",
-    values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
-  ): string;
   encodeFunctionData(
     functionFragment: "tokenURI",
     values: [PromiseOrValue<BigNumberish>]
@@ -268,10 +342,19 @@ export interface ImmutableERC721PermissionedMintableInterface
     functionFragment: "MINTER_ROLE",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "_burnedTokens",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "_totalSupply",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "baseURI", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "burnBatch", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "contractURI",
     data: BytesLike
@@ -323,12 +406,21 @@ export interface ImmutableERC721PermissionedMintableInterface
     functionFragment: "royaltyInfo",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "safeMint", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "safeMintBatch",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "safeTransferFrom(address,address,uint256)",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "safeTransferFrom(address,address,uint256,bytes)",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "safeTransferFromBatch",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -341,6 +433,18 @@ export interface ImmutableERC721PermissionedMintableInterface
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "setDefaultRoyaltyReceiver",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setNFTRoyaltyReceiver",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setNFTRoyaltyReceiverBatch",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "setRoyaltyAllowlistRegistry",
     data: BytesLike
   ): Result;
@@ -349,14 +453,6 @@ export interface ImmutableERC721PermissionedMintableInterface
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "tokenByIndex",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "tokenOfOwnerByIndex",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "tokenURI", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "totalSupply",
@@ -504,6 +600,13 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
 
     MINTER_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
+    _burnedTokens(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
+    _totalSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     approve(
       to: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
@@ -519,6 +622,11 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
 
     burn(
       tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    burnBatch(
+      tokenIDs: PromiseOrValue<BigNumberish>[],
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -572,7 +680,7 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
 
     mint(
       to: PromiseOrValue<string>,
-      amount: PromiseOrValue<BigNumberish>,
+      tokenID: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -603,10 +711,21 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
     royaltyAllowlist(overrides?: CallOverrides): Promise<[string]>;
 
     royaltyInfo(
-      _tokenId: PromiseOrValue<BigNumberish>,
-      _salePrice: PromiseOrValue<BigNumberish>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      salePrice: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[string, BigNumber]>;
+
+    safeMint(
+      to: PromiseOrValue<string>,
+      tokenID: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    safeMintBatch(
+      mintRequests: ImmutableERC721Base.IDMintStruct[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
     "safeTransferFrom(address,address,uint256)"(
       from: PromiseOrValue<string>,
@@ -620,6 +739,11 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
       to: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
       data: PromiseOrValue<BytesLike>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    safeTransferFromBatch(
+      tr: ImmutableERC721Base.TransferRequestStruct,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -639,6 +763,26 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    setDefaultRoyaltyReceiver(
+      receiver: PromiseOrValue<string>,
+      feeNumerator: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    setNFTRoyaltyReceiver(
+      tokenId: PromiseOrValue<BigNumberish>,
+      receiver: PromiseOrValue<string>,
+      feeNumerator: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    setNFTRoyaltyReceiverBatch(
+      tokenIds: PromiseOrValue<BigNumberish>[],
+      receiver: PromiseOrValue<string>,
+      feeNumerator: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     setRoyaltyAllowlistRegistry(
       _royaltyAllowlist: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -650,17 +794,6 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
     ): Promise<[boolean]>;
 
     symbol(overrides?: CallOverrides): Promise<[string]>;
-
-    tokenByIndex(
-      index: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    tokenOfOwnerByIndex(
-      owner: PromiseOrValue<string>,
-      index: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
 
     tokenURI(
       tokenId: PromiseOrValue<BigNumberish>,
@@ -681,6 +814,13 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
 
   MINTER_ROLE(overrides?: CallOverrides): Promise<string>;
 
+  _burnedTokens(
+    arg0: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
+  _totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
+
   approve(
     to: PromiseOrValue<string>,
     tokenId: PromiseOrValue<BigNumberish>,
@@ -696,6 +836,11 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
 
   burn(
     tokenId: PromiseOrValue<BigNumberish>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  burnBatch(
+    tokenIDs: PromiseOrValue<BigNumberish>[],
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -749,7 +894,7 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
 
   mint(
     to: PromiseOrValue<string>,
-    amount: PromiseOrValue<BigNumberish>,
+    tokenID: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -780,10 +925,21 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
   royaltyAllowlist(overrides?: CallOverrides): Promise<string>;
 
   royaltyInfo(
-    _tokenId: PromiseOrValue<BigNumberish>,
-    _salePrice: PromiseOrValue<BigNumberish>,
+    tokenId: PromiseOrValue<BigNumberish>,
+    salePrice: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<[string, BigNumber]>;
+
+  safeMint(
+    to: PromiseOrValue<string>,
+    tokenID: PromiseOrValue<BigNumberish>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  safeMintBatch(
+    mintRequests: ImmutableERC721Base.IDMintStruct[],
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
   "safeTransferFrom(address,address,uint256)"(
     from: PromiseOrValue<string>,
@@ -797,6 +953,11 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
     to: PromiseOrValue<string>,
     tokenId: PromiseOrValue<BigNumberish>,
     data: PromiseOrValue<BytesLike>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  safeTransferFromBatch(
+    tr: ImmutableERC721Base.TransferRequestStruct,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -816,6 +977,26 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  setDefaultRoyaltyReceiver(
+    receiver: PromiseOrValue<string>,
+    feeNumerator: PromiseOrValue<BigNumberish>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  setNFTRoyaltyReceiver(
+    tokenId: PromiseOrValue<BigNumberish>,
+    receiver: PromiseOrValue<string>,
+    feeNumerator: PromiseOrValue<BigNumberish>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  setNFTRoyaltyReceiverBatch(
+    tokenIds: PromiseOrValue<BigNumberish>[],
+    receiver: PromiseOrValue<string>,
+    feeNumerator: PromiseOrValue<BigNumberish>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   setRoyaltyAllowlistRegistry(
     _royaltyAllowlist: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -827,17 +1008,6 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
   ): Promise<boolean>;
 
   symbol(overrides?: CallOverrides): Promise<string>;
-
-  tokenByIndex(
-    index: PromiseOrValue<BigNumberish>,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  tokenOfOwnerByIndex(
-    owner: PromiseOrValue<string>,
-    index: PromiseOrValue<BigNumberish>,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
 
   tokenURI(
     tokenId: PromiseOrValue<BigNumberish>,
@@ -858,6 +1028,13 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
 
     MINTER_ROLE(overrides?: CallOverrides): Promise<string>;
 
+    _burnedTokens(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
+    _totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
+
     approve(
       to: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
@@ -873,6 +1050,11 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
 
     burn(
       tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    burnBatch(
+      tokenIDs: PromiseOrValue<BigNumberish>[],
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -926,7 +1108,7 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
 
     mint(
       to: PromiseOrValue<string>,
-      amount: PromiseOrValue<BigNumberish>,
+      tokenID: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -957,10 +1139,21 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
     royaltyAllowlist(overrides?: CallOverrides): Promise<string>;
 
     royaltyInfo(
-      _tokenId: PromiseOrValue<BigNumberish>,
-      _salePrice: PromiseOrValue<BigNumberish>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      salePrice: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[string, BigNumber]>;
+
+    safeMint(
+      to: PromiseOrValue<string>,
+      tokenID: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    safeMintBatch(
+      mintRequests: ImmutableERC721Base.IDMintStruct[],
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     "safeTransferFrom(address,address,uint256)"(
       from: PromiseOrValue<string>,
@@ -974,6 +1167,11 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
       to: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
       data: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    safeTransferFromBatch(
+      tr: ImmutableERC721Base.TransferRequestStruct,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -993,6 +1191,26 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    setDefaultRoyaltyReceiver(
+      receiver: PromiseOrValue<string>,
+      feeNumerator: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setNFTRoyaltyReceiver(
+      tokenId: PromiseOrValue<BigNumberish>,
+      receiver: PromiseOrValue<string>,
+      feeNumerator: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setNFTRoyaltyReceiverBatch(
+      tokenIds: PromiseOrValue<BigNumberish>[],
+      receiver: PromiseOrValue<string>,
+      feeNumerator: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     setRoyaltyAllowlistRegistry(
       _royaltyAllowlist: PromiseOrValue<string>,
       overrides?: CallOverrides
@@ -1004,17 +1222,6 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
     ): Promise<boolean>;
 
     symbol(overrides?: CallOverrides): Promise<string>;
-
-    tokenByIndex(
-      index: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    tokenOfOwnerByIndex(
-      owner: PromiseOrValue<string>,
-      index: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     tokenURI(
       tokenId: PromiseOrValue<BigNumberish>,
@@ -1113,6 +1320,13 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
 
     MINTER_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
+    _burnedTokens(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    _totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
+
     approve(
       to: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
@@ -1128,6 +1342,11 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
 
     burn(
       tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    burnBatch(
+      tokenIDs: PromiseOrValue<BigNumberish>[],
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -1181,7 +1400,7 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
 
     mint(
       to: PromiseOrValue<string>,
-      amount: PromiseOrValue<BigNumberish>,
+      tokenID: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -1212,9 +1431,20 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
     royaltyAllowlist(overrides?: CallOverrides): Promise<BigNumber>;
 
     royaltyInfo(
-      _tokenId: PromiseOrValue<BigNumberish>,
-      _salePrice: PromiseOrValue<BigNumberish>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      salePrice: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    safeMint(
+      to: PromiseOrValue<string>,
+      tokenID: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    safeMintBatch(
+      mintRequests: ImmutableERC721Base.IDMintStruct[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     "safeTransferFrom(address,address,uint256)"(
@@ -1229,6 +1459,11 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
       to: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
       data: PromiseOrValue<BytesLike>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    safeTransferFromBatch(
+      tr: ImmutableERC721Base.TransferRequestStruct,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -1248,6 +1483,26 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
+    setDefaultRoyaltyReceiver(
+      receiver: PromiseOrValue<string>,
+      feeNumerator: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    setNFTRoyaltyReceiver(
+      tokenId: PromiseOrValue<BigNumberish>,
+      receiver: PromiseOrValue<string>,
+      feeNumerator: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    setNFTRoyaltyReceiverBatch(
+      tokenIds: PromiseOrValue<BigNumberish>[],
+      receiver: PromiseOrValue<string>,
+      feeNumerator: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     setRoyaltyAllowlistRegistry(
       _royaltyAllowlist: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -1259,17 +1514,6 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
     ): Promise<BigNumber>;
 
     symbol(overrides?: CallOverrides): Promise<BigNumber>;
-
-    tokenByIndex(
-      index: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    tokenOfOwnerByIndex(
-      owner: PromiseOrValue<string>,
-      index: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     tokenURI(
       tokenId: PromiseOrValue<BigNumberish>,
@@ -1293,6 +1537,13 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
 
     MINTER_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    _burnedTokens(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    _totalSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     approve(
       to: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
@@ -1308,6 +1559,11 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
 
     burn(
       tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    burnBatch(
+      tokenIDs: PromiseOrValue<BigNumberish>[],
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1361,7 +1617,7 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
 
     mint(
       to: PromiseOrValue<string>,
-      amount: PromiseOrValue<BigNumberish>,
+      tokenID: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1392,9 +1648,20 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
     royaltyAllowlist(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     royaltyInfo(
-      _tokenId: PromiseOrValue<BigNumberish>,
-      _salePrice: PromiseOrValue<BigNumberish>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      salePrice: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    safeMint(
+      to: PromiseOrValue<string>,
+      tokenID: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    safeMintBatch(
+      mintRequests: ImmutableERC721Base.IDMintStruct[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     "safeTransferFrom(address,address,uint256)"(
@@ -1409,6 +1676,11 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
       to: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
       data: PromiseOrValue<BytesLike>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    safeTransferFromBatch(
+      tr: ImmutableERC721Base.TransferRequestStruct,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1428,6 +1700,26 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
+    setDefaultRoyaltyReceiver(
+      receiver: PromiseOrValue<string>,
+      feeNumerator: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setNFTRoyaltyReceiver(
+      tokenId: PromiseOrValue<BigNumberish>,
+      receiver: PromiseOrValue<string>,
+      feeNumerator: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setNFTRoyaltyReceiverBatch(
+      tokenIds: PromiseOrValue<BigNumberish>[],
+      receiver: PromiseOrValue<string>,
+      feeNumerator: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
     setRoyaltyAllowlistRegistry(
       _royaltyAllowlist: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -1439,17 +1731,6 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    tokenByIndex(
-      index: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    tokenOfOwnerByIndex(
-      owner: PromiseOrValue<string>,
-      index: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
 
     tokenURI(
       tokenId: PromiseOrValue<BigNumberish>,

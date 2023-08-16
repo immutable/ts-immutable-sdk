@@ -9,7 +9,13 @@ export class ImmutableConnect extends ImmutableWebComponent {
     this.renderWidget();
   }
 
+  validateInputs(): void {
+    // not implemented as nothing to validate for ConnectWidget
+  }
+
   renderWidget() {
+    this.validateInputs();
+
     if (!this.reactRoot) {
       this.reactRoot = ReactDOM.createRoot(this);
     }
@@ -18,6 +24,9 @@ export class ImmutableConnect extends ImmutableWebComponent {
       <React.StrictMode>
         <ConnectWidget
           config={this.widgetConfig!}
+          params={{
+            passport: this.passport,
+          }}
         />
       </React.StrictMode>,
     );

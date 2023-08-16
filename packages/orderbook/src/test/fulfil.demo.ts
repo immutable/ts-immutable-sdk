@@ -8,16 +8,19 @@ import {
   getFulfillerWallet,
   getOffererWallet,
   getLocalhostProvider,
-  signAndSubmitTx,
-  signMessage,
   TestToken,
   waitForOrderToBeOfStatus,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getConfigFromEnv,
 } from './helpers';
+import { actionAll } from './helpers/actions';
 
 async function deployAndMintNftContract(wallet: Wallet): Promise<TestToken> {
   const { contract } = await deployTestToken(wallet);
+  log('contract deployed');
   const receipt = await contract.safeMint(wallet.address);
   await receipt.wait();
+  log('token minted');
   return contract;
 }
 
@@ -42,17 +45,15 @@ describe('', () => {
     // Deploy an NFT contract and mint a token for the offerer
     const nftContract = await deployAndMintNftContract(offerer);
 
-    // Instantiate the order book SDK. Once environments stabilise there will be default values so
-    // that end users will just be able to do `new Orderbook()` in most cases
+    // uncomment the overrides and set variables in
+    // .env to run on environments other than testnet (e.g. devnet)
+    // const configOverrides = getConfigFromEnv();
     const sdk = new Orderbook({
       baseConfig: {
         environment: Environment.SANDBOX,
       },
-
       overrides: {
-        // Replace overrides with devnet values if needed
-        // values can be found here https://immutable.atlassian.net/wiki/spaces/TRAD/pages/2192573143/zkEVM+orderbook+deployment+addresses
-        provider,
+        // ...configOverrides,
       },
     });
 
@@ -72,18 +73,8 @@ describe('', () => {
       orderExpiry: new Date(Date.now() + 1000000 * 30),
     });
 
-    await signAndSubmitTx(
-      validListing.unsignedApprovalTransaction!,
-      offerer,
-      provider,
-    );
-
-    const signature2 = await signMessage(
-      validListing.typedOrderMessageForSigning,
-      offerer,
-    );
-
-    log('Cretaing new listing to be fulfilled...');
+    const signatures = await actionAll(validListing.actions, offerer, provider);
+    log('Creating new listing to be fulfilled...');
 
     // Submit the order creation request to the order book API
     const {
@@ -91,17 +82,19 @@ describe('', () => {
     } = await sdk.createListing({
       orderComponents: validListing.orderComponents,
       orderHash: validListing.orderHash,
-      orderSignature: signature2,
+      orderSignature: signatures[0],
     });
 
     await waitForOrderToBeOfStatus(sdk, orderId2, OrderStatus.ACTIVE);
     log(`Listing ${orderId2} is now ACTIVE, fulfilling order...`);
 
-    const { unsignedFulfillmentTransaction } = await sdk.fulfillOrder(
+    const { actions } = await sdk.fulfillOrder(
       orderId2,
       fulfiller.address,
     );
-    await signAndSubmitTx(unsignedFulfillmentTransaction, fulfiller, provider);
+
+    await actionAll(actions, fulfiller, provider);
+
     log(
       `Fulfilment transaction sent, waiting for listing ${orderId2} to become FILLED`,
     );

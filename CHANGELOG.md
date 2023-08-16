@@ -5,9 +5,52 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] - YYYY-MM-DD
+## [Unreleased]
+
+## [0.9.0] - 2023-08-15
+### Changed
+
+- @imtbl/orderbook: Changed how transactions and signable messages are returned from `prepareListing` and `prepareFulfillment` to ensure transactions gas limits can be estimated in order.
+- @imtbl/orderbook: Updated sandbox config to reference testnet contract addresses.
+
+## [0.7.0] - 2023-08-14
 
 ### Added
+
+- @imtbl/erc721-permissioned-mintable: Preset contract changes: Added `safeMintBatch` and `burnBatch` to support batch operations.
+
+### Fixed
+
+- @imtbl/passport: Fixed a bug where the guardian popup was not closing if pre-requisite API calls failed.
+
+### Changed
+
+- @imtbl/erc721-permissioned-mintable: Preset contract changes: Modified mint method to specify token IDs instead of number of tokens to mint.
+- Modules are now exported under their own namespaces instead of being flattened
+- @imtbl/passport: Updated testnet (sandbox) zkEvmChainId
+
+### Removed
+
+### Deprecated
+
+## [0.4.4] - 2023-08-04
+
+### Added
+
+- @imtbl/passport: Added `isPassport` property to Passport zkEVM provider
+
+## [0.4.3] - 2023-08-04
+
+### Added
+
+- @imtbl/passport: Added zkEVM Support, see the [zkEVM Passport documentation](https://docs.immutable.com/docs/zkevm/products/passport/) for more information.
+- Fixed an issue where the API version was appended to the header twice in every API call
+
+## [0.4.2] - 2023-07-31
+
+### Added
+
+- @imtbl/blockchain-data: Added Deposit and Withdrawal activity types
 
 ### Fixed
 

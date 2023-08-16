@@ -5,10 +5,10 @@ import { Orderbook } from 'orderbook';
 import { getLocalhostProvider } from './helpers/provider';
 import { getOffererWallet } from './helpers/signers';
 import { deployTestToken } from './helpers/erc721';
-import { signAndSubmitTx, signMessage } from './helpers/sign-and-submit';
 import { TestToken } from './helpers/test-token';
 import { waitForOrderToBeOfStatus } from './helpers/order';
-import { getLocalConfigFromEnv } from './helpers';
+import { getConfigFromEnv } from './helpers';
+import { actionAll } from './helpers/actions';
 
 async function createListing(
   sdk: Orderbook,
@@ -31,25 +31,14 @@ async function createListing(
     },
   });
 
-  if (listing.unsignedApprovalTransaction) {
-    await signAndSubmitTx(
-      listing.unsignedApprovalTransaction,
-      offerer,
-      provider,
-    );
-  }
-
-  const signature = await signMessage(
-    listing.typedOrderMessageForSigning,
-    offerer,
-  );
+  const signatures = await actionAll(listing.actions, offerer, provider);
 
   const {
     result: { id: orderId },
   } = await sdk.createListing({
     orderComponents: listing.orderComponents,
     orderHash: listing.orderHash,
-    orderSignature: signature,
+    orderSignature: signatures[0],
   });
 
   return waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.ACTIVE);
@@ -59,7 +48,7 @@ describe('listListings e2e', () => {
   const provider = getLocalhostProvider();
   const offerer = getOffererWallet(provider);
 
-  const localConfigOverrides = getLocalConfigFromEnv();
+  const localConfigOverrides = getConfigFromEnv();
   const sdk = new Orderbook({
     baseConfig: {
       environment: Environment.SANDBOX,

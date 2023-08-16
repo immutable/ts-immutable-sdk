@@ -34,7 +34,7 @@ describe('config', () => {
 
     expect(() => new BridgeConfiguration(bridgeModuleConfiguration)).toThrow(
       new Error(
-        `Bridge instance with rootchain eip155:11155111 and childchain ${ZKEVM_DEVNET_CHAIN_ID} is not supported in environment production`,
+        `Bridge instance with rootchain 11155111 and childchain ${ZKEVM_DEVNET_CHAIN_ID} is not supported in environment production`,
       ),
     );
   });
@@ -48,6 +48,8 @@ describe('config', () => {
         bridgeContracts: {
           rootChainERC20Predicate: '0x',
           rootChainStateSender: '0x',
+          rootChainCheckpointManager: '0x',
+          rootChainExitHelper: '0x',
           childChainERC20Predicate: '0x',
           childChainStateReceiver: '0x',
         },

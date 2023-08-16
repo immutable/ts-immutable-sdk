@@ -10,7 +10,10 @@ import * as wallet from './wallet';
 import * as network from './network';
 import * as transaction from './transaction';
 import * as gasEstimatorService from './gasEstimate';
+import * as buy from './buy';
+import * as smartCheckout from './smartCheckout';
 import {
+  BuyParams,
   ChainId,
   CheckConnectionParams,
   CheckConnectionResult,
@@ -39,6 +42,7 @@ import {
   GasEstimateParams,
   GasEstimateSwapResult,
   GasEstimateBridgeToL2Result,
+  SmartCheckoutParams,
 } from './types';
 import { CheckoutConfiguration } from './config';
 import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
@@ -256,6 +260,54 @@ export class Checkout {
       } as ValidateProviderOptions,
     );
     return await network.getNetworkInfo(this.config, web3Provider);
+  }
+
+  /**
+   * Determines the requirements for performing a buy.
+   * @param {BuyParams} params - The parameters for the buy.
+  */
+  public async buy(
+    params: BuyParams,
+  ): Promise<void> {
+    if (this.config.isProduction) {
+      throw new Error('This endpoint is not currently available.');
+    }
+
+    // eslint-disable-next-line no-console
+    console.warn('This endpoint is currently under construction.');
+
+    const web3Provider = await provider.validateProvider(
+      this.config,
+      params.provider,
+    );
+
+    await buy.buy(this.config, web3Provider, params.orderId);
+  }
+
+  /**
+   * Determines the transaction requirements to complete a purchase.
+   * @params {SmartCheckoutParams} params - The parameters for smart checkout.
+   */
+  public async smartCheckout(
+    params: SmartCheckoutParams,
+  ): Promise<void> {
+    if (this.config.isProduction) {
+      throw new Error('This endpoint is not currently available.');
+    }
+
+    // eslint-disable-next-line no-console
+    console.warn('This endpoint is currently under construction.');
+
+    const web3Provider = await provider.validateProvider(
+      this.config,
+      params.provider,
+    );
+
+    await smartCheckout.smartCheckout(
+      web3Provider,
+      params.itemRequirements,
+      params.transactionOrGasAmount,
+    );
   }
 
   /**

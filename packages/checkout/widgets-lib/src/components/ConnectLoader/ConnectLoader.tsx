@@ -13,6 +13,7 @@ import React, {
 import {
   ConnectEventType, ConnectionSuccess, IMTBLWidgetEvents,
 } from '@imtbl/checkout-widgets';
+import { Passport } from '@imtbl/passport';
 import {
   ConnectLoaderActions,
   ConnectLoaderContext,
@@ -46,6 +47,7 @@ export interface ConnectLoaderParams {
   targetLayer?: ConnectTargetLayer;
   walletProvider?: WalletProviderName;
   web3Provider?: Web3Provider;
+  passport?: Passport;
   allowedChains: ChainId[];
 }
 
@@ -66,7 +68,9 @@ export function ConnectLoader({
   const {
     connectionStatus, deepLink, checkout, provider,
   } = connectLoaderState;
-  const { targetLayer, walletProvider, allowedChains } = params;
+  const {
+    targetLayer, walletProvider, allowedChains, passport,
+  } = params;
   const networkToSwitchTo = targetLayer ?? ConnectTargetLayer.LAYER2;
 
   const biomeTheme: BaseTokens = widgetConfig.theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
@@ -186,7 +190,10 @@ export function ConnectLoader({
       }
 
       try {
-        if (!provider && walletProvider) {
+        if (!provider
+          && walletProvider
+          && walletProvider !== WalletProviderName.PASSPORT // TODO: remove this clause when WT-1561 is implemented to support create provider for Passport
+        ) {
           const createProviderResult = await checkout.createProvider({
             walletProvider,
           });
@@ -332,7 +339,9 @@ export function ConnectLoader({
         || connectionStatus === ConnectionStatus.CONNECTED_WRONG_NETWORK) && (
           <ConnectWidget
             config={widgetConfig}
-            params={{ ...params, targetLayer: networkToSwitchTo, web3Provider: provider }}
+            params={{
+              ...params, targetLayer: networkToSwitchTo, web3Provider: provider, passport,
+            }}
             deepLink={deepLink}
             sendCloseEventOverride={closeEvent}
           />

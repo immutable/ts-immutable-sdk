@@ -1,4 +1,5 @@
 export * from './balances';
+export * from './buy';
 export * from './chains';
 export * from './config';
 export * from './connect';
@@ -11,3 +12,4 @@ export * from './transaction';
 export * from './wallet';
 export * from './provider';
 export * from './constants';
+export * from './smartCheckout';

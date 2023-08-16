@@ -158,7 +158,14 @@ export async function switchWalletNetwork(
     );
   }
 
-  // WT-1146 - Refer to the README in this folder for explantion on the switch network flow
+  if ((web3Provider.provider as any)?.isPassport) {
+    throw new CheckoutError(
+      'Switching networks with Passport provider is not supported',
+      CheckoutErrorType.SWITCH_NETWORK_UNSUPPORTED,
+    );
+  }
+
+  // WT-1146 - Refer to the README in this folder for explanation on the switch network flow
   try {
     await switchNetworkInWallet(networkMap, web3Provider, chainId);
   } catch (err: any) {

@@ -7,7 +7,9 @@ import {
   OverflowPopoverMenu,
   PriceDisplay,
 } from '@biom3/react';
-import { useContext, useEffect, useState } from 'react';
+import {
+  useContext, useEffect, useState,
+} from 'react';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import {
   balanceItemContainerStyle,
@@ -23,6 +25,7 @@ import {
 import { getL1ChainId, getL2ChainId } from '../../../../lib/networkUtils';
 import { formatZeroAmount, tokenValueFormat } from '../../../../lib/utils';
 import { ConnectLoaderContext } from '../../../../context/connect-loader-context/ConnectLoaderContext';
+import { isPassportProvider } from '../../../../lib/providerUtils';
 
 export interface BalanceItemProps {
   balanceInfo: BalanceInfo;
@@ -31,13 +34,15 @@ export interface BalanceItemProps {
 
 export function BalanceItem({ balanceInfo, bridgeToL2OnClick }: BalanceItemProps) {
   const { connectLoaderState } = useContext(ConnectLoaderContext);
-  const { checkout } = connectLoaderState;
+  const { checkout, provider } = connectLoaderState;
   const fiatAmount = `≈ USD $${formatZeroAmount(balanceInfo.fiatAmount)}`;
   const { walletState } = useContext(WalletContext);
   const { supportedTopUps, network } = walletState;
   const [isOnRampEnabled, setIsOnRampEnabled] = useState<boolean>();
   const [isBridgeEnabled, setIsBridgeEnabled] = useState<boolean>();
   const [isSwapEnabled, setIsSwapEnabled] = useState<boolean>();
+
+  const isPassport = isPassportProvider(provider);
 
   useEffect(() => {
     if (!network || !supportedTopUps || !checkout) return;
@@ -47,17 +52,18 @@ export function BalanceItem({ balanceInfo, bridgeToL2OnClick }: BalanceItemProps
     setIsOnRampEnabled(enableAddCoin);
 
     const enableMoveCoin = network.chainId === getL1ChainId(checkout.config)
-      && (supportedTopUps?.isBridgeEnabled ?? true);
+      && (supportedTopUps?.isBridgeEnabled ?? true)
+      && !isPassport;
     setIsBridgeEnabled(enableMoveCoin);
 
     const enableSwapCoin = network.chainId === getL2ChainId(checkout.config)
       && (supportedTopUps?.isSwapEnabled ?? true);
     setIsSwapEnabled(enableSwapCoin);
-  }, [network, supportedTopUps, checkout]);
+  }, [network, supportedTopUps, checkout, isPassport]);
 
   return (
     <Box
-      testId={`balance-item-${balanceInfo.symbol}`}
+      testId={`balance-item-${balanceInfo.symbol}-${balanceInfo.address}`}
       sx={balanceItemContainerStyle}
     >
       <Box sx={balanceItemCoinBoxStyle}>
