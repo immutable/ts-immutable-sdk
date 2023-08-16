@@ -3,7 +3,7 @@ import { BigNumber, Contract } from 'ethers';
 import { ERC20ABI, ItemRequirement, ItemType } from '../types';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 
-export const erc20Allowance = async (
+export const getERC20Allowance = async (
   provider: Web3Provider,
   contractAddress: string,
   spenderAddress: string,
@@ -71,7 +71,7 @@ export const hasERC20Allowances = async (
     const { contractAddress, spenderAddress } = itemRequirement;
 
     // eslint-disable-next-line no-await-in-loop
-    const allowance = await erc20Allowance(provider, contractAddress, spenderAddress);
+    const allowance = await getERC20Allowance(provider, contractAddress, spenderAddress);
     if (allowance.gte(itemRequirement.amount)) {
       allowances.push({
         sufficient: true,
@@ -93,13 +93,6 @@ export const hasERC20Allowances = async (
         itemRequirement.spenderAddress,
         itemRequirement.amount,
       ),
-    });
-
-    // eslint-disable-next-line no-console
-    console.log({
-      allowance: allowance.toString(),
-      amount: itemRequirement.amount.toString(),
-      delta: itemRequirement.amount.sub(allowance).toString(),
     });
   }
 
