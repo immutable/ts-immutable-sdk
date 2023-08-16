@@ -229,6 +229,7 @@ describe('Connect', () => {
 
     const result = await checkout.createProvider({
       walletProvider: WalletProviderName.METAMASK,
+      passport: null,
     });
 
     expect(createProvider).toBeCalledTimes(1);
