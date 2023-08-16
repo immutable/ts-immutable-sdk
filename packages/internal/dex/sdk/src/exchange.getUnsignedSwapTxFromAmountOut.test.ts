@@ -33,7 +33,6 @@ jest.mock('./lib/utils', () => ({
   __esmodule: true,
   ...jest.requireActual('./lib/utils'),
   getERC20Decimals: async () => 18,
-  isSecondaryFeeContractPaused: jest.fn().mockResolvedValue(false),
 }));
 
 const APPROVED_AMOUNT = BigNumber.from('0'); // No existing approval
@@ -51,6 +50,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       () => ({
         allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT),
         estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
+        paused: jest.fn().mockResolvedValue(false),
       }),
     );
 

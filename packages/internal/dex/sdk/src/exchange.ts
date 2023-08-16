@@ -22,7 +22,6 @@ import {
 import { Router } from './lib/router';
 import {
   getERC20Decimals,
-  isSecondaryFeeContractPaused,
   isValidNonZeroAddress,
   newAmount,
   uniswapTokenToTokenInfo,
@@ -107,7 +106,7 @@ export class Exchange {
         this.provider,
       );
 
-      if (await isSecondaryFeeContractPaused(secondaryFeeContract)) {
+      if (await secondaryFeeContract.paused()) {
         // Do not use secondary fees if the contract is paused
         this.secondaryFees = [];
       }

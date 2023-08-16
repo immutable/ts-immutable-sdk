@@ -27,7 +27,6 @@ import {
   formatEther,
 } from './test/utils';
 import { Router, SecondaryFee, uniswapTokenToTokenInfo } from './lib';
-import { isSecondaryFeeContractPaused } from './lib/utils';
 
 jest.mock('@ethersproject/providers');
 jest.mock('@ethersproject/contracts');
@@ -37,7 +36,6 @@ jest.mock('./lib/utils', () => ({
   __esmodule: true,
   ...jest.requireActual('./lib/utils'),
   getERC20Decimals: async () => 18,
-  isSecondaryFeeContractPaused: jest.fn(),
 }));
 
 const HIGHER_SLIPPAGE = 0.2;
@@ -52,6 +50,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       () => ({
         allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT),
         estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
+        paused: jest.fn().mockResolvedValue(false),
       }),
     );
 
@@ -280,8 +279,13 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
   describe('Swap with secondary fees and paused secondary fee contract', () => {
     it('should use the default router contract with no fees applied to the swap', async () => {
-      (isSecondaryFeeContractPaused as jest.MockedFunction<typeof isSecondaryFeeContractPaused>)
-        .mockResolvedValue(true);
+      erc20Contract = (Contract as unknown as jest.Mock).mockImplementation(
+        () => ({
+          allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT),
+          estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
+          paused: jest.fn().mockResolvedValue(true),
+        }),
+      );
 
       const params = setupSwapTxTest();
       mockRouterImplementation(params);
