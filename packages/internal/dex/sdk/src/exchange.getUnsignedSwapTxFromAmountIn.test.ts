@@ -190,8 +190,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(swapParams.tokenOut).toBe(params.outputToken);
       expect(swapParams.fee).toBe(10000);
       expect(swapParams.recipient).toBe(params.fromAddress);
-      expect(formatEther(swapParams.amountIn)).toBe('100.0'); // 100: swap.amountIn = userQuoteReq.amountIn
-      expect(formatEther(swapParams.amountOutMinimum)).toBe('961.165048543689320388'); // 961.2: swap.amountOutMinimum = ourQuoteRes.amountOut - slippage
+      expect(formatEther(swapParams.amountIn)).toBe('100.0'); // swap.amountIn = userQuoteReq.amountIn
+      expect(formatEther(swapParams.amountOutMinimum)).toBe('961.165048543689320388'); // swap.amountOutMinimum = ourQuoteRes.amountOut - slippage
       expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0');
 
       expect(swap.transaction.to).toBe(TEST_SECONDARY_FEE_ADDRESS);
@@ -240,8 +240,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(decodedPath.secondPoolFee.toString()).toBe('10000');
 
       expect(swapParams.recipient).toBe(params.fromAddress); // recipient of swap
-      expect(formatEther(swapParams.amountIn)).toBe('100.0'); // 100
-      expect(formatEther(swapParams.amountOutMinimum)).toBe('899.100899100899100899'); // 899 includes slippage and fees
+      expect(formatEther(swapParams.amountIn)).toBe('100.0');
+      expect(formatEther(swapParams.amountOutMinimum)).toBe('899.100899100899100899'); // includes slippage and fees
     });
 
     it('returns a quote', async () => {
