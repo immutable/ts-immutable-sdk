@@ -253,7 +253,7 @@ describe('prepareApproval', () => {
     it('uses the amount specified by the user', () => {
       const amountSpecified = ethers.BigNumber.from(1);
       const amountWithSlippage = ethers.BigNumber.from(2);
-      const secondaryFees = [{ feeBasisPoints: 0, feeRecipient: TEST_FROM_ADDRESS }];
+      const secondaryFees = [{ basisPoints: 0, recipient: TEST_FROM_ADDRESS }];
       const approval = prepareApproval(
         TradeType.EXACT_INPUT,
         amountSpecified,
@@ -269,7 +269,7 @@ describe('prepareApproval', () => {
     it('uses the amount calculated with slippage', () => {
       const amountSpecified = ethers.BigNumber.from(1);
       const amountWithSlippage = ethers.BigNumber.from(2);
-      const secondaryFees = [{ feeBasisPoints: 0, feeRecipient: TEST_FROM_ADDRESS }];
+      const secondaryFees = [{ basisPoints: 0, recipient: TEST_FROM_ADDRESS }];
       const approval = prepareApproval(
         TradeType.EXACT_OUTPUT,
         amountSpecified,
@@ -285,7 +285,7 @@ describe('prepareApproval', () => {
     it('uses the secondary fee address as the spender', () => {
       const amountSpecified = ethers.BigNumber.from(1);
       const amountWithSlippage = ethers.BigNumber.from(2);
-      const secondaryFees = [{ feeBasisPoints: 0, feeRecipient: TEST_FROM_ADDRESS }];
+      const secondaryFees = [{ basisPoints: 0, recipient: TEST_FROM_ADDRESS }];
       const approval = prepareApproval(
         TradeType.EXACT_OUTPUT,
         amountSpecified,

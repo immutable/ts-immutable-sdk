@@ -36,8 +36,8 @@ function buildSwapParametersForSinglePoolSwap(
   secondaryFeeContract: SecondaryFeeInterface,
 ) {
   const secondaryFeeValues: ISecondaryFee.SecondaryFeeParamsStruct[] = secondaryFees.map((fee) => ({
-    feeBasisPoints: fee.feeBasisPoints,
-    recipient: fee.feeRecipient,
+    feeBasisPoints: fee.basisPoints,
+    recipient: fee.recipient,
   }));
 
   if (trade.tradeType === TradeType.EXACT_INPUT) {
@@ -75,8 +75,8 @@ function buildSwapParametersForMultiPoolSwap(
   const path: string = encodeRouteToPath(route, trade.tradeType === TradeType.EXACT_OUTPUT);
 
   const secondaryFeeValues: ISecondaryFee.SecondaryFeeParamsStruct[] = secondaryFees.map((fee) => ({
-    feeBasisPoints: fee.feeBasisPoints,
-    recipient: fee.feeRecipient,
+    feeBasisPoints: fee.basisPoints,
+    recipient: fee.recipient,
   }));
 
   if (trade.tradeType === TradeType.EXACT_INPUT) {
