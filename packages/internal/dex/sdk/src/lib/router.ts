@@ -48,7 +48,7 @@ export class Router {
     tradeType: TradeType,
     maxHops: number = 2,
   ): Promise<QuoteTradeInfo> {
-    const [currencyIn, currencyOut] = this.determineERC20InAndERC20Out(
+    const [tokenIn, tokenOut] = this.determineERC20InAndERC20Out(
       tradeType,
       amountSpecified,
       otherToken,
@@ -58,7 +58,7 @@ export class Router {
       this.routingContracts.multicallAddress,
       this.provider,
     );
-    const erc20Pair: ERC20Pair = [currencyIn, currencyOut];
+    const erc20Pair: ERC20Pair = [tokenIn, tokenOut];
 
     // Get all pools and use these to get all possible routes.
     const pools = await fetchValidPools(
@@ -77,13 +77,13 @@ export class Router {
     // TODO: Fix used before defined error
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     const routes = generateAllAcyclicPaths(
-      currencyIn,
-      currencyOut,
+      tokenIn,
+      tokenOut,
       pools,
       maxHops,
       [],
       [],
-      currencyIn,
+      tokenIn,
     );
 
     const noValidRoute = routes.length === 0;
