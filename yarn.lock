@@ -3340,9 +3340,9 @@ __metadata:
     "@testing-library/react": ^13.4.0
     "@testing-library/user-event": ^13.5.0
     "@types/jest": ^29.4.3
-    "@types/node": "^18.14.2 "
+    "@types/node": ^18.14.2
     "@types/react": ^18.0.28
-    "@types/react-dom": "^18.0.11 "
+    "@types/react-dom": ^18.0.11
     "@types/uuid": ^9.0.2
     buffer: ^6.0.3
     crypto: "npm:crypto-browserify@^3.12.0"
@@ -8584,13 +8584,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^18.14.2 ":
-  version: 18.17.5
-  resolution: "@types/node@npm:18.17.5"
-  checksum: b8c658a99234b99425243c324b641ed7b9ceb6bee6b06421fdc9bb7c58f9a5552e353225cc549e6982462ac384abe1985022ed76e2e4728797f59b21f659ca2b
-  languageName: node
-  linkType: hard
-
 "@types/normalize-package-data@npm:^2.4.0":
   version: 2.4.1
   resolution: "@types/normalize-package-data@npm:2.4.1"
@@ -8665,7 +8658,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:^18.0.0, @types/react-dom@npm:^18.0.11, @types/react-dom@npm:^18.0.11 ":
+"@types/react-dom@npm:^18.0.0, @types/react-dom@npm:^18.0.11":
   version: 18.2.7
   resolution: "@types/react-dom@npm:18.2.7"
   dependencies:
