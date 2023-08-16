@@ -19,7 +19,7 @@ export type OpenAPIConfig = {
 };
 
 export const OpenAPI: OpenAPIConfig = {
-  BASE: 'https://api.dev.immutable.com',
+  BASE: 'https://api.sandbox.immutable.com',
   VERSION: '1.0.0',
   WITH_CREDENTIALS: false,
   CREDENTIALS: 'include',

@@ -6,7 +6,10 @@ import {
   OrderbookOverrides,
 } from 'config/config';
 import { ERC721Factory } from 'erc721';
-import { ListingResult, ListListingsResult, OrderStatus } from 'openapi/sdk';
+import {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  Fee, ListingResult, ListListingsResult, OrderStatus,
+} from 'openapi/sdk';
 import { Seaport } from 'seaport';
 import {
   CancelOrderResponse,
@@ -152,16 +155,29 @@ export class Orderbook {
   async fulfillOrder(
     listingId: string,
     takerAddress: string,
+    // TODO: Allow taker fee when backend support is available
+    // takerFee?: Fee,
   ): Promise<FulfillOrderResponse> {
-    const orderResult = await this.apiClient.getListing(listingId);
+    const fulfillmentDataRes = await this.apiClient.fulfillmentData([{
+      order_id: listingId,
+      // fee: takerFee,
+      fee: undefined,
+    }]);
 
-    if (orderResult.result.status !== OrderStatus.ACTIVE) {
+    if (fulfillmentDataRes.result.length !== 1) {
+      throw new Error('unexpected fulfillment data result length');
+    }
+
+    const extraData = fulfillmentDataRes.result[0].extra_data;
+    const orderResult = fulfillmentDataRes.result[0].order;
+
+    if (orderResult.status !== OrderStatus.ACTIVE) {
       throw new Error(
-        `Cannot fulfil order that is not active. Current status: ${orderResult.result.status}`,
+        `Cannot fulfil order that is not active. Current status: ${orderResult.status}`,
       );
     }
 
-    return this.seaport.fulfillOrder(orderResult.result, takerAddress);
+    return this.seaport.fulfillOrder(orderResult, takerAddress, extraData);
   }
 
   /**
