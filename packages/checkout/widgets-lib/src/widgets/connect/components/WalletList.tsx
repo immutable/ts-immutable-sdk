@@ -63,9 +63,10 @@ export function WalletList(props: WalletListProps) {
           const passportzkEVMProvider = passport?.connectEvm();
           web3Provider = new Web3Provider(passportzkEVMProvider);
         } else {
-          web3Provider = await checkout.createProvider({
+          const providerResult = await checkout.createProvider({
             walletProvider: walletProviderName,
           });
+          web3Provider = providerResult.provider;
         }
 
         connectDispatch({

@@ -213,7 +213,7 @@ describe('ConnectWidget tests', () => {
         cySmartGet('ready-to-connect').should('be.visible');
         cySmartGet('footer-button').should('have.text', 'Ready to connect');
         cySmartGet('footer-button').click();
-        cySmartGet('@connectStub').should('have.been.calledWith', { provider: { provider: {} as Web3Provider } });
+        cySmartGet('@connectStub').should('have.been.calledWith', { provider: {} as Web3Provider });
       });
 
       it('should update footer button text to Try again when user rejects connection request', () => {

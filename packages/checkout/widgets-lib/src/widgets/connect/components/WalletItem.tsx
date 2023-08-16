@@ -46,7 +46,7 @@ export function WalletItem(props: WalletProps) {
           <MenuItem.Caption>
             {wallet.walletProvider === WalletProviderName.PASSPORT ? (
               <Box as="span" sx={{ c: 'base.gradient.1' }}>
-                Recommended
+                {wallets[wallet.walletProvider].accentText}
               </Box>
             ) : null}
             {' '}
