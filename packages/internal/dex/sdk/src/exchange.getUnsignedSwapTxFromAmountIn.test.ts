@@ -50,6 +50,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       () => ({
         allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT),
         estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
+        paused: jest.fn().mockResolvedValue(false),
       }),
     );
 
@@ -184,7 +185,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const { swapParams, secondaryFeeParams } = decodeMulticallExactInputSingleWithFees(data);
 
       expect(secondaryFeeParams[0].feeRecipient).toBe(TEST_FEE_RECIPIENT);
-      expect(secondaryFeeParams[0].feeBasisPoints).toBe(100);
+      expect(secondaryFeeParams[0].feeBasisPoints.toString()).toBe('100');
 
       expect(swapParams.tokenIn).toBe(params.inputToken);
       expect(swapParams.tokenOut).toBe(params.outputToken);
@@ -225,7 +226,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const { swapParams, secondaryFeeParams } = decodeMulticallExactInputWithFees(data);
 
       expect(secondaryFeeParams[0].feeRecipient).toBe(TEST_FEE_RECIPIENT);
-      expect(secondaryFeeParams[0].feeBasisPoints).toBe(TEST_MAX_FEE_BASIS_POINTS);
+      expect(secondaryFeeParams[0].feeBasisPoints.toString()).toBe(TEST_MAX_FEE_BASIS_POINTS.toString());
 
       const decodedPath = decodePathForExactInput(swapParams.path.toString());
 
@@ -273,6 +274,100 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           },
         },
       ]);
+    });
+  });
+
+  describe('Swap with secondary fees and paused secondary fee contract', () => {
+    it('should use the default router contract with no fees applied to the swap', async () => {
+      erc20Contract = (Contract as unknown as jest.Mock).mockImplementation(
+        () => ({
+          allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT),
+          estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
+          paused: jest.fn().mockResolvedValue(true),
+        }),
+      );
+
+      const params = setupSwapTxTest();
+      mockRouterImplementation(params);
+
+      const secondaryFees: SecondaryFee[] = [
+        { feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: 100 }, // 1% Fee
+      ];
+      const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
+
+      const { swap, quote } = await exchange.getUnsignedSwapTxFromAmountIn(
+        params.fromAddress,
+        params.inputToken,
+        params.outputToken,
+        utils.parseEther('100'),
+      );
+
+      expectToBeDefined(swap.transaction.data);
+
+      expect(formatAmount(quote.amountWithMaxSlippage)).toEqual('999.000999000999000999'); // min amount out (includes slippage)
+      expect(quote.fees.length).toBe(0); // expect no fees to be applied
+
+      const data = swap.transaction.data.toString();
+      const { swapParams } = decodeMulticallExactInputSingleWithoutFees(data);
+
+      expect(formatEther(swapParams.amountOutMinimum)).toBe(formatEther(quote.amountWithMaxSlippage.value));
+      expect(swap.transaction.to).toBe(TEST_PERIPHERY_ROUTER_ADDRESS); // expect the default router contract to be used
+    });
+
+    describe('when the secondary fee contract is unpaused after a swap request', () => {
+      it('should apply secondary fees to a subsequent swap request', async () => {
+        erc20Contract = (Contract as unknown as jest.Mock).mockImplementation(
+          () => ({
+            allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT),
+            estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
+            paused: jest.fn().mockResolvedValue(true),
+          }),
+        );
+
+        const params = setupSwapTxTest();
+        mockRouterImplementation(params);
+
+        const secondaryFees: SecondaryFee[] = [
+          { feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: 100 }, // 1% Fee
+        ];
+        const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
+
+        await exchange.getUnsignedSwapTxFromAmountIn(
+          params.fromAddress,
+          params.inputToken,
+          params.outputToken,
+          utils.parseEther('100'),
+          3, // 3% Slippage
+        );
+
+        // Unpause the secondary fee contract
+        erc20Contract = (Contract as unknown as jest.Mock).mockImplementation(
+          () => ({
+            allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT),
+            estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
+            paused: jest.fn().mockResolvedValue(false),
+          }),
+        );
+
+        const { swap, quote } = await exchange.getUnsignedSwapTxFromAmountIn(
+          params.fromAddress,
+          params.inputToken,
+          params.outputToken,
+          utils.parseEther('100'),
+          3, // 3% Slippage
+        );
+
+        expectToBeDefined(swap.transaction.data);
+
+        expect(formatAmount(quote.amountWithMaxSlippage)).toEqual('961.165048543689320388'); // min amount out (includes slippage)
+        expect(quote.fees.length).toBe(1); // expect no fees to be applied
+
+        const data = swap.transaction.data.toString();
+        const { swapParams } = decodeMulticallExactInputSingleWithFees(data);
+
+        expect(formatEther(swapParams.amountOutMinimum)).toBe(formatEther(quote.amountWithMaxSlippage.value));
+        expect(swap.transaction.to).toBe(TEST_SECONDARY_FEE_ADDRESS); // expect the secondary fee contract to be used
+      });
     });
   });
 

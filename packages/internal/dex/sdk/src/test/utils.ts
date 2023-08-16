@@ -155,10 +155,10 @@ export function decodePathForExactOutput(path: string) {
   };
 }
 
-type SecondaryFeeFunctionName = 'exactInputSingleWithServiceFee' |
-'exactOutputSingleWithServiceFee' |
-'exactInputWithServiceFee' |
-'exactOutputWithServiceFee';
+type SecondaryFeeFunctionName = 'exactInputSingleWithSecondaryFee' |
+'exactOutputSingleWithSecondaryFee' |
+'exactInputWithSecondaryFee' |
+'exactOutputWithSecondaryFee';
 
 type SwapRouterFunctionName = 'exactInputSingle' | 'exactOutputSingle';
 
@@ -181,7 +181,7 @@ function decodeSwapRouterCall(calldata: utils.BytesLike, functionName: SwapRoute
 }
 
 export function decodeMulticallExactInputWithFees(data: utils.BytesLike) {
-  const decodedParams = decodeSecondaryFeeCall(data, 'exactInputWithServiceFee');
+  const decodedParams = decodeSecondaryFeeCall(data, 'exactInputWithSecondaryFee');
 
   const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map((x: [string, number]) => ({
     feeRecipient: x[0],
@@ -199,7 +199,7 @@ export function decodeMulticallExactInputWithFees(data: utils.BytesLike) {
 }
 
 export function decodeMulticallExactOutputWithFees(data: utils.BytesLike) {
-  const decodedParams = decodeSecondaryFeeCall(data, 'exactOutputWithServiceFee');
+  const decodedParams = decodeSecondaryFeeCall(data, 'exactOutputWithSecondaryFee');
 
   const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map((x: [string, number]) => ({
     feeRecipient: x[0],
@@ -217,7 +217,7 @@ export function decodeMulticallExactOutputWithFees(data: utils.BytesLike) {
 }
 
 export function decodeMulticallExactInputSingleWithFees(data: utils.BytesLike) {
-  const decodedParams = decodeSecondaryFeeCall(data, 'exactInputSingleWithServiceFee');
+  const decodedParams = decodeSecondaryFeeCall(data, 'exactInputSingleWithSecondaryFee');
 
   const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map((x: [string, number]) => ({
     feeRecipient: x[0],
@@ -238,7 +238,7 @@ export function decodeMulticallExactInputSingleWithFees(data: utils.BytesLike) {
 }
 
 export function decodeMulticallExactOutputSingleWithFees(data: utils.BytesLike) {
-  const decodedParams = decodeSecondaryFeeCall(data, 'exactOutputSingleWithServiceFee');
+  const decodedParams = decodeSecondaryFeeCall(data, 'exactOutputSingleWithSecondaryFee');
 
   const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map((x: [string, number]) => ({
     feeRecipient: x[0],
