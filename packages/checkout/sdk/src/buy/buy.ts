@@ -1,20 +1,24 @@
-import { Web3Provider } from '@ethersproject/providers';
+import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
+import {
+  Action, ActionType, TransactionPurpose, constants,
+} from '@imtbl/orderbook';
 import {
   BuyResult,
 } from '../types/buy';
 import * as instance from '../instance';
 import { CheckoutConfiguration } from '../config';
 import { CheckoutError, CheckoutErrorType } from '../errors';
-import { ItemType, ItemRequirement, GasTokenType } from '../types/smartCheckout';
-
-export const GAS_LIMIT = 300000;
-export const SEAPORT_CONTRACT_ADDRESS = '0x474989C4D25DD41B0B9b1ECb4643B9Fe25f83B19';
+import {
+  ItemType, ItemRequirement, GasTokenType, TransactionOrGasType, GasAmount, FulfilmentTransaction,
+} from '../types/smartCheckout';
+import { smartCheckout } from '../smartCheckout';
 
 export const getItemRequirement = (
   type: ItemType,
   contractAddress: string,
   amount: BigNumber,
+  spenderAddress: string,
 ): ItemRequirement => {
   switch (type) {
     case ItemType.ERC20:
@@ -22,7 +26,7 @@ export const getItemRequirement = (
         type,
         amount,
         contractAddress,
-        spenderAddress: SEAPORT_CONTRACT_ADDRESS,
+        spenderAddress,
       };
     case ItemType.NATIVE:
     default:
@@ -33,15 +37,53 @@ export const getItemRequirement = (
   }
 };
 
+export const getUnsignedFulfilmentTransaction = async (
+  actions: Action[],
+): Promise<TransactionRequest | undefined> => {
+  for (const action of actions) {
+    if (action.type === ActionType.TRANSACTION && action.purpose === TransactionPurpose.FULFILL_ORDER) {
+      // eslint-disable-next-line no-await-in-loop
+      return await action.buildTransaction();
+    }
+  }
+  return undefined;
+};
+
+export const getTransactionOrGas = (
+  gasLimit: number,
+  transaction: TransactionRequest | undefined,
+): FulfilmentTransaction | GasAmount => {
+  if (transaction) {
+    return {
+      type: TransactionOrGasType.TRANSACTION,
+      transaction,
+    };
+  }
+
+  return {
+    type: TransactionOrGasType.GAS,
+    gasToken: {
+      type: GasTokenType.NATIVE,
+      limit: BigNumber.from(gasLimit),
+    },
+  };
+};
+
 export const buy = async (
   config: CheckoutConfiguration,
-  provider: Web3Provider, // will be used by smart checkout
+  provider: Web3Provider,
   orderId: string,
 ): Promise<BuyResult> => {
+  let orderbook;
   let order;
+  let spenderAddress = '';
+  const gasLimit = constants.estimatedFulfillmentGasGwei;
+
   try {
-    const orderbook = await instance.createOrderbookInstance(config);
+    orderbook = await instance.createOrderbookInstance(config);
     order = await orderbook.getListing(orderId);
+    const { seaportContractAddress } = orderbook.config();
+    spenderAddress = seaportContractAddress;
   } catch (err: any) {
     throw new CheckoutError(
       'An error occurred while getting the order listing',
@@ -52,6 +94,13 @@ export const buy = async (
       },
     );
   }
+
+  let unsignedTransaction;
+  try {
+    const fulfillerAddress = await provider.getSigner().getAddress();
+    const { actions } = await orderbook.fulfillOrder(orderId, fulfillerAddress);
+    unsignedTransaction = await getUnsignedFulfilmentTransaction(actions);
+  } catch { /* Use the gas limit when the fulfil order request errors */ }
 
   let amount = BigNumber.from('0');
   let type: ItemType = ItemType.NATIVE;
@@ -85,19 +134,25 @@ export const buy = async (
   });
 
   const feeArray = order.result.fees;
-  feeArray.forEach((item: any) => { // If the buy array contains one ERC721 what will the fee token be in?
+  feeArray.forEach((item: any) => {
     amount = amount.add(BigNumber.from(item.amount));
   });
 
-  const itemRequirements: ItemRequirement[] = [
-    getItemRequirement(type, contractAddress, amount),
+  const itemRequirements = [
+    getItemRequirement(type, contractAddress, amount, spenderAddress),
   ];
+
+  await smartCheckout(
+    provider,
+    itemRequirements,
+    getTransactionOrGas(gasLimit, unsignedTransaction),
+  );
 
   return {
     itemRequirements,
     gasToken: {
       type: GasTokenType.NATIVE,
-      limit: BigNumber.from(GAS_LIMIT),
+      limit: BigNumber.from(gasLimit),
     },
   };
 };
