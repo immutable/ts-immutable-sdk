@@ -92,6 +92,11 @@ export const toAmount = (amount: CurrencyAmount<Token>): Amount => ({
   value: toBigNumber(amount),
 });
 
+export const toCurrencyAmount = (amount: Amount): CurrencyAmount<Token> => {
+  const token = tokenInfoToUniswapToken(amount.token);
+  return CurrencyAmount.fromRawAmount(token, amount.value.toString());
+};
+
 export const newAmount = (amount: ethers.BigNumber, token: TokenInfo): Amount => ({
   value: amount,
   token,
