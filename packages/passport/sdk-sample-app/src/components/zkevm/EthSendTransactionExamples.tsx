@@ -3,18 +3,20 @@ import { Accordion, Form } from 'react-bootstrap';
 import { usePassportProvider } from '@/context/PassportProvider';
 import WorkflowButton from '@/components/WorkflowButton';
 import { RequestExampleProps } from '@/types';
+import { parseUnits } from 'ethers/lib/utils';
 
 function EthSendTransactionExamples({ disabled, handleExampleSubmitted }: RequestExampleProps) {
   const [activeAccordionKey, setActiveAccordionKey] = useState<string | string[] | undefined | null>('');
   const [fromAddress, setFromAddress] = useState<string>('');
   const [toAddress, setToAddress] = useState<string>('');
-  const [amount, setAmount] = useState<string>('');
+  const [amount, setAmount] = useState<string>('0');
   const { zkEvmProvider } = usePassportProvider();
 
+  const imxTokenDecimal = 18;
   const getParams = useCallback(() => ([{
     from: fromAddress,
     to: toAddress,
-    value: amount,
+    value: parseUnits(amount, imxTokenDecimal).toString(),
   }]), [fromAddress, toAddress, amount]);
 
   useEffect(() => {
@@ -96,7 +98,7 @@ function EthSendTransactionExamples({ disabled, handleExampleSubmitted }: Reques
               <Form.Control
                 required
                 disabled={disabled}
-                type="text"
+                type="number"
                 onChange={(e) => setAmount(e.target.value)}
               />
             </Form.Group>
