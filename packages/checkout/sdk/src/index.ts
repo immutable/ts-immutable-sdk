@@ -38,6 +38,7 @@ export type {
   RemoteConfiguration,
   SendTransactionParams,
   SendTransactionResult,
+  SmartCheckoutParams,
   SwitchNetworkParams,
   SwitchNetworkResult,
   TokenFilter,

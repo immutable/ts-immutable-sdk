@@ -9,7 +9,7 @@ import {
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { BigNumber } from 'ethers';
-import { Web3Provider } from '@ethersproject/providers';
+import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
 import { TopUpView } from './TopUpView';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { orchestrationEvents } from '../../lib/orchestrationEvents';
@@ -103,6 +103,32 @@ describe('Top Up View', () => {
         <BiomeCombinedProviders>
           <ConnectLoaderTestComponent
             initialStateOverride={connectLoaderState}
+          >
+            <TopUpView
+              showOnrampOption
+              showSwapOption
+              showBridgeOption={false}
+              widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
+              onCloseButtonClick={() => {}}
+            />
+          </ConnectLoaderTestComponent>
+        </BiomeCombinedProviders>,
+      );
+      cySmartGet('menu-item-onramp').should('exist');
+      cySmartGet('menu-item-swap').should('exist');
+      cySmartGet('menu-item-bridge').should('not.exist');
+    });
+
+    it('should hide bridge option when provider is Passport', () => {
+      mount(
+        <BiomeCombinedProviders>
+          <ConnectLoaderTestComponent
+            initialStateOverride={
+              {
+                ...connectLoaderState,
+                provider: { provider: { isPassport: true } as any as ExternalProvider } as Web3Provider,
+              }
+            }
           >
             <TopUpView
               showOnrampOption
