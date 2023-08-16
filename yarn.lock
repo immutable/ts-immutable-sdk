@@ -1919,29 +1919,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.8.1-beta":
-  version: 0.8.1-beta
-  resolution: "@biom3/react@npm:0.8.1-beta"
-  dependencies:
-    "@biom3/design-tokens": "*"
-    "@emotion/css": ^11.11.2
-    "@emotion/react": ^11.11.1
-    "@rive-app/react-canvas": ^3.0.50
-    buffer: ^6.0.3
-    csstype: ^3.1.2
-    framer-motion: ^10.12.12
-    lodash.debounce: ^4.0.8
-    lodash.get: ^4.4.2
-    lodash.isequal: ^4.5.0
-    lodash.throttle: ^4.1.1
-    react: ^18.2.0
-    react-dom: ^18.2.0
-    react-is: ^18.2.0
-    ts-deepmerge: ^5.0.0
-  checksum: 9ae171465605d2416bedeaddb70f61b9b82de3c48fc967dac59bdffe95793ab8f874ce7c4a6254f58f1e3108739c3f6ae53ddbedb085b015c32a67fffb69c891
-  languageName: node
-  linkType: hard
-
 "@chainsafe/as-sha256@npm:^0.3.1":
   version: 0.3.1
   resolution: "@chainsafe/as-sha256@npm:0.3.1"
@@ -3332,27 +3309,27 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/economy-building-blocks-playground@workspace:packages/internal/economy-building-blocks/playground"
   dependencies:
-    "@biom3/design-tokens": ^0.2.2-beta
-    "@biom3/react": ^0.8.1-beta
+    "@biom3/design-tokens": 0.2.0-beta
+    "@biom3/react": ^0.8.0-beta
     "@imtbl/blockchain-data": 0.0.0
     "@imtbl/passport": 0.0.0
-    "@imtbl/sdk": "workspace:^"
-    "@testing-library/jest-dom": ^5.17.0
+    "@imtbl/sdk": 0.0.0
+    "@testing-library/jest-dom": ^5.16.5
     "@testing-library/react": ^13.4.0
     "@testing-library/user-event": ^13.5.0
-    "@types/jest": ^27.5.2
-    "@types/node": ^16.18.39
-    "@types/react": ^18.2.17
-    "@types/react-dom": ^18.2.7
+    "@types/jest": ^29.4.3
+    "@types/node": "^18.14.2 "
+    "@types/react": ^18.0.28
+    "@types/react-dom": "^18.0.11 "
     "@types/uuid": ^9.0.2
-    buffer: "npm:buffer@^6.0.3"
+    buffer: ^6.0.3
     crypto: "npm:crypto-browserify@^3.12.0"
     http: "npm:stream-http@^3.2.0"
     https: "npm:https-browserify@^1.0.0"
     react: ^18.2.0
     react-dom: ^18.2.0
     react-flexbox-grid: ^2.1.2
-    react-router-dom: ^6.14.2
+    react-router-dom: ^6.11.0
     react-scripts: 5.0.1
     stream: "npm:stream-browserify@^3.0.0"
     typescript: ^4.9.5
@@ -3682,7 +3659,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/sdk@0.0.0, @imtbl/sdk@workspace:^, @imtbl/sdk@workspace:sdk":
+"@imtbl/sdk@0.0.0, @imtbl/sdk@workspace:sdk":
   version: 0.0.0-use.local
   resolution: "@imtbl/sdk@workspace:sdk"
   dependencies:
@@ -7955,7 +7932,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@testing-library/jest-dom@npm:^5.16.5, @testing-library/jest-dom@npm:^5.17.0":
+"@testing-library/jest-dom@npm:^5.16.5":
   version: 5.17.0
   resolution: "@testing-library/jest-dom@npm:5.17.0"
   dependencies:
@@ -8435,16 +8412,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/jest@npm:^27.5.2":
-  version: 27.5.2
-  resolution: "@types/jest@npm:27.5.2"
-  dependencies:
-    jest-matcher-utils: ^27.0.0
-    pretty-format: ^27.0.0
-  checksum: 7e11c6826aa429ad990dc262e4e4b54aa36573287fddf15773e4137f07d11d3105f0dd9f1baff73252160a057df23f5529bb83b1bf83cd3f45f9460a5ca5c22e
-  languageName: node
-  linkType: hard
-
 "@types/js-levenshtein@npm:^1.1.1":
   version: 1.1.1
   resolution: "@types/js-levenshtein@npm:1.1.1"
@@ -8587,17 +8554,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^16.18.39":
-  version: 16.18.39
-  resolution: "@types/node@npm:16.18.39"
-  checksum: eac9b202b76013256cb517ca8d3e3f61df206edb1615ca8d8df4c80616e92879fe4d3f8570a11d60f4216a82724a3265d5888b24c6994c80b057a0423c9ff1d2
-  languageName: node
-  linkType: hard
-
 "@types/node@npm:^18.14.2":
   version: 18.16.19
   resolution: "@types/node@npm:18.16.19"
   checksum: 63c31f09616508aa7135380a4c79470a897b75f9ff3a70eb069e534dfabdec3f32fb0f9df5939127f1086614d980ddea0fa5e8cc29a49103c4f74cd687618aaf
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^18.14.2 ":
+  version: 18.17.5
+  resolution: "@types/node@npm:18.17.5"
+  checksum: b8c658a99234b99425243c324b641ed7b9ceb6bee6b06421fdc9bb7c58f9a5552e353225cc549e6982462ac384abe1985022ed76e2e4728797f59b21f659ca2b
   languageName: node
   linkType: hard
 
@@ -8675,7 +8642,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:^18.0.0, @types/react-dom@npm:^18.0.11, @types/react-dom@npm:^18.2.7":
+"@types/react-dom@npm:^18.0.0, @types/react-dom@npm:^18.0.11, @types/react-dom@npm:^18.0.11 ":
   version: 18.2.7
   resolution: "@types/react-dom@npm:18.2.7"
   dependencies:
@@ -8701,17 +8668,6 @@ __metadata:
     "@types/scheduler": "*"
     csstype: ^3.0.2
   checksum: 36989f638201bfe2f4110b06c119180f6df9c0e13d7060481e82e7a745f81745a01ae543c478a25b61e0767cb52e82da2ad5b0dedacabf99339e523d06176705
-  languageName: node
-  linkType: hard
-
-"@types/react@npm:^18.2.17":
-  version: 18.2.17
-  resolution: "@types/react@npm:18.2.17"
-  dependencies:
-    "@types/prop-types": "*"
-    "@types/scheduler": "*"
-    csstype: ^3.0.2
-  checksum: 150516b31bd98b635e4a56bcf2af007330b35cccb6e35e902f46a47f0e81e30c46cdacc095e91051bdf2f33e4846e7e62fd51b67e064dc7d15c00e15dfa449d5
   languageName: node
   linkType: hard
 
@@ -11541,7 +11497,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"buffer@npm:^6.0.3, buffer@npm:buffer@^6.0.3":
+"buffer@npm:^6.0.3":
   version: 6.0.3
   resolution: "buffer@npm:6.0.3"
   dependencies:
@@ -18703,7 +18659,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jest-matcher-utils@npm:^27.0.0, jest-matcher-utils@npm:^27.5.1":
+"jest-matcher-utils@npm:^27.5.1":
   version: 27.5.1
   resolution: "jest-matcher-utils@npm:27.5.1"
   dependencies:
@@ -23629,7 +23585,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pretty-format@npm:^27.0.0, pretty-format@npm:^27.0.2, pretty-format@npm:^27.5.1":
+"pretty-format@npm:^27.0.2, pretty-format@npm:^27.5.1":
   version: 27.5.1
   resolution: "pretty-format@npm:27.5.1"
   dependencies:
@@ -24316,7 +24272,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-router-dom@npm:^6.11.0, react-router-dom@npm:^6.14.2":
+"react-router-dom@npm:^6.11.0":
   version: 6.14.2
   resolution: "react-router-dom@npm:6.14.2"
   dependencies:
