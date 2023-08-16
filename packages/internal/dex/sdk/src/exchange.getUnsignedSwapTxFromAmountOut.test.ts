@@ -33,6 +33,7 @@ jest.mock('./lib/utils', () => ({
   __esmodule: true,
   ...jest.requireActual('./lib/utils'),
   getERC20Decimals: async () => 18,
+  isSecondaryFeeContractPaused: jest.fn().mockResolvedValue(false),
 }));
 
 const APPROVED_AMOUNT = BigNumber.from('0'); // No existing approval
@@ -313,7 +314,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       const { swapParams, secondaryFeeParams } = decodeMulticallExactOutputWithFees(data);
 
       expect(secondaryFeeParams[0].feeRecipient).toBe(TEST_FEE_RECIPIENT);
-      expect(secondaryFeeParams[0].feeBasisPoints).toBe(TEST_MAX_FEE_BASIS_POINTS);
+      expect(secondaryFeeParams[0].feeBasisPoints.toString()).toBe(TEST_MAX_FEE_BASIS_POINTS.toString());
 
       const decodedPath = decodePathForExactOutput(swapParams.path.toString());
 

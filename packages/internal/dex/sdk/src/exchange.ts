@@ -2,21 +2,37 @@ import { ethers } from 'ethers';
 import { Token, TradeType } from '@uniswap/sdk-core';
 import assert from 'assert';
 import {
-  DuplicateAddressesError, InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError,
+  DuplicateAddressesError,
+  InvalidAddressError,
+  InvalidMaxHopsError,
+  InvalidSlippageError,
 } from 'errors';
 import { fetchGasPrice } from 'lib/transactionUtils/gas';
 import { getApproval, prepareApproval } from 'lib/transactionUtils/approval';
 import { getOurQuoteReqAmount, prepareUserQuote } from 'lib/transactionUtils/getQuote';
 import { Fees } from 'lib/fees';
+import { SecondaryFee__factory } from 'contracts/types';
 import {
-  DEFAULT_DEADLINE, DEFAULT_MAX_HOPS, DEFAULT_SLIPPAGE, MAX_MAX_HOPS, MIN_MAX_HOPS,
+  DEFAULT_DEADLINE,
+  DEFAULT_MAX_HOPS,
+  DEFAULT_SLIPPAGE,
+  MAX_MAX_HOPS,
+  MIN_MAX_HOPS,
 } from './constants';
 import { Router } from './lib/router';
 import {
-  getERC20Decimals, isValidNonZeroAddress, newAmount, uniswapTokenToTokenInfo,
+  getERC20Decimals,
+  isSecondaryFeeContractPaused,
+  isValidNonZeroAddress,
+  newAmount,
+  uniswapTokenToTokenInfo,
 } from './lib/utils';
 import {
-  Amount, ExchangeModuleConfiguration, SecondaryFee, TokenInfo, TransactionResponse,
+  Amount,
+  ExchangeModuleConfiguration,
+  SecondaryFee,
+  TokenInfo,
+  TransactionResponse,
 } from './types';
 import { getSwap, prepareSwap } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
@@ -85,6 +101,18 @@ export class Exchange {
   ): Promise<TransactionResponse> {
     Exchange.validate(tokenInAddress, tokenOutAddress, maxHops, slippagePercent, fromAddress);
 
+    if (this.secondaryFees.length > 0) {
+      const secondaryFeeContract = SecondaryFee__factory.connect(
+        this.router.routingContracts.secondaryFeeAddress,
+        this.provider,
+      );
+
+      if (await isSecondaryFeeContractPaused(secondaryFeeContract)) {
+        // Do not use secondary fees if the contract is paused
+        this.secondaryFees = [];
+      }
+    }
+
     // get the decimals of the tokens that will be swapped
     const [tokenInDecimals, tokenOutDecimals] = await Promise.all([
       getERC20Decimals(tokenInAddress, this.provider),
@@ -114,7 +142,6 @@ export class Exchange {
     }
 
     const fees = new Fees(this.secondaryFees, uniswapTokenToTokenInfo(tokenIn));
-
     const ourQuoteReqAmount = getOurQuoteReqAmount(amountSpecified, fees, tradeType);
 
     const ourQuote = await this.router.findOptimalRoute(

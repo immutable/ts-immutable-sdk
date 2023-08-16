@@ -2,6 +2,7 @@ import { Pool } from '@uniswap/v3-sdk';
 import { CurrencyAmount, Token } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
 import { ProviderCallError } from 'errors';
+import { SecondaryFee } from 'contracts/types';
 import { Amount, TokenInfo } from '../types';
 
 export const quoteReturnMapping: { [signature: string]: string[] } = {
@@ -27,6 +28,10 @@ export function poolEquals(poolA: Pool, poolB: Pool): boolean {
       && poolA.token1.equals(poolB.token1)
       && poolA.fee === poolB.fee)
   );
+}
+
+export async function isSecondaryFeeContractPaused(secondaryFeeContract: SecondaryFee) {
+  return await secondaryFeeContract.paused();
 }
 
 export async function getERC20Decimals(

@@ -27,6 +27,7 @@ import {
   formatEther,
 } from './test/utils';
 import { Router, SecondaryFee, uniswapTokenToTokenInfo } from './lib';
+import { isSecondaryFeeContractPaused } from './lib/utils';
 
 jest.mock('@ethersproject/providers');
 jest.mock('@ethersproject/contracts');
@@ -36,6 +37,7 @@ jest.mock('./lib/utils', () => ({
   __esmodule: true,
   ...jest.requireActual('./lib/utils'),
   getERC20Decimals: async () => 18,
+  isSecondaryFeeContractPaused: jest.fn(),
 }));
 
 const HIGHER_SLIPPAGE = 0.2;
@@ -184,7 +186,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const { swapParams, secondaryFeeParams } = decodeMulticallExactInputSingleWithFees(data);
 
       expect(secondaryFeeParams[0].feeRecipient).toBe(TEST_FEE_RECIPIENT);
-      expect(secondaryFeeParams[0].feeBasisPoints).toBe(100);
+      expect(secondaryFeeParams[0].feeBasisPoints.toString()).toBe('100');
 
       expect(swapParams.tokenIn).toBe(params.inputToken);
       expect(swapParams.tokenOut).toBe(params.outputToken);
@@ -225,7 +227,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const { swapParams, secondaryFeeParams } = decodeMulticallExactInputWithFees(data);
 
       expect(secondaryFeeParams[0].feeRecipient).toBe(TEST_FEE_RECIPIENT);
-      expect(secondaryFeeParams[0].feeBasisPoints).toBe(TEST_MAX_FEE_BASIS_POINTS);
+      expect(secondaryFeeParams[0].feeBasisPoints.toString()).toBe(TEST_MAX_FEE_BASIS_POINTS.toString());
 
       const decodedPath = decodePathForExactInput(swapParams.path.toString());
 
@@ -273,6 +275,39 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           },
         },
       ]);
+    });
+  });
+
+  describe('Swap with secondary fees and paused secondary fee contract', () => {
+    it('should use the default router contract with no fees applied to the swap', async () => {
+      (isSecondaryFeeContractPaused as jest.MockedFunction<typeof isSecondaryFeeContractPaused>)
+        .mockResolvedValue(true);
+
+      const params = setupSwapTxTest();
+      mockRouterImplementation(params);
+
+      const secondaryFees: SecondaryFee[] = [
+        { feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: 100 }, // 1% Fee
+      ];
+      const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
+
+      const { swap, quote } = await exchange.getUnsignedSwapTxFromAmountIn(
+        params.fromAddress,
+        params.inputToken,
+        params.outputToken,
+        utils.parseEther('100'),
+      );
+
+      expectToBeDefined(swap.transaction.data);
+
+      expect(formatAmount(quote.amountWithMaxSlippage)).toEqual('999.000999000999000999'); // min amount out (includes slippage)
+      expect(quote.fees.length).toBe(0); // expect no fees to be applied
+
+      const data = swap.transaction.data.toString();
+      const { swapParams } = decodeMulticallExactInputSingleWithoutFees(data);
+
+      expect(formatEther(swapParams.amountOutMinimum)).toBe(formatEther(quote.amountWithMaxSlippage.value));
+      expect(swap.transaction.to).toBe(TEST_PERIPHERY_ROUTER_ADDRESS); // expect the default router contract to be used
     });
   });
 
