@@ -50,6 +50,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       () => ({
         allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT),
         estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
+        paused: jest.fn().mockResolvedValue(false),
       }),
     );
 
@@ -313,7 +314,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       const { swapParams, secondaryFeeParams } = decodeMulticallExactOutputWithFees(data);
 
       expect(secondaryFeeParams[0].feeRecipient).toBe(TEST_FEE_RECIPIENT);
-      expect(secondaryFeeParams[0].feeBasisPoints).toBe(TEST_MAX_FEE_BASIS_POINTS);
+      expect(secondaryFeeParams[0].feeBasisPoints.toString()).toBe(TEST_MAX_FEE_BASIS_POINTS.toString());
 
       const decodedPath = decodePathForExactOutput(swapParams.path.toString());
 
