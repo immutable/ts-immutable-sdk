@@ -495,7 +495,7 @@ describe('Seaport', () => {
                     parameters: anything(),
                     signature: immutableOrder.signature,
                   },
-                  extraData: immutableOrder.protocol_data.operator_signature,
+                  extraData: '',
                 },
               ],
             }),
