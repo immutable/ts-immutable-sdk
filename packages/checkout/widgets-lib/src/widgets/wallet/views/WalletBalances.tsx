@@ -80,6 +80,7 @@ export function WalletBalances() {
   useEffect(() => {
     const setWalletAddressFromProvider = async () => {
       if (!provider) return;
+      console.log(provider);
       setWalletAddress(await provider.getSigner().getAddress());
     };
     setWalletAddressFromProvider();

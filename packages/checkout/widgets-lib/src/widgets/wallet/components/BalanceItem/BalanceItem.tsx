@@ -63,7 +63,7 @@ export function BalanceItem({ balanceInfo, bridgeToL2OnClick }: BalanceItemProps
 
   return (
     <Box
-      testId={`balance-item-${balanceInfo.symbol}-${balanceInfo.address}`}
+      testId={`balance-item-${balanceInfo.symbol}`}
       sx={balanceItemContainerStyle}
     >
       <Box sx={balanceItemCoinBoxStyle}>
