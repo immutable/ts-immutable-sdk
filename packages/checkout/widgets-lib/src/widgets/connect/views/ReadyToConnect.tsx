@@ -16,6 +16,7 @@ import {
   ViewContext,
   ViewActions,
 } from '../../../context/view-context/ViewContext';
+import { isMetaMaskProvider, isPassportProvider } from '../../../lib/providerUtils';
 
 export interface ReadyToConnectProps {
   targetChainId: ChainId;
@@ -27,8 +28,8 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
   } = useContext(ConnectContext);
   const { viewState: { history }, viewDispatch } = useContext(ViewContext);
 
-  const isPassport = useMemo(() => (provider?.provider as any)?.isPassport, [provider]);
-  const isMetaMask = useMemo(() => provider?.provider?.isMetaMask, [provider]);
+  const isPassport = isPassportProvider(provider);
+  const isMetaMask = isMetaMaskProvider(provider);
 
   // make sure wallet provider name is set if coming directly to this screen
   // and not through the wallet list

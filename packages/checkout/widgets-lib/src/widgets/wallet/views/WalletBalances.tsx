@@ -38,6 +38,7 @@ import { isNativeToken } from '../../../lib/utils';
 import { DEFAULT_TOKEN_DECIMALS, ETH_TOKEN_SYMBOL, ZERO_BALANCE_STRING } from '../../../lib';
 import { orchestrationEvents } from '../../../lib/orchestrationEvents';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
+import { isPassportProvider } from '../../../lib/providerUtils';
 
 export function WalletBalances() {
   const { connectLoaderState } = useContext(ConnectLoaderContext);
@@ -57,7 +58,7 @@ export function WalletBalances() {
   const [showNotEnoughGasDrawer, setShowNotEnoughGasDrawer] = useState(false);
   const [walletAddress, setWalletAddress] = useState('');
   const [insufficientFundsForBridgeToL2Gas, setInsufficientFundsForBridgeToL2Gas] = useState(false);
-  const isPassport = useMemo(() => (provider?.provider as any)?.isPassport, [provider]);
+  const isPassport = isPassportProvider(provider);
 
   useEffect(() => {
     (async () => {
