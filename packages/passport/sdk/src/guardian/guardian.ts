@@ -29,7 +29,7 @@ type GuardianEVMValidationParams = {
   metaTransactions: MetaTransaction[];
 };
 
-const transactionRejectedCrossSdkBridgeError = 'Transaction requires confirmation but this functionality is not supported this environment';
+const transactionRejectedCrossSdkBridgeError = 'Transaction requires confirmation but this functionality is not supported in this environment';
 
 export const convertBigNumberishToString = (
   value: ethers.BigNumberish,
