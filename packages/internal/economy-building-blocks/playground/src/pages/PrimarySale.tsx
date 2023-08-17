@@ -1,16 +1,15 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Box, Heading, Banner, Button, Card, Link } from '@biom3/react';
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Box, Heading, Banner, Button, Card, Link } from "@biom3/react";
 
-import { Grid, Row, Col } from 'react-flexbox-grid';
-import { NFT } from '@imtbl/generated-clients/dist/multi-rollup';
+import { Grid, Row, Col } from "react-flexbox-grid";
 
-import { encodeApprove } from '../contracts/erc20';
-import { useMetamaskProvider } from '../MetamaskProvider';
-import ItemCards from '../components/ItemCards';
-import StatusCard from '../components/StatusCard';
-import ConfigForm from '../components/ConfigForm';
-import { useData } from '../context/DataProvider';
-import { TransactionReceipt } from '@ethersproject/providers';
+import { encodeApprove } from "../contracts/erc20";
+import { useMetamaskProvider } from "../MetamaskProvider";
+import ItemCards from "../components/ItemCards";
+import StatusCard from "../components/StatusCard";
+import ConfigForm from "../components/ConfigForm";
+import { useData } from "../context/DataProvider";
+import { TransactionReceipt } from "@ethersproject/providers";
 
 interface MintResponse {
   tx_id: string;
@@ -32,11 +31,11 @@ const useMint = (selectedItems: any[], amount: number, config = {}) => {
   const [error, setError] = useState(null);
 
   const fields = [
-    'contract_address',
-    'recipient_address',
-    'erc20_contract_address',
-    'fee_collection_address',
-    'sale_collection_address',
+    "contract_address",
+    "recipient_address",
+    "erc20_contract_address",
+    "fee_collection_address",
+    "sale_collection_address",
   ];
   const params = Object.keys(config)
     .filter((key) => fields.includes(key))
@@ -57,11 +56,11 @@ const useMint = (selectedItems: any[], amount: number, config = {}) => {
 
     try {
       const response = await fetch(
-        'https://game-primary-sales.sandbox.imtbl.com/v1/games/pokemon/mint',
+        "https://game-primary-sales.sandbox.imtbl.com/v1/games/pokemon/mint",
         {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify(data),
         }
@@ -90,7 +89,7 @@ const useItems = () => {
         async (id) => {
           const response = await fetch(
             `https://pokemon-nfts.s3.ap-southeast-2.amazonaws.com/metadata/${id}`,
-            { method: 'GET' }
+            { method: "GET" }
           );
           const json = await response.json();
 
@@ -100,7 +99,7 @@ const useItems = () => {
             token_id: id,
             name: json.name,
             image: json.image,
-            contract_address: '0xbb0FBc170E2cF13368c60A2B7fD7C6dA4a86b6C8',
+            contract_address: "0xbb0FBc170E2cF13368c60A2B7fD7C6dA4a86b6C8",
             price: price,
             description: `USDC \$${price}`,
           };
@@ -180,12 +179,12 @@ function PrimarySale() {
       const interval = setInterval(async () => {
         try {
           const receipt = await mm_getTransactionReceipt(response.tx_id);
-          console.log('polling status ', receipt);
+          console.log("polling status ", receipt);
 
+          // if receipt is null means the transaction is still pending, no status yet
           if (receipt) {
-            // is receipt is null means the transaction is still pending, no status yet
+            // stop polling when we receive a status either success or fail
             if (receipt.status === 1 || receipt.status === 0) {
-              // stop polling when we receive a status either success or fail
               setReceipt(receipt);
               clearInterval(interval);
             }
@@ -204,12 +203,12 @@ function PrimarySale() {
 
   const setApprove = useCallback(
     async (amount: number): Promise<boolean> => {
-      console.log('🚀 ~ file: PrimarySale.tsx:163 ~ amount:', amount);
+      console.log("🚀 ~ file: PrimarySale.tsx:163 ~ amount:", amount);
       if (!configFields.erc20_contract_address) {
-        throw new Error('ERC20 contract address not defined!');
+        throw new Error("ERC20 contract address not defined!");
       }
       if (!configFields.contract_address) {
-        throw new Error('Guarded multicaller contract address not defined!');
+        throw new Error("Guarded multicaller contract address not defined!");
       }
 
       try {
@@ -281,9 +280,9 @@ function PrimarySale() {
   );
 
   return (
-    <Box sx={{ padding: 'base.spacing.x8' }}>
+    <Box sx={{ padding: "base.spacing.x8" }}>
       <Grid fluid>
-        <Banner variant='guidance' sx={{ marginBottom: 'base.spacing.x4' }}>
+        <Banner variant="guidance" sx={{ marginBottom: "base.spacing.x4" }}>
           <Banner.Title> Order Price: ${amount} USDC</Banner.Title>
           <Banner.Caption>
             Fees (${fee * 100}%): ${amount * fee} USDC
@@ -292,10 +291,10 @@ function PrimarySale() {
         <Row>
           <Col xs={12} md={12} lg={4}>
             <Button
-              size={'large'}
+              size={"large"}
               sx={{
-                background: 'base.color.status.attention.bright',
-                width: '100%',
+                background: "base.color.status.attention.bright",
+                width: "100%",
               }}
               onClick={() => {
                 mm_connect();
@@ -303,98 +302,98 @@ function PrimarySale() {
               disabled={loading}
             >
               <Button.Icon
-                icon={loading ? 'Loading' : 'WalletConnect'}
-                iconVariant='bold'
+                icon={loading ? "Loading" : "WalletConnect"}
+                iconVariant="bold"
                 sx={{
-                  mr: 'base.spacing.x1',
-                  ml: '0',
-                  width: 'base.icon.size.400',
+                  mr: "base.spacing.x1",
+                  ml: "0",
+                  width: "base.icon.size.400",
                 }}
               />
-              {loading ? 'Connecting...' : 'Connect Wallet'}
+              {loading ? "Connecting..." : "Connect Wallet"}
             </Button>
-            <Box sx={{ marginTop: 'base.spacing.x4' }}>
-              <Box sx={{ marginBottom: 'base.spacing.x5' }}>
-                <Heading size={'small'}>Mint Config</Heading>
+            <Box sx={{ marginTop: "base.spacing.x4" }}>
+              <Box sx={{ marginBottom: "base.spacing.x5" }}>
+                <Heading size={"small"}>Mint Config</Heading>
               </Box>
               <ConfigForm
                 fields={[
                   {
-                    type: 'text',
-                    key: 'contract_address',
-                    label: 'Multicaller Address',
-                    hint: 'Contract Address for Guarded Multicaller Contract',
-                    placeholder: '0x...',
+                    type: "text",
+                    key: "contract_address",
+                    label: "Multicaller Address",
+                    hint: "Contract Address for Guarded Multicaller Contract",
+                    placeholder: "0x...",
                     value: configFields.contract_address,
                   },
                   {
-                    type: 'text',
-                    key: 'recipient_address',
-                    label: 'Buyer Address',
-                    hint: 'Wallet address that will receive the NFTs',
-                    placeholder: '0x...',
+                    type: "text",
+                    key: "recipient_address",
+                    label: "Buyer Address",
+                    hint: "Wallet address that will receive the NFTs",
+                    placeholder: "0x...",
                     value: configFields.recipient_address,
                   },
                   {
-                    type: 'text',
-                    key: 'erc20_contract_address',
-                    label: 'ERC20 Contract Address',
-                    hint: 'Contract address for the ERC20 token to be used for payment',
-                    placeholder: '0x...',
+                    type: "text",
+                    key: "erc20_contract_address",
+                    label: "ERC20 Contract Address",
+                    hint: "Contract address for the ERC20 token to be used for payment",
+                    placeholder: "0x...",
                     value: configFields.erc20_contract_address,
                   },
                   {
-                    type: 'text',
-                    key: 'fee_collection_address',
-                    label: 'Platform Fee Recipient Address',
+                    type: "text",
+                    key: "fee_collection_address",
+                    label: "Platform Fee Recipient Address",
                     hint: `Wallet address that will receive the platform fee (${
                       fee * 100
                     }% })`,
-                    placeholder: '0x...',
+                    placeholder: "0x...",
                     value: configFields.fee_collection_address,
                   },
                   {
-                    type: 'text',
-                    key: 'sale_collection_address',
-                    label: 'Revenue Recipient Address',
-                    hint: 'Wallet address that will receive the sale revenue (amounts after platform fee)',
-                    placeholder: '0x...',
+                    type: "text",
+                    key: "sale_collection_address",
+                    label: "Revenue Recipient Address",
+                    hint: "Wallet address that will receive the sale revenue (amounts after platform fee)",
+                    placeholder: "0x...",
                     value: configFields.sale_collection_address,
                   },
                 ]}
                 onChange={handleMintFormChange}
               />
               <Button
-                size={'large'}
+                size={"large"}
                 sx={{
-                  background: 'base.gradient.1',
-                  width: '100%',
-                  marginTop: 'base.spacing.x4',
+                  background: "base.gradient.1",
+                  width: "100%",
+                  marginTop: "base.spacing.x4",
                 }}
                 onClick={handleMint}
                 disabled={amount === 0 || loading}
               >
                 <Button.Icon
-                  icon={loading ? 'Loading' : amount ? 'Minting' : 'Alert'}
-                  iconVariant='regular'
+                  icon={loading ? "Loading" : amount ? "Minting" : "Alert"}
+                  iconVariant="regular"
                   sx={{
-                    mr: 'base.spacing.x1',
-                    ml: '0',
-                    width: 'base.icon.size.400',
+                    mr: "base.spacing.x1",
+                    ml: "0",
+                    width: "base.icon.size.400",
                   }}
                 />
                 {loading
-                  ? 'Please wait...'
+                  ? "Please wait..."
                   : amount
                   ? `Approve ${amount} USDC`
-                  : 'Select items to purchase'}
+                  : "Select items to purchase"}
               </Button>
             </Box>
           </Col>
           <Col xs={12} md={12} lg={8}>
             <Box>
-              <Box sx={{ marginBottom: 'base.spacing.x5' }}>
-                <Heading size={'small'}>Catalog</Heading>
+              <Box sx={{ marginBottom: "base.spacing.x5" }}>
+                <Heading size={"small"}>Catalog</Heading>
               </Box>
               <ItemCards
                 nfts={items}
@@ -402,42 +401,42 @@ function PrimarySale() {
                 isSelected={handleIsSelectedItem}
               />
             </Box>
-            <Box sx={{ marginTop: 'base.spacing.x5' }}>
-              <Box sx={{ marginBottom: 'base.spacing.x5' }}>
-                <Heading size={'small'}>Status</Heading>
+            <Box sx={{ marginTop: "base.spacing.x5" }}>
+              <Box sx={{ marginBottom: "base.spacing.x5" }}>
+                <Heading size={"small"}>Status</Heading>
               </Box>
               <Card>
                 <Card.Caption>
                   <StatusCard
-                    status='Connect Wallet'
-                    description={'| ' + address}
-                    variant={address ? 'success' : 'standard'}
+                    status="Connect Wallet"
+                    description={"| " + address}
+                    variant={address ? "success" : "standard"}
                   ></StatusCard>
                   <StatusCard
-                    status='Approve Txn'
-                    description={approved ? '✅' : ''}
-                    variant={approved ? 'success' : 'standard'}
+                    status="Approve Txn"
+                    description={approved ? "✅" : ""}
+                    variant={approved ? "success" : "standard"}
                   ></StatusCard>
                   <StatusCard
-                    status='Minting'
+                    status="Minting"
                     description={
-                      response ? 'Txn Hash | ' + response.tx_id + ' | ' : ''
+                      response ? "Txn Hash | " + response.tx_id + " | " : ""
                     }
-                    variant={response ? 'success' : 'standard'}
+                    variant={response ? "success" : "standard"}
                     extraContent={
                       response ? (
                         <>
                           <Link
-                            sx={{ marginLeft: 'base.spacing.x1' }}
+                            sx={{ marginLeft: "base.spacing.x1" }}
                             onClick={() => {
                               window.open(
                                 `https://immutable-testnet.blockscout.com/tx/${response?.tx_id}`,
-                                '_blank'
+                                "_blank"
                               );
                             }}
                           >
                             View in Block Explorer
-                            <Link.Icon icon='JumpTo' />
+                            <Link.Icon icon="JumpTo" />
                           </Link>
                         </>
                       ) : null
@@ -447,16 +446,16 @@ function PrimarySale() {
                     status={
                       receipt
                         ? receipt.status == 1
-                          ? 'Minted 🚀'
-                          : 'Not Minted - Failed 🧐'
-                        : 'Minted'
+                          ? "Minted 🚀"
+                          : "Not Minted - Failed 🧐"
+                        : "Minted"
                     }
                     variant={
                       receipt
                         ? receipt.status == 1
-                          ? 'success'
-                          : 'fatal'
-                        : 'standard'
+                          ? "success"
+                          : "fatal"
+                        : "standard"
                     }
                   ></StatusCard>
                 </Card.Caption>
@@ -466,25 +465,25 @@ function PrimarySale() {
         </Row>
         <Row>
           <Col xs={12} md={12} lg={12}>
-            <Box sx={{ marginTop: 'base.spacing.x4' }}>
-              <Box sx={{ marginBottom: 'base.spacing.x5' }}>
-                <Box sx={{ marginBottom: 'base.spacing.x5' }}>
-                  <Heading size={'small'}>List NFTs By Wallet Address</Heading>
+            <Box sx={{ marginTop: "base.spacing.x4" }}>
+              <Box sx={{ marginBottom: "base.spacing.x5" }}>
+                <Box sx={{ marginBottom: "base.spacing.x5" }}>
+                  <Heading size={"small"}>List NFTs By Wallet Address</Heading>
                 </Box>
                 <ConfigForm
                   fields={[
                     {
-                      type: 'text',
-                      key: 'wallet_address',
-                      label: 'Wallet Address',
+                      type: "text",
+                      key: "wallet_address",
+                      label: "Wallet Address",
                       value: configFields.wallet_address
                         ? configFields.wallet_address
                         : configFields.recipient_address,
                     },
                     {
-                      type: 'text',
-                      key: 'collection_address',
-                      label: 'Collection Address',
+                      type: "text",
+                      key: "collection_address",
+                      label: "Collection Address",
                       value: configFields.collection_address,
                     },
                   ]}
