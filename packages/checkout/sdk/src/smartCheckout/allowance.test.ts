@@ -179,7 +179,7 @@ describe('allowance', () => {
           sufficient: false,
           delta: BigNumber.from(1),
           itemRequirement: itemRequirements[1],
-          transaction: { from: '0xADDRESS' },
+          approvalTransaction: { from: '0xADDRESS' },
         },
       ]);
     });
@@ -265,7 +265,7 @@ describe('allowance', () => {
           sufficient: false,
           delta: BigNumber.from(1),
           itemRequirement: itemRequirements[1],
-          transaction: { from: '0xADDRESS' },
+          approvalTransaction: { from: '0xADDRESS' },
         },
         {
           sufficient: true,
