@@ -1,11 +1,15 @@
 import { mount } from 'cypress/react18';
 import { createRef } from 'react';
-import { cy, expect } from 'local-cypress';
+import { before, cy, expect } from 'local-cypress';
 import { Passport } from '@imtbl/passport';
+import { WalletProviderName } from '@imtbl/checkout-sdk';
+import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
 import { ImmutableConnect } from './connect/ConnectWebComponent';
+import { ImmutableBridge } from './bridge/BridgeWebComponent';
+import { cySmartGet } from '../lib/testUtils';
 
 describe('ImmutableWebComponent', () => {
-  beforeEach(() => {
+  before(() => {
     window.customElements.define('imtbl-connect', ImmutableConnect);
   });
 
@@ -23,5 +27,39 @@ describe('ImmutableWebComponent', () => {
         (document.getElementsByTagName('imtbl-connect')[0] as ImmutableConnect).passport,
       ).to.eq(testPassportInstance);
     });
+  });
+});
+
+describe('BridgeWebComponent with Passport', () => {
+  before(() => {
+    window.customElements.define('imtbl-bridge', ImmutableBridge);
+  });
+
+  it('should show BridgeComingSoon screen when mounting bridge widget with passport provider', () => {
+    const reference = createRef<ImmutableBridge>();
+    const testPassportProvider = {
+      provider: { isPassport: true } as ExternalProvider,
+    } as any as Web3Provider;
+
+    mount(
+      <imtbl-bridge ref={reference} />,
+    ).then(() => {
+      (document.getElementsByTagName('imtbl-bridge')[0] as ImmutableBridge)?.setProvider(testPassportProvider);
+    }).then(() => {
+      expect(
+        (document.getElementsByTagName('imtbl-bridge')[0] as ImmutableConnect).provider,
+      ).to.eq(testPassportProvider);
+
+      cySmartGet('bridge-coming-soon').should('be.visible');
+    });
+  });
+
+  it('should show BridgeComingSoon screen when mounting bridge widget with passport walletProvider', () => {
+    const reference = createRef<ImmutableBridge>();
+
+    mount(
+      <imtbl-bridge ref={reference} walletProvider={WalletProviderName.PASSPORT} />,
+    );
+    cySmartGet('bridge-coming-soon').should('be.visible');
   });
 });
