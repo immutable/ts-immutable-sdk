@@ -1,27 +1,18 @@
-import {
-  Currency, CurrencyAmount, Token, TradeType,
-} from '@uniswap/sdk-core';
+import { Token, TradeType } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
 import { QuoteTradeInfo } from 'lib/router';
-import { toBigNumber } from 'lib/utils';
 import { Fees } from 'lib/fees';
 import {
   Amount, Quote, TokenInfo,
 } from '../../types';
 import { slippageToFraction } from './slippage';
 
-function getQuoteAmountFromTradeType(tradeInfo: QuoteTradeInfo, tokenInfo: TokenInfo): Amount {
+function getQuoteAmountFromTradeType(tradeInfo: QuoteTradeInfo): Amount {
   if (tradeInfo.tradeType === TradeType.EXACT_INPUT) {
-    return {
-      token: tokenInfo,
-      value: tradeInfo.amountOut,
-    };
+    return tradeInfo.amountOut;
   }
 
-  return {
-    token: tokenInfo,
-    value: tradeInfo.amountIn,
-  };
+  return tradeInfo.amountIn;
 }
 
 export function applySlippage(
@@ -37,12 +28,12 @@ export function applySlippage(
 }
 
 export function prepareUserQuote(
-  otherCurrency: Currency,
+  otherToken: Token,
   tradeInfo: QuoteTradeInfo,
   slippage: number,
   fees: Fees,
 ): Quote {
-  const resultToken: Token = otherCurrency.wrapped;
+  const resultToken: Token = otherToken.wrapped;
   const tokenInfo: TokenInfo = {
     chainId: resultToken.chainId,
     address: resultToken.address,
@@ -51,7 +42,7 @@ export function prepareUserQuote(
     name: resultToken.name,
   };
 
-  const quote = getQuoteAmountFromTradeType(tradeInfo, tokenInfo);
+  const quote = getQuoteAmountFromTradeType(tradeInfo);
   const amountWithSlippage = applySlippage(tradeInfo.tradeType, quote.value, slippage);
 
   return {
@@ -66,16 +57,16 @@ export function prepareUserQuote(
 }
 
 export function getOurQuoteReqAmount(
-  amount: CurrencyAmount<Token>,
+  amount: Amount,
   fees: Fees,
   tradeType: TradeType,
-) {
+): Amount {
   if (tradeType === TradeType.EXACT_OUTPUT) {
     // For an exact output swap, we do not need to subtract fees from the given amount
     return amount;
   }
 
-  fees.addAmount(toBigNumber(amount));
+  fees.addAmount(amount);
 
-  return CurrencyAmount.fromRawAmount(amount.currency, fees.amountLessFees().toString());
+  return fees.amountLessFees();
 }

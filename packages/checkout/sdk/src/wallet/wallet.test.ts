@@ -9,6 +9,10 @@ describe('getWalletAllowList', () => {
       exclude: [],
       result: [
         {
+          walletProvider: WalletProviderName.PASSPORT,
+          name: WalletProviderName.PASSPORT,
+        },
+        {
           walletProvider: WalletProviderName.METAMASK,
           name: WalletProviderName.METAMASK,
         },
@@ -22,12 +26,21 @@ describe('getWalletAllowList', () => {
           walletProvider: WalletProviderName.METAMASK,
         },
       ],
-      result: [],
+      result: [
+        {
+          walletProvider: WalletProviderName.PASSPORT,
+          name: WalletProviderName.PASSPORT,
+        },
+      ],
     },
     {
       text: 'exclude undefined',
       type: WalletFilterTypes.ALL,
       result: [
+        {
+          walletProvider: WalletProviderName.PASSPORT,
+          name: WalletProviderName.PASSPORT,
+        },
         {
           walletProvider: WalletProviderName.METAMASK,
           name: WalletProviderName.METAMASK,
