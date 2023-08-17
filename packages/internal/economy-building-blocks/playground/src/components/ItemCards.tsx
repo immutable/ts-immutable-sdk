@@ -9,11 +9,11 @@ function ItemCards({
   isSelected,
 }: {
   nfts: Array<NFT>;
-  onClick: (nft: NFT) => void;
-  isSelected: (nft: NFT) => boolean;
+  onClick?: (nft: NFT) => void;
+  isSelected?: (nft: NFT) => boolean;
 }) {
   return (
-    <GridBox sx={{ height: "150px" }}>
+    <GridBox sx={{ height: "max-content", maxHeight: "50vh", overflowY: "scroll" }} minColumnWidth="15%">
       {nfts && nfts.map((nft) => (
         <Box key={nft.token_id} sx={{ w: "100%", h: "100%" }}>
           <ItemCard nft={nft} onClick={onClick} isSelected={isSelected} />

@@ -50,6 +50,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       () => ({
         allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT),
         estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
+        paused: jest.fn().mockResolvedValue(false),
       }),
     );
 
@@ -66,7 +67,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
   describe('Swap with single pool with fees', () => {
     it('generates valid swap calldata', async () => {
       const secondaryFees: SecondaryFee[] = [
-        { feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: 100 }, // 1% Fee
+        { recipient: TEST_FEE_RECIPIENT, basisPoints: 100 }, // 1% Fee
       ];
 
       const params = setupSwapTxTest();
@@ -109,7 +110,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
 
     it('uses the amount with slippage and fees for the approval amount', async () => {
       const secondaryFees: SecondaryFee[] = [
-        { feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: 100 }, // 1% Fee
+        { recipient: TEST_FEE_RECIPIENT, basisPoints: 100 }, // 1% Fee
       ];
 
       const params = setupSwapTxTest();
@@ -141,7 +142,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
 
     it('uses the secondary fee address as the spender for approving', async () => {
       const secondaryFees: SecondaryFee[] = [
-        { feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: 100 }, // 1% Fee
+        { recipient: TEST_FEE_RECIPIENT, basisPoints: 100 }, // 1% Fee
       ];
 
       const params = setupSwapTxTest();
@@ -171,8 +172,8 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       mockRouterImplementation(params);
 
       const secondaryFees: SecondaryFee[] = [
-        { feeRecipient: makeAddr('recipienta'), feeBasisPoints: 200 }, // 2% fee
-        { feeRecipient: makeAddr('recipientb'), feeBasisPoints: 400 }, // 4% fee
+        { recipient: makeAddr('recipienta'), basisPoints: 200 }, // 2% fee
+        { recipient: makeAddr('recipientb'), basisPoints: 400 }, // 4% fee
       ];
 
       const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
@@ -188,16 +189,16 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
 
       expect(quote.fees).toEqual([
         {
-          feeRecipient: makeAddr('recipienta'),
-          feeBasisPoints: 200,
+          recipient: makeAddr('recipienta'),
+          basisPoints: 200,
           amount: {
             token: tokenIn,
             value: ethers.utils.parseEther('2'),
           },
         },
         {
-          feeRecipient: makeAddr('recipientb'),
-          feeBasisPoints: 400,
+          recipient: makeAddr('recipientb'),
+          basisPoints: 400,
           amount: {
             token: tokenIn,
             value: ethers.utils.parseEther('4'),
@@ -294,7 +295,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       mockRouterImplementation(params);
 
       const secondaryFees: SecondaryFee[] = [
-        { feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: TEST_MAX_FEE_BASIS_POINTS },
+        { recipient: TEST_FEE_RECIPIENT, basisPoints: TEST_MAX_FEE_BASIS_POINTS },
       ];
 
       const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
@@ -312,8 +313,8 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
 
       const { swapParams, secondaryFeeParams } = decodeMulticallExactOutputWithFees(data);
 
-      expect(secondaryFeeParams[0].feeRecipient).toBe(TEST_FEE_RECIPIENT);
-      expect(secondaryFeeParams[0].feeBasisPoints).toBe(TEST_MAX_FEE_BASIS_POINTS);
+      expect(secondaryFeeParams[0].recipient).toBe(TEST_FEE_RECIPIENT);
+      expect(secondaryFeeParams[0].basisPoints.toString()).toBe(TEST_MAX_FEE_BASIS_POINTS.toString());
 
       const decodedPath = decodePathForExactOutput(swapParams.path.toString());
 
