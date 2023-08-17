@@ -120,14 +120,10 @@ export function MetamaskProvider({
           await mm_connect();
         }
 
-        setLoading(true);
         const receipt = await provider?.getTransactionReceipt(txHash);
-        
-        setLoading(false);
 
         return receipt;
       } catch (error) {
-        setLoading(false);
         console.log(error);
       }
     },

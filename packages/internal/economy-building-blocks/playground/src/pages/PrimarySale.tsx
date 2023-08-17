@@ -153,7 +153,7 @@ function PrimarySale() {
   const [configFields, setConfigFields] = useState<Record<string, any>>({});
   const [approved, setApproved] = useState(false);
   const [receipt, setReceipt] = useState<TransactionReceipt | null>(null);
-  const [mintLoading, setMintLoading] = useState(false);
+  const [mintResponse, setMintResponse] = useState<MintResponse | null>(null);
 
   const items = useItems() as any[];
   const {
@@ -161,24 +161,32 @@ function PrimarySale() {
     mm_sendTransaction,
     mm_loading,
     address,
-    provider,
     mm_getTransactionReceipt,
   } = useMetamaskProvider();
 
   const loading = mm_loading;
 
-  const { mint, response } = useMint(selectedItems, amount, configFields);
+  let { mint, response } = useMint(selectedItems, amount, configFields);
 
   const nfts = useGetNfts(
     configFields.wallet_address || configFields.recipient_address,
     configFields.collection_address
   );
 
+  // Reset the states of statuses if the selectedItems changes
   useEffect(() => {
+    setApproved(false);
+    setMintResponse(null);
+    setReceipt(null);
+  }, [selectedItems]);
+
+  useEffect(() => {
+    setMintResponse(response);
+
     if (response?.tx_id) {
       const interval = setInterval(async () => {
         try {
-          const receipt = await mm_getTransactionReceipt(response.tx_id);
+          const receipt = await mm_getTransactionReceipt(response!.tx_id);
           console.log("polling status ", receipt);
 
           // if receipt is null means the transaction is still pending, no status yet
@@ -230,6 +238,10 @@ function PrimarySale() {
   );
 
   const handleMint = useCallback(async () => {
+    setApproved(false);
+    setMintResponse(null);
+    setReceipt(null);
+
     const approved = await setApprove(amount);
     if (approved) {
       mint();
@@ -420,42 +432,43 @@ function PrimarySale() {
                   <StatusCard
                     status="Minting"
                     description={
-                      response ? "Txn Hash | " + response.tx_id + " | " : ""
+                      mintResponse ? "Txn Hash | " + mintResponse.tx_id : ""
                     }
-                    variant={response ? "success" : "standard"}
-                    extraContent={
-                      response ? (
-                        <>
-                          <Link
-                            sx={{ marginLeft: "base.spacing.x1" }}
-                            onClick={() => {
-                              window.open(
-                                `https://immutable-testnet.blockscout.com/tx/${response?.tx_id}`,
-                                "_blank"
-                              );
-                            }}
-                          >
-                            View in Block Explorer
-                            <Link.Icon icon="JumpTo" />
-                          </Link>
-                        </>
-                      ) : null
-                    }
+                    variant={mintResponse ? "success" : "standard"}
                   ></StatusCard>
                   <StatusCard
                     status={
                       receipt
-                        ? receipt.status == 1
+                        ? receipt.status === 1
                           ? "Minted 🚀"
-                          : "Not Minted - Failed 🧐"
+                          : "Not Minted - Failed 🧐 | "
                         : "Minted"
                     }
                     variant={
                       receipt
-                        ? receipt.status == 1
+                        ? receipt.status === 1
                           ? "success"
                           : "fatal"
                         : "standard"
+                    }
+                    extraContent={
+                      receipt ? (
+                        <>
+                          <Link
+                            variant="primary"
+                            sx={{ marginLeft: "base.spacing.x1" }}
+                            onClick={() => {
+                              window.open(
+                                `https://immutable-testnet.blockscout.com/tx/${mintResponse?.tx_id}`,
+                                "_blank"
+                              );
+                            }}
+                          >
+                            View on Block Explorer
+                            <Link.Icon icon="JumpTo" />
+                          </Link>
+                        </>
+                      ) : null
                     }
                   ></StatusCard>
                 </Card.Caption>
