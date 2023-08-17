@@ -249,6 +249,11 @@ export const text = {
       text: 'Transaction failed',
       actionText: 'Review & Try again',
     },
+    [BridgeWidgetViews.BRIDGE_COMING_SOON]: {
+      heading: 'Coming soon',
+      body: "Moving funds across networks currently isn't supported for Passport.",
+      actionText: 'Dismiss',
+    },
     [SharedViews.TOP_UP_VIEW]: {
       header: {
         title: 'How would you like to add coins?',
