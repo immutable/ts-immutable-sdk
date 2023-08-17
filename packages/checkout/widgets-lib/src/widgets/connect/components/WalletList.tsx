@@ -8,7 +8,6 @@ import {
 import {
   useContext, useState, useEffect, useCallback,
 } from 'react';
-import { Web3Provider } from '@ethersproject/providers';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { ConnectContext, ConnectActions } from '../context/ConnectContext';
 import { WalletItem } from './WalletItem';
@@ -58,16 +57,11 @@ export function WalletList(props: WalletListProps) {
   const onWalletClick = async (walletProviderName: WalletProviderName) => {
     if (checkout) {
       try {
-        let web3Provider;
-        if (passport && walletProviderName === WalletProviderName.PASSPORT) {
-          const passportzkEVMProvider = passport?.connectEvm();
-          web3Provider = new Web3Provider(passportzkEVMProvider);
-        } else {
-          const providerResult = await checkout.createProvider({
-            walletProvider: walletProviderName,
-          });
-          web3Provider = providerResult.provider;
-        }
+        const providerResult = await checkout.createProvider({
+          walletProvider: walletProviderName,
+          passport,
+        });
+        const web3Provider = providerResult.provider;
 
         connectDispatch({
           payload: {
