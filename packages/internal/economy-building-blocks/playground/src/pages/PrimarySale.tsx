@@ -11,6 +11,10 @@ import StatusCard from '../components/StatusCard';
 import ConfigForm from '../components/ConfigForm';
 import { useData } from '../context/DataProvider';
 
+interface MintResponse {
+  tx_id: string;
+}
+
 const useURLParams = () => {
   const [urlParams, setUrlParams] = useState({});
   useEffect(() => {
@@ -23,7 +27,7 @@ const useURLParams = () => {
 };
 
 const useMint = (selectedItems: any[], amount: number, config = {}) => {
-  const [response, setResponse] = useState(null);
+  const [response, setResponse] = useState<MintResponse | null>(null);
   const [error, setError] = useState(null);
 
   const fields = [
@@ -46,7 +50,7 @@ const useMint = (selectedItems: any[], amount: number, config = {}) => {
       amount,
       items: selectedItems.map((item) => ({
         collection_address: item.contract_address,
-        token_id: item.token_id,
+        token_id: item.token_id.toString(),
       })),
     };
 
@@ -148,6 +152,8 @@ function PrimarySale() {
   const [selectedItems, setSelectedItems] = useState<any[]>([]);
   const [configFields, setConfigFields] = useState<Record<string, any>>({});
   const [approved, setApproved] = useState(false);
+  const [txHash, setTxHash] = useState(null);
+  const [mintLoading, setMintLoading] = useState(false);
 
   const items = useItems() as any[];
   const { mm_connect, mm_sendTransaction, mm_loading, address, provider } =
@@ -155,7 +161,7 @@ function PrimarySale() {
 
   const loading = mm_loading;
 
-  const { mint } = useMint(selectedItems, amount, configFields);
+  const { mint, response } = useMint(selectedItems, amount, configFields);
 
   const nfts = useGetNfts(
     configFields.wallet_address || configFields.recipient_address,
@@ -379,47 +385,35 @@ function PrimarySale() {
                   ></StatusCard>
                   <StatusCard
                     status='Approve Txn'
-                    description={approved ? '| ✅' : ''}
+                    description={approved ? '✅' : ''}
                     variant={approved ? 'success' : 'standard'}
                   ></StatusCard>
                   <StatusCard
                     status='Minting'
-                    description='Txn Hash |'
+                    description={
+                      response ? 'Txn Hash | ' + response.tx_id + ' | ' : ''
+                    }
+                    variant={response ? 'success' : 'standard'}
                     extraContent={
-                      <Link
-                        sx={{ marginLeft: 'base.spacing.x1' }}
-                        onClick={() => {
-                          const txnHash = '';
-                          window.open(
-                            `https://immutable-testnet.blockscout.com/#tx/${txnHash}`,
-                            '_blank'
-                          );
-                        }}
-                      >
-                        View in Block Explorer
-                        <Link.Icon icon='JumpTo' />
-                      </Link>
+                      response ? (
+                        <>
+                          <Link
+                            sx={{ marginLeft: 'base.spacing.x1' }}
+                            onClick={() => {
+                              window.open(
+                                `https://immutable-testnet.blockscout.com/#tx/${response?.tx_id}`,
+                                '_blank'
+                              );
+                            }}
+                          >
+                            View in Block Explorer
+                            <Link.Icon icon='JumpTo' />
+                          </Link>
+                        </>
+                      ) : null
                     }
                   ></StatusCard>
-                  <StatusCard
-                    status='Minted 🚀'
-                    description='Txn Hash |'
-                    extraContent={
-                      <Link
-                        sx={{ marginLeft: 'base.spacing.x1' }}
-                        onClick={() => {
-                          const txnHash = '';
-                          window.open(
-                            `https://immutable-testnet.blockscout.com/#tx/${txnHash}`,
-                            '_blank'
-                          );
-                        }}
-                      >
-                        View in Block Explorer
-                        <Link.Icon icon='JumpTo' />
-                      </Link>
-                    }
-                  ></StatusCard>
+                  <StatusCard status='Minted 🚀'></StatusCard>
                 </Card.Caption>
               </Card>
             </Box>

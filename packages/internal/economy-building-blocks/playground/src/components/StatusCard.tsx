@@ -8,7 +8,7 @@ function StatusCard({
   variant,
 }: {
   status: string;
-  description: string;
+  description?: string;
   extraContent?: React.ReactNode;
   variant?: BannerVariant;
 }) {
