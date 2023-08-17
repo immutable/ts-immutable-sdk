@@ -87,7 +87,7 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
         if (!passportClient) {
           const passportConfig = {
             baseConfig: new config.ImmutableConfiguration({
-              environment: config.Environment.SANDBOX,
+              environment: request.environment,
             }),
             clientId: request.clientId,
             audience,
