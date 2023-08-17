@@ -126,9 +126,9 @@ describe('Approve ERC20 Onboarding', () => {
       );
 
       // assert approve spending copy
-      cySmartGet('simple-text-body__heading').should('have.text', approveSpending.content.heading);
-      cySmartGet('simple-text-body__body').should('include.text', approveSpending.content.body[0]);
-      cySmartGet('simple-text-body__body').should('include.text', approveSpending.content.body[1]);
+      cySmartGet('simple-text-body__heading').should('have.text', approveSpending.content.metamask.heading);
+      cySmartGet('simple-text-body__body').should('include.text', approveSpending.content.metamask.body[0]);
+      cySmartGet('simple-text-body__body').should('include.text', approveSpending.content.metamask.body[1]);
       cySmartGet('footer-button').should('have.text', approveSpending.footer.buttonText);
 
       // make transaction
