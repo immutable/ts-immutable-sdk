@@ -65,7 +65,6 @@ export const hasERC20Allowances = async (
   const allowances: SufficientAllowance[] = [];
 
   for (const itemRequirement of itemRequirements) {
-    /* eslint-disable-next-line no-continue */
     if (itemRequirement.type !== ItemType.ERC20) continue;
 
     const { contractAddress, spenderAddress } = itemRequirement;
@@ -77,7 +76,6 @@ export const hasERC20Allowances = async (
         sufficient: true,
         itemRequirement,
       });
-      /* eslint-disable-next-line no-continue */
       continue;
     }
 
