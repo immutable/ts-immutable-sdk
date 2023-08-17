@@ -70,17 +70,31 @@ export const hasERC20Allowances = async (
   allowances: SufficientAllowance[]
 }> => {
   let sufficient = true;
-  const allowances: SufficientAllowance[] = [];
+  const sufficientAllowances: SufficientAllowance[] = [];
+  const erc20s = new Map<string, ItemRequirement>();
+  const allowancePromises = new Map<string, Promise<BigNumber>>();
+  const insufficientERC20s = new Map<string, SufficientAllowance>();
+  const transactionPromises = new Map<string, Promise<TransactionRequest | undefined>>();
 
   for (const itemRequirement of itemRequirements) {
     if (itemRequirement.type !== ItemType.ERC20) continue;
-
     const { contractAddress, spenderAddress } = itemRequirement;
+    erc20s.set(`${contractAddress}${spenderAddress}`, itemRequirement);
+    allowancePromises.set(
+      `${contractAddress}${spenderAddress}`,
+      getERC20Allowance(provider, ownerAddress, contractAddress, spenderAddress),
+    );
+  }
 
-    // eslint-disable-next-line no-await-in-loop
-    const allowance = await getERC20Allowance(provider, ownerAddress, contractAddress, spenderAddress);
-    if (allowance.gte(itemRequirement.amount)) {
-      allowances.push({
+  const allowances = await Promise.all(allowancePromises.values());
+  const allowancePromiseIds = Array.from(allowancePromises.keys());
+
+  for (let index = 0; index < allowances.length; index++) {
+    const itemRequirement = erc20s.get(allowancePromiseIds[index]);
+
+    if (!itemRequirement || itemRequirement.type !== ItemType.ERC20) continue;
+    if (allowances[index].gte(itemRequirement.amount)) {
+      sufficientAllowances.push({
         sufficient: true,
         itemRequirement,
       });
@@ -88,23 +102,37 @@ export const hasERC20Allowances = async (
     }
 
     sufficient = false;
-    allowances.push({
-      sufficient: false,
-      delta: itemRequirement.amount.sub(allowance),
-      itemRequirement,
-      // eslint-disable-next-line no-await-in-loop
-      approvalTransaction: await getERC20ApprovalTransaction(
+    const { contractAddress, spenderAddress } = itemRequirement;
+    const delta = itemRequirement.amount.sub(allowances[index]);
+    insufficientERC20s.set(
+      `${contractAddress}${spenderAddress}`,
+      {
+        sufficient: false,
+        delta,
+        itemRequirement,
+        approvalTransaction: undefined,
+      },
+    );
+    transactionPromises.set(
+      `${contractAddress}${spenderAddress}`,
+      getERC20ApprovalTransaction(
         provider,
         ownerAddress,
-        itemRequirement.contractAddress,
-        itemRequirement.spenderAddress,
-        itemRequirement.amount,
+        contractAddress,
+        spenderAddress,
+        delta,
       ),
-    });
+    );
   }
 
-  return {
-    sufficient,
-    allowances,
-  };
+  const transactions = await Promise.all(transactionPromises.values());
+  const transactionPromiseIds = Array.from(allowancePromises.keys());
+  transactions.forEach((transaction, index) => {
+    const insufficientERC20 = insufficientERC20s.get(transactionPromiseIds[index]);
+    if (!insufficientERC20) return;
+    if (insufficientERC20.sufficient) return;
+    insufficientERC20.approvalTransaction = transaction;
+  });
+
+  return { sufficient, allowances: sufficientAllowances.concat(Array.from(insufficientERC20s.values())) };
 };

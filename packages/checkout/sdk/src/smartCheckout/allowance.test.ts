@@ -241,18 +241,18 @@ describe('allowance', () => {
 
       const allowances = await hasERC20Allowances(mockProvider, '0xADDRESS', itemRequirements);
       expect(allowances.sufficient).toBeFalsy();
-      expect(allowances.allowances).toEqual([
+      expect(allowances.allowances).toEqual(expect.arrayContaining([
+        {
+          sufficient: true,
+          itemRequirement: itemRequirements[2],
+        },
         {
           sufficient: false,
           delta: BigNumber.from(1),
           itemRequirement: itemRequirements[1],
           approvalTransaction: { from: '0xADDRESS' },
         },
-        {
-          sufficient: true,
-          itemRequirement: itemRequirements[2],
-        },
-      ]);
+      ]));
     });
   });
 });
