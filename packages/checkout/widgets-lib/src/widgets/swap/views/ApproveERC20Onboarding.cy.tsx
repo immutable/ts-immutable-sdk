@@ -1,7 +1,7 @@
 import { mount } from 'cypress/react18';
 import { cy } from 'local-cypress';
 import { BigNumber } from 'ethers';
-import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
+import { ExternalProvider, TransactionRequest, Web3Provider } from '@ethersproject/providers';
 import { Checkout, CheckoutErrorType } from '@imtbl/checkout-sdk';
 import { Quote } from '@imtbl/dex-sdk';
 import { ApproveERC20Onboarding } from './ApproveERC20Onboarding';
@@ -129,6 +129,40 @@ describe('Approve ERC20 Onboarding', () => {
       cySmartGet('simple-text-body__heading').should('have.text', approveSpending.content.metamask.heading);
       cySmartGet('simple-text-body__body').should('include.text', approveSpending.content.metamask.body[0]);
       cySmartGet('simple-text-body__body').should('include.text', approveSpending.content.metamask.body[1]);
+      cySmartGet('footer-button').should('have.text', approveSpending.footer.buttonText);
+
+      // make transaction
+      cySmartGet('footer-button').click();
+
+      // assert approve swap copy
+      cySmartGet('simple-text-body__heading').should('have.text', approveSwap.content.heading);
+      cySmartGet('simple-text-body__body').should('include.text', approveSwap.content.body[0]);
+      cySmartGet('footer-button').should('have.text', approveSwap.footer.buttonText);
+    });
+
+    it('should move to the approve swap content with Passport', () => {
+      sendTransactionStub.resolves({
+        transactionResponse: { wait: () => Promise.resolve({ status: 1 }) },
+      });
+      const { approveSwap, approveSpending } = text.views[SwapWidgetViews.APPROVE_ERC20];
+      mount(
+        <ConnectLoaderTestComponent
+          initialStateOverride={
+            {
+              ...connectLoaderState,
+              provider: { provider: { isPassport: true } as ExternalProvider } as Web3Provider,
+            }
+          }
+        >
+          <SwapWidgetTestComponent initialStateOverride={initialSwapState}>
+            <ApproveERC20Onboarding data={mockApproveERC20Swap} />
+          </SwapWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
+      );
+
+      // assert approve spending copy
+      cySmartGet('simple-text-body__heading').should('have.text', approveSpending.content.passport.heading);
+      cySmartGet('simple-text-body__body').should('include.text', approveSpending.content.passport.body);
       cySmartGet('footer-button').should('have.text', approveSpending.footer.buttonText);
 
       // make transaction
