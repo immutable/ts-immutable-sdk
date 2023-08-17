@@ -149,7 +149,8 @@ function PrimarySale() {
   const [configFields, setConfigFields] = useState<Record<string, any>>({});
 
   const items = useItems() as any[];
-  const { mm_connect, mm_sendTransaction, mm_loading } = useMetamaskProvider();
+  const { mm_connect, mm_sendTransaction, mm_loading, address, provider } =
+    useMetamaskProvider();
 
   const loading = mm_loading;
 
@@ -367,25 +368,57 @@ function PrimarySale() {
               <Box sx={{ marginBottom: 'base.spacing.x5' }}>
                 <Heading size={'small'}>Status</Heading>
               </Box>
-              <StatusCard
-                status='Minting'
-                description='Txn Hash |'
-                extraContent={
-                  <Link
-                    sx={{ marginLeft: 'base.spacing.x1' }}
-                    onClick={() => {
-                      const txnHash = '';
-                      window.open(
-                        `https://immutable-testnet.blockscout.com/#tx/${txnHash}`,
-                        '_blank'
-                      );
-                    }}
-                  >
-                    View in Block Explorer
-                    <Link.Icon icon='JumpTo' />
-                  </Link>
-                }
-              ></StatusCard>
+              <Card>
+                <Card.Caption>
+                  <StatusCard
+                    status='Connect Wallet'
+                    description={address}
+                    variant={address ? 'success' : 'standard'}
+                  ></StatusCard>
+                  <StatusCard
+                    status='Approve Txn'
+                    description='Txn Hash |'
+                  ></StatusCard>
+                  <StatusCard
+                    status='Minting'
+                    description='Txn Hash |'
+                    extraContent={
+                      <Link
+                        sx={{ marginLeft: 'base.spacing.x1' }}
+                        onClick={() => {
+                          const txnHash = '';
+                          window.open(
+                            `https://immutable-testnet.blockscout.com/#tx/${txnHash}`,
+                            '_blank'
+                          );
+                        }}
+                      >
+                        View in Block Explorer
+                        <Link.Icon icon='JumpTo' />
+                      </Link>
+                    }
+                  ></StatusCard>
+                  <StatusCard
+                    status='Minted!'
+                    description='Txn Hash |'
+                    extraContent={
+                      <Link
+                        sx={{ marginLeft: 'base.spacing.x1' }}
+                        onClick={() => {
+                          const txnHash = '';
+                          window.open(
+                            `https://immutable-testnet.blockscout.com/#tx/${txnHash}`,
+                            '_blank'
+                          );
+                        }}
+                      >
+                        View in Block Explorer
+                        <Link.Icon icon='JumpTo' />
+                      </Link>
+                    }
+                  ></StatusCard>
+                </Card.Caption>
+              </Card>
             </Box>
           </Col>
         </Row>

@@ -1,33 +1,25 @@
 import React from 'react';
-import { Card, Banner, Link } from '@biom3/react';
-import { NFT } from '@imtbl/generated-clients/dist/multi-rollup';
-
-const selectedStyle = {
-  border: 'base.border.size.100 solid',
-  borderColor: 'base.color.accent.1',
-};
+import { Banner, BannerVariant } from '@biom3/react';
 
 function StatusCard({
   status,
   description,
   extraContent,
+  variant,
 }: {
   status: string;
   description: string;
   extraContent?: React.ReactNode;
+  variant?: BannerVariant;
 }) {
   return (
-    <Card>
-      <Card.Caption>
-        <Banner variant='standard' sx={{ marginBottom: 'base.spacing.x4' }}>
-          <Banner.Title>{status}</Banner.Title>
-          <Banner.Caption>
-            {description}
-            {extraContent}
-          </Banner.Caption>
-        </Banner>
-      </Card.Caption>
-    </Card>
+    <Banner variant={variant} sx={{ marginBottom: 'base.spacing.x4' }}>
+      <Banner.Title>{status}</Banner.Title>
+      <Banner.Caption>
+        | {description}
+        {extraContent}
+      </Banner.Caption>
+    </Banner>
   );
 }
 

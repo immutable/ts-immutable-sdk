@@ -4,21 +4,25 @@ import {
   useContext,
   useEffect,
   useState,
-} from "react";
-import { Web3Provider } from "@ethersproject/providers";
-import { ethers } from "ethers";
+} from 'react';
+import { Web3Provider } from '@ethersproject/providers';
+import { ethers } from 'ethers';
 
 const MetamaskContext = createContext<{
   mm_connect: () => Promise<void>;
   mm_sendTransaction: (to: string, data: string) => Promise<any>;
   mm_switchNetwork: () => Promise<void>;
   mm_loading: boolean;
+  address: string;
+  provider: Web3Provider | undefined;
 }>({
   mm_connect: () => Promise.resolve(),
   mm_sendTransaction: (_to: string, _data: string) =>
     Promise.resolve(undefined),
   mm_switchNetwork: () => Promise.resolve(),
   mm_loading: false,
+  address: '',
+  provider: undefined,
 });
 
 export function MetamaskProvider({
@@ -36,12 +40,12 @@ export function MetamaskProvider({
   const mm_connect = useCallback(async () => {
     try {
       if (!ethereum) {
-        throw new Error("No ethereum provider");
+        throw new Error('No ethereum provider');
       }
 
       setLoading(true);
       const _provider = new ethers.providers.Web3Provider(ethereum);
-      await _provider.send("eth_requestAccounts", []);
+      await _provider.send('eth_requestAccounts', []);
 
       const _address = await _provider.getSigner().getAddress();
       setProvider(_provider);
@@ -70,7 +74,7 @@ export function MetamaskProvider({
 
         setLoading(true);
 
-        const result = await provider?.send("eth_sendTransaction", [
+        const result = await provider?.send('eth_sendTransaction', [
           {
             from: address,
             to,
@@ -91,21 +95,19 @@ export function MetamaskProvider({
   const mm_switchNetwork = useCallback(async () => {
     try {
       if (!ethereum) {
-        throw new Error("No ethereum provider");
+        throw new Error('No ethereum provider');
       }
 
       const chainId = `0x${(13472).toString(16)}`;
 
       await ethereum.request({
-        method: "wallet_switchEthereumChain",
+        method: 'wallet_switchEthereumChain',
         params: [{ chainId }],
       });
     } catch (error) {
       setLoading(false);
     }
   }, [ethereum]);
-
-  
 
   useEffect(() => {
     if (connectOnMount) {
@@ -120,6 +122,8 @@ export function MetamaskProvider({
         mm_sendTransaction,
         mm_switchNetwork,
         mm_loading: loading,
+        address: address || '',
+        provider: provider || undefined,
       }}
     >
       {children}
