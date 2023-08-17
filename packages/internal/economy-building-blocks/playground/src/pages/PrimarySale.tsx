@@ -147,6 +147,7 @@ function PrimarySale() {
   const [amount, setAmount] = useState(0);
   const [selectedItems, setSelectedItems] = useState<any[]>([]);
   const [configFields, setConfigFields] = useState<Record<string, any>>({});
+  const [approved, setApproved] = useState(false);
 
   const items = useItems() as any[];
   const { mm_connect, mm_sendTransaction, mm_loading, address, provider } =
@@ -197,6 +198,7 @@ function PrimarySale() {
     const approved = await setApprove(amount);
     if (approved) {
       mint();
+      setApproved(true);
     }
   }, [mint, amount]);
 
@@ -372,12 +374,13 @@ function PrimarySale() {
                 <Card.Caption>
                   <StatusCard
                     status='Connect Wallet'
-                    description={address}
+                    description={'| ' + address}
                     variant={address ? 'success' : 'standard'}
                   ></StatusCard>
                   <StatusCard
                     status='Approve Txn'
-                    description='Txn Hash |'
+                    description={approved ? '| ✅' : ''}
+                    variant={approved ? 'success' : 'standard'}
                   ></StatusCard>
                   <StatusCard
                     status='Minting'
@@ -399,7 +402,7 @@ function PrimarySale() {
                     }
                   ></StatusCard>
                   <StatusCard
-                    status='Minted!'
+                    status='Minted 🚀'
                     description='Txn Hash |'
                     extraContent={
                       <Link

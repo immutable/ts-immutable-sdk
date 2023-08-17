@@ -16,7 +16,7 @@ function StatusCard({
     <Banner variant={variant} sx={{ marginBottom: 'base.spacing.x4' }}>
       <Banner.Title>{status}</Banner.Title>
       <Banner.Caption>
-        | {description}
+        {description}
         {extraContent}
       </Banner.Caption>
     </Banner>
