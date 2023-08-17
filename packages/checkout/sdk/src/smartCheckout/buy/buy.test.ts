@@ -8,15 +8,15 @@ import { Web3Provider } from '@ethersproject/providers';
 import {
   getItemRequirement, buy, getTransactionOrGas, getUnsignedFulfilmentTransaction,
 } from './buy';
-import { createOrderbookInstance } from '../instance';
-import { CheckoutConfiguration } from '../config';
-import { CheckoutErrorType } from '../errors';
+import { createOrderbookInstance } from '../../instance';
+import { CheckoutConfiguration } from '../../config';
+import { CheckoutErrorType } from '../../errors';
 import {
   FulfilmentTransaction, GasAmount, GasTokenType, ItemType, TransactionOrGasType,
-} from '../types/smartCheckout';
-import { smartCheckout } from '../smartCheckout';
+} from '../../types/smartCheckout';
+import { smartCheckout } from '..';
 
-jest.mock('../instance');
+jest.mock('../../instance');
 jest.mock('../smartCheckout');
 
 describe('buy', () => {

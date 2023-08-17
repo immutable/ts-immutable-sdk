@@ -5,14 +5,14 @@ import {
 } from '@imtbl/orderbook';
 import {
   BuyResult,
-} from '../types/buy';
-import * as instance from '../instance';
-import { CheckoutConfiguration } from '../config';
-import { CheckoutError, CheckoutErrorType } from '../errors';
+} from '../../types/buy';
+import * as instance from '../../instance';
+import { CheckoutConfiguration } from '../../config';
+import { CheckoutError, CheckoutErrorType } from '../../errors';
 import {
   ItemType, ItemRequirement, GasTokenType, TransactionOrGasType, GasAmount, FulfilmentTransaction,
-} from '../types/smartCheckout';
-import { smartCheckout } from '../smartCheckout';
+} from '../../types/smartCheckout';
+import { smartCheckout } from '..';
 
 export const getItemRequirement = (
   type: ItemType,
