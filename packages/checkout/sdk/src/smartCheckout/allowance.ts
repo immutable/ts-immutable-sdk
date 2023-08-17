@@ -32,12 +32,15 @@ export const getERC20ApprovalTransaction = async (
   amount: BigNumber,
 ): Promise<TransactionRequest | undefined> => {
   try {
+    const owner = await provider.getSigner().getAddress();
     const contract = new Contract(
       contractAddress,
       JSON.stringify(ERC20ABI),
       provider,
     );
-    return await contract.populateTransaction.approve(spenderAddress, amount);
+    const approveTransaction = await contract.populateTransaction.approve(spenderAddress, amount);
+    if (approveTransaction) approveTransaction.from = owner;
+    return approveTransaction;
   } catch {
     return undefined;
   }

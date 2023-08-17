@@ -93,8 +93,8 @@ describe('allowance', () => {
   });
 
   describe('getERC20ApprovalTransaction', () => {
-    it('should get the approval transaction from the contract', async () => {
-      const approveMock = jest.fn().mockResolvedValue({ from: '0xADDRESS' });
+    it('should get the approval transaction from the contract with the from added', async () => {
+      const approveMock = jest.fn().mockResolvedValue({ data: '0xDATA' });
       (Contract as unknown as jest.Mock).mockReturnValue({
         populateTransaction: {
           approve: approveMock,
@@ -113,7 +113,7 @@ describe('allowance', () => {
         '0xSEAPORT',
         BigNumber.from(1),
       );
-      expect(approvalTransaction).toEqual({ from: '0xADDRESS' });
+      expect(approvalTransaction).toEqual({ from: '0xADDRESS', data: '0xDATA' });
       expect(approveMock).toBeCalledWith('0xSEAPORT', BigNumber.from(1));
     });
 
