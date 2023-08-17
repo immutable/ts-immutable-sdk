@@ -102,7 +102,7 @@ describe('guardian', () => {
 
         await expect(guardianClient.validate({ payloadHash: 'hash' }))
           .rejects
-          .toThrow('Transaction requires confirmation but this functionality is not supported in this environment');
+          .toThrow('Transaction requires confirmation but this functionality is not supported in this environment. Please contact Immutable support if you need to enable this feature.');
       });
     });
   });
@@ -191,7 +191,7 @@ describe('guardian', () => {
         ).rejects.toThrow(
           new JsonRpcError(
             RpcErrorCode.TRANSACTION_REJECTED,
-            'Transaction requires confirmation but this functionality is not supported in this environment',
+            'Transaction requires confirmation but this functionality is not supported in this environment. Please contact Immutable support if you need to enable this feature.',
           ),
         );
       });
