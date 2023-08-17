@@ -10,6 +10,7 @@ import ItemCards from '../components/ItemCards';
 import StatusCard from '../components/StatusCard';
 import ConfigForm from '../components/ConfigForm';
 import { useData } from '../context/DataProvider';
+import { TransactionReceipt } from '@ethersproject/providers';
 
 interface MintResponse {
   tx_id: string;
@@ -152,12 +153,18 @@ function PrimarySale() {
   const [selectedItems, setSelectedItems] = useState<any[]>([]);
   const [configFields, setConfigFields] = useState<Record<string, any>>({});
   const [approved, setApproved] = useState(false);
-  const [txHash, setTxHash] = useState(null);
+  const [receipt, setReceipt] = useState<TransactionReceipt | null>(null);
   const [mintLoading, setMintLoading] = useState(false);
 
   const items = useItems() as any[];
-  const { mm_connect, mm_sendTransaction, mm_loading, address, provider } =
-    useMetamaskProvider();
+  const {
+    mm_connect,
+    mm_sendTransaction,
+    mm_loading,
+    address,
+    provider,
+    mm_getTransactionReceipt,
+  } = useMetamaskProvider();
 
   const loading = mm_loading;
 
@@ -167,6 +174,29 @@ function PrimarySale() {
     configFields.wallet_address || configFields.recipient_address,
     configFields.collection_address
   );
+
+  useEffect(() => {
+    if (response?.tx_id) {
+      const interval = setInterval(async () => {
+        try {
+          const receipt = await mm_getTransactionReceipt(response.tx_id);
+          console.log('polling status ', receipt);
+
+          if (receipt) {
+            // is receipt is null means the transaction is still pending, no status yet
+            if (receipt.status === 1 || receipt.status === 0) {
+              // stop polling when we receive a status either success or fail
+              setReceipt(receipt);
+              clearInterval(interval);
+            }
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [response, mm_getTransactionReceipt]);
 
   useEffect(() => {
     setConfigFields(params);
@@ -401,7 +431,7 @@ function PrimarySale() {
                             sx={{ marginLeft: 'base.spacing.x1' }}
                             onClick={() => {
                               window.open(
-                                `https://immutable-testnet.blockscout.com/#tx/${response?.tx_id}`,
+                                `https://immutable-testnet.blockscout.com/tx/${response?.tx_id}`,
                                 '_blank'
                               );
                             }}
@@ -413,7 +443,22 @@ function PrimarySale() {
                       ) : null
                     }
                   ></StatusCard>
-                  <StatusCard status='Minted 🚀'></StatusCard>
+                  <StatusCard
+                    status={
+                      receipt
+                        ? receipt.status == 1
+                          ? 'Minted 🚀'
+                          : 'Not Minted - Failed 🧐'
+                        : 'Minted'
+                    }
+                    variant={
+                      receipt
+                        ? receipt.status == 1
+                          ? 'success'
+                          : 'fatal'
+                        : 'standard'
+                    }
+                  ></StatusCard>
                 </Card.Caption>
               </Card>
             </Box>

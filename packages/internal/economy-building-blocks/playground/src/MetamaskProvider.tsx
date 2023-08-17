@@ -15,6 +15,9 @@ const MetamaskContext = createContext<{
   mm_loading: boolean;
   address: string;
   provider: Web3Provider | undefined;
+  mm_getTransactionReceipt: (
+    txHash: string
+  ) => Promise<ethers.providers.TransactionReceipt | undefined>;
 }>({
   mm_connect: () => Promise.resolve(),
   mm_sendTransaction: (_to: string, _data: string) =>
@@ -23,6 +26,7 @@ const MetamaskContext = createContext<{
   mm_loading: false,
   address: '',
   provider: undefined,
+  mm_getTransactionReceipt: (_txHash: string) => Promise.resolve(undefined),
 });
 
 export function MetamaskProvider({
@@ -109,6 +113,26 @@ export function MetamaskProvider({
     }
   }, [ethereum]);
 
+  const mm_getTransactionReceipt = useCallback(
+    async (txHash: string) => {
+      try {
+        if (!provider) {
+          await mm_connect();
+        }
+
+        setLoading(true);
+        const receipt = await provider?.getTransactionReceipt(txHash);
+        setLoading(false);
+
+        return receipt;
+      } catch (error) {
+        setLoading(false);
+        console.log(error);
+      }
+    },
+    [provider]
+  );
+
   useEffect(() => {
     if (connectOnMount) {
       mm_connect();
@@ -124,6 +148,7 @@ export function MetamaskProvider({
         mm_loading: loading,
         address: address || '',
         provider: provider || undefined,
+        mm_getTransactionReceipt,
       }}
     >
       {children}
