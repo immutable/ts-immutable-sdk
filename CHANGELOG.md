@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- @imtbl/passport: Removed `zkEvmChainId` from Passport configuration. Passport will now automatically resolve the chain ID.
+
 ## [0.9.0] - 2023-08-15
 ### Changed
 
