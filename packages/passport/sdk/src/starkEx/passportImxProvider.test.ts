@@ -13,7 +13,7 @@ import {
   UnsignedOrderRequest,
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
-import { mockUserImx } from '../test/mocks';
+import { mockUserImx, testConfig } from '../test/mocks';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import { PassportImxProvider } from './passportImxProvider';
 import {
@@ -46,15 +46,13 @@ describe('PassportImxProvider', () => {
     getAddress: jest.fn(),
   };
 
-  const imxPublicApiDomain = 'http://imxPublicApiDomain';
-
   beforeEach(() => {
     passportImxProvider = new PassportImxProvider({
       user: mockUserImx,
       starkSigner: mockStarkSigner,
       confirmationScreen,
       immutableXClient,
-      imxPublicApiDomain,
+      config: testConfig,
     });
   });
 

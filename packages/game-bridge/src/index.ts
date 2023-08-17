@@ -89,10 +89,11 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
               environment: config.Environment.SANDBOX,
             }),
             clientId: request.clientId,
-            scope,
             audience,
+            scope,
             redirectUri: (redirect ?? redirectUri),
             logoutRedirectUri,
+            crossSdkBridgeEnabled: true,
           };
           passportClient = new passport.Passport(passportConfig);
         }
