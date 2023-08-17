@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - @imtbl/passport: Added SDK bridge support for native applications.
 - @imtbl/orderbook: Added optional fee parameter in create and fulfill order flows
 - @imtbl/orderbook: Changed the way we fulfill orders under the hood to make a call to fulfillment-data
+- @imtbl/erc721-hybrid-permissioned-mintable: Add support for hybrid preset contract.
 
 ## [0.9.0] - 2023-08-15
 ### Changed
