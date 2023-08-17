@@ -54,7 +54,7 @@ type SufficientAllowance = {
   sufficient: false,
   delta: BigNumber,
   itemRequirement: ItemRequirement,
-  transaction: TransactionRequest | undefined,
+  approvalTransaction: TransactionRequest | undefined,
 };
 
 export const hasERC20Allowances = async (
@@ -88,7 +88,7 @@ export const hasERC20Allowances = async (
       delta: itemRequirement.amount.sub(allowance),
       itemRequirement,
       // eslint-disable-next-line no-await-in-loop
-      transaction: await getERC20ApprovalTransaction(
+      approvalTransaction: await getERC20ApprovalTransaction(
         provider,
         itemRequirement.contractAddress,
         itemRequirement.spenderAddress,
