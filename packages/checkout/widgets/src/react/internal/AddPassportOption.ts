@@ -3,7 +3,7 @@ import { CheckoutWidgetTagNames } from '../../definitions/types';
 
 export function AddPassportOption(
   tagName: CheckoutWidgetTagNames,
-  passport: Passport | null,
+  passport?: Passport,
 ) {
   if (!passport) {
     // eslint-disable-next-line no-console

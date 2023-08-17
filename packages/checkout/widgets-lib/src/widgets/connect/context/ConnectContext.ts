@@ -6,7 +6,7 @@ import { Passport } from '@imtbl/passport';
 export interface ConnectState {
   checkout: Checkout | null;
   provider: Web3Provider | null;
-  passport: Passport | null;
+  passport: Passport | undefined;
   walletProviderName: WalletProviderName | null;
   sendCloseEvent: () => void;
 }
@@ -14,7 +14,7 @@ export interface ConnectState {
 export const initialConnectState: ConnectState = {
   checkout: null,
   provider: null,
-  passport: null,
+  passport: undefined,
   walletProviderName: null,
   sendCloseEvent: () => {},
 };
