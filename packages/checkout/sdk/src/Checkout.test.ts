@@ -234,6 +234,7 @@ describe('Connect', () => {
     expect(createProvider).toBeCalledTimes(1);
     expect(createProvider).toBeCalledWith(
       WalletProviderName.METAMASK,
+      undefined,
     );
     expect(result).toEqual(createProviderResult);
   });

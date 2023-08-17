@@ -79,6 +79,7 @@ export class Checkout {
   ): Promise<CreateProviderResult> {
     return await provider.createProvider(
       params.walletProvider,
+      params.passport,
     );
   }
 

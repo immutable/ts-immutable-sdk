@@ -31,6 +31,13 @@ describe('WalletWidget tests', () => {
     }),
   } as Web3Provider;
 
+  const mockPassportProvider = {
+    getSigner: () => ({
+      getAddress: () => Promise.resolve('0xwalletAddress'),
+    }),
+    provider: { isPassport: true } as ExternalProvider,
+  } as Web3Provider;
+
   const connectLoaderState = {
     checkout: new Checkout({
       baseConfig: { environment: Environment.SANDBOX },
@@ -409,7 +416,32 @@ describe('WalletWidget tests', () => {
         cySmartGet('wallet-address').should('have.text', '0xwalletAddress');
       });
 
-      it('should show a disconnect button that fires the right event when clicked', () => {
+      it('should NOT show a disconnect button for Metamask users', () => {
+        const widgetConfig = {
+          theme: WidgetTheme.DARK,
+          environment: Environment.SANDBOX,
+          isBridgeEnabled: false,
+          isSwapEnabled: false,
+          isOnRampEnabled: false,
+        } as StrongCheckoutWidgetsConfig;
+
+        mount(
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <WalletWidget
+              config={widgetConfig}
+            />
+            ,x
+          </ConnectLoaderTestComponent>,
+        );
+        cySmartGet('settings-button').click();
+        cySmartGet('disconnect-button').should(
+          'not.exist',
+        );
+      });
+
+      it('should show a disconnect button for Passport that fires the right event when clicked', () => {
         cy.window().then((window) => {
           window.addEventListener(
             IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
@@ -427,12 +459,17 @@ describe('WalletWidget tests', () => {
 
         mount(
           <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
+            initialStateOverride={
+              {
+                ...connectLoaderState,
+                provider: mockPassportProvider,
+              }
+            }
           >
             <WalletWidget
               config={widgetConfig}
             />
-            ,
+            ,x
           </ConnectLoaderTestComponent>,
         );
         cySmartGet('settings-button').click();
@@ -520,15 +557,6 @@ describe('WalletWidget tests', () => {
     });
 
     describe('Passport Wallet Widget', () => {
-      const mockPassportProvider = {
-        getSigner: () => ({
-          getAddress: () => Promise.resolve('0xwalletAddress'),
-        }),
-        provider: {
-          isPassport: true,
-        } as ExternalProvider,
-      } as Web3Provider;
-
       const passportConnectLoaderState = {
         checkout: new Checkout({
           baseConfig: { environment: Environment.SANDBOX },
