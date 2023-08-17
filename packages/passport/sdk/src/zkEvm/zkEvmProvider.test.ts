@@ -160,6 +160,9 @@ describe('ZkEvmProvider', () => {
 
       (JsonRpcProvider as unknown as jest.Mock).mockImplementation(() => ({
         send: sendMock,
+        network: Promise.resolve({
+          chainId: 13371,
+        }),
       }));
     });
 
@@ -269,7 +272,6 @@ describe('ZkEvmProvider', () => {
         magicProvider: mockMagicProvider,
         guardianClient: expect.any(GuardianClient),
         jsonRpcProvider: expect.any(Object),
-        config: expect.any(Object),
         relayerClient: expect.any(RelayerClient),
         user: mockUser,
       });
