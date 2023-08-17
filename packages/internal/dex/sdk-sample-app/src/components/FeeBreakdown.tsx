@@ -10,9 +10,9 @@ export const FeeBreakdown = ({fees, addressMap}: {fees: Fee[], addressMap: mappi
         <h2 className="mb-1 mt-4 text-lg font-extrabold leading-none tracking-tight text-gray-900 md:text-lg lg:text-lg dark:text-white">Fee Breakdown:</h2>
             {fees.map((fee, index) => {
                 return (<div key={index}>
-                    <div>Fee Recipient: {fee.feeRecipient}</div>
-                    <div>Fee Basis Points: {fee.feeBasisPoints}</div>
-                    <div>Fee Amount: {ethers.utils.formatEther(fee.amount.value.toString())} {addressMap[fee.amount.token.address]}</div>
+                    <div>Recipient: {fee.recipient}</div>
+                    <div>Basis Points: {fee.basisPoints}</div>
+                    <div>Amount: {ethers.utils.formatEther(fee.amount.value.toString())} {addressMap[fee.amount.token.address]}</div>
                 </div>)
             })}
         </>
