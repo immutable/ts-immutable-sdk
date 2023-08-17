@@ -11,7 +11,7 @@ import { Passport } from '@imtbl/passport';
 import { cySmartGet } from '../../lib/testUtils';
 import { ConnectWidget, ConnectWidgetParams } from './ConnectWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { WidgetTheme } from '../../lib';
+import { ConnectTargetLayer, WidgetTheme } from '../../lib';
 
 describe('ConnectWidget tests', () => {
   const config: StrongCheckoutWidgetsConfig = {
@@ -384,6 +384,48 @@ describe('ConnectWidget tests', () => {
       cySmartGet('footer-button').click();
       cySmartGet('footer-button').should('have.text', 'Try Again');
       cySmartGet('success-view').should('not.exist');
+    });
+  });
+
+  describe('BridgeComingSoon for Passport', () => {
+    beforeEach(() => {
+      cy.stub(Checkout.prototype, 'connect').as('connectStub').resolves({
+        provider: { provider: { isPassport: true } as ExternalProvider } as Web3Provider,
+      });
+      cy.stub(Checkout.prototype, 'createProvider')
+        .as('createProviderStub')
+        .resolves({
+          provider: { provider: { isPassport: true } as ExternalProvider } as Web3Provider,
+        });
+    });
+
+    it('should show BridgeComingSoon for Passport users if trying to switch to L1', () => {
+      cy.stub(Checkout.prototype, 'getNetworkInfo')
+        .as('getNetworkInfoStub')
+        .resolves({
+          name: ChainName.IMTBL_ZKEVM_TESTNET,
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        });
+
+      const passportProvider = mockPassportProvider('resolve');
+      const testPassportInstance = {
+        connectEvm: cy.stub().as('connectEvmStub').returns(passportProvider),
+      } as any as Passport;
+      const passportParams = {
+        passport: testPassportInstance,
+        targetLayer: ConnectTargetLayer.LAYER1,
+      } as ConnectWidgetParams;
+
+      mount(
+        <ConnectWidget
+          params={passportParams}
+          config={config}
+        />,
+      );
+      cySmartGet('wallet-list-passport').click();
+      cySmartGet('footer-button').click();
+
+      cySmartGet('bridge-coming-soon').should('be.visible');
     });
   });
 

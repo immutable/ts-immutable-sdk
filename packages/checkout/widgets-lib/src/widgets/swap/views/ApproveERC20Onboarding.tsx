@@ -20,6 +20,7 @@ import { SwapContext } from '../context/SwapContext';
 import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { LoadingView } from '../../../views/loading/LoadingView';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
+import { isPassportProvider } from '../../../lib/providerUtils';
 
 export interface ApproveERC20Props {
   data: ApproveERC20SwapData;
@@ -30,6 +31,8 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
   const { checkout, provider } = connectLoaderState;
   const { viewDispatch } = useContext(ViewContext);
   const { approveSpending, approveSwap } = text.views[SwapWidgetViews.APPROVE_ERC20];
+
+  const isPassport = isPassportProvider(provider);
 
   // Local state
   const [actionDisabled, setActionDisabled] = useState(false);
@@ -173,12 +176,17 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
     setApprovalTxnLoading,
   ]);
 
-  const approveSpendingContent = useMemo(() => (
-    <SimpleTextBody heading={approveSpending.content.heading}>
-      {/* eslint-disable-next-line max-len */}
-      <Box>{`${approveSpending.content.body[0]} ${data.swapFormInfo.fromAmount} ${fromToken?.symbol || ''} ${approveSpending.content.body[1]}`}</Box>
-    </SimpleTextBody>
-  ), [data.swapFormInfo, fromToken]);
+  const approveSpendingContent = useMemo(() => {
+    const { metamask, passport } = approveSpending.content;
+    return (
+      <SimpleTextBody heading={isPassport ? passport.heading : metamask.heading}>
+        {isPassport && (<Box>{passport.body}</Box>)}
+        {!isPassport
+        // eslint-disable-next-line max-len
+        && (<Box>{`${metamask.body[0]} ${data.swapFormInfo.fromAmount} ${fromToken?.symbol || ''} ${metamask.body[1]}`}</Box>)}
+      </SimpleTextBody>
+    );
+  }, [data.swapFormInfo, fromToken, isPassport]);
 
   const approveSpendingFooter = useMemo(() => (
     <FooterButton
