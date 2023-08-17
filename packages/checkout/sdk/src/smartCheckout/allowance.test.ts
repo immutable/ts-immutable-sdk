@@ -20,14 +20,11 @@ describe('allowance', () => {
         allowance: allowanceMock,
       });
 
-      mockProvider = {
-        getSigner: jest.fn().mockReturnValue({
-          getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
-        }),
-      } as unknown as Web3Provider;
+      mockProvider = {} as unknown as Web3Provider;
 
       const allowance = await getERC20Allowance(
         mockProvider,
+        '0xADDRESS',
         'OxERC20',
         '0xSEAPORT',
       );
@@ -41,15 +38,12 @@ describe('allowance', () => {
         allowance: allowanceMock,
       });
 
-      mockProvider = {
-        getSigner: jest.fn().mockReturnValue({
-          getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
-        }),
-      } as unknown as Web3Provider;
+      mockProvider = {} as unknown as Web3Provider;
 
       try {
         await getERC20Allowance(
           mockProvider,
+          '0xADDRESS',
           'OxERC20',
           '0xSEAPORT',
         );
@@ -70,14 +64,11 @@ describe('allowance', () => {
       });
 
       try {
-        mockProvider = {
-          getSigner: jest.fn().mockReturnValue({
-            getAddress: jest.fn().mockRejectedValue(''),
-          }),
-        } as unknown as Web3Provider;
+        mockProvider = {} as unknown as Web3Provider;
 
         await getERC20Allowance(
           mockProvider,
+          '0xADDRESS',
           'OxERC20',
           '0xSEAPORT',
         );
@@ -101,14 +92,11 @@ describe('allowance', () => {
         },
       });
 
-      mockProvider = {
-        getSigner: jest.fn().mockReturnValue({
-          getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
-        }),
-      } as unknown as Web3Provider;
+      mockProvider = {} as unknown as Web3Provider;
 
       const approvalTransaction = await getERC20ApprovalTransaction(
         mockProvider,
+        '0xADDRESS',
         'OxERC20',
         '0xSEAPORT',
         BigNumber.from(1),
@@ -117,7 +105,7 @@ describe('allowance', () => {
       expect(approveMock).toBeCalledWith('0xSEAPORT', BigNumber.from(1));
     });
 
-    it('should return undefined if approve call errors', async () => {
+    it('should error is call to approve fails', async () => {
       const approveMock = jest.fn().mockRejectedValue({ from: '0xADDRESS' });
       (Contract as unknown as jest.Mock).mockReturnValue({
         populateTransaction: {
@@ -125,20 +113,25 @@ describe('allowance', () => {
         },
       });
 
-      mockProvider = {
-        getSigner: jest.fn().mockReturnValue({
-          getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
-        }),
-      } as unknown as Web3Provider;
+      mockProvider = {} as unknown as Web3Provider;
 
-      const approvalTransaction = await getERC20ApprovalTransaction(
-        mockProvider,
-        'OxERC20',
-        '0xSEAPORT',
-        BigNumber.from(1),
-      );
-      expect(approvalTransaction).toBeUndefined();
-      expect(approveMock).toBeCalledWith('0xSEAPORT', BigNumber.from(1));
+      try {
+        const approvalTransaction = await getERC20ApprovalTransaction(
+          mockProvider,
+          '0xADDRESS',
+          'OxERC20',
+          '0xSEAPORT',
+          BigNumber.from(1),
+        );
+        expect(approvalTransaction).toBeUndefined();
+      } catch (err: any) {
+        expect(err.message).toEqual('Failed to get the approval transaction for ERC20');
+        expect(err.type).toEqual(CheckoutErrorType.GET_ERC20_ALLOWANCE_ERROR);
+        expect(err.data).toEqual({
+          contractAddress: 'OxERC20',
+        });
+        expect(approveMock).toBeCalledWith('0xSEAPORT', BigNumber.from(1));
+      }
     });
   });
 
@@ -153,11 +146,7 @@ describe('allowance', () => {
         },
       });
 
-      mockProvider = {
-        getSigner: jest.fn().mockReturnValue({
-          getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
-        }),
-      } as unknown as Web3Provider;
+      mockProvider = {} as unknown as Web3Provider;
 
       const itemRequirements: ItemRequirement[] = [
         {
@@ -172,7 +161,7 @@ describe('allowance', () => {
         },
       ];
 
-      const allowances = await hasERC20Allowances(mockProvider, itemRequirements);
+      const allowances = await hasERC20Allowances(mockProvider, '0xADDRESS', itemRequirements);
       expect(allowances.sufficient).toBeFalsy();
       expect(allowances.allowances).toEqual([
         {
@@ -194,11 +183,7 @@ describe('allowance', () => {
         },
       });
 
-      mockProvider = {
-        getSigner: jest.fn().mockReturnValue({
-          getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
-        }),
-      } as unknown as Web3Provider;
+      mockProvider = {} as unknown as Web3Provider;
 
       const itemRequirements: ItemRequirement[] = [
         {
@@ -213,7 +198,7 @@ describe('allowance', () => {
         },
       ];
 
-      const allowances = await hasERC20Allowances(mockProvider, itemRequirements);
+      const allowances = await hasERC20Allowances(mockProvider, '0xADDRESS', itemRequirements);
       expect(allowances.sufficient).toBeTruthy();
       expect(allowances.allowances).toEqual([
         {
@@ -233,11 +218,7 @@ describe('allowance', () => {
         },
       });
 
-      mockProvider = {
-        getSigner: jest.fn().mockReturnValue({
-          getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
-        }),
-      } as unknown as Web3Provider;
+      mockProvider = {} as unknown as Web3Provider;
 
       const itemRequirements: ItemRequirement[] = [
         {
@@ -258,7 +239,7 @@ describe('allowance', () => {
         },
       ];
 
-      const allowances = await hasERC20Allowances(mockProvider, itemRequirements);
+      const allowances = await hasERC20Allowances(mockProvider, '0xADDRESS', itemRequirements);
       expect(allowances.sufficient).toBeFalsy();
       expect(allowances.allowances).toEqual([
         {

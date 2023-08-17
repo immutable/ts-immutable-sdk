@@ -5,17 +5,17 @@ import { CheckoutError, CheckoutErrorType } from '../errors';
 
 export const getERC20Allowance = async (
   provider: Web3Provider,
+  ownerAddress: string,
   contractAddress: string,
   spenderAddress: string,
 ): Promise<BigNumber> => {
   try {
-    const owner = await provider.getSigner().getAddress();
     const contract = new Contract(
       contractAddress,
       JSON.stringify(ERC20ABI),
       provider,
     );
-    return await contract.allowance(owner, spenderAddress);
+    return await contract.allowance(ownerAddress, spenderAddress);
   } catch (err: any) {
     throw new CheckoutError(
       'Failed to get the allowance for ERC20',
@@ -27,22 +27,26 @@ export const getERC20Allowance = async (
 
 export const getERC20ApprovalTransaction = async (
   provider: Web3Provider,
+  ownerAddress: string,
   contractAddress: string,
   spenderAddress: string,
   amount: BigNumber,
 ): Promise<TransactionRequest | undefined> => {
   try {
-    const owner = await provider.getSigner().getAddress();
     const contract = new Contract(
       contractAddress,
       JSON.stringify(ERC20ABI),
       provider,
     );
     const approveTransaction = await contract.populateTransaction.approve(spenderAddress, amount);
-    if (approveTransaction) approveTransaction.from = owner;
+    if (approveTransaction) approveTransaction.from = ownerAddress;
     return approveTransaction;
   } catch {
-    return undefined;
+    throw new CheckoutError(
+      'Failed to get the approval transaction for ERC20',
+      CheckoutErrorType.GET_ERC20_ALLOWANCE_ERROR,
+      { contractAddress },
+    );
   }
 };
 
@@ -59,6 +63,7 @@ type SufficientAllowance = {
 
 export const hasERC20Allowances = async (
   provider: Web3Provider,
+  ownerAddress: string,
   itemRequirements: ItemRequirement[],
 ): Promise<{
   sufficient: boolean,
@@ -73,7 +78,7 @@ export const hasERC20Allowances = async (
     const { contractAddress, spenderAddress } = itemRequirement;
 
     // eslint-disable-next-line no-await-in-loop
-    const allowance = await getERC20Allowance(provider, contractAddress, spenderAddress);
+    const allowance = await getERC20Allowance(provider, ownerAddress, contractAddress, spenderAddress);
     if (allowance.gte(itemRequirement.amount)) {
       allowances.push({
         sufficient: true,
@@ -90,6 +95,7 @@ export const hasERC20Allowances = async (
       // eslint-disable-next-line no-await-in-loop
       approvalTransaction: await getERC20ApprovalTransaction(
         provider,
+        ownerAddress,
         itemRequirement.contractAddress,
         itemRequirement.spenderAddress,
         itemRequirement.amount,
