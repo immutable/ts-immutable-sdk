@@ -161,7 +161,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const findOptimalRouteMock = mockRouterImplementation(params);
 
       const secondaryFees: SecondaryFee[] = [
-        { feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: 100 }, // 1% Fee
+        { recipient: TEST_FEE_RECIPIENT, basisPoints: 100 }, // 1% Fee
       ];
       const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
 
@@ -184,8 +184,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       const { swapParams, secondaryFeeParams } = decodeMulticallExactInputSingleWithFees(data);
 
-      expect(secondaryFeeParams[0].feeRecipient).toBe(TEST_FEE_RECIPIENT);
-      expect(secondaryFeeParams[0].feeBasisPoints.toString()).toBe('100');
+      expect(secondaryFeeParams[0].recipient).toBe(TEST_FEE_RECIPIENT);
+      expect(secondaryFeeParams[0].basisPoints.toString()).toBe('100');
 
       expect(swapParams.tokenIn).toBe(params.inputToken);
       expect(swapParams.tokenOut).toBe(params.outputToken);
@@ -207,7 +207,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       mockRouterImplementation(params);
 
       const secondaryFees: SecondaryFee[] = [
-        { feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: TEST_MAX_FEE_BASIS_POINTS },
+        { recipient: TEST_FEE_RECIPIENT, basisPoints: TEST_MAX_FEE_BASIS_POINTS },
       ];
 
       const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
@@ -225,8 +225,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       const { swapParams, secondaryFeeParams } = decodeMulticallExactInputWithFees(data);
 
-      expect(secondaryFeeParams[0].feeRecipient).toBe(TEST_FEE_RECIPIENT);
-      expect(secondaryFeeParams[0].feeBasisPoints.toString()).toBe(TEST_MAX_FEE_BASIS_POINTS.toString());
+      expect(secondaryFeeParams[0].recipient).toBe(TEST_FEE_RECIPIENT);
+      expect(secondaryFeeParams[0].basisPoints.toString()).toBe(TEST_MAX_FEE_BASIS_POINTS.toString());
 
       const decodedPath = decodePathForExactInput(swapParams.path.toString());
 
@@ -250,7 +250,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       mockRouterImplementation(params);
 
       const secondaryFees: SecondaryFee[] = [
-        { feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: TEST_MAX_FEE_BASIS_POINTS },
+        { recipient: TEST_FEE_RECIPIENT, basisPoints: TEST_MAX_FEE_BASIS_POINTS },
       ];
 
       const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
@@ -266,8 +266,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       expect(quote.fees).toEqual([
         {
-          feeRecipient: TEST_FEE_RECIPIENT,
-          feeBasisPoints: TEST_MAX_FEE_BASIS_POINTS,
+          recipient: TEST_FEE_RECIPIENT,
+          basisPoints: TEST_MAX_FEE_BASIS_POINTS,
           amount: {
             token: tokenIn,
             value: utils.parseEther('10'),
@@ -291,7 +291,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       mockRouterImplementation(params);
 
       const secondaryFees: SecondaryFee[] = [
-        { feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: 100 }, // 1% Fee
+        { recipient: TEST_FEE_RECIPIENT, basisPoints: 100 }, // 1% Fee
       ];
       const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
 
@@ -328,7 +328,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         mockRouterImplementation(params);
 
         const secondaryFees: SecondaryFee[] = [
-          { feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: 100 }, // 1% Fee
+          { recipient: TEST_FEE_RECIPIENT, basisPoints: 100 }, // 1% Fee
         ];
         const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
 

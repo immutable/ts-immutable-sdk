@@ -64,14 +64,14 @@ function validateSecondaryFees(secondaryFees: SecondaryFee[]) {
   let totalSecondaryFeeBasisPoints = 0;
 
   for (const secondaryFee of secondaryFees) {
-    if (!isValidNonZeroAddress(secondaryFee.feeRecipient)) {
-      throw new InvalidConfigurationError(`Invalid secondary fee recipient address: ${secondaryFee.feeRecipient}`);
+    if (!isValidNonZeroAddress(secondaryFee.recipient)) {
+      throw new InvalidConfigurationError(`Invalid secondary fee recipient address: ${secondaryFee.recipient}`);
     }
-    if (secondaryFee.feeBasisPoints < 0 || secondaryFee.feeBasisPoints > MAX_SECONDARY_FEE_BASIS_POINTS) {
-      throw new InvalidConfigurationError(`Invalid secondary fee basis points: ${secondaryFee.feeBasisPoints}`);
+    if (secondaryFee.basisPoints < 0 || secondaryFee.basisPoints > MAX_SECONDARY_FEE_BASIS_POINTS) {
+      throw new InvalidConfigurationError(`Invalid secondary fee basis points: ${secondaryFee.basisPoints}`);
     }
 
-    totalSecondaryFeeBasisPoints += secondaryFee.feeBasisPoints;
+    totalSecondaryFeeBasisPoints += secondaryFee.basisPoints;
   }
 
   if (totalSecondaryFeeBasisPoints > MAX_SECONDARY_FEE_BASIS_POINTS) {

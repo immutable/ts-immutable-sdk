@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
-import axios from "axios";
-import { Box, Heading, Body, Banner, Button } from "@biom3/react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Box, Heading, Banner, Button, Card, Link } from "@biom3/react";
 
 import { Grid, Row, Col } from "react-flexbox-grid";
 import { NFT } from "@imtbl/generated-clients/dist/multi-rollup";
@@ -9,10 +8,10 @@ import { encodeApprove } from "../contracts/erc20";
 import { useMetamaskProvider } from "../MetamaskProvider";
 import ItemCards from "../components/ItemCards";
 import ConfigForm from "../components/ConfigForm";
+import { useData } from "../context/DataProvider";
 
 const useURLParams = () => {
   const [urlParams, setUrlParams] = useState({});
-
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const params = Object.fromEntries(urlParams.entries());
@@ -26,12 +25,26 @@ const useMint = (selectedItems: any[], amount: number, config = {}) => {
   const [response, setResponse] = useState(null);
   const [error, setError] = useState(null);
 
+  const fields = [
+    "contract_address",
+    "recipient_address",
+    "erc20_contract_address",
+    "fee_collection_address",
+    "sale_collection_address",
+  ];
+  const params = Object.keys(config)
+    .filter((key) => fields.includes(key))
+    .reduce(
+      (obj, key) => ({ ...obj, [key]: (config as Record<string, any>)[key] }),
+      {}
+    );
+
   const mint = useCallback(async () => {
     const data = {
-      ...config,
+      ...params,
       amount,
       items: selectedItems.map((item) => ({
-        contract_address: item.contract_address,
+        collection_address: item.contract_address,
         token_id: item.token_id,
       })),
     };
@@ -58,88 +71,73 @@ const useMint = (selectedItems: any[], amount: number, config = {}) => {
   return { mint, response, error };
 };
 
-const useItems = (): Array<
-  Pick<
-    NFT,
-    "token_id" | "name" | "image" | "contract_address" | "description"
-  > & {
-    price: number;
-  }
-> => {
-  return [
-    {
-      token_id: "59464",
-      name: "Item 59464",
-      image: "https://assets.pokemon.com/assets/cms2/img/pokedex/full/001.png",
-      contract_address: "0xbb0FBc170E2cF13368c60A2B7fD7C6dA4a86b6C8",
-      price: 5,
-      description: "$USDC 5",
-    },
-    {
-      token_id: "53538",
-      name: "Item 53538",
-      image: "https://assets.pokemon.com/assets/cms2/img/pokedex/full/002.png",
-      contract_address: "0xbb0FBc170E2cF13368c60A2B7fD7C6dA4a86b6C8",
-      price: 10,
-      description: "$USDC 10",
-    },
-    {
-      token_id: "4767",
-      name: "Item 47674",
-      image: "https://assets.pokemon.com/assets/cms2/img/pokedex/full/003.png",
-      contract_address: "0xbb0FBc170E2cF13368c60A2B7fD7C6dA4a86b6C8",
-      price: 15,
-      description: "$USDC 15",
-    },
-    {
-      token_id: "78567",
-      name: "Item 78567",
-      image: "https://assets.pokemon.com/assets/cms2/img/pokedex/full/004.png",
-      contract_address: "0xbb0FBc170E2cF13368c60A2B7fD7C6dA4a86b6C8",
-      price: 5,
-      description: "$USDC 5",
-    },
-    {
-      token_id: "36018",
-      name: "Item 36018",
-      image: "https://assets.pokemon.com/assets/cms2/img/pokedex/full/005.png",
-      contract_address: "0xbb0FBc170E2cF13368c60A2B7fD7C6dA4a86b6C8",
-      price: 10,
-      description: "$USDC 10",
-    },
-    {
-      token_id: "60250",
-      name: "Item 60250",
-      image: "https://assets.pokemon.com/assets/cms2/img/pokedex/full/006.png",
-      contract_address: "0xbb0FBc170E2cF13368c60A2B7fD7C6dA4a86b6C8",
-      price: 15,
-      description: "$USDC 15",
-    },
-    {
-      token_id: "1016",
-      name: "Item 10164",
-      image: "https://assets.pokemon.com/assets/cms2/img/pokedex/full/007.png",
-      contract_address: "0xbb0FBc170E2cF13368c60A2B7fD7C6dA4a86b6C8",
-      price: 5,
-      description: "$USDC 5",
-    },
-    {
-      token_id: "55696",
-      name: "Item 55696",
-      image: "https://assets.pokemon.com/assets/cms2/img/pokedex/full/008.png",
-      contract_address: "0xbb0FBc170E2cF13368c60A2B7fD7C6dA4a86b6C8",
-      price: 10,
-      description: "$USDC 10",
-    },
-    {
-      token_id: "94898",
-      name: "Item 94898",
-      image: "https://assets.pokemon.com/assets/cms2/img/pokedex/full/009.png",
-      contract_address: "0xbb0FBc170E2cF13368c60A2B7fD7C6dA4a86b6C8",
-      price: 15,
-      description: "$USDC 15",
-    },
-  ];
+const useItems = () => {
+  const once = useRef(true);
+  const [items, setItems] = useState<any[]>([]);
+
+  const getItems = useCallback(async () => {
+    once.current = false;
+
+    const size = 721; // number of pre generated NFT metadata
+    try {
+      const items$ = Array.from({ length: size }, (_, i) => i + 1).map(
+        async (id) => {
+          const response = await fetch(
+            `https://pokemon-nfts.s3.ap-southeast-2.amazonaws.com/metadata/${id}`,
+            { method: "GET" }
+          );
+          const json = await response.json();
+
+          const price = Math.floor(Math.random() * 25) + 1;
+
+          return {
+            token_id: id,
+            name: json.name,
+            image: json.image,
+            contract_address: "0xbb0FBc170E2cF13368c60A2B7fD7C6dA4a86b6C8",
+            price: price,
+            description: `USDC \$${price}`,
+          };
+        }
+      );
+
+      const _items = await Promise.all(items$);
+
+      setItems(_items);
+    } catch (error) {}
+  }, []);
+
+  useEffect(() => {
+    once.current && getItems();
+  }, []);
+
+  return items;
+};
+
+const useGetNfts = (
+  walletAddr: string,
+  collectionAddr: string,
+  refreshingTime = 2
+) => {
+  const { getNFTs } = useData();
+  const [nfts, setNFTs] = useState<any[]>([]);
+
+  const getNFTsAsync = useCallback(async () => {
+    try {
+      const res = await getNFTs(walletAddr, collectionAddr);
+
+      setNFTs(res?.result || []);
+    } catch (error) {}
+  }, [walletAddr, collectionAddr]);
+
+  useEffect(() => {
+    const timer = setInterval(async () => {
+      await getNFTsAsync();
+    }, refreshingTime * 1000);
+    return () => clearInterval(timer);
+  }, [walletAddr, collectionAddr]);
+
+  return nfts;
 };
 
 function PrimarySale() {
@@ -150,9 +148,16 @@ function PrimarySale() {
   const [configFields, setConfigFields] = useState<Record<string, any>>({});
 
   const items = useItems() as any[];
-  const { mm_connect, mm_sendTransaction } = useMetamaskProvider();
+  const { mm_connect, mm_sendTransaction, mm_loading } = useMetamaskProvider();
+
+  const loading = mm_loading;
 
   const { mint } = useMint(selectedItems, amount, configFields);
+
+  const nfts = useGetNfts(
+    configFields.wallet_address || configFields.recipient_address,
+    configFields.collection_address
+  );
 
   useEffect(() => {
     setConfigFields(params);
@@ -160,7 +165,7 @@ function PrimarySale() {
 
   const setApprove = useCallback(
     async (amount: number): Promise<boolean> => {
-      console.log("🚀 ~ file: PrimarySale.tsx:163 ~ amount:", amount)
+      console.log("🚀 ~ file: PrimarySale.tsx:163 ~ amount:", amount);
       if (!configFields.erc20_contract_address) {
         throw new Error("ERC20 contract address not defined!");
       }
@@ -223,7 +228,7 @@ function PrimarySale() {
     [handleIsSelectedItem]
   );
 
-  const handleFormChange = useCallback(
+  const handleMintFormChange = useCallback(
     (label: string, value: string | number | boolean) => {
       setConfigFields((prev) => {
         return {
@@ -255,9 +260,10 @@ function PrimarySale() {
               onClick={() => {
                 mm_connect();
               }}
+              disabled={loading}
             >
               <Button.Icon
-                icon="WalletConnect"
+                icon={loading ? "Loading" : "WalletConnect"}
                 iconVariant="bold"
                 sx={{
                   mr: "base.spacing.x1",
@@ -265,7 +271,7 @@ function PrimarySale() {
                   width: "base.icon.size.400",
                 }}
               />
-              Connect with Metamask
+              {loading ? "Connecting..." : "Connect Wallet"}
             </Button>
             <Box sx={{ marginTop: "base.spacing.x4" }}>
               <Box sx={{ marginBottom: "base.spacing.x5" }}>
@@ -316,16 +322,20 @@ function PrimarySale() {
                     value: configFields.sale_collection_address,
                   },
                 ]}
-                onChange={handleFormChange}
+                onChange={handleMintFormChange}
               />
               <Button
                 size={"large"}
-                sx={{ background: "base.gradient.1", width: "100%" }}
+                sx={{
+                  background: "base.gradient.1",
+                  width: "100%",
+                  marginTop: "base.spacing.x4",
+                }}
                 onClick={handleMint}
-                disabled={amount === 0}
+                disabled={amount === 0 || loading}
               >
                 <Button.Icon
-                  icon={amount ? "Minting" : "Alert"}
+                  icon={loading ? "Loading" : amount ? "Minting" : "Alert"}
                   iconVariant="regular"
                   sx={{
                     mr: "base.spacing.x1",
@@ -333,16 +343,87 @@ function PrimarySale() {
                     width: "base.icon.size.400",
                   }}
                 />
-                {amount ? `Approve ${amount} USDC` : "Select Items"}
+                {loading
+                  ? "Please wait..."
+                  : amount
+                  ? `Approve ${amount} USDC`
+                  : "Select items to purchase"}
               </Button>
             </Box>
           </Col>
           <Col xs={12} md={12} lg={8}>
-            <ItemCards
-              nfts={items}
-              onClick={handleSelectItem}
-              isSelected={handleIsSelectedItem}
-            />
+            <Box>
+              <Box sx={{ marginBottom: "base.spacing.x5" }}>
+                <Heading size={"small"}>Catalog</Heading>
+              </Box>
+              <ItemCards
+                nfts={items}
+                onClick={handleSelectItem}
+                isSelected={handleIsSelectedItem}
+              />
+            </Box>
+            <Box sx={{ marginTop: "base.spacing.x5" }}>
+              <Box sx={{ marginBottom: "base.spacing.x5" }}>
+                <Heading size={"small"}>Status</Heading>
+              </Box>
+              <Card>
+                <Card.Caption>
+                  <Banner
+                    variant="standard"
+                    sx={{ marginBottom: "base.spacing.x4" }}
+                  >
+                    <Banner.Title> Minting</Banner.Title>
+                    <Banner.Caption>
+                      Txn Hash |
+                      <Link
+                        sx={{ marginLeft: "base.spacing.x1" }}
+                        onClick={() => {
+                          const txnHash = "";
+                          window.open(
+                            `https://immutable-testnet.blockscout.com/#tx/${txnHash}`,
+                            "_blank"
+                          );
+                        }}
+                      >
+                        View in Block Explorer
+                        <Link.Icon icon="JumpTo" />
+                      </Link>
+                    </Banner.Caption>
+                  </Banner>
+                </Card.Caption>
+              </Card>
+            </Box>
+          </Col>
+        </Row>
+        <Row>
+          <Col xs={12} md={12} lg={12}>
+            <Box sx={{ marginTop: "base.spacing.x4" }}>
+              <Box sx={{ marginBottom: "base.spacing.x5" }}>
+                <Box sx={{ marginBottom: "base.spacing.x5" }}>
+                  <Heading size={"small"}>List NFTs By Wallet Address</Heading>
+                </Box>
+                <ConfigForm
+                  fields={[
+                    {
+                      type: "text",
+                      key: "wallet_address",
+                      label: "Wallet Address",
+                      value: configFields.wallet_address
+                        ? configFields.wallet_address
+                        : configFields.recipient_address,
+                    },
+                    {
+                      type: "text",
+                      key: "collection_address",
+                      label: "Collection Address",
+                      value: configFields.collection_address,
+                    },
+                  ]}
+                  onChange={handleMintFormChange}
+                />
+              </Box>
+              <ItemCards nfts={nfts} />
+            </Box>
           </Col>
         </Row>
       </Grid>

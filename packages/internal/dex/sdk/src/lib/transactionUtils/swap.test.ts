@@ -105,7 +105,7 @@ describe('getSwap', () => {
         makeAddr('periphery'),
         makeAddr('secondaryFeeContract'),
         BigNumber.from(0),
-        [{ feeBasisPoints: 100, feeRecipient: makeAddr('feeRecipient') }],
+        [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
       );
 
       expectToBeDefined(swap.transaction.data);
@@ -128,7 +128,7 @@ describe('getSwap', () => {
         makeAddr('periphery'),
         makeAddr('secondaryFeeContract'),
         BigNumber.from(0),
-        [{ feeBasisPoints: 100, feeRecipient: makeAddr('feeRecipient') }],
+        [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
       );
 
       expectToBeDefined(swap.transaction.data);
@@ -165,7 +165,7 @@ describe('prepareSwap', () => {
         const preparedSwap = prepareSwap(
           quote,
           quote.amountIn,
-          new Fees([{ feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: 1000 }], IMX_TEST_TOKEN), // 1% fee
+          new Fees([{ recipient: TEST_FEE_RECIPIENT, basisPoints: 1000 }], IMX_TEST_TOKEN), // 1% fee
         );
 
         expect(formatAmount(preparedSwap.amountIn)).toEqual(formatAmount(quote.amountIn));
@@ -199,7 +199,7 @@ describe('prepareSwap', () => {
         const preparedSwap = prepareSwap(
           quote,
           quote.amountOut,
-          new Fees([{ feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: 1000 }], IMX_TEST_TOKEN), // 1% fee
+          new Fees([{ recipient: TEST_FEE_RECIPIENT, basisPoints: 1000 }], IMX_TEST_TOKEN), // 1% fee
         );
 
         expect(formatAmount(preparedSwap.amountIn)).toEqual('110.0'); // quotedAmount + 1% fee

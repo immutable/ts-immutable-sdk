@@ -8,10 +8,7 @@ import {
 const blockchainData = new BlockchainData({
   baseConfig: new ImmutableConfiguration({
     environment: Environment.SANDBOX,
-  }),
-  overrides: {
-    basePath: "https://indexer-mr.dev.imtbl.com",
-  },
+  })
 });
 
 const DataContext = createContext<{
@@ -29,7 +26,7 @@ export function DataProvider({
     return await blockchainData?.listNFTsByAccountAddress({
       accountAddress: account,
       contractAddress: contract,
-      chainName: "imtbl-zkevm-devnet",
+      chainName: "imtbl-zkevm-testnet",
     });
   }, []);
 
