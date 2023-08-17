@@ -43,6 +43,7 @@ import {
   GasEstimateSwapResult,
   GasEstimateBridgeToL2Result,
   SmartCheckoutParams,
+  WalletProviderName,
 } from './types';
 import { CheckoutConfiguration } from './config';
 import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
@@ -77,9 +78,14 @@ export class Checkout {
   public async createProvider(
     params: CreateProviderParams,
   ): Promise<CreateProviderResult> {
+    if (params.walletProvider === WalletProviderName.PASSPORT && params.passport) {
+      return await provider.createProvider(
+        params.walletProvider,
+        params.passport,
+      );
+    }
     return await provider.createProvider(
       params.walletProvider,
-      params.passport,
     );
   }
 
