@@ -56,6 +56,14 @@ export const MainPage = () => {
     setShowWidgets({...hideAllWidgets, showWallet: {show: true, data: {}}});
   }, [setShowWidgets])
 
+  const openSwapWidget = useCallback(() => {
+    setShowWidgets({...hideAllWidgets, showSwap: {show: true, data: {}}});
+  }, [setShowWidgets])
+
+  const openBridgeWidget = useCallback(() => {
+    setShowWidgets({...hideAllWidgets, showBridge: {show: true, data: {}}});
+  }, [setShowWidgets])
+
   const handleBuyClick = () => {
     alert("you can buy now");
   }
@@ -76,6 +84,8 @@ export const MainPage = () => {
       {web3Provider && (
         <Button onClick={openWalletWidget}>My Wallet</Button>
       )}
+      <Button onClick={openSwapWidget}>Open Swap</Button>
+      <Button onClick={openBridgeWidget}>Open Bridge</Button>
       <Button onClick={passPassportInstance}>Pass Passport Instance</Button>
       {passportInstance && <Button onClick={removePassportInstance}>Remove Passport Instance</Button>}
       <Button onClick={setPassportProvider}>Set Passport Provider</Button>

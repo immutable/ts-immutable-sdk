@@ -13,6 +13,7 @@ export enum BridgeWidgetViews {
   FAIL = 'FAIL',
   ERROR = 'ERROR',
   APPROVE_ERC20 = 'APPROVE_ERC20_BRIDGE',
+  BRIDGE_COMING_SOON = 'BRIDGE_COMING_SOON',
 }
 
 export type BridgeWidgetView =

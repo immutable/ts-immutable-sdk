@@ -190,12 +190,10 @@ export function ConnectLoader({
       }
 
       try {
-        if (!provider
-          && walletProvider
-          && walletProvider !== WalletProviderName.PASSPORT // TODO: remove this clause when WT-1561 is implemented to support create provider for Passport
-        ) {
+        if (!provider && walletProvider && passport) {
           const createProviderResult = await checkout.createProvider({
             walletProvider,
+            passport,
           });
           connectLoaderDispatch({
             payload: {

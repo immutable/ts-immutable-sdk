@@ -18,6 +18,8 @@ export const sendBridgeSuccessEvent = (transactionHash: string) => {
       },
     },
   );
+  // eslint-disable-next-line no-console
+  console.log('bridge success ', successEvent);
   if (window !== undefined) window.dispatchEvent(successEvent);
 };
 
@@ -34,12 +36,12 @@ export const sendBridgeFailedEvent = (reason: string) => {
       },
     },
   );
+  // eslint-disable-next-line no-console
+  console.log('bridge failed ', failedEvent);
   if (window !== undefined) window.dispatchEvent(failedEvent);
 };
 
 export function sendBridgeWidgetCloseEvent() {
-  // eslint-disable-next-line no-console
-  console.log(BridgeEventType.CLOSE_WIDGET);
   const closeWidgetEvent = new CustomEvent<WidgetEvent<any>>(
     IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT,
     {
@@ -49,5 +51,7 @@ export function sendBridgeWidgetCloseEvent() {
       },
     },
   );
+  // eslint-disable-next-line no-console
+  console.log('bridge close ', closeWidgetEvent);
   if (window !== undefined) window.dispatchEvent(closeWidgetEvent);
 }
