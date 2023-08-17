@@ -10,9 +10,10 @@ export const text = {
   views: {
     [ConnectWidgetViews.CONNECT_WALLET]: {
       header: {
-        title: 'Connect a wallet',
+        title: 'Connect',
       },
       body: {
+        heading: 'Connect a wallet',
         content:
           "You'll need to connect or create a digital wallet to buy, sell, trade and store your coins and collectibles.",
       },
@@ -94,8 +95,16 @@ export const text = {
       },
     },
     [WalletWidgetViews.COIN_INFO]: {
-      heading: 'Coins and collectibles are native to networks',
-      body: 'You can switch networks to add coins or move them from one network to another',
+      metamask: {
+        heading: 'Coins and collectibles are native to networks',
+        body: 'You can switch networks to add coins or move them from one network to another',
+      },
+      passport: {
+        heading: 'Coins and collectibles are native to networks',
+        body1: 'This network is called Immutable zkEVM. If you have other coins in your Passport and can’t see them here, they might be on another network. ',
+        body2: ' for more info.',
+        linkText: 'Visit our FAQs',
+      },
     },
     [SwapWidgetViews.SWAP]: {
       header: {
@@ -264,6 +273,12 @@ export const text = {
     },
   },
   wallets: {
+    [WalletProviderName.PASSPORT]: {
+      heading: 'Immutable Passport',
+      accentText: 'Recommended',
+      description:
+        'digital wallet and identity',
+    },
     [WalletProviderName.METAMASK]: {
       heading: 'MetaMask',
       description:

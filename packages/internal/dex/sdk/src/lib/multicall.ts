@@ -55,7 +55,7 @@ export async function multicallMultipleCallDataSingContract(
   options?: SingleContractCallOptions,
 ): Promise<MulticallResponse> {
   // Create call objects
-  const calls = new Array(calldata.length);
+  const calls = new Array<UniswapInterfaceMulticall.CallStruct>(calldata.length);
   // TODO: use object.keys of something similar to avoid iterating over
   // entire object prototype
   // eslint-disable-next-line no-restricted-syntax, guard-for-in

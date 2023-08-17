@@ -11,7 +11,7 @@
     "parcel": "^2.8.3"
   },
   "scripts": {
-    "build": "parcel build",
+    "build": "parcel build --no-cache --no-optimize",
     "start": "parcel"
   },
   "source": "src/index.html",

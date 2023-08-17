@@ -24,7 +24,6 @@ import {
   EIP_712_ORDER_TYPE,
   ItemType,
   SEAPORT_CONTRACT_NAME,
-  SEAPORT_CONTRACT_VERSION_V1_4,
   SEAPORT_CONTRACT_VERSION_V1_5,
 } from './constants';
 import { getOrderComponentsFromMessage } from './components';
@@ -93,7 +92,11 @@ export class Seaport {
     };
   }
 
-  async fulfillOrder(order: Order, account: string): Promise<FulfillOrderResponse> {
+  async fulfillOrder(
+    order: Order,
+    account: string,
+    extraData: string,
+  ): Promise<FulfillOrderResponse> {
     const orderComponents = await this.mapImmutableOrderToSeaportOrderComponents(order);
     const seaportLib = this.getSeaportLib(order);
 
@@ -104,7 +107,7 @@ export class Seaport {
           parameters: orderComponents,
           signature: order.signature,
         },
-        extraData: order.protocol_data.operator_signature,
+        extraData,
       }],
     });
 
@@ -199,7 +202,7 @@ export class Seaport {
 
     const domainData = {
       name: SEAPORT_CONTRACT_NAME,
-      version: SEAPORT_CONTRACT_VERSION_V1_4,
+      version: SEAPORT_CONTRACT_VERSION_V1_5,
       chainId,
       verifyingContract: this.seaportContractAddress,
     };
@@ -214,10 +217,10 @@ export class Seaport {
   private getSeaportLib(order?: Order): SeaportLib {
     const seaportAddress = order?.protocol_data?.seaport_address ?? this.seaportContractAddress;
 
-    let seaportVersion: SeaportVersion = SEAPORT_CONTRACT_VERSION_V1_4;
-    if (order?.protocol_data?.seaport_version === SEAPORT_CONTRACT_VERSION_V1_5) {
-      seaportVersion = SEAPORT_CONTRACT_VERSION_V1_5;
-    }
+    const seaportVersion: SeaportVersion = SEAPORT_CONTRACT_VERSION_V1_5;
+    // if (order?.protocol_data?.seaport_version === SEAPORT_CONTRACT_VERSION_V1_5) {
+    //   seaportVersion = SEAPORT_CONTRACT_VERSION_V1_5;
+    // }
 
     return this.seaportLibFactory.create(seaportVersion, seaportAddress);
   }
