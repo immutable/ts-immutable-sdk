@@ -75,10 +75,6 @@ export function PassportProvider({
     setIsLoading(true);
     const provider = passportClient?.connectEvm();
     if (provider) {
-      Object.defineProperty(window, 'zkEvmProvider', {
-        configurable: true,
-        value: provider,
-      });
       setZkEvmProvider(provider);
       addMessage('ConnectZkEvm', 'Connected');
     } else {
@@ -118,8 +114,8 @@ export function PassportProvider({
     try {
       setIsLoading(true);
       await passportClient?.logout();
-      // setImxProvider(undefined);
-      // setZkEvmProvider(undefined);
+      setImxProvider(undefined);
+      setZkEvmProvider(undefined);
     } catch (err) {
       if (err instanceof Error) {
         addMessage(err.toString());
