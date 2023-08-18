@@ -1,5 +1,5 @@
-import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { useEffect } from 'react';
+import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { silentLogoutParentUri } from '@/config';
 
 export default function HandleCallback() {
