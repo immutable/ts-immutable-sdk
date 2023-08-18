@@ -26,6 +26,8 @@ import {
 } from './workflows';
 import { ConfirmationScreen } from '../confirmation';
 import { PassportConfiguration } from '../config';
+import { PassportEventMap, PassportEvents } from '../types';
+import TypedEventEmitter from '../typedEventEmitter';
 
 jest.mock('./workflows');
 describe('PassportImxProvider', () => {
@@ -46,15 +48,19 @@ describe('PassportImxProvider', () => {
     getAddress: jest.fn(),
   };
 
+  let passportEventEmitter: TypedEventEmitter<PassportEventMap>;
+
   const imxPublicApiDomain = 'http://imxPublicApiDomain';
 
   beforeEach(() => {
+    passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
     passportImxProvider = new PassportImxProvider({
       user: mockUserImx,
       starkSigner: mockStarkSigner,
       confirmationScreen,
       immutableXClient,
       imxPublicApiDomain,
+      passportEventEmitter,
     });
   });
 
@@ -248,6 +254,103 @@ describe('PassportImxProvider', () => {
     it('should return user ether key address', async () => {
       const response = await passportImxProvider.getAddress();
       expect(response).toEqual(mockUserImx.imx.ethAddress);
+    });
+  });
+
+  describe.only('when the user has been logged out', () => {
+    beforeEach(() => {
+      passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
+    });
+
+    describe('transfer', () => {
+      it('returns an error', async () => {
+        await expect(async () => (
+          await passportImxProvider.transfer({} as UnsignedTransferRequest)
+        )).rejects.toThrow(
+          new PassportError(
+            'User has been logged out',
+            PassportErrorType.NOT_LOGGED_IN_ERROR,
+          ),
+        );
+      });
+    });
+
+    describe('createOrder', () => {
+      it('returns an error', async () => {
+        await expect(async () => (
+          await passportImxProvider.createOrder({} as UnsignedOrderRequest)
+        )).rejects.toThrow(
+          new PassportError(
+            'User has been logged out',
+            PassportErrorType.NOT_LOGGED_IN_ERROR,
+          ),
+        );
+      });
+    });
+
+    describe('cancelOrder', () => {
+      it('returns an error', async () => {
+        await expect(async () => (
+          await passportImxProvider.cancelOrder({} as GetSignableCancelOrderRequest)
+        )).rejects.toThrow(
+          new PassportError(
+            'User has been logged out',
+            PassportErrorType.NOT_LOGGED_IN_ERROR,
+          ),
+        );
+      });
+    });
+
+    describe('createTrade', () => {
+      it('returns an error', async () => {
+        await expect(async () => (
+          await passportImxProvider.createTrade({} as GetSignableTradeRequest)
+        )).rejects.toThrow(
+          new PassportError(
+            'User has been logged out',
+            PassportErrorType.NOT_LOGGED_IN_ERROR,
+          ),
+        );
+      });
+    });
+
+    describe('batchNftTransfer', () => {
+      it('returns an error', async () => {
+        await expect(async () => (
+          await passportImxProvider.batchNftTransfer([] as NftTransferDetails[])
+        )).rejects.toThrow(
+          new PassportError(
+            'User has been logged out',
+            PassportErrorType.NOT_LOGGED_IN_ERROR,
+          ),
+        );
+      });
+    });
+
+    describe('exchangeTransfer', () => {
+      it('returns an error', async () => {
+        await expect(async () => (
+          await passportImxProvider.exchangeTransfer({} as UnsignedExchangeTransferRequest)
+        )).rejects.toThrow(
+          new PassportError(
+            'User has been logged out',
+            PassportErrorType.NOT_LOGGED_IN_ERROR,
+          ),
+        );
+      });
+    });
+
+    describe('getAddress', () => {
+      it('returns an error', async () => {
+        await expect(async () => (
+          await passportImxProvider.getAddress()
+        )).rejects.toThrow(
+          new PassportError(
+            'User has been logged out',
+            PassportErrorType.NOT_LOGGED_IN_ERROR,
+          ),
+        );
+      });
     });
   });
 });

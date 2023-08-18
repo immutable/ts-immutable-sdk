@@ -8,9 +8,12 @@ import { PassportConfiguration } from '../config';
 import AuthManager from '../authManager';
 import { ConfirmationScreen } from '../confirmation';
 import MagicAdapter from '../magicAdapter';
-import { DeviceTokenResponse, User, UserImx } from '../types';
+import {
+  DeviceTokenResponse, PassportEventMap, User, UserImx,
+} from '../types';
 import { PassportImxProvider } from './passportImxProvider';
 import { getStarkSigner } from './getStarkSigner';
+import TypedEventEmitter from '../typedEventEmitter';
 
 export type PassportImxProviderFactoryInput = {
   authManager: AuthManager;
@@ -18,6 +21,7 @@ export type PassportImxProviderFactoryInput = {
   confirmationScreen: ConfirmationScreen;
   immutableXClient: ImmutableXClient;
   magicAdapter: MagicAdapter;
+  passportEventEmitter: TypedEventEmitter<PassportEventMap>;
 };
 
 export class PassportImxProviderFactory {
@@ -31,18 +35,22 @@ export class PassportImxProviderFactory {
 
   private readonly magicAdapter: MagicAdapter;
 
+  private readonly passportEventEmitter: TypedEventEmitter<PassportEventMap>;
+
   constructor({
     authManager,
     config,
     confirmationScreen,
     immutableXClient,
     magicAdapter,
+    passportEventEmitter,
   }: PassportImxProviderFactoryInput) {
     this.authManager = authManager;
     this.config = config;
     this.confirmationScreen = confirmationScreen;
     this.immutableXClient = immutableXClient;
     this.magicAdapter = magicAdapter;
+    this.passportEventEmitter = passportEventEmitter;
   }
 
   public async getProvider(): Promise<PassportImxProvider> {
@@ -105,6 +113,7 @@ export class PassportImxProviderFactory {
         immutableXClient: this.immutableXClient,
         imxPublicApiDomain: this.config.imxPublicApiDomain,
         confirmationScreen: this.confirmationScreen,
+        passportEventEmitter: this.passportEventEmitter,
       });
     }
 
@@ -114,6 +123,7 @@ export class PassportImxProviderFactory {
       immutableXClient: this.immutableXClient,
       imxPublicApiDomain: this.config.imxPublicApiDomain,
       confirmationScreen: this.confirmationScreen,
+      passportEventEmitter: this.passportEventEmitter,
     });
   }
 

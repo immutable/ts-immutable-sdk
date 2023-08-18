@@ -12,10 +12,10 @@ import {
 } from './types';
 import AuthManager from '../authManager';
 import MagicAdapter from '../magicAdapter';
-import TypedEventEmitter from './typedEventEmitter';
+import TypedEventEmitter from '../typedEventEmitter';
 import { PassportConfiguration } from '../config';
 import { ConfirmationScreen } from '../confirmation';
-import { UserZkEvm } from '../types';
+import { PassportEventMap, PassportEvents, UserZkEvm } from '../types';
 import { RelayerClient } from './relayerClient';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';
 import { loginZkEvmUser } from './user';
@@ -28,6 +28,7 @@ export type ZkEvmProviderInput = {
   config: PassportConfiguration,
   confirmationScreen: ConfirmationScreen,
   multiRollupApiClients: MultiRollupApiClients,
+  passportEventEmitter: TypedEventEmitter<PassportEventMap>;
 };
 
 type LoggedInZkEvmProvider = {
@@ -62,12 +63,15 @@ export class ZkEvmProvider implements Provider {
 
   protected user?: UserZkEvm;
 
+  public readonly isPassport: boolean = true;
+
   constructor({
     authManager,
     magicAdapter,
     config,
     confirmationScreen,
     multiRollupApiClients,
+    passportEventEmitter,
   }: ZkEvmProviderInput) {
     this.authManager = authManager;
     this.magicAdapter = magicAdapter;
@@ -81,9 +85,22 @@ export class ZkEvmProvider implements Provider {
     this.jsonRpcProvider = new JsonRpcProvider(this.config.zkEvmRpcUrl);
     this.multiRollupApiClients = multiRollupApiClients;
     this.eventEmitter = new TypedEventEmitter<ProviderEventMap>();
+
+    passportEventEmitter.on(PassportEvents.LOGGED_OUT, this.handleLogout);
   }
 
-  public isPassport: boolean = true;
+  private handleLogout = () => {
+    const shouldEmitAccountsChanged = this.isLoggedIn();
+
+    this.magicProvider = undefined;
+    this.user = undefined;
+    this.relayerClient = undefined;
+    this.guardianClient = undefined;
+
+    if (shouldEmitAccountsChanged) {
+      this.eventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, []);
+    }
+  };
 
   private isLoggedIn(): this is LoggedInZkEvmProvider {
     return this.magicProvider !== undefined
