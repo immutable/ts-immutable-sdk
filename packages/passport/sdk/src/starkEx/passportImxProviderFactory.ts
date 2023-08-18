@@ -103,8 +103,8 @@ export class PassportImxProviderFactory {
         user: userImx,
         starkSigner,
         immutableXClient: this.immutableXClient,
-        imxPublicApiDomain: this.config.imxPublicApiDomain,
         confirmationScreen: this.confirmationScreen,
+        config: this.config,
       });
     }
 
@@ -112,8 +112,8 @@ export class PassportImxProviderFactory {
       user: user as UserImx,
       starkSigner,
       immutableXClient: this.immutableXClient,
-      imxPublicApiDomain: this.config.imxPublicApiDomain,
       confirmationScreen: this.confirmationScreen,
+      config: this.config,
     });
   }
 
