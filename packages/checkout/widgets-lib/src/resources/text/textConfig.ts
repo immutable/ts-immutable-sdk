@@ -10,21 +10,37 @@ export const text = {
   views: {
     [ConnectWidgetViews.CONNECT_WALLET]: {
       header: {
-        title: 'Connect a wallet',
+        title: 'Connect',
       },
       body: {
+        heading: 'Connect a wallet',
         content:
           "You'll need to connect or create a digital wallet to buy, sell, trade and store your coins and collectibles.",
       },
     },
     [ConnectWidgetViews.READY_TO_CONNECT]: {
-      body: {
-        heading: 'Check for the pop-up from MetaMask',
-        content: 'Follow the prompts in the MetaMask popup to connect',
+      header: {
+        title: 'Connect',
       },
-      footer: {
-        buttonText1: 'Ready to connect',
-        buttonText2: 'Try again',
+      metamask: {
+        body: {
+          heading: 'Check for the pop-up from MetaMask',
+          content: 'Follow the prompts in the MetaMask popup to connect',
+        },
+        footer: {
+          buttonText1: 'Ready to connect',
+          buttonText2: 'Try again',
+        },
+      },
+      passport: {
+        body: {
+          heading: 'Connect with Immutable Passport',
+          content: 'Follow the prompts to connect with Immutable Passport',
+        },
+        footer: {
+          buttonText1: 'Continue',
+          buttonText2: 'Try again',
+        },
       },
     },
     [ConnectWidgetViews.SWITCH_NETWORK]: {
@@ -79,8 +95,16 @@ export const text = {
       },
     },
     [WalletWidgetViews.COIN_INFO]: {
-      heading: 'Coins and collectibles are native to networks',
-      body: 'You can switch networks to add coins or move them from one network to another',
+      metamask: {
+        heading: 'Coins and collectibles are native to networks',
+        body: 'You can switch networks to add coins or move them from one network to another',
+      },
+      passport: {
+        heading: 'Coins and collectibles are native to networks',
+        body1: 'This network is called Immutable zkEVM. If you have other coins in your Passport and can’t see them here, they might be on another network. ',
+        body2: ' for more info.',
+        linkText: 'Visit our FAQs',
+      },
     },
     [SwapWidgetViews.SWAP]: {
       header: {
@@ -134,8 +158,8 @@ export const text = {
     [SwapWidgetViews.APPROVE_ERC20]: {
       approveSwap: {
         content: {
-          heading: "Now you'll just need to approve the transaction",
-          body: 'Follow the prompts in MetaMask.',
+          heading: "Now you'll just need to confirm the transaction",
+          body: 'Follow the prompts in your wallet.',
         },
         footer: {
           buttonText: 'Okay',
@@ -144,8 +168,17 @@ export const text = {
       },
       approveSpending: {
         content: {
-          heading: "You'll be asked to set a spending cap for this transaction",
-          body: ['Input at least', 'for this transaction and future transactions, then follow the prompts.'],
+          metamask: {
+            heading: "You'll be asked to set a spending cap for this transaction",
+            body: [
+              'Input at least',
+              'for this transaction and future transactions, then follow the prompts.',
+            ],
+          },
+          passport: {
+            heading: "You'll be asked to approve a spending cap for this transaction",
+            body: 'Follow the prompts in your wallet to approve the spending cap.',
+          },
         },
         footer: {
           buttonText: 'Got it',
@@ -184,8 +217,7 @@ export const text = {
     [BridgeWidgetViews.IN_PROGRESS]: {
       heading: 'Move in progress',
       body1: (symbol: string) => `Less than 3 mins until your ${symbol} lands on zkEVM.`,
-      body2:
-        'You can close this window, the transaction will be reflected in your wallet once complete.',
+      body2: 'You can close this window, the transaction will be reflected in your wallet once complete.',
     },
     [BridgeWidgetViews.APPROVE_ERC20]: {
       approveBridge: {
@@ -201,7 +233,10 @@ export const text = {
       approveSpending: {
         content: {
           heading: "You'll be asked to set a spending cap for this transaction",
-          body: ['Input at least', 'for this transaction and future transactions, then follow the prompts.'],
+          body: [
+            'Input at least',
+            'for this transaction and future transactions, then follow the prompts.',
+          ],
         },
         footer: {
           buttonText: 'Got it',
@@ -219,6 +254,11 @@ export const text = {
     [BridgeWidgetViews.FAIL]: {
       text: 'Transaction failed',
       actionText: 'Review & Try again',
+    },
+    [BridgeWidgetViews.BRIDGE_COMING_SOON]: {
+      heading: 'Coming soon',
+      body: "Moving funds across networks currently isn't supported for Passport.",
+      actionText: 'Dismiss',
     },
     [SharedViews.TOP_UP_VIEW]: {
       header: {
@@ -244,6 +284,12 @@ export const text = {
     },
   },
   wallets: {
+    [WalletProviderName.PASSPORT]: {
+      heading: 'Immutable Passport',
+      accentText: 'Recommended',
+      description:
+        'digital wallet and identity',
+    },
     [WalletProviderName.METAMASK]: {
       heading: 'MetaMask',
       description:

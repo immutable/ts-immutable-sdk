@@ -32,12 +32,7 @@ export interface PrepareListingParams {
 }
 
 export interface PrepareListingResponse {
-  actions: TransactionAction[];
-  typedOrderMessageForSigning: {
-    domain: TypedDataDomain;
-    types: Record<string, TypedDataField[]>;
-    value: Record<string, any>;
-  };
+  actions: Action[];
   orderComponents: OrderComponents;
   orderHash: string;
 }
@@ -56,20 +51,42 @@ Parameters<typeof OrdersService.prototype.listListings>[0],
 'chainName'
 >;
 
-export enum TransactionType {
+export enum TransactionPurpose {
   APPROVAL = 'APPROVAL',
   FULFILL_ORDER = 'FULFILL_ORDER',
+}
+
+export enum SignablePurpose {
+  CREATE_LISTING = 'CREATE_LISTING',
+}
+
+export enum ActionType {
+  TRANSACTION = 'TRANSACTION',
+  SIGNABLE = 'SIGNABLE',
 }
 
 export type TransactionBuilder = () => Promise<PopulatedTransaction>;
 
 export interface TransactionAction {
-  transactionType: TransactionType;
+  type: ActionType.TRANSACTION;
+  purpose: TransactionPurpose;
   buildTransaction: TransactionBuilder;
 }
 
+export interface SignableAction {
+  type: ActionType.SIGNABLE;
+  purpose: SignablePurpose;
+  message: {
+    domain: TypedDataDomain;
+    types: Record<string, TypedDataField[]>;
+    value: Record<string, any>;
+  }
+}
+
+export type Action = TransactionAction | SignableAction;
+
 export interface FulfillOrderResponse {
-  actions: TransactionAction[];
+  actions: Action[];
 }
 
 export interface CancelOrderResponse {

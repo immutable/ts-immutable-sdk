@@ -1,6 +1,7 @@
 import { ExternalProvider, JsonRpcProvider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import * as guardian from '@imtbl/guardian';
+import { ImmutableConfiguration } from '@imtbl/config';
 import {
   JsonRpcRequestCallback,
   JsonRpcRequestPayload,
@@ -112,10 +113,15 @@ export class ZkEvmProvider implements Provider {
           user: this.user,
         });
         this.guardianClient = new GuardianClient({
-          imxPublicApiDomain: this.config.imxPublicApiDomain,
           accessToken: this.user.accessToken,
           confirmationScreen: this.confirmationScreen,
           imxEtherAddress: this.user.zkEvm.ethAddress,
+          config: new PassportConfiguration({
+            baseConfig: {} as ImmutableConfiguration,
+            clientId: 'client123',
+            logoutRedirectUri: 'http://localhost:3000/logout',
+            redirectUri: 'http://localhost:3000/redirect',
+          }),
         });
 
         this.eventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, [this.user.zkEvm.ethAddress]);

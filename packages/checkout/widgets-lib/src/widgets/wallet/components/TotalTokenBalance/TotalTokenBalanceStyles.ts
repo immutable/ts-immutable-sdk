@@ -12,3 +12,11 @@ export const totalTokenBalanceValueStyle = {
   columnGap: 'base.spacing.x1',
   alignItems: 'center',
 };
+
+export const coinInfoButtonStyle = {
+  width: 'base.icon.size.250',
+  height: 'base.icon.size.250',
+  fill: 'base.color.accent.4',
+  cursor: 'pointer',
+  borderRadius: '50%',
+};

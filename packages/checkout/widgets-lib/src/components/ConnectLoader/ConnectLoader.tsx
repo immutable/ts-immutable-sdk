@@ -190,9 +190,10 @@ export function ConnectLoader({
       }
 
       try {
-        if (!provider && walletProvider) {
+        if (!provider && walletProvider && passport) {
           const createProviderResult = await checkout.createProvider({
             walletProvider,
+            passport,
           });
           connectLoaderDispatch({
             payload: {
