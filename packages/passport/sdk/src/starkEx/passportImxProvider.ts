@@ -31,16 +31,17 @@ import {
   createTrade,
 } from './workflows';
 import { ConfirmationScreen } from '../confirmation';
+import { PassportConfiguration } from '../config';
 import TypedEventEmitter from '../typedEventEmitter';
 
-export type PassportImxProviderInput = {
+export interface PassportImxProviderInput {
   user: UserImx;
   starkSigner: StarkSigner;
   immutableXClient: ImmutableXClient;
   confirmationScreen: ConfirmationScreen;
-  imxPublicApiDomain: string;
+  config: PassportConfiguration;
   passportEventEmitter: TypedEventEmitter<PassportEventMap>;
-};
+}
 
 type LoggedInPassportImxProvider = {
   user: UserImx;
@@ -62,8 +63,8 @@ export class PassportImxProvider implements IMXProvider {
     user,
     starkSigner,
     immutableXClient,
-    imxPublicApiDomain,
     confirmationScreen,
+    config,
     passportEventEmitter,
   }: PassportImxProviderInput) {
     this.user = user;
@@ -71,10 +72,10 @@ export class PassportImxProvider implements IMXProvider {
     this.immutableXClient = immutableXClient;
     this.confirmationScreen = confirmationScreen;
     this.guardianClient = new GuardianClient({
-      imxPublicApiDomain,
       accessToken: user.accessToken,
       confirmationScreen,
       imxEtherAddress: user.imx.ethAddress,
+      config,
     });
 
     passportEventEmitter.on(PassportEvents.LOGGED_OUT, this.handleLogout);

@@ -70,9 +70,14 @@ export interface PassportOverrides {
   passportMrBasePath: string;
 }
 
-export interface PassportModuleConfiguration
-  extends ModuleConfiguration<PassportOverrides>,
-  OidcConfiguration {}
+export interface PassportModuleConfiguration extends ModuleConfiguration<PassportOverrides>,
+  OidcConfiguration {
+  /**
+   * This flag indicates that Passport is being used in a cross-sdk bridge scenario
+   * and not directly on the web.
+   */
+  crossSdkBridgeEnabled?: boolean;
+}
 
 type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 

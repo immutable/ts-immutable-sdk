@@ -1,9 +1,20 @@
+import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { User, UserImx, UserZkEvm } from '../types';
+import { PassportConfiguration } from '../config';
 
 export const mockErrorMessage = 'Server is down';
 export const mockStarkSignature = 'starkSignature';
 
 const accessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2V4YW1wbGUuYXV0aDAuY29tLyIsImF1ZCI6Imh0dHBzOi8vYXBpLmV4YW1wbGUuY29tL2NhbGFuZGFyL3YxLyIsInN1YiI6InVzcl8xMjMiLCJpYXQiOjE0NTg3ODU3OTYsImV4cCI6MTQ1ODg3MjE5Nn0.CA7eaHjIHz5NxeIJoFK9krqaeZrPLwmMmgI_XiQiIkQ';
+
+export const testConfig = new PassportConfiguration({
+  baseConfig: new ImmutableConfiguration({
+    environment: Environment.SANDBOX,
+  }),
+  clientId: 'client123',
+  logoutRedirectUri: 'http://localhost:3000/logout',
+  redirectUri: 'http://localhost:3000/callback',
+});
 
 export const mockUser: User = {
   accessToken,

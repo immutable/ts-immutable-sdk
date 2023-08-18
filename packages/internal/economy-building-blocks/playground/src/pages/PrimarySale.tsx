@@ -2,13 +2,18 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Box, Heading, Banner, Button, Card, Link } from "@biom3/react";
 
 import { Grid, Row, Col } from "react-flexbox-grid";
-import { NFT } from "@imtbl/generated-clients/dist/multi-rollup";
 
 import { encodeApprove } from "../contracts/erc20";
 import { useMetamaskProvider } from "../MetamaskProvider";
 import ItemCards from "../components/ItemCards";
+import StatusCard from "../components/StatusCard";
 import ConfigForm from "../components/ConfigForm";
 import { useData } from "../context/DataProvider";
+import { TransactionReceipt } from "@ethersproject/providers";
+
+interface MintResponse {
+  tx_id: string;
+}
 
 const useURLParams = () => {
   const [urlParams, setUrlParams] = useState({});
@@ -22,7 +27,7 @@ const useURLParams = () => {
 };
 
 const useMint = (selectedItems: any[], amount: number, config = {}) => {
-  const [response, setResponse] = useState(null);
+  const [response, setResponse] = useState<MintResponse | null>(null);
   const [error, setError] = useState(null);
 
   const fields = [
@@ -45,7 +50,7 @@ const useMint = (selectedItems: any[], amount: number, config = {}) => {
       amount,
       items: selectedItems.map((item) => ({
         collection_address: item.contract_address,
-        token_id: item.token_id,
+        token_id: item.token_id.toString(),
       })),
     };
 
@@ -146,18 +151,59 @@ function PrimarySale() {
   const [amount, setAmount] = useState(0);
   const [selectedItems, setSelectedItems] = useState<any[]>([]);
   const [configFields, setConfigFields] = useState<Record<string, any>>({});
+  const [approved, setApproved] = useState(false);
+  const [receipt, setReceipt] = useState<TransactionReceipt | null>(null);
+  const [mintResponse, setMintResponse] = useState<MintResponse | null>(null);
 
   const items = useItems() as any[];
-  const { mm_connect, mm_sendTransaction, mm_loading } = useMetamaskProvider();
+  const {
+    mm_connect,
+    mm_sendTransaction,
+    mm_loading,
+    address,
+    mm_getTransactionReceipt,
+  } = useMetamaskProvider();
 
   const loading = mm_loading;
 
-  const { mint } = useMint(selectedItems, amount, configFields);
+  let { mint, response } = useMint(selectedItems, amount, configFields);
 
   const nfts = useGetNfts(
     configFields.wallet_address || configFields.recipient_address,
     configFields.collection_address
   );
+
+  // Reset the states of statuses if the selectedItems changes
+  useEffect(() => {
+    setApproved(false);
+    setMintResponse(null);
+    setReceipt(null);
+  }, [selectedItems]);
+
+  useEffect(() => {
+    setMintResponse(response);
+
+    if (response?.tx_id) {
+      const interval = setInterval(async () => {
+        try {
+          const receipt = await mm_getTransactionReceipt(response!.tx_id);
+          console.log("polling status ", receipt);
+
+          // if receipt is null means the transaction is still pending, no status yet
+          if (receipt) {
+            // stop polling when we receive a status either success or fail
+            if (receipt.status === 1 || receipt.status === 0) {
+              setReceipt(receipt);
+              clearInterval(interval);
+            }
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [response, mm_getTransactionReceipt]);
 
   useEffect(() => {
     setConfigFields(params);
@@ -192,9 +238,14 @@ function PrimarySale() {
   );
 
   const handleMint = useCallback(async () => {
+    setApproved(false);
+    setMintResponse(null);
+    setReceipt(null);
+
     const approved = await setApprove(amount);
     if (approved) {
       mint();
+      setApproved(true);
     }
   }, [mint, amount]);
 
@@ -368,28 +419,58 @@ function PrimarySale() {
               </Box>
               <Card>
                 <Card.Caption>
-                  <Banner
-                    variant="standard"
-                    sx={{ marginBottom: "base.spacing.x4" }}
-                  >
-                    <Banner.Title> Minting</Banner.Title>
-                    <Banner.Caption>
-                      Txn Hash |
-                      <Link
-                        sx={{ marginLeft: "base.spacing.x1" }}
-                        onClick={() => {
-                          const txnHash = "";
-                          window.open(
-                            `https://immutable-testnet.blockscout.com/#tx/${txnHash}`,
-                            "_blank"
-                          );
-                        }}
-                      >
-                        View in Block Explorer
-                        <Link.Icon icon="JumpTo" />
-                      </Link>
-                    </Banner.Caption>
-                  </Banner>
+                  <StatusCard
+                    status="Connect Wallet"
+                    description={"| " + address}
+                    variant={address ? "success" : "standard"}
+                  ></StatusCard>
+                  <StatusCard
+                    status="Approve Txn"
+                    description={approved ? "✅" : ""}
+                    variant={approved ? "success" : "standard"}
+                  ></StatusCard>
+                  <StatusCard
+                    status="Minting"
+                    description={
+                      mintResponse ? "Txn Hash | " + mintResponse.tx_id : ""
+                    }
+                    variant={mintResponse ? "success" : "standard"}
+                  ></StatusCard>
+                  <StatusCard
+                    status={
+                      receipt
+                        ? receipt.status === 1
+                          ? "Minted 🚀"
+                          : "Not Minted - Failed 🧐 | "
+                        : "Minted"
+                    }
+                    variant={
+                      receipt
+                        ? receipt.status === 1
+                          ? "success"
+                          : "fatal"
+                        : "standard"
+                    }
+                    extraContent={
+                      receipt ? (
+                        <>
+                          <Link
+                            variant="primary"
+                            sx={{ marginLeft: "base.spacing.x1" }}
+                            onClick={() => {
+                              window.open(
+                                `https://immutable-testnet.blockscout.com/tx/${mintResponse?.tx_id}`,
+                                "_blank"
+                              );
+                            }}
+                          >
+                            View on Block Explorer
+                            <Link.Icon icon="JumpTo" />
+                          </Link>
+                        </>
+                      ) : null
+                    }
+                  ></StatusCard>
                 </Card.Caption>
               </Card>
             </Box>

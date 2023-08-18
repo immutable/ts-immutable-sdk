@@ -77,7 +77,7 @@ export class Passport {
     return this.passportImxProviderFactory.getProviderWithDeviceFlow(deviceCode, interval, timeoutMs);
   }
 
-  getPKCEAuthorizationUrl(): string {
+  public getPKCEAuthorizationUrl(): string {
     return this.authManager.getPKCEAuthorizationUrl();
   }
 

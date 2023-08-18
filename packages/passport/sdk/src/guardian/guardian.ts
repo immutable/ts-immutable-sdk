@@ -9,12 +9,13 @@ import { retryWithDelay } from '../network/retry';
 import { JsonRpcError, RpcErrorCode } from '../zkEvm/JsonRpcError';
 import { MetaTransaction } from '../zkEvm/types';
 import { UserZkEvm } from '../types';
+import { PassportConfiguration } from '../config';
 
 export type GuardianClientParams = {
   accessToken: string;
-  imxPublicApiDomain: string;
   confirmationScreen: ConfirmationScreen;
   imxEtherAddress: string;
+  config: PassportConfiguration;
 };
 
 export type GuardianValidateParams = {
@@ -27,6 +28,9 @@ type GuardianEVMValidationParams = {
   user: UserZkEvm;
   metaTransactions: MetaTransaction[];
 };
+
+const transactionRejectedCrossSdkBridgeError = 'Transaction requires confirmation but this functionality is not'
+  + ' supported in this environment. Please contact Immutable support if you need to enable this feature.';
 
 export const convertBigNumberishToString = (
   value: ethers.BigNumberish,
@@ -61,20 +65,23 @@ export default class GuardianClient {
   // TODO: ID-977, make this rollup agnostic
   private readonly imxEtherAddress: string;
 
+  private readonly crossSdkBridgeEnabled: boolean;
+
   constructor({
-    imxPublicApiDomain,
     accessToken,
     confirmationScreen,
     imxEtherAddress,
+    config,
   }: GuardianClientParams) {
     this.confirmationScreen = confirmationScreen;
     this.transactionAPI = new guardian.TransactionsApi(
       new guardian.Configuration({
         accessToken,
-        basePath: imxPublicApiDomain,
+        basePath: config.imxPublicApiDomain,
       }),
     );
     this.imxEtherAddress = imxEtherAddress;
+    this.crossSdkBridgeEnabled = config.crossSdkBridgeEnabled;
   }
 
   /**
@@ -109,7 +116,7 @@ export default class GuardianClient {
     return this.withConfirmationScreenTask()(task);
   }
 
-  public async validate({ payloadHash }: GuardianValidateParams) {
+  public async validate({ payloadHash }: GuardianValidateParams): Promise<void> {
     const finallyFn = () => {
       this.confirmationScreen.closeWindow();
     };
@@ -135,6 +142,10 @@ export default class GuardianClient {
 
     const { confirmationRequired } = evaluateStarkexRes.data;
     if (confirmationRequired) {
+      if (this.crossSdkBridgeEnabled) {
+        throw new Error(transactionRejectedCrossSdkBridgeError);
+      }
+
       const confirmationResult = await this.confirmationScreen.startGuardianTransaction(
         payloadHash,
         this.imxEtherAddress,
@@ -197,6 +208,13 @@ export default class GuardianClient {
     });
 
     const { confirmationRequired, transactionId } = transactionEvaluationResponse;
+    if (confirmationRequired && this.crossSdkBridgeEnabled) {
+      throw new JsonRpcError(
+        RpcErrorCode.TRANSACTION_REJECTED,
+        transactionRejectedCrossSdkBridgeError,
+      );
+    }
+
     if (confirmationRequired && !!transactionId) {
       const confirmationResult = await this.confirmationScreen.startGuardianTransaction(
         transactionId,
@@ -207,8 +225,8 @@ export default class GuardianClient {
 
       if (!confirmationResult.confirmed) {
         throw new JsonRpcError(
-          RpcErrorCode.USER_REJECTED_REQUEST,
-          'Transaction rejected by user ',
+          RpcErrorCode.TRANSACTION_REJECTED,
+          'Transaction rejected by user',
         );
       }
     } else {
