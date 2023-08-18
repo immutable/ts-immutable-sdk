@@ -1,6 +1,7 @@
 import {
   ConsiderationItem,
   OrderComponents,
+  TipInputItem,
 } from '@opensea/seaport-js/lib/types';
 import { ERC721Item, Order } from 'openapi/sdk';
 import { constants } from 'ethers';
@@ -10,7 +11,7 @@ export function mapImmutableOrderToSeaportOrderComponents(
   order: Order,
   counter: string,
   zoneAddress: string,
-): OrderComponents {
+): [OrderComponents, Array<TipInputItem>] {
   const considerationItems: ConsiderationItem[] = order.buy.map((buyItem) => {
     switch (buyItem.item_type) {
       case 'NATIVE':
@@ -43,9 +44,8 @@ export function mapImmutableOrderToSeaportOrderComponents(
     }
   });
 
-  const fees: ConsiderationItem[] = order.fees.map((fee) => ({
-    startAmount: fee.amount,
-    endAmount: fee.amount,
+  const fees: TipInputItem[] = order.fees.map((fee) => ({
+    amount: fee.amount,
     itemType:
       order.buy[0].item_type === 'ERC20' ? ItemType.ERC20 : ItemType.NATIVE,
     recipient: fee.recipient,
@@ -56,9 +56,9 @@ export function mapImmutableOrderToSeaportOrderComponents(
     identifierOrCriteria: '0',
   }));
 
-  return {
+  return [{
     conduitKey: constants.HashZero,
-    consideration: [...considerationItems, ...fees],
+    consideration: [...considerationItems],
     offer: order.sell.map((sellItem) => {
       const erc721Item = sellItem as ERC721Item;
       return {
@@ -77,8 +77,9 @@ export function mapImmutableOrderToSeaportOrderComponents(
     salt: order.salt,
     offerer: order.account_address,
     zone: zoneAddress,
-    totalOriginalConsiderationItems: 2,
+    // this should be the fee exclusive number of items the user signed for
+    totalOriginalConsiderationItems: considerationItems.length,
     orderType: OrderType.FULL_RESTRICTED,
     zoneHash: constants.HashZero,
-  };
+  }, fees];
 }

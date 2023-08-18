@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - @imtbl/passport: Added SDK bridge support for native applications.
+- @imtbl/orderbook: Added optional fee parameter in create and fulfill order flows
+- @imtbl/orderbook: Changed the way we fulfill orders under the hood to make a call to fulfillment-data
 
 ## [0.9.0] - 2023-08-15
 ### Changed
@@ -22,7 +24,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - @imtbl/erc721-permissioned-mintable: Preset contract changes: Added `safeMintBatch` and `burnBatch` to support batch operations.
-- Optional Maker Marketplace fee when creating a listing
 
 ### Fixed
 

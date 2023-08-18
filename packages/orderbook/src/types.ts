@@ -41,7 +41,7 @@ export interface CreateListingParams {
   orderComponents: OrderComponents;
   orderHash: string;
   orderSignature: string;
-  fees?: Array<Fee>
+  makerFee?: Fee
 }
 
 // Expose the list order filtering and ordering directly from the openAPI SDK, except

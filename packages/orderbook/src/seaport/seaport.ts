@@ -5,6 +5,7 @@ import {
   ExchangeAction,
   OrderComponents,
   OrderUseCase,
+  TipInputItem,
 } from '@opensea/seaport-js/lib/types';
 import { PopulatedTransaction, providers } from 'ethers';
 import {
@@ -98,7 +99,7 @@ export class Seaport {
     account: string,
     extraData: string,
   ): Promise<FulfillOrderResponse> {
-    const orderComponents = await this.mapImmutableOrderToSeaportOrderComponents(order);
+    const [orderComponents, tipComponents] = this.mapImmutableOrderToSeaportOrderComponents(order);
     const seaportLib = this.getSeaportLib(order);
 
     const { actions: seaportActions } = await seaportLib.fulfillOrders({
@@ -110,6 +111,7 @@ export class Seaport {
             signature: order.signature,
           },
           extraData,
+          tips: tipComponents,
         },
       ],
     });
@@ -151,7 +153,7 @@ export class Seaport {
     order: Order,
     account: string,
   ): Promise<PopulatedTransaction> {
-    const orderComponents = await this.mapImmutableOrderToSeaportOrderComponents(order);
+    const [orderComponents] = this.mapImmutableOrderToSeaportOrderComponents(order);
     const seaportLib = this.getSeaportLib(order);
 
     const cancellationTransaction = await seaportLib.cancelOrders(
@@ -164,7 +166,7 @@ export class Seaport {
 
   private mapImmutableOrderToSeaportOrderComponents(
     order: Order,
-  ): OrderComponents {
+  ): [OrderComponents, Array<TipInputItem>] {
     const orderCounter = order.protocol_data.counter;
     return mapImmutableOrderToSeaportOrderComponents(
       order,

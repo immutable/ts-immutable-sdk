@@ -44,7 +44,7 @@ export class ImmutableApiClient {
     orderHash,
     orderComponents,
     orderSignature,
-    fees,
+    makerFee,
   }: CreateListingParams): Promise<ListingResult> {
     if (orderComponents.offer.length !== 1) {
       throw new Error('Only one item can be listed at a time');
@@ -78,7 +78,7 @@ export class ImmutableApiClient {
             contract_address: orderComponents.consideration[0].token,
           },
         ],
-        fees: fees ?? [],
+        fees: makerFee ? [makerFee] : [],
         end_time: new Date(
           parseInt(`${orderComponents.endTime.toString()}000`, 10),
         ).toISOString(),

@@ -150,14 +150,12 @@ export class Orderbook {
   async fulfillOrder(
     listingId: string,
     takerAddress: string,
-    // TODO: Allow taker fee when backend support is available
-    // takerFee?: Fee,
+    takerFee?: Fee,
   ): Promise<FulfillOrderResponse> {
     const fulfillmentDataRes = await this.apiClient.fulfillmentData([
       {
         order_id: listingId,
-        // fee: takerFee,
-        fee: undefined,
+        fee: takerFee,
       },
     ]);
 
