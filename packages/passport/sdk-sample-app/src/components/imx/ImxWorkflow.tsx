@@ -72,8 +72,8 @@ function ImxWorkflow() {
             {showTrade
               && (
                 <Trade
-                  showTrade={showTrade}
-                  setShowTrade={setShowTrade}
+                  showModal={showTrade}
+                  setShowModal={setShowTrade}
                 />
               )}
             <WorkflowButton
@@ -85,8 +85,8 @@ function ImxWorkflow() {
             {showOrder
               && (
                 <Order
-                  show={showOrder}
-                  setShow={setShowOrder}
+                  showModal={showOrder}
+                  setShowModal={setShowOrder}
                 />
               )}
             <WorkflowButton
@@ -98,8 +98,8 @@ function ImxWorkflow() {
             {showTransfer
               && (
                 <Transfer
-                  showTransfer={showTransfer}
-                  setShowTransfer={setShowTransfer}
+                  showModal={showTransfer}
+                  setShowModal={setShowTransfer}
                 />
               )}
             <WorkflowButton
@@ -111,8 +111,8 @@ function ImxWorkflow() {
             {showBulkTransfer
               && (
                 <BulkTransfer
-                  showBulkTransfer={showBulkTransfer}
-                  setShowBulkTransfer={setShowBulkTransfer}
+                  showModal={showBulkTransfer}
+                  setShowModal={setShowBulkTransfer}
                 />
               )}
             <WorkflowButton
