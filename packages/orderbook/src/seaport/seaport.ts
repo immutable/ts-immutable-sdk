@@ -99,7 +99,7 @@ export class Seaport {
     account: string,
     extraData: string,
   ): Promise<FulfillOrderResponse> {
-    const [orderComponents, tipComponents] = this.mapImmutableOrderToSeaportOrderComponents(order);
+    const { orderComponents, tips } = this.mapImmutableOrderToSeaportOrderComponents(order);
     const seaportLib = this.getSeaportLib(order);
 
     const { actions: seaportActions } = await seaportLib.fulfillOrders({
@@ -111,7 +111,7 @@ export class Seaport {
             signature: order.signature,
           },
           extraData,
-          tips: tipComponents,
+          tips,
         },
       ],
     });
@@ -153,7 +153,7 @@ export class Seaport {
     order: Order,
     account: string,
   ): Promise<PopulatedTransaction> {
-    const [orderComponents] = this.mapImmutableOrderToSeaportOrderComponents(order);
+    const { orderComponents } = this.mapImmutableOrderToSeaportOrderComponents(order);
     const seaportLib = this.getSeaportLib(order);
 
     const cancellationTransaction = await seaportLib.cancelOrders(
@@ -166,7 +166,7 @@ export class Seaport {
 
   private mapImmutableOrderToSeaportOrderComponents(
     order: Order,
-  ): [OrderComponents, Array<TipInputItem>] {
+  ): { orderComponents: OrderComponents, tips: Array<TipInputItem> } {
     const orderCounter = order.protocol_data.counter;
     return mapImmutableOrderToSeaportOrderComponents(
       order,

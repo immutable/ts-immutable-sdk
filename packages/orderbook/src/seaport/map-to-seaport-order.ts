@@ -11,7 +11,7 @@ export function mapImmutableOrderToSeaportOrderComponents(
   order: Order,
   counter: string,
   zoneAddress: string,
-): [OrderComponents, Array<TipInputItem>] {
+): { orderComponents: OrderComponents, tips: Array<TipInputItem> } {
   const considerationItems: ConsiderationItem[] = order.buy.map((buyItem) => {
     switch (buyItem.item_type) {
       case 'NATIVE':
@@ -56,30 +56,33 @@ export function mapImmutableOrderToSeaportOrderComponents(
     identifierOrCriteria: '0',
   }));
 
-  return [{
-    conduitKey: constants.HashZero,
-    consideration: [...considerationItems],
-    offer: order.sell.map((sellItem) => {
-      const erc721Item = sellItem as ERC721Item;
-      return {
-        startAmount: '1',
-        endAmount: '1',
-        itemType: ItemType.ERC721,
-        token: erc721Item.contract_address!,
-        identifierOrCriteria: erc721Item.token_id,
-      };
-    }),
-    counter,
-    endTime: Math.round(new Date(order.end_time).getTime() / 1000).toString(),
-    startTime: Math.round(
-      new Date(order.start_time).getTime() / 1000,
-    ).toString(),
-    salt: order.salt,
-    offerer: order.account_address,
-    zone: zoneAddress,
-    // this should be the fee exclusive number of items the user signed for
-    totalOriginalConsiderationItems: considerationItems.length,
-    orderType: OrderType.FULL_RESTRICTED,
-    zoneHash: constants.HashZero,
-  }, fees];
+  return {
+    orderComponents: {
+      conduitKey: constants.HashZero,
+      consideration: [...considerationItems],
+      offer: order.sell.map((sellItem) => {
+        const erc721Item = sellItem as ERC721Item;
+        return {
+          startAmount: '1',
+          endAmount: '1',
+          itemType: ItemType.ERC721,
+          token: erc721Item.contract_address!,
+          identifierOrCriteria: erc721Item.token_id,
+        };
+      }),
+      counter,
+      endTime: Math.round(new Date(order.end_time).getTime() / 1000).toString(),
+      startTime: Math.round(
+        new Date(order.start_time).getTime() / 1000,
+      ).toString(),
+      salt: order.salt,
+      offerer: order.account_address,
+      zone: zoneAddress,
+      // this should be the fee exclusive number of items the user signed for
+      totalOriginalConsiderationItems: considerationItems.length,
+      orderType: OrderType.FULL_RESTRICTED,
+      zoneHash: constants.HashZero,
+    },
+    tips: fees,
+  };
 }
