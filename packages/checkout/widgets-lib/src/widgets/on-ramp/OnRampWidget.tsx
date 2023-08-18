@@ -24,7 +24,7 @@ export function OnRampWidget(props: BridgeWidgetProps) {
     ? 'https://global-stg.transak.com?apiKey=41ad2da7-ed5a-4d89-a90b-c751865effc2'
     : '';
 
-  const configurations = 'exchangeScreenTitle=onramp%20crypto';
+  const configurations = 'exchangeScreenTitle=BUY';
 
   const finalUrl = `${url}&${configurations}`;
   const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
