@@ -31,14 +31,15 @@ import {
   createTrade,
 } from './workflows';
 import { ConfirmationScreen } from '../confirmation';
+import { PassportConfiguration } from '../config';
 
-export type PassportImxProviderInput = {
+export interface PassportImxProviderInput {
   user: UserImx;
   starkSigner: StarkSigner;
   immutableXClient: ImmutableXClient;
   confirmationScreen: ConfirmationScreen;
-  imxPublicApiDomain: string;
-};
+  config: PassportConfiguration;
+}
 
 export class PassportImxProvider implements IMXProvider {
   private readonly user: UserImx;
@@ -55,18 +56,18 @@ export class PassportImxProvider implements IMXProvider {
     user,
     starkSigner,
     immutableXClient,
-    imxPublicApiDomain,
     confirmationScreen,
+    config,
   }: PassportImxProviderInput) {
     this.user = user;
     this.starkSigner = starkSigner;
     this.immutableXClient = immutableXClient;
     this.confirmationScreen = confirmationScreen;
     this.guardianClient = new GuardianClient({
-      imxPublicApiDomain,
       accessToken: user.accessToken,
       confirmationScreen,
       imxEtherAddress: user.imx.ethAddress,
+      config,
     });
   }
 

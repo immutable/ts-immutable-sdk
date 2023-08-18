@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- @imtbl/passport: Added SDK bridge support for native applications.
+
+## [0.9.0] - 2023-08-15
+### Changed
+
+- @imtbl/orderbook: Changed how transactions and signable messages are returned from `prepareListing` and `prepareFulfillment` to ensure transactions gas limits can be estimated in order.
+- @imtbl/orderbook: Updated sandbox config to reference testnet contract addresses.
+
 ## [0.7.0] - 2023-08-14
 
 ### Added

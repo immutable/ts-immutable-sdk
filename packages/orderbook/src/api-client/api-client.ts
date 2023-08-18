@@ -6,7 +6,9 @@ import {
   OrdersService,
 } from 'openapi/sdk';
 import { CreateListingParams, ListListingsParams } from 'types';
-import { ItemType, SEAPORT_CONTRACT_VERSION_V1_4 } from '../seaport';
+import { FulfillmentDataResult } from 'openapi/sdk/models/FulfillmentDataResult';
+import { FulfillmentDataRequest } from 'openapi/sdk/models/FulfillmentDataRequest';
+import { ItemType, SEAPORT_CONTRACT_VERSION_V1_5 } from '../seaport';
 
 export class ImmutableApiClient {
   constructor(
@@ -14,6 +16,14 @@ export class ImmutableApiClient {
     private readonly chainName: string,
     private readonly seaportAddress: string,
   ) {}
+
+  async fulfillmentData(requests: Array<FulfillmentDataRequest>):
+  Promise<{ result: FulfillmentDataResult[] }> {
+    return this.orderbookService.fulfillmentData({
+      chainName: this.chainName,
+      requestBody: requests,
+    });
+  }
 
   async getListing(listingId: string): Promise<ListingResult> {
     return this.orderbookService.getListing({
@@ -85,7 +95,7 @@ export class ImmutableApiClient {
           order_type: CreateOrderProtocolData.order_type.FULL_RESTRICTED,
           zone_address: orderComponents.zone,
           seaport_address: this.seaportAddress,
-          seaport_version: SEAPORT_CONTRACT_VERSION_V1_4,
+          seaport_version: SEAPORT_CONTRACT_VERSION_V1_5,
           counter: orderComponents.counter.toString(),
         },
         salt: orderComponents.salt,

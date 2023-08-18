@@ -1,5 +1,7 @@
 /**
  * ProviderErrors should take priority over RpcErrorCodes
+ * https://eips.ethereum.org/EIPS/eip-1193#provider-errors
+ * https://eips.ethereum.org/EIPS/eip-1474#error-codes
  */
 export enum ProviderErrorCode {
   USER_REJECTED_REQUEST = 4001,
@@ -15,7 +17,7 @@ export enum RpcErrorCode {
   INVALID_PARAMS = -32602,
   INTERNAL_ERROR = -32603,
   PARSE_ERROR = -32700,
-  USER_REJECTED_REQUEST = -32003,
+  TRANSACTION_REJECTED = -32003,
 }
 
 export class JsonRpcError extends Error {

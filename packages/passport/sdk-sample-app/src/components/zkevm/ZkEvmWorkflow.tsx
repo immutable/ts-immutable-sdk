@@ -30,8 +30,8 @@ function ZkEvmWorkflow() {
             {showRequest
               && (
                 <Request
-                  showRequest={showRequest}
-                  setShowRequest={setShowRequest}
+                  showModal={showRequest}
+                  setShowModal={setShowRequest}
                 />
               )}
           </>

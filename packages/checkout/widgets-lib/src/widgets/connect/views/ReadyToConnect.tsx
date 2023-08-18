@@ -1,7 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { ChainId, Checkout } from '@imtbl/checkout-sdk';
+import { ChainId, Checkout, WalletProviderName } from '@imtbl/checkout-sdk';
 import {
-  useContext, useState, useCallback, useMemo,
+  useContext, useState, useCallback, useMemo, useEffect,
 } from 'react';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../../components/Footer/FooterButton';
@@ -16,6 +16,7 @@ import {
   ViewContext,
   ViewActions,
 } from '../../../context/view-context/ViewContext';
+import { isMetaMaskProvider, isPassportProvider } from '../../../lib/providerUtils';
 
 export interface ReadyToConnectProps {
   targetChainId: ChainId;
@@ -27,7 +28,29 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
   } = useContext(ConnectContext);
   const { viewState: { history }, viewDispatch } = useContext(ViewContext);
 
-  const isPassport = useMemo(() => (provider?.provider as any)?.isPassport, [provider]);
+  const isPassport = isPassportProvider(provider);
+  const isMetaMask = isMetaMaskProvider(provider);
+
+  // make sure wallet provider name is set if coming directly to this screen
+  // and not through the wallet list
+  useEffect(() => {
+    if (isPassport) {
+      connectDispatch({
+        payload: {
+          type: ConnectActions.SET_WALLET_PROVIDER_NAME,
+          walletProviderName: WalletProviderName.PASSPORT,
+        },
+      });
+    }
+    if (isMetaMask) {
+      connectDispatch({
+        payload: {
+          type: ConnectActions.SET_WALLET_PROVIDER_NAME,
+          walletProviderName: WalletProviderName.METAMASK,
+        },
+      });
+    }
+  }, [isPassport, isMetaMask]);
 
   const textView = () => {
     if (isPassport) {
@@ -89,7 +112,6 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
         const connectResult = await checkout.connect({
           provider,
         });
-
         connectDispatch({
           payload: {
             type: ConnectActions.SET_PROVIDER,

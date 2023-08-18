@@ -1,19 +1,23 @@
 import React from 'react';
 import { WalletProviderName } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
+import { BiomeCombinedProviders } from '@biom3/react';
+import { onDarkBase } from '@biom3/design-tokens';
 import { BridgeWidget, BridgeWidgetParams } from './BridgeWidget';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
 import { ConnectTargetLayer, getL1ChainId } from '../../lib';
 import { ConnectLoader, ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
 import { sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
 import { isValidAddress, isValidAmount, isValidWalletProvider } from '../../lib/validations/widgetValidators';
+import { isPassportProvider } from '../../lib/providerUtils';
+import { BridgeComingSoon } from './views/BridgeComingSoon';
 
 export class ImmutableBridge extends ImmutableWebComponent {
   fromContractAddress = '';
 
   amount = '';
 
-  walletProvider: WalletProviderName = WalletProviderName.METAMASK;
+  walletProvider: WalletProviderName | undefined = undefined;
 
   connectedCallback() {
     super.connectedCallback();
@@ -21,7 +25,7 @@ export class ImmutableBridge extends ImmutableWebComponent {
     this.amount = this.getAttribute('amount') ?? '';
     this.walletProvider = this.getAttribute(
       'walletProvider',
-    )?.toLowerCase() as WalletProviderName ?? WalletProviderName.METAMASK;
+    )?.toLowerCase() as WalletProviderName;
 
     this.renderWidget();
   }
@@ -30,7 +34,7 @@ export class ImmutableBridge extends ImmutableWebComponent {
     if (!isValidWalletProvider(this.walletProvider)) {
       // eslint-disable-next-line no-console
       console.warn('[IMTBL]: invalid "walletProvider" widget input');
-      this.walletProvider = WalletProviderName.METAMASK;
+      this.walletProvider = undefined;
     }
 
     if (!isValidAmount(this.amount)) {
@@ -66,19 +70,28 @@ export class ImmutableBridge extends ImmutableWebComponent {
     if (!this.reactRoot) {
       this.reactRoot = ReactDOM.createRoot(this);
     }
+    const showBridgeComingSoonScreen = isPassportProvider(this.provider)
+    || this.walletProvider === WalletProviderName.PASSPORT;
 
     this.reactRoot.render(
       <React.StrictMode>
-        <ConnectLoader
-          params={connectLoaderParams}
-          closeEvent={sendBridgeWidgetCloseEvent}
-          widgetConfig={this.widgetConfig!}
-        >
-          <BridgeWidget
-            params={params}
-            config={this.widgetConfig!}
-          />
-        </ConnectLoader>
+        {showBridgeComingSoonScreen && (
+        <BiomeCombinedProviders theme={{ base: onDarkBase }}>
+          <BridgeComingSoon onCloseEvent={sendBridgeWidgetCloseEvent} />
+        </BiomeCombinedProviders>
+        )}
+        {!showBridgeComingSoonScreen && (
+          <ConnectLoader
+            params={connectLoaderParams}
+            closeEvent={sendBridgeWidgetCloseEvent}
+            widgetConfig={this.widgetConfig!}
+          >
+            <BridgeWidget
+              params={params}
+              config={this.widgetConfig!}
+            />
+          </ConnectLoader>
+        )}
       </React.StrictMode>,
     );
   }

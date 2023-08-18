@@ -8,7 +8,7 @@ function WalletWebView() {
   };
 
   return (
-    <imtbl-wallet widgetConfig={JSON.stringify(config)} walletProvider="metamask" />
+    <imtbl-wallet widgetConfig={JSON.stringify(config)} />
   );
 }
 

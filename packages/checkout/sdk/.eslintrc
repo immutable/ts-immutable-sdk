@@ -7,6 +7,7 @@
     "tsconfigRootDir": "."
   },
   "rules": {
-    "max-len": ["error", { "comments": 140, "code": 120 }]
+    "max-len": ["error", { "comments": 140, "code": 120 }],
+    "no-continue": 0
   }
 }

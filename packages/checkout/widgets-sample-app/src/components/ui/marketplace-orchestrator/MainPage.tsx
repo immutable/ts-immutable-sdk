@@ -11,12 +11,12 @@ import { Passport } from '@imtbl/passport';
 import { passportConfig } from './passportConfig';
 
 export const MainPage = () => {
-  
   // local state for enabling/disabling and changing buttons
   const [doneSwap, setDoneSwap] = useState<boolean>(false);
   const [web3Provider, setWeb3Provider] = useState<Web3Provider|undefined>(undefined);
 
   const passport = useMemo(() => new Passport(passportConfig), [passportConfig]);
+  const [passportInstance, setpassportInstance]= useState<Passport|undefined>(undefined);
 
   const setPassportProvider = useCallback(() => {
     if(passport) {
@@ -25,6 +25,14 @@ export const MainPage = () => {
     }
   }, [passport]);
 
+  const passPassportInstance = useCallback(() => {
+    setpassportInstance(passport)
+  }, [passport]);
+  
+  const removePassportInstance = useCallback(() => {
+    setpassportInstance(undefined);
+  }, []);
+  
   // widget context state for showing/hiding widgets
   const {showWidgets: {
     showConnect,
@@ -48,6 +56,14 @@ export const MainPage = () => {
     setShowWidgets({...hideAllWidgets, showWallet: {show: true, data: {}}});
   }, [setShowWidgets])
 
+  const openSwapWidget = useCallback(() => {
+    setShowWidgets({...hideAllWidgets, showSwap: {show: true, data: {}}});
+  }, [setShowWidgets])
+
+  const openBridgeWidget = useCallback(() => {
+    setShowWidgets({...hideAllWidgets, showBridge: {show: true, data: {}}});
+  }, [setShowWidgets])
+
   const handleBuyClick = () => {
     alert("you can buy now");
   }
@@ -68,6 +84,10 @@ export const MainPage = () => {
       {web3Provider && (
         <Button onClick={openWalletWidget}>My Wallet</Button>
       )}
+      <Button onClick={openSwapWidget}>Open Swap</Button>
+      <Button onClick={openBridgeWidget}>Open Bridge</Button>
+      <Button onClick={passPassportInstance}>Pass Passport Instance</Button>
+      {passportInstance && <Button onClick={removePassportInstance}>Remove Passport Instance</Button>}
       <Button onClick={setPassportProvider}>Set Passport Provider</Button>
       {passport && web3Provider && (web3Provider.provider as any)?.isPassport && <Button onClick={logout}>Passport Logout</Button>}
       </Box>
@@ -86,7 +106,8 @@ export const MainPage = () => {
                 </Box>
               ))}
           </Box>
-          <ImtblWidgets 
+          <ImtblWidgets
+            passport={passportInstance}
             web3Provider={web3Provider} 
             showConnect={showConnect} 
             showWallet={showWallet} 

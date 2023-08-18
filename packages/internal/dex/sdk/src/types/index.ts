@@ -20,25 +20,25 @@ export type Chain = {
 
 /**
  * Interface representing the secondary fees for a swap
- * @property {string} feeRecipient - The fee recipient address
- * @property {number} feeBasisPoints - The fee percentage in basis points
+ * @property {string} recipient - The fee recipient address
+ * @property {number} basisPoints - The fee percentage in basis points
  * @example 100 basis points = 1%
  */
 export type SecondaryFee = {
-  feeRecipient: string;
-  feeBasisPoints: number;
+  recipient: string;
+  basisPoints: number;
 };
 
 /**
  * Interface representing the fees returned in the quote
- * @property {string} feeRecipient - The fee recipient address
- * @property {number} feeBasisPoints - The fee percentage in basis points
+ * @property {string} recipient - The fee recipient address
+ * @property {number} basisPoints - The fee percentage in basis points
  * @property {Amount} amount - The amount of the fee
  * @example 100 basis points = 1% = 1 IMX
  */
 export type Fee = {
-  feeRecipient: string;
-  feeBasisPoints: number;
+  recipient: string;
+  basisPoints: number;
   amount: Amount;
 };
 
