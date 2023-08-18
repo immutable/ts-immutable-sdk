@@ -3752,7 +3752,7 @@ __metadata:
     "@jest/globals": ^29.5.0
     "@magic-ext/oidc": ^1.0.1
     "@metamask/detect-provider": ^2.0.0
-    "@opensea/seaport-js": 2.0.5
+    "@opensea/seaport-js": 2.0.7
     "@rollup/plugin-commonjs": ^24.0.1
     "@rollup/plugin-json": ^6.0.0
     "@rollup/plugin-node-resolve": ^15.0.2
@@ -5241,17 +5241,6 @@ __metadata:
   version: 1.0.3
   resolution: "@open-draft/until@npm:1.0.3"
   checksum: 323e92ebef0150ed0f8caedc7d219b68cdc50784fa4eba0377eef93533d3f46514eb2400ced83dda8c51bddc3d2c7b8e9cf95e5ec85ab7f62dfc015d174f62f2
-  languageName: node
-  linkType: hard
-
-"@opensea/seaport-js@npm:2.0.5":
-  version: 2.0.5
-  resolution: "@opensea/seaport-js@npm:2.0.5"
-  dependencies:
-    "@0xsequence/multicall": ^0.43.29
-    ethers: ^5.7.2
-    merkletreejs: ^0.3.10
-  checksum: b00ee0eaec34a32af1da038c37ec0506519fbfb7397df090d0ada56c26f39b1e5f832d294de0e59df63e5d59616df3146efb489e710b5691fe64a0fbaad893f5
   languageName: node
   linkType: hard
 
