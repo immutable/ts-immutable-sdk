@@ -76,6 +76,8 @@ export const hasERC20Allowances = async (
   const insufficientERC20s = new Map<string, SufficientAllowance>();
   const transactionPromises = new Map<string, Promise<TransactionRequest | undefined>>();
 
+  // Populate maps for both the ERC20 data and promises to get the allowance using the same key
+  // so the promise and data can be linked together when the promise resolves
   for (const itemRequirement of itemRequirements) {
     if (itemRequirement.type !== ItemType.ERC20) continue;
     const { contractAddress, spenderAddress } = itemRequirement;
@@ -89,10 +91,13 @@ export const hasERC20Allowances = async (
   const allowances = await Promise.all(allowancePromises.values());
   const allowancePromiseIds = Array.from(allowancePromises.keys());
 
+  // Iterate through the allowance promises and get the ERC20 data from the ERC20 map
+  // If the allowance returned for that ERC20 is sufficient then just set the item requirements
+  // If the allowance is insufficient then set the delta and a promise for the approval transaction
   for (let index = 0; index < allowances.length; index++) {
     const itemRequirement = erc20s.get(allowancePromiseIds[index]);
-
     if (!itemRequirement || itemRequirement.type !== ItemType.ERC20) continue;
+
     if (allowances[index].gte(itemRequirement.amount)) {
       sufficientAllowances.push({
         sufficient: true,
@@ -101,9 +106,10 @@ export const hasERC20Allowances = async (
       continue;
     }
 
-    sufficient = false;
+    sufficient = false; // Set sufficient false on the root of the return object when an ERC20 is insufficient
     const { contractAddress, spenderAddress } = itemRequirement;
     const delta = itemRequirement.amount.sub(allowances[index]);
+    // Create maps for both the insufficient ERC20 data and the transaction promises using the same key so the results can be merged
     insufficientERC20s.set(
       `${contractAddress}${spenderAddress}`,
       {
@@ -125,6 +131,7 @@ export const hasERC20Allowances = async (
     );
   }
 
+  // Resolves the approval transactions and merges them with the insufficient ERC20 data
   const transactions = await Promise.all(transactionPromises.values());
   const transactionPromiseIds = Array.from(allowancePromises.keys());
   transactions.forEach((transaction, index) => {
@@ -134,5 +141,6 @@ export const hasERC20Allowances = async (
     insufficientERC20.approvalTransaction = transaction;
   });
 
+  // Merge the allowance arrays to get both the sufficient allowances and the insufficient ERC20 allowances
   return { sufficient, allowances: sufficientAllowances.concat(Array.from(insufficientERC20s.values())) };
 };
