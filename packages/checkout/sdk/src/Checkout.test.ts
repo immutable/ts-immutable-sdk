@@ -32,7 +32,7 @@ import * as network from './network';
 import { createProvider, isWeb3Provider, validateProvider } from './provider';
 import { getTokenAllowList } from './tokens';
 import { getWalletAllowList } from './wallet';
-import { buy } from './buy';
+import { buy } from './smartCheckout/buy';
 import { smartCheckout } from './smartCheckout';
 
 jest.mock('./connect');
@@ -44,7 +44,7 @@ jest.mock('./readOnlyProviders/readOnlyProvider');
 jest.mock('./provider');
 jest.mock('./tokens');
 jest.mock('./wallet');
-jest.mock('./buy');
+jest.mock('./smartCheckout/buy');
 jest.mock('./smartCheckout');
 
 describe('Connect', () => {
