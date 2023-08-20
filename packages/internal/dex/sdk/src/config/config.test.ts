@@ -255,6 +255,13 @@ describe('ExchangeConfiguration', () => {
         },
       ];
 
+      const secondaryFeesWithZeroBasisPoints = [
+        {
+          recipient: dummyFeeRecipient,
+          basisPoints: 0,
+        },
+      ];
+
       const rpcURL = 'https://anrpcurl.net';
       const overrides: ExchangeOverrides = {
         rpcURL,
@@ -279,6 +286,15 @@ describe('ExchangeConfiguration', () => {
         overrides,
       })).toThrow(new InvalidConfigurationError(
         'Invalid total secondary fee basis points: 11000',
+      ));
+
+      expect(() => new ExchangeConfiguration({
+        baseConfig: immutableConfig,
+        chainId,
+        secondaryFees: secondaryFeesWithZeroBasisPoints,
+        overrides,
+      })).toThrow(new InvalidConfigurationError(
+        'Invalid secondary fee basis points: 0',
       ));
     });
 
