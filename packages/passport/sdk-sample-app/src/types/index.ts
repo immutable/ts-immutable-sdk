@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction, PropsWithChildren } from 'react';
 import { RequestArguments } from '@imtbl/passport';
+import { Order } from '@imtbl/core-sdk';
 
 export enum EnvironmentNames {
   DEV = 'dev',
@@ -15,29 +16,14 @@ export interface EnvironmentPropsType {
   disabled: boolean
 }
 
-export interface BulkTransferProps {
-  showBulkTransfer: boolean
-  setShowBulkTransfer: Dispatch<SetStateAction<boolean>>
+export interface ModalProps {
+  showModal: boolean;
+  setShowModal: Dispatch<SetStateAction<boolean>>;
 }
 
-export interface TransferProps {
-  showTransfer: boolean
-  setShowTransfer: Dispatch<SetStateAction<boolean>>
-}
-
-export interface TradeProps {
-  showTrade: boolean
-  setShowTrade: Dispatch<SetStateAction<boolean>>
-}
-
-export interface OrderProps {
-  show: boolean
-  setShow: Dispatch<SetStateAction<boolean>>
-}
-
-export interface RequestProps {
-  showRequest: boolean;
-  setShowRequest: Dispatch<SetStateAction<boolean>>;
+export interface MakeOfferModalProps extends ModalProps {
+  order?: Order;
+  onClose?: () => void;
 }
 
 export interface RequestExampleProps {
