@@ -9,14 +9,14 @@ import {
 } from 'react-bootstrap';
 import { Heading } from '@biom3/react';
 import { Asset, Order as OrderType, UnsignedOrderRequest } from '@imtbl/core-sdk';
-import { OrderProps } from '@/types';
+import { ModalProps } from '@/types';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { useStatusProvider } from '@/context/StatusProvider';
 import { usePassportProvider } from '@/context/PassportProvider';
 
 type AssetWithSellOrder = { asset: Asset; sellOrder?: OrderType };
 
-function Order({ show, setShow }: OrderProps) {
+function Order({ showModal, setShowModal }: ModalProps) {
   const [userAssets, setUserAssets] = useState<AssetWithSellOrder[]>([]);
   const [needReload, setNeedReload] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -42,7 +42,7 @@ function Order({ show, setShow }: OrderProps) {
   }, [coreSdkClient, imxProvider]);
 
   useEffect(() => {
-    if (show) {
+    if (showModal) {
       (async () => {
         setLoading(true);
         setUserAssets([]);
@@ -52,7 +52,7 @@ function Order({ show, setShow }: OrderProps) {
         setLoading(false);
       })();
     }
-  }, [getUserAssetsWithOrder, show]);
+  }, [getUserAssetsWithOrder, showModal]);
 
   useEffect(() => {
     if (needReload) {
@@ -76,8 +76,8 @@ function Order({ show, setShow }: OrderProps) {
   }, [getUserAssetsWithOrder]);
 
   const handleClose = useCallback(() => {
-    setShow(false);
-  }, [setShow]);
+    setShowModal(false);
+  }, [setShowModal]);
 
   const cancelOrder = useCallback(async (id: number) => {
     if (!imxProvider) {
@@ -198,7 +198,7 @@ function Order({ show, setShow }: OrderProps) {
 
   return (
     <Offcanvas
-      show={show}
+      show={showModal}
       onHide={handleClose}
       backdrop="static"
       placement="end"

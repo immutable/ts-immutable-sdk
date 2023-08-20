@@ -9,7 +9,7 @@ import {
 } from 'react-bootstrap';
 import { Heading } from '@biom3/react';
 import { Asset, NftTransferDetails } from '@imtbl/core-sdk';
-import { BulkTransferProps } from '@/types';
+import { ModalProps } from '@/types';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { usePassportProvider } from '@/context/PassportProvider';
 import { useStatusProvider } from '@/context/StatusProvider';
@@ -21,7 +21,7 @@ interface Transfer {
   tokenAddress: string;
 }
 
-function BulkTransfer({ showBulkTransfer, setShowBulkTransfer }: BulkTransferProps) {
+function BulkTransfer({ showModal, setShowModal }: ModalProps) {
   const [isInvalid, setInvalid] = useState<boolean | undefined>(undefined);
   const [loadingTransfer, setLoadingTransfer] = useState<boolean>(false);
   const [loadingAssets, setLoadingAssets] = useState<boolean>(false);
@@ -46,7 +46,7 @@ function BulkTransfer({ showBulkTransfer, setShowBulkTransfer }: BulkTransferPro
   useEffect(() => {
     (async () => {
       setLoadingAssets(true);
-      if (showBulkTransfer) {
+      if (showModal) {
         setAssets([]);
 
         const imxWalletAddress = await imxProvider?.getAddress();
@@ -55,7 +55,7 @@ function BulkTransfer({ showBulkTransfer, setShowBulkTransfer }: BulkTransferPro
         setLoadingAssets(false);
       }
     })();
-  }, [showBulkTransfer, coreSdkClient, imxProvider]);
+  }, [showModal, coreSdkClient, imxProvider]);
 
   const resetForm = () => {
     setTransfers([]);
@@ -65,7 +65,7 @@ function BulkTransfer({ showBulkTransfer, setShowBulkTransfer }: BulkTransferPro
   const handleClose = () => {
     resetForm();
     setLoadingTransfer(false);
-    setShowBulkTransfer(false);
+    setShowModal(false);
   };
 
   const addTransfer = () => {
@@ -125,7 +125,7 @@ function BulkTransfer({ showBulkTransfer, setShowBulkTransfer }: BulkTransferPro
 
   return (
     <Offcanvas
-      show={showBulkTransfer}
+      show={showModal}
       onHide={handleClose}
       backdrop="static"
       placement="end"
