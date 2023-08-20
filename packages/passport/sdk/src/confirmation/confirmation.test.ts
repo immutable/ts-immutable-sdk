@@ -4,9 +4,9 @@
 import { TransactionApprovalRequestChainTypeEnum } from '@imtbl/guardian';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import ConfirmationScreen from './confirmation';
-import { Transaction, TransactionTypes } from './types';
-import { PassportConfiguration } from '../config';
 import SpyInstance = jest.SpyInstance;
+import { testConfig } from '../test/mocks';
+import { PassportConfiguration } from '../config';
 
 let windowSpy: SpyInstance;
 const closeMock = jest.fn();
@@ -35,21 +35,30 @@ describe('confirmation', () => {
     windowSpy.mockRestore();
   });
 
-  const config = new PassportConfiguration({
-    baseConfig: new ImmutableConfiguration({
-      environment: Environment.SANDBOX,
-    }),
-    clientId: 'clientId123',
-    logoutRedirectUri: 'http://localhost:3000',
-    redirectUri: 'http://localhost:3000',
-  });
-
-  const confirmationScreen = new ConfirmationScreen(config);
+  const confirmationScreen = new ConfirmationScreen(testConfig);
 
   describe('loading', () => {
     it('will loading the confirmation screen', () => {
       confirmationScreen.loading();
       expect(mockedOpen).toHaveBeenCalledTimes(1);
+    });
+
+    describe('crossSdkBridgeEnabled', () => {
+      it('does not open the confirmation popup if the cross sdk bridge flag is enabled', () => {
+        const config = new PassportConfiguration({
+          baseConfig: new ImmutableConfiguration({
+            environment: Environment.SANDBOX,
+          }),
+          clientId: 'client123',
+          logoutRedirectUri: 'http://localhost:3000/logout',
+          redirectUri: 'http://localhost:3000/callback',
+          crossSdkBridgeEnabled: true,
+        });
+        const confirmation = new ConfirmationScreen(config);
+
+        confirmation.loading();
+        expect(mockedOpen).toHaveBeenCalledTimes(0);
+      });
     });
   });
 
@@ -61,10 +70,10 @@ describe('confirmation', () => {
     });
   });
 
-  describe('startGuardianTransaction', () => {
+  describe('requestConfirmation', () => {
     it('should handle popup window opened', async () => {
       const transactionId = 'transactionId123';
-      const res = await confirmationScreen.startGuardianTransaction(
+      const res = await confirmationScreen.requestConfirmation(
         transactionId,
         mockEtherAddress,
         TransactionApprovalRequestChainTypeEnum.Starkex,
@@ -73,33 +82,6 @@ describe('confirmation', () => {
 
       expect(res.confirmed).toEqual(false);
       expect(mockNewWindow.location.href).toEqual('https://passport.sandbox.immutable.com/transaction-confirmation/transaction.html?transactionId=transactionId123&imxEtherAddress=0x1234&chainType=starkex');
-    });
-  });
-
-  describe('startTransaction', () => {
-    it('should handle popup window opened', async () => {
-      const transaction: Transaction = {
-        transactionType: TransactionTypes.createTransfer,
-        transactionData: {
-          amount: '1',
-          token: {
-            type: 'ERC721',
-            data: {
-              token_id: '194442292',
-              token_address: '0xacb3c6a43d15b907e8433077b6d38ae40936fe2c',
-            },
-          },
-          sender: '0x0000000000000000000000000000000000000001',
-          receiver: '0x0000000000000000000000000000000000000000',
-        },
-      };
-      const res = await confirmationScreen.startTransaction(
-        'ehyyy',
-        transaction,
-      );
-
-      expect(res.confirmed).toEqual(false);
-      expect(mockedOpen).toHaveBeenCalledTimes(1);
     });
   });
 });
