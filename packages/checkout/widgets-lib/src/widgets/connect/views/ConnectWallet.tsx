@@ -9,7 +9,7 @@ import { WalletList } from '../components/WalletList';
 import { ConnectContext } from '../context/ConnectContext';
 
 export function ConnectWallet() {
-  const { header, body } = text.views[ConnectWidgetViews.CONNECT_WALLET];
+  const { body } = text.views[ConnectWidgetViews.CONNECT_WALLET];
   const {
     connectState: { sendCloseEvent },
   } = useContext(ConnectContext);
@@ -18,7 +18,6 @@ export function ConnectWallet() {
       testId="connect-wallet"
       header={(
         <HeaderNavigation
-          title={header.title}
           onCloseButtonClick={sendCloseEvent}
         />
       )}

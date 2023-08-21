@@ -1,7 +1,5 @@
 import { ExternalProvider, JsonRpcProvider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
-import * as guardian from '@imtbl/guardian';
-import { ImmutableConfiguration } from '@imtbl/config';
 import {
   JsonRpcRequestCallback,
   JsonRpcRequestPayload,
@@ -48,8 +46,6 @@ export class ZkEvmProvider implements Provider {
 
   private readonly magicAdapter: MagicAdapter;
 
-  private readonly transactionAPI: guardian.TransactionsApi;
-
   private readonly multiRollupApiClients: MultiRollupApiClients;
 
   private readonly jsonRpcProvider: JsonRpcProvider; // Used for read
@@ -78,11 +74,6 @@ export class ZkEvmProvider implements Provider {
     this.magicAdapter = magicAdapter;
     this.config = config;
     this.confirmationScreen = confirmationScreen;
-    this.transactionAPI = new guardian.TransactionsApi(
-      new guardian.Configuration({
-        basePath: this.config.imxPublicApiDomain,
-      }),
-    );
     this.jsonRpcProvider = new JsonRpcProvider(this.config.zkEvmRpcUrl);
     this.multiRollupApiClients = multiRollupApiClients;
     this.eventEmitter = new TypedEventEmitter<ProviderEventMap>();
@@ -127,18 +118,14 @@ export class ZkEvmProvider implements Provider {
         this.magicProvider = magicProvider;
         this.relayerClient = new RelayerClient({
           config: this.config,
+          jsonRpcProvider: this.jsonRpcProvider,
           user: this.user,
         });
         this.guardianClient = new GuardianClient({
           accessToken: this.user.accessToken,
           confirmationScreen: this.confirmationScreen,
           imxEtherAddress: this.user.zkEvm.ethAddress,
-          config: new PassportConfiguration({
-            baseConfig: {} as ImmutableConfiguration,
-            clientId: 'client123',
-            logoutRedirectUri: 'http://localhost:3000/logout',
-            redirectUri: 'http://localhost:3000/redirect',
-          }),
+          config: this.config,
         });
 
         this.eventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, [this.user.zkEvm.ethAddress]);
@@ -155,7 +142,6 @@ export class ZkEvmProvider implements Provider {
           magicProvider: this.magicProvider,
           guardianClient: this.guardianClient,
           jsonRpcProvider: this.jsonRpcProvider,
-          config: this.config,
           relayerClient: this.relayerClient,
           user: this.user,
         });

@@ -99,11 +99,4 @@ export const getSignedMetaTransactions = async (
   ]);
 };
 
-export const chainIdNumber = (chainId: string): BigNumber => {
-  const caip2Components = chainId.split(':');
-  if (caip2Components.length !== 2) {
-    throw new Error('Invalid configuration, chain ID is not in CAIP-2 format');
-  }
-
-  return BigNumber.from(caip2Components[1]);
-};
+export const getEip155ChainId = (chainId: number) => `eip155:${chainId}`;
