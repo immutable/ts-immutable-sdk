@@ -24,6 +24,7 @@ const PASSPORT_FUNCTIONS = {
   logout: 'logout',
   getEmail: 'getEmail',
   imxTransfer: 'imxTransfer',
+  imxBatchNftTransfer: 'imxBatchNftTransfer',
 };
 
 // To notify game engine that this file is loaded
@@ -219,6 +220,17 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
       case PASSPORT_FUNCTIONS.imxTransfer: {
         const unsignedTransferRequest = JSON.parse(data);
         const response = await providerInstance?.transfer(unsignedTransferRequest);
+        callbackToGame({
+          responseFor: fxName,
+          requestId,
+          success: response !== null && response !== undefined,
+          result: response,
+        });
+        break;
+      }
+      case PASSPORT_FUNCTIONS.imxBatchNftTransfer: {
+        const nftTransferDetails = JSON.parse(data);
+        const response = await providerInstance?.batchNftTransfer(nftTransferDetails)
         callbackToGame({
           responseFor: fxName,
           requestId,
