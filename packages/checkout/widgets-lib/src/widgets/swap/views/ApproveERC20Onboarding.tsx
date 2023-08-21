@@ -122,7 +122,6 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
 
   const handleApproveSpendingClick = useCallback(async () => {
     if (loading) return;
-
     setLoading(true);
 
     if (!checkout || !provider) {
@@ -159,7 +158,6 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
       setActionDisabled(false);
       setShowSwapTxnStep(true);
     } catch (err: any) {
-      setLoading(false);
       setApprovalTxnLoading(false);
       setActionDisabled(false);
       if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
@@ -167,6 +165,8 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
         return;
       }
       handleExceptions(err, data.swapFormInfo as PrefilledSwapForm);
+    } finally {
+      setLoading(false);
     }
   }, [
     checkout,
@@ -208,6 +208,9 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
   /* ----------------- */
 
   const handleApproveSwapClick = useCallback(async () => {
+    if (loading) return;
+    setLoading(true);
+
     if (!checkout || !provider) {
       showErrorView();
       return;
@@ -246,6 +249,8 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
         return;
       }
       handleExceptions(err, data.swapFormInfo as PrefilledSwapForm);
+    } finally {
+      setLoading(false);
     }
   }, [
     checkout,
@@ -267,12 +272,13 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
 
   const approveSwapFooter = useMemo(() => (
     <FooterButton
+      loading={loading}
       actionText={rejectedSwap
         ? approveSwap.footer.retryText
         : approveSwap.footer.buttonText}
       onActionClick={handleApproveSwapClick}
     />
-  ), [rejectedSwap, handleApproveSwapClick]);
+  ), [rejectedSwap, handleApproveSwapClick, loading]);
 
   return (
     <>
