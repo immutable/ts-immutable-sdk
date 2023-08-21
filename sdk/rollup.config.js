@@ -85,53 +85,53 @@ const buildBundles = () => {
 
 export default [
   // Main build entry
-  {
-    input: 'src/index.ts',
-    output: {
-      file: 'dist/index.cjs',
-      format: 'cjs',
-    },
-    plugins: [
-      nodeResolve({
-        resolveOnly: getPackages(),
-      }),
-      json(),
-      commonJs(),
-      typescript(),
-      replace({
-        exclude: 'node_modules/**',
-        preventAssignment: true,
-        __SDK_VERSION__: pkg.version,
-      }),
-    ],
-  },
+  // {
+  //   input: 'src/index.ts',
+  //   output: {
+  //     file: 'dist/index.cjs',
+  //     format: 'cjs',
+  //   },
+  //   plugins: [
+  //     nodeResolve({
+  //       resolveOnly: getPackages(),
+  //     }),
+  //     json(),
+  //     commonJs(),
+  //     typescript(),
+  //     replace({
+  //       exclude: 'node_modules/**',
+  //       preventAssignment: true,
+  //       __SDK_VERSION__: pkg.version,
+  //     }),
+  //   ],
+  // },
   // Browser Bundle
-  {
-    input: 'src/index.ts',
-    output: {
-      file: 'dist/index.browser.js',
-      format: 'umd',
-      sourcemap: true,
-      name: 'immutable',
-    },
-    plugins: [
-      nodeResolve({
-        jsnext: true,
-        main: true,
-        browser: true,
-      }),
-      nodePolyfills(),
-      commonJs(),
-      typescript(),
-      json(),
-      replace({
-        exclude: 'node_modules/**',
-        preventAssignment: true,
-        __SDK_VERSION__: pkg.version,
-      }),
-      terser(),
-    ],
-  },
+  // {
+  //   input: 'src/index.ts',
+  //   output: {
+  //     file: 'dist/index.browser.js',
+  //     format: 'umd',
+  //     sourcemap: true,
+  //     name: 'immutable',
+  //   },
+  //   plugins: [
+  //     nodeResolve({
+  //       jsnext: true,
+  //       main: true,
+  //       browser: true,
+  //     }),
+  //     nodePolyfills(),
+  //     commonJs(),
+  //     typescript(),
+  //     json(),
+  //     replace({
+  //       exclude: 'node_modules/**',
+  //       preventAssignment: true,
+  //       __SDK_VERSION__: pkg.version,
+  //     }),
+  //     terser(),
+  //   ],
+  // },
 
   // Export ES Modules
   ...buildBundles(),
