@@ -1,6 +1,14 @@
 import { ModuleConfiguration } from '@imtbl/config';
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 
+export enum PassportEvents {
+  LOGGED_OUT = 'loggedOut',
+}
+
+export interface PassportEventMap extends Record<string, any> {
+  [PassportEvents.LOGGED_OUT]: [];
+}
+
 export type UserProfile = {
   email?: string;
   nickname?: string;
