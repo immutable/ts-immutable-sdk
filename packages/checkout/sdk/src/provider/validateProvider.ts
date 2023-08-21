@@ -25,6 +25,10 @@ export async function validateProvider(
 ): Promise<Web3Provider> {
   return withCheckoutError(
     async () => {
+      if ((web3Provider.provider as any)?.isPassport) {
+        // if Passport skip the validation checks
+        return web3Provider;
+      }
       if (!isWeb3Provider(web3Provider)) {
         throw new CheckoutError(
           'Parsed provider is not a valid Web3Provider',
