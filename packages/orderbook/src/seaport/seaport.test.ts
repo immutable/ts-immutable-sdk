@@ -454,6 +454,7 @@ describe('Seaport', () => {
                     signature: immutableOrder.signature,
                   },
                   extraData: '',
+                  tips: [],
                 },
               ],
             }),
