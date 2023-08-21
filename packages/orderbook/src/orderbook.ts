@@ -5,10 +5,12 @@ import {
   OrderbookModuleConfiguration,
   OrderbookOverrides,
 } from 'config/config';
-import { ERC721Factory } from 'erc721';
 import {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  Fee, ListingResult, ListListingsResult, OrderStatus,
+  Fee,
+  ListingResult,
+  ListListingsResult,
+  OrderStatus,
 } from 'openapi/sdk';
 import { Seaport } from 'seaport';
 import {
@@ -92,8 +94,8 @@ export class Orderbook {
   /**
    * List orders. This method is used to get a list of orders filtered by conditions specified
    * in the params object.
-   * @param {ListOrderParams} listOrderParams - Filtering, ordering and page parameters.
-   * @return {Orders} The paged orders.
+   * @param {ListListingsParams} listOrderParams - Filtering, ordering and page parameters.
+   * @return {ListListingsResult} The paged orders.
    */
   listListings(
     listOrderParams: ListListingsParams,
@@ -115,17 +117,10 @@ export class Orderbook {
     buy,
     orderExpiry,
   }: PrepareListingParams): Promise<PrepareListingResponse> {
-    const erc721 = new ERC721Factory(
-      sell.contractAddress,
-      this.orderbookConfig.provider,
-    ).create();
-    const royaltyInfo = await erc721.royaltyInfo(sell.tokenId, buy.amount);
-
     return this.seaport.prepareSeaportOrder(
       makerAddress,
       sell,
       buy,
-      royaltyInfo,
       // Default order start to now
       new Date(),
       // Default order expiry to 2 years from now
@@ -155,14 +150,14 @@ export class Orderbook {
   async fulfillOrder(
     listingId: string,
     takerAddress: string,
-    // TODO: Allow taker fee when backend support is available
-    // takerFee?: Fee,
+    takerFee?: Fee,
   ): Promise<FulfillOrderResponse> {
-    const fulfillmentDataRes = await this.apiClient.fulfillmentData([{
-      order_id: listingId,
-      // fee: takerFee,
-      fee: undefined,
-    }]);
+    const fulfillmentDataRes = await this.apiClient.fulfillmentData([
+      {
+        order_id: listingId,
+        fee: takerFee,
+      },
+    ]);
 
     if (fulfillmentDataRes.result.length !== 1) {
       throw new Error('unexpected fulfillment data result length');

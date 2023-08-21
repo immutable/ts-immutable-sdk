@@ -1,10 +1,13 @@
 import { Seaport as SeaportLib } from '@opensea/seaport-js';
 import {
-  ApprovalAction, CreateOrderAction, ExchangeAction, OrderComponents, OrderUseCase,
+  ApprovalAction,
+  CreateOrderAction,
+  ExchangeAction,
+  OrderComponents,
+  OrderUseCase,
+  TipInputItem,
 } from '@opensea/seaport-js/lib/types';
-import {
-  PopulatedTransaction, providers,
-} from 'ethers';
+import { PopulatedTransaction, providers } from 'ethers';
 import {
   Action,
   ActionType,
@@ -13,7 +16,6 @@ import {
   FulfillOrderResponse,
   NativeItem,
   PrepareListingResponse,
-  RoyaltyInfo,
   SignableAction,
   SignablePurpose,
   TransactionAction,
@@ -43,7 +45,6 @@ export class Seaport {
     offerer: string,
     listingItem: ERC721Item,
     considerationItem: ERC20Item | NativeItem,
-    royaltyInfo: RoyaltyInfo,
     orderStart: Date,
     orderExpiry: Date,
   ): Promise<PrepareListingResponse> {
@@ -51,15 +52,15 @@ export class Seaport {
       offerer,
       listingItem,
       considerationItem,
-      royaltyInfo,
       orderStart,
       orderExpiry,
     );
 
     const listingActions: Action[] = [];
 
-    const approvalAction = seaportActions
-      .find((action) => action.type === 'approval') as ApprovalAction | undefined;
+    const approvalAction = seaportActions.find(
+      (action) => action.type === 'approval',
+    ) as ApprovalAction | undefined;
 
     if (approvalAction) {
       listingActions.push({
@@ -69,8 +70,9 @@ export class Seaport {
       });
     }
 
-    const createAction: CreateOrderAction | undefined = seaportActions
-      .find((action) => action.type === 'create') as CreateOrderAction | undefined;
+    const createAction: CreateOrderAction | undefined = seaportActions.find(
+      (action) => action.type === 'create',
+    ) as CreateOrderAction | undefined;
 
     if (!createAction) {
       throw new Error('No create order action found');
@@ -97,24 +99,28 @@ export class Seaport {
     account: string,
     extraData: string,
   ): Promise<FulfillOrderResponse> {
-    const orderComponents = await this.mapImmutableOrderToSeaportOrderComponents(order);
+    const { orderComponents, tips } = this.mapImmutableOrderToSeaportOrderComponents(order);
     const seaportLib = this.getSeaportLib(order);
 
     const { actions: seaportActions } = await seaportLib.fulfillOrders({
       accountAddress: account,
-      fulfillOrderDetails: [{
-        order: {
-          parameters: orderComponents,
-          signature: order.signature,
+      fulfillOrderDetails: [
+        {
+          order: {
+            parameters: orderComponents,
+            signature: order.signature,
+          },
+          extraData,
+          tips,
         },
-        extraData,
-      }],
+      ],
     });
 
     const fulfillmentActions: TransactionAction[] = [];
 
-    const approvalAction = seaportActions
-      .find((action) => action.type === 'approval') as ApprovalAction | undefined;
+    const approvalAction = seaportActions.find(
+      (action) => action.type === 'approval',
+    ) as ApprovalAction | undefined;
 
     if (approvalAction) {
       fulfillmentActions.push({
@@ -124,8 +130,9 @@ export class Seaport {
       });
     }
 
-    const fulfilOrderAction: ExchangeAction | undefined = seaportActions
-      .find((action) => action.type === 'exchange') as ExchangeAction | undefined;
+    const fulfilOrderAction: ExchangeAction | undefined = seaportActions.find(
+      (action) => action.type === 'exchange',
+    ) as ExchangeAction | undefined;
 
     if (!fulfilOrderAction) {
       throw new Error('No exchange action found');
@@ -133,23 +140,33 @@ export class Seaport {
 
     fulfillmentActions.push({
       type: ActionType.TRANSACTION,
-      buildTransaction: prepareTransaction(fulfilOrderAction.transactionMethods),
+      buildTransaction: prepareTransaction(
+        fulfilOrderAction.transactionMethods,
+      ),
       purpose: TransactionPurpose.FULFILL_ORDER,
     });
 
     return { actions: fulfillmentActions };
   }
 
-  async cancelOrder(order: Order, account: string): Promise<PopulatedTransaction> {
-    const orderComponents = await this.mapImmutableOrderToSeaportOrderComponents(order);
+  async cancelOrder(
+    order: Order,
+    account: string,
+  ): Promise<PopulatedTransaction> {
+    const { orderComponents } = this.mapImmutableOrderToSeaportOrderComponents(order);
     const seaportLib = this.getSeaportLib(order);
 
-    const cancellationTransaction = await seaportLib.cancelOrders([orderComponents], account);
+    const cancellationTransaction = await seaportLib.cancelOrders(
+      [orderComponents],
+      account,
+    );
 
     return prepareTransaction(cancellationTransaction)();
   }
 
-  private mapImmutableOrderToSeaportOrderComponents(order: Order): OrderComponents {
+  private mapImmutableOrderToSeaportOrderComponents(
+    order: Order,
+  ): { orderComponents: OrderComponents, tips: Array<TipInputItem> } {
     const orderCounter = order.protocol_data.counter;
     return mapImmutableOrderToSeaportOrderComponents(
       order,
@@ -162,37 +179,37 @@ export class Seaport {
     offerer: string,
     listingItem: ERC721Item,
     considerationItem: ERC20Item | NativeItem,
-    royaltyInfo: RoyaltyInfo,
     orderStart: Date,
     orderExpiry: Date,
   ): Promise<OrderUseCase<CreateOrderAction>> {
     const seaportLib = this.getSeaportLib();
-    return seaportLib.createOrder({
-      allowPartialFills: false,
-      offer: [
-        {
-          itemType: ItemType.ERC721,
-          token: listingItem.contractAddress,
-          identifier: listingItem.tokenId,
-        },
-      ],
-      consideration: [
-        {
-          token: considerationItem.type === 'ERC20' ? considerationItem.contractAddress : undefined,
-          amount: considerationItem.amount,
-          recipient: offerer,
-        },
-        {
-          token: considerationItem.type === 'ERC20' ? considerationItem.contractAddress : undefined,
-          amount: royaltyInfo.amountRequired,
-          recipient: royaltyInfo.recipient,
-        },
-      ],
-      startTime: (orderStart.getTime() / 1000).toFixed(0),
-      endTime: (orderExpiry.getTime() / 1000).toFixed(0),
-      zone: this.zoneContractAddress,
-      restrictedByZone: true,
-    }, offerer);
+    return seaportLib.createOrder(
+      {
+        allowPartialFills: false,
+        offer: [
+          {
+            itemType: ItemType.ERC721,
+            token: listingItem.contractAddress,
+            identifier: listingItem.tokenId,
+          },
+        ],
+        consideration: [
+          {
+            token:
+              considerationItem.type === 'ERC20'
+                ? considerationItem.contractAddress
+                : undefined,
+            amount: considerationItem.amount,
+            recipient: offerer,
+          },
+        ],
+        startTime: (orderStart.getTime() / 1000).toFixed(0),
+        endTime: (orderExpiry.getTime() / 1000).toFixed(0),
+        zone: this.zoneContractAddress,
+        restrictedByZone: true,
+      },
+      offerer,
+    );
   }
 
   private async getTypedDataFromOrderComponents(

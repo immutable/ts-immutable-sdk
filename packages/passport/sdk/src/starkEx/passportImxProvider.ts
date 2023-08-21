@@ -20,7 +20,7 @@ import {
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 import { IMXProvider } from '@imtbl/provider';
 import GuardianClient from '../guardian/guardian';
-import { UserImx } from '../types';
+import { PassportEventMap, PassportEvents, UserImx } from '../types';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import {
   batchNftTransfer,
@@ -32,6 +32,7 @@ import {
 } from './workflows';
 import { ConfirmationScreen } from '../confirmation';
 import { PassportConfiguration } from '../config';
+import TypedEventEmitter from '../typedEventEmitter';
 
 export interface PassportImxProviderInput {
   user: UserImx;
@@ -39,12 +40,18 @@ export interface PassportImxProviderInput {
   immutableXClient: ImmutableXClient;
   confirmationScreen: ConfirmationScreen;
   config: PassportConfiguration;
+  passportEventEmitter: TypedEventEmitter<PassportEventMap>;
 }
 
-export class PassportImxProvider implements IMXProvider {
-  private readonly user: UserImx;
+type LoggedInPassportImxProvider = {
+  user: UserImx;
+  starkSigner: StarkSigner;
+};
 
-  private readonly starkSigner: StarkSigner;
+export class PassportImxProvider implements IMXProvider {
+  protected user?: UserImx;
+
+  protected starkSigner?: StarkSigner;
 
   private readonly immutableXClient: ImmutableXClient;
 
@@ -58,6 +65,7 @@ export class PassportImxProvider implements IMXProvider {
     immutableXClient,
     confirmationScreen,
     config,
+    passportEventEmitter,
   }: PassportImxProviderInput) {
     this.user = user;
     this.starkSigner = starkSigner;
@@ -69,11 +77,29 @@ export class PassportImxProvider implements IMXProvider {
       imxEtherAddress: user.imx.ethAddress,
       config,
     });
+
+    passportEventEmitter.on(PassportEvents.LOGGED_OUT, this.handleLogout);
+  }
+
+  private handleLogout = (): void => {
+    this.user = undefined;
+    this.starkSigner = undefined;
+  };
+
+  private checkIsLoggedIn(): asserts this is LoggedInPassportImxProvider {
+    if (this.user === undefined || this.starkSigner === undefined) {
+      throw new PassportError(
+        'User has been logged out',
+        PassportErrorType.NOT_LOGGED_IN_ERROR,
+      );
+    }
   }
 
   async transfer(
     request: UnsignedTransferRequest,
   ): Promise<CreateTransferResponseV1> {
+    this.checkIsLoggedIn();
+
     return transfer({
       request,
       user: this.user,
@@ -102,6 +128,8 @@ export class PassportImxProvider implements IMXProvider {
   }
 
   createOrder(request: UnsignedOrderRequest): Promise<CreateOrderResponse> {
+    this.checkIsLoggedIn();
+
     return createOrder({
       request,
       user: this.user,
@@ -114,6 +142,8 @@ export class PassportImxProvider implements IMXProvider {
   cancelOrder(
     request: GetSignableCancelOrderRequest,
   ): Promise<CancelOrderResponse> {
+    this.checkIsLoggedIn();
+
     return cancelOrder({
       request,
       user: this.user,
@@ -124,6 +154,8 @@ export class PassportImxProvider implements IMXProvider {
   }
 
   createTrade(request: GetSignableTradeRequest): Promise<CreateTradeResponse> {
+    this.checkIsLoggedIn();
+
     return createTrade({
       request,
       user: this.user,
@@ -136,6 +168,8 @@ export class PassportImxProvider implements IMXProvider {
   batchNftTransfer(
     request: NftTransferDetails[],
   ): Promise<CreateTransferResponse> {
+    this.checkIsLoggedIn();
+
     return batchNftTransfer({
       request,
       user: this.user,
@@ -148,6 +182,8 @@ export class PassportImxProvider implements IMXProvider {
   exchangeTransfer(
     request: UnsignedExchangeTransferRequest,
   ): Promise<CreateTransferResponseV1> {
+    this.checkIsLoggedIn();
+
     return exchangeTransfer({
       request,
       user: this.user,
@@ -189,6 +225,8 @@ export class PassportImxProvider implements IMXProvider {
   }
 
   getAddress(): Promise<string> {
+    this.checkIsLoggedIn();
+
     return Promise.resolve(this.user.imx.ethAddress);
   }
 }
