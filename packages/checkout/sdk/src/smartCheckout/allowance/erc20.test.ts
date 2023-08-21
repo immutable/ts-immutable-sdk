@@ -36,6 +36,10 @@ describe('allowance', () => {
         allowance: allowanceMock,
       });
 
+      let message = '';
+      let type = '';
+      let data = {};
+
       try {
         await getERC20Allowance(
           mockProvider,
@@ -44,13 +48,17 @@ describe('allowance', () => {
           '0xSEAPORT',
         );
       } catch (err: any) {
-        expect(err.message).toEqual('Failed to get the allowance for ERC20');
-        expect(err.type).toEqual(CheckoutErrorType.GET_ERC20_ALLOWANCE_ERROR);
-        expect(err.data).toEqual({
-          contractAddress: 'OxERC20',
-        });
-        expect(allowanceMock).toBeCalledWith('0xADDRESS', '0xSEAPORT');
+        message = err.message;
+        type = err.type;
+        data = err.data;
       }
+
+      expect(message).toEqual('Failed to get the allowance for ERC20');
+      expect(type).toEqual(CheckoutErrorType.GET_ERC20_ALLOWANCE_ERROR);
+      expect(data).toEqual({
+        contractAddress: 'OxERC20',
+      });
+      expect(allowanceMock).toBeCalledWith('0xADDRESS', '0xSEAPORT');
     });
   });
 
@@ -82,6 +90,10 @@ describe('allowance', () => {
         },
       });
 
+      let message = '';
+      let type = '';
+      let data = {};
+
       try {
         await getERC20ApprovalTransaction(
           mockProvider,
@@ -91,13 +103,17 @@ describe('allowance', () => {
           BigNumber.from(1),
         );
       } catch (err: any) {
-        expect(err.message).toEqual('Failed to get the approval transaction for ERC20');
-        expect(err.type).toEqual(CheckoutErrorType.GET_ERC20_ALLOWANCE_ERROR);
-        expect(err.data).toEqual({
-          contractAddress: 'OxERC20',
-        });
-        expect(approveMock).toBeCalledWith('0xSEAPORT', BigNumber.from(1));
+        message = err.message;
+        type = err.type;
+        data = err.data;
       }
+
+      expect(message).toEqual('Failed to get the approval transaction for ERC20');
+      expect(type).toEqual(CheckoutErrorType.GET_ERC20_ALLOWANCE_ERROR);
+      expect(data).toEqual({
+        contractAddress: 'OxERC20',
+      });
+      expect(approveMock).toBeCalledWith('0xSEAPORT', BigNumber.from(1));
     });
   });
 

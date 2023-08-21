@@ -1,6 +1,7 @@
 import { BigNumber, Contract } from 'ethers';
 import { Web3Provider } from '@ethersproject/providers';
 import {
+  convertIdToNumber,
   getApproveTransaction,
   getERC721ApprovedAddress,
   hasERC721Allowances,
@@ -26,7 +27,7 @@ describe('erc721', () => {
 
       const address = await getERC721ApprovedAddress(
         mockProvider,
-        'OxERC721',
+        '0xERC721',
         0,
       );
       expect(address).toEqual('0xSEAPORT');
@@ -39,20 +40,28 @@ describe('erc721', () => {
         getApproved: getApprovedMock,
       });
 
+      let message = '';
+      let type = '';
+      let data = {};
+
       try {
         await getERC721ApprovedAddress(
           mockProvider,
-          'OxERC721',
+          '0xERC721',
           0,
         );
       } catch (err: any) {
-        expect(getApprovedMock).toBeCalledWith(0);
-        expect(err.message).toEqual('Failed to get approved address for ERC721');
-        expect(err.type).toEqual(CheckoutErrorType.GET_ERC721_ALLOWANCE_ERROR);
-        expect(err.data).toEqual({
-          contractAddress: 'OxERC721',
-        });
+        message = err.message;
+        type = err.type;
+        data = err.data;
       }
+
+      expect(message).toEqual('Failed to get approved address for ERC721');
+      expect(type).toEqual(CheckoutErrorType.GET_ERC721_ALLOWANCE_ERROR);
+      expect(data).toEqual({
+        contractAddress: '0xERC721',
+      });
+      expect(getApprovedMock).toBeCalledWith(0);
     });
   });
 
@@ -84,6 +93,10 @@ describe('erc721', () => {
         },
       });
 
+      let message = '';
+      let type = '';
+      let data = {};
+
       try {
         await getApproveTransaction(
           mockProvider,
@@ -93,13 +106,17 @@ describe('erc721', () => {
           0,
         );
       } catch (err: any) {
-        expect(err.message).toEqual('Failed to get the approval transaction for ERC721');
-        expect(err.type).toEqual(CheckoutErrorType.GET_ERC721_ALLOWANCE_ERROR);
-        expect(err.data).toEqual({
-          contractAddress: '0xERC721',
-        });
-        expect(approveMock).toBeCalledWith('0xSEAPORT', 0);
+        message = err.message;
+        type = err.type;
+        data = err.data;
       }
+
+      expect(message).toEqual('Failed to get the approval transaction for ERC721');
+      expect(type).toEqual(CheckoutErrorType.GET_ERC721_ALLOWANCE_ERROR);
+      expect(data).toEqual({
+        contractAddress: '0xERC721',
+      });
+      expect(approveMock).toBeCalledWith('0xSEAPORT', 0);
     });
   });
 
@@ -226,6 +243,174 @@ describe('erc721', () => {
           itemRequirement: itemRequirements[3],
         },
       ]));
+    });
+
+    it('should error if an item requirement has an invalid id', async () => {
+      const getApprovedMock = jest.fn().mockResolvedValue('0x00000000');
+      const approveMock = jest.fn().mockResolvedValue({ data: '0xDATA', to: '0x00000' });
+      (Contract as unknown as jest.Mock).mockReturnValue({
+        getApproved: getApprovedMock,
+        populateTransaction: {
+          approve: approveMock,
+        },
+      });
+
+      const itemRequirements: ItemRequirement[] = [
+        {
+          type: ItemType.ERC721,
+          contractAddress: '0xERC721',
+          id: '1',
+          spenderAddress: '0xSEAPORT',
+        },
+        {
+          type: ItemType.ERC721,
+          contractAddress: '0xERC721',
+          id: 'invalid',
+          spenderAddress: '0xSEAPORT',
+        },
+      ];
+
+      let message = '';
+      let type = '';
+      let data = {};
+
+      try {
+        await hasERC721Allowances(mockProvider, '0xADDRESS', itemRequirements);
+      } catch (err: any) {
+        message = err.message;
+        type = err.type;
+        data = err.data;
+      }
+
+      expect(message).toEqual('Invalid ERC721 ID');
+      expect(type).toEqual(CheckoutErrorType.GET_ERC721_ALLOWANCE_ERROR);
+      expect(data).toEqual({
+        id: 'invalid',
+        contractAddress: '0xERC721',
+      });
+    });
+  });
+
+  describe('convertIdToNumber', () => {
+    it('should converts a valid string ID to a number', () => {
+      const id = '123';
+      const result = convertIdToNumber(id, '0xERC721');
+      expect(result).toBe(123);
+    });
+
+    it('should throws an error for invalid string ID', () => {
+      const id = 'invalid';
+
+      let message = '';
+      let type = '';
+      let data = {};
+
+      try {
+        convertIdToNumber(id, '0xERC721');
+      } catch (err: any) {
+        message = err.message;
+        type = err.type;
+        data = err.data;
+      }
+
+      expect(message).toEqual('Invalid ERC721 ID');
+      expect(type).toEqual(CheckoutErrorType.GET_ERC721_ALLOWANCE_ERROR);
+      expect(data).toEqual({
+        id: 'invalid',
+        contractAddress: '0xERC721',
+      });
+    });
+
+    it('should throws an error for empty string ID', () => {
+      const id = '';
+
+      let message = '';
+      let type = '';
+      let data = {};
+
+      try {
+        convertIdToNumber(id, '0xERC721');
+      } catch (err: any) {
+        message = err.message;
+        type = err.type;
+        data = err.data;
+      }
+
+      expect(message).toEqual('Invalid ERC721 ID');
+      expect(type).toEqual(CheckoutErrorType.GET_ERC721_ALLOWANCE_ERROR);
+      expect(data).toEqual({
+        id: '',
+        contractAddress: '0xERC721',
+      });
+    });
+
+    it('should throws an error for whitespace string ID', () => {
+      const id = ' ';
+
+      let message = '';
+      let type = '';
+      let data = {};
+
+      try {
+        convertIdToNumber(id, '0xERC721');
+      } catch (err: any) {
+        message = err.message;
+        type = err.type;
+        data = err.data;
+      }
+
+      expect(message).toEqual('Invalid ERC721 ID');
+      expect(type).toEqual(CheckoutErrorType.GET_ERC721_ALLOWANCE_ERROR);
+      expect(data).toEqual({
+        id: ' ',
+        contractAddress: '0xERC721',
+      });
+    });
+
+    it('should throws an error for null ID', () => {
+      const id = null as any;
+
+      let message = '';
+      let type = '';
+      let data = {};
+
+      try {
+        convertIdToNumber(id, '0xERC721');
+      } catch (err: any) {
+        message = err.message;
+        type = err.type;
+        data = err.data;
+      }
+
+      expect(message).toEqual('Invalid ERC721 ID');
+      expect(type).toEqual(CheckoutErrorType.GET_ERC721_ALLOWANCE_ERROR);
+      expect(data).toEqual({
+        id: null,
+        contractAddress: '0xERC721',
+      });
+    });
+
+    it('should throws an error for undefined ID', () => {
+      const id = undefined as any;
+
+      let message = '';
+      let type = '';
+      let data = {};
+
+      try {
+        convertIdToNumber(id, '0xERC721');
+      } catch (err: any) {
+        message = err.message;
+        type = err.type;
+        data = err.data;
+      }
+
+      expect(message).toEqual('Invalid ERC721 ID');
+      expect(type).toEqual(CheckoutErrorType.GET_ERC721_ALLOWANCE_ERROR);
+      expect(data).toEqual({
+        id: undefined,
+        contractAddress: '0xERC721',
+      });
     });
   });
 });

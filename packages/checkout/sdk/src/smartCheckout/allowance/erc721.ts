@@ -53,7 +53,19 @@ export const getERC721ApprovedAddress = async (
   }
 };
 
-export const parseIdToNumber = (id: string) => parseInt(id, 10);
+export const convertIdToNumber = (id: string, contractAddress: string): number => {
+  const parsedId = parseInt(id, 10);
+
+  if (Number.isNaN(parsedId)) {
+    throw new CheckoutError(
+      'Invalid ERC721 ID',
+      CheckoutErrorType.GET_ERC721_ALLOWANCE_ERROR,
+      { id, contractAddress },
+    );
+  }
+
+  return parsedId;
+};
 
 export const hasERC721Allowances = async (
   provider: Web3Provider,
@@ -78,10 +90,11 @@ export const hasERC721Allowances = async (
     if (itemRequirement.type !== ItemType.ERC721) continue;
     const { contractAddress, id } = itemRequirement;
     const key = `${contractAddress}-${id}`;
+    const convertedId = convertIdToNumber(id, contractAddress);
     erc721s.set(key, itemRequirement);
     approvedAddressPromises.set(
       key,
-      getERC721ApprovedAddress(provider, contractAddress, parseIdToNumber(id)),
+      getERC721ApprovedAddress(provider, contractAddress, convertedId),
     );
   }
 
@@ -107,6 +120,7 @@ export const hasERC721Allowances = async (
 
     const { contractAddress, id, spenderAddress } = itemRequirement;
     const key = `${contractAddress}-${id}`;
+    const convertedId = convertIdToNumber(id, contractAddress);
     // Create maps for both the insufficient ERC721 data and the transaction promises using the same key so the results can be merged
     insufficientERC721s.set(
       key,
@@ -124,7 +138,7 @@ export const hasERC721Allowances = async (
         ownerAddress,
         contractAddress,
         spenderAddress,
-        parseIdToNumber(id),
+        convertedId,
       ),
     );
   }
