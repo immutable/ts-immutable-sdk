@@ -1,8 +1,5 @@
 import * as guardian from '@imtbl/guardian';
-import {
-  TransactionApprovalRequestChainTypeEnum,
-  TransactionEvaluationResponse,
-} from '@imtbl/guardian';
+import { TransactionApprovalRequestChainTypeEnum, TransactionEvaluationResponse } from '@imtbl/guardian';
 import { BigNumber, ethers } from 'ethers';
 import { ConfirmationScreen } from '../confirmation';
 import { retryWithDelay } from '../network/retry';
@@ -103,8 +100,7 @@ export default class GuardianClient {
       this.confirmationScreen.loading(popupWindowSize);
 
       try {
-        const result = await task();
-        return result;
+        return await task();
       } catch (err) {
         this.confirmationScreen.closeWindow();
         throw err;
@@ -146,7 +142,7 @@ export default class GuardianClient {
         throw new Error(transactionRejectedCrossSdkBridgeError);
       }
 
-      const confirmationResult = await this.confirmationScreen.startGuardianTransaction(
+      const confirmationResult = await this.confirmationScreen.requestConfirmation(
         payloadHash,
         this.imxEtherAddress,
         TransactionApprovalRequestChainTypeEnum.Starkex,
@@ -216,7 +212,7 @@ export default class GuardianClient {
     }
 
     if (confirmationRequired && !!transactionId) {
-      const confirmationResult = await this.confirmationScreen.startGuardianTransaction(
+      const confirmationResult = await this.confirmationScreen.requestConfirmation(
         transactionId,
         this.imxEtherAddress,
         TransactionApprovalRequestChainTypeEnum.Evm,
