@@ -4,6 +4,29 @@ import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { ERC721ABI, ItemRequirement, ItemType } from '../../types';
 import { SufficientAllowance } from './types';
 
+// Returns true if the spender address is approved for all ERC721s of this collection
+export const getERC721ApprovedForAll = async (
+  provider: Web3Provider,
+  owner: string,
+  contractAddress: string,
+  spenderAddress: string,
+): Promise<boolean> => {
+  try {
+    const contract = new Contract(
+      contractAddress,
+      JSON.stringify(ERC721ABI),
+      provider,
+    );
+    return await contract.isApprovedForAll(owner, spenderAddress);
+  } catch (err: any) {
+    throw new CheckoutError(
+      'Failed to check approval for ERC721',
+      CheckoutErrorType.GET_ERC721_ALLOWANCE_ERROR,
+      { contractAddress },
+    );
+  }
+};
+
 // Returns a populated transaction to approve the ERC721 for the spender.
 export const getApproveTransaction = async (
   provider: Web3Provider,
@@ -67,6 +90,37 @@ export const convertIdToNumber = (id: string, contractAddress: string): number =
   return parsedId;
 };
 
+export const getApprovedCollections = async (
+  provider: Web3Provider,
+  itemRequirements: ItemRequirement[],
+  owner: string,
+): Promise<Map<string, boolean>> => {
+  const approvedCollections = new Map<string, boolean>();
+  const approvedForAllPromises = new Map<string, Promise<boolean>>();
+
+  for (const itemRequirement of itemRequirements) {
+    if (itemRequirement.type !== ItemType.ERC721) continue;
+    const { contractAddress, spenderAddress } = itemRequirement;
+    const key = `${contractAddress}-${spenderAddress}`;
+    approvedCollections.set(key, false);
+    if (approvedForAllPromises.has(key)) continue;
+    approvedForAllPromises.set(key, getERC721ApprovedForAll(
+      provider,
+      owner,
+      contractAddress,
+      spenderAddress,
+    ));
+  }
+
+  const approvals = await Promise.all(approvedForAllPromises.values());
+  const keys = Array.from(approvedForAllPromises.keys());
+  approvals.forEach((approval, index) => {
+    approvedCollections.set(keys[index], approval);
+  });
+
+  return approvedCollections;
+};
+
 export const hasERC721Allowances = async (
   provider: Web3Provider,
   ownerAddress: string,
@@ -84,11 +138,32 @@ export const hasERC721Allowances = async (
   const insufficientERC721s = new Map<string, SufficientAllowance>();
   const transactionPromises = new Map<string, Promise<TransactionRequest | undefined>>();
 
+  // Check if there are any collections with approvals for all ERC721s for a given spender
+  const approvedCollections = await getApprovedCollections(
+    provider,
+    itemRequirements,
+    ownerAddress,
+  );
+
   // Populate maps for both the ERC721 data and promises to get the approved addresses using the same key
   // so the promise and data can be linked together when the promise is resolved
   for (const itemRequirement of itemRequirements) {
     if (itemRequirement.type !== ItemType.ERC721) continue;
-    const { contractAddress, id } = itemRequirement;
+
+    const { contractAddress, id, spenderAddress } = itemRequirement;
+
+    // If the collection is approved for all then just set the item requirements and sufficient true
+    const approvedForAllKey = `${contractAddress}-${spenderAddress}`;
+    const approvedForAll = approvedCollections.get(approvedForAllKey);
+    if (approvedForAll) {
+      sufficientAllowances.push({
+        sufficient: true,
+        itemRequirement,
+      });
+      continue;
+    }
+
+    // If collection not approved for all then check if the given ERC721 is approved for the spender
     const key = `${contractAddress}-${id}`;
     const convertedId = convertIdToNumber(id, contractAddress);
     erc721s.set(key, itemRequirement);

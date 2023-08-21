@@ -4,6 +4,7 @@ import {
   convertIdToNumber,
   getApproveTransaction,
   getERC721ApprovedAddress,
+  getERC721ApprovedForAll,
   hasERC721Allowances,
 } from './erc721';
 import { CheckoutErrorType } from '../../errors';
@@ -120,14 +121,65 @@ describe('erc721', () => {
     });
   });
 
+  describe('getERC721ApprovedForAll', () => {
+    it('should get the approved for all from the contract', async () => {
+      const isApprovedForAllMock = jest.fn().mockResolvedValue(true);
+      (Contract as unknown as jest.Mock).mockReturnValue({
+        isApprovedForAll: isApprovedForAllMock,
+      });
+
+      const approvedForAll = await getERC721ApprovedForAll(
+        mockProvider,
+        '0xADDRESS',
+        '0xERC721',
+        '0xSEAPORT',
+      );
+      expect(approvedForAll).toBeTruthy();
+      expect(isApprovedForAllMock).toBeCalledWith('0xADDRESS', '0xSEAPORT');
+    });
+
+    it('should error if call to isApprovedForAll fails', async () => {
+      const isApprovedForAllMock = jest.fn().mockRejectedValue({});
+      (Contract as unknown as jest.Mock).mockReturnValue({
+        isApprovedForAll: isApprovedForAllMock,
+      });
+
+      let message = '';
+      let type = '';
+      let data = {};
+
+      try {
+        await getERC721ApprovedForAll(
+          mockProvider,
+          '0xADDRESS',
+          '0xERC721',
+          '0xSEAPORT',
+        );
+      } catch (err: any) {
+        message = err.message;
+        type = err.type;
+        data = err.data;
+      }
+
+      expect(message).toEqual('Failed to check approval for ERC721');
+      expect(type).toEqual(CheckoutErrorType.GET_ERC721_ALLOWANCE_ERROR);
+      expect(data).toEqual({
+        contractAddress: '0xERC721',
+      });
+      expect(isApprovedForAllMock).toBeCalledWith('0xADDRESS', '0xSEAPORT');
+    });
+  });
+
   describe('hasERC721Allowances', () => {
     it(
       'should return allowances with sufficient false and approval transaction if allowance not sufficient',
       async () => {
+        const isApprovedForAllMock = jest.fn().mockResolvedValue(false);
         const getApprovedMock = jest.fn().mockResolvedValue('0x00000000');
         const approveMock = jest.fn().mockResolvedValue({ data: '0xDATA', to: '0x00000' });
         (Contract as unknown as jest.Mock).mockReturnValue({
           getApproved: getApprovedMock,
+          isApprovedForAll: isApprovedForAllMock,
           populateTransaction: {
             approve: approveMock,
           },
@@ -160,8 +212,10 @@ describe('erc721', () => {
     );
 
     it('should return allowances with sufficient true if allowance sufficient', async () => {
+      const isApprovedForAllMock = jest.fn().mockResolvedValue(false);
       const getApprovedMock = jest.fn().mockResolvedValue('0xSEAPORT');
       (Contract as unknown as jest.Mock).mockReturnValue({
+        isApprovedForAll: isApprovedForAllMock,
         getApproved: getApprovedMock,
       });
 
@@ -190,9 +244,11 @@ describe('erc721', () => {
 
     it('should handle multiple ERC721 item requirements', async () => {
       const getApprovedMock = jest.fn().mockResolvedValue('0x00000000');
+      const isApprovedForAllMock = jest.fn().mockResolvedValue(false);
       const approveMock = jest.fn().mockResolvedValue({ data: '0xDATA', to: '0x00000' });
       (Contract as unknown as jest.Mock).mockReturnValue({
         getApproved: getApprovedMock,
+        isApprovedForAll: isApprovedForAllMock,
         populateTransaction: {
           approve: approveMock,
         },
@@ -248,8 +304,10 @@ describe('erc721', () => {
     it('should error if an item requirement has an invalid id', async () => {
       const getApprovedMock = jest.fn().mockResolvedValue('0x00000000');
       const approveMock = jest.fn().mockResolvedValue({ data: '0xDATA', to: '0x00000' });
+      const isApprovedForAllMock = jest.fn().mockResolvedValue(false);
       (Contract as unknown as jest.Mock).mockReturnValue({
         getApproved: getApprovedMock,
+        isApprovedForAll: isApprovedForAllMock,
         populateTransaction: {
           approve: approveMock,
         },
@@ -289,6 +347,123 @@ describe('erc721', () => {
         contractAddress: '0xERC721',
       });
     });
+
+    it('should return sufficient true if approved for all', async () => {
+      const isApprovedForAllMock = jest.fn().mockResolvedValue(true);
+      const getApprovedMock = jest.fn().mockResolvedValue('0x00000000');
+      const approveMock = jest.fn().mockResolvedValue({ data: '0xDATA', to: '0x00000' });
+      (Contract as unknown as jest.Mock).mockReturnValue({
+        getApproved: getApprovedMock,
+        isApprovedForAll: isApprovedForAllMock,
+        populateTransaction: {
+          approve: approveMock,
+        },
+      });
+
+      const itemRequirements: ItemRequirement[] = [
+        {
+          type: ItemType.ERC721,
+          contractAddress: '0xERC721',
+          id: '0',
+          spenderAddress: '0xSEAPORT',
+        },
+        {
+          type: ItemType.ERC721,
+          contractAddress: '0xERC721',
+          id: '1',
+          spenderAddress: '0xSEAPORT',
+        },
+        {
+          type: ItemType.ERC721,
+          contractAddress: '0xERC721',
+          id: '2',
+          spenderAddress: '0xSEAPORT',
+        },
+      ];
+
+      const allowances = await hasERC721Allowances(mockProvider, '0xADDRESS', itemRequirements);
+      expect(allowances.sufficient).toBeTruthy();
+      expect(allowances.allowances).toEqual([
+        {
+          sufficient: true,
+          itemRequirement: itemRequirements[0],
+        },
+        {
+          sufficient: true,
+          itemRequirement: itemRequirements[1],
+        },
+        {
+          sufficient: true,
+          itemRequirement: itemRequirements[2],
+        },
+      ]);
+
+      expect(isApprovedForAllMock).toBeCalledWith('0xADDRESS', '0xSEAPORT');
+      expect(getApprovedMock).toBeCalledTimes(0);
+      expect(approveMock).toBeCalledTimes(0);
+    });
+
+    it(
+      'should return sufficient false for non-approved items and true for contract addresses that are approved for all',
+      async () => {
+        const isApprovedForAllMock = jest.fn()
+          .mockResolvedValueOnce(true)
+          .mockResolvedValueOnce(false);
+        const getApprovedMock = jest.fn().mockResolvedValue('0xSEAPORT');
+        const approveMock = jest.fn().mockResolvedValue({ data: '0xDATA', to: '0xOTHER' });
+        (Contract as unknown as jest.Mock).mockReturnValue({
+          getApproved: getApprovedMock,
+          isApprovedForAll: isApprovedForAllMock,
+          populateTransaction: {
+            approve: approveMock,
+          },
+        });
+
+        const itemRequirements: ItemRequirement[] = [
+          {
+            type: ItemType.ERC721,
+            contractAddress: '0xERC721',
+            id: '0',
+            spenderAddress: '0xSEAPORT',
+          },
+          {
+            type: ItemType.ERC721,
+            contractAddress: '0xERC721',
+            id: '1',
+            spenderAddress: '0xSEAPORT',
+          },
+          {
+            type: ItemType.ERC721,
+            contractAddress: '0xERC721',
+            id: '2',
+            spenderAddress: '0xOTHER',
+          },
+        ];
+
+        const allowances = await hasERC721Allowances(mockProvider, '0xADDRESS', itemRequirements);
+        expect(allowances.sufficient).toBeFalsy();
+        expect(allowances.allowances).toEqual([
+          {
+            sufficient: true,
+            itemRequirement: itemRequirements[0],
+          },
+          {
+            sufficient: true,
+            itemRequirement: itemRequirements[1],
+          },
+          {
+            type: ItemType.ERC721,
+            sufficient: false,
+            itemRequirement: itemRequirements[2],
+            approvalTransaction: { from: '0xADDRESS', data: '0xDATA', to: '0xOTHER' },
+          },
+        ]);
+
+        expect(isApprovedForAllMock).toBeCalledTimes(2);
+        expect(getApprovedMock).toBeCalledTimes(1);
+        expect(approveMock).toBeCalledTimes(1);
+      },
+    );
   });
 
   describe('convertIdToNumber', () => {
