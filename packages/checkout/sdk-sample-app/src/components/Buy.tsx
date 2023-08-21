@@ -3,19 +3,24 @@ import { Web3Provider } from '@ethersproject/providers';
 import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
+import { Box, FormControl, TextInput } from '@biom3/react';
 
 interface BuyProps {
   checkout: Checkout;
   provider: Web3Provider | undefined;
 }
 
-export default function Buy(props: BuyProps) {
-  const { checkout, provider } = props;
-
+export default function Buy({ checkout, provider }: BuyProps) {
+  const [orderId, setOrderId] = useState<string>('');
+  const [orderIdError, setOrderIdError] = useState<any>(null);
   const [error, setError] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
   async function buyClick() {
+    if (!orderId) {
+      setOrderIdError('Please enter an order ID');
+      return;
+    }
     if (!checkout) {
       console.error('missing checkout, please connect first');
       return;
@@ -29,7 +34,7 @@ export default function Buy(props: BuyProps) {
     try {
       await checkout.buy({
         provider,
-        orderId: '0189d7cc-5bf6-94b2-29ab-af73aa8ab24d',
+        orderId,
       });
       setLoading(false);
     } catch (err: any) {
@@ -42,13 +47,26 @@ export default function Buy(props: BuyProps) {
     }
   }
 
+  const updateOrderId = (event: any) => {
+    setOrderId(event.target.value);
+    setOrderIdError('');
+  }
+
   useEffect(() => {
     setError(null);
     setLoading(false);
   }, [checkout]);
 
   return (
-    <div>
+    <Box>
+      <FormControl validationStatus={orderIdError ? 'error' : 'success'} >
+        <FormControl.Label>Order ID</FormControl.Label>
+        <TextInput onChange={updateOrderId} />
+        {orderIdError && (
+          <FormControl.Validation>{orderIdError}</FormControl.Validation>
+        )}
+      </FormControl>
+      <br />
       <LoadingButton onClick={buyClick} loading={loading}>
         Buy
       </LoadingButton>
@@ -58,6 +76,6 @@ export default function Buy(props: BuyProps) {
           {error.message}. Check console logs for more details.
         </ErrorMessage>
       )}
-    </div>
+    </Box>
   );
 }
