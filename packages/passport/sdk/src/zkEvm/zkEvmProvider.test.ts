@@ -6,6 +6,9 @@ import { JsonRpcError, ProviderErrorCode } from './JsonRpcError';
 import GuardianClient from '../guardian/guardian';
 import { RelayerClient } from './relayerClient';
 import { Provider } from './types';
+import { PassportEventMap, PassportEvents } from '../types';
+import TypedEventEmitter from '../typedEventEmitter';
+import { mockUserZkEvm } from '../test/mocks';
 
 jest.mock('@ethersproject/providers');
 jest.mock('./relayerClient');
@@ -13,9 +16,16 @@ jest.mock('./user');
 jest.mock('./sendTransaction');
 
 describe('ZkEvmProvider', () => {
+  let passportEventEmitter: TypedEventEmitter<PassportEventMap>;
+
+  beforeEach(() => {
+    passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
+  });
+
   const getProvider = () => {
     const constructorParameters = {
       config: {},
+      passportEventEmitter,
     } as Partial<ZkEvmProviderInput>;
 
     return new ZkEvmProvider(constructorParameters as ZkEvmProviderInput);
@@ -185,14 +195,9 @@ describe('ZkEvmProvider', () => {
 
   describe('eth_requestAccounts', () => {
     it('should return the ethAddress if already logged in', async () => {
-      const mockUser = {
-        zkEvm: {
-          ethAddress: '0x123',
-        },
-      };
       const mockMagicProvider = {};
       (loginZkEvmUser as jest.Mock).mockResolvedValue({
-        user: mockUser,
+        user: mockUserZkEvm,
         magicProvider: mockMagicProvider,
       });
       const provider = getProvider();
@@ -200,20 +205,15 @@ describe('ZkEvmProvider', () => {
       const resultOne = await provider.request({ method: 'eth_requestAccounts', params: [] });
       const resultTwo = await provider.request({ method: 'eth_requestAccounts', params: [] });
 
-      expect(resultOne).toEqual([mockUser.zkEvm.ethAddress]);
-      expect(resultTwo).toEqual([mockUser.zkEvm.ethAddress]);
+      expect(resultOne).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
+      expect(resultTwo).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
       expect(loginZkEvmUser).toBeCalledTimes(1);
     });
 
     it('should emit accountsChanged event when user logs in', async () => {
-      const mockUser = {
-        zkEvm: {
-          ethAddress: '0x123',
-        },
-      };
       const mockMagicProvider = {};
       (loginZkEvmUser as jest.Mock).mockResolvedValue({
-        user: mockUser,
+        user: mockUserZkEvm,
         magicProvider: mockMagicProvider,
       });
       const provider = getProvider();
@@ -223,8 +223,8 @@ describe('ZkEvmProvider', () => {
 
       const result = await provider.request({ method: 'eth_requestAccounts' });
 
-      expect(result).toEqual([mockUser.zkEvm.ethAddress]);
-      expect(onAccountsChanged).toHaveBeenCalledWith([mockUser.zkEvm.ethAddress]);
+      expect(result).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
+      expect(onAccountsChanged).toHaveBeenCalledWith([mockUserZkEvm.zkEvm.ethAddress]);
     });
   });
 
@@ -247,14 +247,9 @@ describe('ZkEvmProvider', () => {
 
     it('should call sendTransaction with the correct params', async () => {
       const transactionHash = '0x789';
-      const mockUser = {
-        zkEvm: {
-          ethAddress: '0x123',
-        },
-      };
       const mockMagicProvider = {};
       (loginZkEvmUser as jest.Mock).mockResolvedValue({
-        user: mockUser,
+        user: mockUserZkEvm,
         magicProvider: mockMagicProvider,
       });
       (sendTransaction as jest.Mock).mockResolvedValue(transactionHash);
@@ -273,7 +268,7 @@ describe('ZkEvmProvider', () => {
         guardianClient: expect.any(GuardianClient),
         jsonRpcProvider: expect.any(Object),
         relayerClient: expect.any(RelayerClient),
-        user: mockUser,
+        user: mockUserZkEvm,
       });
     });
   });
@@ -284,6 +279,39 @@ describe('ZkEvmProvider', () => {
 
       expect(provider.isPassport).toBe(true);
       expect((provider as Provider).isPassport).toBe(true);
+    });
+  });
+
+  describe('when the user has been logged out', () => {
+    it('should clear the user specific properties & emit accountsChanged', async () => {
+      (loginZkEvmUser as jest.Mock).mockResolvedValue({
+        user: mockUserZkEvm,
+        magicProvider: {},
+      });
+      const provider = getProvider();
+      await provider.request({ method: 'eth_requestAccounts' });
+
+      const userLoggedInKeys = [
+        'magicProvider',
+        'user',
+        'relayerClient',
+        'guardianClient',
+      ];
+
+      userLoggedInKeys.forEach((key) => {
+        // @ts-ignore
+        expect(provider[key]).toBeDefined();
+      });
+
+      const onAccountsChanged = jest.fn();
+      provider.on('accountsChanged', onAccountsChanged);
+      passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
+
+      expect(onAccountsChanged).toHaveBeenCalledWith([]);
+      userLoggedInKeys.forEach((key) => {
+        // @ts-ignore
+        expect(provider[key]).toBeUndefined();
+      });
     });
   });
 });

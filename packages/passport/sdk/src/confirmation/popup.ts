@@ -20,6 +20,7 @@ export const openPopupCenter = ({
     0,
     Math.round(window.screenY + (window.outerHeight - height) / 2),
   );
+
   const newWindow = window.open(
     url,
     title,

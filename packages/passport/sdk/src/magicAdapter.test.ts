@@ -9,6 +9,8 @@ const loginWithOIDCMock:jest.MockedFunction<(args: LoginWithOpenIdParams) => Pro
 
 const rpcProvider = {};
 
+const logoutMock = jest.fn();
+
 jest.mock('magic-sdk');
 jest.mock('@magic-ext/oidc', () => ({
   OpenIdExtension: jest.fn(),
@@ -26,10 +28,13 @@ describe('MagicWallet', () => {
   const idToken = 'e30=.e30=.e30=';
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    jest.resetAllMocks();
     (Magic as jest.Mock).mockImplementation(() => ({
       openid: {
         loginWithOIDC: loginWithOIDCMock,
+      },
+      user: {
+        logout: logoutMock,
       },
       rpcProvider,
     }));
@@ -66,6 +71,15 @@ describe('MagicWallet', () => {
           PassportErrorType.WALLET_CONNECTION_ERROR,
         ),
       );
+    });
+  });
+
+  describe('logout', () => {
+    it('calls the logout function', async () => {
+      await magicWallet.login(idToken, config.network);
+      await magicWallet.logout();
+
+      expect(logoutMock).toHaveBeenCalled();
     });
   });
 });
