@@ -49,7 +49,7 @@ describe('guardian', () => {
 
       await guardianClient.validate({ payloadHash: 'hash' });
 
-      expect(mockConfirmationScreen.startGuardianTransaction).toBeCalledTimes(0);
+      expect(mockConfirmationScreen.requestConfirmation).toBeCalledTimes(0);
     });
 
     it('should not show the confirmation screen if it is not required', async () => {
@@ -58,25 +58,25 @@ describe('guardian', () => {
 
       await guardianClient.validate({ payloadHash: 'hash' });
 
-      expect(mockConfirmationScreen.startGuardianTransaction).toBeCalledTimes(0);
+      expect(mockConfirmationScreen.requestConfirmation).toBeCalledTimes(0);
     });
 
     it('should show the confirmation screen when some of the confirmations are required', async () => {
       mockGetTransactionByID.mockResolvedValueOnce({ data: { id: '1234' } });
       mockEvaluateTransaction
         .mockResolvedValueOnce({ data: { confirmationRequired: true } });
-      (mockConfirmationScreen.startGuardianTransaction as jest.Mock).mockResolvedValueOnce({ confirmed: true });
+      (mockConfirmationScreen.requestConfirmation as jest.Mock).mockResolvedValueOnce({ confirmed: true });
 
       await guardianClient.validate({ payloadHash: 'hash' });
 
-      expect(mockConfirmationScreen.startGuardianTransaction).toHaveBeenCalledWith('hash', mockEtherAddress, 'starkex');
+      expect(mockConfirmationScreen.requestConfirmation).toHaveBeenCalledWith('hash', mockEtherAddress, 'starkex');
     });
 
     it('should throw error if user did not confirm the transaction', async () => {
       mockGetTransactionByID.mockResolvedValueOnce({ data: { id: '1234' } });
       mockEvaluateTransaction
         .mockResolvedValueOnce({ data: { confirmationRequired: true } });
-      (mockConfirmationScreen.startGuardianTransaction as jest.Mock).mockResolvedValueOnce({ confirmed: false });
+      (mockConfirmationScreen.requestConfirmation as jest.Mock).mockResolvedValueOnce({ confirmed: false });
 
       await expect(guardianClient.validate({ payloadHash: 'hash' })).rejects.toThrow('Transaction rejected by user');
     });
