@@ -38,7 +38,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
   const [actionDisabled, setActionDisabled] = useState(false);
   const [approvalTxnLoading, setApprovalTxnLoading] = useState(false);
   const [showSwapTxnStep, setShowSwapTxnStep] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   // reject transaction flags
   const [rejectedSpending, setRejectedSpending] = useState(false);
   const [rejectedSwap, setRejectedSwap] = useState(false);
@@ -121,6 +121,9 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
   /* --------------------- */
 
   const handleApproveSpendingClick = useCallback(async () => {
+    if (loading) return;
+    setLoading(true);
+
     if (!checkout || !provider) {
       showErrorView();
       return;
@@ -162,6 +165,8 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
         return;
       }
       handleExceptions(err, data.swapFormInfo as PrefilledSwapForm);
+    } finally {
+      setLoading(false);
     }
   }, [
     checkout,
@@ -190,18 +195,22 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
 
   const approveSpendingFooter = useMemo(() => (
     <FooterButton
+      loading={loading}
       actionText={rejectedSpending
         ? approveSpending.footer.retryText
         : approveSpending.footer.buttonText}
       onActionClick={handleApproveSpendingClick}
     />
-  ), [rejectedSpending, handleApproveSpendingClick]);
+  ), [rejectedSpending, handleApproveSpendingClick, loading]);
 
   /* ----------------- */
   // Approve swap step //
   /* ----------------- */
 
   const handleApproveSwapClick = useCallback(async () => {
+    if (loading) return;
+    setLoading(true);
+
     if (!checkout || !provider) {
       showErrorView();
       return;
@@ -240,6 +249,8 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
         return;
       }
       handleExceptions(err, data.swapFormInfo as PrefilledSwapForm);
+    } finally {
+      setLoading(false);
     }
   }, [
     checkout,
@@ -261,12 +272,13 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
 
   const approveSwapFooter = useMemo(() => (
     <FooterButton
+      loading={loading}
       actionText={rejectedSwap
         ? approveSwap.footer.retryText
         : approveSwap.footer.buttonText}
       onActionClick={handleApproveSwapClick}
     />
-  ), [rejectedSwap, handleApproveSwapClick]);
+  ), [rejectedSwap, handleApproveSwapClick, loading]);
 
   return (
     <>
