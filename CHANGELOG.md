@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - @imtbl/orderbook: Added optional fee parameter in create and fulfill order flows
 - @imtbl/orderbook: Changed the way we fulfill orders under the hood to make a call to fulfillment-data
 
+### Changed
+
+- @imtbl/passport: Removed `zkEvmChainId` from Passport configuration. Passport will now automatically resolve the chain ID.
+
 ## [0.9.0] - 2023-08-15
 ### Changed
 

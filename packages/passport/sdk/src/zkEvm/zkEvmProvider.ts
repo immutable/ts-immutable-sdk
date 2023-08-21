@@ -127,6 +127,7 @@ export class ZkEvmProvider implements Provider {
         this.magicProvider = magicProvider;
         this.relayerClient = new RelayerClient({
           config: this.config,
+          jsonRpcProvider: this.jsonRpcProvider,
           user: this.user,
         });
         this.guardianClient = new GuardianClient({
@@ -155,7 +156,6 @@ export class ZkEvmProvider implements Provider {
           magicProvider: this.magicProvider,
           guardianClient: this.guardianClient,
           jsonRpcProvider: this.jsonRpcProvider,
-          config: this.config,
           relayerClient: this.relayerClient,
           user: this.user,
         });

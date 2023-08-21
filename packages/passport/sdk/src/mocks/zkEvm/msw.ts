@@ -6,18 +6,19 @@ import { JsonRpcRequestPayload } from '../../zkEvm/types';
 
 export const relayerId = '0x745';
 export const chainId = '13472';
+export const chainIdHex = '0x343C';
 export const transactionHash = '0x867';
 
 const mandatoryHandlers = [
-  rest.post('https://rpc.testnet.immutable.com', (req, res, ctx) => {
-    const body = req.body as JsonRpcRequestPayload;
+  rest.post('https://rpc.testnet.immutable.com', async (req, res, ctx) => {
+    const body = await req.json<JsonRpcRequestPayload>();
     switch (body.method) {
       case 'eth_chainId': {
         return res(
           ctx.json({
             id: body.id,
             jsonrpc: '2.0',
-            result: '0x343C',
+            result: chainIdHex,
           }),
         );
       }
@@ -34,8 +35,8 @@ export const mswHandlers = {
     internalServerError: rest.post('https://api.sandbox.immutable.com/passport-mr/v1/counterfactual-address', (req, res, ctx) => res(ctx.status(500))),
   },
   jsonRpcProvider: {
-    success: rest.post('https://rpc.testnet.immutable.com', (req, res, ctx) => {
-      const body = req.body as JsonRpcRequestPayload;
+    success: rest.post('https://rpc.testnet.immutable.com', async (req, res, ctx) => {
+      const body = await req.json<JsonRpcRequestPayload>();
       switch (body.method) {
         case 'eth_getCode': {
           return res(
@@ -47,14 +48,14 @@ export const mswHandlers = {
           );
         }
         default: {
-          return res(ctx.status(500));
+          return undefined;
         }
       }
     }),
   },
   relayer: {
-    success: rest.post('https://api.sandbox.immutable.com/relayer-mr/v1/transactions', (req, res, ctx) => {
-      const body = req.body as RelayerTransactionRequest;
+    success: rest.post('https://api.sandbox.immutable.com/relayer-mr/v1/transactions', async (req, res, ctx) => {
+      const body = await req.json<RelayerTransactionRequest>();
       switch (body.method) {
         case 'eth_sendTransaction': {
           return res(
@@ -97,7 +98,7 @@ export const mswHandlers = {
           );
         }
         default: {
-          return res(ctx.status(500));
+          return undefined;
         }
       }
     }),

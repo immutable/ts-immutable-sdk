@@ -1,9 +1,8 @@
 import { JsonRpcProvider, TransactionRequest } from '@ethersproject/providers';
-import { getNonce, getSignedMetaTransactions } from './walletHelpers';
+import { getEip155ChainId, getNonce, getSignedMetaTransactions } from './walletHelpers';
 import { sendTransaction } from './sendTransaction';
 import { mockUserZkEvm } from '../test/mocks';
 import { RelayerClient } from './relayerClient';
-import { PassportConfiguration } from '../config';
 import { retryWithDelay } from '../network/retry';
 import { RelayerTransaction, RelayerTransactionStatus } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
@@ -20,13 +19,19 @@ describe('sendTransaction', () => {
   const relayerTransactionId = 'relayerTransactionId123';
   const transactionHash = 'transactionHash123';
 
+  const nonce = '5';
+  const chainId = 13472;
+  const eip155ChainId = `eip155:${chainId}`;
+
   const transactionRequest: TransactionRequest = {
     to: mockUserZkEvm.zkEvm.ethAddress,
     data: '0x456',
     value: '0x00',
   };
   const magicProvider = {};
-  const jsonRpcProvider = {};
+  const jsonRpcProvider = {
+    ready: Promise.resolve({ chainId }),
+  };
   const relayerClient = {
     imGetFeeOptions: jest.fn(),
     ethSendTransaction: jest.fn(),
@@ -36,11 +41,6 @@ describe('sendTransaction', () => {
     validateEVMTransaction: jest.fn(),
     withConfirmationScreen: jest.fn(() => (task: () => void) => task()),
     loading: jest.fn(),
-  };
-
-  const nonce = '5';
-  const config: Partial<PassportConfiguration> = {
-    zkEvmChainId: 'eip155:13472',
   };
 
   const imxFeeOption = {
@@ -55,6 +55,7 @@ describe('sendTransaction', () => {
     jest.resetAllMocks();
     relayerClient.imGetFeeOptions.mockResolvedValue([imxFeeOption]);
     (getNonce as jest.Mock).mockResolvedValueOnce(nonce);
+    (getEip155ChainId as jest.Mock).mockReturnValue(eip155ChainId);
     (getSignedMetaTransactions as jest.Mock).mockResolvedValueOnce(
       signedTransaction,
     );
@@ -77,7 +78,6 @@ describe('sendTransaction', () => {
       magicProvider,
       jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
-      config: config as PassportConfiguration,
       user: mockUserZkEvm,
       guardianClient: guardianClient as unknown as GuardianClient,
     });
@@ -94,21 +94,22 @@ describe('sendTransaction', () => {
       status: RelayerTransactionStatus.SUCCESSFUL,
       hash: transactionHash,
     } as RelayerTransaction);
+    (getEip155ChainId as jest.Mock).mockReturnValue(`eip155:${chainId}`);
 
     const result = await sendTransaction({
       params: [transactionRequest],
       magicProvider,
       jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
-      config: config as PassportConfiguration,
       user: mockUserZkEvm,
       guardianClient: guardianClient as unknown as GuardianClient,
     });
 
     expect(result).toEqual(transactionHash);
+    expect(getEip155ChainId).toHaveBeenCalledWith(chainId);
     expect(guardianClient.validateEVMTransaction).toHaveBeenCalledWith(
       {
-        chainId: config.zkEvmChainId,
+        chainId: eip155ChainId,
         nonce,
         user: mockUserZkEvm,
         metaTransactions: [
@@ -145,7 +146,6 @@ describe('sendTransaction', () => {
         magicProvider,
         jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
         relayerClient: relayerClient as unknown as RelayerClient,
-        config: config as PassportConfiguration,
         user: mockUserZkEvm,
         guardianClient: guardianClient as unknown as GuardianClient,
       }),

@@ -25,7 +25,6 @@ describe('Config', () => {
     network: Networks.SANDBOX,
     passportDomain: 'customDomain123',
     zkEvmRpcUrl: 'rpcUrl123',
-    zkEvmChainId: '123',
     relayerUrl: 'relayerUrl123',
     immutableXClient: {} as ImmutableXClient,
     indexerMrBasePath: 'indexerMrBasePath123',

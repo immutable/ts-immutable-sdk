@@ -86,7 +86,6 @@ describe('Passport', () => {
             network: Networks.SANDBOX,
             passportDomain: 'customDomain123',
             relayerUrl: 'relayerUrl123',
-            zkEvmChainId: '123',
             zkEvmRpcUrl: 'zkEvmRpcUrl123',
             indexerMrBasePath: 'indexerMrBasePath123',
             orderBookMrBasePath: 'orderBookMrBasePath123',
