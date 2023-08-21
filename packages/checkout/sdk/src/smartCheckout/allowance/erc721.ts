@@ -7,7 +7,7 @@ import { SufficientAllowance } from './types';
 // Returns true if the spender address is approved for all ERC721s of this collection
 export const getERC721ApprovedForAll = async (
   provider: Web3Provider,
-  owner: string,
+  ownerAddress: string,
   contractAddress: string,
   spenderAddress: string,
 ): Promise<boolean> => {
@@ -17,10 +17,10 @@ export const getERC721ApprovedForAll = async (
       JSON.stringify(ERC721ABI),
       provider,
     );
-    return await contract.isApprovedForAll(owner, spenderAddress);
+    return await contract.isApprovedForAll(ownerAddress, spenderAddress);
   } catch (err: any) {
     throw new CheckoutError(
-      'Failed to check approval for ERC721',
+      'Failed to check approval for all ERC721s of collection',
       CheckoutErrorType.GET_ERC721_ALLOWANCE_ERROR,
       { contractAddress },
     );

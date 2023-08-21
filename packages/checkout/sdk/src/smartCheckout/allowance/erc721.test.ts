@@ -161,7 +161,7 @@ describe('erc721', () => {
         data = err.data;
       }
 
-      expect(message).toEqual('Failed to check approval for ERC721');
+      expect(message).toEqual('Failed to check approval for all ERC721s of collection');
       expect(type).toEqual(CheckoutErrorType.GET_ERC721_ALLOWANCE_ERROR);
       expect(data).toEqual({
         contractAddress: '0xERC721',
