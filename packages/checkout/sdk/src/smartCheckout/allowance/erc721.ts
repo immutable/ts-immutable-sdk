@@ -55,10 +55,6 @@ export const getERC721ApprovedAddress = async (
 
 export const parseIdToNumber = (id: string) => parseInt(id, 10);
 
-export const validateERC721 = () => {
-
-};
-
 export const hasERC721Allowances = async (
   provider: Web3Provider,
   ownerAddress: string,
