@@ -74,7 +74,7 @@ const getFileBuild = (inputFilename) => [
   },
 ];
 
-const buildBundles = () => {
+const esmBuild = () => {
   const modules = [];
   const filesToBuild = getFilesToBuild();
   for (const file of filesToBuild) {
@@ -134,5 +134,5 @@ export default [
   // },
 
   // Export ES Modules
-  ...buildBundles(),
+  ...esmBuild(),
 ];
