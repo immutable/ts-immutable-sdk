@@ -67,7 +67,7 @@ function validateSecondaryFees(secondaryFees: SecondaryFee[]) {
     if (!isValidNonZeroAddress(secondaryFee.recipient)) {
       throw new InvalidConfigurationError(`Invalid secondary fee recipient address: ${secondaryFee.recipient}`);
     }
-    if (secondaryFee.basisPoints < 0 || secondaryFee.basisPoints > MAX_SECONDARY_FEE_BASIS_POINTS) {
+    if (secondaryFee.basisPoints <= 0 || secondaryFee.basisPoints > MAX_SECONDARY_FEE_BASIS_POINTS) {
       throw new InvalidConfigurationError(`Invalid secondary fee basis points: ${secondaryFee.basisPoints}`);
     }
 
