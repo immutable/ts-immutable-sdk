@@ -255,7 +255,7 @@ describe('PassportImxProvider', () => {
     });
   });
 
-  describe.only('when the user has been logged out', () => {
+  describe('when the user has been logged out', () => {
     beforeEach(() => {
       passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
     });
