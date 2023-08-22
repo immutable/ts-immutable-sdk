@@ -79,6 +79,27 @@ const getFileBuild = (inputFilename) => [
   },
 ];
 
+const cjsBuild = () => ({
+  input: 'src/index.ts',
+  output: {
+    file: 'dist/index.cjs',
+    format: 'cjs',
+  },
+  plugins: [
+    nodeResolve({
+      resolveOnly: getPackages(),
+    }),
+    json(),
+    commonJs(),
+    typescript(),
+    replace({
+      exclude: 'node_modules/**',
+      preventAssignment: true,
+      __SDK_VERSION__: pkg.version,
+    }),
+  ],
+});
+
 const esmBuild = () => {
   const modules = [];
   const filesToBuild = getFilesToBuild();
@@ -98,26 +119,7 @@ const buildBundles = () => {
 
 export default [
   // Main build entry
-  // {
-  //   input: 'src/index.ts',
-  //   output: {
-  //     file: 'dist/index.cjs',
-  //     format: 'cjs',
-  //   },
-  //   plugins: [
-  //     nodeResolve({
-  //       resolveOnly: getPackages(),
-  //     }),
-  //     json(),
-  //     commonJs(),
-  //     typescript(),
-  //     replace({
-  //       exclude: 'node_modules/**',
-  //       preventAssignment: true,
-  //       __SDK_VERSION__: pkg.version,
-  //     }),
-  //   ],
-  // },
+  cjsBuild(),
   // Browser Bundle
   // {
   //   input: 'src/index.ts',
