@@ -1,15 +1,16 @@
 name: Publish SDK Reference Docs
 
 on:
+  push:
   # workflow_dispatch:
   #   inputs:
   #     version:
   #       description: 'Version to publish'
   #       required: true
-  workflow_run:
-    workflows: ["Publish to NPM"]
-    types:
-      - completed
+  # workflow_run:
+  #   workflows: ["Publish to NPM"]
+  #   types:
+  #     - completed
 
 jobs:
   PublishDocs:
