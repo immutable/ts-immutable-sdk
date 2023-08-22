@@ -91,7 +91,7 @@ export const formatZeroAmount = (
 
 const tokenValueFormatDecimals = (s: string, numDecimals: number): string => {
   const pointIndex = s.indexOf('.');
-  return parseFloat(s.substring(0, pointIndex + numDecimals + 1)).toString();
+  return parseFloat(s.substring(0, pointIndex + numDecimals + 1)).toFixed(numDecimals);
 };
 
 export const tokenValueFormat = (s: Number | string): string => {
