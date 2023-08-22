@@ -52,6 +52,7 @@ export function HeaderNavigation({
     >
       {showBack && (
         <AppHeaderBar.LeftButtCon
+          sx={ButtonNavigationStyles(transparent)}
           icon="ArrowBackward"
           iconVariant="bold"
           onClick={handleBackButtonClick}
@@ -65,6 +66,7 @@ export function HeaderNavigation({
         {showSettings && onSettingsClick && (
           <ButtCon
             icon="SettingsCog"
+            sx={ButtonNavigationStyles(transparent)}
             iconVariant="bold"
             onClick={onSettingsClick}
             testId="settings-button"

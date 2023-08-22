@@ -19,7 +19,7 @@ import {
   TransactionPurpose,
 } from 'types';
 import { BigNumber, PopulatedTransaction, providers } from 'ethers';
-import { CreateOrderProtocolData, Order, OrderStatus } from 'openapi/sdk';
+import { ProtocolData, Order, OrderStatus } from 'openapi/sdk';
 import {
   EIP_712_ORDER_TYPE,
   ItemType,
@@ -394,9 +394,8 @@ describe('Seaport', () => {
         end_time: new Date().toISOString(),
         id: '1',
         protocol_data: {
-          order_type: CreateOrderProtocolData.order_type.FULL_RESTRICTED,
+          order_type: ProtocolData.order_type.FULL_RESTRICTED,
           zone_address: randomAddress(),
-          operator_signature: randomAddress(),
           seaport_address: randomAddress(),
           seaport_version: SEAPORT_CONTRACT_VERSION_V1_5,
           counter: '0',

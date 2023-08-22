@@ -16,6 +16,7 @@
         "checkout_sdk": "alpha",
         "checkout_widgets": "alpha",
         "erc20": "alpha",
+        "erc721_hybrid_permissioned_mintable": "alpha",
         "erc721_permissioned_mintable": "alpha"
     },
     "fileCopy": [

@@ -12,7 +12,6 @@ export type { OpenAPIConfig } from './core/OpenAPI';
 export type { Chain } from './models/Chain';
 export type { ChainName } from './models/ChainName';
 export type { CreateListingRequestBody } from './models/CreateListingRequestBody';
-export { CreateOrderProtocolData } from './models/CreateOrderProtocolData';
 export type { ERC20Item } from './models/ERC20Item';
 export type { ERC721Item } from './models/ERC721Item';
 export type { Error } from './models/Error';
@@ -28,6 +27,6 @@ export { OrderStatus } from './models/OrderStatus';
 export type { Page } from './models/Page';
 export type { PageCursor } from './models/PageCursor';
 export type { PageSize } from './models/PageSize';
-export type { ProtocolData } from './models/ProtocolData';
+export { ProtocolData } from './models/ProtocolData';
 
 export { OrdersService } from './services/OrdersService';
