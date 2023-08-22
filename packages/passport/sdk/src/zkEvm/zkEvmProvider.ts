@@ -152,6 +152,7 @@ export class ZkEvmProvider implements Provider {
       // Pass through methods
       case 'eth_gasPrice':
       case 'eth_getBalance':
+      case 'eth_getCode':
       case 'eth_getStorageAt':
       case 'eth_estimateGas':
       case 'eth_call':
