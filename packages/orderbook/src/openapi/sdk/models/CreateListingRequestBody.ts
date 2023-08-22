@@ -2,9 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { CreateOrderProtocolData } from './CreateOrderProtocolData';
 import type { Fee } from './Fee';
 import type { Item } from './Item';
+import type { ProtocolData } from './ProtocolData';
 
 export type CreateListingRequestBody = {
   account_address: string;
@@ -18,7 +18,7 @@ export type CreateListingRequestBody = {
    * Time after which the Order is considered expired
    */
   end_time: string;
-  protocol_data: CreateOrderProtocolData;
+  protocol_data: ProtocolData;
   /**
    * A random value added to the create Order request
    */
