@@ -15,7 +15,7 @@
     "@jest/globals": "^29.5.0",
     "@magic-ext/oidc": "^1.0.1",
     "@metamask/detect-provider": "^2.0.0",
-    "@opensea/seaport-js": "2.0.5",
+    "@opensea/seaport-js": "2.0.7",
     "@uniswap/router-sdk": "^1.4.0",
     "@uniswap/sdk-core": "^3.0.1",
     "@uniswap/v3-sdk": "^3.9.0",
@@ -33,6 +33,7 @@
     "@imtbl/config": "0.0.0",
     "@imtbl/cryptofiat": "0.0.0",
     "@imtbl/erc20": "0.0.0",
+    "@imtbl/erc721-hybrid-permissioned-mintable": "0.0.0",
     "@imtbl/erc721-permissioned-mintable": "0.0.0",
     "@imtbl/generated-clients": "0.0.0",
     "@imtbl/guardian": "0.0.0",
@@ -101,6 +102,10 @@
     "./erc20": {
       "types": "./dist/erc20.d.ts",
       "import": "./dist/erc20.js"
+    },
+    "./erc721_hybrid_permissioned_mintable": {
+      "types": "./dist/erc721_hybrid_permissioned_mintable.d.ts",
+      "import": "./dist/erc721_hybrid_permissioned_mintable.js"
     },
     "./erc721_permissioned_mintable": {
       "types": "./dist/erc721_permissioned_mintable.d.ts",

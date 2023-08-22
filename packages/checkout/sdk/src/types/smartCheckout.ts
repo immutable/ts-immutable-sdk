@@ -38,7 +38,7 @@ export enum ItemType {
  * @property {ItemType} type - The type indicate this is a native item.
  * @property {BigNumber} amount - The amount of the item.
  */
-type NativeItem = {
+export type NativeItem = {
   type: ItemType.NATIVE;
   amount: BigNumber;
 };
@@ -50,7 +50,7 @@ type NativeItem = {
  * @property {BigNumber} amount - The amount of the item.
  * @property {string} spenderAddress - The contract address of the approver.
  */
-type ERC20Item = {
+export type ERC20Item = {
   type: ItemType.ERC20;
   contractAddress: string;
   amount: BigNumber;
@@ -64,7 +64,7 @@ type ERC20Item = {
  * @property {string} id - The ID of this ERC721 in the collection.
  * @property {string} spenderAddress - The contract address of the approver.
  */
-type ERC721Item = {
+export type ERC721Item = {
   type: ItemType.ERC721;
   contractAddress: string;
   id: string;

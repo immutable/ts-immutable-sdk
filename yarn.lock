@@ -3479,6 +3479,20 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@imtbl/erc721-hybrid-permissioned-mintable@0.0.0, @imtbl/erc721-hybrid-permissioned-mintable@workspace:packages/erc721-hybrid-permissioned-mintable":
+  version: 0.0.0-use.local
+  resolution: "@imtbl/erc721-hybrid-permissioned-mintable@workspace:packages/erc721-hybrid-permissioned-mintable"
+  dependencies:
+    "@imtbl/config": 0.0.0
+    "@imtbl/contracts": 0.0.0
+    "@rollup/plugin-typescript": ^11.0.0
+    "@swc/jest": ^0.2.24
+    "@typechain/ethers-v5": ^10.2.0
+    ethers: ^5.7.2
+    rollup: ^3.17.2
+  languageName: unknown
+  linkType: soft
+
 "@imtbl/erc721-permissioned-mintable@0.0.0, @imtbl/erc721-permissioned-mintable@workspace:packages/erc721-permissioned-mintable":
   version: 0.0.0-use.local
   resolution: "@imtbl/erc721-permissioned-mintable@workspace:packages/erc721-permissioned-mintable"
@@ -3558,7 +3572,7 @@ __metadata:
   resolution: "@imtbl/orderbook@workspace:packages/orderbook"
   dependencies:
     "@imtbl/config": 0.0.0
-    "@opensea/seaport-js": 2.0.5
+    "@opensea/seaport-js": 2.0.7
     "@rollup/plugin-typescript": ^11.0.0
     "@swc/jest": ^0.2.24
     "@typechain/ethers-v5": ^10.2.0
@@ -3699,6 +3713,7 @@ __metadata:
     "@imtbl/core-sdk": ^2.0.2
     "@imtbl/cryptofiat": 0.0.0
     "@imtbl/erc20": 0.0.0
+    "@imtbl/erc721-hybrid-permissioned-mintable": 0.0.0
     "@imtbl/erc721-permissioned-mintable": 0.0.0
     "@imtbl/generated-clients": 0.0.0
     "@imtbl/guardian": 0.0.0
@@ -3709,7 +3724,7 @@ __metadata:
     "@jest/globals": ^29.5.0
     "@magic-ext/oidc": ^1.0.1
     "@metamask/detect-provider": ^2.0.0
-    "@opensea/seaport-js": 2.0.5
+    "@opensea/seaport-js": 2.0.7
     "@rollup/plugin-commonjs": ^24.0.1
     "@rollup/plugin-json": ^6.0.0
     "@rollup/plugin-node-resolve": ^15.0.2
@@ -5208,14 +5223,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opensea/seaport-js@npm:2.0.5":
-  version: 2.0.5
-  resolution: "@opensea/seaport-js@npm:2.0.5"
+"@opensea/seaport-js@npm:2.0.7":
+  version: 2.0.7
+  resolution: "@opensea/seaport-js@npm:2.0.7"
   dependencies:
     "@0xsequence/multicall": ^0.43.29
     ethers: ^5.7.2
     merkletreejs: ^0.3.10
-  checksum: b00ee0eaec34a32af1da038c37ec0506519fbfb7397df090d0ada56c26f39b1e5f832d294de0e59df63e5d59616df3146efb489e710b5691fe64a0fbaad893f5
+  checksum: 02dec110c85899ec758a19e3de32635da025b28950d220cc57a3ea9c9297105aa72682dee9d5854e1aa51050a433caf214ce909e1162cf0177dc37a70ae26bd4
   languageName: node
   linkType: hard
 

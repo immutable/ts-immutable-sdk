@@ -15,12 +15,11 @@ import {
   ERC20Item,
   ERC721Item,
   NativeItem,
-  RoyaltyInfo,
   SignableAction,
   TransactionPurpose,
 } from 'types';
 import { BigNumber, PopulatedTransaction, providers } from 'ethers';
-import { CreateOrderProtocolData, Order, OrderStatus } from 'openapi/sdk';
+import { ProtocolData, Order, OrderStatus } from 'openapi/sdk';
 import {
   EIP_712_ORDER_TYPE,
   ItemType,
@@ -63,11 +62,6 @@ describe('Seaport', () => {
         type: 'ERC20',
       };
 
-      const royaltyInfo: RoyaltyInfo = {
-        amountRequired: '10',
-        recipient: randomAddress(),
-      };
-
       const orderStart = new Date();
       const orderExpiry = new Date();
       const orderHash = randomAddress();
@@ -84,12 +78,11 @@ describe('Seaport', () => {
         when(mockedProvider.getNetwork()).thenReturn(
           Promise.resolve({ chainId: network, name: 'foobar' }),
         );
-        when(mockedSeaportLibFactory.create(anything(), anything()))
-          .thenReturn(instance(mockedSeaportJs));
+        when(mockedSeaportLibFactory.create(anything(), anything())).thenReturn(
+          instance(mockedSeaportJs),
+        );
         when(
-          mockedSeaportJs.getOrderHash(
-            deepEqual(orderComponentsWithHexSalt as OrderComponents),
-          ),
+          mockedSeaportJs.getOrderHash(deepEqual(orderComponentsWithHexSalt as OrderComponents)),
         ).thenReturn(orderHash);
         when(createAction.getMessageToSign()).thenReturn(
           Promise.resolve(JSON.stringify({ message: orderComponents })),
@@ -110,11 +103,6 @@ describe('Seaport', () => {
                   token: considerationItem.contractAddress,
                   amount: considerationItem.amount,
                   recipient: offerer,
-                },
-                {
-                  token: considerationItem.contractAddress,
-                  amount: royaltyInfo.amountRequired,
-                  recipient: royaltyInfo.recipient,
                 },
               ],
               startTime: (orderStart.getTime() / 1000).toFixed(0),
@@ -144,7 +132,6 @@ describe('Seaport', () => {
           offerer,
           listingItem,
           considerationItem,
-          royaltyInfo,
           orderStart,
           orderExpiry,
         );
@@ -159,7 +146,6 @@ describe('Seaport', () => {
           offerer,
           listingItem,
           considerationItem,
-          royaltyInfo,
           orderStart,
           orderExpiry,
         );
@@ -185,7 +171,6 @@ describe('Seaport', () => {
           offerer,
           listingItem,
           considerationItem,
-          royaltyInfo,
           orderStart,
           orderExpiry,
         );
@@ -197,7 +182,6 @@ describe('Seaport', () => {
           offerer,
           listingItem,
           considerationItem,
-          royaltyInfo,
           orderStart,
           orderExpiry,
         );
@@ -230,11 +214,6 @@ describe('Seaport', () => {
         type: 'NATIVE',
       };
 
-      const royaltyInfo: RoyaltyInfo = {
-        amountRequired: '20',
-        recipient: randomAddress(),
-      };
-
       const orderStart = new Date();
       const orderExpiry = new Date();
       const orderHash = randomAddress();
@@ -264,19 +243,16 @@ describe('Seaport', () => {
         when(transactionMethods.buildTransaction()).thenReturn(
           Promise.resolve(approvalTransaction),
         );
-        when(transactionMethods.estimateGas()).thenReturn(
-          Promise.resolve(approvalGas),
-        );
+        when(transactionMethods.estimateGas()).thenReturn(Promise.resolve(approvalGas));
 
         when(mockedProvider.getNetwork()).thenReturn(
           Promise.resolve({ chainId: network, name: 'foobar' }),
         );
-        when(mockedSeaportLibFactory.create(anything(), anything()))
-          .thenReturn(instance(mockedSeaportJs));
+        when(mockedSeaportLibFactory.create(anything(), anything())).thenReturn(
+          instance(mockedSeaportJs),
+        );
         when(
-          mockedSeaportJs.getOrderHash(
-            deepEqual(orderComponentsWithHexSalt as OrderComponents),
-          ),
+          mockedSeaportJs.getOrderHash(deepEqual(orderComponentsWithHexSalt as OrderComponents)),
         ).thenReturn(orderHash);
         when(
           mockedSeaportJs.createOrder(
@@ -294,11 +270,6 @@ describe('Seaport', () => {
                   token: undefined,
                   amount: considerationItem.amount,
                   recipient: offerer,
-                },
-                {
-                  token: undefined,
-                  amount: royaltyInfo.amountRequired,
-                  recipient: royaltyInfo.recipient,
                 },
               ],
               startTime: (orderStart.getTime() / 1000).toFixed(0),
@@ -328,7 +299,6 @@ describe('Seaport', () => {
           offerer,
           listingItem,
           considerationItem,
-          royaltyInfo,
           orderStart,
           orderExpiry,
         );
@@ -337,9 +307,7 @@ describe('Seaport', () => {
         )!;
         expect(approvalAction.purpose).toEqual(TransactionPurpose.APPROVAL);
         const unsignedApprovalTransaction = await approvalAction.buildTransaction();
-        expect(unsignedApprovalTransaction!.from).toEqual(
-          approvalTransaction.from,
-        );
+        expect(unsignedApprovalTransaction!.from).toEqual(approvalTransaction.from);
         expect(unsignedApprovalTransaction!.to).toEqual(approvalTransaction.to);
 
         const expectedGasLimit = approvalGas.add(approvalGas.div(5));
@@ -351,7 +319,6 @@ describe('Seaport', () => {
           offerer,
           listingItem,
           considerationItem,
-          royaltyInfo,
           orderStart,
           orderExpiry,
         );
@@ -378,7 +345,6 @@ describe('Seaport', () => {
           offerer,
           listingItem,
           considerationItem,
-          royaltyInfo,
           orderStart,
           orderExpiry,
         );
@@ -390,7 +356,6 @@ describe('Seaport', () => {
           offerer,
           listingItem,
           considerationItem,
-          royaltyInfo,
           orderStart,
           orderExpiry,
         );
@@ -429,9 +394,8 @@ describe('Seaport', () => {
         end_time: new Date().toISOString(),
         id: '1',
         protocol_data: {
-          order_type: CreateOrderProtocolData.order_type.FULL_RESTRICTED,
+          order_type: ProtocolData.order_type.FULL_RESTRICTED,
           zone_address: randomAddress(),
-          operator_signature: randomAddress(),
           seaport_address: randomAddress(),
           seaport_version: SEAPORT_CONTRACT_VERSION_V1_5,
           counter: '0',
@@ -459,32 +423,25 @@ describe('Seaport', () => {
         const exchangeAction = mock<ExchangeAction<any>>();
         const exchangeActionInstance = instance(exchangeAction);
         exchangeActionInstance.type = 'exchange';
-        exchangeActionInstance.transactionMethods = instance(
-          exchangeTransactionMethods,
-        );
+        exchangeActionInstance.transactionMethods = instance(exchangeTransactionMethods);
         when(exchangeTransactionMethods.buildTransaction()).thenReturn(
           Promise.resolve(fulfilTransaction),
         );
-        when(exchangeTransactionMethods.estimateGas()).thenReturn(
-          Promise.resolve(fulfilGas),
-        );
+        when(exchangeTransactionMethods.estimateGas()).thenReturn(Promise.resolve(fulfilGas));
 
         const approvalTransactionMethods = mock<TransactionMethods<boolean>>();
         const approvalAction = mock<ApprovalAction>();
         const approvalActionInstance = instance(approvalAction);
         approvalActionInstance.type = 'approval';
-        approvalActionInstance.transactionMethods = instance(
-          approvalTransactionMethods,
-        );
+        approvalActionInstance.transactionMethods = instance(approvalTransactionMethods);
         when(approvalTransactionMethods.buildTransaction()).thenReturn(
           Promise.resolve(approvalTransaction),
         );
-        when(approvalTransactionMethods.estimateGas()).thenReturn(
-          Promise.resolve(approvalGas),
-        );
+        when(approvalTransactionMethods.estimateGas()).thenReturn(Promise.resolve(approvalGas));
 
-        when(mockedSeaportLibFactory.create(anything(), anything()))
-          .thenReturn(instance(mockedSeaportJs));
+        when(mockedSeaportLibFactory.create(anything(), anything())).thenReturn(
+          instance(mockedSeaportJs),
+        );
         when(
           mockedSeaportJs.fulfillOrders(
             deepEqual({
@@ -496,6 +453,7 @@ describe('Seaport', () => {
                     signature: immutableOrder.signature,
                   },
                   extraData: '',
+                  tips: [],
                 },
               ],
             }),
@@ -507,9 +465,7 @@ describe('Seaport', () => {
           }),
         );
 
-        when(mockedSeaportJs.getCounter(offerer)).thenReturn(
-          Promise.resolve(BigNumber.from(1)),
-        );
+        when(mockedSeaportJs.getCounter(offerer)).thenReturn(Promise.resolve(BigNumber.from(1)));
 
         sut = new Seaport(
           instance(mockedSeaportLibFactory),
@@ -520,19 +476,13 @@ describe('Seaport', () => {
       });
 
       it('returns the expected unsignedApprovalTransaction', async () => {
-        const { actions } = await sut.fulfillOrder(
-          immutableOrder,
-          fulfiller,
-          '',
-        );
+        const { actions } = await sut.fulfillOrder(immutableOrder, fulfiller, '');
         const approvalAction = actions.find(
           (a): a is TransactionAction => a.purpose === TransactionPurpose.APPROVAL,
         );
         expect(approvalAction).toBeTruthy();
         const unsignedApprovalTransaction = await approvalAction!.buildTransaction();
-        expect(unsignedApprovalTransaction!.from).toEqual(
-          approvalTransaction.from,
-        );
+        expect(unsignedApprovalTransaction!.from).toEqual(approvalTransaction.from);
         expect(unsignedApprovalTransaction!.to).toEqual(approvalTransaction.to);
 
         const expectedGasLimit = approvalGas.add(approvalGas.div(5));
@@ -540,27 +490,17 @@ describe('Seaport', () => {
       });
 
       it('returns the expected unsignedFulfillmentTransaction', async () => {
-        const { actions } = await sut.fulfillOrder(
-          immutableOrder,
-          fulfiller,
-          '',
-        );
+        const { actions } = await sut.fulfillOrder(immutableOrder, fulfiller, '');
         const fulfillmentAction = actions.find(
           (a): a is TransactionAction => a.purpose === TransactionPurpose.FULFILL_ORDER,
         );
         const unsignedFulfillmentTransaction = await fulfillmentAction!.buildTransaction();
         expect(unsignedFulfillmentTransaction).toBeTruthy();
-        expect(unsignedFulfillmentTransaction!.from).toEqual(
-          approvalTransaction.from,
-        );
-        expect(unsignedFulfillmentTransaction!.to).toEqual(
-          approvalTransaction.to,
-        );
+        expect(unsignedFulfillmentTransaction!.from).toEqual(approvalTransaction.from);
+        expect(unsignedFulfillmentTransaction!.to).toEqual(approvalTransaction.to);
 
         const expectedGasLimit = fulfilGas.add(fulfilGas.div(5));
-        expect(unsignedFulfillmentTransaction!.gasLimit).toEqual(
-          expectedGasLimit,
-        );
+        expect(unsignedFulfillmentTransaction!.gasLimit).toEqual(expectedGasLimit);
       });
     });
   });

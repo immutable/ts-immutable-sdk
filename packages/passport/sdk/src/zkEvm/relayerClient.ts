@@ -1,10 +1,13 @@
 import { BytesLike } from 'ethers';
+import { JsonRpcProvider } from '@ethersproject/providers';
 import { PassportConfiguration } from '../config';
 import { FeeOption, RelayerTransaction } from './types';
 import { UserZkEvm } from '../types';
+import { getEip155ChainId } from './walletHelpers';
 
 export type RelayerClientInput = {
   config: PassportConfiguration,
+  jsonRpcProvider: JsonRpcProvider,
   user: UserZkEvm,
 };
 
@@ -59,10 +62,13 @@ export type RelayerTransactionRequest =
 export class RelayerClient {
   private readonly config: PassportConfiguration;
 
+  private readonly jsonRpcProvider: JsonRpcProvider;
+
   private readonly user: UserZkEvm;
 
-  constructor({ config, user }: RelayerClientInput) {
+  constructor({ config, jsonRpcProvider, user }: RelayerClientInput) {
     this.config = config;
+    this.jsonRpcProvider = jsonRpcProvider;
     this.user = user;
   }
 
@@ -91,12 +97,13 @@ export class RelayerClient {
   }
 
   public async ethSendTransaction(to: string, data: BytesLike): Promise<string> {
+    const { chainId } = await this.jsonRpcProvider.ready;
     const payload: EthSendTransactionRequest = {
       method: 'eth_sendTransaction',
       params: [{
         to,
         data,
-        chainId: this.config.zkEvmChainId.toString(),
+        chainId: getEip155ChainId(chainId),
       }],
     };
     const { result } = await this.postToRelayer<EthSendTransactionResponse>(payload);
@@ -113,12 +120,13 @@ export class RelayerClient {
   }
 
   public async imGetFeeOptions(userAddress: string, data: BytesLike): Promise<FeeOption[]> {
+    const { chainId } = await this.jsonRpcProvider.ready;
     const payload: ImGetFeeOptionsRequest = {
       method: 'im_getFeeOptions',
       params: [{
         userAddress,
         data,
-        chainId: this.config.zkEvmChainId.toString(),
+        chainId: getEip155ChainId(chainId),
       }],
     };
     const { result } = await this.postToRelayer<ImGetFeeOptionsResponse>(payload);

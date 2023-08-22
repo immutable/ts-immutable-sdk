@@ -44,8 +44,6 @@ export class PassportConfiguration {
 
   readonly baseConfig: ImmutableConfiguration;
 
-  readonly zkEvmChainId: string;
-
   readonly zkEvmRpcUrl: string;
 
   readonly relayerUrl: string;
@@ -79,7 +77,6 @@ export class PassportConfiguration {
           'magicPublishableApiKey',
           'magicProviderId',
           'zkEvmRpcUrl',
-          'zkEvmChainId',
           'relayerUrl',
           'imxPublicApiDomain',
           'indexerMrBasePath',
@@ -95,7 +92,6 @@ export class PassportConfiguration {
       this.magicPublishableApiKey = overrides.magicPublishableApiKey;
       this.magicProviderId = overrides.magicProviderId;
       this.zkEvmRpcUrl = overrides.zkEvmRpcUrl;
-      this.zkEvmChainId = overrides.zkEvmChainId;
       this.relayerUrl = overrides.relayerUrl;
       this.multiRollupConfig = {
         indexer: createConfig({
@@ -118,7 +114,6 @@ export class PassportConfiguration {
           this.passportDomain = 'https://passport.immutable.com';
           this.imxPublicApiDomain = 'https://api.immutable.com';
           this.zkEvmRpcUrl = ''; // TODO: ID-785 Update once mainnet has been deployed
-          this.zkEvmChainId = ''; // TODO: ID-785 Update once mainnet has been deployed
           this.relayerUrl = 'https://api.immutable.com/relayer-mr';
           this.multiRollupConfig = multiRollupConfig.getProduction();
           break;
@@ -132,7 +127,6 @@ export class PassportConfiguration {
           this.passportDomain = 'https://passport.sandbox.immutable.com';
           this.imxPublicApiDomain = 'https://api.sandbox.immutable.com';
           this.zkEvmRpcUrl = 'https://rpc.testnet.immutable.com';
-          this.zkEvmChainId = 'eip155:13472';
           this.relayerUrl = 'https://api.sandbox.immutable.com/relayer-mr';
           this.multiRollupConfig = multiRollupConfig.getSandbox();
           break;

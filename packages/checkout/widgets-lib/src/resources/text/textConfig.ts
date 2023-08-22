@@ -9,9 +9,6 @@ import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextT
 export const text = {
   views: {
     [ConnectWidgetViews.CONNECT_WALLET]: {
-      header: {
-        title: 'Connect',
-      },
       body: {
         heading: 'Connect a wallet',
         content:

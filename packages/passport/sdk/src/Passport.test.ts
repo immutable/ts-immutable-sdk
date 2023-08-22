@@ -25,6 +25,7 @@ describe('Passport', () => {
   let loginCallbackMock: jest.Mock;
   let logoutMock: jest.Mock;
   let magicLoginMock: jest.Mock;
+  let magicLogoutMock: jest.Mock;
   let getUserMock: jest.Mock;
   let requestRefreshTokenMock: jest.Mock;
   let loginSilentMock: jest.Mock;
@@ -35,6 +36,7 @@ describe('Passport', () => {
     authLoginMock = jest.fn().mockReturnValue(mockUser);
     loginCallbackMock = jest.fn();
     magicLoginMock = jest.fn();
+    magicLogoutMock = jest.fn();
     logoutMock = jest.fn();
     getUserMock = jest.fn();
     requestRefreshTokenMock = jest.fn();
@@ -51,6 +53,7 @@ describe('Passport', () => {
     });
     (MagicAdapter as jest.Mock).mockReturnValue({
       login: magicLoginMock,
+      logout: magicLogoutMock,
     });
     (PassportImxProviderFactory as jest.Mock).mockReturnValue({
       getProvider: getProviderMock,
@@ -83,7 +86,6 @@ describe('Passport', () => {
             network: Networks.SANDBOX,
             passportDomain: 'customDomain123',
             relayerUrl: 'relayerUrl123',
-            zkEvmChainId: '123',
             zkEvmRpcUrl: 'zkEvmRpcUrl123',
             indexerMrBasePath: 'indexerMrBasePath123',
             orderBookMrBasePath: 'orderBookMrBasePath123',
@@ -147,6 +149,7 @@ describe('Passport', () => {
       await passport.logout();
 
       expect(logoutMock).toBeCalledTimes(1);
+      expect(magicLogoutMock).toBeCalledTimes(1);
     });
   });
 
