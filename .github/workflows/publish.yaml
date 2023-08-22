@@ -129,11 +129,11 @@ jobs:
 
       - name: Testing Output
         run: |
-          echo "VERSION={{ steps.version.outputs.NEXT_VERSION }}"
+          echo "VERSION=${{ steps.version.outputs.NEXT_VERSION }}"
 
       - name: Push Changelog
         # if: contains(github.event.inputs.release_type, 'release') && github.event.inputs.dry_run == 'false'
-        run: VERSION={{ steps.version.outputs.NEXT_VERSION }} ./.github/scripts/push-pr.sh CHANGELOG.md
+        run: VERSION="${{ steps.version.outputs.NEXT_VERSION }}" ./.github/scripts/push-pr.sh CHANGELOG.md
 
       - name: Trigger Publish Docs Workflow
         # if: contains(github.event.inputs.release_type, 'release') && github.event.inputs.dry_run == 'false'
