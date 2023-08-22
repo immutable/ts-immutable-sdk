@@ -89,29 +89,33 @@ export const formatZeroAmount = (
   return amount;
 };
 
+const tokenValueFormatDecimals = (s: string, numDecimals: number): string => {
+  const pointIndex = s.indexOf('.');
+  return parseFloat(s.substring(0, pointIndex + numDecimals + 1)).toString();
+};
+
 export const tokenValueFormat = (s: Number | string): string => {
   const asString = s.toString();
 
+  // Only float numbers will be handled by this function
   const pointIndex = asString.indexOf('.');
   if (pointIndex === -1) return asString;
 
-  if (asString[0] !== '.' && parseInt(asString[0], 10) > 0) {
-    let formatted = parseFloat(asString.substring(
-      0,
-      pointIndex + DEFAULT_GT_ONE_TOKEN_FORMATTING_DECIMALS + 1,
-    )).toFixed(DEFAULT_GT_ONE_TOKEN_FORMATTING_DECIMALS);
-
-    if (formatted.endsWith('.00')) {
-      // eslint-disable-next-line prefer-destructuring
-      formatted = formatted.substring(0, pointIndex);
-    }
-    return formatted;
+  // If the first decimal is zero, this can happen if:
+  // 1. The number provided starts with "." (e.g. ".012")
+  // 2. The number starts with 0 (e.g. "0.234")
+  if (asString[0] === '.' || parseInt(asString[0], 10) === 0) {
+    return tokenValueFormatDecimals(asString, DEFAULT_TOKEN_FORMATTING_DECIMALS);
   }
 
-  return asString.substring(
-    0,
-    pointIndex + DEFAULT_TOKEN_FORMATTING_DECIMALS + 1,
-  );
+  // In case the number is greater than 1 then the formatting will look slightly different.
+  // "12312.1231" => "12312.12"
+  let formatted = tokenValueFormatDecimals(asString, DEFAULT_GT_ONE_TOKEN_FORMATTING_DECIMALS);
+
+  // Truncate the .00 if the number is greater than 1
+  if (formatted.endsWith('.00')) formatted = tokenValueFormatDecimals(formatted, 0);
+
+  return formatted;
 };
 
 export const isZkEvmChainId = (chainId: ChainId) => chainId === ChainId.IMTBL_ZKEVM_DEVNET
