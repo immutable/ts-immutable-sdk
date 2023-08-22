@@ -80,6 +80,7 @@ const getFileBuild = (inputFilename) => [
 ];
 
 const cjsBuild = () => {
+  console.log('cjs build');
   return {
     input: 'src/index.ts',
     output: {
