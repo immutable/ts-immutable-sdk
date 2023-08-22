@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.0] - 2023-08-22
+
 ### Added
 
 - @imtbl/passport: Improved silent logout functionality - zkEvm provider will now emit `accountsChanged` and IMXProvider will throw an error if workflows are called after logout.
