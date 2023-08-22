@@ -1,9 +1,4 @@
 #!/bin/sh
-
-# echo all the parameters passed to this script
-echo "All parameters: $*"
-echo "Version: $VERSION"
-
 set -e
 set -x
 
@@ -21,10 +16,13 @@ fi
 
 PR_BRANCH="release-changelog-$VERSION"
 
+git checkout -b $PR_BRANCH
+
+# DELETE ME
 echo "Foo" >> CHANGELOG.md
 
 echo "Staging changes"
-git add $*
+git add CHANGELOG.md
 
 echo "Adding git commit"
 if git status | grep -q "Changes to be committed"
@@ -38,7 +36,8 @@ then
   echo "Creating a pull request"
   gh pr create --title "Release SDK CHANGELOG $VERSION" \
                --body "Updated CHANGELOG.md from ts-immutable-sdk release workflow" \
-               --reviewer "$GITHUB_ACTOR"
+               --reviewer "$GITHUB_ACTOR" \
+               --base "main"
 else
   echo "No changes detected"
 fi
