@@ -13,14 +13,13 @@ then
   exit 1
 fi
 
-INPUT_DESTINATION_HEAD_BRANCH="release-changelog-$VERSION"
-
-if [ -z "$INPUT_PULL_REQUEST_REVIEWERS" ]
+if [ -z "GITHUB_ACTOR" ]
 then
-  PULL_REQUEST_REVIEWERS=$INPUT_PULL_REQUEST_REVIEWERS
-else
-  PULL_REQUEST_REVIEWERS='-r '$INPUT_PULL_REQUEST_REVIEWERS
+  echo "GITHUB_ACTOR is not set"
+  exit 1
 fi
+
+PR_BRANCH="release-changelog-$VERSION"
 
 echo "Foo" >> CHANGELOG.md
 
@@ -32,7 +31,7 @@ if git status | grep -q "Changes to be committed"
 then
   git commit --message "Update from https://github.com/$GITHUB_REPOSITORY/commit/$GITHUB_SHA"
   echo "Pushing git commit"
-  git push -u origin HEAD:$INPUT_DESTINATION_HEAD_BRANCH
+  git push -u origin HEAD:$PR_BRANCH
 
   sleep 10
 
