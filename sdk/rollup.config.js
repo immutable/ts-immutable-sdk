@@ -127,32 +127,32 @@ export default [
   // Main build entry
   // cjsBuild(),
   // Browser Bundle
-  // {
-  //   input: 'src/index.ts',
-  //   output: {
-  //     file: 'dist/index.browser.js',
-  //     format: 'umd',
-  //     sourcemap: true,
-  //     name: 'immutable',
-  //   },
-  //   plugins: [
-  //     nodeResolve({
-  //       jsnext: true,
-  //       main: true,
-  //       browser: true,
-  //     }),
-  //     nodePolyfills(),
-  //     commonJs(),
-  //     typescript(),
-  //     json(),
-  //     replace({
-  //       exclude: 'node_modules/**',
-  //       preventAssignment: true,
-  //       __SDK_VERSION__: pkg.version,
-  //     }),
-  //     terser(),
-  //   ],
-  // },
+  {
+    input: 'src/index.ts',
+    output: {
+      file: 'dist/index.browser.js',
+      format: 'umd',
+      sourcemap: true,
+      name: 'immutable',
+    },
+    plugins: [
+      nodeResolve({
+        jsnext: true,
+        main: true,
+        browser: true,
+      }),
+      nodePolyfills(),
+      commonJs(),
+      typescript(),
+      json(),
+      replace({
+        exclude: 'node_modules/**',
+        preventAssignment: true,
+        __SDK_VERSION__: pkg.version,
+      }),
+      terser(),
+    ],
+  },
 
   // Export ES Modules
   ...buildBundles(),
