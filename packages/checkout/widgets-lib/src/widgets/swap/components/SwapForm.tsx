@@ -17,7 +17,7 @@ import {
   calculateCryptoToFiat, formatZeroAmount, isNativeToken, tokenValueFormat,
 } from '../../../lib/utils';
 import {
-  DEFAULT_TOKEN_DECIMALS, DEFAULT_QUOTE_REFRESH_INTERVAL, NATIVE, IMX_ADDRESS_ZKEVM,
+  DEFAULT_TOKEN_DECIMALS, DEFAULT_QUOTE_REFRESH_INTERVAL, NATIVE, IMX_ADDRESS_ZKEVM, DEFAULT_TOKEN_VALIDATION_DECIMALS,
 } from '../../../lib';
 import { quotesProcessor } from '../functions/FetchQuote';
 import { SelectInput } from '../../../components/FormComponents/SelectInput/SelectInput';
@@ -496,8 +496,7 @@ export function SwapForm({ data }: SwapFromProps) {
 
   const textInputMaxButtonClick = () => {
     if (!fromBalance) return;
-
-    const fromBalanceTruncated = fromBalance.slice(0, fromBalance.indexOf('.') + 7);
+    const fromBalanceTruncated = fromBalance.slice(0, fromBalance.indexOf('.') + DEFAULT_TOKEN_VALIDATION_DECIMALS + 1);
     setFromAmount(fromBalanceTruncated);
     setDirection(SwapDirection.FROM);
   };
