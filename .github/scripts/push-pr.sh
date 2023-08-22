@@ -27,9 +27,9 @@ git add CHANGELOG.md
 echo "Adding git commit"
 if git status | grep -q "Changes to be committed"
 then
-  git commit --message "Update from https://github.com/$GITHUB_REPOSITORY/commit/$GITHUB_SHA"
+  git commit --message "Update CHANGELOG $VERSION during release workflow"
   echo "Pushing git commit"
-  git push -u origin HEAD:$PR_BRANCH
+  git push -u origin $PR_BRANCH
 
   sleep 10
 
