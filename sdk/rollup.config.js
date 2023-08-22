@@ -79,9 +79,7 @@ const getFileBuild = (inputFilename) => [
   },
 ];
 
-const cjsBuild = () => {
-  console.log('cjs build');
-  return {
+const cjsBuild = () => ({
     input: 'src/index.ts',
     output: {
       file: 'dist/index.cjs',
@@ -100,8 +98,7 @@ const cjsBuild = () => {
         __SDK_VERSION__: pkg.version,
       }),
     ],
-  }
-};
+  });
 
 const esmBuild = () => {
   const modules = [];
@@ -114,6 +111,12 @@ const esmBuild = () => {
 
 const buildBundles = () => {
   const builds = [];
+  if(enabledBundles.length === 0){
+    throw new Error("No bundles enabled. Please set BUNDLES environment variable to a comma separated list of bundles to build. Example: BUNDLES=cjs,browser,esm");
+  }
+  if(enabledBundles.includes("cjs")){
+    builds.push(cjsBuild());
+  } 
   if(enabledBundles.includes("esm")){
     builds.push(...esmBuild());
   } 
@@ -122,7 +125,7 @@ const buildBundles = () => {
 
 export default [
   // Main build entry
-  cjsBuild(),
+  // cjsBuild(),
   // Browser Bundle
   // {
   //   input: 'src/index.ts',
