@@ -43,7 +43,6 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          # token: ${{ secrets.RELEASE_TOKEN }}
 
       - name: Setup Github
         run: |
@@ -59,31 +58,31 @@ jobs:
           node-version: lts/*
           cache: 'yarn'
 
-      # - name: Workout next version string
-      #   run: |
-      #     upgrade_type=${{ github.event.inputs.upgrade_type }}
-      #     if [ ${{ contains(github.event.inputs.upgrade_type, 'none') }} == true ]
-      #     then
-      #       upgrade_type=""
-      #       revision_upgrade=$( ${{ contains(github.event.inputs.release_type, 'alpha') }} && echo '--revision' || echo '')
-      #       echo $revision
-      #     fi
-      #     ./.github/scripts/version-up.sh --${{github.event.inputs.release_type }} --$upgrade_type --apply $revision_upgrade
-      #   shell: bash
+      - name: Workout next version string
+        run: |
+          upgrade_type=${{ github.event.inputs.upgrade_type }}
+          if [ ${{ contains(github.event.inputs.upgrade_type, 'none') }} == true ]
+          then
+            upgrade_type=""
+            revision_upgrade=$( ${{ contains(github.event.inputs.release_type, 'alpha') }} && echo '--revision' || echo '')
+            echo $revision
+          fi
+          ./.github/scripts/version-up.sh --${{github.event.inputs.release_type }} --$upgrade_type --apply $revision_upgrade
+        shell: bash
 
       - name: Workout next version string
         run: |
           ./.github/scripts/version-up.sh --release --patch --apply
         shell: bash        
 
-      # - name: Install dependencies
-      #   run: yarn install --immutable
+      - name: Install dependencies
+        run: yarn install --immutable
 
-      # - name: Lint
-      #   run: yarn lint
+      - name: Lint
+        run: yarn lint
 
-      # - name: Check Single Package Version Policy
-      #   run: yarn syncpack:check
+      - name: Check Single Package Version Policy
+        run: yarn syncpack:check
 
       - name: Get next version string
         id: version
@@ -96,14 +95,14 @@ jobs:
       #     tmp=$(mktemp)
       #     jq '.version = "${{steps.version.outputs.NEXT_VERSION}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
 
-      # - name: Build
-      #   run: export NODE_OPTIONS=--max-old-space-size=6144 && RELEASE_TYPE=${{ github.event.inputs.release_type }} yarn build
+      - name: Build
+        run: export NODE_OPTIONS=--max-old-space-size=6144 && RELEASE_TYPE=${{ github.event.inputs.release_type }} yarn build
 
-      # - name: Typecheck
-      #   run: yarn typecheck
+      - name: Typecheck
+        run: yarn typecheck
 
-      # - name: Test
-      #   run: yarn test
+      - name: Test
+        run: yarn test
 
       # - name: Push tags
       #   # Boolean inputs are not actually booleans, see https://github.com/actions/runner/issues/1483
@@ -129,6 +128,7 @@ jobs:
       #   if: contains(github.event.inputs.release_type, 'release')
       #   run: yarn release --ci --no-increment -c .release-it.json $( ${{ github.event.inputs.dry_run }} && echo "--dry-run" || echo "") --github.tokenRef=${{ secrets.RELEASE_TOKEN }}
 
+      # DELETE ME
       - name: Testing Output
         run: |
           echo "VERSION=${{ steps.version.outputs.NEXT_VERSION }}"
@@ -136,9 +136,3 @@ jobs:
       - name: Push Changelog
         # if: contains(github.event.inputs.release_type, 'release') && github.event.inputs.dry_run == 'false'
         run: VERSION="${{ steps.version.outputs.NEXT_VERSION }}" ./.github/scripts/push-pr.sh CHANGELOG.md
-
-      # - name: Trigger Publish Docs Workflow
-      #   # if: contains(github.event.inputs.release_type, 'release') && github.event.inputs.dry_run == 'false'
-      #   uses: .github/workflows/publish-docs.yaml
-      #   with:
-      #     version: ${{ steps.version.outputs.NEXT_VERSION }}
