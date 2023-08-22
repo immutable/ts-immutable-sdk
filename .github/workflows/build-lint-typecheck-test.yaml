@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - DX-2199/parallelise-build
   pull_request:
 
 jobs:
