@@ -83,6 +83,14 @@ const esmBuild = () => {
   return modules;
 };
 
+const enabledBuilds = () => {
+  const builds = [];
+  if(true){
+    builds.push(...esmBuild());
+  }
+  return builds;
+}
+
 export default [
   // Main build entry
   // {
@@ -134,5 +142,5 @@ export default [
   // },
 
   // Export ES Modules
-  ...esmBuild(),
+  ...enabledBuilds(),
 ];
