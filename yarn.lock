@@ -3479,6 +3479,20 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@imtbl/erc721-hybrid-permissioned-mintable@0.0.0, @imtbl/erc721-hybrid-permissioned-mintable@workspace:packages/erc721-hybrid-permissioned-mintable":
+  version: 0.0.0-use.local
+  resolution: "@imtbl/erc721-hybrid-permissioned-mintable@workspace:packages/erc721-hybrid-permissioned-mintable"
+  dependencies:
+    "@imtbl/config": 0.0.0
+    "@imtbl/contracts": 0.0.0
+    "@rollup/plugin-typescript": ^11.0.0
+    "@swc/jest": ^0.2.24
+    "@typechain/ethers-v5": ^10.2.0
+    ethers: ^5.7.2
+    rollup: ^3.17.2
+  languageName: unknown
+  linkType: soft
+
 "@imtbl/erc721-permissioned-mintable@0.0.0, @imtbl/erc721-permissioned-mintable@workspace:packages/erc721-permissioned-mintable":
   version: 0.0.0-use.local
   resolution: "@imtbl/erc721-permissioned-mintable@workspace:packages/erc721-permissioned-mintable"
@@ -3699,6 +3713,7 @@ __metadata:
     "@imtbl/core-sdk": ^2.0.2
     "@imtbl/cryptofiat": 0.0.0
     "@imtbl/erc20": 0.0.0
+    "@imtbl/erc721-hybrid-permissioned-mintable": 0.0.0
     "@imtbl/erc721-permissioned-mintable": 0.0.0
     "@imtbl/generated-clients": 0.0.0
     "@imtbl/guardian": 0.0.0
