@@ -137,6 +137,6 @@ jobs:
 
       - name: Trigger Publish Docs Workflow
         # if: contains(github.event.inputs.release_type, 'release') && github.event.inputs.dry_run == 'false'
-        uses: .github/workflows/publish-docs.yaml
+        uses: ./.github/workflows/publish-docs.yaml
         with:
           version: ${{ steps.version.outputs.NEXT_VERSION }}
