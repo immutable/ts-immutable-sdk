@@ -14,6 +14,11 @@ import nodePolyfills from 'rollup-plugin-polyfill-node';
 // RELEASE_TYPE environment variable is set by the CI/CD pipeline
 const releaseType = process.env.RELEASE_TYPE || 'alpha';
 
+const bundles = ["cjs","browser","esm"];
+const wantBundles = process.env.BUNDLES || bundles.join(',');
+const enabledBundles = wantBundles.split(',').filter((b) => bundles.includes(b));
+console.log('enabled bundles:', enabledBundles);
+
 const packages = JSON.parse(
   readFileSync('./workspace-packages.json', { encoding: 'utf8' })
 );
@@ -83,11 +88,11 @@ const esmBuild = () => {
   return modules;
 };
 
-const enabledBuilds = () => {
+const buildBundles = () => {
   const builds = [];
-  if(true){
+  if(enabledBundles.includes("esm")){
     builds.push(...esmBuild());
-  }
+  } 
   return builds;
 }
 
@@ -142,5 +147,5 @@ export default [
   // },
 
   // Export ES Modules
-  ...enabledBuilds(),
+  ...buildBundles(),
 ];
