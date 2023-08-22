@@ -1,15 +1,15 @@
 name: Publish SDK Reference Docs
 
 on:
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version to publish'
-        required: true
-  # workflow_run:
-  #   workflows: ["Publish to NPM"]
-  #   types:
-  #     - completed
+  # workflow_dispatch:
+  #   inputs:
+  #     version:
+  #       description: 'Version to publish'
+  #       required: true
+  workflow_run:
+    workflows: ["Publish to NPM"]
+    types:
+      - completed
 
 jobs:
   PublishDocs:
@@ -18,14 +18,14 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.PLATFORM_SA_GITHUB_TOKEN }}
     steps:
-      - name: Echo Workflow Inputs
-        run: |
-          echo "VERSION={{ github.event.inputs.version }}"
+      # - name: Echo Workflow Inputs
+      #   run: |
+      #     echo "VERSION=${{ github.event.workflow_run. }}"
 
-      # - name: Checkout
-      #   uses: actions/checkout@v3
-      #   with:
-      #     fetch-depth: 0
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       # - name: Checkout Docs Repo
       #   uses: actions/checkout@v3
@@ -35,9 +35,13 @@ jobs:
       #     path: imx-docs
       #     ref: main
 
+      - name: Setup environment variables
+        run: |
+          echo "VERSION=$(git describe --tags --abbrev=0)"
+
       # - name: Setup environment variables
       #   run: |
-      #     echo "VERSION={{ github.event.inputs.version }}" >> $GITHUB_ENV
+      #     echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
       #     echo "CLONE_DIR=./imx-docs" >> $GITHUB_ENV
 
       # - name: Pending release check
