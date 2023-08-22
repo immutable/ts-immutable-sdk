@@ -38,6 +38,9 @@
   },
   "scripts": {
     "build": "wsrun -p @imtbl/sdk -p @imtbl/checkout-widgets-lib -e -r --serial build && yarn syncpack:format && yarn wsrun -p @imtbl/sdk -a -m copyBrowserBundles",
+    "build:browser": "BUNDLES=esm yarn build",
+    "build:cjs": "BUNDLES=cjs yarn build",
+    "build:esm": "BUNDLES=esm yarn build",
     "build:onlysdk": "wsrun -y 4 --stages build && yarn syncpack:format",
     "docs:build": "typedoc",
     "docs:serve": "http-server ./docs --cors -p 8080 -c-1",
