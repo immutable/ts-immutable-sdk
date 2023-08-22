@@ -497,7 +497,8 @@ export function SwapForm({ data }: SwapFromProps) {
   const textInputMaxButtonClick = () => {
     if (!fromBalance) return;
 
-    setFromAmount(fromBalance);
+    const fromBalanceTruncated = fromBalance.slice(0, fromBalance.indexOf('.') + 7);
+    setFromAmount(fromBalanceTruncated);
     setDirection(SwapDirection.FROM);
   };
 
