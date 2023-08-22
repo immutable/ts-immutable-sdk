@@ -4,11 +4,12 @@ on:
   push:
     branches:
       - main
+      - DX-2199/parallelise-build
   pull_request:
 
 jobs:
-  build:
-    name: Build, Lint, Typecheck, Test
+  lint:
+    name: Lint
     runs-on: ubuntu-latest-8-cores
     steps:
       - name: Checkout
@@ -29,6 +30,22 @@ jobs:
 
       - name: Lint
         run: yarn lint
+  build:
+    name: Build, Typecheck, Test
+    runs-on: ubuntu-latest-8-cores
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: lts/*
+          registry-url: https://registry.npmjs.org/
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --immutable
 
       - name: Build
         run: export NODE_OPTIONS=--max-old-space-size=6144 && yarn build
