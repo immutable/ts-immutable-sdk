@@ -16,10 +16,8 @@ fi
 
 PR_BRANCH="release-changelog-$VERSION"
 
+echo "Checkout PR branch"
 git checkout -b $PR_BRANCH
-
-# DELETE ME
-echo "Foo" >> CHANGELOG.md
 
 echo "Staging changes"
 git add CHANGELOG.md
