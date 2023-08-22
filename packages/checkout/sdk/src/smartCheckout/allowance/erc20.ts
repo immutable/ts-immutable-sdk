@@ -1,8 +1,10 @@
 import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
 import { BigNumber, Contract } from 'ethers';
-import { ERC20ABI, ItemRequirement, ItemType } from '../types';
-import { CheckoutError, CheckoutErrorType } from '../errors';
+import { CheckoutError, CheckoutErrorType } from '../../errors';
+import { ERC20ABI, ItemRequirement, ItemType } from '../../types';
+import { SufficientAllowance } from './types';
 
+// Gets the amount an address has allowed to be spent by the spender for the ERC20.
 export const getERC20Allowance = async (
   provider: Web3Provider,
   ownerAddress: string,
@@ -25,6 +27,8 @@ export const getERC20Allowance = async (
   }
 };
 
+// Returns the approval transaction for the ERC20 that the owner can sign
+// to approve the spender spending the provided amount of ERC20.
 export const getERC20ApprovalTransaction = async (
   provider: Web3Provider,
   ownerAddress: string,
@@ -50,17 +54,6 @@ export const getERC20ApprovalTransaction = async (
   }
 };
 
-type SufficientAllowance = {
-  sufficient: true,
-  itemRequirement: ItemRequirement,
-}
-| {
-  sufficient: false,
-  delta: BigNumber,
-  itemRequirement: ItemRequirement,
-  approvalTransaction: TransactionRequest | undefined,
-};
-
 export const hasERC20Allowances = async (
   provider: Web3Provider,
   ownerAddress: string,
@@ -81,9 +74,10 @@ export const hasERC20Allowances = async (
   for (const itemRequirement of itemRequirements) {
     if (itemRequirement.type !== ItemType.ERC20) continue;
     const { contractAddress, spenderAddress } = itemRequirement;
-    erc20s.set(`${contractAddress}${spenderAddress}`, itemRequirement);
+    const key = `${contractAddress}${spenderAddress}`;
+    erc20s.set(key, itemRequirement);
     allowancePromises.set(
-      `${contractAddress}${spenderAddress}`,
+      key,
       getERC20Allowance(provider, ownerAddress, contractAddress, spenderAddress),
     );
   }
@@ -108,11 +102,13 @@ export const hasERC20Allowances = async (
 
     sufficient = false; // Set sufficient false on the root of the return object when an ERC20 is insufficient
     const { contractAddress, spenderAddress } = itemRequirement;
+    const key = `${contractAddress}${spenderAddress}`;
     const delta = itemRequirement.amount.sub(allowances[index]);
     // Create maps for both the insufficient ERC20 data and the transaction promises using the same key so the results can be merged
     insufficientERC20s.set(
-      `${contractAddress}${spenderAddress}`,
+      key,
       {
+        type: ItemType.ERC20,
         sufficient: false,
         delta,
         itemRequirement,
@@ -120,7 +116,7 @@ export const hasERC20Allowances = async (
       },
     );
     transactionPromises.set(
-      `${contractAddress}${spenderAddress}`,
+      key,
       getERC20ApprovalTransaction(
         provider,
         ownerAddress,
@@ -133,7 +129,7 @@ export const hasERC20Allowances = async (
 
   // Resolves the approval transactions and merges them with the insufficient ERC20 data
   const transactions = await Promise.all(transactionPromises.values());
-  const transactionPromiseIds = Array.from(allowancePromises.keys());
+  const transactionPromiseIds = Array.from(transactionPromises.keys());
   transactions.forEach((transaction, index) => {
     const insufficientERC20 = insufficientERC20s.get(transactionPromiseIds[index]);
     if (!insufficientERC20) return;
