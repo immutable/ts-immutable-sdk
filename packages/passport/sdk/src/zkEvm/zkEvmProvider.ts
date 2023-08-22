@@ -1,6 +1,5 @@
 import { ExternalProvider, JsonRpcProvider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
-import * as guardian from '@imtbl/guardian';
 import {
   JsonRpcRequestCallback,
   JsonRpcRequestPayload,
@@ -12,10 +11,10 @@ import {
 } from './types';
 import AuthManager from '../authManager';
 import MagicAdapter from '../magicAdapter';
-import TypedEventEmitter from './typedEventEmitter';
+import TypedEventEmitter from '../typedEventEmitter';
 import { PassportConfiguration } from '../config';
 import { ConfirmationScreen } from '../confirmation';
-import { UserZkEvm } from '../types';
+import { PassportEventMap, PassportEvents, UserZkEvm } from '../types';
 import { RelayerClient } from './relayerClient';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';
 import { loginZkEvmUser } from './user';
@@ -28,6 +27,7 @@ export type ZkEvmProviderInput = {
   config: PassportConfiguration,
   confirmationScreen: ConfirmationScreen,
   multiRollupApiClients: MultiRollupApiClients,
+  passportEventEmitter: TypedEventEmitter<PassportEventMap>;
 };
 
 type LoggedInZkEvmProvider = {
@@ -46,8 +46,6 @@ export class ZkEvmProvider implements Provider {
 
   private readonly magicAdapter: MagicAdapter;
 
-  private readonly transactionAPI: guardian.TransactionsApi;
-
   private readonly multiRollupApiClients: MultiRollupApiClients;
 
   private readonly jsonRpcProvider: JsonRpcProvider; // Used for read
@@ -62,28 +60,39 @@ export class ZkEvmProvider implements Provider {
 
   protected user?: UserZkEvm;
 
+  public readonly isPassport: boolean = true;
+
   constructor({
     authManager,
     magicAdapter,
     config,
     confirmationScreen,
     multiRollupApiClients,
+    passportEventEmitter,
   }: ZkEvmProviderInput) {
     this.authManager = authManager;
     this.magicAdapter = magicAdapter;
     this.config = config;
     this.confirmationScreen = confirmationScreen;
-    this.transactionAPI = new guardian.TransactionsApi(
-      new guardian.Configuration({
-        basePath: this.config.imxPublicApiDomain,
-      }),
-    );
     this.jsonRpcProvider = new JsonRpcProvider(this.config.zkEvmRpcUrl);
     this.multiRollupApiClients = multiRollupApiClients;
     this.eventEmitter = new TypedEventEmitter<ProviderEventMap>();
+
+    passportEventEmitter.on(PassportEvents.LOGGED_OUT, this.handleLogout);
   }
 
-  public isPassport: boolean = true;
+  private handleLogout = () => {
+    const shouldEmitAccountsChanged = this.isLoggedIn();
+
+    this.magicProvider = undefined;
+    this.user = undefined;
+    this.relayerClient = undefined;
+    this.guardianClient = undefined;
+
+    if (shouldEmitAccountsChanged) {
+      this.eventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, []);
+    }
+  };
 
   private isLoggedIn(): this is LoggedInZkEvmProvider {
     return this.magicProvider !== undefined
@@ -109,13 +118,14 @@ export class ZkEvmProvider implements Provider {
         this.magicProvider = magicProvider;
         this.relayerClient = new RelayerClient({
           config: this.config,
+          jsonRpcProvider: this.jsonRpcProvider,
           user: this.user,
         });
         this.guardianClient = new GuardianClient({
-          imxPublicApiDomain: this.config.imxPublicApiDomain,
           accessToken: this.user.accessToken,
           confirmationScreen: this.confirmationScreen,
           imxEtherAddress: this.user.zkEvm.ethAddress,
+          config: this.config,
         });
 
         this.eventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, [this.user.zkEvm.ethAddress]);
@@ -132,7 +142,6 @@ export class ZkEvmProvider implements Provider {
           magicProvider: this.magicProvider,
           guardianClient: this.guardianClient,
           jsonRpcProvider: this.jsonRpcProvider,
-          config: this.config,
           relayerClient: this.relayerClient,
           user: this.user,
         });

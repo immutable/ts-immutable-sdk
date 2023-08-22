@@ -5,6 +5,11 @@ import {
   GasAmount,
   ItemRequirement, SmartCheckoutResult, TransactionRequirementType,
 } from '../types/smartCheckout';
+import { itemAggregator } from './itemAggregator';
+import {
+  hasERC20Allowances,
+  hasERC721Allowances,
+} from './allowance';
 
 export const smartCheckout = async (
   provider: Web3Provider,
@@ -13,6 +18,17 @@ export const smartCheckout = async (
 ): Promise<SmartCheckoutResult> => {
   // eslint-disable-next-line no-console
   console.log(provider, itemRequirements, transactionOrGasAmount);
+
+  const ownerAddress = await provider.getSigner().getAddress();
+  const aggregatedItems = itemAggregator(itemRequirements);
+  const erc20Allowances = await hasERC20Allowances(provider, ownerAddress, aggregatedItems);
+  const erc721Allowances = await hasERC721Allowances(provider, ownerAddress, aggregatedItems);
+
+  // eslint-disable-next-line no-console
+  console.log('ERC20 Allowances', erc20Allowances);
+  // eslint-disable-next-line no-console
+  console.log('ERC721 Allowances', erc721Allowances);
+
   return {
     sufficient: true,
     transactionRequirements: [{

@@ -30,7 +30,7 @@ export class Fees {
   withAmounts(): Fee[] {
     return this.secondaryFees.map((fee) => {
       const feeAmount = this.amount.value
-        .mul(fee.feeBasisPoints)
+        .mul(fee.basisPoints)
         .div(BASIS_POINT_PRECISION);
 
       return {
@@ -45,7 +45,7 @@ export class Fees {
 
     for (const fee of this.secondaryFees) {
       const feeAmount = this.amount.value
-        .mul(fee.feeBasisPoints)
+        .mul(fee.basisPoints)
         .div(BASIS_POINT_PRECISION);
       totalFees = addAmount(totalFees, newAmount(feeAmount, this.amount.token));
     }

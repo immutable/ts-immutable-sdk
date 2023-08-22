@@ -5,8 +5,13 @@ import {
   OrderbookModuleConfiguration,
   OrderbookOverrides,
 } from 'config/config';
-import { ERC721Factory } from 'erc721';
-import { ListingResult, ListListingsResult, OrderStatus } from 'openapi/sdk';
+import {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  Fee,
+  ListingResult,
+  ListListingsResult,
+  OrderStatus,
+} from 'openapi/sdk';
 import { Seaport } from 'seaport';
 import {
   CancelOrderResponse,
@@ -89,8 +94,8 @@ export class Orderbook {
   /**
    * List orders. This method is used to get a list of orders filtered by conditions specified
    * in the params object.
-   * @param {ListOrderParams} listOrderParams - Filtering, ordering and page parameters.
-   * @return {Orders} The paged orders.
+   * @param {ListListingsParams} listOrderParams - Filtering, ordering and page parameters.
+   * @return {ListListingsResult} The paged orders.
    */
   listListings(
     listOrderParams: ListListingsParams,
@@ -112,17 +117,10 @@ export class Orderbook {
     buy,
     orderExpiry,
   }: PrepareListingParams): Promise<PrepareListingResponse> {
-    const erc721 = new ERC721Factory(
-      sell.contractAddress,
-      this.orderbookConfig.provider,
-    ).create();
-    const royaltyInfo = await erc721.royaltyInfo(sell.tokenId, buy.amount);
-
     return this.seaport.prepareSeaportOrder(
       makerAddress,
       sell,
       buy,
-      royaltyInfo,
       // Default order start to now
       new Date(),
       // Default order expiry to 2 years from now
@@ -152,16 +150,29 @@ export class Orderbook {
   async fulfillOrder(
     listingId: string,
     takerAddress: string,
+    takerFee?: Fee,
   ): Promise<FulfillOrderResponse> {
-    const orderResult = await this.apiClient.getListing(listingId);
+    const fulfillmentDataRes = await this.apiClient.fulfillmentData([
+      {
+        order_id: listingId,
+        fee: takerFee,
+      },
+    ]);
 
-    if (orderResult.result.status !== OrderStatus.ACTIVE) {
+    if (fulfillmentDataRes.result.length !== 1) {
+      throw new Error('unexpected fulfillment data result length');
+    }
+
+    const extraData = fulfillmentDataRes.result[0].extra_data;
+    const orderResult = fulfillmentDataRes.result[0].order;
+
+    if (orderResult.status !== OrderStatus.ACTIVE) {
       throw new Error(
-        `Cannot fulfil order that is not active. Current status: ${orderResult.result.status}`,
+        `Cannot fulfil order that is not active. Current status: ${orderResult.status}`,
       );
     }
 
-    return this.seaport.fulfillOrder(orderResult.result, takerAddress);
+    return this.seaport.fulfillOrder(orderResult, takerAddress, extraData);
   }
 
   /**

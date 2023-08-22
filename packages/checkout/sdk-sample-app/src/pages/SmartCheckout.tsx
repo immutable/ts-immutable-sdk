@@ -7,6 +7,7 @@ import { Checkout } from '@imtbl/checkout-sdk';
 import { useState, useMemo } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
 import Buy from '../components/Buy';
+import { SmartCheckoutForm } from '../components/SmartCheckoutForm';
 
 export default function SmartCheckout() {
   const [environment, setEnvironment] = useState(Environment.SANDBOX);
@@ -14,14 +15,6 @@ export default function SmartCheckout() {
     return new Checkout({ baseConfig: { environment: environment } });
   }, [environment]);
   const [provider, setProvider] = useState<Web3Provider>();
-
-  function toggleEnvironment() {
-    if (environment === Environment.PRODUCTION) {
-      setEnvironment(Environment.SANDBOX);
-    } else {
-      setEnvironment(Environment.PRODUCTION);
-    }
-  }
   
   return (
     <div>
@@ -101,6 +94,19 @@ export default function SmartCheckout() {
         Buy
       </Divider>
       <Buy
+        checkout={checkout} 
+        provider={provider} />
+
+      <Divider
+        sx={{
+          marginTop: 'base.spacing.x6',
+          marginBottom: 'base.spacing.x2',
+        }}
+      >
+        Smart Checkout
+      </Divider>
+      
+      <SmartCheckoutForm
         checkout={checkout} 
         provider={provider} />
     </div>

@@ -5,7 +5,9 @@ import {
   WalletInfo,
   WalletProviderName,
 } from '@imtbl/checkout-sdk';
-import { useContext, useState, useEffect } from 'react';
+import {
+  useContext, useState, useEffect, useCallback,
+} from 'react';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { ConnectContext, ConnectActions } from '../context/ConnectContext';
 import { WalletItem } from './WalletItem';
@@ -24,33 +26,47 @@ export function WalletList(props: WalletListProps) {
   const { walletFilterTypes, excludeWallets } = props;
   const {
     connectDispatch,
-    connectState: { checkout },
+    connectState: { checkout, passport },
   } = useContext(ConnectContext);
   const { viewDispatch } = useContext(ViewContext);
   const [wallets, setWallets] = useState<WalletInfo[]>([]);
+
+  const excludedWallets = useCallback(() => {
+    const passportWalletProvider = { walletProvider: WalletProviderName.PASSPORT };
+    if (!excludeWallets && !passport) {
+      return [passportWalletProvider];
+    }
+    if (excludeWallets && !passport) {
+      excludeWallets.push(passportWalletProvider);
+      return excludeWallets;
+    }
+    return excludeWallets;
+  }, [excludeWallets, passport]);
 
   useEffect(() => {
     const getAllowedWallets = async () => {
       const allowedWallets = await checkout?.getWalletAllowList({
         type: walletFilterTypes ?? WalletFilterTypes.ALL,
-        exclude: excludeWallets,
+        exclude: excludedWallets(),
       });
       setWallets(allowedWallets?.wallets || []);
     };
     getAllowedWallets();
-  }, [checkout, excludeWallets, walletFilterTypes]);
+  }, [checkout, excludedWallets, walletFilterTypes]);
 
   const onWalletClick = async (walletProviderName: WalletProviderName) => {
     if (checkout) {
       try {
-        const { provider } = await checkout.createProvider({
+        const providerResult = await checkout.createProvider({
           walletProvider: walletProviderName,
+          passport,
         });
+        const web3Provider = providerResult.provider;
 
         connectDispatch({
           payload: {
             type: ConnectActions.SET_PROVIDER,
-            provider,
+            provider: web3Provider,
           },
         });
         connectDispatch({

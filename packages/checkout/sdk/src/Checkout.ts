@@ -10,7 +10,7 @@ import * as wallet from './wallet';
 import * as network from './network';
 import * as transaction from './transaction';
 import * as gasEstimatorService from './gasEstimate';
-import * as buy from './buy';
+import * as buy from './smartCheckout/buy';
 import * as smartCheckout from './smartCheckout';
 import {
   BuyParams,
@@ -79,6 +79,7 @@ export class Checkout {
   ): Promise<CreateProviderResult> {
     return await provider.createProvider(
       params.walletProvider,
+      params.passport,
     );
   }
 

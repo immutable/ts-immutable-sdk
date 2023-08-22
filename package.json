@@ -1,7 +1,7 @@
 {
   "name": "ts-immutable-sdk",
   "description": "Immutable Unified TypeScript SDK",
-  "version": "0.9.0",
+  "version": "0.13.0",
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "devDependencies": {
@@ -59,6 +59,7 @@
     "sdk",
     "packages/config",
     "packages/erc20",
+    "packages/erc721-hybrid-permissioned-mintable",
     "packages/erc721-permissioned-mintable",
     "packages/immutablex_client",
     "packages/passport/sdk",
@@ -85,6 +86,7 @@
     "packages/economy/services",
     "packages/blockchain-data/sdk",
     "packages/blockchain-data/sample-app",
-    "packages/game-bridge"
+    "packages/game-bridge",
+    "packages/internal/economy-building-blocks/playground"
   ]
 }

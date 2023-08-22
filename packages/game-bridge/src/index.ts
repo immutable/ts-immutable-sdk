@@ -23,6 +23,8 @@ const PASSPORT_FUNCTIONS = {
   checkStoredCredentials: 'checkStoredCredentials',
   logout: 'logout',
   getEmail: 'getEmail',
+  imxTransfer: 'imxTransfer',
+  imxBatchNftTransfer: 'imxBatchNftTransfer',
 };
 
 // To notify game engine that this file is loaded
@@ -86,13 +88,14 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
         if (!passportClient) {
           const passportConfig = {
             baseConfig: new config.ImmutableConfiguration({
-              environment: config.Environment.SANDBOX,
+              environment: request.environment,
             }),
             clientId: request.clientId,
-            scope,
             audience,
+            scope,
             redirectUri: (redirect ?? redirectUri),
             logoutRedirectUri,
+            crossSdkBridgeEnabled: true,
           };
           passportClient = new passport.Passport(passportConfig);
         }
@@ -211,6 +214,28 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
           requestId,
           success: true,
           result: userProfile?.email,
+        });
+        break;
+      }
+      case PASSPORT_FUNCTIONS.imxTransfer: {
+        const unsignedTransferRequest = JSON.parse(data);
+        const response = await providerInstance?.transfer(unsignedTransferRequest);
+        callbackToGame({
+          responseFor: fxName,
+          requestId,
+          success: response !== null && response !== undefined,
+          result: response,
+        });
+        break;
+      }
+      case PASSPORT_FUNCTIONS.imxBatchNftTransfer: {
+        const nftTransferDetails = JSON.parse(data);
+        const response = await providerInstance?.batchNftTransfer(nftTransferDetails)
+        callbackToGame({
+          responseFor: fxName,
+          requestId,
+          success: response !== null && response !== undefined,
+          result: response,
         });
         break;
       }

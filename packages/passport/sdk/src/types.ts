@@ -1,6 +1,14 @@
 import { ModuleConfiguration } from '@imtbl/config';
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 
+export enum PassportEvents {
+  LOGGED_OUT = 'loggedOut',
+}
+
+export interface PassportEventMap extends Record<string, any> {
+  [PassportEvents.LOGGED_OUT]: [];
+}
+
 export type UserProfile = {
   email?: string;
   nickname?: string;
@@ -55,16 +63,20 @@ export interface PassportOverrides {
   imxPublicApiDomain: string;
   immutableXClient: ImmutableXClient;
   zkEvmRpcUrl: string;
-  zkEvmChainId: string;
   relayerUrl: string;
   indexerMrBasePath: string;
   orderBookMrBasePath: string;
   passportMrBasePath: string;
 }
 
-export interface PassportModuleConfiguration
-  extends ModuleConfiguration<PassportOverrides>,
-  OidcConfiguration {}
+export interface PassportModuleConfiguration extends ModuleConfiguration<PassportOverrides>,
+  OidcConfiguration {
+  /**
+   * This flag indicates that Passport is being used in a cross-sdk bridge scenario
+   * and not directly on the web.
+   */
+  crossSdkBridgeEnabled?: boolean;
+}
 
 type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 

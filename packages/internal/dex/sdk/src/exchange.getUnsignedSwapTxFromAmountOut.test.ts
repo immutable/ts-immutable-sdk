@@ -21,6 +21,8 @@ import {
   decodePathForExactOutput,
   makeAddr,
   IMX_TEST_TOKEN,
+  formatAmount,
+  formatEther,
 } from './test/utils';
 
 jest.mock('@ethersproject/providers');
@@ -48,6 +50,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       () => ({
         allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT),
         estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
+        paused: jest.fn().mockResolvedValue(false),
       }),
     );
 
@@ -64,7 +67,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
   describe('Swap with single pool with fees', () => {
     it('generates valid swap calldata', async () => {
       const secondaryFees: SecondaryFee[] = [
-        { feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: 100 }, // 1% Fee
+        { recipient: TEST_FEE_RECIPIENT, basisPoints: 100 }, // 1% Fee
       ];
 
       const params = setupSwapTxTest();
@@ -83,11 +86,11 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
 
       expectToBeDefined(swap.transaction.data);
 
-      expect(quote.amountWithMaxSlippage.value.toString()).toEqual('104030000000000000000'); // userQuoteRes.amountInMaximum = swap.amountInMaximum
+      expect(formatAmount(quote.amountWithMaxSlippage)).toEqual('104.03'); // userQuoteRes.amountInMaximum = swap.amountInMaximum
 
       // The maxAmountIn is the amount out + fees + slippage
       const ourQuoteReqAmountOut = findOptimalRouteMock.mock.calls[0][0];
-      expect(ourQuoteReqAmountOut.toExact()).toEqual('1000'); // ourQuoteReq.amountOut = userQuoteReq.amountOut
+      expect(formatAmount(ourQuoteReqAmountOut)).toEqual('1000.0'); // ourQuoteReq.amountOut = userQuoteReq.amountOut
 
       const data = swap.transaction.data.toString();
 
@@ -100,14 +103,14 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       expect(swap.transaction.to).toBe(TEST_SECONDARY_FEE_ADDRESS); // to address
       expect(swap.transaction.from).toBe(params.fromAddress); // from address
       expect(swap.transaction.value).toBe('0x00'); // refers to 0ETH
-      expect(swapParams.amountOut.toString()).toBe('1000000000000000000000'); // amount out (1,000)
-      expect(swapParams.amountInMaximum.toString()).toBe('104030000000000000000'); // max amount in (104.3)
+      expect(formatEther(swapParams.amountOut)).toBe('1000.0'); // amount out (1,000)
+      expect(formatEther(swapParams.amountInMaximum)).toBe('104.03'); // max amount in
       expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
     });
 
     it('uses the amount with slippage and fees for the approval amount', async () => {
       const secondaryFees: SecondaryFee[] = [
-        { feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: 100 }, // 1% Fee
+        { recipient: TEST_FEE_RECIPIENT, basisPoints: 100 }, // 1% Fee
       ];
 
       const params = setupSwapTxTest();
@@ -130,16 +133,16 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       const decodedResults = erc20ContractInterface.decodeFunctionData('approve', approval.transaction.data);
       const approvalAmount: string = decodedResults[1].toString();
 
-      expect(approvalAmount).toEqual('104030000000000000000'); // want 104.3
+      expect(formatEther(approvalAmount)).toEqual('104.03');
       expect(approval.transaction.to).toEqual(params.inputToken);
       expect(approval.transaction.from).toEqual(params.fromAddress);
       expect(approval.transaction.value).toEqual(0); // we do not want to send any ETH
-      expect(quote.amountWithMaxSlippage.value.toString()).toEqual('104030000000000000000');
+      expect(formatAmount(quote.amountWithMaxSlippage)).toEqual('104.03');
     });
 
     it('uses the secondary fee address as the spender for approving', async () => {
       const secondaryFees: SecondaryFee[] = [
-        { feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: 100 }, // 1% Fee
+        { recipient: TEST_FEE_RECIPIENT, basisPoints: 100 }, // 1% Fee
       ];
 
       const params = setupSwapTxTest();
@@ -169,8 +172,8 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       mockRouterImplementation(params);
 
       const secondaryFees: SecondaryFee[] = [
-        { feeRecipient: makeAddr('recipienta'), feeBasisPoints: 200 }, // 2% fee
-        { feeRecipient: makeAddr('recipientb'), feeBasisPoints: 400 }, // 4% fee
+        { recipient: makeAddr('recipienta'), basisPoints: 200 }, // 2% fee
+        { recipient: makeAddr('recipientb'), basisPoints: 400 }, // 4% fee
       ];
 
       const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
@@ -186,16 +189,16 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
 
       expect(quote.fees).toEqual([
         {
-          feeRecipient: makeAddr('recipienta'),
-          feeBasisPoints: 200,
+          recipient: makeAddr('recipienta'),
+          basisPoints: 200,
           amount: {
             token: tokenIn,
             value: ethers.utils.parseEther('2'),
           },
         },
         {
-          feeRecipient: makeAddr('recipientb'),
-          feeBasisPoints: 400,
+          recipient: makeAddr('recipientb'),
+          basisPoints: 400,
           amount: {
             token: tokenIn,
             value: ethers.utils.parseEther('4'),
@@ -233,8 +236,8 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       expect(swap.transaction.to).toBe(TEST_PERIPHERY_ROUTER_ADDRESS); // to address
       expect(swap.transaction.from).toBe(params.fromAddress); // from address
       expect(swap.transaction.value).toBe('0x00'); // refers to 0ETH
-      expect(swapParams.amountOut.toString()).toBe('1000000000000000000000'); // 1,000 amount out
-      expect(swapParams.amountInMaximum.toString()).toBe('100100000000000000000'); // 100.1 max amount in includes slippage
+      expect(formatEther(swapParams.amountOut)).toBe('1000.0'); // 1,000 amount out
+      expect(formatEther(swapParams.amountInMaximum)).toBe('100.1'); // 100.1 max amount in includes slippage
       expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
     });
 
@@ -253,12 +256,12 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
 
       expect(quote.amount.token.address).toEqual(params.inputToken);
       expect(quote.slippage).toBe(0.1);
-      expect(quote.amount.value.toString()).toEqual('100000000000000000000'); // 100
+      expect(formatAmount(quote.amount)).toEqual('100.0');
       expect(quote.amountWithMaxSlippage.token.address).toEqual(
         params.inputToken,
       );
-      expect(quote.amountWithMaxSlippage.value.toString()).toEqual(
-        '100100000000000000000', // 100.1 (includes slippage)
+      expect(formatAmount(quote.amountWithMaxSlippage)).toEqual(
+        '100.1', // (includes slippage)
       );
     });
 
@@ -292,7 +295,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       mockRouterImplementation(params);
 
       const secondaryFees: SecondaryFee[] = [
-        { feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: TEST_MAX_FEE_BASIS_POINTS },
+        { recipient: TEST_FEE_RECIPIENT, basisPoints: TEST_MAX_FEE_BASIS_POINTS },
       ];
 
       const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
@@ -310,8 +313,8 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
 
       const { swapParams, secondaryFeeParams } = decodeMulticallExactOutputWithFees(data);
 
-      expect(secondaryFeeParams[0].feeRecipient).toBe(TEST_FEE_RECIPIENT);
-      expect(secondaryFeeParams[0].feeBasisPoints).toBe(TEST_MAX_FEE_BASIS_POINTS);
+      expect(secondaryFeeParams[0].recipient).toBe(TEST_FEE_RECIPIENT);
+      expect(secondaryFeeParams[0].basisPoints.toString()).toBe(TEST_MAX_FEE_BASIS_POINTS.toString());
 
       const decodedPath = decodePathForExactOutput(swapParams.path.toString());
 
@@ -327,8 +330,8 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       expect(decodedPath.secondPoolFee.toString()).toBe('10000');
 
       expect(swapParams.recipient).toBe(params.fromAddress); // recipient of swap
-      expect(swapParams.amountInMaximum.toString()).toBe('110110000000000000000'); // 110.11 (includes fees and slippage)
-      expect(swapParams.amountOut.toString()).toBe('1000000000000000000000'); // 1,000
+      expect(formatEther(swapParams.amountInMaximum)).toBe('110.11'); // (includes fees and slippage)
+      expect(formatEther(swapParams.amountOut)).toBe('1000.0');
     });
   });
 });

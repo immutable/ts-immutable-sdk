@@ -29,14 +29,14 @@ import type {
 } from "./common";
 
 export declare namespace ISecondaryFee {
-  export type ServiceFeeParamsStruct = {
+  export type SecondaryFeeParamsStruct = {
     recipient: PromiseOrValue<string>;
-    feePrcntBasisPoints: PromiseOrValue<BigNumberish>;
+    feeBasisPoints: PromiseOrValue<BigNumberish>;
   };
 
-  export type ServiceFeeParamsStructOutput = [string, number] & {
+  export type SecondaryFeeParamsStructOutput = [string, BigNumber] & {
     recipient: string;
-    feePrcntBasisPoints: number;
+    feeBasisPoints: BigNumber;
   };
 }
 
@@ -139,39 +139,55 @@ export declare namespace IV3SwapRouter {
 export interface SecondaryFeeInterface extends utils.Interface {
   functions: {
     "BASIS_POINT_PRECISION()": FunctionFragment;
-    "MAX_SERVICE_FEE()": FunctionFragment;
-    "exactInputSingleWithServiceFee((address,uint16)[],(address,address,uint24,address,uint256,uint256,uint160))": FunctionFragment;
-    "exactInputWithServiceFee((address,uint16)[],(bytes,address,uint256,uint256))": FunctionFragment;
-    "exactOutputSingleWithServiceFee((address,uint16)[],(address,address,uint24,address,uint256,uint256,uint160))": FunctionFragment;
-    "exactOutputWithServiceFee((address,uint16)[],(bytes,address,uint256,uint256))": FunctionFragment;
+    "DEFAULT_ADMIN_ROLE()": FunctionFragment;
+    "FEE_BASIS_POINTS_MAXIMUM()": FunctionFragment;
+    "PAUSE()": FunctionFragment;
+    "UNPAUSE()": FunctionFragment;
+    "WITHDRAW()": FunctionFragment;
+    "exactInputSingleWithSecondaryFee((address,uint256)[],(address,address,uint24,address,uint256,uint256,uint160))": FunctionFragment;
+    "exactInputWithSecondaryFee((address,uint256)[],(bytes,address,uint256,uint256))": FunctionFragment;
+    "exactOutputSingleWithSecondaryFee((address,uint256)[],(address,address,uint24,address,uint256,uint256,uint160))": FunctionFragment;
+    "exactOutputWithSecondaryFee((address,uint256)[],(bytes,address,uint256,uint256))": FunctionFragment;
+    "getRoleAdmin(bytes32)": FunctionFragment;
+    "grantRole(bytes32,address)": FunctionFragment;
+    "hasRole(bytes32,address)": FunctionFragment;
     "multicall(uint256,bytes[])": FunctionFragment;
     "multicall(bytes[])": FunctionFragment;
-    "owner()": FunctionFragment;
     "pause()": FunctionFragment;
     "paused()": FunctionFragment;
-    "renounceOwnership()": FunctionFragment;
-    "transferOwnership(address)": FunctionFragment;
+    "renounceRole(bytes32,address)": FunctionFragment;
+    "revokeRole(bytes32,address)": FunctionFragment;
+    "supportsInterface(bytes4)": FunctionFragment;
     "uniswapRouter()": FunctionFragment;
     "unpause()": FunctionFragment;
+    "withdrawFunds(address,address)": FunctionFragment;
   };
 
   getFunction(
     nameOrSignatureOrTopic:
       | "BASIS_POINT_PRECISION"
-      | "MAX_SERVICE_FEE"
-      | "exactInputSingleWithServiceFee"
-      | "exactInputWithServiceFee"
-      | "exactOutputSingleWithServiceFee"
-      | "exactOutputWithServiceFee"
+      | "DEFAULT_ADMIN_ROLE"
+      | "FEE_BASIS_POINTS_MAXIMUM"
+      | "PAUSE"
+      | "UNPAUSE"
+      | "WITHDRAW"
+      | "exactInputSingleWithSecondaryFee"
+      | "exactInputWithSecondaryFee"
+      | "exactOutputSingleWithSecondaryFee"
+      | "exactOutputWithSecondaryFee"
+      | "getRoleAdmin"
+      | "grantRole"
+      | "hasRole"
       | "multicall(uint256,bytes[])"
       | "multicall(bytes[])"
-      | "owner"
       | "pause"
       | "paused"
-      | "renounceOwnership"
-      | "transferOwnership"
+      | "renounceRole"
+      | "revokeRole"
+      | "supportsInterface"
       | "uniswapRouter"
       | "unpause"
+      | "withdrawFunds"
   ): FunctionFragment;
 
   encodeFunctionData(
@@ -179,36 +195,55 @@ export interface SecondaryFeeInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "MAX_SERVICE_FEE",
+    functionFragment: "DEFAULT_ADMIN_ROLE",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "exactInputSingleWithServiceFee",
+    functionFragment: "FEE_BASIS_POINTS_MAXIMUM",
+    values?: undefined
+  ): string;
+  encodeFunctionData(functionFragment: "PAUSE", values?: undefined): string;
+  encodeFunctionData(functionFragment: "UNPAUSE", values?: undefined): string;
+  encodeFunctionData(functionFragment: "WITHDRAW", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "exactInputSingleWithSecondaryFee",
     values: [
-      ISecondaryFee.ServiceFeeParamsStruct[],
+      ISecondaryFee.SecondaryFeeParamsStruct[],
       IV3SwapRouter.ExactInputSingleParamsStruct
     ]
   ): string;
   encodeFunctionData(
-    functionFragment: "exactInputWithServiceFee",
+    functionFragment: "exactInputWithSecondaryFee",
     values: [
-      ISecondaryFee.ServiceFeeParamsStruct[],
+      ISecondaryFee.SecondaryFeeParamsStruct[],
       IV3SwapRouter.ExactInputParamsStruct
     ]
   ): string;
   encodeFunctionData(
-    functionFragment: "exactOutputSingleWithServiceFee",
+    functionFragment: "exactOutputSingleWithSecondaryFee",
     values: [
-      ISecondaryFee.ServiceFeeParamsStruct[],
+      ISecondaryFee.SecondaryFeeParamsStruct[],
       IV3SwapRouter.ExactOutputSingleParamsStruct
     ]
   ): string;
   encodeFunctionData(
-    functionFragment: "exactOutputWithServiceFee",
+    functionFragment: "exactOutputWithSecondaryFee",
     values: [
-      ISecondaryFee.ServiceFeeParamsStruct[],
+      ISecondaryFee.SecondaryFeeParamsStruct[],
       IV3SwapRouter.ExactOutputParamsStruct
     ]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getRoleAdmin",
+    values: [PromiseOrValue<BytesLike>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "grantRole",
+    values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "hasRole",
+    values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
     functionFragment: "multicall(uint256,bytes[])",
@@ -218,47 +253,67 @@ export interface SecondaryFeeInterface extends utils.Interface {
     functionFragment: "multicall(bytes[])",
     values: [PromiseOrValue<BytesLike>[]]
   ): string;
-  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(functionFragment: "pause", values?: undefined): string;
   encodeFunctionData(functionFragment: "paused", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "renounceOwnership",
-    values?: undefined
+    functionFragment: "renounceRole",
+    values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
-    functionFragment: "transferOwnership",
-    values: [PromiseOrValue<string>]
+    functionFragment: "revokeRole",
+    values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "supportsInterface",
+    values: [PromiseOrValue<BytesLike>]
   ): string;
   encodeFunctionData(
     functionFragment: "uniswapRouter",
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "withdrawFunds",
+    values: [PromiseOrValue<string>, PromiseOrValue<string>]
+  ): string;
 
   decodeFunctionResult(
     functionFragment: "BASIS_POINT_PRECISION",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "MAX_SERVICE_FEE",
+    functionFragment: "DEFAULT_ADMIN_ROLE",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "exactInputSingleWithServiceFee",
+    functionFragment: "FEE_BASIS_POINTS_MAXIMUM",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "PAUSE", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "UNPAUSE", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "WITHDRAW", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "exactInputSingleWithSecondaryFee",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "exactInputWithServiceFee",
+    functionFragment: "exactInputWithSecondaryFee",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "exactOutputSingleWithServiceFee",
+    functionFragment: "exactOutputSingleWithSecondaryFee",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "exactOutputWithServiceFee",
+    functionFragment: "exactOutputWithSecondaryFee",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "getRoleAdmin",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "grantRole", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "hasRole", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "multicall(uint256,bytes[])",
     data: BytesLike
@@ -267,15 +322,15 @@ export interface SecondaryFeeInterface extends utils.Interface {
     functionFragment: "multicall(bytes[])",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "renounceOwnership",
+    functionFragment: "renounceRole",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "revokeRole", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "transferOwnership",
+    functionFragment: "supportsInterface",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -283,17 +338,25 @@ export interface SecondaryFeeInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "withdrawFunds",
+    data: BytesLike
+  ): Result;
 
   events: {
     "FeeTaken(address,address,address,uint256)": EventFragment;
-    "OwnershipTransferred(address,address)": EventFragment;
     "Paused(address)": EventFragment;
+    "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
+    "RoleGranted(bytes32,address,address)": EventFragment;
+    "RoleRevoked(bytes32,address,address)": EventFragment;
     "Unpaused(address)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "FeeTaken"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RoleAdminChanged"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RoleGranted"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RoleRevoked"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
 }
 
@@ -310,24 +373,49 @@ export type FeeTakenEvent = TypedEvent<
 
 export type FeeTakenEventFilter = TypedEventFilter<FeeTakenEvent>;
 
-export interface OwnershipTransferredEventObject {
-  previousOwner: string;
-  newOwner: string;
-}
-export type OwnershipTransferredEvent = TypedEvent<
-  [string, string],
-  OwnershipTransferredEventObject
->;
-
-export type OwnershipTransferredEventFilter =
-  TypedEventFilter<OwnershipTransferredEvent>;
-
 export interface PausedEventObject {
   account: string;
 }
 export type PausedEvent = TypedEvent<[string], PausedEventObject>;
 
 export type PausedEventFilter = TypedEventFilter<PausedEvent>;
+
+export interface RoleAdminChangedEventObject {
+  role: string;
+  previousAdminRole: string;
+  newAdminRole: string;
+}
+export type RoleAdminChangedEvent = TypedEvent<
+  [string, string, string],
+  RoleAdminChangedEventObject
+>;
+
+export type RoleAdminChangedEventFilter =
+  TypedEventFilter<RoleAdminChangedEvent>;
+
+export interface RoleGrantedEventObject {
+  role: string;
+  account: string;
+  sender: string;
+}
+export type RoleGrantedEvent = TypedEvent<
+  [string, string, string],
+  RoleGrantedEventObject
+>;
+
+export type RoleGrantedEventFilter = TypedEventFilter<RoleGrantedEvent>;
+
+export interface RoleRevokedEventObject {
+  role: string;
+  account: string;
+  sender: string;
+}
+export type RoleRevokedEvent = TypedEvent<
+  [string, string, string],
+  RoleRevokedEventObject
+>;
+
+export type RoleRevokedEventFilter = TypedEventFilter<RoleRevokedEvent>;
 
 export interface UnpausedEventObject {
   account: string;
@@ -363,33 +451,58 @@ export interface SecondaryFee extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    BASIS_POINT_PRECISION(overrides?: CallOverrides): Promise<[number]>;
+    BASIS_POINT_PRECISION(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    MAX_SERVICE_FEE(overrides?: CallOverrides): Promise<[number]>;
+    DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
-    exactInputSingleWithServiceFee(
-      serviceFee: ISecondaryFee.ServiceFeeParamsStruct[],
-      params: IV3SwapRouter.ExactInputSingleParamsStruct,
+    FEE_BASIS_POINTS_MAXIMUM(overrides?: CallOverrides): Promise<[number]>;
+
+    PAUSE(overrides?: CallOverrides): Promise<[string]>;
+
+    UNPAUSE(overrides?: CallOverrides): Promise<[string]>;
+
+    WITHDRAW(overrides?: CallOverrides): Promise<[string]>;
+
+    exactInputSingleWithSecondaryFee(
+      secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+      swapParams: IV3SwapRouter.ExactInputSingleParamsStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
-    exactInputWithServiceFee(
-      serviceFee: ISecondaryFee.ServiceFeeParamsStruct[],
-      params: IV3SwapRouter.ExactInputParamsStruct,
+    exactInputWithSecondaryFee(
+      secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+      swapParams: IV3SwapRouter.ExactInputParamsStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
-    exactOutputSingleWithServiceFee(
-      serviceFee: ISecondaryFee.ServiceFeeParamsStruct[],
-      params: IV3SwapRouter.ExactOutputSingleParamsStruct,
+    exactOutputSingleWithSecondaryFee(
+      secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+      swapParams: IV3SwapRouter.ExactOutputSingleParamsStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
-    exactOutputWithServiceFee(
-      serviceFee: ISecondaryFee.ServiceFeeParamsStruct[],
-      params: IV3SwapRouter.ExactOutputParamsStruct,
+    exactOutputWithSecondaryFee(
+      secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+      swapParams: IV3SwapRouter.ExactOutputParamsStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
+
+    getRoleAdmin(
+      role: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    grantRole(
+      role: PromiseOrValue<BytesLike>,
+      account: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    hasRole(
+      role: PromiseOrValue<BytesLike>,
+      account: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
 
     "multicall(uint256,bytes[])"(
       deadline: PromiseOrValue<BigNumberish>,
@@ -402,57 +515,94 @@ export interface SecondaryFee extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
-    owner(overrides?: CallOverrides): Promise<[string]>;
-
     pause(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
     paused(overrides?: CallOverrides): Promise<[boolean]>;
 
-    renounceOwnership(
+    renounceRole(
+      role: PromiseOrValue<BytesLike>,
+      account: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
-    transferOwnership(
-      newOwner: PromiseOrValue<string>,
+    revokeRole(
+      role: PromiseOrValue<BytesLike>,
+      account: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
+
+    supportsInterface(
+      interfaceId: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
 
     uniswapRouter(overrides?: CallOverrides): Promise<[string]>;
 
     unpause(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
+
+    withdrawFunds(
+      to: PromiseOrValue<string>,
+      erc20: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
   };
 
-  BASIS_POINT_PRECISION(overrides?: CallOverrides): Promise<number>;
+  BASIS_POINT_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
 
-  MAX_SERVICE_FEE(overrides?: CallOverrides): Promise<number>;
+  DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
-  exactInputSingleWithServiceFee(
-    serviceFee: ISecondaryFee.ServiceFeeParamsStruct[],
-    params: IV3SwapRouter.ExactInputSingleParamsStruct,
+  FEE_BASIS_POINTS_MAXIMUM(overrides?: CallOverrides): Promise<number>;
+
+  PAUSE(overrides?: CallOverrides): Promise<string>;
+
+  UNPAUSE(overrides?: CallOverrides): Promise<string>;
+
+  WITHDRAW(overrides?: CallOverrides): Promise<string>;
+
+  exactInputSingleWithSecondaryFee(
+    secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+    swapParams: IV3SwapRouter.ExactInputSingleParamsStruct,
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  exactInputWithServiceFee(
-    serviceFee: ISecondaryFee.ServiceFeeParamsStruct[],
-    params: IV3SwapRouter.ExactInputParamsStruct,
+  exactInputWithSecondaryFee(
+    secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+    swapParams: IV3SwapRouter.ExactInputParamsStruct,
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  exactOutputSingleWithServiceFee(
-    serviceFee: ISecondaryFee.ServiceFeeParamsStruct[],
-    params: IV3SwapRouter.ExactOutputSingleParamsStruct,
+  exactOutputSingleWithSecondaryFee(
+    secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+    swapParams: IV3SwapRouter.ExactOutputSingleParamsStruct,
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  exactOutputWithServiceFee(
-    serviceFee: ISecondaryFee.ServiceFeeParamsStruct[],
-    params: IV3SwapRouter.ExactOutputParamsStruct,
+  exactOutputWithSecondaryFee(
+    secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+    swapParams: IV3SwapRouter.ExactOutputParamsStruct,
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
+
+  getRoleAdmin(
+    role: PromiseOrValue<BytesLike>,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  grantRole(
+    role: PromiseOrValue<BytesLike>,
+    account: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  hasRole(
+    role: PromiseOrValue<BytesLike>,
+    account: PromiseOrValue<string>,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
 
   "multicall(uint256,bytes[])"(
     deadline: PromiseOrValue<BigNumberish>,
@@ -465,22 +615,28 @@ export interface SecondaryFee extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  owner(overrides?: CallOverrides): Promise<string>;
-
   pause(
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
   paused(overrides?: CallOverrides): Promise<boolean>;
 
-  renounceOwnership(
+  renounceRole(
+    role: PromiseOrValue<BytesLike>,
+    account: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  transferOwnership(
-    newOwner: PromiseOrValue<string>,
+  revokeRole(
+    role: PromiseOrValue<BytesLike>,
+    account: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
+
+  supportsInterface(
+    interfaceId: PromiseOrValue<BytesLike>,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
 
   uniswapRouter(overrides?: CallOverrides): Promise<string>;
 
@@ -488,34 +644,65 @@ export interface SecondaryFee extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  withdrawFunds(
+    to: PromiseOrValue<string>,
+    erc20: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   callStatic: {
-    BASIS_POINT_PRECISION(overrides?: CallOverrides): Promise<number>;
+    BASIS_POINT_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
 
-    MAX_SERVICE_FEE(overrides?: CallOverrides): Promise<number>;
+    DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
-    exactInputSingleWithServiceFee(
-      serviceFee: ISecondaryFee.ServiceFeeParamsStruct[],
-      params: IV3SwapRouter.ExactInputSingleParamsStruct,
+    FEE_BASIS_POINTS_MAXIMUM(overrides?: CallOverrides): Promise<number>;
+
+    PAUSE(overrides?: CallOverrides): Promise<string>;
+
+    UNPAUSE(overrides?: CallOverrides): Promise<string>;
+
+    WITHDRAW(overrides?: CallOverrides): Promise<string>;
+
+    exactInputSingleWithSecondaryFee(
+      secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+      swapParams: IV3SwapRouter.ExactInputSingleParamsStruct,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    exactInputWithServiceFee(
-      serviceFee: ISecondaryFee.ServiceFeeParamsStruct[],
-      params: IV3SwapRouter.ExactInputParamsStruct,
+    exactInputWithSecondaryFee(
+      secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+      swapParams: IV3SwapRouter.ExactInputParamsStruct,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    exactOutputSingleWithServiceFee(
-      serviceFee: ISecondaryFee.ServiceFeeParamsStruct[],
-      params: IV3SwapRouter.ExactOutputSingleParamsStruct,
+    exactOutputSingleWithSecondaryFee(
+      secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+      swapParams: IV3SwapRouter.ExactOutputSingleParamsStruct,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    exactOutputWithServiceFee(
-      serviceFee: ISecondaryFee.ServiceFeeParamsStruct[],
-      params: IV3SwapRouter.ExactOutputParamsStruct,
+    exactOutputWithSecondaryFee(
+      secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+      swapParams: IV3SwapRouter.ExactOutputParamsStruct,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    getRoleAdmin(
+      role: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    grantRole(
+      role: PromiseOrValue<BytesLike>,
+      account: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    hasRole(
+      role: PromiseOrValue<BytesLike>,
+      account: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
 
     "multicall(uint256,bytes[])"(
       deadline: PromiseOrValue<BigNumberish>,
@@ -528,22 +715,36 @@ export interface SecondaryFee extends BaseContract {
       overrides?: CallOverrides
     ): Promise<string[]>;
 
-    owner(overrides?: CallOverrides): Promise<string>;
-
     pause(overrides?: CallOverrides): Promise<void>;
 
     paused(overrides?: CallOverrides): Promise<boolean>;
 
-    renounceOwnership(overrides?: CallOverrides): Promise<void>;
-
-    transferOwnership(
-      newOwner: PromiseOrValue<string>,
+    renounceRole(
+      role: PromiseOrValue<BytesLike>,
+      account: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    revokeRole(
+      role: PromiseOrValue<BytesLike>,
+      account: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    supportsInterface(
+      interfaceId: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
 
     uniswapRouter(overrides?: CallOverrides): Promise<string>;
 
     unpause(overrides?: CallOverrides): Promise<void>;
+
+    withdrawFunds(
+      to: PromiseOrValue<string>,
+      erc20: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<void>;
   };
 
   filters: {
@@ -560,17 +761,41 @@ export interface SecondaryFee extends BaseContract {
       feeAmount?: null
     ): FeeTakenEventFilter;
 
-    "OwnershipTransferred(address,address)"(
-      previousOwner?: PromiseOrValue<string> | null,
-      newOwner?: PromiseOrValue<string> | null
-    ): OwnershipTransferredEventFilter;
-    OwnershipTransferred(
-      previousOwner?: PromiseOrValue<string> | null,
-      newOwner?: PromiseOrValue<string> | null
-    ): OwnershipTransferredEventFilter;
-
     "Paused(address)"(account?: null): PausedEventFilter;
     Paused(account?: null): PausedEventFilter;
+
+    "RoleAdminChanged(bytes32,bytes32,bytes32)"(
+      role?: PromiseOrValue<BytesLike> | null,
+      previousAdminRole?: PromiseOrValue<BytesLike> | null,
+      newAdminRole?: PromiseOrValue<BytesLike> | null
+    ): RoleAdminChangedEventFilter;
+    RoleAdminChanged(
+      role?: PromiseOrValue<BytesLike> | null,
+      previousAdminRole?: PromiseOrValue<BytesLike> | null,
+      newAdminRole?: PromiseOrValue<BytesLike> | null
+    ): RoleAdminChangedEventFilter;
+
+    "RoleGranted(bytes32,address,address)"(
+      role?: PromiseOrValue<BytesLike> | null,
+      account?: PromiseOrValue<string> | null,
+      sender?: PromiseOrValue<string> | null
+    ): RoleGrantedEventFilter;
+    RoleGranted(
+      role?: PromiseOrValue<BytesLike> | null,
+      account?: PromiseOrValue<string> | null,
+      sender?: PromiseOrValue<string> | null
+    ): RoleGrantedEventFilter;
+
+    "RoleRevoked(bytes32,address,address)"(
+      role?: PromiseOrValue<BytesLike> | null,
+      account?: PromiseOrValue<string> | null,
+      sender?: PromiseOrValue<string> | null
+    ): RoleRevokedEventFilter;
+    RoleRevoked(
+      role?: PromiseOrValue<BytesLike> | null,
+      account?: PromiseOrValue<string> | null,
+      sender?: PromiseOrValue<string> | null
+    ): RoleRevokedEventFilter;
 
     "Unpaused(address)"(account?: null): UnpausedEventFilter;
     Unpaused(account?: null): UnpausedEventFilter;
@@ -579,30 +804,55 @@ export interface SecondaryFee extends BaseContract {
   estimateGas: {
     BASIS_POINT_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
 
-    MAX_SERVICE_FEE(overrides?: CallOverrides): Promise<BigNumber>;
+    DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
-    exactInputSingleWithServiceFee(
-      serviceFee: ISecondaryFee.ServiceFeeParamsStruct[],
-      params: IV3SwapRouter.ExactInputSingleParamsStruct,
+    FEE_BASIS_POINTS_MAXIMUM(overrides?: CallOverrides): Promise<BigNumber>;
+
+    PAUSE(overrides?: CallOverrides): Promise<BigNumber>;
+
+    UNPAUSE(overrides?: CallOverrides): Promise<BigNumber>;
+
+    WITHDRAW(overrides?: CallOverrides): Promise<BigNumber>;
+
+    exactInputSingleWithSecondaryFee(
+      secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+      swapParams: IV3SwapRouter.ExactInputSingleParamsStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
-    exactInputWithServiceFee(
-      serviceFee: ISecondaryFee.ServiceFeeParamsStruct[],
-      params: IV3SwapRouter.ExactInputParamsStruct,
+    exactInputWithSecondaryFee(
+      secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+      swapParams: IV3SwapRouter.ExactInputParamsStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
-    exactOutputSingleWithServiceFee(
-      serviceFee: ISecondaryFee.ServiceFeeParamsStruct[],
-      params: IV3SwapRouter.ExactOutputSingleParamsStruct,
+    exactOutputSingleWithSecondaryFee(
+      secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+      swapParams: IV3SwapRouter.ExactOutputSingleParamsStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
-    exactOutputWithServiceFee(
-      serviceFee: ISecondaryFee.ServiceFeeParamsStruct[],
-      params: IV3SwapRouter.ExactOutputParamsStruct,
+    exactOutputWithSecondaryFee(
+      secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+      swapParams: IV3SwapRouter.ExactOutputParamsStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    getRoleAdmin(
+      role: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    grantRole(
+      role: PromiseOrValue<BytesLike>,
+      account: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    hasRole(
+      role: PromiseOrValue<BytesLike>,
+      account: PromiseOrValue<string>,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     "multicall(uint256,bytes[])"(
@@ -616,26 +866,38 @@ export interface SecondaryFee extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
-    owner(overrides?: CallOverrides): Promise<BigNumber>;
-
     pause(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     paused(overrides?: CallOverrides): Promise<BigNumber>;
 
-    renounceOwnership(
+    renounceRole(
+      role: PromiseOrValue<BytesLike>,
+      account: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
-    transferOwnership(
-      newOwner: PromiseOrValue<string>,
+    revokeRole(
+      role: PromiseOrValue<BytesLike>,
+      account: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    supportsInterface(
+      interfaceId: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     uniswapRouter(overrides?: CallOverrides): Promise<BigNumber>;
 
     unpause(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    withdrawFunds(
+      to: PromiseOrValue<string>,
+      erc20: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
   };
@@ -645,30 +907,59 @@ export interface SecondaryFee extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    MAX_SERVICE_FEE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    DEFAULT_ADMIN_ROLE(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
-    exactInputSingleWithServiceFee(
-      serviceFee: ISecondaryFee.ServiceFeeParamsStruct[],
-      params: IV3SwapRouter.ExactInputSingleParamsStruct,
+    FEE_BASIS_POINTS_MAXIMUM(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    PAUSE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    UNPAUSE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    WITHDRAW(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    exactInputSingleWithSecondaryFee(
+      secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+      swapParams: IV3SwapRouter.ExactInputSingleParamsStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
-    exactInputWithServiceFee(
-      serviceFee: ISecondaryFee.ServiceFeeParamsStruct[],
-      params: IV3SwapRouter.ExactInputParamsStruct,
+    exactInputWithSecondaryFee(
+      secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+      swapParams: IV3SwapRouter.ExactInputParamsStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
-    exactOutputSingleWithServiceFee(
-      serviceFee: ISecondaryFee.ServiceFeeParamsStruct[],
-      params: IV3SwapRouter.ExactOutputSingleParamsStruct,
+    exactOutputSingleWithSecondaryFee(
+      secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+      swapParams: IV3SwapRouter.ExactOutputSingleParamsStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
-    exactOutputWithServiceFee(
-      serviceFee: ISecondaryFee.ServiceFeeParamsStruct[],
-      params: IV3SwapRouter.ExactOutputParamsStruct,
+    exactOutputWithSecondaryFee(
+      secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+      swapParams: IV3SwapRouter.ExactOutputParamsStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    getRoleAdmin(
+      role: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    grantRole(
+      role: PromiseOrValue<BytesLike>,
+      account: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    hasRole(
+      role: PromiseOrValue<BytesLike>,
+      account: PromiseOrValue<string>,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     "multicall(uint256,bytes[])"(
@@ -682,26 +973,38 @@ export interface SecondaryFee extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
-    owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     pause(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     paused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    renounceOwnership(
+    renounceRole(
+      role: PromiseOrValue<BytesLike>,
+      account: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
-    transferOwnership(
-      newOwner: PromiseOrValue<string>,
+    revokeRole(
+      role: PromiseOrValue<BytesLike>,
+      account: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    supportsInterface(
+      interfaceId: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     uniswapRouter(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     unpause(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    withdrawFunds(
+      to: PromiseOrValue<string>,
+      erc20: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
   };

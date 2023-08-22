@@ -9,11 +9,14 @@ import { WalletWidgetViews } from '../../../context/view-context/WalletViewConte
 import { WalletAddress } from '../components/WalletAddress/WalletAddress';
 import { settingsBoxStyle, settingsDisconnectButtonStyle } from './SettingsStyles';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
+import { isPassportProvider } from '../../../lib/providerUtils';
 
 export function Settings() {
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { provider } = connectLoaderState;
   const { header, disconnectButton } = text.views[WalletWidgetViews.SETTINGS];
+
+  const isPassport = isPassportProvider(provider);
 
   return (
     <SimpleLayout
@@ -31,6 +34,7 @@ export function Settings() {
         sx={settingsBoxStyle}
       >
         <WalletAddress provider={provider} />
+        {isPassport && (
         <Button
           testId="disconnect-button"
           variant="secondary"
@@ -39,6 +43,7 @@ export function Settings() {
         >
           {disconnectButton.label}
         </Button>
+        )}
       </Box>
     </SimpleLayout>
   );
