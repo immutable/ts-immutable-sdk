@@ -138,7 +138,10 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
         transaction: data.approveTransaction,
       });
 
+      console.log('approve specnding txResult', txnResult);
+
       setApprovalTxnLoading(true);
+      // const approvalReceipt = await provider.waitForTransaction(txnResult.transactionResponse.hash as any as string);
       const approvalReceipt = await txnResult.transactionResponse.wait();
 
       if (approvalReceipt.status !== 1) {
@@ -158,6 +161,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
       setActionDisabled(false);
       setShowSwapTxnStep(true);
     } catch (err: any) {
+      console.error('approve spending:', err);
       setApprovalTxnLoading(false);
       setActionDisabled(false);
       if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
@@ -226,6 +230,8 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
         transaction: data.transaction,
       });
 
+      console.log('approve swap txResult', txn);
+
       setActionDisabled(false);
 
       // user approves swap
@@ -243,6 +249,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
         },
       });
     } catch (err: any) {
+      console.error('approve swap', err);
       setActionDisabled(false);
       if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
         setRejectedSwap(true);

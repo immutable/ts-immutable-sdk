@@ -10,6 +10,7 @@ import {
 } from '../../../context/view-context/SwapViewContextTypes';
 import { LoadingView } from '../../../views/loading/LoadingView';
 import { text } from '../../../resources/text/textConfig';
+import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 
 interface SwapInProgressProps {
   transactionResponse: TransactionResponse;
@@ -18,12 +19,17 @@ interface SwapInProgressProps {
 
 export function SwapInProgress({ transactionResponse, swapForm }: SwapInProgressProps) {
   const { viewDispatch } = useContext(ViewContext);
+  const { connectLoaderState } = useContext(ConnectLoaderContext);
+  const { provider } = connectLoaderState;
   const { IN_PROGRESS: { loading } } = text.views[SwapWidgetViews.SWAP];
 
   useEffect(() => {
     (async () => {
       try {
+        if (!provider) return;
+        console.log('swap in progress', transactionResponse);
         const receipt = await transactionResponse.wait();
+        // const receipt = await provider?.waitForTransaction(transactionResponse.hash as any as string);
 
         if (receipt.status === 1) {
           viewDispatch({
@@ -32,7 +38,7 @@ export function SwapInProgress({ transactionResponse, swapForm }: SwapInProgress
               view: {
                 type: SwapWidgetViews.SUCCESS,
                 data: {
-                  transactionHash: receipt.transactionHash,
+                  transactionHash: '',
                 },
               },
             },
@@ -63,7 +69,7 @@ export function SwapInProgress({ transactionResponse, swapForm }: SwapInProgress
         });
       }
     })();
-  }, [transactionResponse]);
+  }, [transactionResponse, provider]);
 
   return (
     <LoadingView loadingText={loading.text} showFooterLogo />

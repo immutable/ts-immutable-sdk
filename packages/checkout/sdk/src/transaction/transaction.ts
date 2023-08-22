@@ -8,14 +8,27 @@ export const sendTransaction = async (
   transaction: TransactionRequest,
 ): Promise<SendTransactionResult> => {
   try {
+    // const updatedTransaction = { ...transaction, gasLimit: '15000000', gasPrice: '100000000000' };
+    console.log('checkoutSendTransaction', transaction);
     const transactionResponse = await web3Provider
       .getSigner()
       .sendTransaction(transaction);
+
+    // if (!web3Provider.provider?.request) {
+    //   throw new Error();
+    // }
+    // // const signer = await web3Provider.getSigner();
+    // // signer.sendTransaction;
+
+    // const transactionResponse = await web3Provider.provider.request(
+    //   { method: 'eth_sendTransaction', params: [transaction] },
+    // );
 
     return {
       transactionResponse,
     };
   } catch (err: any) {
+    console.error('checkoutSendTransaction', err);
     if (err.code === ethers.errors.INSUFFICIENT_FUNDS) {
       throw new CheckoutError(
         err.message,
