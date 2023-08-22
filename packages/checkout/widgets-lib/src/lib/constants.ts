@@ -3,14 +3,21 @@ import { WalletProviderName } from '@imtbl/checkout-sdk';
 import { WidgetTheme } from './types';
 
 export const NATIVE = 'NATIVE';
+
 export const DEFAULT_TOKEN_DECIMALS = 18;
 export const DEFAULT_TOKEN_FORMATTING_DECIMALS = 6;
-export const DEFAULT_TOKEN_VALIDATION_DECIMALS = DEFAULT_TOKEN_FORMATTING_DECIMALS;
+// Used to enforce the number of decimals to show if the number is greater than 1
 export const DEFAULT_GT_ONE_TOKEN_FORMATTING_DECIMALS = 2;
+// Used to enforce the number of decimals in the input fields
+export const DEFAULT_TOKEN_VALIDATION_DECIMALS = DEFAULT_TOKEN_FORMATTING_DECIMALS;
+
 export const IMX_TOKEN_SYMBOL = 'IMX';
 export const ETH_TOKEN_SYMBOL = 'ETH';
+
 export const ZERO_BALANCE_STRING = '0.0';
+
 export const IMX_ADDRESS_ZKEVM = '0x0000000000000000000000000000000000001010';
+
 export const FAQS_LINK = 'https://support.immutable.com/en/';
 
 /**
