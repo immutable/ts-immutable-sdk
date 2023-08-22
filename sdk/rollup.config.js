@@ -79,26 +79,28 @@ const getFileBuild = (inputFilename) => [
   },
 ];
 
-const cjsBuild = () => ({
-  input: 'src/index.ts',
-  output: {
-    file: 'dist/index.cjs',
-    format: 'cjs',
-  },
-  plugins: [
-    nodeResolve({
-      resolveOnly: getPackages(),
-    }),
-    json(),
-    commonJs(),
-    typescript(),
-    replace({
-      exclude: 'node_modules/**',
-      preventAssignment: true,
-      __SDK_VERSION__: pkg.version,
-    }),
-  ],
-});
+const cjsBuild = () => {
+  return {
+    input: 'src/index.ts',
+    output: {
+      file: 'dist/index.cjs',
+      format: 'cjs',
+    },
+    plugins: [
+      nodeResolve({
+        resolveOnly: getPackages(),
+      }),
+      json(),
+      commonJs(),
+      typescript(),
+      replace({
+        exclude: 'node_modules/**',
+        preventAssignment: true,
+        __SDK_VERSION__: pkg.version,
+      }),
+    ],
+  }
+};
 
 const esmBuild = () => {
   const modules = [];
