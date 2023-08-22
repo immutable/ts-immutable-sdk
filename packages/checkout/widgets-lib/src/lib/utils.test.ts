@@ -12,7 +12,9 @@ import {
   sortTokensByAmount,
   tokenValueFormat,
 } from './utils';
-import { DEFAULT_TOKEN_FORMATTING_DECIMALS, IMX_ADDRESS_ZKEVM, NATIVE } from './constants';
+import {
+  DEFAULT_GT_ONE_TOKEN_FORMATTING_DECIMALS, DEFAULT_TOKEN_FORMATTING_DECIMALS, IMX_ADDRESS_ZKEVM, NATIVE,
+} from './constants';
 
 const checkout = new Checkout({
   baseConfig: {
@@ -416,8 +418,13 @@ describe('utils', () => {
       expect(tokenValueFormat('112233445566')).toEqual('112233445566');
     });
 
-    it(`should format number with less than ${DEFAULT_TOKEN_FORMATTING_DECIMALS} decimals`, () => {
-      expect(tokenValueFormat('11.22')).toEqual('11.22');
+    // eslint-disable-next-line max-len
+    it(`should format number with ${DEFAULT_GT_ONE_TOKEN_FORMATTING_DECIMALS} decimals if number greater than 1`, () => {
+      expect(tokenValueFormat('11.223')).toEqual('11.22');
+    });
+
+    it('should format number with 0 decimals if number greater than 1 and .00 decimals', () => {
+      expect(tokenValueFormat('11.00')).toEqual('11');
     });
 
     it('should format number removing the decimals', () => {
