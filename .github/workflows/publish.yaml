@@ -7,7 +7,7 @@ on:
         type: choice
         description: Release Type
         options:
-          - alpha
+          # - alpha
           - release
         required: true
         default: alpha
@@ -83,11 +83,11 @@ jobs:
         run: |
           echo "NEXT_VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
 
-      - name: Update package.json version for pre (alpha) releases
-        if: contains(github.event.inputs.release_type, 'alpha')
-        run: |
-          tmp=$(mktemp)
-          jq '.version = "${{steps.version.outputs.NEXT_VERSION}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
+      # - name: Update package.json version for pre (alpha) releases
+      #   if: contains(github.event.inputs.release_type, 'alpha')
+      #   run: |
+      #     tmp=$(mktemp)
+      #     jq '.version = "${{steps.version.outputs.NEXT_VERSION}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
 
       - name: Build
         run: export NODE_OPTIONS=--max-old-space-size=6144 && RELEASE_TYPE=${{ github.event.inputs.release_type }} yarn build
@@ -104,15 +104,15 @@ jobs:
         run: |
           echo "$(git push --tags)"
 
-      - name: Pre Release Step
-        if: contains(github.event.inputs.release_type, 'alpha')
-        uses: JS-DevTools/npm-publish@v1
-        with:
-          token: ${{ secrets.PLATFORM_SA_NPM_TOKEN }}
-          access: public
-          package: ./sdk/package.json
-          tag: ${{ contains(github.event.inputs.release_type, 'alpha') && 'alpha' }}
-          dry-run: ${{ github.event.inputs.dry_run }}
+      # - name: Pre Release Step
+      #   if: contains(github.event.inputs.release_type, 'alpha')
+      #   uses: JS-DevTools/npm-publish@v1
+      #   with:
+      #     token: ${{ secrets.PLATFORM_SA_NPM_TOKEN }}
+      #     access: public
+      #     package: ./sdk/package.json
+      #     tag: ${{ contains(github.event.inputs.release_type, 'alpha') && 'alpha' }}
+      #     dry-run: ${{ github.event.inputs.dry_run }}
 
       - name: Authenticate NPM
         if: contains(github.event.inputs.release_type, 'release')
