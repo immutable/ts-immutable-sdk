@@ -20,6 +20,7 @@ import { SwapContext } from '../context/SwapContext';
 import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { LoadingView } from '../../../views/loading/LoadingView';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
+import { isPassportProvider } from '../../../lib/providerUtils';
 
 export interface ApproveERC20Props {
   data: ApproveERC20SwapData;
@@ -31,11 +32,13 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
   const { viewDispatch } = useContext(ViewContext);
   const { approveSpending, approveSwap } = text.views[SwapWidgetViews.APPROVE_ERC20];
 
+  const isPassport = isPassportProvider(provider);
+
   // Local state
   const [actionDisabled, setActionDisabled] = useState(false);
   const [approvalTxnLoading, setApprovalTxnLoading] = useState(false);
   const [showSwapTxnStep, setShowSwapTxnStep] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   // reject transaction flags
   const [rejectedSpending, setRejectedSpending] = useState(false);
   const [rejectedSwap, setRejectedSwap] = useState(false);
@@ -118,6 +121,9 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
   /* --------------------- */
 
   const handleApproveSpendingClick = useCallback(async () => {
+    if (loading) return;
+    setLoading(true);
+
     if (!checkout || !provider) {
       showErrorView();
       return;
@@ -159,6 +165,8 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
         return;
       }
       handleExceptions(err, data.swapFormInfo as PrefilledSwapForm);
+    } finally {
+      setLoading(false);
     }
   }, [
     checkout,
@@ -173,27 +181,36 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
     setApprovalTxnLoading,
   ]);
 
-  const approveSpendingContent = useMemo(() => (
-    <SimpleTextBody heading={approveSpending.content.heading}>
-      {/* eslint-disable-next-line max-len */}
-      <Box>{`${approveSpending.content.body[0]} ${data.swapFormInfo.fromAmount} ${fromToken?.symbol || ''} ${approveSpending.content.body[1]}`}</Box>
-    </SimpleTextBody>
-  ), [data.swapFormInfo, fromToken]);
+  const approveSpendingContent = useMemo(() => {
+    const { metamask, passport } = approveSpending.content;
+    return (
+      <SimpleTextBody heading={isPassport ? passport.heading : metamask.heading}>
+        {isPassport && (<Box>{passport.body}</Box>)}
+        {!isPassport
+        // eslint-disable-next-line max-len
+        && (<Box>{`${metamask.body[0]} ${data.swapFormInfo.fromAmount} ${fromToken?.symbol || ''} ${metamask.body[1]}`}</Box>)}
+      </SimpleTextBody>
+    );
+  }, [data.swapFormInfo, fromToken, isPassport]);
 
   const approveSpendingFooter = useMemo(() => (
     <FooterButton
+      loading={loading}
       actionText={rejectedSpending
         ? approveSpending.footer.retryText
         : approveSpending.footer.buttonText}
       onActionClick={handleApproveSpendingClick}
     />
-  ), [rejectedSpending, handleApproveSpendingClick]);
+  ), [rejectedSpending, handleApproveSpendingClick, loading]);
 
   /* ----------------- */
   // Approve swap step //
   /* ----------------- */
 
   const handleApproveSwapClick = useCallback(async () => {
+    if (loading) return;
+    setLoading(true);
+
     if (!checkout || !provider) {
       showErrorView();
       return;
@@ -232,6 +249,8 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
         return;
       }
       handleExceptions(err, data.swapFormInfo as PrefilledSwapForm);
+    } finally {
+      setLoading(false);
     }
   }, [
     checkout,
@@ -253,12 +272,13 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
 
   const approveSwapFooter = useMemo(() => (
     <FooterButton
+      loading={loading}
       actionText={rejectedSwap
         ? approveSwap.footer.retryText
         : approveSwap.footer.buttonText}
       onActionClick={handleApproveSwapClick}
     />
-  ), [rejectedSwap, handleApproveSwapClick]);
+  ), [rejectedSwap, handleApproveSwapClick, loading]);
 
   return (
     <>

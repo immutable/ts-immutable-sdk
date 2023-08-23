@@ -3,7 +3,7 @@ import {
   Form, Offcanvas, Spinner, Stack,
 } from 'react-bootstrap';
 import { Divider, Heading } from '@biom3/react';
-import { RequestExampleProps, RequestProps } from '@/types';
+import { RequestExampleProps, ModalProps } from '@/types';
 import { useStatusProvider } from '@/context/StatusProvider';
 import { usePassportProvider } from '@/context/PassportProvider';
 import { RequestArguments } from '@imtbl/passport';
@@ -41,6 +41,13 @@ const EthereumMethods: EthereumMethod[] = [
   { name: 'eth_gasPrice' },
   {
     name: 'eth_getBalance',
+    params: [
+      { name: 'address' },
+      { name: 'blockNumber/tag', default: 'latest' },
+    ],
+  },
+  {
+    name: 'eth_getCode',
     params: [
       { name: 'address' },
       { name: 'blockNumber/tag', default: 'latest' },
@@ -103,7 +110,7 @@ const EthereumMethods: EthereumMethod[] = [
   },
 ];
 
-function Request({ showRequest, setShowRequest }: RequestProps) {
+function Request({ showModal, setShowModal }: ModalProps) {
   const [selectedEthMethod, setSelectedEthMethod] = useState<EthereumMethod>(EthereumMethods[0]);
   const [params, setParams] = useState<string[]>([]);
   const [loadingRequest, setLoadingRequest] = useState<boolean>(false);
@@ -119,7 +126,7 @@ function Request({ showRequest, setShowRequest }: RequestProps) {
 
   const handleClose = () => {
     resetForm();
-    setShowRequest(false);
+    setShowModal(false);
   };
 
   const performRequest = async (request: RequestArguments) => {
@@ -188,7 +195,7 @@ function Request({ showRequest, setShowRequest }: RequestProps) {
 
   return (
     <Offcanvas
-      show={showRequest}
+      show={showModal}
       onHide={handleClose}
       backdrop="static"
       placement="end"

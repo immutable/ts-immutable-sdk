@@ -9,12 +9,15 @@ import {
   DeviceConnectResponse,
   DeviceTokenResponse,
   Networks,
+  PassportEventMap,
+  PassportEvents,
   PassportModuleConfiguration,
   UserProfile,
 } from './types';
 import { ConfirmationScreen } from './confirmation';
 import { ZkEvmProvider } from './zkEvm';
 import { Provider } from './zkEvm/types';
+import TypedEventEmitter from './typedEventEmitter';
 
 export class Passport {
   private readonly authManager: AuthManager;
@@ -27,9 +30,11 @@ export class Passport {
 
   private readonly magicAdapter: MagicAdapter;
 
+  private readonly multiRollupApiClients: MultiRollupApiClients;
+
   private readonly passportImxProviderFactory: PassportImxProviderFactory;
 
-  private readonly multiRollupApiClients: MultiRollupApiClients;
+  private readonly passportEventEmitter: TypedEventEmitter<PassportEventMap>;
 
   constructor(passportModuleConfiguration: PassportModuleConfiguration) {
     this.config = new PassportConfiguration(passportModuleConfiguration);
@@ -41,12 +46,14 @@ export class Passport {
         baseConfig: passportModuleConfiguration.baseConfig,
       });
     this.multiRollupApiClients = new MultiRollupApiClients(this.config.multiRollupConfig);
+    this.passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
     this.passportImxProviderFactory = new PassportImxProviderFactory({
       authManager: this.authManager,
       config: this.config,
       confirmationScreen: this.confirmationScreen,
       immutableXClient: this.immutableXClient,
       magicAdapter: this.magicAdapter,
+      passportEventEmitter: this.passportEventEmitter,
     });
   }
 
@@ -70,7 +77,7 @@ export class Passport {
     return this.passportImxProviderFactory.getProviderWithDeviceFlow(deviceCode, interval, timeoutMs);
   }
 
-  getPKCEAuthorizationUrl(): string {
+  public getPKCEAuthorizationUrl(): string {
     return this.authManager.getPKCEAuthorizationUrl();
   }
 
@@ -95,6 +102,7 @@ export class Passport {
     }
 
     return new ZkEvmProvider({
+      passportEventEmitter: this.passportEventEmitter,
       authManager: this.authManager,
       magicAdapter: this.magicAdapter,
       config: this.config,
@@ -108,7 +116,11 @@ export class Passport {
   }
 
   public async logout(): Promise<void> {
-    return this.authManager.logout();
+    await this.authManager.logout();
+
+    // Code after this point is only executed if the logout mode is silent
+    await this.magicAdapter.logout();
+    this.passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
   }
 
   /**

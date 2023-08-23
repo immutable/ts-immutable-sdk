@@ -14,6 +14,13 @@ import nodePolyfills from 'rollup-plugin-polyfill-node';
 // RELEASE_TYPE environment variable is set by the CI/CD pipeline
 const releaseType = process.env.RELEASE_TYPE || 'alpha';
 
+const bundles = ["cjs","browser","esm"];
+const wantBundles = process.env.BUNDLES || bundles.join(',');
+const enabledBundles = wantBundles.split(',').filter((b) => bundles.includes(b));
+if(enabledBundles.length === 0){
+  throw new Error("No bundles enabled. Please set BUNDLES env variable to a valid list of bundles. Example: BUNDLES=cjs,browser,esm");
+}
+
 const packages = JSON.parse(
   readFileSync('./workspace-packages.json', { encoding: 'utf8' })
 );
@@ -74,18 +81,7 @@ const getFileBuild = (inputFilename) => [
   },
 ];
 
-const buildBundles = () => {
-  const modules = [];
-  const filesToBuild = getFilesToBuild();
-  for (const file of filesToBuild) {
-    modules.push(...getFileBuild(file));
-  }
-  return modules;
-};
-
-export default [
-  // Main build entry
-  {
+const cjsBuild = () => ({
     input: 'src/index.ts',
     output: {
       file: 'dist/index.cjs',
@@ -104,35 +100,58 @@ export default [
         __SDK_VERSION__: pkg.version,
       }),
     ],
-  },
-  // Browser Bundle
-  {
-    input: 'src/index.ts',
-    output: {
-      file: 'dist/index.browser.js',
-      format: 'umd',
-      sourcemap: true,
-      name: 'immutable',
-    },
-    plugins: [
-      nodeResolve({
-        jsnext: true,
-        main: true,
-        browser: true,
-      }),
-      nodePolyfills(),
-      commonJs(),
-      typescript(),
-      json(),
-      replace({
-        exclude: 'node_modules/**',
-        preventAssignment: true,
-        __SDK_VERSION__: pkg.version,
-      }),
-      terser(),
-    ],
-  },
+  });
 
-  // Export ES Modules
+const browserBuild = () => ({
+  input: 'src/index.ts',
+  output: {
+    file: 'dist/index.browser.js',
+    format: 'umd',
+    sourcemap: true,
+    name: 'immutable',
+  },
+  plugins: [
+    nodeResolve({
+      jsnext: true,
+      main: true,
+      browser: true,
+    }),
+    nodePolyfills(),
+    commonJs(),
+    typescript(),
+    json(),
+    replace({
+      exclude: 'node_modules/**',
+      preventAssignment: true,
+      __SDK_VERSION__: pkg.version,
+    }),
+    terser(),
+  ]
+});
+
+const esmBuild = () => {
+  const modules = [];
+  const filesToBuild = getFilesToBuild();
+  for (const file of filesToBuild) {
+    modules.push(...getFileBuild(file));
+  }
+  return modules;
+};
+
+const buildBundles = () => {
+  const builds = [];
+  if(enabledBundles.includes("cjs")){
+    builds.push(cjsBuild());
+  } 
+  if(enabledBundles.includes("browser")){
+    builds.push(browserBuild());
+  } 
+  if(enabledBundles.includes("esm")){
+    builds.push(...esmBuild());
+  } 
+  return builds;
+}
+
+export default [
   ...buildBundles(),
 ];

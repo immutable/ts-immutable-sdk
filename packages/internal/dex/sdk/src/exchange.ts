@@ -2,14 +2,22 @@ import { ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
 import assert from 'assert';
 import {
-  DuplicateAddressesError, InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError,
+  DuplicateAddressesError,
+  InvalidAddressError,
+  InvalidMaxHopsError,
+  InvalidSlippageError,
 } from 'errors';
 import { fetchGasPrice } from 'lib/transactionUtils/gas';
 import { getApproval, prepareApproval } from 'lib/transactionUtils/approval';
 import { getOurQuoteReqAmount, prepareUserQuote } from 'lib/transactionUtils/getQuote';
 import { Fees } from 'lib/fees';
+import { SecondaryFee__factory } from 'contracts/types';
 import {
-  DEFAULT_DEADLINE, DEFAULT_MAX_HOPS, DEFAULT_SLIPPAGE, MAX_MAX_HOPS, MIN_MAX_HOPS,
+  DEFAULT_DEADLINE,
+  DEFAULT_MAX_HOPS,
+  DEFAULT_SLIPPAGE,
+  MAX_MAX_HOPS,
+  MIN_MAX_HOPS,
 } from './constants';
 import { Router } from './lib/router';
 import {
@@ -73,6 +81,24 @@ export class Exchange {
     assert(slippagePercent >= 0, new InvalidSlippageError('slippage percent must be greater than or equal to 0'));
   }
 
+  private async getSecondaryFees() {
+    if (this.secondaryFees.length === 0) {
+      return [];
+    }
+
+    const secondaryFeeContract = SecondaryFee__factory.connect(
+      this.router.routingContracts.secondaryFeeAddress,
+      this.provider,
+    );
+
+    if (await secondaryFeeContract.paused()) {
+      // Do not use secondary fees if the contract is paused
+      return [];
+    }
+
+    return this.secondaryFees;
+  }
+
   private async getUnsignedSwapTx(
     fromAddress: string,
     tokenInAddress: string,
@@ -86,9 +112,10 @@ export class Exchange {
     Exchange.validate(tokenInAddress, tokenOutAddress, maxHops, slippagePercent, fromAddress);
 
     // get the decimals of the tokens that will be swapped
-    const [tokenInDecimals, tokenOutDecimals] = await Promise.all([
+    const [tokenInDecimals, tokenOutDecimals, secondaryFees] = await Promise.all([
       getERC20Decimals(tokenInAddress, this.provider),
       getERC20Decimals(tokenOutAddress, this.provider),
+      this.getSecondaryFees(),
     ]);
 
     const tokenIn: TokenInfo = {
@@ -112,15 +139,16 @@ export class Exchange {
 
     const ourQuoteReqAmount = getOurQuoteReqAmount(amountSpecified, fees, tradeType);
 
-    const ourQuote = await this.router.findOptimalRoute(
-      ourQuoteReqAmount,
-      otherToken,
-      tradeType,
-      maxHops,
-    );
-
-    // get gas details
-    const gasPrice = await fetchGasPrice(this.provider);
+    // get quote and gas details
+    const [ourQuote, gasPrice] = await Promise.all([
+      this.router.findOptimalRoute(
+        ourQuoteReqAmount,
+        otherToken,
+        tradeType,
+        maxHops,
+      ),
+      fetchGasPrice(this.provider),
+    ]);
 
     const adjustedQuote = prepareSwap(ourQuote, amountSpecified, fees);
 
@@ -133,7 +161,7 @@ export class Exchange {
       this.router.routingContracts.peripheryRouterAddress,
       this.router.routingContracts.secondaryFeeAddress,
       gasPrice,
-      this.secondaryFees,
+      secondaryFees,
     );
 
     const userQuote = prepareUserQuote(otherToken, adjustedQuote, slippagePercent, fees);
@@ -143,7 +171,7 @@ export class Exchange {
       amount,
       userQuote.amountWithMaxSlippage.value,
       this.router.routingContracts,
-      this.secondaryFees,
+      secondaryFees,
     );
 
     // we always use the tokenIn address because we are always selling the tokenIn

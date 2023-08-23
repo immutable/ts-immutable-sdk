@@ -10,6 +10,7 @@ import {
   resetMswHandlers,
   transactionHash,
   mswHandlers,
+  chainIdHex,
 } from './mocks/zkEvm/msw';
 import { JsonRpcError, RpcErrorCode } from './zkEvm/JsonRpcError';
 import GuardianClient from './guardian/guardian';
@@ -172,7 +173,7 @@ describe('Passport', () => {
     });
 
     describe('eth_sendTransaction', () => {
-      it('successfully initialises the zkEvm provider and sends a transaction', async () => { // TODO: BROKEN
+      it('successfully initialises the zkEvm provider and sends a transaction', async () => {
         const transferToAddress = '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC';
 
         useMswHandlers([
@@ -181,21 +182,21 @@ describe('Passport', () => {
           mswHandlers.relayer.success,
           mswHandlers.guardian.evaluateTransaction.success,
         ]);
-        mockMagicRequest.mockImplementationOnce(({ method }: RequestArguments) => {
-          expect(method).toEqual('eth_accounts');
-          return Promise.resolve([magicWalletAddress]);
-        });
-        mockMagicRequest.mockImplementationOnce(({ method }: RequestArguments) => {
-          expect(method).toEqual('personal_sign');
-          return Promise.resolve('0x6b168cf5d90189eaa51d02ff3fa8ffc8956b1ea20fdd34280f521b1acca092305b9ace24e643fe64a30c528323065f5b77e1fb4045bd330aad01e7b9a07591f91b');
-        });
-        mockMagicRequest.mockImplementationOnce(({ method }: RequestArguments) => {
-          expect(method).toEqual('eth_accounts');
-          return Promise.resolve([magicWalletAddress]);
-        });
-        mockMagicRequest.mockImplementationOnce(({ method }: RequestArguments) => {
-          expect(method).toEqual('personal_sign');
-          return Promise.resolve('0xa29c8ff87dbbf59f4f46ea3006e5b27980fa4262668ad0bc1f0b24bc01a727e92ef80db88e391707bec7bdf1e1479d2fa994b732e0cb28c9438c1d0e7e67b52d1b');
+        mockMagicRequest.mockImplementation(({ method }: RequestArguments) => {
+          switch (method) {
+            case 'eth_chainId': {
+              return Promise.resolve(chainIdHex);
+            }
+            case 'eth_accounts': {
+              return Promise.resolve([magicWalletAddress]);
+            }
+            case 'personal_sign': {
+              return Promise.resolve('0x6b168cf5d90189eaa51d02ff3fa8ffc8956b1ea20fdd34280f521b1acca092305b9ace24e643fe64a30c528323065f5b77e1fb4045bd330aad01e7b9a07591f91b');
+            }
+            default: {
+              throw new Error(`Unexpected method: ${method}`);
+            }
+          }
         });
         mockGetUser.mockResolvedValue(mockOidcUserZkevm);
 

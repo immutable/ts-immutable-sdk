@@ -56,7 +56,7 @@ export function Example() {
     try {
       let exchange: Exchange;
       if (secondaryFeeRecipient && secondaryFeePercentage) {
-        exchange = new Exchange({...configuration, secondaryFees: [{feeRecipient: secondaryFeeRecipient, feeBasisPoints: secondaryFeePercentage * 100}]});
+        exchange = new Exchange({...configuration, secondaryFees: [{recipient: secondaryFeeRecipient, basisPoints: secondaryFeePercentage * 100}]});
       } else {
         exchange = new Exchange(configuration);
       }

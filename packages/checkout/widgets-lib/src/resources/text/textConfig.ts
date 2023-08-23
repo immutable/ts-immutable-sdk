@@ -9,9 +9,6 @@ import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextT
 export const text = {
   views: {
     [ConnectWidgetViews.CONNECT_WALLET]: {
-      header: {
-        title: 'Connect',
-      },
       body: {
         heading: 'Connect a wallet',
         content:
@@ -158,8 +155,8 @@ export const text = {
     [SwapWidgetViews.APPROVE_ERC20]: {
       approveSwap: {
         content: {
-          heading: "Now you'll just need to approve the transaction",
-          body: 'Follow the prompts in MetaMask.',
+          heading: "Now you'll just need to confirm the transaction",
+          body: 'Follow the prompts in your wallet.',
         },
         footer: {
           buttonText: 'Okay',
@@ -168,11 +165,17 @@ export const text = {
       },
       approveSpending: {
         content: {
-          heading: "You'll be asked to set a spending cap for this transaction",
-          body: [
-            'Input at least',
-            'for this transaction and future transactions, then follow the prompts.',
-          ],
+          metamask: {
+            heading: "You'll be asked to set a spending cap for this transaction",
+            body: [
+              'Input at least',
+              'for this transaction and future transactions, then follow the prompts.',
+            ],
+          },
+          passport: {
+            heading: "You'll be asked to approve a spending cap for this transaction",
+            body: 'Follow the prompts in your wallet to approve the spending cap.',
+          },
         },
         footer: {
           buttonText: 'Got it',
@@ -248,6 +251,11 @@ export const text = {
     [BridgeWidgetViews.FAIL]: {
       text: 'Transaction failed',
       actionText: 'Review & Try again',
+    },
+    [BridgeWidgetViews.BRIDGE_COMING_SOON]: {
+      heading: 'Coming soon',
+      body: "Moving funds across networks currently isn't supported for Passport.",
+      actionText: 'Dismiss',
     },
     [SharedViews.TOP_UP_VIEW]: {
       header: {

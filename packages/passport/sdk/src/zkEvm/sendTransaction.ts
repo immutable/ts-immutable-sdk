@@ -1,11 +1,11 @@
 import {
   ExternalProvider, JsonRpcProvider, TransactionRequest, Web3Provider,
 } from '@ethersproject/providers';
-import { chainIdNumber, getNonce, getSignedMetaTransactions } from './walletHelpers';
+import { BigNumber } from 'ethers';
+import { getEip155ChainId, getNonce, getSignedMetaTransactions } from './walletHelpers';
 import { MetaTransaction, RelayerTransactionStatus } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { retryWithDelay } from '../network/retry';
-import { PassportConfiguration } from '../config';
 import { RelayerClient } from './relayerClient';
 import { UserZkEvm } from '../types';
 import GuardianClient, { convertBigNumberishToString } from '../guardian/guardian';
@@ -17,7 +17,6 @@ export type EthSendTransactionParams = {
   magicProvider: ExternalProvider;
   jsonRpcProvider: JsonRpcProvider;
   guardianClient: GuardianClient;
-  config: PassportConfiguration;
   relayerClient: RelayerClient;
   user: UserZkEvm;
   params: Array<any>;
@@ -29,7 +28,6 @@ export const sendTransaction = ({
   jsonRpcProvider,
   relayerClient,
   guardianClient,
-  config,
   user,
 }: EthSendTransactionParams): Promise<string> => guardianClient
   .withConfirmationScreen({ width: 480, height: 520 })(async () => {
@@ -38,7 +36,8 @@ export const sendTransaction = ({
       throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'eth_sendTransaction requires a "to" field');
     }
 
-    const chainId = chainIdNumber(config.zkEvmChainId);
+    const { chainId } = await jsonRpcProvider.ready;
+    const chainIdBigNumber = BigNumber.from(chainId);
     const magicWeb3Provider = new Web3Provider(magicProvider);
     const signer = magicWeb3Provider.getSigner();
 
@@ -58,7 +57,7 @@ export const sendTransaction = ({
     const signedTransaction = await getSignedMetaTransactions(
       [metaTransaction],
       nonce,
-      chainId,
+      chainIdBigNumber,
       user.zkEvm.ethAddress,
       signer,
     );
@@ -84,7 +83,7 @@ export const sendTransaction = ({
     };
 
     await guardianClient.validateEVMTransaction({
-      chainId: config.zkEvmChainId,
+      chainId: getEip155ChainId(chainId),
       nonce: convertBigNumberishToString(nonce),
       user,
       metaTransactions: [metaTransaction, feeMetaTransaction],
@@ -95,12 +94,10 @@ export const sendTransaction = ({
     const signedTransactions = await getSignedMetaTransactions(
       [metaTransaction, feeMetaTransaction],
       nonce,
-      chainId,
+      chainIdBigNumber,
       user.zkEvm.ethAddress,
       signer,
     );
-
-    // TODO: ID-697 Evaluate transactions through Guardian
 
     const relayerId = await relayerClient.ethSendTransaction(user.zkEvm.ethAddress, signedTransactions);
 

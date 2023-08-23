@@ -1,6 +1,5 @@
 import {
-  CreateOrderProtocolData,
-  Fee,
+  ProtocolData,
   ListingResult,
   ListListingsResult,
   OrdersService,
@@ -45,6 +44,7 @@ export class ImmutableApiClient {
     orderHash,
     orderComponents,
     orderSignature,
+    makerFee,
   }: CreateListingParams): Promise<ListingResult> {
     if (orderComponents.offer.length !== 1) {
       throw new Error('Only one item can be listed at a time');
@@ -78,21 +78,12 @@ export class ImmutableApiClient {
             contract_address: orderComponents.consideration[0].token,
           },
         ],
-        fees:
-          orderComponents.consideration.length > 1
-            ? [
-              {
-                amount: orderComponents.consideration[1].startAmount,
-                recipient: orderComponents.consideration[1].recipient,
-                fee_type: Fee.fee_type.ROYALTY,
-              },
-            ]
-            : [],
+        fees: makerFee ? [makerFee] : [],
         end_time: new Date(
           parseInt(`${orderComponents.endTime.toString()}000`, 10),
         ).toISOString(),
         protocol_data: {
-          order_type: CreateOrderProtocolData.order_type.FULL_RESTRICTED,
+          order_type: ProtocolData.order_type.FULL_RESTRICTED,
           zone_address: orderComponents.zone,
           seaport_address: this.seaportAddress,
           seaport_version: SEAPORT_CONTRACT_VERSION_V1_5,

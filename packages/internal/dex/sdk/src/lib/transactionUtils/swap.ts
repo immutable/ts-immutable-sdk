@@ -35,13 +35,13 @@ function buildSwapParametersForSinglePoolSwap(
   secondaryFees: SecondaryFee[],
   secondaryFeeContract: SecondaryFeeInterface,
 ) {
-  const secondaryFeeValues: ISecondaryFee.ServiceFeeParamsStruct[] = secondaryFees.map((fee) => ({
-    feePrcntBasisPoints: fee.feeBasisPoints,
-    recipient: fee.feeRecipient,
+  const secondaryFeeValues: ISecondaryFee.SecondaryFeeParamsStruct[] = secondaryFees.map((fee) => ({
+    feeBasisPoints: fee.basisPoints,
+    recipient: fee.recipient,
   }));
 
   if (trade.tradeType === TradeType.EXACT_INPUT) {
-    return secondaryFeeContract.encodeFunctionData('exactInputSingleWithServiceFee', [secondaryFeeValues, {
+    return secondaryFeeContract.encodeFunctionData('exactInputSingleWithSecondaryFee', [secondaryFeeValues, {
       tokenIn: route.tokenPath[0].address,
       tokenOut: route.tokenPath[1].address,
       fee: route.pools[0].fee,
@@ -52,7 +52,7 @@ function buildSwapParametersForSinglePoolSwap(
     }]);
   }
 
-  return secondaryFeeContract.encodeFunctionData('exactOutputSingleWithServiceFee', [secondaryFeeValues, {
+  return secondaryFeeContract.encodeFunctionData('exactOutputSingleWithSecondaryFee', [secondaryFeeValues, {
     tokenIn: route.tokenPath[0].address,
     tokenOut: route.tokenPath[1].address,
     fee: route.pools[0].fee,
@@ -74,13 +74,13 @@ function buildSwapParametersForMultiPoolSwap(
 ) {
   const path: string = encodeRouteToPath(route, trade.tradeType === TradeType.EXACT_OUTPUT);
 
-  const secondaryFeeValues: ISecondaryFee.ServiceFeeParamsStruct[] = secondaryFees.map((fee) => ({
-    feePrcntBasisPoints: fee.feeBasisPoints,
-    recipient: fee.feeRecipient,
+  const secondaryFeeValues: ISecondaryFee.SecondaryFeeParamsStruct[] = secondaryFees.map((fee) => ({
+    feeBasisPoints: fee.basisPoints,
+    recipient: fee.recipient,
   }));
 
   if (trade.tradeType === TradeType.EXACT_INPUT) {
-    return secondaryFeeContract.encodeFunctionData('exactInputWithServiceFee', [secondaryFeeValues, {
+    return secondaryFeeContract.encodeFunctionData('exactInputWithSecondaryFee', [secondaryFeeValues, {
       path,
       recipient: fromAddress,
       amountIn,
@@ -88,7 +88,7 @@ function buildSwapParametersForMultiPoolSwap(
     }]);
   }
 
-  return secondaryFeeContract.encodeFunctionData('exactOutputWithServiceFee', [secondaryFeeValues, {
+  return secondaryFeeContract.encodeFunctionData('exactOutputWithSecondaryFee', [secondaryFeeValues, {
     path,
     recipient: fromAddress,
     amountInMaximum: amountIn,

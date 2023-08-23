@@ -109,6 +109,10 @@ In order to regenerate these clients with updated spec files, follow the steps b
 
 From a root level, if you want to build the dependencies of the core SDK and other dependencies, have a look at the `build` script at the root `package.json`.
 
+The build script takes a while and builds 3 bundle types: ES Modules, Browser and CommonJS
+
+You can choose to build a specific bundle type using `build:cjs`, `build:esm` or `build:browser`
+
 If your package isn't part of the dependency tree for the main SDK, then you might need to manually build your project using:
 
 ```sh

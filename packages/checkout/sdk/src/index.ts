@@ -2,12 +2,15 @@ export { Checkout } from './Checkout';
 export {
   ChainId,
   ChainName,
-  WalletProviderName,
+  CHECKOUT_API_BASE_URL,
   GasEstimateType,
+  GasTokenType,
+  ItemType,
   NetworkFilterTypes,
   TokenFilterTypes,
+  TransactionOrGasType,
   WalletFilterTypes,
-  CHECKOUT_API_BASE_URL,
+  WalletProviderName,
 } from './types';
 export type {
   AllowedNetworkConfig,

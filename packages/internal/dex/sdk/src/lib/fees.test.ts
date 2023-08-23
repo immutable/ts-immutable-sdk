@@ -5,12 +5,12 @@ import { Fees } from './fees';
 const buildFees = () => new Fees(
   [
     {
-      feeBasisPoints: 1000, // 10%
-      feeRecipient: makeAddr('yeet'),
+      basisPoints: 1000, // 10%
+      recipient: makeAddr('yeet'),
     },
     {
-      feeBasisPoints: 500, // 5%
-      feeRecipient: makeAddr('yort'),
+      basisPoints: 500, // 5%
+      recipient: makeAddr('yort'),
     },
   ],
   IMX_TEST_TOKEN,
