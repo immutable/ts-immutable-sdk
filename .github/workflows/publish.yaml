@@ -15,7 +15,7 @@ on:
         type: choice
         description: Upgrade Type
         options:
-          - none
+          # - none only needed for alpha releases?
           - patch
           - minor
           # - major
@@ -122,6 +122,6 @@ jobs:
         if: contains(github.event.inputs.release_type, 'release')
         run: yarn release --ci --no-increment -c .release-it.json $( ${{ github.event.inputs.dry_run }} && echo "--dry-run" || echo "") --github.tokenRef=${{ secrets.RELEASE_TOKEN }}
 
-      - name: Push Changelog
+      - name: Push Changelog PR
         if: github.event.inputs.dry_run == 'false'
         run: VERSION="${{ steps.version.outputs.NEXT_VERSION }}" ./.github/scripts/push-changelog-pr.sh
