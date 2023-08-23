@@ -323,6 +323,12 @@ export const text = {
         },
       },
     },
+    [PrimaryRevenueWidgetViews.REVIEW_ORDER]: {
+      header: {
+        heading: 'Review & Pay',
+        caption: 'lore ipsum dolor sit amet',
+      },
+    },
   },
   wallets: {
     [WalletProviderName.PASSPORT]: {
