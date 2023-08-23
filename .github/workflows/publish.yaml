@@ -31,6 +31,8 @@ jobs:
   Publish:
     name: Publish Workflow
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.PLATFORM_SA_GITHUB_TOKEN }}
     steps:
       - name: Check Public Release Branch
         if: contains(github.event.inputs.release_type, 'release') && (github.ref != 'refs/heads/main')
@@ -40,7 +42,6 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          token: ${{ secrets.RELEASE_TOKEN }}
 
       - name: Setup Github
         run: |
@@ -67,6 +68,11 @@ jobs:
           fi
           ./.github/scripts/version-up.sh --${{github.event.inputs.release_type }} --$upgrade_type --apply $revision_upgrade
         shell: bash
+
+      - name: Workout next version string
+        run: |
+          ./.github/scripts/version-up.sh --release --patch --apply
+        shell: bash        
 
       - name: Install dependencies
         run: yarn install --immutable
@@ -121,9 +127,6 @@ jobs:
         if: contains(github.event.inputs.release_type, 'release')
         run: yarn release --ci --no-increment -c .release-it.json $( ${{ github.event.inputs.dry_run }} && echo "--dry-run" || echo "") --github.tokenRef=${{ secrets.RELEASE_TOKEN }}
 
-      - name: Push Changes to main
-        if: contains(github.event.inputs.release_type, 'release')
-        run: |
-          git add CHANGELOG.md package.json
-          git commit -m "Release ${{ steps.version.outputs.NEXT_VERSION }}"
-          git push origin main
+      - name: Push Changelog
+        if: github.event.inputs.dry_run == 'false'
+        run: VERSION="${{ steps.version.outputs.NEXT_VERSION }}" ./.github/scripts/push-changelog-pr.sh
