@@ -1,8 +1,8 @@
 import { BigNumber, Contract } from 'ethers';
 import { Web3Provider } from '@ethersproject/providers';
-import { getERC20Allowance, getERC20ApprovalTransaction, hasERC20Allowances } from './allowance';
-import { CheckoutErrorType } from '../errors';
-import { ItemRequirement, ItemType } from '../types';
+import { getERC20Allowance, getERC20ApprovalTransaction, hasERC20Allowances } from './erc20';
+import { CheckoutErrorType } from '../../errors';
+import { ItemRequirement, ItemType } from '../../types';
 
 jest.mock('ethers', () => ({
   ...jest.requireActual('ethers'),
@@ -11,7 +11,7 @@ jest.mock('ethers', () => ({
 }));
 
 describe('allowance', () => {
-  let mockProvider: Web3Provider;
+  const mockProvider = {} as unknown as Web3Provider;
 
   describe('getERC20Allowance', () => {
     it('should get the allowance from the contract', async () => {
@@ -19,8 +19,6 @@ describe('allowance', () => {
       (Contract as unknown as jest.Mock).mockReturnValue({
         allowance: allowanceMock,
       });
-
-      mockProvider = {} as unknown as Web3Provider;
 
       const allowance = await getERC20Allowance(
         mockProvider,
@@ -38,7 +36,9 @@ describe('allowance', () => {
         allowance: allowanceMock,
       });
 
-      mockProvider = {} as unknown as Web3Provider;
+      let message = '';
+      let type = '';
+      let data = {};
 
       try {
         await getERC20Allowance(
@@ -48,38 +48,17 @@ describe('allowance', () => {
           '0xSEAPORT',
         );
       } catch (err: any) {
-        expect(err.message).toEqual('Failed to get the allowance for ERC20');
-        expect(err.type).toEqual(CheckoutErrorType.GET_ERC20_ALLOWANCE_ERROR);
-        expect(err.data).toEqual({
-          contractAddress: 'OxERC20',
-        });
-        expect(allowanceMock).toBeCalledWith('0xADDRESS', '0xSEAPORT');
+        message = err.message;
+        type = err.type;
+        data = err.data;
       }
-    });
 
-    it('should throw checkout error when provider call errors', async () => {
-      const allowanceMock = jest.fn().mockResolvedValue({});
-      (Contract as unknown as jest.Mock).mockReturnValue({
-        allowance: allowanceMock,
+      expect(message).toEqual('Failed to get the allowance for ERC20');
+      expect(type).toEqual(CheckoutErrorType.GET_ERC20_ALLOWANCE_ERROR);
+      expect(data).toEqual({
+        contractAddress: 'OxERC20',
       });
-
-      try {
-        mockProvider = {} as unknown as Web3Provider;
-
-        await getERC20Allowance(
-          mockProvider,
-          '0xADDRESS',
-          'OxERC20',
-          '0xSEAPORT',
-        );
-      } catch (err: any) {
-        expect(err.message).toEqual('Failed to get the allowance for ERC20');
-        expect(err.type).toEqual(CheckoutErrorType.GET_ERC20_ALLOWANCE_ERROR);
-        expect(err.data).toEqual({
-          contractAddress: 'OxERC20',
-        });
-        expect(allowanceMock).toBeCalledTimes(0);
-      }
+      expect(allowanceMock).toBeCalledWith('0xADDRESS', '0xSEAPORT');
     });
   });
 
@@ -91,8 +70,6 @@ describe('allowance', () => {
           approve: approveMock,
         },
       });
-
-      mockProvider = {} as unknown as Web3Provider;
 
       const approvalTransaction = await getERC20ApprovalTransaction(
         mockProvider,
@@ -113,25 +90,30 @@ describe('allowance', () => {
         },
       });
 
-      mockProvider = {} as unknown as Web3Provider;
+      let message = '';
+      let type = '';
+      let data = {};
 
       try {
-        const approvalTransaction = await getERC20ApprovalTransaction(
+        await getERC20ApprovalTransaction(
           mockProvider,
           '0xADDRESS',
           'OxERC20',
           '0xSEAPORT',
           BigNumber.from(1),
         );
-        expect(approvalTransaction).toBeUndefined();
       } catch (err: any) {
-        expect(err.message).toEqual('Failed to get the approval transaction for ERC20');
-        expect(err.type).toEqual(CheckoutErrorType.GET_ERC20_ALLOWANCE_ERROR);
-        expect(err.data).toEqual({
-          contractAddress: 'OxERC20',
-        });
-        expect(approveMock).toBeCalledWith('0xSEAPORT', BigNumber.from(1));
+        message = err.message;
+        type = err.type;
+        data = err.data;
       }
+
+      expect(message).toEqual('Failed to get the approval transaction for ERC20');
+      expect(type).toEqual(CheckoutErrorType.GET_ERC20_ALLOWANCE_ERROR);
+      expect(data).toEqual({
+        contractAddress: 'OxERC20',
+      });
+      expect(approveMock).toBeCalledWith('0xSEAPORT', BigNumber.from(1));
     });
   });
 
@@ -145,8 +127,6 @@ describe('allowance', () => {
           approve: approveMock,
         },
       });
-
-      mockProvider = {} as unknown as Web3Provider;
 
       const itemRequirements: ItemRequirement[] = [
         {
@@ -165,6 +145,7 @@ describe('allowance', () => {
       expect(allowances.sufficient).toBeFalsy();
       expect(allowances.allowances).toEqual([
         {
+          type: ItemType.ERC20,
           sufficient: false,
           delta: BigNumber.from(1),
           itemRequirement: itemRequirements[1],
@@ -182,8 +163,6 @@ describe('allowance', () => {
           approve: approveMock,
         },
       });
-
-      mockProvider = {} as unknown as Web3Provider;
 
       const itemRequirements: ItemRequirement[] = [
         {
@@ -218,8 +197,6 @@ describe('allowance', () => {
         },
       });
 
-      mockProvider = {} as unknown as Web3Provider;
-
       const itemRequirements: ItemRequirement[] = [
         {
           type: ItemType.NATIVE,
@@ -237,6 +214,12 @@ describe('allowance', () => {
           amount: BigNumber.from(1),
           spenderAddress: '0xSEAPORT',
         },
+        {
+          type: ItemType.ERC20,
+          contractAddress: '0xERC20c',
+          amount: BigNumber.from(2),
+          spenderAddress: '0xSEAPORT',
+        },
       ];
 
       const allowances = await hasERC20Allowances(mockProvider, '0xADDRESS', itemRequirements);
@@ -247,9 +230,17 @@ describe('allowance', () => {
           itemRequirement: itemRequirements[2],
         },
         {
+          type: ItemType.ERC20,
           sufficient: false,
           delta: BigNumber.from(1),
           itemRequirement: itemRequirements[1],
+          approvalTransaction: { from: '0xADDRESS' },
+        },
+        {
+          type: ItemType.ERC20,
+          sufficient: false,
+          delta: BigNumber.from(1),
+          itemRequirement: itemRequirements[3],
           approvalTransaction: { from: '0xADDRESS' },
         },
       ]));

@@ -28,6 +28,29 @@ export const erc20ItemAggregator = (
   return aggregatedItemRequirements.concat(Array.from(aggregatedMap.values()));
 };
 
+export const erc721ItemAggregator = (
+  itemRequirements: ItemRequirement[],
+): ItemRequirement[] => {
+  const aggregatedMap = new Map<string, ItemRequirement>();
+  const aggregatedItemRequirements: ItemRequirement[] = [];
+
+  itemRequirements.forEach((itemRequirement) => {
+    const { type } = itemRequirement;
+
+    if (type !== ItemType.ERC721) {
+      aggregatedItemRequirements.push(itemRequirement);
+      return;
+    }
+
+    const { contractAddress, spenderAddress, id } = itemRequirement;
+    const key = `${contractAddress}${spenderAddress}${id}`;
+    const aggregateItem = aggregatedMap.get(key);
+    if (!aggregateItem) aggregatedMap.set(key, { ...itemRequirement });
+  });
+
+  return aggregatedItemRequirements.concat(Array.from(aggregatedMap.values()));
+};
+
 export const itemAggregator = (
   itemRequirements: ItemRequirement[],
-): ItemRequirement[] => erc20ItemAggregator(itemRequirements);
+): ItemRequirement[] => erc721ItemAggregator(erc20ItemAggregator(itemRequirements));

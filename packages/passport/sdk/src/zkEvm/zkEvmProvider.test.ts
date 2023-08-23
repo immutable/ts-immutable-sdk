@@ -36,6 +36,7 @@ describe('ZkEvmProvider', () => {
     const passthroughMethods: Array<[string, any]> = [
       ['eth_getStorageAt', '0x'],
       ['eth_getBalance', '0x1'],
+      ['eth_getCode', '0x'],
       ['eth_gasPrice', '0x2'],
       ['eth_estimateGas', '0x3'],
       ['eth_call', '0x'],
