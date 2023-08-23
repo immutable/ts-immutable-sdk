@@ -277,6 +277,9 @@ You can optionally do a dry run by checking the `Dry run` checkbox. This will ru
 
 #### Versioning
 
+> [!IMPORTANT]
+> While the SDK are on `0.X` releases, interface or breaking changes should bump the minor version, whilst non-breaking changes should bump the patch version.
+
 When releasing a new version of the SDK, you will need to specify the `Upgrade Type` (either `none`, `patch`, `minor`, or `major`). This will determine what the next version of the SDK will be based off the existing [tags in the repo](https://github.com/immutable/ts-immutable-sdk/tags).
 
 The `Publish to NPM` workflow will update the version in the top level `package.json` and push it back to the `main` branch.
@@ -285,15 +288,10 @@ Selecting `Release Type` of `release` and an `Upgrade Type` other than `none` wi
 
 For example, given the latest tag of `0.8.0-alpha` and selecting patch as the `Upgrade Type`: `0.8.0-alpha` -> `0.9.0`
 
-#### Alpha Versioning
-
-Selecting `alpha` and a `Upgrade Type` other than `none` will create a new `alpha` release and bump the version.
-
-For example, create a minor alpha release selecting a `Upgrade Type` of `minor`: `0.8.0` -> `0.9.0-alpha`
-
-Use the `none` upgrade type to bump an alpha: `0.8.0-alpha` -> `0.8.0-alpha.1`
-
 #### Updated SDK Reference Documentation
+
+> [!NOTE]
+> To have a package documented, the package must have a `typedoc.json` file in the root of the package. See [passport](packages/passport/typedoc.json) for an example. And the package must be listed in the root level `typedoc.json` file.
 
 When the `Publish to NPM` workflow successfully runs, it will trigger the `Publish SDK Reference Docs` GitHub Action. This will build the SDK reference documentation, similar to the steps in [Generate SDK Reference Documentation](#generate-sdk-reference-documentation), and push the changes to the `imx-docs` repo and create a PR for you to review.
 
