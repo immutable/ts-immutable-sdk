@@ -2,7 +2,7 @@ import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
 import { Contract } from 'ethers';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { ERC721ABI, ItemRequirement, ItemType } from '../../types';
-import { SufficientAllowance } from './types';
+import { Allowance, InsufficientERC721 } from './types';
 
 // Returns true if the spender address is approved for all ERC721s of this collection
 export const getERC721ApprovedForAll = async (
@@ -127,15 +127,15 @@ export const hasERC721Allowances = async (
   itemRequirements: ItemRequirement[],
 ): Promise<{
   sufficient: boolean,
-  allowances: SufficientAllowance[]
+  allowances: Allowance[]
 }> => {
   let sufficient = true;
-  const sufficientAllowances: SufficientAllowance[] = [];
+  const sufficientAllowances: Allowance[] = [];
 
   // Setup maps to be able to link data back to the associated promises
   const erc721s = new Map<string, ItemRequirement>();
   const approvedAddressPromises = new Map<string, Promise<string>>();
-  const insufficientERC721s = new Map<string, SufficientAllowance>();
+  const insufficientERC721s = new Map<string, InsufficientERC721>();
   const transactionPromises = new Map<string, Promise<TransactionRequest | undefined>>();
 
   // Check if there are any collections with approvals for all ERC721s for a given spender
