@@ -5,9 +5,9 @@ import {
   OrdersService,
   Fee,
 } from 'openapi/sdk';
-import { CreateListingParams, ListListingsParams } from 'types';
-import { FulfillmentDataResult } from 'openapi/sdk/models/FulfillmentDataResult';
-import { FulfillmentDataRequest } from 'openapi/sdk/models/FulfillmentDataRequest';
+import { CreateListingParams, ListListingsParams } from '../types';
+import { FulfillmentDataResult } from '../openapi/sdk/models/FulfillmentDataResult';
+import { FulfillmentDataRequest } from '../openapi/sdk/models/FulfillmentDataRequest';
 import { ItemType, SEAPORT_CONTRACT_VERSION_V1_5 } from '../seaport';
 
 export class ImmutableApiClient {

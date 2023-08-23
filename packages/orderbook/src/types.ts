@@ -3,7 +3,7 @@ import { PopulatedTransaction, TypedDataDomain, TypedDataField } from 'ethers';
 import {
   Fee as OpenapiFee,
   OrdersService,
-} from 'openapi/sdk';
+} from './openapi/sdk';
 
 // Strictly re-export some of the openapi generated types
 export {
@@ -11,7 +11,7 @@ export {
   ListingResult,
   ListListingsResult,
   Order,
-} from 'openapi/sdk';
+} from './openapi/sdk';
 
 export interface ERC721Item {
   type: 'ERC721';

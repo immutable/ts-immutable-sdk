@@ -1,12 +1,13 @@
 import { ModuleConfiguration } from '@imtbl/config';
-import { ImmutableApiClient, ImmutableApiClientFactory } from 'api-client';
+import { ImmutableApiClient, ImmutableApiClientFactory } from './api-client';
 import {
   getOrderbookConfig,
   OrderbookModuleConfiguration,
   OrderbookOverrides,
-} from 'config/config';
-import { Fee as OpenApiFee } from 'openapi/sdk';
-import { Seaport } from 'seaport';
+} from './config/config';
+import { Fee as OpenApiFee } from './openapi/sdk';
+import { Seaport } from './seaport';
+import { SeaportLibFactory } from './seaport/seaport-lib-factory';
 import {
   CancelOrderResponse,
   CreateListingParams,
@@ -18,8 +19,7 @@ import {
   OrderStatus,
   PrepareListingParams,
   PrepareListingResponse,
-} from 'types';
-import { SeaportLibFactory } from './seaport/seaport-lib-factory';
+} from './types';
 
 /**
  * zkEVM orderbook SDK
