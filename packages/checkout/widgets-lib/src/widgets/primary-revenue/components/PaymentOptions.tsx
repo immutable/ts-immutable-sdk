@@ -1,12 +1,8 @@
 import { Box } from '@biom3/react';
 
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import { PaymentOption } from './PaymentOption';
-import {
-  ViewContext,
-  ViewActions,
-  SharedViews,
-} from '../../../context/view-context/ViewContext';
+
 import { PrimaryRevenueWidgetViews } from '../../../context/view-context/PrimaryRevenueViewContextTypes';
 
 const defaultPaymentOptions: PrimaryRevenueWidgetViews[] = [
@@ -15,12 +11,13 @@ const defaultPaymentOptions: PrimaryRevenueWidgetViews[] = [
 ];
 
 export interface PaymentOptionsProps {
+  onClick: (type: PrimaryRevenueWidgetViews) => void;
   disabledOptions?: PrimaryRevenueWidgetViews[];
 }
 
 export function PaymentOptions(props: PaymentOptionsProps) {
-  const { disabledOptions = [] } = props;
-  const { viewDispatch } = useContext(ViewContext);
+  const { disabledOptions = [], onClick } = props;
+
   const [options, setOptions] = useState<PrimaryRevenueWidgetViews[]>(
     defaultPaymentOptions,
   );
@@ -29,40 +26,6 @@ export function PaymentOptions(props: PaymentOptionsProps) {
     if (disabledOptions.length === 0) return;
     setOptions((prev) => prev.filter((option) => !disabledOptions?.includes(option)));
   }, []);
-
-  const onClick = async (type: PrimaryRevenueWidgetViews) => {
-    console.log('clicked', type); // eslint-disable-line no-console
-
-    try {
-      switch (type) {
-        case PrimaryRevenueWidgetViews.PAY_WITH_CARD:
-          viewDispatch({
-            payload: {
-              type: ViewActions.UPDATE_VIEW,
-              view: { type: PrimaryRevenueWidgetViews.PAY_WITH_CARD },
-            },
-          });
-          break;
-        case PrimaryRevenueWidgetViews.PAY_WITH_CRYPTO:
-          viewDispatch({
-            payload: {
-              type: ViewActions.UPDATE_VIEW,
-              view: { type: PrimaryRevenueWidgetViews.PAY_WITH_CRYPTO },
-            },
-          });
-          break;
-        default:
-          break;
-      }
-    } catch (err: any) {
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: { type: SharedViews.ERROR_VIEW, error: err },
-        },
-      });
-    }
-  };
 
   return (
     <Box
