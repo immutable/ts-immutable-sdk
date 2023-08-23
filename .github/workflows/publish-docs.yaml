@@ -28,11 +28,7 @@ jobs:
 
       - name: Setup environment variables
         run: |
-          echo "VERSION=$(git describe --tags --abbrev=0)"
-
-      - name: Setup environment variables
-        run: |
-          echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+          echo "VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
           echo "CLONE_DIR=./imx-docs" >> $GITHUB_ENV
 
       - name: Pending release check
