@@ -36,6 +36,9 @@ export const smartCheckout = async (
   aggregatedItems.push(await gasCalculator(provider, aggregatedAllowances, transactionOrGasAmount));
   aggregatedItems = itemAggregator(aggregatedItems);
 
+  // eslint-disable-next-line no-console
+  console.log('Aggregated Items', aggregatedItems);
+
   return {
     sufficient: true,
     transactionRequirements: [{
