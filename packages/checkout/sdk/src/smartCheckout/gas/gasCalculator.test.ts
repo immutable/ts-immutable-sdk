@@ -6,7 +6,29 @@ import {
 import { gasCalculator } from './gasCalculator';
 
 describe('gasCalculator', () => {
-  it('should return the total gas required for the transactions', async () => {
+  it('should return gas for transaction', async () => {
+    const mockProvider = {
+      estimateGas: jest.fn().mockResolvedValue(100000),
+    } as unknown as Web3Provider;
+
+    const item = await gasCalculator(
+      mockProvider,
+      [],
+      {
+        type: TransactionOrGasType.TRANSACTION,
+        transaction: {
+          from: '0xADDRESS',
+        },
+      },
+    );
+
+    expect(item).toEqual({
+      type: ItemType.NATIVE,
+      amount: BigNumber.from(100000),
+    });
+  });
+
+  it('should return the total gas required for approvals and transaction', async () => {
     const mockProvider = {
       estimateGas: jest.fn().mockResolvedValue(100000),
     } as unknown as Web3Provider;
@@ -26,6 +48,17 @@ describe('gasCalculator', () => {
           },
           approvalTransaction: { from: '0xADDRESS', data: '0xDATA', to: '0xSEAPORT' },
         },
+        {
+          sufficient: false,
+          type: ItemType.ERC721,
+          itemRequirement: {
+            type: ItemType.ERC721,
+            contractAddress: '0xERC721',
+            id: '0',
+            spenderAddress: '0xSEAPORT',
+          },
+          approvalTransaction: { from: '0xADDRESS', data: '0xDATA', to: '0xSEAPORT' },
+        },
       ],
       {
         type: TransactionOrGasType.TRANSACTION,
@@ -37,7 +70,7 @@ describe('gasCalculator', () => {
 
     expect(item).toEqual({
       type: ItemType.NATIVE,
-      amount: BigNumber.from(200000),
+      amount: BigNumber.from(300000),
     });
   });
 
@@ -66,6 +99,17 @@ describe('gasCalculator', () => {
           },
           approvalTransaction: { from: '0xADDRESS', data: '0xDATA', to: '0xSEAPORT' },
         },
+        {
+          sufficient: false,
+          type: ItemType.ERC721,
+          itemRequirement: {
+            type: ItemType.ERC721,
+            contractAddress: '0xERC721',
+            id: '0',
+            spenderAddress: '0xSEAPORT',
+          },
+          approvalTransaction: { from: '0xADDRESS', data: '0xDATA', to: '0xSEAPORT' },
+        },
       ],
       {
         type: TransactionOrGasType.GAS,
@@ -78,7 +122,7 @@ describe('gasCalculator', () => {
 
     expect(item).toEqual({
       type: ItemType.NATIVE,
-      amount: BigNumber.from(300000),
+      amount: BigNumber.from(400000),
     });
   });
 
@@ -107,6 +151,17 @@ describe('gasCalculator', () => {
           },
           approvalTransaction: { from: '0xADDRESS', data: '0xDATA', to: '0xSEAPORT' },
         },
+        {
+          sufficient: false,
+          type: ItemType.ERC721,
+          itemRequirement: {
+            type: ItemType.ERC721,
+            contractAddress: '0xERC721',
+            id: '0',
+            spenderAddress: '0xSEAPORT',
+          },
+          approvalTransaction: { from: '0xADDRESS', data: '0xDATA', to: '0xSEAPORT' },
+        },
       ],
       {
         type: TransactionOrGasType.GAS,
@@ -121,8 +176,27 @@ describe('gasCalculator', () => {
     expect(items).toEqual({
       type: ItemType.ERC20,
       contractAddress: '0xERC20',
-      amount: BigNumber.from(300000),
+      amount: BigNumber.from(400000),
       spenderAddress: '',
     });
+  });
+
+  it('should return null if no gas required', async () => {
+    const mockProvider = {
+      estimateGas: jest.fn().mockResolvedValue(0),
+    } as unknown as Web3Provider;
+
+    const item = await gasCalculator(
+      mockProvider,
+      [],
+      {
+        type: TransactionOrGasType.TRANSACTION,
+        transaction: {
+          from: '0xADDRESS',
+        },
+      },
+    );
+
+    expect(item).toBeNull();
   });
 });

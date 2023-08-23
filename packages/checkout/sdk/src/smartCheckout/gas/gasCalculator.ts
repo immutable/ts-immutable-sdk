@@ -56,7 +56,7 @@ export const gasCalculator = async (
   provider: Web3Provider,
   insufficientItems: (InsufficientERC20 | InsufficientERC721)[],
   transactionOrGas: FulfilmentTransaction | GasAmount,
-): Promise<ItemRequirement> => {
+): Promise<ItemRequirement | null> => {
   const estimateGasPromises = [];
   let totalGas = BigNumber.from(0);
 
@@ -83,5 +83,6 @@ export const gasCalculator = async (
     totalGas = totalGas.add(gasEstimate);
   });
 
+  if (totalGas.eq(0)) return null;
   return getGasItemRequirement(totalGas, transactionOrGas);
 };

@@ -33,8 +33,11 @@ export const smartCheckout = async (
 
   const aggregatedAllowances = allowanceAggregator(erc20Allowances, erc721Allowances);
 
-  aggregatedItems.push(await gasCalculator(provider, aggregatedAllowances, transactionOrGasAmount));
-  aggregatedItems = itemAggregator(aggregatedItems);
+  const gasItem = await gasCalculator(provider, aggregatedAllowances, transactionOrGasAmount);
+  if (gasItem !== null) {
+    aggregatedItems.push(gasItem);
+    aggregatedItems = itemAggregator(aggregatedItems);
+  }
 
   // eslint-disable-next-line no-console
   console.log('Aggregated Items', aggregatedItems);
