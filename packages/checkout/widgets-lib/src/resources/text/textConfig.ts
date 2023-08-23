@@ -5,6 +5,7 @@ import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes
 import { SharedViews } from '../../context/view-context/ViewContext';
 import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
+import { PrimaryRevenueWidgetViews } from '../../context/view-context/PrimaryRevenueViewContextTypes';
 
 export const text = {
   views: {
@@ -276,6 +277,22 @@ export const text = {
           heading: 'Move my coins',
           caption: 'From the coins I have on a different network',
           subcaption: 'Fees ≈',
+        },
+      },
+    },
+    [PrimaryRevenueWidgetViews.PAYMENT_METHODS]: {
+      header: {
+        heading: 'Select payment method',
+        caption: 'How would you like to pay? You can pay with your a crypto wallet or with a credit card.',
+      },
+      options: {
+        [PrimaryRevenueWidgetViews.PAY_WITH_CRYPTO]: {
+          heading: 'Crypto',
+          caption: 'Pay with your Immtable Passport wallet',
+        },
+        [PrimaryRevenueWidgetViews.PAY_WITH_CARD]: {
+          heading: 'Card',
+          caption: 'Buy with credit card using Transak',
         },
       },
     },
