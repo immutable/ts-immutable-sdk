@@ -5,19 +5,17 @@ import {
   OrderbookModuleConfiguration,
   OrderbookOverrides,
 } from 'config/config';
-import {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  Fee,
-  ListingResult,
-  ListListingsResult,
-  OrderStatus,
-} from 'openapi/sdk';
+import { Fee as OpenApiFee } from 'openapi/sdk';
 import { Seaport } from 'seaport';
 import {
   CancelOrderResponse,
   CreateListingParams,
+  Fee,
   FulfillOrderResponse,
   ListListingsParams,
+  ListListingsResult,
+  ListingResult,
+  OrderStatus,
   PrepareListingParams,
   PrepareListingResponse,
 } from 'types';
@@ -155,7 +153,13 @@ export class Orderbook {
     const fulfillmentDataRes = await this.apiClient.fulfillmentData([
       {
         order_id: listingId,
-        fee: takerFee,
+        fee: takerFee
+          ? {
+            amount: takerFee.amount,
+            fee_type: takerFee.type as unknown as OpenApiFee.fee_type,
+            recipient: takerFee.recipient,
+          }
+          : undefined,
       },
     ]);
 
