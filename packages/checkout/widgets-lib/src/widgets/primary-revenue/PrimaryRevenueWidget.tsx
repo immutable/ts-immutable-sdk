@@ -13,9 +13,13 @@ import {
   viewReducer,
   initialViewState,
   ViewContext,
+  ViewActions,
   SharedViews,
 } from '../../context/view-context/ViewContext';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
+
+import { PaymentMethods } from './views/PaymentMethods';
+import { PrimaryRevenueWidgetViews } from '../../context/view-context/PrimaryRevenueViewContextTypes';
 
 export interface PrimaryRevenueWidgetProps {
   config: StrongCheckoutWidgetsConfig;
@@ -41,10 +45,30 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
   const { checkout, provider } = connectLoaderState;
 
   const mount = useCallback(async () => {
-    // TODO: Initialise PrimaryRevenue options view
-  }, []);
+    if (!checkout || !provider) return;
+
+    try {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: { type: PrimaryRevenueWidgetViews.PAYMENT_METHODS },
+        },
+      });
+    } catch (error: any) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SharedViews.ERROR_VIEW,
+            error,
+          },
+        },
+      });
+    }
+  }, [checkout, provider]);
 
   useEffect(() => {
+    if (!checkout || !provider) return;
     mount();
   }, [checkout, provider]);
 
@@ -54,7 +78,9 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
         {viewState.view.type === SharedViews.LOADING_VIEW && (
           <LoadingView loadingText={loadingText} />
         )}
-        PrimaryRevenue Widget
+        {viewState.view.type === PrimaryRevenueWidgetViews.PAYMENT_METHODS && (
+          <PaymentMethods />
+        )}
       </ViewContext.Provider>
     </BiomeCombinedProviders>
   );
