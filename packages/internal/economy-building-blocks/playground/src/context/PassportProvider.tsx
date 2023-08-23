@@ -109,6 +109,7 @@ const PassportContext = createContext<{
   handleRedirectCallback: () => void;
   logout: () => void;
   getUserInfo: () => Promise<UserProfile | undefined>;
+  getUserAddresses: () => Promise<string[] | undefined>;
   sendTx: (to: string, data: string) => Promise<any>;
   call: (to: string, data: string) => Promise<any>;
 }>({
@@ -117,6 +118,7 @@ const PassportContext = createContext<{
   handleRedirectCallback: () => undefined,
   logout: () => undefined,
   getUserInfo: () => Promise.resolve(undefined),
+  getUserAddresses: () => Promise.resolve(undefined),
   sendTx: (_to: string, _data: string) => Promise.resolve(undefined),
   call: (_to: string, _data: string) => Promise.resolve(undefined),
 });
@@ -160,13 +162,19 @@ export function PassportProvider({
     return await passport?.getUserInfo();
   }, []);
 
+  const getUserAddresses = useCallback(async () => {
+    return await zkEvmProvider?.request({
+      method: "eth_accounts",
+    });
+  }, []);
+
   const sendTx = useCallback(
     async (to: string, data: string) => {
       console.log("inside sendTx", zkEvmProvider);
 
       const addresses = await zkEvmProvider?.request({
         method: "eth_requestAccounts",
-      });
+      });      
       console.log("@@@ account", addresses);
       console.log("@@@ to", to);
       console.log("@@@ data", data);
@@ -177,7 +185,7 @@ export function PassportProvider({
           {
             to: to,
             data: data,
-          }
+          },
         ],
       });
     },
@@ -208,6 +216,7 @@ export function PassportProvider({
         handleRedirectCallback,
         logout,
         getUserInfo,
+        getUserAddresses,
         sendTx,
         call,
       }}

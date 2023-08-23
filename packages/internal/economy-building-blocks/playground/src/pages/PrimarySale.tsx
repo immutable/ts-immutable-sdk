@@ -4,7 +4,7 @@ import { Box, Heading, Banner, Button, Card, Link } from "@biom3/react";
 import { Grid, Row, Col } from "react-flexbox-grid";
 
 import { encodeApprove } from "../contracts/erc20";
-import { useMetamaskProvider } from "../MetamaskProvider";
+import { useMetamaskProvider } from "../context/MetamaskProvider";
 import { usePassportProvider } from "../context/PassportProvider";
 import ItemCards from "../components/ItemCards";
 import StatusCard from "../components/StatusCard";
@@ -150,9 +150,10 @@ function PrimarySale() {
   const fee = 0.1;
   const params = useURLParams();
   const [amount, setAmount] = useState(0);
+  const [isPassportConnected, setIsPassportConnected] = useState(false);
   const [selectedItems, setSelectedItems] = useState<any[]>([]);
   const [configFields, setConfigFields] = useState<Record<string, any>>({});
-  const [approved, setApproved] = useState(false);
+  const [isApproved, setIsApproved] = useState(false);
   const [receipt, setReceipt] = useState<TransactionReceipt | null>(null);
   const [mintResponse, setMintResponse] = useState<MintResponse | null>(null);
 
@@ -165,7 +166,7 @@ function PrimarySale() {
     mm_getTransactionReceipt,
   } = useMetamaskProvider();
 
-  const { sendTx } = usePassportProvider();
+  const { sendTx, getUserInfo } = usePassportProvider();
 
   const loading = mm_loading;
 
@@ -176,11 +177,22 @@ function PrimarySale() {
     configFields.collection_address
   );
 
+  useEffect(() => {
+    getPassportInfoAsync();
+  });
+
+  const getPassportInfoAsync = async () => {
+    if (await getUserInfo()) {
+      setIsPassportConnected(true);
+    }
+  };
+
   // Reset the states of statuses if the selectedItems changes
   useEffect(() => {
-    setApproved(false);
+    setIsApproved(false);
     setMintResponse(null);
     setReceipt(null);
+    setIsPassportConnected(false);
   }, [selectedItems]);
 
   useEffect(() => {
@@ -227,13 +239,13 @@ function PrimarySale() {
           configFields.contract_address,
           `${amount}`
         );
-      
+
         const execute = walletType === "MM" ? mm_sendTransaction : sendTx;
         const approved = await execute(
           configFields.erc20_contract_address,
           txData
         );
-      
+
         console.log("@@@ txData", txData);
         return approved;
       } catch (error) {
@@ -246,14 +258,14 @@ function PrimarySale() {
 
   const handleMint = useCallback(
     (walletType: "MM" | "Passport") => async () => {
-      setApproved(false);
+      setIsApproved(false);
       setMintResponse(null);
-      setReceipt(null);
+      setIsPassportConnected(false);
 
       const approved = await setApprove(amount, walletType);
       if (approved) {
         mint();
-        setApproved(true);
+        setIsApproved(true);
       }
     },
     [mint, amount]
@@ -456,13 +468,24 @@ function PrimarySale() {
                 <Card.Caption>
                   <StatusCard
                     status="Connect Wallet"
-                    description={"| " + address}
-                    variant={address ? "success" : "standard"}
+                    description={
+                      isPassportConnected || address
+                        ? "| " +
+                          "MM: " +
+                          (address ? "✅" : "") +
+                          " | " +
+                          "Passport: " +
+                          (isPassportConnected ? "✅" : "❌")
+                        : ""
+                    }
+                    variant={
+                      address || isPassportConnected ? "success" : "standard"
+                    }
                   ></StatusCard>
                   <StatusCard
                     status="Approve Txn"
-                    description={approved ? "✅" : ""}
-                    variant={approved ? "success" : "standard"}
+                    description={isApproved ? "✅" : ""}
+                    variant={isApproved ? "success" : "standard"}
                   ></StatusCard>
                   <StatusCard
                     status="Minting"
