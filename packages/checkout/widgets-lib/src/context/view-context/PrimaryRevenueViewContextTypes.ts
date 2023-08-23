@@ -4,6 +4,7 @@ export enum PrimaryRevenueWidgetViews {
   PAYMENT_METHODS = 'PAYMENT_METHODS',
   PAY_WITH_CRYPTO = 'PAY_WITH_CRYPTO',
   PAY_WITH_CARD = 'PAY_WITH_CARD',
+  REVIEW_ORDER = 'REVIEW_ORDER',
   SUCCESS = 'SUCCESS',
   FAIL = 'FAIL',
 }
@@ -13,6 +14,7 @@ export type PrimaryRevenueWidgetView =
   | PrimaryRevenueWithCryptoView
   | PrimaryRevenueWithCardView
   | PrimaryRevenueSuccessView
+  | PrimaryRevenueReviewOrderView
   | PrimaryRevenueFailView;
 
 interface PrimaryRevenueMethodsView extends ViewType {
@@ -26,6 +28,9 @@ interface PrimaryRevenueWithCardView extends ViewType {
 }
 interface PrimaryRevenueSuccessView extends ViewType {
   type: PrimaryRevenueWidgetViews.SUCCESS;
+}
+interface PrimaryRevenueReviewOrderView extends ViewType {
+  type: PrimaryRevenueWidgetViews.REVIEW_ORDER;
 }
 interface PrimaryRevenueFailView extends ViewType {
   type: PrimaryRevenueWidgetViews.FAIL;
