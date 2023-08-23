@@ -7,7 +7,7 @@ import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
 
-export interface BridgeWidgetProps {
+export interface OnRampWidgetProps {
   // eslint-disable-next-line react/no-unused-prop-types
   params: OnRampWidgetParams;
   config: StrongCheckoutWidgetsConfig;
@@ -17,7 +17,7 @@ export interface OnRampWidgetParams {
   amount?: string;
 }
 
-export function OnRampWidget(props: BridgeWidgetProps) {
+export function OnRampWidget(props: OnRampWidgetProps) {
   const { config } = props;
   const { environment, theme } = config;
   const url = environment === Environment.SANDBOX
