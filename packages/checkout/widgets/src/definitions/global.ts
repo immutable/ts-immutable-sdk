@@ -134,3 +134,18 @@ export interface ImtblOnRampProps
   amount?: string;
   contractAddress?: string;
 }
+
+/**
+ * Interface for the properties of the primary revenue web component.
+ * Extends the React.DetailedHTMLProps interface to inherit HTML attributes for an HTMLElement.
+ * @interface ImtblPrimaryRevenueProps
+ * @extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>
+ * @property {string | undefined} widgetConfig - Optional string representing the widget configuration.
+ */
+export interface ImtblPrimaryRevenueProps
+  extends React.DetailedHTMLProps<
+  React.HTMLAttributes<HTMLElement>,
+  HTMLElement
+  > {
+  widgetConfig?: string;
+}
