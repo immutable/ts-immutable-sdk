@@ -129,4 +129,4 @@ jobs:
 
       - name: Push Changelog
         if: github.event.inputs.dry_run == 'false'
-        run: VERSION="${{ steps.version.outputs.NEXT_VERSION }}" ./.github/scripts/push-pr.sh CHANGELOG.md
+        run: VERSION="${{ steps.version.outputs.NEXT_VERSION }}" ./.github/scripts/push-changelog-pr.sh
