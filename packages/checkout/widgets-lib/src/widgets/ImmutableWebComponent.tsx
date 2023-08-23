@@ -16,7 +16,7 @@ export abstract class ImmutableWebComponent extends HTMLElement {
   passport: Passport | undefined;
 
   static get observedAttributes() {
-    return ['widgetconfig'];
+    return ['widgetconfig']; // attributes must be lowercase
   }
 
   setProvider(provider: Web3Provider): void {
