@@ -24,6 +24,7 @@ declare global {
       'imtbl-bridge': ImtblBridgeProps;
       'imtbl-onramp': ImtblOnRampProps;
       'imtbl-buy': ImtblBuyProps;
+      'imtbl-primary-revenue': ImtblPrimaryRevenueProps;
       'imtbl-example': ImtblExampleProps;
       'imtbl-transition-example': ImtblTransitionExampleProps;
       'imtbl-inner-widget-example': ImtblInnerWidgetExampleProps;
