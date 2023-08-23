@@ -69,11 +69,6 @@ jobs:
           ./.github/scripts/version-up.sh --${{github.event.inputs.release_type }} --$upgrade_type --apply $revision_upgrade
         shell: bash
 
-      - name: Workout next version string
-        run: |
-          ./.github/scripts/version-up.sh --release --patch --apply
-        shell: bash        
-
       - name: Install dependencies
         run: yarn install --immutable
 
