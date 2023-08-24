@@ -29,6 +29,7 @@ export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER2,
       web3Provider: this.provider,
+      passport: this.passport,
       allowedChains: [
         getL1ChainId(this.checkout!.config),
         getL2ChainId(this.checkout!.config),
