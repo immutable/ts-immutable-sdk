@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - @imtbl/passport: Added support for `eth_getCode` to Passport zkEvm provider.
 
+### Changed
+
+- All SDK modules marked as `prod`.
+
 ## [0.13.0] - 2023-08-22
 
 ### Added
@@ -133,3 +137,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 ### Deprecated
+and this project adheres to \[Semantic Versioning\](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+and this project adheres to \[Semantic Versioning\](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+and this project adheres to \[Semantic Versioning\](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
