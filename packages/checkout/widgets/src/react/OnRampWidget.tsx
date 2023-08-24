@@ -29,8 +29,6 @@ export function OnRampReact(props: OnRampReactProps): JSX.Element {
     provider,
   } = props;
 
-  console.log('in react component');
-
   useEffect(() => {
     if (provider) {
       SetProvider(CheckoutWidgetTagNames.ONRAMP, provider);
@@ -38,8 +36,6 @@ export function OnRampReact(props: OnRampReactProps): JSX.Element {
   }, [provider]);
 
   const config = window.ImtblCheckoutWidgetConfig;
-
-  console.log('config:', config);
 
   return (
     <imtbl-onramp
