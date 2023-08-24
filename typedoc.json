@@ -7,6 +7,7 @@
     "packages/config/",
     "packages/economy/sdk/",
     "packages/erc20/",
+    "packages/erc721-hybrid-permissioned-mintable/",
     "packages/erc721-permissioned-mintable/",
     "packages/immutablex_client/",
     "packages/orderbook/",
