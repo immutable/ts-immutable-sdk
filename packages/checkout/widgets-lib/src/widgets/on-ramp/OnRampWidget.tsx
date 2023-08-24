@@ -59,7 +59,6 @@ export function OnRampWidget(props: OnRampWidgetProps) {
       <SimpleLayout
         header={(
           <HeaderNavigation
-            showBack
             title="Add coins"
             onCloseButtonClick={() => sendOnRampWidgetCloseEvent()}
           />
