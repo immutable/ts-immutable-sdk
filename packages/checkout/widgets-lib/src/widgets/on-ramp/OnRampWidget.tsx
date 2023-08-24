@@ -6,7 +6,8 @@ import { WidgetTheme } from '../../lib';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
-import { AnalyticsProvider, useAnalytics } from '../../context/AnalyticsProvider';
+import { useAnalytics } from '../../context/AnalyticsProvider';
+import { SegmentAnalyticsProvider } from '../../context/analytics-provider/AnalyticsProvider';
 
 export interface BridgeWidgetProps {
   // eslint-disable-next-line react/no-unused-prop-types
@@ -19,6 +20,7 @@ export interface OnRampWidgetParams {
 }
 
 export function OnRampWidget(props: BridgeWidgetProps) {
+  const { track } = useAnalytics();
   const { config } = props;
   const { environment, theme } = config;
   const url = environment === Environment.SANDBOX
@@ -31,8 +33,6 @@ export function OnRampWidget(props: BridgeWidgetProps) {
   const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
     : onDarkBase;
-
-  const { track } = useAnalytics();
 
   useEffect(() => {
     const domIframe:HTMLIFrameElement = document.getElementById('transak-iframe') as HTMLIFrameElement;
@@ -66,7 +66,7 @@ export function OnRampWidget(props: BridgeWidgetProps) {
   }, []);
 
   return (
-    <AnalyticsProvider>
+    <SegmentAnalyticsProvider>
       <BiomeCombinedProviders theme={{ base: biomeTheme }}>
         <SimpleLayout
           header={(
@@ -98,6 +98,6 @@ export function OnRampWidget(props: BridgeWidgetProps) {
           </Box>
         </SimpleLayout>
       </BiomeCombinedProviders>
-    </AnalyticsProvider>
+    </SegmentAnalyticsProvider>
   );
 }
