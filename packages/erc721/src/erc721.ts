@@ -25,6 +25,9 @@ export type IDMint = ERC721Hybrid.IDMintStruct;
 // Struct for transferring multiple tokens between two addresses.
 export type TransferRequest = ERC721Hybrid.TransferRequestStruct;
 
+// Struct for burning multiple tokens from the same address
+export type IDBurn = ERC721Hybrid.IDBurnStruct;
+
 export class ERC721 {
   private readonly contract: ImmutableERC721;
 
@@ -299,6 +302,31 @@ export class ERC721 {
   }
 
   /**
+   * @returns a populated transaction for the safe burn contract function
+   */
+  public async populateSafeBurn(
+    owner: PromiseOrValue<string>,
+    tokenId: PromiseOrValue<BigNumberish>,
+    overrides: Overrides & {
+      from?: PromiseOrValue<string>;
+    } = {},
+  ): Promise<PopulatedTransaction> {
+    return await this.contract.populateTransaction.safeBurn(owner, tokenId, overrides);
+  }
+
+  /**
+   * @returns a populated transaction for the safe burn batch contract function
+   */
+  public async populateSafeBurnBatch(
+    burns: IDBurn[],
+    overrides: Overrides & {
+      from?: PromiseOrValue<string>;
+    } = {},
+  ): Promise<PopulatedTransaction> {
+    return await this.contract.populateTransaction.safeBurnBatch(burns, overrides);
+  }
+
+  /**
    * @returns a populated transaction for the grantMinterRole contract function
    */
   public async populateGrantMinterRole(
@@ -333,7 +361,7 @@ export class ERC721 {
   /**
    * @returns a populated transaction for the mint by ID contract function
    */
-  public async populateMintByID(
+  public async populateMint(
     to: PromiseOrValue<string>,
     tokenId: PromiseOrValue<BigNumberish>,
     overrides: Overrides & {
@@ -346,7 +374,7 @@ export class ERC721 {
   /**
    * @returns a populated transaction for the safe mint by ID contract function
    */
-  public async populateSafeMintByID(
+  public async populateSafeMint(
     to: PromiseOrValue<string>,
     tokenId: PromiseOrValue<BigNumberish>,
     overrides: Overrides & {
@@ -385,7 +413,7 @@ export class ERC721 {
   /**
    * @returns a populated transaction for the batch mint by quantity contract function
    */
-  public async populateBatchMintByQuantity(
+  public async populateMintBatchByQuantity(
     mints: Mint[],
     overrides: Overrides & {
       from?: PromiseOrValue<string>;
@@ -397,7 +425,7 @@ export class ERC721 {
   /**
    * @returns a populated transaction for the batch safe mint by quantity contract function
    */
-  public async populateBatchSafeMintByQuantity(
+  public async populateSafeMintBatchByQuantity(
     mints: Mint[],
     overrides: Overrides & {
       from?: PromiseOrValue<string>;
@@ -409,7 +437,7 @@ export class ERC721 {
   /**
    * @returns a populated transaction for the batch mint by ID to multiple recipients contract function
    */
-  public async populateBatchMintByIDToMultiple(
+  public async populateMintBatch(
     mints: IDMint[],
     overrides: Overrides & {
       from?: PromiseOrValue<string>;
@@ -421,7 +449,7 @@ export class ERC721 {
   /**
    * @returns a populated transaction for the batch safe mint by ID to multiple recipients contract function
    */
-  public async populateBatchSafeMintByIDToMultiple(
+  public async populateSafeMintBatch(
     mints: IDMint[],
     overrides: Overrides & {
       from?: PromiseOrValue<string>;

@@ -28,6 +28,16 @@ import type {
 } from "./common";
 
 export declare namespace ImmutableERC721Base {
+  export type IDBurnStruct = {
+    owner: PromiseOrValue<string>;
+    tokenIds: PromiseOrValue<BigNumberish>[];
+  };
+
+  export type IDBurnStructOutput = [string, BigNumber[]] & {
+    owner: string;
+    tokenIds: BigNumber[];
+  };
+
   export type IDMintStruct = {
     to: PromiseOrValue<string>;
     tokenIds: PromiseOrValue<BigNumberish>[];
@@ -55,6 +65,7 @@ export interface ImmutableERC721MintByIDInterface extends utils.Interface {
   functions: {
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
     "MINTER_ROLE()": FunctionFragment;
+    "_safeBurnBatch((address,uint256[])[])": FunctionFragment;
     "_totalSupply()": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
@@ -80,6 +91,8 @@ export interface ImmutableERC721MintByIDInterface extends utils.Interface {
     "revokeRole(bytes32,address)": FunctionFragment;
     "royaltyAllowlist()": FunctionFragment;
     "royaltyInfo(uint256,uint256)": FunctionFragment;
+    "safeBurn(address,uint256)": FunctionFragment;
+    "safeBurnBatch((address,uint256[])[])": FunctionFragment;
     "safeMint(address,uint256)": FunctionFragment;
     "safeMintBatch((address,uint256[])[])": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
@@ -103,6 +116,7 @@ export interface ImmutableERC721MintByIDInterface extends utils.Interface {
     nameOrSignatureOrTopic:
       | "DEFAULT_ADMIN_ROLE"
       | "MINTER_ROLE"
+      | "_safeBurnBatch"
       | "_totalSupply"
       | "approve"
       | "balanceOf"
@@ -128,6 +142,8 @@ export interface ImmutableERC721MintByIDInterface extends utils.Interface {
       | "revokeRole"
       | "royaltyAllowlist"
       | "royaltyInfo"
+      | "safeBurn"
+      | "safeBurnBatch"
       | "safeMint"
       | "safeMintBatch"
       | "safeTransferFrom(address,address,uint256)"
@@ -154,6 +170,10 @@ export interface ImmutableERC721MintByIDInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "MINTER_ROLE",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "_safeBurnBatch",
+    values: [ImmutableERC721Base.IDBurnStruct[]]
   ): string;
   encodeFunctionData(
     functionFragment: "_totalSupply",
@@ -245,6 +265,14 @@ export interface ImmutableERC721MintByIDInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "royaltyInfo",
     values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "safeBurn",
+    values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "safeBurnBatch",
+    values: [ImmutableERC721Base.IDBurnStruct[]]
   ): string;
   encodeFunctionData(
     functionFragment: "safeMint",
@@ -342,6 +370,10 @@ export interface ImmutableERC721MintByIDInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "_safeBurnBatch",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "_totalSupply",
     data: BytesLike
   ): Result;
@@ -400,6 +432,11 @@ export interface ImmutableERC721MintByIDInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "royaltyInfo",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "safeBurn", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "safeBurnBatch",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "safeMint", data: BytesLike): Result;
@@ -596,6 +633,11 @@ export interface ImmutableERC721MintByID extends BaseContract {
 
     MINTER_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
+    _safeBurnBatch(
+      burns: ImmutableERC721Base.IDBurnStruct[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     _totalSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     approve(
@@ -712,6 +754,17 @@ export interface ImmutableERC721MintByID extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string, BigNumber]>;
 
+    safeBurn(
+      owner: PromiseOrValue<string>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    safeBurnBatch(
+      burns: ImmutableERC721Base.IDBurnStruct[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     safeMint(
       to: PromiseOrValue<string>,
       tokenID: PromiseOrValue<BigNumberish>,
@@ -809,6 +862,11 @@ export interface ImmutableERC721MintByID extends BaseContract {
   DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
   MINTER_ROLE(overrides?: CallOverrides): Promise<string>;
+
+  _safeBurnBatch(
+    burns: ImmutableERC721Base.IDBurnStruct[],
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
   _totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -926,6 +984,17 @@ export interface ImmutableERC721MintByID extends BaseContract {
     overrides?: CallOverrides
   ): Promise<[string, BigNumber]>;
 
+  safeBurn(
+    owner: PromiseOrValue<string>,
+    tokenId: PromiseOrValue<BigNumberish>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  safeBurnBatch(
+    burns: ImmutableERC721Base.IDBurnStruct[],
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   safeMint(
     to: PromiseOrValue<string>,
     tokenID: PromiseOrValue<BigNumberish>,
@@ -1023,6 +1092,11 @@ export interface ImmutableERC721MintByID extends BaseContract {
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
     MINTER_ROLE(overrides?: CallOverrides): Promise<string>;
+
+    _safeBurnBatch(
+      burns: ImmutableERC721Base.IDBurnStruct[],
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     _totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1139,6 +1213,17 @@ export interface ImmutableERC721MintByID extends BaseContract {
       salePrice: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[string, BigNumber]>;
+
+    safeBurn(
+      owner: PromiseOrValue<string>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    safeBurnBatch(
+      burns: ImmutableERC721Base.IDBurnStruct[],
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     safeMint(
       to: PromiseOrValue<string>,
@@ -1316,6 +1401,11 @@ export interface ImmutableERC721MintByID extends BaseContract {
 
     MINTER_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
+    _safeBurnBatch(
+      burns: ImmutableERC721Base.IDBurnStruct[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     _totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
     approve(
@@ -1432,6 +1522,17 @@ export interface ImmutableERC721MintByID extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    safeBurn(
+      owner: PromiseOrValue<string>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    safeBurnBatch(
+      burns: ImmutableERC721Base.IDBurnStruct[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     safeMint(
       to: PromiseOrValue<string>,
       tokenID: PromiseOrValue<BigNumberish>,
@@ -1532,6 +1633,11 @@ export interface ImmutableERC721MintByID extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     MINTER_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    _safeBurnBatch(
+      burns: ImmutableERC721Base.IDBurnStruct[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
 
     _totalSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -1647,6 +1753,17 @@ export interface ImmutableERC721MintByID extends BaseContract {
       tokenId: PromiseOrValue<BigNumberish>,
       salePrice: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    safeBurn(
+      owner: PromiseOrValue<string>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    safeBurnBatch(
+      burns: ImmutableERC721Base.IDBurnStruct[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     safeMint(

@@ -22,6 +22,9 @@ export type IDMint = ImmutableERC721Base.IDMintStruct;
 // Struct for transferring multiple tokens between two addresses.
 export type TransferRequest = ImmutableERC721Base.TransferRequestStruct;
 
+// Struct for safe burning multiple tokens from a single address.
+export type IDBurn = ImmutableERC721Base.IDBurnStruct;
+
 export class ERC721MintByID {
   private readonly contract: ImmutableERC721MintByID;
 
@@ -350,6 +353,31 @@ export class ERC721MintByID {
     } = {},
   ): Promise<PopulatedTransaction> {
     return await this.contract.populateTransaction.safeMintBatch(mints, overrides);
+  }
+
+  /**
+   * @returns a populated transaction for the safe burn contract function
+   */
+  public async populateSafeBurn(
+    owner: PromiseOrValue<string>,
+    tokenId: PromiseOrValue<BigNumberish>,
+    overrides: Overrides & {
+      from?: PromiseOrValue<string>;
+    } = {},
+  ): Promise<PopulatedTransaction> {
+    return await this.contract.populateTransaction.safeBurn(owner, tokenId, overrides);
+  }
+
+  /**
+   * @returns a populated transaction for the safe burn batch contract function
+   */
+  public async populateSafeBurnBatch(
+    burns: IDBurn[],
+    overrides: Overrides & {
+      from?: PromiseOrValue<string>;
+    } = {},
+  ): Promise<PopulatedTransaction> {
+    return await this.contract.populateTransaction.safeBurnBatch(burns, overrides);
   }
 
   /**
