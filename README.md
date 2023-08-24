@@ -291,7 +291,7 @@ For example, given the latest tag of `0.8.0-alpha` and selecting patch as the `U
 #### Updated SDK Reference Documentation
 
 > [!NOTE]
-> To have a package documented, the package must have a `typedoc.json` file in the root of the package. See [passport](packages/passport/typedoc.json) for an example. And the package must be listed in the root level `typedoc.json` file.
+> To have a package documented, the package must have a `typedoc.json` file in the root of the package. See [passport](./packages/passport/sdk/typedoc.json) for an example. And the package must be listed in the root level `typedoc.json` file.
 
 When the `Publish to NPM` workflow successfully runs, it will trigger the `Publish SDK Reference Docs` GitHub Action. This will build the SDK reference documentation, similar to the steps in [Generate SDK Reference Documentation](#generate-sdk-reference-documentation), and push the changes to the `imx-docs` repo and create a PR for you to review.
 
