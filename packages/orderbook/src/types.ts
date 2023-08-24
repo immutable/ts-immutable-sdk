@@ -1,6 +1,17 @@
 import { OrderComponents } from '@opensea/seaport-js/lib/types';
 import { PopulatedTransaction, TypedDataDomain, TypedDataField } from 'ethers';
-import { Fee, OrdersService } from 'openapi/sdk';
+import {
+  Fee as OpenapiFee,
+  OrdersService,
+} from './openapi/sdk';
+
+// Strictly re-export some of the openapi generated types
+export {
+  OrderStatus,
+  ListingResult,
+  ListListingsResult,
+  Order,
+} from './openapi/sdk';
 
 export interface ERC721Item {
   type: 'ERC721';
@@ -50,6 +61,19 @@ export type ListListingsParams = Omit<
 Parameters<typeof OrdersService.prototype.listListings>[0],
 'chainName'
 >;
+
+export enum FeeType {
+  MAKER_MARKETPLACE = OpenapiFee.fee_type.MAKER_MARKETPLACE,
+  TAKER_MARKETPLACE = OpenapiFee.fee_type.TAKER_MARKETPLACE,
+  PROTOCOL = OpenapiFee.fee_type.PROTOCOL,
+  ROYALTY = OpenapiFee.fee_type.ROYALTY,
+}
+
+export interface Fee {
+  type: FeeType;
+  recipient: string;
+  amount: string;
+}
 
 export enum TransactionPurpose {
   APPROVAL = 'APPROVAL',

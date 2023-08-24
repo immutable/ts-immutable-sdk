@@ -28,6 +28,16 @@ import type {
 } from "./common";
 
 export declare namespace ImmutableERC721Base {
+  export type IDBurnStruct = {
+    owner: PromiseOrValue<string>;
+    tokenIds: PromiseOrValue<BigNumberish>[];
+  };
+
+  export type IDBurnStructOutput = [string, BigNumber[]] & {
+    owner: string;
+    tokenIds: BigNumber[];
+  };
+
   export type IDMintStruct = {
     to: PromiseOrValue<string>;
     tokenIds: PromiseOrValue<BigNumberish>[];
@@ -51,12 +61,11 @@ export declare namespace ImmutableERC721Base {
   };
 }
 
-export interface ImmutableERC721PermissionedMintableInterface
-  extends utils.Interface {
+export interface ImmutableERC721MintByIDInterface extends utils.Interface {
   functions: {
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
     "MINTER_ROLE()": FunctionFragment;
-    "_burnedTokens(uint256)": FunctionFragment;
+    "_safeBurnBatch((address,uint256[])[])": FunctionFragment;
     "_totalSupply()": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
@@ -74,6 +83,7 @@ export interface ImmutableERC721PermissionedMintableInterface
     "hasRole(bytes32,address)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
     "mint(address,uint256)": FunctionFragment;
+    "mintBatch((address,uint256[])[])": FunctionFragment;
     "name()": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
     "renounceRole(bytes32,address)": FunctionFragment;
@@ -81,6 +91,8 @@ export interface ImmutableERC721PermissionedMintableInterface
     "revokeRole(bytes32,address)": FunctionFragment;
     "royaltyAllowlist()": FunctionFragment;
     "royaltyInfo(uint256,uint256)": FunctionFragment;
+    "safeBurn(address,uint256)": FunctionFragment;
+    "safeBurnBatch((address,uint256[])[])": FunctionFragment;
     "safeMint(address,uint256)": FunctionFragment;
     "safeMintBatch((address,uint256[])[])": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
@@ -104,7 +116,7 @@ export interface ImmutableERC721PermissionedMintableInterface
     nameOrSignatureOrTopic:
       | "DEFAULT_ADMIN_ROLE"
       | "MINTER_ROLE"
-      | "_burnedTokens"
+      | "_safeBurnBatch"
       | "_totalSupply"
       | "approve"
       | "balanceOf"
@@ -122,6 +134,7 @@ export interface ImmutableERC721PermissionedMintableInterface
       | "hasRole"
       | "isApprovedForAll"
       | "mint"
+      | "mintBatch"
       | "name"
       | "ownerOf"
       | "renounceRole"
@@ -129,6 +142,8 @@ export interface ImmutableERC721PermissionedMintableInterface
       | "revokeRole"
       | "royaltyAllowlist"
       | "royaltyInfo"
+      | "safeBurn"
+      | "safeBurnBatch"
       | "safeMint"
       | "safeMintBatch"
       | "safeTransferFrom(address,address,uint256)"
@@ -157,8 +172,8 @@ export interface ImmutableERC721PermissionedMintableInterface
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "_burnedTokens",
-    values: [PromiseOrValue<BigNumberish>]
+    functionFragment: "_safeBurnBatch",
+    values: [ImmutableERC721Base.IDBurnStruct[]]
   ): string;
   encodeFunctionData(
     functionFragment: "_totalSupply",
@@ -222,6 +237,10 @@ export interface ImmutableERC721PermissionedMintableInterface
     functionFragment: "mint",
     values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
   ): string;
+  encodeFunctionData(
+    functionFragment: "mintBatch",
+    values: [ImmutableERC721Base.IDMintStruct[]]
+  ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "ownerOf",
@@ -246,6 +265,14 @@ export interface ImmutableERC721PermissionedMintableInterface
   encodeFunctionData(
     functionFragment: "royaltyInfo",
     values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "safeBurn",
+    values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "safeBurnBatch",
+    values: [ImmutableERC721Base.IDBurnStruct[]]
   ): string;
   encodeFunctionData(
     functionFragment: "safeMint",
@@ -343,7 +370,7 @@ export interface ImmutableERC721PermissionedMintableInterface
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "_burnedTokens",
+    functionFragment: "_safeBurnBatch",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -387,6 +414,7 @@ export interface ImmutableERC721PermissionedMintableInterface
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "mintBatch", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
   decodeFunctionResult(
@@ -404,6 +432,11 @@ export interface ImmutableERC721PermissionedMintableInterface
   ): Result;
   decodeFunctionResult(
     functionFragment: "royaltyInfo",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "safeBurn", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "safeBurnBatch",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "safeMint", data: BytesLike): Result;
@@ -469,7 +502,7 @@ export interface ImmutableERC721PermissionedMintableInterface
     "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
     "RoleGranted(bytes32,address,address)": EventFragment;
     "RoleRevoked(bytes32,address,address)": EventFragment;
-    "RoyaltytAllowlistRegistryUpdated(address,address)": EventFragment;
+    "RoyaltyAllowlistRegistryUpdated(address,address)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
   };
 
@@ -479,7 +512,7 @@ export interface ImmutableERC721PermissionedMintableInterface
   getEvent(nameOrSignatureOrTopic: "RoleGranted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleRevoked"): EventFragment;
   getEvent(
-    nameOrSignatureOrTopic: "RoyaltytAllowlistRegistryUpdated"
+    nameOrSignatureOrTopic: "RoyaltyAllowlistRegistryUpdated"
   ): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
 }
@@ -545,17 +578,17 @@ export type RoleRevokedEvent = TypedEvent<
 
 export type RoleRevokedEventFilter = TypedEventFilter<RoleRevokedEvent>;
 
-export interface RoyaltytAllowlistRegistryUpdatedEventObject {
+export interface RoyaltyAllowlistRegistryUpdatedEventObject {
   oldRegistry: string;
   newRegistry: string;
 }
-export type RoyaltytAllowlistRegistryUpdatedEvent = TypedEvent<
+export type RoyaltyAllowlistRegistryUpdatedEvent = TypedEvent<
   [string, string],
-  RoyaltytAllowlistRegistryUpdatedEventObject
+  RoyaltyAllowlistRegistryUpdatedEventObject
 >;
 
-export type RoyaltytAllowlistRegistryUpdatedEventFilter =
-  TypedEventFilter<RoyaltytAllowlistRegistryUpdatedEvent>;
+export type RoyaltyAllowlistRegistryUpdatedEventFilter =
+  TypedEventFilter<RoyaltyAllowlistRegistryUpdatedEvent>;
 
 export interface TransferEventObject {
   from: string;
@@ -569,12 +602,12 @@ export type TransferEvent = TypedEvent<
 
 export type TransferEventFilter = TypedEventFilter<TransferEvent>;
 
-export interface ImmutableERC721PermissionedMintable extends BaseContract {
+export interface ImmutableERC721MintByID extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: ImmutableERC721PermissionedMintableInterface;
+  interface: ImmutableERC721MintByIDInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
@@ -600,10 +633,10 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
 
     MINTER_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
-    _burnedTokens(
-      arg0: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
+    _safeBurnBatch(
+      burns: ImmutableERC721Base.IDBurnStruct[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
     _totalSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -684,6 +717,11 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    mintBatch(
+      mintRequests: ImmutableERC721Base.IDMintStruct[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     name(overrides?: CallOverrides): Promise<[string]>;
 
     ownerOf(
@@ -715,6 +753,17 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
       salePrice: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[string, BigNumber]>;
+
+    safeBurn(
+      owner: PromiseOrValue<string>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    safeBurnBatch(
+      burns: ImmutableERC721Base.IDBurnStruct[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
     safeMint(
       to: PromiseOrValue<string>,
@@ -814,10 +863,10 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
 
   MINTER_ROLE(overrides?: CallOverrides): Promise<string>;
 
-  _burnedTokens(
-    arg0: PromiseOrValue<BigNumberish>,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
+  _safeBurnBatch(
+    burns: ImmutableERC721Base.IDBurnStruct[],
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
   _totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -898,6 +947,11 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  mintBatch(
+    mintRequests: ImmutableERC721Base.IDMintStruct[],
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   name(overrides?: CallOverrides): Promise<string>;
 
   ownerOf(
@@ -929,6 +983,17 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
     salePrice: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<[string, BigNumber]>;
+
+  safeBurn(
+    owner: PromiseOrValue<string>,
+    tokenId: PromiseOrValue<BigNumberish>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  safeBurnBatch(
+    burns: ImmutableERC721Base.IDBurnStruct[],
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
   safeMint(
     to: PromiseOrValue<string>,
@@ -1028,10 +1093,10 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
 
     MINTER_ROLE(overrides?: CallOverrides): Promise<string>;
 
-    _burnedTokens(
-      arg0: PromiseOrValue<BigNumberish>,
+    _safeBurnBatch(
+      burns: ImmutableERC721Base.IDBurnStruct[],
       overrides?: CallOverrides
-    ): Promise<boolean>;
+    ): Promise<void>;
 
     _totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1112,6 +1177,11 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    mintBatch(
+      mintRequests: ImmutableERC721Base.IDMintStruct[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     name(overrides?: CallOverrides): Promise<string>;
 
     ownerOf(
@@ -1143,6 +1213,17 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
       salePrice: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[string, BigNumber]>;
+
+    safeBurn(
+      owner: PromiseOrValue<string>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    safeBurnBatch(
+      burns: ImmutableERC721Base.IDBurnStruct[],
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     safeMint(
       to: PromiseOrValue<string>,
@@ -1294,14 +1375,14 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
       sender?: PromiseOrValue<string> | null
     ): RoleRevokedEventFilter;
 
-    "RoyaltytAllowlistRegistryUpdated(address,address)"(
+    "RoyaltyAllowlistRegistryUpdated(address,address)"(
       oldRegistry?: null,
       newRegistry?: null
-    ): RoyaltytAllowlistRegistryUpdatedEventFilter;
-    RoyaltytAllowlistRegistryUpdated(
+    ): RoyaltyAllowlistRegistryUpdatedEventFilter;
+    RoyaltyAllowlistRegistryUpdated(
       oldRegistry?: null,
       newRegistry?: null
-    ): RoyaltytAllowlistRegistryUpdatedEventFilter;
+    ): RoyaltyAllowlistRegistryUpdatedEventFilter;
 
     "Transfer(address,address,uint256)"(
       from?: PromiseOrValue<string> | null,
@@ -1320,9 +1401,9 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
 
     MINTER_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
-    _burnedTokens(
-      arg0: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
+    _safeBurnBatch(
+      burns: ImmutableERC721Base.IDBurnStruct[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     _totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1404,6 +1485,11 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
+    mintBatch(
+      mintRequests: ImmutableERC721Base.IDMintStruct[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
     ownerOf(
@@ -1434,6 +1520,17 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
       tokenId: PromiseOrValue<BigNumberish>,
       salePrice: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    safeBurn(
+      owner: PromiseOrValue<string>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    safeBurnBatch(
+      burns: ImmutableERC721Base.IDBurnStruct[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     safeMint(
@@ -1537,9 +1634,9 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
 
     MINTER_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    _burnedTokens(
-      arg0: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
+    _safeBurnBatch(
+      burns: ImmutableERC721Base.IDBurnStruct[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     _totalSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -1621,6 +1718,11 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
+    mintBatch(
+      mintRequests: ImmutableERC721Base.IDMintStruct[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     ownerOf(
@@ -1651,6 +1753,17 @@ export interface ImmutableERC721PermissionedMintable extends BaseContract {
       tokenId: PromiseOrValue<BigNumberish>,
       salePrice: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    safeBurn(
+      owner: PromiseOrValue<string>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    safeBurnBatch(
+      burns: ImmutableERC721Base.IDBurnStruct[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     safeMint(

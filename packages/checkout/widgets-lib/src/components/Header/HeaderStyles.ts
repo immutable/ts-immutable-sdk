@@ -3,5 +3,5 @@ export const HeaderNavigationStyles = (transparent: boolean) => ({
 });
 
 export const ButtonNavigationStyles = (transparent: boolean) => ({
-  backgroundColor: transparent ? 'base.color.neutral.800' : '',
+  backgroundColor: transparent ? 'base.color.translucent.standard.200' : '',
 });
