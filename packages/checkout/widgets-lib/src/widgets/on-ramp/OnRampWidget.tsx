@@ -40,11 +40,13 @@ export function OnRampWidget(props: OnRampWidgetProps) {
     const handler = (event: any) => {
       if (event.source === domIframe.contentWindow) {
         if (event.origin === 'https://global-stg.transak.com') {
+          // eslint-disable-next-line no-console
           console.log('TRANSAK event data: ', event.data);
         }
       }
     };
 
+    // eslint-disable-next-line no-console
     console.log('useeffect passed check for iframe domElement');
     window.addEventListener('message', handler);
 
