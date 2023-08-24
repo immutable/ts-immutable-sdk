@@ -8,7 +8,7 @@ import { isValidAmount, isValidWalletProvider } from '../../lib/validations/widg
 export class ImmutableOnRamp extends ImmutableWebComponent {
   amount = '';
 
-  walletProvider: WalletProviderName = WalletProviderName.METAMASK;
+  walletProvider?: WalletProviderName;
 
   connectedCallback() {
     super.connectedCallback();
@@ -24,7 +24,7 @@ export class ImmutableOnRamp extends ImmutableWebComponent {
     if (!isValidWalletProvider(this.walletProvider)) {
       // eslint-disable-next-line no-console
       console.warn('[IMTBL]: invalid "walletProvider" widget input');
-      this.walletProvider = WalletProviderName.METAMASK;
+      this.walletProvider = undefined;
     }
 
     if (!isValidAmount(this.amount)) {
@@ -35,8 +35,6 @@ export class ImmutableOnRamp extends ImmutableWebComponent {
   }
 
   renderWidget() {
-    console.log('start render onramp widget');
-
     // this.validateInputs();
 
     // const connectLoaderParams: ConnectLoaderParams = {
@@ -54,8 +52,6 @@ export class ImmutableOnRamp extends ImmutableWebComponent {
     if (!this.reactRoot) {
       this.reactRoot = ReactDOM.createRoot(this);
     }
-
-    console.log('render onramp widget');
 
     this.reactRoot.render(
       <React.StrictMode>
