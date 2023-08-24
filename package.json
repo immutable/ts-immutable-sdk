@@ -60,7 +60,7 @@
     "packages/config",
     "packages/erc20",
     "packages/erc721-hybrid-permissioned-mintable",
-    "packages/erc721-permissioned-mintable",
+    "packages/erc721-mint-by-id",
     "packages/immutablex_client",
     "packages/passport/sdk",
     "packages/passport/sdk-sample-app",

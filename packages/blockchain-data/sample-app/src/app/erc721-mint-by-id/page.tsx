@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { getDefaultProvider, Wallet } from 'ethers';
-import { ERC721PermissionedMintable } from '@imtbl/erc721-permissioned-mintable';
+import { ERC721MintByID } from '@imtbl/erc721-mint-by-id';
 
 import { PageLayout } from '@/components/PageLayout';
 import { Provider, TransactionResponse } from '@ethersproject/providers';
@@ -12,12 +12,12 @@ const PRIVATE_KEY = process.env.NEXT_PUBLIC_PRIVATE_KEY!;
 
 interface State {
   isLoading: Boolean;
-  contract: ERC721PermissionedMintable | null;
+  contract: ERC721MintByID | null;
   name: string;
   provider: Provider | null;
 }
 
-export default function ERC721PermissionedMintablePage() {
+export default function ERC721MintByIDPage() {
   const [state, setState] = useState<State>({
     isLoading: true,
     contract: null,
@@ -30,7 +30,7 @@ export default function ERC721PermissionedMintablePage() {
   useEffect(() => {
     async function fn() {
       // Contract interface instance
-      const contract = new ERC721PermissionedMintable(CONTRACT_ADDRESS);
+      const contract = new ERC721MintByID(CONTRACT_ADDRESS);
       const provider = getDefaultProvider('sepolia');
 
       try {
