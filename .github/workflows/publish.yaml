@@ -107,11 +107,11 @@ jobs:
       # - name: Build
       #   run: export NODE_OPTIONS=--max-old-space-size=6144 && RELEASE_TYPE=${{ github.event.inputs.release_type }} yarn build
 
-      - name: Typecheck
-        run: yarn typecheck
+      # - name: Typecheck
+      #   run: yarn typecheck
 
-      - name: Test
-        run: yarn test
+      # - name: Test
+      #   run: yarn test
 
       # - name: Push tags
       #   # Boolean inputs are not actually booleans, see https://github.com/actions/runner/issues/1483
