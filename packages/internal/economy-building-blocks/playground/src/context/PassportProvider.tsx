@@ -89,7 +89,6 @@ const getPassportConfig = (
             },
           }),
           zkEvmRpcUrl: "https://zkevm-rpc.dev.x.immutable.com",
-          zkEvmChainId: "eip155:13433",
           relayerUrl: "https://api.dev.immutable.com/relayer-mr",
           indexerMrBasePath: "https://indexer-mr.dev.imtbl.com",
           orderBookMrBasePath: "https://order-book-mr.dev.imtbl.com",
@@ -104,21 +103,13 @@ const getPassportConfig = (
   }
 };
 
-const devConfig = Config.createConfig({
-  basePath: "https://api.dev.x.immutable.com",
-  chainID: 5,
-  coreContractAddress: "0xd05323731807A35599BF9798a1DE15e89d6D6eF1",
-  registrationContractAddress: "0x7EB840223a3b1E0e8D54bF8A6cd83df5AFfC88B2",
-});
-
-const passport = new Passport(getPassportConfig(EnvironmentNames.DEV));
-
 const PassportContext = createContext<{
   connect: () => Promise<void>;
   connectSilent: () => Promise<void>;
   handleRedirectCallback: () => void;
   logout: () => void;
   getUserInfo: () => Promise<UserProfile | undefined>;
+  getUserAddresses: () => Promise<string[] | undefined>;
   sendTx: (to: string, data: string) => Promise<any>;
   call: (to: string, data: string) => Promise<any>;
 }>({
@@ -127,6 +118,7 @@ const PassportContext = createContext<{
   handleRedirectCallback: () => undefined,
   logout: () => undefined,
   getUserInfo: () => Promise.resolve(undefined),
+  getUserAddresses: () => Promise.resolve(undefined),
   sendTx: (_to: string, _data: string) => Promise.resolve(undefined),
   call: (_to: string, _data: string) => Promise.resolve(undefined),
 });
@@ -138,12 +130,15 @@ export function PassportProvider({
 }) {
   const [zkEvmProvider, setZkEvmProvider] = useState<Provider | undefined>();
 
+  const passport = new Passport(getPassportConfig(EnvironmentNames.SANDBOX));
+
   const connect = useCallback(async () => {
     await passport?.connectImx().catch((error) => {
       console.log(error);
     });
     // @ts-ignore TODO ID-926 Remove once method is public
-    setZkEvmProvider(passport?.connectEvm());
+    const provider = await passport?.connectEvm();
+    setZkEvmProvider(provider);
   }, [setZkEvmProvider]);
 
   const connectSilent = useCallback(async () => {
@@ -151,7 +146,8 @@ export function PassportProvider({
       console.log(error);
     });
     // @ts-ignore TODO ID-926 Remove once method is public
-    setZkEvmProvider(passport?.connectEvm());
+    const provider = await passport?.connectEvm();
+    setZkEvmProvider(provider);
   }, [setZkEvmProvider]);
 
   const handleRedirectCallback = useCallback(async () => {
@@ -166,18 +162,31 @@ export function PassportProvider({
     return await passport?.getUserInfo();
   }, []);
 
+  const getUserAddresses = useCallback(async () => {
+    return await zkEvmProvider?.request({
+      method: "eth_accounts",
+    });
+  }, []);
+
   const sendTx = useCallback(
     async (to: string, data: string) => {
-      await zkEvmProvider?.request({ method: "eth_requestAccounts" });
+      console.log("inside sendTx", zkEvmProvider);
+
+      const addresses = await zkEvmProvider?.request({
+        method: "eth_requestAccounts",
+      });      
+      console.log("@@@ account", addresses);
+      console.log("@@@ to", to);
+      console.log("@@@ data", data);
+
       return await zkEvmProvider?.request({
         method: "eth_sendTransaction",
-        params: [{
-          "to": to,
-          "data": data,
-          "gas": "0x76c0",
-          "gasPrice": "0x9184e72a000",
-          // "nonce": "0x11",
-        }, "latest"]
+        params: [
+          {
+            to: to,
+            data: data,
+          },
+        ],
       });
     },
     [zkEvmProvider]
@@ -187,10 +196,13 @@ export function PassportProvider({
     async (to: string, data: string) => {
       return await zkEvmProvider?.request({
         method: "eth_call",
-        params: [{
-          "to": to,
-          "data": data,
-        }, "latest"]
+        params: [
+          {
+            to: to,
+            data: data,
+          },
+          "latest",
+        ],
       });
     },
     [zkEvmProvider]
@@ -204,6 +216,7 @@ export function PassportProvider({
         handleRedirectCallback,
         logout,
         getUserInfo,
+        getUserAddresses,
         sendTx,
         call,
       }}

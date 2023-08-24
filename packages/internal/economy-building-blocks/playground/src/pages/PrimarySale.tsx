@@ -4,7 +4,8 @@ import { Box, Heading, Banner, Button, Card, Link } from "@biom3/react";
 import { Grid, Row, Col } from "react-flexbox-grid";
 
 import { encodeApprove } from "../contracts/erc20";
-import { useMetamaskProvider } from "../MetamaskProvider";
+import { useMetamaskProvider } from "../context/MetamaskProvider";
+import { usePassportProvider } from "../context/PassportProvider";
 import ItemCards from "../components/ItemCards";
 import StatusCard from "../components/StatusCard";
 import ConfigForm from "../components/ConfigForm";
@@ -149,9 +150,10 @@ function PrimarySale() {
   const fee = 0.1;
   const params = useURLParams();
   const [amount, setAmount] = useState(0);
+  const [isPassportConnected, setIsPassportConnected] = useState(false);
   const [selectedItems, setSelectedItems] = useState<any[]>([]);
   const [configFields, setConfigFields] = useState<Record<string, any>>({});
-  const [approved, setApproved] = useState(false);
+  const [isApproved, setIsApproved] = useState(false);
   const [receipt, setReceipt] = useState<TransactionReceipt | null>(null);
   const [mintResponse, setMintResponse] = useState<MintResponse | null>(null);
 
@@ -164,6 +166,8 @@ function PrimarySale() {
     mm_getTransactionReceipt,
   } = useMetamaskProvider();
 
+  const { sendTx, getUserInfo } = usePassportProvider();
+
   const loading = mm_loading;
 
   let { mint, response } = useMint(selectedItems, amount, configFields);
@@ -173,11 +177,22 @@ function PrimarySale() {
     configFields.collection_address
   );
 
+  useEffect(() => {
+    getPassportInfoAsync();
+  });
+
+  const getPassportInfoAsync = async () => {
+    if (await getUserInfo()) {
+      setIsPassportConnected(true);
+    }
+  };
+
   // Reset the states of statuses if the selectedItems changes
   useEffect(() => {
-    setApproved(false);
+    setIsApproved(false);
     setMintResponse(null);
     setReceipt(null);
+    setIsPassportConnected(false);
   }, [selectedItems]);
 
   useEffect(() => {
@@ -210,7 +225,7 @@ function PrimarySale() {
   }, [params]);
 
   const setApprove = useCallback(
-    async (amount: number): Promise<boolean> => {
+    async (amount: number, walletType: "MM" | "Passport"): Promise<boolean> => {
       console.log("🚀 ~ file: PrimarySale.tsx:163 ~ amount:", amount);
       if (!configFields.erc20_contract_address) {
         throw new Error("ERC20 contract address not defined!");
@@ -224,30 +239,37 @@ function PrimarySale() {
           configFields.contract_address,
           `${amount}`
         );
-        const approved = await mm_sendTransaction(
+
+        const execute = walletType === "MM" ? mm_sendTransaction : sendTx;
+        const approved = await execute(
           configFields.erc20_contract_address,
           txData
         );
+
+        console.log("@@@ txData", txData);
         return approved;
       } catch (error) {
-        console.log(error);
+        console.error("An error occurred:", error);
         return false;
       }
     },
     [mm_sendTransaction, configFields]
   );
 
-  const handleMint = useCallback(async () => {
-    setApproved(false);
-    setMintResponse(null);
-    setReceipt(null);
+  const handleMint = useCallback(
+    (walletType: "MM" | "Passport") => async () => {
+      setIsApproved(false);
+      setMintResponse(null);
+      setIsPassportConnected(false);
 
-    const approved = await setApprove(amount);
-    if (approved) {
-      mint();
-      setApproved(true);
-    }
-  }, [mint, amount]);
+      const approved = await setApprove(amount, walletType);
+      if (approved) {
+        mint();
+        setIsApproved(true);
+      }
+    },
+    [mint, amount]
+  );
 
   const handleIsSelectedItem = useCallback(
     (item: any) => {
@@ -378,11 +400,11 @@ function PrimarySale() {
               <Button
                 size={"large"}
                 sx={{
-                  background: "base.gradient.1",
+                  background: "base.color.status.attention.bright",
                   width: "100%",
                   marginTop: "base.spacing.x4",
                 }}
-                onClick={handleMint}
+                onClick={handleMint("MM")}
                 disabled={amount === 0 || loading}
               >
                 <Button.Icon
@@ -397,7 +419,30 @@ function PrimarySale() {
                 {loading
                   ? "Please wait..."
                   : amount
-                  ? `Approve ${amount} USDC`
+                  ? `Approve ${amount} USDC with MM`
+                  : "Select items to purchase"}
+              </Button>
+              <Button
+                size={"large"}
+                sx={{
+                  background: "base.gradient.1",
+                  width: "100%",
+                  marginTop: "base.spacing.x4",
+                }}
+                onClick={handleMint("Passport")}
+                disabled={amount === 0 || loading}
+              >
+                <Button.Icon
+                  icon={amount ? "Wallet" : "Alert"}
+                  iconVariant="regular"
+                  sx={{
+                    mr: "base.spacing.x1",
+                    ml: "0",
+                    width: "base.icon.size.400",
+                  }}
+                />
+                {amount
+                  ? `Approve ${amount} USDC with Passport`
                   : "Select items to purchase"}
               </Button>
             </Box>
@@ -421,13 +466,24 @@ function PrimarySale() {
                 <Card.Caption>
                   <StatusCard
                     status="Connect Wallet"
-                    description={"| " + address}
-                    variant={address ? "success" : "standard"}
+                    description={
+                      isPassportConnected || address
+                        ? "| " +
+                          "MM: " +
+                          (address ? "✅" : "") +
+                          " | " +
+                          "Passport: " +
+                          (isPassportConnected ? "✅" : "❌")
+                        : ""
+                    }
+                    variant={
+                      address || isPassportConnected ? "success" : "standard"
+                    }
                   ></StatusCard>
                   <StatusCard
                     status="Approve Txn"
-                    description={approved ? "✅" : ""}
-                    variant={approved ? "success" : "standard"}
+                    description={isApproved ? "✅" : ""}
+                    variant={isApproved ? "success" : "standard"}
                   ></StatusCard>
                   <StatusCard
                     status="Minting"
