@@ -1,5 +1,32 @@
 import { BigNumber } from 'ethers';
-import { ItemRequirement, ItemType } from '../types';
+import { ItemRequirement, ItemType } from '../../types';
+
+export const nativeAggregator = (
+  itemRequirements: ItemRequirement[],
+): ItemRequirement[] => {
+  const aggregatedMap = new Map<string, ItemRequirement>();
+  const aggregatedItemRequirements: ItemRequirement[] = [];
+
+  itemRequirements.forEach((itemRequirement) => {
+    const { type } = itemRequirement;
+
+    if (type !== ItemType.NATIVE) {
+      aggregatedItemRequirements.push(itemRequirement);
+      return;
+    }
+
+    const { amount } = itemRequirement;
+
+    const aggregateItem = aggregatedMap.get(type);
+    if (aggregateItem && aggregateItem.type === ItemType.NATIVE) {
+      aggregateItem.amount = BigNumber.from(aggregateItem.amount).add(amount);
+    } else {
+      aggregatedMap.set(type, { ...itemRequirement });
+    }
+  });
+
+  return aggregatedItemRequirements.concat(Array.from(aggregatedMap.values()));
+};
 
 export const erc20ItemAggregator = (
   itemRequirements: ItemRequirement[],
@@ -53,4 +80,4 @@ export const erc721ItemAggregator = (
 
 export const itemAggregator = (
   itemRequirements: ItemRequirement[],
-): ItemRequirement[] => erc721ItemAggregator(erc20ItemAggregator(itemRequirements));
+): ItemRequirement[] => erc721ItemAggregator(erc20ItemAggregator(nativeAggregator(itemRequirements)));

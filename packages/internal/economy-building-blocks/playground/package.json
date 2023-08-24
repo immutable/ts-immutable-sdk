@@ -1,18 +1,7 @@
 {
   "name": "@imtbl/economy-building-blocks-playground",
   "version": "0.1.0",
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
+  "private": true,
   "dependencies": {
     "@biom3/design-tokens": "0.2.0-beta",
     "@biom3/react": "^0.8.0-beta",
@@ -44,16 +33,27 @@
     "util": "npm:util@^0.12.5",
     "zlib": "npm:browserify-zlib@^0.2.0"
   },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "eject": "react-scripts eject"
+  },
   "eslintConfig": {
     "extends": [
       "react-app",
       "react-app/jest"
     ]
   },
-  "private": true,
-  "scripts": {
-    "build": "react-scripts build",
-    "eject": "react-scripts eject",
-    "start": "react-scripts start"
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
