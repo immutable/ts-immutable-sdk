@@ -8,12 +8,12 @@ import type {
 } from 'ethers';
 import type { Provider } from '@ethersproject/providers';
 import {
-  ImmutableERC721HybridPermissionedMintable,
-  ImmutableERC721HybridPermissionedMintable__factory,
+  ImmutableERC721,
+  ImmutableERC721__factory,
 } from '@imtbl/contracts';
 import {
   ERC721Hybrid,
-} from '@imtbl/contracts/dist/typechain/types/ImmutableERC721HybridPermissionedMintable';
+} from '@imtbl/contracts/dist/typechain/types/ImmutableERC721';
 import { PromiseOrValue } from '@imtbl/contracts/dist/typechain/types/common';
 
 // Struct for specifying token IDs to mint to an address, by quantity.
@@ -25,11 +25,11 @@ export type IDMint = ERC721Hybrid.IDMintStruct;
 // Struct for transferring multiple tokens between two addresses.
 export type TransferRequest = ERC721Hybrid.TransferRequestStruct;
 
-export class ERC721HybridPermissionedMintable {
-  private readonly contract: ImmutableERC721HybridPermissionedMintable;
+export class ERC721 {
+  private readonly contract: ImmutableERC721;
 
   constructor(contractAddress: string) {
-    const factory = new ImmutableERC721HybridPermissionedMintable__factory();
+    const factory = new ImmutableERC721__factory();
     this.contract = factory.attach(contractAddress);
   }
 
@@ -340,7 +340,7 @@ export class ERC721HybridPermissionedMintable {
       from?: PromiseOrValue<string>;
     } = {},
   ): Promise<PopulatedTransaction> {
-    return await this.contract.populateTransaction.mintByID(to, tokenId, overrides);
+    return await this.contract.populateTransaction.mint(to, tokenId, overrides);
   }
 
   /**
@@ -353,7 +353,7 @@ export class ERC721HybridPermissionedMintable {
       from?: PromiseOrValue<string>;
     } = {},
   ): Promise<PopulatedTransaction> {
-    return await this.contract.populateTransaction.safeMintByID(to, tokenId, overrides);
+    return await this.contract.populateTransaction.safeMint(to, tokenId, overrides);
   }
 
   /**
@@ -391,7 +391,7 @@ export class ERC721HybridPermissionedMintable {
       from?: PromiseOrValue<string>;
     } = {},
   ): Promise<PopulatedTransaction> {
-    return await this.contract.populateTransaction.batchMintByQuantity(mints, overrides);
+    return await this.contract.populateTransaction.mintBatchByQuantity(mints, overrides);
   }
 
   /**
@@ -403,7 +403,7 @@ export class ERC721HybridPermissionedMintable {
       from?: PromiseOrValue<string>;
     } = {},
   ): Promise<PopulatedTransaction> {
-    return await this.contract.populateTransaction.batchSafeMintByQuantity(mints, overrides);
+    return await this.contract.populateTransaction.safeMintBatchByQuantity(mints, overrides);
   }
 
   /**
@@ -415,7 +415,7 @@ export class ERC721HybridPermissionedMintable {
       from?: PromiseOrValue<string>;
     } = {},
   ): Promise<PopulatedTransaction> {
-    return await this.contract.populateTransaction.batchMintByIDToMultiple(mints, overrides);
+    return await this.contract.populateTransaction.mintBatch(mints, overrides);
   }
 
   /**
@@ -427,7 +427,7 @@ export class ERC721HybridPermissionedMintable {
       from?: PromiseOrValue<string>;
     } = {},
   ): Promise<PopulatedTransaction> {
-    return await this.contract.populateTransaction.batchSafeMintByIDToMultiple(mints, overrides);
+    return await this.contract.populateTransaction.safeMintBatch(mints, overrides);
   }
 
   /**

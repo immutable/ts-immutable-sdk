@@ -106,7 +106,7 @@ export default function ERC721MintByIDPage() {
           <div>
             <div>
               <h1 className={`text-xs tracking-wider font-mono mb-1`}>
-                ERC721PermissionedMintable
+                ERC721
               </h1>
               <h1 className={`text-xl font-bold`}>{state.name}</h1>
             </div>

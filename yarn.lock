@@ -3479,9 +3479,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/erc721-hybrid-permissioned-mintable@0.0.0, @imtbl/erc721-hybrid-permissioned-mintable@workspace:packages/erc721-hybrid-permissioned-mintable":
+"@imtbl/erc721-mint-by-id@0.0.0, @imtbl/erc721-mint-by-id@workspace:packages/erc721-mint-by-id":
   version: 0.0.0-use.local
-  resolution: "@imtbl/erc721-hybrid-permissioned-mintable@workspace:packages/erc721-hybrid-permissioned-mintable"
+  resolution: "@imtbl/erc721-mint-by-id@workspace:packages/erc721-mint-by-id"
   dependencies:
     "@imtbl/config": 0.0.0
     "@imtbl/contracts": 0.0.0
@@ -3493,9 +3493,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/erc721-mint-by-id@0.0.0, @imtbl/erc721-mint-by-id@workspace:packages/erc721-mint-by-id":
+"@imtbl/erc721@0.0.0, @imtbl/erc721@workspace:packages/erc721":
   version: 0.0.0-use.local
-  resolution: "@imtbl/erc721-mint-by-id@workspace:packages/erc721-mint-by-id"
+  resolution: "@imtbl/erc721@workspace:packages/erc721"
   dependencies:
     "@imtbl/config": 0.0.0
     "@imtbl/contracts": 0.0.0
@@ -3713,7 +3713,7 @@ __metadata:
     "@imtbl/core-sdk": ^2.0.2
     "@imtbl/cryptofiat": 0.0.0
     "@imtbl/erc20": 0.0.0
-    "@imtbl/erc721-hybrid-permissioned-mintable": 0.0.0
+    "@imtbl/erc721": 0.0.0
     "@imtbl/erc721-mint-by-id": 0.0.0
     "@imtbl/generated-clients": 0.0.0
     "@imtbl/guardian": 0.0.0
