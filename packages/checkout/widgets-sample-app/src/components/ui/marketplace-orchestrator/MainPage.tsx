@@ -9,6 +9,7 @@ import { WidgetContext, hideAllWidgets } from "./WidgetProvider";
 import { ImtblWidgets } from "./ImtblWidgets";
 import { Passport } from '@imtbl/passport';
 import { passportConfig } from './passportConfig';
+import { useOnRampWidget } from './useOnRampWidget';
 
 export const MainPage = () => {
   // local state for enabling/disabling and changing buttons
@@ -47,6 +48,7 @@ export const MainPage = () => {
   useWalletWidget(setWeb3Provider);
   useSwapWidget(setDoneSwap);
   useBridgeWidget();
+  useOnRampWidget()
 
   // button click functions to open/close widgets
   const openConnectWidget = useCallback(() => {

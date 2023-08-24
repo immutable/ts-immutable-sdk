@@ -6,6 +6,7 @@ import { WidgetTheme } from '../../lib';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
+import { sendOnRampWidgetCloseEvent } from './OnRampWidgetEvents';
 
 export interface OnRampWidgetProps {
   // eslint-disable-next-line react/no-unused-prop-types
@@ -60,7 +61,7 @@ export function OnRampWidget(props: OnRampWidgetProps) {
           <HeaderNavigation
             showBack
             title="Add coins"
-            onCloseButtonClick={() => console.log('close widget event')}
+            onCloseButtonClick={() => sendOnRampWidgetCloseEvent()}
           />
         )}
         footerBackgroundColor="base.color.translucent.emphasis.200"
