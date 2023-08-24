@@ -1,14 +1,12 @@
 import { Box } from '@biom3/react';
-import { ReactComponent as Bridge } from '../../assets/Bridge.svg';
-import { ReactComponent as PurpleDownGradient } from '../../assets/PurpleDownGradient.svg';
+import { ReactComponent as EthereumPlanet } from '../../assets/EthereumPlanet.svg';
 import { heroBackGroundStyles, heroImageStyles } from './HeroImageStyles';
 
-export function BridgeHero() {
+export function EthereumPlanetHero() {
   return (
     <Box sx={{ ...heroBackGroundStyles, background: 'base.color.translucent.emphasis.100' }}>
-      <PurpleDownGradient />
       <Box sx={heroImageStyles}>
-        <Bridge />
+        <EthereumPlanet />
       </Box>
     </Box>
   );
