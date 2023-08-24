@@ -5,6 +5,7 @@ import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes
 import { SharedViews } from '../../context/view-context/ViewContext';
 import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
+import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextTypes';
 
 export const text = {
   views: {
@@ -256,6 +257,9 @@ export const text = {
       heading: 'Coming soon',
       body: "Moving funds across networks currently isn't supported for Passport.",
       actionText: 'Dismiss',
+    },
+    [OnRampWidgetViews.ONRAMP]: {
+      initialLoadingText: 'Taking you to Transak',
     },
     [SharedViews.TOP_UP_VIEW]: {
       header: {
