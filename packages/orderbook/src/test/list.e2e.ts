@@ -109,8 +109,8 @@ describe('listListings e2e', () => {
     expect(ordersPage.result.length).toBe(2);
     expect(ordersPage.result[0].id).toEqual(token1Order2.id);
     expect(ordersPage.result[1].id).toEqual(token1Order1.id);
-    expect(ordersPage.page?.next_cursor).toBeNull();
-    expect(ordersPage.page?.previous_cursor).toBeNull();
+    expect(ordersPage.page?.nextCursor).toBeNull();
+    expect(ordersPage.page?.previousCursor).toBeNull();
   });
 
   it('should list orders by tokenID', async () => {
@@ -122,8 +122,8 @@ describe('listListings e2e', () => {
 
     expect(ordersPage.result.length).toBe(1);
     expect(ordersPage.result[0].id).toEqual(token2Order1.id);
-    expect(ordersPage.page?.next_cursor).toBeNull();
-    expect(ordersPage.page?.previous_cursor).toBeNull();
+    expect(ordersPage.page?.nextCursor).toBeNull();
+    expect(ordersPage.page?.previousCursor).toBeNull();
   });
 
   it('should sort orders by buy amount', async () => {
@@ -136,8 +136,8 @@ describe('listListings e2e', () => {
     expect(ordersPage.result.length).toBe(2);
     expect(ordersPage.result[0].id).toEqual(token1Order1.id);
     expect(ordersPage.result[1].id).toEqual(token1Order2.id);
-    expect(ordersPage.page?.next_cursor).toBeNull();
-    expect(ordersPage.page?.previous_cursor).toBeNull();
+    expect(ordersPage.page?.nextCursor).toBeNull();
+    expect(ordersPage.page?.previousCursor).toBeNull();
   });
 
   it('should page orders', async () => {
@@ -149,30 +149,30 @@ describe('listListings e2e', () => {
 
     expect(ordersPage1.result.length).toBe(1);
     expect(ordersPage1.result[0].id).toEqual(token1Order2.id);
-    expect(ordersPage1.page?.next_cursor).toBeTruthy();
-    expect(ordersPage1.page?.previous_cursor).toBeNull();
+    expect(ordersPage1.page?.nextCursor).toBeTruthy();
+    expect(ordersPage1.page?.previousCursor).toBeNull();
 
     const ordersPage2 = await sdk.listListings({
       sellItemContractAddress: token1ContractAddress,
       status: OrderStatus.ACTIVE,
       pageSize: 1,
-      pageCursor: ordersPage1.page!.next_cursor!,
+      pageCursor: ordersPage1.page!.nextCursor!,
     });
 
     expect(ordersPage2.result.length).toBe(1);
     expect(ordersPage2.result[0].id).toEqual(token1Order1.id);
-    expect(ordersPage2.page?.next_cursor).toBeTruthy();
-    expect(ordersPage2.page?.previous_cursor).toBeTruthy();
+    expect(ordersPage2.page?.nextCursor).toBeTruthy();
+    expect(ordersPage2.page?.previousCursor).toBeTruthy();
 
     const ordersPage3 = await sdk.listListings({
       sellItemContractAddress: token1ContractAddress,
       status: OrderStatus.ACTIVE,
       pageSize: 1,
-      pageCursor: ordersPage2.page!.next_cursor!,
+      pageCursor: ordersPage2.page!.nextCursor!,
     });
 
     expect(ordersPage3.result.length).toBe(0);
-    expect(ordersPage3.page?.next_cursor).toBeNull();
-    expect(ordersPage3.page?.previous_cursor).toBeNull();
+    expect(ordersPage3.page?.nextCursor).toBeNull();
+    expect(ordersPage3.page?.previousCursor).toBeNull();
   });
 });
