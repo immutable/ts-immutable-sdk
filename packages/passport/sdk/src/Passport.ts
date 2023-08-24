@@ -154,4 +154,8 @@ export class Passport {
     const user = await this.authManager.getUser();
     return user?.accessToken;
   }
+
+  public async getLinkedAddresses(): Promise<string[]> {
+    return this.authManager.getLinkedAddresses();
+  }
 }

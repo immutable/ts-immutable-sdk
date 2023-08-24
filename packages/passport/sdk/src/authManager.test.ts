@@ -44,6 +44,8 @@ const zkEvmProfileData = {
   zkevm_user_admin_address: mockUserZkEvm.zkEvm.userAdminAddress,
 };
 
+const linkedAddresses = ['0x123', '0x456'];
+
 const mockErrorMsg = 'NONO';
 
 describe('AuthManager', () => {
@@ -326,6 +328,29 @@ describe('AuthManager', () => {
       getUserMock.mockReturnValue(null);
 
       expect(await authManager.getUser()).toBeNull();
+    });
+  });
+
+  describe('getLinkedAddresses', () => {
+    it('should retrieve the linked addresses from the userManager and return the list', async () => {
+      getUserMock.mockReturnValue({
+        ...mockOidcUser,
+        profile: {
+          ...mockOidcUser.profile,
+          passport: {
+            linked_addresses: linkedAddresses,
+          },
+        },
+      });
+
+      const result = await authManager.getLinkedAddresses();
+
+      expect(result).toEqual(linkedAddresses);
+    });
+
+    it('should return null if no user is returned', async () => {
+      getUserMock.mockReturnValue(mockOidcUser);
+      expect(await authManager.getLinkedAddresses()).toHaveLength(0);
     });
   });
 });

@@ -5,7 +5,7 @@ import MagicAdapter from './magicAdapter';
 import { Passport } from './Passport';
 import { PassportImxProvider, PassportImxProviderFactory } from './starkEx';
 import { Networks, OidcConfiguration } from './types';
-import { mockUser } from './test/mocks';
+import { mockUser, mockLinkedAddresses } from './test/mocks';
 
 jest.mock('./authManager');
 jest.mock('./magicAdapter');
@@ -31,6 +31,7 @@ describe('Passport', () => {
   let loginSilentMock: jest.Mock;
   let getProviderMock: jest.Mock;
   let getProviderSilentMock: jest.Mock;
+  let getLinkedAddressesMock: jest.Mock;
 
   beforeEach(() => {
     authLoginMock = jest.fn().mockReturnValue(mockUser);
@@ -43,6 +44,7 @@ describe('Passport', () => {
     loginSilentMock = jest.fn();
     getProviderMock = jest.fn();
     getProviderSilentMock = jest.fn();
+    getLinkedAddressesMock = jest.fn();
     (AuthManager as unknown as jest.Mock).mockReturnValue({
       login: authLoginMock,
       loginCallback: loginCallbackMock,
@@ -50,6 +52,7 @@ describe('Passport', () => {
       getUser: getUserMock,
       loginSilent: loginSilentMock,
       requestRefreshTokenAfterRegistration: requestRefreshTokenMock,
+      getLinkedAddresses: getLinkedAddressesMock,
     });
     (MagicAdapter as jest.Mock).mockReturnValue({
       login: magicLoginMock,
@@ -204,6 +207,24 @@ describe('Passport', () => {
       const result = await passport.getAccessToken();
 
       expect(result).toEqual(undefined);
+    });
+  });
+
+  describe('getLinkedAddresses', () => {
+    it('should execute getLinkedAddresses', async () => {
+      getLinkedAddressesMock.mockReturnValue(mockLinkedAddresses);
+
+      const result = await passport.getLinkedAddresses();
+
+      expect(result).toEqual(mockLinkedAddresses);
+    });
+
+    it('should return empty array if there is no linked addresses', async () => {
+      getUserMock.mockReturnValue(null);
+
+      const result = await passport.getLinkedAddresses();
+
+      expect(result).toHaveLength(0);
     });
   });
 });

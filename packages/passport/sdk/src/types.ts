@@ -30,6 +30,7 @@ export type User = {
     ethAddress: string;
     userAdminAddress: string;
   };
+  linkedAddresses?: string[];
 };
 
 export type PassportMetadata = {
@@ -38,6 +39,7 @@ export type PassportMetadata = {
   imx_user_admin_address: string;
   zkevm_eth_address: string;
   zkevm_user_admin_address: string;
+  linked_addresses?: string[];
 };
 
 export enum Networks {
