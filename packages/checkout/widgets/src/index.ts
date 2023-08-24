@@ -7,6 +7,7 @@ export * from './definitions/events/walletEvents';
 export * from './definitions/events/swapEvents';
 export * from './definitions/events/bridgeEvents';
 export * from './definitions/events/orchestrationEvents';
+export * from './definitions/events/onrampEvents';
 
 // Definitions
 export * from './definitions/global';
