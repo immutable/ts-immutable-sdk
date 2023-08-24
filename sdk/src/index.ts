@@ -7,5 +7,5 @@ export * as provider from './provider';
 export * as checkoutSdk from './checkout_sdk';
 export * as checkoutWidgets from './checkout_widgets';
 export * as erc20 from './erc20';
-export * as erc721HybridPermissionedMintable from './erc721_hybrid_permissioned_mintable';
-export * as erc721PermissionedMintable from './erc721_permissioned_mintable';
+export * as erc721 from './erc721';
+export * as erc721MintById from './erc721_mint_by_id';

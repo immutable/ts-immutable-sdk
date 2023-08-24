@@ -48,6 +48,16 @@ export declare namespace ERC721Hybrid {
     quantity: BigNumber;
   };
 
+  export type IDBurnStruct = {
+    owner: PromiseOrValue<string>;
+    tokenIds: PromiseOrValue<BigNumberish>[];
+  };
+
+  export type IDBurnStructOutput = [string, BigNumber[]] & {
+    owner: string;
+    tokenIds: BigNumber[];
+  };
+
   export type TransferRequestStruct = {
     from: PromiseOrValue<string>;
     tos: PromiseOrValue<string>[];
@@ -61,18 +71,13 @@ export declare namespace ERC721Hybrid {
   };
 }
 
-export interface ImmutableERC721HybridPermissionedMintableInterface
-  extends utils.Interface {
+export interface ImmutableERC721Interface extends utils.Interface {
   functions: {
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
     "MINTER_ROLE()": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "baseURI()": FunctionFragment;
-    "batchMintByIDToMultiple((address,uint256[])[])": FunctionFragment;
-    "batchMintByQuantity((address,uint256)[])": FunctionFragment;
-    "batchSafeMintByIDToMultiple((address,uint256[])[])": FunctionFragment;
-    "batchSafeMintByQuantity((address,uint256)[])": FunctionFragment;
     "bulkMintThreshold()": FunctionFragment;
     "burn(uint256)": FunctionFragment;
     "burnBatch(uint256[])": FunctionFragment;
@@ -87,7 +92,9 @@ export interface ImmutableERC721HybridPermissionedMintableInterface
     "grantRole(bytes32,address)": FunctionFragment;
     "hasRole(bytes32,address)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
-    "mintByID(address,uint256)": FunctionFragment;
+    "mint(address,uint256)": FunctionFragment;
+    "mintBatch((address,uint256[])[])": FunctionFragment;
+    "mintBatchByQuantity((address,uint256)[])": FunctionFragment;
     "mintByQuantity(address,uint256)": FunctionFragment;
     "name()": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
@@ -96,7 +103,11 @@ export interface ImmutableERC721HybridPermissionedMintableInterface
     "revokeRole(bytes32,address)": FunctionFragment;
     "royaltyAllowlist()": FunctionFragment;
     "royaltyInfo(uint256,uint256)": FunctionFragment;
-    "safeMintByID(address,uint256)": FunctionFragment;
+    "safeBurn(address,uint256)": FunctionFragment;
+    "safeBurnBatch((address,uint256[])[])": FunctionFragment;
+    "safeMint(address,uint256)": FunctionFragment;
+    "safeMintBatch((address,uint256[])[])": FunctionFragment;
+    "safeMintBatchByQuantity((address,uint256)[])": FunctionFragment;
     "safeMintByQuantity(address,uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256,bytes)": FunctionFragment;
@@ -122,10 +133,6 @@ export interface ImmutableERC721HybridPermissionedMintableInterface
       | "approve"
       | "balanceOf"
       | "baseURI"
-      | "batchMintByIDToMultiple"
-      | "batchMintByQuantity"
-      | "batchSafeMintByIDToMultiple"
-      | "batchSafeMintByQuantity"
       | "bulkMintThreshold"
       | "burn"
       | "burnBatch"
@@ -140,7 +147,9 @@ export interface ImmutableERC721HybridPermissionedMintableInterface
       | "grantRole"
       | "hasRole"
       | "isApprovedForAll"
-      | "mintByID"
+      | "mint"
+      | "mintBatch"
+      | "mintBatchByQuantity"
       | "mintByQuantity"
       | "name"
       | "ownerOf"
@@ -149,7 +158,11 @@ export interface ImmutableERC721HybridPermissionedMintableInterface
       | "revokeRole"
       | "royaltyAllowlist"
       | "royaltyInfo"
-      | "safeMintByID"
+      | "safeBurn"
+      | "safeBurnBatch"
+      | "safeMint"
+      | "safeMintBatch"
+      | "safeMintBatchByQuantity"
       | "safeMintByQuantity"
       | "safeTransferFrom(address,address,uint256)"
       | "safeTransferFrom(address,address,uint256,bytes)"
@@ -185,22 +198,6 @@ export interface ImmutableERC721HybridPermissionedMintableInterface
     values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(functionFragment: "baseURI", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "batchMintByIDToMultiple",
-    values: [ERC721Hybrid.IDMintStruct[]]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "batchMintByQuantity",
-    values: [ERC721Hybrid.MintStruct[]]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "batchSafeMintByIDToMultiple",
-    values: [ERC721Hybrid.IDMintStruct[]]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "batchSafeMintByQuantity",
-    values: [ERC721Hybrid.MintStruct[]]
-  ): string;
   encodeFunctionData(
     functionFragment: "bulkMintThreshold",
     values?: undefined
@@ -255,8 +252,16 @@ export interface ImmutableERC721HybridPermissionedMintableInterface
     values: [PromiseOrValue<string>, PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
-    functionFragment: "mintByID",
+    functionFragment: "mint",
     values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "mintBatch",
+    values: [ERC721Hybrid.IDMintStruct[]]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "mintBatchByQuantity",
+    values: [ERC721Hybrid.MintStruct[]]
   ): string;
   encodeFunctionData(
     functionFragment: "mintByQuantity",
@@ -288,8 +293,24 @@ export interface ImmutableERC721HybridPermissionedMintableInterface
     values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
-    functionFragment: "safeMintByID",
+    functionFragment: "safeBurn",
     values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "safeBurnBatch",
+    values: [ERC721Hybrid.IDBurnStruct[]]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "safeMint",
+    values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "safeMintBatch",
+    values: [ERC721Hybrid.IDMintStruct[]]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "safeMintBatchByQuantity",
+    values: [ERC721Hybrid.MintStruct[]]
   ): string;
   encodeFunctionData(
     functionFragment: "safeMintByQuantity",
@@ -386,22 +407,6 @@ export interface ImmutableERC721HybridPermissionedMintableInterface
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "baseURI", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "batchMintByIDToMultiple",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "batchMintByQuantity",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "batchSafeMintByIDToMultiple",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "batchSafeMintByQuantity",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "bulkMintThreshold",
     data: BytesLike
   ): Result;
@@ -439,7 +444,12 @@ export interface ImmutableERC721HybridPermissionedMintableInterface
     functionFragment: "isApprovedForAll",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "mintByID", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "mintBatch", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "mintBatchByQuantity",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "mintByQuantity",
     data: BytesLike
@@ -463,8 +473,18 @@ export interface ImmutableERC721HybridPermissionedMintableInterface
     functionFragment: "royaltyInfo",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "safeBurn", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "safeMintByID",
+    functionFragment: "safeBurnBatch",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "safeMint", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "safeMintBatch",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "safeMintBatchByQuantity",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -629,13 +649,12 @@ export type TransferEvent = TypedEvent<
 
 export type TransferEventFilter = TypedEventFilter<TransferEvent>;
 
-export interface ImmutableERC721HybridPermissionedMintable
-  extends BaseContract {
+export interface ImmutableERC721 extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: ImmutableERC721HybridPermissionedMintableInterface;
+  interface: ImmutableERC721Interface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
@@ -673,26 +692,6 @@ export interface ImmutableERC721HybridPermissionedMintable
     ): Promise<[BigNumber]>;
 
     baseURI(overrides?: CallOverrides): Promise<[string]>;
-
-    batchMintByIDToMultiple(
-      mints: ERC721Hybrid.IDMintStruct[],
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    batchMintByQuantity(
-      mints: ERC721Hybrid.MintStruct[],
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    batchSafeMintByIDToMultiple(
-      mints: ERC721Hybrid.IDMintStruct[],
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    batchSafeMintByQuantity(
-      mints: ERC721Hybrid.MintStruct[],
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
 
     bulkMintThreshold(overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -759,9 +758,19 @@ export interface ImmutableERC721HybridPermissionedMintable
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    mintByID(
+    mint(
       to: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    mintBatch(
+      mints: ERC721Hybrid.IDMintStruct[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    mintBatchByQuantity(
+      mints: ERC721Hybrid.MintStruct[],
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -803,9 +812,30 @@ export interface ImmutableERC721HybridPermissionedMintable
       overrides?: CallOverrides
     ): Promise<[string, BigNumber]>;
 
-    safeMintByID(
+    safeBurn(
+      owner: PromiseOrValue<string>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    safeBurnBatch(
+      burns: ERC721Hybrid.IDBurnStruct[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    safeMint(
       to: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    safeMintBatch(
+      mints: ERC721Hybrid.IDMintStruct[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    safeMintBatchByQuantity(
+      mints: ERC721Hybrid.MintStruct[],
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -915,26 +945,6 @@ export interface ImmutableERC721HybridPermissionedMintable
 
   baseURI(overrides?: CallOverrides): Promise<string>;
 
-  batchMintByIDToMultiple(
-    mints: ERC721Hybrid.IDMintStruct[],
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  batchMintByQuantity(
-    mints: ERC721Hybrid.MintStruct[],
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  batchSafeMintByIDToMultiple(
-    mints: ERC721Hybrid.IDMintStruct[],
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  batchSafeMintByQuantity(
-    mints: ERC721Hybrid.MintStruct[],
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
   bulkMintThreshold(overrides?: CallOverrides): Promise<BigNumber>;
 
   burn(
@@ -1000,9 +1010,19 @@ export interface ImmutableERC721HybridPermissionedMintable
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  mintByID(
+  mint(
     to: PromiseOrValue<string>,
     tokenId: PromiseOrValue<BigNumberish>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  mintBatch(
+    mints: ERC721Hybrid.IDMintStruct[],
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  mintBatchByQuantity(
+    mints: ERC721Hybrid.MintStruct[],
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -1044,9 +1064,30 @@ export interface ImmutableERC721HybridPermissionedMintable
     overrides?: CallOverrides
   ): Promise<[string, BigNumber]>;
 
-  safeMintByID(
+  safeBurn(
+    owner: PromiseOrValue<string>,
+    tokenId: PromiseOrValue<BigNumberish>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  safeBurnBatch(
+    burns: ERC721Hybrid.IDBurnStruct[],
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  safeMint(
     to: PromiseOrValue<string>,
     tokenId: PromiseOrValue<BigNumberish>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  safeMintBatch(
+    mints: ERC721Hybrid.IDMintStruct[],
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  safeMintBatchByQuantity(
+    mints: ERC721Hybrid.MintStruct[],
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -1156,26 +1197,6 @@ export interface ImmutableERC721HybridPermissionedMintable
 
     baseURI(overrides?: CallOverrides): Promise<string>;
 
-    batchMintByIDToMultiple(
-      mints: ERC721Hybrid.IDMintStruct[],
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    batchMintByQuantity(
-      mints: ERC721Hybrid.MintStruct[],
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    batchSafeMintByIDToMultiple(
-      mints: ERC721Hybrid.IDMintStruct[],
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    batchSafeMintByQuantity(
-      mints: ERC721Hybrid.MintStruct[],
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     bulkMintThreshold(overrides?: CallOverrides): Promise<BigNumber>;
 
     burn(
@@ -1241,9 +1262,19 @@ export interface ImmutableERC721HybridPermissionedMintable
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    mintByID(
+    mint(
       to: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    mintBatch(
+      mints: ERC721Hybrid.IDMintStruct[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    mintBatchByQuantity(
+      mints: ERC721Hybrid.MintStruct[],
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1285,9 +1316,30 @@ export interface ImmutableERC721HybridPermissionedMintable
       overrides?: CallOverrides
     ): Promise<[string, BigNumber]>;
 
-    safeMintByID(
+    safeBurn(
+      owner: PromiseOrValue<string>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    safeBurnBatch(
+      burns: ERC721Hybrid.IDBurnStruct[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    safeMint(
       to: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    safeMintBatch(
+      mints: ERC721Hybrid.IDMintStruct[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    safeMintBatchByQuantity(
+      mints: ERC721Hybrid.MintStruct[],
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1475,26 +1527,6 @@ export interface ImmutableERC721HybridPermissionedMintable
 
     baseURI(overrides?: CallOverrides): Promise<BigNumber>;
 
-    batchMintByIDToMultiple(
-      mints: ERC721Hybrid.IDMintStruct[],
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    batchMintByQuantity(
-      mints: ERC721Hybrid.MintStruct[],
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    batchSafeMintByIDToMultiple(
-      mints: ERC721Hybrid.IDMintStruct[],
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    batchSafeMintByQuantity(
-      mints: ERC721Hybrid.MintStruct[],
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
     bulkMintThreshold(overrides?: CallOverrides): Promise<BigNumber>;
 
     burn(
@@ -1560,9 +1592,19 @@ export interface ImmutableERC721HybridPermissionedMintable
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    mintByID(
+    mint(
       to: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    mintBatch(
+      mints: ERC721Hybrid.IDMintStruct[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    mintBatchByQuantity(
+      mints: ERC721Hybrid.MintStruct[],
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -1604,9 +1646,30 @@ export interface ImmutableERC721HybridPermissionedMintable
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    safeMintByID(
+    safeBurn(
+      owner: PromiseOrValue<string>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    safeBurnBatch(
+      burns: ERC721Hybrid.IDBurnStruct[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    safeMint(
       to: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    safeMintBatch(
+      mints: ERC721Hybrid.IDMintStruct[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    safeMintBatchByQuantity(
+      mints: ERC721Hybrid.MintStruct[],
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -1719,26 +1782,6 @@ export interface ImmutableERC721HybridPermissionedMintable
 
     baseURI(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    batchMintByIDToMultiple(
-      mints: ERC721Hybrid.IDMintStruct[],
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    batchMintByQuantity(
-      mints: ERC721Hybrid.MintStruct[],
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    batchSafeMintByIDToMultiple(
-      mints: ERC721Hybrid.IDMintStruct[],
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    batchSafeMintByQuantity(
-      mints: ERC721Hybrid.MintStruct[],
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
     bulkMintThreshold(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     burn(
@@ -1804,9 +1847,19 @@ export interface ImmutableERC721HybridPermissionedMintable
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    mintByID(
+    mint(
       to: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    mintBatch(
+      mints: ERC721Hybrid.IDMintStruct[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    mintBatchByQuantity(
+      mints: ERC721Hybrid.MintStruct[],
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1848,9 +1901,30 @@ export interface ImmutableERC721HybridPermissionedMintable
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    safeMintByID(
+    safeBurn(
+      owner: PromiseOrValue<string>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    safeBurnBatch(
+      burns: ERC721Hybrid.IDBurnStruct[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    safeMint(
       to: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    safeMintBatch(
+      mints: ERC721Hybrid.IDMintStruct[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    safeMintBatchByQuantity(
+      mints: ERC721Hybrid.MintStruct[],
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
