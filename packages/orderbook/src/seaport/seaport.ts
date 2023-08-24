@@ -20,8 +20,8 @@ import {
   SignablePurpose,
   TransactionAction,
   TransactionPurpose,
-} from 'types';
-import { Order } from 'openapi/sdk';
+} from '../types';
+import { Order } from '../openapi/sdk';
 import {
   EIP_712_ORDER_TYPE,
   ItemType,
