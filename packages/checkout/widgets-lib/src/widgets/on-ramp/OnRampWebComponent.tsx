@@ -12,8 +12,6 @@ export class ImmutableOnRamp extends ImmutableWebComponent {
 
   connectedCallback() {
     super.connectedCallback();
-    console.log('in connectedCallback');
-
     this.amount = this.getAttribute('amount') ?? '';
     this.walletProvider = this.getAttribute(
       'walletProvider',
