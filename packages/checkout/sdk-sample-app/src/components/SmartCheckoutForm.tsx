@@ -13,7 +13,7 @@ import {
 import { Web3Provider } from '@ethersproject/providers';
 import { useEffect, useState } from 'react';
 import { BigNumber } from 'ethers';
-import { Body, Box, Button, FormControl, Heading, Select, TextInput, Option, OptionKey } from '@biom3/react';
+import { Body, Box, Button, FormControl, Heading, Select, TextInput, Option, OptionKey, Checkbox } from '@biom3/react';
 import LoadingButton from './LoadingButton';
 import { ErrorMessage, SuccessMessage } from './messages';
 
@@ -55,6 +55,13 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
   const [spenderAddress, setSpenderAddress] = useState<string>('');
   const [spenderAddressError, setSpenderAddressError] = useState<string>('');
 
+  const [nativeGasAmountChecked, setNativeGasAmountChecked] = useState<boolean>(true);
+  const [erc20GasAmountChecked, setErc20GasAmountChecked] = useState<boolean>(false);
+  const [gasLimit, setGasLimit] = useState<string>('400000');
+  const [gasLimitError, setGasLimitError] = useState<string>('');
+  const [gasContractAddress, setGasContractAddress] = useState<string>('');
+  const [gasContractAddressError, setGasContractAddressError] = useState<string>('');
+
   useEffect(() => {
     if (!checkout) return;
 
@@ -85,6 +92,36 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
     if (!provider) {
       setError('missing provider, please connect first')
       return;
+    }
+
+    if (!gasLimit) {
+      setGasLimitError('Gas limit is required');
+      return;
+    }
+
+    if (nativeGasAmountChecked) {
+      setTransactionOrGasAmount({
+        type: TransactionOrGasType.GAS,
+        gasToken: {
+          type: GasTokenType.NATIVE,
+          limit: BigNumber.from(gasLimit),
+        }
+      });
+    }
+
+    if (erc20GasAmountChecked) {
+      if (!gasContractAddress) {
+        setGasContractAddressError('Contract address is required for ERC20 gas token');
+        return;
+      }
+      setTransactionOrGasAmount({
+        type: TransactionOrGasType.GAS,
+        gasToken: {
+          type: GasTokenType.ERC20,
+          limit: BigNumber.from(gasLimit),
+          contractAddress: gasContractAddress,
+        }
+      });
     }
 
     setItemRequirementsError('');
@@ -360,7 +397,7 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
                     Seaport
                   </TextInput.Button>
                 </TextInput>
-              {spenderAddressError && (
+                {spenderAddressError && (
                   <FormControl.Validation>{spenderAddressError}</FormControl.Validation>
                 )}
               </FormControl>
@@ -380,6 +417,89 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
     )
   }
 
+  const updateGasLimit = (event: any) => {
+    const value = event.target.value;
+    setGasLimit(value.split('.')[0]);
+    setGasLimitError('');
+  }
+
+  const updateGasContractAddress = (event: any) => {
+    setGasContractAddress(event.target.value);
+    setGasContractAddressError('');
+  }
+
+  const gasAmountForm = () => {
+    return(
+      <>
+        <Body>Set Gas Amount</Body>
+        <Box sx={{ display: 'flex' }}>
+          <FormControl sx={{ padding: 'base.spacing.x4' }}>
+            <FormControl.Label>Native</FormControl.Label>
+              <Checkbox
+                checked={nativeGasAmountChecked}
+                onChange={() => {
+                  setNativeGasAmountChecked(!nativeGasAmountChecked);
+                  setErc20GasAmountChecked(!erc20GasAmountChecked);
+                  setGasContractAddress('');
+                  setGasContractAddressError('');
+                }}
+              />
+          </FormControl>
+          <FormControl sx={{ padding: 'base.spacing.x4' }}>
+            <FormControl.Label>ERC20</FormControl.Label>
+              <Checkbox
+                checked={erc20GasAmountChecked}
+                onChange={() => {
+                  setErc20GasAmountChecked(!erc20GasAmountChecked);
+                  setNativeGasAmountChecked(!nativeGasAmountChecked);
+                }}
+              />
+          </FormControl>
+        </Box>
+        <Box sx={{ display: 'flex' }}>
+          <FormControl
+            sx={{ paddingLeft: 'base.spacing.x4' }}
+            validationStatus={gasLimitError ? 'error' : 'success'}
+          >
+            <FormControl.Label>Limit</FormControl.Label>
+            <TextInput
+              type='number'
+              value={gasLimit}
+              onChange={updateGasLimit}
+            >
+              <TextInput.Button
+                onClick={() => {
+                  setGasLimit('400000');
+                  setGasLimitError('');
+                }}
+              >
+                Default
+              </TextInput.Button>
+            </TextInput>
+            {gasLimitError && (
+              <FormControl.Validation>{gasLimitError}</FormControl.Validation>
+            )}
+          </FormControl>
+          {erc20GasAmountChecked && (
+            <FormControl
+              sx={{ paddingLeft: 'base.spacing.x4' }}
+              validationStatus={gasContractAddressError ? 'error' : 'success'}
+            >
+              <FormControl.Label>Contract Address</FormControl.Label>
+              <TextInput
+                value={gasContractAddress}
+                onChange={updateGasContractAddress}
+              />
+              {gasContractAddressError && (
+                <FormControl.Validation>{gasContractAddressError}</FormControl.Validation>
+              )}
+            </FormControl>
+          )}
+        </Box>
+      </>
+    )
+  }
+
   return(
     <Box>
       <Body>
@@ -393,6 +513,12 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
         <Button sx={{ marginTop: 'base.spacing.x2' }} size='small' onClick={clearItemRequirements}>
           Clear Item Requirements
         </Button>
+      </Box>
+      <Box sx={{
+        paddingTop: 'base.spacing.x4',
+        paddingBottom: 'base.spacing.x8'
+      }} >
+        {gasAmountForm()}
       </Box>
       <LoadingButton onClick={smartCheckout} loading={loading}>
         Run Smart Checkout

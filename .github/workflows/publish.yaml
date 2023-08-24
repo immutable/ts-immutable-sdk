@@ -97,6 +97,14 @@ jobs:
         run: |
           cp CHANGELOG.md ./sdk/CHANGELOG.md
 
+      - name: Update Changelog title
+        run: |
+          ./.github/scripts/update-changelog-title.sh "${{ steps.version.outputs.NEXT_VERSION }}" CHANGELOG.md
+
+      - name: Copy Changelog to SDK
+        run: |
+          cp CHANGELOG.md ./sdk/CHANGELOG.md
+
       - name: Build
         run: export NODE_OPTIONS=--max-old-space-size=6144 && RELEASE_TYPE=${{ github.event.inputs.release_type }} yarn build
 

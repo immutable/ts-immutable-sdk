@@ -1,27 +1,25 @@
 import { ModuleConfiguration } from '@imtbl/config';
-import { ImmutableApiClient, ImmutableApiClientFactory } from 'api-client';
+import { ImmutableApiClient, ImmutableApiClientFactory } from './api-client';
 import {
   getOrderbookConfig,
   OrderbookModuleConfiguration,
   OrderbookOverrides,
-} from 'config/config';
-import {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  Fee,
-  ListingResult,
-  ListListingsResult,
-  OrderStatus,
-} from 'openapi/sdk';
-import { Seaport } from 'seaport';
+} from './config/config';
+import { Fee as OpenApiFee } from './openapi/sdk';
+import { Seaport } from './seaport';
+import { SeaportLibFactory } from './seaport/seaport-lib-factory';
 import {
   CancelOrderResponse,
   CreateListingParams,
+  Fee,
   FulfillOrderResponse,
   ListListingsParams,
+  ListListingsResult,
+  ListingResult,
+  OrderStatus,
   PrepareListingParams,
   PrepareListingResponse,
-} from 'types';
-import { SeaportLibFactory } from './seaport/seaport-lib-factory';
+} from './types';
 
 /**
  * zkEVM orderbook SDK
@@ -155,7 +153,13 @@ export class Orderbook {
     const fulfillmentDataRes = await this.apiClient.fulfillmentData([
       {
         order_id: listingId,
-        fee: takerFee,
+        fee: takerFee
+          ? {
+            amount: takerFee.amount,
+            fee_type: takerFee.type as unknown as OpenApiFee.fee_type,
+            recipient: takerFee.recipient,
+          }
+          : undefined,
       },
     ]);
 

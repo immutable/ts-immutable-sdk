@@ -7,9 +7,9 @@ on:
   pull_request:
 
 jobs:
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
+  build:
+    name: Build, Lint, Typecheck, Test
+    runs-on: ubuntu-latest-8-cores
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -29,107 +29,15 @@ jobs:
 
       - name: Lint
         run: yarn lint
-      
-  build-esm:
-    name: SDK ES Modules
-    runs-on: ubuntu-latest-8-cores
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Use Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: lts/*
-          registry-url: https://registry.npmjs.org/
-          cache: 'yarn'
-
-      - name: Install dependencies
-        run: yarn install --immutable
 
       - name: Build
-        run: export NODE_OPTIONS=--max-old-space-size=6144 && yarn build:esm
+        run: export NODE_OPTIONS=--max-old-space-size=6144 && yarn build
 
       - name: Typecheck
         run: yarn typecheck
 
       - name: Test
         run: yarn test
-
-      - name: Get reviewing teams
-        id: reviewer-teams
-        run: echo "teams=${{ join(github.event.pull_request.requested_teams.*.name, ', ') }}" >> $GITHUB_OUTPUT
-
-      - name: Checkout SDK test coverage
-        if: ${{ contains(steps.reviewer-teams.outputs.teams, 'Wallets')}}
-        run: yarn test:checkout:sdk:coverage
-
-      - name: Upload Checkout SDK test coverage artifacts
-        if: ${{ contains(steps.reviewer-teams.outputs.teams, 'Wallets')}}
-        uses: actions/upload-artifact@v2
-        with:
-          name: checkout-sdk-coverage-report
-          path: ./packages/checkout/sdk/coverage
-
-  build-browser:
-    name: SDK Browser Bundle
-    runs-on: ubuntu-latest-8-cores
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Use Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: lts/*
-          registry-url: https://registry.npmjs.org/
-          cache: 'yarn'
-
-      - name: Install dependencies
-        run: yarn install --immutable
-
-      - name: Build
-        run: export NODE_OPTIONS=--max-old-space-size=6144 && yarn build:browser
-
-  build-cjs:
-    name: SDK CommonJS
-    runs-on: ubuntu-latest-8-cores
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Use Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: lts/*
-          registry-url: https://registry.npmjs.org/
-          cache: 'yarn'
-
-      - name: Install dependencies
-        run: yarn install --immutable
-
-      - name: Build
-        run: export NODE_OPTIONS=--max-old-space-size=6144 && yarn build:cjs
-
-  build-checkout:
-    name: Checkout build & test
-    runs-on: ubuntu-latest-8-cores
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Use Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: lts/*
-          registry-url: https://registry.npmjs.org/
-          cache: 'yarn'
-
-      - name: Install dependencies
-        run: yarn install --immutable
-
-      - name: Build
-        run: export NODE_OPTIONS=--max-old-space-size=6144 && yarn build:checkout-widget
 
       - name: Get reviewing teams
         id: reviewer-teams
@@ -152,3 +60,14 @@ jobs:
         with:
           name: checkout-widgets-cypress-screenshots
           path: ./packages/checkout/widgets-lib/cypress/screenshots
+
+      - name: Checkout SDK test coverage
+        if: ${{ contains(steps.reviewer-teams.outputs.teams, 'Wallets')}}
+        run: yarn test:checkout:sdk:coverage
+
+      - name: Upload Checkout SDK test coverage artifacts
+        if: ${{ contains(steps.reviewer-teams.outputs.teams, 'Wallets')}}
+        uses: actions/upload-artifact@v2
+        with:
+          name: checkout-sdk-coverage-report
+          path: ./packages/checkout/sdk/coverage

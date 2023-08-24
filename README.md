@@ -109,10 +109,6 @@ In order to regenerate these clients with updated spec files, follow the steps b
 
 From a root level, if you want to build the dependencies of the core SDK and other dependencies, have a look at the `build` script at the root `package.json`.
 
-The build script takes a while and builds 3 bundle types: ES Modules, Browser and CommonJS
-
-You can choose to build a specific bundle type using `build:cjs`, `build:esm` or `build:browser`
-
 If your package isn't part of the dependency tree for the main SDK, then you might need to manually build your project using:
 
 ```sh
@@ -276,6 +272,9 @@ To use this action, you will need to:
 You can optionally do a dry run by checking the `Dry run` checkbox. This will run the workflow, but not publish the SDK to NPM, or create a new GitHub release/tag. This is useful to see what the workflow will tag the next release version as, before actually releasing it.
 
 #### Versioning
+
+> [!IMPORTANT]
+> While the SDK are on `0.X` releases, interface or breaking changes should bump the minor version, whilst non-breaking changes should bump the patch version.
 
 > [!IMPORTANT]
 > While the SDK are on `0.X` releases, interface or breaking changes should bump the minor version, whilst non-breaking changes should bump the patch version.
