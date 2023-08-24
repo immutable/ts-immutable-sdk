@@ -11,6 +11,7 @@ import { AddPassportOption } from './internal/AddPassportOption';
  * @interface WalletReactProps
  * @property {WalletProviderName | undefined} walletProvider - The name of the wallet provider.
  * @property {Web3Provider | undefined} provider - The Web3 provider.
+ * @property {Passport | undefined} passport - The Passport instance to create a Web3Provider.
  */
 export interface WalletReactProps {
   walletProvider?: WalletProviderName;

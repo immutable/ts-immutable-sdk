@@ -16,7 +16,7 @@ export abstract class ImmutableWebComponent extends HTMLElement {
   passport: Passport | undefined;
 
   static get observedAttributes() {
-    return ['widgetConfig'];
+    return ['widgetconfig']; // attributes must be lowercase
   }
 
   setProvider(provider: Web3Provider): void {
@@ -30,7 +30,7 @@ export abstract class ImmutableWebComponent extends HTMLElement {
   }
 
   attributeChangedCallback(name: string, oldValue, newValue: any) {
-    if (name === 'widgetConfig') {
+    if (name === 'widgetconfig') {
       this.widgetConfig = this.parseWidgetConfig(newValue);
       this.updateCheckout();
     } else {
@@ -44,8 +44,7 @@ export abstract class ImmutableWebComponent extends HTMLElement {
   }
 
   connectedCallback() {
-    console.log('super connectedCallback');
-    const widgetConfig = this.getAttribute('widgetConfig') || undefined;
+    const widgetConfig = this.getAttribute('widgetconfig') || undefined;
     this.widgetConfig = this.parseWidgetConfig(widgetConfig);
     this.updateCheckout();
   }

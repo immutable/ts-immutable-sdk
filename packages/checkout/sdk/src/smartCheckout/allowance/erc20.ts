@@ -2,7 +2,7 @@ import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
 import { BigNumber, Contract } from 'ethers';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { ERC20ABI, ItemRequirement, ItemType } from '../../types';
-import { SufficientAllowance } from './types';
+import { Allowance, InsufficientERC20 } from './types';
 
 // Gets the amount an address has allowed to be spent by the spender for the ERC20.
 export const getERC20Allowance = async (
@@ -60,13 +60,13 @@ export const hasERC20Allowances = async (
   itemRequirements: ItemRequirement[],
 ): Promise<{
   sufficient: boolean,
-  allowances: SufficientAllowance[]
+  allowances: Allowance[]
 }> => {
   let sufficient = true;
-  const sufficientAllowances: SufficientAllowance[] = [];
+  const sufficientAllowances: Allowance[] = [];
   const erc20s = new Map<string, ItemRequirement>();
   const allowancePromises = new Map<string, Promise<BigNumber>>();
-  const insufficientERC20s = new Map<string, SufficientAllowance>();
+  const insufficientERC20s = new Map<string, InsufficientERC20>();
   const transactionPromises = new Map<string, Promise<TransactionRequest | undefined>>();
 
   // Populate maps for both the ERC20 data and promises to get the allowance using the same key

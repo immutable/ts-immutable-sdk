@@ -2,6 +2,7 @@ export const networkMenuStyles = {
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'flex-start',
+  paddingTop: 'base.spacing.x4',
 };
 
 export const activeNetworkButtonStyle = {

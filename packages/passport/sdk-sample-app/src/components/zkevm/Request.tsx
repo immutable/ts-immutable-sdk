@@ -47,6 +47,13 @@ const EthereumMethods: EthereumMethod[] = [
     ],
   },
   {
+    name: 'eth_getCode',
+    params: [
+      { name: 'address' },
+      { name: 'blockNumber/tag', default: 'latest' },
+    ],
+  },
+  {
     name: 'eth_getStorageAt',
     params: [
       { name: 'address' },

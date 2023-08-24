@@ -18,7 +18,7 @@ import {
   walletBalanceOuterContainerStyles,
   walletBalanceContainerStyles,
   walletBalanceLoadingIconStyles,
-  WalletBalanceItemStyle,
+  walletBalanceListContainerStyles,
 } from './WalletBalancesStyles';
 import { getL1ChainId, getL2ChainId } from '../../../lib/networkUtils';
 import {
@@ -59,6 +59,7 @@ export function WalletBalances() {
   const [walletAddress, setWalletAddress] = useState('');
   const [insufficientFundsForBridgeToL2Gas, setInsufficientFundsForBridgeToL2Gas] = useState(false);
   const isPassport = isPassportProvider(provider);
+  const showNetworkMenu = !isPassport;
 
   useEffect(() => {
     (async () => {
@@ -211,13 +212,10 @@ export function WalletBalances() {
         sx={walletBalanceOuterContainerStyles}
       >
         <Box sx={walletBalanceContainerStyles}>
-          {!isPassport && <NetworkMenu setBalancesLoading={setBalancesLoading} />}
+          {showNetworkMenu && <NetworkMenu setBalancesLoading={setBalancesLoading} />}
           <TotalTokenBalance totalBalance={totalFiatAmount} />
           <Box
-            sx={WalletBalanceItemStyle(
-              showAddCoins,
-              tokenBalances.length > 2 || balancesLoading,
-            )}
+            sx={walletBalanceListContainerStyles(showNetworkMenu, showAddCoins)}
           >
             {balancesLoading && (
             <Box sx={walletBalanceLoadingIconStyles}>
