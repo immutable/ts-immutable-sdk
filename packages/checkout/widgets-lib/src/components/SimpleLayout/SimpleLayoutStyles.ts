@@ -48,6 +48,8 @@ export const heroContentStyle = {
 };
 
 export const bodyStyle = {
+  display: 'flex',
+  flexDirection: 'column',
   flex: '1 0 0', // needed to set flex-basis to 0 for even distribution with HeroContent
   width: '100%',
 };

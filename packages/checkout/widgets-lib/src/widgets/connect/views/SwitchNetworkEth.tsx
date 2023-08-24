@@ -2,7 +2,7 @@ import { useCallback, useContext, useState } from 'react';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../../components/Footer/FooterButton';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
-import { EthereumNetworkHero } from '../../../components/Hero/EthereumNetworkHero';
+import { EthereumPlanetHero } from '../../../components/Hero/EthereumPlanetHero';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { text } from '../../../resources/text/textConfig';
@@ -73,7 +73,7 @@ export function SwitchNetworkEth() {
           onActionClick={switchNetwork}
         />
       )}
-      heroContent={<EthereumNetworkHero />}
+      heroContent={<EthereumPlanetHero />}
       floatHeader
     >
       <SimpleTextBody heading={heading}>{body}</SimpleTextBody>

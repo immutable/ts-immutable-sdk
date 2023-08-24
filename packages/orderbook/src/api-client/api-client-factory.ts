@@ -1,4 +1,4 @@
-import { OrderBookClient } from 'openapi/sdk';
+import { OrderBookClient } from '../openapi/sdk';
 import { ImmutableApiClient } from './api-client';
 
 export class ImmutableApiClientFactory {

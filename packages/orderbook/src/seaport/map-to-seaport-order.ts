@@ -3,9 +3,9 @@ import {
   OrderComponents,
   TipInputItem,
 } from '@opensea/seaport-js/lib/types';
-import { ERC721Item, Order } from 'openapi/sdk';
 import { constants } from 'ethers';
 import { ItemType, OrderType } from './constants';
+import { ERC721Item, Order } from '../openapi/sdk';
 
 export function mapImmutableOrderToSeaportOrderComponents(
   order: Order,
