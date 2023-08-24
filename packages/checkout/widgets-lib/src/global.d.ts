@@ -10,6 +10,7 @@ import {
   ImtblTransitionExampleProps,
   ImtblInnerWidgetExampleProps,
   ImtblOuterWidgetExampleProps,
+  ImtblPrimaryRevenueProps,
 } from '@imtbl/checkout-widgets';
 
 declare global {
