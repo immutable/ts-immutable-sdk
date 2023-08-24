@@ -8,12 +8,12 @@ import type {
 } from 'ethers';
 import type { Provider } from '@ethersproject/providers';
 import {
-  ImmutableERC721PermissionedMintable,
-  ImmutableERC721PermissionedMintable__factory,
+  ImmutableERC721MintByID,
+  ImmutableERC721MintByID__factory,
 } from '@imtbl/contracts';
 import {
   ImmutableERC721Base,
-} from '@imtbl/contracts/dist/typechain/types/ImmutableERC721PermissionedMintable';
+} from '@imtbl/contracts/dist/typechain/types/ImmutableERC721MintByID';
 import { PromiseOrValue } from '@imtbl/contracts/dist/typechain/types/common';
 
 // Struct for specifying token IDs to mint to an address.
@@ -22,11 +22,14 @@ export type IDMint = ImmutableERC721Base.IDMintStruct;
 // Struct for transferring multiple tokens between two addresses.
 export type TransferRequest = ImmutableERC721Base.TransferRequestStruct;
 
-export class ERC721PermissionedMintable {
-  private readonly contract: ImmutableERC721PermissionedMintable;
+// Struct for safe burning multiple tokens from a single address.
+export type IDBurn = ImmutableERC721Base.IDBurnStruct;
+
+export class ERC721MintByID {
+  private readonly contract: ImmutableERC721MintByID;
 
   constructor(contractAddress: string) {
-    const factory = new ImmutableERC721PermissionedMintable__factory();
+    const factory = new ImmutableERC721MintByID__factory();
     this.contract = factory.attach(contractAddress);
   }
 
@@ -350,6 +353,31 @@ export class ERC721PermissionedMintable {
     } = {},
   ): Promise<PopulatedTransaction> {
     return await this.contract.populateTransaction.safeMintBatch(mints, overrides);
+  }
+
+  /**
+   * @returns a populated transaction for the safe burn contract function
+   */
+  public async populateSafeBurn(
+    owner: PromiseOrValue<string>,
+    tokenId: PromiseOrValue<BigNumberish>,
+    overrides: Overrides & {
+      from?: PromiseOrValue<string>;
+    } = {},
+  ): Promise<PopulatedTransaction> {
+    return await this.contract.populateTransaction.safeBurn(owner, tokenId, overrides);
+  }
+
+  /**
+   * @returns a populated transaction for the safe burn batch contract function
+   */
+  public async populateSafeBurnBatch(
+    burns: IDBurn[],
+    overrides: Overrides & {
+      from?: PromiseOrValue<string>;
+    } = {},
+  ): Promise<PopulatedTransaction> {
+    return await this.contract.populateTransaction.safeBurnBatch(burns, overrides);
   }
 
   /**

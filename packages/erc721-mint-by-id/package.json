@@ -1,6 +1,6 @@
 {
-  "name": "@imtbl/erc721-permissioned-mintable",
-  "description": "Wrapper functions for interacting with a deployed ERC721PermissionedMintable contract.",
+  "name": "@imtbl/erc721-mint-by-id",
+  "description": "Wrapper functions for interacting with a deployed ImmutableERC721MintByID contract.",
   "version": "0.0.0",
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
