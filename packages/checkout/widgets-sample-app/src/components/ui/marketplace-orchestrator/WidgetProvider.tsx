@@ -8,6 +8,7 @@ export interface WidgetState {
   showWallet: ShowWidget;
   showSwap: ShowWidget;
   showBridge: ShowWidget;
+  showOnRamp: ShowWidget;
 }
 
 export interface WidgetContextState {
@@ -20,6 +21,7 @@ export const hideAllWidgets: WidgetState = {
   showWallet: {show: false, data: {}},
   showSwap: {show: false, data: {}},
   showBridge: {show: false, data: {}},
+  showOnRamp: {show: false, data: {}},
 }
 
 export const initialWidgetContextState: WidgetContextState = {

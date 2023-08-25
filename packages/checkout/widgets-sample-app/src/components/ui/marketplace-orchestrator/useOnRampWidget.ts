@@ -1,36 +1,20 @@
 import {
   IMTBLWidgetEvents,
+  OnRampEventType,
   OrchestrationEventType,
-  SwapEventType,
-  SwapFailed,
-  SwapRejected,
-  SwapSuccess,
 } from '@imtbl/checkout-widgets';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect } from 'react';
 import { WidgetContext, hideAllWidgets } from './WidgetProvider';
 import { handleOrchestrationEvent } from './orchestration';
 
-export function useSwapWidget(setDoneSwap: (val: boolean) => void) {
+export function useOnRampWidget() {
   const {showWidgets, setShowWidgets} = useContext(WidgetContext);
-  const {showSwap} = showWidgets;
+  const {showOnRamp} = showWidgets;
 
   useEffect(() => {
-    const handleSwapWidgetEvents = ((event: CustomEvent) => {
+    const handleOnRampWidgetEvents = ((event: CustomEvent) => {
       switch (event.detail.type) {
-        case SwapEventType.SUCCESS: {
-          const eventData = event.detail.data as SwapSuccess;
-          setDoneSwap(true);
-          break;
-        }
-        case SwapEventType.FAILURE: {
-          const eventData = event.detail.data as SwapFailed;
-          break;
-        }
-        case SwapEventType.REJECTED: {
-          const eventData = event.detail.data as SwapRejected;
-          break;
-        }
-        case SwapEventType.CLOSE_WIDGET: {
+        case OnRampEventType.CLOSE_WIDGET: {
           setShowWidgets(hideAllWidgets);
           break;
         }
@@ -47,19 +31,19 @@ export function useSwapWidget(setDoneSwap: (val: boolean) => void) {
       }
     }) as EventListener;
 
-    if (showSwap) {
+    if (showOnRamp) {
       window.addEventListener(
-        IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT,
-        handleSwapWidgetEvents
+        IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT,
+        handleOnRampWidgetEvents
       );
     }
 
     return () => {
       window.removeEventListener(
-        IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT,
-        handleSwapWidgetEvents
+        IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT,
+        handleOnRampWidgetEvents
       );
     };
-  }, [showSwap]);
+  }, [showOnRamp]);
 
 }
