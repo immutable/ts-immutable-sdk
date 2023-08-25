@@ -21,6 +21,12 @@ jobs:
           node-version: lts/*
           cache: 'yarn'
 
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Build
+        run: export NODE_OPTIONS=--max-old-space-size=6144 && yarn build
+
       # Typecheck Code Snippets in Docs Repo
       - name: Checkout Docs Repo
         uses: actions/checkout@v3
