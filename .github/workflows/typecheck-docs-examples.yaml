@@ -1,0 +1,37 @@
+name: Typecheck Docs Code Snippets
+# typecheck the code snippets in the docs repo against the built version of the
+# sdk from the current branch to raise broken code examples in our docs
+
+on:
+  push:
+
+jobs:
+  TypecheckDocsCodeSnippets:
+    name: Typecheck Docs Code Snippets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: lts/*
+          cache: 'yarn'
+
+      # Typecheck Code Snippets in Docs Repo
+      - name: Checkout Docs Repo
+        uses: actions/checkout@v3
+        with:
+          repository: immutable/imx-docs
+          token: ${{ secrets.PLATFORM_SA_GITHUB_TOKEN }}
+          path: imx-docs
+          ref: main
+
+      - name: Typecheck Code Snippets
+        run: |
+          cd imx-docs
+          yarn add @imtbl/sdk@file:../sdk
+          yarn build-examples
