@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable no-unused-vars */
 
-import { Box, Button } from '@biom3/react';
+import { Body, Box, Button } from '@biom3/react';
 
 import { useEffect, useState } from 'react';
-import { NFT } from '@imtbl/generated-clients/dist/multi-rollup';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
@@ -12,7 +11,7 @@ import { text } from '../../../resources/text/textConfig';
 import { PrimaryRevenueWidgetViews } from '../../../context/view-context/PrimaryRevenueViewContextTypes';
 import { OrderList } from '../components/OrderList';
 
-const mockOrderItems: NFT[] = [
+const mockOrderItems: any[] = [
   {
     name: 'Gems Chest',
     contract_address: '0x18ea1d312a4037B8676c760AbfD7D1DBE65486a1',
@@ -29,6 +28,8 @@ const mockOrderItems: NFT[] = [
     animation_url: 'https://via.placeholder.com/150',
     youtube_url: 'https://via.placeholder.com/150',
     mint_activity_id: '1',
+    price: '0.0001',
+    currency: 'ETH',
   },
   {
     name: 'Redstone Chest',
@@ -46,12 +47,21 @@ const mockOrderItems: NFT[] = [
     animation_url: 'https://via.placeholder.com/151',
     youtube_url: 'https://via.placeholder.com/151',
     mint_activity_id: '2',
+    price: '0.0002',
+    currency: 'ETH',
   },
 ];
 
-export function ReviewOrder() {
+export interface ReviewOrderProps {
+  currency?: string;
+}
+
+export function ReviewOrder(props: ReviewOrderProps) {
   const { header } = text.views[PrimaryRevenueWidgetViews.REVIEW_ORDER];
-  const [orderItems, setOrderItems] = useState<NFT[]>([]);
+  const [orderItems, setOrderItems] = useState<any[]>([]);
+  const [totalPrice, setTotalPrice] = useState<number>(0);
+
+  const { currency } = props;
 
   useEffect(() => {
     // TODO: fetch the order from the BE
@@ -60,9 +70,17 @@ export function ReviewOrder() {
 
     setOrderItems(items);
 
-    // simulate loading time
-    // setTimeout(() => {});
+    // calculate total price
+    const calculatedTotalPrice = items.reduce(
+      (total, item) => parseFloat((total + parseFloat(item.price)).toFixed(5)),
+      0,
+    );
+    setTotalPrice(calculatedTotalPrice);
   });
+
+  const proceedToPayment = () => {
+    // approve with passport
+  };
 
   return (
     <SimpleLayout
@@ -102,18 +120,13 @@ export function ReviewOrder() {
         >
           <Button
             testId="pay-now-button"
-            // disabled={loading}
             variant="primary"
-            // onClick={sendTransaction}
+            onClick={proceedToPayment}
             size="large"
           >
-            {/* {loading ? (
-            <Button.Icon icon="Loading" sx={swapButtonIconLoadingStyle} />
-          ) : (
-            buttonText
-          )} */}
             Pay Now
           </Button>
+          <Body>{`${totalPrice} ${currency ?? 'ETH'}`}</Body>
         </Box>
       </Box>
     </SimpleLayout>

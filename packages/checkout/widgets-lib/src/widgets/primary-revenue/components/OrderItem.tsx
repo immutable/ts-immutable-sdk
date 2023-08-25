@@ -1,9 +1,7 @@
 import { Box, Body } from '@biom3/react';
 
-import { NFT } from '@imtbl/generated-clients/dist/multi-rollup';
-
 export interface OrderItemProps {
-  item: NFT;
+  item: any;
 }
 
 export function OrderItem(props: OrderItemProps) {
@@ -40,7 +38,7 @@ export function OrderItem(props: OrderItemProps) {
           }}
         >
           <Body size="medium" weight="bold">
-            0.0001 ETH
+            {`${item.price} ${item.currency}`}
           </Body>
         </Box>
       </Box>
