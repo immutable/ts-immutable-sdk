@@ -25,9 +25,8 @@
     "unreal": {
       "context": "browser",
       "engines": {
-        "browsers": "Chrome 59"
-      },
-      "outputFormat": "global"
+        "browsers": "Chrome 84"
+      }
     }
   }
 }

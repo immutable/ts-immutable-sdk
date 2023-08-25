@@ -2,6 +2,7 @@ import * as passport from '@imtbl/passport';
 import * as config from '@imtbl/config';
 import * as provider from '@imtbl/provider';
 
+/* eslint-disable no-console */
 /* eslint-disable no-undef */
 const scope = 'openid offline_access profile email transact';
 const audience = 'platform_api';
@@ -45,9 +46,16 @@ let zkEvmProviderInstance: passport.Provider;
 
 declare global {
   interface Window {
-    callFunction: (jsonData: string) => void;
+    callFunction: (jsonData: string) => void,
+    ue: any,
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    Unity: any,
   }
 }
+// eslint-disable-next-line @typescript-eslint/naming-convention
+declare function blu_event(event: string, data: string): void;
+// eslint-disable-next-line @typescript-eslint/naming-convention
+declare function UnityPostMessage(message: string): void;
 
 const callbackToGame = (data: object) => {
   const message = JSON.stringify(data);
@@ -59,6 +67,8 @@ const callbackToGame = (data: object) => {
     } else {
       window.ue.jsconnector.sendtogame(message);
     }
+  } else if (typeof blu_event !== 'undefined') {
+    blu_event('sendtogame', message);
   } else if (typeof UnityPostMessage !== 'undefined') {
     UnityPostMessage(message);
   } else if (window.Unity !== 'undefined') {
