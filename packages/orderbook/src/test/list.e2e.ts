@@ -1,6 +1,6 @@
 import { providers, Wallet } from 'ethers';
 import { Environment } from '@imtbl/config';
-import { Order, OrderStatus } from 'openapi/sdk';
+import { OrderStatus } from 'openapi/sdk';
 import { Orderbook } from 'orderbook';
 import { getLocalhostProvider } from './helpers/provider';
 import { getOffererWallet } from './helpers/signers';
@@ -9,6 +9,7 @@ import { TestToken } from './helpers/test-token';
 import { waitForOrderToBeOfStatus } from './helpers/order';
 import { getConfigFromEnv } from './helpers';
 import { actionAll } from './helpers/actions';
+import { Order } from '../types';
 
 async function createListing(
   sdk: Orderbook,

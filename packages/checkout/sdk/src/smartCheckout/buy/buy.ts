@@ -108,13 +108,13 @@ export const buy = async (
 
   const buyArray = order.result.buy;
   if (buyArray.length > 0) {
-    switch (buyArray[0].item_type) {
+    switch (buyArray[0].type) {
       case 'NATIVE':
         type = ItemType.NATIVE;
         break;
       case 'ERC20':
         type = ItemType.ERC20;
-        contractAddress = buyArray[0].contract_address;
+        contractAddress = buyArray[0].contractAddress;
         break;
       default:
         throw new CheckoutError(
