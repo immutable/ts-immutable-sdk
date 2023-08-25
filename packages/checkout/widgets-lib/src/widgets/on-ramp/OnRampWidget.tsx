@@ -50,7 +50,7 @@ export function OnRampWidget(props: OnRampWidgetProps) {
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>
       <ViewContext.Provider value={viewReducerValues}>
         {viewState.view.type === SharedViews.LOADING_VIEW && (
-          <LoadingView loadingText={initialLoadingText} />
+          <LoadingView loadingText={initialLoadingText} showFooterLogo />
         )}
         {viewState.view.type === OnRampWidgetViews.ONRAMP && (
           <OnRampMain environment={environment} />
