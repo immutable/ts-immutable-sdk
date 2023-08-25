@@ -125,4 +125,6 @@ export interface ImtblPrimaryRevenueProps
   HTMLElement
   > {
   widgetConfig?: string;
+  amount?: string;
+  fromContractAddress?: string;
 }
