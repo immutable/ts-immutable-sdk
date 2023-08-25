@@ -1,7 +1,12 @@
 import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import {
-  Action, ActionType, TransactionPurpose, constants,
+  Action,
+  ActionType,
+  ERC20Item,
+  NativeItem,
+  TransactionPurpose,
+  constants,
 } from '@imtbl/orderbook';
 import {
   BuyResult,
@@ -108,13 +113,13 @@ export const buy = async (
 
   const buyArray = order.result.buy;
   if (buyArray.length > 0) {
-    switch (buyArray[0].item_type) {
+    switch (buyArray[0].type) {
       case 'NATIVE':
         type = ItemType.NATIVE;
         break;
       case 'ERC20':
         type = ItemType.ERC20;
-        contractAddress = buyArray[0].contract_address;
+        contractAddress = buyArray[0].contractAddress;
         break;
       default:
         throw new CheckoutError(
@@ -127,9 +132,9 @@ export const buy = async (
     }
   }
 
-  buyArray.forEach((item: any) => {
-    if (item.item_type !== ItemType.ERC721) {
-      amount = amount.add(BigNumber.from(item.start_amount));
+  buyArray.forEach((item: (ERC20Item | NativeItem)) => {
+    if (item.type !== ItemType.ERC721 as string) {
+      amount = amount.add(BigNumber.from(item.amount));
     }
   });
 
