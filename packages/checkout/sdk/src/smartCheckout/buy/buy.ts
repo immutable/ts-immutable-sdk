@@ -1,7 +1,12 @@
 import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import {
-  Action, ActionType, TransactionPurpose, constants,
+  Action,
+  ActionType,
+  ERC20Item,
+  NativeItem,
+  TransactionPurpose,
+  constants,
 } from '@imtbl/orderbook';
 import {
   BuyResult,
@@ -127,9 +132,9 @@ export const buy = async (
     }
   }
 
-  buyArray.forEach((item: any) => {
-    if (item.item_type !== ItemType.ERC721) {
-      amount = amount.add(BigNumber.from(item.start_amount));
+  buyArray.forEach((item: (ERC20Item | NativeItem)) => {
+    if (item.type !== ItemType.ERC721 as string) {
+      amount = amount.add(BigNumber.from(item.amount));
     }
   });
 
