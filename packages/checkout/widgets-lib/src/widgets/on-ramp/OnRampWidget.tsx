@@ -11,6 +11,7 @@ import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextT
 import { OnRampMain } from './views/OnRampMain';
 import { LoadingView } from '../../views/loading/LoadingView';
 import { text } from '../../resources/text/textConfig';
+import { AnalyticsProvider } from '../../context/SegmentAnalyticsProvider';
 
 const LOADING_VIEW_DELAY_MS = 1000;
 export interface OnRampWidgetProps {
@@ -47,15 +48,17 @@ export function OnRampWidget(props: OnRampWidgetProps) {
   }, [viewDispatch]);
 
   return (
-    <BiomeCombinedProviders theme={{ base: biomeTheme }}>
-      <ViewContext.Provider value={viewReducerValues}>
-        {viewState.view.type === SharedViews.LOADING_VIEW && (
+    <AnalyticsProvider>
+      <BiomeCombinedProviders theme={{ base: biomeTheme }}>
+        <ViewContext.Provider value={viewReducerValues}>
+          {viewState.view.type === SharedViews.LOADING_VIEW && (
           <LoadingView loadingText={initialLoadingText} showFooterLogo />
-        )}
-        {viewState.view.type === OnRampWidgetViews.ONRAMP && (
+          )}
+          {viewState.view.type === OnRampWidgetViews.ONRAMP && (
           <OnRampMain environment={environment} />
-        )}
-      </ViewContext.Provider>
-    </BiomeCombinedProviders>
+          )}
+        </ViewContext.Provider>
+      </BiomeCombinedProviders>
+    </AnalyticsProvider>
   );
 }
