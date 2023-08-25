@@ -1,7 +1,6 @@
 import { log } from 'console';
 import { Environment } from '@imtbl/config';
 import { Wallet } from 'ethers';
-import { FeeType } from 'types';
 import { OrderStatus } from '../openapi/sdk/index';
 import { Orderbook } from '../orderbook';
 import {
@@ -86,7 +85,6 @@ describe('', () => {
       orderSignature: signatures[0],
       makerFee: {
         amount: '1',
-        type: FeeType.MAKER_MARKETPLACE,
         recipient: offerer.address,
       },
     });
@@ -99,7 +97,6 @@ describe('', () => {
       fulfiller.address,
       {
         amount: '1',
-        type: FeeType.TAKER_MARKETPLACE,
         recipient: offerer.address,
       },
     );

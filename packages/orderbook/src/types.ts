@@ -3,15 +3,11 @@ import { PopulatedTransaction, TypedDataDomain, TypedDataField } from 'ethers';
 import {
   Fee as OpenapiFee,
   OrdersService,
+  OrderStatus,
 } from './openapi/sdk';
 
-// Strictly re-export some of the openapi generated types
-export {
-  OrderStatus,
-  ListingResult,
-  ListListingsResult,
-  Order,
-} from './openapi/sdk';
+// Strictly re-export only the OrderStatus enum from the openapi types
+export { OrderStatus } from './openapi/sdk';
 
 export interface ERC721Item {
   type: 'ERC721';
@@ -52,7 +48,7 @@ export interface CreateListingParams {
   orderComponents: OrderComponents;
   orderHash: string;
   orderSignature: string;
-  makerFee?: Fee
+  makerFee?: FeeValue
 }
 
 // Expose the list order filtering and ordering directly from the openAPI SDK, except
@@ -69,10 +65,13 @@ export enum FeeType {
   ROYALTY = OpenapiFee.fee_type.ROYALTY,
 }
 
-export interface Fee {
-  type: FeeType;
+export interface FeeValue {
   recipient: string;
   amount: string;
+}
+
+export interface Fee extends FeeValue {
+  type: FeeType;
 }
 
 export enum TransactionPurpose {
@@ -115,4 +114,56 @@ export interface FulfillOrderResponse {
 
 export interface CancelOrderResponse {
   unsignedCancelOrderTransaction: PopulatedTransaction;
+}
+
+export interface Order {
+  id: string;
+  accountAddress: string;
+  buy: (ERC20Item | NativeItem)[];
+  sell: ERC721Item[];
+  fees: Fee[];
+  chain: {
+    id: string;
+    name: string;
+  };
+  createTime: string;
+  updateTime: string;
+  /**
+   * Time after which the Order is considered active
+   */
+  startTime: string;
+  /**
+   * Time after which the Order is expired
+   */
+  endTime: string;
+  protocolData: {
+    orderType: 'FULL_RESTRICTED';
+    zoneAddress: string;
+    counter: string;
+    seaportAddress: string;
+    seaportVersion: string;
+  }
+  salt: string;
+  signature: string;
+  status: OrderStatus;
+}
+
+export interface ListingResult {
+  result: Order;
+}
+
+export interface ListListingsResult {
+  page: Page;
+  result: Order[];
+}
+
+export interface Page {
+  /**
+   * First item as an encoded string
+   */
+  previousCursor: string | null;
+  /**
+   * Last item as an encoded string
+   */
+  nextCursor: string | null;
 }
