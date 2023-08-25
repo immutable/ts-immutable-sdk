@@ -3,6 +3,8 @@ import { ChainId, ChainName } from './chains';
 import { TokenInfo } from './tokenInfo';
 
 export const ENV_DEVELOPMENT = 'development' as Environment;
+export const IMX_ADDRESS_ZKEVM = '0x0000000000000000000000000000000000001010';
+export const DEFAULT_TOKEN_DECIMALS = 18;
 
 /**
  * Base URL for the checkout API based on the environment.
@@ -300,6 +302,25 @@ export const ERC721ABI = [
       },
     ],
     payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
+    name: 'ownerOf',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
     stateMutability: 'view',
     type: 'function',
   },
