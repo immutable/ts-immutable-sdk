@@ -1,15 +1,15 @@
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { BigNumber } from '@ethersproject/bignumber';
 import {
+  expectToBeDefined,
   TEST_FROM_ADDRESS, TEST_PERIPHERY_ROUTER_ADDRESS, TEST_ROUTING_CONTRACTS, WETH_TEST_TOKEN,
 } from 'test/utils';
 import { Contract } from '@ethersproject/contracts';
 import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
 import { ApproveError } from 'errors';
-import { BytesLike } from '@ethersproject/bytes';
 import { ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
-import { SecondaryFee } from 'lib';
+import { newAmount, SecondaryFee } from 'lib';
 import { getApproveGasEstimate, getApproveTransaction, prepareApproval } from './approval';
 
 jest.mock('@ethersproject/providers');
@@ -19,7 +19,7 @@ jest.mock('@ethersproject/contracts');
 const spenderAddress = TEST_PERIPHERY_ROUTER_ADDRESS;
 const fromAddress = TEST_FROM_ADDRESS;
 const existingAllowance = BigNumber.from('1000000000000000000');
-const tokenInAmount = BigNumber.from('2000000000000000000');
+const tokenInAmount = newAmount(BigNumber.from('2000000000000000000'), WETH_TEST_TOKEN);
 
 describe('getApprovalTransaction', () => {
   describe('when the allowance is greater than the given amount', () => {
@@ -52,8 +52,7 @@ describe('getApprovalTransaction', () => {
       const result = await getApproveTransaction(
         provider,
         TEST_FROM_ADDRESS,
-        WETH_TEST_TOKEN.address,
-        BigNumber.from('100000000000000000'),
+        newAmount(BigNumber.from('100000000000000000'), WETH_TEST_TOKEN),
         spenderAddress,
       );
       expect(result).toBeNull();
@@ -88,24 +87,22 @@ describe('getApprovalTransaction', () => {
       // Mock the contract instance creation
       erc20ContractFactory.connect.mockReturnValue(erc20Contract);
 
-      const expectedAmountToApprove = tokenInAmount.sub(existingAllowance);
+      const expectedAmountToApprove = tokenInAmount.value.sub(existingAllowance);
 
       const result = await getApproveTransaction(
         provider,
         TEST_FROM_ADDRESS,
-        WETH_TEST_TOKEN.address,
         tokenInAmount,
         spenderAddress,
       );
 
-      expect(result).not.toBeNull();
-      expect(result?.data).not.toBeNull();
-      expect(result?.to).toEqual(WETH_TEST_TOKEN.address);
-      expect(result?.from).toEqual(TEST_FROM_ADDRESS);
-      expect(result?.value).toEqual(0); // we do not want to send any ETH
+      expectToBeDefined(result?.data);
+      expect(result.to).toEqual(WETH_TEST_TOKEN.address);
+      expect(result.from).toEqual(TEST_FROM_ADDRESS);
+      expect(result.value).toEqual(0); // we do not want to send any ETH
 
       const erc20ContractInterface = ERC20__factory.createInterface();
-      const decodedResults = erc20ContractInterface.decodeFunctionData('approve', result?.data as BytesLike);
+      const decodedResults = erc20ContractInterface.decodeFunctionData('approve', result.data);
       expect(decodedResults[0]).toEqual(TEST_PERIPHERY_ROUTER_ADDRESS);
       expect(decodedResults[1].toString()).toEqual(expectedAmountToApprove.toString());
       expect(erc20Contract.mock.calls.length).toEqual(1);
@@ -142,15 +139,15 @@ describe('getApprovalTransaction', () => {
       const result = await getApproveTransaction(
         provider,
         TEST_FROM_ADDRESS,
-        WETH_TEST_TOKEN.address,
         tokenInAmount,
         spenderAddress,
       );
+      expectToBeDefined(result?.data);
 
       const erc20ContractInterface = ERC20__factory.createInterface();
-      const decodedResults = erc20ContractInterface.decodeFunctionData('approve', result?.data as BytesLike);
+      const decodedResults = erc20ContractInterface.decodeFunctionData('approve', result.data);
 
-      expect(decodedResults[1].toString()).toEqual(tokenInAmount.toString());
+      expect(decodedResults[1].toString()).toEqual(tokenInAmount.value.toString());
     });
 
     describe('when the allowance rpc call fails', () => {
@@ -183,7 +180,6 @@ describe('getApprovalTransaction', () => {
         await expect(getApproveTransaction(
           provider,
           TEST_FROM_ADDRESS,
-          WETH_TEST_TOKEN.address,
           tokenInAmount,
           spenderAddress,
         ))
@@ -194,7 +190,7 @@ describe('getApprovalTransaction', () => {
 
   describe("when the owner's address is the same as the spender's address", () => {
     it('should throw an ApproveError', async () => {
-      const amount = BigNumber.from('2000000000000000000');
+      const amount = newAmount(BigNumber.from('2000000000000000000'), WETH_TEST_TOKEN);
 
       const erc20Contract = (Contract as unknown as jest.Mock).mockImplementation(
         () => ({
@@ -210,7 +206,6 @@ describe('getApprovalTransaction', () => {
       await expect(() => getApproveTransaction(
         provider,
         spenderAddress,
-        WETH_TEST_TOKEN.address,
         amount,
         spenderAddress,
       )).rejects.toThrow(new ApproveError('owner and spender addresses are the same'));
@@ -251,8 +246,8 @@ describe('getApproveGasEstimate', () => {
 describe('prepareApproval', () => {
   describe('when exact input amount is specified', () => {
     it('uses the amount specified by the user', () => {
-      const amountSpecified = ethers.BigNumber.from(1);
-      const amountWithSlippage = ethers.BigNumber.from(2);
+      const amountSpecified = newAmount(ethers.BigNumber.from(1), WETH_TEST_TOKEN);
+      const amountWithSlippage = newAmount(ethers.BigNumber.from(2), WETH_TEST_TOKEN);
       const secondaryFees = [{ basisPoints: 0, recipient: TEST_FROM_ADDRESS }];
       const approval = prepareApproval(
         TradeType.EXACT_INPUT,
@@ -267,8 +262,8 @@ describe('prepareApproval', () => {
 
   describe('when exact output amount is specified', () => {
     it('uses the amount calculated with slippage', () => {
-      const amountSpecified = ethers.BigNumber.from(1);
-      const amountWithSlippage = ethers.BigNumber.from(2);
+      const amountSpecified = newAmount(ethers.BigNumber.from(1), WETH_TEST_TOKEN);
+      const amountWithSlippage = newAmount(ethers.BigNumber.from(2), WETH_TEST_TOKEN);
       const secondaryFees = [{ basisPoints: 0, recipient: TEST_FROM_ADDRESS }];
       const approval = prepareApproval(
         TradeType.EXACT_OUTPUT,
@@ -283,8 +278,8 @@ describe('prepareApproval', () => {
 
   describe('when secondary fees are specified', () => {
     it('uses the secondary fee address as the spender', () => {
-      const amountSpecified = ethers.BigNumber.from(1);
-      const amountWithSlippage = ethers.BigNumber.from(2);
+      const amountSpecified = newAmount(ethers.BigNumber.from(1), WETH_TEST_TOKEN);
+      const amountWithSlippage = newAmount(ethers.BigNumber.from(2), WETH_TEST_TOKEN);
       const secondaryFees = [{ basisPoints: 0, recipient: TEST_FROM_ADDRESS }];
       const approval = prepareApproval(
         TradeType.EXACT_OUTPUT,
@@ -299,8 +294,8 @@ describe('prepareApproval', () => {
 
   describe('when no secondary fees are specified', () => {
     it('uses the periphery router address as the spender', () => {
-      const amountSpecified = ethers.BigNumber.from(1);
-      const amountWithSlippage = ethers.BigNumber.from(2);
+      const amountSpecified = newAmount(ethers.BigNumber.from(1), WETH_TEST_TOKEN);
+      const amountWithSlippage = newAmount(ethers.BigNumber.from(2), WETH_TEST_TOKEN);
       const secondaryFees: SecondaryFee[] = [];
       const approval = prepareApproval(
         TradeType.EXACT_OUTPUT,

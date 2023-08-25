@@ -50,14 +50,13 @@ describe('getSwap', () => {
       quote.amountOut.value = utils.parseEther('990');
 
       const swap = getSwap(
-        IMX_TEST_TOKEN,
         quote,
         makeAddr('fromAddress'),
         3,
         0,
         makeAddr('periphery'),
         makeAddr('secondaryFeeContract'),
-        BigNumber.from(0),
+        newAmount(BigNumber.from(0), IMX_TEST_TOKEN),
         [],
       );
 
@@ -73,14 +72,13 @@ describe('getSwap', () => {
       quote.amountIn.value = utils.parseEther('100');
 
       const swap = getSwap(
-        IMX_TEST_TOKEN,
         quote,
         makeAddr('fromAddress'),
         3,
         0,
         makeAddr('periphery'),
         makeAddr('secondaryFeeContract'),
-        BigNumber.from(0),
+        newAmount(BigNumber.from(0), IMX_TEST_TOKEN),
         [],
       );
 
@@ -98,14 +96,13 @@ describe('getSwap', () => {
       quote.amountOut.value = utils.parseEther('990');
 
       const swap = getSwap(
-        IMX_TEST_TOKEN,
         quote,
         makeAddr('fromAddress'),
         3,
         0,
         makeAddr('periphery'),
         makeAddr('secondaryFeeContract'),
-        BigNumber.from(0),
+        newAmount(BigNumber.from(0), IMX_TEST_TOKEN),
         [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
       );
 
@@ -121,14 +118,13 @@ describe('getSwap', () => {
       quote.amountIn.value = utils.parseEther('100');
 
       const swap = getSwap(
-        IMX_TEST_TOKEN,
         quote,
         makeAddr('fromAddress'),
         3,
         0,
         makeAddr('periphery'),
         makeAddr('secondaryFeeContract'),
-        BigNumber.from(0),
+        newAmount(BigNumber.from(0), IMX_TEST_TOKEN),
         [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
       );
 
