@@ -46,3 +46,11 @@ export interface GetAllBalancesParams {
 export interface GetAllBalancesResult {
   balances: GetBalanceResult[];
 }
+
+/**
+ * Interface representing the result of {@link Checkout.getBalances}.
+ * @property {GetBalanceResult[]} balances - The array of balances of the wallet specific tokens.
+ */
+export interface GetBalancesResult {
+  balances: GetBalanceResult[];
+}

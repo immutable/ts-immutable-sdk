@@ -4,7 +4,7 @@ import {
   DEFAULT_TOKEN_DECIMALS,
   ERC20Item,
   ERC721Item,
-  IMX_ADDRESS_ZKEVM,
+  IMX_ADDRESS_ZKEVM, ItemRequirement,
   ItemType,
   NativeItem,
   TokenInfo,
@@ -16,6 +16,22 @@ import {
   BalanceResult,
   BalanceTokenResult,
 } from './types';
+
+export const getTokensFromRequirements = (itemRequirements: ItemRequirement[]): TokenInfo[] => itemRequirements
+  .map((itemRequirement) => {
+    if (itemRequirement.type === ItemType.NATIVE) {
+      return {
+        name: 'IMX',
+        symbol: 'IMX',
+        address: IMX_ADDRESS_ZKEVM,
+      } as TokenInfo;
+    }
+
+    return {
+      name: itemRequirement.type,
+      address: itemRequirement.contractAddress,
+    } as TokenInfo;
+  });
 
 /**
  * Gets the balance requirement with delta for an ERC721 requirement.
@@ -78,7 +94,8 @@ export const getTokenBalanceRequirement = (
     });
   } else if (itemRequirement.type === ItemType.NATIVE) {
     itemBalanceResult = balances.find((balance) => {
-      return (balance as BalanceTokenResult).token?.address === IMX_ADDRESS_ZKEVM;
+      return !('address' in (balance as BalanceTokenResult).token)
+        || (balance as BalanceTokenResult).token?.address === IMX_ADDRESS_ZKEVM;
     });
   }
 

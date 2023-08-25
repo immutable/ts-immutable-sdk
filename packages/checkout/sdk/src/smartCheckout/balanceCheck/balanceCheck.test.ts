@@ -9,7 +9,7 @@ import {
 } from '../../types';
 import { balanceCheck } from './balanceCheck';
 import { CheckoutConfiguration } from '../../config';
-import { getAllBalances } from '../../balances';
+import { getBalances } from '../../balances';
 import { BalanceCheckInsufficient } from './types';
 
 jest.mock('../../balances');
@@ -47,7 +47,7 @@ describe('balanceCheck', () => {
           amount: BigNumber.from(1),
         },
       ];
-      const getAllBalancesResult = {
+      const getBalancesResult = {
         balances:
           [
             {
@@ -62,7 +62,7 @@ describe('balanceCheck', () => {
             },
           ],
       };
-      (getAllBalances as jest.Mock).mockResolvedValue(getAllBalancesResult);
+      (getBalances as jest.Mock).mockResolvedValue(getBalancesResult);
 
       const balanceRequirements = await balanceCheck(config, mockProvider, '0xADDRESS', itemRequirements);
       expect(balanceRequirements.sufficient).toEqual(true);
@@ -75,7 +75,7 @@ describe('balanceCheck', () => {
           amount: BigNumber.from(3),
         },
       ];
-      const getAllBalancesResult = {
+      const getBalancesResult = {
         balances:
           [
             {
@@ -90,7 +90,7 @@ describe('balanceCheck', () => {
             },
           ],
       };
-      (getAllBalances as jest.Mock).mockResolvedValue(getAllBalancesResult);
+      (getBalances as jest.Mock).mockResolvedValue(getBalancesResult);
 
       const balanceRequirements = await balanceCheck(config, mockProvider, '0xADDRESS', itemRequirements);
       expect(balanceRequirements.sufficient).toEqual(false);
@@ -104,7 +104,7 @@ describe('balanceCheck', () => {
                 balance: BigNumber.from(2),
                 formattedBalance: '0.000000000000000002',
               },
-              current: getAllBalancesResult.balances[0],
+              current: getBalancesResult.balances[0],
               required: {
                 balance: BigNumber.from(3),
                 formattedBalance: '0.000000000000000003',
@@ -132,7 +132,7 @@ describe('balanceCheck', () => {
           spenderAddress: '0xSEAPORT',
         },
       ];
-      const getAllBalancesResult = {
+      const getBalancesResult = {
         balances:
           [
             {
@@ -147,7 +147,7 @@ describe('balanceCheck', () => {
             },
           ],
       };
-      (getAllBalances as jest.Mock).mockResolvedValue(getAllBalancesResult);
+      (getBalances as jest.Mock).mockResolvedValue(getBalancesResult);
 
       const balanceRequirements = await balanceCheck(config, mockProvider, '0xADDRESS', itemRequirements);
       expect(balanceRequirements.sufficient).toEqual(true);
@@ -162,7 +162,7 @@ describe('balanceCheck', () => {
           spenderAddress: '0xSEAPORT',
         },
       ];
-      const getAllBalancesResult = {
+      const getBalancesResult = {
         balances:
           [
             {
@@ -177,7 +177,7 @@ describe('balanceCheck', () => {
             },
           ],
       };
-      (getAllBalances as jest.Mock).mockResolvedValue(getAllBalancesResult);
+      (getBalances as jest.Mock).mockResolvedValue(getBalancesResult);
 
       const balanceRequirements = await balanceCheck(config, mockProvider, '0xADDRESS', itemRequirements);
       expect(balanceRequirements.sufficient).toEqual(false);
@@ -191,7 +191,7 @@ describe('balanceCheck', () => {
                 balance: BigNumber.from(5),
                 formattedBalance: '0.000000000000000005',
               },
-              current: getAllBalancesResult.balances[0],
+              current: getBalancesResult.balances[0],
               required: {
                 balance: BigNumber.from(10),
                 formattedBalance: '0.00000000000000001',
@@ -219,7 +219,7 @@ describe('balanceCheck', () => {
           spenderAddress: '0xSEAPORT',
         },
       ];
-      (getAllBalances as jest.Mock).mockResolvedValue({ balances: [] });
+      (getBalances as jest.Mock).mockResolvedValue({ balances: [] });
       (Contract as unknown as jest.Mock).mockReturnValue({
         ownerOf: jest.fn().mockResolvedValue('0xADDRESS'),
       });
@@ -253,8 +253,8 @@ describe('balanceCheck', () => {
           spenderAddress: '0xSEAPORT',
         },
       ];
-      const getAllBalancesResult = { balances: [] };
-      (getAllBalances as jest.Mock).mockResolvedValue(getAllBalancesResult);
+      const getBalancesResult = { balances: [] };
+      (getBalances as jest.Mock).mockResolvedValue(getBalancesResult);
       (Contract as unknown as jest.Mock).mockReturnValue({
         ownerOf: jest.fn().mockResolvedValue('0xADDRESS'),
       });
@@ -342,7 +342,7 @@ describe('balanceCheck', () => {
           spenderAddress: '0xSEAPORT',
         },
       ];
-      const getAllBalancesResult = {
+      const getBalancesResult = {
         balances:
           [
             {
@@ -367,7 +367,7 @@ describe('balanceCheck', () => {
             },
           ],
       };
-      (getAllBalances as jest.Mock).mockResolvedValue(getAllBalancesResult);
+      (getBalances as jest.Mock).mockResolvedValue(getBalancesResult);
       (Contract as unknown as jest.Mock).mockReturnValue({
         ownerOf: jest.fn().mockResolvedValue('0xADDRESS'),
       });
@@ -411,7 +411,7 @@ describe('balanceCheck', () => {
           spenderAddress: '0xSEAPORT',
         },
       ];
-      const getAllBalancesResult = {
+      const getBalancesResult = {
         balances:
           [
             {
@@ -426,7 +426,7 @@ describe('balanceCheck', () => {
             },
           ],
       };
-      (getAllBalances as jest.Mock).mockResolvedValue(getAllBalancesResult);
+      (getBalances as jest.Mock).mockResolvedValue(getBalancesResult);
       (Contract as unknown as jest.Mock).mockReturnValue({
         ownerOf: jest.fn().mockResolvedValue('0xADDRESS'),
       });
@@ -514,8 +514,8 @@ describe('balanceCheck', () => {
           spenderAddress: '0xSEAPORT',
         },
       ];
-      const getAllBalancesResult = { balances: [] };
-      (getAllBalances as jest.Mock).mockResolvedValue(getAllBalancesResult);
+      const getBalancesResult = { balances: [] };
+      (getBalances as jest.Mock).mockResolvedValue(getBalancesResult);
 
       // Mock ERC721 balance as not owned by the spender
       (Contract as unknown as jest.Mock).mockReturnValue({
