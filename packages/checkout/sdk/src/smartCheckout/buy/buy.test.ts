@@ -193,7 +193,7 @@ describe('buy', () => {
           result: {
             buy: [
               {
-                itemType: 'ERC721',
+                type: 'ERC721',
                 tokenId: '1',
                 contractAddress: '0x123',
               },
