@@ -4,7 +4,7 @@ import {
   ChainId,
   ERC20ABI,
   GetAllBalancesResult,
-  GetBalanceResult,
+  GetBalanceResult, GetBalancesResult, IMX_ADDRESS_ZKEVM,
   TokenFilterTypes,
   TokenInfo,
 } from '../types';
@@ -54,49 +54,61 @@ export async function getERC20Balance(
         JSON.stringify(ERC20ABI),
         web3Provider,
       );
-      const name = await contract.name();
-      const symbol = await contract.symbol();
-      const balance = await contract.balanceOf(walletAddress);
-      const decimals = await contract.decimals();
-      const formattedBalance = utils.formatUnits(balance, decimals);
-      return {
-        balance,
-        formattedBalance,
-        token: {
-          name,
-          symbol,
-          decimals,
-          address: contractAddress,
-        },
-      } as GetBalanceResult;
+
+      return Promise.all([
+        contract.name(),
+        contract.symbol(),
+        contract.balanceOf(walletAddress),
+        contract.decimals(),
+      ])
+        .then(([name, symbol, balance, decimals]) => {
+          const formattedBalance = utils.formatUnits(balance, decimals);
+          return {
+            balance,
+            formattedBalance,
+            token: {
+              name,
+              symbol,
+              decimals,
+              address: contractAddress,
+            },
+          } as GetBalanceResult;
+        });
     },
     { type: CheckoutErrorType.GET_ERC20_BALANCE_ERROR },
   );
 }
 
-export const getAllBalances = async (
+/**
+ * Get the balances of the wallet for specific tokens.
+ * @param config
+ * @param web3Provider
+ * @param walletAddress
+ * @param tokens
+ */
+export const getBalances = async (
   config: CheckoutConfiguration,
   web3Provider: Web3Provider,
   walletAddress: string,
-  chainId: ChainId,
-): Promise<GetAllBalancesResult> => {
-  const tokenList = await getTokenAllowList(
-    config,
-    {
-      type: TokenFilterTypes.ALL,
-      chainId,
-    },
-  );
+  tokens: TokenInfo[],
+): Promise<GetBalancesResult> => {
   const allBalancePromises: Promise<GetBalanceResult>[] = [];
-  allBalancePromises.push(getBalance(config, web3Provider, walletAddress));
-
-  tokenList.tokens
-    .forEach((token: TokenInfo) => token.address && allBalancePromises.push(
-      getERC20Balance(web3Provider, walletAddress, token.address),
-    ));
+  tokens
+    .forEach((token: TokenInfo) => {
+      // Check for NATIVE token
+      if (!token.address || token.address === IMX_ADDRESS_ZKEVM) {
+        allBalancePromises.push(
+          getBalance(config, web3Provider, walletAddress),
+        );
+      } else {
+        allBalancePromises.push(
+          getERC20Balance(web3Provider, walletAddress, token.address),
+        );
+      }
+    });
 
   const balanceResults = await Promise.allSettled(allBalancePromises);
-  const getBalanceResults = (
+  const balances = (
     balanceResults.filter(
       (result) => result.status === 'fulfilled',
     ) as PromiseFulfilledResult<GetBalanceResult>[]
@@ -104,5 +116,29 @@ export const getAllBalances = async (
     (fulfilledResult: PromiseFulfilledResult<GetBalanceResult>) => fulfilledResult.value,
   ) as GetBalanceResult[];
 
-  return { balances: getBalanceResults };
+  return { balances };
+};
+
+/**
+ * Get the balances of the wallet for all tokens in allow list.
+ * @param config
+ * @param web3Provider
+ * @param walletAddress
+ * @param chainId
+ */
+export const getAllBalances = async (
+  config: CheckoutConfiguration,
+  web3Provider: Web3Provider,
+  walletAddress: string,
+  chainId: ChainId,
+): Promise<GetAllBalancesResult> => {
+  const { tokens } = await getTokenAllowList(
+    config,
+    {
+      type: TokenFilterTypes.ALL,
+      chainId,
+    },
+  );
+
+  return await getBalances(config, web3Provider, walletAddress, tokens);
 };

@@ -5,10 +5,10 @@ import {
   ERC721ABI,
   ERC721Item,
   ItemRequirement,
-  ItemType,
+  ItemType, TokenInfo,
 } from '../../types';
-import { getAllBalances } from '../../balances';
-import { CheckoutConfiguration, getL2ChainId } from '../../config';
+import { getBalances } from '../../balances';
+import { CheckoutConfiguration } from '../../config';
 import {
   BalanceCheckResult,
   BalanceERC721Result,
@@ -18,7 +18,11 @@ import {
 } from './types';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { balanceAggregator } from '../aggregators/balanceAggregator';
-import { getERC721BalanceRequirement, getTokenBalanceRequirement } from './balanceRequirement';
+import {
+  getERC721BalanceRequirement,
+  getTokenBalanceRequirement,
+  getTokensFromRequirements,
+} from './balanceRequirement';
 
 /**
  * Gets the balances for all NATIVE and ERC20 balance requirements.
@@ -27,12 +31,13 @@ const getTokenBalances = async (
   config: CheckoutConfiguration,
   provider: Web3Provider,
   ownerAddress: string,
+  itemRequirements: ItemRequirement[],
 ) : Promise<BalanceResult[]> => {
   let tokenBalances: BalanceTokenResult[] = [];
 
   try {
-    // TODO: Update to getBalance and getERC20Balance based on itemRequirements token list
-    const { balances } = await getAllBalances(config, provider, ownerAddress, getL2ChainId(config));
+    const tokenList: TokenInfo[] = getTokensFromRequirements(itemRequirements);
+    const { balances } = await getBalances(config, provider, ownerAddress, tokenList);
     tokenBalances = [
       ...balances.map((balance) => balance as BalanceTokenResult),
     ];
@@ -126,7 +131,7 @@ export const balanceCheck = async (
   const tokenItemRequirements: ItemRequirement[] = aggregatedItems
     .filter((itemRequirement) => itemRequirement.type === ItemType.ERC20 || itemRequirement.type === ItemType.NATIVE);
   if (tokenItemRequirements.length > 0) {
-    currentBalances.push(getTokenBalances(config, provider, ownerAddress));
+    currentBalances.push(getTokenBalances(config, provider, ownerAddress, aggregatedItems));
   }
 
   // Get all ERC721 balances
