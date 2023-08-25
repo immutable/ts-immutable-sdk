@@ -25,7 +25,7 @@ export const PageLayout: React.FC<Props> = ({ children }) => {
             className="cursor-pointer hover:underline"
             href="/erc721-permissioned-mintable"
           >
-            ERC721PermissionedMintable
+            ERC721
           </a>
         </div>
       </div>

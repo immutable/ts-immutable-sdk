@@ -33,8 +33,8 @@
     "@imtbl/config": "0.0.0",
     "@imtbl/cryptofiat": "0.0.0",
     "@imtbl/erc20": "0.0.0",
-    "@imtbl/erc721-hybrid-permissioned-mintable": "0.0.0",
-    "@imtbl/erc721-permissioned-mintable": "0.0.0",
+    "@imtbl/erc721": "0.0.0",
+    "@imtbl/erc721-mint-by-id": "0.0.0",
     "@imtbl/generated-clients": "0.0.0",
     "@imtbl/guardian": "0.0.0",
     "@imtbl/immutablex-client": "0.0.0",
@@ -103,13 +103,13 @@
       "types": "./dist/erc20.d.ts",
       "import": "./dist/erc20.js"
     },
-    "./erc721_hybrid_permissioned_mintable": {
-      "types": "./dist/erc721_hybrid_permissioned_mintable.d.ts",
-      "import": "./dist/erc721_hybrid_permissioned_mintable.js"
+    "./erc721": {
+      "types": "./dist/erc721.d.ts",
+      "import": "./dist/erc721.js"
     },
-    "./erc721_permissioned_mintable": {
-      "types": "./dist/erc721_permissioned_mintable.d.ts",
-      "import": "./dist/erc721_permissioned_mintable.js"
+    "./erc721_mint_by_id": {
+      "types": "./dist/erc721_mint_by_id.d.ts",
+      "import": "./dist/erc721_mint_by_id.js"
     }
   },
   "files": [

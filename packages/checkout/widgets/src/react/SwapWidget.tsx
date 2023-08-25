@@ -12,6 +12,7 @@ import { AddPassportOption } from './internal/AddPassportOption';
  * @interface SwapReactProps
  * @property {WalletProviderName | undefined} walletProvider - The name of the wallet provider.
  * @property {Web3Provider | undefined} provider - The Web3 provider.
+ * @property {Passport | undefined} passport - The Passport instance to create a Web3Provider.
  * @property {string | undefined} fromContractAddress - The address of the contract swapping from. If the string is 'NATIVE' then the native token is used.
  * @property {string | undefined} amount - The amount.
  * @property {string | undefined} toContractAddress - The address of the contract swapping to. If the string is 'NATIVE' then the native token is used.

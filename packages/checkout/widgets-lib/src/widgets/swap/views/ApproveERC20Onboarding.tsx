@@ -13,14 +13,14 @@ import {
   PrefilledSwapForm,
   SwapWidgetViews,
 } from '../../../context/view-context/SwapViewContextTypes';
-import { IMXCoinsHero } from '../../../components/Hero/IMXCoinsHero';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
-import { ImmutableNetworkHero } from '../../../components/Hero/ImmutableNetworkHero';
 import { SwapContext } from '../context/SwapContext';
 import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { LoadingView } from '../../../views/loading/LoadingView';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import { isPassportProvider } from '../../../lib/providerUtils';
+import { SpendingCapHero } from '../../../components/Hero/SpendingCapHero';
+import { WalletApproveHero } from '../../../components/Hero/WalletApproveHero';
 
 export interface ApproveERC20Props {
   data: ApproveERC20SwapData;
@@ -294,7 +294,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
             />
 )}
           floatHeader
-          heroContent={showSwapTxnStep ? <ImmutableNetworkHero /> : <IMXCoinsHero />}
+          heroContent={showSwapTxnStep ? <WalletApproveHero /> : <SpendingCapHero />}
           footer={showSwapTxnStep ? approveSwapFooter : approveSpendingFooter}
         >
           {showSwapTxnStep ? approveSwapContent : approveSpendingContent}

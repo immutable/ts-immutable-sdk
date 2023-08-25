@@ -1,6 +1,7 @@
 import { log } from 'console';
 import { Environment } from '@imtbl/config';
 import { Wallet } from 'ethers';
+import { FeeType } from 'types';
 import { OrderStatus } from '../openapi/sdk/index';
 import { Orderbook } from '../orderbook';
 import {
@@ -14,7 +15,6 @@ import {
   getConfigFromEnv,
 } from './helpers';
 import { actionAll } from './helpers/actions';
-import { Fee } from '../openapi/sdk/models/Fee';
 
 async function deployAndMintNftContract(wallet: Wallet): Promise<TestToken> {
   const { contract } = await deployTestToken(wallet);
@@ -86,7 +86,7 @@ describe('', () => {
       orderSignature: signatures[0],
       makerFee: {
         amount: '1',
-        fee_type: Fee.fee_type.MAKER_MARKETPLACE,
+        type: FeeType.MAKER_MARKETPLACE,
         recipient: offerer.address,
       },
     });
@@ -99,7 +99,7 @@ describe('', () => {
       fulfiller.address,
       {
         amount: '1',
-        fee_type: Fee.fee_type.TAKER_MARKETPLACE,
+        type: FeeType.TAKER_MARKETPLACE,
         recipient: offerer.address,
       },
     );

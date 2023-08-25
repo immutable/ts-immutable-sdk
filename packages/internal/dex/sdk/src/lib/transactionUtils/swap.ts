@@ -6,9 +6,9 @@ import { Token, Percent, TradeType } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
 import { SecondaryFee__factory } from 'contracts/types';
 import { ISecondaryFee, SecondaryFeeInterface } from 'contracts/types/SecondaryFee';
-import { QuoteTradeInfo } from 'lib/router';
 import { Fees } from 'lib/fees';
 import { toCurrencyAmount } from 'lib/utils';
+import { QuoteResult } from 'lib/getQuotesForRoutes';
 import {
   Amount,
   SecondaryFee,
@@ -165,7 +165,7 @@ function createSwapCallParametersWithFees(
 }
 
 function createSwapParameters(
-  adjustedQuote: QuoteTradeInfo,
+  adjustedQuote: QuoteResult,
   fromAddress: string,
   slippage: number,
   deadline: number,
@@ -197,7 +197,7 @@ function createSwapParameters(
 
 export function getSwap(
   nativeToken: TokenInfo,
-  adjustedQuote: QuoteTradeInfo,
+  adjustedQuote: QuoteResult,
   fromAddress: string,
   slippage: number,
   deadline: number,
@@ -232,10 +232,10 @@ export function getSwap(
 }
 
 export function prepareSwap(
-  ourQuote: QuoteTradeInfo,
+  ourQuote: QuoteResult,
   amountSpecified: Amount,
   fees: Fees,
-): QuoteTradeInfo {
+): QuoteResult {
   if (ourQuote.tradeType === TradeType.EXACT_OUTPUT) {
     fees.addAmount(ourQuote.amountIn);
 
