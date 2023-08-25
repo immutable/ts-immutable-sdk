@@ -43,12 +43,10 @@ export const withDefaultWidgetConfigs = (
 ): StrongCheckoutWidgetsConfig => ({
   theme: getValidTheme(configs?.theme),
   environment: getValidEnvironment(configs?.environment),
-  // TODO https://immutable.atlassian.net/browse/WT-1509
-  // isOnRampEnabled: getValidBoolean(
-  //   DEFAULT_ON_RAMP_ENABLED,
-  //   configs?.isOnRampEnabled?.toString(),
-  // ),
-  isOnRampEnabled: DEFAULT_ON_RAMP_ENABLED,
+  isOnRampEnabled: getValidBoolean(
+    DEFAULT_ON_RAMP_ENABLED,
+    configs?.isOnRampEnabled?.toString(),
+  ),
   isSwapEnabled: getValidBoolean(
     DEFAULT_SWAP_ENABLED,
     configs?.isSwapEnabled?.toString(),
