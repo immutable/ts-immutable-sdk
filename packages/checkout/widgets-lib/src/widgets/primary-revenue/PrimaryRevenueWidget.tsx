@@ -27,10 +27,12 @@ import { TopUpView } from '../../views/top-up/TopUpView';
 
 export interface PrimaryRevenueWidgetProps {
   config: StrongCheckoutWidgetsConfig;
+  amount: string;
+  fromContractAddress: string;
 }
 
 export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
-  const { config } = props;
+  const { config, amount, fromContractAddress } = props;
   const loadingText = text.views[SharedViews.LOADING_VIEW].text;
 
   const { theme } = config;
@@ -79,16 +81,14 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
     const { formattedBalance } = await checkout.getBalance({
       provider,
       walletAddress,
-      // FIXME: get erc20 address from props
-      contractAddress: '0x21b51ec6fb7654b7e59e832f9e9687f29df94fb8',
+      contractAddress: fromContractAddress,
     });
 
-    const balance = Number(formattedBalance);
+    const balance = parseFloat(formattedBalance);
+    const requiredAmounts = parseFloat(amount);
 
-    // FIXME: get amount from props
-    const amount = 0.0001;
-    return balance > amount;
-  }, [checkout, provider]);
+    return balance > requiredAmounts;
+  }, [checkout, provider, amount, fromContractAddress]);
 
   useEffect(() => {
     if (!checkout || !provider) return;
