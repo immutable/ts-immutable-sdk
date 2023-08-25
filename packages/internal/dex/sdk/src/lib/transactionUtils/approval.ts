@@ -87,13 +87,13 @@ export const prepareApproval = (
   routingContracts: RoutingContracts,
   secondaryFees: SecondaryFee[],
 ): PreparedApproval => {
-  const amount = tradeType === TradeType.EXACT_INPUT ? amountSpecified : amountWithSlippage;
+  const amountOfTokenIn = tradeType === TradeType.EXACT_INPUT ? amountSpecified : amountWithSlippage;
 
   const spender = secondaryFees.length === 0
     ? routingContracts.peripheryRouterAddress
     : routingContracts.secondaryFeeAddress;
 
-  return { spender, amount };
+  return { spender, amount: amountOfTokenIn };
 };
 
 /**
@@ -151,7 +151,6 @@ export async function getApproveGasEstimate(
 export const getApproval = async (
   provider: JsonRpcProvider,
   ownerAddress: string,
-  tokenAddress: string,
   preparedApproval: PreparedApproval,
   gasPrice: Amount | null,
 ): Promise<TransactionDetails | null> => {
@@ -166,7 +165,12 @@ export const getApproval = async (
     return null;
   }
 
-  const gasEstimate = await getApproveGasEstimate(provider, ownerAddress, preparedApproval.spender, tokenAddress);
+  const gasEstimate = await getApproveGasEstimate(
+    provider,
+    ownerAddress,
+    preparedApproval.spender,
+    preparedApproval.amount.token.address,
+  );
 
   const gasFeeEstimate = gasPrice ? calculateGasFee(gasPrice, gasEstimate) : null;
 

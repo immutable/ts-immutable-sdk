@@ -25,6 +25,7 @@ import {
   expectToBeDefined,
   formatAmount,
   formatEther,
+  USDC_TEST_TOKEN,
 } from './test/utils';
 import { Router, SecondaryFee, uniswapTokenToTokenInfo } from './lib';
 
@@ -35,7 +36,10 @@ jest.mock('./lib/utils', () => ({
   // eslint-disable-next-line @typescript-eslint/naming-convention
   __esmodule: true,
   ...jest.requireActual('./lib/utils'),
-  getERC20Decimals: async () => 18,
+  // eslint-disable-next-line arrow-body-style
+  getERC20Decimals: async (address: string) => {
+    return address === USDC_TEST_TOKEN.address ? USDC_TEST_TOKEN.decimals : 18;
+  },
 }));
 
 const HIGHER_SLIPPAGE = 0.2;
@@ -157,7 +161,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
   describe('Swap with single pool and secondary fees', () => {
     it('generates valid swap calldata', async () => {
-      const params = setupSwapTxTest();
+      const params = setupSwapTxTest(IMX_TEST_TOKEN);
       const findOptimalRouteMock = mockRouterImplementation(params);
 
       const secondaryFees: SecondaryFee[] = [
@@ -203,7 +207,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
   describe('Swap with multiple pools and secondary fees', () => {
     it('generates valid swap calldata', async () => {
-      const params = setupSwapTxTest(true);
+      const params = setupSwapTxTest(undefined, true);
       mockRouterImplementation(params);
 
       const secondaryFees: SecondaryFee[] = [
@@ -246,7 +250,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
     });
 
     it('returns a quote', async () => {
-      const params = setupSwapTxTest(true);
+      const params = setupSwapTxTest(undefined, true);
       mockRouterImplementation(params);
 
       const secondaryFees: SecondaryFee[] = [
@@ -262,7 +266,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         utils.parseEther('100'),
       );
 
-      const tokenIn = { ...uniswapTokenToTokenInfo(IMX_TEST_TOKEN), name: undefined, symbol: undefined };
+      const tokenIn = { ...uniswapTokenToTokenInfo(USDC_TEST_TOKEN), name: undefined, symbol: undefined };
 
       expect(quote.fees).toEqual([
         {

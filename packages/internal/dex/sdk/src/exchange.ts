@@ -173,11 +173,10 @@ export class Exchange {
       secondaryFees,
     );
 
-    // we always use the tokenIn address because we are always selling the tokenIn
+    // preparedApproval always uses the tokenIn address because we are always selling the tokenIn
     const approval = await getApproval(
       this.provider,
       fromAddress,
-      tokenInAddress,
       preparedApproval,
       gasPrice,
     );

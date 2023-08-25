@@ -20,9 +20,9 @@ import {
   expectToBeDefined,
   decodePathForExactOutput,
   makeAddr,
-  IMX_TEST_TOKEN,
   formatAmount,
   formatEther,
+  USDC_TEST_TOKEN,
 } from './test/utils';
 
 jest.mock('@ethersproject/providers');
@@ -32,7 +32,10 @@ jest.mock('./lib/utils', () => ({
   // eslint-disable-next-line @typescript-eslint/naming-convention
   __esmodule: true,
   ...jest.requireActual('./lib/utils'),
-  getERC20Decimals: async () => 18,
+  // eslint-disable-next-line arrow-body-style
+  getERC20Decimals: async (address: string) => {
+    return address === USDC_TEST_TOKEN.address ? USDC_TEST_TOKEN.decimals : 18;
+  },
 }));
 
 const APPROVED_AMOUNT = BigNumber.from('0'); // No existing approval
@@ -168,7 +171,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
     });
 
     it('returns valid swap quote', async () => {
-      const params = setupSwapTxTest();
+      const params = setupSwapTxTest(USDC_TEST_TOKEN);
       mockRouterImplementation(params);
 
       const secondaryFees: SecondaryFee[] = [
@@ -185,7 +188,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         ethers.utils.parseEther('1000'),
       );
 
-      const tokenIn = { ...uniswapTokenToTokenInfo(IMX_TEST_TOKEN), name: undefined, symbol: undefined };
+      const tokenIn = { ...uniswapTokenToTokenInfo(USDC_TEST_TOKEN), name: undefined, symbol: undefined };
 
       expect(quote.fees).toEqual([
         {
@@ -242,7 +245,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
     });
 
     it('returns valid swap quote', async () => {
-      const params = setupSwapTxTest();
+      const params = setupSwapTxTest(USDC_TEST_TOKEN);
       mockRouterImplementation(params);
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
@@ -291,7 +294,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
 
   describe('Swap with multiple pools and secondary fees', () => {
     it('generates valid swap calldata', async () => {
-      const params = setupSwapTxTest(true);
+      const params = setupSwapTxTest(undefined, true);
       mockRouterImplementation(params);
 
       const secondaryFees: SecondaryFee[] = [

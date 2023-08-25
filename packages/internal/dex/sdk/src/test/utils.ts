@@ -10,9 +10,12 @@ import { PromiseOrValue } from 'contracts/types/common';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
 import {
   Amount,
+  newAmount,
   Router,
   RoutingContracts,
   SecondaryFee,
+  TokenInfo,
+  tokenInfoToUniswapToken,
   uniswapTokenToTokenInfo,
 } from '../lib';
 
@@ -290,16 +293,16 @@ export function decodeMulticallExactOutputSingleWithoutFees(data: utils.BytesLik
   return { swapParams };
 }
 
-export function setupSwapTxTest(multiPoolSwap: boolean = false): SwapTest {
+export function setupSwapTxTest(tokenIn = USDC_TEST_TOKEN, multiPoolSwap = false): SwapTest {
   const fromAddress = TEST_FROM_ADDRESS;
 
   const arbitraryTick = 100;
   const arbitraryLiquidity = 10;
   const sqrtPriceAtTick = TickMath.getSqrtRatioAtTick(arbitraryTick);
 
-  const tokenIn: Token = new Token(TEST_CHAIN_ID, IMX_TEST_TOKEN.address, 18);
-  const intermediaryToken: Token = new Token(TEST_CHAIN_ID, FUN_TEST_TOKEN.address, 18);
-  const tokenOut: Token = new Token(TEST_CHAIN_ID, WETH_TEST_TOKEN.address, 18);
+  const uniswapTokenIn = tokenInfoToUniswapToken(tokenIn);
+  const intermediaryToken = tokenInfoToUniswapToken(FUN_TEST_TOKEN);
+  const tokenOut = tokenInfoToUniswapToken(WETH_TEST_TOKEN);
 
   const fee = 10000;
 
@@ -307,7 +310,7 @@ export function setupSwapTxTest(multiPoolSwap: boolean = false): SwapTest {
   if (multiPoolSwap) {
     pools = [
       new Pool(
-        tokenIn,
+        uniswapTokenIn,
         intermediaryToken,
         fee,
         sqrtPriceAtTick,
@@ -326,7 +329,7 @@ export function setupSwapTxTest(multiPoolSwap: boolean = false): SwapTest {
   } else {
     pools = [
       new Pool(
-        tokenIn,
+        uniswapTokenIn,
         tokenOut,
         fee,
         sqrtPriceAtTick,
@@ -352,6 +355,10 @@ export function setupSwapTxTest(multiPoolSwap: boolean = false): SwapTest {
   };
 }
 
+// 1 IMX = 1000000000000000000
+// 1 IMX = 10 USDC
+// 10 USDC = 10000000
+
 type MockParams = {
   chainId: number;
   inputToken: string;
@@ -360,36 +367,64 @@ type MockParams = {
   exchangeRate?: number;
 };
 
+// amountIN = 1 IMX (18 decimals)
+// expectedAmountOut = 10 USDC (6 decimals)
+
+export const howMuchAmountOut = (amountIn: Amount, tokenOut: TokenInfo, exchangeRate: number) => {
+  let amountOut = amountIn.value.mul(exchangeRate); // 10 * 10^18
+
+  if (amountIn.token.decimals > tokenOut.decimals) {
+    amountOut = amountOut.div(BigNumber.from(10).pow(amountIn.token.decimals - tokenOut.decimals)); // 10^(18-6) = 10^12
+  }
+
+  if (amountIn.token.decimals < tokenOut.decimals) {
+    amountOut = amountOut.mul(BigNumber.from(10).pow(tokenOut.decimals - amountIn.token.decimals)); // 10^(18-6) = 10^12
+  }
+
+  return newAmount(amountOut, tokenOut);
+};
+
+export const howMuchAmountIn = (amountOut: Amount, tokenIn: TokenInfo, exchangeRate: number) => {
+  let amountIn = amountOut.value.div(exchangeRate); // 1 * 10^6
+
+  if (tokenIn.decimals > amountOut.token.decimals) {
+    amountIn = amountIn.mul(BigNumber.from(10).pow(tokenIn.decimals - amountOut.token.decimals)); // 10^(18-6) = 10^12
+  }
+
+  return newAmount(amountIn, tokenIn);
+};
+
 export function mockRouterImplementation(params: MockParams) {
-  const exchangeRate = params.exchangeRate ?? 10;
+  const exchangeRate = params.exchangeRate ?? 10; // 1 TokenIn = 10 TokenOut
   const findOptimalRoute = jest.fn((
     amountSpecified: Amount,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    otherToken: Token,
+    otherToken: TokenInfo,
     tradeType: TradeType,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     secondaryFees: SecondaryFee[],
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     maxHops: number,
   ) => {
-    const tokenIn: Token = new Token(params.chainId, params.inputToken, 18);
-    const tokenOut: Token = new Token(
-      params.chainId,
-      params.outputToken,
-      18,
-    );
+    const tokenIn = tradeType === TradeType.EXACT_INPUT ? amountSpecified.token : otherToken;
+    const tokenOut = tradeType === TradeType.EXACT_OUTPUT ? amountSpecified.token : otherToken;
 
     const route = new Route(
       params.pools,
-      tokenIn,
-      tokenOut,
+      tokenInfoToUniswapToken(tokenIn),
+      tokenInfoToUniswapToken(tokenOut),
     );
 
     const amountIn = tradeType === TradeType.EXACT_INPUT
-      ? amountSpecified : { token: uniswapTokenToTokenInfo(tokenIn), value: amountSpecified.value.div(exchangeRate) };
+      ? amountSpecified : howMuchAmountIn(tokenIn, amountSpecified, exchangeRate)
+
+    // const amountIn = tradeType === TradeType.EXACT_INPUT
+    //   ? amountSpecified : { token: tokenIn, value: amountSpecified.value.div(exchangeRate) };
 
     const amountOut = tradeType === TradeType.EXACT_INPUT
-      ? { token: uniswapTokenToTokenInfo(tokenOut), value: amountSpecified.value.mul(exchangeRate) } : amountSpecified;
+      ? howMuchAmountOut(tokenOut, amountSpecified, exchangeRate) : amountSpecified;
+
+    // const amountOut = tradeType === TradeType.EXACT_INPUT
+    //   ? { token: tokenOut, value: amountSpecified.value.mul(exchangeRate) } : amountSpecified;
 
     const trade: QuoteResult = {
       route,
