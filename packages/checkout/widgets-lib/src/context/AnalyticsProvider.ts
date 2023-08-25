@@ -8,7 +8,7 @@ export type StandardAnalyticsActions =
 
 export type AnalyticsControlTypes = StandardAnalyticsControlTypes
 | 'Button'
-| 'StatusUpdate';
+| 'OnRampWidget';
 
 const getWriteKey = () => process.env.NEXT_PUBLIC_SEGMENT_WRITEKEY || 'b69BcXnFXdaiFC6MqRQiHvjcPrTxftZl';
 

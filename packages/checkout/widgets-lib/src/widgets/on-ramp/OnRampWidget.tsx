@@ -1,13 +1,12 @@
-import { BiomeCombinedProviders, Box } from '@biom3/react';
+import { BiomeCombinedProviders } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
-import { useEffect } from 'react';
 import { Environment } from '@imtbl/config';
 import { WidgetTheme } from '../../lib';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
-import { useAnalytics } from '../../context/AnalyticsProvider';
-import { SegmentAnalyticsProvider } from '../../context/analytics-provider/AnalyticsProvider';
+import { AnalyticsProvider } from '../../context/AnalyticsProvider';
+import { OnrampComponent } from './component/OnrampComponent';
 
 export interface BridgeWidgetProps {
   // eslint-disable-next-line react/no-unused-prop-types
@@ -20,7 +19,6 @@ export interface OnRampWidgetParams {
 }
 
 export function OnRampWidget(props: BridgeWidgetProps) {
-  const { track } = useAnalytics();
   const { config } = props;
   const { environment, theme } = config;
   const url = environment === Environment.SANDBOX
@@ -34,39 +32,8 @@ export function OnRampWidget(props: BridgeWidgetProps) {
     ? onLightBase
     : onDarkBase;
 
-  useEffect(() => {
-    const domIframe:HTMLIFrameElement = document.getElementById('transak-iframe') as HTMLIFrameElement;
-
-    if (domIframe === undefined) return;
-
-    const handler = (event: any) => {
-      if (event.source === domIframe.contentWindow) {
-        if (event.origin === 'https://global-stg.transak.com') {
-          console.log('TRANSAK event data: ', event.data);
-
-          track({
-            userJourney: 'OnRampCrypto', // On-ramping crypto with Transak
-            screen: 'Initial payment screen',
-            control: 'StatusEvents',
-            controlType: 'StatusUpdate',
-            action: 'Opened',
-            userId: '0x00address00',
-          });
-        }
-      }
-    };
-
-    console.log('useeffect passed check for iframe domElement');
-    window.addEventListener('message', handler);
-
-    // eslint-disable-next-line consistent-return
-    return () => {
-      window.removeEventListener('message', handler);
-    };
-  }, []);
-
   return (
-    <SegmentAnalyticsProvider>
+    <AnalyticsProvider>
       <BiomeCombinedProviders theme={{ base: biomeTheme }}>
         <SimpleLayout
           header={(
@@ -75,29 +42,12 @@ export function OnRampWidget(props: BridgeWidgetProps) {
               title="Add coins"
               onCloseButtonClick={() => console.log('close widget event')}
             />
-        )}
+            )}
           footerBackgroundColor="base.color.translucent.emphasis.200"
         >
-          <Box style={{
-            position: 'relative',
-            width: '420px',
-            height: '565px',
-            boxShadow: '0 0 15px #1461db',
-            borderRadius: '15px',
-            overflow: 'hidden',
-            marginLeft: '5px',
-          }}
-          >
-            <iframe
-              title="Transak title"
-              id="transak-iframe"
-              src={finalUrl}
-              allow="camera;microphone;fullscreen;payment"
-              style={{ height: '100%', width: '100%', border: 'none' }}
-            />
-          </Box>
+          <OnrampComponent finalUrl={finalUrl} />
         </SimpleLayout>
       </BiomeCombinedProviders>
-    </SegmentAnalyticsProvider>
+    </AnalyticsProvider>
   );
 }
