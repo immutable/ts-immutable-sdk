@@ -1,6 +1,4 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable no-unused-vars */
-
 import { Body, Box, Button } from '@biom3/react';
 
 import { useEffect, useState } from 'react';
@@ -65,7 +63,7 @@ export function ReviewOrder(props: ReviewOrderProps) {
 
   useEffect(() => {
     // TODO: fetch the order from the BE
-    // mock order list
+    // mocking order list
     const items = mockOrderItems;
 
     setOrderItems(items);
@@ -112,10 +110,12 @@ export function ReviewOrder(props: ReviewOrderProps) {
         <Box
           sx={{
             display: 'flex',
-            flexDirection: 'column',
+            flexDirection: 'row',
             paddingY: 'base.spacing.x6',
             paddingX: 'base.spacing.x4',
             backgroundColor: 'base.color.translucent.emphasis.200',
+            justifyContent: 'space-between',
+            alignItems: 'center',
           }}
         >
           <Button

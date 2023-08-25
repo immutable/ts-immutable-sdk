@@ -86,9 +86,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
     const balance = Number(formattedBalance);
 
     // FIXME: get amount from props
-    // const amount = 0.0001;
-    const amount = 10000000;
-
+    const amount = 0.0001;
     return balance > amount;
   }, [checkout, provider]);
 

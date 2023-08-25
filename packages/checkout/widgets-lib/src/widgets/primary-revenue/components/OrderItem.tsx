@@ -12,15 +12,17 @@ export function OrderItem(props: OrderItemProps) {
       testId="order-list-item-container"
       sx={{
         width: '100%',
-        backgroundColor: 'base.color.neutral.800',
-        paddingTop: 'base.spacing.x4',
-        paddingBottom: 'base.spacing.x1',
-        paddingX: 'base.spacing.x1',
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        padding: '24px 16px 24px 16px',
+        backgroundColor: 'base.color.translucent.emphasis.100',
         borderRadius: 'base.borderRadius.x6',
       }}
     >
       <Box
         sx={{
+          width: '100%',
           display: 'flex',
           flexDirection: 'row',
           justifyContent: 'space-between',
