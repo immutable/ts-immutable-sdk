@@ -23,7 +23,7 @@ export const doesChainSupportEIP1559 = (fee: FeeData): fee is EIP1559FeeData => 
 /**
  * Fetch the current gas price estimate. Supports both EIP-1559 and non-EIP1559 chains
  * @param {JsonRpcProvider} provider - The JSON RPC provider used to fetch fee data
- * @returns {BigNumber | null} - The gas price in the smallest denomination of the chain's currency,
+ * @returns {Amount | null} - The gas price in the smallest denomination of the chain's currency,
  * or null if no gas price is available
  */
 export const fetchGasPrice = async (provider: JsonRpcProvider, nativeToken: TokenInfo): Promise<Amount | null> => {
@@ -34,20 +34,16 @@ export const fetchGasPrice = async (provider: JsonRpcProvider, nativeToken: Toke
     return newAmount(feeData.maxFeePerGas.add(feeData.maxPriorityFeePerGas), nativeToken);
   }
 
-  if (feeData.gasPrice) return newAmount(feeData.gasPrice, nativeToken);
-
-  return null;
+  return feeData.gasPrice ? newAmount(feeData.gasPrice, nativeToken) : null;
 };
 
 /**
  * Calculate the gas fee from the gas price and gas units used for the transaction
  *
- * @param {BigNumber} gasPriceInWei - The price of gas in wei
+ * @param {Amount} gasPriceInWei - The price of gas
  * @param {BigNumber} gasUsed - The total gas units that will be used for the transaction
  * @returns - The cost of the transaction in the gas token's smallest denomination (e.g. WEI)
  */
-const calculateGasFee2 = (gasPriceInWei: BigNumber, gasUsed: BigNumber): BigNumber => gasUsed.mul(gasPriceInWei);
-
 export const calculateGasFee = (gasPrice: Amount, gasEstimate: BigNumber): Amount =>
   // eslint-disable-next-line implicit-arrow-linebreak
-  newAmount(calculateGasFee2(gasPrice.value, gasEstimate), gasPrice.token);
+  newAmount(gasEstimate.mul(gasPrice.value), gasPrice.token);
