@@ -3,7 +3,6 @@ import { ConnectWidgetView } from './ConnectViewContextTypes';
 import { WalletWidgetView } from './WalletViewContextTypes';
 import { PrefilledSwapForm, SwapWidgetView } from './SwapViewContextTypes';
 import { BridgeWidgetView, PrefilledBridgeForm } from './BridgeViewContextTypes';
-import { PrimaryRevenueWidgetView } from './PrimaryRevenueViewContextTypes';
 import { ViewType } from './ViewType';
 
 export enum SharedViews {
@@ -37,8 +36,7 @@ export type View =
   | ConnectWidgetView
   | WalletWidgetView
   | SwapWidgetView
-  | BridgeWidgetView
-  | PrimaryRevenueWidgetView;
+  | BridgeWidgetView;
 
 export interface ViewState {
   view: View;
