@@ -6,6 +6,7 @@ import ConnectWebView from './widgets/connect/ConnectWebView';
 import SwapWebView from './widgets/swap/SwapWebView';
 import BridgeWebView from './widgets/bridge/BridgeWebView';
 import WalletWebView from './widgets/wallet/WalletWebView';
+import OnRampWebView from './widgets/on-ramp/OnRampWebView';
 
 import './build';
 
@@ -28,6 +29,10 @@ function App() {
       <br />
       <h2>
         <a href="/bridge">Bridge Widget</a>
+      </h2>
+      <br />
+      <h2>
+        <a href="/on-ramp">Onramp Widget</a>
       </h2>
       <br />
     </div>
@@ -54,6 +59,10 @@ const router = createBrowserRouter([
   {
     path: '/wallet',
     element: <WalletWebView />,
+  },
+  {
+    path: '/on-ramp',
+    element: <OnRampWebView />,
   },
 ]);
 

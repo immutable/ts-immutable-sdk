@@ -33,7 +33,8 @@ export function useConnectWidget(setWeb3Provider: (val: Web3Provider) => void) {
         case OrchestrationEventType.REQUEST_CONNECT:
         case OrchestrationEventType.REQUEST_WALLET:
         case OrchestrationEventType.REQUEST_SWAP:
-        case OrchestrationEventType.REQUEST_BRIDGE: {
+        case OrchestrationEventType.REQUEST_BRIDGE:
+        case OrchestrationEventType.REQUEST_ONRAMP: {
           handleOrchestrationEvent(event, setShowWidgets);
           break;
         }
