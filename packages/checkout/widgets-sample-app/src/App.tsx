@@ -28,6 +28,11 @@ function App() {
         </div>
         <br />
         <div>
+          <a href={'/on-ramp'}>On-ramp Widget (React)</a> |{' '}
+          <a href={'/lib/examples/onramp.html'}>OnRamp Widget (Static)</a>
+        </div>
+        <br />
+        <div>
           <a href={'/marketplace-orchestrator'}>Marketplace Orchestrator</a>
         </div>
         <br />
