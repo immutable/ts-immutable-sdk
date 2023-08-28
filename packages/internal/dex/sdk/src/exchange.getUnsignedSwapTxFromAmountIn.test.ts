@@ -158,7 +158,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        utils.parseEther('100'),
+        newAmountFromString('100', USDC_TEST_TOKEN).value,
       )).rejects.toThrow(new NoRoutesAvailableError());
     });
   });
@@ -177,7 +177,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        utils.parseUnits('100', USDC_TEST_TOKEN.decimals),
+        newAmountFromString('100', USDC_TEST_TOKEN).value,
         3, // 3% Slippage
       );
 
@@ -225,7 +225,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        utils.parseUnits('100', USDC_TEST_TOKEN.decimals),
+        newAmountFromString('100', USDC_TEST_TOKEN).value,
       );
 
       expectToBeDefined(swap.transaction.data);
@@ -269,7 +269,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        utils.parseEther('100'),
+        newAmountFromString('100', USDC_TEST_TOKEN).value,
       );
 
       const tokenIn = { ...uniswapTokenToTokenInfo(USDC_TEST_TOKEN), name: undefined, symbol: undefined };
@@ -278,10 +278,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         {
           recipient: TEST_FEE_RECIPIENT,
           basisPoints: TEST_MAX_FEE_BASIS_POINTS,
-          amount: {
-            token: tokenIn,
-            value: utils.parseEther('10'),
-          },
+          amount: newAmountFromString('10', tokenIn),
         },
       ]);
     });
@@ -309,7 +306,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        utils.parseUnits('100', USDC_TEST_TOKEN.decimals),
+        newAmountFromString('100', USDC_TEST_TOKEN).value,
       );
 
       expectToBeDefined(swap.transaction.data);
@@ -346,7 +343,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           params.fromAddress,
           params.inputToken,
           params.outputToken,
-          utils.parseEther('100'),
+          newAmountFromString('100', USDC_TEST_TOKEN).value,
           3, // 3% Slippage
         );
 
@@ -363,7 +360,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           params.fromAddress,
           params.inputToken,
           params.outputToken,
-          utils.parseUnits('100', USDC_TEST_TOKEN.decimals),
+          newAmountFromString('100', USDC_TEST_TOKEN).value,
           3, // 3% Slippage
         );
 
@@ -393,7 +390,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        utils.parseUnits('100', USDC_TEST_TOKEN.decimals),
+        newAmountFromString('100', USDC_TEST_TOKEN).value,
       );
 
       expectToBeDefined(swap.transaction.data);
@@ -426,7 +423,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        utils.parseEther('100'),
+        newAmountFromString('100', USDC_TEST_TOKEN).value,
       );
 
       expectToBeDefined(tx.swap.gasFeeEstimate);
@@ -450,7 +447,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        utils.parseUnits('100', USDC_TEST_TOKEN.decimals),
+        newAmountFromString('100', USDC_TEST_TOKEN).value,
       );
 
       expect(quote).not.toBe(undefined);
@@ -473,7 +470,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        utils.parseUnits('100', USDC_TEST_TOKEN.decimals),
+        newAmountFromString('100', USDC_TEST_TOKEN).value,
         HIGHER_SLIPPAGE,
       );
 
@@ -531,7 +528,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           invalidAddress,
           params.inputToken,
           params.outputToken,
-          utils.parseEther('100'),
+          newAmountFromString('100', USDC_TEST_TOKEN).value,
           HIGHER_SLIPPAGE,
         ),
       ).rejects.toThrow(
@@ -543,7 +540,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           params.fromAddress,
           invalidAddress,
           params.outputToken,
-          utils.parseEther('100'),
+          newAmountFromString('100', USDC_TEST_TOKEN).value,
           HIGHER_SLIPPAGE,
         ),
       ).rejects.toThrow(new InvalidAddressError('Error: invalid token in address'));
@@ -553,7 +550,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           params.fromAddress,
           params.inputToken,
           invalidAddress,
-          utils.parseEther('100'),
+          newAmountFromString('100', USDC_TEST_TOKEN).value,
           HIGHER_SLIPPAGE,
         ),
       ).rejects.toThrow(new InvalidAddressError('Error: invalid token out address'));
@@ -573,7 +570,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           invalidAddress,
           params.inputToken,
           params.outputToken,
-          utils.parseEther('100'),
+          newAmountFromString('100', USDC_TEST_TOKEN).value,
           HIGHER_SLIPPAGE,
         ),
       ).rejects.toThrow(
@@ -585,7 +582,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           params.fromAddress,
           invalidAddress,
           params.outputToken,
-          utils.parseEther('100'),
+          newAmountFromString('100', USDC_TEST_TOKEN).value,
           HIGHER_SLIPPAGE,
         ),
       ).rejects.toThrow(new InvalidAddressError('Error: invalid token in address'));
@@ -595,7 +592,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           params.fromAddress,
           params.inputToken,
           invalidAddress,
-          utils.parseEther('100'),
+          newAmountFromString('100', USDC_TEST_TOKEN).value,
           HIGHER_SLIPPAGE,
         ),
       ).rejects.toThrow(new InvalidAddressError('Error: invalid token out address'));
@@ -614,7 +611,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           params.fromAddress,
           params.inputToken,
           params.outputToken,
-          utils.parseEther('100'),
+          newAmountFromString('100', USDC_TEST_TOKEN).value,
           HIGHER_SLIPPAGE,
           11,
         ),
@@ -634,7 +631,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           params.fromAddress,
           params.inputToken,
           params.outputToken,
-          utils.parseEther('100'),
+          newAmountFromString('100', USDC_TEST_TOKEN).value,
           HIGHER_SLIPPAGE,
           0,
         ),
@@ -654,7 +651,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           params.fromAddress,
           params.inputToken,
           params.outputToken,
-          utils.parseEther('100'),
+          newAmountFromString('100', USDC_TEST_TOKEN).value,
           100,
           2,
         ),
@@ -674,7 +671,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           params.fromAddress,
           params.inputToken,
           params.outputToken,
-          utils.parseEther('100'),
+          newAmountFromString('100', USDC_TEST_TOKEN).value,
           -5,
           2,
         ),

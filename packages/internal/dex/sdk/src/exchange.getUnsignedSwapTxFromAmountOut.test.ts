@@ -26,6 +26,7 @@ import {
   USDC_TEST_TOKEN,
   newAmountFromString,
   expectInstanceOf,
+  WETH_TEST_TOKEN,
 } from './test/utils';
 
 jest.mock('@ethersproject/providers');
@@ -86,7 +87,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        ethers.utils.parseEther('1000'),
+        newAmountFromString('1000', WETH_TEST_TOKEN).value,
         3, // 3% Slippage
       );
 
@@ -131,7 +132,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        ethers.utils.parseEther('1000'),
+        newAmountFromString('1000', WETH_TEST_TOKEN).value,
         3, // 3% Slippage
       );
 
@@ -163,7 +164,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        ethers.utils.parseEther('1000'),
+        newAmountFromString('1000', WETH_TEST_TOKEN).value,
       );
 
       expectToBeDefined(approval?.transaction.data);
@@ -189,7 +190,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        ethers.utils.parseEther('1000'), /// 1,000 outputToken
+        newAmountFromString('1000', WETH_TEST_TOKEN).value,
       );
 
       const tokenIn = { ...uniswapTokenToTokenInfo(USDC_TEST_TOKEN), name: undefined, symbol: undefined };
@@ -221,7 +222,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        ethers.utils.parseEther('1000'),
+        newAmountFromString('1000', WETH_TEST_TOKEN).value,
       );
 
       expectToBeDefined(swap.transaction.data);
@@ -253,7 +254,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        ethers.utils.parseEther('1000'),
+        newAmountFromString('1000', WETH_TEST_TOKEN).value,
       );
 
       expect(quote.amount.token.address).toEqual(params.inputToken);
@@ -279,7 +280,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        ethers.utils.parseEther('1000'),
+        newAmountFromString('1000', WETH_TEST_TOKEN).value,
       );
 
       expectToBeDefined(approval?.transaction.data);
@@ -306,7 +307,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        ethers.utils.parseEther('1000'),
+        newAmountFromString('1000', WETH_TEST_TOKEN).value,
       );
 
       expectToBeDefined(swap.transaction.data);
