@@ -477,6 +477,12 @@ describe('Seaport', () => {
         );
       });
 
+      it('returns correctly decoded expiration time', async () => {
+        const { expiration } = await sut.fulfillOrder(immutableOrder, fulfiller, fakeExtraData);
+        // Generated extra data and generated correct timestamp
+        expect(expiration).toEqual('2023-08-28T05:25:00.000Z');
+      });
+
       it('returns the expected unsignedApprovalTransaction', async () => {
         const { actions } = await sut.fulfillOrder(immutableOrder, fulfiller, fakeExtraData);
         const approvalAction = actions.find(
