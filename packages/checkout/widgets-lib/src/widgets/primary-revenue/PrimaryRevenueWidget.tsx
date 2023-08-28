@@ -115,7 +115,6 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
 
     try {
       const transaction = await prepareApprove();
-
       const approved = await provider.send('eth_sendTransaction', [
         transaction,
       ]);

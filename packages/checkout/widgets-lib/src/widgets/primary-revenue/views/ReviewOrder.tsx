@@ -59,6 +59,7 @@ export function ReviewOrder(props: ReviewOrderProps) {
   const { header } = text.views[PrimaryRevenueWidgetViews.REVIEW_ORDER];
   const [orderItems, setOrderItems] = useState<any[]>([]);
   const [totalPrice, setTotalPrice] = useState<number>(0);
+  const [loading, setLoading] = useState(false);
 
   const { currency, executeBuyNow } = props;
 
@@ -77,9 +78,10 @@ export function ReviewOrder(props: ReviewOrderProps) {
     setTotalPrice(calculatedTotalPrice);
   });
 
-  const handlePayment = () => {
-    // approve with passport
-    executeBuyNow();
+  const handlePayment = async () => {
+    setLoading(true);
+    await executeBuyNow();
+    setLoading(false);
   };
 
   return (
@@ -124,12 +126,20 @@ export function ReviewOrder(props: ReviewOrderProps) {
           }}
         >
           <Button
+            disabled={loading}
             testId="pay-now-button"
             variant="primary"
             onClick={handlePayment}
             size="large"
           >
-            Pay Now
+            {loading ? (
+              <Button.Icon
+                icon="Loading"
+                sx={{ width: 'base.icon.size.400' }}
+              />
+            ) : (
+              'Buy Now'
+            )}
           </Button>
           <Body>{`${totalPrice} ${currency ?? 'ETH'}`}</Body>
         </Box>
