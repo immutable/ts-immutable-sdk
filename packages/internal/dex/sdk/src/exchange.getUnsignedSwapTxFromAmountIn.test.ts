@@ -162,7 +162,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
   describe('Swap with single pool and secondary fees', () => {
     it('generates valid swap calldata', async () => {
-      const params = setupSwapTxTest({ tokenIn: IMX_TEST_TOKEN });
+      const params = setupSwapTxTest();
       const findOptimalRouteMock = mockRouterImplementation(params);
 
       const secondaryFees: SecondaryFee[] = [
@@ -174,7 +174,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        utils.parseEther('100'),
+        utils.parseUnits('100', USDC_TEST_TOKEN.decimals),
         3, // 3% Slippage
       );
 
@@ -188,6 +188,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const data = swap.transaction.data.toString();
 
       const { swapParams, secondaryFeeParams } = decodeMulticallExactInputSingleWithFees(data);
+      expectInstanceOf(BigNumber, swapParams.amountIn);
 
       expect(secondaryFeeParams[0].recipient).toBe(TEST_FEE_RECIPIENT);
       expect(secondaryFeeParams[0].basisPoints.toString()).toBe('100');
@@ -196,7 +197,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(swapParams.tokenOut).toBe(params.outputToken);
       expect(swapParams.fee).toBe(10000);
       expect(swapParams.recipient).toBe(params.fromAddress);
-      expect(formatEther(swapParams.amountIn)).toBe('100.0'); // swap.amountIn = userQuoteReq.amountIn
+      expect(formatUnits(swapParams.amountIn, USDC_TEST_TOKEN.decimals)).toBe('100.0'); // swap.amountIn = userQuoteReq.amountIn
       expect(formatEther(swapParams.amountOutMinimum)).toBe('961.165048543689320388'); // swap.amountOutMinimum = ourQuoteRes.amountOut - slippage
       expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0');
 
