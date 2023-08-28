@@ -12,8 +12,7 @@
         "immutablex_client": "prod",
         "passport": "prod",
         "orderbook": "alpha",
-        "provider": "prod",
-        "checkout_sdk": "alpha"
+        "provider": "prod"
     },
     "fileCopy": [
         {
