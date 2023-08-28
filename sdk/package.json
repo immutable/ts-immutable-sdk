@@ -86,10 +86,6 @@
     "./orderbook": {
       "types": "./dist/orderbook.d.ts",
       "import": "./dist/orderbook.js"
-    },
-    "./provider": {
-      "types": "./dist/provider.d.ts",
-      "import": "./dist/provider.js"
     }
   },
   "files": [

@@ -11,8 +11,7 @@
         "blockchain_data": "alpha",
         "immutablex_client": "prod",
         "passport": "prod",
-        "orderbook": "alpha",
-        "provider": "prod"
+        "orderbook": "alpha"
     },
     "fileCopy": [
         {
