@@ -60,6 +60,5 @@ export const smartCheckout = async (
 
   const balanceRequirements = await balanceCheck(config, provider, ownerAddress, aggregatedItems);
 
-  console.log(getSmartCheckoutResult(balanceRequirements));
   return getSmartCheckoutResult(balanceRequirements);
 };
