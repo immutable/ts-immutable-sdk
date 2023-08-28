@@ -35,10 +35,7 @@ export function PaymentMethods(props: PaymentMethodsProps) {
           },
         });
 
-        let hasEnoughBalance = await checkBalances();
-
-        // REMOVE THIS LINE - only for testing ReviewOrder view
-        hasEnoughBalance = true;
+        const hasEnoughBalance = await checkBalances();
 
         // FIXME: best way to handle conditional routing?
         if (!hasEnoughBalance) {
