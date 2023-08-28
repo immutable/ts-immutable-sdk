@@ -292,7 +292,9 @@ export function decodeMulticallExactOutputSingleWithoutFees(data: utils.BytesLik
   return { swapParams };
 }
 
-export function setupSwapTxTest(tokenIn = USDC_TEST_TOKEN, multiPoolSwap = false): SwapTest {
+export function setupSwapTxTest(params?: { tokenIn?: TokenInfo, multiPoolSwap?: boolean }): SwapTest {
+  const tokenIn = params?.tokenIn ?? USDC_TEST_TOKEN;
+  const multiPoolSwap = params?.multiPoolSwap ?? false;
   const fromAddress = TEST_FROM_ADDRESS;
 
   const arbitraryTick = 100;
@@ -465,4 +467,9 @@ export function formatEther(bn: PromiseOrValue<BigNumberish>): string {
     return utils.formatEther(bn);
   }
   throw new Error('formatEther: bn is not a BigNumber');
+}
+
+export function newAmountFromString(amount: string, token: TokenInfo): Amount {
+  const bn = utils.parseUnits(amount, token.decimals);
+  return newAmount(bn, token);
 }

@@ -4,6 +4,7 @@ import { BigNumber } from '@ethersproject/bignumber';
 import { SecondaryFee, uniswapTokenToTokenInfo } from 'lib';
 import { ethers } from 'ethers';
 import { ERC20__factory } from 'contracts/types';
+import { formatUnits } from 'ethers/lib/utils';
 import { Exchange } from './exchange';
 import {
   mockRouterImplementation,
@@ -23,6 +24,9 @@ import {
   formatAmount,
   formatEther,
   USDC_TEST_TOKEN,
+  IMX_TEST_TOKEN,
+  newAmountFromString,
+  expectInstanceOf,
 } from './test/utils';
 
 jest.mock('@ethersproject/providers');
@@ -98,6 +102,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       const data = swap.transaction.data.toString();
 
       const { swapParams } = decodeMulticallExactOutputSingleWithFees(data);
+      expectInstanceOf(BigNumber, swapParams.amountInMaximum);
 
       expect(swapParams.tokenIn).toBe(params.inputToken); // input token
       expect(swapParams.tokenOut).toBe(params.outputToken); // output token
@@ -107,7 +112,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       expect(swap.transaction.from).toBe(params.fromAddress); // from address
       expect(swap.transaction.value).toBe('0x00'); // refers to 0ETH
       expect(formatEther(swapParams.amountOut)).toBe('1000.0'); // amount out (1,000)
-      expect(formatEther(swapParams.amountInMaximum)).toBe('104.03'); // max amount in
+      expect(formatUnits(swapParams.amountInMaximum, USDC_TEST_TOKEN.decimals)).toBe('104.03'); // max amount in
       expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
     });
 
@@ -134,9 +139,9 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       expectToBeDefined(approval?.transaction.data);
 
       const decodedResults = erc20ContractInterface.decodeFunctionData('approve', approval.transaction.data);
-      const approvalAmount: string = decodedResults[1].toString();
+      const approvalAmount = decodedResults[1].toString();
 
-      expect(formatEther(approvalAmount)).toEqual('104.03');
+      expect(formatUnits(approvalAmount, USDC_TEST_TOKEN.decimals)).toEqual('104.03');
       expect(approval.transaction.to).toEqual(params.inputToken);
       expect(approval.transaction.from).toEqual(params.fromAddress);
       expect(approval.transaction.value).toEqual(0); // we do not want to send any ETH
@@ -171,7 +176,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
     });
 
     it('returns valid swap quote', async () => {
-      const params = setupSwapTxTest(USDC_TEST_TOKEN);
+      const params = setupSwapTxTest();
       mockRouterImplementation(params);
 
       const secondaryFees: SecondaryFee[] = [
@@ -185,7 +190,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        ethers.utils.parseEther('1000'),
+        ethers.utils.parseEther('1000'), /// 1,000 outputToken
       );
 
       const tokenIn = { ...uniswapTokenToTokenInfo(USDC_TEST_TOKEN), name: undefined, symbol: undefined };
@@ -194,18 +199,12 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         {
           recipient: makeAddr('recipienta'),
           basisPoints: 200,
-          amount: {
-            token: tokenIn,
-            value: ethers.utils.parseEther('2'),
-          },
+          amount: newAmountFromString('2', tokenIn),
         },
         {
           recipient: makeAddr('recipientb'),
           basisPoints: 400,
-          amount: {
-            token: tokenIn,
-            value: ethers.utils.parseEther('4'),
-          },
+          amount: newAmountFromString('4', tokenIn),
         },
       ]);
     });
@@ -213,7 +212,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
 
   describe('Swap with single pool without fees and default slippage tolerance', () => {
     it('generates valid swap calldata', async () => {
-      const params = setupSwapTxTest();
+      const params = setupSwapTxTest({ tokenIn: IMX_TEST_TOKEN });
 
       mockRouterImplementation(params);
 
@@ -245,7 +244,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
     });
 
     it('returns valid swap quote', async () => {
-      const params = setupSwapTxTest(USDC_TEST_TOKEN);
+      const params = setupSwapTxTest();
       mockRouterImplementation(params);
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
@@ -294,7 +293,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
 
   describe('Swap with multiple pools and secondary fees', () => {
     it('generates valid swap calldata', async () => {
-      const params = setupSwapTxTest(undefined, true);
+      const params = setupSwapTxTest({ tokenIn: IMX_TEST_TOKEN, multiPoolSwap: true });
       mockRouterImplementation(params);
 
       const secondaryFees: SecondaryFee[] = [

@@ -6,6 +6,7 @@ import {
 } from 'errors';
 import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
 import { constants, utils } from 'ethers';
+import { formatUnits } from 'ethers/lib/utils';
 import { Exchange } from './exchange';
 import {
   mockRouterImplementation,
@@ -26,6 +27,7 @@ import {
   formatAmount,
   formatEther,
   USDC_TEST_TOKEN,
+  expectInstanceOf,
 } from './test/utils';
 import { Router, SecondaryFee, uniswapTokenToTokenInfo } from './lib';
 
@@ -43,7 +45,7 @@ jest.mock('./lib/utils', () => ({
 }));
 
 const HIGHER_SLIPPAGE = 0.2;
-const APPROVED_AMOUNT = utils.parseEther('1');
+const APPROVED_AMOUNT = utils.parseUnits('1', USDC_TEST_TOKEN.decimals);
 const APPROVE_GAS_ESTIMATE = BigNumber.from('100000');
 
 describe('getUnsignedSwapTxFromAmountIn', () => {
@@ -77,7 +79,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
-      const amountIn = APPROVED_AMOUNT.add(utils.parseEther('1'));
+      const amountIn = APPROVED_AMOUNT.add(utils.parseUnits('1', USDC_TEST_TOKEN.decimals));
       const tx = await exchange.getUnsignedSwapTxFromAmountIn(
         params.fromAddress,
         params.inputToken,
@@ -87,8 +89,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       expectToBeDefined(tx.approval?.transaction.data);
 
-      const decodedResults = erc20ContractInterface
-        .decodeFunctionData('approve', tx.approval.transaction.data);
+      const decodedResults = erc20ContractInterface.decodeFunctionData('approve', tx.approval.transaction.data);
       expect(decodedResults[0]).toEqual(TEST_PERIPHERY_ROUTER_ADDRESS);
       // we have already approved 1000000000000000000, so we expect to approve 1000000000000000000 more
       expect(decodedResults[1].toString()).toEqual(APPROVED_AMOUNT.toString());
@@ -161,7 +162,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
   describe('Swap with single pool and secondary fees', () => {
     it('generates valid swap calldata', async () => {
-      const params = setupSwapTxTest(IMX_TEST_TOKEN);
+      const params = setupSwapTxTest({ tokenIn: IMX_TEST_TOKEN });
       const findOptimalRouteMock = mockRouterImplementation(params);
 
       const secondaryFees: SecondaryFee[] = [
@@ -207,7 +208,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
   describe('Swap with multiple pools and secondary fees', () => {
     it('generates valid swap calldata', async () => {
-      const params = setupSwapTxTest(undefined, true);
+      const params = setupSwapTxTest({ multiPoolSwap: true });
       mockRouterImplementation(params);
 
       const secondaryFees: SecondaryFee[] = [
@@ -220,7 +221,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        utils.parseEther('100'),
+        utils.parseUnits('100', USDC_TEST_TOKEN.decimals),
       );
 
       expectToBeDefined(swap.transaction.data);
@@ -228,6 +229,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const data = swap.transaction.data.toString();
 
       const { swapParams, secondaryFeeParams } = decodeMulticallExactInputWithFees(data);
+      expectInstanceOf(BigNumber, swapParams.amountIn);
 
       expect(secondaryFeeParams[0].recipient).toBe(TEST_FEE_RECIPIENT);
       expect(secondaryFeeParams[0].basisPoints.toString()).toBe(TEST_MAX_FEE_BASIS_POINTS.toString());
@@ -245,12 +247,12 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(decodedPath.secondPoolFee.toString()).toBe('10000');
 
       expect(swapParams.recipient).toBe(params.fromAddress); // recipient of swap
-      expect(formatEther(swapParams.amountIn)).toBe('100.0');
+      expect(formatUnits(swapParams.amountIn, USDC_TEST_TOKEN.decimals)).toBe('100.0');
       expect(formatEther(swapParams.amountOutMinimum)).toBe('899.100899100899100899'); // includes slippage and fees
     });
 
     it('returns a quote', async () => {
-      const params = setupSwapTxTest(undefined, true);
+      const params = setupSwapTxTest({ multiPoolSwap: true });
       mockRouterImplementation(params);
 
       const secondaryFees: SecondaryFee[] = [
@@ -303,7 +305,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        utils.parseEther('100'),
+        utils.parseUnits('100', USDC_TEST_TOKEN.decimals),
       );
 
       expectToBeDefined(swap.transaction.data);
@@ -357,7 +359,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           params.fromAddress,
           params.inputToken,
           params.outputToken,
-          utils.parseEther('100'),
+          utils.parseUnits('100', USDC_TEST_TOKEN.decimals),
           3, // 3% Slippage
         );
 
@@ -387,7 +389,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        utils.parseEther('100'),
+        utils.parseUnits('100', USDC_TEST_TOKEN.decimals),
       );
 
       expectToBeDefined(swap.transaction.data);
@@ -395,6 +397,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const data = swap.transaction.data.toString();
 
       const { swapParams } = decodeMulticallExactInputSingleWithoutFees(data);
+      expectInstanceOf(BigNumber, swapParams.amountIn);
 
       expect(swapParams.tokenIn).toBe(params.inputToken); // input token
       expect(swapParams.tokenOut).toBe(params.outputToken); // output token
@@ -403,7 +406,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(swap.transaction.to).toBe(TEST_PERIPHERY_ROUTER_ADDRESS); // to address
       expect(swap.transaction.from).toBe(params.fromAddress); // from address
       expect(swap.transaction.value).toBe('0x00'); // refers to 0ETH
-      expect(formatEther(swapParams.amountIn)).toBe('100.0'); // amount in
+      expect(formatUnits(swapParams.amountIn, USDC_TEST_TOKEN.decimals)).toBe('100.0'); // amount in
       expect(formatEther(swapParams.amountOutMinimum)).toBe('999.000999000999000999'); // min amount out (includes slippage)
       expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
     });
@@ -443,7 +446,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        utils.parseEther('100'),
+        utils.parseUnits('100', USDC_TEST_TOKEN.decimals),
       );
 
       expect(quote).not.toBe(undefined);
@@ -466,7 +469,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        utils.parseEther('100'),
+        utils.parseUnits('100', USDC_TEST_TOKEN.decimals),
         HIGHER_SLIPPAGE,
       );
 
@@ -475,6 +478,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const data = swap.transaction.data.toString();
 
       const { swapParams } = decodeMulticallExactInputSingleWithoutFees(data);
+      expectInstanceOf(BigNumber, swapParams.amountIn);
 
       expect(swapParams.tokenIn).toBe(params.inputToken); // input token
       expect(swapParams.tokenOut).toBe(params.outputToken); // output token
@@ -483,7 +487,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(swap.transaction.to).toBe(TEST_PERIPHERY_ROUTER_ADDRESS); // to address
       expect(swap.transaction.from).toBe(params.fromAddress); // from address
       expect(swap.transaction.value).toBe('0x00'); // refers to 0ETH
-      expect(formatEther(swapParams.amountIn)).toBe('100.0'); // amount in
+      expect(formatUnits(swapParams.amountIn, USDC_TEST_TOKEN.decimals)).toBe('100.0'); // amount in
       expect(formatEther(swapParams.amountOutMinimum)).toBe('998.003992015968063872'); // min amount out (includes 0.2% slippage)
       expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
     });
@@ -498,7 +502,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        utils.parseEther('100'),
+        utils.parseUnits('100', USDC_TEST_TOKEN.decimals),
         HIGHER_SLIPPAGE,
       );
 
