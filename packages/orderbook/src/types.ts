@@ -110,6 +110,13 @@ export type Action = TransactionAction | SignableAction;
 
 export interface FulfillOrderResponse {
   actions: Action[];
+  /**
+   * User MUST submit the fulfillment transaction before the expiration
+   * Submitting after the expiration will result in a on chain revert
+   */
+  expiration: string;
+  // order might contain updated fee information
+  order: Order;
 }
 
 export interface CancelOrderResponse {
