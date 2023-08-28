@@ -87,9 +87,9 @@
       "types": "./dist/orderbook.d.ts",
       "import": "./dist/orderbook.js"
     },
-    "./provider": {
-      "types": "./dist/provider.d.ts",
-      "import": "./dist/provider.js"
+    "./checkout_sdk": {
+      "types": "./dist/checkout_sdk.d.ts",
+      "import": "./dist/checkout_sdk.js"
     },
     "./checkout_widgets": {
       "types": "./dist/checkout_widgets.d.ts",
