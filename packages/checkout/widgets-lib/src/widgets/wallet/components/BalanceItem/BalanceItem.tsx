@@ -77,7 +77,7 @@ export function BalanceItem({ balanceInfo, bridgeToL2OnClick }: BalanceItemProps
   const showAddMenuItem = useMemo(
     () => Boolean(isOnRampEnabled
     && onRampAllowedTokens.length > 0
-    && onRampAllowedTokens.map((token) => token.address?.toLowerCase()).includes(balanceInfo.address?.toLowerCase())),
+    && onRampAllowedTokens.find((token) => token.address?.toLowerCase() === balanceInfo.address?.toLowerCase())),
     [isOnRampEnabled, onRampAllowedTokens],
   );
 
