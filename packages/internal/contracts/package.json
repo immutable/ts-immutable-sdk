@@ -5,9 +5,12 @@
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "devDependencies": {
+    "@imtbl/zkevm-contracts": "latest",
+    "@openzeppelin/contracts": "^4.9.3",
     "@rollup/plugin-typescript": "^11.0.0",
     "hardhat": "^2.15.0",
     "rollup": "^3.17.2",
+    "solidity-bits": "^0.4.0",
     "typechain": "^8.1.1",
     "typescript": "^4.9.5"
   },
