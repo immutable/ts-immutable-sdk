@@ -300,7 +300,7 @@ export function setupSwapTxTest(params?: { multiPoolSwap?: boolean }): SwapTest 
   const arbitraryLiquidity = 10;
   const sqrtPriceAtTick = TickMath.getSqrtRatioAtTick(arbitraryTick);
 
-  const uniswapTokenIn = tokenInfoToUniswapToken(USDC_TEST_TOKEN);
+  const tokenIn = tokenInfoToUniswapToken(USDC_TEST_TOKEN);
   const intermediaryToken = tokenInfoToUniswapToken(FUN_TEST_TOKEN);
   const tokenOut = tokenInfoToUniswapToken(WETH_TEST_TOKEN);
 
@@ -310,7 +310,7 @@ export function setupSwapTxTest(params?: { multiPoolSwap?: boolean }): SwapTest 
   if (multiPoolSwap) {
     pools = [
       new Pool(
-        uniswapTokenIn,
+        tokenIn,
         intermediaryToken,
         fee,
         sqrtPriceAtTick,
@@ -329,7 +329,7 @@ export function setupSwapTxTest(params?: { multiPoolSwap?: boolean }): SwapTest 
   } else {
     pools = [
       new Pool(
-        uniswapTokenIn,
+        tokenIn,
         tokenOut,
         fee,
         sqrtPriceAtTick,
