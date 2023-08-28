@@ -207,16 +207,3 @@ export type BalanceDelta = {
   balance: BigNumber;
   formattedBalance: string;
 };
-
-/**
- * An enum representing the transaction requirement types
- * @enum {string}
- * @property {string} NATIVE - If the transaction requirement is for a native token.
- * @property {string} ERC20 - If the transaction requirement is for an ERC20 token.
- * @property {string} ERC721 - If the transaction requirement is for an ERC721 token.
- */
-export enum TransactionRequirementType {
-  NATIVE = 'NATIVE',
-  ERC20 = 'ERC20',
-  ERC721 = 'ERC721',
-}

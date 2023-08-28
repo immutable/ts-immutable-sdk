@@ -2,7 +2,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import {
   FulfilmentTransaction,
   GasAmount,
-  ItemRequirement, ItemType, SmartCheckoutResult, TransactionRequirement, TransactionRequirementType,
+  ItemRequirement, SmartCheckoutResult, TransactionRequirement,
 } from '../types/smartCheckout';
 import { itemAggregator } from './aggregators';
 import {
@@ -24,21 +24,8 @@ export const getSmartCheckoutResult = (
   for (const balance of balanceCheckResult.balanceRequirements) {
     if (!balance.sufficient) sufficient = false;
 
-    let type;
-    switch (balance.type) {
-      case ItemType.ERC20:
-        type = TransactionRequirementType.ERC20;
-        break;
-      case ItemType.ERC721:
-        type = TransactionRequirementType.ERC721;
-        break;
-      default:
-        type = TransactionRequirementType.NATIVE;
-        break;
-    }
-
     transactionRequirements.push({
-      type,
+      type: balance.type,
       sufficient: balance.sufficient,
       required: balance.required,
       current: balance.current,
@@ -73,5 +60,6 @@ export const smartCheckout = async (
 
   const balanceRequirements = await balanceCheck(config, provider, ownerAddress, aggregatedItems);
 
+  console.log(getSmartCheckoutResult(balanceRequirements));
   return getSmartCheckoutResult(balanceRequirements);
 };

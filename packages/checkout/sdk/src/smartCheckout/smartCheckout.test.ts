@@ -438,6 +438,7 @@ describe('smartCheckout', () => {
             type: ItemType.NATIVE,
             sufficient: true,
             required: {
+              type: ItemType.NATIVE,
               balance: BigNumber.from(1),
               formattedBalance: '1.0',
               token: {
@@ -448,6 +449,7 @@ describe('smartCheckout', () => {
               },
             },
             current: {
+              type: ItemType.NATIVE,
               balance: BigNumber.from(1),
               formattedBalance: '1.0',
               token: {
@@ -466,6 +468,7 @@ describe('smartCheckout', () => {
             type: ItemType.ERC20,
             sufficient: true,
             required: {
+              type: ItemType.ERC20,
               balance: BigNumber.from(1),
               formattedBalance: '1.0',
               token: {
@@ -476,6 +479,7 @@ describe('smartCheckout', () => {
               },
             },
             current: {
+              type: ItemType.ERC20,
               balance: BigNumber.from(1),
               formattedBalance: '1.0',
               token: {
@@ -494,12 +498,14 @@ describe('smartCheckout', () => {
             type: ItemType.ERC721,
             sufficient: true,
             required: {
+              type: ItemType.ERC721,
               balance: BigNumber.from(1),
               formattedBalance: '1.0',
               id: '0',
               contractAddress: '0xCollection',
             },
             current: {
+              type: ItemType.ERC721,
               balance: BigNumber.from(1),
               formattedBalance: '1.0',
               id: '0',
@@ -519,6 +525,7 @@ describe('smartCheckout', () => {
           type: ItemType.NATIVE,
           sufficient: true,
           required: {
+            type: ItemType.NATIVE,
             balance: BigNumber.from(1),
             formattedBalance: '1.0',
             token: {
@@ -529,6 +536,7 @@ describe('smartCheckout', () => {
             },
           },
           current: {
+            type: ItemType.NATIVE,
             balance: BigNumber.from(1),
             formattedBalance: '1.0',
             token: {
@@ -547,6 +555,7 @@ describe('smartCheckout', () => {
           type: ItemType.ERC20,
           sufficient: true,
           required: {
+            type: ItemType.ERC20,
             balance: BigNumber.from(1),
             formattedBalance: '1.0',
             token: {
@@ -557,6 +566,7 @@ describe('smartCheckout', () => {
             },
           },
           current: {
+            type: ItemType.ERC20,
             balance: BigNumber.from(1),
             formattedBalance: '1.0',
             token: {
@@ -575,12 +585,14 @@ describe('smartCheckout', () => {
           type: ItemType.ERC721,
           sufficient: true,
           required: {
+            type: ItemType.ERC721,
             balance: BigNumber.from(1),
             formattedBalance: '1.0',
             id: '0',
             contractAddress: '0xCollection',
           },
           current: {
+            type: ItemType.ERC721,
             balance: BigNumber.from(1),
             formattedBalance: '1.0',
             id: '0',
@@ -602,6 +614,7 @@ describe('smartCheckout', () => {
             type: ItemType.NATIVE,
             sufficient: false,
             required: {
+              type: ItemType.NATIVE,
               balance: BigNumber.from(2),
               formattedBalance: '2.0',
               token: {
@@ -612,6 +625,7 @@ describe('smartCheckout', () => {
               },
             },
             current: {
+              type: ItemType.NATIVE,
               balance: BigNumber.from(1),
               formattedBalance: '1.0',
               token: {
@@ -630,6 +644,7 @@ describe('smartCheckout', () => {
             type: ItemType.ERC20,
             sufficient: false,
             required: {
+              type: ItemType.ERC20,
               balance: BigNumber.from(2),
               formattedBalance: '2.0',
               token: {
@@ -640,6 +655,7 @@ describe('smartCheckout', () => {
               },
             },
             current: {
+              type: ItemType.ERC20,
               balance: BigNumber.from(1),
               formattedBalance: '1.0',
               token: {
@@ -658,12 +674,14 @@ describe('smartCheckout', () => {
             type: ItemType.ERC721,
             sufficient: false,
             required: {
+              type: ItemType.ERC721,
               balance: BigNumber.from(1),
               formattedBalance: '1.0',
               id: '0',
               contractAddress: '0xCollection',
             },
             current: {
+              type: ItemType.ERC721,
               balance: BigNumber.from(0),
               formattedBalance: '0.0',
               id: '0',
@@ -683,6 +701,7 @@ describe('smartCheckout', () => {
           type: ItemType.NATIVE,
           sufficient: false,
           required: {
+            type: ItemType.NATIVE,
             balance: BigNumber.from(2),
             formattedBalance: '2.0',
             token: {
@@ -693,6 +712,7 @@ describe('smartCheckout', () => {
             },
           },
           current: {
+            type: ItemType.NATIVE,
             balance: BigNumber.from(1),
             formattedBalance: '1.0',
             token: {
@@ -711,6 +731,7 @@ describe('smartCheckout', () => {
           type: ItemType.ERC20,
           sufficient: false,
           required: {
+            type: ItemType.ERC20,
             balance: BigNumber.from(2),
             formattedBalance: '2.0',
             token: {
@@ -721,6 +742,7 @@ describe('smartCheckout', () => {
             },
           },
           current: {
+            type: ItemType.ERC20,
             balance: BigNumber.from(1),
             formattedBalance: '1.0',
             token: {
@@ -741,12 +763,14 @@ describe('smartCheckout', () => {
           type: ItemType.ERC721,
           sufficient: false,
           required: {
+            type: ItemType.ERC721,
             balance: BigNumber.from(1),
             formattedBalance: '1.0',
             id: '0',
             contractAddress: '0xCollection',
           },
           current: {
+            type: ItemType.ERC721,
             balance: BigNumber.from(0),
             formattedBalance: '0.0',
             id: '0',
@@ -768,6 +792,7 @@ describe('smartCheckout', () => {
             type: ItemType.NATIVE,
             sufficient: true,
             required: {
+              type: ItemType.NATIVE,
               balance: BigNumber.from(2),
               formattedBalance: '2.0',
               token: {
@@ -778,6 +803,7 @@ describe('smartCheckout', () => {
               },
             },
             current: {
+              type: ItemType.NATIVE,
               balance: BigNumber.from(2),
               formattedBalance: '2.0',
               token: {
@@ -796,6 +822,7 @@ describe('smartCheckout', () => {
             type: ItemType.ERC20,
             sufficient: false,
             required: {
+              type: ItemType.ERC20,
               balance: BigNumber.from(2),
               formattedBalance: '2.0',
               token: {
@@ -806,6 +833,7 @@ describe('smartCheckout', () => {
               },
             },
             current: {
+              type: ItemType.ERC20,
               balance: BigNumber.from(1),
               formattedBalance: '1.0',
               token: {
@@ -829,6 +857,7 @@ describe('smartCheckout', () => {
           type: ItemType.NATIVE,
           sufficient: true,
           required: {
+            type: ItemType.NATIVE,
             balance: BigNumber.from(2),
             formattedBalance: '2.0',
             token: {
@@ -839,6 +868,7 @@ describe('smartCheckout', () => {
             },
           },
           current: {
+            type: ItemType.NATIVE,
             balance: BigNumber.from(2),
             formattedBalance: '2.0',
             token: {
@@ -857,6 +887,7 @@ describe('smartCheckout', () => {
           type: ItemType.ERC20,
           sufficient: false,
           required: {
+            type: ItemType.ERC20,
             balance: BigNumber.from(2),
             formattedBalance: '2.0',
             token: {
@@ -867,6 +898,7 @@ describe('smartCheckout', () => {
             },
           },
           current: {
+            type: ItemType.ERC20,
             balance: BigNumber.from(1),
             formattedBalance: '1.0',
             token: {
