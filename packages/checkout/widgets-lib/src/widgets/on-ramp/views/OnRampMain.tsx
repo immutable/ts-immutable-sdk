@@ -80,9 +80,6 @@ export function OnRampMain({ environment }: OnRampProps) {
         }
       }
     };
-
-    // eslint-disable-next-line no-console
-    console.log('useeffect passed check for iframe domElement');
     window.addEventListener('message', handler);
 
     // eslint-disable-next-line consistent-return
