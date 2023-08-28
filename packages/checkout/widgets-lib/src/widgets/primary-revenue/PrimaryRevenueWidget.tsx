@@ -86,7 +86,6 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
 
     const balance = parseFloat(formattedBalance);
     const requiredAmounts = parseFloat(amount);
-    console.log('🚀 ~ file:  ~ balance:', balance, requiredAmounts);
 
     return balance > requiredAmounts;
   }, [checkout, provider, amount, fromContractAddress]);
