@@ -292,8 +292,7 @@ export function decodeMulticallExactOutputSingleWithoutFees(data: utils.BytesLik
   return { swapParams };
 }
 
-export function setupSwapTxTest(params?: { tokenIn?: TokenInfo, multiPoolSwap?: boolean }): SwapTest {
-  const tokenIn = params?.tokenIn ?? USDC_TEST_TOKEN;
+export function setupSwapTxTest(params?: { multiPoolSwap?: boolean }): SwapTest {
   const multiPoolSwap = params?.multiPoolSwap ?? false;
   const fromAddress = TEST_FROM_ADDRESS;
 
@@ -301,7 +300,7 @@ export function setupSwapTxTest(params?: { tokenIn?: TokenInfo, multiPoolSwap?: 
   const arbitraryLiquidity = 10;
   const sqrtPriceAtTick = TickMath.getSqrtRatioAtTick(arbitraryTick);
 
-  const uniswapTokenIn = tokenInfoToUniswapToken(tokenIn);
+  const uniswapTokenIn = tokenInfoToUniswapToken(USDC_TEST_TOKEN);
   const intermediaryToken = tokenInfoToUniswapToken(FUN_TEST_TOKEN);
   const tokenOut = tokenInfoToUniswapToken(WETH_TEST_TOKEN);
 
