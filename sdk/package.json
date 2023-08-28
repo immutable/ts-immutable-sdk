@@ -102,10 +102,6 @@
     "./erc20": {
       "types": "./dist/erc20.d.ts",
       "import": "./dist/erc20.js"
-    },
-    "./erc721": {
-      "types": "./dist/erc721.d.ts",
-      "import": "./dist/erc721.js"
     }
   },
   "files": [
