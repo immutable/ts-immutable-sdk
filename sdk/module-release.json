@@ -13,8 +13,7 @@
         "passport": "prod",
         "orderbook": "alpha",
         "provider": "prod",
-        "checkout_sdk": "alpha",
-        "checkout_widgets": "alpha"
+        "checkout_sdk": "alpha"
     },
     "fileCopy": [
         {
