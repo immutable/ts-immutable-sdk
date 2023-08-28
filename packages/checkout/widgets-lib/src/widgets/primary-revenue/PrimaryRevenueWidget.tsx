@@ -93,8 +93,6 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
   }, [checkout, provider, amount, fromContractAddress]);
 
   const prepareApprove = async () => {
-    if (!provider) return false;
-
     // Encode data
     const txData = encodeApprove(fromContractAddress, amount);
 
