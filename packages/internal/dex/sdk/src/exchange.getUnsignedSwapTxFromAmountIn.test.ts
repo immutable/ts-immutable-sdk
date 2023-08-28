@@ -28,8 +28,11 @@ import {
   formatEther,
   USDC_TEST_TOKEN,
   expectInstanceOf,
+  newAmountFromString,
 } from './test/utils';
-import { Router, SecondaryFee, uniswapTokenToTokenInfo } from './lib';
+import {
+  addAmount, Router, SecondaryFee, uniswapTokenToTokenInfo,
+} from './lib';
 
 jest.mock('@ethersproject/providers');
 jest.mock('@ethersproject/contracts');
@@ -45,7 +48,7 @@ jest.mock('./lib/utils', () => ({
 }));
 
 const HIGHER_SLIPPAGE = 0.2;
-const APPROVED_AMOUNT = utils.parseUnits('1', USDC_TEST_TOKEN.decimals);
+const APPROVED_AMOUNT = newAmountFromString('1', USDC_TEST_TOKEN);
 const APPROVE_GAS_ESTIMATE = BigNumber.from('100000');
 
 describe('getUnsignedSwapTxFromAmountIn', () => {
@@ -54,7 +57,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   beforeAll(() => {
     erc20Contract = (Contract as unknown as jest.Mock).mockImplementation(
       () => ({
-        allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT),
+        allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT.value),
         estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
         paused: jest.fn().mockResolvedValue(false),
       }),
@@ -79,12 +82,12 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
-      const amountIn = APPROVED_AMOUNT.add(utils.parseUnits('1', USDC_TEST_TOKEN.decimals));
+      const amountIn = addAmount(APPROVED_AMOUNT, newAmountFromString('1', USDC_TEST_TOKEN));
       const tx = await exchange.getUnsignedSwapTxFromAmountIn(
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        amountIn,
+        amountIn.value,
       );
 
       expectToBeDefined(tx.approval?.transaction.data);
@@ -92,7 +95,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const decodedResults = erc20ContractInterface.decodeFunctionData('approve', tx.approval.transaction.data);
       expect(decodedResults[0]).toEqual(TEST_PERIPHERY_ROUTER_ADDRESS);
       // we have already approved 1000000000000000000, so we expect to approve 1000000000000000000 more
-      expect(decodedResults[1].toString()).toEqual(APPROVED_AMOUNT.toString());
+      expect(decodedResults[1].toString()).toEqual(APPROVED_AMOUNT.value.toString());
       expect(tx.approval.transaction.to).toEqual(params.inputToken);
       expect(tx.approval.transaction.from).toEqual(params.fromAddress);
       expect(tx.approval.transaction.value).toEqual(0); // we do not want to send any ETH
@@ -104,12 +107,12 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
-      const amountIn = APPROVED_AMOUNT.add(utils.parseEther('1'));
+      const amountIn = addAmount(APPROVED_AMOUNT, newAmountFromString('1', USDC_TEST_TOKEN));
       const tx = await exchange.getUnsignedSwapTxFromAmountIn(
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        amountIn,
+        amountIn.value,
       );
 
       expectToBeDefined(tx.approval?.gasFeeEstimate);
@@ -134,7 +137,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        APPROVED_AMOUNT,
+        APPROVED_AMOUNT.value,
       );
 
       // we have already approved 1000000000000000000, so we don't expect to approve anything
@@ -288,7 +291,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
     it('should use the default router contract with no fees applied to the swap', async () => {
       erc20Contract = (Contract as unknown as jest.Mock).mockImplementation(
         () => ({
-          allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT),
+          allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT.value),
           estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
           paused: jest.fn().mockResolvedValue(true),
         }),
@@ -325,7 +328,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       it('should apply secondary fees to a subsequent swap request', async () => {
         erc20Contract = (Contract as unknown as jest.Mock).mockImplementation(
           () => ({
-            allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT),
+            allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT.value),
             estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
             paused: jest.fn().mockResolvedValue(true),
           }),
@@ -350,7 +353,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         // Unpause the secondary fee contract
         erc20Contract = (Contract as unknown as jest.Mock).mockImplementation(
           () => ({
-            allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT),
+            allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT.value),
             estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
             paused: jest.fn().mockResolvedValue(false),
           }),
@@ -503,11 +506,10 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        utils.parseUnits('100', USDC_TEST_TOKEN.decimals),
+        newAmountFromString('100', USDC_TEST_TOKEN).value,
         HIGHER_SLIPPAGE,
       );
 
-      expect(quote).not.toBe(undefined);
       expect(quote.amount.token.address).toEqual(params.outputToken);
       expect(quote.slippage).toBe(0.2);
       expect(formatAmount(quote.amount)).toEqual('1000.0');
