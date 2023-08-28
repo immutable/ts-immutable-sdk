@@ -13,7 +13,10 @@ export type CreateListingRequestBody = {
    * Buy item for listing should either be NATIVE or ERC20 item
    */
   buy: Array<Item>;
-  fees: Array<Fee>;
+  /**
+   * The maker marketplace fee
+   */
+  fee?: Fee;
   /**
    * Time after which the Order is considered expired
    */
