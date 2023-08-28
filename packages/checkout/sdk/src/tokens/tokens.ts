@@ -2,6 +2,7 @@ import {
   DexConfig,
   GetTokenAllowListParams,
   GetTokenAllowListResult,
+  OnRampConfig,
   TokenFilterTypes,
   TokenInfo,
 } from '../types';
@@ -9,7 +10,9 @@ import { CheckoutConfiguration } from '../config';
 
 export const getTokenAllowList = async (
   config: CheckoutConfiguration,
-  { type = TokenFilterTypes.ALL, chainId, exclude }: GetTokenAllowListParams,
+  {
+    type = TokenFilterTypes.ALL, chainId, exclude, onRampProvider,
+  }: GetTokenAllowListParams,
 ): Promise<GetTokenAllowListResult> => {
   let tokens: TokenInfo[] = [];
 
@@ -21,7 +24,9 @@ export const getTokenAllowList = async (
       tokens = ((await config.remote.getConfig('dex')) as DexConfig)
         .tokens || [];
       break;
-
+    case TokenFilterTypes.ONRAMP:
+      tokens = ((await config.remote.getConfig('onramp')) as OnRampConfig)[onRampProvider ?? 'transak'].tokens || [];
+      break;
     case TokenFilterTypes.BRIDGE:
     case TokenFilterTypes.ALL:
     default:

@@ -1,4 +1,5 @@
 import { ChainId } from './chains';
+import { OnRampProvider } from './onramp';
 import { TokenInfo } from './tokenInfo';
 
 export interface TokenMasterInfo extends TokenInfo {
@@ -16,6 +17,7 @@ export interface GetTokenAllowListParams {
   type: TokenFilterTypes;
   chainId: ChainId;
   exclude?: TokenFilter[];
+  onRampProvider?: OnRampProvider
 }
 
 /**
@@ -33,6 +35,7 @@ export enum TokenFilterTypes {
   ALL = 'all',
   SWAP = 'swap',
   BRIDGE = 'bridge',
+  ONRAMP = 'onramp',
 }
 
 /**
