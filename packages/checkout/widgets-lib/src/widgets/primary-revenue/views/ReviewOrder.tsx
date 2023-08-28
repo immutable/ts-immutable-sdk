@@ -32,7 +32,7 @@ const mockOrderItems: any[] = [
   {
     name: 'Redstone Chest',
     contract_address: '0x18ea1d312a4037B8676c760AbfD7D1DBE65486a1',
-    token_id: '0x123',
+    token_id: '0x234',
     image: 'https://via.placeholder.com/151',
     chain: {
       id: '5',
@@ -52,6 +52,7 @@ const mockOrderItems: any[] = [
 
 export interface ReviewOrderProps {
   currency?: string;
+  executeBuyNow: () => Promise<string>;
 }
 
 export function ReviewOrder(props: ReviewOrderProps) {
@@ -59,7 +60,7 @@ export function ReviewOrder(props: ReviewOrderProps) {
   const [orderItems, setOrderItems] = useState<any[]>([]);
   const [totalPrice, setTotalPrice] = useState<number>(0);
 
-  const { currency } = props;
+  const { currency, executeBuyNow } = props;
 
   useEffect(() => {
     // TODO: fetch the order from the BE
@@ -76,16 +77,20 @@ export function ReviewOrder(props: ReviewOrderProps) {
     setTotalPrice(calculatedTotalPrice);
   });
 
-  const proceedToPayment = () => {
+  const handlePayment = () => {
     // approve with passport
+    executeBuyNow();
   };
 
   return (
     <SimpleLayout
       testId="review-order-view"
-      header={
-        <HeaderNavigation title={header.heading} onCloseButtonClick={() => {}} />
-      }
+      header={(
+        <HeaderNavigation
+          title={header.heading}
+          onCloseButtonClick={() => {}}
+        />
+      )}
       footer={<FooterLogo />}
       footerBackgroundColor="base.color.translucent.emphasis.200"
     >
@@ -121,7 +126,7 @@ export function ReviewOrder(props: ReviewOrderProps) {
           <Button
             testId="pay-now-button"
             variant="primary"
-            onClick={proceedToPayment}
+            onClick={handlePayment}
             size="large"
           >
             Pay Now
