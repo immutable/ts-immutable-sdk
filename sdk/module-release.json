@@ -10,7 +10,13 @@
         "config": "prod",
         "blockchain_data": "alpha",
         "immutablex_client": "prod",
-        "passport": "prod"
+        "passport": "prod",
+        "provider": "prod",
+        "checkout_sdk": "alpha",
+        "checkout_widgets": "alpha",
+        "erc20": "alpha",
+        "erc721": "alpha",
+        "erc721_mint_by_id": "alpha"
     },
     "fileCopy": [
         {
