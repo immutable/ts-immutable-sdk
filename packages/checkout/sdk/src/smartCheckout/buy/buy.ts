@@ -148,6 +148,7 @@ export const buy = async (
   ];
 
   await smartCheckout(
+    config,
     provider,
     itemRequirements,
     getTransactionOrGas(gasLimit, unsignedTransaction),

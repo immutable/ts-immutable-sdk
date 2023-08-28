@@ -503,7 +503,12 @@ describe('Connect', () => {
     await checkout.smartCheckout(params);
 
     expect(smartCheckout).toBeCalledTimes(1);
-    expect(smartCheckout).toBeCalledWith(params.provider, params.itemRequirements, params.transactionOrGasAmount);
+    expect(smartCheckout).toBeCalledWith(
+      checkout.config,
+      params.provider,
+      params.itemRequirements,
+      params.transactionOrGasAmount,
+    );
   });
 
   it('should throw error for smartCheckout function if is production', async () => {
