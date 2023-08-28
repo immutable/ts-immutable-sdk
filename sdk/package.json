@@ -98,10 +98,6 @@
     "./checkout_widgets": {
       "types": "./dist/checkout_widgets.d.ts",
       "import": "./dist/checkout_widgets.js"
-    },
-    "./erc20": {
-      "types": "./dist/erc20.d.ts",
-      "import": "./dist/erc20.js"
     }
   },
   "files": [

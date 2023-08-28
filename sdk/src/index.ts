@@ -6,4 +6,3 @@ export * as orderbook from './orderbook';
 export * as provider from './provider';
 export * as checkoutSdk from './checkout_sdk';
 export * as checkoutWidgets from './checkout_widgets';
-export * as erc20 from './erc20';
