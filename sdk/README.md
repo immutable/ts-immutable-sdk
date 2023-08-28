@@ -11,7 +11,10 @@
 
 See our [developer documentation](https://docs.immutable.com) for information on building on Immutable.
 
-See our [API reference](https://docs.immutable.com/reference) for more information on our APIs.
+See our rollup API references for more information on our APIs.
+
+- [Immutable X API Reference](https://docs.immutable.com/x/reference)
+- [Immutable zkEVM API Reference](https://docs.immutable.com/zkevm/reference)
 
 ### Examples
 
@@ -20,7 +23,7 @@ See our [API reference](https://docs.immutable.com/reference) for more informati
 ## Installation
 
 ```sh
-npm install @imtbl/sdk --save
+npm install @imtbl/sdk
 # or
 yarn add @imtbl/sdk
 ```

@@ -1,6 +1,8 @@
 import { BigNumber } from 'ethers';
-import { ItemRequirement, ItemType } from '../types';
-import { erc20ItemAggregator, erc721ItemAggregator, itemAggregator } from './itemAggregator';
+import { ItemRequirement, ItemType } from '../../types';
+import {
+  erc20ItemAggregator, erc721ItemAggregator, itemAggregator, nativeAggregator,
+} from './itemAggregator';
 
 describe('itemAggregator', () => {
   describe('itemAggregator', () => {
@@ -44,11 +46,7 @@ describe('itemAggregator', () => {
       expect(aggregatedItems).toEqual([
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
-        },
-        {
-          type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigNumber.from(2),
         },
         {
           type: ItemType.ERC20,
@@ -461,6 +459,53 @@ describe('itemAggregator', () => {
           } as ItemRequirement,
         ]),
       );
+    });
+  });
+
+  describe('nativeAggregator', () => {
+    it('should aggregate native items', () => {
+      const itemRequirements: ItemRequirement[] = [
+        {
+          type: ItemType.NATIVE,
+          amount: BigNumber.from(1),
+        },
+        {
+          type: ItemType.NATIVE,
+          amount: BigNumber.from(1),
+        },
+        {
+          type: ItemType.ERC20,
+          amount: BigNumber.from(1),
+          contractAddress: '0xERC20',
+          spenderAddress: '0xSEAPORT',
+        },
+        {
+          type: ItemType.ERC20,
+          amount: BigNumber.from(1),
+          contractAddress: '0xERC20',
+          spenderAddress: '0xSEAPORT',
+        },
+      ];
+
+      const aggregatedItems = nativeAggregator(itemRequirements);
+      expect(aggregatedItems).toEqual([
+        {
+          type: ItemType.ERC20,
+          amount: BigNumber.from(1),
+          contractAddress: '0xERC20',
+          spenderAddress: '0xSEAPORT',
+        },
+        {
+          type: ItemType.ERC20,
+          amount: BigNumber.from(1),
+          contractAddress: '0xERC20',
+          spenderAddress: '0xSEAPORT',
+        },
+        {
+          type: ItemType.NATIVE,
+          amount: BigNumber.from(2),
+        },
+      ]);
     });
   });
 });

@@ -18,6 +18,7 @@ export * from './react/BridgeWidget';
 export * from './react/ConnectWidget';
 export * from './react/SwapWidget';
 export * from './react/WalletWidget';
+export * from './react/OnRampWidget';
 
 // Checkout
 export { CheckoutWidgets, UpdateConfig };
