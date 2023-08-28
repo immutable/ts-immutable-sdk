@@ -17,6 +17,7 @@ import { ConnectionStatus } from '../../../../context/connect-loader-context/Con
 import {
   ConnectLoaderTestComponent,
 } from '../../../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
+import { IMX_ADDRESS_ZKEVM } from '../../../../lib';
 
 describe('BalanceItem', () => {
   const connectLoaderState = {
@@ -39,6 +40,7 @@ describe('BalanceItem', () => {
     id: '1',
     symbol: 'IMX',
     balance: '21.32',
+    address: IMX_ADDRESS_ZKEVM,
     description: 'some description',
   };
 
@@ -102,7 +104,56 @@ describe('BalanceItem', () => {
     cySmartGet('token-menu').should('exist');
   });
 
-  it('should show ONLY the add and swap options on zkEVM when all topUps are enabled', () => {
+  it('should show the swap option on zkEVM when all topUps are enabled', () => {
+    const testWalletState = {
+      ...baseWalletState,
+      network: {
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        name: ChainName.IMTBL_ZKEVM_TESTNET,
+        nativeCurrency: {
+          name: 'IMX',
+          symbol: 'IMX',
+          decimals: 18,
+        },
+        isSupported: true,
+      },
+      tokenBalances: [testBalanceInfo],
+      supportedTopUps: {
+        isOnRampEnabled: true,
+        isSwapEnabled: true,
+        isBridgeEnabled: true,
+      },
+    };
+
+    mount(
+      <ConnectLoaderTestComponent
+        initialStateOverride={connectLoaderState}
+      >
+        <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+          <BalanceItem balanceInfo={testBalanceInfo} bridgeToL2OnClick={() => {}} />
+        </WalletWidgetTestComponent>
+        ,
+      </ConnectLoaderTestComponent>,
+    );
+
+    cySmartGet('token-menu').should('exist');
+    cySmartGet('token-menu').click();
+    cySmartGet('balance-item-swap-option').should('be.visible');
+    cySmartGet('balance-item-swap-option').should('have.text', 'Swap IMX');
+    cySmartGet('balance-item-move-option').should('not.be.visible');
+  });
+
+  it('should show the add option on zkEVM when token is in onramp allowlist', () => {
+    cy.stub(Checkout.prototype, 'getTokenAllowList').as('tokenAllowListStub').resolves({
+      tokens: [
+        {
+          name: 'tIMX',
+          symbol: 'tIMX',
+          decimals: 18,
+          address: IMX_ADDRESS_ZKEVM,
+        },
+      ],
+    });
     const testWalletState = {
       ...baseWalletState,
       network: {
@@ -140,6 +191,65 @@ describe('BalanceItem', () => {
     cySmartGet('balance-item-add-option').should('have.text', 'Add IMX');
     cySmartGet('balance-item-swap-option').should('be.visible');
     cySmartGet('balance-item-swap-option').should('have.text', 'Swap IMX');
+    cySmartGet('balance-item-move-option').should('not.be.visible');
+  });
+
+  it('should NOT show the add option on zkEVM if token is not in allowlist', () => {
+    cy.stub(Checkout.prototype, 'getTokenAllowList').as('tokenAllowListStub').resolves({
+      tokens: [
+        {
+          name: 'tIMX',
+          symbol: 'tIMX',
+          decimals: 18,
+          address: IMX_ADDRESS_ZKEVM,
+        },
+      ],
+    });
+    const balanceInfoNotInAllowList = {
+      fiatAmount: '3412.08',
+      id: '1',
+      symbol: 'zkTEST',
+      balance: '21.32',
+      address: '0x1234567890123456789012345678901234567890',
+      description: 'some description',
+    };
+    const testWalletState = {
+      ...baseWalletState,
+      network: {
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        name: ChainName.IMTBL_ZKEVM_TESTNET,
+        nativeCurrency: {
+          name: 'IMX',
+          symbol: 'IMX',
+          decimals: 18,
+        },
+        isSupported: true,
+      },
+      tokenBalances: [testBalanceInfo, balanceInfoNotInAllowList,
+      ],
+      supportedTopUps: {
+        isOnRampEnabled: true,
+        isSwapEnabled: true,
+        isBridgeEnabled: true,
+      },
+    };
+
+    mount(
+      <ConnectLoaderTestComponent
+        initialStateOverride={connectLoaderState}
+      >
+        <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+          <BalanceItem balanceInfo={balanceInfoNotInAllowList} bridgeToL2OnClick={() => {}} />
+        </WalletWidgetTestComponent>
+        ,
+      </ConnectLoaderTestComponent>,
+    );
+
+    cySmartGet('token-menu').should('exist');
+    cySmartGet('token-menu').click();
+    cySmartGet('balance-item-add-option').should('not.be.visible');
+    cySmartGet('balance-item-swap-option').should('be.visible');
+    cySmartGet('balance-item-swap-option').should('have.text', 'Swap zkTEST');
     cySmartGet('balance-item-move-option').should('not.be.visible');
   });
 
@@ -222,7 +332,7 @@ describe('BalanceItem', () => {
     cySmartGet('balance-item-move-option').should('have.text', 'Move IMX');
   });
 
-  it('should show NOT the move option when provider is Passport', () => {
+  it('should NOT show the move option when provider is Passport', () => {
     const testWalletState = {
       ...baseWalletState,
       network: {
@@ -295,7 +405,7 @@ describe('BalanceItem', () => {
         ...baseWalletState,
         network: {
           chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-          name: 'Immutable zkEVM Testnet',
+          name: ChainName.IMTBL_ZKEVM_TESTNET,
           nativeCurrency: {
             name: 'IMX',
             symbol: 'IMX',
@@ -333,7 +443,7 @@ describe('BalanceItem', () => {
         IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
         {
           toTokenAddress: '',
-          fromTokenAddress: '',
+          fromTokenAddress: IMX_ADDRESS_ZKEVM,
           amount: '',
         },
       );
@@ -359,7 +469,7 @@ describe('BalanceItem', () => {
         window,
         IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
         {
-          tokenAddress: '',
+          tokenAddress: IMX_ADDRESS_ZKEVM,
           amount: '',
         },
       );
