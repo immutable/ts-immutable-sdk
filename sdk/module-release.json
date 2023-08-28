@@ -15,8 +15,7 @@
         "provider": "prod",
         "checkout_sdk": "alpha",
         "checkout_widgets": "alpha",
-        "erc20": "alpha",
-        "erc721": "alpha"
+        "erc20": "alpha"
     },
     "fileCopy": [
         {
