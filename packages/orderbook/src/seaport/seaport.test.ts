@@ -29,6 +29,8 @@ import {
 import { Seaport } from './seaport';
 import { SeaportLibFactory } from './seaport-lib-factory';
 
+const fakeExtraData = '0x0000000000000000000000000000000000000000000000000064ec2faca1186bef338313426612ad6ed494b50e5ddc65ad4e6067df53d6625f921b22156ac9435d4fd946bc5f07859ecd7aca94f87da703b9204f9c09f0089be18d5c268a5f36c80c779ed3cbf6ed54b7c7bf2991a4b11065b01c1a2594619f1a0d49f9';
+
 // Make an address-like string for tests
 function randomAddress() {
   return `0x${Math.random().toString(16).substr(2)}`;
@@ -452,7 +454,7 @@ describe('Seaport', () => {
                     parameters: anything(),
                     signature: immutableOrder.signature,
                   },
-                  extraData: '',
+                  extraData: fakeExtraData,
                   tips: [],
                 },
               ],
@@ -476,7 +478,7 @@ describe('Seaport', () => {
       });
 
       it('returns the expected unsignedApprovalTransaction', async () => {
-        const { actions } = await sut.fulfillOrder(immutableOrder, fulfiller, '');
+        const { actions } = await sut.fulfillOrder(immutableOrder, fulfiller, fakeExtraData);
         const approvalAction = actions.find(
           (a): a is TransactionAction => a.purpose === TransactionPurpose.APPROVAL,
         );
@@ -490,7 +492,7 @@ describe('Seaport', () => {
       });
 
       it('returns the expected unsignedFulfillmentTransaction', async () => {
-        const { actions } = await sut.fulfillOrder(immutableOrder, fulfiller, '');
+        const { actions } = await sut.fulfillOrder(immutableOrder, fulfiller, fakeExtraData);
         const fulfillmentAction = actions.find(
           (a): a is TransactionAction => a.purpose === TransactionPurpose.FULFILL_ORDER,
         );
