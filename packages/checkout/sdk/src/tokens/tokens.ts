@@ -11,7 +11,7 @@ import { CheckoutConfiguration } from '../config';
 export const getTokenAllowList = async (
   config: CheckoutConfiguration,
   {
-    type = TokenFilterTypes.ALL, chainId, exclude, onRampProvider,
+    type = TokenFilterTypes.ALL, chainId, exclude,
   }: GetTokenAllowListParams,
 ): Promise<GetTokenAllowListResult> => {
   let tokens: TokenInfo[] = [];
@@ -25,7 +25,7 @@ export const getTokenAllowList = async (
         .tokens || [];
       break;
     case TokenFilterTypes.ONRAMP:
-      tokens = ((await config.remote.getConfig('onramp')) as OnRampConfig)[onRampProvider ?? 'transak'].tokens || [];
+      tokens = ((await config.remote.getConfig('onramp')) as OnRampConfig).transak.tokens || [];
       break;
     case TokenFilterTypes.BRIDGE:
     case TokenFilterTypes.ALL:

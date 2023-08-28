@@ -34,12 +34,12 @@ export type OnRampProviderFees = {
 
 /**
  * A type representing the configuration for the OnRamp for a specific provider.
- * @property {TokenInfo[] | undefined} tokens - allowed tokens for the OnRamp provider
+ * @property {TokenInfo[]} tokens - allowed tokens for the OnRamp provider
  * @property {OnRampProviderFees} fees - on ramp provider transaction fees
  */
 export type OnRampProviderConfig = {
-  tokens?: TokenInfo[],
-  fees?: OnRampProviderFees
+  tokens: TokenInfo[],
+  fees: OnRampProviderFees
 };
 
 /**
