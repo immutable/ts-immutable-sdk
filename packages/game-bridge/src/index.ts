@@ -221,10 +221,12 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
         const unsignedTransferRequest = JSON.parse(data);
         const response = await providerInstance?.transfer(unsignedTransferRequest);
         callbackToGame({
-          responseFor: fxName,
-          requestId,
-          success: response !== null && response !== undefined,
-          result: response,
+          ...{
+            responseFor: fxName,
+            requestId,
+            success: response !== null && response !== undefined,
+          },
+          ...response
         });
         break;
       }
@@ -232,10 +234,13 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
         const nftTransferDetails = JSON.parse(data);
         const response = await providerInstance?.batchNftTransfer(nftTransferDetails)
         callbackToGame({
-          responseFor: fxName,
-          requestId,
-          success: response !== null && response !== undefined,
-          result: response,
+          ...{
+            responseFor: fxName,
+            requestId,
+            success: response !== null && response !== undefined,
+            result: response
+          },
+          ...response
         });
         break;
       }

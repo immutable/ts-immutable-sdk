@@ -14,7 +14,6 @@ import {
   getConfigFromEnv,
 } from './helpers';
 import { actionAll } from './helpers/actions';
-import { Fee } from '../openapi/sdk/models/Fee';
 
 async function deployAndMintNftContract(wallet: Wallet): Promise<TestToken> {
   const { contract } = await deployTestToken(wallet);
@@ -86,7 +85,6 @@ describe('', () => {
       orderSignature: signatures[0],
       makerFee: {
         amount: '1',
-        fee_type: Fee.fee_type.MAKER_MARKETPLACE,
         recipient: offerer.address,
       },
     });
@@ -99,7 +97,6 @@ describe('', () => {
       fulfiller.address,
       {
         amount: '1',
-        fee_type: Fee.fee_type.TAKER_MARKETPLACE,
         recipient: offerer.address,
       },
     );

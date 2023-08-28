@@ -13,13 +13,13 @@ import {
   BridgeWidgetViews,
   PrefilledBridgeForm,
 } from '../../../context/view-context/BridgeViewContextTypes';
-import { IMXCoinsHero } from '../../../components/Hero/IMXCoinsHero';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
-import { ImmutableNetworkHero } from '../../../components/Hero/ImmutableNetworkHero';
+import { ImmutablePlanetHero } from '../../../components/Hero/ImmutablePlanetHero';
 import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { LoadingView } from '../../../views/loading/LoadingView';
 import { BridgeContext } from '../context/BridgeContext';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
+import { WalletApproveHero } from '../../../components/Hero/WalletApproveHero';
 
 export interface ApproveERC20BridgeProps {
   data: ApproveERC20BridgeData;
@@ -271,7 +271,7 @@ export function ApproveERC20BridgeOnboarding({ data }: ApproveERC20BridgeProps) 
             />
           )}
           floatHeader
-          heroContent={showBridgeTxnStep ? <ImmutableNetworkHero /> : <IMXCoinsHero />}
+          heroContent={showBridgeTxnStep ? <ImmutablePlanetHero /> : <WalletApproveHero />}
           footer={showBridgeTxnStep ? approveBridgeFooter : approveSpendingFooter}
         >
           {showBridgeTxnStep ? approveBridgeContent : approveSpendingContent}

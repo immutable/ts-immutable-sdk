@@ -3,10 +3,11 @@ import {
   ListingResult,
   ListListingsResult,
   OrdersService,
+  Fee,
 } from 'openapi/sdk';
-import { CreateListingParams, ListListingsParams } from 'types';
-import { FulfillmentDataResult } from 'openapi/sdk/models/FulfillmentDataResult';
-import { FulfillmentDataRequest } from 'openapi/sdk/models/FulfillmentDataRequest';
+import { CreateListingParams, FeeType, ListListingsParams } from '../types';
+import { FulfillmentDataResult } from '../openapi/sdk/models/FulfillmentDataResult';
+import { FulfillmentDataRequest } from '../openapi/sdk/models/FulfillmentDataRequest';
 import { ItemType, SEAPORT_CONTRACT_VERSION_V1_5 } from '../seaport';
 
 export class ImmutableApiClient {
@@ -78,7 +79,11 @@ export class ImmutableApiClient {
             contract_address: orderComponents.consideration[0].token,
           },
         ],
-        fees: makerFee ? [makerFee] : [],
+        fees: makerFee ? [{
+          amount: makerFee.amount,
+          fee_type: FeeType.MAKER_MARKETPLACE as unknown as Fee.fee_type,
+          recipient: makerFee.recipient,
+        }] : [],
         end_time: new Date(
           parseInt(`${orderComponents.endTime.toString()}000`, 10),
         ).toISOString(),
