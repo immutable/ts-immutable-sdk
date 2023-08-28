@@ -10,7 +10,7 @@ import {
 import { balanceCheck } from './balanceCheck';
 import { CheckoutConfiguration } from '../../config';
 import { getBalances } from '../../balances';
-import { BalanceCheckInsufficient } from './types';
+import { BalanceCheckResult } from './types';
 
 jest.mock('../../balances');
 jest.mock('ethers', () => ({
@@ -64,8 +64,8 @@ describe('balanceCheck', () => {
       };
       (getBalances as jest.Mock).mockResolvedValue(getBalancesResult);
 
-      const balanceRequirements = await balanceCheck(config, mockProvider, '0xADDRESS', itemRequirements);
-      expect(balanceRequirements.sufficient).toEqual(true);
+      const { sufficient } = await balanceCheck(config, mockProvider, '0xADDRESS', itemRequirements);
+      expect(sufficient).toBeTruthy();
     });
 
     it('should return delta if balance is not sufficient', async () => {
@@ -92,11 +92,10 @@ describe('balanceCheck', () => {
       };
       (getBalances as jest.Mock).mockResolvedValue(getBalancesResult);
 
-      const balanceRequirements = await balanceCheck(config, mockProvider, '0xADDRESS', itemRequirements);
-      expect(balanceRequirements.sufficient).toEqual(false);
-      expect(balanceRequirements)
+      const result = await balanceCheck(config, mockProvider, '0xADDRESS', itemRequirements);
+      expect(result)
         .toEqual({
-          itemRequirements: [
+          balanceRequirements: [
             {
               type: ItemType.NATIVE,
               sufficient: false,
@@ -149,8 +148,8 @@ describe('balanceCheck', () => {
       };
       (getBalances as jest.Mock).mockResolvedValue(getBalancesResult);
 
-      const balanceRequirements = await balanceCheck(config, mockProvider, '0xADDRESS', itemRequirements);
-      expect(balanceRequirements.sufficient).toEqual(true);
+      const { sufficient } = await balanceCheck(config, mockProvider, '0xADDRESS', itemRequirements);
+      expect(sufficient).toEqual(true);
     });
 
     it('should return delta if balance is not sufficient', async () => {
@@ -179,11 +178,10 @@ describe('balanceCheck', () => {
       };
       (getBalances as jest.Mock).mockResolvedValue(getBalancesResult);
 
-      const balanceRequirements = await balanceCheck(config, mockProvider, '0xADDRESS', itemRequirements);
-      expect(balanceRequirements.sufficient).toEqual(false);
-      expect(balanceRequirements)
+      const result = await balanceCheck(config, mockProvider, '0xADDRESS', itemRequirements);
+      expect(result)
         .toEqual({
-          itemRequirements: [
+          balanceRequirements: [
             {
               type: ItemType.ERC20,
               sufficient: false,
@@ -224,8 +222,8 @@ describe('balanceCheck', () => {
         ownerOf: jest.fn().mockResolvedValue('0xADDRESS'),
       });
 
-      const balanceRequirements = await balanceCheck(config, mockProvider, '0xADDRESS', itemRequirements);
-      expect(balanceRequirements.sufficient).toEqual(true);
+      const { sufficient } = await balanceCheck(config, mockProvider, '0xADDRESS', itemRequirements);
+      expect(sufficient).toBeTruthy();
     });
   });
 
@@ -259,14 +257,14 @@ describe('balanceCheck', () => {
         ownerOf: jest.fn().mockResolvedValue('0xADDRESS'),
       });
 
-      const balanceRequirements = await balanceCheck(
+      const { sufficient, balanceRequirements } = await balanceCheck(
         config,
         mockProvider,
         '0xADDRESS',
         itemRequirements,
-      ) as BalanceCheckInsufficient;
-      expect(balanceRequirements.sufficient).toEqual(false);
-      expect(balanceRequirements.itemRequirements)
+      ) as BalanceCheckResult;
+      expect(sufficient).toBeFalsy();
+      expect(balanceRequirements)
         .toEqual(expect.arrayContaining([
           {
             current: {
@@ -372,8 +370,8 @@ describe('balanceCheck', () => {
         ownerOf: jest.fn().mockResolvedValue('0xADDRESS'),
       });
 
-      const balanceRequirements = await balanceCheck(config, mockProvider, '0xADDRESS', itemRequirements);
-      expect(balanceRequirements.sufficient).toEqual(true);
+      const { sufficient } = await balanceCheck(config, mockProvider, '0xADDRESS', itemRequirements);
+      expect(sufficient).toBeTruthy();
     });
 
     it('should aggregate balance requirements', async () => {
@@ -431,14 +429,14 @@ describe('balanceCheck', () => {
         ownerOf: jest.fn().mockResolvedValue('0xADDRESS'),
       });
 
-      const balanceRequirements = await balanceCheck(
+      const result = await balanceCheck(
         config,
         mockProvider,
         '0xADDRESS',
         itemRequirements,
-      ) as BalanceCheckInsufficient;
-      expect(balanceRequirements.sufficient).toEqual(false);
-      expect(balanceRequirements.itemRequirements)
+      ) as BalanceCheckResult;
+      expect(result.sufficient).toBeFalsy();
+      expect(result.balanceRequirements)
         .toEqual(expect.arrayContaining([
           {
             current: {
@@ -522,14 +520,14 @@ describe('balanceCheck', () => {
         ownerOf: jest.fn().mockResolvedValue('0xSOMEONEELSE'),
       });
 
-      const balanceRequirements = await balanceCheck(
+      const result = await balanceCheck(
         config,
         mockProvider,
         '0xADDRESS',
         itemRequirements,
-      ) as BalanceCheckInsufficient;
-      expect(balanceRequirements.sufficient).toEqual(false);
-      expect(balanceRequirements.itemRequirements)
+      ) as BalanceCheckResult;
+      expect(result.sufficient).toEqual(false);
+      expect(result.balanceRequirements)
         .toEqual(expect.arrayContaining([
           {
             current: {

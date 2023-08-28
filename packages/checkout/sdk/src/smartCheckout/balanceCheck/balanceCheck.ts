@@ -2,6 +2,9 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber, Contract } from 'ethers';
 import {
+  ERC721Balance,
+  ItemBalance,
+  TokenBalance,
   ERC721ABI,
   ERC721Item,
   ItemRequirement,
@@ -11,10 +14,7 @@ import { getBalances } from '../../balances';
 import { CheckoutConfiguration } from '../../config';
 import {
   BalanceCheckResult,
-  BalanceERC721Result,
   BalanceRequirement,
-  BalanceResult,
-  BalanceTokenResult,
 } from './types';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { balanceAggregator } from '../aggregators/balanceAggregator';
@@ -32,14 +32,14 @@ const getTokenBalances = async (
   provider: Web3Provider,
   ownerAddress: string,
   itemRequirements: ItemRequirement[],
-) : Promise<BalanceResult[]> => {
-  let tokenBalances: BalanceTokenResult[] = [];
+) : Promise<ItemBalance[]> => {
+  let tokenBalances: TokenBalance[] = [];
 
   try {
     const tokenList: TokenInfo[] = getTokensFromRequirements(itemRequirements);
     const { balances } = await getBalances(config, provider, ownerAddress, tokenList);
     tokenBalances = [
-      ...balances.map((balance) => balance as BalanceTokenResult),
+      ...balances.map((balance) => balance as TokenBalance),
     ];
   } catch (error: any) {
     throw new CheckoutError(
@@ -58,8 +58,8 @@ const getERC721Balances = async (
   provider: Web3Provider,
   ownerAddress: string,
   itemRequirements: ItemRequirement[],
-) : Promise<BalanceResult[]> => {
-  const erc721Balances: BalanceERC721Result[] = [];
+) : Promise<ItemBalance[]> => {
+  const erc721Balances: ERC721Balance[] = [];
 
   // Setup maps to be able to link data back to the associated promises
   const erc721s = new Map<string, ItemRequirement>();
@@ -93,7 +93,7 @@ const getERC721Balances = async (
         formattedBalance: itemCount.toString(),
         contractAddress: (itemRequirement as ERC721Item).contractAddress,
         id: (itemRequirement as ERC721Item).id,
-      } as BalanceERC721Result);
+      } as ERC721Balance);
     });
   } catch (error: any) {
     throw new CheckoutError(
@@ -127,7 +127,7 @@ export const balanceCheck = async (
   }
 
   // Get all ERC20 and NATIVE balances
-  const currentBalances: Promise<BalanceResult[]>[] = [];
+  const currentBalances: Promise<ItemBalance[]>[] = [];
   const tokenItemRequirements: ItemRequirement[] = aggregatedItems
     .filter((itemRequirement) => itemRequirement.type === ItemType.ERC20 || itemRequirement.type === ItemType.NATIVE);
   if (tokenItemRequirements.length > 0) {
@@ -170,6 +170,6 @@ export const balanceCheck = async (
   }, true);
   return {
     sufficient,
-    itemRequirements: balanceRequirements,
+    balanceRequirements,
   };
 };

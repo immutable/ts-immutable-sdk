@@ -1,22 +1,11 @@
-import { FeeData, TransactionRequest, Web3Provider } from '@ethersproject/providers';
+import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import {
   FulfilmentTransaction, GasAmount, GasTokenType, ItemRequirement, ItemType, TransactionOrGasType,
 } from '../../types';
 import { InsufficientERC20, InsufficientERC721 } from '../allowance/types';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
-
-const doesChainSupportEIP1559 = (feeData: FeeData) => !!feeData.maxFeePerGas && !!feeData.maxPriorityFeePerGas;
-
-const getGasPriceInWei = (feeData: FeeData): BigNumber | undefined => {
-  if (doesChainSupportEIP1559(feeData)) {
-    return BigNumber.from(feeData.maxFeePerGas).add(
-      BigNumber.from(feeData.maxPriorityFeePerGas),
-    );
-  }
-  if (feeData.gasPrice) return BigNumber.from(feeData.gasPrice);
-  return undefined;
-};
+import { getGasPriceInWei } from '../../utils/gasPriceInWei';
 
 export const estimateGas = async (
   provider: Web3Provider,
@@ -73,8 +62,10 @@ export const gasCalculator = async (
   } else {
     const feeData = await provider.getFeeData();
     const gasPrice = getGasPriceInWei(feeData);
-    const gas = gasPrice?.mul(transactionOrGas.gasToken.limit);
-    if (gas) totalGas = totalGas.add(gas);
+    if (gasPrice !== null) {
+      const gas = gasPrice?.mul(transactionOrGas.gasToken.limit);
+      if (gas) totalGas = totalGas.add(gas);
+    }
   }
 
   // Get the gas estimates for all the transactions and calculate the total gas
