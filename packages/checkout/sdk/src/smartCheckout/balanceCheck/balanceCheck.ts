@@ -8,7 +8,7 @@ import {
   ERC721ABI,
   ERC721Item,
   ItemRequirement,
-  ItemType, TokenInfo,
+  ItemType, TokenInfo, NativeItem, ERC20Item,
 } from '../../types';
 import { getBalances } from '../../balances';
 import { CheckoutConfiguration } from '../../config';
@@ -89,11 +89,12 @@ const getERC721Balances = async (
         itemCount = 1;
       }
       erc721Balances.push({
+        type: ItemType.ERC721,
         balance: BigNumber.from(itemCount),
         formattedBalance: itemCount.toString(),
         contractAddress: (itemRequirement as ERC721Item).contractAddress,
         id: (itemRequirement as ERC721Item).id,
-      } as ERC721Balance);
+      });
     });
   } catch (error: any) {
     throw new CheckoutError(
@@ -147,7 +148,7 @@ export const balanceCheck = async (
     if (balances.length > 1 || tokenItemRequirements.length > 0) {
       const tokenBalances = balances[0];
       tokenItemRequirements.forEach((tokenItemRequirement) => {
-        requirements.push(getTokenBalanceRequirement(tokenItemRequirement as any, tokenBalances));
+        requirements.push(getTokenBalanceRequirement(tokenItemRequirement as (NativeItem | ERC20Item), tokenBalances));
       });
       if (erc721ItemRequirements.length > 0) {
         const erc721Balances = balances[1];

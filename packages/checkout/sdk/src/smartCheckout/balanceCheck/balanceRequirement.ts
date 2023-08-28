@@ -12,16 +12,15 @@ import {
   TokenInfo,
 } from '../../types';
 import {
+  BalanceERC20Requirement,
   BalanceERC721Requirement,
-  BalanceRequirement,
+  BalanceNativeRequirement,
 } from './types';
 
 export const getTokensFromRequirements = (itemRequirements: ItemRequirement[]): TokenInfo[] => itemRequirements
   .map((itemRequirement) => {
     if (itemRequirement.type === ItemType.NATIVE) {
       return {
-        name: 'IMX',
-        symbol: 'IMX',
         address: IMX_ADDRESS_ZKEVM,
       } as TokenInfo;
     }
@@ -64,17 +63,17 @@ export const getERC721BalanceRequirement = (
   }
   return {
     sufficient,
-    type: itemRequirement.type,
+    type: ItemType.ERC721,
     delta: {
       balance: delta,
       formattedBalance: delta.toString(),
     },
-    current: erc721BalanceResult as ERC721Balance,
+    current: erc721BalanceResult,
     required: {
       ...erc721BalanceResult,
       balance: BigNumber.from(1),
       formattedBalance: '1',
-    } as ERC721Balance,
+    },
   };
 };
 
@@ -84,7 +83,7 @@ export const getERC721BalanceRequirement = (
 export const getTokenBalanceRequirement = (
   itemRequirement: ERC20Item | NativeItem,
   balances: ItemBalance[],
-) : BalanceRequirement => {
+) : BalanceNativeRequirement | BalanceERC20Requirement => {
   let itemBalanceResult: ItemBalance | undefined;
 
   // Get the requirements related balance
@@ -105,8 +104,8 @@ export const getTokenBalanceRequirement = (
     || (itemBalanceResult?.balance.gte(requiredBalance) ?? false);
 
   const delta = requiredBalance.sub(itemBalanceResult?.balance ?? BigNumber.from(0));
-  let name;
-  let symbol;
+  let name = '';
+  let symbol = '';
   let decimals = DEFAULT_TOKEN_DECIMALS;
   if (itemBalanceResult) {
     decimals = (itemBalanceResult as TokenBalance).token?.decimals ?? DEFAULT_TOKEN_DECIMALS;
@@ -119,17 +118,18 @@ export const getTokenBalanceRequirement = (
     // No token balance so mark as zero native
     if (!tokenBalanceResult) {
       tokenBalanceResult = {
-        type: itemRequirement.type,
+        type: ItemType.NATIVE,
         balance: BigNumber.from(0),
         formattedBalance: '0',
         token: {
-          name: 'IMX',
-          symbol: 'IMX',
+          name,
+          symbol,
           decimals: DEFAULT_TOKEN_DECIMALS,
           address: IMX_ADDRESS_ZKEVM,
         },
       };
     }
+
     return {
       sufficient,
       type: ItemType.NATIVE,
@@ -137,13 +137,17 @@ export const getTokenBalanceRequirement = (
         balance: delta,
         formattedBalance: utils.formatUnits(delta, decimals),
       },
-      current: tokenBalanceResult,
+      current: {
+        ...tokenBalanceResult,
+        type: ItemType.NATIVE,
+      },
       required: {
         ...tokenBalanceResult,
+        type: ItemType.NATIVE,
         balance: BigNumber.from(itemRequirement.amount),
         formattedBalance: utils.formatUnits(itemRequirement.amount, decimals),
       },
-    } as any;
+    };
   }
 
   // No token balance so mark as zero
@@ -157,9 +161,10 @@ export const getTokenBalanceRequirement = (
         symbol,
         address: itemRequirement.contractAddress,
         decimals,
-      } as TokenInfo,
+      },
     };
   }
+
   return {
     sufficient,
     type: ItemType.ERC20,
