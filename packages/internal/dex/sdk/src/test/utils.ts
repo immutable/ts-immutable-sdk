@@ -461,6 +461,10 @@ export function formatAmount(amount: Amount): string {
   return utils.formatUnits(amount.value, amount.token.decimals);
 }
 
+export function formatTokenAmount(amount: BigNumberish, token: TokenInfo): string {
+  return utils.formatUnits(amount, token.decimals);
+}
+
 export function formatEther(bn: PromiseOrValue<BigNumberish>): string {
   if (BigNumber.isBigNumber(bn) || typeof bn === 'string') {
     return utils.formatEther(bn);
