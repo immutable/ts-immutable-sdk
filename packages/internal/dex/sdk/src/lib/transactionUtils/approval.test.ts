@@ -2,6 +2,7 @@ import { JsonRpcProvider } from '@ethersproject/providers';
 import { BigNumber } from '@ethersproject/bignumber';
 import {
   expectToBeDefined,
+  newAmountFromString,
   TEST_FROM_ADDRESS, TEST_PERIPHERY_ROUTER_ADDRESS, TEST_ROUTING_CONTRACTS, WETH_TEST_TOKEN,
 } from 'test/utils';
 import { Contract } from '@ethersproject/contracts';
@@ -9,7 +10,7 @@ import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
 import { ApproveError } from 'errors';
 import { ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
-import { newAmount, SecondaryFee } from 'lib';
+import { SecondaryFee } from 'lib';
 import { getApproveGasEstimate, getApproveTransaction, prepareApproval } from './approval';
 
 jest.mock('@ethersproject/providers');
@@ -19,7 +20,7 @@ jest.mock('@ethersproject/contracts');
 const spenderAddress = TEST_PERIPHERY_ROUTER_ADDRESS;
 const fromAddress = TEST_FROM_ADDRESS;
 const existingAllowance = BigNumber.from('1000000000000000000');
-const tokenInAmount = newAmount(BigNumber.from('2000000000000000000'), WETH_TEST_TOKEN);
+const tokenInAmount = newAmountFromString('2', WETH_TEST_TOKEN);
 
 describe('getApprovalTransaction', () => {
   describe('when the allowance is greater than the given amount', () => {
@@ -52,7 +53,7 @@ describe('getApprovalTransaction', () => {
       const result = await getApproveTransaction(
         provider,
         TEST_FROM_ADDRESS,
-        newAmount(BigNumber.from('100000000000000000'), WETH_TEST_TOKEN),
+        newAmountFromString('1', WETH_TEST_TOKEN),
         spenderAddress,
       );
       expect(result).toBeNull();
@@ -190,7 +191,7 @@ describe('getApprovalTransaction', () => {
 
   describe("when the owner's address is the same as the spender's address", () => {
     it('should throw an ApproveError', async () => {
-      const amount = newAmount(BigNumber.from('2000000000000000000'), WETH_TEST_TOKEN);
+      const amount = newAmountFromString('2', WETH_TEST_TOKEN);
 
       const erc20Contract = (Contract as unknown as jest.Mock).mockImplementation(
         () => ({
@@ -246,8 +247,8 @@ describe('getApproveGasEstimate', () => {
 describe('prepareApproval', () => {
   describe('when exact input amount is specified', () => {
     it('uses the amount specified by the user', () => {
-      const amountSpecified = newAmount(ethers.BigNumber.from(1), WETH_TEST_TOKEN);
-      const amountWithSlippage = newAmount(ethers.BigNumber.from(2), WETH_TEST_TOKEN);
+      const amountSpecified = newAmountFromString('1', WETH_TEST_TOKEN);
+      const amountWithSlippage = newAmountFromString('2', WETH_TEST_TOKEN);
       const secondaryFees = [{ basisPoints: 0, recipient: TEST_FROM_ADDRESS }];
       const approval = prepareApproval(
         TradeType.EXACT_INPUT,
@@ -262,8 +263,8 @@ describe('prepareApproval', () => {
 
   describe('when exact output amount is specified', () => {
     it('uses the amount calculated with slippage', () => {
-      const amountSpecified = newAmount(ethers.BigNumber.from(1), WETH_TEST_TOKEN);
-      const amountWithSlippage = newAmount(ethers.BigNumber.from(2), WETH_TEST_TOKEN);
+      const amountSpecified = newAmountFromString('1', WETH_TEST_TOKEN);
+      const amountWithSlippage = newAmountFromString('2', WETH_TEST_TOKEN);
       const secondaryFees = [{ basisPoints: 0, recipient: TEST_FROM_ADDRESS }];
       const approval = prepareApproval(
         TradeType.EXACT_OUTPUT,
@@ -278,8 +279,8 @@ describe('prepareApproval', () => {
 
   describe('when secondary fees are specified', () => {
     it('uses the secondary fee address as the spender', () => {
-      const amountSpecified = newAmount(ethers.BigNumber.from(1), WETH_TEST_TOKEN);
-      const amountWithSlippage = newAmount(ethers.BigNumber.from(2), WETH_TEST_TOKEN);
+      const amountSpecified = newAmountFromString('2', WETH_TEST_TOKEN);
+      const amountWithSlippage = newAmountFromString('2', WETH_TEST_TOKEN);
       const secondaryFees = [{ basisPoints: 0, recipient: TEST_FROM_ADDRESS }];
       const approval = prepareApproval(
         TradeType.EXACT_OUTPUT,
@@ -294,8 +295,8 @@ describe('prepareApproval', () => {
 
   describe('when no secondary fees are specified', () => {
     it('uses the periphery router address as the spender', () => {
-      const amountSpecified = newAmount(ethers.BigNumber.from(1), WETH_TEST_TOKEN);
-      const amountWithSlippage = newAmount(ethers.BigNumber.from(2), WETH_TEST_TOKEN);
+      const amountSpecified = newAmountFromString('1', WETH_TEST_TOKEN);
+      const amountWithSlippage = newAmountFromString('2', WETH_TEST_TOKEN);
       const secondaryFees: SecondaryFee[] = [];
       const approval = prepareApproval(
         TradeType.EXACT_OUTPUT,

@@ -4,7 +4,7 @@ import {
   FUN_TEST_TOKEN, IMX_TEST_TOKEN, TEST_FEE_RECIPIENT,
   decodeMulticallExactInputSingleWithFees, decodeMulticallExactInputSingleWithoutFees,
   decodeMulticallExactOutputSingleWithFees, decodeMulticallExactOutputSingleWithoutFees,
-  expectInstanceOf, expectToBeDefined, makeAddr, formatAmount,
+  expectInstanceOf, expectToBeDefined, makeAddr, formatAmount, newAmountFromString,
 } from 'test/utils';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import { Fees } from 'lib/fees';
@@ -26,8 +26,8 @@ const buildExactInputQuote = (): QuoteResult => {
   return {
     gasEstimate: BigNumber.from(0),
     route,
-    amountIn: newAmount(utils.parseEther('99'), route.input),
-    amountOut: newAmount(utils.parseEther('990'), route.output),
+    amountIn: newAmountFromString('99', route.input),
+    amountOut: newAmountFromString('990', route.output),
     tradeType: TradeType.EXACT_INPUT,
   };
 };
@@ -37,8 +37,8 @@ const buildExactOutputQuote = (): QuoteResult => {
   return {
     gasEstimate: BigNumber.from(0),
     route,
-    amountIn: newAmount(utils.parseEther('100'), route.input),
-    amountOut: newAmount(utils.parseEther('1000'), route.output),
+    amountIn: newAmountFromString('100', route.input),
+    amountOut: newAmountFromString('1000', route.output),
     tradeType: TradeType.EXACT_OUTPUT,
   };
 };
