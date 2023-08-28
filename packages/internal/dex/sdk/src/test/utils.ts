@@ -16,7 +16,6 @@ import {
   SecondaryFee,
   TokenInfo,
   tokenInfoToUniswapToken,
-  uniswapTokenToTokenInfo,
 } from '../lib';
 
 export const TEST_GAS_PRICE = BigNumber.from('1500000000'); // 1.5 gwei or 1500000000 wei
@@ -355,10 +354,6 @@ export function setupSwapTxTest(tokenIn = USDC_TEST_TOKEN, multiPoolSwap = false
   };
 }
 
-// 1 IMX = 1000000000000000000
-// 1 IMX = 10 USDC
-// 10 USDC = 10000000
-
 type MockParams = {
   chainId: number;
   inputToken: string;
@@ -366,9 +361,6 @@ type MockParams = {
   pools: Pool[];
   exchangeRate?: number;
 };
-
-// amountIN = 1 IMX (18 decimals)
-// expectedAmountOut = 10 USDC (6 decimals)
 
 export const howMuchAmountOut = (amountIn: Amount, tokenOut: TokenInfo, exchangeRate: number) => {
   let amountOut = amountIn.value.mul(exchangeRate); // 10 * 10^18
@@ -389,6 +381,10 @@ export const howMuchAmountIn = (amountOut: Amount, tokenIn: TokenInfo, exchangeR
 
   if (tokenIn.decimals > amountOut.token.decimals) {
     amountIn = amountIn.mul(BigNumber.from(10).pow(tokenIn.decimals - amountOut.token.decimals)); // 10^(18-6) = 10^12
+  }
+
+  if (tokenIn.decimals < amountOut.token.decimals) {
+    amountIn = amountIn.div(BigNumber.from(10).pow(amountOut.token.decimals - tokenIn.decimals)); // 10^(18-6) = 10^12
   }
 
   return newAmount(amountIn, tokenIn);
@@ -415,16 +411,10 @@ export function mockRouterImplementation(params: MockParams) {
     );
 
     const amountIn = tradeType === TradeType.EXACT_INPUT
-      ? amountSpecified : howMuchAmountIn(tokenIn, amountSpecified, exchangeRate)
-
-    // const amountIn = tradeType === TradeType.EXACT_INPUT
-    //   ? amountSpecified : { token: tokenIn, value: amountSpecified.value.div(exchangeRate) };
+      ? amountSpecified : howMuchAmountIn(amountSpecified, tokenIn, exchangeRate);
 
     const amountOut = tradeType === TradeType.EXACT_INPUT
-      ? howMuchAmountOut(tokenOut, amountSpecified, exchangeRate) : amountSpecified;
-
-    // const amountOut = tradeType === TradeType.EXACT_INPUT
-    //   ? { token: tokenOut, value: amountSpecified.value.mul(exchangeRate) } : amountSpecified;
+      ? howMuchAmountOut(amountSpecified, tokenOut, exchangeRate) : amountSpecified;
 
     const trade: QuoteResult = {
       route,
