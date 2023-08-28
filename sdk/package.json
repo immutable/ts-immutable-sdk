@@ -82,10 +82,6 @@
     "./passport": {
       "types": "./dist/passport.d.ts",
       "import": "./dist/passport.js"
-    },
-    "./orderbook": {
-      "types": "./dist/orderbook.d.ts",
-      "import": "./dist/orderbook.js"
     }
   },
   "files": [

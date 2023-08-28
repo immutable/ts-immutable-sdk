@@ -10,8 +10,7 @@
         "config": "prod",
         "blockchain_data": "alpha",
         "immutablex_client": "prod",
-        "passport": "prod",
-        "orderbook": "alpha"
+        "passport": "prod"
     },
     "fileCopy": [
         {
