@@ -83,6 +83,10 @@
       "types": "./dist/passport.d.ts",
       "import": "./dist/passport.js"
     },
+    "./orderbook": {
+      "types": "./dist/orderbook.d.ts",
+      "import": "./dist/orderbook.js"
+    },
     "./provider": {
       "types": "./dist/provider.d.ts",
       "import": "./dist/provider.js"
@@ -98,10 +102,6 @@
     "./erc20": {
       "types": "./dist/erc20.d.ts",
       "import": "./dist/erc20.js"
-    },
-    "./erc721": {
-      "types": "./dist/erc721.d.ts",
-      "import": "./dist/erc721.js"
     },
     "./erc721_mint_by_id": {
       "types": "./dist/erc721_mint_by_id.d.ts",
