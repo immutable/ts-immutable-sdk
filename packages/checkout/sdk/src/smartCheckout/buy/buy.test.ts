@@ -85,6 +85,7 @@ describe('buy', () => {
 
       await buy(config, mockProvider, orderId);
       expect(smartCheckout).toBeCalledWith(
+        config,
         mockProvider,
         itemRequirements,
         fulfilmentTransaction,
@@ -132,6 +133,7 @@ describe('buy', () => {
 
       await buy(config, mockProvider, orderId);
       expect(smartCheckout).toBeCalledWith(
+        config,
         mockProvider,
         itemRequirements,
         gasAmount,
@@ -181,6 +183,7 @@ describe('buy', () => {
 
       await buy(config, mockProvider, orderId);
       expect(smartCheckout).toBeCalledWith(
+        config,
         mockProvider,
         itemRequirements,
         gasAmount,
