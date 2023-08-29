@@ -19,7 +19,7 @@ export class ImmutableOnRamp extends ImmutableWebComponent {
     super.connectedCallback();
     this.amount = this.getAttribute('amount') ?? '';
     this.walletProvider = this.getAttribute('walletProvider')?.toLowerCase() as WalletProviderName;
-    this.amount = this.getAttribute('contractAddress') ?? '';
+    this.contractAddress = this.getAttribute('contractAddress') ?? '';
 
     this.renderWidget();
   }
