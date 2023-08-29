@@ -21,12 +21,14 @@ describe('exchangeAmount', () => {
   });
 
   describe('when the decimals are different', () => {
-    it('exactAmountIn: have 1 IMX - how much USDC?', () => {
-      const exchangeRate = 10; // 1 IMX = 10 USDC
-      const imxAmount = newAmountFromString('1', IMX_TEST_TOKEN);
-      const usdcAmount = howMuchAmountOut(imxAmount, USDC_TEST_TOKEN, exchangeRate);
-      expect(formatAmount(usdcAmount)).toEqual('10.0');
-    });
+    describe('when given exact amount in', () => {
+      it('should multiply the amount in by the exchange rate', () => {
+         const exchangeRate = 10; // 1 IMX = 10 USDC
+        const imxAmount = newAmountFromString('1', IMX_TEST_TOKEN);
+        const usdcAmount = howMuchAmountOut(imxAmount, USDC_TEST_TOKEN, exchangeRate);
+        expect(formatAmount(usdcAmount)).toEqual('10.0');
+      }
+    }
 
     it('exactAmountIn: have 1 USDC - how much IMX?', () => {
       const exchangeRate = 10; // 1 USDC = 10 IMX
