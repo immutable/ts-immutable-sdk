@@ -79,11 +79,11 @@ export class ImmutableApiClient {
             contract_address: orderComponents.consideration[0].token,
           },
         ],
-        fees: makerFee ? [{
+        fee: makerFee ? {
           amount: makerFee.amount,
           fee_type: FeeType.MAKER_MARKETPLACE as unknown as Fee.fee_type,
           recipient: makerFee.recipient,
-        }] : [],
+        } : undefined,
         end_time: new Date(
           parseInt(`${orderComponents.endTime.toString()}000`, 10),
         ).toISOString(),
