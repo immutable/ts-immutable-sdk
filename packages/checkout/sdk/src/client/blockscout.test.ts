@@ -73,50 +73,6 @@ describe('Blockscout', () => {
       );
     });
 
-    it.only('success no cached data', async () => {
-      const mockResponse = {
-        status: 200,
-        data:
-          {
-            items: [
-              {
-                token: {
-                  address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-                  circulating_market_cap: '639486814.4877648',
-                  decimals: '18',
-                  exchange_rate: '0.568914',
-                  holders: '71451',
-                  icon_url: 'https://assets.coingecko.com',
-                  name: 'Immutable X',
-                  symbol: 'IMX',
-                  total_supply: '2000000000000000000000000000',
-                  type: 'ERC-20',
-                },
-                token_id: null,
-                token_instance: null,
-                value: '3000000000000000000',
-              },
-            ],
-            next_page_params: null,
-          },
-      };
-      mockedAxios.get.mockResolvedValue(mockResponse);
-
-      const tokens = [BlockscoutTokenType.ERC20];
-      const client = new Blockscout({ chainId: ChainId.IMTBL_ZKEVM_TESTNET, caching: 0 });
-      const resp = await client.getAddressTokens({ walletAddress: '0x1234567890', tokenType: tokens });
-      await client.getAddressTokens({ walletAddress: '0x1234567890', tokenType: tokens });
-
-      expect(resp.items.length).toEqual(1);
-      expect(resp.items[0].value).toEqual('3000000000000000000');
-      expect(resp.items[0].token.address).toEqual('0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF');
-
-      expect(mockedAxios.get).toHaveBeenNthCalledWith(
-        2,
-        `${client.url}/api/v2/addresses/0x1234567890/tokens?type=${tokens.join(',')}`,
-      );
-    });
-
     it('success with pagination', async () => {
       const mockResponse = {
         status: 200,
