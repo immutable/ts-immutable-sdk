@@ -11,6 +11,7 @@ import { sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
 import { isValidAddress, isValidAmount, isValidWalletProvider } from '../../lib/validations/widgetValidators';
 import { isPassportProvider } from '../../lib/providerUtils';
 import { BridgeComingSoon } from './views/BridgeComingSoon';
+import { AnalyticsProvider } from '../../context/segment-provider/SegmentAnalyticsProvider';
 
 export class ImmutableBridge extends ImmutableWebComponent {
   fromContractAddress = '';
@@ -75,12 +76,13 @@ export class ImmutableBridge extends ImmutableWebComponent {
 
     this.reactRoot.render(
       <React.StrictMode>
-        {showBridgeComingSoonScreen && (
-        <BiomeCombinedProviders theme={{ base: onDarkBase }}>
-          <BridgeComingSoon onCloseEvent={sendBridgeWidgetCloseEvent} />
-        </BiomeCombinedProviders>
-        )}
-        {!showBridgeComingSoonScreen && (
+        <AnalyticsProvider>
+          {showBridgeComingSoonScreen && (
+          <BiomeCombinedProviders theme={{ base: onDarkBase }}>
+            <BridgeComingSoon onCloseEvent={sendBridgeWidgetCloseEvent} />
+          </BiomeCombinedProviders>
+          )}
+          {!showBridgeComingSoonScreen && (
           <ConnectLoader
             params={connectLoaderParams}
             closeEvent={sendBridgeWidgetCloseEvent}
@@ -91,7 +93,8 @@ export class ImmutableBridge extends ImmutableWebComponent {
               config={this.widgetConfig!}
             />
           </ConnectLoader>
-        )}
+          )}
+        </AnalyticsProvider>
       </React.StrictMode>,
     );
   }

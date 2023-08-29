@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { sendOnRampWidgetCloseEvent } from '../OnRampWidgetEvents';
-import { getSegmentWriteKey, useAnalytics } from '../../../context/SegmentAnalyticsProvider';
+import { useAnalytics } from '../../../context/segment-provider/SegmentAnalyticsProvider';
 
 interface OnRampProps {
   environment: Environment
@@ -18,7 +18,7 @@ export function OnRampMain({ environment }: OnRampProps) {
 
   const finalUrl = `${url}&${configurations}`;
 
-  const { track, updateWriteKey } = useAnalytics();
+  const { track } = useAnalytics();
 
   const trackSegmentEvents = (event: any) => {
     switch (event.event_id) {
@@ -70,8 +70,6 @@ export function OnRampMain({ environment }: OnRampProps) {
     const domIframe:HTMLIFrameElement = document.getElementById('transak-iframe') as HTMLIFrameElement;
 
     if (domIframe === undefined) return;
-
-    updateWriteKey(getSegmentWriteKey(environment));
 
     const handler = (event: any) => {
       if (event.source === domIframe.contentWindow) {

@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom/client';
 import { OnRampWidget, OnRampWidgetParams } from './OnRampWidget';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
 import { isValidAmount, isValidWalletProvider } from '../../lib/validations/widgetValidators';
+import { AnalyticsProvider } from '../../context/segment-provider/SegmentAnalyticsProvider';
 
 export class ImmutableOnRamp extends ImmutableWebComponent {
   amount = '';
@@ -55,10 +56,12 @@ export class ImmutableOnRamp extends ImmutableWebComponent {
 
     this.reactRoot.render(
       <React.StrictMode>
-        <OnRampWidget
-          params={params}
-          config={this.widgetConfig!}
-        />
+        <AnalyticsProvider>
+          <OnRampWidget
+            params={params}
+            config={this.widgetConfig!}
+          />
+        </AnalyticsProvider>
       </React.StrictMode>,
     );
   }
