@@ -11,21 +11,15 @@
     "parcel": "^2.8.3"
   },
   "scripts": {
-    "build": "parcel build --no-cache --no-optimize",
+    "build": "parcel build",
     "start": "parcel"
   },
   "source": "src/index.html",
   "targets": {
-    "unity": {
+    "game": {
       "context": "browser",
       "engines": {
         "browsers": "Chrome 90"
-      }
-    },
-    "unreal": {
-      "context": "browser",
-      "engines": {
-        "browsers": "Chrome 84"
       }
     }
   }
