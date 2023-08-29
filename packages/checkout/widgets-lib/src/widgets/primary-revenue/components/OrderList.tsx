@@ -1,10 +1,9 @@
 import { Box } from '@biom3/react';
 
-import { NFT } from '@imtbl/generated-clients/dist/multi-rollup';
 import { OrderItem } from './OrderItem';
 
 export interface OrderListProps {
-  list: NFT[];
+  list: any[];
 }
 
 export function OrderList(props: OrderListProps) {
@@ -22,7 +21,7 @@ export function OrderList(props: OrderListProps) {
       }}
     >
       {list.map((item) => (
-        <OrderItem item={item} />
+        <OrderItem item={item} key={item.token_id} />
       ))}
     </Box>
   );
