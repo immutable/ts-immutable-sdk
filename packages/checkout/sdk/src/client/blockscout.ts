@@ -45,17 +45,17 @@ export class Blockscout {
    * getAddressTokens fetches the list of tokens (by type) owned by the wallet address.
    * @param walletAddress wallet address
    * @param tokenType token types
-   * @param next parameters for the next page, to be provided along side walletAddress and tokenType
+   * @param nextPage parameters for the next page, to be provided along side walletAddress and tokenType
    * @returns list of tokens given the wallet address and the token types
    */
   public async getAddressTokens(params: {
     walletAddress: string,
     tokenType: BlockscoutTokenType[],
-    next?: BlockscoutAddressTokenPagination | null
+    nextPage?: BlockscoutAddressTokenPagination | null
   }): Promise<BlockscoutAddressTokens> {
     try {
       let url = `${this.url}/api/v2/addresses/${params.walletAddress}/tokens?type=${params.tokenType.join(',')}`;
-      if (params.next) url += `&${new URLSearchParams(params.next as Record<string, string>)}`;
+      if (params.nextPage) url += `&${new URLSearchParams(params.nextPage as Record<string, string>)}`;
 
       const response = await Blockscout.makeHttpRequest(url);
 

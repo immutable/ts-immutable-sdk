@@ -81,14 +81,14 @@ describe('Blockscout', () => {
       mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
       const tokens = [BlockscoutTokenType.ERC20];
-      const next = {
+      const nextPage = {
         fiat_value: '217517',
         id: 12,
         items_count: 50,
         value: '1234',
       };
       const client = new Blockscout({ chainId: ChainId.IMTBL_ZKEVM_TESTNET });
-      await client.getAddressTokens({ walletAddress: '0x1234567890', tokenType: tokens, next });
+      await client.getAddressTokens({ walletAddress: '0x1234567890', tokenType: tokens, nextPage });
 
       expect(mockedAxios.get).toHaveBeenNthCalledWith(
         1,
@@ -105,9 +105,9 @@ describe('Blockscout', () => {
       mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
       const tokens = [BlockscoutTokenType.ERC20];
-      const next = null;
+      const nextPage = null;
       const client = new Blockscout({ chainId: ChainId.IMTBL_ZKEVM_TESTNET });
-      await client.getAddressTokens({ walletAddress: '0x1234567890', tokenType: tokens, next });
+      await client.getAddressTokens({ walletAddress: '0x1234567890', tokenType: tokens, nextPage });
 
       expect(mockedAxios.get).toHaveBeenNthCalledWith(
         1,
