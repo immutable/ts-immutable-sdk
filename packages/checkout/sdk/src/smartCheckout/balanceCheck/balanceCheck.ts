@@ -8,7 +8,10 @@ import {
   ERC721ABI,
   ERC721Item,
   ItemRequirement,
-  ItemType, TokenInfo, NativeItem, ERC20Item,
+  ItemType,
+  TokenInfo,
+  NativeItem,
+  ERC20Item,
 } from '../../types';
 import { getBalances } from '../../balances';
 import { CheckoutConfiguration } from '../../config';
