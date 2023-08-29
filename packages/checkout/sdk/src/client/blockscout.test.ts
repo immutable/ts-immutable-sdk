@@ -152,5 +152,38 @@ describe('Blockscout', () => {
         expect((error as BlockscoutError).message).toEqual('error');
       }
     });
+
+    it('fails 500', async () => {
+      const mockResponse = {
+        status: HttpStatusCode.InternalServerError,
+        statusText: 'error',
+        data: {},
+      };
+      mockedAxios.get.mockResolvedValueOnce(mockResponse);
+
+      const tokens = [BlockscoutTokenType.ERC20];
+      const client = new Blockscout({ chainId: ChainId.IMTBL_ZKEVM_TESTNET });
+      try {
+        await client.getAddressTokens({ walletAddress: '0x1234567890', tokenType: tokens });
+      } catch (error: any) {
+        expect(Blockscout.isBlockscoutError(error)).toBe(true);
+        expect((error as BlockscoutError).code).toEqual(HttpStatusCode.InternalServerError);
+        expect((error as BlockscoutError).message).toEqual('error');
+      }
+    });
+
+    it('throws', async () => {
+      mockedAxios.get.mockRejectedValueOnce(new Error());
+
+      const tokens = [BlockscoutTokenType.ERC20];
+      const client = new Blockscout({ chainId: ChainId.IMTBL_ZKEVM_TESTNET });
+      try {
+        await client.getAddressTokens({ walletAddress: '0x1234567890', tokenType: tokens });
+      } catch (error: any) {
+        expect(Blockscout.isBlockscoutError(error)).toBe(true);
+        expect((error as BlockscoutError).code).toEqual(HttpStatusCode.InternalServerError);
+        expect((error as BlockscoutError).message).toEqual('InternalServerError');
+      }
+    });
   });
 });

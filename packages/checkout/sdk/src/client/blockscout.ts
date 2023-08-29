@@ -64,7 +64,7 @@ export class Blockscout {
     } catch (err: any) {
       return Promise.reject({
         code: err.code ?? HttpStatusCode.InternalServerError,
-        message: err.message ?? 'InternalServerError',
+        message: err.message || 'InternalServerError',
       });
     }
   }
