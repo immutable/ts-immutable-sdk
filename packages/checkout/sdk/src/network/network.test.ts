@@ -17,6 +17,7 @@ import {
   ChainName,
   NetworkInfo,
   SANDBOX_CHAIN_ID_NETWORK_MAP,
+  IMX_ADDRESS_ZKEVM,
 } from '../types';
 import { createProvider } from '../provider';
 import { CheckoutError, CheckoutErrorType } from '../errors';
@@ -48,6 +49,7 @@ const zkevmNetworkInfo = {
     name: 'IMX',
     symbol: 'IMX',
     decimals: 18,
+    address: IMX_ADDRESS_ZKEVM,
   },
 };
 
@@ -471,6 +473,7 @@ describe('network functions', () => {
               name: 'IMX',
               symbol: 'IMX',
               decimals: 18,
+              address: IMX_ADDRESS_ZKEVM,
             },
           },
         ],
