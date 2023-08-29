@@ -41,7 +41,7 @@ export const ImtblWidgets = ({
         fromContractAddress={showBridge.data?.tokenAddress || ''}
         amount={showBridge.data?.amount || ''}
       /> )}
-      {showOnRamp.show && (<OnRampReact />)}
+      {showOnRamp.show && (<OnRampReact provider={web3Provider} passport={passport} />)}
     </Box>
   )
 }

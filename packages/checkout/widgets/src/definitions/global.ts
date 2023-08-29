@@ -122,6 +122,7 @@ export interface ImtblBridgeProps
  * @property {string | undefined} walletProvider - The preferred wallet provider to connect to.
  * @property {string | undefined} widgetConfig - The configuration for the bridge widget.
  * @property {string | undefined} amount - The amount to onramp.
+ * @property {string | undefined} contractAddress - The contract address of the token to on ramp.
  */
 export interface ImtblOnRampProps
   extends React.DetailedHTMLProps<
@@ -131,4 +132,5 @@ export interface ImtblOnRampProps
   walletProvider?: string;
   widgetConfig?: string;
   amount?: string;
+  contractAddress?: string;
 }
