@@ -47,13 +47,13 @@ describe('', () => {
 
     // uncomment the overrides and set variables in
     // .env to run on environments other than testnet (e.g. devnet)
-    const configOverrides = getConfigFromEnv();
+    // const configOverrides = getConfigFromEnv();
     const sdk = new Orderbook({
       baseConfig: {
         environment: Environment.SANDBOX,
       },
       overrides: {
-        ...configOverrides,
+        // ...configOverrides,
       },
     });
 
@@ -92,7 +92,7 @@ describe('', () => {
     await waitForOrderToBeOfStatus(sdk, orderId2, OrderStatus.ACTIVE);
     log(`Listing ${orderId2} is now ACTIVE, fulfilling order...`);
 
-    const { actions } = await sdk.fulfillOrder(
+    const { actions, expiration, order } = await sdk.fulfillOrder(
       orderId2,
       fulfiller.address,
       {
@@ -100,6 +100,8 @@ describe('', () => {
         recipient: offerer.address,
       },
     );
+
+    log(`Fulfilling listing ${order.id}, fulfillment transaction valid till ${expiration}`);
 
     await actionAll(actions, fulfiller, provider);
 
