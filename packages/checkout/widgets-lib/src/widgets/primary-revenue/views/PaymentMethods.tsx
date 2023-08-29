@@ -35,8 +35,7 @@ export function PaymentMethods(props: PaymentMethodsProps) {
           },
         });
 
-        let hasEnoughBalance = await checkBalances();
-        hasEnoughBalance = true;
+        const hasEnoughBalance = await checkBalances();
 
         // FIXME: best way to handle conditional routing?
         if (!hasEnoughBalance) {
