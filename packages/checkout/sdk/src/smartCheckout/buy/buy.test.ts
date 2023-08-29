@@ -46,8 +46,8 @@ describe('buy', () => {
           result: {
             buy: [
               {
-                item_type: 'NATIVE',
-                start_amount: '1',
+                type: 'NATIVE',
+                amount: '1',
               },
             ],
             fees: [
@@ -85,6 +85,7 @@ describe('buy', () => {
 
       await buy(config, mockProvider, orderId);
       expect(smartCheckout).toBeCalledWith(
+        config,
         mockProvider,
         itemRequirements,
         fulfilmentTransaction,
@@ -98,8 +99,8 @@ describe('buy', () => {
           result: {
             buy: [
               {
-                item_type: 'NATIVE',
-                start_amount: '1',
+                type: 'NATIVE',
+                amount: '1',
               },
             ],
             fees: [
@@ -132,6 +133,7 @@ describe('buy', () => {
 
       await buy(config, mockProvider, orderId);
       expect(smartCheckout).toBeCalledWith(
+        config,
         mockProvider,
         itemRequirements,
         gasAmount,
@@ -144,9 +146,9 @@ describe('buy', () => {
           result: {
             buy: [
               {
-                item_type: 'ERC20',
-                start_amount: '1',
-                contract_address: '0x123',
+                type: 'ERC20',
+                amount: '1',
+                contractAddress: '0x123',
               },
             ],
             fees: [
@@ -181,6 +183,7 @@ describe('buy', () => {
 
       await buy(config, mockProvider, orderId);
       expect(smartCheckout).toBeCalledWith(
+        config,
         mockProvider,
         itemRequirements,
         gasAmount,
@@ -193,9 +196,9 @@ describe('buy', () => {
           result: {
             buy: [
               {
-                item_type: 'ERC721',
-                token_id: '1',
-                contract_address: '0x123',
+                type: 'ERC721',
+                tokenId: '1',
+                contractAddress: '0x123',
               },
             ],
             fees: [
@@ -227,8 +230,8 @@ describe('buy', () => {
           result: {
             buy: [
               {
-                item_type: 'UNSUPPORTED',
-                start_amount: '1',
+                type: 'UNSUPPORTED',
+                amount: '1',
               },
             ],
             fees: [

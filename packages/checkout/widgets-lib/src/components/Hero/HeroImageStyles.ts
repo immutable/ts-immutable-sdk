@@ -14,6 +14,6 @@ export const heroImageBottomAlign = {
 };
 export const heroBackGroundStyles = {
   position: 'relative',
-  height: '100%',
+  height: '305px',
   width: '100%',
 };

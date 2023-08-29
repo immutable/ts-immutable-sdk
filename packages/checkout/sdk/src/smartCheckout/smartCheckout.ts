@@ -10,10 +10,13 @@ import {
   hasERC20Allowances,
   hasERC721Allowances,
 } from './allowance';
+import { balanceCheck } from './balanceCheck';
+import { CheckoutConfiguration } from '../config';
 import { allowanceAggregator } from './aggregators/allowanceAggregator';
 import { gasCalculator } from './gas/gasCalculator';
 
 export const smartCheckout = async (
+  config: CheckoutConfiguration,
   provider: Web3Provider,
   itemRequirements: ItemRequirement[],
   transactionOrGasAmount: FulfilmentTransaction | GasAmount,
@@ -41,6 +44,11 @@ export const smartCheckout = async (
 
   // eslint-disable-next-line no-console
   console.log('Aggregated Items', aggregatedItems);
+
+  const balanceRequirements = await balanceCheck(config, provider, ownerAddress, aggregatedItems);
+
+  // eslint-disable-next-line no-console
+  console.log('Balance Requirements', balanceRequirements);
 
   return {
     sufficient: true,

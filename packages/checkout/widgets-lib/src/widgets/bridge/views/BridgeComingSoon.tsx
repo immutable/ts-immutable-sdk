@@ -1,7 +1,7 @@
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../../components/Footer/FooterButton';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
-import { ImmutableNetworkHero } from '../../../components/Hero/ImmutableNetworkHero';
+import { ImmutablePlanetHero } from '../../../components/Hero/ImmutablePlanetHero';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
 import { text } from '../../../resources/text/textConfig';
@@ -16,7 +16,7 @@ export function BridgeComingSoon({ onCloseEvent }: BridgeComingSoonProps) {
     <SimpleLayout
       testId="bridge-coming-soon"
       header={<HeaderNavigation transparent onCloseButtonClick={onCloseEvent} />}
-      heroContent={<ImmutableNetworkHero />}
+      heroContent={<ImmutablePlanetHero />}
       floatHeader
       footer={<FooterButton actionText={actionText} onActionClick={onCloseEvent} />}
     >

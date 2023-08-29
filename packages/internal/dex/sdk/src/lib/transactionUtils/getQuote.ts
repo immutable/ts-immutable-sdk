@@ -1,13 +1,13 @@
-import { Token, TradeType } from '@uniswap/sdk-core';
+import { TradeType } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
-import { QuoteTradeInfo } from 'lib/router';
 import { Fees } from 'lib/fees';
+import { QuoteResult } from 'lib/getQuotesForRoutes';
 import {
   Amount, Quote, TokenInfo,
 } from '../../types';
 import { slippageToFraction } from './slippage';
 
-function getQuoteAmountFromTradeType(tradeInfo: QuoteTradeInfo): Amount {
+function getQuoteAmountFromTradeType(tradeInfo: QuoteResult): Amount {
   if (tradeInfo.tradeType === TradeType.EXACT_INPUT) {
     return tradeInfo.amountOut;
   }
@@ -28,27 +28,18 @@ export function applySlippage(
 }
 
 export function prepareUserQuote(
-  otherToken: Token,
-  tradeInfo: QuoteTradeInfo,
+  otherToken: TokenInfo,
+  tradeInfo: QuoteResult,
   slippage: number,
   fees: Fees,
 ): Quote {
-  const resultToken: Token = otherToken.wrapped;
-  const tokenInfo: TokenInfo = {
-    chainId: resultToken.chainId,
-    address: resultToken.address,
-    decimals: resultToken.decimals,
-    symbol: resultToken.symbol,
-    name: resultToken.name,
-  };
-
   const quote = getQuoteAmountFromTradeType(tradeInfo);
   const amountWithSlippage = applySlippage(tradeInfo.tradeType, quote.value, slippage);
 
   return {
     amount: quote,
     amountWithMaxSlippage: {
-      token: tokenInfo,
+      token: otherToken,
       value: amountWithSlippage,
     },
     slippage,

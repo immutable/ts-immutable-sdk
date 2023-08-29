@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import {
   useCallback, useContext, useEffect, useMemo, useReducer,
 } from 'react';
@@ -6,6 +7,7 @@ import { BiomeCombinedProviders } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
+import { ethers } from 'ethers';
 import { WidgetTheme } from '../../lib';
 import { LoadingView } from '../../views/loading/LoadingView';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
@@ -24,6 +26,7 @@ import { ReviewOrder } from './views/ReviewOrder';
 import { PayWithCard } from './views/PayWithCard';
 import { PrimaryRevenueWidgetViews } from '../../context/view-context/PrimaryRevenueViewContextTypes';
 import { TopUpView } from '../../views/top-up/TopUpView';
+import { encodeApprove } from './functions/encodeApprove';
 
 export interface PrimaryRevenueWidgetProps {
   config: StrongCheckoutWidgetsConfig;
@@ -86,9 +89,49 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
 
     const balance = parseFloat(formattedBalance);
     const requiredAmounts = parseFloat(amount);
-    console.log('🚀 ~ file:  ~ balance:', balance, requiredAmounts);
 
     return balance > requiredAmounts;
+  }, [checkout, provider, amount, fromContractAddress]);
+
+  const prepareApprove = async () => {
+    // Encode data
+    const txData = encodeApprove(fromContractAddress, amount);
+
+    // Prepare transaction
+    const transaction = {
+      from: '0x81064a5d163559D422fD311dc36c051424620EB9', // TODO: Remove hardcorded Guarded Multicaller address
+      to: fromContractAddress,
+      data: txData,
+      gasLimit: 21000,
+      gasPrice: ethers.utils.parseUnits('20', 'gwei'),
+    };
+
+    return transaction;
+  };
+
+  const handleApprove = useCallback(async () => {
+    if (!checkout || !provider) return false;
+
+    try {
+      const transaction = await prepareApprove();
+      const approved = await provider.send('eth_sendTransaction', [
+        transaction,
+      ]);
+
+      return approved;
+    } catch (error) {
+      console.error(
+        'An error occurred when executing approve function:',
+        error,
+      );
+      return false;
+    }
+  }, [checkout, provider, amount, fromContractAddress]);
+
+  const executeBuyNow = useCallback(async () => {
+    const approved = await handleApprove();
+    console.log('approved', approved);
+    return approved;
   }, [checkout, provider, amount, fromContractAddress]);
 
   useEffect(() => {
@@ -115,7 +158,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
           <PaymentMethods checkBalances={handleCheckBalances} />
         )}
         {viewState.view.type === PrimaryRevenueWidgetViews.PAY_WITH_CRYPTO && (
-          <ReviewOrder />
+          <ReviewOrder executeBuyNow={executeBuyNow} />
         )}
         {viewState.view.type === PrimaryRevenueWidgetViews.PAY_WITH_CARD && (
           <PayWithCard />

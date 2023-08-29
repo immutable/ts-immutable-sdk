@@ -1,7 +1,6 @@
 import { log } from 'console';
 import { Environment } from '@imtbl/config';
 import { Wallet } from 'ethers';
-import { FeeType } from 'types';
 import { OrderStatus } from '../openapi/sdk/index';
 import { Orderbook } from '../orderbook';
 import {
@@ -48,13 +47,13 @@ describe('', () => {
 
     // uncomment the overrides and set variables in
     // .env to run on environments other than testnet (e.g. devnet)
-    const configOverrides = getConfigFromEnv();
+    // const configOverrides = getConfigFromEnv();
     const sdk = new Orderbook({
       baseConfig: {
         environment: Environment.SANDBOX,
       },
       overrides: {
-        ...configOverrides,
+        // ...configOverrides,
       },
     });
 
@@ -86,7 +85,6 @@ describe('', () => {
       orderSignature: signatures[0],
       makerFee: {
         amount: '1',
-        type: FeeType.MAKER_MARKETPLACE,
         recipient: offerer.address,
       },
     });
@@ -94,15 +92,16 @@ describe('', () => {
     await waitForOrderToBeOfStatus(sdk, orderId2, OrderStatus.ACTIVE);
     log(`Listing ${orderId2} is now ACTIVE, fulfilling order...`);
 
-    const { actions } = await sdk.fulfillOrder(
+    const { actions, expiration, order } = await sdk.fulfillOrder(
       orderId2,
       fulfiller.address,
       {
         amount: '1',
-        type: FeeType.TAKER_MARKETPLACE,
         recipient: offerer.address,
       },
     );
+
+    log(`Fulfilling listing ${order.id}, fulfillment transaction valid till ${expiration}`);
 
     await actionAll(actions, fulfiller, provider);
 
