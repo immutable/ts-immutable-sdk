@@ -65,7 +65,9 @@ export function OnRampMain({ environment }: OnRampProps) {
           id="transak-iframe"
           src={finalUrl}
           allow="camera;microphone;fullscreen;payment"
-          style={{ height: '100%', width: '100%', border: 'none' }}
+          style={{
+            height: '100%', width: '100%', border: 'none', position: 'absolute',
+          }}
         />
       </Box>
     </SimpleLayout>
