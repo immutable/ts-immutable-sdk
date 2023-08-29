@@ -1,6 +1,8 @@
 import { BiomeCombinedProviders } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
-import { useEffect, useMemo, useReducer } from 'react';
+import {
+  useContext, useEffect, useMemo, useReducer,
+} from 'react';
 import { WidgetTheme } from '../../lib';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
@@ -11,6 +13,7 @@ import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextT
 import { OnRampMain } from './views/OnRampMain';
 import { LoadingView } from '../../views/loading/LoadingView';
 import { text } from '../../resources/text/textConfig';
+import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 
 const LOADING_VIEW_DELAY_MS = 1000;
 export interface OnRampWidgetProps {
@@ -21,6 +24,7 @@ export interface OnRampWidgetProps {
 
 export interface OnRampWidgetParams {
   amount?: string;
+  contractAddress?: string;
 }
 
 export function OnRampWidget(props: OnRampWidgetProps) {
@@ -29,6 +33,9 @@ export function OnRampWidget(props: OnRampWidgetProps) {
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
   const viewReducerValues = useMemo(() => ({ viewState, viewDispatch }), [viewState, viewReducer]);
 
+  const { connectLoaderState } = useContext(ConnectLoaderContext);
+  const { checkout, provider } = connectLoaderState;
+
   const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
     : onDarkBase;
@@ -36,15 +43,27 @@ export function OnRampWidget(props: OnRampWidgetProps) {
   const { initialLoadingText } = text.views[OnRampWidgetViews.ONRAMP];
 
   useEffect(() => {
-    setTimeout(() => {
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: { type: OnRampWidgetViews.ONRAMP },
-        },
+    if (!checkout || !provider) return;
+    (async () => {
+      const network = await checkout.getNetworkInfo({
+        provider,
       });
-    }, LOADING_VIEW_DELAY_MS);
-  }, [viewDispatch]);
+
+      /* If the provider's network is not supported, return out of this and let the
+    connect loader handle the switch network functionality */
+      if (!network.isSupported) {
+        return;
+      }
+      setTimeout(() => {
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: { type: OnRampWidgetViews.ONRAMP },
+          },
+        });
+      }, LOADING_VIEW_DELAY_MS);
+    })();
+  }, [checkout, provider, viewDispatch]);
 
   return (
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>
