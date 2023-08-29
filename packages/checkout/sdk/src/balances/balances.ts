@@ -103,7 +103,7 @@ export const getIndexerBalance = async (
   let resp;
   do {
     // eslint-disable-next-line no-await-in-loop
-    resp = await client.getAddressTokens({ walletAddress, tokenType, next: resp?.next_page_params });
+    resp = await client.getAddressTokens({ walletAddress, tokenType, nextPage: resp?.next_page_params });
     items.push(...resp.items);
   } while (resp.next_page_params);
 
