@@ -11,6 +11,7 @@ import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextT
 import { OnRampMain } from './views/OnRampMain';
 import { LoadingView } from '../../views/loading/LoadingView';
 import { text } from '../../resources/text/textConfig';
+import { useAnalytics } from '../../context/segment-provider/SegmentAnalyticsProvider';
 
 const LOADING_VIEW_DELAY_MS = 1000;
 export interface OnRampWidgetProps {
@@ -34,6 +35,18 @@ export function OnRampWidget(props: OnRampWidgetProps) {
     : onDarkBase;
 
   const { initialLoadingText } = text.views[OnRampWidgetViews.ONRAMP];
+  const { track } = useAnalytics();
+
+  useEffect(() => {
+    track({
+      userJourney: 'OnRamp',
+      screen: 'Initial-widget-load',
+      control: 'widgetLoad',
+      controlType: 'OnRampWidget',
+      action: 'Opened',
+      userId: '0xsomeAddress', // todo: insert wallet-address
+    });
+  }, []);
 
   useEffect(() => {
     setTimeout(() => {
@@ -50,10 +63,10 @@ export function OnRampWidget(props: OnRampWidgetProps) {
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>
       <ViewContext.Provider value={viewReducerValues}>
         {viewState.view.type === SharedViews.LOADING_VIEW && (
-        <LoadingView loadingText={initialLoadingText} showFooterLogo />
+          <LoadingView loadingText={initialLoadingText} showFooterLogo />
         )}
         {viewState.view.type === OnRampWidgetViews.ONRAMP && (
-        <OnRampMain environment={environment} />
+          <OnRampMain environment={environment} />
         )}
       </ViewContext.Provider>
     </BiomeCombinedProviders>

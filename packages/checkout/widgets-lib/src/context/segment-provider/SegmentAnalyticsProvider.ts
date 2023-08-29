@@ -21,10 +21,10 @@ export const getSegmentWriteKey = (env: Environment) => (env === Environment.PRO
 export const { AnalyticsProvider, useAnalytics } = createAnalytics<
 'OnRamp' | 'Swap' | 'Bridge',
 string,
-'Click' | 'Confirm' | 'WebhookEvent',
+'Click' | 'Confirm' | 'WebhookEvent' | 'widgetLoad',
 AnalyticsControlTypes,
 AnalyticsActions
 >({
-  writeKey: '',
+  writeKey: 'b69BcXnFXdaiFC6MqRQiHvjcPrTxftZl', // todo: removing this initial key and relyin gon update isn't working
   appName: 'Checkout-widgets',
 });

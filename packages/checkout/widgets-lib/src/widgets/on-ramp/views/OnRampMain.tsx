@@ -4,7 +4,9 @@ import { useEffect } from 'react';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { sendOnRampWidgetCloseEvent } from '../OnRampWidgetEvents';
-import { useAnalytics } from '../../../context/segment-provider/SegmentAnalyticsProvider';
+import {
+  useAnalytics,
+} from '../../../context/segment-provider/SegmentAnalyticsProvider';
 
 interface OnRampProps {
   environment: Environment
@@ -20,8 +22,8 @@ export function OnRampMain({ environment }: OnRampProps) {
 
   const { track } = useAnalytics();
 
-  const trackSegmentEvents = (event: any) => {
-    switch (event.event_id) {
+  const trackSegmentEvents = (eventData: any) => {
+    switch (eventData.event_id) {
       case 'TRANSAK_WIDGET_OPEN':
         track({
           userJourney: 'OnRamp',
@@ -76,7 +78,7 @@ export function OnRampMain({ environment }: OnRampProps) {
         if (event.origin === 'https://global-stg.transak.com') {
           // eslint-disable-next-line no-console
           console.log('TRANSAK event data: ', event.data);
-          trackSegmentEvents(event);
+          trackSegmentEvents(event.data);
         }
       }
     };
