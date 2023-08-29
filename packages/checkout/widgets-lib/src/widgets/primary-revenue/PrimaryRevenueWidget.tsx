@@ -145,17 +145,14 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
     mount();
   }, [checkout, provider]);
 
-  const handleGoBack = useCallback(
-    (view: any = PrimaryRevenueWidgetViews.PAYMENT_METHODS) => {
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: { type: view },
-        },
-      });
-    },
-    [],
-  );
+  const handleGoBackToMethods = useCallback(() => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: { type: PrimaryRevenueWidgetViews.PAYMENT_METHODS },
+      },
+    });
+  }, []);
 
   useEffect(() => {
     const orchestratedWidgetEvents = [
@@ -170,7 +167,14 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
       // TODO: add error handling
       // FIXME: export a SharedEventType in widgets/types ??? close-widget, success, failure, rejected, ...etc
       if (['close-widget', 'failure', 'rejected'].includes(event.detail.type)) {
-        handleGoBack(SharedViews.TOP_UP_VIEW);
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: {
+              type: PrimaryRevenueWidgetViews.PAYMENT_METHODS,
+            },
+          },
+        });
         return;
       }
 
@@ -241,8 +245,8 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
             showOnrampOption
             showSwapOption
             showBridgeOption
-            onCloseButtonClick={handleGoBack}
-            onBackButtonClick={handleGoBack}
+            onCloseButtonClick={handleGoBackToMethods}
+            onBackButtonClick={handleGoBackToMethods}
             // FIXME: pass from props
             amount="100"
             tokenAddress="0x81064a5d163559D422fD311dc36c051424620EB9"
