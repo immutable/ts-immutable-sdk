@@ -152,40 +152,58 @@ export interface SmartCheckoutResult {
 
 /**
  * Represents the transaction requirement for a transaction.
- * @property {TransactionRequirementType} type - The type of the transaction requirement.
+ * @property {ItemType} type - The type of the transaction requirement.
  * @property {boolean} sufficient - If the user address has sufficient funds to cover the transaction.
- * @property {TransactionRequirementItem} required - The required transaction requirement details.
- * @property {TransactionRequirementItem} current - The current transaction requirement details.
+ * @property {TransactionRequirementItem} required - The required item balance.
+ * @property {TransactionRequirementItem} current - The current item balance.
+ * @property {TransactionRequirementDelta} delta - The delta between the required and current balances.
  */
 export type TransactionRequirement = {
-  type: TransactionRequirementType,
+  type: ItemType,
   sufficient: boolean;
-  required: TransactionRequirementItem,
-  current: TransactionRequirementItem,
+  required: ItemBalance,
+  current: ItemBalance,
+  delta: BalanceDelta,
 };
 
 /**
- * Represents the transaction requirement item for a transaction.
+ * Represents the balance for either a native or ERC20 token.
  * @property {BigNumber} balance - The balance of the item.
  * @property {string} formattedBalance - The formatted balance of the item.
  * @property {TokenInfo} token - The token info of the item.
  */
-export type TransactionRequirementItem = {
+export type TokenBalance = {
+  type: ItemType.NATIVE | ItemType.ERC20;
   balance: BigNumber;
   formattedBalance: string;
   token: TokenInfo;
 };
 
 /**
- * An enum representing the transaction requirement types
- * @enum {string}
- * @property {string} GAS - If the transaction requirement is for gas.
- * @property {string} NATIVE - If the transaction requirement is for a native token.
- * @property {string} ERC20 - If the transaction requirement is for an ERC20 token.
+ * Represents the balance for an ERC20.
+ * @property {BigNumber} balance - The balance of the item.
+ * @property {string} formattedBalance - The formatted balance of the item.
+ * @property {TokenInfo} token - The token info of the item.
  */
-export enum TransactionRequirementType {
-  GAS = 'GAS',
-  NATIVE = 'NATIVE',
-  ERC20 = 'ERC20',
-  ERC721 = 'ERC721',
+export interface ERC721Balance {
+  type: ItemType.ERC721,
+  balance: BigNumber;
+  formattedBalance: string;
+  contractAddress: string;
+  id: string;
 }
+
+/**
+ * Type representing the balance of an item.
+ */
+export type ItemBalance = ERC721Balance | TokenBalance;
+
+/**
+ * Represents the delta between two balances.
+ * @property {BigNumber} balance - The delta of the balance.
+ * @property {string} formattedBalance - The formatted balance of the delta.
+ */
+export type BalanceDelta = {
+  balance: BigNumber;
+  formattedBalance: string;
+};

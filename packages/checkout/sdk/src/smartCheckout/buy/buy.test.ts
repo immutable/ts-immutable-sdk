@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { BigNumber, PopulatedTransaction } from 'ethers';
 import { Environment } from '@imtbl/config';
 import {

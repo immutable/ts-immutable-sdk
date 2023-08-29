@@ -10,7 +10,7 @@ import {
 import { balanceCheck } from './balanceCheck';
 import { CheckoutConfiguration } from '../../config';
 import { getBalances } from '../../balances';
-import { BalanceCheckInsufficient } from './types';
+import { BalanceCheckResult } from './types';
 
 jest.mock('../../balances');
 jest.mock('ethers', () => ({
@@ -54,8 +54,8 @@ describe('balanceCheck', () => {
               balance: BigNumber.from(1),
               formattedBalance: '1',
               token: {
-                name: 'IMX',
-                symbol: 'IMX',
+                name: '',
+                symbol: '',
                 decimals: 18,
                 address: IMX_ADDRESS_ZKEVM,
               },
@@ -64,8 +64,8 @@ describe('balanceCheck', () => {
       };
       (getBalances as jest.Mock).mockResolvedValue(getBalancesResult);
 
-      const balanceRequirements = await balanceCheck(config, mockProvider, '0xADDRESS', itemRequirements);
-      expect(balanceRequirements.sufficient).toEqual(true);
+      const { sufficient } = await balanceCheck(config, mockProvider, '0xADDRESS', itemRequirements);
+      expect(sufficient).toBeTruthy();
     });
 
     it('should return delta if balance is not sufficient', async () => {
@@ -92,11 +92,10 @@ describe('balanceCheck', () => {
       };
       (getBalances as jest.Mock).mockResolvedValue(getBalancesResult);
 
-      const balanceRequirements = await balanceCheck(config, mockProvider, '0xADDRESS', itemRequirements);
-      expect(balanceRequirements.sufficient).toEqual(false);
-      expect(balanceRequirements)
+      const result = await balanceCheck(config, mockProvider, '0xADDRESS', itemRequirements);
+      expect(result)
         .toEqual({
-          itemRequirements: [
+          balanceRequirements: [
             {
               type: ItemType.NATIVE,
               sufficient: false,
@@ -104,8 +103,12 @@ describe('balanceCheck', () => {
                 balance: BigNumber.from(2),
                 formattedBalance: '0.000000000000000002',
               },
-              current: getBalancesResult.balances[0],
+              current: {
+                ...getBalancesResult.balances[0],
+                type: ItemType.NATIVE,
+              },
               required: {
+                type: ItemType.NATIVE,
                 balance: BigNumber.from(3),
                 formattedBalance: '0.000000000000000003',
                 token: {
@@ -149,8 +152,8 @@ describe('balanceCheck', () => {
       };
       (getBalances as jest.Mock).mockResolvedValue(getBalancesResult);
 
-      const balanceRequirements = await balanceCheck(config, mockProvider, '0xADDRESS', itemRequirements);
-      expect(balanceRequirements.sufficient).toEqual(true);
+      const { sufficient } = await balanceCheck(config, mockProvider, '0xADDRESS', itemRequirements);
+      expect(sufficient).toEqual(true);
     });
 
     it('should return delta if balance is not sufficient', async () => {
@@ -179,11 +182,10 @@ describe('balanceCheck', () => {
       };
       (getBalances as jest.Mock).mockResolvedValue(getBalancesResult);
 
-      const balanceRequirements = await balanceCheck(config, mockProvider, '0xADDRESS', itemRequirements);
-      expect(balanceRequirements.sufficient).toEqual(false);
-      expect(balanceRequirements)
+      const result = await balanceCheck(config, mockProvider, '0xADDRESS', itemRequirements);
+      expect(result)
         .toEqual({
-          itemRequirements: [
+          balanceRequirements: [
             {
               type: ItemType.ERC20,
               sufficient: false,
@@ -224,8 +226,8 @@ describe('balanceCheck', () => {
         ownerOf: jest.fn().mockResolvedValue('0xADDRESS'),
       });
 
-      const balanceRequirements = await balanceCheck(config, mockProvider, '0xADDRESS', itemRequirements);
-      expect(balanceRequirements.sufficient).toEqual(true);
+      const { sufficient } = await balanceCheck(config, mockProvider, '0xADDRESS', itemRequirements);
+      expect(sufficient).toBeTruthy();
     });
   });
 
@@ -259,24 +261,25 @@ describe('balanceCheck', () => {
         ownerOf: jest.fn().mockResolvedValue('0xADDRESS'),
       });
 
-      const balanceRequirements = await balanceCheck(
+      const { sufficient, balanceRequirements } = await balanceCheck(
         config,
         mockProvider,
         '0xADDRESS',
         itemRequirements,
-      ) as BalanceCheckInsufficient;
-      expect(balanceRequirements.sufficient).toEqual(false);
-      expect(balanceRequirements.itemRequirements)
+      ) as BalanceCheckResult;
+      expect(sufficient).toBeFalsy();
+      expect(balanceRequirements)
         .toEqual(expect.arrayContaining([
           {
             current: {
+              type: ItemType.NATIVE,
               balance: BigNumber.from(0),
               formattedBalance: '0',
               token: {
                 address: IMX_ADDRESS_ZKEVM,
                 decimals: DEFAULT_TOKEN_DECIMALS,
-                name: 'IMX',
-                symbol: 'IMX',
+                name: '',
+                symbol: '',
               },
             },
             delta: {
@@ -284,13 +287,14 @@ describe('balanceCheck', () => {
               formattedBalance: '0.000000000000000002',
             },
             required: {
+              type: ItemType.NATIVE,
               balance: BigNumber.from(2),
               formattedBalance: '0.000000000000000002',
               token: {
                 address: IMX_ADDRESS_ZKEVM,
                 decimals: DEFAULT_TOKEN_DECIMALS,
-                name: 'IMX',
-                symbol: 'IMX',
+                name: '',
+                symbol: '',
               },
             },
             sufficient: false,
@@ -302,17 +306,25 @@ describe('balanceCheck', () => {
               formattedBalance: '0.00000000000000002',
             },
             current: {
+              type: ItemType.ERC20,
               balance: BigNumber.from(0),
               formattedBalance: '0',
               token: {
+                name: '',
+                symbol: '',
                 address: '0xERC20',
+                decimals: DEFAULT_TOKEN_DECIMALS,
               },
             },
             required: {
+              type: ItemType.ERC20,
               balance: BigNumber.from(20),
               formattedBalance: '0.00000000000000002',
               token: {
+                name: '',
+                symbol: '',
                 address: '0xERC20',
+                decimals: DEFAULT_TOKEN_DECIMALS,
               },
             },
             sufficient: false,
@@ -372,8 +384,8 @@ describe('balanceCheck', () => {
         ownerOf: jest.fn().mockResolvedValue('0xADDRESS'),
       });
 
-      const balanceRequirements = await balanceCheck(config, mockProvider, '0xADDRESS', itemRequirements);
-      expect(balanceRequirements.sufficient).toEqual(true);
+      const { sufficient } = await balanceCheck(config, mockProvider, '0xADDRESS', itemRequirements);
+      expect(sufficient).toBeTruthy();
     });
 
     it('should aggregate balance requirements', async () => {
@@ -431,17 +443,18 @@ describe('balanceCheck', () => {
         ownerOf: jest.fn().mockResolvedValue('0xADDRESS'),
       });
 
-      const balanceRequirements = await balanceCheck(
+      const result = await balanceCheck(
         config,
         mockProvider,
         '0xADDRESS',
         itemRequirements,
-      ) as BalanceCheckInsufficient;
-      expect(balanceRequirements.sufficient).toEqual(false);
-      expect(balanceRequirements.itemRequirements)
+      ) as BalanceCheckResult;
+      expect(result.sufficient).toBeFalsy();
+      expect(result.balanceRequirements)
         .toEqual(expect.arrayContaining([
           {
             current: {
+              type: ItemType.NATIVE,
               balance: BigNumber.from(1),
               formattedBalance: '0.000000000000000001',
               token: {
@@ -456,6 +469,7 @@ describe('balanceCheck', () => {
               formattedBalance: '0.000000000000000001',
             },
             required: {
+              type: ItemType.NATIVE,
               balance: BigNumber.from(2),
               formattedBalance: '0.000000000000000002',
               token: {
@@ -474,21 +488,51 @@ describe('balanceCheck', () => {
               formattedBalance: '0.00000000000000002',
             },
             current: {
+              type: ItemType.ERC20,
               balance: BigNumber.from(0),
               formattedBalance: '0',
               token: {
+                name: '',
+                symbol: '',
+                decimals: DEFAULT_TOKEN_DECIMALS,
                 address: '0xERC20',
               },
             },
             required: {
+              type: ItemType.ERC20,
               balance: BigNumber.from(20),
               formattedBalance: '0.00000000000000002',
               token: {
+                name: '',
+                symbol: '',
+                decimals: DEFAULT_TOKEN_DECIMALS,
                 address: '0xERC20',
               },
             },
             sufficient: false,
             type: ItemType.ERC20,
+          },
+          {
+            delta: {
+              balance: BigNumber.from(0),
+              formattedBalance: '0',
+            },
+            current: {
+              type: ItemType.ERC721,
+              balance: BigNumber.from(1),
+              formattedBalance: '1',
+              contractAddress: '0xERC721',
+              id: '1',
+            },
+            required: {
+              type: ItemType.ERC721,
+              balance: BigNumber.from(1),
+              formattedBalance: '1',
+              contractAddress: '0xERC721',
+              id: '1',
+            },
+            sufficient: true,
+            type: ItemType.ERC721,
           },
         ]));
     });
@@ -522,17 +566,18 @@ describe('balanceCheck', () => {
         ownerOf: jest.fn().mockResolvedValue('0xSOMEONEELSE'),
       });
 
-      const balanceRequirements = await balanceCheck(
+      const result = await balanceCheck(
         config,
         mockProvider,
         '0xADDRESS',
         itemRequirements,
-      ) as BalanceCheckInsufficient;
-      expect(balanceRequirements.sufficient).toEqual(false);
-      expect(balanceRequirements.itemRequirements)
+      ) as BalanceCheckResult;
+      expect(result.sufficient).toEqual(false);
+      expect(result.balanceRequirements)
         .toEqual(expect.arrayContaining([
           {
             current: {
+              type: ItemType.ERC721,
               balance: BigNumber.from(0),
               formattedBalance: '0',
               contractAddress: '0xERC721',
@@ -543,6 +588,7 @@ describe('balanceCheck', () => {
               formattedBalance: '1',
             },
             required: {
+              type: ItemType.ERC721,
               balance: BigNumber.from(1),
               formattedBalance: '1',
               contractAddress: '0xERC721',
@@ -553,6 +599,7 @@ describe('balanceCheck', () => {
           },
           {
             current: {
+              type: ItemType.ERC721,
               balance: BigNumber.from(0),
               formattedBalance: '0',
               contractAddress: '0xERC721',
@@ -563,6 +610,7 @@ describe('balanceCheck', () => {
               formattedBalance: '1',
             },
             required: {
+              type: ItemType.ERC721,
               balance: BigNumber.from(1),
               formattedBalance: '1',
               contractAddress: '0xERC721',
