@@ -1,10 +1,16 @@
-import { describe, it } from 'local-cypress';
+import { cy, describe, it } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { Environment } from '@imtbl/config';
+import { ChainId, ChainName, Checkout } from '@imtbl/checkout-sdk';
+import { Web3Provider } from '@ethersproject/providers';
 import { cySmartGet } from '../../lib/testUtils';
 import { OnRampWidget, OnRampWidgetParams } from './OnRampWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { WidgetTheme } from '../../lib';
+import {
+  ConnectLoaderTestComponent,
+} from '../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
+import { ConnectionStatus } from '../../context/connect-loader-context/ConnectLoaderContext';
 
 describe('OnRampWidget tests', () => {
   const config: StrongCheckoutWidgetsConfig = {
@@ -15,22 +21,55 @@ describe('OnRampWidget tests', () => {
     isOnRampEnabled: true,
   };
 
-  /** mounting the on ramp widget should be done to start all tests */
-  const mountOnRampWidget = () => {
-    const params = {} as OnRampWidgetParams;
+  const mockProvider = {
+    getSigner: () => ({
+      getAddress: () => Promise.resolve('0xwalletAddress'),
+    }),
+    getNetwork: async () => ({
+      chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+      name: ChainName.IMTBL_ZKEVM_TESTNET,
+    }),
+    provider: {
+      request: async () => null,
+    },
+  } as unknown as Web3Provider;
 
-    mount(
-      <OnRampWidget
-        params={params}
-        config={config}
-      />,
-    );
+  const connectLoaderState = {
+    checkout: new Checkout({
+      baseConfig: { environment: Environment.SANDBOX },
+    }),
+    provider: mockProvider,
+    connectionStatus: ConnectionStatus.CONNECTED_WITH_NETWORK,
   };
 
   describe('OnRamp screen', () => {
     it('should have title', () => {
-      mountOnRampWidget();
+      const params = {} as OnRampWidgetParams;
+      mount(
+        <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
+          <OnRampWidget
+            params={params}
+            config={config}
+          />
+        </ConnectLoaderTestComponent>,
+      );
 
+      cySmartGet('header-title').should('have.text', 'Add coins');
+    });
+
+    it('should show the loading screen before the on ramp iframe', () => {
+      const params = {} as OnRampWidgetParams;
+      mount(
+        <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
+          <OnRampWidget
+            params={params}
+            config={config}
+          />
+        </ConnectLoaderTestComponent>,
+      );
+
+      cySmartGet('loading-view').should('be.visible');
+      cy.wait(1000);
       cySmartGet('header-title').should('have.text', 'Add coins');
     });
   });
