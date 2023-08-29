@@ -92,7 +92,7 @@ export const getTokenBalanceRequirement = (
     });
   } else if (itemRequirement.type === ItemType.NATIVE) {
     itemBalanceResult = balances.find((balance) => {
-      return !('address' in (balance as TokenBalance).token)
+      return (balance as TokenBalance).token?.address === ''
         || (balance as TokenBalance).token?.address === IMX_ADDRESS_ZKEVM;
     });
   }
