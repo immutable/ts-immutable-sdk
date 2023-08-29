@@ -158,12 +158,10 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
     }
     if (actionDisabled) return;
     if (!preparedApprovalTx) {
-      console.log('prapred tx is undefined');
       return;
     }
 
     setActionDisabled(true);
-    console.log('button click', new Date().getTime());
     try {
       const txnResult = await checkout.sendTransaction({
         provider,
@@ -253,7 +251,6 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
     setActionDisabled(true);
 
     if (!preparedSwapTx) {
-      console.log('prepared swap tx is undefined');
       return;
     }
 
