@@ -68,17 +68,16 @@ const getERC721Balances = async (
   const erc721s = new Map<string, ItemRequirement>();
   const erc721OwnershipPromises = new Map<string, Promise<string>>();
   itemRequirements
-    .filter((itemRequirement) => itemRequirement.type === ItemType.ERC721)
     .forEach((itemRequirement) => {
-      const erc721Requirement = itemRequirement as ERC721Item;
+      if (itemRequirement.type !== ItemType.ERC721) return;
       const contract = new Contract(
-        erc721Requirement.contractAddress,
+        itemRequirement.contractAddress,
         JSON.stringify(ERC721ABI),
         provider,
       );
 
-      erc721s.set(erc721Requirement.contractAddress, itemRequirement);
-      erc721OwnershipPromises.set(erc721Requirement.contractAddress, contract.ownerOf(erc721Requirement.id));
+      erc721s.set(itemRequirement.contractAddress, itemRequirement);
+      erc721OwnershipPromises.set(itemRequirement.contractAddress, contract.ownerOf(itemRequirement.id));
     });
 
   try {
