@@ -12,7 +12,7 @@ import {
 } from '@imtbl/orderbook';
 import { Web3Provider } from '@ethersproject/providers';
 import { useEffect, useState } from 'react';
-import { BigNumber } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 import { Body, Box, Button, FormControl, Heading, Select, TextInput, Option, OptionKey, Checkbox } from '@biom3/react';
 import LoadingButton from './LoadingButton';
 import { ErrorMessage, SuccessMessage } from './messages';
@@ -152,12 +152,16 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
     setItemRequirements([...itemRequirements, itemRequirement]);
   }
 
+  const get18DecimalBigNumber = (amount: string) => {
+    return BigNumber.from(amount).mul(BigNumber.from(10).pow(18));
+  }
+
   const addNativeRequirement = () => {
     if (!amount) {
       setAmountError('Amount is required for native token');
       return;
     }
-    const bn = BigNumber.from(amount);
+    const bn = get18DecimalBigNumber(amount);
     updateItemRequirements({
       type: ItemType.NATIVE,
       amount: bn,
@@ -177,7 +181,7 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
     if (!amount || !contractAddress || !spenderAddress) {
       return;
     }
-    const bn = BigNumber.from(amount);
+    const bn = get18DecimalBigNumber(amount);
     updateItemRequirements({
       type: ItemType.ERC20,
       amount: bn,
@@ -230,7 +234,7 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
         return (
           <tr key={index}>
             <td>{item.type}</td>
-            <td>{item.amount.toString()}</td>
+            <td>{utils.formatUnits(item.amount, 18)}</td>
             <td></td>
             <td></td>
             <td></td>
@@ -240,7 +244,7 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
         return (
           <tr key={index}>
             <td>{item.type}</td>
-            <td>{item.amount.toString()}</td>
+            <td>{utils.formatUnits(item.amount, 18)}</td>
             <td></td>
             <td>{item.contractAddress}</td>
             <td>{item.spenderAddress}</td>
