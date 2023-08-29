@@ -89,7 +89,6 @@ export function ConnectLoader({
   const { updateWriteKey } = useAnalytics();
   useEffect(() => {
     const writeKey = getSegmentWriteKey(widgetConfig.environment);
-    console.log('writeKey from loader:', writeKey);
     updateWriteKey(writeKey);
   }, []);
 
