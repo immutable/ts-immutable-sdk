@@ -546,9 +546,9 @@ export class ImmutableXClient {
   }
 
   /**
-   * Get details of a Transfer with the given ID
+   * Get details of a TransferImx with the given ID
    * @param request - the request object containing the parameters to be provided in the API request
-   * @returns a promise that resolves with the requested Transfer
+   * @returns a promise that resolves with the requested TransferImx
    * @throws {@link index.IMXError}
    */
   public getTransfer(request: TransfersApiGetTransferRequest) {
@@ -596,10 +596,10 @@ export class ImmutableXClient {
   }
 
   /**
-   * Create a new Transfer request
+   * Create a new TransferImx request
    * @param walletConnection - the pair of Eth/Stark signers
    * @param request - the request object to be provided in the API request
-   * @returns a promise that resolves with the created Exchange Transfer
+   * @returns a promise that resolves with the created Exchange TransferImx
    * @throws {@link index.IMXError}
    */
   public exchangeTransfer(

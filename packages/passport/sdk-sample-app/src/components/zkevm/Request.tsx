@@ -2,13 +2,15 @@ import React, { useState } from 'react';
 import {
   Form, Offcanvas, Spinner, Stack,
 } from 'react-bootstrap';
-import { Divider, Heading } from '@biom3/react';
+import { Heading } from '@biom3/react';
 import { RequestExampleProps, ModalProps } from '@/types';
 import { useStatusProvider } from '@/context/StatusProvider';
 import { usePassportProvider } from '@/context/PassportProvider';
 import { RequestArguments } from '@imtbl/passport';
 import WorkflowButton from '@/components/WorkflowButton';
+import RequestExampleAccordion from '@/components/zkevm/RequestExampleAccordion';
 import EthSendTransactionExamples from './EthSendTransactionExamples';
+import EthSignTypedDataV4Examples from './EthSignTypedDataV4Examples';
 
 enum EthereumParamType {
   string = 'string',
@@ -25,7 +27,7 @@ interface EthereumParam {
 interface EthereumMethod {
   name: string;
   params?: Array<EthereumParam>;
-  exampleComponent?: React.ComponentType<RequestExampleProps>;
+  exampleComponents?: Array<React.ComponentType<RequestExampleProps>>;
 }
 
 const EthereumMethods: EthereumMethod[] = [
@@ -36,7 +38,15 @@ const EthereumMethods: EthereumMethod[] = [
     params: [
       { name: 'transaction', type: EthereumParamType.object },
     ],
-    exampleComponent: EthSendTransactionExamples,
+    exampleComponents: EthSendTransactionExamples,
+  },
+  {
+    name: 'eth_signTypedData_v4',
+    params: [
+      { name: 'address' },
+      { name: 'payload', type: EthereumParamType.object },
+    ],
+    exampleComponents: EthSignTypedDataV4Examples,
   },
   { name: 'eth_gasPrice' },
   {
@@ -168,7 +178,6 @@ function Request({ showModal, setShowModal }: ModalProps) {
               return param === 'true';
             }
             case EthereumParamType.object: {
-              console.log(param);
               return JSON.parse(param);
             }
             default: {
@@ -249,20 +258,12 @@ function Request({ showModal, setShowModal }: ModalProps) {
             { loadingRequest && <Spinner /> }
           </Stack>
         </Form>
-        { selectedEthMethod?.exampleComponent && (
-          <Stack gap={3} style={{ marginTop: '24px' }}>
-            <Divider />
-            <Heading
-              as="h2"
-              size="medium"
-            >
-              Example transactions
-            </Heading>
-            { React.createElement(selectedEthMethod.exampleComponent, {
-              handleExampleSubmitted,
-              disabled: loadingRequest,
-            }) }
-          </Stack>
+        { selectedEthMethod?.exampleComponents && (
+          <RequestExampleAccordion
+            disabled={loadingRequest}
+            handleExampleSubmitted={handleExampleSubmitted}
+            examples={selectedEthMethod.exampleComponents}
+          />
         )}
       </Offcanvas.Body>
     </Offcanvas>

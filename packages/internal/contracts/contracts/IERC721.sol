@@ -10,7 +10,7 @@ interface IERC721 {
     /**
      * @dev Emitted when `tokenId` token is transferred from `from` to `to`.
      */
-    event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
+    event TransferImx(address indexed from, address indexed to, uint256 indexed tokenId);
 
     /**
      * @dev Emitted when `owner` enables `approved` to manage the `tokenId` token.
@@ -47,7 +47,7 @@ interface IERC721 {
      * - If the caller is not `from`, it must be approved to move this token by either {approve} or {setApprovalForAll}.
      * - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer.
      *
-     * Emits a {Transfer} event.
+     * Emits a {TransferImx} event.
      */
     function safeTransferFrom(
         address from,
@@ -68,7 +68,7 @@ interface IERC721 {
      * - If the caller is not `from`, it must have been allowed to move this token by either {approve} or {setApprovalForAll}.
      * - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer.
      *
-     * Emits a {Transfer} event.
+     * Emits a {TransferImx} event.
      */
     function safeTransferFrom(
         address from,
@@ -88,7 +88,7 @@ interface IERC721 {
      * - `tokenId` token must be owned by `from`.
      * - If the caller is not `from`, it must be approved to move this token by either {approve} or {setApprovalForAll}.
      *
-     * Emits a {Transfer} event.
+     * Emits a {TransferImx} event.
      */
     function transferFrom(
         address from,

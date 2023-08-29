@@ -60,17 +60,17 @@ export interface IMXProvider {
    */
   createTrade(request: GetSignableTradeRequest): Promise<CreateTradeResponse>;
   /**
-   * Create a new Transfer request
+   * Create a new TransferImx request
    *
    * @param {UnsignedTransferRequest} request The unsigned transfer request
-   * @return {Promise<CreateTransferResponseV1>} Returns a promise that resolves with the created Transfer
+   * @return {Promise<CreateTransferResponseV1>} Returns a promise that resolves with the created TransferImx
    */
   transfer(request: UnsignedTransferRequest): Promise<CreateTransferResponseV1>;
   /**
    * Create a batch of NFT transfer requests
    *
    * @param {Array<NftTransferDetails>} request An array of NFT transfer details
-   * @return {Promise<CreateTransferResponse>} Resolves a promise that resolves with the list of Transfer IDs
+   * @return {Promise<CreateTransferResponse>} Resolves a promise that resolves with the list of TransferImx IDs
    */
   batchNftTransfer(
     request: Array<NftTransferDetails>

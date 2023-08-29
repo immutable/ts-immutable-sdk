@@ -15,7 +15,7 @@
 
 
 /**
- * 
+ *
  * @export
  * @interface OptionalExchangeData
  */
@@ -63,7 +63,7 @@ export interface OptionalExchangeData {
      */
     'to_currency'?: string;
     /**
-     * Transfer ID
+     * TransferImx ID
      * @type {string}
      * @memberof OptionalExchangeData
      */

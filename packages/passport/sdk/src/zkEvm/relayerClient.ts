@@ -1,7 +1,7 @@
 import { BytesLike } from 'ethers';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { PassportConfiguration } from '../config';
-import { FeeOption, RelayerTransaction } from './types';
+import {FeeOption, RelayerTransaction, TypedDataPayload} from './types';
 import { UserZkEvm } from '../types';
 import { getEip155ChainId } from './walletHelpers';
 
@@ -27,7 +27,7 @@ type EthSendTransactionRequest = {
   }[];
 };
 
-type EthSendTransactionResponse = {
+type EthSendTransactionResponse = JsonRpc & {
   result: string;
 };
 
@@ -41,6 +41,7 @@ type ImGetTransactionByHashResponse = JsonRpc & {
   result: RelayerTransaction;
 };
 
+// ImGetFeeOptions types
 type ImGetFeeOptionsRequest = {
   method: 'im_getFeeOptions';
   params: {
@@ -54,10 +55,25 @@ type ImGetFeeOptionsResponse = JsonRpc & {
   result: FeeOption[]
 };
 
+// ImSignTypedData types
+type ImSignTypedDataRequest = {
+  method: 'im_signTypedData';
+  params: {
+    chainId: string;
+    address: string;
+    eip712Payload: TypedDataPayload;
+  }[];
+};
+
+type ImSignTypedDataResponse = JsonRpc & {
+  result: string;
+};
+
 export type RelayerTransactionRequest =
   | EthSendTransactionRequest
   | ImGetTransactionByHashRequest
-  | ImGetFeeOptionsRequest;
+  | ImGetFeeOptionsRequest
+  | ImSignTypedDataRequest;
 
 export class RelayerClient {
   private readonly config: PassportConfiguration;
@@ -130,6 +146,20 @@ export class RelayerClient {
       }],
     };
     const { result } = await this.postToRelayer<ImGetFeeOptionsResponse>(payload);
+    return result;
+  }
+
+  public async imSignTypedData(address: string, eip712Payload: TypedDataPayload): Promise<string> {
+    const { chainId } = await this.jsonRpcProvider.ready;
+    const payload: ImSignTypedDataRequest = {
+      method: 'im_signTypedData',
+      params: [{
+        address,
+        eip712Payload,
+        chainId: getEip155ChainId(chainId),
+      }],
+    };
+    const { result } = await this.postToRelayer<ImSignTypedDataResponse>(payload);
     return result;
   }
 }

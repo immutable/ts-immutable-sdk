@@ -18,7 +18,7 @@
 import { TransferToken } from './transfer-token';
 
 /**
- * 
+ *
  * @export
  * @interface Transfer
  */
@@ -26,37 +26,37 @@ export interface Transfer {
     /**
      * Ethereum address of the user who received this transfer
      * @type {string}
-     * @memberof Transfer
+     * @memberof TransferImx
      */
     'receiver': string;
     /**
      * Status of the transaction
      * @type {string}
-     * @memberof Transfer
+     * @memberof TransferImx
      */
     'status': string;
     /**
      * Timestamp of the transfer
      * @type {string}
-     * @memberof Transfer
+     * @memberof TransferImx
      */
     'timestamp': string | null;
     /**
-     * 
+     *
      * @type {TransferToken}
-     * @memberof Transfer
+     * @memberof TransferImx
      */
     'token': TransferToken;
     /**
      * Sequential transaction ID
      * @type {number}
-     * @memberof Transfer
+     * @memberof TransferImx
      */
     'transaction_id': number;
     /**
      * Ethereum address of the user  who submitted this transfer
      * @type {string}
-     * @memberof Transfer
+     * @memberof TransferImx
      */
     'user': string;
 }

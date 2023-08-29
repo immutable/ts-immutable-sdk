@@ -26,25 +26,25 @@ export interface Transfer {
     /**
      * The account address the asset was transferred from
      * @type {string}
-     * @memberof Transfer
+     * @memberof TransferImx
      */
     'from': string;
     /**
      * The account address the asset was transferred to
      * @type {string}
-     * @memberof Transfer
+     * @memberof TransferImx
      */
     'to': string;
     /**
      * The amount of assets transferred
      * @type {string}
-     * @memberof Transfer
+     * @memberof TransferImx
      */
     'amount': string;
     /**
-     * 
+     *
      * @type {ActivityAsset}
-     * @memberof Transfer
+     * @memberof TransferImx
      */
     'asset': ActivityAsset;
 }
