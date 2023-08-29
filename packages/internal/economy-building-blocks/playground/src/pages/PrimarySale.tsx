@@ -74,7 +74,7 @@ const useMint = (selectedItems: any[], amount: number, config = {}) => {
       setError(error as any);
     }
   }, [selectedItems, amount, config]);
-
+  
   return { mint, response, error };
 };
 
@@ -82,16 +82,17 @@ const useItems = (contract_address: string, pointer = 1) => {
   const maxItems = 721;
   const once = useRef<number | undefined>(undefined);
   const [items, setItems] = useState<any[]>([]);
-
+  
   const getItems = useCallback(async () => {
     once.current = pointer;
-
+    
     const pageSize = 100;
     const start = pointer * pageSize - pageSize + 1;
-    const length = start + pageSize - 1 <= maxItems ? pageSize : maxItems - start + 1;
-
+    const length =
+    start + pageSize - 1 <= maxItems ? pageSize : maxItems - start + 1;
+    
     if (start > maxItems) return;
-
+    
     try {
       const items$ = Array.from({ length }, (_, i) => i + start).map(
         async (id) => {
@@ -101,7 +102,7 @@ const useItems = (contract_address: string, pointer = 1) => {
           );
           const json = await response.json();
 
-          const price = Math.floor(Math.random() * 25) + 1;
+          const price = Math.round((Math.random() * 3 + 0.1) * 100) / 100;
 
           return {
             token_id: id,
@@ -121,8 +122,9 @@ const useItems = (contract_address: string, pointer = 1) => {
   }, [contract_address, pointer]);
 
   useEffect(() => {
+    if (!contract_address) return
     once.current !== pointer && getItems();
-  }, [pointer]);
+  }, [pointer, contract_address]);
 
   return items;
 };
@@ -166,7 +168,10 @@ function PrimarySale() {
 
   const [itemsPointer, setItemsPointer] = useState(1);
 
-  const items = useItems(configFields.contract_address, itemsPointer) as any[];
+  const items = useItems(
+    configFields.collection_address,
+    itemsPointer
+  ) as any[];
   const {
     mm_connect,
     mm_sendTransaction,
@@ -248,14 +253,14 @@ function PrimarySale() {
           configFields.contract_address,
           `${amount}`
         );
+        console.log("@@@ txData", txData);
 
         const execute = walletType === "MM" ? mm_sendTransaction : sendTx;
         const approved = await execute(
           configFields.erc20_contract_address,
           txData
         );
-
-        console.log("@@@ txData", txData);
+        
         return approved;
       } catch (error) {
         console.error("An error occurred:", error);
@@ -527,7 +532,7 @@ function PrimarySale() {
                             sx={{ marginLeft: "base.spacing.x1" }}
                             onClick={() => {
                               window.open(
-                                `https://immutable-testnet.blockscout.com/tx/${mintResponse?.tx_id}`,
+                                `https://explorer.testnet.immutable.com/search-results?q=${mintResponse?.tx_id}`,
                                 "_blank"
                               );
                             }}
