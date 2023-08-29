@@ -26,7 +26,6 @@ export const getTokensFromRequirements = (itemRequirements: ItemRequirement[]): 
     }
 
     return {
-      name: itemRequirement.type,
       address: itemRequirement.contractAddress,
     } as TokenInfo;
   });
