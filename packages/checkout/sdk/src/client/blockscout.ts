@@ -2,7 +2,7 @@ import axios, {
   AxiosResponse,
   HttpStatusCode,
 } from 'axios';
-import { BLOCKSCOUNT_CHAIN_URL_MAP, ChainId } from '../types';
+import { BLOCKSCOUT_CHAIN_URL_MAP, ChainId } from '../types';
 import {
   BlockscoutAddressTokenPagination,
   BlockscoutAddressTokens,
@@ -22,7 +22,7 @@ export class Blockscout {
   constructor(params: {
     chainId: ChainId;
   }) {
-    this.url = BLOCKSCOUNT_CHAIN_URL_MAP[params.chainId];
+    this.url = BLOCKSCOUT_CHAIN_URL_MAP[params.chainId];
   }
 
   /**
@@ -30,7 +30,7 @@ export class Blockscout {
    * @param chainId
    * @returns TRUE if supported, otherwise FALSE
    */
-  public static isChainSupported = (chainId: ChainId): boolean => Boolean(BLOCKSCOUNT_CHAIN_URL_MAP[chainId]);
+  public static isChainSupported = (chainId: ChainId): boolean => Boolean(BLOCKSCOUT_CHAIN_URL_MAP[chainId]);
 
   public static isBlockscoutError = (err: any): boolean => Object.hasOwn(err, 'code');
 

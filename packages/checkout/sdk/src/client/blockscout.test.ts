@@ -1,7 +1,7 @@
 /* eslint @typescript-eslint/naming-convention: off */
 import axios, { HttpStatusCode } from 'axios';
 import {
-  BLOCKSCOUNT_CHAIN_URL_MAP,
+  BLOCKSCOUT_CHAIN_URL_MAP,
   ChainId,
 } from '../types';
 import { Blockscout } from './blockscout';
@@ -20,7 +20,7 @@ describe('Blockscout', () => {
 
   describe('isChainSupported', () => {
     it('supported', () => {
-      Object.keys(BLOCKSCOUNT_CHAIN_URL_MAP).forEach((chain) => {
+      Object.keys(BLOCKSCOUT_CHAIN_URL_MAP).forEach((chain) => {
         expect(Blockscout.isChainSupported(chain as unknown as ChainId)).toBe(true);
       });
     });
