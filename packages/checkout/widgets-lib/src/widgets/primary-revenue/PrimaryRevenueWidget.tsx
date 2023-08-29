@@ -1,6 +1,12 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable no-console */
 import {
-  useCallback, useContext, useEffect, useMemo, useReducer,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+  useState,
 } from 'react';
 
 import { BiomeCombinedProviders } from '@biom3/react';
@@ -35,7 +41,12 @@ export interface PrimaryRevenueWidgetProps {
 }
 
 export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
-  const { config, amount, fromContractAddress } = props;
+  const [mintResponse, setMintResponse] = useState<any | null>(null);
+  const [mintError, setMintError] = useState(null);
+
+  const {
+    config, amount, fromContractAddress,
+  } = props;
   const loadingText = text.views[SharedViews.LOADING_VIEW].text;
 
   const { theme } = config;
@@ -90,6 +101,8 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
     const balance = parseFloat(formattedBalance);
     const requiredAmounts = parseFloat(amount);
 
+    console.log('balance', balance);
+    console.log('requiredAmounts', requiredAmounts);
     return balance > requiredAmounts;
   }, [checkout, provider, amount, fromContractAddress]);
 
@@ -128,9 +141,54 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
     }
   }, [checkout, provider, amount, fromContractAddress]);
 
+  const mint = useCallback(async () => {
+    if (!provider) return;
+
+    const recipient_address = await provider.getSigner().getAddress();
+
+    const data = {
+      contract_address: '0x81064a5d163559D422fD311dc36c051424620EB9',
+      recipient_address,
+      erc20_contract_address: '0x21B51Ec6fB7654B7e59e832F9e9687f29dF94Fb8',
+      fee_collection_address: '0x862E424DE37B92cdf4F419713a54AA105DDB16b4',
+      sale_collection_address: '0xB6E5b4C297D6B504F830d66093af4756A5Ba7985',
+      amount,
+      // items: items.map((item) => ({
+      //   collection_address: item.contract_address,
+      //   token_id: item.token_id.toString(),
+      // })),
+    };
+
+    try {
+      const response = await fetch(
+        'https://game-primary-sales.sandbox.imtbl.com/v1/games/pokemon/mint',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-immutable-api-key': 'sk_imapik-Ekz6cLnnwREtqjGn$xo6_fb97b8',
+          },
+          body: JSON.stringify(data),
+        },
+      );
+
+      const json = await response.json();
+      setMintResponse(json);
+      console.log('mintResponse', mintResponse);
+    } catch (error) {
+      setMintError(error as any);
+      console.log('mintError', mintError);
+    }
+  }, [amount, fromContractAddress]);
+
   const executeBuyNow = useCallback(async () => {
     const approved = await handleApprove();
     console.log('approved', approved);
+
+    if (approved) {
+      mint();
+    }
+
     return approved;
   }, [checkout, provider, amount, fromContractAddress]);
 

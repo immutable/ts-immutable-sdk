@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/naming-convention */
 import { useEffect, useState } from 'react';
 import { Environment } from '@imtbl/config';
 import { config, passport } from '@imtbl/sdk';
@@ -13,6 +15,13 @@ const defaultPassportConfig = {
   audience: 'platform_api',
   scope: 'openid offline_access email transact',
 };
+
+const defaultOrderList = [
+  {
+    token_id: '',
+    collection_address: '',
+  },
+];
 
 const useParams = () => {
   const urlParams = new URLSearchParams(window.location.search);
@@ -78,6 +87,9 @@ function PrimaryRevenueWebView() {
     JSON.stringify(defaultPassportConfig, null, 2),
   );
   const [passportOn, setPassportOn] = useState(false);
+  const [orderList, setOrderList] = useState<string>(
+    JSON.stringify(defaultOrderList),
+  );
 
   const handlePassportConfigChange = (e: any) => {
     setPassportConfig(e.target.value);
@@ -87,11 +99,31 @@ function PrimaryRevenueWebView() {
     let value;
     try {
       value = JSON.parse(e.target.value);
-    } catch (error) { /** */ }
+    } catch (error) {
+      /** */
+    }
 
     if (value) {
       setPassportConfig(JSON.stringify(value, null, 2));
       localStorage.setItem('passportConfig', JSON.stringify(value));
+    }
+  };
+
+  const handleOrderListChange = (e: any) => {
+    setOrderList(e.target.value);
+  };
+
+  const handleOrderListBlur = () => {
+    let value;
+    try {
+      value = JSON.parse(orderList);
+    } catch (error) {
+      console.error('Invalid JSON for order list');
+    }
+
+    if (value) {
+      setOrderList(JSON.stringify(value));
+      localStorage.setItem('orderList', JSON.stringify(value));
     }
   };
 
@@ -118,6 +150,11 @@ function PrimaryRevenueWebView() {
     if (lsPassportConfig) {
       setPassportConfig(JSON.stringify(JSON.parse(lsPassportConfig), null, 2));
     }
+
+    const lsOrderList = localStorage.getItem('orderList');
+    if (lsOrderList) {
+      setOrderList(JSON.stringify(JSON.parse(lsOrderList), null, 2));
+    }
   }, []);
 
   const widgetConfig = {
@@ -133,19 +170,32 @@ function PrimaryRevenueWebView() {
         fromContractAddress={fromContractAddress}
       />
       <br />
-      <h1>
-        <textarea
-          rows={10}
-          cols={50}
-          value={passportConfig}
-          onChange={handlePassportConfigChange}
-          onBlur={handlePassportConfigFormat}
-        />
-        <br />
-        <button type="button" onClick={() => { setPassportOn(true); }}>
-          Passport On
-        </button>
-      </h1>
+      <h3>Passport config</h3>
+      <textarea
+        rows={10}
+        cols={50}
+        value={passportConfig}
+        onChange={handlePassportConfigChange}
+        onBlur={handlePassportConfigFormat}
+      />
+      <br />
+      <h3>Order list</h3>
+      <textarea
+        rows={10}
+        cols={50}
+        value={orderList}
+        onChange={handleOrderListChange}
+        onBlur={handleOrderListBlur}
+      />
+      <br />
+      <button
+        type="button"
+        onClick={() => {
+          setPassportOn(true);
+        }}
+      >
+        Passport On
+      </button>
     </>
   );
 }
