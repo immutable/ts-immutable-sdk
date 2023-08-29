@@ -6,6 +6,7 @@ import { WidgetTheme } from '../../lib';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
+import { sendOnRampWidgetCloseEvent } from './OnRampWidgetEvents';
 
 export interface OnRampWidgetProps {
   // eslint-disable-next-line react/no-unused-prop-types
@@ -32,7 +33,9 @@ export function OnRampWidget(props: OnRampWidgetProps) {
     : onDarkBase;
 
   useEffect(() => {
-    const domIframe:HTMLIFrameElement = document.getElementById('transak-iframe') as HTMLIFrameElement;
+    const domIframe: HTMLIFrameElement = document.getElementById(
+      'transak-iframe',
+    ) as HTMLIFrameElement;
 
     if (domIframe === undefined) return;
 
@@ -58,22 +61,20 @@ export function OnRampWidget(props: OnRampWidgetProps) {
       <SimpleLayout
         header={(
           <HeaderNavigation
-            showBack
             title="Add coins"
-            onCloseButtonClick={() => console.log('close widget event')}
+            onCloseButtonClick={sendOnRampWidgetCloseEvent}
           />
         )}
         footerBackgroundColor="base.color.translucent.emphasis.200"
       >
-        <Box style={{
-          position: 'relative',
-          width: '420px',
-          height: '565px',
-          boxShadow: '0 0 15px #1461db',
-          borderRadius: '15px',
-          overflow: 'hidden',
-          marginLeft: '5px',
-        }}
+        <Box
+          style={{
+            position: 'relative',
+            width: '420px',
+            height: '565px',
+            overflow: 'hidden',
+            minWidth: '100%',
+          }}
         >
           <iframe
             title="Transak title"
