@@ -15,6 +15,10 @@ import {
 export class Blockscout {
   readonly url: string;
 
+  private static async makeHttpRequest(url: string): Promise<AxiosResponse> {
+    return axios.get(url);
+  }
+
   /**
    * Blockscout constructor
    * @param chainId target chain
@@ -28,15 +32,14 @@ export class Blockscout {
   /**
    * isChainSupported verifies if the chain is supported by Blockscout
    * @param chainId
-   * @returns TRUE if supported, otherwise FALSE
    */
   public static isChainSupported = (chainId: ChainId): boolean => Boolean(BLOCKSCOUT_CHAIN_URL_MAP[chainId]);
 
+  /**
+   * isBlockscoutError verifies if the error is a Blockscout client error
+   * @param err error to evaluate
+   */
   public static isBlockscoutError = (err: any): boolean => Object.hasOwn(err, 'code');
-
-  private static async makeHttpRequest(url: string): Promise<AxiosResponse> {
-    return axios.get(url);
-  }
 
   /**
    * getAddressTokens fetches the list of tokens (by type) owned by the wallet address.
