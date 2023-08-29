@@ -25,6 +25,6 @@ string,
 AnalyticsControlTypes,
 AnalyticsActions
 >({
-  writeKey: 'b69BcXnFXdaiFC6MqRQiHvjcPrTxftZl', // todo: removing this initial key and relyin gon update isn't working
+  writeKey: '',
   appName: 'Checkout-widgets',
 });

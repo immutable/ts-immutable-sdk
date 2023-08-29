@@ -36,7 +36,6 @@ import {
 } from '../../lib';
 import { useInterval } from '../../lib/hooks/useInterval';
 import {
-  AnalyticsProvider,
   getSegmentWriteKey,
   useAnalytics,
 } from '../../context/segment-provider/SegmentAnalyticsProvider';
@@ -87,10 +86,6 @@ export function ConnectLoader({
   const [attempts, setAttempts] = useState<number>(0);
 
   const { updateWriteKey } = useAnalytics();
-  useEffect(() => {
-    const writeKey = getSegmentWriteKey(widgetConfig.environment);
-    updateWriteKey(writeKey);
-  }, []);
 
   // Check if Web3Provider injected, otherwise load the widget without the provider after several attempts
   let clearInterval: () => void;
@@ -177,6 +172,9 @@ export function ConnectLoader({
         checkout: new Checkout({ baseConfig: { environment: widgetConfig.environment } }),
       },
     });
+
+    const writeKey = getSegmentWriteKey(widgetConfig.environment);
+    updateWriteKey(writeKey);
   }, [widgetConfig]);
 
   useEffect(() => {
@@ -336,7 +334,7 @@ export function ConnectLoader({
   );
 
   return (
-    <AnalyticsProvider>
+    <>
       {connectionStatus === ConnectionStatus.LOADING && (
         <BiomeCombinedProviders theme={{ base: biomeTheme }}>
           <LoadingView loadingText="Connecting" />
@@ -375,6 +373,6 @@ export function ConnectLoader({
           />
         </BiomeCombinedProviders>
       )}
-    </AnalyticsProvider>
+    </>
   );
 }
