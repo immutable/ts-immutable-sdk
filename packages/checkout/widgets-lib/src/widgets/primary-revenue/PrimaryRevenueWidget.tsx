@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import {
   useCallback, useContext, useEffect, useMemo, useReducer,
 } from 'react';
