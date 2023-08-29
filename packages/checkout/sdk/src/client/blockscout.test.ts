@@ -1,5 +1,5 @@
 /* eslint @typescript-eslint/naming-convention: off */
-import axios from 'axios';
+import axios, { HttpStatusCode } from 'axios';
 import {
   BLOCKSCOUNT_CHAIN_URL_MAP,
   ChainId,
@@ -97,9 +97,27 @@ describe('Blockscout', () => {
       );
     });
 
-    it('fails', async () => {
+    it('success with no pagination', async () => {
       const mockResponse = {
-        status: 400,
+        status: 200,
+        data: {},
+      };
+      mockedAxios.get.mockResolvedValueOnce(mockResponse);
+
+      const tokens = [BlockscoutTokenType.ERC20];
+      const next = null;
+      const client = new Blockscout({ chainId: ChainId.IMTBL_ZKEVM_TESTNET });
+      await client.getAddressTokens({ walletAddress: '0x1234567890', tokenType: tokens, next });
+
+      expect(mockedAxios.get).toHaveBeenNthCalledWith(
+        1,
+        `${client.url}/api/v2/addresses/0x1234567890/tokens?type=${tokens.join(',')}`,
+      );
+    });
+
+    it('fails 400', async () => {
+      const mockResponse = {
+        status: HttpStatusCode.BadRequest,
         statusText: 'error',
         data: {},
       };
@@ -111,7 +129,26 @@ describe('Blockscout', () => {
         await client.getAddressTokens({ walletAddress: '0x1234567890', tokenType: tokens });
       } catch (error: any) {
         expect(Blockscout.isBlockscoutError(error)).toBe(true);
-        expect((error as BlockscoutError).code).toEqual(400);
+        expect((error as BlockscoutError).code).toEqual(HttpStatusCode.BadRequest);
+        expect((error as BlockscoutError).message).toEqual('error');
+      }
+    });
+
+    it('fails 400', async () => {
+      const mockResponse = {
+        status: HttpStatusCode.InternalServerError,
+        statusText: 'error',
+        data: {},
+      };
+      mockedAxios.get.mockResolvedValueOnce(mockResponse);
+
+      const tokens = [BlockscoutTokenType.ERC20];
+      const client = new Blockscout({ chainId: ChainId.IMTBL_ZKEVM_TESTNET });
+      try {
+        await client.getAddressTokens({ walletAddress: '0x1234567890', tokenType: tokens });
+      } catch (error: any) {
+        expect(Blockscout.isBlockscoutError(error)).toBe(true);
+        expect((error as BlockscoutError).code).toEqual(HttpStatusCode.InternalServerError);
         expect((error as BlockscoutError).message).toEqual('error');
       }
     });

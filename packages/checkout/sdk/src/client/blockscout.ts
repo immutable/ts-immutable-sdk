@@ -48,7 +48,7 @@ export class Blockscout {
   public async getAddressTokens(params: {
     walletAddress: string,
     tokenType: BlockscoutTokenType[],
-    next?: BlockscoutAddressTokenPagination
+    next?: BlockscoutAddressTokenPagination | null
   }): Promise<BlockscoutAddressTokens> {
     try {
       let url = `${this.url}/api/v2/addresses/${params.walletAddress}/tokens?type=${params.tokenType.join(',')}`;
