@@ -10,7 +10,7 @@ import { sendWalletWidgetCloseEvent } from './WalletWidgetEvents';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
 import { ConnectTargetLayer, getL1ChainId, getL2ChainId } from '../../lib';
 import { isValidWalletProvider } from '../../lib/validations/widgetValidators';
-import { AnalyticsProvider } from '../../context/segment-provider/SegmentAnalyticsProvider';
+import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 
 export class ImmutableWallet extends ImmutableWebComponent {
   walletProvider: WalletProviderName | undefined = undefined;
@@ -47,7 +47,7 @@ export class ImmutableWallet extends ImmutableWebComponent {
     }
     this.reactRoot.render(
       <React.StrictMode>
-        <AnalyticsProvider>
+        <CustomAnalyticsProvider widgetConfig={this.widgetConfig!}>
           <ConnectLoader
             widgetConfig={this.widgetConfig!}
             params={connectLoaderParams}
@@ -57,7 +57,7 @@ export class ImmutableWallet extends ImmutableWebComponent {
               config={this.widgetConfig!}
             />
           </ConnectLoader>
-        </AnalyticsProvider>
+        </CustomAnalyticsProvider>
       </React.StrictMode>,
     );
   }

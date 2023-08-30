@@ -1,6 +1,6 @@
 import {
   AnalyticsProvider,
-} from '../../context/segment-provider/SegmentAnalyticsProvider';
+} from './SegmentAnalyticsProvider';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { SetupAnalytics } from './SetupAnalytics';
 

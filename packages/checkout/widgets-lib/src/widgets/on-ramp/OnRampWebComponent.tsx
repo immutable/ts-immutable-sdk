@@ -7,7 +7,7 @@ import { isValidAddress, isValidAmount, isValidWalletProvider } from '../../lib/
 import { ConnectLoader, ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
 import { sendOnRampWidgetCloseEvent } from './OnRampWidgetEvents';
 import { ConnectTargetLayer, getL1ChainId, getL2ChainId } from '../../lib';
-import { CustomAnalyticsProvider } from '../../components/CustomAnalyticsProvider/CustomAnalyticsProvider';
+import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 
 export class ImmutableOnRamp extends ImmutableWebComponent {
   amount = '';

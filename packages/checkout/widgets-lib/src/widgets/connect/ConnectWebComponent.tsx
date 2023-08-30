@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { ConnectWidget } from './ConnectWidget';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
-import { CustomAnalyticsProvider } from '../../components/CustomAnalyticsProvider/CustomAnalyticsProvider';
+import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 
 export class ImmutableConnect extends ImmutableWebComponent {
   connectedCallback() {

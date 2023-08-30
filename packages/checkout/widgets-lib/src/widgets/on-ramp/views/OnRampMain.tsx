@@ -10,7 +10,7 @@ import { text } from '../../../resources/text/textConfig';
 import { containerStyle } from './onRampStyles';
 import {
   useAnalytics,
-} from '../../../context/segment-provider/SegmentAnalyticsProvider';
+} from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { OnRampAnalyticsEvents } from '../OnRampAnalyticsEvents';
 
 interface OnRampProps {

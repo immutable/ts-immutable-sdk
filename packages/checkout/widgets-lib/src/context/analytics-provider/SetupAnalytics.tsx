@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useAnalytics, getSegmentWriteKey } from '../../context/segment-provider/SegmentAnalyticsProvider';
+import { useAnalytics, getSegmentWriteKey } from './SegmentAnalyticsProvider';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 
 type SetupAnalyticsProps = {
@@ -15,7 +15,7 @@ export function SetupAnalytics(
   useEffect(() => {
     const writeKey = getSegmentWriteKey(widgetConfig.environment);
     updateWriteKey(writeKey);
-  }, []);
+  }, [widgetConfig]);
 
   // eslint-disable-next-line react/jsx-no-useless-fragment
   return (<>{children}</>);

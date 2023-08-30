@@ -17,7 +17,7 @@ import { text } from '../../resources/text/textConfig';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 import { TopUpView } from '../../views/top-up/TopUpView';
 import { sendOnRampWidgetCloseEvent } from './OnRampWidgetEvents';
-import { useAnalytics } from '../../context/segment-provider/SegmentAnalyticsProvider';
+import { useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 
 const LOADING_VIEW_DELAY_MS = 1000;
 export interface OnRampWidgetProps {

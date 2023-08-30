@@ -9,7 +9,6 @@ import { cySmartGet } from '../../lib/testUtils';
 import { ConnectLoader, ConnectLoaderParams } from './ConnectLoader';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { ProviderEvent, WidgetTheme } from '../../lib';
-import { AnalyticsProvider } from '../../context/segment-provider/SegmentAnalyticsProvider';
 
 describe('ConnectLoader', () => {
   const config: StrongCheckoutWidgetsConfig = {
@@ -33,15 +32,15 @@ describe('ConnectLoader', () => {
       allowedChains: [ChainId.IMTBL_ZKEVM_TESTNET],
     } as ConnectLoaderParams;
     mount(
-      <AnalyticsProvider>
-        <ConnectLoader
-          widgetConfig={config}
-          params={params}
-          closeEvent={() => {}}
-        >
-          <div id="inner-widget">Inner Widget</div>
-        </ConnectLoader>
-      </AnalyticsProvider>,
+
+      <ConnectLoader
+        widgetConfig={config}
+        params={params}
+        closeEvent={() => {}}
+      >
+        <div id="inner-widget">Inner Widget</div>
+      </ConnectLoader>
+      ,
     );
     cySmartGet('wallet-list-metamask').should('be.visible');
     cy.get('#inner-widget').should('not.exist');
@@ -61,15 +60,15 @@ describe('ConnectLoader', () => {
       });
 
     mount(
-      <AnalyticsProvider>
-        <ConnectLoader
-          widgetConfig={config}
-          params={params}
-          closeEvent={() => {}}
-        >
-          <div id="inner-widget">Inner Widget</div>
-        </ConnectLoader>
-      </AnalyticsProvider>,
+
+      <ConnectLoader
+        widgetConfig={config}
+        params={params}
+        closeEvent={() => {}}
+      >
+        <div id="inner-widget">Inner Widget</div>
+      </ConnectLoader>
+      ,
     );
 
     cySmartGet('footer-button').should('have.text', 'Ready to connect');
@@ -115,15 +114,15 @@ describe('ConnectLoader', () => {
       });
 
     mount(
-      <AnalyticsProvider>
-        <ConnectLoader
-          widgetConfig={config}
-          params={params}
-          closeEvent={() => {}}
-        >
-          <div id="inner-widget">Inner Widget</div>
-        </ConnectLoader>
-      </AnalyticsProvider>,
+
+      <ConnectLoader
+        widgetConfig={config}
+        params={params}
+        closeEvent={() => {}}
+      >
+        <div id="inner-widget">Inner Widget</div>
+      </ConnectLoader>
+      ,
     );
 
     cySmartGet('switch-network-view').should('be.visible');
@@ -180,15 +179,15 @@ describe('ConnectLoader', () => {
       });
 
     mount(
-      <AnalyticsProvider>
-        <ConnectLoader
-          widgetConfig={config}
-          params={params}
-          closeEvent={() => {}}
-        >
-          <div id="inner-widget">Inner Widget</div>
-        </ConnectLoader>
-      </AnalyticsProvider>,
+
+      <ConnectLoader
+        widgetConfig={config}
+        params={params}
+        closeEvent={() => {}}
+      >
+        <div id="inner-widget">Inner Widget</div>
+      </ConnectLoader>
+      ,
     );
 
     cySmartGet('footer-button').click();
@@ -238,15 +237,15 @@ describe('ConnectLoader', () => {
       });
 
     mount(
-      <AnalyticsProvider>
-        <ConnectLoader
-          widgetConfig={config}
-          params={params}
-          closeEvent={() => {}}
-        >
-          <div id="inner-widget">Inner Widget</div>
-        </ConnectLoader>
-      </AnalyticsProvider>,
+
+      <ConnectLoader
+        widgetConfig={config}
+        params={params}
+        closeEvent={() => {}}
+      >
+        <div id="inner-widget">Inner Widget</div>
+      </ConnectLoader>
+      ,
     );
 
     cy.get('#inner-widget').should('be.visible');
@@ -296,15 +295,15 @@ describe('ConnectLoader', () => {
         });
 
       mount(
-        <AnalyticsProvider>
-          <ConnectLoader
-            widgetConfig={config}
-            params={params}
-            closeEvent={() => {}}
-          >
-            <div id="inner-widget">Inner Widget</div>
-          </ConnectLoader>
-        </AnalyticsProvider>,
+
+        <ConnectLoader
+          widgetConfig={config}
+          params={params}
+          closeEvent={() => {}}
+        >
+          <div id="inner-widget">Inner Widget</div>
+        </ConnectLoader>
+        ,
       );
 
       cy.get('#inner-widget').should('be.visible');

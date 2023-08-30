@@ -35,10 +35,6 @@ import {
   removeChainChangedListener,
 } from '../../lib';
 import { useInterval } from '../../lib/hooks/useInterval';
-import {
-  getSegmentWriteKey,
-  useAnalytics,
-} from '../../context/segment-provider/SegmentAnalyticsProvider';
 
 export interface ConnectLoaderProps {
   children?: React.ReactNode;
@@ -84,8 +80,6 @@ export function ConnectLoader({
   const [hasWeb3Provider, setHasWeb3Provider] = useState<boolean | undefined>();
 
   const [attempts, setAttempts] = useState<number>(0);
-
-  const { updateWriteKey } = useAnalytics();
 
   // Check if Web3Provider injected, otherwise load the widget without the provider after several attempts
   let clearInterval: () => void;
@@ -172,9 +166,6 @@ export function ConnectLoader({
         checkout: new Checkout({ baseConfig: { environment: widgetConfig.environment } }),
       },
     });
-
-    const writeKey = getSegmentWriteKey(widgetConfig.environment);
-    updateWriteKey(writeKey);
   }, [widgetConfig]);
 
   useEffect(() => {

@@ -6,7 +6,6 @@ import {
   connectLoaderReducer,
   ConnectLoaderContext,
 } from '../ConnectLoaderContext';
-import { AnalyticsProvider } from '../../segment-provider/SegmentAnalyticsProvider';
 
 export interface TestProps {
   children: React.ReactNode;
@@ -25,12 +24,10 @@ export function ConnectLoaderTestComponent({ children, initialStateOverride }: T
   );
 
   return (
-    <AnalyticsProvider>
-      <BiomeCombinedProviders>
-        <ConnectLoaderContext.Provider value={reducerValues}>
-          {children}
-        </ConnectLoaderContext.Provider>
-      </BiomeCombinedProviders>
-    </AnalyticsProvider>
+    <BiomeCombinedProviders>
+      <ConnectLoaderContext.Provider value={reducerValues}>
+        {children}
+      </ConnectLoaderContext.Provider>
+    </BiomeCombinedProviders>
   );
 }
