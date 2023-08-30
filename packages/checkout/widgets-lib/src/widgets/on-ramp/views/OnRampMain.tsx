@@ -7,6 +7,7 @@ import { sendOnRampWidgetCloseEvent } from '../OnRampWidgetEvents';
 import {
   useAnalytics,
 } from '../../../context/segment-provider/SegmentAnalyticsProvider';
+import { OnRampAnalyticsEvents } from '../OnRampAnalyticsEvents';
 
 interface OnRampProps {
   environment: Environment
@@ -24,7 +25,7 @@ export function OnRampMain({ environment }: OnRampProps) {
 
   const trackSegmentEvents = (eventData: any) => {
     switch (eventData.event_id) {
-      case 'TRANSAK_WIDGET_OPEN':
+      case OnRampAnalyticsEvents.TRANSAK_WIDGET_OPEN:
         track({
           userJourney: 'OnRamp',
           screen: 'Initial-onramp-screen',
@@ -34,7 +35,7 @@ export function OnRampMain({ environment }: OnRampProps) {
           userId: '0x00address00', // todo: insert wallet-address
         });
         break;
-      case 'TRANSAK_ORDER_CREATED': // AWAITING_PAYMENT_FROM_USER
+      case OnRampAnalyticsEvents.TRANSAK_ORDER_CREATED:
         track({
           userJourney: 'OnRamp',
           screen: 'order-creation',
@@ -44,7 +45,7 @@ export function OnRampMain({ environment }: OnRampProps) {
           userId: '0x00address00', // todo: insert wallet-address
         });
         break;
-      case 'TRANSAK_ORDER_SUCCESSFUL': // user paid
+      case OnRampAnalyticsEvents.TRANSAK_ORDER_SUCCESSFUL: // user paid
         track({
           userJourney: 'OnRamp',
           screen: 'payment-confirmation',
@@ -54,7 +55,7 @@ export function OnRampMain({ environment }: OnRampProps) {
           userId: '0x00address00', // todo: insert wallet-address
         });
         break;
-      case 'TRANSAK_ORDER_FAILED': // payment failed
+      case OnRampAnalyticsEvents.TRANSAK_ORDER_FAILED: // payment failed
         track({
           userJourney: 'OnRamp',
           screen: 'failure-screen',
