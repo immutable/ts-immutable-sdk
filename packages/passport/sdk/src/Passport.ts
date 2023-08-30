@@ -160,9 +160,10 @@ export class Passport {
     if (!user?.profile.sub) {
       return [];
     }
+    const headers = { Authorization: `Bearer ${user.accessToken}` };
     const linkedAddressesResult = await this.multiRollupApiClients.passportApi.getLinkedAddresses({
       userId: user?.profile.sub,
-    });
+    }, { headers });
     return linkedAddressesResult.data.linkedAddresses;
   }
 }
