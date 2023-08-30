@@ -284,6 +284,14 @@ Selecting `Release Type` of `release` and an `Upgrade Type` other than `none` wi
 
 For example, given the latest tag of `0.8.0-alpha` and selecting patch as the `Upgrade Type`: `0.8.0-alpha` -> `0.9.0`
 
+#### Alpha Versioning
+
+Selecting `alpha` and a `Upgrade Type` other than `none` will create a new `alpha` release and bump the version.
+
+For example, create a minor alpha release selecting a `Upgrade Type` of `minor`: `0.8.0` -> `0.9.0-alpha`
+
+Use the `none` upgrade type to bump an alpha: `0.8.0-alpha` -> `0.8.0-alpha.1`
+
 #### Updated SDK Reference Documentation
 
 > [!NOTE]

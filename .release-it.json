@@ -16,6 +16,11 @@
     "allowSameVersion": true
   },
   "plugins": {
+    "./.github/scripts/keep-a-changelog.mjs": {
+      "filename": "CHANGELOG.md",
+      "strictLatest": false,
+      "addUnreleased": true
+    },    
     "@release-it-plugins/workspaces": {
       "workspaces": ["sdk"],
       "publish": true

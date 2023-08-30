@@ -7,7 +7,7 @@ on:
         type: choice
         description: Release Type
         options:
-          # - alpha
+          - alpha
           - release
         required: true
         default: alpha
@@ -15,7 +15,7 @@ on:
         type: choice
         description: Upgrade Type
         options:
-          # - none only needed for alpha releases?
+          - none
           - patch
           - minor
           # - major
@@ -89,14 +89,6 @@ jobs:
           tmp=$(mktemp)
           jq '.version = "${{steps.version.outputs.NEXT_VERSION}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
 
-      - name: Update Changelog title
-        run: |
-          ./.github/scripts/update-changelog-title.sh "${{ steps.version.outputs.NEXT_VERSION }}" CHANGELOG.md
-
-      - name: Copy Changelog to SDK
-        run: |
-          cp CHANGELOG.md ./sdk/CHANGELOG.md
-
       - name: Build
         run: export NODE_OPTIONS=--max-old-space-size=6144 && RELEASE_TYPE=${{ github.event.inputs.release_type }} yarn build
 
@@ -130,11 +122,6 @@ jobs:
         if: contains(github.event.inputs.release_type, 'release')
         run: yarn release --ci --no-increment -c .release-it.json $( ${{ github.event.inputs.dry_run }} && echo "--dry-run" || echo "") --github.tokenRef=${{ secrets.RELEASE_TOKEN }}
 
-      - name: Add Changelog title
-        if: contains(github.event.inputs.release_type, 'release') && github.event.inputs.dry_run == 'false'
-        run: |
-          ./.github/scripts/add-changelog-title.sh CHANGELOG.md
-
-      - name: Push Changelog PR
-        if: contains(github.event.inputs.release_type, 'release') && github.event.inputs.dry_run == 'false'
+      - name: Push Changelog
+        if: github.event.inputs.dry_run == 'false'
         run: VERSION="${{ steps.version.outputs.NEXT_VERSION }}" ./.github/scripts/push-changelog-pr.sh
