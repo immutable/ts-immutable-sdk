@@ -24,7 +24,7 @@ export const loginZkEvmUser = async ({
   magicAdapter,
   multiRollupApiClients,
 }: LoginZkEvmUserInput): Promise<LoginZkEvmUserOutput> => {
-  const user = await authManager.getUser() || await authManager.login();
+  const user = await authManager.getUser() || await authManager.getUserDeviceFlow() || await authManager.login();
   if (!user.idToken) {
     throw new Error('User is missing idToken');
   }
@@ -38,6 +38,7 @@ export const loginZkEvmUser = async ({
     // Generate counterfactual address and retrieve updated Auth0 user
     const userZkevm = await registerZkEvmUser({
       authManager,
+      config,
       magicProvider,
       multiRollupApiClients,
       accessToken: user.accessToken,
