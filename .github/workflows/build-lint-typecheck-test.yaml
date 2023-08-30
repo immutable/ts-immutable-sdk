@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: general-runner
+    runs-on: ubuntu-latest-4-cores
     env:
       NODE_OPTIONS: --max-old-space-size=14366
     steps:
