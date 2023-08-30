@@ -384,17 +384,6 @@ export default class AuthManager {
     }, PassportErrorType.NOT_LOGGED_IN_ERROR);
   }
 
-  public async getLinkedAddresses(): Promise<string[]> {
-    return withPassportError<string[]>(async () => {
-      const oidcUser = await this.userManager.getUser();
-      if (oidcUser) {
-        const passport = oidcUser.profile?.passport as PassportMetadata;
-        return passport?.linked_addresses ?? [];
-      }
-      return [];
-    }, PassportErrorType.NOT_LOGGED_IN_ERROR);
-  }
-
   public async getUserDeviceFlow(): Promise<User | null> {
     return withPassportError<User | null>(async () => {
       const deviceToken = this.deviceCredentialsManager.getCredentials();

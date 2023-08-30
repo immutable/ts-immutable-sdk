@@ -45,7 +45,11 @@ export const mockUserZkEvm: UserZkEvm = {
   },
 };
 
-export const mockLinkedAddresses: string[] = [
-  '0x123',
-  '0x456',
-];
+export const mockLinkedAddresses = {
+  data: {
+    linkedAddresses: [
+      '0x123',
+      '0x456',
+    ],
+  },
+};

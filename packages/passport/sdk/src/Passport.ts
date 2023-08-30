@@ -156,6 +156,13 @@ export class Passport {
   }
 
   public async getLinkedAddresses(): Promise<string[]> {
-    return this.authManager.getLinkedAddresses();
+    const user = await this.authManager.getUser();
+    if (!user?.profile.sub) {
+      return [];
+    }
+    const linkedAddressesResult = await this.multiRollupApiClients.passportApi.getLinkedAddresses({
+      userId: user?.profile.sub,
+    });
+    return linkedAddressesResult.data.linkedAddresses;
   }
 }
