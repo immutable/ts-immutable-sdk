@@ -12,12 +12,14 @@ import {
   ViewActions, ViewContext, initialViewState, viewReducer,
 } from '../../context/view-context/ViewContext';
 import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextTypes';
-import { OnRampMain } from './views/OnRampMain';
 import { LoadingView } from '../../views/loading/LoadingView';
 import { text } from '../../resources/text/textConfig';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 import { TopUpView } from '../../views/top-up/TopUpView';
 import { sendOnRampWidgetCloseEvent } from './OnRampWidgetEvents';
+import { OnRampMain } from './views/OnRampMain';
+import { StatusType } from '../../components/Status/StatusType';
+import { StatusView } from '../../components/Status/StatusView';
 import { useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { isPassportProvider } from '../../lib/providerUtils';
 
@@ -54,6 +56,12 @@ export function OnRampWidget(props: OnRampWidgetProps) {
     : onDarkBase;
 
   const { initialLoadingText } = text.views[OnRampWidgetViews.ONRAMP];
+
+  const showIframe = useMemo(
+    () => viewState.view.type === OnRampWidgetViews.ONRAMP,
+    [viewState.view.type],
+  );
+
   const { track } = useAnalytics();
 
   useEffect(() => {
@@ -112,14 +120,29 @@ export function OnRampWidget(props: OnRampWidgetProps) {
         {viewState.view.type === SharedViews.LOADING_VIEW && (
           <LoadingView loadingText={initialLoadingText} showFooterLogo />
         )}
-        {viewState.view.type === OnRampWidgetViews.ONRAMP && (
-          <OnRampMain
-            environment={environment}
-            walletAddress={walletAddress}
-            isPassport={isPassport}
-            email={emailAddress}
+        {viewState.view.type === OnRampWidgetViews.IN_PROGRESS && (
+          <LoadingView loadingText="Processing payment" showFooterLogo />
+        )}
+
+        {viewState.view.type === OnRampWidgetViews.SUCCESS && (
+          <StatusView
+            statusText="Coins are on the way"
+            actionText="Done"
+            onRenderEvent={sendOnRampWidgetCloseEvent}
+            onActionClick={sendOnRampWidgetCloseEvent}
+            statusType={StatusType.SUCCESS}
+            testId="success-view"
           />
         )}
+
+        <OnRampMain
+          environment={environment}
+          walletAddress={walletAddress}
+          isPassport={isPassport}
+          email={emailAddress}
+          showIframe={showIframe}
+        />
+
         {viewState.view.type === SharedViews.TOP_UP_VIEW && (
           <TopUpView
             widgetEvent={IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT}

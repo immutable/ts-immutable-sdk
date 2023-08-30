@@ -4,10 +4,10 @@ import { useContext, useEffect, useMemo } from 'react';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { sendOnRampWidgetCloseEvent } from '../OnRampWidgetEvents';
-import { SharedViews, ViewContext } from '../../../context/view-context/ViewContext';
+import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { OnRampWidgetViews } from '../../../context/view-context/OnRampViewContextTypes';
 import { text } from '../../../resources/text/textConfig';
-import { containerStyle } from './onRampStyles';
+import { boxMainStyle, containerStyle } from './onRampStyles';
 import {
   useAnalytics,
 } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
@@ -18,12 +18,14 @@ interface OnRampProps {
   walletAddress?: string;
   email?: string;
   isPassport?: boolean;
+  showIframe: boolean;
 }
 export function OnRampMain({
-  environment, walletAddress, isPassport, email,
+  environment, walletAddress, isPassport, email, showIframe,
 }: OnRampProps) {
   const { header } = text.views[OnRampWidgetViews.ONRAMP];
   const { viewState } = useContext(ViewContext);
+  const { viewDispatch } = useContext(ViewContext);
 
   const showBackButton = useMemo(() => viewState.history.length > 2
     && viewState.history[viewState.history.length - 2].type === SharedViews.TOP_UP_VIEW, [viewState.history]);
@@ -96,6 +98,53 @@ export function OnRampMain({
           // eslint-disable-next-line no-console
           console.log('TRANSAK event data: ', event.data);
           trackSegmentEvents(event.data);
+
+          if (event.data.event_id === TransakEvents.TRANSAK_ORDER_CREATED) {
+            viewDispatch({
+              payload: {
+                type: ViewActions.UPDATE_VIEW,
+                view: {
+                  type: OnRampWidgetViews.IN_PROGRESS,
+                },
+              },
+            });
+          }
+
+          if (event.data.event_id === TransakEvents.TRANSAK_ORDER_SUCCESSFUL
+            && event.data.data.status === 'PROCESSING') {
+            viewDispatch({
+              payload: {
+                type: ViewActions.UPDATE_VIEW,
+                view: {
+                  type: OnRampWidgetViews.IN_PROGRESS,
+                },
+              },
+            });
+          }
+
+          if (event.data.event_id === TransakEvents.TRANSAK_ORDER_SUCCESSFUL
+            && event.data.data.status === 'COMPLETED'
+          ) {
+            viewDispatch({
+              payload: {
+                type: ViewActions.UPDATE_VIEW,
+                view: {
+                  type: OnRampWidgetViews.SUCCESS,
+                },
+              },
+            });
+          }
+
+          if (event.data.event_id === TransakEvents.TRANSAK_ORDER_FAILED) {
+            viewDispatch({
+              payload: {
+                type: ViewActions.UPDATE_VIEW,
+                view: {
+                  type: OnRampWidgetViews.FAIL,
+                },
+              },
+            });
+          }
         }
       }
     };
@@ -108,27 +157,29 @@ export function OnRampMain({
   }, []);
 
   return (
-    <SimpleLayout
-      header={(
-        <HeaderNavigation
-          showBack={showBackButton}
-          title={header.title}
-          onCloseButtonClick={() => sendOnRampWidgetCloseEvent()}
-        />
+    <Box sx={boxMainStyle(showIframe)}>
+      <SimpleLayout
+        header={(
+          <HeaderNavigation
+            showBack={showBackButton}
+            title={header.title}
+            onCloseButtonClick={() => sendOnRampWidgetCloseEvent()}
+          />
         )}
-      footerBackgroundColor="base.color.translucent.emphasis.200"
-    >
-      <Box sx={containerStyle}>
-        <iframe
-          title="Transak title"
-          id="transak-iframe"
-          src={url}
-          allow="camera;microphone;fullscreen;payment"
-          style={{
-            height: '100%', width: '100%', border: 'none', position: 'absolute',
-          }}
-        />
-      </Box>
-    </SimpleLayout>
+        footerBackgroundColor="base.color.translucent.emphasis.200"
+      >
+        <Box sx={containerStyle(showIframe)}>
+          <iframe
+            title="Transak title"
+            id="transak-iframe"
+            src={url}
+            allow="camera;microphone;fullscreen;payment"
+            style={{
+              height: '100%', width: '100%', border: 'none', position: 'absolute',
+            }}
+          />
+        </Box>
+      </SimpleLayout>
+    </Box>
   );
 }
