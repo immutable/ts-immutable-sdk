@@ -105,10 +105,6 @@ export default class AuthManager {
         userAdminAddress: passport?.zkevm_user_admin_address,
       };
     }
-    if (passport?.linked_addresses) {
-      user.linkedAddresses = passport?.linked_addresses;
-    }
-
     return user;
   };
 
@@ -131,10 +127,6 @@ export default class AuthManager {
         userAdminAddress: idTokenPayload?.passport?.imx_user_admin_address,
       };
     }
-    if (idTokenPayload?.passport?.linked_addresses) {
-      user.linkedAddresses = idTokenPayload?.passport?.linked_addresses;
-    }
-
     return user;
   };
 
