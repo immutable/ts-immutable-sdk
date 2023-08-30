@@ -21,6 +21,9 @@ export const getSmartCheckoutResult = (
   let sufficient = true;
   const transactionRequirements: TransactionRequirement[] = [];
 
+  // eslint-disable-next-line no-console
+  console.log('balanceCheckResult', balanceCheckResult);
+
   for (const balance of balanceCheckResult.balanceRequirements) {
     if (!balance.sufficient) sufficient = false;
 
