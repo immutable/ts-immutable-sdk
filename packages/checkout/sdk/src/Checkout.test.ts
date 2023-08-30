@@ -33,6 +33,7 @@ import { createProvider, isWeb3Provider, validateProvider } from './provider';
 import { getTokenAllowList } from './tokens';
 import { getWalletAllowList } from './wallet';
 import { buy } from './smartCheckout/buy';
+import { sell } from './smartCheckout/sell';
 import { smartCheckout } from './smartCheckout';
 
 jest.mock('./connect');
@@ -45,6 +46,7 @@ jest.mock('./provider');
 jest.mock('./tokens');
 jest.mock('./wallet');
 jest.mock('./smartCheckout/buy');
+jest.mock('./smartCheckout/sell');
 jest.mock('./smartCheckout');
 
 describe('Connect', () => {
@@ -450,21 +452,8 @@ describe('Connect', () => {
 
   it('should throw error for buy function if is production', async () => {
     const provider = new Web3Provider(providerMock, ChainId.SEPOLIA);
-    const buyResult = {
-      requirements: [
-        {
-          type: ItemType.NATIVE,
-          amount: BigNumber.from('1'),
-        },
-      ],
-      gas: {
-        type: GasTokenType.NATIVE,
-        limit: BigNumber.from('1'),
-      },
-    };
 
     (validateProvider as jest.Mock).mockResolvedValue(provider);
-    (buy as jest.Mock).mockResolvedValue(buyResult);
 
     const checkout = new Checkout({
       baseConfig: { environment: Environment.PRODUCTION },
@@ -476,6 +465,61 @@ describe('Connect', () => {
     })).rejects.toThrow('This endpoint is not currently available.');
 
     expect(buy).toBeCalledTimes(0);
+  });
+
+  it('should call sell function', async () => {
+    const provider = new Web3Provider(providerMock, ChainId.SEPOLIA);
+    const sellResult = {};
+
+    (validateProvider as jest.Mock).mockResolvedValue(provider);
+    (sell as jest.Mock).mockResolvedValue(sellResult);
+
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.SANDBOX },
+    });
+
+    await checkout.sell({
+      provider,
+      id: '0',
+      collectionAddress: '0xERC721',
+      buyToken: {
+        type: ItemType.NATIVE,
+        amount: '100000',
+      },
+    });
+
+    expect(sell).toBeCalledTimes(1);
+    expect(sell).toBeCalledWith(
+      checkout.config,
+      provider,
+      '0',
+      '0xERC721',
+      {
+        type: ItemType.NATIVE,
+        amount: '100000',
+      },
+    );
+  });
+
+  it('should throw error for sell function if is production', async () => {
+    const provider = new Web3Provider(providerMock, ChainId.SEPOLIA);
+    (validateProvider as jest.Mock).mockResolvedValue(provider);
+
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.PRODUCTION },
+    });
+
+    await expect(checkout.sell({
+      provider,
+      id: '0',
+      collectionAddress: '0xERC721',
+      buyToken: {
+        type: ItemType.NATIVE,
+        amount: '100000',
+      },
+    })).rejects.toThrow('This endpoint is not currently available.');
+
+    expect(sell).toBeCalledTimes(0);
   });
 
   it('should call smartCheckout function', async () => {
