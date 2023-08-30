@@ -13,21 +13,18 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import { FulfillmentDataResult } from './fulfillment-data-result';
 
 /**
  * 
  * @export
- * @interface FulfillmentData200Response
+ * @interface GetLinkedAddressesRes
  */
-export interface FulfillmentData200Response {
+export interface GetLinkedAddressesRes {
     /**
-     * 
-     * @type {Array<FulfillmentDataResult>}
-     * @memberof FulfillmentData200Response
+     * The user\'s list of linked addresses
+     * @type {Array<string>}
+     * @memberof GetLinkedAddressesRes
      */
-    'result': Array<FulfillmentDataResult>;
+    'linkedAddresses': Array<string>;
 }
 
