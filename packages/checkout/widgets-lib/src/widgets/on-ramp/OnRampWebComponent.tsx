@@ -7,7 +7,7 @@ import { isValidAddress, isValidAmount, isValidWalletProvider } from '../../lib/
 import { ConnectLoader, ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
 import { sendOnRampWidgetCloseEvent } from './OnRampWidgetEvents';
 import { ConnectTargetLayer, getL2ChainId } from '../../lib';
-import { AnalyticsProvider } from '../../context/segment-provider/SegmentAnalyticsProvider';
+import { CustomAnalyticsProvider } from '../../components/CustomAnalyticsProvider/CustomAnalyticsProvider';
 
 export class ImmutableOnRamp extends ImmutableWebComponent {
   amount = '';
@@ -68,7 +68,9 @@ export class ImmutableOnRamp extends ImmutableWebComponent {
 
     this.reactRoot.render(
       <React.StrictMode>
-        <AnalyticsProvider>
+        <CustomAnalyticsProvider
+          widgetConfig={this.widgetConfig!}
+        >
           <ConnectLoader
             params={connectLoaderParams}
             widgetConfig={this.widgetConfig!}
@@ -79,7 +81,7 @@ export class ImmutableOnRamp extends ImmutableWebComponent {
               config={this.widgetConfig!}
             />
           </ConnectLoader>
-        </AnalyticsProvider>
+        </CustomAnalyticsProvider>
       </React.StrictMode>,
     );
   }

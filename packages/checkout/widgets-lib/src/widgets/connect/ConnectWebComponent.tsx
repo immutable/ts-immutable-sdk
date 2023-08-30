@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { ConnectWidget } from './ConnectWidget';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
-import { AnalyticsProvider } from '../../context/segment-provider/SegmentAnalyticsProvider';
+import { CustomAnalyticsProvider } from '../../components/CustomAnalyticsProvider/CustomAnalyticsProvider';
 
 export class ImmutableConnect extends ImmutableWebComponent {
   connectedCallback() {
@@ -23,14 +23,16 @@ export class ImmutableConnect extends ImmutableWebComponent {
 
     this.reactRoot.render(
       <React.StrictMode>
-        <AnalyticsProvider>
+        <CustomAnalyticsProvider
+          widgetConfig={this.widgetConfig!}
+        >
           <ConnectWidget
             config={this.widgetConfig!}
             params={{
               passport: this.passport,
             }}
           />
-        </AnalyticsProvider>
+        </CustomAnalyticsProvider>
       </React.StrictMode>,
     );
   }
