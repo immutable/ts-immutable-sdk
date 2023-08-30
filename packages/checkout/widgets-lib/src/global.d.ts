@@ -4,6 +4,7 @@ import {
   ImtblWalletProps,
   ImtblSwapProps,
   ImtblBridgeProps,
+  ImtblOnRampProps,
   ImtblExampleProps,
   ImtblBuyProps,
   ImtblTransitionExampleProps,
@@ -22,6 +23,7 @@ declare global {
       'imtbl-wallet': ImtblWalletProps;
       'imtbl-swap': ImtblSwapProps;
       'imtbl-bridge': ImtblBridgeProps;
+      'imtbl-onramp': ImtblOnRampProps;
       'imtbl-buy': ImtblBuyProps;
       'imtbl-primary-revenue': ImtblPrimaryRevenueProps;
       'imtbl-example': ImtblExampleProps;
