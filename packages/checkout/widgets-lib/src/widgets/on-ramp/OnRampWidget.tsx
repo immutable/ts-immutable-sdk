@@ -1,7 +1,7 @@
 import { BiomeCombinedProviders } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
-  useContext, useEffect, useMemo, useReducer,
+  useContext, useEffect, useMemo, useReducer, useState,
 } from 'react';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import { WidgetTheme } from '../../lib';
@@ -18,6 +18,7 @@ import { ConnectLoaderContext } from '../../context/connect-loader-context/Conne
 import { TopUpView } from '../../views/top-up/TopUpView';
 import { sendOnRampWidgetCloseEvent } from './OnRampWidgetEvents';
 import { useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import { isPassportProvider } from '../../lib/providerUtils';
 
 const LOADING_VIEW_DELAY_MS = 1000;
 export interface OnRampWidgetProps {
@@ -41,6 +42,8 @@ export function OnRampWidget(props: OnRampWidgetProps) {
 
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
+  const [walletAddress, setWalletAddress] = useState('');
+  const [isPassport, setIsPassport] = useState(false);
 
   const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
@@ -50,15 +53,29 @@ export function OnRampWidget(props: OnRampWidgetProps) {
   const { track } = useAnalytics();
 
   useEffect(() => {
-    track({
-      userJourney: 'OnRamp',
-      screen: 'Initial-widget-load',
-      control: 'widgetLoad',
-      controlType: 'OnRampWidget',
-      action: 'Opened',
-      userId: '0xsomeAddress', // todo: insert wallet-address
-    });
-  }, []);
+    const setDataFromProvider = async () => {
+      if (!provider) return;
+      const userWalletAddress = await provider.getSigner().getAddress();
+      setWalletAddress(userWalletAddress);
+      const isPassportUser = isPassportProvider(provider);
+      setIsPassport(isPassportUser);
+      if (isPassportUser) {
+        console.log('set email address here and add it to track()');
+      }
+
+      track({
+        userJourney: 'OnRamp',
+        screen: 'Onramp-widget-load',
+        control: 'WidgetInitialisation',
+        controlType: 'WidgetLoad',
+        action: 'Opened',
+        userId: userWalletAddress,
+        isPassportWallet: isPassportUser,
+        email: 'userEmail@emailDomain.com',
+      });
+    };
+    setDataFromProvider();
+  }, [provider]);
 
   useEffect(() => {
     if (!checkout || !provider) return;
@@ -90,7 +107,7 @@ export function OnRampWidget(props: OnRampWidgetProps) {
           <LoadingView loadingText={initialLoadingText} showFooterLogo />
         )}
         {viewState.view.type === OnRampWidgetViews.ONRAMP && (
-          <OnRampMain environment={environment} />
+          <OnRampMain environment={environment} walletAddress={walletAddress} isPassport={isPassport} />
         )}
         {viewState.view.type === SharedViews.TOP_UP_VIEW && (
           <TopUpView

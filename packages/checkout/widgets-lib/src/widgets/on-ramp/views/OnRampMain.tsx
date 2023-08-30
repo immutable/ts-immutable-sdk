@@ -14,9 +14,14 @@ import {
 import { OnRampAnalyticsEvents } from '../OnRampAnalyticsEvents';
 
 interface OnRampProps {
-  environment: Environment
+  environment: Environment;
+  walletAddress?: string;
+  email?: string;
+  isPassport?: boolean;
 }
-export function OnRampMain({ environment }: OnRampProps) {
+export function OnRampMain({
+  environment, walletAddress, isPassport, email,
+}: OnRampProps) {
   const { header } = text.views[OnRampWidgetViews.ONRAMP];
   const { viewState } = useContext(ViewContext);
 
@@ -27,13 +32,14 @@ export function OnRampMain({ environment }: OnRampProps) {
     ? 'https://global-stg.transak.com?apiKey=41ad2da7-ed5a-4d89-a90b-c751865effc2'
     : '';
 
-  const configurations = 'exchangeScreenTitle=BUY';
-
-  const finalUrl = `${url}&${configurations}`;
-
   const { track } = useAnalytics();
 
   const trackSegmentEvents = (eventData: any) => {
+    const miscProps = {
+      userId: walletAddress,
+      isPassportWallet: isPassport,
+      email,
+    };
     switch (eventData.event_id) {
       case OnRampAnalyticsEvents.TRANSAK_WIDGET_OPEN:
         track({
@@ -42,7 +48,7 @@ export function OnRampMain({ environment }: OnRampProps) {
           control: 'WebhookEvent',
           controlType: 'Trigger',
           action: 'Opened',
-          userId: '0x00address00', // todo: insert wallet-address
+          ...miscProps,
         });
         break;
       case OnRampAnalyticsEvents.TRANSAK_ORDER_CREATED:
@@ -52,7 +58,7 @@ export function OnRampMain({ environment }: OnRampProps) {
           control: 'WebhookEvent',
           controlType: 'Trigger',
           action: 'Started',
-          userId: '0x00address00', // todo: insert wallet-address
+          ...miscProps,
         });
         break;
       case OnRampAnalyticsEvents.TRANSAK_ORDER_SUCCESSFUL: // user paid
@@ -62,7 +68,7 @@ export function OnRampMain({ environment }: OnRampProps) {
           control: 'Confirm',
           controlType: 'Button',
           action: 'Processing',
-          userId: '0x00address00', // todo: insert wallet-address
+          ...miscProps,
         });
         break;
       case OnRampAnalyticsEvents.TRANSAK_ORDER_FAILED: // payment failed
@@ -72,7 +78,7 @@ export function OnRampMain({ environment }: OnRampProps) {
           control: 'WebhookEvent',
           controlType: 'Trigger',
           action: 'Failed',
-          userId: '0x00address00', // todo: insert wallet-address
+          ...miscProps,
         });
         break;
       default:
@@ -116,7 +122,7 @@ export function OnRampMain({ environment }: OnRampProps) {
         <iframe
           title="Transak title"
           id="transak-iframe"
-          src={finalUrl}
+          src={url}
           allow="camera;microphone;fullscreen;payment"
           style={{
             height: '100%', width: '100%', border: 'none', position: 'absolute',
