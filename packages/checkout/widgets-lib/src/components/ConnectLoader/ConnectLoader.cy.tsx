@@ -32,15 +32,13 @@ describe('ConnectLoader', () => {
       allowedChains: [ChainId.IMTBL_ZKEVM_TESTNET],
     } as ConnectLoaderParams;
     mount(
-
       <ConnectLoader
         widgetConfig={config}
         params={params}
         closeEvent={() => {}}
       >
         <div id="inner-widget">Inner Widget</div>
-      </ConnectLoader>
-      ,
+      </ConnectLoader>,
     );
     cySmartGet('wallet-list-metamask').should('be.visible');
     cy.get('#inner-widget').should('not.exist');
@@ -60,15 +58,13 @@ describe('ConnectLoader', () => {
       });
 
     mount(
-
       <ConnectLoader
         widgetConfig={config}
         params={params}
         closeEvent={() => {}}
       >
         <div id="inner-widget">Inner Widget</div>
-      </ConnectLoader>
-      ,
+      </ConnectLoader>,
     );
 
     cySmartGet('footer-button').should('have.text', 'Ready to connect');
@@ -114,15 +110,13 @@ describe('ConnectLoader', () => {
       });
 
     mount(
-
       <ConnectLoader
         widgetConfig={config}
         params={params}
         closeEvent={() => {}}
       >
         <div id="inner-widget">Inner Widget</div>
-      </ConnectLoader>
-      ,
+      </ConnectLoader>,
     );
 
     cySmartGet('switch-network-view').should('be.visible');
@@ -179,15 +173,13 @@ describe('ConnectLoader', () => {
       });
 
     mount(
-
       <ConnectLoader
         widgetConfig={config}
         params={params}
         closeEvent={() => {}}
       >
         <div id="inner-widget">Inner Widget</div>
-      </ConnectLoader>
-      ,
+      </ConnectLoader>,
     );
 
     cySmartGet('footer-button').click();
@@ -237,15 +229,13 @@ describe('ConnectLoader', () => {
       });
 
     mount(
-
       <ConnectLoader
         widgetConfig={config}
         params={params}
         closeEvent={() => {}}
       >
         <div id="inner-widget">Inner Widget</div>
-      </ConnectLoader>
-      ,
+      </ConnectLoader>,
     );
 
     cy.get('#inner-widget').should('be.visible');
@@ -295,15 +285,13 @@ describe('ConnectLoader', () => {
         });
 
       mount(
-
         <ConnectLoader
           widgetConfig={config}
           params={params}
           closeEvent={() => {}}
         >
           <div id="inner-widget">Inner Widget</div>
-        </ConnectLoader>
-        ,
+        </ConnectLoader>,
       );
 
       cy.get('#inner-widget').should('be.visible');
