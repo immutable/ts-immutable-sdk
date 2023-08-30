@@ -144,10 +144,8 @@ function Request({ showModal, setShowModal }: ModalProps) {
   };
 
   const handleExampleSubmitted = async (request: RequestArguments) => {
-    console.log("On submitted...");
     if (request.params) {
       const newParams = params;
-      console.log(`params = ${newParams}`);
       request.params.forEach((param, i) => {
         newParams[i] = JSON.stringify(param);
       });
@@ -162,12 +160,9 @@ function Request({ showModal, setShowModal }: ModalProps) {
 
     const form = e.currentTarget;
     if (form.checkValidity()) {
-      console.log(`selectedEthMethod name: ${selectedEthMethod.name}`);
-      console.log(`selectedEthMethod params: ${selectedEthMethod.params}`);
       await performRequest({
         method: selectedEthMethod?.name || '',
         params: params.map((param, i) => {
-          console.log(`selectedEthMethod params at ${i}: ${selectedEthMethod.params![i].type}`);
           switch (selectedEthMethod.params![i].type) {
             case EthereumParamType.flag: {
               return param === 'true';
