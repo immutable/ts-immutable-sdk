@@ -11,6 +11,7 @@ import * as network from './network';
 import * as transaction from './transaction';
 import * as gasEstimatorService from './gasEstimate';
 import * as buy from './smartCheckout/buy';
+import * as cancel from './smartCheckout/cancel';
 import * as sell from './smartCheckout/sell';
 import * as smartCheckout from './smartCheckout';
 import {
@@ -48,6 +49,7 @@ import {
 import { CheckoutConfiguration } from './config';
 import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
 import { SellParams } from './types/sell';
+import { CancelParams } from './types/cancel';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
@@ -307,6 +309,29 @@ export class Checkout {
     );
 
     await sell.sell(this.config, web3Provider, params.id, params.collectionAddress, params.buyToken);
+  }
+
+  /**
+   * Cancels a sell.
+   * @param {SellParams} params - The parameters for the cancel.
+   * @param params
+   */
+  public async cancel(
+    params: CancelParams,
+  ): Promise<void> {
+    if (this.config.isProduction) {
+      throw new Error('This endpoint is not currently available.');
+    }
+
+    // eslint-disable-next-line no-console
+    console.warn('This endpoint is currently under construction.');
+
+    const web3Provider = await provider.validateProvider(
+      this.config,
+      params.provider,
+    );
+
+    await cancel.cancel(this.config, web3Provider, params.orderId);
   }
 
   /**
