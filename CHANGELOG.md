@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - @imtbl/passport: Added support for `eth_getCode` to Passport zkEvm provider.
+- @imtbl/passport: Added support for `getLinkedAddresses` to Passport to read addresses connected with SIWE.
 - @imtbl/erc721: renamed from @imtbl/erc721-hybrid-permissioned-mintable. Renamed various mint methods to match with preset methods released in zkevm-contracts v1.0.8. Added `safeBurn` and `safeBurnBatch` methods released in zkevm-contracts v1.1.0
 - @imtbl/erc721-mint-by-id: renamed from @imtbl/erc721-permissioned-mintable. Added `safeBurn` and `safeBurnBatch` methods released in zkevm-contracts v1.1.0 
 
