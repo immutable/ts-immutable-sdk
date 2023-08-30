@@ -6,7 +6,7 @@ import { ImmutableWebComponent } from '../ImmutableWebComponent';
 import { isValidAddress, isValidAmount, isValidWalletProvider } from '../../lib/validations/widgetValidators';
 import { ConnectLoader, ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
 import { sendOnRampWidgetCloseEvent } from './OnRampWidgetEvents';
-import { ConnectTargetLayer, getL2ChainId } from '../../lib';
+import { ConnectTargetLayer, getL1ChainId, getL2ChainId } from '../../lib';
 import { CustomAnalyticsProvider } from '../../components/CustomAnalyticsProvider/CustomAnalyticsProvider';
 
 export class ImmutableOnRamp extends ImmutableWebComponent {
@@ -55,6 +55,7 @@ export class ImmutableOnRamp extends ImmutableWebComponent {
       passport: this.passport,
       allowedChains: [
         getL2ChainId(this.checkout!.config),
+        getL1ChainId(this.checkout!.config),
       ],
     };
     const params: OnRampWidgetParams = {
