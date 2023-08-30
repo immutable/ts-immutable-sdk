@@ -7,17 +7,10 @@ import {
 import {
   TokenAmountEstimate,
 } from '../types/gasEstimate';
-import { BridgeFeeEstimateResult } from './bridgetGasEstimateType';
+import { BridgeFeeEstimateResult } from './bridgeGasEstimateType';
+import { getGasPriceInWei } from '../utils/gasPriceInWei';
 
 const GAS_LIMIT = 140000;
-
-const doesChainSupportEIP1559 = (feeData: FeeData) => !!feeData.maxFeePerGas && !!feeData.maxPriorityFeePerGas;
-
-const getGasPriceInWei = (feeData: FeeData): BigNumber | null => (doesChainSupportEIP1559(feeData)
-  ? BigNumber.from(feeData.maxFeePerGas).add(
-    BigNumber.from(feeData.maxPriorityFeePerGas),
-  )
-  : feeData.gasPrice && BigNumber.from(feeData.gasPrice));
 
 const getGasEstimates = async (
   provider: Web3Provider,

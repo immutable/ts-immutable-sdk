@@ -2,19 +2,22 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber, Contract } from 'ethers';
 import {
+  ERC721Balance,
+  ItemBalance,
+  TokenBalance,
   ERC721ABI,
   ERC721Item,
   ItemRequirement,
-  ItemType, TokenInfo,
+  ItemType,
+  TokenInfo,
+  NativeItem,
+  ERC20Item,
 } from '../../types';
 import { getBalances } from '../../balances';
 import { CheckoutConfiguration } from '../../config';
 import {
   BalanceCheckResult,
-  BalanceERC721Result,
   BalanceRequirement,
-  BalanceResult,
-  BalanceTokenResult,
 } from './types';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { balanceAggregator } from '../aggregators/balanceAggregator';
@@ -32,14 +35,14 @@ const getTokenBalances = async (
   provider: Web3Provider,
   ownerAddress: string,
   itemRequirements: ItemRequirement[],
-) : Promise<BalanceResult[]> => {
-  let tokenBalances: BalanceTokenResult[] = [];
+) : Promise<ItemBalance[]> => {
+  let tokenBalances: TokenBalance[] = [];
 
   try {
     const tokenList: TokenInfo[] = getTokensFromRequirements(itemRequirements);
     const { balances } = await getBalances(config, provider, ownerAddress, tokenList);
     tokenBalances = [
-      ...balances.map((balance) => balance as BalanceTokenResult),
+      ...balances.map((balance) => balance as TokenBalance),
     ];
   } catch (error: any) {
     throw new CheckoutError(
@@ -58,24 +61,23 @@ const getERC721Balances = async (
   provider: Web3Provider,
   ownerAddress: string,
   itemRequirements: ItemRequirement[],
-) : Promise<BalanceResult[]> => {
-  const erc721Balances: BalanceERC721Result[] = [];
+) : Promise<ItemBalance[]> => {
+  const erc721Balances: ERC721Balance[] = [];
 
   // Setup maps to be able to link data back to the associated promises
   const erc721s = new Map<string, ItemRequirement>();
   const erc721OwnershipPromises = new Map<string, Promise<string>>();
   itemRequirements
-    .filter((itemRequirement) => itemRequirement.type === ItemType.ERC721)
     .forEach((itemRequirement) => {
-      const erc721Requirement = itemRequirement as ERC721Item;
+      if (itemRequirement.type !== ItemType.ERC721) return;
       const contract = new Contract(
-        erc721Requirement.contractAddress,
+        itemRequirement.contractAddress,
         JSON.stringify(ERC721ABI),
         provider,
       );
 
-      erc721s.set(erc721Requirement.contractAddress, itemRequirement);
-      erc721OwnershipPromises.set(erc721Requirement.contractAddress, contract.ownerOf(erc721Requirement.id));
+      erc721s.set(itemRequirement.contractAddress, itemRequirement);
+      erc721OwnershipPromises.set(itemRequirement.contractAddress, contract.ownerOf(itemRequirement.id));
     });
 
   try {
@@ -89,11 +91,12 @@ const getERC721Balances = async (
         itemCount = 1;
       }
       erc721Balances.push({
+        type: ItemType.ERC721,
         balance: BigNumber.from(itemCount),
         formattedBalance: itemCount.toString(),
         contractAddress: (itemRequirement as ERC721Item).contractAddress,
         id: (itemRequirement as ERC721Item).id,
-      } as BalanceERC721Result);
+      });
     });
   } catch (error: any) {
     throw new CheckoutError(
@@ -127,7 +130,7 @@ export const balanceCheck = async (
   }
 
   // Get all ERC20 and NATIVE balances
-  const currentBalances: Promise<BalanceResult[]>[] = [];
+  const currentBalances: Promise<ItemBalance[]>[] = [];
   const tokenItemRequirements: ItemRequirement[] = aggregatedItems
     .filter((itemRequirement) => itemRequirement.type === ItemType.ERC20 || itemRequirement.type === ItemType.NATIVE);
   if (tokenItemRequirements.length > 0) {
@@ -147,7 +150,7 @@ export const balanceCheck = async (
     if (balances.length > 1 || tokenItemRequirements.length > 0) {
       const tokenBalances = balances[0];
       tokenItemRequirements.forEach((tokenItemRequirement) => {
-        requirements.push(getTokenBalanceRequirement(tokenItemRequirement as any, tokenBalances));
+        requirements.push(getTokenBalanceRequirement(tokenItemRequirement as (NativeItem | ERC20Item), tokenBalances));
       });
       if (erc721ItemRequirements.length > 0) {
         const erc721Balances = balances[1];
@@ -170,6 +173,6 @@ export const balanceCheck = async (
   }, true);
   return {
     sufficient,
-    itemRequirements: balanceRequirements,
+    balanceRequirements,
   };
 };
