@@ -73,14 +73,17 @@ export type GasEstimateSwapTokenConfig = {
 };
 
 /**
- * A type representing all the feature flags available.
- * @property {TokenInfo[] | undefined} allowed - List of allowed tokens for a given chain.
- * @property {boolean | undefined} blockscout - Feature flag to enable/disable blockscout integration.
+ * A type that represents the tokens configuration for chain.
  */
 export type ChainsTokensConfig = {
   [key in ChainId]: ChainTokensConfig;
 };
 
+/**
+ * A type representing all the feature flags available.
+ * @property {TokenInfo[] | undefined} allowed - List of allowed tokens for a given chain.
+ * @property {boolean | undefined} blockscout - Feature flag to enable/disable blockscout integration.
+ */
 export type ChainTokensConfig = {
   allowed?: TokenInfo[];
   blockscout?: boolean;
