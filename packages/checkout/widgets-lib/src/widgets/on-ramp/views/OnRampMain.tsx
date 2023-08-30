@@ -11,7 +11,7 @@ import { containerStyle } from './onRampStyles';
 import {
   useAnalytics,
 } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
-import { OnRampAnalyticsEvents } from '../OnRampAnalyticsEvents';
+import { TransakEvents } from '../TransakEvents';
 
 interface OnRampProps {
   environment: Environment;
@@ -41,7 +41,7 @@ export function OnRampMain({
       email,
     };
     switch (eventData.event_id) {
-      case OnRampAnalyticsEvents.TRANSAK_WIDGET_OPEN:
+      case TransakEvents.TRANSAK_WIDGET_OPEN:
         track({
           userJourney: 'OnRamp',
           screen: 'Initial-onramp-screen',
@@ -51,7 +51,7 @@ export function OnRampMain({
           ...miscProps,
         });
         break;
-      case OnRampAnalyticsEvents.TRANSAK_ORDER_CREATED:
+      case TransakEvents.TRANSAK_ORDER_CREATED:
         track({
           userJourney: 'OnRamp',
           screen: 'order-creation',
@@ -61,7 +61,7 @@ export function OnRampMain({
           ...miscProps,
         });
         break;
-      case OnRampAnalyticsEvents.TRANSAK_ORDER_SUCCESSFUL: // user paid
+      case TransakEvents.TRANSAK_ORDER_SUCCESSFUL: // user paid
         track({
           userJourney: 'OnRamp',
           screen: 'payment-confirmation',
@@ -71,7 +71,7 @@ export function OnRampMain({
           ...miscProps,
         });
         break;
-      case OnRampAnalyticsEvents.TRANSAK_ORDER_FAILED: // payment failed
+      case TransakEvents.TRANSAK_ORDER_FAILED: // payment failed
         track({
           userJourney: 'OnRamp',
           screen: 'failure-screen',
