@@ -26,6 +26,7 @@
     "import/no-extraneous-dependencies": ["off"],
     "@typescript-eslint/return-await": ["off"],
     "@typescript-eslint/naming-convention": "off",
-    "react/jsx-props-no-spreading": "off"
+    "react/jsx-props-no-spreading": "off",
+    "jsx-a11y/heading-has-content": "off"
   }
 }
