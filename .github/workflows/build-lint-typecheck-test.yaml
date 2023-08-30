@@ -28,7 +28,7 @@ jobs:
         run: yarn syncpack:check
 
       - name: Build
-        run: export NODE_OPTIONS=--max-old-space-size=6144 && yarn build
+        run: export NODE_OPTIONS=--max-old-space-size=14366 && yarn build:ci
 
   test:
     name: Test

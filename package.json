@@ -37,6 +37,7 @@
     "@biom3/design-tokens": "0.2.0-beta"
   },
   "scripts": {
+    "build:ci": "wsrun -y 4 -p @imtbl/sdk -p @imtbl/checkout-widgets-lib -e -r --serial build && yarn syncpack:format && yarn wsrun -p @imtbl/sdk -a -m copyBrowserBundles",
     "build": "wsrun -y 1 -p @imtbl/sdk -p @imtbl/checkout-widgets-lib -e -r --serial build && yarn syncpack:format && yarn wsrun -p @imtbl/sdk -a -m copyBrowserBundles",
     "build:onlysdk": "wsrun -y 4 --stages build && yarn syncpack:format",
     "docs:build": "typedoc",
