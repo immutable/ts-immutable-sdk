@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 
-import { useCallback, useContext } from 'react';
+import { useCallback, useContext, useEffect } from 'react';
 import { Body, Box } from '@biom3/react';
 
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -23,7 +23,15 @@ export interface PaymentMethodsProps {
 export function PaymentMethods(props: PaymentMethodsProps) {
   const { checkBalances } = props;
   const { header } = text.views[PrimaryRevenueWidgetViews.PAYMENT_METHODS];
-  const { viewDispatch } = useContext(ViewContext);
+  const { viewDispatch, viewState } = useContext(ViewContext);
+
+  const {
+    amount,
+    // envId,
+    // fromCurrency,
+    // items,
+    fromContractAddress,
+  } = viewState.view.data || {};
 
   const handleOptionClick = useCallback(
     async (type: PrimaryRevenueWidgetViews) => {
@@ -38,11 +46,27 @@ export function PaymentMethods(props: PaymentMethodsProps) {
         const hasEnoughBalance = await checkBalances();
 
         // FIXME: best way to handle conditional routing?
-        if (!hasEnoughBalance && type === PrimaryRevenueWidgetViews.PAY_WITH_CRYPTO) {
+        if (
+          !hasEnoughBalance
+          && type === PrimaryRevenueWidgetViews.PAY_WITH_CRYPTO
+        ) {
           viewDispatch({
             payload: {
               type: ViewActions.UPDATE_VIEW,
-              view: { type: SharedViews.TOP_UP_VIEW },
+              view: {
+                type: SharedViews.TOP_UP_VIEW,
+                data: {
+
+                },
+                bridgeData: {
+                  fromAmount: amount,
+                  fromContractAddress,
+                },
+                swapData: {
+                  fromAmount: amount,
+                  toContractAddress: fromContractAddress,
+                },
+              },
             },
           });
 
@@ -66,6 +90,10 @@ export function PaymentMethods(props: PaymentMethodsProps) {
     },
     [],
   );
+
+  useEffect(() => {
+    console.log('🚀 ~ file: PaymentMethodsntMethods ~ viewState:', viewState);
+  }, [viewState]);
 
   return (
     <SimpleLayout

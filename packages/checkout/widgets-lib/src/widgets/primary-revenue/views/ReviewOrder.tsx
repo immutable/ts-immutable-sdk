@@ -52,7 +52,8 @@ const mockOrderItems: any[] = [
 
 export interface ReviewOrderProps {
   currency?: string;
-  executeBuyNow: () => Promise<string>;
+  execute: () => Promise<void>;
+  sign: () => Promise<void>;
 }
 
 export function ReviewOrder(props: ReviewOrderProps) {
@@ -61,7 +62,7 @@ export function ReviewOrder(props: ReviewOrderProps) {
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const [loading, setLoading] = useState(false);
 
-  const { currency, executeBuyNow } = props;
+  const { currency, execute, sign } = props;
 
   useEffect(() => {
     // TODO: fetch the order from the BE
@@ -80,9 +81,13 @@ export function ReviewOrder(props: ReviewOrderProps) {
 
   const handlePayment = async () => {
     setLoading(true);
-    await executeBuyNow();
+    await execute();
     setLoading(false);
   };
+
+  useEffect(() => {
+    sign();
+  }, []);
 
   return (
     <SimpleLayout

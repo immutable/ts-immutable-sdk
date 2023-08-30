@@ -10,7 +10,6 @@ import {
   IMTBLWidgetEvents,
   OrchestrationEventType,
 } from '@imtbl/checkout-widgets';
-import { ethers } from 'ethers';
 import { WidgetTheme } from '../../lib';
 import { LoadingView } from '../../views/loading/LoadingView';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
@@ -29,19 +28,45 @@ import { ReviewOrder } from './views/ReviewOrder';
 import { PayWithCard } from './views/PayWithCard';
 import { PrimaryRevenueWidgetViews } from '../../context/view-context/PrimaryRevenueViewContextTypes';
 import { TopUpView } from '../../views/top-up/TopUpView';
-import { encodeApprove } from './functions/encodeApprove';
 import { BridgeWidget } from '../bridge/BridgeWidget';
 import { SwapWidget } from '../swap/SwapWidget';
 import { OnRampWidget } from '../on-ramp/OnRampWidget';
+import { useSignOrder } from './hooks/useSignOrder';
 
 export interface PrimaryRevenueWidgetProps {
+  // @deprecated
+  fromContractAddress: string;
+
   config: StrongCheckoutWidgetsConfig;
   amount: string;
-  fromContractAddress: string;
+  envId: string;
+  fromCurrency: string;
+  items: {
+    id: string;
+    name: string;
+    price: string;
+    qty: number;
+    image: string;
+  }[];
 }
 
 export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
-  const { config, amount, fromContractAddress } = props;
+  const {
+    config, amount, fromContractAddress, fromCurrency, envId, items,
+  } = props;
+
+  const { sign, execute } = useSignOrder({
+    envId,
+    items,
+    amount,
+    fromContractAddress,
+    fromCurrency,
+    // deprecated
+    fromCollectionAddress: '0xf578b6bB4FA5c7403147C29be864f5e12BF211a0',
+    // provide connected wallet
+    recipientAddress: '0x81064a5d163559d422fd311dc36c051424620eb9',
+  });
+
   const loadingText = text.views[SharedViews.LOADING_VIEW].text;
 
   const { theme } = config;
@@ -66,7 +91,9 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
-          view: { type: PrimaryRevenueWidgetViews.PAYMENT_METHODS },
+          view: {
+            type: PrimaryRevenueWidgetViews.PAYMENT_METHODS,
+          },
         },
       });
     } catch (error: any) {
@@ -97,47 +124,6 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
     const requiredAmounts = parseFloat(amount);
 
     return balance > requiredAmounts;
-  }, [checkout, provider, amount, fromContractAddress]);
-
-  const prepareApprove = async () => {
-    // Encode data
-    const txData = encodeApprove(fromContractAddress, amount);
-
-    // Prepare transaction
-    const transaction = {
-      from: '0x81064a5d163559D422fD311dc36c051424620EB9', // TODO: Remove hardcorded Guarded Multicaller address
-      to: fromContractAddress,
-      data: txData,
-      gasLimit: 21000,
-      gasPrice: ethers.utils.parseUnits('20', 'gwei'),
-    };
-
-    return transaction;
-  };
-
-  const handleApprove = useCallback(async () => {
-    if (!checkout || !provider) return false;
-
-    try {
-      const transaction = await prepareApprove();
-      const approved = await provider.send('eth_sendTransaction', [
-        transaction,
-      ]);
-
-      return approved;
-    } catch (error) {
-      console.error(
-        'An error occurred when executing approve function:',
-        error,
-      );
-      return false;
-    }
-  }, [checkout, provider, amount, fromContractAddress]);
-
-  const executeBuyNow = useCallback(async () => {
-    const approved = await handleApprove();
-    console.log('approved', approved);
-    return approved;
   }, [checkout, provider, amount, fromContractAddress]);
 
   useEffect(() => {
@@ -233,7 +219,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
           <PaymentMethods checkBalances={handleCheckBalances} />
         )}
         {viewState.view.type === PrimaryRevenueWidgetViews.PAY_WITH_CRYPTO && (
-          <ReviewOrder executeBuyNow={executeBuyNow} />
+          <ReviewOrder execute={execute} sign={sign} />
         )}
         {viewState.view.type === PrimaryRevenueWidgetViews.PAY_WITH_CARD && (
           <PayWithCard />
@@ -247,9 +233,8 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
             showBridgeOption
             onCloseButtonClick={handleGoBackToMethods}
             onBackButtonClick={handleGoBackToMethods}
-            // FIXME: pass from props
-            amount="100"
-            tokenAddress="0x81064a5d163559D422fD311dc36c051424620EB9"
+            amount={amount}
+            tokenAddress={fromContractAddress}
           />
         )}
         {viewState.view.type
