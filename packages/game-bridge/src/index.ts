@@ -18,7 +18,6 @@ const PASSPORT_FUNCTIONS = {
   getPKCEAuthUrl: 'getPKCEAuthUrl',
   connectPKCE: 'connectPKCE',
   confirmCode: 'confirmCode',
-  connectEvm: 'connectEvm',
   connectWithCredentials: 'connectWithCredentials',
   getAddress: 'getAddress',
   checkStoredCredentials: 'checkStoredCredentials',
@@ -29,6 +28,7 @@ const PASSPORT_FUNCTIONS = {
     batchNftTransfer: 'imxBatchNftTransfer',
   },
   zkEvm: {
+    connectEvm: 'connectEvm',
     sendTransaction: 'zkEvmSendTransaction',
     requestAccounts: 'zkEvmRequestAccounts',
     getBalance: 'zkEvmGetBalance',
@@ -193,7 +193,7 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
         });
         break;
       }
-      case PASSPORT_FUNCTIONS.connectEvm: {
+      case PASSPORT_FUNCTIONS.zkEvm.connectEvm: {
         const zkEvmProvider = passportClient?.connectEvm();
         const success = setZkEvmProvider(zkEvmProvider);
         callbackToGame({
