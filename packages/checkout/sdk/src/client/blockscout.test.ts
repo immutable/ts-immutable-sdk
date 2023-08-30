@@ -73,6 +73,52 @@ describe('Blockscout', () => {
       );
     });
 
+    it('success cached', async () => {
+      const mockResponse = {
+        status: 200,
+        data:
+          {
+            items: [],
+            next_page_params: null,
+          },
+      };
+      mockedAxios.get.mockResolvedValue(mockResponse);
+
+      const tokens = [BlockscoutTokenType.ERC20];
+      const client = new Blockscout({ chainId: ChainId.IMTBL_ZKEVM_TESTNET });
+
+      await client.getAddressTokens({ walletAddress: '0x1234567890', tokenType: tokens });
+      await client.getAddressTokens({ walletAddress: '0x1234567890', tokenType: tokens });
+
+      expect(mockedAxios.get).toHaveBeenNthCalledWith(
+        1,
+        `${client.url}/api/v2/addresses/0x1234567890/tokens?type=${tokens.join(',')}`,
+      );
+    });
+
+    it('success zero TTL', async () => {
+      const mockResponse = {
+        status: 200,
+        data:
+          {
+            items: [],
+            next_page_params: null,
+          },
+      };
+      mockedAxios.get.mockResolvedValue(mockResponse);
+
+      const tokens = [BlockscoutTokenType.ERC20];
+      const client = new Blockscout({ chainId: ChainId.IMTBL_ZKEVM_TESTNET, ttl: 0 });
+
+      await client.getAddressTokens({ walletAddress: '0x1234567890', tokenType: tokens });
+      await client.getAddressTokens({ walletAddress: '0x1234567890', tokenType: tokens });
+
+      expect(mockedAxios.get).toHaveBeenNthCalledWith(
+        2,
+        `${client.url}/api/v2/addresses/0x1234567890/tokens?type=${tokens.join(',')}`,
+      );
+    });
+
     it('success with pagination', async () => {
       const mockResponse = {
         status: 200,

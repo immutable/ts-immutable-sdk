@@ -9,24 +9,52 @@ import {
   BlockscoutTokenType,
 } from './blockscoutType';
 
+type CacheData = {
+  data: any,
+  ttl: number
+};
+
+const CACHE_DATA_TTL = 60; // seconds
+
 /**
  * Blockscout class provides a client abstraction for the Immutable 3rd party indexer.
  */
 export class Blockscout {
   readonly url: string;
 
+  readonly ttl: number;
+
+  readonly chainId: ChainId;
+
+  private cacheMap: { [key: string]: CacheData };
+
   private static async makeHttpRequest(url: string): Promise<AxiosResponse> {
     return axios.get(url);
+  }
+
+  private setCache(key: string, data: any) {
+    this.cacheMap[key] = { data, ttl: new Date().getTime() + this.ttl * 1000 };
+  }
+
+  private getCache(key: string): any {
+    const d = this.cacheMap[key];
+    if (!d || d.ttl <= new Date().getTime()) return null;
+    return d.data;
   }
 
   /**
    * Blockscout constructor
    * @param chainId target chain
+   * @param ttl cache TTL
    */
   constructor(params: {
     chainId: ChainId;
+    ttl?: number
   }) {
-    this.url = BLOCKSCOUT_CHAIN_URL_MAP[params.chainId];
+    this.chainId = params.chainId;
+    this.url = BLOCKSCOUT_CHAIN_URL_MAP[this.chainId];
+    this.cacheMap = {};
+    this.ttl = params.ttl !== undefined ? params.ttl : CACHE_DATA_TTL;
   }
 
   /**
@@ -57,12 +85,16 @@ export class Blockscout {
       let url = `${this.url}/api/v2/addresses/${params.walletAddress}/tokens?type=${params.tokenType.join(',')}`;
       if (params.nextPage) url += `&${new URLSearchParams(params.nextPage as Record<string, string>)}`;
 
-      const response = await Blockscout.makeHttpRequest(url);
+      // Cache response data to prevent unnecessary requests
+      const cached = this.getCache(url) as AxiosResponse;
+      if (cached && cached.status < 400) return Promise.resolve(cached.data);
 
+      const response = await Blockscout.makeHttpRequest(url);
       if (response.status >= 400) {
         return Promise.reject({ code: response.status, message: response.statusText });
       }
 
+      this.setCache(url, response);
       return Promise.resolve(response.data);
     } catch (err: any) {
       return Promise.reject({
