@@ -1,9 +1,8 @@
 import { Box } from '@biom3/react';
 import {
-  useCallback, useContext, useEffect, useMemo, useState,
+  useCallback, useContext, useMemo, useState,
 } from 'react';
 import { CheckoutErrorType, TokenInfo } from '@imtbl/checkout-sdk';
-import { TransactionRequest } from '@ethersproject/providers';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { sendSwapWidgetCloseEvent } from '../SwapWidgetEvents';
@@ -44,10 +43,6 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
   const [rejectedSpending, setRejectedSpending] = useState(false);
   const [rejectedSwap, setRejectedSwap] = useState(false);
 
-  // prepared transactions
-  const [preparedApprovalTx, setPreparedApprovalTx] = useState<TransactionRequest>();
-  const [preparedSwapTx, setPreparedSwapTx] = useState<TransactionRequest>();
-
   // Get symbol from swap info for approve amount text
   const fromToken = useMemo(
     () => allowedTokens.find(
@@ -55,29 +50,6 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
     ),
     [allowedTokens, data.swapFormInfo.fromContractAddress],
   );
-
-  useEffect(() => {
-    (async () => {
-      if (!provider) return;
-      try {
-        setLoading(true);
-        if (!showSwapTxnStep) {
-          // prepare the approval tx here
-          const updateTxRequest = await provider.getSigner().populateTransaction(data.approveTransaction);
-          setPreparedApprovalTx(updateTxRequest);
-        } else {
-          // prepare the swap tx here
-          const updateTxRequest = await provider.getSigner().populateTransaction(data.transaction);
-          setPreparedSwapTx(updateTxRequest);
-        }
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.log(err);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [provider, data, showSwapTxnStep, setPreparedApprovalTx, setPreparedSwapTx]);
 
   // Common error view function
   const showErrorView = useCallback(() => {
@@ -157,15 +129,12 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
       return;
     }
     if (actionDisabled) return;
-    if (!preparedApprovalTx) {
-      return;
-    }
 
     setActionDisabled(true);
     try {
       const txnResult = await checkout.sendTransaction({
         provider,
-        transaction: preparedApprovalTx,
+        transaction: data.approveTransaction,
       });
 
       setApprovalTxnLoading(true);
@@ -204,7 +173,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
     showErrorView,
     viewDispatch,
     setRejectedSwap,
-    preparedApprovalTx,
+    data.approveTransaction,
     data.swapFormInfo,
     actionDisabled,
     setActionDisabled,
@@ -250,14 +219,10 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
 
     setActionDisabled(true);
 
-    if (!preparedSwapTx) {
-      return;
-    }
-
     try {
       const txn = await checkout.sendTransaction({
         provider,
-        transaction: preparedSwapTx,
+        transaction: data.transaction,
       });
 
       setActionDisabled(false);
@@ -292,7 +257,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
     showErrorView,
     viewDispatch,
     setRejectedSwap,
-    preparedSwapTx,
+    data.transaction,
     data.swapFormInfo,
     actionDisabled,
     setActionDisabled,
