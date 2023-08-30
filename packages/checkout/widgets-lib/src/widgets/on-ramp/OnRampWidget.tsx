@@ -1,9 +1,10 @@
 import { BiomeCombinedProviders } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
-  useContext, useEffect, useMemo, useReducer,
+  useContext, useEffect, useMemo, useReducer, useState,
 } from 'react';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
+import { Passport, UserProfile } from '@imtbl/passport';
 import { WidgetTheme } from '../../lib';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
@@ -17,6 +18,8 @@ import { text } from '../../resources/text/textConfig';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 import { TopUpView } from '../../views/top-up/TopUpView';
 import { sendOnRampWidgetCloseEvent } from './OnRampWidgetEvents';
+import { useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import { isPassportProvider } from '../../lib/providerUtils';
 
 const LOADING_VIEW_DELAY_MS = 1000;
 export interface OnRampWidgetProps {
@@ -28,10 +31,12 @@ export interface OnRampWidgetProps {
 export interface OnRampWidgetParams {
   amount?: string;
   contractAddress?: string;
+  passport?: Passport;
 }
 
 export function OnRampWidget(props: OnRampWidgetProps) {
-  const { config } = props;
+  const { config, params } = props;
+  const { passport } = params;
   const {
     environment, theme, isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
   } = config;
@@ -40,12 +45,43 @@ export function OnRampWidget(props: OnRampWidgetProps) {
 
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
+  const [walletAddress, setWalletAddress] = useState('');
+  const [isPassport, setIsPassport] = useState(false);
+  const [emailAddress, setEmailAddress] = useState<string | undefined>(undefined);
 
   const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
     : onDarkBase;
 
   const { initialLoadingText } = text.views[OnRampWidgetViews.ONRAMP];
+  const { track } = useAnalytics();
+
+  useEffect(() => {
+    const setDataFromProvider = async () => {
+      if (!provider) return;
+      const userWalletAddress = await provider.getSigner().getAddress();
+      setWalletAddress(userWalletAddress);
+      const isPassportUser = isPassportProvider(provider);
+      setIsPassport(isPassportUser);
+      let userInfo:UserProfile | undefined;
+      if (isPassportUser && passport) {
+        userInfo = await passport.getUserInfo();
+        setEmailAddress(userInfo?.email);
+      }
+
+      track({
+        userJourney: 'OnRamp',
+        screen: 'Onramp-widget-load',
+        control: 'WidgetInitialisation',
+        controlType: 'WidgetLoad',
+        action: 'Opened',
+        userId: userWalletAddress,
+        isPassportWallet: isPassportUser,
+        email: userInfo?.email,
+      });
+    };
+    setDataFromProvider();
+  }, [provider]);
 
   useEffect(() => {
     if (!checkout || !provider) return;
@@ -77,7 +113,12 @@ export function OnRampWidget(props: OnRampWidgetProps) {
           <LoadingView loadingText={initialLoadingText} showFooterLogo />
         )}
         {viewState.view.type === OnRampWidgetViews.ONRAMP && (
-          <OnRampMain environment={environment} />
+          <OnRampMain
+            environment={environment}
+            walletAddress={walletAddress}
+            isPassport={isPassport}
+            email={emailAddress}
+          />
         )}
         {viewState.view.type === SharedViews.TOP_UP_VIEW && (
           <TopUpView

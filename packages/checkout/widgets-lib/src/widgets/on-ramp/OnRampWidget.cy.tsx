@@ -11,9 +11,10 @@ import {
   ConnectLoaderTestComponent,
 } from '../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
 import { ConnectionStatus } from '../../context/connect-loader-context/ConnectLoaderContext';
+import { AnalyticsProvider } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 
 describe('OnRampWidget tests', () => {
-  const config: StrongCheckoutWidgetsConfig = {
+  const widgetsConfig: StrongCheckoutWidgetsConfig = {
     environment: Environment.SANDBOX,
     theme: WidgetTheme.DARK,
     isBridgeEnabled: true,
@@ -47,10 +48,12 @@ describe('OnRampWidget tests', () => {
       const params = {} as OnRampWidgetParams;
       mount(
         <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
-          <OnRampWidget
-            params={params}
-            config={config}
-          />
+          <AnalyticsProvider>
+            <OnRampWidget
+              params={params}
+              config={widgetsConfig}
+            />
+          </AnalyticsProvider>
         </ConnectLoaderTestComponent>,
       );
 
@@ -61,10 +64,12 @@ describe('OnRampWidget tests', () => {
       const params = {} as OnRampWidgetParams;
       mount(
         <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
-          <OnRampWidget
-            params={params}
-            config={config}
-          />
+          <AnalyticsProvider>
+            <OnRampWidget
+              params={params}
+              config={widgetsConfig}
+            />
+          </AnalyticsProvider>
         </ConnectLoaderTestComponent>,
       );
 
