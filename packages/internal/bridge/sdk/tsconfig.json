@@ -6,8 +6,8 @@
       "src"
     ],
     "target": "es2022",
-    "module": "es2022",
-    "moduleResolution": "node",
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "allowJs": false,
     "skipLibCheck": true,
     "esModuleInterop": true,
