@@ -67,7 +67,7 @@ export class Blockscout {
    * isBlockscoutError verifies if the error is a Blockscout client error
    * @param err error to evaluate
    */
-  public static isBlockscoutError = (err: any): boolean => Object.hasOwn(err, 'code');
+  public static isBlockscoutError = (err: any): boolean => 'code' in err;
 
   /**
    * getAddressTokens fetches the list of tokens (by type) owned by the wallet address.
