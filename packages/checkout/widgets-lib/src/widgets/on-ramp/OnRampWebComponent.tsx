@@ -6,7 +6,8 @@ import { ImmutableWebComponent } from '../ImmutableWebComponent';
 import { isValidAddress, isValidAmount, isValidWalletProvider } from '../../lib/validations/widgetValidators';
 import { ConnectLoader, ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
 import { sendOnRampWidgetCloseEvent } from './OnRampWidgetEvents';
-import { ConnectTargetLayer, getL2ChainId } from '../../lib';
+import { ConnectTargetLayer, getL1ChainId, getL2ChainId } from '../../lib';
+import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 
 export class ImmutableOnRamp extends ImmutableWebComponent {
   amount = '';
@@ -54,11 +55,13 @@ export class ImmutableOnRamp extends ImmutableWebComponent {
       passport: this.passport,
       allowedChains: [
         getL2ChainId(this.checkout!.config),
+        getL1ChainId(this.checkout!.config),
       ],
     };
     const params: OnRampWidgetParams = {
       amount: this.amount,
       contractAddress: this.contractAddress,
+      passport: this.passport,
     };
 
     if (!this.reactRoot) {
@@ -67,16 +70,20 @@ export class ImmutableOnRamp extends ImmutableWebComponent {
 
     this.reactRoot.render(
       <React.StrictMode>
-        <ConnectLoader
-          params={connectLoaderParams}
+        <CustomAnalyticsProvider
           widgetConfig={this.widgetConfig!}
-          closeEvent={sendOnRampWidgetCloseEvent}
         >
-          <OnRampWidget
-            params={params}
-            config={this.widgetConfig!}
-          />
-        </ConnectLoader>
+          <ConnectLoader
+            params={connectLoaderParams}
+            widgetConfig={this.widgetConfig!}
+            closeEvent={sendOnRampWidgetCloseEvent}
+          >
+            <OnRampWidget
+              params={params}
+              config={this.widgetConfig!}
+            />
+          </ConnectLoader>
+        </CustomAnalyticsProvider>
       </React.StrictMode>,
     );
   }

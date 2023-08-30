@@ -8,11 +8,20 @@ import { SharedViews, ViewContext } from '../../../context/view-context/ViewCont
 import { OnRampWidgetViews } from '../../../context/view-context/OnRampViewContextTypes';
 import { text } from '../../../resources/text/textConfig';
 import { containerStyle } from './onRampStyles';
+import {
+  useAnalytics,
+} from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { TransakEvents } from '../TransakEvents';
 
 interface OnRampProps {
-  environment: Environment
+  environment: Environment;
+  walletAddress?: string;
+  email?: string;
+  isPassport?: boolean;
 }
-export function OnRampMain({ environment }: OnRampProps) {
+export function OnRampMain({
+  environment, walletAddress, isPassport, email,
+}: OnRampProps) {
   const { header } = text.views[OnRampWidgetViews.ONRAMP];
   const { viewState } = useContext(ViewContext);
 
@@ -23,9 +32,58 @@ export function OnRampMain({ environment }: OnRampProps) {
     ? 'https://global-stg.transak.com?apiKey=41ad2da7-ed5a-4d89-a90b-c751865effc2'
     : '';
 
-  const configurations = 'exchangeScreenTitle=BUY';
+  const { track } = useAnalytics();
 
-  const finalUrl = `${url}&${configurations}`;
+  const trackSegmentEvents = (eventData: any) => {
+    const miscProps = {
+      userId: walletAddress,
+      isPassportWallet: isPassport,
+      email,
+    };
+    switch (eventData.event_id) {
+      case TransakEvents.TRANSAK_WIDGET_OPEN:
+        track({
+          userJourney: 'OnRamp',
+          screen: 'Initial-onramp-screen',
+          control: 'WebhookEvent',
+          controlType: 'Trigger',
+          action: 'Opened',
+          ...miscProps,
+        });
+        break;
+      case TransakEvents.TRANSAK_ORDER_CREATED:
+        track({
+          userJourney: 'OnRamp',
+          screen: 'order-creation',
+          control: 'WebhookEvent',
+          controlType: 'Trigger',
+          action: 'Started',
+          ...miscProps,
+        });
+        break;
+      case TransakEvents.TRANSAK_ORDER_SUCCESSFUL: // user paid
+        track({
+          userJourney: 'OnRamp',
+          screen: 'payment-confirmation',
+          control: 'Confirm',
+          controlType: 'Button',
+          action: 'Processing',
+          ...miscProps,
+        });
+        break;
+      case TransakEvents.TRANSAK_ORDER_FAILED: // payment failed
+        track({
+          userJourney: 'OnRamp',
+          screen: 'failure-screen',
+          control: 'WebhookEvent',
+          controlType: 'Trigger',
+          action: 'Failed',
+          ...miscProps,
+        });
+        break;
+      default:
+    }
+  };
 
   useEffect(() => {
     const domIframe:HTMLIFrameElement = document.getElementById('transak-iframe') as HTMLIFrameElement;
@@ -37,6 +95,7 @@ export function OnRampMain({ environment }: OnRampProps) {
         if (event.origin === 'https://global-stg.transak.com') {
           // eslint-disable-next-line no-console
           console.log('TRANSAK event data: ', event.data);
+          trackSegmentEvents(event.data);
         }
       }
     };
@@ -63,7 +122,7 @@ export function OnRampMain({ environment }: OnRampProps) {
         <iframe
           title="Transak title"
           id="transak-iframe"
-          src={finalUrl}
+          src={url}
           allow="camera;microphone;fullscreen;payment"
           style={{
             height: '100%', width: '100%', border: 'none', position: 'absolute',
