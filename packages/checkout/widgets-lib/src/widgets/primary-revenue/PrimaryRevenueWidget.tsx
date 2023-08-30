@@ -6,7 +6,10 @@ import {
 import { BiomeCombinedProviders } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 
-import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
+import {
+  IMTBLWidgetEvents,
+  OrchestrationEventType,
+} from '@imtbl/checkout-widgets';
 import { ethers } from 'ethers';
 import { WidgetTheme } from '../../lib';
 import { LoadingView } from '../../views/loading/LoadingView';
@@ -27,6 +30,9 @@ import { PayWithCard } from './views/PayWithCard';
 import { PrimaryRevenueWidgetViews } from '../../context/view-context/PrimaryRevenueViewContextTypes';
 import { TopUpView } from '../../views/top-up/TopUpView';
 import { encodeApprove } from './functions/encodeApprove';
+import { BridgeWidget } from '../bridge/BridgeWidget';
+import { SwapWidget } from '../swap/SwapWidget';
+import { OnRampWidget } from '../on-ramp/OnRampWidget';
 
 export interface PrimaryRevenueWidgetProps {
   config: StrongCheckoutWidgetsConfig;
@@ -139,13 +145,82 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
     mount();
   }, [checkout, provider]);
 
-  const handleGoBack = useCallback(() => {
+  const handleGoBackToMethods = useCallback(() => {
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
         view: { type: PrimaryRevenueWidgetViews.PAYMENT_METHODS },
       },
     });
+  }, []);
+
+  useEffect(() => {
+    const orchestratedWidgetEvents = [
+      IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT,
+      IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT,
+      IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT,
+    ];
+
+    const handleWidgetEvents = ((event: CustomEvent) => {
+      event?.stopPropagation();
+
+      // TODO: add error handling
+      // FIXME: export a SharedEventType in widgets/types ??? close-widget, success, failure, rejected, ...etc
+      if (['close-widget', 'failure', 'rejected'].includes(event.detail.type)) {
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: {
+              type: PrimaryRevenueWidgetViews.PAYMENT_METHODS,
+            },
+          },
+        });
+        return;
+      }
+
+      // TODO: handle `success` for all orchestrated widgets
+      if (
+        orchestratedWidgetEvents.includes(event.type as IMTBLWidgetEvents)
+        && event.detail.type === 'success'
+      ) {
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: {
+              type: PrimaryRevenueWidgetViews.PAY_WITH_CRYPTO,
+              data: event.detail.data,
+            },
+          },
+        });
+
+        return;
+      }
+
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: { type: event.detail.type, data: event.detail.data },
+        },
+      });
+
+      console.log('event', event.detail);
+    }) as EventListener;
+
+    window.addEventListener(
+      IMTBLWidgetEvents.IMTBL_PRIMARY_REVENUE_WIDGET_EVENT,
+      handleWidgetEvents,
+    );
+
+    orchestratedWidgetEvents.forEach((event) => {
+      window.addEventListener(event as IMTBLWidgetEvents, handleWidgetEvents);
+    });
+
+    return () => {
+      window.removeEventListener(
+        IMTBLWidgetEvents.IMTBL_PRIMARY_REVENUE_WIDGET_EVENT,
+        handleWidgetEvents,
+      );
+    };
   }, []);
 
   return (
@@ -170,9 +245,24 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
             showOnrampOption
             showSwapOption
             showBridgeOption
-            onCloseButtonClick={handleGoBack}
-            onBackButtonClick={handleGoBack}
+            onCloseButtonClick={handleGoBackToMethods}
+            onBackButtonClick={handleGoBackToMethods}
+            // FIXME: pass from props
+            amount="100"
+            tokenAddress="0x81064a5d163559D422fD311dc36c051424620EB9"
           />
+        )}
+        {viewState.view.type
+          === (OrchestrationEventType.REQUEST_ONRAMP as unknown) && (
+          <OnRampWidget config={config} params={{ ...viewState.view.data }} />
+        )}
+        {viewState.view.type
+          === (OrchestrationEventType.REQUEST_SWAP as unknown) && (
+          <SwapWidget config={config} params={{ ...viewState.view.data }} />
+        )}
+        {viewState.view.type
+          === (OrchestrationEventType.REQUEST_BRIDGE as unknown) && (
+          <BridgeWidget config={config} params={{ ...viewState.view.data }} />
         )}
       </ViewContext.Provider>
     </BiomeCombinedProviders>

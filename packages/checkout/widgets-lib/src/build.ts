@@ -16,7 +16,6 @@ customElements.get('imtbl-bridge')
   || customElements.define('imtbl-bridge', ImmutableBridge);
 customElements.get('imtbl-onramp')
 || customElements.define('imtbl-onramp', ImmutableOnRamp);
-
 // FIXME: bundle separately
 customElements.get('imtbl-primary-revenue')
   || customElements.define('imtbl-primary-revenue', ImmutablePrimaryRevenue);
