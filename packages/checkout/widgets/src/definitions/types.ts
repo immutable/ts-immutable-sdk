@@ -15,4 +15,5 @@ export enum CheckoutWidgetTagNames {
   WALLET = 'imtbl-wallet',
   SWAP = 'imtbl-swap',
   BRIDGE = 'imtbl-bridge',
+  ONRAMP = 'imtbl-onramp',
 }
