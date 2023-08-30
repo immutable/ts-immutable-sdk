@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - All SDK modules marked as `prod`.
 
+### Fixed
+
+- @imtbl/immutablex-client: Some request/response types were not being exported.
+
 ## [0.13.0] - 2023-08-22
 
 ### Added

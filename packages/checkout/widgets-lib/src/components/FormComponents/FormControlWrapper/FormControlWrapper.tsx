@@ -1,4 +1,4 @@
-import { FormControl } from '@biom3/react';
+import { FormControl, FormControlProps } from '@biom3/react';
 
 interface FormControlWrapperProps {
   testId: string;
@@ -7,6 +7,7 @@ interface FormControlWrapperProps {
   textAlign?: 'left' | 'right';
   isErrored?: boolean;
   errorMessage?: string;
+  sx?: FormControlProps<undefined>['sx'];
 }
 
 export function FormControlWrapper({
@@ -16,17 +17,25 @@ export function FormControlWrapper({
   textAlign,
   isErrored,
   errorMessage,
+  sx,
 }: FormControlWrapperProps) {
   return (
     <FormControl
       testId={testId}
       textAlign={textAlign ?? 'left'}
       validationStatus={isErrored ? 'error' : 'success'}
+      sx={sx}
     >
       {children}
-      {subtext && <FormControl.Caption testId={`${testId}-subtext`}>{subtext}</FormControl.Caption>}
+      {subtext && (
+        <FormControl.Caption testId={`${testId}-subtext`}>
+          {subtext}
+        </FormControl.Caption>
+      )}
       {isErrored && (
-        <FormControl.Validation testId={`${testId}-error`}>{errorMessage}</FormControl.Validation>
+        <FormControl.Validation testId={`${testId}-error`}>
+          {errorMessage}
+        </FormControl.Validation>
       )}
     </FormControl>
   );

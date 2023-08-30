@@ -69,6 +69,7 @@ export function SelectForm({
           defaultLabel="Select coin"
           targetClickOveride={() => setCoinSelectorOpen(true)}
           selectedOption={getSelectedOption()}
+          sx={{ minw: '170px' }}
         >
           {/*
             because we are using the CoinSelector, the options are shown on the bottom sheet component
