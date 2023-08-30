@@ -126,6 +126,7 @@ export const getIndexerBalance = async (
         symbol: renamed.symbol ?? tokenData.symbol,
         decimals: parseInt(tokenData.decimals, 10),
       };
+
       const formattedBalance = utils.formatUnits(i.value, token.decimals);
 
       return { balance, formattedBalance, token } as GetBalanceResult;
