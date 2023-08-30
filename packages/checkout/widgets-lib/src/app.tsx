@@ -1,11 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+
 import reportWebVitals from './reportWebVitals';
 import ConnectWebView from './widgets/connect/ConnectWebView';
 import SwapWebView from './widgets/swap/SwapWebView';
 import BridgeWebView from './widgets/bridge/BridgeWebView';
 import WalletWebView from './widgets/wallet/WalletWebView';
+import OnRampWebView from './widgets/on-ramp/OnRampWebView';
 import PrimaryRevenueWebView from './widgets/primary-revenue/PrimaryRevenueWebView';
 
 import './build';
@@ -32,6 +34,10 @@ function App() {
       </h2>
       <br />
       <h2>
+        <a href="/on-ramp">On Ramp Widget</a>
+      </h2>
+      <br />
+      <h2>
         <a href="/primary-revenue">Primary Revenue Widget</a>
       </h2>
       <br />
@@ -55,6 +61,10 @@ const router = createBrowserRouter([
   {
     path: '/bridge',
     element: <BridgeWebView />,
+  },
+  {
+    path: '/on-ramp',
+    element: <OnRampWebView />,
   },
   {
     path: '/wallet',
