@@ -10,6 +10,7 @@ import {
 import { sendSwapWidgetCloseEvent } from './SwapWidgetEvents';
 import { ConnectTargetLayer, getL2ChainId } from '../../lib';
 import { isValidAddress, isValidAmount, isValidWalletProvider } from '../../lib/validations/widgetValidators';
+import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 
 export class ImmutableSwap extends ImmutableWebComponent {
   walletProvider: WalletProviderName | undefined = undefined;
@@ -81,16 +82,18 @@ export class ImmutableSwap extends ImmutableWebComponent {
 
     this.reactRoot.render(
       <React.StrictMode>
-        <ConnectLoader
-          params={connectLoaderParams}
-          widgetConfig={this.widgetConfig!}
-          closeEvent={sendSwapWidgetCloseEvent}
-        >
-          <SwapWidget
-            params={swapParams}
-            config={this.widgetConfig!}
-          />
-        </ConnectLoader>
+        <CustomAnalyticsProvider widgetConfig={this.widgetConfig!}>
+          <ConnectLoader
+            params={connectLoaderParams}
+            widgetConfig={this.widgetConfig!}
+            closeEvent={sendSwapWidgetCloseEvent}
+          >
+            <SwapWidget
+              params={swapParams}
+              config={this.widgetConfig!}
+            />
+          </ConnectLoader>
+        </CustomAnalyticsProvider>
       </React.StrictMode>,
     );
   }
