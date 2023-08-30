@@ -67,6 +67,26 @@ export {
   WalletConnection as ImxClientWalletConnection,
 };
 
+// export types from core-sdk
+export {
+  IMXError,
+  UnsignedOrderRequest,
+  UnsignedTransferRequest,
+  UnsignedMintRequest,
+  UnsignedExchangeTransferRequest,
+  StarkSigner,
+  WalletConnection,
+  ERC20Token,
+  ERC721Token,
+  ETHToken,
+  ETHAmount,
+  ERC20Amount,
+  AnyToken,
+  TokenAmount,
+  ExchangeTokenAmount,
+  NftTransferDetails,
+} from '@imtbl/core-sdk';
+
 export class ImmutableXClient {
   private immutableX: ImmutableX;
 
