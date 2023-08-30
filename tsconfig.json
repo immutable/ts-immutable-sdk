@@ -13,5 +13,100 @@
     "declaration": false,
     "resolveJsonModule": true,
     "skipLibCheck": true
-  }
+  },
+  "references": [
+    {
+      "path": "sdk"
+    },
+    {
+      "path": "packages/config"
+    },
+    {
+      "path": "packages/erc20"
+    },
+    {
+      "path": "packages/erc721"
+    },
+    {
+      "path": "packages/erc721-mint-by-id"
+    },
+    {
+      "path": "packages/immutablex_client"
+    },
+    {
+      "path": "packages/passport/sdk"
+    },
+    {
+      "path": "packages/passport/sdk-sample-app"
+    },
+    {
+      "path": "packages/provider"
+    },
+    {
+      "path": "packages/provider/src/sample-app"
+    },
+    {
+      "path": "packages/orderbook"
+    },
+    {
+      "path": "packages/internal/contracts"
+    },
+    {
+      "path": "packages/internal/toolkit"
+    },
+    {
+      "path": "packages/internal/cryptofiat"
+    },
+    {
+      "path": "packages/internal/dex/sdk"
+    },
+    {
+      "path": "packages/internal/dex/sdk-sample-app"
+    },
+    {
+      "path": "packages/internal/bridge/sdk"
+    },
+    {
+      "path": "packages/internal/generated-clients"
+    },
+    {
+      "path": "packages/internal/guardian"
+    },
+    {
+      "path": "packages/internal/bridge/bridge-sample-app"
+    },
+    {
+      "path": "packages/checkout/sdk"
+    },
+    {
+      "path": "packages/checkout/sdk-sample-app"
+    },
+    {
+      "path": "packages/checkout/widgets"
+    },
+    {
+      "path": "packages/checkout/widgets-sample-app"
+    },
+    {
+      "path": "packages/checkout/widgets-lib"
+    },
+    {
+      "path": "packages/economy/sdk"
+    },
+    {
+      "path": "packages/economy/playground"
+    },
+    {
+      "path": "packages/economy/services"
+    },
+    {
+      "path": "packages/blockchain-data/sdk"
+    },
+    {
+      "path": "packages/blockchain-data/sample-app"
+    },
+    {
+      "path": "packages/internal/economy-building-blocks/playground"
+    }
+  ]
 }
