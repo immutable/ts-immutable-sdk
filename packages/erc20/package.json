@@ -4,6 +4,9 @@
   "version": "0.0.0",
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
+  "dependencies": {
+    "@imtbl/contracts": "0.0.0"
+  },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.0.0",
     "@swc/jest": "^0.2.24",

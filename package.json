@@ -20,7 +20,7 @@
     "release-it": "^15.10.1",
     "syncpack": "^9.8.4",
     "typedoc": "^0.24.8",
-    "typescript": "^4.9.5",
+    "typescript": "^5.0.0",
     "wsrun": "^5.2.4"
   },
   "engines": {
@@ -51,6 +51,7 @@
     "syncpack:check": "yarn syncpack list-mismatches",
     "syncpack:fix": "yarn syncpack fix-mismatches",
     "syncpack:format": "yarn syncpack format",
+    "synctypes": "workspaces-to-typescript-project-references",
     "test": "wsrun --exclude-missing -e test",
     "test:checkout:cypress": "wsrun -p @imtbl/checkout-widgets-lib --exclude-missing -e test:cypress",
     "test:checkout:sdk:coverage": "wsrun -p @imtbl/checkout-sdk --exclude-missing -e test:coverage",
