@@ -1,6 +1,7 @@
 import { BridgeEventType } from './bridgeEvents';
 import { ConnectEventType } from './connectEvents';
 import { OrchestrationEventType } from './orchestrationEvents';
+import { SmartEventType } from './smartEvents';
 import { SwapEventType } from './swapEvents';
 import { WalletEventType } from './walletEvents';
 
@@ -12,6 +13,7 @@ export enum IMTBLWidgetEvents {
   IMTBL_WALLET_WIDGET_EVENT = 'imtbl-wallet-widget',
   IMTBL_SWAP_WIDGET_EVENT = 'imtbl-swap-widget',
   IMTBL_BRIDGE_WIDGET_EVENT = 'imtbl-bridge-widget',
+  IMTBL_SMART_WIDGET_EVENT = 'imtbl-smart-widget',
 }
 
 /**
@@ -21,6 +23,6 @@ export enum IMTBLWidgetEvents {
  * @property {T} data - The data associated with the event.
  */
 export type WidgetEvent<T> = {
-  type: OrchestrationEventType | ConnectEventType | WalletEventType | SwapEventType | BridgeEventType,
+  type: OrchestrationEventType | ConnectEventType | WalletEventType | SwapEventType | BridgeEventType | SmartEventType,
   data: T;
 };

@@ -204,6 +204,19 @@ export function ConnectLoader({
           return;
         }
 
+        if (!provider && walletProvider && !passport) {
+          const createProviderResult = await checkout.createProvider({
+            walletProvider,
+          });
+          connectLoaderDispatch({
+            payload: {
+              type: ConnectLoaderActions.SET_PROVIDER,
+              provider: createProviderResult.provider,
+            },
+          });
+          return;
+        }
+
         if (!provider) {
           connectLoaderDispatch({
             payload: {

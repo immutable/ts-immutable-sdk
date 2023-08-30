@@ -8,6 +8,7 @@ import BridgeWebView from './widgets/bridge/BridgeWebView';
 import WalletWebView from './widgets/wallet/WalletWebView';
 
 import './build';
+import SmartWebView from './widgets/smart-checkout/SmartWebView';
 
 function App() {
   return (
@@ -28,6 +29,10 @@ function App() {
       <br />
       <h2>
         <a href="/bridge">Bridge Widget</a>
+      </h2>
+      <br />
+      <h2>
+        <a href="/smart-checkout">SmartCheckout Widget</a>
       </h2>
       <br />
     </div>
@@ -54,6 +59,10 @@ const router = createBrowserRouter([
   {
     path: '/wallet',
     element: <WalletWebView />,
+  },
+  {
+    path: '/smart-checkout',
+    element: <SmartWebView />,
   },
 ]);
 

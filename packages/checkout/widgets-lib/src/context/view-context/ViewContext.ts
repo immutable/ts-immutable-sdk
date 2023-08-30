@@ -4,6 +4,7 @@ import { WalletWidgetView } from './WalletViewContextTypes';
 import { PrefilledSwapForm, SwapWidgetView } from './SwapViewContextTypes';
 import { BridgeWidgetView, PrefilledBridgeForm } from './BridgeViewContextTypes';
 import { ViewType } from './ViewType';
+import { SmartWidgetView } from './SwapViewContextType';
 
 export enum SharedViews {
   LOADING_VIEW = 'LOADING_VIEW',
@@ -36,7 +37,8 @@ export type View =
   | ConnectWidgetView
   | WalletWidgetView
   | SwapWidgetView
-  | BridgeWidgetView;
+  | BridgeWidgetView
+  | SmartWidgetView;
 
 export interface ViewState {
   view: View;
