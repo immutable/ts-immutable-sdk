@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - @imtbl/erc721: renamed from @imtbl/erc721-hybrid-permissioned-mintable. Renamed various mint methods to match with preset methods released in zkevm-contracts v1.0.8. Added `safeBurn` and `safeBurnBatch` methods released in zkevm-contracts v1.1.0
 - @imtbl/erc721-mint-by-id: renamed from @imtbl/erc721-permissioned-mintable. Added `safeBurn` and `safeBurnBatch` methods released in zkevm-contracts v1.1.0 
 
+### Changed
+
+- All SDK modules marked as `prod`.
+
 ### Fixed
 
 - @imtbl/immutablex-client: Some request/response types were not being exported.
