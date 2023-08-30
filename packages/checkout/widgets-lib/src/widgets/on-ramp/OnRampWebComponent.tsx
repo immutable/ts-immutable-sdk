@@ -61,6 +61,7 @@ export class ImmutableOnRamp extends ImmutableWebComponent {
     const params: OnRampWidgetParams = {
       amount: this.amount,
       contractAddress: this.contractAddress,
+      passport: this.passport,
     };
 
     if (!this.reactRoot) {

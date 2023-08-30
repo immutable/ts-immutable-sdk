@@ -4,6 +4,7 @@ import {
   useContext, useEffect, useMemo, useReducer, useState,
 } from 'react';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
+import { Passport, UserProfile } from '@imtbl/passport';
 import { WidgetTheme } from '../../lib';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
@@ -30,10 +31,12 @@ export interface OnRampWidgetProps {
 export interface OnRampWidgetParams {
   amount?: string;
   contractAddress?: string;
+  passport?: Passport;
 }
 
 export function OnRampWidget(props: OnRampWidgetProps) {
-  const { config } = props;
+  const { config, params } = props;
+  const { passport } = params;
   const {
     environment, theme, isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
   } = config;
@@ -44,6 +47,7 @@ export function OnRampWidget(props: OnRampWidgetProps) {
   const { checkout, provider } = connectLoaderState;
   const [walletAddress, setWalletAddress] = useState('');
   const [isPassport, setIsPassport] = useState(false);
+  const [emailAddress, setEmailAddress] = useState<string | undefined>(undefined);
 
   const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
@@ -59,8 +63,10 @@ export function OnRampWidget(props: OnRampWidgetProps) {
       setWalletAddress(userWalletAddress);
       const isPassportUser = isPassportProvider(provider);
       setIsPassport(isPassportUser);
-      if (isPassportUser) {
-        console.log('set email address here and add it to track()');
+      let userInfo:UserProfile | undefined;
+      if (isPassportUser && passport) {
+        userInfo = await passport.getUserInfo();
+        setEmailAddress(userInfo?.email);
       }
 
       track({
@@ -71,7 +77,7 @@ export function OnRampWidget(props: OnRampWidgetProps) {
         action: 'Opened',
         userId: userWalletAddress,
         isPassportWallet: isPassportUser,
-        email: 'userEmail@emailDomain.com',
+        email: userInfo?.email,
       });
     };
     setDataFromProvider();
@@ -107,7 +113,12 @@ export function OnRampWidget(props: OnRampWidgetProps) {
           <LoadingView loadingText={initialLoadingText} showFooterLogo />
         )}
         {viewState.view.type === OnRampWidgetViews.ONRAMP && (
-          <OnRampMain environment={environment} walletAddress={walletAddress} isPassport={isPassport} />
+          <OnRampMain
+            environment={environment}
+            walletAddress={walletAddress}
+            isPassport={isPassport}
+            email={emailAddress}
+          />
         )}
         {viewState.view.type === SharedViews.TOP_UP_VIEW && (
           <TopUpView
