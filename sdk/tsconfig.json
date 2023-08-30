@@ -2,11 +2,12 @@
   "compilerOptions": {
     "baseUrl": "./src",
     "outDir": "./dist",
-    "rootDirs": ["src"],
+    "rootDirs": [
+      "src"
+    ],
     "target": "es2022",
     "module": "esnext",
-    "moduleResolution": "node",
-    "noEmit": true,
+    "moduleResolution": "Bundler",
     "allowJs": false,
     "removeComments": false,
     "strict": true,
@@ -17,11 +18,56 @@
     "resolveJsonModule": true,
     "skipLibCheck": true
   },
-  "include": ["src"],
+  "include": [
+    "src"
+  ],
   "exclude": [
     "node_modules",
+    "scripts",
     "dist",
-    "src/modules/provider/sample-app",
-    "src/modules/checkout"
+  ],
+  "references": [
+    {
+      "path": "../packages/blockchain-data/sdk"
+    },
+    {
+      "path": "../packages/checkout/sdk"
+    },
+    {
+      "path": "../packages/checkout/widgets"
+    },
+    {
+      "path": "../packages/config"
+    },
+    {
+      "path": "../packages/internal/cryptofiat"
+    },
+    {
+      "path": "../packages/erc20"
+    },
+    {
+      "path": "../packages/erc721"
+    },
+    {
+      "path": "../packages/erc721-mint-by-id"
+    },
+    {
+      "path": "../packages/internal/generated-clients"
+    },
+    {
+      "path": "../packages/internal/guardian"
+    },
+    {
+      "path": "../packages/immutablex_client"
+    },
+    {
+      "path": "../packages/orderbook"
+    },
+    {
+      "path": "../packages/passport/sdk"
+    },
+    {
+      "path": "../packages/provider"
+    }
   ]
 }

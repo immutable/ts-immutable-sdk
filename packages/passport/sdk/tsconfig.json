@@ -2,11 +2,13 @@
   "compilerOptions": {
     "baseUrl": "./src",
     "outDir": "./dist",
-    "rootDirs": ["src"],
+    "rootDirs": [
+      "src"
+    ],
     "target": "es2022",
     "module": "esnext",
     "moduleResolution": "node",
-    "noEmit": true,
+    "composite": true,
     "allowJs": false,
     "removeComments": false,
     "strict": true,
@@ -17,11 +19,34 @@
     "resolveJsonModule": true,
     "skipLibCheck": true
   },
-  "include": ["src", "src/types.ts"],
+  "include": [
+    "src",
+    "src/types.ts"
+  ],
   "exclude": [
     "node_modules",
     "dist",
     "src/modules/provider/sample-app",
     "src/modules/checkout"
+  ],
+  "references": [
+    {
+      "path": "../../config"
+    },
+    {
+      "path": "../../internal/generated-clients"
+    },
+    {
+      "path": "../../internal/guardian"
+    },
+    {
+      "path": "../../immutablex_client"
+    },
+    {
+      "path": "../../provider"
+    },
+    {
+      "path": "../../internal/toolkit"
+    }
   ]
 }

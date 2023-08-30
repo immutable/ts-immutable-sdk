@@ -15,6 +15,12 @@
     "baseUrl": "./",
     "esModuleInterop": true
   },
-  "include": ["./src/**/*"],
-  "exclude": ["node_modules", "**/*.test.ts"]
+  "include": [
+    "./src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/*.test.ts"
+  ],
+  "references": []
 }

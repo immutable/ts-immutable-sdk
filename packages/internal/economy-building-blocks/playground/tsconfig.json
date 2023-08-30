@@ -22,5 +22,16 @@
   },
   "include": [
     "src"
+  ],
+  "references": [
+    {
+      "path": "../../../blockchain-data/sdk"
+    },
+    {
+      "path": "../../../passport/sdk"
+    },
+    {
+      "path": "../../../../sdk"
+    }
   ]
 }

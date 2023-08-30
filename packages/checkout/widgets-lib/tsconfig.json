@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "es2022",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -18,5 +22,31 @@
     "noImplicitAny": false,
     "experimentalDecorators": true
   },
-  "include": ["src", "babel.config.js"]
+  "include": [
+    "src",
+    "babel.config.js"
+  ],
+  "references": [
+    {
+      "path": "../../internal/bridge/sdk"
+    },
+    {
+      "path": "../sdk"
+    },
+    {
+      "path": "../widgets"
+    },
+    {
+      "path": "../../config"
+    },
+    {
+      "path": "../../internal/cryptofiat"
+    },
+    {
+      "path": "../../internal/dex/sdk"
+    },
+    {
+      "path": "../../passport/sdk"
+    }
+  ]
 }
