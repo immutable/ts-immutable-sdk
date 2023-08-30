@@ -259,6 +259,9 @@ export const text = {
       actionText: 'Dismiss',
     },
     [OnRampWidgetViews.ONRAMP]: {
+      header: {
+        title: 'Add coins',
+      },
       initialLoadingText: 'Taking you to Transak',
     },
     [SharedViews.TOP_UP_VIEW]: {
