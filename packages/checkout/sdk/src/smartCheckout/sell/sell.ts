@@ -1,16 +1,18 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
+import { Web3Provider } from '@ethersproject/providers';
 import {
-  Action,
-  ActionType,
-  ERC20Item, NativeItem, Orderbook, PrepareListingResponse, SignablePurpose, TransactionPurpose, constants,
+  ERC20Item,
+  NativeItem,
+  Orderbook,
+  PrepareListingResponse,
+  constants,
 } from '@imtbl/orderbook';
 import { BigNumber } from 'ethers';
 import { BuyToken, SellResult } from '../../types/sell';
 import {
   ERC721Item,
   GasTokenType,
-  IMX_ADDRESS_ZKEVM, ItemType, TokenInfo, TransactionOrGasType,
+  ItemType,
+  TransactionOrGasType,
 } from '../../types';
 import * as instance from '../../instance';
 import { CheckoutConfiguration } from '../../config';
@@ -28,24 +30,20 @@ export const getERC721Requirement = (
   spenderAddress,
 });
 
-export const getBuyToken = (
-  token: TokenInfo,
-  amount: string,
+export const getBuy = (
+  buyToken: BuyToken,
 ): ERC20Item | NativeItem => {
-  if (
-    token.address === IMX_ADDRESS_ZKEVM
-    || token.address === ''
-    || token.address === undefined) {
+  if (buyToken.type === ItemType.NATIVE) {
     return {
       type: ItemType.NATIVE,
-      amount,
+      amount: buyToken.amount.toString(),
     };
   }
 
   return {
     type: ItemType.ERC20,
-    amount,
-    contractAddress: token.address,
+    amount: buyToken.amount.toString(),
+    contractAddress: buyToken.contractAddress,
   };
 };
 
@@ -68,7 +66,7 @@ export const sell = async (
     spenderAddress = seaportContractAddress;
     listing = await orderbook.prepareListing({
       makerAddress: walletAddress,
-      buy: buyToken,
+      buy: getBuy(buyToken),
       sell: {
         type: ItemType.ERC721,
         contractAddress,

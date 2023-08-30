@@ -4,6 +4,7 @@ import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
 import { Box, FormControl, Select, TextInput, Option, Button, OptionKey } from '@biom3/react';
+import { BigNumber } from 'ethers';
 
 interface SellProps {
   checkout: Checkout;
@@ -30,12 +31,12 @@ export default function Sell({ checkout, provider }: SellProps) {
     if (listingType === ItemType.NATIVE) {
       return {
         type: ItemType.NATIVE,
-        amount,
+        amount: BigNumber.from(amount).mul(BigNumber.from(10).pow(18)),
       }
     }
     return {
       type: ItemType.ERC20,
-      amount,
+      amount: BigNumber.from(amount).mul(BigNumber.from(10).pow(18)),
       contractAddress,
     };
   }
@@ -105,7 +106,8 @@ export default function Sell({ checkout, provider }: SellProps) {
   }
 
   const updateAmount = (event: any) => {
-    setAmount(event.target.value);
+    const value = event.target.value;
+    setAmount(value.split('.')[0]);
     setAmountError('');
   }
 
