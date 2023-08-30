@@ -15,8 +15,8 @@ import { getNetworkInfo } from '../network';
 import { getTokenAllowList } from '../tokens';
 import { CheckoutConfiguration } from '../config';
 import {
-  Blockscout as Indexer,
-  BlockscoutTokenType as IndexerTokenType,
+  Blockscout,
+  BlockscoutTokenType,
 } from '../client';
 
 export const getBalance = async (
@@ -92,8 +92,8 @@ export const getIndexerBalance = async (
 ): Promise<GetAllBalancesResult> => {
   const mapRename = Object.assign({}, ...(rename.map((t) => ({ [t.address || '']: t }))));
 
-  const client = new Indexer({ chainId });
-  const tokenType = [IndexerTokenType.ERC20];
+  const client = new Blockscout({ chainId });
+  const tokenType = [BlockscoutTokenType.ERC20];
 
   // Hold the items in an array for post-fetching processing
   const items = [];
@@ -178,7 +178,7 @@ export const getAllBalances = async (
   // let's use the Indexer if available for the
   // given chain.
   const flag = (await config.remote.getTokensConfig(chainId)).blockscout || false;
-  if (flag && Indexer.isChainSupported(chainId)) {
+  if (flag && Blockscout.isChainSupported(chainId)) {
     return await getIndexerBalance(walletAddress, chainId, tokens);
   }
 
