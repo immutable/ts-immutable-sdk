@@ -4,7 +4,7 @@ export default function App() {
   return (
     <>
       <MenuItem
-        renderContainer={(props) => <a {...props} href="/connect" />}
+        rc={<a href="/connect" />}
         emphasized
         size="medium"
       >
@@ -18,7 +18,7 @@ export default function App() {
         </MenuItem.Caption>
       </MenuItem>
       <MenuItem
-        renderContainer={(props) => <a {...props} href="/smart-checkout" />}
+        rc={<a href="/smart-checkout" />}
         emphasized
         size="medium"
       >

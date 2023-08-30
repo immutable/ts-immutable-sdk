@@ -66,6 +66,7 @@
     "react/react-in-jsx-scope": ["off"],
     "jsx-a11y/anchor-is-valid": "off",
     "jsx-a11y/anchor-has-content": "off",
+    "jsx-a11y/control-has-associated-label": "off",
     "react/jsx-props-no-spreading": "off",
   }
 }

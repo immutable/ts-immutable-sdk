@@ -23,8 +23,16 @@ const PASSPORT_FUNCTIONS = {
   checkStoredCredentials: 'checkStoredCredentials',
   logout: 'logout',
   getEmail: 'getEmail',
-  imxTransfer: 'imxTransfer',
-  imxBatchNftTransfer: 'imxBatchNftTransfer',
+  imx: {
+    transfer: 'imxTransfer',
+    batchNftTransfer: 'imxBatchNftTransfer',
+  },
+  zkEvm: {
+    connectEvm: 'connectEvm',
+    sendTransaction: 'zkEvmSendTransaction',
+    requestAccounts: 'zkEvmRequestAccounts',
+    getBalance: 'zkEvmGetBalance',
+  },
 };
 
 // To notify game engine that this file is loaded
@@ -33,6 +41,7 @@ const initRequestId = '1';
 
 let passportClient: passport.Passport;
 let providerInstance: provider.IMXProvider;
+let zkEvmProviderInstance: passport.Provider;
 
 declare global {
   interface Window {
@@ -66,6 +75,16 @@ const setProvider = (passportProvider: provider.IMXProvider | null): boolean => 
     return true;
   }
   console.log('No IMX provider');
+  return false;
+};
+
+const setZkEvmProvider = (zkEvmProvider: passport.Provider | null): boolean => {
+  if (zkEvmProvider !== null && zkEvmProvider !== undefined) {
+    zkEvmProviderInstance = zkEvmProvider;
+    console.log('ZkEvm provider set');
+    return true;
+  }
+  console.log('No ZkEvm provider');
   return false;
 };
 
@@ -132,11 +151,11 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
       case PASSPORT_FUNCTIONS.connectPKCE: {
         const request = JSON.parse(data);
         const passportProvider = await passportClient?.connectImxPKCEFlow(request.authorizationCode, request.state);
-        setProvider(passportProvider);
+        const success = setProvider(passportProvider);
         callbackToGame({
           responseFor: fxName,
           requestId,
-          success: true,
+          success,
         });
         break;
       }
@@ -147,11 +166,11 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
           request.interval,
           request.timeoutMs ?? null,
         );
-        setProvider(passportProvider);
+        const success = setProvider(passportProvider);
         callbackToGame({
           responseFor: fxName,
           requestId,
-          success: true,
+          success,
         });
         break;
       }
@@ -167,6 +186,16 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
         });
         /* eslint-enable @typescript-eslint/naming-convention */
         const success = setProvider(passportProvider);
+        callbackToGame({
+          responseFor: fxName,
+          requestId,
+          success,
+        });
+        break;
+      }
+      case PASSPORT_FUNCTIONS.zkEvm.connectEvm: {
+        const zkEvmProvider = passportClient?.connectEvm();
+        const success = setZkEvmProvider(zkEvmProvider);
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -217,7 +246,7 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
         });
         break;
       }
-      case PASSPORT_FUNCTIONS.imxTransfer: {
+      case PASSPORT_FUNCTIONS.imx.transfer: {
         const unsignedTransferRequest = JSON.parse(data);
         const response = await providerInstance?.transfer(unsignedTransferRequest);
         callbackToGame({
@@ -226,21 +255,61 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
             requestId,
             success: response !== null && response !== undefined,
           },
-          ...response
+          ...response,
         });
         break;
       }
-      case PASSPORT_FUNCTIONS.imxBatchNftTransfer: {
+      case PASSPORT_FUNCTIONS.imx.batchNftTransfer: {
         const nftTransferDetails = JSON.parse(data);
-        const response = await providerInstance?.batchNftTransfer(nftTransferDetails)
+        const response = await providerInstance?.batchNftTransfer(nftTransferDetails);
         callbackToGame({
           ...{
             responseFor: fxName,
             requestId,
             success: response !== null && response !== undefined,
-            result: response
+            result: response,
           },
-          ...response
+          ...response,
+        });
+        break;
+      }
+      case PASSPORT_FUNCTIONS.zkEvm.sendTransaction: {
+        const transaction = JSON.parse(data);
+        const transactionHash = await zkEvmProviderInstance.request({
+          method: 'eth_sendTransaction',
+          params: [transaction],
+        });
+        callbackToGame({
+          responseFor: fxName,
+          requestId,
+          success: true,
+          result: transactionHash,
+        });
+        break;
+      }
+      case PASSPORT_FUNCTIONS.zkEvm.requestAccounts: {
+        const result = await zkEvmProviderInstance.request({
+          method: 'eth_requestAccounts',
+        });
+        callbackToGame({
+          responseFor: fxName,
+          requestId,
+          success: true,
+          accounts: result,
+        });
+        break;
+      }
+      case PASSPORT_FUNCTIONS.zkEvm.getBalance: {
+        const request = JSON.parse(data);
+        const result = await zkEvmProviderInstance.request({
+          method: 'eth_getBalance',
+          params: [request.address, request.blockNumberOrTag],
+        });
+        callbackToGame({
+          responseFor: fxName,
+          requestId,
+          success: true,
+          result,
         });
         break;
       }
