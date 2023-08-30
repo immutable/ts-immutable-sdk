@@ -85,25 +85,31 @@ export async function getERC20Balance(
   );
 }
 
+// Blockscout client singleton
+let bcs: Blockscout;
+
 export const getIndexerBalance = async (
   walletAddress: string,
   chainId: ChainId,
   rename: TokenInfo[],
 ): Promise<GetAllBalancesResult> => {
+  // Shuffle the mapping of the tokens configuration so it is a hashmap
+  // for faster access to tokens config objects.
   const mapRename = Object.assign({}, ...(rename.map((t) => ({ [t.address || '']: t }))));
 
-  const client = new Blockscout({ chainId });
-  const tokenType = [BlockscoutTokenType.ERC20];
+  // Ensure singleton is present and match the selected chain
+  if (!bcs || bcs.chainId !== chainId) bcs = new Blockscout({ chainId });
 
   // Hold the items in an array for post-fetching processing
   const items = [];
 
+  const tokenType = [BlockscoutTokenType.ERC20];
   // Given that the widgets aren't yet designed to support pagination,
   // fetch all the possible tokens associated to a given wallet address.
   let resp;
   do {
     // eslint-disable-next-line no-await-in-loop
-    resp = await client.getAddressTokens({ walletAddress, tokenType, nextPage: resp?.next_page_params });
+    resp = await bcs.getAddressTokens({ walletAddress, tokenType, nextPage: resp?.next_page_params });
     items.push(...resp.items);
   } while (resp.next_page_params);
 

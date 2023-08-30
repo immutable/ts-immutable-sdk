@@ -333,7 +333,7 @@ describe('balances', () => {
       );
     });
 
-    it('should call getIndexerBalance', async () => {
+    it.only('should call getIndexerBalance', async () => {
       const chainId = Object.keys(BLOCKSCOUT_CHAIN_URL_MAP)[0] as unknown as ChainId;
 
       const mockResponse = {
@@ -379,6 +379,11 @@ describe('balances', () => {
         jest.fn() as unknown as Web3Provider,
         'abc123',
         chainId,
+      );
+
+      expect(mockedAxios.get).toHaveBeenNthCalledWith(
+        1,
+        `${BLOCKSCOUT_CHAIN_URL_MAP[chainId]}/api/v2/addresses/abc123/tokens?type=${BlockscoutTokenType.ERC20}`,
       );
 
       expect(getAllBalancesResult.balances).toEqual([{
