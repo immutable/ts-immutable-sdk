@@ -45,7 +45,7 @@ export function WalletItem(props: WalletProps) {
           <MenuItem.IntentIcon />
           <MenuItem.Caption>
             {wallet.walletProvider === WalletProviderName.PASSPORT ? (
-              <Box as="span" sx={{ c: 'base.gradient.1' }}>
+              <Box rc={<span />} sx={{ c: 'base.gradient.1' }}>
                 {wallets[wallet.walletProvider].accentText}
               </Box>
             ) : null}

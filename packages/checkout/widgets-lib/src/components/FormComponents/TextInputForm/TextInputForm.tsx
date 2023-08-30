@@ -60,6 +60,7 @@ export function TextInputForm({
       subtext={errorMessage ? undefined : subtext}
       isErrored={!!errorMessage}
       errorMessage={errorMessage}
+      sx={{ width: '100%' }}
     >
       <TextInput
         id={`${id}-text`}
