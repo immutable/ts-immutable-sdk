@@ -5,6 +5,7 @@
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "devDependencies": {
+    "@imtbl/contracts": "0.0.0",
     "@rollup/plugin-typescript": "^11.0.0",
     "@swc/jest": "^0.2.24",
     "@typechain/ethers-v5": "^10.2.0",
