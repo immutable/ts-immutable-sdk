@@ -151,3 +151,22 @@ export interface ImtblPrimaryRevenueProps
   amount?: string;
   fromContractAddress?: string;
 }
+
+/**
+ * Interface for the properties of a bridge web component.
+ * Extends the React.DetailedHTMLProps interface to inherit HTML attributes for the component's root element.
+ * @interface ImtblOnRampProps
+ * @extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>
+ * @property {string | undefined} walletProvider - The preferred wallet provider to connect to.
+ * @property {string | undefined} widgetConfig - The configuration for the bridge widget.
+ * @property {string | undefined} amount - The amount to onramp.
+ */
+export interface ImtblOnRampProps
+  extends React.DetailedHTMLProps<
+  React.HTMLAttributes<HTMLElement>,
+  HTMLElement
+  > {
+  walletProvider?: string;
+  widgetConfig?: string;
+  amount?: string;
+}

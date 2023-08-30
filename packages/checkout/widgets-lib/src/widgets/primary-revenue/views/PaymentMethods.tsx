@@ -38,7 +38,7 @@ export function PaymentMethods(props: PaymentMethodsProps) {
         const hasEnoughBalance = await checkBalances();
 
         // FIXME: best way to handle conditional routing?
-        if (!hasEnoughBalance) {
+        if (!hasEnoughBalance && type === PrimaryRevenueWidgetViews.PAY_WITH_CRYPTO) {
           viewDispatch({
             payload: {
               type: ViewActions.UPDATE_VIEW,
