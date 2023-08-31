@@ -5,6 +5,7 @@ export * from './definitions/events/events';
 export * from './definitions/events/connectEvents';
 export * from './definitions/events/walletEvents';
 export * from './definitions/events/swapEvents';
+export * from './definitions/events/primaryRevenueEvents';
 export * from './definitions/events/bridgeEvents';
 export * from './definitions/events/orchestrationEvents';
 
