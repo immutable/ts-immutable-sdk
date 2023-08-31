@@ -4,6 +4,7 @@
 import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
 import { BigNumber, ethers } from 'ethers';
+import { Passport, UserProfile } from '@imtbl/passport';
 import { getNetworkAllowList, getNetworkInfo, switchWalletNetwork } from './network';
 
 import { Checkout } from './Checkout';
@@ -22,6 +23,9 @@ import {
   ItemType,
   TransactionOrGasType,
   SmartCheckoutParams,
+  NetworkInfo,
+  GetTokenAllowListResult,
+  TokenInfo,
 } from './types';
 import { getAllBalances, getBalance, getERC20Balance } from './balances';
 import { sendTransaction } from './transaction';
@@ -34,6 +38,8 @@ import { getTokenAllowList } from './tokens';
 import { getWalletAllowList } from './wallet';
 import { buy } from './smartCheckout/buy';
 import { smartCheckout } from './smartCheckout';
+import { CryptoFiatExchangeService } from './cryptoFiatExchange';
+import { CryptoFiatExchangeParams, ExchangeType, OnRampProvider } from './types/cryptoFiatExchange';
 
 jest.mock('./connect');
 jest.mock('./network');
@@ -46,6 +52,7 @@ jest.mock('./tokens');
 jest.mock('./wallet');
 jest.mock('./smartCheckout/buy');
 jest.mock('./smartCheckout');
+jest.mock('./cryptoFiatExchange');
 
 describe('Connect', () => {
   let providerMock: ExternalProvider;
@@ -543,5 +550,168 @@ describe('Connect', () => {
     (isWeb3Provider as jest.Mock).mockResolvedValue(true);
     const result = await Checkout.isWeb3Provider(new Web3Provider(providerMock, ChainId.ETHEREUM));
     expect(result).toBeTruthy();
+  });
+
+  describe('createCryptoFiatExchangeUrl', () => {
+    let createWidgetUrlMock: jest.Mock;
+    let checkout: Checkout;
+    let mockProvider: Web3Provider;
+    let networkInfoResult: NetworkInfo;
+    let getTokenAllowListResult: GetTokenAllowListResult;
+
+    const defaultWidgetUrl = 'https://global-stg.transak.com?apiKey=41ad2da7-ed5a-4d89-a90b-c751865effc2'
+      + '&network=immutablezkevm&defaultPaymentMethod=credit_debit_card&disablePaymentMethods='
+      + 'sepa_bank_transfer,gbp_bank_transfer,pm_cash_app,pm_jwire,pm_paymaya,pm_bpi,pm_ubp,pm_grabpay,'
+      + 'pm_shopeepay,pm_gcash,pm_pix,pm_astropay,pm_pse,inr_bank_transfer&productsAvailed=buy'
+      + '&exchangeScreenTitle=Buy&themeColor=0D0D0D';
+
+    beforeEach(() => {
+      createWidgetUrlMock = jest.fn().mockResolvedValue(defaultWidgetUrl);
+      (CryptoFiatExchangeService as jest.Mock).mockReturnValue({
+        createWidgetUrl: createWidgetUrlMock,
+      });
+
+      mockProvider = {
+        getSigner: jest.fn().mockReturnValue({
+          getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
+        }),
+        network: {
+          chainId: ChainId.ETHEREUM,
+        },
+      } as unknown as Web3Provider;
+
+      networkInfoResult = {
+        name: ChainName.ETHEREUM,
+        chainId: ChainId.ETHEREUM,
+        nativeCurrency: {
+          name: 'ETHEREUM',
+          symbol: 'ETH',
+          decimals: 18,
+        },
+        isSupported: true,
+      };
+      (getNetworkInfo as jest.Mock).mockResolvedValue(networkInfoResult);
+
+      getTokenAllowListResult = {
+        tokens: [],
+      };
+      (getTokenAllowList as jest.Mock).mockResolvedValue(getTokenAllowListResult);
+
+      checkout = new Checkout({
+        baseConfig: { environment: Environment.PRODUCTION },
+      });
+    });
+
+    it(`should call cryptoFiatExchangeService.createWidgetUrl with correct params
+      when only onRampProvider, exchangeType and web3Provider are provided`, async () => {
+      const params: CryptoFiatExchangeParams = {
+        onRampProvider: OnRampProvider.TRANSAK,
+        exchangeType: ExchangeType.ONRAMP,
+        web3Provider: mockProvider,
+      };
+
+      await checkout.createCryptoFiatExchangeUrl(params);
+
+      expect(createWidgetUrlMock).toBeCalledTimes(1);
+      expect(createWidgetUrlMock).toBeCalledWith({
+        onRampProvider: OnRampProvider.TRANSAK,
+        exchangeType: ExchangeType.ONRAMP,
+        isPassport: false,
+        walletAddress: '0xADDRESS',
+        tokenAmount: undefined,
+        tokenSymbol: 'IMX',
+        email: undefined,
+      });
+    });
+
+    it(`should call cryptoFiatExchangeService.createWidgetUrl with correct params
+      when tokenAmount and tokenSymbol are provided`, async () => {
+      getTokenAllowListResult = {
+        tokens: [
+          {
+            name: 'Immutable X',
+            address: '0xaddr',
+            symbol: 'IMX',
+            decimals: 18,
+          } as TokenInfo,
+          {
+            name: 'Ethereum',
+            address: '0xethAddr',
+            symbol: 'ETH',
+            decimals: 18,
+          } as TokenInfo,
+          {
+            name: 'Matic',
+            address: '0xmaticAddr',
+            symbol: 'MATIC',
+            decimals: '18',
+          },
+        ],
+      } as GetTokenAllowListResult;
+      (getTokenAllowList as jest.Mock).mockResolvedValue(getTokenAllowListResult);
+
+      const params: CryptoFiatExchangeParams = {
+        onRampProvider: OnRampProvider.TRANSAK,
+        exchangeType: ExchangeType.ONRAMP,
+        web3Provider: mockProvider,
+        tokenAmount: BigNumber.from(10),
+        tokenAddress: '0xethAddr',
+      };
+
+      await checkout.createCryptoFiatExchangeUrl(params);
+
+      expect(createWidgetUrlMock).toBeCalledTimes(1);
+      expect(createWidgetUrlMock).toBeCalledWith({
+        onRampProvider: OnRampProvider.TRANSAK,
+        exchangeType: ExchangeType.ONRAMP,
+        isPassport: false,
+        walletAddress: '0xADDRESS',
+        tokenAmount: undefined,
+        tokenSymbol: 'ETH',
+        email: undefined,
+      });
+    });
+
+    it(`should call cryptoFiatExchangeService.createWidgetUrl with correct params
+      when passport is provided`, async () => {
+      mockProvider = {
+        getSigner: jest.fn().mockReturnValue({
+          getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
+        }),
+        network: {
+          chainId: ChainId.ETHEREUM,
+        },
+        provider: {
+          isPassport: true,
+        },
+      } as unknown as Web3Provider;
+      const mockUser: UserProfile = {
+        sub: 'email|123',
+        email: 'passport.user@immutable.com',
+      };
+      const mockPassport = {
+        getUserInfo: jest.fn().mockResolvedValue(mockUser),
+      } as unknown as Passport;
+
+      const params: CryptoFiatExchangeParams = {
+        onRampProvider: OnRampProvider.TRANSAK,
+        exchangeType: ExchangeType.ONRAMP,
+        web3Provider: mockProvider,
+        passport: mockPassport,
+      };
+
+      await checkout.createCryptoFiatExchangeUrl(params);
+
+      expect(createWidgetUrlMock).toBeCalledTimes(1);
+      expect(createWidgetUrlMock).toBeCalledWith({
+        onRampProvider: OnRampProvider.TRANSAK,
+        exchangeType: ExchangeType.ONRAMP,
+        isPassport: true,
+        walletAddress: '0xADDRESS',
+        tokenAmount: undefined,
+        tokenSymbol: 'IMX',
+        email: mockUser.email,
+      });
+    });
   });
 });
