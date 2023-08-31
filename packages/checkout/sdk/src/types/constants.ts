@@ -18,6 +18,10 @@ export const CHECKOUT_API_BASE_URL = {
   [Environment.PRODUCTION]: 'https://checkout-api.immutable.com',
 };
 
+export const BLOCKSCOUT_CHAIN_URL_MAP: { [key: string]: string } = {
+  [ChainId.IMTBL_ZKEVM_TESTNET]: 'https://explorer.testnet.immutable.com',
+};
+
 type NetworkDetails = {
   chainIdHex: string;
   chainName: string;
