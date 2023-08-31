@@ -8,6 +8,7 @@ import { GasTokenType, ItemType, TransactionOrGasType } from '../../types';
 import { smartCheckout } from '../smartCheckout';
 import { createOrderbookInstance } from '../../instance';
 import { BuyToken } from '../../types/sell';
+import { CheckoutErrorType } from '../../errors';
 
 jest.mock('../../instance');
 jest.mock('../smartCheckout');
@@ -140,6 +141,74 @@ describe('sell', () => {
           },
         },
       );
+    });
+
+    it('should throw error if prepare listing fails', async () => {
+      const id = '0';
+      const contractAddress = '0xERC721';
+
+      const erc721TransactionRequirement = {
+        type: ItemType.ERC721,
+        sufficient: true,
+        required: {
+          type: ItemType.ERC721,
+          balance: BigNumber.from(1),
+          formattedBalance: '1',
+          contractAddress: '0xab8bb5bc4FB1Cfc060f77f87B558c98abDa65130',
+          id: '0',
+        },
+        current: {
+          type: ItemType.ERC721,
+          balance: BigNumber.from(1),
+          formattedBalance: '1',
+          contractAddress: '0xab8bb5bc4FB1Cfc060f77f87B558c98abDa65130',
+          id: '0',
+        },
+        delta: {
+          balance: BigNumber.from(0),
+          formattedBalance: '0',
+        },
+      };
+
+      (smartCheckout as jest.Mock).mockResolvedValue({
+        sufficient: true,
+        transactionRequirements: [
+          erc721TransactionRequirement,
+        ],
+      });
+      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+        config: jest.fn().mockReturnValue({
+          seaportContractAddress,
+        }),
+        prepareListing: jest.fn().mockRejectedValue(new Error('error from orderbook')),
+      });
+
+      let message;
+      let type;
+      let data;
+
+      try {
+        await sell(
+          config,
+          mockProvider,
+          id,
+          contractAddress,
+          {
+            type: ItemType.NATIVE,
+            amount: BigNumber.from(1),
+          },
+        );
+      } catch (err: any) {
+        message = err.message;
+        type = err.type;
+        data = err.data;
+      }
+
+      expect(message).toEqual('An error occurred while preparing the listing');
+      expect(type).toEqual(CheckoutErrorType.PREPARE_LISTING_ERROR);
+      expect(data).toEqual({ message: 'error from orderbook' });
+
+      expect(smartCheckout).toBeCalledTimes(0);
     });
   });
 

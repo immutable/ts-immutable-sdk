@@ -75,8 +75,8 @@ export const sell = async (
     });
   } catch (err: any) {
     throw new CheckoutError(
-      'An error occurred while fulfilling the listing',
-      CheckoutErrorType.GET_ORDER_LISTING_ERROR,
+      'An error occurred while preparing the listing',
+      CheckoutErrorType.PREPARE_LISTING_ERROR,
       {
         message: err.message,
       },
