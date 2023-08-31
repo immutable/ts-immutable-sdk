@@ -72,21 +72,6 @@ describe('sell', () => {
         ],
       });
       (createOrderbookInstance as jest.Mock).mockResolvedValue({
-        getListing: jest.fn().mockResolvedValue({
-          result: {
-            buy: [
-              {
-                type: 'NATIVE',
-                amount: '1',
-              },
-            ],
-            fees: [
-              {
-                amount: '1',
-              },
-            ],
-          },
-        }),
         config: jest.fn().mockReturnValue({
           seaportContractAddress,
         }),
@@ -147,35 +132,6 @@ describe('sell', () => {
       const id = '0';
       const contractAddress = '0xERC721';
 
-      const erc721TransactionRequirement = {
-        type: ItemType.ERC721,
-        sufficient: true,
-        required: {
-          type: ItemType.ERC721,
-          balance: BigNumber.from(1),
-          formattedBalance: '1',
-          contractAddress: '0xab8bb5bc4FB1Cfc060f77f87B558c98abDa65130',
-          id: '0',
-        },
-        current: {
-          type: ItemType.ERC721,
-          balance: BigNumber.from(1),
-          formattedBalance: '1',
-          contractAddress: '0xab8bb5bc4FB1Cfc060f77f87B558c98abDa65130',
-          id: '0',
-        },
-        delta: {
-          balance: BigNumber.from(0),
-          formattedBalance: '0',
-        },
-      };
-
-      (smartCheckout as jest.Mock).mockResolvedValue({
-        sufficient: true,
-        transactionRequirements: [
-          erc721TransactionRequirement,
-        ],
-      });
       (createOrderbookInstance as jest.Mock).mockResolvedValue({
         config: jest.fn().mockReturnValue({
           seaportContractAddress,
@@ -206,7 +162,72 @@ describe('sell', () => {
 
       expect(message).toEqual('An error occurred while preparing the listing');
       expect(type).toEqual(CheckoutErrorType.PREPARE_ORDER_LISTING_ERROR);
-      expect(data).toEqual({ message: 'error from orderbook' });
+      expect(data).toEqual({
+        message: 'error from orderbook',
+        id,
+        collectionAddress: contractAddress,
+      });
+
+      expect(smartCheckout).toBeCalledTimes(0);
+    });
+
+    it('should throw error if getSigner call errors', async () => {
+      const id = '0';
+      const contractAddress = '0xERC721';
+
+      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+        config: jest.fn().mockReturnValue({
+          seaportContractAddress,
+        }),
+        prepareListing: jest.fn().mockReturnValue({
+          actions: [
+            {
+              type: ActionType.SIGNABLE,
+              purpose: SignablePurpose.CREATE_LISTING,
+              message: {
+                domain: '',
+                types: '',
+                value: '',
+              },
+            },
+          ],
+        }),
+      });
+
+      const rejectedProvider = {
+        getSigner: jest.fn().mockReturnValue({
+          getAddress: jest.fn().mockRejectedValue(new Error('error from provider')),
+        }),
+      } as unknown as Web3Provider;
+
+      let message;
+      let type;
+      let data;
+
+      try {
+        await sell(
+          config,
+          rejectedProvider,
+          id,
+          contractAddress,
+          {
+            type: ItemType.NATIVE,
+            amount: BigNumber.from(1),
+          },
+        );
+      } catch (err: any) {
+        message = err.message;
+        type = err.type;
+        data = err.data;
+      }
+
+      expect(message).toEqual('An error occurred while preparing the listing');
+      expect(type).toEqual(CheckoutErrorType.PREPARE_ORDER_LISTING_ERROR);
+      expect(data).toEqual({
+        message: 'error from provider',
+        id,
+        collectionAddress: contractAddress,
+      });
 
       expect(smartCheckout).toBeCalledTimes(0);
     });

@@ -8,6 +8,8 @@ import {
  * Interface representing the parameters for {@link Checkout.sell}
  * @property {Web3Provider} provider - The provider to use for the sell.
  * @property {string} orderId - The order ID.
+ * @property {string} collectionAddress - The contract address of the ERC721s collection.
+ * @property {BuyToken} buyToken - The token to buy the item with.
  */
 export interface SellParams {
   provider: Web3Provider;
@@ -49,7 +51,6 @@ type NativeBuyToken = {
  * @property {ItemType} type - The type indicate this is a ERC20 token.
  * @property {BigNumber} amount - The amount of native token.
  * @property {string} contractAddress - The contract address of the ERC20.
- * @property {number} decimals - The decimals of the ERC20.
  */
 type ERC20BuyToken = {
   type: ItemType.ERC20;
