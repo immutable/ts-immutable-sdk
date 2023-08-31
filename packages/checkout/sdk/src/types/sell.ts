@@ -7,7 +7,7 @@ import {
 /**
  * Interface representing the parameters for {@link Checkout.sell}
  * @property {Web3Provider} provider - The provider to use for the sell.
- * @property {string} orderId - The order ID.
+ * @property {string} id - The ERC721 ID.
  * @property {string} collectionAddress - The contract address of the ERC721s collection.
  * @property {BuyToken} buyToken - The token to buy the item with.
  */
