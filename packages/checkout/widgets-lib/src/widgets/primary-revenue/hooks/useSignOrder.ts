@@ -1,5 +1,9 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/naming-convention */
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { Web3Provider } from '@ethersproject/providers';
+import { PrimaryRevenueSuccess } from '@imtbl/checkout-widgets';
 
 type SignDataType = {
   transactions: {
@@ -23,7 +27,6 @@ type Input = {
   amount: string;
   fromContractAddress: string;
   fromCollectionAddress: string;
-  recipientAddress: string;
   items: {
     id: string;
     name: string;
@@ -34,18 +37,54 @@ type Input = {
   fromCurrency?: string;
   paymentMethod?: string;
   envId?: string;
+  provider: Web3Provider | undefined;
 };
 
 export const useSignOrder = ({
   items,
   amount,
   fromContractAddress,
-  recipientAddress,
   fromCollectionAddress,
+  provider,
 }: Input) => {
   const [signData, setSignData] = useState<SignDataType | undefined>();
+  const [recipientAddress, setRecipientAddress] = useState<string | undefined>(
+    undefined,
+  );
 
-  const sign = useCallback(async () => {
+  const sendTx = useCallback(
+    async (
+      to: string,
+      data: string,
+      gasLimit: number,
+    ): Promise<string | undefined> => {
+      let transactionHash: string | undefined;
+
+      try {
+        const signer = provider?.getSigner();
+        const gasPrice = await provider?.getGasPrice();
+        const txnResponse = await signer?.sendTransaction({
+          to,
+          data,
+          gasPrice,
+          gasLimit,
+        });
+        console.log('🚀 ~ [PENDING] txn:', txnResponse?.hash);
+
+        await txnResponse?.wait(1);
+
+        transactionHash = txnResponse?.hash;
+      } catch (error) {
+        throw new Error('failed');
+      }
+
+      console.log('🚀 [SUBMITTED] txn:', transactionHash);
+      return transactionHash;
+    },
+    [provider],
+  );
+
+  const sign = useCallback(async (): Promise<void> => {
     const data = {
       amount: Number(amount),
       recipient_address: recipientAddress,
@@ -76,28 +115,47 @@ export const useSignOrder = ({
       //
     }
   }, [
+    items,
     amount,
     fromCollectionAddress,
     fromContractAddress,
-    items,
     recipientAddress,
   ]);
 
-  const execute = useCallback(async () => {
-    console.log('signData', signData);
-
-    try {
-      // for each transaction call a fn
-      signData?.transactions.forEach(async (transaction) => {
-        console.log('transaction', transaction);
-      });
-    } catch (error) {
-      //
+  const execute = useCallback(async (): Promise<PrimaryRevenueSuccess> => {
+    if (!signData) {
+      // FIXME: ensure is not empty
+      throw new Error('No sign data, retry /sign/order');
     }
-  }, []);
 
-  return {
-    sign,
-    execute,
-  };
+    const transactionHashes = {};
+    for (const transaction of signData.transactions) {
+      const {
+        contract_address: to,
+        raw_data: data,
+        method_call: method,
+      } = transaction;
+      const transactionHash = await sendTx(to, data, 5000000);
+
+      if (!transactionHash) {
+        throw new Error('failed');
+      }
+
+      transactionHashes[method] = transactionHash;
+    }
+
+    return transactionHashes;
+  }, [signData]);
+
+  useEffect(() => {
+    const getRecipientAddress = async () => {
+      const signer = provider?.getSigner();
+      const address = await signer?.getAddress();
+      setRecipientAddress(address);
+    };
+
+    getRecipientAddress();
+  }, [provider]);
+
+  return { sign, execute, sendTx };
 };
