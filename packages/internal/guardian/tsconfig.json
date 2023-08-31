@@ -6,8 +6,8 @@
       "src"
     ],
     "target": "es2022",
-    "module": "es2022",
-    "moduleResolution": "node",
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "allowJs": false,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -18,13 +18,15 @@
     "noFallthroughCasesInSwitch": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
+    "composite": true,
     "declaration": true
   },
   "include": [
     "src"
   ],
-  "exclude": ["node_modules",
+  "exclude": [
+    "node_modules",
     "dist"
-  ]
+  ],
+  "references": []
 }

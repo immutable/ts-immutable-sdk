@@ -24,6 +24,6 @@ import { ZkEvmTransactionEvaluationRequest } from './zk-evm-transaction-evaluati
  * @type TransactionEvaluationRequest
  * @export
  */
-export type TransactionEvaluationRequest = { chainType: 'evm' } & ZkEvmTransactionEvaluationRequest | { chainType: 'starkex' } & StarkExTransactionEvaluationRequest;
+export type TransactionEvaluationRequest = { chainType: 'evm' } & ZkEvmTransactionEvaluationRequest | { chainType: 'starkex' };
 
 

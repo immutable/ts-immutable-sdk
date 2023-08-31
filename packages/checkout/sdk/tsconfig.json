@@ -1,7 +1,12 @@
 {
   "compilerOptions": {
     "target": "es2022",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "outDir": "./dist",
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -10,11 +15,28 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
+    "composite": true,
+    "declaration": true,
     "jsx": "react-jsx"
   },
-  "include": ["src", "babel.config.js"]
+  "include": [
+    "src/**/*"
+  ],
+  "references": [
+    {
+      "path": "../../internal/bridge/sdk"
+    },
+    {
+      "path": "../../config"
+    },
+    {
+      "path": "../../internal/dex/sdk"
+    },
+    {
+      "path": "../../orderbook"
+    }
+  ]
 }
