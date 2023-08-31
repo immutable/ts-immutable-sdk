@@ -10,6 +10,11 @@
       "url": "https://support.immutable.com"
     }
   },
+  "servers": [
+    {
+      "url": "https://api.sandbox.immutable.com"
+    }
+  ],
   "tags": [
     {
       "name": "activities",
@@ -58,29 +63,6 @@
       "name": "passport",
       "description": "Passport operations",
       "x-displayName": "passport"
-    }
-  ],
-  "x-tagGroups": [
-    {
-      "name": "oas",
-      "tags": [
-        "activities",
-        "chains",
-        "collections",
-        "nfts",
-        "nft owners",
-        "demopage",
-        "tokens",
-        "listings",
-        "orders",
-        "passport"
-      ],
-      "description": "Passport MR API"
-    }
-  ],
-  "servers": [
-    {
-      "url": "https://api.sandbox.immutable.com"
     }
   ],
   "paths": {
@@ -1090,8 +1072,7 @@
               "type": "string",
               "description": "Global Order identifier",
               "example": "018792C9-4AD7-8EC4-4038-9E05C598534A"
-            },
-            "example": "018792C9-4AD7-8EC4-4038-9E05C598534A"
+            }
           }
         ],
         "responses": {
@@ -1117,7 +1098,7 @@
         }
       }
     },
-    "/v1/chains/{chain_name}/orders/fulfillment_data": {
+    "/v1/chains/{chain_name}/orders/fulfillment-data": {
       "post": {
         "tags": [
           "orders"
@@ -1142,18 +1123,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {
-                    "orderId": {
-                      "type": "string"
-                    },
-                    "fee": {
-                      "$ref": "#/components/schemas/Fee"
-                    }
-                  },
-                  "required": [
-                    "orderId"
-                  ]
+                  "$ref": "#/components/schemas/FulfillmentDataRequest"
                 }
               }
             }
@@ -1170,21 +1140,154 @@
                     "result": {
                       "type": "array",
                       "items": {
-                        "type": "object",
-                        "properties": {
-                          "extraData": {
-                            "type": "string"
-                          },
-                          "order": {
-                            "$ref": "#/components/schemas/Order"
-                          }
-                        }
+                        "$ref": "#/components/schemas/FulfillmentDataResult"
                       }
                     }
                   },
                   "required": [
                     "result"
                   ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/trades": {
+      "get": {
+        "tags": [
+          "orders"
+        ],
+        "summary": "List all trades",
+        "description": "List all trades",
+        "operationId": "ListTrades",
+        "parameters": [
+          {
+            "name": "chain_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "description": "Maximum number of trades to return per page",
+            "schema": {
+              "$ref": "#/components/schemas/PageSize"
+            }
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "description": "Trade field to sort by",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "created_at"
+              ],
+              "description": "Trade field to sort by",
+              "example": "created_at"
+            },
+            "example": "created_at"
+          },
+          {
+            "name": "sort_direction",
+            "in": "query",
+            "description": "Ascending or descending direction for sort",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "description": "Ascending or descending direction for sort",
+              "example": "asc"
+            },
+            "example": "asc"
+          },
+          {
+            "name": "page_cursor",
+            "in": "query",
+            "description": "Page cursor to retrieve previous or next page. Use the value returned in the response.",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageCursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListTradeResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/trades/{trade_id}": {
+      "get": {
+        "tags": [
+          "orders"
+        ],
+        "summary": "Get a single trade by ID",
+        "description": "Get a single trade by ID",
+        "operationId": "GetTrade",
+        "parameters": [
+          {
+            "name": "chain_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            }
+          },
+          {
+            "name": "trade_id",
+            "in": "path",
+            "description": "Global Trade identifier",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Global Trade identifier",
+              "example": "018792C9-4AD7-8EC4-4038-9E05C598534A"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TradeResult"
                 }
               }
             }
@@ -1233,6 +1336,106 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CreateCounterfactualAddressRes"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "TooManyRequestsError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError429"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicAPIError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/passport-mr/v1/users/{userId}/linked-addresses": {
+      "get": {
+        "summary": "Get Ethereum linked addresses for a user",
+        "description": "Get all the Ethereum linked addresses for a user based on its userId",
+        "tags": [
+          "passport"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "The user's userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "operationId": "getLinkedAddresses",
+        "security": [
+          {
+            "BearerAuth": [
+              "openid"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User's list of linked addresses response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetLinkedAddressesRes"
                 }
               }
             }
@@ -2556,6 +2759,35 @@
           }
         }
       },
+      "FulfillmentDataRequest": {
+        "type": "object",
+        "properties": {
+          "order_id": {
+            "type": "string"
+          },
+          "fee": {
+            "$ref": "#/components/schemas/Fee"
+          }
+        },
+        "required": [
+          "order_id"
+        ]
+      },
+      "FulfillmentDataResult": {
+        "type": "object",
+        "properties": {
+          "extra_data": {
+            "type": "string"
+          },
+          "order": {
+            "$ref": "#/components/schemas/Order"
+          }
+        },
+        "required": [
+          "extra_data",
+          "order"
+        ]
+      },
       "NativeItem": {
         "type": "object",
         "properties": {
@@ -2667,14 +2899,9 @@
             "minItems": 1,
             "maxItems": 1
           },
-          "fees": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Fee"
-            },
-            "example": [],
-            "minItems": 0,
-            "maxItems": 1
+          "fee": {
+            "$ref": "#/components/schemas/Fee",
+            "description": "The maker marketplace fee"
           },
           "end_time": {
             "type": "string",
@@ -2683,7 +2910,7 @@
             "example": "2022-03-09T05:00:50.52Z"
           },
           "protocol_data": {
-            "$ref": "#/components/schemas/CreateOrderProtocolData"
+            "$ref": "#/components/schemas/ProtocolData"
           },
           "salt": {
             "type": "string",
@@ -2728,13 +2955,18 @@
               "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
             }
           ],
-          "fees": [],
+          "fee": {
+            "amount": "2250000000000000000",
+            "fee_type": "MAKER_MARKETPLACE",
+            "recipient": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92233"
+          },
           "end_time": "2022-03-10T05:00:50.52Z",
           "protocol_data": {
             "order_type": "FULL_RESTRICTED",
             "zone_address": "0x12",
             "seaport_address": "0x12",
-            "seaport_version": "1.4"
+            "seaport_version": "1.4",
+            "counter": "1"
           },
           "salt": "12686911856931635052326433555881236148",
           "sell": [
@@ -2752,7 +2984,6 @@
           "order_hash",
           "buy",
           "sell",
-          "fees",
           "end_time",
           "start_time",
           "protocol_data",
@@ -2797,7 +3028,10 @@
             "description": "Fee type",
             "example": "ROYALTY",
             "enum": [
-              "ROYALTY"
+              "ROYALTY",
+              "MAKER_MARKETPLACE",
+              "TAKER_MARKETPLACE",
+              "PROTOCOL"
             ]
           },
           "recipient": {
@@ -2932,10 +3166,10 @@
           "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
           "protocol_data": {
             "order_type": "FULL_RESTRICTED",
-            "operator_signature": "0x12",
             "zone_address": "0x12",
             "seaport_address": "0x12",
-            "seaport_version": "1.4"
+            "seaport_version": "1.4",
+            "counter": "1"
           },
           "salt": "12686911856931635052326433555881236148",
           "sell": [
@@ -2967,6 +3201,130 @@
           "status"
         ]
       },
+      "Trade": {
+        "type": "object",
+        "properties": {
+          "buy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Item"
+            },
+            "example": [
+              {
+                "item_type": "NATIVE",
+                "start_amount": "9750000000000000000",
+                "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+              }
+            ],
+            "minItems": 1,
+            "maxItems": 1
+          },
+          "buyer_address": {
+            "type": "string",
+            "example": "0xFC99a706C0D05B8C71E1fAAC91b3E1343aC34D40"
+          },
+          "buyer_fees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Fee"
+            },
+            "example": [],
+            "minItems": 0,
+            "maxItems": 1
+          },
+          "chain": {
+            "$ref": "#/components/schemas/Chain"
+          },
+          "blockchain_metadata": {
+            "$ref": "#/components/schemas/TradeBlockchainMetadata"
+          },
+          "create_time": {
+            "type": "string",
+            "description": "Time the Trade is created",
+            "format": "date-time",
+            "example": "2022-03-07T07:20:50.52Z"
+          },
+          "id": {
+            "type": "string",
+            "description": "Global Trade identifier",
+            "example": "018792C9-4AD7-8EC4-4038-9E05C598534A"
+          },
+          "sell": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Item"
+            },
+            "example": [
+              {
+                "item_type": "ERC721",
+                "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+                "token_id": "1"
+              }
+            ],
+            "minItems": 1,
+            "maxItems": 1
+          },
+          "seller_address": {
+            "type": "string",
+            "example": "0x002b9B1cbf464782Df5d48870358FA6c09f1b19D"
+          },
+          "maker_address": {
+            "type": "string",
+            "example": "0x002b9B1cbf464782Df5d48870358FA6c09f1b19D"
+          },
+          "taker_address": {
+            "type": "string",
+            "example": "0xFC99a706C0D05B8C71E1fAAC91b3E1343aC34D40"
+          },
+          "update_time": {
+            "type": "string",
+            "description": "Time the Trade is last updated",
+            "format": "date-time",
+            "example": "2022-03-07T07:20:50.52Z"
+          }
+        },
+        "example": {
+          "buy": [
+            {
+              "item_type": "NATIVE",
+              "start_amount": "9750000000000000000",
+              "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+            }
+          ],
+          "buyer_address": "0xFC99a706C0D05B8C71E1fAAC91b3E1343aC34D40",
+          "buyer_fees": [],
+          "chain": {
+            "id": "eip155:11155111",
+            "name": "sepolia"
+          },
+          "create_time": "2022-03-07T07:20:50.52Z",
+          "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
+          "sell": [
+            {
+              "item_type": "ERC721",
+              "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+              "token_id": "1"
+            }
+          ],
+          "seller_address": "0x002b9B1cbf464782Df5d48870358FA6c09f1b19D",
+          "maker_address": "0x002b9B1cbf464782Df5d48870358FA6c09f1b19D",
+          "taker_address": "0xFC99a706C0D05B8C71E1fAAC91b3E1343aC34D40",
+          "update_time": "2022-03-07T07:20:50.52Z"
+        },
+        "required": [
+          "id",
+          "buy",
+          "buyer_address",
+          "sell",
+          "seller_address",
+          "buyer_fees",
+          "chain",
+          "maker_address",
+          "taker_address",
+          "create_time",
+          "update_time"
+        ]
+      },
       "ListingResult": {
         "type": "object",
         "properties": {
@@ -2994,13 +3352,13 @@
             },
             "create_time": "2022-03-07T07:20:50.52Z",
             "end_time": "2022-03-10T05:00:50.52Z",
-            "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
+            "id": "018792C9-4AD7-8EC4-4038-9E05C598534B",
             "protocol_data": {
               "order_type": "FULL_RESTRICTED",
-              "operator_signature": "0x12",
               "zone_address": "0x12",
               "seaport_address": "0x12",
-              "seaport_version": "1.4"
+              "seaport_version": "1.4",
+              "counter": "1"
             },
             "salt": "12686911856931635052326433555881236148",
             "sell": [
@@ -3061,10 +3419,10 @@
               "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
               "protocol_data": {
                 "order_type": "FULL_RESTRICTED",
-                "operator_signature": "0x12",
                 "zone_address": "0x12",
                 "seaport_address": "0x12",
-                "seaport_version": "1.4"
+                "seaport_version": "1.4",
+                "counter": "1"
               },
               "salt": "12686911856931635052326433555881236148",
               "sell": [
@@ -3097,8 +3455,8 @@
               "end_time": "2022-03-10T05:00:50.52Z",
               "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
               "protocol_data": {
+                "counter": "1",
                 "order_type": "FULL_RESTRICTED",
-                "operator_signature": "0x12",
                 "zone_address": "0x12",
                 "seaport_address": "0x12",
                 "seaport_version": "1.4"
@@ -3119,6 +3477,131 @@
           ]
         }
       },
+      "TradeResult": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "$ref": "#/components/schemas/Trade"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "example": {
+          "result": {
+            "buy": [
+              {
+                "item_type": "ERC20",
+                "start_amount": "9750000000000000000",
+                "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+              }
+            ],
+            "buyer_address": "0xFC99a706C0D05B8C71E1fAAC91b3E1343aC34D40",
+            "buyer_fees": [],
+            "chain": {
+              "id": "eip155:11155111",
+              "name": "sepolia"
+            },
+            "create_time": "2022-03-07T07:20:50.52Z",
+            "id": "018792C9-4AD7-8EC4-4038-9E05C598534B",
+            "sell": [
+              {
+                "item_type": "ERC721",
+                "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+                "token_id": "1"
+              }
+            ],
+            "seller_address": "0x002b9B1cbf464782Df5d48870358FA6c09f1b19D",
+            "maker_address": "0x002b9B1cbf464782Df5d48870358FA6c09f1b19D",
+            "taker_address": "0xFC99a706C0D05B8C71E1fAAC91b3E1343aC34D40",
+            "update_time": "2022-03-07T07:20:50.52Z"
+          }
+        }
+      },
+      "ListTradeResult": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "$ref": "#/components/schemas/Page"
+          },
+          "result": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Trade"
+            },
+            "minItems": 0,
+            "maxItems": 200
+          }
+        },
+        "required": [
+          "page",
+          "result"
+        ],
+        "example": {
+          "page": {
+            "previous_cursor": "MjAyMy0wMS0yM1QwMTo1NToyNy4zNTM2MzA",
+            "next_cursor": "MjAyMy0wMS0yM1QwMTo1NToyNy4zNTM2MzA"
+          },
+          "result": [
+            {
+              "buy": [
+                {
+                  "item_type": "ERC20",
+                  "start_amount": "9750000000000000000",
+                  "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+                }
+              ],
+              "buyer_address": "0xFC99a706C0D05B8C71E1fAAC91b3E1343aC34D40",
+              "buyer_fees": [],
+              "chain": {
+                "id": "eip155:11155111",
+                "name": "sepolia"
+              },
+              "create_time": "2022-03-07T07:20:50.52Z",
+              "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
+              "sell": [
+                {
+                  "item_type": "ERC721",
+                  "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+                  "token_id": "1"
+                }
+              ],
+              "seller_address": "0x002b9B1cbf464782Df5d48870358FA6c09f1b19D",
+              "maker_address": "0x002b9B1cbf464782Df5d48870358FA6c09f1b19D",
+              "taker_address": "0xFC99a706C0D05B8C71E1fAAC91b3E1343aC34D40",
+              "update_time": "2022-03-07T07:20:50.52Z"
+            },
+            {
+              "buy": [
+                {
+                  "item_type": "ERC20",
+                  "start_amount": "9750000000000000000",
+                  "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+                }
+              ],
+              "buyer_address": "0x017406f3F27d507a1491976B7835CE5CD0fA647a",
+              "buyer_fees": [],
+              "chain": {
+                "id": "eip155:11155111",
+                "name": "sepolia"
+              },
+              "create_time": "2022-03-07T07:20:50.52Z",
+              "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
+              "sell": [
+                {
+                  "item_type": "ERC721",
+                  "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+                  "token_id": "1"
+                }
+              ],
+              "seller_address": "0xC73349c545C1D757eb650cDc463A2f6dF1Ec41cb",
+              "maker_address": "0xC73349c545C1D757eb650cDc463A2f6dF1Ec41cb",
+              "taker_address": "0x017406f3F27d507a1491976B7835CE5CD0fA647a",
+              "update_time": "2022-03-07T07:20:50.52Z"
+            }
+          ]
+        }
+      },
       "OrderStatus": {
         "type": "string",
         "description": "The Order status",
@@ -3132,7 +3615,7 @@
           "EXPIRED"
         ]
       },
-      "CreateOrderProtocolData": {
+      "ProtocolData": {
         "type": "object",
         "properties": {
           "order_type": {
@@ -3179,27 +3662,37 @@
           "seaport_version"
         ]
       },
-      "ProtocolData": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/CreateOrderProtocolData"
+      "TradeBlockchainMetadata": {
+        "description": "The metadata related to the transaction in which the activity occurred",
+        "nullable": true,
+        "type": "object",
+        "properties": {
+          "transaction_hash": {
+            "type": "string",
+            "description": "The transaction hash of the trade",
+            "example": "0x68d9eac5e3b3c3580404989a4030c948a78e1b07b2b5ea5688d8c38a6c61c93e"
           },
-          {
-            "type": "object",
-            "properties": {
-              "operator_signature": {
-                "type": "string",
-                "description": "Operator signature signed by orderbook",
-                "example": "0x12"
-              }
-            },
-            "example": {
-              "operator_signature": "0x12"
-            },
-            "required": [
-              "operator_signature"
-            ]
+          "block_number": {
+            "description": "EVM block number (uint64 as string)",
+            "type": "string",
+            "example": "1"
+          },
+          "transaction_index": {
+            "description": "Transaction index in a block (uint32 as string)",
+            "type": "string",
+            "example": "1"
+          },
+          "log_index": {
+            "description": "The log index of the fulfillment event in a block (uint32 as string)",
+            "type": "string",
+            "example": "1"
           }
+        },
+        "required": [
+          "transaction_hash",
+          "block_number",
+          "transaction_index",
+          "log_index"
         ]
       },
       "CreateCounterfactualAddressRequest": {
@@ -3235,6 +3728,25 @@
           }
         }
       },
+      "GetLinkedAddressesRes": {
+        "type": "object",
+        "required": [
+          "linkedAddresses"
+        ],
+        "properties": {
+          "linkedAddresses": {
+            "type": "array",
+            "minItems": 0,
+            "description": "The user's list of linked addresses",
+            "items": {
+              "description": "The user's linked address",
+              "type": "string",
+              "pattern": "^0x[0-9a-fA-F]*$",
+              "maxLength": 42
+            }
+          }
+        }
+      },
       "APIError403": {
         "allOf": [
           {
@@ -3265,5 +3777,23 @@
         ]
       }
     }
-  }
+  },
+  "x-tagGroups": [
+    {
+      "name": "oas",
+      "tags": [
+        "activities",
+        "chains",
+        "collections",
+        "nfts",
+        "nft owners",
+        "demopage",
+        "tokens",
+        "listings",
+        "orders",
+        "passport"
+      ],
+      "description": "Passport MR API"
+    }
+  ]
 }

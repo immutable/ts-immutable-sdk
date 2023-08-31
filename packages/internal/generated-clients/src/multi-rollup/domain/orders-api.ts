@@ -31,13 +31,17 @@ import { CreateListingRequestBody } from '../models';
 // @ts-ignore
 import { FulfillmentData200Response } from '../models';
 // @ts-ignore
-import { FulfillmentDataRequestInner } from '../models';
+import { FulfillmentDataRequest } from '../models';
 // @ts-ignore
 import { ListListingsResult } from '../models';
+// @ts-ignore
+import { ListTradeResult } from '../models';
 // @ts-ignore
 import { ListingResult } from '../models';
 // @ts-ignore
 import { OrderStatus } from '../models';
+// @ts-ignore
+import { TradeResult } from '../models';
 /**
  * OrdersApi - axios parameter creator
  * @export
@@ -88,16 +92,16 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
          * Retrieve signed fulfillment data based on the list of order IDs and corresponding fees.
          * @summary Retrieve fulfillment data for orders
          * @param {string} chainName 
-         * @param {Array<FulfillmentDataRequestInner>} fulfillmentDataRequestInner 
+         * @param {Array<FulfillmentDataRequest>} fulfillmentDataRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        fulfillmentData: async (chainName: string, fulfillmentDataRequestInner: Array<FulfillmentDataRequestInner>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        fulfillmentData: async (chainName: string, fulfillmentDataRequest: Array<FulfillmentDataRequest>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'chainName' is not null or undefined
             assertParamExists('fulfillmentData', 'chainName', chainName)
-            // verify required parameter 'fulfillmentDataRequestInner' is not null or undefined
-            assertParamExists('fulfillmentData', 'fulfillmentDataRequestInner', fulfillmentDataRequestInner)
-            const localVarPath = `/v1/chains/{chain_name}/orders/fulfillment_data`
+            // verify required parameter 'fulfillmentDataRequest' is not null or undefined
+            assertParamExists('fulfillmentData', 'fulfillmentDataRequest', fulfillmentDataRequest)
+            const localVarPath = `/v1/chains/{chain_name}/orders/fulfillment-data`
                 .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -117,7 +121,7 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(fulfillmentDataRequestInner, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(fulfillmentDataRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -140,6 +144,44 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
             const localVarPath = `/v1/chains/{chain_name}/orders/listings/{listing_id}`
                 .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)))
                 .replace(`{${"listing_id"}}`, encodeURIComponent(String(listingId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Get a single trade by ID
+         * @summary Get a single trade by ID
+         * @param {string} chainName 
+         * @param {string} tradeId Global Trade identifier
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getTrade: async (chainName: string, tradeId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'chainName' is not null or undefined
+            assertParamExists('getTrade', 'chainName', chainName)
+            // verify required parameter 'tradeId' is not null or undefined
+            assertParamExists('getTrade', 'tradeId', tradeId)
+            const localVarPath = `/v1/chains/{chain_name}/trades/{trade_id}`
+                .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)))
+                .replace(`{${"trade_id"}}`, encodeURIComponent(String(tradeId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -236,6 +278,60 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * List all trades
+         * @summary List all trades
+         * @param {string} chainName 
+         * @param {number} [pageSize] Maximum number of trades to return per page
+         * @param {'created_at'} [sortBy] Trade field to sort by
+         * @param {'asc' | 'desc'} [sortDirection] Ascending or descending direction for sort
+         * @param {string} [pageCursor] Page cursor to retrieve previous or next page. Use the value returned in the response.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listTrades: async (chainName: string, pageSize?: number, sortBy?: 'created_at', sortDirection?: 'asc' | 'desc', pageCursor?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'chainName' is not null or undefined
+            assertParamExists('listTrades', 'chainName', chainName)
+            const localVarPath = `/v1/chains/{chain_name}/trades`
+                .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (pageSize !== undefined) {
+                localVarQueryParameter['page_size'] = pageSize;
+            }
+
+            if (sortBy !== undefined) {
+                localVarQueryParameter['sort_by'] = sortBy;
+            }
+
+            if (sortDirection !== undefined) {
+                localVarQueryParameter['sort_direction'] = sortDirection;
+            }
+
+            if (pageCursor !== undefined) {
+                localVarQueryParameter['page_cursor'] = pageCursor;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -262,12 +358,12 @@ export const OrdersApiFp = function(configuration?: Configuration) {
          * Retrieve signed fulfillment data based on the list of order IDs and corresponding fees.
          * @summary Retrieve fulfillment data for orders
          * @param {string} chainName 
-         * @param {Array<FulfillmentDataRequestInner>} fulfillmentDataRequestInner 
+         * @param {Array<FulfillmentDataRequest>} fulfillmentDataRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async fulfillmentData(chainName: string, fulfillmentDataRequestInner: Array<FulfillmentDataRequestInner>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FulfillmentData200Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.fulfillmentData(chainName, fulfillmentDataRequestInner, options);
+        async fulfillmentData(chainName: string, fulfillmentDataRequest: Array<FulfillmentDataRequest>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FulfillmentData200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.fulfillmentData(chainName, fulfillmentDataRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -280,6 +376,18 @@ export const OrdersApiFp = function(configuration?: Configuration) {
          */
         async getListing(chainName: string, listingId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListingResult>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getListing(chainName, listingId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Get a single trade by ID
+         * @summary Get a single trade by ID
+         * @param {string} chainName 
+         * @param {string} tradeId Global Trade identifier
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getTrade(chainName: string, tradeId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TradeResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getTrade(chainName, tradeId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -299,6 +407,21 @@ export const OrdersApiFp = function(configuration?: Configuration) {
          */
         async listListings(chainName: string, status?: OrderStatus, sellItemContractAddress?: string, buyItemContractAddress?: string, sellItemTokenId?: string, pageSize?: number, sortBy?: 'created_at' | 'updated_at' | 'buy_item_amount', sortDirection?: 'asc' | 'desc', pageCursor?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListListingsResult>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listListings(chainName, status, sellItemContractAddress, buyItemContractAddress, sellItemTokenId, pageSize, sortBy, sortDirection, pageCursor, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * List all trades
+         * @summary List all trades
+         * @param {string} chainName 
+         * @param {number} [pageSize] Maximum number of trades to return per page
+         * @param {'created_at'} [sortBy] Trade field to sort by
+         * @param {'asc' | 'desc'} [sortDirection] Ascending or descending direction for sort
+         * @param {string} [pageCursor] Page cursor to retrieve previous or next page. Use the value returned in the response.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listTrades(chainName: string, pageSize?: number, sortBy?: 'created_at', sortDirection?: 'asc' | 'desc', pageCursor?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListTradeResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listTrades(chainName, pageSize, sortBy, sortDirection, pageCursor, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -326,12 +449,12 @@ export const OrdersApiFactory = function (configuration?: Configuration, basePat
          * Retrieve signed fulfillment data based on the list of order IDs and corresponding fees.
          * @summary Retrieve fulfillment data for orders
          * @param {string} chainName 
-         * @param {Array<FulfillmentDataRequestInner>} fulfillmentDataRequestInner 
+         * @param {Array<FulfillmentDataRequest>} fulfillmentDataRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        fulfillmentData(chainName: string, fulfillmentDataRequestInner: Array<FulfillmentDataRequestInner>, options?: any): AxiosPromise<FulfillmentData200Response> {
-            return localVarFp.fulfillmentData(chainName, fulfillmentDataRequestInner, options).then((request) => request(axios, basePath));
+        fulfillmentData(chainName: string, fulfillmentDataRequest: Array<FulfillmentDataRequest>, options?: any): AxiosPromise<FulfillmentData200Response> {
+            return localVarFp.fulfillmentData(chainName, fulfillmentDataRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * Get a single listing by ID
@@ -343,6 +466,17 @@ export const OrdersApiFactory = function (configuration?: Configuration, basePat
          */
         getListing(chainName: string, listingId: string, options?: any): AxiosPromise<ListingResult> {
             return localVarFp.getListing(chainName, listingId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get a single trade by ID
+         * @summary Get a single trade by ID
+         * @param {string} chainName 
+         * @param {string} tradeId Global Trade identifier
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getTrade(chainName: string, tradeId: string, options?: any): AxiosPromise<TradeResult> {
+            return localVarFp.getTrade(chainName, tradeId, options).then((request) => request(axios, basePath));
         },
         /**
          * List all listings
@@ -361,6 +495,20 @@ export const OrdersApiFactory = function (configuration?: Configuration, basePat
          */
         listListings(chainName: string, status?: OrderStatus, sellItemContractAddress?: string, buyItemContractAddress?: string, sellItemTokenId?: string, pageSize?: number, sortBy?: 'created_at' | 'updated_at' | 'buy_item_amount', sortDirection?: 'asc' | 'desc', pageCursor?: string, options?: any): AxiosPromise<ListListingsResult> {
             return localVarFp.listListings(chainName, status, sellItemContractAddress, buyItemContractAddress, sellItemTokenId, pageSize, sortBy, sortDirection, pageCursor, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * List all trades
+         * @summary List all trades
+         * @param {string} chainName 
+         * @param {number} [pageSize] Maximum number of trades to return per page
+         * @param {'created_at'} [sortBy] Trade field to sort by
+         * @param {'asc' | 'desc'} [sortDirection] Ascending or descending direction for sort
+         * @param {string} [pageCursor] Page cursor to retrieve previous or next page. Use the value returned in the response.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listTrades(chainName: string, pageSize?: number, sortBy?: 'created_at', sortDirection?: 'asc' | 'desc', pageCursor?: string, options?: any): AxiosPromise<ListTradeResult> {
+            return localVarFp.listTrades(chainName, pageSize, sortBy, sortDirection, pageCursor, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -401,10 +549,10 @@ export interface OrdersApiFulfillmentDataRequest {
 
     /**
      * 
-     * @type {Array<FulfillmentDataRequestInner>}
+     * @type {Array<FulfillmentDataRequest>}
      * @memberof OrdersApiFulfillmentData
      */
-    readonly fulfillmentDataRequestInner: Array<FulfillmentDataRequestInner>
+    readonly fulfillmentDataRequest: Array<FulfillmentDataRequest>
 }
 
 /**
@@ -426,6 +574,27 @@ export interface OrdersApiGetListingRequest {
      * @memberof OrdersApiGetListing
      */
     readonly listingId: string
+}
+
+/**
+ * Request parameters for getTrade operation in OrdersApi.
+ * @export
+ * @interface OrdersApiGetTradeRequest
+ */
+export interface OrdersApiGetTradeRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof OrdersApiGetTrade
+     */
+    readonly chainName: string
+
+    /**
+     * Global Trade identifier
+     * @type {string}
+     * @memberof OrdersApiGetTrade
+     */
+    readonly tradeId: string
 }
 
 /**
@@ -499,6 +668,48 @@ export interface OrdersApiListListingsRequest {
 }
 
 /**
+ * Request parameters for listTrades operation in OrdersApi.
+ * @export
+ * @interface OrdersApiListTradesRequest
+ */
+export interface OrdersApiListTradesRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof OrdersApiListTrades
+     */
+    readonly chainName: string
+
+    /**
+     * Maximum number of trades to return per page
+     * @type {number}
+     * @memberof OrdersApiListTrades
+     */
+    readonly pageSize?: number
+
+    /**
+     * Trade field to sort by
+     * @type {'created_at'}
+     * @memberof OrdersApiListTrades
+     */
+    readonly sortBy?: 'created_at'
+
+    /**
+     * Ascending or descending direction for sort
+     * @type {'asc' | 'desc'}
+     * @memberof OrdersApiListTrades
+     */
+    readonly sortDirection?: 'asc' | 'desc'
+
+    /**
+     * Page cursor to retrieve previous or next page. Use the value returned in the response.
+     * @type {string}
+     * @memberof OrdersApiListTrades
+     */
+    readonly pageCursor?: string
+}
+
+/**
  * OrdersApi - object-oriented interface
  * @export
  * @class OrdersApi
@@ -526,7 +737,7 @@ export class OrdersApi extends BaseAPI {
      * @memberof OrdersApi
      */
     public fulfillmentData(requestParameters: OrdersApiFulfillmentDataRequest, options?: AxiosRequestConfig) {
-        return OrdersApiFp(this.configuration).fulfillmentData(requestParameters.chainName, requestParameters.fulfillmentDataRequestInner, options).then((request) => request(this.axios, this.basePath));
+        return OrdersApiFp(this.configuration).fulfillmentData(requestParameters.chainName, requestParameters.fulfillmentDataRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -542,6 +753,18 @@ export class OrdersApi extends BaseAPI {
     }
 
     /**
+     * Get a single trade by ID
+     * @summary Get a single trade by ID
+     * @param {OrdersApiGetTradeRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrdersApi
+     */
+    public getTrade(requestParameters: OrdersApiGetTradeRequest, options?: AxiosRequestConfig) {
+        return OrdersApiFp(this.configuration).getTrade(requestParameters.chainName, requestParameters.tradeId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * List all listings
      * @summary List all listings
      * @param {OrdersApiListListingsRequest} requestParameters Request parameters.
@@ -551,5 +774,17 @@ export class OrdersApi extends BaseAPI {
      */
     public listListings(requestParameters: OrdersApiListListingsRequest, options?: AxiosRequestConfig) {
         return OrdersApiFp(this.configuration).listListings(requestParameters.chainName, requestParameters.status, requestParameters.sellItemContractAddress, requestParameters.buyItemContractAddress, requestParameters.sellItemTokenId, requestParameters.pageSize, requestParameters.sortBy, requestParameters.sortDirection, requestParameters.pageCursor, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * List all trades
+     * @summary List all trades
+     * @param {OrdersApiListTradesRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrdersApi
+     */
+    public listTrades(requestParameters: OrdersApiListTradesRequest, options?: AxiosRequestConfig) {
+        return OrdersApiFp(this.configuration).listTrades(requestParameters.chainName, requestParameters.pageSize, requestParameters.sortBy, requestParameters.sortDirection, requestParameters.pageCursor, options).then((request) => request(this.axios, this.basePath));
     }
 }
