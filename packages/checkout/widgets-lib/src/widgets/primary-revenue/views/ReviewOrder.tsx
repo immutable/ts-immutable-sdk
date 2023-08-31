@@ -27,7 +27,6 @@ export function ReviewOrder(props: ReviewOrderProps) {
   const {
     currency, execute, sign, items, amount,
   } = props;
-  console.log('🚀 ~ file: ReviewOrder.tsx:30 ~ ReviewOrder ~ items:', items);
   const { header } = text.views[PrimaryRevenueWidgetViews.REVIEW_ORDER];
   const [loading, setLoading] = useState(false);
 
