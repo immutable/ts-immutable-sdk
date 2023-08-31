@@ -25,7 +25,7 @@ export interface ApproveERC20BridgeProps {
   data: ApproveERC20BridgeData;
 }
 export function ApproveERC20BridgeOnboarding({ data }: ApproveERC20BridgeProps) {
-  const { bridgeState: { allowedTokens } } = useContext(BridgeContext);
+  const { bridgeState: { allowedTokens, eventTarget } } = useContext(BridgeContext);
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
   const { viewDispatch } = useContext(ViewContext);
@@ -266,7 +266,7 @@ export function ApproveERC20BridgeOnboarding({ data }: ApproveERC20BridgeProps) 
             <HeaderNavigation
               transparent
               showBack
-              onCloseButtonClick={sendBridgeWidgetCloseEvent}
+              onCloseButtonClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
               onBackButtonClick={goBackWithSwapData}
             />
           )}

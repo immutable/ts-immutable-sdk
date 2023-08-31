@@ -20,6 +20,7 @@ export interface BridgeProps {
 export function Bridge({ amount, fromContractAddress }: BridgeProps) {
   const { header } = text.views[BridgeWidgetViews.BRIDGE];
   const { bridgeDispatch } = useContext(BridgeContext);
+  const { bridgeState: { eventTarget } } = useContext(BridgeContext);
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
 
@@ -45,7 +46,7 @@ export function Bridge({ amount, fromContractAddress }: BridgeProps) {
       header={(
         <HeaderNavigation
           title={header.title}
-          onCloseButtonClick={() => sendBridgeWidgetCloseEvent()}
+          onCloseButtonClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
         />
       )}
       footer={<FooterLogo />}

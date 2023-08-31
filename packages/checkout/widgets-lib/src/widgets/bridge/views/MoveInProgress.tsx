@@ -21,10 +21,12 @@ interface MoveInProgressProps {
 
 export function MoveInProgress({ token, transactionResponse, bridgeForm }: MoveInProgressProps) {
   const { viewDispatch } = useContext(ViewContext);
+
   const { heading, body1, body2 } = text.views[BridgeWidgetViews.IN_PROGRESS];
   const {
     bridgeState: {
       tokenBridge,
+      eventTarget,
     },
   } = useContext(BridgeContext);
 
@@ -86,7 +88,7 @@ export function MoveInProgress({ token, transactionResponse, bridgeForm }: MoveI
       header={(
         <HeaderNavigation
           transparent
-          onCloseButtonClick={sendBridgeWidgetCloseEvent}
+          onCloseButtonClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
         />
       )}
       footer={(

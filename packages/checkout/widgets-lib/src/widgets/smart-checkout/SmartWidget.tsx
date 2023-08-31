@@ -7,6 +7,7 @@ import {
   useContext, useEffect, useMemo, useReducer,
 } from 'react';
 
+import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import {
   ConnectTargetLayer,
   WidgetTheme,
@@ -35,6 +36,7 @@ import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
 import { SimpleTextBody } from '../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../components/Footer/FooterButton';
 import { SmartCheckoutHero } from '../../components/Hero/SmartCheckoutHero';
+import { sendSwapWidgetCloseEvent } from '../swap/SwapWidgetEvents';
 
 export interface SmartWidgetProps {
   params: SmartWidgetParams;
@@ -123,10 +125,6 @@ export function SmartWidget(props: SmartWidgetProps) {
     });
   };
 
-  const onrampClick = () => {
-    console.log('coming soon');
-  };
-
   const onStartClick = () => {
     viewDispatch({
       payload: {
@@ -135,6 +133,49 @@ export function SmartWidget(props: SmartWidgetProps) {
       },
     });
   };
+
+  const eventTarget = new EventTarget();
+
+  const handleCustomEvent = (event) => {
+    console.log('Custom event triggered!', event);
+    // Handle the custom event here
+  };
+
+  useEffect(() => {
+    // Add a custom event listener when the component mounts
+    eventTarget.addEventListener(IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT, handleCustomEvent);
+
+    // Remove the custom event listener when the component unmounts
+    return () => {
+      eventTarget.removeEventListener(IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT, handleCustomEvent);
+    };
+  }, [eventTarget]);
+
+  const triggerCustomEvent = () => {
+    // Create and dispatch the custom event
+    const customEvent = new CustomEvent(IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT);
+    eventTarget.dispatchEvent(customEvent);
+  };
+
+  useEffect(() => {
+    const handleBridgeWidgetEvents = ((event: CustomEvent) => {
+      console.log('EVENT INNER', event);
+    }) as EventListener;
+
+    if (viewReducerValues.viewState.view.type === SmartWidgetViews.SMART_BRIDGE) {
+      window.addEventListener(
+        IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT,
+        handleBridgeWidgetEvents,
+      );
+    }
+
+    return () => {
+      window.removeEventListener(
+        IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT,
+        handleBridgeWidgetEvents,
+      );
+    };
+  }, [viewReducerValues.viewState.view.type]);
 
   useEffect(() => {
     viewDispatch({
@@ -173,12 +214,13 @@ export function SmartWidget(props: SmartWidgetProps) {
           {viewReducerValues.viewState.view.type === SmartWidgetViews.SMART_BRIDGE && (
             <ConnectLoader
               params={bridgeLoaderParams}
-              closeEvent={sendBridgeWidgetCloseEvent}
+              closeEvent={() => sendBridgeWidgetCloseEvent(eventTarget)}
               widgetConfig={config}
             >
               <BridgeWidget
                 params={bridgeParams}
                 config={config}
+                eventTarget={eventTarget}
               />
             </ConnectLoader>
           )}
@@ -186,7 +228,7 @@ export function SmartWidget(props: SmartWidgetProps) {
           {viewReducerValues.viewState.view.type === SmartWidgetViews.SMART_SWAP && (
             <ConnectLoader
               params={swapLoaderParams}
-              closeEvent={sendBridgeWidgetCloseEvent}
+              closeEvent={() => sendSwapWidgetCloseEvent}
               widgetConfig={config}
             >
               <SwapWidget
@@ -199,10 +241,10 @@ export function SmartWidget(props: SmartWidgetProps) {
             width: '430px', backgroundColor: '#0D0D0D', marginTop: '10px', padding: '16px', borderRadius: '8px',
           }}
           >
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Button onClick={bridgeClick}>BRIDGE</Button>
-              <Button onClick={swapClick}>SWAP</Button>
-              <Button onClick={onrampClick}>ONRAMP</Button>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', columnGap: '16px' }}>
+              <Button sx={{ flexGrow: 1 }} onClick={bridgeClick}>BRIDGE</Button>
+              <Button sx={{ flexGrow: 1 }} onClick={swapClick}>SWAP</Button>
+              <Button sx={{ flexGrow: 1 }} onClick={triggerCustomEvent}>EVENT</Button>
             </Box>
 
           </Box>

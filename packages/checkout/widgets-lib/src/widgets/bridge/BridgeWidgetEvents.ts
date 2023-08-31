@@ -41,7 +41,7 @@ export const sendBridgeFailedEvent = (reason: string) => {
   if (window !== undefined) window.dispatchEvent(failedEvent);
 };
 
-export function sendBridgeWidgetCloseEvent() {
+export function sendBridgeWidgetCloseEvent(eventTarget:EventTarget | Window = window) {
   const closeWidgetEvent = new CustomEvent<WidgetEvent<any>>(
     IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT,
     {
@@ -53,5 +53,5 @@ export function sendBridgeWidgetCloseEvent() {
   );
   // eslint-disable-next-line no-console
   console.log('bridge close ', closeWidgetEvent);
-  if (window !== undefined) window.dispatchEvent(closeWidgetEvent);
+  if (eventTarget !== undefined) eventTarget.dispatchEvent(closeWidgetEvent);
 }
