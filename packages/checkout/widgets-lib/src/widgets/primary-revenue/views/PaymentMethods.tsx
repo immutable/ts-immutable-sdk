@@ -63,6 +63,7 @@ export function PaymentMethods(props: PaymentMethodsProps) {
                   fromContractAddress,
                 },
                 swapData: {
+                  fromContractAddress: '',
                   fromAmount: amount,
                   toContractAddress: fromContractAddress,
                 },
