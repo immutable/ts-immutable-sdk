@@ -200,7 +200,7 @@ describe('Blockscout', () => {
     });
 
     it('throws', async () => {
-      mockedAxios.get.mockRejectedValueOnce(new Error());
+      mockedAxios.get.mockRejectedValueOnce('hello');
 
       const tokens = [BlockscoutTokenType.ERC20];
       const client = new Blockscout({ chainId: ChainId.IMTBL_ZKEVM_TESTNET });

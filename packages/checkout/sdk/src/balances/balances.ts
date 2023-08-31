@@ -93,54 +93,51 @@ export const getIndexerBalance = async (
   walletAddress: string,
   chainId: ChainId,
   rename: TokenInfo[],
-): Promise<GetAllBalancesResult> => withCheckoutError<GetAllBalancesResult>(
-  async () => {
+): Promise<GetAllBalancesResult> => {
   // Shuffle the mapping of the tokens configuration so it is a hashmap
   // for faster access to tokens config objects.
-    const mapRename = Object.assign({}, ...(rename.map((t) => ({ [t.address || '']: t }))));
+  const mapRename = Object.assign({}, ...(rename.map((t) => ({ [t.address || '']: t }))));
 
-    // Ensure singleton is present and match the selected chain
-    if (!blockscoutClient || blockscoutClient.chainId !== chainId) blockscoutClient = new Blockscout({ chainId });
+  // Ensure singleton is present and match the selected chain
+  if (!blockscoutClient || blockscoutClient.chainId !== chainId) blockscoutClient = new Blockscout({ chainId });
 
-    // Hold the items in an array for post-fetching processing
-    const items = [];
+  // Hold the items in an array for post-fetching processing
+  const items = [];
 
-    const tokenType = [BlockscoutTokenType.ERC20];
-    // Given that the widgets aren't yet designed to support pagination,
-    // fetch all the possible tokens associated to a given wallet address.
-    let resp: BlockscoutAddressTokens | undefined;
-    try {
-      do {
-        // eslint-disable-next-line no-await-in-loop
-        resp = await blockscoutClient.getAddressTokens({ walletAddress, tokenType, nextPage: resp?.next_page_params });
-        items.push(...resp.items);
-      } while (resp.next_page_params);
-    } catch (err: any) {
-      throw new CheckoutError(err.message, CheckoutErrorType.GET_INDEXER_BALANCE_ERROR, err);
-    }
+  const tokenType = [BlockscoutTokenType.ERC20];
+  // Given that the widgets aren't yet designed to support pagination,
+  // fetch all the possible tokens associated to a given wallet address.
+  let resp: BlockscoutAddressTokens | undefined;
+  try {
+    do {
+      // eslint-disable-next-line no-await-in-loop
+      resp = await blockscoutClient.getAddressTokens({ walletAddress, tokenType, nextPage: resp?.next_page_params });
+      items.push(...resp.items);
+    } while (resp.next_page_params);
+  } catch (err: any) {
+    throw new CheckoutError(err.message || 'InternalServerError', CheckoutErrorType.GET_INDEXER_BALANCE_ERROR, err);
+  }
 
-    return {
-      balances: items.map((item) => {
-        const tokenData = item.token || {};
+  return {
+    balances: items.map((item) => {
+      const tokenData = item.token || {};
 
-        const balance = BigNumber.from(item.value);
+      const balance = BigNumber.from(item.value);
 
-        const renamed = (mapRename[tokenData.address] || {}) as TokenInfo;
-        const token = {
-          ...tokenData,
-          name: renamed.name ?? tokenData.name,
-          symbol: renamed.symbol ?? tokenData.symbol,
-          decimals: parseInt(tokenData.decimals, 10),
-        };
+      const renamed = (mapRename[tokenData.address] || {}) as TokenInfo;
+      const token = {
+        ...tokenData,
+        name: renamed.name ?? tokenData.name,
+        symbol: renamed.symbol ?? tokenData.symbol,
+        decimals: parseInt(tokenData.decimals, 10),
+      };
 
-        const formattedBalance = utils.formatUnits(item.value, token.decimals);
+      const formattedBalance = utils.formatUnits(item.value, token.decimals);
 
-        return { balance, formattedBalance, token } as GetBalanceResult;
-      }),
-    };
-  },
-  { type: CheckoutErrorType.GET_BALANCE_ERROR },
-);
+      return { balance, formattedBalance, token } as GetBalanceResult;
+    }),
+  };
+};
 
 export const getBalances = async (
   config: CheckoutConfiguration,

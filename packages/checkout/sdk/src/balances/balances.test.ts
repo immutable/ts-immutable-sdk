@@ -1,7 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber, Contract } from 'ethers';
 import { Environment } from '@imtbl/config';
-import axios from 'axios';
+import axios, { HttpStatusCode } from 'axios';
 import {
   getAllBalances,
   getBalance,
@@ -23,8 +23,6 @@ import { CheckoutConfiguration } from '../config';
 import { BlockscoutTokenType } from '../client';
 
 jest.mock('axios');
-const mockedAxios = axios as jest.Mocked<typeof axios>;
-
 jest.mock('../tokens');
 jest.mock('ethers', () => ({
   ...jest.requireActual('ethers'),
@@ -33,6 +31,7 @@ jest.mock('ethers', () => ({
 }));
 
 describe('balances', () => {
+  const mockedAxios = axios as jest.Mocked<typeof axios>;
   const testCheckoutConfig = new CheckoutConfiguration({ baseConfig: { environment: Environment.PRODUCTION } });
   const currentBalance = BigNumber.from('1000000000000000000');
   const formattedBalance = '1.0';
@@ -336,7 +335,7 @@ describe('balances', () => {
     it('should call getIndexerBalance', async () => {
       const chainId = Object.keys(BLOCKSCOUT_CHAIN_URL_MAP)[0] as unknown as ChainId;
 
-      const mockResponse = {
+      mockedAxios.get.mockResolvedValueOnce({
         status: 200,
         data: {
           items: [
@@ -364,8 +363,7 @@ describe('balances', () => {
           // eslint-disable-next-line @typescript-eslint/naming-convention
           next_page_params: null,
         },
-      };
-      mockedAxios.get.mockResolvedValueOnce(mockResponse);
+      });
 
       const getAllBalancesResult = await getAllBalances(
         {
@@ -408,6 +406,56 @@ describe('balances', () => {
           type: 'ERC-20',
         },
       }]);
+    });
+
+    it('should call getIndexerBalance and throw error', async () => {
+      const chainId = Object.keys(BLOCKSCOUT_CHAIN_URL_MAP)[0] as unknown as ChainId;
+
+      mockedAxios.isAxiosError.mockReturnValue(true);
+      mockedAxios.get.mockResolvedValueOnce({
+        status: 200,
+        data: {
+          items: [],
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          next_page_params: {},
+        },
+      });
+      mockedAxios.get.mockRejectedValueOnce({ response: { status: HttpStatusCode.Forbidden }, message: 'test' });
+
+      let message;
+      let type;
+      let data;
+      try {
+        await getAllBalances(
+          {
+            remote: {
+              getTokensConfig: () => ({
+                blockscout: true,
+              }),
+            },
+            networkMap: testCheckoutConfig.networkMap,
+          } as unknown as CheckoutConfiguration,
+          jest.fn() as unknown as Web3Provider,
+          '0xabc123', // use unique wallet address to prevent cached data
+          chainId,
+        );
+      } catch (err: any) {
+        message = err.message;
+        type = err.type;
+        data = err.data;
+      }
+
+      expect(mockedAxios.get).toHaveBeenNthCalledWith(
+        1,
+        `${BLOCKSCOUT_CHAIN_URL_MAP[chainId]}/api/v2/addresses/0xabc123/tokens?type=${BlockscoutTokenType.ERC20}`,
+      );
+
+      expect(message).toEqual('test');
+      expect(type).toEqual(CheckoutErrorType.GET_INDEXER_BALANCE_ERROR);
+      expect(data).toEqual({
+        code: HttpStatusCode.Forbidden,
+        message: 'test',
+      });
     });
   });
 
