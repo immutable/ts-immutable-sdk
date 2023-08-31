@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- @imtbl/game-bridge: Added support for Blui to be used as a browser widget for UE4
+
 ## [0.16.0] - 2023-08-31
 
 ### Added
