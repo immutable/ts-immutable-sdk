@@ -44,3 +44,12 @@ export const mockUserZkEvm: UserZkEvm = {
     userAdminAddress: 'zkevmUserAdminAddress123',
   },
 };
+
+export const mockLinkedAddresses = {
+  data: {
+    linkedAddresses: [
+      '0x123',
+      '0x456',
+    ],
+  },
+};

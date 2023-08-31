@@ -16,6 +16,7 @@ const PassportContext = createContext<{
   getIdToken: () => Promise<string | undefined>;
   getAccessToken: () => Promise<string | undefined>;
   getUserInfo: () => Promise<UserProfile | undefined>;
+  getLinkedAddresses: () => Promise<string[] | undefined>;
 }>({
       imxProvider: undefined,
       zkEvmProvider: undefined,
@@ -26,6 +27,7 @@ const PassportContext = createContext<{
       getIdToken: () => Promise.resolve(undefined),
       getAccessToken: () => Promise.resolve(undefined),
       getUserInfo: () => Promise.resolve(undefined),
+      getLinkedAddresses: () => Promise.resolve(undefined),
     });
 
 export function PassportProvider({
@@ -110,6 +112,15 @@ export function PassportProvider({
     return userInfo;
   }, [passportClient, setIsLoading, addMessage]);
 
+  const getLinkedAddresses = useCallback(async () => {
+    setIsLoading(true);
+    const linkedAddresses = await passportClient?.getLinkedAddresses();
+    addMessage('Get Linked Addresses', linkedAddresses);
+    setIsLoading(false);
+
+    return linkedAddresses;
+  }, [passportClient, setIsLoading, addMessage]);
+
   const logout = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -136,6 +147,7 @@ export function PassportProvider({
     getIdToken,
     getAccessToken,
     getUserInfo,
+    getLinkedAddresses,
   }), [
     imxProvider,
     zkEvmProvider,
@@ -146,6 +158,7 @@ export function PassportProvider({
     getIdToken,
     getAccessToken,
     getUserInfo,
+    getLinkedAddresses,
   ]);
 
   return (
@@ -166,6 +179,7 @@ export function usePassportProvider() {
     getIdToken,
     getAccessToken,
     getUserInfo,
+    getLinkedAddresses,
   } = useContext(PassportContext);
   return {
     imxProvider,
@@ -177,5 +191,6 @@ export function usePassportProvider() {
     getIdToken,
     getAccessToken,
     getUserInfo,
+    getLinkedAddresses,
   };
 }
