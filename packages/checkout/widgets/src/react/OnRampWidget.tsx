@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React, { useEffect } from 'react';
 import { WalletProviderName } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';

@@ -4,6 +4,7 @@ import { OnRampEventType } from './onrampEvents';
 import { OrchestrationEventType } from './orchestrationEvents';
 import { SwapEventType } from './swapEvents';
 import { WalletEventType } from './walletEvents';
+import { PrimaryRevenueEventType } from './primaryRevenueEvents';
 
 /**
  * Enum representing the events emitted by the widgets.
@@ -20,10 +21,16 @@ export enum IMTBLWidgetEvents {
 /**
  * Represents an event emitted by a widget.
  * @template T - The type of data associated with the event.
- * @property {OrchestrationEventType | ConnectEventType | WalletEventType | SwapEventType | BridgeEventType | OnRampEventType} type - The type of the event.
+ * @property {OrchestrationEventType | ConnectEventType | WalletEventType | SwapEventType | BridgeEventType | OnRampEventType | PrimaryRevenueEventType} type - The type of the event.
  * @property {T} data - The data associated with the event.
  */
 export type WidgetEvent<T> = {
-  type: OrchestrationEventType | ConnectEventType | WalletEventType | SwapEventType | BridgeEventType | OnRampEventType,
+  type: OrchestrationEventType
+  | ConnectEventType
+  | WalletEventType
+  | SwapEventType
+  | BridgeEventType
+  | OnRampEventType
+  | PrimaryRevenueEventType,
   data: T;
 };
