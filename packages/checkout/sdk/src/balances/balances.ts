@@ -16,6 +16,7 @@ import { getTokenAllowList } from '../tokens';
 import { CheckoutConfiguration } from '../config';
 import {
   Blockscout,
+  BlockscoutAddressTokens,
   BlockscoutTokenType,
 } from '../client';
 
@@ -92,47 +93,54 @@ export const getIndexerBalance = async (
   walletAddress: string,
   chainId: ChainId,
   rename: TokenInfo[],
-): Promise<GetAllBalancesResult> => {
+): Promise<GetAllBalancesResult> => withCheckoutError<GetAllBalancesResult>(
+  async () => {
   // Shuffle the mapping of the tokens configuration so it is a hashmap
   // for faster access to tokens config objects.
-  const mapRename = Object.assign({}, ...(rename.map((t) => ({ [t.address || '']: t }))));
+    const mapRename = Object.assign({}, ...(rename.map((t) => ({ [t.address || '']: t }))));
 
-  // Ensure singleton is present and match the selected chain
-  if (!bcs || bcs.chainId !== chainId) bcs = new Blockscout({ chainId });
+    // Ensure singleton is present and match the selected chain
+    if (!bcs || bcs.chainId !== chainId) bcs = new Blockscout({ chainId });
 
-  // Hold the items in an array for post-fetching processing
-  const items = [];
+    // Hold the items in an array for post-fetching processing
+    const items = [];
 
-  const tokenType = [BlockscoutTokenType.ERC20];
-  // Given that the widgets aren't yet designed to support pagination,
-  // fetch all the possible tokens associated to a given wallet address.
-  let resp;
-  do {
-    // eslint-disable-next-line no-await-in-loop
-    resp = await bcs.getAddressTokens({ walletAddress, tokenType, nextPage: resp?.next_page_params });
-    items.push(...resp.items);
-  } while (resp.next_page_params);
+    const tokenType = [BlockscoutTokenType.ERC20];
+    // Given that the widgets aren't yet designed to support pagination,
+    // fetch all the possible tokens associated to a given wallet address.
+    let resp: BlockscoutAddressTokens | undefined;
+    try {
+      do {
+        // eslint-disable-next-line no-await-in-loop
+        resp = await bcs.getAddressTokens({ walletAddress, tokenType, nextPage: resp?.next_page_params });
+        items.push(...resp.items);
+      } while (resp.next_page_params);
+    } catch (err: any) {
+      throw new CheckoutError(err.message, CheckoutErrorType.GET_INDEXER_BALANCE_ERROR, err);
+    }
 
-  return {
-    balances: items.map((i) => {
-      const tokenData = i.token || {};
+    return {
+      balances: items.map((item) => {
+        const tokenData = item.token || {};
 
-      const balance = BigNumber.from(i.value);
+        const balance = BigNumber.from(item.value);
 
-      const renamed = (mapRename[tokenData.address] || {}) as TokenInfo;
-      const token = {
-        ...tokenData,
-        name: renamed.name ?? tokenData.name,
-        symbol: renamed.symbol ?? tokenData.symbol,
-        decimals: parseInt(tokenData.decimals, 10),
-      };
+        const renamed = (mapRename[tokenData.address] || {}) as TokenInfo;
+        const token = {
+          ...tokenData,
+          name: renamed.name ?? tokenData.name,
+          symbol: renamed.symbol ?? tokenData.symbol,
+          decimals: parseInt(tokenData.decimals, 10),
+        };
 
-      const formattedBalance = utils.formatUnits(i.value, token.decimals);
+        const formattedBalance = utils.formatUnits(item.value, token.decimals);
 
-      return { balance, formattedBalance, token } as GetBalanceResult;
-    }),
-  };
-};
+        return { balance, formattedBalance, token } as GetBalanceResult;
+      }),
+    };
+  },
+  { type: CheckoutErrorType.GET_BALANCE_ERROR },
+);
 
 export const getBalances = async (
   config: CheckoutConfiguration,
@@ -184,7 +192,14 @@ export const getAllBalances = async (
   // In order to prevent unnecessary RPC calls
   // let's use the Indexer if available for the
   // given chain.
-  const flag = (await config.remote.getTokensConfig(chainId)).blockscout || false;
+  let flag = false;
+  try {
+    flag = (await config.remote.getTokensConfig(chainId)).blockscout || flag;
+  } catch (err: any) {
+    // eslint-disable-next-line no-console
+    console.error(err);
+  }
+
   if (flag && Blockscout.isChainSupported(chainId)) {
     return await getIndexerBalance(walletAddress, chainId, tokens);
   }
