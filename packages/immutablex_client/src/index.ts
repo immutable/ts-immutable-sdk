@@ -67,6 +67,26 @@ export {
   WalletConnection as ImxClientWalletConnection,
 };
 
+// export types from core-sdk
+export {
+  IMXError,
+  UnsignedOrderRequest,
+  UnsignedTransferRequest,
+  UnsignedMintRequest,
+  UnsignedExchangeTransferRequest,
+  StarkSigner,
+  WalletConnection,
+  ERC20Token,
+  ERC721Token,
+  ETHToken,
+  ETHAmount,
+  ERC20Amount,
+  AnyToken,
+  TokenAmount,
+  ExchangeTokenAmount,
+  NftTransferDetails,
+} from '@imtbl/core-sdk';
+
 export class ImmutableXClient {
   private immutableX: ImmutableX;
 
@@ -546,9 +566,9 @@ export class ImmutableXClient {
   }
 
   /**
-   * Get details of a TransferImx with the given ID
+   * Get details of a Transfer with the given ID
    * @param request - the request object containing the parameters to be provided in the API request
-   * @returns a promise that resolves with the requested TransferImx
+   * @returns a promise that resolves with the requested Transfer
    * @throws {@link index.IMXError}
    */
   public getTransfer(request: TransfersApiGetTransferRequest) {
@@ -596,10 +616,10 @@ export class ImmutableXClient {
   }
 
   /**
-   * Create a new TransferImx request
+   * Create a new Transfer request
    * @param walletConnection - the pair of Eth/Stark signers
    * @param request - the request object to be provided in the API request
-   * @returns a promise that resolves with the created Exchange TransferImx
+   * @returns a promise that resolves with the created Exchange Transfer
    * @throws {@link index.IMXError}
    */
   public exchangeTransfer(

@@ -15,7 +15,7 @@
 
 
 /**
- *
+ * 
  * @export
  * @interface TransferRequest
  */
@@ -63,7 +63,7 @@ export interface TransferRequest {
      */
     'sender_vault_id': number;
     /**
-     * TransferImx payload signature
+     * Transfer payload signature
      * @type {string}
      * @memberof TransferRequest
      */

@@ -82,7 +82,7 @@ export const TransfersApiAxiosParamCreator = function (configuration?: Configura
             }
 
 
-
+    
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -133,7 +133,7 @@ export const TransfersApiAxiosParamCreator = function (configuration?: Configura
             }
 
 
-
+    
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -169,7 +169,7 @@ export const TransfersApiAxiosParamCreator = function (configuration?: Configura
             const localVarQueryParameter = {} as any;
 
 
-
+    
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -205,7 +205,7 @@ export const TransfersApiAxiosParamCreator = function (configuration?: Configura
             const localVarQueryParameter = {} as any;
 
 
-
+    
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -221,7 +221,7 @@ export const TransfersApiAxiosParamCreator = function (configuration?: Configura
         /**
          * Get details of a transfer with the given ID
          * @summary Get details of a transfer with the given ID
-         * @param {string} id TransferImx ID
+         * @param {string} id Transfer ID
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -242,7 +242,7 @@ export const TransfersApiAxiosParamCreator = function (configuration?: Configura
             const localVarQueryParameter = {} as any;
 
 
-
+    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -357,7 +357,7 @@ export const TransfersApiAxiosParamCreator = function (configuration?: Configura
             }
 
 
-
+    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -430,7 +430,7 @@ export const TransfersApiFp = function(configuration?: Configuration) {
         /**
          * Get details of a transfer with the given ID
          * @summary Get details of a transfer with the given ID
-         * @param {string} id TransferImx ID
+         * @param {string} id Transfer ID
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -524,7 +524,7 @@ export const TransfersApiFactory = function (configuration?: Configuration, base
         /**
          * Get details of a transfer with the given ID
          * @summary Get details of a transfer with the given ID
-         * @param {string} id TransferImx ID
+         * @param {string} id Transfer ID
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -665,7 +665,7 @@ export interface TransfersApiGetSignableTransferV1Request {
  */
 export interface TransfersApiGetTransferRequest {
     /**
-     * TransferImx ID
+     * Transfer ID
      * @type {string}
      * @memberof TransfersApiGetTransfer
      */

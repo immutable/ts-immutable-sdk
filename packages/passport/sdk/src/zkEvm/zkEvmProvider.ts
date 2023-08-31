@@ -21,7 +21,6 @@ import { loginZkEvmUser } from './user';
 import { sendTransaction } from './sendTransaction';
 import GuardianClient from '../guardian/guardian';
 import { signTypedDataV4 } from './signTypedDataV4';
-import { isValidSignature, isValidSignatureSequence } from './walletHelpers';
 
 export type ZkEvmProviderInput = {
   authManager: AuthManager;
@@ -81,18 +80,6 @@ export class ZkEvmProvider implements Provider {
     this.eventEmitter = new TypedEventEmitter<ProviderEventMap>();
 
     passportEventEmitter.on(PassportEvents.LOGGED_OUT, this.handleLogout);
-
-    Object.defineProperty(window, 'zkevmProvider', {
-      configurable: true,
-      value: {
-        isValidSignature: async (address: string, typedData: string, signature: string): Promise<boolean> => (
-          isValidSignature(this.jsonRpcProvider, address, JSON.parse(typedData), signature)
-        ),
-        isValidSignatureSequence: async (address: string, typedData: string, signature: string): Promise<boolean> => (
-          isValidSignatureSequence(this.jsonRpcProvider, address, JSON.parse(typedData), signature)
-        ),
-      },
-    });
   }
 
   private handleLogout = () => {

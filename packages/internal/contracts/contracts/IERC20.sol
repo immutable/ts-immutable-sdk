@@ -13,7 +13,7 @@ interface IERC20 {
      *
      * Note that `value` may be zero.
      */
-    event TransferImx(address indexed from, address indexed to, uint256 value);
+    event Transfer(address indexed from, address indexed to, uint256 value);
 
     /**
      * @dev Emitted when the allowance of a `spender` for an `owner` is set by
@@ -36,7 +36,7 @@ interface IERC20 {
      *
      * Returns a boolean value indicating whether the operation succeeded.
      *
-     * Emits a {TransferImx} event.
+     * Emits a {Transfer} event.
      */
     function transfer(address to, uint256 amount) external returns (bool);
 
@@ -72,7 +72,7 @@ interface IERC20 {
      *
      * Returns a boolean value indicating whether the operation succeeded.
      *
-     * Emits a {TransferImx} event.
+     * Emits a {Transfer} event.
      */
     function transferFrom(
         address from,

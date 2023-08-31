@@ -67,7 +67,7 @@ export const ExchangesApiAxiosParamCreator = function (configuration?: Configura
             const localVarQueryParameter = {} as any;
 
 
-
+    
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -122,7 +122,7 @@ export const ExchangesApiAxiosParamCreator = function (configuration?: Configura
             }
 
 
-
+    
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -159,7 +159,7 @@ export const ExchangesApiAxiosParamCreator = function (configuration?: Configura
             const localVarQueryParameter = {} as any;
 
 
-
+    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -196,7 +196,7 @@ export const ExchangesApiAxiosParamCreator = function (configuration?: Configura
             const localVarQueryParameter = {} as any;
 
 
-
+    
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -220,7 +220,7 @@ export const ExchangesApiAxiosParamCreator = function (configuration?: Configura
          * @param {string} [walletAddress] Ethereum address of the user who created transaction
          * @param {'created' | 'pending' | 'completed' | 'failed' | 'waitingPayment' | 'timedOut'} [status] Transaction status
          * @param {'moonpay' | 'layerswap'} [provider] Provider name
-         * @param {string} [transferId] TransferImx ID
+         * @param {string} [transferId] Transfer ID
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -274,7 +274,7 @@ export const ExchangesApiAxiosParamCreator = function (configuration?: Configura
             }
 
 
-
+    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -354,7 +354,7 @@ export const ExchangesApiFp = function(configuration?: Configuration) {
          * @param {string} [walletAddress] Ethereum address of the user who created transaction
          * @param {'created' | 'pending' | 'completed' | 'failed' | 'waitingPayment' | 'timedOut'} [status] Transaction status
          * @param {'moonpay' | 'layerswap'} [provider] Provider name
-         * @param {string} [transferId] TransferImx ID
+         * @param {string} [transferId] Transfer ID
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -428,7 +428,7 @@ export const ExchangesApiFactory = function (configuration?: Configuration, base
          * @param {string} [walletAddress] Ethereum address of the user who created transaction
          * @param {'created' | 'pending' | 'completed' | 'failed' | 'waitingPayment' | 'timedOut'} [status] Transaction status
          * @param {'moonpay' | 'layerswap'} [provider] Provider name
-         * @param {string} [transferId] TransferImx ID
+         * @param {string} [transferId] Transfer ID
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -592,7 +592,7 @@ export interface ExchangesApiGetExchangesRequest {
     readonly provider?: 'moonpay' | 'layerswap'
 
     /**
-     * TransferImx ID
+     * Transfer ID
      * @type {string}
      * @memberof ExchangesApiGetExchanges
      */
