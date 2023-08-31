@@ -1,13 +1,18 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+import { useEffect, useRef, useState } from 'react';
 import { Body, Box, Button } from '@biom3/react';
+import { PrimaryRevenueSuccess } from '@imtbl/checkout-widgets';
 
-import { useEffect, useState } from 'react';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { text } from '../../../resources/text/textConfig';
 import { PrimaryRevenueWidgetViews } from '../../../context/view-context/PrimaryRevenueViewContextTypes';
 import { OrderList } from '../components/OrderList';
+import {
+  sendPrimaryRevenueFailedEvent,
+  sendPrimaryRevenueSuccessEvent,
+} from '../PrimaryRevenuWidgetEvents';
 
 const mockOrderItems: any[] = [
   {
@@ -52,11 +57,12 @@ const mockOrderItems: any[] = [
 
 export interface ReviewOrderProps {
   currency?: string;
-  execute: () => Promise<void>;
   sign: () => Promise<void>;
+  execute: () => Promise<PrimaryRevenueSuccess>;
 }
 
 export function ReviewOrder(props: ReviewOrderProps) {
+  const once = useRef(false);
   const { header } = text.views[PrimaryRevenueWidgetViews.REVIEW_ORDER];
   const [orderItems, setOrderItems] = useState<any[]>([]);
   const [totalPrice, setTotalPrice] = useState<number>(0);
@@ -81,12 +87,21 @@ export function ReviewOrder(props: ReviewOrderProps) {
 
   const handlePayment = async () => {
     setLoading(true);
-    await execute();
+    try {
+      const transactionHashes = await execute();
+      sendPrimaryRevenueSuccessEvent(transactionHashes);
+    } catch (error) {
+      sendPrimaryRevenueFailedEvent((error as Error).message);
+    }
+
     setLoading(false);
   };
 
   useEffect(() => {
-    sign();
+    if (once.current === false) {
+      once.current = true;
+      sign();
+    }
   }, []);
 
   return (

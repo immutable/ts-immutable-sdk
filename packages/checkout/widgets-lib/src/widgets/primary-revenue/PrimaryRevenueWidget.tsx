@@ -55,6 +55,9 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
     config, amount, fromContractAddress, fromCurrency, envId, items,
   } = props;
 
+  const { connectLoaderState } = useContext(ConnectLoaderContext);
+  const { checkout, provider } = connectLoaderState;
+
   const { sign, execute } = useSignOrder({
     envId,
     items,
@@ -63,8 +66,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
     fromCurrency,
     // deprecated
     fromCollectionAddress: '0xf578b6bB4FA5c7403147C29be864f5e12BF211a0',
-    // provide connected wallet
-    recipientAddress: '0x81064a5d163559d422fd311dc36c051424620eb9',
+    provider,
   });
 
   const loadingText = text.views[SharedViews.LOADING_VIEW].text;
@@ -80,9 +82,6 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
     () => ({ viewState, viewDispatch }),
     [viewState, viewDispatch],
   );
-
-  const { connectLoaderState } = useContext(ConnectLoaderContext);
-  const { checkout, provider } = connectLoaderState;
 
   const mount = useCallback(async () => {
     if (!checkout || !provider) return;
@@ -141,7 +140,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
   }, []);
 
   useEffect(() => {
-    const orchestratedWidgetEvents = [
+    const topUpWidgetEvents = [
       IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT,
       IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT,
       IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT,
@@ -166,7 +165,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
 
       // TODO: handle `success` for all orchestrated widgets
       if (
-        orchestratedWidgetEvents.includes(event.type as IMTBLWidgetEvents)
+        topUpWidgetEvents.includes(event.type as IMTBLWidgetEvents)
         && event.detail.type === 'success'
       ) {
         viewDispatch({
@@ -197,7 +196,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
       handleWidgetEvents,
     );
 
-    orchestratedWidgetEvents.forEach((event) => {
+    topUpWidgetEvents.forEach((event) => {
       window.addEventListener(event as IMTBLWidgetEvents, handleWidgetEvents);
     });
 
@@ -206,6 +205,9 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
         IMTBLWidgetEvents.IMTBL_PRIMARY_REVENUE_WIDGET_EVENT,
         handleWidgetEvents,
       );
+      topUpWidgetEvents.forEach((event) => {
+        window.removeEventListener(event as IMTBLWidgetEvents, handleWidgetEvents);
+      });
     };
   }, []);
 
