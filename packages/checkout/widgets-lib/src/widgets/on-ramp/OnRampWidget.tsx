@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { BiomeCombinedProviders, Box } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import { useEffect } from 'react';

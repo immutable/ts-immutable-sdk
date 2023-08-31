@@ -92,6 +92,7 @@ export function PaymentMethods(props: PaymentMethodsProps) {
   );
 
   useEffect(() => {
+    // eslint-disable-next-line no-console
     console.log('🚀 ~ file: PaymentMethodsntMethods ~ viewState:', viewState);
   }, [viewState]);
 
