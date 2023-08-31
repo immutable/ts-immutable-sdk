@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { Token, TradeType } from '@uniswap/sdk-core';
+import { TradeType } from '@uniswap/sdk-core';
 import assert from 'assert';
 import {
   DuplicateAddressesError,
@@ -21,17 +21,10 @@ import {
 } from './constants';
 import { Router } from './lib/router';
 import {
-  getERC20Decimals,
-  isValidNonZeroAddress,
-  newAmount,
-  uniswapTokenToTokenInfo,
+  getERC20Decimals, isValidNonZeroAddress, newAmount,
 } from './lib/utils';
 import {
-  Amount,
-  ExchangeModuleConfiguration,
-  SecondaryFee,
-  TokenInfo,
-  TransactionResponse,
+  ExchangeModuleConfiguration, SecondaryFee, TokenInfo, TransactionResponse,
 } from './types';
 import { getSwap, prepareSwap } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
@@ -125,29 +118,25 @@ export class Exchange {
       this.getSecondaryFees(),
     ]);
 
-    const tokenIn: Token = new Token(
-      this.chainId,
-      tokenInAddress,
-      tokenInDecimals,
-    );
-    const tokenOut: Token = new Token(
-      this.chainId,
-      tokenOutAddress,
-      tokenOutDecimals,
-    );
+    const tokenIn: TokenInfo = {
+      address: tokenInAddress,
+      chainId: this.chainId,
+      decimals: tokenInDecimals,
+    };
+    const tokenOut: TokenInfo = {
+      address: tokenOutAddress,
+      chainId: this.chainId,
+      decimals: tokenOutDecimals,
+    };
 
     // determine which amount was specified for the swap from the TradeType
-    let amountSpecified: Amount;
-    let otherToken: Token;
-    if (tradeType === TradeType.EXACT_INPUT) {
-      amountSpecified = newAmount(amount, tokenIn);
-      otherToken = tokenOut;
-    } else {
-      amountSpecified = newAmount(amount, tokenOut);
-      otherToken = tokenIn;
-    }
+    const [tokenSpecified, otherToken] = tradeType === TradeType.EXACT_INPUT
+      ? [tokenIn, tokenOut] : [tokenOut, tokenIn];
 
-    const fees = new Fees(secondaryFees, uniswapTokenToTokenInfo(tokenIn));
+    const amountSpecified = newAmount(amount, tokenSpecified);
+
+    const fees = new Fees(secondaryFees, tokenIn);
+
     const ourQuoteReqAmount = getOurQuoteReqAmount(amountSpecified, fees, tradeType);
 
     // get quote and gas details

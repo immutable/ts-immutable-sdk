@@ -3,6 +3,8 @@ import { ChainId, ChainName } from './chains';
 import { TokenInfo } from './tokenInfo';
 
 export const ENV_DEVELOPMENT = 'development' as Environment;
+export const IMX_ADDRESS_ZKEVM = '0x0000000000000000000000000000000000001010';
+export const DEFAULT_TOKEN_DECIMALS = 18;
 
 /**
  * Base URL for the checkout API based on the environment.
@@ -14,6 +16,10 @@ export const CHECKOUT_API_BASE_URL = {
   [ENV_DEVELOPMENT]: 'https://checkout-api.dev.immutable.com',
   [Environment.SANDBOX]: 'https://checkout-api.sandbox.immutable.com',
   [Environment.PRODUCTION]: 'https://checkout-api.immutable.com',
+};
+
+export const BLOCKSCOUT_CHAIN_URL_MAP: { [key: string]: string } = {
+  [ChainId.IMTBL_ZKEVM_TESTNET]: 'https://explorer.testnet.immutable.com',
 };
 
 type NetworkDetails = {
@@ -54,6 +60,7 @@ NetworkDetails
         name: 'IMX',
         symbol: 'IMX',
         decimals: 18,
+        address: IMX_ADDRESS_ZKEVM,
       },
     },
   ],
@@ -89,6 +96,7 @@ NetworkDetails
         name: 'IMX',
         symbol: 'IMX',
         decimals: 18,
+        address: IMX_ADDRESS_ZKEVM,
       },
     },
   ],
@@ -122,6 +130,7 @@ NetworkDetails
         name: 'IMX',
         symbol: 'IMX',
         decimals: 18,
+        address: IMX_ADDRESS_ZKEVM,
       },
     },
   ],
@@ -300,6 +309,25 @@ export const ERC721ABI = [
       },
     ],
     payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
+    name: 'ownerOf',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
     stateMutability: 'view',
     type: 'function',
   },

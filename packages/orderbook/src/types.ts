@@ -1,6 +1,13 @@
 import { OrderComponents } from '@opensea/seaport-js/lib/types';
 import { PopulatedTransaction, TypedDataDomain, TypedDataField } from 'ethers';
-import { Fee, OrdersService } from 'openapi/sdk';
+import {
+  Fee as OpenapiFee,
+  OrdersService,
+  OrderStatus,
+} from './openapi/sdk';
+
+// Strictly re-export only the OrderStatus enum from the openapi types
+export { OrderStatus } from './openapi/sdk';
 
 export interface ERC721Item {
   type: 'ERC721';
@@ -41,7 +48,7 @@ export interface CreateListingParams {
   orderComponents: OrderComponents;
   orderHash: string;
   orderSignature: string;
-  makerFee?: Fee
+  makerFee?: FeeValue
 }
 
 // Expose the list order filtering and ordering directly from the openAPI SDK, except
@@ -50,6 +57,22 @@ export type ListListingsParams = Omit<
 Parameters<typeof OrdersService.prototype.listListings>[0],
 'chainName'
 >;
+
+export enum FeeType {
+  MAKER_MARKETPLACE = OpenapiFee.fee_type.MAKER_MARKETPLACE,
+  TAKER_MARKETPLACE = OpenapiFee.fee_type.TAKER_MARKETPLACE,
+  PROTOCOL = OpenapiFee.fee_type.PROTOCOL,
+  ROYALTY = OpenapiFee.fee_type.ROYALTY,
+}
+
+export interface FeeValue {
+  recipient: string;
+  amount: string;
+}
+
+export interface Fee extends FeeValue {
+  type: FeeType;
+}
 
 export enum TransactionPurpose {
   APPROVAL = 'APPROVAL',
@@ -87,8 +110,67 @@ export type Action = TransactionAction | SignableAction;
 
 export interface FulfillOrderResponse {
   actions: Action[];
+  /**
+   * User MUST submit the fulfillment transaction before the expiration
+   * Submitting after the expiration will result in a on chain revert
+   */
+  expiration: string;
+  // order might contain updated fee information
+  order: Order;
 }
 
 export interface CancelOrderResponse {
   unsignedCancelOrderTransaction: PopulatedTransaction;
+}
+
+export interface Order {
+  id: string;
+  accountAddress: string;
+  buy: (ERC20Item | NativeItem)[];
+  sell: ERC721Item[];
+  fees: Fee[];
+  chain: {
+    id: string;
+    name: string;
+  };
+  createTime: string;
+  updateTime: string;
+  /**
+   * Time after which the Order is considered active
+   */
+  startTime: string;
+  /**
+   * Time after which the Order is expired
+   */
+  endTime: string;
+  protocolData: {
+    orderType: 'FULL_RESTRICTED';
+    zoneAddress: string;
+    counter: string;
+    seaportAddress: string;
+    seaportVersion: string;
+  }
+  salt: string;
+  signature: string;
+  status: OrderStatus;
+}
+
+export interface ListingResult {
+  result: Order;
+}
+
+export interface ListListingsResult {
+  page: Page;
+  result: Order[];
+}
+
+export interface Page {
+  /**
+   * First item as an encoded string
+   */
+  previousCursor: string | null;
+  /**
+   * Last item as an encoded string
+   */
+  nextCursor: string | null;
 }

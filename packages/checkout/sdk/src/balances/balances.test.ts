@@ -1,12 +1,16 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber, Contract } from 'ethers';
 import { Environment } from '@imtbl/config';
-import { getAllBalances, getBalance, getERC20Balance } from './balances';
+import {
+  getAllBalances,
+  getBalance,
+  getBalances,
+  getERC20Balance,
+} from './balances';
 import {
   ChainId,
   ChainName,
   ERC20ABI,
-  GetAllBalancesResult,
   GetTokenAllowListResult,
   NetworkInfo,
   TokenInfo,
@@ -279,39 +283,105 @@ describe('balances', () => {
       expect(nameMock).toBeCalledTimes(2);
       expect(symbolMock).toBeCalledTimes(2);
 
-      expect(getAllBalancesResult).toEqual({
-        balances: [
-          {
-            balance: currentBalance,
-            formattedBalance,
-            token: {
-              name: ChainName.ETHEREUM,
-              symbol: 'ETH',
-              decimals: 18,
+      expect(getAllBalancesResult.balances).toEqual(
+        expect.arrayContaining(
+          [
+            {
+              balance: currentBalance,
+              formattedBalance,
+              token: {
+                name: ChainName.ETHEREUM,
+                symbol: 'ETH',
+                decimals: 18,
+              },
             },
-          },
-          {
-            balance: currentBalance,
-            formattedBalance,
-            token: {
-              name: 'Immutable X',
-              symbol: 'IMX',
-              decimals: 18,
-              address: '0xaddr',
+            {
+              balance: currentBalance,
+              formattedBalance,
+              token: {
+                name: 'Immutable X',
+                symbol: 'IMX',
+                decimals: 18,
+                address: '0xaddr',
+              },
             },
-          },
-          {
-            balance: currentBalance,
-            formattedBalance,
-            token: {
-              name: 'Matic',
-              symbol: 'MATIC',
-              decimals: 18,
-              address: '0xmaticAddr',
+            {
+              balance: currentBalance,
+              formattedBalance,
+              token: {
+                name: 'Matic',
+                symbol: 'MATIC',
+                decimals: 18,
+                address: '0xmaticAddr',
+              },
             },
-          },
-        ],
-      } as GetAllBalancesResult);
+          ],
+        ),
+      );
+    });
+  });
+
+  describe('getBalances()', () => {
+    let mockProviderForAllBalances: jest.Mock;
+
+    beforeEach(() => {
+      jest.restoreAllMocks();
+      mockProviderForAllBalances = jest.fn().mockImplementation(() => ({
+        getBalance: jest.fn().mockResolvedValue(currentBalance),
+        getNetwork: jest.fn().mockResolvedValue({ chainId: ChainId.IMTBL_ZKEVM_TESTNET, name: 'ZKEVM' }),
+        provider: {
+          request: jest.fn(),
+        },
+      } as unknown as Web3Provider));
+    });
+
+    it('should call getERC20Balance functions', async () => {
+      (Contract as unknown as jest.Mock).mockReturnValue({
+        balanceOf: jest.fn().mockResolvedValue(currentBalance),
+        decimals: jest.fn().mockResolvedValue(18),
+        name: jest.fn().mockResolvedValue('zkCATS'),
+        symbol: jest.fn().mockResolvedValue('zkCATS'),
+        address: jest.fn().mockResolvedValue('0xaddr'),
+      });
+
+      const getBalancesResult = await getBalances(
+        testCheckoutConfig,
+        mockProviderForAllBalances() as unknown as Web3Provider,
+        'abc123',
+        [{
+          name: 'zkCATS',
+          symbol: 'zkCATS',
+          decimals: 18,
+          address: '0xaddr',
+        }],
+      );
+
+      expect(getBalancesResult.balances).toEqual(
+        expect.arrayContaining(
+          [
+            {
+              balance: currentBalance,
+              formattedBalance,
+              token: {
+                name: 'zkCATS',
+                symbol: 'zkCATS',
+                decimals: 18,
+                address: '0xaddr',
+              },
+            },
+          ],
+        ),
+      );
+    });
+
+    it('should return an empty list if the token list is empty', async () => {
+      const getBalancesResult = await getBalances(
+        testCheckoutConfig,
+        mockProvider() as unknown as Web3Provider,
+        'abc123',
+        [],
+      );
+      expect(getBalancesResult.balances).toEqual([]);
     });
   });
 });

@@ -305,6 +305,7 @@ export class Checkout {
     );
 
     await smartCheckout.smartCheckout(
+      this.config,
       web3Provider,
       params.itemRequirements,
       params.transactionOrGasAmount,

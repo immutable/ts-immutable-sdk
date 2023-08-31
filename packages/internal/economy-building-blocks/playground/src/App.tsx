@@ -10,7 +10,7 @@ import Crafting from "./pages/Crafting";
 import PrimarySale from "./pages/PrimarySale";
 import Login from "./pages/Login";
 import { MulticallerProvider } from "./context/MulticallerProvider";
-import { MetamaskProvider } from "./MetamaskProvider";
+import { MetamaskProvider } from "./context/MetamaskProvider";
 
 function App() {
   return (
@@ -18,22 +18,22 @@ function App() {
       <DataProvider>
         <MulticallerProvider>
           <MetamaskProvider>
-          <PassportProvider>
-            <BiomeCombinedProviders>
-              <BiomeThemeProvider theme={{ base: onDarkBase }}>
-                <div className="App">
-                  <Container>
-                    <Header />
-                    <Routes>
-                      <Route path="/sale" element={<PrimarySale />} />
-                      <Route path="/crafting" element={<Crafting />} />
-                      <Route path="/login" element={<Login />} />
-                    </Routes>
-                  </Container>
-                </div>
-              </BiomeThemeProvider>
-            </BiomeCombinedProviders>
-          </PassportProvider>
+            <PassportProvider>
+              <BiomeCombinedProviders>
+                <BiomeThemeProvider theme={{ base: onDarkBase }}>
+                  <div className="App">
+                    <Container>
+                      <Header />
+                      <Routes>
+                        <Route path="/sale" element={<PrimarySale />} />
+                        <Route path="/crafting" element={<Crafting />} />
+                        <Route path="/login" element={<Login />} />
+                      </Routes>
+                    </Container>
+                  </div>
+                </BiomeThemeProvider>
+              </BiomeCombinedProviders>
+            </PassportProvider>
           </MetamaskProvider>
         </MulticallerProvider>
       </DataProvider>

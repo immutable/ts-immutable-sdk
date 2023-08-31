@@ -8,6 +8,7 @@ import {
   TipInputItem,
 } from '@opensea/seaport-js/lib/types';
 import { PopulatedTransaction, providers } from 'ethers';
+import { mapFromOpenApiOrder } from 'openapi/mapper';
 import {
   Action,
   ActionType,
@@ -20,8 +21,8 @@ import {
   SignablePurpose,
   TransactionAction,
   TransactionPurpose,
-} from 'types';
-import { Order } from 'openapi/sdk';
+} from '../types';
+import { Order } from '../openapi/sdk';
 import {
   EIP_712_ORDER_TYPE,
   ItemType,
@@ -146,7 +147,18 @@ export class Seaport {
       purpose: TransactionPurpose.FULFILL_ORDER,
     });
 
-    return { actions: fulfillmentActions };
+    // Expirtaion bytes in SIP7 extra data [21:29]
+    // In hex string -> [21 * 2 + 2 (0x) : 29 * 2]
+    // In JS slice (start, end_inclusive), (44,60)
+    // 8 bytes uint64 epoch time in seconds
+    const expirationHex = extraData.slice(44, 60);
+    const expirationInSeconds = parseInt(expirationHex, 16);
+
+    return {
+      actions: fulfillmentActions,
+      expiration: (new Date(expirationInSeconds * 1000)).toISOString(),
+      order: mapFromOpenApiOrder(order),
+    };
   }
 
   async cancelOrder(

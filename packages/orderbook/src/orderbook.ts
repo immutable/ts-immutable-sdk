@@ -1,27 +1,28 @@
 import { ModuleConfiguration } from '@imtbl/config';
-import { ImmutableApiClient, ImmutableApiClientFactory } from 'api-client';
+import { ImmutableApiClient, ImmutableApiClientFactory } from './api-client';
 import {
   getOrderbookConfig,
   OrderbookModuleConfiguration,
   OrderbookOverrides,
-} from 'config/config';
-import {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  Fee,
-  ListingResult,
-  ListListingsResult,
-  OrderStatus,
-} from 'openapi/sdk';
-import { Seaport } from 'seaport';
+} from './config/config';
+import { Fee as OpenApiFee } from './openapi/sdk';
+import { mapFromOpenApiOrder, mapFromOpenApiPage } from './openapi/mapper';
+import { Seaport } from './seaport';
+import { SeaportLibFactory } from './seaport/seaport-lib-factory';
 import {
   CancelOrderResponse,
   CreateListingParams,
+  Fee,
+  FeeType,
+  FeeValue,
   FulfillOrderResponse,
   ListListingsParams,
+  ListListingsResult,
+  ListingResult,
+  OrderStatus,
   PrepareListingParams,
   PrepareListingResponse,
-} from 'types';
-import { SeaportLibFactory } from './seaport/seaport-lib-factory';
+} from './types';
 
 /**
  * zkEVM orderbook SDK
@@ -87,8 +88,11 @@ export class Orderbook {
    * @param {string} listingId - The listingId to find.
    * @return {ListingResult} The returned order result.
    */
-  getListing(listingId: string): Promise<ListingResult> {
-    return this.apiClient.getListing(listingId);
+  async getListing(listingId: string): Promise<ListingResult> {
+    const apiListing = await this.apiClient.getListing(listingId);
+    return {
+      result: mapFromOpenApiOrder(apiListing.result),
+    };
   }
 
   /**
@@ -97,10 +101,14 @@ export class Orderbook {
    * @param {ListListingsParams} listOrderParams - Filtering, ordering and page parameters.
    * @return {ListListingsResult} The paged orders.
    */
-  listListings(
+  async listListings(
     listOrderParams: ListListingsParams,
   ): Promise<ListListingsResult> {
-    return this.apiClient.listListings(listOrderParams);
+    const apiListings = await this.apiClient.listListings(listOrderParams);
+    return {
+      page: mapFromOpenApiPage(apiListings.page),
+      result: apiListings.result.map(mapFromOpenApiOrder),
+    };
   }
 
   /**
@@ -133,10 +141,24 @@ export class Orderbook {
    * @param {CreateListingParams} createListingParams - create an order with the given params.
    * @return {ListingResult} The result of the order created in the Immutable services.
    */
-  createListing(
+  async createListing(
     createListingParams: CreateListingParams,
   ): Promise<ListingResult> {
-    return this.apiClient.createListing(createListingParams);
+    const makerFee: Fee | undefined = createListingParams.makerFee
+      ? {
+        ...createListingParams.makerFee,
+        type: FeeType.MAKER_MARKETPLACE,
+      }
+      : undefined;
+
+    const apiListingResponse = await this.apiClient.createListing({
+      ...createListingParams,
+      makerFee,
+    });
+
+    return {
+      result: mapFromOpenApiOrder(apiListingResponse.result),
+    };
   }
 
   /**
@@ -150,12 +172,18 @@ export class Orderbook {
   async fulfillOrder(
     listingId: string,
     takerAddress: string,
-    takerFee?: Fee,
+    takerFee?: FeeValue,
   ): Promise<FulfillOrderResponse> {
     const fulfillmentDataRes = await this.apiClient.fulfillmentData([
       {
         order_id: listingId,
-        fee: takerFee,
+        fee: takerFee
+          ? {
+            amount: takerFee.amount,
+            fee_type: FeeType.TAKER_MARKETPLACE as unknown as OpenApiFee.fee_type.TAKER_MARKETPLACE,
+            recipient: takerFee.recipient,
+          }
+          : undefined,
       },
     ]);
 

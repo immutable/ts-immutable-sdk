@@ -8,7 +8,8 @@ import {
 } from 'test/utils';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import { Fees } from 'lib/fees';
-import { QuoteTradeInfo, newAmount } from 'lib';
+import { newAmount } from 'lib';
+import { QuoteResult } from 'lib/getQuotesForRoutes';
 import { getSwap, prepareSwap } from './swap';
 
 const testPool = new Pool(
@@ -20,7 +21,7 @@ const testPool = new Pool(
   100,
 );
 
-const buildExactInputQuote = (): QuoteTradeInfo => {
+const buildExactInputQuote = (): QuoteResult => {
   const route = new Route([testPool], IMX_TEST_TOKEN, FUN_TEST_TOKEN);
   return {
     gasEstimate: BigNumber.from(0),
@@ -31,7 +32,7 @@ const buildExactInputQuote = (): QuoteTradeInfo => {
   };
 };
 
-const buildExactOutputQuote = (): QuoteTradeInfo => {
+const buildExactOutputQuote = (): QuoteResult => {
   const route = new Route([testPool], IMX_TEST_TOKEN, FUN_TEST_TOKEN);
   return {
     gasEstimate: BigNumber.from(0),

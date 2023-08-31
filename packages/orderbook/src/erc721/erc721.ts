@@ -1,5 +1,5 @@
-import { ImmutableERC721Base } from 'typechain/types';
-import { RoyaltyInfo } from 'types';
+import { ImmutableERC721Base } from '../typechain/types';
+import { RoyaltyInfo } from '../types';
 
 export class ERC721 {
   constructor(private readonly erc721: ImmutableERC721Base) {}

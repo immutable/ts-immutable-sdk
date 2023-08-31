@@ -2,7 +2,6 @@ import { useCallback, useContext, useState } from 'react';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../../components/Footer/FooterButton';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
-import { ImmutableNetworkHero } from '../../../components/Hero/ImmutableNetworkHero';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { text } from '../../../resources/text/textConfig';
@@ -12,6 +11,7 @@ import {
   ViewActions,
 } from '../../../context/view-context/ViewContext';
 import { getL2ChainId } from '../../../lib';
+import { ImmutablePlanetHero } from '../../../components/Hero/ImmutablePlanetHero';
 
 export function SwitchNetworkZkEVM() {
   const { viewDispatch } = useContext(ViewContext);
@@ -64,7 +64,7 @@ export function SwitchNetworkZkEVM() {
           onActionClick={switchNetwork}
         />
       )}
-      heroContent={<ImmutableNetworkHero />}
+      heroContent={<ImmutablePlanetHero />}
       floatHeader
     >
       <SimpleTextBody heading={heading}>{body}</SimpleTextBody>

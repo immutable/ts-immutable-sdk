@@ -8,8 +8,7 @@ export const bridgeFormWrapperStyles = {
 export const formInputsContainerStyles = {
   paddingTop: 'base.spacing.x4',
   display: 'flex',
-  justifyContent: 'space-between',
-  columnGap: 'base.spacing.x1',
+  gap: 'base.spacing.x1',
 };
 
 export const bridgeFormButtonContainerStyles = {

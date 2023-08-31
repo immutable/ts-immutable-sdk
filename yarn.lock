@@ -1896,14 +1896,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.8.0-beta":
-  version: 0.8.0-beta
-  resolution: "@biom3/react@npm:0.8.0-beta"
+"@biom3/react@npm:^0.9.7-beta":
+  version: 0.9.7-beta
+  resolution: "@biom3/react@npm:0.9.7-beta"
   dependencies:
     "@biom3/design-tokens": "*"
     "@emotion/css": ^11.11.2
     "@emotion/react": ^11.11.1
-    "@rive-app/react-canvas": ^3.0.50
+    "@rive-app/react-canvas": ^4.1.4
     buffer: ^6.0.3
     csstype: ^3.1.2
     framer-motion: ^10.12.12
@@ -1915,7 +1915,7 @@ __metadata:
     react-dom: ^18.2.0
     react-is: ^18.2.0
     ts-deepmerge: ^5.0.0
-  checksum: 81794b51735b2ffdc1fa77c949c9a4f15cdff0434909a95c7fe8b1043d2adf717cf7840b5c9833135b968067048133e1ac5f8bc52603518a7250fa1762b9cc89
+  checksum: afdf3be649d5a45c55b9f70a2c8726715237c5dc15e4fbd0eba71b4c7d1c67b8674d2f371b94b32120f2c00c1340792b4800066895e2bcd7b8bd106ee9df2bde
   languageName: node
   linkType: hard
 
@@ -3054,7 +3054,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-sdk-sample-app@workspace:packages/checkout/sdk-sample-app"
   dependencies:
-    "@biom3/react": ^0.8.0-beta
+    "@biom3/react": ^0.9.7-beta
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/config": 0.0.0
     "@svgr/webpack": ^8.0.1
@@ -3110,7 +3110,7 @@ __metadata:
   resolution: "@imtbl/checkout-widgets-lib@workspace:packages/checkout/widgets-lib"
   dependencies:
     "@biom3/design-tokens": 0.2.0-beta
-    "@biom3/react": ^0.8.0-beta
+    "@biom3/react": ^0.9.7-beta
     "@ethersproject/providers": ^5.7.2
     "@imtbl/bridge-sdk": 0.0.0
     "@imtbl/checkout-sdk": 0.0.0
@@ -3156,7 +3156,7 @@ __metadata:
   resolution: "@imtbl/checkout-widgets-sample-app@workspace:packages/checkout/widgets-sample-app"
   dependencies:
     "@biom3/design-tokens": 0.2.0-beta
-    "@biom3/react": ^0.8.0-beta
+    "@biom3/react": ^0.9.7-beta
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
@@ -3332,7 +3332,7 @@ __metadata:
   resolution: "@imtbl/economy-building-blocks-playground@workspace:packages/internal/economy-building-blocks/playground"
   dependencies:
     "@biom3/design-tokens": 0.2.0-beta
-    "@biom3/react": ^0.8.0-beta
+    "@biom3/react": ^0.9.7-beta
     "@imtbl/blockchain-data": 0.0.0
     "@imtbl/passport": 0.0.0
     "@imtbl/sdk": 0.0.0
@@ -3479,9 +3479,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/erc721-hybrid-permissioned-mintable@0.0.0, @imtbl/erc721-hybrid-permissioned-mintable@workspace:packages/erc721-hybrid-permissioned-mintable":
+"@imtbl/erc721-mint-by-id@0.0.0, @imtbl/erc721-mint-by-id@workspace:packages/erc721-mint-by-id":
   version: 0.0.0-use.local
-  resolution: "@imtbl/erc721-hybrid-permissioned-mintable@workspace:packages/erc721-hybrid-permissioned-mintable"
+  resolution: "@imtbl/erc721-mint-by-id@workspace:packages/erc721-mint-by-id"
   dependencies:
     "@imtbl/config": 0.0.0
     "@imtbl/contracts": 0.0.0
@@ -3493,9 +3493,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/erc721-permissioned-mintable@0.0.0, @imtbl/erc721-permissioned-mintable@workspace:packages/erc721-permissioned-mintable":
+"@imtbl/erc721@0.0.0, @imtbl/erc721@workspace:packages/erc721":
   version: 0.0.0-use.local
-  resolution: "@imtbl/erc721-permissioned-mintable@workspace:packages/erc721-permissioned-mintable"
+  resolution: "@imtbl/erc721@workspace:packages/erc721"
   dependencies:
     "@imtbl/config": 0.0.0
     "@imtbl/contracts": 0.0.0
@@ -3595,7 +3595,7 @@ __metadata:
   resolution: "@imtbl/passport-sdk-sample-app@workspace:packages/passport/sdk-sample-app"
   dependencies:
     "@biom3/design-tokens": 0.2.0-beta
-    "@biom3/react": ^0.8.0-beta
+    "@biom3/react": ^0.9.7-beta
     "@imtbl/config": 0.0.0
     "@imtbl/core-sdk": ^2.0.2
     "@imtbl/immutablex-client": 0.0.0
@@ -3713,8 +3713,8 @@ __metadata:
     "@imtbl/core-sdk": ^2.0.2
     "@imtbl/cryptofiat": 0.0.0
     "@imtbl/erc20": 0.0.0
-    "@imtbl/erc721-hybrid-permissioned-mintable": 0.0.0
-    "@imtbl/erc721-permissioned-mintable": 0.0.0
+    "@imtbl/erc721": 0.0.0
+    "@imtbl/erc721-mint-by-id": 0.0.0
     "@imtbl/generated-clients": 0.0.0
     "@imtbl/guardian": 0.0.0
     "@imtbl/immutablex-client": 0.0.0
@@ -6263,21 +6263,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rive-app/canvas@npm:1.2.2":
-  version: 1.2.2
-  resolution: "@rive-app/canvas@npm:1.2.2"
-  checksum: 6dbf644c9a7c8798bf32729eac50caf54a79a123bd97c82a26d76574fe5bfdf266d9026324de6ad9ff2a40ac1e2ed6bb29507bcb2c8307cb0103b19a898e691c
+"@rive-app/canvas@npm:2.2.2":
+  version: 2.2.2
+  resolution: "@rive-app/canvas@npm:2.2.2"
+  checksum: c420b431e512642e791942910aa40a9973cadb9320c98ec8f4575f5d4b7aab904dd1bc6f7e0f0f5cfcd9c9739333149e5caed0695179485be2fbf46f35e9d8de
   languageName: node
   linkType: hard
 
-"@rive-app/react-canvas@npm:^3.0.50":
-  version: 3.0.55
-  resolution: "@rive-app/react-canvas@npm:3.0.55"
+"@rive-app/react-canvas@npm:^4.1.4":
+  version: 4.1.6
+  resolution: "@rive-app/react-canvas@npm:4.1.6"
   dependencies:
-    "@rive-app/canvas": 1.2.2
+    "@rive-app/canvas": 2.2.2
   peerDependencies:
     react: ^16.8.0 || ^17.0.0 || ^18.0.0
-  checksum: 0520c23264c3981e4cbdca971235f7e046facb15460913c3b30636cd01e3bb416d5c4f734c55026fa39ccd0d1900efb181baaae01baedea196953eba2cca6727
+  checksum: c851bf1cb68461b427d9eaf199308bfd04314ff1fb5982b415c60d062f5280b4a65e20ff21e23005f9470a75ffd8fb560c1fb89d821223594018e1477f9e6952
   languageName: node
   linkType: hard
 
@@ -11150,7 +11150,7 @@ __metadata:
     "@ethersproject/providers": ^5.7.2
     "@imtbl/blockchain-data": 0.0.0
     "@imtbl/config": 0.0.0
-    "@imtbl/erc721-permissioned-mintable": 0.0.0
+    "@imtbl/erc721-mint-by-id": 0.0.0
     "@types/node": ^18.14.2
     "@types/react": ^18.0.28
     "@types/react-dom": ^18.0.11
@@ -25371,7 +25371,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "sample-app@workspace:packages/provider/src/sample-app"
   dependencies:
-    "@biom3/react": ^0.8.0-beta
+    "@biom3/react": ^0.9.7-beta
     "@imtbl/core-sdk": ^2.0.2
     "@imtbl/sdk": 0.0.0
     "@svgr/webpack": ^8.0.1

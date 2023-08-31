@@ -4,26 +4,26 @@
         "get bundled and released as part of alpha and prod",
         "releases of the SDK.",
         "Under `modules`, each key is a file in `src`, and each value is either alpha or prod",
-        "Under `fileCopy`, each object has `src` and `dest` keys, as wel, which are paths relative to this file"
+        "Under `fileCopy`, each object has `src` and `dest` keys, as well, which are paths relative to this file"
     ],
     "modules": {
         "config": "prod",
-        "blockchain_data": "alpha",
+        "blockchain_data": "prod",
         "immutablex_client": "prod",
         "passport": "prod",
-        "orderbook": "alpha",
+        "orderbook": "prod",
         "provider": "prod",
-        "checkout_sdk": "alpha",
-        "checkout_widgets": "alpha",
-        "erc20": "alpha",
-        "erc721_hybrid_permissioned_mintable": "alpha",
-        "erc721_permissioned_mintable": "alpha"
+        "checkout_sdk": "prod",
+        "checkout_widgets": "prod",
+        "erc20": "prod",
+        "erc721": "prod",
+        "erc721_mint_by_id": "prod"
     },
     "fileCopy": [
         {
             "src": "../packages/checkout/widgets-lib/build/static/js/main.*.js",
             "dest": "./dist/browser/checkout.js",
-            "stage": "alpha"
+            "stage": "prod"
         }
     ]
 }

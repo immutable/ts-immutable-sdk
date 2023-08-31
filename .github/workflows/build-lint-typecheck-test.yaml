@@ -7,9 +7,11 @@ on:
   pull_request:
 
 jobs:
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
+  build:
+    name: Build
+    runs-on: ubuntu-latest-4-cores
+    env:
+      NODE_OPTIONS: --max-old-space-size=14366
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -27,12 +29,12 @@ jobs:
       - name: Check Single Package Version Policy
         run: yarn syncpack:check
 
-      - name: Lint
-        run: yarn lint
-      
-  build-esm:
-    name: SDK ES Modules
-    runs-on: ubuntu-latest-8-cores
+      - name: Build
+        run: yarn build
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest-4-cores
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -46,12 +48,6 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --immutable
-
-      - name: Build
-        run: export NODE_OPTIONS=--max-old-space-size=6144 && yarn build:esm
-
-      - name: Typecheck
-        run: yarn typecheck
 
       - name: Test
         run: yarn test
@@ -71,9 +67,9 @@ jobs:
           name: checkout-sdk-coverage-report
           path: ./packages/checkout/sdk/coverage
 
-  build-browser:
-    name: SDK Browser Bundle
-    runs-on: ubuntu-latest-8-cores
+  cypress:
+    name: Cypress
+    runs-on: ubuntu-latest-4-cores
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -87,49 +83,6 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --immutable
-
-      - name: Build
-        run: export NODE_OPTIONS=--max-old-space-size=6144 && yarn build:browser
-
-  build-cjs:
-    name: SDK CommonJS
-    runs-on: ubuntu-latest-8-cores
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Use Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: lts/*
-          registry-url: https://registry.npmjs.org/
-          cache: 'yarn'
-
-      - name: Install dependencies
-        run: yarn install --immutable
-
-      - name: Build
-        run: export NODE_OPTIONS=--max-old-space-size=6144 && yarn build:cjs
-
-  build-checkout:
-    name: Checkout build & test
-    runs-on: ubuntu-latest-8-cores
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Use Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: lts/*
-          registry-url: https://registry.npmjs.org/
-          cache: 'yarn'
-
-      - name: Install dependencies
-        run: yarn install --immutable
-
-      - name: Build
-        run: export NODE_OPTIONS=--max-old-space-size=6144 && yarn build:checkout-widget
 
       - name: Get reviewing teams
         id: reviewer-teams
@@ -152,3 +105,23 @@ jobs:
         with:
           name: checkout-widgets-cypress-screenshots
           path: ./packages/checkout/widgets-lib/cypress/screenshots
+  
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest-4-cores
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: lts/*
+          registry-url: https://registry.npmjs.org/
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Lint
+        run: yarn lint

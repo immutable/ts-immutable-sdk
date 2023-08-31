@@ -15,7 +15,7 @@ function RequestExampleAccordion({ disabled, examples, handleExampleSubmitted }:
     <Stack gap={3} style={{ marginTop: '24px' }}>
       <Divider />
       <Heading
-        as="h2"
+        rc={<h2 />}
         size="medium"
       >
         Examples
