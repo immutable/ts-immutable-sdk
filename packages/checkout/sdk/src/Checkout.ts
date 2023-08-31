@@ -313,8 +313,7 @@ export class Checkout {
 
   /**
    * Cancels a sell.
-   * @param {SellParams} params - The parameters for the cancel.
-   * @param params
+   * @param {CancelParams} params - The parameters for the cancel.
    */
   public async cancel(
     params: CancelParams,
