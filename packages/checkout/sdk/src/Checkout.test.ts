@@ -484,7 +484,7 @@ describe('Connect', () => {
       collectionAddress: '0xERC721',
       buyToken: {
         type: ItemType.NATIVE,
-        amount: '100000',
+        amount: BigNumber.from('100000'),
       },
     });
 
@@ -496,7 +496,7 @@ describe('Connect', () => {
       '0xERC721',
       {
         type: ItemType.NATIVE,
-        amount: '100000',
+        amount: BigNumber.from('100000'),
       },
     );
   });
@@ -515,7 +515,7 @@ describe('Connect', () => {
       collectionAddress: '0xERC721',
       buyToken: {
         type: ItemType.NATIVE,
-        amount: '100000',
+        amount: BigNumber.from('100000'),
       },
     })).rejects.toThrow('This endpoint is not currently available.');
 
