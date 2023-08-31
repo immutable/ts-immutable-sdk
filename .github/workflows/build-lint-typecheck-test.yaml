@@ -84,12 +84,13 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
 
-      - name: Build
-        run: yarn build
-
       - name: Get reviewing teams
         id: reviewer-teams
         run: echo "teams=${{ join(github.event.pull_request.requested_teams.*.name, ', ') }}" >> $GITHUB_OUTPUT
+
+      - name: Build
+        if: ${{ contains(steps.reviewer-teams.outputs.teams, 'Wallets') && !contains(github.event.pull_request.title, 'SKIP-CY') }}
+        run: yarn build
 
       - name: Checkout-widgets cypress tests
         if: ${{ contains(steps.reviewer-teams.outputs.teams, 'Wallets') && !contains(github.event.pull_request.title, 'SKIP-CY') }}
