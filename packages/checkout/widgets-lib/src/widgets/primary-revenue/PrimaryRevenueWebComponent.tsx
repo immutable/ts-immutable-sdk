@@ -71,6 +71,24 @@ export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
             config={this.widgetConfig!}
             amount={this.amount}
             fromContractAddress={this.fromContractAddress}
+            fromCurrency="USDC"
+            envId="63a1f100-192e-4305-a504-1c65b0300f1e"
+            items={[
+              {
+                id: '1',
+                name: 'Gems chest',
+                price: '0.5',
+                image: 'http://placehold.it/100x100',
+                qty: 1,
+              },
+              {
+                id: '2',
+                name: 'Redstone chest',
+                price: '1',
+                image: 'http://placehold.it/100x100',
+                qty: 2,
+              },
+            ]}
           />
         </ConnectLoader>
       </React.StrictMode>,
