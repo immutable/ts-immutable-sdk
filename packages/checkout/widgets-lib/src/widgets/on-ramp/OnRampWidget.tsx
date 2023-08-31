@@ -20,7 +20,11 @@ import { sendOnRampWidgetCloseEvent } from './OnRampWidgetEvents';
 import { OnRampMain } from './views/OnRampMain';
 import { StatusType } from '../../components/Status/StatusType';
 import { StatusView } from '../../components/Status/StatusView';
-import { useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import {
+  AnalyticsControls,
+  useAnalytics,
+  UserJourney,
+} from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { isPassportProvider } from '../../lib/providerUtils';
 
 const LOADING_VIEW_DELAY_MS = 1000;
@@ -78,9 +82,9 @@ export function OnRampWidget(props: OnRampWidgetProps) {
       }
 
       track({
-        userJourney: 'OnRamp',
+        userJourney: UserJourney.ON_RAMP,
         screen: 'Onramp-widget-load',
-        control: 'WidgetInitialisation',
+        control: AnalyticsControls.WIDGET_INITIALISATION,
         controlType: 'WidgetLoad',
         action: 'Opened',
         userId: userWalletAddress,

@@ -9,7 +9,8 @@ import { OnRampWidgetViews } from '../../../context/view-context/OnRampViewConte
 import { text } from '../../../resources/text/textConfig';
 import { boxMainStyle, containerStyle } from './onRampStyles';
 import {
-  useAnalytics,
+  AnalyticsControls,
+  useAnalytics, UserJourney,
 } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { TransakEvents } from '../TransakEvents';
 
@@ -45,9 +46,9 @@ export function OnRampMain({
     switch (eventData.event_id) {
       case TransakEvents.TRANSAK_WIDGET_OPEN:
         track({
-          userJourney: 'OnRamp',
+          userJourney: UserJourney.ON_RAMP,
           screen: 'Initial-onramp-screen',
-          control: 'WebhookEvent',
+          control: AnalyticsControls.WEBHOOK_EVENT,
           controlType: 'Trigger',
           action: 'Opened',
           ...miscProps,
@@ -55,9 +56,9 @@ export function OnRampMain({
         break;
       case TransakEvents.TRANSAK_ORDER_CREATED:
         track({
-          userJourney: 'OnRamp',
+          userJourney: UserJourney.ON_RAMP,
           screen: 'order-creation',
-          control: 'WebhookEvent',
+          control: AnalyticsControls.WEBHOOK_EVENT,
           controlType: 'Trigger',
           action: 'Started',
           ...miscProps,
@@ -65,9 +66,9 @@ export function OnRampMain({
         break;
       case TransakEvents.TRANSAK_ORDER_SUCCESSFUL: // user paid
         track({
-          userJourney: 'OnRamp',
+          userJourney: UserJourney.ON_RAMP,
           screen: 'payment-confirmation',
-          control: 'Confirm',
+          control: AnalyticsControls.CONFIRM,
           controlType: 'Button',
           action: 'Processing',
           ...miscProps,
@@ -75,9 +76,9 @@ export function OnRampMain({
         break;
       case TransakEvents.TRANSAK_ORDER_FAILED: // payment failed
         track({
-          userJourney: 'OnRamp',
+          userJourney: UserJourney.ON_RAMP,
           screen: 'failure-screen',
-          control: 'WebhookEvent',
+          control: AnalyticsControls.WEBHOOK_EVENT,
           controlType: 'Trigger',
           action: 'Failed',
           ...miscProps,
