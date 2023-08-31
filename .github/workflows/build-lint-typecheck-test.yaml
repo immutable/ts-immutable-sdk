@@ -70,6 +70,8 @@ jobs:
   cypress:
     name: Cypress
     runs-on: ubuntu-latest-4-cores
+    env:
+      NODE_OPTIONS: --max-old-space-size=14366
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -87,6 +89,10 @@ jobs:
       - name: Get reviewing teams
         id: reviewer-teams
         run: echo "teams=${{ join(github.event.pull_request.requested_teams.*.name, ', ') }}" >> $GITHUB_OUTPUT
+
+      - name: Build
+        if: ${{ contains(steps.reviewer-teams.outputs.teams, 'Wallets') && !contains(github.event.pull_request.title, 'SKIP-CY') }}
+        run: yarn build
 
       - name: Checkout-widgets cypress tests
         if: ${{ contains(steps.reviewer-teams.outputs.teams, 'Wallets') && !contains(github.event.pull_request.title, 'SKIP-CY') }}
