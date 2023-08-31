@@ -11,9 +11,7 @@ import {
   ImmutableERC721MintByID,
   ImmutableERC721MintByID__factory,
 } from '@imtbl/contracts';
-import {
-  ImmutableERC721Base,
-} from '@imtbl/contracts/dist/typechain/types/ImmutableERC721MintByID';
+import { ImmutableERC721Base } from '@imtbl/contracts/dist/typechain/types/ImmutableERC721MintByID';
 import { PromiseOrValue } from '@imtbl/contracts/dist/typechain/types/common';
 
 // Struct for specifying token IDs to mint to an address.
@@ -199,13 +197,13 @@ export class ERC721MintByID {
   }
 
   /**
-   * @returns the royalty allowlist as a string.
+   * @returns the operator allowlist as a string.
    */
-  public async royaltyAllowlist(
+  public async operatorAllowlist(
     provider: Provider,
     overrides: CallOverrides = {},
   ): Promise<string> {
-    return await this.contract.connect(provider).royaltyAllowlist(overrides);
+    return await this.contract.connect(provider).operatorAllowlist(overrides);
   }
 
   /**
@@ -295,7 +293,10 @@ export class ERC721MintByID {
       from?: PromiseOrValue<string>;
     } = {},
   ): Promise<PopulatedTransaction> {
-    return await this.contract.populateTransaction.burnBatch(tokenIds, overrides);
+    return await this.contract.populateTransaction.burnBatch(
+      tokenIds,
+      overrides,
+    );
   }
 
   /**
@@ -352,7 +353,10 @@ export class ERC721MintByID {
       from?: PromiseOrValue<string>;
     } = {},
   ): Promise<PopulatedTransaction> {
-    return await this.contract.populateTransaction.safeMintBatch(mints, overrides);
+    return await this.contract.populateTransaction.safeMintBatch(
+      mints,
+      overrides,
+    );
   }
 
   /**
@@ -365,7 +369,11 @@ export class ERC721MintByID {
       from?: PromiseOrValue<string>;
     } = {},
   ): Promise<PopulatedTransaction> {
-    return await this.contract.populateTransaction.safeBurn(owner, tokenId, overrides);
+    return await this.contract.populateTransaction.safeBurn(
+      owner,
+      tokenId,
+      overrides,
+    );
   }
 
   /**
@@ -377,7 +385,10 @@ export class ERC721MintByID {
       from?: PromiseOrValue<string>;
     } = {},
   ): Promise<PopulatedTransaction> {
-    return await this.contract.populateTransaction.safeBurnBatch(burns, overrides);
+    return await this.contract.populateTransaction.safeBurnBatch(
+      burns,
+      overrides,
+    );
   }
 
   /**
@@ -438,7 +449,10 @@ export class ERC721MintByID {
       from?: PromiseOrValue<string>;
     } = {},
   ): Promise<PopulatedTransaction> {
-    return await this.contract.populateTransaction.safeTransferFromBatch(transfers, overrides);
+    return await this.contract.populateTransaction.safeTransferFromBatch(
+      transfers,
+      overrides,
+    );
   }
 
   /**
@@ -577,16 +591,16 @@ export class ERC721MintByID {
   }
 
   /**
-   * @returns a populated transaction for the setRoyaltyAllowlistRegistry contract function
+   * @returns a populated transaction for the setOperatorAllowlistRegistry contract function
    */
-  public async populateSetRoyaltyAllowlistRegistry(
-    _royaltyAllowlist: PromiseOrValue<string>,
+  public async populateSetOperatorAllowlistRegistry(
+    _operatorAllowlist: PromiseOrValue<string>,
     overrides: Overrides & {
       from?: PromiseOrValue<string>;
     } = {},
   ): Promise<PopulatedTransaction> {
-    return await this.contract.populateTransaction.setRoyaltyAllowlistRegistry(
-      _royaltyAllowlist,
+    return await this.contract.populateTransaction.setOperatorAllowlistRegistry(
+      _operatorAllowlist,
       overrides,
     );
   }
