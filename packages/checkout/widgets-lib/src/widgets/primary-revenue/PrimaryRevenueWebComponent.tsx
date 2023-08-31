@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { PrimaryRevenueWidget } from './PrimaryRevenueWidget';
+import { PrimaryRevenueWidget, Item } from './PrimaryRevenueWidget';
 import {
   ConnectLoader,
   ConnectLoaderParams,
@@ -13,9 +13,16 @@ import {
 } from '../../lib/validations/widgetValidators';
 
 export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
+  // @deprecated
+  fromContractAddress = '';
+
   amount = '';
 
-  fromContractAddress = '';
+  envId = '';
+
+  fromCurrency = '';
+
+  items: Item[] = [];
 
   constructor() {
     console.log('ImmutablePrimaryRevenue constructor'); // eslint-disable-line no-console
@@ -45,6 +52,11 @@ export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
     }
   }
 
+  setItems(items: Item[]) {
+    this.items = items;
+    this.renderWidget();
+  }
+
   renderWidget() {
     this.validateInputs();
     const connectLoaderParams: ConnectLoaderParams = {
@@ -70,25 +82,11 @@ export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
           <PrimaryRevenueWidget
             config={this.widgetConfig!}
             amount={this.amount}
-            fromContractAddress={this.fromContractAddress}
             fromCurrency="USDC"
-            envId="63a1f100-192e-4305-a504-1c65b0300f1e"
-            items={[
-              {
-                id: '1',
-                name: 'Gems chest',
-                price: '0.5',
-                image: 'http://placehold.it/100x100',
-                qty: 1,
-              },
-              {
-                id: '2',
-                name: 'Redstone chest',
-                price: '1',
-                image: 'http://placehold.it/100x100',
-                qty: 2,
-              },
-            ]}
+            envId={this.envId}
+            items={this.items}
+            // deprecated
+            fromContractAddress={this.fromContractAddress}
           />
         </ConnectLoader>
       </React.StrictMode>,

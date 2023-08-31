@@ -33,6 +33,14 @@ import { SwapWidget } from '../swap/SwapWidget';
 import { OnRampWidget } from '../on-ramp/OnRampWidget';
 import { useSignOrder } from './hooks/useSignOrder';
 
+export type Item = {
+  id: string;
+  name: string;
+  price: string;
+  qty: number;
+  image: string;
+  description?: string;
+};
 export interface PrimaryRevenueWidgetProps {
   // @deprecated
   fromContractAddress: string;
@@ -41,13 +49,7 @@ export interface PrimaryRevenueWidgetProps {
   amount: string;
   envId: string;
   fromCurrency: string;
-  items: {
-    id: string;
-    name: string;
-    price: string;
-    qty: number;
-    image: string;
-  }[];
+  items: Item[];
 }
 
 export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
@@ -206,7 +208,10 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
         handleWidgetEvents,
       );
       topUpWidgetEvents.forEach((event) => {
-        window.removeEventListener(event as IMTBLWidgetEvents, handleWidgetEvents);
+        window.removeEventListener(
+          event as IMTBLWidgetEvents,
+          handleWidgetEvents,
+        );
       });
     };
   }, []);
@@ -221,7 +226,13 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
           <PaymentMethods checkBalances={handleCheckBalances} />
         )}
         {viewState.view.type === PrimaryRevenueWidgetViews.PAY_WITH_CRYPTO && (
-          <ReviewOrder execute={execute} sign={sign} />
+          <ReviewOrder
+            items={items}
+            currency={fromCurrency}
+            amount={amount}
+            sign={sign}
+            execute={execute}
+          />
         )}
         {viewState.view.type === PrimaryRevenueWidgetViews.PAY_WITH_CARD && (
           <PayWithCard />
@@ -229,10 +240,9 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
         {viewState.view.type === SharedViews.TOP_UP_VIEW && (
           <TopUpView
             widgetEvent={IMTBLWidgetEvents.IMTBL_PRIMARY_REVENUE_WIDGET_EVENT}
-            // FIXME: pass on config to enable/disable options
-            showOnrampOption
-            showSwapOption
-            showBridgeOption
+            showOnrampOption={config.isOnRampEnabled}
+            showSwapOption={config.isSwapEnabled}
+            showBridgeOption={config.isBridgeEnabled}
             onCloseButtonClick={handleGoBackToMethods}
             onBackButtonClick={handleGoBackToMethods}
             amount={amount}
