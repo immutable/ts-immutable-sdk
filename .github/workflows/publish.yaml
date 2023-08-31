@@ -122,6 +122,6 @@ jobs:
         if: contains(github.event.inputs.release_type, 'release')
         run: yarn release --ci --no-increment -c .release-it.json $( ${{ github.event.inputs.dry_run }} && echo "--dry-run" || echo "") --github.tokenRef=${{ secrets.RELEASE_TOKEN }}
 
-      - name: Push Changelog
-        if: github.event.inputs.dry_run == 'false'
-        run: VERSION="${{ steps.version.outputs.NEXT_VERSION }}" ./.github/scripts/push-changelog-pr.sh
+      - name: Create GitHub Release
+        if: contains(github.event.inputs.release_type, 'release') && github.event.inputs.dry_run == 'false'
+        run: gh release create ${{ steps.version.outputs.NEXT_VERSION }} --title ${{ steps.version.outputs.NEXT_VERSION }} --draft=true --prerelease=false --generate-notes --repo immutable/ts-immutable-sdk
