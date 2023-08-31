@@ -8,6 +8,7 @@ import { useState, useMemo } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
 import Buy from '../components/Buy';
 import { SmartCheckoutForm } from '../components/SmartCheckoutForm';
+import Sell from '../components/Sell';
 
 export default function SmartCheckout() {
   const [environment, setEnvironment] = useState(Environment.SANDBOX);
@@ -94,6 +95,18 @@ export default function SmartCheckout() {
         Buy
       </Divider>
       <Buy
+        checkout={checkout} 
+        provider={provider} />
+
+      <Divider
+        sx={{
+          marginTop: 'base.spacing.x6',
+          marginBottom: 'base.spacing.x2',
+        }}
+      >
+        Sell
+      </Divider>
+      <Sell
         checkout={checkout} 
         provider={provider} />
 
