@@ -205,7 +205,7 @@ describe('sell', () => {
       }
 
       expect(message).toEqual('An error occurred while preparing the listing');
-      expect(type).toEqual(CheckoutErrorType.PREPARE_LISTING_ERROR);
+      expect(type).toEqual(CheckoutErrorType.PREPARE_ORDER_LISTING_ERROR);
       expect(data).toEqual({ message: 'error from orderbook' });
 
       expect(smartCheckout).toBeCalledTimes(0);
