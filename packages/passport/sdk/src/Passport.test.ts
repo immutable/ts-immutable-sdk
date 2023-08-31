@@ -1,15 +1,17 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { ImmutableXClient } from '@imtbl/immutablex-client';
+import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
 import { Passport } from './Passport';
 import { PassportImxProvider, PassportImxProviderFactory } from './starkEx';
 import { Networks, OidcConfiguration } from './types';
-import { mockUser } from './test/mocks';
+import { mockUser, mockLinkedAddresses } from './test/mocks';
 
 jest.mock('./authManager');
 jest.mock('./magicAdapter');
 jest.mock('./starkEx');
+jest.mock('@imtbl/generated-clients');
 
 const oidcConfiguration: OidcConfiguration = {
   clientId: '11111',
@@ -31,6 +33,7 @@ describe('Passport', () => {
   let loginSilentMock: jest.Mock;
   let getProviderMock: jest.Mock;
   let getProviderSilentMock: jest.Mock;
+  let getLinkedAddressesMock: jest.Mock;
 
   beforeEach(() => {
     authLoginMock = jest.fn().mockReturnValue(mockUser);
@@ -43,6 +46,7 @@ describe('Passport', () => {
     loginSilentMock = jest.fn();
     getProviderMock = jest.fn();
     getProviderSilentMock = jest.fn();
+    getLinkedAddressesMock = jest.fn();
     (AuthManager as unknown as jest.Mock).mockReturnValue({
       login: authLoginMock,
       loginCallback: loginCallbackMock,
@@ -58,6 +62,11 @@ describe('Passport', () => {
     (PassportImxProviderFactory as jest.Mock).mockReturnValue({
       getProvider: getProviderMock,
       getProviderSilent: getProviderSilentMock,
+    });
+    (MultiRollupApiClients as jest.Mock).mockReturnValue({
+      passportApi: {
+        getLinkedAddresses: getLinkedAddressesMock,
+      },
     });
     passport = new Passport({
       baseConfig: new ImmutableConfiguration({
@@ -204,6 +213,30 @@ describe('Passport', () => {
       const result = await passport.getAccessToken();
 
       expect(result).toEqual(undefined);
+    });
+  });
+
+  describe('getLinkedAddresses', () => {
+    it('should execute getLinkedAddresses', async () => {
+      getUserMock.mockReturnValue(mockUser);
+      getLinkedAddressesMock.mockReturnValue(mockLinkedAddresses);
+
+      const result = await passport.getLinkedAddresses();
+
+      expect(result).toEqual(mockLinkedAddresses.data.linkedAddresses);
+    });
+
+    it('should return empty array if there is no linked addresses', async () => {
+      getUserMock.mockReturnValue(mockUser);
+      getLinkedAddressesMock.mockReturnValue({
+        data: {
+          linkedAddresses: [],
+        },
+      });
+
+      const result = await passport.getLinkedAddresses();
+
+      expect(result).toHaveLength(0);
     });
   });
 });

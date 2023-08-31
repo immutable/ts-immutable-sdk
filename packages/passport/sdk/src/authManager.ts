@@ -105,7 +105,6 @@ export default class AuthManager {
         userAdminAddress: passport?.zkevm_user_admin_address,
       };
     }
-
     return user;
   };
 
@@ -128,7 +127,12 @@ export default class AuthManager {
         userAdminAddress: idTokenPayload?.passport?.imx_user_admin_address,
       };
     }
-
+    if (idTokenPayload?.passport?.zkevm_eth_address) {
+      user.zkEvm = {
+        ethAddress: idTokenPayload?.passport?.zkevm_eth_address,
+        userAdminAddress: idTokenPayload?.passport?.zkevm_user_admin_address,
+      };
+    }
     return user;
   };
 
@@ -312,15 +316,15 @@ export default class AuthManager {
       const refreshToken = tokenResponse?.refresh_token ?? null;
       if (refreshToken) {
         // Token is no longer valid, but refresh token can be used to a new one
-        const newTokenResponse = await this.refreshToken(refreshToken);
-        return AuthManager.mapDeviceTokenResponseToDomainUserModel(newTokenResponse);
+        const user = await this.refreshToken(refreshToken);
+        return user;
       }
 
       return null;
     }, PassportErrorType.AUTHENTICATION_ERROR);
   }
 
-  private async refreshToken(refreshToken: string): Promise<DeviceTokenResponse> {
+  public async refreshToken(refreshToken: string): Promise<User | null> {
     const response = await axios.post<DeviceTokenResponse>(
       `${this.config.authenticationDomain}/oauth/token`,
       {
@@ -330,8 +334,9 @@ export default class AuthManager {
       },
       formUrlEncodedHeader,
     );
+    const newTokenResponse = response.data;
 
-    return response.data;
+    return AuthManager.mapDeviceTokenResponseToDomainUserModel(newTokenResponse);
   }
 
   public async logout(): Promise<void> {

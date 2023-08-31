@@ -24,6 +24,12 @@ describe('Approve ERC20 Onboarding', () => {
   let connectLoaderState: ConnectLoaderState;
   let mockApproveERC20Swap: ApproveERC20SwapData;
   let sendTransactionStub;
+  const mockProvider = {
+    getSigner: () => ({
+      getAddress: () => Promise.resolve('0xwalletAddress'),
+      populateTransaction: (tx) => Promise.resolve(tx),
+    }),
+  } as Web3Provider;
 
   beforeEach(() => {
     cy.viewport('ipad-2');
@@ -33,7 +39,7 @@ describe('Approve ERC20 Onboarding', () => {
       checkout: {
         sendTransaction: sendTransactionStub,
       } as unknown as Checkout,
-      provider: {} as Web3Provider,
+      provider: mockProvider,
       connectionStatus: ConnectionStatus.CONNECTED_WITH_NETWORK,
     };
 
@@ -104,7 +110,7 @@ describe('Approve ERC20 Onboarding', () => {
         .should(
           'have.been.calledOnceWith',
           {
-            provider: {},
+            provider: mockProvider,
             transaction: { from: 'test-approval', to: 'test-approval' },
           },
         );
@@ -150,7 +156,7 @@ describe('Approve ERC20 Onboarding', () => {
           initialStateOverride={
             {
               ...connectLoaderState,
-              provider: { provider: { isPassport: true } as ExternalProvider } as Web3Provider,
+              provider: { ...mockProvider, provider: { isPassport: true } as ExternalProvider } as Web3Provider,
             }
           }
         >
@@ -228,7 +234,7 @@ describe('Approve ERC20 Onboarding', () => {
         .should(
           'have.been.calledOnceWith',
           {
-            provider: {},
+            provider: mockProvider,
             transaction: { from: 'test-approval', to: 'test-approval' },
           },
         );
@@ -239,7 +245,7 @@ describe('Approve ERC20 Onboarding', () => {
         .should(
           'have.been.calledWith',
           {
-            provider: {},
+            provider: mockProvider,
             transaction: { from: 'test-swap', to: 'test-swap' },
           },
         );

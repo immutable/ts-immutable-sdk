@@ -131,7 +131,6 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
     if (actionDisabled) return;
 
     setActionDisabled(true);
-
     try {
       const txnResult = await checkout.sendTransaction({
         provider,

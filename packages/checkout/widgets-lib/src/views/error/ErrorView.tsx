@@ -50,9 +50,9 @@ export function ErrorView({
         {' '}
         <Link
           size="small"
-          renderContainer={(props) => (
-            <a {...props} href="https://support.immutable.com/en/" />
-          )}
+          rc={
+            <a href="https://support.immutable.com/en/" />
+          }
         >
           {errorText.body[1]}
         </Link>

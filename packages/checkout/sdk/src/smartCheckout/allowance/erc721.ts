@@ -22,7 +22,7 @@ export const getERC721ApprovedForAll = async (
     throw new CheckoutError(
       'Failed to check approval for all ERC721s of collection',
       CheckoutErrorType.GET_ERC721_ALLOWANCE_ERROR,
-      { contractAddress },
+      { ownerAddress, contractAddress, spenderAddress },
     );
   }
 };
@@ -48,7 +48,9 @@ export const getApproveTransaction = async (
     throw new CheckoutError(
       'Failed to get the approval transaction for ERC721',
       CheckoutErrorType.GET_ERC721_ALLOWANCE_ERROR,
-      { contractAddress },
+      {
+        id: id.toString(), contractAddress, spenderAddress, ownerAddress,
+      },
     );
   }
 };
@@ -71,7 +73,7 @@ export const getERC721ApprovedAddress = async (
     throw new CheckoutError(
       'Failed to get approved address for ERC721',
       CheckoutErrorType.GET_ERC721_ALLOWANCE_ERROR,
-      { contractAddress },
+      { id: id.toString(), contractAddress },
     );
   }
 };
