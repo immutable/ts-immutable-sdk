@@ -14,76 +14,24 @@ import {
   sendPrimaryRevenueSuccessEvent,
 } from '../PrimaryRevenuWidgetEvents';
 
-const mockOrderItems: any[] = [
-  {
-    name: 'Gems Chest',
-    contract_address: '0x18ea1d312a4037B8676c760AbfD7D1DBE65486a1',
-    token_id: '0x123',
-    image: 'https://via.placeholder.com/150',
-    chain: {
-      id: '5',
-      name: 'goerli',
-    },
-    metadata_synced_at: '2021-09-01T00:00:00.000Z',
-    indexed_at: '2023-09-01T00:00:00.000Z',
-    external_link: 'https://via.placeholder.com/150',
-    description: 'NFT 1',
-    animation_url: 'https://via.placeholder.com/150',
-    youtube_url: 'https://via.placeholder.com/150',
-    mint_activity_id: '1',
-    price: '0.0001',
-    currency: 'ETH',
-  },
-  {
-    name: 'Redstone Chest',
-    contract_address: '0x18ea1d312a4037B8676c760AbfD7D1DBE65486a1',
-    token_id: '0x234',
-    image: 'https://via.placeholder.com/151',
-    chain: {
-      id: '5',
-      name: 'goerli',
-    },
-    metadata_synced_at: '2021-09-01T00:00:00.000Z',
-    indexed_at: '2023-09-01T00:00:00.000Z',
-    external_link: 'https://via.placeholder.com/151',
-    description: 'NFT 2',
-    animation_url: 'https://via.placeholder.com/151',
-    youtube_url: 'https://via.placeholder.com/151',
-    mint_activity_id: '2',
-    price: '0.0002',
-    currency: 'ETH',
-  },
-];
-
 export interface ReviewOrderProps {
-  currency?: string;
   sign: () => Promise<void>;
   execute: () => Promise<PrimaryRevenueSuccess>;
+  currency: string;
+  amount: string;
+  // FIXME: add type
+  items: any[];
 }
 
 export function ReviewOrder(props: ReviewOrderProps) {
-  const once = useRef(false);
+  const {
+    currency, execute, sign, items, amount,
+  } = props;
+  console.log('🚀 ~ file: ReviewOrder.tsx:30 ~ ReviewOrder ~ items:', items);
   const { header } = text.views[PrimaryRevenueWidgetViews.REVIEW_ORDER];
-  const [orderItems, setOrderItems] = useState<any[]>([]);
-  const [totalPrice, setTotalPrice] = useState<number>(0);
   const [loading, setLoading] = useState(false);
 
-  const { currency, execute, sign } = props;
-
-  useEffect(() => {
-    // TODO: fetch the order from the BE
-    // mocking order list
-    const items = mockOrderItems;
-
-    setOrderItems(items);
-
-    // calculate total price
-    const calculatedTotalPrice = items.reduce(
-      (total, item) => parseFloat((total + parseFloat(item.price)).toFixed(5)),
-      0,
-    );
-    setTotalPrice(calculatedTotalPrice);
-  });
+  const once = useRef(false);
 
   const handlePayment = async () => {
     setLoading(true);
@@ -132,7 +80,7 @@ export function ReviewOrder(props: ReviewOrderProps) {
             rowGap: 'base.spacing.x9',
           }}
         >
-          <OrderList list={orderItems} />
+          <OrderList items={items} currency={currency} />
         </Box>
         <Box
           sx={{
@@ -161,7 +109,7 @@ export function ReviewOrder(props: ReviewOrderProps) {
               'Buy Now'
             )}
           </Button>
-          <Body>{`${totalPrice} ${currency ?? 'ETH'}`}</Body>
+          <Body>{`${amount} ${currency}`}</Body>
         </Box>
       </Box>
     </SimpleLayout>

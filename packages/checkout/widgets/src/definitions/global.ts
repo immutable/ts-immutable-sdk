@@ -126,9 +126,13 @@ export interface ImtblPrimaryRevenueProps
   React.HTMLAttributes<HTMLElement>,
   HTMLElement
   > {
-  widgetConfig?: string;
-  amount?: string;
+  // @deprecated
   fromContractAddress?: string;
+
+  widgetConfig?: string;
+  amount: string;
+  envId: string;
+  fromCurrency: string;
 }
 
 /**
