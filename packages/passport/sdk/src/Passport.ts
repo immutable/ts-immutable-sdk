@@ -154,4 +154,16 @@ export class Passport {
     const user = await this.authManager.getUser();
     return user?.accessToken;
   }
+
+  public async getLinkedAddresses(): Promise<string[]> {
+    const user = await this.authManager.getUser();
+    if (!user?.profile.sub) {
+      return [];
+    }
+    const headers = { Authorization: `Bearer ${user.accessToken}` };
+    const linkedAddressesResult = await this.multiRollupApiClients.passportApi.getLinkedAddresses({
+      userId: user?.profile.sub,
+    }, { headers });
+    return linkedAddressesResult.data.linkedAddresses;
+  }
 }

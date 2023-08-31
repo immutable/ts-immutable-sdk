@@ -12,6 +12,7 @@ function PassportMethods() {
     getIdToken,
     getAccessToken,
     getUserInfo,
+    getLinkedAddresses,
   } = usePassportProvider();
 
   return (
@@ -40,6 +41,12 @@ function PassportMethods() {
           onClick={getUserInfo}
         >
           Get User Info
+        </WorkflowButton>
+        <WorkflowButton
+          disabled={isLoading}
+          onClick={getLinkedAddresses}
+        >
+          Get Linked Addresses
         </WorkflowButton>
       </Stack>
     </CardStack>

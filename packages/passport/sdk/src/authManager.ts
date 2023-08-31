@@ -105,7 +105,6 @@ export default class AuthManager {
         userAdminAddress: passport?.zkevm_user_admin_address,
       };
     }
-
     return user;
   };
 
@@ -134,7 +133,6 @@ export default class AuthManager {
         userAdminAddress: idTokenPayload?.passport?.zkevm_user_admin_address,
       };
     }
-
     return user;
   };
 
