@@ -9,7 +9,6 @@ export interface OrderListProps {
 
 export function OrderList(props: OrderListProps) {
   const { items, currency } = props;
-
   return (
     <Box
       testId="order-list"

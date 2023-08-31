@@ -5,7 +5,6 @@ import { config, passport } from '@imtbl/sdk';
 import { WidgetTheme } from '../../lib';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
 import { Item } from './PrimaryRevenueWidget';
-import { ImmutablePrimaryRevenue } from './PrimaryRevenueWebComponent';
 
 const defaultPassportConfig = {
   environment: 'sandbox',
@@ -47,27 +46,17 @@ const useParams = () => {
   const urlParams = new URLSearchParams(window.location.search);
 
   const login = urlParams.get('login') as string;
-  const clientId = urlParams.get('clientId') as string;
-  const redirectUri = urlParams.get('redirectUri') as string;
-  const logoutRedirectUri = urlParams.get('logoutRedirectUri') as string;
-  const audience = urlParams.get('audience') as string;
-  const scope = urlParams.get('scope') as string;
-  const environment = {
-    sandbox: config.Environment.SANDBOX,
-    production: config.Environment.PRODUCTION,
-  }[urlParams.get('environment') || 'sandbox'];
   const amount = urlParams.get('amount') as string;
+  const envId = urlParams.get('envId') as string;
+  const fromCurrency = urlParams.get('fromCurrency') as string;
+  // @deprecated
   const fromContractAddress = urlParams.get('fromContractAddress') as string;
 
   return {
     login,
-    clientId,
-    redirectUri,
-    logoutRedirectUri,
-    audience,
-    scope,
-    environment,
     amount,
+    envId,
+    fromCurrency,
     fromContractAddress,
   };
 };
@@ -102,7 +91,9 @@ const usePassportInstance = (passportConfig: any) => {
 
 function PrimaryRevenueWebView() {
   const params = useParams();
-  const { login, amount, fromContractAddress } = params;
+  const {
+    login, amount, envId, fromCurrency, fromContractAddress,
+  } = params;
   const [passportOn, setPassportOn] = useState(false);
   const [passportConfig, setPassportConfig] = useState(
     JSON.stringify(defaultPassportConfig, null, 2),
@@ -158,7 +149,7 @@ function PrimaryRevenueWebView() {
   useEffect(() => {
     const passportInstance = usePassportInstance(JSON.parse(passportConfig));
 
-    if (login && passportInstance) {
+    if (passportInstance) {
       passportInstance.loginCallback();
     }
   }, [login]);
@@ -173,11 +164,6 @@ function PrimaryRevenueWebView() {
     if (lsItems) {
       setItems(JSON.stringify(JSON.parse(lsItems), null, 2));
     }
-
-    const widget = document.querySelector(
-      'imtbl-primary-revenue',
-    ) as ImmutablePrimaryRevenue;
-    widget?.setItems(JSON.parse(items));
   }, []);
 
   const widgetConfig = {
@@ -190,6 +176,10 @@ function PrimaryRevenueWebView() {
       <imtbl-primary-revenue
         widgetConfig={JSON.stringify(widgetConfig)}
         amount={amount}
+        envId={envId}
+        fromCurrency={fromCurrency}
+        items={items}
+        // @deprecated
         fromContractAddress={fromContractAddress}
       />
       <br />

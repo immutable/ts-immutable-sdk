@@ -133,6 +133,7 @@ export interface ImtblPrimaryRevenueProps
   amount: string;
   envId: string;
   fromCurrency: string;
+  items: string;
 }
 
 /**
