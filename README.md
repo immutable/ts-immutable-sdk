@@ -307,16 +307,13 @@ Note, the docs will only be updated if the `Publish to NPM` workflow is run with
 
 #### Changelog
 
-Add your changes to the [CHANGELOG.md](CHANGELOG.md) file under the `[Unreleased]` section under the appropriate subheading:
+What `CHANGELOG`?
 
-- `### [Added]` - for new features
-- `### [Changed]` - for changes in existing functionality
-- `### [Deprecated]` - for soon-to-be removed features
-- `### [Removed]` - for now removed features
-- `### [Fixed]` - for any bug fixes
-- `### [Security]` - in case of vulnerabilities
+Publishing a non-alpha version of the SDK to NPM will create a new GitHub release with auto-generated release notes to communicate changes between releases. These auto-generated notes are a list of PR titles that have been merged since the last release.
 
-The `[Unreleased]` title will be updated by the `Publish to NPM` workflow to the next version number and pushed back to the `main` branch.
+In an effort to help make the auto-generated notes useful to customers, please write meaningful PR titles. For example, `Fix bug` is not a meaningful title, but `Fix bug when user does X` is.
+
+If you feel you need to add more information to the release notes, you can manually update GitHub release.
 
 ## Disclaimer for Alpha Releases
 
