@@ -24,6 +24,7 @@ import { useInterval } from '../../lib/hooks/useInterval';
 import { DEFAULT_TOKEN_SYMBOLS } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 import { isPassportProvider } from '../../lib/providerUtils';
+import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextTypes';
 
 interface TopUpViewProps {
   widgetEvent: IMTBLWidgetEvents,
@@ -73,16 +74,6 @@ export function TopUpView({
       },
     });
   }, [checkout, cryptoFiatDispatch]);
-
-  const onClickOnramp = () => {
-    // if (widgetEvent === IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT) {
-    //   // dispatch onramp view
-    // }
-    orchestrationEvents.sendRequestOnrampEvent(widgetEvent, {
-      tokenAddress: tokenAddress ?? '',
-      amount: amount ?? '',
-    });
-  };
 
   const refreshFees = async (silent: boolean = false) => {
     if (!checkout) return;
@@ -176,6 +167,28 @@ export function TopUpView({
     });
   };
 
+  const onClickOnRamp = () => {
+    if (widgetEvent === IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: OnRampWidgetViews.ONRAMP,
+            data: {
+              contractAddress: '',
+              amount: '',
+            },
+          },
+        },
+      });
+      return;
+    }
+    orchestrationEvents.sendRequestOnrampEvent(widgetEvent, {
+      tokenAddress: tokenAddress ?? '',
+      amount: amount ?? '',
+    });
+  };
+
   const renderFees = (fees: string, feesLoading: boolean): ReactNode => {
     if (feesLoading) {
       return (
@@ -244,7 +257,7 @@ export function TopUpView({
             onramp.heading,
             onramp.caption,
             onramp.subcaption,
-            onClickOnramp,
+            onClickOnRamp,
           )}
           {showSwapOption && renderMenuItem(
             'swap',

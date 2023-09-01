@@ -118,7 +118,13 @@ export function OnRampWidget(props: OnRampWidgetProps) {
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,
-            view: { type: OnRampWidgetViews.ONRAMP },
+            view: {
+              type: OnRampWidgetViews.ONRAMP,
+              data: {
+                amount: viewState.view.data.amount ?? amount,
+                contractAddress: viewState.view.data.contractAddress ?? contractAddress,
+              },
+            },
           },
         });
       }, LOADING_VIEW_DELAY_MS);
