@@ -28,6 +28,7 @@ declare global {
       'imtbl-swap': ImtblSwapProps;
       'imtbl-bridge': ImtblBridgeProps;
       'imtbl-onramp': ImtblOnRampProps;
+      'imtbl-primary-revenue': ImtblPrimaryRevenueProps;
     }
   }
 
@@ -47,8 +48,8 @@ declare global {
  */
 export interface ImtblConnectProps
   extends React.DetailedHTMLProps<
-  React.HTMLAttributes<HTMLElement>,
-  HTMLElement
+    React.HTMLAttributes<HTMLElement>,
+    HTMLElement
   > {
   widgetConfig?: string;
 }
@@ -63,8 +64,8 @@ export interface ImtblConnectProps
  */
 export interface ImtblWalletProps
   extends React.DetailedHTMLProps<
-  React.HTMLAttributes<HTMLElement>,
-  HTMLElement
+    React.HTMLAttributes<HTMLElement>,
+    HTMLElement
   > {
   walletProvider?: string;
   widgetConfig?: string;
@@ -83,8 +84,8 @@ export interface ImtblWalletProps
  */
 export interface ImtblSwapProps
   extends React.DetailedHTMLProps<
-  React.HTMLAttributes<HTMLElement>,
-  HTMLElement
+    React.HTMLAttributes<HTMLElement>,
+    HTMLElement
   > {
   walletProvider?: string;
   widgetConfig?: string;
@@ -105,8 +106,8 @@ export interface ImtblSwapProps
  */
 export interface ImtblBridgeProps
   extends React.DetailedHTMLProps<
-  React.HTMLAttributes<HTMLElement>,
-  HTMLElement
+    React.HTMLAttributes<HTMLElement>,
+    HTMLElement
   > {
   walletProvider?: string;
   widgetConfig?: string;
@@ -123,8 +124,8 @@ export interface ImtblBridgeProps
  */
 export interface ImtblPrimaryRevenueProps
   extends React.DetailedHTMLProps<
-  React.HTMLAttributes<HTMLElement>,
-  HTMLElement
+    React.HTMLAttributes<HTMLElement>,
+    HTMLElement
   > {
   // @deprecated
   fromContractAddress?: string;
@@ -147,8 +148,8 @@ export interface ImtblPrimaryRevenueProps
  */
 export interface ImtblOnRampProps
   extends React.DetailedHTMLProps<
-  React.HTMLAttributes<HTMLElement>,
-  HTMLElement
+    React.HTMLAttributes<HTMLElement>,
+    HTMLElement
   > {
   walletProvider?: string;
   widgetConfig?: string;
