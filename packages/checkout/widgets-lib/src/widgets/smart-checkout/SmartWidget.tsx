@@ -241,7 +241,7 @@ export function SmartWidget(props: SmartWidgetProps) {
             {viewReducerValues.viewState.view.type === SmartWidgetViews.SMART_SWAP && (
               <ConnectLoader
                 params={swapLoaderParams}
-                closeEvent={sendSwapWidgetCloseEvent}
+                closeEvent={() => sendSwapWidgetCloseEvent(eventTarget)}
                 widgetConfig={config}
               >
                 <SwapWidget
