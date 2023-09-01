@@ -13,17 +13,49 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import { CreateOrderProtocolData } from './create-order-protocol-data';
-// May contain unused imports in some cases
-// @ts-ignore
-import { ProtocolDataAllOf } from './protocol-data-all-of';
 
 /**
- * @type ProtocolData
+ * 
  * @export
+ * @interface ProtocolData
  */
-export type ProtocolData = CreateOrderProtocolData & ProtocolDataAllOf;
+export interface ProtocolData {
+    /**
+     * The Order type
+     * @type {string}
+     * @memberof ProtocolData
+     */
+    'order_type': ProtocolDataOrderTypeEnum;
+    /**
+     * Immutable zone address
+     * @type {string}
+     * @memberof ProtocolData
+     */
+    'zone_address': string;
+    /**
+     * big.Int or uint256 string for order counter
+     * @type {string}
+     * @memberof ProtocolData
+     */
+    'counter': string;
+    /**
+     * Immutable Seaport contract address
+     * @type {string}
+     * @memberof ProtocolData
+     */
+    'seaport_address': string;
+    /**
+     * Immutable Seaport contract version
+     * @type {string}
+     * @memberof ProtocolData
+     */
+    'seaport_version': string;
+}
+
+export const ProtocolDataOrderTypeEnum = {
+    FullRestricted: 'FULL_RESTRICTED'
+} as const;
+
+export type ProtocolDataOrderTypeEnum = typeof ProtocolDataOrderTypeEnum[keyof typeof ProtocolDataOrderTypeEnum];
 
 

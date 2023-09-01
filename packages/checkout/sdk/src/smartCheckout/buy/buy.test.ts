@@ -214,13 +214,20 @@ describe('buy', () => {
       });
 
       const orderId = '1';
+      let message;
+      let type;
+      let data;
       try {
         await buy(config, mockProvider, orderId);
       } catch (err: any) {
-        expect(err.message).toEqual('Purchasing token type is unsupported');
-        expect(err.type).toEqual(CheckoutErrorType.UNSUPPORTED_TOKEN_TYPE_ERROR);
-        expect(err.data).toEqual({ orderId: '1' });
+        message = err.message;
+        type = err.type;
+        data = err.data;
       }
+
+      expect(message).toEqual('Purchasing token type is unsupported');
+      expect(type).toEqual(CheckoutErrorType.UNSUPPORTED_TOKEN_TYPE_ERROR);
+      expect(data).toEqual({ orderId: '1' });
     });
 
     it('should throw error if orderbook returns unsupported item type', async () => {
@@ -247,13 +254,20 @@ describe('buy', () => {
       });
 
       const orderId = '1';
+      let message;
+      let type;
+      let data;
       try {
         await buy(config, mockProvider, orderId);
       } catch (err: any) {
-        expect(err.message).toEqual('Purchasing token type is unsupported');
-        expect(err.type).toEqual(CheckoutErrorType.UNSUPPORTED_TOKEN_TYPE_ERROR);
-        expect(err.data).toEqual({ orderId: '1' });
+        message = err.message;
+        type = err.type;
+        data = err.data;
       }
+
+      expect(message).toEqual('Purchasing token type is unsupported');
+      expect(type).toEqual(CheckoutErrorType.UNSUPPORTED_TOKEN_TYPE_ERROR);
+      expect(data).toEqual({ orderId: '1' });
     });
 
     it('should throw error if orderbook returns error', async () => {
@@ -264,16 +278,24 @@ describe('buy', () => {
       const provider = {} as any;
       const orderId = '1';
 
+      let message;
+      let type;
+      let data;
+
       try {
         await buy(config, provider, orderId);
       } catch (err: any) {
-        expect(err.message).toEqual('An error occurred while getting the order listing');
-        expect(err.type).toEqual(CheckoutErrorType.GET_ORDER_LISTING_ERROR);
-        expect(err.data).toEqual({
-          orderId: '1',
-          message: 'error from orderbook',
-        });
+        message = err.message;
+        type = err.type;
+        data = err.data;
       }
+
+      expect(message).toEqual('An error occurred while getting the order listing');
+      expect(type).toEqual(CheckoutErrorType.GET_ORDER_LISTING_ERROR);
+      expect(data).toEqual({
+        orderId: '1',
+        message: 'error from orderbook',
+      });
     });
   });
 

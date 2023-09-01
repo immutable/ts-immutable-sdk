@@ -19,7 +19,7 @@ export const sendBridgeSuccessEvent = (eventTarget: Window | EventTarget, transa
     },
   );
   // eslint-disable-next-line no-console
-  console.log('bridge success ', successEvent);
+  console.log('bridge success ', eventTarget, successEvent);
   if (eventTarget !== undefined) eventTarget.dispatchEvent(successEvent);
 };
 
@@ -37,7 +37,7 @@ export const sendBridgeFailedEvent = (eventTarget: Window | EventTarget, reason:
     },
   );
   // eslint-disable-next-line no-console
-  console.log('bridge failed ', failedEvent);
+  console.log('bridge failed ', eventTarget, failedEvent);
   if (eventTarget !== undefined) eventTarget.dispatchEvent(failedEvent);
 };
 
@@ -52,5 +52,6 @@ export function sendBridgeWidgetCloseEvent(eventTarget: Window | EventTarget) {
     },
   );
   // eslint-disable-next-line no-console
+  console.log('bridge close ', eventTarget, closeWidgetEvent);
   if (eventTarget !== undefined) eventTarget.dispatchEvent(closeWidgetEvent);
 }

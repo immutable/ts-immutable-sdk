@@ -31,6 +31,7 @@ import {
   ConnectLoaderActions,
   ConnectLoaderContext,
 } from '../../../../context/connect-loader-context/ConnectLoaderContext';
+import { EventTargetContext } from '../../../../context/event-target-context/EventTargetContext';
 
 const logoColour = {
   [ChainId.IMTBL_ZKEVM_DEVNET]: 'base.color.text.link.primary',
@@ -55,6 +56,7 @@ export interface NetworkMenuProps {
 
 export function NetworkMenu({ setBalancesLoading }: NetworkMenuProps) {
   const { connectLoaderState, connectLoaderDispatch } = useContext(ConnectLoaderContext);
+  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
   const { checkout, provider } = connectLoaderState;
   const { viewDispatch } = useContext(ViewContext);
   const { walletState, walletDispatch } = useContext(WalletContext);
@@ -87,7 +89,7 @@ export function NetworkMenu({ setBalancesLoading }: NetworkMenuProps) {
           },
         });
 
-        sendNetworkSwitchEvent(switchNetworkResult.provider, switchNetworkResult.network);
+        sendNetworkSwitchEvent(eventTarget, switchNetworkResult.provider, switchNetworkResult.network);
       } catch (err: any) {
         setBalancesLoading(false);
         if (err.type === 'USER_REJECTED_REQUEST_ERROR') {
