@@ -1,6 +1,8 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { Checkout, ChainId } from '@imtbl/checkout-sdk';
 import { calculateCryptoToFiat, sortTokensByAmount } from '../../../lib/utils';
+import { DEFAULT_RETRY_DELAY } from '../../../lib';
+import { retry } from '../../../lib/retry';
 
 export interface BalanceInfo {
   id: string;
@@ -25,38 +27,37 @@ export const getTokenBalances = async (
 ): Promise<BalanceInfo[]> => {
   if (!checkout || !provider || !chainId) return [];
 
-  try {
-    const walletAddress = await provider.getSigner().getAddress();
-    const getAllBalancesResult = await checkout.getAllBalances({
+  const walletAddress = await provider.getSigner().getAddress();
+  const getAllBalancesResult = await retry(
+    () => checkout.getAllBalances({
       provider,
       walletAddress,
       chainId,
+    }),
+    { retryIntervalMs: DEFAULT_RETRY_DELAY },
+  );
+
+  const sortedTokens = sortTokensByAmount(
+    checkout.config,
+    getAllBalancesResult.balances,
+    chainId,
+  );
+
+  const tokenBalances: BalanceInfo[] = [];
+  sortedTokens.forEach((balance) => {
+    tokenBalances.push({
+      id: formatTokenId(chainId, balance.token.symbol, balance.token.address),
+      balance: balance.formattedBalance,
+      fiatAmount: calculateCryptoToFiat(
+        balance.formattedBalance,
+        balance.token.symbol,
+        conversions,
+      ),
+      symbol: balance.token.symbol,
+      address: balance.token.address,
+      description: balance.token.name,
     });
+  });
 
-    const sortedTokens = sortTokensByAmount(
-      checkout.config,
-      getAllBalancesResult.balances,
-      chainId,
-    );
-
-    const tokenBalances: BalanceInfo[] = [];
-    sortedTokens.forEach((balance) => {
-      tokenBalances.push({
-        id: formatTokenId(chainId, balance.token.symbol, balance.token.address),
-        balance: balance.formattedBalance,
-        fiatAmount: calculateCryptoToFiat(
-          balance.formattedBalance,
-          balance.token.symbol,
-          conversions,
-        ),
-        symbol: balance.token.symbol,
-        address: balance.token.address,
-        description: balance.token.name,
-      });
-    });
-
-    return tokenBalances;
-  } catch (err: any) {
-    return [];
-  }
+  return tokenBalances;
 };

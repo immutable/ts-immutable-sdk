@@ -21,6 +21,11 @@ export const IMX_ADDRESS_ZKEVM = '0x0000000000000000000000000000000000001010';
 export const FAQS_LINK = 'https://support.immutable.com/en/';
 
 /**
+ * Delay between retries (milliseconds)
+ */
+export const DEFAULT_RETRY_DELAY = 10 * 1000;
+
+/**
  * Checkout Widget default env
  */
 export const DEFAULT_ENV = Environment.SANDBOX;
