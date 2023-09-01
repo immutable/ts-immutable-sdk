@@ -1,20 +1,21 @@
-/* eslint-disable @typescript-eslint/no-unused-expressions */
-import { ImmutableConnect } from './widgets/connect/ConnectWebComponent';
-import { ImmutableSwap } from './widgets/swap/SwapWebComponent';
-import { ImmutableWallet } from './widgets/wallet/WalletWebComponent';
-import { ImmutableBridge } from './widgets/bridge/BridgeWebComponent';
-import { ImmutableOnRamp } from './widgets/on-ramp/OnRampWebComponent';
-import { ImmutablePrimaryRevenue } from './widgets/primary-revenue/PrimaryRevenueWebComponent';
+// Define dynamic imports
+const importConnect = () => import('./widgets/connect/ConnectWebComponent');
+const importSwap = () => import('./widgets/swap/SwapWebComponent');
+const importWallet = () => import('./widgets/wallet/WalletWebComponent');
+const importBridge = () => import('./widgets/bridge/BridgeWebComponent');
+const importOnRamp = () => import('./widgets/on-ramp/OnRampWebComponent');
 
-customElements.get('imtbl-connect')
-  || customElements.define('imtbl-connect', ImmutableConnect);
-customElements.get('imtbl-wallet')
-  || customElements.define('imtbl-wallet', ImmutableWallet);
-customElements.get('imtbl-swap')
-  || customElements.define('imtbl-swap', ImmutableSwap);
-customElements.get('imtbl-bridge')
-  || customElements.define('imtbl-bridge', ImmutableBridge);
-customElements.get('imtbl-onramp')
-|| customElements.define('imtbl-onramp', ImmutableOnRamp);
-customElements.get('imtbl-primary-revenue')
-  || customElements.define('imtbl-primary-revenue', ImmutablePrimaryRevenue);
+// Use the dynamic imports to load components asynchronously
+Promise.all([
+  customElements.get('imtbl-connect')
+    || customElements.define('imtbl-connect', (await importConnect()).ImmutableConnect),
+  customElements.get('imtbl-wallet')
+    || customElements.define('imtbl-wallet', (await importWallet()).ImmutableWallet),
+  customElements.get('imtbl-swap')
+    || customElements.define('imtbl-swap', (await importSwap()).ImmutableSwap),
+  customElements.get('imtbl-bridge')
+    || customElements.define('imtbl-bridge', (await importBridge()).ImmutableBridge),
+  customElements.get('imtbl-onramp')
+    || customElements.define('imtbl-onramp', (await importOnRamp()).ImmutableOnRamp),
+]);
+export { };
