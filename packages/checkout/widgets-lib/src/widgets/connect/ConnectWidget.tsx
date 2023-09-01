@@ -3,7 +3,7 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { BiomeCombinedProviders } from '@biom3/react';
 import { Checkout } from '@imtbl/checkout-sdk';
-import { useEffect, useReducer } from 'react';
+import { useContext, useEffect, useReducer } from 'react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import { Passport } from '@imtbl/passport';
 import {
@@ -39,6 +39,7 @@ import {
 import { SwitchNetworkEth } from './views/SwitchNetworkEth';
 import { ErrorView } from '../../views/error/ErrorView';
 import { text } from '../../resources/text/textConfig';
+import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 
 export interface ConnectWidgetProps {
   params?: ConnectWidgetParams;
@@ -59,6 +60,8 @@ export function ConnectWidget(props: ConnectWidgetProps) {
   const { deepLink = ConnectWidgetViews.CONNECT_WALLET } = props;
   const { environment, theme } = config;
   const errorText = text.views[SharedViews.ERROR_VIEW].actionText;
+
+  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const [connectState, connectDispatch] = useReducer(connectReducer, initialConnectState);
   const { sendCloseEvent, provider, walletProviderName } = connectState;
@@ -106,7 +109,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
     connectDispatch({
       payload: {
         type: ConnectActions.SET_SEND_CLOSE_EVENT,
-        sendCloseEvent: sendCloseEventOverride ?? sendCloseWidgetEvent,
+        sendCloseEvent: sendCloseEventOverride ?? (() => sendCloseWidgetEvent(eventTarget)),
       },
     });
     viewDispatch({
@@ -121,7 +124,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
 
   useEffect(() => {
     if (viewState.view.type !== SharedViews.ERROR_VIEW) return;
-    sendConnectFailedEvent(viewState.view.error.message);
+    sendConnectFailedEvent(eventTarget, viewState.view.error.message);
   }, [viewState]);
 
   return (
@@ -152,7 +155,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
                   statusText="Connection secure"
                   actionText="Continue"
                   onActionClick={() => sendCloseEvent()}
-                  onRenderEvent={() => sendConnectSuccessEvent(provider, walletProviderName ?? undefined)}
+                  onRenderEvent={() => sendConnectSuccessEvent(eventTarget, provider, walletProviderName ?? undefined)}
                   statusType={StatusType.SUCCESS}
                   testId="success-view"
                 />
