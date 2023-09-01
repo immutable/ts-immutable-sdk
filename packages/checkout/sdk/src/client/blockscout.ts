@@ -1,4 +1,5 @@
 import axios, {
+  AxiosError,
   AxiosResponse,
   HttpStatusCode,
 } from 'axios';
@@ -91,16 +92,22 @@ export class Blockscout {
 
       const response = await Blockscout.makeHttpRequest(url);
       if (response.status >= 400) {
-        return Promise.reject({ code: response.status, message: response.statusText });
+        return Promise.reject({
+          code: response.status,
+          message: response.statusText,
+        });
       }
 
       this.setCache(url, response);
       return Promise.resolve(response.data);
     } catch (err: any) {
-      return Promise.reject({
-        code: err.code ?? HttpStatusCode.InternalServerError,
-        message: err.message || 'InternalServerError',
-      });
+      let code: number = HttpStatusCode.InternalServerError;
+      let message = 'InternalServerError';
+      if (axios.isAxiosError(err)) {
+        code = (err as AxiosError).response?.status || code;
+        message = (err as AxiosError).message;
+      }
+      return Promise.reject({ code, message });
     }
   }
 }

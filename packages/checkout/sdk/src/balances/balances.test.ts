@@ -1,6 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber, Contract } from 'ethers';
 import { Environment } from '@imtbl/config';
+import axios, { HttpStatusCode } from 'axios';
 import {
   getAllBalances,
   getBalance,
@@ -8,6 +9,7 @@ import {
   getERC20Balance,
 } from './balances';
 import {
+  BLOCKSCOUT_CHAIN_URL_MAP,
   ChainId,
   ChainName,
   ERC20ABI,
@@ -18,7 +20,9 @@ import {
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import * as tokens from '../tokens';
 import { CheckoutConfiguration } from '../config';
+import { BlockscoutTokenType } from '../client';
 
+jest.mock('axios');
 jest.mock('../tokens');
 jest.mock('ethers', () => ({
   ...jest.requireActual('ethers'),
@@ -27,6 +31,7 @@ jest.mock('ethers', () => ({
 }));
 
 describe('balances', () => {
+  const mockedAxios = axios as jest.Mocked<typeof axios>;
   const testCheckoutConfig = new CheckoutConfiguration({ baseConfig: { environment: Environment.PRODUCTION } });
   const currentBalance = BigNumber.from('1000000000000000000');
   const formattedBalance = '1.0';
@@ -271,7 +276,14 @@ describe('balances', () => {
 
     it('should call getBalance and getERC20Balance functions', async () => {
       const getAllBalancesResult = await getAllBalances(
-        testCheckoutConfig,
+        {
+          remote: {
+            getTokensConfig: () => ({
+              blockscout: false,
+            }),
+          },
+          networkMap: testCheckoutConfig.networkMap,
+        } as unknown as CheckoutConfiguration,
         mockProviderForAllBalances() as unknown as Web3Provider,
         'abc123',
         ChainId.ETHEREUM,
@@ -318,6 +330,132 @@ describe('balances', () => {
           ],
         ),
       );
+    });
+
+    it('should call getIndexerBalance', async () => {
+      const chainId = Object.keys(BLOCKSCOUT_CHAIN_URL_MAP)[0] as unknown as ChainId;
+
+      mockedAxios.get.mockResolvedValueOnce({
+        status: 200,
+        data: {
+          items: [
+            {
+              token: {
+                address: '0x0000000000000000000000000000000000001010',
+                decimals: '18',
+                name: 'Test Immutable X',
+                symbol: 'tIMX',
+                type: BlockscoutTokenType.ERC20,
+              },
+              value: '396897342421454458',
+            },
+            {
+              token: {
+                address: '0x65AA7a21B0f3ce9B478aAC3408fE75b423939b1F',
+                decimals: '18',
+                name: 'Ether',
+                symbol: 'ETH',
+                type: BlockscoutTokenType.ERC20,
+              },
+              value: '330000000000000000',
+            },
+          ],
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          next_page_params: null,
+        },
+      });
+
+      const getAllBalancesResult = await getAllBalances(
+        {
+          remote: {
+            getTokensConfig: () => ({
+              blockscout: true,
+            }),
+          },
+          networkMap: testCheckoutConfig.networkMap,
+        } as unknown as CheckoutConfiguration,
+        jest.fn() as unknown as Web3Provider,
+        'abc123',
+        chainId,
+      );
+
+      expect(mockedAxios.get).toHaveBeenNthCalledWith(
+        1,
+        `${BLOCKSCOUT_CHAIN_URL_MAP[chainId]}/api/v2/addresses/abc123/tokens?type=${BlockscoutTokenType.ERC20}`,
+      );
+
+      expect(getAllBalancesResult.balances).toEqual([{
+        balance: BigNumber.from('396897342421454458'),
+        formattedBalance: '0.396897342421454458',
+        token: {
+          address: '0x0000000000000000000000000000000000001010',
+          decimals: 18,
+          name: 'Test Immutable X',
+          symbol: 'tIMX',
+          type: 'ERC-20',
+        },
+      },
+      {
+        balance: BigNumber.from('330000000000000000'),
+        formattedBalance: '0.33',
+        token: {
+          address: '0x65AA7a21B0f3ce9B478aAC3408fE75b423939b1F',
+          decimals: 18,
+          name: 'Ether',
+          symbol: 'ETH',
+          type: 'ERC-20',
+        },
+      }]);
+    });
+
+    it('should call getIndexerBalance and throw error', async () => {
+      const chainId = Object.keys(BLOCKSCOUT_CHAIN_URL_MAP)[0] as unknown as ChainId;
+
+      mockedAxios.isAxiosError.mockReturnValue(true);
+      mockedAxios.get.mockResolvedValueOnce({
+        status: 200,
+        data: {
+          items: [],
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          next_page_params: {},
+        },
+      });
+      mockedAxios.get.mockRejectedValueOnce({ response: { status: HttpStatusCode.Forbidden }, message: 'test' });
+
+      let message;
+      let type;
+      let data;
+      try {
+        await getAllBalances(
+          {
+            remote: {
+              getTokensConfig: () => ({
+                blockscout: true,
+              }),
+            },
+            networkMap: testCheckoutConfig.networkMap,
+          } as unknown as CheckoutConfiguration,
+          jest.fn() as unknown as Web3Provider,
+          '0xabc123', // use unique wallet address to prevent cached data
+          chainId,
+        );
+      } catch (err: any) {
+        message = err.message;
+        type = err.type;
+        data = err.data;
+      }
+
+      expect(mockedAxios.get).toHaveBeenNthCalledWith(
+        1,
+        `${BLOCKSCOUT_CHAIN_URL_MAP[chainId]}/api/v2/addresses/0xabc123/tokens?type=${BlockscoutTokenType.ERC20}`,
+      );
+
+      expect(message).toEqual('test');
+      expect(type).toEqual(CheckoutErrorType.GET_INDEXER_BALANCE_ERROR);
+      expect(data).toEqual({
+        code: HttpStatusCode.Forbidden,
+        message: 'test',
+      });
     });
   });
 
