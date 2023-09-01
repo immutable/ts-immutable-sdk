@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { PrimaryRevenueWidget } from './PrimaryRevenueWidget';
+import { PrimaryRevenueWidget, Item } from './PrimaryRevenueWidget';
 import {
   ConnectLoader,
   ConnectLoaderParams,
@@ -13,9 +13,16 @@ import {
 } from '../../lib/validations/widgetValidators';
 
 export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
+  // @deprecated
+  fromContractAddress = '';
+
   amount = '';
 
-  fromContractAddress = '';
+  envId = '';
+
+  fromCurrency = '';
+
+  items: Item[] = [];
 
   constructor() {
     console.log('ImmutablePrimaryRevenue constructor'); // eslint-disable-line no-console
@@ -26,8 +33,11 @@ export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
     super.connectedCallback();
 
     this.amount = this.getAttribute('amount') ?? '';
+    this.envId = this.getAttribute('envId') ?? '';
+    this.fromCurrency = this.getAttribute('fromCurrency') ?? '';
+    this.items = JSON.parse(this.getAttribute('items') ?? '');
+    // @deprecated
     this.fromContractAddress = this.getAttribute('fromContractAddress')?.toLowerCase() ?? '';
-
     this.renderWidget();
   }
 
@@ -38,6 +48,25 @@ export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
       this.amount = '';
     }
 
+    if (this.items.length === 0) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "items" widget input');
+      this.items = [];
+    }
+
+    if (!this.envId) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "envId" widget input');
+      this.envId = '';
+    }
+
+    if (!this.fromCurrency) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "fromCurrency" widget input');
+      this.fromCurrency = '';
+    }
+
+    // @deprecated
     if (!isValidAddress(this.fromContractAddress)) {
       // eslint-disable-next-line no-console
       console.warn('[IMTBL]: invalid "fromContractAddress" widget input');
@@ -70,25 +99,11 @@ export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
           <PrimaryRevenueWidget
             config={this.widgetConfig!}
             amount={this.amount}
+            envId={this.envId}
+            fromCurrency={this.fromCurrency}
+            items={this.items}
+            // deprecated
             fromContractAddress={this.fromContractAddress}
-            fromCurrency="USDC"
-            envId="63a1f100-192e-4305-a504-1c65b0300f1e"
-            items={[
-              {
-                id: '1',
-                name: 'Gems chest',
-                price: '0.5',
-                image: 'http://placehold.it/100x100',
-                qty: 1,
-              },
-              {
-                id: '2',
-                name: 'Redstone chest',
-                price: '1',
-                image: 'http://placehold.it/100x100',
-                qty: 2,
-              },
-            ]}
           />
         </ConnectLoader>
       </React.StrictMode>,
