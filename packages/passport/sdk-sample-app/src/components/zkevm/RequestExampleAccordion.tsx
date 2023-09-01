@@ -24,6 +24,7 @@ function RequestExampleAccordion({ disabled, examples, handleExampleSubmitted }:
         {
           examples?.map((component) => (
             React.createElement(component, {
+              key: component.name,
               handleExampleSubmitted: (request: RequestArguments) => {
                 setActiveAccordionKey('');
                 return handleExampleSubmitted(request);

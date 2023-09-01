@@ -1,7 +1,7 @@
 import { BytesLike } from 'ethers';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { PassportConfiguration } from '../config';
-import {FeeOption, RelayerTransaction, TypedDataPayload} from './types';
+import { FeeOption, RelayerTransaction, TypedDataPayload } from './types';
 import { UserZkEvm } from '../types';
 import { getEip155ChainId } from './walletHelpers';
 

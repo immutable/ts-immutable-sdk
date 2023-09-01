@@ -111,11 +111,8 @@ export const getSignedTypedData = async (
   walletAddress: string,
   signer: Signer,
 ): Promise<string> => {
-  // Get the hash
+  // Ethers auto-generates the EIP712Domain type in the TypedDataEncoder, and so it needs to be removed
   const types = { ...typedData.types };
-
-  // remove EIP712Domain key from types as ethers will auto-gen it in
-  // the hash encoder below
   // @ts-ignore
   delete types.EIP712Domain;
 

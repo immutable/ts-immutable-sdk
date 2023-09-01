@@ -9,28 +9,35 @@ import { TypedDataPayload } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { RelayerClient } from './relayerClient';
 import { UserZkEvm } from '../types';
-import GuardianClient from '../guardian/guardian';
 
 export type SignTypedDataV4Params = {
   magicProvider: ExternalProvider;
   jsonRpcProvider: JsonRpcProvider;
-  guardianClient: GuardianClient;
   relayerClient: RelayerClient;
   user: UserZkEvm;
+  method: string;
   params: Array<any>;
 };
 
 export const signTypedDataV4 = async ({
   params,
+  method,
   magicProvider,
   jsonRpcProvider,
   relayerClient,
 }: SignTypedDataV4Params): Promise<string> => {
   const fromAddress: string = params[0];
-  const typedData: TypedDataPayload = params[1];
+  const typedDataString: string = params[1];
 
-  if (!fromAddress || !typedData) {
-    throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'eth_signTypedData requires an address and a typed data object');
+  if (!fromAddress || !typedDataString) {
+    throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, `${method} requires an address and a typed data JSON`);
+  }
+
+  let typedData: TypedDataPayload;
+  try {
+    typedData = JSON.parse(typedDataString);
+  } catch (ex) {
+    throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, `Failed to parse typed data JSON: ${ex}`);
   }
 
   // ID-959: Submit raw typedData payload to Guardian for evaluation

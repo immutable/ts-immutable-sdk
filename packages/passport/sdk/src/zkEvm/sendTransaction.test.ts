@@ -1,7 +1,7 @@
 import { JsonRpcProvider, TransactionRequest } from '@ethersproject/providers';
 import { getEip155ChainId, getNonce, getSignedMetaTransactions } from './walletHelpers';
 import { sendTransaction } from './sendTransaction';
-import { mockUserZkEvm } from '../test/mocks';
+import { chainId, eip155ChainId, mockUserZkEvm } from '../test/mocks';
 import { RelayerClient } from './relayerClient';
 import { retryWithDelay } from '../network/retry';
 import { RelayerTransaction, RelayerTransactionStatus } from './types';
@@ -20,8 +20,6 @@ describe('sendTransaction', () => {
   const transactionHash = 'transactionHash123';
 
   const nonce = '5';
-  const chainId = 13472;
-  const eip155ChainId = `eip155:${chainId}`;
 
   const transactionRequest: TransactionRequest = {
     to: mockUserZkEvm.zkEvm.ethAddress,

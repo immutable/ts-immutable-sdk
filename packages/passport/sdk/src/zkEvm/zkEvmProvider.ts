@@ -157,9 +157,9 @@ export class ZkEvmProvider implements Provider {
         }
 
         return signTypedDataV4({
+          method: request.method,
           params: request.params || [],
           magicProvider: this.magicProvider,
-          guardianClient: this.guardianClient,
           jsonRpcProvider: this.jsonRpcProvider,
           relayerClient: this.relayerClient,
           user: this.user,

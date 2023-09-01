@@ -2,11 +2,11 @@ import { JsonRpcProvider } from '@ethersproject/providers';
 import { RelayerClient } from './relayerClient';
 import { PassportConfiguration } from '../config';
 import { UserZkEvm } from '../types';
-import { RelayerTransactionStatus } from './types';
+import { RelayerTransactionStatus, TypedDataPayload } from './types';
+import { chainId, eip155ChainId } from '../test/mocks';
 
 describe('relayerClient', () => {
   const transactionHash = '0x456';
-  const chainId = 13371;
   const config = {
     relayerUrl: 'https://example.com',
   };
@@ -61,7 +61,7 @@ describe('relayerClient', () => {
         params: [{
           to,
           data,
-          chainId: 'eip155:13371',
+          chainId: eip155ChainId,
         }],
       });
     });
@@ -135,7 +135,41 @@ describe('relayerClient', () => {
         params: [{
           userAddress,
           data,
-          chainId: 'eip155:13371',
+          chainId: eip155ChainId,
+        }],
+      });
+    });
+  });
+
+  describe('imSignTypedData', () => {
+    it('calls relayer with the correct arguments', async () => {
+      const address = '0xd64b0d2d72bb1b3f18046b8a7fc6c9ee6bccd287';
+      const eip712Payload = {} as TypedDataPayload;
+      const relayerSignature = '0x123';
+
+      (global.fetch as jest.Mock).mockResolvedValue({
+        json: () => ({
+          result: relayerSignature,
+        }),
+      });
+
+      const result = await relayerClient.imSignTypedData(address, eip712Payload);
+      expect(result).toEqual(relayerSignature);
+      expect(global.fetch).toHaveBeenCalledWith(`${config.relayerUrl}/v1/transactions`, expect.objectContaining({
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${user.accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      }));
+      expect(JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body)).toMatchObject({
+        id: 1,
+        jsonrpc: '2.0',
+        method: 'im_signTypedData',
+        params: [{
+          address,
+          eip712Payload,
+          chainId: eip155ChainId,
         }],
       });
     });

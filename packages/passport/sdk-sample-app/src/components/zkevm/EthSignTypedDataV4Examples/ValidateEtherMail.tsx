@@ -7,7 +7,7 @@ import { usePassportProvider } from '@/context/PassportProvider';
 import WorkflowButton from '@/components/WorkflowButton';
 import { RequestExampleProps } from '@/types';
 import { ethers } from 'ethers';
-import etherMailTypedPayload from './etherMailTypedPayload.json';
+import { getEtherMailTypedPayload } from './etherMailTypedPayload';
 
 function ValidateEtherMail({ disabled }: RequestExampleProps) {
   const [address, setAddress] = useState<string>('');
@@ -15,8 +15,21 @@ function ValidateEtherMail({ disabled }: RequestExampleProps) {
   const [isValidSignature, setIsValidSignature] = useState<boolean | undefined>();
   const [signatureValidationMessage, setSignatureValidationMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [etherMailTypedPayload, setEtherMailTypedPayload] = useState<string>('');
 
   const { zkEvmProvider } = usePassportProvider();
+
+  useEffect(() => {
+    const populateParams = async () => {
+      if (zkEvmProvider) {
+        const chainIdHex = await zkEvmProvider.request({ method: 'eth_chainId' });
+        const chainId = parseInt(chainIdHex, 16);
+        setEtherMailTypedPayload(getEtherMailTypedPayload(chainId));
+      }
+    };
+
+    populateParams().catch(console.log);
+  }, [zkEvmProvider]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -33,15 +46,22 @@ function ValidateEtherMail({ disabled }: RequestExampleProps) {
         return;
       }
 
-      const types = { ...etherMailTypedPayload.types };
+      if (!etherMailTypedPayload) {
+        setIsValidSignature(false);
+        setSignatureValidationMessage('Example typedDataPayload cannot be null');
+        return;
+      }
+
+      const typedDataPayload = JSON.parse(etherMailTypedPayload);
+      const types = { ...typedDataPayload.types };
       // @ts-ignore
       delete types.EIP712Domain;
 
       // eslint-disable-next-line no-underscore-dangle
       const hash = ethers.utils._TypedDataEncoder.hash(
-        etherMailTypedPayload.domain,
+        typedDataPayload.domain,
         types,
-        etherMailTypedPayload.message,
+        typedDataPayload.message,
       );
       const contract = new ethers.Contract(
         address,
@@ -96,7 +116,7 @@ function ValidateEtherMail({ disabled }: RequestExampleProps) {
             </Form.Label>
             <Form.Control
               required
-              value={JSON.stringify(etherMailTypedPayload)}
+              value={etherMailTypedPayload}
               disabled
               type="text"
             />

@@ -44,7 +44,7 @@ const EthereumMethods: EthereumMethod[] = [
     name: 'eth_signTypedData_v4',
     params: [
       { name: 'address' },
-      { name: 'payload', type: EthereumParamType.object },
+      { name: 'payload' },
     ],
     exampleComponents: EthSignTypedDataV4Examples,
   },

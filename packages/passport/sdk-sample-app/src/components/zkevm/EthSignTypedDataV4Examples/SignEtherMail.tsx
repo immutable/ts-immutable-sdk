@@ -3,7 +3,7 @@ import { Accordion, Form } from 'react-bootstrap';
 import { usePassportProvider } from '@/context/PassportProvider';
 import WorkflowButton from '@/components/WorkflowButton';
 import { RequestExampleProps } from '@/types';
-import etherMailTypedPayload from './etherMailTypedPayload.json';
+import { getEtherMailTypedPayload } from './etherMailTypedPayload';
 
 function SignEtherMail({ disabled, handleExampleSubmitted }: RequestExampleProps) {
   const [address, setAddress] = useState<string>('');
@@ -11,11 +11,21 @@ function SignEtherMail({ disabled, handleExampleSubmitted }: RequestExampleProps
   const [params, setParams] = useState<any[]>([]);
 
   useEffect(() => {
-    setParams([
-      address,
-      etherMailTypedPayload,
-    ]);
-  }, [address]);
+    const populateParams = async () => {
+      if (zkEvmProvider) {
+        const chainIdHex = await zkEvmProvider.request({ method: 'eth_chainId' });
+        const chainId = parseInt(chainIdHex, 16);
+        const etherMailTypedPayload = getEtherMailTypedPayload(chainId);
+
+        setParams([
+          address,
+          etherMailTypedPayload,
+        ]);
+      }
+    };
+
+    populateParams().catch(console.log);
+  }, [address, zkEvmProvider]);
 
   useEffect(() => {
     const getAddress = async () => {
