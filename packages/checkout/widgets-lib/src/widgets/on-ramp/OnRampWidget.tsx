@@ -121,8 +121,8 @@ export function OnRampWidget(props: OnRampWidgetProps) {
             view: {
               type: OnRampWidgetViews.ONRAMP,
               data: {
-                amount: viewState.view.data.amount ?? amount,
-                contractAddress: viewState.view.data.contractAddress ?? contractAddress,
+                amount: viewState.view.data?.amount ?? amount,
+                contractAddress: viewState.view.data?.contractAddress ?? contractAddress,
               },
             },
           },
