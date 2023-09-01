@@ -46,6 +46,12 @@ jobs:
           node-version: lts/*
           cache: 'yarn'
 
+      - name: Update SDK package.json version
+        run: |
+          tmp=$(mktemp)
+          jq '.version = "${{ env.VERSION }}"' ./package.json > "$tmp" && mv "$tmp" ./package.json
+        shell: bash
+
       - name: Install dependencies
         run: yarn install --immutable
 
