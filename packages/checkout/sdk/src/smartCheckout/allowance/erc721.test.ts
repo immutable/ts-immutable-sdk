@@ -60,6 +60,7 @@ describe('erc721', () => {
       expect(message).toEqual('Failed to get approved address for ERC721');
       expect(type).toEqual(CheckoutErrorType.GET_ERC721_ALLOWANCE_ERROR);
       expect(data).toEqual({
+        id: '0',
         contractAddress: '0xERC721',
       });
       expect(getApprovedMock).toBeCalledWith(0);
@@ -86,7 +87,7 @@ describe('erc721', () => {
       expect(approveMock).toBeCalledWith('0xSEAPORT', 0);
     });
 
-    it('should error is call to approve fails', async () => {
+    it('should throw checkout error if call to approve fails', async () => {
       const approveMock = jest.fn().mockRejectedValue({ from: '0xADDRESS' });
       (Contract as unknown as jest.Mock).mockReturnValue({
         populateTransaction: {
@@ -115,7 +116,10 @@ describe('erc721', () => {
       expect(message).toEqual('Failed to get the approval transaction for ERC721');
       expect(type).toEqual(CheckoutErrorType.GET_ERC721_ALLOWANCE_ERROR);
       expect(data).toEqual({
+        id: '0',
         contractAddress: '0xERC721',
+        spenderAddress: '0xSEAPORT',
+        ownerAddress: '0xADDRESS',
       });
       expect(approveMock).toBeCalledWith('0xSEAPORT', 0);
     });
@@ -138,7 +142,7 @@ describe('erc721', () => {
       expect(isApprovedForAllMock).toBeCalledWith('0xADDRESS', '0xSEAPORT');
     });
 
-    it('should error if call to isApprovedForAll fails', async () => {
+    it('should throw checkout error if call to isApprovedForAll fails', async () => {
       const isApprovedForAllMock = jest.fn().mockRejectedValue({});
       (Contract as unknown as jest.Mock).mockReturnValue({
         isApprovedForAll: isApprovedForAllMock,
@@ -164,7 +168,9 @@ describe('erc721', () => {
       expect(message).toEqual('Failed to check approval for all ERC721s of collection');
       expect(type).toEqual(CheckoutErrorType.GET_ERC721_ALLOWANCE_ERROR);
       expect(data).toEqual({
+        ownerAddress: '0xADDRESS',
         contractAddress: '0xERC721',
+        spenderAddress: '0xSEAPORT',
       });
       expect(isApprovedForAllMock).toBeCalledWith('0xADDRESS', '0xSEAPORT');
     });
@@ -473,7 +479,7 @@ describe('erc721', () => {
       expect(result).toBe(123);
     });
 
-    it('should throws an error for invalid string ID', () => {
+    it('should throw checkout error an error for invalid string ID', () => {
       const id = 'invalid';
 
       let message = '';
@@ -496,7 +502,7 @@ describe('erc721', () => {
       });
     });
 
-    it('should throws an error for empty string ID', () => {
+    it('should throw checkout error an error for empty string ID', () => {
       const id = '';
 
       let message = '';
@@ -519,7 +525,7 @@ describe('erc721', () => {
       });
     });
 
-    it('should throws an error for whitespace string ID', () => {
+    it('should throw checkout error an error for whitespace string ID', () => {
       const id = ' ';
 
       let message = '';
@@ -542,7 +548,7 @@ describe('erc721', () => {
       });
     });
 
-    it('should throws an error for null ID', () => {
+    it('should throw checkout error an error for null ID', () => {
       const id = null as any;
 
       let message = '';
@@ -565,7 +571,7 @@ describe('erc721', () => {
       });
     });
 
-    it('should throws an error for undefined ID', () => {
+    it('should throw checkout error an error for undefined ID', () => {
       const id = undefined as any;
 
       let message = '';

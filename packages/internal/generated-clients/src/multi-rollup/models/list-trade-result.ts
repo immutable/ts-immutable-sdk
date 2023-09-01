@@ -15,19 +15,28 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { FulfillmentDataResult } from './fulfillment-data-result';
+import { Page } from './page';
+// May contain unused imports in some cases
+// @ts-ignore
+import { Trade } from './trade';
 
 /**
  * 
  * @export
- * @interface FulfillmentData200Response
+ * @interface ListTradeResult
  */
-export interface FulfillmentData200Response {
+export interface ListTradeResult {
     /**
      * 
-     * @type {Array<FulfillmentDataResult>}
-     * @memberof FulfillmentData200Response
+     * @type {Page}
+     * @memberof ListTradeResult
      */
-    'result': Array<FulfillmentDataResult>;
+    'page': Page;
+    /**
+     * 
+     * @type {Array<Trade>}
+     * @memberof ListTradeResult
+     */
+    'result': Array<Trade>;
 }
 
