@@ -12,17 +12,19 @@ import {
   AnalyticsControls,
   useAnalytics, UserJourney,
 } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
-import { TransakEvents } from '../TransakEvents';
+import { TransakEventData, TransakEvents, TransakStatuses } from '../TransakEvents';
 
 interface OnRampProps {
   environment: Environment;
   walletAddress?: string;
   email?: string;
   isPassport?: boolean;
+  amount?: string;
+  contractAddress?: string;
   showIframe: boolean;
 }
 export function OnRampMain({
-  environment, walletAddress, isPassport, email, showIframe,
+  environment, walletAddress, isPassport, email, showIframe, amount, contractAddress,
 }: OnRampProps) {
   const { header } = text.views[OnRampWidgetViews.ONRAMP];
   const { viewState } = useContext(ViewContext);
@@ -87,6 +89,57 @@ export function OnRampMain({
       default:
     }
   };
+  const transakEventHandler = (event: any) => {
+    const eventData = event.data as TransakEventData;
+
+    if ((event.event_id === TransakEvents.TRANSAK_ORDER_CREATED)
+      || (event.event_id === TransakEvents.TRANSAK_ORDER_SUCCESSFUL
+        && eventData.status === TransakStatuses.PROCESSING)
+    ) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: OnRampWidgetViews.IN_PROGRESS,
+          },
+        },
+      });
+      return;
+    }
+
+    if (event.event_id === TransakEvents.TRANSAK_ORDER_SUCCESSFUL
+      && eventData.status === TransakStatuses.COMPLETED
+    ) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: OnRampWidgetViews.SUCCESS,
+            data: {
+              transactionHash: eventData.transactionHash!,
+            },
+          },
+        },
+      });
+      return;
+    }
+
+    if (event.event_id === TransakEvents.TRANSAK_ORDER_FAILED) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: OnRampWidgetViews.FAIL,
+            data: {
+              amount,
+              contractAddress,
+            },
+            reason: eventData.statusReason ?? 'Transaction failed',
+          },
+        },
+      });
+    }
+  };
 
   useEffect(() => {
     const domIframe:HTMLIFrameElement = document.getElementById('transak-iframe') as HTMLIFrameElement;
@@ -99,53 +152,7 @@ export function OnRampMain({
           // eslint-disable-next-line no-console
           console.log('TRANSAK event data: ', event.data);
           trackSegmentEvents(event.data);
-
-          if (event.data.event_id === TransakEvents.TRANSAK_ORDER_CREATED) {
-            viewDispatch({
-              payload: {
-                type: ViewActions.UPDATE_VIEW,
-                view: {
-                  type: OnRampWidgetViews.IN_PROGRESS,
-                },
-              },
-            });
-          }
-
-          if (event.data.event_id === TransakEvents.TRANSAK_ORDER_SUCCESSFUL
-            && event.data.data.status === 'PROCESSING') {
-            viewDispatch({
-              payload: {
-                type: ViewActions.UPDATE_VIEW,
-                view: {
-                  type: OnRampWidgetViews.IN_PROGRESS,
-                },
-              },
-            });
-          }
-
-          if (event.data.event_id === TransakEvents.TRANSAK_ORDER_SUCCESSFUL
-            && event.data.data.status === 'COMPLETED'
-          ) {
-            viewDispatch({
-              payload: {
-                type: ViewActions.UPDATE_VIEW,
-                view: {
-                  type: OnRampWidgetViews.SUCCESS,
-                },
-              },
-            });
-          }
-
-          if (event.data.event_id === TransakEvents.TRANSAK_ORDER_FAILED) {
-            viewDispatch({
-              payload: {
-                type: ViewActions.UPDATE_VIEW,
-                view: {
-                  type: OnRampWidgetViews.FAIL,
-                },
-              },
-            });
-          }
+          transakEventHandler(event.data);
         }
       }
     };
