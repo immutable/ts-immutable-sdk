@@ -4,21 +4,29 @@ import {
   GetTokenAllowListResult,
   TokenFilterTypes,
 } from '@imtbl/checkout-sdk';
+import { retry } from '../../../lib/retry';
+import { DEFAULT_RETRY_DELAY } from '../../../lib';
 
-export async function getBridgeTokensAndBalances(checkout: Checkout, web3Provider: Web3Provider) {
-  const network = await checkout.getNetworkInfo({
-    provider: web3Provider,
-  });
-  const address = await web3Provider.getSigner().getAddress();
-  const tokenBalances = await checkout.getAllBalances({
-    provider: web3Provider,
-    walletAddress: address,
-    chainId: network.chainId,
-  });
+export async function getBridgeTokensAndBalances(
+  checkout: Checkout,
+  provider: Web3Provider,
+) {
+  if (!checkout || !provider) return {};
+
+  const { chainId } = await checkout.getNetworkInfo({ provider });
+  const walletAddress = await provider.getSigner().getAddress();
+  const tokenBalances = await retry(
+    () => checkout.getAllBalances({
+      provider,
+      walletAddress,
+      chainId,
+    }),
+    { retryIntervalMs: DEFAULT_RETRY_DELAY },
+  );
 
   const allowList: GetTokenAllowListResult = await checkout.getTokenAllowList(
     {
-      chainId: network.chainId,
+      chainId,
       type: TokenFilterTypes.BRIDGE,
     },
   );

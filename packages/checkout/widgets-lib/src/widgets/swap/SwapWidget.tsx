@@ -29,7 +29,7 @@ import {
 import { SwapSuccessView, SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { WidgetTheme } from '../../lib';
+import { DEFAULT_RETRY_DELAY, WidgetTheme } from '../../lib';
 import { StatusView } from '../../components/Status/StatusView';
 import { StatusType } from '../../components/Status/StatusType';
 import { text } from '../../resources/text/textConfig';
@@ -43,6 +43,7 @@ import { ApproveERC20Onboarding } from './views/ApproveERC20Onboarding';
 import { TopUpView } from '../../views/top-up/TopUpView';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
+import { retry } from '../../lib/retry';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
@@ -128,11 +129,15 @@ export function SwapWidget(props: SwapWidgetProps) {
         },
       });
 
-      const tokenBalances = await checkout.getAllBalances({
-        provider,
-        walletAddress: await provider.getSigner().getAddress(),
-        chainId: network.chainId,
-      });
+      const walletAddress = await provider.getSigner().getAddress();
+      const tokenBalances = await retry(
+        () => checkout.getAllBalances({
+          provider,
+          walletAddress,
+          chainId: network.chainId,
+        }),
+        { retryIntervalMs: DEFAULT_RETRY_DELAY },
+      );
 
       const allowList: GetTokenAllowListResult = await checkout.getTokenAllowList(
         {
@@ -141,9 +146,11 @@ export function SwapWidget(props: SwapWidgetProps) {
         },
       );
 
-      const allowedTokenBalances = tokenBalances.balances.filter((balance) => allowList.tokens
-        .map((token) => token.address)
-        .includes(balance.token.address));
+      const allowedTokenBalances = tokenBalances.balances.filter(
+        (balance) => allowList.tokens.map(
+          (token) => token.address,
+        ).includes(balance.token.address),
+      );
 
       swapDispatch({
         payload: {

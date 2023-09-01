@@ -35,7 +35,11 @@ import {
 import { fetchTokenSymbols } from '../../../lib/fetchTokenSymbols';
 import { NotEnoughGas } from '../../../components/NotEnoughGas/NotEnoughGas';
 import { isNativeToken } from '../../../lib/utils';
-import { DEFAULT_TOKEN_DECIMALS, ETH_TOKEN_SYMBOL, ZERO_BALANCE_STRING } from '../../../lib';
+import {
+  DEFAULT_TOKEN_DECIMALS,
+  ETH_TOKEN_SYMBOL,
+  ZERO_BALANCE_STRING,
+} from '../../../lib';
 import { orchestrationEvents } from '../../../lib/orchestrationEvents';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import { isPassportProvider } from '../../../lib/providerUtils';
@@ -140,24 +144,20 @@ export function WalletBalances() {
   }, [tokenBalances, checkout, network]);
 
   useEffect(() => {
-    if (!checkout || !provider || !network) return;
-    (async () => {
-      const balances = await getTokenBalances(
-        checkout,
-        provider,
-        network.chainId,
-        conversions,
-      );
+    if (!checkout || !provider || !network || !conversions) return;
+    if (conversions.size <= 0) return; // Prevent unnecessary re-rendering
 
-      walletDispatch({
-        payload: {
-          type: WalletActions.SET_TOKEN_BALANCES,
-          tokenBalances: balances,
-        },
+    getTokenBalances(checkout, provider, network.chainId, conversions)
+      .then((balances) => {
+        walletDispatch({
+          payload: {
+            type: WalletActions.SET_TOKEN_BALANCES,
+            tokenBalances: balances,
+          },
+        });
+        setBalancesLoading(false);
       });
-      setBalancesLoading(false);
-    })();
-  }, [checkout, network, provider, conversions, setBalancesLoading, walletDispatch]);
+  }, [checkout, provider, network, conversions]);
 
   const showAddCoins = useMemo(() => {
     if (!checkout || !network) return false;

@@ -210,6 +210,40 @@ describe('SwapWidget tests', () => {
 
       cySmartGet('not-enough-gas-bottom-sheet').should('not.exist');
     });
+
+    it('should show top up view with coins if getAllBalances succeed at least once', () => {
+      cy.stub(Checkout.prototype, 'getAllBalances')
+        .as('getAllBalancesStub')
+        .rejects()
+        .resolves({
+          balances: [
+            {
+              balance: BigNumber.from('0'),
+              formattedBalance: '0',
+              token: {
+                name: 'ImmutableX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: IMX_ADDRESS_ZKEVM,
+              },
+            },
+          ],
+        });
+
+      mount(
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <SwapWidget
+            params={params}
+            config={config}
+          />
+        </ConnectLoaderTestComponent>,
+      );
+
+      cySmartGet('not-enough-gas-add-imx-button').click();
+      cySmartGet('top-up-view').should('be.visible');
+    });
   });
 
   describe('SwapWidget Form', () => {
