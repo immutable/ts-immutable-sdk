@@ -25,6 +25,7 @@ describe('SwapWidget tests', () => {
   const mockProvider = {
     getSigner: () => ({
       getAddress: () => Promise.resolve('0xwalletAddress'),
+      populateTransaction: (tx) => Promise.resolve(tx),
     }),
     getNetwork: async () => ({
       chainId: ChainId.IMTBL_ZKEVM_TESTNET,

@@ -13,18 +13,21 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import { Trade } from './trade';
 
 /**
  * 
  * @export
- * @interface ProtocolDataAllOf
+ * @interface TradeResult
  */
-export interface ProtocolDataAllOf {
+export interface TradeResult {
     /**
-     * Operator signature signed by orderbook
-     * @type {string}
-     * @memberof ProtocolDataAllOf
+     * 
+     * @type {Trade}
+     * @memberof TradeResult
      */
-    'operator_signature': string;
+    'result': Trade;
 }
 

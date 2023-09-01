@@ -36,6 +36,8 @@ import { BasicAPIError } from '../models';
 import { CreateCounterfactualAddressRequest } from '../models';
 // @ts-ignore
 import { CreateCounterfactualAddressRes } from '../models';
+// @ts-ignore
+import { GetLinkedAddressesRes } from '../models';
 /**
  * PassportApi - axios parameter creator
  * @export
@@ -82,6 +84,44 @@ export const PassportApiAxiosParamCreator = function (configuration?: Configurat
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * Get all the Ethereum linked addresses for a user based on its userId
+         * @summary Get Ethereum linked addresses for a user
+         * @param {string} userId The user\&#39;s userId
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getLinkedAddresses: async (userId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('getLinkedAddresses', 'userId', userId)
+            const localVarPath = `/passport-mr/v1/users/{userId}/linked-addresses`
+                .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -101,6 +141,17 @@ export const PassportApiFp = function(configuration?: Configuration) {
          */
         async createCounterfactualAddress(createCounterfactualAddressRequest: CreateCounterfactualAddressRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateCounterfactualAddressRes>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createCounterfactualAddress(createCounterfactualAddressRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Get all the Ethereum linked addresses for a user based on its userId
+         * @summary Get Ethereum linked addresses for a user
+         * @param {string} userId The user\&#39;s userId
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getLinkedAddresses(userId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetLinkedAddressesRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getLinkedAddresses(userId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -123,6 +174,16 @@ export const PassportApiFactory = function (configuration?: Configuration, baseP
         createCounterfactualAddress(createCounterfactualAddressRequest: CreateCounterfactualAddressRequest, options?: any): AxiosPromise<CreateCounterfactualAddressRes> {
             return localVarFp.createCounterfactualAddress(createCounterfactualAddressRequest, options).then((request) => request(axios, basePath));
         },
+        /**
+         * Get all the Ethereum linked addresses for a user based on its userId
+         * @summary Get Ethereum linked addresses for a user
+         * @param {string} userId The user\&#39;s userId
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getLinkedAddresses(userId: string, options?: any): AxiosPromise<GetLinkedAddressesRes> {
+            return localVarFp.getLinkedAddresses(userId, options).then((request) => request(axios, basePath));
+        },
     };
 };
 
@@ -138,6 +199,20 @@ export interface PassportApiCreateCounterfactualAddressRequest {
      * @memberof PassportApiCreateCounterfactualAddress
      */
     readonly createCounterfactualAddressRequest: CreateCounterfactualAddressRequest
+}
+
+/**
+ * Request parameters for getLinkedAddresses operation in PassportApi.
+ * @export
+ * @interface PassportApiGetLinkedAddressesRequest
+ */
+export interface PassportApiGetLinkedAddressesRequest {
+    /**
+     * The user\&#39;s userId
+     * @type {string}
+     * @memberof PassportApiGetLinkedAddresses
+     */
+    readonly userId: string
 }
 
 /**
@@ -157,5 +232,17 @@ export class PassportApi extends BaseAPI {
      */
     public createCounterfactualAddress(requestParameters: PassportApiCreateCounterfactualAddressRequest, options?: AxiosRequestConfig) {
         return PassportApiFp(this.configuration).createCounterfactualAddress(requestParameters.createCounterfactualAddressRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get all the Ethereum linked addresses for a user based on its userId
+     * @summary Get Ethereum linked addresses for a user
+     * @param {PassportApiGetLinkedAddressesRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PassportApi
+     */
+    public getLinkedAddresses(requestParameters: PassportApiGetLinkedAddressesRequest, options?: AxiosRequestConfig) {
+        return PassportApiFp(this.configuration).getLinkedAddresses(requestParameters.userId, options).then((request) => request(this.axios, this.basePath));
     }
 }

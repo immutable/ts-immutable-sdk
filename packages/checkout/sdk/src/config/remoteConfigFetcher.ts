@@ -3,11 +3,16 @@ import { Environment } from '@imtbl/config';
 import {
   ChainId,
   CHECKOUT_API_BASE_URL,
+  ChainsTokensConfig,
   ENV_DEVELOPMENT,
   RemoteConfiguration,
-  TokenInfo,
+  ChainTokensConfig,
 } from '../types';
-import { ConfiguredTokens, RemoteConfigParams } from './remoteConfigType';
+
+export type RemoteConfigParams = {
+  isDevelopment: boolean;
+  isProduction: boolean;
+};
 
 export class RemoteConfigFetcher {
   private isDevelopment: boolean;
@@ -16,7 +21,7 @@ export class RemoteConfigFetcher {
 
   private configCache: RemoteConfiguration | undefined;
 
-  private tokensCache: ConfiguredTokens | undefined;
+  private tokensCache: ChainsTokensConfig | undefined;
 
   constructor(params: RemoteConfigParams) {
     this.isDevelopment = params.isDevelopment;
@@ -58,7 +63,7 @@ export class RemoteConfigFetcher {
     return this.configCache;
   }
 
-  private async loadConfigTokens(): Promise<ConfiguredTokens | undefined> {
+  private async loadConfigTokens(): Promise<ChainsTokensConfig | undefined> {
     if (this.tokensCache) return this.tokensCache;
 
     const response = await RemoteConfigFetcher.makeHttpRequest(
@@ -82,9 +87,9 @@ export class RemoteConfigFetcher {
     return config[key];
   }
 
-  public async getTokens(chainId: ChainId): Promise<TokenInfo[]> {
+  public async getTokensConfig(chainId: ChainId): Promise<ChainTokensConfig> {
     const config = await this.loadConfigTokens();
-    if (!config) return [];
-    return config[chainId]?.allowed ?? [];
+    if (!config || !config[chainId]) return {};
+    return config[chainId] ?? [];
   }
 }

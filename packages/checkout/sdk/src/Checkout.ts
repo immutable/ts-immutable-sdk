@@ -11,6 +11,7 @@ import * as network from './network';
 import * as transaction from './transaction';
 import * as gasEstimatorService from './gasEstimate';
 import * as buy from './smartCheckout/buy';
+import * as sell from './smartCheckout/sell';
 import * as smartCheckout from './smartCheckout';
 import {
   BuyParams,
@@ -46,6 +47,7 @@ import {
 } from './types';
 import { CheckoutConfiguration } from './config';
 import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
+import { SellParams } from './types/sell';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
@@ -286,6 +288,28 @@ export class Checkout {
   }
 
   /**
+   * Determines the requirements for performing a sell.
+   * @param {SellParams} params - The parameters for the sell.
+  */
+  public async sell(
+    params: SellParams,
+  ): Promise<void> {
+    if (this.config.isProduction) {
+      throw new Error('This endpoint is not currently available.');
+    }
+
+    // eslint-disable-next-line no-console
+    console.warn('This endpoint is currently under construction.');
+
+    const web3Provider = await provider.validateProvider(
+      this.config,
+      params.provider,
+    );
+
+    await sell.sell(this.config, web3Provider, params.id, params.collectionAddress, params.buyToken);
+  }
+
+  /**
    * Determines the transaction requirements to complete a purchase.
    * @params {SmartCheckoutParams} params - The parameters for smart checkout.
    */
@@ -305,6 +329,7 @@ export class Checkout {
     );
 
     await smartCheckout.smartCheckout(
+      this.config,
       web3Provider,
       params.itemRequirements,
       params.transactionOrGasAmount,
