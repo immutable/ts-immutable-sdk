@@ -44,11 +44,11 @@ import { ErrorView } from '../../views/error/ErrorView';
 import { ApproveERC20BridgeOnboarding } from './views/ApproveERC20Bridge';
 import { getBridgeTokensAndBalances } from './functions/getBridgeTokens';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
+import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 
 export interface BridgeWidgetProps {
   params: BridgeWidgetParams;
   config: StrongCheckoutWidgetsConfig;
-  eventTarget?: EventTarget | Window;
 }
 
 export interface BridgeWidgetParams {
@@ -57,7 +57,7 @@ export interface BridgeWidgetParams {
 }
 
 export function BridgeWidget(props: BridgeWidgetProps) {
-  const { params, config, eventTarget } = props;
+  const { params, config } = props;
   const { environment, theme } = config;
   const successText = text.views[BridgeWidgetViews.SUCCESS];
   const failText = text.views[BridgeWidgetViews.FAIL];
@@ -72,6 +72,8 @@ export function BridgeWidget(props: BridgeWidgetProps) {
   const [bridgeState, bridgeDispatch] = useReducer(bridgeReducer, initialBridgeState);
   const bridgeReducerValues = useMemo(() => ({ bridgeState, bridgeDispatch }), [bridgeState, bridgeDispatch]);
 
+  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+
   const {
     amount, fromContractAddress,
   } = params;
@@ -83,15 +85,6 @@ export function BridgeWidget(props: BridgeWidgetProps) {
   useEffect(() => {
     const bridgetWidgetSetup = async () => {
       if (!checkout || !provider) return;
-
-      if (eventTarget) {
-        bridgeDispatch({
-          payload: {
-            type: BridgeActions.SET_EVENT_TARGET,
-            eventTarget,
-          },
-        });
-      }
 
       const getNetworkResult = await checkout.getNetworkInfo({ provider });
 
@@ -208,6 +201,7 @@ export function BridgeWidget(props: BridgeWidgetProps) {
                 actionText={successText.actionText}
                 onActionClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
                 onRenderEvent={() => sendBridgeSuccessEvent(
+                  eventTarget,
                   (viewReducerValues.viewState.view as BridgeSuccessView).data.transactionHash,
                 )}
                 statusType={StatusType.SUCCESS}
@@ -231,7 +225,7 @@ export function BridgeWidget(props: BridgeWidgetProps) {
                     });
                   }
                 }}
-                onRenderEvent={() => sendBridgeFailedEvent('Transaction failed')}
+                onRenderEvent={() => sendBridgeFailedEvent(eventTarget, 'Transaction failed')}
                 onCloseClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
                 statusType={StatusType.FAILURE}
                 testId="fail-view"

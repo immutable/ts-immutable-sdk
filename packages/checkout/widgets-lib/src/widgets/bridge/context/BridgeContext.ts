@@ -14,7 +14,6 @@ export interface BridgeState {
   toNetwork: NetworkInfo | null;
   tokenBalances: GetBalanceResult[];
   allowedTokens: TokenInfo[];
-  eventTarget: Window | EventTarget
 }
 
 export const initialBridgeState: BridgeState = {
@@ -24,7 +23,6 @@ export const initialBridgeState: BridgeState = {
   toNetwork: null,
   tokenBalances: [],
   allowedTokens: [],
-  eventTarget: window,
 };
 
 export interface BridgeContextState {
@@ -42,8 +40,7 @@ type ActionPayload =
   | SetNetworkPayload
   | SetToNetworkPayload
   | SetTokenBalancesPayload
-  | SetAllowedTokensPayload
-  | SetEventTargetPayload;
+  | SetAllowedTokensPayload;
 
 export enum BridgeActions {
   SET_WALLET_PROVIDER = 'SET_WALLET_PROVIDER',
@@ -52,12 +49,6 @@ export enum BridgeActions {
   SET_TO_NETWORK = 'SET_TO_NETWORK',
   SET_TOKEN_BALANCES = 'SET_TOKEN_BALANCES',
   SET_ALLOWED_TOKENS = 'SET_ALLOWED_TOKENS',
-  SET_EVENT_TARGET = 'SET_EVENT_TARGET',
-}
-
-export interface SetEventTargetPayload {
-  type: BridgeActions.SET_EVENT_TARGET;
-  eventTarget: Window | EventTarget;
 }
 
 export interface SetWalletProviderPayload {
@@ -105,11 +96,6 @@ export const bridgeReducer: Reducer<BridgeState, BridgeAction> = (
   action: BridgeAction,
 ) => {
   switch (action.payload.type) {
-    case BridgeActions.SET_EVENT_TARGET:
-      return {
-        ...state,
-        eventTarget: action.payload.eventTarget,
-      };
     case BridgeActions.SET_WALLET_PROVIDER:
       return {
         ...state,

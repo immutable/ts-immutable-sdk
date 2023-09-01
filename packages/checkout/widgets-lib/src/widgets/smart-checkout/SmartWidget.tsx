@@ -37,6 +37,9 @@ import { SimpleTextBody } from '../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../components/Footer/FooterButton';
 import { SmartCheckoutHero } from '../../components/Hero/SmartCheckoutHero';
 import { sendSwapWidgetCloseEvent } from '../swap/SwapWidgetEvents';
+import {
+  EventTargetActions, EventTargetContext, eventTargetReducer, initialEventTargetState,
+} from '../../context/event-target-context/EventTargetContext';
 
 export interface SmartWidgetProps {
   params: SmartWidgetParams;
@@ -62,6 +65,10 @@ export function SmartWidget(props: SmartWidgetProps) {
 
   const [smartState, smartDispatch] = useReducer(smartReducer, initialSmartState);
   const smartReducerValues = useMemo(() => ({ smartState, smartDispatch }), [smartState, smartDispatch]);
+
+  const [eventTargetState, eventTargetDispatch] = useReducer(eventTargetReducer, initialEventTargetState);
+  const eventTargetReducerValues = useMemo(() => (
+    { eventTargetState, eventTargetDispatch }), [eventTargetState, eventTargetDispatch]);
 
   const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
@@ -144,12 +151,11 @@ export function SmartWidget(props: SmartWidgetProps) {
   useEffect(() => {
     // Add a custom event listener when the component mounts
     eventTarget.addEventListener(IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT, handleCustomEvent);
-
     // Remove the custom event listener when the component unmounts
     return () => {
       eventTarget.removeEventListener(IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT, handleCustomEvent);
     };
-  }, [eventTarget]);
+  }, []);
 
   const triggerCustomEvent = () => {
     // Create and dispatch the custom event
@@ -178,6 +184,12 @@ export function SmartWidget(props: SmartWidgetProps) {
   }, [viewReducerValues.viewState.view.type]);
 
   useEffect(() => {
+    eventTargetDispatch({
+      payload: {
+        type: EventTargetActions.SET_EVENT_TARGET,
+        eventTarget,
+      },
+    });
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
@@ -190,65 +202,66 @@ export function SmartWidget(props: SmartWidgetProps) {
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>
       <ViewContext.Provider value={viewReducerValues}>
         <SmartContext.Provider value={smartReducerValues}>
-          {viewReducerValues.viewState.view.type === SharedViews.LOADING_VIEW && (
-            <LoadingView loadingText={loadingText} />
-          )}
-
-          {viewReducerValues.viewState.view.type === SmartWidgetViews.SMART_CHECKOUT && (
-            <SimpleLayout
-              testId="ready-to-connect"
-              floatHeader
-              heroContent={<SmartCheckoutHero />}
-              footer={(
-                <FooterButton
-                  actionText="Let's do it"
-                  onActionClick={onStartClick}
-                />
+          <EventTargetContext.Provider value={eventTargetReducerValues}>
+            {viewReducerValues.viewState.view.type === SharedViews.LOADING_VIEW && (
+              <LoadingView loadingText={loadingText} />
             )}
-            >
-              <SimpleTextBody heading="You'll need more coins">
-                It&lsquo;s a bit tricky, so let&lsquo;s make it easy for you
-              </SimpleTextBody>
-            </SimpleLayout>
-          )}
-          {viewReducerValues.viewState.view.type === SmartWidgetViews.SMART_BRIDGE && (
-            <ConnectLoader
-              params={bridgeLoaderParams}
-              closeEvent={() => sendBridgeWidgetCloseEvent(eventTarget)}
-              widgetConfig={config}
-            >
-              <BridgeWidget
-                params={bridgeParams}
-                config={config}
-                eventTarget={eventTarget}
-              />
-            </ConnectLoader>
-          )}
 
-          {viewReducerValues.viewState.view.type === SmartWidgetViews.SMART_SWAP && (
-            <ConnectLoader
-              params={swapLoaderParams}
-              closeEvent={() => sendSwapWidgetCloseEvent}
-              widgetConfig={config}
+            {viewReducerValues.viewState.view.type === SmartWidgetViews.SMART_CHECKOUT && (
+              <SimpleLayout
+                testId="ready-to-connect"
+                floatHeader
+                heroContent={<SmartCheckoutHero />}
+                footer={(
+                  <FooterButton
+                    actionText="Let's do it"
+                    onActionClick={onStartClick}
+                  />
+              )}
+              >
+                <SimpleTextBody heading="You'll need more coins">
+                  It&lsquo;s a bit tricky, so let&lsquo;s make it easy for you
+                </SimpleTextBody>
+              </SimpleLayout>
+            )}
+            {viewReducerValues.viewState.view.type === SmartWidgetViews.SMART_BRIDGE && (
+
+              <ConnectLoader
+                params={bridgeLoaderParams}
+                closeEvent={() => sendBridgeWidgetCloseEvent(eventTarget)}
+                widgetConfig={config}
+              >
+                <BridgeWidget
+                  params={bridgeParams}
+                  config={config}
+                />
+              </ConnectLoader>
+            )}
+
+            {viewReducerValues.viewState.view.type === SmartWidgetViews.SMART_SWAP && (
+              <ConnectLoader
+                params={swapLoaderParams}
+                closeEvent={sendSwapWidgetCloseEvent}
+                widgetConfig={config}
+              >
+                <SwapWidget
+                  params={swapParams}
+                  config={config}
+                />
+              </ConnectLoader>
+            )}
+            <Box sx={{
+              width: '430px', backgroundColor: '#0D0D0D', marginTop: '10px', padding: '16px', borderRadius: '8px',
+            }}
             >
-              <SwapWidget
-                params={swapParams}
-                config={config}
-              />
-            </ConnectLoader>
-          )}
-          <Box sx={{
-            width: '430px', backgroundColor: '#0D0D0D', marginTop: '10px', padding: '16px', borderRadius: '8px',
-          }}
-          >
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', columnGap: '16px' }}>
-              <Button sx={{ flexGrow: 1 }} onClick={bridgeClick}>BRIDGE</Button>
-              <Button sx={{ flexGrow: 1 }} onClick={swapClick}>SWAP</Button>
-              <Button sx={{ flexGrow: 1 }} onClick={triggerCustomEvent}>EVENT</Button>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', columnGap: '16px' }}>
+                <Button sx={{ flexGrow: 1 }} onClick={bridgeClick}>BRIDGE</Button>
+                <Button sx={{ flexGrow: 1 }} onClick={swapClick}>SWAP</Button>
+                <Button sx={{ flexGrow: 1 }} onClick={triggerCustomEvent}>EVENT</Button>
+              </Box>
+
             </Box>
-
-          </Box>
-
+          </EventTargetContext.Provider>
         </SmartContext.Provider>
       </ViewContext.Provider>
     </BiomeCombinedProviders>
