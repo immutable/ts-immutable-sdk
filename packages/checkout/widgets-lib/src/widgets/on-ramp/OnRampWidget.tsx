@@ -139,9 +139,9 @@ export function OnRampWidget(props: OnRampWidgetProps) {
           <StatusView
             statusText={SUCCESS.text}
             actionText={SUCCESS.actionText}
-            onRenderEvent={
-              () => sendOnRampSuccessEvent((viewState.view as OnRampSuccessView).data.transactionHash)
-            }
+            onRenderEvent={() => sendOnRampSuccessEvent(
+              (viewState.view as OnRampSuccessView).data.transactionHash,
+            )}
             onActionClick={sendOnRampWidgetCloseEvent}
             statusType={StatusType.SUCCESS}
             testId="success-view"
@@ -152,11 +152,10 @@ export function OnRampWidget(props: OnRampWidgetProps) {
           <StatusView
             statusText={FAIL.text}
             actionText={FAIL.actionText}
-            onRenderEvent={
-            () => sendOnRampFailedEvent(
-              (viewState.view as OnRampFailView).reason ?? 'Transaction failed',
-            )
-          }
+            onRenderEvent={() => sendOnRampFailedEvent(
+              (viewState.view as OnRampFailView).reason
+                  ?? 'Transaction failed',
+            )}
             onActionClick={() => {
               if (viewState.view.type === OnRampWidgetViews.FAIL) {
                 viewDispatch({
@@ -176,6 +175,11 @@ export function OnRampWidget(props: OnRampWidgetProps) {
           />
         )}
 
+        {/* This keeps Transak's iframe instance in dom so as to listen to transak's events. */}
+        {/* We will remove the iframe instance once the processing has been finalised, either as a success or a failure */}
+        {(viewState.view.type === OnRampWidgetViews.IN_PROGRESS
+        || viewState.view.type === OnRampWidgetViews.ONRAMP
+        ) && (
         <OnRampMain
           environment={environment}
           walletAddress={walletAddress}
@@ -183,8 +187,11 @@ export function OnRampWidget(props: OnRampWidgetProps) {
           email={emailAddress}
           showIframe={showIframe}
           amount={viewState.view.data?.amount ?? amount}
-          contractAddress={viewState.view.data?.contractAddress ?? contractAddress}
+          contractAddress={
+            viewState.view.data?.contractAddress ?? contractAddress
+          }
         />
+        )}
 
         {viewState.view.type === SharedViews.TOP_UP_VIEW && (
           <TopUpView

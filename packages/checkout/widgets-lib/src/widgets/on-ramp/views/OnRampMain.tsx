@@ -134,7 +134,7 @@ export function OnRampMain({
               amount,
               contractAddress,
             },
-            reason: eventData.statusReason ?? 'Transaction failed',
+            reason: `Transaction failed: ${eventData.statusReason}`,
           },
         },
       });
