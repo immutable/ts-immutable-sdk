@@ -45,7 +45,7 @@ describe('retry', () => {
     expect(mockFn).toHaveBeenCalledTimes(3);
   });
 
-  it.only('should throw error based on nonRetryable', async () => {
+  it('should throw error based on nonRetryable', async () => {
     const mockFn = jest.fn()
       .mockRejectedValueOnce(new Error('Failed 1st time'))
       .mockRejectedValueOnce(new Error('Failed 2nd time'))
