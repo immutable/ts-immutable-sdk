@@ -106,7 +106,8 @@ export function WalletBalances() {
 
   // Silently runs a gas check for bridge to L2
   // This is to prevent the user having to wait for the gas estimate to complete to use the UI
-  // As a trade-off there is a slight delay between when the gas estimate is fetched and checked against the user balance, so 'move' can be selected before the gas estimate is completed
+  // As a trade-off there is a slight delay between when the gas estimate is fetched and checked
+  // against the user balance, so 'move' can be selected before the gas estimate is completed
   useEffect(() => {
     const bridgeToL2GasCheck = async () => {
       if (!checkout) return;
