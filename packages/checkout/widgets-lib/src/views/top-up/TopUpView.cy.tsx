@@ -313,12 +313,16 @@ describe('Top Up View', () => {
           },
         });
 
+      const cryptoConversions = new Map<string, number>([['eth', 2000], ['imx', 1.5], ['usdc', 1]]);
       mount(
         <CryptoFiatProvider environment={Environment.SANDBOX}>
           <ConnectLoaderTestComponent
             initialStateOverride={connectLoaderState}
           >
-            <WalletWidgetTestComponent initialStateOverride={baseWalletState}>
+            <WalletWidgetTestComponent
+              initialStateOverride={baseWalletState}
+              cryptoConversionsOverride={cryptoConversions}
+            >
               <TopUpView
                 showOnrampOption
                 showSwapOption
