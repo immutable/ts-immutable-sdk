@@ -34,7 +34,7 @@ export function Bridge({ amount, fromContractAddress }: BridgeProps) {
     bridgeDispatch({
       payload: {
         type: BridgeActions.SET_TOKEN_BALANCES,
-        tokenBalances: tokensAndBalances.allowedTokenBalances,
+        tokenBalances: tokensAndBalances?.allowedTokenBalances ?? [],
       },
     });
   }, [checkout, provider]);

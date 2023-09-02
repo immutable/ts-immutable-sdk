@@ -1,6 +1,7 @@
 import { Environment } from '@imtbl/config';
 import { WalletProviderName } from '@imtbl/checkout-sdk';
 import { WidgetTheme } from './types';
+import { RetryType } from './retry';
 
 export const NATIVE = 'NATIVE';
 
@@ -24,6 +25,14 @@ export const FAQS_LINK = 'https://support.immutable.com/en/';
  * Delay between retries (milliseconds)
  */
 export const DEFAULT_RETRY_DELAY = 10 * 1000;
+
+/**
+ * Default retry policy for fetching balances from remote.
+ */
+export const DEFAULT_BALANCE_RETRY_POLICY: RetryType = {
+  retryIntervalMs: 10 * 1000,
+  retries: 50,
+};
 
 /**
  * Checkout Widget default env

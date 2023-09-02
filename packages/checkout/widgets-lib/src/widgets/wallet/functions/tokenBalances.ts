@@ -1,7 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { Checkout, ChainId } from '@imtbl/checkout-sdk';
 import { calculateCryptoToFiat, sortTokensByAmount } from '../../../lib/utils';
-import { DEFAULT_RETRY_DELAY } from '../../../lib';
+import { DEFAULT_BALANCE_RETRY_POLICY } from '../../../lib';
 import { retry } from '../../../lib/retry';
 
 export interface BalanceInfo {
@@ -34,7 +34,7 @@ export const getTokenBalances = async (
       walletAddress,
       chainId,
     }),
-    { retryIntervalMs: DEFAULT_RETRY_DELAY },
+    DEFAULT_BALANCE_RETRY_POLICY,
   );
 
   const sortedTokens = sortTokensByAmount(

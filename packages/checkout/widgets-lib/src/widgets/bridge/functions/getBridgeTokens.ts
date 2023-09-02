@@ -5,7 +5,7 @@ import {
   TokenFilterTypes,
 } from '@imtbl/checkout-sdk';
 import { retry } from '../../../lib/retry';
-import { DEFAULT_RETRY_DELAY } from '../../../lib';
+import { DEFAULT_BALANCE_RETRY_POLICY } from '../../../lib';
 
 export async function getBridgeTokensAndBalances(
   checkout: Checkout,
@@ -21,7 +21,7 @@ export async function getBridgeTokensAndBalances(
       walletAddress,
       chainId,
     }),
-    { retryIntervalMs: DEFAULT_RETRY_DELAY },
+    DEFAULT_BALANCE_RETRY_POLICY,
   );
 
   const allowList: GetTokenAllowListResult = await checkout.getTokenAllowList(
