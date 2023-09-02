@@ -30,7 +30,7 @@ export const DEFAULT_RETRY_DELAY = 10 * 1000;
  * Default retry policy for fetching balances from remote.
  */
 export const DEFAULT_BALANCE_RETRY_POLICY: RetryType = {
-  retryIntervalMs: 10 * 1000,
+  retryIntervalMs: DEFAULT_RETRY_DELAY,
   retries: 50,
 };
 
