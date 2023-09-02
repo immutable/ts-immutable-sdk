@@ -26,7 +26,7 @@ describe('getBridgeTokensAndBalances', () => {
       formattedBalance: '25.34',
     },
     {
-      balance: BigNumber.from(1), // <<< zero balance
+      balance: BigNumber.from(1),
       token: { symbol: 'CCC', name: 'CCC', address: 'NATIVE' } as TokenInfo,
       formattedBalance: '36.34',
     },
