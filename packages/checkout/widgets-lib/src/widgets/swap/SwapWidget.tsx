@@ -29,7 +29,7 @@ import {
 import { SwapSuccessView, SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { DEFAULT_RETRY_DELAY, WidgetTheme } from '../../lib';
+import { DEFAULT_BALANCE_RETRY_POLICY, WidgetTheme } from '../../lib';
 import { StatusView } from '../../components/Status/StatusView';
 import { StatusType } from '../../components/Status/StatusType';
 import { text } from '../../resources/text/textConfig';
@@ -136,7 +136,7 @@ export function SwapWidget(props: SwapWidgetProps) {
           walletAddress,
           chainId: network.chainId,
         }),
-        { retryIntervalMs: DEFAULT_RETRY_DELAY },
+        DEFAULT_BALANCE_RETRY_POLICY,
       );
 
       const allowList: GetTokenAllowListResult = await checkout.getTokenAllowList(

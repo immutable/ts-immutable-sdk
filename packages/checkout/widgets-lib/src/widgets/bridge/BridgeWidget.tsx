@@ -149,14 +149,14 @@ export function BridgeWidget(props: BridgeWidgetProps) {
       bridgeDispatch({
         payload: {
           type: BridgeActions.SET_ALLOWED_TOKENS,
-          allowedTokens: tokensAndBalances.allowList.tokens,
+          allowedTokens: tokensAndBalances?.allowList?.tokens ?? [],
         },
       });
 
       bridgeDispatch({
         payload: {
           type: BridgeActions.SET_TOKEN_BALANCES,
-          tokenBalances: tokensAndBalances.allowedTokenBalances,
+          tokenBalances: tokensAndBalances.allowedTokenBalances ?? [],
         },
       });
 
