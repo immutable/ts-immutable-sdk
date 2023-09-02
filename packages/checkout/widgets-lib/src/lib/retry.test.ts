@@ -44,4 +44,21 @@ describe('retry', () => {
     ).rejects.toThrow('Failed every time');
     expect(mockFn).toHaveBeenCalledTimes(3);
   });
+
+  it.only('should throw error based on nonRetryable', async () => {
+    const mockFn = jest.fn()
+      .mockRejectedValueOnce(new Error('Failed 1st time'))
+      .mockRejectedValueOnce(new Error('Failed 2nd time'))
+      .mockRejectedValueOnce(new Error('Failed 3rd time'))
+      .mockRejectedValueOnce(new Error('nonRetryable error'))
+      .mockRejectedValueOnce(new Error('Failed 4th time'));
+
+    await expect(
+      retry(mockFn, {
+        retryIntervalMs: 1,
+        nonRetryable: (err: Error) => err.message.includes('nonRetryable error'),
+      }),
+    ).rejects.toThrow('nonRetryable error');
+    expect(mockFn).toHaveBeenCalledTimes(4);
+  });
 });
