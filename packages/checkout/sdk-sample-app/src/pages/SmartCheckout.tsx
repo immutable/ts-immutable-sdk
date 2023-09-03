@@ -9,6 +9,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import Buy from '../components/Buy';
 import { SmartCheckoutForm } from '../components/SmartCheckoutForm';
 import Sell from '../components/Sell';
+import Cancel from '../components/Cancel';
 
 export default function SmartCheckout() {
   const [environment, setEnvironment] = useState(Environment.SANDBOX);
@@ -16,7 +17,7 @@ export default function SmartCheckout() {
     return new Checkout({ baseConfig: { environment: environment } });
   }, [environment]);
   const [provider, setProvider] = useState<Web3Provider>();
-  
+
   return (
     <div>
       <Heading>Smart Checkout</Heading>
@@ -71,8 +72,8 @@ export default function SmartCheckout() {
       >
         Connect
       </Divider>
-      <Connect 
-        checkout={checkout} 
+      <Connect
+        checkout={checkout}
         provider={provider}
         setProvider={setProvider} />
 
@@ -95,7 +96,19 @@ export default function SmartCheckout() {
         Buy
       </Divider>
       <Buy
-        checkout={checkout} 
+        checkout={checkout}
+        provider={provider} />
+
+      <Divider
+        sx={{
+          marginTop: 'base.spacing.x6',
+          marginBottom: 'base.spacing.x2',
+        }}
+      >
+        Cancel
+      </Divider>
+      <Cancel
+        checkout={checkout}
         provider={provider} />
 
       <Divider
@@ -107,7 +120,7 @@ export default function SmartCheckout() {
         Sell
       </Divider>
       <Sell
-        checkout={checkout} 
+        checkout={checkout}
         provider={provider} />
 
       <Divider
@@ -118,9 +131,9 @@ export default function SmartCheckout() {
       >
         Smart Checkout
       </Divider>
-      
+
       <SmartCheckoutForm
-        checkout={checkout} 
+        checkout={checkout}
         provider={provider} />
     </div>
   );
