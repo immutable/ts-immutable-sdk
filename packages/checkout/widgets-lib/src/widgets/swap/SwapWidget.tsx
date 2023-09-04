@@ -42,6 +42,7 @@ import { SwapInProgress } from './views/SwapInProgress';
 import { ApproveERC20Onboarding } from './views/ApproveERC20Onboarding';
 import { TopUpView } from '../../views/top-up/TopUpView';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
+import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
@@ -70,6 +71,8 @@ export function SwapWidget(props: SwapWidgetProps) {
     () => ({ swapState, swapDispatch }),
     [swapState, swapDispatch],
   );
+
+  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const { params, config } = props;
   const {
@@ -202,10 +205,11 @@ export function SwapWidget(props: SwapWidgetProps) {
               actionText={success.actionText}
               onRenderEvent={
               () => sendSwapSuccessEvent(
+                eventTarget,
                 (viewState.view as SwapSuccessView).data.transactionHash,
               )
               }
-              onActionClick={sendSwapWidgetCloseEvent}
+              onActionClick={() => sendSwapWidgetCloseEvent(eventTarget)}
               statusType={StatusType.SUCCESS}
               testId="success-view"
             />
@@ -214,7 +218,7 @@ export function SwapWidget(props: SwapWidgetProps) {
             <StatusView
               statusText={failed.text}
               actionText={failed.actionText}
-              onRenderEvent={() => sendSwapFailedEvent('Transaction failed')}
+              onRenderEvent={() => sendSwapFailedEvent(eventTarget, 'Transaction failed')}
               onActionClick={() => {
                 if (viewState.view.type === SwapWidgetViews.FAIL) {
                   viewDispatch({
@@ -229,7 +233,7 @@ export function SwapWidget(props: SwapWidgetProps) {
                 }
               }}
               statusType={StatusType.FAILURE}
-              onCloseClick={sendSwapWidgetCloseEvent}
+              onCloseClick={() => sendSwapWidgetCloseEvent(eventTarget)}
               testId="fail-view"
             />
             )}
@@ -237,7 +241,7 @@ export function SwapWidget(props: SwapWidgetProps) {
             <StatusView
               statusText={rejected.text}
               actionText={rejected.actionText}
-              onRenderEvent={() => sendSwapRejectedEvent('Price surge')}
+              onRenderEvent={() => sendSwapRejectedEvent(eventTarget, 'Price surge')}
               onActionClick={() => {
                 if (viewState.view.type === SwapWidgetViews.PRICE_SURGE) {
                   viewDispatch({
@@ -252,7 +256,7 @@ export function SwapWidget(props: SwapWidgetProps) {
                 }
               }}
               statusType={StatusType.WARNING}
-              onCloseClick={sendSwapWidgetCloseEvent}
+              onCloseClick={() => sendSwapWidgetCloseEvent(eventTarget)}
               testId="price-surge-view"
             />
             )}
@@ -267,7 +271,7 @@ export function SwapWidget(props: SwapWidgetProps) {
                   },
                 });
               }}
-              onCloseClick={sendSwapWidgetCloseEvent}
+              onCloseClick={() => sendSwapWidgetCloseEvent(eventTarget)}
             />
             )}
             {viewState.view.type === SharedViews.TOP_UP_VIEW && (
@@ -276,7 +280,7 @@ export function SwapWidget(props: SwapWidgetProps) {
               showOnrampOption={isOnRampEnabled}
               showSwapOption={isSwapEnabled}
               showBridgeOption={isBridgeEnabled}
-              onCloseButtonClick={sendSwapWidgetCloseEvent}
+              onCloseButtonClick={() => sendSwapWidgetCloseEvent(eventTarget)}
             />
             )}
           </CryptoFiatProvider>

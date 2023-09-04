@@ -39,12 +39,15 @@ import { DEFAULT_TOKEN_DECIMALS, ETH_TOKEN_SYMBOL, ZERO_BALANCE_STRING } from '.
 import { orchestrationEvents } from '../../../lib/orchestrationEvents';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import { isPassportProvider } from '../../../lib/providerUtils';
+import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 
 export function WalletBalances() {
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { walletState, walletDispatch } = useContext(WalletContext);
+  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+
   const { viewDispatch } = useContext(ViewContext);
   const [totalFiatAmount, setTotalFiatAmount] = useState(0.0);
   const { header } = text.views[WalletWidgetViews.WALLET_BALANCES];
@@ -182,7 +185,7 @@ export function WalletBalances() {
       setShowNotEnoughGasDrawer(true);
       return;
     }
-    orchestrationEvents.sendRequestBridgeEvent(IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {
+    orchestrationEvents.sendRequestBridgeEvent(eventTarget, IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {
       tokenAddress: address ?? '',
       amount: '',
     });
@@ -203,7 +206,7 @@ export function WalletBalances() {
               },
             });
           }}
-          onCloseButtonClick={sendWalletWidgetCloseEvent}
+          onCloseButtonClick={() => sendWalletWidgetCloseEvent(eventTarget)}
         />
       )}
       footer={<FooterLogo />}

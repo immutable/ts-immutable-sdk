@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- @imtbl/orderbook: Added `getTrade` and `listTrades` methods for querying trades
 - @imtbl/passport: Added support for `eth_signTypedData_v4` to Passport zkEvm provider. 
 
 ## [0.16.0] - 2023-08-31
@@ -16,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - @imtbl/passport: Added support for `eth_getCode` to Passport zkEvm provider.
+- @imtbl/passport: Added support for `getLinkedAddresses` to Passport to read addresses connected with SIWE.
 - @imtbl/erc721: Added `safeBurn` and `safeBurnBatch` methods released in zkevm-contracts v1.1.0
 - @imtbl/erc721-mint-by-id: Added `safeBurn` and `safeBurnBatch` methods released in zkevm-contracts v1.1.0 
 

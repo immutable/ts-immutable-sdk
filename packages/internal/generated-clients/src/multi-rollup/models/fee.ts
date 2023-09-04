@@ -41,7 +41,10 @@ export interface Fee {
 }
 
 export const FeeFeeTypeEnum = {
-    Royalty: 'ROYALTY'
+    Royalty: 'ROYALTY',
+    MakerMarketplace: 'MAKER_MARKETPLACE',
+    TakerMarketplace: 'TAKER_MARKETPLACE',
+    Protocol: 'PROTOCOL'
 } as const;
 
 export type FeeFeeTypeEnum = typeof FeeFeeTypeEnum[keyof typeof FeeFeeTypeEnum];

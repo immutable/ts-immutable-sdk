@@ -12,7 +12,7 @@ describe('token related functions', () => {
   describe('when tokens are not configured', () => {
     it('should return the empty list of tokens', async () => {
       (RemoteConfigFetcher as unknown as jest.Mock).mockReturnValue({
-        getTokens: jest.fn().mockResolvedValue([]),
+        getTokensConfig: jest.fn().mockResolvedValue({ allowed: [] }),
       });
       config = new CheckoutConfiguration({
         baseConfig: { environment: Environment.SANDBOX },
@@ -30,26 +30,28 @@ describe('token related functions', () => {
 
   describe('getTokenAllowList', () => {
     const remoteConfigMockReturn = {
-      getTokens: jest.fn().mockResolvedValue([
-        {
-          address: '0x1',
-          decimals: 18,
-          name: 'token-aa-testnet',
-          symbol: 'AA',
-        },
-        {
-          address: '0x2',
-          decimals: 18,
-          name: 'token-bb-testnet',
-          symbol: 'BB',
-        },
-        {
-          address: '',
-          decimals: 18,
-          name: 'token-cc-testnet',
-          symbol: 'CC',
-        },
-      ]),
+      getTokensConfig: jest.fn().mockResolvedValue({
+        allowed: [
+          {
+            address: '0x1',
+            decimals: 18,
+            name: 'token-aa-testnet',
+            symbol: 'AA',
+          },
+          {
+            address: '0x2',
+            decimals: 18,
+            name: 'token-bb-testnet',
+            symbol: 'BB',
+          },
+          {
+            address: '',
+            decimals: 18,
+            name: 'token-cc-testnet',
+            symbol: 'CC',
+          },
+        ],
+      }),
       getConfig: jest.fn().mockResolvedValue({
         overrides: {
           rpcURL: 'https://test',
@@ -181,7 +183,7 @@ describe('token related functions', () => {
         chainId: ChainId.IMTBL_ZKEVM_DEVNET,
         result: [],
         remoteConfigMockReturn: {
-          getTokens: jest.fn().mockResolvedValue(undefined),
+          getTokensConfig: jest.fn().mockResolvedValue(undefined),
           getConfig: jest.fn().mockResolvedValue({}),
         },
       },

@@ -6,7 +6,7 @@ import {
   OrderbookOverrides,
 } from './config/config';
 import { Fee as OpenApiFee } from './openapi/sdk';
-import { mapFromOpenApiOrder, mapFromOpenApiPage } from './openapi/mapper';
+import { mapFromOpenApiOrder, mapFromOpenApiPage, mapFromOpenApiTrade } from './openapi/mapper';
 import { Seaport } from './seaport';
 import { SeaportLibFactory } from './seaport/seaport-lib-factory';
 import {
@@ -18,10 +18,13 @@ import {
   FulfillOrderResponse,
   ListListingsParams,
   ListListingsResult,
+  ListTradesParams,
+  ListTradesResult,
   ListingResult,
   OrderStatus,
   PrepareListingParams,
   PrepareListingResponse,
+  TradeResult,
 } from './types';
 
 /**
@@ -96,6 +99,18 @@ export class Orderbook {
   }
 
   /**
+   * Get a trade by ID
+   * @param {string} tradeId - The tradeId to find.
+   * @return {TradeResult} The returned order result.
+   */
+  async getTrade(tradeId: string): Promise<TradeResult> {
+    const apiListing = await this.apiClient.getTrade(tradeId);
+    return {
+      result: mapFromOpenApiTrade(apiListing.result),
+    };
+  }
+
+  /**
    * List orders. This method is used to get a list of orders filtered by conditions specified
    * in the params object.
    * @param {ListListingsParams} listOrderParams - Filtering, ordering and page parameters.
@@ -108,6 +123,22 @@ export class Orderbook {
     return {
       page: mapFromOpenApiPage(apiListings.page),
       result: apiListings.result.map(mapFromOpenApiOrder),
+    };
+  }
+
+  /**
+   * List trades. This method is used to get a list of trades filtered by conditions specified
+   * in the params object
+   * @param {ListTradesParams} listTradesParams - Filtering, ordering and page parameters.
+   * @return {ListTradesResult} The paged trades.
+   */
+  async listTrades(
+    listTradesParams: ListTradesParams,
+  ): Promise<ListTradesResult> {
+    const apiListings = await this.apiClient.listTrades(listTradesParams);
+    return {
+      page: mapFromOpenApiPage(apiListings.page),
+      result: apiListings.result.map(mapFromOpenApiTrade),
     };
   }
 
