@@ -77,9 +77,6 @@ export function TopUpView({
   }, [checkout, cryptoFiatDispatch]);
 
   const onClickOnramp = () => {
-    // if (widgetEvent === IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT) {
-    //   // dispatch onramp view
-    // }
     orchestrationEvents.sendRequestOnrampEvent(eventTarget, widgetEvent, {
       tokenAddress: tokenAddress ?? '',
       amount: amount ?? '',
