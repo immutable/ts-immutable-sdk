@@ -1,5 +1,5 @@
 /**
- * @enum {string} BridgeErrorType - Enumeration of different types of bridge errors.
+ * @enum {string} FactoryErrorType - Enumeration of different types of factory errors.
  */
 export enum FactoryErrorType {
   UNSUPPORTED_ERROR = 'UNSUPPORTED_ERROR',

@@ -8,16 +8,16 @@ import {
   FactoryInstance, FactoryModuleConfiguration,
 } from '../types';
 
-const SUPPORTED_SANDBOX_BRIDGES: FactoryInstance[] = [ZKEVM_DEVNET, ZKEVM_TESTNET];
+const SUPPORTED_SANDBOX_FACTORIES: FactoryInstance[] = [ZKEVM_DEVNET, ZKEVM_TESTNET];
 
 // TODO: Add when supported
-const SUPPORTED_PRODUCTION_BRIDGES: FactoryInstance[] = [];
+const SUPPORTED_PRODUCTION_FACTORIES: FactoryInstance[] = [];
 
-export const SUPPORTED_BRIDGES_FOR_ENVIRONMENT: {
+export const SUPPORTED_FACTORIES_FOR_ENVIRONMENT: {
   [key in Environment]: FactoryInstance[];
 } = {
-  [Environment.SANDBOX]: SUPPORTED_SANDBOX_BRIDGES,
-  [Environment.PRODUCTION]: SUPPORTED_PRODUCTION_BRIDGES,
+  [Environment.SANDBOX]: SUPPORTED_SANDBOX_FACTORIES,
+  [Environment.PRODUCTION]: SUPPORTED_PRODUCTION_FACTORIES,
 };
 
 export class FactoryConfiguration {
@@ -27,11 +27,6 @@ export class FactoryConfiguration {
 
   public provider: ethers.providers.Provider;
 
-  /**
-   * Constructs a BridgeConfiguration instance.
-   *
-   * @param {FactoryModuleConfiguration} options - The configuration options for the bridge module.
-   */
   constructor({
     factoryInstance,
     provider,
@@ -47,7 +42,7 @@ export class FactoryConfiguration {
       return;
     }
 
-    const supported = SUPPORTED_BRIDGES_FOR_ENVIRONMENT[baseConfig.environment].includes(
+    const supported = SUPPORTED_FACTORIES_FOR_ENVIRONMENT[baseConfig.environment].includes(
       factoryInstance,
     );
 
