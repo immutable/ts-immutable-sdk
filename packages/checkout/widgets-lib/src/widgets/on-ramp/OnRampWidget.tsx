@@ -144,9 +144,10 @@ export function OnRampWidget(props: OnRampWidgetProps) {
             statusText={SUCCESS.text}
             actionText={SUCCESS.actionText}
             onRenderEvent={() => sendOnRampSuccessEvent(
+              window,
               (viewState.view as OnRampSuccessView).data.transactionHash,
             )}
-            onActionClick={sendOnRampWidgetCloseEvent}
+            onActionClick={() => sendOnRampWidgetCloseEvent(window)}
             statusType={StatusType.SUCCESS}
             testId="success-view"
           />
@@ -157,6 +158,7 @@ export function OnRampWidget(props: OnRampWidgetProps) {
             statusText={FAIL.text}
             actionText={FAIL.actionText}
             onRenderEvent={() => sendOnRampFailedEvent(
+              window,
               (viewState.view as OnRampFailView).reason
                   ?? 'Transaction failed',
             )}
@@ -172,7 +174,7 @@ export function OnRampWidget(props: OnRampWidgetProps) {
               });
             }}
             statusType={StatusType.FAILURE}
-            onCloseClick={sendOnRampWidgetCloseEvent}
+            onCloseClick={() => sendOnRampWidgetCloseEvent(window)}
             testId="fail-view"
           />
         )}
@@ -200,7 +202,7 @@ export function OnRampWidget(props: OnRampWidgetProps) {
             showOnrampOption={isOnRampEnabled}
             showSwapOption={isSwapEnabled}
             showBridgeOption={isBridgeEnabled}
-            onCloseButtonClick={sendOnRampWidgetCloseEvent}
+            onCloseButtonClick={() => sendOnRampWidgetCloseEvent(window)}
           />
         )}
       </ViewContext.Provider>

@@ -3,7 +3,8 @@ import {
 } from '@imtbl/checkout-widgets';
 import { OnRampFailed } from '@imtbl/checkout-widgets/src';
 
-export function sendOnRampWidgetCloseEvent() {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function sendOnRampWidgetCloseEvent(eventTarget: Window | EventTarget) {
   const closeWidgetEvent = new CustomEvent<WidgetEvent<any>>(
     IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT,
     {
@@ -16,10 +17,10 @@ export function sendOnRampWidgetCloseEvent() {
   // TODO: please remove or if necessary keep the eslint ignore
   // eslint-disable-next-line no-console
   console.log('close widget event:', closeWidgetEvent);
-  if (window !== undefined) window.dispatchEvent(closeWidgetEvent);
+  if (eventTarget !== undefined) eventTarget.dispatchEvent(closeWidgetEvent);
 }
 
-export const sendOnRampSuccessEvent = (transactionHash: string) => {
+export const sendOnRampSuccessEvent = (eventTarget: Window | EventTarget, transactionHash: string) => {
   const successEvent = new CustomEvent<WidgetEvent<OnRampSuccess>>(
     IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT,
     {
@@ -33,10 +34,10 @@ export const sendOnRampSuccessEvent = (transactionHash: string) => {
   );
   // eslint-disable-next-line no-console
   console.log('on-ramp success event:', successEvent);
-  if (window !== undefined) window.dispatchEvent(successEvent);
+  if (eventTarget !== undefined) eventTarget.dispatchEvent(successEvent);
 };
 
-export const sendOnRampFailedEvent = (reason: string) => {
+export const sendOnRampFailedEvent = (eventTarget: Window | EventTarget, reason: string) => {
   const failedEvent = new CustomEvent<WidgetEvent<OnRampFailed>>(
     IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT,
     {
@@ -51,5 +52,5 @@ export const sendOnRampFailedEvent = (reason: string) => {
   );
   // eslint-disable-next-line no-console
   console.log('on-ramp failed event:', failedEvent);
-  if (window !== undefined) window.dispatchEvent(failedEvent);
+  if (eventTarget !== undefined) eventTarget.dispatchEvent(failedEvent);
 };
