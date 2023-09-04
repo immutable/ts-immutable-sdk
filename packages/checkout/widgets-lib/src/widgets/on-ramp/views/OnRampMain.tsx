@@ -8,30 +8,35 @@ import { ExchangeType } from '@imtbl/checkout-sdk';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { sendOnRampWidgetCloseEvent } from '../OnRampWidgetEvents';
-import { SharedViews, ViewContext } from '../../../context/view-context/ViewContext';
+import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { OnRampWidgetViews } from '../../../context/view-context/OnRampViewContextTypes';
 import { text } from '../../../resources/text/textConfig';
-import { containerStyle } from './onRampStyles';
+import { boxMainStyle, containerStyle } from './onRampStyles';
 import {
-  useAnalytics,
+  AnalyticsControls,
+  useAnalytics, UserJourney,
 } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
-import { TransakEvents } from '../TransakEvents';
+import { TransakEventData, TransakEvents, TransakStatuses } from '../TransakEvents';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 
+const transakIframeId = 'transak-iframe';
+const transakOrigin = 'transak.com';
 interface OnRampProps {
   walletAddress?: string;
   email?: string;
+  showIframe: boolean;
   tokenAmount?: string;
   tokenAddress?: string;
   passport?: Passport;
 }
 export function OnRampMain({
-  walletAddress, email, tokenAmount, tokenAddress, passport,
+  walletAddress, passport, email, showIframe, tokenAmount, tokenAddress,
 }: OnRampProps) {
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
   const { header } = text.views[OnRampWidgetViews.ONRAMP];
   const { viewState } = useContext(ViewContext);
+  const { viewDispatch } = useContext(ViewContext);
   const [widgetUrl, setWidgetUrl] = useState<string>('');
 
   const isPassport = !!passport && (provider?.provider as any)?.isPassport;
@@ -50,9 +55,9 @@ export function OnRampMain({
     switch (eventData.event_id) {
       case TransakEvents.TRANSAK_WIDGET_OPEN:
         track({
-          userJourney: 'OnRamp',
+          userJourney: UserJourney.ON_RAMP,
           screen: 'Initial-onramp-screen',
-          control: 'WebhookEvent',
+          control: AnalyticsControls.WEBHOOK_EVENT,
           controlType: 'Trigger',
           action: 'Opened',
           ...miscProps,
@@ -60,9 +65,9 @@ export function OnRampMain({
         break;
       case TransakEvents.TRANSAK_ORDER_CREATED:
         track({
-          userJourney: 'OnRamp',
+          userJourney: UserJourney.ON_RAMP,
           screen: 'order-creation',
-          control: 'WebhookEvent',
+          control: AnalyticsControls.WEBHOOK_EVENT,
           controlType: 'Trigger',
           action: 'Started',
           ...miscProps,
@@ -70,9 +75,9 @@ export function OnRampMain({
         break;
       case TransakEvents.TRANSAK_ORDER_SUCCESSFUL: // user paid
         track({
-          userJourney: 'OnRamp',
+          userJourney: UserJourney.ON_RAMP,
           screen: 'payment-confirmation',
-          control: 'Confirm',
+          control: AnalyticsControls.CONFIRM,
           controlType: 'Button',
           action: 'Processing',
           ...miscProps,
@@ -80,15 +85,66 @@ export function OnRampMain({
         break;
       case TransakEvents.TRANSAK_ORDER_FAILED: // payment failed
         track({
-          userJourney: 'OnRamp',
+          userJourney: UserJourney.ON_RAMP,
           screen: 'failure-screen',
-          control: 'WebhookEvent',
+          control: AnalyticsControls.WEBHOOK_EVENT,
           controlType: 'Trigger',
           action: 'Failed',
           ...miscProps,
         });
         break;
       default:
+    }
+  };
+  const transakEventHandler = (event: any) => {
+    const eventData = event.data as TransakEventData;
+
+    if ((event.event_id === TransakEvents.TRANSAK_ORDER_CREATED)
+      || (event.event_id === TransakEvents.TRANSAK_ORDER_SUCCESSFUL
+        && eventData.status === TransakStatuses.PROCESSING)
+    ) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: OnRampWidgetViews.IN_PROGRESS,
+          },
+        },
+      });
+      return;
+    }
+
+    if (event.event_id === TransakEvents.TRANSAK_ORDER_SUCCESSFUL
+      && eventData.status === TransakStatuses.COMPLETED
+    ) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: OnRampWidgetViews.SUCCESS,
+            data: {
+              transactionHash: eventData.transactionHash!,
+            },
+          },
+        },
+      });
+      return;
+    }
+
+    if (event.event_id === TransakEvents.TRANSAK_ORDER_FAILED) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: OnRampWidgetViews.FAIL,
+            data: {
+              amount: tokenAmount,
+              contractAddress: tokenAddress,
+            },
+            reason: `Transaction failed: ${eventData.statusReason}`,
+          },
+        },
+      });
     }
   };
 
@@ -107,49 +163,49 @@ export function OnRampMain({
       setWidgetUrl(await checkout.createCryptoFiatExchangeUrl(params));
     })();
 
-    const domIframe:HTMLIFrameElement = document.getElementById('transak-iframe') as HTMLIFrameElement;
+    const domIframe:HTMLIFrameElement = document.getElementById(transakIframeId) as HTMLIFrameElement;
 
     if (domIframe === undefined) return;
 
-    const handler = (event: any) => {
-      if (event.source === domIframe.contentWindow) {
-        if (event.origin === 'https://global-stg.transak.com') {
-          // eslint-disable-next-line no-console
-          console.log('TRANSAK event data: ', event.data);
-          trackSegmentEvents(event.data);
-        }
+    const handleTransakEvents = (event: any) => {
+      if (event.source === domIframe.contentWindow
+        && event.origin.toLowerCase().includes(transakOrigin)) {
+        trackSegmentEvents(event.data);
+        transakEventHandler(event.data);
       }
     };
-    window.addEventListener('message', handler);
+    window.addEventListener('message', handleTransakEvents);
 
     // eslint-disable-next-line consistent-return
     return () => {
-      window.removeEventListener('message', handler);
+      window.removeEventListener('message', handleTransakEvents);
     };
-  }, []);
+  }, [checkout, provider, tokenAmount, tokenAddress, passport]);
 
   return (
-    <SimpleLayout
-      header={(
-        <HeaderNavigation
-          showBack={showBackButton}
-          title={header.title}
-          onCloseButtonClick={() => sendOnRampWidgetCloseEvent()}
-        />
+    <Box sx={boxMainStyle(showIframe)}>
+      <SimpleLayout
+        header={(
+          <HeaderNavigation
+            showBack={showBackButton}
+            title={header.title}
+            onCloseButtonClick={() => sendOnRampWidgetCloseEvent(window)}
+          />
         )}
-      footerBackgroundColor="base.color.translucent.emphasis.200"
-    >
-      <Box sx={containerStyle}>
-        <iframe
-          title="Transak title"
-          id="transak-iframe"
-          src={widgetUrl}
-          allow="camera;microphone;fullscreen;payment"
-          style={{
-            height: '100%', width: '100%', border: 'none', position: 'absolute',
-          }}
-        />
-      </Box>
-    </SimpleLayout>
+        footerBackgroundColor="base.color.translucent.emphasis.200"
+      >
+        <Box sx={containerStyle(showIframe)}>
+          <iframe
+            title="Transak title"
+            id={transakIframeId}
+            src={widgetUrl}
+            allow="camera;microphone;fullscreen;payment"
+            style={{
+              height: '100%', width: '100%', border: 'none', position: 'absolute',
+            }}
+          />
+        </Box>
+      </SimpleLayout>
+    </Box>
   );
 }

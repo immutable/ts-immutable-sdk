@@ -76,7 +76,7 @@ export class ImmutableOnRamp extends ImmutableWebComponent {
           <ConnectLoader
             params={connectLoaderParams}
             widgetConfig={this.widgetConfig!}
-            closeEvent={sendOnRampWidgetCloseEvent}
+            closeEvent={() => sendOnRampWidgetCloseEvent(window)}
           >
             <OnRampWidget
               params={params}

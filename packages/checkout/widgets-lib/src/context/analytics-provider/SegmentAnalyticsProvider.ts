@@ -1,18 +1,21 @@
 import { createAnalytics, StandardAnalyticsActions, StandardAnalyticsControlTypes } from '@imtbl/react-analytics';
 import { Environment } from '@imtbl/config';
 
-export type UserJourney = 'OnRamp' | 'Swap' | 'Bridge';
-export type AnalyticsControls = 'Click' | 'Confirm' | 'WebhookEvent' | 'WidgetInitialisation';
+export enum UserJourney {
+  ON_RAMP = 'OnRamp',
+  SWAP = 'Swap',
+  BRIDGE = 'Bridge',
+}
+export enum AnalyticsControls {
+  CLICK = 'Click',
+  CONFIRM = 'Confirm',
+  WEBHOOK_EVENT = 'WebhookEvent',
+  WIDGET_INITIALISATION = 'WidgetInitialisation',
+}
 
-export type AnalyticsActions = StandardAnalyticsActions
-| 'Opened'
-| 'Started'
-| 'Processing'
-| 'Succeeded'
-| 'Failed';
+export type AnalyticsActions = StandardAnalyticsActions | 'Processing';
 
 export type AnalyticsControlTypes = StandardAnalyticsControlTypes
-| 'Button'
 | 'Trigger'
 | 'WidgetLoad';
 
