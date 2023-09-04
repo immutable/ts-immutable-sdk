@@ -1,7 +1,7 @@
+import { Environment } from '@imtbl/config';
 import { BigNumber } from 'ethers';
 import { ExchangeType, OnRampProvider } from '../types/cryptoFiatExchange';
 import { TRANSAK_API_BASE_URL, TRANSAK_PUBLISHABLE_KEY } from '../types';
-import { CheckoutConfiguration } from '../config';
 
 export interface CryptoFiatExchangeWidgetParams {
   onRampProvider: OnRampProvider;
@@ -14,14 +14,14 @@ export interface CryptoFiatExchangeWidgetParams {
 }
 
 export class CryptoFiatExchangeService {
-  readonly config: CheckoutConfiguration;
+  readonly environment: Environment;
 
   /**
-   * Constructs a new instance of the ExchangeService class.
-   * @param {CheckoutConfiguration} config - The configuration object for the ExchangeService.
+   * Constructs a new instance of the CryptoFiatExchangeService class.
+   * @param {Environment} environment - The environment required for the CryptoFiatExchangeService.
    */
-  constructor(config: CheckoutConfiguration) {
-    this.config = config;
+  constructor(environment: Environment) {
+    this.environment = environment;
   }
 
   public async createWidgetUrl(params: CryptoFiatExchangeWidgetParams): Promise<string> {
@@ -33,8 +33,8 @@ export class CryptoFiatExchangeService {
   }
 
   private getTransakWidgetUrl(params: CryptoFiatExchangeWidgetParams): string {
-    let widgetUrl = `${TRANSAK_API_BASE_URL[this.config.environment]}?`;
-    const transakPublishableKey = `apiKey=${TRANSAK_PUBLISHABLE_KEY[this.config.environment]}`;
+    let widgetUrl = `${TRANSAK_API_BASE_URL[this.environment]}?`;
+    const transakPublishableKey = `apiKey=${TRANSAK_PUBLISHABLE_KEY[this.environment]}`;
     const zkevmNetwork = 'network=immutablezkevm';
     const defaultPaymentMethod = 'defaultPaymentMethod=credit_debit_card';
     const disableBankTransfer = 'disablePaymentMethods=sepa_bank_transfer,gbp_bank_transfer,'

@@ -1,6 +1,5 @@
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
-import { CheckoutConfiguration } from '../config';
 import { CryptoFiatExchangeService, CryptoFiatExchangeWidgetParams } from './cryptoFiatExchange';
 import { ExchangeType, OnRampProvider } from '../types/cryptoFiatExchange';
 
@@ -10,17 +9,13 @@ const defaultWidgetUrl = 'https://global-stg.transak.com?apiKey=41ad2da7-ed5a-4d
 + 'pm_astropay,pm_pse,inr_bank_transfer&productsAvailed=buy&exchangeScreenTitle=Buy&themeColor=0D0D0D';
 
 describe('cryptoFiatExchange', () => {
-  let config: CheckoutConfiguration;
   let cryptoFiatExchangeService: CryptoFiatExchangeService;
 
   beforeEach(() => {
-    config = new CheckoutConfiguration({
-      baseConfig: { environment: Environment.SANDBOX },
-    });
-    cryptoFiatExchangeService = new CryptoFiatExchangeService(config);
+    cryptoFiatExchangeService = new CryptoFiatExchangeService(Environment.SANDBOX);
   });
 
-  describe.only('createWidgetUrl', () => {
+  describe('createWidgetUrl', () => {
     it('should return widget url with non-configurable query params when onRampProvider is Transak', async () => {
       const params: CryptoFiatExchangeWidgetParams = {
         onRampProvider: OnRampProvider.TRANSAK,

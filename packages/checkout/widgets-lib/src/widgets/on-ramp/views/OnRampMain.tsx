@@ -34,7 +34,7 @@ export function OnRampMain({
   const { viewState } = useContext(ViewContext);
   const [widgetUrl, setWidgetUrl] = useState<string>('');
 
-  const isPassport = !!passport;
+  const isPassport = !!passport && (provider?.provider as any)?.isPassport;
 
   const showBackButton = useMemo(() => viewState.history.length > 2
     && viewState.history[viewState.history.length - 2].type === SharedViews.TOP_UP_VIEW, [viewState.history]);

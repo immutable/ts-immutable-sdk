@@ -71,7 +71,7 @@ export class Checkout {
     config: CheckoutModuleConfiguration = SANDBOX_CONFIGURATION,
   ) {
     this.config = new CheckoutConfiguration(config);
-    this.cryptoFiatExchangeService = new CryptoFiatExchangeService(this.config);
+    this.cryptoFiatExchangeService = new CryptoFiatExchangeService(this.config.environment);
     this.readOnlyProviders = new Map<ChainId, ethers.providers.JsonRpcProvider>();
   }
 
@@ -361,7 +361,8 @@ export class Checkout {
     const isPassport = (params.web3Provider.provider as any)?.isPassport || false;
 
     if (isPassport && params.passport) {
-      email = await params.passport.getUserInfo().then((userInfo) => userInfo?.email);
+      const userInfo = await params.passport.getUserInfo();
+      email = userInfo?.email;
     }
 
     const networkInfo = await network.getNetworkInfo(this.config, params.web3Provider);
