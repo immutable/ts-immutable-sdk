@@ -189,7 +189,7 @@ export function OnRampMain({
           <HeaderNavigation
             showBack={showBackButton}
             title={header.title}
-            onCloseButtonClick={() => sendOnRampWidgetCloseEvent()}
+            onCloseButtonClick={() => sendOnRampWidgetCloseEvent(window)}
           />
         )}
         footerBackgroundColor="base.color.translucent.emphasis.200"
