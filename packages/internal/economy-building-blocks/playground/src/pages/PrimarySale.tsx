@@ -9,10 +9,6 @@ import ConfigForm from '../components/ConfigForm';
 import { useData } from '../context/DataProvider';
 import { TransactionReceipt } from '@ethersproject/providers';
 
-interface MintResponse {
-  tx_id: string;
-}
-
 const useURLParams = () => {
   const [urlParams, setUrlParams] = useState({});
   useEffect(() => {
