@@ -6,6 +6,9 @@ import {
   PRODUCTION_CHAIN_ID_NETWORK_MAP,
   SANDBOX_CHAIN_ID_NETWORK_MAP,
   ChainId,
+  DEFAULT_ON_RAMP_ENABLED,
+  DEFAULT_SWAP_ENABLED,
+  DEFAULT_BRIDGE_ENABLED,
 } from '../types';
 import { RemoteConfigFetcher } from './remoteConfigFetcher';
 
@@ -53,6 +56,12 @@ export class CheckoutConfiguration {
 
   readonly isProduction: boolean;
 
+  readonly isOnRampEnabled: boolean;
+
+  readonly isSwapEnabled: boolean;
+
+  readonly isBridgeEnabled: boolean;
+
   readonly remote: RemoteConfigFetcher;
 
   readonly environment: Environment;
@@ -70,6 +79,9 @@ export class CheckoutConfiguration {
 
     // Developer mode will super set any environment configuration
     this.isProduction = !this.isDevelopment && this.environment === Environment.PRODUCTION;
+    this.isOnRampEnabled = config.isOnRampEnabled ?? DEFAULT_ON_RAMP_ENABLED;
+    this.isSwapEnabled = config.isSwapEnabled ?? DEFAULT_SWAP_ENABLED;
+    this.isBridgeEnabled = config.isBridgeEnabled ?? DEFAULT_BRIDGE_ENABLED;
 
     this.networkMap = networkMap(
       this.isProduction,
