@@ -7,8 +7,9 @@ import { getEtherMailTypedPayload } from './etherMailTypedPayload';
 
 function SignEtherMail({ disabled, handleExampleSubmitted }: RequestExampleProps) {
   const [address, setAddress] = useState<string>('');
-  const { zkEvmProvider } = usePassportProvider();
   const [params, setParams] = useState<any[]>([]);
+
+  const { zkEvmProvider } = usePassportProvider();
 
   useEffect(() => {
     const populateParams = async () => {

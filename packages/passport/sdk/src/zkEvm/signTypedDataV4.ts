@@ -41,9 +41,8 @@ export const signTypedDataV4 = async ({
   }
 
   const { chainId } = await jsonRpcProvider.ready;
-
-  if (typedData.domain?.chainId && typedData.domain.chainId !== (await jsonRpcProvider.ready).chainId) {
-    throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'Invalid chainId');
+  if (typedData.domain?.chainId && typedData.domain.chainId !== chainId) {
+    throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, `Invalid chainId, expected ${chainId}`);
   }
 
   // ID-959: Submit raw typedData payload to Guardian for evaluation

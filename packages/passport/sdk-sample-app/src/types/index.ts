@@ -1,4 +1,9 @@
-import {Dispatch, SetStateAction, PropsWithChildren, ComponentType} from 'react';
+import {
+  Dispatch,
+  SetStateAction,
+  PropsWithChildren,
+  ComponentType,
+} from 'react';
 import { RequestArguments } from '@imtbl/passport';
 import { Order } from '@imtbl/core-sdk';
 

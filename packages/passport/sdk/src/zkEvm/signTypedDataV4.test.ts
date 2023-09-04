@@ -93,4 +93,28 @@ describe('signTypedDataV4', () => {
       );
     });
   });
+
+  describe('when an invalid chainId is used', () => {
+    it('should throw an error', async () => {
+      await expect(async () => (
+        signTypedDataV4({
+          method: 'eth_signTypedData_v4',
+          params: [
+            address,
+            JSON.stringify({
+              domain: {
+                chainId: 5,
+              },
+            }),
+          ],
+          magicProvider,
+          jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
+          relayerClient: relayerClient as unknown as RelayerClient,
+          user: mockUserZkEvm,
+        })
+      )).rejects.toThrow(
+        new JsonRpcError(RpcErrorCode.INVALID_PARAMS, `Invalid chainId, expected ${chainId}`),
+      );
+    });
+  });
 });
