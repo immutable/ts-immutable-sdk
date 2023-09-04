@@ -23,7 +23,7 @@
       "@/*": [
         "./src/*",
       ],
-      "@imtbl/bridge-sdk/*": [
+      "@imtbl/factory-sdk/*": [
         "../sdk/dist/*"
       ]
     }
