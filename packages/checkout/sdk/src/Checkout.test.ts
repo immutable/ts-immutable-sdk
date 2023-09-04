@@ -447,7 +447,7 @@ describe('Connect', () => {
     });
 
     expect(buy).toBeCalledTimes(1);
-    expect(buy).toBeCalledWith(checkout.config, provider, '1');
+    expect(buy).toBeCalledWith(checkout.config, provider, '1', undefined);
   });
 
   it('should throw error for buy function if is production', async () => {

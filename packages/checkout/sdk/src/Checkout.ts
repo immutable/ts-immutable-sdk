@@ -286,7 +286,7 @@ export class Checkout {
       params.provider,
     );
 
-    await buy.buy(this.config, web3Provider, params.orderId);
+    await buy.buy(this.config, web3Provider, params.orderId, params.executeTransactions);
   }
 
   /**

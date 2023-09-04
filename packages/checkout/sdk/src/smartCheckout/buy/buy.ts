@@ -15,9 +15,10 @@ import * as instance from '../../instance';
 import { CheckoutConfiguration } from '../../config';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import {
-  ItemType, ItemRequirement, GasTokenType, TransactionOrGasType, GasAmount, FulfilmentTransaction,
+  ItemType, ItemRequirement, GasTokenType, TransactionOrGasType, GasAmount, FulfilmentTransaction, UnsignedTransactions,
 } from '../../types/smartCheckout';
 import { smartCheckout } from '..';
+import { executeTransactions } from '../transactions/executeTransactions';
 
 export const getItemRequirement = (
   type: ItemType,
@@ -42,26 +43,41 @@ export const getItemRequirement = (
   }
 };
 
-export const getUnsignedFulfilmentTransaction = async (
+export const getUnsignedTransactions = async (
   actions: Action[],
-): Promise<TransactionRequest | undefined> => {
+): Promise<UnsignedTransactions> => {
+  let approvalTransactions = [];
+  let fulfilmentTransactions = [];
+
+  const approvalPromises: Promise<TransactionRequest>[] = [];
+  const fulfilmentPromises: Promise<TransactionRequest>[] = [];
   for (const action of actions) {
-    if (action.type === ActionType.TRANSACTION && action.purpose === TransactionPurpose.FULFILL_ORDER) {
-      // eslint-disable-next-line no-await-in-loop
-      return await action.buildTransaction();
+    if (action.type !== ActionType.TRANSACTION) continue;
+    if (action.purpose === TransactionPurpose.APPROVAL) {
+      approvalPromises.push(action.buildTransaction());
+    }
+    if (action.purpose === TransactionPurpose.FULFILL_ORDER) {
+      fulfilmentPromises.push(action.buildTransaction());
     }
   }
-  return undefined;
+
+  approvalTransactions = await Promise.all(approvalPromises);
+  fulfilmentTransactions = await Promise.all(fulfilmentPromises);
+
+  return {
+    approvalTransactions,
+    fulfilmentTransactions,
+  };
 };
 
 export const getTransactionOrGas = (
   gasLimit: number,
-  transaction: TransactionRequest | undefined,
+  unsignedTransactions: UnsignedTransactions,
 ): FulfilmentTransaction | GasAmount => {
-  if (transaction) {
+  if (unsignedTransactions.fulfilmentTransactions.length > 0) {
     return {
       type: TransactionOrGasType.TRANSACTION,
-      transaction,
+      transaction: unsignedTransactions.fulfilmentTransactions[0],
     };
   }
 
@@ -78,6 +94,7 @@ export const buy = async (
   config: CheckoutConfiguration,
   provider: Web3Provider,
   orderId: string,
+  shouldExecuteTransactions?: boolean,
 ): Promise<BuyResult> => {
   let orderbook;
   let order;
@@ -100,11 +117,14 @@ export const buy = async (
     );
   }
 
-  let unsignedTransaction;
+  let unsignedTransactions: UnsignedTransactions = {
+    approvalTransactions: [],
+    fulfilmentTransactions: [],
+  };
   try {
     const fulfillerAddress = await provider.getSigner().getAddress();
     const { actions } = await orderbook.fulfillOrder(orderId, fulfillerAddress);
-    unsignedTransaction = await getUnsignedFulfilmentTransaction(actions);
+    unsignedTransactions = await getUnsignedTransactions(actions);
   } catch { /* Use the gas limit when the fulfil order request errors */ }
 
   let amount = BigNumber.from('0');
@@ -147,18 +167,22 @@ export const buy = async (
     getItemRequirement(type, contractAddress, amount, spenderAddress),
   ];
 
-  await smartCheckout(
+  const smartCheckoutResult = await smartCheckout(
     config,
     provider,
     itemRequirements,
-    getTransactionOrGas(gasLimit, unsignedTransaction),
+    getTransactionOrGas(gasLimit, unsignedTransactions),
   );
 
+  if (smartCheckoutResult.sufficient && shouldExecuteTransactions) {
+    await executeTransactions(provider, unsignedTransactions);
+    return {
+      smartCheckoutResult,
+    };
+  }
+
   return {
-    itemRequirements,
-    gasToken: {
-      type: GasTokenType.NATIVE,
-      limit: BigNumber.from(gasLimit),
-    },
+    smartCheckoutResult,
+    transactions: unsignedTransactions,
   };
 };

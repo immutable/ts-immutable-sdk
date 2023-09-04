@@ -217,3 +217,12 @@ export type RoutingOptionsAvailable = {
   swap?: boolean;
   bridge?: boolean;
 };
+
+/** Represents the unsigned transactions.
+ * @property {TransactionRequest} approvalTransactions - Approval transactions.
+ * @property {TransactionRequest} fulfilmentTransactions - Fulfilment transactions.
+ */
+export type UnsignedTransactions = {
+  approvalTransactions: TransactionRequest[],
+  fulfilmentTransactions: TransactionRequest[],
+};
