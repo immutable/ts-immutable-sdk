@@ -263,6 +263,19 @@ export const text = {
         title: 'Add coins',
       },
       initialLoadingText: 'Taking you to Transak',
+      [OnRampWidgetViews.IN_PROGRESS]: {
+        loading: {
+          text: 'Processing your order',
+        },
+      },
+      [OnRampWidgetViews.SUCCESS]: {
+        text: 'Coins are on the way',
+        actionText: 'Done',
+      },
+      [OnRampWidgetViews.FAIL]: {
+        text: 'Transaction failed',
+        actionText: 'Try again',
+      },
     },
     [SharedViews.TOP_UP_VIEW]: {
       header: {
