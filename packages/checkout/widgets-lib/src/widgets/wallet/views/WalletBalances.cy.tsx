@@ -98,6 +98,54 @@ describe('WalletBalances', () => {
       cySmartGet('balance-item-ETH').should('exist');
     });
 
+    it('should show balances after getAllBalances failure', () => {
+      cy.stub(Checkout.prototype, 'getAllBalances')
+        .as('getAllBalances')
+        .rejects()
+        .resolves({
+          balances: [
+            {
+              balance: BigNumber.from('1000000000000000000'),
+              formattedBalance: '0.1',
+              token: {
+                name: 'ETH',
+                symbol: 'ETH',
+                decimals: 18,
+                address: '',
+                icon: '123',
+              },
+            },
+            {
+              balance: BigNumber.from('10000000000000'),
+              formattedBalance: '0.1',
+              token: {
+                name: 'ImmutableX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+                icon: '123',
+              },
+            },
+          ],
+        });
+
+      mount(
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <WalletWidgetTestComponent
+            initialStateOverride={baseWalletState}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <WalletBalances />
+          </WalletWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
+      );
+
+      cySmartGet('balance-item-IMX').should('exist');
+      cySmartGet('balance-item-ETH').should('exist');
+    });
+
     it('should show no balances', () => {
       cy.stub(Checkout.prototype, 'getAllBalances')
         .as('getAllBalancesStub')

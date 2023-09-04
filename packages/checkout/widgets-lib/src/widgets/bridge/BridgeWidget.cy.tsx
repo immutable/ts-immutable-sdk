@@ -63,6 +63,8 @@ describe('Bridge Widget tests', () => {
     connectionStatus: ConnectionStatus.CONNECTED_WITH_NETWORK,
   };
 
+  let getAllBalancesStub: any;
+
   beforeEach(() => {
     cy.viewport('ipad-2');
 
@@ -94,7 +96,7 @@ describe('Bridge Widget tests', () => {
       .as('connectStub')
       .resolves(connectStubReturnValue);
 
-    cy.stub(Checkout.prototype, 'getAllBalances')
+    getAllBalancesStub = cy.stub(Checkout.prototype, 'getAllBalances')
       .as('getAllBalancesStub')
       .resolves({
         balances: [
@@ -230,6 +232,41 @@ describe('Bridge Widget tests', () => {
       cySmartGet('header-title').should('have.text', header.title);
       cySmartGet('bridge-form-content-heading').should('have.text', content.title);
       cySmartGet('close-button').should('be.visible');
+    });
+
+    it('should show balances after getAllBalances failure', () => {
+      const params = {} as BridgeWidgetParams;
+
+      getAllBalancesStub.rejects()
+        .resolves({
+          balances: [
+            {
+              balance: BigNumber.from('10000000000000'),
+              formattedBalance: '0.1',
+              token: {
+                name: 'ImmutableX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+                icon: '123',
+              },
+            },
+          ],
+        });
+
+      mount(
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <BridgeWidget
+            config={config}
+            params={params}
+          />
+        </ConnectLoaderTestComponent>,
+      );
+
+      cySmartGet('bridge-token-select__target').click();
+      cySmartGet('bridge-token-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').should('exist');
     });
 
     it('should set up bridge widget on mount', () => {
