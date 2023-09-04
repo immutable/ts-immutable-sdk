@@ -1,4 +1,5 @@
 import { Order as OpenApiOrder } from './sdk/models/Order';
+import { Trade as OpenApiTrade } from './sdk/models/Trade';
 import { Page as OpenApiPage } from './sdk/models/Page';
 import {
   ERC20Item,
@@ -7,6 +8,7 @@ import {
   ERC721Item,
   FeeType,
   Page,
+  Trade,
 } from '../types';
 
 export function mapFromOpenApiOrder(order: OpenApiOrder): Order {
@@ -66,6 +68,63 @@ export function mapFromOpenApiOrder(order: OpenApiOrder): Order {
     startTime: order.start_time,
     status: order.status,
     updateTime: order.update_time,
+  };
+}
+
+export function mapFromOpenApiTrade(trade: OpenApiTrade): Trade {
+  const buyItems: (ERC20Item | NativeItem)[] = trade.buy.map((item) => {
+    if (item.item_type === 'ERC20') {
+      return {
+        type: 'ERC20',
+        contractAddress: item.contract_address,
+        amount: item.start_amount,
+      };
+    }
+
+    if (item.item_type === 'NATIVE') {
+      return {
+        type: 'NATIVE',
+        amount: item.start_amount,
+      };
+    }
+
+    throw new Error('Buy items must be either ERC20 or NATIVE');
+  });
+
+  const sellItems: ERC721Item[] = trade.sell.map((item) => {
+    if (item.item_type === 'ERC721') {
+      return {
+        type: 'ERC721',
+        contractAddress: item.contract_address,
+        tokenId: item.token_id,
+      };
+    }
+
+    throw new Error('Sell items must ERC721');
+  });
+
+  return {
+    id: trade.id,
+    orderId: trade.order_id,
+    buy: buyItems,
+    sell: sellItems,
+    buyerFees: trade.buyer_fees.map((fee) => ({
+      amount: fee.amount,
+      recipient: fee.recipient,
+      type: fee.fee_type as unknown as FeeType,
+    })),
+    chain: trade.chain,
+    indexedAt: trade.indexed_at,
+    blockchainMetadata: {
+      blockNumber: trade.blockchain_metadata.block_number,
+      logIndex: trade.blockchain_metadata.log_index,
+      transactionHash: trade.blockchain_metadata.transaction_hash,
+      transactionIndex: trade.blockchain_metadata.transaction_index,
+    },
+    buyerAddress: trade.buyer_address,
+    makerAddress: trade.maker_address,
+    sellerAddress: trade.seller_address,
+    takerAddress: trade.taker_address,
   };
 }
 

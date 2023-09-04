@@ -7,9 +7,11 @@ import type { FulfillmentDataRequest } from '../models/FulfillmentDataRequest';
 import type { FulfillmentDataResult } from '../models/FulfillmentDataResult';
 import type { ListingResult } from '../models/ListingResult';
 import type { ListListingsResult } from '../models/ListListingsResult';
+import type { ListTradeResult } from '../models/ListTradeResult';
 import type { OrderStatus } from '../models/OrderStatus';
 import type { PageCursor } from '../models/PageCursor';
 import type { PageSize } from '../models/PageSize';
+import type { TradeResult } from '../models/TradeResult';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -176,6 +178,91 @@ export class OrdersService {
       },
       body: requestBody,
       mediaType: 'application/json',
+      errors: {
+        400: `Bad Request (400)`,
+        404: `The specified resource was not found (404)`,
+        500: `Internal Server Error (500)`,
+      },
+    });
+  }
+
+  /**
+   * List all trades
+   * List all trades
+   * @returns ListTradeResult OK response.
+   * @throws ApiError
+   */
+  public listTrades({
+    chainName,
+    accountAddress,
+    pageSize,
+    sortBy,
+    sortDirection,
+    pageCursor,
+  }: {
+    chainName: ChainName,
+    accountAddress?: string,
+    /**
+     * Maximum number of trades to return per page
+     */
+    pageSize?: PageSize,
+    /**
+     * Trade field to sort by
+     */
+    sortBy?: 'created_at',
+    /**
+     * Ascending or descending direction for sort
+     */
+    sortDirection?: 'asc' | 'desc',
+    /**
+     * Page cursor to retrieve previous or next page. Use the value returned in the response.
+     */
+    pageCursor?: PageCursor,
+  }): CancelablePromise<ListTradeResult> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/v1/chains/{chain_name}/trades',
+      path: {
+        'chain_name': chainName,
+      },
+      query: {
+        'account_address': accountAddress,
+        'page_size': pageSize,
+        'sort_by': sortBy,
+        'sort_direction': sortDirection,
+        'page_cursor': pageCursor,
+      },
+      errors: {
+        400: `Bad Request (400)`,
+        404: `The specified resource was not found (404)`,
+        500: `Internal Server Error (500)`,
+      },
+    });
+  }
+
+  /**
+   * Get a single trade by ID
+   * Get a single trade by ID
+   * @returns TradeResult OK response.
+   * @throws ApiError
+   */
+  public getTrade({
+    chainName,
+    tradeId,
+  }: {
+    chainName: ChainName,
+    /**
+     * Global Trade identifier
+     */
+    tradeId: string,
+  }): CancelablePromise<TradeResult> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/v1/chains/{chain_name}/trades/{trade_id}',
+      path: {
+        'chain_name': chainName,
+        'trade_id': tradeId,
+      },
       errors: {
         400: `Bad Request (400)`,
         404: `The specified resource was not found (404)`,

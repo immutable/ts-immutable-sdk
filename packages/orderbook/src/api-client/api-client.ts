@@ -2,10 +2,17 @@ import {
   ProtocolData,
   ListingResult,
   ListListingsResult,
+  ListTradeResult,
   OrdersService,
   Fee,
+  TradeResult,
 } from 'openapi/sdk';
-import { CreateListingParams, FeeType, ListListingsParams } from '../types';
+import {
+  CreateListingParams,
+  FeeType,
+  ListListingsParams,
+  ListTradesParams,
+} from '../types';
 import { FulfillmentDataResult } from '../openapi/sdk/models/FulfillmentDataResult';
 import { FulfillmentDataRequest } from '../openapi/sdk/models/FulfillmentDataRequest';
 import { ItemType, SEAPORT_CONTRACT_VERSION_V1_5 } from '../seaport';
@@ -32,12 +39,28 @@ export class ImmutableApiClient {
     });
   }
 
+  async getTrade(tradeId: string): Promise<TradeResult> {
+    return this.orderbookService.getTrade({
+      chainName: this.chainName,
+      tradeId,
+    });
+  }
+
   async listListings(
     listOrderParams: ListListingsParams,
   ): Promise<ListListingsResult> {
     return this.orderbookService.listListings({
       chainName: this.chainName,
       ...listOrderParams,
+    });
+  }
+
+  async listTrades(
+    listTradesParams: ListTradesParams,
+  ): Promise<ListTradeResult> {
+    return this.orderbookService.listTrades({
+      chainName: this.chainName,
+      ...listTradesParams,
     });
   }
 
