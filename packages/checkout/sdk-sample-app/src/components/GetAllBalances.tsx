@@ -34,7 +34,7 @@ export default function GetAllBalances(props: BalanceProps) {
       const resp = await checkout.getAllBalances({
         provider,
         walletAddress,
-        chainId: ChainId.SEPOLIA,
+        chainId: (await provider.getNetwork()).chainId,
       });
       setResult(resp.balances);
       setLoading(false);
@@ -63,7 +63,7 @@ export default function GetAllBalances(props: BalanceProps) {
         }}
       >
         <LoadingButton onClick={getAllBalances} loading={loading}>
-          Get all balances (Sepolia)
+          Get all balances (Current Network)
         </LoadingButton>
       </Box>
       {result && !error && (

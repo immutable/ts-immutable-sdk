@@ -273,6 +273,9 @@ You can optionally do a dry run by checking the `Dry run` checkbox. This will ru
 
 #### Versioning
 
+> [!IMPORTANT]
+> While the SDK are on `0.X` releases, interface or breaking changes should bump the minor version, whilst non-breaking changes should bump the patch version.
+
 When releasing a new version of the SDK, you will need to specify the `Upgrade Type` (either `none`, `patch`, `minor`, or `major`). This will determine what the next version of the SDK will be based off the existing [tags in the repo](https://github.com/immutable/ts-immutable-sdk/tags).
 
 The `Publish to NPM` workflow will update the version in the top level `package.json` and push it back to the `main` branch.
@@ -291,6 +294,9 @@ Use the `none` upgrade type to bump an alpha: `0.8.0-alpha` -> `0.8.0-alpha.1`
 
 #### Updated SDK Reference Documentation
 
+> [!NOTE]
+> To have a package documented, the package must have a `typedoc.json` file in the root of the package. See [passport](./packages/passport/sdk/typedoc.json) for an example. And the package must be listed in the root level `typedoc.json` file.
+
 When the `Publish to NPM` workflow successfully runs, it will trigger the `Publish SDK Reference Docs` GitHub Action. This will build the SDK reference documentation, similar to the steps in [Generate SDK Reference Documentation](#generate-sdk-reference-documentation), and push the changes to the `imx-docs` repo and create a PR for you to review.
 
 The PR will add the user that initated the `Publish to NPM` workflow as a reviewer, so you can review the changes and merge the PR.
@@ -301,16 +307,13 @@ Note, the docs will only be updated if the `Publish to NPM` workflow is run with
 
 #### Changelog
 
-Add your changes to the [CHANGELOG.md](CHANGELOG.md) file under the `[Unreleased]` section under the appropriate subheading:
+What `CHANGELOG`?
 
-- `### [Added]` - for new features
-- `### [Changed]` - for changes in existing functionality
-- `### [Deprecated]` - for soon-to-be removed features
-- `### [Removed]` - for now removed features
-- `### [Fixed]` - for any bug fixes
-- `### [Security]` - in case of vulnerabilities
+Publishing a non-alpha version of the SDK to NPM will create a new GitHub release with auto-generated release notes to communicate changes between releases. These auto-generated notes are a list of PR titles that have been merged since the last release.
 
-The `[Unreleased]` title will be updated by the `Publish to NPM` workflow to the next version number and pushed back to the `main` branch.
+In an effort to help make the auto-generated notes useful to customers, please write meaningful PR titles. For example, `Fix bug` is not a meaningful title, but `Fix bug when user does X` is.
+
+If you feel you need to add more information to the release notes, you can manually update GitHub release.
 
 ## Disclaimer for Alpha Releases
 

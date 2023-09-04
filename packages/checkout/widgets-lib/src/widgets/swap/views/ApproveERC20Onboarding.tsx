@@ -21,6 +21,7 @@ import { ConnectLoaderContext } from '../../../context/connect-loader-context/Co
 import { isPassportProvider } from '../../../lib/providerUtils';
 import { SpendingCapHero } from '../../../components/Hero/SpendingCapHero';
 import { WalletApproveHero } from '../../../components/Hero/WalletApproveHero';
+import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 
 export interface ApproveERC20Props {
   data: ApproveERC20SwapData;
@@ -31,6 +32,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
   const { checkout, provider } = connectLoaderState;
   const { viewDispatch } = useContext(ViewContext);
   const { approveSpending, approveSwap } = text.views[SwapWidgetViews.APPROVE_ERC20];
+  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const isPassport = isPassportProvider(provider);
 
@@ -131,7 +133,6 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
     if (actionDisabled) return;
 
     setActionDisabled(true);
-
     try {
       const txnResult = await checkout.sendTransaction({
         provider,
@@ -289,7 +290,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
             <HeaderNavigation
               transparent
               showBack
-              onCloseButtonClick={sendSwapWidgetCloseEvent}
+              onCloseButtonClick={() => sendSwapWidgetCloseEvent(eventTarget)}
               onBackButtonClick={goBackWithSwapData}
             />
 )}

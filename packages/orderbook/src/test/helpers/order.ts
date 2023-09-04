@@ -1,5 +1,5 @@
-import { Order, OrderStatus } from 'openapi/sdk';
 import { Orderbook } from 'orderbook';
+import { Order, OrderStatus } from '../../types';
 
 export async function waitForOrderToBeOfStatus(
   sdk: Orderbook,

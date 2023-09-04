@@ -165,16 +165,18 @@ function Crafting() {
           </Banner>
         )}
         {Array.from(successMessages.keys()).map((key) => (
-          <Banner key={key} variant="success" sx={{ marginBottom: "base.spacing.x4" }}>
+          <Banner
+            key={key}
+            variant="success"
+            sx={{ marginBottom: "base.spacing.x4" }}
+          >
             <Banner.Title>{successMessages.get(key)}</Banner.Title>
-            <Banner.RightHandButtons>
-              <ButtCon
-                icon="CloseWithCircle"
-                onClick={() => {
-                  removeSuccessMessage(key);
-                }}
-              />
-            </Banner.RightHandButtons>
+            <Banner.RightButtCon
+              icon="CloseWithCircle"
+              onClick={() => {
+                removeSuccessMessage(key);
+              }}
+            />
           </Banner>
         ))}
         <Row>

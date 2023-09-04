@@ -1,10 +1,12 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { Contract, utils } from 'ethers';
+import { BigNumber, Contract, utils } from 'ethers';
 import {
   ChainId,
   ERC20ABI,
   GetAllBalancesResult,
   GetBalanceResult,
+  GetBalancesResult,
+  IMX_ADDRESS_ZKEVM,
   TokenFilterTypes,
   TokenInfo,
 } from '../types';
@@ -12,6 +14,11 @@ import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 import { getNetworkInfo } from '../network';
 import { getTokenAllowList } from '../tokens';
 import { CheckoutConfiguration } from '../config';
+import {
+  Blockscout,
+  BlockscoutAddressTokens,
+  BlockscoutTokenType,
+} from '../client';
 
 export const getBalance = async (
   config: CheckoutConfiguration,
@@ -54,49 +61,107 @@ export async function getERC20Balance(
         JSON.stringify(ERC20ABI),
         web3Provider,
       );
-      const name = await contract.name();
-      const symbol = await contract.symbol();
-      const balance = await contract.balanceOf(walletAddress);
-      const decimals = await contract.decimals();
-      const formattedBalance = utils.formatUnits(balance, decimals);
-      return {
-        balance,
-        formattedBalance,
-        token: {
-          name,
-          symbol,
-          decimals,
-          address: contractAddress,
-        },
-      } as GetBalanceResult;
+
+      return Promise.all([
+        contract.name(),
+        contract.symbol(),
+        contract.balanceOf(walletAddress),
+        contract.decimals(),
+      ])
+        .then(([name, symbol, balance, decimals]) => {
+          const formattedBalance = utils.formatUnits(balance, decimals);
+          return {
+            balance,
+            formattedBalance,
+            token: {
+              name,
+              symbol,
+              decimals,
+              address: contractAddress,
+            },
+          } as GetBalanceResult;
+        });
     },
     { type: CheckoutErrorType.GET_ERC20_BALANCE_ERROR },
   );
 }
 
-export const getAllBalances = async (
+// Blockscout client singleton
+let blockscoutClient: Blockscout;
+
+export const getIndexerBalance = async (
+  walletAddress: string,
+  chainId: ChainId,
+  rename: TokenInfo[],
+): Promise<GetAllBalancesResult> => {
+  // Shuffle the mapping of the tokens configuration so it is a hashmap
+  // for faster access to tokens config objects.
+  const mapRename = Object.assign({}, ...(rename.map((t) => ({ [t.address || '']: t }))));
+
+  // Ensure singleton is present and match the selected chain
+  if (!blockscoutClient || blockscoutClient.chainId !== chainId) blockscoutClient = new Blockscout({ chainId });
+
+  // Hold the items in an array for post-fetching processing
+  const items = [];
+
+  const tokenType = [BlockscoutTokenType.ERC20];
+  // Given that the widgets aren't yet designed to support pagination,
+  // fetch all the possible tokens associated to a given wallet address.
+  let resp: BlockscoutAddressTokens | undefined;
+  try {
+    do {
+      // eslint-disable-next-line no-await-in-loop
+      resp = await blockscoutClient.getAddressTokens({ walletAddress, tokenType, nextPage: resp?.next_page_params });
+      items.push(...resp.items);
+    } while (resp.next_page_params);
+  } catch (err: any) {
+    throw new CheckoutError(err.message || 'InternalServerError', CheckoutErrorType.GET_INDEXER_BALANCE_ERROR, err);
+  }
+
+  return {
+    balances: items.map((item) => {
+      const tokenData = item.token || {};
+
+      const balance = BigNumber.from(item.value);
+
+      const renamed = (mapRename[tokenData.address] || {}) as TokenInfo;
+      const token = {
+        ...tokenData,
+        name: renamed.name ?? tokenData.name,
+        symbol: renamed.symbol ?? tokenData.symbol,
+        decimals: parseInt(tokenData.decimals, 10),
+      };
+
+      const formattedBalance = utils.formatUnits(item.value, token.decimals);
+
+      return { balance, formattedBalance, token } as GetBalanceResult;
+    }),
+  };
+};
+
+export const getBalances = async (
   config: CheckoutConfiguration,
   web3Provider: Web3Provider,
   walletAddress: string,
-  chainId: ChainId,
-): Promise<GetAllBalancesResult> => {
-  const tokenList = await getTokenAllowList(
-    config,
-    {
-      type: TokenFilterTypes.ALL,
-      chainId,
-    },
-  );
+  tokens: TokenInfo[],
+): Promise<GetBalancesResult> => {
   const allBalancePromises: Promise<GetBalanceResult>[] = [];
-  allBalancePromises.push(getBalance(config, web3Provider, walletAddress));
-
-  tokenList.tokens
-    .forEach((token: TokenInfo) => token.address && allBalancePromises.push(
-      getERC20Balance(web3Provider, walletAddress, token.address),
-    ));
+  tokens
+    .forEach((token: TokenInfo) => {
+      // Check for NATIVE token
+      if (!token.address || token.address === IMX_ADDRESS_ZKEVM) {
+        allBalancePromises.push(
+          getBalance(config, web3Provider, walletAddress),
+        );
+      } else {
+        allBalancePromises.push(
+          getERC20Balance(web3Provider, walletAddress, token.address),
+        );
+      }
+    });
 
   const balanceResults = await Promise.allSettled(allBalancePromises);
-  const getBalanceResults = (
+  const balances = (
     balanceResults.filter(
       (result) => result.status === 'fulfilled',
     ) as PromiseFulfilledResult<GetBalanceResult>[]
@@ -104,5 +169,37 @@ export const getAllBalances = async (
     (fulfilledResult: PromiseFulfilledResult<GetBalanceResult>) => fulfilledResult.value,
   ) as GetBalanceResult[];
 
-  return { balances: getBalanceResults };
+  return { balances };
+};
+
+export const getAllBalances = async (
+  config: CheckoutConfiguration,
+  web3Provider: Web3Provider,
+  walletAddress: string,
+  chainId: ChainId,
+): Promise<GetAllBalancesResult> => {
+  const { tokens } = await getTokenAllowList(
+    config,
+    {
+      type: TokenFilterTypes.ALL,
+      chainId,
+    },
+  );
+
+  // In order to prevent unnecessary RPC calls
+  // let's use the Indexer if available for the
+  // given chain.
+  let flag = false;
+  try {
+    flag = (await config.remote.getTokensConfig(chainId)).blockscout || flag;
+  } catch (err: any) {
+    // eslint-disable-next-line no-console
+    console.error(err);
+  }
+
+  if (flag && Blockscout.isChainSupported(chainId)) {
+    return await getIndexerBalance(walletAddress, chainId, tokens);
+  }
+
+  return await getBalances(config, web3Provider, walletAddress, tokens);
 };

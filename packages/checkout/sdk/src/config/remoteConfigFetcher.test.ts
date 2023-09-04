@@ -154,8 +154,8 @@ describe('RemoteConfig', () => {
           isDevelopment: env === ENV_DEVELOPMENT,
           isProduction: env !== ENV_DEVELOPMENT && env === Environment.PRODUCTION,
         });
-        await fetcher.getTokens(ChainId.SEPOLIA);
-        await fetcher.getTokens(ChainId.IMTBL_ZKEVM_DEVNET);
+        await fetcher.getTokensConfig(ChainId.SEPOLIA);
+        await fetcher.getTokensConfig(ChainId.IMTBL_ZKEVM_DEVNET);
 
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
         expect(mockedAxios.get).toHaveBeenNthCalledWith(
@@ -175,7 +175,7 @@ describe('RemoteConfig', () => {
           isProduction: env !== ENV_DEVELOPMENT && env === Environment.PRODUCTION,
         });
 
-        expect(await fetcher.getTokens(ChainId.SEPOLIA)).toEqual([]);
+        expect(await fetcher.getTokensConfig(ChainId.SEPOLIA)).toEqual({});
       });
 
       it(`should throw error when non-200 status [${env}]`, async () => {
@@ -190,7 +190,7 @@ describe('RemoteConfig', () => {
           isProduction: env !== ENV_DEVELOPMENT && env === Environment.PRODUCTION,
         });
 
-        await expect(fetcher.getTokens(ChainId.SEPOLIA))
+        await expect(fetcher.getTokensConfig(ChainId.SEPOLIA))
           .rejects
           .toThrow(new Error('Error fetching from api: 500 error message'));
       });
@@ -205,7 +205,7 @@ describe('RemoteConfig', () => {
           isProduction: env !== ENV_DEVELOPMENT && env === Environment.PRODUCTION,
         });
 
-        await expect(fetcher.getTokens(ChainId.SEPOLIA))
+        await expect(fetcher.getTokensConfig(ChainId.SEPOLIA))
           .rejects
           .toThrow(new Error('Error fetching from api: error message'));
       });

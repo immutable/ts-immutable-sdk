@@ -1896,14 +1896,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.8.0-beta":
-  version: 0.8.0-beta
-  resolution: "@biom3/react@npm:0.8.0-beta"
+"@biom3/react@npm:^0.9.7-beta":
+  version: 0.9.7-beta
+  resolution: "@biom3/react@npm:0.9.7-beta"
   dependencies:
     "@biom3/design-tokens": "*"
     "@emotion/css": ^11.11.2
     "@emotion/react": ^11.11.1
-    "@rive-app/react-canvas": ^3.0.50
+    "@rive-app/react-canvas": ^4.1.4
     buffer: ^6.0.3
     csstype: ^3.1.2
     framer-motion: ^10.12.12
@@ -1915,7 +1915,7 @@ __metadata:
     react-dom: ^18.2.0
     react-is: ^18.2.0
     ts-deepmerge: ^5.0.0
-  checksum: 81794b51735b2ffdc1fa77c949c9a4f15cdff0434909a95c7fe8b1043d2adf717cf7840b5c9833135b968067048133e1ac5f8bc52603518a7250fa1762b9cc89
+  checksum: afdf3be649d5a45c55b9f70a2c8726715237c5dc15e4fbd0eba71b4c7d1c67b8674d2f371b94b32120f2c00c1340792b4800066895e2bcd7b8bd106ee9df2bde
   languageName: node
   linkType: hard
 
@@ -3054,7 +3054,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-sdk-sample-app@workspace:packages/checkout/sdk-sample-app"
   dependencies:
-    "@biom3/react": ^0.8.0-beta
+    "@biom3/react": ^0.9.7-beta
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/config": 0.0.0
     "@svgr/webpack": ^8.0.1
@@ -3066,13 +3066,18 @@ __metadata:
     "@types/react": ^18.0.28
     "@types/react-dom": ^18.0.11
     "@typescript-eslint/parser": ^5.57.1
+    assert-browserify: ^2.0.0
+    buffer: ^6.0.3
+    crypto-browserify: ^3.12.0
     ethers: ^5.7.2
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
     react: ^18.2.0
+    react-app-rewired: ^2.2.1
     react-dom: ^18.2.0
     react-router-dom: ^6.11.0
     react-scripts: 5.0.1
+    stream-browserify: ^3.0.0
     typescript: ^4.9.5
     web-vitals: ^2.1.4
   languageName: unknown
@@ -3110,7 +3115,7 @@ __metadata:
   resolution: "@imtbl/checkout-widgets-lib@workspace:packages/checkout/widgets-lib"
   dependencies:
     "@biom3/design-tokens": 0.2.0-beta
-    "@biom3/react": ^0.8.0-beta
+    "@biom3/react": ^0.9.7-beta
     "@ethersproject/providers": ^5.7.2
     "@imtbl/bridge-sdk": 0.0.0
     "@imtbl/checkout-sdk": 0.0.0
@@ -3156,7 +3161,7 @@ __metadata:
   resolution: "@imtbl/checkout-widgets-sample-app@workspace:packages/checkout/widgets-sample-app"
   dependencies:
     "@biom3/design-tokens": 0.2.0-beta
-    "@biom3/react": ^0.8.0-beta
+    "@biom3/react": ^0.9.7-beta
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
@@ -3332,7 +3337,7 @@ __metadata:
   resolution: "@imtbl/economy-building-blocks-playground@workspace:packages/internal/economy-building-blocks/playground"
   dependencies:
     "@biom3/design-tokens": 0.2.0-beta
-    "@biom3/react": ^0.8.0-beta
+    "@biom3/react": ^0.9.7-beta
     "@imtbl/blockchain-data": 0.0.0
     "@imtbl/passport": 0.0.0
     "@imtbl/sdk": 0.0.0
@@ -3595,7 +3600,7 @@ __metadata:
   resolution: "@imtbl/passport-sdk-sample-app@workspace:packages/passport/sdk-sample-app"
   dependencies:
     "@biom3/design-tokens": 0.2.0-beta
-    "@biom3/react": ^0.8.0-beta
+    "@biom3/react": ^0.9.7-beta
     "@imtbl/config": 0.0.0
     "@imtbl/core-sdk": ^2.0.2
     "@imtbl/immutablex-client": 0.0.0
@@ -6213,18 +6218,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@release-it/keep-a-changelog@npm:^3.1.0":
-  version: 3.1.0
-  resolution: "@release-it/keep-a-changelog@npm:3.1.0"
-  dependencies:
-    detect-newline: ^4.0.0
-    string-template: ^1.0.0
-  peerDependencies:
-    release-it: ^15.0.0-esm.4
-  checksum: 28cf7c8642bc67872c0e69f89ecef05cbdc0eda4c6297410a111f34602ae09691f672dc5e43b4089508663ea890efd94783cc0e81163fb4a2ecef3df89890744
-  languageName: node
-  linkType: hard
-
 "@remix-run/router@npm:1.7.2":
   version: 1.7.2
   resolution: "@remix-run/router@npm:1.7.2"
@@ -6263,21 +6256,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rive-app/canvas@npm:1.2.2":
-  version: 1.2.2
-  resolution: "@rive-app/canvas@npm:1.2.2"
-  checksum: 6dbf644c9a7c8798bf32729eac50caf54a79a123bd97c82a26d76574fe5bfdf266d9026324de6ad9ff2a40ac1e2ed6bb29507bcb2c8307cb0103b19a898e691c
+"@rive-app/canvas@npm:2.2.2":
+  version: 2.2.2
+  resolution: "@rive-app/canvas@npm:2.2.2"
+  checksum: c420b431e512642e791942910aa40a9973cadb9320c98ec8f4575f5d4b7aab904dd1bc6f7e0f0f5cfcd9c9739333149e5caed0695179485be2fbf46f35e9d8de
   languageName: node
   linkType: hard
 
-"@rive-app/react-canvas@npm:^3.0.50":
-  version: 3.0.55
-  resolution: "@rive-app/react-canvas@npm:3.0.55"
+"@rive-app/react-canvas@npm:^4.1.4":
+  version: 4.1.6
+  resolution: "@rive-app/react-canvas@npm:4.1.6"
   dependencies:
-    "@rive-app/canvas": 1.2.2
+    "@rive-app/canvas": 2.2.2
   peerDependencies:
     react: ^16.8.0 || ^17.0.0 || ^18.0.0
-  checksum: 0520c23264c3981e4cbdca971235f7e046facb15460913c3b30636cd01e3bb416d5c4f734c55026fa39ccd0d1900efb181baaae01baedea196953eba2cca6727
+  checksum: c851bf1cb68461b427d9eaf199308bfd04314ff1fb5982b415c60d062f5280b4a65e20ff21e23005f9470a75ffd8fb560c1fb89d821223594018e1477f9e6952
   languageName: node
   linkType: hard
 
@@ -13542,13 +13535,6 @@ __metadata:
   version: 3.1.0
   resolution: "detect-newline@npm:3.1.0"
   checksum: ae6cd429c41ad01b164c59ea36f264a2c479598e61cba7c99da24175a7ab80ddf066420f2bec9a1c57a6bead411b4655ff15ad7d281c000a89791f48cbe939e7
-  languageName: node
-  linkType: hard
-
-"detect-newline@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "detect-newline@npm:4.0.0"
-  checksum: 52767347c70f485b2d1db6493dde57b8c3c1f249e24bad7eb7424cc1129200aa7e671902ede18bc94a8b69e10dec91456aab4c7e2478559d9eedb31ef3847f36
   languageName: node
   linkType: hard
 
@@ -25371,7 +25357,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "sample-app@workspace:packages/provider/src/sample-app"
   dependencies:
-    "@biom3/react": ^0.8.0-beta
+    "@biom3/react": ^0.9.7-beta
     "@imtbl/core-sdk": ^2.0.2
     "@imtbl/sdk": 0.0.0
     "@svgr/webpack": ^8.0.1
@@ -26489,13 +26475,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"string-template@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "string-template@npm:1.0.0"
-  checksum: 15b0e8616ff25f3ddcd42e4a58a6833cc7be81029f97afc7b8f8d2e7c4d482a136e67399d207b7d2c31080e7a88266c670131a59e50ebc482bfeddb06b3a4215
-  languageName: node
-  linkType: hard
-
 "string-width-cjs@npm:string-width@^4.2.0, string-width@npm:^1.0.2 || 2 || 3 || 4, string-width@npm:^4.1.0, string-width@npm:^4.2.0, string-width@npm:^4.2.3":
   version: 4.2.3
   resolution: "string-width@npm:4.2.3"
@@ -27504,7 +27483,6 @@ __metadata:
   resolution: "ts-immutable-sdk@workspace:."
   dependencies:
     "@release-it-plugins/workspaces": ^3.2.0
-    "@release-it/keep-a-changelog": ^3.1.0
     "@typescript-eslint/eslint-plugin": ^5.57.1
     "@typescript-eslint/parser": ^5.57.1
     eslint: ^8.40.0

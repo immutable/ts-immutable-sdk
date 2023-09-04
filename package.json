@@ -1,12 +1,11 @@
 {
   "name": "ts-immutable-sdk",
   "description": "Immutable Unified TypeScript SDK",
-  "version": "0.13.0",
+  "version": "0.0.0",
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "devDependencies": {
     "@release-it-plugins/workspaces": "^3.2.0",
-    "@release-it/keep-a-changelog": "^3.1.0",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
     "eslint": "^8.40.0",
@@ -37,7 +36,7 @@
     "@biom3/design-tokens": "0.2.0-beta"
   },
   "scripts": {
-    "build": "wsrun -p @imtbl/sdk -p @imtbl/checkout-widgets-lib -e -r --serial build && yarn syncpack:format && yarn wsrun -p @imtbl/sdk -a -m copyBrowserBundles",
+    "build": "wsrun -y 4 -p @imtbl/sdk -p @imtbl/checkout-widgets-lib -e -r --serial build && yarn syncpack:format && yarn wsrun -p @imtbl/sdk -a -m copyBrowserBundles",
     "build:onlysdk": "wsrun -y 4 --stages build && yarn syncpack:format",
     "docs:build": "typedoc",
     "docs:serve": "http-server ./docs --cors -p 8080 -c-1",

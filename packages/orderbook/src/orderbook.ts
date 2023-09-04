@@ -6,19 +6,25 @@ import {
   OrderbookOverrides,
 } from './config/config';
 import { Fee as OpenApiFee } from './openapi/sdk';
+import { mapFromOpenApiOrder, mapFromOpenApiPage, mapFromOpenApiTrade } from './openapi/mapper';
 import { Seaport } from './seaport';
 import { SeaportLibFactory } from './seaport/seaport-lib-factory';
 import {
   CancelOrderResponse,
   CreateListingParams,
   Fee,
+  FeeType,
+  FeeValue,
   FulfillOrderResponse,
   ListListingsParams,
   ListListingsResult,
+  ListTradesParams,
+  ListTradesResult,
   ListingResult,
   OrderStatus,
   PrepareListingParams,
   PrepareListingResponse,
+  TradeResult,
 } from './types';
 
 /**
@@ -85,8 +91,23 @@ export class Orderbook {
    * @param {string} listingId - The listingId to find.
    * @return {ListingResult} The returned order result.
    */
-  getListing(listingId: string): Promise<ListingResult> {
-    return this.apiClient.getListing(listingId);
+  async getListing(listingId: string): Promise<ListingResult> {
+    const apiListing = await this.apiClient.getListing(listingId);
+    return {
+      result: mapFromOpenApiOrder(apiListing.result),
+    };
+  }
+
+  /**
+   * Get a trade by ID
+   * @param {string} tradeId - The tradeId to find.
+   * @return {TradeResult} The returned order result.
+   */
+  async getTrade(tradeId: string): Promise<TradeResult> {
+    const apiListing = await this.apiClient.getTrade(tradeId);
+    return {
+      result: mapFromOpenApiTrade(apiListing.result),
+    };
   }
 
   /**
@@ -95,10 +116,30 @@ export class Orderbook {
    * @param {ListListingsParams} listOrderParams - Filtering, ordering and page parameters.
    * @return {ListListingsResult} The paged orders.
    */
-  listListings(
+  async listListings(
     listOrderParams: ListListingsParams,
   ): Promise<ListListingsResult> {
-    return this.apiClient.listListings(listOrderParams);
+    const apiListings = await this.apiClient.listListings(listOrderParams);
+    return {
+      page: mapFromOpenApiPage(apiListings.page),
+      result: apiListings.result.map(mapFromOpenApiOrder),
+    };
+  }
+
+  /**
+   * List trades. This method is used to get a list of trades filtered by conditions specified
+   * in the params object
+   * @param {ListTradesParams} listTradesParams - Filtering, ordering and page parameters.
+   * @return {ListTradesResult} The paged trades.
+   */
+  async listTrades(
+    listTradesParams: ListTradesParams,
+  ): Promise<ListTradesResult> {
+    const apiListings = await this.apiClient.listTrades(listTradesParams);
+    return {
+      page: mapFromOpenApiPage(apiListings.page),
+      result: apiListings.result.map(mapFromOpenApiTrade),
+    };
   }
 
   /**
@@ -131,10 +172,24 @@ export class Orderbook {
    * @param {CreateListingParams} createListingParams - create an order with the given params.
    * @return {ListingResult} The result of the order created in the Immutable services.
    */
-  createListing(
+  async createListing(
     createListingParams: CreateListingParams,
   ): Promise<ListingResult> {
-    return this.apiClient.createListing(createListingParams);
+    const makerFee: Fee | undefined = createListingParams.makerFee
+      ? {
+        ...createListingParams.makerFee,
+        type: FeeType.MAKER_MARKETPLACE,
+      }
+      : undefined;
+
+    const apiListingResponse = await this.apiClient.createListing({
+      ...createListingParams,
+      makerFee,
+    });
+
+    return {
+      result: mapFromOpenApiOrder(apiListingResponse.result),
+    };
   }
 
   /**
@@ -148,7 +203,7 @@ export class Orderbook {
   async fulfillOrder(
     listingId: string,
     takerAddress: string,
-    takerFee?: Fee,
+    takerFee?: FeeValue,
   ): Promise<FulfillOrderResponse> {
     const fulfillmentDataRes = await this.apiClient.fulfillmentData([
       {
@@ -156,7 +211,7 @@ export class Orderbook {
         fee: takerFee
           ? {
             amount: takerFee.amount,
-            fee_type: takerFee.type as unknown as OpenApiFee.fee_type,
+            fee_type: FeeType.TAKER_MARKETPLACE as unknown as OpenApiFee.fee_type.TAKER_MARKETPLACE,
             recipient: takerFee.recipient,
           }
           : undefined,

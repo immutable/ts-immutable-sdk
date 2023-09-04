@@ -1,12 +1,14 @@
 import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { signRaw } from '@imtbl/toolkit';
+import { PassportConfiguration } from 'config';
 import { UserZkEvm } from '../../types';
 import AuthManager from '../../authManager';
 import { JsonRpcError, RpcErrorCode } from '../JsonRpcError';
 
 export type RegisterZkEvmUserInput = {
   authManager: AuthManager;
+  config: PassportConfiguration,
   magicProvider: ExternalProvider,
   multiRollupApiClients: MultiRollupApiClients,
   accessToken: string;
@@ -16,6 +18,7 @@ const MESSAGE_TO_SIGN = 'Only sign this message from Immutable Passport';
 
 export async function registerZkEvmUser({
   authManager,
+  config,
   magicProvider,
   multiRollupApiClients,
   accessToken,
@@ -41,7 +44,16 @@ export async function registerZkEvmUser({
     throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, `Failed to create counterfactual address: ${error}`);
   }
 
-  const user = await authManager.loginSilent();
+  let user;
+  if (config.crossSdkBridgeEnabled) {
+    const credentials = authManager.checkStoredDeviceFlowCredentials();
+    if (!credentials || !credentials.refresh_token) {
+      throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, 'Cross SDK bridge: Failed to refresh user details');
+    }
+    user = await authManager.refreshToken(credentials.refresh_token);
+  } else {
+    user = await authManager.loginSilent();
+  }
   if (!user?.zkEvm) {
     throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, 'Failed to refresh user details');
   }

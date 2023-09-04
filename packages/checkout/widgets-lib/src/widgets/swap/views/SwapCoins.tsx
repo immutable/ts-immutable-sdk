@@ -14,6 +14,7 @@ import { hasZeroBalance } from '../../../lib/gasBalanceCheck';
 import { SwapContext } from '../context/SwapContext';
 import { NotEnoughImx } from '../../../components/NotEnoughImx/NotEnoughImx';
 import { IMX_TOKEN_SYMBOL } from '../../../lib';
+import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 
 export interface SwapCoinsProps {
   fromAmount?: string;
@@ -30,6 +31,7 @@ export function SwapCoins({
 }: SwapCoinsProps) {
   const { header } = text.views[SwapWidgetViews.SWAP];
   const { viewState, viewDispatch } = useContext(ViewContext);
+  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const showBackButton = useMemo(() => viewState.history.length > 2
   && viewState.history[viewState.history.length - 2].type === SharedViews.TOP_UP_VIEW, [viewState.history]);
@@ -54,7 +56,7 @@ export function SwapCoins({
         <HeaderNavigation
           showBack={showBackButton}
           title={header.title}
-          onCloseButtonClick={() => sendSwapWidgetCloseEvent()}
+          onCloseButtonClick={() => sendSwapWidgetCloseEvent(eventTarget)}
         />
       )}
       footer={<FooterLogo />}
