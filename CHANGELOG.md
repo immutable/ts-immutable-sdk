@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- @imtbl/passport: Added support for `eth_signTypedData_v4` to Passport zkEvm provider. 
+
 ## [0.16.0] - 2023-08-31
 
 ### Added
