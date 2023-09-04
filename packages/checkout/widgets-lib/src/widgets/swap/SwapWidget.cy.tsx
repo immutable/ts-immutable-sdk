@@ -247,8 +247,10 @@ describe('SwapWidget tests', () => {
   });
 
   describe('SwapWidget Form', () => {
+    let getAllBalancesStub: any;
+
     beforeEach(() => {
-      cy.stub(Checkout.prototype, 'getAllBalances')
+      getAllBalancesStub = cy.stub(Checkout.prototype, 'getAllBalances')
         .as('getAllBalancesStub')
         .resolves({
           balances: [
@@ -302,6 +304,39 @@ describe('SwapWidget tests', () => {
       cySmartGet('fromTokenInputs-text-form-text').should('be.visible');
       cySmartGet('toTokenInputs-select-form-select__target').should('be.visible');
       cySmartGet('toTokenInputs-text-form-text').should('be.visible');
+    });
+
+    it('should show balances after getAllBalances failure', () => {
+      getAllBalancesStub.rejects()
+        .resolves({
+          balances: [
+            {
+              balance: BigNumber.from('10000000000000000000'),
+              formattedBalance: '0.1',
+              token: {
+                name: 'ImmutableX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: IMX_ADDRESS_ZKEVM,
+              },
+            },
+          ],
+        });
+
+      mount(
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <SwapWidget
+            config={config}
+            params={params}
+          />
+        </ConnectLoaderTestComponent>,
+      );
+
+      cySmartGet('fromTokenInputs-select-form-select__target').click();
+      cySmartGet(`fromTokenInputs-select-form-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`)
+        .should('exist');
     });
 
     it('should set fromTokens to user balances filtered by the token allow list', () => {
