@@ -38,7 +38,7 @@ export function OnRampWidget(props: OnRampWidgetProps) {
   const { config, params } = props;
   const { passport } = params;
   const {
-    environment, theme, isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
+    theme, isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
   } = config;
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
   const viewReducerValues = useMemo(() => ({ viewState, viewDispatch }), [viewState, viewReducer]);
@@ -114,10 +114,11 @@ export function OnRampWidget(props: OnRampWidgetProps) {
         )}
         {viewState.view.type === OnRampWidgetViews.ONRAMP && (
           <OnRampMain
-            environment={environment}
             walletAddress={walletAddress}
-            isPassport={isPassport}
             email={emailAddress}
+            tokenAmount={params.amount}
+            tokenAddress={params.contractAddress}
+            passport={isPassport ? passport : undefined}
           />
         )}
         {viewState.view.type === SharedViews.TOP_UP_VIEW && (
