@@ -195,7 +195,8 @@ describe('Top Up View', () => {
       cy.get('@sendRequestOnrampEventStub')
         .should(
           'have.been.calledWith',
-          'imtbl-wallet-widget',
+          window,
+          IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
           { tokenAddress: '0x123', amount: '10' },
         );
     });
@@ -226,7 +227,8 @@ describe('Top Up View', () => {
       cy.get('@sendRequestSwapEventStub')
         .should(
           'have.been.calledWith',
-          'imtbl-wallet-widget',
+          window,
+          IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
           // fromToken and amount should be empty for swap in top up
           { fromTokenAddress: '', toTokenAddress: '0x123', amount: '' },
         );
@@ -258,7 +260,8 @@ describe('Top Up View', () => {
       cy.get('@sendRequestBridgeEventStub')
         .should(
           'have.been.calledWith',
-          'imtbl-wallet-widget',
+          window,
+          IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
           // tokenAddress and amount should be empty for bridging in top up
           { tokenAddress: '', amount: '' },
         );

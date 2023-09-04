@@ -327,11 +327,16 @@ describe('BalanceItem', () => {
       cySmartGet('token-menu').click();
       cySmartGet('balance-item-swap-option').click();
       cySmartGet('@requestSwapEventStub').should('have.been.called');
-      cySmartGet('@requestSwapEventStub').should('have.been.calledWith', IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {
-        toTokenAddress: '',
-        fromTokenAddress: '',
-        amount: '',
-      });
+      cySmartGet('@requestSwapEventStub').should(
+        'have.been.calledWith',
+        window,
+        IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
+        {
+          toTokenAddress: '',
+          fromTokenAddress: '',
+          amount: '',
+        },
+      );
     });
 
     it('should emit sendRequestOnrampEvent when add menu button is clicked', () => {
@@ -351,8 +356,8 @@ describe('BalanceItem', () => {
       cySmartGet('@requestOnrampEventStub').should('have.been.called');
       cySmartGet('@requestOnrampEventStub').should(
         'have.been.calledWith',
+        window,
         IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
-
         {
           tokenAddress: '',
           amount: '',
