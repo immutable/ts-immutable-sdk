@@ -44,6 +44,7 @@ import { ErrorView } from '../../views/error/ErrorView';
 import { ApproveERC20BridgeOnboarding } from './views/ApproveERC20Bridge';
 import { getBridgeTokensAndBalances } from './functions/getBridgeTokens';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
+import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 
 export interface BridgeWidgetProps {
   params: BridgeWidgetParams;
@@ -70,6 +71,8 @@ export function BridgeWidget(props: BridgeWidgetProps) {
   const { checkout, provider } = connectLoaderState;
   const [bridgeState, bridgeDispatch] = useReducer(bridgeReducer, initialBridgeState);
   const bridgeReducerValues = useMemo(() => ({ bridgeState, bridgeDispatch }), [bridgeState, bridgeDispatch]);
+
+  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const {
     amount, fromContractAddress,
@@ -196,8 +199,9 @@ export function BridgeWidget(props: BridgeWidgetProps) {
               <StatusView
                 statusText={successText.text} // todo: move to text
                 actionText={successText.actionText}
-                onActionClick={sendBridgeWidgetCloseEvent}
+                onActionClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
                 onRenderEvent={() => sendBridgeSuccessEvent(
+                  eventTarget,
                   (viewReducerValues.viewState.view as BridgeSuccessView).data.transactionHash,
                 )}
                 statusType={StatusType.SUCCESS}
@@ -221,8 +225,8 @@ export function BridgeWidget(props: BridgeWidgetProps) {
                     });
                   }
                 }}
-                onRenderEvent={() => sendBridgeFailedEvent('Transaction failed')}
-                onCloseClick={sendBridgeWidgetCloseEvent}
+                onRenderEvent={() => sendBridgeFailedEvent(eventTarget, 'Transaction failed')}
+                onCloseClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
                 statusType={StatusType.FAILURE}
                 testId="fail-view"
               />
@@ -238,7 +242,7 @@ export function BridgeWidget(props: BridgeWidgetProps) {
                     },
                   });
                 }}
-                onCloseClick={sendBridgeWidgetCloseEvent}
+                onCloseClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
               />
             )}
           </CryptoFiatProvider>

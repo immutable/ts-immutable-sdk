@@ -26,6 +26,7 @@ import { getL1ChainId, getL2ChainId } from '../../../../lib/networkUtils';
 import { formatZeroAmount, tokenValueFormat } from '../../../../lib/utils';
 import { ConnectLoaderContext } from '../../../../context/connect-loader-context/ConnectLoaderContext';
 import { isPassportProvider } from '../../../../lib/providerUtils';
+import { EventTargetContext } from '../../../../context/event-target-context/EventTargetContext';
 
 export interface BalanceItemProps {
   balanceInfo: BalanceInfo;
@@ -41,6 +42,7 @@ export function BalanceItem({ balanceInfo, bridgeToL2OnClick }: BalanceItemProps
   const [isOnRampEnabled, setIsOnRampEnabled] = useState<boolean>();
   const [isBridgeEnabled, setIsBridgeEnabled] = useState<boolean>();
   const [isSwapEnabled, setIsSwapEnabled] = useState<boolean>();
+  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const isPassport = isPassportProvider(provider);
 
@@ -87,7 +89,7 @@ export function BalanceItem({ balanceInfo, bridgeToL2OnClick }: BalanceItemProps
               testId="balance-item-add-option"
               sx={ShowMenuItem(isOnRampEnabled)}
               onClick={() => {
-                orchestrationEvents.sendRequestOnrampEvent(IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {
+                orchestrationEvents.sendRequestOnrampEvent(eventTarget, IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {
                   tokenAddress: balanceInfo.address ?? '',
                   amount: '',
                 });
@@ -100,7 +102,7 @@ export function BalanceItem({ balanceInfo, bridgeToL2OnClick }: BalanceItemProps
               testId="balance-item-swap-option"
               sx={ShowMenuItem(isSwapEnabled)}
               onClick={() => {
-                orchestrationEvents.sendRequestSwapEvent(IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {
+                orchestrationEvents.sendRequestSwapEvent(eventTarget, IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {
                   fromTokenAddress: balanceInfo.address ?? '',
                   toTokenAddress: '',
                   amount: '',

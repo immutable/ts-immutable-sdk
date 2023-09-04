@@ -21,6 +21,7 @@ export type { FulfillmentDataResult } from './models/FulfillmentDataResult';
 export type { Item } from './models/Item';
 export type { ListingResult } from './models/ListingResult';
 export type { ListListingsResult } from './models/ListListingsResult';
+export type { ListTradeResult } from './models/ListTradeResult';
 export type { NativeItem } from './models/NativeItem';
 export type { Order } from './models/Order';
 export { OrderStatus } from './models/OrderStatus';
@@ -28,5 +29,8 @@ export type { Page } from './models/Page';
 export type { PageCursor } from './models/PageCursor';
 export type { PageSize } from './models/PageSize';
 export { ProtocolData } from './models/ProtocolData';
+export type { Trade } from './models/Trade';
+export type { TradeBlockchainMetadata } from './models/TradeBlockchainMetadata';
+export type { TradeResult } from './models/TradeResult';
 
 export { OrdersService } from './services/OrdersService';

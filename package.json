@@ -1,12 +1,11 @@
 {
   "name": "ts-immutable-sdk",
   "description": "Immutable Unified TypeScript SDK",
-  "version": "0.13.0",
+  "version": "0.0.0",
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "devDependencies": {
     "@release-it-plugins/workspaces": "^3.2.0",
-    "@release-it/keep-a-changelog": "^3.1.0",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
     "eslint": "^8.40.0",
