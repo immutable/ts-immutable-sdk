@@ -38,7 +38,7 @@ export const getTokenAllowList = async (
     case TokenFilterTypes.BRIDGE:
     case TokenFilterTypes.ALL:
     default:
-      tokens = (await config.remote.getTokens(chainId || getL1ChainId(config))) as TokenInfo[];
+      tokens = (await config.remote.getTokensConfig(chainId || getL1ChainId(config))).allowed as TokenInfo[];
   }
 
   if (!exclude || exclude?.length === 0) return { tokens };

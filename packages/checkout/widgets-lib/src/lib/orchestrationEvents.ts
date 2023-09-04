@@ -7,7 +7,11 @@ import {
   WidgetEvent,
 } from '@imtbl/checkout-widgets';
 
-function sendRequestOnrampEvent(imtblWidgetEvent: IMTBLWidgetEvents, eventData: RequestOnrampEvent) {
+function sendRequestOnrampEvent(
+  eventTarget: Window | EventTarget,
+  imtblWidgetEvent: IMTBLWidgetEvents,
+  eventData: RequestOnrampEvent,
+) {
   const requestOnrampEvent = new CustomEvent<WidgetEvent<RequestOnrampEvent>>(
     imtblWidgetEvent,
     {
@@ -19,11 +23,15 @@ function sendRequestOnrampEvent(imtblWidgetEvent: IMTBLWidgetEvents, eventData: 
   );
   // TODO: please remove or if necessary keep the eslint ignore
   // eslint-disable-next-line no-console
-  console.log('request onramp event:', requestOnrampEvent);
-  if (window !== undefined) window.dispatchEvent(requestOnrampEvent);
+  console.log('request onramp event:', eventTarget, requestOnrampEvent);
+  if (eventTarget !== undefined) eventTarget.dispatchEvent(requestOnrampEvent);
 }
 
-function sendRequestSwapEvent(imtblWidgetEvent: IMTBLWidgetEvents, eventData: RequestSwapEvent) {
+function sendRequestSwapEvent(
+  eventTarget: Window | EventTarget,
+  imtblWidgetEvent: IMTBLWidgetEvents,
+  eventData: RequestSwapEvent,
+) {
   const requestSwapEvent = new CustomEvent<WidgetEvent<RequestSwapEvent>>(
     imtblWidgetEvent,
     {
@@ -35,11 +43,15 @@ function sendRequestSwapEvent(imtblWidgetEvent: IMTBLWidgetEvents, eventData: Re
   );
   // TODO: please remove or if necessary keep the eslint ignore
   // eslint-disable-next-line no-console
-  console.log('request swap event:', requestSwapEvent);
-  if (window !== undefined) window.dispatchEvent(requestSwapEvent);
+  console.log('request swap event:', eventTarget, requestSwapEvent);
+  if (eventTarget !== undefined) eventTarget.dispatchEvent(requestSwapEvent);
 }
 
-function sendRequestBridgeEvent(imtblWidgetEvent: IMTBLWidgetEvents, eventData: RequestBridgeEvent) {
+function sendRequestBridgeEvent(
+  eventTarget: Window | EventTarget,
+  imtblWidgetEvent: IMTBLWidgetEvents,
+  eventData: RequestBridgeEvent,
+) {
   const requestBridgeEvent = new CustomEvent<WidgetEvent<RequestBridgeEvent>>(imtblWidgetEvent, {
     detail: {
       type: OrchestrationEventType.REQUEST_BRIDGE,
@@ -48,8 +60,8 @@ function sendRequestBridgeEvent(imtblWidgetEvent: IMTBLWidgetEvents, eventData: 
   });
   // TODO: please remove or if necessary keep the eslint ignore
   // eslint-disable-next-line no-console
-  console.log('bridge coins event:', requestBridgeEvent);
-  if (window !== undefined) window.dispatchEvent(requestBridgeEvent);
+  console.log('bridge coins event:', eventTarget, requestBridgeEvent);
+  if (eventTarget !== undefined) eventTarget.dispatchEvent(requestBridgeEvent);
 }
 
 export const orchestrationEvents = {

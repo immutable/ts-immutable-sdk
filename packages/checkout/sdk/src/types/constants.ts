@@ -18,6 +18,10 @@ export const CHECKOUT_API_BASE_URL = {
   [Environment.PRODUCTION]: 'https://checkout-api.immutable.com',
 };
 
+export const BLOCKSCOUT_CHAIN_URL_MAP: { [key: string]: string } = {
+  [ChainId.IMTBL_ZKEVM_TESTNET]: 'https://explorer.testnet.immutable.com',
+};
+
 export const TRANSAK_API_BASE_URL = {
   [Environment.SANDBOX]: 'https://global-stg.transak.com',
   [Environment.PRODUCTION]: 'https://global.transak.com/',

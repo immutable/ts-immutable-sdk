@@ -10,6 +10,7 @@ import { BridgeActions, BridgeContext } from '../context/BridgeContext';
 import { getBridgeTokensAndBalances } from '../functions/getBridgeTokens';
 import { useInterval } from '../../../lib/hooks/useInterval';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
+import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 
 const REFRESH_TOKENS_INTERVAL_MS = 10000;
 export interface BridgeProps {
@@ -22,6 +23,7 @@ export function Bridge({ amount, fromContractAddress }: BridgeProps) {
   const { bridgeDispatch } = useContext(BridgeContext);
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
+  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const refreshBalances = useCallback(async () => {
     if (!checkout) return;
@@ -45,7 +47,7 @@ export function Bridge({ amount, fromContractAddress }: BridgeProps) {
       header={(
         <HeaderNavigation
           title={header.title}
-          onCloseButtonClick={() => sendBridgeWidgetCloseEvent()}
+          onCloseButtonClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
         />
       )}
       footer={<FooterLogo />}

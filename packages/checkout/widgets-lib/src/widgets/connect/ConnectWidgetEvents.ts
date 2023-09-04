@@ -10,6 +10,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import { WalletProviderName } from '@imtbl/checkout-sdk';
 
 export function sendConnectSuccessEvent(
+  eventTarget: Window | EventTarget,
   provider: Web3Provider,
   walletProvider?: WalletProviderName,
 ) {
@@ -26,11 +27,11 @@ export function sendConnectSuccessEvent(
     },
   );
   // eslint-disable-next-line no-console
-  console.log('success event:', successEvent);
-  if (window !== undefined) window.dispatchEvent(successEvent);
+  console.log('success event:', eventTarget, successEvent);
+  if (eventTarget !== undefined) eventTarget.dispatchEvent(successEvent);
 }
 
-export function sendCloseWidgetEvent() {
+export function sendCloseWidgetEvent(eventTarget: Window | EventTarget) {
   const closeWidgetEvent = new CustomEvent<WidgetEvent<any>>(
     IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
     {
@@ -41,11 +42,11 @@ export function sendCloseWidgetEvent() {
     },
   );
   // eslint-disable-next-line no-console
-  console.log('close event:', closeWidgetEvent);
-  if (window !== undefined) window.dispatchEvent(closeWidgetEvent);
+  console.log('close event:', eventTarget, closeWidgetEvent);
+  if (eventTarget !== undefined) eventTarget.dispatchEvent(closeWidgetEvent);
 }
 
-export function sendConnectFailedEvent(reason: string) {
+export function sendConnectFailedEvent(eventTarget: Window | EventTarget, reason: string) {
   const failedEvent = new CustomEvent<WidgetEvent<ConnectionFailed>>(
     IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
     {
@@ -57,5 +58,7 @@ export function sendConnectFailedEvent(reason: string) {
       },
     },
   );
-  if (window !== undefined) window.dispatchEvent(failedEvent);
+  // eslint-disable-next-line no-console
+  console.log('failed event:', eventTarget, failedEvent);
+  if (eventTarget !== undefined) eventTarget.dispatchEvent(failedEvent);
 }

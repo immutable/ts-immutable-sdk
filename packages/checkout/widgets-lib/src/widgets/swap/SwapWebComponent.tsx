@@ -86,7 +86,7 @@ export class ImmutableSwap extends ImmutableWebComponent {
           <ConnectLoader
             params={connectLoaderParams}
             widgetConfig={this.widgetConfig!}
-            closeEvent={sendSwapWidgetCloseEvent}
+            closeEvent={() => sendSwapWidgetCloseEvent(window)}
           >
             <SwapWidget
               params={swapParams}

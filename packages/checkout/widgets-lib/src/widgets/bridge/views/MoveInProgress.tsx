@@ -12,6 +12,7 @@ import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { BridgeWidgetViews, PrefilledBridgeForm } from '../../../context/view-context/BridgeViewContextTypes';
 import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { BridgeContext } from '../context/BridgeContext';
+import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 
 interface MoveInProgressProps {
   token: TokenInfo,
@@ -21,6 +22,8 @@ interface MoveInProgressProps {
 
 export function MoveInProgress({ token, transactionResponse, bridgeForm }: MoveInProgressProps) {
   const { viewDispatch } = useContext(ViewContext);
+  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+
   const { heading, body1, body2 } = text.views[BridgeWidgetViews.IN_PROGRESS];
   const {
     bridgeState: {
@@ -86,7 +89,7 @@ export function MoveInProgress({ token, transactionResponse, bridgeForm }: MoveI
       header={(
         <HeaderNavigation
           transparent
-          onCloseButtonClick={sendBridgeWidgetCloseEvent}
+          onCloseButtonClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
         />
       )}
       footer={(

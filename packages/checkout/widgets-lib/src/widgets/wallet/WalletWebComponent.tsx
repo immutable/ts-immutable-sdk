@@ -51,7 +51,7 @@ export class ImmutableWallet extends ImmutableWebComponent {
           <ConnectLoader
             widgetConfig={this.widgetConfig!}
             params={connectLoaderParams}
-            closeEvent={sendWalletWidgetCloseEvent}
+            closeEvent={() => sendWalletWidgetCloseEvent(window)}
           >
             <WalletWidget
               config={this.widgetConfig!}

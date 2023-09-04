@@ -25,6 +25,7 @@ import { DEFAULT_TOKEN_SYMBOLS } from '../../context/crypto-fiat-context/CryptoF
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 import { isPassportProvider } from '../../lib/providerUtils';
 import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextTypes';
+import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 
 interface TopUpViewProps {
   widgetEvent: IMTBLWidgetEvents,
@@ -56,6 +57,7 @@ export function TopUpView({
   const { viewDispatch } = useContext(ViewContext);
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { conversions, fiatSymbol } = cryptoFiatState;
+  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const [swapFeesInFiat, setSwapFeesInFiat] = useState('-.--');
   const [bridgeFeesInFiat, setBridgeFeesInFiat] = useState('-.--');
@@ -138,7 +140,7 @@ export function TopUpView({
       });
       return;
     }
-    orchestrationEvents.sendRequestSwapEvent(widgetEvent, {
+    orchestrationEvents.sendRequestSwapEvent(eventTarget, widgetEvent, {
       fromTokenAddress: '',
       toTokenAddress: tokenAddress ?? '',
       amount: '',
@@ -161,7 +163,7 @@ export function TopUpView({
       });
       return;
     }
-    orchestrationEvents.sendRequestBridgeEvent(widgetEvent, {
+    orchestrationEvents.sendRequestBridgeEvent(eventTarget, widgetEvent, {
       tokenAddress: '',
       amount: '',
     });
@@ -183,7 +185,7 @@ export function TopUpView({
       });
       return;
     }
-    orchestrationEvents.sendRequestOnrampEvent(widgetEvent, {
+    orchestrationEvents.sendRequestOnrampEvent(window, widgetEvent, {
       tokenAddress: tokenAddress ?? '',
       amount: amount ?? '',
     });
