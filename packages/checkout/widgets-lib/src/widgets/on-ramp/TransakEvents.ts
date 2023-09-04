@@ -4,3 +4,15 @@ export enum TransakEvents {
   TRANSAK_ORDER_SUCCESSFUL = 'TRANSAK_ORDER_SUCCESSFUL', // order successfully submitted and completed
   TRANSAK_ORDER_FAILED = 'TRANSAK_ORDER_FAILED', // order processing failed
 }
+
+export enum TransakStatuses {
+  PROCESSING = 'PROCESSING',
+  COMPLETED = 'COMPLETED',
+}
+
+export interface TransakEventData {
+  id: string;
+  status: string;
+  statusReason?: string;
+  transactionHash?: string; // only available for completed txns
+}

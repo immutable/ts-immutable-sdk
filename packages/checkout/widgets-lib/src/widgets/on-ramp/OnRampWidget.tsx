@@ -11,14 +11,24 @@ import {
   SharedViews,
   ViewActions, ViewContext, initialViewState, viewReducer,
 } from '../../context/view-context/ViewContext';
-import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextTypes';
-import { OnRampMain } from './views/OnRampMain';
+import {
+  OnRampFailView,
+  OnRampSuccessView,
+  OnRampWidgetViews,
+} from '../../context/view-context/OnRampViewContextTypes';
 import { LoadingView } from '../../views/loading/LoadingView';
 import { text } from '../../resources/text/textConfig';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 import { TopUpView } from '../../views/top-up/TopUpView';
-import { sendOnRampWidgetCloseEvent } from './OnRampWidgetEvents';
-import { useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import { sendOnRampFailedEvent, sendOnRampSuccessEvent, sendOnRampWidgetCloseEvent } from './OnRampWidgetEvents';
+import { OnRampMain } from './views/OnRampMain';
+import { StatusType } from '../../components/Status/StatusType';
+import { StatusView } from '../../components/Status/StatusView';
+import {
+  AnalyticsControls,
+  useAnalytics,
+  UserJourney,
+} from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { isPassportProvider } from '../../lib/providerUtils';
 
 const LOADING_VIEW_DELAY_MS = 1000;
@@ -36,7 +46,7 @@ export interface OnRampWidgetParams {
 
 export function OnRampWidget(props: OnRampWidgetProps) {
   const { config, params } = props;
-  const { passport } = params;
+  const { passport, amount, contractAddress } = params;
   const {
     theme, isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
   } = config;
@@ -46,23 +56,30 @@ export function OnRampWidget(props: OnRampWidgetProps) {
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
   const [walletAddress, setWalletAddress] = useState('');
-  const [isPassport, setIsPassport] = useState(false);
   const [emailAddress, setEmailAddress] = useState<string | undefined>(undefined);
 
   const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
     : onDarkBase;
 
-  const { initialLoadingText } = text.views[OnRampWidgetViews.ONRAMP];
+  const {
+    initialLoadingText, IN_PROGRESS, SUCCESS, FAIL,
+  } = text.views[OnRampWidgetViews.ONRAMP];
+
+  const showIframe = useMemo(
+    () => viewState.view.type === OnRampWidgetViews.ONRAMP,
+    [viewState.view.type],
+  );
+
   const { track } = useAnalytics();
 
   useEffect(() => {
     const setDataFromProvider = async () => {
       if (!provider) return;
+
       const userWalletAddress = await provider.getSigner().getAddress();
       setWalletAddress(userWalletAddress);
       const isPassportUser = isPassportProvider(provider);
-      setIsPassport(isPassportUser);
       let userInfo:UserProfile | undefined;
       if (isPassportUser && passport) {
         userInfo = await passport.getUserInfo();
@@ -70,9 +87,9 @@ export function OnRampWidget(props: OnRampWidgetProps) {
       }
 
       track({
-        userJourney: 'OnRamp',
+        userJourney: UserJourney.ON_RAMP,
         screen: 'Onramp-widget-load',
-        control: 'WidgetInitialisation',
+        control: AnalyticsControls.WIDGET_INITIALISATION,
         controlType: 'WidgetLoad',
         action: 'Opened',
         userId: userWalletAddress,
@@ -81,7 +98,7 @@ export function OnRampWidget(props: OnRampWidgetProps) {
       });
     };
     setDataFromProvider();
-  }, [provider]);
+  }, [provider, passport]);
 
   useEffect(() => {
     if (!checkout || !provider) return;
@@ -99,7 +116,13 @@ export function OnRampWidget(props: OnRampWidgetProps) {
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,
-            view: { type: OnRampWidgetViews.ONRAMP },
+            view: {
+              type: OnRampWidgetViews.ONRAMP,
+              data: {
+                amount: viewState.view.data?.amount ?? amount,
+                contractAddress: viewState.view.data?.contractAddress ?? contractAddress,
+              },
+            },
           },
         });
       }, LOADING_VIEW_DELAY_MS);
@@ -112,22 +135,74 @@ export function OnRampWidget(props: OnRampWidgetProps) {
         {viewState.view.type === SharedViews.LOADING_VIEW && (
           <LoadingView loadingText={initialLoadingText} showFooterLogo />
         )}
-        {viewState.view.type === OnRampWidgetViews.ONRAMP && (
-          <OnRampMain
-            walletAddress={walletAddress}
-            email={emailAddress}
-            tokenAmount={params.amount}
-            tokenAddress={params.contractAddress}
-            passport={isPassport ? passport : undefined}
+        {viewState.view.type === OnRampWidgetViews.IN_PROGRESS && (
+          <LoadingView loadingText={IN_PROGRESS.loading.text} showFooterLogo />
+        )}
+
+        {viewState.view.type === OnRampWidgetViews.SUCCESS && (
+          <StatusView
+            statusText={SUCCESS.text}
+            actionText={SUCCESS.actionText}
+            onRenderEvent={() => sendOnRampSuccessEvent(
+              window,
+              (viewState.view as OnRampSuccessView).data.transactionHash,
+            )}
+            onActionClick={() => sendOnRampWidgetCloseEvent(window)}
+            statusType={StatusType.SUCCESS}
+            testId="success-view"
           />
         )}
+
+        {viewState.view.type === OnRampWidgetViews.FAIL && (
+          <StatusView
+            statusText={FAIL.text}
+            actionText={FAIL.actionText}
+            onRenderEvent={() => sendOnRampFailedEvent(
+              window,
+              (viewState.view as OnRampFailView).reason
+                  ?? 'Transaction failed',
+            )}
+            onActionClick={() => {
+              viewDispatch({
+                payload: {
+                  type: ViewActions.UPDATE_VIEW,
+                  view: {
+                    type: OnRampWidgetViews.ONRAMP,
+                    data: viewState.view.data,
+                  },
+                },
+              });
+            }}
+            statusType={StatusType.FAILURE}
+            onCloseClick={() => sendOnRampWidgetCloseEvent(window)}
+            testId="fail-view"
+          />
+        )}
+
+        {/* This keeps Transak's iframe instance in dom so as to listen to transak's events. */}
+        {/* We will remove the iframe instance once the processing has been finalised, either as a success or a failure */}
+        {(viewState.view.type === OnRampWidgetViews.IN_PROGRESS
+        || viewState.view.type === OnRampWidgetViews.ONRAMP
+        ) && (
+        <OnRampMain
+          walletAddress={walletAddress}
+          passport={passport}
+          email={emailAddress}
+          showIframe={showIframe}
+          tokenAmount={viewState.view.data?.amount ?? amount}
+          tokenAddress={
+            viewState.view.data?.contractAddress ?? contractAddress
+          }
+        />
+        )}
+
         {viewState.view.type === SharedViews.TOP_UP_VIEW && (
           <TopUpView
             widgetEvent={IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT}
             showOnrampOption={isOnRampEnabled}
             showSwapOption={isSwapEnabled}
             showBridgeOption={isBridgeEnabled}
-            onCloseButtonClick={sendOnRampWidgetCloseEvent}
+            onCloseButtonClick={() => sendOnRampWidgetCloseEvent(window)}
           />
         )}
       </ViewContext.Provider>
