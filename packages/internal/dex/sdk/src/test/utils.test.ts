@@ -1,54 +1,64 @@
 import {
-  howMuchAmountOut, howMuchAmountIn, formatAmount, IMX_TEST_TOKEN, uniqBy,
+  amountOutFromAmountIn, amountInFromAmountOut, formatAmount, IMX_TEST_TOKEN, uniqBy,
   USDC_TEST_TOKEN, WETH_TEST_TOKEN, newAmountFromString,
 } from './utils';
 
 describe('exchangeAmount', () => {
-  describe('when the decimals are the same', () => {
-    it('exactAmountIn: have 1 IMX - want WETH', () => {
-      const exchangeRate = 10;
-      const imxAmount = newAmountFromString('1', IMX_TEST_TOKEN);
-      const wethAmount = howMuchAmountOut(imxAmount, WETH_TEST_TOKEN, exchangeRate);
-      expect(formatAmount(wethAmount)).toEqual('10.0');
+  describe('when the input and output token decimals are the same', () => {
+    describe('when amount-in', () => {
+      it('should multiply the amount-in by the exchange rate', () => {
+        const exchangeRate = 10;
+        const imxAmount = newAmountFromString('1', IMX_TEST_TOKEN);
+        const wethAmount = amountOutFromAmountIn(imxAmount, WETH_TEST_TOKEN, exchangeRate);
+        expect(formatAmount(wethAmount)).toEqual('10.0');
+      });
     });
 
-    it('exactAmountOut: have 10 WETH - want IMX', () => {
-      const exchangeRate = 10;
-      const wethAmount = newAmountFromString('10', WETH_TEST_TOKEN);
-      const imxAmount = howMuchAmountIn(wethAmount, IMX_TEST_TOKEN, exchangeRate);
-      expect(formatAmount(imxAmount)).toEqual('1.0');
+    describe('when amount-out', () => {
+      it('should divide the amount-out by the exchange rate', () => {
+        const exchangeRate = 10;
+        const wethAmount = newAmountFromString('10', WETH_TEST_TOKEN);
+        const imxAmount = amountInFromAmountOut(wethAmount, IMX_TEST_TOKEN, exchangeRate);
+        expect(formatAmount(imxAmount)).toEqual('1.0');
+      });
     });
   });
 
-  describe('when the decimals are different', () => {
-    describe('when given exact amount in', () => {
-      it('should multiply the amount in by the exchange rate', () => {
-         const exchangeRate = 10; // 1 IMX = 10 USDC
+  describe('when the input token and output token decimals are different', () => {
+    describe('when amount-in has higher decimals', () => {
+      it('should multiply the amount-in by the exchange rate', () => {
+        const exchangeRate = 10; // 1 IMX = 10 USDC
         const imxAmount = newAmountFromString('1', IMX_TEST_TOKEN);
-        const usdcAmount = howMuchAmountOut(imxAmount, USDC_TEST_TOKEN, exchangeRate);
+        const usdcAmount = amountOutFromAmountIn(imxAmount, USDC_TEST_TOKEN, exchangeRate);
         expect(formatAmount(usdcAmount)).toEqual('10.0');
-      }
-    }
-
-    it('exactAmountIn: have 1 USDC - how much IMX?', () => {
-      const exchangeRate = 10; // 1 USDC = 10 IMX
-      const usdcAmount = newAmountFromString('1', USDC_TEST_TOKEN);
-      const imxAmount = howMuchAmountOut(usdcAmount, IMX_TEST_TOKEN, exchangeRate);
-      expect(formatAmount(imxAmount)).toEqual('10.0');
+      });
     });
 
-    it('exactAmountOut: want 10 USDC - how much IMX?', () => {
-      const exchangeRate = 10; // 1 USDC = 0.1 IMX
-      const usdcAmount = newAmountFromString('10', USDC_TEST_TOKEN);
-      const imxAmount = howMuchAmountIn(usdcAmount, IMX_TEST_TOKEN, exchangeRate);
-      expect(formatAmount(imxAmount)).toEqual('1.0');
+    describe('when amount-in has lower decimals', () => {
+      it('should multiply the amount-in by the exchange rate', () => {
+        const exchangeRate = 10; // 1 USDC = 10 IMX
+        const usdcAmount = newAmountFromString('1', USDC_TEST_TOKEN);
+        const imxAmount = amountOutFromAmountIn(usdcAmount, IMX_TEST_TOKEN, exchangeRate);
+        expect(formatAmount(imxAmount)).toEqual('10.0');
+      });
     });
 
-    it('exactAmountOut: want 10 IMX - how much USDC?', () => {
-      const exchangeRate = 10; // 1 IMX = 10 USDC
-      const imxAmount = newAmountFromString('10', IMX_TEST_TOKEN);
-      const usdcAmount = howMuchAmountIn(imxAmount, USDC_TEST_TOKEN, exchangeRate);
-      expect(formatAmount(usdcAmount)).toEqual('1.0');
+    describe('when amount-out has higher decimals', () => {
+      it('should divide the amount-out by the exchange rate', () => {
+        const exchangeRate = 10; // 1 IMX = 10 USDC
+        const imxAmount = newAmountFromString('10', IMX_TEST_TOKEN);
+        const usdcAmount = amountInFromAmountOut(imxAmount, USDC_TEST_TOKEN, exchangeRate);
+        expect(formatAmount(usdcAmount)).toEqual('1.0');
+      });
+    });
+
+    describe('when amount-out has lower decimals', () => {
+      it('should divide the amount-out by the exchange rate', () => {
+        const exchangeRate = 10; // 1 USDC = 0.1 IMX
+        const usdcAmount = newAmountFromString('10', USDC_TEST_TOKEN);
+        const imxAmount = amountInFromAmountOut(usdcAmount, IMX_TEST_TOKEN, exchangeRate);
+        expect(formatAmount(imxAmount)).toEqual('1.0');
+      });
     });
   });
 });

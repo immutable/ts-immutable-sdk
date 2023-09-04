@@ -363,7 +363,7 @@ type MockParams = {
   exchangeRate?: number;
 };
 
-export const howMuchAmountOut = (amountIn: Amount, tokenOut: TokenInfo, exchangeRate: number) => {
+export const amountOutFromAmountIn = (amountIn: Amount, tokenOut: TokenInfo, exchangeRate: number) => {
   let amountOut = amountIn.value.mul(exchangeRate); // 10 * 10^18
 
   if (amountIn.token.decimals > tokenOut.decimals) {
@@ -377,7 +377,7 @@ export const howMuchAmountOut = (amountIn: Amount, tokenOut: TokenInfo, exchange
   return newAmount(amountOut, tokenOut);
 };
 
-export const howMuchAmountIn = (amountOut: Amount, tokenIn: TokenInfo, exchangeRate: number) => {
+export const amountInFromAmountOut = (amountOut: Amount, tokenIn: TokenInfo, exchangeRate: number) => {
   let amountIn = amountOut.value.div(exchangeRate); // 1 * 10^6
 
   if (tokenIn.decimals > amountOut.token.decimals) {
@@ -412,10 +412,10 @@ export function mockRouterImplementation(params: MockParams) {
     );
 
     const amountIn = tradeType === TradeType.EXACT_INPUT
-      ? amountSpecified : howMuchAmountIn(amountSpecified, tokenIn, exchangeRate);
+      ? amountSpecified : amountInFromAmountOut(amountSpecified, tokenIn, exchangeRate);
 
     const amountOut = tradeType === TradeType.EXACT_INPUT
-      ? howMuchAmountOut(amountSpecified, tokenOut, exchangeRate) : amountSpecified;
+      ? amountOutFromAmountIn(amountSpecified, tokenOut, exchangeRate) : amountSpecified;
 
     const trade: QuoteResult = {
       route,
