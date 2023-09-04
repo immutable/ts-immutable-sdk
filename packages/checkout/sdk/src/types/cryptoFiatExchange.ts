@@ -3,15 +3,6 @@ import { Passport } from '@imtbl/passport';
 import { BigNumber } from 'ethers';
 
 /**
- * An enum representing the on-ramp provider name.
- * @enum {string}
- * @property {string} TRANSAK - The on-ramp provider name.
- */
-export enum OnRampProvider {
-  TRANSAK = 'transak',
-}
-
-/**
  * An enum representing the type of exchange.
  * @enum {string}
  * @property {string} ONRAMP - The exchange type for transacting.
@@ -22,7 +13,6 @@ export enum ExchangeType {
 
 /**
  * Interface representing the result of {@link Checkout.generateTransakWidgetUrl}.
- * @property {OnRampProvider} onRampProvider - The OnRampProvider specified.
  * @property {ExchangeType} exchangeType - The ExchangeType specified.
  * @property {Web3Provider} web3Provider - The Web3Provider used to exchange.
  * @property {string | undefined} tokenAmount - The token amount specified as input.
@@ -30,7 +20,6 @@ export enum ExchangeType {
  * @property {Passport | undefined} passport - The Passport instance specified as input.
  */
 export interface CryptoFiatExchangeParams {
-  onRampProvider:OnRampProvider;
   exchangeType: ExchangeType;
   web3Provider: Web3Provider;
   tokenAmount?: BigNumber;

@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { CryptoFiatExchangeService, CryptoFiatExchangeWidgetParams } from './cryptoFiatExchange';
-import { ExchangeType, OnRampProvider } from '../types/cryptoFiatExchange';
+import { ExchangeType } from '../types/cryptoFiatExchange';
 
 const defaultWidgetUrl = 'https://global-stg.transak.com?apiKey=41ad2da7-ed5a-4d89-a90b-c751865effc2'
 + '&network=immutablezkevm&defaultPaymentMethod=credit_debit_card&disablePaymentMethods=sepa_bank_transfer,'
@@ -18,7 +18,6 @@ describe('cryptoFiatExchange', () => {
   describe('createWidgetUrl', () => {
     it('should return widget url with non-configurable query params when onRampProvider is Transak', async () => {
       const params: CryptoFiatExchangeWidgetParams = {
-        onRampProvider: OnRampProvider.TRANSAK,
         exchangeType: ExchangeType.ONRAMP,
         isPassport: false,
       };
@@ -34,7 +33,6 @@ describe('cryptoFiatExchange', () => {
     it(`should return widget url with encoded email, isAutoFillUserData and disableWalletAddressForm query params
     for passport users`, async () => {
       const params: CryptoFiatExchangeWidgetParams = {
-        onRampProvider: OnRampProvider.TRANSAK,
         exchangeType: ExchangeType.ONRAMP,
         isPassport: true,
         email: 'passport.user@immutable.com',
@@ -48,7 +46,6 @@ describe('cryptoFiatExchange', () => {
     it(`should return widget url with defaultCryptoAmount and cryptoCurrencyCode query params when tokenAmount and
     tokenSymbol is present`, async () => {
       const params: CryptoFiatExchangeWidgetParams = {
-        onRampProvider: OnRampProvider.TRANSAK,
         exchangeType: ExchangeType.ONRAMP,
         isPassport: false,
         tokenAmount: BigNumber.from(100),
@@ -62,7 +59,6 @@ describe('cryptoFiatExchange', () => {
 
     it('should return widget url with walletAddress query params when walletAddress is present', async () => {
       const params: CryptoFiatExchangeWidgetParams = {
-        onRampProvider: OnRampProvider.TRANSAK,
         exchangeType: ExchangeType.ONRAMP,
         isPassport: false,
         walletAddress: '0x1234567890',

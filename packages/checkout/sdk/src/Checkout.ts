@@ -365,17 +365,11 @@ export class Checkout {
       email = userInfo?.email;
     }
 
-    const networkInfo = await network.getNetworkInfo(this.config, params.web3Provider);
-
-    const tokenList = await this.getTokenAllowList({
-      type: TokenFilterTypes.ONRAMP,
-      chainId: networkInfo.chainId,
-    });
+    const tokenList = await tokens.getTokenAllowList(this.config, { type: TokenFilterTypes.ONRAMP });
 
     const token = tokenList.tokens.find((t) => t.address === params.tokenAddress);
 
     return await this.cryptoFiatExchangeService.createWidgetUrl({
-      onRampProvider: params.onRampProvider,
       exchangeType: params.exchangeType,
       isPassport,
       walletAddress,

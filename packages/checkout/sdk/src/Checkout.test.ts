@@ -39,7 +39,7 @@ import { getWalletAllowList } from './wallet';
 import { buy } from './smartCheckout/buy';
 import { smartCheckout } from './smartCheckout';
 import { CryptoFiatExchangeService } from './cryptoFiatExchange';
-import { CryptoFiatExchangeParams, ExchangeType, OnRampProvider } from './types/cryptoFiatExchange';
+import { CryptoFiatExchangeParams, ExchangeType } from './types/cryptoFiatExchange';
 
 jest.mock('./connect');
 jest.mock('./network');
@@ -605,7 +605,6 @@ describe('Connect', () => {
     it(`should call cryptoFiatExchangeService.createWidgetUrl with correct params
       when only onRampProvider, exchangeType and web3Provider are provided`, async () => {
       const params: CryptoFiatExchangeParams = {
-        onRampProvider: OnRampProvider.TRANSAK,
         exchangeType: ExchangeType.ONRAMP,
         web3Provider: mockProvider,
       };
@@ -614,7 +613,6 @@ describe('Connect', () => {
 
       expect(createWidgetUrlMock).toBeCalledTimes(1);
       expect(createWidgetUrlMock).toBeCalledWith({
-        onRampProvider: OnRampProvider.TRANSAK,
         exchangeType: ExchangeType.ONRAMP,
         isPassport: false,
         walletAddress: '0xADDRESS',
@@ -651,7 +649,6 @@ describe('Connect', () => {
       (getTokenAllowList as jest.Mock).mockResolvedValue(getTokenAllowListResult);
 
       const params: CryptoFiatExchangeParams = {
-        onRampProvider: OnRampProvider.TRANSAK,
         exchangeType: ExchangeType.ONRAMP,
         web3Provider: mockProvider,
         tokenAmount: BigNumber.from(10),
@@ -662,7 +659,6 @@ describe('Connect', () => {
 
       expect(createWidgetUrlMock).toBeCalledTimes(1);
       expect(createWidgetUrlMock).toBeCalledWith({
-        onRampProvider: OnRampProvider.TRANSAK,
         exchangeType: ExchangeType.ONRAMP,
         isPassport: false,
         walletAddress: '0xADDRESS',
@@ -694,7 +690,6 @@ describe('Connect', () => {
       } as unknown as Passport;
 
       const params: CryptoFiatExchangeParams = {
-        onRampProvider: OnRampProvider.TRANSAK,
         exchangeType: ExchangeType.ONRAMP,
         web3Provider: mockProvider,
         passport: mockPassport,
@@ -704,7 +699,6 @@ describe('Connect', () => {
 
       expect(createWidgetUrlMock).toBeCalledTimes(1);
       expect(createWidgetUrlMock).toBeCalledWith({
-        onRampProvider: OnRampProvider.TRANSAK,
         exchangeType: ExchangeType.ONRAMP,
         isPassport: true,
         walletAddress: '0xADDRESS',

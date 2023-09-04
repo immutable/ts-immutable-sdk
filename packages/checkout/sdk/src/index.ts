@@ -7,7 +7,6 @@ export {
   GasEstimateType,
   GasTokenType,
   ItemType,
-  OnRampProvider,
   NetworkFilterTypes,
   TokenFilterTypes,
   TransactionOrGasType,

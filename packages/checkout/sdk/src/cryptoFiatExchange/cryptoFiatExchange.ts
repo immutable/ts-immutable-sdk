@@ -1,10 +1,9 @@
 import { Environment } from '@imtbl/config';
 import { BigNumber } from 'ethers';
-import { ExchangeType, OnRampProvider } from '../types/cryptoFiatExchange';
+import { ExchangeType } from '../types/cryptoFiatExchange';
 import { TRANSAK_API_BASE_URL, TRANSAK_PUBLISHABLE_KEY } from '../types';
 
 export interface CryptoFiatExchangeWidgetParams {
-  onRampProvider: OnRampProvider;
   exchangeType: ExchangeType;
   isPassport: boolean;
   walletAddress?: string;
@@ -25,11 +24,7 @@ export class CryptoFiatExchangeService {
   }
 
   public async createWidgetUrl(params: CryptoFiatExchangeWidgetParams): Promise<string> {
-    switch (params.onRampProvider) {
-      case OnRampProvider.TRANSAK:
-        return this.getTransakWidgetUrl(params);
-      default: return '';
-    }
+    return this.getTransakWidgetUrl(params);
   }
 
   private getTransakWidgetUrl(params: CryptoFiatExchangeWidgetParams): string {

@@ -4,7 +4,7 @@ import {
   useContext, useEffect, useMemo, useState,
 } from 'react';
 import { BigNumber } from 'ethers';
-import { ExchangeType, OnRampProvider } from '@imtbl/checkout-sdk';
+import { ExchangeType } from '@imtbl/checkout-sdk';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { sendOnRampWidgetCloseEvent } from '../OnRampWidgetEvents';
@@ -97,7 +97,6 @@ export function OnRampMain({
 
     (async () => {
       const params = {
-        onRampProvider: OnRampProvider.TRANSAK,
         exchangeType: ExchangeType.ONRAMP,
         web3Provider: provider,
         tokenAddress,
