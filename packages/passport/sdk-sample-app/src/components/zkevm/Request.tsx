@@ -16,12 +16,14 @@ enum EthereumParamType {
   string = 'string',
   flag = 'flag',
   object = 'object',
+  json = 'json',
 }
 
 interface EthereumParam {
   name: string;
   type?: EthereumParamType;
   default?: string;
+  placeholder?: string;
 }
 
 interface EthereumMethod {
@@ -44,7 +46,7 @@ const EthereumMethods: EthereumMethod[] = [
     name: 'eth_signTypedData_v4',
     params: [
       { name: 'address' },
-      { name: 'payload' },
+      { name: 'payload', type: EthereumParamType.json, placeholder: 'A valid JSON string' },
     ],
     exampleComponents: EthSignTypedDataV4Examples,
   },
@@ -243,6 +245,7 @@ function Request({ showModal, setShowModal }: ModalProps) {
                       newParams[index] = e.target.value;
                       setParams(newParams);
                     }}
+                    placeholder={param.placeholder}
                   />
                 </div>
               ))

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   Accordion, Alert, Form, Spinner, Stack,
 } from 'react-bootstrap';
@@ -6,30 +6,17 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import { usePassportProvider } from '@/context/PassportProvider';
 import WorkflowButton from '@/components/WorkflowButton';
 import { RequestExampleProps } from '@/types';
-import { getEtherMailTypedPayload } from './etherMailTypedPayload';
 import { isSignatureValid } from './isSignatureValid';
 
-function ValidateEtherMail({ disabled }: RequestExampleProps) {
+function ValidateSignature({ disabled }: RequestExampleProps) {
   const [address, setAddress] = useState<string>('');
   const [signature, setSignature] = useState<string>('');
+  const [payload, setPayload] = useState<string>('');
   const [isValidSignature, setIsValidSignature] = useState<boolean | undefined>();
   const [signatureValidationMessage, setSignatureValidationMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [etherMailTypedPayload, setEtherMailTypedPayload] = useState<string>('');
 
   const { zkEvmProvider } = usePassportProvider();
-
-  useEffect(() => {
-    const populateParams = async () => {
-      if (zkEvmProvider) {
-        const chainIdHex = await zkEvmProvider.request({ method: 'eth_chainId' });
-        const chainId = parseInt(chainIdHex, 16);
-        setEtherMailTypedPayload(getEtherMailTypedPayload(chainId));
-      }
-    };
-
-    populateParams().catch(console.log);
-  }, [zkEvmProvider]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -46,13 +33,7 @@ function ValidateEtherMail({ disabled }: RequestExampleProps) {
         return;
       }
 
-      if (!etherMailTypedPayload) {
-        setIsValidSignature(false);
-        setSignatureValidationMessage('Example typedDataPayload cannot be null');
-        return;
-      }
-
-      const isValid = await isSignatureValid(address, etherMailTypedPayload, signature, zkEvmProvider);
+      const isValid = await isSignatureValid(address, payload, signature, zkEvmProvider);
 
       setIsValidSignature(isValid);
       setSignatureValidationMessage(isValid ? 'Signature is valid' : 'Signature is invalid');
@@ -62,11 +43,11 @@ function ValidateEtherMail({ disabled }: RequestExampleProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [address, etherMailTypedPayload, signature, zkEvmProvider]);
+  }, [address, payload, signature, zkEvmProvider]);
 
   return (
-    <Accordion.Item eventKey="2">
-      <Accordion.Header>Validate Ether Mail Signature</Accordion.Header>
+    <Accordion.Item eventKey="0">
+      <Accordion.Header>Validate Signature</Accordion.Header>
       <Accordion.Body>
         <Alert variant="warning">
           Note: This functionality is not provided by the Immutable SDK.
@@ -90,8 +71,8 @@ function ValidateEtherMail({ disabled }: RequestExampleProps) {
             </Form.Label>
             <Form.Control
               required
-              value={etherMailTypedPayload}
-              disabled
+              value={payload}
+              onChange={(e) => setPayload(e.target.value)}
               type="text"
             />
           </Form.Group>
@@ -133,4 +114,4 @@ function ValidateEtherMail({ disabled }: RequestExampleProps) {
   );
 }
 
-export default ValidateEtherMail;
+export default ValidateSignature;

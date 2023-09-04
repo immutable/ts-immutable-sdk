@@ -51,8 +51,8 @@ function SignEtherMail({ disabled, handleExampleSubmitted }: RequestExampleProps
   }, [params, handleExampleSubmitted]);
 
   return (
-    <Accordion.Item eventKey="0">
-      <Accordion.Header>Sign Ether Mail Example</Accordion.Header>
+    <Accordion.Item eventKey="1">
+      <Accordion.Header>Sign Ether Mail Payload</Accordion.Header>
       <Accordion.Body>
         <Form noValidate onSubmit={handleSubmitSignPayload} className="mb-4">
           <Form.Group className="mb-3">
@@ -63,7 +63,7 @@ function SignEtherMail({ disabled, handleExampleSubmitted }: RequestExampleProps
               readOnly
               as="textarea"
               rows={7}
-              value={JSON.stringify(params, null, '\t')}
+              value={JSON.stringify(params, null, '\t').replaceAll('\\n', '')}
               style={{
                 fontSize: '0.8rem',
               }}

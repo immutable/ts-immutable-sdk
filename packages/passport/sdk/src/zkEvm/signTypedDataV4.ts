@@ -40,14 +40,17 @@ export const signTypedDataV4 = async ({
     throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, `Failed to parse typed data JSON: ${ex}`);
   }
 
+  const { chainId } = await jsonRpcProvider.ready;
+
+  if (typedData.domain?.chainId && typedData.domain.chainId !== (await jsonRpcProvider.ready).chainId) {
+    throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'Invalid chainId');
+  }
+
   // ID-959: Submit raw typedData payload to Guardian for evaluation
 
   const relayerSignature = await relayerClient.imSignTypedData(fromAddress, typedData);
-
-  const { chainId } = await jsonRpcProvider.ready;
-  const chainIdBigNumber = BigNumber.from(chainId);
   const magicWeb3Provider = new Web3Provider(magicProvider);
   const signer = magicWeb3Provider.getSigner();
 
-  return getSignedTypedData(typedData, relayerSignature, chainIdBigNumber, fromAddress, signer);
+  return getSignedTypedData(typedData, relayerSignature, BigNumber.from(chainId), fromAddress, signer);
 };
