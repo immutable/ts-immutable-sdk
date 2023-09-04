@@ -7,6 +7,7 @@ import { getTokenSymbol } from '../utils/getTokenSymbol';
 import { AmountInput } from './AmountInput';
 import { SecondaryFeeInput } from './SecondaryFeeInput';
 import { FeeBreakdown } from './FeeBreakdown';
+import { SendIt } from './SendIt';
 
 type mapping = {
   [address: string]: string;
@@ -144,6 +145,8 @@ export function Example() {
       </h3>
 
       <hr className="my-4" />
+
+      <SendIt ethereumAccount={ethereumAccount} />
 
       <SecondaryFeeInput setSecondaryFeeRecipient={setSecondaryFeeRecipient} setFeePercentage={setFeePercentage}/>
       <AmountInput
