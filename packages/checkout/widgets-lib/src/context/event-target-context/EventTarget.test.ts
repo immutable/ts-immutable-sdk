@@ -1,3 +1,7 @@
+/*
+ * @jest-environment jsdom
+ */
+
 import { describe, expect } from '@jest/globals';
 import {
   EventTargetActions,

@@ -12,7 +12,7 @@ const config: Config = {
     '@imtbl/dex-sdk': '<rootDir>../../internal/dex/sdk/src',
     '@imtbl/orderbook': '<rootDir>../../orderbook/src',
   },
-  testEnvironment: 'jsdom',
+  testEnvironment: 'node',
   transform: {
     '^.+\\.(t|j)sx?$': '@swc/jest',
   },
