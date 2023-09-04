@@ -1,6 +1,10 @@
+import { Passport } from '@imtbl/passport';
 import { Box } from '@biom3/react';
-import { Environment } from '@imtbl/config';
-import { useContext, useEffect, useMemo } from 'react';
+import {
+  useContext, useEffect, useMemo, useState,
+} from 'react';
+import { BigNumber } from 'ethers';
+import { ExchangeType } from '@imtbl/checkout-sdk';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { sendOnRampWidgetCloseEvent } from '../OnRampWidgetEvents';
@@ -13,29 +17,32 @@ import {
   useAnalytics, UserJourney,
 } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { TransakEventData, TransakEvents, TransakStatuses } from '../TransakEvents';
+import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 
+const transakIframeId = 'transak-iframe';
+const transakOrigin = 'transak.com';
 interface OnRampProps {
-  environment: Environment;
   walletAddress?: string;
   email?: string;
-  isPassport?: boolean;
-  amount?: string;
-  contractAddress?: string;
   showIframe: boolean;
+  tokenAmount?: string;
+  tokenAddress?: string;
+  passport?: Passport;
 }
 export function OnRampMain({
-  environment, walletAddress, isPassport, email, showIframe, amount, contractAddress,
+  walletAddress, passport, email, showIframe, tokenAmount, tokenAddress,
 }: OnRampProps) {
+  const { connectLoaderState } = useContext(ConnectLoaderContext);
+  const { checkout, provider } = connectLoaderState;
   const { header } = text.views[OnRampWidgetViews.ONRAMP];
   const { viewState } = useContext(ViewContext);
   const { viewDispatch } = useContext(ViewContext);
+  const [widgetUrl, setWidgetUrl] = useState<string>('');
+
+  const isPassport = !!passport && (provider?.provider as any)?.isPassport;
 
   const showBackButton = useMemo(() => viewState.history.length > 2
     && viewState.history[viewState.history.length - 2].type === SharedViews.TOP_UP_VIEW, [viewState.history]);
-
-  const url = environment === Environment.SANDBOX
-    ? 'https://global-stg.transak.com?apiKey=41ad2da7-ed5a-4d89-a90b-c751865effc2'
-    : '';
 
   const { track } = useAnalytics();
 
@@ -131,8 +138,8 @@ export function OnRampMain({
           view: {
             type: OnRampWidgetViews.FAIL,
             data: {
-              amount,
-              contractAddress,
+              amount: tokenAmount,
+              contractAddress: tokenAddress,
             },
             reason: `Transaction failed: ${eventData.statusReason}`,
           },
@@ -142,27 +149,38 @@ export function OnRampMain({
   };
 
   useEffect(() => {
-    const domIframe:HTMLIFrameElement = document.getElementById('transak-iframe') as HTMLIFrameElement;
+    if (!checkout || !provider) return;
+
+    (async () => {
+      const params = {
+        exchangeType: ExchangeType.ONRAMP,
+        web3Provider: provider,
+        tokenAddress,
+        tokenAmount: tokenAmount ? BigNumber.from(tokenAmount) : undefined,
+        passport,
+      };
+
+      setWidgetUrl(await checkout.createCryptoFiatExchangeUrl(params));
+    })();
+
+    const domIframe:HTMLIFrameElement = document.getElementById(transakIframeId) as HTMLIFrameElement;
 
     if (domIframe === undefined) return;
 
-    const handler = (event: any) => {
-      if (event.source === domIframe.contentWindow) {
-        if (event.origin === 'https://global-stg.transak.com') {
-          // eslint-disable-next-line no-console
-          console.log('TRANSAK event data: ', event.data);
-          trackSegmentEvents(event.data);
-          transakEventHandler(event.data);
-        }
+    const handleTransakEvents = (event: any) => {
+      if (event.source === domIframe.contentWindow
+        && event.origin.toLowerCase().includes(transakOrigin)) {
+        trackSegmentEvents(event.data);
+        transakEventHandler(event.data);
       }
     };
-    window.addEventListener('message', handler);
+    window.addEventListener('message', handleTransakEvents);
 
     // eslint-disable-next-line consistent-return
     return () => {
-      window.removeEventListener('message', handler);
+      window.removeEventListener('message', handleTransakEvents);
     };
-  }, []);
+  }, [checkout, provider, tokenAmount, tokenAddress, passport]);
 
   return (
     <Box sx={boxMainStyle(showIframe)}>
@@ -179,8 +197,8 @@ export function OnRampMain({
         <Box sx={containerStyle(showIframe)}>
           <iframe
             title="Transak title"
-            id="transak-iframe"
-            src={url}
+            id={transakIframeId}
+            src={widgetUrl}
             allow="camera;microphone;fullscreen;payment"
             style={{
               height: '100%', width: '100%', border: 'none', position: 'absolute',

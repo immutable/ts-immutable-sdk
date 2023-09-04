@@ -48,7 +48,7 @@ export function OnRampWidget(props: OnRampWidgetProps) {
   const { config, params } = props;
   const { passport, amount, contractAddress } = params;
   const {
-    environment, theme, isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
+    theme, isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
   } = config;
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
   const viewReducerValues = useMemo(() => ({ viewState, viewDispatch }), [viewState, viewReducer]);
@@ -56,7 +56,6 @@ export function OnRampWidget(props: OnRampWidgetProps) {
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
   const [walletAddress, setWalletAddress] = useState('');
-  const [isPassport, setIsPassport] = useState(false);
   const [emailAddress, setEmailAddress] = useState<string | undefined>(undefined);
 
   const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
@@ -81,7 +80,6 @@ export function OnRampWidget(props: OnRampWidgetProps) {
       const userWalletAddress = await provider.getSigner().getAddress();
       setWalletAddress(userWalletAddress);
       const isPassportUser = isPassportProvider(provider);
-      setIsPassport(isPassportUser);
       let userInfo:UserProfile | undefined;
       if (isPassportUser && passport) {
         userInfo = await passport.getUserInfo();
@@ -163,17 +161,15 @@ export function OnRampWidget(props: OnRampWidgetProps) {
                   ?? 'Transaction failed',
             )}
             onActionClick={() => {
-              if (viewState.view.type === OnRampWidgetViews.FAIL) {
-                viewDispatch({
-                  payload: {
-                    type: ViewActions.UPDATE_VIEW,
-                    view: {
-                      type: OnRampWidgetViews.ONRAMP,
-                      data: viewState.view.data,
-                    },
+              viewDispatch({
+                payload: {
+                  type: ViewActions.UPDATE_VIEW,
+                  view: {
+                    type: OnRampWidgetViews.ONRAMP,
+                    data: viewState.view.data,
                   },
-                });
-              }
+                },
+              });
             }}
             statusType={StatusType.FAILURE}
             onCloseClick={sendOnRampWidgetCloseEvent}
@@ -187,13 +183,12 @@ export function OnRampWidget(props: OnRampWidgetProps) {
         || viewState.view.type === OnRampWidgetViews.ONRAMP
         ) && (
         <OnRampMain
-          environment={environment}
           walletAddress={walletAddress}
-          isPassport={isPassport}
+          passport={passport}
           email={emailAddress}
           showIframe={showIframe}
-          amount={viewState.view.data?.amount ?? amount}
-          contractAddress={
+          tokenAmount={viewState.view.data?.amount ?? amount}
+          tokenAddress={
             viewState.view.data?.contractAddress ?? contractAddress
           }
         />
