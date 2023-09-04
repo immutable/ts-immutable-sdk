@@ -348,5 +348,14 @@ function onLoadHandler() {
   });
 }
 
-window.addEventListener('load', onLoadHandler);
 console.log('index.ts loaded');
+
+function winLoad(callback: { (): void }) {
+  if (document.readyState === 'complete') {
+    callback();
+  } else {
+    window.addEventListener('load', callback);
+  }
+}
+
+winLoad(onLoadHandler);

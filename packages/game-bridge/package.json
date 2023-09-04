@@ -16,8 +16,17 @@
   },
   "source": "src/index.html",
   "targets": {
-    "game": {
+    "unity": {
       "context": "browser",
+      "source": "src/index.html",
+      "engines": {
+        "browsers": "Chrome 90"
+      }
+    },
+    "unreal": {
+      "outputFormat": "global",
+      "context": "browser",
+      "source": "src/index.ts",
       "engines": {
         "browsers": "Chrome 90"
       }
