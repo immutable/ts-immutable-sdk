@@ -37,6 +37,16 @@ export const BLOCKSCOUT_CHAIN_URL_MAP: { [key: string]: string } = {
   [ChainId.IMTBL_ZKEVM_TESTNET]: 'https://explorer.testnet.immutable.com',
 };
 
+export const TRANSAK_API_BASE_URL = {
+  [Environment.SANDBOX]: 'https://global-stg.transak.com',
+  [Environment.PRODUCTION]: 'https://global.transak.com/',
+};
+
+export const TRANSAK_PUBLISHABLE_KEY = {
+  [Environment.SANDBOX]: '41ad2da7-ed5a-4d89-a90b-c751865effc2',
+  [Environment.PRODUCTION]: '',
+};
+
 type NetworkDetails = {
   chainIdHex: string;
   chainName: string;
