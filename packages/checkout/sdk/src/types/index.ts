@@ -13,3 +13,4 @@ export * from './wallet';
 export * from './provider';
 export * from './constants';
 export * from './smartCheckout';
+export * from './cryptoFiatExchange';
