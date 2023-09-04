@@ -30,6 +30,7 @@ import {
   UserJourney,
 } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { isPassportProvider } from '../../lib/providerUtils';
+import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 
 const LOADING_VIEW_DELAY_MS = 1000;
 export interface OnRampWidgetProps {
@@ -57,6 +58,8 @@ export function OnRampWidget(props: OnRampWidgetProps) {
   const { checkout, provider } = connectLoaderState;
   const [walletAddress, setWalletAddress] = useState('');
   const [emailAddress, setEmailAddress] = useState<string | undefined>(undefined);
+
+  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
@@ -144,10 +147,10 @@ export function OnRampWidget(props: OnRampWidgetProps) {
             statusText={SUCCESS.text}
             actionText={SUCCESS.actionText}
             onRenderEvent={() => sendOnRampSuccessEvent(
-              window,
+              eventTarget,
               (viewState.view as OnRampSuccessView).data.transactionHash,
             )}
-            onActionClick={() => sendOnRampWidgetCloseEvent(window)}
+            onActionClick={() => sendOnRampWidgetCloseEvent(eventTarget)}
             statusType={StatusType.SUCCESS}
             testId="success-view"
           />
@@ -158,7 +161,7 @@ export function OnRampWidget(props: OnRampWidgetProps) {
             statusText={FAIL.text}
             actionText={FAIL.actionText}
             onRenderEvent={() => sendOnRampFailedEvent(
-              window,
+              eventTarget,
               (viewState.view as OnRampFailView).reason
                   ?? 'Transaction failed',
             )}
@@ -174,7 +177,7 @@ export function OnRampWidget(props: OnRampWidgetProps) {
               });
             }}
             statusType={StatusType.FAILURE}
-            onCloseClick={() => sendOnRampWidgetCloseEvent(window)}
+            onCloseClick={() => sendOnRampWidgetCloseEvent(eventTarget)}
             testId="fail-view"
           />
         )}
@@ -202,7 +205,7 @@ export function OnRampWidget(props: OnRampWidgetProps) {
             showOnrampOption={isOnRampEnabled}
             showSwapOption={isSwapEnabled}
             showBridgeOption={isBridgeEnabled}
-            onCloseButtonClick={() => sendOnRampWidgetCloseEvent(window)}
+            onCloseButtonClick={() => sendOnRampWidgetCloseEvent(eventTarget)}
           />
         )}
       </ViewContext.Provider>
