@@ -161,13 +161,15 @@ export const getBalances = async (
     });
 
   const balanceResults = await Promise.allSettled(allBalancePromises);
-  const balances = (
-    balanceResults.filter(
-      (result) => result.status === 'fulfilled',
-    ) as PromiseFulfilledResult<GetBalanceResult>[]
-  ).map(
-    (fulfilledResult: PromiseFulfilledResult<GetBalanceResult>) => fulfilledResult.value,
-  ) as GetBalanceResult[];
+  const balances = (balanceResults.filter(
+    (result) => result.status === 'fulfilled',
+  ) as PromiseFulfilledResult<GetBalanceResult>[]
+  ).map((result) => result.value);
+
+  // Ensure that we have all the ERC20s balances
+  if (balanceResults.length !== balances.length) {
+    throw new CheckoutError('Unable to fetch all ERC20s balances', CheckoutErrorType.GET_ERC20_BALANCE_ERROR);
+  }
 
   return { balances };
 };

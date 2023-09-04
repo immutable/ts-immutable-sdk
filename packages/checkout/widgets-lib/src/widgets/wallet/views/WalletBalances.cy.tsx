@@ -5,7 +5,7 @@ import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { BiomeCombinedProviders } from '@biom3/react';
 import { BigNumber } from 'ethers';
-import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
+import { IMTBLWidgetEvents, WidgetTheme } from '@imtbl/checkout-widgets';
 import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
 import { WalletBalances } from './WalletBalances';
@@ -17,6 +17,9 @@ import { ConnectionStatus } from '../../../context/connect-loader-context/Connec
 import {
   ConnectLoaderTestComponent,
 } from '../../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
+import { WalletWidget } from '../WalletWidget';
+import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
+import { IMX_ADDRESS_ZKEVM } from '../../../lib';
 
 describe('WalletBalances', () => {
   beforeEach(() => {
@@ -32,7 +35,14 @@ describe('WalletBalances', () => {
       getSigner: () => ({
         getAddress: async () => Promise.resolve(''),
       }),
-    } as Web3Provider,
+      getNetwork: async () => ({
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        name: ChainName.IMTBL_ZKEVM_TESTNET,
+      }),
+      provider: {
+        request: () => {},
+      },
+    } as any as Web3Provider,
     connectionStatus: ConnectionStatus.CONNECTED_WITH_NETWORK,
   };
 
@@ -74,7 +84,7 @@ describe('WalletBalances', () => {
                 name: 'ImmutableX',
                 symbol: 'IMX',
                 decimals: 18,
-                address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+                address: IMX_ADDRESS_ZKEVM,
                 icon: '123',
               },
             },
@@ -122,7 +132,7 @@ describe('WalletBalances', () => {
                 name: 'ImmutableX',
                 symbol: 'IMX',
                 decimals: 18,
-                address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+                address: IMX_ADDRESS_ZKEVM,
                 icon: '123',
               },
             },
@@ -144,6 +154,50 @@ describe('WalletBalances', () => {
 
       cySmartGet('balance-item-IMX').should('exist');
       cySmartGet('balance-item-ETH').should('exist');
+    });
+
+    it('should show error screen after getAllBalances unrecoverable failure', () => {
+      cy.stub(Checkout.prototype, 'getAllBalances')
+        .as('getAllBalances')
+        .onFirstCall()
+        .rejects({ data: { code: 500 } })
+        .onSecondCall()
+        .resolves({
+          balances: [
+            {
+              balance: BigNumber.from('10000000000000'),
+              formattedBalance: '0.1',
+              token: {
+                name: 'ImmutableX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: IMX_ADDRESS_ZKEVM,
+                icon: '123',
+              },
+            },
+          ],
+        });
+
+      const widgetConfig = {
+        theme: WidgetTheme.DARK,
+        environment: Environment.SANDBOX,
+        isBridgeEnabled: false,
+        isSwapEnabled: false,
+        isOnRampEnabled: false,
+      } as StrongCheckoutWidgetsConfig;
+
+      mount(
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <WalletWidget config={widgetConfig} />
+        </ConnectLoaderTestComponent>,
+      );
+
+      cySmartGet('error-view').should('be.visible');
+      cySmartGet('footer-button').click();
+
+      cySmartGet('balance-item-IMX').should('exist');
     });
 
     it('should show no balances', () => {
@@ -203,7 +257,7 @@ describe('WalletBalances', () => {
                 name: 'ImmutableX',
                 symbol: 'IMX',
                 decimals: 18,
-                address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+                address: IMX_ADDRESS_ZKEVM,
                 icon: '123',
               },
             },

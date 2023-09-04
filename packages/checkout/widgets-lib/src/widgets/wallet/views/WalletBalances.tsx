@@ -1,5 +1,6 @@
 import { Box, Icon, MenuItem } from '@biom3/react';
 import {
+  useCallback,
   useContext, useEffect, useMemo, useState,
 } from 'react';
 import { GasEstimateType } from '@imtbl/checkout-sdk';
@@ -36,6 +37,7 @@ import { fetchTokenSymbols } from '../../../lib/fetchTokenSymbols';
 import { NotEnoughGas } from '../../../components/NotEnoughGas/NotEnoughGas';
 import { isNativeToken } from '../../../lib/utils';
 import {
+  DEFAULT_BALANCE_RETRY_POLICY,
   DEFAULT_TOKEN_DECIMALS,
   ETH_TOKEN_SYMBOL,
   ZERO_BALANCE_STRING,
@@ -144,6 +146,18 @@ export function WalletBalances() {
     bridgeToL2GasCheck();
   }, [tokenBalances, checkout, network]);
 
+  const showErrorView = useCallback(() => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: SharedViews.ERROR_VIEW,
+          error: new Error('Unable to fetch balances'),
+        },
+      },
+    });
+  }, [viewDispatch]);
+
   useEffect(() => {
     if (!checkout || !provider || !network || !conversions) return;
     if (conversions.size <= 0) return; // Prevent unnecessary re-rendering
@@ -157,6 +171,8 @@ export function WalletBalances() {
           },
         });
         setBalancesLoading(false);
+      }).catch((err) => {
+        if (DEFAULT_BALANCE_RETRY_POLICY.nonRetryable!(err)) showErrorView();
       });
   }, [checkout, provider, network, conversions]);
 

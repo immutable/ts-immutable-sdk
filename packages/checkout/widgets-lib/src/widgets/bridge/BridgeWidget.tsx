@@ -1,13 +1,13 @@
 import {
   BiomeCombinedProviders,
 } from '@biom3/react';
-import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
-  NetworkFilterTypes,
+  NetworkFilterTypes, TokenFilterTypes,
 } from '@imtbl/checkout-sdk';
 import {
+  useCallback,
   useContext,
-  useEffect, useMemo, useReducer,
+  useEffect, useMemo, useReducer, useState,
 } from 'react';
 import { ImmutableConfiguration } from '@imtbl/config';
 import { ethers } from 'ethers';
@@ -19,14 +19,18 @@ import {
   TokenBridge,
 } from '@imtbl/bridge-sdk';
 import {
-  WidgetTheme,
+  DEFAULT_BALANCE_RETRY_POLICY,
   getL1ChainId,
   getL2ChainId,
 } from '../../lib';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
+  ErrorView as ErrorViewType,
   SharedViews,
-  ViewActions, ViewContext, initialViewState, viewReducer,
+  ViewActions,
+  ViewContext,
+  initialViewState,
+  viewReducer,
 } from '../../context/view-context/ViewContext';
 import {
   BridgeActions, BridgeContext, bridgeReducer, initialBridgeState,
@@ -42,9 +46,10 @@ import { MoveInProgress } from './views/MoveInProgress';
 import { text } from '../../resources/text/textConfig';
 import { ErrorView } from '../../views/error/ErrorView';
 import { ApproveERC20BridgeOnboarding } from './views/ApproveERC20Bridge';
-import { getBridgeTokensAndBalances } from './functions/getBridgeTokens';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
+import { GetAllowedBalancesResultType, getAllowedBalances } from '../../lib/balance';
+import { widgetTheme } from '../../lib/theme';
 
 export interface BridgeWidgetProps {
   params: BridgeWidgetParams;
@@ -64,13 +69,21 @@ export function BridgeWidget(props: BridgeWidgetProps) {
   const loadingText = text.views[SharedViews.LOADING_VIEW].text;
   const errorText = text.views[SharedViews.ERROR_VIEW];
 
+  const { connectLoaderState: { checkout, provider } } = useContext(ConnectLoaderContext);
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
-
-  const viewReducerValues = useMemo(() => ({ viewState, viewDispatch }), [viewState, viewDispatch]);
-  const { connectLoaderState } = useContext(ConnectLoaderContext);
-  const { checkout, provider } = connectLoaderState;
   const [bridgeState, bridgeDispatch] = useReducer(bridgeReducer, initialBridgeState);
-  const bridgeReducerValues = useMemo(() => ({ bridgeState, bridgeDispatch }), [bridgeState, bridgeDispatch]);
+
+  const viewReducerValues = useMemo(
+    () => ({ viewState, viewDispatch }),
+    [viewState, viewDispatch],
+  );
+  const bridgeReducerValues = useMemo(
+    () => ({ bridgeState, bridgeDispatch }),
+    [bridgeState, bridgeDispatch],
+  );
+  const themeReducerValue = useMemo(() => widgetTheme(theme), [theme]);
+
+  const [errorViewLoading, setErrorViewLoading] = useState(false);
 
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
@@ -78,9 +91,66 @@ export function BridgeWidget(props: BridgeWidgetProps) {
     amount, fromContractAddress,
   } = params;
 
-  const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
-    ? onLightBase
-    : onDarkBase;
+  const showErrorView = useCallback((error: any, tryAgain?: () => Promise<boolean>) => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: SharedViews.ERROR_VIEW,
+          tryAgain,
+          error,
+        },
+      },
+    });
+  }, [viewDispatch]);
+
+  const showBridgeWidget = useCallback(() => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: { type: BridgeWidgetViews.BRIDGE },
+      },
+    });
+  }, [viewDispatch]);
+
+  const loadBalances = async (): Promise<boolean> => {
+    if (!checkout) throw new Error('loadBalances: missing checkout');
+    if (!provider) throw new Error('loadBalances: missing provider');
+
+    let tokensAndBalances: GetAllowedBalancesResultType = {
+      allowList: { tokens: [] },
+      allowedBalances: [],
+    };
+    try {
+      tokensAndBalances = await getAllowedBalances({
+        checkout,
+        provider,
+        allowTokenListType: TokenFilterTypes.BRIDGE,
+        allowNative: true,
+      });
+    } catch (err: any) {
+      if (DEFAULT_BALANCE_RETRY_POLICY.nonRetryable!(err)) {
+        showErrorView(err, loadBalances);
+        return false;
+      }
+    }
+
+    bridgeDispatch({
+      payload: {
+        type: BridgeActions.SET_ALLOWED_TOKENS,
+        allowedTokens: tokensAndBalances.allowList.tokens,
+      },
+    });
+
+    bridgeDispatch({
+      payload: {
+        type: BridgeActions.SET_TOKEN_BALANCES,
+        tokenBalances: tokensAndBalances.allowedBalances,
+      },
+    });
+
+    return true;
+  };
 
   useEffect(() => {
     const bridgetWidgetSetup = async () => {
@@ -134,7 +204,6 @@ export function BridgeWidget(props: BridgeWidgetProps) {
       const toNetwork = allowedBridgingNetworks.networks.find(
         (network) => network.chainId === toChainId,
       );
-
       if (toNetwork) {
         bridgeDispatch({
           payload: {
@@ -144,35 +213,16 @@ export function BridgeWidget(props: BridgeWidgetProps) {
         });
       }
 
-      const tokensAndBalances = await getBridgeTokensAndBalances(checkout, provider);
+      if (!await loadBalances()) return;
 
-      bridgeDispatch({
-        payload: {
-          type: BridgeActions.SET_ALLOWED_TOKENS,
-          allowedTokens: tokensAndBalances?.allowList?.tokens ?? [],
-        },
-      });
-
-      bridgeDispatch({
-        payload: {
-          type: BridgeActions.SET_TOKEN_BALANCES,
-          tokenBalances: tokensAndBalances.allowedTokenBalances ?? [],
-        },
-      });
-
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: { type: BridgeWidgetViews.BRIDGE },
-        },
-      });
+      showBridgeWidget();
     };
 
     bridgetWidgetSetup();
   }, [checkout, provider]);
 
   return (
-    <BiomeCombinedProviders theme={{ base: biomeTheme }}>
+    <BiomeCombinedProviders theme={{ base: themeReducerValue }}>
       <ViewContext.Provider value={viewReducerValues}>
         <BridgeContext.Provider value={bridgeReducerValues}>
           <CryptoFiatProvider environment={environment}>
@@ -234,15 +284,21 @@ export function BridgeWidget(props: BridgeWidgetProps) {
             {viewReducerValues.viewState.view.type === SharedViews.ERROR_VIEW && (
               <ErrorView
                 actionText={errorText.actionText}
-                onActionClick={() => {
-                  viewDispatch({
-                    payload: {
-                      type: ViewActions.UPDATE_VIEW,
-                      view: { type: BridgeWidgetViews.BRIDGE },
-                    },
-                  });
+                onActionClick={async () => {
+                  setErrorViewLoading(true);
+                  const data = viewState.view as ErrorViewType;
+
+                  if (!data.tryAgain) {
+                    showBridgeWidget();
+                    setErrorViewLoading(false);
+                    return;
+                  }
+
+                  if (await data.tryAgain()) showBridgeWidget();
+                  setErrorViewLoading(false);
                 }}
                 onCloseClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
+                errorEventActionLoading={errorViewLoading}
               />
             )}
           </CryptoFiatProvider>

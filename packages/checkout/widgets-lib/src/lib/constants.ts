@@ -1,5 +1,5 @@
 import { Environment } from '@imtbl/config';
-import { WalletProviderName } from '@imtbl/checkout-sdk';
+import { CheckoutErrorType, WalletProviderName } from '@imtbl/checkout-sdk';
 import { WidgetTheme } from './types';
 import { RetryType } from './retry';
 
@@ -31,7 +31,8 @@ export const DEFAULT_RETRY_DELAY = 10 * 1000;
  */
 export const DEFAULT_BALANCE_RETRY_POLICY: RetryType = {
   retryIntervalMs: DEFAULT_RETRY_DELAY,
-  retries: 50,
+  retries: 60, // retry up to DEFAULT_RETRY_DELAY / 1000 minutes
+  nonRetryable: (err: any) => err?.data?.code >= 500 || err.type === CheckoutErrorType.GET_ERC20_BALANCE_ERROR,
 };
 
 /**

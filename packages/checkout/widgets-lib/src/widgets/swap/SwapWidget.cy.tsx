@@ -339,6 +339,45 @@ describe('SwapWidget tests', () => {
         .should('exist');
     });
 
+    it('should show error screen after getAllBalances unrecoverable failure', () => {
+      getAllBalancesStub
+        .onFirstCall()
+        .rejects({ data: { code: 500 } })
+        .onSecondCall()
+        .resolves({
+          balances: [
+            {
+              balance: BigNumber.from('10000000000000000000'),
+              formattedBalance: '0.1',
+              token: {
+                name: 'ImmutableX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: IMX_ADDRESS_ZKEVM,
+              },
+            },
+          ],
+        });
+
+      mount(
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <SwapWidget
+            config={config}
+            params={params}
+          />
+        </ConnectLoaderTestComponent>,
+      );
+
+      cySmartGet('error-view').should('be.visible');
+      cySmartGet('footer-button').click();
+
+      cySmartGet('fromTokenInputs-select-form-select__target').click();
+      cySmartGet(`fromTokenInputs-select-form-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`)
+        .should('exist');
+    });
+
     it('should set fromTokens to user balances filtered by the token allow list', () => {
       mount(
         <ConnectLoaderTestComponent

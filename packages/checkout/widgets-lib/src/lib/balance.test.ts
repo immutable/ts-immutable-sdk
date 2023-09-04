@@ -1,12 +1,12 @@
 import { Web3Provider } from '@ethersproject/providers';
 import {
-  ChainId, Checkout, GetBalanceResult, NetworkInfo, TokenInfo,
+  ChainId, Checkout, GetBalanceResult, NetworkInfo, TokenFilterTypes, TokenInfo,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { BigNumber } from 'ethers';
-import { getBridgeTokensAndBalances } from './getBridgeTokens';
+import { getAllowedBalances } from './balance';
 
-describe('getBridgeTokensAndBalances', () => {
+describe('getAllowedBalances', () => {
   const tokenInfo = {
     balance: BigNumber.from(1),
     token: { symbol: 'QQQ', name: 'QQQ', address: '0xQ' } as TokenInfo,
@@ -32,7 +32,7 @@ describe('getBridgeTokensAndBalances', () => {
     },
   ];
 
-  it('should return allowList and allowedTokenBalances', async () => {
+  it('should return allowList and allowedBalances', async () => {
     const checkout = new Checkout({
       baseConfig: { environment: Environment.PRODUCTION },
     });
@@ -54,20 +54,96 @@ describe('getBridgeTokensAndBalances', () => {
       ],
     });
 
-    const resp = await getBridgeTokensAndBalances(
+    const resp = await getAllowedBalances({
       checkout,
-      mockProvider as unknown as Web3Provider,
-    );
+      provider: mockProvider as unknown as Web3Provider,
+      allowTokenListType: TokenFilterTypes.BRIDGE,
+      allowNative: true,
+    });
 
     expect(resp).toEqual({
       allowList: {
         tokens: [{ address: tokenInfo.token.address }],
       },
-      allowedTokenBalances: [tokenInfo],
+      allowedBalances: [tokenInfo],
     });
   });
 
-  it('should return allowList and allowedTokenBalances if getAllBalances succeed at least once', async () => {
+  it('should use the correct allowTokenListType', async () => {
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.PRODUCTION },
+    });
+
+    const mockProvider = {
+      getSigner: jest.fn().mockReturnValue({
+        getAddress: jest.fn().mockResolvedValue('0xaddress'),
+      }),
+    };
+    jest.spyOn(checkout, 'getNetworkInfo').mockResolvedValue(
+      { chainId: ChainId.IMTBL_ZKEVM_MAINNET } as unknown as NetworkInfo,
+    );
+    jest.spyOn(checkout, 'getAllBalances').mockResolvedValue({ balances });
+    const getTokenAllowListMock = jest.spyOn(checkout, 'getTokenAllowList').mockResolvedValue({ tokens: [] });
+
+    await getAllowedBalances({
+      checkout,
+      provider: mockProvider as unknown as Web3Provider,
+      allowTokenListType: TokenFilterTypes.BRIDGE,
+      allowNative: true,
+    });
+
+    expect(getTokenAllowListMock.mock.calls).toEqual([[{
+      chainId: ChainId.IMTBL_ZKEVM_MAINNET, type: TokenFilterTypes.BRIDGE,
+    }]]);
+
+    getTokenAllowListMock.mockClear();
+    await getAllowedBalances({
+      checkout,
+      provider: mockProvider as unknown as Web3Provider,
+      allowTokenListType: TokenFilterTypes.SWAP,
+      allowNative: true,
+    });
+
+    expect(getTokenAllowListMock.mock.calls).toEqual([[{
+      chainId: ChainId.IMTBL_ZKEVM_MAINNET, type: TokenFilterTypes.SWAP,
+    }]]);
+  });
+
+  it('should use the correct chainId', async () => {
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.PRODUCTION },
+    });
+
+    const mockProvider = {
+      getSigner: jest.fn().mockReturnValue({
+        getAddress: jest.fn().mockResolvedValue('0xaddress'),
+      }),
+    };
+    jest.spyOn(checkout, 'getNetworkInfo').mockResolvedValue(
+      { chainId: ChainId.IMTBL_ZKEVM_MAINNET } as unknown as NetworkInfo,
+    );
+    const getAllBalancesMock = jest.spyOn(checkout, 'getAllBalances').mockResolvedValue({ balances });
+    const getTokenAllowListMock = jest.spyOn(checkout, 'getTokenAllowList').mockResolvedValue({ tokens: [] });
+
+    await getAllowedBalances({
+      checkout,
+      provider: mockProvider as unknown as Web3Provider,
+      allowTokenListType: TokenFilterTypes.BRIDGE,
+      allowNative: true,
+      chainId: ChainId.IMTBL_ZKEVM_DEVNET,
+    });
+
+    expect(getAllBalancesMock.mock.calls).toEqual([[{
+      chainId: ChainId.IMTBL_ZKEVM_DEVNET,
+      provider: mockProvider,
+      walletAddress: '0xaddress',
+    }]]);
+    expect(getTokenAllowListMock.mock.calls).toEqual([[{
+      chainId: ChainId.IMTBL_ZKEVM_DEVNET, type: TokenFilterTypes.BRIDGE,
+    }]]);
+  });
+
+  it('should return allowList and allowedBalances if getAllBalances succeed at least once', async () => {
     const checkout = new Checkout({
       baseConfig: { environment: Environment.PRODUCTION },
     });
@@ -91,16 +167,18 @@ describe('getBridgeTokensAndBalances', () => {
       ],
     });
 
-    const resp = await getBridgeTokensAndBalances(
+    const resp = await getAllowedBalances({
       checkout,
-      mockProvider as unknown as Web3Provider,
-    );
+      provider: mockProvider as unknown as Web3Provider,
+      allowTokenListType: TokenFilterTypes.BRIDGE,
+      allowNative: true,
+    });
 
     expect(resp).toEqual({
       allowList: {
         tokens: [{ address: tokenInfo.token.address }],
       },
-      allowedTokenBalances: [tokenInfo],
+      allowedBalances: [tokenInfo],
     });
   });
 
@@ -126,16 +204,18 @@ describe('getBridgeTokensAndBalances', () => {
       ],
     });
 
-    const resp = await getBridgeTokensAndBalances(
+    const resp = await getAllowedBalances({
       checkout,
-      mockProvider as unknown as Web3Provider,
-    );
+      provider: mockProvider as unknown as Web3Provider,
+      allowTokenListType: TokenFilterTypes.BRIDGE,
+      allowNative: true,
+    });
 
     expect(resp).toEqual({
       allowList: {
         tokens: [{ address: '0xA' }],
       },
-      allowedTokenBalances: [],
+      allowedBalances: [],
     });
   });
 
@@ -161,28 +241,18 @@ describe('getBridgeTokensAndBalances', () => {
       ],
     });
 
-    const resp = await getBridgeTokensAndBalances(
+    const resp = await getAllowedBalances({
       checkout,
-      mockProvider as unknown as Web3Provider,
-    );
+      provider: mockProvider as unknown as Web3Provider,
+      allowTokenListType: TokenFilterTypes.BRIDGE,
+      allowNative: true,
+    });
 
     expect(resp).toEqual({
       allowList: {
         tokens: [{ address: '0xA' }],
       },
-      allowedTokenBalances: [],
+      allowedBalances: [],
     });
-  });
-
-  it('should return empty array if params are missing', async () => {
-    const checkout = new Checkout({
-      baseConfig: { environment: Environment.PRODUCTION },
-    });
-    expect(
-      await getBridgeTokensAndBalances(
-        checkout,
-        null as unknown as Web3Provider,
-      ),
-    ).toEqual({});
   });
 });

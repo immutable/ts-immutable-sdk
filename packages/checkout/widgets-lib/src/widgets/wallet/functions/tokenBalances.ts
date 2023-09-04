@@ -28,6 +28,8 @@ export const getTokenBalances = async (
   if (!checkout || !provider || !chainId) return [];
 
   const walletAddress = await provider.getSigner().getAddress();
+  // Do not catch the error so that the caller can decide
+  // how to handle the experience.
   const getAllBalancesResult = await retry(
     () => checkout.getAllBalances({
       provider,
