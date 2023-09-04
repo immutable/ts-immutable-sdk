@@ -308,9 +308,9 @@ describe('ZkEvmProvider', () => {
 
       expect(result).toEqual(signature);
       expect(signTypedDataV4).toHaveBeenCalledWith({
+        method: 'eth_signTypedData_v4',
         params: [address, typedDataPayload],
         magicProvider: mockMagicProvider,
-        guardianClient: expect.any(GuardianClient),
         jsonRpcProvider: expect.any(Object),
         relayerClient: expect.any(RelayerClient),
         user: mockUserZkEvm,
