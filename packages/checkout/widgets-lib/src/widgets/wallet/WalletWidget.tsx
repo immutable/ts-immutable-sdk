@@ -30,6 +30,7 @@ import { CoinInfo } from './views/CoinInfo';
 import { TopUpView } from '../../views/top-up/TopUpView';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 import { text } from '../../resources/text/textConfig';
+import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 
 export interface WalletWidgetProps {
   config: StrongCheckoutWidgetsConfig,
@@ -39,6 +40,7 @@ export function WalletWidget(props: WalletWidgetProps) {
   const { config } = props;
   const errorActionText = text.views[SharedViews.ERROR_VIEW].actionText;
   const loadingText = text.views[SharedViews.LOADING_VIEW].text;
+  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const {
     environment, theme, isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
@@ -155,7 +157,7 @@ export function WalletWidget(props: WalletWidgetProps) {
             <ErrorView
               actionText={errorActionText}
               onActionClick={errorAction}
-              onCloseClick={sendWalletWidgetCloseEvent}
+              onCloseClick={() => sendWalletWidgetCloseEvent(eventTarget)}
             />
             )}
             {viewState.view.type === SharedViews.TOP_UP_VIEW && (
@@ -164,7 +166,7 @@ export function WalletWidget(props: WalletWidgetProps) {
               showOnrampOption={isOnRampEnabled}
               showSwapOption={isSwapEnabled}
               showBridgeOption={isBridgeEnabled}
-              onCloseButtonClick={sendWalletWidgetCloseEvent}
+              onCloseButtonClick={() => sendWalletWidgetCloseEvent(eventTarget)}
             />
             )}
           </WalletContext.Provider>

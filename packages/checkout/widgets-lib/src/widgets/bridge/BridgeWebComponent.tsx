@@ -77,13 +77,13 @@ export class ImmutableBridge extends ImmutableWebComponent {
       <React.StrictMode>
         {showBridgeComingSoonScreen && (
         <BiomeCombinedProviders theme={{ base: onDarkBase }}>
-          <BridgeComingSoon onCloseEvent={sendBridgeWidgetCloseEvent} />
+          <BridgeComingSoon onCloseEvent={() => sendBridgeWidgetCloseEvent(window)} />
         </BiomeCombinedProviders>
         )}
         {!showBridgeComingSoonScreen && (
           <ConnectLoader
             params={connectLoaderParams}
-            closeEvent={sendBridgeWidgetCloseEvent}
+            closeEvent={() => sendBridgeWidgetCloseEvent(window)}
             widgetConfig={this.widgetConfig!}
           >
             <BridgeWidget
