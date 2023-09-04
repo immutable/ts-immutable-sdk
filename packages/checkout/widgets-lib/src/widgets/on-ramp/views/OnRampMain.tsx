@@ -18,6 +18,7 @@ import {
 } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { TransakEventData, TransakEvents, TransakStatuses } from '../TransakEvents';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
+import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 
 const transakIframeId = 'transak-iframe';
 const transakOrigin = 'transak.com';
@@ -34,6 +35,8 @@ export function OnRampMain({
 }: OnRampProps) {
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
+  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+
   const { header } = text.views[OnRampWidgetViews.ONRAMP];
   const { viewState } = useContext(ViewContext);
   const { viewDispatch } = useContext(ViewContext);
@@ -189,7 +192,7 @@ export function OnRampMain({
           <HeaderNavigation
             showBack={showBackButton}
             title={header.title}
-            onCloseButtonClick={() => sendOnRampWidgetCloseEvent(window)}
+            onCloseButtonClick={() => sendOnRampWidgetCloseEvent(eventTarget)}
           />
         )}
         footerBackgroundColor="base.color.translucent.emphasis.200"
