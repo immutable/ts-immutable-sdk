@@ -1,18 +1,25 @@
 import {
+  ChainId,
   DexConfig,
-  GetTokenAllowListParams,
   GetTokenAllowListResult,
   OnRampConfig,
+  TokenFilter,
   TokenFilterTypes,
   TokenInfo,
 } from '../types';
-import { CheckoutConfiguration } from '../config';
+import { CheckoutConfiguration, getL1ChainId } from '../config';
+
+type TokenAllowListParams = {
+  type: TokenFilterTypes;
+  chainId?: ChainId;
+  exclude?: TokenFilter[];
+};
 
 export const getTokenAllowList = async (
   config: CheckoutConfiguration,
   {
     type = TokenFilterTypes.ALL, chainId, exclude,
-  }: GetTokenAllowListParams,
+  }: TokenAllowListParams,
 ): Promise<GetTokenAllowListResult> => {
   let tokens: TokenInfo[] = [];
 
@@ -31,7 +38,7 @@ export const getTokenAllowList = async (
     case TokenFilterTypes.BRIDGE:
     case TokenFilterTypes.ALL:
     default:
-      tokens = (await config.remote.getTokensConfig(chainId)).allowed as TokenInfo[];
+      tokens = (await config.remote.getTokensConfig(chainId || getL1ChainId(config))).allowed as TokenInfo[];
   }
 
   if (!exclude || exclude?.length === 0) return { tokens };

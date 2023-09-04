@@ -45,11 +45,14 @@ import {
   GasEstimateSwapResult,
   GasEstimateBridgeToL2Result,
   SmartCheckoutParams,
+  TokenFilterTypes,
 } from './types';
 import { CheckoutConfiguration } from './config';
 import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
 import { SellParams } from './types/sell';
 import { CancelParams } from './types/cancel';
+import { CryptoFiatExchangeService, CryptoFiatExchangeWidgetParams } from './cryptoFiatExchange';
+import { CryptoFiatExchangeParams } from './types/cryptoFiatExchange';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
@@ -59,6 +62,8 @@ const SANDBOX_CONFIGURATION = {
 
 export class Checkout {
   readonly config: CheckoutConfiguration;
+
+  readonly cryptoFiatExchangeService: CryptoFiatExchangeService;
 
   private readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>;
 
@@ -70,6 +75,7 @@ export class Checkout {
     config: CheckoutModuleConfiguration = SANDBOX_CONFIGURATION,
   ) {
     this.config = new CheckoutConfiguration(config);
+    this.cryptoFiatExchangeService = new CryptoFiatExchangeService(this.config.environment);
     this.readOnlyProviders = new Map<ChainId, ethers.providers.JsonRpcProvider>();
   }
 
@@ -389,5 +395,35 @@ export class Checkout {
       this.readOnlyProviders,
       this.config,
     );
+  }
+
+  /**
+   * Creates and returns a URL for the crypto fiat exchange widget.
+   * @param {CryptoFiatExchangeParams} params - The parameters for creating the url.
+   * @returns {Promise<string>} - A promise that resolves to a string url.
+   */
+  public async createCryptoFiatExchangeUrl(params: CryptoFiatExchangeParams): Promise<string> {
+    let email;
+
+    const walletAddress = await params.web3Provider.getSigner().getAddress();
+    const isPassport = (params.web3Provider.provider as any)?.isPassport || false;
+
+    if (isPassport && params.passport) {
+      const userInfo = await params.passport.getUserInfo();
+      email = userInfo?.email;
+    }
+
+    const tokenList = await tokens.getTokenAllowList(this.config, { type: TokenFilterTypes.ONRAMP });
+
+    const token = tokenList.tokens.find((t) => t.address === params.tokenAddress);
+
+    return await this.cryptoFiatExchangeService.createWidgetUrl({
+      exchangeType: params.exchangeType,
+      isPassport,
+      walletAddress,
+      tokenAmount: token ? undefined : params.tokenAmount,
+      tokenSymbol: token?.symbol ?? 'IMX',
+      email,
+    } as CryptoFiatExchangeWidgetParams);
   }
 }
