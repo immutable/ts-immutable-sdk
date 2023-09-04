@@ -114,35 +114,6 @@ const useOpenPopup = (url: string, name: string, specs: string) => {
 const useMint = (amount: number, selectedItems: any[], configFields: any) => {
   const [loading, setLoading] = useState(false);
   const [receipt, setReceipt] = useState<TransactionReceipt | null>(null);
-  const defaultItems = [
-    {
-      id: '60',
-      qty: 1,
-      price: '0.5',
-      name: 'Poliwag',
-      image:
-        'https://pokemon-nfts.s3.ap-southeast-2.amazonaws.com/images/60.png',
-      description: 'Poliwag',
-    },
-    {
-      id: '61',
-      qty: 1,
-      price: '1',
-      name: 'Poliwhirl',
-      image:
-        'https://pokemon-nfts.s3.ap-southeast-2.amazonaws.com/images/61.png',
-      description: 'Poliwhirl',
-    },
-    {
-      id: '62',
-      qty: 1,
-      price: '2',
-      name: 'Poliwrath',
-      image:
-        'https://pokemon-nfts.s3.ap-southeast-2.amazonaws.com/images/62.png',
-      description: 'Poliwrath',
-    },
-  ];
 
   const items = selectedItems.map((item) => {
     return {
