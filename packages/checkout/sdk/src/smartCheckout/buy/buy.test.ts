@@ -14,11 +14,11 @@ import {
   FulfilmentTransaction, GasAmount, GasTokenType, ItemType, TransactionOrGasType,
 } from '../../types/smartCheckout';
 import { smartCheckout } from '..';
-import { executeTransactions, getUnsignedTransactions } from '../transactions';
+import { executeTransactions, getUnsignedActions } from '../actions';
 
 jest.mock('../../instance');
 jest.mock('../smartCheckout');
-jest.mock('../transactions');
+jest.mock('../actions');
 
 describe('buy', () => {
   const gasLimit = constants.estimatedFulfillmentGasGwei;
@@ -109,7 +109,7 @@ describe('buy', () => {
             ],
           }),
         });
-        (getUnsignedTransactions as jest.Mock).mockResolvedValue({
+        (getUnsignedActions as jest.Mock).mockResolvedValue({
           approvalTransactions: [{ from: '0xAPPROVAL' }],
           fulfilmentTransactions: [{ from: '0xTRANSACTION' }],
           signableMessages: [],
@@ -136,7 +136,7 @@ describe('buy', () => {
         );
         expect(buyResult).toEqual({
           smartCheckoutResult,
-          transactions: {
+          unsignedActions: {
             approvalTransactions: [{ from: '0xAPPROVAL' }],
             fulfilmentTransactions: [{ from: '0xTRANSACTION' }],
             signableMessages: [],

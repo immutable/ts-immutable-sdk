@@ -1,10 +1,10 @@
 import { TransactionRequest } from '@ethersproject/providers';
 import { Action, TransactionPurpose, ActionType } from '@imtbl/orderbook';
-import { UnsignedTransactions, SignableMessage } from '../../types';
+import { UnsignedActions, SignableMessage } from '../../types';
 
-export const getUnsignedTransactions = async (
+export const getUnsignedActions = async (
   actions: Action[],
-): Promise<UnsignedTransactions> => {
+): Promise<UnsignedActions> => {
   let approvalTransactions: TransactionRequest[] = [];
   let fulfilmentTransactions: TransactionRequest[] = [];
   const signableMessages: SignableMessage[] = [];

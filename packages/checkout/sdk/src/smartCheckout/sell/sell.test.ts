@@ -9,11 +9,11 @@ import { smartCheckout } from '../smartCheckout';
 import { createOrderbookInstance } from '../../instance';
 import { BuyToken } from '../../types/sell';
 import { CheckoutErrorType } from '../../errors';
-import { executeTransactions, getUnsignedTransactions } from '../transactions';
+import { executeTransactions, getUnsignedActions } from '../actions';
 
 jest.mock('../../instance');
 jest.mock('../smartCheckout');
-jest.mock('../transactions');
+jest.mock('../actions');
 
 describe('sell', () => {
   const seaportContractAddress = '0xSEAPORT';
@@ -91,7 +91,7 @@ describe('sell', () => {
           ],
         }),
       });
-      (getUnsignedTransactions as jest.Mock).mockResolvedValue({
+      (getUnsignedActions as jest.Mock).mockResolvedValue({
         approvalTransactions: [{ from: '0xAPPROVAL' }],
         fulfilmentTransactions: [],
         signableMessages: [{
@@ -117,7 +117,7 @@ describe('sell', () => {
           sufficient: true,
           transactionRequirements: [erc721TransactionRequirement],
         },
-        transactions: {
+        unsignedActions: {
           approvalTransactions: [{ from: '0xAPPROVAL' }],
           fulfilmentTransactions: [],
           signableMessages: [{
@@ -201,7 +201,7 @@ describe('sell', () => {
           ],
         }),
       });
-      (getUnsignedTransactions as jest.Mock).mockResolvedValue({
+      (getUnsignedActions as jest.Mock).mockResolvedValue({
         approvalTransactions: [{ from: '0xAPPROVAL' }],
         fulfilmentTransactions: [],
         signableMessages: [{

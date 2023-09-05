@@ -18,7 +18,7 @@ import * as instance from '../../instance';
 import { CheckoutConfiguration } from '../../config';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { smartCheckout } from '../smartCheckout';
-import { executeTransactions, getUnsignedTransactions } from '../transactions';
+import { executeTransactions, getUnsignedActions } from '../actions';
 
 export const getERC721Requirement = (
   id: string,
@@ -104,16 +104,16 @@ export const sell = async (
   );
 
   if (smartCheckoutResult.sufficient) {
-    const unsignedTransactions = await getUnsignedTransactions(listing.actions);
+    const unsignedActions = await getUnsignedActions(listing.actions);
     if (shouldExecuteTransactions) {
-      await executeTransactions(provider, unsignedTransactions);
+      await executeTransactions(provider, unsignedActions);
       return {
         smartCheckoutResult,
       };
     }
     return {
       smartCheckoutResult,
-      transactions: unsignedTransactions,
+      unsignedActions,
     };
   }
 

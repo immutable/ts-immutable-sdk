@@ -219,11 +219,12 @@ export type RoutingOptionsAvailable = {
 };
 
 /** Represents the unsigned transactions.
+ * Represents the unsigned actions.
  * @property {TransactionRequest} approvalTransactions - Approval transactions.
  * @property {TransactionRequest} fulfilmentTransactions - Fulfilment transactions.
- * @property {SignableMessage} signableMessages - Signable transactions.
+ * @property {SignableMessage} signableMessages - Signable messages.
  */
-export type UnsignedTransactions = {
+export type UnsignedActions = {
   approvalTransactions: TransactionRequest[],
   fulfilmentTransactions: TransactionRequest[],
   signableMessages: SignableMessage[],

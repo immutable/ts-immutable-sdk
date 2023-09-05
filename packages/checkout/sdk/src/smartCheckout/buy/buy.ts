@@ -12,10 +12,10 @@ import * as instance from '../../instance';
 import { CheckoutConfiguration } from '../../config';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import {
-  ItemType, ItemRequirement, GasTokenType, TransactionOrGasType, GasAmount, FulfilmentTransaction, UnsignedTransactions,
+  ItemType, ItemRequirement, GasTokenType, TransactionOrGasType, GasAmount, FulfilmentTransaction, UnsignedActions,
 } from '../../types/smartCheckout';
 import { smartCheckout } from '..';
-import { executeTransactions, getUnsignedTransactions } from '../transactions';
+import { executeTransactions, getUnsignedActions } from '../actions';
 
 export const getItemRequirement = (
   type: ItemType,
@@ -42,12 +42,12 @@ export const getItemRequirement = (
 
 export const getTransactionOrGas = (
   gasLimit: number,
-  unsignedTransactions: UnsignedTransactions,
+  unsignedActions: UnsignedActions,
 ): FulfilmentTransaction | GasAmount => {
-  if (unsignedTransactions.fulfilmentTransactions.length > 0) {
+  if (unsignedActions.fulfilmentTransactions.length > 0) {
     return {
       type: TransactionOrGasType.TRANSACTION,
-      transaction: unsignedTransactions.fulfilmentTransactions[0],
+      transaction: unsignedActions.fulfilmentTransactions[0],
     };
   }
 
@@ -87,7 +87,7 @@ export const buy = async (
     );
   }
 
-  let unsignedTransactions: UnsignedTransactions = {
+  let unsignedActions: UnsignedActions = {
     approvalTransactions: [],
     fulfilmentTransactions: [],
     signableMessages: [],
@@ -95,7 +95,7 @@ export const buy = async (
   try {
     const fulfillerAddress = await provider.getSigner().getAddress();
     const { actions } = await orderbook.fulfillOrder(orderId, fulfillerAddress);
-    unsignedTransactions = await getUnsignedTransactions(actions);
+    unsignedActions = await getUnsignedActions(actions);
   } catch {
     // Error usually thrown when fulfiller does not have enough balance to fulfil the order
     // Silently catch & continue to run smart checkout to return the diffs
@@ -145,11 +145,11 @@ export const buy = async (
     config,
     provider,
     itemRequirements,
-    getTransactionOrGas(gasLimit, unsignedTransactions),
+    getTransactionOrGas(gasLimit, unsignedActions),
   );
 
   if (smartCheckoutResult.sufficient && shouldExecuteTransactions) {
-    await executeTransactions(provider, unsignedTransactions);
+    await executeTransactions(provider, unsignedActions);
     return {
       smartCheckoutResult,
     };
@@ -158,7 +158,7 @@ export const buy = async (
   if (smartCheckoutResult.sufficient) {
     return {
       smartCheckoutResult,
-      transactions: unsignedTransactions,
+      unsignedActions,
     };
   }
 

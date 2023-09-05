@@ -1,5 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { executeTransactions } from './executeTransactions';
+import { executeTransactions } from './executeActions';
 import { CheckoutErrorType } from '../../errors';
 
 describe('executeTransactions', () => {

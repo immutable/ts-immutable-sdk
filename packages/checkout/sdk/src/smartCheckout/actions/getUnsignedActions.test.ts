@@ -2,9 +2,9 @@ import {
   Action, ActionType, SignablePurpose, TransactionPurpose,
 } from '@imtbl/orderbook';
 import { PopulatedTransaction, TypedDataDomain } from 'ethers';
-import { getUnsignedTransactions } from './unsignedTransactions';
+import { getUnsignedActions } from './getUnsignedActions';
 
-describe('getUnsignedTransactions', () => {
+describe('getUnsignedActions', () => {
   it('should get the unsigned transactions', async () => {
     const actions: Action[] = [
       {
@@ -47,7 +47,7 @@ describe('getUnsignedTransactions', () => {
       },
     ];
 
-    await expect(getUnsignedTransactions(actions)).resolves.toEqual({
+    await expect(getUnsignedActions(actions)).resolves.toEqual({
       approvalTransactions: [{ from: '0xAPPROVAL1' }, { from: '0xAPPROVAL2' }],
       fulfilmentTransactions: [{ from: '0xTRANSACTION1' }, { from: '0xTRANSACTION2' }],
       signableMessages: [
@@ -68,7 +68,7 @@ describe('getUnsignedTransactions', () => {
   it('should return empty arrays if no transactions or signable messages', async () => {
     const actions: Action[] = [];
 
-    await expect(getUnsignedTransactions(actions)).resolves.toEqual({
+    await expect(getUnsignedActions(actions)).resolves.toEqual({
       approvalTransactions: [],
       fulfilmentTransactions: [],
       signableMessages: [],

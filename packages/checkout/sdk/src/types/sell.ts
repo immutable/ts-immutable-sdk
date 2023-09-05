@@ -1,7 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import {
-  ItemType, SmartCheckoutResult, UnsignedTransactions,
+  ItemType, SmartCheckoutResult, UnsignedActions,
 } from './smartCheckout';
 
 /**
@@ -17,18 +17,18 @@ export interface SellParams {
   id: string;
   collectionAddress: string;
   buyToken: BuyToken;
-  executeTransactions?: boolean;
+  signActions?: boolean;
 }
 
 /**
  * Interface representing the result of the sell
  * @property {SmartCheckoutResult} smartCheckoutResult - The result of the smart checkout.
- * @property {UnsignedTransactions | undefined} transactions - Unsigned transactions, present when
- * smart checkout returns sufficient true and executeTransactions false.
+ * @property {UnsignedActions | undefined} transactions - Unsigned actions, present when
+ * smart checkout returns sufficient true and signActions false.
  */
 export type SellResult = {
   smartCheckoutResult: SmartCheckoutResult,
-  transactions?: UnsignedTransactions,
+  unsignedActions?: UnsignedActions,
 };
 
 /**
