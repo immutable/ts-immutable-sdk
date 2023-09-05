@@ -221,11 +221,11 @@ export function TopUpView({
         <>
           {' '}
           <Icon icon="Loading" />
-          %
+          {' %'}
         </>
       );
     }
-    return (` ${fees}`);
+    return (` ${fees}%`);
   };
 
   const renderMenuItem = (
