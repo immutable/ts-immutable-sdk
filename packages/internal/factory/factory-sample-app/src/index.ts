@@ -17,7 +17,7 @@ async function main() {
         process.env.PROVIDER,
     );
 
-    // Create a wallet instance to simulate the user's wallet
+    // Create a wallet instance to simulate the user's wallet.
     const wallet = new ethers.Wallet(
         process.env.PRIVATE_KEY,
         provider,
