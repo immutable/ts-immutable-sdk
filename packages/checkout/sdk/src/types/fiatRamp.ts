@@ -12,14 +12,14 @@ export enum ExchangeType {
 }
 
 /**
- * Interface representing the result of {@link Checkout.generateTransakWidgetUrl}.
+ * Interface representing the result of {@link Checkout.createFiatRampUrl}.
  * @property {ExchangeType} exchangeType - The ExchangeType specified.
  * @property {Web3Provider} web3Provider - The Web3Provider used to exchange.
  * @property {string | undefined} tokenAmount - The token amount specified as input.
  * @property {string | undefined} tokenSymbol - The token symbol specified as input.
  * @property {Passport | undefined} passport - The Passport instance specified as input.
  */
-export interface CryptoFiatExchangeParams {
+export interface FiatRampParams {
   exchangeType: ExchangeType;
   web3Provider: Web3Provider;
   tokenAmount?: BigNumber;

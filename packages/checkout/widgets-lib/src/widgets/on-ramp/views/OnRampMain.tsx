@@ -163,7 +163,7 @@ export function OnRampMain({
         passport,
       };
 
-      setWidgetUrl(await checkout.createCryptoFiatExchangeUrl(params));
+      setWidgetUrl(await checkout.createFiatRampUrl(params));
     })();
 
     const domIframe:HTMLIFrameElement = document.getElementById(transakIframeId) as HTMLIFrameElement;
