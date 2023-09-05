@@ -1,10 +1,16 @@
 import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import { getEip155ChainId, getSignedTypedData } from './walletHelpers';
-import { chainId, eip155ChainId, mockUserZkEvm } from '../test/mocks';
+import {
+  chainId,
+  chainIdHex,
+  chainIdEip155,
+  mockUserZkEvm,
+} from '../test/mocks';
 import { RelayerClient } from './relayerClient';
 import { signTypedDataV4 } from './signTypedDataV4';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
+import { TypedDataPayload } from './types';
 
 jest.mock('@ethersproject/providers');
 jest.mock('./walletHelpers');
@@ -27,7 +33,7 @@ describe('signTypedDataV4', () => {
   beforeEach(() => {
     jest.resetAllMocks();
     relayerClient.imSignTypedData.mockResolvedValue(relayerSignature);
-    (getEip155ChainId as jest.Mock).mockReturnValue(eip155ChainId);
+    (getEip155ChainId as jest.Mock).mockReturnValue(chainIdEip155);
     (getSignedTypedData as jest.Mock).mockResolvedValueOnce(
       combinedSignature,
     );
@@ -36,28 +42,56 @@ describe('signTypedDataV4', () => {
     }));
   });
 
-  it('returns a signature', async () => {
-    const result = await signTypedDataV4({
-      method: 'eth_signTypedData_v4',
-      params: [address, JSON.stringify(eip712Payload)],
-      magicProvider,
-      jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
-      relayerClient: relayerClient as unknown as RelayerClient,
-      user: mockUserZkEvm,
-    });
+  describe('when a valid address and json are provided', () => {
+    it('returns a signature', async () => {
+      const result = await signTypedDataV4({
+        method: 'eth_signTypedData_v4',
+        params: [address, JSON.stringify(eip712Payload)],
+        magicProvider,
+        jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
+        relayerClient: relayerClient as unknown as RelayerClient,
+        user: mockUserZkEvm,
+      });
 
-    expect(result).toEqual(combinedSignature);
-    expect(relayerClient.imSignTypedData).toHaveBeenCalledWith(
-      address,
-      eip712Payload,
-    );
-    expect(getSignedTypedData).toHaveBeenCalledWith(
-      eip712Payload,
-      relayerSignature,
-      BigNumber.from(chainId),
-      address,
-      magicSigner,
-    );
+      expect(result).toEqual(combinedSignature);
+      expect(relayerClient.imSignTypedData).toHaveBeenCalledWith(
+        address,
+        eip712Payload,
+      );
+      expect(getSignedTypedData).toHaveBeenCalledWith(
+        eip712Payload,
+        relayerSignature,
+        BigNumber.from(chainId),
+        address,
+        magicSigner,
+      );
+    });
+  });
+
+  describe('when a valid address and object are provided', () => {
+    it('returns a signature', async () => {
+      const result = await signTypedDataV4({
+        method: 'eth_signTypedData_v4',
+        params: [address, eip712Payload],
+        magicProvider,
+        jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
+        relayerClient: relayerClient as unknown as RelayerClient,
+        user: mockUserZkEvm,
+      });
+
+      expect(result).toEqual(combinedSignature);
+      expect(relayerClient.imSignTypedData).toHaveBeenCalledWith(
+        address,
+        eip712Payload,
+      );
+      expect(getSignedTypedData).toHaveBeenCalledWith(
+        eip712Payload,
+        relayerSignature,
+        BigNumber.from(chainId),
+        address,
+        magicSigner,
+      );
+    });
   });
 
   describe('when an argument is missing', () => {
@@ -94,7 +128,7 @@ describe('signTypedDataV4', () => {
     });
   });
 
-  describe('when an invalid chainId is used', () => {
+  describe('when a different chainId is used', () => {
     it('should throw an error', async () => {
       await expect(async () => (
         signTypedDataV4({
@@ -116,5 +150,40 @@ describe('signTypedDataV4', () => {
         new JsonRpcError(RpcErrorCode.INVALID_PARAMS, `Invalid chainId, expected ${chainId}`),
       );
     });
+  });
+
+  it.each([chainIdHex, `${chainIdHex}`])('converts the chainId to a number and returns a signature', async (testChainId: any) => {
+    const result = await signTypedDataV4({
+      method: 'eth_signTypedData_v4',
+      params: [
+        address,
+        JSON.stringify({
+          domain: {
+            chainId: testChainId,
+          },
+        }),
+      ],
+      magicProvider,
+      jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
+      relayerClient: relayerClient as unknown as RelayerClient,
+      user: mockUserZkEvm,
+    });
+
+    const expectedPayload: Partial<TypedDataPayload> = {
+      domain: { chainId },
+    };
+
+    expect(result).toEqual(combinedSignature);
+    expect(relayerClient.imSignTypedData).toHaveBeenCalledWith(
+      address,
+      expectedPayload,
+    );
+    expect(getSignedTypedData).toHaveBeenCalledWith(
+      expectedPayload,
+      relayerSignature,
+      BigNumber.from(chainId),
+      address,
+      magicSigner,
+    );
   });
 });

@@ -10,10 +10,10 @@ import {
   resetMswHandlers,
   transactionHash,
   mswHandlers,
-  chainIdHex,
 } from './mocks/zkEvm/msw';
 import { JsonRpcError, RpcErrorCode } from './zkEvm/JsonRpcError';
 import GuardianClient from './guardian/guardian';
+import { chainIdHex } from './test/mocks';
 
 jest.mock('./guardian/guardian');
 

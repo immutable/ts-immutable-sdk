@@ -3,7 +3,7 @@ import { RelayerClient } from './relayerClient';
 import { PassportConfiguration } from '../config';
 import { UserZkEvm } from '../types';
 import { RelayerTransactionStatus, TypedDataPayload } from './types';
-import { chainId, eip155ChainId } from '../test/mocks';
+import { chainId, chainIdEip155 } from '../test/mocks';
 
 describe('relayerClient', () => {
   const transactionHash = '0x456';
@@ -61,7 +61,7 @@ describe('relayerClient', () => {
         params: [{
           to,
           data,
-          chainId: eip155ChainId,
+          chainId: chainIdEip155,
         }],
       });
     });
@@ -135,7 +135,7 @@ describe('relayerClient', () => {
         params: [{
           userAddress,
           data,
-          chainId: eip155ChainId,
+          chainId: chainIdEip155,
         }],
       });
     });
@@ -169,7 +169,7 @@ describe('relayerClient', () => {
         params: [{
           address,
           eip712Payload,
-          chainId: eip155ChainId,
+          chainId: chainIdEip155,
         }],
       });
     });

@@ -19,6 +19,39 @@ export type SignTypedDataV4Params = {
   params: Array<any>;
 };
 
+const transformTypedData = (typedData: string | object, chainId: number): TypedDataPayload => {
+  let transformedTypedData: TypedDataPayload;
+
+  if (typeof typedData === 'string') {
+    try {
+      transformedTypedData = JSON.parse(typedData);
+    } catch (ex) {
+      throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, `Failed to parse typed data JSON: ${ex}`);
+    }
+  } else if (typeof typedData === 'object') {
+    transformedTypedData = typedData as TypedDataPayload;
+  } else {
+    throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, `Invalid typed data argument: ${typedData}`);
+  }
+
+  if (transformedTypedData.domain?.chainId) {
+    // domain.chainId (if defined) can be a number, string, or hex value, but the relayer only accepts a number.
+    if (typeof transformedTypedData.domain.chainId === 'string') {
+      if (transformedTypedData.domain.chainId.startsWith('0x')) {
+        transformedTypedData.domain.chainId = parseInt(transformedTypedData.domain.chainId, 16);
+      } else {
+        transformedTypedData.domain.chainId = parseInt(transformedTypedData.domain.chainId, 10);
+      }
+    }
+
+    if (transformedTypedData.domain.chainId !== chainId) {
+      throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, `Invalid chainId, expected ${chainId}`);
+    }
+  }
+
+  return transformedTypedData;
+};
+
 export const signTypedDataV4 = async ({
   params,
   method,
@@ -27,23 +60,14 @@ export const signTypedDataV4 = async ({
   relayerClient,
 }: SignTypedDataV4Params): Promise<string> => {
   const fromAddress: string = params[0];
-  const typedDataString: string = params[1];
+  const typedDataParam: string | object = params[1];
 
-  if (!fromAddress || !typedDataString) {
+  if (!fromAddress || !typedDataParam) {
     throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, `${method} requires an address and a typed data JSON`);
   }
 
-  let typedData: TypedDataPayload;
-  try {
-    typedData = JSON.parse(typedDataString);
-  } catch (ex) {
-    throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, `Failed to parse typed data JSON: ${ex}`);
-  }
-
   const { chainId } = await jsonRpcProvider.ready;
-  if (typedData.domain?.chainId && typedData.domain.chainId !== chainId) {
-    throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, `Invalid chainId, expected ${chainId}`);
-  }
+  const typedData = transformTypedData(typedDataParam, chainId);
 
   // ID-959: Submit raw typedData payload to Guardian for evaluation
 
