@@ -16,11 +16,11 @@ export type Order = {
   /**
    * Time the Order is created
    */
-  created_at: string;
+  create_time: string;
   /**
    * Time after which the Order is considered expired
    */
-  end_at: string;
+  end_time: string;
   /**
    * Global Order identifier
    */
@@ -38,11 +38,11 @@ export type Order = {
   /**
    * Time after which Order is considered active
    */
-  start_at: string;
+  start_time: string;
   status: OrderStatus;
   /**
    * Time the Order is last updated
    */
-  updated_at: string;
+  update_time: string;
 };
 
