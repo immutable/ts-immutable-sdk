@@ -1,15 +1,15 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
-import { UnsignedTransactions } from '../../types';
+import { UnsignedActions } from '../../types';
 
-export const executeTransactions = async (
+export const signActions = async (
   provider: Web3Provider,
-  unsignedTransactions: UnsignedTransactions,
+  unsignedActions: UnsignedActions,
 ) => {
-  if (unsignedTransactions.approvalTransactions.length > 0) {
+  if (unsignedActions.approvalTransactions.length > 0) {
     try {
       const approvalTransactions = [];
-      for (const approvalTransaction of unsignedTransactions.approvalTransactions) {
+      for (const approvalTransaction of unsignedActions.approvalTransactions) {
         approvalTransactions.push(provider.getSigner().sendTransaction(approvalTransaction));
       }
       await Promise.all(approvalTransactions);
@@ -23,10 +23,10 @@ export const executeTransactions = async (
       );
     }
   }
-  if (unsignedTransactions.signableMessages.length > 0) {
+  if (unsignedActions.signableMessages.length > 0) {
     try {
       const signableMessages = [];
-      for (const signableMessage of unsignedTransactions.signableMessages) {
+      for (const signableMessage of unsignedActions.signableMessages) {
         // eslint-disable-next-line no-underscore-dangle
         signableMessages.push(provider.getSigner()._signTypedData(
           signableMessage.domain,
@@ -45,10 +45,10 @@ export const executeTransactions = async (
       );
     }
   }
-  if (unsignedTransactions.fulfilmentTransactions.length > 0) {
+  if (unsignedActions.fulfilmentTransactions.length > 0) {
     try {
       const fulfilmentTransactions = [];
-      for (const fulfilmentTransaction of unsignedTransactions.fulfilmentTransactions) {
+      for (const fulfilmentTransaction of unsignedActions.fulfilmentTransactions) {
         fulfilmentTransactions.push(provider.getSigner().sendTransaction(fulfilmentTransaction));
       }
       await Promise.all(fulfilmentTransactions);

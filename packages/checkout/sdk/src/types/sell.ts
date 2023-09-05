@@ -10,7 +10,8 @@ import {
  * @property {string} id - The ERC721 ID.
  * @property {string} collectionAddress - The contract address of the ERC721s collection.
  * @property {BuyToken} buyToken - The token to buy the item with.
- * @property {boolean} [executeTransactions] - Whether the transactions should be executed if the user is able to complete the sell.
+ * @property {boolean} [signActions] - Whether unsigned messages and transactions should be
+ * executed if the user is able to complete the buy.
  */
 export interface SellParams {
   provider: Web3Provider;

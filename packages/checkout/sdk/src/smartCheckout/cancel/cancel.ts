@@ -4,11 +4,13 @@ import { CheckoutConfiguration } from '../../config';
 import { CancelResult } from '../../types/cancel';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import * as instance from '../../instance';
+import { signActions } from '../actions';
 
 export const cancel = async (
   config: CheckoutConfiguration,
   provider: Web3Provider,
   orderId: string,
+  shouldSignActions?: boolean,
 ): Promise<CancelResult> => {
   let unsignedCancelOrderTransaction: PopulatedTransaction;
   try {
@@ -30,7 +32,18 @@ export const cancel = async (
     );
   }
 
+  const unsignedActions = {
+    fulfilmentTransactions: [unsignedCancelOrderTransaction],
+    approvalTransactions: [],
+    signableMessages: [],
+  };
+
+  if (shouldSignActions) {
+    await signActions(provider, unsignedActions);
+    return {};
+  }
+
   return {
-    unsignedCancelOrderTransaction,
+    unsignedActions,
   };
 };

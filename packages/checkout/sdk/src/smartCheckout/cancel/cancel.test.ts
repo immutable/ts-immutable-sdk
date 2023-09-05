@@ -6,8 +6,10 @@ import { CheckoutConfiguration } from '../../config';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { cancel } from './cancel';
 import { createOrderbookInstance } from '../../instance';
+import { signActions } from '../actions';
 
 jest.mock('../../instance');
+jest.mock('../actions');
 
 describe('cancel', () => {
   describe('cancel', () => {
@@ -83,12 +85,55 @@ describe('cancel', () => {
       const result = await cancel(config, mockProvider, orderId);
 
       expect(result).toEqual({
-        unsignedCancelOrderTransaction: {
-          to: '0xTO',
-          from: '0xFROM',
-          nonce: 1,
-        } as PopulatedTransaction,
+        unsignedActions: {
+          approvalTransactions: [],
+          fulfilmentTransactions: [
+            {
+              to: '0xTO',
+              from: '0xFROM',
+              nonce: 1,
+            },
+          ],
+          signableMessages: [],
+        },
       });
+    });
+
+    it('should sign the cancel transaction', async () => {
+      const orderId = '1';
+      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+        getListing: jest.fn().mockResolvedValue({
+          result: {
+            accountAddress: '0x123',
+            status: OrderStatus.ACTIVE,
+          },
+        }),
+        cancelOrder: jest.fn().mockResolvedValue({
+          unsignedCancelOrderTransaction: {
+            to: '0xTO',
+            from: '0xFROM',
+            nonce: 1,
+          } as PopulatedTransaction,
+        }),
+      });
+      (signActions as jest.Mock).mockResolvedValue({});
+
+      const result = await cancel(config, mockProvider, orderId, true);
+      expect(signActions).toBeCalledWith(
+        mockProvider,
+        {
+          approvalTransactions: [],
+          fulfilmentTransactions: [
+            {
+              to: '0xTO',
+              from: '0xFROM',
+              nonce: 1,
+            },
+          ],
+          signableMessages: [],
+        },
+      );
+      expect(result).toEqual({});
     });
   });
 });

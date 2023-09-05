@@ -18,7 +18,7 @@ import * as instance from '../../instance';
 import { CheckoutConfiguration } from '../../config';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { smartCheckout } from '../smartCheckout';
-import { executeTransactions, getUnsignedActions } from '../actions';
+import { signActions, getUnsignedActions } from '../actions';
 
 export const getERC721Requirement = (
   id: string,
@@ -54,7 +54,7 @@ export const sell = async (
   id: string,
   contractAddress: string,
   buyToken: BuyToken,
-  shouldExecuteTransactions?: boolean,
+  shouldSignActions?: boolean,
 ): Promise<SellResult> => {
   let orderbook: Orderbook;
   let listing: PrepareListingResponse;
@@ -105,8 +105,8 @@ export const sell = async (
 
   if (smartCheckoutResult.sufficient) {
     const unsignedActions = await getUnsignedActions(listing.actions);
-    if (shouldExecuteTransactions) {
-      await executeTransactions(provider, unsignedActions);
+    if (shouldSignActions) {
+      await signActions(provider, unsignedActions);
       return {
         smartCheckoutResult,
       };

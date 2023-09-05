@@ -15,7 +15,7 @@ import {
   ItemType, ItemRequirement, GasTokenType, TransactionOrGasType, GasAmount, FulfilmentTransaction, UnsignedActions,
 } from '../../types/smartCheckout';
 import { smartCheckout } from '..';
-import { executeTransactions, getUnsignedActions } from '../actions';
+import { signActions, getUnsignedActions } from '../actions';
 
 export const getItemRequirement = (
   type: ItemType,
@@ -64,7 +64,7 @@ export const buy = async (
   config: CheckoutConfiguration,
   provider: Web3Provider,
   orderId: string,
-  shouldExecuteTransactions?: boolean,
+  shouldSignActions?: boolean,
 ): Promise<BuyResult> => {
   let orderbook;
   let order;
@@ -148,8 +148,8 @@ export const buy = async (
     getTransactionOrGas(gasLimit, unsignedActions),
   );
 
-  if (smartCheckoutResult.sufficient && shouldExecuteTransactions) {
-    await executeTransactions(provider, unsignedActions);
+  if (smartCheckoutResult.sufficient && shouldSignActions) {
+    await signActions(provider, unsignedActions);
     return {
       smartCheckoutResult,
     };

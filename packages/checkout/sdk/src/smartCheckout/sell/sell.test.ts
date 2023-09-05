@@ -9,7 +9,7 @@ import { smartCheckout } from '../smartCheckout';
 import { createOrderbookInstance } from '../../instance';
 import { BuyToken } from '../../types/sell';
 import { CheckoutErrorType } from '../../errors';
-import { executeTransactions, getUnsignedActions } from '../actions';
+import { signActions, getUnsignedActions } from '../actions';
 
 jest.mock('../../instance');
 jest.mock('../smartCheckout');
@@ -143,7 +143,7 @@ describe('sell', () => {
       );
     });
 
-    it('should call smart checkout and execute the transactions', async () => {
+    it('should call smart checkout and sign the actions', async () => {
       const id = '0';
       const contractAddress = '0xERC721';
 
@@ -210,7 +210,7 @@ describe('sell', () => {
           value: '',
         }],
       });
-      (executeTransactions as jest.Mock).mockResolvedValue({});
+      (signActions as jest.Mock).mockResolvedValue({});
 
       const result = await sell(
         config,
@@ -244,7 +244,18 @@ describe('sell', () => {
           },
         },
       );
-      expect(executeTransactions).toBeCalledTimes(1);
+      expect(signActions).toBeCalledWith(
+        mockProvider,
+        {
+          approvalTransactions: [{ from: '0xAPPROVAL' }],
+          fulfilmentTransactions: [],
+          signableMessages: [{
+            domain: '',
+            types: '',
+            value: '',
+          }],
+        },
+      );
     });
 
     it('should call smart checkout and return no transactions when sufficient false', async () => {

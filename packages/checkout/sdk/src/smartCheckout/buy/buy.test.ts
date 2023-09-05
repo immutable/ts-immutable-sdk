@@ -14,7 +14,7 @@ import {
   FulfilmentTransaction, GasAmount, GasTokenType, ItemType, TransactionOrGasType,
 } from '../../types/smartCheckout';
 import { smartCheckout } from '..';
-import { executeTransactions, getUnsignedActions } from '../actions';
+import { signActions, getUnsignedActions } from '../actions';
 
 jest.mock('../../instance');
 jest.mock('../smartCheckout');
@@ -41,7 +41,7 @@ describe('buy', () => {
     });
 
     it(
-      'should call smart checkout with item requirements and fulfilment transaction and not execute transactions',
+      'should call smart checkout with item requirements and fulfilment transaction and not execute actions',
       async () => {
         const smartCheckoutResult = {
           sufficient: true,
@@ -142,7 +142,7 @@ describe('buy', () => {
             signableMessages: [],
           },
         });
-        expect(executeTransactions).toBeCalledTimes(0);
+        expect(signActions).toBeCalledTimes(0);
       },
     );
 
@@ -244,7 +244,7 @@ describe('buy', () => {
       );
     });
 
-    it('should execute transactions when execute transaction flag provided and sufficient true', async () => {
+    it('should sign actions when sign actions flag provided and sufficient true', async () => {
       const smartCheckoutResult = {
         sufficient: true,
         transactionRequirements: [{
@@ -311,7 +311,12 @@ describe('buy', () => {
           ],
         }),
       });
-      (executeTransactions as jest.Mock).mockResolvedValue({});
+      (getUnsignedActions as jest.Mock).mockResolvedValue({
+        approvalTransactions: [{ from: '0xAPPROVAL' }],
+        fulfilmentTransactions: [{ from: '0xTRANSACTION' }],
+        signableMessages: [],
+      });
+      (signActions as jest.Mock).mockResolvedValue({});
 
       const orderId = '1';
       const itemRequirements = [
@@ -332,7 +337,7 @@ describe('buy', () => {
         itemRequirements,
         fulfilmentTransaction,
       );
-      expect(executeTransactions).toBeCalledWith(
+      expect(signActions).toBeCalledWith(
         mockProvider,
         {
           approvalTransactions: [{ from: '0xAPPROVAL' }],
@@ -346,8 +351,8 @@ describe('buy', () => {
     });
 
     it(
-      `should not execute transactions and only return smart checkout result when 
-      execute transaction flag provided and sufficient false`,
+      `should not sign actions and only return smart checkout result when 
+      sign actions flag provided and sufficient false`,
       async () => {
         const smartCheckoutResult = {
           sufficient: false,
@@ -415,8 +420,11 @@ describe('buy', () => {
             ],
           }),
         });
-        (executeTransactions as jest.Mock).mockResolvedValue({});
-
+        (getUnsignedActions as jest.Mock).mockResolvedValue({
+          approvalTransactions: [{ from: '0xAPPROVAL' }],
+          fulfilmentTransactions: [{ from: '0xTRANSACTION' }],
+          signableMessages: [],
+        });
         const orderId = '1';
         const itemRequirements = [
           {
@@ -436,7 +444,7 @@ describe('buy', () => {
           itemRequirements,
           fulfilmentTransaction,
         );
-        expect(executeTransactions).toBeCalledTimes(0);
+        expect(signActions).toBeCalledTimes(0);
         expect(buyResult).toEqual({
           smartCheckoutResult,
         });
