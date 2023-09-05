@@ -38,7 +38,7 @@
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
-    "build": "NODE_ENV=production rollup --config rollup.config.js",
+    "build": "",
     "lint": "eslint ./src --ext .ts --max-warnings=0",
     "lint:fix": "cd ../../../ && yarn wsrun -p @imtbl/bridge-sdk -c lint --fix",
     "test": "jest test",
