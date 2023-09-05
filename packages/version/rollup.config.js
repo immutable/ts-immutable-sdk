@@ -7,5 +7,8 @@ export default {
     dir: 'dist',
     format: 'es',
   },
-  plugins: [typescript(),json()],
+  plugins: [
+    typescript(),
+    json()
+  ],
 };
