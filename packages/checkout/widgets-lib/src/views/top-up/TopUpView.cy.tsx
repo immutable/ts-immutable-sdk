@@ -280,7 +280,14 @@ describe('Top Up View', () => {
       cyIntercept();
     });
 
-    it('should display fees for swap and bridge', () => {
+    it('should display fees for onramp, swap and bridge', () => {
+      cy.stub(Checkout.prototype, 'getExchangeFeeEstimate')
+        .as('getExchangeFeeEstimateStub')
+        .onFirstCall()
+        .resolves({
+          minPercentage: '3.5',
+          maxPercentage: '5.5',
+        });
       cy.stub(Checkout.prototype, 'gasEstimate')
         .as('gasEstimateStub')
         .onFirstCall()
@@ -336,6 +343,7 @@ describe('Top Up View', () => {
 
       cySmartGet('menu-item-caption-swap').contains('$0.20 USD');
       cySmartGet('menu-item-caption-bridge').contains('$0.40 USD');
+      cySmartGet('menu-item-caption-onramp').contains('3.5% to 5.5%');
     });
   });
 });
