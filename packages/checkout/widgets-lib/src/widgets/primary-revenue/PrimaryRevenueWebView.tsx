@@ -17,28 +17,16 @@ const defaultPassportConfig = {
 
 const defaultItems: Item[] = [
   {
-    id: '60',
+    productId: 'P0001',
     qty: 1,
-    price: '0.5',
-    name: 'Poliwag',
-    image: 'https://pokemon-nfts.s3.ap-southeast-2.amazonaws.com/images/60.png',
-    description: 'Poliwag',
   },
   {
-    id: '61',
+    productId: 'P0002',
     qty: 1,
-    price: '1',
-    name: 'Poliwhirl',
-    image: 'https://pokemon-nfts.s3.ap-southeast-2.amazonaws.com/images/61.png',
-    description: 'Poliwhirl',
   },
   {
-    id: '62',
+    productId: 'P0003',
     qty: 1,
-    price: '2',
-    name: 'Poliwrath',
-    image: 'https://pokemon-nfts.s3.ap-southeast-2.amazonaws.com/images/62.png',
-    description: 'Poliwrath',
   },
 ];
 
@@ -49,15 +37,12 @@ const useParams = () => {
   const amount = urlParams.get('amount') as string;
   const envId = urlParams.get('envId') as string;
   const fromCurrency = urlParams.get('fromCurrency') as string;
-  // @deprecated
-  const fromContractAddress = urlParams.get('fromContractAddress') as string;
 
   return {
     login,
     amount,
     envId,
     fromCurrency,
-    fromContractAddress,
   };
 };
 
@@ -92,7 +77,7 @@ const usePassportInstance = (passportConfig: any) => {
 function PrimaryRevenueWebView() {
   const params = useParams();
   const {
-    login, amount, envId, fromCurrency, fromContractAddress,
+    login, amount, envId, fromCurrency,
   } = params;
   const [passportOn, setPassportOn] = useState(false);
   const [passportConfig, setPassportConfig] = useState(
@@ -179,8 +164,6 @@ function PrimaryRevenueWebView() {
         envId={envId}
         fromCurrency={fromCurrency}
         items={items}
-        // @deprecated
-        fromContractAddress={fromContractAddress}
       />
       <br />
       <h3>Passport Config</h3>
