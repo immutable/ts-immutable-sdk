@@ -338,103 +338,103 @@ describe('buy', () => {
       });
     });
 
-    it('should not execute transactions when execute transaction flag provided and sufficient false', async () => {
-      const smartCheckoutResult = {
-        sufficient: false,
-        transactionRequirements: [{
-          type: ItemType.NATIVE,
+    it(
+      `should not execute transactions and only return smart checkout result when 
+      execute transaction flag provided and sufficient false`,
+      async () => {
+        const smartCheckoutResult = {
           sufficient: false,
-          required: {
+          transactionRequirements: [{
             type: ItemType.NATIVE,
-            balance: BigNumber.from(2),
-            formattedBalance: '2',
-            token: {
-              name: 'IMX',
-              symbol: 'IMX',
-              decimals: 18,
+            sufficient: false,
+            required: {
+              type: ItemType.NATIVE,
+              balance: BigNumber.from(2),
+              formattedBalance: '2',
+              token: {
+                name: 'IMX',
+                symbol: 'IMX',
+                decimals: 18,
+              },
             },
-          },
-          current: {
-            type: ItemType.NATIVE,
-            balance: BigNumber.from(1),
-            formattedBalance: '1',
-            token: {
-              name: 'IMX',
-              symbol: 'IMX',
-              decimals: 18,
+            current: {
+              type: ItemType.NATIVE,
+              balance: BigNumber.from(1),
+              formattedBalance: '1',
+              token: {
+                name: 'IMX',
+                symbol: 'IMX',
+                decimals: 18,
+              },
             },
-          },
-          delta: {
-            balance: BigNumber.from(1),
-            formattedBalance: '1',
-          },
-        }],
-      };
-      (smartCheckout as jest.Mock).mockResolvedValue(smartCheckoutResult);
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
-        getListing: jest.fn().mockResolvedValue({
-          result: {
-            buy: [
+            delta: {
+              balance: BigNumber.from(1),
+              formattedBalance: '1',
+            },
+          }],
+        };
+        (smartCheckout as jest.Mock).mockResolvedValue(smartCheckoutResult);
+        (createOrderbookInstance as jest.Mock).mockResolvedValue({
+          getListing: jest.fn().mockResolvedValue({
+            result: {
+              buy: [
+                {
+                  type: 'NATIVE',
+                  amount: '1',
+                },
+              ],
+              fees: [
+                {
+                  amount: '1',
+                },
+              ],
+            },
+          }),
+          config: jest.fn().mockReturnValue({
+            seaportContractAddress,
+          }),
+          fulfillOrder: jest.fn().mockReturnValue({
+            actions: [
               {
-                type: 'NATIVE',
-                amount: '1',
+                type: ActionType.TRANSACTION,
+                purpose: TransactionPurpose.FULFILL_ORDER,
+                buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION' } as PopulatedTransaction),
+              },
+              {
+                type: ActionType.TRANSACTION,
+                purpose: TransactionPurpose.APPROVAL,
+                buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL' } as PopulatedTransaction),
               },
             ],
-            fees: [
-              {
-                amount: '1',
-              },
-            ],
+          }),
+        });
+        (executeTransactions as jest.Mock).mockResolvedValue({});
+
+        const orderId = '1';
+        const itemRequirements = [
+          {
+            type: ItemType.NATIVE,
+            amount: BigNumber.from('2'),
           },
-        }),
-        config: jest.fn().mockReturnValue({
-          seaportContractAddress,
-        }),
-        fulfillOrder: jest.fn().mockReturnValue({
-          actions: [
-            {
-              type: ActionType.TRANSACTION,
-              purpose: TransactionPurpose.FULFILL_ORDER,
-              buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION' } as PopulatedTransaction),
-            },
-            {
-              type: ActionType.TRANSACTION,
-              purpose: TransactionPurpose.APPROVAL,
-              buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL' } as PopulatedTransaction),
-            },
-          ],
-        }),
-      });
-      (executeTransactions as jest.Mock).mockResolvedValue({});
+        ];
+        const fulfilmentTransaction: FulfilmentTransaction = {
+          type: TransactionOrGasType.TRANSACTION,
+          transaction: { from: '0xTRANSACTION' },
+        };
 
-      const orderId = '1';
-      const itemRequirements = [
-        {
-          type: ItemType.NATIVE,
-          amount: BigNumber.from('2'),
-        },
-      ];
-      const fulfilmentTransaction: FulfilmentTransaction = {
-        type: TransactionOrGasType.TRANSACTION,
-        transaction: { from: '0xTRANSACTION' },
-      };
-
-      const buyResult = await buy(config, mockProvider, orderId, true);
-      expect(smartCheckout).toBeCalledWith(
-        config,
-        mockProvider,
-        itemRequirements,
-        fulfilmentTransaction,
-      );
-      expect(executeTransactions).toBeCalledTimes(0);
-      expect(buyResult).toEqual({
-        smartCheckoutResult,
-        transactions: {
-          approvalTransactions: [{ from: '0xAPPROVAL' }],
-          fulfilmentTransactions: [{ from: '0xTRANSACTION' }],
-        },
-      });
-    });
+        const buyResult = await buy(config, mockProvider, orderId, true);
+        expect(smartCheckout).toBeCalledWith(
+          config,
+          mockProvider,
+          itemRequirements,
+          fulfilmentTransaction,
+        );
+        expect(executeTransactions).toBeCalledTimes(0);
+        expect(buyResult).toEqual({
+          smartCheckoutResult,
+        });
+      },
+    );
 
     it('should throw error if orderbook returns erc721', async () => {
       (createOrderbookInstance as jest.Mock).mockResolvedValue({

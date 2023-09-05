@@ -125,7 +125,10 @@ export const buy = async (
     const fulfillerAddress = await provider.getSigner().getAddress();
     const { actions } = await orderbook.fulfillOrder(orderId, fulfillerAddress);
     unsignedTransactions = await getUnsignedTransactions(actions);
-  } catch { /* Use the gas limit when the fulfil order request errors */ }
+  } catch {
+    // Error usually thrown when fulfiller does not have enough balance to fulfil the order
+    // Silently catch & continue to run smart checkout to return the diffs
+  }
 
   let amount = BigNumber.from('0');
   let type: ItemType = ItemType.NATIVE;
@@ -181,8 +184,14 @@ export const buy = async (
     };
   }
 
+  if (smartCheckoutResult.sufficient) {
+    return {
+      smartCheckoutResult,
+      transactions: unsignedTransactions,
+    };
+  }
+
   return {
     smartCheckoutResult,
-    transactions: unsignedTransactions,
   };
 };
