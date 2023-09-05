@@ -8,14 +8,10 @@ import {
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
 import { ConnectTargetLayer, getL1ChainId, getL2ChainId } from '../../lib';
 import {
-  isValidAddress,
   isValidAmount,
 } from '../../lib/validations/widgetValidators';
 
 export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
-  // @deprecated
-  fromContractAddress = '';
-
   amount = '';
 
   envId = '';
@@ -36,8 +32,6 @@ export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
     this.envId = this.getAttribute('envId') ?? '';
     this.fromCurrency = this.getAttribute('fromCurrency') ?? '';
     this.items = JSON.parse(this.getAttribute('items') ?? '');
-    // @deprecated
-    this.fromContractAddress = this.getAttribute('fromContractAddress')?.toLowerCase() ?? '';
     this.renderWidget();
   }
 
@@ -64,13 +58,6 @@ export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
       // eslint-disable-next-line no-console
       console.warn('[IMTBL]: invalid "fromCurrency" widget input');
       this.fromCurrency = '';
-    }
-
-    // @deprecated
-    if (!isValidAddress(this.fromContractAddress)) {
-      // eslint-disable-next-line no-console
-      console.warn('[IMTBL]: invalid "fromContractAddress" widget input');
-      this.fromContractAddress = '';
     }
   }
 
@@ -99,11 +86,8 @@ export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
           <PrimaryRevenueWidget
             config={this.widgetConfig!}
             amount={this.amount}
-            envId={this.envId}
             fromCurrency={this.fromCurrency}
             items={this.items}
-            // deprecated
-            fromContractAddress={this.fromContractAddress}
           />
         </ConnectLoader>
       </React.StrictMode>,

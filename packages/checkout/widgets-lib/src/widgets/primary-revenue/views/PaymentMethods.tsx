@@ -18,10 +18,11 @@ import {
 
 export interface PaymentMethodsProps {
   checkBalances: () => Promise<boolean>;
+  setPaymentType: (type: 'fiat' | 'crypto' | undefined) => void;
 }
 
 export function PaymentMethods(props: PaymentMethodsProps) {
-  const { checkBalances } = props;
+  const { checkBalances, setPaymentType } = props;
   const { header } = text.views[PrimaryRevenueWidgetViews.PAYMENT_METHODS];
   const { viewDispatch, viewState } = useContext(ViewContext);
 
@@ -35,6 +36,10 @@ export function PaymentMethods(props: PaymentMethodsProps) {
 
   const handleOptionClick = useCallback(
     async (type: PrimaryRevenueWidgetViews) => {
+      setPaymentType(
+        type === PrimaryRevenueWidgetViews.PAY_WITH_CRYPTO ? 'crypto' : 'fiat',
+      );
+
       try {
         viewDispatch({
           payload: {
@@ -55,9 +60,7 @@ export function PaymentMethods(props: PaymentMethodsProps) {
               type: ViewActions.UPDATE_VIEW,
               view: {
                 type: SharedViews.TOP_UP_VIEW,
-                data: {
-
-                },
+                data: {},
                 bridgeData: {
                   fromAmount: amount,
                   fromContractAddress,
