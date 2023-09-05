@@ -152,7 +152,7 @@ describe('signTypedDataV4', () => {
     });
   });
 
-  it.each([chainIdHex, `${chainIdHex}`])('converts the chainId to a number and returns a signature', async (testChainId: any) => {
+  it.each([chainIdHex, `${chainId}`])('converts the chainId to a number and returns a signature', async (testChainId: any) => {
     const result = await signTypedDataV4({
       method: 'eth_signTypedData_v4',
       params: [
