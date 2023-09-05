@@ -260,6 +260,7 @@ describe('WalletBalances', () => {
       cySmartGet('@requestBridgeEventStub').should('have.been.called');
       cySmartGet('@requestBridgeEventStub').should(
         'have.been.calledWith',
+        window,
         IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
         {
           tokenAddress: 'NATIVE',
