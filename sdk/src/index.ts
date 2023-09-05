@@ -9,3 +9,4 @@ export * as checkoutWidgets from './checkout_widgets';
 export * as erc20 from './erc20';
 export * as erc721 from './erc721';
 export * as erc721MintById from './erc721_mint_by_id';
+export * as version from './version';

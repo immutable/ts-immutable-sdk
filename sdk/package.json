@@ -111,6 +111,10 @@
     "./erc721_mint_by_id": {
       "types": "./dist/erc721_mint_by_id.d.ts",
       "import": "./dist/erc721_mint_by_id.js"
+    },
+    "./version": {
+      "types": "./dist/version.d.ts",
+      "import": "./dist/version.js"
     }
   },
   "files": [
