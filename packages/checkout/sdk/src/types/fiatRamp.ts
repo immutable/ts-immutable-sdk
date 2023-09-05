@@ -16,7 +16,7 @@ export enum ExchangeType {
  * @property {ExchangeType} exchangeType - The ExchangeType specified.
  * @property {Web3Provider} web3Provider - The Web3Provider used to exchange.
  * @property {string | undefined} tokenAmount - The token amount specified as input.
- * @property {string | undefined} tokenSymbol - The token symbol specified as input.
+ * @property {string | undefined} tokenAddress - The token address specified as input.
  * @property {Passport | undefined} passport - The Passport instance specified as input.
  */
 export interface FiatRampParams {
