@@ -17,7 +17,7 @@ export type CreateListingRequestBody = {
   /**
    * Time after which the Order is considered expired
    */
-  end_time: string;
+  end_at: string;
   protocol_data: ProtocolData;
   /**
    * A random value added to the create Order request
@@ -34,6 +34,6 @@ export type CreateListingRequestBody = {
   /**
    * Time after which Order is considered active
    */
-  start_time: string;
+  start_at: string;
 };
 
