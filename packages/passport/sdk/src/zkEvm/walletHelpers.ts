@@ -7,7 +7,7 @@ import { MetaTransaction, MetaTransactionNormalised, TypedDataPayload } from './
 
 const SIGNATURE_WEIGHT = 1; // Weight of a single signature in the multi-sig
 const TRANSACTION_SIGNATURE_THRESHOLD = 1; // Total required weight in the multi-sig for a transaction
-const SIGNING_SIGNATURE_THRESHOLD = 2; // Total required weight in the multi-sig for data signing
+const EIP712_SIGNATURE_THRESHOLD = 2; // Total required weight in the multi-sig for data signing
 
 const ETH_SIGN_FLAG = '02';
 const ETH_SIGN_PREFIX = '\x19\x01';
@@ -130,7 +130,7 @@ export const getSignedTypedData = async (
   const { signers } = decodeRelayerTypedDataSignature(relayerSignature);
 
   return encodeSignature({
-    threshold: SIGNING_SIGNATURE_THRESHOLD,
+    threshold: EIP712_SIGNATURE_THRESHOLD,
     signers: [
       ...signers,
       {

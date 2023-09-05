@@ -1,6 +1,10 @@
 import { Provider, TypedDataPayload } from '@imtbl/passport';
 import { ethers } from 'ethers';
 
+// https://eips.ethereum.org/EIPS/eip-1271#specification
+// EIP-1271 states that `isValidSignature` must return the following value if the signature is valid
+const ERC_1271_MAGIC_VALUE = '0x1626ba7e';
+
 export const isSignatureValid = async (
   address: string,
   payload: TypedDataPayload,
@@ -19,18 +23,10 @@ export const isSignatureValid = async (
   );
   const contract = new ethers.Contract(
     address,
-    [{
-      type: 'function',
-      name: 'isValidSignature',
-      constant: true,
-      inputs: [{ type: 'bytes32' }, { type: 'bytes' }],
-      outputs: [{ type: 'bytes4' }],
-      payable: false,
-      stateMutability: 'view',
-    }],
+    ['function isValidSignature(bytes32, bytes) public view returns (bytes4)'],
     new ethers.providers.Web3Provider(zkEvmProvider),
   );
 
   const isValidSignatureHex = await contract.isValidSignature(hash, signature);
-  return isValidSignatureHex === '0x1626ba7e';
+  return isValidSignatureHex === ERC_1271_MAGIC_VALUE;
 };

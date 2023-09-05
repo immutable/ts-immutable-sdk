@@ -25,8 +25,8 @@ const transformTypedData = (typedData: string | object, chainId: number): TypedD
   if (typeof typedData === 'string') {
     try {
       transformedTypedData = JSON.parse(typedData);
-    } catch (ex) {
-      throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, `Failed to parse typed data JSON: ${ex}`);
+    } catch (err: any) {
+      throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, `Failed to parse typed data JSON: ${err}`);
     }
   } else if (typeof typedData === 'object') {
     transformedTypedData = typedData as TypedDataPayload;
