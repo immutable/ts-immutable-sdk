@@ -25,27 +25,19 @@ type SignDataType = {
 };
 
 type Input = {
-  amount: string;
-  fromContractAddress: string;
-  fromCollectionAddress: string;
   items: {
-    id: string;
-    name: string;
-    price: string;
+    productId: string;
     qty: number;
-    image: string;
   }[];
   fromCurrency?: string;
-  paymentMethod?: string;
-  envId?: string;
+  paymentType?: string;
   provider: Web3Provider | undefined;
 };
 
 export const useSignOrder = ({
   items,
-  amount,
-  fromContractAddress,
-  fromCollectionAddress,
+  fromCurrency,
+  paymentType,
   provider,
 }: Input) => {
   const [signData, setSignData] = useState<SignDataType | undefined>();
@@ -87,14 +79,16 @@ export const useSignOrder = ({
 
   const sign = useCallback(async (): Promise<void> => {
     const data = {
-      amount: Number(amount),
       recipient_address: recipientAddress,
-      erc20_contract_address: fromContractAddress,
-      items: items.map((item) => ({
-        collection_address: fromCollectionAddress,
-        token_id: item.id,
+      currency: fromCurrency,
+      payment_type: paymentType,
+      products: items.map((item) => ({
+        product_id: item.productId,
+        quantity: item.qty,
       })),
     };
+
+    console.log('@@@ data', data);
 
     try {
       const response = await fetch(
@@ -117,9 +111,8 @@ export const useSignOrder = ({
     }
   }, [
     items,
-    amount,
-    fromCollectionAddress,
-    fromContractAddress,
+    fromCurrency,
+    paymentType,
     recipientAddress,
   ]);
 
