@@ -182,7 +182,7 @@ describe('getAllowedBalances', () => {
     });
   });
 
-  it.only('should accept a different policy', async () => {
+  it('should accept a different policy', async () => {
     const checkout = new Checkout({
       baseConfig: { environment: Environment.PRODUCTION },
     });
