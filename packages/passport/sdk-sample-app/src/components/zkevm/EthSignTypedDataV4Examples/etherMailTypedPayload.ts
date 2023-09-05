@@ -1,4 +1,4 @@
-export const getEtherMailTypedPayload = (chainId: number) => JSON.stringify({
+export const getEtherMailTypedPayload = (chainId: number) => ({
   domain: {
     name: 'Ether Mail',
     version: '1',

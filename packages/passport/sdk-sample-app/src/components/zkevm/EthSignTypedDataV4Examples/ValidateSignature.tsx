@@ -6,6 +6,7 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import { usePassportProvider } from '@/context/PassportProvider';
 import WorkflowButton from '@/components/WorkflowButton';
 import { RequestExampleProps } from '@/types';
+import { TypedDataPayload } from '@imtbl/passport';
 import { isSignatureValid } from './isSignatureValid';
 
 function ValidateSignature({ disabled }: RequestExampleProps) {
@@ -33,7 +34,12 @@ function ValidateSignature({ disabled }: RequestExampleProps) {
         return;
       }
 
-      const isValid = await isSignatureValid(address, payload, signature, zkEvmProvider);
+      const isValid = await isSignatureValid(
+        address,
+        JSON.parse(payload) as TypedDataPayload,
+        signature,
+        zkEvmProvider,
+      );
 
       setIsValidSignature(isValid);
       setSignatureValidationMessage(isValid ? 'Signature is valid' : 'Signature is invalid');

@@ -6,6 +6,7 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import { usePassportProvider } from '@/context/PassportProvider';
 import WorkflowButton from '@/components/WorkflowButton';
 import { RequestExampleProps } from '@/types';
+import { TypedDataPayload } from '@imtbl/passport';
 import { getEtherMailTypedPayload } from './etherMailTypedPayload';
 import { isSignatureValid } from './isSignatureValid';
 
@@ -15,7 +16,7 @@ function ValidateEtherMail({ disabled }: RequestExampleProps) {
   const [isValidSignature, setIsValidSignature] = useState<boolean | undefined>();
   const [signatureValidationMessage, setSignatureValidationMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [etherMailTypedPayload, setEtherMailTypedPayload] = useState<string>('');
+  const [etherMailTypedPayload, setEtherMailTypedPayload] = useState<TypedDataPayload | undefined>();
 
   const { zkEvmProvider } = usePassportProvider();
 
@@ -90,7 +91,7 @@ function ValidateEtherMail({ disabled }: RequestExampleProps) {
             </Form.Label>
             <Form.Control
               required
-              value={etherMailTypedPayload}
+              value={etherMailTypedPayload ? JSON.stringify(etherMailTypedPayload) : ''}
               disabled
               type="text"
             />

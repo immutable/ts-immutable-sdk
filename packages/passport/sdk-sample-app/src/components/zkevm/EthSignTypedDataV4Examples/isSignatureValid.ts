@@ -1,22 +1,21 @@
-import { Provider } from '@imtbl/passport';
+import { Provider, TypedDataPayload } from '@imtbl/passport';
 import { ethers } from 'ethers';
 
 export const isSignatureValid = async (
   address: string,
-  payload: string,
+  payload: TypedDataPayload,
   signature: string,
   zkEvmProvider: Provider,
 ) => {
-  const typedDataPayload = JSON.parse(payload);
-  const types = { ...typedDataPayload.types };
+  const types = { ...payload.types };
   // @ts-ignore
   delete types.EIP712Domain;
 
   // eslint-disable-next-line no-underscore-dangle
   const hash = ethers.utils._TypedDataEncoder.hash(
-    typedDataPayload.domain,
+    payload.domain,
     types,
-    typedDataPayload.message,
+    payload.message,
   );
   const contract = new ethers.Contract(
     address,
