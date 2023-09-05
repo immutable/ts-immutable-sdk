@@ -284,8 +284,8 @@ export const text = {
       topUpOptions: {
         onramp: {
           heading: 'Buy with card',
-          caption: 'Google pay & Apple pay available. Minimum $20.',
-          subcaption: 'Fees ≈ 0.3%',
+          caption: 'Google pay & Apple pay available. Minimum $5.',
+          subcaption: 'Fees ≈',
         },
         swap: {
           heading: 'Swap my coins',
