@@ -51,10 +51,10 @@ Table of contents
 2. Add the package folder to the list of `workspaces` in the `packages.json` (at the root level).
 3. Run `yarn` again for workspaces to register the new project, and map internals.
 4. If your project is intended to be exported at the SDK root level (i.e. not internal):
-5. Add your project to the list of `devDependencies` of the root project
-6. Add a new file in the `sdk/src` folder, importing all your exports from project, and re-export them.
-7. Add this file to the `rollup.config.js` file for this to be built.
-8. You'll need to add this to the `exports` of the `package.json` of the SDK too.
+   1. Add your project to the list of `devDependencies` of the root project
+   2. Add a new file in the `sdk/src` folder, importing all your exports from project, and re-export them.
+   3. Add this file to the `rollup.config.js` file for this to be built.
+   4. You'll need to add this to the `exports` of the `package.json` of the SDK too.
 
 Please name your project as `@imtbl/PROJECT_NAME`. Please also mark your project as `private: true` in your package.json, as we don't intend to publish your package.
 
