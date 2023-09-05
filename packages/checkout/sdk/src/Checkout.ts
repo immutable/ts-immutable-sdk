@@ -46,6 +46,7 @@ import {
   GasEstimateBridgeToL2Result,
   SmartCheckoutParams,
   TokenFilterTypes,
+  OnRampProviderFees,
 } from './types';
 import { CheckoutConfiguration } from './config';
 import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
@@ -75,7 +76,7 @@ export class Checkout {
     config: CheckoutModuleConfiguration = SANDBOX_CONFIGURATION,
   ) {
     this.config = new CheckoutConfiguration(config);
-    this.cryptoFiatExchangeService = new CryptoFiatExchangeService(this.config.environment);
+    this.cryptoFiatExchangeService = new CryptoFiatExchangeService(this.config);
     this.readOnlyProviders = new Map<ChainId, ethers.providers.JsonRpcProvider>();
   }
 
@@ -425,5 +426,13 @@ export class Checkout {
       tokenSymbol: token?.symbol ?? 'IMX',
       email,
     } as CryptoFiatExchangeWidgetParams);
+  }
+
+  /**
+   * Fetches crypto fiat exchange fee estimations.
+   * @returns {Promise<OnRampProviderFees>} - A promise that resolves to OnRampProviderFees.
+   */
+  public async getExchangeFeeEstimate(): Promise<OnRampProviderFees> {
+    return await this.cryptoFiatExchangeService.feeEstimate();
   }
 }

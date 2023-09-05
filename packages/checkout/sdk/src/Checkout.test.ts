@@ -752,4 +752,32 @@ describe('Connect', () => {
       });
     });
   });
+
+  describe('getExchangeFeeEstimate', () => {
+    let feeEstimateMock: jest.Mock;
+    let checkout: Checkout;
+
+    const feeEstimate = {
+      minPercentage: '3.5',
+      maxPercentage: '5.5',
+      feePercentage: undefined,
+    };
+
+    beforeEach(() => {
+      feeEstimateMock = jest.fn().mockResolvedValue(feeEstimate);
+      (CryptoFiatExchangeService as jest.Mock).mockReturnValue({
+        feeEstimate: feeEstimateMock,
+      });
+
+      checkout = new Checkout({
+        baseConfig: { environment: Environment.PRODUCTION },
+      });
+    });
+
+    it('should call cryptoFiatExchangeService.getExchangeFeeEstimate', async () => {
+      await checkout.getExchangeFeeEstimate();
+
+      expect(feeEstimateMock).toBeCalledTimes(1);
+    });
+  });
 });
