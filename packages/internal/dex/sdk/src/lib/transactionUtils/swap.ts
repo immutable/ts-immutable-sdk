@@ -3,17 +3,12 @@ import {
 } from '@uniswap/v3-sdk';
 import { SwapRouter } from '@uniswap/router-sdk';
 import { Token, Percent, TradeType } from '@uniswap/sdk-core';
-import { ethers } from 'ethers';
 import { SecondaryFee__factory } from 'contracts/types';
 import { ISecondaryFee, SecondaryFeeInterface } from 'contracts/types/SecondaryFee';
 import { Fees } from 'lib/fees';
 import { toCurrencyAmount } from 'lib/utils';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
-import {
-  Amount,
-  SecondaryFee,
-  TokenInfo, TransactionDetails,
-} from '../../types';
+import { Amount, SecondaryFee, TransactionDetails } from '../../types';
 import { calculateGasFee } from './gas';
 import { slippageToFraction } from './slippage';
 
@@ -196,14 +191,13 @@ function createSwapParameters(
 }
 
 export function getSwap(
-  nativeToken: TokenInfo,
   adjustedQuote: QuoteResult,
   fromAddress: string,
   slippage: number,
   deadline: number,
   peripheryRouterAddress: string,
   secondaryFeesAddress: string,
-  gasPrice: ethers.BigNumber | null,
+  gasPrice: Amount | null,
   secondaryFees: SecondaryFee[],
 ): TransactionDetails {
   const calldata = createSwapParameters(
@@ -215,10 +209,7 @@ export function getSwap(
   );
 
   // TODO: Add additional gas fee estimates for secondary fees
-  const gasFeeEstimate = gasPrice ? {
-    token: nativeToken,
-    value: calculateGasFee(gasPrice, adjustedQuote.gasEstimate),
-  } : null;
+  const gasFeeEstimate = gasPrice ? calculateGasFee(gasPrice, adjustedQuote.gasEstimate) : null;
 
   return {
     transaction: {
