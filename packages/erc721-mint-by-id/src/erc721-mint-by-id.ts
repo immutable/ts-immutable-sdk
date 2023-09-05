@@ -1,16 +1,8 @@
 import type {
-  BigNumber,
-  BigNumberish,
-  BytesLike,
-  CallOverrides,
-  Overrides,
-  PopulatedTransaction,
+  BigNumber, BigNumberish, BytesLike, CallOverrides, Overrides, PopulatedTransaction,
 } from 'ethers';
 import type { Provider } from '@ethersproject/providers';
-import {
-  ImmutableERC721MintByID,
-  ImmutableERC721MintByID__factory,
-} from '@imtbl/contracts';
+import { ImmutableERC721MintByID, ImmutableERC721MintByID__factory } from '@imtbl/contracts';
 import { ImmutableERC721Base } from '@imtbl/contracts/dist/typechain/types/ImmutableERC721MintByID';
 import { PromiseOrValue } from '@imtbl/contracts/dist/typechain/types/common';
 
@@ -38,20 +30,14 @@ export class ERC721MintByID {
   /**
    * @returns the DEFAULT_ADMIN_ROLE as a string.
    */
-  public async DEFAULT_ADMIN_ROLE(
-    provider: Provider,
-    overrides: CallOverrides = {},
-  ): Promise<string> {
+  public async DEFAULT_ADMIN_ROLE(provider: Provider, overrides: CallOverrides = {}): Promise<string> {
     return await this.contract.connect(provider).DEFAULT_ADMIN_ROLE(overrides);
   }
 
   /**
    * @returns the MINTER_ROLE as a string.
    */
-  public async MINTER_ROLE(
-    provider: Provider,
-    overrides: CallOverrides = {},
-  ): Promise<string> {
+  public async MINTER_ROLE(provider: Provider, overrides: CallOverrides = {}): Promise<string> {
     return await this.contract.connect(provider).MINTER_ROLE(overrides);
   }
 
@@ -69,30 +55,21 @@ export class ERC721MintByID {
   /**
    * @returns the baseURI as a string.
    */
-  public async baseURI(
-    provider: Provider,
-    overrides: CallOverrides = {},
-  ): Promise<string> {
+  public async baseURI(provider: Provider, overrides: CallOverrides = {}): Promise<string> {
     return await this.contract.connect(provider).baseURI(overrides);
   }
 
   /**
    * @returns the contractURI as a string.
    */
-  public async contractURI(
-    provider: Provider,
-    overrides: CallOverrides = {},
-  ): Promise<string> {
+  public async contractURI(provider: Provider, overrides: CallOverrides = {}): Promise<string> {
     return await this.contract.connect(provider).contractURI(overrides);
   }
 
   /**
    * @returns admin addresses as an array of strings.
    */
-  public async getAdmins(
-    provider: Provider,
-    overrides: CallOverrides = {},
-  ): Promise<string[]> {
+  public async getAdmins(provider: Provider, overrides: CallOverrides = {}): Promise<string[]> {
     return await this.contract.connect(provider).getAdmins(overrides);
   }
 
@@ -104,9 +81,7 @@ export class ERC721MintByID {
     tokenId: PromiseOrValue<BigNumberish>,
     overrides: CallOverrides = {},
   ): Promise<string> {
-    return await this.contract
-      .connect(provider)
-      .getApproved(tokenId, overrides);
+    return await this.contract.connect(provider).getApproved(tokenId, overrides);
   }
 
   /**
@@ -129,9 +104,7 @@ export class ERC721MintByID {
     index: PromiseOrValue<BigNumberish>,
     overrides: CallOverrides = {},
   ): Promise<string> {
-    return await this.contract
-      .connect(provider)
-      .getRoleMember(role, index, overrides);
+    return await this.contract.connect(provider).getRoleMember(role, index, overrides);
   }
 
   /**
@@ -142,9 +115,7 @@ export class ERC721MintByID {
     role: PromiseOrValue<BytesLike>,
     overrides: CallOverrides = {},
   ): Promise<BigNumber> {
-    return await this.contract
-      .connect(provider)
-      .getRoleMemberCount(role, overrides);
+    return await this.contract.connect(provider).getRoleMemberCount(role, overrides);
   }
 
   /**
@@ -156,9 +127,7 @@ export class ERC721MintByID {
     account: PromiseOrValue<string>,
     overrides: CallOverrides = {},
   ): Promise<boolean> {
-    return await this.contract
-      .connect(provider)
-      .hasRole(role, account, overrides);
+    return await this.contract.connect(provider).hasRole(role, account, overrides);
   }
 
   /**
@@ -170,18 +139,13 @@ export class ERC721MintByID {
     operator: PromiseOrValue<string>,
     overrides: CallOverrides = {},
   ): Promise<boolean> {
-    return await this.contract
-      .connect(provider)
-      .isApprovedForAll(owner, operator, overrides);
+    return await this.contract.connect(provider).isApprovedForAll(owner, operator, overrides);
   }
 
   /**
    * @returns the name of the contract as a string.
    */
-  public async name(
-    provider: Provider,
-    overrides: CallOverrides = {},
-  ): Promise<string> {
+  public async name(provider: Provider, overrides: CallOverrides = {}): Promise<string> {
     return await this.contract.connect(provider).name(overrides);
   }
 
@@ -197,12 +161,22 @@ export class ERC721MintByID {
   }
 
   /**
+   * Returns the current nonce of a given token ID.
+   * @param tokenId The ID of the token for which to retrieve the nonce.
+   * @return Current nonce of the given token.
+   */
+  public async nonces(
+    provider: Provider,
+    tokenId: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides,
+  ): Promise<BigNumber> {
+    return await this.contract.connect(provider).nonces(tokenId, overrides);
+  }
+
+  /**
    * @returns the operator allowlist as a string.
    */
-  public async operatorAllowlist(
-    provider: Provider,
-    overrides: CallOverrides = {},
-  ): Promise<string> {
+  public async operatorAllowlist(provider: Provider, overrides: CallOverrides = {}): Promise<string> {
     return await this.contract.connect(provider).operatorAllowlist(overrides);
   }
 
@@ -215,18 +189,13 @@ export class ERC721MintByID {
     _salePrice: PromiseOrValue<BigNumberish>,
     overrides: CallOverrides = {},
   ): Promise<[string, BigNumber]> {
-    return await this.contract
-      .connect(provider)
-      .royaltyInfo(_tokenId, _salePrice, overrides);
+    return await this.contract.connect(provider).royaltyInfo(_tokenId, _salePrice, overrides);
   }
 
   /**
    * @returns the symbol of the contract as a string.
    */
-  public async symbol(
-    provider: Provider,
-    overrides: CallOverrides = {},
-  ): Promise<string> {
+  public async symbol(provider: Provider, overrides: CallOverrides = {}): Promise<string> {
     return await this.contract.connect(provider).symbol(overrides);
   }
 
@@ -244,10 +213,7 @@ export class ERC721MintByID {
   /**
    * @returns returns the total amount of tokens stored by the contract.
    */
-  public async totalSupply(
-    provider: Provider,
-    overrides: CallOverrides = {},
-  ): Promise<BigNumber> {
+  public async totalSupply(provider: Provider, overrides: CallOverrides = {}): Promise<BigNumber> {
     return await this.contract.connect(provider).totalSupply(overrides);
   }
 
@@ -265,11 +231,24 @@ export class ERC721MintByID {
       from?: PromiseOrValue<string>;
     } = {},
   ): Promise<PopulatedTransaction> {
-    return await this.contract.populateTransaction.approve(
-      to,
-      tokenId,
-      overrides,
-    );
+    return await this.contract.populateTransaction.approve(to, tokenId, overrides);
+  }
+
+  /**
+   * Function to approve by way of owner signature
+   * @param spender the address to approve
+   * @param tokenId the index of the NFT to approve the spender on
+   * @param deadline a timestamp expiry for the permit
+   * @param sig a traditional or EIP-2098 signature
+   */
+  public async populatePermit(
+    spender: PromiseOrValue<string>,
+    tokenId: PromiseOrValue<BigNumberish>,
+    deadline: PromiseOrValue<BigNumberish>,
+    sig: PromiseOrValue<BytesLike>,
+    overrides: CallOverrides = {},
+  ): Promise<PopulatedTransaction> {
+    return await this.contract.populateTransaction.permit(spender, tokenId, deadline, sig, overrides);
   }
 
   /**
@@ -293,10 +272,7 @@ export class ERC721MintByID {
       from?: PromiseOrValue<string>;
     } = {},
   ): Promise<PopulatedTransaction> {
-    return await this.contract.populateTransaction.burnBatch(
-      tokenIds,
-      overrides,
-    );
+    return await this.contract.populateTransaction.burnBatch(tokenIds, overrides);
   }
 
   /**
@@ -308,10 +284,7 @@ export class ERC721MintByID {
       from?: PromiseOrValue<string>;
     } = {},
   ): Promise<PopulatedTransaction> {
-    return await this.contract.populateTransaction.grantMinterRole(
-      user,
-      overrides,
-    );
+    return await this.contract.populateTransaction.grantMinterRole(user, overrides);
   }
 
   /**
@@ -324,11 +297,7 @@ export class ERC721MintByID {
       from?: PromiseOrValue<string>;
     } = {},
   ): Promise<PopulatedTransaction> {
-    return await this.contract.populateTransaction.grantRole(
-      role,
-      account,
-      overrides,
-    );
+    return await this.contract.populateTransaction.grantRole(role, account, overrides);
   }
 
   /**
@@ -353,10 +322,7 @@ export class ERC721MintByID {
       from?: PromiseOrValue<string>;
     } = {},
   ): Promise<PopulatedTransaction> {
-    return await this.contract.populateTransaction.safeMintBatch(
-      mints,
-      overrides,
-    );
+    return await this.contract.populateTransaction.safeMintBatch(mints, overrides);
   }
 
   /**
@@ -369,11 +335,7 @@ export class ERC721MintByID {
       from?: PromiseOrValue<string>;
     } = {},
   ): Promise<PopulatedTransaction> {
-    return await this.contract.populateTransaction.safeBurn(
-      owner,
-      tokenId,
-      overrides,
-    );
+    return await this.contract.populateTransaction.safeBurn(owner, tokenId, overrides);
   }
 
   /**
@@ -385,10 +347,7 @@ export class ERC721MintByID {
       from?: PromiseOrValue<string>;
     } = {},
   ): Promise<PopulatedTransaction> {
-    return await this.contract.populateTransaction.safeBurnBatch(
-      burns,
-      overrides,
-    );
+    return await this.contract.populateTransaction.safeBurnBatch(burns, overrides);
   }
 
   /**
@@ -401,11 +360,7 @@ export class ERC721MintByID {
       from?: PromiseOrValue<string>;
     } = {},
   ): Promise<PopulatedTransaction> {
-    return await this.contract.populateTransaction.renounceRole(
-      role,
-      account,
-      overrides,
-    );
+    return await this.contract.populateTransaction.renounceRole(role, account, overrides);
   }
 
   /**
@@ -417,10 +372,7 @@ export class ERC721MintByID {
       from?: PromiseOrValue<string>;
     } = {},
   ): Promise<PopulatedTransaction> {
-    return await this.contract.populateTransaction.revokeMinterRole(
-      user,
-      overrides,
-    );
+    return await this.contract.populateTransaction.revokeMinterRole(user, overrides);
   }
 
   /**
@@ -433,11 +385,7 @@ export class ERC721MintByID {
       from?: PromiseOrValue<string>;
     } = {},
   ): Promise<PopulatedTransaction> {
-    return await this.contract.populateTransaction.revokeRole(
-      role,
-      account,
-      overrides,
-    );
+    return await this.contract.populateTransaction.revokeRole(role, account, overrides);
   }
 
   /**
@@ -449,10 +397,7 @@ export class ERC721MintByID {
       from?: PromiseOrValue<string>;
     } = {},
   ): Promise<PopulatedTransaction> {
-    return await this.contract.populateTransaction.safeTransferFromBatch(
-      transfers,
-      overrides,
-    );
+    return await this.contract.populateTransaction.safeTransferFromBatch(transfers, overrides);
   }
 
   /**
@@ -466,9 +411,12 @@ export class ERC721MintByID {
       from?: PromiseOrValue<string>;
     } = {},
   ): Promise<PopulatedTransaction> {
-    return await this.contract.populateTransaction[
-      'safeTransferFrom(address,address,uint256)'
-    ](from, to, tokenId, overrides);
+    return await this.contract.populateTransaction['safeTransferFrom(address,address,uint256)'](
+      from,
+      to,
+      tokenId,
+      overrides,
+    );
   }
 
   /**
@@ -483,9 +431,13 @@ export class ERC721MintByID {
       from?: PromiseOrValue<string>;
     } = {},
   ): Promise<PopulatedTransaction> {
-    return await this.contract.populateTransaction[
-      'safeTransferFrom(address,address,uint256,bytes)'
-    ](from, to, tokenId, data, overrides);
+    return await this.contract.populateTransaction['safeTransferFrom(address,address,uint256,bytes)'](
+      from,
+      to,
+      tokenId,
+      data,
+      overrides,
+    );
   }
 
   /**
@@ -498,11 +450,7 @@ export class ERC721MintByID {
       from?: PromiseOrValue<string>;
     } = {},
   ): Promise<PopulatedTransaction> {
-    return await this.contract.populateTransaction.setApprovalForAll(
-      operator,
-      approved,
-      overrides,
-    );
+    return await this.contract.populateTransaction.setApprovalForAll(operator, approved, overrides);
   }
 
   /**
@@ -514,10 +462,7 @@ export class ERC721MintByID {
       from?: PromiseOrValue<string>;
     } = {},
   ): Promise<PopulatedTransaction> {
-    return await this.contract.populateTransaction.setBaseURI(
-      baseURI_,
-      overrides,
-    );
+    return await this.contract.populateTransaction.setBaseURI(baseURI_, overrides);
   }
 
   /**
@@ -529,10 +474,7 @@ export class ERC721MintByID {
       from?: PromiseOrValue<string>;
     } = {},
   ): Promise<PopulatedTransaction> {
-    return await this.contract.populateTransaction.setContractURI(
-      _contractURI,
-      overrides,
-    );
+    return await this.contract.populateTransaction.setContractURI(_contractURI, overrides);
   }
 
   /**
@@ -545,11 +487,7 @@ export class ERC721MintByID {
       from?: PromiseOrValue<string>;
     } = {},
   ): Promise<PopulatedTransaction> {
-    return await this.contract.populateTransaction.setDefaultRoyaltyReceiver(
-      receiver,
-      feeNumerator,
-      overrides,
-    );
+    return await this.contract.populateTransaction.setDefaultRoyaltyReceiver(receiver, feeNumerator, overrides);
   }
 
   /**
@@ -563,12 +501,7 @@ export class ERC721MintByID {
       from?: PromiseOrValue<string>;
     } = {},
   ): Promise<PopulatedTransaction> {
-    return await this.contract.populateTransaction.setNFTRoyaltyReceiver(
-      tokenId,
-      receiver,
-      feeNumerator,
-      overrides,
-    );
+    return await this.contract.populateTransaction.setNFTRoyaltyReceiver(tokenId, receiver, feeNumerator, overrides);
   }
 
   /**
@@ -599,9 +532,6 @@ export class ERC721MintByID {
       from?: PromiseOrValue<string>;
     } = {},
   ): Promise<PopulatedTransaction> {
-    return await this.contract.populateTransaction.setOperatorAllowlistRegistry(
-      _operatorAllowlist,
-      overrides,
-    );
+    return await this.contract.populateTransaction.setOperatorAllowlistRegistry(_operatorAllowlist, overrides);
   }
 }
