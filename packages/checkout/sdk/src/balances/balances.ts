@@ -111,7 +111,11 @@ export const getIndexerBalance = async (
   try {
     do {
       // eslint-disable-next-line no-await-in-loop
-      resp = await blockscoutClient.getAddressTokens({ walletAddress, tokenType, nextPage: resp?.next_page_params });
+      resp = await blockscoutClient.getAddressTokens({
+        walletAddress,
+        tokenType,
+        nextPage: resp?.next_page_params,
+      });
       items.push(...resp.items);
     } while (resp.next_page_params);
   } catch (err: any) {

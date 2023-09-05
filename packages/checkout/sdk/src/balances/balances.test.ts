@@ -332,7 +332,7 @@ describe('balances', () => {
       );
     });
 
-    it.only('should call getIndexerBalance', async () => {
+    it('should call getIndexerBalance', async () => {
       const chainId = Object.keys(BLOCKSCOUT_CHAIN_URL_MAP)[0] as unknown as ChainId;
 
       mockedAxios.get.mockResolvedValueOnce({

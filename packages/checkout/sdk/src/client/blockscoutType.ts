@@ -3,7 +3,6 @@
 import { HttpStatusCode } from 'axios';
 
 export enum BlockscoutTokenType {
-  NATIVE = 'NATIVE',
   ERC20 = 'ERC-20',
 }
 
