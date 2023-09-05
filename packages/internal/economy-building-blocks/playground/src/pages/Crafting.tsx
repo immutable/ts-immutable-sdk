@@ -164,7 +164,7 @@ function Crafting() {
             <Banner.Title>Crafting...</Banner.Title>
           </Banner>
         )}
-        {Array.from(successMessages.keys()).map((key) => (
+        {/* {Array.from(successMessages.keys()).map((key) => (
           <Banner
             key={key}
             variant="success"
@@ -178,7 +178,7 @@ function Crafting() {
               }}
             />
           </Banner>
-        ))}
+        ))} */}
         <Row>
           <Col xs={12} md={3}>
             <Box sx={{ marginBottom: "base.spacing.x8" }}>

@@ -28,6 +28,7 @@ declare global {
       'imtbl-swap': ImtblSwapProps;
       'imtbl-bridge': ImtblBridgeProps;
       'imtbl-onramp': ImtblOnRampProps;
+      'imtbl-primary-revenue': ImtblPrimaryRevenueProps;
     }
   }
 
