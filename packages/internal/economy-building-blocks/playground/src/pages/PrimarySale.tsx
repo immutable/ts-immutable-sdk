@@ -3,18 +3,11 @@ import { Box, Heading, Banner, Button, Card, Link } from "@biom3/react";
 
 import { Grid, Row, Col } from "react-flexbox-grid";
 
-import { encodeApprove } from "../contracts/erc20";
-import { useMetamaskProvider } from "../context/MetamaskProvider";
-import { usePassportProvider } from "../context/PassportProvider";
 import ItemCards from "../components/ItemCards";
 import StatusCard from "../components/StatusCard";
 import ConfigForm from "../components/ConfigForm";
 import { useData } from "../context/DataProvider";
 import { TransactionReceipt } from "@ethersproject/providers";
-
-interface MintResponse {
-  tx_id: string;
-}
 
 const useURLParams = () => {
   const [urlParams, setUrlParams] = useState({});
@@ -27,57 +20,6 @@ const useURLParams = () => {
   return urlParams;
 };
 
-const useMint = (selectedItems: any[], amount: number, config = {}) => {
-  const [response, setResponse] = useState<MintResponse | null>(null);
-  const [error, setError] = useState(null);
-
-  const fields = [
-    "contract_address",
-    "recipient_address",
-    "erc20_contract_address",
-    "fee_collection_address",
-    "sale_collection_address",
-  ];
-  const params = Object.keys(config)
-    .filter((key) => fields.includes(key))
-    .reduce(
-      (obj, key) => ({ ...obj, [key]: (config as Record<string, any>)[key] }),
-      {}
-    );
-
-  const mint = useCallback(async () => {
-    const data = {
-      ...params,
-      amount,
-      items: selectedItems.map((item) => ({
-        collection_address: item.contract_address,
-        token_id: item.token_id.toString(),
-      })),
-    };
-
-    try {
-      const response = await fetch(
-        "https://game-primary-sales.sandbox.imtbl.com/v1/games/pokemon/mint",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-immutable-api-key": "sk_imapik-Ekz6cLnnwREtqjGn$xo6_fb97b8",
-          },
-          body: JSON.stringify(data),
-        }
-      );
-
-      const json = await response.json();
-      setResponse(json);
-    } catch (error) {
-      setError(error as any);
-    }
-  }, [selectedItems, amount, config]);
-
-  return { mint, response, error };
-};
-
 const useItems = (contract_address: string, pointer = 1) => {
   const maxItems = 721;
   const once = useRef<number | undefined>(undefined);
@@ -88,7 +30,8 @@ const useItems = (contract_address: string, pointer = 1) => {
 
     const pageSize = 100;
     const start = pointer * pageSize - pageSize + 1;
-    const length = start + pageSize - 1 <= maxItems ? pageSize : maxItems - start + 1;
+    const length =
+      start + pageSize - 1 <= maxItems ? pageSize : maxItems - start + 1;
 
     if (start > maxItems) return;
 
@@ -101,7 +44,8 @@ const useItems = (contract_address: string, pointer = 1) => {
           );
           const json = await response.json();
 
-          const price = Math.floor(Math.random() * 25) + 1;
+          // const price = Math.floor(Math.random() * 25) + 1;
+          const price = Math.round((Math.random() * 3 + 0.1) * 100) / 100;
 
           return {
             token_id: id,
@@ -153,131 +97,87 @@ const useGetNfts = (
   return nfts;
 };
 
+const useOpenPopup = (url: string, name: string, specs: string) => {
+  const popup = useRef<Window | null>(null);
+
+  const openPopup = useCallback(() => {
+    popup.current = window.open(url, name, specs);
+  }, [url, name, specs]);
+
+  return { openPopup, popup };
+};
+
+const useMint = (amount: number, selectedItems: any[], configFields: any) => {
+  const [loading, setLoading] = useState(false);
+  const [receipt, setReceipt] = useState<TransactionReceipt | null>(null);
+
+  const items = selectedItems.map((item) => {
+    return {
+      id: item.token_id.toString(),
+      qty: 1,
+      price: item.price.toString(),
+      name: item.name,
+      image: item.image,
+      description: item.description,
+    };
+  });
+
+  console.log("items", items);
+
+  const params = {
+    amount: amount.toString(),
+    envId: "123",
+    fromCurrency: "USDC",
+    fromContractAddress: configFields.erc20_contract_address,
+    items: JSON.stringify(items),
+  };
+
+  const urlParams = new URLSearchParams(params).toString();
+
+  const { openPopup } = useOpenPopup(
+    `${window.location.origin}/mint-sale?${urlParams}`,
+    "Mint",
+    "width=430,height=650"
+  );
+
+  const handleMint = useCallback(async () => {
+    setLoading(true);
+    openPopup();
+  }, [amount, configFields, selectedItems]);
+
+  return { loading, receipt, handleMint };
+};
+
 function PrimarySale() {
   const fee = 0.1;
   const params = useURLParams();
   const [amount, setAmount] = useState(0);
-  const [isPassportConnected, setIsPassportConnected] = useState(false);
   const [selectedItems, setSelectedItems] = useState<any[]>([]);
   const [configFields, setConfigFields] = useState<Record<string, any>>({});
   const [isApproved, setIsApproved] = useState(false);
-  const [receipt, setReceipt] = useState<TransactionReceipt | null>(null);
-  const [mintResponse, setMintResponse] = useState<MintResponse | null>(null);
 
   const [itemsPointer, setItemsPointer] = useState(1);
 
   const items = useItems(configFields.contract_address, itemsPointer) as any[];
-  const {
-    mm_connect,
-    mm_sendTransaction,
-    mm_loading,
-    address,
-    mm_getTransactionReceipt,
-  } = useMetamaskProvider();
-
-  const { sendTx, getUserInfo } = usePassportProvider();
-
-  const loading = mm_loading;
-
-  let { mint, response } = useMint(selectedItems, amount, configFields);
 
   const nfts = useGetNfts(
     configFields.wallet_address || configFields.recipient_address,
     configFields.collection_address
   );
 
-  useEffect(() => {
-    getPassportInfoAsync();
-  });
-
-  const getPassportInfoAsync = async () => {
-    if (await getUserInfo()) {
-      setIsPassportConnected(true);
-    }
-  };
-
   // Reset the states of statuses if the selectedItems changes
   useEffect(() => {
     setIsApproved(false);
-    setMintResponse(null);
-    setReceipt(null);
-    setIsPassportConnected(false);
   }, [selectedItems]);
-
-  useEffect(() => {
-    setMintResponse(response);
-
-    if (response?.tx_id) {
-      const interval = setInterval(async () => {
-        try {
-          const receipt = await mm_getTransactionReceipt(response!.tx_id);
-          console.log("polling status ", receipt);
-
-          // if receipt is null means the transaction is still pending, no status yet
-          if (receipt) {
-            // stop polling when we receive a status either success or fail
-            if (receipt.status === 1 || receipt.status === 0) {
-              setReceipt(receipt);
-              clearInterval(interval);
-            }
-          }
-        } catch (error) {
-          console.error(error);
-        }
-      }, 1000);
-      return () => clearInterval(interval);
-    }
-  }, [response, mm_getTransactionReceipt]);
 
   useEffect(() => {
     setConfigFields(params);
   }, [params]);
 
-  const setApprove = useCallback(
-    async (amount: number, walletType: "MM" | "Passport"): Promise<boolean> => {
-      console.log("🚀 ~ file: PrimarySale.tsx:163 ~ amount:", amount);
-      if (!configFields.erc20_contract_address) {
-        throw new Error("ERC20 contract address not defined!");
-      }
-      if (!configFields.contract_address) {
-        throw new Error("Guarded multicaller contract address not defined!");
-      }
-
-      try {
-        const txData = encodeApprove(
-          configFields.contract_address,
-          `${amount}`
-        );
-
-        const execute = walletType === "MM" ? mm_sendTransaction : sendTx;
-        const approved = await execute(
-          configFields.erc20_contract_address,
-          txData
-        );
-
-        console.log("@@@ txData", txData);
-        return approved;
-      } catch (error) {
-        console.error("An error occurred:", error);
-        return false;
-      }
-    },
-    [mm_sendTransaction, configFields]
-  );
-
-  const handleMint = useCallback(
-    (walletType: "MM" | "Passport") => async () => {
-      setIsApproved(false);
-      setMintResponse(null);
-      setIsPassportConnected(false);
-
-      const approved = await setApprove(amount, walletType);
-      if (approved) {
-        mint();
-        setIsApproved(true);
-      }
-    },
-    [mint, amount]
+  const { loading, receipt, handleMint } = useMint(
+    amount,
+    selectedItems,
+    configFields
   );
 
   const handleIsSelectedItem = useCallback(
@@ -333,28 +233,6 @@ function PrimarySale() {
         </Banner>
         <Row>
           <Col xs={12} md={12} lg={4}>
-            <Button
-              size={"large"}
-              sx={{
-                background: "base.color.status.attention.bright",
-                width: "100%",
-              }}
-              onClick={() => {
-                mm_connect();
-              }}
-              disabled={loading}
-            >
-              <Button.Icon
-                icon={loading ? "Loading" : "WalletConnect"}
-                iconVariant="bold"
-                sx={{
-                  mr: "base.spacing.x1",
-                  ml: "0",
-                  width: "base.icon.size.400",
-                }}
-              />
-              {loading ? "Connecting..." : "Connect Wallet"}
-            </Button>
             <Box sx={{ marginTop: "base.spacing.x4" }}>
               <Box sx={{ marginBottom: "base.spacing.x5" }}>
                 <Heading size={"small"}>Mint Config</Heading>
@@ -409,36 +287,11 @@ function PrimarySale() {
               <Button
                 size={"large"}
                 sx={{
-                  background: "base.color.status.attention.bright",
-                  width: "100%",
-                  marginTop: "base.spacing.x4",
-                }}
-                onClick={handleMint("MM")}
-                disabled={amount === 0 || loading}
-              >
-                <Button.Icon
-                  icon={loading ? "Loading" : amount ? "Minting" : "Alert"}
-                  iconVariant="regular"
-                  sx={{
-                    mr: "base.spacing.x1",
-                    ml: "0",
-                    width: "base.icon.size.400",
-                  }}
-                />
-                {loading
-                  ? "Please wait..."
-                  : amount
-                  ? `Approve ${amount} USDC with MM`
-                  : "Select items to purchase"}
-              </Button>
-              <Button
-                size={"large"}
-                sx={{
                   background: "base.gradient.1",
                   width: "100%",
                   marginTop: "base.spacing.x4",
                 }}
-                onClick={handleMint("Passport")}
+                onClick={handleMint}
                 disabled={amount === 0 || loading}
               >
                 <Button.Icon
@@ -450,9 +303,7 @@ function PrimarySale() {
                     width: "base.icon.size.400",
                   }}
                 />
-                {amount
-                  ? `Approve ${amount} USDC with Passport`
-                  : "Select items to purchase"}
+                {amount ? "Buy Now" : "Select items to purchase"}
               </Button>
             </Box>
           </Col>
@@ -477,32 +328,14 @@ function PrimarySale() {
               <Card>
                 <Card.Caption>
                   <StatusCard
-                    status="Connect Wallet"
-                    description={
-                      isPassportConnected || address
-                        ? "| " +
-                          "MM: " +
-                          (address ? "✅" : "") +
-                          " | " +
-                          "Passport: " +
-                          (isPassportConnected ? "✅" : "❌")
-                        : ""
-                    }
-                    variant={
-                      address || isPassportConnected ? "success" : "standard"
-                    }
-                  ></StatusCard>
-                  <StatusCard
                     status="Approve Txn"
                     description={isApproved ? "✅" : ""}
                     variant={isApproved ? "success" : "standard"}
                   ></StatusCard>
                   <StatusCard
                     status="Minting"
-                    description={
-                      mintResponse ? "Txn Hash | " + mintResponse.tx_id : ""
-                    }
-                    variant={mintResponse ? "success" : "standard"}
+                    description={receipt ? "Txn Hash | " + receipt : ""}
+                    variant={receipt ? "success" : "standard"}
                   ></StatusCard>
                   <StatusCard
                     status={
@@ -527,7 +360,7 @@ function PrimarySale() {
                             sx={{ marginLeft: "base.spacing.x1" }}
                             onClick={() => {
                               window.open(
-                                `https://immutable-testnet.blockscout.com/tx/${mintResponse?.tx_id}`,
+                                `https://immutable-testnet.blockscout.com/tx/${receipt}`,
                                 "_blank"
                               );
                             }}
