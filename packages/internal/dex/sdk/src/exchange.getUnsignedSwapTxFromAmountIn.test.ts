@@ -25,8 +25,14 @@ import {
   expectToBeDefined,
   formatAmount,
   formatEther,
+  USDC_TEST_TOKEN,
+  expectInstanceOf,
+  newAmountFromString,
+  formatTokenAmount,
 } from './test/utils';
-import { Router, SecondaryFee, uniswapTokenToTokenInfo } from './lib';
+import {
+  addAmount, Router, SecondaryFee, uniswapTokenToTokenInfo,
+} from './lib';
 
 jest.mock('@ethersproject/providers');
 jest.mock('@ethersproject/contracts');
@@ -35,11 +41,14 @@ jest.mock('./lib/utils', () => ({
   // eslint-disable-next-line @typescript-eslint/naming-convention
   __esmodule: true,
   ...jest.requireActual('./lib/utils'),
-  getERC20Decimals: async () => 18,
+  // eslint-disable-next-line arrow-body-style
+  getERC20Decimals: async (address: string) => {
+    return address === USDC_TEST_TOKEN.address ? USDC_TEST_TOKEN.decimals : 18;
+  },
 }));
 
 const HIGHER_SLIPPAGE = 0.2;
-const APPROVED_AMOUNT = utils.parseEther('1');
+const APPROVED_AMOUNT = newAmountFromString('1', USDC_TEST_TOKEN);
 const APPROVE_GAS_ESTIMATE = BigNumber.from('100000');
 
 describe('getUnsignedSwapTxFromAmountIn', () => {
@@ -48,7 +57,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   beforeAll(() => {
     erc20Contract = (Contract as unknown as jest.Mock).mockImplementation(
       () => ({
-        allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT),
+        allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT.value),
         estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
         paused: jest.fn().mockResolvedValue(false),
       }),
@@ -73,21 +82,20 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
-      const amountIn = APPROVED_AMOUNT.add(utils.parseEther('1'));
+      const amountIn = addAmount(APPROVED_AMOUNT, newAmountFromString('1', USDC_TEST_TOKEN));
       const tx = await exchange.getUnsignedSwapTxFromAmountIn(
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        amountIn,
+        amountIn.value,
       );
 
       expectToBeDefined(tx.approval?.transaction.data);
 
-      const decodedResults = erc20ContractInterface
-        .decodeFunctionData('approve', tx.approval.transaction.data);
+      const decodedResults = erc20ContractInterface.decodeFunctionData('approve', tx.approval.transaction.data);
       expect(decodedResults[0]).toEqual(TEST_PERIPHERY_ROUTER_ADDRESS);
       // we have already approved 1000000000000000000, so we expect to approve 1000000000000000000 more
-      expect(decodedResults[1].toString()).toEqual(APPROVED_AMOUNT.toString());
+      expect(decodedResults[1].toString()).toEqual(APPROVED_AMOUNT.value.toString());
       expect(tx.approval.transaction.to).toEqual(params.inputToken);
       expect(tx.approval.transaction.from).toEqual(params.fromAddress);
       expect(tx.approval.transaction.value).toEqual(0); // we do not want to send any ETH
@@ -99,12 +107,12 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
-      const amountIn = APPROVED_AMOUNT.add(utils.parseEther('1'));
+      const amountIn = addAmount(APPROVED_AMOUNT, newAmountFromString('1', USDC_TEST_TOKEN));
       const tx = await exchange.getUnsignedSwapTxFromAmountIn(
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        amountIn,
+        amountIn.value,
       );
 
       expectToBeDefined(tx.approval?.gasFeeEstimate);
@@ -129,7 +137,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        APPROVED_AMOUNT,
+        APPROVED_AMOUNT.value,
       );
 
       // we have already approved 1000000000000000000, so we don't expect to approve anything
@@ -150,7 +158,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        utils.parseEther('100'),
+        newAmountFromString('100', USDC_TEST_TOKEN).value,
       )).rejects.toThrow(new NoRoutesAvailableError());
     });
   });
@@ -169,7 +177,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        utils.parseEther('100'),
+        newAmountFromString('100', USDC_TEST_TOKEN).value,
         3, // 3% Slippage
       );
 
@@ -183,6 +191,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const data = swap.transaction.data.toString();
 
       const { swapParams, secondaryFeeParams } = decodeMulticallExactInputSingleWithFees(data);
+      expectInstanceOf(BigNumber, swapParams.amountIn);
 
       expect(secondaryFeeParams[0].recipient).toBe(TEST_FEE_RECIPIENT);
       expect(secondaryFeeParams[0].basisPoints.toString()).toBe('100');
@@ -191,7 +200,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(swapParams.tokenOut).toBe(params.outputToken);
       expect(swapParams.fee).toBe(10000);
       expect(swapParams.recipient).toBe(params.fromAddress);
-      expect(formatEther(swapParams.amountIn)).toBe('100.0'); // swap.amountIn = userQuoteReq.amountIn
+      expect(formatTokenAmount(swapParams.amountIn, USDC_TEST_TOKEN)).toBe('100.0'); // swap.amountIn = userQuoteReq.amountIn
       expect(formatEther(swapParams.amountOutMinimum)).toBe('961.165048543689320388'); // swap.amountOutMinimum = ourQuoteRes.amountOut - slippage
       expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0');
 
@@ -203,7 +212,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
   describe('Swap with multiple pools and secondary fees', () => {
     it('generates valid swap calldata', async () => {
-      const params = setupSwapTxTest(true);
+      const params = setupSwapTxTest({ multiPoolSwap: true });
       mockRouterImplementation(params);
 
       const secondaryFees: SecondaryFee[] = [
@@ -216,7 +225,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        utils.parseEther('100'),
+        newAmountFromString('100', USDC_TEST_TOKEN).value,
       );
 
       expectToBeDefined(swap.transaction.data);
@@ -224,6 +233,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const data = swap.transaction.data.toString();
 
       const { swapParams, secondaryFeeParams } = decodeMulticallExactInputWithFees(data);
+      expectInstanceOf(BigNumber, swapParams.amountIn);
 
       expect(secondaryFeeParams[0].recipient).toBe(TEST_FEE_RECIPIENT);
       expect(secondaryFeeParams[0].basisPoints.toString()).toBe(TEST_MAX_FEE_BASIS_POINTS.toString());
@@ -241,12 +251,12 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(decodedPath.secondPoolFee.toString()).toBe('10000');
 
       expect(swapParams.recipient).toBe(params.fromAddress); // recipient of swap
-      expect(formatEther(swapParams.amountIn)).toBe('100.0');
+      expect(formatTokenAmount(swapParams.amountIn, USDC_TEST_TOKEN)).toBe('100.0');
       expect(formatEther(swapParams.amountOutMinimum)).toBe('899.100899100899100899'); // includes slippage and fees
     });
 
     it('returns a quote', async () => {
-      const params = setupSwapTxTest(true);
+      const params = setupSwapTxTest({ multiPoolSwap: true });
       mockRouterImplementation(params);
 
       const secondaryFees: SecondaryFee[] = [
@@ -259,19 +269,16 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        utils.parseEther('100'),
+        newAmountFromString('100', USDC_TEST_TOKEN).value,
       );
 
-      const tokenIn = { ...uniswapTokenToTokenInfo(IMX_TEST_TOKEN), name: undefined, symbol: undefined };
+      const tokenIn = { ...uniswapTokenToTokenInfo(USDC_TEST_TOKEN), name: undefined, symbol: undefined };
 
       expect(quote.fees).toEqual([
         {
           recipient: TEST_FEE_RECIPIENT,
           basisPoints: TEST_MAX_FEE_BASIS_POINTS,
-          amount: {
-            token: tokenIn,
-            value: utils.parseEther('10'),
-          },
+          amount: newAmountFromString('10', tokenIn),
         },
       ]);
     });
@@ -281,7 +288,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
     it('should use the default router contract with no fees applied to the swap', async () => {
       erc20Contract = (Contract as unknown as jest.Mock).mockImplementation(
         () => ({
-          allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT),
+          allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT.value),
           estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
           paused: jest.fn().mockResolvedValue(true),
         }),
@@ -299,7 +306,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        utils.parseEther('100'),
+        newAmountFromString('100', USDC_TEST_TOKEN).value,
       );
 
       expectToBeDefined(swap.transaction.data);
@@ -318,7 +325,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       it('should apply secondary fees to a subsequent swap request', async () => {
         erc20Contract = (Contract as unknown as jest.Mock).mockImplementation(
           () => ({
-            allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT),
+            allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT.value),
             estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
             paused: jest.fn().mockResolvedValue(true),
           }),
@@ -336,14 +343,14 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           params.fromAddress,
           params.inputToken,
           params.outputToken,
-          utils.parseEther('100'),
+          newAmountFromString('100', USDC_TEST_TOKEN).value,
           3, // 3% Slippage
         );
 
         // Unpause the secondary fee contract
         erc20Contract = (Contract as unknown as jest.Mock).mockImplementation(
           () => ({
-            allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT),
+            allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT.value),
             estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
             paused: jest.fn().mockResolvedValue(false),
           }),
@@ -353,7 +360,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           params.fromAddress,
           params.inputToken,
           params.outputToken,
-          utils.parseEther('100'),
+          newAmountFromString('100', USDC_TEST_TOKEN).value,
           3, // 3% Slippage
         );
 
@@ -383,7 +390,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        utils.parseEther('100'),
+        newAmountFromString('100', USDC_TEST_TOKEN).value,
       );
 
       expectToBeDefined(swap.transaction.data);
@@ -391,6 +398,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const data = swap.transaction.data.toString();
 
       const { swapParams } = decodeMulticallExactInputSingleWithoutFees(data);
+      expectInstanceOf(BigNumber, swapParams.amountIn);
 
       expect(swapParams.tokenIn).toBe(params.inputToken); // input token
       expect(swapParams.tokenOut).toBe(params.outputToken); // output token
@@ -399,7 +407,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(swap.transaction.to).toBe(TEST_PERIPHERY_ROUTER_ADDRESS); // to address
       expect(swap.transaction.from).toBe(params.fromAddress); // from address
       expect(swap.transaction.value).toBe('0x00'); // refers to 0ETH
-      expect(formatEther(swapParams.amountIn)).toBe('100.0'); // amount in
+      expect(formatTokenAmount(swapParams.amountIn, USDC_TEST_TOKEN)).toBe('100.0'); // amount in
       expect(formatEther(swapParams.amountOutMinimum)).toBe('999.000999000999000999'); // min amount out (includes slippage)
       expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
     });
@@ -415,7 +423,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        utils.parseEther('100'),
+        newAmountFromString('100', USDC_TEST_TOKEN).value,
       );
 
       expectToBeDefined(tx.swap.gasFeeEstimate);
@@ -439,7 +447,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        utils.parseEther('100'),
+        newAmountFromString('100', USDC_TEST_TOKEN).value,
       );
 
       expect(quote).not.toBe(undefined);
@@ -462,7 +470,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        utils.parseEther('100'),
+        newAmountFromString('100', USDC_TEST_TOKEN).value,
         HIGHER_SLIPPAGE,
       );
 
@@ -471,6 +479,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const data = swap.transaction.data.toString();
 
       const { swapParams } = decodeMulticallExactInputSingleWithoutFees(data);
+      expectInstanceOf(BigNumber, swapParams.amountIn);
 
       expect(swapParams.tokenIn).toBe(params.inputToken); // input token
       expect(swapParams.tokenOut).toBe(params.outputToken); // output token
@@ -479,7 +488,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(swap.transaction.to).toBe(TEST_PERIPHERY_ROUTER_ADDRESS); // to address
       expect(swap.transaction.from).toBe(params.fromAddress); // from address
       expect(swap.transaction.value).toBe('0x00'); // refers to 0ETH
-      expect(formatEther(swapParams.amountIn)).toBe('100.0'); // amount in
+      expect(formatTokenAmount(swapParams.amountIn, USDC_TEST_TOKEN)).toBe('100.0'); // amount in
       expect(formatEther(swapParams.amountOutMinimum)).toBe('998.003992015968063872'); // min amount out (includes 0.2% slippage)
       expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
     });
@@ -494,11 +503,10 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        utils.parseEther('100'),
+        newAmountFromString('100', USDC_TEST_TOKEN).value,
         HIGHER_SLIPPAGE,
       );
 
-      expect(quote).not.toBe(undefined);
       expect(quote.amount.token.address).toEqual(params.outputToken);
       expect(quote.slippage).toBe(0.2);
       expect(formatAmount(quote.amount)).toEqual('1000.0');
@@ -520,7 +528,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           invalidAddress,
           params.inputToken,
           params.outputToken,
-          utils.parseEther('100'),
+          newAmountFromString('100', USDC_TEST_TOKEN).value,
           HIGHER_SLIPPAGE,
         ),
       ).rejects.toThrow(
@@ -532,7 +540,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           params.fromAddress,
           invalidAddress,
           params.outputToken,
-          utils.parseEther('100'),
+          newAmountFromString('100', USDC_TEST_TOKEN).value,
           HIGHER_SLIPPAGE,
         ),
       ).rejects.toThrow(new InvalidAddressError('Error: invalid token in address'));
@@ -542,7 +550,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           params.fromAddress,
           params.inputToken,
           invalidAddress,
-          utils.parseEther('100'),
+          newAmountFromString('100', USDC_TEST_TOKEN).value,
           HIGHER_SLIPPAGE,
         ),
       ).rejects.toThrow(new InvalidAddressError('Error: invalid token out address'));
@@ -562,7 +570,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           invalidAddress,
           params.inputToken,
           params.outputToken,
-          utils.parseEther('100'),
+          newAmountFromString('100', USDC_TEST_TOKEN).value,
           HIGHER_SLIPPAGE,
         ),
       ).rejects.toThrow(
@@ -574,7 +582,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           params.fromAddress,
           invalidAddress,
           params.outputToken,
-          utils.parseEther('100'),
+          newAmountFromString('100', USDC_TEST_TOKEN).value,
           HIGHER_SLIPPAGE,
         ),
       ).rejects.toThrow(new InvalidAddressError('Error: invalid token in address'));
@@ -584,7 +592,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           params.fromAddress,
           params.inputToken,
           invalidAddress,
-          utils.parseEther('100'),
+          newAmountFromString('100', USDC_TEST_TOKEN).value,
           HIGHER_SLIPPAGE,
         ),
       ).rejects.toThrow(new InvalidAddressError('Error: invalid token out address'));
@@ -603,7 +611,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           params.fromAddress,
           params.inputToken,
           params.outputToken,
-          utils.parseEther('100'),
+          newAmountFromString('100', USDC_TEST_TOKEN).value,
           HIGHER_SLIPPAGE,
           11,
         ),
@@ -623,7 +631,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           params.fromAddress,
           params.inputToken,
           params.outputToken,
-          utils.parseEther('100'),
+          newAmountFromString('100', USDC_TEST_TOKEN).value,
           HIGHER_SLIPPAGE,
           0,
         ),
@@ -643,7 +651,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           params.fromAddress,
           params.inputToken,
           params.outputToken,
-          utils.parseEther('100'),
+          newAmountFromString('100', USDC_TEST_TOKEN).value,
           100,
           2,
         ),
@@ -663,7 +671,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           params.fromAddress,
           params.inputToken,
           params.outputToken,
-          utils.parseEther('100'),
+          newAmountFromString('100', USDC_TEST_TOKEN).value,
           -5,
           2,
         ),

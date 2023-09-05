@@ -1,6 +1,9 @@
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { BigNumber } from '@ethersproject/bignumber';
-import { TEST_CHAIN_ID, TEST_RPC_URL } from 'test/utils';
+import {
+  expectToBeDefined, IMX_TEST_TOKEN, TEST_CHAIN_ID, TEST_RPC_URL,
+} from 'test/utils';
+import { newAmount } from 'lib/utils';
 import { calculateGasFee, fetchGasPrice } from './gas';
 
 jest.mock('@ethersproject/providers');
@@ -8,13 +11,13 @@ jest.mock('@ethersproject/providers');
 describe('calculateGasFee', () => {
   describe('when given a price and gas used', () => {
     it('calculates gas fee from gas used and gas price', async () => {
-      const gasPrice = BigNumber.from('1500000000'); // 1.5 gwei or 1500000000 wei
+      const gasPrice = newAmount(BigNumber.from('1500000000'), IMX_TEST_TOKEN); // 1.5 gwei or 1500000000 wei
 
       const gasUsedInTransaction = BigNumber.from('200000');
       const gasFeeEstimate = calculateGasFee(gasPrice, gasUsedInTransaction);
 
-      expect(gasFeeEstimate).not.toBeNull();
-      expect(gasFeeEstimate?.toString()).toEqual('300000000000000');
+      expectToBeDefined(gasFeeEstimate);
+      expect(gasFeeEstimate.value.toString()).toEqual('300000000000000');
     });
   });
 });
@@ -36,7 +39,7 @@ describe('fetchGasPrice', () => {
         TEST_CHAIN_ID,
       );
 
-      const gasFeeEstimate = await fetchGasPrice(provider);
+      const gasFeeEstimate = await fetchGasPrice(provider, IMX_TEST_TOKEN);
 
       expect(gasFeeEstimate).toBeNull();
     });
@@ -60,10 +63,10 @@ describe('fetchGasPrice', () => {
         TEST_CHAIN_ID,
       );
 
-      const gasFeeEstimate = await fetchGasPrice(provider);
+      const gasFeeEstimate = await fetchGasPrice(provider, IMX_TEST_TOKEN);
 
-      expect(gasFeeEstimate).not.toBeNull();
-      expect(gasFeeEstimate?.toString()).toEqual('1500000000');
+      expectToBeDefined(gasFeeEstimate);
+      expect(gasFeeEstimate.value.toString()).toEqual('1500000000');
     });
   });
 
@@ -87,10 +90,9 @@ describe('fetchGasPrice', () => {
         TEST_CHAIN_ID,
       );
 
-      const gasFeeEstimate = await fetchGasPrice(provider);
-
-      expect(gasFeeEstimate).not.toBeNull();
-      expect(gasFeeEstimate?.toString()).toEqual('3000000000');
+      const gasFeeEstimate = await fetchGasPrice(provider, IMX_TEST_TOKEN);
+      expectToBeDefined(gasFeeEstimate);
+      expect(gasFeeEstimate.value.toString()).toEqual('3000000000');
     });
   });
 });
