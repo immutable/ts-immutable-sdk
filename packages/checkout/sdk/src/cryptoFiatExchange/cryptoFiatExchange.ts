@@ -1,7 +1,9 @@
-import { Environment } from '@imtbl/config';
 import { BigNumber } from 'ethers';
 import { ExchangeType } from '../types/cryptoFiatExchange';
-import { TRANSAK_API_BASE_URL, TRANSAK_PUBLISHABLE_KEY } from '../types';
+import {
+  OnRampConfig, OnRampProviderFees, TRANSAK_API_BASE_URL, TRANSAK_PUBLISHABLE_KEY,
+} from '../types';
+import { CheckoutConfiguration } from '../config';
 
 export interface CryptoFiatExchangeWidgetParams {
   exchangeType: ExchangeType;
@@ -13,14 +15,18 @@ export interface CryptoFiatExchangeWidgetParams {
 }
 
 export class CryptoFiatExchangeService {
-  readonly environment: Environment;
+  readonly config: CheckoutConfiguration;
 
   /**
    * Constructs a new instance of the CryptoFiatExchangeService class.
-   * @param {Environment} environment - The environment required for the CryptoFiatExchangeService.
+   * @param {CheckoutConfiguration} config - The config required for the CryptoFiatExchangeService.
    */
-  constructor(environment: Environment) {
-    this.environment = environment;
+  constructor(config: CheckoutConfiguration) {
+    this.config = config;
+  }
+
+  public async feeEstimate(): Promise<OnRampProviderFees> {
+    return ((await this.config.remote.getConfig('onramp')) as OnRampConfig)?.transak?.fees;
   }
 
   public async createWidgetUrl(params: CryptoFiatExchangeWidgetParams): Promise<string> {
@@ -28,8 +34,8 @@ export class CryptoFiatExchangeService {
   }
 
   private getTransakWidgetUrl(params: CryptoFiatExchangeWidgetParams): string {
-    let widgetUrl = `${TRANSAK_API_BASE_URL[this.environment]}?`;
-    const transakPublishableKey = `apiKey=${TRANSAK_PUBLISHABLE_KEY[this.environment]}`;
+    let widgetUrl = `${TRANSAK_API_BASE_URL[this.config.environment]}?`;
+    const transakPublishableKey = `apiKey=${TRANSAK_PUBLISHABLE_KEY[this.config.environment]}`;
     const zkevmNetwork = 'network=immutablezkevm';
     const defaultPaymentMethod = 'defaultPaymentMethod=credit_debit_card';
     const disableBankTransfer = 'disablePaymentMethods=sepa_bank_transfer,gbp_bank_transfer,'

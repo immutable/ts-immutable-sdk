@@ -2,17 +2,82 @@ import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { CryptoFiatExchangeService, CryptoFiatExchangeWidgetParams } from './cryptoFiatExchange';
 import { ExchangeType } from '../types/cryptoFiatExchange';
+import { CheckoutConfiguration } from '../config';
+import { RemoteConfigFetcher } from '../config/remoteConfigFetcher';
 
 const defaultWidgetUrl = 'https://global-stg.transak.com?apiKey=41ad2da7-ed5a-4d89-a90b-c751865effc2'
 + '&network=immutablezkevm&defaultPaymentMethod=credit_debit_card&disablePaymentMethods=sepa_bank_transfer,'
 + 'gbp_bank_transfer,pm_cash_app,pm_jwire,pm_paymaya,pm_bpi,pm_ubp,pm_grabpay,pm_shopeepay,pm_gcash,pm_pix,'
 + 'pm_astropay,pm_pse,inr_bank_transfer&productsAvailed=buy&exchangeScreenTitle=Buy&themeColor=0D0D0D';
 
+jest.mock('../config/remoteConfigFetcher');
+
 describe('cryptoFiatExchange', () => {
+  let config: CheckoutConfiguration;
   let cryptoFiatExchangeService: CryptoFiatExchangeService;
 
   beforeEach(() => {
-    cryptoFiatExchangeService = new CryptoFiatExchangeService(Environment.SANDBOX);
+    config = new CheckoutConfiguration({
+      baseConfig: {
+        environment: Environment.SANDBOX,
+      },
+    });
+    cryptoFiatExchangeService = new CryptoFiatExchangeService(config);
+  });
+
+  describe('feeEstimate', () => {
+    it('should return transak fees', async () => {
+      (RemoteConfigFetcher as unknown as jest.Mock).mockReturnValue({
+        getConfig: jest.fn().mockResolvedValue({
+          transak: {
+            fees: {
+              minPercentage: '3.5',
+              maxPercentage: '5.5',
+            },
+          },
+        }),
+      });
+      config = new CheckoutConfiguration({
+        baseConfig: {
+          environment: Environment.SANDBOX,
+        },
+      });
+      cryptoFiatExchangeService = new CryptoFiatExchangeService(config);
+
+      const result = await cryptoFiatExchangeService.feeEstimate();
+      expect(result).toEqual({
+        minPercentage: '3.5',
+        maxPercentage: '5.5',
+        feePercentage: undefined,
+      });
+    });
+
+    it('should return transak fees with feePercentage when feePercentage is defined', async () => {
+      (RemoteConfigFetcher as unknown as jest.Mock).mockReturnValue({
+        getConfig: jest.fn().mockResolvedValue({
+          transak: {
+            fees: {
+              minPercentage: '3.5',
+              maxPercentage: '5.5',
+              feePercentage: '4.5',
+            },
+          },
+        }),
+      });
+      config = new CheckoutConfiguration({
+        baseConfig: {
+          environment: Environment.SANDBOX,
+        },
+      });
+      cryptoFiatExchangeService = new CryptoFiatExchangeService(config);
+
+      const result = await cryptoFiatExchangeService.feeEstimate();
+      expect(result).toEqual({
+        minPercentage: '3.5',
+        maxPercentage: '5.5',
+        feePercentage: '4.5',
+      });
+    });
   });
 
   describe('createWidgetUrl', () => {
