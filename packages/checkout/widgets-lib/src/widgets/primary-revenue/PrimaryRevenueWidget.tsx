@@ -1,6 +1,11 @@
 /* eslint-disable no-console */
 import {
-  useCallback, useContext, useEffect, useMemo, useReducer,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+  useState,
 } from 'react';
 
 import { BiomeCombinedProviders } from '@biom3/react';
@@ -34,40 +39,31 @@ import { OnRampWidget } from '../on-ramp/OnRampWidget';
 import { useSignOrder } from './hooks/useSignOrder';
 
 export type Item = {
-  id: string;
-  name: string;
-  price: string;
+  productId: string;
   qty: number;
-  image: string;
-  description?: string;
 };
 export interface PrimaryRevenueWidgetProps {
-  // @deprecated
-  fromContractAddress: string;
-
   config: StrongCheckoutWidgetsConfig;
   amount: string;
-  envId: string;
   fromCurrency: string;
   items: Item[];
 }
 
+export type PaymentType = 'crypto' | 'fiat';
+
 export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
   const {
-    config, amount, fromContractAddress, fromCurrency, envId, items,
+    config, amount, fromCurrency, items,
   } = props;
 
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
+  const [paymentType, setPaymentType] = useState<PaymentType | undefined>(undefined);
 
   const { sign, execute } = useSignOrder({
-    envId,
     items,
-    amount,
-    fromContractAddress,
+    paymentType,
     fromCurrency,
-    // deprecated
-    fromCollectionAddress: '0xf578b6bB4FA5c7403147C29be864f5e12BF211a0',
     provider,
   });
 
@@ -118,14 +114,14 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
     const { formattedBalance } = await checkout.getBalance({
       provider,
       walletAddress,
-      contractAddress: fromContractAddress,
+      contractAddress: '',
     });
 
     const balance = parseFloat(formattedBalance);
     const requiredAmounts = parseFloat(amount);
 
     return balance > requiredAmounts;
-  }, [checkout, provider, amount, fromContractAddress]);
+  }, [checkout, provider, amount]);
 
   useEffect(() => {
     if (!checkout || !provider) return;
@@ -223,7 +219,10 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
           <LoadingView loadingText={loadingText} />
         )}
         {viewState.view.type === PrimaryRevenueWidgetViews.PAYMENT_METHODS && (
-          <PaymentMethods checkBalances={handleCheckBalances} />
+          <PaymentMethods
+            checkBalances={handleCheckBalances}
+            setPaymentType={setPaymentType}
+          />
         )}
         {viewState.view.type === PrimaryRevenueWidgetViews.PAY_WITH_CRYPTO && (
           <ReviewOrder
@@ -246,7 +245,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
             onCloseButtonClick={handleGoBackToMethods}
             onBackButtonClick={handleGoBackToMethods}
             amount={amount}
-            tokenAddress={fromContractAddress}
+            tokenAddress=""
           />
         )}
         {viewState.view.type
