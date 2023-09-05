@@ -21,7 +21,7 @@ export type {
   CheckoutModuleConfiguration,
   ConnectParams,
   ConnectResult,
-  CryptoFiatExchangeParams,
+  FiatRampParams,
   DexConfig,
   GasEstimateBridgeToL2Result,
   GasEstimateParams,

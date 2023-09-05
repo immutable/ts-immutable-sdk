@@ -1,9 +1,11 @@
-import { Environment } from '@imtbl/config';
 import { BigNumber } from 'ethers';
-import { ExchangeType } from '../types/cryptoFiatExchange';
-import { TRANSAK_API_BASE_URL, TRANSAK_PUBLISHABLE_KEY } from '../types';
+import { ExchangeType } from '../types/fiatRamp';
+import {
+  OnRampConfig, OnRampProviderFees, TRANSAK_API_BASE_URL, TRANSAK_PUBLISHABLE_KEY,
+} from '../types';
+import { CheckoutConfiguration } from '../config';
 
-export interface CryptoFiatExchangeWidgetParams {
+export interface FiatRampWidgetParams {
   exchangeType: ExchangeType;
   isPassport: boolean;
   walletAddress?: string;
@@ -12,24 +14,28 @@ export interface CryptoFiatExchangeWidgetParams {
   email?: string;
 }
 
-export class CryptoFiatExchangeService {
-  readonly environment: Environment;
+export class FiatRampService {
+  readonly config: CheckoutConfiguration;
 
   /**
-   * Constructs a new instance of the CryptoFiatExchangeService class.
-   * @param {Environment} environment - The environment required for the CryptoFiatExchangeService.
+   * Constructs a new instance of the FiatRampService class.
+   * @param {CheckoutConfiguration} config - The config required for the FiatRampService.
    */
-  constructor(environment: Environment) {
-    this.environment = environment;
+  constructor(config: CheckoutConfiguration) {
+    this.config = config;
   }
 
-  public async createWidgetUrl(params: CryptoFiatExchangeWidgetParams): Promise<string> {
+  public async feeEstimate(): Promise<OnRampProviderFees> {
+    return ((await this.config.remote.getConfig('onramp')) as OnRampConfig)?.transak?.fees;
+  }
+
+  public async createWidgetUrl(params: FiatRampWidgetParams): Promise<string> {
     return this.getTransakWidgetUrl(params);
   }
 
-  private getTransakWidgetUrl(params: CryptoFiatExchangeWidgetParams): string {
-    let widgetUrl = `${TRANSAK_API_BASE_URL[this.environment]}?`;
-    const transakPublishableKey = `apiKey=${TRANSAK_PUBLISHABLE_KEY[this.environment]}`;
+  private getTransakWidgetUrl(params: FiatRampWidgetParams): string {
+    let widgetUrl = `${TRANSAK_API_BASE_URL[this.config.environment]}?`;
+    const transakPublishableKey = `apiKey=${TRANSAK_PUBLISHABLE_KEY[this.config.environment]}`;
     const zkevmNetwork = 'network=immutablezkevm';
     const defaultPaymentMethod = 'defaultPaymentMethod=credit_debit_card';
     const disableBankTransfer = 'disablePaymentMethods=sepa_bank_transfer,gbp_bank_transfer,'

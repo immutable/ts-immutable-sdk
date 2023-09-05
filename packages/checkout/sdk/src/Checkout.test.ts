@@ -39,8 +39,8 @@ import { getWalletAllowList } from './wallet';
 import { buy } from './smartCheckout/buy';
 import { sell } from './smartCheckout/sell';
 import { smartCheckout } from './smartCheckout';
-import { CryptoFiatExchangeService } from './cryptoFiatExchange';
-import { CryptoFiatExchangeParams, ExchangeType } from './types/cryptoFiatExchange';
+import { FiatRampService } from './fiatRamp';
+import { FiatRampParams, ExchangeType } from './types/fiatRamp';
 
 jest.mock('./connect');
 jest.mock('./network');
@@ -54,7 +54,7 @@ jest.mock('./wallet');
 jest.mock('./smartCheckout/buy');
 jest.mock('./smartCheckout/sell');
 jest.mock('./smartCheckout');
-jest.mock('./cryptoFiatExchange');
+jest.mock('./fiatRamp');
 
 describe('Connect', () => {
   let providerMock: ExternalProvider;
@@ -596,7 +596,7 @@ describe('Connect', () => {
     expect(result).toBeTruthy();
   });
 
-  describe('createCryptoFiatExchangeUrl', () => {
+  describe('createFiatRampUrl', () => {
     let createWidgetUrlMock: jest.Mock;
     let checkout: Checkout;
     let mockProvider: Web3Provider;
@@ -611,7 +611,7 @@ describe('Connect', () => {
 
     beforeEach(() => {
       createWidgetUrlMock = jest.fn().mockResolvedValue(defaultWidgetUrl);
-      (CryptoFiatExchangeService as jest.Mock).mockReturnValue({
+      (FiatRampService as jest.Mock).mockReturnValue({
         createWidgetUrl: createWidgetUrlMock,
       });
 
@@ -646,14 +646,14 @@ describe('Connect', () => {
       });
     });
 
-    it(`should call cryptoFiatExchangeService.createWidgetUrl with correct params
+    it(`should call FiatRampService.createWidgetUrl with correct params
       when only onRampProvider, exchangeType and web3Provider are provided`, async () => {
-      const params: CryptoFiatExchangeParams = {
+      const params: FiatRampParams = {
         exchangeType: ExchangeType.ONRAMP,
         web3Provider: mockProvider,
       };
 
-      await checkout.createCryptoFiatExchangeUrl(params);
+      await checkout.createFiatRampUrl(params);
 
       expect(createWidgetUrlMock).toBeCalledTimes(1);
       expect(createWidgetUrlMock).toBeCalledWith({
@@ -666,7 +666,7 @@ describe('Connect', () => {
       });
     });
 
-    it(`should call cryptoFiatExchangeService.createWidgetUrl with correct params
+    it(`should call fiatRampService.createWidgetUrl with correct params
       when tokenAmount and tokenSymbol are provided`, async () => {
       getTokenAllowListResult = {
         tokens: [
@@ -692,14 +692,14 @@ describe('Connect', () => {
       } as GetTokenAllowListResult;
       (getTokenAllowList as jest.Mock).mockResolvedValue(getTokenAllowListResult);
 
-      const params: CryptoFiatExchangeParams = {
+      const params: FiatRampParams = {
         exchangeType: ExchangeType.ONRAMP,
         web3Provider: mockProvider,
         tokenAmount: BigNumber.from(10),
         tokenAddress: '0xethAddr',
       };
 
-      await checkout.createCryptoFiatExchangeUrl(params);
+      await checkout.createFiatRampUrl(params);
 
       expect(createWidgetUrlMock).toBeCalledTimes(1);
       expect(createWidgetUrlMock).toBeCalledWith({
@@ -712,7 +712,7 @@ describe('Connect', () => {
       });
     });
 
-    it(`should call cryptoFiatExchangeService.createWidgetUrl with correct params
+    it(`should call fiatRampService.createWidgetUrl with correct params
       when passport is provided`, async () => {
       mockProvider = {
         getSigner: jest.fn().mockReturnValue({
@@ -733,13 +733,13 @@ describe('Connect', () => {
         getUserInfo: jest.fn().mockResolvedValue(mockUser),
       } as unknown as Passport;
 
-      const params: CryptoFiatExchangeParams = {
+      const params: FiatRampParams = {
         exchangeType: ExchangeType.ONRAMP,
         web3Provider: mockProvider,
         passport: mockPassport,
       };
 
-      await checkout.createCryptoFiatExchangeUrl(params);
+      await checkout.createFiatRampUrl(params);
 
       expect(createWidgetUrlMock).toBeCalledTimes(1);
       expect(createWidgetUrlMock).toBeCalledWith({
@@ -750,6 +750,34 @@ describe('Connect', () => {
         tokenSymbol: 'IMX',
         email: mockUser.email,
       });
+    });
+  });
+
+  describe('getExchangeFeeEstimate', () => {
+    let feeEstimateMock: jest.Mock;
+    let checkout: Checkout;
+
+    const feeEstimate = {
+      minPercentage: '3.5',
+      maxPercentage: '5.5',
+      feePercentage: undefined,
+    };
+
+    beforeEach(() => {
+      feeEstimateMock = jest.fn().mockResolvedValue(feeEstimate);
+      (FiatRampService as jest.Mock).mockReturnValue({
+        feeEstimate: feeEstimateMock,
+      });
+
+      checkout = new Checkout({
+        baseConfig: { environment: Environment.PRODUCTION },
+      });
+    });
+
+    it('should call fiatRampService.getExchangeFeeEstimate', async () => {
+      await checkout.getExchangeFeeEstimate();
+
+      expect(feeEstimateMock).toBeCalledTimes(1);
     });
   });
 });
