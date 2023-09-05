@@ -23,6 +23,28 @@ export const executeTransactions = async (
       );
     }
   }
+  if (unsignedTransactions.signableMessages.length > 0) {
+    try {
+      const signableMessages = [];
+      for (const signableMessage of unsignedTransactions.signableMessages) {
+        // eslint-disable-next-line no-underscore-dangle
+        signableMessages.push(provider.getSigner()._signTypedData(
+          signableMessage.domain,
+          signableMessage.types,
+          signableMessage.value,
+        ));
+      }
+      await Promise.all(signableMessages);
+    } catch (err: any) {
+      throw new CheckoutError(
+        'An error occurred while executing the signable transaction',
+        CheckoutErrorType.EXECUTE_TRANSACTIONS_ERROR,
+        {
+          message: err.message,
+        },
+      );
+    }
+  }
   if (unsignedTransactions.fulfilmentTransactions.length > 0) {
     try {
       const fulfilmentTransactions = [];

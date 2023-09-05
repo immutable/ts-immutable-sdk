@@ -1,11 +1,8 @@
-import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
+import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import {
-  Action,
-  ActionType,
   ERC20Item,
   NativeItem,
-  TransactionPurpose,
   constants,
 } from '@imtbl/orderbook';
 import {
@@ -18,7 +15,7 @@ import {
   ItemType, ItemRequirement, GasTokenType, TransactionOrGasType, GasAmount, FulfilmentTransaction, UnsignedTransactions,
 } from '../../types/smartCheckout';
 import { smartCheckout } from '..';
-import { executeTransactions } from '../transactions/executeTransactions';
+import { executeTransactions, getUnsignedTransactions } from '../transactions';
 
 export const getItemRequirement = (
   type: ItemType,
@@ -41,33 +38,6 @@ export const getItemRequirement = (
         amount,
       };
   }
-};
-
-export const getUnsignedTransactions = async (
-  actions: Action[],
-): Promise<UnsignedTransactions> => {
-  let approvalTransactions = [];
-  let fulfilmentTransactions = [];
-
-  const approvalPromises: Promise<TransactionRequest>[] = [];
-  const fulfilmentPromises: Promise<TransactionRequest>[] = [];
-  for (const action of actions) {
-    if (action.type !== ActionType.TRANSACTION) continue;
-    if (action.purpose === TransactionPurpose.APPROVAL) {
-      approvalPromises.push(action.buildTransaction());
-    }
-    if (action.purpose === TransactionPurpose.FULFILL_ORDER) {
-      fulfilmentPromises.push(action.buildTransaction());
-    }
-  }
-
-  approvalTransactions = await Promise.all(approvalPromises);
-  fulfilmentTransactions = await Promise.all(fulfilmentPromises);
-
-  return {
-    approvalTransactions,
-    fulfilmentTransactions,
-  };
 };
 
 export const getTransactionOrGas = (
@@ -120,6 +90,7 @@ export const buy = async (
   let unsignedTransactions: UnsignedTransactions = {
     approvalTransactions: [],
     fulfilmentTransactions: [],
+    signableMessages: [],
   };
   try {
     const fulfillerAddress = await provider.getSigner().getAddress();

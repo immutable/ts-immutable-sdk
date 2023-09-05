@@ -1,7 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import {
-  ItemRequirement, GasToken, ItemType, SmartCheckoutResult,
+  ItemType, SmartCheckoutResult, UnsignedTransactions,
 } from './smartCheckout';
 
 /**
@@ -10,24 +10,25 @@ import {
  * @property {string} id - The ERC721 ID.
  * @property {string} collectionAddress - The contract address of the ERC721s collection.
  * @property {BuyToken} buyToken - The token to buy the item with.
+ * @property {boolean} [executeTransactions] - Whether the transactions should be executed if the user is able to complete the sell.
  */
 export interface SellParams {
   provider: Web3Provider;
   id: string;
   collectionAddress: string;
   buyToken: BuyToken;
+  executeTransactions?: boolean;
 }
 
 /**
  * Interface representing the result of the sell
- * @property {ItemRequirement[]} itemRequirements - The item requirements for the sell.
- * @property {GasToken} gasToken - The gas token used for the sell.
  * @property {SmartCheckoutResult} smartCheckoutResult - The result of the smart checkout.
+ * @property {UnsignedTransactions | undefined} transactions - Unsigned transactions, present when
+ * smart checkout returns sufficient true and executeTransactions false.
  */
 export type SellResult = {
-  itemRequirements: ItemRequirement[],
-  gasToken: GasToken,
   smartCheckoutResult: SmartCheckoutResult,
+  transactions?: UnsignedTransactions,
 };
 
 /**

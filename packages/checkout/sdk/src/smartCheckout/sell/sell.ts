@@ -18,6 +18,7 @@ import * as instance from '../../instance';
 import { CheckoutConfiguration } from '../../config';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { smartCheckout } from '../smartCheckout';
+import { executeTransactions, getUnsignedTransactions } from '../transactions';
 
 export const getERC721Requirement = (
   id: string,
@@ -30,7 +31,7 @@ export const getERC721Requirement = (
   spenderAddress,
 });
 
-export const getBuy = (
+export const getBuyToken = (
   buyToken: BuyToken,
 ): ERC20Item | NativeItem => {
   if (buyToken.type === ItemType.NATIVE) {
@@ -53,6 +54,7 @@ export const sell = async (
   id: string,
   contractAddress: string,
   buyToken: BuyToken,
+  shouldExecuteTransactions?: boolean,
 ): Promise<SellResult> => {
   let orderbook: Orderbook;
   let listing: PrepareListingResponse;
@@ -65,7 +67,7 @@ export const sell = async (
     spenderAddress = seaportContractAddress;
     listing = await orderbook.prepareListing({
       makerAddress: walletAddress,
-      buy: getBuy(buyToken),
+      buy: getBuyToken(buyToken),
       sell: {
         type: ItemType.ERC721,
         contractAddress,
@@ -88,9 +90,6 @@ export const sell = async (
     getERC721Requirement(id, contractAddress, spenderAddress),
   ];
 
-  // eslint-disable-next-line no-console
-  console.log(listing); // TODO: Get order signature, provider.getSigner()._signTypedData to sign
-
   const smartCheckoutResult = await smartCheckout(
     config,
     provider,
@@ -104,15 +103,21 @@ export const sell = async (
     },
   );
 
-  // eslint-disable-next-line no-console
-  console.log('transactionRequirements', smartCheckoutResult);
+  if (smartCheckoutResult.sufficient) {
+    const unsignedTransactions = await getUnsignedTransactions(listing.actions);
+    if (shouldExecuteTransactions) {
+      await executeTransactions(provider, unsignedTransactions);
+      return {
+        smartCheckoutResult,
+      };
+    }
+    return {
+      smartCheckoutResult,
+      transactions: unsignedTransactions,
+    };
+  }
 
   return {
-    itemRequirements,
-    gasToken: {
-      type: GasTokenType.NATIVE,
-      limit: BigNumber.from(constants.estimatedFulfillmentGasGwei),
-    },
     smartCheckoutResult,
   };
 };

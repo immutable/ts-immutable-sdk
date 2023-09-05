@@ -19,7 +19,7 @@ export interface BuyParams {
  * Interface representing the result of the buy
  * @property {SmartCheckoutResult} smartCheckoutResult - The result of smart checkout.
  * @property {UnsignedTransactions | undefined} transactions - Unsigned transactions, present when
- * smart checkout returns sufficient true and executeTransactions is true.
+ * smart checkout returns sufficient true and executeTransactions false.
  */
 export type BuyResult = {
   smartCheckoutResult: SmartCheckoutResult,

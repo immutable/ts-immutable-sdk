@@ -1,11 +1,11 @@
 import { BigNumber, PopulatedTransaction } from 'ethers';
 import { Environment } from '@imtbl/config';
 import {
-  Action, ActionType, SignableAction, TransactionPurpose, constants,
+  ActionType, TransactionPurpose, constants,
 } from '@imtbl/orderbook';
 import { Web3Provider } from '@ethersproject/providers';
 import {
-  getItemRequirement, buy, getTransactionOrGas, getUnsignedTransactions,
+  getItemRequirement, buy, getTransactionOrGas,
 } from './buy';
 import { createOrderbookInstance } from '../../instance';
 import { CheckoutConfiguration } from '../../config';
@@ -14,11 +14,11 @@ import {
   FulfilmentTransaction, GasAmount, GasTokenType, ItemType, TransactionOrGasType,
 } from '../../types/smartCheckout';
 import { smartCheckout } from '..';
-import { executeTransactions } from '../transactions/executeTransactions';
+import { executeTransactions, getUnsignedTransactions } from '../transactions';
 
 jest.mock('../../instance');
 jest.mock('../smartCheckout');
-jest.mock('../transactions/executeTransactions');
+jest.mock('../transactions');
 
 describe('buy', () => {
   const gasLimit = constants.estimatedFulfillmentGasGwei;
@@ -109,6 +109,11 @@ describe('buy', () => {
             ],
           }),
         });
+        (getUnsignedTransactions as jest.Mock).mockResolvedValue({
+          approvalTransactions: [{ from: '0xAPPROVAL' }],
+          fulfilmentTransactions: [{ from: '0xTRANSACTION' }],
+          signableMessages: [],
+        });
 
         const orderId = '1';
         const itemRequirements = [
@@ -134,6 +139,7 @@ describe('buy', () => {
           transactions: {
             approvalTransactions: [{ from: '0xAPPROVAL' }],
             fulfilmentTransactions: [{ from: '0xTRANSACTION' }],
+            signableMessages: [],
           },
         });
         expect(executeTransactions).toBeCalledTimes(0);
@@ -331,6 +337,7 @@ describe('buy', () => {
         {
           approvalTransactions: [{ from: '0xAPPROVAL' }],
           fulfilmentTransactions: [{ from: '0xTRANSACTION' }],
+          signableMessages: [],
         },
       );
       expect(buyResult).toEqual({
@@ -600,6 +607,7 @@ describe('buy', () => {
         {
           fulfilmentTransactions: [{ from: '0x123' }],
           approvalTransactions: [{ from: '0x234' }],
+          signableMessages: [],
         },
       )).toEqual(
         {
@@ -617,6 +625,7 @@ describe('buy', () => {
         {
           fulfilmentTransactions: [],
           approvalTransactions: [{ from: '0x234' }],
+          signableMessages: [],
         },
       )).toEqual(
         {
@@ -627,72 +636,6 @@ describe('buy', () => {
           },
         },
       );
-    });
-  });
-
-  describe('getUnsignedTransactions', () => {
-    it('should get the unsigned transactions', async () => {
-      const actions: Action[] = [
-        {
-          type: ActionType.SIGNABLE,
-        } as SignableAction,
-        {
-          type: ActionType.TRANSACTION,
-          purpose: TransactionPurpose.APPROVAL,
-          buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL1' } as PopulatedTransaction),
-        },
-        {
-          type: ActionType.TRANSACTION,
-          purpose: TransactionPurpose.FULFILL_ORDER,
-          buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION1' } as PopulatedTransaction),
-        },
-        {
-          type: ActionType.TRANSACTION,
-          purpose: TransactionPurpose.APPROVAL,
-          buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL2' } as PopulatedTransaction),
-        },
-        {
-          type: ActionType.TRANSACTION,
-          purpose: TransactionPurpose.FULFILL_ORDER,
-          buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION2' } as PopulatedTransaction),
-        },
-      ];
-
-      await expect(getUnsignedTransactions(actions)).resolves.toEqual({
-        approvalTransactions: [{ from: '0xAPPROVAL1' }, { from: '0xAPPROVAL2' }],
-        fulfilmentTransactions: [{ from: '0xTRANSACTION1' }, { from: '0xTRANSACTION2' }],
-      });
-    });
-
-    it('should return the fulfilment transaction only', async () => {
-      const actions: Action[] = [
-        {
-          type: ActionType.SIGNABLE,
-        } as SignableAction,
-        {
-          type: ActionType.TRANSACTION,
-          purpose: TransactionPurpose.FULFILL_ORDER,
-          buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION' } as PopulatedTransaction),
-        },
-      ];
-
-      await expect(getUnsignedTransactions(actions)).resolves.toEqual({
-        approvalTransactions: [],
-        fulfilmentTransactions: [{ from: '0xTRANSACTION' }],
-      });
-    });
-
-    it('should return empty arrays if no transactions', async () => {
-      const actions: Action[] = [
-        {
-          type: ActionType.SIGNABLE,
-        } as SignableAction,
-      ];
-
-      await expect(getUnsignedTransactions(actions)).resolves.toEqual({
-        approvalTransactions: [],
-        fulfilmentTransactions: [],
-      });
     });
   });
 });
