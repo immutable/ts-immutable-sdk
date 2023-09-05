@@ -1,4 +1,6 @@
-import { GasEstimateBridgeToL2Result, GasEstimateSwapResult, TokenInfo } from '@imtbl/checkout-sdk';
+import {
+  GasEstimateBridgeToL2Result, GasEstimateSwapResult, OnRampProviderFees, TokenInfo,
+} from '@imtbl/checkout-sdk';
 import { BigNumber, ethers } from 'ethers';
 
 const convertFeeToFiat = (
@@ -46,6 +48,16 @@ export function formatFiatDecimals(value: number): string {
 
   return value.toFixed(2);
 }
+
+export const getOnRampFeeEstimation = (
+  onRampFees: OnRampProviderFees,
+): string => {
+  const { minPercentage, maxPercentage } = onRampFees;
+
+  if (minPercentage === undefined || maxPercentage === undefined) return '-.--';
+
+  return `${minPercentage}% to ${maxPercentage}%`;
+};
 
 export const getSwapFeeEstimation = (
   swapFees: GasEstimateSwapResult,

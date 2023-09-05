@@ -7,7 +7,9 @@ import {
 import {
   ReactNode, useContext, useEffect, useState,
 } from 'react';
-import { GasEstimateBridgeToL2Result, GasEstimateSwapResult, GasEstimateType } from '@imtbl/checkout-sdk';
+import {
+  GasEstimateBridgeToL2Result, GasEstimateSwapResult, GasEstimateType, OnRampProviderFees,
+} from '@imtbl/checkout-sdk';
 import { FooterLogo } from '../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
@@ -18,7 +20,7 @@ import {
 } from '../../lib/orchestrationEvents';
 import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
-import { getBridgeFeeEstimation, getSwapFeeEstimation } from '../../lib/feeEstimation';
+import { getBridgeFeeEstimation, getOnRampFeeEstimation, getSwapFeeEstimation } from '../../lib/feeEstimation';
 import { CryptoFiatActions, CryptoFiatContext } from '../../context/crypto-fiat-context/CryptoFiatContext';
 import { useInterval } from '../../lib/hooks/useInterval';
 import { DEFAULT_TOKEN_SYMBOLS } from '../../context/crypto-fiat-context/CryptoFiatProvider';
@@ -59,8 +61,10 @@ export function TopUpView({
   const { conversions, fiatSymbol } = cryptoFiatState;
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
+  const [onRampFeesPercentage, setOnRampFeesPercentage] = useState('-.--');
   const [swapFeesInFiat, setSwapFeesInFiat] = useState('-.--');
   const [bridgeFeesInFiat, setBridgeFeesInFiat] = useState('-.--');
+  const [loadingOnRampFees, setLoadingOnRampFees] = useState(false);
   const [loadingSwapFees, setLoadingSwapFees] = useState(false);
   const [loadingBridgeFees, setLoadingBridgeFees] = useState(false);
 
@@ -81,12 +85,13 @@ export function TopUpView({
     if (!checkout) return;
 
     if (!silent) {
+      setLoadingOnRampFees(true);
       setLoadingSwapFees(true);
       setLoadingBridgeFees(true);
     }
 
     try {
-      const [swapEstimate, bridgeEstimate] = await Promise.all([
+      const [swapEstimate, bridgeEstimate, onRampFeesEstimate] = await Promise.all([
         checkout.gasEstimate({
           gasEstimateType: GasEstimateType.SWAP,
         }),
@@ -94,7 +99,12 @@ export function TopUpView({
           gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
           isSpendingCapApprovalRequired: true,
         }),
+        checkout.getExchangeFeeEstimate(),
       ]);
+      const onRampFees = getOnRampFeeEstimation(
+        onRampFeesEstimate as OnRampProviderFees,
+      );
+      setOnRampFeesPercentage(onRampFees);
       const swapFeeInFiat = getSwapFeeEstimation(
         swapEstimate as GasEstimateSwapResult,
         conversions,
@@ -106,11 +116,13 @@ export function TopUpView({
       );
       setBridgeFeesInFiat(bridgeFeeInFiat);
     } catch {
+      setOnRampFeesPercentage('-.--');
       setSwapFeesInFiat('-.--');
       setBridgeFeesInFiat('-.--');
     } finally {
       setLoadingBridgeFees(false);
       setLoadingSwapFees(false);
+      setLoadingOnRampFees(false);
     }
   };
 
@@ -203,6 +215,18 @@ export function TopUpView({
     }
     return (` $${fees} ${fiatSymbol.toLocaleUpperCase()}`);
   };
+  const renderFeePercentage = (fees: string, feesLoading: boolean): ReactNode => {
+    if (feesLoading) {
+      return (
+        <>
+          {' '}
+          <Icon icon="Loading" />
+          %
+        </>
+      );
+    }
+    return (` ${fees}`);
+  };
 
   const renderMenuItem = (
     testId: string,
@@ -260,6 +284,7 @@ export function TopUpView({
             onramp.caption,
             onramp.subcaption,
             onClickOnRamp,
+            () => renderFeePercentage(onRampFeesPercentage, loadingOnRampFees),
           )}
           {showSwapOption && renderMenuItem(
             'swap',
