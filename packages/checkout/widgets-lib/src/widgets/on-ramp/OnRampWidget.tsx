@@ -5,7 +5,7 @@ import {
 } from 'react';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import { Passport, UserProfile } from '@imtbl/passport';
-import { WidgetTheme } from '../../lib';
+import { IMX_ADDRESS_ZKEVM, NATIVE, WidgetTheme } from '../../lib';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
   SharedViews,
@@ -58,6 +58,7 @@ export function OnRampWidget(props: OnRampWidgetProps) {
   const { checkout, provider } = connectLoaderState;
   const [walletAddress, setWalletAddress] = useState('');
   const [emailAddress, setEmailAddress] = useState<string | undefined>(undefined);
+  const [tokenAddress, setTokenAddress] = useState(contractAddress);
 
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
@@ -109,12 +110,17 @@ export function OnRampWidget(props: OnRampWidgetProps) {
       const network = await checkout.getNetworkInfo({
         provider,
       });
-
       /* If the provider's network is not supported, return out of this and let the
     connect loader handle the switch network functionality */
       if (!network.isSupported) {
         return;
       }
+      const tknAddr = contractAddress?.toLocaleUpperCase() === NATIVE
+        ? IMX_ADDRESS_ZKEVM
+        : contractAddress;
+
+      setTokenAddress(tknAddr);
+
       setTimeout(() => {
         viewDispatch({
           payload: {
@@ -123,7 +129,7 @@ export function OnRampWidget(props: OnRampWidgetProps) {
               type: OnRampWidgetViews.ONRAMP,
               data: {
                 amount: viewState.view.data?.amount ?? amount,
-                contractAddress: viewState.view.data?.contractAddress ?? contractAddress,
+                contractAddress: viewState.view.data?.contractAddress ?? tknAddr,
               },
             },
           },
@@ -194,7 +200,7 @@ export function OnRampWidget(props: OnRampWidgetProps) {
           showIframe={showIframe}
           tokenAmount={viewState.view.data?.amount ?? amount}
           tokenAddress={
-            viewState.view.data?.contractAddress ?? contractAddress
+            viewState.view.data?.contractAddress ?? tokenAddress
           }
         />
         )}

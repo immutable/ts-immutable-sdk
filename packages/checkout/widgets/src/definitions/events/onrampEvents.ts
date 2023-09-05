@@ -9,7 +9,7 @@ export enum OnRampEventType {
 
 /**
  * Represents a successful on-ramp transaction.
- * @property {string} orderId - The transaction hash of the successful transaction.
+ * @property {string} transactionHash - The transaction hash of the successful transaction.
  */
 export type OnRampSuccess = {
   transactionHash: string;
