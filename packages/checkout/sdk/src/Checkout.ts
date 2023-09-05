@@ -47,13 +47,13 @@ import {
   SmartCheckoutParams,
   TokenFilterTypes,
   OnRampProviderFees,
+  FiatRampParams,
 } from './types';
 import { CheckoutConfiguration } from './config';
 import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
 import { SellParams } from './types/sell';
 import { CancelParams } from './types/cancel';
-import { CryptoFiatExchangeService, CryptoFiatExchangeWidgetParams } from './cryptoFiatExchange';
-import { CryptoFiatExchangeParams } from './types/cryptoFiatExchange';
+import { FiatRampService, FiatRampWidgetParams } from './fiatRamp';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
@@ -64,7 +64,7 @@ const SANDBOX_CONFIGURATION = {
 export class Checkout {
   readonly config: CheckoutConfiguration;
 
-  readonly cryptoFiatExchangeService: CryptoFiatExchangeService;
+  readonly fiatRampService: FiatRampService;
 
   private readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>;
 
@@ -76,7 +76,7 @@ export class Checkout {
     config: CheckoutModuleConfiguration = SANDBOX_CONFIGURATION,
   ) {
     this.config = new CheckoutConfiguration(config);
-    this.cryptoFiatExchangeService = new CryptoFiatExchangeService(this.config);
+    this.fiatRampService = new FiatRampService(this.config);
     this.readOnlyProviders = new Map<ChainId, ethers.providers.JsonRpcProvider>();
   }
 
@@ -399,11 +399,11 @@ export class Checkout {
   }
 
   /**
-   * Creates and returns a URL for the crypto fiat exchange widget.
-   * @param {CryptoFiatExchangeParams} params - The parameters for creating the url.
+   * Creates and returns a URL for the fiat ramp widget.
+   * @param {FiatRampParams} params - The parameters for creating the url.
    * @returns {Promise<string>} - A promise that resolves to a string url.
    */
-  public async createCryptoFiatExchangeUrl(params: CryptoFiatExchangeParams): Promise<string> {
+  public async createFiatRampUrl(params: FiatRampParams): Promise<string> {
     let email;
 
     const walletAddress = await params.web3Provider.getSigner().getAddress();
@@ -418,21 +418,21 @@ export class Checkout {
 
     const token = tokenList.tokens.find((t) => t.address === params.tokenAddress);
 
-    return await this.cryptoFiatExchangeService.createWidgetUrl({
+    return await this.fiatRampService.createWidgetUrl({
       exchangeType: params.exchangeType,
       isPassport,
       walletAddress,
       tokenAmount: token ? undefined : params.tokenAmount,
       tokenSymbol: token?.symbol ?? 'IMX',
       email,
-    } as CryptoFiatExchangeWidgetParams);
+    } as FiatRampWidgetParams);
   }
 
   /**
-   * Fetches crypto fiat exchange fee estimations.
+   * Fetches fiat ramp fee estimations.
    * @returns {Promise<OnRampProviderFees>} - A promise that resolves to OnRampProviderFees.
    */
   public async getExchangeFeeEstimate(): Promise<OnRampProviderFees> {
-    return await this.cryptoFiatExchangeService.feeEstimate();
+    return await this.fiatRampService.feeEstimate();
   }
 }

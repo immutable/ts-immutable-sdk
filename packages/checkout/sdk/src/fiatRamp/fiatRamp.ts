@@ -1,11 +1,11 @@
 import { BigNumber } from 'ethers';
-import { ExchangeType } from '../types/cryptoFiatExchange';
+import { ExchangeType } from '../types/fiatRamp';
 import {
   OnRampConfig, OnRampProviderFees, TRANSAK_API_BASE_URL, TRANSAK_PUBLISHABLE_KEY,
 } from '../types';
 import { CheckoutConfiguration } from '../config';
 
-export interface CryptoFiatExchangeWidgetParams {
+export interface FiatRampWidgetParams {
   exchangeType: ExchangeType;
   isPassport: boolean;
   walletAddress?: string;
@@ -14,12 +14,12 @@ export interface CryptoFiatExchangeWidgetParams {
   email?: string;
 }
 
-export class CryptoFiatExchangeService {
+export class FiatRampService {
   readonly config: CheckoutConfiguration;
 
   /**
-   * Constructs a new instance of the CryptoFiatExchangeService class.
-   * @param {CheckoutConfiguration} config - The config required for the CryptoFiatExchangeService.
+   * Constructs a new instance of the FiatRampService class.
+   * @param {CheckoutConfiguration} config - The config required for the FiatRampService.
    */
   constructor(config: CheckoutConfiguration) {
     this.config = config;
@@ -29,11 +29,11 @@ export class CryptoFiatExchangeService {
     return ((await this.config.remote.getConfig('onramp')) as OnRampConfig)?.transak?.fees;
   }
 
-  public async createWidgetUrl(params: CryptoFiatExchangeWidgetParams): Promise<string> {
+  public async createWidgetUrl(params: FiatRampWidgetParams): Promise<string> {
     return this.getTransakWidgetUrl(params);
   }
 
-  private getTransakWidgetUrl(params: CryptoFiatExchangeWidgetParams): string {
+  private getTransakWidgetUrl(params: FiatRampWidgetParams): string {
     let widgetUrl = `${TRANSAK_API_BASE_URL[this.config.environment]}?`;
     const transakPublishableKey = `apiKey=${TRANSAK_PUBLISHABLE_KEY[this.config.environment]}`;
     const zkevmNetwork = 'network=immutablezkevm';

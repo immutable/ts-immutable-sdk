@@ -1,9 +1,9 @@
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
-import { CryptoFiatExchangeService, CryptoFiatExchangeWidgetParams } from './cryptoFiatExchange';
-import { ExchangeType } from '../types/cryptoFiatExchange';
 import { CheckoutConfiguration } from '../config';
 import { RemoteConfigFetcher } from '../config/remoteConfigFetcher';
+import { FiatRampService, FiatRampWidgetParams } from './fiatRamp';
+import { ExchangeType } from '../types';
 
 const defaultWidgetUrl = 'https://global-stg.transak.com?apiKey=41ad2da7-ed5a-4d89-a90b-c751865effc2'
 + '&network=immutablezkevm&defaultPaymentMethod=credit_debit_card&disablePaymentMethods=sepa_bank_transfer,'
@@ -12,9 +12,9 @@ const defaultWidgetUrl = 'https://global-stg.transak.com?apiKey=41ad2da7-ed5a-4d
 
 jest.mock('../config/remoteConfigFetcher');
 
-describe('cryptoFiatExchange', () => {
+describe('FiatRampService', () => {
   let config: CheckoutConfiguration;
-  let cryptoFiatExchangeService: CryptoFiatExchangeService;
+  let fiatRampService: FiatRampService;
 
   beforeEach(() => {
     config = new CheckoutConfiguration({
@@ -22,7 +22,7 @@ describe('cryptoFiatExchange', () => {
         environment: Environment.SANDBOX,
       },
     });
-    cryptoFiatExchangeService = new CryptoFiatExchangeService(config);
+    fiatRampService = new FiatRampService(config);
   });
 
   describe('feeEstimate', () => {
@@ -42,9 +42,9 @@ describe('cryptoFiatExchange', () => {
           environment: Environment.SANDBOX,
         },
       });
-      cryptoFiatExchangeService = new CryptoFiatExchangeService(config);
+      fiatRampService = new FiatRampService(config);
 
-      const result = await cryptoFiatExchangeService.feeEstimate();
+      const result = await fiatRampService.feeEstimate();
       expect(result).toEqual({
         minPercentage: '3.5',
         maxPercentage: '5.5',
@@ -69,9 +69,9 @@ describe('cryptoFiatExchange', () => {
           environment: Environment.SANDBOX,
         },
       });
-      cryptoFiatExchangeService = new CryptoFiatExchangeService(config);
+      fiatRampService = new FiatRampService(config);
 
-      const result = await cryptoFiatExchangeService.feeEstimate();
+      const result = await fiatRampService.feeEstimate();
       expect(result).toEqual({
         minPercentage: '3.5',
         maxPercentage: '5.5',
@@ -82,11 +82,11 @@ describe('cryptoFiatExchange', () => {
 
   describe('createWidgetUrl', () => {
     it('should return widget url with non-configurable query params when onRampProvider is Transak', async () => {
-      const params: CryptoFiatExchangeWidgetParams = {
+      const params: FiatRampWidgetParams = {
         exchangeType: ExchangeType.ONRAMP,
         isPassport: false,
       };
-      const result = await cryptoFiatExchangeService.createWidgetUrl(params);
+      const result = await fiatRampService.createWidgetUrl(params);
       expect(result).toContain(defaultWidgetUrl);
       expect(result).not.toContain('&email=');
       expect(result).not.toContain('&isAutoFillUserData=true&disableWalletAddressForm=true');
@@ -97,12 +97,12 @@ describe('cryptoFiatExchange', () => {
 
     it(`should return widget url with encoded email, isAutoFillUserData and disableWalletAddressForm query params
     for passport users`, async () => {
-      const params: CryptoFiatExchangeWidgetParams = {
+      const params: FiatRampWidgetParams = {
         exchangeType: ExchangeType.ONRAMP,
         isPassport: true,
         email: 'passport.user@immutable.com',
       };
-      const result = await cryptoFiatExchangeService.createWidgetUrl(params);
+      const result = await fiatRampService.createWidgetUrl(params);
       expect(result).toContain(defaultWidgetUrl);
       expect(result).toContain('&email=passport.user%40immutable.com');
       expect(result).toContain('&isAutoFillUserData=true&disableWalletAddressForm=true');
@@ -110,25 +110,25 @@ describe('cryptoFiatExchange', () => {
 
     it(`should return widget url with defaultCryptoAmount and cryptoCurrencyCode query params when tokenAmount and
     tokenSymbol is present`, async () => {
-      const params: CryptoFiatExchangeWidgetParams = {
+      const params: FiatRampWidgetParams = {
         exchangeType: ExchangeType.ONRAMP,
         isPassport: false,
         tokenAmount: BigNumber.from(100),
         tokenSymbol: 'ETH',
       };
-      const result = await cryptoFiatExchangeService.createWidgetUrl(params);
+      const result = await fiatRampService.createWidgetUrl(params);
       expect(result).toContain(defaultWidgetUrl);
       expect(result).toContain('&defaultCryptoAmount=100');
       expect(result).toContain('&cryptoCurrencyCode=ETH');
     });
 
     it('should return widget url with walletAddress query params when walletAddress is present', async () => {
-      const params: CryptoFiatExchangeWidgetParams = {
+      const params: FiatRampWidgetParams = {
         exchangeType: ExchangeType.ONRAMP,
         isPassport: false,
         walletAddress: '0x1234567890',
       };
-      const result = await cryptoFiatExchangeService.createWidgetUrl(params);
+      const result = await fiatRampService.createWidgetUrl(params);
       expect(result).toContain(defaultWidgetUrl);
       expect(result).toContain('&walletAddress=0x1234567890');
     });
