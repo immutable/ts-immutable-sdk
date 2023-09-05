@@ -1,6 +1,4 @@
-import {
-  Box, Heading, Icon, MenuItem,
-} from '@biom3/react';
+import { Box, Heading, Icon } from '@biom3/react';
 import {
   IMTBLWidgetEvents,
 } from '@imtbl/checkout-widgets';
@@ -28,6 +26,7 @@ import { ConnectLoaderContext } from '../../context/connect-loader-context/Conne
 import { isPassportProvider } from '../../lib/providerUtils';
 import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextTypes';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
+import { TopUpMenuItem } from './TopUpMenuItem';
 
 interface TopUpViewProps {
   widgetEvent: IMTBLWidgetEvents,
@@ -225,41 +224,8 @@ export function TopUpView({
         </>
       );
     }
-    return (` ${fees}%`);
+    return (` ${fees}`);
   };
-
-  const renderMenuItem = (
-    testId: string,
-    icon: 'Wallet' | 'Coins' | 'Minting',
-    heading: string,
-    caption: string,
-    subcaption: string,
-    onClick: () => void,
-    renderFeeFunction?: (fees: string, feesLoading: boolean) => ReactNode,
-  ) => (
-    <Box testId="top-up-view" sx={{ paddingY: '1px' }}>
-      <MenuItem
-        testId={`menu-item-${testId}`}
-        size="medium"
-        emphasized
-        onClick={onClick}
-      >
-        <MenuItem.Icon
-          icon={icon}
-        />
-        <MenuItem.Label size="medium">
-          {heading}
-        </MenuItem.Label>
-        <MenuItem.IntentIcon />
-        <MenuItem.Caption testId={`menu-item-caption-${testId}`}>
-          {caption}
-          <br />
-          {subcaption}
-          {renderFeeFunction && renderFeeFunction(swapFeesInFiat, loadingSwapFees)}
-        </MenuItem.Caption>
-      </MenuItem>
-    </Box>
-  );
 
   return (
     <SimpleLayout
@@ -277,32 +243,38 @@ export function TopUpView({
       <Box sx={{ paddingX: 'base.spacing.x4', paddingY: 'base.spacing.x4' }}>
         <Heading size="small">{header.title}</Heading>
         <Box sx={{ paddingY: 'base.spacing.x4' }}>
-          {showOnrampOption && renderMenuItem(
-            'onramp',
-            'Wallet',
-            onramp.heading,
-            onramp.caption,
-            onramp.subcaption,
-            onClickOnRamp,
-            () => renderFeePercentage(onRampFeesPercentage, loadingOnRampFees),
+          {showOnrampOption && (
+            <TopUpMenuItem
+              testId="onramp"
+              icon="Wallet"
+              heading={onramp.heading}
+              caption={onramp.heading}
+              subcaption={onramp.subcaption}
+              onClick={onClickOnRamp}
+              renderFeeFunction={() => renderFeePercentage(onRampFeesPercentage, loadingOnRampFees)}
+            />
           )}
-          {showSwapOption && renderMenuItem(
-            'swap',
-            'Coins',
-            swap.heading,
-            swap.caption,
-            swap.subcaption,
-            onClickSwap,
-            () => renderFees(swapFeesInFiat, loadingSwapFees),
+          {showSwapOption && (
+            <TopUpMenuItem
+              testId="swap"
+              icon="Coins"
+              heading={swap.heading}
+              caption={swap.heading}
+              subcaption={swap.subcaption}
+              onClick={onClickSwap}
+              renderFeeFunction={() => renderFees(swapFeesInFiat, loadingSwapFees)}
+            />
           )}
-          {showBridgeOption && !isPassport && renderMenuItem(
-            'bridge',
-            'Minting',
-            bridge.heading,
-            bridge.caption,
-            bridge.subcaption,
-            onClickBridge,
-            () => renderFees(bridgeFeesInFiat, loadingBridgeFees),
+          {showBridgeOption && !isPassport && (
+            <TopUpMenuItem
+              testId="bridge"
+              icon="Minting"
+              heading={bridge.heading}
+              caption={bridge.caption}
+              subcaption={bridge.subcaption}
+              onClick={onClickBridge}
+              renderFeeFunction={() => renderFees(bridgeFeesInFiat, loadingBridgeFees)}
+            />
           )}
         </Box>
       </Box>
