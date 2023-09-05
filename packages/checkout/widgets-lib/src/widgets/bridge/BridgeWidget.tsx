@@ -104,7 +104,7 @@ export function BridgeWidget(props: BridgeWidgetProps) {
     });
   }, [viewDispatch]);
 
-  const showBridgeWidget = useCallback(() => {
+  const showBridgeView = useCallback(() => {
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
@@ -215,7 +215,7 @@ export function BridgeWidget(props: BridgeWidgetProps) {
 
       if (!await loadBalances()) return;
 
-      showBridgeWidget();
+      showBridgeView();
     };
 
     bridgetWidgetSetup();
@@ -289,12 +289,12 @@ export function BridgeWidget(props: BridgeWidgetProps) {
                   const data = viewState.view as ErrorViewType;
 
                   if (!data.tryAgain) {
-                    showBridgeWidget();
+                    showBridgeView();
                     setErrorViewLoading(false);
                     return;
                   }
 
-                  if (await data.tryAgain()) showBridgeWidget();
+                  if (await data.tryAgain()) showBridgeView();
                   setErrorViewLoading(false);
                 }}
                 onCloseClick={() => sendBridgeWidgetCloseEvent(eventTarget)}

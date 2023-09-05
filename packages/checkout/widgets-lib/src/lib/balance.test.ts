@@ -182,6 +182,52 @@ describe('getAllowedBalances', () => {
     });
   });
 
+  it.only('should accept a different policy', async () => {
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.PRODUCTION },
+    });
+
+    const mockProvider = {
+      getSigner: jest.fn().mockReturnValue({
+        getAddress: jest.fn().mockResolvedValue('0xaddress'),
+      }),
+    };
+    jest.spyOn(checkout, 'getNetworkInfo').mockResolvedValue(
+      { chainId: ChainId.IMTBL_ZKEVM_MAINNET } as unknown as NetworkInfo,
+    );
+    const getAllBalancesSpy = jest.spyOn(checkout, 'getAllBalances')
+      .mockRejectedValueOnce({ data: { code: 500 } })
+      .mockRejectedValueOnce({ data: { code: 12 } })
+      .mockResolvedValue({ balances });
+    jest.spyOn(checkout, 'getTokenAllowList').mockResolvedValue({
+      tokens: [
+        {
+          address: '0xQ',
+        } as unknown as TokenInfo,
+      ],
+    });
+
+    let error;
+    try {
+      await getAllowedBalances({
+        checkout,
+        provider: mockProvider as unknown as Web3Provider,
+        allowTokenListType: TokenFilterTypes.BRIDGE,
+        allowNative: true,
+        retryPolicy: {
+          retryIntervalMs: 0,
+          retries: 2,
+          nonRetryable: (err: any) => err.data.code === 12,
+        },
+      });
+    } catch (err: any) {
+      error = err;
+    }
+
+    expect(getAllBalancesSpy).toBeCalledTimes(2);
+    expect(error.data.code).toEqual(12);
+  });
+
   it('should not return zero balances', async () => {
     const checkout = new Checkout({
       baseConfig: { environment: Environment.PRODUCTION },
@@ -219,7 +265,7 @@ describe('getAllowedBalances', () => {
     });
   });
 
-  it('should not return NATIVE address or empty address', async () => {
+  it('should not return native address or empty address', async () => {
     const checkout = new Checkout({
       baseConfig: { environment: Environment.PRODUCTION },
     });

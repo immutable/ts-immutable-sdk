@@ -13,8 +13,6 @@ import { ConnectLoaderContext } from '../../../context/connect-loader-context/Co
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { getAllowedBalances } from '../../../lib/balance';
 
-// TODO: Clarify
-// Why this is 10s and not DEFAULT_QUOTE_REFRESH_INTERVAL?
 const REFRESH_TOKENS_INTERVAL_MS = 10000;
 
 export interface BridgeProps {
@@ -29,26 +27,34 @@ export function Bridge({ amount, fromContractAddress }: BridgeProps) {
   const { checkout, provider } = connectLoaderState;
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
-  // TODO: Clarify
-  // Do we really need this?
-  // The balances are already loaded by the BridgeWidget component
+  // This is used to refresh the balances after the Bridge widget
+  // has been loaded so that processing transfers will be eventually
+  // reflected.
   const refreshBalances = useCallback(async () => {
     if (!checkout) return;
     if (!provider) return;
 
-    const tokensAndBalances = await getAllowedBalances({
-      checkout,
-      provider,
-      allowTokenListType: TokenFilterTypes.BRIDGE,
-      allowNative: true,
-    });
+    try {
+      const tokensAndBalances = await getAllowedBalances({
+        checkout,
+        provider,
+        allowTokenListType: TokenFilterTypes.BRIDGE,
+        allowNative: true,
+        retryPolicy: { retryIntervalMs: 0, retries: 0 },
+      });
 
-    bridgeDispatch({
-      payload: {
-        type: BridgeActions.SET_TOKEN_BALANCES,
-        tokenBalances: tokensAndBalances.allowedBalances,
-      },
-    });
+      bridgeDispatch({
+        payload: {
+          type: BridgeActions.SET_TOKEN_BALANCES,
+          tokenBalances: tokensAndBalances.allowedBalances,
+        },
+      });
+      // Ignore errors given that this is a background refresh
+      // and the logic will retry anyways.
+    } catch (e: any) {
+      // eslint-disable-next-line no-console
+      console.debug(e);
+    }
   }, [checkout, provider]);
   useInterval(refreshBalances, REFRESH_TOKENS_INTERVAL_MS);
 

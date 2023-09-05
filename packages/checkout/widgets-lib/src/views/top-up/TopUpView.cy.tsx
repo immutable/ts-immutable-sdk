@@ -15,7 +15,6 @@ import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { orchestrationEvents } from '../../lib/orchestrationEvents';
 import { WalletWidgetTestComponent } from '../../widgets/wallet/test-components/WalletWidgetTestComponent';
 import { WalletState } from '../../widgets/wallet/context/WalletContext';
-import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import { ConnectionStatus } from '../../context/connect-loader-context/ConnectLoaderContext';
 import {
   ConnectLoaderTestComponent,
@@ -318,24 +317,22 @@ describe('Top Up View', () => {
 
       const cryptoConversions = new Map<string, number>([['eth', 2000], ['imx', 1.5], ['usdc', 1]]);
       mount(
-        <CryptoFiatProvider environment={Environment.SANDBOX}>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <WalletWidgetTestComponent
+            initialStateOverride={baseWalletState}
+            cryptoConversionsOverride={cryptoConversions}
           >
-            <WalletWidgetTestComponent
-              initialStateOverride={baseWalletState}
-              cryptoConversionsOverride={cryptoConversions}
-            >
-              <TopUpView
-                showOnrampOption
-                showSwapOption
-                showBridgeOption
-                widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
-                onCloseButtonClick={() => {}}
-              />
-            </WalletWidgetTestComponent>
-          </ConnectLoaderTestComponent>
-        </CryptoFiatProvider>,
+            <TopUpView
+              showOnrampOption
+              showSwapOption
+              showBridgeOption
+              widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
+              onCloseButtonClick={() => {}}
+            />
+          </WalletWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('menu-item-caption-swap').contains('$0.20 USD');

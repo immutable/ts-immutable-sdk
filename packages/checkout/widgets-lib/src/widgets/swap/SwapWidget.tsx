@@ -107,7 +107,7 @@ export function SwapWidget(props: SwapWidgetProps) {
     });
   }, [viewDispatch]);
 
-  const showSwapWidget = useCallback(() => {
+  const showSwapView = useCallback(() => {
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
@@ -194,7 +194,7 @@ export function SwapWidget(props: SwapWidgetProps) {
 
       if (!await loadBalances()) return;
 
-      showSwapWidget();
+      showSwapView();
     })();
   }, [checkout, provider]);
 
@@ -294,12 +294,12 @@ export function SwapWidget(props: SwapWidgetProps) {
                 const data = viewState.view as ErrorViewType;
 
                 if (!data.tryAgain) {
-                  showSwapWidget();
+                  showSwapView();
                   setErrorViewLoading(false);
                   return;
                 }
 
-                if (await data.tryAgain()) showSwapWidget();
+                if (await data.tryAgain()) showSwapView();
                 setErrorViewLoading(false);
               }}
               onCloseClick={() => sendSwapWidgetCloseEvent(eventTarget)}

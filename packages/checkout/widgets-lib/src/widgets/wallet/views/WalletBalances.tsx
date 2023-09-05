@@ -26,7 +26,7 @@ import {
   CryptoFiatActions,
   CryptoFiatContext,
 } from '../../../context/crypto-fiat-context/CryptoFiatContext';
-import { getTokenBalances } from '../functions/tokenBalances';
+import { BalanceInfo, getTokenBalances } from '../functions/tokenBalances';
 import { WalletWidgetViews } from '../../../context/view-context/WalletViewContextTypes';
 import {
   SharedViews,
@@ -162,18 +162,25 @@ export function WalletBalances() {
     if (!checkout || !provider || !network || !conversions) return;
     if (conversions.size <= 0) return; // Prevent unnecessary re-rendering
 
-    getTokenBalances(checkout, provider, network.chainId, conversions)
-      .then((balances) => {
-        walletDispatch({
-          payload: {
-            type: WalletActions.SET_TOKEN_BALANCES,
-            tokenBalances: balances,
-          },
-        });
-        setBalancesLoading(false);
-      }).catch((err) => {
-        if (DEFAULT_BALANCE_RETRY_POLICY.nonRetryable!(err)) showErrorView();
+    (async () => {
+      let balances: BalanceInfo[] = [];
+      try {
+        balances = await getTokenBalances(checkout, provider, network.chainId, conversions);
+      } catch (error: any) {
+        if (DEFAULT_BALANCE_RETRY_POLICY.nonRetryable!(error)) {
+          showErrorView();
+          return;
+        }
+      }
+
+      walletDispatch({
+        payload: {
+          type: WalletActions.SET_TOKEN_BALANCES,
+          tokenBalances: balances,
+        },
       });
+      setBalancesLoading(false);
+    })();
   }, [checkout, provider, network, conversions]);
 
   const showAddCoins = useMemo(() => {
