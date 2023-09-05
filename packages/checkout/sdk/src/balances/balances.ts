@@ -104,7 +104,7 @@ export const getIndexerBalance = async (
   // Hold the items in an array for post-fetching processing
   const items = [];
 
-  const tokenType = [BlockscoutTokenType.ERC20];
+  const tokenType = BlockscoutTokenType.ERC20;
   // Given that the widgets aren't yet designed to support pagination,
   // fetch all the possible tokens associated to a given wallet address.
   let resp: BlockscoutAddressTokens | undefined;
@@ -115,7 +115,22 @@ export const getIndexerBalance = async (
       items.push(...resp.items);
     } while (resp.next_page_params);
   } catch (err: any) {
-    throw new CheckoutError(err.message || 'InternalServerError', CheckoutErrorType.GET_INDEXER_BALANCE_ERROR, err);
+    throw new CheckoutError(
+      err.message || 'InternalServerError | getAddressTokens',
+      CheckoutErrorType.GET_INDEXER_BALANCE_ERROR,
+      err,
+    );
+  }
+
+  try {
+    const respNative = await blockscoutClient.getAddressNativeTokens({ walletAddress });
+    items.push(respNative);
+  } catch (err: any) {
+    throw new CheckoutError(
+      err.message || 'InternalServerError | getAddressNativeTokens',
+      CheckoutErrorType.GET_INDEXER_BALANCE_ERROR,
+      err,
+    );
   }
 
   return {

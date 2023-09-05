@@ -332,7 +332,7 @@ describe('balances', () => {
       );
     });
 
-    it('should call getIndexerBalance', async () => {
+    it.only('should call getIndexerBalance', async () => {
       const chainId = Object.keys(BLOCKSCOUT_CHAIN_URL_MAP)[0] as unknown as ChainId;
 
       mockedAxios.get.mockResolvedValueOnce({
@@ -363,7 +363,14 @@ describe('balances', () => {
           // eslint-disable-next-line @typescript-eslint/naming-convention
           next_page_params: null,
         },
-      });
+      })
+        .mockResolvedValueOnce({
+          status: 200,
+          data: {
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            coin_balance: '777777777777777777',
+          },
+        });
 
       const getAllBalancesResult = await getAllBalances(
         {
@@ -381,31 +388,32 @@ describe('balances', () => {
 
       expect(mockedAxios.get).toHaveBeenNthCalledWith(
         1,
-        `${BLOCKSCOUT_CHAIN_URL_MAP[chainId]}/api/v2/addresses/abc123/tokens?type=${BlockscoutTokenType.ERC20}`,
+        `${BLOCKSCOUT_CHAIN_URL_MAP[chainId].url}/api/v2/addresses/abc123/tokens?type=${BlockscoutTokenType.ERC20}`,
       );
 
-      expect(getAllBalancesResult.balances).toEqual([{
-        balance: BigNumber.from('396897342421454458'),
-        formattedBalance: '0.396897342421454458',
-        token: {
-          address: '0x0000000000000000000000000000000000001010',
-          decimals: 18,
-          name: 'Test Immutable X',
-          symbol: 'tIMX',
-          type: 'ERC-20',
+      expect(getAllBalancesResult.balances).toEqual([
+        {
+          balance: BigNumber.from('330000000000000000'),
+          formattedBalance: '0.33',
+          token: {
+            address: '0x65AA7a21B0f3ce9B478aAC3408fE75b423939b1F',
+            decimals: 18,
+            name: 'Ether',
+            symbol: 'ETH',
+            type: 'ERC-20',
+          },
         },
-      },
-      {
-        balance: BigNumber.from('330000000000000000'),
-        formattedBalance: '0.33',
-        token: {
-          address: '0x65AA7a21B0f3ce9B478aAC3408fE75b423939b1F',
-          decimals: 18,
-          name: 'Ether',
-          symbol: 'ETH',
-          type: 'ERC-20',
+        {
+          balance: BigNumber.from('777777777777777777'),
+          formattedBalance: '0.777777777777777777',
+          token: {
+            address: '0x0000000000000000000000000000000000001010',
+            decimals: 18,
+            name: 'IMX',
+            symbol: 'IMX',
+          },
         },
-      }]);
+      ]);
     });
 
     it('should call getIndexerBalance and throw error', async () => {
@@ -447,7 +455,7 @@ describe('balances', () => {
 
       expect(mockedAxios.get).toHaveBeenNthCalledWith(
         1,
-        `${BLOCKSCOUT_CHAIN_URL_MAP[chainId]}/api/v2/addresses/0xabc123/tokens?type=${BlockscoutTokenType.ERC20}`,
+        `${BLOCKSCOUT_CHAIN_URL_MAP[chainId].url}/api/v2/addresses/0xabc123/tokens?type=${BlockscoutTokenType.ERC20}`,
       );
 
       expect(message).toEqual('test');

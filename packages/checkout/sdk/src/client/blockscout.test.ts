@@ -59,9 +59,9 @@ describe('Blockscout', () => {
       };
       mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
-      const tokens = [BlockscoutTokenType.ERC20];
+      const token = BlockscoutTokenType.ERC20;
       const client = new Blockscout({ chainId: ChainId.IMTBL_ZKEVM_TESTNET });
-      const resp = await client.getAddressTokens({ walletAddress: '0x1234567890', tokenType: tokens });
+      const resp = await client.getAddressTokens({ walletAddress: '0x1234567890', tokenType: token });
 
       expect(resp.items.length).toEqual(1);
       expect(resp.items[0].value).toEqual('3000000000000000000');
@@ -69,7 +69,7 @@ describe('Blockscout', () => {
 
       expect(mockedAxios.get).toHaveBeenNthCalledWith(
         1,
-        `${client.url}/api/v2/addresses/0x1234567890/tokens?type=${tokens.join(',')}`,
+        `${client.url}/api/v2/addresses/0x1234567890/tokens?type=${token}`,
       );
     });
 
@@ -84,15 +84,15 @@ describe('Blockscout', () => {
       };
       mockedAxios.get.mockResolvedValue(mockResponse);
 
-      const tokens = [BlockscoutTokenType.ERC20];
+      const token = BlockscoutTokenType.ERC20;
       const client = new Blockscout({ chainId: ChainId.IMTBL_ZKEVM_TESTNET });
 
-      await client.getAddressTokens({ walletAddress: '0x1234567890', tokenType: tokens });
-      await client.getAddressTokens({ walletAddress: '0x1234567890', tokenType: tokens });
+      await client.getAddressTokens({ walletAddress: '0x1234567890', tokenType: token });
+      await client.getAddressTokens({ walletAddress: '0x1234567890', tokenType: token });
 
       expect(mockedAxios.get).toHaveBeenNthCalledWith(
         1,
-        `${client.url}/api/v2/addresses/0x1234567890/tokens?type=${tokens.join(',')}`,
+        `${client.url}/api/v2/addresses/0x1234567890/tokens?type=${token}`,
       );
     });
 
@@ -107,15 +107,15 @@ describe('Blockscout', () => {
       };
       mockedAxios.get.mockResolvedValue(mockResponse);
 
-      const tokens = [BlockscoutTokenType.ERC20];
+      const token = BlockscoutTokenType.ERC20;
       const client = new Blockscout({ chainId: ChainId.IMTBL_ZKEVM_TESTNET, ttl: 0 });
 
-      await client.getAddressTokens({ walletAddress: '0x1234567890', tokenType: tokens });
-      await client.getAddressTokens({ walletAddress: '0x1234567890', tokenType: tokens });
+      await client.getAddressTokens({ walletAddress: '0x1234567890', tokenType: token });
+      await client.getAddressTokens({ walletAddress: '0x1234567890', tokenType: token });
 
       expect(mockedAxios.get).toHaveBeenNthCalledWith(
         2,
-        `${client.url}/api/v2/addresses/0x1234567890/tokens?type=${tokens.join(',')}`,
+        `${client.url}/api/v2/addresses/0x1234567890/tokens?type=${token}`,
       );
     });
 
@@ -126,7 +126,7 @@ describe('Blockscout', () => {
       };
       mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
-      const tokens = [BlockscoutTokenType.ERC20];
+      const token = BlockscoutTokenType.ERC20;
       const nextPage = {
         fiat_value: '217517',
         id: 12,
@@ -134,11 +134,11 @@ describe('Blockscout', () => {
         value: '1234',
       };
       const client = new Blockscout({ chainId: ChainId.IMTBL_ZKEVM_TESTNET });
-      await client.getAddressTokens({ walletAddress: '0x1234567890', tokenType: tokens, nextPage });
+      await client.getAddressTokens({ walletAddress: '0x1234567890', tokenType: token, nextPage });
 
       expect(mockedAxios.get).toHaveBeenNthCalledWith(
         1,
-        `${client.url}/api/v2/addresses/0x1234567890/tokens?type=${tokens.join(',')}`
+        `${client.url}/api/v2/addresses/0x1234567890/tokens?type=${token}`
         + '&fiat_value=217517&id=12&items_count=50&value=1234',
       );
     });
@@ -150,14 +150,14 @@ describe('Blockscout', () => {
       };
       mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
-      const tokens = [BlockscoutTokenType.ERC20];
+      const token = BlockscoutTokenType.ERC20;
       const nextPage = null;
       const client = new Blockscout({ chainId: ChainId.IMTBL_ZKEVM_TESTNET });
-      await client.getAddressTokens({ walletAddress: '0x1234567890', tokenType: tokens, nextPage });
+      await client.getAddressTokens({ walletAddress: '0x1234567890', tokenType: token, nextPage });
 
       expect(mockedAxios.get).toHaveBeenNthCalledWith(
         1,
-        `${client.url}/api/v2/addresses/0x1234567890/tokens?type=${tokens.join(',')}`,
+        `${client.url}/api/v2/addresses/0x1234567890/tokens?type=${token}`,
       );
     });
 
@@ -169,10 +169,10 @@ describe('Blockscout', () => {
       };
       mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
-      const tokens = [BlockscoutTokenType.ERC20];
+      const token = BlockscoutTokenType.ERC20;
       const client = new Blockscout({ chainId: ChainId.IMTBL_ZKEVM_TESTNET });
       try {
-        await client.getAddressTokens({ walletAddress: '0x1234567890', tokenType: tokens });
+        await client.getAddressTokens({ walletAddress: '0x1234567890', tokenType: token });
       } catch (error: any) {
         expect(Blockscout.isBlockscoutError(error)).toBe(true);
         expect((error as BlockscoutError).code).toEqual(HttpStatusCode.BadRequest);
@@ -188,10 +188,10 @@ describe('Blockscout', () => {
       };
       mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
-      const tokens = [BlockscoutTokenType.ERC20];
+      const token = BlockscoutTokenType.ERC20;
       const client = new Blockscout({ chainId: ChainId.IMTBL_ZKEVM_TESTNET });
       try {
-        await client.getAddressTokens({ walletAddress: '0x1234567890', tokenType: tokens });
+        await client.getAddressTokens({ walletAddress: '0x1234567890', tokenType: token });
       } catch (error: any) {
         expect(Blockscout.isBlockscoutError(error)).toBe(true);
         expect((error as BlockscoutError).code).toEqual(HttpStatusCode.InternalServerError);
@@ -202,10 +202,10 @@ describe('Blockscout', () => {
     it('throws', async () => {
       mockedAxios.get.mockRejectedValueOnce('error');
 
-      const tokens = [BlockscoutTokenType.ERC20];
+      const token = BlockscoutTokenType.ERC20;
       const client = new Blockscout({ chainId: ChainId.IMTBL_ZKEVM_TESTNET });
       try {
-        await client.getAddressTokens({ walletAddress: '0x1234567890', tokenType: tokens });
+        await client.getAddressTokens({ walletAddress: '0x1234567890', tokenType: token });
       } catch (error: any) {
         expect(Blockscout.isBlockscoutError(error)).toBe(true);
         expect((error as BlockscoutError).code).toEqual(HttpStatusCode.InternalServerError);
