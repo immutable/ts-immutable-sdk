@@ -23,7 +23,7 @@ export default function Sell({ checkout, provider }: SellProps) {
   const [amountError, setAmountError] = useState<string>('');
   const [contractAddress, setContractAddress] = useState<string>('');
   const [contractAddressError, setContractAddressError] = useState<string>('');
-  const [executeTransactions, setExecuteTransactions] = useState<boolean>(false);
+  const [signActions, setSignActions] = useState<boolean>(false);
   const [error, setError] = useState<any>(null);
   const [success, setSuccess] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -84,7 +84,7 @@ export default function Sell({ checkout, provider }: SellProps) {
         id,
         collectionAddress,
         buyToken: getBuyToken(),
-        executeTransactions,
+        signActions,
       });
       setLoading(false);
     } catch (err: any) {
@@ -220,8 +220,8 @@ export default function Sell({ checkout, provider }: SellProps) {
       <FormControl>
         <FormControl.Label>Execute Transactions</FormControl.Label>
         <Checkbox
-          checked={executeTransactions}
-          onChange={(event: any) => setExecuteTransactions(event.target.checked)}
+          checked={signActions}
+          onChange={(event: any) => setSignActions(event.target.checked)}
         />
       </FormControl>
       <br />

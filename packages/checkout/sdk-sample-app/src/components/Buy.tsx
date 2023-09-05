@@ -13,7 +13,7 @@ interface BuyProps {
 export default function Buy({ checkout, provider }: BuyProps) {
   const [orderId, setOrderId] = useState<string>('');
   const [orderIdError, setOrderIdError] = useState<any>(null);
-  const [executeTransactions, setExecuteTransactions] = useState<boolean>(false);
+  const [signActions, setSignActions] = useState<boolean>(false);
   const [error, setError] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -36,7 +36,7 @@ export default function Buy({ checkout, provider }: BuyProps) {
       await checkout.buy({
         provider,
         orderId,
-        executeTransactions,
+        signActions,
       });
       setLoading(false);
     } catch (err: any) {
@@ -72,8 +72,8 @@ export default function Buy({ checkout, provider }: BuyProps) {
       <FormControl>
         <FormControl.Label>Execute Transactions</FormControl.Label>
         <Checkbox
-          checked={executeTransactions}
-          onChange={(event: any) => setExecuteTransactions(event.target.checked)}
+          checked={signActions}
+          onChange={(event: any) => setSignActions(event.target.checked)}
         />
       </FormControl>
       <br />

@@ -3,7 +3,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
-import { Box, FormControl, TextInput } from '@biom3/react';
+import { Box, Checkbox, FormControl, TextInput } from '@biom3/react';
 
 interface CancelProps {
   checkout: Checkout;
@@ -13,6 +13,7 @@ interface CancelProps {
 export default function Cancel({ checkout, provider }: CancelProps) {
   const [orderId, setOrderId] = useState<string>('');
   const [orderIdError, setOrderIdError] = useState<any>(null);
+  const [signActions, setSignActions] = useState<boolean>(false);
   const [error, setError] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -35,6 +36,7 @@ export default function Cancel({ checkout, provider }: CancelProps) {
       await checkout.cancel({
         provider,
         orderId,
+        signActions,
       });
       setLoading(false);
     } catch (err: any) {
@@ -65,6 +67,14 @@ export default function Cancel({ checkout, provider }: CancelProps) {
         {orderIdError && (
           <FormControl.Validation>{orderIdError}</FormControl.Validation>
         )}
+      </FormControl>
+      <br />
+      <FormControl>
+        <FormControl.Label>Execute Transactions</FormControl.Label>
+        <Checkbox
+          checked={signActions}
+          onChange={(event: any) => setSignActions(event.target.checked)}
+        />
       </FormControl>
       <br />
       <LoadingButton onClick={cancelClick} loading={loading}>
