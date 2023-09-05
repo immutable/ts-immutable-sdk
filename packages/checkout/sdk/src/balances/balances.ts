@@ -166,11 +166,6 @@ export const getBalances = async (
   ) as PromiseFulfilledResult<GetBalanceResult>[]
   ).map((result) => result.value);
 
-  // Ensure that we have all the ERC20s balances
-  if (balanceResults.length !== balances.length) {
-    throw new CheckoutError('Unable to fetch all ERC20s balances', CheckoutErrorType.GET_ERC20_BALANCE_ERROR);
-  }
-
   return { balances };
 };
 
@@ -203,5 +198,8 @@ export const getAllBalances = async (
     return await getIndexerBalance(walletAddress, chainId, tokens);
   }
 
+  // This fallback to use ERC20s calls which is a best effort solution
+  // Fails in fetching data form the RCP calls might result in some
+  // missing data.
   return await getBalances(config, web3Provider, walletAddress, tokens);
 };

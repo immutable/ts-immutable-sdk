@@ -20,6 +20,7 @@ export const CHECKOUT_API_BASE_URL = {
 
 export const BLOCKSCOUT_CHAIN_URL_MAP: { [key: string]: string } = {
   [ChainId.IMTBL_ZKEVM_TESTNET]: 'https://explorer.testnet.immutable.com',
+  [ChainId.IMTBL_ZKEVM_MAINNET]: 'https://explorer.mainnet.immutable.com',
 };
 
 type NetworkDetails = {
