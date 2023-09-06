@@ -3,6 +3,7 @@
  */
 export enum FactoryErrorType {
   UNSUPPORTED_ERROR = 'UNSUPPORTED_ERROR',
+  PROVIDER_ERROR = 'PROVIDER_ERROR',
 }
 
 export class FactoryError extends Error {
