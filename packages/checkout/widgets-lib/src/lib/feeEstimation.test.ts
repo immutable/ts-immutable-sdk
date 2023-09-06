@@ -14,7 +14,7 @@ describe('feeEstimation', () => {
         maxPercentage: '5.5',
       } as OnRampProviderFees;
 
-      expect(getOnRampFeeEstimation(onRampFee)).toEqual('3.5% to 5.5%');
+      expect(getOnRampFeeEstimation(onRampFee)).toEqual('3.5% to 5.5');
     });
 
     it('should return -.-- if no minPercentage', () => {
