@@ -34,5 +34,5 @@ interface PrimaryRevenueReviewOrderView extends ViewType {
 }
 interface PrimaryRevenueFailView extends ViewType {
   type: PrimaryRevenueWidgetViews.FAIL;
-  reason: string;
+  reason?: string;
 }

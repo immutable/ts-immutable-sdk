@@ -4,7 +4,7 @@ import { config, passport } from '@imtbl/sdk';
 
 import { WidgetTheme } from '../../lib';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
-import { Item } from './PrimaryRevenueWidget';
+import { Item } from './hooks/useMergedItemsInfo';
 
 const defaultPassportConfig = {
   environment: 'sandbox',
@@ -19,14 +19,23 @@ const defaultItems: Item[] = [
   {
     productId: 'P0001',
     qty: 1,
+    name: 'Poliwag',
+    image: 'https://pokemon-nfts.s3.ap-southeast-2.amazonaws.com/images/60.png',
+    description: 'Poliwag',
   },
   {
     productId: 'P0002',
     qty: 1,
+    name: 'Poliwhirl',
+    image: 'https://pokemon-nfts.s3.ap-southeast-2.amazonaws.com/images/61.png',
+    description: 'Poliwhirl',
   },
   {
     productId: 'P0003',
     qty: 1,
+    name: 'Poliwrath',
+    image: 'https://pokemon-nfts.s3.ap-southeast-2.amazonaws.com/images/62.png',
+    description: 'Poliwrath',
   },
 ];
 
@@ -166,6 +175,12 @@ function PrimaryRevenueWebView() {
         items={items}
       />
       <br />
+      <button type="button" onClick={() => setPassportOn(true)}>
+        Passport On
+      </button>
+      <br />
+      <br />
+      <br />
       <h3>Passport Config</h3>
       <textarea
         rows={12}
@@ -174,10 +189,6 @@ function PrimaryRevenueWebView() {
         onChange={handlePassportConfigChange}
         onBlur={handlePassportConfigFormat}
       />
-      <br />
-      <button type="button" onClick={() => setPassportOn(true)}>
-        Passport On
-      </button>
       <br />
       <br />
       <h3>Items</h3>

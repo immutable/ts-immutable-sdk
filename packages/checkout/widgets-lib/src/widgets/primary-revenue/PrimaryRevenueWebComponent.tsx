@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { PrimaryRevenueWidget, Item } from './PrimaryRevenueWidget';
+import { PrimaryRevenueWidget } from './PrimaryRevenueWidget';
 import {
   ConnectLoader,
   ConnectLoaderParams,
@@ -10,6 +10,7 @@ import { ConnectTargetLayer, getL1ChainId, getL2ChainId } from '../../lib';
 import {
   isValidAmount,
 } from '../../lib/validations/widgetValidators';
+import { Item } from './hooks/useMergedItemsInfo';
 
 export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
   amount = '';
