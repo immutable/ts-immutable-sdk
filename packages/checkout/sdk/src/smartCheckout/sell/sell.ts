@@ -69,14 +69,6 @@ export const sell = async (
     orderbook = await instance.createOrderbookInstance(config);
     const { seaportContractAddress } = orderbook.config();
     spenderAddress = seaportContractAddress;
-    console.log('walletAddress', walletAddress);
-    console.log('seaportContractAddress', seaportContractAddress);
-    console.log('buy', getBuyToken(buyToken));
-    console.log('sell', {
-      type: ItemType.ERC721,
-      contractAddress,
-      tokenId: id,
-    });
     listing = await orderbook.prepareListing({
       makerAddress: walletAddress,
       buy: getBuyToken(buyToken),
@@ -122,7 +114,16 @@ export const sell = async (
       listing.actions,
     );
     if (!unsignedMessage) {
-      throw new Error('asd'); // todo: error
+      // For sell it is expected the orderbook has returned an unsigned message
+      // If for some reason it is missing then we cannot proceed with the create listing
+      throw new CheckoutError(
+        'The unsigned message is missing after preparing the listing',
+        CheckoutErrorType.EXECUTE_TRANSACTIONS_ERROR,
+        {
+          id,
+          collectionAddress: contractAddress,
+        },
+      );
     }
     const signedMessage = await signMessage(
       provider,
@@ -130,13 +131,23 @@ export const sell = async (
     );
     const unsignedTransactions = await getUnsignedTransactions(listing.actions);
     await signApprovalTransactions(provider, unsignedTransactions.approvalTransactions);
-    const order = await orderbook.createListing({
-      orderComponents: signedMessage.orderComponents,
-      orderHash: signedMessage.orderHash,
-      orderSignature: signedMessage.signedMessage,
-    });
-    // eslint-disable-next-line no-console
-    console.log(order);
+    try {
+      await orderbook.createListing({
+        orderComponents: signedMessage.orderComponents,
+        orderHash: signedMessage.orderHash,
+        orderSignature: signedMessage.signedMessage,
+      });
+    } catch (err: any) {
+      throw new CheckoutError(
+        'An error occurred while creating the listing',
+        CheckoutErrorType.CREATE_ORDER_LISTING_ERROR,
+        {
+          message: err.message,
+          id,
+          collectionAddress: contractAddress,
+        },
+      );
+    }
   }
 
   return {

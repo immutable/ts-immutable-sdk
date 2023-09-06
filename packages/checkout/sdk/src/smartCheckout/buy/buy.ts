@@ -157,10 +157,7 @@ export const buy = async (
   if (smartCheckoutResult.sufficient) {
     await signApprovalTransactions(provider, unsignedTransactions.approvalTransactions);
     await signFulfilmentTransactions(provider, unsignedTransactions.fulfilmentTransactions);
-    console.log(unsignedTransactions);
   }
-
-  console.log('smartCheckoutResult', smartCheckoutResult);
 
   return {
     smartCheckoutResult,

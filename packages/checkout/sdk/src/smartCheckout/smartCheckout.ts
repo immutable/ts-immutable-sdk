@@ -60,8 +60,5 @@ export const smartCheckout = async (
 
   const balanceRequirements = await balanceCheck(config, provider, ownerAddress, aggregatedItems);
 
-  console.log('erc20Allowances', erc20Allowances);
-  console.log('erc721Allowances', erc721Allowances);
-
   return getSmartCheckoutResult(balanceRequirements);
 };
