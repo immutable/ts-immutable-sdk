@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers';
 import { ExchangeType } from '../types/fiatRamp';
 import {
-  OnRampConfig, OnRampProviderFees, TRANSAK_API_BASE_URL, TRANSAK_PUBLISHABLE_KEY,
+  OnRampConfig, OnRampProvider, OnRampProviderFees, TRANSAK_API_BASE_URL, TRANSAK_PUBLISHABLE_KEY,
 } from '../types';
 import { CheckoutConfiguration } from '../config';
 
@@ -26,7 +26,8 @@ export class FiatRampService {
   }
 
   public async feeEstimate(): Promise<OnRampProviderFees> {
-    return ((await this.config.remote.getConfig('onramp')) as OnRampConfig)?.transak?.fees;
+    const config = (await this.config.remote.getConfig('onramp')) as OnRampConfig;
+    return config[OnRampProvider.TRANSAK]?.fees;
   }
 
   public async createWidgetUrl(params: FiatRampWidgetParams): Promise<string> {
