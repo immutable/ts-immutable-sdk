@@ -263,9 +263,9 @@ export const text = {
         title: 'Add coins',
       },
       initialLoadingText: 'Taking you to Transak',
-      [OnRampWidgetViews.IN_PROGRESS]: {
+      [OnRampWidgetViews.LOADING]: {
         loading: {
-          text: 'Processing your order',
+          text: 'Transak is processing your order',
         },
       },
       [OnRampWidgetViews.SUCCESS]: {

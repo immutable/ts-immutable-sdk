@@ -67,7 +67,7 @@ export function OnRampWidget(props: OnRampWidgetProps) {
     : onDarkBase;
 
   const {
-    initialLoadingText, IN_PROGRESS, SUCCESS, FAIL,
+    initialLoadingText, LOADING, SUCCESS, FAIL,
   } = text.views[OnRampWidgetViews.ONRAMP];
 
   const showIframe = useMemo(
@@ -144,8 +144,8 @@ export function OnRampWidget(props: OnRampWidgetProps) {
         {viewState.view.type === SharedViews.LOADING_VIEW && (
           <LoadingView loadingText={initialLoadingText} showFooterLogo />
         )}
-        {viewState.view.type === OnRampWidgetViews.IN_PROGRESS && (
-          <LoadingView loadingText={IN_PROGRESS.loading.text} showFooterLogo />
+        {viewState.view.type === OnRampWidgetViews.LOADING && (
+          <LoadingView loadingText={LOADING.loading.text} showFooterLogo />
         )}
 
         {viewState.view.type === OnRampWidgetViews.SUCCESS && (
@@ -190,7 +190,7 @@ export function OnRampWidget(props: OnRampWidgetProps) {
 
         {/* This keeps Transak's iframe instance in dom so as to listen to transak's events. */}
         {/* We will remove the iframe instance once the processing has been finalised, either as a success or a failure */}
-        {(viewState.view.type === OnRampWidgetViews.IN_PROGRESS
+        {(viewState.view.type === OnRampWidgetViews.LOADING
         || viewState.view.type === OnRampWidgetViews.ONRAMP
         ) && (
         <OnRampMain

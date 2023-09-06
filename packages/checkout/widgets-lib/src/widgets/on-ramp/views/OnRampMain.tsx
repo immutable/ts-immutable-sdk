@@ -110,7 +110,7 @@ export function OnRampMain({
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
-            type: OnRampWidgetViews.IN_PROGRESS,
+            type: OnRampWidgetViews.LOADING,
           },
         },
       });
