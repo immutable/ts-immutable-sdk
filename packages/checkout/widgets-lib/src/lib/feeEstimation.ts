@@ -56,7 +56,7 @@ export const getOnRampFeeEstimation = (
 
   if (minPercentage === undefined || maxPercentage === undefined) return '-.--';
 
-  return `${minPercentage}% to ${maxPercentage}%`;
+  return `${minPercentage}% to ${maxPercentage}`;
 };
 
 export const getSwapFeeEstimation = (
