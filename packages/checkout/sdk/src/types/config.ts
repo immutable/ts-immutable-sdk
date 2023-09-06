@@ -47,12 +47,15 @@ export type OnRampProviderConfig = {
   fees: OnRampProviderFees
 };
 
+export enum OnRampProvider {
+  TRANSAK = '201811419111',
+}
 /**
  * A type representing the configuration for the OnRamp.
  * @property {OnRampProviderConfig} transak - OnRamp config for Transak provider
  */
 export type OnRampConfig = {
-  transak: OnRampProviderConfig;
+  [key: string]: OnRampProviderConfig;
 };
 
 /**
