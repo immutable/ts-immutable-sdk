@@ -4,7 +4,11 @@ import { TokenInfo } from './tokenInfo';
 import { ChainId } from './chains';
 
 export interface CheckoutOverrides {}
-export interface CheckoutModuleConfiguration extends ModuleConfiguration<CheckoutOverrides> {}
+export interface CheckoutModuleConfiguration extends ModuleConfiguration<CheckoutOverrides> {
+  isOnRampEnabled?: boolean,
+  isSwapEnabled?: boolean,
+  isBridgeEnabled?: boolean,
+}
 
 /**
  * A type representing various remotely defined configurations which are
