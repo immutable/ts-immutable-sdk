@@ -1,10 +1,10 @@
 import { ModuleConfiguration } from '@imtbl/config';
 import { ethers } from 'ethers';
 
-export type FactoryInstance = {
+export interface FactoryInstance {
   chainID: string;
   factory: Address;
-};
+}
 
 export interface FactoryModuleConfiguration
   extends ModuleConfiguration<FactoryInstance> {
@@ -12,7 +12,32 @@ export interface FactoryModuleConfiguration
   provider: ethers.providers.Provider;
 }
 
+export interface ParamInput {
+  name: string;
+  type: string;
+}
+
+export interface CreationABI {
+  inputs: ParamInput[];
+  stateMutability: string,
+  type: string,
+}
+
+export interface Preset {
+  name: string;
+  group: string;
+  description: string;
+  link: string;
+  creationABI: CreationABI;
+}
+
 /**
  * @typedef {string} Address - Represents an Ethereum address.
  */
 export type Address = string;
+
+export interface GetPresetsRequest {}
+
+export interface GetPresetsResponse {
+  presets: Preset[];
+}
