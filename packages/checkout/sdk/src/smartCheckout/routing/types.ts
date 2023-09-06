@@ -1,5 +1,6 @@
 import { BigNumber } from 'ethers';
-import { TokenInfo } from '../../types';
+import { GetBalanceResult, TokenInfo } from '../../types';
+import { CheckoutError } from '../../errors';
 
 export type RoutingCalculatorResult = {
   availableOptions: any[],
@@ -27,4 +28,10 @@ export type FundingRouteStep = {
 export type FundingRoute = {
   priority: number;
   steps: FundingRouteStep[]
+};
+
+export type TokenBalanceResult = {
+  success: boolean,
+  balances: GetBalanceResult[],
+  error?: CheckoutError,
 };

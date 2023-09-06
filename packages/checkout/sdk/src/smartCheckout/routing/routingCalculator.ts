@@ -2,14 +2,19 @@ import { BigNumber } from 'ethers';
 import { RoutingOptionsAvailable } from '../../types';
 import { BalanceCheckResult } from '../balanceCheck/types';
 import { RoutingCalculatorResult } from './types';
+import { CheckoutConfiguration } from '../../config';
+import { getAllTokenBalances } from './tokenBalances';
 
 export const routingCalculator = async (
+  config: CheckoutConfiguration,
+  ownerAddress: string,
   balanceRequirements: BalanceCheckResult,
   availableRoutingOptions: RoutingOptionsAvailable,
 ): Promise<RoutingCalculatorResult> => {
   // eslint-disable-next-line no-console
-  console.log('routingCalculator', availableRoutingOptions, balanceRequirements);
-  // Get native & token balances on L1 & L2
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const tokenBalances = await getAllTokenBalances(config, ownerAddress, availableRoutingOptions);
 
   // Get allowed tokens?
 
