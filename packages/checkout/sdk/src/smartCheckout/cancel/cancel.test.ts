@@ -6,7 +6,7 @@ import { CheckoutConfiguration } from '../../config';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { cancel } from './cancel';
 import { createOrderbookInstance } from '../../instance';
-import { signActions } from '../actions';
+import { signFulfilmentTransactions } from '../actions';
 
 jest.mock('../../instance');
 jest.mock('../actions');
@@ -26,6 +26,71 @@ describe('cancel', () => {
       config = new CheckoutConfiguration({
         baseConfig: { environment: Environment.SANDBOX },
       });
+    });
+
+    it('should sign the cancel transaction', async () => {
+      const orderId = '1';
+      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+        getListing: jest.fn().mockResolvedValue({
+          result: {
+            accountAddress: '0x123',
+            status: OrderStatus.ACTIVE,
+          },
+        }),
+        cancelOrder: jest.fn().mockResolvedValue({
+          unsignedCancelOrderTransaction: {
+            to: '0xTO',
+            from: '0xFROM',
+            nonce: 1,
+          } as PopulatedTransaction,
+        }),
+      });
+      (signFulfilmentTransactions as jest.Mock).mockResolvedValue({});
+
+      await cancel(config, mockProvider, orderId);
+      expect(signFulfilmentTransactions).toBeCalledWith(
+        mockProvider,
+        [
+          {
+            to: '0xTO',
+            from: '0xFROM',
+            nonce: 1,
+          },
+        ],
+      );
+    });
+
+    it('should throw error when sign rejects', async () => {
+      const orderId = '1';
+      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+        getListing: jest.fn().mockResolvedValue({
+          result: {
+            accountAddress: '0x123',
+            status: OrderStatus.ACTIVE,
+          },
+        }),
+        cancelOrder: jest.fn().mockResolvedValue({
+          unsignedCancelOrderTransaction: {
+            to: '0xTO',
+            from: '0xFROM',
+            nonce: 1,
+          } as PopulatedTransaction,
+        }),
+      });
+      (signFulfilmentTransactions as jest.Mock).mockRejectedValue(new Error('ERROR'));
+
+      await expect(cancel(config, mockProvider, orderId)).rejects.toThrow('ERROR');
+
+      expect(signFulfilmentTransactions).toBeCalledWith(
+        mockProvider,
+        [
+          {
+            to: '0xTO',
+            from: '0xFROM',
+            nonce: 1,
+          },
+        ],
+      );
     });
 
     it('should handle errors from orderbook', async () => {
@@ -62,78 +127,6 @@ describe('cancel', () => {
         orderId: '1',
         message: 'An error occurred while cancelling the order listing',
       });
-    });
-
-    it('should return the unsigned cancel order transaction', async () => {
-      const orderId = '1';
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
-        getListing: jest.fn().mockResolvedValue({
-          result: {
-            accountAddress: '0x123',
-            status: OrderStatus.ACTIVE,
-          },
-        }),
-        cancelOrder: jest.fn().mockResolvedValue({
-          unsignedCancelOrderTransaction: {
-            to: '0xTO',
-            from: '0xFROM',
-            nonce: 1,
-          } as PopulatedTransaction,
-        }),
-      });
-
-      const result = await cancel(config, mockProvider, orderId);
-
-      expect(result).toEqual({
-        unsignedActions: {
-          approvalTransactions: [],
-          fulfilmentTransactions: [
-            {
-              to: '0xTO',
-              from: '0xFROM',
-              nonce: 1,
-            },
-          ],
-          signableMessages: [],
-        },
-      });
-    });
-
-    it('should sign the cancel transaction', async () => {
-      const orderId = '1';
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
-        getListing: jest.fn().mockResolvedValue({
-          result: {
-            accountAddress: '0x123',
-            status: OrderStatus.ACTIVE,
-          },
-        }),
-        cancelOrder: jest.fn().mockResolvedValue({
-          unsignedCancelOrderTransaction: {
-            to: '0xTO',
-            from: '0xFROM',
-            nonce: 1,
-          } as PopulatedTransaction,
-        }),
-      });
-      (signActions as jest.Mock).mockResolvedValue({});
-
-      const result = await cancel(config, mockProvider, orderId, true);
-      expect(signActions).toBeCalledWith(
-        mockProvider,
-        {
-          approvalTransactions: [],
-          fulfilmentTransactions: [
-            {
-              to: '0xTO',
-              from: '0xFROM',
-              nonce: 1,
-            },
-          ],
-          signableMessages: [],
-        },
-      );
-      expect(result).toEqual({});
     });
   });
 });

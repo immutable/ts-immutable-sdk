@@ -286,7 +286,7 @@ export class Checkout {
       params.provider,
     );
 
-    await buy.buy(this.config, web3Provider, params.orderId, params.signActions);
+    await buy.buy(this.config, web3Provider, params.orderId);
   }
 
   /**
@@ -314,7 +314,6 @@ export class Checkout {
       params.id,
       params.collectionAddress,
       params.buyToken,
-      params.signActions,
     );
   }
 
@@ -337,7 +336,7 @@ export class Checkout {
       params.provider,
     );
 
-    await cancel.cancel(this.config, web3Provider, params.orderId, params.signActions);
+    await cancel.cancel(this.config, web3Provider, params.orderId);
   }
 
   /**

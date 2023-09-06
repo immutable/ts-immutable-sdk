@@ -1,65 +1,74 @@
-import { Web3Provider } from '@ethersproject/providers';
-import { CheckoutError, CheckoutErrorType } from '../../errors';
-import { UnsignedActions } from '../../types';
+// signActions.ts
 
-export const signActions = async (
+import { TransactionRequest, TransactionResponse, Web3Provider } from '@ethersproject/providers';
+import { CheckoutError, CheckoutErrorType } from '../../errors';
+import { SignedMessage, UnsignedMessage } from './types';
+
+export const signApprovalTransactions = async (
   provider: Web3Provider,
-  unsignedActions: UnsignedActions,
-) => {
-  if (unsignedActions.approvalTransactions.length > 0) {
-    try {
-      const approvalTransactions = [];
-      for (const approvalTransaction of unsignedActions.approvalTransactions) {
-        approvalTransactions.push(provider.getSigner().sendTransaction(approvalTransaction));
-      }
-      await Promise.all(approvalTransactions);
-    } catch (err: any) {
-      throw new CheckoutError(
-        'An error occurred while executing the approval transaction',
-        CheckoutErrorType.EXECUTE_TRANSACTIONS_ERROR,
-        {
-          message: err.message,
-        },
-      );
+  approvalTransactions: TransactionRequest[],
+): Promise<void> => {
+  try {
+    const transactions: Promise<TransactionResponse>[] = [];
+    for (const approvalTransaction of approvalTransactions) {
+      transactions.push(provider.getSigner().sendTransaction(approvalTransaction));
     }
+    await Promise.all(transactions);
+  } catch (err: any) {
+    throw new CheckoutError(
+      'An error occurred while executing the approval transaction',
+      CheckoutErrorType.EXECUTE_TRANSACTIONS_ERROR,
+      {
+        message: err.message,
+      },
+    );
   }
-  if (unsignedActions.signableMessages.length > 0) {
-    try {
-      const signableMessages = [];
-      for (const signableMessage of unsignedActions.signableMessages) {
-        // eslint-disable-next-line no-underscore-dangle
-        signableMessages.push(provider.getSigner()._signTypedData(
-          signableMessage.domain,
-          signableMessage.types,
-          signableMessage.value,
-        ));
-      }
-      await Promise.all(signableMessages);
-    } catch (err: any) {
-      throw new CheckoutError(
-        'An error occurred while executing the signable transaction',
-        CheckoutErrorType.EXECUTE_TRANSACTIONS_ERROR,
-        {
-          message: err.message,
-        },
-      );
+};
+
+export const signFulfilmentTransactions = async (
+  provider: Web3Provider,
+  fulfilmentTransactions: TransactionRequest[],
+): Promise<void> => {
+  try {
+    const transactions: Promise<TransactionResponse>[] = [];
+    for (const fulfilmentTransaction of fulfilmentTransactions) {
+      transactions.push(provider.getSigner().sendTransaction(fulfilmentTransaction));
     }
+    await Promise.all(transactions);
+  } catch (err: any) {
+    throw new CheckoutError(
+      'An error occurred while executing the fulfilment transaction',
+      CheckoutErrorType.EXECUTE_TRANSACTIONS_ERROR,
+      {
+        message: err.message,
+      },
+    );
   }
-  if (unsignedActions.fulfilmentTransactions.length > 0) {
-    try {
-      const fulfilmentTransactions = [];
-      for (const fulfilmentTransaction of unsignedActions.fulfilmentTransactions) {
-        fulfilmentTransactions.push(provider.getSigner().sendTransaction(fulfilmentTransaction));
-      }
-      await Promise.all(fulfilmentTransactions);
-    } catch (err: any) {
-      throw new CheckoutError(
-        'An error occurred while executing the transaction',
-        CheckoutErrorType.EXECUTE_TRANSACTIONS_ERROR,
-        {
-          message: err.message,
-        },
-      );
-    }
+};
+
+export const signMessage = async (
+  provider: Web3Provider,
+  unsignedMessage: UnsignedMessage,
+): Promise<SignedMessage> => {
+  try {
+    // eslint-disable-next-line no-underscore-dangle
+    const signedMessage = await provider.getSigner()._signTypedData(
+      unsignedMessage.unsignedMessage.domain,
+      unsignedMessage.unsignedMessage.types,
+      unsignedMessage.unsignedMessage.value,
+    );
+    return {
+      orderComponents: unsignedMessage.orderComponents,
+      orderHash: unsignedMessage.orderHash,
+      signedMessage,
+    };
+  } catch (err: any) {
+    throw new CheckoutError(
+      'An error occurred while executing the fulfilment transaction',
+      CheckoutErrorType.EXECUTE_TRANSACTIONS_ERROR,
+      {
+        message: err.message,
+      },
+    );
   }
 };

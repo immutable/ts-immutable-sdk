@@ -3,7 +3,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
-import { Box, Checkbox, FormControl, TextInput } from '@biom3/react';
+import { Box, FormControl, TextInput } from '@biom3/react';
 
 interface BuyProps {
   checkout: Checkout;
@@ -13,7 +13,6 @@ interface BuyProps {
 export default function Buy({ checkout, provider }: BuyProps) {
   const [orderId, setOrderId] = useState<string>('');
   const [orderIdError, setOrderIdError] = useState<any>(null);
-  const [signActions, setSignActions] = useState<boolean>(false);
   const [error, setError] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -36,7 +35,6 @@ export default function Buy({ checkout, provider }: BuyProps) {
       await checkout.buy({
         provider,
         orderId,
-        signActions,
       });
       setLoading(false);
     } catch (err: any) {
@@ -67,14 +65,6 @@ export default function Buy({ checkout, provider }: BuyProps) {
         {orderIdError && (
           <FormControl.Validation>{orderIdError}</FormControl.Validation>
         )}
-      </FormControl>
-      <br />
-      <FormControl>
-        <FormControl.Label>Execute Transactions</FormControl.Label>
-        <Checkbox
-          checked={signActions}
-          onChange={(event: any) => setSignActions(event.target.checked)}
-        />
       </FormControl>
       <br />
       <LoadingButton onClick={buyClick} loading={loading}>

@@ -18,7 +18,12 @@ import * as instance from '../../instance';
 import { CheckoutConfiguration } from '../../config';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { smartCheckout } from '../smartCheckout';
-import { signActions, getUnsignedActions } from '../actions';
+import {
+  getUnsignedTransactions,
+  getUnsignedMessage,
+  signApprovalTransactions,
+  signMessage,
+} from '../actions';
 
 export const getERC721Requirement = (
   id: string,
@@ -54,7 +59,6 @@ export const sell = async (
   id: string,
   contractAddress: string,
   buyToken: BuyToken,
-  shouldSignActions?: boolean,
 ): Promise<SellResult> => {
   let orderbook: Orderbook;
   let listing: PrepareListingResponse;
@@ -65,6 +69,14 @@ export const sell = async (
     orderbook = await instance.createOrderbookInstance(config);
     const { seaportContractAddress } = orderbook.config();
     spenderAddress = seaportContractAddress;
+    console.log('walletAddress', walletAddress);
+    console.log('seaportContractAddress', seaportContractAddress);
+    console.log('buy', getBuyToken(buyToken));
+    console.log('sell', {
+      type: ItemType.ERC721,
+      contractAddress,
+      tokenId: id,
+    });
     listing = await orderbook.prepareListing({
       makerAddress: walletAddress,
       buy: getBuyToken(buyToken),
@@ -104,17 +116,27 @@ export const sell = async (
   );
 
   if (smartCheckoutResult.sufficient) {
-    const unsignedActions = await getUnsignedActions(listing.actions);
-    if (shouldSignActions) {
-      await signActions(provider, unsignedActions);
-      return {
-        smartCheckoutResult,
-      };
+    const unsignedMessage = getUnsignedMessage(
+      listing.orderHash,
+      listing.orderComponents,
+      listing.actions,
+    );
+    if (!unsignedMessage) {
+      throw new Error('asd'); // todo: error
     }
-    return {
-      smartCheckoutResult,
-      unsignedActions,
-    };
+    const signedMessage = await signMessage(
+      provider,
+      unsignedMessage,
+    );
+    const unsignedTransactions = await getUnsignedTransactions(listing.actions);
+    await signApprovalTransactions(provider, unsignedTransactions.approvalTransactions);
+    const order = await orderbook.createListing({
+      orderComponents: signedMessage.orderComponents,
+      orderHash: signedMessage.orderHash,
+      orderSignature: signedMessage.signedMessage,
+    });
+    // eslint-disable-next-line no-console
+    console.log(order);
   }
 
   return {

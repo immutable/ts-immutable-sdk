@@ -12,10 +12,16 @@ import * as instance from '../../instance';
 import { CheckoutConfiguration } from '../../config';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import {
-  ItemType, ItemRequirement, GasTokenType, TransactionOrGasType, GasAmount, FulfilmentTransaction, UnsignedActions,
+  ItemType,
+  ItemRequirement,
+  GasTokenType,
+  TransactionOrGasType,
+  GasAmount,
+  FulfilmentTransaction,
 } from '../../types/smartCheckout';
 import { smartCheckout } from '..';
-import { signActions, getUnsignedActions } from '../actions';
+import { getUnsignedTransactions, signApprovalTransactions, signFulfilmentTransactions } from '../actions';
+import { UnsignedTransactions } from '../actions/types';
 
 export const getItemRequirement = (
   type: ItemType,
@@ -42,12 +48,12 @@ export const getItemRequirement = (
 
 export const getTransactionOrGas = (
   gasLimit: number,
-  unsignedActions: UnsignedActions,
+  unsignedTransactions: UnsignedTransactions,
 ): FulfilmentTransaction | GasAmount => {
-  if (unsignedActions.fulfilmentTransactions.length > 0) {
+  if (unsignedTransactions.fulfilmentTransactions.length > 0) {
     return {
       type: TransactionOrGasType.TRANSACTION,
-      transaction: unsignedActions.fulfilmentTransactions[0],
+      transaction: unsignedTransactions.fulfilmentTransactions[0],
     };
   }
 
@@ -64,7 +70,6 @@ export const buy = async (
   config: CheckoutConfiguration,
   provider: Web3Provider,
   orderId: string,
-  shouldSignActions?: boolean,
 ): Promise<BuyResult> => {
   let orderbook;
   let order;
@@ -87,18 +92,16 @@ export const buy = async (
     );
   }
 
-  let unsignedActions: UnsignedActions = {
+  let unsignedTransactions: UnsignedTransactions = {
     approvalTransactions: [],
     fulfilmentTransactions: [],
-    signableMessages: [],
   };
   try {
     const fulfillerAddress = await provider.getSigner().getAddress();
     const { actions } = await orderbook.fulfillOrder(orderId, fulfillerAddress);
-    unsignedActions = await getUnsignedActions(actions);
+    unsignedTransactions = await getUnsignedTransactions(actions);
   } catch {
-    // Error usually thrown when fulfiller does not have enough balance to fulfil the order
-    // Silently catch & continue to run smart checkout to return the diffs
+    // Silently ignore error as usually throws if user does not have enough balance
   }
 
   let amount = BigNumber.from('0');
@@ -145,22 +148,19 @@ export const buy = async (
     config,
     provider,
     itemRequirements,
-    getTransactionOrGas(gasLimit, unsignedActions),
+    getTransactionOrGas(
+      gasLimit,
+      unsignedTransactions,
+    ),
   );
 
-  if (smartCheckoutResult.sufficient && shouldSignActions) {
-    await signActions(provider, unsignedActions);
-    return {
-      smartCheckoutResult,
-    };
+  if (smartCheckoutResult.sufficient) {
+    await signApprovalTransactions(provider, unsignedTransactions.approvalTransactions);
+    await signFulfilmentTransactions(provider, unsignedTransactions.fulfilmentTransactions);
+    console.log(unsignedTransactions);
   }
 
-  if (smartCheckoutResult.sufficient) {
-    return {
-      smartCheckoutResult,
-      unsignedActions,
-    };
-  }
+  console.log('smartCheckoutResult', smartCheckoutResult);
 
   return {
     smartCheckoutResult,

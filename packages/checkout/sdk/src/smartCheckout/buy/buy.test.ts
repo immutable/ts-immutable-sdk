@@ -14,7 +14,7 @@ import {
   FulfilmentTransaction, GasAmount, GasTokenType, ItemType, TransactionOrGasType,
 } from '../../types/smartCheckout';
 import { smartCheckout } from '..';
-import { signActions, getUnsignedActions } from '../actions';
+import { getUnsignedTransactions, signApprovalTransactions, signFulfilmentTransactions } from '../actions';
 
 jest.mock('../../instance');
 jest.mock('../smartCheckout');
@@ -41,7 +41,7 @@ describe('buy', () => {
     });
 
     it(
-      'should call smart checkout with item requirements and fulfilment transaction and not execute actions',
+      'should call smart checkout with item requirements and execute transactions',
       async () => {
         const smartCheckoutResult = {
           sufficient: true,
@@ -109,11 +109,12 @@ describe('buy', () => {
             ],
           }),
         });
-        (getUnsignedActions as jest.Mock).mockResolvedValue({
+        (getUnsignedTransactions as jest.Mock).mockResolvedValue({
           approvalTransactions: [{ from: '0xAPPROVAL' }],
           fulfilmentTransactions: [{ from: '0xTRANSACTION' }],
-          signableMessages: [],
         });
+        (signApprovalTransactions as jest.Mock).mockResolvedValue({});
+        (signFulfilmentTransactions as jest.Mock).mockResolvedValue({});
 
         const orderId = '1';
         const itemRequirements = [
@@ -136,13 +137,10 @@ describe('buy', () => {
         );
         expect(buyResult).toEqual({
           smartCheckoutResult,
-          unsignedActions: {
-            approvalTransactions: [{ from: '0xAPPROVAL' }],
-            fulfilmentTransactions: [{ from: '0xTRANSACTION' }],
-            signableMessages: [],
-          },
         });
-        expect(signActions).toBeCalledTimes(0);
+        expect(getUnsignedTransactions).toBeCalledTimes(1);
+        expect(signApprovalTransactions).toBeCalledWith(mockProvider, [{ from: '0xAPPROVAL' }]);
+        expect(signFulfilmentTransactions).toBeCalledWith(mockProvider, [{ from: '0xTRANSACTION' }]);
       },
     );
 
@@ -217,6 +215,40 @@ describe('buy', () => {
         }),
         fulfillOrder: jest.fn().mockRejectedValue({}),
       });
+      const smartCheckoutResult = {
+        sufficient: true,
+        transactionRequirements: [{
+          type: ItemType.ERC20,
+          sufficient: true,
+          required: {
+            type: ItemType.ERC20,
+            balance: BigNumber.from(1),
+            formattedBalance: '1',
+            token: {
+              name: 'ERC20',
+              symbol: 'ERC20',
+              decimals: 18,
+              address: '0x123',
+            },
+          },
+          current: {
+            type: ItemType.ERC20,
+            balance: BigNumber.from(1),
+            formattedBalance: '1',
+            token: {
+              name: 'ERC20',
+              symbol: 'ERC20',
+              decimals: 18,
+              address: '0x123',
+            },
+          },
+          delta: {
+            balance: BigNumber.from(0),
+            formattedBalance: '0',
+          },
+        }],
+      };
+      (smartCheckout as jest.Mock).mockResolvedValue(smartCheckoutResult);
 
       const orderId = '1';
       const itemRequirements = [
@@ -244,16 +276,16 @@ describe('buy', () => {
       );
     });
 
-    it('should sign actions when sign actions flag provided and sufficient true', async () => {
+    it('should not sign actions and only return smart checkout result when sufficient false', async () => {
       const smartCheckoutResult = {
-        sufficient: true,
+        sufficient: false,
         transactionRequirements: [{
           type: ItemType.NATIVE,
-          sufficient: true,
+          sufficient: false,
           required: {
             type: ItemType.NATIVE,
-            balance: BigNumber.from(1),
-            formattedBalance: '1',
+            balance: BigNumber.from(2),
+            formattedBalance: '2',
             token: {
               name: 'IMX',
               symbol: 'IMX',
@@ -271,8 +303,8 @@ describe('buy', () => {
             },
           },
           delta: {
-            balance: BigNumber.from(0),
-            formattedBalance: '0',
+            balance: BigNumber.from(1),
+            formattedBalance: '1',
           },
         }],
       };
@@ -311,13 +343,12 @@ describe('buy', () => {
           ],
         }),
       });
-      (getUnsignedActions as jest.Mock).mockResolvedValue({
+      (getUnsignedTransactions as jest.Mock).mockResolvedValue({
         approvalTransactions: [{ from: '0xAPPROVAL' }],
         fulfilmentTransactions: [{ from: '0xTRANSACTION' }],
-        signableMessages: [],
       });
-      (signActions as jest.Mock).mockResolvedValue({});
-
+      (signApprovalTransactions as jest.Mock).mockResolvedValue({});
+      (signFulfilmentTransactions as jest.Mock).mockResolvedValue({});
       const orderId = '1';
       const itemRequirements = [
         {
@@ -330,126 +361,19 @@ describe('buy', () => {
         transaction: { from: '0xTRANSACTION' },
       };
 
-      const buyResult = await buy(config, mockProvider, orderId, true);
+      const buyResult = await buy(config, mockProvider, orderId);
       expect(smartCheckout).toBeCalledWith(
         config,
         mockProvider,
         itemRequirements,
         fulfilmentTransaction,
       );
-      expect(signActions).toBeCalledWith(
-        mockProvider,
-        {
-          approvalTransactions: [{ from: '0xAPPROVAL' }],
-          fulfilmentTransactions: [{ from: '0xTRANSACTION' }],
-          signableMessages: [],
-        },
-      );
+      expect(signApprovalTransactions).toBeCalledTimes(0);
+      expect(signFulfilmentTransactions).toBeCalledTimes(0);
       expect(buyResult).toEqual({
         smartCheckoutResult,
       });
     });
-
-    it(
-      `should not sign actions and only return smart checkout result when 
-      sign actions flag provided and sufficient false`,
-      async () => {
-        const smartCheckoutResult = {
-          sufficient: false,
-          transactionRequirements: [{
-            type: ItemType.NATIVE,
-            sufficient: false,
-            required: {
-              type: ItemType.NATIVE,
-              balance: BigNumber.from(2),
-              formattedBalance: '2',
-              token: {
-                name: 'IMX',
-                symbol: 'IMX',
-                decimals: 18,
-              },
-            },
-            current: {
-              type: ItemType.NATIVE,
-              balance: BigNumber.from(1),
-              formattedBalance: '1',
-              token: {
-                name: 'IMX',
-                symbol: 'IMX',
-                decimals: 18,
-              },
-            },
-            delta: {
-              balance: BigNumber.from(1),
-              formattedBalance: '1',
-            },
-          }],
-        };
-        (smartCheckout as jest.Mock).mockResolvedValue(smartCheckoutResult);
-        (createOrderbookInstance as jest.Mock).mockResolvedValue({
-          getListing: jest.fn().mockResolvedValue({
-            result: {
-              buy: [
-                {
-                  type: 'NATIVE',
-                  amount: '1',
-                },
-              ],
-              fees: [
-                {
-                  amount: '1',
-                },
-              ],
-            },
-          }),
-          config: jest.fn().mockReturnValue({
-            seaportContractAddress,
-          }),
-          fulfillOrder: jest.fn().mockReturnValue({
-            actions: [
-              {
-                type: ActionType.TRANSACTION,
-                purpose: TransactionPurpose.FULFILL_ORDER,
-                buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION' } as PopulatedTransaction),
-              },
-              {
-                type: ActionType.TRANSACTION,
-                purpose: TransactionPurpose.APPROVAL,
-                buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL' } as PopulatedTransaction),
-              },
-            ],
-          }),
-        });
-        (getUnsignedActions as jest.Mock).mockResolvedValue({
-          approvalTransactions: [{ from: '0xAPPROVAL' }],
-          fulfilmentTransactions: [{ from: '0xTRANSACTION' }],
-          signableMessages: [],
-        });
-        const orderId = '1';
-        const itemRequirements = [
-          {
-            type: ItemType.NATIVE,
-            amount: BigNumber.from('2'),
-          },
-        ];
-        const fulfilmentTransaction: FulfilmentTransaction = {
-          type: TransactionOrGasType.TRANSACTION,
-          transaction: { from: '0xTRANSACTION' },
-        };
-
-        const buyResult = await buy(config, mockProvider, orderId, true);
-        expect(smartCheckout).toBeCalledWith(
-          config,
-          mockProvider,
-          itemRequirements,
-          fulfilmentTransaction,
-        );
-        expect(signActions).toBeCalledTimes(0);
-        expect(buyResult).toEqual({
-          smartCheckoutResult,
-        });
-      },
-    );
 
     it('should throw error if orderbook returns erc721', async () => {
       (createOrderbookInstance as jest.Mock).mockResolvedValue({
@@ -615,7 +539,6 @@ describe('buy', () => {
         {
           fulfilmentTransactions: [{ from: '0x123' }],
           approvalTransactions: [{ from: '0x234' }],
-          signableMessages: [],
         },
       )).toEqual(
         {
@@ -633,7 +556,6 @@ describe('buy', () => {
         {
           fulfilmentTransactions: [],
           approvalTransactions: [{ from: '0x234' }],
-          signableMessages: [],
         },
       )).toEqual(
         {
