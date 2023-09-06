@@ -55,7 +55,7 @@ export const BLOCKSCOUT_CHAIN_URL_MAP: {
     url: 'https://explorer.testnet.immutable.com',
     nativeToken: ZKEVM_NATIVE_TOKEN,
   },
-}
+};
 
 type NetworkDetails = {
   chainIdHex: string;
