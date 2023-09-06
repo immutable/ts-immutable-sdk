@@ -695,7 +695,7 @@ describe('Connect', () => {
       const params: FiatRampParams = {
         exchangeType: ExchangeType.ONRAMP,
         web3Provider: mockProvider,
-        tokenAmount: BigNumber.from(10),
+        tokenAmount: '10',
         tokenAddress: '0xethAddr',
       };
 
@@ -706,7 +706,7 @@ describe('Connect', () => {
         exchangeType: ExchangeType.ONRAMP,
         isPassport: false,
         walletAddress: '0xADDRESS',
-        tokenAmount: undefined,
+        tokenAmount: '10',
         tokenSymbol: 'ETH',
         email: undefined,
       });
@@ -719,7 +719,7 @@ describe('Connect', () => {
           getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
         }),
         network: {
-          chainId: ChainId.ETHEREUM,
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
         },
         provider: {
           isPassport: true,

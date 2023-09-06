@@ -415,14 +415,13 @@ export class Checkout {
     }
 
     const tokenList = await tokens.getTokenAllowList(this.config, { type: TokenFilterTypes.ONRAMP });
-
-    const token = tokenList.tokens.find((t) => t.address === params.tokenAddress);
+    const token = tokenList.tokens.find((t) => t.address?.toLowerCase() === params.tokenAddress?.toLowerCase());
 
     return await this.fiatRampService.createWidgetUrl({
       exchangeType: params.exchangeType,
       isPassport,
       walletAddress,
-      tokenAmount: token ? undefined : params.tokenAmount,
+      tokenAmount: token ? params.tokenAmount : undefined,
       tokenSymbol: token?.symbol ?? 'IMX',
       email,
     } as FiatRampWidgetParams);

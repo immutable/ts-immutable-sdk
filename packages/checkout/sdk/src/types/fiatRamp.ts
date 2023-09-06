@@ -1,6 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { Passport } from '@imtbl/passport';
-import { BigNumber } from 'ethers';
 
 /**
  * An enum representing the type of exchange.
@@ -22,7 +21,7 @@ export enum ExchangeType {
 export interface FiatRampParams {
   exchangeType: ExchangeType;
   web3Provider: Web3Provider;
-  tokenAmount?: BigNumber;
+  tokenAmount?: string;
   tokenAddress?: string;
   passport?: Passport;
 }

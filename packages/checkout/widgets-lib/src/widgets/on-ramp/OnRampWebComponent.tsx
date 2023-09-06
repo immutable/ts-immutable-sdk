@@ -10,6 +10,11 @@ import { ConnectTargetLayer, getL1ChainId, getL2ChainId } from '../../lib';
 import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 
 export class ImmutableOnRamp extends ImmutableWebComponent {
+  static get observedAttributes(): string[] {
+    const baseObservedAttributes = super.observedAttributes;
+    return [...baseObservedAttributes, 'amount', 'contractaddress'];
+  }
+
   amount = '';
 
   walletProvider?: WalletProviderName;
@@ -21,6 +26,18 @@ export class ImmutableOnRamp extends ImmutableWebComponent {
     this.amount = this.getAttribute('amount') ?? '';
     this.walletProvider = this.getAttribute('walletProvider')?.toLowerCase() as WalletProviderName;
     this.contractAddress = this.getAttribute('contractAddress') ?? '';
+
+    this.renderWidget();
+  }
+
+  attributeChangedCallback(name: string, oldValue: any, newValue: any): void {
+    super.attributeChangedCallback(name, oldValue, newValue);
+    if (name === 'amount') {
+      this.amount = newValue;
+    }
+    if (name === 'contractaddress') {
+      this.contractAddress = newValue;
+    }
 
     this.renderWidget();
   }
