@@ -3,6 +3,7 @@ import { ViewType } from './ViewType';
 export enum OnRampWidgetViews {
   ONRAMP = 'ONRAMP',
   LOADING = 'LOADING',
+  IN_PROGRESS = 'IN_PROGRESS',
   SUCCESS = 'SUCCESS',
   FAIL = 'FAIL',
 }
@@ -10,6 +11,7 @@ export enum OnRampWidgetViews {
 export type OnRampWidgetView =
   | OnRampView
   | OnRampLoadingView
+  | OnRampInProgressView
   | OnRampSuccessView
   | OnRampFailView;
 
@@ -19,6 +21,9 @@ interface OnRampView extends ViewType {
 }
 interface OnRampLoadingView extends ViewType {
   type: OnRampWidgetViews.LOADING;
+}
+interface OnRampInProgressView extends ViewType {
+  type: OnRampWidgetViews.IN_PROGRESS;
 }
 export interface OnRampSuccessView extends ViewType {
   type: OnRampWidgetViews.SUCCESS;

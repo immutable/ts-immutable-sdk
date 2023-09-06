@@ -268,6 +268,13 @@ export const text = {
           text: 'Transak is processing your order',
         },
       },
+      [OnRampWidgetViews.IN_PROGRESS]: {
+        content: {
+          heading: 'Order in progress',
+          body1: 'You’ll receive an email from Transak when complete. This can take up to 3 mins.',
+          body2: 'You can close this window, the transaction will be reflected in your wallet once complete.',
+        },
+      },
       [OnRampWidgetViews.SUCCESS]: {
         text: 'Coins are on the way',
         actionText: 'Done',

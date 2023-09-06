@@ -31,6 +31,7 @@ import {
 } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { isPassportProvider } from '../../lib/providerUtils';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
+import { OrderInProgress } from './views/OrderInProgress';
 
 const LOADING_VIEW_DELAY_MS = 1000;
 export interface OnRampWidgetProps {
@@ -147,6 +148,9 @@ export function OnRampWidget(props: OnRampWidgetProps) {
         {viewState.view.type === OnRampWidgetViews.LOADING && (
           <LoadingView loadingText={LOADING.loading.text} showFooterLogo />
         )}
+        {viewState.view.type === OnRampWidgetViews.IN_PROGRESS && (
+          <OrderInProgress />
+        )}
 
         {viewState.view.type === OnRampWidgetViews.SUCCESS && (
           <StatusView
@@ -191,6 +195,7 @@ export function OnRampWidget(props: OnRampWidgetProps) {
         {/* This keeps Transak's iframe instance in dom so as to listen to transak's events. */}
         {/* We will remove the iframe instance once the processing has been finalised, either as a success or a failure */}
         {(viewState.view.type === OnRampWidgetViews.LOADING
+        || viewState.view.type === OnRampWidgetViews.IN_PROGRESS
         || viewState.view.type === OnRampWidgetViews.ONRAMP
         ) && (
         <OnRampMain

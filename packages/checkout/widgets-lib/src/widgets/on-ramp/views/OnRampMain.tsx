@@ -22,6 +22,7 @@ import { EventTargetContext } from '../../../context/event-target-context/EventT
 
 const transakIframeId = 'transak-iframe';
 const transakOrigin = 'transak.com';
+const IN_PROGRESS_VIEW_DELAY_MS = 1200;
 interface OnRampProps {
   walletAddress?: string;
   email?: string;
@@ -101,11 +102,7 @@ export function OnRampMain({
   };
   const transakEventHandler = (event: any) => {
     const eventData = event.data as TransakEventData;
-
-    if ((event.event_id === TransakEvents.TRANSAK_ORDER_CREATED)
-      || (event.event_id === TransakEvents.TRANSAK_ORDER_SUCCESSFUL
-        && eventData.status === TransakStatuses.PROCESSING)
-    ) {
+    if (event.event_id === TransakEvents.TRANSAK_ORDER_CREATED) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -114,6 +111,21 @@ export function OnRampMain({
           },
         },
       });
+      return;
+    }
+
+    if (event.event_id === TransakEvents.TRANSAK_ORDER_SUCCESSFUL
+      && eventData.status === TransakStatuses.PROCESSING) {
+      setTimeout(() => {
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: {
+              type: OnRampWidgetViews.IN_PROGRESS,
+            },
+          },
+        });
+      }, IN_PROGRESS_VIEW_DELAY_MS);
       return;
     }
 
