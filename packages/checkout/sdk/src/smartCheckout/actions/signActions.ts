@@ -1,5 +1,3 @@
-// signActions.ts
-
 import { TransactionRequest, TransactionResponse, Web3Provider } from '@ethersproject/providers';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { SignedMessage, UnsignedMessage } from './types';
