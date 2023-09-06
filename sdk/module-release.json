@@ -7,17 +7,6 @@
         "Under `fileCopy`, each object has `src` and `dest` keys, as well, which are paths relative to this file"
     ],
     "modules": {
-        "config": "prod",
-        "blockchain_data": "prod",
-        "immutablex_client": "prod",
-        "passport": "prod",
-        "orderbook": "prod",
-        "provider": "prod",
-        "checkout_sdk": "prod",
-        "checkout_widgets": "prod",
-        "erc20": "prod",
-        "erc721": "prod",
-        "erc721_mint_by_id": "prod",
         "version":"prod"
     },
     "fileCopy": [
