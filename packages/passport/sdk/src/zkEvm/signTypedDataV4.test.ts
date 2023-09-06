@@ -17,7 +17,12 @@ jest.mock('./walletHelpers');
 
 describe('signTypedDataV4', () => {
   const address = '0xd64b0d2d72bb1b3f18046b8a7fc6c9ee6bccd287';
-  const eip712Payload = {};
+  const eip712Payload: TypedDataPayload = {
+    types: { EIP712Domain: [] },
+    domain: {},
+    primaryType: '',
+    message: {},
+  };
   const relayerSignature = '02011b1d383526a2815d26550eb314b5d7e0551327330043c4d07715346a7d5517ecbc32304fc1ccdcd52fea386c94c3b58b90410f20cd1d5c6db8fa1f03c34e82dce78c3445ce38583e0b0689c69b8fbedbc33d3a2e45431b0103';
   const combinedSignature = '0x000202011b1d383526a2815d26550eb314b5d7e0551327330043c4d07715346a7d5517ecbc32304fc1ccdcd52fea386c94c3b58b90410f20cd1d5c6db8fa1f03c34e82dce78c3445ce38583e0b0689c69b8fbedbc33d3a2e45431b01030001d25acf5eef26fb627f91e02ebd111580030ab8fb0a55567ac8cc66c34de7ae98185125a76adc6ee2fea042c7fce9c85a41e790ce3529f93dfec281bf56620ef21b02';
 
@@ -128,6 +133,29 @@ describe('signTypedDataV4', () => {
     });
   });
 
+  describe('when the typedDataPayload is missing a required property', () => {
+    it('should throw an error', async () => {
+      const payload = {
+        domain: {},
+        primaryType: '',
+        message: {},
+      };
+
+      await expect(async () => (
+        signTypedDataV4({
+          method: 'eth_signTypedData_v4',
+          params: [address, payload],
+          magicProvider,
+          jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
+          relayerClient: relayerClient as unknown as RelayerClient,
+          user: mockUserZkEvm,
+        })
+      )).rejects.toThrow(
+        new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'Invalid typed data argument. The following properties are required: types, domain, primaryType, message'),
+      );
+    });
+  });
+
   describe('when a different chainId is used', () => {
     it('should throw an error', async () => {
       await expect(async () => (
@@ -135,11 +163,12 @@ describe('signTypedDataV4', () => {
           method: 'eth_signTypedData_v4',
           params: [
             address,
-            JSON.stringify({
+            {
+              ...eip712Payload,
               domain: {
                 chainId: 5,
               },
-            }),
+            },
           ],
           magicProvider,
           jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
@@ -153,15 +182,17 @@ describe('signTypedDataV4', () => {
   });
 
   it.each([chainIdHex, `${chainId}`])('converts the chainId to a number and returns a signature', async (testChainId: any) => {
+    const payload: TypedDataPayload = {
+      ...eip712Payload,
+      domain: {
+        chainId: testChainId,
+      },
+    };
     const result = await signTypedDataV4({
       method: 'eth_signTypedData_v4',
       params: [
         address,
-        JSON.stringify({
-          domain: {
-            chainId: testChainId,
-          },
-        }),
+        payload,
       ],
       magicProvider,
       jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
@@ -169,17 +200,13 @@ describe('signTypedDataV4', () => {
       user: mockUserZkEvm,
     });
 
-    const expectedPayload: Partial<TypedDataPayload> = {
-      domain: { chainId },
-    };
-
     expect(result).toEqual(combinedSignature);
     expect(relayerClient.imSignTypedData).toHaveBeenCalledWith(
       address,
-      expectedPayload,
+      payload,
     );
     expect(getSignedTypedData).toHaveBeenCalledWith(
-      expectedPayload,
+      payload,
       relayerSignature,
       BigNumber.from(chainId),
       address,

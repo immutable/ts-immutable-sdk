@@ -19,8 +19,13 @@ export type SignTypedDataV4Params = {
   params: Array<any>;
 };
 
+const REQUIRED_TYPED_DATA_PROPERTIES = ['types', 'domain', 'primaryType', 'message'];
+const isValidTypedDataPayload = (typedData: object): typedData is TypedDataPayload => (
+  REQUIRED_TYPED_DATA_PROPERTIES.every((key) => key in typedData)
+);
+
 const transformTypedData = (typedData: string | object, chainId: number): TypedDataPayload => {
-  let transformedTypedData: TypedDataPayload;
+  let transformedTypedData: object | TypedDataPayload;
 
   if (typeof typedData === 'string') {
     try {
@@ -29,9 +34,16 @@ const transformTypedData = (typedData: string | object, chainId: number): TypedD
       throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, `Failed to parse typed data JSON: ${err}`);
     }
   } else if (typeof typedData === 'object') {
-    transformedTypedData = typedData as TypedDataPayload;
+    transformedTypedData = typedData;
   } else {
     throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, `Invalid typed data argument: ${typedData}`);
+  }
+
+  if (!isValidTypedDataPayload(transformedTypedData)) {
+    throw new JsonRpcError(
+      RpcErrorCode.INVALID_PARAMS,
+      `Invalid typed data argument. The following properties are required: ${REQUIRED_TYPED_DATA_PROPERTIES.join(', ')}`,
+    );
   }
 
   if (transformedTypedData.domain?.chainId) {
