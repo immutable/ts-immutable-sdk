@@ -20,6 +20,7 @@ import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';
 import { loginZkEvmUser } from './user';
 import { sendTransaction } from './sendTransaction';
 import GuardianClient from '../guardian/guardian';
+import { signTypedDataV4 } from './signTypedDataV4';
 
 export type ZkEvmProviderInput = {
   authManager: AuthManager;
@@ -148,6 +149,21 @@ export class ZkEvmProvider implements Provider {
       }
       case 'eth_accounts': {
         return this.isLoggedIn() ? [this.user.zkEvm.ethAddress] : [];
+      }
+      case 'eth_signTypedData':
+      case 'eth_signTypedData_v4': {
+        if (!this.isLoggedIn()) {
+          throw new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
+        }
+
+        return signTypedDataV4({
+          method: request.method,
+          params: request.params || [],
+          magicProvider: this.magicProvider,
+          jsonRpcProvider: this.jsonRpcProvider,
+          relayerClient: this.relayerClient,
+          user: this.user,
+        });
       }
       // Pass through methods
       case 'eth_gasPrice':
