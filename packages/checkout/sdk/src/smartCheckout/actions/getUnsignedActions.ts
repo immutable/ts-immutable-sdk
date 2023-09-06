@@ -1,6 +1,9 @@
 import { TransactionRequest } from '@ethersproject/providers';
 import {
-  Action, TransactionPurpose, ActionType, SignablePurpose,
+  Action,
+  TransactionPurpose,
+  ActionType,
+  SignablePurpose,
 } from '@imtbl/orderbook';
 import { UnsignedMessage, UnsignedTransactions } from './types';
 
@@ -49,6 +52,7 @@ export const getUnsignedMessage = (
       };
     }
   }
+
   if (!unsignedMessage) return undefined;
 
   return {
