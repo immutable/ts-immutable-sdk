@@ -446,11 +446,10 @@ describe('Connect', () => {
     await checkout.buy({
       provider,
       orderId: '1',
-      signActions: true,
     });
 
     expect(buy).toBeCalledTimes(1);
-    expect(buy).toBeCalledWith(checkout.config, provider, '1', true);
+    expect(buy).toBeCalledWith(checkout.config, provider, '1');
   });
 
   it('should throw error for buy function if is production', async () => {
@@ -489,7 +488,6 @@ describe('Connect', () => {
         type: ItemType.NATIVE,
         amount: BigNumber.from('100000'),
       },
-      signActions: true,
     });
 
     expect(sell).toBeCalledTimes(1);
@@ -502,7 +500,6 @@ describe('Connect', () => {
         type: ItemType.NATIVE,
         amount: BigNumber.from('100000'),
       },
-      true,
     );
   });
 
@@ -540,7 +537,6 @@ describe('Connect', () => {
     await checkout.cancel({
       provider,
       orderId: '1234',
-      signActions: true,
     });
 
     expect(cancel).toBeCalledTimes(1);
@@ -548,7 +544,6 @@ describe('Connect', () => {
       checkout.config,
       provider,
       '1234',
-      true,
     );
   });
 

@@ -64,7 +64,7 @@ export const signMessage = async (
     };
   } catch (err: any) {
     throw new CheckoutError(
-      'An error occurred while executing the fulfilment transaction',
+      'An error occurred while signing the message',
       CheckoutErrorType.EXECUTE_TRANSACTIONS_ERROR,
       {
         message: err.message,
