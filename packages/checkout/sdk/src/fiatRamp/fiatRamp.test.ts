@@ -3,7 +3,7 @@ import { Environment } from '@imtbl/config';
 import { CheckoutConfiguration } from '../config';
 import { RemoteConfigFetcher } from '../config/remoteConfigFetcher';
 import { FiatRampService, FiatRampWidgetParams } from './fiatRamp';
-import { ExchangeType } from '../types';
+import { ExchangeType, OnRampProvider } from '../types';
 
 const defaultWidgetUrl = 'https://global-stg.transak.com?apiKey=41ad2da7-ed5a-4d89-a90b-c751865effc2'
 + '&network=immutablezkevm&defaultPaymentMethod=credit_debit_card&disablePaymentMethods=sepa_bank_transfer,'
@@ -29,7 +29,7 @@ describe('FiatRampService', () => {
     it('should return transak fees', async () => {
       (RemoteConfigFetcher as unknown as jest.Mock).mockReturnValue({
         getConfig: jest.fn().mockResolvedValue({
-          transak: {
+          [OnRampProvider.TRANSAK]: {
             fees: {
               minPercentage: '3.5',
               maxPercentage: '5.5',
@@ -55,7 +55,7 @@ describe('FiatRampService', () => {
     it('should return transak fees with feePercentage when feePercentage is defined', async () => {
       (RemoteConfigFetcher as unknown as jest.Mock).mockReturnValue({
         getConfig: jest.fn().mockResolvedValue({
-          transak: {
+          [OnRampProvider.TRANSAK]: {
             fees: {
               minPercentage: '3.5',
               maxPercentage: '5.5',
