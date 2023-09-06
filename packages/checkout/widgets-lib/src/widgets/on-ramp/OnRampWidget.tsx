@@ -33,7 +33,6 @@ import { isPassportProvider } from '../../lib/providerUtils';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { OrderInProgress } from './views/OrderInProgress';
 
-const LOADING_VIEW_DELAY_MS = 1000;
 export interface OnRampWidgetProps {
   // eslint-disable-next-line react/no-unused-prop-types
   params: OnRampWidgetParams;
@@ -121,21 +120,6 @@ export function OnRampWidget(props: OnRampWidgetProps) {
         : contractAddress;
 
       setTokenAddress(tknAddr);
-
-      setTimeout(() => {
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: {
-              type: OnRampWidgetViews.ONRAMP,
-              data: {
-                amount: viewState.view.data?.amount ?? amount,
-                contractAddress: viewState.view.data?.contractAddress ?? tknAddr,
-              },
-            },
-          },
-        });
-      }, LOADING_VIEW_DELAY_MS);
     })();
   }, [checkout, provider, viewDispatch]);
 
@@ -192,11 +176,10 @@ export function OnRampWidget(props: OnRampWidgetProps) {
           />
         )}
 
-        {/* This keeps Transak's iframe instance in dom so as to listen to transak's events. */}
+        {/* This keeps Transak's iframe instance in dom to listen to transak's events. */}
         {/* We will remove the iframe instance once the processing has been finalised, either as a success or a failure */}
-        {(viewState.view.type === OnRampWidgetViews.IN_PROGRESS_LOADING
-        || viewState.view.type === OnRampWidgetViews.IN_PROGRESS
-        || viewState.view.type === OnRampWidgetViews.ONRAMP
+        {(viewState.view.type !== OnRampWidgetViews.SUCCESS
+        && viewState.view.type !== OnRampWidgetViews.FAIL
         ) && (
         <OnRampMain
           walletAddress={walletAddress}

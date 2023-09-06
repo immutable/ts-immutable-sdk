@@ -102,6 +102,23 @@ export function OnRampMain({
   };
   const transakEventHandler = (event: any) => {
     const eventData = event.data as TransakEventData;
+
+    if (event.event_id === TransakEvents.TRANSAK_WIDGET_OPEN) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: OnRampWidgetViews.ONRAMP,
+            data: {
+              amount: viewState.view.data?.amount ?? tokenAmount,
+              contractAddress: viewState.view.data?.contractAddress ?? tokenAddress,
+            },
+          },
+        },
+      });
+      return;
+    }
+
     if (event.event_id === TransakEvents.TRANSAK_ORDER_CREATED) {
       viewDispatch({
         payload: {
