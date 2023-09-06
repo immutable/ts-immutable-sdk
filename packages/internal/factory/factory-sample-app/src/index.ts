@@ -5,7 +5,6 @@ import { ethers } from 'ethers';
 
 async function main() {
     if (!process.env.PROVIDER) {
-        console.log(process.env.PROVIDER);
         throw new Error('PROVIDER not set');
     }
 
