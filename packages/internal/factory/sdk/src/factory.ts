@@ -16,7 +16,7 @@ export class Factory {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async getPresets(req: GetPresetsRequest): Promise<GetPresetsResponse> {
-    this.validateChainConfiguration();
+    await this.validateChainConfiguration();
     return { presets: PRESETS };
   }
 
