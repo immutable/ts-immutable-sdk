@@ -224,7 +224,7 @@ export function TopUpView({
         </>
       );
     }
-    return (` ${fees}`);
+    return (` ${fees}%`);
   };
 
   return (
