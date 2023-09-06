@@ -2,7 +2,7 @@ import {
   ChainId,
   DexConfig,
   GetTokenAllowListResult,
-  OnRampConfig,
+  OnRampConfig, OnRampProvider,
   TokenFilter,
   TokenFilterTypes,
   TokenInfo,
@@ -22,6 +22,7 @@ export const getTokenAllowList = async (
   }: TokenAllowListParams,
 ): Promise<GetTokenAllowListResult> => {
   let tokens: TokenInfo[] = [];
+  let onRampConfig: OnRampConfig;
 
   switch (type) {
     case TokenFilterTypes.SWAP:
@@ -32,8 +33,9 @@ export const getTokenAllowList = async (
         .tokens || [];
       break;
     case TokenFilterTypes.ONRAMP:
-      // Only using transak as it's the only on-ramp provider at the moment
-      tokens = ((await config.remote.getConfig('onramp')) as OnRampConfig)?.transak?.tokens || [];
+      onRampConfig = (await config.remote.getConfig('onramp')) as OnRampConfig;
+      // Only using Transak as it's the only on-ramp provider at the moment
+      tokens = onRampConfig[OnRampProvider.TRANSAK]?.tokens || [];
       break;
     case TokenFilterTypes.BRIDGE:
     case TokenFilterTypes.ALL:
