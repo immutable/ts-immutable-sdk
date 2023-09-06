@@ -58,7 +58,6 @@ function useRuntimeId(runtimeId?: string) {
 // In prep for releasing new Unified SDK
 // Get a better understanding of what versions are being used
 export function sdkVersionCheck(version = '') {
-  console.log('trying to check version');
   try {
     const runtimeId = useRuntimeId();
     const runtimeDetails = sdkRuntimeDetails();
@@ -73,12 +72,15 @@ export function sdkVersionCheck(version = '') {
             `@imtbl/sdk: ${message}\n\nPlease update the SDK to the latest version.`,
           );
         }
+        console.log('version check successful');
+        console.log('message:', message);
         if (runtimeId) {
+          console.log('runtime id:', runtimeId);
           useRuntimeId(runtimeId);
         }
       })
       .catch(() => {});
-  } catch (_) {
-    console.warn('@imtbl/sdk: Unable to check for latest version.');
+  } catch (e) {
+    console.warn('@imtbl/sdk: Unable to check for latest version: ', e);
   }
 }
