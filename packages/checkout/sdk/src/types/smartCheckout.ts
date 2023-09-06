@@ -1,5 +1,5 @@
 import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
-import { BigNumber, TypedDataDomain, TypedDataField } from 'ethers';
+import { BigNumber } from 'ethers';
 import { TokenInfo } from './tokenInfo';
 
 /**
@@ -216,28 +216,4 @@ export type RoutingOptionsAvailable = {
   onRamp?: boolean;
   swap?: boolean;
   bridge?: boolean;
-};
-
-/** Represents the unsigned transactions.
- * Represents the unsigned actions.
- * @property {TransactionRequest} approvalTransactions - Approval transactions.
- * @property {TransactionRequest} fulfilmentTransactions - Fulfilment transactions.
- * @property {SignableMessage} signableMessages - Signable messages.
- */
-export type UnsignedActions = {
-  approvalTransactions: TransactionRequest[],
-  fulfilmentTransactions: TransactionRequest[],
-  signableMessages: SignableMessage[],
-};
-
-/**
- * Represents the signable message.
- * @property {TypedDataDomain} domain - Domain as defined by ethers.
- * @property {Record<string, TypedDataField[]>} types - Types as defined by ethers.
- * @property {Record<string, any>} value - Value as defined by ethers.
- */
-export type SignableMessage = {
-  domain: TypedDataDomain,
-  types: Record<string, TypedDataField[]>,
-  value: Record<string, any>
 };
