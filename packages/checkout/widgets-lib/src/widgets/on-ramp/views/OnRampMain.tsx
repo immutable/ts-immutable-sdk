@@ -107,7 +107,7 @@ export function OnRampMain({
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
-            type: OnRampWidgetViews.LOADING,
+            type: OnRampWidgetViews.IN_PROGRESS_LOADING,
           },
         },
       });
