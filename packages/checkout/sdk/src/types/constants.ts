@@ -18,6 +18,21 @@ export const CHECKOUT_API_BASE_URL = {
   [Environment.PRODUCTION]: 'https://checkout-api.immutable.com',
 };
 
+/**
+ * Smart Checkout routing default onramp enabled flag
+ */
+export const DEFAULT_ON_RAMP_ENABLED = true;
+
+/**
+ * Smart Checkout routing default swap enabled flag
+ */
+export const DEFAULT_SWAP_ENABLED = true;
+
+/**
+ * Smart Checkout routing default bridge enabled flag
+ */
+export const DEFAULT_BRIDGE_ENABLED = true;
+
 export const BLOCKSCOUT_CHAIN_URL_MAP: { [key: string]: string } = {
   [ChainId.IMTBL_ZKEVM_TESTNET]: 'https://explorer.testnet.immutable.com',
 };
