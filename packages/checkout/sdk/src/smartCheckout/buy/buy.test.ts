@@ -177,12 +177,6 @@ describe('buy', () => {
         }),
         fulfillOrder: jest.fn().mockRejectedValue({}),
       });
-      (signApprovalTransactions as jest.Mock).mockResolvedValue({
-        type: SignTransactionStatusType.SUCCESS,
-      });
-      (signFulfilmentTransactions as jest.Mock).mockResolvedValue({
-        type: SignTransactionStatusType.SUCCESS,
-      });
 
       const orderId = '1';
       const itemRequirements = [
@@ -209,9 +203,6 @@ describe('buy', () => {
       expect(result).toEqual({
         smartCheckoutResult: {},
         orderId,
-        status: {
-          type: BuyStatusType.SUCCESS,
-        },
       });
     });
 
@@ -304,7 +295,7 @@ describe('buy', () => {
         gasAmount,
       );
       expect(result).toEqual({
-        smartCheckoutResult: {},
+        smartCheckoutResult,
         orderId,
         status: {
           type: BuyStatusType.SUCCESS,
