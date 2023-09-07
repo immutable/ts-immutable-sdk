@@ -308,7 +308,13 @@ export class Checkout {
       params.provider,
     );
 
-    await sell.sell(this.config, web3Provider, params.id, params.collectionAddress, params.buyToken);
+    await sell.sell(
+      this.config,
+      web3Provider,
+      params.id,
+      params.collectionAddress,
+      params.buyToken,
+    );
   }
 
   /**

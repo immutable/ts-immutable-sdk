@@ -3,7 +3,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
-import { Box, FormControl, Select, TextInput, Option, Button, OptionKey } from '@biom3/react';
+import { Box, FormControl, Select, TextInput, Option, OptionKey } from '@biom3/react';
 import { BigNumber } from 'ethers';
 
 interface SellProps {
@@ -23,6 +23,7 @@ export default function Sell({ checkout, provider }: SellProps) {
   const [amountError, setAmountError] = useState<string>('');
   const [contractAddress, setContractAddress] = useState<string>('');
   const [contractAddressError, setContractAddressError] = useState<string>('');
+  const [signActions, setSignActions] = useState<boolean>(false);
   const [error, setError] = useState<any>(null);
   const [success, setSuccess] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
