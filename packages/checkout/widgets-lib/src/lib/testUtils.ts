@@ -85,6 +85,29 @@ export const cyIntercept = (overrides?: {
         },
       },
     },
+    onramp: {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      201811419111: {
+        tokens: [
+          {
+            address: 0x0000000000000000000000000000000000001010,
+            name: 'IMX',
+            symbol: 'IMX',
+            decimals: 18,
+          },
+          {
+            address: '0x65AA7a21B0f3ce9B478aAC3408fE75b423939b1F',
+            name: 'ETH',
+            symbol: 'ETH',
+            decimals: 18,
+          },
+        ],
+        fees: {
+          minPercentage: '3.5',
+          maxPercentage: '5.5',
+        },
+      },
+    },
   };
   const defaultTokensConfig = {
     [ChainId.IMTBL_ZKEVM_TESTNET]: {
