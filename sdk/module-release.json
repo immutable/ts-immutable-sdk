@@ -15,9 +15,9 @@
         "provider": "prod",
         "checkout_sdk": "prod",
         "checkout_widgets": "prod",
-        "erc20": "prod",
-        "erc721": "prod",
-        "erc721_mint_by_id": "prod"
+        "contracts/erc20": "prod",
+        "contracts/erc721": "prod",
+        "contracts/erc721_mint_by_id": "prod"
     },
     "fileCopy": [
         {
