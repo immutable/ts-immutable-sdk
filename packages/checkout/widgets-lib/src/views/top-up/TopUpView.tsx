@@ -121,6 +121,7 @@ export function TopUpView({
     } finally {
       setLoadingBridgeFees(false);
       setLoadingSwapFees(false);
+      setLoadingOnRampFees(false);
     }
   };
 
