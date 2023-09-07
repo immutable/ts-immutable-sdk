@@ -147,13 +147,12 @@ export class Exchange {
         tradeType,
         maxHops,
       ),
-      fetchGasPrice(this.provider),
+      fetchGasPrice(this.provider, this.nativeToken),
     ]);
 
     const adjustedQuote = prepareSwap(ourQuote, amountSpecified, fees);
 
     const swap = getSwap(
-      this.nativeToken,
       adjustedQuote,
       fromAddress,
       slippagePercent,
@@ -168,18 +167,16 @@ export class Exchange {
 
     const preparedApproval = prepareApproval(
       tradeType,
-      amount,
-      userQuote.amountWithMaxSlippage.value,
+      amountSpecified,
+      userQuote.amountWithMaxSlippage,
       this.router.routingContracts,
       secondaryFees,
     );
 
-    // we always use the tokenIn address because we are always selling the tokenIn
+    // preparedApproval always uses the tokenIn address because we are always selling the tokenIn
     const approval = await getApproval(
-      this.nativeToken,
       this.provider,
       fromAddress,
-      tokenInAddress,
       preparedApproval,
       gasPrice,
     );

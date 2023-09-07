@@ -74,6 +74,7 @@ export declare namespace ERC721Hybrid {
 export interface ImmutableERC721Interface extends utils.Interface {
   functions: {
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
+    "DOMAIN_SEPARATOR()": FunctionFragment;
     "MINTER_ROLE()": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
@@ -82,6 +83,7 @@ export interface ImmutableERC721Interface extends utils.Interface {
     "burn(uint256)": FunctionFragment;
     "burnBatch(uint256[])": FunctionFragment;
     "contractURI()": FunctionFragment;
+    "eip712Domain()": FunctionFragment;
     "exists(uint256)": FunctionFragment;
     "getAdmins()": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
@@ -97,11 +99,13 @@ export interface ImmutableERC721Interface extends utils.Interface {
     "mintBatchByQuantity((address,uint256)[])": FunctionFragment;
     "mintByQuantity(address,uint256)": FunctionFragment;
     "name()": FunctionFragment;
+    "nonces(uint256)": FunctionFragment;
+    "operatorAllowlist()": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
+    "permit(address,uint256,uint256,bytes)": FunctionFragment;
     "renounceRole(bytes32,address)": FunctionFragment;
     "revokeMinterRole(address)": FunctionFragment;
     "revokeRole(bytes32,address)": FunctionFragment;
-    "royaltyAllowlist()": FunctionFragment;
     "royaltyInfo(uint256,uint256)": FunctionFragment;
     "safeBurn(address,uint256)": FunctionFragment;
     "safeBurnBatch((address,uint256[])[])": FunctionFragment;
@@ -118,7 +122,7 @@ export interface ImmutableERC721Interface extends utils.Interface {
     "setDefaultRoyaltyReceiver(address,uint96)": FunctionFragment;
     "setNFTRoyaltyReceiver(uint256,address,uint96)": FunctionFragment;
     "setNFTRoyaltyReceiverBatch(uint256[],address,uint96)": FunctionFragment;
-    "setRoyaltyAllowlistRegistry(address)": FunctionFragment;
+    "setOperatorAllowlistRegistry(address)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "symbol()": FunctionFragment;
     "tokenURI(uint256)": FunctionFragment;
@@ -129,6 +133,7 @@ export interface ImmutableERC721Interface extends utils.Interface {
   getFunction(
     nameOrSignatureOrTopic:
       | "DEFAULT_ADMIN_ROLE"
+      | "DOMAIN_SEPARATOR"
       | "MINTER_ROLE"
       | "approve"
       | "balanceOf"
@@ -137,6 +142,7 @@ export interface ImmutableERC721Interface extends utils.Interface {
       | "burn"
       | "burnBatch"
       | "contractURI"
+      | "eip712Domain"
       | "exists"
       | "getAdmins"
       | "getApproved"
@@ -152,11 +158,13 @@ export interface ImmutableERC721Interface extends utils.Interface {
       | "mintBatchByQuantity"
       | "mintByQuantity"
       | "name"
+      | "nonces"
+      | "operatorAllowlist"
       | "ownerOf"
+      | "permit"
       | "renounceRole"
       | "revokeMinterRole"
       | "revokeRole"
-      | "royaltyAllowlist"
       | "royaltyInfo"
       | "safeBurn"
       | "safeBurnBatch"
@@ -173,7 +181,7 @@ export interface ImmutableERC721Interface extends utils.Interface {
       | "setDefaultRoyaltyReceiver"
       | "setNFTRoyaltyReceiver"
       | "setNFTRoyaltyReceiverBatch"
-      | "setRoyaltyAllowlistRegistry"
+      | "setOperatorAllowlistRegistry"
       | "supportsInterface"
       | "symbol"
       | "tokenURI"
@@ -183,6 +191,10 @@ export interface ImmutableERC721Interface extends utils.Interface {
 
   encodeFunctionData(
     functionFragment: "DEFAULT_ADMIN_ROLE",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "DOMAIN_SEPARATOR",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -212,6 +224,10 @@ export interface ImmutableERC721Interface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "contractURI",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "eip712Domain",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -269,8 +285,25 @@ export interface ImmutableERC721Interface extends utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(
+    functionFragment: "nonces",
+    values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "operatorAllowlist",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "ownerOf",
     values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "permit",
+    values: [
+      PromiseOrValue<string>,
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<BytesLike>
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "renounceRole",
@@ -283,10 +316,6 @@ export interface ImmutableERC721Interface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "revokeRole",
     values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "royaltyAllowlist",
-    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "royaltyInfo",
@@ -370,7 +399,7 @@ export interface ImmutableERC721Interface extends utils.Interface {
     ]
   ): string;
   encodeFunctionData(
-    functionFragment: "setRoyaltyAllowlistRegistry",
+    functionFragment: "setOperatorAllowlistRegistry",
     values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
@@ -400,6 +429,10 @@ export interface ImmutableERC721Interface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "DOMAIN_SEPARATOR",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "MINTER_ROLE",
     data: BytesLike
   ): Result;
@@ -414,6 +447,10 @@ export interface ImmutableERC721Interface extends utils.Interface {
   decodeFunctionResult(functionFragment: "burnBatch", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "contractURI",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "eip712Domain",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "exists", data: BytesLike): Result;
@@ -455,7 +492,13 @@ export interface ImmutableERC721Interface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "operatorAllowlist",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "permit", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceRole",
     data: BytesLike
@@ -465,10 +508,6 @@ export interface ImmutableERC721Interface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "revokeRole", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "royaltyAllowlist",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "royaltyInfo",
     data: BytesLike
@@ -525,7 +564,7 @@ export interface ImmutableERC721Interface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "setRoyaltyAllowlistRegistry",
+    functionFragment: "setOperatorAllowlistRegistry",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -546,21 +585,23 @@ export interface ImmutableERC721Interface extends utils.Interface {
   events: {
     "Approval(address,address,uint256)": EventFragment;
     "ApprovalForAll(address,address,bool)": EventFragment;
+    "EIP712DomainChanged()": EventFragment;
+    "OperatorAllowlistRegistryUpdated(address,address)": EventFragment;
     "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
     "RoleGranted(bytes32,address,address)": EventFragment;
     "RoleRevoked(bytes32,address,address)": EventFragment;
-    "RoyaltyAllowlistRegistryUpdated(address,address)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "EIP712DomainChanged"): EventFragment;
+  getEvent(
+    nameOrSignatureOrTopic: "OperatorAllowlistRegistryUpdated"
+  ): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleAdminChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleGranted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleRevoked"): EventFragment;
-  getEvent(
-    nameOrSignatureOrTopic: "RoyaltyAllowlistRegistryUpdated"
-  ): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
 }
 
@@ -587,6 +628,27 @@ export type ApprovalForAllEvent = TypedEvent<
 >;
 
 export type ApprovalForAllEventFilter = TypedEventFilter<ApprovalForAllEvent>;
+
+export interface EIP712DomainChangedEventObject {}
+export type EIP712DomainChangedEvent = TypedEvent<
+  [],
+  EIP712DomainChangedEventObject
+>;
+
+export type EIP712DomainChangedEventFilter =
+  TypedEventFilter<EIP712DomainChangedEvent>;
+
+export interface OperatorAllowlistRegistryUpdatedEventObject {
+  oldRegistry: string;
+  newRegistry: string;
+}
+export type OperatorAllowlistRegistryUpdatedEvent = TypedEvent<
+  [string, string],
+  OperatorAllowlistRegistryUpdatedEventObject
+>;
+
+export type OperatorAllowlistRegistryUpdatedEventFilter =
+  TypedEventFilter<OperatorAllowlistRegistryUpdatedEvent>;
 
 export interface RoleAdminChangedEventObject {
   role: string;
@@ -624,18 +686,6 @@ export type RoleRevokedEvent = TypedEvent<
 >;
 
 export type RoleRevokedEventFilter = TypedEventFilter<RoleRevokedEvent>;
-
-export interface RoyaltyAllowlistRegistryUpdatedEventObject {
-  oldRegistry: string;
-  newRegistry: string;
-}
-export type RoyaltyAllowlistRegistryUpdatedEvent = TypedEvent<
-  [string, string],
-  RoyaltyAllowlistRegistryUpdatedEventObject
->;
-
-export type RoyaltyAllowlistRegistryUpdatedEventFilter =
-  TypedEventFilter<RoyaltyAllowlistRegistryUpdatedEvent>;
 
 export interface TransferEventObject {
   from: string;
@@ -678,6 +728,8 @@ export interface ImmutableERC721 extends BaseContract {
   functions: {
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
+    DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<[string]>;
+
     MINTER_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
     approve(
@@ -706,6 +758,20 @@ export interface ImmutableERC721 extends BaseContract {
     ): Promise<ContractTransaction>;
 
     contractURI(overrides?: CallOverrides): Promise<[string]>;
+
+    eip712Domain(
+      overrides?: CallOverrides
+    ): Promise<
+      [string, string, string, BigNumber, string, string, BigNumber[]] & {
+        fields: string;
+        name: string;
+        version: string;
+        chainId: BigNumber;
+        verifyingContract: string;
+        salt: string;
+        extensions: BigNumber[];
+      }
+    >;
 
     exists(
       tokenId: PromiseOrValue<BigNumberish>,
@@ -782,10 +848,25 @@ export interface ImmutableERC721 extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<[string]>;
 
+    nonces(
+      tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    operatorAllowlist(overrides?: CallOverrides): Promise<[string]>;
+
     ownerOf(
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[string]>;
+
+    permit(
+      spender: PromiseOrValue<string>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      deadline: PromiseOrValue<BigNumberish>,
+      sig: PromiseOrValue<BytesLike>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
     renounceRole(
       role: PromiseOrValue<BytesLike>,
@@ -803,8 +884,6 @@ export interface ImmutableERC721 extends BaseContract {
       account: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
-
-    royaltyAllowlist(overrides?: CallOverrides): Promise<[string]>;
 
     royaltyInfo(
       tokenId: PromiseOrValue<BigNumberish>,
@@ -901,8 +980,8 @@ export interface ImmutableERC721 extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
-    setRoyaltyAllowlistRegistry(
-      _royaltyAllowlist: PromiseOrValue<string>,
+    setOperatorAllowlistRegistry(
+      _operatorAllowlist: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -929,6 +1008,8 @@ export interface ImmutableERC721 extends BaseContract {
   };
 
   DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
+
+  DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<string>;
 
   MINTER_ROLE(overrides?: CallOverrides): Promise<string>;
 
@@ -958,6 +1039,20 @@ export interface ImmutableERC721 extends BaseContract {
   ): Promise<ContractTransaction>;
 
   contractURI(overrides?: CallOverrides): Promise<string>;
+
+  eip712Domain(
+    overrides?: CallOverrides
+  ): Promise<
+    [string, string, string, BigNumber, string, string, BigNumber[]] & {
+      fields: string;
+      name: string;
+      version: string;
+      chainId: BigNumber;
+      verifyingContract: string;
+      salt: string;
+      extensions: BigNumber[];
+    }
+  >;
 
   exists(
     tokenId: PromiseOrValue<BigNumberish>,
@@ -1034,10 +1129,25 @@ export interface ImmutableERC721 extends BaseContract {
 
   name(overrides?: CallOverrides): Promise<string>;
 
+  nonces(
+    tokenId: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  operatorAllowlist(overrides?: CallOverrides): Promise<string>;
+
   ownerOf(
     tokenId: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<string>;
+
+  permit(
+    spender: PromiseOrValue<string>,
+    tokenId: PromiseOrValue<BigNumberish>,
+    deadline: PromiseOrValue<BigNumberish>,
+    sig: PromiseOrValue<BytesLike>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
   renounceRole(
     role: PromiseOrValue<BytesLike>,
@@ -1055,8 +1165,6 @@ export interface ImmutableERC721 extends BaseContract {
     account: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
-
-  royaltyAllowlist(overrides?: CallOverrides): Promise<string>;
 
   royaltyInfo(
     tokenId: PromiseOrValue<BigNumberish>,
@@ -1153,8 +1261,8 @@ export interface ImmutableERC721 extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  setRoyaltyAllowlistRegistry(
-    _royaltyAllowlist: PromiseOrValue<string>,
+  setOperatorAllowlistRegistry(
+    _operatorAllowlist: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -1181,6 +1289,8 @@ export interface ImmutableERC721 extends BaseContract {
 
   callStatic: {
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
+
+    DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<string>;
 
     MINTER_ROLE(overrides?: CallOverrides): Promise<string>;
 
@@ -1210,6 +1320,20 @@ export interface ImmutableERC721 extends BaseContract {
     ): Promise<void>;
 
     contractURI(overrides?: CallOverrides): Promise<string>;
+
+    eip712Domain(
+      overrides?: CallOverrides
+    ): Promise<
+      [string, string, string, BigNumber, string, string, BigNumber[]] & {
+        fields: string;
+        name: string;
+        version: string;
+        chainId: BigNumber;
+        verifyingContract: string;
+        salt: string;
+        extensions: BigNumber[];
+      }
+    >;
 
     exists(
       tokenId: PromiseOrValue<BigNumberish>,
@@ -1286,10 +1410,25 @@ export interface ImmutableERC721 extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<string>;
 
+    nonces(
+      tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    operatorAllowlist(overrides?: CallOverrides): Promise<string>;
+
     ownerOf(
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<string>;
+
+    permit(
+      spender: PromiseOrValue<string>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      deadline: PromiseOrValue<BigNumberish>,
+      sig: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     renounceRole(
       role: PromiseOrValue<BytesLike>,
@@ -1307,8 +1446,6 @@ export interface ImmutableERC721 extends BaseContract {
       account: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    royaltyAllowlist(overrides?: CallOverrides): Promise<string>;
 
     royaltyInfo(
       tokenId: PromiseOrValue<BigNumberish>,
@@ -1405,8 +1542,8 @@ export interface ImmutableERC721 extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    setRoyaltyAllowlistRegistry(
-      _royaltyAllowlist: PromiseOrValue<string>,
+    setOperatorAllowlistRegistry(
+      _operatorAllowlist: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1455,6 +1592,18 @@ export interface ImmutableERC721 extends BaseContract {
       approved?: null
     ): ApprovalForAllEventFilter;
 
+    "EIP712DomainChanged()"(): EIP712DomainChangedEventFilter;
+    EIP712DomainChanged(): EIP712DomainChangedEventFilter;
+
+    "OperatorAllowlistRegistryUpdated(address,address)"(
+      oldRegistry?: null,
+      newRegistry?: null
+    ): OperatorAllowlistRegistryUpdatedEventFilter;
+    OperatorAllowlistRegistryUpdated(
+      oldRegistry?: null,
+      newRegistry?: null
+    ): OperatorAllowlistRegistryUpdatedEventFilter;
+
     "RoleAdminChanged(bytes32,bytes32,bytes32)"(
       role?: PromiseOrValue<BytesLike> | null,
       previousAdminRole?: PromiseOrValue<BytesLike> | null,
@@ -1488,15 +1637,6 @@ export interface ImmutableERC721 extends BaseContract {
       sender?: PromiseOrValue<string> | null
     ): RoleRevokedEventFilter;
 
-    "RoyaltyAllowlistRegistryUpdated(address,address)"(
-      oldRegistry?: null,
-      newRegistry?: null
-    ): RoyaltyAllowlistRegistryUpdatedEventFilter;
-    RoyaltyAllowlistRegistryUpdated(
-      oldRegistry?: null,
-      newRegistry?: null
-    ): RoyaltyAllowlistRegistryUpdatedEventFilter;
-
     "Transfer(address,address,uint256)"(
       from?: PromiseOrValue<string> | null,
       to?: PromiseOrValue<string> | null,
@@ -1511,6 +1651,8 @@ export interface ImmutableERC721 extends BaseContract {
 
   estimateGas: {
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
+
+    DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<BigNumber>;
 
     MINTER_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1540,6 +1682,8 @@ export interface ImmutableERC721 extends BaseContract {
     ): Promise<BigNumber>;
 
     contractURI(overrides?: CallOverrides): Promise<BigNumber>;
+
+    eip712Domain(overrides?: CallOverrides): Promise<BigNumber>;
 
     exists(
       tokenId: PromiseOrValue<BigNumberish>,
@@ -1616,9 +1760,24 @@ export interface ImmutableERC721 extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
+    nonces(
+      tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    operatorAllowlist(overrides?: CallOverrides): Promise<BigNumber>;
+
     ownerOf(
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    permit(
+      spender: PromiseOrValue<string>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      deadline: PromiseOrValue<BigNumberish>,
+      sig: PromiseOrValue<BytesLike>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     renounceRole(
@@ -1637,8 +1796,6 @@ export interface ImmutableERC721 extends BaseContract {
       account: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
-
-    royaltyAllowlist(overrides?: CallOverrides): Promise<BigNumber>;
 
     royaltyInfo(
       tokenId: PromiseOrValue<BigNumberish>,
@@ -1735,8 +1892,8 @@ export interface ImmutableERC721 extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
-    setRoyaltyAllowlistRegistry(
-      _royaltyAllowlist: PromiseOrValue<string>,
+    setOperatorAllowlistRegistry(
+      _operatorAllowlist: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -1767,6 +1924,8 @@ export interface ImmutableERC721 extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     MINTER_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     approve(
@@ -1795,6 +1954,8 @@ export interface ImmutableERC721 extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     contractURI(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    eip712Domain(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     exists(
       tokenId: PromiseOrValue<BigNumberish>,
@@ -1871,9 +2032,24 @@ export interface ImmutableERC721 extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    nonces(
+      tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    operatorAllowlist(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     ownerOf(
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    permit(
+      spender: PromiseOrValue<string>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      deadline: PromiseOrValue<BigNumberish>,
+      sig: PromiseOrValue<BytesLike>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     renounceRole(
@@ -1892,8 +2068,6 @@ export interface ImmutableERC721 extends BaseContract {
       account: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
-
-    royaltyAllowlist(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     royaltyInfo(
       tokenId: PromiseOrValue<BigNumberish>,
@@ -1990,8 +2164,8 @@ export interface ImmutableERC721 extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
-    setRoyaltyAllowlistRegistry(
-      _royaltyAllowlist: PromiseOrValue<string>,
+    setOperatorAllowlistRegistry(
+      _operatorAllowlist: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 

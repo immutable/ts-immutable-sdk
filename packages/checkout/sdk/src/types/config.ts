@@ -1,9 +1,14 @@
 import { ModuleConfiguration } from '@imtbl/config';
 import { ExchangeOverrides } from '@imtbl/dex-sdk';
 import { TokenInfo } from './tokenInfo';
+import { ChainId } from './chains';
 
 export interface CheckoutOverrides {}
-export interface CheckoutModuleConfiguration extends ModuleConfiguration<CheckoutOverrides> {}
+export interface CheckoutModuleConfiguration extends ModuleConfiguration<CheckoutOverrides> {
+  isOnRampEnabled?: boolean,
+  isSwapEnabled?: boolean,
+  isBridgeEnabled?: boolean,
+}
 
 /**
  * A type representing various remotely defined configurations which are
@@ -69,4 +74,21 @@ export type GasEstimateBridgeToL2TokenConfig = {
 export type GasEstimateSwapTokenConfig = {
   inAddress: string;
   outAddress: string;
+};
+
+/**
+ * A type that represents the tokens configuration for chain.
+ */
+export type ChainsTokensConfig = {
+  [key in ChainId]: ChainTokensConfig;
+};
+
+/**
+ * A type representing all the feature flags available.
+ * @property {TokenInfo[] | undefined} allowed - List of allowed tokens for a given chain.
+ * @property {boolean | undefined} blockscout - Feature flag to enable/disable blockscout integration.
+ */
+export type ChainTokensConfig = {
+  allowed?: TokenInfo[];
+  blockscout?: boolean;
 };

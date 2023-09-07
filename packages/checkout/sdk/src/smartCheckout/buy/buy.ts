@@ -1,23 +1,28 @@
-import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
+import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import {
-  Action,
-  ActionType,
   ERC20Item,
   NativeItem,
-  TransactionPurpose,
   constants,
 } from '@imtbl/orderbook';
 import {
   BuyResult,
+  BuyStatusType,
 } from '../../types/buy';
 import * as instance from '../../instance';
 import { CheckoutConfiguration } from '../../config';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import {
-  ItemType, ItemRequirement, GasTokenType, TransactionOrGasType, GasAmount, FulfilmentTransaction,
+  ItemType,
+  ItemRequirement,
+  GasTokenType,
+  TransactionOrGasType,
+  GasAmount,
+  FulfilmentTransaction,
 } from '../../types/smartCheckout';
 import { smartCheckout } from '..';
+import { getUnsignedTransactions, signApprovalTransactions, signFulfilmentTransactions } from '../actions';
+import { SignTransactionStatusType, UnsignedTransactions } from '../actions/types';
 
 export const getItemRequirement = (
   type: ItemType,
@@ -42,26 +47,14 @@ export const getItemRequirement = (
   }
 };
 
-export const getUnsignedFulfilmentTransaction = async (
-  actions: Action[],
-): Promise<TransactionRequest | undefined> => {
-  for (const action of actions) {
-    if (action.type === ActionType.TRANSACTION && action.purpose === TransactionPurpose.FULFILL_ORDER) {
-      // eslint-disable-next-line no-await-in-loop
-      return await action.buildTransaction();
-    }
-  }
-  return undefined;
-};
-
 export const getTransactionOrGas = (
   gasLimit: number,
-  transaction: TransactionRequest | undefined,
+  unsignedTransactions: UnsignedTransactions,
 ): FulfilmentTransaction | GasAmount => {
-  if (transaction) {
+  if (unsignedTransactions.fulfilmentTransactions.length > 0) {
     return {
       type: TransactionOrGasType.TRANSACTION,
-      transaction,
+      transaction: unsignedTransactions.fulfilmentTransactions[0],
     };
   }
 
@@ -100,12 +93,18 @@ export const buy = async (
     );
   }
 
-  let unsignedTransaction;
+  let unsignedTransactions: UnsignedTransactions = {
+    approvalTransactions: [],
+    fulfilmentTransactions: [],
+  };
   try {
     const fulfillerAddress = await provider.getSigner().getAddress();
     const { actions } = await orderbook.fulfillOrder(orderId, fulfillerAddress);
-    unsignedTransaction = await getUnsignedFulfilmentTransaction(actions);
-  } catch { /* Use the gas limit when the fulfil order request errors */ }
+    unsignedTransactions = await getUnsignedTransactions(actions);
+  } catch {
+    // Silently ignore error as this is usually thrown if user does not have enough balance
+    // todo: if balance error - can we determine if its the balance error otherwise throw?
+  }
 
   let amount = BigNumber.from('0');
   let type: ItemType = ItemType.NATIVE;
@@ -147,18 +146,54 @@ export const buy = async (
     getItemRequirement(type, contractAddress, amount, spenderAddress),
   ];
 
-  await smartCheckout(
+  const smartCheckoutResult = await smartCheckout(
     config,
     provider,
     itemRequirements,
-    getTransactionOrGas(gasLimit, unsignedTransaction),
+    getTransactionOrGas(
+      gasLimit,
+      unsignedTransactions,
+    ),
   );
 
+  if (smartCheckoutResult.sufficient) {
+    const approvalResult = await signApprovalTransactions(provider, unsignedTransactions.approvalTransactions);
+    if (approvalResult.type === SignTransactionStatusType.FAILED) {
+      return {
+        smartCheckoutResult,
+        orderId,
+        status: {
+          type: BuyStatusType.FAILED,
+          transactionHash: approvalResult.transactionHash,
+          reason: approvalResult.reason,
+        },
+      };
+    }
+
+    const fulfilmentResult = await signFulfilmentTransactions(provider, unsignedTransactions.fulfilmentTransactions);
+    if (fulfilmentResult.type === SignTransactionStatusType.FAILED) {
+      return {
+        smartCheckoutResult,
+        orderId,
+        status: {
+          type: BuyStatusType.FAILED,
+          transactionHash: fulfilmentResult.transactionHash,
+          reason: fulfilmentResult.reason,
+        },
+      };
+    }
+
+    return {
+      smartCheckoutResult,
+      orderId,
+      status: {
+        type: BuyStatusType.SUCCESS,
+      },
+    };
+  }
+
   return {
-    itemRequirements,
-    gasToken: {
-      type: GasTokenType.NATIVE,
-      limit: BigNumber.from(gasLimit),
-    },
+    smartCheckoutResult,
+    orderId,
   };
 };

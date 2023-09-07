@@ -15,13 +15,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { CreateOrderProtocolData } from './create-order-protocol-data';
-// May contain unused imports in some cases
-// @ts-ignore
 import { Fee } from './fee';
 // May contain unused imports in some cases
 // @ts-ignore
 import { Item } from './item';
+// May contain unused imports in some cases
+// @ts-ignore
+import { ProtocolData } from './protocol-data';
 
 /**
  * 
@@ -49,10 +49,10 @@ export interface CreateListingRequestBody {
     'buy': Array<Item>;
     /**
      * 
-     * @type {Array<Fee>}
+     * @type {Fee}
      * @memberof CreateListingRequestBody
      */
-    'fees': Array<Fee>;
+    'fee'?: Fee;
     /**
      * Time after which the Order is considered expired
      * @type {string}
@@ -61,10 +61,10 @@ export interface CreateListingRequestBody {
     'end_time': string;
     /**
      * 
-     * @type {CreateOrderProtocolData}
+     * @type {ProtocolData}
      * @memberof CreateListingRequestBody
      */
-    'protocol_data': CreateOrderProtocolData;
+    'protocol_data': ProtocolData;
     /**
      * A random value added to the create Order request
      * @type {string}

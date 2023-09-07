@@ -10,11 +10,13 @@ import { WalletAddress } from '../components/WalletAddress/WalletAddress';
 import { settingsBoxStyle, settingsDisconnectButtonStyle } from './SettingsStyles';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import { isPassportProvider } from '../../../lib/providerUtils';
+import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 
 export function Settings() {
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { provider } = connectLoaderState;
   const { header, disconnectButton } = text.views[WalletWidgetViews.SETTINGS];
+  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const isPassport = isPassportProvider(provider);
 
@@ -25,7 +27,7 @@ export function Settings() {
         <HeaderNavigation
           showBack
           title={header.title}
-          onCloseButtonClick={sendWalletWidgetCloseEvent}
+          onCloseButtonClick={() => sendWalletWidgetCloseEvent(eventTarget)}
         />
       )}
       footer={<FooterLogo />}
@@ -39,7 +41,7 @@ export function Settings() {
           testId="disconnect-button"
           variant="secondary"
           sx={settingsDisconnectButtonStyle}
-          onClick={sendDisconnectWalletEvent}
+          onClick={() => sendDisconnectWalletEvent(eventTarget)}
         >
           {disconnectButton.label}
         </Button>

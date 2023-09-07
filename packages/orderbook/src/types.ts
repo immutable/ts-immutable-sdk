@@ -58,6 +58,11 @@ Parameters<typeof OrdersService.prototype.listListings>[0],
 'chainName'
 >;
 
+export type ListTradesParams = Omit<
+Parameters<typeof OrdersService.prototype.listTrades>[0],
+'chainName'
+>;
+
 export enum FeeType {
   MAKER_MARKETPLACE = OpenapiFee.fee_type.MAKER_MARKETPLACE,
   TAKER_MARKETPLACE = OpenapiFee.fee_type.TAKER_MARKETPLACE,
@@ -173,4 +178,51 @@ export interface Page {
    * Last item as an encoded string
    */
   nextCursor: string | null;
+}
+
+export interface Trade {
+  id: string;
+  orderId: string;
+  chain: {
+    id: string;
+    name: string;
+  };
+  buy: (ERC20Item | NativeItem)[];
+  sell: ERC721Item[];
+  buyerFees: Fee[];
+  sellerAddress: string
+  buyerAddress: string
+  makerAddress: string
+  takerAddress: string
+  /**
+   * Time the on-chain event was indexed by the Immutable order book service
+   */
+  indexedAt: string;
+  blockchainMetadata: {
+    /**
+     * The transaction hash of the trade
+     */
+    transactionHash: string;
+    /**
+     * EVM block number (uint64 as string)
+     */
+    blockNumber: string;
+    /**
+     * Transaction index in a block (uint32 as string)
+     */
+    transactionIndex: string;
+    /**
+     * The log index of the fulfillment event in a block (uint32 as string)
+     */
+    logIndex: string;
+  }
+}
+
+export interface TradeResult {
+  result: Trade;
+}
+
+export interface ListTradesResult {
+  page: Page;
+  result: Trade[];
 }

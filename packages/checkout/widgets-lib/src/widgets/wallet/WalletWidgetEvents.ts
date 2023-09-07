@@ -7,7 +7,7 @@ import {
   WalletNetworkSwitchEvent,
 } from '@imtbl/checkout-widgets';
 
-export function sendWalletWidgetCloseEvent() {
+export function sendWalletWidgetCloseEvent(eventTarget: Window | EventTarget) {
   const closeWidgetEvent = new CustomEvent<WidgetEvent<any>>(
     IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
     {
@@ -19,11 +19,15 @@ export function sendWalletWidgetCloseEvent() {
   );
   // TODO: please remove or if necessary keep the eslint ignore
   // eslint-disable-next-line no-console
-  console.log('close widget event:', closeWidgetEvent);
-  if (window !== undefined) window.dispatchEvent(closeWidgetEvent);
+  console.log('close widget event:', eventTarget, closeWidgetEvent);
+  if (eventTarget !== undefined) eventTarget.dispatchEvent(closeWidgetEvent);
 }
 
-export function sendNetworkSwitchEvent(provider: Web3Provider, network: NetworkInfo) {
+export function sendNetworkSwitchEvent(
+  eventTarget: Window | EventTarget,
+  provider: Web3Provider,
+  network: NetworkInfo,
+) {
   const walletWidgetSwitchNetworkEvent = new CustomEvent<
   WidgetEvent<WalletNetworkSwitchEvent>
   >(IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {
@@ -37,11 +41,11 @@ export function sendNetworkSwitchEvent(provider: Web3Provider, network: NetworkI
     },
   });
   // eslint-disable-next-line no-console
-  console.log('switch network event:', walletWidgetSwitchNetworkEvent);
-  if (window !== undefined) window.dispatchEvent(walletWidgetSwitchNetworkEvent);
+  console.log('switch network event:', eventTarget, walletWidgetSwitchNetworkEvent);
+  if (eventTarget !== undefined) eventTarget.dispatchEvent(walletWidgetSwitchNetworkEvent);
 }
 
-export function sendDisconnectWalletEvent() {
+export function sendDisconnectWalletEvent(eventTarget: Window | EventTarget) {
   const disconnectWalletEvent = new CustomEvent<WidgetEvent<any>>(
     IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
     {
@@ -52,6 +56,6 @@ export function sendDisconnectWalletEvent() {
     },
   );
   // eslint-disable-next-line no-console
-  console.log('disconnect wallet event:', disconnectWalletEvent);
-  if (window !== undefined) window.dispatchEvent(disconnectWalletEvent);
+  console.log('disconnect wallet event:', eventTarget, disconnectWalletEvent);
+  if (eventTarget !== undefined) eventTarget.dispatchEvent(disconnectWalletEvent);
 }
