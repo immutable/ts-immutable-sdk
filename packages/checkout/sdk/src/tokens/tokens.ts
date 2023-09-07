@@ -35,6 +35,9 @@ export const getTokenAllowList = async (
     case TokenFilterTypes.ONRAMP:
       onRampConfig = (await config.remote.getConfig('onramp')) as OnRampConfig;
       // Only using Transak as it's the only on-ramp provider at the moment
+      if (!onRampConfig) {
+        tokens = [];
+      }
       tokens = onRampConfig[OnRampProvider.TRANSAK]?.tokens || [];
       break;
     case TokenFilterTypes.BRIDGE:
