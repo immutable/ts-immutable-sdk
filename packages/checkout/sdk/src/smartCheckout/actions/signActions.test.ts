@@ -34,7 +34,7 @@ describe('signActions', () => {
 
       const result = await signApprovalTransactions(mockProvider, approvalTransactions);
       expect(result).toEqual({
-        status: SignTransactionStatusType.SUCCESS,
+        type: SignTransactionStatusType.SUCCESS,
       });
       expect(mockProvider.getSigner().sendTransaction).toHaveBeenCalledTimes(2);
       expect(mockProvider.getSigner().sendTransaction).toHaveBeenCalledWith({
@@ -68,7 +68,7 @@ describe('signActions', () => {
 
       const result = await signApprovalTransactions(mockProvider, approvalTransactions);
       expect(result).toEqual({
-        status: SignTransactionStatusType.FAILED,
+        type: SignTransactionStatusType.FAILED,
         transactionHash: '0xHASH',
         reason: 'Approval transaction failed and was reverted',
       });
@@ -101,7 +101,7 @@ describe('signActions', () => {
       }
 
       expect(message).toEqual('An error occurred while executing the approval transaction');
-      expect(type).toEqual(CheckoutErrorType.EXECUTE_TRANSACTIONS_ERROR);
+      expect(type).toEqual(CheckoutErrorType.EXECUTE_APPROVAL_TRANSACTION_ERROR);
       expect(data).toEqual({
         message: 'approval error',
       });
@@ -164,7 +164,7 @@ describe('signActions', () => {
 
       const result = await signFulfilmentTransactions(mockProvider, fulfilmentTransactions);
       expect(result).toEqual({
-        status: SignTransactionStatusType.FAILED,
+        type: SignTransactionStatusType.FAILED,
         transactionHash: '0xHASH',
         reason: 'Fulfilment transaction failed and was reverted',
       });
@@ -197,7 +197,7 @@ describe('signActions', () => {
       }
 
       expect(message).toEqual('An error occurred while executing the fulfilment transaction');
-      expect(type).toEqual(CheckoutErrorType.EXECUTE_TRANSACTIONS_ERROR);
+      expect(type).toEqual(CheckoutErrorType.EXECUTE_FULFILMENT_TRANSACTION_ERROR);
       expect(data).toEqual({
         message: 'fulfilment error',
       });
@@ -271,7 +271,7 @@ describe('signActions', () => {
       }
 
       expect(message).toEqual('An error occurred while signing the message');
-      expect(type).toEqual(CheckoutErrorType.EXECUTE_TRANSACTIONS_ERROR);
+      expect(type).toEqual(CheckoutErrorType.SIGN_MESSAGE_ERROR);
       expect(data).toEqual({
         message: 'sign message error',
       });

@@ -892,7 +892,7 @@ describe('sell', () => {
       }
 
       expect(message).toEqual('The unsigned message is missing after preparing the listing');
-      expect(type).toEqual(CheckoutErrorType.EXECUTE_TRANSACTIONS_ERROR);
+      expect(type).toEqual(CheckoutErrorType.SIGN_MESSAGE_ERROR);
       expect(data).toEqual({
         id,
         collectionAddress: contractAddress,

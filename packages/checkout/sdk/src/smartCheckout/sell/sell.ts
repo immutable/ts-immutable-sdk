@@ -119,7 +119,7 @@ export const sell = async (
       // If for some reason it is missing then we cannot proceed with the create listing
       throw new CheckoutError(
         'The unsigned message is missing after preparing the listing',
-        CheckoutErrorType.EXECUTE_TRANSACTIONS_ERROR,
+        CheckoutErrorType.SIGN_MESSAGE_ERROR,
         {
           id,
           collectionAddress: contractAddress,
