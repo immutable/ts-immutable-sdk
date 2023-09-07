@@ -37,10 +37,12 @@ export type SellStatus = SellSuccessStatus | SellFailedStatus;
 
 /**
  * Represents the status of a successful Sell
- * @property {string} type - The success Sell status type.
+ * @property {string} type - The success sell status type.
+ * @property {string} orderId - The order ID of the listing.
  */
 export interface SellSuccessStatus {
   type: SellStatusType.SUCCESS;
+  orderId: string;
 }
 
 /**

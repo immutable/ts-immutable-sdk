@@ -76,7 +76,11 @@ describe('sell', () => {
           erc721TransactionRequirement,
         ],
       });
-      const mockCreateListing = jest.fn().mockResolvedValue({});
+      const mockCreateListing = jest.fn().mockResolvedValue({
+        result: {
+          id: '1234',
+        },
+      });
       (createOrderbookInstance as jest.Mock).mockResolvedValue({
         config: jest.fn().mockReturnValue({
           seaportContractAddress,
@@ -139,6 +143,7 @@ describe('sell', () => {
         },
         status: {
           type: SellStatusType.SUCCESS,
+          orderId: '1234',
         },
       });
 

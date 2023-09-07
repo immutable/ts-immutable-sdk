@@ -145,12 +145,15 @@ export const sell = async (
       };
     }
 
+    let orderId = '';
+
     try {
-      await orderbook.createListing({
+      const order = await orderbook.createListing({
         orderComponents: signedMessage.orderComponents,
         orderHash: signedMessage.orderHash,
         orderSignature: signedMessage.signedMessage,
       });
+      orderId = order.result.id;
     } catch (err: any) {
       throw new CheckoutError(
         'An error occurred while creating the listing',
@@ -169,6 +172,7 @@ export const sell = async (
       smartCheckoutResult,
       status: {
         type: SellStatusType.SUCCESS,
+        orderId,
       },
     };
   }

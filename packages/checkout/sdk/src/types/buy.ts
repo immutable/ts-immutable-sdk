@@ -31,7 +31,7 @@ export type BuyStatus = BuySuccessStatus | BuyFailedStatus;
 
 /**
  * Represents the status of a successful Buy
- * @property {string} type - The success Buy status type.
+ * @property {string} type - The success buy status type.
  */
 export interface BuySuccessStatus {
   type: BuyStatusType.SUCCESS;

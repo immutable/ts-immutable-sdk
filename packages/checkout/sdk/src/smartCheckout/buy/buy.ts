@@ -6,7 +6,8 @@ import {
   constants,
 } from '@imtbl/orderbook';
 import {
-  BuyResult, BuyStatusType,
+  BuyResult,
+  BuyStatusType,
 } from '../../types/buy';
 import * as instance from '../../instance';
 import { CheckoutConfiguration } from '../../config';
