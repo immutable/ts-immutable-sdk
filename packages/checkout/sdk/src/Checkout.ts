@@ -404,6 +404,8 @@ export class Checkout {
    * @returns {Promise<string>} - A promise that resolves to a string url.
    */
   public async createFiatRampUrl(params: FiatRampParams): Promise<string> {
+    let tokenAmount;
+    let tokenSymbol = 'IMX';
     let email;
 
     const walletAddress = await params.web3Provider.getSigner().getAddress();
@@ -415,15 +417,18 @@ export class Checkout {
     }
 
     const tokenList = await tokens.getTokenAllowList(this.config, { type: TokenFilterTypes.ONRAMP });
-
-    const token = tokenList.tokens.find((t) => t.address === params.tokenAddress);
+    const token = tokenList.tokens.find((t) => t.address?.toLowerCase() === params.tokenAddress?.toLowerCase());
+    if (token) {
+      tokenAmount = params.tokenAmount;
+      tokenSymbol = token.symbol;
+    }
 
     return await this.fiatRampService.createWidgetUrl({
       exchangeType: params.exchangeType,
       isPassport,
       walletAddress,
-      tokenAmount: token ? undefined : params.tokenAmount,
-      tokenSymbol: token?.symbol ?? 'IMX',
+      tokenAmount,
+      tokenSymbol,
       email,
     } as FiatRampWidgetParams);
   }

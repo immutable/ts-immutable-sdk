@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import { ExchangeType } from '../types/fiatRamp';
 import {
   OnRampConfig, OnRampProvider, OnRampProviderFees, TRANSAK_API_BASE_URL, TRANSAK_PUBLISHABLE_KEY,
@@ -9,7 +8,7 @@ export interface FiatRampWidgetParams {
   exchangeType: ExchangeType;
   isPassport: boolean;
   walletAddress?: string;
-  tokenAmount?: BigNumber;
+  tokenAmount?: string;
   tokenSymbol?: string;
   email?: string;
 }

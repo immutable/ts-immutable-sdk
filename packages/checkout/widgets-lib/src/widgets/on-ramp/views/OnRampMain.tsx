@@ -3,7 +3,6 @@ import { Box } from '@biom3/react';
 import {
   useContext, useEffect, useMemo, useState,
 } from 'react';
-import { BigNumber } from 'ethers';
 import { ExchangeType } from '@imtbl/checkout-sdk';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -188,7 +187,7 @@ export function OnRampMain({
         exchangeType: ExchangeType.ONRAMP,
         web3Provider: provider,
         tokenAddress,
-        tokenAmount: tokenAmount ? BigNumber.from(tokenAmount) : undefined,
+        tokenAmount,
         passport,
       };
 
