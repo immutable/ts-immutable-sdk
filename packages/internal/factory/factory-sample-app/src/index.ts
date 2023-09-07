@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { FactoryConfiguration, Factory, GetPresetsResponse, ZKEVM_DEVNET, GetUnsignedDeployPresetTxRequest } from '@imtbl/factory-sdk';
+import { FactoryConfiguration, Factory, GetPresetsResponse, ZKEVM_DEVNET, GetUnsignedDeployPresetTxRequest, ZKEVM_TESTNET } from '@imtbl/factory-sdk';
 import { ethers } from 'ethers';
 
 async function main() {
@@ -27,7 +27,7 @@ async function main() {
         baseConfig: new ImmutableConfiguration({
         environment: Environment.SANDBOX,
         }),
-        factoryInstance: ZKEVM_DEVNET,
+        factoryInstance: ZKEVM_TESTNET,
         provider: provider,
     });
 
@@ -38,7 +38,7 @@ async function main() {
     console.log(presets);
 
     // obtained form https://immutable.atlassian.net/wiki/spaces/IGG/pages/2216527667/Allowlist+Configuration
-    const royaltyAllowlistAddress = "0x9A48B1B27743d807331d06eCF0bFb15c06fDb58D";
+    const royaltyAllowlistAddress = "0xc341821C99aE27867A2eF865941892aA8976856b";
     const req: GetUnsignedDeployPresetTxRequest = {
         presetName: "ImmutableERC721MintByID",
         arguments: [wallet.address, "hello", "world", "cool", "beans", royaltyAllowlistAddress, wallet.address, "10"]
