@@ -4,7 +4,7 @@ import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
 import { TypedDataDomain } from 'ethers';
 import { signApprovalTransactions, signFulfilmentTransactions, signMessage } from './signActions';
 import { CheckoutErrorType } from '../../errors';
-import { UnsignedMessage } from './types';
+import { SignTransactionStatusType, UnsignedMessage } from './types';
 
 describe('signActions', () => {
   let mockProvider: Web3Provider;
@@ -13,7 +13,11 @@ describe('signActions', () => {
     it('should sign approval transactions', async () => {
       mockProvider = {
         getSigner: jest.fn().mockReturnValue({
-          sendTransaction: jest.fn().mockResolvedValue({}),
+          sendTransaction: jest.fn().mockResolvedValue({
+            wait: jest.fn().mockResolvedValue({
+              status: 1,
+            }),
+          }),
         }),
       } as unknown as Web3Provider;
 
@@ -28,7 +32,10 @@ describe('signActions', () => {
         },
       ];
 
-      await signApprovalTransactions(mockProvider, approvalTransactions);
+      const result = await signApprovalTransactions(mockProvider, approvalTransactions);
+      expect(result).toEqual({
+        status: SignTransactionStatusType.SUCCESS,
+      });
       expect(mockProvider.getSigner().sendTransaction).toHaveBeenCalledTimes(2);
       expect(mockProvider.getSigner().sendTransaction).toHaveBeenCalledWith({
         data: '0xAPPROVAL1',
@@ -37,6 +44,33 @@ describe('signActions', () => {
       expect(mockProvider.getSigner().sendTransaction).toHaveBeenCalledWith({
         data: '0xAPPROVAL2',
         to: '0x123',
+      });
+    });
+
+    it('should return failed when approval transaction reverted', async () => {
+      mockProvider = {
+        getSigner: jest.fn().mockReturnValue({
+          sendTransaction: jest.fn().mockResolvedValue({
+            wait: jest.fn().mockResolvedValue({
+              status: 0,
+              transactionHash: '0xHASH',
+            }),
+          }),
+        }),
+      } as unknown as Web3Provider;
+
+      const approvalTransactions: TransactionRequest[] = [
+        {
+          to: '0x123',
+          data: '0xAPPROVAL1',
+        },
+      ];
+
+      const result = await signApprovalTransactions(mockProvider, approvalTransactions);
+      expect(result).toEqual({
+        status: SignTransactionStatusType.FAILED,
+        transactionHash: '0xHASH',
+        reason: 'Approval transaction failed and was reverted',
       });
     });
 
@@ -78,7 +112,11 @@ describe('signActions', () => {
     it('should sign fulfilment transactions', async () => {
       mockProvider = {
         getSigner: jest.fn().mockReturnValue({
-          sendTransaction: jest.fn().mockResolvedValue({}),
+          sendTransaction: jest.fn().mockResolvedValue({
+            wait: jest.fn().mockResolvedValue({
+              status: 1,
+            }),
+          }),
         }),
       } as unknown as Web3Provider;
 
@@ -102,6 +140,33 @@ describe('signActions', () => {
       expect(mockProvider.getSigner().sendTransaction).toHaveBeenCalledWith({
         data: '0xFULFILMENT2',
         to: '0x123',
+      });
+    });
+
+    it('should return failed when approval transaction reverted', async () => {
+      mockProvider = {
+        getSigner: jest.fn().mockReturnValue({
+          sendTransaction: jest.fn().mockResolvedValue({
+            wait: jest.fn().mockResolvedValue({
+              status: 0,
+              transactionHash: '0xHASH',
+            }),
+          }),
+        }),
+      } as unknown as Web3Provider;
+
+      const fulfilmentTransactions: TransactionRequest[] = [
+        {
+          to: '0x123',
+          data: '0xAPPROVAL1',
+        },
+      ];
+
+      const result = await signFulfilmentTransactions(mockProvider, fulfilmentTransactions);
+      expect(result).toEqual({
+        status: SignTransactionStatusType.FAILED,
+        transactionHash: '0xHASH',
+        reason: 'Fulfilment transaction failed and was reverted',
       });
     });
 

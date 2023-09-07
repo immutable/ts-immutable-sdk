@@ -21,3 +21,20 @@ export type SignedMessage = {
   orderComponents: any;
   signedMessage: string;
 };
+
+export type SignTransactionResult = SignTransactionSuccessStatus | SignTransactionFailedStatus;
+
+export interface SignTransactionSuccessStatus {
+  type: SignTransactionStatusType.SUCCESS;
+}
+
+export interface SignTransactionFailedStatus {
+  type: SignTransactionStatusType.FAILED;
+  transactionHash: string;
+  reason: string;
+}
+
+export enum SignTransactionStatusType {
+  SUCCESS = 'SUCCESS',
+  FAILED = 'FAILED',
+}

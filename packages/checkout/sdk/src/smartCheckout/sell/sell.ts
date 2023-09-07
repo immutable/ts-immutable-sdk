@@ -7,7 +7,7 @@ import {
   constants,
 } from '@imtbl/orderbook';
 import { BigNumber } from 'ethers';
-import { BuyToken, SellResult } from '../../types/sell';
+import { BuyToken, SellResult, SellStatusType } from '../../types/sell';
 import {
   ERC721Item,
   GasTokenType,
@@ -24,6 +24,7 @@ import {
   signApprovalTransactions,
   signMessage,
 } from '../actions';
+import { SignTransactionStatusType } from '../actions/types';
 
 export const getERC721Requirement = (
   id: string,
@@ -114,7 +115,7 @@ export const sell = async (
       listing.actions,
     );
     if (!unsignedMessage) {
-      // For sell it is expected the orderbook has returned an unsigned message
+      // For sell it is expected the orderbook will always return an unsigned message
       // If for some reason it is missing then we cannot proceed with the create listing
       throw new CheckoutError(
         'The unsigned message is missing after preparing the listing',
@@ -130,7 +131,20 @@ export const sell = async (
       unsignedMessage,
     );
     const unsignedTransactions = await getUnsignedTransactions(listing.actions);
-    await signApprovalTransactions(provider, unsignedTransactions.approvalTransactions);
+    const approvalResult = await signApprovalTransactions(provider, unsignedTransactions.approvalTransactions);
+    if (approvalResult.type === SignTransactionStatusType.FAILED) {
+      return {
+        id,
+        collectionAddress: contractAddress,
+        smartCheckoutResult,
+        status: {
+          type: SellStatusType.FAILED,
+          transactionHash: approvalResult.transactionHash,
+          reason: approvalResult.reason,
+        },
+      };
+    }
+
     try {
       await orderbook.createListing({
         orderComponents: signedMessage.orderComponents,
@@ -148,9 +162,20 @@ export const sell = async (
         },
       );
     }
+
+    return {
+      id,
+      collectionAddress: contractAddress,
+      smartCheckoutResult,
+      status: {
+        type: SellStatusType.SUCCESS,
+      },
+    };
   }
 
   return {
+    id,
+    collectionAddress: contractAddress,
     smartCheckoutResult,
   };
 };

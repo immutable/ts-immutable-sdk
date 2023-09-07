@@ -1,17 +1,22 @@
-import { TransactionRequest, TransactionResponse, Web3Provider } from '@ethersproject/providers';
+import {
+  TransactionReceipt,
+  TransactionRequest,
+  Web3Provider,
+} from '@ethersproject/providers';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
-import { SignedMessage, UnsignedMessage } from './types';
+import {
+  SignTransactionResult, SignTransactionStatusType, SignedMessage, UnsignedMessage,
+} from './types';
 
 export const signApprovalTransactions = async (
   provider: Web3Provider,
   approvalTransactions: TransactionRequest[],
-): Promise<void> => {
+): Promise<SignTransactionResult> => {
+  let receipts: TransactionReceipt[] = [];
+
   try {
-    const transactions: Promise<TransactionResponse>[] = [];
-    for (const approvalTransaction of approvalTransactions) {
-      transactions.push(provider.getSigner().sendTransaction(approvalTransaction));
-    }
-    await Promise.all(transactions);
+    const response = await Promise.all(approvalTransactions.map((tx) => provider.getSigner().sendTransaction(tx)));
+    receipts = await Promise.all(response.map((tx) => tx.wait()));
   } catch (err: any) {
     throw new CheckoutError(
       'An error occurred while executing the approval transaction',
@@ -21,18 +26,31 @@ export const signApprovalTransactions = async (
       },
     );
   }
+
+  for (const receipt of receipts) {
+    if (receipt.status === 0) {
+      return {
+        type: SignTransactionStatusType.FAILED,
+        transactionHash: receipt.transactionHash,
+        reason: 'Approval transaction failed and was reverted',
+      };
+    }
+  }
+
+  return {
+    type: SignTransactionStatusType.SUCCESS,
+  };
 };
 
 export const signFulfilmentTransactions = async (
   provider: Web3Provider,
   fulfilmentTransactions: TransactionRequest[],
-): Promise<void> => {
+): Promise<SignTransactionResult> => {
+  let receipts: TransactionReceipt[] = [];
+
   try {
-    const transactions: Promise<TransactionResponse>[] = [];
-    for (const fulfilmentTransaction of fulfilmentTransactions) {
-      transactions.push(provider.getSigner().sendTransaction(fulfilmentTransaction));
-    }
-    await Promise.all(transactions);
+    const response = await Promise.all(fulfilmentTransactions.map((tx) => provider.getSigner().sendTransaction(tx)));
+    receipts = await Promise.all(response.map((tx) => tx.wait()));
   } catch (err: any) {
     throw new CheckoutError(
       'An error occurred while executing the fulfilment transaction',
@@ -42,6 +60,20 @@ export const signFulfilmentTransactions = async (
       },
     );
   }
+
+  for (const receipt of receipts) {
+    if (receipt.status === 0) {
+      return {
+        type: SignTransactionStatusType.FAILED,
+        transactionHash: receipt.transactionHash,
+        reason: 'Fulfilment transaction failed and was reverted',
+      };
+    }
+  }
+
+  return {
+    type: SignTransactionStatusType.SUCCESS,
+  };
 };
 
 export const signMessage = async (

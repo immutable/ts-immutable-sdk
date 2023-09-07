@@ -6,7 +6,7 @@ import {
   constants,
 } from '@imtbl/orderbook';
 import {
-  BuyResult,
+  BuyResult, BuyStatusType,
 } from '../../types/buy';
 import * as instance from '../../instance';
 import { CheckoutConfiguration } from '../../config';
@@ -21,7 +21,7 @@ import {
 } from '../../types/smartCheckout';
 import { smartCheckout } from '..';
 import { getUnsignedTransactions, signApprovalTransactions, signFulfilmentTransactions } from '../actions';
-import { UnsignedTransactions } from '../actions/types';
+import { SignTransactionStatusType, UnsignedTransactions } from '../actions/types';
 
 export const getItemRequirement = (
   type: ItemType,
@@ -101,7 +101,8 @@ export const buy = async (
     const { actions } = await orderbook.fulfillOrder(orderId, fulfillerAddress);
     unsignedTransactions = await getUnsignedTransactions(actions);
   } catch {
-    // Silently ignore error as usually throws if user does not have enough balance
+    // Silently ignore error as this is usually thrown if user does not have enough balance
+    // todo: if balance error - can we determine if its the balance error otherwise throw?
   }
 
   let amount = BigNumber.from('0');
@@ -155,11 +156,43 @@ export const buy = async (
   );
 
   if (smartCheckoutResult.sufficient) {
-    await signApprovalTransactions(provider, unsignedTransactions.approvalTransactions);
-    await signFulfilmentTransactions(provider, unsignedTransactions.fulfilmentTransactions);
+    const approvalResult = await signApprovalTransactions(provider, unsignedTransactions.approvalTransactions);
+    if (approvalResult.type === SignTransactionStatusType.FAILED) {
+      return {
+        smartCheckoutResult,
+        orderId,
+        status: {
+          type: BuyStatusType.FAILED,
+          transactionHash: approvalResult.transactionHash,
+          reason: approvalResult.reason,
+        },
+      };
+    }
+
+    const fulfilmentResult = await signFulfilmentTransactions(provider, unsignedTransactions.fulfilmentTransactions);
+    if (fulfilmentResult.type === SignTransactionStatusType.FAILED) {
+      return {
+        smartCheckoutResult,
+        orderId,
+        status: {
+          type: BuyStatusType.FAILED,
+          transactionHash: fulfilmentResult.transactionHash,
+          reason: fulfilmentResult.reason,
+        },
+      };
+    }
+
+    return {
+      smartCheckoutResult,
+      orderId,
+      status: {
+        type: BuyStatusType.SUCCESS,
+      },
+    };
   }
 
   return {
     smartCheckoutResult,
+    orderId,
   };
 };
