@@ -25,16 +25,13 @@ export const useMergedItemsInfo = (
   backendItems: SignResponse,
 ) => {
   const getMergedItemsList = useCallback(() => {
-    // console.log('@@@@@@ clientItems', clientItems);
-    // console.log('@@@@@@ backendItems', backendItems);
-
     // Create a hashmap from clientItems for quick lookup
     const mapClientItems: Record<number, Item> = {};
     clientItems.forEach((item) => {
       mapClientItems[item.productId] = item;
     });
 
-    // Merge arrayB and hashmap into a new array
+    // Merge backedItems and hashmap into a new array
     const mergedArray = backendItems.order.products.map((item) => {
       const matchedClientItem = mapClientItems[item.product_id];
       return {
