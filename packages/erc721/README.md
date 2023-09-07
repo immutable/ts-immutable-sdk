@@ -1,2 +1,2 @@
-# ERC721 Hybrid Permissioned Mintable
-Wrapper functions for interacting with a deployed ERC721HybridPermissionedMintable contract.
+# ERC721
+Wrapper functions for interacting with a deployed ERC721 contract.
