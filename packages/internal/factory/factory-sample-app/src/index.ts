@@ -49,13 +49,8 @@ async function main() {
     const deployTx = await wallet.sendTransaction(unsignedTx.unsignedTx);
     console.log(`Deploy transaction hash: ${deployTx.hash} ; waiting for confirmation...`);
     const receipt = await deployTx.wait();
-    console.log(`Deploy transaction confirmed!`);
-    for (const log of receipt.logs) {
-        // This signature "0x68cc5c99c3d3fc4545fc38c25e0c6974cc1f0c1d73cc822a9f376904e5117dd1" will never change
-        if (log.topics.length >= 1 && log.topics[0] === "0x68cc5c99c3d3fc4545fc38c25e0c6974cc1f0c1d73cc822a9f376904e5117dd1") {
-            console.log(`Deployed contract address: ${ethers.utils.hexStripZeros(log.topics[2])}`);
-        }
-    }
+    const deployDetails = await factory.getDeployDetails({receipt: receipt});
+    console.log(deployDetails.deployedAddress);
 }
 
 // Run the deposit function and exit the process when completed

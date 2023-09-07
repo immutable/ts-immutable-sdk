@@ -50,3 +50,11 @@ export interface GetUnsignedDeployPresetTxRequest {
 export interface GetUnsignedDeployPresetTxResponse {
   unsignedTx: ethers.providers.TransactionRequest;
 }
+
+export interface GetDeployDetailsRequest {
+  receipt: ethers.providers.TransactionReceipt
+}
+
+export interface GetDeployDetailsResponse {
+  deployedAddress: Address
+}
