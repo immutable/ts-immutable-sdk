@@ -15,8 +15,10 @@ export const signApprovalTransactions = async (
   let receipts: TransactionReceipt[] = [];
 
   try {
-    const response = await Promise.all(approvalTransactions.map((tx) => provider.getSigner().sendTransaction(tx)));
-    receipts = await Promise.all(response.map((tx) => tx.wait()));
+    const response = await Promise.all(
+      approvalTransactions.map((transaction) => provider.getSigner().sendTransaction(transaction)),
+    );
+    receipts = await Promise.all(response.map((transaction) => transaction.wait()));
   } catch (err: any) {
     throw new CheckoutError(
       'An error occurred while executing the approval transaction',
@@ -49,8 +51,10 @@ export const signFulfilmentTransactions = async (
   let receipts: TransactionReceipt[] = [];
 
   try {
-    const response = await Promise.all(fulfilmentTransactions.map((tx) => provider.getSigner().sendTransaction(tx)));
-    receipts = await Promise.all(response.map((tx) => tx.wait()));
+    const response = await Promise.all(fulfilmentTransactions.map(
+      (transaction) => provider.getSigner().sendTransaction(transaction),
+    ));
+    receipts = await Promise.all(response.map((transaction) => transaction.wait()));
   } catch (err: any) {
     throw new CheckoutError(
       'An error occurred while executing the fulfilment transaction',
