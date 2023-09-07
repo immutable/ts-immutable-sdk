@@ -263,9 +263,16 @@ export const text = {
         title: 'Add coins',
       },
       initialLoadingText: 'Taking you to Transak',
-      [OnRampWidgetViews.IN_PROGRESS]: {
+      [OnRampWidgetViews.IN_PROGRESS_LOADING]: {
         loading: {
-          text: 'Processing your order',
+          text: 'Transak is processing your order',
+        },
+      },
+      [OnRampWidgetViews.IN_PROGRESS]: {
+        content: {
+          heading: 'Order in progress',
+          body1: 'You’ll receive an email from Transak when complete. This can take up to 3 mins.',
+          body2: 'You can close this window, the transaction will be reflected in your wallet once complete.',
         },
       },
       [OnRampWidgetViews.SUCCESS]: {

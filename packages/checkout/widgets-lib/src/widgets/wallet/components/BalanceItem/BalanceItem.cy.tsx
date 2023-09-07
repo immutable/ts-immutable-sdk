@@ -333,6 +333,16 @@ describe('BalanceItem', () => {
   });
 
   it('should NOT show the move option when provider is Passport', () => {
+    cy.stub(Checkout.prototype, 'getTokenAllowList').as('tokenAllowListStub').resolves({
+      tokens: [
+        {
+          name: 'tIMX',
+          symbol: 'tIMX',
+          decimals: 18,
+          address: IMX_ADDRESS_ZKEVM,
+        },
+      ],
+    });
     const testWalletState = {
       ...baseWalletState,
       network: {
@@ -401,6 +411,16 @@ describe('BalanceItem', () => {
   describe('Balance Item events', () => {
     let testWalletState;
     beforeEach(() => {
+      cy.stub(Checkout.prototype, 'getTokenAllowList').as('tokenAllowListStub').resolves({
+        tokens: [
+          {
+            name: 'tIMX',
+            symbol: 'tIMX',
+            decimals: 18,
+            address: IMX_ADDRESS_ZKEVM,
+          },
+        ],
+      });
       testWalletState = {
         ...baseWalletState,
         network: {
