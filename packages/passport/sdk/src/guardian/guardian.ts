@@ -57,6 +57,8 @@ const transformGuardianTransactions = (
 export default class GuardianClient {
   private readonly transactionAPI: guardian.TransactionsApi;
 
+  private readonly messageAPI: guardian.MessagesApi;
+
   private readonly confirmationScreen: ConfirmationScreen;
 
   // TODO: ID-977, make this rollup agnostic
@@ -70,15 +72,14 @@ export default class GuardianClient {
     imxEtherAddress,
     config,
   }: GuardianClientParams) {
+    const guardianConfiguration = new guardian.Configuration({ accessToken, basePath: config.imxPublicApiDomain });
     this.confirmationScreen = confirmationScreen;
     this.transactionAPI = new guardian.TransactionsApi(
-      new guardian.Configuration({
-        accessToken,
-        basePath: config.imxPublicApiDomain,
-      }),
+      new guardian.Configuration(guardianConfiguration),
     );
     this.imxEtherAddress = imxEtherAddress;
     this.crossSdkBridgeEnabled = config.crossSdkBridgeEnabled;
+    this.messageAPI = new guardian.MessagesApi(guardianConfiguration);
   }
 
   /**
@@ -217,6 +218,41 @@ export default class GuardianClient {
         this.imxEtherAddress,
         TransactionApprovalRequestChainTypeEnum.Evm,
         chainId,
+      );
+
+      if (!confirmationResult.confirmed) {
+        throw new JsonRpcError(
+          RpcErrorCode.TRANSACTION_REJECTED,
+          'Transaction rejected by user',
+        );
+      }
+    } else {
+      this.confirmationScreen.closeWindow();
+    }
+  }
+
+  private async evaluateMessage(
+    { chainID, payload }:guardian.MessageEvaluationRequest,
+  ): Promise<guardian.MessageEvaluationResponse> {
+    try {
+      const messageEvalResponse = await this.messageAPI.evaluateMessage(
+        { messageEvaluationRequest: { chainID, payload } },
+      );
+      return messageEvalResponse.data;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, `Transaction failed to validate with error: ${errorMessage}`);
+    }
+  }
+
+  public async validateMessage({ chainID, payload }: guardian.MessageEvaluationRequest) {
+    const { confirmationRequired, messageId } = await this.evaluateMessage({ chainID, payload });
+    if (confirmationRequired && this.crossSdkBridgeEnabled) {
+      throw new JsonRpcError(RpcErrorCode.TRANSACTION_REJECTED, transactionRejectedCrossSdkBridgeError);
+    }
+    if (confirmationRequired && !!messageId) {
+      const confirmationResult = await this.confirmationScreen.requestMessageConfirmation(
+        messageId,
       );
 
       if (!confirmationResult.confirmed) {

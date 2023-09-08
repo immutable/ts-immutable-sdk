@@ -314,6 +314,7 @@ describe('ZkEvmProvider', () => {
         jsonRpcProvider: expect.any(Object),
         relayerClient: expect.any(RelayerClient),
         user: mockUserZkEvm,
+        guardianClient: expect.any(GuardianClient),
       });
     });
   });

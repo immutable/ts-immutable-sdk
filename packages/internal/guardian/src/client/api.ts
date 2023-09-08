@@ -14,6 +14,7 @@
 
 
 
+export * from './domain/messages-api';
 export * from './domain/starkex-transactions-api';
 export * from './domain/transactions-api';
 
