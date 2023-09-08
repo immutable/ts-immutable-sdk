@@ -23,9 +23,6 @@
       "@/*": [
         "./src/*"
       ],
-      "@imtbl/factory-sdk/*": [
-        "../sdk/dist/*"
-      ]
     }
   },
   "include": [
