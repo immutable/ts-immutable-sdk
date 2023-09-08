@@ -385,6 +385,82 @@
         }
       }
     },
+    "/v1/chains/{chain_name}/accounts/{account_address}/collections": {
+      "get": {
+        "description": "List collections by NFT owner account address",
+        "tags": [
+          "collections"
+        ],
+        "operationId": "ListCollectionsByNFTOwner",
+        "summary": "List collections by NFT owner",
+        "parameters": [
+          {
+            "name": "account_address",
+            "in": "path",
+            "description": "Account address",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
+          },
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            },
+            "examples": {
+              "testnet": {
+                "value": "imtbl-zkevm-testnet",
+                "summary": "Immutable zkEVM Public Testnet"
+              }
+            }
+          },
+          {
+            "name": "page_cursor",
+            "in": "query",
+            "description": "Encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageCursor"
+            }
+          },
+          {
+            "name": "page_size",
+            "description": "Maximum number of items to return",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageSize"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListCollectionsResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
     "/v1/chains/{chain_name}/collections/{contract_address}/nfts/{token_id}": {
       "get": {
         "description": "Get NFT by token ID",
@@ -1181,6 +1257,17 @@
             }
           },
           {
+            "name": "account_address",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Account address to filter trades by (includes buy and sell trades)",
+              "example": "0x784578949A4A50DeA641Fb15dd2B11C72E76919a",
+              "pattern": "^0x[a-fA-F0-9]{40}$"
+            }
+          },
+          {
             "name": "page_size",
             "in": "query",
             "description": "Maximum number of trades to return per page",
@@ -1543,6 +1630,16 @@
           }
         }
       },
+      "ForbiddenRequest": {
+        "description": "Forbidden Request (403)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/APIError403"
+            }
+          }
+        }
+      },
       "TooManyRequests": {
         "description": "Too Many Requests (429)",
         "content": {
@@ -1853,6 +1950,24 @@
           "price_excluding_fees",
           "price_including_fees",
           "fees"
+        ]
+      },
+      "LinkCollectionRequest": {
+        "type": "object",
+        "properties": {
+          "signature": {
+            "description": "String created by signing wallet address and timestamp",
+            "type": "string"
+          },
+          "contract_address": {
+            "type": "string",
+            "description": "The address of the contract",
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          }
+        },
+        "required": [
+          "signature",
+          "contract_address"
         ]
       },
       "SaleFee": {
@@ -2709,6 +2824,35 @@
           }
         ]
       },
+      "APIError403": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasicAPIError"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "Error Code",
+                "enum": [
+                  "AUTHENTICATION_ERROR"
+                ],
+                "example": "AUTHENTICATION_ERROR"
+              },
+              "details": {
+                "type": "object",
+                "nullable": true,
+                "description": "Additional details to help resolve the error"
+              }
+            },
+            "required": [
+              "code",
+              "details"
+            ]
+          }
+        ]
+      },
       "APIError429": {
         "allOf": [
           {
@@ -2900,8 +3044,7 @@
             "maxItems": 1
           },
           "fee": {
-            "$ref": "#/components/schemas/Fee",
-            "description": "The maker marketplace fee"
+            "$ref": "#/components/schemas/Fee"
           },
           "end_time": {
             "type": "string",
@@ -3235,12 +3378,16 @@
           "chain": {
             "$ref": "#/components/schemas/Chain"
           },
+          "order_id": {
+            "type": "string",
+            "example": "7df3e99e-f7b3-459c-bef6-ffb66a18bb59"
+          },
           "blockchain_metadata": {
             "$ref": "#/components/schemas/TradeBlockchainMetadata"
           },
-          "create_time": {
+          "indexed_at": {
             "type": "string",
-            "description": "Time the Trade is created",
+            "description": "Time the on-chain trade event is indexed by the order book system",
             "format": "date-time",
             "example": "2022-03-07T07:20:50.52Z"
           },
@@ -3275,12 +3422,6 @@
           "taker_address": {
             "type": "string",
             "example": "0xFC99a706C0D05B8C71E1fAAC91b3E1343aC34D40"
-          },
-          "update_time": {
-            "type": "string",
-            "description": "Time the Trade is last updated",
-            "format": "date-time",
-            "example": "2022-03-07T07:20:50.52Z"
           }
         },
         "example": {
@@ -3297,7 +3438,7 @@
             "id": "eip155:11155111",
             "name": "sepolia"
           },
-          "create_time": "2022-03-07T07:20:50.52Z",
+          "indexed_at": "2022-03-07T07:20:50.52Z",
           "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
           "sell": [
             {
@@ -3308,11 +3449,11 @@
           ],
           "seller_address": "0x002b9B1cbf464782Df5d48870358FA6c09f1b19D",
           "maker_address": "0x002b9B1cbf464782Df5d48870358FA6c09f1b19D",
-          "taker_address": "0xFC99a706C0D05B8C71E1fAAC91b3E1343aC34D40",
-          "update_time": "2022-03-07T07:20:50.52Z"
+          "taker_address": "0xFC99a706C0D05B8C71E1fAAC91b3E1343aC34D40"
         },
         "required": [
           "id",
+          "order_id",
           "buy",
           "buyer_address",
           "sell",
@@ -3321,8 +3462,8 @@
           "chain",
           "maker_address",
           "taker_address",
-          "create_time",
-          "update_time"
+          "indexed_at",
+          "blockchain_metadata"
         ]
       },
       "ListingResult": {
@@ -3746,35 +3887,6 @@
             }
           }
         }
-      },
-      "APIError403": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/BasicAPIError"
-          },
-          {
-            "type": "object",
-            "properties": {
-              "code": {
-                "type": "string",
-                "description": "Error Code",
-                "enum": [
-                  "AUTHENTICATION_ERROR"
-                ],
-                "example": "AUTHENTICATION_ERROR"
-              },
-              "details": {
-                "type": "object",
-                "nullable": true,
-                "description": "Additional details to help resolve the error"
-              }
-            },
-            "required": [
-              "code",
-              "details"
-            ]
-          }
-        ]
       }
     }
   },
