@@ -163,6 +163,7 @@ export class ZkEvmProvider implements Provider {
           jsonRpcProvider: this.jsonRpcProvider,
           relayerClient: this.relayerClient,
           user: this.user,
+          guardianClient: this.guardianClient,
         });
       }
       // Pass through methods

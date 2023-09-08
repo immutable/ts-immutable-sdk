@@ -12,17 +12,28 @@
  * Do not edit the class manually.
  */
 
+
 // May contain unused imports in some cases
 // @ts-ignore
-import { ZkEvmTransactionData } from './zk-evm-transaction-data';
-// May contain unused imports in some cases
-// @ts-ignore
-import { ZkEvmTransactionEvaluationRequest } from './zk-evm-transaction-evaluation-request';
+import { EIP712Message } from './eip712-message';
 
 /**
- * @type TransactionEvaluationRequest
+ * 
  * @export
+ * @interface MessageEvaluationRequest
  */
-export type TransactionEvaluationRequest =
-  | ({ chainType: 'evm' } & ZkEvmTransactionEvaluationRequest)
-  | { chainType: 'starkex' };
+export interface MessageEvaluationRequest {
+    /**
+     * 
+     * @type {EIP712Message}
+     * @memberof MessageEvaluationRequest
+     */
+    'payload': EIP712Message;
+    /**
+     * rollup chain ID
+     * @type {string}
+     * @memberof MessageEvaluationRequest
+     */
+    'chainID': string;
+}
+
