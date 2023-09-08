@@ -52,8 +52,7 @@ export const text = {
         },
       },
       zkEVM: {
-        heading:
-          'You’ll be asked to switch to the Immutable zkEVM network',
+        heading: 'You’ll be asked to switch to the Immutable zkEVM network',
         body: "Check for the pop-up from MetaMask and 'Approve' to switch. If this is the first time, MetaMask will also ask you to add the network.",
         button: {
           text: 'Ready to Switch',
@@ -99,7 +98,8 @@ export const text = {
       },
       passport: {
         heading: 'Coins and collectibles are native to networks',
-        body1: 'This network is called Immutable zkEVM. If you have other coins in your Passport and can’t see them here, they might be on another network. ',
+        body1:
+          'This network is called Immutable zkEVM. If you have other coins in your Passport and can’t see them here, they might be on another network. ',
         body2: ' for more info.',
         linkText: 'Visit our FAQs',
       },
@@ -167,14 +167,16 @@ export const text = {
       approveSpending: {
         content: {
           metamask: {
-            heading: "You'll be asked to set a spending cap for this transaction",
+            heading:
+              "You'll be asked to set a spending cap for this transaction",
             body: [
               'Input at least',
               'for this transaction and future transactions, then follow the prompts.',
             ],
           },
           passport: {
-            heading: "You'll be asked to approve a spending cap for this transaction",
+            heading:
+              "You'll be asked to approve a spending cap for this transaction",
             body: 'Follow the prompts in your wallet to approve the spending cap.',
           },
         },
@@ -215,7 +217,8 @@ export const text = {
     [BridgeWidgetViews.IN_PROGRESS]: {
       heading: 'Move in progress',
       body1: (symbol: string) => `Less than 3 mins until your ${symbol} lands on zkEVM.`,
-      body2: 'You can close this window, the transaction will be reflected in your wallet once complete.',
+      body2:
+        'You can close this window, the transaction will be reflected in your wallet once complete.',
     },
     [BridgeWidgetViews.APPROVE_ERC20]: {
       approveBridge: {
@@ -282,17 +285,16 @@ export const text = {
     },
     [PrimaryRevenueWidgetViews.PAYMENT_METHODS]: {
       header: {
-        heading: 'Select payment method',
-        caption: 'How would you like to pay? You can pay with your a crypto wallet or with a credit card.',
+        heading: 'How would you like to pay?',
       },
       options: {
         [PrimaryRevenueWidgetViews.PAY_WITH_CRYPTO]: {
-          heading: 'Crypto',
-          caption: 'Pay with your Immtable Passport wallet',
+          heading: 'Coins',
+          caption: 'Using the coins balance in your wallet',
         },
         [PrimaryRevenueWidgetViews.PAY_WITH_CARD]: {
           heading: 'Card',
-          caption: 'Buy with credit card using Transak',
+          caption: 'GooglePay also available with Transak',
         },
       },
     },
@@ -307,8 +309,7 @@ export const text = {
     [WalletProviderName.PASSPORT]: {
       heading: 'Immutable Passport',
       accentText: 'Recommended',
-      description:
-        'digital wallet and identity',
+      description: 'digital wallet and identity',
     },
     [WalletProviderName.METAMASK]: {
       heading: 'MetaMask',

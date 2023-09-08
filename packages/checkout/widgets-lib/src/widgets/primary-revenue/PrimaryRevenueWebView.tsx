@@ -152,7 +152,7 @@ function PrimaryRevenueWebView() {
   }, []);
 
   const widgetConfig = {
-    theme: WidgetTheme.LIGHT,
+    theme: WidgetTheme.DARK,
     environment: Environment.SANDBOX,
   };
 
