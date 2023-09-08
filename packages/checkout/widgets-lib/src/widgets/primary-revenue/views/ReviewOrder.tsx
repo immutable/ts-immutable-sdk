@@ -17,8 +17,8 @@ import { ViewState } from '../../../context/view-context/ViewContext';
 import {
   Item,
   MergedItemsDetails,
-  useMergedItemsInfo,
-} from '../hooks/useMergedItemsInfo';
+  useMergeItemsInfo,
+} from '../hooks/useMergeItemsInfo';
 
 export interface ReviewOrderProps {
   execute: () => Promise<PrimaryRevenueSuccess>;
@@ -37,11 +37,12 @@ export function ReviewOrder(props: ReviewOrderProps) {
   MergedItemsDetails[] | null
   >(null);
 
-  const { getMergedItemsList } = useMergedItemsInfo(items, viewState.view.data);
+  const { getMergedItemsList } = useMergeItemsInfo(items, viewState.view.data);
 
   useEffect(() => {
     if (viewState.view.data) {
       setMergedItemsList(getMergedItemsList());
+      // eslint-disable-next-line no-console
       console.log('@@@@ mergedItemsList', mergedItemsList);
     }
   }, [items, viewState, viewState.view.data]);

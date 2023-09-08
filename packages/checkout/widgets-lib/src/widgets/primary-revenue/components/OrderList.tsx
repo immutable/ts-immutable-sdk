@@ -1,8 +1,7 @@
 import { Box } from '@biom3/react';
-
 import { useEffect } from 'react';
 import { OrderItem } from './OrderItem';
-import { MergedItemsDetails } from '../hooks/useMergedItemsInfo';
+import { MergedItemsDetails } from '../hooks/useMergeItemsInfo';
 
 export interface OrderListProps {
   items: MergedItemsDetails[] | null;
@@ -11,6 +10,7 @@ export interface OrderListProps {
 export function OrderList(props: OrderListProps) {
   const { items } = props;
   useEffect(() => {
+    // eslint-disable-next-line no-console
     console.log('@@@@@@@@@@@@@@ items', items);
   }, [items]);
 
@@ -27,10 +27,7 @@ export function OrderList(props: OrderListProps) {
     >
       {items
         ? items.map((item: MergedItemsDetails) => (
-          <OrderItem
-            key={item.tokenId}
-            item={item}
-          />
+          <OrderItem key={item.tokenId} item={item} />
         ))
         : null}
     </Box>

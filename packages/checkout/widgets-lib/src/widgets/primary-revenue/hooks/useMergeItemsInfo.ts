@@ -20,7 +20,7 @@ export type MergedItemsDetails = {
   currency: string;
 };
 
-export const useMergedItemsInfo = (
+export const useMergeItemsInfo = (
   clientItems: Item[],
   backendItems: SignResponse,
 ) => {

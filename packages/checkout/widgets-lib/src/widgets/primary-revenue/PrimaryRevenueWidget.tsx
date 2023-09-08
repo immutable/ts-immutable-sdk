@@ -32,7 +32,7 @@ import { BridgeWidget } from '../bridge/BridgeWidget';
 import { SwapWidget } from '../swap/SwapWidget';
 import { OnRampWidget } from '../on-ramp/OnRampWidget';
 import { useSignOrder } from './hooks/useSignOrder';
-import { Item } from './hooks/useMergedItemsInfo';
+import { Item } from './hooks/useMergeItemsInfo';
 
 export interface PrimaryRevenueWidgetProps {
   config: StrongCheckoutWidgetsConfig;

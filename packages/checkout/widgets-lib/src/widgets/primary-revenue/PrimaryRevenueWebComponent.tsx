@@ -7,10 +7,8 @@ import {
 } from '../../components/ConnectLoader/ConnectLoader';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
 import { ConnectTargetLayer, getL1ChainId, getL2ChainId } from '../../lib';
-import {
-  isValidAmount,
-} from '../../lib/validations/widgetValidators';
-import { Item } from './hooks/useMergedItemsInfo';
+import { isValidAmount } from '../../lib/validations/widgetValidators';
+import { Item } from './hooks/useMergeItemsInfo';
 
 export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
   amount = '';

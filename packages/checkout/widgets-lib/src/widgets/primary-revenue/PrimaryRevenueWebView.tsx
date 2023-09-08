@@ -4,7 +4,7 @@ import { config, passport } from '@imtbl/sdk';
 
 import { WidgetTheme } from '../../lib';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
-import { Item } from './hooks/useMergedItemsInfo';
+import { Item } from './hooks/useMergeItemsInfo';
 
 const defaultPassportConfig = {
   environment: 'sandbox',
