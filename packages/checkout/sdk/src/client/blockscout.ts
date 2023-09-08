@@ -5,10 +5,10 @@ import axios, {
 } from 'axios';
 import { BLOCKSCOUT_CHAIN_URL_MAP, ChainId } from '../types';
 import {
-  BlockscoutAddressNativeTokenData,
-  BlockscoutAddressToken,
-  BlockscoutAddressTokenPagination,
-  BlockscoutAddressTokens,
+  BlockscoutNativeTokenData,
+  BlockscoutToken,
+  BlockscoutTokenPagination,
+  BlockscoutTokens,
   BlockscoutTokenType,
 } from './blockscoutType';
 
@@ -25,7 +25,7 @@ const CACHE_DATA_TTL = 60; // seconds
 export class Blockscout {
   readonly url: string;
 
-  readonly nativeToken: BlockscoutAddressNativeTokenData;
+  readonly nativeToken: BlockscoutNativeTokenData;
 
   readonly ttl: number;
 
@@ -57,9 +57,9 @@ export class Blockscout {
     ttl?: number
   }) {
     this.chainId = params.chainId;
-    this.url = BLOCKSCOUT_CHAIN_URL_MAP[this.chainId]?.url;
+    this.url = BLOCKSCOUT_CHAIN_URL_MAP[this.chainId].url;
 
-    const native = BLOCKSCOUT_CHAIN_URL_MAP[this.chainId]?.nativeToken;
+    const native = BLOCKSCOUT_CHAIN_URL_MAP[this.chainId].nativeToken;
     this.nativeToken = {
       address: native.address ?? '',
       decimals: native.decimals.toString(),
@@ -84,17 +84,17 @@ export class Blockscout {
   public static isBlockscoutError = (err: any): boolean => 'code' in err;
 
   /**
-   * getAddressTokens fetches the list of tokens (by type) owned by the wallet address.
+   * getTokensByWalletAddress fetches the list of tokens (by type) owned by the wallet address.
    * @param walletAddress wallet address
    * @param tokenType token type
    * @param nextPage parameters for the next page, to be provided along side walletAddress and tokenType
    * @returns list of tokens given the wallet address and the token types
    */
-  public async getAddressTokens(params: {
+  public async getTokensByWalletAddress(params: {
     walletAddress: string,
     tokenType: BlockscoutTokenType,
-    nextPage?: BlockscoutAddressTokenPagination | null
-  }): Promise<BlockscoutAddressTokens> {
+    nextPage?: BlockscoutTokenPagination | null
+  }): Promise<BlockscoutTokens> {
     try {
       let url = `${this.url}/api/v2/addresses/${params.walletAddress}/tokens?type=${params.tokenType}`;
       if (params.nextPage) url += `&${new URLSearchParams(params.nextPage as Record<string, string>)}`;
@@ -113,11 +113,11 @@ export class Blockscout {
 
       // To get around an issue with native tokens being an ERC-20, there is the need
       // to remove IMX from `resp` and add it back in using getAddressNativeTokens.
-      // This has affected some of the early wallets and it might not be an issue in mainnet
+      // This has affected some of the early wallets, and it might not be an issue in mainnet
       // however, let's enforce it.
       const data = {
         items: response.data?.items?.filter(
-          (token: BlockscoutAddressToken) => token.token.address && token.token.address !== this.nativeToken.address,
+          (token: BlockscoutToken) => token.token.address && token.token.address !== this.nativeToken.address,
         ),
         // eslint-disable-next-line @typescript-eslint/naming-convention
         next_page_params: response.data?.next_page_params,
@@ -137,11 +137,11 @@ export class Blockscout {
   }
 
   /**
-   * getAddressNativeTokens fetches the native token owned by the wallet address.
+   * getNativeTokenByWalletAddress fetches the native token owned by the wallet address.
    * @param walletAddress wallet address
    * @returns list of tokens given the wallet address and the token types
    */
-  public async getAddressNativeTokens(params: { walletAddress: string, }): Promise<BlockscoutAddressToken> {
+  public async getNativeTokenByWalletAddress(params: { walletAddress: string, }): Promise<BlockscoutToken> {
     try {
       const url = `${this.url}/api/v2/addresses/${params.walletAddress}`;
 

@@ -6,19 +6,19 @@ export enum BlockscoutTokenType {
   ERC20 = 'ERC-20',
 }
 
-export interface BlockscoutAddressTokens {
-  items: BlockscoutAddressToken[]
-  next_page_params: BlockscoutAddressTokenPagination | null
+export interface BlockscoutTokens {
+  items: BlockscoutToken[]
+  next_page_params: BlockscoutTokenPagination | null
 }
 
-export interface BlockscoutAddressTokenPagination { [key: string]: string | number | null }
+export interface BlockscoutTokenPagination { [key: string]: string | number | null }
 
-export interface BlockscoutAddressToken {
-  token: BlockscoutAddressTokenData | BlockscoutAddressNativeTokenData;
+export interface BlockscoutToken {
+  token: BlockscoutTokenData | BlockscoutNativeTokenData;
   value: string;
 }
 
-export interface BlockscoutAddressTokenData {
+export interface BlockscoutTokenData {
   address: string
   decimals: string
   name: string
@@ -31,7 +31,7 @@ export interface BlockscoutError {
   message: string
 }
 
-export interface BlockscoutAddressNativeTokenData {
+export interface BlockscoutNativeTokenData {
   address: string
   decimals: string
   name: string

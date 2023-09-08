@@ -16,7 +16,7 @@ import { getTokenAllowList } from '../tokens';
 import { CheckoutConfiguration } from '../config';
 import {
   Blockscout,
-  BlockscoutAddressTokens,
+  BlockscoutTokens,
   BlockscoutTokenType,
 } from '../client';
 
@@ -107,11 +107,11 @@ export const getIndexerBalance = async (
   const tokenType = BlockscoutTokenType.ERC20;
   // Given that the widgets aren't yet designed to support pagination,
   // fetch all the possible tokens associated to a given wallet address.
-  let resp: BlockscoutAddressTokens | undefined;
+  let resp: BlockscoutTokens | undefined;
   try {
     do {
       // eslint-disable-next-line no-await-in-loop
-      resp = await blockscoutClient.getAddressTokens({
+      resp = await blockscoutClient.getTokensByWalletAddress({
         walletAddress,
         tokenType,
         nextPage: resp?.next_page_params,
@@ -127,7 +127,7 @@ export const getIndexerBalance = async (
   }
 
   try {
-    const respNative = await blockscoutClient.getAddressNativeTokens({ walletAddress });
+    const respNative = await blockscoutClient.getNativeTokenByWalletAddress({ walletAddress });
     items.push(respNative);
   } catch (err: any) {
     throw new CheckoutError(
