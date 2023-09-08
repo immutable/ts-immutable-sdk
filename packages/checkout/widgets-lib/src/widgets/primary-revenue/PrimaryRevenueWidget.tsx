@@ -94,7 +94,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
     }
   }, [checkout, provider]);
 
-  // FIXME: Inteegrate Smart Checkout to check balances
+  // TODO: Integrate Smart Checkout to check balances
   const handleCheckBalances = useCallback(async () => {
     if (!checkout || !provider) return false;
 

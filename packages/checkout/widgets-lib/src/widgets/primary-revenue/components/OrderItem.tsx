@@ -1,11 +1,9 @@
 import {
-  //  Box, Body,
   MenuItem,
 } from '@biom3/react';
 import { MergedItemsDetails } from '../hooks/useMergeItemsInfo';
 
 export interface OrderItemProps {
-  // FIXME: add type
   item: MergedItemsDetails;
 }
 
