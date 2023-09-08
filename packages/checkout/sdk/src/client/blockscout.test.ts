@@ -2,7 +2,7 @@
 import axios, { HttpStatusCode } from 'axios';
 import {
   BLOCKSCOUT_CHAIN_URL_MAP,
-  ChainId,
+  ChainId, IMX_ADDRESS_ZKEVM,
 } from '../types';
 import { Blockscout } from './blockscout';
 import {
@@ -29,7 +29,7 @@ describe('Blockscout', () => {
     });
   });
 
-  describe('getAddressTokens', () => {
+  describe('getTokensByWalletAddress', () => {
     it('success', async () => {
       const mockResponse = {
         status: 200,
@@ -53,6 +53,23 @@ describe('Blockscout', () => {
                 token_instance: null,
                 value: '3000000000000000000',
               },
+              {
+                token: {
+                  address: IMX_ADDRESS_ZKEVM,
+                  circulating_market_cap: '639486814.4877648',
+                  decimals: '18',
+                  exchange_rate: '0.568914',
+                  holders: '71451',
+                  icon_url: 'https://assets.coingecko.com',
+                  name: 'Immutable X',
+                  symbol: 'IMX',
+                  total_supply: '2000000000000000000000000000',
+                  type: 'ERC-20',
+                },
+                token_id: null,
+                token_instance: null,
+                value: '3000000000000000000',
+              },
             ],
             next_page_params: null,
           },
@@ -61,8 +78,14 @@ describe('Blockscout', () => {
 
       const token = BlockscoutTokenType.ERC20;
       const client = new Blockscout({ chainId: ChainId.IMTBL_ZKEVM_TESTNET });
-      const resp = await client.getTokensByWalletAddress({ walletAddress: '0x1234567890', tokenType: token });
+      const resp = await client.getTokensByWalletAddress(
+        {
+          walletAddress: '0x1234567890',
+          tokenType: token,
+        },
+      );
 
+      // should not contain native token data
       expect(resp.items.length).toEqual(1);
       expect(resp.items[0].value).toEqual('3000000000000000000');
       expect(resp.items[0].token.address).toEqual('0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF');
