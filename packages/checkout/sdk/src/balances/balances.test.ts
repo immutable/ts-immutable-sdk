@@ -415,44 +415,61 @@ describe('balances', () => {
       ]);
     });
 
-    it('should call getIndexerBalance and throw error', async () => {
-      getTokensByWalletAddressMock = jest.fn().mockRejectedValue({ code: HttpStatusCode.Forbidden, message: 'test' });
+    const testcases = [{
+      errorMessage: 'test',
+      expectedErrorMessage: 'test',
+    },
+    {
+      errorMessage: '',
+      expectedErrorMessage: 'InternalServerError | getTokensByWalletAddress',
+    },
+    {
+      errorMessage: undefined,
+      expectedErrorMessage: 'InternalServerError | getTokensByWalletAddress',
+    }];
 
-      (Blockscout as unknown as jest.Mock).mockReturnValue({
-        getTokensByWalletAddress: getTokensByWalletAddressMock,
-      });
-
-      const chainId = Object.keys(BLOCKSCOUT_CHAIN_URL_MAP)[0] as unknown as ChainId;
-      let message;
-      let type;
-      let data;
-      try {
-        await getAllBalances(
-          {
-            remote: {
-              getTokensConfig: () => ({
-                blockscout: true,
-              }),
-            },
-            networkMap: testCheckoutConfig.networkMap,
-          } as unknown as CheckoutConfiguration,
-          jest.fn() as unknown as Web3Provider,
-          '0xabc123', // use unique wallet address to prevent cached data
-          chainId,
+    testcases.forEach((testcase) => {
+      it('should call getIndexerBalance and throw error', async () => {
+        getTokensByWalletAddressMock = jest.fn().mockRejectedValue(
+          { code: HttpStatusCode.Forbidden, message: testcase.errorMessage },
         );
-      } catch (err: any) {
-        message = err.message;
-        type = err.type;
-        data = err.data;
-      }
 
-      expect(getTokensByWalletAddressMock).toHaveBeenCalledTimes(1);
+        (Blockscout as unknown as jest.Mock).mockReturnValue({
+          getTokensByWalletAddress: getTokensByWalletAddressMock,
+        });
 
-      expect(message).toEqual('test');
-      expect(type).toEqual(CheckoutErrorType.GET_INDEXER_BALANCE_ERROR);
-      expect(data).toEqual({
-        code: HttpStatusCode.Forbidden,
-        message: 'test',
+        const chainId = Object.keys(BLOCKSCOUT_CHAIN_URL_MAP)[0] as unknown as ChainId;
+        let message;
+        let type;
+        let data;
+        try {
+          await getAllBalances(
+            {
+              remote: {
+                getTokensConfig: () => ({
+                  blockscout: true,
+                }),
+              },
+              networkMap: testCheckoutConfig.networkMap,
+            } as unknown as CheckoutConfiguration,
+            jest.fn() as unknown as Web3Provider,
+            '0xabc123', // use unique wallet address to prevent cached data
+            chainId,
+          );
+        } catch (err: any) {
+          message = err.message;
+          type = err.type;
+          data = err.data;
+        }
+
+        expect(getTokensByWalletAddressMock).toHaveBeenCalledTimes(1);
+
+        expect(message).toEqual(testcase.expectedErrorMessage);
+        expect(type).toEqual(CheckoutErrorType.GET_INDEXER_BALANCE_ERROR);
+        expect(data).toEqual({
+          code: HttpStatusCode.Forbidden,
+          message: testcase.errorMessage,
+        });
       });
     });
   });

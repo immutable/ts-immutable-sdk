@@ -120,7 +120,7 @@ export const getIndexerBalance = async (
     } while (resp.next_page_params);
   } catch (err: any) {
     throw new CheckoutError(
-      err.message || 'InternalServerError | getAddressTokens',
+      err.message || 'InternalServerError | getTokensByWalletAddress',
       CheckoutErrorType.GET_INDEXER_BALANCE_ERROR,
       err,
     );
@@ -131,7 +131,7 @@ export const getIndexerBalance = async (
     items.push(respNative);
   } catch (err: any) {
     throw new CheckoutError(
-      err.message || 'InternalServerError | getAddressNativeTokens',
+      err.message || 'InternalServerError | getNativeTokenByWalletAddress',
       CheckoutErrorType.GET_INDEXER_BALANCE_ERROR,
       err,
     );

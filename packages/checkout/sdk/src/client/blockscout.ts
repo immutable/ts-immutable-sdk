@@ -87,7 +87,7 @@ export class Blockscout {
    * getTokensByWalletAddress fetches the list of tokens (by type) owned by the wallet address.
    * @param walletAddress wallet address
    * @param tokenType token type
-   * @param nextPage parameters for the next page, to be provided along side walletAddress and tokenType
+   * @param nextPage parameters for the next page, to be provided alongside walletAddress and tokenType
    * @returns list of tokens given the wallet address and the token types
    */
   public async getTokensByWalletAddress(params: {
@@ -112,7 +112,7 @@ export class Blockscout {
       }
 
       // To get around an issue with native tokens being an ERC-20, there is the need
-      // to remove IMX from `resp` and add it back in using getAddressNativeTokens.
+      // to remove IMX from `resp` and add it back in using getNativeTokenByWalletAddress.
       // This has affected some of the early wallets, and it might not be an issue in mainnet
       // however, let's enforce it.
       const data = {
