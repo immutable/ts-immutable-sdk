@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 
 import { useCallback, useContext, useEffect } from 'react';
-import { Body, Box } from '@biom3/react';
+import { Box, Heading } from '@biom3/react';
 
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
@@ -103,32 +103,30 @@ export function PaymentMethods(props: PaymentMethodsProps) {
   return (
     <SimpleLayout
       testId="payment-methods"
-      header={(
-        <HeaderNavigation
-          title={header.heading}
-          onCloseButtonClick={() => {}}
-        />
-      )}
+      header={<HeaderNavigation onCloseButtonClick={() => {}} />}
       footer={<FooterLogo />}
     >
       <Box
+        id="payment-methods-content"
         sx={{
           display: 'flex',
           flexDirection: 'column',
           paddingX: 'base.spacing.x2',
-          rowGap: 'base.spacing.x9',
+          paddingY: 'base.spacing.x8',
+          rowGap: 'base.spacing.x4',
         }}
       >
-        <Body
+        <Heading
           size="small"
           sx={{
-            color: 'base.color.text.secondary',
-            paddingX: 'base.spacing.x2',
+            paddingX: 'base.spacing.x4',
           }}
         >
-          {header.caption}
-        </Body>
-        <PaymentOptions onClick={handleOptionClick} />
+          {header.heading}
+        </Heading>
+        <Box sx={{ paddingX: 'base.spacing.x2' }}>
+          <PaymentOptions onClick={handleOptionClick} />
+        </Box>
       </Box>
     </SimpleLayout>
   );
