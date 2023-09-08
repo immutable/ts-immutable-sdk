@@ -1,4 +1,4 @@
-import { MenuItem, LogoProps } from '@biom3/react';
+import { IconProps, MenuItem } from '@biom3/react';
 
 import { text } from '../../../resources/text/textConfig';
 import { PrimaryRevenueWidgetViews } from '../../../context/view-context/PrimaryRevenueViewContextTypes';
@@ -13,23 +13,21 @@ export function PaymentOption(props: PaymentOptionProps) {
   const { options } = text.views[PrimaryRevenueWidgetViews.PAYMENT_METHODS];
   const optionText = options[type];
 
-  const logo: Record<string, LogoProps['logo']> = {
-    [PrimaryRevenueWidgetViews.PAY_WITH_CRYPTO]: 'PassportSymbol',
-    [PrimaryRevenueWidgetViews.PAY_WITH_CARD]: 'ImmutableSymbol',
+  const icon: Record<string, IconProps['icon']> = {
+    [PrimaryRevenueWidgetViews.PAY_WITH_CRYPTO]: 'Coins', // FIXME: find icon for bank card
+    [PrimaryRevenueWidgetViews.PAY_WITH_CARD]: 'Coins',
   };
 
   if (!optionText) return null;
 
   return (
-    <MenuItem size="medium" emphasized onClick={() => onClick(type)}>
-      <MenuItem.FramedLogo
-        logo={logo[type]}
-        sx={{
-          width: 'base.icon.size.500',
-          backgroundColor: 'base.color.translucent.emphasis.200',
-          borderRadius: 'base.borderRadius.x2',
-        }}
-      />
+    <MenuItem
+      size="medium"
+      emphasized
+      onClick={() => onClick(type)}
+      sx={{ marginBottom: 'base.spacing.x1' }}
+    >
+      <MenuItem.FramedIcon icon={icon[type]} />
       <MenuItem.Label size="medium">{optionText.heading}</MenuItem.Label>
       <MenuItem.IntentIcon />
       <MenuItem.Caption>{optionText.caption}</MenuItem.Caption>
