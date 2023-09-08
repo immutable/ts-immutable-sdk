@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { FactoryConfiguration, Factory, GetPresetsResponse, ZKEVM_DEVNET, GetUnsignedDeployPresetTxRequest, ZKEVM_TESTNET } from '@imtbl/factory-sdk';
+import { FactoryConfiguration, Factory, GetPresetsResponse, ZKEVM_DEVNET, GetUnsignedDeployPresetTxRequest, ZKEVM_TESTNET } from '@imtbl/factory-sdk/index';
 import { ethers } from 'ethers';
 
 async function main() {

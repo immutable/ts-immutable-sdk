@@ -35,6 +35,7 @@
     "@imtbl/erc20": "0.0.0",
     "@imtbl/erc721": "0.0.0",
     "@imtbl/erc721-mint-by-id": "0.0.0",
+    "@imtbl/factory-sdk": "0.0.0",
     "@imtbl/generated-clients": "0.0.0",
     "@imtbl/guardian": "0.0.0",
     "@imtbl/immutablex-client": "0.0.0",
@@ -94,6 +95,10 @@
     "./checkout_sdk": {
       "types": "./dist/checkout_sdk.d.ts",
       "import": "./dist/checkout_sdk.js"
+    },
+    "./factory": {
+      "types": "./dist/factory.d.ts",
+      "import": "./dist/factory.js"
     },
     "./checkout_widgets": {
       "types": "./dist/checkout_widgets.d.ts",

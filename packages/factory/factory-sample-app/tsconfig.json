@@ -18,10 +18,10 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "baseUrl": ".",
+    "baseUrl": "./",
     "paths": {
       "@/*": [
-        "./src/*",
+        "./src/*"
       ],
       "@imtbl/factory-sdk/*": [
         "../sdk/dist/*"
