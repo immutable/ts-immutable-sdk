@@ -56,7 +56,6 @@ export function OnRampWidget(props: OnRampWidgetProps) {
 
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
-  const [walletAddress, setWalletAddress] = useState('');
   const [emailAddress, setEmailAddress] = useState<string | undefined>(undefined);
   const [tokenAddress, setTokenAddress] = useState(contractAddress);
 
@@ -82,7 +81,6 @@ export function OnRampWidget(props: OnRampWidgetProps) {
       if (!provider) return;
 
       const userWalletAddress = await provider.getSigner().getAddress();
-      setWalletAddress(userWalletAddress);
       const isPassportUser = isPassportProvider(provider);
       let userInfo:UserProfile | undefined;
       if (isPassportUser && passport) {
@@ -182,7 +180,6 @@ export function OnRampWidget(props: OnRampWidgetProps) {
         && viewState.view.type !== OnRampWidgetViews.FAIL
         ) && (
         <OnRampMain
-          walletAddress={walletAddress}
           passport={passport}
           email={emailAddress}
           showIframe={showIframe}

@@ -23,7 +23,6 @@ const transakIframeId = 'transak-iframe';
 const transakOrigin = 'transak.com';
 const IN_PROGRESS_VIEW_DELAY_MS = 1200;
 interface OnRampProps {
-  walletAddress?: string;
   email?: string;
   showIframe: boolean;
   tokenAmount?: string;
@@ -31,7 +30,7 @@ interface OnRampProps {
   passport?: Passport;
 }
 export function OnRampMain({
-  walletAddress, passport, email, showIframe, tokenAmount, tokenAddress,
+  passport, email, showIframe, tokenAmount, tokenAddress,
 }: OnRampProps) {
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
@@ -49,7 +48,7 @@ export function OnRampMain({
 
   const { track } = useAnalytics();
 
-  const trackSegmentEvents = (eventData: any) => {
+  const trackSegmentEvents = async (eventData: any, walletAddress: string) => {
     const miscProps = {
       userId: walletAddress,
       isPassportWallet: isPassport,
@@ -182,6 +181,8 @@ export function OnRampMain({
   useEffect(() => {
     if (!checkout || !provider) return;
 
+    let userWalletAddress = '';
+
     (async () => {
       const params = {
         exchangeType: ExchangeType.ONRAMP,
@@ -192,6 +193,7 @@ export function OnRampMain({
       };
 
       setWidgetUrl(await checkout.createFiatRampUrl(params));
+      userWalletAddress = await provider!.getSigner().getAddress();
     })();
 
     const domIframe:HTMLIFrameElement = document.getElementById(transakIframeId) as HTMLIFrameElement;
@@ -201,7 +203,7 @@ export function OnRampMain({
     const handleTransakEvents = (event: any) => {
       if (event.source === domIframe.contentWindow
         && event.origin.toLowerCase().includes(transakOrigin)) {
-        trackSegmentEvents(event.data);
+        trackSegmentEvents(event.data, userWalletAddress);
         transakEventHandler(event.data);
       }
     };
