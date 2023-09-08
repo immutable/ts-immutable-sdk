@@ -1,15 +1,17 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { PopulatedTransaction } from 'ethers';
 import { CheckoutConfiguration } from '../../config';
-import { CancelResult } from '../../types/cancel';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import * as instance from '../../instance';
+import { signFulfilmentTransactions } from '../actions';
+import { CancelResponse, CancelStatusType } from '../../types';
+import { SignTransactionStatusType } from '../actions/types';
 
 export const cancel = async (
   config: CheckoutConfiguration,
   provider: Web3Provider,
   orderId: string,
-): Promise<CancelResult> => {
+): Promise<CancelResponse> => {
   let unsignedCancelOrderTransaction: PopulatedTransaction;
   try {
     const offererAddress = await provider.getSigner().getAddress();
@@ -30,7 +32,22 @@ export const cancel = async (
     );
   }
 
+  const result = await signFulfilmentTransactions(provider, [unsignedCancelOrderTransaction]);
+  if (result.type === SignTransactionStatusType.FAILED) {
+    return {
+      orderId,
+      status: {
+        type: CancelStatusType.FAILED,
+        transactionHash: result.transactionHash,
+        reason: result.reason,
+      },
+    };
+  }
+
   return {
-    unsignedCancelOrderTransaction,
+    orderId,
+    status: {
+      type: CancelStatusType.SUCCESS,
+    },
   };
 };
