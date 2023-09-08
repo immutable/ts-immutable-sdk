@@ -15,6 +15,7 @@ const releaseType = process.env.RELEASE_TYPE || 'alpha';
 // Generate the index.ts file contents based on the release type
 let indexFileContent = '';
 Object.keys(moduleData.modules).forEach((moduleName) => {
+  const exportName = moduleName.replace('/', '_');
   const moduleReleaseType = moduleData.modules[moduleName];
 
   if (
@@ -22,7 +23,7 @@ Object.keys(moduleData.modules).forEach((moduleName) => {
     || (releaseType !== 'alpha' && moduleReleaseType === 'prod')
   ) {
     // Split underscores and capitalize each word from the second
-    const moduleNameCapitalized = moduleName.split('_')
+    const moduleNameCapitalized = exportName.split('_')
       .map((part, index) => {
         if (index === 0) {
           return part;

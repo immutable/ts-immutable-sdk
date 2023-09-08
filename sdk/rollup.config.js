@@ -40,7 +40,7 @@ const getFileBuild = (inputFilename) => [
   {
     input: `./src/${inputFilename}.ts`,
     output: {
-      dir: 'dist',
+      file: `./dist/${inputFilename}.js`,
       format: 'es',
     },
     plugins: [

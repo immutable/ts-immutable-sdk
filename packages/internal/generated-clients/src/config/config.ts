@@ -61,7 +61,7 @@ export type MultiRollupAPIConfiguration = {
 export const multiRollupConfig = {
   getProduction: (): MultiRollupAPIConfiguration => ({
     indexer: createConfig({
-      basePath: 'https://indexer-mr.imtbl.com',
+      basePath: 'https://api.x.immutable.com',
     }),
     orderBook: createConfig({
       basePath: 'https://order-book-mr.imtbl.com',

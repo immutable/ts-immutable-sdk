@@ -38,7 +38,7 @@ export const createAPIConfiguration = ({
 
 const production = (): mr.Configuration =>
   createAPIConfiguration({
-    basePath: 'https://indexer-mr.imtbl.com',
+    basePath: 'https://api.x.immutable.com',
   });
 
 const sandbox = (): mr.Configuration =>

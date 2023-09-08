@@ -3473,9 +3473,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/erc20@0.0.0, @imtbl/erc20@workspace:packages/erc20":
+"@imtbl/erc20@0.0.0, @imtbl/erc20@workspace:packages/contracts/erc20":
   version: 0.0.0-use.local
-  resolution: "@imtbl/erc20@workspace:packages/erc20"
+  resolution: "@imtbl/erc20@workspace:packages/contracts/erc20"
   dependencies:
     "@rollup/plugin-typescript": ^11.0.0
     "@swc/jest": ^0.2.24
@@ -3484,9 +3484,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/erc721-mint-by-id@0.0.0, @imtbl/erc721-mint-by-id@workspace:packages/erc721-mint-by-id":
+"@imtbl/erc721-mint-by-id@0.0.0, @imtbl/erc721-mint-by-id@workspace:packages/contracts/erc721-mint-by-id":
   version: 0.0.0-use.local
-  resolution: "@imtbl/erc721-mint-by-id@workspace:packages/erc721-mint-by-id"
+  resolution: "@imtbl/erc721-mint-by-id@workspace:packages/contracts/erc721-mint-by-id"
   dependencies:
     "@imtbl/config": 0.0.0
     "@imtbl/contracts": 0.0.0
@@ -3498,9 +3498,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/erc721@0.0.0, @imtbl/erc721@workspace:packages/erc721":
+"@imtbl/erc721@0.0.0, @imtbl/erc721@workspace:packages/contracts/erc721":
   version: 0.0.0-use.local
-  resolution: "@imtbl/erc721@workspace:packages/erc721"
+  resolution: "@imtbl/erc721@workspace:packages/contracts/erc721"
   dependencies:
     "@imtbl/config": 0.0.0
     "@imtbl/contracts": 0.0.0
