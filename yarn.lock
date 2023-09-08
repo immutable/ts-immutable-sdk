@@ -1887,18 +1887,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/design-tokens@npm:0.2.0-beta":
-  version: 0.2.0-beta
-  resolution: "@biom3/design-tokens@npm:0.2.0-beta"
+"@biom3/design-tokens@npm:0.2.4-beta":
+  version: 0.2.4-beta
+  resolution: "@biom3/design-tokens@npm:0.2.4-beta"
   dependencies:
     lodash.get: ^4.4.2
-  checksum: 9c2f415f9c4ccd773810c3cea1fc843f1f673734c239466b7746864f5a45d2ba9681d22c9446259786bdff7befc93a2c261a08ab6138d48a35f4944f09792267
+  checksum: a68500472c922c5456ce19ab8d3676e72a11cc92e165291f5bf985e77b8095eddf1b93504ae16150171dfe800c84612e46df5d91f2b343efa5ee4d647c9aa0f4
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.9.7-beta":
-  version: 0.9.7-beta
-  resolution: "@biom3/react@npm:0.9.7-beta"
+"@biom3/react@npm:^0.9.17-beta":
+  version: 0.9.17-beta
+  resolution: "@biom3/react@npm:0.9.17-beta"
   dependencies:
     "@biom3/design-tokens": "*"
     "@emotion/css": ^11.11.2
@@ -1914,8 +1914,8 @@ __metadata:
     react: ^18.2.0
     react-dom: ^18.2.0
     react-is: ^18.2.0
-    ts-deepmerge: ^5.0.0
-  checksum: afdf3be649d5a45c55b9f70a2c8726715237c5dc15e4fbd0eba71b4c7d1c67b8674d2f371b94b32120f2c00c1340792b4800066895e2bcd7b8bd106ee9df2bde
+    ts-deepmerge: ^6.2.0
+  checksum: c5aff71ae42989b2e3509a2798c579866c7728c31fefa2d42b877a041cc2ab0c2a0a75c7bd49b9053b6709c20a3ea0ead92174f01fa8cdfee52ed8f84963aab2
   languageName: node
   linkType: hard
 
@@ -3054,7 +3054,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-sdk-sample-app@workspace:packages/checkout/sdk-sample-app"
   dependencies:
-    "@biom3/react": ^0.9.7-beta
+    "@biom3/react": ^0.9.17-beta
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/config": 0.0.0
     "@svgr/webpack": ^8.0.1
@@ -3114,8 +3114,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-widgets-lib@workspace:packages/checkout/widgets-lib"
   dependencies:
-    "@biom3/design-tokens": 0.2.0-beta
-    "@biom3/react": ^0.9.7-beta
+    "@biom3/design-tokens": 0.2.4-beta
+    "@biom3/react": ^0.9.17-beta
     "@ethersproject/providers": ^5.7.2
     "@imtbl/bridge-sdk": 0.0.0
     "@imtbl/checkout-sdk": 0.0.0
@@ -3160,8 +3160,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-widgets-sample-app@workspace:packages/checkout/widgets-sample-app"
   dependencies:
-    "@biom3/design-tokens": 0.2.0-beta
-    "@biom3/react": ^0.9.7-beta
+    "@biom3/design-tokens": 0.2.4-beta
+    "@biom3/react": ^0.9.17-beta
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
@@ -3336,8 +3336,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/economy-building-blocks-playground@workspace:packages/internal/economy-building-blocks/playground"
   dependencies:
-    "@biom3/design-tokens": 0.2.0-beta
-    "@biom3/react": ^0.9.7-beta
+    "@biom3/design-tokens": 0.2.4-beta
+    "@biom3/react": ^0.9.17-beta
     "@imtbl/blockchain-data": 0.0.0
     "@imtbl/passport": 0.0.0
     "@imtbl/sdk": 0.0.0
@@ -3624,8 +3624,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/passport-sdk-sample-app@workspace:packages/passport/sdk-sample-app"
   dependencies:
-    "@biom3/design-tokens": 0.2.0-beta
-    "@biom3/react": ^0.9.7-beta
+    "@biom3/design-tokens": 0.2.4-beta
+    "@biom3/react": ^0.9.17-beta
     "@imtbl/config": 0.0.0
     "@imtbl/core-sdk": ^2.0.2
     "@imtbl/immutablex-client": 0.0.0
@@ -25398,7 +25398,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "sample-app@workspace:packages/provider/src/sample-app"
   dependencies:
-    "@biom3/react": ^0.9.7-beta
+    "@biom3/react": ^0.9.17-beta
     "@imtbl/core-sdk": ^2.0.2
     "@imtbl/sdk": 0.0.0
     "@svgr/webpack": ^8.0.1
@@ -27503,10 +27503,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ts-deepmerge@npm:^5.0.0":
-  version: 5.0.0
-  resolution: "ts-deepmerge@npm:5.0.0"
-  checksum: 251557d72a4999fb70edf57e6b3d5afa129a6fdd62d6b06c57de3a931fa45740d3193b2b914632def85ae99f6a1f78657707397811108f3af5f3dbc64ea3d7fc
+"ts-deepmerge@npm:^6.2.0":
+  version: 6.2.0
+  resolution: "ts-deepmerge@npm:6.2.0"
+  checksum: 88014409051cf614c5cd26c60eb2605a59b0b98896609b0483503083a2727362409b1db9b7e4bf4446733396881f32cd504ef8141dd448e38304dcdf1f9d39d0
   languageName: node
   linkType: hard
 
