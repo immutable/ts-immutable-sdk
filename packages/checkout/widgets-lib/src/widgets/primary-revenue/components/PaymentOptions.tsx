@@ -6,8 +6,8 @@ import { PaymentOption } from './PaymentOption';
 import { PrimaryRevenueWidgetViews } from '../../../context/view-context/PrimaryRevenueViewContextTypes';
 
 const defaultPaymentOptions: PrimaryRevenueWidgetViews[] = [
-  PrimaryRevenueWidgetViews.PAY_WITH_CRYPTO,
   PrimaryRevenueWidgetViews.PAY_WITH_CARD,
+  PrimaryRevenueWidgetViews.PAY_WITH_CRYPTO,
 ];
 
 export interface PaymentOptionsProps {
