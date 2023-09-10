@@ -58,6 +58,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
   const { config, sendCloseEventOverride, params } = props;
   const { targetLayer, web3Provider, passport } = params ?? {}; // nullish operator handles if params is undefined
   const { deepLink = ConnectWidgetViews.CONNECT_WALLET } = props;
+
   const { environment, theme } = config;
   const errorText = text.views[SharedViews.ERROR_VIEW].actionText;
 

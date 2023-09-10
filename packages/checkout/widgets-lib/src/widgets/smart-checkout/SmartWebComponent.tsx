@@ -64,7 +64,7 @@ export class ImmutableSmart extends ImmutableWebComponent {
     const params: SmartWidgetParams = {
       fromContractAddress: this.fromContractAddress,
       amount: this.amount,
-      connectLoaderParams,
+      // connectLoaderParams,
     };
 
     if (!this.reactRoot) {

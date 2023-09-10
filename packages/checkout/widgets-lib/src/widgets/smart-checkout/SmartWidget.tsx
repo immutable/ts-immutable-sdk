@@ -4,19 +4,23 @@ import {
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 
 import {
-  useContext, useEffect, useMemo, useReducer,
+  useCallback,
+  useContext, useEffect, useMemo, useReducer, useState,
 } from 'react';
 
-import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
+import { ConnectEventType, ConnectionSuccess, IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
+
 import {
   ConnectTargetLayer,
-  WidgetTheme,
-  getL1ChainId,
-  getL2ChainId,
+  // ConnectTargetLayer,
+  WidgetTheme, getL1ChainId, getL2ChainId,
+  // getL1ChainId,
+  // getL2ChainId,
 } from '../../lib';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
   SharedViews,
+  View,
   ViewActions,
   ViewContext, initialViewState, viewReducer,
 } from '../../context/view-context/ViewContext';
@@ -24,22 +28,28 @@ import {
   SmartContext, smartReducer, initialSmartState,
 } from './context/SmartContext';
 
-import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
-import { ConnectLoader, ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
+import {
+  ConnectLoaderActions,
+  ConnectLoaderContext,
+} from '../../context/connect-loader-context/ConnectLoaderContext';
+// import { ConnectLoader, ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
 import { BridgeWidget, BridgeWidgetParams } from '../bridge/BridgeWidget';
-import { sendBridgeWidgetCloseEvent } from '../bridge/BridgeWidgetEvents';
+// import { sendBridgeWidgetCloseEvent } from '../bridge/BridgeWidgetEvents';
 import { text } from '../../resources/text/textConfig';
 import { LoadingView } from '../../views/loading/LoadingView';
-import { SmartWidgetViews } from '../../context/view-context/SwapViewContextType';
+import { SmartWidgetViews } from '../../context/view-context/SmartViewContextType';
 import { SwapWidget, SwapWidgetParams } from '../swap/SwapWidget';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
 import { SimpleTextBody } from '../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../components/Footer/FooterButton';
 import { SmartCheckoutHero } from '../../components/Hero/SmartCheckoutHero';
-import { sendSwapWidgetCloseEvent } from '../swap/SwapWidgetEvents';
+// import { sendSwapWidgetCloseEvent } from '../swap/SwapWidgetEvents';
 import {
   EventTargetActions, EventTargetContext, eventTargetReducer, initialEventTargetState,
 } from '../../context/event-target-context/EventTargetContext';
+import { WalletWidget } from '../wallet/WalletWidget';
+import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
+import { ConnectWidget } from '../connect/ConnectWidget';
 
 export interface SmartWidgetProps {
   params: SmartWidgetParams;
@@ -49,19 +59,20 @@ export interface SmartWidgetProps {
 export interface SmartWidgetParams {
   fromContractAddress?: string;
   amount?: string;
-  connectLoaderParams: ConnectLoaderParams;
 }
 
 export function SmartWidget(props: SmartWidgetProps) {
-  const { params, config } = props;
+  const { config, params } = props;
   const { theme } = config;
   const loadingText = text.views[SharedViews.LOADING_VIEW].text;
 
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
 
+  const [nextView, setNextView] = useState<View | false>(false);
+
   const viewReducerValues = useMemo(() => ({ viewState, viewDispatch }), [viewState, viewDispatch]);
-  const { connectLoaderState } = useContext(ConnectLoaderContext);
-  const { checkout } = connectLoaderState;
+  const { connectLoaderState, connectLoaderDispatch } = useContext(ConnectLoaderContext);
+  const { checkout, provider } = connectLoaderState;
 
   const [smartState, smartDispatch] = useReducer(smartReducer, initialSmartState);
   const smartReducerValues = useMemo(() => ({ smartState, smartDispatch }), [smartState, smartDispatch]);
@@ -74,27 +85,9 @@ export function SmartWidget(props: SmartWidgetProps) {
     ? onLightBase
     : onDarkBase;
 
-  const { connectLoaderParams } = params;
+  console.log('params', params);
 
-  const bridgeLoaderParams: ConnectLoaderParams = {
-    targetLayer: ConnectTargetLayer.LAYER1,
-    walletProvider: connectLoaderParams.walletProvider,
-    web3Provider: connectLoaderParams.web3Provider,
-    passport: connectLoaderParams.passport,
-    allowedChains: [
-      getL1ChainId(checkout!.config),
-    ],
-  };
-
-  const swapLoaderParams: ConnectLoaderParams = {
-    targetLayer: ConnectTargetLayer.LAYER2,
-    walletProvider: connectLoaderParams.walletProvider,
-    web3Provider: connectLoaderParams.web3Provider,
-    passport: connectLoaderParams.passport,
-    allowedChains: [
-      getL2ChainId(checkout!.config),
-    ],
-  };
+  const eventTarget = new EventTarget();
 
   const bridgeParams: BridgeWidgetParams = {
     amount: '1',
@@ -108,24 +101,80 @@ export function SmartWidget(props: SmartWidgetProps) {
 
   };
 
-  const swapClick = () => {
+  const swapClick = useCallback(async () => {
+    if (!checkout || !provider) return;
+    const network = await checkout.getNetworkInfo({
+      provider,
+    });
+
+    if (network.chainId === getL2ChainId(checkout!.config)) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SmartWidgetViews.SMART_SWAP,
+            data: viewState.view.data,
+          },
+        },
+      });
+      return;
+    }
+    setNextView({
+      type: SmartWidgetViews.SMART_SWAP,
+      data: viewState.view.data,
+    });
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
         view: {
-          type: SmartWidgetViews.SMART_SWAP,
+          type: SmartWidgetViews.SWITCH_NETWORK_ZKEVM,
           data: viewState.view.data,
         },
       },
     });
-  };
+    // await switchNetwork(getL2ChainId(checkout!.config));
+  }, [provider]);
 
-  const bridgeClick = () => {
+  const bridgeClick = useCallback(async () => {
+    if (!checkout || !provider) return;
+    const network = await checkout.getNetworkInfo({
+      provider,
+    });
+
+    if (network.chainId === getL1ChainId(checkout!.config)) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SmartWidgetViews.SMART_BRIDGE,
+            data: viewState.view.data,
+          },
+        },
+      });
+      return;
+    }
+    setNextView({
+      type: SmartWidgetViews.SMART_BRIDGE,
+      data: viewState.view.data,
+    });
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
         view: {
-          type: SmartWidgetViews.SMART_BRIDGE,
+          type: SmartWidgetViews.SWITCH_NETWORK_ETH,
+          data: viewState.view.data,
+        },
+      },
+    });
+    // await switchNetwork(getL2ChainId(checkout!.config));
+  }, [provider]);
+
+  const walletClick = () => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: SmartWidgetViews.SMART_WALLET,
           data: viewState.view.data,
         },
       },
@@ -141,47 +190,54 @@ export function SmartWidget(props: SmartWidgetProps) {
     });
   };
 
-  const eventTarget = new EventTarget();
-
   const handleCustomEvent = (event) => {
     console.log('Custom event triggered!', event);
     // Handle the custom event here
   };
 
-  useEffect(() => {
-    // Add a custom event listener when the component mounts
-    eventTarget.addEventListener(IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT, handleCustomEvent);
-    // Remove the custom event listener when the component unmounts
-    return () => {
-      eventTarget.removeEventListener(IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT, handleCustomEvent);
-    };
-  }, []);
-
-  const triggerCustomEvent = () => {
-    // Create and dispatch the custom event
-    const customEvent = new CustomEvent(IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT);
-    eventTarget.dispatchEvent(customEvent);
+  const handleConnectEvent = (event) => {
+    console.log('Connect event triggered!', event);
+    switch (event.detail.type) {
+      case ConnectEventType.SUCCESS: {
+        const eventData = event.detail.data as ConnectionSuccess;
+        connectLoaderDispatch({
+          payload: {
+            type: ConnectLoaderActions.SET_PROVIDER,
+            provider: eventData.provider,
+          },
+        });
+        console.log('nextView', nextView);
+        if (nextView !== false) {
+          viewDispatch({
+            payload: {
+              type: ViewActions.UPDATE_VIEW,
+              view: nextView,
+            },
+          });
+          setNextView(false);
+        }
+        break;
+      }
+      default:
+        console.log('invalid event');
+    }
   };
 
   useEffect(() => {
-    const handleBridgeWidgetEvents = ((event: CustomEvent) => {
-      console.log('EVENT INNER', event);
-    }) as EventListener;
+    // Add a custom event listener when the component mounts
+    eventTarget.addEventListener(IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT, handleConnectEvent);
+    eventTarget.addEventListener(IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT, handleCustomEvent);
+    eventTarget.addEventListener(IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT, handleCustomEvent);
+    eventTarget.addEventListener(IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, handleCustomEvent);
 
-    if (viewReducerValues.viewState.view.type === SmartWidgetViews.SMART_BRIDGE) {
-      window.addEventListener(
-        IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT,
-        handleBridgeWidgetEvents,
-      );
-    }
-
+    // Remove the custom event listener when the component unmounts
     return () => {
-      window.removeEventListener(
-        IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT,
-        handleBridgeWidgetEvents,
-      );
+      eventTarget.removeEventListener(IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT, handleCustomEvent);
+      eventTarget.removeEventListener(IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT, handleCustomEvent);
+      eventTarget.removeEventListener(IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT, handleCustomEvent);
+      eventTarget.removeEventListener(IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, handleCustomEvent);
     };
-  }, [viewReducerValues.viewState.view.type]);
+  }, []);
 
   useEffect(() => {
     eventTargetDispatch({
@@ -224,31 +280,40 @@ export function SmartWidget(props: SmartWidgetProps) {
                 </SimpleTextBody>
               </SimpleLayout>
             )}
-            {viewReducerValues.viewState.view.type === SmartWidgetViews.SMART_BRIDGE && (
-
-              <ConnectLoader
-                params={bridgeLoaderParams}
-                closeEvent={() => sendBridgeWidgetCloseEvent(eventTarget)}
-                widgetConfig={config}
-              >
-                <BridgeWidget
-                  params={bridgeParams}
-                  config={config}
-                />
-              </ConnectLoader>
+            {viewReducerValues.viewState.view.type === SmartWidgetViews.SWITCH_NETWORK_ZKEVM && (
+              <ConnectWidget
+                config={config}
+                params={{
+                  ...params, targetLayer: ConnectTargetLayer.LAYER2, web3Provider: provider,
+                }}
+                deepLink={ConnectWidgetViews.SWITCH_NETWORK}
+              />
             )}
-
+            {viewReducerValues.viewState.view.type === SmartWidgetViews.SWITCH_NETWORK_ETH && (
+              <ConnectWidget
+                config={config}
+                params={{
+                  ...params, targetLayer: ConnectTargetLayer.LAYER1, web3Provider: provider,
+                }}
+                deepLink={ConnectWidgetViews.SWITCH_NETWORK}
+              />
+            )}
+            {viewReducerValues.viewState.view.type === SmartWidgetViews.SMART_BRIDGE && (
+              <BridgeWidget
+                params={bridgeParams}
+                config={config}
+              />
+            )}
             {viewReducerValues.viewState.view.type === SmartWidgetViews.SMART_SWAP && (
-              <ConnectLoader
-                params={swapLoaderParams}
-                closeEvent={() => sendSwapWidgetCloseEvent(eventTarget)}
-                widgetConfig={config}
-              >
-                <SwapWidget
-                  params={swapParams}
-                  config={config}
-                />
-              </ConnectLoader>
+              <SwapWidget
+                params={swapParams}
+                config={config}
+              />
+            )}
+            {viewReducerValues.viewState.view.type === SmartWidgetViews.SMART_WALLET && (
+              <WalletWidget
+                config={config}
+              />
             )}
             <Box sx={{
               width: '430px', backgroundColor: '#0D0D0D', marginTop: '10px', padding: '16px', borderRadius: '8px',
@@ -257,7 +322,7 @@ export function SmartWidget(props: SmartWidgetProps) {
               <Box sx={{ display: 'flex', justifyContent: 'space-between', columnGap: '16px' }}>
                 <Button sx={{ flexGrow: 1 }} onClick={bridgeClick}>BRIDGE</Button>
                 <Button sx={{ flexGrow: 1 }} onClick={swapClick}>SWAP</Button>
-                <Button sx={{ flexGrow: 1 }} onClick={triggerCustomEvent}>EVENT</Button>
+                <Button sx={{ flexGrow: 1 }} onClick={walletClick}>WALLET</Button>
               </Box>
 
             </Box>
