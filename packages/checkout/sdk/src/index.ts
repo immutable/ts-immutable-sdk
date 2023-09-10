@@ -15,6 +15,8 @@ export {
 export type {
   AllowedNetworkConfig,
   BuyParams,
+  BuyResult,
+  CancelParams,
   CheckConnectionParams,
   CheckConnectionResult,
   CheckoutModuleConfiguration,
@@ -39,6 +41,8 @@ export type {
   NetworkFilter,
   NetworkInfo,
   RemoteConfiguration,
+  SellParams,
+  SellResult,
   SendTransactionParams,
   SendTransactionResult,
   SmartCheckoutParams,

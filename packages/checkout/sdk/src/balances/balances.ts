@@ -16,7 +16,7 @@ import { getTokenAllowList } from '../tokens';
 import { CheckoutConfiguration } from '../config';
 import {
   Blockscout,
-  BlockscoutAddressTokens,
+  BlockscoutTokens,
   BlockscoutTokenType,
 } from '../client';
 
@@ -104,18 +104,37 @@ export const getIndexerBalance = async (
   // Hold the items in an array for post-fetching processing
   const items = [];
 
-  const tokenType = [BlockscoutTokenType.ERC20];
+  const tokenType = BlockscoutTokenType.ERC20;
   // Given that the widgets aren't yet designed to support pagination,
   // fetch all the possible tokens associated to a given wallet address.
-  let resp: BlockscoutAddressTokens | undefined;
+  let resp: BlockscoutTokens | undefined;
   try {
     do {
       // eslint-disable-next-line no-await-in-loop
-      resp = await blockscoutClient.getAddressTokens({ walletAddress, tokenType, nextPage: resp?.next_page_params });
+      resp = await blockscoutClient.getTokensByWalletAddress({
+        walletAddress,
+        tokenType,
+        nextPage: resp?.next_page_params,
+      });
       items.push(...resp.items);
     } while (resp.next_page_params);
   } catch (err: any) {
-    throw new CheckoutError(err.message || 'InternalServerError', CheckoutErrorType.GET_INDEXER_BALANCE_ERROR, err);
+    throw new CheckoutError(
+      err.message || 'InternalServerError | getTokensByWalletAddress',
+      CheckoutErrorType.GET_INDEXER_BALANCE_ERROR,
+      err,
+    );
+  }
+
+  try {
+    const respNative = await blockscoutClient.getNativeTokenByWalletAddress({ walletAddress });
+    items.push(respNative);
+  } catch (err: any) {
+    throw new CheckoutError(
+      err.message || 'InternalServerError | getNativeTokenByWalletAddress',
+      CheckoutErrorType.GET_INDEXER_BALANCE_ERROR,
+      err,
+    );
   }
 
   return {
