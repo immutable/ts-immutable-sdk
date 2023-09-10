@@ -207,3 +207,30 @@ export type BalanceDelta = {
   balance: BigNumber;
   formattedBalance: string;
 };
+
+/**
+ * A type representing the Smart Checkout routing options available for a user
+ * if they are configured and enabled (not geo-blocked etc.)
+ */
+export type RoutingOptionsAvailable = {
+  onRamp?: boolean;
+  swap?: boolean;
+  bridge?: boolean;
+};
+
+export type FundingRouteBalanceItem = {
+  balance: BigNumber,
+  formattedBalance: string,
+  token: TokenInfo
+};
+
+export type FundingRouteStep = {
+  type: 'bridge' | 'onRamp' | 'swap';
+  chainId: number,
+  asset: FundingRouteBalanceItem,
+};
+
+export type FundingRoute = {
+  priority: number;
+  steps: FundingRouteStep[]
+};

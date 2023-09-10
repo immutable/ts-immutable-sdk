@@ -33,7 +33,7 @@
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "resolutions": {
-    "@biom3/design-tokens": "0.2.0-beta"
+    "@biom3/design-tokens": "0.2.4-beta"
   },
   "scripts": {
     "build": "wsrun -y 4 -p @imtbl/sdk -p @imtbl/checkout-widgets-lib -e -r --serial build && yarn syncpack:format && yarn wsrun -p @imtbl/sdk -a -m copyBrowserBundles",
@@ -72,6 +72,8 @@
     "packages/internal/dex/sdk",
     "packages/internal/dex/sdk-sample-app",
     "packages/internal/bridge/sdk",
+    "packages/internal/factory/sdk",
+    "packages/internal/factory/factory-sample-app",
     "packages/internal/generated-clients",
     "packages/internal/guardian",
     "packages/internal/bridge/bridge-sample-app",

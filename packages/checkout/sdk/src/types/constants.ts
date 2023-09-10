@@ -3,8 +3,17 @@ import { ChainId, ChainName } from './chains';
 import { TokenInfo } from './tokenInfo';
 
 export const ENV_DEVELOPMENT = 'development' as Environment;
+
 export const IMX_ADDRESS_ZKEVM = '0x0000000000000000000000000000000000001010';
+
 export const DEFAULT_TOKEN_DECIMALS = 18;
+
+const ZKEVM_NATIVE_TOKEN = {
+  name: 'IMX',
+  symbol: 'IMX',
+  decimals: DEFAULT_TOKEN_DECIMALS,
+  address: IMX_ADDRESS_ZKEVM,
+};
 
 /**
  * Base URL for the checkout API based on the environment.
@@ -18,8 +27,34 @@ export const CHECKOUT_API_BASE_URL = {
   [Environment.PRODUCTION]: 'https://checkout-api.immutable.com',
 };
 
-export const BLOCKSCOUT_CHAIN_URL_MAP: { [key: string]: string } = {
-  [ChainId.IMTBL_ZKEVM_TESTNET]: 'https://explorer.testnet.immutable.com',
+/**
+ * Smart Checkout routing default onramp enabled flag
+ */
+export const DEFAULT_ON_RAMP_ENABLED = true;
+
+/**
+ * Smart Checkout routing default swap enabled flag
+ */
+export const DEFAULT_SWAP_ENABLED = true;
+
+/**
+ * Smart Checkout routing default bridge enabled flag
+ */
+export const DEFAULT_BRIDGE_ENABLED = true;
+
+/**
+ * Blockscout API configuration per chain
+ */
+export const BLOCKSCOUT_CHAIN_URL_MAP: {
+  [key: string]: {
+    url: string,
+    nativeToken: TokenInfo
+  }
+} = {
+  [ChainId.IMTBL_ZKEVM_TESTNET]: {
+    url: 'https://explorer.testnet.immutable.com',
+    nativeToken: ZKEVM_NATIVE_TOKEN,
+  },
 };
 
 type NetworkDetails = {
@@ -56,12 +91,7 @@ NetworkDetails
       chainIdHex: `0x${ChainId.IMTBL_ZKEVM_MAINNET.toString(16)}`,
       chainName: ChainName.IMTBL_ZKEVM_MAINNET,
       rpcUrls: ['https://rpc.immutable.com'],
-      nativeCurrency: {
-        name: 'IMX',
-        symbol: 'IMX',
-        decimals: 18,
-        address: IMX_ADDRESS_ZKEVM,
-      },
+      nativeCurrency: ZKEVM_NATIVE_TOKEN,
     },
   ],
 ]);
@@ -92,12 +122,7 @@ NetworkDetails
       chainIdHex: `0x${ChainId.IMTBL_ZKEVM_TESTNET.toString(16)}`,
       chainName: ChainName.IMTBL_ZKEVM_TESTNET,
       rpcUrls: ['https://rpc.testnet.immutable.com'],
-      nativeCurrency: {
-        name: 'IMX',
-        symbol: 'IMX',
-        decimals: 18,
-        address: IMX_ADDRESS_ZKEVM,
-      },
+      nativeCurrency: ZKEVM_NATIVE_TOKEN,
     },
   ],
 ]);
@@ -126,12 +151,7 @@ NetworkDetails
       chainIdHex: `0x${ChainId.IMTBL_ZKEVM_DEVNET.toString(16)}`,
       chainName: ChainName.IMTBL_ZKEVM_DEVNET,
       rpcUrls: ['https://rpc.dev.immutable.com'],
-      nativeCurrency: {
-        name: 'IMX',
-        symbol: 'IMX',
-        decimals: 18,
-        address: IMX_ADDRESS_ZKEVM,
-      },
+      nativeCurrency: ZKEVM_NATIVE_TOKEN,
     },
   ],
 ]);

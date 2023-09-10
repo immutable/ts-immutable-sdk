@@ -13,6 +13,7 @@ interface CancelProps {
 export default function Cancel({ checkout, provider }: CancelProps) {
   const [orderId, setOrderId] = useState<string>('');
   const [orderIdError, setOrderIdError] = useState<any>(null);
+  const [signActions, setSignActions] = useState<boolean>(false);
   const [error, setError] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
 

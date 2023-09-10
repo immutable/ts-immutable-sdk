@@ -9,20 +9,32 @@ import { gasCalculator } from './gas';
 import { BalanceCheckResult } from './balanceCheck/types';
 import { CheckoutConfiguration } from '../config';
 import { balanceCheck } from './balanceCheck';
+import { routingCalculator } from './routing/routingCalculator';
 
 jest.mock('./allowance');
 jest.mock('./gas');
 jest.mock('./balanceCheck');
+jest.mock('./routing/routingCalculator');
 
 describe('smartCheckout', () => {
   let mockProvider: Web3Provider;
 
   beforeEach(() => {
+    jest.resetAllMocks();
     mockProvider = {
       getSigner: jest.fn().mockReturnValue({
         getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
       }),
     } as unknown as Web3Provider;
+
+    (routingCalculator as jest.Mock).mockResolvedValue({
+      availableOptions: [],
+      response: {
+        type: 'NO_ROUTES',
+        message: 'No routes found',
+      },
+      fundingRoutes: [],
+    });
   });
 
   describe('smartCheckout', () => {
