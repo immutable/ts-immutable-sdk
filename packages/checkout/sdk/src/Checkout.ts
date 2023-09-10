@@ -358,6 +358,7 @@ export class Checkout {
       params.provider,
     );
 
+    // console.log('Smart Checkout Params ::', params);
     await smartCheckout.smartCheckout(
       this.config,
       web3Provider,

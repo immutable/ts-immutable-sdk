@@ -5,8 +5,10 @@ import axios, {
 } from 'axios';
 import { BLOCKSCOUT_CHAIN_URL_MAP, ChainId } from '../types';
 import {
-  BlockscoutAddressTokenPagination,
-  BlockscoutAddressTokens,
+  BlockscoutNativeTokenData,
+  BlockscoutToken,
+  BlockscoutTokenPagination,
+  BlockscoutTokens,
   BlockscoutTokenType,
 } from './blockscoutType';
 
@@ -22,6 +24,8 @@ const CACHE_DATA_TTL = 60; // seconds
  */
 export class Blockscout {
   readonly url: string;
+
+  readonly nativeToken: BlockscoutNativeTokenData;
 
   readonly ttl: number;
 
@@ -53,7 +57,16 @@ export class Blockscout {
     ttl?: number
   }) {
     this.chainId = params.chainId;
-    this.url = BLOCKSCOUT_CHAIN_URL_MAP[this.chainId];
+    this.url = BLOCKSCOUT_CHAIN_URL_MAP[this.chainId].url;
+
+    const native = BLOCKSCOUT_CHAIN_URL_MAP[this.chainId].nativeToken;
+    this.nativeToken = {
+      address: native.address ?? '',
+      decimals: native.decimals.toString(),
+      name: native.name,
+      symbol: native.symbol,
+    };
+
     this.cacheMap = {};
     this.ttl = params.ttl !== undefined ? params.ttl : CACHE_DATA_TTL;
   }
@@ -71,19 +84,19 @@ export class Blockscout {
   public static isBlockscoutError = (err: any): boolean => 'code' in err;
 
   /**
-   * getAddressTokens fetches the list of tokens (by type) owned by the wallet address.
+   * getTokensByWalletAddress fetches the list of tokens (by type) owned by the wallet address.
    * @param walletAddress wallet address
-   * @param tokenType token types
-   * @param nextPage parameters for the next page, to be provided along side walletAddress and tokenType
+   * @param tokenType token type
+   * @param nextPage parameters for the next page, to be provided alongside walletAddress and tokenType
    * @returns list of tokens given the wallet address and the token types
    */
-  public async getAddressTokens(params: {
+  public async getTokensByWalletAddress(params: {
     walletAddress: string,
-    tokenType: BlockscoutTokenType[],
-    nextPage?: BlockscoutAddressTokenPagination | null
-  }): Promise<BlockscoutAddressTokens> {
+    tokenType: BlockscoutTokenType,
+    nextPage?: BlockscoutTokenPagination | null
+  }): Promise<BlockscoutTokens> {
     try {
-      let url = `${this.url}/api/v2/addresses/${params.walletAddress}/tokens?type=${params.tokenType.join(',')}`;
+      let url = `${this.url}/api/v2/addresses/${params.walletAddress}/tokens?type=${params.tokenType}`;
       if (params.nextPage) url += `&${new URLSearchParams(params.nextPage as Record<string, string>)}`;
 
       // Cache response data to prevent unnecessary requests
@@ -98,8 +111,59 @@ export class Blockscout {
         });
       }
 
-      this.setCache(url, response);
-      return Promise.resolve(response.data);
+      // To get around an issue with native tokens being an ERC-20, there is the need
+      // to remove IMX from `resp` and add it back in using getNativeTokenByWalletAddress.
+      // This has affected some of the early wallets, and it might not be an issue in mainnet
+      // however, let's enforce it.
+      const data = {
+        items: response.data?.items?.filter(
+          (token: BlockscoutToken) => token.token.address && token.token.address !== this.nativeToken.address,
+        ),
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        next_page_params: response.data?.next_page_params,
+      };
+
+      this.setCache(url, data);
+      return Promise.resolve(data);
+    } catch (err: any) {
+      let code: number = HttpStatusCode.InternalServerError;
+      let message = 'InternalServerError';
+      if (axios.isAxiosError(err)) {
+        code = (err as AxiosError).response?.status || code;
+        message = (err as AxiosError).message;
+      }
+      return Promise.reject({ code, message });
+    }
+  }
+
+  /**
+   * getNativeTokenByWalletAddress fetches the native token owned by the wallet address.
+   * @param walletAddress wallet address
+   * @returns list of tokens given the wallet address and the token types
+   */
+  public async getNativeTokenByWalletAddress(params: { walletAddress: string, }): Promise<BlockscoutToken> {
+    try {
+      const url = `${this.url}/api/v2/addresses/${params.walletAddress}`;
+
+      // Cache response data to prevent unnecessary requests
+      const cached = this.getCache(url) as AxiosResponse;
+      if (cached && cached.status < 400) return Promise.resolve(cached.data);
+
+      const response = await Blockscout.makeHttpRequest(url);
+      if (response.status >= 400) {
+        return Promise.reject({
+          code: response.status,
+          message: response.statusText,
+        });
+      }
+
+      const data = {
+        token: this.nativeToken,
+        value: response.data.coin_balance,
+      };
+
+      this.setCache(url, data);
+      return Promise.resolve(data);
     } catch (err: any) {
       let code: number = HttpStatusCode.InternalServerError;
       let message = 'InternalServerError';
