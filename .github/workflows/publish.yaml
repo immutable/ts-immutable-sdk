@@ -137,7 +137,5 @@ jobs:
         if: contains(github.event.inputs.release_type, 'release') && github.event.inputs.dry_run == 'false'
         run: |
           tempBody=$(mktemp)
-          echo "@${{ github.triggering_actor }} Released SDK version ${{ env.RELEASE_NAME }} 🎉🎉🎉
-          
-          The GitHub release can be found here: ${{ env.RELEASE_URL }}" > $tempBody
-          gh pr comment --body-file $tempBody
+          echo "@${{ github.triggering_actor }} Released SDK version ${{ env.RELEASE_NAME }} 🎉🎉🎉 The GitHub release can be found here: ${{ env.RELEASE_URL }}" > $tempBody
+
