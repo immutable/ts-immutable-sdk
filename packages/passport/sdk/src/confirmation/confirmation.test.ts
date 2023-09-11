@@ -84,4 +84,13 @@ describe('confirmation', () => {
       expect(mockNewWindow.location.href).toEqual('https://passport.sandbox.immutable.com/transaction-confirmation/transaction.html?transactionId=transactionId123&imxEtherAddress=0x1234&chainType=starkex');
     });
   });
+
+  describe('requestMessageConfirmation', () => {
+    it('should open a window when confirmation is required', async () => {
+      const res = await confirmationScreen.requestMessageConfirmation('asd123');
+      confirmationScreen.loading();
+      expect(res.confirmed).toEqual(false);
+      expect(mockNewWindow.location.href).toEqual('https://passport.sandbox.immutable.com/transaction-confirmation/zkevm/message?messageID=asd123');
+    });
+  });
 });
