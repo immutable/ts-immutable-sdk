@@ -126,7 +126,6 @@ export function BridgeWidget(props: BridgeWidgetProps) {
         checkout,
         provider,
         allowTokenListType: TokenFilterTypes.BRIDGE,
-        allowNative: true,
       });
     } catch (err: any) {
       if (DEFAULT_BALANCE_RETRY_POLICY.nonRetryable!(err)) {

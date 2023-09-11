@@ -39,7 +39,6 @@ export function Bridge({ amount, fromContractAddress }: BridgeProps) {
         checkout,
         provider,
         allowTokenListType: TokenFilterTypes.BRIDGE,
-        allowNative: true,
         // Skip retry given that in this case it is not needed;
         // refreshBalances will be, automatically, called again
         // after REFRESH_TOKENS_INTERVAL_MS.

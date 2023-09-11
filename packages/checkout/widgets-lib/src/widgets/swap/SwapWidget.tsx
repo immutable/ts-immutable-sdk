@@ -129,7 +129,6 @@ export function SwapWidget(props: SwapWidgetProps) {
         checkout,
         provider,
         allowTokenListType: TokenFilterTypes.SWAP,
-        allowNative: true,
       });
     } catch (err: any) {
       if (DEFAULT_BALANCE_RETRY_POLICY.nonRetryable!(err)) {

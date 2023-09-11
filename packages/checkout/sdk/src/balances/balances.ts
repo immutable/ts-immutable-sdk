@@ -218,7 +218,7 @@ export const getAllBalances = async (
   }
 
   // This fallback to use ERC20s calls which is a best effort solution
-  // Fails in fetching data form the RCP calls might result in some
+  // Fails in fetching data from the RCP calls might result in some
   // missing data.
   return await getBalances(config, web3Provider, walletAddress, tokens);
 };

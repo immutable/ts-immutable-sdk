@@ -7,7 +7,7 @@ import {
   TokenFilterTypes,
 } from '@imtbl/checkout-sdk';
 import { RetryType, retry } from './retry';
-import { DEFAULT_BALANCE_RETRY_POLICY, IMX_ADDRESS_ZKEVM } from './constants';
+import { DEFAULT_BALANCE_RETRY_POLICY } from './constants';
 
 export type GetAllowedBalancesParamsType = {
   checkout: Checkout,
@@ -29,7 +29,6 @@ export const getAllowedBalances = async ({
   provider,
   allowTokenListType,
   chainId,
-  allowNative = false,
   allowZero = false,
   retryPolicy = DEFAULT_BALANCE_RETRY_POLICY,
 }: GetAllowedBalancesParamsType):Promise<GetAllowedBalancesResultType> => {
@@ -54,9 +53,6 @@ export const getAllowedBalances = async ({
   allowList.tokens.forEach((token) => tokensAddresses.set(token.address || '', true));
 
   const allowedBalances = tokenBalances.balances.filter((balance) => {
-    // Token is native (no address or address is IMX_ADDRESS_ZKEVM) and it is not allow to have native tokens
-    if ((!balance.token.address || balance.token.address === IMX_ADDRESS_ZKEVM) && !allowNative) return false;
-
     // Balance is <= 0 and it is not allow to have zeros
     if (balance.balance.lte(0) && !allowZero) return false;
 
