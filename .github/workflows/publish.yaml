@@ -23,7 +23,7 @@ on:
         default: none
       dry_run:
         type: boolean
-        description: '(Optional) Dry run'
+        description: "(Optional) Dry run"
         required: false
         default: false
 
@@ -66,7 +66,7 @@ jobs:
             revision_upgrade=$( ${{ contains(github.event.inputs.release_type, 'alpha') }} && echo '--revision' || echo '')
             echo $revision
           fi
-          ./.github/scripts/version-up.sh --${{github.event.inputs.release_type }} --$upgrade_type --apply $revision_upgrade
+          ./.github/scripts/version-up.sh --${{ github.event.inputs.release_type }} --$upgrade_type --apply $revision_upgrade
         shell: bash
 
       - name: Install dependencies
@@ -137,7 +137,4 @@ jobs:
         if: contains(github.event.inputs.release_type, 'release') && github.event.inputs.dry_run == 'false'
         run: |
           tempBody=$(mktemp)
-          echo "@${{ github.triggering_actor }} Released SDK version ${{ env.RELEASE_NAME }} 🎉🎉🎉
-
-          The GitHub release can be found here: ${{ env.RELEASE_URL }}" > $tempBody
-          gh pr comment --body-file $tempBody
+          echo "@${{ github.triggering_actor }} Released SDK version ${{ env.RELEASE_NAME }}"
