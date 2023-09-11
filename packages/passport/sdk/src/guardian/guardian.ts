@@ -26,6 +26,10 @@ type GuardianEVMValidationParams = {
   metaTransactions: MetaTransaction[];
 };
 
+type GuardianMessageValidationParams = guardian.MessageEvaluationRequest & {
+  user: UserZkEvm
+};
+
 const transactionRejectedCrossSdkBridgeError = 'Transaction requires confirmation but this functionality is not'
   + ' supported in this environment. Please contact Immutable support if you need to enable this feature.';
 
@@ -232,11 +236,12 @@ export default class GuardianClient {
   }
 
   private async evaluateMessage(
-    { chainID, payload }:guardian.MessageEvaluationRequest,
+    { chainID, payload, user }:GuardianMessageValidationParams,
   ): Promise<guardian.MessageEvaluationResponse> {
     try {
       const messageEvalResponse = await this.messageAPI.evaluateMessage(
         { messageEvaluationRequest: { chainID, payload } },
+        { headers: { Authorization: `Bearer ${user.accessToken}` } },
       );
       return messageEvalResponse.data;
     } catch (error) {
@@ -245,8 +250,8 @@ export default class GuardianClient {
     }
   }
 
-  public async validateMessage({ chainID, payload }: guardian.MessageEvaluationRequest) {
-    const { confirmationRequired, messageId } = await this.evaluateMessage({ chainID, payload });
+  public async validateMessage({ chainID, payload, user }: GuardianMessageValidationParams) {
+    const { messageId, confirmationRequired } = await this.evaluateMessage({ chainID, payload, user });
     if (confirmationRequired && this.crossSdkBridgeEnabled) {
       throw new JsonRpcError(RpcErrorCode.TRANSACTION_REJECTED, transactionRejectedCrossSdkBridgeError);
     }
