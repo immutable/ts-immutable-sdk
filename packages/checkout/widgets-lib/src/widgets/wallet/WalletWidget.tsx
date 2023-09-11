@@ -1,5 +1,4 @@
 import { BiomeCombinedProviders } from '@biom3/react';
-import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
   useContext, useEffect, useMemo, useReducer,
 } from 'react';
@@ -25,47 +24,45 @@ import {
 import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
 import { Settings } from './views/Settings';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { WidgetTheme } from '../../lib';
 import { CoinInfo } from './views/CoinInfo';
 import { TopUpView } from '../../views/top-up/TopUpView';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 import { text } from '../../resources/text/textConfig';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
+import { widgetTheme } from '../../lib/theme';
 
 export interface WalletWidgetProps {
   config: StrongCheckoutWidgetsConfig,
 }
 
 export function WalletWidget(props: WalletWidgetProps) {
-  const { config } = props;
   const errorActionText = text.views[SharedViews.ERROR_VIEW].actionText;
   const loadingText = text.views[SharedViews.LOADING_VIEW].text;
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const {
-    environment, theme, isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
-  } = config;
+    config: {
+      environment, theme, isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
+    },
+  } = props;
 
-  const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
-    ? onLightBase
-    : onDarkBase;
+  const { connectLoaderState: { checkout, provider } } = useContext(ConnectLoaderContext);
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
-  const viewReducerValues = useMemo(
-    () => ({ viewState, viewDispatch }),
-    [viewState, viewDispatch],
-  );
-
-  const { connectLoaderState } = useContext(ConnectLoaderContext);
-  const { checkout, provider } = connectLoaderState;
 
   const [walletState, walletDispatch] = useReducer(
     walletReducer,
     initialWalletState,
   );
+
   const walletReducerValues = useMemo(
     () => ({ walletState, walletDispatch }),
     [walletState, walletDispatch],
   );
+  const viewReducerValues = useMemo(
+    () => ({ viewState, viewDispatch }),
+    [viewState, viewDispatch],
+  );
+  const themeReducerValue = useMemo(() => widgetTheme(theme), [theme]);
 
   /* Set Config into WalletState */
   useEffect(() => {
@@ -139,7 +136,7 @@ export function WalletWidget(props: WalletWidgetProps) {
   };
 
   return (
-    <BiomeCombinedProviders theme={{ base: biomeTheme }}>
+    <BiomeCombinedProviders theme={{ base: themeReducerValue }}>
       <ViewContext.Provider value={viewReducerValues}>
         <CryptoFiatProvider environment={environment}>
           <WalletContext.Provider value={walletReducerValues}>

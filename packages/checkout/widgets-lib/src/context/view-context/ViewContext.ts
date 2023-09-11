@@ -20,9 +20,10 @@ interface LoadingView extends ViewType {
   type: SharedViews.LOADING_VIEW
 }
 
-interface ErrorView extends ViewType {
+export interface ErrorView extends ViewType {
   type: SharedViews.ERROR_VIEW;
   error: Error;
+  tryAgain?: () => Promise<any>
 }
 
 interface TopUpView extends ViewType {

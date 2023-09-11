@@ -1,17 +1,25 @@
 import { BiomeCombinedProviders } from '@biom3/react';
-import React, { useMemo, useReducer } from 'react';
+import React, { useCallback, useMemo, useReducer } from 'react';
 import {
   initialWalletState,
   WalletContext,
   walletReducer, WalletState,
 } from '../context/WalletContext';
+import {
+  CryptoFiatContext, CryptoFiatContextState, CryptoFiatState, FiatSymbols,
+} from '../../../context/crypto-fiat-context/CryptoFiatContext';
 
 export interface TestProps {
   children: React.ReactNode;
   initialStateOverride?: WalletState;
+  cryptoConversionsOverride?: Map<string, number>;
 }
 
-export function WalletWidgetTestComponent({ children, initialStateOverride }: TestProps) {
+export function WalletWidgetTestComponent({
+  children,
+  initialStateOverride,
+  cryptoConversionsOverride,
+}: TestProps) {
   const [walletState, walletDispatch] = useReducer(
     walletReducer,
     initialStateOverride ?? initialWalletState,
@@ -22,10 +30,25 @@ export function WalletWidgetTestComponent({ children, initialStateOverride }: Te
     [walletState, walletDispatch],
   );
 
+  const cryptoFiatState = useMemo(() => ({
+    cryptoFiat: null,
+    fiatSymbol: FiatSymbols.USD,
+    tokenSymbols: [],
+    conversions: cryptoConversionsOverride,
+  } as CryptoFiatState), [cryptoConversionsOverride]);
+
+  const cryptoFiatDispatch = useCallback(() => {}, []);
+
+  const cryptoFiatReducerValues = useMemo(() => (
+    { cryptoFiatState, cryptoFiatDispatch }
+  ), [cryptoFiatState, cryptoFiatDispatch]);
+
   return (
     <BiomeCombinedProviders>
       <WalletContext.Provider value={reducerValues}>
-        {children}
+        <CryptoFiatContext.Provider value={cryptoFiatReducerValues as CryptoFiatContextState}>
+          {children}
+        </CryptoFiatContext.Provider>
       </WalletContext.Provider>
     </BiomeCombinedProviders>
   );

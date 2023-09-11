@@ -75,33 +75,7 @@ describe('token balance tests', () => {
 
     const actualResult = await getTokenBalances(
       checkout,
-      {} as unknown as Web3Provider,
-      ChainId.SEPOLIA,
-      conversions,
-    );
-
-    expect(actualResult.length).toBe(0);
-  });
-
-  it('should return empty array when checkout.getAllBalances throws error', async () => {
-    const mockProvider = {
-      getSigner: jest.fn().mockReturnValue({
-        getAddress: jest.fn().mockResolvedValue('0xaddress'),
-      }),
-    };
-    const checkout = new Checkout({
-      baseConfig: { environment: Environment.PRODUCTION },
-    });
-
-    const conversions = new Map<string, number>([]);
-
-    jest
-      .spyOn(checkout, 'getAllBalances')
-      .mockRejectedValue(new Error('some-err'));
-
-    const actualResult = await getTokenBalances(
-      checkout,
-      mockProvider as unknown as Web3Provider,
+      null as unknown as Web3Provider,
       ChainId.SEPOLIA,
       conversions,
     );

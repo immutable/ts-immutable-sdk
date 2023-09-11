@@ -3,8 +3,9 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { BiomeCombinedProviders } from '@biom3/react';
 import { Checkout } from '@imtbl/checkout-sdk';
-import { useContext, useEffect, useReducer } from 'react';
-import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
+import {
+  useContext, useMemo, useEffect, useReducer,
+} from 'react';
 import { Passport } from '@imtbl/passport';
 import {
   sendCloseWidgetEvent,
@@ -33,13 +34,12 @@ import {
 import { StatusType } from '../../components/Status/StatusType';
 import { StatusView } from '../../components/Status/StatusView';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import {
-  ConnectTargetLayer, getTargetLayerChainId, WidgetTheme,
-} from '../../lib';
+import { ConnectTargetLayer, getTargetLayerChainId } from '../../lib';
 import { SwitchNetworkEth } from './views/SwitchNetworkEth';
 import { ErrorView } from '../../views/error/ErrorView';
 import { text } from '../../resources/text/textConfig';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
+import { widgetTheme } from '../../lib/theme';
 
 export interface ConnectWidgetProps {
   params?: ConnectWidgetParams;
@@ -59,18 +59,26 @@ export function ConnectWidget(props: ConnectWidgetProps) {
   const { targetLayer, web3Provider, passport } = params ?? {}; // nullish operator handles if params is undefined
   const { deepLink = ConnectWidgetViews.CONNECT_WALLET } = props;
   const { environment, theme } = config;
+
   const errorText = text.views[SharedViews.ERROR_VIEW].actionText;
 
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const [connectState, connectDispatch] = useReducer(connectReducer, initialConnectState);
   const { sendCloseEvent, provider, walletProviderName } = connectState;
+
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
   const { view } = viewState;
 
-  const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
-    ? onLightBase
-    : onDarkBase;
+  const connectReducerValues = useMemo(
+    () => ({ connectState, connectDispatch }),
+    [connectState, connectDispatch],
+  );
+  const viewReducerValues = useMemo(
+    () => ({ viewState, viewDispatch }),
+    [viewState, viewDispatch],
+  );
+  const themeReducerValue = useMemo(() => widgetTheme(theme), [theme]);
 
   const networkToSwitchTo = targetLayer ?? ConnectTargetLayer.LAYER2;
 
@@ -128,11 +136,9 @@ export function ConnectWidget(props: ConnectWidgetProps) {
   }, [viewState]);
 
   return (
-    <BiomeCombinedProviders theme={{ base: biomeTheme }}>
-      {/* TODO: The object passed as the value prop to the Context provider changes every render.
-          To fix this consider wrapping it in a useMemo hook. */}
-      <ViewContext.Provider value={{ viewState, viewDispatch }}>
-        <ConnectContext.Provider value={{ connectState, connectDispatch }}>
+    <BiomeCombinedProviders theme={{ base: themeReducerValue }}>
+      <ViewContext.Provider value={viewReducerValues}>
+        <ConnectContext.Provider value={connectReducerValues}>
           <>
             {view.type === SharedViews.LOADING_VIEW && (
               <LoadingView loadingText="Connecting" />

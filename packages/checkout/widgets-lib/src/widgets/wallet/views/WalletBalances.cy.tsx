@@ -17,6 +17,7 @@ import { ConnectionStatus } from '../../../context/connect-loader-context/Connec
 import {
   ConnectLoaderTestComponent,
 } from '../../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
+import { IMX_ADDRESS_ZKEVM } from '../../../lib';
 
 describe('WalletBalances', () => {
   beforeEach(() => {
@@ -32,26 +33,35 @@ describe('WalletBalances', () => {
       getSigner: () => ({
         getAddress: async () => Promise.resolve(''),
       }),
-    } as Web3Provider,
+      getNetwork: async () => ({
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        name: ChainName.IMTBL_ZKEVM_TESTNET,
+      }),
+      provider: {
+        request: () => {},
+      },
+    } as any as Web3Provider,
     connectionStatus: ConnectionStatus.CONNECTED_WITH_NETWORK,
   };
 
-  const baseWalletState: WalletState = {
-    network: {
-      chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-      name: ChainName.IMTBL_ZKEVM_TESTNET,
-      nativeCurrency: {} as unknown as TokenInfo,
-      isSupported: true,
-    },
-    walletProvider: WalletProviderName.METAMASK,
-    tokenBalances: [],
-    supportedTopUps: null,
-  };
+  const cryptoConversions = new Map<string, number>([['eth', 1800], ['imx', 0.75]]);
 
   describe('balances', () => {
+    const baseWalletState: WalletState = {
+      network: {
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        name: ChainName.IMTBL_ZKEVM_TESTNET,
+        nativeCurrency: {} as unknown as TokenInfo,
+        isSupported: true,
+      },
+      walletProvider: WalletProviderName.METAMASK,
+      tokenBalances: [],
+      supportedTopUps: null,
+    };
+
     it('should show balances', () => {
       cy.stub(Checkout.prototype, 'getAllBalances')
-        .as('getAllBalancesStub')
+        .as('getAllBalances')
         .resolves({
           balances: [
             {
@@ -72,7 +82,7 @@ describe('WalletBalances', () => {
                 name: 'ImmutableX',
                 symbol: 'IMX',
                 decimals: 18,
-                address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+                address: IMX_ADDRESS_ZKEVM,
                 icon: '123',
               },
             },
@@ -83,7 +93,58 @@ describe('WalletBalances', () => {
         <ConnectLoaderTestComponent
           initialStateOverride={connectLoaderState}
         >
-          <WalletWidgetTestComponent initialStateOverride={baseWalletState}>
+          <WalletWidgetTestComponent
+            initialStateOverride={baseWalletState}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <WalletBalances />
+          </WalletWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
+      );
+
+      cySmartGet('balance-item-IMX').should('exist');
+      cySmartGet('balance-item-ETH').should('exist');
+    });
+
+    it('should show balances after getAllBalances failure', () => {
+      cy.stub(Checkout.prototype, 'getAllBalances')
+        .as('getAllBalances')
+        .rejects()
+        .resolves({
+          balances: [
+            {
+              balance: BigNumber.from('1000000000000000000'),
+              formattedBalance: '0.1',
+              token: {
+                name: 'ETH',
+                symbol: 'ETH',
+                decimals: 18,
+                address: '',
+                icon: '123',
+              },
+            },
+            {
+              balance: BigNumber.from('10000000000000'),
+              formattedBalance: '0.1',
+              token: {
+                name: 'ImmutableX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: IMX_ADDRESS_ZKEVM,
+                icon: '123',
+              },
+            },
+          ],
+        });
+
+      mount(
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <WalletWidgetTestComponent
+            initialStateOverride={baseWalletState}
+            cryptoConversionsOverride={cryptoConversions}
+          >
             <WalletBalances />
           </WalletWidgetTestComponent>
         </ConnectLoaderTestComponent>,
@@ -96,13 +157,17 @@ describe('WalletBalances', () => {
     it('should show no balances', () => {
       cy.stub(Checkout.prototype, 'getAllBalances')
         .as('getAllBalancesStub')
-        .rejects({});
+        .rejects({})
+        .resolves({ balances: [] });
 
       mount(
         <ConnectLoaderTestComponent
           initialStateOverride={connectLoaderState}
         >
-          <WalletWidgetTestComponent initialStateOverride={baseWalletState}>
+          <WalletWidgetTestComponent
+            initialStateOverride={baseWalletState}
+            cryptoConversionsOverride={cryptoConversions}
+          >
             <WalletBalances />
           </WalletWidgetTestComponent>
         </ConnectLoaderTestComponent>,
@@ -113,40 +178,59 @@ describe('WalletBalances', () => {
   });
 
   describe('move coins gas check', () => {
+    const baseWalletState = {
+      network: {
+        chainId: ChainId.SEPOLIA,
+        name: ChainName.SEPOLIA,
+        nativeCurrency: {} as unknown as TokenInfo,
+        isSupported: true,
+      },
+      walletProvider: WalletProviderName.METAMASK,
+      tokenBalances: [
+        {
+          id: 'eth',
+          balance: '0.0',
+          symbol: 'ETH',
+          fiatAmount: '0',
+        },
+      ],
+      supportedTopUps: {
+        isBridgeEnabled: true,
+      },
+    };
+
     it('should show not enough gas drawer when trying to bridge to L2 with 0 eth balance', () => {
-      const walletState: WalletState = {
-        network: {
-          chainId: ChainId.SEPOLIA,
-          name: 'Sepolia',
-          nativeCurrency: {} as unknown as TokenInfo,
-          isSupported: true,
-        },
-        walletProvider: WalletProviderName.METAMASK,
-        tokenBalances: [
-          {
-            id: 'eth',
-            balance: '0.0',
-            symbol: 'ETH',
-            fiatAmount: '0',
-          },
-        ],
-        supportedTopUps: {
-          isBridgeEnabled: true,
-        },
-      };
+      cy.stub(Checkout.prototype, 'getAllBalances')
+        .as('getAllBalancesStub')
+        .resolves({
+          balances: [
+            {
+              balance: BigNumber.from('10000000000000'),
+              formattedBalance: '0.1',
+              token: {
+                name: 'ImmutableX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: IMX_ADDRESS_ZKEVM,
+                icon: '123',
+              },
+            },
+          ],
+        });
+
       mount(
-        <BiomeCombinedProviders>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <WalletWidgetTestComponent
+            initialStateOverride={baseWalletState}
+            cryptoConversionsOverride={cryptoConversions}
           >
-            <WalletContext.Provider
-              value={{ walletState, walletDispatch: () => {} }}
-            >
-              <WalletBalances />
-            </WalletContext.Provider>
-          </ConnectLoaderTestComponent>
-        </BiomeCombinedProviders>,
+            <WalletBalances />
+          </WalletWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
       );
+
       cySmartGet('token-menu').click();
       cySmartGet('balance-item-move-option').click();
       cySmartGet('not-enough-gas-bottom-sheet').should('be.visible');
@@ -164,6 +248,24 @@ describe('WalletBalances', () => {
           gasFee: {
             estimatedAmount: BigNumber.from('10000000000000000'),
           },
+        });
+
+      cy.stub(Checkout.prototype, 'getAllBalances')
+        .as('getAllBalancesStub')
+        .resolves({
+          balances: [
+            {
+              balance: BigNumber.from('10000000000'),
+              formattedBalance: '0.001',
+              token: {
+                name: 'ETH',
+                symbol: 'ETH',
+                decimals: 18,
+                address: '',
+                icon: '123',
+              },
+            },
+          ],
         });
 
       const walletState: WalletState = {
@@ -186,19 +288,20 @@ describe('WalletBalances', () => {
           isBridgeEnabled: true,
         },
       };
+
       mount(
-        <BiomeCombinedProviders>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <WalletWidgetTestComponent
+            initialStateOverride={walletState}
+            cryptoConversionsOverride={cryptoConversions}
           >
-            <WalletContext.Provider
-              value={{ walletState, walletDispatch: () => {} }}
-            >
-              <WalletBalances />
-            </WalletContext.Provider>
-          </ConnectLoaderTestComponent>
-        </BiomeCombinedProviders>,
+            <WalletBalances />
+          </WalletWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
       );
+
       cySmartGet('token-menu').click();
       cySmartGet('balance-item-move-option').click();
       cySmartGet('not-enough-gas-bottom-sheet').should('be.visible');
@@ -217,6 +320,24 @@ describe('WalletBalances', () => {
           gasFee: {
             estimatedAmount: BigNumber.from('10000000000000000'),
           },
+        });
+
+      cy.stub(Checkout.prototype, 'getAllBalances')
+        .as('getAllBalancesStub')
+        .resolves({
+          balances: [
+            {
+              balance: BigNumber.from('1000000000000000'),
+              formattedBalance: '100',
+              token: {
+                name: 'ETH',
+                symbol: 'ETH',
+                decimals: 18,
+                address: 'NATIVE',
+                icon: '123',
+              },
+            },
+          ],
         });
 
       const walletState: WalletState = {
@@ -240,23 +361,23 @@ describe('WalletBalances', () => {
           isBridgeEnabled: true,
         },
       };
+
       mount(
-        <BiomeCombinedProviders>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <WalletWidgetTestComponent
+            initialStateOverride={walletState}
+            cryptoConversionsOverride={cryptoConversions}
           >
-            <WalletContext.Provider
-              value={{ walletState, walletDispatch: () => {} }}
-            >
-              <WalletBalances />
-            </WalletContext.Provider>
-          </ConnectLoaderTestComponent>
-        </BiomeCombinedProviders>,
+            <WalletBalances />
+          </WalletWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
       );
+
       cySmartGet('token-menu').click();
       cySmartGet('balance-item-move-option').click();
       cySmartGet('not-enough-gas-bottom-sheet').should('not.exist');
-
       cySmartGet('@requestBridgeEventStub').should('have.been.called');
       cySmartGet('@requestBridgeEventStub').should(
         'have.been.calledWith',
@@ -271,6 +392,18 @@ describe('WalletBalances', () => {
   });
 
   describe('add coins button', () => {
+    const baseWalletState: WalletState = {
+      network: {
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        name: ChainName.IMTBL_ZKEVM_TESTNET,
+        nativeCurrency: {} as unknown as TokenInfo,
+        isSupported: true,
+      },
+      walletProvider: WalletProviderName.METAMASK,
+      tokenBalances: [],
+      supportedTopUps: null,
+    };
+
     it('should show add coins button on zkEVM when topUps are supported', () => {
       const topUpFeatureTestCases = [
         {
