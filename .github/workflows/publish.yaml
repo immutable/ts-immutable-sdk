@@ -66,7 +66,7 @@ jobs:
             revision_upgrade=$( ${{ contains(github.event.inputs.release_type, 'alpha') }} && echo '--revision' || echo '')
             echo $revision
           fi
-          ./.github/scripts/version-up.sh --${{ github.event.inputs.release_type }} --$upgrade_type --apply $revision_upgrade
+          ./.github/scripts/version-up.sh --${{github.event.inputs.release_type }} --$upgrade_type --apply $revision_upgrade
         shell: bash
 
       - name: Install dependencies
@@ -121,3 +121,7 @@ jobs:
       - name: Release
         if: contains(github.event.inputs.release_type, 'release')
         run: yarn release --ci --no-increment -c .release-it.json $( ${{ github.event.inputs.dry_run }} && echo "--dry-run" || echo "") --github.tokenRef=${{ secrets.RELEASE_TOKEN }}
+
+      - name: Create GitHub Release
+        if: contains(github.event.inputs.release_type, 'release') && github.event.inputs.dry_run == 'false'
+        run: gh release create ${{ steps.version.outputs.NEXT_VERSION }} --title ${{ steps.version.outputs.NEXT_VERSION }} --draft=false --prerelease=false --generate-notes --repo immutable/ts-immutable-sdk
