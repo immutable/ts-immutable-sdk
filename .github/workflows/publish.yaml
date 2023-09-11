@@ -121,23 +121,3 @@ jobs:
       - name: Release
         if: contains(github.event.inputs.release_type, 'release')
         run: yarn release --ci --no-increment -c .release-it.json $( ${{ github.event.inputs.dry_run }} && echo "--dry-run" || echo "") --github.tokenRef=${{ secrets.RELEASE_TOKEN }}
-
-      - name: Create GitHub Release
-        if: contains(github.event.inputs.release_type, 'release') && github.event.inputs.dry_run == 'false'
-        run: gh release create ${{ steps.version.outputs.NEXT_VERSION }} --title ${{ steps.version.outputs.NEXT_VERSION }} --draft=false --prerelease=false --generate-notes --repo immutable/ts-immutable-sdk
-
-      - name: Get GitHub Release Name and URL
-        if: contains(github.event.inputs.release_type, 'release') && github.event.inputs.dry_run == 'false'
-        id: release
-        run: |
-          echo "RELEASE_NAME=$(gh release view --json name | jq -r .name)" >> $GITHUB_OUTPUT
-          echo "RELEASE_URL=$(gh release view --json url | jq -r .url)" >> $GITHUB_OUTPUT
-
-      - name: Comment on PR
-        if: contains(github.event.inputs.release_type, 'release') && github.event.inputs.dry_run == 'false'
-        run: |
-          tempBody=$(mktemp)
-          echo "@${{ github.triggering_actor }} Released SDK version ${{ env.RELEASE_NAME }} 🎉🎉🎉
-          
-          The GitHub release can be found here: ${{ env.RELEASE_URL }}" > $tempBody
-          gh pr comment --body-file $tempBody
