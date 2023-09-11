@@ -59,7 +59,6 @@ models/get-nftresult.ts
 models/get-token-result.ts
 models/index.ts
 models/item.ts
-models/link-collection-request.ts
 models/list-activities-result.ts
 models/list-chains-result.ts
 models/list-collections-result.ts
