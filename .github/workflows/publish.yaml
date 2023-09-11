@@ -23,7 +23,7 @@ on:
         default: none
       dry_run:
         type: boolean
-        description: "(Optional) Dry run"
+        description: '(Optional) Dry run'
         required: false
         default: false
 
@@ -138,5 +138,6 @@ jobs:
         run: |
           tempBody=$(mktemp)
           echo "@${{ github.triggering_actor }} Released SDK version ${{ env.RELEASE_NAME }} 🎉🎉🎉
+
           The GitHub release can be found here: ${{ env.RELEASE_URL }}" > $tempBody
           gh pr comment --body-file $tempBody
