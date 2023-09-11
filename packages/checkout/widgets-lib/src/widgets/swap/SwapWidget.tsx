@@ -1,13 +1,16 @@
+import {
+  useEffect,
+  useReducer,
+  useMemo,
+  useContext,
+  useCallback,
+  useState,
+} from 'react';
 import { BiomeCombinedProviders } from '@biom3/react';
 import {
   DexConfig,
-  GetTokenAllowListResult,
   TokenFilterTypes,
 } from '@imtbl/checkout-sdk';
-import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
-import {
-  useEffect, useReducer, useMemo, useContext,
-} from 'react';
 import { ImmutableConfiguration } from '@imtbl/config';
 import { Exchange, ExchangeOverrides } from '@imtbl/dex-sdk';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
@@ -20,6 +23,7 @@ import {
   swapReducer,
 } from './context/SwapContext';
 import {
+  ErrorView as ErrorViewType,
   SharedViews,
   ViewActions,
   ViewContext,
@@ -29,20 +33,24 @@ import {
 import { SwapSuccessView, SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { WidgetTheme } from '../../lib';
+import { DEFAULT_BALANCE_RETRY_POLICY } from '../../lib';
 import { StatusView } from '../../components/Status/StatusView';
 import { StatusType } from '../../components/Status/StatusType';
 import { text } from '../../resources/text/textConfig';
 import { ErrorView } from '../../views/error/ErrorView';
 import {
-  sendSwapFailedEvent, sendSwapRejectedEvent,
-  sendSwapSuccessEvent, sendSwapWidgetCloseEvent,
+  sendSwapFailedEvent,
+  sendSwapRejectedEvent,
+  sendSwapSuccessEvent,
+  sendSwapWidgetCloseEvent,
 } from './SwapWidgetEvents';
 import { SwapInProgress } from './views/SwapInProgress';
 import { ApproveERC20Onboarding } from './views/ApproveERC20Onboarding';
 import { TopUpView } from '../../views/top-up/TopUpView';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
+import { GetAllowedBalancesResultType, getAllowedBalances } from '../../lib/balance';
+import { widgetTheme } from '../../lib/theme';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
@@ -59,18 +67,6 @@ export function SwapWidget(props: SwapWidgetProps) {
   const { success, failed, rejected } = text.views[SwapWidgetViews.SWAP];
   const loadingText = text.views[SharedViews.LOADING_VIEW].text;
   const { actionText } = text.views[SharedViews.ERROR_VIEW];
-  const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
-  const viewReducerValues = useMemo(
-    () => ({ viewState, viewDispatch }),
-    [viewState, viewDispatch],
-  );
-  const { connectLoaderState } = useContext(ConnectLoaderContext);
-  const { checkout, provider } = connectLoaderState;
-  const [swapState, swapDispatch] = useReducer(swapReducer, initialSwapState);
-  const swapReducerValues = useMemo(
-    () => ({ swapState, swapDispatch }),
-    [swapState, swapDispatch],
-  );
 
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
@@ -82,37 +78,97 @@ export function SwapWidget(props: SwapWidgetProps) {
     amount, fromContractAddress, toContractAddress,
   } = params;
 
-  const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
-    ? onLightBase
-    : onDarkBase;
+  const { connectLoaderState: { checkout, provider } } = useContext(ConnectLoaderContext);
+  const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
+  const [swapState, swapDispatch] = useReducer(swapReducer, initialSwapState);
+
+  const [errorViewLoading, setErrorViewLoading] = useState(false);
+
+  const swapReducerValues = useMemo(
+    () => ({ swapState, swapDispatch }),
+    [swapState, swapDispatch],
+  );
+  const viewReducerValues = useMemo(
+    () => ({ viewState, viewDispatch }),
+    [viewState, viewDispatch],
+  );
+  const themeReducerValue = useMemo(() => widgetTheme(theme), [theme]);
+
+  const showErrorView = useCallback((error: any, tryAgain?: () => Promise<boolean>) => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: SharedViews.ERROR_VIEW,
+          tryAgain,
+          error,
+        },
+      },
+    });
+  }, [viewDispatch]);
+
+  const showSwapView = useCallback(() => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: { type: SwapWidgetViews.SWAP },
+      },
+    });
+  }, [viewDispatch]);
+
+  const loadBalances = async (): Promise<boolean> => {
+    if (!checkout) throw new Error('loadBalances: missing checkout');
+    if (!provider) throw new Error('loadBalances: missing provider');
+
+    let tokensAndBalances: GetAllowedBalancesResultType = {
+      allowList: { tokens: [] },
+      allowedBalances: [],
+    };
+    try {
+      tokensAndBalances = await getAllowedBalances({
+        checkout,
+        provider,
+        allowTokenListType: TokenFilterTypes.SWAP,
+      });
+    } catch (err: any) {
+      if (DEFAULT_BALANCE_RETRY_POLICY.nonRetryable!(err)) {
+        showErrorView(err, loadBalances);
+        return false;
+      }
+    }
+
+    swapDispatch({
+      payload: {
+        type: SwapActions.SET_ALLOWED_TOKENS,
+        allowedTokens: tokensAndBalances.allowList.tokens,
+      },
+    });
+
+    swapDispatch({
+      payload: {
+        type: SwapActions.SET_TOKEN_BALANCES,
+        tokenBalances: tokensAndBalances.allowedBalances,
+      },
+    });
+
+    return true;
+  };
 
   useEffect(() => {
     (async () => {
       if (!checkout || !provider) return;
 
-      const network = await checkout.getNetworkInfo({
-        provider,
-      });
+      const network = await checkout.getNetworkInfo({ provider });
 
-      /* If the provider's network is not supported, return out of this and let the
-      connect loader handle the switch network functionality */
-      if (!network.isSupported) {
-        return;
-      }
+      // If the provider's network is not supported, return out of this and let the
+      // connect loader handle the switch network functionality
+      if (!network.isSupported) return;
 
       let overrides: ExchangeOverrides | undefined;
       try {
         overrides = ((await checkout.config.remote.getConfig('dex')) as DexConfig).overrides;
       } catch (err: any) {
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: {
-              type: SharedViews.ERROR_VIEW,
-              error: err,
-            },
-          },
-        });
+        showErrorView(err);
       }
 
       const exchange = new Exchange({
@@ -128,37 +184,6 @@ export function SwapWidget(props: SwapWidgetProps) {
         },
       });
 
-      const tokenBalances = await checkout.getAllBalances({
-        provider,
-        walletAddress: await provider.getSigner().getAddress(),
-        chainId: network.chainId,
-      });
-
-      const allowList: GetTokenAllowListResult = await checkout.getTokenAllowList(
-        {
-          chainId: network.chainId,
-          type: TokenFilterTypes.SWAP,
-        },
-      );
-
-      const allowedTokenBalances = tokenBalances.balances.filter((balance) => allowList.tokens
-        .map((token) => token.address)
-        .includes(balance.token.address));
-
-      swapDispatch({
-        payload: {
-          type: SwapActions.SET_ALLOWED_TOKENS,
-          allowedTokens: allowList.tokens,
-        },
-      });
-
-      swapDispatch({
-        payload: {
-          type: SwapActions.SET_TOKEN_BALANCES,
-          tokenBalances: allowedTokenBalances,
-        },
-      });
-
       swapDispatch({
         payload: {
           type: SwapActions.SET_NETWORK,
@@ -166,17 +191,17 @@ export function SwapWidget(props: SwapWidgetProps) {
         },
       });
 
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: { type: SwapWidgetViews.SWAP },
-        },
-      });
+      if (!await loadBalances()) return;
+
+      showSwapView();
     })();
   }, [checkout, provider]);
 
   return (
-    <BiomeCombinedProviders theme={{ base: biomeTheme }} bottomSheetContainerId="bottom-sheet-container">
+    <BiomeCombinedProviders
+      theme={{ base: themeReducerValue }}
+      bottomSheetContainerId="bottom-sheet-container"
+    >
       <ViewContext.Provider value={viewReducerValues}>
         <SwapContext.Provider value={swapReducerValues}>
           <CryptoFiatProvider environment={environment}>
@@ -263,15 +288,21 @@ export function SwapWidget(props: SwapWidgetProps) {
             {viewState.view.type === SharedViews.ERROR_VIEW && (
             <ErrorView
               actionText={actionText}
-              onActionClick={() => {
-                viewDispatch({
-                  payload: {
-                    type: ViewActions.UPDATE_VIEW,
-                    view: { type: SwapWidgetViews.SWAP },
-                  },
-                });
+              onActionClick={async () => {
+                setErrorViewLoading(true);
+                const data = viewState.view as ErrorViewType;
+
+                if (!data.tryAgain) {
+                  showSwapView();
+                  setErrorViewLoading(false);
+                  return;
+                }
+
+                if (await data.tryAgain()) showSwapView();
+                setErrorViewLoading(false);
               }}
               onCloseClick={() => sendSwapWidgetCloseEvent(eventTarget)}
+              errorEventActionLoading={errorViewLoading}
             />
             )}
             {viewState.view.type === SharedViews.TOP_UP_VIEW && (

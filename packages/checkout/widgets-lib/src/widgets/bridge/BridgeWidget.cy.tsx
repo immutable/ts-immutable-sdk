@@ -18,7 +18,7 @@ import {
   BridgeWidgetParams,
 } from './BridgeWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { WidgetTheme } from '../../lib';
+import { IMX_ADDRESS_ZKEVM, WidgetTheme } from '../../lib';
 import { text } from '../../resources/text/textConfig';
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
 import { ConnectionStatus } from '../../context/connect-loader-context/ConnectLoaderContext';
@@ -63,6 +63,8 @@ describe('Bridge Widget tests', () => {
     connectionStatus: ConnectionStatus.CONNECTED_WITH_NETWORK,
   };
 
+  let getAllBalancesStub: any;
+
   beforeEach(() => {
     cy.viewport('ipad-2');
 
@@ -94,7 +96,7 @@ describe('Bridge Widget tests', () => {
       .as('connectStub')
       .resolves(connectStubReturnValue);
 
-    cy.stub(Checkout.prototype, 'getAllBalances')
+    getAllBalancesStub = cy.stub(Checkout.prototype, 'getAllBalances')
       .as('getAllBalancesStub')
       .resolves({
         balances: [
@@ -116,7 +118,7 @@ describe('Bridge Widget tests', () => {
               name: 'ImmutableX',
               symbol: 'IMX',
               decimals: 18,
-              address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+              address: IMX_ADDRESS_ZKEVM,
               icon: '123',
             },
           },
@@ -141,7 +143,7 @@ describe('Bridge Widget tests', () => {
             name: 'ImmutableX',
             symbol: 'IMX',
             decimals: 18,
-            address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+            address: IMX_ADDRESS_ZKEVM,
           },
         ],
       });
@@ -230,6 +232,82 @@ describe('Bridge Widget tests', () => {
       cySmartGet('header-title').should('have.text', header.title);
       cySmartGet('bridge-form-content-heading').should('have.text', content.title);
       cySmartGet('close-button').should('be.visible');
+    });
+
+    it('should show balances after getAllBalances failure', () => {
+      const params = {} as BridgeWidgetParams;
+
+      getAllBalancesStub.rejects()
+        .resolves({
+          balances: [
+            {
+              balance: BigNumber.from('10000000000000'),
+              formattedBalance: '0.1',
+              token: {
+                name: 'ImmutableX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: IMX_ADDRESS_ZKEVM,
+                icon: '123',
+              },
+            },
+          ],
+        });
+
+      mount(
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <BridgeWidget
+            config={config}
+            params={params}
+          />
+        </ConnectLoaderTestComponent>,
+      );
+
+      cySmartGet('bridge-token-select__target').click();
+      cySmartGet(`bridge-token-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).should('exist');
+    });
+
+    it('should show error screen after getAllBalances unrecoverable failure', () => {
+      getAllBalancesStub
+        .onFirstCall()
+        .rejects({ data: { code: 500 } })
+        .onSecondCall()
+        .resolves({
+          balances: [
+            {
+              balance: BigNumber.from('10000000000000'),
+              formattedBalance: '0.1',
+              token: {
+                name: 'ImmutableX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: IMX_ADDRESS_ZKEVM,
+                icon: '123',
+              },
+            },
+          ],
+        });
+
+      const params = {} as BridgeWidgetParams;
+
+      mount(
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <BridgeWidget
+            config={config}
+            params={params}
+          />
+        </ConnectLoaderTestComponent>,
+      );
+
+      cySmartGet('error-view').should('be.visible');
+      cySmartGet('footer-button').click();
+
+      cySmartGet('bridge-token-select__target').click();
+      cySmartGet(`bridge-token-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).should('exist');
     });
 
     it('should set up bridge widget on mount', () => {
@@ -327,7 +405,7 @@ describe('Bridge Widget tests', () => {
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet('bridge-token-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').click();
+      cySmartGet(`bridge-token-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
       cySmartGet('bridge-amount-text__input').blur();
@@ -407,7 +485,7 @@ describe('Bridge Widget tests', () => {
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet('bridge-token-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').click();
+      cySmartGet(`bridge-token-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
       cySmartGet('bridge-amount-text__input').blur();
@@ -458,7 +536,7 @@ describe('Bridge Widget tests', () => {
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet('bridge-token-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').click();
+      cySmartGet(`bridge-token-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
       cySmartGet('bridge-amount-text__input').blur();
@@ -515,7 +593,7 @@ describe('Bridge Widget tests', () => {
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet('bridge-token-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').click();
+      cySmartGet(`bridge-token-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
       cySmartGet('bridge-amount-text__input').blur();
@@ -569,7 +647,7 @@ describe('Bridge Widget tests', () => {
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet('bridge-token-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').click();
+      cySmartGet(`bridge-token-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
       cySmartGet('bridge-amount-text__input').blur();
@@ -623,7 +701,7 @@ describe('Bridge Widget tests', () => {
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet('bridge-token-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').click();
+      cySmartGet(`bridge-token-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
       cySmartGet('bridge-amount-text__input').blur();
