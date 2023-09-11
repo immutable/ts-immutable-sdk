@@ -41,7 +41,6 @@ export * from './get-linked-addresses-res';
 export * from './get-nftresult';
 export * from './get-token-result';
 export * from './item';
-export * from './link-collection-request';
 export * from './list-activities-result';
 export * from './list-chains-result';
 export * from './list-collections-result';
