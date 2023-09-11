@@ -132,10 +132,3 @@ jobs:
         run: |
           echo "RELEASE_NAME=$(gh release view --json name | jq -r .name)" >> $GITHUB_OUTPUT
           echo "RELEASE_URL=$(gh release view --json url | jq -r .url)" >> $GITHUB_OUTPUT
-
-      - name: Comment on PR
-        if: contains(github.event.inputs.release_type, 'release') && github.event.inputs.dry_run == 'false'
-        run: |
-          tempBody=$(mktemp)
-          echo "@${{ github.triggering_actor }} Released SDK version ${{ env.RELEASE_NAME }} 🎉🎉🎉 The GitHub release can be found here: ${{ env.RELEASE_URL }}" > $tempBody
-
