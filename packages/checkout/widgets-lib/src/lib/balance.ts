@@ -13,7 +13,6 @@ export type GetAllowedBalancesParamsType = {
   checkout: Checkout,
   provider: Web3Provider,
   allowTokenListType: TokenFilterTypes,
-  allowNative?: boolean,
   allowZero?: boolean,
   retryPolicy?: RetryType,
   chainId?: ChainId

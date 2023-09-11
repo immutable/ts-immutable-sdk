@@ -58,7 +58,6 @@ describe('getAllowedBalances', () => {
       checkout,
       provider: mockProvider as unknown as Web3Provider,
       allowTokenListType: TokenFilterTypes.BRIDGE,
-      allowNative: true,
     });
 
     expect(resp).toEqual({
@@ -89,7 +88,6 @@ describe('getAllowedBalances', () => {
       checkout,
       provider: mockProvider as unknown as Web3Provider,
       allowTokenListType: TokenFilterTypes.BRIDGE,
-      allowNative: true,
     });
 
     expect(getTokenAllowListMock.mock.calls).toEqual([[{
@@ -101,7 +99,6 @@ describe('getAllowedBalances', () => {
       checkout,
       provider: mockProvider as unknown as Web3Provider,
       allowTokenListType: TokenFilterTypes.SWAP,
-      allowNative: true,
     });
 
     expect(getTokenAllowListMock.mock.calls).toEqual([[{
@@ -129,7 +126,6 @@ describe('getAllowedBalances', () => {
       checkout,
       provider: mockProvider as unknown as Web3Provider,
       allowTokenListType: TokenFilterTypes.BRIDGE,
-      allowNative: true,
       chainId: ChainId.IMTBL_ZKEVM_DEVNET,
     });
 
@@ -171,7 +167,6 @@ describe('getAllowedBalances', () => {
       checkout,
       provider: mockProvider as unknown as Web3Provider,
       allowTokenListType: TokenFilterTypes.BRIDGE,
-      allowNative: true,
     });
 
     expect(resp).toEqual({
@@ -213,7 +208,6 @@ describe('getAllowedBalances', () => {
         checkout,
         provider: mockProvider as unknown as Web3Provider,
         allowTokenListType: TokenFilterTypes.BRIDGE,
-        allowNative: true,
         retryPolicy: {
           retryIntervalMs: 0,
           retries: 2,
@@ -254,7 +248,6 @@ describe('getAllowedBalances', () => {
       checkout,
       provider: mockProvider as unknown as Web3Provider,
       allowTokenListType: TokenFilterTypes.BRIDGE,
-      allowNative: true,
     });
 
     expect(resp).toEqual({
@@ -291,7 +284,6 @@ describe('getAllowedBalances', () => {
       checkout,
       provider: mockProvider as unknown as Web3Provider,
       allowTokenListType: TokenFilterTypes.BRIDGE,
-      allowNative: true,
     });
 
     expect(resp).toEqual({
