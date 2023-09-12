@@ -101,7 +101,7 @@ export class Blockscout {
 
       // Cache response data to prevent unnecessary requests
       const cached = this.getCache(url) as AxiosResponse;
-      if (cached && cached.status < 400) return Promise.resolve(cached.data);
+      if (cached) return Promise.resolve(cached.data);
 
       const response = await Blockscout.makeHttpRequest(url);
       if (response.status >= 400) {
@@ -147,7 +147,7 @@ export class Blockscout {
 
       // Cache response data to prevent unnecessary requests
       const cached = this.getCache(url) as AxiosResponse;
-      if (cached && cached.status < 400) return Promise.resolve(cached.data);
+      if (cached) return Promise.resolve(cached.data);
 
       const response = await Blockscout.makeHttpRequest(url);
       if (response.status >= 400) {
