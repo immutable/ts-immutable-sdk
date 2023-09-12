@@ -9,6 +9,7 @@ import { ImmutableConfiguration } from '@imtbl/config';
 import { ethers } from 'ethers';
 import { Exchange } from '@imtbl/dex-sdk';
 import { Orderbook } from '@imtbl/orderbook';
+import { BlockchainData } from '@imtbl/blockchain-data';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { ChainId, DexConfig } from '../types';
 import { CheckoutConfiguration } from '../config';
@@ -70,6 +71,16 @@ export async function createOrderbookInstance(
   config: CheckoutConfiguration,
 ): Promise<Orderbook> {
   return new Orderbook({
+    baseConfig: {
+      environment: config.environment,
+    },
+  });
+}
+
+export function createBlockchainDataInstance(
+  config: CheckoutConfiguration,
+): BlockchainData {
+  return new BlockchainData({
     baseConfig: {
       environment: config.environment,
     },
