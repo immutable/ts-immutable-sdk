@@ -2,8 +2,8 @@ import { mr } from '@imtbl/generated-clients';
 import {
   BlockchainDataConfiguration,
   BlockchainDataModuleConfiguration,
-} from 'config';
-import { formatError } from 'utils/formatErrors';
+} from './config';
+import { formatError } from './utils/formatErrors';
 
 export class BlockchainData {
   public readonly config: BlockchainDataConfiguration;
