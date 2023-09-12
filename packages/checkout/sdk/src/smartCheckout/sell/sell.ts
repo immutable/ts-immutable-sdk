@@ -1,5 +1,6 @@
 import { Web3Provider } from '@ethersproject/providers';
 import {
+  CreateListingParams,
   ERC20Item,
   NativeItem,
   Orderbook,
@@ -7,7 +8,9 @@ import {
   constants,
 } from '@imtbl/orderbook';
 import { BigNumber } from 'ethers';
-import { BuyToken, SellResult, SellStatusType } from '../../types/sell';
+import {
+  BuyToken, SellOrder, SellResult, SellStatusType,
+} from '../../types/sell';
 import {
   ERC721Item,
   GasTokenType,
@@ -25,6 +28,7 @@ import {
   signMessage,
 } from '../actions';
 import { SignTransactionStatusType } from '../actions/types';
+import { calculateFees } from '../fees/fees';
 
 export const getERC721Requirement = (
   id: string,
@@ -57,13 +61,15 @@ export const getBuyToken = (
 export const sell = async (
   config: CheckoutConfiguration,
   provider: Web3Provider,
-  id: string,
-  contractAddress: string,
-  buyToken: BuyToken,
+  orders: Array<SellOrder>,
 ): Promise<SellResult> => {
   let orderbook: Orderbook;
   let listing: PrepareListingResponse;
   let spenderAddress = '';
+
+  const { buyToken, collection, makerFee } = orders[0];
+
+  const buyTokenOrNative = getBuyToken(buyToken);
 
   try {
     const walletAddress = await provider.getSigner().getAddress();
@@ -72,11 +78,11 @@ export const sell = async (
     spenderAddress = seaportContractAddress;
     listing = await orderbook.prepareListing({
       makerAddress: walletAddress,
-      buy: getBuyToken(buyToken),
+      buy: buyTokenOrNative,
       sell: {
         type: ItemType.ERC721,
-        contractAddress,
-        tokenId: id,
+        contractAddress: collection.address,
+        tokenId: collection.id,
       },
     });
   } catch (err: any) {
@@ -85,14 +91,14 @@ export const sell = async (
       CheckoutErrorType.PREPARE_ORDER_LISTING_ERROR,
       {
         message: err.message,
-        id,
-        collectionAddress: contractAddress,
+        collectionId: collection.id,
+        collectionAddress: collection.address,
       },
     );
   }
 
   const itemRequirements = [
-    getERC721Requirement(id, contractAddress, spenderAddress),
+    getERC721Requirement(collection.id, collection.address, spenderAddress),
   ];
 
   const smartCheckoutResult = await smartCheckout(
@@ -121,8 +127,8 @@ export const sell = async (
         'The unsigned message is missing after preparing the listing',
         CheckoutErrorType.SIGN_MESSAGE_ERROR,
         {
-          id,
-          collectionAddress: contractAddress,
+          collectionId: collection.id,
+          collectionAddress: collection.address,
         },
       );
     }
@@ -134,8 +140,8 @@ export const sell = async (
     const approvalResult = await signApprovalTransactions(provider, unsignedTransactions.approvalTransactions);
     if (approvalResult.type === SignTransactionStatusType.FAILED) {
       return {
-        id,
-        collectionAddress: contractAddress,
+        id: collection.id,
+        collectionAddress: collection.address,
         smartCheckoutResult,
         status: {
           type: SellStatusType.FAILED,
@@ -146,13 +152,24 @@ export const sell = async (
     }
 
     let orderId = '';
+    let orderFee = '';
+
+    const createListingParams:CreateListingParams = {
+      orderComponents: signedMessage.orderComponents,
+      orderHash: signedMessage.orderHash,
+      orderSignature: signedMessage.signedMessage,
+    };
+
+    if (makerFee !== undefined) {
+      orderFee = calculateFees(makerFee, buyTokenOrNative);
+      createListingParams.makerFee = {
+        recipient: makerFee?.recipient,
+        amount: orderFee,
+      };
+    }
 
     try {
-      const order = await orderbook.createListing({
-        orderComponents: signedMessage.orderComponents,
-        orderHash: signedMessage.orderHash,
-        orderSignature: signedMessage.signedMessage,
-      });
+      const order = await orderbook.createListing(createListingParams);
       orderId = order.result.id;
     } catch (err: any) {
       throw new CheckoutError(
@@ -160,15 +177,15 @@ export const sell = async (
         CheckoutErrorType.CREATE_ORDER_LISTING_ERROR,
         {
           message: err.message,
-          id,
-          collectionAddress: contractAddress,
+          collectionId: collection.id,
+          collectionAddress: collection.address,
         },
       );
     }
 
     return {
-      id,
-      collectionAddress: contractAddress,
+      id: collection.id,
+      collectionAddress: collection.address,
       smartCheckoutResult,
       status: {
         type: SellStatusType.SUCCESS,
@@ -178,8 +195,8 @@ export const sell = async (
   }
 
   return {
-    id,
-    collectionAddress: contractAddress,
+    id: collection.id,
+    collectionAddress: collection.address,
     smartCheckoutResult,
   };
 };

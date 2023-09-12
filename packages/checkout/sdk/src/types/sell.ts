@@ -1,19 +1,24 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import { ItemType, SmartCheckoutResult } from './smartCheckout';
+import { Collection } from './collection';
+import { OrderFee } from './fees';
 
 /**
  * Interface representing the parameters for {@link Checkout.sell}
  * @property {Web3Provider} provider - The provider to use for the sell.
- * @property {string} id - The ERC721 ID.
- * @property {string} collectionAddress - The contract address of the ERC721s collection.
- * @property {BuyToken} buyToken - The token to buy the item with.
+ * @property {Array<SellOrder>} orders - An array of sell orders to execute.
+ * Only currently actions the first order in the array until we support batch processing.
  */
 export interface SellParams {
   provider: Web3Provider;
-  id: string;
-  collectionAddress: string;
+  orders: Array<SellOrder>;
+}
+
+export interface SellOrder {
+  collection: Collection;
   buyToken: BuyToken;
+  makerFee?: OrderFee;
 }
 
 /**

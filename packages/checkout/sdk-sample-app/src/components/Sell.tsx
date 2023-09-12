@@ -1,4 +1,4 @@
-import { BuyToken, Checkout, ItemType } from '@imtbl/checkout-sdk';
+import { BuyToken, Checkout, ItemType, SellOrder } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';
@@ -79,11 +79,22 @@ export default function Sell({ checkout, provider }: SellProps) {
     setError(null);
     setLoading(true);
     try {
+
+      const orders:Array<SellOrder> = [{
+        collection: {
+          id,
+          address: collectionAddress
+        },
+        buyToken: getBuyToken(),
+        makerFee: {
+          amount: { percent: 0.025 },
+          recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772'
+        }
+      }]
+
       await checkout.sell({
         provider,
-        id,
-        collectionAddress,
-        buyToken: getBuyToken(),
+        orders,
       });
       setLoading(false);
     } catch (err: any) {

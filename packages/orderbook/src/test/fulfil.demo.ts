@@ -45,6 +45,9 @@ describe('', () => {
     // Deploy an NFT contract and mint a token for the offerer
     const nftContract = await deployAndMintNftContract(offerer);
 
+    console.log(nftContract.address);
+    return;
+
     // uncomment the overrides and set variables in
     // .env to run on environments other than testnet (e.g. devnet)
     // const configOverrides = getConfigFromEnv();
