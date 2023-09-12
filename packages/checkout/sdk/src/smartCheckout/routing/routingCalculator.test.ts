@@ -104,13 +104,13 @@ describe('routingCalculator', () => {
       .toEqual({
         availableOptions: [],
         response: {
-          type: 'ROUTES_FOUND',
+          type: RouteCalculatorType.ROUTES_FOUND,
           message: 'Routes found',
         },
         fundingRoutes: [{
           priority: 1,
           steps: [{
-            type: 'bridge',
+            type: FundingRouteType.BRIDGE,
             chainId: 1,
             asset: {
               balance: BigNumber.from(1),
