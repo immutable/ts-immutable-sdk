@@ -1,6 +1,6 @@
 import { ExchangeType } from '../types/fiatRamp';
 import {
-  OnRampConfig, OnRampProvider, OnRampProviderFees, TRANSAK_API_BASE_URL, TRANSAK_PUBLISHABLE_KEY,
+  OnRampConfig, OnRampProvider, OnRampProviderFees, TRANSAK_API_BASE_URL,
 } from '../types';
 import { CheckoutConfiguration } from '../config';
 
@@ -30,12 +30,14 @@ export class FiatRampService {
   }
 
   public async createWidgetUrl(params: FiatRampWidgetParams): Promise<string> {
-    return this.getTransakWidgetUrl(params);
+    return (await this.getTransakWidgetUrl(params));
   }
 
-  private getTransakWidgetUrl(params: FiatRampWidgetParams): string {
+  private async getTransakWidgetUrl(params: FiatRampWidgetParams): Promise<string> {
     let widgetUrl = `${TRANSAK_API_BASE_URL[this.config.environment]}?`;
-    const transakPublishableKey = `apiKey=${TRANSAK_PUBLISHABLE_KEY[this.config.environment]}`;
+    const onRampConfig = (await this.config.remote.getConfig('onramp')) as OnRampConfig;
+    const apiKey = onRampConfig[OnRampProvider.TRANSAK].publishableApiKey;
+    const transakPublishableKey = `apiKey=${apiKey}`;
     const zkevmNetwork = 'network=immutablezkevm';
     const defaultPaymentMethod = 'defaultPaymentMethod=credit_debit_card';
     const disableBankTransfer = 'disablePaymentMethods=sepa_bank_transfer,gbp_bank_transfer,'

@@ -39,10 +39,12 @@ export type OnRampProviderFees = {
 
 /**
  * A type representing the configuration for the OnRamp for a specific provider.
+ * @property {string} publishableApiKey - on ramp provider publishable api-key
  * @property {TokenInfo[]} tokens - allowed tokens for the OnRamp provider
  * @property {OnRampProviderFees} fees - on ramp provider transaction fees
  */
 export type OnRampProviderConfig = {
+  publishableApiKey: string,
   tokens: TokenInfo[],
   fees: OnRampProviderFees
 };

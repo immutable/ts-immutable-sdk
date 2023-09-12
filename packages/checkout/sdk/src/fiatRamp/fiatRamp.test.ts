@@ -1,11 +1,10 @@
-import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { CheckoutConfiguration } from '../config';
 import { RemoteConfigFetcher } from '../config/remoteConfigFetcher';
 import { FiatRampService, FiatRampWidgetParams } from './fiatRamp';
 import { ExchangeType, OnRampProvider } from '../types';
 
-const defaultWidgetUrl = 'https://global-stg.transak.com?apiKey=41ad2da7-ed5a-4d89-a90b-c751865effc2'
+const defaultWidgetUrl = 'https://global-stg.transak.com?apiKey=mock-api-key'
 + '&network=immutablezkevm&defaultPaymentMethod=credit_debit_card&disablePaymentMethods=sepa_bank_transfer,'
 + 'gbp_bank_transfer,pm_cash_app,pm_jwire,pm_paymaya,pm_bpi,pm_ubp,pm_grabpay,pm_shopeepay,pm_gcash,pm_pix,'
 + 'pm_astropay,pm_pse,inr_bank_transfer&productsAvailed=buy&exchangeScreenTitle=Buy&themeColor=0D0D0D';
@@ -15,15 +14,6 @@ jest.mock('../config/remoteConfigFetcher');
 describe('FiatRampService', () => {
   let config: CheckoutConfiguration;
   let fiatRampService: FiatRampService;
-
-  beforeEach(() => {
-    config = new CheckoutConfiguration({
-      baseConfig: {
-        environment: Environment.SANDBOX,
-      },
-    });
-    fiatRampService = new FiatRampService(config);
-  });
 
   describe('feeEstimate', () => {
     it('should return transak fees', async () => {
@@ -81,6 +71,21 @@ describe('FiatRampService', () => {
   });
 
   describe('createWidgetUrl', () => {
+    beforeEach(() => {
+      (RemoteConfigFetcher as unknown as jest.Mock).mockReturnValue({
+        getConfig: jest.fn().mockResolvedValue({
+          [OnRampProvider.TRANSAK]: {
+            publishableApiKey: 'mock-api-key',
+          },
+        }),
+      });
+      config = new CheckoutConfiguration({
+        baseConfig: {
+          environment: Environment.SANDBOX,
+        },
+      });
+      fiatRampService = new FiatRampService(config);
+    });
     it('should return widget url with non-configurable query params when onRampProvider is Transak', async () => {
       const params: FiatRampWidgetParams = {
         exchangeType: ExchangeType.ONRAMP,
@@ -113,7 +118,7 @@ describe('FiatRampService', () => {
       const params: FiatRampWidgetParams = {
         exchangeType: ExchangeType.ONRAMP,
         isPassport: false,
-        tokenAmount: BigNumber.from(100),
+        tokenAmount: '100',
         tokenSymbol: 'ETH',
       };
       const result = await fiatRampService.createWidgetUrl(params);
