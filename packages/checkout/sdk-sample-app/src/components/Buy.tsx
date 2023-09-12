@@ -1,4 +1,4 @@
-import { Checkout } from '@imtbl/checkout-sdk';
+import { Checkout, BuyResult, BuyStatusType, BuyStatus } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';

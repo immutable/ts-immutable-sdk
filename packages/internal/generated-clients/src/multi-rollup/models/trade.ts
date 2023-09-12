@@ -58,16 +58,22 @@ export interface Trade {
     'chain': Chain;
     /**
      * 
-     * @type {TradeBlockchainMetadata}
-     * @memberof Trade
-     */
-    'blockchain_metadata'?: TradeBlockchainMetadata | null;
-    /**
-     * Time the Trade is created
      * @type {string}
      * @memberof Trade
      */
-    'create_time': string;
+    'order_id': string;
+    /**
+     * 
+     * @type {TradeBlockchainMetadata}
+     * @memberof Trade
+     */
+    'blockchain_metadata': TradeBlockchainMetadata | null;
+    /**
+     * Time the on-chain trade event is indexed by the order book system
+     * @type {string}
+     * @memberof Trade
+     */
+    'indexed_at': string;
     /**
      * Global Trade identifier
      * @type {string}
@@ -98,11 +104,5 @@ export interface Trade {
      * @memberof Trade
      */
     'taker_address': string;
-    /**
-     * Time the Trade is last updated
-     * @type {string}
-     * @memberof Trade
-     */
-    'update_time': string;
 }
 

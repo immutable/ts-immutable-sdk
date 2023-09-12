@@ -6,8 +6,12 @@ import { CheckoutConfiguration } from '../../config';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { cancel } from './cancel';
 import { createOrderbookInstance } from '../../instance';
+import { signFulfilmentTransactions } from '../actions';
+import { SignTransactionStatusType } from '../actions/types';
+import { CancelStatusType } from '../../types';
 
 jest.mock('../../instance');
+jest.mock('../actions');
 
 describe('cancel', () => {
   describe('cancel', () => {
@@ -24,6 +28,123 @@ describe('cancel', () => {
       config = new CheckoutConfiguration({
         baseConfig: { environment: Environment.SANDBOX },
       });
+    });
+
+    it('should sign the cancel transaction', async () => {
+      const orderId = '1';
+      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+        getListing: jest.fn().mockResolvedValue({
+          result: {
+            accountAddress: '0x123',
+            status: OrderStatus.ACTIVE,
+          },
+        }),
+        cancelOrder: jest.fn().mockResolvedValue({
+          unsignedCancelOrderTransaction: {
+            to: '0xTO',
+            from: '0xFROM',
+            nonce: 1,
+          } as PopulatedTransaction,
+        }),
+      });
+      (signFulfilmentTransactions as jest.Mock).mockResolvedValue({
+        type: SignTransactionStatusType.SUCCESS,
+      });
+
+      const result = await cancel(config, mockProvider, orderId);
+      expect(result).toEqual({
+        orderId: '1',
+        status: {
+          type: CancelStatusType.SUCCESS,
+        },
+      });
+      expect(signFulfilmentTransactions).toBeCalledWith(
+        mockProvider,
+        [
+          {
+            to: '0xTO',
+            from: '0xFROM',
+            nonce: 1,
+          },
+        ],
+      );
+    });
+
+    it('should return failed status when transaction reverts', async () => {
+      const orderId = '1';
+      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+        getListing: jest.fn().mockResolvedValue({
+          result: {
+            accountAddress: '0x123',
+            status: OrderStatus.ACTIVE,
+          },
+        }),
+        cancelOrder: jest.fn().mockResolvedValue({
+          unsignedCancelOrderTransaction: {
+            to: '0xTO',
+            from: '0xFROM',
+            nonce: 1,
+          } as PopulatedTransaction,
+        }),
+      });
+      (signFulfilmentTransactions as jest.Mock).mockResolvedValue({
+        type: SignTransactionStatusType.FAILED,
+        transactionHash: '0xHASH',
+        reason: 'Fulfilment transaction failed and was reverted',
+      });
+
+      const result = await cancel(config, mockProvider, orderId);
+      expect(result).toEqual({
+        orderId: '1',
+        status: {
+          type: CancelStatusType.FAILED,
+          transactionHash: '0xHASH',
+          reason: 'Fulfilment transaction failed and was reverted',
+        },
+      });
+      expect(signFulfilmentTransactions).toBeCalledWith(
+        mockProvider,
+        [
+          {
+            to: '0xTO',
+            from: '0xFROM',
+            nonce: 1,
+          },
+        ],
+      );
+    });
+
+    it('should throw error when sign rejects', async () => {
+      const orderId = '1';
+      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+        getListing: jest.fn().mockResolvedValue({
+          result: {
+            accountAddress: '0x123',
+            status: OrderStatus.ACTIVE,
+          },
+        }),
+        cancelOrder: jest.fn().mockResolvedValue({
+          unsignedCancelOrderTransaction: {
+            to: '0xTO',
+            from: '0xFROM',
+            nonce: 1,
+          } as PopulatedTransaction,
+        }),
+      });
+      (signFulfilmentTransactions as jest.Mock).mockRejectedValue(new Error('ERROR'));
+
+      await expect(cancel(config, mockProvider, orderId)).rejects.toThrow('ERROR');
+
+      expect(signFulfilmentTransactions).toBeCalledWith(
+        mockProvider,
+        [
+          {
+            to: '0xTO',
+            from: '0xFROM',
+            nonce: 1,
+          },
+        ],
+      );
     });
 
     it('should handle errors from orderbook', async () => {
@@ -59,35 +180,6 @@ describe('cancel', () => {
       expect(data).toEqual({
         orderId: '1',
         message: 'An error occurred while cancelling the order listing',
-      });
-    });
-
-    it('should return the unsigned cancel order transaction', async () => {
-      const orderId = '1';
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
-        getListing: jest.fn().mockResolvedValue({
-          result: {
-            accountAddress: '0x123',
-            status: OrderStatus.ACTIVE,
-          },
-        }),
-        cancelOrder: jest.fn().mockResolvedValue({
-          unsignedCancelOrderTransaction: {
-            to: '0xTO',
-            from: '0xFROM',
-            nonce: 1,
-          } as PopulatedTransaction,
-        }),
-      });
-
-      const result = await cancel(config, mockProvider, orderId);
-
-      expect(result).toEqual({
-        unsignedCancelOrderTransaction: {
-          to: '0xTO',
-          from: '0xFROM',
-          nonce: 1,
-        } as PopulatedTransaction,
       });
     });
   });

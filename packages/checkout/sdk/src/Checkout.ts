@@ -315,7 +315,13 @@ export class Checkout {
       params.provider,
     );
 
-    await sell.sell(this.config, web3Provider, params.id, params.collectionAddress, params.buyToken);
+    await sell.sell(
+      this.config,
+      web3Provider,
+      params.id,
+      params.collectionAddress,
+      params.buyToken,
+    );
   }
 
   /**
@@ -359,6 +365,7 @@ export class Checkout {
       params.provider,
     );
 
+    // console.log('Smart Checkout Params ::', params);
     await smartCheckout.smartCheckout(
       this.config,
       web3Provider,

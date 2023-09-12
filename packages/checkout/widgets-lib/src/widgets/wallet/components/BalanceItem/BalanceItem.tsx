@@ -98,8 +98,7 @@ export function BalanceItem({ balanceInfo, bridgeToL2OnClick }: BalanceItemProps
       <Box sx={balanceItemPriceBoxStyle}>
         <PriceDisplay
           testId={`balance-item-${balanceInfo.symbol}`}
-          use={Heading}
-          size="xSmall"
+          use={<Heading size="xSmall" />}
           price={tokenValueFormat(balanceInfo.balance)}
           fiatAmount={fiatAmount}
         />

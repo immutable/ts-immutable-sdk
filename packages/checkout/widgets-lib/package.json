@@ -14,8 +14,8 @@
     ]
   },
   "dependencies": {
-    "@biom3/design-tokens": "0.2.0-beta",
-    "@biom3/react": "^0.9.7-beta",
+    "@biom3/design-tokens": "0.2.4-beta",
+    "@biom3/react": "^0.9.17-beta",
     "@ethersproject/providers": "^5.7.2",
     "@imtbl/bridge-sdk": "0.0.0",
     "@imtbl/checkout-sdk": "0.0.0",
@@ -76,6 +76,7 @@
     "start": " cp src/app.tsx src/index.tsx && PORT=3001 GENERATE_SOURCEMAP=false PUBLIC_URL=/ react-app-rewired start",
     "test": "jest test --passWithNoTests",
     "test:cypress": "NODE_ENV=test cypress run --component --headless",
-    "test:cypress:open": "NODE_ENV=test cypress open --component --browser electron"
+    "test:cypress:open": "NODE_ENV=test cypress open --component --browser electron",
+    "test:watch": "jest test --passWithNoTests --watch"
   }
 }
