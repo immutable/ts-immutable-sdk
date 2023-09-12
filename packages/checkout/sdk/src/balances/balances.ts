@@ -180,13 +180,10 @@ export const getBalances = async (
     });
 
   const balanceResults = await Promise.allSettled(allBalancePromises);
-  const balances = (
-    balanceResults.filter(
-      (result) => result.status === 'fulfilled',
-    ) as PromiseFulfilledResult<GetBalanceResult>[]
-  ).map(
-    (fulfilledResult: PromiseFulfilledResult<GetBalanceResult>) => fulfilledResult.value,
-  ) as GetBalanceResult[];
+  const balances = (balanceResults.filter(
+    (result) => result.status === 'fulfilled',
+  ) as PromiseFulfilledResult<GetBalanceResult>[]
+  ).map((result) => result.value);
 
   return { balances };
 };
@@ -220,5 +217,8 @@ export const getAllBalances = async (
     return await getIndexerBalance(walletAddress, chainId, tokens);
   }
 
+  // This fallback to use ERC20s calls which is a best effort solution
+  // Fails in fetching data from the RCP calls might result in some
+  // missing data.
   return await getBalances(config, web3Provider, walletAddress, tokens);
 };

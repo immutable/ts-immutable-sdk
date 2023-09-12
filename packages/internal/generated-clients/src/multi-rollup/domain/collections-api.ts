@@ -118,6 +118,54 @@ export const CollectionsApiAxiosParamCreator = function (configuration?: Configu
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * List collections by NFT owner account address
+         * @summary List collections by NFT owner
+         * @param {string} accountAddress Account address
+         * @param {string} chainName The name of chain
+         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
+         * @param {number} [pageSize] Maximum number of items to return
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listCollectionsByNFTOwner: async (accountAddress: string, chainName: string, pageCursor?: string, pageSize?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'accountAddress' is not null or undefined
+            assertParamExists('listCollectionsByNFTOwner', 'accountAddress', accountAddress)
+            // verify required parameter 'chainName' is not null or undefined
+            assertParamExists('listCollectionsByNFTOwner', 'chainName', chainName)
+            const localVarPath = `/v1/chains/{chain_name}/accounts/{account_address}/collections`
+                .replace(`{${"account_address"}}`, encodeURIComponent(String(accountAddress)))
+                .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (pageCursor !== undefined) {
+                localVarQueryParameter['page_cursor'] = pageCursor;
+            }
+
+            if (pageSize !== undefined) {
+                localVarQueryParameter['page_size'] = pageSize;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -153,6 +201,20 @@ export const CollectionsApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listCollections(chainName, pageCursor, pageSize, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
+        /**
+         * List collections by NFT owner account address
+         * @summary List collections by NFT owner
+         * @param {string} accountAddress Account address
+         * @param {string} chainName The name of chain
+         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
+         * @param {number} [pageSize] Maximum number of items to return
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listCollectionsByNFTOwner(accountAddress: string, chainName: string, pageCursor?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListCollectionsResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listCollectionsByNFTOwner(accountAddress, chainName, pageCursor, pageSize, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
     }
 };
 
@@ -185,6 +247,19 @@ export const CollectionsApiFactory = function (configuration?: Configuration, ba
          */
         listCollections(chainName: string, pageCursor?: string, pageSize?: number, options?: any): AxiosPromise<ListCollectionsResult> {
             return localVarFp.listCollections(chainName, pageCursor, pageSize, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * List collections by NFT owner account address
+         * @summary List collections by NFT owner
+         * @param {string} accountAddress Account address
+         * @param {string} chainName The name of chain
+         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
+         * @param {number} [pageSize] Maximum number of items to return
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listCollectionsByNFTOwner(accountAddress: string, chainName: string, pageCursor?: string, pageSize?: number, options?: any): AxiosPromise<ListCollectionsResult> {
+            return localVarFp.listCollectionsByNFTOwner(accountAddress, chainName, pageCursor, pageSize, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -239,6 +314,41 @@ export interface CollectionsApiListCollectionsRequest {
 }
 
 /**
+ * Request parameters for listCollectionsByNFTOwner operation in CollectionsApi.
+ * @export
+ * @interface CollectionsApiListCollectionsByNFTOwnerRequest
+ */
+export interface CollectionsApiListCollectionsByNFTOwnerRequest {
+    /**
+     * Account address
+     * @type {string}
+     * @memberof CollectionsApiListCollectionsByNFTOwner
+     */
+    readonly accountAddress: string
+
+    /**
+     * The name of chain
+     * @type {string}
+     * @memberof CollectionsApiListCollectionsByNFTOwner
+     */
+    readonly chainName: string
+
+    /**
+     * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
+     * @type {string}
+     * @memberof CollectionsApiListCollectionsByNFTOwner
+     */
+    readonly pageCursor?: string
+
+    /**
+     * Maximum number of items to return
+     * @type {number}
+     * @memberof CollectionsApiListCollectionsByNFTOwner
+     */
+    readonly pageSize?: number
+}
+
+/**
  * CollectionsApi - object-oriented interface
  * @export
  * @class CollectionsApi
@@ -267,5 +377,17 @@ export class CollectionsApi extends BaseAPI {
      */
     public listCollections(requestParameters: CollectionsApiListCollectionsRequest, options?: AxiosRequestConfig) {
         return CollectionsApiFp(this.configuration).listCollections(requestParameters.chainName, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * List collections by NFT owner account address
+     * @summary List collections by NFT owner
+     * @param {CollectionsApiListCollectionsByNFTOwnerRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CollectionsApi
+     */
+    public listCollectionsByNFTOwner(requestParameters: CollectionsApiListCollectionsByNFTOwnerRequest, options?: AxiosRequestConfig) {
+        return CollectionsApiFp(this.configuration).listCollectionsByNFTOwner(requestParameters.accountAddress, requestParameters.chainName, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 }

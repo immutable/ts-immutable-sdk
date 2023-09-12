@@ -1,5 +1,6 @@
 import { Box, Icon, MenuItem } from '@biom3/react';
 import {
+  useCallback,
   useContext, useEffect, useMemo, useState,
 } from 'react';
 import { GasEstimateType } from '@imtbl/checkout-sdk';
@@ -25,7 +26,7 @@ import {
   CryptoFiatActions,
   CryptoFiatContext,
 } from '../../../context/crypto-fiat-context/CryptoFiatContext';
-import { getTokenBalances } from '../functions/tokenBalances';
+import { BalanceInfo, getTokenBalances } from '../functions/tokenBalances';
 import { WalletWidgetViews } from '../../../context/view-context/WalletViewContextTypes';
 import {
   SharedViews,
@@ -35,7 +36,12 @@ import {
 import { fetchTokenSymbols } from '../../../lib/fetchTokenSymbols';
 import { NotEnoughGas } from '../../../components/NotEnoughGas/NotEnoughGas';
 import { isNativeToken } from '../../../lib/utils';
-import { DEFAULT_TOKEN_DECIMALS, ETH_TOKEN_SYMBOL, ZERO_BALANCE_STRING } from '../../../lib';
+import {
+  DEFAULT_BALANCE_RETRY_POLICY,
+  DEFAULT_TOKEN_DECIMALS,
+  ETH_TOKEN_SYMBOL,
+  ZERO_BALANCE_STRING,
+} from '../../../lib';
 import { orchestrationEvents } from '../../../lib/orchestrationEvents';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import { isPassportProvider } from '../../../lib/providerUtils';
@@ -102,7 +108,8 @@ export function WalletBalances() {
 
   // Silently runs a gas check for bridge to L2
   // This is to prevent the user having to wait for the gas estimate to complete to use the UI
-  // As a trade-off there is a slight delay between when the gas estimate is fetched and checked against the user balance, so 'move' can be selected before the gas estimate is completed
+  // As a trade-off there is a slight delay between when the gas estimate is fetched and checked
+  // against the user balance, so 'move' can be selected before the gas estimate is completed
   useEffect(() => {
     const bridgeToL2GasCheck = async () => {
       if (!checkout) return;
@@ -139,15 +146,32 @@ export function WalletBalances() {
     bridgeToL2GasCheck();
   }, [tokenBalances, checkout, network]);
 
+  const showErrorView = useCallback(() => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: SharedViews.ERROR_VIEW,
+          error: new Error('Unable to fetch balances'),
+        },
+      },
+    });
+  }, [viewDispatch]);
+
   useEffect(() => {
-    if (!checkout || !provider || !network) return;
+    if (!checkout || !provider || !network || !conversions) return;
+    if (conversions.size <= 0) return; // Prevent unnecessary re-rendering
+
     (async () => {
-      const balances = await getTokenBalances(
-        checkout,
-        provider,
-        network.chainId,
-        conversions,
-      );
+      let balances: BalanceInfo[] = [];
+      try {
+        balances = await getTokenBalances(checkout, provider, network.chainId, conversions);
+      } catch (error: any) {
+        if (DEFAULT_BALANCE_RETRY_POLICY.nonRetryable!(error)) {
+          showErrorView();
+          return;
+        }
+      }
 
       walletDispatch({
         payload: {
@@ -157,7 +181,7 @@ export function WalletBalances() {
       });
       setBalancesLoading(false);
     })();
-  }, [checkout, network, provider, conversions, setBalancesLoading, walletDispatch]);
+  }, [checkout, provider, network, conversions]);
 
   const showAddCoins = useMemo(() => {
     if (!checkout || !network) return false;
