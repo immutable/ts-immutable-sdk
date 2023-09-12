@@ -5,7 +5,8 @@
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
-    "@imtbl/config": "0.0.0",
+    "@ethersproject/contracts": "^5.7.0",
+    "@ethersproject/providers": "^5.7.2",
     "@imtbl/contracts": "0.0.0",
     "ethers": "^5.7.2"
   },
@@ -13,7 +14,8 @@
     "@rollup/plugin-typescript": "^11.0.0",
     "@swc/jest": "^0.2.24",
     "@typechain/ethers-v5": "^10.2.0",
-    "rollup": "^3.17.2"
+    "rollup": "^3.17.2",
+    "typescript": "^5.2.2"
   },
   "engines": {
     "node": ">=16.11.0"
