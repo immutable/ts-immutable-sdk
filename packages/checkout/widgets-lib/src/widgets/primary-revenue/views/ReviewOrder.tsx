@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Body, Box, Button } from '@biom3/react';
 import { PrimaryRevenueSuccess } from '@imtbl/checkout-widgets';
 
@@ -13,24 +13,39 @@ import {
   sendPrimaryRevenueFailedEvent,
   sendPrimaryRevenueSuccessEvent,
 } from '../PrimaryRevenuWidgetEvents';
+import { ViewState } from '../../../context/view-context/ViewContext';
+import {
+  Item,
+  MergedItemsDetails,
+  useMergeItemsInfo,
+} from '../hooks/useMergeItemsInfo';
 
 export interface ReviewOrderProps {
-  sign: () => Promise<void>;
   execute: () => Promise<PrimaryRevenueSuccess>;
   currency: string;
-  amount: string;
-  // FIXME: add type
-  items: any[];
+  viewState: ViewState;
+  items: Item[];
 }
 
 export function ReviewOrder(props: ReviewOrderProps) {
   const {
-    currency, execute, sign, items, amount,
+    currency, execute, viewState, items,
   } = props;
   const { header } = text.views[PrimaryRevenueWidgetViews.REVIEW_ORDER];
   const [loading, setLoading] = useState(false);
+  const [mergedItemsList, setMergedItemsList] = useState<
+  MergedItemsDetails[] | null
+  >(null);
 
-  const once = useRef(false);
+  const { getMergedItemsList } = useMergeItemsInfo(items, viewState.view.data);
+
+  useEffect(() => {
+    if (viewState.view.data) {
+      setMergedItemsList(getMergedItemsList());
+      // eslint-disable-next-line no-console
+      console.log('@@@@ mergedItemsList', mergedItemsList);
+    }
+  }, [items, viewState, viewState.view.data]);
 
   const handlePayment = async () => {
     setLoading(true);
@@ -43,13 +58,6 @@ export function ReviewOrder(props: ReviewOrderProps) {
 
     setLoading(false);
   };
-
-  useEffect(() => {
-    if (once.current === false) {
-      once.current = true;
-      sign();
-    }
-  }, []);
 
   return (
     <SimpleLayout
@@ -79,7 +87,7 @@ export function ReviewOrder(props: ReviewOrderProps) {
             rowGap: 'base.spacing.x9',
           }}
         >
-          <OrderList items={items} currency={currency} />
+          <OrderList items={mergedItemsList} />
         </Box>
         <Box
           sx={{
@@ -108,7 +116,11 @@ export function ReviewOrder(props: ReviewOrderProps) {
               'Buy Now'
             )}
           </Button>
-          <Body>{`${amount} ${currency}`}</Body>
+          <Body>
+            {viewState.view.data && viewState.view.data.order.total_amount
+              ? `${viewState.view.data.order.total_amount} ${currency}`
+              : ''}
+          </Body>
         </Box>
       </Box>
     </SimpleLayout>

@@ -1,14 +1,19 @@
 import { Box } from '@biom3/react';
-
+import { useEffect } from 'react';
 import { OrderItem } from './OrderItem';
+import { MergedItemsDetails } from '../hooks/useMergeItemsInfo';
 
 export interface OrderListProps {
-  currency: string;
-  items: any[];
+  items: MergedItemsDetails[] | null;
 }
 
 export function OrderList(props: OrderListProps) {
-  const { items, currency } = props;
+  const { items } = props;
+  useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.log('@@@@@@@@@@@@@@ items', items);
+  }, [items]);
+
   return (
     <Box
       testId="order-list"
@@ -20,9 +25,11 @@ export function OrderList(props: OrderListProps) {
         alignItems: 'flex-start',
       }}
     >
-      {items.map((item) => (
-        <OrderItem key={item.token_id} currency={currency} item={item} />
-      ))}
+      {items
+        ? items.map((item: MergedItemsDetails) => (
+          <OrderItem key={item.tokenId} item={item} />
+        ))
+        : null}
     </Box>
   );
 }

@@ -15,43 +15,47 @@ import {
   ViewActions,
   SharedViews,
 } from '../../../context/view-context/ViewContext';
+import { PaymentType, SignResponse } from '../hooks/useSignOrder';
 
 export interface PaymentMethodsProps {
   checkBalances: () => Promise<boolean>;
-  setPaymentType: (type: 'fiat' | 'crypto' | undefined) => void;
+  sign: (paymentType: PaymentType) => Promise<SignResponse | undefined>;
 }
 
-export function PaymentMethods(props: PaymentMethodsProps) {
-  const { checkBalances, setPaymentType } = props;
+export function PaymentMethods({ checkBalances, sign }: PaymentMethodsProps) {
   const { header } = text.views[PrimaryRevenueWidgetViews.PAYMENT_METHODS];
   const { viewDispatch, viewState } = useContext(ViewContext);
 
-  const {
-    amount,
-    // envId,
-    // fromCurrency,
-    // items,
-    fromContractAddress,
-  } = viewState.view.data || {};
+  const { amount, fromContractAddress } = viewState.view.data || {};
 
   const handleOptionClick = useCallback(
     async (type: PrimaryRevenueWidgetViews) => {
-      setPaymentType(
-        type === PrimaryRevenueWidgetViews.PAY_WITH_CRYPTO ? 'crypto' : 'fiat',
-      );
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: { type: SharedViews.LOADING_VIEW },
+        },
+      });
 
       try {
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: { type: SharedViews.LOADING_VIEW },
-          },
-        });
-
         const hasEnoughBalance = await checkBalances();
 
-        // FIXME: best way to handle conditional routing?
         if (
+          hasEnoughBalance
+          && type === PrimaryRevenueWidgetViews.PAY_WITH_CRYPTO
+        ) {
+          const signResponse = await sign(PaymentType.CRYPTO);
+
+          viewDispatch({
+            payload: {
+              type: ViewActions.UPDATE_VIEW,
+              view: {
+                type: PrimaryRevenueWidgetViews.PAY_WITH_CRYPTO,
+                data: signResponse,
+              },
+            },
+          });
+        } else if (
           !hasEnoughBalance
           && type === PrimaryRevenueWidgetViews.PAY_WITH_CRYPTO
         ) {
@@ -60,29 +64,21 @@ export function PaymentMethods(props: PaymentMethodsProps) {
               type: ViewActions.UPDATE_VIEW,
               view: {
                 type: SharedViews.TOP_UP_VIEW,
-                data: {},
                 bridgeData: {
                   fromAmount: amount,
                   fromContractAddress,
                 },
-                swapData: {
-                  fromContractAddress: '',
-                  fromAmount: amount,
-                  toContractAddress: fromContractAddress,
-                },
               },
             },
           });
-
-          return;
+        } else {
+          viewDispatch({
+            payload: {
+              type: ViewActions.UPDATE_VIEW,
+              view: { type: PrimaryRevenueWidgetViews.PAY_WITH_CARD },
+            },
+          });
         }
-
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: { type: type as any },
-          },
-        });
       } catch (err: any) {
         viewDispatch({
           payload: {
@@ -92,7 +88,7 @@ export function PaymentMethods(props: PaymentMethodsProps) {
         });
       }
     },
-    [],
+    [checkBalances, sign],
   );
 
   useEffect(() => {
