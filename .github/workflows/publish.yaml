@@ -30,9 +30,10 @@ on:
 jobs:
   Publish:
     name: Publish Workflow
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-4-cores
     env:
       GH_TOKEN: ${{ secrets.PLATFORM_SA_GITHUB_TOKEN }}
+      NODE_OPTIONS: --max-old-space-size=14366
     steps:
       - name: Check Public Release Branch
         if: contains(github.event.inputs.release_type, 'release') && (github.ref != 'refs/heads/main')
