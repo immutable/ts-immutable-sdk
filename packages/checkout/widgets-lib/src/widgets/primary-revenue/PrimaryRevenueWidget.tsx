@@ -1,11 +1,6 @@
 /* eslint-disable no-console */
 import {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useReducer,
-  useState,
+  useCallback, useContext, useEffect, useMemo, useReducer,
 } from 'react';
 
 import { BiomeCombinedProviders } from '@biom3/react';
@@ -37,19 +32,14 @@ import { BridgeWidget } from '../bridge/BridgeWidget';
 import { SwapWidget } from '../swap/SwapWidget';
 import { OnRampWidget } from '../on-ramp/OnRampWidget';
 import { useSignOrder } from './hooks/useSignOrder';
+import { Item } from './hooks/useMergeItemsInfo';
 
-export type Item = {
-  productId: string;
-  qty: number;
-};
 export interface PrimaryRevenueWidgetProps {
   config: StrongCheckoutWidgetsConfig;
   amount: string;
   fromCurrency: string;
   items: Item[];
 }
-
-export type PaymentType = 'crypto' | 'fiat';
 
 export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
   const {
@@ -58,11 +48,9 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
 
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
-  const [paymentType, setPaymentType] = useState<PaymentType | undefined>(undefined);
 
   const { sign, execute } = useSignOrder({
     items,
-    paymentType,
     fromCurrency,
     provider,
   });
@@ -106,7 +94,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
     }
   }, [checkout, provider]);
 
-  // FIXME: Best way to check balances?
+  // TODO: Integrate Smart Checkout to check balances
   const handleCheckBalances = useCallback(async () => {
     if (!checkout || !provider) return false;
 
@@ -219,18 +207,14 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
           <LoadingView loadingText={loadingText} />
         )}
         {viewState.view.type === PrimaryRevenueWidgetViews.PAYMENT_METHODS && (
-          <PaymentMethods
-            checkBalances={handleCheckBalances}
-            setPaymentType={setPaymentType}
-          />
+          <PaymentMethods checkBalances={handleCheckBalances} sign={sign} />
         )}
         {viewState.view.type === PrimaryRevenueWidgetViews.PAY_WITH_CRYPTO && (
           <ReviewOrder
-            items={items}
             currency={fromCurrency}
-            amount={amount}
-            sign={sign}
             execute={execute}
+            viewState={viewState}
+            items={items}
           />
         )}
         {viewState.view.type === PrimaryRevenueWidgetViews.PAY_WITH_CARD && (
