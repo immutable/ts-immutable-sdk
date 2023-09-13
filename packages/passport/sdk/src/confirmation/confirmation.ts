@@ -90,12 +90,12 @@ export default class ConfirmationScreen {
           case ReceiveMessage.CONFIRMATION_WINDOW_READY: {
             break;
           }
-          case ReceiveMessage.TRANSACTION_CONFIRMED: {
+          case ReceiveMessage.MESSAGE_CONFIRMED: {
             resolve({ confirmed: true });
             break;
           }
-          case ReceiveMessage.TRANSACTION_ERROR: {
-            reject(new Error('Transaction error'));
+          case ReceiveMessage.MESSAGE_REJECTED: {
+            reject(new Error('Message rejected'));
             break;
           }
 
