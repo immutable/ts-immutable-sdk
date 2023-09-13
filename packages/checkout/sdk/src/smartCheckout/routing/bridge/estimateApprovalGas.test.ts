@@ -3,10 +3,10 @@ import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
 import * as instance from '../../../instance';
 import { CheckoutConfiguration } from '../../../config';
-import { ChainId, ItemType } from '../../../types';
-import { BalanceRequirement } from '../../balanceCheck/types';
+import { ChainId } from '../../../types';
 import { estimateApprovalGas, estimateGasForBridgeApproval } from './estimateApprovalGas';
 import { CheckoutErrorType } from '../../../errors';
+import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from './constants';
 
 jest.mock('../../../instance');
 jest.mock('../../../config');
@@ -21,7 +21,7 @@ describe('estimateGasForBridgeApproval', () => {
   beforeEach(() => {
     providerMock = {
       getSigner: jest.fn().mockReturnValue({
-        getAddress: jest.fn().mockResolvedValue('0xaddress'),
+        getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
       }),
       estimateGas: jest.fn().mockResolvedValue(BigNumber.from(123)),
     } as unknown as Web3Provider;
@@ -29,34 +29,6 @@ describe('estimateGasForBridgeApproval', () => {
 
   describe('estimateGasForBridgeApproval', () => {
     it('should estimate gas for bridge approval for ERC20 token', async () => {
-      const balanceRequirement: BalanceRequirement = {
-        type: ItemType.ERC20,
-        sufficient: false,
-        delta: { balance: BigNumber.from(100), formattedBalance: '100' },
-        current: {
-          type: ItemType.ERC20,
-          balance: BigNumber.from(50),
-          formattedBalance: '50',
-          token: {
-            address: '0xERC20',
-            decimals: 18,
-            symbol: 'ERC20',
-            name: 'ERC20',
-          },
-        },
-        required: {
-          type: ItemType.ERC20,
-          balance: BigNumber.from(150),
-          formattedBalance: '150',
-          token: {
-            address: '0xERC20',
-            decimals: 18,
-            symbol: 'ERC20',
-            name: 'ERC20',
-          },
-        },
-      };
-
       const tokenBridge = {
         getUnsignedApproveDepositBridgeTx: jest.fn().mockResolvedValue({
           unsignedTx: {},
@@ -68,41 +40,19 @@ describe('estimateGasForBridgeApproval', () => {
         config,
         readOnlyProviders,
         providerMock,
-        balanceRequirement,
+        '0xERC20',
+        BigNumber.from(5),
       );
 
       expect(gasEstimation).toEqual(BigNumber.from(123));
+      expect(tokenBridge.getUnsignedApproveDepositBridgeTx).toBeCalledWith({
+        depositorAddress: '0xADDRESS',
+        token: '0xERC20',
+        depositAmount: BigNumber.from(5),
+      });
     });
 
     it('should return zero for bridge approval if NATIVE token', async () => {
-      const balanceRequirement: BalanceRequirement = {
-        type: ItemType.NATIVE,
-        sufficient: false,
-        delta: { balance: BigNumber.from(100), formattedBalance: '100' },
-        current: {
-          type: ItemType.NATIVE,
-          balance: BigNumber.from(50),
-          formattedBalance: '50',
-          token: {
-            address: '0xIMX',
-            decimals: 18,
-            symbol: 'IMX',
-            name: 'IMX',
-          },
-        },
-        required: {
-          type: ItemType.NATIVE,
-          balance: BigNumber.from(150),
-          formattedBalance: '150',
-          token: {
-            address: '0xIMX',
-            decimals: 18,
-            symbol: 'IMX',
-            name: 'IMX',
-          },
-        },
-      };
-
       const tokenBridge = {
         getUnsignedApproveDepositBridgeTx: jest.fn().mockResolvedValue({
           unsignedTx: {},
@@ -114,91 +64,12 @@ describe('estimateGasForBridgeApproval', () => {
         config,
         readOnlyProviders,
         providerMock,
-        balanceRequirement,
+        INDEXER_ETH_ROOT_CONTRACT_ADDRESS,
+        BigNumber.from(5),
       );
 
       expect(gasEstimation).toEqual(BigNumber.from(0));
       expect(tokenBridge.getUnsignedApproveDepositBridgeTx).not.toHaveBeenCalled();
-    });
-
-    it('should throw error if trying to estimate an ERC20 with no address', async () => {
-      const balanceRequirement: BalanceRequirement = {
-        type: ItemType.ERC20,
-        sufficient: false,
-        delta: { balance: BigNumber.from(100), formattedBalance: '100' },
-        current: {
-          type: ItemType.ERC20,
-          balance: BigNumber.from(50),
-          formattedBalance: '50',
-          token: {
-            decimals: 18,
-            symbol: 'ERC20',
-            name: 'ERC20',
-          },
-        },
-        required: {
-          type: ItemType.ERC20,
-          balance: BigNumber.from(150),
-          formattedBalance: '150',
-          token: {
-            decimals: 18,
-            symbol: 'ERC20',
-            name: 'ERC20',
-          },
-        },
-      };
-
-      let type;
-
-      try {
-        await estimateGasForBridgeApproval(
-          config,
-          readOnlyProviders,
-          providerMock,
-          balanceRequirement,
-        );
-      } catch (err: any) {
-        type = err.type;
-      }
-
-      expect(type).toEqual(CheckoutErrorType.BRIDGE_GAS_ESTIMATE_ERROR);
-    });
-
-    it('should throw error if trying to estimate an ERC721', async () => {
-      const balanceRequirement: BalanceRequirement = {
-        type: ItemType.ERC721,
-        sufficient: false,
-        delta: { balance: BigNumber.from(1), formattedBalance: '1' },
-        current: {
-          type: ItemType.ERC721,
-          balance: BigNumber.from(0),
-          formattedBalance: '0',
-          contractAddress: '0xERC721',
-          id: '0',
-        },
-        required: {
-          type: ItemType.ERC721,
-          balance: BigNumber.from(1),
-          formattedBalance: '1',
-          contractAddress: '0xERC721',
-          id: '0',
-        },
-      };
-
-      let type;
-
-      try {
-        await estimateGasForBridgeApproval(
-          config,
-          readOnlyProviders,
-          providerMock,
-          balanceRequirement,
-        );
-      } catch (err: any) {
-        type = err.type;
-      }
-
-      expect(type).toEqual(CheckoutErrorType.BRIDGE_GAS_ESTIMATE_ERROR);
     });
   });
 
@@ -224,7 +95,7 @@ describe('estimateGasForBridgeApproval', () => {
       expect(gasEstimation).toEqual(BigNumber.from(123));
     });
 
-    it('should return zero for estimated gas', async () => {
+    it('should return zero for estimated gas if unsigned approval is null', async () => {
       const tokenBridge = {
         getUnsignedApproveDepositBridgeTx: jest.fn().mockResolvedValue({
           unsignedTx: null,

@@ -1,10 +1,10 @@
 import { BigNumber, ethers } from 'ethers';
 import { Web3Provider } from '@ethersproject/providers';
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../../config';
-import { ChainId, ItemType } from '../../../types';
+import { ChainId } from '../../../types';
 import * as instance from '../../../instance';
-import { BalanceRequirement } from '../../balanceCheck/types';
 import { CheckoutError, CheckoutErrorType } from '../../../errors';
+import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from './constants';
 
 export const estimateApprovalGas = async (
   config: CheckoutConfiguration,
@@ -24,6 +24,7 @@ export const estimateApprovalGas = async (
     );
 
     const depositorAddress = await provider.getSigner().getAddress();
+
     const { unsignedTx } = await tokenBridge.getUnsignedApproveDepositBridgeTx({
       depositorAddress,
       token,
@@ -46,24 +47,11 @@ export const estimateGasForBridgeApproval = async (
   config: CheckoutConfiguration,
   readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
   provider: Web3Provider,
-  balanceRequirement: BalanceRequirement,
+  l1Address: string,
+  delta: BigNumber,
 ): Promise<BigNumber> => {
-  if (balanceRequirement.type === ItemType.NATIVE) {
-    return BigNumber.from(0); // Native tokens don't require approval
-  }
-
-  if (balanceRequirement.type === ItemType.ERC721) {
-    throw new CheckoutError(
-      'Cannot estimate approval gas on bridge for an ERC721',
-      CheckoutErrorType.BRIDGE_GAS_ESTIMATE_ERROR,
-    );
-  }
-
-  if (!balanceRequirement.required.token.address) {
-    throw new CheckoutError(
-      'Cannot estimate approval gas on bridge for an ERC20 without an address',
-      CheckoutErrorType.BRIDGE_GAS_ESTIMATE_ERROR,
-    );
+  if (l1Address === INDEXER_ETH_ROOT_CONTRACT_ADDRESS) {
+    return BigNumber.from(0); // Native ETH does not require approval
   }
 
   const fromChainId = getL1ChainId(config);
@@ -75,7 +63,7 @@ export const estimateGasForBridgeApproval = async (
     provider,
     fromChainId,
     toChainId,
-    balanceRequirement.required.token.address,
-    balanceRequirement.delta.balance,
+    l1Address,
+    delta,
   );
 };

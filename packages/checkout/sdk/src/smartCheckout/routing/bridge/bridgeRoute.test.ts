@@ -2,7 +2,11 @@ import { Environment } from '@imtbl/config';
 import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import {
-  INDEXER_ETH_ROOT_CONTRACT_ADDRESS, bridgeRoute, fetchL1Representation, getBridgeGasEstimate, hasSufficientL1Eth,
+  bridgeRoute,
+  fetchL1Representation,
+  getBridgeGasEstimate,
+  hasSufficientL1Eth,
+  isNativeEth,
 } from './bridgeRoute';
 import { CheckoutConfiguration } from '../../../config';
 import {
@@ -14,6 +18,7 @@ import { FundingRouteType, TokenBalanceResult } from '../types';
 import { createBlockchainDataInstance } from '../../../instance';
 import { estimateGasForBridgeApproval } from './estimateApprovalGas';
 import { bridgeGasEstimate } from './bridgeGasEstimate';
+import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from './constants';
 
 jest.mock('../../../gasEstimate');
 jest.mock('../../../instance');
@@ -96,6 +101,16 @@ describe('bridgeRoute', () => {
           [ChainId.SEPOLIA, {
             success: true,
             balances: [
+              {
+                balance: BigNumber.from(20),
+                formattedBalance: '20',
+                token: {
+                  name: 'Immutable X',
+                  symbol: 'IMX',
+                  decimals: 18,
+                  address: '0xIMX',
+                },
+              },
               {
                 balance: BigNumber.from(12),
                 formattedBalance: '12',
@@ -795,6 +810,20 @@ describe('bridgeRoute', () => {
       expect(feeEstimates).toEqual(new Map<FundingRouteType, BigNumber>([
         [FundingRouteType.BRIDGE, BigNumber.from(1)],
       ]));
+    });
+  });
+
+  describe('isNativeEth', () => {
+    it('should return true if address empty string', () => {
+      expect(isNativeEth('')).toBeTruthy();
+    });
+
+    it('should return true if address undefined', () => {
+      expect(isNativeEth(undefined)).toBeTruthy();
+    });
+
+    it('should return false if address exists', () => {
+      expect(isNativeEth('0xERC20')).toBeFalsy();
     });
   });
 });

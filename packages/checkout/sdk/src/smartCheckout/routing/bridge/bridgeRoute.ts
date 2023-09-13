@@ -14,23 +14,8 @@ import { BalanceRequirement } from '../../balanceCheck/types';
 import { createBlockchainDataInstance } from '../../../instance';
 import { getEthBalance } from './getEthBalance';
 import { bridgeGasEstimate } from './bridgeGasEstimate';
+import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS, getImxL1Representation, getIndexerChainName } from './constants';
 import { estimateGasForBridgeApproval } from './estimateApprovalGas';
-
-// If the root address evaluates to this then its ETH
-export const INDEXER_ETH_ROOT_CONTRACT_ADDRESS = '0x0000000000000000000000000000000000000001';
-
-const getIndexerChainName = (chainId: ChainId): string => {
-  if (chainId === ChainId.IMTBL_ZKEVM_TESTNET) return 'imtbl-zkevm-testnet';
-  return '';
-};
-
-// Indexer ERC20 call does not support IMX so cannot get root chain mapping from this endpoint.
-// TODO: WT-1693 - Move mapping to remote config
-const getImxL1Representation = (chainId: ChainId): string => {
-  if (chainId === ChainId.SEPOLIA) return '0x2Fa06C6672dDCc066Ab04631192738799231dE4a';
-  if (chainId === ChainId.ETHEREUM) return '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF';
-  return '';
-};
 
 export const hasSufficientL1Eth = (
   balances: TokenBalanceResult,
@@ -113,6 +98,11 @@ const constructBridgeFundingRoute = (
   },
 });
 
+export const isNativeEth = (address: string | undefined): boolean => {
+  if (!address || address === '') return true;
+  return false;
+};
+
 export const bridgeRoute = async (
   config: CheckoutConfiguration,
   provider: Web3Provider,
@@ -135,19 +125,30 @@ export const bridgeRoute = async (
 
   // If the user has no ETH to cover the bridge fees or approval fees then bridge cannot be an option
   if (!hasSufficientL1Eth(tokenBalanceResult, bridgeFeeEstimate)) return undefined;
-  const gasForApproval = await estimateGasForBridgeApproval(config, readOnlyProviders, provider, balanceRequirement);
+
+  const l1address = await fetchL1Representation(config, balanceRequirement);
+  if (l1address === '') return undefined;
+
+  const gasForApproval = await estimateGasForBridgeApproval(
+    config,
+    readOnlyProviders,
+    provider,
+    l1address,
+    balanceRequirement.delta.balance,
+  );
+
   if (!hasSufficientL1Eth(
     tokenBalanceResult,
     gasForApproval.add(bridgeFeeEstimate),
   )) return undefined;
 
-  const l1address = await fetchL1Representation(config, balanceRequirement);
-  if (l1address === '') return undefined;
-
   // Find the balance of the l1 representation of the token
   for (const balance of tokenBalanceResult.balances) {
-    // check if enough eth for gas
-    if (l1address === INDEXER_ETH_ROOT_CONTRACT_ADDRESS) {
+    if (
+      isNativeEth(balance.token.address)
+      && l1address === INDEXER_ETH_ROOT_CONTRACT_ADDRESS
+    ) {
+      // If the requirement is native ETH then ensure fees + total ETh required is sufficient for bridging
       if (balance.balance.gte(balanceRequirement.delta.balance.add(bridgeFeeEstimate))) {
         return constructBridgeFundingRoute(chainId, balance);
       }
