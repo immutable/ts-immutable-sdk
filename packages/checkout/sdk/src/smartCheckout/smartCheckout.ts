@@ -14,8 +14,8 @@ import { CheckoutConfiguration } from '../config';
 import { allowanceAggregator } from './aggregators/allowanceAggregator';
 import { gasCalculator } from './gas';
 import { BalanceCheckResult } from './balanceCheck/types';
-// import { routingOptionsAvailable } from './routing';
-// import { routingCalculator } from './routing/routingCalculator';
+import { routingOptionsAvailable } from './routing';
+import { routingCalculator } from './routing/routingCalculator';
 
 export const getSmartCheckoutResult = (
   balanceCheckResult: BalanceCheckResult,
@@ -63,8 +63,14 @@ export const smartCheckout = async (
   const balanceRequirements = await balanceCheck(config, provider, ownerAddress, aggregatedItems);
 
   // Determine which services are available
-  // const availableRoutingOptions = await routingOptionsAvailable(config, provider);
-  // const fundingRoutes = await routingCalculator(balanceRequirements, availableRoutingOptions);
+  const availableRoutingOptions = await routingOptionsAvailable(config, provider);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const fundingRoutes = await routingCalculator(
+    config,
+    ownerAddress,
+    balanceRequirements,
+    availableRoutingOptions,
+  );
 
   return getSmartCheckoutResult(balanceRequirements);
 };

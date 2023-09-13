@@ -11,7 +11,7 @@ import { CryptoFiat } from '@imtbl/cryptofiat';
 import { WalletWidget } from './WalletWidget';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { WidgetTheme } from '../../lib';
+import { IMX_ADDRESS_ZKEVM, WidgetTheme } from '../../lib';
 import { text } from '../../resources/text/textConfig';
 import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
 import {
@@ -363,6 +363,51 @@ describe('WalletWidget tests', () => {
           'Gods Unchained',
         );
         cySmartGet('balance-item-GODS__price').should('have.text', '100.20');
+      });
+
+      it('should show error screen after getAllBalances unrecoverable failure', () => {
+        const widgetConfig = {
+          theme: WidgetTheme.DARK,
+          environment: Environment.SANDBOX,
+          isBridgeEnabled: false,
+          isSwapEnabled: false,
+          isOnRampEnabled: false,
+        } as StrongCheckoutWidgetsConfig;
+
+        getAllBalancesStub
+          .onFirstCall()
+          .rejects({ data: { code: 500 } })
+          .onSecondCall()
+          .resolves({
+            balances: [
+              {
+                balance: BigNumber.from('10000000000000'),
+                formattedBalance: '0.1',
+                token: {
+                  name: 'ImmutableX',
+                  symbol: 'IMX',
+                  decimals: 18,
+                  address: IMX_ADDRESS_ZKEVM,
+                  icon: '123',
+                },
+              },
+            ],
+          });
+
+        mount(
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <WalletWidget
+              config={widgetConfig}
+            />
+          </ConnectLoaderTestComponent>,
+        );
+
+        cySmartGet('error-view').should('be.visible');
+        cySmartGet('footer-button').click();
+        cySmartGet('error-view').should('not.exist');
+        cySmartGet('wallet-balances').should('be.visible');
       });
     });
 

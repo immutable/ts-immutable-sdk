@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - @imtbl/orderbook: Added `getTrade` and `listTrades` methods for querying trades
+- @imtbl/blockchain-data: Added method `listCollectionsByNFTOwner`
 - @imtbl/passport: Added support for `eth_signTypedData_v4` to Passport zkEvm provider. 
 
 ## [0.16.0] - 2023-08-31
@@ -19,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - @imtbl/passport: Added support for `eth_getCode` to Passport zkEvm provider.
 - @imtbl/passport: Added support for `getLinkedAddresses` to Passport to read addresses connected with SIWE.
 - @imtbl/erc721: Added `safeBurn` and `safeBurnBatch` methods released in zkevm-contracts v1.1.0
-- @imtbl/erc721-mint-by-id: Added `safeBurn` and `safeBurnBatch` methods released in zkevm-contracts v1.1.0 
+- @imtbl/erc721-mint-by-id: Added `safeBurn` and `safeBurnBatch` methods released in zkevm-contracts v1.1.0
 
 ### Changed
 
@@ -31,8 +32,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- @imtbl/erc721: Renamed from @imtbl/erc721-hybrid-permissioned-mintable. 
-- @imtbl/erc721: Renamed various mint methods to match with preset methods released in zkevm-contracts v1.0.8. 
+- @imtbl/erc721: Renamed from @imtbl/erc721-hybrid-permissioned-mintable.
+- @imtbl/erc721: Renamed various mint methods to match with preset methods released in zkevm-contracts v1.0.8.
 - @imtbl/erc721: Renamed all instances of "Royalty Allowlist" to a more generic "Operator Allowlist"
 - @imtbl/erc721-mint-by-id: Renamed from @imtbl/erc721-permissioned-mintable.
 - @imtbl/erc721-mint-by-id: Renamed all instances of "Royalty Allowlist" to a more generic "Operator Allowlist"
@@ -52,6 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - @imtbl/passport: Removed `zkEvmChainId` from Passport configuration. Passport will now automatically resolve the chain ID.
 
 ## [0.9.0] - 2023-08-15
+
 ### Changed
 
 - @imtbl/orderbook: Changed how transactions and signable messages are returned from `prepareListing` and `prepareFulfillment` to ensure transactions gas limits can be estimated in order.
@@ -117,6 +119,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 ### Changed
+
 - @imtbl/blockchain-data: Improved naming for Activity types
 
 - @imtbl/immutablex-client: Order requests now pointing to the V3 endpoints
@@ -124,7 +127,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 ### Deprecated
-
 
 ## [0.3.0] - 2023-07-18
 
@@ -139,6 +141,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - @imtbl/passport: Fixed the confirmation popup being blocked by browser issue
 
 ### Changed
+
 - @imtbl/passport: Changed all the other Passport starkEx Provider functions to call the confirmation screen with guardian check
 
 ## [0.1.8] - 2023-06-05
