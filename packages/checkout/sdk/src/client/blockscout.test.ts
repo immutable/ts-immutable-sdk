@@ -280,8 +280,10 @@ describe('Blockscout', () => {
 
       const client = new Blockscout({ chainId: ChainId.IMTBL_ZKEVM_TESTNET });
 
-      await client.getNativeTokenByWalletAddress({ walletAddress: '0x1234567890' });
-      await client.getNativeTokenByWalletAddress({ walletAddress: '0x1234567890' });
+      const precache = await client.getNativeTokenByWalletAddress({ walletAddress: '0x1234567890' });
+      const cached = await client.getNativeTokenByWalletAddress({ walletAddress: '0x1234567890' });
+
+      expect(cached).toEqual(precache);
 
       expect(mockedAxios.get).toHaveBeenNthCalledWith(
         1,
