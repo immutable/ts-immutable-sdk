@@ -565,7 +565,6 @@ describe('Connect', () => {
     await expect(checkout.cancel({
       provider,
       orderId: '1234',
-      signActions: true,
     })).rejects.toThrow('This endpoint is not currently available.');
 
     expect(cancel).toBeCalledTimes(0);
