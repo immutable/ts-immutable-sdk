@@ -9,6 +9,7 @@ import { WidgetContext, hideAllWidgets } from "./WidgetProvider";
 import { ImtblWidgets } from "./ImtblWidgets";
 import { Passport } from '@imtbl/passport';
 import { passportConfig } from './passportConfig';
+import { useOnRampWidget } from './useOnRampWidget';
 
 export const MainPage = () => {
   // local state for enabling/disabling and changing buttons
@@ -38,7 +39,8 @@ export const MainPage = () => {
     showConnect,
     showWallet,
     showSwap,
-    showBridge
+    showBridge,
+    showOnRamp
   }, setShowWidgets} = useContext(WidgetContext);
 
   // hooks for each widget set up event listeners and orchestration logic
@@ -46,6 +48,7 @@ export const MainPage = () => {
   useWalletWidget(setWeb3Provider);
   useSwapWidget(setDoneSwap);
   useBridgeWidget();
+  useOnRampWidget()
 
   // button click functions to open/close widgets
   const openConnectWidget = useCallback(() => {
@@ -62,6 +65,10 @@ export const MainPage = () => {
 
   const openBridgeWidget = useCallback(() => {
     setShowWidgets({...hideAllWidgets, showBridge: {show: true, data: {}}});
+  }, [setShowWidgets])
+
+  const openOnRampWidget = useCallback(() => {
+    setShowWidgets({...hideAllWidgets, showOnRamp: {show: true, data: {}}});
   }, [setShowWidgets])
 
   const handleBuyClick = () => {
@@ -86,6 +93,7 @@ export const MainPage = () => {
       )}
       <Button onClick={openSwapWidget}>Open Swap</Button>
       <Button onClick={openBridgeWidget}>Open Bridge</Button>
+      <Button onClick={openOnRampWidget}>Open OnRamp</Button>
       <Button onClick={passPassportInstance}>Pass Passport Instance</Button>
       {passportInstance && <Button onClick={removePassportInstance}>Remove Passport Instance</Button>}
       <Button onClick={setPassportProvider}>Set Passport Provider</Button>
@@ -113,6 +121,7 @@ export const MainPage = () => {
             showWallet={showWallet} 
             showSwap={showSwap} 
             showBridge={showBridge} 
+            showOnRamp={showOnRamp} 
           />
         </GridBox>
       </Box>

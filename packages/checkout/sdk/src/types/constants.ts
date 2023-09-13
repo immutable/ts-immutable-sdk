@@ -57,6 +57,11 @@ export const BLOCKSCOUT_CHAIN_URL_MAP: {
   },
 };
 
+export const TRANSAK_API_BASE_URL = {
+  [Environment.SANDBOX]: 'https://global-stg.transak.com',
+  [Environment.PRODUCTION]: 'https://global.transak.com/',
+};
+
 type NetworkDetails = {
   chainIdHex: string;
   chainName: string;
