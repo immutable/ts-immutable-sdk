@@ -529,6 +529,42 @@ describe('balances', () => {
       ]);
     });
 
+    it('should call getIndexerBalance and return empty balance due to 404', async () => {
+      getTokensByWalletAddressMock = jest.fn().mockRejectedValue(
+        { code: HttpStatusCode.NotFound, message: 'not found' },
+      );
+
+      getNativeTokenByWalletAddressMock = jest.fn().mockRejectedValue(
+        { code: HttpStatusCode.NotFound, message: 'not found' },
+      );
+
+      (Blockscout as unknown as jest.Mock).mockReturnValue({
+        getTokensByWalletAddress: getTokensByWalletAddressMock,
+        getNativeTokenByWalletAddress: getNativeTokenByWalletAddressMock,
+      });
+
+      const chainId = Object.keys(BLOCKSCOUT_CHAIN_URL_MAP)[0] as unknown as ChainId;
+
+      const getAllBalancesResult = await getAllBalances(
+        {
+          remote: {
+            getTokensConfig: () => ({
+              blockscout: true,
+            }),
+          },
+          networkMap: testCheckoutConfig.networkMap,
+        } as unknown as CheckoutConfiguration,
+        jest.fn() as unknown as Web3Provider,
+        'abc123',
+        chainId,
+      );
+
+      expect(getNativeTokenByWalletAddressMock).toHaveBeenCalledTimes(1);
+      expect(getTokensByWalletAddressMock).toHaveBeenCalledTimes(1);
+
+      expect(getAllBalancesResult.balances).toEqual([]);
+    });
+
     const testcases = [{
       errorMessage: 'test',
       expectedErrorMessage: 'test',
