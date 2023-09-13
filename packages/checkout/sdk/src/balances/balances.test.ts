@@ -415,6 +415,120 @@ describe('balances', () => {
       ]);
     });
 
+    it('should call getIndexerBalance and return native balance on ERC20 404', async () => {
+      getTokensByWalletAddressMock = jest.fn().mockRejectedValue(
+        { code: HttpStatusCode.NotFound, message: 'not found' },
+      );
+
+      getNativeTokenByWalletAddressMock = jest.fn().mockResolvedValue({
+        token: {
+          name: 'IMX',
+          symbol: 'IMX',
+          decimals: '18',
+          address: IMX_ADDRESS_ZKEVM,
+        } as BlockscoutNativeTokenData,
+        value: '777777777777777777',
+      } as BlockscoutToken);
+
+      (Blockscout as unknown as jest.Mock).mockReturnValue({
+        getTokensByWalletAddress: getTokensByWalletAddressMock,
+        getNativeTokenByWalletAddress: getNativeTokenByWalletAddressMock,
+      });
+
+      const chainId = Object.keys(BLOCKSCOUT_CHAIN_URL_MAP)[0] as unknown as ChainId;
+
+      const getAllBalancesResult = await getAllBalances(
+        {
+          remote: {
+            getTokensConfig: () => ({
+              blockscout: true,
+            }),
+          },
+          networkMap: testCheckoutConfig.networkMap,
+        } as unknown as CheckoutConfiguration,
+        jest.fn() as unknown as Web3Provider,
+        'abc123',
+        chainId,
+      );
+
+      expect(getNativeTokenByWalletAddressMock).toHaveBeenCalledTimes(1);
+      expect(getTokensByWalletAddressMock).toHaveBeenCalledTimes(1);
+
+      expect(getAllBalancesResult.balances).toEqual([
+        {
+          balance: BigNumber.from('777777777777777777'),
+          formattedBalance: '0.777777777777777777',
+          token: {
+            address: '0x0000000000000000000000000000000000001010',
+            decimals: 18,
+            name: 'IMX',
+            symbol: 'IMX',
+          },
+        },
+      ]);
+    });
+
+    it('should call getIndexerBalance and return ERC20 balances on native 404', async () => {
+      getTokensByWalletAddressMock = jest.fn().mockResolvedValue({
+        items: [
+          {
+            token: {
+              address: '0x65AA7a21B0f3ce9B478aAC3408fE75b423939b1F',
+              decimals: '18',
+              name: 'Ether',
+              symbol: 'ETH',
+              type: BlockscoutTokenType.ERC20,
+            },
+            value: '330000000000000000',
+          },
+        ],
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        next_page_params: null,
+      } as BlockscoutTokens);
+
+      getNativeTokenByWalletAddressMock = jest.fn().mockRejectedValue(
+        { code: HttpStatusCode.NotFound, message: 'not found' },
+      );
+
+      (Blockscout as unknown as jest.Mock).mockReturnValue({
+        getTokensByWalletAddress: getTokensByWalletAddressMock,
+        getNativeTokenByWalletAddress: getNativeTokenByWalletAddressMock,
+      });
+
+      const chainId = Object.keys(BLOCKSCOUT_CHAIN_URL_MAP)[0] as unknown as ChainId;
+
+      const getAllBalancesResult = await getAllBalances(
+        {
+          remote: {
+            getTokensConfig: () => ({
+              blockscout: true,
+            }),
+          },
+          networkMap: testCheckoutConfig.networkMap,
+        } as unknown as CheckoutConfiguration,
+        jest.fn() as unknown as Web3Provider,
+        'abc123',
+        chainId,
+      );
+
+      expect(getNativeTokenByWalletAddressMock).toHaveBeenCalledTimes(1);
+      expect(getTokensByWalletAddressMock).toHaveBeenCalledTimes(1);
+
+      expect(getAllBalancesResult.balances).toEqual([
+        {
+          balance: BigNumber.from('330000000000000000'),
+          formattedBalance: '0.33',
+          token: {
+            address: '0x65AA7a21B0f3ce9B478aAC3408fE75b423939b1F',
+            decimals: 18,
+            name: 'Ether',
+            symbol: 'ETH',
+            type: 'ERC-20',
+          },
+        },
+      ]);
+    });
+
     const testcases = [{
       errorMessage: 'test',
       expectedErrorMessage: 'test',
