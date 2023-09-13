@@ -16,6 +16,7 @@ import { getEthBalance } from './getEthBalance';
 import { bridgeGasEstimate } from './bridgeGasEstimate';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS, getImxL1Representation, getIndexerChainName } from './constants';
 import { estimateGasForBridgeApproval } from './estimateApprovalGas';
+import { CheckoutError, CheckoutErrorType } from '../../../errors';
 
 export const hasSufficientL1Eth = (
   balances: TokenBalanceResult,
@@ -116,10 +117,22 @@ export const bridgeRoute = async (
   const chainId = getL1ChainId(config);
   const tokenBalanceResult = balances.get(chainId);
   const l1provider = readOnlyProviders.get(chainId);
-  if (!l1provider) return undefined;
+  if (!l1provider) {
+    throw new CheckoutError(
+      'No L1 provider available',
+      CheckoutErrorType.PROVIDER_ERROR,
+      { chainId: chainId.toString() },
+    );
+  }
 
   // If no balances on layer 1 then Bridge cannot be an option
-  if (!tokenBalanceResult || !tokenBalanceResult.success) return undefined;
+  if (tokenBalanceResult === undefined || tokenBalanceResult.success === false) {
+    throw new CheckoutError(
+      'Error getting balances',
+      CheckoutErrorType.GET_BALANCE_ERROR,
+      { chainId: chainId.toString() },
+    );
+  }
   if (tokenBalanceResult.balances.length === 0) return undefined;
 
   const bridgeFeeEstimate = await getBridgeGasEstimate(config, readOnlyProviders, feeEstimates);
