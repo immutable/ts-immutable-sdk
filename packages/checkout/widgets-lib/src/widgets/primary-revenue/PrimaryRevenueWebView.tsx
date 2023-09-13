@@ -136,6 +136,7 @@ function PrimaryRevenueWebView() {
   };
 
   const handleEvent = ((event: CustomEvent) => {
+    // eslint-disable-next-line no-console
     console.log('@@@@@ event', event.detail);
 
     switch (event.detail.type) {
@@ -144,6 +145,7 @@ function PrimaryRevenueWebView() {
         break;
       }
       default:
+        // eslint-disable-next-line no-console
         console.log('Does not match any expected event type');
     }
   }) as EventListener;
