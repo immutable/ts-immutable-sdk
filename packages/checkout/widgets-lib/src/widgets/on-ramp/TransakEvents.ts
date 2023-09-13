@@ -11,8 +11,12 @@ export enum TransakStatuses {
 }
 
 export interface TransakEventData {
-  id: string;
-  status: string;
-  statusReason?: string;
-  transactionHash?: string; // only available for completed txns
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  event_id: TransakEvents,
+  data: {
+    id: string;
+    status: string;
+    statusReason?: string;
+    transactionHash?: string; // only available for completed txns
+  }
 }

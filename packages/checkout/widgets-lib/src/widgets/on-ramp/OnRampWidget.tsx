@@ -4,7 +4,7 @@ import {
   useContext, useEffect, useMemo, useReducer, useState,
 } from 'react';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
-import { Passport, UserProfile } from '@imtbl/passport';
+import { Passport } from '@imtbl/passport';
 import { IMX_ADDRESS_ZKEVM, NATIVE, WidgetTheme } from '../../lib';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
@@ -24,12 +24,6 @@ import { sendOnRampFailedEvent, sendOnRampSuccessEvent, sendOnRampWidgetCloseEve
 import { OnRampMain } from './views/OnRampMain';
 import { StatusType } from '../../components/Status/StatusType';
 import { StatusView } from '../../components/Status/StatusView';
-import {
-  AnalyticsControls,
-  useAnalytics,
-  UserJourney,
-} from '../../context/analytics-provider/SegmentAnalyticsProvider';
-import { isPassportProvider } from '../../lib/providerUtils';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { OrderInProgress } from './views/OrderInProgress';
 
@@ -56,7 +50,6 @@ export function OnRampWidget(props: OnRampWidgetProps) {
 
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
-  const [emailAddress, setEmailAddress] = useState<string | undefined>(undefined);
   const [tokenAddress, setTokenAddress] = useState(contractAddress);
 
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
@@ -73,34 +66,6 @@ export function OnRampWidget(props: OnRampWidgetProps) {
     () => viewState.view.type === OnRampWidgetViews.ONRAMP,
     [viewState.view.type],
   );
-
-  const { track } = useAnalytics();
-
-  useEffect(() => {
-    const setDataFromProvider = async () => {
-      if (!provider) return;
-
-      const userWalletAddress = await provider.getSigner().getAddress();
-      const isPassportUser = isPassportProvider(provider);
-      let userInfo:UserProfile | undefined;
-      if (isPassportUser && passport) {
-        userInfo = await passport.getUserInfo();
-        setEmailAddress(userInfo?.email);
-      }
-
-      track({
-        userJourney: UserJourney.ON_RAMP,
-        screen: 'Onramp-widget-load',
-        control: AnalyticsControls.WIDGET_INITIALISATION,
-        controlType: 'WidgetLoad',
-        action: 'Opened',
-        userId: userWalletAddress,
-        isPassportWallet: isPassportUser,
-        email: userInfo?.email,
-      });
-    };
-    setDataFromProvider();
-  }, [provider, passport]);
 
   useEffect(() => {
     if (!checkout || !provider) return;
@@ -181,7 +146,6 @@ export function OnRampWidget(props: OnRampWidgetProps) {
         ) && (
         <OnRampMain
           passport={passport}
-          email={emailAddress}
           showIframe={showIframe}
           tokenAmount={viewState.view.data?.amount ?? amount}
           tokenAddress={
