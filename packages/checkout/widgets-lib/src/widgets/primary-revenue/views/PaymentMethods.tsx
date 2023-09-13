@@ -16,6 +16,7 @@ import {
   SharedViews,
 } from '../../../context/view-context/ViewContext';
 import { PaymentType, SignResponse } from '../hooks/useSignOrder';
+import { sendPrimaryRevenueWidgetCloseEvent } from '../PrimaryRevenuWidgetEvents';
 
 export interface PaymentMethodsProps {
   checkBalances: () => Promise<boolean>;
@@ -99,7 +100,7 @@ export function PaymentMethods({ checkBalances, sign }: PaymentMethodsProps) {
   return (
     <SimpleLayout
       testId="payment-methods"
-      header={<HeaderNavigation onCloseButtonClick={() => {}} />}
+      header={<HeaderNavigation onCloseButtonClick={() => sendPrimaryRevenueWidgetCloseEvent()} />}
       footer={<FooterLogo />}
     >
       <Box
