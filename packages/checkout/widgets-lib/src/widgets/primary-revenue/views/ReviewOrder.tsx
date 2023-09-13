@@ -12,6 +12,7 @@ import { OrderList } from '../components/OrderList';
 import {
   sendPrimaryRevenueFailedEvent,
   sendPrimaryRevenueSuccessEvent,
+  sendPrimaryRevenueWidgetCloseEvent,
 } from '../PrimaryRevenuWidgetEvents';
 import { ViewState } from '../../../context/view-context/ViewContext';
 import {
@@ -65,7 +66,7 @@ export function ReviewOrder(props: ReviewOrderProps) {
       header={(
         <HeaderNavigation
           title={header.heading}
-          onCloseButtonClick={() => {}}
+          onCloseButtonClick={() => sendPrimaryRevenueWidgetCloseEvent()}
         />
       )}
       footer={<FooterLogo />}

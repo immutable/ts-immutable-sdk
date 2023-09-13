@@ -2,6 +2,10 @@ import { useEffect, useState } from 'react';
 import { Environment } from '@imtbl/config';
 import { config, passport } from '@imtbl/sdk';
 
+import {
+  IMTBLWidgetEvents,
+  PrimaryRevenueEventType,
+} from '@imtbl/checkout-widgets';
 import { WidgetTheme } from '../../lib';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
 import { Item } from './hooks/useMergeItemsInfo';
@@ -93,6 +97,7 @@ function PrimaryRevenueWebView() {
     JSON.stringify(defaultPassportConfig, null, 2),
   );
   const [items, setItems] = useState(JSON.stringify(defaultItems, null, 2));
+  const [showWidget, setShowWidget] = useState(true);
 
   const handlePassportConfigChange = (e: any) => {
     setPassportConfig(e.target.value);
@@ -130,6 +135,19 @@ function PrimaryRevenueWebView() {
     }
   };
 
+  const handleEvent = ((event: CustomEvent) => {
+    console.log('@@@@@ event', event.detail);
+
+    switch (event.detail.type) {
+      case PrimaryRevenueEventType.CLOSE_WIDGET: {
+        setShowWidget(false);
+        break;
+      }
+      default:
+        console.log('Does not match any expected event type');
+    }
+  }) as EventListener;
+
   useEffect(() => {
     if (!passportOn) return;
 
@@ -160,6 +178,20 @@ function PrimaryRevenueWebView() {
     }
   }, []);
 
+  useEffect(() => {
+    window.addEventListener(
+      IMTBLWidgetEvents.IMTBL_PRIMARY_REVENUE_WIDGET_EVENT,
+      handleEvent,
+    );
+
+    return () => {
+      window.removeEventListener(
+        IMTBLWidgetEvents.IMTBL_PRIMARY_REVENUE_WIDGET_EVENT,
+        handleEvent,
+      );
+    };
+  }, []);
+
   const widgetConfig = {
     theme: WidgetTheme.DARK,
     environment: Environment.SANDBOX,
@@ -167,13 +199,16 @@ function PrimaryRevenueWebView() {
 
   return (
     <>
-      <imtbl-primary-revenue
-        widgetConfig={JSON.stringify(widgetConfig)}
-        amount={amount}
-        envId={envId}
-        fromCurrency={fromCurrency}
-        items={items}
-      />
+      {showWidget ? (
+        <imtbl-primary-revenue
+          widgetConfig={JSON.stringify(widgetConfig)}
+          amount={amount}
+          envId={envId}
+          fromCurrency={fromCurrency}
+          items={items}
+        />
+      ) : undefined}
+
       <br />
       <button type="button" onClick={() => setPassportOn(true)}>
         Passport On
