@@ -1,8 +1,11 @@
 /* eslint-disable no-unused-vars */
 
-import { useCallback, useContext, useEffect } from 'react';
+import {
+  useCallback, useContext, useEffect,
+} from 'react';
 import { Box, Heading } from '@biom3/react';
 
+import { SmartCheckoutResult } from '@imtbl/checkout-sdk';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
@@ -16,13 +19,16 @@ import {
   SharedViews,
 } from '../../../context/view-context/ViewContext';
 import { PaymentType, SignResponse } from '../hooks/useSignOrder';
+import { SmartCheckoutInput } from '../hooks/useSmartCheckout';
 
 export interface PaymentMethodsProps {
   checkBalances: () => Promise<boolean>;
   sign: (paymentType: PaymentType) => Promise<SignResponse | undefined>;
+  smartCheckout: (x: SmartCheckoutInput) => Promise<SmartCheckoutResult>;
+
 }
 
-export function PaymentMethods({ checkBalances, sign }: PaymentMethodsProps) {
+export function PaymentMethods({ checkBalances, sign, smartCheckout }: PaymentMethodsProps) {
   const { header } = text.views[PrimaryRevenueWidgetViews.PAYMENT_METHODS];
   const { viewDispatch, viewState } = useContext(ViewContext);
 
@@ -39,22 +45,44 @@ export function PaymentMethods({ checkBalances, sign }: PaymentMethodsProps) {
 
       try {
         const hasEnoughBalance = await checkBalances();
-
         if (
           hasEnoughBalance
           && type === PrimaryRevenueWidgetViews.PAY_WITH_CRYPTO
         ) {
           const signResponse = await sign(PaymentType.CRYPTO);
 
-          viewDispatch({
-            payload: {
-              type: ViewActions.UPDATE_VIEW,
-              view: {
-                type: PrimaryRevenueWidgetViews.PAY_WITH_CRYPTO,
-                data: signResponse,
-              },
-            },
+          const approveTx = signResponse?.transactions.find(
+            (tx) => tx.method_call === 'approve(address spender,uint256 amount)',
+          );
+
+          // eslint-disable-next-line no-console
+          console.log('@@@@@@@@ PaymentMethods.tsx signResponse', signResponse);
+          const smartCheckoutRes = await smartCheckout({
+            spenderAddress: approveTx?.params.spender || '',
+            amount: `${signResponse?.order.total_amount}`,
+            contractAddress: approveTx?.contract_address || '',
           });
+
+          // Use smartCheckoutRes to determine if crypto payment is possible
+          // waiting on fundingRoutes being return by SmartCheckout
+          // eslint-disable-next-line no-console
+          console.log('@@@@@@@@ PaymentMethods.tsx smartCheckoutRes', smartCheckoutRes);
+
+          if (smartCheckoutRes.sufficient) {
+            viewDispatch({
+              payload: {
+                type: ViewActions.UPDATE_VIEW,
+                view: {
+                  type: PrimaryRevenueWidgetViews.PAY_WITH_CRYPTO,
+                  data: signResponse,
+                },
+              },
+            });
+          } else {
+            // Take user to SC Orchestrator
+            // eslint-disable-next-line no-console
+            console.log('@@@@@@@@ PaymentMethods.tsx not enough funds -> sending to SC Ochestrator');
+          }
         } else if (
           !hasEnoughBalance
           && type === PrimaryRevenueWidgetViews.PAY_WITH_CRYPTO
@@ -99,7 +127,7 @@ export function PaymentMethods({ checkBalances, sign }: PaymentMethodsProps) {
   return (
     <SimpleLayout
       testId="payment-methods"
-      header={<HeaderNavigation onCloseButtonClick={() => {}} />}
+      header={<HeaderNavigation onCloseButtonClick={() => { }} />}
       footer={<FooterLogo />}
     >
       <Box
@@ -121,7 +149,9 @@ export function PaymentMethods({ checkBalances, sign }: PaymentMethodsProps) {
           {header.heading}
         </Heading>
         <Box sx={{ paddingX: 'base.spacing.x2' }}>
-          <PaymentOptions onClick={handleOptionClick} />
+          <PaymentOptions
+            onClick={handleOptionClick}
+          />
         </Box>
       </Box>
     </SimpleLayout>
