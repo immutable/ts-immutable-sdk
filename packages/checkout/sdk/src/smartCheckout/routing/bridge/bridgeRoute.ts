@@ -157,23 +157,22 @@ export const bridgeRoute = async (
     gasForApproval.add(bridgeFeeEstimate),
   )) return undefined;
 
-  // Find the balance of the l1 representation of the token
-  for (const balance of tokenBalanceResult.balances) {
-    if (
-      isNativeEth(balance.token.address)
-      && l1address === INDEXER_ETH_ROOT_CONTRACT_ADDRESS
-    ) {
-      // If the requirement is native ETH then ensure fees + total ETh required is sufficient for bridging
-      if (balance.balance.gte(balanceRequirement.delta.balance.add(bridgeFeeEstimate))) {
-        return constructBridgeFundingRoute(chainId, balance);
-      }
+  // If the L1 representation of the requirement is ETH then find the ETH balance and check if the balance covers the delta
+  if (l1address === INDEXER_ETH_ROOT_CONTRACT_ADDRESS) {
+    const nativeETHBalance = tokenBalanceResult.balances
+      .find((balance) => isNativeEth(balance.token.address));
+
+    if (nativeETHBalance && nativeETHBalance.balance.gte(balanceRequirement.delta.balance.add(bridgeFeeEstimate))) {
+      return constructBridgeFundingRoute(chainId, nativeETHBalance);
     }
 
-    if (balance.token.address === l1address) {
-      if (balance.balance.gte(balanceRequirement.delta.balance)) {
-        return constructBridgeFundingRoute(chainId, balance);
-      }
-    }
+    return undefined;
+  }
+
+  // Find the balance of the L1 representation of the token and check if the balance covers the delta
+  const erc20balance = tokenBalanceResult.balances.find((balance) => balance.token.address === l1address);
+  if (erc20balance && erc20balance.balance.gte(balanceRequirement.delta.balance)) {
+    return constructBridgeFundingRoute(chainId, erc20balance);
   }
 
   return undefined;
