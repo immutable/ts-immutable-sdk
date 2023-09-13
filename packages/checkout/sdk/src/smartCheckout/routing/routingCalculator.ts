@@ -72,8 +72,6 @@ export const routingCalculator = async (
     );
   }
 
-  console.log('bridgeFundingStep', bridgeFundingStep);
-
   // Check on-ramp routes
 
   // Check swap routes
