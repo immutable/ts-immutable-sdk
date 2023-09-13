@@ -11,6 +11,7 @@ const config: Config = {
     '@imtbl/cryptofiat': '<rootDir>../../internal/cryptofiat/src',
     '@imtbl/dex-sdk': '<rootDir>../../internal/dex/sdk/src',
     '@imtbl/orderbook': '<rootDir>../../orderbook/src',
+    '@imtbl/blockchain-data': '<rootDir>../../blockchain-data/sdk/src'
   },
   testEnvironment: 'jsdom',
   transform: {
