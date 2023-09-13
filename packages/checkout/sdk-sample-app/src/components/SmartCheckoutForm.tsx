@@ -152,8 +152,8 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
     setItemRequirements([...itemRequirements, itemRequirement]);
   }
 
-  const get18DecimalBigNumber = (amount: string) => {
-    return BigNumber.from(amount).mul(BigNumber.from(10).pow(18));
+  const parseUnits = (amount: string): BigNumber => {
+    return utils.parseUnits(amount, 18);
   }
 
   const addNativeRequirement = () => {
@@ -161,7 +161,7 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
       setAmountError('Amount is required for native token');
       return;
     }
-    const bn = get18DecimalBigNumber(amount);
+    const bn = parseUnits(amount);
     updateItemRequirements({
       type: ItemType.NATIVE,
       amount: bn,
@@ -181,7 +181,7 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
     if (!amount || !contractAddress || !spenderAddress) {
       return;
     }
-    const bn = get18DecimalBigNumber(amount);
+    const bn = parseUnits(amount);
     updateItemRequirements({
       type: ItemType.ERC20,
       amount: bn,
@@ -301,7 +301,7 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
 
   const updateAmount = (event: any) => {
     const value = event.target.value;
-    setAmount(value.split('.')[0]);
+    setAmount(value);
     setAmountError('');
   }
 
