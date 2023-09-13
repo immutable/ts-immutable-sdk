@@ -43,7 +43,6 @@ export const fetchL1Representation = async (
   config: CheckoutConfiguration,
   balanceRequirement: BalanceRequirement,
 ): Promise<string> => {
-  // Get the address from requirement
   const l2address = getTokenAddressFromRequirement(balanceRequirement);
   if (l2address === '') return '';
 
