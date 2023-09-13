@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers';
 import { Web3Provider } from '@ethersproject/providers';
 import { RoutingOptionsAvailable } from '../../types';
-import { BalanceCheckResult } from '../balanceCheck/types';
+import { BalanceCheckResult, BalanceRequirement } from '../balanceCheck/types';
 import {
   FundingRouteType,
   RouteCalculatorType,
@@ -13,18 +13,20 @@ import { CheckoutConfiguration } from '../../config';
 import { createReadOnlyProviders } from '../../readOnlyProviders/readOnlyProvider';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 
-export const shouldCheckBridgeRoute = (
+export const getInsufficientRequirement = (
   balanceRequirements: BalanceCheckResult,
-): boolean => {
+): BalanceRequirement | undefined => {
   let insufficientBalanceCount = 0;
+  let insufficientBridgeRequirement;
   for (const balanceRequirement of balanceRequirements.balanceRequirements) {
     if (!balanceRequirement.sufficient) {
       insufficientBalanceCount++;
+      insufficientBridgeRequirement = balanceRequirement;
     }
   }
-  if (insufficientBalanceCount !== 1) return false;
+  if (insufficientBalanceCount === 1) return insufficientBridgeRequirement;
 
-  return true;
+  return undefined;
 };
 
 export const routingCalculator = async (
@@ -59,13 +61,14 @@ export const routingCalculator = async (
 
   // Ensures only 1 balance requirement is insufficient otherwise one bridge route cannot be recommended
   let bridgeFundingStep;
-  if (availableRoutingOptions.bridge && shouldCheckBridgeRoute(balanceRequirements)) {
+  const insufficientRequirement = getInsufficientRequirement(balanceRequirements);
+  if (availableRoutingOptions.bridge && insufficientRequirement) {
     bridgeFundingStep = await bridgeRoute(
       config,
       provider,
       readOnlyProviders,
       availableRoutingOptions,
-      balanceRequirements.balanceRequirements[0], // todo - get the insufficient balance requirement
+      insufficientRequirement, // todo - get the insufficient balance requirement
       tokenBalances,
       feeEstimates,
     );
