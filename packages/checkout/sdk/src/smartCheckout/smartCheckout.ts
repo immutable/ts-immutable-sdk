@@ -67,7 +67,6 @@ export const smartCheckout = async (
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const fundingRoutes = await routingCalculator(
     config,
-    provider,
     ownerAddress,
     balanceRequirements,
     availableRoutingOptions,

@@ -1,5 +1,4 @@
 import { BigNumber, ethers } from 'ethers';
-import { Web3Provider } from '@ethersproject/providers';
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../../config';
 import { ChainId } from '../../../types';
 import * as instance from '../../../instance';
@@ -9,7 +8,8 @@ import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from './constants';
 export const estimateApprovalGas = async (
   config: CheckoutConfiguration,
   readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
-  provider: Web3Provider,
+  l1provider: ethers.providers.JsonRpcProvider,
+  depositorAddress: string,
   fromChainId: ChainId,
   toChainId: ChainId,
   token: string,
@@ -23,8 +23,6 @@ export const estimateApprovalGas = async (
       config,
     );
 
-    const depositorAddress = await provider.getSigner().getAddress();
-
     const { unsignedTx } = await tokenBridge.getUnsignedApproveDepositBridgeTx({
       depositorAddress,
       token,
@@ -32,8 +30,7 @@ export const estimateApprovalGas = async (
     });
 
     if (unsignedTx === null) return BigNumber.from(0);
-
-    return await provider.estimateGas(unsignedTx);
+    return await l1provider.estimateGas(unsignedTx);
   } catch (err: any) {
     throw new CheckoutError(
       'Error occurred while attempting ot estimate gas for approval transaction',
@@ -46,7 +43,8 @@ export const estimateApprovalGas = async (
 export const estimateGasForBridgeApproval = async (
   config: CheckoutConfiguration,
   readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
-  provider: Web3Provider,
+  l1provider: ethers.providers.JsonRpcProvider,
+  depositorAddress: string,
   l1Address: string,
   delta: BigNumber,
 ): Promise<BigNumber> => {
@@ -60,7 +58,8 @@ export const estimateGasForBridgeApproval = async (
   return await estimateApprovalGas(
     config,
     readOnlyProviders,
-    provider,
+    l1provider,
+    depositorAddress,
     fromChainId,
     toChainId,
     l1Address,

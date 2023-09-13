@@ -1,5 +1,5 @@
 import { Environment } from '@imtbl/config';
-import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
+import { JsonRpcProvider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import {
   bridgeRoute,
@@ -26,8 +26,6 @@ jest.mock('./estimateApprovalGas');
 jest.mock('./bridgeGasEstimate');
 
 describe('bridgeRoute', () => {
-  let providerMock: Web3Provider;
-
   const config = new CheckoutConfiguration({
     baseConfig: { environment: Environment.SANDBOX },
   });
@@ -36,15 +34,6 @@ describe('bridgeRoute', () => {
     [ChainId.SEPOLIA, {} as JsonRpcProvider],
     [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
   ]);
-
-  beforeEach(() => {
-    providerMock = {
-      getSigner: jest.fn().mockReturnValue({
-        getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
-      }),
-      estimateGas: jest.fn().mockResolvedValue(BigNumber.from(1)),
-    } as unknown as Web3Provider;
-  });
 
   describe('bridgeRoute', () => {
     const feeEstimates = new Map<FundingRouteType, BigNumber>([
@@ -126,8 +115,8 @@ describe('bridgeRoute', () => {
 
         const route = await bridgeRoute(
           config,
-          providerMock,
           readonlyProviders,
+          '0xADDRESS',
           {
             bridge: true,
           },
@@ -171,8 +160,8 @@ describe('bridgeRoute', () => {
 
         const route = await bridgeRoute(
           config,
-          providerMock,
           readonlyProviders,
+          '0xADDRESS',
           {
             bridge: true,
           },
@@ -216,8 +205,8 @@ describe('bridgeRoute', () => {
 
         const route = await bridgeRoute(
           config,
-          providerMock,
           readonlyProviders,
+          '0xADDRESS',
           {
             bridge: true,
           },
@@ -305,8 +294,8 @@ describe('bridgeRoute', () => {
 
         const route = await bridgeRoute(
           config,
-          providerMock,
           readonlyProviders,
+          '0xADDRESS',
           {
             bridge: true,
           },
@@ -361,8 +350,8 @@ describe('bridgeRoute', () => {
 
         const route = await bridgeRoute(
           config,
-          providerMock,
           readonlyProviders,
+          '0xADDRESS',
           {
             bridge: true,
           },
@@ -417,8 +406,8 @@ describe('bridgeRoute', () => {
 
         const route = await bridgeRoute(
           config,
-          providerMock,
           readonlyProviders,
+          '0xADDRESS',
           {
             bridge: true,
           },
@@ -460,8 +449,8 @@ describe('bridgeRoute', () => {
 
         const route = await bridgeRoute(
           config,
-          providerMock,
           readonlyProviders,
+          '0xADDRESS',
           {
             bridge: true,
           },

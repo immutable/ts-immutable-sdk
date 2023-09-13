@@ -1,5 +1,4 @@
 import { BigNumber } from 'ethers';
-import { Web3Provider } from '@ethersproject/providers';
 import { RoutingOptionsAvailable } from '../../types';
 import { BalanceCheckResult, BalanceRequirement } from '../balanceCheck/types';
 import {
@@ -31,7 +30,6 @@ export const getInsufficientRequirement = (
 
 export const routingCalculator = async (
   config: CheckoutConfiguration,
-  provider: Web3Provider,
   ownerAddress: string,
   balanceRequirements: BalanceCheckResult,
   availableRoutingOptions: RoutingOptionsAvailable,
@@ -65,14 +63,16 @@ export const routingCalculator = async (
   if (availableRoutingOptions.bridge && insufficientRequirement) {
     bridgeFundingStep = await bridgeRoute(
       config,
-      provider,
       readOnlyProviders,
+      ownerAddress,
       availableRoutingOptions,
-      insufficientRequirement, // todo - get the insufficient balance requirement
+      insufficientRequirement,
       tokenBalances,
       feeEstimates,
     );
   }
+
+  console.log('bridgeFundingStep', bridgeFundingStep);
 
   // Check on-ramp routes
 

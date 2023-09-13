@@ -20,9 +20,6 @@ describe('estimateGasForBridgeApproval', () => {
 
   beforeEach(() => {
     providerMock = {
-      getSigner: jest.fn().mockReturnValue({
-        getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
-      }),
       estimateGas: jest.fn().mockResolvedValue(BigNumber.from(123)),
     } as unknown as Web3Provider;
   });
@@ -40,6 +37,7 @@ describe('estimateGasForBridgeApproval', () => {
         config,
         readOnlyProviders,
         providerMock,
+        '0xADDRESS',
         '0xERC20',
         BigNumber.from(5),
       );
@@ -64,6 +62,7 @@ describe('estimateGasForBridgeApproval', () => {
         config,
         readOnlyProviders,
         providerMock,
+        '0xADDRESS',
         INDEXER_ETH_ROOT_CONTRACT_ADDRESS,
         BigNumber.from(5),
       );
@@ -86,6 +85,7 @@ describe('estimateGasForBridgeApproval', () => {
         config,
         readOnlyProviders,
         providerMock,
+        '0xADDRESS',
         ChainId.SEPOLIA,
         ChainId.IMTBL_ZKEVM_TESTNET,
         '0xERC20',
@@ -107,6 +107,7 @@ describe('estimateGasForBridgeApproval', () => {
         config,
         readOnlyProviders,
         providerMock,
+        '0xADDRESS',
         ChainId.SEPOLIA,
         ChainId.IMTBL_ZKEVM_TESTNET,
         '0xERC20',
@@ -130,6 +131,7 @@ describe('estimateGasForBridgeApproval', () => {
           config,
           readOnlyProviders,
           providerMock,
+          '0xADDRESS',
           ChainId.SEPOLIA,
           ChainId.IMTBL_ZKEVM_TESTNET,
           '0xERC20',

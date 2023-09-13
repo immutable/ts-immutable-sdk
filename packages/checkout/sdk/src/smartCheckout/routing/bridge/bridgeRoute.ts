@@ -105,8 +105,8 @@ export const isNativeEth = (address: string | undefined): boolean => {
 
 export const bridgeRoute = async (
   config: CheckoutConfiguration,
-  provider: Web3Provider,
   readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
+  depositorAddress: string,
   availableRoutingOptions: RoutingOptionsAvailable,
   balanceRequirement: BalanceRequirement,
   balances: Map<ChainId, TokenBalanceResult>,
@@ -116,6 +116,8 @@ export const bridgeRoute = async (
 
   const chainId = getL1ChainId(config);
   const tokenBalanceResult = balances.get(chainId);
+  const l1provider = readOnlyProviders.get(chainId);
+  if (!l1provider) return undefined;
 
   // If no balances on layer 1 then Bridge cannot be an option
   if (!tokenBalanceResult || !tokenBalanceResult.success) return undefined;
@@ -132,7 +134,8 @@ export const bridgeRoute = async (
   const gasForApproval = await estimateGasForBridgeApproval(
     config,
     readOnlyProviders,
-    provider,
+    l1provider,
+    depositorAddress,
     l1address,
     balanceRequirement.delta.balance,
   );

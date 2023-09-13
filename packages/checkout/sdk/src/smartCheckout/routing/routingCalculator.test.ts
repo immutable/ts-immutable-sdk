@@ -1,6 +1,6 @@
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
-import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
+import { JsonRpcProvider } from '@ethersproject/providers';
 import { routingCalculator } from './routingCalculator';
 import { CheckoutConfiguration } from '../../config';
 import { getAllTokenBalances } from './tokenBalances';
@@ -17,14 +17,11 @@ jest.mock('../../readOnlyProviders/readOnlyProvider');
 
 describe('routingCalculator', () => {
   let config: CheckoutConfiguration;
-  let providerMock: Web3Provider;
 
   beforeEach(() => {
     config = new CheckoutConfiguration({
       baseConfig: { environment: Environment.SANDBOX },
     });
-
-    providerMock = {} as unknown as Web3Provider;
   });
 
   it('should return routes', async () => {
@@ -95,7 +92,6 @@ describe('routingCalculator', () => {
 
     const routingOptions = await routingCalculator(
       config,
-      providerMock,
       '0x123',
       balanceRequirements,
       availableRoutingOptions,
@@ -194,7 +190,6 @@ describe('routingCalculator', () => {
 
     const routingOptions = await routingCalculator(
       config,
-      providerMock,
       '0x123',
       balanceRequirements,
       availableRoutingOptions,
@@ -235,7 +230,6 @@ describe('routingCalculator', () => {
 
     const routingOptions = await routingCalculator(
       config,
-      providerMock,
       '0x123',
       balanceRequirements,
       availableRoutingOptions,
@@ -320,7 +314,7 @@ describe('routingCalculator', () => {
     try {
       await routingCalculator(
         config,
-        providerMock,
+
         '0x123',
         balanceRequirements,
         availableRoutingOptions,
