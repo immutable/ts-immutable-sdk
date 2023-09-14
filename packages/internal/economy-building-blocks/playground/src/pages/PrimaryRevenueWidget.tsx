@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 
 const useParams = () => {
@@ -37,13 +37,27 @@ const handleEvent = ((event: CustomEvent) => {
 }) as EventListener;
 
 function PrimaryRevenueWidget() {
-  const { amount, envId, fromCurrency, items } = useParams();
+  const {  amount, envId, fromCurrency, items } = useParams();
+
+  console.log('@@@@@ items', JSON.parse(items));
+  const componentRef = useRef(null);
 
   useEffect(() => {
     window.addEventListener(
       IMTBLWidgetEvents.IMTBL_PRIMARY_REVENUE_WIDGET_EVENT,
       handleEvent
     );
+
+    // Assuming window.sharedData.passportInstance contains the necessary data
+    const passportInstance = window?.opener?.sharedData?.passportInstance;
+
+    console.log('@@@@@ passportInstance', passportInstance);
+
+    if (passportInstance && componentRef.current) {
+      (
+        componentRef.current as unknown as ImmutableWebComponent
+      ).addPassportOption(passportInstance);
+    }
 
     return () => {
       window.removeEventListener(
@@ -55,6 +69,7 @@ function PrimaryRevenueWidget() {
 
   return (
     <imtbl-primary-revenue
+      ref={componentRef}
       amount={amount}
       envId={envId}
       fromCurrency={fromCurrency}
