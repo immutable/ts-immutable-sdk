@@ -50,49 +50,15 @@ export const sendTransaction = ({
       revertOnError: true,
     };
 
-    // NOTE: We sign the transaction before getting the fee options because
-    // accurate estimation of a transaction gas cost is only possible if the smart
-    // wallet contract can actually execute it (in a simulated environment) - and
-    // it can only execute signed transactions.
-    const signedTransaction = await getSignedMetaTransactions(
-      [metaTransaction],
-      nonce,
-      chainIdBigNumber,
-      user.zkEvm.ethAddress,
-      signer,
-    );
-
-    // TODO: ID-698 Add support for non-native gas payments (e.g ERC20, feeTransaction initialisation must change)
-
-    // NOTE: "Fee Options" represent the multiple ways we could pay for the gas
-    // used in this transaction. Each fee option has a "recipientAddress" we
-    // should transfer the payment to, an amount and a currency. We choose one
-    // option and build a transaction that sends the expected currency amount for
-    // that option to the specified address.
-    const feeOptions = await relayerClient.imGetFeeOptions(user.zkEvm.ethAddress, signedTransaction);
-    const imxFeeOption = feeOptions.find((feeOption) => feeOption.tokenSymbol === 'IMX');
-    if (!imxFeeOption) {
-      throw new Error('Failed to retrieve fees for IMX token');
-    }
-
-    const feeMetaTransaction: MetaTransaction = {
-      nonce,
-      to: imxFeeOption.recipientAddress,
-      value: imxFeeOption.tokenPrice,
-      revertOnError: true,
-    };
-
     await guardianClient.validateEVMTransaction({
       chainId: getEip155ChainId(chainId),
       nonce: convertBigNumberishToString(nonce),
       user,
-      metaTransactions: [metaTransaction, feeMetaTransaction],
+      metaTransactions: [metaTransaction],
     });
 
-    // NOTE: We sign again because we now are adding the fee transaction, so the
-    // whole payload is different and needs a new signature.
     const signedTransactions = await getSignedMetaTransactions(
-      [metaTransaction, feeMetaTransaction],
+      [metaTransaction],
       nonce,
       chainIdBigNumber,
       user.zkEvm.ethAddress,

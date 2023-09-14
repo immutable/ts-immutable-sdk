@@ -15,7 +15,6 @@ const withConfirmationScreenStub = jest.fn();
 
 describe('sendTransaction', () => {
   const signedTransaction = 'signedTransaction123';
-  const signedTransactions = 'signedTransactions123';
   const relayerTransactionId = 'relayerTransactionId123';
   const transactionHash = 'transactionHash123';
 
@@ -59,9 +58,6 @@ describe('sendTransaction', () => {
     (getSignedMetaTransactions as jest.Mock).mockResolvedValueOnce(
       signedTransaction,
     );
-    (getSignedMetaTransactions as jest.Mock).mockResolvedValueOnce(
-      signedTransactions,
-    );
     relayerClient.ethSendTransaction.mockResolvedValue(relayerTransactionId);
     withConfirmationScreenStub.mockImplementation(() => (task: () => void) => task());
     guardianClient.withConfirmationScreen = withConfirmationScreenStub;
@@ -85,7 +81,7 @@ describe('sendTransaction', () => {
     expect(result).toEqual(transactionHash);
     expect(relayerClient.ethSendTransaction).toHaveBeenCalledWith(
       mockUserZkEvm.zkEvm.ethAddress,
-      signedTransactions,
+      signedTransaction,
     );
   });
 
@@ -120,18 +116,12 @@ describe('sendTransaction', () => {
             value: '0x00',
             nonce,
           },
-          {
-            revertOnError: true,
-            to: imxFeeOption.recipientAddress,
-            value: imxFeeOption.tokenPrice,
-            nonce,
-          },
         ],
       },
     );
     expect(relayerClient.ethSendTransaction).toHaveBeenCalledWith(
       mockUserZkEvm.zkEvm.ethAddress,
-      signedTransactions,
+      signedTransaction,
     );
   });
 
