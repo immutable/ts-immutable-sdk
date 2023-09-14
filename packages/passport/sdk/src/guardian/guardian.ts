@@ -4,7 +4,7 @@ import { BigNumber, ethers } from 'ethers';
 import { ConfirmationScreen } from '../confirmation';
 import { retryWithDelay } from '../network/retry';
 import { JsonRpcError, RpcErrorCode } from '../zkEvm/JsonRpcError';
-import { MetaTransaction } from '../zkEvm/types';
+import { MetaTransaction, TypedDataPayload } from '../zkEvm/types';
 import { UserZkEvm } from '../types';
 import { PassportConfiguration } from '../config';
 
@@ -26,7 +26,9 @@ type GuardianEVMValidationParams = {
   metaTransactions: MetaTransaction[];
 };
 
-type GuardianMessageValidationParams = guardian.MessageEvaluationRequest & {
+type GuardianMessageValidationParams = {
+  chainID: string;
+  payload: TypedDataPayload;
   user: UserZkEvm
 };
 

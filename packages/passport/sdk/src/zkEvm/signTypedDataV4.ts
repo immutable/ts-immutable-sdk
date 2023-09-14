@@ -5,7 +5,6 @@ import {
 } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import GuardianClient from 'guardian/guardian';
-import { EIP712Message } from '@imtbl/guardian';
 import { getSignedTypedData } from './walletHelpers';
 import { TypedDataPayload } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
@@ -49,13 +48,14 @@ const transformTypedData = (typedData: string | object, chainId: number): TypedD
     );
   }
 
-  if (transformedTypedData.domain?.chainId) {
-    // domain.chainId (if defined) can be a number, string, or hex value, but the relayer only accepts a number.
-    if (typeof transformedTypedData.domain.chainId === 'string') {
-      if (transformedTypedData.domain.chainId.startsWith('0x')) {
-        transformedTypedData.domain.chainId = parseInt(transformedTypedData.domain.chainId, 16);
+  const providedChainId: number | string | undefined = (transformedTypedData as any).domain?.chainId;
+  if (providedChainId) {
+    // domain.chainId (if defined) can be a number, string, or hex value, but the relayer & guardian only accept a number.
+    if (typeof providedChainId === 'string') {
+      if (providedChainId.startsWith('0x')) {
+        transformedTypedData.domain.chainId = parseInt(providedChainId, 16);
       } else {
-        transformedTypedData.domain.chainId = parseInt(transformedTypedData.domain.chainId, 10);
+        transformedTypedData.domain.chainId = parseInt(providedChainId, 10);
       }
     }
 
@@ -88,7 +88,7 @@ export const signTypedDataV4 = async ({
     const typedData = transformTypedData(typedDataParam, chainId);
 
     // ID-959: Submit raw typedData payload to Guardian for evaluation
-    await guardianClient.validateMessage({ chainID: String(chainId), payload: typedData as EIP712Message, user });
+    await guardianClient.validateMessage({ chainID: String(chainId), payload: typedData, user });
     const relayerSignature = await relayerClient.imSignTypedData(fromAddress, typedData);
     const magicWeb3Provider = new Web3Provider(magicProvider);
     const signer = magicWeb3Provider.getSigner();

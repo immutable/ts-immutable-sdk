@@ -141,7 +141,7 @@ describe('signTypedDataV4', () => {
           guardianClient: guardianClient as any,
         })
       )).rejects.toThrow(
-        new JsonRpcError(RpcErrorCode.INVALID_PARAMS, "Failed to parse typed data JSON: SyntaxError: Unexpected token '*', \"*~<|8)-/-<\" is not valid JSON"),
+        new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'Failed to parse typed data JSON: SyntaxError: Unexpected token * in JSON at position 0'),
       );
     });
   });

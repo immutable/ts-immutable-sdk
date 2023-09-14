@@ -52,9 +52,9 @@ export interface TypedDataPayload {
   domain: {
     name?: string;
     version? :string;
-    chainId?: BigNumberish;
+    chainId?: number;
     verifyingContract?: string;
-    salt?: BytesLike;
+    salt?: string;
   };
   primaryType: string;
   message: Record<string, any>;
