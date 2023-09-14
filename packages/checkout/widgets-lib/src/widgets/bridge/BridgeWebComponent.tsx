@@ -20,6 +20,11 @@ export class ImmutableBridge extends ImmutableWebComponent {
 
   walletProvider: WalletProviderName | undefined = undefined;
 
+  static get observedAttributes(): string[] {
+    const baseObservedAttributes = super.observedAttributes;
+    return [...baseObservedAttributes, 'amount', 'fromContractAddress'];
+  }
+
   connectedCallback() {
     super.connectedCallback();
     this.fromContractAddress = this.getAttribute('fromContractAddress')?.toLowerCase() ?? '';
@@ -27,6 +32,18 @@ export class ImmutableBridge extends ImmutableWebComponent {
     this.walletProvider = this.getAttribute(
       'walletProvider',
     )?.toLowerCase() as WalletProviderName;
+
+    this.renderWidget();
+  }
+
+  attributeChangedCallback(name: string, oldValue: any, newValue: any): void {
+    super.attributeChangedCallback(name, oldValue, newValue);
+    if (name === 'amount') {
+      this.amount = newValue;
+    }
+    if (name === 'fromcontractaddress') {
+      this.fromContractAddress = newValue;
+    }
 
     this.renderWidget();
   }
