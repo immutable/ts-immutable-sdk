@@ -26,5 +26,5 @@ AnalyticsControlTypes,
 StandardAnalyticsActions
 >({
   writeKey: '',
-  appName: 'checkoutwidgets',
+  appName: 'checkout',
 });
