@@ -17,6 +17,8 @@ const SEGMENT_ANALYTICS_WRITE_KEY = {
 
 export const getSegmentWriteKey = (env: Environment) => SEGMENT_ANALYTICS_WRITE_KEY[env];
 
+const productName = 'checkout';
+
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const { AnalyticsProvider, useAnalytics } = createAnalytics<
 UserJourney,
@@ -26,5 +28,5 @@ AnalyticsControlTypes,
 StandardAnalyticsActions
 >({
   writeKey: '',
-  appName: 'checkout',
+  appName: productName,
 });
