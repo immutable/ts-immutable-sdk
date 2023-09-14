@@ -10,6 +10,10 @@ import { useData } from "../context/DataProvider";
 import { TransactionReceipt } from "@ethersproject/providers";
 import { PrimaryRevenueEventType } from "@imtbl/checkout-widgets";
 
+const approveFunction = "approve(address spender,uint256 amount)";
+const executeFunction =
+  "execute(address multicallSigner, bytes32 reference, address[] targets, bytes[] data, uint256 deadline, bytes signature)";
+
 const useURLParams = () => {
   const [urlParams, setUrlParams] = useState({});
   useEffect(() => {
@@ -129,8 +133,6 @@ const useMint = (amount: number, selectedItems: any[], configFields: any) => {
     };
   });
 
-  console.log("items", items);
-
   const params = {
     amount: amount.toString(),
     envId: "123",
@@ -161,7 +163,8 @@ function PrimarySale() {
   const [amount, setAmount] = useState(0);
   const [selectedItems, setSelectedItems] = useState<any[]>([]);
   const [configFields, setConfigFields] = useState<Record<string, any>>({});
-  const [isApproved, setIsApproved] = useState(false);
+  const [approvedTx, setApprovedTx] = useState("");
+  const [executedTx, setExecutedTx] = useState("");
 
   const [itemsPointer, setItemsPointer] = useState(1);
 
@@ -174,7 +177,8 @@ function PrimarySale() {
 
   // Reset the states of statuses if the selectedItems changes
   useEffect(() => {
-    setIsApproved(false);
+    setApprovedTx("");
+    setExecutedTx("");
   }, [selectedItems]);
 
   useEffect(() => {
@@ -202,6 +206,14 @@ function PrimarySale() {
     switch (data.type) {
       case PrimaryRevenueEventType.CLOSE_WIDGET: {
         console.log("@@@ close widget");
+        closePopup();
+        break;
+      }
+      case PrimaryRevenueEventType.SUCCESS: {
+        console.log("@@@ sucess event", data);
+        setApprovedTx(data.data[approveFunction]);
+        setExecutedTx(data.data[executeFunction]);
+
         closePopup();
         break;
       }
@@ -288,15 +300,38 @@ function PrimarySale() {
                 <Card.Caption>
                   <StatusCard
                     status="Approve Txn"
-                    description={isApproved ? "✅" : ""}
-                    variant={isApproved ? "success" : "standard"}
+                    description={approvedTx ? `${approvedTx} ✅` : ""}
+                    variant={approvedTx ? "success" : "standard"}
+                  ></StatusCard>
+                  <StatusCard
+                    status="Execute Txn"
+                    description={executedTx ? `${executedTx} ✅` : ""}
+                    variant={executedTx ? "success" : "standard"}
                   ></StatusCard>
                   <StatusCard
                     status="Minting"
-                    description={receipt ? "Txn Hash | " + receipt : ""}
-                    variant={receipt ? "success" : "standard"}
+                    variant={executedTx ? "success" : "standard"}
+                    extraContent={
+                      executedTx ? (
+                        <>
+                          <Link
+                            variant="primary"
+                            sx={{ marginLeft: "base.spacing.x1" }}
+                            onClick={() => {
+                              window.open(
+                                `https://explorer.testnet.immutable.com/tx/${executedTx}`,
+                                "_blank"
+                              );
+                            }}
+                          >
+                            View on Block Explorer
+                            <Link.Icon icon="JumpTo" />
+                          </Link>
+                        </>
+                      ) : null
+                    }
                   ></StatusCard>
-                  <StatusCard
+                  {/* <StatusCard
                     status={
                       receipt
                         ? receipt.status === 1
@@ -330,7 +365,7 @@ function PrimarySale() {
                         </>
                       ) : null
                     }
-                  ></StatusCard>
+                  ></StatusCard> */}
                 </Card.Caption>
               </Card>
             </Box>
