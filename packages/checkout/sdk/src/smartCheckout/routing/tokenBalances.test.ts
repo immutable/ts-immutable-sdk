@@ -3,14 +3,12 @@ import { JsonRpcProvider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import { getAllTokenBalances } from './tokenBalances';
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../config';
-import { createReadOnlyProviders } from '../../readOnlyProviders/readOnlyProvider';
 import { ChainId, IMX_ADDRESS_ZKEVM } from '../../types';
 import { getAllBalances } from '../../balances';
 import { CheckoutErrorType } from '../../errors';
 import { TokenBalanceResult } from './types';
 
 jest.mock('../../balances');
-jest.mock('../../readOnlyProviders/readOnlyProvider');
 jest.mock('../../config');
 
 describe('tokenBalances', () => {
@@ -33,12 +31,12 @@ describe('tokenBalances', () => {
       swap: true,
       bridge: true,
     };
-    (createReadOnlyProviders as jest.Mock).mockResolvedValue(
-      new Map<ChainId, JsonRpcProvider>([
-        [ChainId.SEPOLIA, {} as JsonRpcProvider],
-        [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
-      ]),
-    );
+
+    const readonlyProviders = new Map<ChainId, JsonRpcProvider>([
+      [ChainId.SEPOLIA, {} as JsonRpcProvider],
+      [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
+    ]);
+
     const getBalancesResult = {
       balances:
         [
@@ -56,7 +54,12 @@ describe('tokenBalances', () => {
     };
     (getAllBalances as jest.Mock).mockResolvedValue(getBalancesResult);
 
-    const tokenBalances = await getAllTokenBalances(mockConfig, ownerAddress, availableRoutingOptions);
+    const tokenBalances = await getAllTokenBalances(
+      mockConfig,
+      readonlyProviders,
+      ownerAddress,
+      availableRoutingOptions,
+    );
     expect(tokenBalances.size).toEqual(2);
     expect(tokenBalances.get(ChainId.SEPOLIA)).toEqual({ success: true, balances: getBalancesResult.balances });
     expect(tokenBalances.get(ChainId.IMTBL_ZKEVM_TESTNET)).toEqual({
@@ -71,12 +74,12 @@ describe('tokenBalances', () => {
       swap: true,
       bridge: false,
     };
-    (createReadOnlyProviders as jest.Mock).mockResolvedValue(
-      new Map<ChainId, JsonRpcProvider>([
-        [ChainId.SEPOLIA, {} as JsonRpcProvider],
-        [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
-      ]),
-    );
+
+    const readonlyProviders = new Map<ChainId, JsonRpcProvider>([
+      [ChainId.SEPOLIA, {} as JsonRpcProvider],
+      [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
+    ]);
+
     const getBalancesResult = {
       balances:
         [
@@ -94,7 +97,12 @@ describe('tokenBalances', () => {
     };
     (getAllBalances as jest.Mock).mockResolvedValue(getBalancesResult);
 
-    const tokenBalances = await getAllTokenBalances(mockConfig, ownerAddress, availableRoutingOptions);
+    const tokenBalances = await getAllTokenBalances(
+      mockConfig,
+      readonlyProviders,
+      ownerAddress,
+      availableRoutingOptions,
+    );
 
     expect(tokenBalances.size).toEqual(1);
     expect(tokenBalances.get(ChainId.IMTBL_ZKEVM_TESTNET)).toEqual({
@@ -109,11 +117,15 @@ describe('tokenBalances', () => {
       swap: true,
       bridge: true,
     };
-    (createReadOnlyProviders as jest.Mock).mockResolvedValue(
-      new Map<ChainId, JsonRpcProvider>(),
-    );
 
-    const tokenBalances = await getAllTokenBalances(mockConfig, ownerAddress, availableRoutingOptions);
+    const readonlyProviders = new Map<ChainId, JsonRpcProvider>([]);
+
+    const tokenBalances = await getAllTokenBalances(
+      mockConfig,
+      readonlyProviders,
+      ownerAddress,
+      availableRoutingOptions,
+    );
 
     expect(tokenBalances.size).toEqual(2);
     const balanceResultL1 = tokenBalances.get(ChainId.SEPOLIA) as TokenBalanceResult;
@@ -127,41 +139,17 @@ describe('tokenBalances', () => {
     expect(balanceResultL2.error?.type).toEqual(CheckoutErrorType.PROVIDER_ERROR);
   });
 
-  it('should return failed for both chains if createReadOnlyProviders rejects', async () => {
-    const availableRoutingOptions = {
-      onRamp: true,
-      swap: true,
-      bridge: true,
-    };
-    (createReadOnlyProviders as jest.Mock).mockRejectedValue(
-      new Error('Provider failed'),
-    );
-
-    const tokenBalances = await getAllTokenBalances(mockConfig, ownerAddress, availableRoutingOptions);
-
-    expect(tokenBalances.size).toEqual(2);
-    const balanceResultL1 = tokenBalances.get(ChainId.SEPOLIA) as TokenBalanceResult;
-    expect(balanceResultL1.success).toEqual(false);
-    expect(balanceResultL1.balances).toEqual([]);
-    expect(balanceResultL1.error).toBeDefined();
-
-    const balanceResultL2 = tokenBalances.get(ChainId.IMTBL_ZKEVM_TESTNET) as TokenBalanceResult;
-    expect(balanceResultL2.success).toEqual(false);
-    expect(balanceResultL2.balances).toEqual([]);
-    expect(balanceResultL2.error).toBeDefined();
-  });
-
   it('should return L1 failed when no L1 provider is available', async () => {
     const availableRoutingOptions = {
       onRamp: true,
       swap: true,
       bridge: true,
     };
-    (createReadOnlyProviders as jest.Mock).mockResolvedValue(
-      new Map<ChainId, JsonRpcProvider>([
-        [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
-      ]),
-    );
+
+    const readonlyProviders = new Map<ChainId, JsonRpcProvider>([
+      [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
+    ]);
+
     const getBalancesResult = {
       balances:
         [
@@ -179,7 +167,12 @@ describe('tokenBalances', () => {
     };
     (getAllBalances as jest.Mock).mockResolvedValue(getBalancesResult);
 
-    const tokenBalances = await getAllTokenBalances(mockConfig, ownerAddress, availableRoutingOptions);
+    const tokenBalances = await getAllTokenBalances(
+      mockConfig,
+      readonlyProviders,
+      ownerAddress,
+      availableRoutingOptions,
+    );
 
     expect(tokenBalances.size).toEqual(2);
     const balanceResultL1 = tokenBalances.get(ChainId.SEPOLIA) as TokenBalanceResult;
@@ -198,11 +191,11 @@ describe('tokenBalances', () => {
       swap: true,
       bridge: true,
     };
-    (createReadOnlyProviders as jest.Mock).mockResolvedValue(
-      new Map<ChainId, JsonRpcProvider>([
-        [ChainId.SEPOLIA, {} as JsonRpcProvider],
-      ]),
-    );
+
+    const readonlyProviders = new Map<ChainId, JsonRpcProvider>([
+      [ChainId.SEPOLIA, {} as JsonRpcProvider],
+    ]);
+
     const getBalancesResult = {
       balances:
         [
@@ -220,7 +213,12 @@ describe('tokenBalances', () => {
     };
     (getAllBalances as jest.Mock).mockResolvedValue(getBalancesResult);
 
-    const tokenBalances = await getAllTokenBalances(mockConfig, ownerAddress, availableRoutingOptions);
+    const tokenBalances = await getAllTokenBalances(
+      mockConfig,
+      readonlyProviders,
+      ownerAddress,
+      availableRoutingOptions,
+    );
 
     expect(tokenBalances.size).toEqual(2);
     expect(tokenBalances.get(ChainId.SEPOLIA)).toEqual({ success: true, balances: getBalancesResult.balances });
