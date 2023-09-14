@@ -15,14 +15,13 @@ then
   exit 1
 fi
 
-
 (
   cd $CLONE_DIR;
-  FILE=docs/main/sdks/_typescript.mdx
+  FILE=src/components/UnifiedSDKLink/index.tsx
   if [ "$(uname)" == "Darwin" ]; then
       # On Mac OS, sed requires an empty string as an argument to -i to avoid creating a backup file
-      sed -i '' -E "s/[0-9]\\.[0-9]\\.[0-9](.* class=\"ts-immutable-sdk-ref-link\")/$VERSION\1/g;" $FILE
+      sed -i '' -E "s/SDK_VERSION = '.*'/SDK_VERSION = '$VERSION'/g;" $FILE
   else
-      sed -i -E "s/[0-9]\\.[0-9]\\.[0-9](.* class=\"ts-immutable-sdk-ref-link\")/$VERSION\1/g;" $FILE
+      sed -i -E "s/SDK_VERSION = '.*'/SDK_VERSION = '$VERSION'/g;" $FILE
   fi
 )
