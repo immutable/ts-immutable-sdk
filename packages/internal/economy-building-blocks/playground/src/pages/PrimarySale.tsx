@@ -9,10 +9,58 @@ import ConfigForm from "../components/ConfigForm";
 import { useData } from "../context/DataProvider";
 import { TransactionReceipt } from "@ethersproject/providers";
 import { PrimaryRevenueEventType } from "@imtbl/checkout-widgets";
+import { config, passport } from "@imtbl/sdk";
 
 const approveFunction = "approve(address spender,uint256 amount)";
 const executeFunction =
   "execute(address multicallSigner, bytes32 reference, address[] targets, bytes[] data, uint256 deadline, bytes signature)";
+
+const passportConfig = {
+  environment: "sandbox",
+  clientId: "yBoJyIcgPv0ixCP867Glbw8D3DfkMkE6",
+  redirectUri: "http://localhost:3000/sale?login=true",
+  logoutRedirectUri: "http://localhost:3000/sale?logout=true",
+  audience: "platform_api",
+  scope: "openid offline_access email transact",
+};
+
+const useParams = () => {
+  const urlParams = new URLSearchParams(window.location.search);
+
+  const login = urlParams.get("login") as string;
+
+  return {
+    login,
+  };
+};
+
+const usePassportInstance = (passportConfig: any) => {
+  const {
+    clientId,
+    redirectUri,
+    logoutRedirectUri,
+    audience,
+    scope,
+    environment,
+  } = passportConfig;
+
+  if (!clientId || !redirectUri || !logoutRedirectUri || !audience || !scope) {
+    return null;
+  }
+
+  const passportInstance = new passport.Passport({
+    baseConfig: new config.ImmutableConfiguration({
+      environment: environment || config.Environment.SANDBOX,
+    }),
+    clientId,
+    redirectUri,
+    logoutRedirectUri,
+    audience,
+    scope,
+  });
+
+  return passportInstance;
+};
 
 const useURLParams = () => {
   const [urlParams, setUrlParams] = useState({});
@@ -102,10 +150,20 @@ const useGetNfts = (
   return nfts;
 };
 
-const useOpenPopup = (url: string, name: string, specs: string) => {
+const useOpenPopup = (
+  url: string,
+  name: string,
+  specs: string,
+  passportOn: boolean
+) => {
   const popup = useRef<Window | null>(null);
+  const passportInstance = usePassportInstance(passportConfig);
 
   const openPopup = useCallback(() => {
+    if (passportOn) {
+      (window as unknown as any).sharedData = { passportInstance };
+    }
+
     popup.current = window.open(url, name, specs);
   }, [url, name, specs]);
 
@@ -118,7 +176,12 @@ const useOpenPopup = (url: string, name: string, specs: string) => {
   return { openPopup, closePopup, popup };
 };
 
-const useMint = (amount: number, selectedItems: any[], configFields: any) => {
+const useMint = (
+  amount: number,
+  selectedItems: any[],
+  configFields: any,
+  passportOn: boolean
+) => {
   const [loading, setLoading] = useState(false);
   const [receipt, setReceipt] = useState<TransactionReceipt | null>(null);
 
@@ -146,7 +209,8 @@ const useMint = (amount: number, selectedItems: any[], configFields: any) => {
   const { openPopup, closePopup } = useOpenPopup(
     `${window.location.origin}/mint-sale?${urlParams}`,
     "Mint",
-    "width=430,height=650"
+    "width=430,height=650",
+    passportOn
   );
 
   const handleMint = useCallback(async () => {
@@ -158,13 +222,17 @@ const useMint = (amount: number, selectedItems: any[], configFields: any) => {
 };
 
 function PrimarySale() {
+  const { login } = useParams();
   const fee = 0.1;
   const params = useURLParams();
+  const passportInstance = usePassportInstance(passportConfig);
+
   const [amount, setAmount] = useState(0);
   const [selectedItems, setSelectedItems] = useState<any[]>([]);
   const [configFields, setConfigFields] = useState<Record<string, any>>({});
   const [approvedTx, setApprovedTx] = useState("");
   const [executedTx, setExecutedTx] = useState("");
+  const [passportOn, setPassportOn] = useState<boolean>(false);
 
   const [itemsPointer, setItemsPointer] = useState(1);
 
@@ -174,6 +242,22 @@ function PrimarySale() {
     configFields.wallet_address || configFields.recipient_address,
     configFields.collection_address
   );
+
+  useEffect(() => {
+    console.log("@@@ login", login);
+    if (passportInstance) {
+      passportInstance.loginCallback();
+    }
+  }, [login]);
+
+  useEffect(() => {
+    const passportInstance = window?.opener?.sharedData?.passportInstance;
+
+    if (passportInstance) {
+      console.log("@@@ login", login);
+      passportInstance.loginCallback();
+    }
+  }, [login]);
 
   // Reset the states of statuses if the selectedItems changes
   useEffect(() => {
@@ -233,7 +317,8 @@ function PrimarySale() {
   const { loading, receipt, handleMint, closePopup } = useMint(
     amount,
     selectedItems,
-    configFields
+    configFields,
+    passportOn
   );
 
   const handleIsSelectedItem = useCallback(
@@ -286,6 +371,28 @@ function PrimarySale() {
             <Box sx={{ marginTop: "base.spacing.x5" }}>
               <Box sx={{ marginBottom: "base.spacing.x5" }}>
                 <Heading size={"small"}>Status</Heading>
+              </Box>
+              <Box sx={{ marginTop: "base.spacing.x4" }}>
+                <Button
+                  size={"large"}
+                  sx={{
+                    background: "base.color.accent.8",
+                    width: "100%",
+                    marginTop: "base.spacing.x4",
+                  }}
+                  onClick={() => setPassportOn((prev) => !prev)}
+                >
+                  <Button.Icon
+                    icon={amount ? "Wallet" : "Alert"}
+                    iconVariant="regular"
+                    sx={{
+                      mr: "base.spacing.x1",
+                      ml: "0",
+                      width: "base.icon.size.400",
+                    }}
+                  />
+                  {passportOn ? "Disable Passport" : "Enable Passport"}
+                </Button>
               </Box>
               <Banner
                 variant="guidance"
