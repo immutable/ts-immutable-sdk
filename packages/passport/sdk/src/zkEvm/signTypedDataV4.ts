@@ -87,7 +87,6 @@ export const signTypedDataV4 = async ({
     const { chainId } = await jsonRpcProvider.ready;
     const typedData = transformTypedData(typedDataParam, chainId);
 
-    // ID-959: Submit raw typedData payload to Guardian for evaluation
     await guardianClient.validateMessage({ chainID: String(chainId), payload: typedData, user });
     const relayerSignature = await relayerClient.imSignTypedData(fromAddress, typedData);
     const magicWeb3Provider = new Web3Provider(magicProvider);

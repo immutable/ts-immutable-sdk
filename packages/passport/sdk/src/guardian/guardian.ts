@@ -248,7 +248,7 @@ export default class GuardianClient {
       return messageEvalResponse.data;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, `Transaction failed to validate with error: ${errorMessage}`);
+      throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, `Message failed to validate with error: ${errorMessage}`);
     }
   }
 
@@ -265,7 +265,7 @@ export default class GuardianClient {
       if (!confirmationResult.confirmed) {
         throw new JsonRpcError(
           RpcErrorCode.TRANSACTION_REJECTED,
-          'Transaction rejected by user',
+          'Signature rejected by user',
         );
       }
     } else {
