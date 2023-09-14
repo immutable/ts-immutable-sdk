@@ -42,21 +42,6 @@ export const DEFAULT_SWAP_ENABLED = true;
  */
 export const DEFAULT_BRIDGE_ENABLED = true;
 
-/**
- * Blockscout API configuration per chain
- */
-export const BLOCKSCOUT_CHAIN_URL_MAP: {
-  [key: string]: {
-    url: string,
-    nativeToken: TokenInfo
-  }
-} = {
-  [ChainId.IMTBL_ZKEVM_TESTNET]: {
-    url: 'https://explorer.testnet.immutable.com',
-    nativeToken: ZKEVM_NATIVE_TOKEN,
-  },
-};
-
 export const TRANSAK_API_BASE_URL = {
   [Environment.SANDBOX]: 'https://global-stg.transak.com',
   [Environment.PRODUCTION]: 'https://global.transak.com/',
@@ -160,6 +145,25 @@ NetworkDetails
     },
   ],
 ]);
+
+/**
+ * Blockscout API configuration per chain
+ */
+export const BLOCKSCOUT_CHAIN_URL_MAP: {
+  [key: string]: {
+    url: string,
+    nativeToken: TokenInfo
+  }
+} = {
+  [ChainId.IMTBL_ZKEVM_TESTNET]: {
+    url: 'https://explorer.testnet.immutable.com',
+    nativeToken: SANDBOX_CHAIN_ID_NETWORK_MAP.get(ChainId.IMTBL_ZKEVM_TESTNET)!.nativeCurrency,
+  },
+  [ChainId.IMTBL_ZKEVM_MAINNET]: {
+    url: 'https://explorer.mainnet.immutable.com',
+    nativeToken: PRODUCTION_CHAIN_ID_NETWORK_MAP.get(ChainId.IMTBL_ZKEVM_MAINNET)!.nativeCurrency,
+  },
+};
 
 export const ERC20ABI = [
   {
