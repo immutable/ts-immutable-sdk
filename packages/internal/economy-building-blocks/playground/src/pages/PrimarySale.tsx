@@ -8,6 +8,7 @@ import StatusCard from "../components/StatusCard";
 import ConfigForm from "../components/ConfigForm";
 import { useData } from "../context/DataProvider";
 import { TransactionReceipt } from "@ethersproject/providers";
+import { PrimaryRevenueEventType } from "@imtbl/checkout-widgets";
 
 const useURLParams = () => {
   const [urlParams, setUrlParams] = useState({});
@@ -43,11 +44,11 @@ const useItems = (contract_address: string, pointer = 1) => {
             { method: "GET" }
           );
           const json = await response.json();
-
           // const price = Math.floor(Math.random() * 25) + 1;
-          const price = Math.round((Math.random() * 3 + 0.1) * 100) / 100;
+          const price = Math.round((Math.random() * 3 + 0.1) * 100) / 1000;
 
           return {
+            productId: `P${id.toString().padStart(4, "0")}`,
             token_id: id,
             name: json.name,
             image: json.image,
@@ -104,7 +105,13 @@ const useOpenPopup = (url: string, name: string, specs: string) => {
     popup.current = window.open(url, name, specs);
   }, [url, name, specs]);
 
-  return { openPopup, popup };
+  const closePopup = useCallback(() => {
+    if (popup.current && !popup.current.closed) {
+      popup.current.close();
+    }
+  }, []);
+
+  return { openPopup, closePopup, popup };
 };
 
 const useMint = (amount: number, selectedItems: any[], configFields: any) => {
@@ -113,7 +120,7 @@ const useMint = (amount: number, selectedItems: any[], configFields: any) => {
 
   const items = selectedItems.map((item) => {
     return {
-      id: item.token_id.toString(),
+      productId: item.productId.toString(),
       qty: 1,
       price: item.price.toString(),
       name: item.name,
@@ -128,13 +135,13 @@ const useMint = (amount: number, selectedItems: any[], configFields: any) => {
     amount: amount.toString(),
     envId: "123",
     fromCurrency: "USDC",
-    fromContractAddress: configFields.erc20_contract_address,
+
     items: JSON.stringify(items),
   };
 
   const urlParams = new URLSearchParams(params).toString();
 
-  const { openPopup } = useOpenPopup(
+  const { openPopup, closePopup } = useOpenPopup(
     `${window.location.origin}/mint-sale?${urlParams}`,
     "Mint",
     "width=430,height=650"
@@ -145,7 +152,7 @@ const useMint = (amount: number, selectedItems: any[], configFields: any) => {
     openPopup();
   }, [amount, configFields, selectedItems]);
 
-  return { loading, receipt, handleMint };
+  return { loading, receipt, handleMint, closePopup };
 };
 
 function PrimarySale() {
@@ -174,7 +181,44 @@ function PrimarySale() {
     setConfigFields(params);
   }, [params]);
 
-  const { loading, receipt, handleMint } = useMint(
+  const handleEvent = ((event: MessageEvent<any>) => {
+    if (
+      !event.data ||
+      typeof event.data !== "object" ||
+      !("type" in event.data) ||
+      !("data" in event.data) ||
+      !("identifier" in event.data)
+    ) {
+      return;
+    }
+    console.log("@@@@ event from popup", event);
+
+    const { data, identifier } = event.data;
+
+    if (identifier !== "primary-revenue-widget-events") {
+      return;
+    }
+
+    switch (data.type) {
+      case PrimaryRevenueEventType.CLOSE_WIDGET: {
+        console.log("@@@ close widget");
+        closePopup();
+        break;
+      }
+      default:
+        console.log("Does not match any expected event type");
+    }
+  }) as EventListener;
+
+  useEffect(() => {
+    window.addEventListener("message", handleEvent);
+
+    return () => {
+      window.removeEventListener("message", handleEvent);
+    };
+  }, []);
+
+  const { loading, receipt, handleMint, closePopup } = useMint(
     amount,
     selectedItems,
     configFields
@@ -225,106 +269,21 @@ function PrimarySale() {
   return (
     <Box sx={{ padding: "base.spacing.x8" }}>
       <Grid fluid>
-        <Banner variant="guidance" sx={{ marginBottom: "base.spacing.x4" }}>
-          <Banner.Title> Order Price: ${amount} USDC</Banner.Title>
-          <Banner.Caption>
-            Fees (${fee * 100}%): ${amount * fee} USDC
-          </Banner.Caption>
-        </Banner>
         <Row>
           <Col xs={12} md={12} lg={4}>
-            <Box sx={{ marginTop: "base.spacing.x4" }}>
-              <Box sx={{ marginBottom: "base.spacing.x5" }}>
-                <Heading size={"small"}>Mint Config</Heading>
-              </Box>
-              <ConfigForm
-                fields={[
-                  {
-                    type: "text",
-                    key: "contract_address",
-                    label: "Multicaller Address",
-                    hint: "Contract Address for Guarded Multicaller Contract",
-                    placeholder: "0x...",
-                    value: configFields.contract_address,
-                  },
-                  {
-                    type: "text",
-                    key: "recipient_address",
-                    label: "Buyer Address",
-                    hint: "Wallet address that will receive the NFTs",
-                    placeholder: "0x...",
-                    value: configFields.recipient_address,
-                  },
-                  {
-                    type: "text",
-                    key: "erc20_contract_address",
-                    label: "ERC20 Contract Address",
-                    hint: "Contract address for the ERC20 token to be used for payment",
-                    placeholder: "0x...",
-                    value: configFields.erc20_contract_address,
-                  },
-                  {
-                    type: "text",
-                    key: "fee_collection_address",
-                    label: "Platform Fee Recipient Address",
-                    hint: `Wallet address that will receive the platform fee (${
-                      fee * 100
-                    }% })`,
-                    placeholder: "0x...",
-                    value: configFields.fee_collection_address,
-                  },
-                  {
-                    type: "text",
-                    key: "sale_collection_address",
-                    label: "Revenue Recipient Address",
-                    hint: "Wallet address that will receive the sale revenue (amounts after platform fee)",
-                    placeholder: "0x...",
-                    value: configFields.sale_collection_address,
-                  },
-                ]}
-                onChange={handleMintFormChange}
-              />
-              <Button
-                size={"large"}
-                sx={{
-                  background: "base.gradient.1",
-                  width: "100%",
-                  marginTop: "base.spacing.x4",
-                }}
-                onClick={handleMint}
-                disabled={amount === 0 || loading}
-              >
-                <Button.Icon
-                  icon={amount ? "Wallet" : "Alert"}
-                  iconVariant="regular"
-                  sx={{
-                    mr: "base.spacing.x1",
-                    ml: "0",
-                    width: "base.icon.size.400",
-                  }}
-                />
-                {amount ? "Buy Now" : "Select items to purchase"}
-              </Button>
-            </Box>
-          </Col>
-          <Col xs={12} md={12} lg={8}>
-            <Box>
-              <Box sx={{ marginBottom: "base.spacing.x5" }}>
-                <Heading size={"small"}>Catalog</Heading>
-              </Box>
-              <ItemCards
-                nfts={items}
-                onClick={handleSelectItem}
-                isSelected={handleIsSelectedItem}
-                onRefetch={() => {
-                  setItemsPointer((prev) => prev + 1);
-                }}
-              />
-            </Box>
             <Box sx={{ marginTop: "base.spacing.x5" }}>
               <Box sx={{ marginBottom: "base.spacing.x5" }}>
                 <Heading size={"small"}>Status</Heading>
               </Box>
+              <Banner
+                variant="guidance"
+                sx={{ marginBottom: "base.spacing.x4" }}
+              >
+                <Banner.Title> Order Price: ${amount} USDC</Banner.Title>
+                <Banner.Caption>
+                  Fees (${fee * 100}%): ${amount * fee} USDC
+                </Banner.Caption>
+              </Banner>
               <Card>
                 <Card.Caption>
                   <StatusCard
@@ -360,7 +319,7 @@ function PrimarySale() {
                             sx={{ marginLeft: "base.spacing.x1" }}
                             onClick={() => {
                               window.open(
-                                `https://immutable-testnet.blockscout.com/tx/${receipt}`,
+                                `https://explorer.testnet.immutable.com/tx/${receipt}`,
                                 "_blank"
                               );
                             }}
@@ -376,9 +335,44 @@ function PrimarySale() {
               </Card>
             </Box>
           </Col>
-        </Row>
-        <Row>
-          <Col xs={12} md={12} lg={12}>
+          <Col xs={12} md={12} lg={8}>
+            <Box>
+              <Box sx={{ marginBottom: "base.spacing.x5" }}>
+                <Heading size={"small"}>Catalog</Heading>
+              </Box>
+              <ItemCards
+                nfts={items}
+                onClick={handleSelectItem}
+                isSelected={handleIsSelectedItem}
+                onRefetch={() => {
+                  setItemsPointer((prev) => prev + 1);
+                }}
+              />
+            </Box>
+            <Box sx={{ marginTop: "base.spacing.x4" }}>
+              <Button
+                size={"large"}
+                sx={{
+                  background: "base.gradient.1",
+                  width: "100%",
+                  marginTop: "base.spacing.x4",
+                }}
+                onClick={handleMint}
+                disabled={amount === 0 || loading}
+              >
+                <Button.Icon
+                  icon={amount ? "Wallet" : "Alert"}
+                  iconVariant="regular"
+                  sx={{
+                    mr: "base.spacing.x1",
+                    ml: "0",
+                    width: "base.icon.size.400",
+                  }}
+                />
+                {amount ? "Buy Now" : "Select items to purchase"}
+              </Button>
+            </Box>
+
             <Box sx={{ marginTop: "base.spacing.x4" }}>
               <Box sx={{ marginBottom: "base.spacing.x5" }}>
                 <Box sx={{ marginBottom: "base.spacing.x5" }}>
