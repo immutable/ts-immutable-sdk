@@ -135,9 +135,10 @@ describe('sendTransaction', () => {
     );
   });
 
-  it('returns an error if the relayer does not return a successful status', async () => {
+  it('returns and surfaces an error if the relayer does not return a successful status', async () => {
     (retryWithDelay as jest.Mock).mockResolvedValue({
       status: RelayerTransactionStatus.FAILED,
+      statusMessage: 'Unable to complete transaction',
     } as RelayerTransaction);
 
     await expect(
@@ -152,7 +153,7 @@ describe('sendTransaction', () => {
     ).rejects.toThrow(
       new JsonRpcError(
         RpcErrorCode.INTERNAL_ERROR,
-        'Transaction failed to submit with status FAILED',
+        'Transaction failed to submit with status FAILED. Error message: Unable to complete transaction',
       ),
     );
   });
