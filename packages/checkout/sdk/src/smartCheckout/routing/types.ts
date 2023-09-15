@@ -8,8 +8,14 @@ export type RoutingCalculatorResult = {
   fundingRoutes: FundingRoute[],
 };
 
+export enum RouteCalculatorType {
+  ROUTES_FOUND = 'ROUTES_FOUND',
+  NO_ROUTES = 'NO_ROUTES',
+  NO_OPTIONS = 'NO_OPTIONS',
+}
+
 export type RoutingCalculatorResponse = {
-  type: 'ROUTES_FOUND' | 'NO_ROUTES' | 'NO_OPTIONS',
+  type: RouteCalculatorType,
   message: string,
 };
 
@@ -19,8 +25,14 @@ export type FundingRouteBalanceItem = {
   token: TokenInfo
 };
 
+export enum FundingRouteType {
+  BRIDGE = 'BRIDGE',
+  ON_RAMP = 'ONRAMP',
+  SWAP = 'SWAP',
+}
+
 export type FundingRouteStep = {
-  type: 'bridge' | 'onRamp' | 'swap';
+  type: FundingRouteType;
   chainId: number,
   asset: FundingRouteBalanceItem,
 };
