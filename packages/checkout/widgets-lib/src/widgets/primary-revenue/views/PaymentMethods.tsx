@@ -92,6 +92,15 @@ export function PaymentMethods({ checkBalances, sign, smartCheckout }: PaymentMe
             // Take user to SC Orchestrator
             // eslint-disable-next-line no-console
             console.log('@@@@@@@@ PaymentMethods.tsx not enough funds -> sending to SC Ochestrator');
+            viewDispatch({
+              payload: {
+                type: ViewActions.UPDATE_VIEW,
+                view: {
+                  type: PrimaryRevenueWidgetViews.SMART_CHECKOUT,
+                  data: { signResponse, smartCheckoutRes },
+                },
+              },
+            });
           }
         } else if (
           !hasEnoughBalance

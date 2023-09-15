@@ -34,6 +34,7 @@ import { OnRampWidget } from '../on-ramp/OnRampWidget';
 import { useSignOrder } from './hooks/useSignOrder';
 import { Item } from './hooks/useMergeItemsInfo';
 import { useSmartCheckout } from './hooks/useSmartCheckout';
+import { SmartCheckout } from './views/SmartCheckout';
 
 export interface PrimaryRevenueWidgetProps {
   config: StrongCheckoutWidgetsConfig;
@@ -159,6 +160,9 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
             amount={amount}
             tokenAddress=""
           />
+        )}
+        {viewState.view.type === PrimaryRevenueWidgetViews.SMART_CHECKOUT && (
+          <SmartCheckout />
         )}
         {viewState.view.type
           === (OrchestrationEventType.REQUEST_ONRAMP as unknown) && (

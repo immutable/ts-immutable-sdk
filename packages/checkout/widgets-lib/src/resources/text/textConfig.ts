@@ -325,6 +325,16 @@ export const text = {
         },
       },
     },
+    [PrimaryRevenueWidgetViews.SMART_CHECKOUT]: {
+      options: {
+        continue: {
+          text: 'Continue',
+        },
+        payWithCard: {
+          text: 'No thanks, I\'ll pay with card',
+        },
+      },
+    },
     [PrimaryRevenueWidgetViews.REVIEW_ORDER]: {
       header: {
         heading: 'Review & Pay',
