@@ -73,6 +73,8 @@ const router = createBrowserRouter([
   {
     path: '/on-ramp',
     element: <OnRampWebView />,
+  },
+  {
     path: '/primary-revenue',
     element: <PrimaryRevenueWebView />,
   },
