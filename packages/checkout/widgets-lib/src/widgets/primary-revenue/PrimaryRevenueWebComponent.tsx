@@ -31,7 +31,18 @@ export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
     this.amount = this.getAttribute('amount') ?? '';
     this.envId = this.getAttribute('envId') ?? '';
     this.fromCurrency = this.getAttribute('fromCurrency') ?? '';
-    this.items = JSON.parse(this.getAttribute('items') ?? '');
+
+    const items = this.getAttribute('items') ?? '';
+    if (items) {
+      try {
+        this.items = JSON.parse(items);
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Failed to parse items attribute:', error);
+        this.items = [];
+      }
+    }
+
     this.renderWidget();
   }
 
