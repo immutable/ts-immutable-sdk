@@ -16,13 +16,15 @@ export function sendPrimaryRevenueWidgetCloseEvent() {
       },
     },
   );
-  // TODO: remove once fixed
+
   // eslint-disable-next-line no-console
   console.log('close widget event:', event);
   if (window !== undefined) window.dispatchEvent(event);
 }
 
-export const sendPrimaryRevenueSuccessEvent = (data: Record<string, string>) => {
+export const sendPrimaryRevenueSuccessEvent = (
+  data: Record<string, string>,
+) => {
   const event = new CustomEvent<WidgetEvent<PrimaryRevenueSuccess>>(
     IMTBLWidgetEvents.IMTBL_PRIMARY_REVENUE_WIDGET_EVENT,
     {

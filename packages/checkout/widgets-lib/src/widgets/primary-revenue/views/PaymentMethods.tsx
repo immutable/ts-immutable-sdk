@@ -20,6 +20,7 @@ import {
 } from '../../../context/view-context/ViewContext';
 import { PaymentType, SignResponse } from '../hooks/useSignOrder';
 import { SmartCheckoutInput } from '../hooks/useSmartCheckout';
+import { sendPrimaryRevenueWidgetCloseEvent } from '../PrimaryRevenuWidgetEvents';
 
 export interface PaymentMethodsProps {
   checkBalances: () => Promise<boolean>;
@@ -136,7 +137,7 @@ export function PaymentMethods({ checkBalances, sign, smartCheckout }: PaymentMe
   return (
     <SimpleLayout
       testId="payment-methods"
-      header={<HeaderNavigation onCloseButtonClick={() => { }} />}
+      header={<HeaderNavigation onCloseButtonClick={() => sendPrimaryRevenueWidgetCloseEvent()} />}
       footer={<FooterLogo />}
     >
       <Box
