@@ -23,7 +23,7 @@ export class ImmutableSwap extends ImmutableWebComponent {
 
   static get observedAttributes(): string[] {
     const baseObservedAttributes = super.observedAttributes;
-    return [...baseObservedAttributes, 'amount', 'fromContractAddress', 'toContractAddress', 'walletprovider'];
+    return [...baseObservedAttributes, 'amount', 'fromcontractaddress', 'tocontractaddress', 'walletprovider'];
   }
 
   connectedCallback() {
