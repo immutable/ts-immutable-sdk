@@ -70,10 +70,12 @@ export const calculateFees = (
         CheckoutErrorType.ORDER_FEE_ERROR,
       );
     }
-    calculateFeesResult.push({
-      amount: currentFeeBn.toString(),
-      recipient: orderFee.recipient,
-    });
+    if (currentFeeBn.gte(0)) {
+      calculateFeesResult.push({
+        amount: currentFeeBn.toString(),
+        recipient: orderFee.recipient,
+      });
+    }
   }// for
 
   return calculateFeesResult;
