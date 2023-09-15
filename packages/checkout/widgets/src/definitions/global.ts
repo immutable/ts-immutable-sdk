@@ -14,7 +14,8 @@ import React from 'react';
  * @property {ImtblWalletProps} 'imtbl-wallet' - Props for the 'imtbl-wallet' component.
  * @property {ImtblSwapProps} 'imtbl-swap' - Props for the 'imtbl-swap' component.
  * @property {ImtblBridgeProps} 'imtbl-bridge' - Props for the 'imtbl-bridge' component.
- */
+ * @property {ImtblOnRampProps} 'imtbl-onramp' - Props for the 'imtbl-onramp' component.
+ * */
 declare global {
   interface Window {
     ImtblCheckoutWidgetConfig: any;
@@ -26,6 +27,7 @@ declare global {
       'imtbl-wallet': ImtblWalletProps;
       'imtbl-swap': ImtblSwapProps;
       'imtbl-bridge': ImtblBridgeProps;
+      'imtbl-onramp': ImtblOnRampProps;
     }
   }
 
@@ -110,4 +112,25 @@ export interface ImtblBridgeProps
   widgetConfig?: string;
   fromContractAddress?: string;
   amount?: string;
+}
+
+/**
+ * Interface for the properties of a bridge web component.
+ * Extends the React.DetailedHTMLProps interface to inherit HTML attributes for the component's root element.
+ * @interface ImtblOnRampProps
+ * @extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>
+ * @property {string | undefined} walletProvider - The preferred wallet provider to connect to.
+ * @property {string | undefined} widgetConfig - The configuration for the bridge widget.
+ * @property {string | undefined} amount - The amount to onramp.
+ * @property {string | undefined} contractAddress - The contract address of the token to on ramp.
+ */
+export interface ImtblOnRampProps
+  extends React.DetailedHTMLProps<
+  React.HTMLAttributes<HTMLElement>,
+  HTMLElement
+  > {
+  walletProvider?: string;
+  widgetConfig?: string;
+  amount?: string;
+  contractAddress?: string;
 }

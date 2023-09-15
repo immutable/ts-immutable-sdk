@@ -100,8 +100,8 @@ export class Blockscout {
       if (params.nextPage) url += `&${new URLSearchParams(params.nextPage as Record<string, string>)}`;
 
       // Cache response data to prevent unnecessary requests
-      const cached = this.getCache(url) as AxiosResponse;
-      if (cached && cached.status < 400) return Promise.resolve(cached.data);
+      const cached = this.getCache(url);
+      if (cached) return Promise.resolve(cached);
 
       const response = await Blockscout.makeHttpRequest(url);
       if (response.status >= 400) {
@@ -146,8 +146,8 @@ export class Blockscout {
       const url = `${this.url}/api/v2/addresses/${params.walletAddress}`;
 
       // Cache response data to prevent unnecessary requests
-      const cached = this.getCache(url) as AxiosResponse;
-      if (cached && cached.status < 400) return Promise.resolve(cached.data);
+      const cached = this.getCache(url);
+      if (cached) return Promise.resolve(cached);
 
       const response = await Blockscout.makeHttpRequest(url);
       if (response.status >= 400) {
