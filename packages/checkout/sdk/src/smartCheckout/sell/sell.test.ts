@@ -132,10 +132,10 @@ describe('sell', () => {
           type: ItemType.NATIVE,
           amount: '1',
         },
-        makerFee: {
-          amount: { percent: 0.025 },
+        makerFees: [{
+          amount: { percentageDecimal: 0.025 },
           recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
-        },
+        }],
       }];
 
       const result = await sell(
@@ -284,10 +284,10 @@ describe('sell', () => {
           type: ItemType.NATIVE,
           amount: '1',
         },
-        makerFee: {
-          amount: { percent: 0.025 },
+        makerFees: [{
+          amount: { percentageDecimal: 0.025 },
           recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
-        },
+        }],
       }];
 
       const result = await sell(
@@ -416,10 +416,10 @@ describe('sell', () => {
           type: ItemType.NATIVE,
           amount: '1',
         },
-        makerFee: {
-          amount: { percent: 0.025 },
+        makerFees: [{
+          amount: { percentageDecimal: 0.025 },
           recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
-        },
+        }],
       }];
 
       const result = await sell(
@@ -498,10 +498,10 @@ describe('sell', () => {
             type: ItemType.NATIVE,
             amount: '1',
           },
-          makerFee: {
-            amount: { percent: 0.025 },
+          makerFees: [{
+            amount: { percentageDecimal: 0.025 },
             recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
-          },
+          }],
         }];
 
         await sell(
@@ -569,10 +569,10 @@ describe('sell', () => {
             type: ItemType.NATIVE,
             amount: '1',
           },
-          makerFee: {
-            amount: { percent: 0.025 },
+          makerFees: [{
+            amount: { percentageDecimal: 0.025 },
             recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
-          },
+          }],
         }];
 
         await sell(
@@ -676,10 +676,10 @@ describe('sell', () => {
           type: ItemType.NATIVE,
           amount: '1',
         },
-        makerFee: {
-          amount: { percent: 0.025 },
+        makerFees: [{
+          amount: { percentageDecimal: 0.025 },
           recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
-        },
+        }],
       }];
 
       await expect(
@@ -777,10 +777,10 @@ describe('sell', () => {
           type: ItemType.NATIVE,
           amount: '1',
         },
-        makerFee: {
-          amount: { percent: 0.025 },
+        makerFees: [{
+          amount: { percentageDecimal: 0.025 },
           recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
-        },
+        }],
       }];
 
       await expect(
@@ -881,10 +881,10 @@ describe('sell', () => {
           type: ItemType.NATIVE,
           amount: '1',
         },
-        makerFee: {
-          amount: { percent: 0.025 },
+        makerFees: [{
+          amount: { percentageDecimal: 0.025 },
           recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
-        },
+        }],
       }];
 
       await expect(
@@ -963,10 +963,10 @@ describe('sell', () => {
           type: ItemType.NATIVE,
           amount: '1',
         },
-        makerFee: {
-          amount: { percent: 0.025 },
+        makerFees: [{
+          amount: { percentageDecimal: 0.025 },
           recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
-        },
+        }],
       }];
 
       try {
@@ -1081,10 +1081,10 @@ describe('sell', () => {
           type: ItemType.NATIVE,
           amount: '1',
         },
-        makerFee: {
-          amount: { percent: 0.025 },
+        makerFees: [{
+          amount: { percentageDecimal: 0.025 },
           recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
-        },
+        }],
       }];
 
       try {

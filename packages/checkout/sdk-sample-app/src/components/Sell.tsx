@@ -85,10 +85,10 @@ export default function Sell({ checkout, provider }: SellProps) {
           address: collectionAddress
         },
         buyToken: getBuyToken(),
-        makerFee: {
-          amount: { percent: 0.025 },
+        makerFees: [{
+          amount: { percentageDecimal: 0.025 },
           recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772'
-        }
+        }]
       }]
 
       await checkout.sell({

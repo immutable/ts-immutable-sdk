@@ -1,5 +1,5 @@
 export interface OrderFee {
-  amount: FeeToken | FeePercent;
+  amount: FeeToken | FeePercentage;
   recipient: string;
 }
 
@@ -7,6 +7,6 @@ export interface FeeToken {
   token: string
 }
 
-export interface FeePercent {
-  percent: number
+export interface FeePercentage {
+  percentageDecimal: number
 }

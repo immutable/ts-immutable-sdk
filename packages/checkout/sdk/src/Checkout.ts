@@ -300,6 +300,7 @@ export class Checkout {
    * Determines the requirements for performing a sell.
    * @param {SellParams} params - The parameters for the sell.
    * Only currently actions the first order in the array until we support batch processing.
+   * Only currently actions the first fee in the fees array of each order until we support multiple fees.
   */
   public async sell(
     params: SellParams,

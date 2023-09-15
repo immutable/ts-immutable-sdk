@@ -71,7 +71,7 @@ export const sell = async (
   let listing: PrepareListingResponse;
   let spenderAddress = '';
 
-  const { buyToken, collection, makerFee } = orders[0];
+  const { buyToken, collection, makerFees } = orders[0];
 
   let decimals = 18;
   if (buyToken.type === ItemType.ERC20) {
@@ -168,7 +168,6 @@ export const sell = async (
     }
 
     let orderId = '';
-    let orderFee = '';
 
     const createListingParams:CreateListingParams = {
       orderComponents: signedMessage.orderComponents,
@@ -176,12 +175,11 @@ export const sell = async (
       orderSignature: signedMessage.signedMessage,
     };
 
-    if (makerFee !== undefined) {
-      orderFee = calculateFees(makerFee, buyTokenOrNative, decimals);
-      createListingParams.makerFee = {
-        recipient: makerFee?.recipient,
-        amount: orderFee,
-      };
+    if (makerFees !== undefined) {
+      const orderBookFees = calculateFees(makerFees, buyTokenOrNative, decimals);
+      // @TODO add support for an array of fees when the orderbook enables it
+      const [makerFee] = orderBookFees;
+      createListingParams.makerFee = makerFee;
     }
 
     try {

@@ -26,7 +26,7 @@ export type {
   ConnectResult,
   FiatRampParams,
   DexConfig,
-  FeePercent,
+  FeePercentage,
   FeeToken,
   GasEstimateBridgeToL2Result,
   GasEstimateParams,

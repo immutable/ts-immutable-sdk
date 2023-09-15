@@ -17,7 +17,7 @@ export interface SellParams {
 export interface SellOrder {
   collection: Collection;
   buyToken: BuyToken;
-  makerFee?: OrderFee;
+  makerFees?: Array<OrderFee>;
 }
 
 /**
