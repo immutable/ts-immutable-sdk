@@ -24,7 +24,8 @@ import { SmartCheckoutInput } from '../hooks/useSmartCheckout';
 export interface PaymentMethodsProps {
   checkBalances: () => Promise<boolean>;
   sign: (paymentType: PaymentType) => Promise<SignResponse | undefined>;
-  smartCheckout: (x: SmartCheckoutInput) => Promise<SmartCheckoutResult>;
+  // SmartCheckout currently returns Promise<void> but later will return Promise<SmartCheckoutResult>
+  smartCheckout: (x: SmartCheckoutInput) => Promise<SmartCheckoutResult | void>;
 
 }
 
@@ -68,7 +69,15 @@ export function PaymentMethods({ checkBalances, sign, smartCheckout }: PaymentMe
           // eslint-disable-next-line no-console
           console.log('@@@@@@@@ PaymentMethods.tsx smartCheckoutRes', smartCheckoutRes);
 
-          if (smartCheckoutRes.sufficient) {
+          let sufficient = smartCheckoutRes?.sufficient;
+          if (!smartCheckoutRes) {
+            // SmartCheckout still being developed - for now assume sufficient
+            sufficient = true;
+            // eslint-disable-next-line no-console
+            console.log('@@@@@@@@ PaymentMethods.tsx SmartCheckout unable to return');
+          }
+
+          if (sufficient) {
             viewDispatch({
               payload: {
                 type: ViewActions.UPDATE_VIEW,
