@@ -419,25 +419,6 @@ function PrimarySale() {
                   <StatusCard
                     status="Minting"
                     variant={executedTx ? "success" : "standard"}
-                    extraContent={
-                      executedTx ? (
-                        <>
-                          <Link
-                            variant="primary"
-                            sx={{ marginLeft: "base.spacing.x1" }}
-                            onClick={() => {
-                              window.open(
-                                `https://explorer.testnet.immutable.com/tx/${executedTx}`,
-                                "_blank"
-                              );
-                            }}
-                          >
-                            View on Block Explorer
-                            <Link.Icon icon="JumpTo" />
-                          </Link>
-                        </>
-                      ) : null
-                    }
                   ></StatusCard>
                   <StatusCard
                     status={
@@ -455,14 +436,14 @@ function PrimarySale() {
                         : "standard"
                     }
                     extraContent={
-                      receipt ? (
+                      executedTx ? (
                         <>
                           <Link
                             variant="primary"
                             sx={{ marginLeft: "base.spacing.x1" }}
                             onClick={() => {
                               window.open(
-                                `https://explorer.testnet.immutable.com/tx/${receipt}`,
+                                `https://explorer.testnet.immutable.com/tx/${executedTx}`,
                                 "_blank"
                               );
                             }}
@@ -491,7 +472,7 @@ function PrimarySale() {
                   size={"medium"}
                   sx={{
                     background: "base.color.accent.8",
-                    width: "30%",
+                    width: "20%",
                     marginTop: "base.spacing.x4",
                   }}
                   onClick={() => setPassportOn((prev) => !prev)}
