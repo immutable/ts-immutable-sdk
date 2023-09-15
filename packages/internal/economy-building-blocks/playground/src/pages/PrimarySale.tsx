@@ -7,7 +7,6 @@ import ItemCards from "../components/ItemCards";
 import StatusCard from "../components/StatusCard";
 import ConfigForm from "../components/ConfigForm";
 import { useData } from "../context/DataProvider";
-import { TransactionReceipt } from "@ethersproject/providers";
 import { PrimaryRevenueEventType } from "@imtbl/checkout-widgets";
 import { config, passport } from "@imtbl/sdk";
 
@@ -106,7 +105,7 @@ const useItems = (contract_address: string, pointer = 1) => {
             image: json.image,
             contract_address,
             price: price,
-            description: `USDC \$${price}`,
+            description: json.description,
           };
         }
       );
@@ -183,7 +182,6 @@ const useMint = (
   passportOn: boolean
 ) => {
   const [loading, setLoading] = useState(false);
-  const [receipt, setReceipt] = useState<TransactionReceipt | null>(null);
 
   const items = selectedItems.map((item) => {
     return {
@@ -218,7 +216,7 @@ const useMint = (
     openPopup();
   }, [amount, configFields, selectedItems]);
 
-  return { loading, receipt, handleMint, closePopup };
+  return { loading, handleMint, closePopup };
 };
 
 function PrimarySale() {
@@ -232,7 +230,8 @@ function PrimarySale() {
   const [configFields, setConfigFields] = useState<Record<string, any>>({});
   const [approvedTx, setApprovedTx] = useState("");
   const [executedTx, setExecutedTx] = useState("");
-  const [passportOn, setPassportOn] = useState<boolean>(false);
+  const [passportOn, setPassportOn] = useState<boolean>(true);
+  const [receipt, setReceipt] = useState<any | null>(null);
 
   const [itemsPointer, setItemsPointer] = useState(1);
 
@@ -244,17 +243,39 @@ function PrimarySale() {
   );
 
   useEffect(() => {
-    console.log("@@@ login", login);
-    if (passportInstance) {
-      passportInstance.loginCallback();
+    if (!passportInstance || !executedTx) {
+      return;
     }
-  }, [login]);
+
+    const intervalId = setInterval(async () => {
+      try {
+        const zkEvmProvider = await passportInstance.connectEvm();
+        const currentReceipt = await zkEvmProvider.request({
+          method: "eth_getTransactionReceipt",
+          params: [executedTx],
+        });
+
+        setReceipt(currentReceipt);
+
+        if (currentReceipt) {
+          if (currentReceipt.status === "0x1") {
+            console.log("Transaction was successfully minted.");
+            clearInterval(intervalId);
+          } else if (currentReceipt.status === "0x0") {
+            console.log("Transaction failed during execution.");
+            clearInterval(intervalId);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching transaction receipt", error);
+      }
+    }, 1500);
+
+    return () => clearInterval(intervalId);
+  }, [executedTx]);
 
   useEffect(() => {
-    const passportInstance = window?.opener?.sharedData?.passportInstance;
-
     if (passportInstance) {
-      console.log("@@@ login", login);
       passportInstance.loginCallback();
     }
   }, [login]);
@@ -263,6 +284,7 @@ function PrimarySale() {
   useEffect(() => {
     setApprovedTx("");
     setExecutedTx("");
+    setReceipt(null);
   }, [selectedItems]);
 
   useEffect(() => {
@@ -314,7 +336,7 @@ function PrimarySale() {
     };
   }, []);
 
-  const { loading, receipt, handleMint, closePopup } = useMint(
+  const { loading, handleMint, closePopup } = useMint(
     amount,
     selectedItems,
     configFields,
@@ -372,28 +394,6 @@ function PrimarySale() {
               <Box sx={{ marginBottom: "base.spacing.x5" }}>
                 <Heading size={"small"}>Status</Heading>
               </Box>
-              <Box sx={{ marginTop: "base.spacing.x4" }}>
-                <Button
-                  size={"large"}
-                  sx={{
-                    background: "base.color.accent.8",
-                    width: "100%",
-                    marginTop: "base.spacing.x4",
-                  }}
-                  onClick={() => setPassportOn((prev) => !prev)}
-                >
-                  <Button.Icon
-                    icon={amount ? "Wallet" : "Alert"}
-                    iconVariant="regular"
-                    sx={{
-                      mr: "base.spacing.x1",
-                      ml: "0",
-                      width: "base.icon.size.400",
-                    }}
-                  />
-                  {passportOn ? "Disable Passport" : "Enable Passport"}
-                </Button>
-              </Box>
               <Banner
                 variant="guidance"
                 sx={{ marginBottom: "base.spacing.x4" }}
@@ -403,6 +403,7 @@ function PrimarySale() {
                   Fees (${fee * 100}%): ${amount * fee} USDC
                 </Banner.Caption>
               </Banner>
+
               <Card>
                 <Card.Caption>
                   <StatusCard
@@ -438,17 +439,17 @@ function PrimarySale() {
                       ) : null
                     }
                   ></StatusCard>
-                  {/* <StatusCard
+                  <StatusCard
                     status={
                       receipt
-                        ? receipt.status === 1
+                        ? parseInt(receipt.status) === 1
                           ? "Minted 🚀"
                           : "Not Minted - Failed 🧐 | "
                         : "Minted"
                     }
                     variant={
                       receipt
-                        ? receipt.status === 1
+                        ? parseInt(receipt.status) === 1
                           ? "success"
                           : "fatal"
                         : "standard"
@@ -472,13 +473,41 @@ function PrimarySale() {
                         </>
                       ) : null
                     }
-                  ></StatusCard> */}
+                  ></StatusCard>
                 </Card.Caption>
               </Card>
             </Box>
           </Col>
           <Col xs={12} md={12} lg={8}>
             <Box>
+              <Box
+                sx={{
+                  marginTop: "base.spacing.x4",
+                  display: "flex",
+                  justifyContent: "end",
+                }}
+              >
+                <Button
+                  size={"medium"}
+                  sx={{
+                    background: "base.color.accent.8",
+                    width: "30%",
+                    marginTop: "base.spacing.x4",
+                  }}
+                  onClick={() => setPassportOn((prev) => !prev)}
+                >
+                  <Button.Icon
+                    icon={"Wallet"}
+                    iconVariant="regular"
+                    sx={{
+                      mr: "base.spacing.x1",
+                      ml: "0",
+                      width: "base.icon.size.400",
+                    }}
+                  />
+                  {passportOn ? "Disable Passport" : "Enable Passport"}
+                </Button>
+              </Box>
               <Box sx={{ marginBottom: "base.spacing.x5" }}>
                 <Heading size={"small"}>Catalog</Heading>
               </Box>

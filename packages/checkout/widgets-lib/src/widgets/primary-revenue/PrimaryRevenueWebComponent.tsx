@@ -37,6 +37,7 @@ export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
       try {
         this.items = JSON.parse(items);
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Failed to parse items attribute:', error);
         this.items = [];
       }
