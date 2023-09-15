@@ -52,7 +52,12 @@ function ItemCards({
         {nfts &&
           nfts.map((nft, index) => (
             <Box sx={{ w: "100%", h: "100%" }}>
-              <ItemCard nft={nft} onClick={onClick} isSelected={isSelected} />
+              <ItemCard
+                nft={nft}
+                onClick={onClick}
+                isSelected={isSelected}
+                key={nft.token_id}
+              />
             </Box>
           ))}
         <span

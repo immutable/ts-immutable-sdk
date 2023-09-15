@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 
 const useParams = () => {
@@ -7,46 +7,57 @@ const useParams = () => {
   const amount = urlParams.get('amount') as string;
   const envId = urlParams.get('envId') as string;
   const fromCurrency = urlParams.get('fromCurrency') as string;
-  // @deprecated
-  const fromContractAddress = urlParams.get('fromContractAddress') as string;
   const items = urlParams.get('items') as string;
 
   console.log('amount', amount);
   console.log('envId', envId);
   console.log('fromCurrency', fromCurrency);
-  console.log('fromContractAddress', fromContractAddress);
   console.log('items', items);
 
   return {
     amount,
     envId,
     fromCurrency,
-    fromContractAddress,
     items,
   };
 };
 
 const handleEvent = ((event: CustomEvent) => {
-  console.log('event', event.detail);
+  console.log('@@@@@ event', event.detail);
+
   // send the window opener post message with type and data
   window?.opener.postMessage(
     {
       type: 'mint_sale_popup_event',
       data: event.detail,
+      identifier: 'primary-revenue-widget-events',
     },
     '*'
   );
 }) as EventListener;
 
 function PrimaryRevenueWidget() {
-  const { amount, envId, fromCurrency, fromContractAddress, items } =
-    useParams();
+  const {  amount, envId, fromCurrency, items } = useParams();
+
+  console.log('@@@@@ items', JSON.parse(items));
+  const componentRef = useRef(null);
 
   useEffect(() => {
     window.addEventListener(
       IMTBLWidgetEvents.IMTBL_PRIMARY_REVENUE_WIDGET_EVENT,
       handleEvent
     );
+
+    // Assuming window.sharedData.passportInstance contains the necessary data
+    const passportInstance = window?.opener?.sharedData?.passportInstance;
+
+    console.log('@@@@@ passportInstance', passportInstance);
+
+    if (passportInstance && componentRef.current) {
+      (
+        componentRef.current as unknown as ImmutableWebComponent
+      ).addPassportOption(passportInstance);
+    }
 
     return () => {
       window.removeEventListener(
@@ -58,11 +69,11 @@ function PrimaryRevenueWidget() {
 
   return (
     <imtbl-primary-revenue
+      ref={componentRef}
       amount={amount}
       envId={envId}
       fromCurrency={fromCurrency}
       items={items}
-      fromContractAddress={fromContractAddress}
       widgetConfig="{theme: 'dark', environment: 'sandbox'}"
     />
   );
