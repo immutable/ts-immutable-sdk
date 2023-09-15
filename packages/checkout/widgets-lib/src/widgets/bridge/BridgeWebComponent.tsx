@@ -22,7 +22,7 @@ export class ImmutableBridge extends ImmutableWebComponent {
 
   static get observedAttributes(): string[] {
     const baseObservedAttributes = super.observedAttributes;
-    return [...baseObservedAttributes, 'amount', 'fromContractAddress'];
+    return [...baseObservedAttributes, 'amount', 'fromContractAddress', 'walletprovider'];
   }
 
   connectedCallback() {
@@ -43,6 +43,9 @@ export class ImmutableBridge extends ImmutableWebComponent {
     }
     if (name === 'fromcontractaddress') {
       this.fromContractAddress = newValue;
+    }
+    if (name === 'walletprovider') {
+      this.walletProvider = newValue.toLowerCase() as WalletProviderName;
     }
 
     this.renderWidget();
