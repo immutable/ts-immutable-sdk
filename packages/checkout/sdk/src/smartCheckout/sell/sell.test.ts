@@ -7,7 +7,7 @@ import { CheckoutConfiguration } from '../../config';
 import { GasTokenType, ItemType, TransactionOrGasType } from '../../types';
 import { smartCheckout } from '../smartCheckout';
 import { createOrderbookInstance } from '../../instance';
-import { BuyToken, SellStatusType } from '../../types/sell';
+import { BuyToken, SellOrder, SellStatusType } from '../../types/sell';
 import { CheckoutErrorType } from '../../errors';
 import {
   getUnsignedMessage, getUnsignedTransactions, signApprovalTransactions, signMessage,
@@ -123,15 +123,25 @@ describe('sell', () => {
         type: SignTransactionStatusType.SUCCESS,
       });
 
+      const orders:Array<SellOrder> = [{
+        collection: {
+          id,
+          address: contractAddress,
+        },
+        buyToken: {
+          type: ItemType.NATIVE,
+          amount: '1',
+        },
+        makerFee: {
+          amount: { percent: 0.025 },
+          recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
+        },
+      }];
+
       const result = await sell(
         config,
         mockProvider,
-        id,
-        contractAddress,
-        {
-          type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
-        },
+        orders,
       );
 
       expect(result).toEqual({
@@ -265,15 +275,25 @@ describe('sell', () => {
       });
       (signApprovalTransactions as jest.Mock).mockResolvedValue({});
 
+      const orders:Array<SellOrder> = [{
+        collection: {
+          id,
+          address: contractAddress,
+        },
+        buyToken: {
+          type: ItemType.NATIVE,
+          amount: '1',
+        },
+        makerFee: {
+          amount: { percent: 0.025 },
+          recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
+        },
+      }];
+
       const result = await sell(
         config,
         mockProvider,
-        id,
-        contractAddress,
-        {
-          type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
-        },
+        orders,
       );
 
       expect(result).toEqual({
@@ -387,15 +407,25 @@ describe('sell', () => {
         reason: 'Approval transaction failed and was reverted',
       });
 
+      const orders:Array<SellOrder> = [{
+        collection: {
+          id,
+          address: contractAddress,
+        },
+        buyToken: {
+          type: ItemType.NATIVE,
+          amount: '1',
+        },
+        makerFee: {
+          amount: { percent: 0.025 },
+          recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
+        },
+      }];
+
       const result = await sell(
         config,
         mockProvider,
-        id,
-        contractAddress,
-        {
-          type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
-        },
+        orders,
       );
 
       expect(result).toEqual({
@@ -459,15 +489,25 @@ describe('sell', () => {
       let data;
 
       try {
+        const orders:Array<SellOrder> = [{
+          collection: {
+            id,
+            address: contractAddress,
+          },
+          buyToken: {
+            type: ItemType.NATIVE,
+            amount: '1',
+          },
+          makerFee: {
+            amount: { percent: 0.025 },
+            recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
+          },
+        }];
+
         await sell(
           config,
           mockProvider,
-          id,
-          contractAddress,
-          {
-            type: ItemType.NATIVE,
-            amount: BigNumber.from(1),
-          },
+          orders,
         );
       } catch (err: any) {
         message = err.message;
@@ -520,15 +560,25 @@ describe('sell', () => {
       let data;
 
       try {
+        const orders:Array<SellOrder> = [{
+          collection: {
+            id,
+            address: contractAddress,
+          },
+          buyToken: {
+            type: ItemType.NATIVE,
+            amount: '1',
+          },
+          makerFee: {
+            amount: { percent: 0.025 },
+            recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
+          },
+        }];
+
         await sell(
           config,
           rejectedProvider,
-          id,
-          contractAddress,
-          {
-            type: ItemType.NATIVE,
-            amount: BigNumber.from(1),
-          },
+          orders,
         );
       } catch (err: any) {
         message = err.message;
@@ -617,16 +667,26 @@ describe('sell', () => {
       });
       (signApprovalTransactions as jest.Mock).mockResolvedValue({});
 
+      const orders:Array<SellOrder> = [{
+        collection: {
+          id,
+          address: contractAddress,
+        },
+        buyToken: {
+          type: ItemType.NATIVE,
+          amount: '1',
+        },
+        makerFee: {
+          amount: { percent: 0.025 },
+          recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
+        },
+      }];
+
       await expect(
         sell(
           config,
           mockProvider,
-          id,
-          contractAddress,
-          {
-            type: ItemType.NATIVE,
-            amount: BigNumber.from(1),
-          },
+          orders,
         ),
       ).rejects.toThrowError('error from sign message');
 
@@ -708,16 +768,26 @@ describe('sell', () => {
       (getUnsignedTransactions as jest.Mock).mockRejectedValue(new Error('error from get unsigned transactions'));
       (signApprovalTransactions as jest.Mock).mockResolvedValue({});
 
+      const orders:Array<SellOrder> = [{
+        collection: {
+          id,
+          address: contractAddress,
+        },
+        buyToken: {
+          type: ItemType.NATIVE,
+          amount: '1',
+        },
+        makerFee: {
+          amount: { percent: 0.025 },
+          recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
+        },
+      }];
+
       await expect(
         sell(
           config,
           mockProvider,
-          id,
-          contractAddress,
-          {
-            type: ItemType.NATIVE,
-            amount: BigNumber.from(1),
-          },
+          orders,
         ),
       ).rejects.toThrowError('error from get unsigned transactions');
 
@@ -802,16 +872,26 @@ describe('sell', () => {
       });
       (signApprovalTransactions as jest.Mock).mockRejectedValue(new Error('error from sign approval transactions'));
 
+      const orders:Array<SellOrder> = [{
+        collection: {
+          id,
+          address: contractAddress,
+        },
+        buyToken: {
+          type: ItemType.NATIVE,
+          amount: '1',
+        },
+        makerFee: {
+          amount: { percent: 0.025 },
+          recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
+        },
+      }];
+
       await expect(
         sell(
           config,
           mockProvider,
-          id,
-          contractAddress,
-          {
-            type: ItemType.NATIVE,
-            amount: BigNumber.from(1),
-          },
+          orders,
         ),
       ).rejects.toThrowError('error from sign approval transactions');
 
@@ -874,16 +954,26 @@ describe('sell', () => {
       let type;
       let data;
 
+      const orders:Array<SellOrder> = [{
+        collection: {
+          id,
+          address: contractAddress,
+        },
+        buyToken: {
+          type: ItemType.NATIVE,
+          amount: '1',
+        },
+        makerFee: {
+          amount: { percent: 0.025 },
+          recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
+        },
+      }];
+
       try {
         await sell(
           config,
           mockProvider,
-          id,
-          contractAddress,
-          {
-            type: ItemType.NATIVE,
-            amount: BigNumber.from(1),
-          },
+          orders,
         );
       } catch (err: any) {
         message = err.message;
@@ -982,16 +1072,26 @@ describe('sell', () => {
       let type;
       let data;
 
+      const orders:Array<SellOrder> = [{
+        collection: {
+          id,
+          address: contractAddress,
+        },
+        buyToken: {
+          type: ItemType.NATIVE,
+          amount: '1',
+        },
+        makerFee: {
+          amount: { percent: 0.025 },
+          recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
+        },
+      }];
+
       try {
         await sell(
           config,
           mockProvider,
-          id,
-          contractAddress,
-          {
-            type: ItemType.NATIVE,
-            amount: BigNumber.from(1),
-          },
+          orders,
         );
       } catch (err: any) {
         message = err.message;
@@ -1018,7 +1118,7 @@ describe('sell', () => {
     it('should return a native buy token', () => {
       const buyToken: BuyToken = {
         type: ItemType.NATIVE,
-        amount: BigNumber.from(1),
+        amount: '1',
       };
 
       const result = getBuyToken(buyToken);
@@ -1032,7 +1132,7 @@ describe('sell', () => {
     it('should return an ERC20 buy token', () => {
       const buyToken: BuyToken = {
         type: ItemType.ERC20,
-        amount: BigNumber.from(1),
+        amount: '1',
         contractAddress: '0xERC20',
       };
 

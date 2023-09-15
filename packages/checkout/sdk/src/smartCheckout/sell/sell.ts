@@ -7,7 +7,7 @@ import {
   PrepareListingResponse,
   constants,
 } from '@imtbl/orderbook';
-import { BigNumber } from 'ethers';
+import { BigNumber, Contract } from 'ethers';
 import {
   BuyToken, SellOrder, SellResult, SellStatusType,
 } from '../../types/sell';
@@ -16,6 +16,7 @@ import {
   GasTokenType,
   ItemType,
   TransactionOrGasType,
+  ERC20ABI,
 } from '../../types';
 import * as instance from '../../instance';
 import { CheckoutConfiguration } from '../../config';
@@ -43,17 +44,20 @@ export const getERC721Requirement = (
 
 export const getBuyToken = (
   buyToken: BuyToken,
+  decimals: number = 18,
 ): ERC20Item | NativeItem => {
+  const bnAmount = BigNumber.from(buyToken.amount).mul(BigNumber.from(10).pow(decimals));
+
   if (buyToken.type === ItemType.NATIVE) {
     return {
       type: ItemType.NATIVE,
-      amount: buyToken.amount.toString(),
+      amount: bnAmount.toString(),
     };
   }
 
   return {
     type: ItemType.ERC20,
-    amount: buyToken.amount.toString(),
+    amount: bnAmount.toString(),
     contractAddress: buyToken.contractAddress,
   };
 };
@@ -69,7 +73,19 @@ export const sell = async (
 
   const { buyToken, collection, makerFee } = orders[0];
 
-  const buyTokenOrNative = getBuyToken(buyToken);
+  let decimals = 18;
+  if (buyToken.type === ItemType.ERC20) {
+    // get this from the allowed list
+    const buyContract = new Contract(
+      buyToken.contractAddress,
+      JSON.stringify(ERC20ABI),
+      provider,
+    );
+
+    decimals = buyContract.decimals();
+  }
+
+  const buyTokenOrNative = getBuyToken(buyToken, decimals);
 
   try {
     const walletAddress = await provider.getSigner().getAddress();
@@ -161,7 +177,7 @@ export const sell = async (
     };
 
     if (makerFee !== undefined) {
-      orderFee = calculateFees(makerFee, buyTokenOrNative);
+      orderFee = calculateFees(makerFee, buyTokenOrNative, decimals);
       createListingParams.makerFee = {
         recipient: makerFee?.recipient,
         amount: orderFee,

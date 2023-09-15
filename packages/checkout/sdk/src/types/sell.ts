@@ -1,5 +1,4 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { BigNumber } from 'ethers';
 import { ItemType, SmartCheckoutResult } from './smartCheckout';
 import { Collection } from './collection';
 import { OrderFee } from './fees';
@@ -86,7 +85,7 @@ export type BuyToken = NativeBuyToken | ERC20BuyToken;
  */
 type NativeBuyToken = {
   type: ItemType.NATIVE;
-  amount: BigNumber;
+  amount: string;
 };
 
 /**
@@ -97,6 +96,6 @@ type NativeBuyToken = {
  */
 type ERC20BuyToken = {
   type: ItemType.ERC20;
-  amount: BigNumber;
+  amount: string;
   contractAddress: string;
 };

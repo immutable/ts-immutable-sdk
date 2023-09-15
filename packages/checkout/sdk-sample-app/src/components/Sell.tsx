@@ -31,12 +31,12 @@ export default function Sell({ checkout, provider }: SellProps) {
     if (listingType === ItemType.NATIVE) {
       return {
         type: ItemType.NATIVE,
-        amount: utils.parseUnits(amount, 18),
+        amount,
       }
     }
     return {
       type: ItemType.ERC20,
-      amount: utils.parseUnits(amount, 18),
+      amount,
       contractAddress,
     };
   }
