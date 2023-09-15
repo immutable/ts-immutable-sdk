@@ -70,7 +70,7 @@ export const calculateFees = (
         CheckoutErrorType.ORDER_FEE_ERROR,
       );
     }
-    if (currentFeeBn.gte(0)) {
+    if (currentFeeBn.gt(0)) {
       calculateFeesResult.push({
         amount: currentFeeBn.toString(),
         recipient: orderFee.recipient,
