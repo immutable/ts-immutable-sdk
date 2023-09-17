@@ -21,6 +21,7 @@ export interface CheckoutModuleConfiguration extends ModuleConfiguration<Checkou
 export type RemoteConfiguration = {
   dex: DexConfig;
   onramp: OnRampConfig;
+  bridge: BridgeConfig;
   allowedNetworks: AllowedNetworkConfig[];
   gasEstimateTokens?: GasEstimateTokenConfig;
 };
@@ -67,6 +68,10 @@ export type OnRampConfig = {
  */
 export type DexConfig = {
   overrides?: ExchangeOverrides;
+  tokens?: TokenInfo[];
+};
+
+export type BridgeConfig = {
   tokens?: TokenInfo[];
 };
 

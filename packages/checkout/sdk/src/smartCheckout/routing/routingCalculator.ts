@@ -52,8 +52,6 @@ export const routingCalculator = async (
     availableRoutingOptions,
   );
 
-  // Get allowed tokens?
-
   // Bridge and swap fee cache
   const feeEstimates = new Map<FundingRouteType, BigNumber>();
 
@@ -71,6 +69,8 @@ export const routingCalculator = async (
       feeEstimates,
     );
   }
+
+  // Check bridging routes
 
   // Check on-ramp routes
 
