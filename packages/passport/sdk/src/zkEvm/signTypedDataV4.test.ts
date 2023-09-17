@@ -1,5 +1,6 @@
 import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
+import GuardianClient from 'guardian/guardian';
 import { getEip155ChainId, getSignedTypedData } from './walletHelpers';
 import {
   chainId,
@@ -34,6 +35,12 @@ describe('signTypedDataV4', () => {
   const relayerClient = {
     imSignTypedData: jest.fn(),
   };
+  const guardianClient = {
+    validateMessage: jest.fn(),
+    withConfirmationScreen: jest.fn(() => (task: () => void) => task()),
+    loading: jest.fn(),
+  };
+  const withConfirmationScreenStub = jest.fn();
 
   beforeEach(() => {
     jest.resetAllMocks();
@@ -45,6 +52,8 @@ describe('signTypedDataV4', () => {
     (Web3Provider as unknown as jest.Mock).mockImplementation(() => ({
       getSigner: () => magicSigner,
     }));
+    withConfirmationScreenStub.mockImplementation(() => (task: () => void) => task());
+    guardianClient.withConfirmationScreen = withConfirmationScreenStub;
   });
 
   describe('when a valid address and json are provided', () => {
@@ -56,6 +65,7 @@ describe('signTypedDataV4', () => {
         jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
         relayerClient: relayerClient as unknown as RelayerClient,
         user: mockUserZkEvm,
+        guardianClient: guardianClient as unknown as GuardianClient,
       });
 
       expect(result).toEqual(combinedSignature);
@@ -82,6 +92,7 @@ describe('signTypedDataV4', () => {
         jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
         relayerClient: relayerClient as unknown as RelayerClient,
         user: mockUserZkEvm,
+        guardianClient: guardianClient as any,
       });
 
       expect(result).toEqual(combinedSignature);
@@ -109,6 +120,7 @@ describe('signTypedDataV4', () => {
           jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
           relayerClient: relayerClient as unknown as RelayerClient,
           user: mockUserZkEvm,
+          guardianClient: guardianClient as any,
         })
       )).rejects.toThrow(
         new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'eth_signTypedData_v4 requires an address and a typed data JSON'),
@@ -126,6 +138,7 @@ describe('signTypedDataV4', () => {
           jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
           relayerClient: relayerClient as unknown as RelayerClient,
           user: mockUserZkEvm,
+          guardianClient: guardianClient as any,
         })
       )).rejects.toThrow(
         new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'Failed to parse typed data JSON: SyntaxError: Unexpected token * in JSON at position 0'),
@@ -149,6 +162,7 @@ describe('signTypedDataV4', () => {
           jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
           relayerClient: relayerClient as unknown as RelayerClient,
           user: mockUserZkEvm,
+          guardianClient: guardianClient as any,
         })
       )).rejects.toThrow(
         new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'Invalid typed data argument. The following properties are required: types, domain, primaryType, message'),
@@ -174,6 +188,7 @@ describe('signTypedDataV4', () => {
           jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
           relayerClient: relayerClient as unknown as RelayerClient,
           user: mockUserZkEvm,
+          guardianClient: guardianClient as any,
         })
       )).rejects.toThrow(
         new JsonRpcError(RpcErrorCode.INVALID_PARAMS, `Invalid chainId, expected ${chainId}`),
@@ -198,6 +213,7 @@ describe('signTypedDataV4', () => {
       jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
       user: mockUserZkEvm,
+      guardianClient: guardianClient as any,
     });
 
     expect(result).toEqual(combinedSignature);
