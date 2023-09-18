@@ -69,7 +69,10 @@ describe('getAllowedBalances', () => {
 
     expect(resp).toEqual({
       allowList: {
-        tokens: [{ address: '0xQ' }, {}],
+        tokens: [
+          { address: tokenInfo.token.address },
+          { address: nativeTokenInfo.token.address },
+        ],
       },
       allowedBalances: [
         tokenInfo,
