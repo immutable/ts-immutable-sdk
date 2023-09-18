@@ -3131,7 +3131,7 @@ __metadata:
     "@imtbl/cryptofiat": 0.0.0
     "@imtbl/dex-sdk": 0.0.0
     "@imtbl/passport": 0.0.0
-    "@imtbl/react-analytics": 0.0.3-alpha
+    "@imtbl/react-analytics": 0.0.5-alpha
     "@svgr/webpack": ^8.0.1
     "@testing-library/jest-dom": ^5.16.5
     "@testing-library/react": ^13.4.0
@@ -3753,13 +3753,13 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/react-analytics@npm:0.0.3-alpha":
-  version: 0.0.3-alpha
-  resolution: "@imtbl/react-analytics@npm:0.0.3-alpha"
+"@imtbl/react-analytics@npm:0.0.5-alpha":
+  version: 0.0.5-alpha
+  resolution: "@imtbl/react-analytics@npm:0.0.5-alpha"
   dependencies:
     "@segment/analytics-next": ^1.53.2
     react: ^18.2.0
-  checksum: ebd68dbccce15ba235c74f3fcf9284296d6675cef5feb9851ea6790d7464d47343d14530a7e7320e7ffac74ab258545d470c99bd0bc597ab8eadea3aae8b8873
+  checksum: 1682cedb7a2b55c1626dd3d785de07b7cbccaa764432755ecfc4bafd018950bae414a615bd3a94182f36e2a2b639f255c626fe56d53bbab0c3091ec36721bd64
   languageName: node
   linkType: hard
 
@@ -3769,7 +3769,10 @@ __metadata:
   dependencies:
     "@0xsequence/abi": ^0.43.34
     "@0xsequence/config": ^0.43.34
+    "@ethersproject/abi": ^5.7.0
     "@ethersproject/abstract-signer": ^5.7.0
+    "@ethersproject/bignumber": ^5.7.0
+    "@ethersproject/contracts": ^5.7.0
     "@ethersproject/providers": ^5.7.2
     "@ethersproject/wallet": ^5.7.0
     "@imtbl/blockchain-data": 0.0.0
@@ -3814,6 +3817,7 @@ __metadata:
     rollup-plugin-dts: ^5.3.0
     rollup-plugin-polyfill-node: ^0.12.0
     semver: ^7.4.0
+    typechain: ^8.1.1
     typescript: ^4.9.5
   peerDependencies:
     react: ^18.2.0
@@ -28885,6 +28889,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "ts-immutable-sdk@workspace:."
   dependencies:
+    "@imtbl/react-analytics": 0.0.5-alpha
     "@release-it-plugins/workspaces": ^3.2.0
     "@typescript-eslint/eslint-plugin": ^5.57.1
     "@typescript-eslint/parser": ^5.57.1
