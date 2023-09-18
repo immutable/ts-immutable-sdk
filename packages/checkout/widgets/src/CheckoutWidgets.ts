@@ -12,21 +12,13 @@ export function validateAndBuildVersion(
 ): string {
   const defaultPackageVersion = globalPackageVersion();
 
-  if (version === undefined) return defaultPackageVersion;
-
-  // Pre-production release
-  // TODO: https://immutable.atlassian.net/browse/WT-1501
-  if (
-    version.major === undefined
-    || version.minor === undefined
-    || version.patch === undefined
-    || version.prerelease === undefined
+  if (version === undefined
+    || version.major === undefined
   ) return defaultPackageVersion;
 
   if (version.major < 0) return defaultPackageVersion;
   if (version.minor < 0) return defaultPackageVersion;
   if (version.patch < 0) return defaultPackageVersion;
-  if (version.prerelease !== 'alpha') return defaultPackageVersion;
 
   if (version.major === 0 && version.minor === 0 && version.patch === 0) return defaultPackageVersion;
 
@@ -36,20 +28,25 @@ export function validateAndBuildVersion(
     validatedVersion = version.major.toString();
   }
 
-  if (!Number.isNaN(version.minor)) {
+  if (version.minor !== undefined && !Number.isNaN(version.minor)) {
     validatedVersion += `.${version.minor.toString()}`;
   }
 
-  if (!Number.isNaN(version.patch)) {
+  if (version.minor !== undefined
+    && version.patch !== undefined && !Number.isNaN(version.patch)) {
     validatedVersion += `.${version.patch.toString()}`;
   }
 
-  // TODO: https://immutable.atlassian.net/browse/WT-1501
-  // Ensure this is gated by `version.prerelease !== undefined`
-  // once we go to prod with checkout.
-  validatedVersion += `-${version.prerelease}`;
+  if (version.minor !== undefined
+    && version.patch !== undefined
+    && version.prerelease !== undefined && version.prerelease === 'alpha') {
+    validatedVersion += `-${version.prerelease}`;
+  }
 
-  if (version.build !== undefined && version.build > 0) {
+  if (version.minor !== undefined
+    && version.patch !== undefined
+    && version.prerelease !== undefined
+    && version.build !== undefined && version.build > 0) {
     validatedVersion += `.${version.build}`;
   }
 

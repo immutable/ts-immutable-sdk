@@ -38,7 +38,7 @@ describe('CheckoutWidgets', () => {
           patch: 1,
           prerelease: 'alpha',
         },
-        expectedVersion: SDK_VERSION,
+        expectedVersion: '1',
       },
       {
         title: 'undefined patch should return default version',
@@ -48,7 +48,7 @@ describe('CheckoutWidgets', () => {
           patch: undefined as unknown as number,
           prerelease: 'alpha',
         },
-        expectedVersion: SDK_VERSION,
+        expectedVersion: '1.1',
       },
       {
         title: 'undefined prerelease should return default version',
@@ -58,7 +58,7 @@ describe('CheckoutWidgets', () => {
           patch: 1,
           prerelease: undefined as unknown as 'alpha',
         },
-        expectedVersion: SDK_VERSION,
+        expectedVersion: '1.1.1',
       },
       {
         title: 'all zero versions should return default version',
@@ -78,7 +78,7 @@ describe('CheckoutWidgets', () => {
           patch: 0,
           prerelease: 'test' as 'alpha',
         },
-        expectedVersion: SDK_VERSION,
+        expectedVersion: '0.1.0',
       },
       {
         title: 'provided prerelease should be appended to version',
