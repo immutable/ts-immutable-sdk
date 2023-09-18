@@ -1,7 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { ChainId, Checkout, WalletProviderName } from '@imtbl/checkout-sdk';
 import {
-  useContext, useState, useCallback, useMemo, useEffect,
+  useContext, useState, useCallback, useMemo, useEffect, useRef,
 } from 'react';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../../components/Footer/FooterButton';
@@ -17,6 +17,7 @@ import {
   ViewActions,
 } from '../../../context/view-context/ViewContext';
 import { isMetaMaskProvider, isPassportProvider } from '../../../lib/providerUtils';
+import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 export interface ReadyToConnectProps {
   targetChainId: ChainId;
@@ -30,6 +31,19 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
 
   const isPassport = isPassportProvider(provider);
   const isMetaMask = isMetaMaskProvider(provider);
+
+  const { page, identify, track } = useAnalytics();
+
+  const sendPageViewEvent = useRef(true);
+  useEffect(() => {
+    if (sendPageViewEvent.current) {
+      sendPageViewEvent.current = false;
+      page({
+        userJourney: UserJourney.CONNECT,
+        screen: 'ReadyToConnect',
+      });
+    }
+  }, [sendPageViewEvent]);
 
   // make sure wallet provider name is set if coming directly to this screen
   // and not through the wallet list
@@ -109,9 +123,22 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
     setLoading(true);
     if (checkout && provider) {
       try {
+        track({
+          userJourney: UserJourney.CONNECT,
+          screen: 'ReadyToConnect',
+          control: 'Connect',
+          controlType: 'Button',
+        });
         const connectResult = await checkout.connect({
           provider,
         });
+
+        const walletAddress = (await connectResult.provider.getSigner().getAddress()).toLowerCase();
+        identify(walletAddress, {
+          isMetaMask,
+          isPP: isPassport,
+        });
+
         connectDispatch({
           payload: {
             type: ConnectActions.SET_PROVIDER,
@@ -124,7 +151,7 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
         setFooterButtonText(footer.buttonText2);
       }
     }
-  }, [checkout, provider, connectDispatch, viewDispatch, footer.buttonText2]);
+  }, [checkout, provider, connectDispatch, viewDispatch, footer.buttonText2, isMetaMask, isPassport]);
 
   return (
     <SimpleLayout

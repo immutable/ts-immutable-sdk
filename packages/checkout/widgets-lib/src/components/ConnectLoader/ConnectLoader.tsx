@@ -35,6 +35,8 @@ import {
   removeChainChangedListener,
 } from '../../lib';
 import { useInterval } from '../../lib/hooks/useInterval';
+import { useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import { isMetaMaskProvider, isPassportProvider } from '../../lib/providerUtils';
 
 export interface ConnectLoaderProps {
   children?: React.ReactNode;
@@ -80,6 +82,7 @@ export function ConnectLoader({
   const [hasWeb3Provider, setHasWeb3Provider] = useState<boolean | undefined>();
 
   const [attempts, setAttempts] = useState<number>(0);
+  const { identify } = useAnalytics();
 
   // Check if Web3Provider injected, otherwise load the widget without the provider after several attempts
   let clearInterval: () => void;
@@ -119,7 +122,7 @@ export function ConnectLoader({
   useEffect(() => {
     if (!provider) return () => {};
 
-    function handleAccountsChanged(e: string[]) {
+    async function handleAccountsChanged(e: string[]) {
       if (e.length === 0) {
         // when a user disconnects all accounts, send them back to the connect screen
         connectLoaderDispatch({
@@ -130,11 +133,21 @@ export function ConnectLoader({
           },
         });
       } else {
+        const newProvider = new Web3Provider(provider!.provider);
+        // WT-1698 Analytics - Identify new user as wallet address has changed
+        const walletAddress = (await newProvider.getSigner().getAddress()).toLowerCase();
+        const isMetaMask = isMetaMaskProvider(provider);
+        const isPassport = isPassportProvider(provider);
+        identify(walletAddress, {
+          isMetaMask,
+          isPP: isPassport,
+        });
+
         // trigger a re-load of the connectLoader so that the widget re loads with a new provider
         connectLoaderDispatch({
           payload: {
             type: ConnectLoaderActions.SET_PROVIDER,
-            provider: new Web3Provider(provider!.provider),
+            provider: newProvider,
           },
         });
       }
@@ -157,7 +170,7 @@ export function ConnectLoader({
       removeAccountsChangedListener(provider, handleAccountsChanged);
       removeChainChangedListener(provider, handleChainChanged);
     };
-  }, [provider]);
+  }, [provider, identify]);
 
   useEffect(() => {
     connectLoaderDispatch({
@@ -246,6 +259,15 @@ export function ConnectLoader({
           return;
         }
 
+        // WT-1698 Analytics - Identify user here then progress to widget
+        const walletAddress = (await provider.getSigner().getAddress()).toLowerCase();
+        const isMetaMask = isMetaMaskProvider(provider);
+        const isPassport = isPassportProvider(provider);
+        identify(walletAddress, {
+          isMetaMask,
+          isPP: isPassport,
+        });
+
         connectLoaderDispatch({
           payload: {
             type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
@@ -273,7 +295,8 @@ export function ConnectLoader({
               provider: eventData.provider,
             },
           });
-
+          // WT-1698 Analytics - No need to call Identify here as it is
+          // called in the Connect Widget when raising the ConnectSuccess event
           connectLoaderDispatch({
             payload: {
               type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
