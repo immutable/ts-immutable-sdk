@@ -173,6 +173,7 @@ export const cyIntercept = (overrides?: {
   cy.intercept('https://cdn.segment.com/v1/projects//settings', {
     writeKey: 'segment-mock-write-key',
   });
+  cy.intercept('https://api.segment.com/v1*'); // intercept analytics being sent to segment from tests
   cy.intercept(
     `${checkoutApi}/fiat/coins/all*`,
     overrides?.cryptoFiatOverrides?.coins || [

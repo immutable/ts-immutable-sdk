@@ -197,7 +197,7 @@ export function ConnectLoader({
       }
 
       try {
-        if (!provider && walletProvider && passport) {
+        if (!provider && walletProvider) {
           const createProviderResult = await checkout.createProvider({
             walletProvider,
             passport,

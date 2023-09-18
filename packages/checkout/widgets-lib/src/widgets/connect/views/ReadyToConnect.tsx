@@ -133,7 +133,6 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
         const connectResult = await checkout.connect({
           provider,
         });
-
         await identifyUser(identify, connectResult.provider);
 
         connectDispatch({
