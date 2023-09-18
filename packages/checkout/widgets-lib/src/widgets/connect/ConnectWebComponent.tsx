@@ -10,6 +10,12 @@ export class ImmutableConnect extends ImmutableWebComponent {
     this.renderWidget();
   }
 
+  attributeChangedCallback(name: string, oldValue: any, newValue: any): void {
+    super.attributeChangedCallback(name, oldValue, newValue);
+
+    this.renderWidget();
+  }
+
   validateInputs(): void {
     // not implemented as nothing to validate for ConnectWidget
   }

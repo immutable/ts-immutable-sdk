@@ -6,10 +6,11 @@ import { WalletProviderName } from '@imtbl/checkout-sdk';
 import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
 import { ImmutableConnect } from './connect/ConnectWebComponent';
 import { ImmutableBridge } from './bridge/BridgeWebComponent';
-import { cySmartGet } from '../lib/testUtils';
+import { cyIntercept, cySmartGet } from '../lib/testUtils';
 
 describe('ImmutableWebComponent', () => {
   before(() => {
+    cyIntercept();
     window.customElements.define('imtbl-connect', ImmutableConnect);
   });
 
@@ -35,6 +36,10 @@ describe('BridgeWebComponent with Passport', () => {
     window.customElements.define('imtbl-bridge', ImmutableBridge);
   });
 
+  beforeEach(() => {
+    cyIntercept();
+  });
+
   it('should show BridgeComingSoon screen when mounting bridge widget with passport provider', () => {
     const reference = createRef<ImmutableBridge>();
     const testPassportProvider = {
@@ -56,10 +61,20 @@ describe('BridgeWebComponent with Passport', () => {
 
   it('should show BridgeComingSoon screen when mounting bridge widget with passport walletProvider', () => {
     const reference = createRef<ImmutableBridge>();
-
+    const testPassportInstance = {
+      connectEvm: cy.stub().returns({
+        isPassport: true,
+        request: cy.stub(),
+      }),
+    } as any as Passport;
     mount(
-      <imtbl-bridge ref={reference} walletProvider={WalletProviderName.PASSPORT} />,
-    );
+      <imtbl-bridge ref={reference} />,
+    ).then(() => {
+      (document.getElementsByTagName('imtbl-bridge')[0] as ImmutableBridge)?.addPassportOption(testPassportInstance);
+    }).then(() => {
+      reference.current?.setAttribute('walletProvider', WalletProviderName.PASSPORT);
+    });
+
     cySmartGet('bridge-coming-soon').should('be.visible');
   });
 });

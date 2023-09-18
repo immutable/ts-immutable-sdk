@@ -167,6 +167,12 @@ export const cyIntercept = (overrides?: {
     ...defaultTokensConfig,
     ...overrides?.tokenConfigOverrides && overrides.tokenConfigOverrides,
   });
+  cy.intercept('https://cdn.segment.com/v1/projects/b69BcXnFXdaiFC6MqRQiHvjcPrTxftZl/settings', {
+    writeKey: 'segment-mock-write-key',
+  });
+  cy.intercept('https://cdn.segment.com/v1/projects//settings', {
+    writeKey: 'segment-mock-write-key',
+  });
   cy.intercept(
     `${checkoutApi}/fiat/coins/all*`,
     overrides?.cryptoFiatOverrides?.coins || [

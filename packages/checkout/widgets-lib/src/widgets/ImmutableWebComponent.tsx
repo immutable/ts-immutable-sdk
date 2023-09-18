@@ -33,10 +33,7 @@ export abstract class ImmutableWebComponent extends HTMLElement {
     if (name === 'widgetconfig') {
       this.widgetConfig = this.parseWidgetConfig(newValue);
       this.updateCheckout();
-    } else {
-      this[name] = (newValue as string)?.toLowerCase();
     }
-    this.renderWidget();
   }
 
   updateCheckout() {
