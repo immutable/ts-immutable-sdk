@@ -15,9 +15,24 @@ import { CustomAnalyticsProvider } from '../../context/analytics-provider/Custom
 export class ImmutableWallet extends ImmutableWebComponent {
   walletProvider: WalletProviderName | undefined = undefined;
 
+  static get observedAttributes(): string[] {
+    const baseObservedAttributes = super.observedAttributes;
+    return [...baseObservedAttributes, 'walletprovider'];
+  }
+
   connectedCallback() {
     super.connectedCallback();
     this.walletProvider = this.getAttribute('walletProvider')?.toLowerCase() as WalletProviderName;
+    this.renderWidget();
+  }
+
+  attributeChangedCallback(name: string, oldValue: any, newValue: any): void {
+    super.attributeChangedCallback(name, oldValue, newValue);
+
+    if (name === 'walletprovider') {
+      this.walletProvider = newValue.toLowerCase() as WalletProviderName;
+    }
+
     this.renderWidget();
   }
 
