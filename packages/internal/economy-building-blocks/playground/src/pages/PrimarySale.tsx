@@ -186,7 +186,7 @@ const useMint = (
   const items = selectedItems.map((item) => {
     return {
       productId: item.productId.toString(),
-      qty: 1,
+      qty: item.quantity,
       price: item.price.toString(),
       name: item.name,
       image: item.image,
@@ -346,31 +346,40 @@ function PrimarySale() {
   const handleIsSelectedItem = useCallback(
     (item: any) => {
       return selectedItems.some((selectedItem) => {
-        return selectedItem.token_id === item.token_id;
+        return selectedItem.productId === item.productId;
       });
     },
     [selectedItems]
   );
 
   const handleSelectItem = useCallback(
-    (item: any) => {
-      let items;
+    (item: any, quantity: number) => {
+      let items = selectedItems.filter((selectedItem) => {
+        return selectedItem.token_id !== item.token_id;
+      });
+
       if (handleIsSelectedItem(item)) {
-        items = selectedItems.filter((selectedItem) => {
-          return selectedItem.token_id !== item.token_id;
-        });
+        // Find the existing item and update its quantity
+        const existingItem = selectedItems.find(
+          (selectedItem) => selectedItem.token_id === item.token_id
+        );
+        if (existingItem) {
+          existingItem.quantity = quantity;
+          items = [...items, existingItem];
+        }
       } else {
-        items = [...selectedItems, item];
+        // If the item does not exist, add it with the quantity field
+        items = [...items, { ...item, quantity }];
       }
 
-      const amount = items.reduce((acc, item) => {
-        return acc + item.price;
+      const amount = items.reduce((acc, currentItem) => {
+        return acc + currentItem.price * currentItem.quantity;
       }, 0);
 
       setSelectedItems(items);
       setAmount(amount);
     },
-    [handleIsSelectedItem]
+    [handleIsSelectedItem, selectedItems]
   );
 
   const handleMintFormChange = useCallback(
