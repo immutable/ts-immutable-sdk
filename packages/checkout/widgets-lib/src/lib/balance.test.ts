@@ -13,6 +13,12 @@ describe('getAllowedBalances', () => {
     formattedBalance: '12.34',
   };
 
+  const nativeTokenInfo = {
+    balance: BigNumber.from(2),
+    token: { symbol: 'AAA', name: 'AAA' } as TokenInfo,
+    formattedBalance: '6.34',
+  };
+
   const balances: GetBalanceResult[] = [
     tokenInfo,
     {
@@ -27,7 +33,7 @@ describe('getAllowedBalances', () => {
     },
     {
       balance: BigNumber.from(1),
-      token: { symbol: 'CCC', name: 'CCC', address: 'NATIVE' } as TokenInfo,
+      token: { symbol: 'CCC', name: 'CCC', address: '0xC' } as TokenInfo,
       formattedBalance: '36.34',
     },
   ];
@@ -51,6 +57,7 @@ describe('getAllowedBalances', () => {
         {
           address: '0xQ',
         } as unknown as TokenInfo,
+        {} as unknown as TokenInfo, // <<< allows NATIVE -- no address
       ],
     });
 
@@ -62,9 +69,12 @@ describe('getAllowedBalances', () => {
 
     expect(resp).toEqual({
       allowList: {
-        tokens: [{ address: tokenInfo.token.address }],
+        tokens: [{ address: '0xQ' }, {}],
       },
-      allowedBalances: [tokenInfo],
+      allowedBalances: [
+        tokenInfo,
+        nativeTokenInfo,
+      ],
     });
   });
 
