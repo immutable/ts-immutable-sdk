@@ -8,14 +8,14 @@ import {
 import { TransactionRequest } from '@ethersproject/providers';
 import { CheckoutConfiguration } from '../../../config';
 import { ChainId } from '../../../types';
-import { QuoteFetcherResponse, quoteFetcher } from './quoteFetcher';
+import { quoteFetcher } from './quoteFetcher';
 import { createExchangeInstance } from '../../../instance';
-import { CheckoutErrorType } from '../../../errors';
+import { DexQuote, DexQuotes } from '../types';
 
 jest.mock('../../../instance');
 
 describe('quoteFetcher', () => {
-  const constructQuote = (
+  const constructTransactionResponse = (
     quoteAmount: number,
     feeAmount: number,
     swapGasFeeEstimate?: number,
@@ -69,56 +69,53 @@ describe('quoteFetcher', () => {
     return resp;
   };
 
-  const constructDexResponse = (
-    key: string,
+  const constructDexQuote = (
     quoteAmount: number,
     feeAmount: number,
     swap?: number,
     approval?: number,
   ) => {
-    const quoteFetcherResponse: QuoteFetcherResponse = {
-      [key]: {
-        approval: undefined,
-        swap: null,
-        quote: {
-          amount: {
-            value: BigNumber.from(quoteAmount),
-            token: {} as TokenInfo,
-          },
-          amountWithMaxSlippage: {
-            value: BigNumber.from(quoteAmount),
-            token: {} as TokenInfo,
-          },
-          slippage: 0,
-          fees: [
-            {
-              amount: {
-                value: BigNumber.from(feeAmount),
-                token: {} as TokenInfo,
-              },
-              recipient: '',
-              basisPoints: 0,
-            },
-          ],
+    const dexQuote: DexQuote = {
+      approval: undefined,
+      swap: null,
+      quote: {
+        amount: {
+          value: BigNumber.from(quoteAmount),
+          token: {} as TokenInfo,
         },
+        amountWithMaxSlippage: {
+          value: BigNumber.from(quoteAmount),
+          token: {} as TokenInfo,
+        },
+        slippage: 0,
+        fees: [
+          {
+            amount: {
+              value: BigNumber.from(feeAmount),
+              token: {} as TokenInfo,
+            },
+            recipient: '',
+            basisPoints: 0,
+          },
+        ],
       },
     };
 
     if (swap) {
-      quoteFetcherResponse[key].swap = {
+      dexQuote.swap = {
         value: BigNumber.from(swap),
         token: {} as TokenInfo,
       };
     }
 
     if (approval) {
-      quoteFetcherResponse[key].approval = {
+      dexQuote.approval = {
         value: BigNumber.from(approval),
         token: {} as TokenInfo,
       };
     }
 
-    return quoteFetcherResponse;
+    return dexQuote;
   };
 
   const config = new CheckoutConfiguration({
@@ -129,15 +126,20 @@ describe('quoteFetcher', () => {
     (createExchangeInstance as jest.Mock).mockReturnValue({
       getUnsignedSwapTxFromAmountIn: jest.fn()
         .mockResolvedValueOnce(
-          constructQuote(1, 2, 3, 4),
+          constructTransactionResponse(1, 2, 3, 4),
         )
         .mockResolvedValueOnce(
-          constructQuote(5, 6, 7, 8),
+          constructTransactionResponse(5, 6, 7, 8),
         )
         .mockResolvedValueOnce(
-          constructQuote(9, 10, 11, 12),
+          constructTransactionResponse(9, 10, 11, 12),
         ),
     });
+
+    const mockDexQuotes: DexQuotes = new Map<string, DexQuote>([]);
+    mockDexQuotes.set('0xERC20_1', constructDexQuote(1, 2, 3, 4));
+    mockDexQuotes.set('0xERC20_2', constructDexQuote(5, 6, 7, 8));
+    mockDexQuotes.set('0xERC20_3', constructDexQuote(9, 10, 11, 12));
 
     const quotes = await quoteFetcher(
       config,
@@ -150,26 +152,27 @@ describe('quoteFetcher', () => {
       ['0xERC20_1', '0xERC20_2', '0xERC20_3'],
     );
 
-    expect(quotes).toEqual({
-      ...constructDexResponse('0xERC20_1', 1, 2, 3, 4),
-      ...constructDexResponse('0xERC20_2', 5, 6, 7, 8),
-      ...constructDexResponse('0xERC20_3', 9, 10, 11, 12),
-    });
+    expect(quotes).toEqual(mockDexQuotes);
   });
 
   it('should fetch quotes with no approval', async () => {
     (createExchangeInstance as jest.Mock).mockReturnValue({
       getUnsignedSwapTxFromAmountIn: jest.fn()
         .mockResolvedValueOnce(
-          constructQuote(1, 2, 3),
+          constructTransactionResponse(1, 2, 3),
         )
         .mockResolvedValueOnce(
-          constructQuote(5, 6, 7),
+          constructTransactionResponse(5, 6, 7),
         )
         .mockResolvedValueOnce(
-          constructQuote(9, 10, 11),
+          constructTransactionResponse(9, 10, 11),
         ),
     });
+
+    const mockDexQuotes: DexQuotes = new Map<string, DexQuote>([]);
+    mockDexQuotes.set('0xERC20_1', constructDexQuote(1, 2, 3));
+    mockDexQuotes.set('0xERC20_2', constructDexQuote(5, 6, 7));
+    mockDexQuotes.set('0xERC20_3', constructDexQuote(9, 10, 11));
 
     const quotes = await quoteFetcher(
       config,
@@ -182,26 +185,27 @@ describe('quoteFetcher', () => {
       ['0xERC20_1', '0xERC20_2', '0xERC20_3'],
     );
 
-    expect(quotes).toEqual({
-      ...constructDexResponse('0xERC20_1', 1, 2, 3),
-      ...constructDexResponse('0xERC20_2', 5, 6, 7),
-      ...constructDexResponse('0xERC20_3', 9, 10, 11),
-    });
+    expect(quotes).toEqual(mockDexQuotes);
   });
 
   it('should fetch quotes with no swap', async () => {
     (createExchangeInstance as jest.Mock).mockReturnValue({
       getUnsignedSwapTxFromAmountIn: jest.fn()
         .mockResolvedValueOnce(
-          constructQuote(1, 2),
+          constructTransactionResponse(1, 2),
         )
         .mockResolvedValueOnce(
-          constructQuote(5, 6),
+          constructTransactionResponse(5, 6),
         )
         .mockResolvedValueOnce(
-          constructQuote(9, 10),
+          constructTransactionResponse(9, 10),
         ),
     });
+
+    const mockDexQuotes: DexQuotes = new Map<string, DexQuote>([]);
+    mockDexQuotes.set('0xERC20_1', constructDexQuote(1, 2));
+    mockDexQuotes.set('0xERC20_2', constructDexQuote(5, 6));
+    mockDexQuotes.set('0xERC20_3', constructDexQuote(9, 10));
 
     const quotes = await quoteFetcher(
       config,
@@ -214,38 +218,23 @@ describe('quoteFetcher', () => {
       ['0xERC20_1', '0xERC20_2', '0xERC20_3'],
     );
 
-    expect(quotes).toEqual({
-      ...constructDexResponse('0xERC20_1', 1, 2),
-      ...constructDexResponse('0xERC20_2', 5, 6),
-      ...constructDexResponse('0xERC20_3', 9, 10),
-    });
+    expect(quotes).toEqual(mockDexQuotes);
   });
 
-  it('should throw error if dex quote errors', async () => {
-    (createExchangeInstance as jest.Mock).mockRejectedValue(new Error('error from dex'));
+  it('should return empty map if dex errors', async () => {
+    (createExchangeInstance as jest.Mock).mockRejectedValue({});
 
-    let type;
-    let data;
+    const quotes = await quoteFetcher(
+      config,
+      ChainId.IMTBL_ZKEVM_TESTNET,
+      '0xADDRESS',
+      {
+        address: '0xREQUIRED_ERC20',
+        amount: BigNumber.from(0),
+      },
+      ['0xERC20_1', '0xERC20_2', '0xERC20_3'],
+    );
 
-    try {
-      await quoteFetcher(
-        config,
-        ChainId.IMTBL_ZKEVM_TESTNET,
-        '0xADDRESS',
-        {
-          address: '0xREQUIRED_ERC20',
-          amount: BigNumber.from(0),
-        },
-        ['0xERC20_1', '0xERC20_2', '0xERC20_3'],
-      );
-    } catch (err: any) {
-      type = err.type;
-      data = err.data;
-    }
-
-    expect(type).toEqual(CheckoutErrorType.FETCH_SWAP_QUOTE_ERROR);
-    expect(data).toEqual({
-      message: 'error from dex',
-    });
+    expect(quotes).toEqual(new Map<string, DexQuote>([]));
   });
 });

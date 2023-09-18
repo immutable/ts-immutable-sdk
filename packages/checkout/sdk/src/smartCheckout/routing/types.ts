@@ -1,5 +1,8 @@
 import { BigNumber } from 'ethers';
-import { ChainId, GetBalanceResult, TokenInfo } from '../../types';
+import { Amount, Quote } from '@imtbl/dex-sdk';
+import {
+  ChainId, FundingRouteType, GetBalanceResult, TokenInfo,
+} from '../../types';
 import { CheckoutError } from '../../errors';
 
 export type RoutingCalculatorResult = {
@@ -25,12 +28,6 @@ export type FundingRouteBalanceItem = {
   token: TokenInfo
 };
 
-export enum FundingRouteType {
-  BRIDGE = 'BRIDGE',
-  ON_RAMP = 'ONRAMP',
-  SWAP = 'SWAP',
-}
-
 export type FundingRouteStep = {
   type: FundingRouteType;
   chainId: number,
@@ -49,3 +46,13 @@ export type TokenBalanceResult = {
 };
 
 export type TokenBalances = Map<ChainId, TokenBalanceResult>;
+
+// Map for maintaining quotes between token pairs from the dex
+// Used to ensure when we call the swap route multiple times we do not make unnecessary calls to fetch similar quotes via the dex
+export type DexQuoteCache = Map<string, DexQuotes>;
+export type DexQuotes = Map<string, DexQuote>;
+export type DexQuote = {
+  quote: Quote,
+  approval: Amount | null | undefined,
+  swap: Amount | null,
+};
