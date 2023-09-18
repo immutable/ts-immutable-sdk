@@ -341,8 +341,13 @@ describe('Top Up View', () => {
         </ConnectLoaderTestComponent>,
       );
 
+      cySmartGet('menu-item-caption-swap').contains('Using the coins I have on the same network');
       cySmartGet('menu-item-caption-swap').contains('$0.20 USD');
+
+      cySmartGet('menu-item-caption-bridge').contains('From the coins I have on a different network');
       cySmartGet('menu-item-caption-bridge').contains('$0.40 USD');
+
+      cySmartGet('menu-item-caption-onramp').contains('Google pay & Apple pay available. Minimum $5.');
       cySmartGet('menu-item-caption-onramp').contains('3.5% to 5.5%');
     });
 
