@@ -1,5 +1,5 @@
 import React from "react";
-import { Card } from "@biom3/react";
+import { Body, Box, Card, StatefulButtCon } from "@biom3/react";
 import { NFT } from "@imtbl/generated-clients/dist/multi-rollup";
 
 const selectedStyle = {
@@ -21,21 +21,35 @@ function ItemCard({
   };
 
   return (
-    <Card
-      onClick={() => onCardClick(nft)}
-      sx={isSelected && isSelected(nft) ? selectedStyle : {}}
-    >
-      <Card.Title>
-        <div>{nft.name}</div>
-        <div>Token {nft.token_id}</div>
-      </Card.Title>
-      <Card.Caption>USDC ${nft.price}</Card.Caption>
-      <Card.AssetImage
-        imageUrl={nft.image}
-        aspectRatio="4:3"
-        relativeImageSizeInLayout="60vw"
-      />
-    </Card>
+    <Box>
+      <Card
+        onClick={() => onCardClick(nft)}
+        sx={isSelected && isSelected(nft) ? selectedStyle : {}}
+      >
+        <Card.Title>
+          <div>{nft.name}</div>
+          <div>Token {nft.token_id}</div>
+        </Card.Title>
+        <Card.Caption>USDC ${nft.price}</Card.Caption>
+        <Card.AssetImage
+          imageUrl={nft.image}
+          aspectRatio="4:3"
+          relativeImageSizeInLayout="60vw"
+        />
+      </Card>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <StatefulButtCon icon="Add" />
+        <Body>1</Body>
+        <StatefulButtCon icon="Minus" />
+      </Box>
+    </Box>
   );
 }
 
