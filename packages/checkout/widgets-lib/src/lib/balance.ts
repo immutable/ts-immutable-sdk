@@ -7,7 +7,7 @@ import {
   TokenFilterTypes,
 } from '@imtbl/checkout-sdk';
 import { RetryType, retry } from './retry';
-import { DEFAULT_BALANCE_RETRY_POLICY } from './constants';
+import { DEFAULT_BALANCE_RETRY_POLICY, NATIVE } from './constants';
 
 export type GetAllowedBalancesParamsType = {
   checkout: Checkout,
@@ -49,13 +49,13 @@ export const getAllowedBalances = async ({
   });
 
   const tokensAddresses = new Map();
-  allowList.tokens.forEach((token) => tokensAddresses.set(token.address || '', true));
+  allowList.tokens.forEach((token) => tokensAddresses.set(token.address || NATIVE, true));
 
   const allowedBalances = tokenBalances.balances.filter((balance) => {
     // Balance is <= 0 and it is not allow to have zeros
     if (balance.balance.lte(0) && !allowZero) return false;
 
-    return tokensAddresses.get(balance.token.address);
+    return tokensAddresses.get(balance.token.address || NATIVE);
   });
 
   return { allowList, allowedBalances };
