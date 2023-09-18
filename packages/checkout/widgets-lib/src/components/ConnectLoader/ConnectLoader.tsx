@@ -36,7 +36,7 @@ import {
 } from '../../lib';
 import { useInterval } from '../../lib/hooks/useInterval';
 import { useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
-import { isMetaMaskProvider, isPassportProvider } from '../../lib/providerUtils';
+import { identifyUser } from '../../lib/analytics/identifyUser';
 
 export interface ConnectLoaderProps {
   children?: React.ReactNode;
@@ -135,13 +135,7 @@ export function ConnectLoader({
       } else {
         const newProvider = new Web3Provider(provider!.provider);
         // WT-1698 Analytics - Identify new user as wallet address has changed
-        const walletAddress = (await newProvider.getSigner().getAddress()).toLowerCase();
-        const isMetaMask = isMetaMaskProvider(provider);
-        const isPassport = isPassportProvider(provider);
-        identify(walletAddress, {
-          isMetaMask,
-          isPP: isPassport,
-        });
+        await identifyUser(identify, newProvider);
 
         // trigger a re-load of the connectLoader so that the widget re loads with a new provider
         connectLoaderDispatch({
@@ -260,13 +254,7 @@ export function ConnectLoader({
         }
 
         // WT-1698 Analytics - Identify user here then progress to widget
-        const walletAddress = (await provider.getSigner().getAddress()).toLowerCase();
-        const isMetaMask = isMetaMaskProvider(provider);
-        const isPassport = isPassportProvider(provider);
-        identify(walletAddress, {
-          isMetaMask,
-          isPP: isPassport,
-        });
+        await identifyUser(identify, provider);
 
         connectLoaderDispatch({
           payload: {

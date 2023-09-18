@@ -41,7 +41,7 @@ import { text } from '../../resources/text/textConfig';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { widgetTheme } from '../../lib/theme';
 import { useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
-import { isMetaMaskProvider, isPassportProvider } from '../../lib/providerUtils';
+import { identifyUser } from '../../lib/analytics/identifyUser';
 
 export interface ConnectWidgetProps {
   params?: ConnectWidgetParams;
@@ -142,13 +142,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
   const handleConnectSuccess = useCallback(async () => {
     if (!provider) return;
     // WT-1698 Analytics - Identify user here
-    const walletAddress = (await provider.getSigner().getAddress()).toLowerCase();
-    const isMetaMask = isMetaMaskProvider(provider);
-    const isPassport = isPassportProvider(provider);
-    identify(walletAddress, {
-      isMetaMask,
-      isPP: isPassport,
-    });
+    await identifyUser(identify, provider);
     sendConnectSuccessEvent(eventTarget, provider, walletProviderName ?? undefined);
   }, [provider, identify]);
 

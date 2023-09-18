@@ -18,6 +18,7 @@ import {
 } from '../../../context/view-context/ViewContext';
 import { isMetaMaskProvider, isPassportProvider } from '../../../lib/providerUtils';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { identifyUser } from '../../../lib/analytics/identifyUser';
 
 export interface ReadyToConnectProps {
   targetChainId: ChainId;
@@ -133,11 +134,7 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
           provider,
         });
 
-        const walletAddress = (await connectResult.provider.getSigner().getAddress()).toLowerCase();
-        identify(walletAddress, {
-          isMetaMask,
-          isPP: isPassport,
-        });
+        await identifyUser(identify, connectResult.provider);
 
         connectDispatch({
           payload: {
