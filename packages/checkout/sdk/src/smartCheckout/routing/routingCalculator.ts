@@ -11,7 +11,6 @@ import { bridgeRoute } from './bridge/bridgeRoute';
 import { CheckoutConfiguration } from '../../config';
 import { createReadOnlyProviders } from '../../readOnlyProviders/readOnlyProvider';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
-import { allowListCheck } from '../allowList/allowListCheck';
 
 export const getInsufficientRequirement = (
   balanceRequirements: BalanceCheckResult,
@@ -70,9 +69,6 @@ export const routingCalculator = async (
       feeEstimates,
     );
   }
-  const allowedTokens = await allowListCheck(config, availableRoutingOptions, tokenBalances, balanceRequirements);
-  console.log('Allowed tokens', allowedTokens);
-  // Check bridging routes
 
   // Check on-ramp routes
 
