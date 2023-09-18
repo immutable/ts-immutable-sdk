@@ -1,5 +1,6 @@
 import { ERC20Item, FeeValue, NativeItem } from '@imtbl/orderbook';
 import { BigNumber } from 'ethers';
+import { parseUnits } from 'ethers/lib/utils';
 import { FeePercentage, FeeToken, OrderFee } from '../../types/fees';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 
@@ -26,10 +27,7 @@ const calculateFeesToken = (
   decimals: number,
 ): BigNumber => {
   const feeToken = orderFee.amount as FeeToken;
-
-  const bnFeeAmount = BigNumber.from(feeToken.token)
-    .mul(BigNumber.from(10)
-      .pow(decimals));
+  const bnFeeAmount = parseUnits(feeToken.token, decimals);
   return bnFeeAmount;
 };
 
@@ -40,9 +38,7 @@ export const calculateFees = (
 ):Array<FeeValue> => {
   let totalTokenFees: BigNumber = BigNumber.from(0);
 
-  const amountBn = BigNumber.from(buyTokenOrNative.amount)
-    .mul(BigNumber.from(10)
-      .pow(decimals));
+  const amountBn = parseUnits(buyTokenOrNative.amount, decimals);
 
   const totalAllowableFees: BigNumber = amountBn
     .mul(MAX_FEE_PERCENTAGE_DECIMAL * (10 ** MAX_FEE_DECIMAL_PLACES))
