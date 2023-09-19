@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from 'react';
+import { useContext, useEffect } from 'react';
 import { Body, Box, Heading } from '@biom3/react';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
@@ -16,16 +16,13 @@ export function ConnectWallet() {
   } = useContext(ConnectContext);
 
   const { page } = useAnalytics();
-  const sendPageViewEvent = useRef(true);
+
   useEffect(() => {
-    if (sendPageViewEvent.current) {
-      sendPageViewEvent.current = false;
-      page({
-        userJourney: UserJourney.CONNECT,
-        screen: 'ConnectWallet',
-      });
-    }
-  }, [sendPageViewEvent]);
+    page({
+      userJourney: UserJourney.CONNECT,
+      screen: 'ConnectWallet',
+    });
+  }, []);
 
   return (
     <SimpleLayout

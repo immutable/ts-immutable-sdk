@@ -1,7 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { ChainId, Checkout, WalletProviderName } from '@imtbl/checkout-sdk';
 import {
-  useContext, useState, useCallback, useMemo, useEffect, useRef,
+  useContext, useState, useCallback, useMemo, useEffect,
 } from 'react';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../../components/Footer/FooterButton';
@@ -35,16 +35,12 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
 
   const { page, identify, track } = useAnalytics();
 
-  const sendPageViewEvent = useRef(true);
   useEffect(() => {
-    if (sendPageViewEvent.current) {
-      sendPageViewEvent.current = false;
-      page({
-        userJourney: UserJourney.CONNECT,
-        screen: 'ReadyToConnect',
-      });
-    }
-  }, [sendPageViewEvent]);
+    page({
+      userJourney: UserJourney.CONNECT,
+      screen: 'ReadyToConnect',
+    });
+  }, []);
 
   // make sure wallet provider name is set if coming directly to this screen
   // and not through the wallet list
