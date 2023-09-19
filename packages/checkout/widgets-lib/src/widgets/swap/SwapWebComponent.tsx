@@ -10,6 +10,7 @@ import {
 import { sendSwapWidgetCloseEvent } from './SwapWidgetEvents';
 import { ConnectTargetLayer, getL2ChainId } from '../../lib';
 import { isValidAddress, isValidAmount, isValidWalletProvider } from '../../lib/validations/widgetValidators';
+import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 
 export class ImmutableSwap extends ImmutableWebComponent {
   walletProvider: WalletProviderName | undefined = undefined;
@@ -20,6 +21,11 @@ export class ImmutableSwap extends ImmutableWebComponent {
 
   toContractAddress = '';
 
+  static get observedAttributes(): string[] {
+    const baseObservedAttributes = super.observedAttributes;
+    return [...baseObservedAttributes, 'amount', 'fromcontractaddress', 'tocontractaddress', 'walletprovider'];
+  }
+
   connectedCallback() {
     super.connectedCallback();
     this.walletProvider = this.getAttribute(
@@ -28,6 +34,24 @@ export class ImmutableSwap extends ImmutableWebComponent {
     this.amount = this.getAttribute('amount') ?? '';
     this.fromContractAddress = this.getAttribute('fromContractAddress')?.toLowerCase() ?? '';
     this.toContractAddress = this.getAttribute('toContractAddress')?.toLowerCase() ?? '';
+    this.renderWidget();
+  }
+
+  attributeChangedCallback(name: string, oldValue: any, newValue: any): void {
+    super.attributeChangedCallback(name, oldValue, newValue);
+    if (name === 'amount') {
+      this.amount = newValue;
+    }
+    if (name === 'fromcontractaddress') {
+      this.fromContractAddress = newValue;
+    }
+    if (name === 'tocontractaddress') {
+      this.toContractAddress = newValue;
+    }
+    if (name === 'walletprovider') {
+      this.walletProvider = newValue.toLowerCase() as WalletProviderName;
+    }
+
     this.renderWidget();
   }
 
@@ -81,16 +105,18 @@ export class ImmutableSwap extends ImmutableWebComponent {
 
     this.reactRoot.render(
       <React.StrictMode>
-        <ConnectLoader
-          params={connectLoaderParams}
-          widgetConfig={this.widgetConfig!}
-          closeEvent={() => sendSwapWidgetCloseEvent(window)}
-        >
-          <SwapWidget
-            params={swapParams}
-            config={this.widgetConfig!}
-          />
-        </ConnectLoader>
+        <CustomAnalyticsProvider widgetConfig={this.widgetConfig!}>
+          <ConnectLoader
+            params={connectLoaderParams}
+            widgetConfig={this.widgetConfig!}
+            closeEvent={() => sendSwapWidgetCloseEvent(window)}
+          >
+            <SwapWidget
+              params={swapParams}
+              config={this.widgetConfig!}
+            />
+          </ConnectLoader>
+        </CustomAnalyticsProvider>
       </React.StrictMode>,
     );
   }
