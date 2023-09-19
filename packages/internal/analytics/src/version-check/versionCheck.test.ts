@@ -32,12 +32,18 @@ describe('sdkVersionCheck', () => {
     expect(axios.get).toHaveBeenCalledWith(expect.stringContaining(`${expectedUrl}${expectedQueryParams}`));
   });
 
-  test('should send id and details query parameters', () => {
+  test('should send details query parameter', () => {
     sdkVersionCheck();
 
     expect(axios.get).toHaveBeenCalledTimes(1);
-    expect(axios.get).toHaveBeenCalledWith(expect.stringContaining('&id='));
     expect(axios.get).toHaveBeenCalledWith(expect.stringContaining('&details='));
+  });
+
+  test('should not send id query parameters if runtimeId is not set', () => {
+    sdkVersionCheck();
+
+    expect(axios.get).toHaveBeenCalledTimes(1);
+    expect(axios.get).toHaveBeenCalledWith(expect.not.stringContaining('&id='));
   });
 
   test('should send app name and version number', () => {

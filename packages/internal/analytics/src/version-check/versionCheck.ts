@@ -44,11 +44,6 @@ const sdkRuntimeDetails = () => {
 };
 
 const useRuntimeId = (runtimeId?: string) => {
-  // if (window) {
-  //   console.log('window');
-  //   // console.log(window);
-  //   return '';
-  // }
   // only run on browser
   if (typeof window === 'undefined') {
     return '';
@@ -73,7 +68,10 @@ export const sdkVersionCheck = (appName?: string, appVersion?: string) => {
     const idParam = `id=${existingRuntimeId}`;
     const detailsParam = `details=${runtimeDetails}`;
 
-    const versionCheckUrl = `${imtblApi}${versionApi}?${versionParam}&${idParam}&${detailsParam}`;
+    let versionCheckUrl = `${imtblApi}${versionApi}?${versionParam}&${detailsParam}`;
+    if (existingRuntimeId) {
+      versionCheckUrl += `&${idParam}`;
+    }
 
     axios
       .get(versionCheckUrl)
