@@ -143,7 +143,7 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
         setFooterButtonText(footer.buttonText2);
       }
     }
-  }, [checkout, provider, connectDispatch, viewDispatch, footer.buttonText2, isMetaMask, isPassport]);
+  }, [checkout, provider, connectDispatch, viewDispatch, footer.buttonText2, identify]);
 
   return (
     <SimpleLayout

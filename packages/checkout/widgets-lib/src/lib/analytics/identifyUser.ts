@@ -16,6 +16,6 @@ export async function identifyUser(
   const isPassport = isPassportProvider(provider);
   identify(walletAddress, {
     isMetaMask,
-    isImtblPP: isPassport,
+    isPassportWallet: isPassport,
   });
 }

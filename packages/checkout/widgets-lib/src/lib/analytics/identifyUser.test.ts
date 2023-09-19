@@ -10,7 +10,7 @@ describe('identifyUser', () => {
     identify = jest.fn().mockReturnValue({});
   });
 
-  it('should identify a user by their wallet address and add properties isMetaMask and isImtblPP', async () => {
+  it('should identify a user by their wallet address and add properties isMetaMask and isPassportWallet', async () => {
     provider = {
       getSigner: jest.fn().mockReturnValue({
         getAddress: jest.fn().mockResolvedValue('0xtest'),
@@ -22,7 +22,7 @@ describe('identifyUser', () => {
     } as any as Web3Provider;
 
     await identifyUser(identify, provider);
-    expect(identify).toBeCalledWith('0xtest', { isMetaMask: true, isImtblPP: false });
+    expect(identify).toBeCalledWith('0xtest', { isMetaMask: true, isPassportWallet: false });
   });
 
   it('should correctly identify users wallet as Passport', async () => {
@@ -36,6 +36,6 @@ describe('identifyUser', () => {
       },
     } as any as Web3Provider;
     await identifyUser(identify, provider);
-    expect(identify).toBeCalledWith('0xtest', { isMetaMask: false, isImtblPP: true });
+    expect(identify).toBeCalledWith('0xtest', { isMetaMask: false, isPassportWallet: true });
   });
 });
