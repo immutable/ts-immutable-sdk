@@ -115,6 +115,12 @@ If your package isn't part of the dependency tree for the main SDK, then you mig
 yarn wsrun -p @imtbl/your_project --recursive --stages build
 ```
 
+If you run out of memory, set NODE_OPTIONS to limit Node's use of memory (this assumes you have about 16GB of memory):
+
+```sh
+export NODE_OPTIONS=--max-old-space-size=14366
+```
+
 ### Linting
 
 #### ESLint Tooling
