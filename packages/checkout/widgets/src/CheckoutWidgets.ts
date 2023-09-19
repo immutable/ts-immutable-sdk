@@ -12,42 +12,41 @@ export function validateAndBuildVersion(
 ): string {
   const defaultPackageVersion = globalPackageVersion();
 
-  if (version === undefined
-    || version.major === undefined
-  ) return defaultPackageVersion;
+  if (version === undefined || version.major === undefined) return defaultPackageVersion;
 
-  if (version.major < 0) return defaultPackageVersion;
-  if (version.minor < 0) return defaultPackageVersion;
-  if (version.patch < 0) return defaultPackageVersion;
+  if (!Number.isInteger(version.major) || version.major < 0) return defaultPackageVersion;
+  if (version.minor !== undefined && version.minor < 0) return defaultPackageVersion;
+  if (version.patch !== undefined && version.patch < 0) return defaultPackageVersion;
 
+  if (version.major === 0 && version.minor === undefined) return defaultPackageVersion;
+  if (version.major === 0 && version.minor === 0 && version.patch === undefined) return defaultPackageVersion;
+  if (version.major === 0 && version.minor === undefined && version.patch === undefined) return defaultPackageVersion;
   if (version.major === 0 && version.minor === 0 && version.patch === 0) return defaultPackageVersion;
 
-  let validatedVersion: string = defaultPackageVersion;
+  let validatedVersion: string = version.major.toString();
 
-  if (!Number.isNaN(version.major) && version.major >= 0) {
-    validatedVersion = version.major.toString();
-  }
+  if (version.minor === undefined) return validatedVersion;
 
-  if (version.minor !== undefined && !Number.isNaN(version.minor)) {
+  if (Number.isInteger(version.minor)) {
     validatedVersion += `.${version.minor.toString()}`;
   }
 
-  if (version.minor !== undefined
-    && version.patch !== undefined && !Number.isNaN(version.patch)) {
+  if (version.patch === undefined) return validatedVersion;
+
+  if (Number.isInteger(version.patch)) {
     validatedVersion += `.${version.patch.toString()}`;
   }
 
-  if (version.minor !== undefined
-    && version.patch !== undefined
-    && version.prerelease !== undefined && version.prerelease === 'alpha') {
+  if (version.prerelease === undefined || version.prerelease !== 'alpha') return validatedVersion;
+
+  if (version.prerelease === 'alpha') {
     validatedVersion += `-${version.prerelease}`;
   }
 
-  if (version.minor !== undefined
-    && version.patch !== undefined
-    && version.prerelease !== undefined
-    && version.build !== undefined && version.build > 0) {
-    validatedVersion += `.${version.build}`;
+  if (version.build === undefined) return validatedVersion;
+
+  if (Number.isInteger(version.build) && version.build >= 0) {
+    validatedVersion += `.${version.build.toString()}`;
   }
 
   return validatedVersion;
