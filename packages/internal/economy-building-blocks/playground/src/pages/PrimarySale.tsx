@@ -1,5 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Box, Heading, Banner, Button, Card, Link } from "@biom3/react";
+import {
+  Box,
+  Heading,
+  Button,
+  Card,
+  Link,
+  Body,
+  MenuItem,
+  Icon,
+} from "@biom3/react";
 
 import { Grid, Row, Col } from "react-flexbox-grid";
 
@@ -186,7 +195,7 @@ const useMint = (
   const items = selectedItems.map((item) => {
     return {
       productId: item.productId.toString(),
-      qty: 1,
+      qty: item.quantity,
       price: item.price.toString(),
       name: item.name,
       image: item.image,
@@ -346,31 +355,42 @@ function PrimarySale() {
   const handleIsSelectedItem = useCallback(
     (item: any) => {
       return selectedItems.some((selectedItem) => {
-        return selectedItem.token_id === item.token_id;
+        return selectedItem.productId === item.productId;
       });
     },
     [selectedItems]
   );
 
   const handleSelectItem = useCallback(
-    (item: any) => {
-      let items;
+    (item: any, quantity: number) => {
+      let items = selectedItems.filter((selectedItem) => {
+        return selectedItem.token_id !== item.token_id;
+      });
+
       if (handleIsSelectedItem(item)) {
-        items = selectedItems.filter((selectedItem) => {
-          return selectedItem.token_id !== item.token_id;
-        });
+        // Find the existing item and update its quantity
+        const existingItem = selectedItems.find(
+          (selectedItem) => selectedItem.token_id === item.token_id
+        );
+        if (existingItem) {
+          existingItem.quantity = quantity + existingItem.quantity;
+          items = [...items, existingItem];
+        }
       } else {
-        items = [...selectedItems, item];
+        // If the item does not exist, add it with the quantity field
+        items = [...items, { ...item, quantity }];
       }
 
-      const amount = items.reduce((acc, item) => {
-        return acc + item.price;
+      const amount = items.reduce((acc, currentItem) => {
+        return acc + currentItem.price * currentItem.quantity;
       }, 0);
 
       setSelectedItems(items);
       setAmount(amount);
+      console.log("@@@@ selected items", items);
+      console.log("@@@@ amount", amount);
     },
-    [handleIsSelectedItem]
+    [handleIsSelectedItem, selectedItems]
   );
 
   const handleMintFormChange = useCallback(
@@ -394,16 +414,6 @@ function PrimarySale() {
               <Box sx={{ marginBottom: "base.spacing.x5" }}>
                 <Heading size={"small"}>Status</Heading>
               </Box>
-              <Banner
-                variant="guidance"
-                sx={{ marginBottom: "base.spacing.x4" }}
-              >
-                <Banner.Title> Order Price: ${amount} USDC</Banner.Title>
-                <Banner.Caption>
-                  Fees (${fee * 100}%): ${amount * fee} USDC
-                </Banner.Caption>
-              </Banner>
-
               <Card>
                 <Card.Caption>
                   <StatusCard
@@ -455,6 +465,61 @@ function PrimarySale() {
                       ) : null
                     }
                   ></StatusCard>
+                </Card.Caption>
+              </Card>
+            </Box>
+            <Box sx={{ marginTop: "base.spacing.x5" }}>
+              <Box sx={{ marginBottom: "base.spacing.x5" }}>
+                <Heading size={"small"}> My Cart</Heading>
+              </Box>
+
+              <Card sx={{ height: "100%" }}>
+                <Card.Caption>
+                  {selectedItems && selectedItems.length ? (
+                    selectedItems.map((item) => (
+                      <MenuItem emphasized size="small">
+                        <MenuItem.FramedImage imageUrl={item.image} />
+                        <MenuItem.Label>
+                          {item.name} x {item.quantity}
+                        </MenuItem.Label>
+                        <MenuItem.Caption>{item.description}</MenuItem.Caption>
+                        {item.price && (
+                          <MenuItem.PriceDisplay
+                            price={item.price.toString()}
+                            currencyImageUrl="https://design-system.immutable.com/hosted-for-ds/currency-icons/currency--usdc.svg"
+                          />
+                        )}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <Body>No items selected</Body>
+                  )}
+                  <br />
+                  {selectedItems.length ? (
+                    <>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Heading size={"small"}>Subtotal</Heading>
+                        <Body> ${amount} USDC</Body>
+                      </Box>
+
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Heading size={"small"}>
+                          Total (+ fees {fee * 100}%):
+                        </Heading>
+                        ${amount * fee} USDC
+                      </Box>
+                    </>
+                  ) : null}
                 </Card.Caption>
               </Card>
             </Box>

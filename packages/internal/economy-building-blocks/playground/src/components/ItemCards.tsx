@@ -10,7 +10,7 @@ function ItemCards({
   onRefetch,
 }: {
   nfts: Array<NFT>;
-  onClick?: (nft: NFT) => void;
+  onClick?: (nft: NFT, quantity: number) => void;
   isSelected?: (nft: NFT) => boolean;
   onRefetch?: () => void;
 }) {
@@ -56,7 +56,7 @@ function ItemCards({
                 nft={nft}
                 onClick={onClick}
                 isSelected={isSelected}
-                key={nft.token_id}
+                key={index}
               />
             </Box>
           ))}
