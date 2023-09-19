@@ -1,7 +1,7 @@
-/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 import {
-  Body, Box, Button, Heading,
+  Body, Box, Button, Heading, Select, Option,
 } from '@biom3/react';
 
 import { useState } from 'react';
@@ -19,14 +19,32 @@ export function SmartCheckout() {
 
   const [smartCheckoutDrawerVisible, setSmartCheckoutDrawerVisible] = useState(false);
 
-  const onClickContinue = async () => {
-    setSmartCheckoutDrawerVisible(true);
-  };
+  const mockSmartCheckoutOptions = [
+    {
+      label: 'ETH coins',
+    },
+    {
+      label: 'GODS coins',
+    },
+    {
+      label: 'ETH L1 coins',
+    },
+    {
+      label: 'USDC L1 coins',
+    },
+  ];
+
+  const onClickContinue = async () => null;
 
   const closeBottomSheet = () => {
-    // eslint-disable-next-line no-console
-    console.log('@@@@@@@ closeBottomSheet');
     setSmartCheckoutDrawerVisible(false);
+  };
+
+  const onSmartCheckoutDropdownClick = (event) => {
+    // event.stopPropagation();
+    // eslint-disable-next-line no-console
+    console.log('@@@@@ onSmartCheckoutDropdownClickevent', event);
+    setSmartCheckoutDrawerVisible(true);
   };
 
   return (
@@ -37,7 +55,7 @@ export function SmartCheckout() {
     >
 
       <Box
-        id="payment-methods-content"
+        id="smart-checkout-content"
         sx={{
           display: 'flex',
           flexDirection: 'column',
@@ -46,9 +64,37 @@ export function SmartCheckout() {
           rowGap: 'base.spacing.x4',
         }}
       >
-        <Heading size="small">
-          Pay with your ETH coins
-        </Heading>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            paddingX: 'base.spacing.x2',
+            paddingY: 'base.spacing.x8',
+            rowGap: 'base.spacing.x4',
+          }}
+        >
+          <Heading size="small">
+            Pay with your
+          </Heading>
+          {mockSmartCheckoutOptions.length === 1
+            ? (mockSmartCheckoutOptions[0].label)
+            : (
+
+              <Select
+                defaultLabel={mockSmartCheckoutOptions[0].label}
+                targetClickOveride={onSmartCheckoutDropdownClick}
+              >
+                {/* {mockSmartCheckoutOptions.map((option, i) => (
+                  <Option optionKey={i}>
+                    <Option.Label>{option.label}</Option.Label>
+                  </Option>
+                ))} */}
+              </Select>
+
+            )}
+
+        </Box>
+
         <Body size="small">
           We’ll swap ETH for USDC to fund this purchase
           <br />
