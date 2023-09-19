@@ -19,7 +19,7 @@ export type SemanticVersion = {
   major: number;
   minor?: number;
   patch?: number;
-  prerelease?: 'alpha' | undefined;
+  prerelease?: 'alpha';
   build?: number;
 };
 
