@@ -1,3 +1,4 @@
+import { sdkVersionCheck } from '@imtbl/analytics';
 import { CheckoutWidgetsConfig, SemanticVersion } from './definitions/config';
 import { globalPackageVersion, isDevMode } from './lib/env';
 
@@ -84,6 +85,8 @@ export function CheckoutWidgets(config?: CheckoutWidgetsConfig) {
 
   document.head.appendChild(checkoutWidgetJS);
   window.ImtblCheckoutWidgetConfig = JSON.stringify(config);
+
+  sdkVersionCheck('imtbl-checkout-widgets', validVersion);
 }
 
 /**
