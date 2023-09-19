@@ -56,7 +56,7 @@ function ItemCards({
                 nft={nft}
                 onClick={onClick}
                 isSelected={isSelected}
-                key={nft.token_id}
+                key={index}
               />
             </Box>
           ))}

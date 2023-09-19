@@ -1,5 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Box, Heading, Banner, Button, Card, Link } from "@biom3/react";
+import {
+  Box,
+  Heading,
+  Button,
+  Card,
+  Link,
+  Body,
+  MenuItem,
+  Icon,
+} from "@biom3/react";
 
 import { Grid, Row, Col } from "react-flexbox-grid";
 
@@ -364,7 +373,7 @@ function PrimarySale() {
           (selectedItem) => selectedItem.token_id === item.token_id
         );
         if (existingItem) {
-          existingItem.quantity = quantity;
+          existingItem.quantity = quantity + existingItem.quantity;
           items = [...items, existingItem];
         }
       } else {
@@ -378,6 +387,8 @@ function PrimarySale() {
 
       setSelectedItems(items);
       setAmount(amount);
+      console.log("@@@@ selected items", items);
+      console.log("@@@@ amount", amount);
     },
     [handleIsSelectedItem, selectedItems]
   );
@@ -403,16 +414,6 @@ function PrimarySale() {
               <Box sx={{ marginBottom: "base.spacing.x5" }}>
                 <Heading size={"small"}>Status</Heading>
               </Box>
-              <Banner
-                variant="guidance"
-                sx={{ marginBottom: "base.spacing.x4" }}
-              >
-                <Banner.Title> Order Price: ${amount} USDC</Banner.Title>
-                <Banner.Caption>
-                  Fees (${fee * 100}%): ${amount * fee} USDC
-                </Banner.Caption>
-              </Banner>
-
               <Card>
                 <Card.Caption>
                   <StatusCard
@@ -464,6 +465,61 @@ function PrimarySale() {
                       ) : null
                     }
                   ></StatusCard>
+                </Card.Caption>
+              </Card>
+            </Box>
+            <Box sx={{ marginTop: "base.spacing.x5" }}>
+              <Box sx={{ marginBottom: "base.spacing.x5" }}>
+                <Heading size={"small"}> My Cart</Heading>
+              </Box>
+
+              <Card sx={{ height: "100%" }}>
+                <Card.Caption>
+                  {selectedItems && selectedItems.length ? (
+                    selectedItems.map((item) => (
+                      <MenuItem emphasized size="small">
+                        <MenuItem.FramedImage imageUrl={item.image} />
+                        <MenuItem.Label>
+                          {item.name} x {item.quantity}
+                        </MenuItem.Label>
+                        <MenuItem.Caption>{item.description}</MenuItem.Caption>
+                        {item.price && (
+                          <MenuItem.PriceDisplay
+                            price={item.price.toString()}
+                            currencyImageUrl="https://design-system.immutable.com/hosted-for-ds/currency-icons/currency--usdc.svg"
+                          />
+                        )}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <Body>No items selected</Body>
+                  )}
+                  <br />
+                  {selectedItems.length ? (
+                    <>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Heading size={"small"}>Subtotal</Heading>
+                        <Body> ${amount} USDC</Body>
+                      </Box>
+
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Heading size={"small"}>
+                          Total (+ fees {fee * 100}%):
+                        </Heading>
+                        ${amount * fee} USDC
+                      </Box>
+                    </>
+                  ) : null}
                 </Card.Caption>
               </Card>
             </Box>

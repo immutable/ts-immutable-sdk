@@ -2,11 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Body, Box, Button, Card, StatefulButtCon } from "@biom3/react";
 import { NFT } from "@imtbl/generated-clients/dist/multi-rollup";
 
-const selectedStyle = {
-  border: "base.border.size.100 solid",
-  borderColor: "base.color.accent.1",
-};
-
 function ItemCard({
   nft,
   onClick,
@@ -26,7 +21,7 @@ function ItemCard({
 
   return (
     <Box>
-      <Card sx={isSelected && isSelected(nft) ? selectedStyle : {}}>
+      <Card>
         <Card.Title>
           <div>{nft.name}</div>
           <div>Token {nft.token_id}</div>
