@@ -16,6 +16,7 @@ import {
   ViewActions,
   SharedViews,
 } from '../../../context/view-context/ViewContext';
+import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 export interface WalletListProps {
   walletFilterTypes?: WalletFilterTypes;
@@ -30,6 +31,7 @@ export function WalletList(props: WalletListProps) {
   } = useContext(ConnectContext);
   const { viewDispatch } = useContext(ViewContext);
   const [wallets, setWallets] = useState<WalletInfo[]>([]);
+  const { track } = useAnalytics();
 
   const excludedWallets = useCallback(() => {
     const passportWalletProvider = { walletProvider: WalletProviderName.PASSPORT };
@@ -54,7 +56,13 @@ export function WalletList(props: WalletListProps) {
     getAllowedWallets();
   }, [checkout, excludedWallets, walletFilterTypes]);
 
-  const onWalletClick = async (walletProviderName: WalletProviderName) => {
+  const onWalletClick = useCallback(async (walletProviderName: WalletProviderName) => {
+    track({
+      userJourney: UserJourney.CONNECT,
+      screen: 'ConnectWallet',
+      control: walletProviderName,
+      controlType: 'MenuItem',
+    });
     if (checkout) {
       try {
         const providerResult = await checkout.createProvider({
@@ -90,7 +98,7 @@ export function WalletList(props: WalletListProps) {
         });
       }
     }
-  };
+  }, [track]);
 
   return (
     <Box
