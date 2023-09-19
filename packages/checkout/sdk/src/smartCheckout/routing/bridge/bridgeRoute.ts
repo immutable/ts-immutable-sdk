@@ -140,7 +140,11 @@ export const bridgeRoute = async (
   if (l1address === '') return undefined;
 
   // Ensure l1address is in the allowed token list
-  if (!allowedTokenList.find((token) => token.address === l1address)) return undefined;
+  if (l1address === INDEXER_ETH_ROOT_CONTRACT_ADDRESS) {
+    if (!allowedTokenList.find((token) => !('address' in token))) return undefined;
+  } else if (!allowedTokenList.find((token) => token.address === l1address)) {
+    return undefined;
+  }
 
   const gasForApproval = await estimateGasForBridgeApproval(
     config,

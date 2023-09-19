@@ -91,7 +91,6 @@ describe('bridgeRoute', () => {
             name: 'Ethereum',
             symbol: 'ETH',
             decimals: 18,
-            address: INDEXER_ETH_ROOT_CONTRACT_ADDRESS,
           },
         ]);
       });
