@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers';
-import { GetBalanceResult, TokenInfo } from '../../types';
+import { ChainId, GetBalanceResult, TokenInfo } from '../../types';
 import { CheckoutError } from '../../errors';
 
 export type RoutingCalculatorResult = {
@@ -47,3 +47,5 @@ export type TokenBalanceResult = {
   balances: GetBalanceResult[],
   error?: CheckoutError,
 };
+
+export type TokenBalances = Map<ChainId, TokenBalanceResult>;

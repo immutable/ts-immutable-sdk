@@ -17,6 +17,7 @@ import { bridgeGasEstimate } from './bridgeGasEstimate';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS, getImxL1Representation, getIndexerChainName } from './constants';
 import { estimateGasForBridgeApproval } from './estimateApprovalGas';
 import { CheckoutError, CheckoutErrorType } from '../../../errors';
+import { allowListCheckForBridge } from '../../allowList/allowListCheck';
 
 export const hasSufficientL1Eth = (
   balances: TokenBalanceResult,
@@ -113,7 +114,6 @@ export const bridgeRoute = async (
   feeEstimates: Map<FundingRouteType, BigNumber>,
 ): Promise<FundingRouteStep | undefined> => {
   if (!availableRoutingOptions.bridge) return undefined;
-
   const chainId = getL1ChainId(config);
   const tokenBalanceResult = balances.get(chainId);
   const l1provider = readOnlyProviders.get(chainId);
@@ -126,14 +126,10 @@ export const bridgeRoute = async (
   }
 
   // If no balances on layer 1 then Bridge cannot be an option
-  if (tokenBalanceResult === undefined || tokenBalanceResult.success === false) {
-    throw new CheckoutError(
-      'Error getting balances',
-      CheckoutErrorType.GET_BALANCE_ERROR,
-      { chainId: chainId.toString() },
-    );
-  }
-  if (tokenBalanceResult.balances.length === 0) return undefined;
+  if (tokenBalanceResult === undefined || tokenBalanceResult.success === false) return undefined;
+
+  const allowedTokenList = await allowListCheckForBridge(config, balances, availableRoutingOptions);
+  if (allowedTokenList.length === 0) return undefined;
 
   const bridgeFeeEstimate = await getBridgeGasEstimate(config, readOnlyProviders, feeEstimates);
 
@@ -142,6 +138,13 @@ export const bridgeRoute = async (
 
   const l1address = await fetchL1Representation(config, balanceRequirement);
   if (l1address === '') return undefined;
+
+  // Ensure l1address is in the allowed token list
+  if (l1address === INDEXER_ETH_ROOT_CONTRACT_ADDRESS) {
+    if (!allowedTokenList.find((token) => !('address' in token))) return undefined;
+  } else if (!allowedTokenList.find((token) => token.address === l1address)) {
+    return undefined;
+  }
 
   const gasForApproval = await estimateGasForBridgeApproval(
     config,
