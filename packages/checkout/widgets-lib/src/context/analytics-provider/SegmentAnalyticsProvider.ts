@@ -2,6 +2,8 @@ import { createAnalytics, StandardAnalyticsActions, StandardAnalyticsControlType
 import { Environment } from '@imtbl/config';
 
 export enum UserJourney {
+  CONNECT = 'Connect',
+  WALLET = 'Wallet',
   ON_RAMP = 'OnRamp',
   SWAP = 'Swap',
   BRIDGE = 'Bridge',

@@ -60,7 +60,7 @@ export function OnRampMain({
           control: 'TransakWidgetOpen',
           controlType: 'IframeEvent',
           ...miscProps,
-        }); // checkoutwidgetsOnRampInputScreen_TransakWidgetOpenIframeEvent
+        }); // checkoutOnRampInputScreen_TransakWidgetOpenIframeEvent
         break;
       case TransakEvents.TRANSAK_ORDER_CREATED:
         track({
@@ -69,7 +69,7 @@ export function OnRampMain({
           control: 'OrderCreated',
           controlType: 'IframeEvent',
           ...miscProps,
-        }); // checkoutwidgetsOnRampInputScreen_OrderCreatedIframeEvent
+        }); // checkoutOnRampInputScreen_OrderCreatedIframeEvent
         break;
       case TransakEvents.TRANSAK_ORDER_SUCCESSFUL:
         if (event.data.status === TransakStatuses.PROCESSING) {
@@ -80,7 +80,7 @@ export function OnRampMain({
             control: 'PaymentProcessing',
             controlType: 'IframeEvent',
             ...miscProps,
-          }); // checkoutwidgetsOnRampOrderInProgress_PaymentProcessingIframeEvent
+          }); // checkoutOnRampOrderInProgress_PaymentProcessingIframeEvent
         }
         if (event.data.status === TransakStatuses.COMPLETED) {
           track({
@@ -89,7 +89,7 @@ export function OnRampMain({
             control: 'PaymentCompleted',
             controlType: 'IframeEvent',
             ...miscProps,
-          }); // checkoutwidgetsOnRampSuccess_PaymentCompletedIframeEvent
+          }); // checkoutOnRampSuccess_PaymentCompletedIframeEvent
         }
         break;
       case TransakEvents.TRANSAK_ORDER_FAILED: // payment failed
@@ -99,7 +99,7 @@ export function OnRampMain({
           control: 'PaymentFailed',
           controlType: 'IframeEvent',
           ...miscProps,
-        }); // checkoutwidgetsOnRampFailure_PaymentFailedIframeEvent
+        }); // checkoutOnRampFailure_PaymentFailedIframeEvent
         break;
       default:
     }
