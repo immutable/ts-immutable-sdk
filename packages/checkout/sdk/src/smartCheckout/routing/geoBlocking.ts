@@ -1,3 +1,3 @@
-export const isOnRampGeoBlocked = async (): Promise<boolean> => true;
+export const isOnRampGeoBlocked = async (): Promise<boolean> => false;
 
-export const isSwapGeoBlocked = async (): Promise<boolean> => true;
+export const isSwapGeoBlocked = async (): Promise<boolean> => false;
