@@ -8,6 +8,7 @@ import {
   constants,
 } from '@imtbl/orderbook';
 import { BigNumber, Contract } from 'ethers';
+import { parseUnits } from 'ethers/lib/utils';
 import {
   BuyToken, SellOrder, SellResult, SellStatusType,
 } from '../../types/sell';
@@ -46,7 +47,7 @@ export const getBuyToken = (
   buyToken: BuyToken,
   decimals: number = 18,
 ): ERC20Item | NativeItem => {
-  const bnAmount = BigNumber.from(buyToken.amount).mul(BigNumber.from(10).pow(decimals));
+  const bnAmount = parseUnits(buyToken.amount, decimals);
 
   if (buyToken.type === ItemType.NATIVE) {
     return {
@@ -71,18 +72,25 @@ export const sell = async (
   let listing: PrepareListingResponse;
   let spenderAddress = '';
 
-  const { buyToken, collection, makerFees } = orders[0];
+  if (orders.length === 0) {
+    throw new CheckoutError(
+      'No orders were parsed, must parse at least one order',
+      CheckoutErrorType.PREPARE_ORDER_LISTING_ERROR,
+    );
+  }
+
+  const { buyToken, sellToken, makerFees } = orders[0];
 
   let decimals = 18;
   if (buyToken.type === ItemType.ERC20) {
     // get this from the allowed list
-    const buyContract = new Contract(
+    const buyTokenContract = new Contract(
       buyToken.contractAddress,
       JSON.stringify(ERC20ABI),
       provider,
     );
 
-    decimals = buyContract.decimals();
+    decimals = buyTokenContract.decimals();
   }
 
   const buyTokenOrNative = getBuyToken(buyToken, decimals);
@@ -97,8 +105,8 @@ export const sell = async (
       buy: buyTokenOrNative,
       sell: {
         type: ItemType.ERC721,
-        contractAddress: collection.address,
-        tokenId: collection.id,
+        contractAddress: sellToken.collectionAddress,
+        tokenId: sellToken.id,
       },
     });
   } catch (err: any) {
@@ -107,14 +115,14 @@ export const sell = async (
       CheckoutErrorType.PREPARE_ORDER_LISTING_ERROR,
       {
         message: err.message,
-        collectionId: collection.id,
-        collectionAddress: collection.address,
+        id: sellToken.id,
+        collectionAddress: sellToken.collectionAddress,
       },
     );
   }
 
   const itemRequirements = [
-    getERC721Requirement(collection.id, collection.address, spenderAddress),
+    getERC721Requirement(sellToken.id, sellToken.collectionAddress, spenderAddress),
   ];
 
   const smartCheckoutResult = await smartCheckout(
@@ -143,8 +151,8 @@ export const sell = async (
         'The unsigned message is missing after preparing the listing',
         CheckoutErrorType.SIGN_MESSAGE_ERROR,
         {
-          collectionId: collection.id,
-          collectionAddress: collection.address,
+          id: sellToken.id,
+          collectionAddress: sellToken.collectionAddress,
         },
       );
     }
@@ -156,8 +164,8 @@ export const sell = async (
     const approvalResult = await signApprovalTransactions(provider, unsignedTransactions.approvalTransactions);
     if (approvalResult.type === SignTransactionStatusType.FAILED) {
       return {
-        id: collection.id,
-        collectionAddress: collection.address,
+        id: sellToken.id,
+        collectionAddress: sellToken.collectionAddress,
         smartCheckoutResult,
         status: {
           type: SellStatusType.FAILED,
@@ -176,11 +184,19 @@ export const sell = async (
     };
 
     if (makerFees !== undefined) {
-      const orderBookFees = calculateFees(makerFees, buyTokenOrNative, decimals);
+      const orderBookFees = calculateFees(makerFees, buyTokenOrNative.amount, decimals);
       // @TODO add support for an array of fees when the orderbook enables it
+      if (orderBookFees.length !== makerFees.length) {
+        throw new CheckoutError(
+          'One of the fees is too small, must be greater than 0.000001',
+          CheckoutErrorType.CREATE_ORDER_LISTING_ERROR,
+        );
+      }
       const [makerFee] = orderBookFees;
       createListingParams.makerFee = makerFee;
     }
+
+    console.log('createListingsParams', createListingParams);
 
     try {
       const order = await orderbook.createListing(createListingParams);
@@ -191,15 +207,15 @@ export const sell = async (
         CheckoutErrorType.CREATE_ORDER_LISTING_ERROR,
         {
           message: err.message,
-          collectionId: collection.id,
-          collectionAddress: collection.address,
+          collectionId: sellToken.id,
+          collectionAddress: sellToken.collectionAddress,
         },
       );
     }
 
     return {
-      id: collection.id,
-      collectionAddress: collection.address,
+      id: sellToken.id,
+      collectionAddress: sellToken.collectionAddress,
       smartCheckoutResult,
       status: {
         type: SellStatusType.SUCCESS,
@@ -209,8 +225,8 @@ export const sell = async (
   }
 
   return {
-    id: collection.id,
-    collectionAddress: collection.address,
+    id: sellToken.id,
+    collectionAddress: sellToken.collectionAddress,
     smartCheckoutResult,
   };
 };

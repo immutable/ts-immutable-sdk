@@ -1,6 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { ItemType, SmartCheckoutResult } from './smartCheckout';
-import { Collection } from './collection';
 import { OrderFee } from './fees';
 
 /**
@@ -15,9 +14,14 @@ export interface SellParams {
 }
 
 export interface SellOrder {
-  collection: Collection;
+  sellToken: SellToken;
   buyToken: BuyToken;
   makerFees?: Array<OrderFee>;
+}
+
+export interface SellToken {
+  id: string,
+  collectionAddress: string,
 }
 
 /**

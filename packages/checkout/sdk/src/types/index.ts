@@ -2,7 +2,6 @@ export * from './balances';
 export * from './buy';
 export * from './cancel';
 export * from './chains';
-export * from './collection';
 export * from './config';
 export * from './connect';
 export * from './fees';

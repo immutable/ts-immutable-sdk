@@ -1,4 +1,4 @@
-import { ERC20Item, FeeValue, NativeItem } from '@imtbl/orderbook';
+import { FeeValue } from '@imtbl/orderbook';
 import { BigNumber } from 'ethers';
 import { parseUnits } from 'ethers/lib/utils';
 import { FeePercentage, FeeToken, OrderFee } from '../../types/fees';
@@ -13,6 +13,7 @@ const calculateFeesPercent = (
 ): BigNumber => {
   const feePercentage = orderFee.amount as FeePercentage;
 
+  // note: multiply in and out of the maximum decimal places to the power of ten to do the math in big number integers
   const feePercentageMultiplier = Math.round(feePercentage.percentageDecimal * (10 ** MAX_FEE_DECIMAL_PLACES));
 
   const bnFeeAmount = amountBn
@@ -33,13 +34,14 @@ const calculateFeesToken = (
 
 export const calculateFees = (
   orderFees: Array<OrderFee>,
-  buyTokenOrNative: ERC20Item | NativeItem,
+  weiAmount: string,
   decimals: number = 18,
 ):Array<FeeValue> => {
   let totalTokenFees: BigNumber = BigNumber.from(0);
 
-  const amountBn = parseUnits(buyTokenOrNative.amount, decimals);
+  const amountBn = BigNumber.from(weiAmount);
 
+  // note: multiply in and out of the maximum decimal places to the power of ten to do the math in big number integers
   const totalAllowableFees: BigNumber = amountBn
     .mul(MAX_FEE_PERCENTAGE_DECIMAL * (10 ** MAX_FEE_DECIMAL_PLACES))
     .div(10 ** MAX_FEE_DECIMAL_PLACES);

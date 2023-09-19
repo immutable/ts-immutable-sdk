@@ -124,9 +124,9 @@ describe('sell', () => {
       });
 
       const orders:Array<SellOrder> = [{
-        collection: {
+        sellToken: {
           id,
-          address: contractAddress,
+          collectionAddress: contractAddress,
         },
         buyToken: {
           type: ItemType.NATIVE,
@@ -187,6 +187,10 @@ describe('sell', () => {
       );
       expect(mockCreateListing).toBeCalledWith(
         {
+          makerFee: {
+            amount: '25000000000000000',
+            recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
+          },
           orderComponents: {},
           orderHash: 'hash',
           orderSignature: '0xSIGNED',
@@ -276,9 +280,9 @@ describe('sell', () => {
       (signApprovalTransactions as jest.Mock).mockResolvedValue({});
 
       const orders:Array<SellOrder> = [{
-        collection: {
+        sellToken: {
           id,
-          address: contractAddress,
+          collectionAddress: contractAddress,
         },
         buyToken: {
           type: ItemType.NATIVE,
@@ -408,9 +412,9 @@ describe('sell', () => {
       });
 
       const orders:Array<SellOrder> = [{
-        collection: {
+        sellToken: {
           id,
-          address: contractAddress,
+          collectionAddress: contractAddress,
         },
         buyToken: {
           type: ItemType.NATIVE,
@@ -490,9 +494,9 @@ describe('sell', () => {
 
       try {
         const orders:Array<SellOrder> = [{
-          collection: {
+          sellToken: {
             id,
-            address: contractAddress,
+            collectionAddress: contractAddress,
           },
           buyToken: {
             type: ItemType.NATIVE,
@@ -561,9 +565,9 @@ describe('sell', () => {
 
       try {
         const orders:Array<SellOrder> = [{
-          collection: {
+          sellToken: {
             id,
-            address: contractAddress,
+            collectionAddress: contractAddress,
           },
           buyToken: {
             type: ItemType.NATIVE,
@@ -668,9 +672,9 @@ describe('sell', () => {
       (signApprovalTransactions as jest.Mock).mockResolvedValue({});
 
       const orders:Array<SellOrder> = [{
-        collection: {
+        sellToken: {
           id,
-          address: contractAddress,
+          collectionAddress: contractAddress,
         },
         buyToken: {
           type: ItemType.NATIVE,
@@ -769,9 +773,9 @@ describe('sell', () => {
       (signApprovalTransactions as jest.Mock).mockResolvedValue({});
 
       const orders:Array<SellOrder> = [{
-        collection: {
+        sellToken: {
           id,
-          address: contractAddress,
+          collectionAddress: contractAddress,
         },
         buyToken: {
           type: ItemType.NATIVE,
@@ -873,9 +877,9 @@ describe('sell', () => {
       (signApprovalTransactions as jest.Mock).mockRejectedValue(new Error('error from sign approval transactions'));
 
       const orders:Array<SellOrder> = [{
-        collection: {
+        sellToken: {
           id,
-          address: contractAddress,
+          collectionAddress: contractAddress,
         },
         buyToken: {
           type: ItemType.NATIVE,
@@ -955,9 +959,9 @@ describe('sell', () => {
       let data;
 
       const orders:Array<SellOrder> = [{
-        collection: {
+        sellToken: {
           id,
-          address: contractAddress,
+          collectionAddress: contractAddress,
         },
         buyToken: {
           type: ItemType.NATIVE,
@@ -995,7 +999,7 @@ describe('sell', () => {
     });
 
     it('should throw error if create listing errors', async () => {
-      const id = '0';
+      const collectionId = '0';
       const contractAddress = '0xERC721';
 
       const erc721TransactionRequirement = {
@@ -1006,14 +1010,14 @@ describe('sell', () => {
           balance: BigNumber.from(1),
           formattedBalance: '1',
           contractAddress: '0xab8bb5bc4FB1Cfc060f77f87B558c98abDa65130',
-          id: '0',
+          collectionId: '0',
         },
         current: {
           type: ItemType.ERC721,
           balance: BigNumber.from(1),
           formattedBalance: '1',
           contractAddress: '0xab8bb5bc4FB1Cfc060f77f87B558c98abDa65130',
-          id: '0',
+          collectionId: '0',
         },
         delta: {
           balance: BigNumber.from(0),
@@ -1073,9 +1077,9 @@ describe('sell', () => {
       let data;
 
       const orders:Array<SellOrder> = [{
-        collection: {
-          id,
-          address: contractAddress,
+        sellToken: {
+          id: collectionId,
+          collectionAddress: contractAddress,
         },
         buyToken: {
           type: ItemType.NATIVE,
@@ -1103,7 +1107,7 @@ describe('sell', () => {
       expect(type).toEqual(CheckoutErrorType.CREATE_ORDER_LISTING_ERROR);
       expect(data).toEqual({
         message: 'error from create listing',
-        id,
+        collectionId,
         collectionAddress: contractAddress,
       });
 
@@ -1125,7 +1129,7 @@ describe('sell', () => {
 
       expect(result).toEqual({
         type: ItemType.NATIVE,
-        amount: '1',
+        amount: '1000000000000000000',
       });
     });
 
@@ -1140,7 +1144,7 @@ describe('sell', () => {
 
       expect(result).toEqual({
         type: ItemType.ERC20,
-        amount: '1',
+        amount: '1000000000000000000',
         contractAddress: '0xERC20',
       });
     });
