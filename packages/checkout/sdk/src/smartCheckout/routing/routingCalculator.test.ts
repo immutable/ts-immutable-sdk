@@ -17,12 +17,14 @@ import { createReadOnlyProviders } from '../../readOnlyProviders/readOnlyProvide
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { swapRoute } from './swap/swapRoute';
 import { allowListCheck } from '../allowList';
+import { onRampRoute } from './onRamp';
 
 jest.mock('./tokenBalances');
 jest.mock('./bridge/bridgeRoute');
 jest.mock('../../readOnlyProviders/readOnlyProvider');
 jest.mock('../../config/remoteConfigFetcher');
 jest.mock('./swap/swapRoute');
+jest.mock('./onRamp/onRampRoute');
 jest.mock('../allowList');
 
 describe('routingCalculator', () => {
@@ -153,7 +155,14 @@ describe('routingCalculator', () => {
 
   it('should return bridge funding step', async () => {
     (allowListCheck as jest.Mock).mockImplementation(() => (
-      {}
+      {
+        bridge: [{
+          name: 'ETH-ERC20',
+          symbol: 'ETH-ERC20',
+          decimals: 18,
+          address: '0x123',
+        }],
+      }
     ));
 
     const balanceERC20Requirement: BalanceERC20Requirement = {
@@ -398,6 +407,150 @@ describe('routingCalculator', () => {
       });
   });
 
+  it('should return onRamp funding step', async () => {
+    (allowListCheck as jest.Mock).mockImplementation(() => (
+      {
+        onRamp: [{
+          name: 'ERC20_1',
+          symbol: 'ERC20_1',
+          decimals: 18,
+          address: '0xERC20_1',
+        },
+        {
+          name: 'ERC20_2',
+          symbol: 'ERC20_2',
+          decimals: 18,
+          address: '0xERC20_2',
+        }],
+        swap: [],
+      }
+    ));
+
+    const balanceERC20Requirement = {
+      type: ItemType.ERC20,
+      sufficient: false,
+      delta: {
+        balance: BigNumber.from(1),
+        formattedBalance: '1',
+      },
+      current: {
+        type: ItemType.ERC20,
+        balance: BigNumber.from(1),
+        formattedBalance: '1',
+        token: {
+          name: 'ERC20_1',
+          symbol: 'ERC20_1',
+          decimals: 18,
+          address: '0xERC20_1',
+        },
+      },
+      required: {
+        type: ItemType.ERC20,
+        balance: BigNumber.from(2),
+        formattedBalance: '2',
+        token: {
+          name: 'ERC20_1',
+          symbol: 'ERC20_1',
+          decimals: 18,
+          address: '0xERC20_1',
+        },
+      },
+    } as BalanceRequirement;
+
+    const balanceRequirements = {
+      sufficient: false,
+      balanceRequirements: [balanceERC20Requirement],
+    };
+
+    const availableRoutingOptions = {
+      onRamp: true,
+      swap: false,
+      bridge: false,
+    };
+
+    (getAllTokenBalances as jest.Mock).mockResolvedValue(new Map([
+      [ChainId.SEPOLIA, []],
+      [ChainId.IMTBL_ZKEVM_TESTNET, {
+        success: true,
+        balances: [
+          {
+            balance: BigNumber.from(10),
+            formattedBalance: '10',
+            token: {
+              name: 'ERC20_2',
+              symbol: 'ERC20_2',
+              decimals: 18,
+              address: '0xERC20_2',
+            },
+          },
+          {
+            balance: BigNumber.from(10),
+            formattedBalance: '10',
+            token: {
+              name: 'IMX',
+              symbol: 'IMX',
+              decimals: 18,
+              address: IMX_ADDRESS_ZKEVM,
+            },
+          },
+        ],
+      }],
+    ]));
+
+    (onRampRoute as jest.Mock).mockResolvedValue({
+      type: FundingRouteType.ONRAMP,
+      chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+      asset: {
+        balance: BigNumber.from(10),
+        formattedBalance: '10',
+        token: {
+          name: 'ERC20_1',
+          symbol: 'ERC20_1',
+          decimals: 18,
+          address: '0xERC20_1',
+        },
+      },
+    });
+
+    (swapRoute as jest.Mock).mockResolvedValue(undefined);
+
+    (createReadOnlyProviders as jest.Mock).mockResolvedValue(new Map([
+      [ChainId.SEPOLIA, {} as JsonRpcProvider],
+      [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
+    ]));
+
+    const routingOptions = await routingCalculator(
+      config,
+      '0x123',
+      balanceRequirements,
+      availableRoutingOptions,
+    );
+    expect(routingOptions)
+      .toEqual({
+        response: {
+          type: RouteCalculatorType.ROUTES_FOUND,
+          message: 'Routes found',
+        },
+        fundingRoutes: [{
+          priority: 1,
+          steps: [{
+            type: FundingRouteType.ONRAMP,
+            chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+            asset: {
+              balance: BigNumber.from(10),
+              formattedBalance: '10',
+              token: {
+                name: 'ERC20_1',
+                symbol: 'ERC20_1',
+                decimals: 18,
+                address: '0xERC20_1',
+              },
+            },
+          }],
+        }],
+      });
+  });
+
   it('should return bridge and swap funding step', async () => {
     (allowListCheck as jest.Mock).mockImplementation(() => (
       {
@@ -456,7 +609,7 @@ describe('routingCalculator', () => {
     };
 
     const availableRoutingOptions = {
-      onRamp: true,
+      onRamp: false,
       swap: true,
       bridge: true,
     };
