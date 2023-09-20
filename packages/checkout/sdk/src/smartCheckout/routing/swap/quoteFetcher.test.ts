@@ -21,7 +21,7 @@ describe('quoteFetcher', () => {
     swapGasFeeEstimate?: number,
     approvalGasFeeEstimate?: number,
   ): TransactionResponse => {
-    const resp: TransactionResponse = {
+    const transactionResponse: TransactionResponse = {
       swap: {
         transaction: {} as TransactionRequest,
         gasFeeEstimate: null,
@@ -51,14 +51,14 @@ describe('quoteFetcher', () => {
     };
 
     if (swapGasFeeEstimate) {
-      resp.swap.gasFeeEstimate = {
+      transactionResponse.swap.gasFeeEstimate = {
         value: BigNumber.from(swapGasFeeEstimate),
         token: {} as TokenInfo,
       };
     }
 
     if (approvalGasFeeEstimate) {
-      resp.approval = {
+      transactionResponse.approval = {
         gasFeeEstimate: {
           value: BigNumber.from(approvalGasFeeEstimate),
           token: {} as TokenInfo,
@@ -66,7 +66,7 @@ describe('quoteFetcher', () => {
       } as TransactionDetails;
     }
 
-    return resp;
+    return transactionResponse;
   };
 
   const constructDexQuote = (
