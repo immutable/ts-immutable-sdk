@@ -10,16 +10,16 @@ import { ConnectTargetLayer, getL1ChainId, getL2ChainId } from '../../lib';
 import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 
 export class ImmutableOnRamp extends ImmutableWebComponent {
-  static get observedAttributes(): string[] {
-    const baseObservedAttributes = super.observedAttributes;
-    return [...baseObservedAttributes, 'amount', 'contractaddress'];
-  }
-
   amount = '';
 
   walletProvider?: WalletProviderName;
 
   contractAddress = '';
+
+  static get observedAttributes(): string[] {
+    const baseObservedAttributes = super.observedAttributes;
+    return [...baseObservedAttributes, 'amount', 'contractaddress', 'walletprovider'];
+  }
 
   connectedCallback() {
     super.connectedCallback();
@@ -37,6 +37,9 @@ export class ImmutableOnRamp extends ImmutableWebComponent {
     }
     if (name === 'contractaddress') {
       this.contractAddress = newValue;
+    }
+    if (name === 'walletprovider') {
+      this.walletProvider = newValue.toLowerCase() as WalletProviderName;
     }
 
     this.renderWidget();

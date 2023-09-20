@@ -249,7 +249,7 @@ export function TopUpView({
             testId="onramp"
             icon="Wallet"
             heading={onramp.heading}
-            caption={onramp.heading}
+            caption={onramp.caption}
             subcaption={onramp.subcaption}
             onClick={onClickOnRamp}
             renderFeeFunction={() => renderFeePercentage(onRampFeesPercentage, loadingOnRampFees)}
@@ -260,7 +260,7 @@ export function TopUpView({
               testId="swap"
               icon="Coins"
               heading={swap.heading}
-              caption={swap.heading}
+              caption={swap.caption}
               subcaption={swap.subcaption}
               onClick={onClickSwap}
               renderFeeFunction={() => renderFees(swapFeesInFiat, loadingSwapFees)}

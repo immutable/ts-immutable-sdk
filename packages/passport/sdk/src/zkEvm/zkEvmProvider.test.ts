@@ -9,11 +9,13 @@ import { Provider } from './types';
 import { PassportEventMap, PassportEvents } from '../types';
 import TypedEventEmitter from '../typedEventEmitter';
 import { mockUserZkEvm } from '../test/mocks';
+import { signTypedDataV4 } from './signTypedDataV4';
 
 jest.mock('@ethersproject/providers');
 jest.mock('./relayerClient');
 jest.mock('./user');
 jest.mock('./sendTransaction');
+jest.mock('./signTypedDataV4');
 
 describe('ZkEvmProvider', () => {
   let passportEventEmitter: TypedEventEmitter<PassportEventMap>;
@@ -270,6 +272,49 @@ describe('ZkEvmProvider', () => {
         jsonRpcProvider: expect.any(Object),
         relayerClient: expect.any(RelayerClient),
         user: mockUserZkEvm,
+      });
+    });
+  });
+
+  describe('eth_signTypedData_v4', () => {
+    const address = '0xd64b0d2d72bb1b3f18046b8a7fc6c9ee6bccd287';
+    const typedDataPayload = '{}';
+
+    it('should throw an error if the user is not logged in', async () => {
+      const provider = getProvider();
+
+      await expect(async () => (
+        provider.request({ method: 'eth_signTypedData_v4', params: [address, typedDataPayload] })
+      )).rejects.toThrow(
+        new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first'),
+      );
+    });
+
+    it('should call signTypedDataV4 with the correct params', async () => {
+      const signature = '0x123';
+      const mockMagicProvider = {};
+      (loginZkEvmUser as jest.Mock).mockResolvedValue({
+        user: mockUserZkEvm,
+        magicProvider: mockMagicProvider,
+      });
+      (signTypedDataV4 as jest.Mock).mockResolvedValue(signature);
+
+      const provider = getProvider();
+      await provider.request({ method: 'eth_requestAccounts' });
+      const result = await provider.request({
+        method: 'eth_signTypedData_v4',
+        params: [address, typedDataPayload],
+      });
+
+      expect(result).toEqual(signature);
+      expect(signTypedDataV4).toHaveBeenCalledWith({
+        method: 'eth_signTypedData_v4',
+        params: [address, typedDataPayload],
+        magicProvider: mockMagicProvider,
+        jsonRpcProvider: expect.any(Object),
+        relayerClient: expect.any(RelayerClient),
+        user: mockUserZkEvm,
+        guardianClient: expect.any(GuardianClient),
       });
     });
   });

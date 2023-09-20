@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 // May contain unused imports in some cases
 // @ts-ignore
 import { ZkEvmTransactionData } from './zk-evm-transaction-data';
@@ -24,6 +23,6 @@ import { ZkEvmTransactionEvaluationRequest } from './zk-evm-transaction-evaluati
  * @type TransactionEvaluationRequest
  * @export
  */
-export type TransactionEvaluationRequest = { chainType: 'evm' } & ZkEvmTransactionEvaluationRequest | { chainType: 'starkex' } & StarkExTransactionEvaluationRequest;
-
-
+export type TransactionEvaluationRequest =
+  | ({ chainType: 'evm' } & ZkEvmTransactionEvaluationRequest)
+  | { chainType: 'starkex' };
