@@ -1148,6 +1148,22 @@ describe('sell', () => {
         contractAddress: '0xERC20',
       });
     });
+
+    it('should return an ERC20 buy token with smaller decimals', () => {
+      const buyToken: BuyToken = {
+        type: ItemType.ERC20,
+        amount: '1',
+        contractAddress: '0xERC20',
+      };
+
+      const result = getBuyToken(buyToken, 6);
+
+      expect(result).toEqual({
+        type: ItemType.ERC20,
+        amount: '1000000',
+        contractAddress: '0xERC20',
+      });
+    });
   });
 
   describe('getERC721Requirement', () => {
