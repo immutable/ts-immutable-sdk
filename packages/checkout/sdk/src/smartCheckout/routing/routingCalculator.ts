@@ -143,7 +143,6 @@ export const routingCalculator = async (
   // > Could double swap
 
   const response: RoutingCalculatorResult = {
-    availableOptions: [],
     response: {
       type: RouteCalculatorType.NO_ROUTES,
       message: 'Routes not found',

@@ -6,7 +6,6 @@ import {
 import { CheckoutError } from '../../errors';
 
 export type RoutingCalculatorResult = {
-  availableOptions: any[],
   response: RoutingCalculatorResponse,
   fundingRoutes: FundingRoute[],
 };

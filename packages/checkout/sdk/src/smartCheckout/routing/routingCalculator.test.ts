@@ -229,7 +229,6 @@ describe('routingCalculator', () => {
     );
     expect(routingOptions)
       .toEqual({
-        availableOptions: [],
         response: {
           type: RouteCalculatorType.ROUTES_FOUND,
           message: 'Routes found',
@@ -375,7 +374,6 @@ describe('routingCalculator', () => {
     );
     expect(routingOptions)
       .toEqual({
-        availableOptions: [],
         response: {
           type: RouteCalculatorType.ROUTES_FOUND,
           message: 'Routes found',
@@ -534,7 +532,6 @@ describe('routingCalculator', () => {
     );
     expect(routingOptions)
       .toEqual({
-        availableOptions: [],
         response: {
           type: RouteCalculatorType.ROUTES_FOUND,
           message: 'Routes found',
@@ -651,7 +648,6 @@ describe('routingCalculator', () => {
     );
     expect(routingOptions)
       .toEqual({
-        availableOptions: [],
         response: {
           type: RouteCalculatorType.NO_ROUTES,
           message: 'Routes not found',
@@ -691,7 +687,6 @@ describe('routingCalculator', () => {
     );
     expect(routingOptions)
       .toEqual({
-        availableOptions: [],
         response: {
           type: RouteCalculatorType.NO_ROUTES,
           message: 'Routes not found',
