@@ -26,6 +26,7 @@ import {
   NetworkInfo,
   GetTokenAllowListResult,
   TokenInfo,
+  BuyToken,
 } from './types';
 import { getAllBalances, getBalance, getERC20Balance } from './balances';
 import { sendTransaction } from './transaction';
@@ -487,26 +488,33 @@ describe('Connect', () => {
       baseConfig: { environment: Environment.SANDBOX },
     });
 
-    await checkout.sell({
-      provider,
-      id: '0',
-      collectionAddress: '0xERC721',
+    const orders = [{
+      sellToken: {
+        id: '0',
+        collectionAddress: '0xERC721',
+      },
       buyToken: {
         type: ItemType.NATIVE,
-        amount: BigNumber.from('100000'),
-      },
+        amount: '10',
+      } as BuyToken,
+      makerFees: [
+        {
+          amount: { percentageDecimal: 0.025 },
+          recipient: '0x222',
+        },
+      ],
+    }];
+
+    await checkout.sell({
+      provider,
+      orders,
     });
 
     expect(sell).toBeCalledTimes(1);
     expect(sell).toBeCalledWith(
       checkout.config,
       provider,
-      '0',
-      '0xERC721',
-      {
-        type: ItemType.NATIVE,
-        amount: BigNumber.from('100000'),
-      },
+      orders,
     );
   });
 
@@ -520,12 +528,23 @@ describe('Connect', () => {
 
     await expect(checkout.sell({
       provider,
-      id: '0',
-      collectionAddress: '0xERC721',
-      buyToken: {
-        type: ItemType.NATIVE,
-        amount: BigNumber.from('100000'),
-      },
+      orders: [{
+        sellToken: {
+          id: '0',
+          collectionAddress: '0xERC721',
+        },
+        buyToken: {
+          type: ItemType.NATIVE,
+          amount: '10',
+        },
+        makerFees: [
+          {
+            amount: { percentageDecimal: 0.025 },
+            recipient: '0x222',
+          },
+        ],
+      }],
+
     })).rejects.toThrow('This endpoint is not currently available.');
 
     expect(sell).toBeCalledTimes(0);
