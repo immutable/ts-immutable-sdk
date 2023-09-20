@@ -35,7 +35,6 @@ export const getRequiredToken = (
   return { address, amount };
 };
 
-// todo: test this in sample app - should be always IMX for approval fees
 type SufficientApprovalFees = { sufficient: boolean, approvalGasFee: BigNumber, approvalGasTokenAddress: string };
 export const checkUserCanCoverApprovalFees = (
   l2Balances: GetBalanceResult[],

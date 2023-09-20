@@ -145,8 +145,6 @@ export const routingCalculator = async (
   // > Could on-ramp first
   // > Could double swap
 
-  // todo: cleanup below if/else to a better way
-
   if (bridgeFundingStep && swapFundingStep) {
     return {
       availableOptions: [],
