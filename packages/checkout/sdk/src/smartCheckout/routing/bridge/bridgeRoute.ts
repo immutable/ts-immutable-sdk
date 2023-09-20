@@ -3,13 +3,14 @@ import { BigNumber, Contract, ethers } from 'ethers';
 import { Web3Provider } from '@ethersproject/providers';
 import {
   ChainId,
+  FundingRouteType,
   GetBalanceResult,
   IMX_ADDRESS_ZKEVM,
   ItemType,
   RoutingOptionsAvailable,
 } from '../../../types';
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../../config';
-import { FundingRouteStep, FundingRouteType, TokenBalanceResult } from '../types';
+import { FundingRouteStep, TokenBalanceResult } from '../types';
 import { BalanceRequirement } from '../../balanceCheck/types';
 import { createBlockchainDataInstance } from '../../../instance';
 import { getEthBalance } from './getEthBalance';

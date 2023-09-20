@@ -225,10 +225,16 @@ export type FundingRouteBalanceItem = {
 };
 
 export type FundingRouteStep = {
-  type: 'bridge' | 'onRamp' | 'swap';
+  type: FundingRouteType;
   chainId: number,
   asset: FundingRouteBalanceItem,
 };
+
+export enum FundingRouteType {
+  BRIDGE = 'BRIDGE',
+  ONRAMP = 'ONRAMP',
+  SWAP = 'SWAP',
+}
 
 export type FundingRoute = {
   priority: number;
