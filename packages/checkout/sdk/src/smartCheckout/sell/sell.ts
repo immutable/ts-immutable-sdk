@@ -196,8 +196,6 @@ export const sell = async (
       createListingParams.makerFee = makerFee;
     }
 
-    console.log('createListingsParams', createListingParams);
-
     try {
       const order = await orderbook.createListing(createListingParams);
       orderId = order.result.id;
