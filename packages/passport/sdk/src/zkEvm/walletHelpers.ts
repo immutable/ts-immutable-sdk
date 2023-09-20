@@ -1,17 +1,13 @@
 import { BigNumber, BigNumberish, ethers } from 'ethers';
 import { walletContracts } from '@0xsequence/abi';
-import { encodeSignature } from '@0xsequence/config';
+import { decodeSignature, encodeSignature } from '@0xsequence/config';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { Signer } from '@ethersproject/abstract-signer';
-import { MetaTransaction, MetaTransactionNormalised } from './types';
+import { MetaTransaction, MetaTransactionNormalised, TypedDataPayload } from './types';
 
-// These are ignored by the Relayer but for consistency we set them to the
-// appropriate values for a 1/1 wallet.
-//
-// Weight of a single signature in the multisig
-const SIGNATURE_WEIGHT = 1;
-// Total required weight in the multisig
-const SIGNATURE_THRESHOLD = 1;
+const SIGNATURE_WEIGHT = 1; // Weight of a single signature in the multi-sig
+const TRANSACTION_SIGNATURE_THRESHOLD = 1; // Total required weight in the multi-sig for a transaction
+const EIP712_SIGNATURE_THRESHOLD = 2; // Total required weight in the multi-sig for data signing
 
 const ETH_SIGN_FLAG = '02';
 const ETH_SIGN_PREFIX = '\x19\x01';
@@ -56,6 +52,13 @@ export const getNonce = async (jsonRpcProvider: JsonRpcProvider, smartContractWa
   return 0;
 };
 
+const encodeMessageSubDigest = (chainId: BigNumber, walletAddress: string, digest: string): string => (
+  ethers.utils.solidityPack(
+    ['string', 'uint256', 'address', 'bytes32'],
+    [ETH_SIGN_PREFIX, chainId, walletAddress, digest],
+  )
+);
+
 export const getSignedMetaTransactions = async (
   metaTransactions: MetaTransaction[],
   nonce: BigNumberish,
@@ -67,10 +70,7 @@ export const getSignedMetaTransactions = async (
 
   // Get the hash
   const digest = digestOfTransactionsAndNonce(nonce, normalisedMetaTransactions);
-  const completePayload = ethers.utils.solidityPack(
-    ['string', 'uint256', 'address', 'bytes32'],
-    [ETH_SIGN_PREFIX, chainId, walletAddress, digest],
-  );
+  const completePayload = encodeMessageSubDigest(chainId, walletAddress, digest);
 
   const hash = ethers.utils.keccak256(completePayload);
 
@@ -81,7 +81,7 @@ export const getSignedMetaTransactions = async (
 
   // Add metadata
   const encodedSignature = encodeSignature({
-    threshold: SIGNATURE_THRESHOLD,
+    threshold: TRANSACTION_SIGNATURE_THRESHOLD,
     signers: [
       {
         weight: SIGNATURE_WEIGHT,
@@ -97,6 +97,48 @@ export const getSignedMetaTransactions = async (
     nonce,
     encodedSignature,
   ]);
+};
+
+const decodeRelayerTypedDataSignature = (relayerSignature: string) => {
+  const signatureWithThreshold = `0000${relayerSignature}`;
+  return decodeSignature(signatureWithThreshold);
+};
+
+export const getSignedTypedData = async (
+  typedData: TypedDataPayload,
+  relayerSignature: string,
+  chainId: BigNumber,
+  walletAddress: string,
+  signer: Signer,
+): Promise<string> => {
+  // Ethers auto-generates the EIP712Domain type in the TypedDataEncoder, and so it needs to be removed
+  const types = { ...typedData.types };
+  // @ts-ignore
+  delete types.EIP712Domain;
+
+  // eslint-disable-next-line no-underscore-dangle
+  const digest = ethers.utils._TypedDataEncoder.hash(typedData.domain, types, typedData.message);
+  const completePayload = encodeMessageSubDigest(chainId, walletAddress, digest);
+
+  const hash = ethers.utils.keccak256(completePayload);
+
+  // Sign the digest
+  const hashArray = ethers.utils.arrayify(hash);
+  const ethsigNoType = await signer.signMessage(hashArray);
+  const signedDigest = `${ethsigNoType}${ETH_SIGN_FLAG}`;
+
+  const { signers } = decodeRelayerTypedDataSignature(relayerSignature);
+
+  return encodeSignature({
+    threshold: EIP712_SIGNATURE_THRESHOLD,
+    signers: [
+      ...signers,
+      {
+        weight: SIGNATURE_WEIGHT,
+        signature: signedDigest,
+      },
+    ],
+  });
 };
 
 export const getEip155ChainId = (chainId: number) => `eip155:${chainId}`;
