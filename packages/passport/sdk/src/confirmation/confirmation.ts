@@ -12,6 +12,9 @@ const CONFIRMATION_WINDOW_HEIGHT = 380;
 const CONFIRMATION_WINDOW_WIDTH = 480;
 const CONFIRMATION_WINDOW_CLOSED_POLLING_DURATION = 1000;
 
+export const CONFIRMATION_IFRAME_ID = 'passport-confirm';
+export const CONFIRMATION_IFRAME_STYLE = 'position: absolute;width:1px;height:1px;border:0;';
+
 type MessageHandler = (arg0: MessageEvent) => void;
 
 export default class ConfirmationScreen {
@@ -125,6 +128,33 @@ export default class ConfirmationScreen {
 
   closeWindow() {
     this.confirmationWindow?.close();
+  }
+
+  logout(): Promise<{ logout: boolean }> {
+    return new Promise((resolve, rejects) => {
+      const iframe = document.createElement('iframe');
+      iframe.setAttribute('id', CONFIRMATION_IFRAME_ID);
+      iframe.setAttribute('src', `${this.config.passportDomain}/transaction-confirmation/logout`);
+      iframe.setAttribute('style', CONFIRMATION_IFRAME_STYLE);
+      const logoutHandler = ({ data, origin }: MessageEvent) => {
+        if (
+          origin !== this.config.passportDomain
+          || data.eventType !== PASSPORT_EVENT_TYPE
+        ) {
+          return;
+        }
+        window.removeEventListener('message', logoutHandler);
+        iframe.remove();
+
+        if (data.messageType === ReceiveMessage.LOGOUT_SUCCESS) {
+          resolve({ logout: true });
+        }
+        rejects(new Error('Unsupported logout type'));
+      };
+
+      window.addEventListener('message', logoutHandler);
+      document.body.appendChild(iframe);
+    });
   }
 
   showConfirmationScreen(href: string, messageHandler: MessageHandler, resolve: Function) {
