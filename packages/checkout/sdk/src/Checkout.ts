@@ -299,6 +299,8 @@ export class Checkout {
   /**
    * Determines the requirements for performing a sell.
    * @param {SellParams} params - The parameters for the sell.
+   * Only currently actions the first order in the array until we support batch processing.
+   * Only currently actions the first fee in the fees array of each order until we support multiple fees.
   */
   public async sell(
     params: SellParams,
@@ -310,6 +312,11 @@ export class Checkout {
     // eslint-disable-next-line no-console
     console.warn('This endpoint is currently under construction.');
 
+    if (params.orders.length > 1) {
+      // eslint-disable-next-line no-console
+      console.warn('This endpoint currently only actions the first order in the array.');
+    }
+
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
@@ -318,9 +325,7 @@ export class Checkout {
     await sell.sell(
       this.config,
       web3Provider,
-      params.id,
-      params.collectionAddress,
-      params.buyToken,
+      params.orders,
     );
   }
 
