@@ -135,7 +135,11 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
           <LoadingView loadingText={loadingText} />
         )}
         {viewState.view.type === PrimaryRevenueWidgetViews.PAYMENT_METHODS && (
-          <PaymentMethods smartCheckout={smartCheckout} checkBalances={handleCheckBalances} sign={sign} />
+          <PaymentMethods
+            smartCheckout={smartCheckout}
+            checkBalances={handleCheckBalances}
+            sign={sign}
+          />
         )}
         {viewState.view.type === PrimaryRevenueWidgetViews.PAY_WITH_CRYPTO && (
           <ReviewOrder
@@ -146,7 +150,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
           />
         )}
         {viewState.view.type === PrimaryRevenueWidgetViews.PAY_WITH_CARD && (
-          <PayWithCard />
+          <PayWithCard config={config} />
         )}
         {viewState.view.type === SharedViews.TOP_UP_VIEW && (
           <TopUpView
@@ -162,15 +166,15 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
         )}
         {viewState.view.type
           === (OrchestrationEventType.REQUEST_ONRAMP as unknown) && (
-            <OnRampWidget config={config} params={{ ...viewState.view.data }} />
+          <OnRampWidget config={config} params={{ ...viewState.view.data }} />
         )}
         {viewState.view.type
           === (OrchestrationEventType.REQUEST_SWAP as unknown) && (
-            <SwapWidget config={config} params={{ ...viewState.view.data }} />
+          <SwapWidget config={config} params={{ ...viewState.view.data }} />
         )}
         {viewState.view.type
           === (OrchestrationEventType.REQUEST_BRIDGE as unknown) && (
-            <BridgeWidget config={config} params={{ ...viewState.view.data }} />
+          <BridgeWidget config={config} params={{ ...viewState.view.data }} />
         )}
       </ViewContext.Provider>
     </BiomeCombinedProviders>

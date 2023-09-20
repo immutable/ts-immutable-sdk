@@ -275,8 +275,10 @@ export const text = {
       [OnRampWidgetViews.IN_PROGRESS]: {
         content: {
           heading: 'Order in progress',
-          body1: 'You’ll receive an email from Transak when complete. This can take up to 3 mins.',
-          body2: 'You can close this window, the transaction will be reflected in your wallet once complete.',
+          body1:
+            'You’ll receive an email from Transak when complete. This can take up to 3 mins.',
+          body2:
+            'You can close this window, the transaction will be reflected in your wallet once complete.',
         },
       },
       [OnRampWidgetViews.SUCCESS]: {
@@ -330,6 +332,9 @@ export const text = {
         heading: 'Review & Pay',
         caption: 'lore ipsum dolor sit amet',
       },
+    },
+    [PrimaryRevenueWidgetViews.PAY_WITH_CARD]: {
+      initialLoadingText: 'Taking you to Transak',
     },
   },
   wallets: {
