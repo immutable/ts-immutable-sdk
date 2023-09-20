@@ -59,12 +59,9 @@ export const getSwapFundingStep = async (
   if (tokenBalanceResult.error !== undefined || !tokenBalanceResult.success) return undefined;
 
   if (swapTokenAllowList.length === 0) return undefined;
-  const swappableTokens: string[] = [];
-  for (const token of swapTokenAllowList) {
-    if (token.address === undefined) continue;
-    if (token.address === '') continue;
-    swappableTokens.push(token.address);
-  }
+  const swappableTokens: string[] = swapTokenAllowList
+    .filter((token) => token.address).map((token) => token.address as string);
+
   if (swappableTokens.length === 0) return undefined;
 
   const swapFundingStep = await swapRoute(
