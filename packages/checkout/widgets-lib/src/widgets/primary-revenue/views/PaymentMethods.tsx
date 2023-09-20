@@ -27,7 +27,6 @@ export interface PaymentMethodsProps {
   sign: (paymentType: PaymentType) => Promise<SignResponse | undefined>;
   // SmartCheckout currently returns Promise<void> but later will return Promise<SmartCheckoutResult>
   smartCheckout: (x: SmartCheckoutInput) => Promise<SmartCheckoutResult | void>;
-
 }
 
 export function PaymentMethods({ checkBalances, sign, smartCheckout }: PaymentMethodsProps) {

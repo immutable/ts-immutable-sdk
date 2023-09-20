@@ -34,17 +34,19 @@ import { OnRampWidget } from '../on-ramp/OnRampWidget';
 import { useSignOrder } from './hooks/useSignOrder';
 import { Item } from './hooks/useMergeItemsInfo';
 import { useSmartCheckout } from './hooks/useSmartCheckout';
+import { ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
 
 export interface PrimaryRevenueWidgetProps {
   config: StrongCheckoutWidgetsConfig;
   amount: string;
   fromCurrency: string;
   items: Item[];
+  params: ConnectLoaderParams
 }
 
 export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
   const {
-    config, amount, fromCurrency, items,
+    config, amount, fromCurrency, items, params,
   } = props;
 
   const { connectLoaderState } = useContext(ConnectLoaderContext);
@@ -150,7 +152,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
           />
         )}
         {viewState.view.type === PrimaryRevenueWidgetViews.PAY_WITH_CARD && (
-          <PayWithCard config={config} />
+          <PayWithCard config={config} passport={params.passport} />
         )}
         {viewState.view.type === SharedViews.TOP_UP_VIEW && (
           <TopUpView
