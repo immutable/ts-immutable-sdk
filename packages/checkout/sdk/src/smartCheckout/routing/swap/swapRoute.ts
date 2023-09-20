@@ -20,16 +20,16 @@ export const getRequiredToken = (
   let address = '';
   let amount = BigNumber.from(0);
 
-  if (balanceRequirement.type === ItemType.ERC20) {
-    address = balanceRequirement.required.token.address ?? '';
-  }
-
-  if (balanceRequirement.type === ItemType.NATIVE) {
-    address = IMX_ADDRESS_ZKEVM;
-  }
-
-  if (balanceRequirement.type === ItemType.ERC20 || balanceRequirement.type === ItemType.NATIVE) {
-    amount = balanceRequirement.delta.balance;
+  switch (balanceRequirement.type) {
+    case ItemType.ERC20:
+      address = balanceRequirement.required.token.address ?? '';
+      amount = balanceRequirement.delta.balance;
+      break;
+    case ItemType.NATIVE:
+      address = IMX_ADDRESS_ZKEVM;
+      amount = balanceRequirement.delta.balance;
+      break;
+    default: break;
   }
 
   return { address, amount };
@@ -138,9 +138,8 @@ export const swapRoute = async (
 
   const l2TokenBalanceResult = tokenBalanceResults.get(getL2ChainId(config));
   if (!l2TokenBalanceResult) return undefined;
-  const l2balances = l2TokenBalanceResult.balances;
-  if (l2balances.length === 0) return undefined;
-  if (swappableTokens.length === 0) return undefined;
+  const l2Balances = l2TokenBalanceResult.balances;
+  if (l2Balances.length === 0) return undefined;
 
   const quotes = await getOrSetQuotesFromCache(
     config,
@@ -156,7 +155,7 @@ export const swapRoute = async (
     const quote = quotes.get(quoteTokenAddress);
     if (!quote) continue;
     // Find the balance the user has for this quoted token
-    const userBalanceOfQuotedToken = l2balances.find((balance) => balance.token.address === quoteTokenAddress);
+    const userBalanceOfQuotedToken = l2Balances.find((balance) => balance.token.address === quoteTokenAddress);
     // If no balance found on L2 for this quoted token then continue
     if (!userBalanceOfQuotedToken) continue;
     // Check the amount of quoted token required against the user balance
@@ -165,13 +164,13 @@ export const swapRoute = async (
     // If user does not have enough balance to perform the swap with this token then continue
     if (userBalanceOfQuotedToken.balance.lt(amountOfQuoteTokenRequired.value)) continue;
 
-    const approvalFees = checkUserCanCoverApprovalFees(l2balances, quote.approval);
+    const approvalFees = checkUserCanCoverApprovalFees(l2Balances, quote.approval);
     // If user does not have enough to cover approval fees then continue
     if (!approvalFees.sufficient) continue;
 
     // If user does not have enough to cover swap fees then continue
     if (!checkUserCanCoverSwapFees(
-      l2balances,
+      l2Balances,
       quote.quote.fees,
       approvalFees,
       {
