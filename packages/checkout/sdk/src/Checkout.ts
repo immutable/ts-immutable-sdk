@@ -45,11 +45,15 @@ import {
   GasEstimateSwapResult,
   GasEstimateBridgeToL2Result,
   SmartCheckoutParams,
+  TokenFilterTypes,
+  OnRampProviderFees,
+  FiatRampParams,
 } from './types';
 import { CheckoutConfiguration } from './config';
 import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
 import { SellParams } from './types/sell';
 import { CancelParams } from './types/cancel';
+import { FiatRampService, FiatRampWidgetParams } from './fiatRamp';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
@@ -59,6 +63,8 @@ const SANDBOX_CONFIGURATION = {
 
 export class Checkout {
   readonly config: CheckoutConfiguration;
+
+  readonly fiatRampService: FiatRampService;
 
   private readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>;
 
@@ -70,6 +76,7 @@ export class Checkout {
     config: CheckoutModuleConfiguration = SANDBOX_CONFIGURATION,
   ) {
     this.config = new CheckoutConfiguration(config);
+    this.fiatRampService = new FiatRampService(this.config);
     this.readOnlyProviders = new Map<ChainId, ethers.providers.JsonRpcProvider>();
   }
 
@@ -308,7 +315,13 @@ export class Checkout {
       params.provider,
     );
 
-    await sell.sell(this.config, web3Provider, params.id, params.collectionAddress, params.buyToken);
+    await sell.sell(
+      this.config,
+      web3Provider,
+      params.id,
+      params.collectionAddress,
+      params.buyToken,
+    );
   }
 
   /**
@@ -352,6 +365,7 @@ export class Checkout {
       params.provider,
     );
 
+    // console.log('Smart Checkout Params ::', params);
     await smartCheckout.smartCheckout(
       this.config,
       web3Provider,
@@ -389,5 +403,48 @@ export class Checkout {
       this.readOnlyProviders,
       this.config,
     );
+  }
+
+  /**
+   * Creates and returns a URL for the fiat ramp widget.
+   * @param {FiatRampParams} params - The parameters for creating the url.
+   * @returns {Promise<string>} - A promise that resolves to a string url.
+   */
+  public async createFiatRampUrl(params: FiatRampParams): Promise<string> {
+    let tokenAmount;
+    let tokenSymbol = 'IMX';
+    let email;
+
+    const walletAddress = await params.web3Provider.getSigner().getAddress();
+    const isPassport = (params.web3Provider.provider as any)?.isPassport || false;
+
+    if (isPassport && params.passport) {
+      const userInfo = await params.passport.getUserInfo();
+      email = userInfo?.email;
+    }
+
+    const tokenList = await tokens.getTokenAllowList(this.config, { type: TokenFilterTypes.ONRAMP });
+    const token = tokenList.tokens.find((t) => t.address?.toLowerCase() === params.tokenAddress?.toLowerCase());
+    if (token) {
+      tokenAmount = params.tokenAmount;
+      tokenSymbol = token.symbol;
+    }
+
+    return await this.fiatRampService.createWidgetUrl({
+      exchangeType: params.exchangeType,
+      isPassport,
+      walletAddress,
+      tokenAmount,
+      tokenSymbol,
+      email,
+    } as FiatRampWidgetParams);
+  }
+
+  /**
+   * Fetches fiat ramp fee estimations.
+   * @returns {Promise<OnRampProviderFees>} - A promise that resolves to OnRampProviderFees.
+   */
+  public async getExchangeFeeEstimate(): Promise<OnRampProviderFees> {
+    return await this.fiatRampService.feeEstimate();
   }
 }

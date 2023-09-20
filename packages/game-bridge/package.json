@@ -11,23 +11,25 @@
     "parcel": "^2.8.3"
   },
   "scripts": {
-    "build": "parcel build --no-cache --no-optimize",
+    "build": "parcel build --no-cache --no-scope-hoist",
     "start": "parcel"
   },
   "source": "src/index.html",
   "targets": {
     "unity": {
       "context": "browser",
+      "source": "src/index.html",
       "engines": {
         "browsers": "Chrome 90"
       }
     },
     "unreal": {
+      "outputFormat": "global",
       "context": "browser",
+      "source": "src/index.ts",
       "engines": {
-        "browsers": "Chrome 59"
-      },
-      "outputFormat": "global"
+        "browsers": "Chrome 90"
+      }
     }
   }
 }

@@ -8,9 +8,10 @@ import {
   PriceDisplay,
 } from '@biom3/react';
 import {
-  useContext, useEffect, useState,
+  useContext, useEffect, useMemo, useState,
 } from 'react';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
+import { TokenFilterTypes, TokenInfo } from '@imtbl/checkout-sdk';
 import {
   balanceItemContainerStyle,
   balanceItemCoinBoxStyle,
@@ -43,8 +44,20 @@ export function BalanceItem({ balanceInfo, bridgeToL2OnClick }: BalanceItemProps
   const [isBridgeEnabled, setIsBridgeEnabled] = useState<boolean>();
   const [isSwapEnabled, setIsSwapEnabled] = useState<boolean>();
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+  const [onRampAllowedTokens, setOnRampAllowedTokens] = useState<TokenInfo[]>([]);
 
   const isPassport = isPassportProvider(provider);
+
+  useEffect(() => {
+    const getOnRampAllowedTokens = async () => {
+      if (!checkout) return;
+      const onRampAllowedTokensResult = await checkout.getTokenAllowList(
+        { type: TokenFilterTypes.ONRAMP, chainId: getL2ChainId(checkout.config) },
+      );
+      setOnRampAllowedTokens(onRampAllowedTokensResult.tokens);
+    };
+    getOnRampAllowedTokens();
+  }, [checkout]);
 
   useEffect(() => {
     if (!network || !supportedTopUps || !checkout) return;
@@ -63,6 +76,13 @@ export function BalanceItem({ balanceInfo, bridgeToL2OnClick }: BalanceItemProps
     setIsSwapEnabled(enableSwapCoin);
   }, [network, supportedTopUps, checkout, isPassport]);
 
+  const showAddMenuItem = useMemo(
+    () => Boolean(isOnRampEnabled
+    && onRampAllowedTokens.length > 0
+    && onRampAllowedTokens.find((token) => token.address?.toLowerCase() === balanceInfo.address?.toLowerCase())),
+    [isOnRampEnabled, onRampAllowedTokens],
+  );
+
   return (
     <Box
       testId={`balance-item-${balanceInfo.symbol}`}
@@ -78,8 +98,7 @@ export function BalanceItem({ balanceInfo, bridgeToL2OnClick }: BalanceItemProps
       <Box sx={balanceItemPriceBoxStyle}>
         <PriceDisplay
           testId={`balance-item-${balanceInfo.symbol}`}
-          use={Heading}
-          size="xSmall"
+          use={<Heading size="xSmall" />}
           price={tokenValueFormat(balanceInfo.balance)}
           fiatAmount={fiatAmount}
         />
@@ -87,7 +106,7 @@ export function BalanceItem({ balanceInfo, bridgeToL2OnClick }: BalanceItemProps
           <OverflowPopoverMenu size="small" testId="token-menu">
             <MenuItem
               testId="balance-item-add-option"
-              sx={ShowMenuItem(isOnRampEnabled)}
+              sx={ShowMenuItem(showAddMenuItem)}
               onClick={() => {
                 orchestrationEvents.sendRequestOnrampEvent(eventTarget, IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {
                   tokenAddress: balanceInfo.address ?? '',

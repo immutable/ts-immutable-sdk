@@ -38,6 +38,14 @@ export class ERC721 {
   }
 
   /**
+   * Returns the domain separator used in the encoding of the signature for permits, as defined by EIP-712
+   * @return the bytes32 domain separator
+   */
+  public async DOMAIN_SEPARATOR(provider: Provider, overrides?: CallOverrides): Promise<string> {
+    return await this.contract.connect(provider).DOMAIN_SEPARATOR(overrides);
+  }
+
+  /**
    * @returns the MINTER_ROLE as a string.
    */
   public async MINTER_ROLE(provider: Provider, overrides: CallOverrides = {}): Promise<string> {
@@ -67,6 +75,27 @@ export class ERC721 {
    */
   public async contractURI(provider: Provider, overrides: CallOverrides = {}): Promise<string> {
     return await this.contract.connect(provider).contractURI(overrides);
+  }
+
+  /**
+   * @dev returns the fields and values that describe the domain separator used by this contract for EIP-712
+   * signature.
+   */
+  public async eip712Domain(
+    provider: Provider,
+    overrides?: CallOverrides,
+  ): Promise<
+    [string, string, string, BigNumber, string, string, BigNumber[]] & {
+      fields: string;
+      name: string;
+      version: string;
+      chainId: BigNumber;
+      verifyingContract: string;
+      salt: string;
+      extensions: BigNumber[];
+    }
+    > {
+    return await this.contract.eip712Domain(overrides);
   }
 
   /**
@@ -164,6 +193,19 @@ export class ERC721 {
   }
 
   /**
+   * Returns the current nonce of a given token ID.
+   * @param tokenId The ID of the token for which to retrieve the nonce.
+   * @return Current nonce of the given token.
+   */
+  public async nonces(
+    provider: Provider,
+    tokenId: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides,
+  ): Promise<BigNumber> {
+    return await this.contract.connect(provider).nonces(tokenId, overrides);
+  }
+
+  /**
    * @returns the operator allowlist as a string.
    */
   public async operatorAllowlist(provider: Provider, overrides: CallOverrides = {}): Promise<string> {
@@ -222,6 +264,23 @@ export class ERC721 {
     } = {},
   ): Promise<PopulatedTransaction> {
     return await this.contract.populateTransaction.approve(to, tokenId, overrides);
+  }
+
+  /**
+   * Function to approve by way of owner signature
+   * @param spender the address to approve
+   * @param tokenId the index of the NFT to approve the spender on
+   * @param deadline a timestamp expiry for the permit
+   * @param sig a traditional or EIP-2098 signature
+   */
+  public async populatePermit(
+    spender: PromiseOrValue<string>,
+    tokenId: PromiseOrValue<BigNumberish>,
+    deadline: PromiseOrValue<BigNumberish>,
+    sig: PromiseOrValue<BytesLike>,
+    overrides: CallOverrides = {},
+  ): Promise<PopulatedTransaction> {
+    return await this.contract.populateTransaction.permit(spender, tokenId, deadline, sig, overrides);
   }
 
   /**

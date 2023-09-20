@@ -1,5 +1,6 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber, Contract, utils } from 'ethers';
+import { HttpStatusCode } from 'axios';
 import {
   ChainId,
   ERC20ABI,
@@ -16,7 +17,7 @@ import { getTokenAllowList } from '../tokens';
 import { CheckoutConfiguration } from '../config';
 import {
   Blockscout,
-  BlockscoutAddressTokens,
+  BlockscoutTokens,
   BlockscoutTokenType,
 } from '../client';
 
@@ -104,18 +105,55 @@ export const getIndexerBalance = async (
   // Hold the items in an array for post-fetching processing
   const items = [];
 
-  const tokenType = [BlockscoutTokenType.ERC20];
+  const tokenType = BlockscoutTokenType.ERC20;
   // Given that the widgets aren't yet designed to support pagination,
   // fetch all the possible tokens associated to a given wallet address.
-  let resp: BlockscoutAddressTokens | undefined;
+  let resp: BlockscoutTokens | undefined;
   try {
     do {
       // eslint-disable-next-line no-await-in-loop
-      resp = await blockscoutClient.getAddressTokens({ walletAddress, tokenType, nextPage: resp?.next_page_params });
+      resp = await blockscoutClient.getTokensByWalletAddress({
+        walletAddress,
+        tokenType,
+        nextPage: resp?.next_page_params,
+      });
       items.push(...resp.items);
     } while (resp.next_page_params);
   } catch (err: any) {
-    throw new CheckoutError(err.message || 'InternalServerError', CheckoutErrorType.GET_INDEXER_BALANCE_ERROR, err);
+    // In case of a 404, the wallet is a new wallet that hasn't been indexed by
+    // the Blockscout just yet. This happens when a wallet hasn't had any
+    // activity on the chain. In this case, simply ignore the error and return
+    // no currencies.
+    // In case of a malformed wallet address, Blockscout returns a 422, which
+    // means we are safe to assume that a 404 is a missing wallet due to inactivity
+    // or simply an incorrect wallet address was provided.
+    if (err?.code !== HttpStatusCode.NotFound) {
+      throw new CheckoutError(
+        err.message || 'InternalServerError | getTokensByWalletAddress',
+        CheckoutErrorType.GET_INDEXER_BALANCE_ERROR,
+        err,
+      );
+    }
+  }
+
+  try {
+    const respNative = await blockscoutClient.getNativeTokenByWalletAddress({ walletAddress });
+    items.push(respNative);
+  } catch (err: any) {
+    // In case of a 404, the wallet is a new wallet that hasn't been indexed by
+    // the Blockscout just yet. This happens when a wallet hasn't had any
+    // activity on the chain. In this case, simply ignore the error and return
+    // no currencies.
+    // In case of a malformed wallet address, Blockscout returns a 422, which
+    // means we are safe to assume that a 404 is a missing wallet due to inactivity
+    // or simply an incorrect wallet address was provided.
+    if (err?.code !== HttpStatusCode.NotFound) {
+      throw new CheckoutError(
+        err.message || 'InternalServerError | getNativeTokenByWalletAddress',
+        CheckoutErrorType.GET_INDEXER_BALANCE_ERROR,
+        err,
+      );
+    }
   }
 
   return {
@@ -161,13 +199,10 @@ export const getBalances = async (
     });
 
   const balanceResults = await Promise.allSettled(allBalancePromises);
-  const balances = (
-    balanceResults.filter(
-      (result) => result.status === 'fulfilled',
-    ) as PromiseFulfilledResult<GetBalanceResult>[]
-  ).map(
-    (fulfilledResult: PromiseFulfilledResult<GetBalanceResult>) => fulfilledResult.value,
-  ) as GetBalanceResult[];
+  const balances = (balanceResults.filter(
+    (result) => result.status === 'fulfilled',
+  ) as PromiseFulfilledResult<GetBalanceResult>[]
+  ).map((result) => result.value);
 
   return { balances };
 };
@@ -201,5 +236,8 @@ export const getAllBalances = async (
     return await getIndexerBalance(walletAddress, chainId, tokens);
   }
 
+  // This fallback to use ERC20s calls which is a best effort solution
+  // Fails in fetching data from the RCP calls might result in some
+  // missing data.
   return await getBalances(config, web3Provider, walletAddress, tokens);
 };

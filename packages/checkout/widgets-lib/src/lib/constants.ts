@@ -1,6 +1,7 @@
 import { Environment } from '@imtbl/config';
-import { WalletProviderName } from '@imtbl/checkout-sdk';
+import { CheckoutErrorType, WalletProviderName } from '@imtbl/checkout-sdk';
 import { WidgetTheme } from './types';
+import { RetryType } from './retry';
 
 export const NATIVE = 'NATIVE';
 
@@ -21,6 +22,20 @@ export const IMX_ADDRESS_ZKEVM = '0x0000000000000000000000000000000000001010';
 export const FAQS_LINK = 'https://support.immutable.com/en/';
 
 /**
+ * Delay between retries (milliseconds)
+ */
+export const DEFAULT_RETRY_DELAY = 10 * 1000;
+
+/**
+ * Default retry policy for fetching balances from remote.
+ */
+export const DEFAULT_BALANCE_RETRY_POLICY: RetryType = {
+  retryIntervalMs: DEFAULT_RETRY_DELAY,
+  retries: 60, // retry up to DEFAULT_RETRY_DELAY / 1000 minutes
+  nonRetryable: (err: any) => err?.data?.code >= 500 || err.type === CheckoutErrorType.GET_ERC20_BALANCE_ERROR,
+};
+
+/**
  * Checkout Widget default env
  */
 export const DEFAULT_ENV = Environment.SANDBOX;
@@ -38,8 +53,7 @@ export const DEFAULT_PROVIDER = WalletProviderName.METAMASK;
 /**
  * Checkout Widget default onramp enabled flag
  */
-// TODO https://immutable.atlassian.net/browse/WT-1509
-export const DEFAULT_ON_RAMP_ENABLED = false;
+export const DEFAULT_ON_RAMP_ENABLED = true;
 
 /**
  * Checkout Widget default swap enabled flag

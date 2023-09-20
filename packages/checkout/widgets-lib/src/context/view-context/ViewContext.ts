@@ -4,6 +4,7 @@ import { WalletWidgetView } from './WalletViewContextTypes';
 import { PrefilledSwapForm, SwapWidgetView } from './SwapViewContextTypes';
 import { BridgeWidgetView, PrefilledBridgeForm } from './BridgeViewContextTypes';
 import { ViewType } from './ViewType';
+import { OnRampWidgetView } from './OnRampViewContextTypes';
 
 export enum SharedViews {
   LOADING_VIEW = 'LOADING_VIEW',
@@ -20,9 +21,10 @@ interface LoadingView extends ViewType {
   type: SharedViews.LOADING_VIEW
 }
 
-interface ErrorView extends ViewType {
+export interface ErrorView extends ViewType {
   type: SharedViews.ERROR_VIEW;
   error: Error;
+  tryAgain?: () => Promise<any>
 }
 
 interface TopUpView extends ViewType {
@@ -36,7 +38,8 @@ export type View =
   | ConnectWidgetView
   | WalletWidgetView
   | SwapWidgetView
-  | BridgeWidgetView;
+  | BridgeWidgetView
+  | OnRampWidgetView;
 
 export interface ViewState {
   view: View;

@@ -85,6 +85,29 @@ export const cyIntercept = (overrides?: {
         },
       },
     },
+    onramp: {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      201811419111: {
+        tokens: [
+          {
+            address: 0x0000000000000000000000000000000000001010,
+            name: 'IMX',
+            symbol: 'IMX',
+            decimals: 18,
+          },
+          {
+            address: '0x65AA7a21B0f3ce9B478aAC3408fE75b423939b1F',
+            name: 'ETH',
+            symbol: 'ETH',
+            decimals: 18,
+          },
+        ],
+        fees: {
+          minPercentage: '3.5',
+          maxPercentage: '5.5',
+        },
+      },
+    },
   };
   const defaultTokensConfig = {
     [ChainId.IMTBL_ZKEVM_TESTNET]: {
@@ -144,6 +167,19 @@ export const cyIntercept = (overrides?: {
     ...defaultTokensConfig,
     ...overrides?.tokenConfigOverrides && overrides.tokenConfigOverrides,
   });
+  cy.intercept('https://cdn.segment.com/v1/projects/b69BcXnFXdaiFC6MqRQiHvjcPrTxftZl/settings', {
+  });
+  cy.intercept('https://cdn.segment.com/v1/projects//settings', {
+  });
+  cy.intercept('https://api.segment.com/v1/p', {
+    success: true,
+  });
+  cy.intercept('https://api.segment.com/v1/t', {
+    success: true,
+  });
+  cy.intercept('https://api.segment.com/v1/i', {
+    success: true,
+  }); // intercept analytics being sent to segment from tests
   cy.intercept(
     `${checkoutApi}/fiat/coins/all*`,
     overrides?.cryptoFiatOverrides?.coins || [

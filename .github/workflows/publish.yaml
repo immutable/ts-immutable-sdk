@@ -30,9 +30,10 @@ on:
 jobs:
   Publish:
     name: Publish Workflow
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-4-cores
     env:
       GH_TOKEN: ${{ secrets.PLATFORM_SA_GITHUB_TOKEN }}
+      NODE_OPTIONS: --max-old-space-size=14366
     steps:
       - name: Check Public Release Branch
         if: contains(github.event.inputs.release_type, 'release') && (github.ref != 'refs/heads/main')
@@ -83,8 +84,7 @@ jobs:
         run: |
           echo "NEXT_VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
 
-      - name: Update package.json version for pre (alpha) releases
-        if: contains(github.event.inputs.release_type, 'alpha')
+      - name: Update package.json version for build
         run: |
           tmp=$(mktemp)
           jq '.version = "${{steps.version.outputs.NEXT_VERSION}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
@@ -132,12 +132,3 @@ jobs:
         run: |
           echo "RELEASE_NAME=$(gh release view --json name | jq -r .name)" >> $GITHUB_OUTPUT
           echo "RELEASE_URL=$(gh release view --json url | jq -r .url)" >> $GITHUB_OUTPUT
-
-      - name: Comment on PR
-        if: contains(github.event.inputs.release_type, 'release') && github.event.inputs.dry_run == 'false'
-        run: |
-          tempBody=$(mktemp)
-          echo "@${{ github.triggering_actor }} Released SDK version ${{ env.RELEASE_NAME }} 🎉🎉🎉
-          
-          The GitHub release can be found here: ${{ env.RELEASE_URL }}" > $tempBody
-          gh pr comment --body-file $tempBody

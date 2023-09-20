@@ -5,6 +5,7 @@ import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes
 import { SharedViews } from '../../context/view-context/ViewContext';
 import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
+import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextTypes';
 
 export const text = {
   views: {
@@ -257,6 +258,32 @@ export const text = {
       body: "Moving funds across networks currently isn't supported for Passport.",
       actionText: 'Dismiss',
     },
+    [OnRampWidgetViews.ONRAMP]: {
+      header: {
+        title: 'Add coins',
+      },
+      initialLoadingText: 'Taking you to Transak',
+      [OnRampWidgetViews.IN_PROGRESS_LOADING]: {
+        loading: {
+          text: 'Transak is processing your order',
+        },
+      },
+      [OnRampWidgetViews.IN_PROGRESS]: {
+        content: {
+          heading: 'Order in progress',
+          body1: 'You’ll receive an email from Transak when complete. This can take up to 3 mins.',
+          body2: 'You can close this window, the transaction will be reflected in your wallet once complete.',
+        },
+      },
+      [OnRampWidgetViews.SUCCESS]: {
+        text: 'Coins are on the way',
+        actionText: 'Done',
+      },
+      [OnRampWidgetViews.FAIL]: {
+        text: 'Transaction failed',
+        actionText: 'Try again',
+      },
+    },
     [SharedViews.TOP_UP_VIEW]: {
       header: {
         title: 'How would you like to add coins?',
@@ -264,8 +291,8 @@ export const text = {
       topUpOptions: {
         onramp: {
           heading: 'Buy with card',
-          caption: 'Google pay & Apple pay available. Minimum $20.',
-          subcaption: 'Fees ≈ 0.3%',
+          caption: 'Google pay & Apple pay available. Minimum $5.',
+          subcaption: 'Fees ≈',
         },
         swap: {
           heading: 'Swap my coins',

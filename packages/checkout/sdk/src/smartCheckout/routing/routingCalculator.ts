@@ -1,19 +1,74 @@
 import { BigNumber } from 'ethers';
 import { RoutingOptionsAvailable } from '../../types';
-import { BalanceCheckResult } from '../balanceCheck/types';
-import { RoutingCalculatorResult } from './types';
+import { BalanceCheckResult, BalanceRequirement } from '../balanceCheck/types';
+import {
+  FundingRouteType,
+  RouteCalculatorType,
+  RoutingCalculatorResult,
+} from './types';
+import { getAllTokenBalances } from './tokenBalances';
+import { bridgeRoute } from './bridge/bridgeRoute';
+import { CheckoutConfiguration } from '../../config';
+import { createReadOnlyProviders } from '../../readOnlyProviders/readOnlyProvider';
+import { CheckoutError, CheckoutErrorType } from '../../errors';
+
+export const getInsufficientRequirement = (
+  balanceRequirements: BalanceCheckResult,
+): BalanceRequirement | undefined => {
+  let insufficientBalanceCount = 0;
+  let insufficientBridgeRequirement;
+  for (const balanceRequirement of balanceRequirements.balanceRequirements) {
+    if (!balanceRequirement.sufficient) {
+      insufficientBalanceCount++;
+      insufficientBridgeRequirement = balanceRequirement;
+    }
+  }
+  if (insufficientBalanceCount === 1) return insufficientBridgeRequirement;
+
+  return undefined;
+};
 
 export const routingCalculator = async (
+  config: CheckoutConfiguration,
+  ownerAddress: string,
   balanceRequirements: BalanceCheckResult,
   availableRoutingOptions: RoutingOptionsAvailable,
 ): Promise<RoutingCalculatorResult> => {
-  // eslint-disable-next-line no-console
-  console.log('routingCalculator', availableRoutingOptions, balanceRequirements);
-  // Get native & token balances on L1 & L2
+  let readOnlyProviders;
+  try {
+    readOnlyProviders = await createReadOnlyProviders(config);
+  } catch (err: any) {
+    throw new CheckoutError(
+      'Error occurred while creating read only providers',
+      CheckoutErrorType.PROVIDER_ERROR,
+      { message: err.message },
+    );
+  }
 
-  // Get allowed tokens?
+  const tokenBalances = await getAllTokenBalances(
+    config,
+    readOnlyProviders,
+    ownerAddress,
+    availableRoutingOptions,
+  );
 
-  // Check bridging routes
+  // Bridge and swap fee cache
+  const feeEstimates = new Map<FundingRouteType, BigNumber>();
+
+  // Ensures only 1 balance requirement is insufficient otherwise one bridge route cannot be recommended
+  let bridgeFundingStep;
+  const insufficientRequirement = getInsufficientRequirement(balanceRequirements);
+  if (availableRoutingOptions.bridge && insufficientRequirement) {
+    bridgeFundingStep = await bridgeRoute(
+      config,
+      readOnlyProviders,
+      ownerAddress,
+      availableRoutingOptions,
+      insufficientRequirement,
+      tokenBalances,
+      feeEstimates,
+    );
+  }
 
   // Check on-ramp routes
 
@@ -22,27 +77,26 @@ export const routingCalculator = async (
   // > Could on-ramp first
   // > Could double swap
 
+  if (bridgeFundingStep) {
+    return {
+      availableOptions: [],
+      response: {
+        type: RouteCalculatorType.ROUTES_FOUND,
+        message: 'Routes found',
+      },
+      fundingRoutes: [{
+        priority: 1,
+        steps: [bridgeFundingStep],
+      }],
+    };
+  }
+
   return {
     availableOptions: [],
     response: {
-      type: 'ROUTES_FOUND',
-      message: 'Routes found',
+      type: RouteCalculatorType.NO_ROUTES,
+      message: 'Routes not found',
     },
-    fundingRoutes: [{
-      priority: 1,
-      steps: [{
-        type: 'bridge',
-        chainId: 1,
-        asset: {
-          balance: BigNumber.from(0),
-          formattedBalance: '0',
-          token: {
-            name: 'ETH',
-            symbol: 'ETH',
-            decimals: 18,
-          },
-        },
-      }],
-    }],
+    fundingRoutes: [],
   };
 };

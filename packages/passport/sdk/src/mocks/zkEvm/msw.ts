@@ -3,10 +3,9 @@ import { RequestHandler, rest } from 'msw';
 import { SetupServer, setupServer } from 'msw/node';
 import { RelayerTransactionRequest } from '../../zkEvm/relayerClient';
 import { JsonRpcRequestPayload } from '../../zkEvm/types';
+import { chainId, chainIdHex } from '../../test/mocks';
 
 export const relayerId = '0x745';
-export const chainId = '13472';
-export const chainIdHex = '0x343C';
 export const transactionHash = '0x867';
 
 const mandatoryHandlers = [

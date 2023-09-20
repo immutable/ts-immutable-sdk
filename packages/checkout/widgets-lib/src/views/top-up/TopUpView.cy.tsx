@@ -1,12 +1,10 @@
 import {
-  describe, it, cy, beforeEach,
+  beforeEach, cy, describe, it,
 } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { BiomeCombinedProviders } from '@biom3/react';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
-import {
-  Checkout, WalletProviderName, GasEstimateType,
-} from '@imtbl/checkout-sdk';
+import { Checkout, GasEstimateType, WalletProviderName } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { BigNumber } from 'ethers';
 import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
@@ -15,7 +13,6 @@ import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { orchestrationEvents } from '../../lib/orchestrationEvents';
 import { WalletWidgetTestComponent } from '../../widgets/wallet/test-components/WalletWidgetTestComponent';
 import { WalletState } from '../../widgets/wallet/context/WalletContext';
-import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import { ConnectionStatus } from '../../context/connect-loader-context/ConnectLoaderContext';
 import {
   ConnectLoaderTestComponent,
@@ -269,6 +266,8 @@ describe('Top Up View', () => {
   });
 
   describe('Fee display', () => {
+    const cryptoConversions = new Map<string, number>([['eth', 2000], ['imx', 1.5], ['usdc', 1]]);
+
     const baseWalletState: WalletState = {
       network: null,
       walletProvider: WalletProviderName.METAMASK,
@@ -280,7 +279,14 @@ describe('Top Up View', () => {
       cyIntercept();
     });
 
-    it('should display fees for swap and bridge', () => {
+    it('should display fees for onramp, swap and bridge', () => {
+      cy.stub(Checkout.prototype, 'getExchangeFeeEstimate')
+        .as('getExchangeFeeEstimateStub')
+        .onFirstCall()
+        .resolves({
+          minPercentage: '3.5',
+          maxPercentage: '5.5',
+        });
       cy.stub(Checkout.prototype, 'gasEstimate')
         .as('gasEstimateStub')
         .onFirstCall()
@@ -317,25 +323,66 @@ describe('Top Up View', () => {
         });
 
       mount(
-        <CryptoFiatProvider environment={Environment.SANDBOX}>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <WalletWidgetTestComponent
+            initialStateOverride={baseWalletState}
+            cryptoConversionsOverride={cryptoConversions}
           >
-            <WalletWidgetTestComponent initialStateOverride={baseWalletState}>
-              <TopUpView
-                showOnrampOption
-                showSwapOption
-                showBridgeOption
-                widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
-                onCloseButtonClick={() => {}}
-              />
-            </WalletWidgetTestComponent>
-          </ConnectLoaderTestComponent>
-        </CryptoFiatProvider>,
+            <TopUpView
+              showOnrampOption
+              showSwapOption
+              showBridgeOption
+              widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
+              onCloseButtonClick={() => {}}
+            />
+          </WalletWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
       );
 
+      cySmartGet('menu-item-caption-swap').contains('Using the coins I have on the same network');
       cySmartGet('menu-item-caption-swap').contains('$0.20 USD');
+
+      cySmartGet('menu-item-caption-bridge').contains('From the coins I have on a different network');
       cySmartGet('menu-item-caption-bridge').contains('$0.40 USD');
+
+      cySmartGet('menu-item-caption-onramp').contains('Google pay & Apple pay available. Minimum $5.');
+      cySmartGet('menu-item-caption-onramp').contains('3.5% to 5.5%');
+    });
+
+    it('should display placeholder fees for onramp, swap and bridge', () => {
+      cy.stub(Checkout.prototype, 'getExchangeFeeEstimate')
+        .as('getExchangeFeeEstimateStub')
+        .onFirstCall()
+        .rejects();
+      cy.stub(Checkout.prototype, 'gasEstimate')
+        .as('gasEstimateStub')
+        .onFirstCall()
+        .rejects();
+
+      mount(
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <WalletWidgetTestComponent
+            initialStateOverride={baseWalletState}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <TopUpView
+              showOnrampOption
+              showSwapOption
+              showBridgeOption
+              widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
+              onCloseButtonClick={() => {}}
+            />
+          </WalletWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
+      );
+
+      cySmartGet('menu-item-caption-swap').contains('$-.-- USD');
+      cySmartGet('menu-item-caption-bridge').contains('$-.-- USD');
+      cySmartGet('menu-item-caption-onramp').contains('-.--%');
     });
   });
 });

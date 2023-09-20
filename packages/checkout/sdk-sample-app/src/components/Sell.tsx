@@ -3,8 +3,8 @@ import { Web3Provider } from '@ethersproject/providers';
 import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
-import { Box, FormControl, Select, TextInput, Option, Button, OptionKey } from '@biom3/react';
-import { BigNumber } from 'ethers';
+import { Box, FormControl, Select, TextInput, Option, OptionKey } from '@biom3/react';
+import { utils } from 'ethers';
 
 interface SellProps {
   checkout: Checkout;
@@ -31,12 +31,12 @@ export default function Sell({ checkout, provider }: SellProps) {
     if (listingType === ItemType.NATIVE) {
       return {
         type: ItemType.NATIVE,
-        amount: BigNumber.from(amount).mul(BigNumber.from(10).pow(18)),
+        amount: utils.parseUnits(amount, 18),
       }
     }
     return {
       type: ItemType.ERC20,
-      amount: BigNumber.from(amount).mul(BigNumber.from(10).pow(18)),
+      amount: utils.parseUnits(amount, 18),
       contractAddress,
     };
   }
@@ -107,7 +107,7 @@ export default function Sell({ checkout, provider }: SellProps) {
 
   const updateAmount = (event: any) => {
     const value = event.target.value;
-    setAmount(value.split('.')[0]);
+    setAmount(value);
     setAmountError('');
   }
 
