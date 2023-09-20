@@ -124,7 +124,7 @@ describe('quoteFetcher', () => {
 
   it('should fetch quotes', async () => {
     (createExchangeInstance as jest.Mock).mockReturnValue({
-      getUnsignedSwapTxFromAmountIn: jest.fn()
+      getUnsignedSwapTxFromAmountOut: jest.fn()
         .mockResolvedValueOnce(
           constructTransactionResponse(1, 2, 3, 4),
         )
@@ -157,7 +157,7 @@ describe('quoteFetcher', () => {
 
   it('should fetch quotes with no approval', async () => {
     (createExchangeInstance as jest.Mock).mockReturnValue({
-      getUnsignedSwapTxFromAmountIn: jest.fn()
+      getUnsignedSwapTxFromAmountOut: jest.fn()
         .mockResolvedValueOnce(
           constructTransactionResponse(1, 2, 3),
         )
@@ -190,7 +190,7 @@ describe('quoteFetcher', () => {
 
   it('should fetch quotes with no swap', async () => {
     (createExchangeInstance as jest.Mock).mockReturnValue({
-      getUnsignedSwapTxFromAmountIn: jest.fn()
+      getUnsignedSwapTxFromAmountOut: jest.fn()
         .mockResolvedValueOnce(
           constructTransactionResponse(1, 2),
         )

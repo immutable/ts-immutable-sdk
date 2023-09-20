@@ -23,7 +23,7 @@ export const quoteFetcher = async (
 
     // Create a quote for each swappable token
     for (const swappableToken of swappableTokens) {
-      dexTransactionResponsePromises.push(exchange.getUnsignedSwapTxFromAmountIn(
+      dexTransactionResponsePromises.push(exchange.getUnsignedSwapTxFromAmountOut(
         walletAddress,
         swappableToken,
         requiredToken.address,

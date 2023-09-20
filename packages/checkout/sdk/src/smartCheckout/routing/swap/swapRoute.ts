@@ -20,15 +20,15 @@ export const getRequiredToken = (
   let address = '';
   let amount = BigNumber.from(0);
 
-  if (balanceRequirement.required.type === ItemType.ERC20) {
+  if (balanceRequirement.type === ItemType.ERC20) {
     address = balanceRequirement.required.token.address ?? '';
   }
 
-  if (balanceRequirement.required.type === ItemType.NATIVE) {
+  if (balanceRequirement.type === ItemType.NATIVE) {
     address = IMX_ADDRESS_ZKEVM;
   }
 
-  if (balanceRequirement.required.type === ItemType.ERC20 || balanceRequirement.required.type === ItemType.NATIVE) {
+  if (balanceRequirement.type === ItemType.ERC20 || balanceRequirement.type === ItemType.NATIVE) {
     amount = balanceRequirement.delta.balance;
   }
 
@@ -152,16 +152,17 @@ export const swapRoute = async (
   );
 
   const quoteTokenAddresses = Array.from(quotes.keys());
+
   for (const quoteTokenAddress of quoteTokenAddresses) {
     const quote = quotes.get(quoteTokenAddress);
     if (!quote) continue;
-
     // Find the balance the user has for this quoted token
     const userBalanceOfQuotedToken = l2balances.find((balance) => balance.token.address === quoteTokenAddress);
     // If no balance found on L2 for this quoted token then continue
     if (!userBalanceOfQuotedToken) continue;
     // Check the amount of quoted token required against the user balance
     const amountOfQuoteTokenRequired = quote.quote.amount;
+
     // If user does not have enough balance to perform the swap with this token then continue
     if (userBalanceOfQuotedToken.balance.lt(amountOfQuoteTokenRequired.value)) continue;
 
