@@ -12,45 +12,41 @@ export function validateAndBuildVersion(
 ): string {
   const defaultPackageVersion = globalPackageVersion();
 
-  if (version === undefined) return defaultPackageVersion;
+  if (version === undefined || version.major === undefined) return defaultPackageVersion;
 
-  // Pre-production release
-  // TODO: https://immutable.atlassian.net/browse/WT-1501
-  if (
-    version.major === undefined
-    || version.minor === undefined
-    || version.patch === undefined
-    || version.prerelease === undefined
-  ) return defaultPackageVersion;
+  if (!Number.isInteger(version.major) || version.major < 0) return defaultPackageVersion;
+  if (version.minor !== undefined && version.minor < 0) return defaultPackageVersion;
+  if (version.patch !== undefined && version.patch < 0) return defaultPackageVersion;
 
-  if (version.major < 0) return defaultPackageVersion;
-  if (version.minor < 0) return defaultPackageVersion;
-  if (version.patch < 0) return defaultPackageVersion;
-  if (version.prerelease !== 'alpha') return defaultPackageVersion;
-
+  if (version.major === 0 && version.minor === undefined) return defaultPackageVersion;
+  if (version.major === 0 && version.minor === 0 && version.patch === undefined) return defaultPackageVersion;
+  if (version.major === 0 && version.minor === undefined && version.patch === undefined) return defaultPackageVersion;
   if (version.major === 0 && version.minor === 0 && version.patch === 0) return defaultPackageVersion;
 
-  let validatedVersion: string = defaultPackageVersion;
+  let validatedVersion: string = version.major.toString();
 
-  if (!Number.isNaN(version.major) && version.major >= 0) {
-    validatedVersion = version.major.toString();
-  }
+  if (version.minor === undefined) return validatedVersion;
 
-  if (!Number.isNaN(version.minor)) {
+  if (Number.isInteger(version.minor)) {
     validatedVersion += `.${version.minor.toString()}`;
   }
 
-  if (!Number.isNaN(version.patch)) {
+  if (version.patch === undefined) return validatedVersion;
+
+  if (Number.isInteger(version.patch)) {
     validatedVersion += `.${version.patch.toString()}`;
   }
 
-  // TODO: https://immutable.atlassian.net/browse/WT-1501
-  // Ensure this is gated by `version.prerelease !== undefined`
-  // once we go to prod with checkout.
-  validatedVersion += `-${version.prerelease}`;
+  if (version.prerelease === undefined || version.prerelease !== 'alpha') return validatedVersion;
 
-  if (version.build !== undefined && version.build > 0) {
-    validatedVersion += `.${version.build}`;
+  if (version.prerelease === 'alpha') {
+    validatedVersion += `-${version.prerelease}`;
+  }
+
+  if (version.build === undefined) return validatedVersion;
+
+  if (Number.isInteger(version.build) && version.build >= 0) {
+    validatedVersion += `.${version.build.toString()}`;
   }
 
   return validatedVersion;

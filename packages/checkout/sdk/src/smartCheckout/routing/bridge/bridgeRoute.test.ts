@@ -11,20 +11,23 @@ import {
 import { CheckoutConfiguration } from '../../../config';
 import {
   ChainId,
+  FundingRouteType,
   ItemType,
 } from '../../../types';
 import { BalanceRequirement } from '../../balanceCheck/types';
-import { FundingRouteType, TokenBalanceResult } from '../types';
+import { TokenBalanceResult } from '../types';
 import { createBlockchainDataInstance } from '../../../instance';
 import { estimateGasForBridgeApproval } from './estimateApprovalGas';
 import { bridgeGasEstimate } from './bridgeGasEstimate';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from './constants';
 import { CheckoutErrorType } from '../../../errors';
+import { allowListCheckForBridge } from '../../allowList/allowListCheck';
 
 jest.mock('../../../gasEstimate');
 jest.mock('../../../instance');
 jest.mock('./estimateApprovalGas');
 jest.mock('./bridgeGasEstimate');
+jest.mock('../../allowList/allowListCheck');
 
 describe('bridgeRoute', () => {
   const config = new CheckoutConfiguration({
@@ -84,6 +87,13 @@ describe('bridgeRoute', () => {
         });
 
         (estimateGasForBridgeApproval as jest.Mock).mockResolvedValue(BigNumber.from(0));
+        (allowListCheckForBridge as jest.Mock).mockResolvedValue([
+          {
+            name: 'Ethereum',
+            symbol: 'ETH',
+            decimals: 18,
+          },
+        ]);
       });
 
       it('should return the bridge route if user has enough Ethereum & gas on L1', async () => {
@@ -218,6 +228,51 @@ describe('bridgeRoute', () => {
 
         expect(route).toBeUndefined();
       });
+
+      it('should not return bridge route if Ethereum is not on bridge allowlist', async () => {
+        const balances = new Map<ChainId, TokenBalanceResult>([
+          [ChainId.SEPOLIA, {
+            success: true,
+            balances: [
+              {
+                balance: BigNumber.from(20),
+                formattedBalance: '20',
+                token: {
+                  name: 'Immutable X',
+                  symbol: 'IMX',
+                  decimals: 18,
+                  address: '0xIMX',
+                },
+              },
+              {
+                balance: BigNumber.from(12),
+                formattedBalance: '12',
+                token: {
+                  name: 'Ethereum',
+                  symbol: 'ETH',
+                  decimals: 18,
+                },
+              },
+            ],
+          }],
+        ]);
+        (allowListCheckForBridge as jest.Mock).mockResolvedValue([]);
+
+        const route = await bridgeRoute(
+          config,
+          readonlyProviders,
+          '0xADDRESS',
+          {
+            bridge: true,
+          },
+          balanceRequirement,
+          balances,
+          feeEstimates,
+        );
+
+        expect(allowListCheckForBridge).toHaveBeenCalledTimes(1);
+        expect(route).toEqual(undefined);
+      });
     });
 
     describe('Bridge non-ETH ERC20', () => {
@@ -263,6 +318,14 @@ describe('bridgeRoute', () => {
         });
 
         (estimateGasForBridgeApproval as jest.Mock).mockResolvedValue(BigNumber.from(1));
+        (allowListCheckForBridge as jest.Mock).mockResolvedValue([
+          {
+            address: '0xROOT_ADDRESS',
+            name: '0xERC20',
+            symbol: '0xERC20',
+            decimals: 18,
+          },
+        ]);
       });
 
       it('should return the bridge route if user has enough ERC20 & gas on L1', async () => {
@@ -462,6 +525,51 @@ describe('bridgeRoute', () => {
 
         expect(route).toBeUndefined();
       });
+
+      it('should not return bridge route if ERC20 is not on bridge allowlist', async () => {
+        const balances = new Map<ChainId, TokenBalanceResult>([
+          [ChainId.SEPOLIA, {
+            success: true,
+            balances: [
+              {
+                balance: BigNumber.from(10),
+                formattedBalance: '10',
+                token: {
+                  name: 'Ethereum',
+                  symbol: 'ETH',
+                  decimals: 18,
+                },
+              },
+              {
+                balance: BigNumber.from(11),
+                formattedBalance: '11',
+                token: {
+                  name: '0xERC20',
+                  symbol: '0xERC20',
+                  decimals: 18,
+                  address: '0xROOT_ADDRESS',
+                },
+              },
+            ],
+          }],
+        ]);
+        (allowListCheckForBridge as jest.Mock).mockResolvedValue([]);
+
+        const route = await bridgeRoute(
+          config,
+          readonlyProviders,
+          '0xADDRESS',
+          {
+            bridge: true,
+          },
+          balanceRequirement,
+          balances,
+          feeEstimates,
+        );
+
+        expect(allowListCheckForBridge).toHaveBeenCalledTimes(1);
+        expect(route).toEqual(undefined);
+      });
     });
 
     it('should return undefined if no balance on layer 1', async () => {
@@ -518,7 +626,7 @@ describe('bridgeRoute', () => {
       expect(route).toBeUndefined();
     });
 
-    it('should throw error if no token balance result for L1', async () => {
+    it('should return undefined if no token balance result for L1', async () => {
       const balanceRequirement: BalanceRequirement = {
         type: ItemType.ERC20,
         sufficient: false,
@@ -557,31 +665,22 @@ describe('bridgeRoute', () => {
         }],
       ]);
 
-      let type;
-      let data;
+      const route = await bridgeRoute(
+        config,
+        readonlyProviders,
+        '0xADDRESS',
+        {
+          bridge: true,
+        },
+        balanceRequirement,
+        balances,
+        feeEstimates,
+      );
 
-      try {
-        await bridgeRoute(
-          config,
-          readonlyProviders,
-          '0xADDRESS',
-          {
-            bridge: true,
-          },
-          balanceRequirement,
-          balances,
-          feeEstimates,
-        );
-      } catch (err: any) {
-        type = err.type;
-        data = err.data;
-      }
-
-      expect(type).toEqual(CheckoutErrorType.GET_BALANCE_ERROR);
-      expect(data).toEqual({ chainId: ChainId.SEPOLIA.toString() });
+      expect(route).toEqual(undefined);
     });
 
-    it('should throw error if token balance returned unsuccessful on L1', async () => {
+    it('should return undefined if token balance returned unsuccessful on L1', async () => {
       const balanceRequirement: BalanceRequirement = {
         type: ItemType.ERC20,
         sufficient: false,
@@ -620,28 +719,19 @@ describe('bridgeRoute', () => {
         }],
       ]);
 
-      let type;
-      let data;
+      const route = await bridgeRoute(
+        config,
+        readonlyProviders,
+        '0xADDRESS',
+        {
+          bridge: true,
+        },
+        balanceRequirement,
+        balances,
+        feeEstimates,
+      );
 
-      try {
-        await bridgeRoute(
-          config,
-          readonlyProviders,
-          '0xADDRESS',
-          {
-            bridge: true,
-          },
-          balanceRequirement,
-          balances,
-          feeEstimates,
-        );
-      } catch (err: any) {
-        type = err.type;
-        data = err.data;
-      }
-
-      expect(type).toEqual(CheckoutErrorType.GET_BALANCE_ERROR);
-      expect(data).toEqual({ chainId: ChainId.SEPOLIA.toString() });
+      expect(route).toEqual(undefined);
     });
 
     it('should throw error if readonly providers missing L1', async () => {

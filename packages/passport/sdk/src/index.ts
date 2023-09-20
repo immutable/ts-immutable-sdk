@@ -8,6 +8,7 @@ export {
   Provider,
   ProviderEvent,
   AccountsChangedEvent,
+  TypedDataPayload,
 } from './zkEvm/types';
 export {
   JsonRpcError,
