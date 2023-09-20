@@ -43,6 +43,23 @@ export interface MetaTransactionNormalised {
   data: BytesLike
 }
 
+// https://eips.ethereum.org/EIPS/eip-712
+export interface TypedDataPayload {
+  types: {
+    EIP712Domain: Array<{ name: string; type: string }>;
+    [key: string]: Array<{ name: string; type: string }>;
+  };
+  domain: {
+    name?: string;
+    version? :string;
+    chainId?: number;
+    verifyingContract?: string;
+    salt?: string;
+  };
+  primaryType: string;
+  message: Record<string, any>;
+}
+
 export interface RequestArguments {
   method: string;
   params?: Array<any>;
