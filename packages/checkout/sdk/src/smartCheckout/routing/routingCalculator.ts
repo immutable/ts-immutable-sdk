@@ -142,57 +142,7 @@ export const routingCalculator = async (
   // > Could on-ramp first
   // > Could double swap
 
-  if (bridgeFundingStep && swapFundingStep) {
-    return {
-      availableOptions: [],
-      response: {
-        type: RouteCalculatorType.ROUTES_FOUND,
-        message: 'Routes found',
-      },
-      fundingRoutes: [
-        {
-          priority: 1,
-          steps: [bridgeFundingStep],
-        },
-        {
-          priority: 2,
-          steps: [swapFundingStep],
-        },
-      ],
-    };
-  }
-
-  if (bridgeFundingStep) {
-    return {
-      availableOptions: [],
-      response: {
-        type: RouteCalculatorType.ROUTES_FOUND,
-        message: 'Routes found',
-      },
-      fundingRoutes: [{
-        priority: 1,
-        steps: [bridgeFundingStep],
-      }],
-    };
-  }
-
-  if (swapFundingStep) {
-    return {
-      availableOptions: [],
-      response: {
-        type: RouteCalculatorType.ROUTES_FOUND,
-        message: 'Routes found',
-      },
-      fundingRoutes: [
-        {
-          priority: 1,
-          steps: [swapFundingStep],
-        },
-      ],
-    };
-  }
-
-  return {
+  const response: RoutingCalculatorResult = {
     availableOptions: [],
     response: {
       type: RouteCalculatorType.NO_ROUTES,
@@ -200,4 +150,29 @@ export const routingCalculator = async (
     },
     fundingRoutes: [],
   };
+
+  let priority = 0;
+
+  if (bridgeFundingStep || swapFundingStep) {
+    response.response.type = RouteCalculatorType.ROUTES_FOUND;
+    response.response.message = 'Routes found';
+  }
+
+  if (bridgeFundingStep) {
+    priority++;
+    response.fundingRoutes.push({
+      priority,
+      steps: [bridgeFundingStep],
+    });
+  }
+
+  if (swapFundingStep) {
+    priority++;
+    response.fundingRoutes.push({
+      priority,
+      steps: [swapFundingStep],
+    });
+  }
+
+  return response;
 };
