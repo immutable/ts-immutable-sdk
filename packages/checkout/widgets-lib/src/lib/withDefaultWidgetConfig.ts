@@ -18,17 +18,14 @@ export type StrongCheckoutWidgetsConfig = {
 
 function getValidTheme(theme?: string): WidgetTheme {
   if (!theme) return DEFAULT_THEME;
-  if (theme === WidgetTheme.LIGHT) return WidgetTheme.LIGHT;
-  if (theme === WidgetTheme.DARK) return WidgetTheme.DARK;
-  if (theme === WidgetTheme.CUSTOM) return WidgetTheme.CUSTOM;
-  return DEFAULT_THEME;
+  if (!Object.values(WidgetTheme).includes(theme as WidgetTheme)) return DEFAULT_THEME;
+  return theme as WidgetTheme;
 }
 
 function getValidEnvironment(env?: string): Environment {
   if (!env) return DEFAULT_ENV;
-  if (env === Environment.PRODUCTION) return Environment.PRODUCTION;
-  if (env === Environment.SANDBOX) return Environment.SANDBOX;
-  return DEFAULT_ENV;
+  if (!Object.values(Environment).includes(env as Environment)) return DEFAULT_ENV;
+  return env as Environment;
 }
 
 function getValidBoolean(defaultValue: boolean, value?: string): boolean {
