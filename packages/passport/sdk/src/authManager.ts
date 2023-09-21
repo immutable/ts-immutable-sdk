@@ -2,6 +2,7 @@ import {
   User as OidcUser,
   UserManager,
   UserManagerSettings,
+  WebStorageStateStore,
 } from 'oidc-client-ts';
 import axios from 'axios';
 import jwt_decode from 'jwt-decode';
@@ -47,6 +48,7 @@ const getAuthConfiguration = ({
     mergeClaims: true,
     loadUserInfo: true,
     scope: oidcConfiguration.scope,
+    userStore: new WebStorageStateStore({ store: window.localStorage }),
   };
 
   if (oidcConfiguration.audience) {

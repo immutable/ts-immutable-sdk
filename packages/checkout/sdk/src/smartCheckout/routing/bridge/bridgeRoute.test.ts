@@ -11,10 +11,11 @@ import {
 import { CheckoutConfiguration } from '../../../config';
 import {
   ChainId,
+  FundingRouteType,
   ItemType,
 } from '../../../types';
 import { BalanceRequirement } from '../../balanceCheck/types';
-import { FundingRouteType, TokenBalanceResult } from '../types';
+import { TokenBalanceResult } from '../types';
 import { createBlockchainDataInstance } from '../../../instance';
 import { estimateGasForBridgeApproval } from './estimateApprovalGas';
 import { bridgeGasEstimate } from './bridgeGasEstimate';
