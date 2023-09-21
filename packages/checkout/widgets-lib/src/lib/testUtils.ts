@@ -168,11 +168,18 @@ export const cyIntercept = (overrides?: {
     ...overrides?.tokenConfigOverrides && overrides.tokenConfigOverrides,
   });
   cy.intercept('https://cdn.segment.com/v1/projects/b69BcXnFXdaiFC6MqRQiHvjcPrTxftZl/settings', {
-    writeKey: 'segment-mock-write-key',
   });
   cy.intercept('https://cdn.segment.com/v1/projects//settings', {
-    writeKey: 'segment-mock-write-key',
   });
+  cy.intercept('https://api.segment.com/v1/p', {
+    success: true,
+  });
+  cy.intercept('https://api.segment.com/v1/t', {
+    success: true,
+  });
+  cy.intercept('https://api.segment.com/v1/i', {
+    success: true,
+  }); // intercept analytics being sent to segment from tests
   cy.intercept(
     `${checkoutApi}/fiat/coins/all*`,
     overrides?.cryptoFiatOverrides?.coins || [

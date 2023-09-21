@@ -129,7 +129,7 @@ describe('trades', () => {
         guardianClient: mockGuardianClient,
       })).rejects.toThrow(
         new PassportError(
-          `${PassportErrorType.CREATE_TRADE_ERROR}: ${mockErrorMessage}`,
+          mockErrorMessage,
           PassportErrorType.CREATE_TRADE_ERROR,
         ),
       );

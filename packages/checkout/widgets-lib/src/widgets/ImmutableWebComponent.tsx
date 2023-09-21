@@ -49,7 +49,7 @@ export abstract class ImmutableWebComponent extends HTMLElement {
     sdkVersionCheck('checkout-widgets', sdkVersion);
   }
 
-  private parseWidgetConfig(widgetsConfig?: string):StrongCheckoutWidgetsConfig {
+  private parseWidgetConfig(widgetsConfig?: string): StrongCheckoutWidgetsConfig {
     try {
       return withDefaultWidgetConfigs(
         JSON.parse(widgetsConfig || '{}'),

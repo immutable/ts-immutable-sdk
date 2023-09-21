@@ -93,7 +93,10 @@ describe('PassportImxProviderFactory', () => {
           authManagerMock.loginSilent.mockResolvedValue(mockUser);
 
           await expect(() => passportImxProviderFactory.getProvider()).rejects.toThrow(
-            'REFRESH_TOKEN_ERROR',
+            new PassportError(
+              'Retry failed',
+              PassportErrorType.REFRESH_TOKEN_ERROR,
+            ),
           );
 
           expect(authManagerMock.login).toHaveBeenCalledTimes(1);

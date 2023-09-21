@@ -1,7 +1,9 @@
 import {
+  InMemoryWebStorage,
   User as OidcUser,
   UserManager,
   UserManagerSettings,
+  WebStorageStateStore,
 } from 'oidc-client-ts';
 import axios from 'axios';
 import jwt_decode from 'jwt-decode';
@@ -30,6 +32,9 @@ const getAuthConfiguration = ({
   oidcConfiguration,
   authenticationDomain,
 }: PassportConfiguration): UserManagerSettings => {
+  const store = typeof window !== 'undefined' ? window.localStorage : new InMemoryWebStorage();
+  const userStore = new WebStorageStateStore({ store });
+
   const baseConfiguration: UserManagerSettings = {
     authority: authenticationDomain,
     redirect_uri: oidcConfiguration.redirectUri,
@@ -47,6 +52,7 @@ const getAuthConfiguration = ({
     mergeClaims: true,
     loadUserInfo: true,
     scope: oidcConfiguration.scope,
+    userStore,
   };
 
   if (oidcConfiguration.audience) {

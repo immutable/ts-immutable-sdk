@@ -67,7 +67,7 @@ describe('MagicWallet', () => {
         await magicWallet.login(idToken, config.network);
       }).rejects.toThrow(
         new PassportError(
-          'WALLET_CONNECTION_ERROR: oops',
+          'oops',
           PassportErrorType.WALLET_CONNECTION_ERROR,
         ),
       );

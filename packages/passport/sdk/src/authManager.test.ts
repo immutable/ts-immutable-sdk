@@ -1,5 +1,5 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { User as OidcUser, UserManager } from 'oidc-client-ts';
+import { User as OidcUser, UserManager, WebStorageStateStore } from 'oidc-client-ts';
 import AuthManager from './authManager';
 import { PassportError, PassportErrorType } from './errors/passportError';
 import { PassportConfiguration } from './config';
@@ -76,7 +76,7 @@ describe('AuthManager', () => {
   });
 
   describe('constructor', () => {
-    it('should initial AuthManager the configuration contains audience params', () => {
+    it('should initialise AuthManager with a configuration containing audience params', () => {
       const configWithAudience = new PassportConfiguration({
         baseConfig,
         logoutRedirectUri: 'https://test.com',
@@ -108,6 +108,7 @@ describe('AuthManager', () => {
         popup_redirect_uri: configWithAudience.oidcConfiguration.redirectUri,
         redirect_uri: configWithAudience.oidcConfiguration.redirectUri,
         scope: configWithAudience.oidcConfiguration.scope,
+        userStore: expect.any(WebStorageStateStore),
         extraQueryParams: {
           audience: configWithAudience.oidcConfiguration.audience,
         },
@@ -115,7 +116,7 @@ describe('AuthManager', () => {
     });
   });
 
-  it('should initial AuthManager the default configuration', () => {
+  it('should initialise AuthManager with the correct default configuration', () => {
     // to work around new being used as a side effect, which would cause a lint failure
     const am = new AuthManager(config);
     expect(am).toBeDefined();
@@ -138,6 +139,7 @@ describe('AuthManager', () => {
       popup_redirect_uri: config.oidcConfiguration.redirectUri,
       redirect_uri: config.oidcConfiguration.redirectUri,
       scope: config.oidcConfiguration.scope,
+      userStore: expect.any(WebStorageStateStore),
     });
   });
 
@@ -223,7 +225,7 @@ describe('AuthManager', () => {
 
       await expect(() => authManager.login()).rejects.toThrow(
         new PassportError(
-          `${PassportErrorType.AUTHENTICATION_ERROR}: ${mockErrorMsg}`,
+          mockErrorMsg,
           PassportErrorType.AUTHENTICATION_ERROR,
         ),
       );
@@ -306,7 +308,7 @@ describe('AuthManager', () => {
 
       await expect(() => manager.logout()).rejects.toThrow(
         new PassportError(
-          `${PassportErrorType.LOGOUT_ERROR}: ${mockErrorMsg}`,
+          mockErrorMsg,
           PassportErrorType.LOGOUT_ERROR,
         ),
       );
