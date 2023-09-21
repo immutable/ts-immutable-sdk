@@ -108,6 +108,10 @@ function Order({ showModal, setShowModal }: ModalProps) {
         tokenId: asset.token_id,
         tokenAddress: asset.token_address,
       },
+      fees: [{
+        address: '0x8e70719571e87a328696ad099a7d9f6adc120892',
+        fee_percentage: 1,
+      }],
     };
     try {
       await imxProvider.createOrder(request);

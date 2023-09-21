@@ -147,7 +147,7 @@ function Request({ showModal, setShowModal }: ModalProps) {
     try {
       const result = await zkEvmProvider?.request(request);
       setLoadingRequest(false);
-      addMessage(selectedEthMethod?.name, result);
+      addMessage(request.method, result);
       handleClose();
     } catch (err) {
       addMessage('Request', err);
