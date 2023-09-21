@@ -1,4 +1,5 @@
 import {
+  InMemoryWebStorage,
   User as OidcUser,
   UserManager,
   UserManagerSettings,
@@ -31,6 +32,9 @@ const getAuthConfiguration = ({
   oidcConfiguration,
   authenticationDomain,
 }: PassportConfiguration): UserManagerSettings => {
+  const store = typeof window !== 'undefined' ? window.localStorage : new InMemoryWebStorage();
+  const userStore = new WebStorageStateStore({ store });
+
   const baseConfiguration: UserManagerSettings = {
     authority: authenticationDomain,
     redirect_uri: oidcConfiguration.redirectUri,
@@ -48,7 +52,7 @@ const getAuthConfiguration = ({
     mergeClaims: true,
     loadUserInfo: true,
     scope: oidcConfiguration.scope,
-    userStore: new WebStorageStateStore({ store: window.localStorage }),
+    userStore,
   };
 
   if (oidcConfiguration.audience) {
