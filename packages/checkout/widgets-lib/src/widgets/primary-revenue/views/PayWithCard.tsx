@@ -1,9 +1,9 @@
+/* eslint-disable no-console */
 import { BiomeCombinedProviders, Box } from '@biom3/react';
 // import { useContext } from 'react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import { Passport } from '@imtbl/passport';
 import { useContext, useEffect, useState } from 'react';
-import { set } from 'cypress/types/lodash';
 import { WidgetTheme } from '../../../lib';
 // import {
 //   SharedViews,
@@ -47,6 +47,26 @@ export function PayWithCard({ config, passport }: PayWithCardProps) {
     })();
   }, []);
 
+  const onOpen = () => {
+    console.log('onOpen');
+  };
+
+  const onOrderCreated = () => {
+    console.log('onOrderCreated');
+  };
+
+  const onOrderProcessing = () => {
+    console.log('onOrderProcessing');
+  };
+
+  const onOrderCompleted = () => {
+    console.log('onOrderCompleted');
+  };
+
+  const onOrderFailed = () => {
+    console.log('onOrderFailed');
+  };
+
   return (
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>
       <Box>
@@ -66,6 +86,11 @@ export function PayWithCard({ config, passport }: PayWithCardProps) {
             email={email}
             walletAddress={walletAddress}
             isPassportWallet={isPassport}
+            onOpen={onOpen}
+            onOrderCreated={onOrderCreated}
+            onOrderProcessing={onOrderProcessing}
+            onOrderCompleted={onOrderCompleted}
+            onOrderFailed={onOrderFailed}
           />
         </SimpleLayout>
       </Box>

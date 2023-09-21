@@ -1,16 +1,16 @@
 import { useEffect } from 'react';
 
-type UseTransakProps = {
+type UseTransakIframeProps = {
   onOrderCreated: () => {};
 };
 
-export const useTransak = (props: UseTransakProps) => {
+export const useTransakIframe = (props: UseTransakIframeProps) => {
   useEffect(
     () => () => {
       // eslint-disable-next-line no-console
       console.error(props);
     },
-    [],
+    []
   );
 
   return {};

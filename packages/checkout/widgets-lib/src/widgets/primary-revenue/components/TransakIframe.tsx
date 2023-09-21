@@ -1,115 +1,21 @@
+import { useRef } from 'react';
 import { Box } from '@biom3/react';
-import {
-  useCallback, RefObject, useEffect, useRef,
-} from 'react';
 
+import { UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import {
-  TransakEventData,
-  TransakEvents,
-  TransakStatuses,
-} from '../../on-ramp/TransakEvents';
-import { useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+  TransakEventHandlers,
+  useTransakEvents,
+} from '../hooks/useTransakEvents';
 
 // import { useTransak } from '../hooks/useTransak';
 
-type AnalyticEvent = {
-  screen: string;
-  userJourney?: string;
-  control: string;
-  controlType: string;
-  action?: string;
-  userId?: string;
-  [key: string]: unknown;
-};
-
-const analyticsEvents: Record<string, AnalyticEvent> = {
-  [TransakEvents.TRANSAK_WIDGET_OPEN]: {
-    screen: 'InputScreen',
-    control: 'TransakWidgetOpen',
-    controlType: 'IframeEvent',
-  },
-  [TransakEvents.TRANSAK_ORDER_CREATED]: {
-    screen: 'InputScreen',
-    control: 'OrderCreated',
-    controlType: 'IframeEvent',
-  },
-  [`${TransakEvents.TRANSAK_ORDER_SUCCESSFUL}${TransakStatuses.PROCESSING}`]: {
-    screen: 'OrderInProgress',
-    control: 'PaymentProcessing',
-    controlType: 'IframeEvent',
-  },
-  [`${TransakEvents.TRANSAK_ORDER_SUCCESSFUL}${TransakStatuses.COMPLETED}`]: {
-    screen: 'Success',
-    control: 'PaymentCompleted',
-    controlType: 'IframeEvent',
-  },
-  [TransakEvents.TRANSAK_ORDER_FAILED]: {
-    screen: 'Failure',
-    control: 'PaymentFailed',
-    controlType: 'IframeEvent',
-  },
-};
-
-const TRANSAK_ORIGIN = 'transak.com';
-const useTransakEvents = (
-  userJourney: string,
-  ref: RefObject<HTMLIFrameElement> | undefined,
-  email: string,
-  walletAddress: string,
-  isPassportWallet: boolean,
-) => {
-  const { track } = useAnalytics();
-
-  const handleAnalyticsEvent = useCallback((event: TransakEventData) => {
-    const eventData = analyticsEvents?.[event.event_id] || {};
-    const miscData = {
-      email,
-      isPassportWallet,
-      userId,
-      userJourney,
-    };
-
-    track({
-      ...eventData,
-    });
-  }, []);
-
-  const handleMessageEvent = useCallback(
-    (event: MessageEvent) => {
-      const isTransakEvent = event.source === ref?.current?.contentWindow
-        && event.origin.toLowerCase().includes(TRANSAK_ORIGIN);
-
-      if (!isTransakEvent) return;
-
-      handleAnalyticsEvent(event.data);
-
-      console.log('event', event);
-    },
-    [ref],
-  );
-
-  const subscribeEvents = useCallback(() => {
-    console.log(ref?.current);
-
-    window.addEventListener('message', handleMessageEvent);
-
-    return () => {
-      /** */
-    };
-  }, []);
-
-  return {
-    subscribeEvents,
-  };
-};
-
-export interface TransactionIframeProps {
+export type TransactionIframeProps = {
   id: string;
   src: string;
   email: string;
   walletAddress: string;
   isPassportWallet: boolean;
-}
+} & TransakEventHandlers;
 
 export function TransakIframe({
   id,
@@ -117,20 +23,25 @@ export function TransakIframe({
   email,
   walletAddress,
   isPassportWallet,
+  onOpen,
+  onOrderCreated,
+  onOrderProcessing,
+  onOrderCompleted,
+  onOrderFailed,
 }: TransactionIframeProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const { subscribeEvents } = useTransakEvents(
-    'nft-checkout',
-    iframeRef,
+  useTransakEvents({
+    userJourney: UserJourney.PRIMARY_REVENUE,
+    ref: iframeRef,
     email,
-    walletAddress,
+    userId: walletAddress,
     isPassportWallet,
-  );
-
-  useEffect(() => {
-    const unsubscribeEvents = subscribeEvents();
-    return () => unsubscribeEvents();
-  }, []);
+    onOpen,
+    onOrderCreated,
+    onOrderProcessing,
+    onOrderCompleted,
+    onOrderFailed,
+  });
 
   return (
     <Box
