@@ -38,16 +38,14 @@ const getGasEstimate = (): GasAmount => ({
 export const useSmartCheckout = ({
   checkout, provider,
 }: UseSmartCheckoutInput) => {
-  if (!checkout) {
-    throw new Error('missing checkout, please connect first');
-  }
-  if (!provider) {
-    throw new Error('missing provider, please connect first');
-  }
-
-  // Do we need to worry about a loading state here?
-
   const smartCheckout = useCallback(async ({ amount, spenderAddress, contractAddress }: SmartCheckoutInput) => {
+    if (!checkout) {
+      throw new Error('missing checkout, please connect first');
+    }
+    if (!provider) {
+      throw new Error('missing provider, please connect first');
+    }
+
     // ! Generate ItemRequirements
     const itemRequirements = getItemRequirements(amount, spenderAddress, contractAddress);
     // ! Generate GasEstimate
