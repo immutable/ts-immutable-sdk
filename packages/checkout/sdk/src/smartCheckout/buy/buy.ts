@@ -109,7 +109,10 @@ export const buy = async (
     );
   }
 
-  if (order.result.buy.length === 0) throw new Error('No buy token items in order result');
+  if (order.result.buy.length === 0) {
+    // TODO : update this error
+    throw new Error('No buy token items in order result');
+  }
   const buyToken = order.result.buy[0];
 
   let decimals = 18;
