@@ -44,11 +44,9 @@ export const getTokenAddressFromRequirement = (
 
 export const fetchL1Representation = async (
   config: CheckoutConfiguration,
-  balanceRequirement: BalanceRequirement,
+  l2address: string,
 ): Promise<string> => {
-  const l2address = getTokenAddressFromRequirement(balanceRequirement);
   if (l2address === '') return '';
-
   if (l2address === IMX_ADDRESS_ZKEVM) {
     return getImxL1Representation(getL1ChainId(config));
   }
@@ -137,7 +135,8 @@ export const bridgeRoute = async (
   // If the user has no ETH to cover the bridge fees or approval fees then bridge cannot be an option
   if (!hasSufficientL1Eth(tokenBalanceResult, bridgeFeeEstimate)) return undefined;
 
-  const l1address = await fetchL1Representation(config, balanceRequirement);
+  const requiredTokenAddress = getTokenAddressFromRequirement(balanceRequirement);
+  const l1address = await fetchL1Representation(config, requiredTokenAddress);
   if (l1address === '') return undefined;
 
   // Ensure l1address is in the allowed token list

@@ -11,7 +11,7 @@ import {
 import { CheckoutConfiguration } from '../../../config';
 import {
   ChainId,
-  FundingRouteType,
+  FundingRouteType, IMX_ADDRESS_ZKEVM,
   ItemType,
 } from '../../../types';
 import { BalanceRequirement } from '../../balanceCheck/types';
@@ -870,37 +870,7 @@ describe('bridgeRoute', () => {
 
   describe('fetchL1Representation', () => {
     it('should fetch L1 representation of ERC20', async () => {
-      const balanceRequirement: BalanceRequirement = {
-        type: ItemType.ERC20,
-        sufficient: false,
-        delta: {
-          balance: BigNumber.from(10),
-          formattedBalance: '10',
-        },
-        current: {
-          type: ItemType.ERC20,
-          balance: BigNumber.from(0),
-          formattedBalance: '0',
-          token: {
-            name: '0xERC20',
-            symbol: '0xERC20',
-            decimals: 18,
-            address: '0x123',
-          },
-        },
-        required: {
-          type: ItemType.ERC20,
-          balance: BigNumber.from(10),
-          formattedBalance: '10',
-          token: {
-            name: '0xERC20',
-            symbol: '0xERC20',
-            decimals: 18,
-            address: '0x123',
-          },
-        },
-      };
-
+      const requiredL2Address = '0x123';
       (createBlockchainDataInstance as jest.Mock).mockReturnValue({
         getToken: jest.fn().mockResolvedValue({
           result: {
@@ -912,49 +882,21 @@ describe('bridgeRoute', () => {
 
       const l1Address = await fetchL1Representation(
         config,
-        balanceRequirement,
+        requiredL2Address,
       );
 
       expect(l1Address).toEqual('0xROOT_ADDRESS');
     });
 
     it('should fetch L1 representation of NATIVE', async () => {
-      const balanceRequirement: BalanceRequirement = {
-        type: ItemType.NATIVE,
-        sufficient: false,
-        delta: {
-          balance: BigNumber.from(10),
-          formattedBalance: '10',
-        },
-        current: {
-          type: ItemType.NATIVE,
-          balance: BigNumber.from(0),
-          formattedBalance: '0',
-          token: {
-            name: '0xNATIVE',
-            symbol: '0xNATIVE',
-            decimals: 18,
-          },
-        },
-        required: {
-          type: ItemType.NATIVE,
-          balance: BigNumber.from(10),
-          formattedBalance: '10',
-          token: {
-            name: '0xNATIVE',
-            symbol: '0xNATIVE',
-            decimals: 18,
-          },
-        },
-      };
-
+      const requiredL2Address = IMX_ADDRESS_ZKEVM;
       (createBlockchainDataInstance as jest.Mock).mockReturnValue({
         getToken: jest.fn().mockResolvedValue({}),
       });
 
       const l1Address = await fetchL1Representation(
         config,
-        balanceRequirement,
+        requiredL2Address,
       );
 
       expect(l1Address).toEqual('0x2Fa06C6672dDCc066Ab04631192738799231dE4a');
@@ -962,37 +904,7 @@ describe('bridgeRoute', () => {
     });
 
     it('should return empty string if indexer returns null', async () => {
-      const balanceRequirement: BalanceRequirement = {
-        type: ItemType.ERC20,
-        sufficient: false,
-        delta: {
-          balance: BigNumber.from(10),
-          formattedBalance: '10',
-        },
-        current: {
-          type: ItemType.ERC20,
-          balance: BigNumber.from(0),
-          formattedBalance: '0',
-          token: {
-            name: '0xERC20',
-            symbol: '0xERC20',
-            decimals: 18,
-            address: '0x123',
-          },
-        },
-        required: {
-          type: ItemType.ERC20,
-          balance: BigNumber.from(10),
-          formattedBalance: '10',
-          token: {
-            name: '0xERC20',
-            symbol: '0xERC20',
-            decimals: 18,
-            address: '0x123',
-          },
-        },
-      };
-
+      const requiredL2Address = '0x123';
       (createBlockchainDataInstance as jest.Mock).mockReturnValue({
         getToken: jest.fn().mockResolvedValue({
           result: {
@@ -1004,42 +916,14 @@ describe('bridgeRoute', () => {
 
       const l1Address = await fetchL1Representation(
         config,
-        balanceRequirement,
+        requiredL2Address,
       );
 
       expect(l1Address).toEqual('');
     });
 
-    it('should return empty string if no address in ERC20 requirement', async () => {
-      const balanceRequirement: BalanceRequirement = {
-        type: ItemType.ERC20,
-        sufficient: false,
-        delta: {
-          balance: BigNumber.from(10),
-          formattedBalance: '10',
-        },
-        current: {
-          type: ItemType.ERC20,
-          balance: BigNumber.from(0),
-          formattedBalance: '0',
-          token: {
-            name: '0xERC20',
-            symbol: '0xERC20',
-            decimals: 18,
-          },
-        },
-        required: {
-          type: ItemType.ERC20,
-          balance: BigNumber.from(10),
-          formattedBalance: '10',
-          token: {
-            name: '0xERC20',
-            symbol: '0xERC20',
-            decimals: 18,
-          },
-        },
-      };
-
+    it('should return empty string if L2 address is empty', async () => {
+      const requiredL2Address = '';
       (createBlockchainDataInstance as jest.Mock).mockReturnValue({
         getToken: jest.fn().mockResolvedValue({
           result: {
@@ -1051,49 +935,7 @@ describe('bridgeRoute', () => {
 
       const l1Address = await fetchL1Representation(
         config,
-        balanceRequirement,
-      );
-
-      expect(l1Address).toEqual('');
-      expect(createBlockchainDataInstance).not.toHaveBeenCalled();
-    });
-
-    it('should return empty string if ERC721 requirement', async () => {
-      const balanceRequirement: BalanceRequirement = {
-        type: ItemType.ERC721,
-        sufficient: false,
-        delta: {
-          balance: BigNumber.from(10),
-          formattedBalance: '10',
-        },
-        current: {
-          type: ItemType.ERC721,
-          balance: BigNumber.from(0),
-          formattedBalance: '0',
-          id: '0',
-          contractAddress: '0xERC721',
-        },
-        required: {
-          type: ItemType.ERC721,
-          balance: BigNumber.from(10),
-          formattedBalance: '10',
-          id: '0',
-          contractAddress: '0xERC721',
-        },
-      };
-
-      (createBlockchainDataInstance as jest.Mock).mockReturnValue({
-        getToken: jest.fn().mockResolvedValue({
-          result: {
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            root_contract_address: '0xROOT_ADDRESS',
-          },
-        }),
-      });
-
-      const l1Address = await fetchL1Representation(
-        config,
-        balanceRequirement,
+        requiredL2Address,
       );
 
       expect(l1Address).toEqual('');
