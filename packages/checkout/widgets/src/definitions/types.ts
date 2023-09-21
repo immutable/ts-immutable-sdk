@@ -4,7 +4,6 @@
 export enum WidgetTheme {
   LIGHT = 'light',
   DARK = 'dark',
-  CUSTOM = 'custom',
 }
 
 /**

@@ -46,7 +46,7 @@ export abstract class ImmutableWebComponent extends HTMLElement {
     this.updateCheckout();
   }
 
-  private parseWidgetConfig(widgetsConfig?: string):StrongCheckoutWidgetsConfig {
+  private parseWidgetConfig(widgetsConfig?: string): StrongCheckoutWidgetsConfig {
     try {
       return withDefaultWidgetConfigs(
         JSON.parse(widgetsConfig || '{}'),
