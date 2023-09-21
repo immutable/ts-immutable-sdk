@@ -1,13 +1,13 @@
 import {
-  Body,
-  BottomSheet, Box, Button, FramedImage, Heading, Logo,
+  BottomSheet, Box,
+  Heading,
+  IMX_TOKEN_IMAGE_URL,
+  MenuItem,
+  DUMMY_RASTER_IMAGE_URL,
 } from '@biom3/react';
 import {
   containerStyles,
   contentTextStyles,
-  actionButtonStyles,
-  actionButtonContainerStyles,
-  logoContainerStyles,
 } from './SmartCheckoutDrawerStyles';
 
 type SmartCheckoutDrawerProps = {
@@ -16,8 +16,6 @@ type SmartCheckoutDrawerProps = {
 };
 
 export function SmartCheckoutDrawer({ visible, onCloseBottomSheet }: SmartCheckoutDrawerProps) {
-  const imxLogo = 'https://design-system.immutable.com/hosted-for-ds/currency-icons/currency--imx.svg';
-
   return (
     <BottomSheet
       size="full"
@@ -27,49 +25,49 @@ export function SmartCheckoutDrawer({ visible, onCloseBottomSheet }: SmartChecko
     >
       <BottomSheet.Content>
         <Box testId="not-enough-gas-bottom-sheet" sx={containerStyles}>
-          <FramedImage
-            imageUrl={imxLogo}
-            circularFrame
-            sx={{
-              height: '100px',
-            }}
-          />
+
           <Heading
             size="small"
             sx={contentTextStyles}
             testId="not-enough-gas-heading"
           >
-            lorem ipsem
+            Pay with
           </Heading>
-          <Body sx={contentTextStyles}>
-            lorem ipsem
-          </Body>
-          <Box sx={actionButtonContainerStyles}>
-            lorem ipsem
-            <Button
-              testId="not-enough-gas-add-imx-button"
-              sx={actionButtonStyles}
-              variant="tertiary"
-            >
-              lorem ipsem
-            </Button>
-            <Button
-              sx={actionButtonStyles}
-              onClick={onCloseBottomSheet}
-              variant="tertiary"
-              testId="not-enough-gas-cancel-button"
-            >
-              close
 
-            </Button>
+          <Box sx={{
+            d: 'flex',
+            gap: 'base.spacing.x4',
+            flexDirection: 'column',
+          }}
+          >
+            <MenuItem onClick={() => ({})}>
+              <MenuItem.Badge variant="guidance" isAnimated />
+              <MenuItem.IntentIcon icon="ChevronForward" />
+              <MenuItem.FramedImage imageUrl={DUMMY_RASTER_IMAGE_URL} />
+              <MenuItem.Label rc={<span contentEditable />}>
+                Some label text 1
+              </MenuItem.Label>
+              <MenuItem.Caption rc={<span contentEditable />}>
+                Some caption text
+              </MenuItem.Caption>
+            </MenuItem>
+            <MenuItem>
+              <MenuItem.IntentIcon />
+              <MenuItem.Label rc={<span contentEditable />}>
+                Some label text 1
+              </MenuItem.Label>
+              <MenuItem.Caption rc={<span contentEditable />}>
+                Some caption text
+              </MenuItem.Caption>
+              <MenuItem.PriceDisplay
+                fiatAmount="USD $12345.12"
+                price="1835.1234"
+                currencyImageUrl={IMX_TOKEN_IMAGE_URL}
+              />
+
+            </MenuItem>
           </Box>
-          <Box sx={logoContainerStyles}>
-            <Logo
-              testId="footer-logo-image"
-              logo="ImmutableHorizontalLockup"
-              sx={{ width: 'base.spacing.x25' }}
-            />
-          </Box>
+
         </Box>
       </BottomSheet.Content>
     </BottomSheet>
