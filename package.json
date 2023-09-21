@@ -66,6 +66,7 @@
     "packages/provider",
     "packages/provider/src/sample-app",
     "packages/orderbook",
+    "packages/internal/analytics",
     "packages/internal/contracts",
     "packages/internal/toolkit",
     "packages/internal/cryptofiat",
