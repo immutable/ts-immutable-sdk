@@ -18,7 +18,7 @@ export enum PassportErrorType {
   OPERATION_NOT_SUPPORTED_ERROR = 'OPERATION_NOT_SUPPORTED_ERROR',
 }
 
-function instanceOfApiError(error: any): error is APIError {
+function isAPIError(error: any): error is APIError {
   return 'code' in error && 'message' in error;
 }
 
@@ -40,7 +40,7 @@ export const withPassportError = async <T>(
   } catch (error) {
     let errorMessage: string;
 
-    if (isAxiosError(error) && error.response?.data && instanceOfApiError(error.response.data)) {
+    if (isAxiosError(error) && error.response?.data && isAPIError(error.response.data)) {
       errorMessage = error.response.data.message;
     } else {
       errorMessage = (error as Error).message;
