@@ -41,7 +41,7 @@ export interface PrimaryRevenueWidgetProps {
   amount: string;
   fromCurrency: string;
   items: Item[];
-  params: ConnectLoaderParams
+  params: ConnectLoaderParams;
 }
 
 export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
@@ -147,12 +147,16 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
           <ReviewOrder
             currency={fromCurrency}
             execute={execute}
-            viewState={viewState}
             items={items}
           />
         )}
         {viewState.view.type === PrimaryRevenueWidgetViews.PAY_WITH_CARD && (
-          <PayWithCard config={config} passport={params.passport} />
+          <PayWithCard
+            config={config}
+            passport={params.passport}
+            items={items}
+            currency={fromCurrency}
+          />
         )}
         {viewState.view.type === SharedViews.TOP_UP_VIEW && (
           <TopUpView

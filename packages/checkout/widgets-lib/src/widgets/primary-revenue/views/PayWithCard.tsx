@@ -3,7 +3,9 @@ import { BiomeCombinedProviders, Box } from '@biom3/react';
 // import { useContext } from 'react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import { Passport } from '@imtbl/passport';
-import { useContext, useEffect, useState } from 'react';
+import {
+  useContext, useEffect, useMemo, useState,
+} from 'react';
 import { WidgetTheme } from '../../../lib';
 // import {
 //   SharedViews,
@@ -17,16 +19,27 @@ import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { TransakIframe } from '../components/TransakIframe';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
+import { Item, useMergeItemsInfo } from '../hooks/useMergeItemsInfo';
+import { ViewContext } from '../../../context/view-context/ViewContext';
+import { TransakNFTData } from '../hooks/useTransakIframe';
+import { SignResponse } from '../hooks/useSignOrder';
 
 export interface PayWithCardProps {
   config: StrongCheckoutWidgetsConfig;
   passport: Passport | undefined;
+  items: Item[];
+  currency: string;
 }
 
-export function PayWithCard({ config, passport }: PayWithCardProps) {
+export function PayWithCard({
+  config,
+  passport,
+  items,
+  currency,
+}: PayWithCardProps) {
   const { theme } = config;
   // const { initialLoadingText } = text.views[PrimaryRevenueWidgetViews.PAY_WITH_CARD];
-  // const { viewState } = useContext(ViewContext);
+  const { viewState } = useContext(ViewContext);
 
   const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
@@ -38,14 +51,6 @@ export function PayWithCard({ config, passport }: PayWithCardProps) {
 
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { provider } = connectLoaderState;
-
-  useEffect(() => {
-    (async () => {
-      setIsPassport(!!(provider?.provider as any)?.isPassport);
-      setWalletAddress(await provider!.getSigner().getAddress());
-      setEmail((await passport?.getUserInfo())?.email || '');
-    })();
-  }, []);
 
   const onOpen = () => {
     console.log('onOpen');
@@ -67,6 +72,30 @@ export function PayWithCard({ config, passport }: PayWithCardProps) {
     console.log('onOrderFailed');
   };
 
+  useEffect(() => {
+    (async () => {
+      setIsPassport(!!(provider?.provider as any)?.isPassport);
+      setWalletAddress(await provider!.getSigner().getAddress());
+      setEmail((await passport?.getUserInfo())?.email || '');
+    })();
+  }, []);
+
+  const signResponse: SignResponse = viewState.view.data;
+  const mergedItemsList = useMergeItemsInfo(items, signResponse);
+
+  const executeTxn = signResponse.transactions.find((tx) => tx.method_call.startsWith('execute'))!;
+  const nftData: TransakNFTData[] = useMemo(
+    () => mergedItemsList.map((item) => ({
+      collectionAddress: executeTxn?.contract_address!,
+      imageURL: item.image,
+      nftName: item.name,
+      price: item.amount,
+      tokenID: item.tokenId,
+      quantity: item.qty,
+    })),
+    [mergedItemsList, executeTxn],
+  );
+
   return (
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>
       <Box>
@@ -82,10 +111,19 @@ export function PayWithCard({ config, passport }: PayWithCardProps) {
         >
           <TransakIframe
             id="123"
-            src="http://www.google.com/"
+            type="nft-checkout"
             email={email}
             walletAddress={walletAddress}
             isPassportWallet={isPassport}
+            //
+            exchangeScreenTitle=""
+            nftData={nftData}
+            calldata={executeTxn.raw_data}
+            cryptoCurrencyCode={currency}
+            estimatedGasLimit={executeTxn.gas_estimate}
+            smartContractAddress={executeTxn.contract_address}
+            partnerOrderId="some" // FIXME: include signOrder.order.id
+            //
             onOpen={onOpen}
             onOrderCreated={onOrderCreated}
             onOrderProcessing={onOrderProcessing}

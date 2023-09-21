@@ -7,22 +7,34 @@ import {
   useTransakEvents,
 } from '../hooks/useTransakEvents';
 
-// import { useTransak } from '../hooks/useTransak';
+import {
+  useTransakIframe,
+  TransakWidgetType,
+  TransakNFTCheckoutParams,
+} from '../hooks/useTransakIframe';
 
 export type TransactionIframeProps = {
   id: string;
-  src: string;
+  type: TransakWidgetType;
   email: string;
   walletAddress: string;
   isPassportWallet: boolean;
-} & TransakEventHandlers;
+} & TransakEventHandlers &
+TransakNFTCheckoutParams;
 
 export function TransakIframe({
   id,
-  src,
+  type,
   email,
   walletAddress,
   isPassportWallet,
+  nftData,
+  calldata,
+  cryptoCurrencyCode,
+  estimatedGasLimit,
+  exchangeScreenTitle,
+  smartContractAddress,
+  partnerOrderId,
   onOpen,
   onOrderCreated,
   onOrderProcessing,
@@ -30,6 +42,7 @@ export function TransakIframe({
   onOrderFailed,
 }: TransactionIframeProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
+
   useTransakEvents({
     userJourney: UserJourney.PRIMARY_REVENUE,
     ref: iframeRef,
@@ -41,6 +54,19 @@ export function TransakIframe({
     onOrderProcessing,
     onOrderCompleted,
     onOrderFailed,
+  });
+
+  const { iframeSrc } = useTransakIframe({
+    type,
+    nftData,
+    calldata,
+    cryptoCurrencyCode,
+    estimatedGasLimit,
+    exchangeScreenTitle,
+    smartContractAddress,
+    email,
+    walletAddress,
+    partnerOrderId,
   });
 
   return (
@@ -55,13 +81,12 @@ export function TransakIframe({
         marginLeft: 'base.spacing.x2',
         marginRight: 'base.spacing.x2',
         marginBottom: 'base.spacing.x2',
-        margin: '0 auto',
       }}
     >
       <iframe
         ref={iframeRef}
         id={id}
-        src={src}
+        src={iframeSrc}
         title="Transak-Iframe"
         allow="camera;microphone;fullscreen;payment"
         style={{

@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { SignResponse } from './useSignOrder';
 
 export type Item = {
@@ -11,43 +11,49 @@ export type Item = {
 
 export type MergedItemsDetails = {
   productId: string;
-  qty: number;
-  amount: number;
+  qty: string;
   image: string;
   name: string;
   description: string;
-  tokenId: string;
+  amount: number[];
+  tokenId: number[];
   currency: string;
 };
 
 export const useMergeItemsInfo = (
   clientItems: Item[],
-  backendItems: SignResponse,
+  signResponse: SignResponse,
 ) => {
-  const getMergedItemsList = useCallback(() => {
-    // Create a hashmap from clientItems for quick lookup
+  const [mergedItems, setMergedItems] = useState<MergedItemsDetails[]>([]);
+
+  const getMergedItems = useCallback((): MergedItemsDetails[] => {
     const mapClientItems: Record<number, Item> = {};
     clientItems.forEach((item) => {
       mapClientItems[item.productId] = item;
     });
 
-    // Merge backedItems and hashmap into a new array
-    const mergedArray = backendItems.order.products.map((item) => {
+    const mergedArray = signResponse.order.products.map((item) => {
       const matchedClientItem = mapClientItems[item.product_id];
       return {
         productId: item.product_id,
-        image: matchedClientItem ? matchedClientItem.image : null,
-        tokenId: item.detail[0].token_id,
-        qty: matchedClientItem ? matchedClientItem.qty : null,
-        name: matchedClientItem ? matchedClientItem.name : null,
-        description: matchedClientItem ? matchedClientItem.description : null,
-        amount: item.detail[0].amount,
-        currency: backendItems.order.currency,
+        image: matchedClientItem?.image || null,
+        qty: matchedClientItem?.qty || null,
+        name: matchedClientItem?.name || null,
+        description: matchedClientItem?.description || null,
+        currency: signResponse.order.currency,
+        amount: item.detail.map(({ amount }) => amount),
+        tokenId: item.detail.map(({ token_id: tokenId }) => Number(tokenId)),
       };
     });
 
     return mergedArray;
-  }, [clientItems, backendItems]);
+  }, [clientItems, signResponse]);
 
-  return { getMergedItemsList };
+  useEffect(() => {
+    if (signResponse) {
+      setMergedItems(getMergedItems);
+    }
+  }, [clientItems, signResponse]);
+
+  return mergedItems;
 };

@@ -27,7 +27,7 @@ export function OrderList(props: OrderListProps) {
     >
       {items
         ? items.map((item: MergedItemsDetails) => (
-          <OrderItem key={item.tokenId} item={item} />
+          <OrderItem key={`${item.name}${item.tokenId[0]}`} item={item} />
         ))
         : null}
     </Box>

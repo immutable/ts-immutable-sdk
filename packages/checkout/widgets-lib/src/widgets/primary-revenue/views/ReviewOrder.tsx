@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { useEffect, useState } from 'react';
+import { useContext, useState } from 'react';
 import { Body, Box, Button } from '@biom3/react';
 import { PrimaryRevenueSuccess } from '@imtbl/checkout-widgets';
 
@@ -14,39 +14,22 @@ import {
   sendPrimaryRevenueSuccessEvent,
   sendPrimaryRevenueWidgetCloseEvent,
 } from '../PrimaryRevenuWidgetEvents';
-import { ViewState } from '../../../context/view-context/ViewContext';
-import {
-  Item,
-  MergedItemsDetails,
-  useMergeItemsInfo,
-} from '../hooks/useMergeItemsInfo';
+import { ViewContext } from '../../../context/view-context/ViewContext';
+import { Item, useMergeItemsInfo } from '../hooks/useMergeItemsInfo';
 
 export interface ReviewOrderProps {
   execute: () => Promise<PrimaryRevenueSuccess>;
   currency: string;
-  viewState: ViewState;
   items: Item[];
 }
 
 export function ReviewOrder(props: ReviewOrderProps) {
-  const {
-    currency, execute, viewState, items,
-  } = props;
+  const { currency, execute, items } = props;
   const { header } = text.views[PrimaryRevenueWidgetViews.REVIEW_ORDER];
   const [loading, setLoading] = useState(false);
-  const [mergedItemsList, setMergedItemsList] = useState<
-  MergedItemsDetails[] | null
-  >(null);
 
-  const { getMergedItemsList } = useMergeItemsInfo(items, viewState.view.data);
-
-  useEffect(() => {
-    if (viewState.view.data) {
-      setMergedItemsList(getMergedItemsList());
-      // eslint-disable-next-line no-console
-      console.log('@@@@ mergedItemsList', mergedItemsList);
-    }
-  }, [items, viewState, viewState.view.data]);
+  const { viewState } = useContext(ViewContext);
+  const mergedItemsList = useMergeItemsInfo(items, viewState.view.data);
 
   const handlePayment = async () => {
     setLoading(true);
