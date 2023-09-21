@@ -4,6 +4,7 @@ export * from './cancel';
 export * from './chains';
 export * from './config';
 export * from './connect';
+export * from './fees';
 export * from './gasEstimate';
 export * from './network';
 export * from './networkInfo';

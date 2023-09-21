@@ -1,22 +1,149 @@
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { JsonRpcProvider } from '@ethersproject/providers';
-import { routingCalculator } from './routingCalculator';
+import { TokenInfo } from '@imtbl/dex-sdk';
+import { getSwapFundingStep, routingCalculator } from './routingCalculator';
 import { CheckoutConfiguration } from '../../config';
 import { getAllTokenBalances } from './tokenBalances';
-import { FundingRouteType, RouteCalculatorType } from './types';
+import {
+  DexQuote, DexQuoteCache, DexQuotes, RouteCalculatorType, TokenBalanceResult,
+} from './types';
 import { bridgeRoute } from './bridge/bridgeRoute';
-import { ChainId, ItemType } from '../../types';
-import { BalanceERC20Requirement } from '../balanceCheck/types';
+import {
+  ChainId, FundingRouteType, IMX_ADDRESS_ZKEVM, ItemType,
+} from '../../types';
+import { BalanceERC20Requirement, BalanceRequirement } from '../balanceCheck/types';
 import { createReadOnlyProviders } from '../../readOnlyProviders/readOnlyProvider';
-import { CheckoutErrorType } from '../../errors';
+import { CheckoutError, CheckoutErrorType } from '../../errors';
+import { swapRoute } from './swap/swapRoute';
+import { allowListCheck } from '../allowList';
 
 jest.mock('./tokenBalances');
 jest.mock('./bridge/bridgeRoute');
 jest.mock('../../readOnlyProviders/readOnlyProvider');
+jest.mock('../../config/remoteConfigFetcher');
+jest.mock('./swap/swapRoute');
+jest.mock('../allowList');
 
 describe('routingCalculator', () => {
   let config: CheckoutConfiguration;
+
+  const cache: DexQuoteCache = new Map<string, DexQuotes>(
+    [
+      [
+        '0xERC20_1',
+        new Map<string, DexQuote>([
+          ['0xERC20_2',
+            {
+              quote: {
+                amount: {
+                  value: BigNumber.from(1),
+                  token: {
+                    chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+                    name: 'ERC20_2',
+                    symbol: 'ERC20_2',
+                    decimals: 18,
+                    address: '0xERC20_2',
+                  } as TokenInfo,
+                },
+                amountWithMaxSlippage: {
+                  value: BigNumber.from(1),
+                  token: {} as TokenInfo,
+                },
+                slippage: 0,
+                fees: [
+                  {
+                    amount: {
+                      value: BigNumber.from(1),
+                      token: {
+                        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+                        name: 'IMX',
+                        symbol: 'IMX',
+                        decimals: 18,
+                        address: IMX_ADDRESS_ZKEVM,
+                      } as TokenInfo,
+                    },
+                    recipient: '',
+                    basisPoints: 0,
+                  },
+                ],
+              },
+              approval: {
+                value: BigNumber.from(1),
+                token: {
+                  chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+                  name: 'IMX',
+                  symbol: 'IMX',
+                  decimals: 18,
+                  address: IMX_ADDRESS_ZKEVM,
+                } as TokenInfo,
+              },
+              swap: {
+                value: BigNumber.from(1),
+                token: {} as TokenInfo,
+              },
+            },
+          ],
+        ]),
+      ],
+      [
+        '0xERC20_2',
+        new Map<string, DexQuote>([
+          ['0xERC20_1',
+            {
+              quote: {
+                amount: {
+                  value: BigNumber.from(2),
+                  token: {
+                    chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+                    name: 'ERC20_1',
+                    symbol: 'ERC20_1',
+                    decimals: 18,
+                    address: '0xERC20_1',
+                  } as TokenInfo,
+                },
+                amountWithMaxSlippage: {
+                  value: BigNumber.from(2),
+                  token: {} as TokenInfo,
+                },
+                slippage: 0,
+                fees: [
+                  {
+                    amount: {
+                      value: BigNumber.from(2),
+                      token: {
+                        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+                        name: 'IMX',
+                        symbol: 'IMX',
+                        decimals: 18,
+                        address: IMX_ADDRESS_ZKEVM,
+                      } as TokenInfo,
+                    },
+                    recipient: '',
+                    basisPoints: 0,
+                  },
+                ],
+              },
+              approval: {
+                value: BigNumber.from(2),
+                token: {
+                  chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+                  name: 'IMX',
+                  symbol: 'IMX',
+                  decimals: 18,
+                  address: IMX_ADDRESS_ZKEVM,
+                } as TokenInfo,
+              },
+              swap: {
+                value: BigNumber.from(2),
+                token: {} as TokenInfo,
+              },
+            },
+          ],
+        ]),
+      ],
+    ],
+  );
 
   beforeEach(() => {
     config = new CheckoutConfiguration({
@@ -24,7 +151,11 @@ describe('routingCalculator', () => {
     });
   });
 
-  it('should return routes', async () => {
+  it('should return bridge funding step', async () => {
+    (allowListCheck as jest.Mock).mockImplementation(() => (
+      {}
+    ));
+
     const balanceERC20Requirement: BalanceERC20Requirement = {
       type: ItemType.ERC20,
       sufficient: false,
@@ -57,7 +188,7 @@ describe('routingCalculator', () => {
     };
 
     const balanceRequirements = {
-      sufficient: true,
+      sufficient: false,
       balanceRequirements: [balanceERC20Requirement],
     };
 
@@ -73,7 +204,7 @@ describe('routingCalculator', () => {
 
     (bridgeRoute as jest.Mock).mockResolvedValue({
       type: FundingRouteType.BRIDGE,
-      chainId: 1,
+      chainId: ChainId.SEPOLIA,
       asset: {
         balance: BigNumber.from(1),
         formattedBalance: '1',
@@ -98,7 +229,6 @@ describe('routingCalculator', () => {
     );
     expect(routingOptions)
       .toEqual({
-        availableOptions: [],
         response: {
           type: RouteCalculatorType.ROUTES_FOUND,
           message: 'Routes found',
@@ -107,7 +237,7 @@ describe('routingCalculator', () => {
           priority: 1,
           steps: [{
             type: FundingRouteType.BRIDGE,
-            chainId: 1,
+            chainId: ChainId.SEPOLIA,
             asset: {
               balance: BigNumber.from(1),
               formattedBalance: '1',
@@ -122,7 +252,329 @@ describe('routingCalculator', () => {
       });
   });
 
-  it('should not recommend bridge if multiple insufficient ERC20 requirements', async () => {
+  it('should return swap funding step', async () => {
+    (allowListCheck as jest.Mock).mockImplementation(() => (
+      {
+        onRamp: [],
+        swap: [
+          {
+            name: 'ERC20_1',
+            symbol: 'ERC20_1',
+            decimals: 18,
+            address: '0xERC20_1',
+          },
+          {
+            name: 'ERC20_2',
+            symbol: 'ERC20_2',
+            decimals: 18,
+            address: '0xERC20_2',
+          },
+        ],
+      }
+    ));
+
+    const balanceERC20Requirement = {
+      type: ItemType.ERC20,
+      sufficient: false,
+      delta: {
+        balance: BigNumber.from(1),
+        formattedBalance: '1',
+      },
+      current: {
+        type: ItemType.ERC20,
+        balance: BigNumber.from(1),
+        formattedBalance: '1',
+        token: {
+          name: 'ERC20_1',
+          symbol: 'ERC20_1',
+          decimals: 18,
+          address: '0xERC20_1',
+        },
+      },
+      required: {
+        type: ItemType.ERC20,
+        balance: BigNumber.from(2),
+        formattedBalance: '2',
+        token: {
+          name: 'ERC20_1',
+          symbol: 'ERC20_1',
+          decimals: 18,
+          address: '0xERC20_1',
+        },
+      },
+    } as BalanceRequirement;
+
+    const balanceRequirements = {
+      sufficient: false,
+      balanceRequirements: [balanceERC20Requirement],
+    };
+
+    const availableRoutingOptions = {
+      onRamp: true,
+      swap: true,
+      bridge: true,
+    };
+
+    (getAllTokenBalances as jest.Mock).mockResolvedValue(new Map([
+      [ChainId.SEPOLIA, []],
+      [ChainId.IMTBL_ZKEVM_TESTNET, {
+        success: true,
+        balances: [
+          {
+            balance: BigNumber.from(10),
+            formattedBalance: '10',
+            token: {
+              name: 'ERC20',
+              symbol: 'ERC20',
+              decimals: 18,
+              address: '0xERC20_2',
+            },
+          },
+          {
+            balance: BigNumber.from(10),
+            formattedBalance: '10',
+            token: {
+              name: 'IMX',
+              symbol: 'IMX',
+              decimals: 18,
+              address: IMX_ADDRESS_ZKEVM,
+            },
+          },
+        ],
+      }],
+    ]));
+
+    (bridgeRoute as jest.Mock).mockResolvedValue(undefined);
+
+    (swapRoute as jest.Mock).mockResolvedValue({
+      type: FundingRouteType.SWAP,
+      chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+      asset: {
+        balance: BigNumber.from(10),
+        formattedBalance: '10',
+        token: {
+          name: 'ERC20',
+          symbol: 'ERC20',
+          decimals: 18,
+          address: '0xERC20_2',
+        },
+      },
+    });
+
+    (createReadOnlyProviders as jest.Mock).mockResolvedValue(new Map([
+      [ChainId.SEPOLIA, {} as JsonRpcProvider],
+      [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
+    ]));
+
+    const routingOptions = await routingCalculator(
+      config,
+      '0x123',
+      balanceRequirements,
+      availableRoutingOptions,
+    );
+    expect(routingOptions)
+      .toEqual({
+        response: {
+          type: RouteCalculatorType.ROUTES_FOUND,
+          message: 'Routes found',
+        },
+        fundingRoutes: [{
+          priority: 1,
+          steps: [{
+            type: FundingRouteType.SWAP,
+            chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+            asset: {
+              balance: BigNumber.from(10),
+              formattedBalance: '10',
+              token: {
+                name: 'ERC20',
+                symbol: 'ERC20',
+                decimals: 18,
+                address: '0xERC20_2',
+              },
+            },
+          }],
+        }],
+      });
+  });
+
+  it('should return bridge and swap funding step', async () => {
+    (allowListCheck as jest.Mock).mockImplementation(() => (
+      {
+        onRamp: [],
+        swap: [
+          {
+            name: 'ERC20_1',
+            symbol: 'ERC20_1',
+            decimals: 18,
+            address: '0xERC20_1',
+          },
+          {
+            name: 'ERC20_2',
+            symbol: 'ERC20_2',
+            decimals: 18,
+            address: '0xERC20_2',
+          },
+        ],
+      }
+    ));
+
+    const balanceERC20Requirement = {
+      type: ItemType.ERC20,
+      sufficient: false,
+      delta: {
+        balance: BigNumber.from(1),
+        formattedBalance: '1',
+      },
+      current: {
+        type: ItemType.ERC20,
+        balance: BigNumber.from(1),
+        formattedBalance: '1',
+        token: {
+          name: 'ERC20_1',
+          symbol: 'ERC20_1',
+          decimals: 18,
+          address: '0xERC20_1',
+        },
+      },
+      required: {
+        type: ItemType.ERC20,
+        balance: BigNumber.from(2),
+        formattedBalance: '2',
+        token: {
+          name: 'ERC20_1',
+          symbol: 'ERC20_1',
+          decimals: 18,
+          address: '0xERC20_1',
+        },
+      },
+    } as BalanceRequirement;
+
+    const balanceRequirements = {
+      sufficient: false,
+      balanceRequirements: [balanceERC20Requirement],
+    };
+
+    const availableRoutingOptions = {
+      onRamp: true,
+      swap: true,
+      bridge: true,
+    };
+
+    (getAllTokenBalances as jest.Mock).mockResolvedValue(new Map([
+      [ChainId.SEPOLIA, []],
+      [ChainId.IMTBL_ZKEVM_TESTNET, {
+        success: true,
+        balances: [
+          {
+            balance: BigNumber.from(10),
+            formattedBalance: '10',
+            token: {
+              name: 'ERC20',
+              symbol: 'ERC20',
+              decimals: 18,
+              address: '0xERC20_2',
+            },
+          },
+          {
+            balance: BigNumber.from(10),
+            formattedBalance: '10',
+            token: {
+              name: 'IMX',
+              symbol: 'IMX',
+              decimals: 18,
+              address: IMX_ADDRESS_ZKEVM,
+            },
+          },
+        ],
+      }],
+    ]));
+
+    (bridgeRoute as jest.Mock).mockResolvedValue({
+      type: FundingRouteType.BRIDGE,
+      chainId: ChainId.SEPOLIA,
+      asset: {
+        balance: BigNumber.from(1),
+        formattedBalance: '1',
+        token: {
+          name: 'ETH',
+          symbol: 'ETH',
+          decimals: 18,
+        },
+      },
+    });
+
+    (swapRoute as jest.Mock).mockResolvedValue({
+      type: FundingRouteType.SWAP,
+      chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+      asset: {
+        balance: BigNumber.from(10),
+        formattedBalance: '10',
+        token: {
+          name: 'ERC20',
+          symbol: 'ERC20',
+          decimals: 18,
+          address: '0xERC20_2',
+        },
+      },
+    });
+
+    (createReadOnlyProviders as jest.Mock).mockResolvedValue(new Map([
+      [ChainId.SEPOLIA, {} as JsonRpcProvider],
+      [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
+    ]));
+
+    const routingOptions = await routingCalculator(
+      config,
+      '0x123',
+      balanceRequirements,
+      availableRoutingOptions,
+    );
+    expect(routingOptions)
+      .toEqual({
+        response: {
+          type: RouteCalculatorType.ROUTES_FOUND,
+          message: 'Routes found',
+        },
+        fundingRoutes: [
+          {
+            priority: 1,
+            steps: [{
+              type: FundingRouteType.BRIDGE,
+              chainId: ChainId.SEPOLIA,
+              asset: {
+                balance: BigNumber.from(1),
+                formattedBalance: '1',
+                token: {
+                  name: 'ETH',
+                  symbol: 'ETH',
+                  decimals: 18,
+                },
+              },
+            }],
+          },
+          {
+            priority: 2,
+            steps: [{
+              type: FundingRouteType.SWAP,
+              chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+              asset: {
+                balance: BigNumber.from(10),
+                formattedBalance: '10',
+                token: {
+                  name: 'ERC20',
+                  symbol: 'ERC20',
+                  decimals: 18,
+                  address: '0xERC20_2',
+                },
+              },
+            }],
+          },
+        ],
+      });
+  });
+
+  it('should not recommend bridge or swap if multiple insufficient ERC20 requirements', async () => {
     const balanceERC20Requirement: BalanceERC20Requirement = {
       type: ItemType.ERC20,
       sufficient: false,
@@ -196,7 +648,6 @@ describe('routingCalculator', () => {
     );
     expect(routingOptions)
       .toEqual({
-        availableOptions: [],
         response: {
           type: RouteCalculatorType.NO_ROUTES,
           message: 'Routes not found',
@@ -236,7 +687,6 @@ describe('routingCalculator', () => {
     );
     expect(routingOptions)
       .toEqual({
-        availableOptions: [],
         response: {
           type: RouteCalculatorType.NO_ROUTES,
           message: 'Routes not found',
@@ -326,5 +776,523 @@ describe('routingCalculator', () => {
 
     expect(type).toEqual(CheckoutErrorType.PROVIDER_ERROR);
     expect(data).toEqual({ message: 'Error from create readonly providers' });
+  });
+
+  describe('getSwapFundingStep', () => {
+    it('should recommend swap funding step', async () => {
+      (swapRoute as jest.Mock).mockResolvedValue({
+        type: FundingRouteType.SWAP,
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        asset: {
+          balance: BigNumber.from(10),
+          formattedBalance: '10',
+          token: {
+            name: 'ERC20',
+            symbol: 'ERC20',
+            decimals: 18,
+            address: '0xERC20_2',
+          },
+        },
+      });
+
+      const balanceRequirement = {
+        type: ItemType.ERC20,
+        sufficient: false,
+        delta: {
+          balance: BigNumber.from(1),
+          formattedBalance: '1',
+        },
+        current: {
+          type: ItemType.ERC20,
+          balance: BigNumber.from(1),
+          formattedBalance: '1',
+          token: {
+            name: 'ERC20_1',
+            symbol: 'ERC20_1',
+            decimals: 18,
+            address: '0xERC20_1',
+          },
+        },
+        required: {
+          type: ItemType.ERC20,
+          balance: BigNumber.from(2),
+          formattedBalance: '2',
+          token: {
+            name: 'ERC20_1',
+            symbol: 'ERC20_1',
+            decimals: 18,
+            address: '0xERC20_1',
+          },
+        },
+      } as BalanceRequirement;
+
+      const balances = new Map<ChainId, TokenBalanceResult>([
+        [ChainId.IMTBL_ZKEVM_TESTNET, {
+          success: true,
+          balances: [
+            {
+              balance: BigNumber.from(10),
+              formattedBalance: '10',
+              token: {
+                name: 'ERC20',
+                symbol: 'ERC20',
+                decimals: 18,
+                address: '0xERC20_2',
+              },
+            },
+            {
+              balance: BigNumber.from(10),
+              formattedBalance: '10',
+              token: {
+                name: 'IMX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: IMX_ADDRESS_ZKEVM,
+              },
+            },
+          ],
+        }],
+      ]);
+
+      const swapFundingStep = await getSwapFundingStep(
+        config,
+        { swap: true },
+        balanceRequirement,
+        cache,
+        '0xADDRESS',
+        balances,
+        [
+          {
+            name: 'ERC20_1',
+            symbol: 'ERC20_1',
+            decimals: 18,
+            address: '0xERC20_1',
+          },
+          {
+            name: 'ERC20_2',
+            symbol: 'ERC20_2',
+            decimals: 18,
+            address: '0xERC20_2',
+          },
+        ],
+      );
+
+      expect(swapFundingStep).toEqual({
+        type: FundingRouteType.SWAP,
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        asset: {
+          balance: BigNumber.from(10),
+          formattedBalance: '10',
+          token: {
+            name: 'ERC20',
+            symbol: 'ERC20',
+            decimals: 18,
+            address: '0xERC20_2',
+          },
+        },
+      });
+    });
+
+    it('should return undefined if the insufficient requirement is undefined', async () => {
+      const balances = new Map<ChainId, TokenBalanceResult>([
+        [ChainId.IMTBL_ZKEVM_TESTNET, {
+          success: true,
+          balances: [
+            {
+              balance: BigNumber.from(10),
+              formattedBalance: '10',
+              token: {
+                name: 'ERC20',
+                symbol: 'ERC20',
+                decimals: 18,
+                address: '0xERC20_2',
+              },
+            },
+            {
+              balance: BigNumber.from(10),
+              formattedBalance: '10',
+              token: {
+                name: 'IMX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: IMX_ADDRESS_ZKEVM,
+              },
+            },
+          ],
+        }],
+      ]);
+
+      const swapFundingStep = await getSwapFundingStep(
+        config,
+        { swap: true },
+        undefined,
+        cache,
+        '0xADDRESS',
+        balances,
+        [
+          {
+            name: 'ERC20_1',
+            symbol: 'ERC20_1',
+            decimals: 18,
+            address: '0xERC20_1',
+          },
+          {
+            name: 'ERC20_2',
+            symbol: 'ERC20_2',
+            decimals: 18,
+            address: '0xERC20_2',
+          },
+        ],
+      );
+
+      expect(swapFundingStep).toBeUndefined();
+    });
+
+    it('should return undefined if no token balances for L2', async () => {
+      const balanceRequirement = {
+        type: ItemType.ERC20,
+        sufficient: false,
+        delta: {
+          balance: BigNumber.from(1),
+          formattedBalance: '1',
+        },
+        current: {
+          type: ItemType.ERC20,
+          balance: BigNumber.from(1),
+          formattedBalance: '1',
+          token: {
+            name: 'ERC20_1',
+            symbol: 'ERC20_1',
+            decimals: 18,
+            address: '0xERC20_1',
+          },
+        },
+        required: {
+          type: ItemType.ERC20,
+          balance: BigNumber.from(2),
+          formattedBalance: '2',
+          token: {
+            name: 'ERC20_1',
+            symbol: 'ERC20_1',
+            decimals: 18,
+            address: '0xERC20_1',
+          },
+        },
+      } as BalanceRequirement;
+
+      const balances = new Map<ChainId, TokenBalanceResult>([
+        [ChainId.SEPOLIA, {
+          success: true,
+          balances: [
+            {
+              balance: BigNumber.from(10),
+              formattedBalance: '10',
+              token: {
+                name: 'ERC20',
+                symbol: 'ERC20',
+                decimals: 18,
+                address: '0xERC20_2',
+              },
+            },
+            {
+              balance: BigNumber.from(10),
+              formattedBalance: '10',
+              token: {
+                name: 'IMX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: IMX_ADDRESS_ZKEVM,
+              },
+            },
+          ],
+        }],
+      ]);
+
+      const swapFundingStep = await getSwapFundingStep(
+        config,
+        { swap: true },
+        balanceRequirement,
+        cache,
+        '0xADDRESS',
+        balances,
+        [
+          {
+            name: 'ERC20_1',
+            symbol: 'ERC20_1',
+            decimals: 18,
+            address: '0xERC20_1',
+          },
+          {
+            name: 'ERC20_2',
+            symbol: 'ERC20_2',
+            decimals: 18,
+            address: '0xERC20_2',
+          },
+        ],
+      );
+
+      expect(swapFundingStep).toBeUndefined();
+    });
+
+    it('should return undefined if token balance result error', async () => {
+      const balanceRequirement = {
+        type: ItemType.ERC20,
+        sufficient: false,
+        delta: {
+          balance: BigNumber.from(1),
+          formattedBalance: '1',
+        },
+        current: {
+          type: ItemType.ERC20,
+          balance: BigNumber.from(1),
+          formattedBalance: '1',
+          token: {
+            name: 'ERC20_1',
+            symbol: 'ERC20_1',
+            decimals: 18,
+            address: '0xERC20_1',
+          },
+        },
+        required: {
+          type: ItemType.ERC20,
+          balance: BigNumber.from(2),
+          formattedBalance: '2',
+          token: {
+            name: 'ERC20_1',
+            symbol: 'ERC20_1',
+            decimals: 18,
+            address: '0xERC20_1',
+          },
+        },
+      } as BalanceRequirement;
+
+      const balances = new Map<ChainId, TokenBalanceResult>([
+        [ChainId.IMTBL_ZKEVM_TESTNET, {
+          error: new CheckoutError('Error', CheckoutErrorType.GET_BALANCE_ERROR),
+          success: true,
+          balances: [
+            {
+              balance: BigNumber.from(10),
+              formattedBalance: '10',
+              token: {
+                name: 'ERC20',
+                symbol: 'ERC20',
+                decimals: 18,
+                address: '0xERC20_2',
+              },
+            },
+            {
+              balance: BigNumber.from(10),
+              formattedBalance: '10',
+              token: {
+                name: 'IMX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: IMX_ADDRESS_ZKEVM,
+              },
+            },
+          ],
+        }],
+      ]);
+
+      const swapFundingStep = await getSwapFundingStep(
+        config,
+        { swap: true },
+        balanceRequirement,
+        cache,
+        '0xADDRESS',
+        balances,
+        [
+          {
+            name: 'ERC20_1',
+            symbol: 'ERC20_1',
+            decimals: 18,
+            address: '0xERC20_1',
+          },
+          {
+            name: 'ERC20_2',
+            symbol: 'ERC20_2',
+            decimals: 18,
+            address: '0xERC20_2',
+          },
+        ],
+      );
+
+      expect(swapFundingStep).toBeUndefined();
+    });
+
+    it('should return undefined if token balance result failed', async () => {
+      const balanceRequirement = {
+        type: ItemType.ERC20,
+        sufficient: false,
+        delta: {
+          balance: BigNumber.from(1),
+          formattedBalance: '1',
+        },
+        current: {
+          type: ItemType.ERC20,
+          balance: BigNumber.from(1),
+          formattedBalance: '1',
+          token: {
+            name: 'ERC20_1',
+            symbol: 'ERC20_1',
+            decimals: 18,
+            address: '0xERC20_1',
+          },
+        },
+        required: {
+          type: ItemType.ERC20,
+          balance: BigNumber.from(2),
+          formattedBalance: '2',
+          token: {
+            name: 'ERC20_1',
+            symbol: 'ERC20_1',
+            decimals: 18,
+            address: '0xERC20_1',
+          },
+        },
+      } as BalanceRequirement;
+
+      const balances = new Map<ChainId, TokenBalanceResult>([
+        [ChainId.IMTBL_ZKEVM_TESTNET, {
+          success: false,
+          balances: [
+            {
+              balance: BigNumber.from(10),
+              formattedBalance: '10',
+              token: {
+                name: 'ERC20',
+                symbol: 'ERC20',
+                decimals: 18,
+                address: '0xERC20_2',
+              },
+            },
+            {
+              balance: BigNumber.from(10),
+              formattedBalance: '10',
+              token: {
+                name: 'IMX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: IMX_ADDRESS_ZKEVM,
+              },
+            },
+          ],
+        }],
+      ]);
+
+      const swapFundingStep = await getSwapFundingStep(
+        config,
+        { swap: true },
+        balanceRequirement,
+        cache,
+        '0xADDRESS',
+        balances,
+        [
+          {
+            name: 'ERC20_1',
+            symbol: 'ERC20_1',
+            decimals: 18,
+            address: '0xERC20_1',
+          },
+          {
+            name: 'ERC20_2',
+            symbol: 'ERC20_2',
+            decimals: 18,
+            address: '0xERC20_2',
+          },
+        ],
+      );
+
+      expect(swapFundingStep).toBeUndefined();
+    });
+
+    it('should return undefined if no swappable tokens', async () => {
+      (swapRoute as jest.Mock).mockResolvedValue({
+        type: FundingRouteType.SWAP,
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        asset: {
+          balance: BigNumber.from(10),
+          formattedBalance: '10',
+          token: {
+            name: 'ERC20',
+            symbol: 'ERC20',
+            decimals: 18,
+            address: '0xERC20_2',
+          },
+        },
+      });
+
+      const balanceRequirement = {
+        type: ItemType.ERC20,
+        sufficient: false,
+        delta: {
+          balance: BigNumber.from(1),
+          formattedBalance: '1',
+        },
+        current: {
+          type: ItemType.ERC20,
+          balance: BigNumber.from(1),
+          formattedBalance: '1',
+          token: {
+            name: 'ERC20_1',
+            symbol: 'ERC20_1',
+            decimals: 18,
+            address: '0xERC20_1',
+          },
+        },
+        required: {
+          type: ItemType.ERC20,
+          balance: BigNumber.from(2),
+          formattedBalance: '2',
+          token: {
+            name: 'ERC20_1',
+            symbol: 'ERC20_1',
+            decimals: 18,
+            address: '0xERC20_1',
+          },
+        },
+      } as BalanceRequirement;
+
+      const balances = new Map<ChainId, TokenBalanceResult>([
+        [ChainId.IMTBL_ZKEVM_TESTNET, {
+          success: true,
+          balances: [
+            {
+              balance: BigNumber.from(10),
+              formattedBalance: '10',
+              token: {
+                name: 'ERC20',
+                symbol: 'ERC20',
+                decimals: 18,
+                address: '0xERC20_2',
+              },
+            },
+            {
+              balance: BigNumber.from(10),
+              formattedBalance: '10',
+              token: {
+                name: 'IMX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: IMX_ADDRESS_ZKEVM,
+              },
+            },
+          ],
+        }],
+      ]);
+
+      const swapFundingStep = await getSwapFundingStep(
+        config,
+        { swap: true },
+        balanceRequirement,
+        cache,
+        '0xADDRESS',
+        balances,
+        [],
+      );
+
+      expect(swapFundingStep).toBeUndefined();
+    });
   });
 });
