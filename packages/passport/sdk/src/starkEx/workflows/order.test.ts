@@ -147,7 +147,7 @@ describe('order', () => {
         guardianClient: mockGuardianClient,
       })).rejects.toThrow(
         new PassportError(
-          `${PassportErrorType.CREATE_ORDER_ERROR}: ${mockErrorMessage}`,
+          mockErrorMessage,
           PassportErrorType.CREATE_ORDER_ERROR,
         ),
       );
@@ -183,7 +183,7 @@ describe('order', () => {
         request: orderRequest as UnsignedOrderRequest,
         guardianClient: mockGuardianClient,
       })).rejects.toThrowError(new PassportError(
-        `${PassportErrorType.CREATE_ORDER_ERROR}: Transaction rejected by user`,
+        'Transaction rejected by user',
         PassportErrorType.CREATE_ORDER_ERROR,
       ));
       expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
@@ -293,7 +293,7 @@ describe('order', () => {
         request: cancelOrderRequest,
         guardianClient: mockGuardianClient,
       })).rejects.toThrowError(new PassportError(
-        `${PassportErrorType.CANCEL_ORDER_ERROR}: Transaction rejected by user`,
+        'Transaction rejected by user',
         PassportErrorType.CANCEL_ORDER_ERROR,
       ));
     });
@@ -309,7 +309,7 @@ describe('order', () => {
         guardianClient: mockGuardianClient,
       })).rejects.toThrow(
         new PassportError(
-          `${PassportErrorType.CANCEL_ORDER_ERROR}: ${mockErrorMessage}`,
+          mockErrorMessage,
           PassportErrorType.CANCEL_ORDER_ERROR,
         ),
       );

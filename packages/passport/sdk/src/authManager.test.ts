@@ -225,7 +225,7 @@ describe('AuthManager', () => {
 
       await expect(() => authManager.login()).rejects.toThrow(
         new PassportError(
-          `${PassportErrorType.AUTHENTICATION_ERROR}: ${mockErrorMsg}`,
+          mockErrorMsg,
           PassportErrorType.AUTHENTICATION_ERROR,
         ),
       );
@@ -308,7 +308,7 @@ describe('AuthManager', () => {
 
       await expect(() => manager.logout()).rejects.toThrow(
         new PassportError(
-          `${PassportErrorType.LOGOUT_ERROR}: ${mockErrorMsg}`,
+          mockErrorMsg,
           PassportErrorType.LOGOUT_ERROR,
         ),
       );
