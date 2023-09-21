@@ -87,10 +87,14 @@ describe('confirmation', () => {
 
   describe('requestMessageConfirmation', () => {
     it('should open a window when confirmation is required', async () => {
-      const res = await confirmationScreen.requestMessageConfirmation('asd123');
+      const res = await confirmationScreen.requestMessageConfirmation('asd123', mockEtherAddress);
       confirmationScreen.loading();
       expect(res.confirmed).toEqual(false);
-      expect(mockNewWindow.location.href).toEqual('https://passport.sandbox.immutable.com/transaction-confirmation/zkevm/message?messageID=asd123');
+      expect(mockNewWindow.location.href)
+        .toEqual(
+          // eslint-disable-next-line max-len
+          `https://passport.sandbox.immutable.com/transaction-confirmation/zkevm/message?messageID=asd123&imxEtherAddress=${mockEtherAddress}`,
+        );
     });
   });
 });

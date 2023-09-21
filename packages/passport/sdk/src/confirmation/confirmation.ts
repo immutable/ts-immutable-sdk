@@ -71,7 +71,7 @@ export default class ConfirmationScreen {
     });
   }
 
-  requestMessageConfirmation(messageId: string): Promise<ConfirmationResult> {
+  requestMessageConfirmation(messageId: string, imxEtherAddress: string): Promise<ConfirmationResult> {
     return new Promise((resolve, reject) => {
       const messageHandler = ({ data, origin }: MessageEvent) => {
         if (
@@ -103,7 +103,8 @@ export default class ConfirmationScreen {
       }
       window.addEventListener('message', messageHandler);
 
-      const href = `${this.config.passportDomain}/transaction-confirmation/zkevm/message?messageID=${messageId}`;
+      // eslint-disable-next-line max-len
+      const href = `${this.config.passportDomain}/transaction-confirmation/zkevm/message?messageID=${messageId}&imxEtherAddress=${imxEtherAddress}`;
 
       this.showConfirmationScreen(href, messageHandler, resolve);
     });

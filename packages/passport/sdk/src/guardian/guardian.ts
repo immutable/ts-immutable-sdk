@@ -260,6 +260,7 @@ export default class GuardianClient {
     if (confirmationRequired && !!messageId) {
       const confirmationResult = await this.confirmationScreen.requestMessageConfirmation(
         messageId,
+        this.imxEtherAddress,
       );
 
       if (!confirmationResult.confirmed) {
