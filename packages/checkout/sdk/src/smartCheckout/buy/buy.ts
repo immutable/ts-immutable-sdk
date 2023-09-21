@@ -1,5 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { BigNumber, Contract } from 'ethers';
+import {
+  BigNumber,
+} from 'ethers';
 import {
   ERC20Item,
   NativeItem,
@@ -7,7 +9,6 @@ import {
   ListingResult,
   FeeValue,
 } from '@imtbl/orderbook';
-import { ERC20ItemItemTypeEnum } from '@imtbl/generated-clients/dist/multi-rollup';
 import {
   BuyOrder,
   BuyResult,
@@ -91,8 +92,6 @@ export const buy = async (
   }
 
   const { id, takerFees } = orders[0];
-  // eslint-disable-next-line no-console
-  console.log('takerFees', takerFees);
 
   try {
     orderbook = await instance.createOrderbookInstance(config);
@@ -110,23 +109,23 @@ export const buy = async (
     );
   }
 
-  let decimals = 18;
   if (order.result.buy.length === 0) throw new Error('No buy token items in order result');
   const buyToken = order.result.buy[0];
 
-  if (order.result.buy[0].type === ERC20ItemItemTypeEnum.Erc20) {
-    const tokenContract = new Contract(order.result.buy[0].contractAddress, ERC20ABI, provider);
+  let decimals = 18;
+  if (order.result.buy[0].type === 'ERC20') {
+    const tokenContract = instance.getTokenContract(
+      order.result.buy[0].contractAddress,
+      ERC20ABI,
+      provider,
+    );
     decimals = await tokenContract.decimals();
-    // eslint-disable-next-line no-console
-    console.log(decimals);
   }
 
   let fees: FeeValue[] = [];
   // calculate the taker fees here to be applied in the orderbook.fulfillOrder step
   if (takerFees && takerFees.length > 0) {
-    fees = calculateFees(takerFees, buyToken.amount.toString());
-    // eslint-disable-next-line no-console
-    console.log(fees);
+    fees = calculateFees(takerFees, buyToken.amount, decimals);
   }
 
   let unsignedTransactions: UnsignedTransactions = {
@@ -135,7 +134,7 @@ export const buy = async (
   };
   try {
     const fulfillerAddress = await provider.getSigner().getAddress();
-    const { actions } = await orderbook.fulfillOrder(id, fulfillerAddress, []);
+    const { actions } = await orderbook.fulfillOrder(id, fulfillerAddress, fees);
     unsignedTransactions = await getUnsignedTransactions(actions);
   } catch {
     // Silently ignore error as this is usually thrown if user does not have enough balance
