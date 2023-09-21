@@ -1,10 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import {
-  Body, Box, Button, Heading, Select, Option,
+  Body, Box, Button, Heading,
+  Option,
+  Select,
 } from '@biom3/react';
 
 import { useState } from 'react';
+import { ChainId } from '@imtbl/checkout-sdk';
+import { BigNumber } from 'ethers';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -18,25 +22,48 @@ export function SmartCheckout() {
   const { options } = text.views[PrimaryRevenueWidgetViews.SMART_CHECKOUT];
 
   const [smartCheckoutDrawerVisible, setSmartCheckoutDrawerVisible] = useState(false);
+  const [activeFundingRouteIndex, setActiveFundingRouteIndex] = useState(0);
 
-  const mockSmartCheckoutOptions = [
+  const fundingRoutes = [
     {
-      label: 'ETH coins',
+      priority: 1,
+      steps: [{
+        type: 'BRIDGE',
+        chainId: ChainId.SEPOLIA,
+        asset: {
+          balance: BigNumber.from(1),
+          formattedBalance: '1',
+          token: {
+            name: 'ETH',
+            symbol: 'ETH',
+            decimals: 18,
+          },
+        },
+      }],
     },
     {
-      label: 'GODS coins',
-    },
-    {
-      label: 'ETH L1 coins',
-    },
-    {
-      label: 'USDC L1 coins',
+      priority: 2,
+      steps: [{
+        type: 'SWAP',
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        asset: {
+          balance: BigNumber.from(10),
+          formattedBalance: '10',
+          token: {
+            name: 'ERC20',
+            symbol: 'ERC20',
+            decimals: 18,
+            address: '0xERC20_2',
+          },
+        },
+      }],
     },
   ];
 
   const onClickContinue = async () => null;
 
-  const closeBottomSheet = () => {
+  const closeBottomSheet = (selectedFundingRouteIndex: number) => {
+    setActiveFundingRouteIndex(selectedFundingRouteIndex);
     setSmartCheckoutDrawerVisible(false);
   };
 
@@ -76,20 +103,14 @@ export function SmartCheckout() {
           <Heading size="small">
             Pay with your
           </Heading>
-          {mockSmartCheckoutOptions.length === 1
-            ? (mockSmartCheckoutOptions[0].label)
+          {fundingRoutes.length === 1
+            ? (fundingRoutes[activeFundingRouteIndex].steps[0].type)
             : (
 
               <Select
-                defaultLabel={mockSmartCheckoutOptions[0].label}
+                defaultLabel={fundingRoutes[activeFundingRouteIndex].steps[0].type}
                 targetClickOveride={onSmartCheckoutDropdownClick}
-              >
-                {/* {mockSmartCheckoutOptions.map((option, i) => (
-                  <Option optionKey={i}>
-                    <Option.Label>{option.label}</Option.Label>
-                  </Option>
-                ))} */}
-              </Select>
+              />
 
             )}
 
@@ -110,6 +131,8 @@ export function SmartCheckout() {
       <SmartCheckoutDrawer
         visible={smartCheckoutDrawerVisible}
         onCloseBottomSheet={closeBottomSheet}
+        fundingRoutes={fundingRoutes}
+        activeFundingRouteIndex={activeFundingRouteIndex}
       />
     </SimpleLayout>
   );

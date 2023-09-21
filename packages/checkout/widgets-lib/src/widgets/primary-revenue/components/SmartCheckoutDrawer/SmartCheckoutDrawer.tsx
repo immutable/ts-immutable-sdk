@@ -1,9 +1,8 @@
 import {
   BottomSheet, Box,
-  Heading,
-  IMX_TOKEN_IMAGE_URL,
-  MenuItem,
   DUMMY_RASTER_IMAGE_URL,
+  Heading,
+  MenuItem,
 } from '@biom3/react';
 import {
   containerStyles,
@@ -12,14 +11,23 @@ import {
 
 type SmartCheckoutDrawerProps = {
   visible: boolean;
-  onCloseBottomSheet?: () => void;
+  onCloseBottomSheet: (selectedFundingRouteIndex: number) => void;
+  fundingRoutes: any;
+  activeFundingRouteIndex: number;
 };
 
-export function SmartCheckoutDrawer({ visible, onCloseBottomSheet }: SmartCheckoutDrawerProps) {
+export function SmartCheckoutDrawer({
+  visible, onCloseBottomSheet, fundingRoutes, activeFundingRouteIndex,
+}:
+SmartCheckoutDrawerProps) {
+  const onClickMenuItem = (selectedFundingRouteIndex: number) => {
+    onCloseBottomSheet(selectedFundingRouteIndex);
+  };
+
   return (
     <BottomSheet
       size="full"
-      onCloseBottomSheet={onCloseBottomSheet}
+      onCloseBottomSheet={() => onCloseBottomSheet(activeFundingRouteIndex)}
       visible={visible}
       showHeaderBar={false}
     >
@@ -40,32 +48,28 @@ export function SmartCheckoutDrawer({ visible, onCloseBottomSheet }: SmartChecko
             flexDirection: 'column',
           }}
           >
-            <MenuItem onClick={() => ({})}>
-              <MenuItem.Badge variant="guidance" isAnimated />
-              <MenuItem.IntentIcon icon="ChevronForward" />
-              <MenuItem.FramedImage imageUrl={DUMMY_RASTER_IMAGE_URL} />
-              <MenuItem.Label rc={<span contentEditable />}>
-                Some label text 1
-              </MenuItem.Label>
-              <MenuItem.Caption rc={<span contentEditable />}>
-                Some caption text
-              </MenuItem.Caption>
-            </MenuItem>
-            <MenuItem>
-              <MenuItem.IntentIcon />
-              <MenuItem.Label rc={<span contentEditable />}>
-                Some label text 1
-              </MenuItem.Label>
-              <MenuItem.Caption rc={<span contentEditable />}>
-                Some caption text
-              </MenuItem.Caption>
-              <MenuItem.PriceDisplay
-                fiatAmount="USD $12345.12"
-                price="1835.1234"
-                currencyImageUrl={IMX_TOKEN_IMAGE_URL}
-              />
+            {fundingRoutes.map((route: any, i: number) => (
+              <MenuItem
+                onClick={() => onClickMenuItem(i)}
+                key={route.priority}
+                selected={activeFundingRouteIndex === i}
+              >
+                <MenuItem.Badge variant="guidance" isAnimated />
+                <MenuItem.IntentIcon icon="ChevronForward" />
+                <MenuItem.FramedImage imageUrl={DUMMY_RASTER_IMAGE_URL} />
+                <MenuItem.Label>
+                  { route.steps[0].type }
+                  {' '}
+                  -
+                  {' '}
+                  { route.steps[0].asset.token.name}
+                </MenuItem.Label>
+                <MenuItem.Caption>
+                  Some caption text
+                </MenuItem.Caption>
+              </MenuItem>
 
-            </MenuItem>
+            ))}
           </Box>
 
         </Box>
