@@ -1,11 +1,15 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { BigNumber } from 'ethers';
+import { BigNumber, Contract } from 'ethers';
 import {
   ERC20Item,
   NativeItem,
   constants,
+  ListingResult,
+  FeeValue,
 } from '@imtbl/orderbook';
+import { ERC20ItemItemTypeEnum } from '@imtbl/generated-clients/dist/multi-rollup';
 import {
+  BuyOrder,
   BuyResult,
   BuyStatusType,
 } from '../../types/buy';
@@ -23,6 +27,8 @@ import {
 import { smartCheckout } from '..';
 import { getUnsignedTransactions, signApprovalTransactions, signFulfilmentTransactions } from '../actions';
 import { SignTransactionStatusType, UnsignedTransactions } from '../actions/types';
+import { ERC20ABI } from '../../types';
+import { calculateFees } from '../fees/fees';
 
 export const getItemRequirement = (
   type: ItemType,
@@ -70,16 +76,27 @@ export const getTransactionOrGas = (
 export const buy = async (
   config: CheckoutConfiguration,
   provider: Web3Provider,
-  orderId: string,
+  orders: Array<BuyOrder>,
 ): Promise<BuyResult> => {
   let orderbook;
-  let order;
+  let order: ListingResult;
   let spenderAddress = '';
   const gasLimit = constants.estimatedFulfillmentGasGwei;
 
+  if (orders.length === 0) {
+    throw new CheckoutError(
+      'No orders were passed in, must pass at least one order',
+      CheckoutErrorType.FULFILL_ORDER_LISTING_ERROR,
+    );
+  }
+
+  const { id, takerFees } = orders[0];
+  // eslint-disable-next-line no-console
+  console.log('takerFees', takerFees);
+
   try {
     orderbook = await instance.createOrderbookInstance(config);
-    order = await orderbook.getListing(orderId);
+    order = await orderbook.getListing(id);
     const { seaportContractAddress } = orderbook.config();
     spenderAddress = seaportContractAddress;
   } catch (err: any) {
@@ -87,10 +104,29 @@ export const buy = async (
       'An error occurred while getting the order listing',
       CheckoutErrorType.GET_ORDER_LISTING_ERROR,
       {
-        orderId,
+        orderId: id,
         message: err.message,
       },
     );
+  }
+
+  let decimals = 18;
+  if (order.result.buy.length === 0) throw new Error('No buy token items in order result');
+  const buyToken = order.result.buy[0];
+
+  if (order.result.buy[0].type === ERC20ItemItemTypeEnum.Erc20) {
+    const tokenContract = new Contract(order.result.buy[0].contractAddress, ERC20ABI, provider);
+    decimals = await tokenContract.decimals();
+    // eslint-disable-next-line no-console
+    console.log(decimals);
+  }
+
+  let fees: FeeValue[] = [];
+  // calculate the taker fees here to be applied in the orderbook.fulfillOrder step
+  if (takerFees && takerFees.length > 0) {
+    fees = calculateFees(takerFees, buyToken.amount.toString());
+    // eslint-disable-next-line no-console
+    console.log(fees);
   }
 
   let unsignedTransactions: UnsignedTransactions = {
@@ -99,7 +135,7 @@ export const buy = async (
   };
   try {
     const fulfillerAddress = await provider.getSigner().getAddress();
-    const { actions } = await orderbook.fulfillOrder(orderId, fulfillerAddress, []);
+    const { actions } = await orderbook.fulfillOrder(id, fulfillerAddress, []);
     unsignedTransactions = await getUnsignedTransactions(actions);
   } catch {
     // Silently ignore error as this is usually thrown if user does not have enough balance
@@ -125,7 +161,7 @@ export const buy = async (
           'Purchasing token type is unsupported',
           CheckoutErrorType.UNSUPPORTED_TOKEN_TYPE_ERROR,
           {
-            orderId,
+            orderId: id,
           },
         );
     }
@@ -161,7 +197,7 @@ export const buy = async (
     if (approvalResult.type === SignTransactionStatusType.FAILED) {
       return {
         smartCheckoutResult,
-        orderId,
+        orderId: id,
         status: {
           type: BuyStatusType.FAILED,
           transactionHash: approvalResult.transactionHash,
@@ -174,7 +210,7 @@ export const buy = async (
     if (fulfilmentResult.type === SignTransactionStatusType.FAILED) {
       return {
         smartCheckoutResult,
-        orderId,
+        orderId: id,
         status: {
           type: BuyStatusType.FAILED,
           transactionHash: fulfilmentResult.transactionHash,
@@ -185,7 +221,7 @@ export const buy = async (
 
     return {
       smartCheckoutResult,
-      orderId,
+      orderId: id,
       status: {
         type: BuyStatusType.SUCCESS,
       },
@@ -194,6 +230,6 @@ export const buy = async (
 
   return {
     smartCheckoutResult,
-    orderId,
+    orderId: id,
   };
 };

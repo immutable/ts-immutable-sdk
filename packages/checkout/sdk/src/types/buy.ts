@@ -1,5 +1,6 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { SmartCheckoutResult } from './smartCheckout';
+import { OrderFee } from './fees';
 
 /**
  * Interface representing the parameters for {@link Checkout.buy}
@@ -8,7 +9,17 @@ import { SmartCheckoutResult } from './smartCheckout';
  */
 export interface BuyParams {
   provider: Web3Provider;
-  orderId: string;
+  orders: Array<BuyOrder>;
+}
+
+/**
+ * Interface representing the order to buy
+ * @property {string} orderId - the id of the order to buy
+ * @property {Array<OrderFee>} takerFees - array of order fees to apply to the order
+ */
+export interface BuyOrder {
+  id: string;
+  takerFees?: Array<OrderFee>
 }
 
 /**

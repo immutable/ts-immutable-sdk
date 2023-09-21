@@ -122,7 +122,11 @@ describe('buy', () => {
           type: SignTransactionStatusType.SUCCESS,
         });
 
-        const orderId = '1';
+        // const orderId = '1';
+        const order = {
+          id: '1',
+          takerFees: [],
+        };
         const itemRequirements = [
           {
             type: ItemType.NATIVE,
@@ -134,7 +138,7 @@ describe('buy', () => {
           transaction: { from: '0xTRANSACTION' },
         };
 
-        const buyResult = await buy(config, mockProvider, orderId);
+        const buyResult = await buy(config, mockProvider, [order]);
         expect(smartCheckout).toBeCalledWith(
           config,
           mockProvider,
@@ -143,7 +147,7 @@ describe('buy', () => {
         );
         expect(buyResult).toEqual({
           smartCheckoutResult,
-          orderId,
+          orderId: order.id,
           status: {
             type: BuyStatusType.SUCCESS,
           },
@@ -178,7 +182,11 @@ describe('buy', () => {
         fulfillOrder: jest.fn().mockRejectedValue({}),
       });
 
-      const orderId = '1';
+      // const orderId = '1';
+      const order = {
+        id: '1',
+        takerFees: [],
+      };
       const itemRequirements = [
         {
           type: ItemType.NATIVE,
@@ -193,7 +201,7 @@ describe('buy', () => {
         },
       };
 
-      const result = await buy(config, mockProvider, orderId);
+      const result = await buy(config, mockProvider, [order]);
       expect(smartCheckout).toBeCalledWith(
         config,
         mockProvider,
@@ -202,7 +210,7 @@ describe('buy', () => {
       );
       expect(result).toEqual({
         smartCheckoutResult: {},
-        orderId,
+        orderId: order.id,
       });
     });
 
@@ -270,7 +278,11 @@ describe('buy', () => {
         type: SignTransactionStatusType.SUCCESS,
       });
 
-      const orderId = '1';
+      // const orderId = '1';
+      const order = {
+        id: '1',
+        takerFees: [],
+      };
       const itemRequirements = [
         {
           type: ItemType.ERC20,
@@ -287,7 +299,7 @@ describe('buy', () => {
         },
       };
 
-      const result = await buy(config, mockProvider, orderId);
+      const result = await buy(config, mockProvider, [order]);
       expect(smartCheckout).toBeCalledWith(
         config,
         mockProvider,
@@ -296,7 +308,7 @@ describe('buy', () => {
       );
       expect(result).toEqual({
         smartCheckoutResult,
-        orderId,
+        orderId: order.id,
         status: {
           type: BuyStatusType.SUCCESS,
         },
@@ -376,7 +388,11 @@ describe('buy', () => {
       });
       (signApprovalTransactions as jest.Mock).mockResolvedValue({});
       (signFulfilmentTransactions as jest.Mock).mockResolvedValue({});
-      const orderId = '1';
+      // const orderId = '1';
+      const order = {
+        id: '1',
+        takerFees: [],
+      };
       const itemRequirements = [
         {
           type: ItemType.NATIVE,
@@ -388,7 +404,7 @@ describe('buy', () => {
         transaction: { from: '0xTRANSACTION' },
       };
 
-      const buyResult = await buy(config, mockProvider, orderId);
+      const buyResult = await buy(config, mockProvider, [order]);
       expect(smartCheckout).toBeCalledWith(
         config,
         mockProvider,
@@ -399,7 +415,7 @@ describe('buy', () => {
       expect(signFulfilmentTransactions).toBeCalledTimes(0);
       expect(buyResult).toEqual({
         smartCheckoutResult,
-        orderId,
+        orderId: order.id,
       });
     });
 
@@ -483,7 +499,11 @@ describe('buy', () => {
         type: SignTransactionStatusType.SUCCESS,
       });
 
-      const orderId = '1';
+      // const orderId = '1';
+      const order = {
+        id: '1',
+        takerFees: [],
+      };
       const itemRequirements = [
         {
           type: ItemType.NATIVE,
@@ -495,7 +515,7 @@ describe('buy', () => {
         transaction: { from: '0xTRANSACTION' },
       };
 
-      const buyResult = await buy(config, mockProvider, orderId);
+      const buyResult = await buy(config, mockProvider, [order]);
       expect(smartCheckout).toBeCalledWith(
         config,
         mockProvider,
@@ -504,7 +524,7 @@ describe('buy', () => {
       );
       expect(buyResult).toEqual({
         smartCheckoutResult,
-        orderId,
+        orderId: order.id,
         status: {
           type: BuyStatusType.FAILED,
           transactionHash: '0xHASH',
@@ -596,7 +616,11 @@ describe('buy', () => {
         reason: 'fulfilment error',
       });
 
-      const orderId = '1';
+      // const orderId = '1';
+      const order = {
+        id: '1',
+        takerFees: [],
+      };
       const itemRequirements = [
         {
           type: ItemType.NATIVE,
@@ -608,7 +632,7 @@ describe('buy', () => {
         transaction: { from: '0xTRANSACTION' },
       };
 
-      const buyResult = await buy(config, mockProvider, orderId);
+      const buyResult = await buy(config, mockProvider, [order]);
       expect(smartCheckout).toBeCalledWith(
         config,
         mockProvider,
@@ -617,7 +641,7 @@ describe('buy', () => {
       );
       expect(buyResult).toEqual({
         smartCheckoutResult,
-        orderId,
+        orderId: order.id,
         status: {
           type: BuyStatusType.FAILED,
           transactionHash: '0xHASH',
@@ -653,12 +677,16 @@ describe('buy', () => {
         fulfillOrder: jest.fn().mockRejectedValue({}),
       });
 
-      const orderId = '1';
+      // const orderId = '1';
+      const order = {
+        id: '1',
+        takerFees: [],
+      };
       let message;
       let type;
       let data;
       try {
-        await buy(config, mockProvider, orderId);
+        await buy(config, mockProvider, [order]);
       } catch (err: any) {
         message = err.message;
         type = err.type;
@@ -693,12 +721,16 @@ describe('buy', () => {
         fulfillOrder: jest.fn().mockRejectedValue({}),
       });
 
-      const orderId = '1';
+      // const orderId = '1';
+      const order = {
+        id: '1',
+        takerFees: [],
+      };
       let message;
       let type;
       let data;
       try {
-        await buy(config, mockProvider, orderId);
+        await buy(config, mockProvider, [order]);
       } catch (err: any) {
         message = err.message;
         type = err.type;
@@ -716,14 +748,18 @@ describe('buy', () => {
       });
 
       const provider = {} as any;
-      const orderId = '1';
+      // const orderId = '1';
+      const order = {
+        id: '1',
+        takerFees: [],
+      };
 
       let message;
       let type;
       let data;
 
       try {
-        await buy(config, provider, orderId);
+        await buy(config, provider, [order]);
       } catch (err: any) {
         message = err.message;
         type = err.type;
