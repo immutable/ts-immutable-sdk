@@ -112,8 +112,8 @@ export interface TransactionIframeProps {
 }
 
 export function TransakIframe({
-    id, 
-    src,
+  id,
+  src,
   email,
   walletAddress,
   isPassportWallet,

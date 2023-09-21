@@ -103,6 +103,7 @@ export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
               amount={this.amount}
               fromCurrency={this.fromCurrency}
               items={this.items}
+              params={connectLoaderParams}
             />
           </ConnectLoader>
         </CustomAnalyticsProvider>
