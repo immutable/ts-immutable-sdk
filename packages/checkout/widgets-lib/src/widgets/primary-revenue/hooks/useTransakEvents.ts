@@ -74,15 +74,22 @@ export const useTransakEvents = (props: UseTransakEventsProps) => {
   const { track } = useAnalytics();
 
   const handleAnalyticsEvent = useCallback((event: TransakEventData) => {
-    const eventData = ANALYTICS_EVENTS?.[event.event_id] || {};
+    const type = event.event_id;
+    const key = [TransakEvents.TRANSAK_ORDER_SUCCESSFUL].includes(type)
+      ? `${type}${event.data.status}`
+      : type;
 
-    track({
-      ...eventData,
-      email,
-      userId,
-      userJourney,
-      isPassportWallet,
-    });
+    const eventData = ANALYTICS_EVENTS?.[key] || {};
+
+    if (Object.keys(eventData).length >= 0) {
+      track({
+        ...eventData,
+        email,
+        userId,
+        userJourney,
+        isPassportWallet,
+      });
+    }
   }, []);
 
   const handleEvents = useCallback((event: TransakEventData) => {
