@@ -6,7 +6,7 @@ import {
   Select,
 } from '@biom3/react';
 
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { ChainId } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
@@ -17,9 +17,11 @@ import { text } from '../../../resources/text/textConfig';
 
 import { sendPrimaryRevenueWidgetCloseEvent } from '../PrimaryRevenuWidgetEvents';
 import { SmartCheckoutDrawer } from '../components/SmartCheckoutDrawer/SmartCheckoutDrawer';
+import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 
 export function SmartCheckout() {
   const { options } = text.views[PrimaryRevenueWidgetViews.SMART_CHECKOUT];
+  const { viewDispatch } = useContext(ViewContext);
 
   const [smartCheckoutDrawerVisible, setSmartCheckoutDrawerVisible] = useState(false);
   const [activeFundingRouteIndex, setActiveFundingRouteIndex] = useState(0);
@@ -60,7 +62,16 @@ export function SmartCheckout() {
     },
   ];
 
-  const onClickContinue = async () => null;
+  const onClickContinue = () => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: PrimaryRevenueWidgetViews.SWAP,
+        },
+      },
+    });
+  };
 
   const closeBottomSheet = (selectedFundingRouteIndex: number) => {
     setActiveFundingRouteIndex(selectedFundingRouteIndex);

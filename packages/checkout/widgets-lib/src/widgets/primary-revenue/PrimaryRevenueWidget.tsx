@@ -161,16 +161,16 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
             tokenAddress=""
           />
         )}
+        {viewState.view.type
+            === PrimaryRevenueWidgetViews.SWAP && (
+              <SwapWidget config={config} params={{ ...viewState.view.data }} />
+        )}
         {viewState.view.type === PrimaryRevenueWidgetViews.SMART_CHECKOUT && (
           <SmartCheckout />
         )}
         {viewState.view.type
           === (OrchestrationEventType.REQUEST_ONRAMP as unknown) && (
             <OnRampWidget config={config} params={{ ...viewState.view.data }} />
-        )}
-        {viewState.view.type
-          === (OrchestrationEventType.REQUEST_SWAP as unknown) && (
-            <SwapWidget config={config} params={{ ...viewState.view.data }} />
         )}
         {viewState.view.type
           === (OrchestrationEventType.REQUEST_BRIDGE as unknown) && (

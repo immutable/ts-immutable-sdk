@@ -8,6 +8,7 @@ export enum PrimaryRevenueWidgetViews {
   REVIEW_ORDER = 'REVIEW_ORDER',
   SUCCESS = 'SUCCESS',
   FAIL = 'FAIL',
+  SWAP = 'SWAP',
 }
 
 export type PrimaryRevenueWidgetView =
@@ -17,6 +18,7 @@ export type PrimaryRevenueWidgetView =
   | PrimaryRevenueSuccessView
   | PrimaryRevenueReviewOrderView
   | PrimaryRevenueSmartCheckoutView
+  | PrimaryRevenueSwapView
   | PrimaryRevenueFailView;
 
 interface PrimaryRevenueMethodsView extends ViewType {
@@ -40,4 +42,7 @@ interface PrimaryRevenueFailView extends ViewType {
 }
 interface PrimaryRevenueSmartCheckoutView extends ViewType {
   type: PrimaryRevenueWidgetViews.SMART_CHECKOUT;
+}
+interface PrimaryRevenueSwapView extends ViewType {
+  type: PrimaryRevenueWidgetViews.SWAP;
 }
