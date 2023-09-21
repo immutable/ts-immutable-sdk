@@ -1,2 +1,1 @@
-export { sdkVersionCheck } from './versionCheck';
-export { getItem, setItem, deleteItem } from './localStorage';
+export { sdkVersionCheck, sdkVersion } from './versionCheck';

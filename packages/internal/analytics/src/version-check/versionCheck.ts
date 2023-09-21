@@ -3,6 +3,7 @@ import { getItem, setItem } from './localStorage';
 
 export const imtblApi = process.env.IMTBL_API || 'https://api.x.immutable.com';
 export const versionApi = process.env.VERSION_API || '/v1/check';
+export const sdkVersion = '__SDK_VERSION__';
 
 const getReferrer = () => {
   if (typeof window === 'undefined') {
@@ -57,8 +58,6 @@ const useRuntimeId = (runtimeId?: string) => {
 
 export const sdkVersionCheck = (appName?: string, appVersion?: string) => {
   try {
-    const sdkVersion = '__SDK_VERSION__';
-
     const existingRuntimeId = useRuntimeId();
     const runtimeDetails = sdkRuntimeDetails();
     const versionParam = appName && appVersion

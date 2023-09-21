@@ -1,1 +1,1 @@
-export { sdkVersionCheck } from './version-check';
+export { sdkVersionCheck, sdkVersion } from './version-check';
