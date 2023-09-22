@@ -57,18 +57,8 @@ export const useTransakIframe = (props: UseTransakIframeProps) => {
       isNFT: 'true',
       disableWalletAddressForm: 'true',
       environment: 'STAGING',
-      nftData: btoa(JSON.stringify([
-        {
-          collectionAddress: '0x81064a5d163559D422fD311dc36c051424620EB9',
-          imageURL: 'https://pokemon-nfts.s3.ap-southeast-2.amazonaws.com/images/60.png',
-          nftName: 'Poliwag',
-          price: [10],
-          tokenID: [48451390],
-          quantity: 1,
-          nftType: 'ERC721',
-        },
-      ])),
-      estimatedGasLimit: estimatedGasLimit.toString(),
+      nftData: btoa(JSON.stringify(nftData)),
+      estimatedGasLimit: '300', // estimatedGasLimit.toString(),
       ...restTransakParams,
     };
 
