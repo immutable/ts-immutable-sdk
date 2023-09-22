@@ -181,6 +181,7 @@ export const sell = async (
       orderComponents: signedMessage.orderComponents,
       orderHash: signedMessage.orderHash,
       orderSignature: signedMessage.signedMessage,
+      makerFees: [],
     };
 
     if (makerFees !== undefined) {
