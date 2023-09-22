@@ -110,8 +110,14 @@ export const buy = async (
   }
 
   if (order.result.buy.length === 0) {
-    // TODO : update this error
-    throw new Error('No buy token items in order result');
+    throw new CheckoutError(
+      'An error occurred with the get order listing',
+      CheckoutErrorType.GET_ORDER_LISTING_ERROR,
+      {
+        orderId: id,
+        message: 'No buy side tokens found on order',
+      },
+    );
   }
   const buyToken = order.result.buy[0];
 
