@@ -18,9 +18,6 @@ export default function Listings({ checkout, provider }: ListingsProps) {
   const [error, setError] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  useEffect(() => {
-    
-  }, [])
   async function getListingsClick() {
     if (!sellContractAddress) {
       setAddressError('Please enter an collection address');
