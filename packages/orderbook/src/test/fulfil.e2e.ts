@@ -48,6 +48,7 @@ describe('fulfil order', () => {
       orderComponents: listing.orderComponents,
       orderHash: listing.orderHash,
       orderSignature: signatures[0],
+      makerFees: [],
     });
 
     await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.ACTIVE);
@@ -55,6 +56,7 @@ describe('fulfil order', () => {
     const fulfillment = await sdk.fulfillOrder(
       orderId,
       fulfiller.address,
+      [],
     );
 
     await actionAll(fulfillment.actions, fulfiller, provider);
