@@ -35,6 +35,7 @@ import { useSignOrder } from './hooks/useSignOrder';
 import { Item } from './hooks/useMergeItemsInfo';
 import { useSmartCheckout } from './hooks/useSmartCheckout';
 import { SmartCheckout } from './views/SmartCheckout';
+import { FundWithSmartCheckout } from './views/FundWithSmartCheckout';
 
 export interface PrimaryRevenueWidgetProps {
   config: StrongCheckoutWidgetsConfig;
@@ -175,6 +176,10 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
         {viewState.view.type
           === (OrchestrationEventType.REQUEST_BRIDGE as unknown) && (
             <BridgeWidget config={config} params={{ ...viewState.view.data }} />
+        )}
+        {viewState.view.type
+          === (PrimaryRevenueWidgetViews.FUND_WITH_SMART_CHECKOUT) && (
+            <FundWithSmartCheckout data={viewState.view.data} />
         )}
       </ViewContext.Provider>
     </BiomeCombinedProviders>

@@ -1,3 +1,5 @@
+import { SmartCheckoutResult } from '@imtbl/checkout-sdk';
+import { SignResponse } from '../../widgets/primary-revenue/hooks/useSignOrder';
 import { ViewType } from './ViewType';
 
 export enum PrimaryRevenueWidgetViews {
@@ -9,6 +11,7 @@ export enum PrimaryRevenueWidgetViews {
   SUCCESS = 'SUCCESS',
   FAIL = 'FAIL',
   SWAP = 'SWAP',
+  FUND_WITH_SMART_CHECKOUT = 'FUND_WITH_SMART_CHECKOUT',
 }
 
 export type PrimaryRevenueWidgetView =
@@ -19,6 +22,7 @@ export type PrimaryRevenueWidgetView =
   | PrimaryRevenueReviewOrderView
   | PrimaryRevenueSmartCheckoutView
   | PrimaryRevenueSwapView
+  | PrimaryRevenueFundWithSmartCheckoutView
   | PrimaryRevenueFailView;
 
 interface PrimaryRevenueMethodsView extends ViewType {
@@ -45,4 +49,35 @@ interface PrimaryRevenueSmartCheckoutView extends ViewType {
 }
 interface PrimaryRevenueSwapView extends ViewType {
   type: PrimaryRevenueWidgetViews.SWAP;
+}
+interface PrimaryRevenueFundWithSmartCheckoutView extends ViewType {
+  type: PrimaryRevenueWidgetViews.FUND_WITH_SMART_CHECKOUT;
+  data: FundWithSmartCheckoutData;
+}
+
+export type FundWithSmartCheckoutData =
+  | FundWithSmartCheckoutInit
+  | FundWithSmartCheckoutSelect
+  | FundWithSmartCheckoutFundingRoute;
+
+export enum FundWithSmartCheckoutSubViews {
+  INIT = 'INIT',
+  SELECT = 'SELECT',
+  FUNDING_ROUTE = 'FUNDING_ROUTE',
+}
+
+interface FundWithSmartCheckoutInit {
+  type: FundWithSmartCheckoutSubViews.INIT,
+  signResponse?: SignResponse,
+  smartCheckoutResult?: SmartCheckoutResult | void,
+}
+
+interface FundWithSmartCheckoutSelect {
+  type: FundWithSmartCheckoutSubViews.SELECT;
+}
+
+interface FundWithSmartCheckoutFundingRoute {
+  type: FundWithSmartCheckoutSubViews.FUNDING_ROUTE;
+  fundingRoute: any
+
 }

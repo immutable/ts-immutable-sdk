@@ -11,7 +11,10 @@ import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { text } from '../../../resources/text/textConfig';
 import { PaymentOptions } from '../components/PaymentOptions';
-import { PrimaryRevenueWidgetViews } from '../../../context/view-context/PrimaryRevenueViewContextTypes';
+import {
+  FundWithSmartCheckoutSubViews,
+  PrimaryRevenueWidgetViews,
+} from '../../../context/view-context/PrimaryRevenueViewContextTypes';
 
 import {
   ViewContext,
@@ -59,7 +62,7 @@ export function PaymentMethods({ checkBalances, sign, smartCheckout }: PaymentMe
 
           // eslint-disable-next-line no-console
           console.log('@@@@@@@@ PaymentMethods.tsx signResponse', signResponse);
-          const smartCheckoutRes = await smartCheckout({
+          const smartCheckoutResult = await smartCheckout({
             spenderAddress: approveTx?.params.spender || '',
             amount: `${signResponse?.order.total_amount}`,
             contractAddress: approveTx?.contract_address || '',
@@ -68,15 +71,19 @@ export function PaymentMethods({ checkBalances, sign, smartCheckout }: PaymentMe
           // Use smartCheckoutRes to determine if crypto payment is possible
           // waiting on fundingRoutes being return by SmartCheckout
           // eslint-disable-next-line no-console
-          console.log('@@@@@@@@ PaymentMethods.tsx smartCheckoutRes', smartCheckoutRes);
+          console.log('@@@@@@@@ PaymentMethods.tsx smartCheckoutRes', smartCheckoutResult);
 
-          let sufficient = smartCheckoutRes?.sufficient;
-          if (!smartCheckoutRes) {
+          let sufficient = smartCheckoutResult?.sufficient;
+
+          if (!smartCheckoutResult) {
             // SmartCheckout still being developed - for now assume sufficient
             sufficient = true;
             // eslint-disable-next-line no-console
             console.log('@@@@@@@@ PaymentMethods.tsx SmartCheckout unable to return');
           }
+
+          //  todo remove for dev
+          sufficient = false;
 
           if (sufficient) {
             viewDispatch({
@@ -96,8 +103,8 @@ export function PaymentMethods({ checkBalances, sign, smartCheckout }: PaymentMe
               payload: {
                 type: ViewActions.UPDATE_VIEW,
                 view: {
-                  type: PrimaryRevenueWidgetViews.SMART_CHECKOUT,
-                  data: { signResponse, smartCheckoutRes },
+                  type: PrimaryRevenueWidgetViews.FUND_WITH_SMART_CHECKOUT,
+                  data: { signResponse, smartCheckoutResult, type: FundWithSmartCheckoutSubViews.INIT },
                 },
               },
             });
