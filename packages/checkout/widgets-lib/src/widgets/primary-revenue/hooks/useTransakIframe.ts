@@ -8,6 +8,7 @@ export type TransakNFTData = {
   collectionAddress: string;
   tokenID: Array<number>;
   price: Array<number>;
+  nftType: 'ERC721';
 };
 
 export type TransakWidgetType = 'on-ramp' | 'nft-checkout';
@@ -48,29 +49,34 @@ export const useTransakIframe = (props: UseTransakIframeProps) => {
   const network = 'immutablezkevm';
 
   const getNFTCheckoutURL = useCallback(() => {
-    // FIXME: environment will be set by checkout config
-    const sanitisedTransakParams = Object.entries(transakParams).reduce(
-      (acc, [key, value]) => ({
-        ...acc,
-        [key]: typeof value === 'string' ? value : JSON.stringify(value),
-      }),
-      {},
-    );
+    const { nftData, estimatedGasLimit, ...restTransakParams } = transakParams;
 
     const params = {
-      isNFT: 'true',
-      disableWalletAddressForm: 'true',
       apiKey,
       network,
+      isNFT: 'true',
+      disableWalletAddressForm: 'true',
       environment: 'STAGING',
-      ...sanitisedTransakParams,
+      nftData: btoa(JSON.stringify([
+        {
+          collectionAddress: '0x81064a5d163559D422fD311dc36c051424620EB9',
+          imageURL: 'https://pokemon-nfts.s3.ap-southeast-2.amazonaws.com/images/60.png',
+          nftName: 'Poliwag',
+          price: [10],
+          tokenID: [48451390],
+          quantity: 1,
+          nftType: 'ERC721',
+        },
+      ])),
+      estimatedGasLimit: estimatedGasLimit.toString(),
+      ...restTransakParams,
     };
 
     const baseUrl = `${TRANSAK_API_BASE_URL[environment]}?`;
     const queryParams = new URLSearchParams(params);
     const widgetUrl = `${baseUrl}${queryParams.toString()}`;
 
-    console.log(transakParams, widgetUrl);
+    console.log(params, widgetUrl);
     return widgetUrl;
   }, [props]);
 

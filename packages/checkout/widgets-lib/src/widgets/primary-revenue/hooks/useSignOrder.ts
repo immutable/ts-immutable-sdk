@@ -33,6 +33,8 @@ export type SignResponse = {
     params: {
       amount: number;
       spender: string;
+      deadline: string;
+      reference?: string;
     };
     raw_data: string;
   }[];

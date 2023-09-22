@@ -1,19 +1,11 @@
 /* eslint-disable no-console */
 import { BiomeCombinedProviders, Box } from '@biom3/react';
-// import { useContext } from 'react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import { Passport } from '@imtbl/passport';
 import {
   useContext, useEffect, useMemo, useState,
 } from 'react';
 import { WidgetTheme } from '../../../lib';
-// import {
-//   SharedViews,
-//   ViewContext,
-// } from '../../../context/view-context/ViewContext';
-// import { LoadingView } from '../../../views/loading/LoadingView';
-// import { PrimaryRevenueWidgetViews } from '../../../context/view-context/PrimaryRevenueViewContextTypes';
-// import { text } from '../../../resources/text/textConfig';
 import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -83,7 +75,7 @@ export function PayWithCard({
   const signResponse: SignResponse = viewState.view.data;
   const mergedItemsList = useMergeItemsInfo(items, signResponse);
 
-  const executeTxn = signResponse.transactions.find((tx) => tx.method_call.startsWith('execute'))!;
+  const executeTxn = signResponse?.transactions.find((tx) => tx.method_call.startsWith('execute'))!;
   const nftData: TransakNFTData[] = useMemo(
     () => mergedItemsList.map((item) => ({
       collectionAddress: executeTxn?.contract_address!,
@@ -92,6 +84,7 @@ export function PayWithCard({
       price: item.amount,
       tokenID: item.tokenId,
       quantity: item.qty,
+      nftType: 'ERC721',
     })),
     [mergedItemsList, executeTxn],
   );
@@ -110,20 +103,18 @@ export function PayWithCard({
           footerBackgroundColor="base.color.translucent.emphasis.200"
         >
           <TransakIframe
-            id="123"
+            id="transak-iframe"
             type="nft-checkout"
             email={email}
             walletAddress={walletAddress}
             isPassportWallet={isPassport}
-            //
-            exchangeScreenTitle=""
+            exchangeScreenTitle="Pay with Card"
             nftData={nftData}
             calldata={executeTxn.raw_data}
             cryptoCurrencyCode={currency}
             estimatedGasLimit={executeTxn.gas_estimate}
             smartContractAddress={executeTxn.contract_address}
-            partnerOrderId="some" // FIXME: include signOrder.order.id
-            //
+            partnerOrderId={executeTxn.params.reference}
             onOpen={onOpen}
             onOrderCreated={onOrderCreated}
             onOrderProcessing={onOrderProcessing}
