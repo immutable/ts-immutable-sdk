@@ -157,10 +157,12 @@ describe('buy', () => {
       expect(fulfillOrderMock).toBeCalledWith(
         order.id,
         '0xADDRESS',
-        {
-          recipient: '0xFEERECIPIENT',
-          amount: '25000000000000000',
-        },
+        [
+          {
+            recipient: '0xFEERECIPIENT',
+            amount: '25000000000000000',
+          },
+        ],
       );
     });
 
@@ -804,11 +806,12 @@ describe('buy', () => {
           id: '1',
           takerFees: [{ amount: { percentageDecimal: 0.025 }, recipient: '0xFEERECIPIENT' }] as OrderFee[],
         }],
-        expectedTakerFee:
-        {
-          recipient: '0xFEERECIPIENT',
-          amount: '25000000000000000',
-        },
+        expectedTakerFee: [
+          {
+            recipient: '0xFEERECIPIENT',
+            amount: '25000000000000000',
+          },
+        ],
       },
       {
         name: 'token taker fee',
@@ -816,18 +819,19 @@ describe('buy', () => {
           id: '1',
           takerFees: [{ amount: { token: '0.1' }, recipient: '0xFEERECIPIENT' }] as OrderFee[],
         }],
-        expectedTakerFee:
-        {
-          recipient: '0xFEERECIPIENT',
-          amount: '100000000000000000',
-        },
+        expectedTakerFee: [
+          {
+            recipient: '0xFEERECIPIENT',
+            amount: '100000000000000000',
+          },
+        ],
       },
       {
-        name: 'undefined taker fee',
+        name: 'undefined taker fee applies empty array',
         orders: [{
           id: '1',
         }],
-        expectedTakerFee: undefined,
+        expectedTakerFee: [],
       },
       {
         name: 'multiple taker fees applies only the first',
@@ -838,11 +842,16 @@ describe('buy', () => {
             { amount: { token: '0.1' }, recipient: '0xFEERECIPIENT' },
           ] as OrderFee[],
         }],
-        expectedTakerFee:
-        {
-          recipient: '0xFEERECIPIENT',
-          amount: '100000000000000000',
-        },
+        expectedTakerFee: [
+          {
+            recipient: '0xFEERECIPIENT',
+            amount: '100000000000000000',
+          },
+          {
+            recipient: '0xFEERECIPIENT',
+            amount: '100000000000000000',
+          },
+        ],
       },
       {
         name: 'multiple orders and multiple taker fees applies only the first taker fee to first order',
@@ -860,11 +869,16 @@ describe('buy', () => {
             { amount: { token: '0.1' }, recipient: '0xFEERECIPIENT' },
           ] as OrderFee[],
         }],
-        expectedTakerFee:
-        {
-          recipient: '0xFEERECIPIENT',
-          amount: '100000000000000000',
-        },
+        expectedTakerFee: [
+          {
+            recipient: '0xFEERECIPIENT',
+            amount: '100000000000000000',
+          },
+          {
+            recipient: '0xFEERECIPIENT',
+            amount: '100000000000000000',
+          },
+        ],
       },
     ];
     nativeOrderTakerFeeTestCases.forEach((testCase) => {
@@ -991,11 +1005,12 @@ describe('buy', () => {
           id: '1',
           takerFees: [{ amount: { percentageDecimal: 0.025 }, recipient: '0xFEERECIPIENT' }] as OrderFee[],
         }],
-        expectedTakerFee:
-        {
-          recipient: '0xFEERECIPIENT',
-          amount: '25000',
-        },
+        expectedTakerFee: [
+          {
+            recipient: '0xFEERECIPIENT',
+            amount: '25000',
+          },
+        ],
       },
       {
         name: 'token taker fee',
@@ -1003,21 +1018,22 @@ describe('buy', () => {
           id: '1',
           takerFees: [{ amount: { token: '0.1' }, recipient: '0xFEERECIPIENT' }] as OrderFee[],
         }],
-        expectedTakerFee:
-        {
-          recipient: '0xFEERECIPIENT',
-          amount: '100000',
-        },
+        expectedTakerFee: [
+          {
+            recipient: '0xFEERECIPIENT',
+            amount: '100000',
+          },
+        ],
       },
       {
-        name: 'undefined taker fee',
+        name: 'undefined taker fee applies empty array',
         orders: [{
           id: '1',
         }],
-        expectedTakerFee: undefined,
+        expectedTakerFee: [],
       },
       {
-        name: 'multiple taker fees applies only the first',
+        name: 'multiple taker fees',
         orders: [{
           id: '1',
           takerFees: [
@@ -1025,14 +1041,19 @@ describe('buy', () => {
             { amount: { token: '0.1' }, recipient: '0xFEERECIPIENT' },
           ] as OrderFee[],
         }],
-        expectedTakerFee:
-        {
-          recipient: '0xFEERECIPIENT',
-          amount: '100000',
-        },
+        expectedTakerFee: [
+          {
+            recipient: '0xFEERECIPIENT',
+            amount: '100000',
+          },
+          {
+            recipient: '0xFEERECIPIENT',
+            amount: '100000',
+          },
+        ],
       },
       {
-        name: 'multiple orders and multiple taker fees applies only the first taker fee to first order',
+        name: 'multiple orders and multiple taker fees applies only the first order',
         orders: [{
           id: '1',
           takerFees: [
@@ -1047,11 +1068,16 @@ describe('buy', () => {
             { amount: { token: '0.1' }, recipient: '0xFEERECIPIENT' },
           ] as OrderFee[],
         }],
-        expectedTakerFee:
-        {
-          recipient: '0xFEERECIPIENT',
-          amount: '100000',
-        },
+        expectedTakerFee: [
+          {
+            recipient: '0xFEERECIPIENT',
+            amount: '100000',
+          },
+          {
+            recipient: '0xFEERECIPIENT',
+            amount: '100000',
+          },
+        ],
       },
     ];
     erc20OrderTakerFeeTestCases.forEach((testCase) => {
