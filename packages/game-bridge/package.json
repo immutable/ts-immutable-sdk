@@ -11,8 +11,9 @@
     "parcel": "^2.8.3"
   },
   "scripts": {
-    "build": "parcel build --no-cache --no-scope-hoist",
-    "start": "parcel"
+    "build": "yarn updateGameBridgeVersion && parcel build --no-cache --no-scope-hoist",
+    "start": "parcel",
+    "updateGameBridgeVersion": "./scripts/updateSdkVersion.sh"
   },
   "source": "src/index.html",
   "targets": {
