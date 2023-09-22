@@ -2,15 +2,17 @@
 import { BigNumber, Contract, ethers } from 'ethers';
 import { Web3Provider } from '@ethersproject/providers';
 import {
+  BalanceDelta,
   ChainId,
   FundingRouteType,
   GetBalanceResult,
   IMX_ADDRESS_ZKEVM,
   ItemType,
   RoutingOptionsAvailable,
+  TokenInfo,
 } from '../../../types';
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../../config';
-import { FundingRouteStep, TokenBalanceResult } from '../types';
+import { FundingRouteStep, TokenBalance, TokenBalanceResult } from '../types';
 import { BalanceRequirement } from '../../balanceCheck/types';
 import { createBlockchainDataInstance } from '../../../instance';
 import { getEthBalance } from './getEthBalance';
@@ -21,10 +23,10 @@ import { CheckoutError, CheckoutErrorType } from '../../../errors';
 import { allowListCheckForBridge } from '../../allowList/allowListCheck';
 
 export const hasSufficientL1Eth = (
-  balances: TokenBalanceResult,
+  tokenBalanceResult: TokenBalanceResult,
   totalFees: BigNumber,
 ): boolean => {
-  const balance = getEthBalance(balances);
+  const balance = getEthBalance(tokenBalanceResult);
   return balance.gte(totalFees);
 };
 
@@ -45,14 +47,14 @@ export const getTokenAddressFromRequirement = (
 export const fetchL1Representation = async (
   config: CheckoutConfiguration,
   l2address: string,
-): Promise<string> => {
-  if (l2address === '') return '';
+): Promise<{ l1address: string, l2address: string }> => {
+  if (l2address === '') return { l1address: '', l2address };
   if (l2address === IMX_ADDRESS_ZKEVM) {
-    return getImxL1Representation(getL1ChainId(config));
+    return { l1address: getImxL1Representation(getL1ChainId(config)), l2address };
   }
 
   const chainName = getIndexerChainName(getL2ChainId(config));
-  if (chainName === '') return ''; // Chain name not a valid indexer chain name
+  if (chainName === '') return { l1address: '', l2address }; // Chain name not a valid indexer chain name
 
   const blockchainData = createBlockchainDataInstance(config);
   const tokenData = await blockchainData.getToken({
@@ -61,9 +63,9 @@ export const fetchL1Representation = async (
   });
 
   const l1address = tokenData.result.root_contract_address;
-  if (l1address === null) return ''; // No L1 representation of this token
+  if (l1address === null) return { l1address: '', l2address }; // No L1 representation of this token
 
-  return l1address;
+  return { l1address, l2address };
 };
 
 export const getBridgeGasEstimate = async (
@@ -82,7 +84,7 @@ export const getBridgeGasEstimate = async (
 
 const constructBridgeFundingRoute = (
   chainId: ChainId,
-  balance: GetBalanceResult,
+  balance: TokenBalance,
 ) => ({
   type: FundingRouteType.BRIDGE,
   chainId,
@@ -108,13 +110,16 @@ export const bridgeRoute = async (
   readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
   depositorAddress: string,
   availableRoutingOptions: RoutingOptionsAvailable,
-  balanceRequirement: BalanceRequirement,
-  balances: Map<ChainId, TokenBalanceResult>,
+  balanceRequirement: {
+    delta: BalanceDelta,
+    address: string,
+  },
+  tokenBalanceResults: Map<ChainId, TokenBalanceResult>,
   feeEstimates: Map<FundingRouteType, BigNumber>,
 ): Promise<FundingRouteStep | undefined> => {
   if (!availableRoutingOptions.bridge) return undefined;
   const chainId = getL1ChainId(config);
-  const tokenBalanceResult = balances.get(chainId);
+  const tokenBalanceResult = tokenBalanceResults.get(chainId);
   const l1provider = readOnlyProviders.get(chainId);
   if (!l1provider) {
     throw new CheckoutError(
@@ -127,7 +132,7 @@ export const bridgeRoute = async (
   // If no balances on layer 1 then Bridge cannot be an option
   if (tokenBalanceResult === undefined || tokenBalanceResult.success === false) return undefined;
 
-  const allowedTokenList = await allowListCheckForBridge(config, balances, availableRoutingOptions);
+  const allowedTokenList = await allowListCheckForBridge(config, tokenBalanceResults, availableRoutingOptions);
   if (allowedTokenList.length === 0) return undefined;
 
   const bridgeFeeEstimate = await getBridgeGasEstimate(config, readOnlyProviders, feeEstimates);
@@ -135,8 +140,9 @@ export const bridgeRoute = async (
   // If the user has no ETH to cover the bridge fees or approval fees then bridge cannot be an option
   if (!hasSufficientL1Eth(tokenBalanceResult, bridgeFeeEstimate)) return undefined;
 
-  const requiredTokenAddress = getTokenAddressFromRequirement(balanceRequirement);
-  const l1address = await fetchL1Representation(config, requiredTokenAddress);
+  // const requiredTokenAddress = getTokenAddressFromRequirement(balanceRequirement);
+  // todo: we can probably move out the indexer call and instead just pass through cache
+  const { l1address } = await fetchL1Representation(config, balanceRequirement.address);
   if (l1address === '') return undefined;
 
   // Ensure l1address is in the allowed token list
