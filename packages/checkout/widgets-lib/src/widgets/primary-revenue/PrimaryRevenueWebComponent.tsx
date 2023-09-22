@@ -10,6 +10,7 @@ import { ConnectTargetLayer, getL1ChainId, getL2ChainId } from '../../lib';
 import { isValidAmount } from '../../lib/validations/widgetValidators';
 import { Item } from './hooks/useMergeItemsInfo';
 import { sendPrimaryRevenueWidgetCloseEvent } from './PrimaryRevenuWidgetEvents';
+import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 
 export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
   amount = '';
@@ -89,20 +90,24 @@ export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
     }
     this.reactRoot.render(
       <React.StrictMode>
-        <ConnectLoader
+        <CustomAnalyticsProvider
           widgetConfig={this.widgetConfig!}
-          params={connectLoaderParams}
-          closeEvent={() => {
-            sendPrimaryRevenueWidgetCloseEvent();
-          }}
         >
-          <PrimaryRevenueWidget
-            config={this.widgetConfig!}
-            amount={this.amount}
-            fromCurrency={this.fromCurrency}
-            items={this.items}
-          />
-        </ConnectLoader>
+          <ConnectLoader
+            widgetConfig={this.widgetConfig!}
+            params={connectLoaderParams}
+            closeEvent={() => {
+              sendPrimaryRevenueWidgetCloseEvent();
+            }}
+          >
+            <PrimaryRevenueWidget
+              config={this.widgetConfig!}
+              amount={this.amount}
+              fromCurrency={this.fromCurrency}
+              items={this.items}
+            />
+          </ConnectLoader>
+        </CustomAnalyticsProvider>
       </React.StrictMode>,
     );
   }
