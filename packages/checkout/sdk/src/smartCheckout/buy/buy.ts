@@ -132,7 +132,6 @@ export const buy = async (
   }
 
   let fees: FeeValue[] = [];
-  // calculate the taker fees here to be applied in the orderbook.fulfillOrder step
   if (takerFees && takerFees.length > 0) {
     fees = calculateFees(takerFees, buyToken.amount, decimals);
   }
@@ -143,7 +142,7 @@ export const buy = async (
   };
   try {
     const fulfillerAddress = await provider.getSigner().getAddress();
-    const { actions } = await orderbook.fulfillOrder(id, fulfillerAddress, fees[0]);
+    const { actions } = await orderbook.fulfillOrder(id, fulfillerAddress, fees);
     unsignedTransactions = await getUnsignedTransactions(actions);
   } catch {
     // Silently ignore error as this is usually thrown if user does not have enough balance
