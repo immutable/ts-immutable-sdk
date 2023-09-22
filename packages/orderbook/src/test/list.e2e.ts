@@ -40,6 +40,7 @@ async function createListing(
     orderComponents: listing.orderComponents,
     orderHash: listing.orderHash,
     orderSignature: signatures[0],
+    makerFees: [],
   });
 
   return waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.ACTIVE);
