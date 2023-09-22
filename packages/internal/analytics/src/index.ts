@@ -1,1 +1,6 @@
-export { sdkVersionCheck, sdkVersion } from './version-check';
+export {
+  sdkVersion,
+  sdkVersionCheck,
+  gameBridgeVersionCheck,
+  GameBridgeVersionCheckParams,
+} from './version-check';
