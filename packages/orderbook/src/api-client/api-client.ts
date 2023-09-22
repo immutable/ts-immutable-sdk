@@ -1,10 +1,10 @@
 import {
-  ProtocolData,
+  Fee,
   ListingResult,
   ListListingsResult,
   ListTradeResult,
   OrdersService,
-  Fee,
+  ProtocolData,
   TradeResult,
 } from 'openapi/sdk';
 import {
@@ -24,8 +24,9 @@ export class ImmutableApiClient {
     private readonly seaportAddress: string,
   ) {}
 
-  async fulfillmentData(requests: Array<FulfillmentDataRequest>):
-  Promise<{ result: FulfillmentDataResult[] }> {
+  async fulfillmentData(
+    requests: Array<FulfillmentDataRequest>,
+  ): Promise<{ result: FulfillmentDataResult[] }> {
     return this.orderbookService.fulfillmentData({
       chainName: this.chainName,
       requestBody: requests,
@@ -68,7 +69,7 @@ export class ImmutableApiClient {
     orderHash,
     orderComponents,
     orderSignature,
-    makerFee,
+    makerFees,
   }: CreateListingParams): Promise<ListingResult> {
     if (orderComponents.offer.length !== 1) {
       throw new Error('Only one item can be listed at a time');
@@ -102,11 +103,11 @@ export class ImmutableApiClient {
             contract_address: orderComponents.consideration[0].token,
           },
         ],
-        fee: makerFee ? {
-          amount: makerFee.amount,
+        fees: makerFees.map((x) => ({
+          amount: x.amount,
           fee_type: FeeType.MAKER_MARKETPLACE as unknown as Fee.fee_type,
-          recipient: makerFee.recipient,
-        } : undefined,
+          recipient: x.recipient,
+        })),
         end_time: new Date(
           parseInt(`${orderComponents.endTime.toString()}000`, 10),
         ).toISOString(),
