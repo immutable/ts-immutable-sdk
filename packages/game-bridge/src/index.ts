@@ -15,8 +15,10 @@ const keyData = 'data';
 // version check placeholders
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const sdkVersionTag = '__SDK_VERSION__';
+console.log(`Game Bridge SDK version: ${sdkVersionTag}`);
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const sdkVersionSha = '__SDK_VERSION_SHA__';
+console.log(`Game Bridge SDK version SHA: ${sdkVersionSha}`);
 
 const PASSPORT_FUNCTIONS = {
   init: 'init',
