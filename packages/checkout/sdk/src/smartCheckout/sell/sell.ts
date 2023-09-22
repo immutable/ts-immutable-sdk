@@ -185,15 +185,13 @@ export const sell = async (
 
     if (makerFees !== undefined) {
       const orderBookFees = calculateFees(makerFees, buyTokenOrNative.amount, decimals);
-      // @TODO add support for an array of fees when the orderbook enables it
       if (orderBookFees.length !== makerFees.length) {
         throw new CheckoutError(
           'One of the fees is too small, must be greater than 0.000001',
           CheckoutErrorType.CREATE_ORDER_LISTING_ERROR,
         );
       }
-      const [makerFee] = orderBookFees;
-      createListingParams.makerFee = makerFee;
+      createListingParams.makerFees = orderBookFees;
     }
 
     try {

@@ -99,7 +99,7 @@ export const buy = async (
   };
   try {
     const fulfillerAddress = await provider.getSigner().getAddress();
-    const { actions } = await orderbook.fulfillOrder(orderId, fulfillerAddress);
+    const { actions } = await orderbook.fulfillOrder(orderId, fulfillerAddress, []);
     unsignedTransactions = await getUnsignedTransactions(actions);
   } catch {
     // Silently ignore error as this is usually thrown if user does not have enough balance
