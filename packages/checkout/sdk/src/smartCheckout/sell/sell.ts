@@ -90,7 +90,7 @@ export const sell = async (
       provider,
     );
 
-    decimals = buyTokenContract.decimals();
+    decimals = await buyTokenContract.decimals();
   }
 
   const buyTokenOrNative = getBuyToken(buyToken, decimals);
