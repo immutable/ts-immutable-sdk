@@ -12,6 +12,12 @@ const keyFunctionName = 'fxName';
 const keyRequestId = 'requestId';
 const keyData = 'data';
 
+// version check placeholders
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const sdkVersionTag = '__SDK_VERSION__';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const sdkVersionSha = '__SDK_VERSION_SHA__';
+
 const PASSPORT_FUNCTIONS = {
   init: 'init',
   connect: 'connect',
@@ -133,6 +139,9 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
           requestId,
           success: true,
         });
+
+        // version check here...
+
         break;
       }
       case PASSPORT_FUNCTIONS.connect: {
