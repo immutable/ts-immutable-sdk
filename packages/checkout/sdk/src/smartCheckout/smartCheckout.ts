@@ -64,6 +64,7 @@ export const smartCheckout = async (
 
   // Determine which services are available
   const availableRoutingOptions = await routingOptionsAvailable(config, provider);
+  console.log('availableRoutingOptions', availableRoutingOptions);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const fundingRoutes = await routingCalculator(
     config,

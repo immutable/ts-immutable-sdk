@@ -44,7 +44,8 @@ export const quoteFetcher = async (
     });
 
     return dexQuotes;
-  } catch {
+  } catch (error) {
+    console.error('Failed to fetch quotes from the dex', error);
     return dexQuotes;
   }
 };

@@ -13,16 +13,18 @@ import {
   RouteCalculatorType,
   RoutingCalculatorResult,
   TokenBalanceResult,
+  TokenMaps,
 } from './types';
 import { getAllTokenBalances } from './tokenBalances';
 import { bridgeRoute, fetchL1Representation } from './bridge/bridgeRoute';
-import { CheckoutConfiguration, getL2ChainId } from '../../config';
+import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../config';
 import { createReadOnlyProviders } from '../../readOnlyProviders/readOnlyProvider';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { swapRoute } from './swap/swapRoute';
 import { allowListCheck } from '../allowList';
 import { onRampRoute } from './onRamp';
 import { RoutingTokensAllowList } from '../allowList/types';
+import { getOrSetQuotesFromCache } from './swap/dexQuoteCache';
 
 const hasAvailableRoutingOptions = (availableRoutingOptions: RoutingOptionsAvailable) => (
   availableRoutingOptions.bridge || availableRoutingOptions.swap || availableRoutingOptions.onRamp
@@ -88,30 +90,79 @@ export const getBridgeAndSwapFundingSteps = async (
   tokenBalances: Map<ChainId, TokenBalanceResult>,
   tokenAllowList: RoutingTokensAllowList | undefined,
 ): Promise<FundingRouteStep[] | undefined> => {
+  if (!insufficientRequirement) return undefined;
   if (!availableRoutingOptions.bridge || !availableRoutingOptions.swap) return undefined;
 
-  console.log('insufficientRequirement', insufficientRequirement);
-  console.log('dexQuoteCache', dexQuoteCache);
-  console.log('ownerAddress', ownerAddress);
-  console.log('tokenBalances', tokenBalances);
+  console.log('getBridgeAndSwapFundingSteps::insufficientRequirement', insufficientRequirement);
+  console.log('getBridgeAndSwapFundingSteps::tokenBalances', tokenBalances);
 
+  const l1ChainId = getL1ChainId(config);
+  const l2ChainId = getL2ChainId(config);
+
+  // We need to define bridgable tokens (L1) based on what is swappable (L2)
+  // use the swappable L2 tokens to define the swappable L1 tokens
   const swapTokenAllowList = tokenAllowList?.swap ?? [];
   const swappableL2Addresses: string[] = swapTokenAllowList.map((token) => token.address as string);
   const l1AddressPromises = swappableL2Addresses.map((token) => fetchL1Representation(config, token));
   const swappableL1Addresses = await Promise.all(l1AddressPromises);
+  const swappableTokens: TokenMaps = [];
+  swappableL2Addresses.forEach((l2Address, index) => {
+    const tokenMap = new Map<ChainId, string>();
+    tokenMap.set(l1ChainId, swappableL1Addresses[index]);
+    tokenMap.set(l2ChainId, l2Address);
+    swappableTokens.push(tokenMap);
+  });
 
-  // Get the bridgable L2 tokens based on the swappable L2 tokens
+  // Based on swappable L1 tokens intersect to get the bridgable L1 tokens
   const bridgableL1Tokens: TokenInfo[] = tokenAllowList?.bridge ?? [];
   const bridgableL1Addresses = bridgableL1Tokens
-    .filter((token) => token.address && swappableL1Addresses.includes(token.address))
+    .filter((token) => {
+      if (!('address' in token)) {
+        // Native ETH in L1 bridgable need to map to ETH?
+        // TODO: Not sure how native ETH address is mapped back to L1 swappable?
+      }
+      return token.address && swappableL1Addresses.includes(token.address);
+    })
     .map((token) => token.address as string);
 
+  console.log('Swappable token map', swappableTokens);
   console.log('Swappable L2 Tokens', swappableL2Addresses);
+  console.log('Swappable L1 Tokens', swappableL1Addresses);
+  console.log('Allowed bridge tokens', bridgableL1Tokens);
   console.log('Bridgable L1 Tokens', bridgableL1Addresses);
 
-  // Dex parts
+  // For all bridgable L1 tokens map back to L2 for swap quotes so we can use the swap amount when we bridge
+  const l2SwapQuotePromises: Promise<DexQuotes>[] = [];
+  // eslint-disable-next-line consistent-return
+  bridgableL1Addresses.forEach((l1Address) => {
+    const l2Address = swappableTokens.find((token) => token.get(l1ChainId) === l1Address)
+      ?.get(l2ChainId);
 
-  // Swap parts
+    const insufficientAddress = (insufficientRequirement.required as any).token.address;
+    const otherSwappableTokens = swappableL2Addresses.filter((token) => token !== l2Address);
+    const balanceDelta = insufficientRequirement.delta.balance.toString();
+    console.log('Get swap quote for', l2Address, 'others swappable', otherSwappableTokens);
+    console.log('Dex quote required token', insufficientAddress, 'amount', balanceDelta);
+    const swapQuote = getOrSetQuotesFromCache(
+      config,
+      dexQuoteCache,
+      ownerAddress,
+      {
+        address: (insufficientRequirement.required as any).token.address,
+        amount: insufficientRequirement.delta.balance,
+      },
+      swappableL2Addresses.filter((token) => token !== l2Address),
+    );
+    l2SwapQuotePromises.push(swapQuote);
+  });
+  const l2SwapQuotes = await Promise.all(l2SwapQuotePromises);
+  console.log('Get quotes for swap', l2SwapQuotes);
+
+  // ?? For each swap quote need to check bridgableL1Address balance to make sure we can bridge that amount
+
+  // using the dexQuoteCache again build funding steps for bridge and swap
+  // Run bridgeRoute
+  // Run swapRoute
 
   // const fundingSteps = [{
   //   type: FundingRouteType.BRIDGE,
@@ -196,6 +247,7 @@ export const routingCalculator = async (
   );
 
   const allowList = await allowListCheck(config, tokenBalances, availableRoutingOptions);
+  console.log('allowList', allowList);
 
   // Bridge and swap fee cache
   const feeEstimates = new Map<FundingRouteType, BigNumber>();
@@ -234,6 +286,8 @@ export const routingCalculator = async (
     availableRoutingOptions,
     insufficientRequirement,
   );
+
+  console.log('Getting bridge and swap funding steps..');
   const bridgeAndSwapFundingSteps = await getBridgeAndSwapFundingSteps(
     config,
     availableRoutingOptions,
@@ -300,5 +354,6 @@ export const routingCalculator = async (
     });
   }
 
+  console.log('** response', response);
   return response;
 };
