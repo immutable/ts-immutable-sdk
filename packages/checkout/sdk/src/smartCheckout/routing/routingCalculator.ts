@@ -15,7 +15,6 @@ import {
   FundingRouteStep,
   RouteCalculatorType,
   RoutingCalculatorResult,
-  TokenBalance,
   TokenBalanceResult,
 } from './types';
 import { getAllTokenBalances } from './tokenBalances';
@@ -303,21 +302,6 @@ export const getOnRampFundingStep = async (
   );
 
   return onRampFundingStep;
-};
-
-// todo: change tokenbalance naming
-export const constructTokenBalanceArray = (
-  chainId: ChainId,
-  tokenBalanceResult: Map<ChainId, TokenBalanceResult>,
-): TokenBalance[] => {
-  const tokenBalances: TokenBalance[] = [];
-
-  const tokenBalance = tokenBalanceResult.get(chainId);
-  if (tokenBalance && tokenBalance.success) {
-    tokenBalances.push(...tokenBalance.balances);
-  }
-
-  return tokenBalances;
 };
 
 export const routingCalculator = async (

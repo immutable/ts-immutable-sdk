@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { BigNumber, Contract, ethers } from 'ethers';
-import { Web3Provider } from '@ethersproject/providers';
 import {
   BalanceDelta,
   ChainId,
@@ -12,7 +11,7 @@ import {
   TokenInfo,
 } from '../../../types';
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../../config';
-import { FundingRouteStep, TokenBalance, TokenBalanceResult } from '../types';
+import { FundingRouteStep, TokenBalanceResult } from '../types';
 import { BalanceRequirement } from '../../balanceCheck/types';
 import { createBlockchainDataInstance } from '../../../instance';
 import { getEthBalance } from './getEthBalance';
@@ -84,7 +83,7 @@ export const getBridgeGasEstimate = async (
 
 const constructBridgeFundingRoute = (
   chainId: ChainId,
-  balance: TokenBalance,
+  balance: GetBalanceResult,
 ) => ({
   type: FundingRouteType.BRIDGE,
   chainId,

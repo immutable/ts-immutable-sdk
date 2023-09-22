@@ -57,12 +57,3 @@ export type DexQuote = {
   approval: Amount | null | undefined,
   swap: Amount | null,
 };
-
-// todo: the name TokenBalance is a type used elsewhere as diff structure so need to rename
-// this type here is basically a GetBalanceResult type also, but the naming GetBalanceResult is confusing/not generic enough
-// this is to make things more generic for bridge etc to accommodate bridge -> swap route
-export type TokenBalance = {
-  balance: BigNumber,
-  formattedBalance: string,
-  token: TokenInfo,
-};
