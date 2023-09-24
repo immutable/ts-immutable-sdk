@@ -23,6 +23,7 @@ declare global {
       'imtbl-swap': ImtblSwapProps;
       'imtbl-bridge': ImtblBridgeProps;
       'imtbl-onramp': ImtblOnRampProps;
+      'imtbl-link': ImtblWalletProps;
       'imtbl-buy': ImtblBuyProps;
       'imtbl-example': ImtblExampleProps;
       'imtbl-transition-example': ImtblTransitionExampleProps;

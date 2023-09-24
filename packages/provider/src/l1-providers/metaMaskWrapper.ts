@@ -21,7 +21,7 @@ export class MetaMaskIMXProvider extends GenericIMXProvider {
     return await withProviderError<MetaMaskIMXProvider>(
       async () => {
         const metaMaskProvider = await connect({
-          chainID: config.immutableXConfig.ethConfiguration.chainID,
+          chainID: 11155111,
         });
         this.imxSigner = await buildImxSigner(
           metaMaskProvider,

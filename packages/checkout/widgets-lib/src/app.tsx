@@ -9,6 +9,7 @@ import WalletWebView from './widgets/wallet/WalletWebView';
 import OnRampWebView from './widgets/on-ramp/OnRampWebView';
 
 import './build';
+import LinkWebView from './widgets/link/LinkWebView';
 
 function App() {
   return (
@@ -33,6 +34,9 @@ function App() {
       <br />
       <h2>
         <a href="/on-ramp">Onramp Widget</a>
+      </h2>
+      <h2>
+        <a href="/link">Link Widget</a>
       </h2>
       <br />
     </div>
@@ -63,6 +67,10 @@ const router = createBrowserRouter([
   {
     path: '/on-ramp',
     element: <OnRampWebView />,
+  },
+  {
+    path: '/link',
+    element: <LinkWebView />,
   },
 ]);
 
