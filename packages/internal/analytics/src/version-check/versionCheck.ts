@@ -135,6 +135,7 @@ export const gameBridgeVersionCheck = (params: GameBridgeVersionCheckParams) => 
       versionCheckUrl += `&details=${runtimeDetails}`;
     }
 
+    // eslint-disable-next-line no-console
     console.log('gameBridgeVersionCheck', versionCheckUrl);
 
     axios
