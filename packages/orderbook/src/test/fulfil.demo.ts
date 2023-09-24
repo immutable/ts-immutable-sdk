@@ -85,10 +85,10 @@ describe('', () => {
       orderComponents: validListing.orderComponents,
       orderHash: validListing.orderHash,
       orderSignature: signatures[0],
-      makerFee: {
+      makerFees: [{
         amount: '1',
         recipient: offerer.address,
-      },
+      }],
     });
 
     await waitForOrderToBeOfStatus(sdk, orderId2, OrderStatus.ACTIVE);
@@ -97,10 +97,10 @@ describe('', () => {
     const { actions, expiration, order } = await sdk.fulfillOrder(
       orderId2,
       fulfiller.address,
-      {
+      [{
         amount: '1',
         recipient: offerer.address,
-      },
+      }],
     );
 
     log(`Fulfilling listing ${order.id}, fulfillment transaction valid till ${expiration}`);

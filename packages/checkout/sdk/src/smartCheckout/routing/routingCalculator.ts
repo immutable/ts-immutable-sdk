@@ -1,14 +1,11 @@
 import { BigNumber } from 'ethers';
+import { BalanceCheckResult, BalanceRequirement } from '../balanceCheck/types';
 import {
   ChainId,
   FundingRouteType,
   RoutingOptionsAvailable,
   TokenInfo,
 } from '../../types';
-import {
-  BalanceCheckResult,
-  BalanceRequirement,
-} from '../balanceCheck/types';
 import {
   DexQuoteCache,
   DexQuotes,
@@ -24,6 +21,7 @@ import { createReadOnlyProviders } from '../../readOnlyProviders/readOnlyProvide
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { swapRoute } from './swap/swapRoute';
 import { allowListCheck } from '../allowList';
+import { onRampRoute } from './onRamp';
 
 export const getInsufficientRequirement = (
   balanceRequirements: BalanceCheckResult,
@@ -75,6 +73,23 @@ export const getSwapFundingStep = async (
   );
 
   return swapFundingStep;
+};
+
+export const getOnRampFundingStep = async (
+  config: CheckoutConfiguration,
+  availableRoutingOptions: RoutingOptionsAvailable,
+  insufficientRequirement: BalanceRequirement | undefined,
+): Promise<FundingRouteStep | undefined> => {
+  if (!availableRoutingOptions.onRamp) return undefined;
+  if (insufficientRequirement === undefined) return undefined;
+
+  const onRampFundingStep = await onRampRoute(
+    config,
+    availableRoutingOptions,
+    insufficientRequirement,
+  );
+
+  return onRampFundingStep;
 };
 
 export const routingCalculator = async (
@@ -135,7 +150,11 @@ export const routingCalculator = async (
     allowList.swap,
   );
 
-  // Check on-ramp routes
+  const onRampFundingStep = await getOnRampFundingStep(
+    config,
+    availableRoutingOptions,
+    insufficientRequirement,
+  );
 
   // Check swap routes
   // > Could bridge first
@@ -152,7 +171,7 @@ export const routingCalculator = async (
 
   let priority = 0;
 
-  if (bridgeFundingStep || swapFundingStep) {
+  if (bridgeFundingStep || swapFundingStep || onRampFundingStep) {
     response.response.type = RouteCalculatorType.ROUTES_FOUND;
     response.response.message = 'Routes found';
   }
@@ -170,6 +189,14 @@ export const routingCalculator = async (
     response.fundingRoutes.push({
       priority,
       steps: [swapFundingStep],
+    });
+  }
+
+  if (onRampFundingStep) {
+    priority++;
+    response.fundingRoutes.push({
+      priority,
+      steps: [onRampFundingStep],
     });
   }
 

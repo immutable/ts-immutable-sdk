@@ -1,6 +1,7 @@
 import React, {
   createContext, useCallback, useContext, useMemo, useState,
 } from 'react';
+import { PassportError } from '@imtbl/passport';
 
 const MessageContext = createContext<{
   messages: string[],
@@ -21,12 +22,17 @@ export function StatusProvider({
   const [isLoading, setIsLoading] = useState(false);
 
   const addMessage = useCallback((operation: string, ...args: any[]) => {
-    const messageString = args.map((arg) => {
-      if (arg instanceof Error) {
-        return arg.toString();
-      }
-      return JSON.stringify(arg, null, 2);
-    }).join(': ');
+    let messageString: string;
+    if (args[0] instanceof PassportError) {
+      messageString = `${args[0].type}: ${args[0].message}`;
+    } else {
+      messageString = args.map((arg) => {
+        if (arg instanceof Error) {
+          return arg.toString();
+        }
+        return JSON.stringify(arg, null, 2);
+      }).join(': ');
+    }
     setMessages((prevMessages) => [...prevMessages, `${operation}: ${messageString}`]);
   }, []);
 

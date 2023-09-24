@@ -49,6 +49,7 @@ describe('prepareListing and createOrder e2e', () => {
       orderComponents: listing.orderComponents,
       orderHash: listing.orderHash,
       orderSignature: signatures[0],
+      makerFees: [],
     });
 
     await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.ACTIVE);

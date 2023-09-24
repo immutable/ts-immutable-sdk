@@ -187,10 +187,10 @@ describe('sell', () => {
       );
       expect(mockCreateListing).toBeCalledWith(
         {
-          makerFee: {
+          makerFees: [{
             amount: '25000000000000000',
             recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
-          },
+          }],
           orderComponents: {},
           orderHash: 'hash',
           orderSignature: '0xSIGNED',

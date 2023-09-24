@@ -132,7 +132,7 @@ describe('transfer', () => {
         guardianClient: mockGuardianClient,
       })).rejects.toThrow(
         new PassportError(
-          `${PassportErrorType.TRANSFER_ERROR}: ${mockErrorMessage}`,
+          mockErrorMessage,
           PassportErrorType.TRANSFER_ERROR,
         ),
       );
@@ -163,7 +163,10 @@ describe('transfer', () => {
         user: mockUserImx,
         request: mockTransferRequest as UnsignedTransferRequest,
         guardianClient: mockGuardianClient,
-      })).rejects.toThrowError('TRANSFER_ERROR');
+      })).rejects.toThrow(new PassportError(
+        'Transaction rejected by user',
+        PassportErrorType.TRANSFER_ERROR,
+      ));
     });
   });
 
@@ -304,7 +307,7 @@ describe('transfer', () => {
         guardianClient: mockGuardianClient,
       })).rejects.toThrow(
         new PassportError(
-          `${PassportErrorType.TRANSFER_ERROR}: ${mockErrorMessage}`,
+          mockErrorMessage,
           PassportErrorType.TRANSFER_ERROR,
         ),
       );
@@ -348,7 +351,7 @@ describe('transfer', () => {
         guardianClient: mockGuardianClient,
       })).rejects.toThrow(
         new PassportError(
-          `${PassportErrorType.TRANSFER_ERROR}: Transaction rejected by user`,
+          'Transaction rejected by user',
           PassportErrorType.TRANSFER_ERROR,
         ),
       );

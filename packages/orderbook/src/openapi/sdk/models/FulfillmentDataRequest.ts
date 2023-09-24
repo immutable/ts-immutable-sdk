@@ -6,6 +6,6 @@ import type { Fee } from './Fee';
 
 export type FulfillmentDataRequest = {
   order_id: string;
-  fee?: Fee;
+  fees: Array<Fee>;
 };
 
