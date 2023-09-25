@@ -1,4 +1,6 @@
-import { Box, Heading, Icon } from '@biom3/react';
+import {
+  Body, Box, Heading,
+} from '@biom3/react';
 import {
   IMTBLWidgetEvents,
 } from '@imtbl/checkout-widgets';
@@ -205,11 +207,7 @@ export function TopUpView({
   const renderFees = (fees: string, feesLoading: boolean): ReactNode => {
     if (feesLoading) {
       return (
-        <>
-          {' '}
-          <Icon icon="Loading" />
-          {` ${fiatSymbol.toLocaleUpperCase()}`}
-        </>
+        <Body size="xSmall" shimmer={1} />
       );
     }
     return (` $${fees} ${fiatSymbol.toLocaleUpperCase()}`);
@@ -218,11 +216,7 @@ export function TopUpView({
   const renderFeePercentage = (fees: string, feesLoading: boolean): ReactNode => {
     if (feesLoading) {
       return (
-        <>
-          {' '}
-          <Icon icon="Loading" />
-          {' %'}
-        </>
+        <Body size="xSmall" shimmer={1} />
       );
     }
     return (` ${fees}%`);
