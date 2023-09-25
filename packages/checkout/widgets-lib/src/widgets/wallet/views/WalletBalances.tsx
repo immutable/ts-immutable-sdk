@@ -1,4 +1,4 @@
-import { Box, Icon, MenuItem } from '@biom3/react';
+import { Box, MenuItem } from '@biom3/react';
 import {
   useCallback,
   useContext, useEffect, useMemo, useState,
@@ -240,17 +240,15 @@ export function WalletBalances() {
       >
         <Box sx={walletBalanceContainerStyles}>
           {showNetworkMenu && <NetworkMenu setBalancesLoading={setBalancesLoading} />}
-          <TotalTokenBalance totalBalance={totalFiatAmount} />
+          <TotalTokenBalance totalBalance={totalFiatAmount} loading={balancesLoading} />
           <Box
             sx={walletBalanceListContainerStyles(showNetworkMenu, showAddCoins)}
           >
             {balancesLoading && (
             <Box sx={walletBalanceLoadingIconStyles}>
-              <Icon
-                testId="loading-icon"
-                icon="Loading"
-                sx={{ w: 'base.icon.size.500' }}
-              />
+              <MenuItem shimmer emphasized />
+              <MenuItem shimmer emphasized />
+              <MenuItem shimmer emphasized />
             </Box>
             )}
             {!balancesLoading && (

@@ -16,12 +16,13 @@ import { text } from '../../../../resources/text/textConfig';
 
 interface TotalTokenBalanceProps {
   totalBalance: number;
+  loading: boolean;
 }
 
 export function TotalTokenBalance(props: TotalTokenBalanceProps) {
   const { viewDispatch } = useContext(ViewContext);
   const { totalTokenBalance } = text.views[WalletWidgetViews.WALLET_BALANCES];
-  const { totalBalance } = props;
+  const { totalBalance, loading } = props;
   return (
     <Box sx={totalTokenBalanceStyle}>
       <Box sx={totalTokenBalanceValueStyle}>
@@ -42,13 +43,15 @@ export function TotalTokenBalance(props: TotalTokenBalanceProps) {
         </Box>
       </Box>
       <Box sx={totalTokenBalanceValueStyle}>
-        <Body size="medium" weight="bold">
+        <Body weight="bold" shimmer={loading ? 1 : 0} shimmerSx={{ minw: '100px' }}>
           {totalTokenBalance.totalHeading}
         </Body>
-        <Body testId="total-token-balance" size="medium" weight="bold">
+        {!loading && (
+        <Body testId="total-token-balance" weight="bold">
           &asymp; USD $
           {totalBalance.toFixed(2)}
         </Body>
+        )}
       </Box>
     </Box>
   );
