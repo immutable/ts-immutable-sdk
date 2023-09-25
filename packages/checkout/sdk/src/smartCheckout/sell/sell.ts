@@ -24,7 +24,7 @@ import { CheckoutConfiguration } from '../../config';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { smartCheckout } from '../smartCheckout';
 import {
-  getUnsignedTransactions,
+  getUnsignedERC721Transactions,
   getUnsignedMessage,
   signApprovalTransactions,
   signMessage,
@@ -160,7 +160,7 @@ export const sell = async (
       provider,
       unsignedMessage,
     );
-    const unsignedTransactions = await getUnsignedTransactions(listing.actions);
+    const unsignedTransactions = await getUnsignedERC721Transactions(listing.actions);
     const approvalResult = await signApprovalTransactions(provider, unsignedTransactions.approvalTransactions);
     if (approvalResult.type === SignTransactionStatusType.FAILED) {
       return {

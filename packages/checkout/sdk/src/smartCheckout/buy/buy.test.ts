@@ -14,7 +14,13 @@ import {
   FulfilmentTransaction, GasAmount, GasTokenType, ItemType, TransactionOrGasType,
 } from '../../types/smartCheckout';
 import { smartCheckout } from '..';
-import { getUnsignedTransactions, signApprovalTransactions, signFulfilmentTransactions } from '../actions';
+import {
+  getUnsignedERC20ApprovalTransactions,
+  getUnsignedERC721Transactions,
+  getUnsignedFulfilmentTransactions,
+  signApprovalTransactions,
+  signFulfilmentTransactions,
+} from '../actions';
 import { BuyOrder, BuyStatusType, OrderFee } from '../../types';
 import { SignTransactionStatusType } from '../actions/types';
 
@@ -111,10 +117,12 @@ describe('buy', () => {
         }),
         fulfillOrder: fulfillOrderMock,
       });
-      (getUnsignedTransactions as jest.Mock).mockResolvedValue({
-        approvalTransactions: [{ from: '0xAPPROVAL' }],
-        fulfilmentTransactions: [{ from: '0xTRANSACTION' }],
-      });
+      // (getUnsignedERC721Transactions as jest.Mock).mockResolvedValue({
+      //   approvalTransactions: [{ from: '0xAPPROVAL' }],
+      //   fulfilmentTransactions: [{ from: '0xTRANSACTION' }],
+      // });
+      (getUnsignedERC20ApprovalTransactions as jest.Mock).mockResolvedValue([{ from: '0xAPPROVAL' }]);
+      (getUnsignedFulfilmentTransactions as jest.Mock).mockResolvedValue([{ from: '0xTRANSACTION' }]);
       (signApprovalTransactions as jest.Mock).mockResolvedValue({
         type: SignTransactionStatusType.SUCCESS,
       });
@@ -132,9 +140,18 @@ describe('buy', () => {
           amount: BigNumber.from('2000000000000000000'),
         },
       ];
-      const fulfilmentTransaction: FulfilmentTransaction = {
-        type: TransactionOrGasType.TRANSACTION,
-        transaction: { from: '0xTRANSACTION' },
+      // TODO: CHat to Mikhala about fixing this test, what to assert on now
+
+      // const fulfilmentTransaction: FulfilmentTransaction = {
+      //   type: TransactionOrGasType.TRANSACTION,
+      //   transaction: { from: '0xTRANSACTION' },
+      // };
+      const gasTransaction: GasAmount = {
+        type: TransactionOrGasType.GAS,
+        gasToken: {
+          type: GasTokenType.NATIVE,
+          limit: BigNumber.from(constants.estimatedFulfillmentGasGwei),
+        },
       };
 
       const buyResult = await buy(config, mockProvider, [order]);
@@ -142,7 +159,7 @@ describe('buy', () => {
         config,
         mockProvider,
         itemRequirements,
-        fulfilmentTransaction,
+        gasTransaction,
       );
       expect(buyResult).toEqual({
         smartCheckoutResult,
@@ -151,7 +168,8 @@ describe('buy', () => {
           type: BuyStatusType.SUCCESS,
         },
       });
-      expect(getUnsignedTransactions).toBeCalledTimes(1);
+      expect(getUnsignedERC20ApprovalTransactions).toBeCalledTimes(1);
+      expect(getUnsignedFulfilmentTransactions).toBeCalledTimes(1);
       expect(signApprovalTransactions).toBeCalledWith(mockProvider, [{ from: '0xAPPROVAL' }]);
       expect(signFulfilmentTransactions).toBeCalledWith(mockProvider, [{ from: '0xTRANSACTION' }]);
       expect(fulfillOrderMock).toBeCalledWith(
@@ -391,7 +409,7 @@ describe('buy', () => {
           ],
         }),
       });
-      (getUnsignedTransactions as jest.Mock).mockResolvedValue({
+      (getUnsignedERC721Transactions as jest.Mock).mockResolvedValue({
         approvalTransactions: [{ from: '0xAPPROVAL' }],
         fulfilmentTransactions: [{ from: '0xTRANSACTION' }],
       });
@@ -495,7 +513,7 @@ describe('buy', () => {
           ],
         }),
       });
-      (getUnsignedTransactions as jest.Mock).mockResolvedValue({
+      (getUnsignedERC721Transactions as jest.Mock).mockResolvedValue({
         approvalTransactions: [{ from: '0xAPPROVAL' }],
         fulfilmentTransactions: [{ from: '0xTRANSACTION' }],
       });
@@ -540,7 +558,7 @@ describe('buy', () => {
           reason: 'approval error',
         },
       });
-      expect(getUnsignedTransactions).toBeCalledTimes(1);
+      expect(getUnsignedERC721Transactions).toBeCalledTimes(1);
       expect(signApprovalTransactions).toBeCalledWith(mockProvider, [{ from: '0xAPPROVAL' }]);
       expect(signFulfilmentTransactions).toBeCalledTimes(0);
     });
@@ -612,7 +630,7 @@ describe('buy', () => {
           ],
         }),
       });
-      (getUnsignedTransactions as jest.Mock).mockResolvedValue({
+      (getUnsignedERC721Transactions as jest.Mock).mockResolvedValue({
         approvalTransactions: [{ from: '0xAPPROVAL' }],
         fulfilmentTransactions: [{ from: '0xTRANSACTION' }],
       });
@@ -657,7 +675,7 @@ describe('buy', () => {
           reason: 'fulfilment error',
         },
       });
-      expect(getUnsignedTransactions).toBeCalledTimes(1);
+      expect(getUnsignedERC721Transactions).toBeCalledTimes(1);
       expect(signApprovalTransactions).toBeCalledWith(mockProvider, [{ from: '0xAPPROVAL' }]);
       expect(signFulfilmentTransactions).toBeCalledWith(mockProvider, [{ from: '0xTRANSACTION' }]);
     });
@@ -951,7 +969,7 @@ describe('buy', () => {
           }),
           fulfillOrder: fulfillOrderMock,
         });
-        (getUnsignedTransactions as jest.Mock).mockResolvedValue({
+        (getUnsignedERC721Transactions as jest.Mock).mockResolvedValue({
           approvalTransactions: [{ from: '0xAPPROVAL' }],
           fulfilmentTransactions: [{ from: '0xTRANSACTION' }],
         });
@@ -987,7 +1005,7 @@ describe('buy', () => {
             type: BuyStatusType.SUCCESS,
           },
         });
-        expect(getUnsignedTransactions).toBeCalledTimes(1);
+        expect(getUnsignedERC721Transactions).toBeCalledTimes(1);
         expect(signApprovalTransactions).toBeCalledWith(mockProvider, [{ from: '0xAPPROVAL' }]);
         expect(signFulfilmentTransactions).toBeCalledWith(mockProvider, [{ from: '0xTRANSACTION' }]);
         expect(fulfillOrderMock).toBeCalledWith(
@@ -1156,7 +1174,7 @@ describe('buy', () => {
           }),
           fulfillOrder: fulfillOrderMock,
         });
-        (getUnsignedTransactions as jest.Mock).mockResolvedValue({
+        (getUnsignedERC721Transactions as jest.Mock).mockResolvedValue({
           approvalTransactions: [{ from: '0xAPPROVAL' }],
           fulfilmentTransactions: [{ from: '0xTRANSACTION' }],
         });
@@ -1194,7 +1212,7 @@ describe('buy', () => {
             type: BuyStatusType.SUCCESS,
           },
         });
-        expect(getUnsignedTransactions).toBeCalledTimes(1);
+        expect(getUnsignedERC721Transactions).toBeCalledTimes(1);
         expect(signApprovalTransactions).toBeCalledWith(mockProvider, [{ from: '0xAPPROVAL' }]);
         expect(signFulfilmentTransactions).toBeCalledWith(mockProvider, [{ from: '0xTRANSACTION' }]);
         expect(fulfillOrderMock).toBeCalledWith(

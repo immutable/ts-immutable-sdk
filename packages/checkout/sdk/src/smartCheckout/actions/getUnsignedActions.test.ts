@@ -3,7 +3,7 @@ import {
 } from '@imtbl/orderbook';
 import { PopulatedTransaction, TypedDataDomain } from 'ethers';
 import {
-  getUnsignedTransactions,
+  getUnsignedERC721Transactions,
   getUnsignedMessage,
 } from './getUnsignedActions';
 
@@ -51,7 +51,7 @@ describe('getUnsignedActions', () => {
         },
       ];
 
-      await expect(getUnsignedTransactions(actions)).resolves.toEqual({
+      await expect(getUnsignedERC721Transactions(actions)).resolves.toEqual({
         approvalTransactions: [{ from: '0xAPPROVAL1' }, { from: '0xAPPROVAL2' }],
         fulfilmentTransactions: [{ from: '0xTRANSACTION1' }, { from: '0xTRANSACTION2' }],
       });
@@ -60,7 +60,7 @@ describe('getUnsignedActions', () => {
     it('should return empty arrays if no transactions or signable messages', async () => {
       const actions: Action[] = [];
 
-      await expect(getUnsignedTransactions(actions)).resolves.toEqual({
+      await expect(getUnsignedERC721Transactions(actions)).resolves.toEqual({
         approvalTransactions: [],
         fulfilmentTransactions: [],
       });

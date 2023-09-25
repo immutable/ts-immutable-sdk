@@ -1,4 +1,4 @@
-import { Web3Provider } from '@ethersproject/providers';
+import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
 import {
   BigNumber,
 } from 'ethers';
@@ -8,6 +8,7 @@ import {
   constants,
   ListingResult,
   FeeValue,
+  Action,
 } from '@imtbl/orderbook';
 import {
   BuyOrder,
@@ -26,7 +27,12 @@ import {
   FulfilmentTransaction,
 } from '../../types/smartCheckout';
 import { smartCheckout } from '..';
-import { getUnsignedTransactions, signApprovalTransactions, signFulfilmentTransactions } from '../actions';
+import {
+  getUnsignedERC20ApprovalTransactions,
+  getUnsignedFulfilmentTransactions,
+  signApprovalTransactions,
+  signFulfilmentTransactions,
+} from '../actions';
 import { SignTransactionStatusType, UnsignedTransactions } from '../actions/types';
 import { ERC20ABI } from '../../types';
 import { calculateFees } from '../fees/fees';
@@ -120,7 +126,6 @@ export const buy = async (
     );
   }
   const buyToken = order.result.buy[0];
-
   let decimals = 18;
   if (order.result.buy[0].type === 'ERC20') {
     const tokenContract = instance.getTokenContract(
@@ -136,14 +141,18 @@ export const buy = async (
     fees = calculateFees(takerFees, buyToken.amount, decimals);
   }
 
-  let unsignedTransactions: UnsignedTransactions = {
-    approvalTransactions: [],
-    fulfilmentTransactions: [],
-  };
+  // TODO: follow up with Mikhala now these have been split out
+  // reason being building the fulfilment was throwing when user had not signed and sent approval for ERC20 first
+  // Now they are split out, the fulfilment is only built after ERC20 approval is done. This works, but what
+  // effect does it have on the smart checkout gas calculations??
+  let unsignedApprovalTransactions: TransactionRequest[] = [];
+  let unsignedFulfilmentTransactions: TransactionRequest[] = [];
+  let actionsToDo: Action[] = [];
   try {
     const fulfillerAddress = await provider.getSigner().getAddress();
     const { actions } = await orderbook.fulfillOrder(id, fulfillerAddress, fees);
-    unsignedTransactions = await getUnsignedTransactions(actions);
+    actionsToDo = actions;
+    unsignedApprovalTransactions = await getUnsignedERC20ApprovalTransactions(actions);
   } catch {
     // Silently ignore error as this is usually thrown if user does not have enough balance
     // todo: if balance error - can we determine if its the balance error otherwise throw?
@@ -195,12 +204,15 @@ export const buy = async (
     itemRequirements,
     getTransactionOrGas(
       gasLimit,
-      unsignedTransactions,
+      {
+        approvalTransactions: unsignedApprovalTransactions,
+        fulfilmentTransactions: unsignedFulfilmentTransactions,
+      },
     ),
   );
 
   if (smartCheckoutResult.sufficient) {
-    const approvalResult = await signApprovalTransactions(provider, unsignedTransactions.approvalTransactions);
+    const approvalResult = await signApprovalTransactions(provider, unsignedApprovalTransactions);
     if (approvalResult.type === SignTransactionStatusType.FAILED) {
       return {
         smartCheckoutResult,
@@ -213,7 +225,8 @@ export const buy = async (
       };
     }
 
-    const fulfilmentResult = await signFulfilmentTransactions(provider, unsignedTransactions.fulfilmentTransactions);
+    unsignedFulfilmentTransactions = await getUnsignedFulfilmentTransactions(actionsToDo);
+    const fulfilmentResult = await signFulfilmentTransactions(provider, unsignedFulfilmentTransactions);
     if (fulfilmentResult.type === SignTransactionStatusType.FAILED) {
       return {
         smartCheckoutResult,
