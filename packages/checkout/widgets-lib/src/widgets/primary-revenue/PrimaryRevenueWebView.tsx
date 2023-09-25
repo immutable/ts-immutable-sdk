@@ -8,7 +8,7 @@ import {
 } from '@imtbl/checkout-widgets';
 import { WidgetTheme } from '../../lib';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
-import { Item } from './hooks/useMergeItemsInfo';
+import { Item } from './types';
 
 const defaultPassportConfig = {
   environment: 'sandbox',

@@ -8,9 +8,9 @@ import {
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
 import { ConnectTargetLayer, getL1ChainId, getL2ChainId } from '../../lib';
 import { isValidAmount } from '../../lib/validations/widgetValidators';
-import { Item } from './hooks/useMergeItemsInfo';
 import { sendPrimaryRevenueWidgetCloseEvent } from './PrimaryRevenuWidgetEvents';
 import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
+import { Item } from './types';
 
 export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
   amount = '';
