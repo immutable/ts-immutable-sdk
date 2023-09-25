@@ -1,6 +1,6 @@
 {
-  "name": "@imtbl/analytics",
-  "description": "Analytics module for Immutable SDK",
+  "name": "@imtbl/version-check",
+  "description": "Version check module for Immutable SDK",
   "version": "0.0.0",
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
@@ -32,7 +32,7 @@
     "build": "NODE_ENV=production rollup --config rollup.config.js",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "start:checkout-js-server": "http-server -p 8080 -c-1 ../../../sdk/dist",
-    "start:checkout-web-server": "http-server -p 8081 -c-1 ./src/version-check/checkout-widgets-test",
+    "start:checkout-web-server": "http-server -p 8081 -c-1 ./src/checkout-widgets-test",
     "test": "jest",
     "typecheck": "tsc --noEmit --jsx preserve"
   },
