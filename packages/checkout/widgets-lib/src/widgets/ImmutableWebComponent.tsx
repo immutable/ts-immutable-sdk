@@ -1,6 +1,6 @@
 import ReactDOM from 'react-dom/client';
 import { Web3Provider } from '@ethersproject/providers';
-import { sdkVersionCheck, sdkVersion } from '@imtbl/analytics';
+import { sdkVersionCheck, sdkVersion } from '@imtbl/version-check';
 import { Checkout } from '@imtbl/checkout-sdk';
 import { Passport } from '@imtbl/passport';
 import { StrongCheckoutWidgetsConfig, withDefaultWidgetConfigs } from '../lib/withDefaultWidgetConfig';
