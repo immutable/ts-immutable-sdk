@@ -13,7 +13,7 @@ export enum PrimaryRevenueEventType {
  * @property {string} transactionHash - The hash of the successful transaction.
  */
 export type PrimaryRevenueSuccess = {
-  [key: string]: unknown;
+  [key: string]: string;
 };
 
 /**
