@@ -562,14 +562,14 @@ describe('Connect', () => {
 
     await checkout.cancel({
       provider,
-      orderId: '1234',
+      orderIds: ['1234'],
     });
 
     expect(cancel).toBeCalledTimes(1);
     expect(cancel).toBeCalledWith(
       checkout.config,
       provider,
-      '1234',
+      ['1234'],
     );
   });
 
@@ -583,7 +583,7 @@ describe('Connect', () => {
 
     await expect(checkout.cancel({
       provider,
-      orderId: '1234',
+      orderIds: ['1234'],
     })).rejects.toThrow('This endpoint is not currently available.');
 
     expect(cancel).toBeCalledTimes(0);
