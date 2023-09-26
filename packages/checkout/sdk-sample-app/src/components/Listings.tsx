@@ -1,25 +1,26 @@
-import { Checkout } from '@imtbl/checkout-sdk';
+import { Checkout, BuyResult, BuyStatusType, BuyStatus } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
-import { Box, FormControl, TextInput } from '@biom3/react';
+import { Body, Box, FormControl, TextInput } from '@biom3/react';
+import { OrderStatus, Orderbook } from '@imtbl/orderbook';
+import { Environment } from '@imtbl/config';
 
-interface CancelProps {
+interface ListingsProps {
   checkout: Checkout;
   provider: Web3Provider | undefined;
 }
 
-export default function Cancel({ checkout, provider }: CancelProps) {
-  const [orderId, setOrderId] = useState<string>('');
-  const [orderIdError, setOrderIdError] = useState<any>(null);
-  const [signActions, setSignActions] = useState<boolean>(false);
+export default function Listings({ checkout, provider }: ListingsProps) {
+  const [sellContractAddress, setSellContractAddress] = useState<string>('');
+  const [orderIdError, setAddressError] = useState<any>(null);
   const [error, setError] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  async function cancelClick() {
-    if (!orderId) {
-      setOrderIdError('Please enter an order ID');
+  async function getListingsClick() {
+    if (!sellContractAddress) {
+      setAddressError('Please enter an collection address');
       return;
     }
     if (!checkout) {
@@ -33,10 +34,12 @@ export default function Cancel({ checkout, provider }: CancelProps) {
     setError(null);
     setLoading(true);
     try {
-      await checkout.cancel({
-        provider,
-        orderIds: [orderId],
-      });
+        const orderBook = new Orderbook({baseConfig: {environment: checkout.config.environment}})
+        const listingsResult = await orderBook.listListings({
+          sellItemContractAddress: sellContractAddress,
+          status: OrderStatus.ACTIVE
+        })
+        console.log('listings:', listingsResult)
       setLoading(false);
     } catch (err: any) {
       setError(err);
@@ -48,9 +51,9 @@ export default function Cancel({ checkout, provider }: CancelProps) {
     }
   }
 
-  const updateOrderId = (event: any) => {
-    setOrderId(event.target.value);
-    setOrderIdError('');
+  const updateSellContractAddress = (event: any) => {
+    setSellContractAddress(event.target.value);
+    setAddressError('');
   }
 
   useEffect(() => {
@@ -61,17 +64,17 @@ export default function Cancel({ checkout, provider }: CancelProps) {
   return (
     <Box>
       <FormControl validationStatus={orderIdError ? 'error' : 'success'} >
-        <FormControl.Label>Order ID</FormControl.Label>
-        <TextInput onChange={updateOrderId} />
+        <FormControl.Label>Sell Collection Address</FormControl.Label>
+        <TextInput onChange={updateSellContractAddress} />
         {orderIdError && (
           <FormControl.Validation>{orderIdError}</FormControl.Validation>
         )}
       </FormControl>
       <br />
-      <LoadingButton onClick={cancelClick} loading={loading}>
-        Cancel
+      <LoadingButton onClick={getListingsClick} loading={loading}>
+        Get Listings
       </LoadingButton>
-      {!error && <SuccessMessage>Cancel success.</SuccessMessage>}
+      {!error && <SuccessMessage>Get listings success. Check console for result</SuccessMessage>}
       {error && (
         <ErrorMessage>
           {error.message}. Check console logs for more details.
