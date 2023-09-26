@@ -34,12 +34,14 @@ export default function Buy({ checkout, provider }: BuyProps) {
     setError(null);
     setLoading(true);
     try {
-      await checkout.buy({
+      const buyResult = await checkout.buy({
         provider,
         orders: [{id: orderId, takerFees: [{amount: {percentageDecimal: 0.01}, recipient: '0x96654086969DCaa88933E753Aa52d46EAB269Ff7'}]}],
       });
+      console.log(buyResult);
       setLoading(false);
     } catch (err: any) {
+      console.log(err);
       setError(err);
       setLoading(false);
       console.log(err.message);

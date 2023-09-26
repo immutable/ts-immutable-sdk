@@ -33,7 +33,7 @@ import {
   signApprovalTransactions,
   signFulfilmentTransactions,
 } from '../actions';
-import { SignTransactionStatusType, UnsignedTransactions } from '../actions/types';
+import { SignTransactionStatusType } from '../actions/types';
 import { ERC20ABI } from '../../types';
 import { calculateFees } from '../fees/fees';
 
@@ -62,12 +62,12 @@ export const getItemRequirement = (
 
 export const getTransactionOrGas = (
   gasLimit: number,
-  unsignedTransactions: UnsignedTransactions,
+  fulfilmentTransactions: TransactionRequest[],
 ): FulfilmentTransaction | GasAmount => {
-  if (unsignedTransactions.fulfilmentTransactions.length > 0) {
+  if (fulfilmentTransactions.length > 0) {
     return {
       type: TransactionOrGasType.TRANSACTION,
-      transaction: unsignedTransactions.fulfilmentTransactions[0],
+      transaction: fulfilmentTransactions[0],
     };
   }
 
@@ -141,10 +141,6 @@ export const buy = async (
     fees = calculateFees(takerFees, buyToken.amount, decimals);
   }
 
-  // TODO: follow up with Mikhala now these have been split out
-  // reason being building the fulfilment was throwing when user had not signed and sent approval for ERC20 first
-  // Now they are split out, the fulfilment is only built after ERC20 approval is done. This works, but what
-  // effect does it have on the smart checkout gas calculations??
   let unsignedApprovalTransactions: TransactionRequest[] = [];
   let unsignedFulfilmentTransactions: TransactionRequest[] = [];
   let actionsToDo: Action[] = [];
@@ -156,6 +152,13 @@ export const buy = async (
   } catch {
     // Silently ignore error as this is usually thrown if user does not have enough balance
     // todo: if balance error - can we determine if its the balance error otherwise throw?
+  }
+
+  try {
+    unsignedFulfilmentTransactions = await getUnsignedFulfilmentTransactions(actionsToDo);
+  } catch {
+    // if cannot estimate gas then silently continue and use gas limit in smartCheckout
+    // but get the fulfilment transactions after they have approved the spending
   }
 
   let amount = BigNumber.from('0');
@@ -204,10 +207,7 @@ export const buy = async (
     itemRequirements,
     getTransactionOrGas(
       gasLimit,
-      {
-        approvalTransactions: unsignedApprovalTransactions,
-        fulfilmentTransactions: unsignedFulfilmentTransactions,
-      },
+      unsignedFulfilmentTransactions,
     ),
   );
 
@@ -225,7 +225,20 @@ export const buy = async (
       };
     }
 
-    unsignedFulfilmentTransactions = await getUnsignedFulfilmentTransactions(actionsToDo);
+    try {
+      if (unsignedFulfilmentTransactions.length === 0) {
+        unsignedFulfilmentTransactions = await getUnsignedFulfilmentTransactions(actionsToDo);
+      }
+    } catch (err: any) {
+      throw new CheckoutError(
+        'Error fetching fulfilment transaction',
+        CheckoutErrorType.FULFILL_ORDER_LISTING_ERROR,
+        {
+          message: err.message,
+        },
+      );
+    }
+
     const fulfilmentResult = await signFulfilmentTransactions(provider, unsignedFulfilmentTransactions);
     if (fulfilmentResult.type === SignTransactionStatusType.FAILED) {
       return {
