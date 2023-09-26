@@ -13,7 +13,7 @@ const CONFIRMATION_WINDOW_WIDTH = 480;
 const CONFIRMATION_WINDOW_CLOSED_POLLING_DURATION = 1000;
 
 export const CONFIRMATION_IFRAME_ID = 'passport-confirm';
-export const CONFIRMATION_IFRAME_STYLE = 'position: absolute;width:1px;height:1px;border:0;';
+export const CONFIRMATION_IFRAME_STYLE = 'display: none; position: absolute;width:0px;height:0px;border:0;';
 
 type MessageHandler = (arg0: MessageEvent) => void;
 
