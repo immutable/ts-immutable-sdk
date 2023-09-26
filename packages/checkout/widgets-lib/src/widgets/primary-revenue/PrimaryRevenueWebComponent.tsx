@@ -26,6 +26,34 @@ export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
     super();
   }
 
+  static get observedAttributes(): string[] {
+    const baseObservedAttributes = super.observedAttributes;
+    return [
+      ...baseObservedAttributes,
+      'amount',
+      'envId',
+      'fromCurrency',
+      'items',
+    ];
+  }
+
+  attributeChangedCallback(name: string, oldValue: any, newValue: any): void {
+    super.attributeChangedCallback(name, oldValue, newValue);
+
+    if (name === 'amount') {
+      this.amount = newValue;
+    }
+    if (name === 'envId') {
+      this.envId = newValue;
+    }
+    if (name === 'fromCurrency') {
+      this.fromCurrency = newValue;
+    }
+    if (name === 'items') {
+      this.setItems(newValue);
+    }
+  }
+
   connectedCallback() {
     super.connectedCallback();
 
@@ -34,6 +62,10 @@ export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
     this.fromCurrency = this.getAttribute('fromCurrency') ?? '';
 
     const items = this.getAttribute('items') ?? '';
+    this.setItems(items);
+  }
+
+  private setItems(items: string) {
     if (items) {
       try {
         this.items = JSON.parse(items);
@@ -43,8 +75,6 @@ export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
         this.items = [];
       }
     }
-
-    this.renderWidget();
   }
 
   validateInputs(): void {
@@ -90,9 +120,7 @@ export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
     }
     this.reactRoot.render(
       <React.StrictMode>
-        <CustomAnalyticsProvider
-          widgetConfig={this.widgetConfig!}
-        >
+        <CustomAnalyticsProvider widgetConfig={this.widgetConfig!}>
           <ConnectLoader
             widgetConfig={this.widgetConfig!}
             params={connectLoaderParams}
