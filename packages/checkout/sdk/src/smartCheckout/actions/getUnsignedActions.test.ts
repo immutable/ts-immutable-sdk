@@ -3,7 +3,9 @@ import {
 } from '@imtbl/orderbook';
 import { PopulatedTransaction, TypedDataDomain } from 'ethers';
 import {
+  getUnsignedERC20ApprovalTransactions,
   getUnsignedERC721Transactions,
+  getUnsignedFulfilmentTransactions,
   getUnsignedMessage,
 } from './getUnsignedActions';
 
@@ -55,6 +57,42 @@ describe('getUnsignedActions', () => {
         approvalTransactions: [{ from: '0xAPPROVAL1' }, { from: '0xAPPROVAL2' }],
         fulfilmentTransactions: [{ from: '0xTRANSACTION1' }, { from: '0xTRANSACTION2' }],
       });
+    });
+
+    it('should get the unsigned erc20 approval transactions', async () => {
+      const actions: Action[] = [
+        {
+          type: ActionType.TRANSACTION,
+          purpose: TransactionPurpose.APPROVAL,
+          buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL1' } as PopulatedTransaction),
+        },
+        {
+          type: ActionType.TRANSACTION,
+          purpose: TransactionPurpose.APPROVAL,
+          buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL2' } as PopulatedTransaction),
+        },
+      ];
+
+      await expect(getUnsignedERC20ApprovalTransactions(actions)).resolves
+        .toEqual([{ from: '0xAPPROVAL1' }, { from: '0xAPPROVAL2' }]);
+    });
+
+    it('should get the unsigned fulfil transactions', async () => {
+      const actions: Action[] = [
+        {
+          type: ActionType.TRANSACTION,
+          purpose: TransactionPurpose.FULFILL_ORDER,
+          buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION1' } as PopulatedTransaction),
+        },
+        {
+          type: ActionType.TRANSACTION,
+          purpose: TransactionPurpose.FULFILL_ORDER,
+          buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION2' } as PopulatedTransaction),
+        },
+      ];
+
+      await expect(getUnsignedFulfilmentTransactions(actions)).resolves
+        .toEqual([{ from: '0xTRANSACTION1' }, { from: '0xTRANSACTION2' }]);
     });
 
     it('should return empty arrays if no transactions or signable messages', async () => {
