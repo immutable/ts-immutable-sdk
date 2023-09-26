@@ -357,6 +357,10 @@ describe('Top Up View', () => {
         .as('getExchangeFeeEstimateStub')
         .onFirstCall()
         .rejects();
+      cy.stub(Checkout.prototype, 'gasEstimate')
+        .as('gasEstimateStub')
+        .onFirstCall()
+        .rejects();
 
       mount(
         <ConnectLoaderTestComponent
