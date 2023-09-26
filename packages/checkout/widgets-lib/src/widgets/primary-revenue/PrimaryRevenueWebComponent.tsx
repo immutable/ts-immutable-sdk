@@ -125,7 +125,7 @@ export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
             widgetConfig={this.widgetConfig!}
             params={connectLoaderParams}
             closeEvent={() => {
-              sendPrimaryRevenueWidgetCloseEvent();
+              sendPrimaryRevenueWidgetCloseEvent(window);
             }}
           >
             <PrimaryRevenueWidget
