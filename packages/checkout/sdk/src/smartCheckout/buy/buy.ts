@@ -143,11 +143,11 @@ export const buy = async (
 
   let unsignedApprovalTransactions: TransactionRequest[] = [];
   let unsignedFulfilmentTransactions: TransactionRequest[] = [];
-  let actionsToDo: Action[] = [];
+  let orderActions: Action[] = [];
   try {
     const fulfillerAddress = await provider.getSigner().getAddress();
     const { actions } = await orderbook.fulfillOrder(id, fulfillerAddress, fees);
-    actionsToDo = actions;
+    orderActions = actions;
     unsignedApprovalTransactions = await getUnsignedERC20ApprovalTransactions(actions);
   } catch {
     // Silently ignore error as this is usually thrown if user does not have enough balance
@@ -155,7 +155,7 @@ export const buy = async (
   }
 
   try {
-    unsignedFulfilmentTransactions = await getUnsignedFulfilmentTransactions(actionsToDo);
+    unsignedFulfilmentTransactions = await getUnsignedFulfilmentTransactions(orderActions);
   } catch {
     // if cannot estimate gas then silently continue and use gas limit in smartCheckout
     // but get the fulfilment transactions after they have approved the spending
@@ -227,7 +227,7 @@ export const buy = async (
 
     try {
       if (unsignedFulfilmentTransactions.length === 0) {
-        unsignedFulfilmentTransactions = await getUnsignedFulfilmentTransactions(actionsToDo);
+        unsignedFulfilmentTransactions = await getUnsignedFulfilmentTransactions(orderActions);
       }
     } catch (err: any) {
       throw new CheckoutError(
