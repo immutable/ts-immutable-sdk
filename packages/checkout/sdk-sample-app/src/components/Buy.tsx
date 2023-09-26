@@ -3,7 +3,9 @@ import { Web3Provider } from '@ethersproject/providers';
 import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
-import { Box, FormControl, TextInput } from '@biom3/react';
+import { Body, Box, FormControl, TextInput } from '@biom3/react';
+import { Orderbook } from '@imtbl/orderbook';
+import { Environment } from '@imtbl/config';
 
 interface BuyProps {
   checkout: Checkout;
@@ -32,12 +34,14 @@ export default function Buy({ checkout, provider }: BuyProps) {
     setError(null);
     setLoading(true);
     try {
-      await checkout.buy({
+      const buyResult = await checkout.buy({
         provider,
-        orderId,
+        orders: [{id: orderId, takerFees: [{amount: {percentageDecimal: 0.01}, recipient: '0x96654086969DCaa88933E753Aa52d46EAB269Ff7'}]}],
       });
+      console.log(buyResult);
       setLoading(false);
     } catch (err: any) {
+      console.log(err);
       setError(err);
       setLoading(false);
       console.log(err.message);
@@ -67,9 +71,12 @@ export default function Buy({ checkout, provider }: BuyProps) {
         )}
       </FormControl>
       <br />
+      <Box sx={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 'base.spacing.x2'}}>
       <LoadingButton onClick={buyClick} loading={loading}>
         Buy
       </LoadingButton>
+      <Body size="xSmall">(adds 1% taker fee)</Body>
+      </Box>
       {!error && <SuccessMessage>Buy success.</SuccessMessage>}
       {error && (
         <ErrorMessage>
