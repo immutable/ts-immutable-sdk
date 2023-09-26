@@ -5,7 +5,7 @@ import { OrderFee } from './fees';
 /**
  * Interface representing the parameters for {@link Checkout.buy}
  * @property {Web3Provider} provider - The provider to use for the buy.
- * @property {string} orderId - The order ID.
+ * @property {Array<BuyOrder>} orders - The orders to buy
  */
 export interface BuyParams {
   provider: Web3Provider;
