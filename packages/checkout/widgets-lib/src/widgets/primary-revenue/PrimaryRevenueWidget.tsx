@@ -22,6 +22,9 @@ import { ConnectLoaderContext } from '../../context/connect-loader-context/Conne
 import { PrimaryRevenueWidgetViews } from '../../context/view-context/PrimaryRevenueViewContextTypes';
 import { Item } from './types';
 import { SharedContextProvider } from './context/SharedContextProvider';
+import { PaymentMethods } from './views/PaymentMethods';
+import { PayWithCard } from './views/PayWithCard';
+import { PayWithCoins } from './views/PayWithCoins';
 
 export interface PrimaryRevenueWidgetProps {
   config: StrongCheckoutWidgetsConfig;
@@ -111,8 +114,15 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
           {viewState.view.type === SharedViews.ERROR_VIEW && (
             <div>{viewState.view.error.message}</div>
           )}
-          {viewState.view.type === PrimaryRevenueWidgetViews.PAYMENT_METHODS && (
-            <div>Payment methods</div>
+          {viewState.view.type
+            === PrimaryRevenueWidgetViews.PAYMENT_METHODS && (
+            <PaymentMethods config={config} />
+          )}
+          {viewState.view.type === PrimaryRevenueWidgetViews.PAY_WITH_CARD && (
+            <PayWithCard config={config} />
+          )}
+          {viewState.view.type === PrimaryRevenueWidgetViews.PAY_WITH_COINS && (
+            <PayWithCoins config={config} />
           )}
         </SharedContextProvider>
       </ViewContext.Provider>

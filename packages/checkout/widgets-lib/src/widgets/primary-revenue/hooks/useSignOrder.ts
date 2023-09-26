@@ -175,12 +175,10 @@ export const useSignOrder = (input: SignOrderInput) => {
           throw new Error(`HTTP Error: ${response.statusText}`);
         }
 
-        const signApiData: SignApiResponse = await response.json();
-        const signResponse = toSignResponse(signApiData, items);
+        const responseData = toSignResponse(await response.json(), items);
+        setSignResponse(responseData);
 
-        setSignResponse(signResponse);
-
-        return signResponse;
+        return responseData;
       } catch (error) {
         console.error('Signing order failed:', error);
       }
