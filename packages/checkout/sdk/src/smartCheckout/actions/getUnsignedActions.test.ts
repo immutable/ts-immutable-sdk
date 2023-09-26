@@ -82,6 +82,11 @@ describe('getUnsignedActions', () => {
           purpose: TransactionPurpose.APPROVAL,
           buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL2' } as PopulatedTransaction),
         },
+        {
+          type: ActionType.TRANSACTION,
+          purpose: TransactionPurpose.FULFILL_ORDER,
+          buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION1' } as PopulatedTransaction),
+        },
       ];
 
       await expect(getUnsignedERC20ApprovalTransactions(actions)).resolves
@@ -107,6 +112,11 @@ describe('getUnsignedActions', () => {
           type: ActionType.TRANSACTION,
           purpose: TransactionPurpose.FULFILL_ORDER,
           buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION2' } as PopulatedTransaction),
+        },
+        {
+          type: ActionType.TRANSACTION,
+          purpose: TransactionPurpose.APPROVAL,
+          buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL1' } as PopulatedTransaction),
         },
       ];
 
