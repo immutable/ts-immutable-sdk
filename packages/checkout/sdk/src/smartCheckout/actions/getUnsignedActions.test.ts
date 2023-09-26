@@ -10,7 +10,7 @@ import {
 } from './getUnsignedActions';
 
 describe('getUnsignedActions', () => {
-  describe('getUnsignedTransactions', () => {
+  describe('getUnsignedERC721Transactions', () => {
     it('should get the unsigned transactions', async () => {
       const actions: Action[] = [
         {
@@ -59,6 +59,17 @@ describe('getUnsignedActions', () => {
       });
     });
 
+    it('should return empty arrays if no transactions or signable messages', async () => {
+      const actions: Action[] = [];
+
+      await expect(getUnsignedERC721Transactions(actions)).resolves.toEqual({
+        approvalTransactions: [],
+        fulfilmentTransactions: [],
+      });
+    });
+  });
+
+  describe('getUnsignedERC20ApprovalTransactions', () => {
     it('should get the unsigned erc20 approval transactions', async () => {
       const actions: Action[] = [
         {
@@ -77,6 +88,14 @@ describe('getUnsignedActions', () => {
         .toEqual([{ from: '0xAPPROVAL1' }, { from: '0xAPPROVAL2' }]);
     });
 
+    it('should return an empty arrays if no transactions', async () => {
+      const actions: Action[] = [];
+
+      await expect(getUnsignedERC20ApprovalTransactions(actions)).resolves.toEqual([]);
+    });
+  });
+
+  describe('getUnsignedFulfilmentTransactions', () => {
     it('should get the unsigned fulfil transactions', async () => {
       const actions: Action[] = [
         {
@@ -95,13 +114,10 @@ describe('getUnsignedActions', () => {
         .toEqual([{ from: '0xTRANSACTION1' }, { from: '0xTRANSACTION2' }]);
     });
 
-    it('should return empty arrays if no transactions or signable messages', async () => {
+    it('should return an empty arrays if no transactions', async () => {
       const actions: Action[] = [];
 
-      await expect(getUnsignedERC721Transactions(actions)).resolves.toEqual({
-        approvalTransactions: [],
-        fulfilmentTransactions: [],
-      });
+      await expect(getUnsignedFulfilmentTransactions(actions)).resolves.toEqual([]);
     });
   });
 
