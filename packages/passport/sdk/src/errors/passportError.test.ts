@@ -26,7 +26,7 @@ describe('passportError', () => {
         withPassportError(errorFunction, PassportErrorType.AUTHENTICATION_ERROR),
       ).rejects.toThrow(
         new PassportError(
-          'AUTHENTICATION_ERROR: SOMETHINGWRONG',
+          'SOMETHINGWRONG',
           PassportErrorType.AUTHENTICATION_ERROR,
         ),
       );

@@ -31,32 +31,82 @@ describe('CheckoutWidgets', () => {
         expectedVersion: SDK_VERSION,
       },
       {
-        title: 'undefined minor should return default version',
+        title: 'undefined minor should return major version',
         version: {
           major: 1,
-          minor: undefined as unknown as number,
+          minor: undefined,
           patch: 1,
           prerelease: 'alpha',
+        },
+        expectedVersion: '1',
+      },
+      {
+        title: 'undefined patch should return major.minor version',
+        version: {
+          major: 1,
+          minor: 1,
+          patch: undefined,
+          prerelease: 'alpha',
+        },
+        expectedVersion: '1.1',
+      },
+      {
+        title: 'undefined patch with zero minor should return major.minor version',
+        version: {
+          major: 1,
+          minor: 0,
+          patch: undefined,
+          prerelease: 'alpha',
+        },
+        expectedVersion: '1.0',
+      },
+      {
+        title: 'Minor and patch zero values should return in version number',
+        version: {
+          major: 1,
+          minor: 0,
+          patch: 0,
+          prerelease: undefined,
+        },
+        expectedVersion: '1.0.0',
+      },
+      {
+        title: 'non-alpha prerelease should return major.minor.patch version',
+        version: {
+          major: 1,
+          minor: 0,
+          patch: 0,
+          prerelease: 'test' as 'alpha',
+        },
+        expectedVersion: '1.0.0',
+      },
+      {
+        title: 'undefined prerelease should return major.minor.patch version',
+        version: {
+          major: 1,
+          minor: 1,
+          patch: 1,
+          prerelease: undefined,
+        },
+        expectedVersion: '1.1.1',
+      },
+      {
+        title: 'zero major version and rest are all undefined should return default version',
+        version: {
+          major: 0,
+          minor: undefined,
+          patch: undefined,
+          prerelease: undefined,
         },
         expectedVersion: SDK_VERSION,
       },
       {
-        title: 'undefined patch should return default version',
+        title: 'major and minor as zeros and patch undefined should return default version',
         version: {
-          major: 1,
-          minor: 1,
-          patch: undefined as unknown as number,
-          prerelease: 'alpha',
-        },
-        expectedVersion: SDK_VERSION,
-      },
-      {
-        title: 'undefined prerelease should return default version',
-        version: {
-          major: 1,
-          minor: 1,
-          patch: 1,
-          prerelease: undefined as unknown as 'alpha',
+          major: 0,
+          minor: 0,
+          patch: undefined,
+          prerelease: undefined,
         },
         expectedVersion: SDK_VERSION,
       },
@@ -71,14 +121,14 @@ describe('CheckoutWidgets', () => {
         expectedVersion: SDK_VERSION,
       },
       {
-        title: 'invalid prerelease should return default version',
+        title: 'invalid prerelease should return major.minor.patch version',
         version: {
           major: 0,
           minor: 1,
           patch: 0,
           prerelease: 'test' as 'alpha',
         },
-        expectedVersion: SDK_VERSION,
+        expectedVersion: '0.1.0',
       },
       {
         title: 'provided prerelease should be appended to version',

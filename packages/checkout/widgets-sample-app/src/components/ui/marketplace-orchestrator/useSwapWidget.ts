@@ -37,7 +37,8 @@ export function useSwapWidget(setDoneSwap: (val: boolean) => void) {
         case OrchestrationEventType.REQUEST_CONNECT:
         case OrchestrationEventType.REQUEST_WALLET:
         case OrchestrationEventType.REQUEST_SWAP:
-        case OrchestrationEventType.REQUEST_BRIDGE: {
+        case OrchestrationEventType.REQUEST_BRIDGE:
+        case OrchestrationEventType.REQUEST_ONRAMP: {
           handleOrchestrationEvent(event, setShowWidgets);
           break;
         }

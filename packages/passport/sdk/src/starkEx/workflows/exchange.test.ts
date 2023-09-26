@@ -137,7 +137,7 @@ describe('exchangeTransfer', () => {
       exchangesApi: exchangesApiMock,
     })).rejects.toThrow(
       new PassportError(
-        `${PassportErrorType.EXCHANGE_TRANSFER_ERROR}: ${mockErrorMessage}`,
+        mockErrorMessage,
         PassportErrorType.EXCHANGE_TRANSFER_ERROR,
       ),
     );

@@ -83,6 +83,7 @@ describe('', () => {
       orderComponents: soonToExpireListing.orderComponents,
       orderHash: soonToExpireListing.orderHash,
       orderSignature: signatures[0],
+      makerFees: [],
     });
     log('Submitted order to orderbook API with expiry time set in the future');
 
@@ -97,7 +98,7 @@ describe('', () => {
     );
 
     try {
-      await sdk.fulfillOrder(orderId, fulfiller.address);
+      await sdk.fulfillOrder(orderId, fulfiller.address, []);
     } catch (e) {
       log('Fulfillment failed as expected. The error is:');
       log(e);

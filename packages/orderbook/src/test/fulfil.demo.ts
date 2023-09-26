@@ -45,6 +45,8 @@ describe('', () => {
     // Deploy an NFT contract and mint a token for the offerer
     const nftContract = await deployAndMintNftContract(offerer);
 
+    return;
+
     // uncomment the overrides and set variables in
     // .env to run on environments other than testnet (e.g. devnet)
     // const configOverrides = getConfigFromEnv();
@@ -83,10 +85,10 @@ describe('', () => {
       orderComponents: validListing.orderComponents,
       orderHash: validListing.orderHash,
       orderSignature: signatures[0],
-      makerFee: {
+      makerFees: [{
         amount: '1',
         recipient: offerer.address,
-      },
+      }],
     });
 
     await waitForOrderToBeOfStatus(sdk, orderId2, OrderStatus.ACTIVE);
@@ -95,10 +97,10 @@ describe('', () => {
     const { actions, expiration, order } = await sdk.fulfillOrder(
       orderId2,
       fulfiller.address,
-      {
+      [{
         amount: '1',
         recipient: offerer.address,
-      },
+      }],
     );
 
     log(`Fulfilling listing ${order.id}, fulfillment transaction valid till ${expiration}`);

@@ -7,7 +7,7 @@ import { CheckoutConfiguration } from '../../config';
 import { GasTokenType, ItemType, TransactionOrGasType } from '../../types';
 import { smartCheckout } from '../smartCheckout';
 import { createOrderbookInstance } from '../../instance';
-import { BuyToken, SellStatusType } from '../../types/sell';
+import { BuyToken, SellOrder, SellStatusType } from '../../types/sell';
 import { CheckoutErrorType } from '../../errors';
 import {
   getUnsignedMessage, getUnsignedTransactions, signApprovalTransactions, signMessage,
@@ -123,15 +123,25 @@ describe('sell', () => {
         type: SignTransactionStatusType.SUCCESS,
       });
 
+      const orders:Array<SellOrder> = [{
+        sellToken: {
+          id,
+          collectionAddress: contractAddress,
+        },
+        buyToken: {
+          type: ItemType.NATIVE,
+          amount: '1',
+        },
+        makerFees: [{
+          amount: { percentageDecimal: 0.025 },
+          recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
+        }],
+      }];
+
       const result = await sell(
         config,
         mockProvider,
-        id,
-        contractAddress,
-        {
-          type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
-        },
+        orders,
       );
 
       expect(result).toEqual({
@@ -177,6 +187,10 @@ describe('sell', () => {
       );
       expect(mockCreateListing).toBeCalledWith(
         {
+          makerFees: [{
+            amount: '25000000000000000',
+            recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
+          }],
           orderComponents: {},
           orderHash: 'hash',
           orderSignature: '0xSIGNED',
@@ -265,15 +279,25 @@ describe('sell', () => {
       });
       (signApprovalTransactions as jest.Mock).mockResolvedValue({});
 
+      const orders:Array<SellOrder> = [{
+        sellToken: {
+          id,
+          collectionAddress: contractAddress,
+        },
+        buyToken: {
+          type: ItemType.NATIVE,
+          amount: '1',
+        },
+        makerFees: [{
+          amount: { percentageDecimal: 0.025 },
+          recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
+        }],
+      }];
+
       const result = await sell(
         config,
         mockProvider,
-        id,
-        contractAddress,
-        {
-          type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
-        },
+        orders,
       );
 
       expect(result).toEqual({
@@ -387,15 +411,25 @@ describe('sell', () => {
         reason: 'Approval transaction failed and was reverted',
       });
 
+      const orders:Array<SellOrder> = [{
+        sellToken: {
+          id,
+          collectionAddress: contractAddress,
+        },
+        buyToken: {
+          type: ItemType.NATIVE,
+          amount: '1',
+        },
+        makerFees: [{
+          amount: { percentageDecimal: 0.025 },
+          recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
+        }],
+      }];
+
       const result = await sell(
         config,
         mockProvider,
-        id,
-        contractAddress,
-        {
-          type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
-        },
+        orders,
       );
 
       expect(result).toEqual({
@@ -459,15 +493,25 @@ describe('sell', () => {
       let data;
 
       try {
+        const orders:Array<SellOrder> = [{
+          sellToken: {
+            id,
+            collectionAddress: contractAddress,
+          },
+          buyToken: {
+            type: ItemType.NATIVE,
+            amount: '1',
+          },
+          makerFees: [{
+            amount: { percentageDecimal: 0.025 },
+            recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
+          }],
+        }];
+
         await sell(
           config,
           mockProvider,
-          id,
-          contractAddress,
-          {
-            type: ItemType.NATIVE,
-            amount: BigNumber.from(1),
-          },
+          orders,
         );
       } catch (err: any) {
         message = err.message;
@@ -520,15 +564,25 @@ describe('sell', () => {
       let data;
 
       try {
+        const orders:Array<SellOrder> = [{
+          sellToken: {
+            id,
+            collectionAddress: contractAddress,
+          },
+          buyToken: {
+            type: ItemType.NATIVE,
+            amount: '1',
+          },
+          makerFees: [{
+            amount: { percentageDecimal: 0.025 },
+            recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
+          }],
+        }];
+
         await sell(
           config,
           rejectedProvider,
-          id,
-          contractAddress,
-          {
-            type: ItemType.NATIVE,
-            amount: BigNumber.from(1),
-          },
+          orders,
         );
       } catch (err: any) {
         message = err.message;
@@ -617,16 +671,26 @@ describe('sell', () => {
       });
       (signApprovalTransactions as jest.Mock).mockResolvedValue({});
 
+      const orders:Array<SellOrder> = [{
+        sellToken: {
+          id,
+          collectionAddress: contractAddress,
+        },
+        buyToken: {
+          type: ItemType.NATIVE,
+          amount: '1',
+        },
+        makerFees: [{
+          amount: { percentageDecimal: 0.025 },
+          recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
+        }],
+      }];
+
       await expect(
         sell(
           config,
           mockProvider,
-          id,
-          contractAddress,
-          {
-            type: ItemType.NATIVE,
-            amount: BigNumber.from(1),
-          },
+          orders,
         ),
       ).rejects.toThrowError('error from sign message');
 
@@ -708,16 +772,26 @@ describe('sell', () => {
       (getUnsignedTransactions as jest.Mock).mockRejectedValue(new Error('error from get unsigned transactions'));
       (signApprovalTransactions as jest.Mock).mockResolvedValue({});
 
+      const orders:Array<SellOrder> = [{
+        sellToken: {
+          id,
+          collectionAddress: contractAddress,
+        },
+        buyToken: {
+          type: ItemType.NATIVE,
+          amount: '1',
+        },
+        makerFees: [{
+          amount: { percentageDecimal: 0.025 },
+          recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
+        }],
+      }];
+
       await expect(
         sell(
           config,
           mockProvider,
-          id,
-          contractAddress,
-          {
-            type: ItemType.NATIVE,
-            amount: BigNumber.from(1),
-          },
+          orders,
         ),
       ).rejects.toThrowError('error from get unsigned transactions');
 
@@ -802,16 +876,26 @@ describe('sell', () => {
       });
       (signApprovalTransactions as jest.Mock).mockRejectedValue(new Error('error from sign approval transactions'));
 
+      const orders:Array<SellOrder> = [{
+        sellToken: {
+          id,
+          collectionAddress: contractAddress,
+        },
+        buyToken: {
+          type: ItemType.NATIVE,
+          amount: '1',
+        },
+        makerFees: [{
+          amount: { percentageDecimal: 0.025 },
+          recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
+        }],
+      }];
+
       await expect(
         sell(
           config,
           mockProvider,
-          id,
-          contractAddress,
-          {
-            type: ItemType.NATIVE,
-            amount: BigNumber.from(1),
-          },
+          orders,
         ),
       ).rejects.toThrowError('error from sign approval transactions');
 
@@ -874,16 +958,26 @@ describe('sell', () => {
       let type;
       let data;
 
+      const orders:Array<SellOrder> = [{
+        sellToken: {
+          id,
+          collectionAddress: contractAddress,
+        },
+        buyToken: {
+          type: ItemType.NATIVE,
+          amount: '1',
+        },
+        makerFees: [{
+          amount: { percentageDecimal: 0.025 },
+          recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
+        }],
+      }];
+
       try {
         await sell(
           config,
           mockProvider,
-          id,
-          contractAddress,
-          {
-            type: ItemType.NATIVE,
-            amount: BigNumber.from(1),
-          },
+          orders,
         );
       } catch (err: any) {
         message = err.message;
@@ -905,7 +999,7 @@ describe('sell', () => {
     });
 
     it('should throw error if create listing errors', async () => {
-      const id = '0';
+      const collectionId = '0';
       const contractAddress = '0xERC721';
 
       const erc721TransactionRequirement = {
@@ -916,14 +1010,14 @@ describe('sell', () => {
           balance: BigNumber.from(1),
           formattedBalance: '1',
           contractAddress: '0xab8bb5bc4FB1Cfc060f77f87B558c98abDa65130',
-          id: '0',
+          collectionId: '0',
         },
         current: {
           type: ItemType.ERC721,
           balance: BigNumber.from(1),
           formattedBalance: '1',
           contractAddress: '0xab8bb5bc4FB1Cfc060f77f87B558c98abDa65130',
-          id: '0',
+          collectionId: '0',
         },
         delta: {
           balance: BigNumber.from(0),
@@ -982,16 +1076,26 @@ describe('sell', () => {
       let type;
       let data;
 
+      const orders:Array<SellOrder> = [{
+        sellToken: {
+          id: collectionId,
+          collectionAddress: contractAddress,
+        },
+        buyToken: {
+          type: ItemType.NATIVE,
+          amount: '1',
+        },
+        makerFees: [{
+          amount: { percentageDecimal: 0.025 },
+          recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
+        }],
+      }];
+
       try {
         await sell(
           config,
           mockProvider,
-          id,
-          contractAddress,
-          {
-            type: ItemType.NATIVE,
-            amount: BigNumber.from(1),
-          },
+          orders,
         );
       } catch (err: any) {
         message = err.message;
@@ -1003,7 +1107,7 @@ describe('sell', () => {
       expect(type).toEqual(CheckoutErrorType.CREATE_ORDER_LISTING_ERROR);
       expect(data).toEqual({
         message: 'error from create listing',
-        id,
+        collectionId,
         collectionAddress: contractAddress,
       });
 
@@ -1018,21 +1122,21 @@ describe('sell', () => {
     it('should return a native buy token', () => {
       const buyToken: BuyToken = {
         type: ItemType.NATIVE,
-        amount: BigNumber.from(1),
+        amount: '1',
       };
 
       const result = getBuyToken(buyToken);
 
       expect(result).toEqual({
         type: ItemType.NATIVE,
-        amount: '1',
+        amount: '1000000000000000000',
       });
     });
 
     it('should return an ERC20 buy token', () => {
       const buyToken: BuyToken = {
         type: ItemType.ERC20,
-        amount: BigNumber.from(1),
+        amount: '1',
         contractAddress: '0xERC20',
       };
 
@@ -1040,7 +1144,23 @@ describe('sell', () => {
 
       expect(result).toEqual({
         type: ItemType.ERC20,
+        amount: '1000000000000000000',
+        contractAddress: '0xERC20',
+      });
+    });
+
+    it('should return an ERC20 buy token with smaller decimals', () => {
+      const buyToken: BuyToken = {
+        type: ItemType.ERC20,
         amount: '1',
+        contractAddress: '0xERC20',
+      };
+
+      const result = getBuyToken(buyToken, 6);
+
+      expect(result).toEqual({
+        type: ItemType.ERC20,
+        amount: '1000000',
         contractAddress: '0xERC20',
       });
     });

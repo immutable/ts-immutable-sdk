@@ -8,10 +8,11 @@ import { mount } from 'cypress/react18';
 import { Environment } from '@imtbl/config';
 import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
 import { Passport } from '@imtbl/passport';
-import { cySmartGet } from '../../lib/testUtils';
+import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { ConnectWidget, ConnectWidgetParams } from './ConnectWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { ConnectTargetLayer, WidgetTheme } from '../../lib';
+import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 
 describe('ConnectWidget tests', () => {
   const config: StrongCheckoutWidgetsConfig = {
@@ -22,15 +23,27 @@ describe('ConnectWidget tests', () => {
     isOnRampEnabled: true,
   };
 
+  beforeEach(() => {
+    cyIntercept();
+  });
+
+  const baseMockProvider = {
+    getSigner: () => ({
+      getAddress: () => Promise.resolve(''),
+    }),
+  };
+
   /** mounting the connect widget should be done to start all tests */
   const mountConnectWidget = () => {
     const params = {} as ConnectWidgetParams;
 
     mount(
-      <ConnectWidget
-        params={params}
-        config={config}
-      />,
+      <CustomAnalyticsProvider widgetConfig={config}>
+        <ConnectWidget
+          params={params}
+          config={config}
+        />
+      </CustomAnalyticsProvider>,
     );
   };
 
@@ -65,10 +78,12 @@ describe('ConnectWidget tests', () => {
     } as ConnectWidgetParams;
 
     mount(
-      <ConnectWidget
-        params={passportParams}
-        config={config}
-      />,
+      <CustomAnalyticsProvider widgetConfig={config}>
+        <ConnectWidget
+          params={passportParams}
+          config={config}
+        />
+      </CustomAnalyticsProvider>,
     );
   };
 
@@ -253,12 +268,12 @@ describe('ConnectWidget tests', () => {
   describe('SwitchNetwork', () => {
     beforeEach(() => {
       cy.stub(Checkout.prototype, 'connect').as('connectStub').resolves({
-        provider: {} as Web3Provider,
+        provider: baseMockProvider as Web3Provider,
       });
       cy.stub(Checkout.prototype, 'createProvider')
         .as('createProviderStub')
         .resolves({
-          provider: {} as Web3Provider,
+          provider: baseMockProvider as Web3Provider,
         });
     });
 
@@ -301,7 +316,7 @@ describe('ConnectWidget tests', () => {
       cy.stub(Checkout.prototype, 'switchNetwork')
         .as('switchNetworkStub')
         .resolves({
-          provider: {} as Web3Provider,
+          provider: baseMockProvider as Web3Provider,
           network: {
             name: ChainName.IMTBL_ZKEVM_TESTNET,
             chainId: ChainId.IMTBL_ZKEVM_TESTNET,
@@ -348,7 +363,7 @@ describe('ConnectWidget tests', () => {
         .rejects({})
         .onSecondCall()
         .resolves({
-          provider: {} as Web3Provider,
+          provider: baseMockProvider as Web3Provider,
         });
       mountConnectWidgetAndGoToReadyToConnect();
       cySmartGet('ready-to-connect').should('be.visible');
@@ -390,12 +405,12 @@ describe('ConnectWidget tests', () => {
   describe('BridgeComingSoon for Passport', () => {
     beforeEach(() => {
       cy.stub(Checkout.prototype, 'connect').as('connectStub').resolves({
-        provider: { provider: { isPassport: true } as ExternalProvider } as Web3Provider,
+        provider: { ...baseMockProvider, provider: { isPassport: true } as ExternalProvider } as Web3Provider,
       });
       cy.stub(Checkout.prototype, 'createProvider')
         .as('createProviderStub')
         .resolves({
-          provider: { provider: { isPassport: true } as ExternalProvider } as Web3Provider,
+          provider: { ...baseMockProvider, provider: { isPassport: true } as ExternalProvider } as Web3Provider,
         });
     });
 
@@ -417,10 +432,12 @@ describe('ConnectWidget tests', () => {
       } as ConnectWidgetParams;
 
       mount(
-        <ConnectWidget
-          params={passportParams}
-          config={config}
-        />,
+        <CustomAnalyticsProvider widgetConfig={config}>
+          <ConnectWidget
+            params={passportParams}
+            config={config}
+          />
+        </CustomAnalyticsProvider>,
       );
       cySmartGet('wallet-list-passport').click();
       cySmartGet('footer-button').click();
@@ -439,10 +456,12 @@ describe('ConnectWidget tests', () => {
       const params = {} as ConnectWidgetParams;
 
       mount(
-        <ConnectWidget
-          params={params}
-          config={config}
-        />,
+        <CustomAnalyticsProvider widgetConfig={config}>
+          <ConnectWidget
+            params={params}
+            config={config}
+          />
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('wallet-list-metamask').click();
