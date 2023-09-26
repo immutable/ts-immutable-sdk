@@ -17,6 +17,7 @@ import { ConnectionStatus } from '../../context/connect-loader-context/ConnectLo
 import {
   ConnectLoaderTestComponent,
 } from '../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
+import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 
 describe('Top Up View', () => {
   const connectLoaderState = {
@@ -356,10 +357,6 @@ describe('Top Up View', () => {
         .as('getExchangeFeeEstimateStub')
         .onFirstCall()
         .rejects();
-      cy.stub(Checkout.prototype, 'gasEstimate')
-        .as('gasEstimateStub')
-        .onFirstCall()
-        .rejects();
 
       mount(
         <ConnectLoaderTestComponent
@@ -383,6 +380,37 @@ describe('Top Up View', () => {
       cySmartGet('menu-item-caption-swap').contains('$-.-- USD');
       cySmartGet('menu-item-caption-bridge').contains('$-.-- USD');
       cySmartGet('menu-item-caption-onramp').contains('-.--%');
+    });
+
+    it('should show shimmer for fees for onramp, swap and bridge', () => {
+      // @NOTE: return a promise that never resolves...
+      cy.stub(Checkout.prototype, 'gasEstimate')
+        .as('gasEstimateStub')
+        .returns(new Promise(() => {}));
+
+      mount(
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <WalletWidgetTestComponent
+            initialStateOverride={baseWalletState}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <CryptoFiatProvider environment={Environment.SANDBOX}>
+              <TopUpView
+                showOnrampOption
+                showSwapOption
+                showBridgeOption
+                widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
+                onCloseButtonClick={() => {}}
+              />
+
+            </CryptoFiatProvider>
+          </WalletWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
+      );
+      cySmartGet('fee-percentage-shimmer__shimmer').should('be.visible');
+      cySmartGet('fees-shimmer__shimmer').should('have.length', 2).and('be.visible');
     });
   });
 });
