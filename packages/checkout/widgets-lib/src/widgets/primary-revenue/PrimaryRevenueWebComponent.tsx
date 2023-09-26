@@ -8,7 +8,7 @@ import {
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
 import { ConnectTargetLayer, getL1ChainId, getL2ChainId } from '../../lib';
 import { isValidAmount } from '../../lib/validations/widgetValidators';
-import { sendPrimaryRevenueWidgetCloseEvent } from './PrimaryRevenuWidgetEvents';
+import { sendPrimaryRevenueWidgetCloseEvent } from './PrimaryRevenueWidgetEvents';
 import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 import { Item } from './types';
 
