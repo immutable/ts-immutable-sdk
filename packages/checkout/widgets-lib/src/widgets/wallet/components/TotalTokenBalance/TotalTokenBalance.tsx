@@ -43,7 +43,7 @@ export function TotalTokenBalance(props: TotalTokenBalanceProps) {
         </Box>
       </Box>
       <Box sx={totalTokenBalanceValueStyle}>
-        <Body weight="bold" shimmer={loading ? 1 : 0} shimmerSx={{ minw: '100px' }}>
+        <Body testId="total-token-balance-value" weight="bold" shimmer={loading ? 1 : 0} shimmerSx={{ minw: '100px' }}>
           {totalTokenBalance.totalHeading}
         </Body>
         {!loading && (

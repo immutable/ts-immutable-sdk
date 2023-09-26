@@ -246,9 +246,9 @@ export function WalletBalances() {
           >
             {balancesLoading && (
             <Box sx={walletBalanceLoadingIconStyles}>
-              <MenuItem shimmer emphasized />
-              <MenuItem shimmer emphasized />
-              <MenuItem shimmer emphasized />
+              <MenuItem shimmer emphasized testId="balance-item-shimmer--1" />
+              <MenuItem shimmer emphasized testId="balance-item-shimmer--2" />
+              <MenuItem shimmer emphasized testId="balance-item-shimmer--3" />
             </Box>
             )}
             {!balancesLoading && (
