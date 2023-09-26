@@ -184,7 +184,7 @@ export const routingCalculator = async (
 
   let priority = 0;
 
-  if (bridgeFundingStep || swapFundingSteps.length || onRampFundingStep) {
+  if (bridgeFundingStep || swapFundingSteps.length > 0 || onRampFundingStep) {
     response.response.type = RouteCalculatorType.ROUTES_FOUND;
     response.response.message = 'Routes found';
   }
@@ -197,7 +197,7 @@ export const routingCalculator = async (
     });
   }
 
-  if (swapFundingSteps.length) {
+  if (swapFundingSteps.length > 0) {
     priority++;
     swapFundingSteps.forEach((swapFundingStep) => {
       response.fundingRoutes.push({
