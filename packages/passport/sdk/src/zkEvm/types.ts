@@ -14,7 +14,7 @@ export interface RelayerTransaction {
   chainId: string;
   relayerId: string;
   hash: string;
-  statusMessage: string;
+  statusMessage?: string;
 }
 
 export interface FeeOption {

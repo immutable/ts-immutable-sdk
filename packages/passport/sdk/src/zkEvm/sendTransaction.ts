@@ -123,10 +123,13 @@ export const sendTransaction = ({
       RelayerTransactionStatus.SUBMITTED,
       RelayerTransactionStatus.SUCCESSFUL,
     ].includes(relayerTransaction.status)) {
+      let errorMessage = `Transaction failed to submit with status ${relayerTransaction.status}.`;
+      if (!relayerTransaction.statusMessage) {
+        errorMessage += ` Error message: ${relayerTransaction.statusMessage}`;
+      }
       throw new JsonRpcError(
         RpcErrorCode.RPC_SERVER_ERROR,
-        `Transaction failed to submit with status ${relayerTransaction.status}. `
-        + `Error message: ${relayerTransaction.statusMessage}`,
+        errorMessage,
       );
     }
 
