@@ -6,10 +6,11 @@ import { PrimaryRevenueWidgetViews } from '../../../context/view-context/Primary
 export interface PaymentOptionProps {
   type: PrimaryRevenueWidgetViews;
   onClick: (type: PrimaryRevenueWidgetViews) => void;
+  disabled?: boolean;
 }
 
 export function PaymentOption(props: PaymentOptionProps) {
-  const { type, onClick } = props;
+  const { type, onClick, disabled } = props;
   const { options } = text.views[PrimaryRevenueWidgetViews.PAYMENT_METHODS];
   const optionText = options[type];
 
@@ -25,7 +26,11 @@ export function PaymentOption(props: PaymentOptionProps) {
       size="medium"
       emphasized
       onClick={() => onClick(type)}
-      sx={{ marginBottom: 'base.spacing.x1' }}
+      sx={{
+        marginBottom: 'base.spacing.x1',
+        ...(disabled ? { opacity: '0.5' } : {}),
+      }}
+      disabled={disabled}
     >
       <MenuItem.FramedIcon icon={icon[type]} />
       <MenuItem.Label size="medium">{optionText.heading}</MenuItem.Label>
