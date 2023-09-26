@@ -15,7 +15,7 @@ export function PaymentOption(props: PaymentOptionProps) {
 
   const icon: Record<string, IconProps['icon']> = {
     [PrimaryRevenueWidgetViews.PAY_WITH_CRYPTO]: 'Coins', // FIXME: find icon for bank card
-    [PrimaryRevenueWidgetViews.PAY_WITH_CARD]: 'Coins',
+    [PrimaryRevenueWidgetViews.PAY_WITH_CARD]: 'BankCard',
   };
 
   if (!optionText) return null;
