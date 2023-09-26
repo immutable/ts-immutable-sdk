@@ -6,21 +6,24 @@ import {
   OrderbookOverrides,
 } from './config/config';
 import { Fee as OpenApiFee } from './openapi/sdk';
-import { mapFromOpenApiOrder, mapFromOpenApiPage, mapFromOpenApiTrade } from './openapi/mapper';
+import {
+  mapFromOpenApiOrder,
+  mapFromOpenApiPage,
+  mapFromOpenApiTrade,
+} from './openapi/mapper';
 import { Seaport } from './seaport';
 import { SeaportLibFactory } from './seaport/seaport-lib-factory';
 import {
   CancelOrderResponse,
   CreateListingParams,
-  Fee,
   FeeType,
   FeeValue,
   FulfillOrderResponse,
+  ListingResult,
   ListListingsParams,
   ListListingsResult,
   ListTradesParams,
   ListTradesResult,
-  ListingResult,
   OrderStatus,
   PrepareListingParams,
   PrepareListingResponse,
@@ -175,16 +178,8 @@ export class Orderbook {
   async createListing(
     createListingParams: CreateListingParams,
   ): Promise<ListingResult> {
-    const makerFee: Fee | undefined = createListingParams.makerFee
-      ? {
-        ...createListingParams.makerFee,
-        type: FeeType.MAKER_MARKETPLACE,
-      }
-      : undefined;
-
     const apiListingResponse = await this.apiClient.createListing({
       ...createListingParams,
-      makerFee,
     });
 
     return {
@@ -203,18 +198,17 @@ export class Orderbook {
   async fulfillOrder(
     listingId: string,
     takerAddress: string,
-    takerFee?: FeeValue,
+    takerFees: FeeValue[],
   ): Promise<FulfillOrderResponse> {
     const fulfillmentDataRes = await this.apiClient.fulfillmentData([
       {
         order_id: listingId,
-        fee: takerFee
-          ? {
-            amount: takerFee.amount,
-            fee_type: FeeType.TAKER_MARKETPLACE as unknown as OpenApiFee.fee_type.TAKER_MARKETPLACE,
-            recipient: takerFee.recipient,
-          }
-          : undefined,
+        fees: takerFees.map((fee) => ({
+          amount: fee.amount,
+          fee_type:
+            FeeType.TAKER_MARKETPLACE as unknown as OpenApiFee.fee_type.TAKER_MARKETPLACE,
+          recipient: fee.recipient,
+        })),
       },
     ]);
 

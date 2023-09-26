@@ -80,9 +80,9 @@ export default function Sell({ checkout, provider }: SellProps) {
     try {
 
       const orders:Array<SellOrder> = [{
-        collection: {
+        sellToken: {
           id,
-          address: collectionAddress
+          collectionAddress
         },
         buyToken: getBuyToken(),
         makerFees: [{

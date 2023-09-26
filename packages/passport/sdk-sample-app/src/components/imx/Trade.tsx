@@ -54,17 +54,21 @@ function Trade({ showModal: showTradeModal, setShowModal: setShowTradeModal }: M
       const request: GetSignableTradeRequest = {
         order_id: id,
         user,
+        fees: [{
+          address: '0x8e70719571e87a328696ad099a7d9f6adc120892',
+          fee_percentage: 1,
+        }],
       };
       const createTradeResponse = await imxProvider?.createTrade(request);
       if (createTradeResponse) {
         setLoadingTrade(false);
         setTradeIndex(null);
-        addMessage(`Successfully purchased with Order ID ${id}`);
+        addMessage('CreateTrade', `Successfully purchased with Order ID ${id}`);
         handleCloseTrade();
       }
     } catch (err) {
       if (err instanceof Error) {
-        addMessage(err.toString());
+        addMessage('CreateTrade', err);
         handleCloseTrade();
       }
     }

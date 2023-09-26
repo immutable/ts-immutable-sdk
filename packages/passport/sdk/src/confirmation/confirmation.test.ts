@@ -102,7 +102,7 @@ describe('confirmation', () => {
       confirmationScreen.loading();
 
       expect(res.confirmed).toEqual(false);
-      expect(mockNewWindow.location.href).toEqual('https://passport.sandbox.immutable.com/transaction-confirmation/transaction.html?transactionId=transactionId123&imxEtherAddress=0x1234&chainType=starkex');
+      expect(mockNewWindow.location.href).toEqual('https://passport.sandbox.immutable.com/transaction-confirmation/transaction?transactionId=transactionId123&imxEtherAddress=0x1234&chainType=starkex');
     });
   });
 

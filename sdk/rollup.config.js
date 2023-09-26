@@ -125,9 +125,13 @@ export default [
       typescript(),
       json(),
       replace({
-        exclude: 'node_modules/**',
+        // Can't exclude node_modules here because some dependencies use process.env.NODE_ENV
+        // this breaks in browsers
         preventAssignment: true,
         __SDK_VERSION__: pkg.version,
+        
+        // This breaks in a dex dependency, so manually replacing it.
+        'process.env.NODE_ENV': '"production"'
       }),
       terser(),
     ],

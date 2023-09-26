@@ -1,4 +1,5 @@
 import registerPassport, { RegisterPassportParams } from './registration';
+import { PassportError, PassportErrorType } from '../../errors/passportError';
 
 describe('registerPassportWorkflow', () => {
   const requestBody = {
@@ -74,7 +75,10 @@ describe('registerPassportWorkflow', () => {
     };
 
     await expect(registerPassport(request, mockToken)).rejects.toThrow(
-      'USER_REGISTRATION_ERROR',
+      new PassportError(
+        '',
+        PassportErrorType.USER_REGISTRATION_ERROR,
+      ),
     );
 
     expect(mockStarkSigner.signMessage).toHaveBeenCalled();

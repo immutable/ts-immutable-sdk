@@ -65,6 +65,7 @@ describe('ImmutableApiClient', () => {
           orderComponents,
           orderHash: '0x123',
           orderSignature: '0x123',
+          makerFees: [],
         });
 
         await expect(createListingPromise).rejects.toThrowError();
@@ -95,6 +96,7 @@ describe('ImmutableApiClient', () => {
           orderComponents,
           orderHash: '0x123',
           orderSignature: '0x123',
+          makerFees: [],
         });
 
         await expect(createListingPromise).rejects.toThrowError();
@@ -143,6 +145,7 @@ describe('ImmutableApiClient', () => {
           orderComponents,
           orderHash: '0x123',
           orderSignature: '0x123',
+          makerFees: [],
         });
 
         await expect(createListingPromise).rejects.toThrowError();
@@ -202,6 +205,7 @@ describe('ImmutableApiClient', () => {
           orderComponents,
           orderHash: '0x123',
           orderSignature: '0x123',
+          makerFees: [],
         });
 
         expect(orderResult.result.id).toEqual(orderId);

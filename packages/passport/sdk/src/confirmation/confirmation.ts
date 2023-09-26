@@ -65,7 +65,7 @@ export default class ConfirmationScreen {
       let href = '';
       if (chainType === TransactionApprovalRequestChainTypeEnum.Starkex) {
         // eslint-disable-next-line max-len
-        href = `${this.config.passportDomain}/transaction-confirmation/transaction.html?transactionId=${transactionId}&imxEtherAddress=${imxEtherAddress}&chainType=starkex`;
+        href = `${this.config.passportDomain}/transaction-confirmation/transaction?transactionId=${transactionId}&imxEtherAddress=${imxEtherAddress}&chainType=starkex`;
       } else {
         // eslint-disable-next-line max-len
         href = `${this.config.passportDomain}/transaction-confirmation/zkevm?transactionId=${transactionId}&imxEtherAddress=${imxEtherAddress}&chainType=evm&chainId=${chainId}`;
@@ -119,7 +119,7 @@ export default class ConfirmationScreen {
     }
 
     this.confirmationWindow = openPopupCenter({
-      url: `${this.config.passportDomain}/transaction-confirmation/loading.html`,
+      url: `${this.config.passportDomain}/transaction-confirmation/loading`,
       title: CONFIRMATION_WINDOW_TITLE,
       width: popupOptions?.width || CONFIRMATION_WINDOW_WIDTH,
       height: popupOptions?.height || CONFIRMATION_WINDOW_HEIGHT,
