@@ -38,6 +38,7 @@ export function PaymentOptions(props: PaymentOptionsProps) {
         alignItems: 'flex-start',
       }}
     >
+      {/* Add logic to pass disabled prop for Coins option when use has no balance */}
       {options.map((type) => (
         <PaymentOption onClick={onClick} type={type} key={type} />
       ))}
