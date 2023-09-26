@@ -21,6 +21,7 @@ import { loginZkEvmUser } from './user';
 import { sendTransaction } from './sendTransaction';
 import GuardianClient from '../guardian/guardian';
 import { signTypedDataV4 } from './signTypedDataV4';
+import BackgroundTask from '../network/backgroundTask';
 
 export type ZkEvmProviderInput = {
   authManager: AuthManager;
@@ -57,7 +58,7 @@ export class ZkEvmProvider implements Provider {
 
   protected relayerClient?: RelayerClient;
 
-  protected magicProvider?: ExternalProvider; // Used for signing
+  protected magicProvider?: BackgroundTask<ExternalProvider>; // Used for signing
 
   protected user?: UserZkEvm;
 

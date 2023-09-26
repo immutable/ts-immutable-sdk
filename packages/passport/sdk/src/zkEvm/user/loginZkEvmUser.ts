@@ -5,6 +5,7 @@ import { UserZkEvm } from '../../types';
 import AuthManager from '../../authManager';
 import { PassportConfiguration } from '../../config';
 import MagicAdapter from '../../magicAdapter';
+import BackgroundTask from '../../network/backgroundTask';
 
 type LoginZkEvmUserInput = {
   authManager: AuthManager;
@@ -15,12 +16,11 @@ type LoginZkEvmUserInput = {
 
 type LoginZkEvmUserOutput = {
   user: UserZkEvm;
-  magicProvider: ExternalProvider;
+  magicProvider: BackgroundTask<ExternalProvider>;
 };
 
 export const loginZkEvmUser = async ({
   authManager,
-  config,
   magicAdapter,
   multiRollupApiClients,
 }: LoginZkEvmUserInput): Promise<LoginZkEvmUserOutput> => {
@@ -29,10 +29,7 @@ export const loginZkEvmUser = async ({
     throw new Error('User is missing idToken');
   }
 
-  const magicProvider = await magicAdapter.login(
-    user.idToken,
-    config.network,
-  );
+  magicAdapter.login(user.idToken);
 
   if (!user.zkEvm) {
     // Generate counterfactual address and retrieve updated Auth0 user
