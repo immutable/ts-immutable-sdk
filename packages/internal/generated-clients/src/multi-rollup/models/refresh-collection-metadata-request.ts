@@ -15,25 +15,19 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Fee } from './fee';
+import { CollectionMetadata } from './collection-metadata';
 
 /**
  * 
  * @export
- * @interface FulfillmentDataRequest
+ * @interface RefreshCollectionMetadataRequest
  */
-export interface FulfillmentDataRequest {
+export interface RefreshCollectionMetadataRequest {
     /**
      * 
-     * @type {string}
-     * @memberof FulfillmentDataRequest
+     * @type {CollectionMetadata}
+     * @memberof RefreshCollectionMetadataRequest
      */
-    'order_id': string;
-    /**
-     * 
-     * @type {Array<Fee>}
-     * @memberof FulfillmentDataRequest
-     */
-    'fees': Array<Fee>;
+    'collection_metadata': CollectionMetadata;
 }
 
