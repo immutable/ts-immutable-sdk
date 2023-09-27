@@ -51,7 +51,7 @@ describe('cancel', () => {
         type: SignTransactionStatusType.SUCCESS,
       });
 
-      const result = await cancel(config, mockProvider, orderId);
+      const result = await cancel(config, mockProvider, [orderId]);
       expect(result).toEqual({
         orderId: '1',
         status: {
@@ -93,7 +93,7 @@ describe('cancel', () => {
         reason: 'Fulfilment transaction failed and was reverted',
       });
 
-      const result = await cancel(config, mockProvider, orderId);
+      const result = await cancel(config, mockProvider, [orderId]);
       expect(result).toEqual({
         orderId: '1',
         status: {
@@ -133,7 +133,7 @@ describe('cancel', () => {
       });
       (signFulfilmentTransactions as jest.Mock).mockRejectedValue(new Error('ERROR'));
 
-      await expect(cancel(config, mockProvider, orderId)).rejects.toThrow('ERROR');
+      await expect(cancel(config, mockProvider, [orderId])).rejects.toThrow('ERROR');
 
       expect(signFulfilmentTransactions).toBeCalledWith(
         mockProvider,
@@ -168,7 +168,7 @@ describe('cancel', () => {
       let data;
 
       try {
-        await cancel(config, mockProvider, orderId);
+        await cancel(config, mockProvider, [orderId]);
       } catch (err: any) {
         message = err.message;
         type = err.type;

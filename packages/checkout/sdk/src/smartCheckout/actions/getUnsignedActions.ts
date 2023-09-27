@@ -7,7 +7,7 @@ import {
 } from '@imtbl/orderbook';
 import { UnsignedMessage, UnsignedTransactions } from './types';
 
-export const getUnsignedTransactions = async (
+export const getUnsignedERC721Transactions = async (
   actions: Action[],
 ): Promise<UnsignedTransactions> => {
   let approvalTransactions: TransactionRequest[] = [];
@@ -15,7 +15,6 @@ export const getUnsignedTransactions = async (
 
   const approvalPromises: Promise<TransactionRequest>[] = [];
   const fulfilmentPromises: Promise<TransactionRequest>[] = [];
-
   for (const action of actions) {
     if (action.type !== ActionType.TRANSACTION) continue;
     if (action.purpose === TransactionPurpose.APPROVAL) {
@@ -25,7 +24,6 @@ export const getUnsignedTransactions = async (
       fulfilmentPromises.push(action.buildTransaction());
     }
   }
-
   approvalTransactions = await Promise.all(approvalPromises);
   fulfilmentTransactions = await Promise.all(fulfilmentPromises);
 
@@ -33,6 +31,40 @@ export const getUnsignedTransactions = async (
     approvalTransactions,
     fulfilmentTransactions,
   };
+};
+
+export const getUnsignedERC20ApprovalTransactions = async (
+  actions: Action[],
+): Promise<TransactionRequest[]> => {
+  let approvalTransactions: TransactionRequest[] = [];
+
+  const approvalPromises: Promise<TransactionRequest>[] = [];
+  for (const action of actions) {
+    if (action.type !== ActionType.TRANSACTION) continue;
+    if (action.purpose === TransactionPurpose.APPROVAL) {
+      approvalPromises.push(action.buildTransaction());
+    }
+  }
+  approvalTransactions = await Promise.all(approvalPromises);
+
+  return approvalTransactions;
+};
+
+export const getUnsignedFulfilmentTransactions = async (
+  actions: Action[],
+): Promise<TransactionRequest[]> => {
+  let fulfilmentTransactions: TransactionRequest[] = [];
+
+  const fulfilmentPromises: Promise<TransactionRequest>[] = [];
+  for (const action of actions) {
+    if (action.type !== ActionType.TRANSACTION) continue;
+    if (action.purpose === TransactionPurpose.FULFILL_ORDER) {
+      fulfilmentPromises.push(action.buildTransaction());
+    }
+  }
+  fulfilmentTransactions = await Promise.all(fulfilmentPromises);
+
+  return fulfilmentTransactions;
 };
 
 export const getUnsignedMessage = (

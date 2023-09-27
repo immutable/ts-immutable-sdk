@@ -3,6 +3,7 @@ import { ImmutableXClient } from '@imtbl/immutablex-client';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
+import { ConfirmationScreen } from './confirmation';
 import { Passport } from './Passport';
 import { PassportImxProvider, PassportImxProviderFactory } from './starkEx';
 import { Networks, OidcConfiguration } from './types';
@@ -11,6 +12,7 @@ import { mockUser, mockLinkedAddresses } from './test/mocks';
 jest.mock('./authManager');
 jest.mock('./magicAdapter');
 jest.mock('./starkEx');
+jest.mock('./confirmation');
 jest.mock('@imtbl/generated-clients');
 
 const oidcConfiguration: OidcConfiguration = {
@@ -28,6 +30,7 @@ describe('Passport', () => {
   let logoutMock: jest.Mock;
   let magicLoginMock: jest.Mock;
   let magicLogoutMock: jest.Mock;
+  let confirmationLogoutMock: jest.Mock;
   let getUserMock: jest.Mock;
   let requestRefreshTokenMock: jest.Mock;
   let loginSilentMock: jest.Mock;
@@ -39,6 +42,7 @@ describe('Passport', () => {
     authLoginMock = jest.fn().mockReturnValue(mockUser);
     loginCallbackMock = jest.fn();
     magicLoginMock = jest.fn();
+    confirmationLogoutMock = jest.fn();
     magicLogoutMock = jest.fn();
     logoutMock = jest.fn();
     getUserMock = jest.fn();
@@ -54,6 +58,9 @@ describe('Passport', () => {
       getUser: getUserMock,
       loginSilent: loginSilentMock,
       requestRefreshTokenAfterRegistration: requestRefreshTokenMock,
+    });
+    (ConfirmationScreen as jest.Mock).mockReturnValue({
+      logout: confirmationLogoutMock,
     });
     (MagicAdapter as jest.Mock).mockReturnValue({
       login: magicLoginMock,
@@ -158,6 +165,7 @@ describe('Passport', () => {
       await passport.logout();
 
       expect(logoutMock).toBeCalledTimes(1);
+      expect(confirmationLogoutMock).toBeCalledTimes(1);
       expect(magicLogoutMock).toBeCalledTimes(1);
     });
   });

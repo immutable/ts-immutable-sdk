@@ -12,7 +12,7 @@ import { bridgeRoute } from './bridge/bridgeRoute';
 import {
   ChainId, FundingRouteType, IMX_ADDRESS_ZKEVM, ItemType,
 } from '../../types';
-import { BalanceERC20Requirement, BalanceRequirement } from '../balanceCheck/types';
+import { BalanceCheckResult, BalanceERC20Requirement, BalanceRequirement } from '../balanceCheck/types';
 import { createReadOnlyProviders } from '../../readOnlyProviders/readOnlyProvider';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { swapRoute } from './swap/swapRoute';
@@ -151,6 +151,59 @@ describe('routingCalculator', () => {
     config = new CheckoutConfiguration({
       baseConfig: { environment: Environment.SANDBOX },
     });
+  });
+
+  it('should return no options if no routing options are available', async () => {
+    const availableRoutingOptions = {
+      onRamp: false,
+      swap: false,
+      bridge: false,
+    };
+
+    const balanceRequirements = {} as BalanceCheckResult;
+    (createReadOnlyProviders as jest.Mock).mockResolvedValue(new Map([
+      [ChainId.SEPOLIA, {} as JsonRpcProvider],
+      [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
+    ]));
+
+    const routingOptions = await routingCalculator(
+      config,
+      '0x123',
+      balanceRequirements,
+      availableRoutingOptions,
+    );
+    expect(routingOptions)
+      .toEqual({
+        response: {
+          type: RouteCalculatorType.NO_OPTIONS,
+          message: 'No options available',
+        },
+        fundingRoutes: [],
+      });
+  });
+
+  it('should return no options if no routing options are defined', async () => {
+    const availableRoutingOptions = {};
+    const balanceRequirements = {} as BalanceCheckResult;
+    (createReadOnlyProviders as jest.Mock).mockResolvedValue(new Map([
+      [ChainId.SEPOLIA, {} as JsonRpcProvider],
+      [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
+    ]));
+
+    const routingOptions = await routingCalculator(
+      config,
+      '0x123',
+      balanceRequirements,
+      availableRoutingOptions,
+    );
+    expect(routingOptions)
+      .toEqual({
+        response: {
+          type: RouteCalculatorType.NO_OPTIONS,
+          message: 'No options available',
+        },
+        fundingRoutes: [],
+      });
   });
 
   it('should return bridge funding step', async () => {
