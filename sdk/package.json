@@ -10,8 +10,6 @@
     "@0xsequence/config": "^0.43.34",
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/abstract-signer": "^5.7.0",
-    "@ethersproject/bignumber": "^5.7.0",
-    "@ethersproject/contracts": "^5.7.0",
     "@ethersproject/providers": "^5.7.2",
     "@ethersproject/wallet": "^5.7.0",
     "@imtbl/core-sdk": "^2.0.2",
@@ -27,8 +25,7 @@
     "enc-utils": "^3.0.0",
     "ethers": "^5.7.2",
     "magic-sdk": "^13.3.1",
-    "oidc-client-ts": "^2.2.1",
-    "typechain": "^8.1.1"
+    "oidc-client-ts": "^2.2.1"
   },
   "devDependencies": {
     "@imtbl/blockchain-data": "0.0.0",
