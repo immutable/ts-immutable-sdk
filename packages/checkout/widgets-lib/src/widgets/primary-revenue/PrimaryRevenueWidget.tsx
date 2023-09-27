@@ -24,6 +24,7 @@ import { SharedContextProvider } from './context/SharedContextProvider';
 import { PaymentMethods } from './views/PaymentMethods';
 import { PayWithCard } from './views/PayWithCard';
 import { PayWithCoins } from './views/PayWithCoins';
+import { FundWithSmartCheckout } from './views/FundWithSmartCheckout';
 
 export interface PrimaryRevenueWidgetProps {
   config: StrongCheckoutWidgetsConfig;
@@ -104,6 +105,9 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
           )}
           {viewState.view.type === PrimaryRevenueWidgetViews.PAY_WITH_COINS && (
             <PayWithCoins />
+          )}
+          {viewState.view.type === PrimaryRevenueWidgetViews.FUND_WITH_SMART_CHECKOUT && (
+            <FundWithSmartCheckout subView={viewState.view.data.subView} />
           )}
         </SharedContextProvider>
       </ViewContext.Provider>
