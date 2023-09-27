@@ -19,7 +19,7 @@ import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from './constants';
 import { estimateGasForBridgeApproval } from './estimateApprovalGas';
 import { CheckoutError, CheckoutErrorType } from '../../../errors';
 import { allowListCheckForBridge } from '../../allowList/allowListCheck';
-import { fetchCrossChainTokenMapping } from '../indexer/fetchL1Representation';
+import { fetchL1Representation } from '../indexer/fetchL1Representation';
 
 export const hasSufficientL1Eth = (
   tokenBalanceResult: TokenBalanceResult,
@@ -122,7 +122,7 @@ export const bridgeRoute = async (
 
   // const requiredTokenAddress = getTokenAddressFromRequirement(balanceRequirement);
   // todo: we can probably move out the indexer call and instead just pass through cache
-  const tokenMapping = await fetchCrossChainTokenMapping(config, bridgeRequirement.token.address);
+  const tokenMapping = await fetchL1Representation(config, bridgeRequirement.token.address);
   // No mapping on L1 for this token
   if (tokenMapping === undefined) return undefined;
   const { l1address } = tokenMapping;

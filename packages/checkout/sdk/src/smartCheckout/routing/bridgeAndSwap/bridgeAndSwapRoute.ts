@@ -23,7 +23,7 @@ import { swapRoute } from '../swap/swapRoute';
 import { getTokenBalances } from './getTokenBalances';
 import { constructBridgeRequirements } from './constructBridgeRequirements';
 import { CrossChainTokenMapping } from '../indexer/fetchL1Representation';
-import { fetchCrossChainMapping } from './fetchCrossChainAddressMapping';
+import { fetchL1ToL2Mapping } from './fetchL1ToL2Mapping';
 
 export const abortBridgeAndSwap = (
   bridgeableTokens: string[],
@@ -75,7 +75,6 @@ const modifyTokenBalancesWithBridgedAmount = (
     token: TokenInfo
   }[],
 ): Map<ChainId, TokenBalanceResult> => {
-  console.log('[BRIDGE AND SWAP] modifyTokenBalancesWithBridgedAmount');
   const modifiedTokenBalances: Map<ChainId, TokenBalanceResult> = new Map();
   for (const [chainId, tokenBalance] of tokenBalances) {
     modifiedTokenBalances.set(chainId, {
@@ -83,9 +82,6 @@ const modifyTokenBalancesWithBridgedAmount = (
       balances: tokenBalance.balances,
     });
   }
-
-  console.log('[BRIDGE AND SWAP] modifiedTokenBalances', modifiedTokenBalances);
-  console.log('[BRIDGE AND SWAP] unmodified tokenBalances', tokenBalances);
 
   // Construct a map of balances to the L2 token address to make
   // it easier to adjust the balances for the tokens that can be bridged
@@ -186,7 +182,7 @@ export const bridgeAndSwapRoute = async (
   // Fetch L2 to L1 address mapping and based on the L1 address existing then
   // filter the bridgeable and swappable tokens list further to only include
   // tokens that can be both swapped and bridged
-  const crossChainTokenMapping = await fetchCrossChainMapping(config, swappableTokens);
+  const crossChainTokenMapping = await fetchL1ToL2Mapping(config, swappableTokens);
   const filteredSwappableTokens = filterSwappableTokensByBridgeableAddresses(
     requiredTokenAddress as string,
     bridgeableTokens,

@@ -12,7 +12,7 @@ export type CrossChainTokenMapping = {
     symbol: string | null,
   },
 };
-export const fetchCrossChainTokenMapping = async (
+export const fetchL1Representation = async (
   config: CheckoutConfiguration,
   l2address: string,
 ): Promise<CrossChainTokenMapping | undefined> => {
