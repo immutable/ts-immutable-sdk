@@ -42,6 +42,7 @@ export type {
   GetTokenAllowListResult,
   GetWalletAllowListParams,
   GetWalletAllowListResult,
+  ItemRequirement,
   NetworkFilter,
   NetworkInfo,
   OrderFee,

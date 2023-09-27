@@ -43,8 +43,6 @@ export const getItemRequirement = (
   amount: BigNumber,
   spenderAddress: string,
 ): ItemRequirement => {
-  // add decimals to parameters
-  // convert amount to formatted string
   switch (type) {
     case ItemType.ERC20:
       return {
