@@ -2,7 +2,7 @@ import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../../conf
 import { ChainId, GetBalanceResult } from '../../../types';
 import { TokenBalanceResult } from '../types';
 
-export const getTokenBalances = (
+export const getBalancesByChain = (
   config: CheckoutConfiguration,
   tokenBalances: Map<ChainId, TokenBalanceResult>,
 ): {

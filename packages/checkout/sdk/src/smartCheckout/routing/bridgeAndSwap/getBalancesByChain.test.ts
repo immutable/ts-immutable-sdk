@@ -1,10 +1,10 @@
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { ChainId } from '../../../types';
-import { getTokenBalances } from './getTokenBalances';
+import { getBalancesByChain } from './getBalancesByChain';
 import { CheckoutConfiguration } from '../../../config';
 
-describe('getTokenBalances', () => {
+describe('getBalancesByChain', () => {
   const config = new CheckoutConfiguration({
     baseConfig: { environment: Environment.SANDBOX },
   });
@@ -66,7 +66,7 @@ describe('getTokenBalances', () => {
 
     tokenBalances.set(ChainId.IMTBL_ZKEVM_TESTNET, l2balances);
 
-    const result = getTokenBalances(config, tokenBalances);
+    const result = getBalancesByChain(config, tokenBalances);
     expect(result).toEqual(
       {
         l1balances: [
@@ -120,7 +120,7 @@ describe('getTokenBalances', () => {
     const tokenBalances = new Map();
     tokenBalances.set(ChainId.IMTBL_ZKEVM_TESTNET, l2balances);
 
-    const result = getTokenBalances(config, tokenBalances);
+    const result = getBalancesByChain(config, tokenBalances);
     expect(result).toEqual(
       {
         l1balances: [],
@@ -134,7 +134,7 @@ describe('getTokenBalances', () => {
     tokenBalances.set(ChainId.SEPOLIA, undefined);
     tokenBalances.set(ChainId.IMTBL_ZKEVM_TESTNET, l2balances);
 
-    const result = getTokenBalances(config, tokenBalances);
+    const result = getBalancesByChain(config, tokenBalances);
     expect(result).toEqual(
       {
         l1balances: [],
@@ -151,7 +151,7 @@ describe('getTokenBalances', () => {
     });
     tokenBalances.set(ChainId.IMTBL_ZKEVM_TESTNET, l2balances);
 
-    const result = getTokenBalances(config, tokenBalances);
+    const result = getBalancesByChain(config, tokenBalances);
     expect(result).toEqual(
       {
         l1balances: [],
@@ -168,7 +168,7 @@ describe('getTokenBalances', () => {
     });
     tokenBalances.set(ChainId.IMTBL_ZKEVM_TESTNET, l2balances);
 
-    const result = getTokenBalances(config, tokenBalances);
+    const result = getBalancesByChain(config, tokenBalances);
     expect(result).toEqual(
       {
         l1balances: [],
@@ -181,7 +181,7 @@ describe('getTokenBalances', () => {
     const tokenBalances = new Map();
     tokenBalances.set(ChainId.SEPOLIA, l1balances);
 
-    const result = getTokenBalances(config, tokenBalances);
+    const result = getBalancesByChain(config, tokenBalances);
     expect(result).toEqual(
       {
         l1balances: [],
@@ -198,7 +198,7 @@ describe('getTokenBalances', () => {
     });
     tokenBalances.set(ChainId.SEPOLIA, l1balances);
 
-    const result = getTokenBalances(config, tokenBalances);
+    const result = getBalancesByChain(config, tokenBalances);
     expect(result).toEqual(
       {
         l1balances: [],
@@ -215,7 +215,7 @@ describe('getTokenBalances', () => {
     });
     tokenBalances.set(ChainId.SEPOLIA, l1balances);
 
-    const result = getTokenBalances(config, tokenBalances);
+    const result = getBalancesByChain(config, tokenBalances);
     expect(result).toEqual(
       {
         l1balances: [],

@@ -20,7 +20,7 @@ import {
 import { getOrSetQuotesFromCache } from '../swap/dexQuoteCache';
 import { bridgeRoute } from '../bridge/bridgeRoute';
 import { swapRoute } from '../swap/swapRoute';
-import { getTokenBalances } from './getTokenBalances';
+import { getBalancesByChain } from './getBalancesByChain';
 import { constructBridgeRequirements } from './constructBridgeRequirements';
 import { CrossChainTokenMapping } from '../indexer/fetchL1Representation';
 import { fetchL1ToL2Mapping } from './fetchL1ToL2Mapping';
@@ -167,7 +167,7 @@ export const bridgeAndSwapRoute = async (
   bridgeableTokens: string[],
   swappableTokens: string[],
 ): Promise<any[] | undefined> => { // todo: update type to bridge steo -> funding step
-  const { l1balances, l2balances } = getTokenBalances(config, tokenBalances);
+  const { l1balances, l2balances } = getBalancesByChain(config, tokenBalances);
   const requiredTokenAddress = insufficientRequirement.required.token.address;
 
   if (abortBridgeAndSwap(
