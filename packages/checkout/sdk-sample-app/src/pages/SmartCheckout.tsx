@@ -1,10 +1,10 @@
-import { Body, Box, Button, Checkbox, Divider, Heading } from '@biom3/react';
+import { Body, Box, Checkbox, Divider, Heading } from '@biom3/react';
 import { Environment } from '@imtbl/config';
 import CheckConnection from '../components/CheckConnection';
 import Connect from '../components/Connect';
 import Provider from '../components/Provider';
-import { Checkout, ItemType } from '@imtbl/checkout-sdk';
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { Checkout } from '@imtbl/checkout-sdk';
+import { useState, useMemo } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
 import Buy from '../components/Buy';
 import { SmartCheckoutForm } from '../components/SmartCheckoutForm';
