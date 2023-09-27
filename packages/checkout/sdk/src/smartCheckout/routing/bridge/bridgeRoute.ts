@@ -116,8 +116,6 @@ export const bridgeRoute = async (
   // If the user has no ETH to cover the bridge fees or approval fees then bridge cannot be an option
   if (!hasSufficientL1Eth(tokenBalanceResult, bridgeFeeEstimate)) return undefined;
 
-  // const requiredTokenAddress = getTokenAddressFromRequirement(balanceRequirement);
-  // todo: we can probably move out the indexer call and instead just pass through cache
   const l1RepresentationResult = await fetchL1Representation(config, bridgeRequirement.l2address);
   // No mapping on L1 for this token
   const { l1address } = l1RepresentationResult;
