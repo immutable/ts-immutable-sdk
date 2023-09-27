@@ -21,6 +21,7 @@ import { PrimaryRevenueWidgetViews } from '../../context/view-context/PrimaryRev
 import { Item } from './types';
 import { widgetTheme } from '../../lib/theme';
 import { SharedContextProvider } from './context/SharedContextProvider';
+import { FundWithSmartCheckout } from './views/FundWithSmartCheckout';
 
 export interface PrimaryRevenueWidgetProps {
   config: StrongCheckoutWidgetsConfig;
@@ -109,6 +110,9 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
           )}
           {viewState.view.type === PrimaryRevenueWidgetViews.PAYMENT_METHODS && (
             <div>Payment methods</div>
+          )}
+          {viewState.view.type === PrimaryRevenueWidgetViews.SMART_CHECKOUT && (
+            <FundWithSmartCheckout subView={viewState.view.data.subView} />
           )}
         </SharedContextProvider>
       </ViewContext.Provider>
