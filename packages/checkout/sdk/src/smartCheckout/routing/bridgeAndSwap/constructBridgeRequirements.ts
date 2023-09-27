@@ -55,7 +55,7 @@ export const constructBridgeRequirements = (
     if (!l1balance) continue;
 
     // Get the total amount using slippage to ensure a small buffer is added to cover price fluctuations
-    const quotedAmount = quote.quote.amountWithMaxSlippage.value; // todo: test slippage
+    const quotedAmount = quote.quote.amountWithMaxSlippage.value;
     // Add fees to the quoted amount if the fees are in the same token as the token being swapped
     const fees = getFeesForTokenAddress(quote, tokenAddress);
     const totalAmount = quotedAmount.add(fees);

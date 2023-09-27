@@ -55,7 +55,8 @@ export const filterSwappableTokensByBridgeableAddresses = (
     if (addresses.l1address === '') continue;
     if (addresses.l2token.l2address === '') continue;
     if (!bridgeableTokens.includes(addresses.l1address)) continue;
-    if (addresses.l2token.l2address !== requiredTokenAddress) continue;
+    // Filter out the token that is required from the swappable tokens list
+    if (addresses.l2token.l2address === requiredTokenAddress) continue;
 
     filteredSwappableTokens.push(addresses.l2token.l2address);
   }
@@ -74,8 +75,17 @@ const modifyTokenBalancesWithBridgedAmount = (
     token: TokenInfo
   }[],
 ): Map<ChainId, TokenBalanceResult> => {
-  let modifiedTokenBalances: Map<ChainId, TokenBalanceResult> = new Map();
-  modifiedTokenBalances = { ...tokenBalances };
+  console.log('[BRIDGE AND SWAP] modifyTokenBalancesWithBridgedAmount');
+  const modifiedTokenBalances: Map<ChainId, TokenBalanceResult> = new Map();
+  for (const [chainId, tokenBalance] of tokenBalances) {
+    modifiedTokenBalances.set(chainId, {
+      success: tokenBalance.success,
+      balances: tokenBalance.balances,
+    });
+  }
+
+  console.log('[BRIDGE AND SWAP] modifiedTokenBalances', modifiedTokenBalances);
+  console.log('[BRIDGE AND SWAP] unmodified tokenBalances', tokenBalances);
 
   // Construct a map of balances to the L2 token address to make
   // it easier to adjust the balances for the tokens that can be bridged
@@ -120,6 +130,35 @@ const modifyTokenBalancesWithBridgedAmount = (
   return modifiedTokenBalances;
 };
 
+// Reapply the original swap balances after the
+// swap route was modified to fake the bridge
+export const reapplyOriginalSwapBalances = (
+  tokenBalances: Map<ChainId, TokenBalanceResult>,
+  swapRoutes: FundingRouteStep[],
+): FundingRouteStep[] => {
+  const originalSwapSteps: FundingRouteStep[] = [];
+  for (const route of swapRoutes) {
+    const { chainId, asset } = route;
+    const tokenBalance = tokenBalances.get(chainId);
+    if (!tokenBalance) continue;
+
+    let originalBalance = BigNumber.from(0);
+    let originalFormattedBalance = '0';
+    const l2balance = tokenBalance.balances.find((balance) => balance.token.address === asset.token.address);
+    if (l2balance) {
+      originalBalance = l2balance.balance;
+      originalFormattedBalance = l2balance.formattedBalance;
+    }
+
+    route.asset.balance = originalBalance;
+    route.asset.formattedBalance = originalFormattedBalance;
+
+    originalSwapSteps.push(route);
+  }
+
+  return originalSwapSteps;
+};
+
 export const bridgeAndSwapRoute = async (
   config: CheckoutConfiguration,
   readOnlyProviders: Map<ChainId, JsonRpcProvider>,
@@ -131,7 +170,7 @@ export const bridgeAndSwapRoute = async (
   tokenBalances: Map<ChainId, TokenBalanceResult>,
   bridgeableTokens: string[],
   swappableTokens: string[],
-): Promise<FundingRouteStep[] | undefined> => {
+): Promise<any[] | undefined> => { // todo: update type to bridge steo -> funding step
   const { l1balances, l2balances } = getTokenBalances(config, tokenBalances);
   const requiredTokenAddress = insufficientRequirement.required.token.address;
 
@@ -153,6 +192,7 @@ export const bridgeAndSwapRoute = async (
     bridgeableTokens,
     crossChainTokenMapping,
   );
+  if (filteredSwappableTokens.length === 0) return undefined;
 
   // Fetch all the dex quotes from the list of swappable tokens
   const dexQuotes = await getOrSetQuotesFromCache(
@@ -160,7 +200,7 @@ export const bridgeAndSwapRoute = async (
     dexQuoteCache,
     ownerAddress,
     {
-      address: (insufficientRequirement.required as any).token.address,
+      address: requiredTokenAddress as string,
       amount: insufficientRequirement.delta.balance,
     },
     filteredSwappableTokens,
@@ -237,9 +277,8 @@ export const bridgeAndSwapRoute = async (
     bridgedTokens,
   );
 
-  // Call the swap route with the faked balances
-  // WT-1474: Swap currently returns 1 funding route but is going to return an array of all routes
-  const swapRoutes = swapRoute(
+  // Call the swap route with the faked bridged balances
+  const swapRoutes = await swapRoute(
     config,
     availableRoutingOptions,
     dexQuoteCache,
@@ -250,6 +289,10 @@ export const bridgeAndSwapRoute = async (
   );
 
   if (!swapRoutes) return undefined;
+
+  const swapRoundsModified = reapplyOriginalSwapBalances(tokenBalances, swapRoutes);
+
+  console.log('swapRoutesModified', swapRoundsModified);
 
   return undefined;
 };

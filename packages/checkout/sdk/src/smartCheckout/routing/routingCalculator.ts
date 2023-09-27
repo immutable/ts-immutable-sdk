@@ -160,7 +160,10 @@ export const getBridgeAndSwapFundingSteps = async (
     return undefined;
   }
 
-  const routes = bridgeAndSwapRoute(
+  console.log('insufficient requirement', insufficientRequirement);
+  // console.log('bridgeAndSwapRoute', tokenBalances, bridgeableL1Addresses, swappableL2Addresses);
+
+  const routes = await bridgeAndSwapRoute(
     config,
     readOnlyProviders,
     availableRoutingOptions,
@@ -169,13 +172,11 @@ export const getBridgeAndSwapFundingSteps = async (
     ownerAddress,
     feeEstimates,
     tokenBalances,
-    // l1balances,
-    // l2balances,
     bridgeableL1Addresses,
     swappableL2Addresses,
   );
 
-  console.log(routes);
+  console.log('routes', routes);
 
   return routes;
   // const fundingSteps = [{
