@@ -4,9 +4,7 @@ import {
 } from 'react';
 
 import { BiomeCombinedProviders } from '@biom3/react';
-import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 
-import { WidgetTheme } from '../../lib';
 import { LoadingView } from '../../views/loading/LoadingView';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { text } from '../../resources/text/textConfig';
@@ -21,6 +19,7 @@ import { ConnectLoaderContext } from '../../context/connect-loader-context/Conne
 
 import { PrimaryRevenueWidgetViews } from '../../context/view-context/PrimaryRevenueViewContextTypes';
 import { Item } from './types';
+import { widgetTheme } from '../../lib/theme';
 
 export interface PrimaryRevenueWidgetProps {
   config: StrongCheckoutWidgetsConfig;
@@ -43,10 +42,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
   const loadingText = text.views[SharedViews.LOADING_VIEW].text;
 
   const { theme } = config;
-
-  const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
-    ? onLightBase
-    : onDarkBase;
+  const biomeTheme = useMemo(() => widgetTheme(theme), [theme]);
 
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
   const viewReducerValues = useMemo(
