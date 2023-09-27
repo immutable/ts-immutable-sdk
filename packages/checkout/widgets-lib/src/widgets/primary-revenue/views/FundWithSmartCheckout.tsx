@@ -10,6 +10,8 @@ import {
 import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { FundingRouteExecute } from '../components/FundingRouteExecute/FundingRouteExecute';
 import { FundingRouteSelect } from '../components/FundingRouteSelect/FundingRouteSelect';
+import { useSharedContext } from '../context/SharedContextProvider';
+import { LoadingView } from '../../../views/loading/LoadingView';
 
 /**
  * LOADING - get SignResponse and SmartCheckoutResponse
@@ -22,23 +24,27 @@ type FundWithSmartCheckoutProps = {
 export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
   const { viewDispatch } = useContext(ViewContext);
 
+  const { signResponse } = useSharedContext();
+  const smartCheckoutResponse = undefined; // todo add to shared context
+
   useEffect(() => {
+    if (!signResponse) {
+      return;
+    }
     if (subView === FundWithSmartCheckoutSubViews.INIT) {
-      setTimeout(() => {
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: {
-              type: PrimaryRevenueWidgetViews.SMART_CHECKOUT,
-              data: {
-                subView: FundWithSmartCheckoutSubViews.FUNDING_ROUTE_SELECT,
-              },
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: PrimaryRevenueWidgetViews.SMART_CHECKOUT,
+            data: {
+              subView: FundWithSmartCheckoutSubViews.FUNDING_ROUTE_SELECT,
             },
           },
-        });
-      }, 1000);
+        },
+      });
     }
-  }, [subView]);
+  }, [signResponse]);
 
   return (
     <Box>
@@ -46,14 +52,7 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
         hello world from FundWithSmartCheckout
       </p>
       { subView === FundWithSmartCheckoutSubViews.INIT && (
-      <p>
-        {subView}
-      </p>
-      )}
-      { subView === FundWithSmartCheckoutSubViews.LOADING && (
-      <p>
-        {subView}
-      </p>
+        <LoadingView loadingText="todo loading text" />
       )}
       { subView === FundWithSmartCheckoutSubViews.FUNDING_ROUTE_SELECT && (
         <FundingRouteSelect />
