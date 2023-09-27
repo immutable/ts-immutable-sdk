@@ -3482,7 +3482,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/erc20@0.0.0, @imtbl/erc20@workspace:packages/erc20":
+"@imtbl/erc20@workspace:packages/erc20":
   version: 0.0.0-use.local
   resolution: "@imtbl/erc20@workspace:packages/erc20"
   dependencies:
@@ -3520,7 +3520,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/erc721@0.0.0, @imtbl/erc721@workspace:packages/erc721":
+"@imtbl/erc721@workspace:packages/erc721":
   version: 0.0.0-use.local
   resolution: "@imtbl/erc721@workspace:packages/erc721"
   dependencies:
@@ -3782,9 +3782,6 @@ __metadata:
     "@imtbl/config": 0.0.0
     "@imtbl/core-sdk": ^2.0.2
     "@imtbl/cryptofiat": 0.0.0
-    "@imtbl/erc20": 0.0.0
-    "@imtbl/erc721": 0.0.0
-    "@imtbl/erc721-mint-by-id": 0.0.0
     "@imtbl/generated-clients": 0.0.0
     "@imtbl/guardian": 0.0.0
     "@imtbl/immutablex-client": 0.0.0
