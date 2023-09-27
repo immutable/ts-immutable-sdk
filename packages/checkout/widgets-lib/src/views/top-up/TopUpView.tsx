@@ -210,7 +210,7 @@ export function TopUpView({
         <Body size="xSmall" shimmer={1} testId="fees-shimmer" />
       );
     }
-    return (` $${fees} ${fiatSymbol.toLocaleUpperCase()}`);
+    return (`≈ $${fees} ${fiatSymbol.toLocaleUpperCase()}`);
   };
 
   const renderFeePercentage = (fees: string, feesLoading: boolean): ReactNode => {
@@ -219,7 +219,7 @@ export function TopUpView({
         <Body size="xSmall" shimmer={1} testId="fee-percentage-shimmer" />
       );
     }
-    return (` ${fees}%`);
+    return (`≈ ${fees}%`);
   };
 
   return (
