@@ -2,6 +2,7 @@
 import * as passport from '@imtbl/passport';
 import * as config from '@imtbl/config';
 import * as provider from '@imtbl/provider';
+import { gameBridgeVersionCheck } from '@imtbl/version-check';
 
 /* eslint-disable no-undef */
 const scope = 'openid offline_access profile email transact';
@@ -141,8 +142,19 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
           success: true,
         });
 
-        // version check here...
+        // version check
+        const engineVersion = JSON.parse(request.engineVersion);
+        const versionCheckParams = {
+          gameBridgeTag: sdkVersionTag,
+          gameBridgeSha: sdkVersionSha,
+          engine: engineVersion.engine,
+          engineVersion: engineVersion.engineVersion,
+          platform: engineVersion.platform,
+          platformVersion: engineVersion.platformVersion,
+        };
+        console.log(`Version check: ${versionCheckParams}`);
 
+        gameBridgeVersionCheck(versionCheckParams);
         break;
       }
       case PASSPORT_FUNCTIONS.connect: {
