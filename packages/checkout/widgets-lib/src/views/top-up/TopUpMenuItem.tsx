@@ -33,6 +33,7 @@ export function TopUpMenuItem({
           {caption}
           <br />
           {subcaption}
+          {' '}
           {renderFeeFunction('-.--', false)}
         </MenuItem.Caption>
       </MenuItem>

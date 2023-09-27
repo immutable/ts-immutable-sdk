@@ -14,7 +14,7 @@
     ]
   },
   "dependencies": {
-    "@biom3/react": "^0.9.17-beta",
+    "@biom3/react": "^0.10.8",
     "@imtbl/core-sdk": "^2.0.2",
     "@imtbl/sdk": "0.0.0",
     "@testing-library/jest-dom": "^5.16.5",
