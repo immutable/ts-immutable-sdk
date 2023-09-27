@@ -111,7 +111,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
           {viewState.view.type === PrimaryRevenueWidgetViews.PAYMENT_METHODS && (
             <div>Payment methods</div>
           )}
-          {viewState.view.type === PrimaryRevenueWidgetViews.SMART_CHECKOUT && (
+          {viewState.view.type === PrimaryRevenueWidgetViews.FUND_WITH_SMART_CHECKOUT && (
             <FundWithSmartCheckout subView={viewState.view.data.subView} />
           )}
         </SharedContextProvider>
