@@ -44,8 +44,6 @@ export type TokenBalanceResult = {
   error?: CheckoutError,
 };
 
-export type TokenMaps = Map<ChainId, string>[];
-
 export type TokenBalances = Map<ChainId, TokenBalanceResult>;
 
 // Map for maintaining quotes between token pairs from the dex
