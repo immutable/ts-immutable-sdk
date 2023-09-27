@@ -378,7 +378,8 @@ export class Checkout {
       params.provider,
     );
 
-    // console.log('Smart Checkout Params ::', params);
+    // if we change the public interface for item requirement, convert formatted strings to
+
     await smartCheckout.smartCheckout(
       this.config,
       web3Provider,

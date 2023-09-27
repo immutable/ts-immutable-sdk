@@ -10,9 +10,28 @@ import { TokenInfo } from './tokenInfo';
  */
 export interface SmartCheckoutParams {
   provider: Web3Provider;
-  itemRequirements: ItemRequirement[];
+  itemRequirements: (NativeItemRequirement | ERC20ItemRequirement | ERC721ItemRequirement)[];
   transactionOrGasAmount: FulfilmentTransaction | GasAmount,
 }
+
+export type NativeItemRequirement = {
+  type: ItemType.NATIVE;
+  amount: string;
+};
+
+export type ERC20ItemRequirement = {
+  type: ItemType.ERC20;
+  contractAddress: string;
+  amount: string;
+  spenderAddress: string,
+};
+
+export type ERC721ItemRequirement = {
+  type: ItemType.ERC721;
+  contractAddress: string;
+  id: string;
+  spenderAddress: string,
+};
 
 /**
  * Represents the item requirements for a transaction.
