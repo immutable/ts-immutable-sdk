@@ -3,7 +3,6 @@ import { JsonRpcProvider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import {
   bridgeRoute,
-  fetchL1Representation,
   getBridgeGasEstimate,
   hasSufficientL1Eth,
   isNativeEth,
@@ -11,7 +10,7 @@ import {
 import { CheckoutConfiguration } from '../../../config';
 import {
   ChainId,
-  FundingRouteType, IMX_ADDRESS_ZKEVM,
+  FundingRouteType,
   ItemType,
 } from '../../../types';
 import { BalanceRequirement } from '../../balanceCheck/types';
@@ -865,81 +864,6 @@ describe('bridgeRoute', () => {
       );
 
       expect(hasSufficientEth).toBeFalsy();
-    });
-  });
-
-  describe('fetchL1Representation', () => {
-    it('should fetch L1 representation of ERC20', async () => {
-      const requiredL2Address = '0x123';
-      (createBlockchainDataInstance as jest.Mock).mockReturnValue({
-        getToken: jest.fn().mockResolvedValue({
-          result: {
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            root_contract_address: '0xROOT_ADDRESS',
-          },
-        }),
-      });
-
-      const l1Address = await fetchL1Representation(
-        config,
-        requiredL2Address,
-      );
-
-      expect(l1Address).toEqual('0xROOT_ADDRESS');
-    });
-
-    it('should fetch L1 representation of NATIVE', async () => {
-      const requiredL2Address = IMX_ADDRESS_ZKEVM;
-      (createBlockchainDataInstance as jest.Mock).mockReturnValue({
-        getToken: jest.fn().mockResolvedValue({}),
-      });
-
-      const l1Address = await fetchL1Representation(
-        config,
-        requiredL2Address,
-      );
-
-      expect(l1Address).toEqual('0x2Fa06C6672dDCc066Ab04631192738799231dE4a');
-      expect(createBlockchainDataInstance).not.toHaveBeenCalled();
-    });
-
-    it('should return empty string if indexer returns null', async () => {
-      const requiredL2Address = '0x123';
-      (createBlockchainDataInstance as jest.Mock).mockReturnValue({
-        getToken: jest.fn().mockResolvedValue({
-          result: {
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            root_contract_address: null,
-          },
-        }),
-      });
-
-      const l1Address = await fetchL1Representation(
-        config,
-        requiredL2Address,
-      );
-
-      expect(l1Address).toEqual('');
-    });
-
-    it('should return empty string if L2 address is empty', async () => {
-      const requiredL2Address = '';
-      (createBlockchainDataInstance as jest.Mock).mockReturnValue({
-        getToken: jest.fn().mockResolvedValue({
-          result: {
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            root_contract_address: '0xROOT_ADDRESS',
-          },
-        }),
-      });
-
-      const l1Address = await fetchL1Representation(
-        config,
-        requiredL2Address,
-      );
-
-      expect(l1Address).toEqual('');
-      expect(createBlockchainDataInstance).not.toHaveBeenCalled();
     });
   });
 

@@ -16,6 +16,8 @@ export const quoteFetcher = async (
   swappableTokens: string[],
 ): Promise<DexQuotes> => {
   const dexQuotes: DexQuotes = new Map<string, DexQuote>();
+  // Apply a small slippage percent as a buffer to cover price fluctuations between token pairs
+  const slippagePercent = 1;
 
   try {
     const exchange = await instance.createExchangeInstance(chainId, config);
@@ -28,6 +30,7 @@ export const quoteFetcher = async (
         swappableToken,
         requiredToken.address,
         requiredToken.amount,
+        slippagePercent,
       ));
     }
 
