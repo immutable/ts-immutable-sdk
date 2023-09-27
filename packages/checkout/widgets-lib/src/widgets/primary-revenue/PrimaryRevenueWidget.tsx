@@ -17,10 +17,14 @@ import {
 } from '../../context/view-context/ViewContext';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 
-import { PrimaryRevenueWidgetViews } from '../../context/view-context/PrimaryRevenueViewContextTypes';
+import {
+  FundWithSmartCheckoutSubViews,
+  PrimaryRevenueWidgetViews,
+} from '../../context/view-context/PrimaryRevenueViewContextTypes';
 import { Item } from './types';
 import { widgetTheme } from '../../lib/theme';
 import { SharedContextProvider } from './context/SharedContextProvider';
+import { FundWithSmartCheckout } from './views/FundWithSmartCheckout';
 
 export interface PrimaryRevenueWidgetProps {
   config: StrongCheckoutWidgetsConfig;
@@ -38,13 +42,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
 
-  console.info(
-    '@@@ PrimaryRevenueWidget props',
-    envId,
-    items,
-    amount,
-    fromCurrency,
-  );
+  console.info('@@@ PrimaryRevenueWidget props', envId, items, amount, fromCurrency);
 
   const loadingText = text.views[SharedViews.LOADING_VIEW].text;
 
@@ -52,10 +50,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
   const biomeTheme = useMemo(() => widgetTheme(theme), [theme]);
 
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
-  const viewReducerValues = useMemo(
-    () => ({ viewState, viewDispatch }),
-    [viewState, viewDispatch],
-  );
+  const viewReducerValues = useMemo(() => ({ viewState, viewDispatch }), [viewState, viewDispatch]);
 
   const onMount = useCallback(async () => {
     if (!checkout || !provider) return;
@@ -65,7 +60,10 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
-            type: PrimaryRevenueWidgetViews.PAYMENT_METHODS,
+            type: PrimaryRevenueWidgetViews.FUND_WITH_SMART_CHECKOUT,
+            data: {
+              subView: FundWithSmartCheckoutSubViews.FUNDING_ROUTE_SELECT,
+            },
           },
         },
       });
@@ -101,14 +99,11 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
             checkout,
           }}
         >
-          {viewState.view.type === SharedViews.LOADING_VIEW && (
-            <LoadingView loadingText={loadingText} />
-          )}
-          {viewState.view.type === SharedViews.ERROR_VIEW && (
-            <div>{viewState.view.error.message}</div>
-          )}
-          {viewState.view.type === PrimaryRevenueWidgetViews.PAYMENT_METHODS && (
-            <div>Payment methods</div>
+          {viewState.view.type === SharedViews.LOADING_VIEW && <LoadingView loadingText={loadingText} />}
+          {viewState.view.type === SharedViews.ERROR_VIEW && <div>{viewState.view.error.message}</div>}
+          {viewState.view.type === PrimaryRevenueWidgetViews.PAYMENT_METHODS && <div>Payment methods</div>}
+          {viewState.view.type === PrimaryRevenueWidgetViews.FUND_WITH_SMART_CHECKOUT && (
+            <FundWithSmartCheckout subView={viewState.view.data.subView} />
           )}
         </SharedContextProvider>
       </ViewContext.Provider>

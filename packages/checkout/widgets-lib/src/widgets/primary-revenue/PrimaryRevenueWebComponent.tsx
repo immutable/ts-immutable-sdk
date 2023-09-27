@@ -63,6 +63,7 @@ export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
 
     const items = this.getAttribute('items') ?? '';
     this.setItems(items);
+    this.renderWidget();
   }
 
   private setItems(items: string) {
