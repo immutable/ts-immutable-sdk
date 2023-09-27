@@ -302,7 +302,7 @@ export const text = {
         bridge: {
           heading: 'Move my coins',
           caption: 'From the coins I have on a different network',
-          subcaption: 'Fees',
+          subcaption: 'Fees ',
         },
       },
     },
