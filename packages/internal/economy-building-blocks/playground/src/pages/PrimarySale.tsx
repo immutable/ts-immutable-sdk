@@ -1,20 +1,74 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Box, Heading, Banner, Button, Card, Link } from "@biom3/react";
+import {
+  Box,
+  Heading,
+  Button,
+  Card,
+  Link,
+  Body,
+  MenuItem,
+  Icon,
+} from "@biom3/react";
 
 import { Grid, Row, Col } from "react-flexbox-grid";
 
-import { encodeApprove } from "../contracts/erc20";
-import { useMetamaskProvider } from "../context/MetamaskProvider";
-import { usePassportProvider } from "../context/PassportProvider";
 import ItemCards from "../components/ItemCards";
 import StatusCard from "../components/StatusCard";
 import ConfigForm from "../components/ConfigForm";
 import { useData } from "../context/DataProvider";
-import { TransactionReceipt } from "@ethersproject/providers";
+import { PrimaryRevenueEventType } from "@imtbl/checkout-widgets";
+import { config, passport } from "@imtbl/sdk";
 
-interface MintResponse {
-  tx_id: string;
-}
+const approveFunction = "approve(address spender,uint256 amount)";
+const executeFunction =
+  "execute(address multicallSigner, bytes32 reference, address[] targets, bytes[] data, uint256 deadline, bytes signature)";
+
+const passportConfig = {
+  environment: "sandbox",
+  clientId: "yBoJyIcgPv0ixCP867Glbw8D3DfkMkE6",
+  redirectUri: "http://localhost:3000/sale?login=true",
+  logoutRedirectUri: "http://localhost:3000/sale?logout=true",
+  audience: "platform_api",
+  scope: "openid offline_access email transact",
+};
+
+const useParams = () => {
+  const urlParams = new URLSearchParams(window.location.search);
+
+  const login = urlParams.get("login") as string;
+
+  return {
+    login,
+  };
+};
+
+const usePassportInstance = (passportConfig: any) => {
+  const {
+    clientId,
+    redirectUri,
+    logoutRedirectUri,
+    audience,
+    scope,
+    environment,
+  } = passportConfig;
+
+  if (!clientId || !redirectUri || !logoutRedirectUri || !audience || !scope) {
+    return null;
+  }
+
+  const passportInstance = new passport.Passport({
+    baseConfig: new config.ImmutableConfiguration({
+      environment: environment || config.Environment.SANDBOX,
+    }),
+    clientId,
+    redirectUri,
+    logoutRedirectUri,
+    audience,
+    scope,
+  });
+
+  return passportInstance;
+};
 
 const useURLParams = () => {
   const [urlParams, setUrlParams] = useState({});
@@ -27,57 +81,6 @@ const useURLParams = () => {
   return urlParams;
 };
 
-const useMint = (selectedItems: any[], amount: number, config = {}) => {
-  const [response, setResponse] = useState<MintResponse | null>(null);
-  const [error, setError] = useState(null);
-
-  const fields = [
-    "contract_address",
-    "recipient_address",
-    "erc20_contract_address",
-    "fee_collection_address",
-    "sale_collection_address",
-  ];
-  const params = Object.keys(config)
-    .filter((key) => fields.includes(key))
-    .reduce(
-      (obj, key) => ({ ...obj, [key]: (config as Record<string, any>)[key] }),
-      {}
-    );
-
-  const mint = useCallback(async () => {
-    const data = {
-      ...params,
-      amount,
-      items: selectedItems.map((item) => ({
-        collection_address: item.contract_address,
-        token_id: item.token_id.toString(),
-      })),
-    };
-
-    try {
-      const response = await fetch(
-        "https://game-primary-sales.sandbox.imtbl.com/v1/games/pokemon/mint",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-immutable-api-key": "sk_imapik-Ekz6cLnnwREtqjGn$xo6_fb97b8",
-          },
-          body: JSON.stringify(data),
-        }
-      );
-
-      const json = await response.json();
-      setResponse(json);
-    } catch (error) {
-      setError(error as any);
-    }
-  }, [selectedItems, amount, config]);
-
-  return { mint, response, error };
-};
-
 const useItems = (contract_address: string, pointer = 1) => {
   const maxItems = 721;
   const once = useRef<number | undefined>(undefined);
@@ -88,7 +91,8 @@ const useItems = (contract_address: string, pointer = 1) => {
 
     const pageSize = 100;
     const start = pointer * pageSize - pageSize + 1;
-    const length = start + pageSize - 1 <= maxItems ? pageSize : maxItems - start + 1;
+    const length =
+      start + pageSize - 1 <= maxItems ? pageSize : maxItems - start + 1;
 
     if (start > maxItems) return;
 
@@ -100,16 +104,17 @@ const useItems = (contract_address: string, pointer = 1) => {
             { method: "GET" }
           );
           const json = await response.json();
-
-          const price = Math.floor(Math.random() * 25) + 1;
+          // const price = Math.floor(Math.random() * 25) + 1;
+          const price = Math.round((Math.random() * 3 + 0.1) * 100) / 1000;
 
           return {
+            productId: `P${id.toString().padStart(4, "0")}`,
             token_id: id,
             name: json.name,
             image: json.image,
             contract_address,
             price: price,
-            description: `USDC \$${price}`,
+            description: json.description,
           };
         }
       );
@@ -153,33 +158,93 @@ const useGetNfts = (
   return nfts;
 };
 
+const useOpenPopup = (
+  url: string,
+  name: string,
+  specs: string,
+  passportOn: boolean
+) => {
+  const popup = useRef<Window | null>(null);
+  const passportInstance = usePassportInstance(passportConfig);
+
+  const openPopup = useCallback(() => {
+    if (passportOn) {
+      (window as unknown as any).sharedData = { passportInstance };
+    }
+
+    popup.current = window.open(url, name, specs);
+  }, [url, name, specs]);
+
+  const closePopup = useCallback(() => {
+    if (popup.current && !popup.current.closed) {
+      popup.current.close();
+    }
+  }, []);
+
+  return { openPopup, closePopup, popup };
+};
+
+const useMint = (
+  amount: number,
+  selectedItems: any[],
+  configFields: any,
+  passportOn: boolean
+) => {
+  const [loading, setLoading] = useState(false);
+
+  const items = selectedItems.map((item) => {
+    return {
+      productId: item.productId.toString(),
+      qty: item.quantity,
+      price: item.price.toString(),
+      name: item.name,
+      image: item.image,
+      description: item.description,
+    };
+  });
+
+  const params = {
+    amount: amount.toString(),
+    envId: "123",
+    fromCurrency: "USDC",
+
+    items: JSON.stringify(items),
+  };
+
+  const urlParams = new URLSearchParams(params).toString();
+
+  const { openPopup, closePopup } = useOpenPopup(
+    `${window.location.origin}/mint-sale?${urlParams}`,
+    "Mint",
+    "width=430,height=650",
+    passportOn
+  );
+
+  const handleMint = useCallback(async () => {
+    setLoading(true);
+    openPopup();
+  }, [amount, configFields, selectedItems]);
+
+  return { loading, handleMint, closePopup };
+};
+
 function PrimarySale() {
+  const { login } = useParams();
   const fee = 0.1;
   const params = useURLParams();
+  const passportInstance = usePassportInstance(passportConfig);
+
   const [amount, setAmount] = useState(0);
-  const [isPassportConnected, setIsPassportConnected] = useState(false);
   const [selectedItems, setSelectedItems] = useState<any[]>([]);
   const [configFields, setConfigFields] = useState<Record<string, any>>({});
-  const [isApproved, setIsApproved] = useState(false);
-  const [receipt, setReceipt] = useState<TransactionReceipt | null>(null);
-  const [mintResponse, setMintResponse] = useState<MintResponse | null>(null);
+  const [approvedTx, setApprovedTx] = useState("");
+  const [executedTx, setExecutedTx] = useState("");
+  const [passportOn, setPassportOn] = useState<boolean>(true);
+  const [receipt, setReceipt] = useState<any | null>(null);
 
   const [itemsPointer, setItemsPointer] = useState(1);
 
   const items = useItems(configFields.contract_address, itemsPointer) as any[];
-  const {
-    mm_connect,
-    mm_sendTransaction,
-    mm_loading,
-    address,
-    mm_getTransactionReceipt,
-  } = useMetamaskProvider();
-
-  const { sendTx, getUserInfo } = usePassportProvider();
-
-  const loading = mm_loading;
-
-  let { mint, response } = useMint(selectedItems, amount, configFields);
 
   const nfts = useGetNfts(
     configFields.wallet_address || configFields.recipient_address,
@@ -187,127 +252,145 @@ function PrimarySale() {
   );
 
   useEffect(() => {
-    getPassportInfoAsync();
-  });
-
-  const getPassportInfoAsync = async () => {
-    if (await getUserInfo()) {
-      setIsPassportConnected(true);
+    if (!passportInstance || !executedTx) {
+      return;
     }
-  };
+
+    const intervalId = setInterval(async () => {
+      try {
+        const zkEvmProvider = await passportInstance.connectEvm();
+        const currentReceipt = await zkEvmProvider.request({
+          method: "eth_getTransactionReceipt",
+          params: [executedTx],
+        });
+
+        setReceipt(currentReceipt);
+
+        if (currentReceipt) {
+          if (currentReceipt.status === "0x1") {
+            console.log("Transaction was successfully minted.");
+            clearInterval(intervalId);
+          } else if (currentReceipt.status === "0x0") {
+            console.log("Transaction failed during execution.");
+            clearInterval(intervalId);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching transaction receipt", error);
+      }
+    }, 1500);
+
+    return () => clearInterval(intervalId);
+  }, [executedTx]);
+
+  useEffect(() => {
+    if (passportInstance) {
+      passportInstance.loginCallback();
+    }
+  }, [login]);
 
   // Reset the states of statuses if the selectedItems changes
   useEffect(() => {
-    setIsApproved(false);
-    setMintResponse(null);
+    setApprovedTx("");
+    setExecutedTx("");
     setReceipt(null);
-    setIsPassportConnected(false);
   }, [selectedItems]);
-
-  useEffect(() => {
-    setMintResponse(response);
-
-    if (response?.tx_id) {
-      const interval = setInterval(async () => {
-        try {
-          const receipt = await mm_getTransactionReceipt(response!.tx_id);
-          console.log("polling status ", receipt);
-
-          // if receipt is null means the transaction is still pending, no status yet
-          if (receipt) {
-            // stop polling when we receive a status either success or fail
-            if (receipt.status === 1 || receipt.status === 0) {
-              setReceipt(receipt);
-              clearInterval(interval);
-            }
-          }
-        } catch (error) {
-          console.error(error);
-        }
-      }, 1000);
-      return () => clearInterval(interval);
-    }
-  }, [response, mm_getTransactionReceipt]);
 
   useEffect(() => {
     setConfigFields(params);
   }, [params]);
 
-  const setApprove = useCallback(
-    async (amount: number, walletType: "MM" | "Passport"): Promise<boolean> => {
-      console.log("🚀 ~ file: PrimarySale.tsx:163 ~ amount:", amount);
-      if (!configFields.erc20_contract_address) {
-        throw new Error("ERC20 contract address not defined!");
+  const handleEvent = ((event: MessageEvent<any>) => {
+    if (
+      !event.data ||
+      typeof event.data !== "object" ||
+      !("type" in event.data) ||
+      !("data" in event.data) ||
+      !("identifier" in event.data)
+    ) {
+      return;
+    }
+    console.log("@@@@ event from popup", event);
+
+    const { data, identifier } = event.data;
+
+    if (identifier !== "primary-revenue-widget-events") {
+      return;
+    }
+
+    switch (data.type) {
+      case PrimaryRevenueEventType.CLOSE_WIDGET: {
+        console.log("@@@ close widget");
+        closePopup();
+        break;
       }
-      if (!configFields.contract_address) {
-        throw new Error("Guarded multicaller contract address not defined!");
+      case PrimaryRevenueEventType.SUCCESS: {
+        console.log("@@@ sucess event", data);
+        setApprovedTx(data.data[approveFunction]);
+        setExecutedTx(data.data[executeFunction]);
+
+        closePopup();
+        break;
       }
+      default:
+        console.log("Does not match any expected event type");
+    }
+  }) as EventListener;
 
-      try {
-        const txData = encodeApprove(
-          configFields.contract_address,
-          `${amount}`
-        );
+  useEffect(() => {
+    window.addEventListener("message", handleEvent);
 
-        const execute = walletType === "MM" ? mm_sendTransaction : sendTx;
-        const approved = await execute(
-          configFields.erc20_contract_address,
-          txData
-        );
+    return () => {
+      window.removeEventListener("message", handleEvent);
+    };
+  }, []);
 
-        console.log("@@@ txData", txData);
-        return approved;
-      } catch (error) {
-        console.error("An error occurred:", error);
-        return false;
-      }
-    },
-    [mm_sendTransaction, configFields]
-  );
-
-  const handleMint = useCallback(
-    (walletType: "MM" | "Passport") => async () => {
-      setIsApproved(false);
-      setMintResponse(null);
-      setIsPassportConnected(false);
-
-      const approved = await setApprove(amount, walletType);
-      if (approved) {
-        mint();
-        setIsApproved(true);
-      }
-    },
-    [mint, amount]
+  const { loading, handleMint, closePopup } = useMint(
+    amount,
+    selectedItems,
+    configFields,
+    passportOn
   );
 
   const handleIsSelectedItem = useCallback(
     (item: any) => {
       return selectedItems.some((selectedItem) => {
-        return selectedItem.token_id === item.token_id;
+        return selectedItem.productId === item.productId;
       });
     },
     [selectedItems]
   );
 
   const handleSelectItem = useCallback(
-    (item: any) => {
-      let items;
+    (item: any, quantity: number) => {
+      let items = selectedItems.filter((selectedItem) => {
+        return selectedItem.token_id !== item.token_id;
+      });
+
       if (handleIsSelectedItem(item)) {
-        items = selectedItems.filter((selectedItem) => {
-          return selectedItem.token_id !== item.token_id;
-        });
+        // Find the existing item and update its quantity
+        const existingItem = selectedItems.find(
+          (selectedItem) => selectedItem.token_id === item.token_id
+        );
+        if (existingItem) {
+          existingItem.quantity = quantity + existingItem.quantity;
+          items = [...items, existingItem];
+        }
       } else {
-        items = [...selectedItems, item];
+        // If the item does not exist, add it with the quantity field
+        items = [...items, { ...item, quantity }];
       }
 
-      const amount = items.reduce((acc, item) => {
-        return acc + item.price;
+      const amount = items.reduce((acc, currentItem) => {
+        return acc + currentItem.price * currentItem.quantity;
       }, 0);
 
       setSelectedItems(items);
       setAmount(amount);
+      console.log("@@@@ selected items", items);
+      console.log("@@@@ amount", amount);
     },
-    [handleIsSelectedItem]
+    [handleIsSelectedItem, selectedItems]
   );
 
   const handleMintFormChange = useCallback(
@@ -325,151 +408,8 @@ function PrimarySale() {
   return (
     <Box sx={{ padding: "base.spacing.x8" }}>
       <Grid fluid>
-        <Banner variant="guidance" sx={{ marginBottom: "base.spacing.x4" }}>
-          <Banner.Title> Order Price: ${amount} USDC</Banner.Title>
-          <Banner.Caption>
-            Fees (${fee * 100}%): ${amount * fee} USDC
-          </Banner.Caption>
-        </Banner>
         <Row>
           <Col xs={12} md={12} lg={4}>
-            <Button
-              size={"large"}
-              sx={{
-                background: "base.color.status.attention.bright",
-                width: "100%",
-              }}
-              onClick={() => {
-                mm_connect();
-              }}
-              disabled={loading}
-            >
-              <Button.Icon
-                icon={loading ? "Loading" : "WalletConnect"}
-                iconVariant="bold"
-                sx={{
-                  mr: "base.spacing.x1",
-                  ml: "0",
-                  width: "base.icon.size.400",
-                }}
-              />
-              {loading ? "Connecting..." : "Connect Wallet"}
-            </Button>
-            <Box sx={{ marginTop: "base.spacing.x4" }}>
-              <Box sx={{ marginBottom: "base.spacing.x5" }}>
-                <Heading size={"small"}>Mint Config</Heading>
-              </Box>
-              <ConfigForm
-                fields={[
-                  {
-                    type: "text",
-                    key: "contract_address",
-                    label: "Multicaller Address",
-                    hint: "Contract Address for Guarded Multicaller Contract",
-                    placeholder: "0x...",
-                    value: configFields.contract_address,
-                  },
-                  {
-                    type: "text",
-                    key: "recipient_address",
-                    label: "Buyer Address",
-                    hint: "Wallet address that will receive the NFTs",
-                    placeholder: "0x...",
-                    value: configFields.recipient_address,
-                  },
-                  {
-                    type: "text",
-                    key: "erc20_contract_address",
-                    label: "ERC20 Contract Address",
-                    hint: "Contract address for the ERC20 token to be used for payment",
-                    placeholder: "0x...",
-                    value: configFields.erc20_contract_address,
-                  },
-                  {
-                    type: "text",
-                    key: "fee_collection_address",
-                    label: "Platform Fee Recipient Address",
-                    hint: `Wallet address that will receive the platform fee (${
-                      fee * 100
-                    }% })`,
-                    placeholder: "0x...",
-                    value: configFields.fee_collection_address,
-                  },
-                  {
-                    type: "text",
-                    key: "sale_collection_address",
-                    label: "Revenue Recipient Address",
-                    hint: "Wallet address that will receive the sale revenue (amounts after platform fee)",
-                    placeholder: "0x...",
-                    value: configFields.sale_collection_address,
-                  },
-                ]}
-                onChange={handleMintFormChange}
-              />
-              <Button
-                size={"large"}
-                sx={{
-                  background: "base.color.status.attention.bright",
-                  width: "100%",
-                  marginTop: "base.spacing.x4",
-                }}
-                onClick={handleMint("MM")}
-                disabled={amount === 0 || loading}
-              >
-                <Button.Icon
-                  icon={loading ? "Loading" : amount ? "Minting" : "Alert"}
-                  iconVariant="regular"
-                  sx={{
-                    mr: "base.spacing.x1",
-                    ml: "0",
-                    width: "base.icon.size.400",
-                  }}
-                />
-                {loading
-                  ? "Please wait..."
-                  : amount
-                  ? `Approve ${amount} USDC with MM`
-                  : "Select items to purchase"}
-              </Button>
-              <Button
-                size={"large"}
-                sx={{
-                  background: "base.gradient.1",
-                  width: "100%",
-                  marginTop: "base.spacing.x4",
-                }}
-                onClick={handleMint("Passport")}
-                disabled={amount === 0 || loading}
-              >
-                <Button.Icon
-                  icon={amount ? "Wallet" : "Alert"}
-                  iconVariant="regular"
-                  sx={{
-                    mr: "base.spacing.x1",
-                    ml: "0",
-                    width: "base.icon.size.400",
-                  }}
-                />
-                {amount
-                  ? `Approve ${amount} USDC with Passport`
-                  : "Select items to purchase"}
-              </Button>
-            </Box>
-          </Col>
-          <Col xs={12} md={12} lg={8}>
-            <Box>
-              <Box sx={{ marginBottom: "base.spacing.x5" }}>
-                <Heading size={"small"}>Catalog</Heading>
-              </Box>
-              <ItemCards
-                nfts={items}
-                onClick={handleSelectItem}
-                isSelected={handleIsSelectedItem}
-                onRefetch={() => {
-                  setItemsPointer((prev) => prev + 1);
-                }}
-              />
-            </Box>
             <Box sx={{ marginTop: "base.spacing.x5" }}>
               <Box sx={{ marginBottom: "base.spacing.x5" }}>
                 <Heading size={"small"}>Status</Heading>
@@ -477,57 +417,43 @@ function PrimarySale() {
               <Card>
                 <Card.Caption>
                   <StatusCard
-                    status="Connect Wallet"
-                    description={
-                      isPassportConnected || address
-                        ? "| " +
-                          "MM: " +
-                          (address ? "✅" : "") +
-                          " | " +
-                          "Passport: " +
-                          (isPassportConnected ? "✅" : "❌")
-                        : ""
-                    }
-                    variant={
-                      address || isPassportConnected ? "success" : "standard"
-                    }
+                    status="Approve Txn"
+                    description={approvedTx ? `${approvedTx} ✅` : ""}
+                    variant={approvedTx ? "success" : "standard"}
                   ></StatusCard>
                   <StatusCard
-                    status="Approve Txn"
-                    description={isApproved ? "✅" : ""}
-                    variant={isApproved ? "success" : "standard"}
+                    status="Execute Txn"
+                    description={executedTx ? `${executedTx} ✅` : ""}
+                    variant={executedTx ? "success" : "standard"}
                   ></StatusCard>
                   <StatusCard
                     status="Minting"
-                    description={
-                      mintResponse ? "Txn Hash | " + mintResponse.tx_id : ""
-                    }
-                    variant={mintResponse ? "success" : "standard"}
+                    variant={executedTx ? "success" : "standard"}
                   ></StatusCard>
                   <StatusCard
                     status={
                       receipt
-                        ? receipt.status === 1
+                        ? parseInt(receipt.status) === 1
                           ? "Minted 🚀"
                           : "Not Minted - Failed 🧐 | "
                         : "Minted"
                     }
                     variant={
                       receipt
-                        ? receipt.status === 1
+                        ? parseInt(receipt.status) === 1
                           ? "success"
                           : "fatal"
                         : "standard"
                     }
                     extraContent={
-                      receipt ? (
+                      executedTx ? (
                         <>
                           <Link
                             variant="primary"
                             sx={{ marginLeft: "base.spacing.x1" }}
                             onClick={() => {
                               window.open(
-                                `https://immutable-testnet.blockscout.com/tx/${mintResponse?.tx_id}`,
+                                `https://explorer.testnet.immutable.com/tx/${executedTx}`,
                                 "_blank"
                               );
                             }}
@@ -542,10 +468,128 @@ function PrimarySale() {
                 </Card.Caption>
               </Card>
             </Box>
+            <Box sx={{ marginTop: "base.spacing.x5" }}>
+              <Box sx={{ marginBottom: "base.spacing.x5" }}>
+                <Heading size={"small"}> My Cart</Heading>
+              </Box>
+
+              <Card sx={{ height: "100%" }}>
+                <Card.Caption>
+                  {selectedItems && selectedItems.length ? (
+                    selectedItems.map((item) => (
+                      <MenuItem emphasized size="small">
+                        <MenuItem.FramedImage imageUrl={item.image} />
+                        <MenuItem.Label>
+                          {item.name} x {item.quantity}
+                        </MenuItem.Label>
+                        <MenuItem.Caption>{item.description}</MenuItem.Caption>
+                        {item.price && (
+                          <MenuItem.PriceDisplay
+                            price={item.price.toString()}
+                            currencyImageUrl="https://design-system.immutable.com/hosted-for-ds/currency-icons/currency--usdc.svg"
+                          />
+                        )}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <Body>No items selected</Body>
+                  )}
+                  <br />
+                  {selectedItems.length ? (
+                    <>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Heading size={"small"}>Subtotal</Heading>
+                        <Body> ${amount} USDC</Body>
+                      </Box>
+
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Heading size={"small"}>
+                          Total (+ fees {fee * 100}%):
+                        </Heading>
+                        ${amount * fee} USDC
+                      </Box>
+                    </>
+                  ) : null}
+                </Card.Caption>
+              </Card>
+            </Box>
           </Col>
-        </Row>
-        <Row>
-          <Col xs={12} md={12} lg={12}>
+          <Col xs={12} md={12} lg={8}>
+            <Box>
+              <Box
+                sx={{
+                  marginTop: "base.spacing.x4",
+                  display: "flex",
+                  justifyContent: "end",
+                }}
+              >
+                <Button
+                  size={"medium"}
+                  sx={{
+                    background: "base.color.accent.8",
+                    width: "20%",
+                    marginTop: "base.spacing.x4",
+                  }}
+                  onClick={() => setPassportOn((prev) => !prev)}
+                >
+                  <Button.Icon
+                    icon={"Wallet"}
+                    iconVariant="regular"
+                    sx={{
+                      mr: "base.spacing.x1",
+                      ml: "0",
+                      width: "base.icon.size.400",
+                    }}
+                  />
+                  {passportOn ? "Disable Passport" : "Enable Passport"}
+                </Button>
+              </Box>
+              <Box sx={{ marginBottom: "base.spacing.x5" }}>
+                <Heading size={"small"}>Catalog</Heading>
+              </Box>
+              <ItemCards
+                nfts={items}
+                onClick={handleSelectItem}
+                isSelected={handleIsSelectedItem}
+                onRefetch={() => {
+                  setItemsPointer((prev) => prev + 1);
+                }}
+              />
+            </Box>
+            <Box sx={{ marginTop: "base.spacing.x4" }}>
+              <Button
+                size={"large"}
+                sx={{
+                  background: "base.gradient.1",
+                  width: "100%",
+                  marginTop: "base.spacing.x4",
+                }}
+                onClick={handleMint}
+                disabled={amount === 0 || loading}
+              >
+                <Button.Icon
+                  icon={amount ? "Wallet" : "Alert"}
+                  iconVariant="regular"
+                  sx={{
+                    mr: "base.spacing.x1",
+                    ml: "0",
+                    width: "base.icon.size.400",
+                  }}
+                />
+                {amount ? "Buy Now" : "Select items to purchase"}
+              </Button>
+            </Box>
+
             <Box sx={{ marginTop: "base.spacing.x4" }}>
               <Box sx={{ marginBottom: "base.spacing.x5" }}>
                 <Box sx={{ marginBottom: "base.spacing.x5" }}>

@@ -10,7 +10,7 @@ function ItemCards({
   onRefetch,
 }: {
   nfts: Array<NFT>;
-  onClick?: (nft: NFT) => void;
+  onClick?: (nft: NFT, quantity: number) => void;
   isSelected?: (nft: NFT) => boolean;
   onRefetch?: () => void;
 }) {
@@ -52,7 +52,12 @@ function ItemCards({
         {nfts &&
           nfts.map((nft, index) => (
             <Box sx={{ w: "100%", h: "100%" }}>
-              <ItemCard nft={nft} onClick={onClick} isSelected={isSelected} />
+              <ItemCard
+                nft={nft}
+                onClick={onClick}
+                isSelected={isSelected}
+                key={index}
+              />
             </Box>
           ))}
         <span
