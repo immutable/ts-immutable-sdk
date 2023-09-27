@@ -147,9 +147,7 @@ export const bridgeRoute = async (
     const nativeETHBalance = tokenBalanceResult.balances
       .find((balance) => isNativeEth(balance.token.address));
 
-    // todo: balanceRequirement.delta.balance
     if (nativeETHBalance && nativeETHBalance.balance.gte(
-      // balanceRequirement.delta.balance.add(bridgeFeeEstimate)
       bridgeRequirement.amount.add(bridgeFeeEstimate),
     )) {
       return constructBridgeFundingRoute(chainId, nativeETHBalance);
