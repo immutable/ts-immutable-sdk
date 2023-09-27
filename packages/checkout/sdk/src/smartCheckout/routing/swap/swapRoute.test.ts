@@ -86,6 +86,57 @@ describe('swapRoute', () => {
               },
             },
           ],
+          ['0xERC20_3',
+            {
+              quote: {
+                amount: {
+                  value: BigNumber.from(1),
+                  token: {
+                    chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+                    name: 'ERC20_3',
+                    symbol: 'ERC20_3',
+                    decimals: 18,
+                    address: '0xERC20_3',
+                  } as TokenInfo,
+                },
+                amountWithMaxSlippage: {
+                  value: BigNumber.from(1),
+                  token: {} as TokenInfo,
+                },
+                slippage: 0,
+                fees: [
+                  {
+                    amount: {
+                      value: BigNumber.from(1),
+                      token: {
+                        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+                        name: 'IMX',
+                        symbol: 'IMX',
+                        decimals: 18,
+                        address: IMX_ADDRESS_ZKEVM,
+                      } as TokenInfo,
+                    },
+                    recipient: '',
+                    basisPoints: 0,
+                  },
+                ],
+              },
+              approval: {
+                value: BigNumber.from(1),
+                token: {
+                  chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+                  name: 'IMX',
+                  symbol: 'IMX',
+                  decimals: 18,
+                  address: IMX_ADDRESS_ZKEVM,
+                } as TokenInfo,
+              },
+              swap: {
+                value: BigNumber.from(1),
+                token: {} as TokenInfo,
+              },
+            },
+          ],
         ]),
       ],
       [
@@ -220,7 +271,7 @@ describe('swapRoute', () => {
         ['0xERC20_1', '0xERC20_2'],
       );
 
-      expect(route).toEqual(
+      expect(route).toEqual([
         {
           type: FundingRouteType.SWAP,
           chainId: ChainId.IMTBL_ZKEVM_TESTNET,
@@ -235,10 +286,124 @@ describe('swapRoute', () => {
             },
           },
         },
-      );
+      ]);
     });
 
-    it('should return undefined if swap not available', async () => {
+    it('should recommend multiple swap route', async () => {
+      const balanceRequirement = {
+        type: ItemType.ERC20,
+        sufficient: false,
+        delta: {
+          balance: BigNumber.from(1),
+          formattedBalance: '1',
+        },
+        current: {
+          type: ItemType.ERC20,
+          balance: BigNumber.from(1),
+          formattedBalance: '1',
+          token: {
+            name: 'ERC20_1',
+            symbol: 'ERC20_1',
+            decimals: 18,
+            address: '0xERC20_1',
+          },
+        },
+        required: {
+          type: ItemType.ERC20,
+          balance: BigNumber.from(2),
+          formattedBalance: '2',
+          token: {
+            name: 'ERC20_1',
+            symbol: 'ERC20_1',
+            decimals: 18,
+            address: '0xERC20_1',
+          },
+        },
+      } as BalanceRequirement;
+
+      const balances = new Map<ChainId, TokenBalanceResult>([
+        [ChainId.IMTBL_ZKEVM_TESTNET, {
+          success: true,
+          balances: [
+            {
+              balance: BigNumber.from(10),
+              formattedBalance: '10',
+              token: {
+                name: 'ERC20',
+                symbol: 'ERC20',
+                decimals: 18,
+                address: '0xERC20_2',
+              },
+            },
+            {
+              balance: BigNumber.from(10),
+              formattedBalance: '10',
+              token: {
+                name: 'ERC20_3',
+                symbol: 'ERC20_3',
+                decimals: 18,
+                address: '0xERC20_3',
+              },
+            },
+            {
+              balance: BigNumber.from(10),
+              formattedBalance: '10',
+              token: {
+                name: 'IMX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: IMX_ADDRESS_ZKEVM,
+              },
+            },
+          ],
+        }],
+      ]);
+
+      const route = await swapRoute(
+        config,
+        {
+          swap: true,
+        },
+        cache,
+        '0xADDRESS',
+        balanceRequirement,
+        balances,
+        ['0xERC20_1', '0xERC20_2', '0xERC20_3'],
+      );
+
+      expect(route).toEqual([
+        {
+          type: FundingRouteType.SWAP,
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+          asset: {
+            balance: BigNumber.from(10),
+            formattedBalance: '10',
+            token: {
+              name: 'ERC20',
+              symbol: 'ERC20',
+              decimals: 18,
+              address: '0xERC20_2',
+            },
+          },
+        },
+        {
+          type: FundingRouteType.SWAP,
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+          asset: {
+            balance: BigNumber.from(10),
+            formattedBalance: '10',
+            token: {
+              name: 'ERC20_3',
+              symbol: 'ERC20_3',
+              decimals: 18,
+              address: '0xERC20_3',
+            },
+          },
+        },
+      ]);
+    });
+
+    it('should return empty array if swap not available', async () => {
       const balanceRequirement = {} as BalanceRequirement;
       const balances = new Map<ChainId, TokenBalanceResult>([
         [ChainId.IMTBL_ZKEVM_TESTNET, {
@@ -269,10 +434,10 @@ describe('swapRoute', () => {
         balances,
         ['0xERC20', '0xERC20'],
       );
-      expect(route).toBeUndefined();
+      expect(route).toEqual([]);
     });
 
-    it('should return undefined if no swappable tokens', async () => {
+    it('should return empty array if no swappable tokens', async () => {
       const balanceRequirement = {} as BalanceRequirement;
       const balances = new Map<ChainId, TokenBalanceResult>([
         [ChainId.IMTBL_ZKEVM_TESTNET, {
@@ -303,10 +468,10 @@ describe('swapRoute', () => {
         balances,
         [],
       );
-      expect(route).toBeUndefined();
+      expect(route).toEqual([]);
     });
 
-    it('should return undefined if no required token address', async () => {
+    it('should return empty array if no required token address', async () => {
       const balanceRequirement = {
         type: ItemType.ERC20,
         sufficient: false,
@@ -351,7 +516,7 @@ describe('swapRoute', () => {
         }],
       ]);
 
-      const route = await swapRoute(
+      const routes = await swapRoute(
         config,
         {
           swap: true,
@@ -362,10 +527,10 @@ describe('swapRoute', () => {
         balances,
         ['0xERC20'],
       );
-      expect(route).toBeUndefined();
+      expect(routes).toEqual([]);
     });
 
-    it('should return undefined if the user has no L2 balance', async () => {
+    it('should return empty array if the user has no L2 balance', async () => {
       const balanceRequirement = {
         type: ItemType.ERC20,
         sufficient: false,
@@ -426,10 +591,10 @@ describe('swapRoute', () => {
         balances,
         ['0xERC20'],
       );
-      expect(route).toBeUndefined();
+      expect(route).toEqual([]);
     });
 
-    it('should return undefined if user does not have balance of quoted token', async () => {
+    it('should return empty array if user does not have balance of quoted token', async () => {
       const balanceRequirement = {
         type: ItemType.ERC20,
         sufficient: false,
@@ -501,10 +666,10 @@ describe('swapRoute', () => {
         ['0xERC20_1', '0xERC20_2'],
       );
 
-      expect(route).toBeUndefined();
+      expect(route).toEqual([]);
     });
 
-    it('should return undefined if user does not have enough balance to cover the quoted token', async () => {
+    it('should return empty array if user does not have enough balance to cover the quoted token', async () => {
       const balanceRequirement = {
         type: ItemType.ERC20,
         sufficient: false,
@@ -576,10 +741,10 @@ describe('swapRoute', () => {
         ['0xERC20_1', '0xERC20_2'],
       );
 
-      expect(route).toBeUndefined();
+      expect(route).toEqual([]);
     });
 
-    it('should return undefined if not enough to cover approval gas', async () => {
+    it('should return empty array if not enough to cover approval gas', async () => {
       const balanceRequirement = {
         type: ItemType.ERC20,
         sufficient: false,
@@ -641,10 +806,10 @@ describe('swapRoute', () => {
         ['0xERC20_1', '0xERC20_2'],
       );
 
-      expect(route).toBeUndefined();
+      expect(route).toEqual([]);
     });
 
-    it('should return undefined if not enough to cover swap fees', async () => {
+    it('should return empty array if not enough to cover swap fees', async () => {
       const balanceRequirement = {
         type: ItemType.ERC20,
         sufficient: false,
@@ -716,7 +881,7 @@ describe('swapRoute', () => {
         ['0xERC20_1', '0xERC20_2'],
       );
 
-      expect(route).toBeUndefined();
+      expect(route).toEqual([]);
     });
   });
 
