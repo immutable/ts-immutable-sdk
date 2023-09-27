@@ -143,7 +143,7 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
         });
 
         // version check
-        const engineVersion = JSON.parse(request.engineVersion);
+        const { engineVersion } = request;
         const versionCheckParams = {
           gameBridgeTag: sdkVersionTag,
           gameBridgeSha: sdkVersionSha,
