@@ -4,7 +4,7 @@ export enum PrimaryRevenueWidgetViews {
   PAYMENT_METHODS = 'PAYMENT_METHODS',
   PAY_WITH_COINS = 'PAY_WITH_COINS',
   PAY_WITH_CARD = 'PAY_WITH_CARD',
-  SMART_CHECKOUT = 'SMART_CHECKOUT',
+  FUND_WITH_SMART_CHECKOUT = 'FUND_WITH_SMART_CHECKOUT',
   SUCCESS = 'SUCCESS',
   FAIL = 'FAIL',
 }
@@ -27,7 +27,7 @@ interface PrimaryRevenueWithCardView extends ViewType {
   type: PrimaryRevenueWidgetViews.PAY_WITH_CARD;
 }
 interface PrimaryRevenueSmartCheckoutView extends ViewType {
-  type: PrimaryRevenueWidgetViews.SMART_CHECKOUT;
+  type: PrimaryRevenueWidgetViews.FUND_WITH_SMART_CHECKOUT;
 }
 interface PrimaryRevenueSuccessView extends ViewType {
   type: PrimaryRevenueWidgetViews.SUCCESS;

@@ -3,12 +3,14 @@ import {
 } from '@imtbl/orderbook';
 import { PopulatedTransaction, TypedDataDomain } from 'ethers';
 import {
-  getUnsignedTransactions,
+  getUnsignedERC20ApprovalTransactions,
+  getUnsignedERC721Transactions,
+  getUnsignedFulfilmentTransactions,
   getUnsignedMessage,
 } from './getUnsignedActions';
 
 describe('getUnsignedActions', () => {
-  describe('getUnsignedTransactions', () => {
+  describe('getUnsignedERC721Transactions', () => {
     it('should get the unsigned transactions', async () => {
       const actions: Action[] = [
         {
@@ -51,7 +53,7 @@ describe('getUnsignedActions', () => {
         },
       ];
 
-      await expect(getUnsignedTransactions(actions)).resolves.toEqual({
+      await expect(getUnsignedERC721Transactions(actions)).resolves.toEqual({
         approvalTransactions: [{ from: '0xAPPROVAL1' }, { from: '0xAPPROVAL2' }],
         fulfilmentTransactions: [{ from: '0xTRANSACTION1' }, { from: '0xTRANSACTION2' }],
       });
@@ -60,10 +62,72 @@ describe('getUnsignedActions', () => {
     it('should return empty arrays if no transactions or signable messages', async () => {
       const actions: Action[] = [];
 
-      await expect(getUnsignedTransactions(actions)).resolves.toEqual({
+      await expect(getUnsignedERC721Transactions(actions)).resolves.toEqual({
         approvalTransactions: [],
         fulfilmentTransactions: [],
       });
+    });
+  });
+
+  describe('getUnsignedERC20ApprovalTransactions', () => {
+    it('should get the unsigned erc20 approval transactions', async () => {
+      const actions: Action[] = [
+        {
+          type: ActionType.TRANSACTION,
+          purpose: TransactionPurpose.APPROVAL,
+          buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL1' } as PopulatedTransaction),
+        },
+        {
+          type: ActionType.TRANSACTION,
+          purpose: TransactionPurpose.APPROVAL,
+          buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL2' } as PopulatedTransaction),
+        },
+        {
+          type: ActionType.TRANSACTION,
+          purpose: TransactionPurpose.FULFILL_ORDER,
+          buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION1' } as PopulatedTransaction),
+        },
+      ];
+
+      await expect(getUnsignedERC20ApprovalTransactions(actions)).resolves
+        .toEqual([{ from: '0xAPPROVAL1' }, { from: '0xAPPROVAL2' }]);
+    });
+
+    it('should return an empty arrays if no transactions', async () => {
+      const actions: Action[] = [];
+
+      await expect(getUnsignedERC20ApprovalTransactions(actions)).resolves.toEqual([]);
+    });
+  });
+
+  describe('getUnsignedFulfilmentTransactions', () => {
+    it('should get the unsigned fulfil transactions', async () => {
+      const actions: Action[] = [
+        {
+          type: ActionType.TRANSACTION,
+          purpose: TransactionPurpose.FULFILL_ORDER,
+          buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION1' } as PopulatedTransaction),
+        },
+        {
+          type: ActionType.TRANSACTION,
+          purpose: TransactionPurpose.FULFILL_ORDER,
+          buildTransaction: jest.fn().mockResolvedValue({ from: '0xTRANSACTION2' } as PopulatedTransaction),
+        },
+        {
+          type: ActionType.TRANSACTION,
+          purpose: TransactionPurpose.APPROVAL,
+          buildTransaction: jest.fn().mockResolvedValue({ from: '0xAPPROVAL1' } as PopulatedTransaction),
+        },
+      ];
+
+      await expect(getUnsignedFulfilmentTransactions(actions)).resolves
+        .toEqual([{ from: '0xTRANSACTION1' }, { from: '0xTRANSACTION2' }]);
+    });
+
+    it('should return an empty arrays if no transactions', async () => {
+      const actions: Action[] = [];
+
+      await expect(getUnsignedFulfilmentTransactions(actions)).resolves.toEqual([]);
     });
   });
 

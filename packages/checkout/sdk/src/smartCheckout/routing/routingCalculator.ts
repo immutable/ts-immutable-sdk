@@ -23,6 +23,10 @@ import { swapRoute } from './swap/swapRoute';
 import { allowListCheck } from '../allowList';
 import { onRampRoute } from './onRamp';
 
+const hasAvailableRoutingOptions = (availableRoutingOptions: RoutingOptionsAvailable) => (
+  availableRoutingOptions.bridge || availableRoutingOptions.swap || availableRoutingOptions.onRamp
+);
+
 export const getInsufficientRequirement = (
   balanceRequirements: BalanceCheckResult,
 ): BalanceRequirement | undefined => {
@@ -98,6 +102,16 @@ export const routingCalculator = async (
   balanceRequirements: BalanceCheckResult,
   availableRoutingOptions: RoutingOptionsAvailable,
 ): Promise<RoutingCalculatorResult> => {
+  if (!hasAvailableRoutingOptions(availableRoutingOptions)) {
+    return {
+      response: {
+        type: RouteCalculatorType.NO_OPTIONS,
+        message: 'No options available',
+      },
+      fundingRoutes: [],
+    };
+  }
+
   let readOnlyProviders;
   try {
     readOnlyProviders = await createReadOnlyProviders(config);
