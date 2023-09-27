@@ -105,7 +105,9 @@ export const useSignOrder = (input: SignOrderInput) => {
     provider,
     recipientAddress,
   } = input;
-  const [signResponse, setSignResponse] = useState<SignResponse | undefined>(undefined);
+  const [signResponse, setSignResponse] = useState<SignResponse | undefined>(
+    undefined,
+  );
 
   const sendTx = useCallback(
     async (

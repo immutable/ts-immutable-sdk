@@ -117,7 +117,7 @@ export class Passport {
 
   public async logout(): Promise<void> {
     await this.authManager.logout();
-
+    await this.confirmationScreen.logout();
     // Code after this point is only executed if the logout mode is silent
     await this.magicAdapter.logout();
     this.passportEventEmitter.emit(PassportEvents.LOGGED_OUT);

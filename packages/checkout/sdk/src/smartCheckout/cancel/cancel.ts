@@ -10,9 +10,17 @@ import { SignTransactionStatusType } from '../actions/types';
 export const cancel = async (
   config: CheckoutConfiguration,
   provider: Web3Provider,
-  orderId: string,
+  orderIds: string[],
 ): Promise<CancelResponse> => {
   let unsignedCancelOrderTransaction: PopulatedTransaction;
+  if (orderIds.length === 0) {
+    throw new CheckoutError(
+      'No orderIds were passed in, must pass at least one orderId to cancel',
+      CheckoutErrorType.CANCEL_ORDER_LISTING_ERROR,
+    );
+  }
+  // Update this when bulk cancel is supproted
+  const orderId = orderIds[0];
   try {
     const offererAddress = await provider.getSigner().getAddress();
     const orderbook = await instance.createOrderbookInstance(config);

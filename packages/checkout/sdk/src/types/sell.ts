@@ -12,13 +12,23 @@ export interface SellParams {
   provider: Web3Provider;
   orders: Array<SellOrder>;
 }
-
+/**
+ * Interface of the SellOrder to create a listing from, includes makerFees
+ * @property {SellToken} sellToken - the token to be listed for sale
+ * @property {BuyToken} buyToken - the token info of the price of the item
+ * @property {OrderFee[]} makerFees - option array of makerFees to be applied to the listing
+ */
 export interface SellOrder {
   sellToken: SellToken;
   buyToken: BuyToken;
   makerFees?: Array<OrderFee>;
 }
 
+/**
+ * Interface of the SellToken
+ * @property {string} id - The ERC721 token id
+ * @property {string} collectionAddress - The ERC721 contract address
+ */
 export interface SellToken {
   id: string,
   collectionAddress: string,

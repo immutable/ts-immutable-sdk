@@ -10,6 +10,7 @@ import Buy from '../components/Buy';
 import { SmartCheckoutForm } from '../components/SmartCheckoutForm';
 import Sell from '../components/Sell';
 import Cancel from '../components/Cancel';
+import Listings from '../components/Listings';
 
 export default function SmartCheckout() {
   const [environment, setEnvironment] = useState(Environment.SANDBOX);
@@ -86,6 +87,18 @@ export default function SmartCheckout() {
         Check connection
       </Divider>
       <CheckConnection checkout={checkout} provider={provider} />
+
+      <Divider
+        sx={{
+          marginTop: 'base.spacing.x6',
+          marginBottom: 'base.spacing.x2',
+        }}
+      >
+        Get Active Listings for Collection
+      </Divider>
+      <Listings
+        checkout={checkout}
+        provider={provider} />
 
       <Divider
         sx={{

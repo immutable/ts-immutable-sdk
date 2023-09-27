@@ -6,7 +6,9 @@ import {
   PrimaryRevenueFailed,
 } from '@imtbl/checkout-widgets';
 
-export function sendPrimaryRevenueWidgetCloseEvent() {
+export const sendPrimaryRevenueWidgetCloseEvent = (
+  eventTarget: Window | EventTarget,
+) => {
   const event = new CustomEvent<WidgetEvent<any>>(
     IMTBLWidgetEvents.IMTBL_PRIMARY_REVENUE_WIDGET_EVENT,
     {
@@ -19,10 +21,11 @@ export function sendPrimaryRevenueWidgetCloseEvent() {
 
   // eslint-disable-next-line no-console
   console.log('close widget event:', event);
-  if (window !== undefined) window.dispatchEvent(event);
-}
+  if (eventTarget !== undefined) eventTarget.dispatchEvent(event);
+};
 
 export const sendPrimaryRevenueSuccessEvent = (
+  eventTarget: Window | EventTarget,
   data: Record<string, string>,
 ) => {
   const event = new CustomEvent<WidgetEvent<PrimaryRevenueSuccess>>(
@@ -36,10 +39,13 @@ export const sendPrimaryRevenueSuccessEvent = (
   );
   // eslint-disable-next-line no-console
   console.log('primary revenue success event:', event);
-  if (window !== undefined) window.dispatchEvent(event);
+  if (eventTarget !== undefined) eventTarget.dispatchEvent(event);
 };
 
-export const sendPrimaryRevenueFailedEvent = (reason: string) => {
+export const sendPrimaryRevenueFailedEvent = (
+  eventTarget: Window | EventTarget,
+  reason: string,
+) => {
   const event = new CustomEvent<WidgetEvent<PrimaryRevenueFailed>>(
     IMTBLWidgetEvents.IMTBL_PRIMARY_REVENUE_WIDGET_EVENT,
     {
@@ -54,5 +60,5 @@ export const sendPrimaryRevenueFailedEvent = (reason: string) => {
   );
   // eslint-disable-next-line no-console
   console.log('primary revenue failed event:', event);
-  if (window !== undefined) window.dispatchEvent(event);
+  if (eventTarget !== undefined) eventTarget.dispatchEvent(event);
 };
