@@ -10,7 +10,9 @@ import { StatusType } from '../../types';
 
 export interface StatusViewProps {
   actionText: string;
+  optionalText?: string;
   onActionClick: () => void;
+  onOptionalActionClick?: () => void;
   onRenderEvent?: () => void;
   onCloseClick?: () => void;
   testId: string;
@@ -20,7 +22,9 @@ export interface StatusViewProps {
 
 export function StatusView({
   actionText,
+  optionalText,
   onActionClick,
+  onOptionalActionClick,
   onRenderEvent,
   onCloseClick,
   testId,
@@ -38,6 +42,12 @@ export function StatusView({
   const onStatusActionClick = () => {
     if (onActionClick) {
       onActionClick();
+    }
+  };
+
+  const onStatusOptionalActionClick = () => {
+    if (onOptionalActionClick) {
+      onOptionalActionClick();
     }
   };
 
@@ -70,6 +80,18 @@ export function StatusView({
           >
             {actionText}
           </Button>
+
+          {optionalText ? (
+            <Button
+              sx={{ width: '100%', marginTop: 'base.spacing.x2' }}
+              testId="status-action-button"
+              variant="tertiary"
+              size="large"
+              onClick={onStatusOptionalActionClick}
+            >
+              {optionalText}
+            </Button>
+          ) : null}
         </Box>
       </Box>
     </SimpleLayout>

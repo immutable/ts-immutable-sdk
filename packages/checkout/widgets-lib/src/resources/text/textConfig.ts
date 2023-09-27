@@ -347,6 +347,7 @@ export const text = {
     [PrimaryRevenueWidgetViews.FAIL]: {
       text: 'Transaction failed',
       actionText: 'Try again',
+      optionalText: 'View details',
     },
   },
   wallets: {

@@ -138,7 +138,9 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
             <StatusView
               statusText={text.views[PrimaryRevenueWidgetViews.FAIL].text}
               actionText={text.views[PrimaryRevenueWidgetViews.FAIL].actionText}
+              optionalText={text.views[PrimaryRevenueWidgetViews.FAIL].optionalText}
               onActionClick={() => {}}
+              onOptionalActionClick={() => {}}
               statusType={StatusType.FAILURE}
               onCloseClick={() => {}}
               testId="fail-view"
