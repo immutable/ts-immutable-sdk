@@ -1,4 +1,3 @@
-import { Contract } from 'ethers';
 import { Web3Provider } from '@ethersproject/providers';
 import { parseUnits } from 'ethers/lib/utils';
 import {
@@ -12,6 +11,7 @@ import {
   NativeItem,
   NativeItemRequirement,
 } from '../../types';
+import { getTokenContract } from '../../instance';
 
 export async function getItemRequirementsFromParams(
   provider: Web3Provider,
@@ -22,7 +22,7 @@ export async function getItemRequirementsFromParams(
   itemRequirementParams.forEach((itemRequirementParam) => {
     if (itemRequirementParam.type === ItemType.ERC20) {
       const { contractAddress } = (itemRequirementParam as ERC20ItemRequirement);
-      decimalPromises.push(new Contract(contractAddress, ERC20ABI, provider).decimals());
+      decimalPromises.push(getTokenContract(contractAddress, ERC20ABI, provider).decimals());
     }
   });
 
