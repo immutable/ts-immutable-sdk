@@ -13,24 +13,21 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import { Metadata } from './metadata';
 
 /**
- * Resource not found
+ * Single metadata
  * @export
- * @interface ModelError
+ * @interface GetMetadataResult
  */
-export interface ModelError {
+export interface GetMetadataResult {
     /**
-     * Error trace id
-     * @type {string}
-     * @memberof ModelError
+     * 
+     * @type {Metadata}
+     * @memberof GetMetadataResult
      */
-    'id'?: string;
-    /**
-     * Error message
-     * @type {string}
-     * @memberof ModelError
-     */
-    'message': string;
+    'result': Metadata;
 }
 
