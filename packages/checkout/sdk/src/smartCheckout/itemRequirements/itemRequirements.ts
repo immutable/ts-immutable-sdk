@@ -13,13 +13,13 @@ import {
 } from '../../types';
 import { getTokenContract } from '../../instance';
 
-export async function getItemRequirementsFromParams(
+export async function getItemRequirementsFromRequirements(
   provider: Web3Provider,
-  itemRequirementParams: (NativeItemRequirement | ERC20ItemRequirement | ERC721ItemRequirement)[],
+  requirements: (NativeItemRequirement | ERC20ItemRequirement | ERC721ItemRequirement)[],
 ): Promise<ItemRequirement[]> {
   // Get all decimal values by calling contracts for each ERC20
   const decimalPromises:any = [];
-  itemRequirementParams.forEach((itemRequirementParam) => {
+  requirements.forEach((itemRequirementParam) => {
     if (itemRequirementParam.type === ItemType.ERC20) {
       const { contractAddress } = (itemRequirementParam as ERC20ItemRequirement);
       decimalPromises.push(getTokenContract(contractAddress, ERC20ABI, provider).decimals());
@@ -29,7 +29,7 @@ export async function getItemRequirementsFromParams(
   const decimals = await Promise.all(decimalPromises as any);
 
   // Map ItemRequirementsParam objects to ItemRequirement by parsing amounts from formatted string to BigNumebrs
-  const itemRequirements = itemRequirementParams.map((itemRequirementParam, index) => {
+  const itemRequirements = requirements.map((itemRequirementParam, index) => {
     if (itemRequirementParam.type === ItemType.NATIVE) {
       return {
         ...itemRequirementParam,

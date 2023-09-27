@@ -1,7 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { parseUnits } from 'ethers/lib/utils';
 import { getTokenContract } from '../../instance';
-import { getItemRequirementsFromParams } from './itemRequirements';
+import { getItemRequirementsFromRequirements } from './itemRequirements';
 import {
   ERC20ItemRequirement, ERC721ItemRequirement, ItemType, NativeItemRequirement,
 } from '../../types';
@@ -37,7 +37,7 @@ describe('itemRequirements', () => {
         },
 
       ];
-      const itemRequirements = await getItemRequirementsFromParams(mockProvider, erc20ItemRequirements);
+      const itemRequirements = await getItemRequirementsFromRequirements(mockProvider, erc20ItemRequirements);
 
       expect(itemRequirements).toEqual([
         {
