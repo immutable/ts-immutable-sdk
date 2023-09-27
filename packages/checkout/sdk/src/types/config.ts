@@ -24,6 +24,7 @@ export type RemoteConfiguration = {
   bridge: BridgeConfig;
   allowedNetworks: AllowedNetworkConfig[];
   gasEstimateTokens?: GasEstimateTokenConfig;
+  imxAddressMapping?: ImxAddressConfig;
 };
 
 /**
@@ -85,6 +86,14 @@ export type BridgeConfig = {
  */
 export type AllowedNetworkConfig = {
   chainId: number;
+};
+
+/**
+ * A type representing the IMX address mappings across available networks.
+ * @type {{ [chainId: string]: string }}
+ */
+export type ImxAddressConfig = {
+  [chainId: string]: string;
 };
 
 /**
