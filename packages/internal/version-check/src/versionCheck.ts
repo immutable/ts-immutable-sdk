@@ -112,7 +112,7 @@ export const gameBridgeVersionCheck = (params: GameBridgeVersionCheckParams) => 
       versionParams.push(`imtbl-sdk-gamebridge-sha-${params.gameBridgeSha}`);
     }
     if (params.engine && params.engineVersion) {
-      versionParams.push(`engine-${params.engine}-${params.engineVersion}}`);
+      versionParams.push(`engine-${params.engine}-${params.engineVersion}`);
     }
     if (params.platform && params.platformVersion) {
       versionParams.push(`platform-${params.platform}-${params.platformVersion}`);
@@ -136,7 +136,7 @@ export const gameBridgeVersionCheck = (params: GameBridgeVersionCheckParams) => 
     }
 
     // eslint-disable-next-line no-console
-    console.log('gameBridgeVersionCheck', versionCheckUrl);
+    console.log('Game Bridge Version Check:', versionCheckUrl);
 
     axios
       .get(versionCheckUrl)

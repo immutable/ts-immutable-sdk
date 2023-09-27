@@ -152,7 +152,7 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
           platform: engineVersion.platform,
           platformVersion: engineVersion.platformVersion,
         };
-        console.log(`Version check: ${versionCheckParams}`);
+        console.log(`Version check: ${JSON.stringify(versionCheckParams)}`);
 
         gameBridgeVersionCheck(versionCheckParams);
         break;
