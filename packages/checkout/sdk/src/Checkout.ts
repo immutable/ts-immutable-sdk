@@ -288,12 +288,17 @@ export class Checkout {
     // eslint-disable-next-line no-console
     console.warn('This endpoint is currently under construction.');
 
+    if (params.orders.length > 1) {
+      // eslint-disable-next-line no-console
+      console.warn('This endpoint currently only actions the first order in the array.');
+    }
+
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
     );
 
-    await buy.buy(this.config, web3Provider, params.orderId);
+    await buy.buy(this.config, web3Provider, params.orders);
   }
 
   /**
@@ -343,12 +348,15 @@ export class Checkout {
     // eslint-disable-next-line no-console
     console.warn('This endpoint is currently under construction.');
 
+    // eslint-disable-next-line no-console
+    console.warn('This endpoint currently only actions the first order in the array.');
+
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
     );
 
-    await cancel.cancel(this.config, web3Provider, params.orderId);
+    await cancel.cancel(this.config, web3Provider, params.orderIds);
   }
 
   /**

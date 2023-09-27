@@ -3,7 +3,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
-import { Box, FormControl, Select, TextInput, Option, OptionKey } from '@biom3/react';
+import { Box, FormControl, Select, TextInput, Option, OptionKey, Body } from '@biom3/react';
 import { utils } from 'ethers';
 
 interface SellProps {
@@ -226,9 +226,12 @@ export default function Sell({ checkout, provider }: SellProps) {
       </FormControl>
       {tokenForm()}
       <br />
-      <LoadingButton onClick={sellClick} loading={loading}>
-        Sell
-      </LoadingButton>
+      <Box sx={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 'base.spacing.x2'}}>
+        <LoadingButton onClick={sellClick} loading={loading}>
+          Sell
+        </LoadingButton>
+        <Body size="xSmall">(adds 2.5% maker fee)</Body>
+      </Box>
       {(!error && success) && <SuccessMessage>Sell success.</SuccessMessage>}
       {error && (
         <ErrorMessage>
