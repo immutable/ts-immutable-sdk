@@ -44,6 +44,7 @@ import { cancel } from './smartCheckout/cancel';
 import { FiatRampService } from './fiatRamp';
 import { FiatRampParams, ExchangeType } from './types/fiatRamp';
 import { getItemRequirementsFromRequirements } from './smartCheckout/itemRequirements';
+import { CheckoutErrorType } from './errors';
 
 jest.mock('./connect');
 jest.mock('./network');
@@ -650,6 +651,48 @@ describe('Connect', () => {
 
     await expect(checkout.smartCheckout(params)).rejects.toThrow('This endpoint is not currently available.');
 
+    expect(smartCheckout).toBeCalledTimes(0);
+  });
+
+  it('should throw error for smartCheckout function if cannot get itemRequirements', async () => {
+    const provider = new Web3Provider(providerMock, ChainId.IMTBL_ZKEVM_TESTNET);
+    const smartCheckoutResult = {};
+
+    (validateProvider as jest.Mock).mockResolvedValue(provider);
+    (getItemRequirementsFromRequirements as jest.Mock).mockRejectedValue(new Error('Unable to get decimals'));
+    (smartCheckout as jest.Mock).mockResolvedValue(smartCheckoutResult);
+
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.SANDBOX },
+    });
+
+    const params: SmartCheckoutParams = {
+      provider,
+      itemRequirements: [{
+        type: ItemType.ERC20,
+        contractAddress: '0xNOADDRESS',
+        spenderAddress: '0xSPENDER',
+        amount: '1.5',
+      }],
+      transactionOrGasAmount: {
+        type: TransactionOrGasType.GAS,
+        gasToken: {
+          type: GasTokenType.NATIVE,
+          limit: BigNumber.from('1'),
+        },
+      },
+    };
+
+    let errMessage;
+    let errType;
+    try {
+      await checkout.smartCheckout(params);
+    } catch (err:any) {
+      errMessage = err.message;
+      errType = err.type;
+    }
+    expect(errMessage).toEqual('Failed to map item requirements');
+    expect(errType).toEqual(CheckoutErrorType.ITEM_REQUIREMENTS_ERROR);
     expect(smartCheckout).toBeCalledTimes(0);
   });
 
