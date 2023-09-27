@@ -2,22 +2,40 @@ import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { TokenInfo } from '@imtbl/dex-sdk';
-import { getSwapFundingSteps, routingCalculator } from './routingCalculator';
+import {
+  getBridgeAndSwapFundingSteps,
+  getSwapFundingSteps,
+  routingCalculator,
+} from './routingCalculator';
 import { CheckoutConfiguration } from '../../config';
 import { getAllTokenBalances } from './tokenBalances';
 import {
-  DexQuote, DexQuoteCache, DexQuotes, RouteCalculatorType, TokenBalanceResult,
+  DexQuote,
+  DexQuoteCache,
+  DexQuotes,
+  RouteCalculatorType,
+  TokenBalanceResult,
 } from './types';
 import { bridgeRoute } from './bridge/bridgeRoute';
 import {
-  ChainId, FundingRouteType, IMX_ADDRESS_ZKEVM, ItemType,
+  ChainId,
+  FundingRouteType,
+  IMX_ADDRESS_ZKEVM,
+  ItemType,
 } from '../../types';
-import { BalanceCheckResult, BalanceERC20Requirement, BalanceRequirement } from '../balanceCheck/types';
+import {
+  BalanceCheckResult,
+  BalanceERC20Requirement,
+  BalanceERC721Requirement,
+  BalanceRequirement,
+} from '../balanceCheck/types';
 import { createReadOnlyProviders } from '../../readOnlyProviders/readOnlyProvider';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { swapRoute } from './swap/swapRoute';
 import { allowListCheck } from '../allowList';
 import { onRampRoute } from './onRamp';
+import { bridgeAndSwapRoute } from './bridgeAndSwap/bridgeAndSwapRoute';
+import { RoutingTokensAllowList } from '../allowList/types';
 
 jest.mock('./tokenBalances');
 jest.mock('./bridge/bridgeRoute');
@@ -26,6 +44,7 @@ jest.mock('../../config/remoteConfigFetcher');
 jest.mock('./swap/swapRoute');
 jest.mock('./onRamp/onRampRoute');
 jest.mock('../allowList');
+jest.mock('./bridgeAndSwap/bridgeAndSwapRoute');
 
 describe('routingCalculator', () => {
   let config: CheckoutConfiguration;
@@ -146,6 +165,11 @@ describe('routingCalculator', () => {
       ],
     ],
   );
+
+  const readonlyProviders = new Map<ChainId, JsonRpcProvider>([
+    [ChainId.SEPOLIA, {} as JsonRpcProvider],
+    [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
+  ]);
 
   beforeEach(() => {
     config = new CheckoutConfiguration({
@@ -796,7 +820,7 @@ describe('routingCalculator', () => {
       });
   });
 
-  it('should return bridge and swap funding step', async () => {
+  it('should return bridge, swap and bridge & swap funding step', async () => {
     (allowListCheck as jest.Mock).mockImplementation(() => (
       {
         onRamp: [],
@@ -860,7 +884,30 @@ describe('routingCalculator', () => {
     };
 
     (getAllTokenBalances as jest.Mock).mockResolvedValue(new Map([
-      [ChainId.SEPOLIA, []],
+      [ChainId.SEPOLIA, {
+        success: true,
+        balances: [
+          {
+            balance: BigNumber.from(10),
+            formattedBalance: '10',
+            token: {
+              name: 'ETH',
+              symbol: 'ETH',
+              decimals: 18,
+            },
+          },
+          {
+            balance: BigNumber.from(10),
+            formattedBalance: '10',
+            token: {
+              name: 'IMX',
+              symbol: 'IMX',
+              decimals: 18,
+              address: '0xIMX',
+            },
+          },
+        ],
+      }],
       [ChainId.IMTBL_ZKEVM_TESTNET, {
         success: true,
         balances: [
@@ -917,6 +964,39 @@ describe('routingCalculator', () => {
       },
     }]);
 
+    (bridgeAndSwapRoute as jest.Mock).mockResolvedValue([
+      {
+        bridgeFundingStep: {
+          type: FundingRouteType.BRIDGE,
+          chainId: ChainId.SEPOLIA,
+          asset: {
+            balance: BigNumber.from(5),
+            formattedBalance: '5',
+            token: {
+              name: 'IMX',
+              symbol: 'IMX',
+              decimals: 18,
+              address: '0xIMXL1',
+            },
+          },
+        },
+        swapFundingStep: {
+          type: FundingRouteType.SWAP,
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+          asset: {
+            balance: BigNumber.from(10),
+            formattedBalance: '10',
+            token: {
+              name: 'IMX',
+              symbol: 'IMX',
+              decimals: 18,
+              address: '0xIMX',
+            },
+          },
+        },
+      },
+    ]);
+
     (createReadOnlyProviders as jest.Mock).mockResolvedValue(new Map([
       [ChainId.SEPOLIA, {} as JsonRpcProvider],
       [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
@@ -968,6 +1048,39 @@ describe('routingCalculator', () => {
               },
             }],
           },
+          {
+            priority: 3,
+            steps: [
+              {
+                type: FundingRouteType.BRIDGE,
+                chainId: ChainId.SEPOLIA,
+                asset: {
+                  balance: BigNumber.from(5),
+                  formattedBalance: '5',
+                  token: {
+                    name: 'IMX',
+                    symbol: 'IMX',
+                    decimals: 18,
+                    address: '0xIMXL1',
+                  },
+                },
+              },
+              {
+                type: FundingRouteType.SWAP,
+                chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+                asset: {
+                  balance: BigNumber.from(10),
+                  formattedBalance: '10',
+                  token: {
+                    name: 'IMX',
+                    symbol: 'IMX',
+                    decimals: 18,
+                    address: '0xIMX',
+                  },
+                },
+              },
+            ],
+          },
         ],
       });
   });
@@ -1014,6 +1127,8 @@ describe('routingCalculator', () => {
       swap: true,
       bridge: true,
     };
+
+    (allowListCheck as jest.Mock).mockResolvedValue(availableRoutingOptions);
 
     (getAllTokenBalances as jest.Mock).mockResolvedValue(new Map([
       [ChainId.SEPOLIA, []],
@@ -1065,6 +1180,8 @@ describe('routingCalculator', () => {
       swap: true,
       bridge: true,
     };
+
+    (allowListCheck as jest.Mock).mockResolvedValue(availableRoutingOptions);
 
     (getAllTokenBalances as jest.Mock).mockResolvedValue(new Map([
       [ChainId.SEPOLIA, []],
@@ -1691,6 +1808,355 @@ describe('routingCalculator', () => {
       );
 
       expect(swapFundingSteps).toEqual([]);
+    });
+  });
+
+  describe('getBridgeAndSwapFundingSteps', () => {
+    const dexQuoteCache = {} as DexQuoteCache;
+    const insufficientRequirement = {
+      type: ItemType.NATIVE,
+      sufficient: false,
+      delta: {
+        balance: BigNumber.from(5),
+        formattedBalance: '5',
+      },
+      current: {
+        type: ItemType.NATIVE,
+        balance: BigNumber.from(5),
+        formattedBalance: '5',
+        token: {
+          name: 'IMX',
+          symbol: 'IMX',
+          decimals: 18,
+        },
+      },
+      required: {
+        type: ItemType.NATIVE,
+        balance: BigNumber.from(10),
+        formattedBalance: '10',
+        token: {
+          name: 'IMX',
+          symbol: 'IMX',
+          decimals: 18,
+        },
+      },
+    } as BalanceRequirement;
+    const tokenBalances = new Map<ChainId, TokenBalanceResult>([]);
+    const l1balances = {
+      success: true,
+      balances: [
+        {
+          balance: BigNumber.from(10),
+          formattedBalance: '10',
+          token: {
+            name: 'ETH',
+            symbol: 'ETH',
+            decimals: 18,
+          },
+        },
+        {
+          balance: BigNumber.from(10),
+          formattedBalance: '10',
+          token: {
+            name: 'IMX',
+            symbol: 'IMX',
+            decimals: 18,
+            address: '0xIMX',
+          },
+        },
+      ],
+    };
+    const l2balances = {
+      success: true,
+      balances: [
+        {
+          balance: BigNumber.from(10),
+          formattedBalance: '10',
+          token: {
+            name: 'ERC20',
+            symbol: 'ERC20',
+            decimals: 18,
+            address: '0xERC20_2',
+          },
+        },
+        {
+          balance: BigNumber.from(10),
+          formattedBalance: '10',
+          token: {
+            name: 'IMX',
+            symbol: 'IMX',
+            decimals: 18,
+            address: IMX_ADDRESS_ZKEVM,
+          },
+        },
+      ],
+    };
+    const tokenAllowList: RoutingTokensAllowList = {
+      bridge: [{
+        name: 'ERC20_1',
+        symbol: 'ERC20_1',
+        decimals: 18,
+        address: '0xERC20_1',
+      }],
+      swap: [{
+        name: 'ERC20_2',
+        symbol: 'ERC20_2',
+        decimals: 18,
+        address: '0xERC20_2',
+      }],
+    };
+    const feeEstimates = new Map<FundingRouteType, BigNumber>();
+    const balanceRequirements: BalanceCheckResult = {
+      sufficient: false,
+      balanceRequirements: [insufficientRequirement],
+    };
+
+    it('should not get bridge and swap funding step if insufficient requirement undefined', async () => {
+      const result = await getBridgeAndSwapFundingSteps(
+        config,
+        readonlyProviders,
+        { swap: true, bridge: true },
+        undefined,
+        dexQuoteCache,
+        '0xADDRESS',
+        tokenBalances,
+        tokenAllowList,
+        feeEstimates,
+        balanceRequirements,
+      );
+      expect(result).toEqual([]);
+    });
+
+    it('should not get bridge and swap funding step if no l1 balances', async () => {
+      const result = await getBridgeAndSwapFundingSteps(
+        config,
+        readonlyProviders,
+        { swap: true, bridge: true },
+        insufficientRequirement,
+        dexQuoteCache,
+        '0xADDRESS',
+        tokenBalances,
+        tokenAllowList,
+        feeEstimates,
+        balanceRequirements,
+      );
+      expect(result).toEqual([]);
+    });
+
+    it('should not get bridge and swap funding step if l1 balances error', async () => {
+      tokenBalances.set(
+        ChainId.SEPOLIA,
+        {
+          success: true,
+          error: new CheckoutError('error', CheckoutErrorType.GET_BALANCE_ERROR),
+          balances: [],
+        },
+      );
+      const result = await getBridgeAndSwapFundingSteps(
+        config,
+        readonlyProviders,
+        { swap: true, bridge: true },
+        insufficientRequirement,
+        dexQuoteCache,
+        '0xADDRESS',
+        tokenBalances,
+        tokenAllowList,
+        feeEstimates,
+        balanceRequirements,
+      );
+      expect(result).toEqual([]);
+    });
+
+    it('should not get bridge and swap funding step if l1 balances success false', async () => {
+      tokenBalances.set(
+        ChainId.SEPOLIA,
+        {
+          success: false,
+          balances: [],
+        },
+      );
+      const result = await getBridgeAndSwapFundingSteps(
+        config,
+        readonlyProviders,
+        { swap: true, bridge: true },
+        insufficientRequirement,
+        dexQuoteCache,
+        '0xADDRESS',
+        tokenBalances,
+        tokenAllowList,
+        feeEstimates,
+        balanceRequirements,
+      );
+      expect(result).toEqual([]);
+    });
+
+    it('should not get bridge and swap funding step if no l2 balances', async () => {
+      tokenBalances.set(ChainId.SEPOLIA, l1balances);
+      const result = await getBridgeAndSwapFundingSteps(
+        config,
+        readonlyProviders,
+        { swap: true, bridge: true },
+        insufficientRequirement,
+        dexQuoteCache,
+        '0xADDRESS',
+        tokenBalances,
+        tokenAllowList,
+        feeEstimates,
+        balanceRequirements,
+      );
+      expect(result).toEqual([]);
+    });
+
+    it('should not get bridge and swap funding step if l2 balances error', async () => {
+      tokenBalances.set(ChainId.SEPOLIA, l1balances);
+      tokenBalances.set(
+        ChainId.IMTBL_ZKEVM_TESTNET,
+        {
+          success: true,
+          error: new CheckoutError('error', CheckoutErrorType.GET_BALANCE_ERROR),
+          balances: [],
+        },
+      );
+      const result = await getBridgeAndSwapFundingSteps(
+        config,
+        readonlyProviders,
+        { swap: true, bridge: true },
+        insufficientRequirement,
+        dexQuoteCache,
+        '0xADDRESS',
+        tokenBalances,
+        tokenAllowList,
+        feeEstimates,
+        balanceRequirements,
+      );
+      expect(result).toEqual([]);
+    });
+
+    it('should not get bridge and swap funding step if l2 balances success false', async () => {
+      tokenBalances.set(ChainId.SEPOLIA, l1balances);
+      tokenBalances.set(
+        ChainId.IMTBL_ZKEVM_TESTNET,
+        {
+          success: false,
+          balances: [],
+        },
+      );
+      const result = await getBridgeAndSwapFundingSteps(
+        config,
+        readonlyProviders,
+        { swap: true, bridge: true },
+        insufficientRequirement,
+        dexQuoteCache,
+        '0xADDRESS',
+        tokenBalances,
+        tokenAllowList,
+        feeEstimates,
+        balanceRequirements,
+      );
+      expect(result).toEqual([]);
+    });
+
+    it('should not get bridge and swap funding step if item requirement erc721', async () => {
+      tokenBalances.set(ChainId.SEPOLIA, l1balances);
+      tokenBalances.set(ChainId.IMTBL_ZKEVM_TESTNET, l2balances);
+      const result = await getBridgeAndSwapFundingSteps(
+        config,
+        readonlyProviders,
+        { swap: true, bridge: true },
+        {
+          type: ItemType.ERC721,
+        } as BalanceERC721Requirement,
+        dexQuoteCache,
+        '0xADDRESS',
+        tokenBalances,
+        tokenAllowList,
+        feeEstimates,
+        balanceRequirements,
+      );
+      expect(result).toEqual([]);
+    });
+
+    it('should call bridgeAndSwapRoute and return routes', async () => {
+      (bridgeAndSwapRoute as jest.Mock).mockResolvedValue([
+        {
+          bridgeFundingStep: {
+            type: FundingRouteType.BRIDGE,
+            chainId: ChainId.SEPOLIA,
+            asset: {
+              balance: BigNumber.from(5),
+              formattedBalance: '5',
+              token: {
+                name: 'IMX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: '0xIMXL1',
+              },
+            },
+          },
+          swapFundingStep: {
+            type: FundingRouteType.SWAP,
+            chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+            asset: {
+              balance: BigNumber.from(10),
+              formattedBalance: '10',
+              token: {
+                name: 'IMX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: '0xIMX',
+              },
+            },
+          },
+        },
+      ]);
+
+      tokenBalances.set(ChainId.SEPOLIA, l1balances);
+      tokenBalances.set(ChainId.IMTBL_ZKEVM_TESTNET, l2balances);
+      const result = await getBridgeAndSwapFundingSteps(
+        config,
+        readonlyProviders,
+        { swap: true, bridge: true },
+        insufficientRequirement,
+        dexQuoteCache,
+        '0xADDRESS',
+        tokenBalances,
+        tokenAllowList,
+        feeEstimates,
+        balanceRequirements,
+      );
+      expect(result)
+        .toEqual([
+          {
+            bridgeFundingStep: {
+              type: FundingRouteType.BRIDGE,
+              chainId: ChainId.SEPOLIA,
+              asset: {
+                balance: BigNumber.from(5),
+                formattedBalance: '5',
+                token: {
+                  name: 'IMX',
+                  symbol: 'IMX',
+                  decimals: 18,
+                  address: '0xIMXL1',
+                },
+              },
+            },
+            swapFundingStep: {
+              type: FundingRouteType.SWAP,
+              chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+              asset: {
+                balance: BigNumber.from(10),
+                formattedBalance: '10',
+                token: {
+                  name: 'IMX',
+                  symbol: 'IMX',
+                  decimals: 18,
+                  address: '0xIMX',
+                },
+              },
+            },
+          },
+        ]);
     });
   });
 });

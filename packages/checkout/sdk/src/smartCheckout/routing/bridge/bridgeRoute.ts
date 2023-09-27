@@ -1,14 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { BigNumber, ethers } from 'ethers';
 import {
-  BalanceDelta,
   ChainId,
   FundingRouteType,
   GetBalanceResult,
   IMX_ADDRESS_ZKEVM,
   ItemType,
   RoutingOptionsAvailable,
-  TokenInfo,
 } from '../../../types';
 import { CheckoutConfiguration, getL1ChainId } from '../../../config';
 import { FundingRouteStep, TokenBalanceResult } from '../types';
@@ -81,11 +79,9 @@ export const isNativeEth = (address: string | undefined): boolean => {
 };
 
 export type BridgeRequirement = {
-  amountToBridge: {
-    amount: BigNumber;
-    formattedAmount: string;
-  },
-  token: TokenInfo,
+  amount: BigNumber;
+  formattedAmount: string;
+  l2address: string;
 };
 export const bridgeRoute = async (
   config: CheckoutConfiguration,
@@ -97,7 +93,7 @@ export const bridgeRoute = async (
   feeEstimates: Map<FundingRouteType, BigNumber>,
 ): Promise<FundingRouteStep | undefined> => {
   if (!availableRoutingOptions.bridge) return undefined;
-  if (bridgeRequirement.token.address === undefined || bridgeRequirement.token.address === '') return undefined;
+  if (bridgeRequirement.l2address === undefined || bridgeRequirement.l2address === '') return undefined;
   const chainId = getL1ChainId(config);
   const tokenBalanceResult = tokenBalanceResults.get(chainId);
   const l1provider = readOnlyProviders.get(chainId);
@@ -122,10 +118,9 @@ export const bridgeRoute = async (
 
   // const requiredTokenAddress = getTokenAddressFromRequirement(balanceRequirement);
   // todo: we can probably move out the indexer call and instead just pass through cache
-  const tokenMapping = await fetchL1Representation(config, bridgeRequirement.token.address);
+  const l1RepresentationResult = await fetchL1Representation(config, bridgeRequirement.l2address);
   // No mapping on L1 for this token
-  if (tokenMapping === undefined) return undefined;
-  const { l1address } = tokenMapping;
+  const { l1address } = l1RepresentationResult;
   if (l1address === '') return undefined;
 
   // Ensure l1address is in the allowed token list
@@ -141,7 +136,7 @@ export const bridgeRoute = async (
     l1provider,
     depositorAddress,
     l1address,
-    bridgeRequirement.amountToBridge.amount, // todo: balanceRequirement.delta.balance
+    bridgeRequirement.amount,
   );
 
   if (!hasSufficientL1Eth(
@@ -157,7 +152,7 @@ export const bridgeRoute = async (
     // todo: balanceRequirement.delta.balance
     if (nativeETHBalance && nativeETHBalance.balance.gte(
       // balanceRequirement.delta.balance.add(bridgeFeeEstimate)
-      bridgeRequirement.amountToBridge.amount.add(bridgeFeeEstimate),
+      bridgeRequirement.amount.add(bridgeFeeEstimate),
     )) {
       return constructBridgeFundingRoute(chainId, nativeETHBalance);
     }
@@ -168,8 +163,7 @@ export const bridgeRoute = async (
   // Find the balance of the L1 representation of the token and check if the balance covers the delta
   const erc20balance = tokenBalanceResult.balances.find((balance) => balance.token.address === l1address);
   if (erc20balance && erc20balance.balance.gte(
-    // balanceRequirement.delta.balance,
-    bridgeRequirement.amountToBridge.amount,
+    bridgeRequirement.amount,
   )) {
     return constructBridgeFundingRoute(chainId, erc20balance);
   }

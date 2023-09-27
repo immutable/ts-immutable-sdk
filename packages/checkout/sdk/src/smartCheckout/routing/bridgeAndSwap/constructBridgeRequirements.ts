@@ -1,8 +1,9 @@
 import { BigNumber, utils } from 'ethers';
-import { GetBalanceResult } from '../../../types';
+import { GetBalanceResult, ItemType } from '../../../types';
 import { BridgeRequirement } from '../bridge/bridgeRoute';
 import { DexQuote, DexQuotes } from '../types';
-import { CrossChainTokenMapping } from '../indexer/fetchL1Representation';
+import { L1ToL2TokenAddressMapping } from '../indexer/fetchL1Representation';
+import { BalanceCheckResult } from '../../balanceCheck/types';
 
 // The dex will return all the fees which is in a particular token (currently always IMX)
 // If any of the fees are in the same token that is trying to be swapped (e.g. trying to swap IMX)
@@ -29,12 +30,34 @@ export const getFeesForTokenAddress = (
   return fees;
 };
 
+// The token that is being bridged may also be a balance requirement
+// Since this token is going to be swapped after bridging then get the
+// balance requirement amount so this can be considered when bridging
+// enough of the token across
+const getAmountFromBalanceRequirement = (
+  balanceRequirements: BalanceCheckResult,
+  tokenAddress: string,
+): BigNumber => {
+  let amount = BigNumber.from(0);
+
+  balanceRequirements.balanceRequirements.forEach((requirement) => {
+    if (requirement.type === ItemType.NATIVE || requirement.type === ItemType.ERC20) {
+      if (requirement.required.token.address === tokenAddress) {
+        amount = amount.add(requirement.required.balance);
+      }
+    }
+  });
+
+  return amount;
+};
+
 // to be sent to the bridge route
 export const constructBridgeRequirements = (
   dexQuotes: DexQuotes,
   l1balances: GetBalanceResult[],
   l2balances: GetBalanceResult[],
-  crossChainTokenMapping: CrossChainTokenMapping[],
+  l1tol2addresses: L1ToL2TokenAddressMapping[],
+  balanceRequirements: BalanceCheckResult,
 ): BridgeRequirement[] => {
   const bridgeRequirements: BridgeRequirement[] = [];
 
@@ -42,12 +65,12 @@ export const constructBridgeRequirements = (
     // Get the L2 balance for the token address
     const l2balance = l2balances.find((balance) => balance.token.address === tokenAddress);
 
-    const crossChainData = crossChainTokenMapping.find(
-      (data) => data.l2token.l2address === tokenAddress,
+    const l1tol2TokenMapping = l1tol2addresses.find(
+      (token) => token.l2address === tokenAddress,
     );
-    if (!crossChainData) continue;
+    if (!l1tol2TokenMapping) continue;
 
-    const { l1address, l2token } = crossChainData;
+    const { l1address, l2address } = l1tol2TokenMapping;
     if (!l1address) continue;
 
     // If the user does not have any L1 balance for this token then cannot bridge
@@ -58,7 +81,11 @@ export const constructBridgeRequirements = (
     const quotedAmount = quote.quote.amountWithMaxSlippage.value;
     // Add fees to the quoted amount if the fees are in the same token as the token being swapped
     const fees = getFeesForTokenAddress(quote, tokenAddress);
-    const totalAmount = quotedAmount.add(fees);
+    // If the token being bridged is a balance requirement then add this to the total
+    // to ensure when its swapped the balance requirement can still be fulfilled
+    const balanceRequirementAmount = getAmountFromBalanceRequirement(balanceRequirements, tokenAddress);
+    // Add all the amounts together
+    const totalAmount = quotedAmount.add(fees).add(balanceRequirementAmount);
 
     // Subtract any L2 balance from the total amount to only bridge the necessary amount
     const amountToBridge = l2balance ? totalAmount.sub(l2balance.balance) : totalAmount;
@@ -70,20 +97,10 @@ export const constructBridgeRequirements = (
     }
 
     bridgeRequirements.push({
-      amountToBridge: {
-        amount: amountToBridge,
-        formattedAmount: utils.formatUnits(amountToBridge, l1balance.token.decimals),
-      },
+      amount: amountToBridge,
+      formattedAmount: utils.formatUnits(amountToBridge, l1balance.token.decimals),
       // L2 address is used for the bridge requirement as the bridge route uses the indexer to find L1 address
-      token: {
-        address: tokenAddress,
-        // Try to get decimals from indexer, otherwise just use the L1 balance decimals as best effort
-        // Swap requires a TokenInfo, but the user may not have L2 balance so we need to use the inedxer
-        // to get these values
-        decimals: l2token.decimals ? l2token.decimals : l1balance.token.decimals,
-        symbol: l2token.symbol ? l2token.symbol : '',
-        name: l2token.name ? l2token.name : '',
-      },
+      l2address,
     });
   }
 

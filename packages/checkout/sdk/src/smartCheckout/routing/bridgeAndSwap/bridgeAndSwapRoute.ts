@@ -9,6 +9,7 @@ import {
   TokenInfo,
 } from '../../../types';
 import {
+  BalanceCheckResult,
   BalanceERC20Requirement,
   BalanceNativeRequirement,
 } from '../../balanceCheck/types';
@@ -17,17 +18,17 @@ import {
   FundingRouteStep,
   TokenBalanceResult,
 } from '../types';
-import { getOrSetQuotesFromCache } from '../swap/dexQuoteCache';
-import { bridgeRoute } from '../bridge/bridgeRoute';
+import { BridgeRequirement, bridgeRoute } from '../bridge/bridgeRoute';
 import { swapRoute } from '../swap/swapRoute';
 import { getBalancesByChain } from './getBalancesByChain';
 import { constructBridgeRequirements } from './constructBridgeRequirements';
-import { CrossChainTokenMapping } from '../indexer/fetchL1Representation';
-import { fetchL1ToL2Mapping } from './fetchL1ToL2Mapping';
+import { fetchL1ToL2Mappings } from './fetchL1ToL2Mappings';
+import { L1ToL2TokenAddressMapping } from '../indexer/fetchL1Representation';
+import { getDexQuotes } from './getDexQuotes';
 
 export const abortBridgeAndSwap = (
   bridgeableTokens: string[],
-  swappableTokens: string[],
+  swappableTokens: TokenInfo[],
   l1balances: GetBalanceResult[],
   l2balances: GetBalanceResult[],
   availableRoutingOptions: RoutingOptionsAvailable,
@@ -47,18 +48,21 @@ export const abortBridgeAndSwap = (
 export const filterSwappableTokensByBridgeableAddresses = (
   requiredTokenAddress: string,
   bridgeableTokens: string[],
-  crossChainTokenMapping: CrossChainTokenMapping[],
-): string[] => {
-  const filteredSwappableTokens: string[] = [];
+  swappableTokens: TokenInfo[],
+  l1tol2Addresses: L1ToL2TokenAddressMapping[],
+): TokenInfo[] => {
+  const filteredSwappableTokens: TokenInfo[] = [];
 
-  for (const addresses of crossChainTokenMapping) {
+  for (const addresses of l1tol2Addresses) {
     if (addresses.l1address === '') continue;
-    if (addresses.l2token.l2address === '') continue;
+    if (addresses.l2address === '') continue;
     if (!bridgeableTokens.includes(addresses.l1address)) continue;
     // Filter out the token that is required from the swappable tokens list
-    if (addresses.l2token.l2address === requiredTokenAddress) continue;
+    if (addresses.l2address === requiredTokenAddress) continue;
 
-    filteredSwappableTokens.push(addresses.l2token.l2address);
+    const tokenInfo = swappableTokens.find((token) => token.address === addresses.l2address);
+    if (!tokenInfo) continue;
+    filteredSwappableTokens.push(tokenInfo);
   }
 
   return filteredSwappableTokens;
@@ -70,10 +74,8 @@ const modifyTokenBalancesWithBridgedAmount = (
   config: CheckoutConfiguration,
   tokenBalances: Map<ChainId, TokenBalanceResult>,
   l2balances: GetBalanceResult[],
-  bridgedTokens: {
-    amount: BigNumber, // The amount that was bridged
-    token: TokenInfo
-  }[],
+  bridgedTokens: BridgeRequirement[],
+  swappableTokens: TokenInfo[], // used to construct the token info
 ): Map<ChainId, TokenBalanceResult> => {
   const modifiedTokenBalances: Map<ChainId, TokenBalanceResult> = new Map();
   for (const [chainId, tokenBalance] of tokenBalances) {
@@ -94,23 +96,25 @@ const modifyTokenBalancesWithBridgedAmount = (
   // Go through each of the tokens that can be bridged
   // and adjust the balances to fake the bridge
   for (const bridgedToken of bridgedTokens) {
-    const { amount, token } = bridgedToken;
-    if (!token.address) continue;
+    const { amount, l2address } = bridgedToken;
+    if (l2address === '') continue;
 
     let l2balance = BigNumber.from(0);
     // Find the current balance of this token
-    const currentBalance = balanceMap.get(token.address);
+    const currentBalance = balanceMap.get(l2address);
     if (currentBalance) l2balance = currentBalance.balance;
 
     const newBalance = l2balance.add(amount);
 
-    balanceMap.set(token.address, {
+    const tokenInfo = swappableTokens.find((token) => token.address === l2address) as TokenInfo;
+
+    balanceMap.set(l2address, {
       balance: newBalance,
       formattedBalance: utils.formatUnits(
         newBalance,
-        token.decimals,
+        tokenInfo.decimals,
       ),
-      token,
+      token: tokenInfo,
     });
   }
 
@@ -155,6 +159,38 @@ export const reapplyOriginalSwapBalances = (
   return originalSwapSteps;
 };
 
+export const constructBridgeAndSwapRoutes = (
+  bridgeFundingSteps: (FundingRouteStep | undefined)[],
+  swapFundingSteps: FundingRouteStep[],
+  l1tol2Addresses: L1ToL2TokenAddressMapping[],
+): BridgeAndSwapRoute[] => {
+  const bridgeAndSwapRoutes: BridgeAndSwapRoute[] = [];
+
+  for (const bridgeFundingStep of bridgeFundingSteps) {
+    if (!bridgeFundingStep) continue;
+    const mapping = l1tol2Addresses.find(
+      (addresses) => addresses.l1address === bridgeFundingStep.asset.token.address && addresses.l2address,
+    );
+    if (!mapping) continue;
+
+    const swapFundingStep = swapFundingSteps.find(
+      (step) => step.asset.token.address === mapping.l2address,
+    );
+    if (!swapFundingStep) continue;
+
+    bridgeAndSwapRoutes.push({
+      bridgeFundingStep,
+      swapFundingStep,
+    });
+  }
+
+  return bridgeAndSwapRoutes;
+};
+
+export type BridgeAndSwapRoute = {
+  bridgeFundingStep: FundingRouteStep,
+  swapFundingStep: FundingRouteStep,
+};
 export const bridgeAndSwapRoute = async (
   config: CheckoutConfiguration,
   readOnlyProviders: Map<ChainId, JsonRpcProvider>,
@@ -165,8 +201,9 @@ export const bridgeAndSwapRoute = async (
   feeEstimates: Map<FundingRouteType, BigNumber>,
   tokenBalances: Map<ChainId, TokenBalanceResult>,
   bridgeableTokens: string[],
-  swappableTokens: string[],
-): Promise<any[] | undefined> => { // todo: update type to bridge steo -> funding step
+  swappableTokens: TokenInfo[],
+  balanceRequirements: BalanceCheckResult,
+): Promise<BridgeAndSwapRoute[]> => {
   const { l1balances, l2balances } = getBalancesByChain(config, tokenBalances);
   const requiredTokenAddress = insufficientRequirement.required.token.address;
 
@@ -177,28 +214,28 @@ export const bridgeAndSwapRoute = async (
     l2balances,
     availableRoutingOptions,
     requiredTokenAddress,
-  )) return undefined;
+  )) return [];
 
   // Fetch L2 to L1 address mapping and based on the L1 address existing then
   // filter the bridgeable and swappable tokens list further to only include
   // tokens that can be both swapped and bridged
-  const crossChainTokenMapping = await fetchL1ToL2Mapping(config, swappableTokens);
+  const l1tol2Addresses = await fetchL1ToL2Mappings(config, swappableTokens);
   const filteredSwappableTokens = filterSwappableTokensByBridgeableAddresses(
     requiredTokenAddress as string,
     bridgeableTokens,
-    crossChainTokenMapping,
+    swappableTokens,
+    l1tol2Addresses,
   );
-  if (filteredSwappableTokens.length === 0) return undefined;
+
+  if (filteredSwappableTokens.length === 0) return [];
 
   // Fetch all the dex quotes from the list of swappable tokens
-  const dexQuotes = await getOrSetQuotesFromCache(
+  const dexQuotes = await getDexQuotes(
     config,
     dexQuoteCache,
     ownerAddress,
-    {
-      address: requiredTokenAddress as string,
-      amount: insufficientRequirement.delta.balance,
-    },
+    requiredTokenAddress as string,
+    insufficientRequirement,
     filteredSwappableTokens,
   );
 
@@ -207,22 +244,20 @@ export const bridgeAndSwapRoute = async (
     dexQuotes,
     l1balances,
     l2balances,
-    crossChainTokenMapping,
+    l1tol2Addresses,
+    balanceRequirements,
   );
-  if (bridgeRequirements.length === 0) return undefined;
+  if (bridgeRequirements.length === 0) return [];
 
   // Create a mapping of bridge routes to L2 addresses
   const bridgePromises = new Map<string, Promise<FundingRouteStep | undefined>>();
   // Create map of bridgeable tokens to make it easier to get the amount that was bridged when modifying the users balance later
-  const bridgeableTokenMap = new Map<string, { amount: BigNumber, token: TokenInfo }>();
-  const bridgedTokens: {
-    amount: BigNumber,
-    token: TokenInfo,
-  }[] = [];
+  const bridgeableRequirementsMap = new Map<string, BridgeRequirement>();
+  const bridgedTokens: BridgeRequirement[] = [];
   for (const bridgeRequirement of bridgeRequirements) {
-    if (!bridgeRequirement.token.address) continue;
+    if (!bridgeRequirement.l2address) continue;
     bridgePromises.set(
-      bridgeRequirement.token.address,
+      bridgeRequirement.l2address,
       bridgeRoute(
         config,
         readOnlyProviders,
@@ -233,9 +268,10 @@ export const bridgeAndSwapRoute = async (
         feeEstimates,
       ),
     );
-    bridgeableTokenMap.set(bridgeRequirement.token.address, {
-      amount: bridgeRequirement.amountToBridge.amount,
-      token: bridgeRequirement.token,
+    bridgeableRequirementsMap.set(bridgeRequirement.l2address, {
+      amount: bridgeRequirement.amount,
+      formattedAmount: bridgeRequirement.formattedAmount,
+      l2address: bridgeRequirement.l2address,
     });
   }
 
@@ -253,17 +289,18 @@ export const bridgeAndSwapRoute = async (
     if (result === undefined) return;
     swappableTokensAfterBridging.push(key);
 
-    const bridgedToken = bridgeableTokenMap.get(key);
+    const bridgedToken = bridgeableRequirementsMap.get(key);
     if (!bridgedToken) return;
     bridgedTokens.push({
       amount: bridgedToken.amount,
-      token: bridgedToken.token,
+      formattedAmount: bridgedToken.formattedAmount,
+      l2address: bridgedToken.l2address,
     });
   });
 
   // Bridge route determined that no tokens could be bridged
-  if (swappableTokensAfterBridging.length === 0) return undefined;
-  if (bridgedTokens.length === 0) return undefined; // No tokens were bridged
+  if (swappableTokensAfterBridging.length === 0) return [];
+  if (bridgedTokens.length === 0) return []; // No tokens were bridged
 
   // Modify the users L2 balance to include the amount as if the user successfully bridged
   const modifiedTokenBalances = modifyTokenBalancesWithBridgedAmount(
@@ -271,6 +308,7 @@ export const bridgeAndSwapRoute = async (
     tokenBalances,
     l2balances,
     bridgedTokens,
+    swappableTokens,
   );
 
   // Call the swap route with the faked bridged balances
@@ -283,12 +321,16 @@ export const bridgeAndSwapRoute = async (
     modifiedTokenBalances,
     swappableTokensAfterBridging,
   );
+  if (!swapRoutes) return [];
 
-  if (!swapRoutes) return undefined;
+  const originalBalanceSwapRoutes = reapplyOriginalSwapBalances(
+    tokenBalances,
+    swapRoutes,
+  );
 
-  const swapRoundsModified = reapplyOriginalSwapBalances(tokenBalances, swapRoutes);
-
-  console.log('swapRoutesModified', swapRoundsModified);
-
-  return undefined;
+  return constructBridgeAndSwapRoutes(
+    bridgeResults,
+    originalBalanceSwapRoutes,
+    l1tol2Addresses,
+  );
 };

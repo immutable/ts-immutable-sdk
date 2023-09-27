@@ -1,0 +1,350 @@
+import { BigNumber } from 'ethers';
+import { TokenInfo as DexTokenInfo } from '@imtbl/dex-sdk';
+import { DexQuote } from '../types';
+import {
+  ChainId,
+  GetBalanceResult,
+  ItemType,
+  TokenInfo,
+} from '../../../types';
+import { constructBridgeRequirements } from './constructBridgeRequirements';
+import { BalanceRequirement } from '../../balanceCheck/types';
+
+describe('constructBridgeRequirements', () => {
+  const constructDexQuote = (
+    swapTokenInfo: DexTokenInfo,
+    feesTokenInfo: DexTokenInfo,
+    quoteAmount: number,
+    slippageQuoteAmount: number,
+    feeAmount: number,
+    swap?: number,
+    approval?: number,
+  ) => {
+    const dexQuote: DexQuote = {
+      approval: undefined,
+      swap: null,
+      quote: {
+        amount: {
+          value: BigNumber.from(quoteAmount),
+          token: swapTokenInfo,
+        },
+        amountWithMaxSlippage: {
+          value: BigNumber.from(slippageQuoteAmount),
+          token: swapTokenInfo,
+        },
+        slippage: 1,
+        fees: [
+          {
+            amount: {
+              value: BigNumber.from(feeAmount),
+              token: feesTokenInfo,
+            },
+            recipient: '',
+            basisPoints: 0,
+          },
+        ],
+      },
+    };
+
+    if (swap) {
+      dexQuote.swap = {
+        value: BigNumber.from(swap),
+        token: swapTokenInfo,
+      };
+    }
+
+    if (approval) {
+      dexQuote.approval = {
+        value: BigNumber.from(approval),
+        token: feesTokenInfo,
+      };
+    }
+
+    return dexQuote;
+  };
+
+  it('should construct the bridge requirements', () => {
+    const swapTokenInfoA: DexTokenInfo = {
+      chainId: 1,
+      address: '0xERC20A',
+      decimals: 18,
+      symbol: 'ERC20',
+      name: 'ERC20',
+    };
+
+    const swapTokenInfoB: DexTokenInfo = {
+      chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+      address: '0xERC20B',
+      decimals: 18,
+      symbol: 'ERC20',
+      name: 'ERC20',
+    };
+
+    const feesTokenInfo: DexTokenInfo = {
+      chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+      address: '0xERC20',
+      decimals: 18,
+      symbol: 'ERC20',
+      name: 'ERC20',
+    };
+
+    const dexQuoteA = constructDexQuote(
+      swapTokenInfoA,
+      feesTokenInfo,
+      100000000000000,
+      200000000000000,
+      300000000000000,
+      400000000000000,
+      500000000000000,
+    );
+
+    const dexQuoteB = constructDexQuote(
+      swapTokenInfoB,
+      feesTokenInfo,
+      600000000000000,
+      700000000000000,
+      800000000000000,
+      900000000000000,
+      110000000000000,
+    );
+
+    const dexQuotes = new Map<string, DexQuote>([
+      ['0xERC20A', dexQuoteA],
+      ['0xERC20B', dexQuoteB],
+    ]);
+
+    const l1balances: GetBalanceResult[] = [
+      {
+        token: {
+          address: 'ERC20AL1',
+          decimals: 18,
+        } as TokenInfo,
+        balance: BigNumber.from(100000000000000),
+        formattedBalance: '1',
+      },
+      {
+        token: {
+          address: 'ERC20BL1',
+          decimals: 18,
+        } as TokenInfo,
+        balance: BigNumber.from(2000000000000000),
+        formattedBalance: '2',
+      },
+    ];
+
+    const l2balances: GetBalanceResult[] = [];
+
+    const requirements = constructBridgeRequirements(
+      dexQuotes,
+      l1balances,
+      l2balances,
+      [
+        {
+          l1address: 'ERC20AL1',
+          l2address: '0xERC20A',
+        },
+        {
+          l1address: 'ERC20BL1',
+          l2address: '0xERC20B',
+        },
+      ],
+      {
+        sufficient: false,
+        balanceRequirements: [
+          {
+            type: ItemType.ERC20,
+            sufficient: false,
+            required: {
+              type: ItemType.ERC20,
+              balance: BigNumber.from(1),
+              formattedBalance: '1',
+              token: {
+                address: '0xERC20C',
+              } as TokenInfo,
+            },
+          },
+        ] as BalanceRequirement[],
+      },
+    );
+
+    expect(requirements).toEqual(
+      [
+        {
+          amount: BigNumber.from(200000000000000),
+          formattedAmount: '0.0002',
+          l2address: '0xERC20A',
+        },
+        {
+          amount: BigNumber.from(700000000000000),
+          formattedAmount: '0.0007',
+          l2address: '0xERC20B',
+        },
+      ],
+    );
+  });
+
+  it('should add fees and balance requirement if they are same as token address and remove l2 balance', () => {
+    const swapTokenInfo: DexTokenInfo = {
+      chainId: 1,
+      address: '0xIMX',
+      decimals: 18,
+      symbol: '0xIMX',
+      name: '0xIMX',
+    };
+
+    const feesTokenInfo: DexTokenInfo = {
+      chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+      address: '0xIMX',
+      decimals: 18,
+      symbol: '0xIMX',
+      name: '0xIMX',
+    };
+
+    const dexQuote = constructDexQuote(
+      swapTokenInfo,
+      feesTokenInfo,
+      100000000000000,
+      200000000000000,
+      300000000000000,
+      400000000000000,
+      500000000000000,
+    );
+
+    const dexQuotes = new Map<string, DexQuote>([
+      ['0xIMX', dexQuote],
+    ]);
+
+    const l1balances: GetBalanceResult[] = [
+      {
+        token: {
+          address: '0xIMXL1',
+          decimals: 18,
+        } as TokenInfo,
+        balance: BigNumber.from(100000000000000),
+        formattedBalance: '1',
+      },
+    ];
+
+    const l2balances: GetBalanceResult[] = [
+      {
+        token: {
+          address: '0xIMX',
+          decimals: 18,
+        } as TokenInfo,
+        balance: BigNumber.from(10000000000000),
+        formattedBalance: '0.1',
+      },
+    ];
+
+    const requirements = constructBridgeRequirements(
+      dexQuotes,
+      l1balances,
+      l2balances,
+      [
+        {
+          l1address: '0xIMXL1',
+          l2address: '0xIMX',
+        },
+      ],
+      {
+        sufficient: false,
+        balanceRequirements: [
+          {
+            type: ItemType.NATIVE,
+            sufficient: false,
+            required: {
+              type: ItemType.NATIVE,
+              balance: BigNumber.from(120000000000000),
+              formattedBalance: '1',
+              token: {
+                address: '0xIMX',
+              } as TokenInfo,
+            },
+          },
+        ] as BalanceRequirement[],
+      },
+    );
+
+    expect(requirements).toEqual(
+      [
+        {
+          amount: BigNumber.from(1110000000000000),
+          formattedAmount: '0.00111',
+          l2address: '0xIMX',
+        },
+      ],
+    );
+  });
+
+  it('should not return a requirement if amount to bridge is 0 due to sufficient l2 balance', () => {
+    const swapTokenInfo: DexTokenInfo = {
+      chainId: 1,
+      address: '0xL2',
+      decimals: 18,
+      symbol: '0xL2',
+      name: '0xL2',
+    };
+
+    const feesTokenInfo: DexTokenInfo = {
+      chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+      address: '0xIMX',
+      decimals: 18,
+      symbol: '0xIMX',
+      name: '0xIMX',
+    };
+
+    const dexQuote = constructDexQuote(
+      swapTokenInfo,
+      feesTokenInfo,
+      100000000000000,
+      200000000000000,
+      300000000000000,
+      400000000000000,
+      500000000000000,
+    );
+
+    const dexQuotes = new Map<string, DexQuote>([
+      ['0xL2', dexQuote],
+    ]);
+
+    const l1balances: GetBalanceResult[] = [
+      {
+        token: {
+          address: '0xL1',
+          decimals: 18,
+        } as TokenInfo,
+        balance: BigNumber.from(100000000000000),
+        formattedBalance: '1',
+      },
+    ];
+
+    const l2balances: GetBalanceResult[] = [
+      {
+        token: {
+          address: '0xL2',
+          decimals: 18,
+        } as TokenInfo,
+        balance: BigNumber.from(9000000000000000),
+        formattedBalance: '1',
+      },
+    ];
+
+    const requirements = constructBridgeRequirements(
+      dexQuotes,
+      l1balances,
+      l2balances,
+      [
+        {
+          l1address: '0xL1',
+          l2address: '0xL2',
+        },
+      ],
+      {
+        sufficient: false,
+        balanceRequirements: [] as BalanceRequirement[],
+      },
+    );
+
+    expect(requirements).toEqual([]);
+  });
+});

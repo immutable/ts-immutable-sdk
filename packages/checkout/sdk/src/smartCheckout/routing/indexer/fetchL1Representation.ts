@@ -3,34 +3,24 @@ import { createBlockchainDataInstance } from '../../../instance';
 import { IMX_ADDRESS_ZKEVM } from '../../../types';
 import { getImxL1Representation, getIndexerChainName } from '../bridge/constants';
 
-export type CrossChainTokenMapping = {
+export type L1ToL2TokenAddressMapping = {
   l1address: string,
-  l2token: {
-    l2address: string,
-    decimals: number | null,
-    name: string | null,
-    symbol: string | null,
-  },
+  l2address: string,
 };
 export const fetchL1Representation = async (
   config: CheckoutConfiguration,
   l2address: string,
-): Promise<CrossChainTokenMapping | undefined> => {
-  if (l2address === '') return undefined;
+): Promise<L1ToL2TokenAddressMapping> => {
+  if (l2address === '') return { l1address: '', l2address };
   if (l2address === IMX_ADDRESS_ZKEVM) {
     return {
       l1address: getImxL1Representation(getL1ChainId(config)),
-      l2token: {
-        l2address: IMX_ADDRESS_ZKEVM,
-        decimals: 18,
-        name: 'Immutable X',
-        symbol: 'IMX',
-      },
+      l2address: IMX_ADDRESS_ZKEVM,
     };
   }
 
   const chainName = getIndexerChainName(getL2ChainId(config));
-  if (chainName === '') return undefined; // Chain name not a valid indexer chain name
+  if (chainName === '') return { l1address: '', l2address }; // Chain name not a valid indexer chain name
 
   const blockchainData = createBlockchainDataInstance(config);
   const tokenData = await blockchainData.getToken({
@@ -39,15 +29,10 @@ export const fetchL1Representation = async (
   });
 
   const l1address = tokenData.result.root_contract_address;
-  if (l1address === null) return undefined; // No L1 representation of this token
+  if (l1address === null) return { l1address: '', l2address }; // No L1 representation of this token
 
   return {
     l1address,
-    l2token: {
-      l2address,
-      decimals: tokenData.result.decimals,
-      name: tokenData.result.name,
-      symbol: tokenData.result.symbol,
-    },
+    l2address,
   };
 };
