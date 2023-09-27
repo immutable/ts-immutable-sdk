@@ -453,11 +453,11 @@ describe('Connect', () => {
 
     await checkout.buy({
       provider,
-      orderId: '1',
+      orders: [{ id: '1', takerFees: [] }],
     });
 
     expect(buy).toBeCalledTimes(1);
-    expect(buy).toBeCalledWith(checkout.config, provider, '1');
+    expect(buy).toBeCalledWith(checkout.config, provider, [{ id: '1', takerFees: [] }]);
   });
 
   it('should throw error for buy function if is production', async () => {
@@ -471,7 +471,7 @@ describe('Connect', () => {
 
     await expect(checkout.buy({
       provider,
-      orderId: '1',
+      orders: [{ id: '1' }],
     })).rejects.toThrow('This endpoint is not currently available.');
 
     expect(buy).toBeCalledTimes(0);
@@ -562,14 +562,14 @@ describe('Connect', () => {
 
     await checkout.cancel({
       provider,
-      orderId: '1234',
+      orderIds: ['1234'],
     });
 
     expect(cancel).toBeCalledTimes(1);
     expect(cancel).toBeCalledWith(
       checkout.config,
       provider,
-      '1234',
+      ['1234'],
     );
   });
 
@@ -583,7 +583,7 @@ describe('Connect', () => {
 
     await expect(checkout.cancel({
       provider,
-      orderId: '1234',
+      orderIds: ['1234'],
     })).rejects.toThrow('This endpoint is not currently available.');
 
     expect(cancel).toBeCalledTimes(0);
