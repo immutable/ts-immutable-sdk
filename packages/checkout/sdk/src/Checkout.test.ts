@@ -43,6 +43,7 @@ import { smartCheckout } from './smartCheckout';
 import { cancel } from './smartCheckout/cancel';
 import { FiatRampService } from './fiatRamp';
 import { FiatRampParams, ExchangeType } from './types/fiatRamp';
+import { getItemRequirementsFromRequirements } from './smartCheckout/itemRequirements';
 
 jest.mock('./connect');
 jest.mock('./network');
@@ -58,6 +59,7 @@ jest.mock('./smartCheckout/sell');
 jest.mock('./smartCheckout/cancel');
 jest.mock('./smartCheckout');
 jest.mock('./fiatRamp');
+jest.mock('./smartCheckout/itemRequirements');
 
 describe('Connect', () => {
   let providerMock: ExternalProvider;
@@ -595,6 +597,7 @@ describe('Connect', () => {
 
     (validateProvider as jest.Mock).mockResolvedValue(provider);
     (smartCheckout as jest.Mock).mockResolvedValue(smartCheckoutResult);
+    (getItemRequirementsFromRequirements as jest.Mock).mockResolvedValue([]);
 
     const checkout = new Checkout({
       baseConfig: { environment: Environment.SANDBOX },
