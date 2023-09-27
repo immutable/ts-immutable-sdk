@@ -36,3 +36,10 @@ interface PrimaryRevenueFailView extends ViewType {
   type: PrimaryRevenueWidgetViews.FAIL;
   reason?: string;
 }
+
+export enum FundWithSmartCheckoutSubViews {
+  INIT = 'INIT',
+  LOADING = 'LOADING',
+  FUNDING_ROUTE_SELECT = 'FUNDING_ROUTE_SELECT',
+  FUNDING_ROUTE_EXECUTE = 'FUNDING_ROUTE_EXECUTE',
+}
