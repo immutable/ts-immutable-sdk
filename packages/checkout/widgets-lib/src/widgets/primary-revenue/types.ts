@@ -54,3 +54,9 @@ export type SignOrderInput = {
   provider: Web3Provider | undefined;
   fromCurrency: string;
 };
+
+export enum StatusType {
+  SUCCESS = 'success',
+  FAILURE = 'failure',
+  WARNING = 'warning',
+}

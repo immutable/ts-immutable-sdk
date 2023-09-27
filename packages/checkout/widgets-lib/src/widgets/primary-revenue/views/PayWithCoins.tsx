@@ -12,11 +12,6 @@ import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { text as textConfig } from '../../../resources/text/textConfig';
 import { PrimaryRevenueWidgetViews } from '../../../context/view-context/PrimaryRevenueViewContextTypes';
 import { OrderList } from '../components/OrderList';
-import {
-  sendPrimaryRevenueFailedEvent,
-  sendPrimaryRevenueSuccessEvent,
-  sendPrimaryRevenueWidgetCloseEvent,
-} from '../PrimaryRevenuWidgetEvents';
 import { ViewContext } from '../../../context/view-context/ViewContext';
 import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 import { useSharedContext } from '../context/SharedContextProvider';
@@ -38,9 +33,9 @@ export function PayWithCoins(props: PayWithCoinsProps) {
     setLoading(true);
     try {
       const transactionHashes = await execute();
-      sendPrimaryRevenueSuccessEvent(transactionHashes);
+      // sendPrimaryRevenueSuccessEvent(transactionHashes);
     } catch (error) {
-      sendPrimaryRevenueFailedEvent((error as Error).message);
+      // sendPrimaryRevenueFailedEvent((error as Error).message);
     }
 
     setLoading(false);
@@ -56,7 +51,7 @@ export function PayWithCoins(props: PayWithCoinsProps) {
       header={(
         <HeaderNavigation
           title={text.header.heading}
-          onCloseButtonClick={() => sendPrimaryRevenueWidgetCloseEvent()}
+          onCloseButtonClick={() => {}}
         />
       )}
       footer={<FooterLogo />}

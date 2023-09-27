@@ -18,12 +18,14 @@ import {
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 
 import { PrimaryRevenueWidgetViews } from '../../context/view-context/PrimaryRevenueViewContextTypes';
-import { Item } from './types';
+import { Item, StatusType } from './types';
 import { widgetTheme } from '../../lib/theme';
 import { SharedContextProvider } from './context/SharedContextProvider';
 import { PaymentMethods } from './views/PaymentMethods';
 import { PayWithCard } from './views/PayWithCard';
 import { PayWithCoins } from './views/PayWithCoins';
+import { ConnectLoaderSuccess } from '../../components/ConnectLoader/ConnectLoaderSuccess';
+import { StatusView } from './components/Status/StatusView';
 
 export interface PrimaryRevenueWidgetProps {
   config: StrongCheckoutWidgetsConfig;
@@ -119,6 +121,28 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
           )}
           {viewState.view.type === PrimaryRevenueWidgetViews.PAY_WITH_COINS && (
             <PayWithCoins config={config} />
+          )}
+          {viewState.view.type === PrimaryRevenueWidgetViews.SUCCESS
+            && provider && (
+              <ConnectLoaderSuccess>
+                <StatusView
+                  statusText="Connection secure"
+                  actionText="Continue"
+                  onActionClick={() => {}}
+                  statusType={StatusType.SUCCESS}
+                  testId="success-view"
+                />
+              </ConnectLoaderSuccess>
+          )}
+          {viewState.view.type === PrimaryRevenueWidgetViews.FAIL && (
+            <StatusView
+              statusText={text.views[PrimaryRevenueWidgetViews.FAIL].text}
+              actionText={text.views[PrimaryRevenueWidgetViews.FAIL].actionText}
+              onActionClick={() => {}}
+              statusType={StatusType.FAILURE}
+              onCloseClick={() => {}}
+              testId="fail-view"
+            />
           )}
         </SharedContextProvider>
       </ViewContext.Provider>

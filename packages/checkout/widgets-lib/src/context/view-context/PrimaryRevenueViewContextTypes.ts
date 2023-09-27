@@ -5,8 +5,8 @@ export enum PrimaryRevenueWidgetViews {
   PAY_WITH_COINS = 'PAY_WITH_COINS',
   PAY_WITH_CARD = 'PAY_WITH_CARD',
   FUND_WITH_SMART_CHECKOUT = 'FUND_WITH_SMART_CHECKOUT',
-  SUCCESS = 'SUCCESS',
-  FAIL = 'FAIL',
+  SUCCESS = 'PURCHASE_SUCCESS',
+  FAIL = 'PURCHASE_FAIL',
 }
 
 export type PrimaryRevenueWidgetView =

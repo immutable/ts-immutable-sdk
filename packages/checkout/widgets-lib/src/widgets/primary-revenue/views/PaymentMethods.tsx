@@ -15,7 +15,6 @@ import {
   SharedViews,
 } from '../../../context/view-context/ViewContext';
 
-import { sendPrimaryRevenueWidgetCloseEvent } from '../PrimaryRevenuWidgetEvents';
 import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 
 type PaymentMethodsProps = {
@@ -76,7 +75,7 @@ export function PaymentMethods(props: PaymentMethodsProps) {
       testId="payment-methods"
       header={(
         <HeaderNavigation
-          onCloseButtonClick={() => sendPrimaryRevenueWidgetCloseEvent()}
+          onCloseButtonClick={() => {}}
         />
       )}
       footer={<FooterLogo />}
