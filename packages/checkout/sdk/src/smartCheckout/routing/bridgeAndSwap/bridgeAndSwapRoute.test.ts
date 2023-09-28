@@ -409,7 +409,7 @@ describe('bridgeAndSwapRoute', () => {
     );
   });
 
-  it('should return no bridge and swap routes', async () => {
+  it('should return no bridge and swap routes if no bridgeable and swappable tokens available', async () => {
     const insufficientRequirement: BalanceERC20Requirement = {
       type: ItemType.ERC20,
       sufficient: false,

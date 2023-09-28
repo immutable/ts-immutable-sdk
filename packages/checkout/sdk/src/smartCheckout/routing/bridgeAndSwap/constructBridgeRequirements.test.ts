@@ -256,9 +256,6 @@ describe('constructBridgeRequirements', () => {
       },
     );
 
-    console.log(
-      requirements[0].amount.toString(),
-    );
     expect(requirements).toEqual(
       [
         {
