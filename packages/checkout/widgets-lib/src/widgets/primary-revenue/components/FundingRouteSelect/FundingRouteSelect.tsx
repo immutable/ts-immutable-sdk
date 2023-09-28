@@ -10,6 +10,8 @@ import { FooterLogo } from '../../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../../components/SimpleLayout/SimpleLayout';
 import { FundingRouteDrawer } from '../FundingRouteSelectDrawer/FundingRouteDrawer';
+import { FundingRouteMenuItem } from '../FundingRouteMenuItem/FundingRouteMenuItem';
+import { PurchaseMenuItem } from '../PurchaseMenuItem/PurchaseMenuItem';
 
 type FundingRouteSelectProps = {
   fundingRoutes: any[];
@@ -28,8 +30,8 @@ export function FundingRouteSelect({ fundingRoutes }: FundingRouteSelectProps) {
     setSmartCheckoutDrawerVisible(false);
   };
 
-  const onSmartCheckoutDropdownClick = (event) => {
-    console.log('@@@@@ onSmartCheckoutDropdownClickevent', event);
+  const onSmartCheckoutDropdownClick = () => {
+    console.log('@@@@@ onSmartCheckoutDropdownClickevent');
     setSmartCheckoutDrawerVisible(true);
   };
 
@@ -48,39 +50,24 @@ export function FundingRouteSelect({ fundingRoutes }: FundingRouteSelectProps) {
           paddingX: 'base.spacing.x2',
           paddingY: 'base.spacing.x8',
           rowGap: 'base.spacing.x4',
+          height: '100%',
         }}
       >
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            paddingX: 'base.spacing.x2',
-            paddingY: 'base.spacing.x8',
-            rowGap: 'base.spacing.x4',
-          }}
-        >
-          <Heading size="small">
-            Pay with your
-          </Heading>
-          {fundingRoutes.length === 1
-            ? (fundingRoutes[activeFundingRouteIndex].steps[0].type)
-            : (
+        <Heading size="small">
+          Pay with your
+        </Heading>
 
-              <Select
-                defaultLabel={fundingRoutes[activeFundingRouteIndex].steps[0].type}
-                targetClickOveride={onSmartCheckoutDropdownClick}
-              />
+        <FundingRouteMenuItem
+          onClick={onSmartCheckoutDropdownClick}
+          fundingRoute={fundingRoutes[activeFundingRouteIndex]}
+          selected
+          toggleVisible={fundingRoutes.length > 1}
+        />
 
-            )}
+        {/* TODO add purchase data here */}
+        <PurchaseMenuItem />
 
-        </Box>
-
-        <Body size="small">
-          We’ll swap ETH for USDC to fund this purchase
-          <br />
-          Estimated fees:  USD $0.10
-        </Body>
-        <Button variant="primary" onClick={onClickContinue}>
+        <Button sx={{ mt: 'auto' }} variant="primary" onClick={onClickContinue}>
           {/* {options.continue.text} */}
           continue
         </Button>
