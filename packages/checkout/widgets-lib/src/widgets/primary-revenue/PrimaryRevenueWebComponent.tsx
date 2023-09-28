@@ -13,13 +13,32 @@ import { CustomAnalyticsProvider } from '../../context/analytics-provider/Custom
 import { Item } from './types';
 
 export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
+  /**
+   * Amount to be paid
+   */
   amount = '';
 
-  envId = '';
+  /**
+   * Environment ID: SANDBOX, PRODUCTION, DEV
+   */
+  env = '';
 
-  fromCurrency = '';
+  /**
+   * Immutable hub environment ID
+   */
+  environmentId = '';
 
-  items: Item[] = [];
+  /**
+   * Contract address of the token to be paid with
+   */
+  fromContractAddress = '';
+
+  /**
+   * Base64 encoded Item[]
+   */
+  products: string = '';
+
+  private items: Item[] = [];
 
   constructor() {
     console.log('ImmutablePrimaryRevenue constructor'); // eslint-disable-line no-console
@@ -31,9 +50,10 @@ export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
     return [
       ...baseObservedAttributes,
       'amount',
-      'envId',
-      'fromCurrency',
-      'items',
+      'products',
+      'fromContractAddress',
+      'env',
+      'environmentId',
     ];
   }
 
@@ -43,13 +63,20 @@ export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
     if (name === 'amount') {
       this.amount = newValue;
     }
-    if (name === 'envId') {
-      this.envId = newValue;
+
+    if (name === 'fromContractAddress') {
+      this.fromContractAddress = newValue;
     }
-    if (name === 'fromCurrency') {
-      this.fromCurrency = newValue;
+
+    if (name === 'env') {
+      this.env = newValue;
     }
-    if (name === 'items') {
+
+    if (name === 'environmentId') {
+      this.environmentId = newValue;
+    }
+
+    if (name === 'products') {
       this.setItems(newValue);
     }
   }
@@ -58,23 +85,28 @@ export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
     super.connectedCallback();
 
     this.amount = this.getAttribute('amount') ?? '';
-    this.envId = this.getAttribute('envId') ?? '';
-    this.fromCurrency = this.getAttribute('fromCurrency') ?? '';
+    this.env = this.getAttribute('env') ?? '';
+    this.environmentId = this.getAttribute('environmentId') ?? '';
+    this.fromContractAddress = this.getAttribute('fromContractAddress') ?? '';
 
-    const items = this.getAttribute('items') ?? '';
-    this.setItems(items);
+    const products = this.getAttribute('products') ?? '';
+    this.setItems(products);
   }
 
   private setItems(items: string) {
     if (items) {
       try {
-        this.items = JSON.parse(items);
+        this.items = JSON.parse(atob(this.products));
       } catch (error) {
         // eslint-disable-next-line no-console
-        console.error('Failed to parse items attribute:', error);
+        console.error('Failed to parse products attribute. It must be a base64 encoded Item[].', error);
         this.items = [];
       }
     }
+  }
+
+  private isValidProucts(): boolean {
+    return Array.isArray(JSON.parse(atob(this.products)));
   }
 
   validateInputs(): void {
@@ -84,22 +116,28 @@ export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
       this.amount = '';
     }
 
-    if (this.items.length === 0) {
+    if (this.isValidProucts()) {
       // eslint-disable-next-line no-console
-      console.warn('[IMTBL]: invalid "items" widget input');
+      console.warn('[IMTBL]: invalid "products" widget input. It must be a base64 encoded Item[]');
       this.items = [];
     }
 
-    if (!this.envId) {
+    if (!this.env) {
       // eslint-disable-next-line no-console
-      console.warn('[IMTBL]: invalid "envId" widget input');
-      this.envId = '';
+      console.warn('[IMTBL]: invalid "env" widget input');
+      this.env = '';
     }
 
-    if (!this.fromCurrency) {
+    if (!this.environmentId) {
       // eslint-disable-next-line no-console
-      console.warn('[IMTBL]: invalid "fromCurrency" widget input');
-      this.fromCurrency = '';
+      console.warn('[IMTBL]: invalid "environmentId" widget input');
+      this.environmentId = '';
+    }
+
+    if (!this.fromContractAddress) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "fromContractAddress" widget input');
+      this.fromContractAddress = '';
     }
   }
 
@@ -118,6 +156,7 @@ export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
     if (!this.reactRoot) {
       this.reactRoot = ReactDOM.createRoot(this);
     }
+
     this.reactRoot.render(
       <React.StrictMode>
         <CustomAnalyticsProvider widgetConfig={this.widgetConfig!}>
@@ -130,10 +169,11 @@ export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
           >
             <PrimaryRevenueWidget
               config={this.widgetConfig!}
-              envId={this.envId}
               items={this.items}
               amount={this.amount}
-              fromCurrency={this.fromCurrency}
+              fromContractAddress={this.fromContractAddress}
+              environmentId={this.environmentId}
+              env={this.env}
             />
           </ConnectLoader>
         </CustomAnalyticsProvider>

@@ -23,18 +23,19 @@ import { widgetTheme } from '../../lib/theme';
 
 export interface PrimaryRevenueWidgetProps {
   config: StrongCheckoutWidgetsConfig;
-  envId: string;
-  items: Item[];
   amount: string;
-  fromCurrency: string;
+  items: Item[];
+  fromContractAddress: string;
+  env: string;
+  environmentId: string;
 }
 
 export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
   const {
-    config, envId, items, amount, fromCurrency,
+    config, amount, items, fromContractAddress, env, environmentId,
   } = props;
 
-  console.info('PrimaryRevenueWidget props', envId, items, amount, fromCurrency);
+  console.log('@@@ PrimaryRevenueWidget', config, amount, items, fromContractAddress, env, environmentId);
 
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
