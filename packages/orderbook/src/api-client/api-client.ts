@@ -105,7 +105,7 @@ export class ImmutableApiClient {
         ],
         fees: makerFees.map((x) => ({
           amount: x.amount,
-          fee_type: FeeType.MAKER_MARKETPLACE as unknown as Fee.fee_type,
+          fee_type: FeeType.MAKER_ECOSYSTEM as unknown as Fee.fee_type,
           recipient: x.recipient,
         })),
         end_at: new Date(
