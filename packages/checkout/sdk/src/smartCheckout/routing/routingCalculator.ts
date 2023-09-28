@@ -163,8 +163,6 @@ export const getBridgeAndSwapFundingSteps = async (
     return [];
   }
 
-  console.log(bridgeableL1Addresses);
-
   const routes = await bridgeAndSwapRoute(
     config,
     readOnlyProviders,
