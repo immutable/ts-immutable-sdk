@@ -95,7 +95,7 @@ export type BuyToken = NativeBuyToken | ERC20BuyToken;
 /**
  * Represents a native buy token
  * @property {ItemType} type - The type indicate this is a native token.
- * @property {BigNumber} amount - The amount of native token.
+ * @property {string} amount - The amount of native token.
  */
 type NativeBuyToken = {
   type: ItemType.NATIVE;
@@ -105,7 +105,7 @@ type NativeBuyToken = {
 /**
  * Represents a ERC20 buy token
  * @property {ItemType} type - The type indicate this is a ERC20 token.
- * @property {BigNumber} amount - The amount of native token.
+ * @property {string} amount - The amount of native token.
  * @property {string} contractAddress - The contract address of the ERC20.
  */
 type ERC20BuyToken = {

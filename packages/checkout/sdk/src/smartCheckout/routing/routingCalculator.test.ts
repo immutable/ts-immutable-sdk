@@ -2,7 +2,7 @@ import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { TokenInfo } from '@imtbl/dex-sdk';
-import { getSwapFundingStep, routingCalculator } from './routingCalculator';
+import { getSwapFundingSteps, routingCalculator } from './routingCalculator';
 import { CheckoutConfiguration } from '../../config';
 import { getAllTokenBalances } from './tokenBalances';
 import {
@@ -408,7 +408,7 @@ describe('routingCalculator', () => {
 
     (bridgeRoute as jest.Mock).mockResolvedValue(undefined);
 
-    (swapRoute as jest.Mock).mockResolvedValue({
+    (swapRoute as jest.Mock).mockResolvedValue([{
       type: FundingRouteType.SWAP,
       chainId: ChainId.IMTBL_ZKEVM_TESTNET,
       asset: {
@@ -421,7 +421,7 @@ describe('routingCalculator', () => {
           address: '0xERC20_2',
         },
       },
-    });
+    }]);
 
     (createReadOnlyProviders as jest.Mock).mockResolvedValue(new Map([
       [ChainId.SEPOLIA, {} as JsonRpcProvider],
@@ -453,6 +453,198 @@ describe('routingCalculator', () => {
                 symbol: 'ERC20',
                 decimals: 18,
                 address: '0xERC20_2',
+              },
+            },
+          }],
+        }],
+      });
+  });
+
+  it('should return multiple swap funding steps', async () => {
+    (allowListCheck as jest.Mock).mockImplementation(() => (
+      {
+        onRamp: [],
+        swap: [
+          {
+            name: 'ERC20_1',
+            symbol: 'ERC20_1',
+            decimals: 18,
+            address: '0xERC20_1',
+          },
+          {
+            name: 'ERC20_2',
+            symbol: 'ERC20_2',
+            decimals: 18,
+            address: '0xERC20_2',
+          },
+          {
+            name: 'ERC20_3',
+            symbol: 'ERC20_3',
+            decimals: 18,
+            address: '0xERC20_3',
+          },
+        ],
+      }
+    ));
+
+    const balanceERC20Requirement = {
+      type: ItemType.ERC20,
+      sufficient: false,
+      delta: {
+        balance: BigNumber.from(1),
+        formattedBalance: '1',
+      },
+      current: {
+        type: ItemType.ERC20,
+        balance: BigNumber.from(1),
+        formattedBalance: '1',
+        token: {
+          name: 'ERC20_1',
+          symbol: 'ERC20_1',
+          decimals: 18,
+          address: '0xERC20_1',
+        },
+      },
+      required: {
+        type: ItemType.ERC20,
+        balance: BigNumber.from(2),
+        formattedBalance: '2',
+        token: {
+          name: 'ERC20_1',
+          symbol: 'ERC20_1',
+          decimals: 18,
+          address: '0xERC20_1',
+        },
+      },
+    } as BalanceRequirement;
+
+    const balanceRequirements = {
+      sufficient: false,
+      balanceRequirements: [balanceERC20Requirement],
+    };
+
+    const availableRoutingOptions = {
+      onRamp: true,
+      swap: true,
+      bridge: true,
+    };
+
+    (getAllTokenBalances as jest.Mock).mockResolvedValue(new Map([
+      [ChainId.SEPOLIA, []],
+      [ChainId.IMTBL_ZKEVM_TESTNET, {
+        success: true,
+        balances: [
+          {
+            balance: BigNumber.from(10),
+            formattedBalance: '10',
+            token: {
+              name: 'ERC20',
+              symbol: 'ERC20',
+              decimals: 18,
+              address: '0xERC20_2',
+            },
+          },
+          {
+            balance: BigNumber.from(10),
+            formattedBalance: '10',
+            token: {
+              name: 'ERC20_3',
+              symbol: 'ERC20_3',
+              decimals: 18,
+              address: '0xERC20_3',
+            },
+          },
+          {
+            balance: BigNumber.from(10),
+            formattedBalance: '10',
+            token: {
+              name: 'IMX',
+              symbol: 'IMX',
+              decimals: 18,
+              address: IMX_ADDRESS_ZKEVM,
+            },
+          },
+        ],
+      }],
+    ]));
+
+    (bridgeRoute as jest.Mock).mockResolvedValue(undefined);
+
+    (swapRoute as jest.Mock).mockResolvedValue([{
+      type: FundingRouteType.SWAP,
+      chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+      asset: {
+        balance: BigNumber.from(10),
+        formattedBalance: '10',
+        token: {
+          name: 'ERC20',
+          symbol: 'ERC20',
+          decimals: 18,
+          address: '0xERC20_2',
+        },
+      },
+    },
+    {
+      type: FundingRouteType.SWAP,
+      chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+      asset: {
+        balance: BigNumber.from(10),
+        formattedBalance: '10',
+        token: {
+          name: 'ERC20_3',
+          symbol: 'ERC20_3',
+          decimals: 18,
+          address: '0xERC20_3',
+        },
+      },
+    }]);
+
+    (createReadOnlyProviders as jest.Mock).mockResolvedValue(new Map([
+      [ChainId.SEPOLIA, {} as JsonRpcProvider],
+      [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
+    ]));
+
+    const routingOptions = await routingCalculator(
+      config,
+      '0x123',
+      balanceRequirements,
+      availableRoutingOptions,
+    );
+    expect(routingOptions)
+      .toEqual({
+        response: {
+          type: RouteCalculatorType.ROUTES_FOUND,
+          message: 'Routes found',
+        },
+        fundingRoutes: [{
+          priority: 1,
+          steps: [{
+            type: FundingRouteType.SWAP,
+            chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+            asset: {
+              balance: BigNumber.from(10),
+              formattedBalance: '10',
+              token: {
+                name: 'ERC20',
+                symbol: 'ERC20',
+                decimals: 18,
+                address: '0xERC20_2',
+              },
+            },
+          }],
+        }, {
+          priority: 1,
+          steps: [{
+            type: FundingRouteType.SWAP,
+            chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+            asset: {
+              balance: BigNumber.from(10),
+              formattedBalance: '10',
+              token: {
+                name: 'ERC20_3',
+                symbol: 'ERC20_3',
+                decimals: 18,
+                address: '0xERC20_3',
               },
             },
           }],
@@ -710,7 +902,7 @@ describe('routingCalculator', () => {
       },
     });
 
-    (swapRoute as jest.Mock).mockResolvedValue({
+    (swapRoute as jest.Mock).mockResolvedValue([{
       type: FundingRouteType.SWAP,
       chainId: ChainId.IMTBL_ZKEVM_TESTNET,
       asset: {
@@ -723,7 +915,7 @@ describe('routingCalculator', () => {
           address: '0xERC20_2',
         },
       },
-    });
+    }]);
 
     (createReadOnlyProviders as jest.Mock).mockResolvedValue(new Map([
       [ChainId.SEPOLIA, {} as JsonRpcProvider],
@@ -986,7 +1178,7 @@ describe('routingCalculator', () => {
 
   describe('getSwapFundingStep', () => {
     it('should recommend swap funding step', async () => {
-      (swapRoute as jest.Mock).mockResolvedValue({
+      (swapRoute as jest.Mock).mockResolvedValue([{
         type: FundingRouteType.SWAP,
         chainId: ChainId.IMTBL_ZKEVM_TESTNET,
         asset: {
@@ -999,7 +1191,7 @@ describe('routingCalculator', () => {
             address: '0xERC20_2',
           },
         },
-      });
+      }]);
 
       const balanceRequirement = {
         type: ItemType.ERC20,
@@ -1060,7 +1252,7 @@ describe('routingCalculator', () => {
         }],
       ]);
 
-      const swapFundingStep = await getSwapFundingStep(
+      const swapFundingSteps = await getSwapFundingSteps(
         config,
         { swap: true },
         balanceRequirement,
@@ -1083,7 +1275,7 @@ describe('routingCalculator', () => {
         ],
       );
 
-      expect(swapFundingStep).toEqual({
+      expect(swapFundingSteps).toEqual([{
         type: FundingRouteType.SWAP,
         chainId: ChainId.IMTBL_ZKEVM_TESTNET,
         asset: {
@@ -1096,10 +1288,10 @@ describe('routingCalculator', () => {
             address: '0xERC20_2',
           },
         },
-      });
+      }]);
     });
 
-    it('should return undefined if the insufficient requirement is undefined', async () => {
+    it('should return empty array if the insufficient requirement is undefined', async () => {
       const balances = new Map<ChainId, TokenBalanceResult>([
         [ChainId.IMTBL_ZKEVM_TESTNET, {
           success: true,
@@ -1128,7 +1320,7 @@ describe('routingCalculator', () => {
         }],
       ]);
 
-      const swapFundingStep = await getSwapFundingStep(
+      const swapFundingSteps = await getSwapFundingSteps(
         config,
         { swap: true },
         undefined,
@@ -1151,10 +1343,10 @@ describe('routingCalculator', () => {
         ],
       );
 
-      expect(swapFundingStep).toBeUndefined();
+      expect(swapFundingSteps).toEqual([]);
     });
 
-    it('should return undefined if no token balances for L2', async () => {
+    it('should return empty array if no token balances for L2', async () => {
       const balanceRequirement = {
         type: ItemType.ERC20,
         sufficient: false,
@@ -1214,7 +1406,7 @@ describe('routingCalculator', () => {
         }],
       ]);
 
-      const swapFundingStep = await getSwapFundingStep(
+      const swapFundingSteps = await getSwapFundingSteps(
         config,
         { swap: true },
         balanceRequirement,
@@ -1237,10 +1429,10 @@ describe('routingCalculator', () => {
         ],
       );
 
-      expect(swapFundingStep).toBeUndefined();
+      expect(swapFundingSteps).toEqual([]);
     });
 
-    it('should return undefined if token balance result error', async () => {
+    it('should return empty array if token balance result error', async () => {
       const balanceRequirement = {
         type: ItemType.ERC20,
         sufficient: false,
@@ -1301,7 +1493,7 @@ describe('routingCalculator', () => {
         }],
       ]);
 
-      const swapFundingStep = await getSwapFundingStep(
+      const swapFundingSteps = await getSwapFundingSteps(
         config,
         { swap: true },
         balanceRequirement,
@@ -1324,10 +1516,10 @@ describe('routingCalculator', () => {
         ],
       );
 
-      expect(swapFundingStep).toBeUndefined();
+      expect(swapFundingSteps).toEqual([]);
     });
 
-    it('should return undefined if token balance result failed', async () => {
+    it('should return empty array if token balance result failed', async () => {
       const balanceRequirement = {
         type: ItemType.ERC20,
         sufficient: false,
@@ -1387,7 +1579,7 @@ describe('routingCalculator', () => {
         }],
       ]);
 
-      const swapFundingStep = await getSwapFundingStep(
+      const swapFundingSteps = await getSwapFundingSteps(
         config,
         { swap: true },
         balanceRequirement,
@@ -1410,10 +1602,10 @@ describe('routingCalculator', () => {
         ],
       );
 
-      expect(swapFundingStep).toBeUndefined();
+      expect(swapFundingSteps).toEqual([]);
     });
 
-    it('should return undefined if no swappable tokens', async () => {
+    it('should return empty array if no swappable tokens', async () => {
       (swapRoute as jest.Mock).mockResolvedValue({
         type: FundingRouteType.SWAP,
         chainId: ChainId.IMTBL_ZKEVM_TESTNET,
@@ -1488,7 +1680,7 @@ describe('routingCalculator', () => {
         }],
       ]);
 
-      const swapFundingStep = await getSwapFundingStep(
+      const swapFundingSteps = await getSwapFundingSteps(
         config,
         { swap: true },
         balanceRequirement,
@@ -1498,7 +1690,7 @@ describe('routingCalculator', () => {
         [],
       );
 
-      expect(swapFundingStep).toBeUndefined();
+      expect(swapFundingSteps).toEqual([]);
     });
   });
 });

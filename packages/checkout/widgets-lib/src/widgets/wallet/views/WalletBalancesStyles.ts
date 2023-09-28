@@ -14,11 +14,9 @@ export const walletBalanceContainerStyles = {
 };
 
 export const walletBalanceLoadingIconStyles = {
-  height: '100%',
   display: 'flex',
   flexDirection: 'column',
-  justifyContent: 'center',
-  alignItems: 'center',
+  rowGap: 'base.spacing.x2',
 };
 
 export const walletBalanceListContainerStyles = (showNetworkMenu: boolean, showAddCoins: boolean) => {

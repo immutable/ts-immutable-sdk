@@ -1,10 +1,12 @@
 import {
   Checkout,
-  FulfilmentTransaction,
+  ERC20ItemRequirement,
+  ERC721ItemRequirement,
+  FulfillmentTransaction,
   GasAmount,
   GasTokenType,
-  ItemRequirement,
   ItemType,
+  NativeItemRequirement,
   TransactionOrGasType,
 } from '@imtbl/checkout-sdk';
 import {
@@ -23,9 +25,9 @@ interface SmartCheckoutProps {
 }
 
 export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) => {
-  const [itemRequirements, setItemRequirements] = useState<ItemRequirement[]>([]);
+  const [itemRequirements, setItemRequirements] = useState<(NativeItemRequirement | ERC20ItemRequirement | ERC721ItemRequirement)[]>([]);
   const [itemRequirementsError, setItemRequirementsError] = useState<string>('');
-  const [transactionOrGasAmount, setTransactionOrGasAmount] = useState<FulfilmentTransaction | GasAmount>(
+  const [transactionOrGasAmount, setTransactionOrGasAmount] = useState<FulfillmentTransaction | GasAmount>(
     {
       type: TransactionOrGasType.GAS,
       gasToken: {
@@ -148,7 +150,7 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
     }
   }
 
-  const updateItemRequirements = (itemRequirement: ItemRequirement) => {
+  const updateItemRequirements = (itemRequirement: (NativeItemRequirement | ERC20ItemRequirement | ERC721ItemRequirement)) => {
     setItemRequirements([...itemRequirements, itemRequirement]);
   }
 
@@ -161,10 +163,9 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
       setAmountError('Amount is required for native token');
       return;
     }
-    const bn = parseUnits(amount);
     updateItemRequirements({
       type: ItemType.NATIVE,
-      amount: bn,
+      amount
     });
   }
 
@@ -181,10 +182,10 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
     if (!amount || !contractAddress || !spenderAddress) {
       return;
     }
-    const bn = parseUnits(amount);
+
     updateItemRequirements({
       type: ItemType.ERC20,
-      amount: bn,
+      amount,
       contractAddress,
       spenderAddress,
     });
@@ -228,13 +229,13 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
   const clearItemRequirements = () => {
     setItemRequirements([]);
   }
-  const getItemRequirementRow = (item: ItemRequirement, index: number) => {
+  const getItemRequirementRow = (item: (NativeItemRequirement | ERC20ItemRequirement | ERC721ItemRequirement), index: number) => {
     switch (item.type) {
       case ItemType.NATIVE:
         return (
           <tr key={index}>
             <td>{item.type}</td>
-            <td>{utils.formatUnits(item.amount, 18)}</td>
+            <td>{item.amount}</td>
             <td></td>
             <td></td>
             <td></td>
@@ -244,7 +245,7 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
         return (
           <tr key={index}>
             <td>{item.type}</td>
-            <td>{utils.formatUnits(item.amount, 18)}</td>
+            <td>{item.amount}</td>
             <td></td>
             <td>{item.contractAddress}</td>
             <td>{item.spenderAddress}</td>
@@ -339,7 +340,7 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
               <Option optionKey="erc721">
                 <Option.Label>ERC721</Option.Label>
               </Option>
-            </Select>  
+            </Select>
             </td>
             <td>
               <FormControl validationStatus={amountError ? 'error' : 'success'}>

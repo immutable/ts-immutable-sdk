@@ -48,14 +48,16 @@ const useParams = () => {
 
   const login = urlParams.get('login') as string;
   const amount = urlParams.get('amount') as string;
-  const envId = urlParams.get('envId') as string;
-  const fromCurrency = urlParams.get('fromCurrency') as string;
+  const environmentId = urlParams.get('environmentId') as string;
+  const env = urlParams.get('env') as string;
+  const fromContractAddress = urlParams.get('fromContractAddress') as string;
 
   return {
     login,
     amount,
-    envId,
-    fromCurrency,
+    env,
+    environmentId,
+    fromContractAddress,
   };
 };
 
@@ -90,7 +92,7 @@ const usePassportInstance = (passportConfig: any) => {
 function PrimaryRevenueWebView() {
   const params = useParams();
   const {
-    login, amount, envId, fromCurrency,
+    login, amount, env, environmentId, fromContractAddress,
   } = params;
   const [passportOn, setPassportOn] = useState(false);
   const [passportConfig, setPassportConfig] = useState(
@@ -205,9 +207,10 @@ function PrimaryRevenueWebView() {
         <imtbl-primary-revenue
           widgetConfig={JSON.stringify(widgetConfig)}
           amount={amount}
-          envId={envId}
-          fromCurrency={fromCurrency}
-          items={items}
+          products={btoa(JSON.stringify(items))}
+          fromContractAddress={fromContractAddress}
+          environmentId={environmentId}
+          env={env}
         />
       ) : undefined}
 
@@ -229,6 +232,10 @@ function PrimaryRevenueWebView() {
       <br />
       <br />
       <h3>Items</h3>
+      <p>
+        base64 encoded:
+        {btoa(JSON.stringify(items))}
+      </p>
       <textarea
         rows={20}
         cols={80}

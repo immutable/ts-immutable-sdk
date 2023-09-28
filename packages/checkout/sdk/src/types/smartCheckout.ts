@@ -6,13 +6,32 @@ import { TokenInfo } from './tokenInfo';
  * Interface representing the parameters for {@link Checkout.smartCheckout}
  * @property {Web3Provider} provider - The provider to use for smart checkout.
  * @property {ItemRequirement[]} itemRequirements - The item requirements for the transaction.
- * @property {FulfilmentTransaction | GasAmount} transactionOrGasAmount - The transaction or gas amount.
+ * @property {FulfillmentTransaction | GasAmount} transactionOrGasAmount - The transaction or gas amount.
  */
 export interface SmartCheckoutParams {
   provider: Web3Provider;
-  itemRequirements: ItemRequirement[];
-  transactionOrGasAmount: FulfilmentTransaction | GasAmount,
+  itemRequirements: (NativeItemRequirement | ERC20ItemRequirement | ERC721ItemRequirement)[];
+  transactionOrGasAmount: FulfillmentTransaction | GasAmount,
 }
+
+export type NativeItemRequirement = {
+  type: ItemType.NATIVE;
+  amount: string;
+};
+
+export type ERC20ItemRequirement = {
+  type: ItemType.ERC20;
+  contractAddress: string;
+  amount: string;
+  spenderAddress: string,
+};
+
+export type ERC721ItemRequirement = {
+  type: ItemType.ERC721;
+  contractAddress: string;
+  id: string;
+  spenderAddress: string,
+};
 
 /**
  * Represents the item requirements for a transaction.
@@ -83,11 +102,11 @@ export enum TransactionOrGasType {
 }
 
 /**
- * The fulfilment transaction which contains the transaction to send.
- * @property {TransactionOrGasType} type - The type to indicate this is a fulfilment transaction.
+ * The fulfillment transaction which contains the transaction to send.
+ * @property {TransactionOrGasType} type - The type to indicate this is a fulfillment transaction.
  * @property {TransactionRequest} transaction - The transaction to send.
  */
-export type FulfilmentTransaction = {
+export type FulfillmentTransaction = {
   type: TransactionOrGasType.TRANSACTION;
   transaction: TransactionRequest;
 };
