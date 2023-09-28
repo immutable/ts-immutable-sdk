@@ -2,7 +2,7 @@
 /* eslint-disable no-underscore-dangle */
 import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
 import { TypedDataDomain } from 'ethers';
-import { signApprovalTransactions, signFulfilmentTransactions, signMessage } from './signActions';
+import { signApprovalTransactions, signFulfillmentTransactions, signMessage } from './signActions';
 import { CheckoutErrorType } from '../../errors';
 import { SignTransactionStatusType, UnsignedMessage } from './types';
 
@@ -108,8 +108,8 @@ describe('signActions', () => {
     });
   });
 
-  describe('signFulfilmentTransactions', () => {
-    it('should sign fulfilment transactions', async () => {
+  describe('signFulfillmentTransactions', () => {
+    it('should sign fulfillment transactions', async () => {
       mockProvider = {
         getSigner: jest.fn().mockReturnValue({
           sendTransaction: jest.fn().mockResolvedValue({
@@ -123,22 +123,22 @@ describe('signActions', () => {
       const approvalTransactions: TransactionRequest[] = [
         {
           to: '0x123',
-          data: '0xFULFILMENT1',
+          data: '0xFULFILLMENT1',
         },
         {
           to: '0x123',
-          data: '0xFULFILMENT2',
+          data: '0xFULFILLMENT2',
         },
       ];
 
-      await signFulfilmentTransactions(mockProvider, approvalTransactions);
+      await signFulfillmentTransactions(mockProvider, approvalTransactions);
       expect(mockProvider.getSigner().sendTransaction).toHaveBeenCalledTimes(2);
       expect(mockProvider.getSigner().sendTransaction).toHaveBeenCalledWith({
-        data: '0xFULFILMENT1',
+        data: '0xFULFILLMENT1',
         to: '0x123',
       });
       expect(mockProvider.getSigner().sendTransaction).toHaveBeenCalledWith({
-        data: '0xFULFILMENT2',
+        data: '0xFULFILLMENT2',
         to: '0x123',
       });
     });
@@ -155,32 +155,32 @@ describe('signActions', () => {
         }),
       } as unknown as Web3Provider;
 
-      const fulfilmentTransactions: TransactionRequest[] = [
+      const fulfillmentTransactions: TransactionRequest[] = [
         {
           to: '0x123',
           data: '0xAPPROVAL1',
         },
       ];
 
-      const result = await signFulfilmentTransactions(mockProvider, fulfilmentTransactions);
+      const result = await signFulfillmentTransactions(mockProvider, fulfillmentTransactions);
       expect(result).toEqual({
         type: SignTransactionStatusType.FAILED,
         transactionHash: '0xHASH',
-        reason: 'Fulfilment transaction failed and was reverted',
+        reason: 'Fulfillment transaction failed and was reverted',
       });
     });
 
-    it('should throw error when sending the fulfilment transaction errors', async () => {
+    it('should throw error when sending the fulfillment transaction errors', async () => {
       mockProvider = {
         getSigner: jest.fn().mockReturnValue({
-          sendTransaction: jest.fn().mockRejectedValue(new Error('fulfilment error')),
+          sendTransaction: jest.fn().mockRejectedValue(new Error('fulfillment error')),
         }),
       } as unknown as Web3Provider;
 
       const approvalTransactions: TransactionRequest[] = [
         {
           to: '0x123',
-          data: '0xFULFILMENT1',
+          data: '0xFULFILLMENT1',
         },
       ];
 
@@ -189,17 +189,17 @@ describe('signActions', () => {
       let data;
 
       try {
-        await signFulfilmentTransactions(mockProvider, approvalTransactions);
+        await signFulfillmentTransactions(mockProvider, approvalTransactions);
       } catch (err: any) {
         message = err.message;
         type = err.type;
         data = err.data;
       }
 
-      expect(message).toEqual('An error occurred while executing the fulfilment transaction');
-      expect(type).toEqual(CheckoutErrorType.EXECUTE_FULFILMENT_TRANSACTION_ERROR);
+      expect(message).toEqual('An error occurred while executing the fulfillment transaction');
+      expect(type).toEqual(CheckoutErrorType.EXECUTE_FULFILLMENT_TRANSACTION_ERROR);
       expect(data).toEqual({
-        message: 'fulfilment error',
+        message: 'fulfillment error',
       });
     });
   });

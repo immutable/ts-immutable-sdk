@@ -44,21 +44,21 @@ export const signApprovalTransactions = async (
   };
 };
 
-export const signFulfilmentTransactions = async (
+export const signFulfillmentTransactions = async (
   provider: Web3Provider,
-  fulfilmentTransactions: TransactionRequest[],
+  fulfillmentTransactions: TransactionRequest[],
 ): Promise<SignTransactionResult> => {
   let receipts: TransactionReceipt[] = [];
 
   try {
-    const response = await Promise.all(fulfilmentTransactions.map(
+    const response = await Promise.all(fulfillmentTransactions.map(
       (transaction) => provider.getSigner().sendTransaction(transaction),
     ));
     receipts = await Promise.all(response.map((transaction) => transaction.wait()));
   } catch (err: any) {
     throw new CheckoutError(
-      'An error occurred while executing the fulfilment transaction',
-      CheckoutErrorType.EXECUTE_FULFILMENT_TRANSACTION_ERROR,
+      'An error occurred while executing the fulfillment transaction',
+      CheckoutErrorType.EXECUTE_FULFILLMENT_TRANSACTION_ERROR,
       {
         message: err.message,
       },
@@ -70,7 +70,7 @@ export const signFulfilmentTransactions = async (
       return {
         type: SignTransactionStatusType.FAILED,
         transactionHash: receipt.transactionHash,
-        reason: 'Fulfilment transaction failed and was reverted',
+        reason: 'Fulfillment transaction failed and was reverted',
       };
     }
   }
