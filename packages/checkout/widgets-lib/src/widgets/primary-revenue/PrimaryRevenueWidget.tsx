@@ -25,7 +25,7 @@ import { PaymentMethods } from './views/PaymentMethods';
 import { PayWithCard } from './views/PayWithCard';
 import { PayWithCoins } from './views/PayWithCoins';
 import { ConnectLoaderSuccess } from '../../components/ConnectLoader/ConnectLoaderSuccess';
-import { StatusView } from './components/Status/StatusView';
+import { StatusView } from '../../components/Status/StatusView';
 
 export interface PrimaryRevenueWidgetProps {
   config: StrongCheckoutWidgetsConfig;
@@ -138,7 +138,9 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
             <StatusView
               statusText={text.views[PrimaryRevenueWidgetViews.FAIL].text}
               actionText={text.views[PrimaryRevenueWidgetViews.FAIL].actionText}
-              optionalText={text.views[PrimaryRevenueWidgetViews.FAIL].optionalText}
+              optionalText={
+                text.views[PrimaryRevenueWidgetViews.FAIL].optionalText
+              }
               onActionClick={() => {}}
               onOptionalActionClick={() => {}}
               statusType={StatusType.FAILURE}
