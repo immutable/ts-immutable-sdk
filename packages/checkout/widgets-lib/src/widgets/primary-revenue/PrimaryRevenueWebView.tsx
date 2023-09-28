@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Environment } from '@imtbl/config';
 import { config, passport } from '@imtbl/sdk';
 
@@ -48,14 +48,16 @@ const useParams = () => {
 
   const login = urlParams.get('login') as string;
   const amount = urlParams.get('amount') as string;
-  const envId = urlParams.get('envId') as string;
-  const fromCurrency = urlParams.get('fromCurrency') as string;
+  const environmentId = urlParams.get('environmentId') as string;
+  const env = urlParams.get('env') as string;
+  const fromContractAddress = urlParams.get('fromContractAddress') as string;
 
   return {
     login,
     amount,
-    envId,
-    fromCurrency,
+    env,
+    environmentId,
+    fromContractAddress,
   };
 };
 
@@ -90,14 +92,14 @@ const usePassportInstance = (passportConfig: any) => {
 function PrimaryRevenueWebView() {
   const params = useParams();
   const {
-    login, amount, envId, fromCurrency,
+    login, amount, env, environmentId, fromContractAddress,
   } = params;
-  const [passportOn, setPassportOn] = useState(false);
   const [passportConfig, setPassportConfig] = useState(
     JSON.stringify(defaultPassportConfig, null, 2),
   );
   const [items, setItems] = useState(JSON.stringify(defaultItems, null, 2));
   const [showWidget, setShowWidget] = useState(true);
+  const ref = useRef<ImmutableWebComponent>(null);
 
   const handlePassportConfigChange = (e: any) => {
     setPassportConfig(e.target.value);
@@ -151,14 +153,10 @@ function PrimaryRevenueWebView() {
   }) as EventListener;
 
   useEffect(() => {
-    if (!passportOn) return;
-
-    const primaryRevenueElement = document.querySelector<ImmutableWebComponent>(
-      'imtbl-primary-revenue',
-    );
+    const widget = ref.current;
     const passportInstance = usePassportInstance(JSON.parse(passportConfig));
-    primaryRevenueElement?.addPassportOption(passportInstance as any);
-  }, [passportOn, passportConfig, items]);
+    widget?.addPassportOption(passportInstance as any);
+  }, [passportConfig, items]);
 
   useEffect(() => {
     const passportInstance = usePassportInstance(JSON.parse(passportConfig));
@@ -199,22 +197,22 @@ function PrimaryRevenueWebView() {
     environment: Environment.SANDBOX,
   };
 
+  const products = btoa(JSON.stringify(JSON.parse(items)));
+
   return (
     <>
       {showWidget ? (
         <imtbl-primary-revenue
+          ref={ref}
           widgetConfig={JSON.stringify(widgetConfig)}
           amount={amount}
-          envId={envId}
-          fromCurrency={fromCurrency}
-          items={items}
+          products={products}
+          fromContractAddress={fromContractAddress}
+          environmentId={environmentId}
+          env={env}
         />
       ) : undefined}
 
-      <br />
-      <button type="button" onClick={() => setPassportOn(true)}>
-        Passport On
-      </button>
       <br />
       <br />
       <br />

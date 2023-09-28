@@ -14,16 +14,18 @@ import {
 
 const PRIMARY_SALES_API_BASE_URL = {
   [Environment.SANDBOX]:
-    'https://game-primary-sales.sandbox.imtbl.com/v1/games/:gameId/order/sign',
+    'https://api.sandbox.immutable.com/v1/primary-sales/:environmentId/order/sign',
   [Environment.PRODUCTION]:
-    'https://game-primary-sales.imtbl.com/v1/games/:gameId/order/sign',
+    'https://api.immutable.com/v1/primary-sales/:environmentId/order/sign',
 };
 
+// TODO: this should be removed after next version of the /sign/order API is released
 const X_IMMUTABLE_API_KEY = 'sk_imapik-Ekz6cLnnwREtqjGn$xo6_fb97b8';
 
 type SignApiResponse = {
   order: {
     currency: string;
+    currency_symbol: string;
     products: {
       detail: {
         amount: number;
@@ -98,12 +100,12 @@ const toSignResponse = (
 
 export const useSignOrder = (input: SignOrderInput) => {
   const {
-    environment,
-    gameId,
-    items,
-    fromCurrency,
     provider,
+    items,
+    fromContractAddress,
     recipientAddress,
+    env,
+    environmentId,
   } = input;
   const [signResponse, setSignResponse] = useState<SignResponse | undefined>(
     undefined,
@@ -145,13 +147,13 @@ export const useSignOrder = (input: SignOrderInput) => {
     async (paymentType: PaymentTypes): Promise<SignResponse | undefined> => {
       console.log('@@@ paymentType', paymentType);
 
-      if (!provider || !recipientAddress || !fromCurrency || !items.length) {
+      if (!provider || !recipientAddress || !fromContractAddress || !items.length) {
         return undefined;
       }
 
       const data = {
         recipient_address: recipientAddress,
-        currency: fromCurrency,
+        contractAddress: fromContractAddress,
         payment_type: paymentType,
         products: items.map((item) => ({
           product_id: item.productId,
@@ -160,9 +162,9 @@ export const useSignOrder = (input: SignOrderInput) => {
       };
 
       try {
-        const baseUrl = PRIMARY_SALES_API_BASE_URL[environment].replace(
-          ':gameId',
-          gameId,
+        const baseUrl = PRIMARY_SALES_API_BASE_URL[env].replace(
+          ':environmentId',
+          environmentId,
         );
         const response = await fetch(baseUrl, {
           method: 'POST',
@@ -186,7 +188,7 @@ export const useSignOrder = (input: SignOrderInput) => {
       }
       return undefined;
     },
-    [items, fromCurrency, recipientAddress, environment, gameId],
+    [items, fromContractAddress, recipientAddress, environmentId, env],
   );
 
   const execute = useCallback(async (): Promise<PrimaryRevenueSuccess> => {

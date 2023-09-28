@@ -15,25 +15,19 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Fee } from './fee';
+import { RefreshMetadataByID } from './refresh-metadata-by-id';
 
 /**
- * 
+ * Request body for refreshing metadata by id
  * @export
- * @interface FulfillmentDataRequest
+ * @interface RefreshMetadataByIDRequest
  */
-export interface FulfillmentDataRequest {
+export interface RefreshMetadataByIDRequest {
     /**
      * 
-     * @type {string}
-     * @memberof FulfillmentDataRequest
+     * @type {Array<RefreshMetadataByID>}
+     * @memberof RefreshMetadataByIDRequest
      */
-    'order_id': string;
-    /**
-     * 
-     * @type {Array<Fee>}
-     * @memberof FulfillmentDataRequest
-     */
-    'fees': Array<Fee>;
+    'metadata'?: Array<RefreshMetadataByID>;
 }
 

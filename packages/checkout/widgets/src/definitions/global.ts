@@ -142,6 +142,11 @@ export interface ImtblOnRampProps
  * @interface ImtblPrimaryRevenueProps
  * @extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>
  * @property {string | undefined} widgetConfig - Optional string representing the widget configuration.
+ * @property {string | undefined} amount - The amount to be paid.
+ * @property {string | undefined} products - A base64 encoded string of the array of items to be purchased.
+ * @property {string | undefined} fromContractAddress - The contract address of the token to pay with.
+ * @property {string | undefined} env - The environment to use: SANDBOX, DEV, PRODUCTION, ...
+ * @property {string | undefined} environmentId - The environment id from Immutable Hub.
  */
 export interface ImtblPrimaryRevenueProps
   extends React.DetailedHTMLProps<
@@ -150,7 +155,8 @@ export interface ImtblPrimaryRevenueProps
   > {
   widgetConfig?: string;
   amount: string;
-  envId: string;
-  fromCurrency: string;
-  items: string;
+  products: string;
+  fromContractAddress: string;
+  env: string;
+  environmentId: string;
 }

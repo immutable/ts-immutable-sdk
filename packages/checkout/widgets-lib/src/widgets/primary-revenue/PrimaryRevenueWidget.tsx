@@ -27,27 +27,22 @@ import { PayWithCoins } from './views/PayWithCoins';
 
 export interface PrimaryRevenueWidgetProps {
   config: StrongCheckoutWidgetsConfig;
-  envId: string;
-  items: Item[];
   amount: string;
-  fromCurrency: string;
+  items: Item[];
+  fromContractAddress: string;
+  env: string;
+  environmentId: string;
 }
 
 export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
   const {
-    config, envId, items, amount, fromCurrency,
+    config, amount, items, fromContractAddress, env, environmentId,
   } = props;
+
+  console.log('@@@ PrimaryRevenueWidget', config, amount, items, fromContractAddress, env, environmentId);
 
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
-
-  console.info(
-    '@@@ PrimaryRevenueWidget props',
-    envId,
-    items,
-    amount,
-    fromCurrency,
-  );
 
   const loadingText = text.views[SharedViews.LOADING_VIEW].text;
 
@@ -60,29 +55,17 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
     [viewState, viewDispatch],
   );
 
-  const onMount = useCallback(async () => {
+  const onMount = useCallback(() => {
     if (!checkout || !provider) return;
 
-    try {
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: PrimaryRevenueWidgetViews.PAYMENT_METHODS,
-          },
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: PrimaryRevenueWidgetViews.PAYMENT_METHODS,
         },
-      });
-    } catch (error: any) {
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: SharedViews.ERROR_VIEW,
-            error,
-          },
-        },
-      });
-    }
+      },
+    });
   }, [checkout, provider]);
 
   useEffect(() => {
@@ -96,10 +79,11 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
       <ViewContext.Provider value={viewReducerValues}>
         <SharedContextProvider
           value={{
-            envId,
             items,
             amount,
-            fromCurrency,
+            fromContractAddress,
+            env,
+            environmentId,
             provider,
             checkout,
           }}
