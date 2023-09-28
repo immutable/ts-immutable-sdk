@@ -134,16 +134,16 @@ export interface Order {
     id: string;
     name: string;
   };
-  createTime: string;
-  updateTime: string;
+  createdAt: string;
+  updatedAt: string;
   /**
    * Time after which the Order is considered active
    */
-  startTime: string;
+  startAt: string;
   /**
    * Time after which the Order is expired
    */
-  endTime: string;
+  endAt: string;
   protocolData: {
     orderType: 'FULL_RESTRICTED';
     zoneAddress: string;

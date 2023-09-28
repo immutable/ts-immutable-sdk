@@ -108,7 +108,7 @@ export class ImmutableApiClient {
           fee_type: FeeType.MAKER_MARKETPLACE as unknown as Fee.fee_type,
           recipient: x.recipient,
         })),
-        end_time: new Date(
+        end_at: new Date(
           parseInt(`${orderComponents.endTime.toString()}000`, 10),
         ).toISOString(),
         protocol_data: {
@@ -127,7 +127,7 @@ export class ImmutableApiClient {
           },
         ],
         signature: orderSignature,
-        start_time: new Date(
+        start_at: new Date(
           parseInt(`${orderComponents.startTime.toString()}000`, 10),
         ).toISOString(),
       },

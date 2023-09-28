@@ -71,9 +71,9 @@ export function mapImmutableOrderToSeaportOrderComponents(
         };
       }),
       counter,
-      endTime: Math.round(new Date(order.end_time).getTime() / 1000).toString(),
+      endTime: Math.round(new Date(order.end_at).getTime() / 1000).toString(),
       startTime: Math.round(
-        new Date(order.start_time).getTime() / 1000,
+        new Date(order.start_at).getTime() / 1000,
       ).toString(),
       salt: order.salt,
       offerer: order.account_address,
