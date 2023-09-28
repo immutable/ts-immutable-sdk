@@ -36,6 +36,7 @@ import { allowListCheck } from '../allowList';
 import { onRampRoute } from './onRamp';
 import { bridgeAndSwapRoute } from './bridgeAndSwap/bridgeAndSwapRoute';
 import { RoutingTokensAllowList } from '../allowList/types';
+import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from './indexer/fetchL1Representation';
 
 jest.mock('./tokenBalances');
 jest.mock('./bridge/bridgeRoute');
@@ -1828,6 +1829,7 @@ describe('routingCalculator', () => {
           name: 'IMX',
           symbol: 'IMX',
           decimals: 18,
+          address: '0xIMX',
         },
       },
       required: {
@@ -1838,6 +1840,7 @@ describe('routingCalculator', () => {
           name: 'IMX',
           symbol: 'IMX',
           decimals: 18,
+          address: '0xIMX',
         },
       },
     } as BalanceRequirement;
@@ -1892,12 +1895,19 @@ describe('routingCalculator', () => {
       ],
     };
     const tokenAllowList: RoutingTokensAllowList = {
-      bridge: [{
-        name: 'ERC20_1',
-        symbol: 'ERC20_1',
-        decimals: 18,
-        address: '0xERC20_1',
-      }],
+      bridge: [
+        {
+          name: 'ERC20_1',
+          symbol: 'ERC20_1',
+          decimals: 18,
+          address: '0xERC20_1',
+        },
+        {
+          name: 'ETH',
+          symbol: 'ETH',
+          decimals: 18,
+        },
+      ],
       swap: [{
         name: 'ERC20_2',
         symbol: 'ERC20_2',
@@ -2157,6 +2167,26 @@ describe('routingCalculator', () => {
             },
           },
         ]);
+      expect(bridgeAndSwapRoute).toBeCalledWith(
+        config,
+        readonlyProviders,
+        { bridge: true, swap: true },
+        insufficientRequirement,
+        dexQuoteCache,
+        '0xADDRESS',
+        feeEstimates,
+        tokenBalances,
+        ['0xERC20_1', INDEXER_ETH_ROOT_CONTRACT_ADDRESS],
+        [
+          {
+            address: '0xERC20_2',
+            decimals: 18,
+            name: 'ERC20_2',
+            symbol: 'ERC20_2',
+          },
+        ],
+        balanceRequirements,
+      );
     });
   });
 });
