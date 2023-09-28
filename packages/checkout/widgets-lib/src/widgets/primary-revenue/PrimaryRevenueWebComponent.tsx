@@ -93,21 +93,17 @@ export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
     this.setItems(products);
   }
 
-  private setItems(items: string) {
-    if (items) {
-      try {
-        this.items = JSON.parse(atob(this.products));
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('Failed to parse products attribute. It must be a base64 encoded Item[].', error);
-        this.items = [];
-      }
+  private setItems(products: string) {
+    try {
+      this.items = JSON.parse(atob(products));
+    } catch {
+      this.items = [];
     }
   }
 
-  private isValidProucts(): boolean {
+  private isValidProucts(products: string): boolean {
     try {
-      return Array.isArray(JSON.parse(atob(this.products)));
+      return Array.isArray(JSON.parse(atob(products)));
     } catch {
       return false;
     }
@@ -120,7 +116,7 @@ export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
       this.amount = '';
     }
 
-    if (this.isValidProucts()) {
+    if (this.isValidProucts(this.products)) {
       // eslint-disable-next-line no-console
       console.warn('[IMTBL]: invalid "products" widget input. It must be a base64 encoded Item[]');
       this.items = [];
