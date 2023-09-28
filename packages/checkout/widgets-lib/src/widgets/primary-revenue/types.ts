@@ -47,10 +47,10 @@ export type SignResponse = {
 };
 
 export type SignOrderInput = {
-  gameId: string;
-  environment: string;
-  recipientAddress: string;
-  items: Item[];
   provider: Web3Provider | undefined;
-  fromCurrency: string;
+  items: Item[];
+  fromContractAddress: string;
+  recipientAddress: string;
+  env: string;
+  environmentId: string;
 };

@@ -38,7 +38,7 @@ function App() {
       </h2>
       <br />
       <h2>
-        <a href="/primary-revenue?amount=0.01&fromCurrency=USDC&envId=123">Primary Revenue Widget</a>
+        <a href="/primary-revenue">Primary Revenue Widget</a>
       </h2>
       <br />
     </div>

@@ -76,10 +76,11 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
       <ViewContext.Provider value={viewReducerValues}>
         <SharedContextProvider
           value={{
-            envId: 'envId',
             items,
             amount,
-            fromCurrency: 'USDC',
+            fromContractAddress,
+            env,
+            environmentId,
             provider,
             checkout,
           }}
@@ -90,7 +91,8 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
           {viewState.view.type === SharedViews.ERROR_VIEW && (
             <div>{viewState.view.error.message}</div>
           )}
-          {viewState.view.type === PrimaryRevenueWidgetViews.PAYMENT_METHODS && (
+          {viewState.view.type
+            === PrimaryRevenueWidgetViews.PAYMENT_METHODS && (
             <div>Payment methods</div>
           )}
         </SharedContextProvider>

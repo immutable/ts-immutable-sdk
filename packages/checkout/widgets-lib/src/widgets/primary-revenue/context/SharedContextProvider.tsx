@@ -7,7 +7,6 @@ import {
   useState,
 } from 'react';
 
-import { Environment } from '@imtbl/config';
 import { PrimaryRevenueSuccess } from '@imtbl/checkout-widgets';
 
 import { Item, PaymentTypes, SignResponse } from '../types';
@@ -15,10 +14,11 @@ import { useSignOrder } from '../hooks/useSignOrder';
 import { ConnectLoaderState } from '../../../context/connect-loader-context/ConnectLoaderContext';
 
 type SharedContextProps = {
-  envId: string;
+  env: string;
+  environmentId: string;
   items: Item[];
   amount: string;
-  fromCurrency: string;
+  fromContractAddress: string;
   provider: ConnectLoaderState['provider'];
   checkout: ConnectLoaderState['checkout'];
 };
@@ -26,22 +26,19 @@ type SharedContextProps = {
 type SharedContextValues = SharedContextProps & {
   sign: (paymentType: PaymentTypes) => Promise<SignResponse | undefined>
   execute: () => Promise<PrimaryRevenueSuccess>;
-  environment: string;
-  gameId: string;
   recipientAddress: string;
   signResponse: SignResponse | undefined;
 };
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const SharedContext = createContext<SharedContextValues>({
-  envId: '',
   items: [],
   amount: '',
-  fromCurrency: '',
+  fromContractAddress: '',
   provider: undefined,
   checkout: undefined,
-  environment: '',
-  gameId: '',
+  environmentId: '',
+  env: '',
   recipientAddress: '',
   sign: () => Promise.resolve(undefined),
   execute: () => Promise.resolve({} as PrimaryRevenueSuccess),
@@ -57,15 +54,11 @@ export function SharedContextProvider(props: {
   const {
     children,
     value: {
-      envId, items, amount, fromCurrency, provider, checkout,
+      env, environmentId, items, amount, fromContractAddress, provider, checkout,
     },
   } = props;
 
   const [recipientAddress, setRecipientAddress] = useState<string>('');
-
-  // FIXME: retreive gameId & environment from hub config
-  const gameId = 'pokemon';
-  const environment = Environment.SANDBOX;
 
   // Get recipient address
   useEffect(() => {
@@ -83,28 +76,27 @@ export function SharedContextProvider(props: {
   const { sign, execute, signResponse } = useSignOrder({
     items,
     provider,
-    fromCurrency,
+    fromContractAddress,
     recipientAddress,
-    gameId,
-    environment,
+    environmentId,
+    env,
   });
 
   const values = useMemo(
     () => ({
-      envId,
       items,
       amount,
-      fromCurrency,
+      fromContractAddress,
       sign,
       execute,
       signResponse,
-      environment,
-      gameId,
+      environmentId,
+      env,
       provider,
       checkout,
       recipientAddress,
     }),
-    [envId, items, amount, fromCurrency, provider, checkout, recipientAddress, signResponse],
+    [env, environmentId, items, amount, fromContractAddress, provider, checkout, recipientAddress, signResponse],
   );
 
   return (
