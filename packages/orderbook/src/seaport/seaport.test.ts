@@ -392,8 +392,8 @@ describe('Seaport', () => {
         buy: [{ item_type: 'NATIVE', start_amount: '100' }],
         fees: [],
         chain: { id: '1', name: 'imtbl-zkevm-local' },
-        create_time: new Date().toISOString(),
-        end_time: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+        end_at: new Date().toISOString(),
         id: '1',
         protocol_data: {
           order_type: ProtocolData.order_type.FULL_RESTRICTED,
@@ -412,8 +412,8 @@ describe('Seaport', () => {
         ],
         signature: randomAddress(),
         status: OrderStatus.ACTIVE,
-        start_time: new Date().toISOString(),
-        update_time: new Date().toISOString(),
+        start_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
       };
 
       beforeEach(() => {
