@@ -3,6 +3,7 @@ import {
   useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
 import {
+  BiomePortalIdContext,
   Body, Box, Heading, OptionKey,
 } from '@biom3/react';
 import { BigNumber, utils } from 'ethers';
@@ -98,6 +99,7 @@ export function SwapForm({ data }: SwapFromProps) {
   } = useContext(SwapContext);
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { provider } = connectLoaderState;
+  const portalId = useContext(BiomePortalIdContext);
 
   const formatTokenOptionsId = useCallback((symbol: string, address?: string) => {
     if (!address) return symbol.toLowerCase();
@@ -596,7 +598,7 @@ export function SwapForm({ data }: SwapFromProps) {
               {swapForm.from.label}
             </Heading>
             <SelectInput
-              id="fromTokenInputs"
+              id={`fromTokenInputs${portalId}`}
               options={tokensOptionsFrom}
               selectSubtext={
                 fromToken
@@ -651,7 +653,7 @@ export function SwapForm({ data }: SwapFromProps) {
               </Body>
             </Box>
             <SelectInput
-              id="toTokenInputs"
+              id={`toTokenInputs${portalId}`}
               options={tokensOptionsTo}
               selectTextAlign="left"
               textInputValue={toAmount}

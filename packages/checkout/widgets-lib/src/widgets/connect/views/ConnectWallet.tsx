@@ -1,5 +1,7 @@
 import { useContext, useEffect } from 'react';
-import { Body, Box, Heading } from '@biom3/react';
+import {
+  BiomePortalIdContext, Body, Box, Heading,
+} from '@biom3/react';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -10,6 +12,8 @@ import { ConnectContext } from '../context/ConnectContext';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 export function ConnectWallet() {
+  const portalId = useContext(BiomePortalIdContext);
+
   const { body } = text.views[ConnectWidgetViews.CONNECT_WALLET];
   const {
     connectState: { sendCloseEvent },
@@ -35,7 +39,7 @@ export function ConnectWallet() {
       footer={<FooterLogo />}
     >
       <Box
-        id="connect-wallet-content"
+        id={`connect-wallet-content${portalId}`}
         sx={{
           display: 'flex',
           flexDirection: 'column',
