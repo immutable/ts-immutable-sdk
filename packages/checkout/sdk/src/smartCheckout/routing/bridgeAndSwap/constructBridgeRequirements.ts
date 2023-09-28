@@ -2,7 +2,7 @@ import { BigNumber, utils } from 'ethers';
 import { GetBalanceResult, ItemType } from '../../../types';
 import { BridgeRequirement } from '../bridge/bridgeRoute';
 import { DexQuote, DexQuotes } from '../types';
-import { L1ToL2TokenAddressMapping } from '../indexer/fetchL1Representation';
+import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS, L1ToL2TokenAddressMapping } from '../indexer/fetchL1Representation';
 import { BalanceCheckResult } from '../../balanceCheck/types';
 
 // The dex will return all the fees which is in a particular token (currently always IMX)
@@ -64,7 +64,6 @@ export const constructBridgeRequirements = (
   for (const [tokenAddress, quote] of dexQuotes) {
     // Get the L2 balance for the token address
     const l2balance = l2balances.find((balance) => balance.token.address === tokenAddress);
-
     const l1tol2TokenMapping = l1tol2addresses.find(
       (token) => token.l2address === tokenAddress,
     );
@@ -74,7 +73,13 @@ export const constructBridgeRequirements = (
     if (!l1address) continue;
 
     // If the user does not have any L1 balance for this token then cannot bridge
-    const l1balance = l1balances.find((balance) => balance.token.address === l1address);
+    const l1balance = l1balances.find((balance) => {
+      if (balance.token.address === undefined
+        && l1address === INDEXER_ETH_ROOT_CONTRACT_ADDRESS) {
+        return true;
+      }
+      return balance.token.address === l1address;
+    });
     if (!l1balance) continue;
 
     // Get the total amount using slippage to ensure a small buffer is added to cover price fluctuations
@@ -93,6 +98,10 @@ export const constructBridgeRequirements = (
     if (amountToBridge.lte(0)) {
       // If the amount to bridge is 0 then the user already has sufficient L2 balance to swap without bridging
       // In this scenario the swap route will be recommended by the router and no bridging is required
+      continue;
+    }
+
+    if (amountToBridge.gt(l1balance.balance)) {
       continue;
     }
 

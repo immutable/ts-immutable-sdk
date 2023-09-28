@@ -33,6 +33,7 @@ import { RoutingTokensAllowList } from '../allowList/types';
 import { BridgeAndSwapRoute, bridgeAndSwapRoute } from './bridgeAndSwap/bridgeAndSwapRoute';
 import { BridgeRequirement, bridgeRoute } from './bridge/bridgeRoute';
 import { onRampRoute } from './onRamp';
+import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from './indexer/fetchL1Representation';
 
 const hasAvailableRoutingOptions = (availableRoutingOptions: RoutingOptionsAvailable) => (
   availableRoutingOptions.bridge || availableRoutingOptions.swap || availableRoutingOptions.onRamp
@@ -152,12 +153,17 @@ export const getBridgeAndSwapFundingSteps = async (
 
   // Get a list of all the swappable tokens
   const bridgeTokenAllowList = tokenAllowList?.bridge ?? [];
-  const bridgeableL1Addresses: string[] = bridgeTokenAllowList.map((token) => token.address as string);
+  const bridgeableL1Addresses: string[] = bridgeTokenAllowList.map((token) => {
+    if (token.address === undefined) return INDEXER_ETH_ROOT_CONTRACT_ADDRESS;
+    return token.address;
+  });
   const swapTokenAllowList = tokenAllowList?.swap ?? [];
 
   if (insufficientRequirement.type !== ItemType.NATIVE && insufficientRequirement.type !== ItemType.ERC20) {
     return [];
   }
+
+  console.log(bridgeableL1Addresses);
 
   const routes = await bridgeAndSwapRoute(
     config,

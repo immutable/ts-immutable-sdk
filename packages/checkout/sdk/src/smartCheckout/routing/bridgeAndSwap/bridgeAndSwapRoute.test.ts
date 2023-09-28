@@ -19,6 +19,7 @@ import { bridgeRoute } from '../bridge/bridgeRoute';
 import { swapRoute } from '../swap/swapRoute';
 import { getDexQuotes } from './getDexQuotes';
 import { constructBridgeRequirements } from './constructBridgeRequirements';
+import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from '../indexer/fetchL1Representation';
 
 jest.mock('./fetchL1ToL2Mappings');
 jest.mock('./getDexQuotes');
@@ -101,7 +102,7 @@ describe('bridgeAndSwapRoute', () => {
 
   const getTestDexQuotes = (): DexQuotes => {
     const dexQuotes = new Map<string, DexQuote>([]);
-    const dexQuote: DexQuote = {
+    const dexQuoteIMX: DexQuote = {
       quote: {
         amount: {
           value: BigNumber.from(10),
@@ -132,8 +133,40 @@ describe('bridgeAndSwapRoute', () => {
       approval: undefined,
       swap: null,
     };
+    const dexQuoteETH: DexQuote = {
+      quote: {
+        amount: {
+          value: BigNumber.from(10),
+          token: {
+            address: '0xYEET',
+          } as TokenInfo,
+        },
+        amountWithMaxSlippage: {
+          value: BigNumber.from(15),
+          token: {
+            address: '0xETH',
+          } as TokenInfo,
+        },
+        slippage: 1,
+        fees: [
+          {
+            amount: {
+              value: BigNumber.from(5),
+              token: {
+                address: '0xETH',
+              } as TokenInfo,
+            },
+            recipient: '',
+            basisPoints: 0,
+          },
+        ],
+      } as Quote,
+      approval: undefined,
+      swap: null,
+    };
 
-    dexQuotes.set('0xIMX', dexQuote);
+    dexQuotes.set('0xIMX', dexQuoteIMX);
+    dexQuotes.set('0xETH', dexQuoteETH);
     return dexQuotes;
   };
 
@@ -153,25 +186,45 @@ describe('bridgeAndSwapRoute', () => {
           l1address: '0xIMXL1',
           l2address: '0xIMX',
         },
+        {
+          l1address: INDEXER_ETH_ROOT_CONTRACT_ADDRESS,
+          l2address: '0xETH',
+        },
       ],
     );
     (getDexQuotes as jest.Mock).mockResolvedValue(getTestDexQuotes());
-    (bridgeRoute as jest.Mock).mockResolvedValue(
-      {
-        type: FundingRouteType.BRIDGE,
-        chainId: ChainId.SEPOLIA,
-        asset: {
-          balance: BigNumber.from(5),
-          formattedBalance: '5',
-          token: {
-            name: 'IMX',
-            symbol: 'IMX',
-            decimals: 18,
-            address: '0xIMXL1',
+    (bridgeRoute as jest.Mock)
+      .mockResolvedValueOnce(
+        {
+          type: FundingRouteType.BRIDGE,
+          chainId: ChainId.SEPOLIA,
+          asset: {
+            balance: BigNumber.from(5),
+            formattedBalance: '5',
+            token: {
+              name: 'IMX',
+              symbol: 'IMX',
+              decimals: 18,
+              address: '0xIMXL1',
+            },
           },
         },
-      },
-    );
+      )
+      .mockResolvedValueOnce(
+        {
+          type: FundingRouteType.BRIDGE,
+          chainId: ChainId.SEPOLIA,
+          asset: {
+            balance: BigNumber.from(10),
+            formattedBalance: '10',
+            token: {
+              name: 'ETH',
+              symbol: 'ETH',
+              decimals: 18,
+            },
+          },
+        },
+      );
     (swapRoute as jest.Mock).mockResolvedValue(
       [
         {
@@ -188,6 +241,20 @@ describe('bridgeAndSwapRoute', () => {
             },
           },
         },
+        {
+          type: FundingRouteType.SWAP,
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+          asset: {
+            balance: BigNumber.from(5),
+            formattedBalance: '5',
+            token: {
+              name: 'ETH',
+              symbol: 'ETH',
+              decimals: 18,
+              address: '0xETH',
+            },
+          },
+        },
       ],
     );
     (constructBridgeRequirements as jest.Mock).mockReturnValue(
@@ -196,6 +263,11 @@ describe('bridgeAndSwapRoute', () => {
           amount: BigNumber.from(10),
           formattedAmount: '10',
           l2address: '0xIMX',
+        },
+        {
+          amount: BigNumber.from(10),
+          formattedAmount: '10',
+          l2address: '0xETH',
         },
       ],
     );
@@ -231,7 +303,7 @@ describe('bridgeAndSwapRoute', () => {
       },
     };
 
-    const bridgeableTokens: string[] = ['0xIMXL1'];
+    const bridgeableTokens: string[] = [INDEXER_ETH_ROOT_CONTRACT_ADDRESS, '0xIMXL1'];
     const swappableTokens: TokenInfo[] = [
       {
         address: '0xYEET',
@@ -244,6 +316,12 @@ describe('bridgeAndSwapRoute', () => {
         decimals: 18,
         name: 'IMX',
         symbol: 'IMX',
+      },
+      {
+        address: '0xETH',
+        decimals: 18,
+        name: 'ETH',
+        symbol: 'ETH',
       },
     ];
 
@@ -294,6 +372,35 @@ describe('bridgeAndSwapRoute', () => {
                 symbol: 'IMX',
                 decimals: 18,
                 address: '0xIMX',
+              },
+            },
+          },
+        },
+        {
+          bridgeFundingStep: {
+            type: FundingRouteType.BRIDGE,
+            chainId: ChainId.SEPOLIA,
+            asset: {
+              balance: BigNumber.from(10),
+              formattedBalance: '10',
+              token: {
+                name: 'ETH',
+                symbol: 'ETH',
+                decimals: 18,
+              },
+            },
+          },
+          swapFundingStep: {
+            type: FundingRouteType.SWAP,
+            chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+            asset: {
+              balance: BigNumber.from(0),
+              formattedBalance: '0',
+              token: {
+                name: 'ETH',
+                symbol: 'ETH',
+                decimals: 18,
+                address: '0xETH',
               },
             },
           },

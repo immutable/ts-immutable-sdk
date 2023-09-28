@@ -23,7 +23,7 @@ import { swapRoute } from '../swap/swapRoute';
 import { getBalancesByChain } from './getBalancesByChain';
 import { constructBridgeRequirements } from './constructBridgeRequirements';
 import { fetchL1ToL2Mappings } from './fetchL1ToL2Mappings';
-import { L1ToL2TokenAddressMapping } from '../indexer/fetchL1Representation';
+import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS, L1ToL2TokenAddressMapping } from '../indexer/fetchL1Representation';
 import { getDexQuotes } from './getDexQuotes';
 
 export const abortBridgeAndSwap = (
@@ -169,7 +169,12 @@ export const constructBridgeAndSwapRoutes = (
   for (const bridgeFundingStep of bridgeFundingSteps) {
     if (!bridgeFundingStep) continue;
     const mapping = l1tol2Addresses.find(
-      (addresses) => addresses.l1address === bridgeFundingStep.asset.token.address && addresses.l2address,
+      (addresses) => {
+        if (bridgeFundingStep.asset.token.address === undefined) {
+          return addresses.l1address === INDEXER_ETH_ROOT_CONTRACT_ADDRESS && addresses.l2address;
+        }
+        return addresses.l1address === bridgeFundingStep.asset.token.address && addresses.l2address;
+      },
     );
     if (!mapping) continue;
 
@@ -322,7 +327,6 @@ export const bridgeAndSwapRoute = async (
     swappableTokensAfterBridging,
   );
   if (!swapRoutes) return [];
-
   const originalBalanceSwapRoutes = reapplyOriginalSwapBalances(
     tokenBalances,
     swapRoutes,

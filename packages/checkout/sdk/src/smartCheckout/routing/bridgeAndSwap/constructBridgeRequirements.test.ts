@@ -9,6 +9,7 @@ import {
 } from '../../../types';
 import { constructBridgeRequirements } from './constructBridgeRequirements';
 import { BalanceRequirement } from '../../balanceCheck/types';
+import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from '../indexer/fetchL1Representation';
 
 describe('constructBridgeRequirements', () => {
   const constructDexQuote = (
@@ -119,16 +120,16 @@ describe('constructBridgeRequirements', () => {
           address: 'ERC20AL1',
           decimals: 18,
         } as TokenInfo,
-        balance: BigNumber.from(100000000000000),
-        formattedBalance: '1',
+        balance: BigNumber.from(5000000000000000),
+        formattedBalance: '5',
       },
       {
         token: {
           address: 'ERC20BL1',
           decimals: 18,
         } as TokenInfo,
-        balance: BigNumber.from(2000000000000000),
-        formattedBalance: '2',
+        balance: BigNumber.from(6000000000000000),
+        formattedBalance: '6',
       },
     ];
 
@@ -183,6 +184,208 @@ describe('constructBridgeRequirements', () => {
     );
   });
 
+  it('should handle native L1', () => {
+    const swapTokenETH: DexTokenInfo = {
+      chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+      address: '0xETH',
+      decimals: 18,
+      symbol: 'ETH',
+      name: 'ETH',
+    };
+
+    const feesTokenInfo: DexTokenInfo = {
+      chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+      address: '0xIMX',
+      decimals: 18,
+      symbol: 'IMX',
+      name: 'IMX',
+    };
+
+    const ethDexQuote = constructDexQuote(
+      swapTokenETH,
+      feesTokenInfo,
+      100000000000000,
+      200000000000000,
+      300000000000000,
+      400000000000000,
+      500000000000000,
+    );
+
+    const dexQuotes = new Map<string, DexQuote>([
+      ['0xETH', ethDexQuote],
+    ]);
+
+    const l1balances: GetBalanceResult[] = [
+      {
+        token: {
+          decimals: 18,
+        } as TokenInfo,
+        balance: BigNumber.from(300000000000000),
+        formattedBalance: '3',
+      },
+    ];
+
+    const l2balances: GetBalanceResult[] = [];
+
+    const requirements = constructBridgeRequirements(
+      dexQuotes,
+      l1balances,
+      l2balances,
+      [
+        {
+          l1address: INDEXER_ETH_ROOT_CONTRACT_ADDRESS,
+          l2address: '0xETH',
+        },
+      ],
+      {
+        sufficient: false,
+        balanceRequirements: [
+          {
+            type: ItemType.ERC20,
+            sufficient: false,
+            required: {
+              type: ItemType.ERC20,
+              balance: BigNumber.from(1),
+              formattedBalance: '1',
+              token: {
+                address: '0xERC',
+              } as TokenInfo,
+            },
+          },
+        ] as BalanceRequirement[],
+      },
+    );
+
+    console.log(
+      requirements[0].amount.toString(),
+    );
+    expect(requirements).toEqual(
+      [
+        {
+          amount: BigNumber.from(200000000000000),
+          formattedAmount: '0.0002',
+          l2address: '0xETH',
+        },
+      ],
+    );
+  });
+
+  it('should not return bridge requirement if not enough balance on l1', () => {
+    const swapTokenInfoA: DexTokenInfo = {
+      chainId: 1,
+      address: '0xERC20A',
+      decimals: 18,
+      symbol: 'ERC20',
+      name: 'ERC20',
+    };
+
+    const swapTokenInfoB: DexTokenInfo = {
+      chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+      address: '0xERC20B',
+      decimals: 18,
+      symbol: 'ERC20',
+      name: 'ERC20',
+    };
+
+    const feesTokenInfo: DexTokenInfo = {
+      chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+      address: '0xERC20',
+      decimals: 18,
+      symbol: 'ERC20',
+      name: 'ERC20',
+    };
+
+    const dexQuoteA = constructDexQuote(
+      swapTokenInfoA,
+      feesTokenInfo,
+      100000000000000,
+      200000000000000,
+      300000000000000,
+      400000000000000,
+      500000000000000,
+    );
+
+    const dexQuoteB = constructDexQuote(
+      swapTokenInfoB,
+      feesTokenInfo,
+      600000000000000,
+      700000000000000,
+      800000000000000,
+      900000000000000,
+      110000000000000,
+    );
+
+    const dexQuotes = new Map<string, DexQuote>([
+      ['0xERC20A', dexQuoteA],
+      ['0xERC20B', dexQuoteB],
+    ]);
+
+    const l1balances: GetBalanceResult[] = [
+      {
+        token: {
+          address: 'ERC20AL1',
+          decimals: 18,
+        } as TokenInfo,
+        balance: BigNumber.from(500000000000000),
+        formattedBalance: '1',
+      },
+      {
+        token: {
+          address: 'ERC20BL1',
+          decimals: 18,
+        } as TokenInfo,
+        // Not enough balance to bridge this ERC20
+        balance: BigNumber.from(100000000000000),
+        formattedBalance: '1',
+      },
+    ];
+
+    const l2balances: GetBalanceResult[] = [];
+
+    const requirements = constructBridgeRequirements(
+      dexQuotes,
+      l1balances,
+      l2balances,
+      [
+        {
+          l1address: 'ERC20AL1',
+          l2address: '0xERC20A',
+        },
+        {
+          l1address: 'ERC20BL1',
+          l2address: '0xERC20B',
+        },
+      ],
+      {
+        sufficient: false,
+        balanceRequirements: [
+          {
+            type: ItemType.ERC20,
+            sufficient: false,
+            required: {
+              type: ItemType.ERC20,
+              balance: BigNumber.from(1),
+              formattedBalance: '1',
+              token: {
+                address: '0xERC20C',
+              } as TokenInfo,
+            },
+          },
+        ] as BalanceRequirement[],
+      },
+    );
+
+    expect(requirements).toEqual(
+      [
+        {
+          amount: BigNumber.from(200000000000000),
+          formattedAmount: '0.0002',
+          l2address: '0xERC20A',
+        },
+      ],
+    );
+  });
+
   it('should add fees and balance requirement if they are same as token address and remove l2 balance', () => {
     const swapTokenInfo: DexTokenInfo = {
       chainId: 1,
@@ -220,8 +423,8 @@ describe('constructBridgeRequirements', () => {
           address: '0xIMXL1',
           decimals: 18,
         } as TokenInfo,
-        balance: BigNumber.from(100000000000000),
-        formattedBalance: '1',
+        balance: BigNumber.from(5000000000000000),
+        formattedBalance: '5',
       },
     ];
 
