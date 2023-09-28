@@ -2,7 +2,7 @@ import {
   Checkout,
   ERC20ItemRequirement,
   ERC721ItemRequirement,
-  FulfilmentTransaction,
+  FulfillmentTransaction,
   GasAmount,
   GasTokenType,
   ItemType,
@@ -27,7 +27,7 @@ interface SmartCheckoutProps {
 export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) => {
   const [itemRequirements, setItemRequirements] = useState<(NativeItemRequirement | ERC20ItemRequirement | ERC721ItemRequirement)[]>([]);
   const [itemRequirementsError, setItemRequirementsError] = useState<string>('');
-  const [transactionOrGasAmount, setTransactionOrGasAmount] = useState<FulfilmentTransaction | GasAmount>(
+  const [transactionOrGasAmount, setTransactionOrGasAmount] = useState<FulfillmentTransaction | GasAmount>(
     {
       type: TransactionOrGasType.GAS,
       gasToken: {
@@ -340,7 +340,7 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
               <Option optionKey="erc721">
                 <Option.Label>ERC721</Option.Label>
               </Option>
-            </Select>  
+            </Select>
             </td>
             <td>
               <FormControl validationStatus={amountError ? 'error' : 'success'}>
