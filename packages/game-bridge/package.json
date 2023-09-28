@@ -12,9 +12,10 @@
     "parcel": "^2.8.3"
   },
   "scripts": {
-    "build": "yarn updateGameBridgeVersion && parcel build --no-cache --no-scope-hoist",
+    "build": "yarn updateGameBridgeVersion && parcel build --no-cache --no-scope-hoist && yarn revertGameBridgeVersion",
     "start": "parcel",
-    "updateGameBridgeVersion": "./scripts/updateSdkVersion.sh"
+    "updateGameBridgeVersion": "./scripts/updateSdkVersion.sh",
+    "revertGameBridgeVersion": "./scripts/revertSdkVersion.sh"
   },
   "source": "src/index.html",
   "targets": {
