@@ -17,15 +17,14 @@ import { TokenBalanceResult } from '../types';
 import { createBlockchainDataInstance } from '../../../instance';
 import { estimateGasForBridgeApproval } from './estimateApprovalGas';
 import { bridgeGasEstimate } from './bridgeGasEstimate';
-import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from './constants';
 import { CheckoutErrorType } from '../../../errors';
 import { allowListCheckForBridge } from '../../allowList/allowListCheck';
+import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from '../indexer/fetchL1Representation';
 
 jest.mock('../../../gasEstimate');
 jest.mock('../../../instance');
 jest.mock('./estimateApprovalGas');
 jest.mock('./bridgeGasEstimate');
-jest.mock('./constants');
 jest.mock('../../allowList/allowListCheck');
 
 describe('bridgeRoute', () => {

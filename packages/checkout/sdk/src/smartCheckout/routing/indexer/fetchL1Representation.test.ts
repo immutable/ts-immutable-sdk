@@ -1,7 +1,7 @@
 import { Environment } from '@imtbl/config';
 import { CheckoutConfiguration } from '../../../config';
 import { createBlockchainDataInstance } from '../../../instance';
-import { IMX_ADDRESS_ZKEVM } from '../../../types';
+import { ChainId, IMX_ADDRESS_ZKEVM } from '../../../types';
 import { fetchL1Representation } from './fetchL1Representation';
 
 jest.mock('../../../instance');
@@ -37,7 +37,13 @@ describe('fetchL1Representation', () => {
     });
 
     const result = await fetchL1Representation(
-      config,
+      {
+        remote: {
+          getConfig: jest.fn().mockResolvedValue({
+            [ChainId.SEPOLIA]: '0x2Fa06C6672dDCc066Ab04631192738799231dE4a',
+          }),
+        },
+      } as unknown as CheckoutConfiguration,
       requiredL2Address,
     );
 

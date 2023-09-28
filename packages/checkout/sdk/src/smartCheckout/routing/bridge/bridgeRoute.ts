@@ -12,11 +12,10 @@ import { FundingRouteStep, TokenBalanceResult } from '../types';
 import { BalanceRequirement } from '../../balanceCheck/types';
 import { getEthBalance } from './getEthBalance';
 import { bridgeGasEstimate } from './bridgeGasEstimate';
-import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from './constants';
 import { estimateGasForBridgeApproval } from './estimateApprovalGas';
 import { CheckoutError, CheckoutErrorType } from '../../../errors';
 import { allowListCheckForBridge } from '../../allowList/allowListCheck';
-import { fetchL1Representation } from '../indexer/fetchL1Representation';
+import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS, fetchL1Representation } from '../indexer/fetchL1Representation';
 
 export const hasSufficientL1Eth = (
   tokenBalanceResult: TokenBalanceResult,

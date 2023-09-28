@@ -3,7 +3,7 @@ import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../../conf
 import { ChainId } from '../../../types';
 import * as instance from '../../../instance';
 import { CheckoutError, CheckoutErrorType } from '../../../errors';
-import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from './constants';
+import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from '../indexer/fetchL1Representation';
 
 export const estimateApprovalGas = async (
   config: CheckoutConfiguration,
