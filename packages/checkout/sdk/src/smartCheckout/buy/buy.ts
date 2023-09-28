@@ -24,14 +24,14 @@ import {
   GasTokenType,
   TransactionOrGasType,
   GasAmount,
-  FulfilmentTransaction,
+  FulfillmentTransaction,
 } from '../../types/smartCheckout';
 import { smartCheckout } from '..';
 import {
   getUnsignedERC20ApprovalTransactions,
-  getUnsignedFulfilmentTransactions,
+  getUnsignedFulfillmentTransactions,
   signApprovalTransactions,
-  signFulfilmentTransactions,
+  signFulfillmentTransactions,
 } from '../actions';
 import { SignTransactionStatusType } from '../actions/types';
 import { ERC20ABI } from '../../types';
@@ -62,12 +62,12 @@ export const getItemRequirement = (
 
 export const getTransactionOrGas = (
   gasLimit: number,
-  fulfilmentTransactions: TransactionRequest[],
-): FulfilmentTransaction | GasAmount => {
-  if (fulfilmentTransactions.length > 0) {
+  fulfillmentTransactions: TransactionRequest[],
+): FulfillmentTransaction | GasAmount => {
+  if (fulfillmentTransactions.length > 0) {
     return {
       type: TransactionOrGasType.TRANSACTION,
-      transaction: fulfilmentTransactions[0],
+      transaction: fulfillmentTransactions[0],
     };
   }
 
@@ -142,7 +142,7 @@ export const buy = async (
   }
 
   let unsignedApprovalTransactions: TransactionRequest[] = [];
-  let unsignedFulfilmentTransactions: TransactionRequest[] = [];
+  let unsignedFulfillmentTransactions: TransactionRequest[] = [];
   let orderActions: Action[] = [];
   try {
     const fulfillerAddress = await provider.getSigner().getAddress();
@@ -155,10 +155,10 @@ export const buy = async (
   }
 
   try {
-    unsignedFulfilmentTransactions = await getUnsignedFulfilmentTransactions(orderActions);
+    unsignedFulfillmentTransactions = await getUnsignedFulfillmentTransactions(orderActions);
   } catch {
     // if cannot estimate gas then silently continue and use gas limit in smartCheckout
-    // but get the fulfilment transactions after they have approved the spending
+    // but get the fulfillment transactions after they have approved the spending
   }
 
   let amount = BigNumber.from('0');
@@ -207,7 +207,7 @@ export const buy = async (
     itemRequirements,
     getTransactionOrGas(
       gasLimit,
-      unsignedFulfilmentTransactions,
+      unsignedFulfillmentTransactions,
     ),
   );
 
@@ -226,12 +226,12 @@ export const buy = async (
     }
 
     try {
-      if (unsignedFulfilmentTransactions.length === 0) {
-        unsignedFulfilmentTransactions = await getUnsignedFulfilmentTransactions(orderActions);
+      if (unsignedFulfillmentTransactions.length === 0) {
+        unsignedFulfillmentTransactions = await getUnsignedFulfillmentTransactions(orderActions);
       }
     } catch (err: any) {
       throw new CheckoutError(
-        'Error fetching fulfilment transaction',
+        'Error fetching fulfillment transaction',
         CheckoutErrorType.FULFILL_ORDER_LISTING_ERROR,
         {
           message: err.message,
@@ -239,15 +239,15 @@ export const buy = async (
       );
     }
 
-    const fulfilmentResult = await signFulfilmentTransactions(provider, unsignedFulfilmentTransactions);
-    if (fulfilmentResult.type === SignTransactionStatusType.FAILED) {
+    const fulfillmentResult = await signFulfillmentTransactions(provider, unsignedFulfillmentTransactions);
+    if (fulfillmentResult.type === SignTransactionStatusType.FAILED) {
       return {
         smartCheckoutResult,
         orderId: id,
         status: {
           type: BuyStatusType.FAILED,
-          transactionHash: fulfilmentResult.transactionHash,
-          reason: fulfilmentResult.reason,
+          transactionHash: fulfillmentResult.transactionHash,
+          reason: fulfillmentResult.reason,
         },
       };
     }

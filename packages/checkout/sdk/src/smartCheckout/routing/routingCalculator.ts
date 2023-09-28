@@ -43,7 +43,7 @@ export const getInsufficientRequirement = (
   return undefined;
 };
 
-export const getSwapFundingStep = async (
+export const getSwapFundingSteps = async (
   config: CheckoutConfiguration,
   availableRoutingOptions: RoutingOptionsAvailable,
   insufficientRequirement: BalanceRequirement | undefined,
@@ -51,22 +51,23 @@ export const getSwapFundingStep = async (
   ownerAddress: string,
   tokenBalances: Map<ChainId, TokenBalanceResult>,
   swapTokenAllowList: TokenInfo[] | undefined,
-): Promise<FundingRouteStep | undefined> => {
-  if (!availableRoutingOptions.swap) return undefined;
-  if (insufficientRequirement === undefined) return undefined;
-  if (swapTokenAllowList === undefined) return undefined;
+): Promise<FundingRouteStep[]> => {
+  const fundingSteps: FundingRouteStep[] = [];
+  if (!availableRoutingOptions.swap) return fundingSteps;
+  if (insufficientRequirement === undefined) return fundingSteps;
+  if (swapTokenAllowList === undefined) return fundingSteps;
 
   const tokenBalanceResult = tokenBalances.get(getL2ChainId(config));
-  if (!tokenBalanceResult) return undefined;
-  if (tokenBalanceResult.error !== undefined || !tokenBalanceResult.success) return undefined;
+  if (!tokenBalanceResult) return fundingSteps;
+  if (tokenBalanceResult.error !== undefined || !tokenBalanceResult.success) return fundingSteps;
 
-  if (swapTokenAllowList.length === 0) return undefined;
+  if (swapTokenAllowList.length === 0) return fundingSteps;
   const swappableTokens: string[] = swapTokenAllowList
     .filter((token) => token.address).map((token) => token.address as string);
 
-  if (swappableTokens.length === 0) return undefined;
+  if (swappableTokens.length === 0) return fundingSteps;
 
-  const swapFundingStep = await swapRoute(
+  return await swapRoute(
     config,
     availableRoutingOptions,
     dexQuoteCache,
@@ -75,8 +76,6 @@ export const getSwapFundingStep = async (
     tokenBalances,
     swappableTokens,
   );
-
-  return swapFundingStep;
 };
 
 export const getOnRampFundingStep = async (
@@ -154,7 +153,7 @@ export const routingCalculator = async (
     );
   }
 
-  const swapFundingStep = await getSwapFundingStep(
+  const swapFundingSteps = await getSwapFundingSteps(
     config,
     availableRoutingOptions,
     insufficientRequirement,
@@ -185,7 +184,7 @@ export const routingCalculator = async (
 
   let priority = 0;
 
-  if (bridgeFundingStep || swapFundingStep || onRampFundingStep) {
+  if (bridgeFundingStep || swapFundingSteps.length > 0 || onRampFundingStep) {
     response.response.type = RouteCalculatorType.ROUTES_FOUND;
     response.response.message = 'Routes found';
   }
@@ -198,11 +197,13 @@ export const routingCalculator = async (
     });
   }
 
-  if (swapFundingStep) {
+  if (swapFundingSteps.length > 0) {
     priority++;
-    response.fundingRoutes.push({
-      priority,
-      steps: [swapFundingStep],
+    swapFundingSteps.forEach((swapFundingStep) => {
+      response.fundingRoutes.push({
+        priority,
+        steps: [swapFundingStep],
+      });
     });
   }
 

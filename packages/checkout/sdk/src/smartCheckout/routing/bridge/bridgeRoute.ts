@@ -50,7 +50,7 @@ export const fetchL1Representation = async (
   if (l2address === '') return '';
 
   if (l2address === IMX_ADDRESS_ZKEVM) {
-    return getImxL1Representation(getL1ChainId(config));
+    return await getImxL1Representation(getL1ChainId(config), config);
   }
 
   const chainName = getIndexerChainName(getL2ChainId(config));

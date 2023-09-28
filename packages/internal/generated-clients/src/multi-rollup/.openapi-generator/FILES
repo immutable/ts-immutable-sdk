@@ -8,6 +8,7 @@ configuration.ts
 domain/activities-api.ts
 domain/chains-api.ts
 domain/collections-api.ts
+domain/metadata-api.ts
 domain/nft-owners-api.ts
 domain/nfts-api.ts
 domain/orders-api.ts
@@ -41,6 +42,7 @@ models/chain-with-details-all-of.ts
 models/chain-with-details.ts
 models/chain.ts
 models/collection-contract-type.ts
+models/collection-metadata.ts
 models/collection.ts
 models/create-counterfactual-address-request.ts
 models/create-counterfactual-address-res.ts
@@ -55,6 +57,7 @@ models/fulfillment-data200-response.ts
 models/get-activity-result.ts
 models/get-collection-result.ts
 models/get-linked-addresses-res.ts
+models/get-metadata-result.ts
 models/get-nftresult.ts
 models/get-token-result.ts
 models/index.ts
@@ -68,8 +71,8 @@ models/list-nfts-result.ts
 models/list-tokens-result.ts
 models/list-trade-result.ts
 models/listing-result.ts
+models/metadata.ts
 models/mint.ts
-models/model-error.ts
 models/native-item.ts
 models/nft.ts
 models/nftcontract-type.ts
@@ -83,6 +86,14 @@ models/order-status.ts
 models/order.ts
 models/page.ts
 models/protocol-data.ts
+models/refresh-collection-metadata-request.ts
+models/refresh-collection-metadata-result.ts
+models/refresh-metadata-by-id.ts
+models/refresh-metadata-by-idall-of.ts
+models/refresh-metadata-by-idrequest.ts
+models/refresh-metadata-by-token-id.ts
+models/refresh-metadata-by-token-idall-of.ts
+models/refreshable-nftattributes.ts
 models/sale-fee.ts
 models/sale-payment-token.ts
 models/sale-payment.ts

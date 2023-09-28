@@ -11,25 +11,25 @@ export const getUnsignedERC721Transactions = async (
   actions: Action[],
 ): Promise<UnsignedTransactions> => {
   let approvalTransactions: TransactionRequest[] = [];
-  let fulfilmentTransactions: TransactionRequest[] = [];
+  let fulfillmentTransactions: TransactionRequest[] = [];
 
   const approvalPromises: Promise<TransactionRequest>[] = [];
-  const fulfilmentPromises: Promise<TransactionRequest>[] = [];
+  const fulfillmentPromises: Promise<TransactionRequest>[] = [];
   for (const action of actions) {
     if (action.type !== ActionType.TRANSACTION) continue;
     if (action.purpose === TransactionPurpose.APPROVAL) {
       approvalPromises.push(action.buildTransaction());
     }
     if (action.purpose === TransactionPurpose.FULFILL_ORDER) {
-      fulfilmentPromises.push(action.buildTransaction());
+      fulfillmentPromises.push(action.buildTransaction());
     }
   }
   approvalTransactions = await Promise.all(approvalPromises);
-  fulfilmentTransactions = await Promise.all(fulfilmentPromises);
+  fulfillmentTransactions = await Promise.all(fulfillmentPromises);
 
   return {
     approvalTransactions,
-    fulfilmentTransactions,
+    fulfillmentTransactions,
   };
 };
 
@@ -50,21 +50,21 @@ export const getUnsignedERC20ApprovalTransactions = async (
   return approvalTransactions;
 };
 
-export const getUnsignedFulfilmentTransactions = async (
+export const getUnsignedFulfillmentTransactions = async (
   actions: Action[],
 ): Promise<TransactionRequest[]> => {
-  let fulfilmentTransactions: TransactionRequest[] = [];
+  let fulfillmentTransactions: TransactionRequest[] = [];
 
-  const fulfilmentPromises: Promise<TransactionRequest>[] = [];
+  const fulfillmentPromises: Promise<TransactionRequest>[] = [];
   for (const action of actions) {
     if (action.type !== ActionType.TRANSACTION) continue;
     if (action.purpose === TransactionPurpose.FULFILL_ORDER) {
-      fulfilmentPromises.push(action.buildTransaction());
+      fulfillmentPromises.push(action.buildTransaction());
     }
   }
-  fulfilmentTransactions = await Promise.all(fulfilmentPromises);
+  fulfillmentTransactions = await Promise.all(fulfillmentPromises);
 
-  return fulfilmentTransactions;
+  return fulfillmentTransactions;
 };
 
 export const getUnsignedMessage = (

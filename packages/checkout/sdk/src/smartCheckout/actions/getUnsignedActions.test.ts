@@ -5,7 +5,7 @@ import { PopulatedTransaction, TypedDataDomain } from 'ethers';
 import {
   getUnsignedERC20ApprovalTransactions,
   getUnsignedERC721Transactions,
-  getUnsignedFulfilmentTransactions,
+  getUnsignedFulfillmentTransactions,
   getUnsignedMessage,
 } from './getUnsignedActions';
 
@@ -55,7 +55,7 @@ describe('getUnsignedActions', () => {
 
       await expect(getUnsignedERC721Transactions(actions)).resolves.toEqual({
         approvalTransactions: [{ from: '0xAPPROVAL1' }, { from: '0xAPPROVAL2' }],
-        fulfilmentTransactions: [{ from: '0xTRANSACTION1' }, { from: '0xTRANSACTION2' }],
+        fulfillmentTransactions: [{ from: '0xTRANSACTION1' }, { from: '0xTRANSACTION2' }],
       });
     });
 
@@ -64,7 +64,7 @@ describe('getUnsignedActions', () => {
 
       await expect(getUnsignedERC721Transactions(actions)).resolves.toEqual({
         approvalTransactions: [],
-        fulfilmentTransactions: [],
+        fulfillmentTransactions: [],
       });
     });
   });
@@ -100,8 +100,8 @@ describe('getUnsignedActions', () => {
     });
   });
 
-  describe('getUnsignedFulfilmentTransactions', () => {
-    it('should get the unsigned fulfil transactions', async () => {
+  describe('getUnsignedFulfillmentTransactions', () => {
+    it('should get the unsigned fulfill transactions', async () => {
       const actions: Action[] = [
         {
           type: ActionType.TRANSACTION,
@@ -120,14 +120,14 @@ describe('getUnsignedActions', () => {
         },
       ];
 
-      await expect(getUnsignedFulfilmentTransactions(actions)).resolves
+      await expect(getUnsignedFulfillmentTransactions(actions)).resolves
         .toEqual([{ from: '0xTRANSACTION1' }, { from: '0xTRANSACTION2' }]);
     });
 
     it('should return an empty arrays if no transactions', async () => {
       const actions: Action[] = [];
 
-      await expect(getUnsignedFulfilmentTransactions(actions)).resolves.toEqual([]);
+      await expect(getUnsignedFulfillmentTransactions(actions)).resolves.toEqual([]);
     });
   });
 
