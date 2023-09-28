@@ -5,7 +5,7 @@ import { cySmartGet } from '../../../lib/testUtils';
 import { FundWithSmartCheckout } from './FundWithSmartCheckout';
 import { FundWithSmartCheckoutSubViews } from '../../../context/view-context/PrimaryRevenueViewContextTypes';
 
-describe.only('FundWithSmartCheckout View', () => {
+describe('FundWithSmartCheckout View', () => {
   beforeEach(() => {
     cy.viewport('ipad-2');
   });
