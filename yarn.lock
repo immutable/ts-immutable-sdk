@@ -1896,9 +1896,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.9.17-beta":
-  version: 0.9.17-beta
-  resolution: "@biom3/react@npm:0.9.17-beta"
+"@biom3/react@npm:^0.10.8":
+  version: 0.10.8
+  resolution: "@biom3/react@npm:0.10.8"
   dependencies:
     "@biom3/design-tokens": "*"
     "@emotion/css": ^11.11.2
@@ -1915,7 +1915,7 @@ __metadata:
     react-dom: ^18.2.0
     react-is: ^18.2.0
     ts-deepmerge: ^6.2.0
-  checksum: c5aff71ae42989b2e3509a2798c579866c7728c31fefa2d42b877a041cc2ab0c2a0a75c7bd49b9053b6709c20a3ea0ead92174f01fa8cdfee52ed8f84963aab2
+  checksum: c7f10a15bbf6437c09989de009ca63b9e78be3a30149f35a8fbd7b8ed365737aa068d431e14930ef589a6697f644ab5f5135cca25562331d1def622089659289
   languageName: node
   linkType: hard
 
@@ -2669,7 +2669,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ethersproject/contracts@npm:5.7.0, @ethersproject/contracts@npm:^5.7.0":
+"@ethersproject/contracts@npm:5.7.0":
   version: 5.7.0
   resolution: "@ethersproject/contracts@npm:5.7.0"
   dependencies:
@@ -3059,7 +3059,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-sdk-sample-app@workspace:packages/checkout/sdk-sample-app"
   dependencies:
-    "@biom3/react": ^0.9.17-beta
+    "@biom3/react": ^0.10.8
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/config": 0.0.0
     "@svgr/webpack": ^8.0.1
@@ -3122,7 +3122,7 @@ __metadata:
   resolution: "@imtbl/checkout-widgets-lib@workspace:packages/checkout/widgets-lib"
   dependencies:
     "@biom3/design-tokens": 0.2.4-beta
-    "@biom3/react": ^0.9.17-beta
+    "@biom3/react": ^0.10.8
     "@ethersproject/providers": ^5.7.2
     "@imtbl/bridge-sdk": 0.0.0
     "@imtbl/checkout-sdk": 0.0.0
@@ -3170,7 +3170,7 @@ __metadata:
   resolution: "@imtbl/checkout-widgets-sample-app@workspace:packages/checkout/widgets-sample-app"
   dependencies:
     "@biom3/design-tokens": 0.2.4-beta
-    "@biom3/react": ^0.9.17-beta
+    "@biom3/react": ^0.10.8
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
@@ -3261,7 +3261,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/contracts@0.0.0, @imtbl/contracts@workspace:packages/internal/contracts":
+"@imtbl/contracts@workspace:packages/internal/contracts":
   version: 0.0.0-use.local
   resolution: "@imtbl/contracts@workspace:packages/internal/contracts"
   dependencies:
@@ -3346,7 +3346,7 @@ __metadata:
   resolution: "@imtbl/economy-building-blocks-playground@workspace:packages/internal/economy-building-blocks/playground"
   dependencies:
     "@biom3/design-tokens": 0.2.4-beta
-    "@biom3/react": ^0.9.17-beta
+    "@biom3/react": ^0.10.8
     "@imtbl/blockchain-data": 0.0.0
     "@imtbl/passport": 0.0.0
     "@imtbl/sdk": 0.0.0
@@ -3482,63 +3482,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/erc20@0.0.0, @imtbl/erc20@workspace:packages/erc20":
-  version: 0.0.0-use.local
-  resolution: "@imtbl/erc20@workspace:packages/erc20"
-  dependencies:
-    "@ethersproject/abi": ^5.7.0
-    "@ethersproject/bignumber": ^5.7.0
-    "@ethersproject/contracts": ^5.7.0
-    "@ethersproject/providers": ^5.7.2
-    "@imtbl/contracts": 0.0.0
-    "@rollup/plugin-typescript": ^11.0.0
-    "@swc/core": ^1.3.36
-    "@swc/jest": ^0.2.24
-    "@typechain/ethers-v5": ^10.2.0
-    ethers: ^5.7.2
-    rollup: ^3.17.2
-    typechain: ^8.1.1
-    typescript: ^4.9.5
-  languageName: unknown
-  linkType: soft
-
-"@imtbl/erc721-mint-by-id@0.0.0, @imtbl/erc721-mint-by-id@workspace:packages/erc721-mint-by-id":
-  version: 0.0.0-use.local
-  resolution: "@imtbl/erc721-mint-by-id@workspace:packages/erc721-mint-by-id"
-  dependencies:
-    "@ethersproject/abi": ^5.7.0
-    "@ethersproject/providers": ^5.7.2
-    "@imtbl/contracts": 0.0.0
-    "@rollup/plugin-typescript": ^11.0.0
-    "@swc/core": ^1.3.36
-    "@swc/jest": ^0.2.24
-    "@typechain/ethers-v5": ^10.2.0
-    ethers: ^5.7.2
-    rollup: ^3.17.2
-    typechain: ^8.1.1
-    typescript: ^4.9.5
-  languageName: unknown
-  linkType: soft
-
-"@imtbl/erc721@0.0.0, @imtbl/erc721@workspace:packages/erc721":
-  version: 0.0.0-use.local
-  resolution: "@imtbl/erc721@workspace:packages/erc721"
-  dependencies:
-    "@ethersproject/abi": ^5.7.0
-    "@ethersproject/contracts": ^5.7.0
-    "@ethersproject/providers": ^5.7.2
-    "@imtbl/contracts": 0.0.0
-    "@rollup/plugin-typescript": ^11.0.0
-    "@swc/core": ^1.3.36
-    "@swc/jest": ^0.2.24
-    "@typechain/ethers-v5": ^10.2.0
-    ethers: ^5.7.2
-    rollup: ^3.17.2
-    typechain: ^8.1.1
-    typescript: ^4.9.5
-  languageName: unknown
-  linkType: soft
-
 "@imtbl/factory-sdk@0.0.0, @imtbl/factory-sdk@workspace:packages/internal/factory/sdk":
   version: 0.0.0-use.local
   resolution: "@imtbl/factory-sdk@workspace:packages/internal/factory/sdk"
@@ -3653,7 +3596,7 @@ __metadata:
   resolution: "@imtbl/passport-sdk-sample-app@workspace:packages/passport/sdk-sample-app"
   dependencies:
     "@biom3/design-tokens": 0.2.4-beta
-    "@biom3/react": ^0.9.17-beta
+    "@biom3/react": ^0.10.8
     "@imtbl/config": 0.0.0
     "@imtbl/core-sdk": ^2.0.2
     "@imtbl/immutablex-client": 0.0.0
@@ -3783,9 +3726,6 @@ __metadata:
     "@imtbl/config": 0.0.0
     "@imtbl/core-sdk": ^2.0.2
     "@imtbl/cryptofiat": 0.0.0
-    "@imtbl/erc20": 0.0.0
-    "@imtbl/erc721": 0.0.0
-    "@imtbl/erc721-mint-by-id": 0.0.0
     "@imtbl/generated-clients": 0.0.0
     "@imtbl/guardian": 0.0.0
     "@imtbl/immutablex-client": 0.0.0
@@ -12510,7 +12450,6 @@ __metadata:
     "@ethersproject/providers": ^5.7.2
     "@imtbl/blockchain-data": 0.0.0
     "@imtbl/config": 0.0.0
-    "@imtbl/erc721-mint-by-id": 0.0.0
     "@types/node": ^18.14.2
     "@types/react": ^18.0.28
     "@types/react-dom": ^18.0.11
@@ -26770,7 +26709,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "sample-app@workspace:packages/provider/src/sample-app"
   dependencies:
-    "@biom3/react": ^0.9.17-beta
+    "@biom3/react": ^0.10.8
     "@imtbl/core-sdk": ^2.0.2
     "@imtbl/sdk": 0.0.0
     "@svgr/webpack": ^8.0.1

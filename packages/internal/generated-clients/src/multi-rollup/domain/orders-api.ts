@@ -284,13 +284,13 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
          * @param {string} chainName 
          * @param {string} [accountAddress] 
          * @param {number} [pageSize] Maximum number of trades to return per page
-         * @param {'created_at'} [sortBy] Trade field to sort by
+         * @param {'indexed_at'} [sortBy] Trade field to sort by
          * @param {'asc' | 'desc'} [sortDirection] Ascending or descending direction for sort
          * @param {string} [pageCursor] Page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listTrades: async (chainName: string, accountAddress?: string, pageSize?: number, sortBy?: 'created_at', sortDirection?: 'asc' | 'desc', pageCursor?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listTrades: async (chainName: string, accountAddress?: string, pageSize?: number, sortBy?: 'indexed_at', sortDirection?: 'asc' | 'desc', pageCursor?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'chainName' is not null or undefined
             assertParamExists('listTrades', 'chainName', chainName)
             const localVarPath = `/v1/chains/{chain_name}/trades`
@@ -420,13 +420,13 @@ export const OrdersApiFp = function(configuration?: Configuration) {
          * @param {string} chainName 
          * @param {string} [accountAddress] 
          * @param {number} [pageSize] Maximum number of trades to return per page
-         * @param {'created_at'} [sortBy] Trade field to sort by
+         * @param {'indexed_at'} [sortBy] Trade field to sort by
          * @param {'asc' | 'desc'} [sortDirection] Ascending or descending direction for sort
          * @param {string} [pageCursor] Page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listTrades(chainName: string, accountAddress?: string, pageSize?: number, sortBy?: 'created_at', sortDirection?: 'asc' | 'desc', pageCursor?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListTradeResult>> {
+        async listTrades(chainName: string, accountAddress?: string, pageSize?: number, sortBy?: 'indexed_at', sortDirection?: 'asc' | 'desc', pageCursor?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListTradeResult>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listTrades(chainName, accountAddress, pageSize, sortBy, sortDirection, pageCursor, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -508,13 +508,13 @@ export const OrdersApiFactory = function (configuration?: Configuration, basePat
          * @param {string} chainName 
          * @param {string} [accountAddress] 
          * @param {number} [pageSize] Maximum number of trades to return per page
-         * @param {'created_at'} [sortBy] Trade field to sort by
+         * @param {'indexed_at'} [sortBy] Trade field to sort by
          * @param {'asc' | 'desc'} [sortDirection] Ascending or descending direction for sort
          * @param {string} [pageCursor] Page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listTrades(chainName: string, accountAddress?: string, pageSize?: number, sortBy?: 'created_at', sortDirection?: 'asc' | 'desc', pageCursor?: string, options?: any): AxiosPromise<ListTradeResult> {
+        listTrades(chainName: string, accountAddress?: string, pageSize?: number, sortBy?: 'indexed_at', sortDirection?: 'asc' | 'desc', pageCursor?: string, options?: any): AxiosPromise<ListTradeResult> {
             return localVarFp.listTrades(chainName, accountAddress, pageSize, sortBy, sortDirection, pageCursor, options).then((request) => request(axios, basePath));
         },
     };
@@ -703,10 +703,10 @@ export interface OrdersApiListTradesRequest {
 
     /**
      * Trade field to sort by
-     * @type {'created_at'}
+     * @type {'indexed_at'}
      * @memberof OrdersApiListTrades
      */
-    readonly sortBy?: 'created_at'
+    readonly sortBy?: 'indexed_at'
 
     /**
      * Ascending or descending direction for sort

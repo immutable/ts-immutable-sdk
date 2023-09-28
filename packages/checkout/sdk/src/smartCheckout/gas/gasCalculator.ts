@@ -1,7 +1,7 @@
 import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import {
-  FulfilmentTransaction, GasAmount, GasTokenType, ItemRequirement, ItemType, TransactionOrGasType,
+  FulfillmentTransaction, GasAmount, GasTokenType, ItemRequirement, ItemType, TransactionOrGasType,
 } from '../../types';
 import { InsufficientERC20, InsufficientERC721 } from '../allowance/types';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
@@ -23,7 +23,7 @@ export const estimateGas = async (
 
 export const getGasItemRequirement = (
   gas: BigNumber,
-  transactionOrGas: FulfilmentTransaction | GasAmount,
+  transactionOrGas: FulfillmentTransaction | GasAmount,
 ): ItemRequirement => {
   if (transactionOrGas.type === TransactionOrGasType.TRANSACTION
     || transactionOrGas.gasToken.type === GasTokenType.NATIVE) {
@@ -44,7 +44,7 @@ export const getGasItemRequirement = (
 export const gasCalculator = async (
   provider: Web3Provider,
   insufficientItems: (InsufficientERC20 | InsufficientERC721)[],
-  transactionOrGas: FulfilmentTransaction | GasAmount,
+  transactionOrGas: FulfillmentTransaction | GasAmount,
 ): Promise<ItemRequirement | null> => {
   const estimateGasPromises = [];
   let totalGas = BigNumber.from(0);
@@ -55,7 +55,7 @@ export const gasCalculator = async (
     estimateGasPromises.push(estimateGas(provider, item.approvalTransaction));
   }
 
-  // If the transaction is a fulfilment transaction get the estimate gas promise
+  // If the transaction is a fulfillment transaction get the estimate gas promise
   // Otherwise use the gas amount with the limit to estimate the gas
   if (transactionOrGas.type === TransactionOrGasType.TRANSACTION) {
     estimateGasPromises.push(estimateGas(provider, transactionOrGas.transaction));

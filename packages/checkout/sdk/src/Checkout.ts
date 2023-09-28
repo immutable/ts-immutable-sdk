@@ -54,6 +54,8 @@ import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
 import { SellParams } from './types/sell';
 import { CancelParams } from './types/cancel';
 import { FiatRampService, FiatRampWidgetParams } from './fiatRamp';
+import { getItemRequirementsFromRequirements } from './smartCheckout/itemRequirements';
+import { CheckoutError, CheckoutErrorType } from './errors';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
@@ -288,12 +290,17 @@ export class Checkout {
     // eslint-disable-next-line no-console
     console.warn('This endpoint is currently under construction.');
 
+    if (params.orders.length > 1) {
+      // eslint-disable-next-line no-console
+      console.warn('This endpoint currently only actions the first order in the array.');
+    }
+
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
     );
 
-    await buy.buy(this.config, web3Provider, params.orderId);
+    await buy.buy(this.config, web3Provider, params.orders);
   }
 
   /**
@@ -343,12 +350,15 @@ export class Checkout {
     // eslint-disable-next-line no-console
     console.warn('This endpoint is currently under construction.');
 
+    // eslint-disable-next-line no-console
+    console.warn('This endpoint currently only actions the first order in the array.');
+
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
     );
 
-    await cancel.cancel(this.config, web3Provider, params.orderId);
+    await cancel.cancel(this.config, web3Provider, params.orderIds);
   }
 
   /**
@@ -370,11 +380,17 @@ export class Checkout {
       params.provider,
     );
 
-    // console.log('Smart Checkout Params ::', params);
+    let itemRequirements = [];
+    try {
+      itemRequirements = await getItemRequirementsFromRequirements(web3Provider, params.itemRequirements);
+    } catch {
+      throw new CheckoutError('Failed to map item requirements', CheckoutErrorType.ITEM_REQUIREMENTS_ERROR);
+    }
+
     await smartCheckout.smartCheckout(
       this.config,
       web3Provider,
-      params.itemRequirements,
+      itemRequirements,
       params.transactionOrGasAmount,
     );
   }

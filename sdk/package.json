@@ -8,6 +8,7 @@
   "dependencies": {
     "@0xsequence/abi": "^0.43.34",
     "@0xsequence/config": "^0.43.34",
+    "@ethersproject/abi": "^5.7.0",
     "@ethersproject/abstract-signer": "^5.7.0",
     "@ethersproject/providers": "^5.7.2",
     "@ethersproject/wallet": "^5.7.0",
@@ -32,9 +33,6 @@
     "@imtbl/checkout-widgets": "0.0.0",
     "@imtbl/config": "0.0.0",
     "@imtbl/cryptofiat": "0.0.0",
-    "@imtbl/erc20": "0.0.0",
-    "@imtbl/erc721": "0.0.0",
-    "@imtbl/erc721-mint-by-id": "0.0.0",
     "@imtbl/generated-clients": "0.0.0",
     "@imtbl/guardian": "0.0.0",
     "@imtbl/immutablex-client": "0.0.0",
@@ -99,18 +97,6 @@
     "./checkout_widgets": {
       "types": "./dist/checkout_widgets.d.ts",
       "import": "./dist/checkout_widgets.js"
-    },
-    "./erc20": {
-      "types": "./dist/erc20.d.ts",
-      "import": "./dist/erc20.js"
-    },
-    "./erc721": {
-      "types": "./dist/erc721.d.ts",
-      "import": "./dist/erc721.js"
-    },
-    "./erc721_mint_by_id": {
-      "types": "./dist/erc721_mint_by_id.d.ts",
-      "import": "./dist/erc721_mint_by_id.js"
     }
   },
   "files": [

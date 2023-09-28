@@ -6,7 +6,7 @@ import { CheckoutConfiguration } from '../../config';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { cancel } from './cancel';
 import { createOrderbookInstance } from '../../instance';
-import { signFulfilmentTransactions } from '../actions';
+import { signFulfillmentTransactions } from '../actions';
 import { SignTransactionStatusType } from '../actions/types';
 import { CancelStatusType } from '../../types';
 
@@ -47,18 +47,18 @@ describe('cancel', () => {
           } as PopulatedTransaction,
         }),
       });
-      (signFulfilmentTransactions as jest.Mock).mockResolvedValue({
+      (signFulfillmentTransactions as jest.Mock).mockResolvedValue({
         type: SignTransactionStatusType.SUCCESS,
       });
 
-      const result = await cancel(config, mockProvider, orderId);
+      const result = await cancel(config, mockProvider, [orderId]);
       expect(result).toEqual({
         orderId: '1',
         status: {
           type: CancelStatusType.SUCCESS,
         },
       });
-      expect(signFulfilmentTransactions).toBeCalledWith(
+      expect(signFulfillmentTransactions).toBeCalledWith(
         mockProvider,
         [
           {
@@ -87,22 +87,22 @@ describe('cancel', () => {
           } as PopulatedTransaction,
         }),
       });
-      (signFulfilmentTransactions as jest.Mock).mockResolvedValue({
+      (signFulfillmentTransactions as jest.Mock).mockResolvedValue({
         type: SignTransactionStatusType.FAILED,
         transactionHash: '0xHASH',
-        reason: 'Fulfilment transaction failed and was reverted',
+        reason: 'Fulfillment transaction failed and was reverted',
       });
 
-      const result = await cancel(config, mockProvider, orderId);
+      const result = await cancel(config, mockProvider, [orderId]);
       expect(result).toEqual({
         orderId: '1',
         status: {
           type: CancelStatusType.FAILED,
           transactionHash: '0xHASH',
-          reason: 'Fulfilment transaction failed and was reverted',
+          reason: 'Fulfillment transaction failed and was reverted',
         },
       });
-      expect(signFulfilmentTransactions).toBeCalledWith(
+      expect(signFulfillmentTransactions).toBeCalledWith(
         mockProvider,
         [
           {
@@ -131,11 +131,11 @@ describe('cancel', () => {
           } as PopulatedTransaction,
         }),
       });
-      (signFulfilmentTransactions as jest.Mock).mockRejectedValue(new Error('ERROR'));
+      (signFulfillmentTransactions as jest.Mock).mockRejectedValue(new Error('ERROR'));
 
-      await expect(cancel(config, mockProvider, orderId)).rejects.toThrow('ERROR');
+      await expect(cancel(config, mockProvider, [orderId])).rejects.toThrow('ERROR');
 
-      expect(signFulfilmentTransactions).toBeCalledWith(
+      expect(signFulfillmentTransactions).toBeCalledWith(
         mockProvider,
         [
           {
@@ -168,7 +168,7 @@ describe('cancel', () => {
       let data;
 
       try {
-        await cancel(config, mockProvider, orderId);
+        await cancel(config, mockProvider, [orderId]);
       } catch (err: any) {
         message = err.message;
         type = err.type;

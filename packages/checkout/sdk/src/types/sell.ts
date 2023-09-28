@@ -12,13 +12,23 @@ export interface SellParams {
   provider: Web3Provider;
   orders: Array<SellOrder>;
 }
-
+/**
+ * Interface of the SellOrder to create a listing from, includes makerFees
+ * @property {SellToken} sellToken - the token to be listed for sale
+ * @property {BuyToken} buyToken - the token info of the price of the item
+ * @property {OrderFee[]} makerFees - option array of makerFees to be applied to the listing
+ */
 export interface SellOrder {
   sellToken: SellToken;
   buyToken: BuyToken;
   makerFees?: Array<OrderFee>;
 }
 
+/**
+ * Interface of the SellToken
+ * @property {string} id - The ERC721 token id
+ * @property {string} collectionAddress - The ERC721 contract address
+ */
 export interface SellToken {
   id: string,
   collectionAddress: string,
@@ -85,7 +95,7 @@ export type BuyToken = NativeBuyToken | ERC20BuyToken;
 /**
  * Represents a native buy token
  * @property {ItemType} type - The type indicate this is a native token.
- * @property {BigNumber} amount - The amount of native token.
+ * @property {string} amount - The amount of native token.
  */
 type NativeBuyToken = {
   type: ItemType.NATIVE;
@@ -95,7 +105,7 @@ type NativeBuyToken = {
 /**
  * Represents a ERC20 buy token
  * @property {ItemType} type - The type indicate this is a ERC20 token.
- * @property {BigNumber} amount - The amount of native token.
+ * @property {string} amount - The amount of native token.
  * @property {string} contractAddress - The contract address of the ERC20.
  */
 type ERC20BuyToken = {

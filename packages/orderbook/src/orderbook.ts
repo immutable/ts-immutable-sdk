@@ -206,7 +206,7 @@ export class Orderbook {
         fees: takerFees.map((fee) => ({
           amount: fee.amount,
           fee_type:
-            FeeType.TAKER_MARKETPLACE as unknown as OpenApiFee.fee_type.TAKER_MARKETPLACE,
+            FeeType.TAKER_ECOSYSTEM as unknown as OpenApiFee.fee_type.TAKER_ECOSYSTEM,
           recipient: fee.recipient,
         })),
       },

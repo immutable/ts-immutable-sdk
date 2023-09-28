@@ -35,7 +35,7 @@ export default function Cancel({ checkout, provider }: CancelProps) {
     try {
       await checkout.cancel({
         provider,
-        orderId,
+        orderIds: [orderId],
       });
       setLoading(false);
     } catch (err: any) {
