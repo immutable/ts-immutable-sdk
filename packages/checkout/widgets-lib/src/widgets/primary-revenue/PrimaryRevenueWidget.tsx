@@ -50,29 +50,17 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
     [viewState, viewDispatch],
   );
 
-  const mount = useCallback(async () => {
+  const mount = useCallback(() => {
     if (!checkout || !provider) return;
 
-    try {
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: PrimaryRevenueWidgetViews.PAYMENT_METHODS,
-          },
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: PrimaryRevenueWidgetViews.PAYMENT_METHODS,
         },
-      });
-    } catch (error: any) {
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: SharedViews.ERROR_VIEW,
-            error,
-          },
-        },
-      });
-    }
+      },
+    });
   }, [checkout, provider]);
 
   useEffect(() => {
