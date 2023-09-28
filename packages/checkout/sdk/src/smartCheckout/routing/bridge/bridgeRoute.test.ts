@@ -19,7 +19,7 @@ import { TokenBalanceResult } from '../types';
 import { createBlockchainDataInstance } from '../../../instance';
 import { estimateGasForBridgeApproval } from './estimateApprovalGas';
 import { bridgeGasEstimate } from './bridgeGasEstimate';
-import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from './constants';
+import { getImxL1Representation, INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from './constants';
 import { CheckoutErrorType } from '../../../errors';
 import { allowListCheckForBridge } from '../../allowList/allowListCheck';
 
@@ -27,6 +27,7 @@ jest.mock('../../../gasEstimate');
 jest.mock('../../../instance');
 jest.mock('./estimateApprovalGas');
 jest.mock('./bridgeGasEstimate');
+jest.mock('./constants');
 jest.mock('../../allowList/allowListCheck');
 
 describe('bridgeRoute', () => {
@@ -947,7 +948,7 @@ describe('bridgeRoute', () => {
           },
         },
       };
-
+      (getImxL1Representation as jest.Mock).mockResolvedValue('0x2Fa06C6672dDCc066Ab04631192738799231dE4a');
       (createBlockchainDataInstance as jest.Mock).mockReturnValue({
         getToken: jest.fn().mockResolvedValue({}),
       });
