@@ -24,7 +24,11 @@ const X_IMMUTABLE_API_KEY = 'sk_imapik-Ekz6cLnnwREtqjGn$xo6_fb97b8';
 
 type SignApiResponse = {
   order: {
-    currency: string;
+    currency: {
+      name: string;
+      decimals: number;
+      erc20_address: string;
+    };
     currency_symbol: string;
     products: {
       detail: {
@@ -54,6 +58,17 @@ type SignApiResponse = {
   }[];
 };
 
+type SignApiRequest = {
+  recipient_address: string
+  currency_filter: 'contract_address' | 'symbol'
+  currency_value: string
+  payment_type: string
+  products: {
+    product_id: string;
+    quantity: number
+  }[]
+};
+
 const toSignedProduct = (
   product: SignApiResponse['order']['products'][0],
   currency: string,
@@ -77,10 +92,13 @@ const toSignResponse = (
 
   return {
     order: {
-      currency: order.currency,
+      currency: {
+        name: order.currency.name,
+        erc20Address: order.currency.erc20_address,
+      },
       products: order.products.map((product) => toSignedProduct(
         product,
-        order.currency,
+        order.currency.name,
         items.find((item) => item.productId === product.product_id),
       )),
       totalAmount: Number(order.total_amount),
@@ -151,10 +169,11 @@ export const useSignOrder = (input: SignOrderInput) => {
         return undefined;
       }
 
-      const data = {
+      const data: SignApiRequest = {
         recipient_address: recipientAddress,
-        contractAddress: fromContractAddress,
         payment_type: paymentType,
+        currency_filter: 'contract_address',
+        currency_value: fromContractAddress,
         products: items.map((item) => ({
           product_id: item.productId,
           quantity: item.qty,

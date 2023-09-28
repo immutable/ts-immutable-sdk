@@ -9,14 +9,11 @@ import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { text as textConfig } from '../../../resources/text/textConfig';
 import { PrimaryRevenueWidgetViews } from '../../../context/view-context/PrimaryRevenueViewContextTypes';
 
-import {
-  ViewContext,
-  ViewActions,
-  SharedViews,
-} from '../../../context/view-context/ViewContext';
+import { ViewContext, ViewActions, SharedViews } from '../../../context/view-context/ViewContext';
 
-import { sendPrimaryRevenueWidgetCloseEvent } from '../PrimaryRevenuWidgetEvents';
+import { sendPrimaryRevenueWidgetCloseEvent } from '../PrimaryRevenueWidgetEvents';
 import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
+import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 
 type PaymentMethodsProps = {
   config: StrongCheckoutWidgetsConfig;
@@ -27,10 +24,9 @@ export function PaymentMethods(props: PaymentMethodsProps) {
     coins: textConfig.views[PrimaryRevenueWidgetViews.PAY_WITH_COINS],
     card: textConfig.views[PrimaryRevenueWidgetViews.PAY_WITH_CARD],
   };
-
   const { viewDispatch, viewState } = useContext(ViewContext);
-
   const { amount, fromContractAddress } = viewState.view.data || {};
+  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const handleOptionClick = useCallback(
     async (type: PrimaryRevenueWidgetViews) => {
@@ -76,7 +72,7 @@ export function PaymentMethods(props: PaymentMethodsProps) {
       testId="payment-methods"
       header={(
         <HeaderNavigation
-          onCloseButtonClick={() => sendPrimaryRevenueWidgetCloseEvent()}
+          onCloseButtonClick={() => sendPrimaryRevenueWidgetCloseEvent(eventTarget)}
         />
       )}
       footer={<FooterLogo />}

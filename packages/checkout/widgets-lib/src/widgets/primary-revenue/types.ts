@@ -25,7 +25,10 @@ export type SignedOrderProduct = {
 };
 
 export type SignedOrder = {
-  currency: string;
+  currency: {
+    name: string;
+    erc20Address: string;
+  };
   totalAmount: number;
   products: SignedOrderProduct[];
 };

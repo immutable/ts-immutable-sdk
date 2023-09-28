@@ -16,11 +16,12 @@ import {
   sendPrimaryRevenueFailedEvent,
   sendPrimaryRevenueSuccessEvent,
   sendPrimaryRevenueWidgetCloseEvent,
-} from '../PrimaryRevenuWidgetEvents';
+} from '../PrimaryRevenueWidgetEvents';
 import { ViewContext } from '../../../context/view-context/ViewContext';
 import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 import { useSharedContext } from '../context/SharedContextProvider';
 import { PaymentTypes } from '../types';
+import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 
 type PayWithCoinsProps = {
   config: StrongCheckoutWidgetsConfig
@@ -30,17 +31,18 @@ export function PayWithCoins(props: PayWithCoinsProps) {
   const text = textConfig.views[PrimaryRevenueWidgetViews.PAY_WITH_COINS];
   const [loading, setLoading] = useState(false);
   const { viewState } = useContext(ViewContext);
-  const {
-    sign, execute, signResponse, fromCurrency,
-  } = useSharedContext();
+  const { sign, execute, signResponse } = useSharedContext();
+  const currency = signResponse?.order.currency || '';
+
+  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const handlePayment = useCallback(async () => {
     setLoading(true);
     try {
       const transactionHashes = await execute();
-      sendPrimaryRevenueSuccessEvent(transactionHashes);
+      sendPrimaryRevenueSuccessEvent(eventTarget, transactionHashes);
     } catch (error) {
-      sendPrimaryRevenueFailedEvent((error as Error).message);
+      sendPrimaryRevenueFailedEvent(eventTarget, (error as Error).message);
     }
 
     setLoading(false);
@@ -56,7 +58,7 @@ export function PayWithCoins(props: PayWithCoinsProps) {
       header={(
         <HeaderNavigation
           title={text.header.heading}
-          onCloseButtonClick={() => sendPrimaryRevenueWidgetCloseEvent()}
+          onCloseButtonClick={() => sendPrimaryRevenueWidgetCloseEvent(eventTarget)}
         />
       )}
       footer={<FooterLogo />}
@@ -109,7 +111,7 @@ export function PayWithCoins(props: PayWithCoinsProps) {
           </Button>
           <Body>
             {viewState.view.data && viewState.view.data.order.total_amount
-              ? `${viewState.view.data.order.total_amount} ${fromCurrency}`
+              ? `${viewState.view.data.order.total_amount} ${currency}`
               : ''}
           </Body>
         </Box>
