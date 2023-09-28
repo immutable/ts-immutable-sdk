@@ -9,11 +9,16 @@ import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { text as textConfig } from '../../../resources/text/textConfig';
 import { PrimaryRevenueWidgetViews } from '../../../context/view-context/PrimaryRevenueViewContextTypes';
 
-import { ViewContext, ViewActions, SharedViews } from '../../../context/view-context/ViewContext';
+import {
+  ViewContext,
+  ViewActions,
+  SharedViews,
+} from '../../../context/view-context/ViewContext';
 
 import { sendPrimaryRevenueWidgetCloseEvent } from '../PrimaryRevenueWidgetEvents';
 import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
+import { PaymentOptions } from '../components/PaymentOptions';
 
 type PaymentMethodsProps = {
   config: StrongCheckoutWidgetsConfig;
@@ -26,7 +31,9 @@ export function PaymentMethods(props: PaymentMethodsProps) {
   };
   const { viewDispatch, viewState } = useContext(ViewContext);
   const { amount, fromContractAddress } = viewState.view.data || {};
-  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+  const {
+    eventTargetState: { eventTarget },
+  } = useContext(EventTargetContext);
 
   const handleOptionClick = useCallback(
     async (type: PrimaryRevenueWidgetViews) => {
@@ -96,18 +103,7 @@ export function PaymentMethods(props: PaymentMethodsProps) {
           {text.methods.header.heading}
         </Heading>
         <Box sx={{ paddingX: 'base.spacing.x2' }}>
-          <button
-            type="button"
-            onClick={() => handleOptionClick(PrimaryRevenueWidgetViews.PAY_WITH_COINS)}
-          >
-            {text.coins.header.heading}
-          </button>
-          <button
-            type="button"
-            onClick={() => handleOptionClick(PrimaryRevenueWidgetViews.PAY_WITH_CARD)}
-          >
-            {text.card.header.heading}
-          </button>
+          <PaymentOptions onClick={handleOptionClick} />
         </Box>
       </Box>
     </SimpleLayout>
