@@ -18,10 +18,9 @@ const config = new PassportConfiguration({
   scope: 'email profile',
 });
 
-const mockOidcUser: OidcUser = {
+const commonOidcUser: OidcUser = {
   id_token: mockUser.idToken,
   access_token: mockUser.accessToken,
-  refresh_token: mockUser.refreshToken,
   token_type: 'Bearer',
   scope: 'openid',
   expires_in: 167222,
@@ -30,7 +29,23 @@ const mockOidcUser: OidcUser = {
     email: mockUser.profile.email,
     nickname: mockUser.profile.nickname,
   },
+} as OidcUser;
+
+const mockOidcUser: OidcUser = {
+  ...commonOidcUser,
+  refresh_token: mockUser.refreshToken,
   expired: false,
+} as OidcUser;
+
+const mockOidcExpiredUser: OidcUser = {
+  ...commonOidcUser,
+  refresh_token: mockUser.refreshToken,
+  expired: true,
+} as OidcUser;
+
+const mockOidcExpiredNoRefreshTokenUser: OidcUser = {
+  ...commonOidcUser,
+  expired: true,
 } as OidcUser;
 
 const imxProfileData = {
@@ -251,7 +266,7 @@ describe('AuthManager', () => {
     });
 
     it('should return null if user is returned', async () => {
-      getUserMock.mockReturnValue(mockOidcUser);
+      getUserMock.mockReturnValue(mockOidcExpiredUser);
       signinSilentMock.mockResolvedValue(null);
 
       const result = await authManager.loginSilent();
@@ -322,6 +337,29 @@ describe('AuthManager', () => {
       const result = await authManager.getUser();
 
       expect(result).toEqual(mockUser);
+    });
+
+    it('should call signinSilent and returns user when user token is expired with the refresh token', async () => {
+      getUserMock.mockReturnValue(mockOidcExpiredUser);
+      signinSilentMock.mockResolvedValue(mockOidcUser);
+      const result = await authManager.getUser();
+
+      expect(result).toEqual(mockUser);
+    });
+
+    it('should return null when the user token is expired without refresh token', async () => {
+      getUserMock.mockReturnValue(mockOidcExpiredNoRefreshTokenUser);
+      const result = await authManager.getUser();
+
+      expect(result).toEqual(null);
+    });
+
+    it('should return null when the user token is expired with the refresh token, but signinSilent returns null', async () => {
+      getUserMock.mockReturnValue(mockOidcExpiredUser);
+      signinSilentMock.mockResolvedValue(null);
+      const result = await authManager.getUser();
+
+      expect(result).toEqual(null);
     });
 
     it('should return null if no user is returned', async () => {

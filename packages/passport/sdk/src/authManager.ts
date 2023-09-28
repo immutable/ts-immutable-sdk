@@ -369,24 +369,27 @@ export default class AuthManager {
   }
 
   public async loginSilent(): Promise<User | null> {
-    return withPassportError<User | null>(async () => {
-      const existedUser = await this.getUser();
-      if (!existedUser) {
-        return null;
-      }
-      const oidcUser = await this.userManager.signinSilent();
-      if (!oidcUser) {
-        return null;
-      }
+    return withPassportError<User | null>(async () => this.getUser(), PassportErrorType.SILENT_LOGIN_ERROR);
+  }
+
+  private async getWebUser(oidcUser: OidcUser) : Promise<User | null> {
+    if (!oidcUser.expired) {
       return AuthManager.mapOidcUserToDomainModel(oidcUser);
-    }, PassportErrorType.SILENT_LOGIN_ERROR);
+    }
+    if (oidcUser.expired && oidcUser.refresh_token) {
+      const newOidcUser = await this.userManager.signinSilent();
+      return newOidcUser
+        ? AuthManager.mapOidcUserToDomainModel(newOidcUser)
+        : null;
+    }
+    return null;
   }
 
   public async getUser(): Promise<User | null> {
     return withPassportError<User | null>(async () => {
       const oidcUser = await this.userManager.getUser();
       if (oidcUser) {
-        return AuthManager.mapOidcUserToDomainModel(oidcUser);
+        return this.getWebUser(oidcUser);
       }
 
       const deviceToken = this.deviceCredentialsManager.getCredentials();
