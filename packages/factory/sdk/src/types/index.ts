@@ -41,3 +41,20 @@ export interface GetPresetsRequest {}
 export interface GetPresetsResponse {
   presets: Preset[];
 }
+
+export interface GetUnsignedDeployPresetTxRequest {
+  presetName: string;
+  arguments: string[];
+}
+
+export interface GetUnsignedDeployPresetTxResponse {
+  unsignedTx: ethers.providers.TransactionRequest;
+}
+
+export interface GetDeployDetailsRequest {
+  receipt: ethers.providers.TransactionReceipt
+}
+
+export interface GetDeployDetailsResponse {
+  deployedAddress: Address
+}

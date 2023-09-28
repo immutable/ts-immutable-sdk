@@ -4,6 +4,8 @@
 export enum FactoryErrorType {
   UNSUPPORTED_ERROR = 'UNSUPPORTED_ERROR',
   PROVIDER_ERROR = 'PROVIDER_ERROR',
+  NOT_FOUND = 'NOT_FOUND',
+  INVALID_ARGUMENT = 'INVALID_ARGUMENT',
 }
 
 export class FactoryError extends Error {

@@ -3539,9 +3539,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/factory-sdk@0.0.0, @imtbl/factory-sdk@workspace:packages/internal/factory/sdk":
+"@imtbl/factory-sdk@0.0.0, @imtbl/factory-sdk@workspace:packages/factory/sdk":
   version: 0.0.0-use.local
-  resolution: "@imtbl/factory-sdk@workspace:packages/internal/factory/sdk"
+  resolution: "@imtbl/factory-sdk@workspace:packages/factory/sdk"
   dependencies:
     "@imtbl/config": 0.0.0
     "@jest/globals": ^29.5.0
@@ -3785,6 +3785,7 @@ __metadata:
     "@imtbl/erc20": 0.0.0
     "@imtbl/erc721": 0.0.0
     "@imtbl/erc721-mint-by-id": 0.0.0
+    "@imtbl/factory-sdk": 0.0.0
     "@imtbl/generated-clients": 0.0.0
     "@imtbl/guardian": 0.0.0
     "@imtbl/immutablex-client": 0.0.0
@@ -16781,9 +16782,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"factory-sample-app@workspace:packages/internal/factory/factory-sample-app":
+"factory-sample-app@workspace:packages/factory/factory-sample-app":
   version: 0.0.0-use.local
-  resolution: "factory-sample-app@workspace:packages/internal/factory/factory-sample-app"
+  resolution: "factory-sample-app@workspace:packages/factory/factory-sample-app"
   dependencies:
     "@imtbl/config": 0.0.0
     "@imtbl/factory-sdk": 0.0.0

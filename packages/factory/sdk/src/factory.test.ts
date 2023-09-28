@@ -1,6 +1,6 @@
 import { describe } from '@jest/globals';
 
-describe('Token Bridge', () => {
+describe('Factory', () => {
   it('works', () => {
     expect(true).toBe(true);
   });

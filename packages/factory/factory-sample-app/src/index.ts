@@ -1,11 +1,10 @@
 /* eslint-disable no-console */
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { FactoryConfiguration, Factory, GetPresetsResponse, ZKEVM_DEVNET } from '@imtbl/factory-sdk';
+import { FactoryConfiguration, Factory, GetPresetsResponse, ZKEVM_DEVNET, GetUnsignedDeployPresetTxRequest, ZKEVM_TESTNET } from '@imtbl/factory-sdk';
 import { ethers } from 'ethers';
 
 async function main() {
     if (!process.env.PROVIDER) {
-        console.log(process.env.PROVIDER);
         throw new Error('PROVIDER not set');
     }
 
@@ -28,7 +27,7 @@ async function main() {
         baseConfig: new ImmutableConfiguration({
         environment: Environment.SANDBOX,
         }),
-        factoryInstance: ZKEVM_DEVNET,
+        factoryInstance: ZKEVM_TESTNET,
         provider: provider,
     });
 
@@ -37,6 +36,21 @@ async function main() {
     const presets: GetPresetsResponse = await factory.getPresets({});
 
     console.log(presets);
+
+    // obtained form https://immutable.atlassian.net/wiki/spaces/IGG/pages/2216527667/Allowlist+Configuration
+    const royaltyAllowlistAddress = "0xc341821C99aE27867A2eF865941892aA8976856b";
+    const req: GetUnsignedDeployPresetTxRequest = {
+        presetName: "ImmutableERC721MintByID",
+        arguments: [wallet.address, "hello", "world", "cool", "beans", royaltyAllowlistAddress, wallet.address, "10"]
+    }
+    const unsignedTx = await factory.getUnsignedDeployPresetTx(req);
+    console.log(unsignedTx);
+
+    const deployTx = await wallet.sendTransaction(unsignedTx.unsignedTx);
+    console.log(`Deploy transaction hash: ${deployTx.hash} ; waiting for confirmation...`);
+    const receipt = await deployTx.wait();
+    const deployDetails = await factory.getDeployDetails({receipt: receipt});
+    console.log(deployDetails.deployedAddress);
 }
 
 // Run the deposit function and exit the process when completed

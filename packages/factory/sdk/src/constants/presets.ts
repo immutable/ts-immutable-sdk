@@ -89,25 +89,4 @@ export const PRESETS = [
       type: 'constructor',
     },
   },
-  {
-    name: 'ERC721Psi',
-    group: 'NFT',
-    description: 'A simple NFT Preset called ERC721Psi',
-    // eslint-disable-next-line max-len
-    link: 'https://github.com/immutable/zkevm-contracts/blob/main/contracts/token/erc721/erc721psi/ERC721Psi.sol',
-    creationABI: {
-      inputs: [
-        {
-          name: 'name_',
-          type: 'string',
-        },
-        {
-          name: 'symbol_',
-          type: 'string',
-        },
-      ],
-      stateMutability: 'nonpayable',
-      type: 'constructor',
-    },
-  },
 ];

@@ -17,8 +17,8 @@
   "private": true,
   "scripts": {
     "build": "",
-    "factory": "ts-node --esm ./src/index.ts",
-    "lint": "eslint ./src --ext .ts --max-warnings=0"
+    "factory": "ts-node --esm src/index.ts",
+    "lint": "eslint src --ext .ts --max-warnings=0"
   },
   "type": "module"
 }
