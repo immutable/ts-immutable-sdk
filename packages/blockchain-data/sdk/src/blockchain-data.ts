@@ -41,7 +41,7 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async listActivities(
-    request: mr.ActivitiesApiListActivitiesRequest
+    request: mr.ActivitiesApiListActivitiesRequest,
   ): Promise<mr.ListActivitiesResult> {
     return await this.activities
       .listActivities(request)
@@ -58,7 +58,7 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async getActivity(
-    request: mr.ActivitiesApiGetActivityRequest
+    request: mr.ActivitiesApiGetActivityRequest,
   ): Promise<mr.GetActivityResult> {
     return await this.activities
       .getActivity(request)
@@ -75,7 +75,7 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async listChains(
-    request: mr.ChainsApiListChainsRequest
+    request: mr.ChainsApiListChainsRequest,
   ): Promise<mr.ListChainsResult> {
     return await this.chains
       .listChains(request)
@@ -92,7 +92,7 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async listCollections(
-    request: mr.CollectionsApiListCollectionsRequest
+    request: mr.CollectionsApiListCollectionsRequest,
   ): Promise<mr.ListCollectionsResult> {
     return await this.collections
       .listCollections(request)
@@ -109,7 +109,7 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async listCollectionsByNFTOwner(
-    request: mr.CollectionsApiListCollectionsByNFTOwnerRequest
+    request: mr.CollectionsApiListCollectionsByNFTOwnerRequest,
   ): Promise<mr.ListCollectionsResult> {
     return await this.collections
       .listCollectionsByNFTOwner(request)
@@ -126,7 +126,7 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async getCollection(
-    request: mr.CollectionsApiGetCollectionRequest
+    request: mr.CollectionsApiGetCollectionRequest,
   ): Promise<mr.GetCollectionResult> {
     return await this.collections
       .getCollection(request)
@@ -143,7 +143,7 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async getNFT(
-    request: mr.NftsApiGetNFTRequest
+    request: mr.NftsApiGetNFTRequest,
   ): Promise<mr.GetNFTResult> {
     return await this.nfts
       .getNFT(request)
@@ -160,7 +160,7 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async listNFTs(
-    request: mr.NftsApiListNFTsRequest
+    request: mr.NftsApiListNFTsRequest,
   ): Promise<mr.ListNFTsResult> {
     return await this.nfts
       .listNFTs(request)
@@ -177,7 +177,7 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async listNFTsByAccountAddress(
-    request: mr.NftsApiListNFTsByAccountAddressRequest
+    request: mr.NftsApiListNFTsByAccountAddressRequest,
   ): Promise<mr.ListNFTsResult> {
     return await this.nfts
       .listNFTsByAccountAddress(request)
@@ -194,7 +194,7 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async listNFTOwners(
-    request: mr.NftOwnersApiListNFTOwnersRequest
+    request: mr.NftOwnersApiListNFTOwnersRequest,
   ): Promise<mr.ListNFTOwnersResult> {
     return await this.nftOwners
       .listNFTOwners(request)
@@ -211,7 +211,7 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async listTokens(
-    request: mr.TokensApiListERC20TokensRequest
+    request: mr.TokensApiListERC20TokensRequest,
   ): Promise<mr.ListTokensResult> {
     return await this.tokens
       .listERC20Tokens(request)
@@ -228,7 +228,7 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async getToken(
-    request: mr.TokensApiGetERC20TokenRequest
+    request: mr.TokensApiGetERC20TokenRequest,
   ): Promise<mr.GetTokenResult> {
     return await this.tokens
       .getERC20Token(request)
@@ -245,7 +245,7 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async refreshCollectionMetadata(
-    request: mr.CollectionsApiRefreshCollectionMetadataRequest
+    request: mr.CollectionsApiRefreshCollectionMetadataRequest,
   ): Promise<mr.RefreshCollectionMetadataResult> {
     return await this.collections
       .refreshCollectionMetadata(request)
@@ -262,7 +262,7 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async refreshNFTMetadata(
-    request: mr.MetadataApiRefreshNFTMetadataByTokenIDRequest
+    request: mr.MetadataApiRefreshNFTMetadataByTokenIDRequest,
   ): Promise<mr.MetadataRefreshRateLimitResult> {
     return await this.metadata
       .refreshNFTMetadataByTokenID(request)
@@ -279,7 +279,7 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async refreshStackedMetadata(
-    request: mr.MetadataApiRefreshMetadataByIDRequest
+    request: mr.MetadataApiRefreshMetadataByIDRequest,
   ): Promise<mr.MetadataRefreshRateLimitResult> {
     return await this.metadata
       .refreshMetadataByID(request)
