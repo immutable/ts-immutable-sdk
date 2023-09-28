@@ -25,6 +25,7 @@ jest.mock('../../../gasEstimate');
 jest.mock('../../../instance');
 jest.mock('./estimateApprovalGas');
 jest.mock('./bridgeGasEstimate');
+jest.mock('./constants');
 jest.mock('../../allowList/allowListCheck');
 
 describe('bridgeRoute', () => {

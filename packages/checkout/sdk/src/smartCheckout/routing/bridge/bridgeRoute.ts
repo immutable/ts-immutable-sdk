@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { BigNumber, ethers } from 'ethers';
 import {
   ChainId,
