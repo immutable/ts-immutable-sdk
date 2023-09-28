@@ -324,10 +324,11 @@ export const text = {
           caption: 'GooglePay also available with Transak',
         },
       },
+      loading: 'Nice choice',
     },
     [PrimaryRevenueWidgetViews.PAY_WITH_COINS]: {
       header: {
-        heading: 'Pay with your coins',
+        heading: 'Pay with your',
         caption: 'Using the coins balance in your wallet',
       },
       button: {
@@ -335,10 +336,7 @@ export const text = {
       },
     },
     [PrimaryRevenueWidgetViews.PAY_WITH_CARD]: {
-      header: {
-        heading: 'Pay with card',
-        caption: 'Powered by Transak',
-      },
+      screenTitle: 'Pay with card',
     },
   },
   wallets: {

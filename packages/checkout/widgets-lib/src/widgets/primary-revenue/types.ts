@@ -38,6 +38,7 @@ export type SignedTransaction = {
   gasEstimate: number;
   methodCall: string;
   params: {
+    reference: string;
     amount: number;
     spender: string;
   };

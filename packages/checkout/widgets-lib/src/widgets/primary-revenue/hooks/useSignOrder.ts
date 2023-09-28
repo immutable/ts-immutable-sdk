@@ -108,8 +108,9 @@ const toSignResponse = (
       gasEstimate: transaction.gas_estimate,
       methodCall: transaction.method_call,
       params: {
-        amount: transaction.params.amount as number,
-        spender: transaction.params.spender as string,
+        reference: transaction.params.reference || '',
+        amount: transaction.params.amount || 0,
+        spender: transaction.params.spender || '',
       },
       rawData: transaction.raw_data,
     })),

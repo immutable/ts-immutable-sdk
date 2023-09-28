@@ -24,6 +24,7 @@ import { SharedContextProvider } from './context/SharedContextProvider';
 import { PaymentMethods } from './views/PaymentMethods';
 import { PayWithCard } from './views/PayWithCard';
 import { PayWithCoins } from './views/PayWithCoins';
+import { ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
 
 export interface PrimaryRevenueWidgetProps {
   config: StrongCheckoutWidgetsConfig;
@@ -32,11 +33,12 @@ export interface PrimaryRevenueWidgetProps {
   fromContractAddress: string;
   env: string;
   environmentId: string;
+  connectLoaderParams?: ConnectLoaderParams;
 }
 
 export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
   const {
-    config, amount, items, fromContractAddress, env, environmentId,
+    config, amount, items, fromContractAddress, env, environmentId, connectLoaderParams,
   } = props;
 
   console.log('@@@ PrimaryRevenueWidget', config, amount, items, fromContractAddress, env, environmentId);
@@ -44,16 +46,13 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
 
-  const loadingText = text.views[SharedViews.LOADING_VIEW].text;
-
   const { theme } = config;
   const biomeTheme = useMemo(() => widgetTheme(theme), [theme]);
 
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
-  const viewReducerValues = useMemo(
-    () => ({ viewState, viewDispatch }),
-    [viewState, viewDispatch],
-  );
+  const viewReducerValues = useMemo(() => ({ viewState, viewDispatch }), [viewState, viewDispatch]);
+
+  const loadingText = viewState.view.data?.loadingText || text.views[SharedViews.LOADING_VIEW].text;
 
   const onMount = useCallback(() => {
     if (!checkout || !provider) return;
@@ -86,6 +85,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
             environmentId,
             provider,
             checkout,
+            passport: connectLoaderParams?.passport,
           }}
         >
           {viewState.view.type === SharedViews.LOADING_VIEW && (

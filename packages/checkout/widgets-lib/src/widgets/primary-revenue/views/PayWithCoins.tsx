@@ -1,9 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react/no-unused-prop-types */
 
-import {
-  useCallback, useContext, useEffect, useState,
-} from 'react';
+import { useCallback, useContext, useState } from 'react';
 import { Body, Box, Button } from '@biom3/react';
 
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -20,21 +18,22 @@ import {
 import { ViewContext } from '../../../context/view-context/ViewContext';
 import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 import { useSharedContext } from '../context/SharedContextProvider';
-import { PaymentTypes } from '../types';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 
 type PayWithCoinsProps = {
-  config: StrongCheckoutWidgetsConfig
+  config: StrongCheckoutWidgetsConfig;
 };
 
 export function PayWithCoins(props: PayWithCoinsProps) {
   const text = textConfig.views[PrimaryRevenueWidgetViews.PAY_WITH_COINS];
   const [loading, setLoading] = useState(false);
   const { viewState } = useContext(ViewContext);
-  const { sign, execute, signResponse } = useSharedContext();
+  const { execute, signResponse } = useSharedContext();
   const currency = signResponse?.order.currency || '';
 
-  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+  const {
+    eventTargetState: { eventTarget },
+  } = useContext(EventTargetContext);
 
   const handlePayment = useCallback(async () => {
     setLoading(true);
@@ -47,10 +46,6 @@ export function PayWithCoins(props: PayWithCoinsProps) {
 
     setLoading(false);
   }, [execute]);
-
-  useEffect(() => {
-    sign(PaymentTypes.CRYPTO);
-  }, [sign]);
 
   return (
     <SimpleLayout

@@ -1,71 +1,79 @@
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react/no-unused-prop-types */
-import { useCallback, useContext } from 'react';
+import {
+  useCallback, useContext, useEffect, useMemo,
+} from 'react';
 import { Box, Heading } from '@biom3/react';
 
+import { use } from 'chai';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { text as textConfig } from '../../../resources/text/textConfig';
 import { PrimaryRevenueWidgetViews } from '../../../context/view-context/PrimaryRevenueViewContextTypes';
 
-import { ViewContext, ViewActions, SharedViews } from '../../../context/view-context/ViewContext';
-
 import { sendPrimaryRevenueWidgetCloseEvent } from '../PrimaryRevenueWidgetEvents';
 import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
+
+import { useSharedContext } from '../context/SharedContextProvider';
+import { PaymentTypes } from '../types';
+import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 
 type PaymentMethodsProps = {
   config: StrongCheckoutWidgetsConfig;
 };
 export function PaymentMethods(props: PaymentMethodsProps) {
-  const text = {
-    methods: textConfig.views[PrimaryRevenueWidgetViews.PAYMENT_METHODS],
-    coins: textConfig.views[PrimaryRevenueWidgetViews.PAY_WITH_COINS],
-    card: textConfig.views[PrimaryRevenueWidgetViews.PAY_WITH_CARD],
-  };
-  const { viewDispatch, viewState } = useContext(ViewContext);
-  const { amount, fromContractAddress } = viewState.view.data || {};
+  const methodsText = textConfig.views[PrimaryRevenueWidgetViews.PAYMENT_METHODS];
+  const cardText = methodsText.options[PrimaryRevenueWidgetViews.PAY_WITH_CARD];
+  const coinsText = methodsText.options[PrimaryRevenueWidgetViews.PAY_WITH_COINS];
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
-  const handleOptionClick = useCallback(
-    async (type: PrimaryRevenueWidgetViews) => {
-      if (type === PrimaryRevenueWidgetViews.PAY_WITH_CARD) {
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: {
-              type: PrimaryRevenueWidgetViews.PAY_WITH_CARD,
-            },
-          },
-        });
-        return;
-      }
+  const { viewDispatch } = useContext(ViewContext);
 
-      if (type === PrimaryRevenueWidgetViews.PAY_WITH_COINS) {
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: {
-              type: PrimaryRevenueWidgetViews.PAY_WITH_COINS,
-            },
-          },
-        });
-        return;
-      }
+  const {
+    paymentMethod, setPaymentMethod, sign, signResponse,
+  } = useSharedContext();
 
+  const handleGoToPaymentView = useCallback((type: PaymentTypes) => {
+    if (type === PaymentTypes.CRYPTO) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
-            type: SharedViews.ERROR_VIEW,
-            error: Error('Invalid payment type'),
+            type: PrimaryRevenueWidgetViews.PAY_WITH_COINS,
           },
         },
       });
-    },
-    [viewDispatch, amount, fromContractAddress],
-  );
+    }
+
+    if (type === PaymentTypes.FIAT) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: PrimaryRevenueWidgetViews.PAY_WITH_CARD,
+          },
+        },
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (paymentMethod && !signResponse) {
+      sign(paymentMethod, () => handleGoToPaymentView(paymentMethod));
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SharedViews.LOADING_VIEW,
+            data: { loadingText: methodsText.loading },
+          },
+        },
+      });
+    }
+  }, [paymentMethod]);
 
   return (
     <SimpleLayout
@@ -93,20 +101,20 @@ export function PaymentMethods(props: PaymentMethodsProps) {
             paddingX: 'base.spacing.x4',
           }}
         >
-          {text.methods.header.heading}
+          {methodsText.header.heading}
         </Heading>
         <Box sx={{ paddingX: 'base.spacing.x2' }}>
           <button
             type="button"
-            onClick={() => handleOptionClick(PrimaryRevenueWidgetViews.PAY_WITH_COINS)}
+            onClick={() => setPaymentMethod(PaymentTypes.CRYPTO)}
           >
-            {text.coins.header.heading}
+            {coinsText.heading}
           </button>
           <button
             type="button"
-            onClick={() => handleOptionClick(PrimaryRevenueWidgetViews.PAY_WITH_CARD)}
+            onClick={() => setPaymentMethod(PaymentTypes.FIAT)}
           >
-            {text.card.header.heading}
+            {cardText.heading}
           </button>
         </Box>
       </Box>
