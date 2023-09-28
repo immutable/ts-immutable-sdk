@@ -8,60 +8,16 @@
     />
   </head>
   <body>
-    <div>
-      <imtbl-wallet></imtbl-wallet>
-      <imtbl-swap></imtbl-swap>
-    </div>
-
-    <script>
-      let provider;
-
-      window.onload = () => {
-        const imtblWallet = document.getElementsByTagName("imtbl-wallet")[0];
-
-        const imtblSwap = document.getElementsByTagName("imtbl-swap")[0];
-        imtblSwap.style.display = "none";
-
-        const handler = (event) => {
-          switch (event.detail.type) {
-            case "success":
-              // Grab the provider for later use
-              provider = event.data.provider;
-
-            case "request-swap":
-              // Ensure the latest provider is used
-              imtblSwap.setProvider(provider);
-
-              // Hide wallet widget
-              imtblWallet.style.display = "none";
-
-              console.log("imtblSwap", imtblSwap);
-
-              // Set swap widget attributes with event data from event.detail.data
-              imtblSwap.setAttribute(
-                "fromcontractaddress",
-                event.detail.data.fromTokenAddress
-              );
-
-              imtblSwap.style.display = "block";
-
-              break;
-
-            // ... handle other orchestration events
-            // ... handle other wallet events
-
-            default:
-              console.log("did not match any expected event type");
-          }
-        };
-
-        // Add the event listener
-        window.removeEventListener("imtbl-wallet-widget", handler);
-
-        // Add the event listener
-        window.addEventListener("imtbl-wallet-widget", handler);
-      };
-    </script>
+    <h1>Checkout Swap (Static)</h1>
+    <br />
+    <imtbl-swap
+      walletProvider="metamask"
+      theme="dark"
+      environment="sandbox"
+      amount="50000000000000000000"
+      fromContractAddress="0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0"
+      toContractAddress=""
+    ></imtbl-swap>
   </body>
   <script defer src="../js/imtbl-checkout.js"></script>
 </html>
