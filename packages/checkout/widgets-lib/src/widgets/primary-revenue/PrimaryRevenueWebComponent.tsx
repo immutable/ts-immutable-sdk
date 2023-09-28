@@ -106,7 +106,11 @@ export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
   }
 
   private isValidProucts(): boolean {
-    return Array.isArray(JSON.parse(atob(this.products)));
+    try {
+      return Array.isArray(JSON.parse(atob(this.products)));
+    } catch {
+      return false;
+    }
   }
 
   validateInputs(): void {
