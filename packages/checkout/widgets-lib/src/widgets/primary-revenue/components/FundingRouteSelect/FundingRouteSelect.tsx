@@ -43,7 +43,6 @@ export function FundingRouteSelect({ fundingRoutes }: FundingRouteSelectProps) {
     >
 
       <Box
-        id="smart-checkout-content"
         sx={{
           display: 'flex',
           flexDirection: 'column',
@@ -58,7 +57,8 @@ export function FundingRouteSelect({ fundingRoutes }: FundingRouteSelectProps) {
         </Heading>
 
         <FundingRouteMenuItem
-          onClick={onSmartCheckoutDropdownClick}
+          data-testid="funding-route-select-selected-route"
+          onClick={fundingRoutes.length > 1 ? onSmartCheckoutDropdownClick : () => {}}
           fundingRoute={fundingRoutes[activeFundingRouteIndex]}
           selected
           toggleVisible={fundingRoutes.length > 1}

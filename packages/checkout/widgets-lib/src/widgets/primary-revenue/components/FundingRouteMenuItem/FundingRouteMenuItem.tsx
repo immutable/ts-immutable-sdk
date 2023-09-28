@@ -7,16 +7,14 @@ export interface FundingRouteMenuItemProps {
   fundingRoute: any;
   toggleVisible?: boolean;
   selected?: boolean;
-  key?: React.Key;
 }
 export function FundingRouteMenuItem({
-  onClick, fundingRoute, toggleVisible, selected, key,
+  onClick, fundingRoute, toggleVisible, selected,
 }: FundingRouteMenuItemProps) {
   return (
     <MenuItem
       testId="funding-route-menu-item"
       onClick={onClick}
-      key={key}
       selected={selected}
       size="small"
     >
@@ -29,11 +27,7 @@ export function FundingRouteMenuItem({
         currencyImageUrl={ETH_TOKEN_IMAGE_URL}
       />
       <MenuItem.Label>
-        { fundingRoute.steps[0].type }
-        {' '}
-        -
-        {' '}
-        { fundingRoute.steps[0].asset.token.name}
+        { fundingRoute.steps[0].asset.token.symbol}
       </MenuItem.Label>
       <MenuItem.Caption>
         Fees - USD $0.10

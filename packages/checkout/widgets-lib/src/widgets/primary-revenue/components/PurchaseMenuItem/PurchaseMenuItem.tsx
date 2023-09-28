@@ -5,7 +5,7 @@ import { Heading, MenuItem } from '@biom3/react';
 export function PurchaseMenuItem() {
   return (
     <MenuItem
-      testId="funding-route-menu-item"
+      testId="funding-route-purchase-item"
       // onClick={onClick}
       // key={route.priority}
       // selected={selected}
