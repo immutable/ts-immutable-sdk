@@ -18,7 +18,7 @@ import {
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 
 import { PrimaryRevenueWidgetViews } from '../../context/view-context/PrimaryRevenueViewContextTypes';
-import { Item, StatusType } from './types';
+import { Item } from './types';
 import { widgetTheme } from '../../lib/theme';
 import { SharedContextProvider } from './context/SharedContextProvider';
 import { PaymentMethods } from './views/PaymentMethods';
@@ -26,6 +26,7 @@ import { PayWithCard } from './views/PayWithCard';
 import { PayWithCoins } from './views/PayWithCoins';
 import { ConnectLoaderSuccess } from '../../components/ConnectLoader/ConnectLoaderSuccess';
 import { StatusView } from '../../components/Status/StatusView';
+import { StatusType } from '../../components/Status/StatusType';
 
 export interface PrimaryRevenueWidgetProps {
   config: StrongCheckoutWidgetsConfig;
