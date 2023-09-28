@@ -6,13 +6,10 @@
     "packages/checkout/widgets/",
     "packages/config/",
     "packages/economy/sdk/",
-    "packages/erc20/",
-    "packages/erc721/",
-    "packages/erc721-mint-by-id",
     "packages/immutablex_client/",
     "packages/orderbook/",
     "packages/passport/sdk/",
-    "packages/provider/",
+    "packages/provider/"
   ],
   "name": "ts-immutable-sdk",
   "entryPointStrategy": "packages",
@@ -28,6 +25,6 @@
   "titleLink": "https://docs.immutable.com/docs/x/sdks/typescript",
   "navigationLinks": {
     "Immutable Docs": "https://docs.immutable.com",
-    "Immutable Hub": "https://hub.immutable.com",
+    "Immutable Hub": "https://hub.immutable.com"
   }
 }

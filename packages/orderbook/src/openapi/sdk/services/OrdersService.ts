@@ -209,7 +209,7 @@ export class OrdersService {
     /**
      * Trade field to sort by
      */
-    sortBy?: 'created_at',
+    sortBy?: 'indexed_at',
     /**
      * Ascending or descending direction for sort
      */
