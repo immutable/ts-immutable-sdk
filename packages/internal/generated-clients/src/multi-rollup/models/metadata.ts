@@ -16,90 +16,87 @@
 // May contain unused imports in some cases
 // @ts-ignore
 import { Chain } from './chain';
+// May contain unused imports in some cases
+// @ts-ignore
+import { NFTMetadataAttribute } from './nftmetadata-attribute';
 
 /**
  * 
  * @export
- * @interface NFT
+ * @interface Metadata
  */
-export interface NFT {
+export interface Metadata {
+    /**
+     * Metadata ID in UUIDv4 format
+     * @type {string}
+     * @memberof Metadata
+     */
+    'id': string;
     /**
      * 
      * @type {Chain}
-     * @memberof NFT
+     * @memberof Metadata
      */
     'chain': Chain;
     /**
-     * An `uint256` token id as string
+     * The contract address of the metadata
      * @type {string}
-     * @memberof NFT
-     */
-    'token_id': string;
-    /**
-     * The contract address of the NFT
-     * @type {string}
-     * @memberof NFT
+     * @memberof Metadata
      */
     'contract_address': string;
     /**
-     * When the NFT was first indexed
+     * When the metadata was created
      * @type {string}
-     * @memberof NFT
+     * @memberof Metadata
      */
-    'indexed_at': string;
+    'created_at': string;
     /**
-     * When NFT metadata was last synced
+     * When the metadata was last updated
      * @type {string}
-     * @memberof NFT
+     * @memberof Metadata
      */
-    'metadata_synced_at': string | null;
-    /**
-     * The id of the metadata of this NFT
-     * @type {string}
-     * @memberof NFT
-     */
-    'metadata_id'?: string | null;
+    'updated_at': string | null;
     /**
      * The name of the NFT
      * @type {string}
-     * @memberof NFT
+     * @memberof Metadata
      */
     'name': string | null;
     /**
      * The description of the NFT
      * @type {string}
-     * @memberof NFT
+     * @memberof Metadata
      */
     'description': string | null;
     /**
      * The image url of the NFT
      * @type {string}
-     * @memberof NFT
+     * @memberof Metadata
      */
     'image': string | null;
     /**
      * The external website link of NFT
      * @type {string}
-     * @memberof NFT
+     * @memberof Metadata
      */
-    'external_link': string | null;
+    'external_url'?: string | null;
     /**
      * The animation url of the NFT
      * @type {string}
-     * @memberof NFT
+     * @memberof Metadata
      */
     'animation_url': string | null;
     /**
      * The youtube URL of NFT
      * @type {string}
-     * @memberof NFT
+     * @memberof Metadata
      */
     'youtube_url': string | null;
     /**
-     * The id of mint activity of this NFT
-     * @type {string}
-     * @memberof NFT
+     * List of Metadata attributes
+     * @type {Array<NFTMetadataAttribute>}
+     * @memberof Metadata
      */
-    'mint_activity_id': string | null;
+    'attributes': Array<NFTMetadataAttribute> | null;
 }
 

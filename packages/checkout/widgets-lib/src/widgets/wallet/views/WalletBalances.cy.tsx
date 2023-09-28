@@ -106,6 +106,50 @@ describe('WalletBalances', () => {
       cySmartGet('balance-item-ETH').should('exist');
     });
 
+    it('should show shimmer while waiting for balances to load', () => {
+      cy.stub(Checkout.prototype, 'getAllBalances').as('getAllBalances').rejects();
+
+      mount(
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <WalletWidgetTestComponent
+            initialStateOverride={baseWalletState}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <WalletBalances />
+          </WalletWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
+      );
+
+      cySmartGet('balance-item-shimmer--1__shimmer').should('be.visible');
+      cySmartGet('balance-item-shimmer--2__shimmer').should('be.visible');
+      cySmartGet('balance-item-shimmer--3__shimmer').should('be.visible');
+      cySmartGet('total-token-balance-value__shimmer').should('be.visible');
+    });
+
+    it('should not show shimmers once balances has loaded', () => {
+      cy.stub(Checkout.prototype, 'getAllBalances').as('getAllBalances');
+
+      mount(
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <WalletWidgetTestComponent
+            initialStateOverride={baseWalletState}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <WalletBalances />
+          </WalletWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
+      );
+
+      cySmartGet('balance-item-shimmer--1__shimmer').should('not.exist');
+      cySmartGet('balance-item-shimmer--2__shimmer').should('not.exist');
+      cySmartGet('balance-item-shimmer--3__shimmer').should('not.exist');
+      cySmartGet('total-token-balance-value__shimmer').should('not.exist');
+    });
+
     it('should show balances after getAllBalances failure', () => {
       cy.stub(Checkout.prototype, 'getAllBalances')
         .as('getAllBalances')

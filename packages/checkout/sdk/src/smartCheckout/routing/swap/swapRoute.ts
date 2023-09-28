@@ -129,17 +129,18 @@ export const swapRoute = async (
   balanceRequirement: BalanceRequirement,
   tokenBalanceResults: Map<ChainId, TokenBalanceResult>,
   swappableTokens: string[],
-): Promise<FundingRouteStep | undefined> => {
-  if (!availableRoutingOptions.swap) return undefined;
-  if (swappableTokens.length === 0) return undefined;
+): Promise<FundingRouteStep[]> => {
+  const fundingSteps: FundingRouteStep[] = [];
+  if (!availableRoutingOptions.swap) return fundingSteps;
+  if (swappableTokens.length === 0) return fundingSteps;
 
   const requiredToken = getRequiredToken(balanceRequirement);
-  if (requiredToken.address === '') return undefined;
+  if (requiredToken.address === '') return fundingSteps;
 
   const l2TokenBalanceResult = tokenBalanceResults.get(getL2ChainId(config));
-  if (!l2TokenBalanceResult) return undefined;
+  if (!l2TokenBalanceResult) return fundingSteps;
   const l2Balances = l2TokenBalanceResult.balances;
-  if (l2Balances.length === 0) return undefined;
+  if (l2Balances.length === 0) return fundingSteps;
 
   const quotes = await getOrSetQuotesFromCache(
     config,
@@ -150,7 +151,6 @@ export const swapRoute = async (
   );
 
   const quoteTokenAddresses = Array.from(quotes.keys());
-
   for (const quoteTokenAddress of quoteTokenAddresses) {
     const quote = quotes.get(quoteTokenAddress);
     if (!quote) continue;
@@ -181,7 +181,7 @@ export const swapRoute = async (
 
     // User has sufficient funds to cover any approval and swap fees so use this token for the funding route
     // Currently we are not prioritising any particular token so just taking the first sufficient token
-    return {
+    fundingSteps.push({
       type: FundingRouteType.SWAP,
       chainId: getL2ChainId(config),
       asset: {
@@ -189,8 +189,8 @@ export const swapRoute = async (
         formattedBalance: userBalanceOfQuotedToken.formattedBalance,
         token: userBalanceOfQuotedToken.token,
       },
-    };
+    });
   }
 
-  return undefined;
+  return fundingSteps;
 };

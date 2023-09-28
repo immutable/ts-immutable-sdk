@@ -42,13 +42,19 @@
       "x-displayName": "nft owners"
     },
     {
-      "name": "demopage",
-      "description": "Temporary HTML endpoint for demo purposes",
-      "x-displayName": "demopage"
+      "name": "metadata",
+      "description": "NFT Metadata Endpoints",
+      "x-displayName": "metadata"
     },
     {
       "name": "tokens",
+      "description": "ERC20 Token Endpoints",
       "x-displayName": "tokens"
+    },
+    {
+      "name": "demopage",
+      "description": "Temporary HTML endpoint for demo purposes",
+      "x-displayName": "demopage"
     },
     {
       "name": "listings",
@@ -385,6 +391,88 @@
         }
       }
     },
+    "/v1/chains/{chain_name}/collections/{contract_address}/refresh-metadata": {
+      "post": {
+        "description": "Refresh collection metadata",
+        "tags": [
+          "collections"
+        ],
+        "operationId": "RefreshCollectionMetadata",
+        "summary": "Refresh collection metadata",
+        "security": [
+          {
+            "ImmutableApiKey": [
+              "refresh:metadata"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "contract_address",
+            "in": "path",
+            "description": "The address contract",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          },
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            },
+            "examples": {
+              "testnet": {
+                "value": "imtbl-zkevm-testnet",
+                "summary": "Immutable zkEVM Public Testnet"
+              }
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The request body",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshCollectionMetadataRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefreshCollectionMetadataResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorisedRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
     "/v1/chains/{chain_name}/accounts/{account_address}/collections": {
       "get": {
         "description": "List collections by NFT owner account address",
@@ -522,6 +610,143 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/collections/{contract_address}/metadata/{metadata_id}": {
+      "get": {
+        "description": "Get a single metadata by ID",
+        "tags": [
+          "metadata"
+        ],
+        "summary": "Get a single metadata by ID",
+        "operationId": "GetMetadata",
+        "parameters": [
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            },
+            "examples": {
+              "testnet": {
+                "value": "imtbl-zkevm-testnet",
+                "summary": "Immutable zkEVM Public Testnet"
+              }
+            }
+          },
+          {
+            "name": "contract_address",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The address of metadata contract",
+            "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
+          },
+          {
+            "name": "metadata_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/MetadataID"
+            },
+            "description": "The id of the metadata"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetMetadataResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/collections/{contract_address}/metadata/refresh-metadata": {
+      "post": {
+        "x-go-name": "RefreshMetadataByID",
+        "operationId": "RefreshMetadataByID",
+        "description": "Refresh shared metadata for a collection",
+        "tags": [
+          "metadata"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ChainName"
+          },
+          {
+            "$ref": "#/components/parameters/ContractAddress"
+          }
+        ],
+        "security": [
+          {
+            "ImmutableApiKey": [
+              "refresh:metadata"
+            ]
+          }
+        ],
+        "requestBody": {
+          "description": "NFT Metadata Refresh Request",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshMetadataByIDRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "headers": {
+              "imx-refreshes-limit": {
+                "$ref": "#/components/headers/MetadataRefreshLimit"
+              },
+              "imx-refresh-limit-reset": {
+                "$ref": "#/components/headers/MetadataRefreshLimitReset"
+              },
+              "imx-remaining-refreshes": {
+                "$ref": "#/components/headers/MetadataRefreshLimitRemaining"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorisedRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
           },
           "500": {
             "$ref": "#/components/responses/InternalServerError"
@@ -1283,12 +1508,12 @@
             "schema": {
               "type": "string",
               "enum": [
-                "created_at"
+                "indexed_at"
               ],
               "description": "Trade field to sort by",
-              "example": "created_at"
+              "example": "indexed_at"
             },
-            "example": "created_at"
+            "example": "indexed_at"
           },
           {
             "name": "sort_direction",
@@ -1597,6 +1822,38 @@
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT"
+      },
+      "ImmutableApiKey": {
+        "x-go-name": "ImmutableApiKey",
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Immutable-API-Key"
+      }
+    },
+    "parameters": {
+      "ChainName": {
+        "name": "chain_name",
+        "description": "The name of chain",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "$ref": "#/components/schemas/ChainName"
+        },
+        "examples": {
+          "testnet": {
+            "value": "imtbl-zkevm-testnet",
+            "summary": "Immutable zkEVM Public Testnet"
+          }
+        }
+      },
+      "ContractAddress": {
+        "name": "contract_address",
+        "in": "path",
+        "required": true,
+        "description": "Contract address",
+        "schema": {
+          "$ref": "#/components/schemas/Address"
+        }
       }
     },
     "responses": {
@@ -1658,6 +1915,26 @@
               "$ref": "#/components/schemas/APIError500"
             }
           }
+        }
+      }
+    },
+    "headers": {
+      "MetadataRefreshLimit": {
+        "description": "The refresh request limit available to the project for each one-hour window.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "MetadataRefreshLimitReset": {
+        "description": "The expiry date of the current one-hour window.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "MetadataRefreshLimitRemaining": {
+        "description": "The number of refresh requests remaining in the current window.",
+        "schema": {
+          "type": "string"
         }
       }
     },
@@ -1764,6 +2041,17 @@
         "discriminator": {
           "propertyName": "contract_type"
         }
+      },
+      "Address": {
+        "x-go-type": "common.Address",
+        "x-go-type-import": {
+          "package": "github.com/ethereum/go-ethereum/common",
+          "alias": "common"
+        },
+        "description": "An Ethereum address",
+        "type": "string",
+        "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3",
+        "pattern": "^0x[a-fA-F0-9]{40}$"
       },
       "Mint": {
         "type": "object",
@@ -2258,6 +2546,117 @@
           "result"
         ]
       },
+      "GetMetadataResult": {
+        "type": "object",
+        "description": "Single metadata",
+        "properties": {
+          "result": {
+            "$ref": "#/components/schemas/Metadata"
+          }
+        },
+        "required": [
+          "result"
+        ]
+      },
+      "Metadata": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/MetadataID"
+          },
+          "chain": {
+            "$ref": "#/components/schemas/Chain"
+          },
+          "contract_address": {
+            "type": "string",
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e",
+            "description": "The contract address of the metadata"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2022-08-16T17:43:26.991388Z",
+            "description": "When the metadata was created"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When the metadata was last updated",
+            "example": "2022-08-16T17:43:26.991388Z"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "example": "Sword",
+            "description": "The name of the NFT"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "example": "2022-08-16T17:43:26.991388Z",
+            "description": "The description of the NFT"
+          },
+          "image": {
+            "type": "string",
+            "nullable": true,
+            "description": "The image url of the NFT",
+            "example": "https://some-url"
+          },
+          "external_url": {
+            "type": "string",
+            "nullable": true,
+            "description": "The external website link of NFT",
+            "example": "https://some-url"
+          },
+          "animation_url": {
+            "type": "string",
+            "nullable": true,
+            "description": "The animation url of the NFT",
+            "example": "https://some-url"
+          },
+          "youtube_url": {
+            "type": "string",
+            "nullable": true,
+            "description": "The youtube URL of NFT",
+            "example": "https://some-url"
+          },
+          "attributes": {
+            "type": "array",
+            "description": "List of Metadata attributes",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/NFTMetadataAttribute"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "chain",
+          "contract_address",
+          "created_at",
+          "updated_at",
+          "name",
+          "description",
+          "image",
+          "external_link",
+          "animation_url",
+          "youtube_url",
+          "attributes"
+        ]
+      },
+      "RefreshMetadataByIDRequest": {
+        "type": "object",
+        "description": "Request body for refreshing metadata by id",
+        "properties": {
+          "metadata": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RefreshMetadataByID"
+            }
+          }
+        }
+      },
       "NFT": {
         "type": "object",
         "properties": {
@@ -2286,6 +2685,13 @@
             "nullable": true,
             "description": "When NFT metadata was last synced",
             "example": "2022-08-16T17:43:26.991388Z"
+          },
+          "metadata_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true,
+            "description": "The id of the metadata of this NFT",
+            "example": "ae83bc80-4dd5-11ee-be56-0242ac120002"
           },
           "name": {
             "type": "string",
@@ -2397,6 +2803,12 @@
       },
       "ActivityID": {
         "description": "Activity ID in UUIDv4 format",
+        "type": "string",
+        "format": "uuid",
+        "example": "4e28df8d-f65c-4c11-ba04-6a9dd47b179b"
+      },
+      "MetadataID": {
+        "description": "Metadata ID in UUIDv4 format",
         "type": "string",
         "format": "uuid",
         "example": "4e28df8d-f65c-4c11-ba04-6a9dd47b179b"
@@ -2609,6 +3021,103 @@
           "page"
         ]
       },
+      "RefreshMetadataByID": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/RefreshableNFTAttributes"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "metadata_id": {
+                "$ref": "#/components/schemas/MetadataID"
+              }
+            },
+            "required": [
+              "metadata_id"
+            ]
+          }
+        ]
+      },
+      "RefreshMetadataByTokenID": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/RefreshableNFTAttributes"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "token_id": {
+                "type": "string",
+                "description": "An `uint256` token id as string",
+                "example": "1"
+              }
+            },
+            "required": [
+              "token_id"
+            ]
+          }
+        ]
+      },
+      "RefreshableNFTAttributes": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "example": "Sword",
+            "description": "The name of the NFT"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "example": "2022-08-16T17:43:26.991388Z",
+            "description": "The description of the NFT"
+          },
+          "image": {
+            "type": "string",
+            "nullable": true,
+            "description": "The image url of the NFT",
+            "example": "https://some-url"
+          },
+          "external_url": {
+            "type": "string",
+            "nullable": true,
+            "description": "The external link of the NFT",
+            "example": "https://some-url"
+          },
+          "animation_url": {
+            "type": "string",
+            "nullable": true,
+            "description": "The animation url of the NFT",
+            "example": "https://some-url"
+          },
+          "youtube_url": {
+            "type": "string",
+            "nullable": true,
+            "description": "The youtube link of the NFT",
+            "example": "https://some-url"
+          },
+          "attributes": {
+            "type": "array",
+            "description": "List of Metadata attributes",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/NFTMetadataAttribute"
+            }
+          }
+        },
+        "required": [
+          "token_id",
+          "name",
+          "description",
+          "image",
+          "external_url",
+          "animation_url",
+          "youtube_url",
+          "attributes"
+        ]
+      },
       "Token": {
         "type": "object",
         "properties": {
@@ -2661,9 +3170,91 @@
           "name"
         ]
       },
-      "DemoPage": {
-        "type": "string",
-        "example": "<html>HTML text</html>"
+      "CollectionMetadata": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "description": "The name of the collection",
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          },
+          "symbol": {
+            "type": "string",
+            "nullable": true,
+            "description": "The symbol of contract",
+            "example": "BASP"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "The description of collection",
+            "example": "Some description"
+          },
+          "image": {
+            "type": "string",
+            "description": "The url of the collection image",
+            "example": "https://some-url",
+            "nullable": true
+          },
+          "external_link": {
+            "type": "string",
+            "description": "The url of external link",
+            "example": "https://some-url",
+            "nullable": true
+          },
+          "contract_uri": {
+            "type": "string",
+            "description": "The uri for the metadata of the collection",
+            "example": "https://some-url",
+            "nullable": true
+          },
+          "base_uri": {
+            "type": "string",
+            "nullable": true,
+            "description": "The metadata uri for nft",
+            "example": "https://some-url"
+          }
+        },
+        "required": [
+          "name",
+          "image",
+          "symbol",
+          "description",
+          "base_uri",
+          "external_link",
+          "contract_uri"
+        ]
+      },
+      "RefreshCollectionMetadataRequest": {
+        "type": "object",
+        "properties": {
+          "collection_metadata": {
+            "$ref": "#/components/schemas/CollectionMetadata"
+          }
+        },
+        "required": [
+          "collection_metadata"
+        ]
+      },
+      "RefreshCollectionMetadataResult": {
+        "type": "object",
+        "properties": {
+          "contract_address": {
+            "type": "string"
+          },
+          "chain": {
+            "$ref": "#/components/schemas/Chain"
+          },
+          "collection_metadata": {
+            "$ref": "#/components/schemas/CollectionMetadata"
+          }
+        },
+        "required": [
+          "contract_address",
+          "chain",
+          "collection_metadata"
+        ]
       },
       "BasicAPIError": {
         "type": "object",
@@ -2891,12 +3482,25 @@
           "order_id": {
             "type": "string"
           },
-          "fee": {
-            "$ref": "#/components/schemas/Fee"
+          "fees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Fee"
+            },
+            "example": [
+              {
+                "amount": "2250000000000000000",
+                "fee_type": "TAKER_MARKETPLACE",
+                "recipient": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92233"
+              }
+            ],
+            "minItems": 0,
+            "maxItems": 2
           }
         },
         "required": [
-          "order_id"
+          "order_id",
+          "fees"
         ]
       },
       "FulfillmentDataResult": {
@@ -3025,8 +3629,15 @@
             "minItems": 1,
             "maxItems": 1
           },
-          "fee": {
-            "$ref": "#/components/schemas/Fee"
+          "fees": {
+            "type": "array",
+            "description": "Buy fees should only include maker marketplace fees and should be no more than two entries as more entires will incur more gas. It is best practice to have this as few as possible.",
+            "items": {
+              "$ref": "#/components/schemas/Fee"
+            },
+            "example": [],
+            "minItems": 0,
+            "maxItems": 2
           },
           "end_time": {
             "type": "string",
@@ -3080,11 +3691,13 @@
               "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
             }
           ],
-          "fee": {
-            "amount": "2250000000000000000",
-            "fee_type": "MAKER_MARKETPLACE",
-            "recipient": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92233"
-          },
+          "fees": [
+            {
+              "amount": "2250000000000000000",
+              "fee_type": "MAKER_MARKETPLACE",
+              "recipient": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92233"
+            }
+          ],
           "end_time": "2022-03-10T05:00:50.52Z",
           "protocol_data": {
             "order_type": "FULL_RESTRICTED",
@@ -3109,34 +3722,12 @@
           "order_hash",
           "buy",
           "sell",
+          "fees",
           "end_time",
           "start_time",
           "protocol_data",
           "salt",
           "signature"
-        ]
-      },
-      "Error": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Error trace id",
-            "example": "1234567890"
-          },
-          "message": {
-            "type": "string",
-            "description": "Error message",
-            "example": "Order creation failed"
-          }
-        },
-        "description": "Resource not found",
-        "example": {
-          "id": "1234567890",
-          "message": "Order creation failed"
-        },
-        "required": [
-          "message"
         ]
       },
       "Fee": {
@@ -3881,8 +4472,9 @@
         "collections",
         "nfts",
         "nft owners",
-        "demopage",
+        "metadata",
         "tokens",
+        "demopage",
         "listings",
         "orders",
         "passport"
