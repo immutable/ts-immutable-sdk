@@ -7,7 +7,7 @@ import { CoinSelector } from '../../CoinSelector/CoinSelector';
 import { CoinSelectorOptionProps } from '../../CoinSelector/CoinSelectorOption';
 
 interface SelectFormProps {
-  id: string;
+  testId: string;
   options: CoinSelectorOptionProps[];
   textAlign?: 'left' | 'right';
   subtext?: string;
@@ -19,7 +19,7 @@ interface SelectFormProps {
 }
 
 export function SelectForm({
-  id,
+  testId,
   options,
   subtext,
   onSelectChange,
@@ -33,7 +33,7 @@ export function SelectForm({
 
   const coinSelectorOptions = useMemo(() => options.map((option) => ({
     ...option,
-    testId: id,
+    testId,
     onClick: () => {
       onSelectChange(option.id);
       setCoinSelectorOpen(false);
@@ -56,15 +56,15 @@ export function SelectForm({
         onCloseBottomSheet={() => setCoinSelectorOpen(false)}
       />
       <FormControlWrapper
-        testId={`${id}-select-control`}
+        testId={`${testId}-select-control`}
         textAlign={textAlign ?? 'left'}
         subtext={errorMessage ? undefined : subtext}
         isErrored={!!errorMessage}
         errorMessage={errorMessage}
       >
         <Select
-          id={`${id}-select`}
-          testId={`${id}-select`}
+          id={`${testId}-select`}
+          testId={`${testId}-select`}
           size="large"
           defaultLabel="Select coin"
           targetClickOveride={() => setCoinSelectorOpen(true)}

@@ -2,7 +2,7 @@ import { TextInput } from '@biom3/react';
 import { FormControlWrapper } from '../FormControlWrapper/FormControlWrapper';
 
 interface TextInputFormProps {
-  id: string;
+  testId: string;
   value: string;
   placeholder?: string;
   subtext?: string;
@@ -17,7 +17,7 @@ interface TextInputFormProps {
 }
 
 export function TextInputForm({
-  id,
+  testId,
   value,
   placeholder,
   errorMessage,
@@ -55,7 +55,7 @@ export function TextInputForm({
 
   return (
     <FormControlWrapper
-      testId={`${id}-text-control`}
+      testId={`${testId}-text-control`}
       textAlign={textAlign ?? 'left'}
       subtext={errorMessage ? undefined : subtext}
       isErrored={!!errorMessage}
@@ -63,8 +63,8 @@ export function TextInputForm({
       sx={{ width: '100%' }}
     >
       <TextInput
-        id={`${id}-text`}
-        testId={`${id}-text`}
+        id={`${testId}-text`}
+        testId={`${testId}-text`}
         onChange={(event) => handleOnChange(event, value)}
         sizeVariant="large"
         value={value}
@@ -77,7 +77,7 @@ export function TextInputForm({
       >
         {maxButtonClick && (
           <TextInput.Button
-            testId={`${id}-max-button`}
+            testId={`${testId}-max-button`}
             onClick={maxButtonClick}
             disabled={disabled}
           >

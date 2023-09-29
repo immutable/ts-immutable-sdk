@@ -1,5 +1,4 @@
 import {
-  BiomePortalIdContext,
   Box, Button, Heading, OptionKey,
 } from '@biom3/react';
 import {
@@ -53,7 +52,6 @@ export function BridgeForm(props: BridgeFormProps) {
   } = useContext(BridgeContext);
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
-  const portalId = useContext(BiomePortalIdContext);
 
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { viewDispatch } = useContext(ViewContext);
@@ -453,7 +451,7 @@ export function BridgeForm(props: BridgeFormProps) {
         </Heading>
         <Box sx={formInputsContainerStyles}>
           <SelectForm
-            id={`bridge-token${portalId}`}
+            testId="bridge-token"
             options={tokensOptions}
             coinSelectorHeading={bridgeForm.from.selectorTitle}
             selectedOption={selectedOption}
@@ -466,7 +464,7 @@ export function BridgeForm(props: BridgeFormProps) {
             disabled={isFetching}
           />
           <TextInputForm
-            id={`bridge-amount${portalId}`}
+            testId="bridge-amount"
             value={amount}
             placeholder={bridgeForm.from.inputPlaceholder}
             subtext={`${content.fiatPricePrefix} $${formatZeroAmount(amountFiatValue, true)}`}
