@@ -159,6 +159,3 @@ export const gameBridgeVersionCheck = (params: GameBridgeVersionCheckParams) => 
     console.warn('Immutable SDK: Unable to check for latest version.');
   }
 };
-
-// https://api.x.immutable.com/v1/check?version=imtbl-sdk-gamebridge-0.22.0,imtbl-sdk-gamebridge-sha-1234567890,engine-unreal-5.2.1-26001984%2B%2B%2BUE5%2BRelease-5.2,platform-Mac-13.5.2&details=
-// https://api.x.immutable.com/v1/check?version=imtbl-sdk-gamebridge-0.22.0,imtbl-sdk-gamebridge-sha-1234567890,engine-unreal-5.2.1-26001984+++UE5+Release-5.2,platform-Mac-13.5.2&details=
