@@ -65,7 +65,7 @@ export const sdkVersionCheck = (appName?: string, appVersion?: string) => {
       : `version=imtbl-sdk-${sdkVersion}`;
     const detailsParam = `details=${runtimeDetails}`;
 
-    let versionCheckUrl = encodeURI(`${imtblApi}${versionApi}?${versionParam}&${detailsParam}`);
+    let versionCheckUrl = encodeURI(`${imtblApi}${versionApi}?${versionParam}&${detailsParam}`).replaceAll('+', '%2B');
     if (existingRuntimeId) {
       versionCheckUrl += `&id=${existingRuntimeId}`;
     }
@@ -136,10 +136,10 @@ export const gameBridgeVersionCheck = (params: GameBridgeVersionCheckParams) => 
     }
 
     // eslint-disable-next-line no-console
-    console.log('Game Bridge Version Check:', encodeURI(versionCheckUrl));
+    console.log('Game Bridge Version Check:', encodeURI(versionCheckUrl).replaceAll('+', '%2B'));
 
     axios
-      .get(encodeURI(versionCheckUrl))
+      .get(encodeURI(versionCheckUrl).replaceAll('+', '%2B'))
       .then((response) => {
         const { ok, message, runtimeId } = response.data;
         if (!ok) {
@@ -159,3 +159,6 @@ export const gameBridgeVersionCheck = (params: GameBridgeVersionCheckParams) => 
     console.warn('Immutable SDK: Unable to check for latest version.');
   }
 };
+
+// https://api.x.immutable.com/v1/check?version=imtbl-sdk-gamebridge-0.22.0,imtbl-sdk-gamebridge-sha-1234567890,engine-unreal-5.2.1-26001984%2B%2B%2BUE5%2BRelease-5.2,platform-Mac-13.5.2&details=
+// https://api.x.immutable.com/v1/check?version=imtbl-sdk-gamebridge-0.22.0,imtbl-sdk-gamebridge-sha-1234567890,engine-unreal-5.2.1-26001984+++UE5+Release-5.2,platform-Mac-13.5.2&details=
