@@ -5,24 +5,42 @@ import {
   Body, Box,
   Button, Heading, Select,
 } from '@biom3/react';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { FooterLogo } from '../../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../../components/SimpleLayout/SimpleLayout';
 import { FundingRouteDrawer } from '../FundingRouteSelectDrawer/FundingRouteDrawer';
 import { FundingRouteMenuItem } from '../FundingRouteMenuItem/FundingRouteMenuItem';
 import { PurchaseMenuItem } from '../PurchaseMenuItem/PurchaseMenuItem';
+import { ViewActions, ViewContext } from '../../../../context/view-context/ViewContext';
+import {
+  FundWithSmartCheckoutSubViews,
+  PrimaryRevenueWidgetViews,
+} from '../../../../context/view-context/PrimaryRevenueViewContextTypes';
 
 type FundingRouteSelectProps = {
   fundingRoutes: any[];
+  onFundingRouteSelected: (fundingRoute: any) => void;
 };
 
-export function FundingRouteSelect({ fundingRoutes }: FundingRouteSelectProps) {
+export function FundingRouteSelect({ fundingRoutes, onFundingRouteSelected }: FundingRouteSelectProps) {
   const [smartCheckoutDrawerVisible, setSmartCheckoutDrawerVisible] = useState(false);
   const [activeFundingRouteIndex, setActiveFundingRouteIndex] = useState(0);
+  const { viewDispatch } = useContext(ViewContext);
 
   const onClickContinue = () => {
-    console.log('@@@ onClickContinue');
+    onFundingRouteSelected(fundingRoutes[activeFundingRouteIndex]);
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: PrimaryRevenueWidgetViews.FUND_WITH_SMART_CHECKOUT,
+          data: {
+            subView: FundWithSmartCheckoutSubViews.FUNDING_ROUTE_EXECUTE,
+          },
+        },
+      },
+    });
   };
 
   const closeBottomSheet = (selectedFundingRouteIndex: number) => {
@@ -31,7 +49,6 @@ export function FundingRouteSelect({ fundingRoutes }: FundingRouteSelectProps) {
   };
 
   const onSmartCheckoutDropdownClick = () => {
-    console.log('@@@@@ onSmartCheckoutDropdownClickevent');
     setSmartCheckoutDrawerVisible(true);
   };
 

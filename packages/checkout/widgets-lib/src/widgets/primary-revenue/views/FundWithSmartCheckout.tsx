@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { Box } from '@biom3/react';
 import {
   FundWithSmartCheckoutSubViews,
@@ -11,6 +12,10 @@ type FundWithSmartCheckoutProps = {
 };
 
 export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
+  const onFundingRouteSelected = (fundingRoute: any) => {
+    console.log('@@@ onFundingRouteSelected', fundingRoute);
+  };
+
   return (
     <Box>
       <p>
@@ -20,7 +25,10 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
         <LoadingView loadingText="todo loading text" />
       )}
       { subView === FundWithSmartCheckoutSubViews.FUNDING_ROUTE_SELECT && (
-        <FundingRouteSelect fundingRoutes={[]} />
+        <FundingRouteSelect
+          onFundingRouteSelected={onFundingRouteSelected}
+          fundingRoutes={[]}
+        />
       )}
       { subView === FundWithSmartCheckoutSubViews.FUNDING_ROUTE_EXECUTE && (
         <FundingRouteExecute />
