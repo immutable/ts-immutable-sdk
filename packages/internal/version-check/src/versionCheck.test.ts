@@ -63,6 +63,18 @@ describe('sdkVersionCheck', () => {
     expect(axios.get).toHaveBeenCalledTimes(1);
     expect(axios.get).toHaveBeenCalledWith(expect.stringContaining(`${expectedQueryParams}`));
   });
+
+  test('should encode query parameters', () => {
+    const sdkVersion = '__SDK_VERSION__';
+    const packageName = 'test-package';
+    const packageVersion = '1.0.0++1';
+    const expectedQueryParams = `?version=imtbl-sdk-${sdkVersion},${packageName}-1.0.0%2B%2B1`;
+
+    sdkVersionCheck(packageName, packageVersion);
+
+    expect(axios.get).toHaveBeenCalledTimes(1);
+    expect(axios.get).toHaveBeenCalledWith(expect.stringContaining((expectedQueryParams)));
+  });
 });
 
 describe('gameBridgeVersionCheck', () => {
@@ -159,6 +171,25 @@ describe('gameBridgeVersionCheck', () => {
     // details should always go last after the game bridge version params
     // eslint-disable-next-line max-len
     const expectedUrl = 'https://api.x.immutable.com/v1/check?version=imtbl-sdk-gamebridge-1.0.0,imtbl-sdk-gamebridge-sha-1234567890,engine-unity-1.0.0&details=';
+
+    gameBridgeVersionCheck(gameBridgeParams);
+
+    expect(axios.get).toHaveBeenCalledTimes(1);
+    expect(axios.get).toHaveBeenCalledWith(expect.stringContaining((expectedUrl)));
+  });
+
+  test('should encode query parameters', () => {
+    const gameBridgeParams = {
+      gameBridgeTag: '0.22.0',
+      gameBridgeSha: '1234567890',
+      engine: 'unreal',
+      engineVersion: '5.2.1-26001984+++UE5+Release-5.2',
+      platform: 'Mac',
+      platformVersion: '13.5.2',
+    };
+
+    // eslint-disable-next-line max-len
+    const expectedUrl = 'https://api.x.immutable.com/v1/check?version=imtbl-sdk-gamebridge-0.22.0,imtbl-sdk-gamebridge-sha-1234567890,engine-unreal-5.2.1-26001984%2B%2B%2BUE5%2BRelease-5.2,platform-Mac-13.5.2&details=';
 
     gameBridgeVersionCheck(gameBridgeParams);
 
