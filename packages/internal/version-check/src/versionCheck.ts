@@ -65,7 +65,7 @@ export const sdkVersionCheck = (appName?: string, appVersion?: string) => {
       : `version=imtbl-sdk-${sdkVersion}`;
     const detailsParam = `details=${runtimeDetails}`;
 
-    let versionCheckUrl = `${imtblApi}${versionApi}?${versionParam}&${detailsParam}`;
+    let versionCheckUrl = encodeURI(`${imtblApi}${versionApi}?${versionParam}&${detailsParam}`);
     if (existingRuntimeId) {
       versionCheckUrl += `&id=${existingRuntimeId}`;
     }
@@ -136,10 +136,10 @@ export const gameBridgeVersionCheck = (params: GameBridgeVersionCheckParams) => 
     }
 
     // eslint-disable-next-line no-console
-    console.log('Game Bridge Version Check:', versionCheckUrl);
+    console.log('Game Bridge Version Check:', encodeURI(versionCheckUrl));
 
     axios
-      .get(versionCheckUrl)
+      .get(encodeURI(versionCheckUrl))
       .then((response) => {
         const { ok, message, runtimeId } = response.data;
         if (!ok) {
