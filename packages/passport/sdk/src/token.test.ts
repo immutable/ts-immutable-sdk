@@ -12,7 +12,7 @@ const mockExpiredIdToken = encode({
   iat: oneHourBefore,
   exp: oneHourBefore,
 }, 'secret');
-const mockValidIdToken = encode({
+export const mockValidIdToken = encode({
   iat: now,
   exp: oneHourLater,
 }, 'secret');
