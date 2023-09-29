@@ -11,8 +11,6 @@ type FundWithSmartCheckoutProps = {
 };
 
 export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
-  const smartCheckoutResponse: any = {};
-
   return (
     <Box>
       <p>
@@ -22,7 +20,7 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
         <LoadingView loadingText="todo loading text" />
       )}
       { subView === FundWithSmartCheckoutSubViews.FUNDING_ROUTE_SELECT && (
-        <FundingRouteSelect fundingRoutes={smartCheckoutResponse?.fundingRoutes} />
+        <FundingRouteSelect fundingRoutes={[]} />
       )}
       { subView === FundWithSmartCheckoutSubViews.FUNDING_ROUTE_EXECUTE && (
         <FundingRouteExecute />

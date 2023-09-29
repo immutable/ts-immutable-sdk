@@ -56,13 +56,21 @@ export function FundingRouteSelect({ fundingRoutes }: FundingRouteSelectProps) {
           Pay with your
         </Heading>
 
-        <FundingRouteMenuItem
-          data-testid="funding-route-select-selected-route"
-          onClick={fundingRoutes.length > 1 ? onSmartCheckoutDropdownClick : () => {}}
-          fundingRoute={fundingRoutes[activeFundingRouteIndex]}
-          selected
-          toggleVisible={fundingRoutes.length > 1}
-        />
+        {fundingRoutes.length === 0
+          ? (
+            <Heading size="small">
+              No funding routes available
+            </Heading>
+          )
+          : (
+            <FundingRouteMenuItem
+              data-testid="funding-route-select-selected-route"
+              onClick={fundingRoutes.length > 1 ? onSmartCheckoutDropdownClick : () => {}}
+              fundingRoute={fundingRoutes[activeFundingRouteIndex]}
+              selected
+              toggleVisible={fundingRoutes.length > 1}
+            />
+          ) }
 
         {/* TODO add purchase data here */}
         <PurchaseMenuItem />
