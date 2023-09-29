@@ -212,12 +212,14 @@ export class Orderbook {
       },
     ]);
 
-    if (fulfillmentDataRes.result.length !== 1) {
-      throw new Error('unexpected fulfillment data result length');
+    if (fulfillmentDataRes.result.unfulfillable_orders?.length > 0) {
+      throw new Error(`Unable to prepare fulfillment date: ${fulfillmentDataRes.result.unfulfillable_orders[0].reason}`);
+    } else if (fulfillmentDataRes.result.fulfillable_orders?.length !== 1) {
+      throw new Error('unexpected fulfillable order result length');
     }
 
-    const extraData = fulfillmentDataRes.result[0].extra_data;
-    const orderResult = fulfillmentDataRes.result[0].order;
+    const extraData = fulfillmentDataRes.result.fulfillable_orders[0].extra_data;
+    const orderResult = fulfillmentDataRes.result.fulfillable_orders[0].order;
 
     if (orderResult.status !== OrderStatus.ACTIVE) {
       throw new Error(
