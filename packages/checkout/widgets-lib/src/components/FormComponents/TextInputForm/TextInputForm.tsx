@@ -63,7 +63,6 @@ export function TextInputForm({
       sx={{ width: '100%' }}
     >
       <TextInput
-        id={`${testId}-text`}
         testId={`${testId}-text`}
         onChange={(event) => handleOnChange(event, value)}
         sizeVariant="large"
