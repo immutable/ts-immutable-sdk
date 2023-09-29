@@ -1,7 +1,13 @@
 import axios from 'axios';
-import { sdkVersionCheck } from './versionCheck';
+import { sdkVersionCheck, gameBridgeVersionCheck } from './versionCheck';
 
 jest.mock('axios');
+
+beforeEach(() => {
+  (axios.get as jest.Mock).mockResolvedValue({});
+  // prevent console.log from logging to the terminal
+  jest.spyOn(console, 'log').mockImplementation();
+});
 
 describe('sdkVersionCheck', () => {
   test('should now throw errors', () => {
@@ -56,5 +62,107 @@ describe('sdkVersionCheck', () => {
 
     expect(axios.get).toHaveBeenCalledTimes(1);
     expect(axios.get).toHaveBeenCalledWith(expect.stringContaining(`${expectedQueryParams}`));
+  });
+});
+
+describe('gameBridgeVersionCheck', () => {
+  test('should send request to analytics API with the correct query parametrs', () => {
+    const gameBridgeParams = {
+      gameBridgeTag: '1.0.0',
+      gameBridgeSha: '1234567890',
+      engine: 'unity',
+      engineVersion: '1.0.0',
+      platform: 'ios',
+      platformVersion: '1.0.0',
+    };
+    // eslint-disable-next-line max-len
+    const expectedUrl = 'https://api.x.immutable.com/v1/check?version=imtbl-sdk-gamebridge-1.0.0,imtbl-sdk-gamebridge-sha-1234567890,engine-unity-1.0.0,platform-ios-1.0.0';
+
+    gameBridgeVersionCheck(gameBridgeParams);
+
+    expect(axios.get).toHaveBeenCalledTimes(1);
+    expect(axios.get).toHaveBeenCalledWith(expect.stringContaining((expectedUrl)));
+  });
+
+  test('should send default (SDK version, details) parameter if params object is empty', () => {
+    // __SDK_VERSION__ is replaced by the SDK version during build
+    const expectedParams = '?version=imtbl-sdk-__SDK_VERSION__&details=';
+
+    gameBridgeVersionCheck({});
+
+    expect(axios.get).toHaveBeenCalledTimes(1);
+    expect(axios.get).toHaveBeenCalledWith(expect.stringContaining((expectedParams)));
+  });
+
+  test('should send version info if engine is missing', () => {
+    const gameBridgeParams = {
+      gameBridgeTag: '1.0.0',
+      gameBridgeSha: '1234567890',
+      engineVersion: '1.0.0',
+      platform: 'ios',
+      platformVersion: '1.0.0',
+    };
+    // details should always go last after the game bridge version params
+    // eslint-disable-next-line max-len
+    const expectedUrl = 'https://api.x.immutable.com/v1/check?version=imtbl-sdk-gamebridge-1.0.0,imtbl-sdk-gamebridge-sha-1234567890,platform-ios-1.0.0&details=';
+
+    gameBridgeVersionCheck(gameBridgeParams);
+
+    expect(axios.get).toHaveBeenCalledTimes(1);
+    expect(axios.get).toHaveBeenCalledWith(expect.stringContaining((expectedUrl)));
+  });
+
+  test('should send version info if engine version is missing', () => {
+    const gameBridgeParams = {
+      gameBridgeTag: '1.0.0',
+      gameBridgeSha: '1234567890',
+      engine: 'unity',
+      platform: 'ios',
+      platformVersion: '1.0.0',
+    };
+    // details should always go last after the game bridge version params
+    // eslint-disable-next-line max-len
+    const expectedUrl = 'https://api.x.immutable.com/v1/check?version=imtbl-sdk-gamebridge-1.0.0,imtbl-sdk-gamebridge-sha-1234567890,platform-ios-1.0.0&details=';
+
+    gameBridgeVersionCheck(gameBridgeParams);
+
+    expect(axios.get).toHaveBeenCalledTimes(1);
+    expect(axios.get).toHaveBeenCalledWith(expect.stringContaining((expectedUrl)));
+  });
+
+  test('should send version info if platform is missing', () => {
+    const gameBridgeParams = {
+      gameBridgeTag: '1.0.0',
+      gameBridgeSha: '1234567890',
+      engine: 'unity',
+      engineVersion: '1.0.0',
+      platformVersion: '1.0.0',
+    };
+    // details should always go last after the game bridge version params
+    // eslint-disable-next-line max-len
+    const expectedUrl = 'https://api.x.immutable.com/v1/check?version=imtbl-sdk-gamebridge-1.0.0,imtbl-sdk-gamebridge-sha-1234567890,engine-unity-1.0.0&details=';
+
+    gameBridgeVersionCheck(gameBridgeParams);
+
+    expect(axios.get).toHaveBeenCalledTimes(1);
+    expect(axios.get).toHaveBeenCalledWith(expect.stringContaining((expectedUrl)));
+  });
+
+  test('should send version info if platform version is missing', () => {
+    const gameBridgeParams = {
+      gameBridgeTag: '1.0.0',
+      gameBridgeSha: '1234567890',
+      engine: 'unity',
+      engineVersion: '1.0.0',
+      platform: 'ios',
+    };
+    // details should always go last after the game bridge version params
+    // eslint-disable-next-line max-len
+    const expectedUrl = 'https://api.x.immutable.com/v1/check?version=imtbl-sdk-gamebridge-1.0.0,imtbl-sdk-gamebridge-sha-1234567890,engine-unity-1.0.0&details=';
+
+    gameBridgeVersionCheck(gameBridgeParams);
+
+    expect(axios.get).toHaveBeenCalledTimes(1);
+    expect(axios.get).toHaveBeenCalledWith(expect.stringContaining((expectedUrl)));
   });
 });
