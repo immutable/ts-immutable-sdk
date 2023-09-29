@@ -63,7 +63,6 @@ export function SelectForm({
         errorMessage={errorMessage}
       >
         <Select
-          id={`${testId}-select`}
           testId={`${testId}-select`}
           size="large"
           defaultLabel="Select coin"
