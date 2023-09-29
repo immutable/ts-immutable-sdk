@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { ETH_TOKEN_IMAGE_URL, Heading, MenuItem } from '@biom3/react';
 
 export interface FundingRouteMenuItemProps {

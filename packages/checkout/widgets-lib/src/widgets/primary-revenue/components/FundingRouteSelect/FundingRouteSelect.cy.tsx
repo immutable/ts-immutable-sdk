@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { BiomeCombinedProviders } from '@biom3/react';
 import { mount } from 'cypress/react18';
 import { cy, describe } from 'local-cypress';
