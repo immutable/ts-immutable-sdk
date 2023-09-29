@@ -19,6 +19,9 @@ module.exports = function override(config) {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       Buffer: ['buffer', 'Buffer'],
     }),
+    new webpack.optimize.LimitChunkCountPlugin({
+      maxChunks: 1,
+    }),
   ]);
   config.module.rules.push({
     test: /\.m?js/,
@@ -26,5 +29,6 @@ module.exports = function override(config) {
       fullySpecified: false,
     },
   });
+
   return config;
 };
