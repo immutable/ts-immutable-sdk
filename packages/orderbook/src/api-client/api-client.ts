@@ -13,7 +13,8 @@ import {
   ListListingsParams,
   ListTradesParams,
 } from '../types';
-import { FulfillmentDataResult } from '../openapi/sdk/models/FulfillmentDataResult';
+import { FulfillableOrder } from '../openapi/sdk/models/FulfillableOrder';
+import { UnfulfillableOrder } from '../openapi/sdk/models/UnfulfillableOrder';
 import { FulfillmentDataRequest } from '../openapi/sdk/models/FulfillmentDataRequest';
 import { ItemType, SEAPORT_CONTRACT_VERSION_V1_5 } from '../seaport';
 
@@ -26,7 +27,12 @@ export class ImmutableApiClient {
 
   async fulfillmentData(
     requests: Array<FulfillmentDataRequest>,
-  ): Promise<{ result: FulfillmentDataResult[] }> {
+  ): Promise<{
+      result: {
+        fulfillable_orders: Array<FulfillableOrder>;
+        unfulfillable_orders: Array<UnfulfillableOrder>;
+      };
+    }> {
     return this.orderbookService.fulfillmentData({
       chainName: this.chainName,
       requestBody: requests,
