@@ -4,8 +4,10 @@ import AuthManager from './authManager';
 import { PassportError, PassportErrorType } from './errors/passportError';
 import { PassportConfiguration } from './config';
 import { mockUser, mockUserImx, mockUserZkEvm } from './test/mocks';
+import { isTokenExpired } from './token';
 
 jest.mock('oidc-client-ts');
+jest.mock('./token');
 
 const baseConfig = new ImmutableConfiguration({
   environment: Environment.SANDBOX,
@@ -267,6 +269,7 @@ describe('AuthManager', () => {
 
     it('should return null if user is returned', async () => {
       getUserMock.mockReturnValue(mockOidcExpiredUser);
+      (isTokenExpired as jest.Mock).mockReturnValue(true);
       signinSilentMock.mockResolvedValue(null);
 
       const result = await authManager.loginSilent();
@@ -333,6 +336,7 @@ describe('AuthManager', () => {
   describe('getUser', () => {
     it('should retrieve the user from the userManager and return the domain model', async () => {
       getUserMock.mockReturnValue(mockOidcUser);
+      (isTokenExpired as jest.Mock).mockReturnValue(false);
 
       const result = await authManager.getUser();
 
@@ -341,7 +345,9 @@ describe('AuthManager', () => {
 
     it('should call signinSilent and returns user when user token is expired with the refresh token', async () => {
       getUserMock.mockReturnValue(mockOidcExpiredUser);
+      (isTokenExpired as jest.Mock).mockReturnValue(true);
       signinSilentMock.mockResolvedValue(mockOidcUser);
+
       const result = await authManager.getUser();
 
       expect(result).toEqual(mockUser);
@@ -349,6 +355,8 @@ describe('AuthManager', () => {
 
     it('should return null when the user token is expired without refresh token', async () => {
       getUserMock.mockReturnValue(mockOidcExpiredNoRefreshTokenUser);
+      (isTokenExpired as jest.Mock).mockReturnValue(true);
+
       const result = await authManager.getUser();
 
       expect(result).toEqual(null);
@@ -356,6 +364,7 @@ describe('AuthManager', () => {
 
     it('should return null when the user token is expired with the refresh token, but signinSilent returns null', async () => {
       getUserMock.mockReturnValue(mockOidcExpiredUser);
+      (isTokenExpired as jest.Mock).mockReturnValue(true);
       signinSilentMock.mockResolvedValue(null);
       const result = await authManager.getUser();
 

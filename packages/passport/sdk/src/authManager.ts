@@ -6,9 +6,9 @@ import {
   WebStorageStateStore,
 } from 'oidc-client-ts';
 import axios from 'axios';
-import jwt_decode from 'jwt-decode';
 import DeviceCredentialsManager from 'storage/device_credentials_manager';
 import * as crypto from 'crypto';
+import { isTokenExpired } from 'token';
 import { PassportErrorType, withPassportError } from './errors/passportError';
 import {
   PassportMetadata,
@@ -373,10 +373,11 @@ export default class AuthManager {
   }
 
   private async getWebUser(oidcUser: OidcUser) : Promise<User | null> {
-    if (!oidcUser.expired) {
+    const tokenExpired = isTokenExpired(oidcUser);
+    if (!tokenExpired) {
       return AuthManager.mapOidcUserToDomainModel(oidcUser);
     }
-    if (oidcUser.expired && oidcUser.refresh_token) {
+    if (tokenExpired && oidcUser.refresh_token) {
       const newOidcUser = await this.userManager.signinSilent();
       return newOidcUser
         ? AuthManager.mapOidcUserToDomainModel(newOidcUser)
