@@ -1,13 +1,13 @@
 import { Environment } from '@imtbl/config';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import { WidgetTheme } from '../../lib';
 
 function SmartWebView() {
-  const config = {
+  const [config, setConfig] = useState({
     theme: WidgetTheme.DARK,
     environment: Environment.SANDBOX,
-  };
+  });
 
   useEffect(() => {
     const handleBridgeWidgetEvents = ((event: CustomEvent) => {
@@ -27,8 +27,30 @@ function SmartWebView() {
     };
   });
 
+  const changeTheme = () => {
+    if (config.theme === WidgetTheme.DARK) {
+      setConfig({
+        theme: WidgetTheme.LIGHT,
+        environment: Environment.SANDBOX,
+      });
+    } else {
+      setConfig({
+        theme: WidgetTheme.DARK,
+        environment: Environment.SANDBOX,
+      });
+    }
+  };
+
   return (
-    <imtbl-smart-checkout widgetConfig={JSON.stringify(config)} walletProvider="metamask" />
+    <div>
+      <imtbl-smart-checkout widgetConfig={JSON.stringify(config)} walletProvider="metamask" />
+      <button type="button" onClick={changeTheme}>Change Theme</button>
+      <p>
+        current theme:
+        {config.theme}
+      </p>
+    </div>
+
   );
 }
 

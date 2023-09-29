@@ -5,7 +5,7 @@ import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 
 import {
   useCallback,
-  useContext, useEffect, useMemo, useReducer, useState,
+  useContext, useEffect, useMemo, useReducer, useRef,
 } from 'react';
 
 import { ConnectEventType, ConnectionSuccess, IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
@@ -68,7 +68,7 @@ export function SmartWidget(props: SmartWidgetProps) {
 
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
 
-  const [nextView, setNextView] = useState<View | false>(false);
+  const nextView = useRef<View | false>(false);
 
   const viewReducerValues = useMemo(() => ({ viewState, viewDispatch }), [viewState, viewDispatch]);
   const { connectLoaderState, connectLoaderDispatch } = useContext(ConnectLoaderContext);
@@ -84,8 +84,6 @@ export function SmartWidget(props: SmartWidgetProps) {
   const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
     : onDarkBase;
-
-  console.log('params', params);
 
   const eventTarget = new EventTarget();
 
@@ -119,10 +117,11 @@ export function SmartWidget(props: SmartWidgetProps) {
       });
       return;
     }
-    setNextView({
+    nextView.current = {
       type: SmartWidgetViews.SMART_SWAP,
       data: viewState.view.data,
-    });
+    };
+    console.log('setNextView swap', nextView);
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
@@ -153,10 +152,12 @@ export function SmartWidget(props: SmartWidgetProps) {
       });
       return;
     }
-    setNextView({
+    nextView.current = {
       type: SmartWidgetViews.SMART_BRIDGE,
       data: viewState.view.data,
-    });
+    };
+    console.log('setNextView bridge', nextView);
+
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
@@ -207,14 +208,14 @@ export function SmartWidget(props: SmartWidgetProps) {
           },
         });
         console.log('nextView', nextView);
-        if (nextView !== false) {
+        if (nextView.current !== false) {
           viewDispatch({
             payload: {
               type: ViewActions.UPDATE_VIEW,
-              view: nextView,
+              view: nextView.current,
             },
           });
-          setNextView(false);
+          nextView.current = false;
         }
         break;
       }
@@ -224,6 +225,7 @@ export function SmartWidget(props: SmartWidgetProps) {
   };
 
   useEffect(() => {
+    console.log('nextView set listener', nextView);
     // Add a custom event listener when the component mounts
     eventTarget.addEventListener(IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT, handleConnectEvent);
     eventTarget.addEventListener(IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT, handleCustomEvent);
@@ -237,7 +239,7 @@ export function SmartWidget(props: SmartWidgetProps) {
       eventTarget.removeEventListener(IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT, handleCustomEvent);
       eventTarget.removeEventListener(IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, handleCustomEvent);
     };
-  }, []);
+  });
 
   useEffect(() => {
     eventTargetDispatch({
