@@ -48,6 +48,8 @@ import {
   TokenFilterTypes,
   OnRampProviderFees,
   FiatRampParams,
+  SmartCheckoutResult,
+  ActionResult,
 } from './types';
 import { CheckoutConfiguration } from './config';
 import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
@@ -342,7 +344,7 @@ export class Checkout {
    */
   public async cancel(
     params: CancelParams,
-  ): Promise<void> {
+  ): Promise<ActionResult> {
     if (this.config.isProduction) {
       throw new Error('This endpoint is not currently available.');
     }
@@ -358,7 +360,7 @@ export class Checkout {
       params.provider,
     );
 
-    await cancel.cancel(this.config, web3Provider, params.orderIds);
+    return await cancel.cancel(this.config, web3Provider, params.orderIds);
   }
 
   /**
@@ -367,7 +369,7 @@ export class Checkout {
    */
   public async smartCheckout(
     params: SmartCheckoutParams,
-  ): Promise<void> {
+  ): Promise<SmartCheckoutResult> {
     if (this.config.isProduction) {
       throw new Error('This endpoint is not currently available.');
     }
@@ -387,7 +389,7 @@ export class Checkout {
       throw new CheckoutError('Failed to map item requirements', CheckoutErrorType.ITEM_REQUIREMENTS_ERROR);
     }
 
-    await smartCheckout.smartCheckout(
+    return await smartCheckout.smartCheckout(
       this.config,
       web3Provider,
       itemRequirements,

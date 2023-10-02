@@ -2,6 +2,78 @@ import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import { TokenInfo } from './tokenInfo';
 
+export type ActionResult = {
+  status: SuccessStatus | FailedStatus | InsufficientFundsStatus,
+  smartCheckoutResult: Array<SmartCheckoutSufficient | SmartCheckoutInsufficient>
+};
+
+export enum ActionStatusType {
+  SUCCESS = 'SUCCESS',
+  FAILED = 'FAILED',
+  INSUFFICIENT_FUNDS = 'INSUFFICIENT_FUNDS',
+}
+
+type SuccessStatus = {
+  type: ActionStatusType.SUCCESS,
+  order: Order[],
+};
+
+type FailedStatus = {
+  type: ActionStatusType.FAILED,
+  transactionHash: string,
+  reason: string,
+  order: Order[]
+};
+
+type InsufficientFundsStatus = {
+  type: ActionStatusType.INSUFFICIENT_FUNDS,
+  order: Order[]
+};
+
+type Order = BuyOrder | SellOrder | CancelOrder;
+
+export enum OrderType {
+  BUY = 'BUY',
+  SELL = 'SELL',
+  CANCEL = 'CANCEL',
+}
+
+type BuyOrder = {
+  type: OrderType.BUY,
+  id: string,
+  takerFees?:[{
+    amount: { token: string } | { percent: number },
+    recipient: string,
+  }]
+};
+
+type SellOrder = {
+  type: OrderType.SELL,
+  id: string,
+  sellToken: SellToken,
+  buyToken: BuyToken,
+  makerFees?: [{
+    amount: { token: string } | { percent: number },
+    recipient: string,
+  }]
+};
+
+type BuyToken = {
+  type: ItemType.NATIVE | ItemType.ERC20;
+  amount: '1.05';
+  contractAddress: '0x2222';
+};
+
+type SellToken = {
+  id: string,
+  collectionAddress: string
+};
+
+type CancelOrder = {
+  type: OrderType.CANCEL,
+  id: string
+};
+
 /**
  * Interface representing the parameters for {@link Checkout.smartCheckout}
  * @property {Web3Provider} provider - The provider to use for smart checkout.
