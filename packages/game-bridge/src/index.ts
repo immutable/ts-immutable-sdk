@@ -1,6 +1,8 @@
+/* eslint-disable no-console */
 import * as passport from '@imtbl/passport';
 import * as config from '@imtbl/config';
 import * as provider from '@imtbl/provider';
+import { gameBridgeVersionCheck } from '@imtbl/version-check';
 
 /* eslint-disable no-undef */
 const scope = 'openid offline_access profile email transact';
@@ -11,6 +13,12 @@ const logoutRedirectUri = 'https://localhost:3000/'; // Not required
 const keyFunctionName = 'fxName';
 const keyRequestId = 'requestId';
 const keyData = 'data';
+
+// version check placeholders
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const sdkVersionTag = '__SDK_VERSION__';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const sdkVersionSha = '__SDK_VERSION_SHA__';
 
 const PASSPORT_FUNCTIONS = {
   init: 'init',
@@ -133,6 +141,20 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
           requestId,
           success: true,
         });
+
+        // version check
+        const { engineVersion } = request;
+        const versionCheckParams = {
+          gameBridgeTag: sdkVersionTag,
+          gameBridgeSha: sdkVersionSha,
+          engine: engineVersion.engine,
+          engineVersion: engineVersion.engineVersion,
+          platform: engineVersion.platform,
+          platformVersion: engineVersion.platformVersion,
+        };
+        console.log(`Version check: ${JSON.stringify(versionCheckParams)}`);
+
+        gameBridgeVersionCheck(versionCheckParams);
         break;
       }
       case PASSPORT_FUNCTIONS.connect: {
