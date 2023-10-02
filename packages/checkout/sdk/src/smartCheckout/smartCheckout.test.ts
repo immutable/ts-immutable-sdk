@@ -1,6 +1,6 @@
 import { BigNumber } from 'ethers';
 import { Web3Provider } from '@ethersproject/providers';
-import { getSmartCheckoutResult, smartCheckout } from './smartCheckout';
+import { smartCheckout } from './smartCheckout';
 import {
   GasAmount, GasTokenType, ItemRequirement, ItemType, TransactionOrGasType,
 } from '../types';

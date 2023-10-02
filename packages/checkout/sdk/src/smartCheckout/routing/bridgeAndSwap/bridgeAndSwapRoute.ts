@@ -2,10 +2,13 @@ import { BigNumber, utils } from 'ethers';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { CheckoutConfiguration, getL2ChainId } from '../../../config';
 import {
+  AvailableRoutingOptions,
+  BridgeFundingStep,
   ChainId,
-  FundingRouteType,
+  FundingRouteFeeEstimate,
+  FundingStepType,
   GetBalanceResult,
-  RoutingOptionsAvailable,
+  SwapFundingStep,
   TokenInfo,
 } from '../../../types';
 import {
@@ -15,7 +18,6 @@ import {
 } from '../../balanceCheck/types';
 import {
   DexQuoteCache,
-  FundingRouteStep,
   TokenBalanceResult,
 } from '../types';
 import { BridgeRequirement, bridgeRoute } from '../bridge/bridgeRoute';
@@ -31,7 +33,7 @@ export const abortBridgeAndSwap = (
   swappableTokens: TokenInfo[],
   l1balances: GetBalanceResult[],
   l2balances: GetBalanceResult[],
-  availableRoutingOptions: RoutingOptionsAvailable,
+  availableRoutingOptions: AvailableRoutingOptions,
   requiredTokenAddress: string | undefined,
 ) => {
   if (bridgeableTokens.length === 0) return true;
@@ -134,24 +136,25 @@ const modifyTokenBalancesWithBridgedAmount = (
 // swap route was modified to fake the bridge
 export const reapplyOriginalSwapBalances = (
   tokenBalances: Map<ChainId, TokenBalanceResult>,
-  swapRoutes: FundingRouteStep[],
-): FundingRouteStep[] => {
-  const originalSwapSteps: FundingRouteStep[] = [];
+  swapRoutes: SwapFundingStep[],
+): SwapFundingStep[] => {
+  const originalSwapSteps: SwapFundingStep[] = [];
   for (const route of swapRoutes) {
-    const { chainId, asset } = route;
+    const { chainId, fundingItem } = route;
+    const { userBalance } = route.fundingItem;
     const tokenBalance = tokenBalances.get(chainId);
     if (!tokenBalance) continue;
 
     let originalBalance = BigNumber.from(0);
     let originalFormattedBalance = '0';
-    const l2balance = tokenBalance.balances.find((balance) => balance.token.address === asset.token.address);
+    const l2balance = tokenBalance.balances.find((balance) => balance.token.address === fundingItem.token.address);
     if (l2balance) {
       originalBalance = l2balance.balance;
       originalFormattedBalance = l2balance.formattedBalance;
     }
 
-    route.asset.balance = originalBalance;
-    route.asset.formattedBalance = originalFormattedBalance;
+    userBalance.balance = originalBalance;
+    userBalance.formattedBalance = originalFormattedBalance;
 
     originalSwapSteps.push(route);
   }
@@ -160,8 +163,8 @@ export const reapplyOriginalSwapBalances = (
 };
 
 export const constructBridgeAndSwapRoutes = (
-  bridgeFundingSteps: (FundingRouteStep | undefined)[],
-  swapFundingSteps: FundingRouteStep[],
+  bridgeFundingSteps: (BridgeFundingStep | undefined)[],
+  swapFundingSteps: SwapFundingStep[],
   l1tol2Addresses: L1ToL2TokenAddressMapping[],
 ): BridgeAndSwapRoute[] => {
   const bridgeAndSwapRoutes: BridgeAndSwapRoute[] = [];
@@ -170,16 +173,16 @@ export const constructBridgeAndSwapRoutes = (
     if (!bridgeFundingStep) continue;
     const mapping = l1tol2Addresses.find(
       (addresses) => {
-        if (bridgeFundingStep.asset.token.address === undefined) {
+        if (bridgeFundingStep.fundingItem.token.address === undefined) {
           return addresses.l1address === INDEXER_ETH_ROOT_CONTRACT_ADDRESS && addresses.l2address;
         }
-        return addresses.l1address === bridgeFundingStep.asset.token.address && addresses.l2address;
+        return addresses.l1address === bridgeFundingStep.fundingItem.token.address && addresses.l2address;
       },
     );
     if (!mapping) continue;
 
     const swapFundingStep = swapFundingSteps.find(
-      (step) => step.asset.token.address === mapping.l2address,
+      (step) => step.fundingItem.token.address === mapping.l2address,
     );
     if (!swapFundingStep) continue;
 
@@ -193,17 +196,17 @@ export const constructBridgeAndSwapRoutes = (
 };
 
 export type BridgeAndSwapRoute = {
-  bridgeFundingStep: FundingRouteStep,
-  swapFundingStep: FundingRouteStep,
+  bridgeFundingStep: BridgeFundingStep,
+  swapFundingStep: SwapFundingStep,
 };
 export const bridgeAndSwapRoute = async (
   config: CheckoutConfiguration,
   readOnlyProviders: Map<ChainId, JsonRpcProvider>,
-  availableRoutingOptions: RoutingOptionsAvailable,
+  availableRoutingOptions: AvailableRoutingOptions,
   insufficientRequirement: BalanceNativeRequirement | BalanceERC20Requirement,
   dexQuoteCache: DexQuoteCache,
   ownerAddress: string,
-  feeEstimates: Map<FundingRouteType, BigNumber>,
+  feeEstimates: Map<FundingStepType, FundingRouteFeeEstimate>,
   tokenBalances: Map<ChainId, TokenBalanceResult>,
   bridgeableTokens: string[],
   swappableTokens: TokenInfo[],
@@ -255,7 +258,7 @@ export const bridgeAndSwapRoute = async (
   if (bridgeRequirements.length === 0) return [];
 
   // Create a mapping of bridge routes to L2 addresses
-  const bridgePromises = new Map<string, Promise<FundingRouteStep | undefined>>();
+  const bridgePromises = new Map<string, Promise<BridgeFundingStep | undefined>>();
   // Create map of bridgeable tokens to make it easier to get the amount that was bridged when modifying the users balance later
   const bridgeableRequirementsMap = new Map<string, BridgeRequirement>();
   const bridgedTokens: BridgeRequirement[] = [];

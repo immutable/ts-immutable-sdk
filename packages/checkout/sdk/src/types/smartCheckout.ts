@@ -160,14 +160,201 @@ export type ERC20Gas = {
 };
 
 /**
- * Represents the result of {@link Checkout.smartCheckout}.
- * @property {boolean} sufficient - If the user address has sufficient funds to cover the transaction.
- * @property {TransactionRequirement[]} transactionRequirements - The transaction requirements.
+ * The type representing the result of {@link Checkout.smartCheckout}.
  */
-export interface SmartCheckoutResult {
-  sufficient: boolean,
+export type SmartCheckoutResult = SmartCheckoutSufficient | SmartCheckoutInsufficient;
+
+/**
+ * Represents the result of {@link Checkout.smartCheckout} when smart checkout is sufficient.
+ * @property {boolean} sufficient - Indicates that smart checkout determined the user had sufficient funds.
+ * @property {TransactionRequirement[]} transactionRequirements - The transaction requirements smart checkout
+ * determined were required for the transaction.
+ */
+export type SmartCheckoutSufficient = {
+  sufficient: true,
   transactionRequirements: TransactionRequirement[],
+};
+
+/**
+ * Represents the result of {@link Checkout.smartCheckout} when smart checkout is insufficient.
+ * @property {boolean} sufficient - Indicates that smart checkout determined the user has insufficient funds
+ * @property {TransactionRequirement[]} transactionRequirements - The transaction requirements smart checkout
+ * determined were required for the transaction.
+ * @property {SmartCheckoutRouter} router - The type containing the funding routes the user can take to fulfill the transaction requirements
+ */
+export type SmartCheckoutInsufficient = {
+  sufficient: false,
+  transactionRequirements: TransactionRequirement[],
+  router: SmartCheckoutRouter
+};
+
+/**
+ * Represents the routing outcome for a transaction.
+ * @property {boolean} isPassport - Indicates if the provider used was a passport provider.
+ * @property {AvailableRoutingOptions} availableRoutingOptions - The routing options available to the user
+ * @property {RoutingOutcome} routingOutcome - The routing outcome for the transaction which
+ * includes the funding routes if routes were found
+ */
+export type SmartCheckoutRouter = {
+  isPassport: boolean,
+  availableRoutingOptions: AvailableRoutingOptions,
+  routingOutcome: RoutingOutcome
+};
+
+/**
+ * An enum representing the routing outcome types
+ * @enum {string}
+ * @property {string} ROUTES_FOUND - If funding routes were found for the transaction.
+ * @property {string} NO_ROUTES_FOUND - If no funding routes were found for the transaction.
+ * @property {string} NO_ROUTE_OPTIONS - If no routing options were available for the transaction.
+ */
+export enum RoutingOutcomeType {
+  ROUTES_FOUND = 'ROUTES_FOUND',
+  NO_ROUTES_FOUND = 'NO_ROUTES_FOUND',
+  NO_ROUTE_OPTIONS = 'NO_ROUTE_OPTIONS',
 }
+
+/*
+* The type representing the routing outcome for a transaction.
+*/
+export type RoutingOutcome = RoutesFound | NoRoutesFound | NoRouteOptions;
+
+/**
+* Represents the routing outcome for a transaction.
+* @property {RoutingOutcomeType.ROUTES_FOUND} type - Indicates that funding routes were found for the transaction.
+* @property {AvailableRoutingOptions} fundingRoutes - The funding routes found for the transaction.
+*/
+export type RoutesFound = {
+  type: RoutingOutcomeType.ROUTES_FOUND,
+  fundingRoutes: FundingRoute[]
+};
+
+/**
+ * Represents a funding route
+ * @property {number} priority - The priority of the route
+ * @property {FundingStep[]} steps - The steps associated with this funding route
+ * @property {TotalFees | undefined} totalFees - The total fees for this route
+ */
+export type FundingRoute = {
+  priority: number;
+  steps: FundingStep[]
+  totalFees?: TotalFees,
+};
+
+/*
+* Type representing the various funding steps
+*/
+export type FundingStep = BridgeFundingStep | SwapFundingStep | OnRampFundingStep;
+
+/**
+ * Represents a bridge funding route
+ * @property {FundingStepType.BRIDGE} type - Indicates that this is a bridge funding step
+ * @property {number} chainId - The chain id this funding step should be executed on
+ * @property {FundingItem} fundingItem - The funding item for this step
+ * @property {BridgeFees} fees - The aggregated fees for this step
+ */
+export type BridgeFundingStep = {
+  type: FundingStepType.BRIDGE,
+  chainId: number,
+  fundingItem: FundingItem,
+  fees: {
+    approvalGasFees: Fee,
+    bridgeGasFees: Fee,
+    bridgeFees: Fee[],
+  },
+};
+
+/**
+ * Represents the aggregated fees for a funding step
+ * @property {Fee} gas - The total gas fees for this funding step
+ * @property {Fee} other - The total of all other fees associated with this funding step
+ * @property {Fee} total - The total combined gas and other fees for this funding step
+ */
+export type TotalFees = {
+  gas: Fee,
+  other: Fee,
+  total: Fee,
+};
+
+/**
+ * Represents a fee
+ * @property {BigNumber} amount - The amount of the fee
+ * @property {string} formatted - The formatted amount of the fee
+ */
+export type Fee = {
+  amount: BigNumber;
+  formattedAmount: string;
+};
+
+export type SwapFundingStep = {
+  type: FundingStepType.SWAP,
+  chainId: number,
+  fundingItem: FundingItem,
+  fees: {
+    approvalGasFees: Fee,
+    swapGasFees: Fee,
+    swapFees: Fee[],
+  },
+};
+
+export type OnRampFundingStep = {
+  type: FundingStepType.ONRAMP,
+  chainId: number,
+  fundingItem: FundingItem
+};
+
+/**
+ * An enum representing the funding step types
+ * @enum {string}
+ * @property {string} BRIDGE - If the funding step is a bridge.
+ * @property {string} SWAP - If the funding step is a swap.
+ * @property {string} ONRAMP - If the funding step is an onramp.
+ */
+export enum FundingStepType {
+  BRIDGE = 'BRIDGE',
+  SWAP = 'SWAP',
+  ONRAMP = 'ONRAMP',
+}
+
+// Native or ERC20 funding item
+export type FundingItem = {
+  type: ItemType.NATIVE | ItemType.ERC20,
+  fundsRequired: {
+    amount: BigNumber,
+    formattedAmount: string
+  },
+  userBalance: {
+    balance: BigNumber,
+    formattedBalance: string
+  },
+  token: TokenInfo
+};
+
+export type FundingItemFees = {
+  type: FundingItemFeeType,
+  fee: Fee,
+  tokenInfo: TokenInfo,
+};
+
+export enum FundingItemFeeType {
+  GAS = 'GAS',
+  BRIDGE_FEE = 'BRIDGE_FEE',
+  SWAP_FEE = 'SWAP_FEE',
+  MAKER_FEE = 'MAKER_FEE',
+  TAKER_FEE = 'TAKER_FEE',
+  ROYALTY = 'ROYALTY',
+  OTHER = 'OTHER',
+}
+
+type NoRoutesFound = {
+  type: RoutingOutcomeType.NO_ROUTES_FOUND,
+  message: string
+};
+
+type NoRouteOptions = {
+  type: RoutingOutcomeType.NO_ROUTE_OPTIONS,
+  message: string
+};
 
 /**
  * Represents the transaction requirement for a transaction.
@@ -231,7 +418,7 @@ export type BalanceDelta = {
  * A type representing the Smart Checkout routing options available for a user
  * if they are configured and enabled (not geo-blocked etc.)
  */
-export type RoutingOptionsAvailable = {
+export type AvailableRoutingOptions = {
   onRamp?: boolean;
   swap?: boolean;
   bridge?: boolean;
@@ -243,19 +430,21 @@ export type FundingRouteBalanceItem = {
   token: TokenInfo
 };
 
-export type FundingRouteStep = {
-  type: FundingRouteType;
-  chainId: number,
-  asset: FundingRouteBalanceItem,
+export type FundingRouteFeeEstimate = SwapRouteFeeEstimate | BridgeRouteFeeEstimate;
+export type SwapRouteFeeEstimate = {
+  type: FundingStepType.SWAP;
+  estimatedAmount: BigNumber;
+  token: TokenInfo;
 };
-
-export enum FundingRouteType {
-  BRIDGE = 'BRIDGE',
-  ONRAMP = 'ONRAMP',
-  SWAP = 'SWAP',
-}
-
-export type FundingRoute = {
-  priority: number;
-  steps: FundingRouteStep[]
+export type BridgeRouteFeeEstimate = {
+  type: FundingStepType.BRIDGE;
+  gasFee: {
+    estimatedAmount: BigNumber;
+    token?: TokenInfo;
+  };
+  bridgeFee: {
+    estimatedAmount: BigNumber;
+    token?: TokenInfo;
+  };
+  totalFees: BigNumber;
 };

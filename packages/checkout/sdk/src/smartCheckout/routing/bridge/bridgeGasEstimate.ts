@@ -1,13 +1,30 @@
 import { BigNumber, ethers } from 'ethers';
 import { gasEstimator } from '../../../gasEstimate';
-import { GasEstimateType, GasEstimateBridgeToL2Result, ChainId } from '../../../types';
+import {
+  GasEstimateType,
+  GasEstimateBridgeToL2Result,
+  ChainId,
+  TokenInfo,
+} from '../../../types';
 import { CheckoutConfiguration } from '../../../config';
 import { CheckoutError, CheckoutErrorType } from '../../../errors';
 
-export const bridgeGasEstimate = async (
+export const getBridgeFeeEstimate = async (
   config: CheckoutConfiguration,
   readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
-): Promise<BigNumber> => {
+): Promise<
+{
+  gasFee: {
+    estimatedAmount: BigNumber;
+    token?: TokenInfo;
+  };
+  bridgeFee: {
+    estimatedAmount: BigNumber;
+    token?: TokenInfo;
+  };
+  totalFees: BigNumber;
+}
+> => {
   try {
     const estimate = await gasEstimator(
       {
@@ -24,7 +41,17 @@ export const bridgeGasEstimate = async (
     if (gasEstimate) totalFees = totalFees.add(gasEstimate);
     if (bridgeFee) totalFees = totalFees.add(bridgeFee);
 
-    return totalFees;
+    return {
+      gasFee: {
+        estimatedAmount: gasEstimate ?? BigNumber.from(0),
+        token: estimate.gasFee.token,
+      },
+      bridgeFee: {
+        estimatedAmount: bridgeFee ?? BigNumber.from(0),
+        token: estimate.bridgeFee.token,
+      },
+      totalFees,
+    };
   } catch (err: any) {
     throw new CheckoutError(
       'Error estimating gas for bridge',
