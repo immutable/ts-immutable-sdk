@@ -36,7 +36,15 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
     config, amount, items, fromContractAddress, env, environmentId,
   } = props;
 
-  console.log('@@@ PrimaryRevenueWidget', config, amount, items, fromContractAddress, env, environmentId);
+  console.log(
+    '@@@ PrimaryRevenueWidget',
+    config,
+    amount,
+    items,
+    fromContractAddress,
+    env,
+    environmentId,
+  );
 
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;

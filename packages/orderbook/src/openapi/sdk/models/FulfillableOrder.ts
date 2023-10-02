@@ -4,7 +4,7 @@
 
 import type { Order } from './Order';
 
-export type FulfillmentDataResult = {
+export type FulfillableOrder = {
   extra_data: string;
   order: Order;
 };
