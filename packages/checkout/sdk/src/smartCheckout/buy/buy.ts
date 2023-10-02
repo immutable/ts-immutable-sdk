@@ -10,11 +10,6 @@ import {
   FeeValue,
   Action,
 } from '@imtbl/orderbook';
-import {
-  BuyOrder,
-  BuyResult,
-  BuyStatusType,
-} from '../../types/buy';
 import * as instance from '../../instance';
 import { CheckoutConfiguration } from '../../config';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
@@ -25,6 +20,9 @@ import {
   TransactionOrGasType,
   GasAmount,
   FulfillmentTransaction,
+  ActionResult,
+  ActionStatusType,
+  BuyOrder,
 } from '../../types/smartCheckout';
 import { smartCheckout } from '..';
 import {
@@ -84,7 +82,7 @@ export const buy = async (
   config: CheckoutConfiguration,
   provider: Web3Provider,
   orders: Array<BuyOrder>,
-): Promise<BuyResult> => {
+): Promise<ActionResult> => {
   let orderbook;
   let order: ListingResult;
   let spenderAddress = '';
@@ -215,13 +213,13 @@ export const buy = async (
     const approvalResult = await signApprovalTransactions(provider, unsignedApprovalTransactions);
     if (approvalResult.type === SignTransactionStatusType.FAILED) {
       return {
-        smartCheckoutResult,
-        orderId: id,
         status: {
-          type: BuyStatusType.FAILED,
+          type: ActionStatusType.FAILED,
           transactionHash: approvalResult.transactionHash,
           reason: approvalResult.reason,
+          orders: [orders[0]],
         },
+        smartCheckoutResult: [smartCheckoutResult],
       };
     }
 
@@ -242,27 +240,30 @@ export const buy = async (
     const fulfillmentResult = await signFulfillmentTransactions(provider, unsignedFulfillmentTransactions);
     if (fulfillmentResult.type === SignTransactionStatusType.FAILED) {
       return {
-        smartCheckoutResult,
-        orderId: id,
         status: {
-          type: BuyStatusType.FAILED,
+          type: ActionStatusType.FAILED,
           transactionHash: fulfillmentResult.transactionHash,
           reason: fulfillmentResult.reason,
+          orders: [orders[0]],
         },
+        smartCheckoutResult: [smartCheckoutResult],
       };
     }
 
     return {
-      smartCheckoutResult,
-      orderId: id,
       status: {
-        type: BuyStatusType.SUCCESS,
+        type: ActionStatusType.SUCCESS,
+        orders: [orders[0]],
       },
+      smartCheckoutResult: [smartCheckoutResult],
     };
   }
 
   return {
-    smartCheckoutResult,
-    orderId: id,
+    status: {
+      type: ActionStatusType.INSUFFICIENT_FUNDS,
+      orders: [orders[0]],
+    },
+    smartCheckoutResult: [smartCheckoutResult],
   };
 };

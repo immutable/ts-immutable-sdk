@@ -1,6 +1,7 @@
 import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import { TokenInfo } from './tokenInfo';
+import { OrderFee } from './fees';
 
 export type ActionResult = {
   status: SuccessStatus | FailedStatus | InsufficientFundsStatus,
@@ -15,47 +16,37 @@ export enum ActionStatusType {
 
 type SuccessStatus = {
   type: ActionStatusType.SUCCESS,
-  order: Order[],
+  orders: Order[],
 };
 
 type FailedStatus = {
   type: ActionStatusType.FAILED,
   transactionHash: string,
   reason: string,
-  order: Order[]
+  orders: Order[]
 };
 
 type InsufficientFundsStatus = {
   type: ActionStatusType.INSUFFICIENT_FUNDS,
-  order: Order[]
+  orders: Order[]
 };
 
 type Order = BuyOrder | SellOrder | CancelOrder;
 
-export enum OrderType {
-  BUY = 'BUY',
-  SELL = 'SELL',
-  CANCEL = 'CANCEL',
-}
-
-type BuyOrder = {
-  type: OrderType.BUY,
+export type BuyOrder = {
   id: string,
-  takerFees?:[{
-    amount: { token: string } | { percent: number },
-    recipient: string,
-  }]
+  takerFees?: Array<OrderFee>,
 };
 
 type SellOrder = {
-  type: OrderType.SELL,
   id: string,
   sellToken: SellToken,
   buyToken: BuyToken,
-  makerFees?: [{
-    amount: { token: string } | { percent: number },
-    recipient: string,
-  }]
+  makerFees?: Array<OrderFee>,
+};
+
+export type CancelOrder = {
+  id: string
 };
 
 type BuyToken = {
@@ -67,11 +58,6 @@ type BuyToken = {
 type SellToken = {
   id: string,
   collectionAddress: string
-};
-
-type CancelOrder = {
-  type: OrderType.CANCEL,
-  id: string
 };
 
 /**

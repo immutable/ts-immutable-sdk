@@ -7,7 +7,6 @@ import { signFulfillmentTransactions } from '../actions';
 import {
   ActionResult,
   ActionStatusType,
-  OrderType,
 } from '../../types';
 import { SignTransactionStatusType } from '../actions/types';
 
@@ -51,9 +50,8 @@ export const cancel = async (
         type: ActionStatusType.FAILED,
         transactionHash: result.transactionHash,
         reason: result.reason,
-        order: [
+        orders: [
           {
-            type: OrderType.CANCEL,
             id: orderId,
           },
         ],
@@ -70,9 +68,8 @@ export const cancel = async (
   return {
     status: {
       type: ActionStatusType.SUCCESS,
-      order: [
+      orders: [
         {
-          type: OrderType.CANCEL,
           id: orderId,
         },
       ],

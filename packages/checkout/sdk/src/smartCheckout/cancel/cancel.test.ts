@@ -8,7 +8,7 @@ import { cancel } from './cancel';
 import { createOrderbookInstance } from '../../instance';
 import { signFulfillmentTransactions } from '../actions';
 import { SignTransactionStatusType } from '../actions/types';
-import { ActionStatusType, OrderType } from '../../types';
+import { ActionStatusType } from '../../types';
 
 jest.mock('../../instance');
 jest.mock('../actions');
@@ -55,9 +55,8 @@ describe('cancel', () => {
       expect(result).toEqual({
         status: {
           type: ActionStatusType.SUCCESS,
-          order: [
+          orders: [
             {
-              type: OrderType.CANCEL,
               id: orderId,
             },
           ],
@@ -110,9 +109,8 @@ describe('cancel', () => {
           type: ActionStatusType.FAILED,
           transactionHash: '0xHASH',
           reason: 'Fulfillment transaction failed and was reverted',
-          order: [
+          orders: [
             {
-              type: OrderType.CANCEL,
               id: orderId,
             },
           ],
