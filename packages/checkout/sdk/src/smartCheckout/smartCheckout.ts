@@ -55,11 +55,12 @@ export const smartCheckout = async (
     availableRoutingOptions,
   );
 
+  const isPassport = (provider.provider as any)?.isPassport || false;
   return {
     sufficient,
     transactionRequirements,
     router: {
-      isPassport: false,
+      isPassport,
       availableRoutingOptions,
       routingOutcome,
     },
