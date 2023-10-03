@@ -131,13 +131,14 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
     setLoading(true);
 
     try {
-      checkout.smartCheckout(
+      const result = await checkout.smartCheckout(
         {
           provider,
           itemRequirements,
           transactionOrGasAmount,
         }
       );
+      console.log('Smart checkout result', result);
       setLoading(false);
       setSuccess(true);
     } catch (err: any) {
