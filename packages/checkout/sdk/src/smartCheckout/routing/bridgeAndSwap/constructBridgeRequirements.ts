@@ -37,16 +37,35 @@ export const getFeesForTokenAddress = (
 const getAmountFromBalanceRequirement = (
   balanceRequirements: BalanceCheckResult,
   tokenAddress: string,
+  dexQuote: DexQuote,
 ): BigNumber => {
   let amount = BigNumber.from(0);
+  let balanceRequirementToken = '';
 
   balanceRequirements.balanceRequirements.forEach((requirement) => {
     if (requirement.type === ItemType.NATIVE || requirement.type === ItemType.ERC20) {
       if (requirement.required.token.address === tokenAddress) {
+        balanceRequirementToken = requirement.required.token.address;
         amount = amount.add(requirement.required.balance);
       }
     }
   });
+
+  if (!balanceRequirementToken) return amount;
+
+  // Add fees from the swap quote if any match the balance requirement token
+  dexQuote.quote.fees.forEach((fee) => {
+    if (fee.amount.token.address === balanceRequirementToken) {
+      amount = amount.add(fee.amount.value);
+    }
+  });
+
+  // Add approval fee if it matches the requirement token
+  if (dexQuote.approval) {
+    if (dexQuote.approval.token.address === balanceRequirementToken) {
+      amount = amount.add(dexQuote.approval.value);
+    }
+  }
 
   return amount;
 };
@@ -88,7 +107,7 @@ export const constructBridgeRequirements = (
     const fees = getFeesForTokenAddress(quote, tokenAddress);
     // If the token being bridged is a balance requirement then add this to the total
     // to ensure when its swapped the balance requirement can still be fulfilled
-    const balanceRequirementAmount = getAmountFromBalanceRequirement(balanceRequirements, tokenAddress);
+    const balanceRequirementAmount = getAmountFromBalanceRequirement(balanceRequirements, tokenAddress, quote);
     // Add all the amounts together
     const totalAmount = quotedAmount.add(fees).add(balanceRequirementAmount);
 
