@@ -14,6 +14,10 @@ export type RemoteConfigParams = {
   isProduction: boolean;
 };
 
+export enum CheckoutServices {
+  SWAP = 'dex',
+}
+
 export class RemoteConfigFetcher {
   private isDevelopment: boolean;
 
@@ -81,6 +85,10 @@ export class RemoteConfigFetcher {
     | RemoteConfiguration[keyof RemoteConfiguration]
     | undefined
     > {
+    if (key && this.isProduction) {
+      if (await this.checkAvailability(key) === 403) return undefined;
+    }
+
     const config = await this.loadConfig();
     if (!config) return undefined;
     if (!key) return config;
@@ -91,5 +99,20 @@ export class RemoteConfigFetcher {
     const config = await this.loadConfigTokens();
     if (!config || !config[chainId]) return {};
     return config[chainId] ?? [];
+  }
+
+  public async checkAvailability(service: string): Promise<number> {
+    let response;
+    switch (service) {
+      case CheckoutServices.SWAP:
+        response = await RemoteConfigFetcher.makeHttpRequest(
+          `${this.getEndpoint()}/v1/availability/swap`,
+        );
+        break;
+      default:
+        break;
+    }
+
+    return response?.data?.code;
   }
 }

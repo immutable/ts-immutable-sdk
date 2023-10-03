@@ -1,8 +1,9 @@
 import { BiomeCombinedProviders } from '@biom3/react';
 import {
-  useContext, useEffect, useMemo, useReducer,
+  useContext, useEffect, useMemo, useReducer, useState,
 } from 'react';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
+import { DexConfig } from '@imtbl/checkout-sdk';
 import {
   initialWalletState,
   WalletActions,
@@ -32,21 +33,29 @@ import { EventTargetContext } from '../../context/event-target-context/EventTarg
 import { widgetTheme } from '../../lib/theme';
 
 export interface WalletWidgetProps {
-  config: StrongCheckoutWidgetsConfig,
+  config: StrongCheckoutWidgetsConfig;
 }
 
 export function WalletWidget(props: WalletWidgetProps) {
   const errorActionText = text.views[SharedViews.ERROR_VIEW].actionText;
   const loadingText = text.views[SharedViews.LOADING_VIEW].text;
-  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+  const {
+    eventTargetState: { eventTarget },
+  } = useContext(EventTargetContext);
 
   const {
     config: {
-      environment, theme, isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
+      environment,
+      theme,
+      isOnRampEnabled,
+      isSwapEnabled,
+      isBridgeEnabled,
     },
   } = props;
 
-  const { connectLoaderState: { checkout, provider } } = useContext(ConnectLoaderContext);
+  const {
+    connectLoaderState: { checkout, provider },
+  } = useContext(ConnectLoaderContext);
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
 
   const [walletState, walletDispatch] = useReducer(
@@ -64,18 +73,34 @@ export function WalletWidget(props: WalletWidgetProps) {
   );
   const themeReducerValue = useMemo(() => widgetTheme(theme), [theme]);
 
+  const [topUpSwapEnabled, setTopUpSwapEnabled] = useState(false);
+
   /* Set Config into WalletState */
   useEffect(() => {
-    walletDispatch({
-      payload: {
-        type: WalletActions.SET_SUPPORTED_TOP_UPS,
-        supportedTopUps: {
-          isBridgeEnabled,
-          isSwapEnabled,
-          isOnRampEnabled,
+    (async () => {
+      if (!checkout) return;
+
+      let swapEnabled = isSwapEnabled;
+
+      try {
+        (await checkout.config.remote.getConfig('dex')) as DexConfig;
+      } catch (err: any) {
+        swapEnabled = false;
+      }
+
+      setTopUpSwapEnabled(swapEnabled);
+
+      walletDispatch({
+        payload: {
+          type: WalletActions.SET_SUPPORTED_TOP_UPS,
+          supportedTopUps: {
+            isBridgeEnabled,
+            isSwapEnabled: swapEnabled,
+            isOnRampEnabled,
+          },
         },
-      },
-    });
+      });
+    })();
   }, [isBridgeEnabled, isSwapEnabled, isOnRampEnabled, environment]);
 
   const initialiseWallet = async () => {
@@ -141,30 +166,30 @@ export function WalletWidget(props: WalletWidgetProps) {
         <CryptoFiatProvider environment={environment}>
           <WalletContext.Provider value={walletReducerValues}>
             {viewState.view.type === SharedViews.LOADING_VIEW && (
-            <LoadingView loadingText={loadingText} />
+              <LoadingView loadingText={loadingText} />
             )}
             {viewState.view.type === WalletWidgetViews.WALLET_BALANCES && (
-            <WalletBalances />
+              <WalletBalances />
             )}
             {viewState.view.type === WalletWidgetViews.SETTINGS && <Settings />}
             {viewState.view.type === WalletWidgetViews.COIN_INFO && (
-            <CoinInfo />
+              <CoinInfo />
             )}
             {viewState.view.type === SharedViews.ERROR_VIEW && (
-            <ErrorView
-              actionText={errorActionText}
-              onActionClick={errorAction}
-              onCloseClick={() => sendWalletWidgetCloseEvent(eventTarget)}
-            />
+              <ErrorView
+                actionText={errorActionText}
+                onActionClick={errorAction}
+                onCloseClick={() => sendWalletWidgetCloseEvent(eventTarget)}
+              />
             )}
             {viewState.view.type === SharedViews.TOP_UP_VIEW && (
-            <TopUpView
-              widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
-              showOnrampOption={isOnRampEnabled}
-              showSwapOption={isSwapEnabled}
-              showBridgeOption={isBridgeEnabled}
-              onCloseButtonClick={() => sendWalletWidgetCloseEvent(eventTarget)}
-            />
+              <TopUpView
+                widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
+                showOnrampOption={isOnRampEnabled}
+                showSwapOption={topUpSwapEnabled}
+                showBridgeOption={isBridgeEnabled}
+                onCloseButtonClick={() => sendWalletWidgetCloseEvent(eventTarget)}
+              />
             )}
           </WalletContext.Provider>
         </CryptoFiatProvider>
