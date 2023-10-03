@@ -6,6 +6,8 @@ import { useContext, useEffect, useState } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
 import { FundingRouteStep } from '../../views/smartCheckoutTypes';
 import { ConnectLoaderContext } from '../../../../context/connect-loader-context/ConnectLoaderContext';
+import { SwapWidget, SwapWidgetParams } from '../../../swap/SwapWidget';
+import { withDefaultWidgetConfigs } from '../../../../lib/withDefaultWidgetConfig';
 
 type FundingRouteExecuteSwapProps = {
   fundingRouteStep: FundingRouteStep;
@@ -17,6 +19,12 @@ export function FundingRouteExecuteSwap(
 ) {
   const [stage, setStage] = useState<Stages>('LOADING');
   const { connectLoaderState: { provider } } = useContext(ConnectLoaderContext);
+
+  const swapParams: SwapWidgetParams = {
+    amount: '1000',
+    fromContractAddress: '0x123',
+    toContractAddress: '0x123abc',
+  };
 
   const requestPassportSwap = () => {
     console.log('requestPassportSwap');
@@ -49,9 +57,11 @@ export function FundingRouteExecuteSwap(
         <p>LOADING</p>
       )}
       {stage === 'SWAP WIDGET' && (
-      <Button sx={{ mt: 'auto' }} variant="primary" onClick={onSwapRequested}>
-        SWAP WIDGET
-      </Button>
+      <SwapWidget
+        params={swapParams}
+        config={withDefaultWidgetConfigs()}
+      />
+
       )}
       {stage === 'CONFIRMING' && (
       <p>CONFIRMING</p>
