@@ -40,24 +40,24 @@ export function SimpleLayout({
       <Box sx={responsiveStyles} id={`layout-container${portalId}`}>
         <Box testId={testId} sx={simpleLayoutStyle}>
           {header && (
-            <Box id={`header${portalId}`} sx={headerStyle(floatHeader)}>
+            <Box sx={headerStyle(floatHeader)}>
               {header}
             </Box>
           )}
-          <Box id={`content${portalId}`} sx={contentStyle}>
+          <Box sx={contentStyle}>
             {heroContent && (
-              <Box id={`hero-content${portalId}`} sx={heroContentStyle}>
+              <Box sx={heroContentStyle}>
                 {heroContent}
               </Box>
             )}
             {children && (
-              <Box id={`body${portalId}`} sx={bodyStyle}>
+              <Box sx={bodyStyle}>
                 {children}
               </Box>
             )}
           </Box>
           {footer && (
-            <Box id={`footer${portalId}`} sx={footerStyle(footerBackgroundColor)}>
+            <Box sx={footerStyle(footerBackgroundColor)}>
               {footer}
             </Box>
           )}
