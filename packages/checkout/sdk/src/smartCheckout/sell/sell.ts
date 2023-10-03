@@ -7,8 +7,7 @@ import {
   PrepareListingResponse,
   constants,
 } from '@imtbl/orderbook';
-import { BigNumber, Contract } from 'ethers';
-import { parseUnits } from 'ethers/lib/utils';
+import { BigNumber, Contract, utils } from 'ethers';
 import {
   BuyToken, SellOrder, SellResult, SellStatusType,
 } from '../../types/sell';
@@ -47,7 +46,7 @@ export const getBuyToken = (
   buyToken: BuyToken,
   decimals: number = 18,
 ): ERC20Item | NativeItem => {
-  const bnAmount = parseUnits(buyToken.amount, decimals);
+  const bnAmount = utils.parseUnits(buyToken.amount, decimals);
 
   if (buyToken.type === ItemType.NATIVE) {
     return {
