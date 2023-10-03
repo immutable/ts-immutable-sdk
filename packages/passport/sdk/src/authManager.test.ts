@@ -350,6 +350,7 @@ describe('AuthManager', () => {
 
       const result = await authManager.getUser();
 
+      expect(signinSilentMock).toBeCalledTimes(1);
       expect(result).toEqual(mockUser);
     });
 
@@ -359,6 +360,7 @@ describe('AuthManager', () => {
 
       const result = await authManager.getUser();
 
+      expect(signinSilentMock).toBeCalledTimes(0);
       expect(result).toEqual(null);
     });
 
@@ -368,6 +370,7 @@ describe('AuthManager', () => {
       signinSilentMock.mockResolvedValue(null);
       const result = await authManager.getUser();
 
+      expect(signinSilentMock).toBeCalledTimes(1);
       expect(result).toEqual(null);
     });
 
