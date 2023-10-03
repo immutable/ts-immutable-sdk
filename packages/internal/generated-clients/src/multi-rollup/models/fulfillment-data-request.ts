@@ -31,9 +31,9 @@ export interface FulfillmentDataRequest {
     'order_id': string;
     /**
      * 
-     * @type {Fee}
+     * @type {Array<Fee>}
      * @memberof FulfillmentDataRequest
      */
-    'fee'?: Fee;
+    'fees': Array<Fee>;
 }
 

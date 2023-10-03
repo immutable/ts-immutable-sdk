@@ -54,6 +54,12 @@ export interface NFT {
      */
     'metadata_synced_at': string | null;
     /**
+     * The id of the metadata of this NFT
+     * @type {string}
+     * @memberof NFT
+     */
+    'metadata_id'?: string | null;
+    /**
      * The name of the NFT
      * @type {string}
      * @memberof NFT

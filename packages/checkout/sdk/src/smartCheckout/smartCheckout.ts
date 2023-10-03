@@ -1,6 +1,6 @@
 import { Web3Provider } from '@ethersproject/providers';
 import {
-  FulfilmentTransaction,
+  FulfillmentTransaction,
   GasAmount,
   ItemRequirement, SmartCheckoutResult, TransactionRequirement,
 } from '../types/smartCheckout';
@@ -45,7 +45,7 @@ export const smartCheckout = async (
   config: CheckoutConfiguration,
   provider: Web3Provider,
   itemRequirements: ItemRequirement[],
-  transactionOrGasAmount: FulfilmentTransaction | GasAmount,
+  transactionOrGasAmount: FulfillmentTransaction | GasAmount,
 ): Promise<SmartCheckoutResult> => {
   const ownerAddress = await provider.getSigner().getAddress();
   let aggregatedItems = itemAggregator(itemRequirements);
@@ -64,6 +64,7 @@ export const smartCheckout = async (
 
   // Determine which services are available
   const availableRoutingOptions = await routingOptionsAvailable(config, provider);
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const fundingRoutes = await routingCalculator(
     config,

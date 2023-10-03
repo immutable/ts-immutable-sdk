@@ -3,7 +3,7 @@ import { PopulatedTransaction } from 'ethers';
 import { CheckoutConfiguration } from '../../config';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import * as instance from '../../instance';
-import { signFulfilmentTransactions } from '../actions';
+import { signFulfillmentTransactions } from '../actions';
 import { CancelResponse, CancelStatusType } from '../../types';
 import { SignTransactionStatusType } from '../actions/types';
 
@@ -40,7 +40,7 @@ export const cancel = async (
     );
   }
 
-  const result = await signFulfilmentTransactions(provider, [unsignedCancelOrderTransaction]);
+  const result = await signFulfillmentTransactions(provider, [unsignedCancelOrderTransaction]);
   if (result.type === SignTransactionStatusType.FAILED) {
     return {
       orderId,

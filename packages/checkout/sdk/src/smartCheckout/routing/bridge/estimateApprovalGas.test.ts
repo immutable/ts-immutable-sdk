@@ -6,7 +6,7 @@ import { CheckoutConfiguration } from '../../../config';
 import { ChainId } from '../../../types';
 import { estimateApprovalGas, estimateGasForBridgeApproval } from './estimateApprovalGas';
 import { CheckoutErrorType } from '../../../errors';
-import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from './constants';
+import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from '../indexer/fetchL1Representation';
 
 jest.mock('../../../instance');
 jest.mock('../../../config');

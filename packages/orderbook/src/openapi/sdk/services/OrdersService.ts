@@ -3,8 +3,8 @@
 /* eslint-disable */
 import type { ChainName } from '../models/ChainName';
 import type { CreateListingRequestBody } from '../models/CreateListingRequestBody';
+import type { FulfillableOrder } from '../models/FulfillableOrder';
 import type { FulfillmentDataRequest } from '../models/FulfillmentDataRequest';
-import type { FulfillmentDataResult } from '../models/FulfillmentDataResult';
 import type { ListingResult } from '../models/ListingResult';
 import type { ListListingsResult } from '../models/ListListingsResult';
 import type { ListTradeResult } from '../models/ListTradeResult';
@@ -12,6 +12,7 @@ import type { OrderStatus } from '../models/OrderStatus';
 import type { PageCursor } from '../models/PageCursor';
 import type { PageSize } from '../models/PageSize';
 import type { TradeResult } from '../models/TradeResult';
+import type { UnfulfillableOrder } from '../models/UnfulfillableOrder';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -168,7 +169,10 @@ export class OrdersService {
     chainName: ChainName,
     requestBody: Array<FulfillmentDataRequest>,
   }): CancelablePromise<{
-    result: Array<FulfillmentDataResult>;
+    result: {
+      fulfillable_orders: Array<FulfillableOrder>;
+      unfulfillable_orders: Array<UnfulfillableOrder>;
+    };
   }> {
     return this.httpRequest.request({
       method: 'POST',
@@ -209,7 +213,7 @@ export class OrdersService {
     /**
      * Trade field to sort by
      */
-    sortBy?: 'created_at',
+    sortBy?: 'indexed_at',
     /**
      * Ascending or descending direction for sort
      */

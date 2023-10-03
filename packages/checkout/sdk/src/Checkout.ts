@@ -54,6 +54,8 @@ import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
 import { SellParams } from './types/sell';
 import { CancelParams } from './types/cancel';
 import { FiatRampService, FiatRampWidgetParams } from './fiatRamp';
+import { getItemRequirementsFromRequirements } from './smartCheckout/itemRequirements';
+import { CheckoutError, CheckoutErrorType } from './errors';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
@@ -378,11 +380,17 @@ export class Checkout {
       params.provider,
     );
 
-    // console.log('Smart Checkout Params ::', params);
+    let itemRequirements = [];
+    try {
+      itemRequirements = await getItemRequirementsFromRequirements(web3Provider, params.itemRequirements);
+    } catch {
+      throw new CheckoutError('Failed to map item requirements', CheckoutErrorType.ITEM_REQUIREMENTS_ERROR);
+    }
+
     await smartCheckout.smartCheckout(
       this.config,
       web3Provider,
-      params.itemRequirements,
+      itemRequirements,
       params.transactionOrGasAmount,
     );
   }
