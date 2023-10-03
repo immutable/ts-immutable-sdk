@@ -5,7 +5,7 @@ import { SellOrder } from './smartCheckout';
  * Interface representing the parameters for {@link Checkout.sell}
  * @property {Web3Provider} provider - The provider to use for the sell.
  * @property {Array<SellOrder>} orders - An array of sell orders to execute.
- * Only currently actions the first order in the array until we support batch processing.
+ * Currently only actions the first order in the array until batch processing is supported.
  */
 export interface SellParams {
   provider: Web3Provider;

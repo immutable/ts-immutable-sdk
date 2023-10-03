@@ -3,41 +3,75 @@ import { BigNumber } from 'ethers';
 import { TokenInfo } from './tokenInfo';
 import { OrderFee } from './fees';
 
+/**
+ * Represents the result of {@link Checkout.buy}, {@link Checkout.sell} and {@link Checkout.cancel}.
+ * @property {SuccessStatus | FailedStatus | InsufficientFundsStatus} status - The status of the action.
+ * @property {Array<SmartCheckoutSufficient | SmartCheckoutInsufficient>} smartCheckoutResult - The result of the smart checkout.
+ */
 export type ActionResult = {
   status: SuccessStatus | FailedStatus | InsufficientFundsStatus,
   smartCheckoutResult: Array<SmartCheckoutSufficient | SmartCheckoutInsufficient>
 };
 
+/**
+ * An enum representing the action status types
+ * @enum {string}
+ * @property {string} SUCCESS - If the action succeeded as the transactions were able to be processed
+ * @property {string} FAILED - If the action failed due to transactions not settling on chain
+ * @property {string} INSUFFICIENT_FUNDS - If the action failed due to insufficient funds
+ */
 export enum ActionStatusType {
   SUCCESS = 'SUCCESS',
   FAILED = 'FAILED',
   INSUFFICIENT_FUNDS = 'INSUFFICIENT_FUNDS',
 }
 
-type SuccessStatus = {
+/**
+ * Represents a success status
+ * @property {ActionStatusType.SUCCESS} type - Indicates that the action succeeded
+ * @property {Array<BuyOrder | SellListing | CancelOrder>} orders - The orders that were processed
+ */
+export type SuccessStatus = {
   type: ActionStatusType.SUCCESS,
   orders: Array<BuyOrder | SellListing | CancelOrder>
 };
 
-type FailedStatus = {
+/**
+ * Represents a failed status
+ * @property {ActionStatusType.FAILED} type - Indicates that the action failed
+ * @property {Array<BuyOrder | SellOrder | CancelOrder>} orders - The orders that were attempted to be processed
+ * @property {string} transactionHash - The transaction hash of the failed transaction
+ * @property {string} reason - The reason the transaction failed
+ */
+export type FailedStatus = {
   type: ActionStatusType.FAILED,
   transactionHash: string,
   reason: string,
   orders: Array<BuyOrder | SellOrder | CancelOrder>
 };
 
-type InsufficientFundsStatus = {
+/**
+ * Represents an insufficient funds status
+ * @property {ActionStatusType.FAILED} type - Indicates that the action did not process due to insufficient funds
+ * @property {Array<BuyOrder | SellOrder | CancelOrder>} orders - The orders that were attempted to be processed
+ */
+export type InsufficientFundsStatus = {
   type: ActionStatusType.INSUFFICIENT_FUNDS,
   orders: Array<BuyOrder | SellOrder | CancelOrder>
 };
 
+/**
+ * The type representing the order to buy
+ * @property {string} orderId - the id of the order to buy
+ * @property {Array<OrderFee>} takerFees - array of order fees to apply to the order
+ */
 export type BuyOrder = {
   id: string,
   takerFees?: OrderFee[],
 };
 
 /**
- * Interface of the SellOrder to create a listing from, includes makerFees
+ * The type representing the sell order to create a listing from
  * @property {SellToken} sellToken - the token to be listed for sale
  * @property {BuyToken} buyToken - the token info of the price of the item
  * @property {OrderFee[]} makerFees - option array of makerFees to be applied to the listing
@@ -49,11 +83,11 @@ export type SellOrder = {
 };
 
 /**
- * Interface of the SellListing representing the listing and the order id for the sell order
- * @property {string} id - the id of the listing
+ * The type representing the listing and the order id for the sell order
  * @property {SellToken} sellToken - the token that has been listed for sale
  * @property {BuyToken} buyToken - the token info of the price of the item
  * @property {OrderFee[]} makerFees - option array of makerFees applied to the listing
+ * @property {string} id - the id of the listing
  */
 export type SellListing = SellOrder & { id: string };
 
@@ -68,7 +102,7 @@ export type BuyToken = NativeBuyToken | ERC20BuyToken;
  * @property {ItemType} type - The type indicate this is a native token.
  * @property {string} amount - The amount of native token.
  */
-type NativeBuyToken = {
+export type NativeBuyToken = {
   type: ItemType.NATIVE;
   amount: string;
 };
@@ -79,7 +113,7 @@ type NativeBuyToken = {
  * @property {string} amount - The amount of native token.
  * @property {string} contractAddress - The contract address of the ERC20.
  */
-type ERC20BuyToken = {
+export type ERC20BuyToken = {
   type: ItemType.ERC20;
   amount: string;
   contractAddress: string;
@@ -88,13 +122,17 @@ type ERC20BuyToken = {
 /**
  * Interface of the SellToken
  * @property {string} id - The ERC721 token id
- * @property {string} collectionAddress - The ERC721 contract address
+ * @property {string} collectionAddress - The ERC721 collection address
  */
-type SellToken = {
+export type SellToken = {
   id: string,
   collectionAddress: string
 };
 
+/**
+ * The type representing the order to cancel
+ * @property {string[]} id - the id of the order to cancel
+ */
 export type CancelOrder = {
   id: string[]
 };
@@ -111,11 +149,23 @@ export interface SmartCheckoutParams {
   transactionOrGasAmount: FulfillmentTransaction | GasAmount,
 }
 
+/**
+ * Represents a native item requirement for a transaction.
+ * @property {ItemType.NATIVE} type - The type to indicate this is a native item requirement.
+ * @property {string} amount - The amount of the item.
+ */
 export type NativeItemRequirement = {
   type: ItemType.NATIVE;
   amount: string;
 };
 
+/**
+ * Represents an ERC20 item requirement for a transaction.
+ * @property {ItemType.ERC20} type - The type to indicate this is a ERC20 item requirement.
+ * @property {string} amount - The amount of the item.
+ * @property {string} contractAddress - The contract address of the ERC20.
+ * @property {string} spenderAddress - The contract address of the approver.
+ */
 export type ERC20ItemRequirement = {
   type: ItemType.ERC20;
   contractAddress: string;
@@ -123,6 +173,13 @@ export type ERC20ItemRequirement = {
   spenderAddress: string,
 };
 
+/**
+ * Represents an ERC721 item requirement for a transaction.
+ * @property {ItemType.ERC721} type - The type to indicate this is a ERC721 item requirement.
+ * @property {string} contractAddress - The contract address of the ERC721 collection.
+ * @property {string} id - The ID of this ERC721 in the collection.
+ * @property {string} spenderAddress - The contract address of the approver.
+ */
 export type ERC721ItemRequirement = {
   type: ItemType.ERC721;
   contractAddress: string;
@@ -176,7 +233,7 @@ export type ERC20Item = {
 /**
  * Represents an ERC721 item.
  * @property {ItemType} type - The type to indicate this is an ERC721 item.
- * @property {string} contractAddress - The contract address of the ERC721.
+ * @property {string} contractAddress - The contract address of the ERC721 collection.
  * @property {string} id - The ID of this ERC721 in the collection.
  * @property {string} spenderAddress - The contract address of the approver.
  */
@@ -312,18 +369,38 @@ export enum RoutingOutcomeType {
 }
 
 /*
-* The type representing the routing outcome for a transaction.
-*/
+ * The type representing the routing outcome for a transaction.
+ */
 export type RoutingOutcome = RoutesFound | NoRoutesFound | NoRouteOptions;
 
 /**
-* Represents the routing outcome for a transaction.
-* @property {RoutingOutcomeType.ROUTES_FOUND} type - Indicates that funding routes were found for the transaction.
-* @property {AvailableRoutingOptions} fundingRoutes - The funding routes found for the transaction.
-*/
+ * Represents a routing outcome where funding routes were found.
+ * @property {RoutingOutcomeType.ROUTES_FOUND} type - Indicates that funding routes were found for the transaction.
+ * @property {AvailableRoutingOptions} fundingRoutes - The funding routes found for the transaction.
+ */
 export type RoutesFound = {
   type: RoutingOutcomeType.ROUTES_FOUND,
   fundingRoutes: FundingRoute[]
+};
+
+/**
+ * Represents a routing outcome where no funding routes were found.
+ * @property {RoutingOutcomeType.NO_ROUTES_FOUND} type - Indicates that no funding routes were found for the transaction.
+ * @property {string} message - The message indicating why no funding routes were found.
+ */
+type NoRoutesFound = {
+  type: RoutingOutcomeType.NO_ROUTES_FOUND,
+  message: string
+};
+
+/**
+ * Represents a routing outcome where no routing options were available for the transaction.
+ * @property {RoutingOutcomeType.NO_ROUTE_OPTIONS} type - Indicates that no routing options were available for the transaction.
+ * @property {string} message - The message indicating why no routing options were available.
+ */
+type NoRouteOptions = {
+  type: RoutingOutcomeType.NO_ROUTE_OPTIONS,
+  message: string
 };
 
 /**
@@ -338,31 +415,8 @@ export type FundingRoute = {
   totalFees?: TotalFees,
 };
 
-/*
-* Type representing the various funding steps
-*/
-export type FundingStep = BridgeFundingStep | SwapFundingStep | OnRampFundingStep;
-
 /**
- * Represents a bridge funding route
- * @property {FundingStepType.BRIDGE} type - Indicates that this is a bridge funding step
- * @property {number} chainId - The chain id this funding step should be executed on
- * @property {FundingItem} fundingItem - The funding item for this step
- * @property {BridgeFees} fees - The aggregated fees for this step
- */
-export type BridgeFundingStep = {
-  type: FundingStepType.BRIDGE,
-  chainId: number,
-  fundingItem: FundingItem,
-  fees: {
-    approvalGasFees: Fee,
-    bridgeGasFees: Fee,
-    bridgeFees: Fee[],
-  },
-};
-
-/**
- * Represents the aggregated fees for a funding step
+ * Represents the total fees for a route
  * @property {Fee} gas - The total gas fees for this funding step
  * @property {Fee} other - The total of all other fees associated with this funding step
  * @property {Fee} total - The total combined gas and other fees for this funding step
@@ -383,17 +437,69 @@ export type Fee = {
   formattedAmount: string;
 };
 
+/*
+* Type representing the various funding steps
+*/
+export type FundingStep = BridgeFundingStep | SwapFundingStep | OnRampFundingStep;
+
+/**
+ * Represents a bridge funding route
+ * @property {FundingStepType.BRIDGE} type - Indicates that this is a bridge funding step
+ * @property {number} chainId - The chain id the bridge should be executed on
+ * @property {FundingItem} fundingItem - The funding item for the bridge
+ * @property {BridgeFees} fees - The fees for the bridge
+ */
+export type BridgeFundingStep = {
+  type: FundingStepType.BRIDGE,
+  chainId: number,
+  fundingItem: FundingItem,
+  fees: BridgeFees,
+};
+
+/**
+ * Represents the fees for a bridge funding step
+ * @property {Fee} approvalGasFees - The approval gas fees for the bridge
+ * @property {Fee} bridgeGasFees - The bridge gas fees for the bridge
+ * @property {Fee[]} bridgeFees - Additional bridge fees for the bridge
+ */
+export type BridgeFees = {
+  approvalGasFees: Fee,
+  bridgeGasFees: Fee,
+  bridgeFees: Fee[],
+};
+
+/**
+ * Represents a swap funding route
+ * @property {FundingStepType.SWAP} type - Indicates that this is a swap funding step
+ * @property {number} chainId - The chain id the swap should be executed on
+ * @property {FundingItem} fundingItem - The funding item for the swap
+ * @property {SwapFees} fees - The fees for the swap
+ */
 export type SwapFundingStep = {
   type: FundingStepType.SWAP,
   chainId: number,
   fundingItem: FundingItem,
-  fees: {
-    approvalGasFees: Fee,
-    swapGasFees: Fee,
-    swapFees: Fee[],
-  },
+  fees: SwapFees,
 };
 
+/**
+ * Represents the fees for a swap funding step
+ * @property {Fee} approvalGasFees - The approval gas fees for the swap
+ * @property {Fee} swapGasFees - The swap gas fees for the swap
+ * @property {Fee[]} swapFees - Additional swap fees for the swap
+ */
+export type SwapFees = {
+  approvalGasFees: Fee,
+  swapGasFees: Fee,
+  swapFees: Fee[],
+};
+
+/**
+ * Represents an onramp funding route
+ * @property {FundingStepType.ONRAMP} type - Indicates that this is an onramp funding step
+ * @property {number} chainId - The chain id the onramp should provide funds to
+ * @property {FundingItem} fundingItem - The item to be onramped
+ */
 export type OnRampFundingStep = {
   type: FundingStepType.ONRAMP,
   chainId: number,
@@ -413,44 +519,38 @@ export enum FundingStepType {
   ONRAMP = 'ONRAMP',
 }
 
-// Native or ERC20 funding item
+/**
+ * Represents a funding item
+ * @property {ItemType.NATIVE | ItemType.ERC20} type - The type of the funding item
+ * @property {FundsRequired} fundsRequired - The amount of funds required of this funding item
+ * @property {UserBalance} userBalance - The current user balance of this funding item
+ * @property {TokenInfo} token - The token info for the funding item
+ */
 export type FundingItem = {
   type: ItemType.NATIVE | ItemType.ERC20,
-  fundsRequired: {
-    amount: BigNumber,
-    formattedAmount: string
-  },
-  userBalance: {
-    balance: BigNumber,
-    formattedBalance: string
-  },
+  fundsRequired: FundsRequired,
+  userBalance: UserBalance,
   token: TokenInfo
 };
 
-export type FundingItemFees = {
-  type: FundingItemFeeType,
-  fee: Fee,
-  tokenInfo: TokenInfo,
+/**
+ * Represents the funds required of a funding item
+ * @property {BigNumber} amount - The amount of funds required
+ * @property {string} formattedAmount - The formatted amount of funds required
+ */
+export type FundsRequired = {
+  amount: BigNumber,
+  formattedAmount: string
 };
 
-export enum FundingItemFeeType {
-  GAS = 'GAS',
-  BRIDGE_FEE = 'BRIDGE_FEE',
-  SWAP_FEE = 'SWAP_FEE',
-  MAKER_FEE = 'MAKER_FEE',
-  TAKER_FEE = 'TAKER_FEE',
-  ROYALTY = 'ROYALTY',
-  OTHER = 'OTHER',
-}
-
-type NoRoutesFound = {
-  type: RoutingOutcomeType.NO_ROUTES_FOUND,
-  message: string
-};
-
-type NoRouteOptions = {
-  type: RoutingOutcomeType.NO_ROUTE_OPTIONS,
-  message: string
+/**
+ * Represents the user balance of a funding item
+ * @property {BigNumber} balance - The balance of the funding item
+ * @property {string} formattedBalance - The formatted balance of the funding item
+ */
+export type UserBalance = {
+  balance: BigNumber,
+  formattedBalance: string
 };
 
 /**
