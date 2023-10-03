@@ -27,7 +27,7 @@ import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from '../indexer/fetchL1Representat
 jest.mock('../../../gasEstimate');
 jest.mock('../../../instance');
 jest.mock('./estimateApprovalGas');
-jest.mock('./bridgeGasEstimate');
+jest.mock('./getBridgeFeeEstimate');
 jest.mock('../../allowList/allowListCheck');
 
 describe('bridgeRoute', () => {
