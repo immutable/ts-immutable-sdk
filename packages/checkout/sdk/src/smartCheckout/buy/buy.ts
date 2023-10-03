@@ -217,7 +217,7 @@ export const buy = async (
           type: ActionStatusType.FAILED,
           transactionHash: approvalResult.transactionHash,
           reason: approvalResult.reason,
-          orders: [orders[0]],
+          orders,
         },
         smartCheckoutResult: [smartCheckoutResult],
       };
@@ -253,7 +253,7 @@ export const buy = async (
     return {
       status: {
         type: ActionStatusType.SUCCESS,
-        orders: [orders[0]],
+        orders,
       },
       smartCheckoutResult: [smartCheckoutResult],
     };
@@ -262,7 +262,7 @@ export const buy = async (
   return {
     status: {
       type: ActionStatusType.INSUFFICIENT_FUNDS,
-      orders: [orders[0]],
+      orders,
     },
     smartCheckoutResult: [smartCheckoutResult],
   };

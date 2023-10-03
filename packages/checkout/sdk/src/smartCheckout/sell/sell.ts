@@ -10,14 +10,16 @@ import {
 import { BigNumber, Contract } from 'ethers';
 import { parseUnits } from 'ethers/lib/utils';
 import {
-  BuyToken, SellOrder, SellResult, SellStatusType,
-} from '../../types/sell';
-import {
   ERC721Item,
   GasTokenType,
   ItemType,
   TransactionOrGasType,
   ERC20ABI,
+  ActionResult,
+  SellOrder,
+  BuyToken,
+  ActionStatusType,
+  SellListing,
 } from '../../types';
 import * as instance from '../../instance';
 import { CheckoutConfiguration } from '../../config';
@@ -67,7 +69,7 @@ export const sell = async (
   config: CheckoutConfiguration,
   provider: Web3Provider,
   orders: Array<SellOrder>,
-): Promise<SellResult> => {
+): Promise<ActionResult> => {
   let orderbook: Orderbook;
   let listing: PrepareListingResponse;
   let spenderAddress = '';
@@ -144,6 +146,7 @@ export const sell = async (
       listing.orderComponents,
       listing.actions,
     );
+    // todo: swap signing and approval
     if (!unsignedMessage) {
       // For sell it is expected the orderbook will always return an unsigned message
       // If for some reason it is missing then we cannot proceed with the create listing
@@ -164,14 +167,13 @@ export const sell = async (
     const approvalResult = await signApprovalTransactions(provider, unsignedTransactions.approvalTransactions);
     if (approvalResult.type === SignTransactionStatusType.FAILED) {
       return {
-        id: sellToken.id,
-        collectionAddress: sellToken.collectionAddress,
-        smartCheckoutResult,
         status: {
-          type: SellStatusType.FAILED,
+          type: ActionStatusType.FAILED,
           transactionHash: approvalResult.transactionHash,
           reason: approvalResult.reason,
+          orders: [orders[0]],
         },
+        smartCheckoutResult: [smartCheckoutResult],
       };
     }
 
@@ -210,20 +212,25 @@ export const sell = async (
       );
     }
 
+    const sellListing: SellListing = {
+      ...orders[0],
+      id: orderId,
+    };
+
     return {
-      id: sellToken.id,
-      collectionAddress: sellToken.collectionAddress,
-      smartCheckoutResult,
       status: {
-        type: SellStatusType.SUCCESS,
-        orderId,
+        type: ActionStatusType.SUCCESS,
+        orders: [sellListing],
       },
+      smartCheckoutResult: [smartCheckoutResult],
     };
   }
 
   return {
-    id: sellToken.id,
-    collectionAddress: sellToken.collectionAddress,
-    smartCheckoutResult,
+    status: {
+      type: ActionStatusType.INSUFFICIENT_FUNDS,
+      orders: [orders[0]],
+    },
+    smartCheckoutResult: [smartCheckoutResult],
   };
 };

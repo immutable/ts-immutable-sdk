@@ -4,13 +4,22 @@ import { ActionType, SignablePurpose, constants } from '@imtbl/orderbook';
 import { BigNumber, TypedDataDomain } from 'ethers';
 import { getBuyToken, getERC721Requirement, sell } from './sell';
 import { CheckoutConfiguration } from '../../config';
-import { GasTokenType, ItemType, TransactionOrGasType } from '../../types';
+import {
+  ActionStatusType,
+  BuyToken,
+  GasTokenType,
+  ItemType,
+  SellOrder,
+  TransactionOrGasType,
+} from '../../types';
 import { smartCheckout } from '../smartCheckout';
 import { createOrderbookInstance } from '../../instance';
-import { BuyToken, SellOrder, SellStatusType } from '../../types/sell';
 import { CheckoutErrorType } from '../../errors';
 import {
-  getUnsignedMessage, getUnsignedERC721Transactions, signApprovalTransactions, signMessage,
+  getUnsignedMessage,
+  getUnsignedERC721Transactions,
+  signApprovalTransactions,
+  signMessage,
 } from '../actions';
 import { SignTransactionStatusType } from '../actions/types';
 
@@ -145,15 +154,18 @@ describe('sell', () => {
       );
 
       expect(result).toEqual({
-        id,
-        collectionAddress: contractAddress,
-        smartCheckoutResult: {
+        smartCheckoutResult: [{
           sufficient: true,
           transactionRequirements: [erc721TransactionRequirement],
-        },
+        }],
         status: {
-          type: SellStatusType.SUCCESS,
-          orderId: '1234',
+          type: ActionStatusType.SUCCESS,
+          orders: [
+            {
+              ...orders[0],
+              id: '1234',
+            },
+          ],
         },
       });
 
@@ -301,12 +313,14 @@ describe('sell', () => {
       );
 
       expect(result).toEqual({
-        id,
-        collectionAddress: contractAddress,
-        smartCheckoutResult: {
+        status: {
+          type: ActionStatusType.INSUFFICIENT_FUNDS,
+          orders,
+        },
+        smartCheckoutResult: [{
           sufficient: false,
           transactionRequirements: [erc721TransactionRequirement],
-        },
+        }],
       });
 
       expect(smartCheckout).toBeCalledWith(
@@ -433,16 +447,15 @@ describe('sell', () => {
       );
 
       expect(result).toEqual({
-        id,
-        collectionAddress: contractAddress,
-        smartCheckoutResult: {
+        smartCheckoutResult: [{
           sufficient: true,
           transactionRequirements: [erc721TransactionRequirement],
-        },
+        }],
         status: {
-          type: SellStatusType.FAILED,
+          type: ActionStatusType.FAILED,
           transactionHash: '0xHASH',
           reason: 'Approval transaction failed and was reverted',
+          orders,
         },
       });
 

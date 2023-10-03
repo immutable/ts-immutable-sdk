@@ -16,48 +16,87 @@ export enum ActionStatusType {
 
 type SuccessStatus = {
   type: ActionStatusType.SUCCESS,
-  orders: Order[],
+  orders: Array<BuyOrder | SellListing | CancelOrder>
 };
 
 type FailedStatus = {
   type: ActionStatusType.FAILED,
   transactionHash: string,
   reason: string,
-  orders: Order[]
+  orders: Array<BuyOrder | SellOrder | CancelOrder>
 };
 
 type InsufficientFundsStatus = {
   type: ActionStatusType.INSUFFICIENT_FUNDS,
-  orders: Order[]
+  orders: Array<BuyOrder | SellOrder | CancelOrder>
 };
-
-type Order = BuyOrder | SellOrder | CancelOrder;
 
 export type BuyOrder = {
   id: string,
-  takerFees?: Array<OrderFee>,
+  takerFees?: OrderFee[],
 };
 
-type SellOrder = {
-  id: string,
+/**
+ * Interface of the SellOrder to create a listing from, includes makerFees
+ * @property {SellToken} sellToken - the token to be listed for sale
+ * @property {BuyToken} buyToken - the token info of the price of the item
+ * @property {OrderFee[]} makerFees - option array of makerFees to be applied to the listing
+ */
+export type SellOrder = {
   sellToken: SellToken,
   buyToken: BuyToken,
-  makerFees?: Array<OrderFee>,
+  makerFees?: OrderFee[],
 };
 
-export type CancelOrder = {
-  id: string
+/**
+ * Interface of the SellListing representing the listing and the order id for the sell order
+ * @property {string} id - the id of the listing
+ * @property {SellToken} sellToken - the token that has been listed for sale
+ * @property {BuyToken} buyToken - the token info of the price of the item
+ * @property {OrderFee[]} makerFees - option array of makerFees applied to the listing
+ */
+export type SellListing = SellOrder & { id: string };
+
+/**
+ * Represents the token that the item can be bought with once listed for sale.
+ * NativeBuyToken or ERC20BuyToken {@link Checkout.smartCheckout}.
+ */
+export type BuyToken = NativeBuyToken | ERC20BuyToken;
+
+/**
+ * Represents a native buy token
+ * @property {ItemType} type - The type indicate this is a native token.
+ * @property {string} amount - The amount of native token.
+ */
+type NativeBuyToken = {
+  type: ItemType.NATIVE;
+  amount: string;
 };
 
-type BuyToken = {
-  type: ItemType.NATIVE | ItemType.ERC20;
-  amount: '1.05';
-  contractAddress: '0x2222';
+/**
+ * Represents a ERC20 buy token
+ * @property {ItemType} type - The type indicate this is a ERC20 token.
+ * @property {string} amount - The amount of native token.
+ * @property {string} contractAddress - The contract address of the ERC20.
+ */
+type ERC20BuyToken = {
+  type: ItemType.ERC20;
+  amount: string;
+  contractAddress: string;
 };
 
+/**
+ * Interface of the SellToken
+ * @property {string} id - The ERC721 token id
+ * @property {string} collectionAddress - The ERC721 contract address
+ */
 type SellToken = {
   id: string,
   collectionAddress: string
+};
+
+export type CancelOrder = {
+  id: string[]
 };
 
 /**
