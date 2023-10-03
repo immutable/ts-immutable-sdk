@@ -10,7 +10,7 @@ import {
   ItemType,
   SwapFundingStep,
 } from '../../../types';
-import { BalanceRequirement } from '../../balanceCheck/types';
+import { BalanceCheckResult, BalanceRequirement } from '../../balanceCheck/types';
 import { DexQuoteCache, TokenBalanceResult } from '../types';
 import { getOrSetQuotesFromCache } from './dexQuoteCache';
 
@@ -169,6 +169,43 @@ export const checkUserCanCoverSwapFees = (
   return true;
 };
 
+// The item for swapping may also be a balance requirement
+// for the action. Need to ensure that if the user does a swap
+// that they can still cover the balance requirement.
+export const checkIfUserCanCoverRequirement = (
+  balanceRequirements: BalanceCheckResult,
+  tokenAddress: string,
+  amountBeingSwapped: BigNumber,
+  approvalFees: SufficientApprovalFees,
+  swapFees: Fee[],
+): boolean => {
+  let amount = BigNumber.from(0);
+  let balanceRequirementToken = '';
+
+  balanceRequirements.balanceRequirements.forEach((requirement) => {
+    if (requirement.type === ItemType.NATIVE || requirement.type === ItemType.ERC20) {
+      if (requirement.required.token.address === tokenAddress) {
+        balanceRequirementToken = requirement.required.token.address;
+        amount = amount.add(requirement.required.balance);
+      }
+    }
+  });
+
+  if (balanceRequirementToken === '') return true;
+
+  if (approvalFees.approvalGasTokenAddress === balanceRequirementToken) {
+    amount = amount.add(approvalFees.approvalGasFee);
+  }
+
+  for (const swapFee of swapFees) {
+    if (swapFee.amount.token.address === balanceRequirementToken) {
+      amount = amount.add(swapFee.amount.value);
+    }
+  }
+
+  return amount.gte(amountBeingSwapped);
+};
+
 export const swapRoute = async (
   config: CheckoutConfiguration,
   availableRoutingOptions: AvailableRoutingOptions,
@@ -177,6 +214,7 @@ export const swapRoute = async (
   balanceRequirement: BalanceRequirement,
   tokenBalanceResults: Map<ChainId, TokenBalanceResult>,
   swappableTokens: string[],
+  balanceRequirements: BalanceCheckResult,
 ): Promise<SwapFundingStep[]> => {
   const fundingSteps: SwapFundingStep[] = [];
   if (!availableRoutingOptions.swap) return fundingSteps;
@@ -226,6 +264,14 @@ export const swapRoute = async (
         amount: amountOfQuoteTokenRequired.value,
         address: quoteTokenAddress,
       },
+    )) continue;
+
+    if (!checkIfUserCanCoverRequirement(
+      balanceRequirements,
+      quoteTokenAddress,
+      amountOfQuoteTokenRequired.value,
+      approvalFees,
+      quote.quote.fees,
     )) continue;
 
     // User has sufficient funds to cover any approval and swap fees so use this token for the funding route
