@@ -313,7 +313,7 @@ export class Checkout {
   */
   public async sell(
     params: SellParams,
-  ): Promise<void> {
+  ): Promise<ActionResult> {
     if (this.config.isProduction) {
       throw new Error('This endpoint is not currently available.');
     }
@@ -331,7 +331,7 @@ export class Checkout {
       params.provider,
     );
 
-    await sell.sell(
+    return await sell.sell(
       this.config,
       web3Provider,
       params.orders,

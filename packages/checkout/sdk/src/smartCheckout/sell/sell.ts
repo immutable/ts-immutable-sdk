@@ -141,12 +141,25 @@ export const sell = async (
   );
 
   if (smartCheckoutResult.sufficient) {
+    const unsignedTransactions = await getUnsignedERC721Transactions(listing.actions);
+    const approvalResult = await signApprovalTransactions(provider, unsignedTransactions.approvalTransactions);
+    if (approvalResult.type === SignTransactionStatusType.FAILED) {
+      return {
+        status: {
+          type: ActionStatusType.FAILED,
+          transactionHash: approvalResult.transactionHash,
+          reason: approvalResult.reason,
+          orders: [orders[0]],
+        },
+        smartCheckoutResult: [smartCheckoutResult],
+      };
+    }
+
     const unsignedMessage = getUnsignedMessage(
       listing.orderHash,
       listing.orderComponents,
       listing.actions,
     );
-    // todo: swap signing and approval
     if (!unsignedMessage) {
       // For sell it is expected the orderbook will always return an unsigned message
       // If for some reason it is missing then we cannot proceed with the create listing
@@ -163,19 +176,6 @@ export const sell = async (
       provider,
       unsignedMessage,
     );
-    const unsignedTransactions = await getUnsignedERC721Transactions(listing.actions);
-    const approvalResult = await signApprovalTransactions(provider, unsignedTransactions.approvalTransactions);
-    if (approvalResult.type === SignTransactionStatusType.FAILED) {
-      return {
-        status: {
-          type: ActionStatusType.FAILED,
-          transactionHash: approvalResult.transactionHash,
-          reason: approvalResult.reason,
-          orders: [orders[0]],
-        },
-        smartCheckoutResult: [smartCheckoutResult],
-      };
-    }
 
     let orderId = '';
 

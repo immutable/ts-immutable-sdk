@@ -411,11 +411,6 @@ describe('sell', () => {
           },
         },
       );
-      (signMessage as jest.Mock).mockResolvedValue({
-        orderHash: 'hash',
-        orderComponents: {},
-        signedMessage: '0xSIGNED',
-      });
       (getUnsignedERC721Transactions as jest.Mock).mockResolvedValue({
         approvalTransactions: [{ from: '0xAPPROVAL' }],
       });
@@ -471,23 +466,12 @@ describe('sell', () => {
           },
         },
       );
-      expect(signMessage).toBeCalledWith(
-        mockProvider,
-        {
-          orderHash: 'hash',
-          orderComponents: {},
-          unsignedMessage: {
-            domain: {} as TypedDataDomain,
-            types: { types: [] },
-            value: { values: '' },
-          },
-        },
-      );
       expect(signApprovalTransactions).toBeCalledWith(
         mockProvider,
         [{ from: '0xAPPROVAL' }],
       );
-      expect(mockCreateListing).toBeCalledTimes(0);
+      expect(signMessage).not.toBeCalled();
+      expect(mockCreateListing).not.toBeCalled();
     });
 
     it('should throw error if prepare listing fails', async () => {
@@ -667,22 +651,23 @@ describe('sell', () => {
         }),
         createListing: mockCreateListing,
       });
-      (getUnsignedMessage as jest.Mock).mockReturnValue(
-        {
-          orderHash: 'hash',
-          orderComponents: {},
-          unsignedMessage: {
-            domain: {} as TypedDataDomain,
-            types: { types: [] },
-            value: { values: '' },
-          },
+      const unsignedMessage = {
+        orderHash: 'hash',
+        orderComponents: {},
+        unsignedMessage: {
+          domain: {} as TypedDataDomain,
+          types: { types: [] },
+          value: { values: '' },
         },
-      );
+      };
+      (getUnsignedMessage as jest.Mock).mockReturnValue(unsignedMessage);
       (signMessage as jest.Mock).mockRejectedValue(new Error('error from sign message'));
       (getUnsignedERC721Transactions as jest.Mock).mockResolvedValue({
         approvalTransactions: [{ from: '0xAPPROVAL' }],
       });
-      (signApprovalTransactions as jest.Mock).mockResolvedValue({});
+      (signApprovalTransactions as jest.Mock).mockResolvedValue({
+        type: SignTransactionStatusType.SUCCESS,
+      });
 
       const orders:Array<SellOrder> = [{
         sellToken: {
@@ -709,7 +694,12 @@ describe('sell', () => {
 
       expect(smartCheckout).toBeCalledTimes(1);
       expect(signMessage).toBeCalledTimes(1);
-      expect(signApprovalTransactions).toBeCalledTimes(0);
+      expect(signMessage).toBeCalledWith(mockProvider, unsignedMessage);
+      expect(signApprovalTransactions).toBeCalledTimes(1);
+      expect(signApprovalTransactions).toBeCalledWith(
+        mockProvider,
+        [{ from: '0xAPPROVAL' }],
+      );
       expect(mockCreateListing).toBeCalledTimes(0);
     });
 
@@ -766,22 +756,8 @@ describe('sell', () => {
         }),
         createListing: mockCreateListing,
       });
-      (getUnsignedMessage as jest.Mock).mockReturnValue(
-        {
-          orderHash: 'hash',
-          orderComponents: {},
-          unsignedMessage: {
-            domain: {} as TypedDataDomain,
-            types: { types: [] },
-            value: { values: '' },
-          },
-        },
-      );
-      (signMessage as jest.Mock).mockResolvedValue({
-        orderHash: 'hash',
-        orderComponents: {},
-        signedMessage: '0xSIGNED',
-      });
+      (getUnsignedMessage as jest.Mock).mockReturnValue({});
+      (signMessage as jest.Mock).mockResolvedValue({});
       (getUnsignedERC721Transactions as jest.Mock).mockRejectedValue(new Error('error from get unsigned transactions'));
       (signApprovalTransactions as jest.Mock).mockResolvedValue({});
 
@@ -809,8 +785,8 @@ describe('sell', () => {
       ).rejects.toThrowError('error from get unsigned transactions');
 
       expect(smartCheckout).toBeCalledTimes(1);
-      expect(signMessage).toBeCalledTimes(1);
       expect(getUnsignedERC721Transactions).toBeCalledTimes(1);
+      expect(signMessage).toBeCalledTimes(0);
       expect(signApprovalTransactions).toBeCalledTimes(0);
       expect(mockCreateListing).toBeCalledTimes(0);
     });
@@ -868,22 +844,8 @@ describe('sell', () => {
         }),
         createListing: mockCreateListing,
       });
-      (getUnsignedMessage as jest.Mock).mockReturnValue(
-        {
-          orderHash: 'hash',
-          orderComponents: {},
-          unsignedMessage: {
-            domain: {} as TypedDataDomain,
-            types: { types: [] },
-            value: { values: '' },
-          },
-        },
-      );
-      (signMessage as jest.Mock).mockResolvedValue({
-        orderHash: 'hash',
-        orderComponents: {},
-        signedMessage: '0xSIGNED',
-      });
+      (getUnsignedMessage as jest.Mock).mockReturnValue({});
+      (signMessage as jest.Mock).mockResolvedValue({});
       (getUnsignedERC721Transactions as jest.Mock).mockResolvedValue({
         approvalTransactions: [{ from: '0xAPPROVAL' }],
       });
@@ -913,9 +875,9 @@ describe('sell', () => {
       ).rejects.toThrowError('error from sign approval transactions');
 
       expect(smartCheckout).toBeCalledTimes(1);
-      expect(signMessage).toBeCalledTimes(1);
       expect(signApprovalTransactions).toBeCalledTimes(1);
       expect(getUnsignedERC721Transactions).toBeCalledTimes(1);
+      expect(signMessage).toBeCalledTimes(0);
       expect(mockCreateListing).toBeCalledTimes(0);
     });
 
@@ -965,7 +927,9 @@ describe('sell', () => {
       (getUnsignedMessage as jest.Mock).mockReturnValue(undefined);
       (signMessage as jest.Mock).mockResolvedValue({});
       (getUnsignedERC721Transactions as jest.Mock).mockResolvedValue({});
-      (signApprovalTransactions as jest.Mock).mockResolvedValue({});
+      (signApprovalTransactions as jest.Mock).mockResolvedValue({
+        type: SignTransactionStatusType.SUCCESS,
+      });
 
       let message;
       let type;
@@ -1006,8 +970,8 @@ describe('sell', () => {
       });
 
       expect(smartCheckout).toBeCalledTimes(1);
+      expect(signApprovalTransactions).toBeCalledTimes(1);
       expect(signMessage).toBeCalledTimes(0);
-      expect(signApprovalTransactions).toBeCalledTimes(0);
       expect(mockCreateListing).toBeCalledTimes(0);
     });
 
