@@ -1,8 +1,10 @@
 import { Box, Button } from '@biom3/react';
 import { FundingRouteStep } from '../../views/smartCheckoutTypes';
+import { FundingRouteExecuteSwap } from './FundingRouteExecuteSwap';
+import { FundingRouteExecuteBridge } from './FundingRouteExecuteBridge';
 
 type FundingRouteExecuteProps = {
-  fundingRouteStep?: FundingRouteStep;
+  fundingRouteStep: FundingRouteStep;
   onFundingRouteExecuted: () => void;
 };
 export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }: FundingRouteExecuteProps) {
@@ -16,6 +18,19 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
       -
       {' '}
       { fundingRouteStep?.asset.token.symbol }
+
+      { fundingRouteStep.type === 'SWAP' && (
+        <FundingRouteExecuteSwap
+          fundingRouteStep={fundingRouteStep}
+          onFundingRouteExecuted={onFundingRouteExecuted}
+        />
+      )}
+      { fundingRouteStep.type === 'BRIDGE' && (
+        <FundingRouteExecuteBridge
+          fundingRouteStep={fundingRouteStep}
+          onFundingRouteExecuted={onFundingRouteExecuted}
+        />
+      )}
 
       <Button sx={{ mt: 'auto' }} variant="primary" onClick={onFundingRouteExecuted}>
         next

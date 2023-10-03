@@ -21,32 +21,33 @@ import { FundingRoute } from './smartCheckoutTypes';
 const MOCK_ROUTES = [
   {
     priority: 1,
-    steps: [{
-      type: 'BRIDGE',
-      chainId: ChainId.SEPOLIA,
-      asset: {
-        balance: BigNumber.from(1),
-        formattedBalance: '1',
-        token: {
-          name: 'ETH',
-          symbol: 'ETH',
-          decimals: 18,
+    steps: [
+      {
+        type: 'SWAP',
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        asset: {
+          balance: BigNumber.from(10),
+          formattedBalance: '10',
+          token: {
+            name: 'ERC20',
+            symbol: 'USDC',
+            decimals: 18,
+            address: '0xERC20_2',
+          },
         },
-      },
-    }, {
-      type: 'SWAP',
-      chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-      asset: {
-        balance: BigNumber.from(10),
-        formattedBalance: '10',
-        token: {
-          name: 'ERC20',
-          symbol: 'USDC',
-          decimals: 18,
-          address: '0xERC20_2',
+      }, {
+        type: 'BRIDGE',
+        chainId: ChainId.SEPOLIA,
+        asset: {
+          balance: BigNumber.from(1),
+          formattedBalance: '1',
+          token: {
+            name: 'ETH',
+            symbol: 'ETH',
+            decimals: 18,
+          },
         },
-      },
-    }],
+      }],
   },
   {
     priority: 2,
@@ -127,7 +128,7 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
       { subView === FundWithSmartCheckoutSubViews.FUNDING_ROUTE_EXECUTE && (
         <FundingRouteExecute
           onFundingRouteExecuted={onFundingRouteExecuted}
-          fundingRouteStep={fundingRouteStep}
+          fundingRouteStep={fundingRouteStep!}
         />
       )}
       { subView === FundWithSmartCheckoutSubViews.DONE && (
