@@ -401,7 +401,5 @@ export const routingCalculator = async (
     });
   }
 
-  // eslint-disable-next-line no-console
-  console.log('** response', response);
   return response;
 };
