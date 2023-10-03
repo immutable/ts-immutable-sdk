@@ -8,7 +8,8 @@ import {
 import axios from 'axios';
 import DeviceCredentialsManager from 'storage/device_credentials_manager';
 import * as crypto from 'crypto';
-import { isTokenExpired } from 'token';
+import jwt_decode from 'jwt-decode';
+import { isTokenExpired } from './token';
 import { PassportErrorType, withPassportError } from './errors/passportError';
 import {
   PassportMetadata,
@@ -372,25 +373,29 @@ export default class AuthManager {
     return withPassportError<User | null>(async () => this.getUser(), PassportErrorType.SILENT_LOGIN_ERROR);
   }
 
-  private async getWebUser(oidcUser: OidcUser) : Promise<User | null> {
+  private async getWebUser() : Promise<User | null> {
+    const oidcUser = await this.userManager.getUser();
+    if (!oidcUser) {
+      return null;
+    }
     const tokenExpired = isTokenExpired(oidcUser);
     if (!tokenExpired) {
       return AuthManager.mapOidcUserToDomainModel(oidcUser);
     }
-    if (tokenExpired && oidcUser.refresh_token) {
+    if (oidcUser.refresh_token) {
       const newOidcUser = await this.userManager.signinSilent();
-      return newOidcUser
-        ? AuthManager.mapOidcUserToDomainModel(newOidcUser)
-        : null;
+      if (newOidcUser) {
+        return AuthManager.mapOidcUserToDomainModel(newOidcUser);
+      }
     }
     return null;
   }
 
   public async getUser(): Promise<User | null> {
     return withPassportError<User | null>(async () => {
-      const oidcUser = await this.userManager.getUser();
-      if (oidcUser) {
-        return this.getWebUser(oidcUser);
+      const user = await this.getWebUser();
+      if (user) {
+        return user;
       }
 
       const deviceToken = this.deviceCredentialsManager.getCredentials();
