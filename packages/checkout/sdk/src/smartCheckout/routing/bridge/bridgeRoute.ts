@@ -16,7 +16,7 @@ import {
 } from '../types';
 import { BalanceRequirement } from '../../balanceCheck/types';
 import { getEthBalance } from './getEthBalance';
-import { getBridgeFeeEstimate } from './bridgeGasEstimate';
+import { getBridgeFeeEstimate } from './getBridgeFeeEstimate';
 import { estimateGasForBridgeApproval } from './estimateApprovalGas';
 import { CheckoutError, CheckoutErrorType } from '../../../errors';
 import { allowListCheckForBridge } from '../../allowList/allowListCheck';
