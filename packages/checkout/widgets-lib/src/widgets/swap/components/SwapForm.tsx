@@ -595,7 +595,7 @@ export function SwapForm({ data }: SwapFromProps) {
               {swapForm.from.label}
             </Heading>
             <SelectInput
-              id="fromTokenInputs"
+              testId="fromTokenInputs"
               options={tokensOptionsFrom}
               selectSubtext={
                 fromToken
@@ -650,7 +650,7 @@ export function SwapForm({ data }: SwapFromProps) {
               </Body>
             </Box>
             <SelectInput
-              id="toTokenInputs"
+              testId="toTokenInputs"
               options={tokensOptionsTo}
               selectTextAlign="left"
               textInputValue={toAmount}
