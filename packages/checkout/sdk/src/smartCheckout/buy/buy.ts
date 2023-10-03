@@ -149,7 +149,6 @@ export const buy = async (
     unsignedApprovalTransactions = await getUnsignedERC20ApprovalTransactions(actions);
   } catch {
     // Silently ignore error as this is usually thrown if user does not have enough balance
-    // todo: if balance error - can we determine if its the balance error otherwise throw?
   }
 
   try {
@@ -253,7 +252,7 @@ export const buy = async (
     return {
       status: {
         type: ActionStatusType.SUCCESS,
-        orders,
+        orders: [orders[0]],
       },
       smartCheckoutResult: [smartCheckoutResult],
     };
@@ -262,7 +261,7 @@ export const buy = async (
   return {
     status: {
       type: ActionStatusType.INSUFFICIENT_FUNDS,
-      orders,
+      orders: [orders[0]],
     },
     smartCheckoutResult: [smartCheckoutResult],
   };
