@@ -20,6 +20,7 @@ import { ConnectLoaderContext } from '../../context/connect-loader-context/Conne
 import { PrimaryRevenueWidgetViews } from '../../context/view-context/PrimaryRevenueViewContextTypes';
 import { Item } from './types';
 import { widgetTheme } from '../../lib/theme';
+import { SharedContextProvider } from './context/SharedContextProvider';
 
 export interface PrimaryRevenueWidgetProps {
   config: StrongCheckoutWidgetsConfig;
@@ -35,7 +36,15 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
     config, amount, items, fromContractAddress, env, environmentId,
   } = props;
 
-  console.log('@@@ PrimaryRevenueWidget', config, amount, items, fromContractAddress, env, environmentId);
+  console.log(
+    '@@@ PrimaryRevenueWidget',
+    config,
+    amount,
+    items,
+    fromContractAddress,
+    env,
+    environmentId,
+  );
 
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
@@ -51,7 +60,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
     [viewState, viewDispatch],
   );
 
-  const mount = useCallback(() => {
+  const onMount = useCallback(() => {
     if (!checkout || !provider) return;
 
     viewDispatch({
@@ -66,16 +75,35 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
 
   useEffect(() => {
     if (!checkout || !provider) return;
-    mount();
+
+    onMount();
   }, [checkout, provider]);
 
   return (
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>
       <ViewContext.Provider value={viewReducerValues}>
-        {viewState.view.type === SharedViews.LOADING_VIEW && (
-          <LoadingView loadingText={loadingText} />
-        )}
-        Primary Revenue Widget
+        <SharedContextProvider
+          value={{
+            items,
+            amount,
+            fromContractAddress,
+            env,
+            environmentId,
+            provider,
+            checkout,
+          }}
+        >
+          {viewState.view.type === SharedViews.LOADING_VIEW && (
+            <LoadingView loadingText={loadingText} />
+          )}
+          {viewState.view.type === SharedViews.ERROR_VIEW && (
+            <div>{viewState.view.error.message}</div>
+          )}
+          {viewState.view.type
+            === PrimaryRevenueWidgetViews.PAYMENT_METHODS && (
+            <div>Payment methods</div>
+          )}
+        </SharedContextProvider>
       </ViewContext.Provider>
     </BiomeCombinedProviders>
   );
