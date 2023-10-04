@@ -176,7 +176,7 @@ export const checkUserCanCoverSwapFees = (
 // requirement.
 export const checkIfUserCanCoverRequirement = (
   balanceRequirements: BalanceCheckResult,
-  tokenAddress: string,
+  quoteTokenAddress: string,
   amountBeingSwapped: BigNumber,
   approvalFees: SufficientApprovalFees,
   swapFees: Fee[],
@@ -186,7 +186,7 @@ export const checkIfUserCanCoverRequirement = (
 
   balanceRequirements.balanceRequirements.forEach((requirement) => {
     if (requirement.type === ItemType.NATIVE || requirement.type === ItemType.ERC20) {
-      if (requirement.required.token.address === tokenAddress) {
+      if (requirement.required.token.address === quoteTokenAddress) {
         balanceRequirementToken = requirement.required.token.address;
         // Get the balance that would remain if the requirement was removed from the users balance
         remainingBalance = requirement.current.balance.sub(requirement.required.balance);
