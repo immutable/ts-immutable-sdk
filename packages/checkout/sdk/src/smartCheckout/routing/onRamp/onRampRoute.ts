@@ -14,7 +14,7 @@ export const onRampRoute = async (
   balanceRequirement: BalanceRequirement,
 ): Promise<OnRampFundingStep | undefined> => {
   if (balanceRequirement.type !== ItemType.ERC20 && balanceRequirement.type !== ItemType.NATIVE) return undefined;
-  const { required, current } = balanceRequirement;
+  const { required, current, delta } = balanceRequirement;
 
   let hasAllowList = false;
   const onRampProvidersAllowList = await allowListCheckForOnRamp(config, availableRoutingOptions);
@@ -32,16 +32,14 @@ export const onRampRoute = async (
     fundingItem: {
       type: required.token.address === IMX_ADDRESS_ZKEVM ? ItemType.NATIVE : ItemType.ERC20,
       fundsRequired: {
-        amount: required.balance,
-        formattedAmount: required.formattedBalance,
+        amount: delta.balance,
+        formattedAmount: delta.formattedBalance,
       },
       userBalance: {
         balance: current.balance,
         formattedBalance: current.formattedBalance,
       },
-      token: {
-        ...required.token,
-      },
+      token: required.token,
     },
   };
 };

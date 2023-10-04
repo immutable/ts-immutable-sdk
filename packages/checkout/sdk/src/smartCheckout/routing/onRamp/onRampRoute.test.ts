@@ -53,8 +53,8 @@ describe('onRampRoute', () => {
       },
       sufficient: false,
       current: {
-        balance: BigNumber.from(0),
-        formattedBalance: '0',
+        balance: BigNumber.from(4),
+        formattedBalance: '4',
         token: {
           address: '0x65AA7a21B0f3ce9B478aAC3408fE75b423939b1F',
           name: 'Ethereum',
@@ -63,8 +63,8 @@ describe('onRampRoute', () => {
         },
       },
       delta: {
-        balance: BigNumber.from(10),
-        formattedBalance: '10',
+        balance: BigNumber.from(6),
+        formattedBalance: '6',
       },
     } as BalanceERC20Requirement;
 
@@ -83,12 +83,12 @@ describe('onRampRoute', () => {
         fundingItem: {
           type: ItemType.ERC20,
           fundsRequired: {
-            amount: BigNumber.from(10),
-            formattedAmount: '10',
+            amount: BigNumber.from(6),
+            formattedAmount: '6',
           },
           userBalance: {
-            balance: BigNumber.from(0),
-            formattedBalance: '0',
+            balance: BigNumber.from(4),
+            formattedBalance: '4',
           },
           token: {
             address: '0x65AA7a21B0f3ce9B478aAC3408fE75b423939b1F',
@@ -115,8 +115,8 @@ describe('onRampRoute', () => {
       },
       sufficient: false,
       current: {
-        balance: BigNumber.from(0),
-        formattedBalance: '0',
+        balance: BigNumber.from(4),
+        formattedBalance: '4',
         token: {
           address: IMX_ADDRESS_ZKEVM,
           name: 'IMX',
@@ -125,8 +125,8 @@ describe('onRampRoute', () => {
         },
       },
       delta: {
-        balance: BigNumber.from(10),
-        formattedBalance: '10',
+        balance: BigNumber.from(6),
+        formattedBalance: '6',
       },
     } as BalanceERC20Requirement;
 
@@ -145,12 +145,12 @@ describe('onRampRoute', () => {
         fundingItem: {
           type: ItemType.NATIVE,
           fundsRequired: {
-            amount: BigNumber.from(10),
-            formattedAmount: '10',
+            amount: BigNumber.from(6),
+            formattedAmount: '6',
           },
           userBalance: {
-            balance: BigNumber.from(0),
-            formattedBalance: '0',
+            balance: BigNumber.from(4),
+            formattedBalance: '4',
           },
           token: {
             address: IMX_ADDRESS_ZKEVM,
