@@ -21,11 +21,9 @@ export function OrderList(props: OrderListProps) {
         alignItems: 'flex-start',
       }}
     >
-      {items
-        ? items.map((item) => (
-          <OrderItem key={`${item.name}${item.tokenId[0]}`} item={item} />
-        ))
-        : null}
+      {items && items.map((item) => (
+        <OrderItem key={`${item.name}${item.tokenId[0]}`} item={item} />
+      ))}
     </Box>
   );
 }
