@@ -70,16 +70,17 @@ function ViewOffersModal({
           fee_percentage: 1,
         }],
       });
-      addMessage('CreateTrade', createTradeResponse);
+      addMessage('Create Trade', createTradeResponse);
     } catch (err) {
-      addMessage('CreateTrade', err);
+      addMessage('Create Trade', err);
+    } finally {
       handleClose();
     }
   };
 
   return (
     <Modal
-      onHide={() => setShowModal(false)}
+      onHide={handleClose}
       show={showModal}
       aria-labelledby="contained-modal-title-vcenter"
       centered
@@ -123,7 +124,7 @@ function ViewOffersModal({
         ) : <Alert>This asset has no active offers.</Alert>) }
       </Modal.Body>
       <Modal.Footer>
-        <WorkflowButton disabled={isLoading} onClick={() => setShowModal(false)}>
+        <WorkflowButton disabled={isLoading} onClick={handleClose}>
           Cancel
         </WorkflowButton>
       </Modal.Footer>
