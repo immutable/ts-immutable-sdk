@@ -62,9 +62,7 @@ function Trade({ showModal: showTradeModal, setShowModal: setShowTradeModal }: M
       const createTradeResponse = await imxProvider?.createTrade(request);
       addMessage('Create Trade', createTradeResponse);
     } catch (err) {
-      if (err instanceof Error) {
-        addMessage('Create Trade', err);
-      }
+      addMessage('Create Trade', err);
     } finally {
       handleCloseTrade();
     }
