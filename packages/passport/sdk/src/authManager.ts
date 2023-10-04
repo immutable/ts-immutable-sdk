@@ -376,8 +376,12 @@ export default class AuthManager {
     }, PassportErrorType.SILENT_LOGIN_ERROR);
   }
 
+  /**
+   * Get the user from the cache or refresh the token if it's expired.
+   * @param forceRefresh If set to true, force an HTTP call to the OIDC server's authorization endpoint. This call will
+   * throw an error if there's no refresh token.
+   */
   private async getWebUser({ forceRefresh = false }: { forceRefresh: boolean }) : Promise<User | null> {
-    // Force an HTTP call to the OIDC server's authorization endpoint through an iframe
     if (forceRefresh) {
       const newOidcUser = await this.userManager.signinSilent();
       return newOidcUser ? AuthManager.mapOidcUserToDomainModel(newOidcUser) : null;
