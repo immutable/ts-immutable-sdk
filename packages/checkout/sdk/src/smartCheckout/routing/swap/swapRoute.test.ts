@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { Environment } from '@imtbl/config';
 import { Fee, TokenInfo } from '@imtbl/dex-sdk';
-import { BigNumber } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 import { CheckoutConfiguration } from '../../../config';
 import { BalanceRequirement } from '../../balanceCheck/types';
 import {
@@ -9,6 +9,7 @@ import {
   getRequiredToken,
   checkUserCanCoverApprovalFees,
   checkUserCanCoverSwapFees,
+  constructSwapRoute,
 } from './swapRoute';
 import {
   DexQuote,
@@ -18,7 +19,7 @@ import {
 } from '../types';
 import {
   ChainId,
-  FundingRouteType,
+  FundingStepType,
   IMX_ADDRESS_ZKEVM,
   ItemType,
 } from '../../../types';
@@ -273,17 +274,39 @@ describe('swapRoute', () => {
 
       expect(route).toEqual([
         {
-          type: FundingRouteType.SWAP,
+          type: FundingStepType.SWAP,
           chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-          asset: {
-            balance: BigNumber.from(10),
-            formattedBalance: '10',
+          fundingItem: {
+            type: ItemType.ERC20,
+            fundsRequired: {
+              amount: BigNumber.from(1),
+              formattedAmount: utils.formatUnits(BigNumber.from(1), 18),
+            },
+            userBalance: {
+              balance: BigNumber.from(10),
+              formattedBalance: '10',
+            },
             token: {
+              address: '0xERC20_2',
+              decimals: 18,
               name: 'ERC20',
               symbol: 'ERC20',
-              decimals: 18,
-              address: '0xERC20_2',
             },
+          },
+          // WT-1734 - Add fees
+          fees: {
+            approvalGasFees: {
+              amount: BigNumber.from(0),
+              formattedAmount: '0',
+            },
+            swapGasFees: {
+              amount: BigNumber.from(0),
+              formattedAmount: '0',
+            },
+            swapFees: [{
+              amount: BigNumber.from(0),
+              formattedAmount: '0',
+            }],
           },
         },
       ]);
@@ -373,11 +396,18 @@ describe('swapRoute', () => {
 
       expect(route).toEqual([
         {
-          type: FundingRouteType.SWAP,
+          type: FundingStepType.SWAP,
           chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-          asset: {
-            balance: BigNumber.from(10),
-            formattedBalance: '10',
+          fundingItem: {
+            type: ItemType.ERC20,
+            fundsRequired: {
+              amount: BigNumber.from(1),
+              formattedAmount: utils.formatUnits(BigNumber.from(1), 18),
+            },
+            userBalance: {
+              balance: BigNumber.from(10),
+              formattedBalance: '10',
+            },
             token: {
               name: 'ERC20',
               symbol: 'ERC20',
@@ -385,19 +415,56 @@ describe('swapRoute', () => {
               address: '0xERC20_2',
             },
           },
+          // WT-1734 - Add fees
+          fees: {
+            approvalGasFees: {
+              amount: BigNumber.from(0),
+              formattedAmount: '0',
+            },
+            swapGasFees: {
+              amount: BigNumber.from(0),
+              formattedAmount: '0',
+            },
+            swapFees: [{
+              amount: BigNumber.from(0),
+              formattedAmount: '0',
+            }],
+          },
         },
         {
-          type: FundingRouteType.SWAP,
+          type: FundingStepType.SWAP,
           chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-          asset: {
-            balance: BigNumber.from(10),
-            formattedBalance: '10',
+          fundingItem: {
+            type: ItemType.ERC20,
+            fundsRequired: {
+              amount: BigNumber.from(1),
+              formattedAmount: utils.formatUnits(BigNumber.from(1), 18),
+            },
+            userBalance: {
+              balance: BigNumber.from(10),
+              formattedBalance: '10',
+            },
             token: {
               name: 'ERC20_3',
               symbol: 'ERC20_3',
               decimals: 18,
               address: '0xERC20_3',
             },
+          },
+          // WT-1734 - Add fees
+          fees: {
+            approvalGasFees: {
+              amount: BigNumber.from(0),
+              formattedAmount: '0',
+            },
+            swapGasFees: {
+              amount: BigNumber.from(0),
+              formattedAmount: '0',
+            },
+            swapFees: [{
+              amount: BigNumber.from(0),
+              formattedAmount: '0',
+            }],
           },
         },
       ]);
@@ -882,6 +949,118 @@ describe('swapRoute', () => {
       );
 
       expect(route).toEqual([]);
+    });
+  });
+
+  describe('constructSwapRoute', () => {
+    it('should return type NATIVE', () => {
+      const chainId = ChainId.IMTBL_ZKEVM_TESTNET;
+      const fundsRequired = BigNumber.from(100);
+      const userBalance = {
+        balance: BigNumber.from(100),
+        formattedBalance: '100',
+        token: {
+          name: 'IMX',
+          symbol: 'IMX',
+          decimals: 18,
+          address: IMX_ADDRESS_ZKEVM,
+        },
+      };
+
+      const route = constructSwapRoute(chainId, fundsRequired, userBalance);
+      expect(route).toEqual(
+        {
+          type: FundingStepType.SWAP,
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+          fundingItem: {
+            type: ItemType.NATIVE,
+            fundsRequired: {
+              amount: BigNumber.from(100),
+              formattedAmount: utils.formatUnits(BigNumber.from(100), 18),
+            },
+            userBalance: {
+              balance: BigNumber.from(100),
+              formattedBalance: '100',
+            },
+            token: {
+              address: IMX_ADDRESS_ZKEVM,
+              decimals: 18,
+              name: 'IMX',
+              symbol: 'IMX',
+            },
+          },
+          // WT-1734 - Add fees
+          fees: {
+            approvalGasFees: {
+              amount: BigNumber.from(0),
+              formattedAmount: '0',
+            },
+            swapGasFees: {
+              amount: BigNumber.from(0),
+              formattedAmount: '0',
+            },
+            swapFees: [{
+              amount: BigNumber.from(0),
+              formattedAmount: '0',
+            }],
+          },
+        },
+      );
+    });
+
+    it('should return type ERC20', () => {
+      const chainId = ChainId.IMTBL_ZKEVM_TESTNET;
+      const fundsRequired = BigNumber.from(100);
+      const userBalance = {
+        balance: BigNumber.from(100),
+        formattedBalance: '100',
+        token: {
+          name: 'ERC20',
+          symbol: 'ERC20',
+          decimals: 18,
+          address: '0xERC20',
+        },
+      };
+
+      const route = constructSwapRoute(chainId, fundsRequired, userBalance);
+      expect(route).toEqual(
+        {
+          type: FundingStepType.SWAP,
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+          fundingItem: {
+            type: ItemType.ERC20,
+            fundsRequired: {
+              amount: BigNumber.from(100),
+              formattedAmount: utils.formatUnits(BigNumber.from(100), 18),
+            },
+            userBalance: {
+              balance: BigNumber.from(100),
+              formattedBalance: '100',
+            },
+            token: {
+              address: '0xERC20',
+              decimals: 18,
+              name: 'ERC20',
+              symbol: 'ERC20',
+            },
+          },
+          // WT-1734 - Add fees
+          fees: {
+            approvalGasFees: {
+              amount: BigNumber.from(0),
+              formattedAmount: '0',
+            },
+            swapGasFees: {
+              amount: BigNumber.from(0),
+              formattedAmount: '0',
+            },
+            swapFees: [{
+              amount: BigNumber.from(0),
+              formattedAmount: '0',
+            }],
+          },
+        },
+      );
     });
   });
 

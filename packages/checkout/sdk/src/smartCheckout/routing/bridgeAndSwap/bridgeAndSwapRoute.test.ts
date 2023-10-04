@@ -5,7 +5,8 @@ import { Quote } from '@imtbl/dex-sdk';
 import { CheckoutConfiguration } from '../../../config';
 import {
   ChainId,
-  FundingRouteType,
+  FundingRouteFeeEstimate,
+  FundingStepType,
   ItemType,
   TokenInfo,
 } from '../../../types';
@@ -42,8 +43,30 @@ describe('bridgeAndSwapRoute', () => {
     swap: true,
   };
 
-  const feeEstimates = new Map<FundingRouteType, BigNumber>([
-    [FundingRouteType.BRIDGE, BigNumber.from(1)],
+  const feeEstimates = new Map<FundingStepType, FundingRouteFeeEstimate>([
+    [
+      FundingStepType.BRIDGE,
+      {
+        type: FundingStepType.BRIDGE,
+        gasFee: {
+          estimatedAmount: BigNumber.from(1),
+          token: {
+            name: 'Ethereum',
+            symbol: 'ETH',
+            decimals: 18,
+          },
+        },
+        bridgeFee: {
+          estimatedAmount: BigNumber.from(1),
+          token: {
+            name: 'Ethereum',
+            symbol: 'ETH',
+            decimals: 18,
+          },
+        },
+        totalFees: BigNumber.from(2),
+      },
+    ],
   ]);
 
   const tokenBalances = new Map<ChainId, TokenBalanceResult>([
@@ -61,13 +84,23 @@ describe('bridgeAndSwapRoute', () => {
           },
         },
         {
-          balance: BigNumber.from(10),
-          formattedBalance: '10',
+          balance: BigNumber.from(15),
+          formattedBalance: '15',
           token: {
             name: 'IMX',
             symbol: 'IMX',
             decimals: 18,
             address: '0xIMX',
+          },
+        },
+        {
+          balance: BigNumber.from(5),
+          formattedBalance: '5',
+          token: {
+            name: 'IMX',
+            symbol: 'IMX',
+            decimals: 18,
+            address: '0xETH',
           },
         },
       ],
@@ -196,11 +229,18 @@ describe('bridgeAndSwapRoute', () => {
     (bridgeRoute as jest.Mock)
       .mockResolvedValueOnce(
         {
-          type: FundingRouteType.BRIDGE,
+          type: FundingStepType.BRIDGE,
           chainId: ChainId.SEPOLIA,
-          asset: {
-            balance: BigNumber.from(5),
-            formattedBalance: '5',
+          fundingItem: {
+            type: ItemType.ERC20,
+            fundsRequired: {
+              amount: BigNumber.from(1),
+              formattedAmount: '1',
+            },
+            userBalance: {
+              balance: BigNumber.from(5),
+              formattedBalance: '5',
+            },
             token: {
               name: 'IMX',
               symbol: 'IMX',
@@ -208,31 +248,73 @@ describe('bridgeAndSwapRoute', () => {
               address: '0xIMXL1',
             },
           },
+          fees: {
+            approvalGasFees: {
+              amount: BigNumber.from(0),
+              formattedAmount: '0',
+            },
+            bridgeGasFees: {
+              amount: BigNumber.from(0),
+              formattedAmount: '0',
+            },
+            bridgeFees: [{
+              amount: BigNumber.from(0),
+              formattedAmount: '0',
+            }],
+          },
         },
       )
       .mockResolvedValueOnce(
         {
-          type: FundingRouteType.BRIDGE,
+          type: FundingStepType.BRIDGE,
           chainId: ChainId.SEPOLIA,
-          asset: {
-            balance: BigNumber.from(10),
-            formattedBalance: '10',
+          fundingItem: {
+            type: ItemType.NATIVE,
+            fundsRequired: {
+              amount: BigNumber.from(10),
+              formattedAmount: '10',
+            },
+            userBalance: {
+              balance: BigNumber.from(15),
+              formattedBalance: '15',
+            },
             token: {
               name: 'ETH',
               symbol: 'ETH',
               decimals: 18,
             },
           },
+          fees: {
+            approvalGasFees: {
+              amount: BigNumber.from(0),
+              formattedAmount: '0',
+            },
+            bridgeGasFees: {
+              amount: BigNumber.from(0),
+              formattedAmount: '0',
+            },
+            bridgeFees: [{
+              amount: BigNumber.from(0),
+              formattedAmount: '0',
+            }],
+          },
         },
       );
     (swapRoute as jest.Mock).mockResolvedValue(
       [
         {
-          type: FundingRouteType.SWAP,
+          type: FundingStepType.SWAP,
           chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-          asset: {
-            balance: BigNumber.from(5),
-            formattedBalance: '5',
+          fundingItem: {
+            type: ItemType.NATIVE,
+            fundsRequired: {
+              amount: BigNumber.from(10),
+              formattedAmount: '10',
+            },
+            userBalance: {
+              balance: BigNumber.from(15),
+              formattedBalance: '15',
+            },
             token: {
               name: 'IMX',
               symbol: 'IMX',
@@ -240,19 +322,54 @@ describe('bridgeAndSwapRoute', () => {
               address: '0xIMX',
             },
           },
+          fees: {
+            approvalGasFees: {
+              amount: BigNumber.from(0),
+              formattedAmount: '0',
+            },
+            swapGasFees: {
+              amount: BigNumber.from(0),
+              formattedAmount: '0',
+            },
+            swapFees: [{
+              amount: BigNumber.from(0),
+              formattedAmount: '0',
+            }],
+          },
         },
         {
-          type: FundingRouteType.SWAP,
+          type: FundingStepType.SWAP,
           chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-          asset: {
-            balance: BigNumber.from(5),
-            formattedBalance: '5',
+          fundingItem: {
+            type: ItemType.ERC20,
+            fundsRequired: {
+              amount: BigNumber.from(1),
+              formattedAmount: '1',
+            },
+            userBalance: {
+              balance: BigNumber.from(5),
+              formattedBalance: '5',
+            },
             token: {
               name: 'ETH',
               symbol: 'ETH',
               decimals: 18,
               address: '0xETH',
             },
+          },
+          fees: {
+            approvalGasFees: {
+              amount: BigNumber.from(0),
+              formattedAmount: '0',
+            },
+            swapGasFees: {
+              amount: BigNumber.from(0),
+              formattedAmount: '0',
+            },
+            swapFees: [{
+              amount: BigNumber.from(0),
+              formattedAmount: '0',
+            }],
           },
         },
       ],
@@ -348,11 +465,18 @@ describe('bridgeAndSwapRoute', () => {
       [
         {
           bridgeFundingStep: {
-            type: FundingRouteType.BRIDGE,
+            type: FundingStepType.BRIDGE,
             chainId: ChainId.SEPOLIA,
-            asset: {
-              balance: BigNumber.from(5),
-              formattedBalance: '5',
+            fundingItem: {
+              type: ItemType.ERC20,
+              fundsRequired: {
+                amount: BigNumber.from(1),
+                formattedAmount: '1',
+              },
+              userBalance: {
+                balance: BigNumber.from(5),
+                formattedBalance: '5',
+              },
               token: {
                 name: 'IMX',
                 symbol: 'IMX',
@@ -360,13 +484,34 @@ describe('bridgeAndSwapRoute', () => {
                 address: '0xIMXL1',
               },
             },
+            fees: {
+              approvalGasFees: {
+                amount: BigNumber.from(0),
+                formattedAmount: '0',
+              },
+              bridgeGasFees: {
+                amount: BigNumber.from(0),
+                formattedAmount: '0',
+              },
+              bridgeFees: [{
+                amount: BigNumber.from(0),
+                formattedAmount: '0',
+              }],
+            },
           },
           swapFundingStep: {
-            type: FundingRouteType.SWAP,
+            type: FundingStepType.SWAP,
             chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-            asset: {
-              balance: BigNumber.from(10),
-              formattedBalance: '10',
+            fundingItem: {
+              type: ItemType.NATIVE,
+              fundsRequired: {
+                amount: BigNumber.from(10),
+                formattedAmount: '10',
+              },
+              userBalance: {
+                balance: BigNumber.from(15),
+                formattedBalance: '15',
+              },
               token: {
                 name: 'IMX',
                 symbol: 'IMX',
@@ -374,34 +519,90 @@ describe('bridgeAndSwapRoute', () => {
                 address: '0xIMX',
               },
             },
+            fees: {
+              approvalGasFees: {
+                amount: BigNumber.from(0),
+                formattedAmount: '0',
+              },
+              swapGasFees: {
+                amount: BigNumber.from(0),
+                formattedAmount: '0',
+              },
+              swapFees: [{
+                amount: BigNumber.from(0),
+                formattedAmount: '0',
+              }],
+            },
           },
         },
         {
           bridgeFundingStep: {
-            type: FundingRouteType.BRIDGE,
+            type: FundingStepType.BRIDGE,
             chainId: ChainId.SEPOLIA,
-            asset: {
-              balance: BigNumber.from(10),
-              formattedBalance: '10',
+            fundingItem: {
+              type: ItemType.NATIVE,
+              fundsRequired: {
+                amount: BigNumber.from(10),
+                formattedAmount: '10',
+              },
+              userBalance: {
+                balance: BigNumber.from(15),
+                formattedBalance: '15',
+              },
               token: {
                 name: 'ETH',
                 symbol: 'ETH',
                 decimals: 18,
               },
             },
+            fees: {
+              approvalGasFees: {
+                amount: BigNumber.from(0),
+                formattedAmount: '0',
+              },
+              bridgeGasFees: {
+                amount: BigNumber.from(0),
+                formattedAmount: '0',
+              },
+              bridgeFees: [{
+                amount: BigNumber.from(0),
+                formattedAmount: '0',
+              }],
+            },
           },
           swapFundingStep: {
-            type: FundingRouteType.SWAP,
+            type: FundingStepType.SWAP,
             chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-            asset: {
-              balance: BigNumber.from(0),
-              formattedBalance: '0',
+            fundingItem: {
+              type: ItemType.ERC20,
+              fundsRequired: {
+                amount: BigNumber.from(1),
+                formattedAmount: '1',
+              },
+              userBalance: {
+                balance: BigNumber.from(5),
+                formattedBalance: '5',
+              },
               token: {
                 name: 'ETH',
                 symbol: 'ETH',
                 decimals: 18,
                 address: '0xETH',
               },
+            },
+            fees: {
+              approvalGasFees: {
+                amount: BigNumber.from(0),
+                formattedAmount: '0',
+              },
+              swapGasFees: {
+                amount: BigNumber.from(0),
+                formattedAmount: '0',
+              },
+              swapFees: [{
+                amount: BigNumber.from(0),
+                formattedAmount: '0',
+              }],
             },
           },
         },

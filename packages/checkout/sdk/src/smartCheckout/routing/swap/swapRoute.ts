@@ -1,18 +1,66 @@
-import { BigNumber } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 import { Amount, Fee } from '@imtbl/dex-sdk';
 import { CheckoutConfiguration, getL2ChainId } from '../../../config';
 import {
+  AvailableRoutingOptions,
   ChainId,
-  FundingRouteStep,
-  FundingRouteType,
+  FundingStepType,
   GetBalanceResult,
   IMX_ADDRESS_ZKEVM,
   ItemType,
-  RoutingOptionsAvailable,
+  SwapFundingStep,
 } from '../../../types';
 import { BalanceRequirement } from '../../balanceCheck/types';
 import { DexQuoteCache, TokenBalanceResult } from '../types';
 import { getOrSetQuotesFromCache } from './dexQuoteCache';
+
+export const constructSwapRoute = (
+  chainId: ChainId,
+  fundsRequired: BigNumber,
+  userBalance: GetBalanceResult,
+): SwapFundingStep => {
+  const tokenAddress = userBalance.token.address;
+
+  let type = ItemType.ERC20;
+  if (tokenAddress === IMX_ADDRESS_ZKEVM) {
+    type = ItemType.NATIVE;
+  }
+
+  return {
+    type: FundingStepType.SWAP,
+    chainId,
+    fundingItem: {
+      type,
+      fundsRequired: {
+        amount: fundsRequired,
+        formattedAmount: utils.formatUnits(
+          fundsRequired,
+          userBalance.token.decimals,
+        ),
+      },
+      userBalance: {
+        balance: userBalance.balance,
+        formattedBalance: userBalance.formattedBalance,
+      },
+      token: userBalance.token,
+    },
+    // WT-1734 - Add fees
+    fees: {
+      approvalGasFees: {
+        amount: BigNumber.from(0),
+        formattedAmount: '0',
+      },
+      swapGasFees: {
+        amount: BigNumber.from(0),
+        formattedAmount: '0',
+      },
+      swapFees: [{
+        amount: BigNumber.from(0),
+        formattedAmount: '0',
+      }],
+    },
+  };
+};
 
 export const getRequiredToken = (
   balanceRequirement: BalanceRequirement,
@@ -123,21 +171,22 @@ export const checkUserCanCoverSwapFees = (
 
 export const swapRoute = async (
   config: CheckoutConfiguration,
-  availableRoutingOptions: RoutingOptionsAvailable,
+  availableRoutingOptions: AvailableRoutingOptions,
   dexQuoteCache: DexQuoteCache,
   walletAddress: string,
   balanceRequirement: BalanceRequirement,
   tokenBalanceResults: Map<ChainId, TokenBalanceResult>,
   swappableTokens: string[],
-): Promise<FundingRouteStep[]> => {
-  const fundingSteps: FundingRouteStep[] = [];
+): Promise<SwapFundingStep[]> => {
+  const fundingSteps: SwapFundingStep[] = [];
   if (!availableRoutingOptions.swap) return fundingSteps;
   if (swappableTokens.length === 0) return fundingSteps;
 
   const requiredToken = getRequiredToken(balanceRequirement);
   if (requiredToken.address === '') return fundingSteps;
 
-  const l2TokenBalanceResult = tokenBalanceResults.get(getL2ChainId(config));
+  const chainId = getL2ChainId(config);
+  const l2TokenBalanceResult = tokenBalanceResults.get(chainId);
   if (!l2TokenBalanceResult) return fundingSteps;
   const l2Balances = l2TokenBalanceResult.balances;
   if (l2Balances.length === 0) return fundingSteps;
@@ -181,15 +230,13 @@ export const swapRoute = async (
 
     // User has sufficient funds to cover any approval and swap fees so use this token for the funding route
     // Currently we are not prioritising any particular token so just taking the first sufficient token
-    fundingSteps.push({
-      type: FundingRouteType.SWAP,
-      chainId: getL2ChainId(config),
-      asset: {
-        balance: userBalanceOfQuotedToken.balance,
-        formattedBalance: userBalanceOfQuotedToken.formattedBalance,
-        token: userBalanceOfQuotedToken.token,
-      },
-    });
+    fundingSteps.push(
+      constructSwapRoute(
+        chainId,
+        amountOfQuoteTokenRequired.value,
+        userBalanceOfQuotedToken,
+      ),
+    );
   }
 
   return fundingSteps;
