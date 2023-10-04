@@ -5,8 +5,8 @@ import { CheckoutError, CheckoutErrorType } from '../../errors';
 import * as instance from '../../instance';
 import { signFulfillmentTransactions } from '../actions';
 import {
-  ActionResult,
-  ActionStatusType,
+  CancelResult,
+  CheckoutStatus,
 } from '../../types';
 import { SignTransactionStatusType } from '../actions/types';
 
@@ -14,7 +14,7 @@ export const cancel = async (
   config: CheckoutConfiguration,
   provider: Web3Provider,
   orderIds: string[],
-): Promise<ActionResult> => {
+): Promise<CancelResult> => {
   let unsignedCancelOrderTransaction: PopulatedTransaction;
   if (orderIds.length === 0) {
     throw new CheckoutError(
@@ -46,39 +46,13 @@ export const cancel = async (
   const result = await signFulfillmentTransactions(provider, [unsignedCancelOrderTransaction]);
   if (result.type === SignTransactionStatusType.FAILED) {
     return {
-      status: {
-        type: ActionStatusType.FAILED,
-        transactionHash: result.transactionHash,
-        reason: result.reason,
-        orders: [
-          {
-            id: orderId,
-          },
-        ],
-      },
-      smartCheckoutResult: [
-        {
-          sufficient: true,
-          transactionRequirements: [],
-        },
-      ],
+      status: CheckoutStatus.FAILED,
+      transactionHash: result.transactionHash,
+      reason: result.reason,
     };
   }
 
   return {
-    status: {
-      type: ActionStatusType.SUCCESS,
-      orders: [
-        {
-          id: orderId,
-        },
-      ],
-    },
-    smartCheckoutResult: [
-      {
-        sufficient: true,
-        transactionRequirements: [],
-      },
-    ],
+    status: CheckoutStatus.SUCCESS,
   };
 };

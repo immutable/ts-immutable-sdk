@@ -7,8 +7,7 @@ import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { cancel } from './cancel';
 import { createOrderbookInstance } from '../../instance';
 import { signFulfillmentTransactions } from '../actions';
-import { SignTransactionStatusType } from '../actions/types';
-import { ActionStatusType } from '../../types';
+import { CheckoutStatus } from '../../types';
 
 jest.mock('../../instance');
 jest.mock('../actions');
@@ -48,25 +47,12 @@ describe('cancel', () => {
         }),
       });
       (signFulfillmentTransactions as jest.Mock).mockResolvedValue({
-        type: SignTransactionStatusType.SUCCESS,
+        type: CheckoutStatus.SUCCESS,
       });
 
       const result = await cancel(config, mockProvider, [orderId]);
       expect(result).toEqual({
-        status: {
-          type: ActionStatusType.SUCCESS,
-          orders: [
-            {
-              id: orderId,
-            },
-          ],
-        },
-        smartCheckoutResult: [
-          {
-            sufficient: true,
-            transactionRequirements: [],
-          },
-        ],
+        status: CheckoutStatus.SUCCESS,
       });
       expect(signFulfillmentTransactions).toBeCalledWith(
         mockProvider,
@@ -98,29 +84,16 @@ describe('cancel', () => {
         }),
       });
       (signFulfillmentTransactions as jest.Mock).mockResolvedValue({
-        type: SignTransactionStatusType.FAILED,
+        type: CheckoutStatus.FAILED,
         transactionHash: '0xHASH',
         reason: 'Fulfillment transaction failed and was reverted',
       });
 
       const result = await cancel(config, mockProvider, [orderId]);
       expect(result).toEqual({
-        status: {
-          type: ActionStatusType.FAILED,
-          transactionHash: '0xHASH',
-          reason: 'Fulfillment transaction failed and was reverted',
-          orders: [
-            {
-              id: orderId,
-            },
-          ],
-        },
-        smartCheckoutResult: [
-          {
-            sufficient: true,
-            transactionRequirements: [],
-          },
-        ],
+        status: CheckoutStatus.FAILED,
+        transactionHash: '0xHASH',
+        reason: 'Fulfillment transaction failed and was reverted',
       });
       expect(signFulfillmentTransactions).toBeCalledWith(
         mockProvider,

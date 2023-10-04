@@ -3,62 +3,74 @@ import { BigNumber } from 'ethers';
 import { TokenInfo } from './tokenInfo';
 import { OrderFee } from './fees';
 
+export type BuyResult = BuyResultSuccess | BuyResultFailed | BuyResultInsufficientFunds;
+
 /**
  * Represents the result of {@link Checkout.buy}, {@link Checkout.sell} and {@link Checkout.cancel}.
  * @property {SuccessStatus | FailedStatus | InsufficientFundsStatus} status - The status of the action.
  * @property {Array<SmartCheckoutSufficient | SmartCheckoutInsufficient>} smartCheckoutResult - The result of the smart checkout.
  */
-export type ActionResult = {
-  status: SuccessStatus | FailedStatus | InsufficientFundsStatus,
-  smartCheckoutResult: Array<SmartCheckoutSufficient | SmartCheckoutInsufficient>
+export type BuyResultSuccess = {
+  status: CheckoutStatus.SUCCESS,
+  smartCheckoutResult: Array<SmartCheckoutSufficient>
+};
+
+export type BuyResultFailed = {
+  status: CheckoutStatus.FAILED,
+  transactionHash: string,
+  reason: string,
+  smartCheckoutResult: Array<SmartCheckoutSufficient>
+};
+
+export type BuyResultInsufficientFunds = {
+  status: CheckoutStatus.INSUFFICIENT_FUNDS,
+  smartCheckoutResult: Array<SmartCheckoutInsufficient>
+};
+
+export type SellResult = SellResultSuccess | SellResultFailed | SellResultInsufficientFunds;
+
+export type SellResultSuccess = {
+  type: CheckoutStatus.SUCCESS,
+  orderIds: Array<string>
+  smartCheckoutResult: Array<SmartCheckoutSufficient>
+};
+
+export type SellResultFailed = {
+  status: CheckoutStatus.FAILED,
+  transactionHash: string,
+  reason: string,
+  smartCheckoutResult: Array<SmartCheckoutSufficient>
+};
+
+export type SellResultInsufficientFunds = {
+  status: CheckoutStatus.INSUFFICIENT_FUNDS,
+  smartCheckoutResult: Array<SmartCheckoutInsufficient>
+};
+
+export type CancelResult = CancelResultSuccess | CancelResultFailed;
+
+export type CancelResultSuccess = {
+  status: CheckoutStatus.SUCCESS,
+};
+
+export type CancelResultFailed = {
+  status: CheckoutStatus.FAILED,
+  transactionHash: string,
+  reason: string,
 };
 
 /**
- * An enum representing the action status types
+ * An enum representing the checkout status types
  * @enum {string}
  * @property {string} SUCCESS - If the action succeeded as the transactions were able to be processed
  * @property {string} FAILED - If the action failed due to transactions not settling on chain
  * @property {string} INSUFFICIENT_FUNDS - If the action failed due to insufficient funds
  */
-export enum ActionStatusType {
+export enum CheckoutStatus {
   SUCCESS = 'SUCCESS',
   FAILED = 'FAILED',
   INSUFFICIENT_FUNDS = 'INSUFFICIENT_FUNDS',
 }
-
-/**
- * Represents a success status
- * @property {ActionStatusType.SUCCESS} type - Indicates that the action succeeded
- * @property {Array<BuyOrder | SellListing | CancelOrder>} orders - The orders that were processed
- */
-export type SuccessStatus = {
-  type: ActionStatusType.SUCCESS,
-  orders: Array<BuyOrder | SellListing | CancelOrder>
-};
-
-/**
- * Represents a failed status
- * @property {ActionStatusType.FAILED} type - Indicates that the action failed
- * @property {Array<BuyOrder | SellOrder | CancelOrder>} orders - The orders that were attempted to be processed
- * @property {string} transactionHash - The transaction hash of the failed transaction
- * @property {string} reason - The reason the transaction failed
- */
-export type FailedStatus = {
-  type: ActionStatusType.FAILED,
-  transactionHash: string,
-  reason: string,
-  orders: Array<BuyOrder | SellOrder | CancelOrder>
-};
-
-/**
- * Represents an insufficient funds status
- * @property {ActionStatusType.FAILED} type - Indicates that the action did not process due to insufficient funds
- * @property {Array<BuyOrder | SellOrder | CancelOrder>} orders - The orders that were attempted to be processed
- */
-export type InsufficientFundsStatus = {
-  type: ActionStatusType.INSUFFICIENT_FUNDS,
-  orders: Array<BuyOrder | SellOrder | CancelOrder>
-};
 
 /**
  * The type representing the order to buy
@@ -81,15 +93,6 @@ export type SellOrder = {
   buyToken: BuyToken,
   makerFees?: OrderFee[],
 };
-
-/**
- * The type representing the listing and the order id for the sell order
- * @property {SellToken} sellToken - the token that has been listed for sale
- * @property {BuyToken} buyToken - the token info of the price of the item
- * @property {OrderFee[]} makerFees - option array of makerFees applied to the listing
- * @property {string} id - the id of the listing
- */
-export type SellListing = SellOrder & { id: string };
 
 /**
  * Represents the token that the item can be bought with once listed for sale.

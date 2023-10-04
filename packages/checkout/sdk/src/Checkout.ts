@@ -49,7 +49,7 @@ import {
   OnRampProviderFees,
   FiatRampParams,
   SmartCheckoutResult,
-  ActionResult,
+  CancelResult,
 } from './types';
 import { CheckoutConfiguration } from './config';
 import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
@@ -344,7 +344,7 @@ export class Checkout {
    */
   public async cancel(
     params: CancelParams,
-  ): Promise<ActionResult> {
+  ): Promise<CancelResult> {
     if (this.config.isProduction) {
       throw new Error('This endpoint is not currently available.');
     }
