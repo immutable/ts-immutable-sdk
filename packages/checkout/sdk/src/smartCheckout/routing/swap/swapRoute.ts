@@ -212,9 +212,6 @@ export const checkIfUserCanCoverRequirement = (
     }
   }
 
-  console.log('Remaining IMX balance L2', utils.formatUnits(remainingBalance, 18));
-  console.log('Amount of IMX to swap on L2', utils.formatUnits(amountBeingSwapped, 18));
-
   // If the users current balance can cover the balance after fees + the amount
   // that is going to be swapped from another item requirement then return true
   return remainingBalance.gte(amountBeingSwapped);
@@ -280,11 +277,6 @@ export const swapRoute = async (
       },
     )) continue;
 
-    console.log('amount of token required', utils.formatUnits(amountOfQuoteTokenRequired.value, 18));
-    console.log(
-      'userBalanceOfQuotedToken (this should be faked)',
-      utils.formatUnits(userBalanceOfQuotedToken.balance, 18),
-    );
     if (!checkIfUserCanCoverRequirement(
       userBalanceOfQuotedToken.balance,
       balanceRequirements,
@@ -293,7 +285,6 @@ export const swapRoute = async (
       approvalFees,
       quote.quote.fees,
     )) continue;
-    console.log('success - checkIfUserCanCoverRequirement');
 
     // User has sufficient funds to cover any approval and swap fees so use this token for the funding route
     // Currently we are not prioritising any particular token so just taking the first sufficient token
