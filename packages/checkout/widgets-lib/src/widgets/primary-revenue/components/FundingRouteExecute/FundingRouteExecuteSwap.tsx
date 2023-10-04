@@ -2,13 +2,17 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import { Box } from '@biom3/react';
+import { WalletProviderName } from '@imtbl/checkout-sdk';
 import {
-  IMTBLWidgetEvents, OrchestrationEventType, SwapEventType, SwapFailed, SwapRejected, SwapSuccess,
+  CheckoutWidgets,
+  CheckoutWidgetsConfig,
+  IMTBLWidgetEvents, OrchestrationEventType, SwapEventType,
+  SwapFailed, SwapReact, SwapRejected, SwapSuccess, UpdateConfig, WidgetTheme,
 } from '@imtbl/checkout-widgets';
 import { useContext, useEffect } from 'react';
+import { Environment } from '@imtbl/config';
 import { ConnectLoaderContext } from '../../../../context/connect-loader-context/ConnectLoaderContext';
-import { withDefaultWidgetConfigs } from '../../../../lib/withDefaultWidgetConfig';
-import { SwapWidget, SwapWidgetParams } from '../../../swap/SwapWidget';
+import { SwapWidgetParams } from '../../../swap/SwapWidget';
 import { FundingRouteStep } from '../../views/smartCheckoutTypes';
 
 type FundingRouteExecuteSwapProps = {
@@ -19,6 +23,18 @@ export function FundingRouteExecuteSwap(
   { fundingRouteStep, onFundingRouteExecuted }: FundingRouteExecuteSwapProps,
 ) {
   const { connectLoaderState: { provider } } = useContext(ConnectLoaderContext);
+
+  CheckoutWidgets({
+    theme: WidgetTheme.DARK,
+    environment: Environment.SANDBOX,
+  });
+
+  const widgetsConfig2: CheckoutWidgetsConfig = {
+    theme: WidgetTheme.DARK,
+    environment: Environment.SANDBOX,
+  };
+
+  UpdateConfig(widgetsConfig2);
 
   const swapParams: SwapWidgetParams = {
     amount: '1',
@@ -65,6 +81,10 @@ export function FundingRouteExecuteSwap(
       console.error('missing provider, please connect frist');
       return () => {};
     }
+
+    const isPassport = (provider?.provider as any)?.isPassport;
+    console.log('@@@@@@@ isPassport', isPassport);
+
     window.addEventListener(
       IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT,
       handleSwapWidgetEvents,
@@ -80,9 +100,13 @@ export function FundingRouteExecuteSwap(
 
   return (
     <Box testId="funding-route-execute-swap">
-      <SwapWidget
-        params={swapParams}
-        config={withDefaultWidgetConfigs()}
+      <SwapReact
+        walletProvider={(provider?.provider as any)?.isPassport
+          ? WalletProviderName.PASSPORT
+          : WalletProviderName.METAMASK}
+        amount="50000000000000000000"
+        fromContractAddress="0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0"
+        toContractAddress=""
       />
 
     </Box>

@@ -20,6 +20,22 @@ import { FundingRoute } from './smartCheckoutTypes';
 
 const MOCK_ROUTES = [
   {
+    priority: 0,
+    steps: [{
+      type: 'BRIDGE',
+      chainId: ChainId.SEPOLIA,
+      asset: {
+        balance: BigNumber.from(1),
+        formattedBalance: '1',
+        token: {
+          name: 'ETH',
+          symbol: 'ETH',
+          decimals: 18,
+        },
+      },
+    }],
+  },
+  {
     priority: 1,
     steps: [
       {
