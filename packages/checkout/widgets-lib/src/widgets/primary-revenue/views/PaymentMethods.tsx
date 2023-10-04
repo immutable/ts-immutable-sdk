@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable react/no-unused-prop-types */
 import { useCallback, useContext } from 'react';
 import { Box, Heading } from '@biom3/react';
 
@@ -12,13 +10,9 @@ import { PrimaryRevenueWidgetViews } from '../../../context/view-context/Primary
 import { ViewContext, ViewActions, SharedViews } from '../../../context/view-context/ViewContext';
 
 import { sendPrimaryRevenueWidgetCloseEvent } from '../PrimaryRevenueWidgetEvents';
-import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 
-type PaymentMethodsProps = {
-  config: StrongCheckoutWidgetsConfig;
-};
-export function PaymentMethods(props: PaymentMethodsProps) {
+export function PaymentMethods() {
   const text = {
     methods: textConfig.views[PrimaryRevenueWidgetViews.PAYMENT_METHODS],
     coins: textConfig.views[PrimaryRevenueWidgetViews.PAY_WITH_COINS],

@@ -5,16 +5,15 @@ import { WidgetTheme } from '../../../lib';
 import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
+import { useSharedContext } from '../context/SharedContextProvider';
 
 export interface PayWithCardProps {
   config: StrongCheckoutWidgetsConfig;
 
 }
 
-export function PayWithCard({
-  config,
-}: PayWithCardProps) {
-  const { theme } = config;
+export function PayWithCard() {
+  const { config: { theme } } = useSharedContext();
 
   const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase

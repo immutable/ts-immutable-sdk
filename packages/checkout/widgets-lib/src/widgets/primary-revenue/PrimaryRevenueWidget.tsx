@@ -79,6 +79,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
       <ViewContext.Provider value={viewReducerValues}>
         <SharedContextProvider
           value={{
+            config,
             items,
             amount,
             fromContractAddress,
@@ -96,13 +97,13 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
           )}
           {viewState.view.type
             === PrimaryRevenueWidgetViews.PAYMENT_METHODS && (
-            <PaymentMethods config={config} />
+            <PaymentMethods />
           )}
           {viewState.view.type === PrimaryRevenueWidgetViews.PAY_WITH_CARD && (
-            <PayWithCard config={config} />
+            <PayWithCard />
           )}
           {viewState.view.type === PrimaryRevenueWidgetViews.PAY_WITH_COINS && (
-            <PayWithCoins config={config} />
+            <PayWithCoins />
           )}
         </SharedContextProvider>
       </ViewContext.Provider>

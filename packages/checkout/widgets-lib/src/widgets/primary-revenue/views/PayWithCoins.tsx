@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable react/no-unused-prop-types */
-
 import {
   useCallback, useContext, useEffect, useState,
 } from 'react';
@@ -18,16 +15,11 @@ import {
   sendPrimaryRevenueWidgetCloseEvent,
 } from '../PrimaryRevenueWidgetEvents';
 import { ViewContext } from '../../../context/view-context/ViewContext';
-import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 import { useSharedContext } from '../context/SharedContextProvider';
 import { PaymentTypes } from '../types';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 
-type PayWithCoinsProps = {
-  config: StrongCheckoutWidgetsConfig
-};
-
-export function PayWithCoins(props: PayWithCoinsProps) {
+export function PayWithCoins() {
   const text = textConfig.views[PrimaryRevenueWidgetViews.PAY_WITH_COINS];
   const [loading, setLoading] = useState(false);
   const { viewState } = useContext(ViewContext);
