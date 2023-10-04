@@ -193,9 +193,6 @@ export const checkIfUserCanCoverRequirement = (
         requirementExists = true;
         // Get the balance that would remain if the requirement was removed from the users balance
         remainingBalance = l2balance.sub(requirement.required.balance);
-        console.log('Required IMX L2 (should be just gas)', utils.formatUnits(requirement.required.balance, 18));
-        // current imx l2 is not reflected faked bridge amount
-        console.log('Current IMX L2 (faked)', utils.formatUnits(l2balance, 18));
       }
     }
   });

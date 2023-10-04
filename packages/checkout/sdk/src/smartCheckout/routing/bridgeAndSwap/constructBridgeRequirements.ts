@@ -41,7 +41,6 @@ export const getAmountFromBalanceRequirement = (
   for (const requirement of balanceRequirements.balanceRequirements) {
     if (requirement.type === ItemType.NATIVE || requirement.type === ItemType.ERC20) {
       if (requirement.required.token.address === quotedTokenAddress) {
-        console.log('Requirement in construct bridge', utils.formatUnits(requirement.required.balance, 18));
         return requirement.required.balance;
       }
     }
@@ -132,7 +131,6 @@ export const constructBridgeRequirements = (
     // Get the amount to bridge factoring in any balance requirements for this swappable token
     // and the current balance on L2
     const amountToBridge = getAmountToBridge(quotedAmountWithFees, amountFromBalanceRequirement, l2balance);
-    console.log('amount to bridge', utils.formatUnits(amountToBridge, 18));
 
     // No amount to bridge as user has sufficient balance for one swap
     if (amountToBridge.lte(0)) {
