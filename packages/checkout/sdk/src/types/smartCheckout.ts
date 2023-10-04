@@ -672,12 +672,6 @@ export type AvailableRoutingOptions = {
   bridge?: boolean;
 };
 
-export type FundingRouteBalanceItem = {
-  balance: BigNumber,
-  formattedBalance: string,
-  token: TokenInfo
-};
-
 export type FundingRouteFeeEstimate = SwapRouteFeeEstimate | BridgeRouteFeeEstimate;
 export type SwapRouteFeeEstimate = {
   type: FundingStepType.SWAP;
