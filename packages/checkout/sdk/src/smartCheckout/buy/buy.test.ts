@@ -11,7 +11,7 @@ import { createOrderbookInstance, getTokenContract } from '../../instance';
 import { CheckoutConfiguration } from '../../config';
 import { CheckoutErrorType } from '../../errors';
 import {
-  ActionStatusType,
+  CheckoutStatus,
   FulfillmentTransaction, GasAmount, GasTokenType, ItemType, TransactionOrGasType,
 } from '../../types/smartCheckout';
 import { smartCheckout } from '..';
@@ -152,10 +152,7 @@ describe('buy', () => {
       );
 
       expect(buyResult).toEqual({
-        status: {
-          type: ActionStatusType.SUCCESS,
-          orders: [order],
-        },
+        status: CheckoutStatus.SUCCESS,
         smartCheckoutResult: [smartCheckoutResult],
       });
       expect(getUnsignedERC20ApprovalTransactions).toBeCalledTimes(1);
@@ -315,10 +312,7 @@ describe('buy', () => {
         gasTransaction,
       );
       expect(buyResult).toEqual({
-        status: {
-          type: ActionStatusType.SUCCESS,
-          orders: [order],
-        },
+        status: CheckoutStatus.SUCCESS,
         smartCheckoutResult: [smartCheckoutResult],
       });
       expect(getUnsignedERC20ApprovalTransactions).toBeCalledTimes(1);
@@ -750,10 +744,7 @@ describe('buy', () => {
       expect(signApprovalTransactions).toBeCalledTimes(0);
       expect(signFulfillmentTransactions).toBeCalledTimes(0);
       expect(buyResult).toEqual({
-        status: {
-          type: ActionStatusType.INSUFFICIENT_FUNDS,
-          orders: [order],
-        },
+        status: CheckoutStatus.INSUFFICIENT_FUNDS,
         smartCheckoutResult: [smartCheckoutResult],
       });
     });
@@ -863,12 +854,9 @@ describe('buy', () => {
         fulfillmentTransaction,
       );
       expect(buyResult).toEqual({
-        status: {
-          type: ActionStatusType.FAILED,
-          transactionHash: '0xHASH',
-          reason: 'approval error',
-          orders: [order],
-        },
+        status: CheckoutStatus.FAILED,
+        transactionHash: '0xHASH',
+        reason: 'approval error',
         smartCheckoutResult: [smartCheckoutResult],
       });
       expect(getUnsignedERC20ApprovalTransactions).toBeCalledTimes(1);
@@ -982,12 +970,9 @@ describe('buy', () => {
         fulfillmentTransaction,
       );
       expect(buyResult).toEqual({
-        status: {
-          type: ActionStatusType.FAILED,
-          transactionHash: '0xHASH',
-          reason: 'fulfillment error',
-          orders: [order],
-        },
+        status: CheckoutStatus.FAILED,
+        transactionHash: '0xHASH',
+        reason: 'fulfillment error',
         smartCheckoutResult: [smartCheckoutResult],
       });
       expect(getUnsignedERC20ApprovalTransactions).toBeCalledTimes(1);
@@ -1310,10 +1295,7 @@ describe('buy', () => {
           fulfillmentTransaction,
         );
         expect(buyResult).toEqual({
-          status: {
-            type: ActionStatusType.SUCCESS,
-            orders: [testCase.orders[0]],
-          },
+          status: CheckoutStatus.SUCCESS,
           smartCheckoutResult: [smartCheckoutResult],
         });
         expect(getUnsignedERC20ApprovalTransactions).toBeCalledTimes(1);
@@ -1517,10 +1499,7 @@ describe('buy', () => {
           fulfillmentTransaction,
         );
         expect(buyResult).toEqual({
-          status: {
-            type: ActionStatusType.SUCCESS,
-            orders: [testCase.orders[0]],
-          },
+          status: CheckoutStatus.SUCCESS,
           smartCheckoutResult: [smartCheckoutResult],
         });
         expect(getUnsignedERC20ApprovalTransactions).toBeCalledTimes(1);

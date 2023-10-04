@@ -20,8 +20,8 @@ import {
   TransactionOrGasType,
   GasAmount,
   FulfillmentTransaction,
-  ActionResult,
-  ActionStatusType,
+  BuyResult,
+  CheckoutStatus,
   BuyOrder,
 } from '../../types/smartCheckout';
 import { smartCheckout } from '..';
@@ -82,7 +82,7 @@ export const buy = async (
   config: CheckoutConfiguration,
   provider: Web3Provider,
   orders: Array<BuyOrder>,
-): Promise<ActionResult> => {
+): Promise<BuyResult> => {
   let orderbook;
   let order: ListingResult;
   let spenderAddress = '';
@@ -212,12 +212,9 @@ export const buy = async (
     const approvalResult = await signApprovalTransactions(provider, unsignedApprovalTransactions);
     if (approvalResult.type === SignTransactionStatusType.FAILED) {
       return {
-        status: {
-          type: ActionStatusType.FAILED,
-          transactionHash: approvalResult.transactionHash,
-          reason: approvalResult.reason,
-          orders,
-        },
+        status: CheckoutStatus.FAILED,
+        transactionHash: approvalResult.transactionHash,
+        reason: approvalResult.reason,
         smartCheckoutResult: [smartCheckoutResult],
       };
     }
@@ -239,30 +236,21 @@ export const buy = async (
     const fulfillmentResult = await signFulfillmentTransactions(provider, unsignedFulfillmentTransactions);
     if (fulfillmentResult.type === SignTransactionStatusType.FAILED) {
       return {
-        status: {
-          type: ActionStatusType.FAILED,
-          transactionHash: fulfillmentResult.transactionHash,
-          reason: fulfillmentResult.reason,
-          orders: [orders[0]],
-        },
+        status: CheckoutStatus.FAILED,
+        transactionHash: fulfillmentResult.transactionHash,
+        reason: fulfillmentResult.reason,
         smartCheckoutResult: [smartCheckoutResult],
       };
     }
 
     return {
-      status: {
-        type: ActionStatusType.SUCCESS,
-        orders: [orders[0]],
-      },
+      status: CheckoutStatus.SUCCESS,
       smartCheckoutResult: [smartCheckoutResult],
     };
   }
 
   return {
-    status: {
-      type: ActionStatusType.INSUFFICIENT_FUNDS,
-      orders: [orders[0]],
-    },
+    status: CheckoutStatus.INSUFFICIENT_FUNDS,
     smartCheckoutResult: [smartCheckoutResult],
   };
 };

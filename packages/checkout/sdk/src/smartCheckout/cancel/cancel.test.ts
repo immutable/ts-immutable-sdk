@@ -8,6 +8,7 @@ import { cancel } from './cancel';
 import { createOrderbookInstance } from '../../instance';
 import { signFulfillmentTransactions } from '../actions';
 import { CheckoutStatus } from '../../types';
+import { SignTransactionStatusType } from '../actions/types';
 
 jest.mock('../../instance');
 jest.mock('../actions');
@@ -47,7 +48,7 @@ describe('cancel', () => {
         }),
       });
       (signFulfillmentTransactions as jest.Mock).mockResolvedValue({
-        type: CheckoutStatus.SUCCESS,
+        type: SignTransactionStatusType.SUCCESS,
       });
 
       const result = await cancel(config, mockProvider, [orderId]);
@@ -84,7 +85,7 @@ describe('cancel', () => {
         }),
       });
       (signFulfillmentTransactions as jest.Mock).mockResolvedValue({
-        type: CheckoutStatus.FAILED,
+        type: SignTransactionStatusType.FAILED,
         transactionHash: '0xHASH',
         reason: 'Fulfillment transaction failed and was reverted',
       });
