@@ -58,9 +58,14 @@ type SignApiResponse = {
   }[];
 };
 
+enum SignCurrencyFilter {
+  CONTRACT_ADDRESS = 'contract_address',
+  CURRENCY_SYMBOL = 'currency_symbol',
+}
+
 type SignApiRequest = {
   recipient_address: string
-  currency_filter: 'contract_address' | 'symbol'
+  currency_filter: SignCurrencyFilter;
   currency_value: string
   payment_type: string
   products: {
@@ -172,7 +177,7 @@ export const useSignOrder = (input: SignOrderInput) => {
       const data: SignApiRequest = {
         recipient_address: recipientAddress,
         payment_type: paymentType,
-        currency_filter: 'contract_address',
+        currency_filter: SignCurrencyFilter.CONTRACT_ADDRESS,
         currency_value: fromContractAddress,
         products: items.map((item) => ({
           product_id: item.productId,

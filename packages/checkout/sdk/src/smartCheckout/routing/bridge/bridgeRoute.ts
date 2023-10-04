@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { BigNumber, Contract, ethers } from 'ethers';
-import { Web3Provider } from '@ethersproject/providers';
+import { BigNumber, ethers } from 'ethers';
 import {
   ChainId,
   FundingRouteType,
@@ -9,22 +7,21 @@ import {
   ItemType,
   RoutingOptionsAvailable,
 } from '../../../types';
-import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../../config';
+import { CheckoutConfiguration, getL1ChainId } from '../../../config';
 import { FundingRouteStep, TokenBalanceResult } from '../types';
 import { BalanceRequirement } from '../../balanceCheck/types';
-import { createBlockchainDataInstance } from '../../../instance';
 import { getEthBalance } from './getEthBalance';
 import { bridgeGasEstimate } from './bridgeGasEstimate';
-import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS, getImxL1Representation, getIndexerChainName } from './constants';
 import { estimateGasForBridgeApproval } from './estimateApprovalGas';
 import { CheckoutError, CheckoutErrorType } from '../../../errors';
 import { allowListCheckForBridge } from '../../allowList/allowListCheck';
+import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS, fetchL1Representation } from '../indexer/fetchL1Representation';
 
 export const hasSufficientL1Eth = (
-  balances: TokenBalanceResult,
+  tokenBalanceResult: TokenBalanceResult,
   totalFees: BigNumber,
 ): boolean => {
-  const balance = getEthBalance(balances);
+  const balance = getEthBalance(tokenBalanceResult);
   return balance.gte(totalFees);
 };
 
@@ -40,32 +37,6 @@ export const getTokenAddressFromRequirement = (
   }
 
   return '';
-};
-
-export const fetchL1Representation = async (
-  config: CheckoutConfiguration,
-  balanceRequirement: BalanceRequirement,
-): Promise<string> => {
-  const l2address = getTokenAddressFromRequirement(balanceRequirement);
-  if (l2address === '') return '';
-
-  if (l2address === IMX_ADDRESS_ZKEVM) {
-    return await getImxL1Representation(getL1ChainId(config), config);
-  }
-
-  const chainName = getIndexerChainName(getL2ChainId(config));
-  if (chainName === '') return ''; // Chain name not a valid indexer chain name
-
-  const blockchainData = createBlockchainDataInstance(config);
-  const tokenData = await blockchainData.getToken({
-    chainName,
-    contractAddress: l2address,
-  });
-
-  const l1address = tokenData.result.root_contract_address;
-  if (l1address === null) return ''; // No L1 representation of this token
-
-  return l1address;
 };
 
 export const getBridgeGasEstimate = async (
@@ -105,18 +76,24 @@ export const isNativeEth = (address: string | undefined): boolean => {
   return false;
 };
 
+export type BridgeRequirement = {
+  amount: BigNumber;
+  formattedAmount: string;
+  l2address: string;
+};
 export const bridgeRoute = async (
   config: CheckoutConfiguration,
   readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
   depositorAddress: string,
   availableRoutingOptions: RoutingOptionsAvailable,
-  balanceRequirement: BalanceRequirement,
-  balances: Map<ChainId, TokenBalanceResult>,
+  bridgeRequirement: BridgeRequirement,
+  tokenBalanceResults: Map<ChainId, TokenBalanceResult>,
   feeEstimates: Map<FundingRouteType, BigNumber>,
 ): Promise<FundingRouteStep | undefined> => {
   if (!availableRoutingOptions.bridge) return undefined;
+  if (bridgeRequirement.l2address === undefined || bridgeRequirement.l2address === '') return undefined;
   const chainId = getL1ChainId(config);
-  const tokenBalanceResult = balances.get(chainId);
+  const tokenBalanceResult = tokenBalanceResults.get(chainId);
   const l1provider = readOnlyProviders.get(chainId);
   if (!l1provider) {
     throw new CheckoutError(
@@ -129,7 +106,7 @@ export const bridgeRoute = async (
   // If no balances on layer 1 then Bridge cannot be an option
   if (tokenBalanceResult === undefined || tokenBalanceResult.success === false) return undefined;
 
-  const allowedTokenList = await allowListCheckForBridge(config, balances, availableRoutingOptions);
+  const allowedTokenList = await allowListCheckForBridge(config, tokenBalanceResults, availableRoutingOptions);
   if (allowedTokenList.length === 0) return undefined;
 
   const bridgeFeeEstimate = await getBridgeGasEstimate(config, readOnlyProviders, feeEstimates);
@@ -137,7 +114,9 @@ export const bridgeRoute = async (
   // If the user has no ETH to cover the bridge fees or approval fees then bridge cannot be an option
   if (!hasSufficientL1Eth(tokenBalanceResult, bridgeFeeEstimate)) return undefined;
 
-  const l1address = await fetchL1Representation(config, balanceRequirement);
+  const l1RepresentationResult = await fetchL1Representation(config, bridgeRequirement.l2address);
+  // No mapping on L1 for this token
+  const { l1address } = l1RepresentationResult;
   if (l1address === '') return undefined;
 
   // Ensure l1address is in the allowed token list
@@ -153,7 +132,7 @@ export const bridgeRoute = async (
     l1provider,
     depositorAddress,
     l1address,
-    balanceRequirement.delta.balance,
+    bridgeRequirement.amount,
   );
 
   if (!hasSufficientL1Eth(
@@ -166,7 +145,9 @@ export const bridgeRoute = async (
     const nativeETHBalance = tokenBalanceResult.balances
       .find((balance) => isNativeEth(balance.token.address));
 
-    if (nativeETHBalance && nativeETHBalance.balance.gte(balanceRequirement.delta.balance.add(bridgeFeeEstimate))) {
+    if (nativeETHBalance && nativeETHBalance.balance.gte(
+      bridgeRequirement.amount.add(bridgeFeeEstimate),
+    )) {
       return constructBridgeFundingRoute(chainId, nativeETHBalance);
     }
 
@@ -175,7 +156,9 @@ export const bridgeRoute = async (
 
   // Find the balance of the L1 representation of the token and check if the balance covers the delta
   const erc20balance = tokenBalanceResult.balances.find((balance) => balance.token.address === l1address);
-  if (erc20balance && erc20balance.balance.gte(balanceRequirement.delta.balance)) {
+  if (erc20balance && erc20balance.balance.gte(
+    bridgeRequirement.amount,
+  )) {
     return constructBridgeFundingRoute(chainId, erc20balance);
   }
 
