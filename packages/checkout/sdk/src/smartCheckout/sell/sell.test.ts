@@ -5,7 +5,7 @@ import { BigNumber, TypedDataDomain } from 'ethers';
 import { getBuyToken, getERC721Requirement, sell } from './sell';
 import { CheckoutConfiguration } from '../../config';
 import {
-  ActionStatusType,
+  CheckoutStatus,
   BuyToken,
   GasTokenType,
   ItemType,
@@ -158,15 +158,8 @@ describe('sell', () => {
           sufficient: true,
           transactionRequirements: [erc721TransactionRequirement],
         }],
-        status: {
-          type: ActionStatusType.SUCCESS,
-          orders: [
-            {
-              ...orders[0],
-              id: '1234',
-            },
-          ],
-        },
+        status: CheckoutStatus.SUCCESS,
+        orderIds: ['1234'],
       });
 
       expect(smartCheckout).toBeCalledWith(
@@ -313,10 +306,7 @@ describe('sell', () => {
       );
 
       expect(result).toEqual({
-        status: {
-          type: ActionStatusType.INSUFFICIENT_FUNDS,
-          orders,
-        },
+        status: CheckoutStatus.INSUFFICIENT_FUNDS,
         smartCheckoutResult: [{
           sufficient: false,
           transactionRequirements: [erc721TransactionRequirement],
@@ -446,12 +436,9 @@ describe('sell', () => {
           sufficient: true,
           transactionRequirements: [erc721TransactionRequirement],
         }],
-        status: {
-          type: ActionStatusType.FAILED,
-          transactionHash: '0xHASH',
-          reason: 'Approval transaction failed and was reverted',
-          orders,
-        },
+        status: CheckoutStatus.FAILED,
+        transactionHash: '0xHASH',
+        reason: 'Approval transaction failed and was reverted',
       });
 
       expect(smartCheckout).toBeCalledWith(

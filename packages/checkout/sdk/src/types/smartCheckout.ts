@@ -12,39 +12,39 @@ export type BuyResult = BuyResultSuccess | BuyResultFailed | BuyResultInsufficie
  */
 export type BuyResultSuccess = {
   status: CheckoutStatus.SUCCESS,
-  smartCheckoutResult: Array<SmartCheckoutSufficient>
+  smartCheckoutResult: SmartCheckoutSufficient[]
 };
 
 export type BuyResultFailed = {
   status: CheckoutStatus.FAILED,
   transactionHash: string,
   reason: string,
-  smartCheckoutResult: Array<SmartCheckoutSufficient>
+  smartCheckoutResult: SmartCheckoutSufficient[]
 };
 
 export type BuyResultInsufficientFunds = {
   status: CheckoutStatus.INSUFFICIENT_FUNDS,
-  smartCheckoutResult: Array<SmartCheckoutInsufficient>
+  smartCheckoutResult: SmartCheckoutInsufficient[]
 };
 
 export type SellResult = SellResultSuccess | SellResultFailed | SellResultInsufficientFunds;
 
 export type SellResultSuccess = {
-  type: CheckoutStatus.SUCCESS,
-  orderIds: Array<string>
-  smartCheckoutResult: Array<SmartCheckoutSufficient>
+  status: CheckoutStatus.SUCCESS,
+  orderIds: string[],
+  smartCheckoutResult: SmartCheckoutSufficient[]
 };
 
 export type SellResultFailed = {
   status: CheckoutStatus.FAILED,
   transactionHash: string,
   reason: string,
-  smartCheckoutResult: Array<SmartCheckoutSufficient>
+  smartCheckoutResult: SmartCheckoutSufficient[]
 };
 
 export type SellResultInsufficientFunds = {
   status: CheckoutStatus.INSUFFICIENT_FUNDS,
-  smartCheckoutResult: Array<SmartCheckoutInsufficient>
+  smartCheckoutResult: SmartCheckoutInsufficient[]
 };
 
 export type CancelResult = CancelResultSuccess | CancelResultFailed;

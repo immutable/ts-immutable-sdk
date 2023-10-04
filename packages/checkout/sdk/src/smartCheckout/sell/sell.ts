@@ -14,11 +14,10 @@ import {
   ItemType,
   TransactionOrGasType,
   ERC20ABI,
-  ActionResult,
   SellOrder,
   BuyToken,
-  ActionStatusType,
-  SellListing,
+  SellResult,
+  CheckoutStatus,
 } from '../../types';
 import * as instance from '../../instance';
 import { CheckoutConfiguration } from '../../config';
@@ -68,7 +67,7 @@ export const sell = async (
   config: CheckoutConfiguration,
   provider: Web3Provider,
   orders: Array<SellOrder>,
-): Promise<ActionResult> => {
+): Promise<SellResult> => {
   let orderbook: Orderbook;
   let listing: PrepareListingResponse;
   let spenderAddress = '';
@@ -144,12 +143,9 @@ export const sell = async (
     const approvalResult = await signApprovalTransactions(provider, unsignedTransactions.approvalTransactions);
     if (approvalResult.type === SignTransactionStatusType.FAILED) {
       return {
-        status: {
-          type: ActionStatusType.FAILED,
-          transactionHash: approvalResult.transactionHash,
-          reason: approvalResult.reason,
-          orders: [orders[0]],
-        },
+        status: CheckoutStatus.FAILED,
+        transactionHash: approvalResult.transactionHash,
+        reason: approvalResult.reason,
         smartCheckoutResult: [smartCheckoutResult],
       };
     }
@@ -211,25 +207,15 @@ export const sell = async (
       );
     }
 
-    const sellListing: SellListing = {
-      ...orders[0],
-      id: orderId,
-    };
-
     return {
-      status: {
-        type: ActionStatusType.SUCCESS,
-        orders: [sellListing],
-      },
+      status: CheckoutStatus.SUCCESS,
+      orderIds: [orderId],
       smartCheckoutResult: [smartCheckoutResult],
     };
   }
 
   return {
-    status: {
-      type: ActionStatusType.INSUFFICIENT_FUNDS,
-      orders: [orders[0]],
-    },
+    status: CheckoutStatus.INSUFFICIENT_FUNDS,
     smartCheckoutResult: [smartCheckoutResult],
   };
 };
