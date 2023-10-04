@@ -7,6 +7,7 @@ import { WalletWidgetViews } from '../../context/view-context/WalletViewContextT
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
 import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextTypes';
 import { PrimaryRevenueWidgetViews } from '../../context/view-context/PrimaryRevenueViewContextTypes';
+import { MintErrorTypes } from '../../widgets/primary-revenue/types';
 
 export const text = {
   views: {
@@ -338,6 +339,41 @@ export const text = {
       header: {
         heading: 'Pay with card',
         caption: 'Powered by Transak',
+      },
+    },
+    [PrimaryRevenueWidgetViews.FAIL]: {
+      errors: {
+        [MintErrorTypes.TRANSACTION_FAILED]: {
+          description: 'Transaction failed',
+          primaryAction: 'Try again',
+          secondaryAction: 'View details',
+        },
+        [MintErrorTypes.SERVICE_BREAKDOWN]: {
+          description:
+            "Sorry, we're unable to process your payment right now. Please try again in a few minutes.",
+          secondaryAction: 'Dismiss',
+        },
+        [MintErrorTypes.TRANSAK_FAILED]: {
+          description: 'Sorry, something went wrong. Please try again.',
+          primaryAction: 'Try again',
+          secondaryAction: 'Dismiss',
+        },
+        [MintErrorTypes.PASSPORT_FAILED]: {
+          description: "Sorry, we're unable to process this right now.",
+          primaryAction: 'Go back',
+          secondaryAction: 'Dismiss',
+        },
+        [MintErrorTypes.PASSPORT_REJECTED_NO_FUNDS]: {
+          description: 'Sorry, something went wrong. Plese try again.',
+          primaryAction: 'Go back',
+          secondaryAction: 'Dismiss',
+        },
+        [MintErrorTypes.PASSPORT_REJECTED]: {
+          description:
+            "You'll need to approve the transaction in Passport to proceed.",
+          primaryAction: 'Try again',
+          secondaryAction: 'Cancel',
+        },
       },
     },
   },
