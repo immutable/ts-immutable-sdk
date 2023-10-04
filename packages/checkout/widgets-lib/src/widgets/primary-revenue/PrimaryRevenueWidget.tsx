@@ -21,6 +21,9 @@ import { PrimaryRevenueWidgetViews } from '../../context/view-context/PrimaryRev
 import { Item } from './types';
 import { widgetTheme } from '../../lib/theme';
 import { SharedContextProvider } from './context/SharedContextProvider';
+import { PaymentMethods } from './views/PaymentMethods';
+import { PayWithCard } from './views/PayWithCard';
+import { PayWithCoins } from './views/PayWithCoins';
 
 export interface PrimaryRevenueWidgetProps {
   config: StrongCheckoutWidgetsConfig;
@@ -36,15 +39,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
     config, amount, items, fromContractAddress, env, environmentId,
   } = props;
 
-  console.log(
-    '@@@ PrimaryRevenueWidget',
-    config,
-    amount,
-    items,
-    fromContractAddress,
-    env,
-    environmentId,
-  );
+  console.log('@@@ PrimaryRevenueWidget', config, amount, items, fromContractAddress, env, environmentId);
 
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
@@ -84,6 +79,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
       <ViewContext.Provider value={viewReducerValues}>
         <SharedContextProvider
           value={{
+            config,
             items,
             amount,
             fromContractAddress,
@@ -101,7 +97,13 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
           )}
           {viewState.view.type
             === PrimaryRevenueWidgetViews.PAYMENT_METHODS && (
-            <div>Payment methods</div>
+            <PaymentMethods />
+          )}
+          {viewState.view.type === PrimaryRevenueWidgetViews.PAY_WITH_CARD && (
+            <PayWithCard />
+          )}
+          {viewState.view.type === PrimaryRevenueWidgetViews.PAY_WITH_COINS && (
+            <PayWithCoins />
           )}
         </SharedContextProvider>
       </ViewContext.Provider>
