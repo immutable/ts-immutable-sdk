@@ -134,8 +134,7 @@ describe('Passport', () => {
 
         it('registers the user and returns the ether key', async () => {
           mockSigninPopup.mockResolvedValue(mockOidcUser);
-          mockGetUser.mockResolvedValueOnce(null);
-          mockGetUser.mockResolvedValueOnce(mockOidcUserZkevm);
+          mockSigninSilent.mockResolvedValueOnce(mockOidcUserZkevm);
           useMswHandlers([
             mswHandlers.counterfactualAddress.success,
           ]);
@@ -147,7 +146,7 @@ describe('Passport', () => {
           });
 
           expect(accounts).toEqual([mockOidcUserZkevm.profile.passport.zkevm_eth_address]);
-          expect(mockGetUser).toHaveBeenCalledTimes(2);
+          expect(mockGetUser).toHaveBeenCalledTimes(1);
           expect(mockMagicRequest).toHaveBeenCalledTimes(3);
         });
 
