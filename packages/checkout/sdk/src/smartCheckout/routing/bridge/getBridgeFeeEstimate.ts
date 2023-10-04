@@ -4,7 +4,8 @@ import {
   GasEstimateType,
   GasEstimateBridgeToL2Result,
   ChainId,
-  TokenInfo,
+  BridgeRouteFeeEstimate,
+  FundingStepType,
 } from '../../../types';
 import { CheckoutConfiguration } from '../../../config';
 import { CheckoutError, CheckoutErrorType } from '../../../errors';
@@ -12,19 +13,7 @@ import { CheckoutError, CheckoutErrorType } from '../../../errors';
 export const getBridgeFeeEstimate = async (
   config: CheckoutConfiguration,
   readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
-): Promise<
-{
-  gasFee: {
-    estimatedAmount: BigNumber;
-    token?: TokenInfo;
-  };
-  bridgeFee: {
-    estimatedAmount: BigNumber;
-    token?: TokenInfo;
-  };
-  totalFees: BigNumber;
-}
-> => {
+): Promise<BridgeRouteFeeEstimate> => {
   try {
     const estimate = await gasEstimator(
       {
@@ -42,6 +31,7 @@ export const getBridgeFeeEstimate = async (
     if (bridgeFee) totalFees = totalFees.add(bridgeFee);
 
     return {
+      type: FundingStepType.BRIDGE,
       gasFee: {
         estimatedAmount: gasEstimate ?? BigNumber.from(0),
         token: estimate.gasFee.token,

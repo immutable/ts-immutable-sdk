@@ -1,7 +1,9 @@
 import { BigNumber, ethers } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { gasEstimator } from '../../../gasEstimate';
-import { ChainId, GasEstimateBridgeToL2Result, TokenInfo } from '../../../types';
+import {
+  ChainId, FundingStepType, GasEstimateBridgeToL2Result, TokenInfo,
+} from '../../../types';
 import { getBridgeFeeEstimate } from './getBridgeFeeEstimate';
 import { CheckoutConfiguration } from '../../../config';
 import { CheckoutErrorType } from '../../../errors';
@@ -36,6 +38,7 @@ describe('getBridgeFeeEstimate', () => {
 
     const bridgeFee = await getBridgeFeeEstimate(config, readOnlyProviders);
     expect(bridgeFee).toEqual({
+      type: FundingStepType.BRIDGE,
       gasFee: {
         estimatedAmount: BigNumber.from(1),
         token: {

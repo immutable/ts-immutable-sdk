@@ -53,10 +53,7 @@ export const getBridgeGasEstimate = async (
   if (bridgeFeeEstimate) {
     return bridgeFeeEstimate as BridgeRouteFeeEstimate;
   }
-  bridgeFeeEstimate = {
-    type: FundingStepType.BRIDGE,
-    ...await getBridgeFeeEstimate(config, readOnlyProviders),
-  };
+  bridgeFeeEstimate = await getBridgeFeeEstimate(config, readOnlyProviders);
   feeEstimates.set(FundingStepType.BRIDGE, bridgeFeeEstimate);
   return bridgeFeeEstimate;
 };
