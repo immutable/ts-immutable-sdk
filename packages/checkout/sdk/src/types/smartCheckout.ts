@@ -3,18 +3,28 @@ import { BigNumber } from 'ethers';
 import { TokenInfo } from './tokenInfo';
 import { OrderFee } from './fees';
 
+/*
+* Type representing the result of the buy
+*/
 export type BuyResult = BuyResultSuccess | BuyResultFailed | BuyResultInsufficientFunds;
 
 /**
- * Represents the result of {@link Checkout.buy}, {@link Checkout.sell} and {@link Checkout.cancel}.
- * @property {SuccessStatus | FailedStatus | InsufficientFundsStatus} status - The status of the action.
- * @property {Array<SmartCheckoutSufficient | SmartCheckoutInsufficient>} smartCheckoutResult - The result of the smart checkout.
+ * Represents the result of {@link Checkout.buy}
+ * @property {CheckoutStatus.SUCCESS} status - The status to indicate success
+ * @property {SmartCheckoutSufficient[]} smartCheckoutResult - The sufficient result of smart checkout
  */
 export type BuyResultSuccess = {
   status: CheckoutStatus.SUCCESS,
   smartCheckoutResult: SmartCheckoutSufficient[]
 };
 
+/**
+ * Represents the result of {@link Checkout.buy}
+ * @property {CheckoutStatus.FAILED} status - The status to indicate failure
+ * @property {string} transactionHash - The transaction hash of the failed transaction
+ * @property {string} reason - The reason for the failure
+ * @property {SmartCheckoutSufficient[]} smartCheckoutResult - The sufficient result of smart checkout
+ */
 export type BuyResultFailed = {
   status: CheckoutStatus.FAILED,
   transactionHash: string,
@@ -22,19 +32,39 @@ export type BuyResultFailed = {
   smartCheckoutResult: SmartCheckoutSufficient[]
 };
 
+/**
+ * Represents the result of {@link Checkout.buy}
+ * @property {CheckoutStatus.INSUFFICIENT_FUNDS} status - The status to indicate insufficient funds
+ * @property {SmartCheckoutInsufficient[]} smartCheckoutResult - The insufficient result of smart checkout
+ */
 export type BuyResultInsufficientFunds = {
   status: CheckoutStatus.INSUFFICIENT_FUNDS,
   smartCheckoutResult: SmartCheckoutInsufficient[]
 };
 
+/*
+* Type representing the result of the sell
+*/
 export type SellResult = SellResultSuccess | SellResultFailed | SellResultInsufficientFunds;
 
+/**
+ * Represents the result of {@link Checkout.sell}
+ * @property {CheckoutStatus.SUCCESS} status - The status to indicate success
+ * @property {SmartCheckoutSufficient[]} smartCheckoutResult - The sufficient result of smart checkout
+ */
 export type SellResultSuccess = {
   status: CheckoutStatus.SUCCESS,
   orderIds: string[],
   smartCheckoutResult: SmartCheckoutSufficient[]
 };
 
+/**
+ * Represents the result of {@link Checkout.sell}
+ * @property {CheckoutStatus.FAILED} status - The status to indicate failure
+ * @property {string} transactionHash - The transaction hash of the failed transaction
+ * @property {string} reason - The reason for the failure
+ * @property {SmartCheckoutSufficient[]} smartCheckoutResult - The sufficient result of smart checkout
+ */
 export type SellResultFailed = {
   status: CheckoutStatus.FAILED,
   transactionHash: string,
@@ -42,17 +72,35 @@ export type SellResultFailed = {
   smartCheckoutResult: SmartCheckoutSufficient[]
 };
 
+/**
+ * Represents the result of {@link Checkout.sell}
+ * @property {CheckoutStatus.INSUFFICIENT_FUNDS} status - The status to indicate insufficient funds
+ * @property {SmartCheckoutInsufficient[]} smartCheckoutResult - The insufficient result of smart checkout
+ */
 export type SellResultInsufficientFunds = {
   status: CheckoutStatus.INSUFFICIENT_FUNDS,
   smartCheckoutResult: SmartCheckoutInsufficient[]
 };
 
+/*
+* Type representing the result of the cancel
+*/
 export type CancelResult = CancelResultSuccess | CancelResultFailed;
 
+/**
+ * Represents the result of {@link Checkout.cancel}
+ * @property {CheckoutStatus.SUCCESS} status - The status to indicate success
+ */
 export type CancelResultSuccess = {
   status: CheckoutStatus.SUCCESS,
 };
 
+/**
+ * Represents the result of {@link Checkout.cancel}
+ * @property {CheckoutStatus.FAILED} status - The status to indicate failure
+ * @property {string} transactionHash - The transaction hash of the failed transaction
+ * @property {string} reason - The reason for the failure
+ */
 export type CancelResultFailed = {
   status: CheckoutStatus.FAILED,
   transactionHash: string,
@@ -62,9 +110,9 @@ export type CancelResultFailed = {
 /**
  * An enum representing the checkout status types
  * @enum {string}
- * @property {string} SUCCESS - If the action succeeded as the transactions were able to be processed
- * @property {string} FAILED - If the action failed due to transactions not settling on chain
- * @property {string} INSUFFICIENT_FUNDS - If the action failed due to insufficient funds
+ * @property {string} SUCCESS - If checkout succeeded as the transactions were able to be processed
+ * @property {string} FAILED - If checkout failed due to transactions not settling on chain
+ * @property {string} INSUFFICIENT_FUNDS - If checkout failed due to insufficient funds
  */
 export enum CheckoutStatus {
   SUCCESS = 'SUCCESS',
