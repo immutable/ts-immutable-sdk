@@ -286,8 +286,8 @@ export const swapRoute = async (
       quote.quote.fees,
     )) continue;
 
-    // User has sufficient funds to cover any approval and swap fees so use this token for the funding route
-    // Currently we are not prioritising any particular token so just taking the first sufficient token
+    // User has sufficient funds of this token to cover any gas fees, swap fees and balance requirements
+    // so add this token to the possible swap options
     fundingSteps.push(
       constructSwapRoute(
         chainId,
