@@ -431,7 +431,7 @@ export type RoutesFound = {
  * @property {RoutingOutcomeType.NO_ROUTES_FOUND} type - Indicates that no funding routes were found for the transaction.
  * @property {string} message - The message indicating why no funding routes were found.
  */
-type NoRoutesFound = {
+export type NoRoutesFound = {
   type: RoutingOutcomeType.NO_ROUTES_FOUND,
   message: string
 };
@@ -441,7 +441,7 @@ type NoRoutesFound = {
  * @property {RoutingOutcomeType.NO_ROUTE_OPTIONS} type - Indicates that no routing options were available for the transaction.
  * @property {string} message - The message indicating why no routing options were available.
  */
-type NoRouteOptions = {
+export type NoRouteOptions = {
   type: RoutingOutcomeType.NO_ROUTE_OPTIONS,
   message: string
 };
