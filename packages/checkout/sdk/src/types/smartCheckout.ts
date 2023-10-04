@@ -181,14 +181,6 @@ export type SellToken = {
 };
 
 /**
- * The type representing the order to cancel
- * @property {string[]} id - the id of the order to cancel
- */
-export type CancelOrder = {
-  id: string[]
-};
-
-/**
  * Interface representing the parameters for {@link Checkout.smartCheckout}
  * @property {Web3Provider} provider - The provider to use for smart checkout.
  * @property {ItemRequirement[]} itemRequirements - The item requirements for the transaction.
