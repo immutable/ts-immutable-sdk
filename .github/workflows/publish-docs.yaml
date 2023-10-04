@@ -65,5 +65,18 @@ jobs:
         run: ./.github/scripts/update-docs-link.sh
 
       - name: Create SDK Docs PR
+        id: docs_pr 
         run: ./.github/scripts/push-docs-pr.sh
         shell: bash
+
+      - name: Notify SDK Slack Docs PR Success
+        if: ${{ success() && steps.docs_pr.conclusion == 'success' }}
+        uses: ./.github/actions/notify-slack-publish-status
+        with:
+          message: "✅ Docs PR published successfully - please review and merge (Release SDK reference docs v${{ env.VERSION }})[https://github.com/immutable/imx-docs/pulls]"
+
+      - name: Notify SDK Slack Docs PR Failure
+        if: ${{ failure() && steps.docs_pr.conclusion == 'failure' }}
+        uses: ./.github/actions/notify-slack-publish-status
+        with:
+          message: "❌ Docs PR failed to publish. Please check the logs for more details."
