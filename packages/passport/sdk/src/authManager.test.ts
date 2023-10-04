@@ -334,6 +334,18 @@ describe('AuthManager', () => {
   });
 
   describe('getUser', () => {
+    describe('when forceRefresh is set to true', () => {
+      it('should call signinSilent and return the domain model', async () => {
+        signinSilentMock.mockReturnValue(mockOidcUser);
+
+        const result = await authManager.getUser({ forceRefresh: true });
+
+        expect(result).toEqual(mockUser);
+        expect(signinSilentMock).toBeCalled();
+        expect(getUserMock).not.toBeCalled();
+      });
+    });
+
     it('should retrieve the user from the userManager and return the domain model', async () => {
       getUserMock.mockReturnValue(mockOidcUser);
       (isTokenExpired as jest.Mock).mockReturnValue(false);
