@@ -296,7 +296,7 @@ export class Checkout {
 
     if (params.orders.length > 1) {
       // eslint-disable-next-line no-console
-      console.warn('This endpoint currently only actions the first order in the array.');
+      console.warn('This endpoint currently only processes the first order in the array.');
     }
 
     const web3Provider = await provider.validateProvider(
@@ -325,7 +325,7 @@ export class Checkout {
 
     if (params.orders.length > 1) {
       // eslint-disable-next-line no-console
-      console.warn('This endpoint currently only actions the first order in the array.');
+      console.warn('This endpoint currently only processes the first order in the array.');
     }
 
     const web3Provider = await provider.validateProvider(
@@ -355,7 +355,7 @@ export class Checkout {
     console.warn('This endpoint is currently under construction.');
 
     // eslint-disable-next-line no-console
-    console.warn('This endpoint currently only actions the first order in the array.');
+    console.warn('This endpoint currently only processes the first order in the array.');
 
     const web3Provider = await provider.validateProvider(
       this.config,
