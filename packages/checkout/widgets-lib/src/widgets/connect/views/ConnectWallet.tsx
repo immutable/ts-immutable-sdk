@@ -35,7 +35,6 @@ export function ConnectWallet() {
       footer={<FooterLogo />}
     >
       <Box
-        id="connect-wallet-content"
         sx={{
           display: 'flex',
           flexDirection: 'column',

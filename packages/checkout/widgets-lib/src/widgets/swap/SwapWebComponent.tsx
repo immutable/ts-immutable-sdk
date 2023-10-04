@@ -1,6 +1,7 @@
 import React from 'react';
 import { WalletProviderName } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
+import { BiomePortalIdProvider } from '@biom3/react';
 import { SwapWidget, SwapWidgetParams } from './SwapWidget';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
 import {
@@ -105,18 +106,20 @@ export class ImmutableSwap extends ImmutableWebComponent {
 
     this.reactRoot.render(
       <React.StrictMode>
-        <CustomAnalyticsProvider widgetConfig={this.widgetConfig!}>
-          <ConnectLoader
-            params={connectLoaderParams}
-            widgetConfig={this.widgetConfig!}
-            closeEvent={() => sendSwapWidgetCloseEvent(window)}
-          >
-            <SwapWidget
-              params={swapParams}
-              config={this.widgetConfig!}
-            />
-          </ConnectLoader>
-        </CustomAnalyticsProvider>
+        <BiomePortalIdProvider>
+          <CustomAnalyticsProvider widgetConfig={this.widgetConfig!}>
+            <ConnectLoader
+              params={connectLoaderParams}
+              widgetConfig={this.widgetConfig!}
+              closeEvent={() => sendSwapWidgetCloseEvent(window)}
+            >
+              <SwapWidget
+                params={swapParams}
+                config={this.widgetConfig!}
+              />
+            </ConnectLoader>
+          </CustomAnalyticsProvider>
+        </BiomePortalIdProvider>
       </React.StrictMode>,
     );
   }
