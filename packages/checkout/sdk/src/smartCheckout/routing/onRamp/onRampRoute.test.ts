@@ -3,7 +3,8 @@ import { Environment } from '@imtbl/config';
 import { CheckoutConfiguration } from '../../../config';
 import {
   ChainId,
-  FundingRouteType,
+  FundingStepType,
+  IMX_ADDRESS_ZKEVM,
   ItemType,
   OnRampProvider,
 } from '../../../types';
@@ -27,6 +28,12 @@ describe('onRampRoute', () => {
           symbol: 'ETH',
           decimals: 18,
         },
+        {
+          address: IMX_ADDRESS_ZKEVM,
+          name: 'IMX',
+          symbol: 'IMX',
+          decimals: 18,
+        },
       ],
     });
   });
@@ -46,8 +53,8 @@ describe('onRampRoute', () => {
       },
       sufficient: false,
       current: {
-        balance: BigNumber.from(0),
-        formattedBalance: '0',
+        balance: BigNumber.from(4),
+        formattedBalance: '4',
         token: {
           address: '0x65AA7a21B0f3ce9B478aAC3408fE75b423939b1F',
           name: 'Ethereum',
@@ -56,8 +63,8 @@ describe('onRampRoute', () => {
         },
       },
       delta: {
-        balance: BigNumber.from(10),
-        formattedBalance: '10',
+        balance: BigNumber.from(6),
+        formattedBalance: '6',
       },
     } as BalanceERC20Requirement;
 
@@ -71,15 +78,84 @@ describe('onRampRoute', () => {
 
     expect(route)
       .toEqual({
-        type: FundingRouteType.ONRAMP,
+        type: FundingStepType.ONRAMP,
         chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-        asset: {
-          balance: BigNumber.from(10),
-          formattedBalance: '10',
+        fundingItem: {
+          type: ItemType.ERC20,
+          fundsRequired: {
+            amount: BigNumber.from(6),
+            formattedAmount: '6',
+          },
+          userBalance: {
+            balance: BigNumber.from(4),
+            formattedBalance: '4',
+          },
           token: {
             address: '0x65AA7a21B0f3ce9B478aAC3408fE75b423939b1F',
             name: 'Ethereum',
             symbol: 'ETH',
+            decimals: 18,
+          },
+        },
+      });
+  });
+
+  it('should return item type NATIVE', async () => {
+    const balanceRequirement: BalanceERC20Requirement = {
+      type: ItemType.ERC20,
+      required: {
+        balance: BigNumber.from(10),
+        formattedBalance: '10',
+        token: {
+          address: IMX_ADDRESS_ZKEVM,
+          name: 'IMX',
+          symbol: 'IMX',
+          decimals: 18,
+        },
+      },
+      sufficient: false,
+      current: {
+        balance: BigNumber.from(4),
+        formattedBalance: '4',
+        token: {
+          address: IMX_ADDRESS_ZKEVM,
+          name: 'IMX',
+          symbol: 'IMX',
+          decimals: 18,
+        },
+      },
+      delta: {
+        balance: BigNumber.from(6),
+        formattedBalance: '6',
+      },
+    } as BalanceERC20Requirement;
+
+    const route = await onRampRoute(
+      config,
+      {
+        onRamp: true,
+      },
+      balanceRequirement,
+    );
+
+    expect(route)
+      .toEqual({
+        type: FundingStepType.ONRAMP,
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        fundingItem: {
+          type: ItemType.NATIVE,
+          fundsRequired: {
+            amount: BigNumber.from(6),
+            formattedAmount: '6',
+          },
+          userBalance: {
+            balance: BigNumber.from(4),
+            formattedBalance: '4',
+          },
+          token: {
+            address: IMX_ADDRESS_ZKEVM,
+            name: 'IMX',
+            symbol: 'IMX',
             decimals: 18,
           },
         },

@@ -3,7 +3,7 @@ import { TypedDataDomain, TypedDataField } from 'ethers';
 
 export type UnsignedTransactions = {
   approvalTransactions: TransactionRequest[];
-  fulfilmentTransactions: TransactionRequest[];
+  fulfillmentTransactions: TransactionRequest[];
 };
 
 export type UnsignedMessage = {

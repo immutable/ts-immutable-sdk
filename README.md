@@ -282,6 +282,9 @@ You can optionally do a dry run by checking the `Dry run` checkbox. This will ru
 > [!IMPORTANT]
 > While the SDK are on `0.X` releases, interface or breaking changes should bump the minor version, whilst non-breaking changes should bump the patch version.
 
+> [!WARNING]
+> Maintainers: Version tags are automatically created by the `Publish to NPM` workflow. Please do not create tags manually. To delete any local tags that are not on the remote, run `.github/scripts/delete-local-tags.sh` before you push.
+
 When releasing a new version of the SDK, you will need to specify the `Upgrade Type` (either `none`, `patch`, `minor`, or `major`). This will determine what the next version of the SDK will be based off the existing [tags in the repo](https://github.com/immutable/ts-immutable-sdk/tags).
 
 The `Publish to NPM` workflow will update the version in the top level `package.json` and push it back to the `main` branch.

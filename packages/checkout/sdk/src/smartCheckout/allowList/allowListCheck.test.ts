@@ -2,7 +2,10 @@ import { Environment } from '@imtbl/config';
 import { BigNumber } from 'ethers';
 import { CheckoutConfiguration } from '../../config';
 import {
-  allowListCheck, allowListCheckForBridge, allowListCheckForOnRamp, allowListCheckForSwap,
+  allowListCheck,
+  allowListCheckForBridge,
+  allowListCheckForOnRamp,
+  allowListCheckForSwap,
 } from './allowListCheck';
 import {
   BridgeConfig,
