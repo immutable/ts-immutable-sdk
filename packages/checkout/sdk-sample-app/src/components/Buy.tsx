@@ -1,4 +1,4 @@
-import { Checkout, BuyResult, BuyStatusType, BuyStatus } from '@imtbl/checkout-sdk';
+import { Checkout } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';
@@ -38,7 +38,7 @@ export default function Buy({ checkout, provider }: BuyProps) {
         provider,
         orders: [{id: orderId, takerFees: [{amount: {percentageDecimal: 0.01}, recipient: '0x96654086969DCaa88933E753Aa52d46EAB269Ff7'}]}],
       });
-      console.log(buyResult);
+      console.log('Buy result', buyResult);
       setLoading(false);
     } catch (err: any) {
       console.log(err);

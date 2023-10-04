@@ -450,7 +450,7 @@ export function BridgeForm(props: BridgeFormProps) {
         </Heading>
         <Box sx={formInputsContainerStyles}>
           <SelectForm
-            id="bridge-token"
+            testId="bridge-token"
             options={tokensOptions}
             coinSelectorHeading={bridgeForm.from.selectorTitle}
             selectedOption={selectedOption}
@@ -463,7 +463,7 @@ export function BridgeForm(props: BridgeFormProps) {
             disabled={isFetching}
           />
           <TextInputForm
-            id="bridge-amount"
+            testId="bridge-amount"
             value={amount}
             placeholder={bridgeForm.from.inputPlaceholder}
             subtext={`${content.fiatPricePrefix} $${formatZeroAmount(amountFiatValue, true)}`}

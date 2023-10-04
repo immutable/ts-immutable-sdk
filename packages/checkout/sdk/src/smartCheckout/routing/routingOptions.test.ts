@@ -1,6 +1,6 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
-import { routingOptionsAvailable } from './routingOptions';
+import { getAvailableRoutingOptions } from './routingOptions';
 import { CheckoutConfiguration } from '../../config';
 import * as geoBlocking from './geoBlocking';
 import { DEFAULT_BRIDGE_ENABLED, DEFAULT_ON_RAMP_ENABLED, DEFAULT_SWAP_ENABLED } from '../../types';
@@ -10,7 +10,7 @@ jest.mock('./geoBlocking', () => ({
   isSwapGeoBlocked: jest.fn().mockResolvedValue(false),
 }));
 
-describe('routingOptions', () => {
+describe('getAvailableRoutingOptions', () => {
   let mockProvider: Web3Provider;
   let config: CheckoutConfiguration;
 
@@ -31,7 +31,7 @@ describe('routingOptions', () => {
   });
 
   it('should return default routing options if no routing availability overrides configured', async () => {
-    const routingOptions = await routingOptionsAvailable(config, mockProvider);
+    const routingOptions = await getAvailableRoutingOptions(config, mockProvider);
     expect(routingOptions).toEqual({
       onRamp: DEFAULT_ON_RAMP_ENABLED,
       swap: DEFAULT_SWAP_ENABLED,
@@ -43,7 +43,7 @@ describe('routingOptions', () => {
     (geoBlocking.isOnRampGeoBlocked as jest.Mock).mockResolvedValue(false);
     (geoBlocking.isSwapGeoBlocked as jest.Mock).mockResolvedValue(false);
 
-    const routingOptions = await routingOptionsAvailable(config, mockProvider);
+    const routingOptions = await getAvailableRoutingOptions(config, mockProvider);
     expect(routingOptions).toEqual({
       onRamp: DEFAULT_ON_RAMP_ENABLED,
       swap: DEFAULT_SWAP_ENABLED,
@@ -59,7 +59,7 @@ describe('routingOptions', () => {
       isSwapEnabled: false,
     });
 
-    const routingOptions = await routingOptionsAvailable(configWithOptions, mockProvider);
+    const routingOptions = await getAvailableRoutingOptions(configWithOptions, mockProvider);
     expect(routingOptions).toEqual({
       onRamp: false,
       swap: false,
@@ -70,28 +70,28 @@ describe('routingOptions', () => {
   it('should disable onRamp options if OnRamp is geo-blocked', async () => {
     (geoBlocking.isOnRampGeoBlocked as jest.Mock).mockResolvedValue(true);
 
-    const routingOptions = await routingOptionsAvailable(config, mockProvider);
+    const routingOptions = await getAvailableRoutingOptions(config, mockProvider);
     expect(routingOptions.onRamp).toEqual(false);
   });
 
   it('should disable OnRamp options if OnRamp geo-blocked checks are rejected', async () => {
     (geoBlocking.isOnRampGeoBlocked as jest.Mock).mockRejectedValue({ error: '404' });
 
-    const routingOptions = await routingOptionsAvailable(config, mockProvider);
+    const routingOptions = await getAvailableRoutingOptions(config, mockProvider);
     expect(routingOptions.onRamp).toEqual(false);
   });
 
   it('should disable Swap options if Swap is geo-blocked', async () => {
     (geoBlocking.isSwapGeoBlocked as jest.Mock).mockResolvedValue(true);
 
-    const routingOptions = await routingOptionsAvailable(config, mockProvider);
+    const routingOptions = await getAvailableRoutingOptions(config, mockProvider);
     expect(routingOptions.swap).toEqual(false);
   });
 
   it('should disable Swap options if Swap geo-blocked checks are rejected', async () => {
     (geoBlocking.isSwapGeoBlocked as jest.Mock).mockRejectedValue({ error: '404' });
 
-    const routingOptions = await routingOptionsAvailable(config, mockProvider);
+    const routingOptions = await getAvailableRoutingOptions(config, mockProvider);
     expect(routingOptions.swap).toEqual(false);
   });
 
@@ -99,7 +99,7 @@ describe('routingOptions', () => {
     (geoBlocking.isOnRampGeoBlocked as jest.Mock).mockResolvedValue(true);
     (geoBlocking.isSwapGeoBlocked as jest.Mock).mockResolvedValue(true);
 
-    const routingOptions = await routingOptionsAvailable(config, mockProvider);
+    const routingOptions = await getAvailableRoutingOptions(config, mockProvider);
     expect(routingOptions.onRamp).toEqual(false);
     expect(routingOptions.swap).toEqual(false);
   });
@@ -108,7 +108,7 @@ describe('routingOptions', () => {
     (geoBlocking.isOnRampGeoBlocked as jest.Mock).mockRejectedValue({ error: '404' });
     (geoBlocking.isSwapGeoBlocked as jest.Mock).mockRejectedValue({ error: '404' });
 
-    const routingOptions = await routingOptionsAvailable(config, mockProvider);
+    const routingOptions = await getAvailableRoutingOptions(config, mockProvider);
     expect(routingOptions.onRamp).toEqual(false);
     expect(routingOptions.swap).toEqual(false);
   });
@@ -120,7 +120,7 @@ describe('routingOptions', () => {
       },
     } as unknown as Web3Provider;
 
-    const routingOptions = await routingOptionsAvailable(config, mockPassportProvider);
+    const routingOptions = await getAvailableRoutingOptions(config, mockPassportProvider);
     expect(routingOptions.bridge).toEqual(false);
   });
 
@@ -129,7 +129,7 @@ describe('routingOptions', () => {
       provider: {},
     } as unknown as Web3Provider;
 
-    const routingOptions = await routingOptionsAvailable(config, mockPassportProvider);
+    const routingOptions = await getAvailableRoutingOptions(config, mockPassportProvider);
     expect(routingOptions.bridge).toEqual(true);
   });
 });

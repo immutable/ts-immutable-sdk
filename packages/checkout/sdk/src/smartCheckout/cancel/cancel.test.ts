@@ -7,8 +7,8 @@ import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { cancel } from './cancel';
 import { createOrderbookInstance } from '../../instance';
 import { signFulfillmentTransactions } from '../actions';
+import { CheckoutStatus } from '../../types';
 import { SignTransactionStatusType } from '../actions/types';
-import { CancelStatusType } from '../../types';
 
 jest.mock('../../instance');
 jest.mock('../actions');
@@ -53,10 +53,7 @@ describe('cancel', () => {
 
       const result = await cancel(config, mockProvider, [orderId]);
       expect(result).toEqual({
-        orderId: '1',
-        status: {
-          type: CancelStatusType.SUCCESS,
-        },
+        status: CheckoutStatus.SUCCESS,
       });
       expect(signFulfillmentTransactions).toBeCalledWith(
         mockProvider,
@@ -95,12 +92,9 @@ describe('cancel', () => {
 
       const result = await cancel(config, mockProvider, [orderId]);
       expect(result).toEqual({
-        orderId: '1',
-        status: {
-          type: CancelStatusType.FAILED,
-          transactionHash: '0xHASH',
-          reason: 'Fulfillment transaction failed and was reverted',
-        },
+        status: CheckoutStatus.FAILED,
+        transactionHash: '0xHASH',
+        reason: 'Fulfillment transaction failed and was reverted',
       });
       expect(signFulfillmentTransactions).toBeCalledWith(
         mockProvider,

@@ -11,6 +11,7 @@ import { createOrderbookInstance, getTokenContract } from '../../instance';
 import { CheckoutConfiguration } from '../../config';
 import { CheckoutErrorType } from '../../errors';
 import {
+  CheckoutStatus,
   FulfillmentTransaction, GasAmount, GasTokenType, ItemType, TransactionOrGasType,
 } from '../../types/smartCheckout';
 import { smartCheckout } from '..';
@@ -21,7 +22,7 @@ import {
   signApprovalTransactions,
   signFulfillmentTransactions,
 } from '../actions';
-import { BuyOrder, BuyStatusType, OrderFee } from '../../types';
+import { BuyOrder, OrderFee } from '../../types';
 import { SignTransactionStatusType } from '../actions/types';
 
 jest.mock('../../instance');
@@ -149,12 +150,10 @@ describe('buy', () => {
         itemRequirements,
         fulfillmentTransaction,
       );
+
       expect(buyResult).toEqual({
-        smartCheckoutResult,
-        orderId: order.id,
-        status: {
-          type: BuyStatusType.SUCCESS,
-        },
+        status: CheckoutStatus.SUCCESS,
+        smartCheckoutResult: [smartCheckoutResult],
       });
       expect(getUnsignedERC20ApprovalTransactions).toBeCalledTimes(1);
       expect(getUnsignedFulfillmentTransactions).toBeCalledTimes(1);
@@ -313,11 +312,8 @@ describe('buy', () => {
         gasTransaction,
       );
       expect(buyResult).toEqual({
-        smartCheckoutResult,
-        orderId: order.id,
-        status: {
-          type: BuyStatusType.SUCCESS,
-        },
+        status: CheckoutStatus.SUCCESS,
+        smartCheckoutResult: [smartCheckoutResult],
       });
       expect(getUnsignedERC20ApprovalTransactions).toBeCalledTimes(1);
       expect(getUnsignedFulfillmentTransactions).toBeCalledTimes(2);
@@ -541,17 +537,13 @@ describe('buy', () => {
         },
       };
 
-      const result = await buy(config, mockProvider, [order]);
+      await buy(config, mockProvider, [order]);
       expect(smartCheckout).toBeCalledWith(
         config,
         mockProvider,
         itemRequirements,
         gasAmount,
       );
-      expect(result).toEqual({
-        smartCheckoutResult: {},
-        orderId: order.id,
-      });
     });
 
     it('should call smart checkout with an erc20 requirement', async () => {
@@ -643,20 +635,13 @@ describe('buy', () => {
         },
       };
 
-      const result = await buy(config, mockProvider, [order]);
+      await buy(config, mockProvider, [order]);
       expect(smartCheckout).toBeCalledWith(
         config,
         mockProvider,
         itemRequirements,
         gasAmount,
       );
-      expect(result).toEqual({
-        smartCheckoutResult,
-        orderId: order.id,
-        status: {
-          type: BuyStatusType.SUCCESS,
-        },
-      });
     });
 
     it('should not sign actions and only return smart checkout result when sufficient false', async () => {
@@ -734,7 +719,6 @@ describe('buy', () => {
       });
       (signApprovalTransactions as jest.Mock).mockResolvedValue({});
       (signFulfillmentTransactions as jest.Mock).mockResolvedValue({});
-      // const orderId = '1';
       const order = {
         id: '1',
         takerFees: [],
@@ -760,8 +744,8 @@ describe('buy', () => {
       expect(signApprovalTransactions).toBeCalledTimes(0);
       expect(signFulfillmentTransactions).toBeCalledTimes(0);
       expect(buyResult).toEqual({
-        smartCheckoutResult,
-        orderId: order.id,
+        status: CheckoutStatus.INSUFFICIENT_FUNDS,
+        smartCheckoutResult: [smartCheckoutResult],
       });
     });
 
@@ -847,7 +831,6 @@ describe('buy', () => {
         type: SignTransactionStatusType.SUCCESS,
       });
 
-      // const orderId = '1';
       const order = {
         id: '1',
         takerFees: [],
@@ -871,13 +854,10 @@ describe('buy', () => {
         fulfillmentTransaction,
       );
       expect(buyResult).toEqual({
-        smartCheckoutResult,
-        orderId: order.id,
-        status: {
-          type: BuyStatusType.FAILED,
-          transactionHash: '0xHASH',
-          reason: 'approval error',
-        },
+        status: CheckoutStatus.FAILED,
+        transactionHash: '0xHASH',
+        reason: 'approval error',
+        smartCheckoutResult: [smartCheckoutResult],
       });
       expect(getUnsignedERC20ApprovalTransactions).toBeCalledTimes(1);
       expect(getUnsignedFulfillmentTransactions).toBeCalledTimes(1);
@@ -967,7 +947,6 @@ describe('buy', () => {
         reason: 'fulfillment error',
       });
 
-      // const orderId = '1';
       const order = {
         id: '1',
         takerFees: [],
@@ -991,13 +970,10 @@ describe('buy', () => {
         fulfillmentTransaction,
       );
       expect(buyResult).toEqual({
-        smartCheckoutResult,
-        orderId: order.id,
-        status: {
-          type: BuyStatusType.FAILED,
-          transactionHash: '0xHASH',
-          reason: 'fulfillment error',
-        },
+        status: CheckoutStatus.FAILED,
+        transactionHash: '0xHASH',
+        reason: 'fulfillment error',
+        smartCheckoutResult: [smartCheckoutResult],
       });
       expect(getUnsignedERC20ApprovalTransactions).toBeCalledTimes(1);
       expect(getUnsignedFulfillmentTransactions).toBeCalledTimes(1);
@@ -1029,7 +1005,6 @@ describe('buy', () => {
         fulfillOrder: jest.fn().mockRejectedValue({}),
       });
 
-      // const orderId = '1';
       const order = {
         id: '1',
         takerFees: [],
@@ -1073,7 +1048,6 @@ describe('buy', () => {
         fulfillOrder: jest.fn().mockRejectedValue({}),
       });
 
-      // const orderId = '1';
       const order = {
         id: '1',
         takerFees: [],
@@ -1100,7 +1074,6 @@ describe('buy', () => {
       });
 
       const provider = {} as any;
-      // const orderId = '1';
       const order = {
         id: '1',
         takerFees: [],
@@ -1322,11 +1295,8 @@ describe('buy', () => {
           fulfillmentTransaction,
         );
         expect(buyResult).toEqual({
-          smartCheckoutResult,
-          orderId: testCase.orders[0].id,
-          status: {
-            type: BuyStatusType.SUCCESS,
-          },
+          status: CheckoutStatus.SUCCESS,
+          smartCheckoutResult: [smartCheckoutResult],
         });
         expect(getUnsignedERC20ApprovalTransactions).toBeCalledTimes(1);
         expect(getUnsignedFulfillmentTransactions).toBeCalledTimes(1);
@@ -1529,11 +1499,8 @@ describe('buy', () => {
           fulfillmentTransaction,
         );
         expect(buyResult).toEqual({
-          smartCheckoutResult,
-          orderId: testCase.orders[0].id,
-          status: {
-            type: BuyStatusType.SUCCESS,
-          },
+          status: CheckoutStatus.SUCCESS,
+          smartCheckoutResult: [smartCheckoutResult],
         });
         expect(getUnsignedERC20ApprovalTransactions).toBeCalledTimes(1);
         expect(getUnsignedFulfillmentTransactions).toBeCalledTimes(1);

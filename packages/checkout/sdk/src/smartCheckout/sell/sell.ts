@@ -9,14 +9,15 @@ import {
 } from '@imtbl/orderbook';
 import { BigNumber, Contract, utils } from 'ethers';
 import {
-  BuyToken, SellOrder, SellResult, SellStatusType,
-} from '../../types/sell';
-import {
   ERC721Item,
   GasTokenType,
   ItemType,
   TransactionOrGasType,
   ERC20ABI,
+  SellOrder,
+  BuyToken,
+  SellResult,
+  CheckoutStatus,
 } from '../../types';
 import * as instance from '../../instance';
 import { CheckoutConfiguration } from '../../config';
@@ -138,6 +139,17 @@ export const sell = async (
   );
 
   if (smartCheckoutResult.sufficient) {
+    const unsignedTransactions = await getUnsignedERC721Transactions(listing.actions);
+    const approvalResult = await signApprovalTransactions(provider, unsignedTransactions.approvalTransactions);
+    if (approvalResult.type === SignTransactionStatusType.FAILED) {
+      return {
+        status: CheckoutStatus.FAILED,
+        transactionHash: approvalResult.transactionHash,
+        reason: approvalResult.reason,
+        smartCheckoutResult: [smartCheckoutResult],
+      };
+    }
+
     const unsignedMessage = getUnsignedMessage(
       listing.orderHash,
       listing.orderComponents,
@@ -159,20 +171,6 @@ export const sell = async (
       provider,
       unsignedMessage,
     );
-    const unsignedTransactions = await getUnsignedERC721Transactions(listing.actions);
-    const approvalResult = await signApprovalTransactions(provider, unsignedTransactions.approvalTransactions);
-    if (approvalResult.type === SignTransactionStatusType.FAILED) {
-      return {
-        id: sellToken.id,
-        collectionAddress: sellToken.collectionAddress,
-        smartCheckoutResult,
-        status: {
-          type: SellStatusType.FAILED,
-          transactionHash: approvalResult.transactionHash,
-          reason: approvalResult.reason,
-        },
-      };
-    }
 
     let orderId = '';
 
@@ -210,19 +208,14 @@ export const sell = async (
     }
 
     return {
-      id: sellToken.id,
-      collectionAddress: sellToken.collectionAddress,
-      smartCheckoutResult,
-      status: {
-        type: SellStatusType.SUCCESS,
-        orderId,
-      },
+      status: CheckoutStatus.SUCCESS,
+      orderIds: [orderId],
+      smartCheckoutResult: [smartCheckoutResult],
     };
   }
 
   return {
-    id: sellToken.id,
-    collectionAddress: sellToken.collectionAddress,
-    smartCheckoutResult,
+    status: CheckoutStatus.INSUFFICIENT_FUNDS,
+    smartCheckoutResult: [smartCheckoutResult],
   };
 };

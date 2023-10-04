@@ -330,6 +330,9 @@ export const text = {
         heading: 'Pay with your coins',
         caption: 'Using the coins balance in your wallet',
       },
+      button: {
+        buyNow: 'Buy now',
+      },
     },
     [PrimaryRevenueWidgetViews.PAY_WITH_CARD]: {
       header: {
