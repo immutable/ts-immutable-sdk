@@ -19,19 +19,15 @@ const run = async () => {
 const postSlackNotification = async () => {
   const status = core.getInput('status');
   const version = core.getInput('version');
-  const docsUrl = core.getInput('docs_pr_url');
-  let message = '';
+  const message = core.getInput('message');
+  let slackMessage = '';
 
   if (version === '0.0.0') return;
 
   if (status === 'success') {
-    message = `✅ Version ${version} of the SDK has been deployed to NPM 🎉`;
-
-    if (docsUrl) {
-      message += `\n\nYou can view the SDK reference docs PR here: ${docsUrl}`
-    }
+    slackMessage = `✅ ${message}`;
   } else {
-    message = `❌ Version ${version} of the SDK failed to deploy to NPM`;
+    slackMessage = `❌ ${message}`;
   }
 
   await web.chat.postMessage({
@@ -41,7 +37,7 @@ const postSlackNotification = async () => {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: message,
+        text: slackMessage,
       },
     }]
   })

@@ -10,9 +10,9 @@ inputs:
     description: 'Version of the SDK that was published'
     required: true
     default: '0.0.0'
-  docs_pr_url:
-    description: 'URL of the docs PR'
-    required: false
+  message:
+    description: 'Message to send to Slack'
+    required: true
     default: ''
 runs:
   using: 'node20'
