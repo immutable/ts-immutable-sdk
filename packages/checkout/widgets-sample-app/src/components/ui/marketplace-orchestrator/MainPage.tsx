@@ -10,8 +10,13 @@ import { ImtblWidgets } from "./ImtblWidgets";
 import { Passport } from '@imtbl/passport';
 import { passportConfig } from './passportConfig';
 import { useOnRampWidget } from './useOnRampWidget';
+import { UpdateConfig, WidgetTheme } from '@imtbl/checkout-widgets';
 
-export const MainPage = () => {
+export const MainPage = ({
+  handleChangeTheme
+}: { 
+  handleChangeTheme: () => void
+}) => {
   // local state for enabling/disabling and changing buttons
   const [doneSwap, setDoneSwap] = useState<boolean>(false);
   const [web3Provider, setWeb3Provider] = useState<Web3Provider|undefined>(undefined);
@@ -85,6 +90,7 @@ export const MainPage = () => {
     <Box sx={{minWidth: '100vw', minHeight: '100vh', width: '100%', height: '100%', backgroundColor: 'base.color.brand.6'}}>
       <Box sx={{width: '100%',padding: 'base.spacing.x4', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
         <Heading>Immutable Checkout Marketplace</Heading>
+        <Button onClick={handleChangeTheme}>Change Theme</Button>
         {!web3Provider && (
         <Button onClick={openConnectWidget}>Connect Wallet</Button>
       )}
