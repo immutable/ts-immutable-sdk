@@ -1727,22 +1727,6 @@ describe('swapRoute', () => {
         balanceRequirements: [
           {
             type: ItemType.ERC20,
-            sufficient: false,
-            delta: {
-              balance: BigNumber.from(1),
-              formattedBalance: '1',
-            },
-            current: {
-              type: ItemType.ERC20,
-              balance: BigNumber.from(1),
-              formattedBalance: '1',
-              token: {
-                name: 'ERC20',
-                symbol: 'ERC20',
-                decimals: 18,
-                address: '0xERC20',
-              },
-            },
             required: {
               type: ItemType.ERC20,
               balance: BigNumber.from(2),
@@ -1754,7 +1738,7 @@ describe('swapRoute', () => {
                 address: '0xERC20',
               },
             },
-          },
+          } as BalanceRequirement,
         ],
       };
       const quoteTokenAddress = '0xIMX';
@@ -1765,8 +1749,9 @@ describe('swapRoute', () => {
         approvalGasTokenAddress: '0xIMX',
       };
       const swapFees: Fee[] = [];
-
+      const l2balance = BigNumber.from(1);
       const canCoverRequirement = checkIfUserCanCoverRequirement(
+        l2balance,
         balanceRequirements,
         quoteTokenAddress,
         amountBeingSwapped,
@@ -1783,22 +1768,6 @@ describe('swapRoute', () => {
         balanceRequirements: [
           {
             type: ItemType.ERC20,
-            sufficient: false,
-            delta: {
-              balance: BigNumber.from(1),
-              formattedBalance: '1',
-            },
-            current: {
-              type: ItemType.ERC20,
-              balance: BigNumber.from(20),
-              formattedBalance: '20',
-              token: {
-                name: 'ERC20',
-                symbol: 'ERC20',
-                decimals: 18,
-                address: '0xERC20',
-              },
-            },
             required: {
               type: ItemType.ERC20,
               balance: BigNumber.from(10),
@@ -1810,7 +1779,7 @@ describe('swapRoute', () => {
                 address: '0xERC20',
               },
             },
-          },
+          } as BalanceRequirement,
         ],
       };
       const quoteTokenAddress = '0xERC20';
@@ -1822,7 +1791,9 @@ describe('swapRoute', () => {
       };
       const swapFees: Fee[] = [];
 
+      const l2balance = BigNumber.from(25);
       const canCoverRequirement = checkIfUserCanCoverRequirement(
+        l2balance,
         balanceRequirements,
         quoteTokenAddress,
         amountBeingSwapped,
@@ -1842,22 +1813,6 @@ describe('swapRoute', () => {
           balanceRequirements: [
             {
               type: ItemType.ERC20,
-              sufficient: false,
-              delta: {
-                balance: BigNumber.from(1),
-                formattedBalance: '1',
-              },
-              current: {
-                type: ItemType.ERC20,
-                balance: BigNumber.from(35),
-                formattedBalance: '35',
-                token: {
-                  name: 'ERC20',
-                  symbol: 'ERC20',
-                  decimals: 18,
-                  address: '0xERC20',
-                },
-              },
               required: {
                 type: ItemType.ERC20,
                 balance: BigNumber.from(10),
@@ -1869,7 +1824,7 @@ describe('swapRoute', () => {
                   address: '0xERC20',
                 },
               },
-            },
+            } as BalanceRequirement,
           ],
         };
         const quoteTokenAddress = '0xERC20';
@@ -1910,7 +1865,9 @@ describe('swapRoute', () => {
           },
         ];
 
+        const l2balance = BigNumber.from(35);
         const canCoverRequirement = checkIfUserCanCoverRequirement(
+          l2balance,
           balanceRequirements,
           quoteTokenAddress,
           amountBeingSwapped,
@@ -1930,22 +1887,6 @@ describe('swapRoute', () => {
           balanceRequirements: [
             {
               type: ItemType.ERC20,
-              sufficient: false,
-              delta: {
-                balance: BigNumber.from(1),
-                formattedBalance: '1',
-              },
-              current: {
-                type: ItemType.ERC20,
-                balance: BigNumber.from(19),
-                formattedBalance: '19',
-                token: {
-                  name: 'ERC20',
-                  symbol: 'ERC20',
-                  decimals: 18,
-                  address: '0xERC20',
-                },
-              },
               required: {
                 type: ItemType.ERC20,
                 balance: BigNumber.from(10),
@@ -1957,7 +1898,7 @@ describe('swapRoute', () => {
                   address: '0xERC20',
                 },
               },
-            },
+            } as BalanceRequirement,
           ],
         };
         const quoteTokenAddress = '0xERC20';
@@ -1969,7 +1910,9 @@ describe('swapRoute', () => {
         };
         const swapFees: Fee[] = [];
 
+        const l2balance = BigNumber.from(9);
         const canCoverRequirement = checkIfUserCanCoverRequirement(
+          l2balance,
           balanceRequirements,
           quoteTokenAddress,
           amountBeingSwapped,
@@ -1990,22 +1933,6 @@ describe('swapRoute', () => {
           balanceRequirements: [
             {
               type: ItemType.ERC20,
-              sufficient: false,
-              delta: {
-                balance: BigNumber.from(1),
-                formattedBalance: '1',
-              },
-              current: {
-                type: ItemType.ERC20,
-                balance: BigNumber.from(34),
-                formattedBalance: '34',
-                token: {
-                  name: 'ERC20',
-                  symbol: 'ERC20',
-                  decimals: 18,
-                  address: '0xERC20',
-                },
-              },
               required: {
                 type: ItemType.ERC20,
                 balance: BigNumber.from(10),
@@ -2017,7 +1944,7 @@ describe('swapRoute', () => {
                   address: '0xERC20',
                 },
               },
-            },
+            } as BalanceRequirement,
           ],
         };
         const quoteTokenAddress = '0xERC20';
@@ -2058,7 +1985,9 @@ describe('swapRoute', () => {
           },
         ];
 
+        const l2balance = BigNumber.from(34);
         const canCoverRequirement = checkIfUserCanCoverRequirement(
+          l2balance,
           balanceRequirements,
           quoteTokenAddress,
           amountBeingSwapped,

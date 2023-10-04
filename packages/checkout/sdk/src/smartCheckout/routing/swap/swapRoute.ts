@@ -175,6 +175,7 @@ export const checkUserCanCoverSwapFees = (
 // still has enough funds of this token to fulfill the balance
 // requirement.
 export const checkIfUserCanCoverRequirement = (
+  l2balance: BigNumber,
   balanceRequirements: BalanceCheckResult,
   quoteTokenAddress: string,
   amountBeingSwapped: BigNumber,
@@ -183,19 +184,24 @@ export const checkIfUserCanCoverRequirement = (
 ): boolean => {
   let remainingBalance = BigNumber.from(0);
   let balanceRequirementToken = '';
+  let requirementExists = false;
 
   balanceRequirements.balanceRequirements.forEach((requirement) => {
     if (requirement.type === ItemType.NATIVE || requirement.type === ItemType.ERC20) {
       if (requirement.required.token.address === quoteTokenAddress) {
         balanceRequirementToken = requirement.required.token.address;
+        requirementExists = true;
         // Get the balance that would remain if the requirement was removed from the users balance
-        remainingBalance = requirement.current.balance.sub(requirement.required.balance);
+        remainingBalance = l2balance.sub(requirement.required.balance);
+        console.log('Required IMX L2 (should be just gas)', utils.formatUnits(requirement.required.balance, 18));
+        // current imx l2 is not reflected faked bridge amount
+        console.log('Current IMX L2 (faked)', utils.formatUnits(l2balance, 18));
       }
     }
   });
 
-  // No requirement exists matching this token
-  if (balanceRequirementToken === '') return true;
+  // No requirement exists matching this token so no need to check if user can cover requirement
+  if (!requirementExists) return true;
 
   // Remove approval fees from the remainder if token matches as these need to be taken out to cover the swap
   if (approvalFees.approvalGasTokenAddress === balanceRequirementToken) {
@@ -208,6 +214,9 @@ export const checkIfUserCanCoverRequirement = (
       remainingBalance = remainingBalance.sub(swapFee.amount.value);
     }
   }
+
+  console.log('Remaining IMX balance L2', utils.formatUnits(remainingBalance, 18));
+  console.log('Amount of IMX to swap on L2', utils.formatUnits(amountBeingSwapped, 18));
 
   // If the users current balance can cover the balance after fees + the amount
   // that is going to be swapped from another item requirement then return true
@@ -274,13 +283,20 @@ export const swapRoute = async (
       },
     )) continue;
 
+    console.log('amount of token required', utils.formatUnits(amountOfQuoteTokenRequired.value, 18));
+    console.log(
+      'userBalanceOfQuotedToken (this should be faked)',
+      utils.formatUnits(userBalanceOfQuotedToken.balance, 18),
+    );
     if (!checkIfUserCanCoverRequirement(
+      userBalanceOfQuotedToken.balance,
       balanceRequirements,
       quoteTokenAddress,
       amountOfQuoteTokenRequired.value,
       approvalFees,
       quote.quote.fees,
     )) continue;
+    console.log('success - checkIfUserCanCoverRequirement');
 
     // User has sufficient funds to cover any approval and swap fees so use this token for the funding route
     // Currently we are not prioritising any particular token so just taking the first sufficient token

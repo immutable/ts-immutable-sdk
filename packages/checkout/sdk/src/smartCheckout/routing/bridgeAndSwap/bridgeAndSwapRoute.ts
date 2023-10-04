@@ -108,6 +108,8 @@ const modifyTokenBalancesWithBridgedAmount = (
 
     const newBalance = l2balance.add(amount);
 
+    console.log('New (faked) L2 balance', utils.formatUnits(newBalance, 18));
+
     const tokenInfo = swappableTokens.find((token) => token.address === l2address) as TokenInfo;
 
     balanceMap.set(l2address, {
