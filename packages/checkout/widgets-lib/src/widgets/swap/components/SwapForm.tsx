@@ -8,7 +8,6 @@ import {
 import { BigNumber, utils } from 'ethers';
 import { TokenInfo } from '@imtbl/checkout-sdk';
 import { TransactionResponse } from '@imtbl/dex-sdk';
-import { parseEther, parseUnits } from 'ethers/lib/utils';
 import { text } from '../../../resources/text/textConfig';
 import { amountInputValidation as textInputValidator } from '../../../lib/validations/amountInputValidations';
 import { SwapContext } from '../context/SwapContext';
@@ -443,9 +442,9 @@ export function SwapForm({ data }: SwapFromProps) {
     if (!imxBalance) return true;
 
     const fromTokenIsImx = fromToken?.address === IMX_ADDRESS_ZKEVM;
-    const gasAmount = parseEther(gasFeeValue.length !== 0 ? gasFeeValue : '0');
+    const gasAmount = utils.parseEther(gasFeeValue.length !== 0 ? gasFeeValue : '0');
     const additionalAmount = fromTokenIsImx && !Number.isNaN(parseFloat(fromAmount))
-      ? parseUnits(fromAmount, fromToken?.decimals || 18)
+      ? utils.parseUnits(fromAmount, fromToken?.decimals || 18)
       : BigNumber.from('0');
 
     return gasAmount.add(additionalAmount).gt(imxBalance.balance);
@@ -596,7 +595,7 @@ export function SwapForm({ data }: SwapFromProps) {
               {swapForm.from.label}
             </Heading>
             <SelectInput
-              id="fromTokenInputs"
+              testId="fromTokenInputs"
               options={tokensOptionsFrom}
               selectSubtext={
                 fromToken
@@ -651,7 +650,7 @@ export function SwapForm({ data }: SwapFromProps) {
               </Body>
             </Box>
             <SelectInput
-              id="toTokenInputs"
+              testId="toTokenInputs"
               options={tokensOptionsTo}
               selectTextAlign="left"
               textInputValue={toAmount}

@@ -1,5 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { parseUnits } from 'ethers/lib/utils';
+import { utils } from 'ethers';
 import { getTokenContract } from '../../instance';
 import { getItemRequirementsFromRequirements } from './itemRequirements';
 import {
@@ -42,18 +42,18 @@ describe('itemRequirements', () => {
       expect(itemRequirements).toEqual([
         {
           type: ItemType.NATIVE,
-          amount: parseUnits('2.0', 18),
+          amount: utils.parseUnits('2.0', 18),
         },
         {
           type: ItemType.ERC20,
           spenderAddress: '0xSPENDER',
-          amount: parseUnits('1.5', 18),
+          amount: utils.parseUnits('1.5', 18),
           contractAddress: '0xCONTRACTADDRESS1',
         },
         {
           type: ItemType.ERC20,
           spenderAddress: '0xSPENDER',
-          amount: parseUnits('0.5', 18),
+          amount: utils.parseUnits('0.5', 18),
           contractAddress: '0xCONTRACTADDRESS2',
         },
         {

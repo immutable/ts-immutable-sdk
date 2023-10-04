@@ -1,5 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { parseUnits } from 'ethers/lib/utils';
+import { utils } from 'ethers';
 import {
   ERC20ABI,
   ERC20Item,
@@ -33,12 +33,12 @@ export async function getItemRequirementsFromRequirements(
     if (itemRequirementParam.type === ItemType.NATIVE) {
       return {
         ...itemRequirementParam,
-        amount: parseUnits(itemRequirementParam.amount, 18),
+        amount: utils.parseUnits(itemRequirementParam.amount, 18),
       } as NativeItem;
     } if (itemRequirementParam.type === ItemType.ERC20) {
       return {
         ...itemRequirementParam,
-        amount: parseUnits(itemRequirementParam.amount, decimals[index]),
+        amount: utils.parseUnits(itemRequirementParam.amount, decimals[index]),
       } as ERC20Item;
     }
     return itemRequirementParam as ERC721Item;
