@@ -50,6 +50,8 @@ import {
   FiatRampParams,
   SmartCheckoutResult,
   CancelResult,
+  BuyResult,
+  SellResult,
 } from './types';
 import { CheckoutConfiguration } from './config';
 import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
@@ -284,7 +286,7 @@ export class Checkout {
   */
   public async buy(
     params: BuyParams,
-  ): Promise<ActionResult> {
+  ): Promise<BuyResult> {
     if (this.config.isProduction) {
       throw new Error('This endpoint is not currently available.');
     }
@@ -313,7 +315,7 @@ export class Checkout {
   */
   public async sell(
     params: SellParams,
-  ): Promise<ActionResult> {
+  ): Promise<SellResult> {
     if (this.config.isProduction) {
       throw new Error('This endpoint is not currently available.');
     }
