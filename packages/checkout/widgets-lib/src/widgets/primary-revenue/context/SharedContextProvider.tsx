@@ -12,8 +12,10 @@ import { PrimaryRevenueSuccess } from '@imtbl/checkout-widgets';
 import { Item, PaymentTypes, SignResponse } from '../types';
 import { useSignOrder } from '../hooks/useSignOrder';
 import { ConnectLoaderState } from '../../../context/connect-loader-context/ConnectLoaderContext';
+import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 
 type SharedContextProps = {
+  config: StrongCheckoutWidgetsConfig;
   env: string;
   environmentId: string;
   items: Item[];
@@ -24,7 +26,7 @@ type SharedContextProps = {
 };
 
 type SharedContextValues = SharedContextProps & {
-  sign: (paymentType: PaymentTypes) => Promise<SignResponse | undefined>
+  sign: (paymentType: PaymentTypes) => Promise<SignResponse | undefined>;
   execute: () => Promise<PrimaryRevenueSuccess>;
   recipientAddress: string;
   signResponse: SignResponse | undefined;
@@ -43,6 +45,7 @@ const SharedContext = createContext<SharedContextValues>({
   sign: () => Promise.resolve(undefined),
   execute: () => Promise.resolve({} as PrimaryRevenueSuccess),
   signResponse: undefined,
+  config: {} as StrongCheckoutWidgetsConfig,
 });
 
 SharedContext.displayName = 'PrimaryRevenueSharedContext';
@@ -54,7 +57,14 @@ export function SharedContextProvider(props: {
   const {
     children,
     value: {
-      env, environmentId, items, amount, fromContractAddress, provider, checkout,
+      config,
+      env,
+      environmentId,
+      items,
+      amount,
+      fromContractAddress,
+      provider,
+      checkout,
     },
   } = props;
 
@@ -84,6 +94,7 @@ export function SharedContextProvider(props: {
 
   const values = useMemo(
     () => ({
+      config,
       items,
       amount,
       fromContractAddress,
@@ -96,7 +107,18 @@ export function SharedContextProvider(props: {
       checkout,
       recipientAddress,
     }),
-    [env, environmentId, items, amount, fromContractAddress, provider, checkout, recipientAddress, signResponse],
+    [
+      config,
+      env,
+      environmentId,
+      items,
+      amount,
+      fromContractAddress,
+      provider,
+      checkout,
+      recipientAddress,
+      signResponse,
+    ],
   );
 
   return (
