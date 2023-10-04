@@ -1,13 +1,91 @@
-import { CheckoutWidgets, validateAndBuildVersion } from './CheckoutWidgets';
+import { CheckoutWidgets, UpdateConfig, validateAndBuildVersion } from './CheckoutWidgets';
 import { SemanticVersion } from './definitions/config';
+import { WidgetTheme } from './definitions/types';
 import { SDK_VERSION_MARKER } from './lib/env';
 
 describe('CheckoutWidgets', () => {
   const SDK_VERSION = SDK_VERSION_MARKER;
 
-  /**
-   * This versioning is currently tied to our current release process of the unified SDK
-   */
+  beforeEach(() => {
+    jest.spyOn(console, 'warn').mockImplementation(() => {});
+  });
+
+  describe('Config', () => {
+    it('empty configuration stored globally', () => {
+      CheckoutWidgets({ theme: WidgetTheme.DARK });
+      expect(window.ImtblCheckoutWidgetConfig).toEqual('{"theme":"dark"}');
+    });
+
+    it('empty configuration stored globally', () => {
+      CheckoutWidgets();
+      expect(window.ImtblCheckoutWidgetConfig).toEqual('{}');
+    });
+
+    it('should validate the versioning', () => {
+      CheckoutWidgets();
+      expect(document.head.innerHTML).toBe(
+        '<script data-product="checkout" '
+        + 'data-version="__SDK_VERSION__" '
+        + `src="https://cdn.jsdelivr.net/npm/@imtbl/sdk@${SDK_VERSION}/dist/browser/checkout.js"></script>`,
+      );
+    });
+
+    it('should not re-add script', () => {
+      CheckoutWidgets();
+      CheckoutWidgets();
+      CheckoutWidgets();
+      expect(document.head.innerHTML).toBe(
+        '<script data-product="checkout" '
+        + 'data-version="__SDK_VERSION__" '
+        + `src="https://cdn.jsdelivr.net/npm/@imtbl/sdk@${SDK_VERSION}/dist/browser/checkout.js"></script>`,
+      );
+    });
+
+    it('should change version', () => {
+      CheckoutWidgets();
+      CheckoutWidgets({
+        version: {
+          major: 1,
+          minor: 2,
+        },
+      });
+      expect(document.head.innerHTML).toBe(
+        '<script data-product="checkout" '
+        + 'data-version="__SDK_VERSION__" '
+        + `src="https://cdn.jsdelivr.net/npm/@imtbl/sdk@${SDK_VERSION}/dist/browser/checkout.js"></script>`,
+      );
+    });
+  });
+
+  describe('Update', () => {
+    it('empty configuration stored globally', () => {
+      CheckoutWidgets();
+      UpdateConfig({});
+      expect(window.ImtblCheckoutWidgetConfig).toEqual('{}');
+    });
+
+    it('any configuration stored globally', () => {
+      CheckoutWidgets();
+      UpdateConfig({ theme: WidgetTheme.DARK });
+      expect(window.ImtblCheckoutWidgetConfig).toEqual('{"theme":"dark"}');
+    });
+
+    it('should update widgets configurations', () => {
+      document.body.innerHTML = '<imtbl-wallet></imtbl-wallet>'
+      + '<imtbl-wallet></imtbl-wallet>'
+      + '<imtbl-swap widgetconfig=\'{"theme":"dark", "isOnRampEnabled":"true"}\'></imtbl-swap>';
+
+      UpdateConfig({ theme: WidgetTheme.LIGHT });
+
+      expect(document.body.innerHTML).toBe(
+        '<imtbl-wallet widgetconfig="{&quot;theme&quot;:&quot;light&quot;}"></imtbl-wallet>'
+        + '<imtbl-wallet widgetconfig="{&quot;theme&quot;:&quot;light&quot;}"></imtbl-wallet>'
+        + '<imtbl-swap widgetconfig="{&quot;theme&quot;:&quot;light&quot;'
+        + ',&quot;isOnRampEnabled&quot;:&quot;true&quot;}"></imtbl-swap>',
+      );
+    });
+  });
+
   describe('Versioning', () => {
     const versionTestCases:
     {
@@ -199,15 +277,6 @@ describe('CheckoutWidgets', () => {
         const validVersion = validateAndBuildVersion(testCase.version);
         expect(validVersion).toEqual(testCase.expectedVersion);
       });
-    });
-
-    it('should validate the correct versioning when using CheckoutWidgets', () => {
-      CheckoutWidgets();
-      expect(document.head.innerHTML).toBe(
-        `<script src="https://cdn.jsdelivr.net/npm/@imtbl/sdk@${
-          SDK_VERSION
-        }/dist/browser/checkout.js"></script>`,
-      );
     });
   });
 });

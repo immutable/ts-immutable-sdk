@@ -6,15 +6,15 @@ import {
 } from '@imtbl/checkout-widgets';
 import { Environment } from '@imtbl/config';
 import { MainPage } from './MainPage';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { WidgetProvider } from './WidgetProvider';
 
 export const Marketplace = () => {
-  useEffect(() => {
-    
+  const [theme, setTheme] = useState(WidgetTheme.DARK)
 
+  useEffect(() => {
     const widgetsConfig: CheckoutWidgetsConfig = {
-      theme: WidgetTheme.DARK,
+      theme,
       environment: Environment.SANDBOX,
       isOnRampEnabled: true,
       isBridgeEnabled: true,
@@ -22,13 +22,17 @@ export const Marketplace = () => {
     };
 
     CheckoutWidgets(widgetsConfig);
-  
-    UpdateConfig(widgetsConfig);
   },[]);
+
+  useEffect(() => UpdateConfig({ theme }), [theme])
+
+  const handleChangeTheme = () => {
+    setTheme(theme === WidgetTheme.DARK ? WidgetTheme.LIGHT : WidgetTheme.DARK)
+  }
 
   return (
     <WidgetProvider>
-      <MainPage />
+      <MainPage handleChangeTheme={handleChangeTheme} />
     </WidgetProvider>
   );
 };
