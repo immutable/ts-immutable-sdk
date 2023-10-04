@@ -171,7 +171,9 @@ export const checkUserCanCoverSwapFees = (
 
 // The item for swapping may also be a balance requirement
 // for the action. Need to ensure that if the user does a swap
-// that they can still cover the balance requirement.
+// this token to cover the insufficient balance that the user
+// still has enough funds of this token to fulfill the balance
+// requirement.
 export const checkIfUserCanCoverRequirement = (
   balanceRequirements: BalanceCheckResult,
   tokenAddress: string,
@@ -179,31 +181,37 @@ export const checkIfUserCanCoverRequirement = (
   approvalFees: SufficientApprovalFees,
   swapFees: Fee[],
 ): boolean => {
-  let amount = BigNumber.from(0);
+  let remainingBalance = BigNumber.from(0);
   let balanceRequirementToken = '';
 
   balanceRequirements.balanceRequirements.forEach((requirement) => {
     if (requirement.type === ItemType.NATIVE || requirement.type === ItemType.ERC20) {
       if (requirement.required.token.address === tokenAddress) {
         balanceRequirementToken = requirement.required.token.address;
-        amount = amount.add(requirement.required.balance);
+        // Get the balance that would remain if the requirement was removed from the users balance
+        remainingBalance = requirement.current.balance.sub(requirement.required.balance);
       }
     }
   });
 
+  // No requirement exists matching this token
   if (balanceRequirementToken === '') return true;
 
+  // Remove approval fees from the remainder if token matches as these need to be taken out to cover the swap
   if (approvalFees.approvalGasTokenAddress === balanceRequirementToken) {
-    amount = amount.add(approvalFees.approvalGasFee);
+    remainingBalance = remainingBalance.sub(approvalFees.approvalGasFee);
   }
 
+  // Remove swap fees from the remainder if token matches as these need to be taken out to cover the swap
   for (const swapFee of swapFees) {
     if (swapFee.amount.token.address === balanceRequirementToken) {
-      amount = amount.add(swapFee.amount.value);
+      remainingBalance = remainingBalance.sub(swapFee.amount.value);
     }
   }
 
-  return amount.gte(amountBeingSwapped);
+  // If the users current balance can cover the balance after fees + the amount
+  // that is going to be swapped from another item requirement then return true
+  return remainingBalance.gte(amountBeingSwapped);
 };
 
 export const swapRoute = async (

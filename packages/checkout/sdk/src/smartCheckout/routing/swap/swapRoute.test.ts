@@ -260,6 +260,10 @@ describe('swapRoute', () => {
         }],
       ]);
 
+      const balanceRequirements = {
+        sufficient: false,
+        balanceRequirements: [balanceRequirement],
+      };
       const route = await swapRoute(
         config,
         {
@@ -270,6 +274,7 @@ describe('swapRoute', () => {
         balanceRequirement,
         balances,
         ['0xERC20_1', '0xERC20_2'],
+        balanceRequirements,
       );
 
       expect(route).toEqual([
@@ -382,6 +387,10 @@ describe('swapRoute', () => {
         }],
       ]);
 
+      const balanceRequirements = {
+        sufficient: false,
+        balanceRequirements: [balanceRequirement],
+      };
       const route = await swapRoute(
         config,
         {
@@ -392,6 +401,7 @@ describe('swapRoute', () => {
         balanceRequirement,
         balances,
         ['0xERC20_1', '0xERC20_2', '0xERC20_3'],
+        balanceRequirements,
       );
 
       expect(route).toEqual([
@@ -490,6 +500,10 @@ describe('swapRoute', () => {
         }],
       ]);
 
+      const balanceRequirements = {
+        sufficient: false,
+        balanceRequirements: [balanceRequirement],
+      };
       const route = await swapRoute(
         config,
         {
@@ -500,6 +514,7 @@ describe('swapRoute', () => {
         balanceRequirement,
         balances,
         ['0xERC20', '0xERC20'],
+        balanceRequirements,
       );
       expect(route).toEqual([]);
     });
@@ -524,6 +539,10 @@ describe('swapRoute', () => {
         }],
       ]);
 
+      const balanceRequirements = {
+        sufficient: false,
+        balanceRequirements: [balanceRequirement],
+      };
       const route = await swapRoute(
         config,
         {
@@ -534,6 +553,7 @@ describe('swapRoute', () => {
         balanceRequirement,
         balances,
         [],
+        balanceRequirements,
       );
       expect(route).toEqual([]);
     });
@@ -583,6 +603,10 @@ describe('swapRoute', () => {
         }],
       ]);
 
+      const balanceRequirements = {
+        sufficient: false,
+        balanceRequirements: [balanceRequirement],
+      };
       const routes = await swapRoute(
         config,
         {
@@ -593,6 +617,7 @@ describe('swapRoute', () => {
         balanceRequirement,
         balances,
         ['0xERC20'],
+        balanceRequirements,
       );
       expect(routes).toEqual([]);
     });
@@ -647,6 +672,10 @@ describe('swapRoute', () => {
         }],
       ]);
 
+      const balanceRequirements = {
+        sufficient: false,
+        balanceRequirements: [balanceRequirement],
+      };
       const route = await swapRoute(
         config,
         {
@@ -657,6 +686,7 @@ describe('swapRoute', () => {
         balanceRequirement,
         balances,
         ['0xERC20'],
+        balanceRequirements,
       );
       expect(route).toEqual([]);
     });
@@ -721,6 +751,10 @@ describe('swapRoute', () => {
         }],
       ]);
 
+      const balanceRequirements = {
+        sufficient: false,
+        balanceRequirements: [balanceRequirement],
+      };
       const route = await swapRoute(
         config,
         {
@@ -731,6 +765,7 @@ describe('swapRoute', () => {
         balanceRequirement,
         balances,
         ['0xERC20_1', '0xERC20_2'],
+        balanceRequirements,
       );
 
       expect(route).toEqual([]);
@@ -796,6 +831,10 @@ describe('swapRoute', () => {
         }],
       ]);
 
+      const balanceRequirements = {
+        sufficient: false,
+        balanceRequirements: [balanceRequirement],
+      };
       const route = await swapRoute(
         config,
         {
@@ -806,6 +845,7 @@ describe('swapRoute', () => {
         balanceRequirement,
         balances,
         ['0xERC20_1', '0xERC20_2'],
+        balanceRequirements,
       );
 
       expect(route).toEqual([]);
@@ -861,6 +901,10 @@ describe('swapRoute', () => {
         }],
       ]);
 
+      const balanceRequirements = {
+        sufficient: false,
+        balanceRequirements: [balanceRequirement],
+      };
       const route = await swapRoute(
         config,
         {
@@ -871,6 +915,7 @@ describe('swapRoute', () => {
         balanceRequirement,
         balances,
         ['0xERC20_1', '0xERC20_2'],
+        balanceRequirements,
       );
 
       expect(route).toEqual([]);
@@ -936,6 +981,10 @@ describe('swapRoute', () => {
         }],
       ]);
 
+      const balanceRequirements = {
+        sufficient: false,
+        balanceRequirements: [balanceRequirement],
+      };
       const route = await swapRoute(
         config,
         {
@@ -946,6 +995,7 @@ describe('swapRoute', () => {
         balanceRequirement,
         balances,
         ['0xERC20_1', '0xERC20_2'],
+        balanceRequirements,
       );
 
       expect(route).toEqual([]);
