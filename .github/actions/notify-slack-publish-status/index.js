@@ -17,17 +17,10 @@ const run = async () => {
 }
 
 const postSlackNotification = async () => {
-  const status = core.getInput('status');
-  const version = core.getInput('version');
   const message = core.getInput('message');
-  let slackMessage = '';
 
-  if (version === '0.0.0') return;
-
-  if (status === 'success') {
-    slackMessage = `✅ ${message}`;
-  } else {
-    slackMessage = `❌ ${message}`;
+  if (!message) {
+    throw new Error('No message input found');
   }
 
   await web.chat.postMessage({
@@ -37,7 +30,7 @@ const postSlackNotification = async () => {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: slackMessage,
+        text: message,
       },
     }]
   })

@@ -2,14 +2,6 @@
 name: 'Notify Slack Publish Status'
 description: 'Notify Slack with the completion status of the publish action'
 inputs:
-  status:
-    description: 'Status of the action'
-    required: true
-    default: 'failure'
-  version:
-    description: 'Version of the SDK that was published'
-    required: true
-    default: '0.0.0'
   message:
     description: 'Message to send to Slack'
     required: true
