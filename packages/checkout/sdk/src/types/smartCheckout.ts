@@ -450,24 +450,10 @@ export type NoRouteOptions = {
  * Represents a funding route
  * @property {number} priority - The priority of the route
  * @property {FundingStep[]} steps - The steps associated with this funding route
- * @property {TotalFees | undefined} totalFees - The total fees for this route
  */
 export type FundingRoute = {
   priority: number;
   steps: FundingStep[]
-  totalFees?: TotalFees,
-};
-
-/**
- * Represents the total fees for a route
- * @property {Fee} gas - The total gas fees for this funding step
- * @property {Fee} other - The total of all other fees associated with this funding step
- * @property {Fee} total - The total combined gas and other fees for this funding step
- */
-export type TotalFees = {
-  gas: Fee,
-  other: Fee,
-  total: Fee,
 };
 
 /**
