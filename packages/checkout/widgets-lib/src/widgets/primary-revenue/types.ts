@@ -65,4 +65,5 @@ export enum MintErrorTypes {
   PASSPORT_FAILED = 'passportFailed',
   PASSPORT_REJECTED_NO_FUNDS = 'passportRejectedNoFunds',
   PASSPORT_REJECTED = 'passportRejected',
+  DEFAULT = 'default',
 }

@@ -374,6 +374,11 @@ export const text = {
           primaryAction: 'Try again',
           secondaryAction: 'Cancel',
         },
+        [MintErrorTypes.DEFAULT]: {
+          description: 'Sorry, something went wrong. Please try again.',
+          primaryAction: 'Try again',
+          secondaryAction: 'Dismiss',
+        },
       },
     },
   },

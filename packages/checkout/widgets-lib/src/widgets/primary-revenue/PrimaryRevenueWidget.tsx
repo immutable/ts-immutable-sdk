@@ -158,19 +158,16 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.WARNING,
     },
+    [MintErrorTypes.DEFAULT]: {
+      onActionClick: updateToPaymentMethods,
+      onSecondaryActionClick: closeWidget,
+      statusType: StatusType.WARNING,
+    },
   };
 
   const determineStatusViewProps = (): StatusViewProps => {
-    console.log(
-      'text[PrimaryRevenueWidgetViews.FAIL]',
-      text.views[PrimaryRevenueWidgetViews.FAIL],
-    );
-    console.log(
-      '@@@@@@@@@@@@@@@@@@@@@viewState.view.data.error',
-      viewState.view.data.error,
-    );
     const errorTextConfig: AllErrorTextConfigs = text.views[PrimaryRevenueWidgetViews.FAIL].errors;
-    const errorType = viewState.view.data.error as MintErrorTypes;
+    const errorType = viewState.view.data?.error || MintErrorTypes.DEFAULT;
 
     const handlers = errorHandlersConfig[errorType] || {};
 
