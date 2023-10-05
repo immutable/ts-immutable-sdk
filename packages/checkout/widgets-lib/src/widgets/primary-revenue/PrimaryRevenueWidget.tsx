@@ -24,6 +24,8 @@ import { SharedContextProvider } from './context/SharedContextProvider';
 import { PaymentMethods } from './views/PaymentMethods';
 import { PayWithCard } from './views/PayWithCard';
 import { PayWithCoins } from './views/PayWithCoins';
+import { StatusView } from '../../components/Status/StatusView';
+import { StatusType } from '../../components/Status/StatusType';
 
 export interface PrimaryRevenueWidgetProps {
   config: StrongCheckoutWidgetsConfig;
@@ -39,7 +41,15 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
     config, amount, items, fromContractAddress, env, environmentId,
   } = props;
 
-  console.log('@@@ PrimaryRevenueWidget', config, amount, items, fromContractAddress, env, environmentId);
+  console.log(
+    '@@@ PrimaryRevenueWidget',
+    config,
+    amount,
+    items,
+    fromContractAddress,
+    env,
+    environmentId,
+  );
 
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
@@ -96,14 +106,28 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
             <div>{viewState.view.error.message}</div>
           )}
           {viewState.view.type
-            === PrimaryRevenueWidgetViews.PAYMENT_METHODS && (
-            <PaymentMethods />
-          )}
+            === PrimaryRevenueWidgetViews.PAYMENT_METHODS && <PaymentMethods />}
           {viewState.view.type === PrimaryRevenueWidgetViews.PAY_WITH_CARD && (
             <PayWithCard />
           )}
           {viewState.view.type === PrimaryRevenueWidgetViews.PAY_WITH_COINS && (
             <PayWithCoins />
+          )}
+          {viewState.view.type === PrimaryRevenueWidgetViews.MINT_SUCCESS
+            && provider && (
+              <StatusView
+                statusText={
+                  text.views[PrimaryRevenueWidgetViews.MINT_SUCCESS].text
+                }
+                actionText={
+                  text.views[PrimaryRevenueWidgetViews.MINT_SUCCESS].actionText
+                }
+                onActionClick={
+                  /* TODO: use closeWidget function from error views PR */ () => {}
+                }
+                statusType={StatusType.SUCCESS}
+                testId="success-view"
+              />
           )}
         </SharedContextProvider>
       </ViewContext.Provider>
