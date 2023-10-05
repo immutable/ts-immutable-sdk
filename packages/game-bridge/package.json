@@ -5,29 +5,34 @@
     "@imtbl/config": "0.0.0",
     "@imtbl/immutablex-client": "0.0.0",
     "@imtbl/passport": "0.0.0",
-    "@imtbl/provider": "0.0.0"
+    "@imtbl/provider": "0.0.0",
+    "@imtbl/version-check": "0.0.0"
   },
   "devDependencies": {
     "parcel": "^2.8.3"
   },
   "scripts": {
-    "build": "parcel build --no-cache --no-optimize",
-    "start": "parcel"
+    "build": "yarn updateGameBridgeVersion && parcel build --no-cache --no-scope-hoist && yarn revertGameBridgeVersion",
+    "start": "parcel",
+    "updateGameBridgeVersion": "./scripts/updateSdkVersion.sh",
+    "revertGameBridgeVersion": "./scripts/revertSdkVersion.sh"
   },
   "source": "src/index.html",
   "targets": {
     "unity": {
       "context": "browser",
+      "source": "src/index.html",
       "engines": {
         "browsers": "Chrome 90"
       }
     },
     "unreal": {
+      "outputFormat": "global",
       "context": "browser",
+      "source": "src/index.ts",
       "engines": {
-        "browsers": "Chrome 59"
-      },
-      "outputFormat": "global"
+        "browsers": "Chrome 90"
+      }
     }
   }
 }

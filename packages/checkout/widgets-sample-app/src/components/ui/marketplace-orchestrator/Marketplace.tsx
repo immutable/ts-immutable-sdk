@@ -6,30 +6,33 @@ import {
 } from '@imtbl/checkout-widgets';
 import { Environment } from '@imtbl/config';
 import { MainPage } from './MainPage';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { WidgetProvider } from './WidgetProvider';
 
 export const Marketplace = () => {
-  useEffect(() => {
-    
+  const [theme, setTheme] = useState(WidgetTheme.DARK)
 
+  useEffect(() => {
     const widgetsConfig: CheckoutWidgetsConfig = {
-      theme: WidgetTheme.DARK,
+      theme,
       environment: Environment.SANDBOX,
-      // TODO https://immutable.atlassian.net/browse/WT-1509
-      // isOnRampEnabled: true,
+      isOnRampEnabled: true,
       isBridgeEnabled: true,
       isSwapEnabled: true
     };
 
     CheckoutWidgets(widgetsConfig);
-  
-    UpdateConfig(widgetsConfig);
   },[]);
+
+  useEffect(() => UpdateConfig({ theme }), [theme])
+
+  const handleChangeTheme = () => {
+    setTheme(theme === WidgetTheme.DARK ? WidgetTheme.LIGHT : WidgetTheme.DARK)
+  }
 
   return (
     <WidgetProvider>
-      <MainPage />
+      <MainPage handleChangeTheme={handleChangeTheme} />
     </WidgetProvider>
   );
 };

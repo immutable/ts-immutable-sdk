@@ -1,11 +1,13 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { User as OidcUser, UserManager } from 'oidc-client-ts';
+import { User as OidcUser, UserManager, WebStorageStateStore } from 'oidc-client-ts';
 import AuthManager from './authManager';
 import { PassportError, PassportErrorType } from './errors/passportError';
 import { PassportConfiguration } from './config';
 import { mockUser, mockUserImx, mockUserZkEvm } from './test/mocks';
+import { isTokenExpired } from './token';
 
 jest.mock('oidc-client-ts');
+jest.mock('./token');
 
 const baseConfig = new ImmutableConfiguration({
   environment: Environment.SANDBOX,
@@ -18,10 +20,9 @@ const config = new PassportConfiguration({
   scope: 'email profile',
 });
 
-const mockOidcUser: OidcUser = {
+const commonOidcUser: OidcUser = {
   id_token: mockUser.idToken,
   access_token: mockUser.accessToken,
-  refresh_token: mockUser.refreshToken,
   token_type: 'Bearer',
   scope: 'openid',
   expires_in: 167222,
@@ -30,7 +31,23 @@ const mockOidcUser: OidcUser = {
     email: mockUser.profile.email,
     nickname: mockUser.profile.nickname,
   },
+} as OidcUser;
+
+const mockOidcUser: OidcUser = {
+  ...commonOidcUser,
+  refresh_token: mockUser.refreshToken,
   expired: false,
+} as OidcUser;
+
+const mockOidcExpiredUser: OidcUser = {
+  ...commonOidcUser,
+  refresh_token: mockUser.refreshToken,
+  expired: true,
+} as OidcUser;
+
+const mockOidcExpiredNoRefreshTokenUser: OidcUser = {
+  ...commonOidcUser,
+  expired: true,
 } as OidcUser;
 
 const imxProfileData = {
@@ -76,7 +93,7 @@ describe('AuthManager', () => {
   });
 
   describe('constructor', () => {
-    it('should initial AuthManager the configuration contains audience params', () => {
+    it('should initialise AuthManager with a configuration containing audience params', () => {
       const configWithAudience = new PassportConfiguration({
         baseConfig,
         logoutRedirectUri: 'https://test.com',
@@ -108,6 +125,7 @@ describe('AuthManager', () => {
         popup_redirect_uri: configWithAudience.oidcConfiguration.redirectUri,
         redirect_uri: configWithAudience.oidcConfiguration.redirectUri,
         scope: configWithAudience.oidcConfiguration.scope,
+        userStore: expect.any(WebStorageStateStore),
         extraQueryParams: {
           audience: configWithAudience.oidcConfiguration.audience,
         },
@@ -115,7 +133,7 @@ describe('AuthManager', () => {
     });
   });
 
-  it('should initial AuthManager the default configuration', () => {
+  it('should initialise AuthManager with the correct default configuration', () => {
     // to work around new being used as a side effect, which would cause a lint failure
     const am = new AuthManager(config);
     expect(am).toBeDefined();
@@ -138,6 +156,7 @@ describe('AuthManager', () => {
       popup_redirect_uri: config.oidcConfiguration.redirectUri,
       redirect_uri: config.oidcConfiguration.redirectUri,
       scope: config.oidcConfiguration.scope,
+      userStore: expect.any(WebStorageStateStore),
     });
   });
 
@@ -223,7 +242,7 @@ describe('AuthManager', () => {
 
       await expect(() => authManager.login()).rejects.toThrow(
         new PassportError(
-          `${PassportErrorType.AUTHENTICATION_ERROR}: ${mockErrorMsg}`,
+          mockErrorMsg,
           PassportErrorType.AUTHENTICATION_ERROR,
         ),
       );
@@ -249,7 +268,8 @@ describe('AuthManager', () => {
     });
 
     it('should return null if user is returned', async () => {
-      getUserMock.mockReturnValue(mockOidcUser);
+      getUserMock.mockReturnValue(mockOidcExpiredUser);
+      (isTokenExpired as jest.Mock).mockReturnValue(true);
       signinSilentMock.mockResolvedValue(null);
 
       const result = await authManager.loginSilent();
@@ -306,7 +326,7 @@ describe('AuthManager', () => {
 
       await expect(() => manager.logout()).rejects.toThrow(
         new PassportError(
-          `${PassportErrorType.LOGOUT_ERROR}: ${mockErrorMsg}`,
+          mockErrorMsg,
           PassportErrorType.LOGOUT_ERROR,
         ),
       );
@@ -314,12 +334,56 @@ describe('AuthManager', () => {
   });
 
   describe('getUser', () => {
+    describe('when forceRefresh is set to true', () => {
+      it('should call signinSilent and return the domain model', async () => {
+        signinSilentMock.mockReturnValue(mockOidcUser);
+
+        const result = await authManager.getUser({ forceRefresh: true });
+
+        expect(result).toEqual(mockUser);
+        expect(signinSilentMock).toBeCalled();
+        expect(getUserMock).not.toBeCalled();
+      });
+    });
+
     it('should retrieve the user from the userManager and return the domain model', async () => {
       getUserMock.mockReturnValue(mockOidcUser);
+      (isTokenExpired as jest.Mock).mockReturnValue(false);
 
       const result = await authManager.getUser();
 
       expect(result).toEqual(mockUser);
+    });
+
+    it('should call signinSilent and returns user when user token is expired with the refresh token', async () => {
+      getUserMock.mockReturnValue(mockOidcExpiredUser);
+      (isTokenExpired as jest.Mock).mockReturnValue(true);
+      signinSilentMock.mockResolvedValue(mockOidcUser);
+
+      const result = await authManager.getUser();
+
+      expect(signinSilentMock).toBeCalledTimes(1);
+      expect(result).toEqual(mockUser);
+    });
+
+    it('should return null when the user token is expired without refresh token', async () => {
+      getUserMock.mockReturnValue(mockOidcExpiredNoRefreshTokenUser);
+      (isTokenExpired as jest.Mock).mockReturnValue(true);
+
+      const result = await authManager.getUser();
+
+      expect(signinSilentMock).toBeCalledTimes(0);
+      expect(result).toEqual(null);
+    });
+
+    it('should return null when the user token is expired with the refresh token, but signinSilent returns null', async () => {
+      getUserMock.mockReturnValue(mockOidcExpiredUser);
+      (isTokenExpired as jest.Mock).mockReturnValue(true);
+      signinSilentMock.mockResolvedValue(null);
+      const result = await authManager.getUser();
+
+      expect(signinSilentMock).toBeCalledTimes(1);
+      expect(result).toEqual(null);
     });
 
     it('should return null if no user is returned', async () => {

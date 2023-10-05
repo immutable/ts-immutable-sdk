@@ -1,8 +1,41 @@
-import { GasEstimateBridgeToL2Result, GasEstimateSwapResult, GasEstimateType } from '@imtbl/checkout-sdk';
+import {
+  GasEstimateBridgeToL2Result, GasEstimateSwapResult, GasEstimateType, OnRampProviderFees,
+} from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
-import { formatFiatDecimals, getBridgeFeeEstimation, getSwapFeeEstimation } from './feeEstimation';
+import {
+  formatFiatDecimals, getBridgeFeeEstimation, getOnRampFeeEstimation, getSwapFeeEstimation,
+} from './feeEstimation';
 
 describe('feeEstimation', () => {
+  describe('getOnRampFeeEstimation', () => {
+    it('should get the onramp fee estimation', () => {
+      const onRampFee = {
+        minPercentage: '3.5',
+        maxPercentage: '5.5',
+      } as OnRampProviderFees;
+
+      expect(getOnRampFeeEstimation(onRampFee)).toEqual('3.5% to 5.5');
+    });
+
+    it('should return -.-- if no minPercentage', () => {
+      const onRampFee = {
+        minPercentage: undefined,
+        maxPercentage: '5.5',
+      } as OnRampProviderFees;
+
+      expect(getOnRampFeeEstimation(onRampFee)).toEqual('-.--');
+    });
+
+    it('should return -.-- if no maxPercentage', () => {
+      const onRampFee = {
+        minPercentage: '3.5',
+        maxPercentage: undefined,
+      } as OnRampProviderFees;
+
+      expect(getOnRampFeeEstimation(onRampFee)).toEqual('-.--');
+    });
+  });
+
   describe('getSwapFeeEstimation', () => {
     it('should get the swap fee estimation', () => {
       const swapFee = {

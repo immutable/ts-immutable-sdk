@@ -3,16 +3,27 @@ import { PopulatedTransaction } from 'ethers';
 import { CheckoutConfiguration } from '../../config';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import * as instance from '../../instance';
-import { signFulfilmentTransactions } from '../actions';
-import { CancelResponse, CancelStatusType } from '../../types';
+import { signFulfillmentTransactions } from '../actions';
+import {
+  CancelResult,
+  CheckoutStatus,
+} from '../../types';
 import { SignTransactionStatusType } from '../actions/types';
 
 export const cancel = async (
   config: CheckoutConfiguration,
   provider: Web3Provider,
-  orderId: string,
-): Promise<CancelResponse> => {
+  orderIds: string[],
+): Promise<CancelResult> => {
   let unsignedCancelOrderTransaction: PopulatedTransaction;
+  if (orderIds.length === 0) {
+    throw new CheckoutError(
+      'No orderIds were passed in, must pass at least one orderId to cancel',
+      CheckoutErrorType.CANCEL_ORDER_LISTING_ERROR,
+    );
+  }
+  // Update this when bulk cancel is supported
+  const orderId = orderIds[0];
   try {
     const offererAddress = await provider.getSigner().getAddress();
     const orderbook = await instance.createOrderbookInstance(config);
@@ -32,22 +43,16 @@ export const cancel = async (
     );
   }
 
-  const result = await signFulfilmentTransactions(provider, [unsignedCancelOrderTransaction]);
+  const result = await signFulfillmentTransactions(provider, [unsignedCancelOrderTransaction]);
   if (result.type === SignTransactionStatusType.FAILED) {
     return {
-      orderId,
-      status: {
-        type: CancelStatusType.FAILED,
-        transactionHash: result.transactionHash,
-        reason: result.reason,
-      },
+      status: CheckoutStatus.FAILED,
+      transactionHash: result.transactionHash,
+      reason: result.reason,
     };
   }
 
   return {
-    orderId,
-    status: {
-      type: CancelStatusType.SUCCESS,
-    },
+    status: CheckoutStatus.SUCCESS,
   };
 };

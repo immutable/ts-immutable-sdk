@@ -1,8 +1,9 @@
 import { Web3Provider } from '@ethersproject/providers';
 import {
-  FulfilmentTransaction,
+  FulfillmentTransaction,
   GasAmount,
-  ItemRequirement, SmartCheckoutResult, TransactionRequirement,
+  ItemRequirement,
+  SmartCheckoutResult,
 } from '../types/smartCheckout';
 import { itemAggregator } from './aggregators';
 import {
@@ -13,39 +14,14 @@ import { balanceCheck } from './balanceCheck';
 import { CheckoutConfiguration } from '../config';
 import { allowanceAggregator } from './aggregators/allowanceAggregator';
 import { gasCalculator } from './gas';
-import { BalanceCheckResult } from './balanceCheck/types';
-import { routingOptionsAvailable } from './routing';
+import { getAvailableRoutingOptions } from './routing';
 import { routingCalculator } from './routing/routingCalculator';
-
-export const getSmartCheckoutResult = (
-  balanceCheckResult: BalanceCheckResult,
-): SmartCheckoutResult => {
-  let sufficient = true;
-  const transactionRequirements: TransactionRequirement[] = [];
-
-  for (const balance of balanceCheckResult.balanceRequirements) {
-    if (!balance.sufficient) sufficient = false;
-
-    transactionRequirements.push({
-      type: balance.type,
-      sufficient: balance.sufficient,
-      required: balance.required,
-      current: balance.current,
-      delta: balance.delta,
-    });
-  }
-
-  return {
-    sufficient,
-    transactionRequirements,
-  };
-};
 
 export const smartCheckout = async (
   config: CheckoutConfiguration,
   provider: Web3Provider,
   itemRequirements: ItemRequirement[],
-  transactionOrGasAmount: FulfilmentTransaction | GasAmount,
+  transactionOrGasAmount: FulfillmentTransaction | GasAmount,
 ): Promise<SmartCheckoutResult> => {
   const ownerAddress = await provider.getSigner().getAddress();
   let aggregatedItems = itemAggregator(itemRequirements);
@@ -60,17 +36,33 @@ export const smartCheckout = async (
     aggregatedItems = itemAggregator(aggregatedItems);
   }
 
-  const balanceRequirements = await balanceCheck(config, provider, ownerAddress, aggregatedItems);
+  const balanceCheckResult = await balanceCheck(config, provider, ownerAddress, aggregatedItems);
+  const { sufficient } = balanceCheckResult;
+  const transactionRequirements = balanceCheckResult.balanceRequirements;
 
-  // Determine which services are available
-  const availableRoutingOptions = await routingOptionsAvailable(config, provider);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const fundingRoutes = await routingCalculator(
+  if (sufficient) {
+    return {
+      sufficient,
+      transactionRequirements,
+    };
+  }
+
+  const availableRoutingOptions = await getAvailableRoutingOptions(config, provider);
+  const routingOutcome = await routingCalculator(
     config,
     ownerAddress,
-    balanceRequirements,
+    balanceCheckResult,
     availableRoutingOptions,
   );
 
-  return getSmartCheckoutResult(balanceRequirements);
+  const isPassport = (provider.provider as any)?.isPassport || false;
+  return {
+    sufficient,
+    transactionRequirements,
+    router: {
+      isPassport,
+      availableRoutingOptions,
+      routingOutcome,
+    },
+  };
 };

@@ -1,6 +1,7 @@
 import React from 'react';
 import { WalletProviderName } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
+import { BiomePortalIdProvider } from '@biom3/react';
 import { WalletWidget } from './WalletWidget';
 import {
   ConnectLoader,
@@ -10,13 +11,29 @@ import { sendWalletWidgetCloseEvent } from './WalletWidgetEvents';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
 import { ConnectTargetLayer, getL1ChainId, getL2ChainId } from '../../lib';
 import { isValidWalletProvider } from '../../lib/validations/widgetValidators';
+import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 
 export class ImmutableWallet extends ImmutableWebComponent {
   walletProvider: WalletProviderName | undefined = undefined;
 
+  static get observedAttributes(): string[] {
+    const baseObservedAttributes = super.observedAttributes;
+    return [...baseObservedAttributes, 'walletprovider'];
+  }
+
   connectedCallback() {
     super.connectedCallback();
     this.walletProvider = this.getAttribute('walletProvider')?.toLowerCase() as WalletProviderName;
+    this.renderWidget();
+  }
+
+  attributeChangedCallback(name: string, oldValue: any, newValue: any): void {
+    super.attributeChangedCallback(name, oldValue, newValue);
+
+    if (name === 'walletprovider') {
+      this.walletProvider = newValue.toLowerCase() as WalletProviderName;
+    }
+
     this.renderWidget();
   }
 
@@ -46,15 +63,19 @@ export class ImmutableWallet extends ImmutableWebComponent {
     }
     this.reactRoot.render(
       <React.StrictMode>
-        <ConnectLoader
-          widgetConfig={this.widgetConfig!}
-          params={connectLoaderParams}
-          closeEvent={() => sendWalletWidgetCloseEvent(window)}
-        >
-          <WalletWidget
-            config={this.widgetConfig!}
-          />
-        </ConnectLoader>
+        <BiomePortalIdProvider>
+          <CustomAnalyticsProvider widgetConfig={this.widgetConfig!}>
+            <ConnectLoader
+              widgetConfig={this.widgetConfig!}
+              params={connectLoaderParams}
+              closeEvent={() => sendWalletWidgetCloseEvent(window)}
+            >
+              <WalletWidget
+                config={this.widgetConfig!}
+              />
+            </ConnectLoader>
+          </CustomAnalyticsProvider>
+        </BiomePortalIdProvider>
       </React.StrictMode>,
     );
   }

@@ -54,19 +54,17 @@ function Trade({ showModal: showTradeModal, setShowModal: setShowTradeModal }: M
       const request: GetSignableTradeRequest = {
         order_id: id,
         user,
+        fees: [{
+          address: '0x8e70719571e87a328696ad099a7d9f6adc120892',
+          fee_percentage: 1,
+        }],
       };
       const createTradeResponse = await imxProvider?.createTrade(request);
-      if (createTradeResponse) {
-        setLoadingTrade(false);
-        setTradeIndex(null);
-        addMessage(`Successfully purchased with Order ID ${id}`);
-        handleCloseTrade();
-      }
+      addMessage('Create Trade', createTradeResponse);
     } catch (err) {
-      if (err instanceof Error) {
-        addMessage(err.toString());
-        handleCloseTrade();
-      }
+      addMessage('Create Trade', err);
+    } finally {
+      handleCloseTrade();
     }
   };
 
@@ -106,7 +104,8 @@ function Trade({ showModal: showTradeModal, setShowModal: setShowTradeModal }: M
                 <Table striped bordered hover responsive>
                   <thead>
                     <tr>
-                      <th style={{ width: '10%' }}>ID</th>
+                      <th>ID</th>
+                      <th>Name</th>
                       <th style={{ width: '10%' }}>Image</th>
                       <th>Price</th>
                       <th>Action</th>
@@ -118,6 +117,7 @@ function Trade({ showModal: showTradeModal, setShowModal: setShowTradeModal }: M
                       return (
                         <tr key={order.order_id}>
                           <td>{ order.order_id }</td>
+                          <td>{ order.sell.data.properties?.name }</td>
                           <td>
                             <Image
                               src={order.sell.data.properties?.image_url || undefined}
@@ -131,7 +131,7 @@ function Trade({ showModal: showTradeModal, setShowModal: setShowTradeModal }: M
                           <td>
                             { !loadingTrade
                             && (
-                              <Stack direction="horizontal" gap={3}>
+                              <Stack gap={3}>
                                 <Button
                                   size="sm"
                                   variant="dark"

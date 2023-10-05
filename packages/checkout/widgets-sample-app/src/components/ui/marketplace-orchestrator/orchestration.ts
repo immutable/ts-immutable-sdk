@@ -23,6 +23,10 @@ export function handleOrchestrationEvent(
       setShowWidgets({...hideAllWidgets, showBridge: {show: true, data: event.detail.data}})
       return;
     }
+    case OrchestrationEventType.REQUEST_ONRAMP: {
+      setShowWidgets({...hideAllWidgets, showOnRamp: {show: true, data: event.detail.data}})
+      return;
+    }
     default: {
       console.log('orchestration event not handled')
       return

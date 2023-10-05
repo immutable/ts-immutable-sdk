@@ -35,7 +35,7 @@ describe('getStarkSigner', () => {
       await getStarkSigner(wallet);
     }).rejects.toThrow(
       new PassportError(
-        `${PassportErrorType.WALLET_CONNECTION_ERROR}: ${errorMessage}`,
+        errorMessage,
         PassportErrorType.WALLET_CONNECTION_ERROR,
       ),
     );

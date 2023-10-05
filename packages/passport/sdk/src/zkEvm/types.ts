@@ -14,6 +14,7 @@ export interface RelayerTransaction {
   chainId: string;
   relayerId: string;
   hash: string;
+  statusMessage?: string;
 }
 
 export interface FeeOption {
@@ -41,6 +42,23 @@ export interface MetaTransactionNormalised {
   target: string
   value: BigNumberish
   data: BytesLike
+}
+
+// https://eips.ethereum.org/EIPS/eip-712
+export interface TypedDataPayload {
+  types: {
+    EIP712Domain: Array<{ name: string; type: string }>;
+    [key: string]: Array<{ name: string; type: string }>;
+  };
+  domain: {
+    name?: string;
+    version? :string;
+    chainId?: number;
+    verifyingContract?: string;
+    salt?: string;
+  };
+  primaryType: string;
+  message: Record<string, any>;
 }
 
 export interface RequestArguments {

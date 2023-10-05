@@ -45,11 +45,21 @@ import {
   GasEstimateSwapResult,
   GasEstimateBridgeToL2Result,
   SmartCheckoutParams,
+  TokenFilterTypes,
+  OnRampProviderFees,
+  FiatRampParams,
+  SmartCheckoutResult,
+  CancelResult,
+  BuyResult,
+  SellResult,
 } from './types';
 import { CheckoutConfiguration } from './config';
 import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
 import { SellParams } from './types/sell';
 import { CancelParams } from './types/cancel';
+import { FiatRampService, FiatRampWidgetParams } from './fiatRamp';
+import { getItemRequirementsFromRequirements } from './smartCheckout/itemRequirements';
+import { CheckoutError, CheckoutErrorType } from './errors';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
@@ -59,6 +69,8 @@ const SANDBOX_CONFIGURATION = {
 
 export class Checkout {
   readonly config: CheckoutConfiguration;
+
+  readonly fiatRampService: FiatRampService;
 
   private readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>;
 
@@ -70,6 +82,7 @@ export class Checkout {
     config: CheckoutModuleConfiguration = SANDBOX_CONFIGURATION,
   ) {
     this.config = new CheckoutConfiguration(config);
+    this.fiatRampService = new FiatRampService(this.config);
     this.readOnlyProviders = new Map<ChainId, ethers.providers.JsonRpcProvider>();
   }
 
@@ -273,7 +286,7 @@ export class Checkout {
   */
   public async buy(
     params: BuyParams,
-  ): Promise<void> {
+  ): Promise<BuyResult> {
     if (this.config.isProduction) {
       throw new Error('This endpoint is not currently available.');
     }
@@ -281,21 +294,28 @@ export class Checkout {
     // eslint-disable-next-line no-console
     console.warn('This endpoint is currently under construction.');
 
+    if (params.orders.length > 1) {
+      // eslint-disable-next-line no-console
+      console.warn('This endpoint currently only processes the first order in the array.');
+    }
+
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
     );
 
-    await buy.buy(this.config, web3Provider, params.orderId);
+    return await buy.buy(this.config, web3Provider, params.orders);
   }
 
   /**
    * Determines the requirements for performing a sell.
    * @param {SellParams} params - The parameters for the sell.
+   * Only currently actions the first order in the array until we support batch processing.
+   * Only currently actions the first fee in the fees array of each order until we support multiple fees.
   */
   public async sell(
     params: SellParams,
-  ): Promise<void> {
+  ): Promise<SellResult> {
     if (this.config.isProduction) {
       throw new Error('This endpoint is not currently available.');
     }
@@ -303,17 +323,20 @@ export class Checkout {
     // eslint-disable-next-line no-console
     console.warn('This endpoint is currently under construction.');
 
+    if (params.orders.length > 1) {
+      // eslint-disable-next-line no-console
+      console.warn('This endpoint currently only processes the first order in the array.');
+    }
+
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
     );
 
-    await sell.sell(
+    return await sell.sell(
       this.config,
       web3Provider,
-      params.id,
-      params.collectionAddress,
-      params.buyToken,
+      params.orders,
     );
   }
 
@@ -323,7 +346,7 @@ export class Checkout {
    */
   public async cancel(
     params: CancelParams,
-  ): Promise<void> {
+  ): Promise<CancelResult> {
     if (this.config.isProduction) {
       throw new Error('This endpoint is not currently available.');
     }
@@ -331,12 +354,15 @@ export class Checkout {
     // eslint-disable-next-line no-console
     console.warn('This endpoint is currently under construction.');
 
+    // eslint-disable-next-line no-console
+    console.warn('This endpoint currently only processes the first order in the array.');
+
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
     );
 
-    await cancel.cancel(this.config, web3Provider, params.orderId);
+    return await cancel.cancel(this.config, web3Provider, params.orderIds);
   }
 
   /**
@@ -345,7 +371,7 @@ export class Checkout {
    */
   public async smartCheckout(
     params: SmartCheckoutParams,
-  ): Promise<void> {
+  ): Promise<SmartCheckoutResult> {
     if (this.config.isProduction) {
       throw new Error('This endpoint is not currently available.');
     }
@@ -358,11 +384,17 @@ export class Checkout {
       params.provider,
     );
 
-    // console.log('Smart Checkout Params ::', params);
-    await smartCheckout.smartCheckout(
+    let itemRequirements = [];
+    try {
+      itemRequirements = await getItemRequirementsFromRequirements(web3Provider, params.itemRequirements);
+    } catch {
+      throw new CheckoutError('Failed to map item requirements', CheckoutErrorType.ITEM_REQUIREMENTS_ERROR);
+    }
+
+    return await smartCheckout.smartCheckout(
       this.config,
       web3Provider,
-      params.itemRequirements,
+      itemRequirements,
       params.transactionOrGasAmount,
     );
   }
@@ -396,5 +428,48 @@ export class Checkout {
       this.readOnlyProviders,
       this.config,
     );
+  }
+
+  /**
+   * Creates and returns a URL for the fiat ramp widget.
+   * @param {FiatRampParams} params - The parameters for creating the url.
+   * @returns {Promise<string>} - A promise that resolves to a string url.
+   */
+  public async createFiatRampUrl(params: FiatRampParams): Promise<string> {
+    let tokenAmount;
+    let tokenSymbol = 'IMX';
+    let email;
+
+    const walletAddress = await params.web3Provider.getSigner().getAddress();
+    const isPassport = (params.web3Provider.provider as any)?.isPassport || false;
+
+    if (isPassport && params.passport) {
+      const userInfo = await params.passport.getUserInfo();
+      email = userInfo?.email;
+    }
+
+    const tokenList = await tokens.getTokenAllowList(this.config, { type: TokenFilterTypes.ONRAMP });
+    const token = tokenList.tokens.find((t) => t.address?.toLowerCase() === params.tokenAddress?.toLowerCase());
+    if (token) {
+      tokenAmount = params.tokenAmount;
+      tokenSymbol = token.symbol;
+    }
+
+    return await this.fiatRampService.createWidgetUrl({
+      exchangeType: params.exchangeType,
+      isPassport,
+      walletAddress,
+      tokenAmount,
+      tokenSymbol,
+      email,
+    } as FiatRampWidgetParams);
+  }
+
+  /**
+   * Fetches fiat ramp fee estimations.
+   * @returns {Promise<OnRampProviderFees>} - A promise that resolves to OnRampProviderFees.
+   */
+  public async getExchangeFeeEstimate(): Promise<OnRampProviderFees> {
+    return await this.fiatRampService.feeEstimate();
   }
 }

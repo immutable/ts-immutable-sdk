@@ -1,4 +1,9 @@
-import { Dispatch, SetStateAction, PropsWithChildren } from 'react';
+import {
+  Dispatch,
+  SetStateAction,
+  PropsWithChildren,
+  ComponentType,
+} from 'react';
 import { RequestArguments } from '@imtbl/passport';
 import { Order } from '@imtbl/core-sdk';
 
@@ -26,7 +31,19 @@ export interface MakeOfferModalProps extends ModalProps {
   onClose?: () => void;
 }
 
+export interface ViewOffersModalProps extends ModalProps {
+  buyTokenAddress: string;
+  buyTokenId: string;
+  onClose?: () => void;
+}
+
 export interface RequestExampleProps {
   handleExampleSubmitted: (request: RequestArguments) => Promise<void>;
   disabled: boolean;
+}
+
+export interface RequestExampleAccordionProps {
+  disabled: boolean;
+  handleExampleSubmitted: (request: RequestArguments) => Promise<void>;
+  examples: Array<ComponentType<RequestExampleProps>>;
 }

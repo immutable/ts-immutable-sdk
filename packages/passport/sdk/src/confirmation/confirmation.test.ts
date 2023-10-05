@@ -7,6 +7,7 @@ import ConfirmationScreen from './confirmation';
 import SpyInstance = jest.SpyInstance;
 import { testConfig } from '../test/mocks';
 import { PassportConfiguration } from '../config';
+import { PASSPORT_EVENT_TYPE, ReceiveMessage } from './types';
 
 let windowSpy: SpyInstance;
 const closeMock = jest.fn();
@@ -70,6 +71,26 @@ describe('confirmation', () => {
     });
   });
 
+  describe('logout', () => {
+    it('should logout the confirmation screen', async () => {
+      const mockedSuccessReturnValue = {
+        origin: testConfig.passportDomain,
+        data: {
+          eventType: PASSPORT_EVENT_TYPE,
+          messageType: ReceiveMessage.LOGOUT_SUCCESS,
+        },
+      };
+      addEventListenerMock
+        .mockImplementationOnce((event, callback) => {
+          callback(mockedSuccessReturnValue);
+        });
+
+      const result = await confirmationScreen.logout();
+
+      expect(addEventListenerMock).toHaveBeenCalledTimes(1);
+      expect(result.logout).toEqual(true);
+    });
+  });
   describe('requestConfirmation', () => {
     it('should handle popup window opened', async () => {
       const transactionId = 'transactionId123';
@@ -81,7 +102,16 @@ describe('confirmation', () => {
       confirmationScreen.loading();
 
       expect(res.confirmed).toEqual(false);
-      expect(mockNewWindow.location.href).toEqual('https://passport.sandbox.immutable.com/transaction-confirmation/transaction.html?transactionId=transactionId123&imxEtherAddress=0x1234&chainType=starkex');
+      expect(mockNewWindow.location.href).toEqual('https://passport.sandbox.immutable.com/transaction-confirmation/transaction?transactionId=transactionId123&imxEtherAddress=0x1234&chainType=starkex');
+    });
+  });
+
+  describe('requestMessageConfirmation', () => {
+    it('should open a window when confirmation is required', async () => {
+      const res = await confirmationScreen.requestMessageConfirmation('asd123');
+      confirmationScreen.loading();
+      expect(res.confirmed).toEqual(false);
+      expect(mockNewWindow.location.href).toEqual('https://passport.sandbox.immutable.com/transaction-confirmation/zkevm/message?messageID=asd123');
     });
   });
 });

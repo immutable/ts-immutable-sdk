@@ -116,17 +116,10 @@ function Transfer({ showModal, setShowModal }: ModalProps) {
           }
         }
         const transferResponse = await imxProvider?.transfer(request);
-        if (transferResponse) {
-          setLoadingTransfer(false);
-          if (amount) {
-            addMessage('Transfer', `Transferred ${token} ${amount} to  ${receiver}`);
-          } else {
-            addMessage('Transfer', `Transferred to ${receiver}`);
-          }
-          handleClose();
-        }
+        addMessage('Transfer', transferResponse);
       } catch (err) {
         addMessage('Transfer', err);
+      } finally {
         handleClose();
       }
     } else {

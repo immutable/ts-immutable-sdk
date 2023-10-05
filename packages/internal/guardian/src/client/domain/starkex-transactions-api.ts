@@ -13,9 +13,8 @@
  */
 
 
-import type { Configuration } from '../configuration';
-import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
-import globalAxios from 'axios';
+import globalAxios, { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import { Configuration } from '../configuration';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
@@ -107,13 +106,13 @@ export const StarkexTransactionsApiFactory = function (configuration?: Configura
         /**
          * Check if it is a valid transaction by payload hash
          * @summary Evaluate if it is an valid transaction
-         * @param {StarkexTransactionsApiEvaluateStarkexTransactionRequest} requestParameters Request parameters.
+         * @param {string} payloadHash Hash for the payload
          * @param {*} [options] Override http request option.
          * @deprecated
          * @throws {RequiredError}
          */
-        evaluateStarkexTransaction(requestParameters: StarkexTransactionsApiEvaluateStarkexTransactionRequest, options?: AxiosRequestConfig): AxiosPromise<TransactionEvaluationResponse> {
-            return localVarFp.evaluateStarkexTransaction(requestParameters.payloadHash, options).then((request) => request(axios, basePath));
+        evaluateStarkexTransaction(payloadHash: string, options?: any): AxiosPromise<TransactionEvaluationResponse> {
+            return localVarFp.evaluateStarkexTransaction(payloadHash, options).then((request) => request(axios, basePath));
         },
     };
 };

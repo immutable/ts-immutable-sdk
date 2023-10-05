@@ -5,6 +5,8 @@ import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes
 import { SharedViews } from '../../context/view-context/ViewContext';
 import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
+import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextTypes';
+import { PrimaryRevenueWidgetViews } from '../../context/view-context/PrimaryRevenueViewContextTypes';
 
 export const text = {
   views: {
@@ -51,8 +53,7 @@ export const text = {
         },
       },
       zkEVM: {
-        heading:
-          'You’ll be asked to switch to the Immutable zkEVM network',
+        heading: 'You’ll be asked to switch to the Immutable zkEVM network',
         body: "Check for the pop-up from MetaMask and 'Approve' to switch. If this is the first time, MetaMask will also ask you to add the network.",
         button: {
           text: 'Ready to Switch',
@@ -98,7 +99,8 @@ export const text = {
       },
       passport: {
         heading: 'Coins and collectibles are native to networks',
-        body1: 'This network is called Immutable zkEVM. If you have other coins in your Passport and can’t see them here, they might be on another network. ',
+        body1:
+          'This network is called Immutable zkEVM. If you have other coins in your Passport and can’t see them here, they might be on another network. ',
         body2: ' for more info.',
         linkText: 'Visit our FAQs',
       },
@@ -166,14 +168,16 @@ export const text = {
       approveSpending: {
         content: {
           metamask: {
-            heading: "You'll be asked to set a spending cap for this transaction",
+            heading:
+              "You'll be asked to set a spending cap for this transaction",
             body: [
               'Input at least',
               'for this transaction and future transactions, then follow the prompts.',
             ],
           },
           passport: {
-            heading: "You'll be asked to approve a spending cap for this transaction",
+            heading:
+              "You'll be asked to approve a spending cap for this transaction",
             body: 'Follow the prompts in your wallet to approve the spending cap.',
           },
         },
@@ -214,7 +218,8 @@ export const text = {
     [BridgeWidgetViews.IN_PROGRESS]: {
       heading: 'Move in progress',
       body1: (symbol: string) => `Less than 3 mins until your ${symbol} lands on zkEVM.`,
-      body2: 'You can close this window, the transaction will be reflected in your wallet once complete.',
+      body2:
+        'You can close this window, the transaction will be reflected in your wallet once complete.',
     },
     [BridgeWidgetViews.APPROVE_ERC20]: {
       approveBridge: {
@@ -257,6 +262,32 @@ export const text = {
       body: "Moving funds across networks currently isn't supported for Passport.",
       actionText: 'Dismiss',
     },
+    [OnRampWidgetViews.ONRAMP]: {
+      header: {
+        title: 'Add coins',
+      },
+      initialLoadingText: 'Taking you to Transak',
+      [OnRampWidgetViews.IN_PROGRESS_LOADING]: {
+        loading: {
+          text: 'Transak is processing your order',
+        },
+      },
+      [OnRampWidgetViews.IN_PROGRESS]: {
+        content: {
+          heading: 'Order in progress',
+          body1: 'You’ll receive an email from Transak when complete. This can take up to 3 mins.',
+          body2: 'You can close this window, the transaction will be reflected in your wallet once complete.',
+        },
+      },
+      [OnRampWidgetViews.SUCCESS]: {
+        text: 'Coins are on the way',
+        actionText: 'Done',
+      },
+      [OnRampWidgetViews.FAIL]: {
+        text: 'Transaction failed',
+        actionText: 'Try again',
+      },
+    },
     [SharedViews.TOP_UP_VIEW]: {
       header: {
         title: 'How would you like to add coins?',
@@ -264,19 +295,49 @@ export const text = {
       topUpOptions: {
         onramp: {
           heading: 'Buy with card',
-          caption: 'Google pay & Apple pay available. Minimum $20.',
-          subcaption: 'Fees ≈ 0.3%',
+          caption: 'Google pay & Apple pay available. Minimum $5.',
+          subcaption: 'Fees',
         },
         swap: {
           heading: 'Swap my coins',
           caption: 'Using the coins I have on the same network',
-          subcaption: 'Fees ≈',
+          subcaption: 'Fees',
         },
         bridge: {
           heading: 'Move my coins',
           caption: 'From the coins I have on a different network',
-          subcaption: 'Fees ≈',
+          subcaption: 'Fees ',
         },
+      },
+    },
+    [PrimaryRevenueWidgetViews.PAYMENT_METHODS]: {
+      header: {
+        heading: 'How would you like to pay?',
+      },
+      options: {
+        [PrimaryRevenueWidgetViews.PAY_WITH_COINS]: {
+          heading: 'Coins',
+          caption: 'Using the coins balance in your wallet',
+        },
+        [PrimaryRevenueWidgetViews.PAY_WITH_CARD]: {
+          heading: 'Card',
+          caption: 'GooglePay also available with Transak',
+        },
+      },
+    },
+    [PrimaryRevenueWidgetViews.PAY_WITH_COINS]: {
+      header: {
+        heading: 'Pay with your coins',
+        caption: 'Using the coins balance in your wallet',
+      },
+      button: {
+        buyNow: 'Buy now',
+      },
+    },
+    [PrimaryRevenueWidgetViews.PAY_WITH_CARD]: {
+      header: {
+        heading: 'Pay with card',
+        caption: 'Powered by Transak',
       },
     },
   },
@@ -284,8 +345,7 @@ export const text = {
     [WalletProviderName.PASSPORT]: {
       heading: 'Immutable Passport',
       accentText: 'Recommended',
-      description:
-        'digital wallet and identity',
+      description: 'digital wallet and identity',
     },
     [WalletProviderName.METAMASK]: {
       heading: 'MetaMask',

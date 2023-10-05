@@ -5,11 +5,13 @@ import {
   ImtblSwapProps,
   ImtblBridgeProps,
   ImtblSmartProps,
+  ImtblOnRampProps,
   ImtblExampleProps,
   ImtblBuyProps,
   ImtblTransitionExampleProps,
   ImtblInnerWidgetExampleProps,
   ImtblOuterWidgetExampleProps,
+  ImtblPrimaryRevenueProps,
 } from '@imtbl/checkout-widgets';
 
 declare global {
@@ -23,7 +25,9 @@ declare global {
       'imtbl-swap': ImtblSwapProps;
       'imtbl-bridge': ImtblBridgeProps;
       'imtbl-smart-checkout': ImtblSmartProps;
+      'imtbl-onramp': ImtblOnRampProps;
       'imtbl-buy': ImtblBuyProps;
+      'imtbl-primary-revenue': ImtblPrimaryRevenueProps;
       'imtbl-example': ImtblExampleProps;
       'imtbl-transition-example': ImtblTransitionExampleProps;
       'imtbl-inner-widget-example': ImtblInnerWidgetExampleProps;

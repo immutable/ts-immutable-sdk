@@ -4,7 +4,7 @@ import { BigNumber, ethers } from 'ethers';
 import { ConfirmationScreen } from '../confirmation';
 import { retryWithDelay } from '../network/retry';
 import { JsonRpcError, RpcErrorCode } from '../zkEvm/JsonRpcError';
-import { MetaTransaction } from '../zkEvm/types';
+import { MetaTransaction, TypedDataPayload } from '../zkEvm/types';
 import { UserZkEvm } from '../types';
 import { PassportConfiguration } from '../config';
 
@@ -24,6 +24,12 @@ type GuardianEVMValidationParams = {
   nonce: string;
   user: UserZkEvm;
   metaTransactions: MetaTransaction[];
+};
+
+type GuardianMessageValidationParams = {
+  chainID: string;
+  payload: TypedDataPayload;
+  user: UserZkEvm
 };
 
 const transactionRejectedCrossSdkBridgeError = 'Transaction requires confirmation but this functionality is not'
@@ -57,6 +63,8 @@ const transformGuardianTransactions = (
 export default class GuardianClient {
   private readonly transactionAPI: guardian.TransactionsApi;
 
+  private readonly messageAPI: guardian.MessagesApi;
+
   private readonly confirmationScreen: ConfirmationScreen;
 
   // TODO: ID-977, make this rollup agnostic
@@ -70,15 +78,14 @@ export default class GuardianClient {
     imxEtherAddress,
     config,
   }: GuardianClientParams) {
+    const guardianConfiguration = new guardian.Configuration({ accessToken, basePath: config.imxPublicApiDomain });
     this.confirmationScreen = confirmationScreen;
     this.transactionAPI = new guardian.TransactionsApi(
-      new guardian.Configuration({
-        accessToken,
-        basePath: config.imxPublicApiDomain,
-      }),
+      new guardian.Configuration(guardianConfiguration),
     );
     this.imxEtherAddress = imxEtherAddress;
     this.crossSdkBridgeEnabled = config.crossSdkBridgeEnabled;
+    this.messageAPI = new guardian.MessagesApi(guardianConfiguration);
   }
 
   /**
@@ -223,6 +230,42 @@ export default class GuardianClient {
         throw new JsonRpcError(
           RpcErrorCode.TRANSACTION_REJECTED,
           'Transaction rejected by user',
+        );
+      }
+    } else {
+      this.confirmationScreen.closeWindow();
+    }
+  }
+
+  private async evaluateMessage(
+    { chainID, payload, user }:GuardianMessageValidationParams,
+  ): Promise<guardian.MessageEvaluationResponse> {
+    try {
+      const messageEvalResponse = await this.messageAPI.evaluateMessage(
+        { messageEvaluationRequest: { chainID, payload } },
+        { headers: { Authorization: `Bearer ${user.accessToken}` } },
+      );
+      return messageEvalResponse.data;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, `Message failed to validate with error: ${errorMessage}`);
+    }
+  }
+
+  public async validateMessage({ chainID, payload, user }: GuardianMessageValidationParams) {
+    const { messageId, confirmationRequired } = await this.evaluateMessage({ chainID, payload, user });
+    if (confirmationRequired && this.crossSdkBridgeEnabled) {
+      throw new JsonRpcError(RpcErrorCode.TRANSACTION_REJECTED, transactionRejectedCrossSdkBridgeError);
+    }
+    if (confirmationRequired && !!messageId) {
+      const confirmationResult = await this.confirmationScreen.requestMessageConfirmation(
+        messageId,
+      );
+
+      if (!confirmationResult.confirmed) {
+        throw new JsonRpcError(
+          RpcErrorCode.TRANSACTION_REJECTED,
+          'Signature rejected by user',
         );
       }
     } else {

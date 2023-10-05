@@ -5,7 +5,7 @@ import React, {
   useState,
 } from 'react';
 import {
-  Alert, Button, Form, Image, InputGroup, Offcanvas, Spinner, Table,
+  Alert, Button, Form, Image, InputGroup, Offcanvas, Spinner, Stack, Table,
 } from 'react-bootstrap';
 import { Heading } from '@biom3/react';
 import { Asset, Order as OrderType, UnsignedOrderRequest } from '@imtbl/core-sdk';
@@ -13,12 +13,15 @@ import { ModalProps } from '@/types';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { useStatusProvider } from '@/context/StatusProvider';
 import { usePassportProvider } from '@/context/PassportProvider';
+import ViewOffersModal from '@/components/imx/ViewOffersModal';
 
 type AssetWithSellOrder = { asset: Asset; sellOrder?: OrderType };
 
 function Order({ showModal, setShowModal }: ModalProps) {
+  const [showViewOffers, setShowViewOffers] = useState<boolean>(false);
+  const [offerBuyTokenAddress, setOfferBuyTokenAddress] = useState<string>('');
+  const [offerBuyTokenId, setOfferBuyTokenId] = useState<string>('');
   const [userAssets, setUserAssets] = useState<AssetWithSellOrder[]>([]);
-  const [needReload, setNeedReload] = useState(false);
   const [loading, setLoading] = useState(true);
   const [sellingPrice, setSellingPrice] = useState<string>('0.01');
 
@@ -48,55 +51,28 @@ function Order({ showModal, setShowModal }: ModalProps) {
         setUserAssets([]);
         const assetsWithOrder = await getUserAssetsWithOrder();
         setUserAssets(assetsWithOrder);
-        setNeedReload(false);
         setLoading(false);
       })();
     }
   }, [getUserAssetsWithOrder, showModal]);
-
-  useEffect(() => {
-    if (needReload) {
-      setTimeout(() => {
-        (async () => {
-          const assetsWithOrder = await getUserAssetsWithOrder();
-          setUserAssets(assetsWithOrder);
-          setNeedReload(false);
-          setLoading(false);
-        })();
-      }, 2000);
-    }
-  }, [getUserAssetsWithOrder, needReload]);
-
-  useEffect(() => {
-    (async () => {
-      const assetsWithOrder = await getUserAssetsWithOrder();
-      setUserAssets(assetsWithOrder);
-      setLoading(false);
-    })();
-  }, [getUserAssetsWithOrder]);
 
   const handleClose = useCallback(() => {
     setShowModal(false);
   }, [setShowModal]);
 
   const cancelOrder = useCallback(async (id: number) => {
-    if (!imxProvider) {
-      return;
-    }
     setLoading(true);
     try {
-      await imxProvider.cancelOrder({ order_id: id });
-      setNeedReload(true);
+      const result = await imxProvider?.cancelOrder({ order_id: id });
+      addMessage('Cancel Order', result);
     } catch (err) {
       addMessage('Cancel Order', err);
+    } finally {
       handleClose();
     }
   }, [imxProvider, handleClose, addMessage]);
 
   const createOrder = useCallback(async (asset: Asset) => {
-    if (!imxProvider) {
-      return;
-    }
     setLoading(true);
     const request: UnsignedOrderRequest = {
       buy: {
@@ -108,15 +84,31 @@ function Order({ showModal, setShowModal }: ModalProps) {
         tokenId: asset.token_id,
         tokenAddress: asset.token_address,
       },
+      fees: [{
+        address: '0x8e70719571e87a328696ad099a7d9f6adc120892',
+        fee_percentage: 1,
+      }],
     };
     try {
-      await imxProvider.createOrder(request);
-      setNeedReload(true);
+      const result = await imxProvider?.createOrder(request);
+      addMessage('Create Order', result);
     } catch (err) {
       addMessage('Create Order', err);
+    } finally {
       handleClose();
     }
   }, [imxProvider, sellingPrice, addMessage, handleClose]);
+
+  const handleViewOffersClosed = () => {
+    handleClose();
+  };
+
+  const viewOffers = useCallback(async (buyTokenAddress: string, buyTokenId: string) => {
+    setLoading(true);
+    setOfferBuyTokenAddress(buyTokenAddress);
+    setOfferBuyTokenId(buyTokenId);
+    setShowViewOffers(true);
+  }, []);
 
   const getOrderList = (assets: AssetWithSellOrder[]) => {
     if (loading) {
@@ -131,10 +123,10 @@ function Order({ showModal, setShowModal }: ModalProps) {
           <Table striped bordered hover>
             <thead>
               <tr>
-                <th>#</th>
+                <th>ID</th>
                 <th>Name</th>
-                <th>Image Url</th>
-                <th>Price</th>
+                <th>Image</th>
+                <th style={{ width: '200px' }}>Price</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -157,34 +149,53 @@ function Order({ showModal, setShowModal }: ModalProps) {
                       ? utils.formatEther(userAsset.sellOrder?.buy.data.quantity_with_fees)
                       : (
                         <InputGroup size="sm" className="mb-3">
-                          <Form.Control
-                            placeholder="Selling Price"
-                            aria-label="Selling Price"
-                            aria-describedby="basic-addon"
-                            onChange={(e) => setSellingPrice(e.target.value)}
-                          />
-                          <InputGroup.Text id="basic-addon">Eth</InputGroup.Text>
-                          <InputGroup.Text>Default: 0.01</InputGroup.Text>
+                          <Stack>
+                            <Form.Label>
+                              Selling Price
+                            </Form.Label>
+                            <Stack direction="horizontal">
+                              <Form.Control
+                                defaultValue={sellingPrice}
+                                placeholder="Selling Price"
+                                aria-label="Selling Price"
+                                aria-describedby="basic-addon"
+                                onChange={(e) => setSellingPrice(e.target.value)}
+                              />
+                              <InputGroup.Text id="basic-addon">Eth</InputGroup.Text>
+                            </Stack>
+                          </Stack>
                         </InputGroup>
                       )}
                   </td>
                   <td>
-                    { !userAsset.sellOrder
-                      ? (
-                        <Button size="sm" variant="dark" onClick={() => createOrder(userAsset.asset)}>
-                          List for
-                          Sell
-                        </Button>
-                      )
-                      : (
-                        <Button
-                          size="sm"
-                          variant="danger"
-                          onClick={() => cancelOrder((userAsset.sellOrder as OrderType).order_id)}
-                        >
-                          Cancel Order
-                        </Button>
-                      ) }
+                    <Stack gap={3}>
+                      { !userAsset.sellOrder
+                        ? (
+                          <Button size="sm" variant="dark" onClick={() => createOrder(userAsset.asset)}>
+                            Sell
+                          </Button>
+                        )
+                        : (
+                          <>
+                            <Button
+                              size="sm"
+                              variant="danger"
+                              onClick={() => cancelOrder((userAsset.sellOrder as OrderType).order_id)}
+                            >
+                              Cancel
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="dark"
+                              onClick={() => (
+                                viewOffers(userAsset.asset.token_address, userAsset.asset.token_id)
+                              )}
+                            >
+                              Offers
+                            </Button>
+                          </>
+                        )}
+                    </Stack>
                   </td>
                 </tr>
               ))
@@ -197,22 +208,31 @@ function Order({ showModal, setShowModal }: ModalProps) {
   };
 
   return (
-    <Offcanvas
-      show={showModal}
-      onHide={handleClose}
-      backdrop="static"
-      placement="end"
-      style={{ width: '50%' }}
-    >
-      <Offcanvas.Header closeButton>
-        <Offcanvas.Title>
-          <Heading>Orders</Heading>
-        </Offcanvas.Title>
-      </Offcanvas.Header>
-      <Offcanvas.Body>
-        { getOrderList(userAssets) }
-      </Offcanvas.Body>
-    </Offcanvas>
+    <>
+      <ViewOffersModal
+        showModal={showViewOffers}
+        setShowModal={setShowViewOffers}
+        buyTokenAddress={offerBuyTokenAddress}
+        buyTokenId={offerBuyTokenId}
+        onClose={handleViewOffersClosed}
+      />
+      <Offcanvas
+        show={showModal}
+        onHide={handleClose}
+        backdrop="static"
+        placement="end"
+        style={{ width: '50%' }}
+      >
+        <Offcanvas.Header closeButton>
+          <Offcanvas.Title>
+            <Heading>Orders</Heading>
+          </Offcanvas.Title>
+        </Offcanvas.Header>
+        <Offcanvas.Body>
+          { getOrderList(userAssets) }
+        </Offcanvas.Body>
+      </Offcanvas>
+    </>
   );
 }
 

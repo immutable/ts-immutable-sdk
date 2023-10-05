@@ -1,30 +1,24 @@
-import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
+import { Web3Provider } from '@ethersproject/providers';
+import { ethers } from 'ethers';
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../config';
-import { ChainId, GetAllBalancesResult, RoutingOptionsAvailable } from '../../types';
-import { createReadOnlyProviders } from '../../readOnlyProviders/readOnlyProvider';
+import { ChainId, GetAllBalancesResult, AvailableRoutingOptions } from '../../types';
 import { getAllBalances } from '../../balances';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { TokenBalanceResult } from './types';
 
 export const getAllTokenBalances = async (
   config: CheckoutConfiguration,
+  readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
   ownerAddress: string,
-  availableRoutingOptions: RoutingOptionsAvailable,
-) => {
+  availableRoutingOptions: AvailableRoutingOptions,
+): Promise<Map<ChainId, TokenBalanceResult>> => {
   const chainBalances: Map<ChainId, TokenBalanceResult> = new Map();
   const chainBalancePromises: Map<ChainId, Promise<GetAllBalancesResult>> = new Map();
-  let readOnlyProviders: Map<ChainId, JsonRpcProvider> = new Map<ChainId, JsonRpcProvider>();
-  let providerError: any;
-  try {
-    readOnlyProviders = await createReadOnlyProviders(config);
-  } catch (error) {
-    providerError = error;
-  }
 
   if (readOnlyProviders.size === 0) {
     const noProviderResult = {
       success: false,
-      error: providerError || new CheckoutError('Provider failed', CheckoutErrorType.PROVIDER_ERROR),
+      error: new CheckoutError('No L1 or L2 provider available', CheckoutErrorType.PROVIDER_ERROR),
       balances: [],
     };
     chainBalances.set(getL1ChainId(config), noProviderResult);

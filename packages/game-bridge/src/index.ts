@@ -1,6 +1,8 @@
+/* eslint-disable no-console */
 import * as passport from '@imtbl/passport';
 import * as config from '@imtbl/config';
 import * as provider from '@imtbl/provider';
+import { gameBridgeVersionCheck } from '@imtbl/version-check';
 
 /* eslint-disable no-undef */
 const scope = 'openid offline_access profile email transact';
@@ -11,6 +13,12 @@ const logoutRedirectUri = 'https://localhost:3000/'; // Not required
 const keyFunctionName = 'fxName';
 const keyRequestId = 'requestId';
 const keyData = 'data';
+
+// version check placeholders
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const sdkVersionTag = '__SDK_VERSION__';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const sdkVersionSha = '__SDK_VERSION_SHA__';
 
 const PASSPORT_FUNCTIONS = {
   init: 'init',
@@ -45,9 +53,17 @@ let zkEvmProviderInstance: passport.Provider;
 
 declare global {
   interface Window {
-    callFunction: (jsonData: string) => void;
+    callFunction: (jsonData: string) => void,
+    ue: any,
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    Unity: any,
   }
 }
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+declare function blu_event(event: string, data: string): void;
+// eslint-disable-next-line @typescript-eslint/naming-convention
+declare function UnityPostMessage(message: string): void;
 
 const callbackToGame = (data: object) => {
   const message = JSON.stringify(data);
@@ -59,6 +75,8 @@ const callbackToGame = (data: object) => {
     } else {
       window.ue.jsconnector.sendtogame(message);
     }
+  } else if (typeof blu_event !== 'undefined') {
+    blu_event('sendtogame', message);
   } else if (typeof UnityPostMessage !== 'undefined') {
     UnityPostMessage(message);
   } else if (window.Unity !== 'undefined') {
@@ -123,6 +141,20 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
           requestId,
           success: true,
         });
+
+        // version check
+        const { engineVersion } = request;
+        const versionCheckParams = {
+          gameBridgeTag: sdkVersionTag,
+          gameBridgeSha: sdkVersionSha,
+          engine: engineVersion.engine,
+          engineVersion: engineVersion.engineVersion,
+          platform: engineVersion.platform,
+          platformVersion: engineVersion.platformVersion,
+        };
+        console.log(`Version check: ${JSON.stringify(versionCheckParams)}`);
+
+        gameBridgeVersionCheck(versionCheckParams);
         break;
       }
       case PASSPORT_FUNCTIONS.connect: {
@@ -338,5 +370,14 @@ function onLoadHandler() {
   });
 }
 
-window.addEventListener('load', onLoadHandler);
 console.log('index.ts loaded');
+
+function winLoad(callback: { (): void }) {
+  if (document.readyState === 'complete') {
+    callback();
+  } else {
+    window.addEventListener('load', callback);
+  }
+}
+
+winLoad(onLoadHandler);

@@ -1,4 +1,9 @@
-import { Box, MountedOverlaysAndProvider } from '@biom3/react';
+import {
+  BiomePortalIdContext,
+  Box,
+  MountedOverlaysAndProvider,
+} from '@biom3/react';
+import { useContext } from 'react';
 import {
   simpleLayoutStyle,
   headerStyle,
@@ -28,29 +33,31 @@ export function SimpleLayout({
   floatHeader = false,
   footerBackgroundColor,
 }: SimpleLayoutProps) {
+  const portalId = useContext(BiomePortalIdContext);
+
   return (
-    <MountedOverlaysAndProvider bottomSheetContainerId="layout-container">
-      <Box sx={responsiveStyles} id="layout-container">
+    <MountedOverlaysAndProvider bottomSheetContainerId={`layout-container${portalId}`}>
+      <Box sx={responsiveStyles} id={`layout-container${portalId}`}>
         <Box testId={testId} sx={simpleLayoutStyle}>
           {header && (
-            <Box id="header" sx={headerStyle(floatHeader)}>
+            <Box sx={headerStyle(floatHeader)}>
               {header}
             </Box>
           )}
-          <Box id="content" sx={contentStyle}>
+          <Box sx={contentStyle}>
             {heroContent && (
-              <Box id="hero-content" sx={heroContentStyle}>
+              <Box sx={heroContentStyle}>
                 {heroContent}
               </Box>
             )}
             {children && (
-              <Box id="body" sx={bodyStyle}>
+              <Box sx={bodyStyle}>
                 {children}
               </Box>
             )}
           </Box>
           {footer && (
-            <Box id="footer" sx={footerStyle(footerBackgroundColor)}>
+            <Box sx={footerStyle(footerBackgroundColor)}>
               {footer}
             </Box>
           )}

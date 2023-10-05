@@ -14,13 +14,52 @@ export interface CheckoutModuleConfiguration extends ModuleConfiguration<Checkou
  * A type representing various remotely defined configurations which are
  * accessible via the Checkout config and configured based on the Environment.
  * @property {DexConfig} dex - The config used for the DEX.
+ * @property {OnRampConfig} onramp - The config used for the OnRamp
  * @property {AllowedNetworkConfig[]} allowedNetworks - An array representing the allowed networks.
  * @property {GasEstimateTokenConfig | undefined} gasEstimateTokens - The config for the tokens used to estimate gas.
  */
 export type RemoteConfiguration = {
   dex: DexConfig;
+  onramp: OnRampConfig;
+  bridge: BridgeConfig;
   allowedNetworks: AllowedNetworkConfig[];
   gasEstimateTokens?: GasEstimateTokenConfig;
+  imxAddressMapping?: ImxAddressConfig;
+};
+
+/**
+ * A type representing the fee structure for an OnRamp provider
+ * @property {string | undefined} minPercentage - minimum percentage fee shown if a fee range is provided
+ * @property {string | undefined} maxPercentage - maximum percentage fee shown if a fee range is provided
+ * @property {string | undefined} feePercentage - specific fee percentage shown if there is no range provided
+ */
+export type OnRampProviderFees = {
+  minPercentage?: string;
+  maxPercentage?: string;
+  feePercentage?: string;
+};
+
+/**
+ * A type representing the configuration for the OnRamp for a specific provider.
+ * @property {string} publishableApiKey - on ramp provider publishable api-key
+ * @property {TokenInfo[]} tokens - allowed tokens for the OnRamp provider
+ * @property {OnRampProviderFees} fees - on ramp provider transaction fees
+ */
+export type OnRampProviderConfig = {
+  publishableApiKey: string,
+  tokens: TokenInfo[],
+  fees: OnRampProviderFees
+};
+
+export enum OnRampProvider {
+  TRANSAK = '201811419111',
+}
+/**
+ * A type representing the configuration for the OnRamp.
+ * @property {OnRampProviderConfig} transak - OnRamp config for Transak provider
+ */
+export type OnRampConfig = {
+  [key: string]: OnRampProviderConfig;
 };
 
 /**
@@ -34,11 +73,27 @@ export type DexConfig = {
 };
 
 /**
+ * A type representing the configuration for the Bridge.
+ * @property {TokenInfo[] | undefined} tokens - An array of tokens compatible with the Bridge.
+ */
+export type BridgeConfig = {
+  tokens?: TokenInfo[];
+};
+
+/**
  * A type representing an allowed network.
  * @property {number} chainId - The network chain id.
  */
 export type AllowedNetworkConfig = {
   chainId: number;
+};
+
+/**
+ * A type representing the IMX address mappings across available networks.
+ * @type {{ [chainId: string]: string }}
+ */
+export type ImxAddressConfig = {
+  [chainId: string]: string;
 };
 
 /**

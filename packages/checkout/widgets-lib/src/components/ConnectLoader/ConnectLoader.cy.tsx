@@ -5,10 +5,11 @@ import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { Environment } from '@imtbl/config';
 import { Web3Provider } from '@ethersproject/providers';
-import { cySmartGet } from '../../lib/testUtils';
+import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { ConnectLoader, ConnectLoaderParams } from './ConnectLoader';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { ProviderEvent, WidgetTheme } from '../../lib';
+import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 
 describe('ConnectLoader', () => {
   const config: StrongCheckoutWidgetsConfig = {
@@ -23,6 +24,7 @@ describe('ConnectLoader', () => {
   let providerRemoveListenerStub;
   beforeEach(() => {
     cy.viewport('ipad-2');
+    cyIntercept();
     providerOnStub = cy.stub().as('providerOnStub');
     providerRemoveListenerStub = cy.stub().as('providerRemoveListenerStub');
   });
@@ -32,20 +34,30 @@ describe('ConnectLoader', () => {
       allowedChains: [ChainId.IMTBL_ZKEVM_TESTNET],
     } as ConnectLoaderParams;
     mount(
-      <ConnectLoader
-        widgetConfig={config}
-        params={params}
-        closeEvent={() => {}}
-      >
-        <div id="inner-widget">Inner Widget</div>
-      </ConnectLoader>,
+      <CustomAnalyticsProvider widgetConfig={config}>
+        <ConnectLoader
+          widgetConfig={config}
+          params={params}
+          closeEvent={() => {}}
+        >
+          <div id="inner-widget">Inner Widget</div>
+        </ConnectLoader>
+        ,
+      </CustomAnalyticsProvider>,
     );
     cySmartGet('wallet-list-metamask').should('be.visible');
     cy.get('#inner-widget').should('not.exist');
   });
 
   it('should show ready to connect view when provider but not connected', () => {
-    const provider = { on: providerOnStub, removeListener: providerRemoveListenerStub, request: () => {} };
+    const provider = {
+      on: providerOnStub,
+      removeListener: providerRemoveListenerStub,
+      request: () => {},
+      getSigner: () => ({
+        getAddress: async () => Promise.resolve(''),
+      }),
+    };
     const params = {
       web3Provider: { provider } as any as Web3Provider,
       allowedChains: [ChainId.IMTBL_ZKEVM_TESTNET],
@@ -58,13 +70,15 @@ describe('ConnectLoader', () => {
       });
 
     mount(
-      <ConnectLoader
-        widgetConfig={config}
-        params={params}
-        closeEvent={() => {}}
-      >
-        <div id="inner-widget">Inner Widget</div>
-      </ConnectLoader>,
+      <CustomAnalyticsProvider widgetConfig={config}>
+        <ConnectLoader
+          widgetConfig={config}
+          params={params}
+          closeEvent={() => {}}
+        >
+          <div id="inner-widget">Inner Widget</div>
+        </ConnectLoader>
+      </CustomAnalyticsProvider>,
     );
 
     cySmartGet('footer-button').should('have.text', 'Ready to connect');
@@ -110,13 +124,15 @@ describe('ConnectLoader', () => {
       });
 
     mount(
-      <ConnectLoader
-        widgetConfig={config}
-        params={params}
-        closeEvent={() => {}}
-      >
-        <div id="inner-widget">Inner Widget</div>
-      </ConnectLoader>,
+      <CustomAnalyticsProvider widgetConfig={config}>
+        <ConnectLoader
+          widgetConfig={config}
+          params={params}
+          closeEvent={() => {}}
+        >
+          <div id="inner-widget">Inner Widget</div>
+        </ConnectLoader>
+      </CustomAnalyticsProvider>,
     );
 
     cySmartGet('switch-network-view').should('be.visible');
@@ -124,9 +140,19 @@ describe('ConnectLoader', () => {
   });
 
   it('should go through connect flow and show inner widget if provider not connected', () => {
-    const provider = { on: providerOnStub, removeListener: providerRemoveListenerStub, request: () => {} };
+    const provider = {
+      on: providerOnStub,
+      removeListener: providerRemoveListenerStub,
+      request: () => {},
+    };
     const params = {
-      web3Provider: { provider } as any as Web3Provider,
+      web3Provider: {
+        provider,
+        getSigner: () => ({
+          getAddress: async () => Promise.resolve(''),
+        }),
+        isMetaMask: true,
+      } as any as Web3Provider,
       allowedChains: [ChainId.IMTBL_ZKEVM_TESTNET],
     };
 
@@ -144,7 +170,13 @@ describe('ConnectLoader', () => {
     cy.stub(Checkout.prototype, 'createProvider')
       .as('createProviderStub')
       .resolves({
-        provider: { provider } as any as Web3Provider,
+        provider: {
+          provider,
+          getSigner: () => ({
+            getAddress: async () => Promise.resolve(''),
+          }),
+          isMetaMask: true,
+        } as any as Web3Provider,
       });
 
     cy.stub(Checkout.prototype, 'connect')
@@ -152,16 +184,16 @@ describe('ConnectLoader', () => {
       .resolves({
         provider: {
           provider: {
-            getSigner: () => ({
-              getAddress: async () => Promise.resolve(''),
-            }),
-            getNetwork: async () => ({
-              chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-              name: ChainName.IMTBL_ZKEVM_TESTNET,
-            }),
             on: providerOnStub,
             removeListener: providerRemoveListenerStub,
           },
+          getSigner: () => ({
+            getAddress: async () => Promise.resolve(''),
+          }),
+          getNetwork: async () => ({
+            chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+            name: ChainName.IMTBL_ZKEVM_TESTNET,
+          }),
         },
       });
 
@@ -173,13 +205,16 @@ describe('ConnectLoader', () => {
       });
 
     mount(
-      <ConnectLoader
-        widgetConfig={config}
-        params={params}
-        closeEvent={() => {}}
-      >
-        <div id="inner-widget">Inner Widget</div>
-      </ConnectLoader>,
+      <CustomAnalyticsProvider widgetConfig={config}>
+        <ConnectLoader
+          widgetConfig={config}
+          params={params}
+          closeEvent={() => {}}
+        >
+          <div id="inner-widget">Inner Widget</div>
+        </ConnectLoader>
+        ,
+      </CustomAnalyticsProvider>,
     );
 
     cySmartGet('footer-button').click();
@@ -189,7 +224,16 @@ describe('ConnectLoader', () => {
   it('should not show connect flow when user already connected', () => {
     const provider = { on: providerOnStub, removeListener: providerRemoveListenerStub, request: () => {} };
     const params = {
-      web3Provider: { provider } as any as Web3Provider,
+      web3Provider: {
+        provider,
+        getSigner: () => ({
+          getAddress: async () => Promise.resolve(''),
+        }),
+        getNetwork: async () => ({
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+          name: ChainName.IMTBL_ZKEVM_TESTNET,
+        }),
+      } as any as Web3Provider,
       allowedChains: [ChainId.IMTBL_ZKEVM_TESTNET],
     } as ConnectLoaderParams;
 
@@ -204,16 +248,16 @@ describe('ConnectLoader', () => {
       .resolves({
         provider: {
           provider: {
-            getSigner: () => ({
-              getAddress: async () => Promise.resolve(''),
-            }),
-            getNetwork: async () => ({
-              chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-              name: ChainName.IMTBL_ZKEVM_TESTNET,
-            }),
             on: providerOnStub,
             removeListener: providerRemoveListenerStub,
           },
+          getSigner: () => ({
+            getAddress: async () => Promise.resolve(''),
+          }),
+          getNetwork: async () => ({
+            chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+            name: ChainName.IMTBL_ZKEVM_TESTNET,
+          }),
         },
       });
 
@@ -229,13 +273,15 @@ describe('ConnectLoader', () => {
       });
 
     mount(
-      <ConnectLoader
-        widgetConfig={config}
-        params={params}
-        closeEvent={() => {}}
-      >
-        <div id="inner-widget">Inner Widget</div>
-      </ConnectLoader>,
+      <CustomAnalyticsProvider widgetConfig={config}>
+        <ConnectLoader
+          widgetConfig={config}
+          params={params}
+          closeEvent={() => {}}
+        >
+          <div id="inner-widget">Inner Widget</div>
+        </ConnectLoader>
+      </CustomAnalyticsProvider>,
     );
 
     cy.get('#inner-widget').should('be.visible');
@@ -245,7 +291,16 @@ describe('ConnectLoader', () => {
     it('should set up event listeners for accountsChanged and chainChanged', () => {
       const provider = { on: providerOnStub, removeListener: providerRemoveListenerStub };
       const params = {
-        web3Provider: { provider } as any as Web3Provider,
+        web3Provider: {
+          provider,
+          getSigner: () => ({
+            getAddress: async () => Promise.resolve(''),
+          }),
+          getNetwork: async () => ({
+            chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+            name: ChainName.IMTBL_ZKEVM_TESTNET,
+          }),
+        } as any as Web3Provider,
         allowedChains: [ChainId.IMTBL_ZKEVM_TESTNET],
       } as ConnectLoaderParams;
 
@@ -260,16 +315,16 @@ describe('ConnectLoader', () => {
         .resolves({
           provider: {
             provider: {
-              getSigner: () => ({
-                getAddress: async () => Promise.resolve(''),
-              }),
-              getNetwork: async () => ({
-                chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-                name: ChainName.IMTBL_ZKEVM_TESTNET,
-              }),
               on: providerOnStub,
               removeListener: providerRemoveListenerStub,
             },
+            getSigner: () => ({
+              getAddress: async () => Promise.resolve(''),
+            }),
+            getNetwork: async () => ({
+              chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+              name: ChainName.IMTBL_ZKEVM_TESTNET,
+            }),
           },
         });
 
@@ -285,13 +340,15 @@ describe('ConnectLoader', () => {
         });
 
       mount(
-        <ConnectLoader
-          widgetConfig={config}
-          params={params}
-          closeEvent={() => {}}
-        >
-          <div id="inner-widget">Inner Widget</div>
-        </ConnectLoader>,
+        <CustomAnalyticsProvider widgetConfig={config}>
+          <ConnectLoader
+            widgetConfig={config}
+            params={params}
+            closeEvent={() => {}}
+          >
+            <div id="inner-widget">Inner Widget</div>
+          </ConnectLoader>
+        </CustomAnalyticsProvider>,
       );
 
       cy.get('#inner-widget').should('be.visible');

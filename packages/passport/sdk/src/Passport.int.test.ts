@@ -2,6 +2,7 @@ import { Magic } from 'magic-sdk';
 import { UserManager } from 'oidc-client-ts';
 import { TransactionRequest } from '@ethersproject/providers';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
+import { mockValidIdToken } from './token.test';
 import { Passport } from './Passport';
 import { RequestArguments } from './zkEvm/types';
 import {
@@ -10,10 +11,10 @@ import {
   resetMswHandlers,
   transactionHash,
   mswHandlers,
-  chainIdHex,
 } from './mocks/zkEvm/msw';
 import { JsonRpcError, RpcErrorCode } from './zkEvm/JsonRpcError';
 import GuardianClient from './guardian/guardian';
+import { chainIdHex } from './test/mocks';
 
 jest.mock('./guardian/guardian');
 
@@ -27,7 +28,7 @@ const mockOidcUser = {
     nickname: 'test',
   },
   expired: false,
-  id_token: 'idToken123',
+  id_token: mockValidIdToken,
   access_token: 'accessToken123',
   refresh_token: 'refreshToken123',
 };
@@ -133,9 +134,7 @@ describe('Passport', () => {
 
         it('registers the user and returns the ether key', async () => {
           mockSigninPopup.mockResolvedValue(mockOidcUser);
-          mockGetUser.mockResolvedValueOnce(null);
-          mockGetUser.mockResolvedValueOnce(mockOidcUser);
-          mockSigninSilent.mockResolvedValue(mockOidcUserZkevm);
+          mockSigninSilent.mockResolvedValueOnce(mockOidcUserZkevm);
           useMswHandlers([
             mswHandlers.counterfactualAddress.success,
           ]);
@@ -147,8 +146,7 @@ describe('Passport', () => {
           });
 
           expect(accounts).toEqual([mockOidcUserZkevm.profile.passport.zkevm_eth_address]);
-          expect(mockGetUser).toHaveBeenCalledTimes(2);
-          expect(mockSigninSilent).toHaveBeenCalledTimes(1);
+          expect(mockGetUser).toHaveBeenCalledTimes(1);
           expect(mockMagicRequest).toHaveBeenCalledTimes(3);
         });
 

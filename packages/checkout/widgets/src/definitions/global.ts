@@ -15,7 +15,8 @@ import React from 'react';
  * @property {ImtblSwapProps} 'imtbl-swap' - Props for the 'imtbl-swap' component.
  * @property {ImtblBridgeProps} 'imtbl-bridge' - Props for the 'imtbl-bridge' component.
  * @property {ImtblSmartProps} 'imtbl-smart-checkout' - Props for the 'imtbl-checkout-checkout' component.
- */
+ * @property {ImtblOnRampProps} 'imtbl-onramp' - Props for the 'imtbl-onramp' component.
+ * */
 declare global {
   interface Window {
     ImtblCheckoutWidgetConfig: any;
@@ -28,6 +29,8 @@ declare global {
       'imtbl-swap': ImtblSwapProps;
       'imtbl-bridge': ImtblBridgeProps;
       'imtbl-smart-checkout': ImtblSmartProps;
+      'imtbl-onramp': ImtblOnRampProps;
+      'imtbl-primary-revenue': ImtblPrimaryRevenueProps;
     }
   }
 
@@ -115,7 +118,7 @@ export interface ImtblBridgeProps
 }
 
 /**
- * Interface for the properties of a bridge web component.
+ * Interface for the properties of a smart widget web component.
  * Extends the React.DetailedHTMLProps interface to inherit HTML attributes for the component's root element.
  * @interface ImtblSmartProps
  * @extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>
@@ -129,8 +132,51 @@ export interface ImtblSmartProps
   React.HTMLAttributes<HTMLElement>,
   HTMLElement
   > {
+  amount?: string;
+  contractAddress?: string;
+}
+/**
+ * Interface for the properties of a onramp web component.
+ * Extends the React.DetailedHTMLProps interface to inherit HTML attributes for the component's root element.
+ * @interface ImtblOnRampProps
+ * @extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>
+ * @property {string | undefined} walletProvider - The preferred wallet provider to connect to.
+ * @property {string | undefined} widgetConfig - The configuration for the bridge widget.
+ * @property {string | undefined} amount - The amount to onramp.
+ * @property {string | undefined} contractAddress - The contract address of the token to on ramp.
+ */
+export interface ImtblOnRampProps
+  extends React.DetailedHTMLProps<
+  React.HTMLAttributes<HTMLElement>,
+  HTMLElement
+  > {
   walletProvider?: string;
   widgetConfig?: string;
   fromContractAddress?: string;
   amount?: string;
+}
+
+/**
+ * Interface for the properties of the primary revenue web component.
+ * Extends the React.DetailedHTMLProps interface to inherit HTML attributes for an HTMLElement.
+ * @interface ImtblPrimaryRevenueProps
+ * @extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>
+ * @property {string | undefined} widgetConfig - Optional string representing the widget configuration.
+ * @property {string | undefined} amount - The amount to be paid.
+ * @property {string | undefined} products - A base64 encoded string of the array of items to be purchased.
+ * @property {string | undefined} fromContractAddress - The contract address of the token to pay with.
+ * @property {string | undefined} env - The environment to use: SANDBOX, DEV, PRODUCTION, ...
+ * @property {string | undefined} environmentId - The environment id from Immutable Hub.
+ */
+export interface ImtblPrimaryRevenueProps
+  extends React.DetailedHTMLProps<
+  React.HTMLAttributes<HTMLElement>,
+  HTMLElement
+  > {
+  widgetConfig?: string;
+  amount: string;
+  products: string;
+  fromContractAddress: string;
+  env: string;
+  environmentId: string;
 }

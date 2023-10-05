@@ -1,10 +1,10 @@
-import { BuyToken, Checkout, ItemType } from '@imtbl/checkout-sdk';
+import { BuyToken, Checkout, ItemType, SellOrder } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
-import { Box, FormControl, Select, TextInput, Option, OptionKey } from '@biom3/react';
-import { BigNumber } from 'ethers';
+import { Box, FormControl, Select, TextInput, Option, OptionKey, Body } from '@biom3/react';
+import { utils } from 'ethers';
 
 interface SellProps {
   checkout: Checkout;
@@ -23,7 +23,6 @@ export default function Sell({ checkout, provider }: SellProps) {
   const [amountError, setAmountError] = useState<string>('');
   const [contractAddress, setContractAddress] = useState<string>('');
   const [contractAddressError, setContractAddressError] = useState<string>('');
-  const [signActions, setSignActions] = useState<boolean>(false);
   const [error, setError] = useState<any>(null);
   const [success, setSuccess] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -32,12 +31,12 @@ export default function Sell({ checkout, provider }: SellProps) {
     if (listingType === ItemType.NATIVE) {
       return {
         type: ItemType.NATIVE,
-        amount: BigNumber.from(amount).mul(BigNumber.from(10).pow(18)),
+        amount,
       }
     }
     return {
       type: ItemType.ERC20,
-      amount: BigNumber.from(amount).mul(BigNumber.from(10).pow(18)),
+      amount,
       contractAddress,
     };
   }
@@ -79,12 +78,24 @@ export default function Sell({ checkout, provider }: SellProps) {
     setError(null);
     setLoading(true);
     try {
-      await checkout.sell({
-        provider,
-        id,
-        collectionAddress,
+
+      const orders:Array<SellOrder> = [{
+        sellToken: {
+          id,
+          collectionAddress
+        },
         buyToken: getBuyToken(),
+        makerFees: [{
+          amount: { percentageDecimal: 0.025 },
+          recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772'
+        }]
+      }]
+
+      const result = await checkout.sell({
+        provider,
+        orders,
       });
+      console.log('Sell result', result);
       setLoading(false);
     } catch (err: any) {
       setError(err);
@@ -108,7 +119,7 @@ export default function Sell({ checkout, provider }: SellProps) {
 
   const updateAmount = (event: any) => {
     const value = event.target.value;
-    setAmount(value.split('.')[0]);
+    setAmount(value);
     setAmountError('');
   }
 
@@ -216,9 +227,12 @@ export default function Sell({ checkout, provider }: SellProps) {
       </FormControl>
       {tokenForm()}
       <br />
-      <LoadingButton onClick={sellClick} loading={loading}>
-        Sell
-      </LoadingButton>
+      <Box sx={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 'base.spacing.x2'}}>
+        <LoadingButton onClick={sellClick} loading={loading}>
+          Sell
+        </LoadingButton>
+        <Body size="xSmall">(adds 2.5% maker fee)</Body>
+      </Box>
       {(!error && success) && <SuccessMessage>Sell success.</SuccessMessage>}
       {error && (
         <ErrorMessage>

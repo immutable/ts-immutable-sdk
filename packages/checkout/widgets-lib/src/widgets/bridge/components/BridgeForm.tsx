@@ -9,7 +9,6 @@ import {
 } from 'react';
 import { ApproveDepositBridgeResponse, BridgeDepositResponse } from '@imtbl/bridge-sdk';
 import { BigNumber, utils } from 'ethers';
-import { parseEther } from 'ethers/lib/utils';
 import { amountInputValidation } from '../../../lib/validations/amountInputValidations';
 import { BridgeContext } from '../context/BridgeContext';
 import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
@@ -229,9 +228,9 @@ export function BridgeForm(props: BridgeFormProps) {
     }
 
     const tokenIsEth = isNativeToken(token?.token.address);
-    const gasAmount = parseEther(gasFee.length !== 0 ? gasFee : '0');
+    const gasAmount = utils.parseEther(gasFee.length !== 0 ? gasFee : '0');
     const additionalAmount = tokenIsEth && !Number.isNaN(parseFloat(amount))
-      ? parseEther(amount)
+      ? utils.parseEther(amount)
       : BigNumber.from('0');
 
     return gasAmount.add(additionalAmount).gt(ethBalance.balance);
@@ -451,7 +450,7 @@ export function BridgeForm(props: BridgeFormProps) {
         </Heading>
         <Box sx={formInputsContainerStyles}>
           <SelectForm
-            id="bridge-token"
+            testId="bridge-token"
             options={tokensOptions}
             coinSelectorHeading={bridgeForm.from.selectorTitle}
             selectedOption={selectedOption}
@@ -464,7 +463,7 @@ export function BridgeForm(props: BridgeFormProps) {
             disabled={isFetching}
           />
           <TextInputForm
-            id="bridge-amount"
+            testId="bridge-amount"
             value={amount}
             placeholder={bridgeForm.from.inputPlaceholder}
             subtext={`${content.fiatPricePrefix} $${formatZeroAmount(amountFiatValue, true)}`}

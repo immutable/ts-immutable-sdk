@@ -13,11 +13,14 @@ export type CreateListingRequestBody = {
    * Buy item for listing should either be NATIVE or ERC20 item
    */
   buy: Array<Item>;
-  fee?: Fee;
+  /**
+   * Buy fees should only include maker marketplace fees and should be no more than two entries as more entires will incur more gas. It is best practice to have this as few as possible.
+   */
+  fees: Array<Fee>;
   /**
    * Time after which the Order is considered expired
    */
-  end_time: string;
+  end_at: string;
   protocol_data: ProtocolData;
   /**
    * A random value added to the create Order request
@@ -34,6 +37,6 @@ export type CreateListingRequestBody = {
   /**
    * Time after which Order is considered active
    */
-  start_time: string;
+  start_at: string;
 };
 

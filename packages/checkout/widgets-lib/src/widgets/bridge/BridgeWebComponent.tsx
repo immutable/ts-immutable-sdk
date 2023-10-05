@@ -1,7 +1,7 @@
 import React from 'react';
 import { WalletProviderName } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
-import { BiomeCombinedProviders } from '@biom3/react';
+import { BiomeCombinedProviders, BiomePortalIdProvider } from '@biom3/react';
 import { onDarkBase } from '@biom3/design-tokens';
 import { BridgeWidget, BridgeWidgetParams } from './BridgeWidget';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
@@ -11,6 +11,7 @@ import { sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
 import { isValidAddress, isValidAmount, isValidWalletProvider } from '../../lib/validations/widgetValidators';
 import { isPassportProvider } from '../../lib/providerUtils';
 import { BridgeComingSoon } from './views/BridgeComingSoon';
+import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 
 export class ImmutableBridge extends ImmutableWebComponent {
   fromContractAddress = '';
@@ -19,6 +20,11 @@ export class ImmutableBridge extends ImmutableWebComponent {
 
   walletProvider: WalletProviderName | undefined = undefined;
 
+  static get observedAttributes(): string[] {
+    const baseObservedAttributes = super.observedAttributes;
+    return [...baseObservedAttributes, 'amount', 'fromcontractaddress', 'walletprovider'];
+  }
+
   connectedCallback() {
     super.connectedCallback();
     this.fromContractAddress = this.getAttribute('fromContractAddress')?.toLowerCase() ?? '';
@@ -26,6 +32,22 @@ export class ImmutableBridge extends ImmutableWebComponent {
     this.walletProvider = this.getAttribute(
       'walletProvider',
     )?.toLowerCase() as WalletProviderName;
+
+    this.renderWidget();
+  }
+
+  attributeChangedCallback(name: string, oldValue: any, newValue: any): void {
+    super.attributeChangedCallback(name, oldValue, newValue);
+
+    if (name === 'amount') {
+      this.amount = newValue;
+    }
+    if (name === 'fromcontractaddress') {
+      this.fromContractAddress = newValue;
+    }
+    if (name === 'walletprovider') {
+      this.walletProvider = newValue.toLowerCase() as WalletProviderName;
+    }
 
     this.renderWidget();
   }
@@ -75,23 +97,29 @@ export class ImmutableBridge extends ImmutableWebComponent {
 
     this.reactRoot.render(
       <React.StrictMode>
-        {showBridgeComingSoonScreen && (
-        <BiomeCombinedProviders theme={{ base: onDarkBase }}>
-          <BridgeComingSoon onCloseEvent={() => sendBridgeWidgetCloseEvent(window)} />
-        </BiomeCombinedProviders>
-        )}
-        {!showBridgeComingSoonScreen && (
-          <ConnectLoader
-            params={connectLoaderParams}
-            closeEvent={() => sendBridgeWidgetCloseEvent(window)}
+        <BiomePortalIdProvider>
+          <CustomAnalyticsProvider
             widgetConfig={this.widgetConfig!}
           >
-            <BridgeWidget
-              params={params}
-              config={this.widgetConfig!}
-            />
-          </ConnectLoader>
-        )}
+            {showBridgeComingSoonScreen && (
+            <BiomeCombinedProviders theme={{ base: onDarkBase }}>
+              <BridgeComingSoon onCloseEvent={() => sendBridgeWidgetCloseEvent(window)} />
+            </BiomeCombinedProviders>
+            )}
+            {!showBridgeComingSoonScreen && (
+            <ConnectLoader
+              params={connectLoaderParams}
+              closeEvent={() => sendBridgeWidgetCloseEvent(window)}
+              widgetConfig={this.widgetConfig!}
+            >
+              <BridgeWidget
+                params={params}
+                config={this.widgetConfig!}
+              />
+            </ConnectLoader>
+            )}
+          </CustomAnalyticsProvider>
+        </BiomePortalIdProvider>
       </React.StrictMode>,
     );
   }

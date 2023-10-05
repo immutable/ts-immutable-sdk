@@ -128,9 +128,7 @@ export function PassportProvider({
       setImxProvider(undefined);
       setZkEvmProvider(undefined);
     } catch (err) {
-      if (err instanceof Error) {
-        addMessage(err.toString());
-      }
+      addMessage('Logout', err);
       console.error(err);
     } finally {
       setIsLoading(false);

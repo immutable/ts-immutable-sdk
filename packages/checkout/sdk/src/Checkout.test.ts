@@ -4,6 +4,7 @@
 import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
 import { BigNumber, ethers } from 'ethers';
+import { Passport, UserProfile } from '@imtbl/passport';
 import { getNetworkAllowList, getNetworkInfo, switchWalletNetwork } from './network';
 
 import { Checkout } from './Checkout';
@@ -22,6 +23,10 @@ import {
   ItemType,
   TransactionOrGasType,
   SmartCheckoutParams,
+  NetworkInfo,
+  GetTokenAllowListResult,
+  TokenInfo,
+  BuyToken,
 } from './types';
 import { getAllBalances, getBalance, getERC20Balance } from './balances';
 import { sendTransaction } from './transaction';
@@ -36,6 +41,10 @@ import { buy } from './smartCheckout/buy';
 import { sell } from './smartCheckout/sell';
 import { smartCheckout } from './smartCheckout';
 import { cancel } from './smartCheckout/cancel';
+import { FiatRampService } from './fiatRamp';
+import { FiatRampParams, ExchangeType } from './types/fiatRamp';
+import { getItemRequirementsFromRequirements } from './smartCheckout/itemRequirements';
+import { CheckoutErrorType } from './errors';
 
 jest.mock('./connect');
 jest.mock('./network');
@@ -50,6 +59,8 @@ jest.mock('./smartCheckout/buy');
 jest.mock('./smartCheckout/sell');
 jest.mock('./smartCheckout/cancel');
 jest.mock('./smartCheckout');
+jest.mock('./fiatRamp');
+jest.mock('./smartCheckout/itemRequirements');
 
 describe('Connect', () => {
   let providerMock: ExternalProvider;
@@ -445,11 +456,11 @@ describe('Connect', () => {
 
     await checkout.buy({
       provider,
-      orderId: '1',
+      orders: [{ id: '1', takerFees: [] }],
     });
 
     expect(buy).toBeCalledTimes(1);
-    expect(buy).toBeCalledWith(checkout.config, provider, '1');
+    expect(buy).toBeCalledWith(checkout.config, provider, [{ id: '1', takerFees: [] }]);
   });
 
   it('should throw error for buy function if is production', async () => {
@@ -463,7 +474,7 @@ describe('Connect', () => {
 
     await expect(checkout.buy({
       provider,
-      orderId: '1',
+      orders: [{ id: '1' }],
     })).rejects.toThrow('This endpoint is not currently available.');
 
     expect(buy).toBeCalledTimes(0);
@@ -480,26 +491,33 @@ describe('Connect', () => {
       baseConfig: { environment: Environment.SANDBOX },
     });
 
-    await checkout.sell({
-      provider,
-      id: '0',
-      collectionAddress: '0xERC721',
+    const orders = [{
+      sellToken: {
+        id: '0',
+        collectionAddress: '0xERC721',
+      },
       buyToken: {
         type: ItemType.NATIVE,
-        amount: BigNumber.from('100000'),
-      },
+        amount: '10',
+      } as BuyToken,
+      makerFees: [
+        {
+          amount: { percentageDecimal: 0.025 },
+          recipient: '0x222',
+        },
+      ],
+    }];
+
+    await checkout.sell({
+      provider,
+      orders,
     });
 
     expect(sell).toBeCalledTimes(1);
     expect(sell).toBeCalledWith(
       checkout.config,
       provider,
-      '0',
-      '0xERC721',
-      {
-        type: ItemType.NATIVE,
-        amount: BigNumber.from('100000'),
-      },
+      orders,
     );
   });
 
@@ -513,12 +531,23 @@ describe('Connect', () => {
 
     await expect(checkout.sell({
       provider,
-      id: '0',
-      collectionAddress: '0xERC721',
-      buyToken: {
-        type: ItemType.NATIVE,
-        amount: BigNumber.from('100000'),
-      },
+      orders: [{
+        sellToken: {
+          id: '0',
+          collectionAddress: '0xERC721',
+        },
+        buyToken: {
+          type: ItemType.NATIVE,
+          amount: '10',
+        },
+        makerFees: [
+          {
+            amount: { percentageDecimal: 0.025 },
+            recipient: '0x222',
+          },
+        ],
+      }],
+
     })).rejects.toThrow('This endpoint is not currently available.');
 
     expect(sell).toBeCalledTimes(0);
@@ -536,14 +565,14 @@ describe('Connect', () => {
 
     await checkout.cancel({
       provider,
-      orderId: '1234',
+      orderIds: ['1234'],
     });
 
     expect(cancel).toBeCalledTimes(1);
     expect(cancel).toBeCalledWith(
       checkout.config,
       provider,
-      '1234',
+      ['1234'],
     );
   });
 
@@ -557,7 +586,7 @@ describe('Connect', () => {
 
     await expect(checkout.cancel({
       provider,
-      orderId: '1234',
+      orderIds: ['1234'],
     })).rejects.toThrow('This endpoint is not currently available.');
 
     expect(cancel).toBeCalledTimes(0);
@@ -569,6 +598,7 @@ describe('Connect', () => {
 
     (validateProvider as jest.Mock).mockResolvedValue(provider);
     (smartCheckout as jest.Mock).mockResolvedValue(smartCheckoutResult);
+    (getItemRequirementsFromRequirements as jest.Mock).mockResolvedValue([]);
 
     const checkout = new Checkout({
       baseConfig: { environment: Environment.SANDBOX },
@@ -624,9 +654,236 @@ describe('Connect', () => {
     expect(smartCheckout).toBeCalledTimes(0);
   });
 
+  it('should throw error for smartCheckout function if cannot get itemRequirements', async () => {
+    const provider = new Web3Provider(providerMock, ChainId.IMTBL_ZKEVM_TESTNET);
+    const smartCheckoutResult = {};
+
+    (validateProvider as jest.Mock).mockResolvedValue(provider);
+    (getItemRequirementsFromRequirements as jest.Mock).mockRejectedValue(new Error('Unable to get decimals'));
+    (smartCheckout as jest.Mock).mockResolvedValue(smartCheckoutResult);
+
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.SANDBOX },
+    });
+
+    const params: SmartCheckoutParams = {
+      provider,
+      itemRequirements: [{
+        type: ItemType.ERC20,
+        contractAddress: '0xNOADDRESS',
+        spenderAddress: '0xSPENDER',
+        amount: '1.5',
+      }],
+      transactionOrGasAmount: {
+        type: TransactionOrGasType.GAS,
+        gasToken: {
+          type: GasTokenType.NATIVE,
+          limit: BigNumber.from('1'),
+        },
+      },
+    };
+
+    let errMessage;
+    let errType;
+    try {
+      await checkout.smartCheckout(params);
+    } catch (err:any) {
+      errMessage = err.message;
+      errType = err.type;
+    }
+    expect(errMessage).toEqual('Failed to map item requirements');
+    expect(errType).toEqual(CheckoutErrorType.ITEM_REQUIREMENTS_ERROR);
+    expect(smartCheckout).toBeCalledTimes(0);
+  });
+
   it('should call isWeb3Provider', async () => {
     (isWeb3Provider as jest.Mock).mockResolvedValue(true);
     const result = await Checkout.isWeb3Provider(new Web3Provider(providerMock, ChainId.ETHEREUM));
     expect(result).toBeTruthy();
+  });
+
+  describe('createFiatRampUrl', () => {
+    let createWidgetUrlMock: jest.Mock;
+    let checkout: Checkout;
+    let mockProvider: Web3Provider;
+    let networkInfoResult: NetworkInfo;
+    let getTokenAllowListResult: GetTokenAllowListResult;
+
+    const defaultWidgetUrl = 'https://global-stg.transak.com?apiKey=41ad2da7-ed5a-4d89-a90b-c751865effc2'
+      + '&network=immutablezkevm&defaultPaymentMethod=credit_debit_card&disablePaymentMethods='
+      + 'sepa_bank_transfer,gbp_bank_transfer,pm_cash_app,pm_jwire,pm_paymaya,pm_bpi,pm_ubp,pm_grabpay,'
+      + 'pm_shopeepay,pm_gcash,pm_pix,pm_astropay,pm_pse,inr_bank_transfer&productsAvailed=buy'
+      + '&exchangeScreenTitle=Buy&themeColor=0D0D0D';
+
+    beforeEach(() => {
+      createWidgetUrlMock = jest.fn().mockResolvedValue(defaultWidgetUrl);
+      (FiatRampService as jest.Mock).mockReturnValue({
+        createWidgetUrl: createWidgetUrlMock,
+      });
+
+      mockProvider = {
+        getSigner: jest.fn().mockReturnValue({
+          getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
+        }),
+        network: {
+          chainId: ChainId.ETHEREUM,
+        },
+      } as unknown as Web3Provider;
+
+      networkInfoResult = {
+        name: ChainName.ETHEREUM,
+        chainId: ChainId.ETHEREUM,
+        nativeCurrency: {
+          name: 'ETHEREUM',
+          symbol: 'ETH',
+          decimals: 18,
+        },
+        isSupported: true,
+      };
+      (getNetworkInfo as jest.Mock).mockResolvedValue(networkInfoResult);
+
+      getTokenAllowListResult = {
+        tokens: [],
+      };
+      (getTokenAllowList as jest.Mock).mockResolvedValue(getTokenAllowListResult);
+
+      checkout = new Checkout({
+        baseConfig: { environment: Environment.PRODUCTION },
+      });
+    });
+
+    it(`should call FiatRampService.createWidgetUrl with correct params
+      when only onRampProvider, exchangeType and web3Provider are provided`, async () => {
+      const params: FiatRampParams = {
+        exchangeType: ExchangeType.ONRAMP,
+        web3Provider: mockProvider,
+      };
+
+      await checkout.createFiatRampUrl(params);
+
+      expect(createWidgetUrlMock).toBeCalledTimes(1);
+      expect(createWidgetUrlMock).toBeCalledWith({
+        exchangeType: ExchangeType.ONRAMP,
+        isPassport: false,
+        walletAddress: '0xADDRESS',
+        tokenAmount: undefined,
+        tokenSymbol: 'IMX',
+        email: undefined,
+      });
+    });
+
+    it(`should call fiatRampService.createWidgetUrl with correct params
+      when tokenAmount and tokenSymbol are provided`, async () => {
+      getTokenAllowListResult = {
+        tokens: [
+          {
+            name: 'Immutable X',
+            address: '0xaddr',
+            symbol: 'IMX',
+            decimals: 18,
+          } as TokenInfo,
+          {
+            name: 'Ethereum',
+            address: '0xethAddr',
+            symbol: 'ETH',
+            decimals: 18,
+          } as TokenInfo,
+          {
+            name: 'Matic',
+            address: '0xmaticAddr',
+            symbol: 'MATIC',
+            decimals: '18',
+          },
+        ],
+      } as GetTokenAllowListResult;
+      (getTokenAllowList as jest.Mock).mockResolvedValue(getTokenAllowListResult);
+
+      const params: FiatRampParams = {
+        exchangeType: ExchangeType.ONRAMP,
+        web3Provider: mockProvider,
+        tokenAmount: '10',
+        tokenAddress: '0xethAddr',
+      };
+
+      await checkout.createFiatRampUrl(params);
+
+      expect(createWidgetUrlMock).toBeCalledTimes(1);
+      expect(createWidgetUrlMock).toBeCalledWith({
+        exchangeType: ExchangeType.ONRAMP,
+        isPassport: false,
+        walletAddress: '0xADDRESS',
+        tokenAmount: '10',
+        tokenSymbol: 'ETH',
+        email: undefined,
+      });
+    });
+
+    it(`should call fiatRampService.createWidgetUrl with correct params
+      when passport is provided`, async () => {
+      mockProvider = {
+        getSigner: jest.fn().mockReturnValue({
+          getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
+        }),
+        network: {
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        },
+        provider: {
+          isPassport: true,
+        },
+      } as unknown as Web3Provider;
+      const mockUser: UserProfile = {
+        sub: 'email|123',
+        email: 'passport.user@immutable.com',
+      };
+      const mockPassport = {
+        getUserInfo: jest.fn().mockResolvedValue(mockUser),
+      } as unknown as Passport;
+
+      const params: FiatRampParams = {
+        exchangeType: ExchangeType.ONRAMP,
+        web3Provider: mockProvider,
+        passport: mockPassport,
+      };
+
+      await checkout.createFiatRampUrl(params);
+
+      expect(createWidgetUrlMock).toBeCalledTimes(1);
+      expect(createWidgetUrlMock).toBeCalledWith({
+        exchangeType: ExchangeType.ONRAMP,
+        isPassport: true,
+        walletAddress: '0xADDRESS',
+        tokenAmount: undefined,
+        tokenSymbol: 'IMX',
+        email: mockUser.email,
+      });
+    });
+  });
+
+  describe('getExchangeFeeEstimate', () => {
+    let feeEstimateMock: jest.Mock;
+    let checkout: Checkout;
+
+    const feeEstimate = {
+      minPercentage: '3.5',
+      maxPercentage: '5.5',
+      feePercentage: undefined,
+    };
+
+    beforeEach(() => {
+      feeEstimateMock = jest.fn().mockResolvedValue(feeEstimate);
+      (FiatRampService as jest.Mock).mockReturnValue({
+        feeEstimate: feeEstimateMock,
+      });
+
+      checkout = new Checkout({
+        baseConfig: { environment: Environment.PRODUCTION },
+      });
+    });
+
+    it('should call fiatRampService.getExchangeFeeEstimate', async () => {
+      await checkout.getExchangeFeeEstimate();
+
+      expect(feeEstimateMock).toBeCalledTimes(1);
+    });
   });
 });

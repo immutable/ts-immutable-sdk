@@ -115,6 +115,12 @@ If your package isn't part of the dependency tree for the main SDK, then you mig
 yarn wsrun -p @imtbl/your_project --recursive --stages build
 ```
 
+If you run out of memory, set NODE_OPTIONS to limit Node's use of memory (this assumes you have about 16GB of memory):
+
+```sh
+export NODE_OPTIONS=--max-old-space-size=14366
+```
+
 ### Linting
 
 #### ESLint Tooling
@@ -275,6 +281,9 @@ You can optionally do a dry run by checking the `Dry run` checkbox. This will ru
 
 > [!IMPORTANT]
 > While the SDK are on `0.X` releases, interface or breaking changes should bump the minor version, whilst non-breaking changes should bump the patch version.
+
+> [!WARNING]
+> Maintainers: Version tags are automatically created by the `Publish to NPM` workflow. Please do not create tags manually. To delete any local tags that are not on the remote, run `.github/scripts/delete-local-tags.sh` before you push.
 
 When releasing a new version of the SDK, you will need to specify the `Upgrade Type` (either `none`, `patch`, `minor`, or `major`). This will determine what the next version of the SDK will be based off the existing [tags in the repo](https://github.com/immutable/ts-immutable-sdk/tags).
 

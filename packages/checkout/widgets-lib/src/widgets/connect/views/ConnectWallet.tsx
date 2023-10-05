@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { Body, Box, Heading } from '@biom3/react';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
@@ -7,12 +7,23 @@ import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewCon
 import { text } from '../../../resources/text/textConfig';
 import { WalletList } from '../components/WalletList';
 import { ConnectContext } from '../context/ConnectContext';
+import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 export function ConnectWallet() {
   const { body } = text.views[ConnectWidgetViews.CONNECT_WALLET];
   const {
     connectState: { sendCloseEvent },
   } = useContext(ConnectContext);
+
+  const { page } = useAnalytics();
+
+  useEffect(() => {
+    page({
+      userJourney: UserJourney.CONNECT,
+      screen: 'ConnectWallet',
+    });
+  }, []);
+
   return (
     <SimpleLayout
       testId="connect-wallet"
@@ -24,7 +35,6 @@ export function ConnectWallet() {
       footer={<FooterLogo />}
     >
       <Box
-        id="connect-wallet-content"
         sx={{
           display: 'flex',
           flexDirection: 'column',

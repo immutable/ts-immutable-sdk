@@ -1,7 +1,7 @@
 import { JsonRpcProvider, TransactionRequest } from '@ethersproject/providers';
 import { getEip155ChainId, getNonce, getSignedMetaTransactions } from './walletHelpers';
 import { sendTransaction } from './sendTransaction';
-import { mockUserZkEvm } from '../test/mocks';
+import { chainId, chainIdEip155, mockUserZkEvm } from '../test/mocks';
 import { RelayerClient } from './relayerClient';
 import { retryWithDelay } from '../network/retry';
 import { RelayerTransaction, RelayerTransactionStatus } from './types';
@@ -20,8 +20,6 @@ describe('sendTransaction', () => {
   const transactionHash = 'transactionHash123';
 
   const nonce = '5';
-  const chainId = 13472;
-  const eip155ChainId = `eip155:${chainId}`;
 
   const transactionRequest: TransactionRequest = {
     to: mockUserZkEvm.zkEvm.ethAddress,
@@ -55,7 +53,7 @@ describe('sendTransaction', () => {
     jest.resetAllMocks();
     relayerClient.imGetFeeOptions.mockResolvedValue([imxFeeOption]);
     (getNonce as jest.Mock).mockResolvedValueOnce(nonce);
-    (getEip155ChainId as jest.Mock).mockReturnValue(eip155ChainId);
+    (getEip155ChainId as jest.Mock).mockReturnValue(chainIdEip155);
     (getSignedMetaTransactions as jest.Mock).mockResolvedValueOnce(
       signedTransaction,
     );
@@ -109,7 +107,7 @@ describe('sendTransaction', () => {
     expect(getEip155ChainId).toHaveBeenCalledWith(chainId);
     expect(guardianClient.validateEVMTransaction).toHaveBeenCalledWith(
       {
-        chainId: eip155ChainId,
+        chainId: chainIdEip155,
         nonce,
         user: mockUserZkEvm,
         metaTransactions: [
@@ -135,9 +133,10 @@ describe('sendTransaction', () => {
     );
   });
 
-  it('returns an error if the relayer does not return a successful status', async () => {
+  it('returns and surfaces an error if the relayer does not return a successful status', async () => {
     (retryWithDelay as jest.Mock).mockResolvedValue({
       status: RelayerTransactionStatus.FAILED,
+      statusMessage: 'Unable to complete transaction',
     } as RelayerTransaction);
 
     await expect(
@@ -152,7 +151,7 @@ describe('sendTransaction', () => {
     ).rejects.toThrow(
       new JsonRpcError(
         RpcErrorCode.INTERNAL_ERROR,
-        'Transaction failed to submit with status FAILED',
+        'Transaction failed to submit with status FAILED. Error message: Unable to complete transaction',
       ),
     );
   });

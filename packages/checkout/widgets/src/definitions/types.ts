@@ -4,7 +4,6 @@
 export enum WidgetTheme {
   LIGHT = 'light',
   DARK = 'dark',
-  CUSTOM = 'custom',
 }
 
 /**
@@ -15,4 +14,5 @@ export enum CheckoutWidgetTagNames {
   WALLET = 'imtbl-wallet',
   SWAP = 'imtbl-swap',
   BRIDGE = 'imtbl-bridge',
+  ONRAMP = 'imtbl-onramp',
 }
