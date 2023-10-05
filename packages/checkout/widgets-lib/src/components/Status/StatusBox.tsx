@@ -24,7 +24,12 @@ export function StatusBox({ statusText, statusType }: StatusViewProps) {
         variant="bold"
         sx={statusLogoFill(isSuccess)}
       />
-      <Body size="medium" weight="bold" testId={`${statusType.toString()}-text`}>
+      <Body
+        size="medium"
+        weight="bold"
+        testId={`${statusType.toString()}-text`}
+        sx={{ textAlign: 'center' }}
+      >
         {statusText}
       </Body>
     </Box>
