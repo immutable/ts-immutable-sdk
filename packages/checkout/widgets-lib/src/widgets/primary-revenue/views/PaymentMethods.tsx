@@ -1,9 +1,7 @@
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react/no-unused-prop-types */
-import {
-  useCallback, useContext, useEffect,
-} from 'react';
+import { useCallback, useContext, useEffect } from 'react';
 import { Box, Heading } from '@biom3/react';
 
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -18,17 +16,25 @@ import { EventTargetContext } from '../../../context/event-target-context/EventT
 import { useSharedContext } from '../context/SharedContextProvider';
 import { PaymentTypes } from '../types';
 
-import { ViewContext, ViewActions, SharedViews } from '../../../context/view-context/ViewContext';
+import {
+  ViewContext,
+  ViewActions,
+  SharedViews,
+} from '../../../context/view-context/ViewContext';
 
 export function PaymentMethods() {
   const text = {
     methods: textConfig.views[PrimaryRevenueWidgetViews.PAYMENT_METHODS],
   };
   const { viewDispatch } = useContext(ViewContext);
-  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+  const {
+    eventTargetState: { eventTarget },
+  } = useContext(EventTargetContext);
   const {
     paymentMethod, setPaymentMethod, sign, signResponse,
   } = useSharedContext();
+
+  const handleOptionClick = useCallback((type: PaymentTypes) => setPaymentMethod(type), []);
 
   const handleGoToPaymentView = useCallback((type: PaymentTypes) => {
     if (type === PaymentTypes.CRYPTO) {
@@ -100,15 +106,21 @@ export function PaymentMethods() {
         <Box sx={{ paddingX: 'base.spacing.x2' }}>
           <button
             type="button"
-            onClick={() => setPaymentMethod(PaymentTypes.CRYPTO)}
+            onClick={() => handleOptionClick(PaymentTypes.CRYPTO)}
           >
-            {text.methods.options[PrimaryRevenueWidgetViews.PAY_WITH_COINS].heading}
+            {
+              text.methods.options[PrimaryRevenueWidgetViews.PAY_WITH_COINS]
+                .heading
+            }
           </button>
           <button
             type="button"
-            onClick={() => setPaymentMethod(PaymentTypes.FIAT)}
+            onClick={() => handleOptionClick(PaymentTypes.FIAT)}
           >
-            {text.methods.options[PrimaryRevenueWidgetViews.PAY_WITH_CARD].heading}
+            {
+              text.methods.options[PrimaryRevenueWidgetViews.PAY_WITH_CARD]
+                .heading
+            }
           </button>
         </Box>
       </Box>
