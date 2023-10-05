@@ -20,7 +20,7 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
         <LoadingView loadingText="todo loading text" />
       )}
       { subView === FundWithSmartCheckoutSubViews.FUNDING_ROUTE_SELECT && (
-        <FundingRouteSelect />
+        <FundingRouteSelect fundingRoutes={[]} />
       )}
       { subView === FundWithSmartCheckoutSubViews.FUNDING_ROUTE_EXECUTE && (
         <FundingRouteExecute />

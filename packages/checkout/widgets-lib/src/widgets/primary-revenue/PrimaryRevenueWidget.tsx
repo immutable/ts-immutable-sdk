@@ -17,7 +17,9 @@ import {
 } from '../../context/view-context/ViewContext';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 
-import { PrimaryRevenueWidgetViews } from '../../context/view-context/PrimaryRevenueViewContextTypes';
+import {
+  PrimaryRevenueWidgetViews,
+} from '../../context/view-context/PrimaryRevenueViewContextTypes';
 import { Item } from './types';
 import { widgetTheme } from '../../lib/theme';
 import { SharedContextProvider } from './context/SharedContextProvider';
@@ -51,10 +53,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
   const biomeTheme = useMemo(() => widgetTheme(theme), [theme]);
 
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
-  const viewReducerValues = useMemo(
-    () => ({ viewState, viewDispatch }),
-    [viewState, viewDispatch],
-  );
+  const viewReducerValues = useMemo(() => ({ viewState, viewDispatch }), [viewState, viewDispatch]);
 
   const onMount = useCallback(() => {
     if (!checkout || !provider) return;
