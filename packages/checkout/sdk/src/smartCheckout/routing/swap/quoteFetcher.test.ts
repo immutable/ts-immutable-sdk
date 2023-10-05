@@ -221,7 +221,7 @@ describe('quoteFetcher', () => {
     expect(quotes).toEqual(mockDexQuotes);
   });
 
-  it('should return empty map if dex errors', async () => {
+  it('should return empty map if creating instance errors', async () => {
     (createExchangeInstance as jest.Mock).mockRejectedValue({});
 
     const quotes = await quoteFetcher(
@@ -236,5 +236,84 @@ describe('quoteFetcher', () => {
     );
 
     expect(quotes).toEqual(new Map<string, DexQuote>([]));
+  });
+
+  it('should fetch quotes that resolved', async () => {
+    (createExchangeInstance as jest.Mock).mockReturnValue({
+      getUnsignedSwapTxFromAmountOut: jest.fn()
+        .mockResolvedValueOnce(
+          constructTransactionResponse(1, 2, 3, 4),
+        )
+        .mockRejectedValueOnce(
+          constructTransactionResponse(5, 6, 7, 8),
+        )
+        .mockResolvedValueOnce(
+          constructTransactionResponse(9, 10, 11, 12),
+        ),
+    });
+
+    const mockDexQuotes: DexQuotes = new Map<string, DexQuote>([]);
+    mockDexQuotes.set('0xERC20_1', constructDexQuote(1, 2, 3, 4));
+    mockDexQuotes.set('0xERC20_3', constructDexQuote(9, 10, 11, 12));
+
+    const quotes = await quoteFetcher(
+      config,
+      ChainId.IMTBL_ZKEVM_TESTNET,
+      '0xADDRESS',
+      {
+        address: '0xREQUIRED_ERC20',
+        amount: BigNumber.from(0),
+      },
+      ['0xERC20_1', '0xERC20_2', '0xERC20_3'],
+    );
+
+    expect(quotes).toEqual(mockDexQuotes);
+  });
+
+  it('should not fetch quote if swappable token matches required token', async () => {
+    const getUnsignedSwapTxFromAmountOut = jest.fn();
+    (createExchangeInstance as jest.Mock).mockReturnValue({
+      getUnsignedSwapTxFromAmountOut,
+    });
+
+    await quoteFetcher(
+      config,
+      ChainId.IMTBL_ZKEVM_TESTNET,
+      '0xADDRESS',
+      {
+        address: '0xREQUIRED_ERC20',
+        amount: BigNumber.from(0),
+      },
+      ['0xREQUIRED_ERC20'],
+    );
+
+    expect(getUnsignedSwapTxFromAmountOut).not.toBeCalled();
+  });
+
+  it('should fetch quote for tokens that do not match required token', async () => {
+    const getUnsignedSwapTxFromAmountOut = jest.fn()
+      .mockResolvedValue(
+        constructTransactionResponse(1, 2, 3, 4),
+      );
+    (createExchangeInstance as jest.Mock).mockReturnValue({
+      getUnsignedSwapTxFromAmountOut,
+    });
+
+    const mockDexQuotes: DexQuotes = new Map<string, DexQuote>([]);
+    mockDexQuotes.set('0xERC20_1', constructDexQuote(1, 2, 3, 4));
+
+    const quotes = await quoteFetcher(
+      config,
+      ChainId.IMTBL_ZKEVM_TESTNET,
+      '0xADDRESS',
+      {
+        address: '0xREQUIRED_ERC20',
+        amount: BigNumber.from(0),
+      },
+      ['0xERC20_1', '0xREQUIRED_ERC20'],
+    );
+
+    expect(quotes).toEqual(mockDexQuotes);
+    expect(getUnsignedSwapTxFromAmountOut).toBeCalledTimes(1);
   });
 });
