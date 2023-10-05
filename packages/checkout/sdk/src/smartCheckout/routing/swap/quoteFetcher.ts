@@ -50,7 +50,7 @@ export const quoteFetcher = async (
     });
 
     return dexQuotes;
-  } catch (err: any) {
+  } catch {
     return dexQuotes;
   }
 };
