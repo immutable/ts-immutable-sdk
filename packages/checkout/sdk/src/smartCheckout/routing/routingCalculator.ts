@@ -5,18 +5,22 @@ import {
   BalanceRequirement,
 } from '../balanceCheck/types';
 import {
+  AvailableRoutingOptions,
+  BridgeFundingStep,
   ChainId,
-  FundingRouteType,
+  FundingRouteFeeEstimate,
+  FundingStepType,
   ItemType,
-  RoutingOptionsAvailable,
+  OnRampFundingStep,
+  RoutesFound,
+  RoutingOutcome,
+  RoutingOutcomeType,
+  SwapFundingStep,
   TokenInfo,
 } from '../../types';
 import {
   DexQuoteCache,
   DexQuotes,
-  FundingRouteStep,
-  RouteCalculatorType,
-  RoutingCalculatorResult,
   TokenBalanceResult,
 } from './types';
 import { getAllTokenBalances } from './tokenBalances';
@@ -35,7 +39,7 @@ import { BridgeRequirement, bridgeRoute } from './bridge/bridgeRoute';
 import { onRampRoute } from './onRamp';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from './indexer/fetchL1Representation';
 
-const hasAvailableRoutingOptions = (availableRoutingOptions: RoutingOptionsAvailable) => (
+const hasAvailableRoutingOptions = (availableRoutingOptions: AvailableRoutingOptions) => (
   availableRoutingOptions.bridge || availableRoutingOptions.swap || availableRoutingOptions.onRamp
 );
 
@@ -58,12 +62,12 @@ export const getInsufficientRequirement = (
 export const getBridgeFundingStep = async (
   config: CheckoutConfiguration,
   readOnlyProviders: Map<ChainId, JsonRpcProvider>,
-  availableRoutingOptions: RoutingOptionsAvailable,
+  availableRoutingOptions: AvailableRoutingOptions,
   insufficientRequirement: BalanceRequirement | undefined,
   ownerAddress: string,
   tokenBalances: Map<ChainId, TokenBalanceResult>,
-  feeEstimates: Map<FundingRouteType, BigNumber>,
-): Promise<FundingRouteStep | undefined> => {
+  feeEstimates: Map<FundingStepType, FundingRouteFeeEstimate>,
+): Promise<BridgeFundingStep | undefined> => {
   let bridgeFundingStep;
 
   if (insufficientRequirement === undefined) return undefined;
@@ -94,14 +98,14 @@ export const getBridgeFundingStep = async (
 
 export const getSwapFundingSteps = async (
   config: CheckoutConfiguration,
-  availableRoutingOptions: RoutingOptionsAvailable,
+  availableRoutingOptions: AvailableRoutingOptions,
   insufficientRequirement: BalanceRequirement | undefined,
   dexQuoteCache: DexQuoteCache,
   ownerAddress: string,
   tokenBalances: Map<ChainId, TokenBalanceResult>,
   swapTokenAllowList: TokenInfo[] | undefined,
-): Promise<FundingRouteStep[]> => {
-  const fundingSteps: FundingRouteStep[] = [];
+): Promise<SwapFundingStep[]> => {
+  const fundingSteps: SwapFundingStep[] = [];
   if (!availableRoutingOptions.swap) return fundingSteps;
   if (insufficientRequirement === undefined) return fundingSteps;
   if (swapTokenAllowList === undefined) return fundingSteps;
@@ -130,13 +134,13 @@ export const getSwapFundingSteps = async (
 export const getBridgeAndSwapFundingSteps = async (
   config: CheckoutConfiguration,
   readOnlyProviders: Map<ChainId, JsonRpcProvider>,
-  availableRoutingOptions: RoutingOptionsAvailable,
+  availableRoutingOptions: AvailableRoutingOptions,
   insufficientRequirement: BalanceRequirement | undefined,
   dexQuoteCache: DexQuoteCache,
   ownerAddress: string,
   tokenBalances: Map<ChainId, TokenBalanceResult>,
   tokenAllowList: RoutingTokensAllowList | undefined,
-  feeEstimates: Map<FundingRouteType, BigNumber>,
+  feeEstimates: Map<FundingStepType, FundingRouteFeeEstimate>,
   balanceRequirements: BalanceCheckResult,
 ): Promise<BridgeAndSwapRoute[]> => {
   if (!insufficientRequirement) return [];
@@ -182,9 +186,9 @@ export const getBridgeAndSwapFundingSteps = async (
 
 export const getOnRampFundingStep = async (
   config: CheckoutConfiguration,
-  availableRoutingOptions: RoutingOptionsAvailable,
+  availableRoutingOptions: AvailableRoutingOptions,
   insufficientRequirement: BalanceRequirement | undefined,
-): Promise<FundingRouteStep | undefined> => {
+): Promise<OnRampFundingStep | undefined> => {
   if (!availableRoutingOptions.onRamp) return undefined;
   if (insufficientRequirement === undefined) return undefined;
 
@@ -201,15 +205,12 @@ export const routingCalculator = async (
   config: CheckoutConfiguration,
   ownerAddress: string,
   balanceRequirements: BalanceCheckResult,
-  availableRoutingOptions: RoutingOptionsAvailable,
-): Promise<RoutingCalculatorResult> => {
+  availableRoutingOptions: AvailableRoutingOptions,
+): Promise<RoutingOutcome> => {
   if (!hasAvailableRoutingOptions(availableRoutingOptions)) {
     return {
-      response: {
-        type: RouteCalculatorType.NO_OPTIONS,
-        message: 'No options available',
-      },
-      fundingRoutes: [],
+      type: RoutingOutcomeType.NO_ROUTE_OPTIONS,
+      message: 'No routing options are available',
     };
   }
 
@@ -238,7 +239,7 @@ export const routingCalculator = async (
   );
 
   // Bridge and swap fee cache
-  const feeEstimates = new Map<FundingRouteType, BigNumber>();
+  const feeEstimates = new Map<FundingStepType, FundingRouteFeeEstimate>();
 
   // Dex quotes cache
   const dexQuoteCache: DexQuoteCache = new Map<string, DexQuotes>();
@@ -289,40 +290,54 @@ export const routingCalculator = async (
 
   const resolved = await Promise.all(routePromises);
 
-  let bridgeFundingStep: FundingRouteStep | undefined;
-  let swapFundingSteps: FundingRouteStep[] = [];
-  let onRampFundingStep: FundingRouteStep | undefined;
+  let bridgeFundingStep: BridgeFundingStep | undefined;
+  let swapFundingSteps: SwapFundingStep[] = [];
+  let onRampFundingStep: OnRampFundingStep | undefined;
   let bridgeAndSwapFundingSteps: BridgeAndSwapRoute[] = [];
   resolved.forEach((result, index) => {
-    if (index === 0) bridgeFundingStep = result as FundingRouteStep | undefined;
-    if (index === 1) swapFundingSteps = result as FundingRouteStep[];
-    if (index === 2) onRampFundingStep = result as FundingRouteStep | undefined;
+    if (index === 0) bridgeFundingStep = result as BridgeFundingStep | undefined;
+    if (index === 1) swapFundingSteps = result as SwapFundingStep[];
+    if (index === 2) onRampFundingStep = result as OnRampFundingStep | undefined;
     if (index === 3) bridgeAndSwapFundingSteps = result as BridgeAndSwapRoute[];
   });
 
-  const response: RoutingCalculatorResult = {
-    response: {
-      type: RouteCalculatorType.NO_ROUTES,
-      message: 'Routes not found',
-    },
+  if (!bridgeFundingStep
+    && swapFundingSteps.length === 0
+    && !onRampFundingStep
+    && bridgeAndSwapFundingSteps.length === 0) {
+    return {
+      type: RoutingOutcomeType.NO_ROUTES_FOUND,
+      message: 'Smart Checkout did not find any funding routes to fulfill the transaction',
+    };
+  }
+
+  const response: RoutesFound = {
+    type: RoutingOutcomeType.ROUTES_FOUND,
     fundingRoutes: [],
   };
 
   let priority = 0;
-
-  if (bridgeFundingStep
-    || swapFundingSteps.length > 0
-    || onRampFundingStep
-    || bridgeAndSwapFundingSteps.length > 0) {
-    response.response.type = RouteCalculatorType.ROUTES_FOUND;
-    response.response.message = 'Routes found';
-  }
 
   if (bridgeFundingStep) {
     priority++;
     response.fundingRoutes.push({
       priority,
       steps: [bridgeFundingStep],
+      // WT-1734 - Add fees
+      totalFees: {
+        gas: {
+          amount: BigNumber.from(0),
+          formattedAmount: '0',
+        },
+        other: {
+          amount: BigNumber.from(0),
+          formattedAmount: '0',
+        },
+        total: {
+          amount: BigNumber.from(0),
+          formattedAmount: '0',
+        },
+      },
     });
   }
 
@@ -332,6 +347,21 @@ export const routingCalculator = async (
       response.fundingRoutes.push({
         priority,
         steps: [swapFundingStep],
+        // WT-1734 - Add fees
+        totalFees: {
+          gas: {
+            amount: BigNumber.from(0),
+            formattedAmount: '0',
+          },
+          other: {
+            amount: BigNumber.from(0),
+            formattedAmount: '0',
+          },
+          total: {
+            amount: BigNumber.from(0),
+            formattedAmount: '0',
+          },
+        },
       });
     });
   }
@@ -352,11 +382,24 @@ export const routingCalculator = async (
       response.fundingRoutes.push({
         priority,
         steps: [bridgeStep, swapStep],
+        // WT-1734 - Add fees
+        totalFees: {
+          gas: {
+            amount: BigNumber.from(0),
+            formattedAmount: '0',
+          },
+          other: {
+            amount: BigNumber.from(0),
+            formattedAmount: '0',
+          },
+          total: {
+            amount: BigNumber.from(0),
+            formattedAmount: '0',
+          },
+        },
       });
     });
   }
 
-  // eslint-disable-next-line no-console
-  console.log('** response', response);
   return response;
 };

@@ -1,6 +1,5 @@
 import { FeeValue } from '@imtbl/orderbook';
-import { BigNumber } from 'ethers';
-import { parseUnits } from 'ethers/lib/utils';
+import { BigNumber, utils } from 'ethers';
 import { FeePercentage, FeeToken, OrderFee } from '../../types/fees';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 
@@ -28,7 +27,7 @@ const calculateFeesToken = (
   decimals: number,
 ): BigNumber => {
   const feeToken = orderFee.amount as FeeToken;
-  const bnFeeAmount = parseUnits(feeToken.token, decimals);
+  const bnFeeAmount = utils.parseUnits(feeToken.token, decimals);
   return bnFeeAmount;
 };
 

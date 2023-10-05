@@ -20,6 +20,10 @@ import { ConnectLoaderContext } from '../../context/connect-loader-context/Conne
 import { PrimaryRevenueWidgetViews } from '../../context/view-context/PrimaryRevenueViewContextTypes';
 import { Item } from './types';
 import { widgetTheme } from '../../lib/theme';
+import { SharedContextProvider } from './context/SharedContextProvider';
+import { PaymentMethods } from './views/PaymentMethods';
+import { PayWithCard } from './views/PayWithCard';
+import { PayWithCoins } from './views/PayWithCoins';
 
 export interface PrimaryRevenueWidgetProps {
   config: StrongCheckoutWidgetsConfig;
@@ -51,7 +55,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
     [viewState, viewDispatch],
   );
 
-  const mount = useCallback(() => {
+  const onMount = useCallback(() => {
     if (!checkout || !provider) return;
 
     viewDispatch({
@@ -66,16 +70,42 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
 
   useEffect(() => {
     if (!checkout || !provider) return;
-    mount();
+
+    onMount();
   }, [checkout, provider]);
 
   return (
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>
       <ViewContext.Provider value={viewReducerValues}>
-        {viewState.view.type === SharedViews.LOADING_VIEW && (
-          <LoadingView loadingText={loadingText} />
-        )}
-        Primary Revenue Widget
+        <SharedContextProvider
+          value={{
+            config,
+            items,
+            amount,
+            fromContractAddress,
+            env,
+            environmentId,
+            provider,
+            checkout,
+          }}
+        >
+          {viewState.view.type === SharedViews.LOADING_VIEW && (
+            <LoadingView loadingText={loadingText} />
+          )}
+          {viewState.view.type === SharedViews.ERROR_VIEW && (
+            <div>{viewState.view.error.message}</div>
+          )}
+          {viewState.view.type
+            === PrimaryRevenueWidgetViews.PAYMENT_METHODS && (
+            <PaymentMethods />
+          )}
+          {viewState.view.type === PrimaryRevenueWidgetViews.PAY_WITH_CARD && (
+            <PayWithCard />
+          )}
+          {viewState.view.type === PrimaryRevenueWidgetViews.PAY_WITH_COINS && (
+            <PayWithCoins />
+          )}
+        </SharedContextProvider>
       </ViewContext.Provider>
     </BiomeCombinedProviders>
   );

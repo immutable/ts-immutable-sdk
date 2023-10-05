@@ -122,5 +122,6 @@ describe('registerZkEvmUser', () => {
         Authorization: `Bearer ${accessToken}`,
       },
     });
+    expect(authManager.loginSilent).toHaveBeenCalledWith({ forceRefresh: true });
   });
 });

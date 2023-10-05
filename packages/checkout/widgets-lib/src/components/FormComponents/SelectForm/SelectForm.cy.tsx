@@ -9,7 +9,7 @@ describe('SelectForm', () => {
     mount(
       <BiomeCombinedProviders>
         <SelectForm
-          id="select-form-test"
+          testId="select-form-test"
           options={[
             {
               id: 'imx',
@@ -35,7 +35,7 @@ describe('SelectForm', () => {
     mount(
       <BiomeCombinedProviders>
         <SelectForm
-          id="select-form-test"
+          testId="select-form-test"
           options={[
             {
               id: 'imx',
@@ -62,7 +62,7 @@ describe('SelectForm', () => {
     mount(
       <BiomeCombinedProviders>
         <SelectForm
-          id="select-form-test"
+          testId="select-form-test"
           options={[
             {
               id: 'imx',
@@ -87,7 +87,7 @@ describe('SelectForm', () => {
     mount(
       <BiomeCombinedProviders>
         <SelectForm
-          id="select-form-test"
+          testId="select-form-test"
           options={[]}
           onSelectChange={() => {}}
           coinSelectorHeading="Select coin"
@@ -101,7 +101,7 @@ describe('SelectForm', () => {
     mount(
       <BiomeCombinedProviders>
         <SelectForm
-          id="select-form-test"
+          testId="select-form-test"
           options={[]}
           onSelectChange={() => {}}
           coinSelectorHeading="Select coin"

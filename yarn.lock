@@ -1896,9 +1896,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.10.8":
-  version: 0.10.8
-  resolution: "@biom3/react@npm:0.10.8"
+"@biom3/react@npm:^0.10.12":
+  version: 0.10.12
+  resolution: "@biom3/react@npm:0.10.12"
   dependencies:
     "@biom3/design-tokens": "*"
     "@emotion/css": ^11.11.2
@@ -1915,7 +1915,7 @@ __metadata:
     react-dom: ^18.2.0
     react-is: ^18.2.0
     ts-deepmerge: ^6.2.0
-  checksum: c7f10a15bbf6437c09989de009ca63b9e78be3a30149f35a8fbd7b8ed365737aa068d431e14930ef589a6697f644ab5f5135cca25562331d1def622089659289
+  checksum: 1961438892fc8dee771c5eb5d9dc9277a51485d4f3b5f39ae5123a3359e983d479e13021cf423aee605fdefdec5d346deda1fed0083c82e2d0f323c3c4fcf56f
   languageName: node
   linkType: hard
 
@@ -3059,7 +3059,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-sdk-sample-app@workspace:packages/checkout/sdk-sample-app"
   dependencies:
-    "@biom3/react": ^0.10.8
+    "@biom3/react": ^0.10.12
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/config": 0.0.0
     "@svgr/webpack": ^8.0.1
@@ -3122,7 +3122,7 @@ __metadata:
   resolution: "@imtbl/checkout-widgets-lib@workspace:packages/checkout/widgets-lib"
   dependencies:
     "@biom3/design-tokens": 0.2.4-beta
-    "@biom3/react": ^0.10.8
+    "@biom3/react": ^0.10.12
     "@ethersproject/providers": ^5.7.2
     "@imtbl/bridge-sdk": 0.0.0
     "@imtbl/checkout-sdk": 0.0.0
@@ -3170,7 +3170,7 @@ __metadata:
   resolution: "@imtbl/checkout-widgets-sample-app@workspace:packages/checkout/widgets-sample-app"
   dependencies:
     "@biom3/design-tokens": 0.2.4-beta
-    "@biom3/react": ^0.10.8
+    "@biom3/react": ^0.10.12
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
@@ -3346,7 +3346,7 @@ __metadata:
   resolution: "@imtbl/economy-building-blocks-playground@workspace:packages/internal/economy-building-blocks/playground"
   dependencies:
     "@biom3/design-tokens": 0.2.4-beta
-    "@biom3/react": ^0.10.8
+    "@biom3/react": ^0.10.12
     "@imtbl/blockchain-data": 0.0.0
     "@imtbl/passport": 0.0.0
     "@imtbl/sdk": 0.0.0
@@ -3596,7 +3596,7 @@ __metadata:
   resolution: "@imtbl/passport-sdk-sample-app@workspace:packages/passport/sdk-sample-app"
   dependencies:
     "@biom3/design-tokens": 0.2.4-beta
-    "@biom3/react": ^0.10.8
+    "@biom3/react": ^0.10.12
     "@imtbl/config": 0.0.0
     "@imtbl/core-sdk": ^2.0.2
     "@imtbl/immutablex-client": 0.0.0
@@ -3644,6 +3644,7 @@ __metadata:
     "@swc/jest": ^0.2.24
     "@types/axios": ^0.14.0
     "@types/jest": ^29.4.3
+    "@types/jwt-encode": ^1.0.1
     "@types/node": ^18.14.2
     "@types/react": ^18.0.28
     "@types/react-dom": ^18.0.11
@@ -3655,6 +3656,8 @@ __metadata:
     ethers: ^5.7.2
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
+    jwt-decode: ^3.1.2
+    jwt-encode: ^1.0.1
     magic-sdk: ^13.3.1
     msw: ^1.2.2
     oidc-client-ts: ^2.2.1
@@ -3752,6 +3755,7 @@ __metadata:
     eslint: ^8.40.0
     ethers: ^5.7.2
     glob: ^10.2.3
+    jwt-decode: ^3.1.2
     magic-sdk: ^13.3.1
     oidc-client-ts: ^2.2.1
     rollup: ^3.17.2
@@ -9777,6 +9781,13 @@ __metadata:
   version: 0.0.29
   resolution: "@types/json5@npm:0.0.29"
   checksum: e60b153664572116dfea673c5bda7778dbff150498f44f998e34b5886d8afc47f16799280e4b6e241c0472aef1bc36add771c569c68fc5125fc2ae519a3eb9ac
+  languageName: node
+  linkType: hard
+
+"@types/jwt-encode@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "@types/jwt-encode@npm:1.0.1"
+  checksum: 63bdfe9ebe0fab5a3635a4219d9e7667b15fbd48534fa07a1d3c9036c30f06ce8c7bcae1d4b17e293186b1c281d2ff4ef943877f5a92fcc0a5cd0d9b6823c5a1
   languageName: node
   linkType: hard
 
@@ -21026,6 +21037,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"jwt-encode@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "jwt-encode@npm:1.0.1"
+  dependencies:
+    ts.cryptojs256: ^1.0.1
+  checksum: 440e0e80a45fcad5e2e2542e632bbf7692d50a2574ca895e0961e8a6c08dc91b537b2e7bcd1bbd1c9a01ca937287d6078dd1e04dcc63832facbe8abb9f6291e6
+  languageName: node
+  linkType: hard
+
 "keccak@npm:^3.0.0, keccak@npm:^3.0.2":
   version: 3.0.3
   resolution: "keccak@npm:3.0.3"
@@ -26706,7 +26726,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "sample-app@workspace:packages/provider/src/sample-app"
   dependencies:
-    "@biom3/react": ^0.10.8
+    "@biom3/react": ^0.10.12
     "@imtbl/core-sdk": ^2.0.2
     "@imtbl/sdk": 0.0.0
     "@svgr/webpack": ^8.0.1
@@ -28946,6 +28966,13 @@ __metadata:
     ts-node-transpile-only: dist/bin-transpile.js
     ts-script: dist/bin-script-deprecated.js
   checksum: 090adff1302ab20bd3486e6b4799e90f97726ed39e02b39e566f8ab674fd5bd5f727f43615debbfc580d33c6d9d1c6b1b3ce7d8e3cca3e20530a145ffa232c35
+  languageName: node
+  linkType: hard
+
+"ts.cryptojs256@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "ts.cryptojs256@npm:1.0.1"
+  checksum: 94f5a3d7e779e7cb533226731bb0d3cf6ed0a3f8e4032e44e80f9a2de68c57c86db1a39e69c412a4012c769186232b586d554fd863bbebd6d431d606d8980c72
   languageName: node
   linkType: hard
 
