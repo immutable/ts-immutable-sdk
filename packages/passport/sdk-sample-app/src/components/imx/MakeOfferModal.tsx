@@ -20,10 +20,6 @@ function MakeOfferModal({
   const { imxProvider } = usePassportProvider();
   const { addMessage } = useStatusProvider();
 
-  if (!order) {
-    return <Spinner />;
-  }
-
   const handleClose = () => {
     setShowModal(false);
     if (onClose) {
@@ -32,8 +28,9 @@ function MakeOfferModal({
   };
 
   const handleSubmit = async () => {
-    setIsLoading(true);
+    if (!order) return;
 
+    setIsLoading(true);
     try {
       const request: UnsignedOrderRequest = {
         sell: {
@@ -52,6 +49,7 @@ function MakeOfferModal({
       addMessage('Create Order', createOrderResponse);
     } catch (err) {
       addMessage('Create Order', err);
+    } finally {
       handleClose();
     }
   };
@@ -69,7 +67,7 @@ function MakeOfferModal({
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        { isLoading ? <Spinner /> : (
+        { isLoading || !order ? <Spinner /> : (
           <Stack gap={2}>
             <dl>
               <dt>Image</dt>
@@ -122,7 +120,7 @@ function MakeOfferModal({
         <WorkflowButton onClick={handleSubmit} disabled={isLoading}>
           Make Offer
         </WorkflowButton>
-        <WorkflowButton disabled={isLoading} onClick={() => setShowModal(false)}>
+        <WorkflowButton disabled={isLoading} onClick={handleClose}>
           Cancel
         </WorkflowButton>
       </Modal.Footer>
