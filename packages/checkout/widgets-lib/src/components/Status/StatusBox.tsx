@@ -18,17 +18,17 @@ export function StatusBox({ statusText, statusType }: StatusViewProps) {
   const isSuccess = statusType === StatusType.SUCCESS;
 
   return (
-    <Box sx={statusBoxStyles} testId={`${statusType.toString()}-box`}>
+    <Box sx={statusBoxStyles} testId={`${statusType}-box`}>
       <Icon
         icon={status[statusType] as any}
-        testId={`${statusType.toString()}-icon`}
+        testId={`${statusType}-icon`}
         variant="bold"
         sx={statusLogoFill(isSuccess)}
       />
       <Body
         size="medium"
         weight="bold"
-        testId={`${statusType.toString()}-text`}
+        testId={`${statusType}-text`}
         sx={{ textAlign: 'center' }}
       >
         {statusText}
