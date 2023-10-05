@@ -50,14 +50,20 @@ export const useTransakIframe = (props: UseTransakIframeProps) => {
 
   const getNFTCheckoutURL = useCallback(() => {
     const {
-      nftData: products,
+      nftData: nfts,
       estimatedGasLimit,
       ...restTransakParams
     } = transakParams;
 
     // Default to first product
-    // TODO: Remove this once transak supports multiple item minting
-    const nftData = products.slice(0, 1);
+    // FIXME: Remove this once transak supports multiple item minting
+    const nftData = nfts.map(({ nftName, ...nft }) => ({
+      ...nft,
+      nftName: nftName.replace(/x\d+$/, ''),
+    })).slice(0, 1);
+
+    // FIXME: Gas limit is not being calculated correctly, and cant be set to 0
+    const gasLimit = estimatedGasLimit > 0 ? estimatedGasLimit : 300000;
 
     const params = {
       apiKey,
@@ -66,16 +72,14 @@ export const useTransakIframe = (props: UseTransakIframeProps) => {
       disableWalletAddressForm: 'true',
       environment: 'STAGING',
       nftData: btoa(JSON.stringify(nftData)),
-      estimatedGasLimit: estimatedGasLimit.toString(),
+      estimatedGasLimit: gasLimit.toString(),
       ...restTransakParams,
     };
-    console.log("@@@ useTransakIframe params:", params, nftData); // eslint-disable-line
 
     const baseUrl = `${TRANSAK_API_BASE_URL[environment]}?`;
     const queryParams = new URLSearchParams(params);
     const widgetUrl = `${baseUrl}${queryParams.toString()}`;
 
-    console.log('🚀 ~ widgetUrl:', widgetUrl);
     return widgetUrl;
   }, [props]);
 

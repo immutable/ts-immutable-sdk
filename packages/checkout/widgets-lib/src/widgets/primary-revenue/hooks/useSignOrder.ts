@@ -19,6 +19,32 @@ const PRIMARY_SALES_API_BASE_URL = {
     'https://api.immutable.com/v1/primary-sales/:environmentId/order/sign',
 };
 
+type SignApiTransaction = {
+  contract_address: string;
+  gas_estimate: number;
+  method_call: string;
+  params: {
+    amount?: number;
+    spender?: string;
+    data?: string[];
+    deadline?: number;
+    multicallSigner?: string;
+    reference?: string;
+    signature?: string;
+    targets?: string[];
+  };
+  raw_data: string;
+};
+
+type SignApiProduct = {
+  detail: {
+    amount: number;
+    collection_address: string;
+    token_id: string;
+  }[];
+  product_id: string;
+};
+
 type SignApiResponse = {
   order: {
     currency: {
@@ -27,32 +53,10 @@ type SignApiResponse = {
       erc20_address: string;
     };
     currency_symbol: string;
-    products: {
-      detail: {
-        amount: number;
-        collection_address: string;
-        token_id: string;
-      }[];
-      product_id: string;
-    }[];
+    products: SignApiProduct[];
     total_amount: string;
   };
-  transactions: {
-    contract_address: string;
-    gas_estimate: number;
-    method_call: string;
-    params: {
-      amount?: number;
-      spender?: string;
-      data?: string[];
-      deadline?: number;
-      multicallSigner?: string;
-      reference?: string;
-      signature?: string;
-      targets?: string[];
-    };
-    raw_data: string;
-  }[];
+  transactions: SignApiTransaction[];
 };
 
 enum SignCurrencyFilter {
@@ -72,7 +76,7 @@ type SignApiRequest = {
 };
 
 const toSignedProduct = (
-  product: SignApiResponse['order']['products'][0],
+  product: SignApiProduct,
   currency: string,
   item?: Item,
 ): SignedOrderProduct => ({

@@ -16,6 +16,7 @@ export function WithCard() {
   const executeTxn = signResponse?.transactions.find((txn) => txn.methodCall.startsWith('execute'));
 
   if (!signResponse || !executeTxn) {
+    // TODO: dispatch error
     return null;
   }
 
