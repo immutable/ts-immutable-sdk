@@ -95,7 +95,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
       payload: {
         type: ViewActions.UPDATE_VIEW,
         view: {
-          type: PrimaryRevenueWidgetViews.FAIL,
+          type: PrimaryRevenueWidgetViews.PAYMENT_METHODS,
         },
       },
     });
@@ -211,17 +211,6 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
           )}
           {viewState.view.type === PrimaryRevenueWidgetViews.PAY_WITH_COINS && (
             <PayWithCoins />
-          )}
-          {viewState.view.type === PrimaryRevenueWidgetViews.SUCCESS && (
-            <StatusView
-              statusText="Connection secure"
-              actionText="Continue"
-              statusType={StatusType.SUCCESS}
-              testId="success-view"
-              onActionClick={() => {}}
-              secondaryActionText="Dismiss"
-              onSecondaryActionClick={() => {}}
-            />
           )}
           {viewState.view.type === PrimaryRevenueWidgetViews.FAIL && (
             <StatusView {...determineStatusViewProps()} />
