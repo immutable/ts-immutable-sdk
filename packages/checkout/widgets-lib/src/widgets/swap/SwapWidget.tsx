@@ -7,7 +7,7 @@ import {
   useState,
 } from 'react';
 import { BiomeCombinedProviders } from '@biom3/react';
-import { DexConfig, TokenFilterTypes } from '@imtbl/checkout-sdk';
+import { CheckoutErrorType, DexConfig, TokenFilterTypes } from '@imtbl/checkout-sdk';
 import { ImmutableConfiguration } from '@imtbl/config';
 import { Exchange, ExchangeOverrides } from '@imtbl/dex-sdk';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
@@ -190,15 +190,14 @@ export function SwapWidget(props: SwapWidgetProps) {
 
       let overrides: ExchangeOverrides | undefined;
       try {
-        const isDexAvailable = await checkout.config.remote.checkDexAvailability();
-        if (!isDexAvailable) {
-          showServiceUnavailableErrorView();
-          return;
-        }
         overrides = (
           (await checkout.config.remote.getConfig('dex')) as DexConfig
         ).overrides;
       } catch (err: any) {
+        if (err.type === CheckoutErrorType.SERVICE_UNAVAILABLE) {
+          showServiceUnavailableErrorView();
+          return;
+        }
         showErrorView(err);
         return;
       }

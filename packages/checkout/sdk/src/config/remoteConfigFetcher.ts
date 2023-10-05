@@ -8,6 +8,7 @@ import {
   RemoteConfiguration,
   ChainTokensConfig,
 } from '../types';
+import { CheckoutError, CheckoutErrorType } from '../errors';
 
 export type RemoteConfigParams = {
   isDevelopment: boolean;
@@ -85,6 +86,12 @@ export class RemoteConfigFetcher {
     | RemoteConfiguration[keyof RemoteConfiguration]
     | undefined
     > {
+    if (key === 'dex') {
+      const isDexAvailable = await this.checkDexAvailability();
+      if (!isDexAvailable) {
+        throw new CheckoutError(CheckoutErrorType.SERVICE_UNAVAILABLE, CheckoutErrorType.SERVICE_UNAVAILABLE);
+      }
+    }
     const config = await this.loadConfig();
     if (!config) return undefined;
     if (!key) return config;
