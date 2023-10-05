@@ -3,7 +3,6 @@ const importConnect = () => import('./widgets/connect/ConnectWebComponent');
 const importSwap = () => import('./widgets/swap/SwapWebComponent');
 const importWallet = () => import('./widgets/wallet/WalletWebComponent');
 const importBridge = () => import('./widgets/bridge/BridgeWebComponent');
-const importOnRamp = () => import('./widgets/on-ramp/OnRampWebComponent');
 
 // Use the dynamic imports to load components asynchronously
 Promise.all([
@@ -15,7 +14,5 @@ Promise.all([
     || customElements.define('imtbl-swap', (await importSwap()).ImmutableSwap),
   customElements.get('imtbl-bridge')
     || customElements.define('imtbl-bridge', (await importBridge()).ImmutableBridge),
-  customElements.get('imtbl-onramp')
-    || customElements.define('imtbl-onramp', (await importOnRamp()).ImmutableOnRamp),
 ]);
 export { };

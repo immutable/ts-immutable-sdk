@@ -54,6 +54,19 @@ const main = () => {
 
         fs.writeFileSync(destPath, data);
       });
+
+      // Copy all *.chunk.js files
+      const chunkFiles = glob.sync(path.join(dirname, '..', item.src.replace('main.*.js', '*.chunk.js')));
+      chunkFiles.forEach((chunkFile) => {
+        const destChunkPath = path.join(dirname, '..', item.dest.replace('checkout.js', path.basename(chunkFile)));
+
+        const directoryChunkPath = path.dirname(destChunkPath);
+        if (!fs.existsSync(directoryChunkPath)) {
+          fs.mkdirSync(directoryChunkPath, { recursive: true });
+        }
+
+        fs.copyFileSync(chunkFile, destChunkPath);
+      });
     }
   });
 };
