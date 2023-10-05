@@ -11,6 +11,7 @@ const status = {
   [StatusType.SUCCESS]: 'TickWithCircle',
   [StatusType.WARNING]: 'Shield',
   [StatusType.FAILURE]: 'CloseWithCircle',
+  [StatusType.INFORMATION]: 'InformationCircle',
 };
 
 export function StatusBox({ statusText, statusType }: StatusViewProps) {

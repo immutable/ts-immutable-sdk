@@ -95,7 +95,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
       payload: {
         type: ViewActions.UPDATE_VIEW,
         view: {
-          type: PrimaryRevenueWidgetViews.PAYMENT_METHODS,
+          type: PrimaryRevenueWidgetViews.FAIL,
         },
       },
     });
@@ -161,7 +161,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
     [MintErrorTypes.DEFAULT]: {
       onActionClick: updateToPaymentMethods,
       onSecondaryActionClick: closeWidget,
-      statusType: StatusType.WARNING,
+      statusType: StatusType.INFORMATION,
     },
   };
 
