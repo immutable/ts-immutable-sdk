@@ -1,8 +1,5 @@
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Box } from '@biom3/react';
-import { ChainId } from '@imtbl/checkout-sdk';
-import { BigNumber } from 'ethers';
+import { FundingRoute } from '@imtbl/checkout-sdk';
 import {
   useContext,
   useMemo, useState,
@@ -16,56 +13,6 @@ import {
   FundingRouteExecute,
 } from '../components/FundingRouteExecute/FundingRouteExecute';
 import { FundingRouteSelect } from '../components/FundingRouteSelect/FundingRouteSelect';
-import { FundingRoute } from './smartCheckoutTypes';
-
-const MOCK_ROUTES = [
-  {
-    priority: 1,
-    steps: [{
-      type: 'BRIDGE',
-      chainId: ChainId.SEPOLIA,
-      asset: {
-        balance: BigNumber.from(1),
-        formattedBalance: '1',
-        token: {
-          name: 'ETH',
-          symbol: 'ETH',
-          decimals: 18,
-        },
-      },
-    }, {
-      type: 'SWAP',
-      chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-      asset: {
-        balance: BigNumber.from(10),
-        formattedBalance: '10',
-        token: {
-          name: 'ERC20',
-          symbol: 'USDC',
-          decimals: 18,
-          address: '0xERC20_2',
-        },
-      },
-    }],
-  },
-  {
-    priority: 2,
-    steps: [{
-      type: 'SWAP',
-      chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-      asset: {
-        balance: BigNumber.from(10),
-        formattedBalance: '10',
-        token: {
-          name: 'ERC20',
-          symbol: 'USDC',
-          decimals: 18,
-          address: '0xERC20_2',
-        },
-      },
-    }],
-  },
-];
 
 type FundWithSmartCheckoutProps = {
   subView: FundWithSmartCheckoutSubViews;
@@ -92,8 +39,6 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
       return;
     }
     if (fundingRouteStepIndex === selectedFundingRoute.steps.length - 1) {
-      // Reached the end - exit FundWithSmartCheckout
-      console.log('@@@@@ FundWithSmartCheckout - all steps completed');
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -118,7 +63,7 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
       { subView === FundWithSmartCheckoutSubViews.FUNDING_ROUTE_SELECT && (
         <FundingRouteSelect
           onFundingRouteSelected={onFundingRouteSelected}
-          fundingRoutes={MOCK_ROUTES}
+          fundingRoutes={[]}
         />
       )}
       { subView === FundWithSmartCheckoutSubViews.FUNDING_ROUTE_EXECUTE && (
