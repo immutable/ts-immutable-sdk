@@ -9,10 +9,11 @@ export interface TopUpMenuItemProps {
   subcaption: string,
   onClick: () => void,
   renderFeeFunction: (fees: string, feesLoading: boolean) => ReactNode,
+  isDisabled?: boolean;
 }
 
 export function TopUpMenuItem({
-  testId, icon, heading, caption, subcaption, onClick, renderFeeFunction,
+  testId, icon, heading, caption, subcaption, onClick, renderFeeFunction, isDisabled,
 }: TopUpMenuItemProps) {
   return (
     <Box testId="top-up-view" sx={{ paddingY: '1px' }}>

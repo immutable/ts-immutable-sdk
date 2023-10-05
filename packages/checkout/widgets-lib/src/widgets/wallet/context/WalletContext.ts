@@ -16,6 +16,7 @@ export interface TopUpFeature {
   isOnRampEnabled?: boolean;
   isSwapEnabled?: boolean;
   isBridgeEnabled?: boolean;
+  isSwapAvailable?: boolean;
 }
 
 export const initialWalletState: WalletState = {

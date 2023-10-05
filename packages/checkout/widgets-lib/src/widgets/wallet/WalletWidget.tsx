@@ -73,30 +73,32 @@ export function WalletWidget(props: WalletWidgetProps) {
   );
   const themeReducerValue = useMemo(() => widgetTheme(theme), [theme]);
 
-  const [topUpSwapEnabled, setTopUpSwapEnabled] = useState(false);
-
   /* Set Config into WalletState */
   useEffect(() => {
     (async () => {
       if (!checkout) return;
 
-      let swapEnabled = isSwapEnabled;
+      let checkSwapAvailable;
 
       try {
-        (await checkout.config.remote.getConfig('dex')) as DexConfig;
+        checkSwapAvailable = await checkout.config.remote.checkDexAvailability();
       } catch (err: any) {
-        swapEnabled = false;
+        if (err.type === CheckoutErrorType.SERVICE_UNAVAILABLE) {
+          checkSwapAvailable = false;
+        } else {
+          showErrorView(err);
+          return;
+        }
       }
-
-      setTopUpSwapEnabled(swapEnabled);
 
       walletDispatch({
         payload: {
           type: WalletActions.SET_SUPPORTED_TOP_UPS,
           supportedTopUps: {
             isBridgeEnabled,
-            isSwapEnabled: swapEnabled,
+            isSwapEnabled,
             isOnRampEnabled,
+            isSwapAvailable: checkSwapAvailable,
           },
         },
       });
@@ -186,7 +188,7 @@ export function WalletWidget(props: WalletWidgetProps) {
               <TopUpView
                 widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
                 showOnrampOption={isOnRampEnabled}
-                showSwapOption={topUpSwapEnabled}
+                showSwapOption={isSwapEnabled}
                 showBridgeOption={isBridgeEnabled}
                 onCloseButtonClick={() => sendWalletWidgetCloseEvent(eventTarget)}
               />
