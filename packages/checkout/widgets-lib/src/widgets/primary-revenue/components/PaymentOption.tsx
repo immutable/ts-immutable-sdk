@@ -34,7 +34,7 @@ export function PaymentOption(props: PaymentOptionProps) {
     >
       <MenuItem.FramedIcon icon={icon[type]} />
       <MenuItem.Label size="medium">{optionText.heading}</MenuItem.Label>
-      {!disabled ? <MenuItem.IntentIcon /> : null}
+      {!disabled && <MenuItem.IntentIcon />}
       <MenuItem.Caption>
         {disabled && optionText.disabledCaption
           ? optionText.disabledCaption
