@@ -341,7 +341,7 @@ export const text = {
         caption: 'Powered by Transak',
       },
     },
-    [PrimaryRevenueWidgetViews.FAIL]: {
+    [PrimaryRevenueWidgetViews.MINT_FAIL]: {
       errors: {
         [MintErrorTypes.TRANSACTION_FAILED]: {
           description: 'Transaction failed',
