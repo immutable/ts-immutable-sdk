@@ -474,10 +474,12 @@ export type TotalFees = {
  * Represents a fee
  * @property {BigNumber} amount - The amount of the fee
  * @property {string} formatted - The formatted amount of the fee
+ * @property {TokenInfo | undefined} token - The token info for the fee
  */
 export type Fee = {
   amount: BigNumber;
   formattedAmount: string;
+  token?: TokenInfo;
 };
 
 /*
