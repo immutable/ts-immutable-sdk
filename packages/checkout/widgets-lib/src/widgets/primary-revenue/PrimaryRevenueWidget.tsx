@@ -166,7 +166,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
   };
 
   const determineStatusViewProps = (): StatusViewProps => {
-    const errorTextConfig: AllErrorTextConfigs = text.views[PrimaryRevenueWidgetViews.FAIL].errors;
+    const errorTextConfig: AllErrorTextConfigs = text.views[PrimaryRevenueWidgetViews.MINT_FAIL].errors;
     const errorType = viewState.view.data?.error || MintErrorTypes.DEFAULT;
 
     const handlers = errorHandlersConfig[errorType] || {};
@@ -212,7 +212,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
           {viewState.view.type === PrimaryRevenueWidgetViews.PAY_WITH_COINS && (
             <PayWithCoins />
           )}
-          {viewState.view.type === PrimaryRevenueWidgetViews.FAIL && (
+          {viewState.view.type === PrimaryRevenueWidgetViews.MINT_FAIL && (
             <StatusView {...determineStatusViewProps()} />
           )}
         </SharedContextProvider>
