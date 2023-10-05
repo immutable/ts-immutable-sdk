@@ -29,7 +29,7 @@ export function PaymentOptions(props: PaymentOptionsProps) {
 
   return (
     <Box
-      testId="wallet-list"
+      testId="payment-options-list"
       sx={{
         width: '100%',
         display: 'flex',
@@ -38,6 +38,7 @@ export function PaymentOptions(props: PaymentOptionsProps) {
         alignItems: 'flex-start',
       }}
     >
+      {/* TODO: based on Smart Checkout result pass disabled={true/false} for Coins option */}
       {options.map((type) => (
         <PaymentOption onClick={onClick} type={type} key={type} />
       ))}
