@@ -1,6 +1,6 @@
 import { Environment } from '@imtbl/config';
 import { JsonRpcProvider } from '@ethersproject/providers';
-import { BigNumber } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 import {
   BridgeRequirement,
   bridgeRoute,
@@ -12,6 +12,7 @@ import { CheckoutConfiguration } from '../../../config';
 import {
   BridgeRouteFeeEstimate,
   ChainId,
+  DEFAULT_TOKEN_DECIMALS,
   FundingRouteFeeEstimate,
   FundingStepType,
   ItemType,
@@ -47,7 +48,7 @@ describe('bridgeRoute', () => {
         {
           type: FundingStepType.BRIDGE,
           gasFee: {
-            estimatedAmount: BigNumber.from(1),
+            estimatedAmount: BigNumber.from(2),
             token: {
               name: 'Ethereum',
               symbol: 'ETH',
@@ -55,14 +56,14 @@ describe('bridgeRoute', () => {
             },
           },
           bridgeFee: {
-            estimatedAmount: BigNumber.from(1),
+            estimatedAmount: BigNumber.from(3),
             token: {
               name: 'Ethereum',
               symbol: 'ETH',
               decimals: 18,
             },
           },
-          totalFees: BigNumber.from(2),
+          totalFees: BigNumber.from(5),
         },
       ],
     ]);
@@ -110,8 +111,8 @@ describe('bridgeRoute', () => {
                 },
               },
               {
-                balance: BigNumber.from(13),
-                formattedBalance: '13',
+                balance: BigNumber.from(16),
+                formattedBalance: '16',
                 token: {
                   name: 'Ethereum',
                   symbol: 'ETH',
@@ -144,8 +145,8 @@ describe('bridgeRoute', () => {
               formattedAmount: '10',
             },
             userBalance: {
-              balance: BigNumber.from(13),
-              formattedBalance: '13',
+              balance: BigNumber.from(16),
+              formattedBalance: '16',
             },
             token: {
               name: 'Ethereum',
@@ -154,19 +155,18 @@ describe('bridgeRoute', () => {
               address: undefined,
             },
           },
-          // WT-1734 - Add fees
           fees: {
             approvalGasFees: {
               amount: BigNumber.from(0),
-              formattedAmount: '0',
+              formattedAmount: utils.formatUnits(BigNumber.from(0), DEFAULT_TOKEN_DECIMALS),
             },
             bridgeGasFees: {
-              amount: BigNumber.from(0),
-              formattedAmount: '0',
+              amount: BigNumber.from(2),
+              formattedAmount: utils.formatUnits(BigNumber.from(2), DEFAULT_TOKEN_DECIMALS),
             },
             bridgeFees: [{
-              amount: BigNumber.from(0),
-              formattedAmount: '0',
+              amount: BigNumber.from(3),
+              formattedAmount: utils.formatUnits(BigNumber.from(3), DEFAULT_TOKEN_DECIMALS),
             }],
           },
         });
@@ -178,8 +178,8 @@ describe('bridgeRoute', () => {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(12),
-                formattedBalance: '12',
+                balance: BigNumber.from(15),
+                formattedBalance: '15',
                 token: {
                   name: 'Ethereum',
                   symbol: 'ETH',
@@ -212,8 +212,8 @@ describe('bridgeRoute', () => {
               formattedAmount: '10',
             },
             userBalance: {
-              balance: BigNumber.from(12),
-              formattedBalance: '12',
+              balance: BigNumber.from(15),
+              formattedBalance: '15',
             },
             token: {
               name: 'Ethereum',
@@ -222,19 +222,18 @@ describe('bridgeRoute', () => {
               address: undefined,
             },
           },
-          // WT-1734 - Add fees
           fees: {
             approvalGasFees: {
               amount: BigNumber.from(0),
-              formattedAmount: '0',
+              formattedAmount: utils.formatUnits(BigNumber.from(0), DEFAULT_TOKEN_DECIMALS),
             },
             bridgeGasFees: {
-              amount: BigNumber.from(0),
-              formattedAmount: '0',
+              amount: BigNumber.from(2),
+              formattedAmount: utils.formatUnits(BigNumber.from(2), DEFAULT_TOKEN_DECIMALS),
             },
             bridgeFees: [{
-              amount: BigNumber.from(0),
-              formattedAmount: '0',
+              amount: BigNumber.from(3),
+              formattedAmount: utils.formatUnits(BigNumber.from(3), DEFAULT_TOKEN_DECIMALS),
             }],
           },
         });
@@ -246,8 +245,8 @@ describe('bridgeRoute', () => {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(11),
-                formattedBalance: '11',
+                balance: BigNumber.from(14),
+                formattedBalance: '14',
                 token: {
                   name: 'Ethereum',
                   symbol: 'ETH',
@@ -289,8 +288,8 @@ describe('bridgeRoute', () => {
                 },
               },
               {
-                balance: BigNumber.from(12),
-                formattedBalance: '12',
+                balance: BigNumber.from(20),
+                formattedBalance: '20',
                 token: {
                   name: 'Ethereum',
                   symbol: 'ETH',
@@ -353,86 +352,8 @@ describe('bridgeRoute', () => {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(10),
-                formattedBalance: '10',
-                token: {
-                  name: 'Ethereum',
-                  symbol: 'ETH',
-                  decimals: 18,
-                },
-              },
-              {
-                balance: BigNumber.from(11),
-                formattedBalance: '11',
-                token: {
-                  name: '0xERC20',
-                  symbol: '0xERC20',
-                  decimals: 18,
-                  address: '0xROOT_ADDRESS',
-                },
-              },
-            ],
-          }],
-        ]);
-
-        const route = await bridgeRoute(
-          config,
-          readonlyProviders,
-          '0xADDRESS',
-          {
-            bridge: true,
-          },
-          bridgeRequirement,
-          balances,
-          feeEstimates,
-        );
-
-        expect(route).toEqual({
-          type: FundingStepType.BRIDGE,
-          chainId: ChainId.SEPOLIA,
-          fundingItem: {
-            type: ItemType.ERC20,
-            fundsRequired: {
-              amount: BigNumber.from(10),
-              formattedAmount: '10',
-            },
-            userBalance: {
-              balance: BigNumber.from(11),
-              formattedBalance: '11',
-            },
-            token: {
-              name: '0xERC20',
-              symbol: '0xERC20',
-              address: '0xROOT_ADDRESS',
-              decimals: 18,
-            },
-          },
-          // WT-1734 - Add fees
-          fees: {
-            approvalGasFees: {
-              amount: BigNumber.from(0),
-              formattedAmount: '0',
-            },
-            bridgeGasFees: {
-              amount: BigNumber.from(0),
-              formattedAmount: '0',
-            },
-            bridgeFees: [{
-              amount: BigNumber.from(0),
-              formattedAmount: '0',
-            }],
-          },
-        });
-      });
-
-      it('should return the bridge route if user has exactly enough ERC20 & gas on L1', async () => {
-        const balances = new Map<ChainId, TokenBalanceResult>([
-          [ChainId.SEPOLIA, {
-            success: true,
-            balances: [
-              {
-                balance: BigNumber.from(2),
-                formattedBalance: '2',
+                balance: BigNumber.from(7),
+                formattedBalance: '7',
                 token: {
                   name: 'Ethereum',
                   symbol: 'ETH',
@@ -485,19 +406,95 @@ describe('bridgeRoute', () => {
               decimals: 18,
             },
           },
-          // WT-1734 - Add fees
           fees: {
             approvalGasFees: {
-              amount: BigNumber.from(0),
-              formattedAmount: '0',
+              amount: BigNumber.from(1),
+              formattedAmount: utils.formatUnits(BigNumber.from(1), DEFAULT_TOKEN_DECIMALS),
             },
             bridgeGasFees: {
-              amount: BigNumber.from(0),
-              formattedAmount: '0',
+              amount: BigNumber.from(2),
+              formattedAmount: utils.formatUnits(BigNumber.from(2), DEFAULT_TOKEN_DECIMALS),
             },
             bridgeFees: [{
-              amount: BigNumber.from(0),
-              formattedAmount: '0',
+              amount: BigNumber.from(3),
+              formattedAmount: utils.formatUnits(BigNumber.from(3), DEFAULT_TOKEN_DECIMALS),
+            }],
+          },
+        });
+      });
+
+      it('should return the bridge route if user has exactly enough ERC20 & gas on L1', async () => {
+        const balances = new Map<ChainId, TokenBalanceResult>([
+          [ChainId.SEPOLIA, {
+            success: true,
+            balances: [
+              {
+                balance: BigNumber.from(6),
+                formattedBalance: '6',
+                token: {
+                  name: 'Ethereum',
+                  symbol: 'ETH',
+                  decimals: 18,
+                },
+              },
+              {
+                balance: BigNumber.from(10),
+                formattedBalance: '10',
+                token: {
+                  name: '0xERC20',
+                  symbol: '0xERC20',
+                  decimals: 18,
+                  address: '0xROOT_ADDRESS',
+                },
+              },
+            ],
+          }],
+        ]);
+
+        const route = await bridgeRoute(
+          config,
+          readonlyProviders,
+          '0xADDRESS',
+          {
+            bridge: true,
+          },
+          bridgeRequirement,
+          balances,
+          feeEstimates,
+        );
+
+        expect(route).toEqual({
+          type: FundingStepType.BRIDGE,
+          chainId: ChainId.SEPOLIA,
+          fundingItem: {
+            type: ItemType.ERC20,
+            fundsRequired: {
+              amount: BigNumber.from(10),
+              formattedAmount: '10',
+            },
+            userBalance: {
+              balance: BigNumber.from(10),
+              formattedBalance: '10',
+            },
+            token: {
+              name: '0xERC20',
+              symbol: '0xERC20',
+              address: '0xROOT_ADDRESS',
+              decimals: 18,
+            },
+          },
+          fees: {
+            approvalGasFees: {
+              amount: BigNumber.from(1),
+              formattedAmount: utils.formatUnits(BigNumber.from(1), DEFAULT_TOKEN_DECIMALS),
+            },
+            bridgeGasFees: {
+              amount: BigNumber.from(2),
+              formattedAmount: utils.formatUnits(BigNumber.from(2), DEFAULT_TOKEN_DECIMALS),
+            },
+            bridgeFees: [{
+              amount: BigNumber.from(3),
+              formattedAmount: utils.formatUnits(BigNumber.from(3), DEFAULT_TOKEN_DECIMALS),
             }],
           },
         });
@@ -509,8 +506,8 @@ describe('bridgeRoute', () => {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(2),
-                formattedBalance: '2',
+                balance: BigNumber.from(10),
+                formattedBalance: '10',
                 token: {
                   name: 'Ethereum',
                   symbol: 'ETH',
@@ -552,8 +549,8 @@ describe('bridgeRoute', () => {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(1),
-                formattedBalance: '1',
+                balance: BigNumber.from(4),
+                formattedBalance: '4',
                 token: {
                   name: 'Ethereum',
                   symbol: 'ETH',

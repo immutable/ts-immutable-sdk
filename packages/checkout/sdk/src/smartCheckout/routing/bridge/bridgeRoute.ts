@@ -1,4 +1,4 @@
-import { BigNumber, ethers } from 'ethers';
+import { BigNumber, ethers, utils } from 'ethers';
 import {
   BridgeFundingStep,
   ChainId,
@@ -9,6 +9,9 @@ import {
   AvailableRoutingOptions,
   BridgeRouteFeeEstimate,
   FundingRouteFeeEstimate,
+  BridgeFees,
+  TokenInfo,
+  DEFAULT_TOKEN_DECIMALS,
 } from '../../../types';
 import { CheckoutConfiguration, getL1ChainId } from '../../../config';
 import {
@@ -58,11 +61,37 @@ export const getBridgeGasEstimate = async (
   return bridgeFeeEstimate;
 };
 
+const constructFees = (
+  approvalGasFees: BigNumber,
+  bridgeGasFees: BigNumber,
+  bridgeFee: {
+    estimatedAmount: BigNumber,
+    token?: TokenInfo,
+  },
+): BridgeFees => {
+  const bridgeFeeDecimals = bridgeFee.token?.decimals ?? DEFAULT_TOKEN_DECIMALS;
+  return {
+    approvalGasFees: {
+      amount: approvalGasFees,
+      formattedAmount: utils.formatUnits(approvalGasFees, DEFAULT_TOKEN_DECIMALS),
+    },
+    bridgeGasFees: {
+      amount: bridgeGasFees,
+      formattedAmount: utils.formatUnits(bridgeGasFees, DEFAULT_TOKEN_DECIMALS),
+    },
+    bridgeFees: [{
+      amount: bridgeFee.estimatedAmount,
+      formattedAmount: utils.formatUnits(bridgeFee.estimatedAmount, bridgeFeeDecimals),
+    }],
+  };
+};
+
 const constructBridgeFundingRoute = (
   chainId: ChainId,
   balance: GetBalanceResult,
   bridgeRequirement: BridgeRequirement,
   itemType: ItemType.NATIVE | ItemType.ERC20,
+  fees: BridgeFees,
 ): BridgeFundingStep => ({
   type: FundingStepType.BRIDGE,
   chainId,
@@ -83,21 +112,7 @@ const constructBridgeFundingRoute = (
       decimals: balance.token.decimals,
     },
   },
-  // WT-1734 - Add fees
-  fees: {
-    approvalGasFees: {
-      amount: BigNumber.from(0),
-      formattedAmount: '0',
-    },
-    bridgeGasFees: {
-      amount: BigNumber.from(0),
-      formattedAmount: '0',
-    },
-    bridgeFees: [{
-      amount: BigNumber.from(0),
-      formattedAmount: '0',
-    }],
-  },
+  fees,
 });
 
 export const isNativeEth = (address: string | undefined): boolean => {
@@ -183,13 +198,19 @@ export const bridgeRoute = async (
     if (nativeETHBalance && nativeETHBalance.balance.gte(
       bridgeRequirement.amount.add(totalFees),
     )) {
-      return constructBridgeFundingRoute(chainId, nativeETHBalance, bridgeRequirement, ItemType.NATIVE);
+      const bridgeFees = constructFees(
+        gasForApproval,
+        bridgeFeeEstimate.gasFee.estimatedAmount,
+        bridgeFeeEstimate.bridgeFee,
+      );
+      return constructBridgeFundingRoute(chainId, nativeETHBalance, bridgeRequirement, ItemType.NATIVE, bridgeFees);
     }
 
     return undefined;
   }
 
   totalFees.add(gasForApproval).add(bridgeFeeEstimate.gasFee.estimatedAmount);
+
   if (!hasSufficientL1Eth(
     tokenBalanceResult,
     totalFees,
@@ -197,10 +218,16 @@ export const bridgeRoute = async (
 
   // Find the balance of the L1 representation of the token and check if the balance covers the delta
   const erc20balance = tokenBalanceResult.balances.find((balance) => balance.token.address === l1address);
+
   if (erc20balance && erc20balance.balance.gte(
     bridgeRequirement.amount,
   )) {
-    return constructBridgeFundingRoute(chainId, erc20balance, bridgeRequirement, ItemType.ERC20);
+    const bridgeFees = constructFees(
+      gasForApproval,
+      bridgeFeeEstimate.gasFee.estimatedAmount,
+      bridgeFeeEstimate.bridgeFee,
+    );
+    return constructBridgeFundingRoute(chainId, erc20balance, bridgeRequirement, ItemType.ERC20, bridgeFees);
   }
 
   return undefined;
