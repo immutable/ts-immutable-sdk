@@ -104,6 +104,7 @@ export const getSwapFundingSteps = async (
   ownerAddress: string,
   tokenBalances: Map<ChainId, TokenBalanceResult>,
   swapTokenAllowList: TokenInfo[] | undefined,
+  balanceRequirements: BalanceCheckResult,
 ): Promise<SwapFundingStep[]> => {
   const fundingSteps: SwapFundingStep[] = [];
   if (!availableRoutingOptions.swap) return fundingSteps;
@@ -128,6 +129,7 @@ export const getSwapFundingSteps = async (
     insufficientRequirement,
     tokenBalances,
     swappableTokens,
+    balanceRequirements,
   );
 };
 
@@ -267,6 +269,7 @@ export const routingCalculator = async (
     ownerAddress,
     tokenBalances,
     allowList.swap,
+    balanceRequirements,
   ));
 
   routePromises.push(getOnRampFundingStep(

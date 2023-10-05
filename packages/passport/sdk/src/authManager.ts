@@ -369,15 +369,27 @@ export default class AuthManager {
     }, PassportErrorType.LOGOUT_ERROR);
   }
 
-  public async loginSilent(): Promise<User | null> {
-    return withPassportError<User | null>(async () => this.getUser(), PassportErrorType.SILENT_LOGIN_ERROR);
+  public async loginSilent({ forceRefresh } = { forceRefresh: false }): Promise<User | null> {
+    // eslint-disable-next-line arrow-body-style
+    return withPassportError<User | null>(async () => {
+      return this.getUser({ forceRefresh });
+    }, PassportErrorType.SILENT_LOGIN_ERROR);
   }
 
-  private async getWebUser() : Promise<User | null> {
-    const oidcUser = await this.userManager.getUser();
-    if (!oidcUser) {
-      return null;
+  /**
+   * Get the user from the cache or refresh the token if it's expired.
+   * @param forceRefresh If set to true, force an HTTP call to the OIDC server's authorization endpoint. This call will
+   * throw an error if there's no refresh token.
+   */
+  private async getWebUser({ forceRefresh = false }: { forceRefresh: boolean }) : Promise<User | null> {
+    if (forceRefresh) {
+      const newOidcUser = await this.userManager.signinSilent();
+      return newOidcUser ? AuthManager.mapOidcUserToDomainModel(newOidcUser) : null;
     }
+
+    const oidcUser = await this.userManager.getUser();
+    if (!oidcUser) return null;
+
     const tokenExpired = isTokenExpired(oidcUser);
     if (!tokenExpired) {
       return AuthManager.mapOidcUserToDomainModel(oidcUser);
@@ -391,9 +403,9 @@ export default class AuthManager {
     return null;
   }
 
-  public async getUser(): Promise<User | null> {
+  public async getUser({ forceRefresh } = { forceRefresh: false }): Promise<User | null> {
     return withPassportError<User | null>(async () => {
-      const user = await this.getWebUser();
+      const user = await this.getWebUser({ forceRefresh });
       if (user) {
         return user;
       }

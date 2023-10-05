@@ -108,6 +108,10 @@ describe('PassportImxProviderFactory', () => {
             usersApi: immutableXClient.usersApi,
           }, mockUser.accessToken);
           expect(authManagerMock.loginSilent).toHaveBeenCalledTimes(4);
+          expect(authManagerMock.loginSilent).toHaveBeenNthCalledWith(1, { forceRefresh: true });
+          expect(authManagerMock.loginSilent).toHaveBeenNthCalledWith(2, { forceRefresh: true });
+          expect(authManagerMock.loginSilent).toHaveBeenNthCalledWith(3, { forceRefresh: true });
+          expect(authManagerMock.loginSilent).toHaveBeenCalledWith({ forceRefresh: true });
         });
       });
 
@@ -131,6 +135,7 @@ describe('PassportImxProviderFactory', () => {
             usersApi: immutableXClient.usersApi,
           }, mockUserImx.accessToken);
           expect(authManagerMock.loginSilent).toHaveBeenCalledTimes(1);
+          expect(authManagerMock.loginSilent).toHaveBeenCalledWith({ forceRefresh: true });
           expect(PassportImxProvider).toHaveBeenCalledWith({
             user: mockUserImx,
             starkSigner: starkSignerMock,

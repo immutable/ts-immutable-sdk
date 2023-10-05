@@ -10,7 +10,7 @@ import {
   ItemType,
   SwapFundingStep,
 } from '../../../types';
-import { BalanceRequirement } from '../../balanceCheck/types';
+import { BalanceCheckResult, BalanceRequirement } from '../../balanceCheck/types';
 import { DexQuoteCache, TokenBalanceResult } from '../types';
 import { getOrSetQuotesFromCache } from './dexQuoteCache';
 
@@ -169,6 +169,54 @@ export const checkUserCanCoverSwapFees = (
   return true;
 };
 
+// The item for swapping may also be a balance requirement
+// for the action. Need to ensure that if the user does a swap
+// this token to cover the insufficient balance that the user
+// still has enough funds of this token to fulfill the balance
+// requirement.
+export const checkIfUserCanCoverRequirement = (
+  l2balance: BigNumber,
+  balanceRequirements: BalanceCheckResult,
+  quoteTokenAddress: string,
+  amountBeingSwapped: BigNumber,
+  approvalFees: SufficientApprovalFees,
+  swapFees: Fee[],
+): boolean => {
+  let remainingBalance = BigNumber.from(0);
+  let balanceRequirementToken = '';
+  let requirementExists = false;
+
+  balanceRequirements.balanceRequirements.forEach((requirement) => {
+    if (requirement.type === ItemType.NATIVE || requirement.type === ItemType.ERC20) {
+      if (requirement.required.token.address === quoteTokenAddress) {
+        balanceRequirementToken = requirement.required.token.address;
+        requirementExists = true;
+        // Get the balance that would remain if the requirement was removed from the users balance
+        remainingBalance = l2balance.sub(requirement.required.balance);
+      }
+    }
+  });
+
+  // No requirement exists matching this token so no need to check if user can cover requirement
+  if (!requirementExists) return true;
+
+  // Remove approval fees from the remainder if token matches as these need to be taken out to cover the swap
+  if (approvalFees.approvalGasTokenAddress === balanceRequirementToken) {
+    remainingBalance = remainingBalance.sub(approvalFees.approvalGasFee);
+  }
+
+  // Remove swap fees from the remainder if token matches as these need to be taken out to cover the swap
+  for (const swapFee of swapFees) {
+    if (swapFee.amount.token.address === balanceRequirementToken) {
+      remainingBalance = remainingBalance.sub(swapFee.amount.value);
+    }
+  }
+
+  // If the users current balance can cover the balance after fees + the amount
+  // that is going to be swapped from another item requirement then return true
+  return remainingBalance.gte(amountBeingSwapped);
+};
+
 export const swapRoute = async (
   config: CheckoutConfiguration,
   availableRoutingOptions: AvailableRoutingOptions,
@@ -177,6 +225,7 @@ export const swapRoute = async (
   balanceRequirement: BalanceRequirement,
   tokenBalanceResults: Map<ChainId, TokenBalanceResult>,
   swappableTokens: string[],
+  balanceRequirements: BalanceCheckResult,
 ): Promise<SwapFundingStep[]> => {
   const fundingSteps: SwapFundingStep[] = [];
   if (!availableRoutingOptions.swap) return fundingSteps;
@@ -228,8 +277,17 @@ export const swapRoute = async (
       },
     )) continue;
 
-    // User has sufficient funds to cover any approval and swap fees so use this token for the funding route
-    // Currently we are not prioritising any particular token so just taking the first sufficient token
+    if (!checkIfUserCanCoverRequirement(
+      userBalanceOfQuotedToken.balance,
+      balanceRequirements,
+      quoteTokenAddress,
+      amountOfQuoteTokenRequired.value,
+      approvalFees,
+      quote.quote.fees,
+    )) continue;
+
+    // User has sufficient funds of this token to cover any gas fees, swap fees and balance requirements
+    // so add this token to the possible swap options
     fundingSteps.push(
       constructSwapRoute(
         chainId,

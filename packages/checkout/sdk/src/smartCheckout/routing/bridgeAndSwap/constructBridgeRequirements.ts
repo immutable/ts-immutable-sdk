@@ -31,24 +31,58 @@ export const getFeesForTokenAddress = (
 };
 
 // The token that is being bridged may also be a balance requirement
-// Since this token is going to be swapped after bridging then get the
-// balance requirement amount so this can be considered when bridging
-// enough of the token across
-const getAmountFromBalanceRequirement = (
+// Since this token is going to be swapped after bridging then get
+// the amount of the current balance requirement
+export const getAmountFromBalanceRequirement = (
   balanceRequirements: BalanceCheckResult,
-  tokenAddress: string,
+  quotedTokenAddress: string,
 ): BigNumber => {
-  let amount = BigNumber.from(0);
-
-  balanceRequirements.balanceRequirements.forEach((requirement) => {
+  // Find if there is an existing balance requirement of the token attempting to be bridged->swapped
+  for (const requirement of balanceRequirements.balanceRequirements) {
     if (requirement.type === ItemType.NATIVE || requirement.type === ItemType.ERC20) {
-      if (requirement.required.token.address === tokenAddress) {
-        amount = amount.add(requirement.required.balance);
+      if (requirement.required.token.address === quotedTokenAddress) {
+        return requirement.required.balance;
       }
     }
-  });
+  }
 
-  return amount;
+  return BigNumber.from(0);
+};
+
+// Get the total amount to bridge factoring in any balance requirements
+// of this token and the current balance on L2
+export const getAmountToBridge = (
+  quotedAmountWithFees: BigNumber,
+  amountFromBalanceRequirement: BigNumber,
+  l2balance: GetBalanceResult | undefined,
+): BigNumber => {
+  const balance = l2balance?.balance ?? BigNumber.from(0);
+
+  // Balance is fully covered and does not require bridging
+  // then the one swap route will be suggested
+  if (balance.gte(quotedAmountWithFees.add(amountFromBalanceRequirement))) {
+    return BigNumber.from(0);
+  }
+
+  // If no balance on L2 then bridge full amount and balance requirement amount if any
+  if (balance.lte(0)) {
+    return quotedAmountWithFees.add(amountFromBalanceRequirement);
+  }
+
+  // Get the remainder from the balance after subtracting the balance requirement amount
+  const remainder = balance.sub(amountFromBalanceRequirement);
+
+  // Remove the remainder from the amount needed as the user has some balance left over
+  // after covering the balance requirement or the remainder is 0 indicating they have
+  // just enough to cover the balance requirement
+  if (remainder.gte(0)) {
+    return quotedAmountWithFees.sub(remainder);
+  }
+
+  // If the remainder is less than 0 then add the quoted amount with the balance requirement
+  // and sub the users current balance to get the total amount needed to be bridged to cover
+  // the quoted amount + balance requirement
+  return quotedAmountWithFees.add(amountFromBalanceRequirement).sub(balance);
 };
 
 // to be sent to the bridge route
@@ -86,22 +120,25 @@ export const constructBridgeRequirements = (
     const quotedAmount = quote.quote.amountWithMaxSlippage.value;
     // Add fees to the quoted amount if the fees are in the same token as the token being swapped
     const fees = getFeesForTokenAddress(quote, tokenAddress);
-    // If the token being bridged is a balance requirement then add this to the total
-    // to ensure when its swapped the balance requirement can still be fulfilled
-    const balanceRequirementAmount = getAmountFromBalanceRequirement(balanceRequirements, tokenAddress);
-    // Add all the amounts together
-    const totalAmount = quotedAmount.add(fees).add(balanceRequirementAmount);
+    const quotedAmountWithFees = quotedAmount.add(fees);
 
-    // Subtract any L2 balance from the total amount to only bridge the necessary amount
-    const amountToBridge = l2balance ? totalAmount.sub(l2balance.balance) : totalAmount;
+    // Get the amount from the balance requirement if the token is also a balance requirement
+    const amountFromBalanceRequirement = getAmountFromBalanceRequirement(
+      balanceRequirements,
+      tokenAddress,
+    );
 
+    // Get the amount to bridge factoring in any balance requirements for this swappable token
+    // and the current balance on L2
+    const amountToBridge = getAmountToBridge(quotedAmountWithFees, amountFromBalanceRequirement, l2balance);
+
+    // No amount to bridge as user has sufficient balance for one swap
     if (amountToBridge.lte(0)) {
-      // If the amount to bridge is 0 then the user already has sufficient L2 balance to swap without bridging
-      // In this scenario the swap route will be recommended by the router and no bridging is required
       continue;
     }
 
-    if (amountToBridge.gt(l1balance.balance)) {
+    // If the amount to bridge is greater than the L1 balance then cannot bridge
+    if (amountToBridge.gte(l1balance.balance)) {
       continue;
     }
 
