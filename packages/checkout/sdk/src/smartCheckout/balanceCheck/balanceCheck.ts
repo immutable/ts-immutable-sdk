@@ -26,6 +26,7 @@ import {
   getTokenBalanceRequirement,
   getTokensFromRequirements,
 } from './balanceRequirement';
+import { performanceAsyncSnapshot } from '../../utils/performance';
 
 /**
  * Gets the balances for all NATIVE and ERC20 balance requirements.
@@ -57,7 +58,7 @@ const getTokenBalances = async (
 /**
  * Gets the balances for all ERC721 balance requirements.
  */
-const getERC721Balances = async (
+const getERC721Balances = performanceAsyncSnapshot(async (
   provider: Web3Provider,
   ownerAddress: string,
   itemRequirements: ItemRequirement[],
@@ -106,12 +107,12 @@ const getERC721Balances = async (
   }
 
   return erc721Balances;
-};
+}, 'getERC721Balances');
 
 /**
  * Checks the item requirements against the owner balances.
  */
-export const balanceCheck = async (
+export const balanceCheck = performanceAsyncSnapshot(async (
   config: CheckoutConfiguration,
   provider: Web3Provider,
   ownerAddress: string,
@@ -175,4 +176,4 @@ export const balanceCheck = async (
     sufficient,
     balanceRequirements,
   };
-};
+}, 'balanceCheck');

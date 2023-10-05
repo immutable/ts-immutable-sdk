@@ -34,6 +34,7 @@ import {
 import { SignTransactionStatusType } from '../actions/types';
 import { ERC20ABI } from '../../types';
 import { calculateFees } from '../fees/fees';
+import { performanceAsyncSnapshot } from '../../utils/performance';
 
 export const getItemRequirement = (
   type: ItemType,
@@ -78,7 +79,7 @@ export const getTransactionOrGas = (
   };
 };
 
-export const buy = async (
+export const buy = performanceAsyncSnapshot(async (
   config: CheckoutConfiguration,
   provider: Web3Provider,
   orders: Array<BuyOrder>,
@@ -99,10 +100,15 @@ export const buy = async (
 
   try {
     orderbook = await instance.createOrderbookInstance(config);
+    performance.mark('orderbook-getListing-start');
     order = await orderbook.getListing(id);
+    performance.mark('orderbook-getListing-end');
+    performance.measure('orderbook-getListing', 'orderbook-getListing-start', 'orderbook-getListing-end');
     const { seaportContractAddress } = orderbook.config();
     spenderAddress = seaportContractAddress;
   } catch (err: any) {
+    performance.mark('orderbook-getListing-end');
+    performance.measure('orderbook-getListing', 'orderbook-getListing-start', 'orderbook-getListing-end');
     throw new CheckoutError(
       'An error occurred while getting the order listing',
       CheckoutErrorType.GET_ORDER_LISTING_ERROR,
@@ -131,7 +137,10 @@ export const buy = async (
       ERC20ABI,
       provider,
     );
+    performance.mark('contract-decimals-start');
     decimals = await tokenContract.decimals();
+    performance.mark('contract-decimals-end');
+    performance.measure('contract-decimals', 'contract-decimals-start', 'contract-decimals-end');
   }
 
   let fees: FeeValue[] = [];
@@ -144,11 +153,17 @@ export const buy = async (
   let orderActions: Action[] = [];
   try {
     const fulfillerAddress = await provider.getSigner().getAddress();
+    performance.mark('orderbook-fulfillOrder-start');
     const { actions } = await orderbook.fulfillOrder(id, fulfillerAddress, fees);
+    performance.mark('orderbook-fulfillOrder-end');
+    performance.measure('orderbook-fulfillOrder', 'orderbook-fulfillOrder-start', 'orderbook-fulfillOrder-end');
     orderActions = actions;
     unsignedApprovalTransactions = await getUnsignedERC20ApprovalTransactions(actions);
   } catch {
     // Silently ignore error as this is usually thrown if user does not have enough balance
+    // todo: if balance error - can we determine if its the balance error otherwise throw?
+    performance.mark('orderbook-fulfillOrder-end');
+    performance.measure('orderbook-fulfillOrder', 'orderbook-fulfillOrder-start', 'orderbook-fulfillOrder-end');
   }
 
   try {
@@ -253,4 +268,4 @@ export const buy = async (
     status: CheckoutStatus.INSUFFICIENT_FUNDS,
     smartCheckoutResult,
   };
-};
+}, 'buy');

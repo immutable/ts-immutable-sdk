@@ -9,8 +9,9 @@ import {
   CheckoutStatus,
 } from '../../types';
 import { SignTransactionStatusType } from '../actions/types';
+import { performanceAsyncSnapshot } from '../../utils/performance';
 
-export const cancel = async (
+export const cancel = performanceAsyncSnapshot(async (
   config: CheckoutConfiguration,
   provider: Web3Provider,
   orderIds: string[],
@@ -25,14 +26,22 @@ export const cancel = async (
   // Update this when bulk cancel is supported
   const orderId = orderIds[0];
   try {
+    performance.mark('getSigner-start');
     const offererAddress = await provider.getSigner().getAddress();
+    performance.mark('getSigner-end');
+    performance.measure('getSigner', 'getSigner-start', 'getSigner-end');
     const orderbook = await instance.createOrderbookInstance(config);
+    performance.mark('orderbook-cancelOrder-start');
     const cancelOrderResponse = await orderbook.cancelOrder(
       orderId,
       offererAddress,
     );
+    performance.mark('orderbook-cancelOrder-end');
+    performance.measure('orderbook-cancelOrder', 'orderbook-cancelOrder-start', 'orderbook-cancelOrder-end');
     unsignedCancelOrderTransaction = cancelOrderResponse.unsignedCancelOrderTransaction;
   } catch (err: any) {
+    performance.mark('orderbook-cancelOrder-end');
+    performance.measure('orderbook-cancelOrder', 'orderbook-cancelOrder-start', 'orderbook-cancelOrder-end');
     throw new CheckoutError(
       'An error occurred while cancelling the order listing',
       CheckoutErrorType.CANCEL_ORDER_LISTING_ERROR,
@@ -55,4 +64,4 @@ export const cancel = async (
   return {
     status: CheckoutStatus.SUCCESS,
   };
-};
+}, 'cancel');

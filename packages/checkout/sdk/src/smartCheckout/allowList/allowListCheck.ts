@@ -7,6 +7,7 @@ import {
 } from '../../types';
 import { TokenBalanceResult, TokenBalances } from '../routing/types';
 import { OnRampTokensAllowList, RoutingTokensAllowList } from './types';
+import { performanceAsyncSnapshot } from '../../utils/performance';
 
 const filterTokens = (allowedTokens: TokenInfo[], balances: TokenBalanceResult | undefined) => {
   if (balances && balances.success) {
@@ -70,7 +71,7 @@ export const allowListCheckForSwap = async (
 /**
  * Checks the user balances against the route option allowlists.
  */
-export const allowListCheck = async (
+export const allowListCheck = performanceAsyncSnapshot(async (
   config: CheckoutConfiguration,
   tokenBalances: TokenBalances,
   availableRoutingOptions: AvailableRoutingOptions,
@@ -81,4 +82,4 @@ export const allowListCheck = async (
   tokenAllowList.onRamp = await allowListCheckForOnRamp(config, availableRoutingOptions);
 
   return tokenAllowList;
-};
+}, 'allowListCheck');

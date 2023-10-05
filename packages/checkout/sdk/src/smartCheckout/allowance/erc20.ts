@@ -3,6 +3,7 @@ import { BigNumber, Contract } from 'ethers';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { ERC20ABI, ItemRequirement, ItemType } from '../../types';
 import { Allowance, InsufficientERC20 } from './types';
+import { performanceAsyncSnapshot } from '../../utils/performance';
 
 // Gets the amount an address has allowed to be spent by the spender for the ERC20.
 export const getERC20Allowance = async (
@@ -54,7 +55,7 @@ export const getERC20ApprovalTransaction = async (
   }
 };
 
-export const hasERC20Allowances = async (
+export const hasERC20Allowances = performanceAsyncSnapshot(async (
   provider: Web3Provider,
   ownerAddress: string,
   itemRequirements: ItemRequirement[],
@@ -139,4 +140,4 @@ export const hasERC20Allowances = async (
 
   // Merge the allowance arrays to get both the sufficient allowances and the insufficient ERC20 allowances
   return { sufficient, allowances: sufficientAllowances.concat(Array.from(insufficientERC20s.values())) };
-};
+}, 'hasERC20Allowances');

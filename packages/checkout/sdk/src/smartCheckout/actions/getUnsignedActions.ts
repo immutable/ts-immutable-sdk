@@ -6,8 +6,9 @@ import {
   SignablePurpose,
 } from '@imtbl/orderbook';
 import { UnsignedMessage, UnsignedTransactions } from './types';
+import { performanceAsyncSnapshot } from '../../utils/performance';
 
-export const getUnsignedERC721Transactions = async (
+export const getUnsignedERC721Transactions = performanceAsyncSnapshot(async (
   actions: Action[],
 ): Promise<UnsignedTransactions> => {
   let approvalTransactions: TransactionRequest[] = [];
@@ -31,9 +32,9 @@ export const getUnsignedERC721Transactions = async (
     approvalTransactions,
     fulfillmentTransactions,
   };
-};
+}, 'UnsignedERC721');
 
-export const getUnsignedERC20ApprovalTransactions = async (
+export const getUnsignedERC20ApprovalTransactions = performanceAsyncSnapshot(async (
   actions: Action[],
 ): Promise<TransactionRequest[]> => {
   let approvalTransactions: TransactionRequest[] = [];
@@ -48,9 +49,9 @@ export const getUnsignedERC20ApprovalTransactions = async (
   approvalTransactions = await Promise.all(approvalPromises);
 
   return approvalTransactions;
-};
+}, 'UnsignedERC20Approval');
 
-export const getUnsignedFulfillmentTransactions = async (
+export const getUnsignedFulfillmentTransactions = performanceAsyncSnapshot(async (
   actions: Action[],
 ): Promise<TransactionRequest[]> => {
   let fulfillmentTransactions: TransactionRequest[] = [];
@@ -65,7 +66,7 @@ export const getUnsignedFulfillmentTransactions = async (
   fulfillmentTransactions = await Promise.all(fulfillmentPromises);
 
   return fulfillmentTransactions;
-};
+}, 'UnsignedFulfillment');
 
 export const getUnsignedMessage = (
   orderHash: string,

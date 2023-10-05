@@ -5,8 +5,9 @@ import { ChainId, GetAllBalancesResult, AvailableRoutingOptions } from '../../ty
 import { getAllBalances } from '../../balances';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { TokenBalanceResult } from './types';
+import { performanceAsyncSnapshot } from '../../utils/performance';
 
-export const getAllTokenBalances = async (
+export const getAllTokenBalances = performanceAsyncSnapshot(async (
   config: CheckoutConfiguration,
   readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
   ownerAddress: string,
@@ -82,4 +83,4 @@ export const getAllTokenBalances = async (
   }
 
   return chainBalances;
-};
+}, 'allTokenBalances');

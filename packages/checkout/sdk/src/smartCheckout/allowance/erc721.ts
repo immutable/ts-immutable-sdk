@@ -3,6 +3,7 @@ import { Contract } from 'ethers';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { ERC721ABI, ItemRequirement, ItemType } from '../../types';
 import { Allowance, InsufficientERC721 } from './types';
+import { performanceAsyncSnapshot } from '../../utils/performance';
 
 // Returns true if the spender address is approved for all ERC721s of this collection
 export const getERC721ApprovedForAll = async (
@@ -123,7 +124,7 @@ export const getApprovedCollections = async (
   return approvedCollections;
 };
 
-export const hasERC721Allowances = async (
+export const hasERC721Allowances = performanceAsyncSnapshot(async (
   provider: Web3Provider,
   ownerAddress: string,
   itemRequirements: ItemRequirement[],
@@ -232,4 +233,4 @@ export const hasERC721Allowances = async (
 
   // Merge the allowance arrays to get both the sufficient allowances and the insufficient ERC721 allowances
   return { sufficient, allowances: sufficientAllowances.concat(Array.from(insufficientERC721s.values())) };
-};
+}, 'hasERC721Allowances');

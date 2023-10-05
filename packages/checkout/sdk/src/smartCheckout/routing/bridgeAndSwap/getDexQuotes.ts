@@ -3,9 +3,10 @@ import { getOrSetQuotesFromCache } from '../swap/dexQuoteCache';
 import { DexQuotes, DexQuoteCache } from '../types';
 import { BalanceNativeRequirement, BalanceERC20Requirement } from '../../balanceCheck/types';
 import { TokenInfo } from '../../../types';
+import { performanceAsyncSnapshot } from '../../../utils/performance';
 
 // Fetch all the dex quotes from the list of swappable tokens
-export const getDexQuotes = async (
+export const getDexQuotes = performanceAsyncSnapshot(async (
   config: CheckoutConfiguration,
   dexQuoteCache: DexQuoteCache,
   ownerAddress: string,
@@ -31,4 +32,4 @@ export const getDexQuotes = async (
   );
 
   return dexQuotes;
-};
+}, 'dexQuotes');
