@@ -119,6 +119,18 @@ export function SwapWidget(props: SwapWidgetProps) {
     [viewDispatch],
   );
 
+  const showServiceUnavailableErrorView = useCallback(() => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: SharedViews.ERROR_VIEW,
+          error: new Error('Service unavailable'),
+        },
+      },
+    });
+  }, [viewDispatch]);
+
   const showSwapView = useCallback(() => {
     viewDispatch({
       payload: {
@@ -178,6 +190,11 @@ export function SwapWidget(props: SwapWidgetProps) {
 
       let overrides: ExchangeOverrides | undefined;
       try {
+        const isDexAvailable = await checkout.config.remote.checkDexAvailability();
+        if (!isDexAvailable) {
+          showServiceUnavailableErrorView();
+          return;
+        }
         overrides = (
           (await checkout.config.remote.getConfig('dex')) as DexConfig
         ).overrides;

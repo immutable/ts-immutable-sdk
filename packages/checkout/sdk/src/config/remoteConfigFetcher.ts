@@ -85,10 +85,6 @@ export class RemoteConfigFetcher {
     | RemoteConfiguration[keyof RemoteConfiguration]
     | undefined
     > {
-    if (key && this.isProduction) {
-      if (await this.checkAvailability(key) === 403) return undefined;
-    }
-
     const config = await this.loadConfig();
     if (!config) return undefined;
     if (!key) return config;
@@ -101,18 +97,28 @@ export class RemoteConfigFetcher {
     return config[chainId] ?? [];
   }
 
-  public async checkAvailability(service: string): Promise<number> {
+  public async checkDexAvailability(): Promise<boolean> {
     let response;
-    switch (service) {
-      case CheckoutServices.SWAP:
-        response = await RemoteConfigFetcher.makeHttpRequest(
-          `${this.getEndpoint()}/v1/availability/swap`,
-        );
-        break;
-      default:
-        break;
+    let availability;
+
+    try {
+      response = await axios.post(`${this.getEndpoint()}/v1/availability/dex`);
+    } catch (error: any) {
+      throw new Error(`Error fetching from api: ${error.message}`);
     }
 
-    return response?.data?.code;
+    if (response.status === 403) {
+      availability = false;
+    }
+
+    if (response.status === 200) {
+      availability = true;
+    } else {
+      throw new Error(
+        `Error fetching from api: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    return availability;
   }
 }
