@@ -239,7 +239,7 @@ export function SmartWidget(props: SmartWidgetProps) {
       eventTarget.removeEventListener(IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT, handleCustomEvent);
       eventTarget.removeEventListener(IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, handleCustomEvent);
     };
-  });
+  }, []);
 
   useEffect(() => {
     eventTargetDispatch({
