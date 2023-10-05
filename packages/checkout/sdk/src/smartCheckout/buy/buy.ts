@@ -10,11 +10,6 @@ import {
   FeeValue,
   Action,
 } from '@imtbl/orderbook';
-import {
-  BuyOrder,
-  BuyResult,
-  BuyStatusType,
-} from '../../types/buy';
 import * as instance from '../../instance';
 import { CheckoutConfiguration } from '../../config';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
@@ -25,6 +20,9 @@ import {
   TransactionOrGasType,
   GasAmount,
   FulfillmentTransaction,
+  BuyResult,
+  CheckoutStatus,
+  BuyOrder,
 } from '../../types/smartCheckout';
 import { smartCheckout } from '..';
 import {
@@ -151,7 +149,6 @@ export const buy = async (
     unsignedApprovalTransactions = await getUnsignedERC20ApprovalTransactions(actions);
   } catch {
     // Silently ignore error as this is usually thrown if user does not have enough balance
-    // todo: if balance error - can we determine if its the balance error otherwise throw?
   }
 
   try {
@@ -215,13 +212,10 @@ export const buy = async (
     const approvalResult = await signApprovalTransactions(provider, unsignedApprovalTransactions);
     if (approvalResult.type === SignTransactionStatusType.FAILED) {
       return {
-        smartCheckoutResult,
-        orderId: id,
-        status: {
-          type: BuyStatusType.FAILED,
-          transactionHash: approvalResult.transactionHash,
-          reason: approvalResult.reason,
-        },
+        status: CheckoutStatus.FAILED,
+        transactionHash: approvalResult.transactionHash,
+        reason: approvalResult.reason,
+        smartCheckoutResult: [smartCheckoutResult],
       };
     }
 
@@ -242,27 +236,21 @@ export const buy = async (
     const fulfillmentResult = await signFulfillmentTransactions(provider, unsignedFulfillmentTransactions);
     if (fulfillmentResult.type === SignTransactionStatusType.FAILED) {
       return {
-        smartCheckoutResult,
-        orderId: id,
-        status: {
-          type: BuyStatusType.FAILED,
-          transactionHash: fulfillmentResult.transactionHash,
-          reason: fulfillmentResult.reason,
-        },
+        status: CheckoutStatus.FAILED,
+        transactionHash: fulfillmentResult.transactionHash,
+        reason: fulfillmentResult.reason,
+        smartCheckoutResult: [smartCheckoutResult],
       };
     }
 
     return {
-      smartCheckoutResult,
-      orderId: id,
-      status: {
-        type: BuyStatusType.SUCCESS,
-      },
+      status: CheckoutStatus.SUCCESS,
+      smartCheckoutResult: [smartCheckoutResult],
     };
   }
 
   return {
-    smartCheckoutResult,
-    orderId: id,
+    status: CheckoutStatus.INSUFFICIENT_FUNDS,
+    smartCheckoutResult: [smartCheckoutResult],
   };
 };

@@ -14,8 +14,10 @@ import { PrimaryRevenueSuccess } from '@imtbl/checkout-widgets';
 import { Item, PaymentTypes, SignResponse } from '../types';
 import { useSignOrder } from '../hooks/useSignOrder';
 import { ConnectLoaderState } from '../../../context/connect-loader-context/ConnectLoaderContext';
+import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 
 type SharedContextProps = {
+  config: StrongCheckoutWidgetsConfig;
   env: string;
   environmentId: string;
   items: Item[];
@@ -55,6 +57,7 @@ const SharedContext = createContext<SharedContextValues>({
   isPassportWallet: false,
   paymentMethod: undefined,
   setPaymentMethod: () => {},
+  config: {} as StrongCheckoutWidgetsConfig,
 });
 
 SharedContext.displayName = 'PrimaryRevenueSharedContext';
@@ -66,6 +69,7 @@ export function SharedContextProvider(props: {
   const {
     children,
     value: {
+      config,
       env,
       environmentId,
       items,
@@ -117,6 +121,7 @@ export function SharedContextProvider(props: {
 
   const values = useMemo(
     () => ({
+      config,
       items,
       amount,
       fromContractAddress,
@@ -134,6 +139,7 @@ export function SharedContextProvider(props: {
       isPassportWallet: !!(provider?.provider as any)?.isPassport,
     }),
     [
+      config,
       env,
       environmentId,
       items,
@@ -145,6 +151,7 @@ export function SharedContextProvider(props: {
       recipientEmail,
       signResponse,
       paymentMethod,
+      signResponse,
     ],
   );
 

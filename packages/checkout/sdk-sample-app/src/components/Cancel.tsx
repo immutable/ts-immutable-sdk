@@ -33,10 +33,11 @@ export default function Cancel({ checkout, provider }: CancelProps) {
     setError(null);
     setLoading(true);
     try {
-      await checkout.cancel({
+      const result = await checkout.cancel({
         provider,
         orderIds: [orderId],
       });
+      console.log('Cancel result', result);
       setLoading(false);
     } catch (err: any) {
       setError(err);

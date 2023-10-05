@@ -14,7 +14,7 @@ export const getOrSetQuotesFromCache = async (
   swappableTokens: string[],
 ): Promise<DexQuotes> => {
   const dexQuotes = dexQuoteCache.get(requiredToken.address);
-  if (dexQuotes) return dexQuotes;
+  if (dexQuotes && dexQuotes.size > 0) return dexQuotes;
 
   const quotes = await quoteFetcher(
     config,

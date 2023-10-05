@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 export type TransakNFTData = {
   imageURL: string;
-  quantity: string;
+  quantity: number;
   nftName: string;
   collectionAddress: string;
   tokenID: Array<number>;
@@ -49,7 +49,15 @@ export const useTransakIframe = (props: UseTransakIframeProps) => {
   const network = 'immutablezkevm';
 
   const getNFTCheckoutURL = useCallback(() => {
-    const { nftData, estimatedGasLimit, ...restTransakParams } = transakParams;
+    const {
+      nftData: products,
+      estimatedGasLimit,
+      ...restTransakParams
+    } = transakParams;
+
+    // Default to first product
+    // TODO: Remove this once transak supports multiple item minting
+    const nftData = products.slice(0, 1);
 
     const params = {
       apiKey,
@@ -58,14 +66,16 @@ export const useTransakIframe = (props: UseTransakIframeProps) => {
       disableWalletAddressForm: 'true',
       environment: 'STAGING',
       nftData: btoa(JSON.stringify(nftData)),
-      estimatedGasLimit: '300', // estimatedGasLimit.toString(),
+      estimatedGasLimit: estimatedGasLimit.toString(),
       ...restTransakParams,
     };
+    console.log("@@@ useTransakIframe params:", params, nftData); // eslint-disable-line
 
     const baseUrl = `${TRANSAK_API_BASE_URL[environment]}?`;
     const queryParams = new URLSearchParams(params);
     const widgetUrl = `${baseUrl}${queryParams.toString()}`;
 
+    console.log('🚀 ~ widgetUrl:', widgetUrl);
     return widgetUrl;
   }, [props]);
 

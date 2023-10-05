@@ -1,7 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { CheckoutConfiguration } from '../../config';
-import { RoutingOptionsAvailable } from '../../types';
 import { isOnRampGeoBlocked, isSwapGeoBlocked } from './geoBlocking';
+import { AvailableRoutingOptions } from '../../types';
 
 const isPassportProvider = (provider: Web3Provider) => (provider.provider as any)?.isPassport === true ?? false;
 
@@ -13,10 +13,10 @@ type GeoBlockingCheck = {
 /**
  * Determines which routing options are available.
  */
-export const routingOptionsAvailable = async (
+export const getAvailableRoutingOptions = async (
   config: CheckoutConfiguration,
   provider: Web3Provider,
-) : Promise<RoutingOptionsAvailable> => {
+) : Promise<AvailableRoutingOptions> => {
   const availableRoutingOptions = {
     onRamp: config.isOnRampEnabled,
     swap: config.isSwapEnabled,

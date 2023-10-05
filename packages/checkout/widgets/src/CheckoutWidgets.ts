@@ -1,5 +1,33 @@
 import { CheckoutWidgetsConfig, SemanticVersion } from './definitions/config';
+import { CheckoutWidgetTagNames } from './definitions/types';
 import { globalPackageVersion, isDevMode } from './lib/env';
+
+function getWidgetConfig(element: Element): CheckoutWidgetsConfig | null {
+  const config = element.getAttribute('widgetconfig');
+  if (!config) return null;
+
+  try {
+    return JSON.parse(config);
+  } catch (err: any) {
+    // eslint-disable-next-line no-console
+    console.warn(`Unable to decode widgetconfig for ${element}: `, err);
+  }
+  return null;
+}
+
+function setWidgetConfig(element: Element, config: CheckoutWidgetsConfig) {
+  element.setAttribute('widgetconfig', JSON.stringify(config));
+}
+
+function saveConfig(config: CheckoutWidgetsConfig) {
+  if (window === undefined) {
+    // eslint-disable-next-line no-console
+    console.error('missing window object: please run Checkout client side');
+    return;
+  }
+
+  window.ImtblCheckoutWidgetConfig = JSON.stringify(config);
+}
 
 /**
  * Validates and builds a version string based on the given SemanticVersion object.
@@ -52,6 +80,36 @@ export function validateAndBuildVersion(
   return validatedVersion;
 }
 
+function loadScript(config: CheckoutWidgetsConfig) {
+  if (document === undefined) {
+    // eslint-disable-next-line no-console
+    console.error('missing document object: please run Checkout client side');
+    return;
+  }
+
+  const validVersion = validateAndBuildVersion(config?.version);
+
+  // Prevent the script to be loaded more than once
+  // by checking the presence of the script and its version.
+  const initScript = document.querySelector('[data-product="checkout"]');
+  if (initScript) {
+    // eslint-disable-next-line no-console
+    console.warn('checkout script has already been loaded, it can only be loaded once.');
+    return;
+  }
+
+  const tag = document.createElement('script');
+
+  let cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${validVersion}/dist/browser/checkout.js`;
+  if (isDevMode()) cdnUrl = 'http://localhost:3000/lib/js/imtbl-checkout.js';
+
+  tag.setAttribute('data-product', 'checkout');
+  tag.setAttribute('data-version', validVersion);
+  tag.setAttribute('src', cdnUrl);
+
+  document.head.appendChild(tag);
+}
+
 /**
  * Creates and appends a checkout widget script to the document head.
  * @param {CheckoutWidgetsConfig} [config] - The configuration object for the checkout widget.
@@ -69,32 +127,50 @@ export function CheckoutWidgets(config?: CheckoutWidgetsConfig) {
     return;
   }
 
-  const checkoutWidgetJS = document.createElement('script');
+  loadScript(config || {});
 
-  const validVersion = validateAndBuildVersion(config?.version);
-
-  let cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${validVersion}/dist/browser/checkout.js`;
-  if (isDevMode()) cdnUrl = 'http://localhost:3000/lib/js/imtbl-checkout.js';
-
-  checkoutWidgetJS.setAttribute('src', cdnUrl);
-
-  document.head.appendChild(checkoutWidgetJS);
-  window.ImtblCheckoutWidgetConfig = JSON.stringify(config);
+  saveConfig(config || {});
 }
 
 /**
  * Updates the configuration for the checkout widgets by setting the global variable
  * `window.ImtblCheckoutWidgetConfig` to the JSON string representation of the given
- * `config` object.
+ * `config` object and update all the Checkout web components configuration.
  * @param {CheckoutWidgetsConfig} config - The new configuration object for the checkout widgets.
  * @returns None
  */
 export function UpdateConfig(config: CheckoutWidgetsConfig) {
   if (window === undefined) {
     // eslint-disable-next-line no-console
+    console.error('missing window object: please run Checkout client side');
+    return;
+  }
+  if (document === undefined) {
+    // eslint-disable-next-line no-console
     console.error('missing document object: please run Checkout client side');
     return;
   }
 
-  window.ImtblCheckoutWidgetConfig = JSON.stringify(config);
+  let globalConfig = {};
+  try {
+    globalConfig = JSON.parse(window.ImtblCheckoutWidgetConfig);
+  } catch (err: any) {
+    // eslint-disable-next-line no-console
+    console.warn('Unable to decode window.ImtblCheckoutWidgetConfig: ', err);
+  }
+
+  Object.values(CheckoutWidgetTagNames).forEach((elem) => {
+    const widgets = document.getElementsByTagName(elem);
+    if (!widgets) return;
+
+    // Loop through all the widgets to ensure that the script
+    // get the correct local configs for the DOM elements and
+    // simply update the global configurations.
+    for (const e of widgets) {
+      const widgetConf = getWidgetConfig(e) || {};
+      setWidgetConfig(e, { ...widgetConf, ...config });
+    }
+  });
+
+  saveConfig({ ...globalConfig, ...config });
 }

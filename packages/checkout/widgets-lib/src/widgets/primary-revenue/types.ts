@@ -15,7 +15,7 @@ export enum PaymentTypes {
 
 export type SignedOrderProduct = {
   productId: string;
-  qty: string;
+  qty: number;
   image: string;
   name: string;
   description: string;

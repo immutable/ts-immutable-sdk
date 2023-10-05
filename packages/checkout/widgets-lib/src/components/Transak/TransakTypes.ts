@@ -4,6 +4,6 @@ export type TransakNFTData = {
   nftName: string;
   nftType: 'ERC721';
   price: number[];
-  quantity: string;
+  quantity: number;
   tokenID: number[];
 };

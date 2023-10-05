@@ -19,9 +19,6 @@ const PRIMARY_SALES_API_BASE_URL = {
     'https://api.immutable.com/v1/primary-sales/:environmentId/order/sign',
 };
 
-// TODO: this should be removed after next version of the /sign/order API is released
-const X_IMMUTABLE_API_KEY = 'sk_imapik-Ekz6cLnnwREtqjGn$xo6_fb97b8';
-
 type SignApiResponse = {
   order: {
     currency: {
@@ -58,9 +55,14 @@ type SignApiResponse = {
   }[];
 };
 
+enum SignCurrencyFilter {
+  CONTRACT_ADDRESS = 'contract_address',
+  CURRENCY_SYMBOL = 'currency_symbol',
+}
+
 type SignApiRequest = {
   recipient_address: string
-  currency_filter: 'contract_address' | 'symbol'
+  currency_filter: SignCurrencyFilter;
   currency_value: string
   payment_type: string
   products: {
@@ -76,7 +78,7 @@ const toSignedProduct = (
 ): SignedOrderProduct => ({
   productId: product.product_id,
   image: item?.image || '',
-  qty: `${item?.qty || 1}`,
+  qty: item?.qty || 1,
   name: `${item?.name || ''}${item?.qty ? ` x${item.qty}` : ''}`,
   description: item?.description || '',
   currency,
@@ -173,7 +175,7 @@ export const useSignOrder = (input: SignOrderInput) => {
       const data: SignApiRequest = {
         recipient_address: recipientAddress,
         payment_type: paymentType,
-        currency_filter: 'contract_address',
+        currency_filter: SignCurrencyFilter.CONTRACT_ADDRESS,
         currency_value: fromContractAddress,
         products: items.map((item) => ({
           product_id: item.productId,
@@ -190,7 +192,6 @@ export const useSignOrder = (input: SignOrderInput) => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'x-immutable-api-key': X_IMMUTABLE_API_KEY,
           },
           body: JSON.stringify(data),
         });

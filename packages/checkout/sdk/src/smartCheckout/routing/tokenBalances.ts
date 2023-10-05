@@ -1,7 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { ethers } from 'ethers';
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../config';
-import { ChainId, GetAllBalancesResult, RoutingOptionsAvailable } from '../../types';
+import { ChainId, GetAllBalancesResult, AvailableRoutingOptions } from '../../types';
 import { getAllBalances } from '../../balances';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { TokenBalanceResult } from './types';
@@ -10,7 +10,7 @@ export const getAllTokenBalances = async (
   config: CheckoutConfiguration,
   readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
   ownerAddress: string,
-  availableRoutingOptions: RoutingOptionsAvailable,
+  availableRoutingOptions: AvailableRoutingOptions,
 ): Promise<Map<ChainId, TokenBalanceResult>> => {
   const chainBalances: Map<ChainId, TokenBalanceResult> = new Map();
   const chainBalancePromises: Map<ChainId, Promise<GetAllBalancesResult>> = new Map();

@@ -1,9 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable react/no-unused-prop-types */
 import { useContext, useMemo } from 'react';
 import { Box } from '@biom3/react';
 
-import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { WithCard } from '../components/WithCard';
@@ -13,11 +10,7 @@ import {
   ViewContext,
 } from '../../../context/view-context/ViewContext';
 
-export interface PayWithCardProps {
-  config: StrongCheckoutWidgetsConfig;
-}
-
-export function PayWithCard(props: PayWithCardProps) {
+export function PayWithCard() {
   const { viewDispatch } = useContext(ViewContext);
 
   const handleGoBack = useMemo(() => () => {

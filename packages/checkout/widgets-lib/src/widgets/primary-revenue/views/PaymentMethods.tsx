@@ -2,11 +2,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react/no-unused-prop-types */
 import {
-  useCallback, useContext, useEffect, useMemo,
+  useCallback, useContext, useEffect,
 } from 'react';
 import { Box, Heading } from '@biom3/react';
 
-import { use } from 'chai';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
@@ -14,24 +13,19 @@ import { text as textConfig } from '../../../resources/text/textConfig';
 import { PrimaryRevenueWidgetViews } from '../../../context/view-context/PrimaryRevenueViewContextTypes';
 
 import { sendPrimaryRevenueWidgetCloseEvent } from '../PrimaryRevenueWidgetEvents';
-import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 
 import { useSharedContext } from '../context/SharedContextProvider';
 import { PaymentTypes } from '../types';
-import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 
-type PaymentMethodsProps = {
-  config: StrongCheckoutWidgetsConfig;
-};
-export function PaymentMethods(props: PaymentMethodsProps) {
-  const methodsText = textConfig.views[PrimaryRevenueWidgetViews.PAYMENT_METHODS];
-  const cardText = methodsText.options[PrimaryRevenueWidgetViews.PAY_WITH_CARD];
-  const coinsText = methodsText.options[PrimaryRevenueWidgetViews.PAY_WITH_COINS];
-  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+import { ViewContext, ViewActions, SharedViews } from '../../../context/view-context/ViewContext';
 
+export function PaymentMethods() {
+  const text = {
+    methods: textConfig.views[PrimaryRevenueWidgetViews.PAYMENT_METHODS],
+  };
   const { viewDispatch } = useContext(ViewContext);
-
+  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
   const {
     paymentMethod, setPaymentMethod, sign, signResponse,
   } = useSharedContext();
@@ -68,7 +62,7 @@ export function PaymentMethods(props: PaymentMethodsProps) {
           type: ViewActions.UPDATE_VIEW,
           view: {
             type: SharedViews.LOADING_VIEW,
-            data: { loadingText: methodsText.loading },
+            data: { loadingText: text.methods.loading },
           },
         },
       });
@@ -101,20 +95,20 @@ export function PaymentMethods(props: PaymentMethodsProps) {
             paddingX: 'base.spacing.x4',
           }}
         >
-          {methodsText.header.heading}
+          {text.methods.header.heading}
         </Heading>
         <Box sx={{ paddingX: 'base.spacing.x2' }}>
           <button
             type="button"
             onClick={() => setPaymentMethod(PaymentTypes.CRYPTO)}
           >
-            {coinsText.heading}
+            {text.methods.options[PrimaryRevenueWidgetViews.PAY_WITH_COINS].heading}
           </button>
           <button
             type="button"
             onClick={() => setPaymentMethod(PaymentTypes.FIAT)}
           >
-            {cardText.heading}
+            {text.methods.options[PrimaryRevenueWidgetViews.PAY_WITH_CARD].heading}
           </button>
         </Box>
       </Box>

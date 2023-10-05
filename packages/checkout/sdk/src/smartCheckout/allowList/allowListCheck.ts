@@ -2,7 +2,7 @@ import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../config'
 import {
   BridgeConfig,
   DexConfig, OnRampConfig,
-  RoutingOptionsAvailable,
+  AvailableRoutingOptions,
   TokenInfo,
 } from '../../types';
 import { TokenBalanceResult, TokenBalances } from '../routing/types';
@@ -23,7 +23,7 @@ const filterTokens = (allowedTokens: TokenInfo[], balances: TokenBalanceResult |
 
 export const allowListCheckForOnRamp = async (
   config: CheckoutConfiguration,
-  availableRoutingOptions: RoutingOptionsAvailable,
+  availableRoutingOptions: AvailableRoutingOptions,
 ) : Promise<OnRampTokensAllowList> => {
   if (availableRoutingOptions.onRamp) {
     const onRampOptions = await config.remote.getConfig('onramp') as OnRampConfig;
@@ -42,7 +42,7 @@ export const allowListCheckForOnRamp = async (
 export const allowListCheckForBridge = async (
   config: CheckoutConfiguration,
   tokenBalances: TokenBalances,
-  availableRoutingOptions: RoutingOptionsAvailable,
+  availableRoutingOptions: AvailableRoutingOptions,
 ) : Promise<TokenInfo[]> => {
   if (availableRoutingOptions.bridge) {
     const allowedTokens = ((await config.remote.getConfig('bridge')) as BridgeConfig)?.tokens ?? [];
@@ -56,7 +56,7 @@ export const allowListCheckForBridge = async (
 export const allowListCheckForSwap = async (
   config: CheckoutConfiguration,
   tokenBalances: TokenBalances,
-  availableRoutingOptions: RoutingOptionsAvailable,
+  availableRoutingOptions: AvailableRoutingOptions,
 ) : Promise<TokenInfo[]> => {
   if (availableRoutingOptions.swap) {
     const allowedTokens = ((await config.remote.getConfig('dex')) as DexConfig)?.tokens ?? [];
@@ -73,7 +73,7 @@ export const allowListCheckForSwap = async (
 export const allowListCheck = async (
   config: CheckoutConfiguration,
   tokenBalances: TokenBalances,
-  availableRoutingOptions: RoutingOptionsAvailable,
+  availableRoutingOptions: AvailableRoutingOptions,
 ) : Promise<RoutingTokensAllowList> => {
   const tokenAllowList: RoutingTokensAllowList = {};
   tokenAllowList.swap = await allowListCheckForSwap(config, tokenBalances, availableRoutingOptions);
