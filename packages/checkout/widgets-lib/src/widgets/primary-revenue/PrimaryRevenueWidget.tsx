@@ -126,7 +126,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
     [MintErrorTypes.TRANSACTION_FAILED]: {
       onActionClick: updateToPaymentMethods,
       onSecondaryActionClick: () => {
-        /* redirects to Immutascan to check the transaction */
+        /* TODO: redirects to Immutascan to check the transaction */
       },
       statusType: StatusType.FAILURE,
     },
