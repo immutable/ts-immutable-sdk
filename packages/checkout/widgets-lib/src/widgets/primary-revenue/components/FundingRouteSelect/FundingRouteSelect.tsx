@@ -1,20 +1,18 @@
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import {
-  Body, Box,
-  Button, Heading, Select,
+  Box,
+  Button, Heading,
 } from '@biom3/react';
+import { FundingRoute } from '@imtbl/checkout-sdk';
 import { useState } from 'react';
 import { FooterLogo } from '../../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../../components/SimpleLayout/SimpleLayout';
-import { FundingRouteDrawer } from '../FundingRouteSelectDrawer/FundingRouteDrawer';
 import { FundingRouteMenuItem } from '../FundingRouteMenuItem/FundingRouteMenuItem';
+import { FundingRouteDrawer } from '../FundingRouteSelectDrawer/FundingRouteDrawer';
 import { PurchaseMenuItem } from '../PurchaseMenuItem/PurchaseMenuItem';
 
 type FundingRouteSelectProps = {
-  fundingRoutes: any[];
+  fundingRoutes: FundingRoute[];
 };
 
 export function FundingRouteSelect({ fundingRoutes }: FundingRouteSelectProps) {
@@ -22,7 +20,6 @@ export function FundingRouteSelect({ fundingRoutes }: FundingRouteSelectProps) {
   const [activeFundingRouteIndex, setActiveFundingRouteIndex] = useState(0);
 
   const onClickContinue = () => {
-    console.log('@@@ onClickContinue');
   };
 
   const closeBottomSheet = (selectedFundingRouteIndex: number) => {
@@ -31,7 +28,6 @@ export function FundingRouteSelect({ fundingRoutes }: FundingRouteSelectProps) {
   };
 
   const onSmartCheckoutDropdownClick = () => {
-    console.log('@@@@@ onSmartCheckoutDropdownClickevent');
     setSmartCheckoutDrawerVisible(true);
   };
 
@@ -72,7 +68,6 @@ export function FundingRouteSelect({ fundingRoutes }: FundingRouteSelectProps) {
             />
           ) }
 
-        {/* TODO add purchase data here */}
         <PurchaseMenuItem />
 
         <Button sx={{ mt: 'auto' }} variant="primary" onClick={onClickContinue}>

@@ -1,15 +1,13 @@
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import {
   BottomSheet,
 } from '@biom3/react';
+import { FundingRoute } from '@imtbl/checkout-sdk';
 import { FundingRouteMenuItem } from '../FundingRouteMenuItem/FundingRouteMenuItem';
 
 type FundingRouteDrawerProps = {
   visible: boolean;
   onCloseBottomSheet: (selectedFundingRouteIndex: number) => void;
-  fundingRoutes: any;
+  fundingRoutes: FundingRoute[];
   activeFundingRouteIndex: number;
 };
 

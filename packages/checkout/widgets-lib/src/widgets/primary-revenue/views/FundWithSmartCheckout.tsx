@@ -13,11 +13,8 @@ type FundWithSmartCheckoutProps = {
 export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
   return (
     <Box>
-      <p>
-        hello world from FundWithSmartCheckout
-      </p>
       { subView === FundWithSmartCheckoutSubViews.INIT && (
-        <LoadingView loadingText="todo loading text" />
+        <LoadingView loadingText="Loading" />
       )}
       { subView === FundWithSmartCheckoutSubViews.FUNDING_ROUTE_SELECT && (
         <FundingRouteSelect fundingRoutes={[]} />
