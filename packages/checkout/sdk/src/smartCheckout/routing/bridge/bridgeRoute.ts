@@ -63,7 +63,10 @@ export const getBridgeGasEstimate = async (
 
 const constructFees = (
   approvalGasFees: BigNumber,
-  bridgeGasFees: BigNumber,
+  bridgeGasFees: {
+    estimatedAmount: BigNumber,
+    token?: TokenInfo,
+  },
   bridgeFee: {
     estimatedAmount: BigNumber,
     token?: TokenInfo,
@@ -74,14 +77,17 @@ const constructFees = (
     approvalGasFees: {
       amount: approvalGasFees,
       formattedAmount: utils.formatUnits(approvalGasFees, DEFAULT_TOKEN_DECIMALS),
+      token: bridgeGasFees.token,
     },
     bridgeGasFees: {
-      amount: bridgeGasFees,
-      formattedAmount: utils.formatUnits(bridgeGasFees, DEFAULT_TOKEN_DECIMALS),
+      amount: bridgeGasFees.estimatedAmount,
+      formattedAmount: utils.formatUnits(bridgeGasFees.estimatedAmount, DEFAULT_TOKEN_DECIMALS),
+      token: bridgeGasFees.token,
     },
     bridgeFees: [{
       amount: bridgeFee.estimatedAmount,
       formattedAmount: utils.formatUnits(bridgeFee.estimatedAmount, bridgeFeeDecimals),
+      token: bridgeFee.token,
     }],
   };
 };
@@ -200,7 +206,7 @@ export const bridgeRoute = async (
     )) {
       const bridgeFees = constructFees(
         gasForApproval,
-        bridgeFeeEstimate.gasFee.estimatedAmount,
+        bridgeFeeEstimate.gasFee,
         bridgeFeeEstimate.bridgeFee,
       );
       return constructBridgeFundingRoute(chainId, nativeETHBalance, bridgeRequirement, ItemType.NATIVE, bridgeFees);
@@ -224,7 +230,7 @@ export const bridgeRoute = async (
   )) {
     const bridgeFees = constructFees(
       gasForApproval,
-      bridgeFeeEstimate.gasFee.estimatedAmount,
+      bridgeFeeEstimate.gasFee,
       bridgeFeeEstimate.bridgeFee,
     );
     return constructBridgeFundingRoute(chainId, erc20balance, bridgeRequirement, ItemType.ERC20, bridgeFees);

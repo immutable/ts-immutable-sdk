@@ -159,14 +159,29 @@ describe('bridgeRoute', () => {
             approvalGasFees: {
               amount: BigNumber.from(0),
               formattedAmount: utils.formatUnits(BigNumber.from(0), DEFAULT_TOKEN_DECIMALS),
+              token: {
+                name: 'Ethereum',
+                symbol: 'ETH',
+                decimals: 18,
+              },
             },
             bridgeGasFees: {
               amount: BigNumber.from(2),
               formattedAmount: utils.formatUnits(BigNumber.from(2), DEFAULT_TOKEN_DECIMALS),
+              token: {
+                name: 'Ethereum',
+                symbol: 'ETH',
+                decimals: 18,
+              },
             },
             bridgeFees: [{
               amount: BigNumber.from(3),
               formattedAmount: utils.formatUnits(BigNumber.from(3), DEFAULT_TOKEN_DECIMALS),
+              token: {
+                name: 'Ethereum',
+                symbol: 'ETH',
+                decimals: 18,
+              },
             }],
           },
         });
@@ -226,14 +241,29 @@ describe('bridgeRoute', () => {
             approvalGasFees: {
               amount: BigNumber.from(0),
               formattedAmount: utils.formatUnits(BigNumber.from(0), DEFAULT_TOKEN_DECIMALS),
+              token: {
+                name: 'Ethereum',
+                symbol: 'ETH',
+                decimals: 18,
+              },
             },
             bridgeGasFees: {
               amount: BigNumber.from(2),
               formattedAmount: utils.formatUnits(BigNumber.from(2), DEFAULT_TOKEN_DECIMALS),
+              token: {
+                name: 'Ethereum',
+                symbol: 'ETH',
+                decimals: 18,
+              },
             },
             bridgeFees: [{
               amount: BigNumber.from(3),
               formattedAmount: utils.formatUnits(BigNumber.from(3), DEFAULT_TOKEN_DECIMALS),
+              token: {
+                name: 'Ethereum',
+                symbol: 'ETH',
+                decimals: 18,
+              },
             }],
           },
         });
@@ -410,14 +440,29 @@ describe('bridgeRoute', () => {
             approvalGasFees: {
               amount: BigNumber.from(1),
               formattedAmount: utils.formatUnits(BigNumber.from(1), DEFAULT_TOKEN_DECIMALS),
+              token: {
+                name: 'Ethereum',
+                symbol: 'ETH',
+                decimals: 18,
+              },
             },
             bridgeGasFees: {
               amount: BigNumber.from(2),
               formattedAmount: utils.formatUnits(BigNumber.from(2), DEFAULT_TOKEN_DECIMALS),
+              token: {
+                name: 'Ethereum',
+                symbol: 'ETH',
+                decimals: 18,
+              },
             },
             bridgeFees: [{
               amount: BigNumber.from(3),
               formattedAmount: utils.formatUnits(BigNumber.from(3), DEFAULT_TOKEN_DECIMALS),
+              token: {
+                name: 'Ethereum',
+                symbol: 'ETH',
+                decimals: 18,
+              },
             }],
           },
         });
@@ -487,14 +532,29 @@ describe('bridgeRoute', () => {
             approvalGasFees: {
               amount: BigNumber.from(1),
               formattedAmount: utils.formatUnits(BigNumber.from(1), DEFAULT_TOKEN_DECIMALS),
+              token: {
+                name: 'Ethereum',
+                symbol: 'ETH',
+                decimals: 18,
+              },
             },
             bridgeGasFees: {
               amount: BigNumber.from(2),
               formattedAmount: utils.formatUnits(BigNumber.from(2), DEFAULT_TOKEN_DECIMALS),
+              token: {
+                name: 'Ethereum',
+                symbol: 'ETH',
+                decimals: 18,
+              },
             },
             bridgeFees: [{
               amount: BigNumber.from(3),
               formattedAmount: utils.formatUnits(BigNumber.from(3), DEFAULT_TOKEN_DECIMALS),
+              token: {
+                name: 'Ethereum',
+                symbol: 'ETH',
+                decimals: 18,
+              },
             }],
           },
         });
