@@ -1,8 +1,11 @@
 import { BiomeCombinedProviders } from '@biom3/react';
 import { mount } from 'cypress/react18';
 import { cy, describe } from 'local-cypress';
-import { ChainId } from '@imtbl/checkout-sdk';
-import { BigNumber } from 'ethers';
+import {
+  BridgeFundingStep,
+  ChainId, FundingRoute, FundingStepType, ItemType, SwapFundingStep,
+} from '@imtbl/checkout-sdk';
+import { BigNumber, utils } from 'ethers';
 import { cySmartGet } from '../../../../lib/testUtils';
 import { FundingRouteSelect } from './FundingRouteSelect';
 
@@ -11,23 +14,82 @@ describe('FundingRouteSelect View', () => {
     cy.viewport('ipad-2');
   });
 
+  const bridgeFundingStep: BridgeFundingStep = {
+    type: FundingStepType.BRIDGE,
+    chainId: ChainId.SEPOLIA,
+    fundingItem: {
+      type: ItemType.NATIVE,
+      fundsRequired: {
+        amount: BigNumber.from(1),
+        formattedAmount: '1',
+      },
+      userBalance: {
+        balance: BigNumber.from(1),
+        formattedBalance: '1',
+      },
+      token: {
+        name: 'Ethereum',
+        symbol: 'ETH',
+        decimals: 18,
+      },
+    },
+    fees: {
+      approvalGasFees: {
+        amount: BigNumber.from(0),
+        formattedAmount: '0',
+      },
+      bridgeGasFees: {
+        amount: BigNumber.from(0),
+        formattedAmount: '0',
+      },
+      bridgeFees: [{
+        amount: BigNumber.from(0),
+        formattedAmount: '0',
+      }],
+    },
+  };
+
+  const swapFundingStep: SwapFundingStep = {
+    type: FundingStepType.SWAP,
+    chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+    fundingItem: {
+      type: ItemType.ERC20,
+      fundsRequired: {
+        amount: BigNumber.from(1),
+        formattedAmount: utils.formatUnits(BigNumber.from(1), 18),
+      },
+      userBalance: {
+        balance: BigNumber.from(10),
+        formattedBalance: '10',
+      },
+      token: {
+        name: 'ERC20',
+        symbol: 'USDC',
+        decimals: 18,
+        address: '0xERC20_2',
+      },
+    },
+    fees: {
+      approvalGasFees: {
+        amount: BigNumber.from(0),
+        formattedAmount: '0',
+      },
+      swapGasFees: {
+        amount: BigNumber.from(0),
+        formattedAmount: '0',
+      },
+      swapFees: [{
+        amount: BigNumber.from(0),
+        formattedAmount: '0',
+      }],
+    },
+  };
+
   describe('single option available', () => {
-    const fundingRoutes = [
+    const fundingRoutes: FundingRoute[] = [
       {
         priority: 1,
-        steps: [{
-          type: 'BRIDGE',
-          chainId: ChainId.SEPOLIA,
-          asset: {
-            balance: BigNumber.from(1),
-            formattedBalance: '1',
-            token: {
-              name: 'ETH',
-              symbol: 'ETH',
-              decimals: 18,
-            },
-          },
-        }],
+        steps: [bridgeFundingStep],
       },
     ];
     beforeEach(() => {
@@ -55,36 +117,11 @@ describe('FundingRouteSelect View', () => {
     const fundingRoutes = [
       {
         priority: 1,
-        steps: [{
-          type: 'BRIDGE',
-          chainId: ChainId.SEPOLIA,
-          asset: {
-            balance: BigNumber.from(1),
-            formattedBalance: '1',
-            token: {
-              name: 'ETH',
-              symbol: 'ETH',
-              decimals: 18,
-            },
-          },
-        }],
+        steps: [bridgeFundingStep],
       },
       {
         priority: 2,
-        steps: [{
-          type: 'SWAP',
-          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-          asset: {
-            balance: BigNumber.from(10),
-            formattedBalance: '10',
-            token: {
-              name: 'ERC20',
-              symbol: 'USDC',
-              decimals: 18,
-              address: '0xERC20_2',
-            },
-          },
-        }],
+        steps: [swapFundingStep],
       },
     ];
     beforeEach(() => {
