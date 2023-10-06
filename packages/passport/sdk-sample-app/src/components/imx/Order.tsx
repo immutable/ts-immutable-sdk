@@ -36,7 +36,7 @@ function Order({ showModal, setShowModal }: ModalProps) {
       user: imxWalletAddress,
       status: 'active',
     });
-    const offerOrders = orders.result.filter(
+    const assetsWithOffers = orders.result.filter(
       (order) => order.buy.type === "ERC721"
     ).map((offerOrder) => ({
       asset: offerOrder.buy.data,
@@ -52,7 +52,7 @@ function Order({ showModal, setShowModal }: ModalProps) {
     });
     return {
       sellAssets: sellOrders,
-      offerAssets: offerOrders,
+      offerAssets: assetsWithOffers,
     }
   }, [coreSdkClient, imxProvider]);
 
