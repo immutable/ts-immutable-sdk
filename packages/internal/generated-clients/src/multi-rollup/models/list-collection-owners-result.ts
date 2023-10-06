@@ -15,25 +15,28 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Order } from './order';
+import { NFTWithOwner } from './nftwith-owner';
+// May contain unused imports in some cases
+// @ts-ignore
+import { Page } from './page';
 
 /**
  * 
  * @export
- * @interface FulfillmentDataResult
+ * @interface ListCollectionOwnersResult
  */
-export interface FulfillmentDataResult {
+export interface ListCollectionOwnersResult {
+    /**
+     * List of NFT owners
+     * @type {Array<NFTWithOwner>}
+     * @memberof ListCollectionOwnersResult
+     */
+    'result': Array<NFTWithOwner>;
     /**
      * 
-     * @type {string}
-     * @memberof FulfillmentDataResult
+     * @type {Page}
+     * @memberof ListCollectionOwnersResult
      */
-    'extra_data': string;
-    /**
-     * 
-     * @type {Order}
-     * @memberof FulfillmentDataResult
-     */
-    'order': Order;
+    'page': Page;
 }
 

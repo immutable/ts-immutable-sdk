@@ -15,19 +15,15 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { FulfillmentData200ResponseResult } from './fulfillment-data200-response-result';
+import { APIError501AllOf } from './apierror501-all-of';
+// May contain unused imports in some cases
+// @ts-ignore
+import { BasicAPIError } from './basic-apierror';
 
 /**
- * 
+ * @type APIError501
  * @export
- * @interface FulfillmentData200Response
  */
-export interface FulfillmentData200Response {
-    /**
-     * 
-     * @type {FulfillmentData200ResponseResult}
-     * @memberof FulfillmentData200Response
-     */
-    'result': FulfillmentData200ResponseResult;
-}
+export type APIError501 = APIError501AllOf & BasicAPIError;
+
 
