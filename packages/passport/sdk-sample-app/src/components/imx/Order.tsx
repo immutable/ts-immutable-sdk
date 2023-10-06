@@ -36,8 +36,6 @@ function Order({ showModal, setShowModal }: ModalProps) {
       user: imxWalletAddress,
       status: 'active',
     });
-    console.log("assets111", assets)
-    console.log("orders", orders)
     const offerOrders = orders.result.filter(
       (order) => order.buy.type === "ERC721"
     ).map((offerOrder) => ({
