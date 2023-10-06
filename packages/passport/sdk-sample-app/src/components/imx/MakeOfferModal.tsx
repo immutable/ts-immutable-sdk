@@ -109,7 +109,7 @@ function MakeOfferModal({
                 required
                 type="date"
                 onChange={(e) => {
-                  setExpirationTimestamp(new Date(e.target.value).getTime());
+                  setExpirationTimestamp(new Date(e.target.value).getTime() / 1000);
                 }}
               />
             </Form.Group>
