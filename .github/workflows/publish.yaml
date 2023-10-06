@@ -34,6 +34,7 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.PLATFORM_SA_GITHUB_TOKEN }}
       NODE_OPTIONS: --max-old-space-size=14366
+      SDK_PUBLISH_SLACK_WEBHOOK: ${{ secrets.SDK_PUBLISH_SLACK_WEBHOOK }}
     steps:
       - name: Check Public Release Branch
         if: contains(github.event.inputs.release_type, 'release') && (github.ref != 'refs/heads/main')

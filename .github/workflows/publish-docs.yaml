@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.PLATFORM_SA_GITHUB_TOKEN }}
+      SDK_PUBLISH_SLACK_WEBHOOK: ${{ secrets.SDK_PUBLISH_SLACK_WEBHOOK }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -73,10 +74,10 @@ jobs:
         if: ${{ success() && steps.docs_pr.conclusion == 'success' }}
         uses: ./.github/actions/notify-slack-publish-status
         with:
-          message: "✅ Docs PR published successfully - please review and merge [Release SDK reference docs v${{ env.VERSION }}](https://github.com/immutable/imx-docs/pulls)"
+          message: "✅ SDK reference documents PR created successfully - please review and merge ${{ env.PR }} into main."
 
       - name: Notify SDK Slack Docs PR Failure
-        if: ${{ failure() && steps.docs_pr.conclusion == 'failure' }}
+        if: ${{ failure() }}
         uses: ./.github/actions/notify-slack-publish-status
         with:
-          message: "❌ Docs PR failed to publish. Please check the logs for more details."
+          message: "❌ Failed to create SDK reference documents PR. Please check the logs for more details."
