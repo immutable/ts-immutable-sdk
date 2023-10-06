@@ -106,7 +106,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
             <PayWithCoins />
           )}
           {viewState.view.type === PrimaryRevenueWidgetViews.FUND_WITH_SMART_CHECKOUT && (
-            <FundWithSmartCheckout subView={viewState.view.data.subView} />
+            <FundWithSmartCheckout subView={viewState.view.subView} />
           )}
         </SharedContextProvider>
       </ViewContext.Provider>

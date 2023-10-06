@@ -28,6 +28,7 @@ interface PrimaryRevenueWithCardView extends ViewType {
 }
 interface PrimaryRevenueSmartCheckoutView extends ViewType {
   type: PrimaryRevenueWidgetViews.FUND_WITH_SMART_CHECKOUT;
+  subView: FundWithSmartCheckoutSubViews;
 }
 interface PrimaryRevenueSuccessView extends ViewType {
   type: PrimaryRevenueWidgetViews.SUCCESS;
