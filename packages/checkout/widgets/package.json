@@ -5,9 +5,12 @@
   "author": "",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
+    "@biom3/design-tokens": "^0.2.4-beta",
+    "@biom3/react": "^0.10.15",
     "@imtbl/checkout-sdk": "0.0.0",
     "@imtbl/config": "0.0.0",
     "@imtbl/passport": "0.0.0",
+    "@imtbl/react-analytics": "^0.0.6-alpha",
     "ethers": "^5.7.2"
   },
   "devDependencies": {

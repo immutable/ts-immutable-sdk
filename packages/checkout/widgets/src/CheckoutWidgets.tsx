@@ -1,3 +1,14 @@
+/* eslint-disable class-methods-use-this */
+// import { CheckoutWidgetsConfig, SemanticVersion } from './definitions/config';
+// import { globalPackageVersion, isDevMode } from './lib/env';
+
+import { Root, createRoot } from 'react-dom/client';
+import { Environment } from '@imtbl/config';
+import React from 'react';
+import { ConnectWidget } from './widgets/widgets/connect/ConnectWidget';
+import { WidgetTheme } from './definitions/types';
+import { CustomAnalyticsProvider } from './widgets/context/analytics-provider/CustomAnalyticsProvider';
+import { StrongCheckoutWidgetsConfig } from './widgets/lib/withDefaultWidgetConfig';
 import { CheckoutWidgetsConfig, SemanticVersion } from './definitions/config';
 import { globalPackageVersion, isDevMode } from './lib/env';
 
@@ -97,4 +108,75 @@ export function UpdateConfig(config: CheckoutWidgetsConfig) {
   }
 
   window.ImtblCheckoutWidgetConfig = JSON.stringify(config);
+}
+
+class Connect {
+  connectRoot?: Root;
+
+  connectParams: any;
+
+  connectConfig?: StrongCheckoutWidgetsConfig;
+
+  private renderConnectWidget() {
+    if (this.connectRoot) {
+      this.connectRoot.render(
+        <React.StrictMode>
+          <CustomAnalyticsProvider
+            widgetConfig={this.connectConfig!}
+          >
+            <ConnectWidget
+              config={this.connectConfig!}
+              params={this.connectParams}
+            />
+          </CustomAnalyticsProvider>
+        </React.StrictMode>,
+      );
+    }
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  mount(id: string, params: any) {
+    const widgetConfig: StrongCheckoutWidgetsConfig = {
+      theme: WidgetTheme.DARK,
+      environment: Environment.SANDBOX,
+      isBridgeEnabled: true,
+      isSwapEnabled: true,
+      isOnRampEnabled: true,
+    };
+    this.connectConfig = widgetConfig;
+    const targetElement = document.getElementById(id);
+
+    const childElement = document.createElement('div');
+
+    // Find the best way to mount the widget etc
+    targetElement?.replaceWith(childElement);
+
+    let reactRoot;
+    if (!this.connectRoot && targetElement && childElement) {
+      reactRoot = createRoot(childElement);
+      this.connectRoot = reactRoot;
+    }
+
+    this.connectParams = params;
+
+    this.renderConnectWidget();
+  }
+
+  update(params: any) {
+    this.connectParams = params;
+    this.connectConfig!.theme = WidgetTheme.LIGHT;
+    this.renderConnectWidget();
+  }
+
+  unmount() {
+    console.log('unmount');
+  }
+}
+
+export class Widgets {
+  connect: Connect;
+
+  constructor() {
+    this.connect = new Connect();
+  }
 }

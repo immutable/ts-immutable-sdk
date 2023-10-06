@@ -1,4 +1,4 @@
-import { CheckoutWidgets, UpdateConfig } from './CheckoutWidgets';
+import { CheckoutWidgets, UpdateConfig, Widgets } from './CheckoutWidgets';
 
 // Definitions | Events
 export * from './definitions/events/events';
@@ -22,4 +22,4 @@ export * from './react/WalletWidget';
 export * from './react/OnRampWidget';
 
 // Checkout
-export { CheckoutWidgets, UpdateConfig };
+export { CheckoutWidgets, UpdateConfig, Widgets };
