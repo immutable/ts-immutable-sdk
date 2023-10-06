@@ -1,18 +1,16 @@
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import { Box } from '@biom3/react';
 import { FundingStep, WalletProviderName } from '@imtbl/checkout-sdk';
 import {
   CheckoutWidgets,
   CheckoutWidgetsConfig,
-  IMTBLWidgetEvents, OrchestrationEventType, SwapEventType,
-  SwapFailed, SwapReact, SwapRejected, SwapSuccess, UpdateConfig, WidgetTheme,
+  IMTBLWidgetEvents,
+  SwapEventType,
+  SwapReact,
+  UpdateConfig, WidgetTheme,
 } from '@imtbl/checkout-widgets';
 import { Environment } from '@imtbl/config';
 import { useContext, useEffect } from 'react';
 import { ConnectLoaderContext } from '../../../../context/connect-loader-context/ConnectLoaderContext';
-import { SwapWidgetParams } from '../../../swap/SwapWidget';
 
 type FundingRouteExecuteSwapProps = {
   fundingRouteStep: FundingStep;
@@ -35,54 +33,35 @@ export function FundingRouteExecuteSwap(
 
   UpdateConfig(widgetsConfig2);
 
-  const swapParams: SwapWidgetParams = {
-    amount: '1',
-    fromContractAddress: undefined,
-    toContractAddress: '0xb95B75B4E4c09F04d5DA6349861BF1b6F163D78c',
-  };
-
   const handleSwapWidgetEvents = ((event: CustomEvent) => {
     switch (event.detail.type) {
       case SwapEventType.SUCCESS: {
-        const eventData = event.detail.data as SwapSuccess;
-        console.log('@@@ FundingRouteExecuteSwap Swap done');
+        // const eventData = event.detail.data as SwapSuccess;
         setTimeout(() => {
-          console.log('@@@ FundingRouteExecuteSwap 1s wait over, moving on');
           onFundingRouteExecuted();
         }, 1000);
         break;
       }
       case SwapEventType.FAILURE: {
-        const eventData = event.detail.data as SwapFailed;
+        // const eventData = event.detail.data as SwapFailed;
         break;
       }
       case SwapEventType.REJECTED: {
-        const eventData = event.detail.data as SwapRejected;
+        // const eventData = event.detail.data as SwapRejected;
         break;
       }
       case SwapEventType.CLOSE_WIDGET: {
         break;
       }
-      case OrchestrationEventType.REQUEST_CONNECT:
-      case OrchestrationEventType.REQUEST_WALLET:
-      case OrchestrationEventType.REQUEST_SWAP:
-      case OrchestrationEventType.REQUEST_BRIDGE:
-      case OrchestrationEventType.REQUEST_ONRAMP: {
-        break;
-      }
       default:
-        console.log('did not match any expected event type');
+        break;
     }
   }) as EventListener;
 
   useEffect(() => {
     if (!provider) {
-      console.error('missing provider, please connect frist');
       return () => {};
     }
-
-    const isPassport = (provider?.provider as any)?.isPassport;
-    console.log('@@@@@@@ isPassport', isPassport);
 
     window.addEventListener(
       IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT,

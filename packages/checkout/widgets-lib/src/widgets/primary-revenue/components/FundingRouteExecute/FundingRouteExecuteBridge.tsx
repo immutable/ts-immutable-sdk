@@ -1,18 +1,16 @@
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import { Box } from '@biom3/react';
 import { FundingStep, WalletProviderName } from '@imtbl/checkout-sdk';
 import {
-  BridgeEventType, BridgeFailed, BridgeReact, BridgeSuccess,
+  BridgeEventType,
+  BridgeReact,
   CheckoutWidgets,
   CheckoutWidgetsConfig,
-  IMTBLWidgetEvents, OrchestrationEventType, UpdateConfig, WidgetTheme,
+  IMTBLWidgetEvents,
+  UpdateConfig, WidgetTheme,
 } from '@imtbl/checkout-widgets';
 import { Environment } from '@imtbl/config';
 import { useContext, useEffect } from 'react';
 import { ConnectLoaderContext } from '../../../../context/connect-loader-context/ConnectLoaderContext';
-import { BridgeWidgetParams } from '../../../bridge/BridgeWidget';
 
 type FundingRouteExecuteBridgeProps = {
   fundingRouteStep: FundingStep;
@@ -35,44 +33,29 @@ export function FundingRouteExecuteBridge(
 
   UpdateConfig(widgetsConfig2);
 
-  const bridgeParams: BridgeWidgetParams = {
-    amount: '1',
-    fromContractAddress: undefined,
-  };
-
   const handleBridgeWidgetEvents = ((event: CustomEvent) => {
     switch (event.detail.type) {
       case BridgeEventType.SUCCESS: {
-        const eventData = event.detail.data as BridgeSuccess;
-        console.log('@@@ FundingRouteExecuteBridge Bridge done');
+        // const eventData = event.detail.data as BridgeSuccess;
         setTimeout(() => {
-          console.log('@@@ FundingRouteExecuteBridge 1s wait over, moving on');
           onFundingRouteExecuted();
         }, 1000);
         break;
       }
       case BridgeEventType.FAILURE: {
-        const eventData = event.detail.data as BridgeFailed;
+        // const eventData = event.detail.data as BridgeFailed;
         break;
       }
       case BridgeEventType.CLOSE_WIDGET: {
         break;
       }
-      case OrchestrationEventType.REQUEST_CONNECT:
-      case OrchestrationEventType.REQUEST_WALLET:
-      case OrchestrationEventType.REQUEST_SWAP:
-      case OrchestrationEventType.REQUEST_BRIDGE:
-      case OrchestrationEventType.REQUEST_ONRAMP: {
-        break;
-      }
       default:
-        console.log('did not match any expected event type');
+        break;
     }
   }) as EventListener;
 
   useEffect(() => {
     if (!provider) {
-      console.error('missing provider, please connect frist');
       return () => {};
     }
     window.addEventListener(
