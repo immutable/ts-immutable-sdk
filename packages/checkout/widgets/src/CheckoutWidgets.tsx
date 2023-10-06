@@ -8,7 +8,7 @@ import React from 'react';
 import { ConnectWidget } from './widgets/widgets/connect/ConnectWidget';
 import { WidgetTheme } from './definitions/types';
 import { CustomAnalyticsProvider } from './widgets/context/analytics-provider/CustomAnalyticsProvider';
-import { StrongCheckoutWidgetsConfig } from './widgets/lib/withDefaultWidgetConfig';
+import { StrongCheckoutWidgetsConfig, withDefaultWidgetConfigs } from './widgets/lib/withDefaultWidgetConfig';
 import { CheckoutWidgetsConfig, SemanticVersion } from './definitions/config';
 import { globalPackageVersion, isDevMode } from './lib/env';
 
@@ -111,11 +111,17 @@ export function UpdateConfig(config: CheckoutWidgetsConfig) {
 }
 
 class Connect {
+  connectTargetId?: string;
+
   connectRoot?: Root;
 
   connectParams: any;
 
   connectConfig?: StrongCheckoutWidgetsConfig;
+
+  constructor(config: CheckoutWidgetsConfig) {
+    this.connectConfig = withDefaultWidgetConfigs(config);
+  }
 
   private renderConnectWidget() {
     if (this.connectRoot) {
@@ -144,15 +150,22 @@ class Connect {
       isOnRampEnabled: true,
     };
     this.connectConfig = widgetConfig;
+
+    this.connectTargetId = id;
     const targetElement = document.getElementById(id);
 
     const childElement = document.createElement('div');
+    childElement.setAttribute('id', 'imtbl-connect');
 
-    // Find the best way to mount the widget etc
-    targetElement?.replaceWith(childElement);
+    if (targetElement?.children.length === 0) {
+      // Find the best way to mount the widget etc
+      targetElement?.appendChild(childElement);
+    } else {
+      targetElement?.replaceChildren(childElement);
+    }
 
     let reactRoot;
-    if (!this.connectRoot && targetElement && childElement) {
+    if (targetElement && childElement) {
       reactRoot = createRoot(childElement);
       this.connectRoot = reactRoot;
     }
@@ -164,19 +177,37 @@ class Connect {
 
   update(params: any) {
     this.connectParams = params;
-    this.connectConfig!.theme = WidgetTheme.LIGHT;
     this.renderConnectWidget();
   }
 
+  updateConfig(config: CheckoutWidgetsConfig) {
+    this.connectConfig = withDefaultWidgetConfigs({ ...this.connectConfig, ...config });
+    console.log('new config', this.connectConfig);
+    this.renderConnectWidget();
+  }
+
+  show() {
+    document.getElementById('imtbl-connect')!.setAttribute('style', 'display: block');
+  }
+
+  hide() {
+    document.getElementById('imtbl-connect')!.setAttribute('style', 'display: none');
+  }
+
   unmount() {
-    console.log('unmount');
+    this.connectRoot?.unmount();
+    document.getElementById(this.connectTargetId as string)?.replaceChildren();
+    this.connectRoot = undefined;
   }
 }
 
 export class Widgets {
+  allWidgetsConfig: CheckoutWidgetsConfig;
+
   connect: Connect;
 
-  constructor() {
-    this.connect = new Connect();
+  constructor(config: CheckoutWidgetsConfig) {
+    this.allWidgetsConfig = config;
+    this.connect = new Connect(this.allWidgetsConfig);
   }
 }
