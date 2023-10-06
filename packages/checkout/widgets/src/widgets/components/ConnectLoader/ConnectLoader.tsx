@@ -10,10 +10,9 @@ import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import React, {
   useCallback, useEffect, useMemo, useReducer, useState,
 } from 'react';
-import {
-  ConnectEventType, ConnectionSuccess, IMTBLWidgetEvents,
-} from '@imtbl/checkout-widgets';
 import { Passport } from '@imtbl/passport';
+import { IMTBLWidgetEvents } from '../../../definitions/events/events';
+import { ConnectEventType, ConnectionSuccess } from '../../../definitions/events/connectEvents';
 import {
   ConnectLoaderActions,
   ConnectLoaderContext,
