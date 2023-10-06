@@ -69,7 +69,7 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
       { subView === FundWithSmartCheckoutSubViews.FUNDING_ROUTE_EXECUTE && (
         <FundingRouteExecute
           onFundingRouteExecuted={onFundingRouteExecuted}
-          fundingRouteStep={fundingRouteStep}
+          fundingRouteStep={fundingRouteStep!}
         />
       )}
       { subView === FundWithSmartCheckoutSubViews.DONE && (

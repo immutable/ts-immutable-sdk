@@ -2,10 +2,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import { Box, Button } from '@biom3/react';
-import { FundingRouteStep } from '../../views/smartCheckoutTypes';
+import { FundingStep } from '@imtbl/checkout-sdk';
 
 type FundingRouteExecuteBridgeProps = {
-  fundingRouteStep: FundingRouteStep;
+  fundingRouteStep: FundingStep;
   onFundingRouteExecuted: () => void;
 };
 type Stages = 'BRIDGE WIDGET' | 'CONFIRMING' | 'PROCESSING' | 'DONE';
