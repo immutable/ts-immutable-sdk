@@ -49,6 +49,15 @@ const main = () => {
         let data = fs.readFileSync(sourceFile, 'utf-8');
 
         data = findAndReplace(data, SDK_VERSION, pkg.version);
+
+        // Point to the location of the checkout files correctly in checkout.js
+        data = findAndReplace(data, 'return"static/js/"', 'return""');
+        data = findAndReplace(
+          data,
+          'p="/immutable/ts-immutable-sdk/"',
+          `p="https://cdn.jsdelivr.net/npm/@imtbl/sdk@${SDK_VERSION}/dist/browser/"`,
+        );
+
         // Add more findAndReplace if and when needed
         // data = findAndReplace(data, <find>, <replace>);
 
