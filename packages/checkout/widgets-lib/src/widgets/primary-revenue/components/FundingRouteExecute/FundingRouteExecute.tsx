@@ -1,8 +1,8 @@
 import { Box, Button } from '@biom3/react';
-import { FundingRouteStep } from '../../views/smartCheckoutTypes';
+import { FundingStep } from '@imtbl/checkout-sdk';
 
 type FundingRouteExecuteProps = {
-  fundingRouteStep?: FundingRouteStep;
+  fundingRouteStep?: FundingStep;
   onFundingRouteExecuted: () => void;
 };
 export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }: FundingRouteExecuteProps) {
@@ -15,7 +15,7 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
       {' '}
       -
       {' '}
-      { fundingRouteStep?.asset.token.symbol }
+      { fundingRouteStep?.fundingItem.token.symbol }
 
       <Button sx={{ mt: 'auto' }} variant="primary" onClick={onFundingRouteExecuted}>
         next

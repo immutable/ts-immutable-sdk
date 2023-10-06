@@ -18,7 +18,7 @@ import { PurchaseMenuItem } from '../PurchaseMenuItem/PurchaseMenuItem';
 
 type FundingRouteSelectProps = {
   fundingRoutes: FundingRoute[];
-  onFundingRouteSelected: (fundingRoute: any) => void;
+  onFundingRouteSelected: (fundingRoute: FundingRoute) => void;
 };
 
 export function FundingRouteSelect({ fundingRoutes, onFundingRouteSelected }: FundingRouteSelectProps) {
