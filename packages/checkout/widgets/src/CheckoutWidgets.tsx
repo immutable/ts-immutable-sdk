@@ -9,182 +9,109 @@ import { ConnectWidget } from './widgets/widgets/connect/ConnectWidget';
 import { WidgetTheme } from './definitions/types';
 import { CustomAnalyticsProvider } from './widgets/context/analytics-provider/CustomAnalyticsProvider';
 import { StrongCheckoutWidgetsConfig, withDefaultWidgetConfigs } from './widgets/lib/withDefaultWidgetConfig';
-import { CheckoutWidgetsConfig, SemanticVersion } from './definitions/config';
-import { CheckoutWidgetTagNames } from './definitions/types';
-import { globalPackageVersion, isDevMode } from './lib/env';
+import { CheckoutWidgetsConfig } from './definitions/config';
+import { ConnectLoader, ConnectLoaderParams } from './widgets/components/ConnectLoader/ConnectLoader';
+import { BridgeWidget } from './widgets/widgets/bridge/BridgeWidget';
+import { ConnectTargetLayer } from './widgets/lib';
+import { sendBridgeWidgetCloseEvent } from './widgets/widgets/bridge/BridgeWidgetEvents';
 
-function getWidgetConfig(element: Element): CheckoutWidgetsConfig | null {
-  const config = element.getAttribute('widgetconfig');
-  if (!config) return null;
+// /**
+//  * Validates and builds a version string based on the given SemanticVersion object.
+//  * If the version is undefined or has an invalid major version, it returns the default checkout version.
+//  * If the version is all zeros, it also returns the default checkout version.
+//  * Otherwise, it constructs a validated version string based on the major, minor, patch, and build numbers.
+//  */
+// export function validateAndBuildVersion(
+//   version: SemanticVersion | undefined,
+// ): string {
+//   const defaultPackageVersion = globalPackageVersion();
 
-  try {
-    return JSON.parse(config);
-  } catch (err: any) {
-    // eslint-disable-next-line no-console
-    console.warn(`Unable to decode widgetconfig for ${element}: `, err);
-  }
-  return null;
-}
+//   if (version === undefined || version.major === undefined) return defaultPackageVersion;
 
-function setWidgetConfig(element: Element, config: CheckoutWidgetsConfig) {
-  element.setAttribute('widgetconfig', JSON.stringify(config));
-}
+//   if (!Number.isInteger(version.major) || version.major < 0) return defaultPackageVersion;
+//   if (version.minor !== undefined && version.minor < 0) return defaultPackageVersion;
+//   if (version.patch !== undefined && version.patch < 0) return defaultPackageVersion;
 
-function saveConfig(config: CheckoutWidgetsConfig) {
-  if (window === undefined) {
-    // eslint-disable-next-line no-console
-    console.error('missing window object: please run Checkout client side');
-    return;
-  }
+//   if (version.major === 0 && version.minor === undefined) return defaultPackageVersion;
+//   if (version.major === 0 && version.minor === 0 && version.patch === undefined) return defaultPackageVersion;
+//   if (version.major === 0 && version.minor === undefined && version.patch === undefined) return defaultPackageVersion;
+//   if (version.major === 0 && version.minor === 0 && version.patch === 0) return defaultPackageVersion;
 
-  window.ImtblCheckoutWidgetConfig = JSON.stringify(config);
-}
+//   let validatedVersion: string = version.major.toString();
 
-/**
- * Validates and builds a version string based on the given SemanticVersion object.
- * If the version is undefined or has an invalid major version, it returns the default checkout version.
- * If the version is all zeros, it also returns the default checkout version.
- * Otherwise, it constructs a validated version string based on the major, minor, patch, and build numbers.
- */
-export function validateAndBuildVersion(
-  version: SemanticVersion | undefined,
-): string {
-  const defaultPackageVersion = globalPackageVersion();
+//   if (version.minor === undefined) return validatedVersion;
 
-  if (version === undefined || version.major === undefined) return defaultPackageVersion;
+//   if (Number.isInteger(version.minor)) {
+//     validatedVersion += `.${version.minor.toString()}`;
+//   }
 
-  if (!Number.isInteger(version.major) || version.major < 0) return defaultPackageVersion;
-  if (version.minor !== undefined && version.minor < 0) return defaultPackageVersion;
-  if (version.patch !== undefined && version.patch < 0) return defaultPackageVersion;
+//   if (version.patch === undefined) return validatedVersion;
 
-  if (version.major === 0 && version.minor === undefined) return defaultPackageVersion;
-  if (version.major === 0 && version.minor === 0 && version.patch === undefined) return defaultPackageVersion;
-  if (version.major === 0 && version.minor === undefined && version.patch === undefined) return defaultPackageVersion;
-  if (version.major === 0 && version.minor === 0 && version.patch === 0) return defaultPackageVersion;
+//   if (Number.isInteger(version.patch)) {
+//     validatedVersion += `.${version.patch.toString()}`;
+//   }
 
-  let validatedVersion: string = version.major.toString();
+//   if (version.prerelease === undefined || version.prerelease !== 'alpha') return validatedVersion;
 
-  if (version.minor === undefined) return validatedVersion;
+//   if (version.prerelease === 'alpha') {
+//     validatedVersion += `-${version.prerelease}`;
+//   }
 
-  if (Number.isInteger(version.minor)) {
-    validatedVersion += `.${version.minor.toString()}`;
-  }
+//   if (version.build === undefined) return validatedVersion;
 
-  if (version.patch === undefined) return validatedVersion;
+//   if (Number.isInteger(version.build) && version.build >= 0) {
+//     validatedVersion += `.${version.build.toString()}`;
+//   }
 
-  if (Number.isInteger(version.patch)) {
-    validatedVersion += `.${version.patch.toString()}`;
-  }
+//   return validatedVersion;
+// }
 
-  if (version.prerelease === undefined || version.prerelease !== 'alpha') return validatedVersion;
+// /**
+//  * Creates and appends a checkout widget script to the document head.
+//  * @param {CheckoutWidgetsConfig} [config] - The configuration object for the checkout widget.
+//  * @returns None
+//  */
+// export function CheckoutWidgets(config?: CheckoutWidgetsConfig) {
+//   if (window === undefined) {
+//     // eslint-disable-next-line no-console
+//     console.error('missing window object: please run Checkout client side');
+//     return;
+//   }
+//   if (document === undefined) {
+//     // eslint-disable-next-line no-console
+//     console.error('missing document object: please run Checkout client side');
+//     return;
+//   }
 
-  if (version.prerelease === 'alpha') {
-    validatedVersion += `-${version.prerelease}`;
-  }
+//   const checkoutWidgetJS = document.createElement('script');
 
-  if (version.build === undefined) return validatedVersion;
+//   const validVersion = validateAndBuildVersion(config?.version);
 
-  if (Number.isInteger(version.build) && version.build >= 0) {
-    validatedVersion += `.${version.build.toString()}`;
-  }
+//   let cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${validVersion}/dist/browser/checkout.js`;
+//   if (isDevMode()) cdnUrl = 'http://localhost:3000/lib/js/imtbl-checkout.js';
 
-  return validatedVersion;
-}
+//   checkoutWidgetJS.setAttribute('src', cdnUrl);
 
-function loadScript(config: CheckoutWidgetsConfig) {
-  if (document === undefined) {
-    // eslint-disable-next-line no-console
-    console.error('missing document object: please run Checkout client side');
-    return;
-  }
+//   document.head.appendChild(checkoutWidgetJS);
+//   window.ImtblCheckoutWidgetConfig = JSON.stringify(config);
+// }
 
-  const validVersion = validateAndBuildVersion(config?.version);
+// /**
+//  * Updates the configuration for the checkout widgets by setting the global variable
+//  * `window.ImtblCheckoutWidgetConfig` to the JSON string representation of the given
+//  * `config` object.
+//  * @param {CheckoutWidgetsConfig} config - The new configuration object for the checkout widgets.
+//  * @returns None
+//  */
+// export function UpdateConfig(config: CheckoutWidgetsConfig) {
+//   if (window === undefined) {
+//     // eslint-disable-next-line no-console
+//     console.error('missing document object: please run Checkout client side');
+//     return;
+//   }
 
-  // Prevent the script to be loaded more than once
-  // by checking the presence of the script and its version.
-  const initScript = document.querySelector('[data-product="checkout"]');
-  if (initScript) {
-    // eslint-disable-next-line no-console
-    console.warn('checkout script has already been loaded, it can only be loaded once.');
-    return;
-  }
-
-  const tag = document.createElement('script');
-
-  let cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${validVersion}/dist/browser/checkout.js`;
-  if (isDevMode()) cdnUrl = 'http://localhost:3000/lib/js/imtbl-checkout.js';
-
-  tag.setAttribute('data-product', 'checkout');
-  tag.setAttribute('data-version', validVersion);
-  tag.setAttribute('src', cdnUrl);
-
-  document.head.appendChild(tag);
-}
-
-/**
- * Creates and appends a checkout widget script to the document head.
- * @param {CheckoutWidgetsConfig} [config] - The configuration object for the checkout widget.
- * @returns None
- */
-export function CheckoutWidgets(config?: CheckoutWidgetsConfig) {
-  if (window === undefined) {
-    // eslint-disable-next-line no-console
-    console.error('missing window object: please run Checkout client side');
-    return;
-  }
-  if (document === undefined) {
-    // eslint-disable-next-line no-console
-    console.error('missing document object: please run Checkout client side');
-    return;
-  }
-
-  loadScript(config || {});
-
-  saveConfig(config || {});
-}
-
-/**
- * Updates the configuration for the checkout widgets by setting the global variable
- * `window.ImtblCheckoutWidgetConfig` to the JSON string representation of the given
- * `config` object and update all the Checkout web components configuration.
- * @param {CheckoutWidgetsConfig} config - The new configuration object for the checkout widgets.
- * @returns None
- */
-export function UpdateConfig(config: CheckoutWidgetsConfig) {
-  if (window === undefined) {
-    // eslint-disable-next-line no-console
-    console.error('missing window object: please run Checkout client side');
-    return;
-  }
-  if (document === undefined) {
-    // eslint-disable-next-line no-console
-    console.error('missing document object: please run Checkout client side');
-    return;
-  }
-
-  let globalConfig = {};
-  try {
-    globalConfig = JSON.parse(window.ImtblCheckoutWidgetConfig);
-  } catch (err: any) {
-    // eslint-disable-next-line no-console
-    console.warn('Unable to decode window.ImtblCheckoutWidgetConfig: ', err);
-  }
-
-  Object.values(CheckoutWidgetTagNames).forEach((elem) => {
-    const widgets = document.getElementsByTagName(elem);
-    if (!widgets) return;
-
-    // Loop through all the widgets to ensure that the script
-    // get the correct local configs for the DOM elements and
-    // simply update the global configurations.
-    for (const e of widgets) {
-      const widgetConf = getWidgetConfig(e) || {};
-      setWidgetConfig(e, { ...widgetConf, ...config });
-    }
-  });
-
-  saveConfig({ ...globalConfig, ...config });
-}
+//   window.ImtblCheckoutWidgetConfig = JSON.stringify(config);
+// }
 
 class Connect {
   connectTargetId?: string;
@@ -256,6 +183,7 @@ class Connect {
     this.renderConnectWidget();
   }
 
+  // config: CheckoutWidgetsConfig
   updateConfig(config: CheckoutWidgetsConfig) {
     this.connectConfig = withDefaultWidgetConfigs({ ...this.connectConfig, ...config });
     console.log('new config', this.connectConfig);
@@ -277,13 +205,123 @@ class Connect {
   }
 }
 
+class Bridge {
+  bridgeTargetId?: string;
+
+  bridgeRoot?: Root;
+
+  bridgeParams: any;
+
+  bridgeConfig?: StrongCheckoutWidgetsConfig;
+
+  constructor(config: CheckoutWidgetsConfig) {
+    this.bridgeConfig = withDefaultWidgetConfigs(config);
+  }
+
+  private renderBridgeWidget() {
+    const connectLoaderParams: ConnectLoaderParams = {
+      targetLayer: ConnectTargetLayer.LAYER1,
+      walletProvider: this.bridgeParams.walletProvider,
+      web3Provider: this.bridgeParams.provider,
+      passport: this.bridgeParams.passport,
+      allowedChains: [
+        11155111,
+      ],
+    };
+    if (this.bridgeRoot) {
+      this.bridgeRoot.render(
+        <React.StrictMode>
+          <CustomAnalyticsProvider
+            widgetConfig={this.bridgeConfig!}
+          >
+            <ConnectLoader
+              params={connectLoaderParams}
+              closeEvent={() => sendBridgeWidgetCloseEvent(window)}
+              widgetConfig={this.bridgeConfig!}
+            >
+              <BridgeWidget
+                params={this.bridgeParams}
+                config={this.bridgeConfig!}
+              />
+            </ConnectLoader>
+          </CustomAnalyticsProvider>
+        </React.StrictMode>,
+      );
+    }
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  mount(id: string, params: any) {
+    const widgetConfig: StrongCheckoutWidgetsConfig = {
+      theme: WidgetTheme.DARK,
+      environment: Environment.SANDBOX,
+      isBridgeEnabled: true,
+      isSwapEnabled: true,
+      isOnRampEnabled: true,
+    };
+    this.bridgeConfig = widgetConfig;
+
+    this.bridgeTargetId = id;
+    const targetElement = document.getElementById(id);
+
+    const childElement = document.createElement('div');
+    childElement.setAttribute('id', 'imtbl-bridge');
+
+    if (targetElement?.children.length === 0) {
+      // Find the best way to mount the widget etc
+      targetElement?.appendChild(childElement);
+    } else {
+      targetElement?.replaceChildren(childElement);
+    }
+
+    let reactRoot;
+    if (targetElement && childElement) {
+      reactRoot = createRoot(childElement);
+      this.bridgeRoot = reactRoot;
+    }
+
+    this.bridgeParams = params;
+
+    this.renderBridgeWidget();
+  }
+
+  update(params: any) {
+    this.bridgeParams = params;
+    this.renderBridgeWidget();
+  }
+
+  // config: CheckoutWidgetsConfig
+  updateConfig(config: CheckoutWidgetsConfig) {
+    this.bridgeConfig = withDefaultWidgetConfigs({ ...this.bridgeConfig, ...config });
+    console.log('new config', this.bridgeConfig);
+    this.renderBridgeWidget();
+  }
+
+  show() {
+    document.getElementById('imtbl-bridge')!.setAttribute('style', 'display: block');
+  }
+
+  hide() {
+    document.getElementById('imtbl-bridge')!.setAttribute('style', 'display: none');
+  }
+
+  unmount() {
+    this.bridgeRoot?.unmount();
+    document.getElementById(this.bridgeTargetId as string)?.replaceChildren();
+    this.bridgeRoot = undefined;
+  }
+}
+
 export class Widgets {
   allWidgetsConfig: CheckoutWidgetsConfig;
 
   connect: Connect;
 
+  bridge: Bridge;
+
   constructor(config: CheckoutWidgetsConfig) {
     this.allWidgetsConfig = config;
-    this.connect = new Connect(this.allWidgetsConfig);
+    this.connect = new Connect(config);
+    this.bridge = new Bridge(config);
   }
 }

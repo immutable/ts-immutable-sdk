@@ -31,7 +31,6 @@ import {
 import { CoinSelectorOptionProps } from '../../../components/CoinSelector/CoinSelectorOption';
 import { useInterval } from '../../../lib/hooks/useInterval';
 import { DEFAULT_TOKEN_DECIMALS, DEFAULT_QUOTE_REFRESH_INTERVAL, NATIVE } from '../../../lib';
-import { swapButtonIconLoadingStyle } from '../../swap/components/SwapButtonStyles';
 import { TransactionRejected } from '../../../components/TransactionRejected/TransactionRejected';
 import { NotEnoughGas } from '../../../components/NotEnoughGas/NotEnoughGas';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
@@ -495,7 +494,7 @@ export function BridgeForm(props: BridgeFormProps) {
           size="large"
         >
           {loading ? (
-            <Button.Icon icon="Loading" sx={swapButtonIconLoadingStyle} />
+            <Button.Icon icon="Loading" sx={{ width: 'base.icon.size.400' }} />
           ) : bridgeForm.buttonText}
         </Button>
         <TransactionRejected
