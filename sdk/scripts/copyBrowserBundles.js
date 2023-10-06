@@ -55,7 +55,7 @@ const main = () => {
         data = findAndReplace(
           data,
           'p="/immutable/ts-immutable-sdk/"',
-          `p="https://cdn.jsdelivr.net/npm/@imtbl/sdk@${SDK_VERSION}/dist/browser/"`,
+          `p="https://cdn.jsdelivr.net/npm/@imtbl/sdk@${pkg.version}/dist/browser/"`,
         );
 
         // Add more findAndReplace if and when needed
