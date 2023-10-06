@@ -71,6 +71,7 @@ models/list-nfts-result.ts
 models/list-tokens-result.ts
 models/list-trade-result.ts
 models/listing-result.ts
+models/metadata-refresh-rate-limit-result.ts
 models/metadata.ts
 models/mint.ts
 models/native-item.ts
@@ -93,6 +94,7 @@ models/refresh-metadata-by-idall-of.ts
 models/refresh-metadata-by-idrequest.ts
 models/refresh-metadata-by-token-id.ts
 models/refresh-metadata-by-token-idall-of.ts
+models/refresh-nftmetadata-by-token-idrequest.ts
 models/refreshable-nftattributes.ts
 models/sale-fee.ts
 models/sale-payment-token.ts
