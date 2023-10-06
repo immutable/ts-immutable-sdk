@@ -83,7 +83,6 @@ export function ConnectWidget(props: ConnectWidgetProps) {
   const themeReducerValue = useMemo(() => widgetTheme(theme), [theme]);
 
   const networkToSwitchTo = targetLayer ?? ConnectTargetLayer.LAYER2;
-  console.log('networkToSwitchTo', networkToSwitchTo);
 
   const checkout = new Checkout({ baseConfig: { environment } });
   const targetChainId = getTargetLayerChainId(checkout.config, targetLayer ?? ConnectTargetLayer.LAYER2);
