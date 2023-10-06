@@ -31,6 +31,12 @@ export interface MakeOfferModalProps extends ModalProps {
   onClose?: () => void;
 }
 
+export interface ViewOffersModalProps extends ModalProps {
+  buyTokenAddress: string;
+  buyTokenId: string;
+  onClose?: () => void;
+}
+
 export interface RequestExampleProps {
   handleExampleSubmitted: (request: RequestArguments) => Promise<void>;
   disabled: boolean;

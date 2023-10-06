@@ -109,13 +109,10 @@ function BulkTransfer({ showModal, setShowModal }: ModalProps) {
       setLoadingTransfer(true);
       try {
         const transferResponse = await imxProvider?.batchNftTransfer(transfers as NftTransferDetails[]);
-        if (transferResponse) {
-          setLoadingTransfer(false);
-          addMessage('Bulk Transfer', `Transferred ${transfers.length} tokens`);
-          handleClose();
-        }
+        addMessage('Bulk Transfer', transferResponse);
       } catch (err) {
         addMessage('Bulk Transfer', err);
+      } finally {
         handleClose();
       }
     } else {
