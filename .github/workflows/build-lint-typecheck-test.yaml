@@ -29,11 +29,11 @@ jobs:
       - name: Check Single Package Version Policy
         run: yarn syncpack:check
 
-      - name: Build
-        run: yarn build
-
       - name: Typecheck
         run: yarn typecheck
+
+      - name: Build
+        run: yarn build
 
   test:
     name: Test
