@@ -35,6 +35,9 @@ function App() {
         <div>
           <a href={'/marketplace-orchestrator'}>Marketplace Orchestrator</a>
         </div>
+        <div>
+          <a href={'/test-widgets'}>Test Widgets</a>
+        </div>
         <br />
       </main>
     </div>
