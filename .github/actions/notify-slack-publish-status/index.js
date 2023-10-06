@@ -1,10 +1,8 @@
 const core = require('@actions/core');
-const { WebClient } = require('@slack/web-api');
-const web = process.env.SLACK_TOKEN && new WebClient(process.env.SLACK_TOKEN);
-const channel = `C051FKT784S` // #team-sdk channel
+const webhook = process.env.SDK_PUBLISH_SLACK_WEBHOOK;
 
 const run = async () => {
-  if (web) {
+  if (webhook) {
     try {
       await postSlackNotification();
     } catch (e) {
@@ -12,7 +10,7 @@ const run = async () => {
       throw new Error(`failed because : ${e}`)
     }
   } else {
-    throw new Error('No SLACK_TOKEN environment variable found');
+    throw new Error('No SDK_PUBLISH_SLACK_WEBHOOK environment variable found');
   }
 }
 
@@ -23,17 +21,32 @@ const postSlackNotification = async () => {
     throw new Error('No message input found');
   }
 
-  await web.chat.postMessage({
-    channel,
-    username: 'Github workflow alert bot',
-    blocks: [{
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: message,
-      },
-    }]
-  })
+  const options = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      text: message,
+      blocks: [
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: message,
+          }
+        }
+      ]
+    }),
+  };
+
+  const response = await fetch(webhook, options);
+  
+  if (response.status == 200) {
+    console.log('Posted message to Slack successfully');
+  } else {
+    throw new Error(`Failed to post message to Slack. Status code: ${response.status}`);
+  }
 }
 
 run();
