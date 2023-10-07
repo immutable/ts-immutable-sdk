@@ -25,3 +25,8 @@ if [ -n "$PENDING_RELEASE" ]; then
   exit 1
 fi
 
+# check INPUT_DESTINATION_HEAD_BRANCH does not contain the substring `alpha`
+if [[ $INPUT_DESTINATION_HEAD_BRANCH == *"alpha"* ]]; then
+  echo "Docs generation skipped for alpha releases"
+  exit 1
+fi
