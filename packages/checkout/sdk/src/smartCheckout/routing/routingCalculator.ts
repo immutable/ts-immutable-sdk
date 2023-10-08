@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import {
   BalanceCheckResult,
@@ -104,6 +103,7 @@ export const getSwapFundingSteps = async (
   ownerAddress: string,
   tokenBalances: Map<ChainId, TokenBalanceResult>,
   swapTokenAllowList: TokenInfo[] | undefined,
+  balanceRequirements: BalanceCheckResult,
 ): Promise<SwapFundingStep[]> => {
   const fundingSteps: SwapFundingStep[] = [];
   if (!availableRoutingOptions.swap) return fundingSteps;
@@ -128,6 +128,7 @@ export const getSwapFundingSteps = async (
     insufficientRequirement,
     tokenBalances,
     swappableTokens,
+    balanceRequirements,
   );
 };
 
@@ -267,6 +268,7 @@ export const routingCalculator = async (
     ownerAddress,
     tokenBalances,
     allowList.swap,
+    balanceRequirements,
   ));
 
   routePromises.push(getOnRampFundingStep(
@@ -323,21 +325,6 @@ export const routingCalculator = async (
     response.fundingRoutes.push({
       priority,
       steps: [bridgeFundingStep],
-      // WT-1734 - Add fees
-      totalFees: {
-        gas: {
-          amount: BigNumber.from(0),
-          formattedAmount: '0',
-        },
-        other: {
-          amount: BigNumber.from(0),
-          formattedAmount: '0',
-        },
-        total: {
-          amount: BigNumber.from(0),
-          formattedAmount: '0',
-        },
-      },
     });
   }
 
@@ -347,21 +334,6 @@ export const routingCalculator = async (
       response.fundingRoutes.push({
         priority,
         steps: [swapFundingStep],
-        // WT-1734 - Add fees
-        totalFees: {
-          gas: {
-            amount: BigNumber.from(0),
-            formattedAmount: '0',
-          },
-          other: {
-            amount: BigNumber.from(0),
-            formattedAmount: '0',
-          },
-          total: {
-            amount: BigNumber.from(0),
-            formattedAmount: '0',
-          },
-        },
       });
     });
   }
@@ -382,21 +354,6 @@ export const routingCalculator = async (
       response.fundingRoutes.push({
         priority,
         steps: [bridgeStep, swapStep],
-        // WT-1734 - Add fees
-        totalFees: {
-          gas: {
-            amount: BigNumber.from(0),
-            formattedAmount: '0',
-          },
-          other: {
-            amount: BigNumber.from(0),
-            formattedAmount: '0',
-          },
-          total: {
-            amount: BigNumber.from(0),
-            formattedAmount: '0',
-          },
-        },
       });
     });
   }

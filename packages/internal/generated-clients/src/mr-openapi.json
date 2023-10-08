@@ -730,6 +730,16 @@
               },
               "imx-remaining-refreshes": {
                 "$ref": "#/components/headers/MetadataRefreshLimitRemaining"
+              },
+              "retry-after": {
+                "$ref": "#/components/headers/MetadataRefreshRetryAfter"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetadataRefreshRateLimitResult"
+                }
               }
             }
           },
@@ -746,7 +756,7 @@
             "$ref": "#/components/responses/NotFound"
           },
           "429": {
-            "$ref": "#/components/responses/TooManyRequests"
+            "$ref": "#/components/responses/TooManyMetadataRefreshes"
           },
           "500": {
             "$ref": "#/components/responses/InternalServerError"
@@ -1158,6 +1168,99 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/collections/{contract_address}/nfts/refresh-metadata": {
+      "post": {
+        "description": "refresh metadata of a list of nfts",
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "RefreshNFTMetadataByTokenID",
+        "summary": "refresh the metedata data of a list of nfts by token id",
+        "security": [
+          {
+            "ImmutableApiKey": [
+              "refresh:metadata"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "contract_address",
+            "in": "path",
+            "description": "The address of contract",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          },
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "the request body",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshNFTMetadataByTokenIDRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "headers": {
+              "imx-refreshes-limit": {
+                "$ref": "#/components/headers/MetadataRefreshLimit"
+              },
+              "imx-refresh-limit-reset": {
+                "$ref": "#/components/headers/MetadataRefreshLimitReset"
+              },
+              "imx-remaining-refreshes": {
+                "$ref": "#/components/headers/MetadataRefreshLimitRemaining"
+              },
+              "retry-after": {
+                "$ref": "#/components/headers/MetadataRefreshRetryAfter"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetadataRefreshRateLimitResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorisedRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyMetadataRefreshes"
           },
           "500": {
             "$ref": "#/components/responses/InternalServerError"
@@ -1897,13 +2000,27 @@
           }
         }
       },
-      "TooManyRequests": {
-        "description": "Too Many Requests (429)",
+      "TooManyMetadataRefreshes": {
+        "description": "Too Many Metadata refreshes (429)",
         "content": {
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/APIError429"
             }
+          }
+        },
+        "headers": {
+          "imx-refreshes-limit": {
+            "$ref": "#/components/headers/MetadataRefreshLimit"
+          },
+          "imx-refresh-limit-reset": {
+            "$ref": "#/components/headers/MetadataRefreshLimitReset"
+          },
+          "imx-remaining-refreshes": {
+            "$ref": "#/components/headers/MetadataRefreshLimitRemaining"
+          },
+          "retry-after": {
+            "$ref": "#/components/headers/MetadataRefreshRetryAfter"
           }
         }
       },
@@ -1933,6 +2050,12 @@
       },
       "MetadataRefreshLimitRemaining": {
         "description": "The number of refresh requests remaining in the current window.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "MetadataRefreshRetryAfter": {
+        "description": "The number of seconds until the next refresh request can be made.",
         "schema": {
           "type": "string"
         }
@@ -3118,6 +3241,21 @@
           "attributes"
         ]
       },
+      "RefreshNFTMetadataByTokenIDRequest": {
+        "type": "object",
+        "properties": {
+          "nft_metadata": {
+            "type": "array",
+            "description": "List of nft metadata to be refreshed",
+            "items": {
+              "$ref": "#/components/schemas/RefreshMetadataByTokenID"
+            }
+          }
+        },
+        "required": [
+          "nft_metadata"
+        ]
+      },
       "Token": {
         "type": "object",
         "properties": {
@@ -3254,6 +3392,29 @@
           "contract_address",
           "chain",
           "collection_metadata"
+        ]
+      },
+      "MetadataRefreshRateLimitResult": {
+        "type": "object",
+        "properties": {
+          "imx_refreshes_limit": {
+            "type": "string"
+          },
+          "imx_refresh_limit_reset": {
+            "type": "string"
+          },
+          "imx_remaining_refreshes": {
+            "type": "string"
+          },
+          "retry_after": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "imx_refreshes_limit",
+          "imx_refresh_limit_reset",
+          "imx_remaining_refreshes",
+          "retry_after"
         ]
       },
       "BasicAPIError": {

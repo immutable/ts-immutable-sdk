@@ -13,6 +13,7 @@ const defaultHeaders = {
 export interface APIConfigurationParams {
   basePath: string;
   headers?: Record<string, string>;
+  baseConfig?: ImmutableConfiguration;
 }
 
 /**
@@ -20,6 +21,7 @@ export interface APIConfigurationParams {
  * other than the production and sandbox defined below.
  */
 export const createAPIConfiguration = ({
+  baseConfig,
   basePath,
   headers: baseHeaders,
 }: APIConfigurationParams): mr.Configuration => {
@@ -29,22 +31,13 @@ export const createAPIConfiguration = ({
 
   const headers = { ...(baseHeaders || {}), ...defaultHeaders };
   const configParams: mr.ConfigurationParameters = {
+    ...baseConfig,
     basePath,
     baseOptions: { headers },
   };
 
   return new mr.Configuration(configParams);
 };
-
-const production = (): mr.Configuration =>
-  createAPIConfiguration({
-    basePath: 'https://indexer-mr.imtbl.com',
-  });
-
-const sandbox = (): mr.Configuration =>
-  createAPIConfiguration({
-    basePath: 'https://api.sandbox.immutable.com',
-  });
 
 export interface BlockchainDataModuleConfiguration
   extends ModuleConfiguration<APIConfigurationParams> {}
@@ -62,15 +55,24 @@ export class BlockchainDataConfiguration {
     } else {
       switch (baseConfig.environment) {
         case Environment.SANDBOX: {
-          this.apiConfig = sandbox();
+          this.apiConfig = createAPIConfiguration({
+            basePath: 'https://api.sandbox.immutable.com',
+            baseConfig,
+          });
           break;
         }
         case Environment.PRODUCTION: {
-          this.apiConfig = production();
+          this.apiConfig = createAPIConfiguration({
+            basePath: 'https://indexer-mr.imtbl.com',
+            baseConfig,
+          });
           break;
         }
         default: {
-          this.apiConfig = sandbox();
+          this.apiConfig = createAPIConfiguration({
+            basePath: 'https://api.sandbox.immutable.com',
+            baseConfig,
+          });
         }
       }
     }
