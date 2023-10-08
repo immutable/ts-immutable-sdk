@@ -30,16 +30,6 @@ async function deployAndMintNftContract(wallet: Wallet, count?: number): Promise
   return contract;
 }
 
-/*
-  Script:
-
-  The new visibile features of the order book since the last demo are:
-   - Interactions exposed through the SDK (plus docs)
-   - Orders expire
-   - Orders can be listed and paged
-   - Order can be fulfiled
-*/
-
 // Just using Jest for ease of executing the demo script, not test syntax used
 describe('', () => {
   it('', async () => {

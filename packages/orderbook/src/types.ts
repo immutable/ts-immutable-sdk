@@ -117,7 +117,7 @@ export interface FulfillmentListing {
 export interface FulfillBulkOrdersResponse {
   actions: Action[];
   expiration: string;
-  ordersFulfilling: Order[];
+  fulfillableOrders: Order[];
   unfulfillableOrders: UnfulfillableOrder[];
 }
 

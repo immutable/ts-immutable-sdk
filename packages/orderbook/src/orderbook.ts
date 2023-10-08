@@ -255,7 +255,7 @@ export class Orderbook {
         fulfillmentDataRes.result.fulfillable_orders,
         takerAddress,
       )),
-      ordersFulfilling: fulfillmentDataRes.result.fulfillable_orders.map(
+      fulfillableOrders: fulfillmentDataRes.result.fulfillable_orders.map(
         (o) => mapFromOpenApiOrder(o.order),
       ),
       unfulfillableOrders: fulfillmentDataRes.result.unfulfillable_orders.map(
