@@ -328,6 +328,7 @@ export const bridgeAndSwapRoute = async (
     insufficientRequirement,
     modifiedTokenBalances,
     swappableTokensAfterBridging,
+    balanceRequirements,
   );
   if (!swapRoutes) return [];
   const originalBalanceSwapRoutes = reapplyOriginalSwapBalances(
