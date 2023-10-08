@@ -119,7 +119,7 @@ describe('', () => {
     await waitForOrderToBeOfStatus(sdk, orderId2, OrderStatus.ACTIVE);
     log(`Listings ${orderId1} and ${orderId2} is now ACTIVE, fulfilling order...`);
 
-    const { actions, expiration, ordersFulfilling } = await sdk.fulfillBulkOrders(
+    const { actions, expiration, fulfillableOrders } = await sdk.fulfillBulkOrders(
       [
         {
           listingId: orderId1,
@@ -139,7 +139,7 @@ describe('', () => {
       fulfiller.address,
     );
 
-    log(`Fulfilling listings ${ordersFulfilling[0].id}, ${ordersFulfilling[1].id} fulfillment transaction valid till ${expiration}`);
+    log(`Fulfilling listings ${fulfillableOrders[0].id}, ${fulfillableOrders[1].id} fulfillment transaction valid till ${expiration}`);
 
     await actionAll(actions, fulfiller, provider);
 
