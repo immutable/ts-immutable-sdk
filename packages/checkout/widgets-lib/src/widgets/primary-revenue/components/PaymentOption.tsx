@@ -21,14 +21,15 @@ export function PaymentOption(props: PaymentOptionProps) {
 
   if (!optionText) return null;
 
+  const handleClick = () => onClick(type);
+
   return (
     <MenuItem
       size="medium"
       emphasized
-      onClick={() => onClick(type)}
+      onClick={disabled ? undefined : handleClick}
       sx={{
         marginBottom: 'base.spacing.x1',
-        ...(disabled ? { opacity: '0.5' } : {}),
       }}
       disabled={disabled}
     >
