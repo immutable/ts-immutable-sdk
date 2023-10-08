@@ -58,9 +58,10 @@ then
   sleep 60
 
   echo "Creating a pull request"
-  gh pr create --title "Release SDK reference docs v$VERSION" \
+  PR=$(gh pr create --title "Release SDK reference docs v$VERSION" \
                --body "Released from ts-immutable-sdk" \
-               --reviewer "$GITHUB_ACTOR"
+               --reviewer "$GITHUB_ACTOR")
+  echo "PR=$PR" >> $GITHUB_ENV
 else
   echo "No changes detected"
 fi
