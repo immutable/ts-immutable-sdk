@@ -196,6 +196,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@actions/core@npm:^1.10.1":
+  version: 1.10.1
+  resolution: "@actions/core@npm:1.10.1"
+  dependencies:
+    "@actions/http-client": ^2.0.1
+    uuid: ^8.3.2
+  checksum: 96524c2725e70e3c3176b4e4d93a1358a86f3c5ca777db9a2f65eadfa672f00877db359bf60fffc416c33838ffb4743db93bcc5bf53e76199dd28bf7f7ff8e80
+  languageName: node
+  linkType: hard
+
+"@actions/http-client@npm:^2.0.1":
+  version: 2.1.1
+  resolution: "@actions/http-client@npm:2.1.1"
+  dependencies:
+    tunnel: ^0.0.6
+  checksum: 5a3fd0407020a11cd3864b6c9ed8ef36912e08418df34fac675d15fc71543abb419db236ddb8fbd649f8ad8b5057bd78f1ac301f87283dfc706aa85578a90658
+  languageName: node
+  linkType: hard
+
 "@adobe/css-tools@npm:^4.0.1":
   version: 4.2.0
   resolution: "@adobe/css-tools@npm:4.2.0"
@@ -12466,7 +12485,7 @@ __metadata:
     eslint-config-next: 13.3.1
     ethers: ^5.7.2
     next: 13.3.1
-    postcss: 8.4.23
+    postcss: 8.4.31
     react: ^18.2.0
     react-dom: ^18.2.0
     tailwindcss: 3.3.2
@@ -24931,14 +24950,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:8.4.23":
-  version: 8.4.23
-  resolution: "postcss@npm:8.4.23"
+"postcss@npm:8.4.31":
+  version: 8.4.31
+  resolution: "postcss@npm:8.4.31"
   dependencies:
     nanoid: ^3.3.6
     picocolors: ^1.0.0
     source-map-js: ^1.0.2
-  checksum: 8bb9d1b2ea6e694f8987d4f18c94617971b2b8d141602725fedcc2222fdc413b776a6e1b969a25d627d7b2681ca5aabb56f59e727ef94072e1b6ac8412105a2f
+  checksum: 1d8611341b073143ad90486fcdfeab49edd243377b1f51834dc4f6d028e82ce5190e4f11bb2633276864503654fb7cab28e67abdc0fbf9d1f88cad4a0ff0beea
   languageName: node
   linkType: hard
 
@@ -26880,7 +26899,7 @@ __metadata:
     eslint: ^8.40.0
     ethers: ^5.7.2
     next: 13.3.1
-    postcss: 8.4.23
+    postcss: 8.4.31
     react: ^18.2.0
     react-dom: ^18.2.0
     tailwindcss: 3.3.2
@@ -28865,6 +28884,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "ts-immutable-sdk@workspace:."
   dependencies:
+    "@actions/core": ^1.10.1
     "@release-it-plugins/workspaces": ^3.2.0
     "@typescript-eslint/eslint-plugin": ^5.57.1
     "@typescript-eslint/parser": ^5.57.1
