@@ -36,6 +36,7 @@ interface ErrorHandlerConfig {
   onActionClick?: () => void;
   onSecondaryActionClick?: () => void;
   statusType: StatusType;
+  statusIconStyles?: Record<string, string>;
 }
 
 interface ErrorTextConfig {
@@ -129,34 +130,43 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
         /* TODO: redirects to Immutascan to check the transaction */
       },
       statusType: StatusType.FAILURE,
+      statusIconStyles: {
+        fill: biomeTheme.color.status.destructive.dim,
+      },
     },
     [MintErrorTypes.SERVICE_BREAKDOWN]: {
       onSecondaryActionClick: closeWidget,
-      statusType: StatusType.WARNING,
+      statusType: StatusType.INFORMATION,
+      statusIconStyles: {
+        fill: biomeTheme.color.status.fatal.dim,
+      },
     },
     [MintErrorTypes.TRANSAK_FAILED]: {
       onActionClick: () => {
         /* TODO: start over the transak flow */
       },
       onSecondaryActionClick: closeWidget,
-      statusType: StatusType.WARNING,
+      statusType: StatusType.INFORMATION,
     },
     [MintErrorTypes.PASSPORT_FAILED]: {
       onActionClick: updateToPaymentMethods,
       onSecondaryActionClick: closeWidget,
-      statusType: StatusType.WARNING,
+      statusType: StatusType.INFORMATION,
+      statusIconStyles: {
+        fill: biomeTheme.color.status.fatal.dim,
+      },
     },
     [MintErrorTypes.PASSPORT_REJECTED_NO_FUNDS]: {
       onActionClick: updateToPaymentMethods,
       onSecondaryActionClick: closeWidget,
-      statusType: StatusType.WARNING,
+      statusType: StatusType.INFORMATION,
     },
     [MintErrorTypes.PASSPORT_REJECTED]: {
       onActionClick: () => {
         /* TODO: trigger the approve and execute flow pop up flow again */
       },
       onSecondaryActionClick: closeWidget,
-      statusType: StatusType.WARNING,
+      statusType: StatusType.INFORMATION,
     },
     [MintErrorTypes.DEFAULT]: {
       onActionClick: updateToPaymentMethods,
@@ -165,13 +175,12 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
     },
   };
 
-  const determineStatusViewProps = (): StatusViewProps => {
+  const statusViewProps = useMemo<StatusViewProps>(() => {
     const errorTextConfig: AllErrorTextConfigs = text.views[PrimaryRevenueWidgetViews.MINT_FAIL].errors;
     const errorType = viewState.view.data?.error || MintErrorTypes.DEFAULT;
-
     const handlers = errorHandlersConfig[errorType] || {};
-
     return {
+      testId: 'fail-view',
       statusText: errorTextConfig[errorType].description,
       actionText: errorTextConfig[errorType]?.primaryAction,
       onActionClick: handlers?.onActionClick,
@@ -179,9 +188,13 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
       onSecondaryActionClick: handlers?.onSecondaryActionClick,
       onCloseClick: closeWidget,
       statusType: handlers.statusType,
-      testId: 'fail-view',
+      statusIconStyles: {
+        transform: 'rotate(180deg)',
+        fill: biomeTheme.color.status.guidance.dim,
+        ...handlers.statusIconStyles,
+      },
     };
-  };
+  }, [viewState.view.data?.error]);
 
   return (
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>
@@ -213,7 +226,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
             <PayWithCoins />
           )}
           {viewState.view.type === PrimaryRevenueWidgetViews.MINT_FAIL && (
-            <StatusView {...determineStatusViewProps()} />
+            <StatusView {...statusViewProps} />
           )}
         </SharedContextProvider>
       </ViewContext.Provider>
