@@ -20,6 +20,8 @@ export class BlockchainData {
 
   private readonly tokens: mr.TokensApi;
 
+  private readonly metadata: mr.MetadataApi;
+
   constructor(moduleConfig: BlockchainDataModuleConfiguration) {
     this.config = new BlockchainDataConfiguration(moduleConfig);
 
@@ -29,6 +31,7 @@ export class BlockchainData {
     this.nfts = new mr.NftsApi(this.config.apiConfig);
     this.nftOwners = new mr.NftOwnersApi(this.config.apiConfig);
     this.tokens = new mr.TokensApi(this.config.apiConfig);
+    this.metadata = new mr.MetadataApi(this.config.apiConfig);
   }
 
   /**
@@ -229,6 +232,57 @@ export class BlockchainData {
   ): Promise<mr.GetTokenResult> {
     return await this.tokens
       .getERC20Token(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
+
+  /**
+   * Refresh collection metadata
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with the updated collection
+   * @throws {@link index.APIError}
+   */
+  public async refreshCollectionMetadata(
+    request: mr.CollectionsApiRefreshCollectionMetadataRequest,
+  ): Promise<mr.RefreshCollectionMetadataResult> {
+    return await this.collections
+      .refreshCollectionMetadata(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
+
+  /**
+   * Refresh metadata for specific NFTs
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with the remaining rate limits
+   * @throws {@link index.APIError}
+   */
+  public async refreshNFTMetadata(
+    request: mr.MetadataApiRefreshNFTMetadataByTokenIDRequest,
+  ): Promise<mr.MetadataRefreshRateLimitResult> {
+    return await this.metadata
+      .refreshNFTMetadataByTokenID(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
+
+  /**
+   * Refresh metadata by ID. This will refresh metadata for all NFTs that reference the given metadata ID.
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with the remaining rate limits
+   * @throws {@link index.APIError}
+   */
+  public async refreshStackedMetadata(
+    request: mr.MetadataApiRefreshMetadataByIDRequest,
+  ): Promise<mr.MetadataRefreshRateLimitResult> {
+    return await this.metadata
+      .refreshMetadataByID(request)
       .then((res) => res.data)
       .catch((err) => {
         throw formatError(err);

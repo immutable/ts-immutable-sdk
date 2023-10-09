@@ -109,6 +109,23 @@ export interface SignableAction {
 
 export type Action = TransactionAction | SignableAction;
 
+export interface FulfillmentListing {
+  listingId: string,
+  takerFees: Array<FeeValue>
+}
+
+export interface FulfillBulkOrdersResponse {
+  actions: Action[];
+  expiration: string;
+  fulfillableOrders: Order[];
+  unfulfillableOrders: UnfulfillableOrder[];
+}
+
+export interface UnfulfillableOrder {
+  orderId: string,
+  reason: string,
+}
+
 export interface FulfillOrderResponse {
   actions: Action[];
   /**
