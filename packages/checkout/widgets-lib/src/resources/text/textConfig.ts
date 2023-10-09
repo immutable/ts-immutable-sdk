@@ -340,6 +340,10 @@ export const text = {
         caption: 'Powered by Transak',
       },
     },
+    [PrimaryRevenueWidgetViews.MINT_SUCCESS]: {
+      text: 'Order completed',
+      actionText: 'Continue',
+    },
   },
   wallets: {
     [WalletProviderName.PASSPORT]: {
