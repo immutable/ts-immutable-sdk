@@ -23,9 +23,19 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 // @ts-ignore
 import { APIError400 } from '../models';
 // @ts-ignore
+import { APIError401 } from '../models';
+// @ts-ignore
 import { APIError404 } from '../models';
 // @ts-ignore
+import { APIError429 } from '../models';
+// @ts-ignore
 import { APIError500 } from '../models';
+// @ts-ignore
+import { APIError501 } from '../models';
+// @ts-ignore
+import { CancelOrdersRequestBody } from '../models';
+// @ts-ignore
+import { CancelOrdersResult } from '../models';
 // @ts-ignore
 import { CreateListingRequestBody } from '../models';
 // @ts-ignore
@@ -48,6 +58,46 @@ import { TradeResult } from '../models';
  */
 export const OrdersApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
+        /**
+         * Cancel one or more orders
+         * @summary Cancel one or more orders
+         * @param {string} chainName 
+         * @param {CancelOrdersRequestBody} cancelOrdersRequestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        cancelOrders: async (chainName: string, cancelOrdersRequestBody: CancelOrdersRequestBody, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'chainName' is not null or undefined
+            assertParamExists('cancelOrders', 'chainName', chainName)
+            // verify required parameter 'cancelOrdersRequestBody' is not null or undefined
+            assertParamExists('cancelOrders', 'cancelOrdersRequestBody', cancelOrdersRequestBody)
+            const localVarPath = `/v1/chains/{chain_name}/orders/cancel`
+                .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(cancelOrdersRequestBody, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
         /**
          * Create a listing
          * @summary Create a listing
@@ -348,6 +398,18 @@ export const OrdersApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = OrdersApiAxiosParamCreator(configuration)
     return {
         /**
+         * Cancel one or more orders
+         * @summary Cancel one or more orders
+         * @param {string} chainName 
+         * @param {CancelOrdersRequestBody} cancelOrdersRequestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async cancelOrders(chainName: string, cancelOrdersRequestBody: CancelOrdersRequestBody, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CancelOrdersResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.cancelOrders(chainName, cancelOrdersRequestBody, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * Create a listing
          * @summary Create a listing
          * @param {string} chainName 
@@ -441,6 +503,17 @@ export const OrdersApiFactory = function (configuration?: Configuration, basePat
     const localVarFp = OrdersApiFp(configuration)
     return {
         /**
+         * Cancel one or more orders
+         * @summary Cancel one or more orders
+         * @param {string} chainName 
+         * @param {CancelOrdersRequestBody} cancelOrdersRequestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        cancelOrders(chainName: string, cancelOrdersRequestBody: CancelOrdersRequestBody, options?: any): AxiosPromise<CancelOrdersResult> {
+            return localVarFp.cancelOrders(chainName, cancelOrdersRequestBody, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Create a listing
          * @summary Create a listing
          * @param {string} chainName 
@@ -519,6 +592,27 @@ export const OrdersApiFactory = function (configuration?: Configuration, basePat
         },
     };
 };
+
+/**
+ * Request parameters for cancelOrders operation in OrdersApi.
+ * @export
+ * @interface OrdersApiCancelOrdersRequest
+ */
+export interface OrdersApiCancelOrdersRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof OrdersApiCancelOrders
+     */
+    readonly chainName: string
+
+    /**
+     * 
+     * @type {CancelOrdersRequestBody}
+     * @memberof OrdersApiCancelOrders
+     */
+    readonly cancelOrdersRequestBody: CancelOrdersRequestBody
+}
 
 /**
  * Request parameters for createListing operation in OrdersApi.
@@ -730,6 +824,18 @@ export interface OrdersApiListTradesRequest {
  * @extends {BaseAPI}
  */
 export class OrdersApi extends BaseAPI {
+    /**
+     * Cancel one or more orders
+     * @summary Cancel one or more orders
+     * @param {OrdersApiCancelOrdersRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrdersApi
+     */
+    public cancelOrders(requestParameters: OrdersApiCancelOrdersRequest, options?: AxiosRequestConfig) {
+        return OrdersApiFp(this.configuration).cancelOrders(requestParameters.chainName, requestParameters.cancelOrdersRequestBody, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * Create a listing
      * @summary Create a listing

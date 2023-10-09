@@ -53,5 +53,11 @@ export interface NFTOwner {
      * @memberof NFTOwner
      */
     'quantity': string;
+    /**
+     * When the NFT owner was last updated
+     * @type {string}
+     * @memberof NFTOwner
+     */
+    'updated_at'?: string;
 }
 

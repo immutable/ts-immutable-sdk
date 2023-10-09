@@ -20,55 +20,43 @@ import { Chain } from './chain';
 /**
  * 
  * @export
- * @interface Token
+ * @interface NFTWithOwner
  */
-export interface Token {
+export interface NFTWithOwner {
     /**
      * 
      * @type {Chain}
-     * @memberof Token
+     * @memberof NFTWithOwner
      */
     'chain': Chain;
     /**
-     * The address of token contract
+     * The address of NFT contract
      * @type {string}
-     * @memberof Token
+     * @memberof NFTWithOwner
      */
     'contract_address': string;
     /**
-     * The address of root token contract
+     * An `uint256` token id as string
      * @type {string}
-     * @memberof Token
+     * @memberof NFTWithOwner
      */
-    'root_contract_address': string | null;
+    'token_id': string;
     /**
-     * The symbol of token
+     * The account address of the owner of the NFT
      * @type {string}
-     * @memberof Token
+     * @memberof NFTWithOwner
      */
-    'symbol': string | null;
+    'account_address': string;
     /**
-     * The decimals of token
-     * @type {number}
-     * @memberof Token
-     */
-    'decimals': number | null;
-    /**
-     * The image url of token
+     * The quantity of owned tokens (uint256 as string)
      * @type {string}
-     * @memberof Token
+     * @memberof NFTWithOwner
      */
-    'image_url': string | null;
+    'quantity': string;
     /**
-     * The name of token
+     * When the owner last changed for the given NFT
      * @type {string}
-     * @memberof Token
-     */
-    'name': string | null;
-    /**
-     * When the collection was last updated
-     * @type {string}
-     * @memberof Token
+     * @memberof NFTWithOwner
      */
     'updated_at': string;
 }

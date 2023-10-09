@@ -15,19 +15,25 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { FulfillmentData200ResponseResult } from './fulfillment-data200-response-result';
+import { Order } from './order';
 
 /**
  * 
  * @export
- * @interface FulfillmentData200Response
+ * @interface FulfillableOrder
  */
-export interface FulfillmentData200Response {
+export interface FulfillableOrder {
     /**
      * 
-     * @type {FulfillmentData200ResponseResult}
-     * @memberof FulfillmentData200Response
+     * @type {string}
+     * @memberof FulfillableOrder
      */
-    'result': FulfillmentData200ResponseResult;
+    'extra_data': string;
+    /**
+     * 
+     * @type {Order}
+     * @memberof FulfillableOrder
+     */
+    'order': Order;
 }
 
