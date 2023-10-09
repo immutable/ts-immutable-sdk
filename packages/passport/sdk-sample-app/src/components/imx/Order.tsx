@@ -127,12 +127,6 @@ function Order({ showModal, setShowModal }: ModalProps) {
   }, []);
 
   const getOrderList = (assets: AssetWithSellOrder[]) => {
-    if (loading) {
-      return (
-        <Spinner animation="border" variant="dark"/>
-      );
-    }
-
     return (
       assets.length > 0
         ? (
@@ -224,12 +218,6 @@ function Order({ showModal, setShowModal }: ModalProps) {
   };
 
   const getOfferList = (assets: AssetWithOffer[]) => {
-    if (loading) {
-      return (
-        <Spinner animation="border" variant="dark"/>
-      );
-    }
-
     return (
       assets.length > 0
         ? (
@@ -316,13 +304,17 @@ function Order({ showModal, setShowModal }: ModalProps) {
             <Heading>Orders</Heading>
           </Offcanvas.Title>
         </Offcanvas.Header>
-        <Offcanvas.Body>
-          {getOrderList(userAssets?.sellAssets || [])}
-          <Offcanvas.Title>
-            <Heading>Offers</Heading>
-          </Offcanvas.Title>
-          {getOfferList(userAssets?.offerAssets || [])}
-        </Offcanvas.Body>
+
+        {loading ?
+          <Spinner animation="border" variant="dark"/> :
+          <Offcanvas.Body>
+            {getOrderList(userAssets?.sellAssets || [])}
+            <Offcanvas.Title>
+              <Heading>Offers</Heading>
+            </Offcanvas.Title>
+            {getOfferList(userAssets?.offerAssets || [])}
+          </Offcanvas.Body>
+        }
       </Offcanvas>
     </>
   );
