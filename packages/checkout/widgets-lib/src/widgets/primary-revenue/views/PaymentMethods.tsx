@@ -7,10 +7,15 @@ import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { text as textConfig } from '../../../resources/text/textConfig';
 import { PrimaryRevenueWidgetViews } from '../../../context/view-context/PrimaryRevenueViewContextTypes';
 
-import { ViewContext, ViewActions, SharedViews } from '../../../context/view-context/ViewContext';
+import {
+  ViewContext,
+  ViewActions,
+  SharedViews,
+} from '../../../context/view-context/ViewContext';
 
 import { sendPrimaryRevenueWidgetCloseEvent } from '../PrimaryRevenueWidgetEvents';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
+import { PaymentOptions } from '../components/PaymentOptions';
 
 export function PaymentMethods() {
   const text = {
@@ -20,7 +25,9 @@ export function PaymentMethods() {
   };
   const { viewDispatch, viewState } = useContext(ViewContext);
   const { amount, fromContractAddress } = viewState.view.data || {};
-  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+  const {
+    eventTargetState: { eventTarget },
+  } = useContext(EventTargetContext);
 
   const handleOptionClick = useCallback(
     async (type: PrimaryRevenueWidgetViews) => {
@@ -90,18 +97,7 @@ export function PaymentMethods() {
           {text.methods.header.heading}
         </Heading>
         <Box sx={{ paddingX: 'base.spacing.x2' }}>
-          <button
-            type="button"
-            onClick={() => handleOptionClick(PrimaryRevenueWidgetViews.PAY_WITH_COINS)}
-          >
-            {text.coins.header.heading}
-          </button>
-          <button
-            type="button"
-            onClick={() => handleOptionClick(PrimaryRevenueWidgetViews.PAY_WITH_CARD)}
-          >
-            {text.card.header.heading}
-          </button>
+          <PaymentOptions onClick={handleOptionClick} />
         </Box>
       </Box>
     </SimpleLayout>

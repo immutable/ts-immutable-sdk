@@ -319,6 +319,7 @@ export const text = {
         [PrimaryRevenueWidgetViews.PAY_WITH_COINS]: {
           heading: 'Coins',
           caption: 'Using the coins balance in your wallet',
+          disabledCaption: "We can't see enough coins in your balance",
         },
         [PrimaryRevenueWidgetViews.PAY_WITH_CARD]: {
           heading: 'Card',
@@ -380,6 +381,10 @@ export const text = {
           secondaryAction: 'Dismiss',
         },
       },
+    },
+    [PrimaryRevenueWidgetViews.MINT_SUCCESS]: {
+      text: 'Order completed',
+      actionText: 'Continue',
     },
   },
   wallets: {

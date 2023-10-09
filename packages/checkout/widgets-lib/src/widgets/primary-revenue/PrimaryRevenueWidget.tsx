@@ -175,7 +175,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
     },
   };
 
-  const statusViewProps = useMemo<StatusViewProps>(() => {
+  const errorViewProps = useMemo<StatusViewProps>(() => {
     const errorTextConfig: AllErrorTextConfigs = text.views[PrimaryRevenueWidgetViews.MINT_FAIL].errors;
     const errorType = viewState.view.data?.error || MintErrorTypes.DEFAULT;
     const handlers = errorHandlersConfig[errorType] || {};
@@ -226,7 +226,21 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
             <PayWithCoins />
           )}
           {viewState.view.type === PrimaryRevenueWidgetViews.MINT_FAIL && (
-            <StatusView {...statusViewProps} />
+            <StatusView {...errorViewProps} />
+          )}
+          {viewState.view.type === PrimaryRevenueWidgetViews.MINT_SUCCESS
+            && provider && (
+              <StatusView
+                statusText={
+                  text.views[PrimaryRevenueWidgetViews.MINT_SUCCESS].text
+                }
+                actionText={
+                  text.views[PrimaryRevenueWidgetViews.MINT_SUCCESS].actionText
+                }
+                onActionClick={() => closeWidget()}
+                statusType={StatusType.SUCCESS}
+                testId="success-view"
+              />
           )}
         </SharedContextProvider>
       </ViewContext.Provider>
