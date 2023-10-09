@@ -10,17 +10,18 @@ import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { text as textConfig } from '../../../resources/text/textConfig';
 import { PrimaryRevenueWidgetViews } from '../../../context/view-context/PrimaryRevenueViewContextTypes';
 
-import { sendPrimaryRevenueWidgetCloseEvent } from '../PrimaryRevenueWidgetEvents';
-import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
-
-import { useSharedContext } from '../context/SharedContextProvider';
-import { PaymentTypes } from '../types';
-
 import {
   ViewContext,
   ViewActions,
   SharedViews,
 } from '../../../context/view-context/ViewContext';
+
+import { sendPrimaryRevenueWidgetCloseEvent } from '../PrimaryRevenueWidgetEvents';
+import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
+import { PaymentOptions } from '../components/PaymentOptions';
+
+import { useSharedContext } from '../context/SharedContextProvider';
+import { PaymentTypes } from '../types';
 
 export function PaymentMethods() {
   const text = {
@@ -104,24 +105,7 @@ export function PaymentMethods() {
           {text.methods.header.heading}
         </Heading>
         <Box sx={{ paddingX: 'base.spacing.x2' }}>
-          <button
-            type="button"
-            onClick={() => handleOptionClick(PaymentTypes.CRYPTO)}
-          >
-            {
-              text.methods.options[PrimaryRevenueWidgetViews.PAY_WITH_COINS]
-                .heading
-            }
-          </button>
-          <button
-            type="button"
-            onClick={() => handleOptionClick(PaymentTypes.FIAT)}
-          >
-            {
-              text.methods.options[PrimaryRevenueWidgetViews.PAY_WITH_CARD]
-                .heading
-            }
-          </button>
+          <PaymentOptions onClick={() => {}} />
         </Box>
       </Box>
     </SimpleLayout>
