@@ -310,7 +310,7 @@ describe('quoteFetcher', () => {
         address: '0xREQUIRED_ERC20',
         amount: BigNumber.from(0),
       },
-      ['0xERC20_1', '0xREQUIRED_ERC20'],
+      ['0xREQUIRED_ERC20', '0xERC20_1'],
     );
 
     expect(quotes).toEqual(mockDexQuotes);
