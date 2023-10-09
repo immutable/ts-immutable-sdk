@@ -18,6 +18,8 @@ import {
   CreateListingParams,
   FeeType,
   FeeValue,
+  FulfillBulkOrdersResponse,
+  FulfillmentListing,
   FulfillOrderResponse,
   ListingResult,
   ListListingsParams,
@@ -213,7 +215,9 @@ export class Orderbook {
     ]);
 
     if (fulfillmentDataRes.result.unfulfillable_orders?.length > 0) {
-      throw new Error(`Unable to prepare fulfillment date: ${fulfillmentDataRes.result.unfulfillable_orders[0].reason}`);
+      throw new Error(
+        `Unable to prepare fulfillment date: ${fulfillmentDataRes.result.unfulfillable_orders[0].reason}`,
+      );
     } else if (fulfillmentDataRes.result.fulfillable_orders?.length !== 1) {
       throw new Error('unexpected fulfillable order result length');
     }
@@ -228,6 +232,39 @@ export class Orderbook {
     }
 
     return this.seaport.fulfillOrder(orderResult, takerAddress, extraData);
+  }
+
+  async fulfillBulkOrders(
+    listings: Array<FulfillmentListing>,
+    takerAddress: string,
+  ): Promise<FulfillBulkOrdersResponse> {
+    const fulfillmentDataRes = await this.apiClient.fulfillmentData(
+      listings.map((listingRequest) => ({
+        order_id: listingRequest.listingId,
+        fees: listingRequest.takerFees.map((fee) => ({
+          amount: fee.amount,
+          fee_type:
+            FeeType.TAKER_ECOSYSTEM as unknown as OpenApiFee.fee_type.TAKER_ECOSYSTEM,
+          recipient: fee.recipient,
+        })),
+      })),
+    );
+
+    return {
+      ...(await this.seaport.fulfillBulkOrders(
+        fulfillmentDataRes.result.fulfillable_orders,
+        takerAddress,
+      )),
+      fulfillableOrders: fulfillmentDataRes.result.fulfillable_orders.map(
+        (o) => mapFromOpenApiOrder(o.order),
+      ),
+      unfulfillableOrders: fulfillmentDataRes.result.unfulfillable_orders.map(
+        (o) => ({
+          orderId: o.order_id,
+          reason: o.reason,
+        }),
+      ),
+    };
   }
 
   /**
