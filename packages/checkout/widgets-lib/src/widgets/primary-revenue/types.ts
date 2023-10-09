@@ -58,3 +58,13 @@ export type SignOrderInput = {
   env: string;
   environmentId: string;
 };
+
+export enum MintErrorTypes {
+  TRANSACTION_FAILED = 'transactionFailed',
+  SERVICE_BREAKDOWN = 'serviceBreakDown',
+  TRANSAK_FAILED = 'transakFailed',
+  PASSPORT_FAILED = 'passportFailed',
+  PASSPORT_REJECTED_NO_FUNDS = 'passportRejectedNoFunds',
+  PASSPORT_REJECTED = 'passportRejected',
+  DEFAULT = 'default',
+}

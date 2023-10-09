@@ -2,10 +2,11 @@ import { IconProps, MenuItem } from '@biom3/react';
 
 import { text } from '../../../resources/text/textConfig';
 import { PrimaryRevenueWidgetViews } from '../../../context/view-context/PrimaryRevenueViewContextTypes';
+import { PaymentTypes } from '../types';
 
 export interface PaymentOptionProps {
-  type: PrimaryRevenueWidgetViews;
-  onClick: (type: PrimaryRevenueWidgetViews) => void;
+  type: PaymentTypes;
+  onClick: (type: PaymentTypes) => void;
   disabled?: boolean;
 }
 
@@ -15,8 +16,8 @@ export function PaymentOption(props: PaymentOptionProps) {
   const optionText = options[type];
 
   const icon: Record<string, IconProps['icon']> = {
-    [PrimaryRevenueWidgetViews.PAY_WITH_COINS]: 'Coins',
-    [PrimaryRevenueWidgetViews.PAY_WITH_CARD]: 'BankCard',
+    [PaymentTypes.CRYPTO]: 'Coins',
+    [PaymentTypes.FIAT]: 'BankCard',
   };
 
   if (!optionText) return null;

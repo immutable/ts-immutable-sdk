@@ -1,6 +1,3 @@
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable react/no-unused-prop-types */
 import { useCallback, useContext, useEffect } from 'react';
 import { Box, Heading } from '@biom3/react';
 
@@ -35,7 +32,7 @@ export function PaymentMethods() {
     paymentMethod, setPaymentMethod, sign, signResponse,
   } = useSharedContext();
 
-  const handleOptionClick = useCallback((type: PaymentTypes) => setPaymentMethod(type), []);
+  const handleOptionClick = (type: PaymentTypes) => setPaymentMethod(type);
 
   const handleGoToPaymentView = useCallback((type: PaymentTypes) => {
     if (type === PaymentTypes.CRYPTO) {
@@ -105,7 +102,7 @@ export function PaymentMethods() {
           {text.methods.header.heading}
         </Heading>
         <Box sx={{ paddingX: 'base.spacing.x2' }}>
-          <PaymentOptions onClick={() => {}} />
+          <PaymentOptions onClick={handleOptionClick} />
         </Box>
       </Box>
     </SimpleLayout>
