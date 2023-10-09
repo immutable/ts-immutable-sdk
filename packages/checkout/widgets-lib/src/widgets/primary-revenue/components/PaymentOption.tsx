@@ -29,18 +29,14 @@ export function PaymentOption(props: PaymentOptionProps) {
       size="medium"
       emphasized
       onClick={disabled ? undefined : handleClick}
-      sx={{
-        marginBottom: 'base.spacing.x1',
-      }}
+      sx={{ marginBottom: 'base.spacing.x1' }}
       disabled={disabled}
     >
       <MenuItem.FramedIcon icon={icon[type]} />
       <MenuItem.Label size="medium">{optionText.heading}</MenuItem.Label>
       {!disabled && <MenuItem.IntentIcon />}
       <MenuItem.Caption>
-        {disabled && optionText.disabledCaption
-          ? optionText.disabledCaption
-          : optionText.caption}
+        {disabled ? optionText.disabledCaption : optionText.caption}
       </MenuItem.Caption>
     </MenuItem>
   );

@@ -1,6 +1,5 @@
 import { Box } from '@biom3/react';
 
-import { useState, useEffect } from 'react';
 import { PaymentOption } from './PaymentOption';
 
 import { PaymentTypes } from '../types';
@@ -17,15 +16,9 @@ export interface PaymentOptionsProps {
 
 export function PaymentOptions(props: PaymentOptionsProps) {
   const { disabledOptions = [], onClick } = props;
-
-  const [options, setOptions] = useState<PaymentTypes[]>(
-    defaultPaymentOptions,
+  const options = defaultPaymentOptions.filter(
+    (option) => !disabledOptions?.includes(option),
   );
-
-  useEffect(() => {
-    if (disabledOptions.length === 0) return;
-    setOptions((prev) => prev.filter((option) => !disabledOptions?.includes(option)));
-  }, []);
 
   return (
     <Box
