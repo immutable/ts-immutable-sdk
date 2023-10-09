@@ -15,19 +15,19 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { FulfillmentData200ResponseResult } from './fulfillment-data200-response-result';
+import { RefreshMetadataByTokenID } from './refresh-metadata-by-token-id';
 
 /**
  * 
  * @export
- * @interface FulfillmentData200Response
+ * @interface RefreshNFTMetadataByTokenIDRequest
  */
-export interface FulfillmentData200Response {
+export interface RefreshNFTMetadataByTokenIDRequest {
     /**
-     * 
-     * @type {FulfillmentData200ResponseResult}
-     * @memberof FulfillmentData200Response
+     * List of nft metadata to be refreshed
+     * @type {Array<RefreshMetadataByTokenID>}
+     * @memberof RefreshNFTMetadataByTokenIDRequest
      */
-    'result': FulfillmentData200ResponseResult;
+    'nft_metadata': Array<RefreshMetadataByTokenID>;
 }
 

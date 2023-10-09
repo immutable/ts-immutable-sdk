@@ -5,26 +5,36 @@ import { StatusType } from './StatusType';
 export interface StatusViewProps {
   statusText: string;
   statusType: StatusType;
+  iconStyles?: Record<string, string>;
 }
 
 const status = {
   [StatusType.SUCCESS]: 'TickWithCircle',
   [StatusType.WARNING]: 'Shield',
   [StatusType.FAILURE]: 'CloseWithCircle',
+  [StatusType.INFORMATION]: 'InformationCircle',
 };
 
-export function StatusBox({ statusText, statusType }: StatusViewProps) {
+export function StatusBox({ statusText, statusType, iconStyles }: StatusViewProps) {
   const isSuccess = statusType === StatusType.SUCCESS;
 
   return (
-    <Box sx={statusBoxStyles} testId={`${statusType.toString()}-box`}>
+    <Box sx={statusBoxStyles} testId={`${statusType}-box`}>
       <Icon
         icon={status[statusType] as any}
-        testId={`${statusType.toString()}-icon`}
+        testId={`${statusType}-icon`}
         variant="bold"
-        sx={statusLogoFill(isSuccess)}
+        sx={{
+          ...statusLogoFill(isSuccess),
+          ...iconStyles || {},
+        }}
       />
-      <Body size="medium" weight="bold" testId={`${statusType.toString()}-text`}>
+      <Body
+        size="medium"
+        weight="bold"
+        testId={`${statusType}-text`}
+        sx={{ textAlign: 'center' }}
+      >
         {statusText}
       </Body>
     </Box>
