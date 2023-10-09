@@ -67,6 +67,10 @@ export const text = {
       body: ['You can try again or contact', 'support', 'for help.'],
       actionText: 'Try again',
     },
+    [SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW]: {
+      heading: 'Service not available in your region',
+      body: 'We’re sorry we cannot provide this service in your region.',
+    },
     [SharedViews.LOADING_VIEW]: {
       text: 'Loading',
     },
