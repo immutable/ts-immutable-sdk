@@ -1,10 +1,13 @@
 import {
   WidgetEvent,
+  IMTBLWidgetEvents,
+} from '../../../definitions/events/events';
+
+import {
   BridgeEventType,
   BridgeSuccess,
-  IMTBLWidgetEvents,
   BridgeFailed,
-} from '@imtbl/checkout-widgets';
+} from '../../../definitions/events/bridgeEvents';
 
 export const sendBridgeSuccessEvent = (eventTarget: Window | EventTarget, transactionHash: string) => {
   const successEvent = new CustomEvent<WidgetEvent<BridgeSuccess>>(

@@ -124,6 +124,16 @@ class Connect {
 
   constructor(config: CheckoutWidgetsConfig) {
     this.connectConfig = withDefaultWidgetConfigs(config);
+
+    window.addEventListener('imtbl-connect-widget', (event: any) => {
+      switch (event.detail.type) {
+        case 'close-widget': {
+          this.unmount();
+          break;
+        }
+        default:
+      }
+    });
   }
 
   private renderConnectWidget() {
@@ -216,6 +226,15 @@ class Bridge {
 
   constructor(config: CheckoutWidgetsConfig) {
     this.bridgeConfig = withDefaultWidgetConfigs(config);
+    window.addEventListener('imtbl-bridge-widget', (event: any) => {
+      switch (event.detail.type) {
+        case 'close-widget': {
+          this.unmount();
+          break;
+        }
+        default:
+      }
+    });
   }
 
   private renderBridgeWidget() {
@@ -228,6 +247,7 @@ class Bridge {
         11155111,
       ],
     };
+    console.log('inside render, bridge params', this.bridgeParams);
     if (this.bridgeRoot) {
       this.bridgeRoot.render(
         <React.StrictMode>
@@ -287,6 +307,8 @@ class Bridge {
 
   update(params: any) {
     this.bridgeParams = params;
+    console.log(params);
+    console.log(this.bridgeParams);
     this.renderBridgeWidget();
   }
 
@@ -323,5 +345,10 @@ export class Widgets {
     this.allWidgetsConfig = config;
     this.connect = new Connect(config);
     this.bridge = new Bridge(config);
+  }
+
+  updateConfig(config: CheckoutWidgetsConfig) {
+    this.connect.updateConfig(config);
+    this.bridge.updateConfig(config);
   }
 }

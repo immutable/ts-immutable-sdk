@@ -33,7 +33,6 @@ import {
   removeAccountsChangedListener,
   removeChainChangedListener,
 } from '../../lib';
-import { useInterval } from '../../lib/hooks/useInterval';
 import { useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { identifyUser } from '../../lib/analytics/identifyUser';
 
@@ -78,16 +77,12 @@ export function ConnectLoader({
     ? onLightBase
     : onDarkBase;
 
-  const [hasWeb3Provider, setHasWeb3Provider] = useState<boolean | undefined>();
+  const [hasWeb3Provider, setHasWeb3Provider] = useState<boolean>(false);
 
-  const [attempts, setAttempts] = useState<number>(0);
+  // const [attempts, setAttempts] = useState<number>(0);
   const { identify } = useAnalytics();
 
-  // Check if Web3Provider injected, otherwise load the widget without the provider after several attempts
-  let clearInterval: () => void;
-  const checkIfWeb3ProviderSet = () => {
-    const maxAttempts = 9;
-
+  useEffect(() => {
     if (params.web3Provider) {
       const isWeb3Provider = Checkout.isWeb3Provider(params.web3Provider);
       if (isWeb3Provider) {
@@ -99,20 +94,40 @@ export function ConnectLoader({
         });
 
         setHasWeb3Provider(true);
-        clearInterval();
-        return;
       }
     }
+  }, [params.web3Provider]);
 
-    if (attempts >= maxAttempts) {
-      setHasWeb3Provider(false);
-      clearInterval();
-      return;
-    }
+  // // Check if Web3Provider injected, otherwise load the widget without the provider after several attempts
+  // let clearInterval: () => void;
+  // const checkIfWeb3ProviderSet = () => {
+  //   const maxAttempts = 9;
 
-    setAttempts(attempts + 1);
-  };
-  clearInterval = useInterval(() => checkIfWeb3ProviderSet(), 10);
+  //   if (params.web3Provider) {
+  //     const isWeb3Provider = Checkout.isWeb3Provider(params.web3Provider);
+  //     if (isWeb3Provider) {
+  //       connectLoaderDispatch({
+  //         payload: {
+  //           type: ConnectLoaderActions.SET_PROVIDER,
+  //           provider: params.web3Provider,
+  //         },
+  //       });
+
+  //       setHasWeb3Provider(true);
+  //       clearInterval();
+  //       return;
+  //     }
+  //   }
+
+  //   if (attempts >= maxAttempts) {
+  //     setHasWeb3Provider(false);
+  //     clearInterval();
+  //     return;
+  //   }
+
+  //   setAttempts(attempts + 1);
+  // };
+  // clearInterval = useInterval(() => checkIfWeb3ProviderSet(), 10);
 
   /** Handle wallet events as per EIP-1193 spec
    * - listen for account changed manually in wallet
@@ -303,12 +318,16 @@ export function ConnectLoader({
           break;
         }
         default:
-          connectLoaderDispatch({
-            payload: {
-              type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
-              connectionStatus: ConnectionStatus.ERROR,
-            },
-          });
+
+        // Not sure why we are throwing an error here simply if we don't handle the event
+        // just let it go
+
+          // connectLoaderDispatch({
+          //   payload: {
+          //     type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
+          //     connectionStatus: ConnectionStatus.ERROR,
+          //   },
+          // });
       }
     }) as EventListener;
 

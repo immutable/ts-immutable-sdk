@@ -1881,7 +1881,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.10.15":
+"@biom3/react@npm:0.10.15, @biom3/react@npm:^0.10.12":
   version: 0.10.15
   resolution: "@biom3/react@npm:0.10.15"
   dependencies:
@@ -1901,29 +1901,6 @@ __metadata:
     react-is: ^18.2.0
     ts-deepmerge: ^6.2.0
   checksum: 6a01a5db727cf7b3bf99d083d08dd6f580d202f9916f2fe08dc99881fb65699c3f06e6ca081991de173a9bbfe1cd568baaf0db0bef8d4da8efbf2c77cb67c179
-  languageName: node
-  linkType: hard
-
-"@biom3/react@npm:^0.9.17-beta":
-  version: 0.9.17-beta
-  resolution: "@biom3/react@npm:0.9.17-beta"
-  dependencies:
-    "@biom3/design-tokens": "*"
-    "@emotion/css": ^11.11.2
-    "@emotion/react": ^11.11.1
-    "@rive-app/react-canvas": ^4.1.4
-    buffer: ^6.0.3
-    csstype: ^3.1.2
-    framer-motion: ^10.12.12
-    lodash.debounce: ^4.0.8
-    lodash.get: ^4.4.2
-    lodash.isequal: ^4.5.0
-    lodash.throttle: ^4.1.1
-    react: ^18.2.0
-    react-dom: ^18.2.0
-    react-is: ^18.2.0
-    ts-deepmerge: ^6.2.0
-  checksum: 1961438892fc8dee771c5eb5d9dc9277a51485d4f3b5f39ae5123a3359e983d479e13021cf423aee605fdefdec5d346deda1fed0083c82e2d0f323c3c4fcf56f
   languageName: node
   linkType: hard
 
@@ -3281,7 +3258,7 @@ __metadata:
     "@babel/core": ^7.21.0
     "@babel/preset-env": ^7.20.2
     "@biom3/design-tokens": ^0.2.4-beta
-    "@biom3/react": ^0.10.15
+    "@biom3/react": 0.10.15
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/config": 0.0.0
     "@imtbl/passport": 0.0.0
@@ -3291,6 +3268,7 @@ __metadata:
     "@rollup/plugin-commonjs": ^25.0.5
     "@rollup/plugin-json": ^6.0.1
     "@rollup/plugin-node-resolve": ^15.2.2
+    "@rollup/plugin-terser": ^0.4.4
     "@rollup/plugin-typescript": ^11.0.0
     "@types/node": ^18.14.2
     "@types/react": ^18.0.28
@@ -7129,7 +7107,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rollup/plugin-terser@npm:^0.4.3":
+"@rollup/plugin-terser@npm:^0.4.3, @rollup/plugin-terser@npm:^0.4.4":
   version: 0.4.4
   resolution: "@rollup/plugin-terser@npm:0.4.4"
   dependencies:
@@ -25872,7 +25850,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:8.4.31":
+"postcss@npm:8.4.31, postcss@npm:^8.3.5, postcss@npm:^8.4.21, postcss@npm:^8.4.23, postcss@npm:^8.4.27, postcss@npm:^8.4.4":
   version: 8.4.31
   resolution: "postcss@npm:8.4.31"
   dependencies:
@@ -25890,17 +25868,6 @@ __metadata:
     picocolors: ^0.2.1
     source-map: ^0.6.1
   checksum: 4ac793f506c23259189064bdc921260d869a115a82b5e713973c5af8e94fbb5721a5cc3e1e26840500d7e1f1fa42a209747c5b1a151918a9bc11f0d7ed9048e3
-  languageName: node
-  linkType: hard
-
-"postcss@npm:^8.3.5, postcss@npm:^8.4.21, postcss@npm:^8.4.23, postcss@npm:^8.4.27, postcss@npm:^8.4.4":
-  version: 8.4.31
-  resolution: "postcss@npm:8.4.31"
-  dependencies:
-    nanoid: ^3.3.6
-    picocolors: ^1.0.0
-    source-map-js: ^1.0.2
-  checksum: 1d8611341b073143ad90486fcdfeab49edd243377b1f51834dc4f6d028e82ce5190e4f11bb2633276864503654fb7cab28e67abdc0fbf9d1f88cad4a0ff0beea
   languageName: node
   linkType: hard
 
