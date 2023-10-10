@@ -15,7 +15,7 @@ export enum PaymentTypes {
 
 export type SignedOrderProduct = {
   productId: string;
-  qty: string;
+  qty: number;
   image: string;
   name: string;
   description: string;
@@ -38,6 +38,7 @@ export type SignedTransaction = {
   gasEstimate: number;
   methodCall: string;
   params: {
+    reference: string;
     amount: number;
     spender: string;
   };
