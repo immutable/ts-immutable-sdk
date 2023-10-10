@@ -1,7 +1,9 @@
 import React from 'react';
 import { WalletProviderName } from '@imtbl/checkout-sdk';
-import ReactDOM from 'react-dom/client';
+import ReactDOM, { createRoot } from 'react-dom/client';
 import { BiomePortalIdProvider } from '@biom3/react';
+import createCache from '@emotion/cache';
+import { CacheProvider } from '@emotion/react';
 import { WalletWidget } from './WalletWidget';
 import {
   ConnectLoader,
@@ -61,21 +63,52 @@ export class ImmutableWallet extends ImmutableWebComponent {
     if (!this.reactRoot) {
       this.reactRoot = ReactDOM.createRoot(this);
     }
-    this.reactRoot.render(
+
+    // create root container where react element will be inserted
+    const container = document.createElement('div');
+
+    // attach shadow DOM to container
+    const shadowRoot = container.attachShadow({ mode: 'open' });
+
+    // get hold of an existing element in HTML DOM
+    const domElement = document.getElementById('name');
+
+    // insert root container element in HTML DOM after the existing element
+    domElement?.replaceChildren(container);
+
+    // const container = document.querySelector('#root');
+    const emotionRoot = document.createElement('style');
+    const shadowRootElement = document.createElement('div');
+    shadowRoot.appendChild(emotionRoot);
+    shadowRoot.appendChild(shadowRootElement);
+
+    const cache = createCache({
+      key: 'css',
+      prepend: true,
+      container: emotionRoot,
+    });
+
+    // shadow DOM as react root
+    const root = createRoot(shadowRoot);
+
+    // render react element inside shadow DOM
+    root.render(
       <React.StrictMode>
-        <BiomePortalIdProvider>
-          <CustomAnalyticsProvider widgetConfig={this.widgetConfig!}>
-            <ConnectLoader
-              widgetConfig={this.widgetConfig!}
-              params={connectLoaderParams}
-              closeEvent={() => sendWalletWidgetCloseEvent(window)}
-            >
-              <WalletWidget
-                config={this.widgetConfig!}
-              />
-            </ConnectLoader>
-          </CustomAnalyticsProvider>
-        </BiomePortalIdProvider>
+        <CacheProvider value={cache}>
+          <BiomePortalIdProvider>
+            <CustomAnalyticsProvider widgetConfig={this.widgetConfig!}>
+              <ConnectLoader
+                widgetConfig={this.widgetConfig!}
+                params={connectLoaderParams}
+                closeEvent={() => sendWalletWidgetCloseEvent(window)}
+              >
+                <WalletWidget
+                  config={this.widgetConfig!}
+                />
+              </ConnectLoader>
+            </CustomAnalyticsProvider>
+          </BiomePortalIdProvider>
+        </CacheProvider>
       </React.StrictMode>,
     );
   }
