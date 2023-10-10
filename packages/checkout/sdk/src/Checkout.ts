@@ -60,6 +60,7 @@ import { CancelParams } from './types/cancel';
 import { FiatRampService, FiatRampWidgetParams } from './fiatRamp';
 import { getItemRequirementsFromRequirements } from './smartCheckout/itemRequirements';
 import { CheckoutError, CheckoutErrorType } from './errors';
+import { AvailabilityService, availabilityService } from './availability';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
@@ -74,7 +75,7 @@ export class Checkout {
 
   private readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>;
 
-  // private availability: AvailabilityService;
+  readonly availability: AvailabilityService;
 
   /**
    * Constructs a new instance of the CheckoutModule class.
@@ -86,7 +87,7 @@ export class Checkout {
     this.config = new CheckoutConfiguration(config);
     this.fiatRampService = new FiatRampService(this.config);
     this.readOnlyProviders = new Map<ChainId, ethers.providers.JsonRpcProvider>();
-    // this.availability = availabilityService(this.config.isDevelopment, this.config.isProduction);
+    this.availability = availabilityService(this.config.isDevelopment, this.config.isProduction);
   }
 
   /**
@@ -481,7 +482,6 @@ export class Checkout {
    * @returns {Promise<boolean>} - A promise that resolves to a boolean.
    */
   public async isSwapAvailable(): Promise<boolean> {
-    // return this.availability.checkDexAvailability();
-    return false;
+    return this.availability.checkDexAvailability();
   }
 }
