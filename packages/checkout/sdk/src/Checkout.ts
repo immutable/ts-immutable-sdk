@@ -74,6 +74,8 @@ export class Checkout {
 
   private readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>;
 
+  // private availability: AvailabilityService;
+
   /**
    * Constructs a new instance of the CheckoutModule class.
    * @param {CheckoutModuleConfiguration} [config=SANDBOX_CONFIGURATION] - The configuration object for the CheckoutModule.
@@ -84,6 +86,7 @@ export class Checkout {
     this.config = new CheckoutConfiguration(config);
     this.fiatRampService = new FiatRampService(this.config);
     this.readOnlyProviders = new Map<ChainId, ethers.providers.JsonRpcProvider>();
+    // this.availability = availabilityService(this.config.isDevelopment, this.config.isProduction);
   }
 
   /**
@@ -471,5 +474,14 @@ export class Checkout {
    */
   public async getExchangeFeeEstimate(): Promise<OnRampProviderFees> {
     return await this.fiatRampService.feeEstimate();
+  }
+
+  /**
+   * Fetches Swap widget availability.
+   * @returns {Promise<boolean>} - A promise that resolves to a boolean.
+   */
+  public async isSwapAvailable(): Promise<boolean> {
+    // return this.availability.checkDexAvailability();
+    return false;
   }
 }
