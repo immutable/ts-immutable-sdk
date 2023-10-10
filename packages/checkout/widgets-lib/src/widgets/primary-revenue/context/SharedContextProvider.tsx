@@ -5,7 +5,9 @@ import {
   ReactNode,
   useEffect,
   useState,
+  useCallback,
 } from 'react';
+import { Passport } from '@imtbl/passport';
 
 import { PrimaryRevenueSuccess } from '@imtbl/checkout-widgets';
 
@@ -23,13 +25,18 @@ type SharedContextProps = {
   fromContractAddress: string;
   provider: ConnectLoaderState['provider'];
   checkout: ConnectLoaderState['checkout'];
+  passport?: Passport;
 };
 
 type SharedContextValues = SharedContextProps & {
-  sign: (paymentType: PaymentTypes) => Promise<SignResponse | undefined>;
+  sign: (paymentType: PaymentTypes, callback?: () => void) => Promise<SignResponse | undefined>;
   execute: () => Promise<PrimaryRevenueSuccess>;
   recipientAddress: string;
+  recipientEmail: string;
   signResponse: SignResponse | undefined;
+  isPassportWallet: boolean;
+  paymentMethod: PaymentTypes | undefined;
+  setPaymentMethod: (paymentMethod: PaymentTypes) => void;
 };
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -42,9 +49,14 @@ const SharedContext = createContext<SharedContextValues>({
   environmentId: '',
   env: '',
   recipientAddress: '',
+  recipientEmail: '',
   sign: () => Promise.resolve(undefined),
   execute: () => Promise.resolve({} as PrimaryRevenueSuccess),
   signResponse: undefined,
+  passport: undefined,
+  isPassportWallet: false,
+  paymentMethod: undefined,
+  setPaymentMethod: () => {},
   config: {} as StrongCheckoutWidgetsConfig,
 });
 
@@ -65,25 +77,34 @@ export function SharedContextProvider(props: {
       fromContractAddress,
       provider,
       checkout,
+      passport,
     },
   } = props;
 
-  const [recipientAddress, setRecipientAddress] = useState<string>('');
+  const [{ recipientEmail, recipientAddress }, setUserInfo] = useState<{
+    recipientEmail: string;
+    recipientAddress: string;
+  }>({
+    recipientEmail: '',
+    recipientAddress: '',
+  });
 
-  // Get recipient address
+  const [paymentMethod, setPaymentMethod] = useState<PaymentTypes | undefined>(undefined);
+
+  // Get user info
   useEffect(() => {
-    const getRecipientAddress = async () => {
+    const getUserInfo = async () => {
       const signer = provider?.getSigner();
-      const address = await signer?.getAddress();
-      if (address) {
-        setRecipientAddress(address);
-      }
+      const address = await signer?.getAddress() || '';
+      const email = (await passport?.getUserInfo())?.email || '';
+
+      setUserInfo({ recipientEmail: email, recipientAddress: address });
     };
 
-    getRecipientAddress();
+    getUserInfo();
   }, [provider]);
 
-  const { sign, execute, signResponse } = useSignOrder({
+  const { sign: signOrder, execute, signResponse } = useSignOrder({
     items,
     provider,
     fromContractAddress,
@@ -91,6 +112,12 @@ export function SharedContextProvider(props: {
     environmentId,
     env,
   });
+
+  const sign = useCallback(async (type: PaymentTypes, callback?: (r?: SignResponse) => void) => {
+    const response = await signOrder(type);
+    callback?.(response);
+    return response;
+  }, [signOrder]);
 
   const values = useMemo(
     () => ({
@@ -106,6 +133,10 @@ export function SharedContextProvider(props: {
       provider,
       checkout,
       recipientAddress,
+      recipientEmail,
+      paymentMethod,
+      setPaymentMethod,
+      isPassportWallet: !!(provider?.provider as any)?.isPassport,
     }),
     [
       config,
@@ -117,6 +148,9 @@ export function SharedContextProvider(props: {
       provider,
       checkout,
       recipientAddress,
+      recipientEmail,
+      signResponse,
+      paymentMethod,
       signResponse,
     ],
   );

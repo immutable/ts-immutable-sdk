@@ -19,6 +19,7 @@ export interface StatusViewProps {
   testId: string;
   statusText: string;
   statusType: StatusType;
+  statusIconStyles?: Record<string, string>;
 }
 
 export function StatusView({
@@ -31,6 +32,7 @@ export function StatusView({
   testId,
   statusText,
   statusType,
+  statusIconStyles,
 }: StatusViewProps) {
   const firstRender = useRef(true);
   useEffect(() => {
@@ -54,7 +56,7 @@ export function StatusView({
     >
       <Box testId="status-view-container" sx={statusContainerStyles}>
         <CenteredBoxContent testId={testId}>
-          <StatusBox statusText={statusText} statusType={statusType} />
+          <StatusBox statusText={statusText} statusType={statusType} iconStyles={statusIconStyles} />
         </CenteredBoxContent>
 
         {actionText && onActionClick && (

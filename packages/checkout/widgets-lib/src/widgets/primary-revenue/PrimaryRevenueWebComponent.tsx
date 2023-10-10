@@ -174,6 +174,7 @@ export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
               fromContractAddress={this.fromContractAddress}
               environmentId={this.environmentId}
               env={this.env}
+              connectLoaderParams={connectLoaderParams}
             />
           </ConnectLoader>
         </CustomAnalyticsProvider>

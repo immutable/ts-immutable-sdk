@@ -1,6 +1,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { CancelOrdersRequestBody } from '../models/CancelOrdersRequestBody';
+import type { CancelOrdersResult } from '../models/CancelOrdersResult';
 import type { ChainName } from '../models/ChainName';
 import type { CreateListingRequestBody } from '../models/CreateListingRequestBody';
 import type { FulfillableOrder } from '../models/FulfillableOrder';
@@ -8,7 +10,7 @@ import type { FulfillmentDataRequest } from '../models/FulfillmentDataRequest';
 import type { ListingResult } from '../models/ListingResult';
 import type { ListListingsResult } from '../models/ListListingsResult';
 import type { ListTradeResult } from '../models/ListTradeResult';
-import type { OrderStatus } from '../models/OrderStatus';
+import type { OrderStatusName } from '../models/OrderStatusName';
 import type { PageCursor } from '../models/PageCursor';
 import type { PageSize } from '../models/PageSize';
 import type { TradeResult } from '../models/TradeResult';
@@ -20,6 +22,38 @@ import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class OrdersService {
 
   constructor(public readonly httpRequest: BaseHttpRequest) {}
+
+  /**
+   * Cancel one or more orders
+   * Cancel one or more orders
+   * @returns CancelOrdersResult Orders cancellation response.
+   * @throws ApiError
+   */
+  public cancelOrders({
+    chainName,
+    requestBody,
+  }: {
+    chainName: ChainName,
+    requestBody: CancelOrdersRequestBody,
+  }): CancelablePromise<CancelOrdersResult> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/v1/chains/{chain_name}/orders/cancel',
+      path: {
+        'chain_name': chainName,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `Bad Request (400)`,
+        401: `Unauthorised Request (401)`,
+        404: `The specified resource was not found (404)`,
+        429: `Too Many Requests (429)`,
+        500: `Internal Server Error (500)`,
+        501: `Not Implemented Error (501)`,
+      },
+    });
+  }
 
   /**
    * List all listings
@@ -42,7 +76,7 @@ export class OrdersService {
     /**
      * Order status to filter by
      */
-    status?: OrderStatus,
+    status?: OrderStatusName,
     /**
      * Sell item contract address to filter by
      */

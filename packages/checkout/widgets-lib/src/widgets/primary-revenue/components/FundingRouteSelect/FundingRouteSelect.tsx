@@ -33,9 +33,7 @@ export function FundingRouteSelect({ fundingRoutes, onFundingRouteSelected }: Fu
         type: ViewActions.UPDATE_VIEW,
         view: {
           type: PrimaryRevenueWidgetViews.FUND_WITH_SMART_CHECKOUT,
-          data: {
-            subView: FundWithSmartCheckoutSubViews.FUNDING_ROUTE_EXECUTE,
-          },
+          subView: FundWithSmartCheckoutSubViews.FUNDING_ROUTE_EXECUTE,
         },
       },
     });

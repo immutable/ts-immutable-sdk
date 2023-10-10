@@ -27,6 +27,8 @@ import { APIError404 } from '../models';
 // @ts-ignore
 import { APIError500 } from '../models';
 // @ts-ignore
+import { ListCollectionOwnersResult } from '../models';
+// @ts-ignore
 import { ListNFTOwnersResult } from '../models';
 /**
  * NftOwnersApi - axios parameter creator
@@ -86,6 +88,61 @@ export const NftOwnersApiAxiosParamCreator = function (configuration?: Configura
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * List owners by contract address
+         * @summary List owners by contract address
+         * @param {string} contractAddress The address of contract
+         * @param {string} chainName The name of chain
+         * @param {string} [fromUpdatedAt] Datetime to use as the oldest updated timestamp
+         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
+         * @param {number} [pageSize] Maximum number of items to return
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listOwnersByContractAddress: async (contractAddress: string, chainName: string, fromUpdatedAt?: string, pageCursor?: string, pageSize?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'contractAddress' is not null or undefined
+            assertParamExists('listOwnersByContractAddress', 'contractAddress', contractAddress)
+            // verify required parameter 'chainName' is not null or undefined
+            assertParamExists('listOwnersByContractAddress', 'chainName', chainName)
+            const localVarPath = `/v1/chains/{chain_name}/collections/{contract_address}/owners`
+                .replace(`{${"contract_address"}}`, encodeURIComponent(String(contractAddress)))
+                .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (fromUpdatedAt !== undefined) {
+                localVarQueryParameter['from_updated_at'] = (fromUpdatedAt as any instanceof Date) ?
+                    (fromUpdatedAt as any).toISOString() :
+                    fromUpdatedAt;
+            }
+
+            if (pageCursor !== undefined) {
+                localVarQueryParameter['page_cursor'] = pageCursor;
+            }
+
+            if (pageSize !== undefined) {
+                localVarQueryParameter['page_size'] = pageSize;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -111,6 +168,21 @@ export const NftOwnersApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listNFTOwners(contractAddress, tokenId, chainName, pageCursor, pageSize, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
+        /**
+         * List owners by contract address
+         * @summary List owners by contract address
+         * @param {string} contractAddress The address of contract
+         * @param {string} chainName The name of chain
+         * @param {string} [fromUpdatedAt] Datetime to use as the oldest updated timestamp
+         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
+         * @param {number} [pageSize] Maximum number of items to return
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listOwnersByContractAddress(contractAddress: string, chainName: string, fromUpdatedAt?: string, pageCursor?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListCollectionOwnersResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listOwnersByContractAddress(contractAddress, chainName, fromUpdatedAt, pageCursor, pageSize, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
     }
 };
 
@@ -134,6 +206,20 @@ export const NftOwnersApiFactory = function (configuration?: Configuration, base
          */
         listNFTOwners(contractAddress: string, tokenId: string, chainName: string, pageCursor?: string, pageSize?: number, options?: any): AxiosPromise<ListNFTOwnersResult> {
             return localVarFp.listNFTOwners(contractAddress, tokenId, chainName, pageCursor, pageSize, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * List owners by contract address
+         * @summary List owners by contract address
+         * @param {string} contractAddress The address of contract
+         * @param {string} chainName The name of chain
+         * @param {string} [fromUpdatedAt] Datetime to use as the oldest updated timestamp
+         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
+         * @param {number} [pageSize] Maximum number of items to return
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listOwnersByContractAddress(contractAddress: string, chainName: string, fromUpdatedAt?: string, pageCursor?: string, pageSize?: number, options?: any): AxiosPromise<ListCollectionOwnersResult> {
+            return localVarFp.listOwnersByContractAddress(contractAddress, chainName, fromUpdatedAt, pageCursor, pageSize, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -181,6 +267,48 @@ export interface NftOwnersApiListNFTOwnersRequest {
 }
 
 /**
+ * Request parameters for listOwnersByContractAddress operation in NftOwnersApi.
+ * @export
+ * @interface NftOwnersApiListOwnersByContractAddressRequest
+ */
+export interface NftOwnersApiListOwnersByContractAddressRequest {
+    /**
+     * The address of contract
+     * @type {string}
+     * @memberof NftOwnersApiListOwnersByContractAddress
+     */
+    readonly contractAddress: string
+
+    /**
+     * The name of chain
+     * @type {string}
+     * @memberof NftOwnersApiListOwnersByContractAddress
+     */
+    readonly chainName: string
+
+    /**
+     * Datetime to use as the oldest updated timestamp
+     * @type {string}
+     * @memberof NftOwnersApiListOwnersByContractAddress
+     */
+    readonly fromUpdatedAt?: string
+
+    /**
+     * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
+     * @type {string}
+     * @memberof NftOwnersApiListOwnersByContractAddress
+     */
+    readonly pageCursor?: string
+
+    /**
+     * Maximum number of items to return
+     * @type {number}
+     * @memberof NftOwnersApiListOwnersByContractAddress
+     */
+    readonly pageSize?: number
+}
+
+/**
  * NftOwnersApi - object-oriented interface
  * @export
  * @class NftOwnersApi
@@ -197,5 +325,17 @@ export class NftOwnersApi extends BaseAPI {
      */
     public listNFTOwners(requestParameters: NftOwnersApiListNFTOwnersRequest, options?: AxiosRequestConfig) {
         return NftOwnersApiFp(this.configuration).listNFTOwners(requestParameters.contractAddress, requestParameters.tokenId, requestParameters.chainName, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * List owners by contract address
+     * @summary List owners by contract address
+     * @param {NftOwnersApiListOwnersByContractAddressRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof NftOwnersApi
+     */
+    public listOwnersByContractAddress(requestParameters: NftOwnersApiListOwnersByContractAddressRequest, options?: AxiosRequestConfig) {
+        return NftOwnersApiFp(this.configuration).listOwnersByContractAddress(requestParameters.contractAddress, requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 }
