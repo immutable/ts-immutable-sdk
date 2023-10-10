@@ -1,45 +1,65 @@
-import { useEffect, useRef } from 'react';
-import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
+import { useEffect, useRef } from "react";
+import { IMTBLWidgetEvents } from "@imtbl/checkout-widgets";
 
 const useParams = () => {
   const urlParams = new URLSearchParams(window.location.search);
 
-  const amount = urlParams.get('amount') as string;
-  const envId = urlParams.get('envId') as string;
-  const fromCurrency = urlParams.get('fromCurrency') as string;
-  const items = urlParams.get('items') as string;
-
-  console.log('amount', amount);
-  console.log('envId', envId);
-  console.log('fromCurrency', fromCurrency);
-  console.log('items', items);
+  const amount = urlParams.get("amount") as string;
+  const env = urlParams.get("env") as string;
+  const theme = urlParams.get("theme") as string;
+  const environmentId = urlParams.get("environmentId") as string;
+  const fromContractAddress = urlParams.get("fromContractAddress") as string;
+  const products = urlParams.get("products") as string;
 
   return {
+    env,
+    theme,
+    environmentId,
+    fromContractAddress,
+    products,
     amount,
-    envId,
-    fromCurrency,
-    items,
   };
 };
 
 const handleEvent = ((event: CustomEvent) => {
-  console.log('@@@@@ event', event.detail);
+  const detail = event.detail;
+  const provider = detail?.data?.provider;
 
-  // send the window opener post message with type and data
-  window?.opener.postMessage(
+  if (provider) {
+    (async () => {
+      const signer = provider?.getSigner();
+      const walletAddress = (await signer?.getAddress()) || "";
+      window?.opener?.postMessage(
+        {
+          type: "mint_sale_popup_event",
+          identifier: "primary-revenue-widget-events",
+          data: {
+            type: [event.type, detail.type].filter(Boolean).join("-"),
+            walletProvider: detail.data.walletProvider,
+            walletAddress,
+          },
+        },
+        "*"
+      );
+    })();
+    return;
+  }
+
+  window?.opener?.postMessage(
     {
-      type: 'mint_sale_popup_event',
+      type: "mint_sale_popup_event",
+      identifier: "primary-revenue-widget-events",
       data: event.detail,
-      identifier: 'primary-revenue-widget-events',
     },
-    '*'
+    "*"
   );
 }) as EventListener;
 
 function PrimaryRevenueWidget() {
-  const {  amount, envId, fromCurrency, items } = useParams();
+  const { amount, products, theme, env, environmentId, fromContractAddress } =
+    useParams();
 
-  console.log('@@@@@ items', JSON.parse(items));
+  console.log("@@@@@ products", JSON.parse(atob(products)));
   const componentRef = useRef(null);
 
   useEffect(() => {
@@ -47,11 +67,15 @@ function PrimaryRevenueWidget() {
       IMTBLWidgetEvents.IMTBL_PRIMARY_REVENUE_WIDGET_EVENT,
       handleEvent
     );
+    window.addEventListener(
+      IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
+      handleEvent
+    );
 
     // Assuming window.sharedData.passportInstance contains the necessary data
     const passportInstance = window?.opener?.sharedData?.passportInstance;
 
-    console.log('@@@@@ passportInstance', passportInstance);
+    console.log("@@@@@ passportInstance", passportInstance);
 
     if (passportInstance && componentRef.current) {
       (
@@ -60,6 +84,10 @@ function PrimaryRevenueWidget() {
     }
 
     return () => {
+      window.removeEventListener(
+        IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
+        handleEvent
+      );
       window.removeEventListener(
         IMTBLWidgetEvents.IMTBL_PRIMARY_REVENUE_WIDGET_EVENT,
         handleEvent
@@ -70,11 +98,15 @@ function PrimaryRevenueWidget() {
   return (
     <imtbl-primary-revenue
       ref={componentRef}
+      widgetConfig={JSON.stringify({
+        theme,
+        environment: env,
+      })}
       amount={amount}
-      envId={envId}
-      fromCurrency={fromCurrency}
-      items={items}
-      widgetConfig="{theme: 'dark', environment: 'sandbox'}"
+      products={products}
+      fromContractAddress={fromContractAddress}
+      environmentId={environmentId}
+      env={env}
     />
   );
 }

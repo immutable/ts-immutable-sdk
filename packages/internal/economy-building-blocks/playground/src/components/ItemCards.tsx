@@ -8,11 +8,13 @@ function ItemCards({
   onClick,
   isSelected,
   onRefetch,
+  withQtySelector,
 }: {
   nfts: Array<NFT>;
   onClick?: (nft: NFT, quantity: number) => void;
   isSelected?: (nft: NFT) => boolean;
   onRefetch?: () => void;
+  withQtySelector?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -56,6 +58,7 @@ function ItemCards({
                 nft={nft}
                 onClick={onClick}
                 isSelected={isSelected}
+                withQtySelector={withQtySelector}
                 key={index}
               />
             </Box>

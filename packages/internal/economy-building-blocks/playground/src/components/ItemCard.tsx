@@ -5,13 +5,14 @@ import { NFT } from "@imtbl/generated-clients/dist/multi-rollup";
 function ItemCard({
   nft,
   onClick,
-  isSelected,
+  withQtySelector
 }: {
   nft: any;
   onClick?: (nft: NFT, quantity: number) => void;
   isSelected?: (nft: NFT) => boolean;
+  withQtySelector?: boolean;
 }) {
-  const [quantity, setQuantity] = useState<number>(0);
+  const [quantity, setQuantity] = useState<number>(1);
 
   const onCardClick = (nft: NFT) => {
     if (quantity === 0) return;
@@ -33,7 +34,7 @@ function ItemCard({
           relativeImageSizeInLayout="60vw"
         />
       </Card>
-      <Box>
+      {withQtySelector && (<Box>
         <Box
           sx={{
             display: "flex",
@@ -45,7 +46,7 @@ function ItemCard({
           <StatefulButtCon
             icon="Minus"
             onClick={() => {
-              quantity > 0 ? setQuantity(quantity - 1) : setQuantity(0);
+              quantity > 1 && setQuantity(quantity - 1);
             }}
           />
           <Body>{quantity}</Body>
@@ -57,7 +58,7 @@ function ItemCard({
             Add
           </Button>
         </Box>
-      </Box>
+      </Box>)}
     </Box>
   );
 }

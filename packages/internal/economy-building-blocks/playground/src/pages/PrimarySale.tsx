@@ -32,16 +32,6 @@ const passportConfig = {
   scope: "openid offline_access email transact",
 };
 
-const useParams = () => {
-  const urlParams = new URLSearchParams(window.location.search);
-
-  const login = urlParams.get("login") as string;
-
-  return {
-    login,
-  };
-};
-
 const usePassportInstance = (passportConfig: any) => {
   const {
     clientId,
@@ -177,7 +167,7 @@ const useOpenPopup = (
 
   const closePopup = useCallback(() => {
     if (popup.current && !popup.current.closed) {
-      popup.current.close();
+      // popup.current.close();
     }
   }, []);
 
@@ -192,23 +182,20 @@ const useMint = (
 ) => {
   const [loading, setLoading] = useState(false);
 
-  const items = selectedItems.map((item) => {
-    return {
-      productId: item.productId.toString(),
-      qty: item.quantity,
-      price: item.price.toString(),
-      name: item.name,
-      image: item.image,
-      description: item.description,
-    };
-  });
+  const items = selectedItems.map((item) => ({
+    productId: item.productId.toString(),
+    qty: item.quantity,
+    name: item.name,
+    image: item.image,
+    description: item.description,
+  }));
 
   const params = {
     amount: amount.toString(),
-    envId: "123",
-    fromCurrency: "USDC",
-
-    items: JSON.stringify(items),
+    env: configFields.env,
+    environmentId: configFields.environmentId,
+    fromContractAddress: configFields.fromContractAddress,
+    products: btoa(JSON.stringify(items)),
   };
 
   const urlParams = new URLSearchParams(params).toString();
@@ -229,9 +216,9 @@ const useMint = (
 };
 
 function PrimarySale() {
-  const { login } = useParams();
   const fee = 0.1;
-  const params = useURLParams();
+  const params = useURLParams() as any;
+  const login = params.login;
   const passportInstance = usePassportInstance(passportConfig);
 
   const [amount, setAmount] = useState(0);
@@ -330,6 +317,14 @@ function PrimarySale() {
         setExecutedTx(data.data[executeFunction]);
 
         closePopup();
+        break;
+      }
+      case "imtbl-connect-widget-success": {
+        setConfigFields((prev) => ({
+          ...prev,
+          wallet_address: data.walletAddress,
+        }));
+
         break;
       }
       default:
@@ -564,6 +559,7 @@ function PrimarySale() {
                 onRefetch={() => {
                   setItemsPointer((prev) => prev + 1);
                 }}
+                withQtySelector
               />
             </Box>
             <Box sx={{ marginTop: "base.spacing.x4" }}>
