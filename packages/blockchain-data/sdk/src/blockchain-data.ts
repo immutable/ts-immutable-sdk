@@ -296,14 +296,14 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async getMetadata(
-      request: mr.MetadataApiGetMetadataRequest,
+    request: mr.MetadataApiGetMetadataRequest,
   ): Promise<mr.GetMetadataResult> {
     return await this.metadata
-        .getMetadata(request)
-        .then((res) => res.data)
-        .catch((err) => {
-          throw formatError(err);
-        });
+      .getMetadata(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
