@@ -290,6 +290,23 @@ export class BlockchainData {
   }
 
   /**
+   * Get metadata by ID
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with a single Metadata
+   * @throws {@link index.APIError}
+   */
+  public async getMetadata(
+      request: mr.MetadataApiGetMetadataRequest,
+  ): Promise<mr.GetMetadataResult> {
+    return await this.metadata
+        .getMetadata(request)
+        .then((res) => res.data)
+        .catch((err) => {
+          throw formatError(err);
+        });
+  }
+
+  /**
    * List NFT Metadata by contract address
    * @param request - the request object containing the parameters to be provided in the API request
    * @returns a promise that resolves with a list of Metadata
