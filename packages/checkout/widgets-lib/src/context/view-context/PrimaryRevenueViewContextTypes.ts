@@ -28,6 +28,7 @@ interface PrimaryRevenueWithCardView extends ViewType {
 }
 interface PrimaryRevenueSmartCheckoutView extends ViewType {
   type: PrimaryRevenueWidgetViews.FUND_WITH_SMART_CHECKOUT;
+  subView: FundWithSmartCheckoutSubViews;
 }
 interface PrimaryRevenueSuccessView extends ViewType {
   type: PrimaryRevenueWidgetViews.MINT_SUCCESS;
@@ -35,4 +36,11 @@ interface PrimaryRevenueSuccessView extends ViewType {
 interface PrimaryRevenueFailView extends ViewType {
   type: PrimaryRevenueWidgetViews.MINT_FAIL;
   reason?: string;
+}
+
+export enum FundWithSmartCheckoutSubViews {
+  INIT = 'INIT',
+  LOADING = 'LOADING',
+  FUNDING_ROUTE_SELECT = 'FUNDING_ROUTE_SELECT',
+  FUNDING_ROUTE_EXECUTE = 'FUNDING_ROUTE_EXECUTE',
 }

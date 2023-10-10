@@ -5,29 +5,33 @@ import {
 
 import { BiomeCombinedProviders } from '@biom3/react';
 
-import { LoadingView } from '../../views/loading/LoadingView';
+import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
+import {
+  SharedViews,
+  ViewActions,
+  ViewContext,
+  initialViewState,
+  viewReducer,
+} from '../../context/view-context/ViewContext';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { text } from '../../resources/text/textConfig';
+import { LoadingView } from '../../views/loading/LoadingView';
+
+import { ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
+import { StatusType } from '../../components/Status/StatusType';
+import { StatusView, StatusViewProps } from '../../components/Status/StatusView';
+import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import {
-  viewReducer,
-  initialViewState,
-  ViewContext,
-  ViewActions,
-  SharedViews,
-} from '../../context/view-context/ViewContext';
-import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
-import { PrimaryRevenueWidgetViews } from '../../context/view-context/PrimaryRevenueViewContextTypes';
-import { Item, MintErrorTypes } from './types';
+  PrimaryRevenueWidgetViews,
+} from '../../context/view-context/PrimaryRevenueViewContextTypes';
 import { widgetTheme } from '../../lib/theme';
+import { sendPrimaryRevenueWidgetCloseEvent } from './PrimaryRevenueWidgetEvents';
 import { SharedContextProvider } from './context/SharedContextProvider';
-import { PaymentMethods } from './views/PaymentMethods';
+import { Item, MintErrorTypes } from './types';
+import { FundWithSmartCheckout } from './views/FundWithSmartCheckout';
 import { PayWithCard } from './views/PayWithCard';
 import { PayWithCoins } from './views/PayWithCoins';
-import { ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
-import { StatusView, StatusViewProps } from '../../components/Status/StatusView';
-import { StatusType } from '../../components/Status/StatusType';
-import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
-import { sendPrimaryRevenueWidgetCloseEvent } from './PrimaryRevenueWidgetEvents';
+import { PaymentMethods } from './views/PaymentMethods';
 
 interface ErrorHandlerConfig {
   onActionClick?: () => void;
@@ -82,10 +86,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
   const biomeTheme = useMemo(() => widgetTheme(theme), [theme]);
 
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
-  const viewReducerValues = useMemo(
-    () => ({ viewState, viewDispatch }),
-    [viewState, viewDispatch],
-  );
+  const viewReducerValues = useMemo(() => ({ viewState, viewDispatch }), [viewState, viewDispatch]);
 
   const loadingText = viewState.view.data?.loadingText
     || text.views[SharedViews.LOADING_VIEW].text;
@@ -247,6 +248,9 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
                 statusType={StatusType.SUCCESS}
                 testId="success-view"
               />
+          )}
+          {viewState.view.type === PrimaryRevenueWidgetViews.FUND_WITH_SMART_CHECKOUT && (
+            <FundWithSmartCheckout subView={viewState.view.subView} />
           )}
         </SharedContextProvider>
       </ViewContext.Provider>
