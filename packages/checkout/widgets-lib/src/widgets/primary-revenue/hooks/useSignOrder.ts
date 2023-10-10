@@ -169,7 +169,8 @@ export const useSignOrder = (input: SignOrderInput) => {
 
         transactionHash = txnResponse?.hash;
       } catch (e) {
-        // TODO: check error type and sent MintErrorTypes.PASSPORT_FAILED
+        // TODO: check error type to send
+        // MintErrorTypes.PASSPORT_REJECTED or MintErrorTypes.PASSPORT_REJECTED_NO_FUNDS
         setError({
           type: MintErrorTypes.PASSPORT_FAILED,
           data: { error: e },
@@ -183,12 +184,7 @@ export const useSignOrder = (input: SignOrderInput) => {
 
   const sign = useCallback(
     async (paymentType: PaymentTypes): Promise<SignResponse | undefined> => {
-      if (
-        !provider
-        || !recipientAddress
-        || !fromContractAddress
-        || !items.length
-      ) {
+      if (!provider || !recipientAddress || !fromContractAddress || !items.length) {
         return undefined;
       }
 

@@ -186,10 +186,6 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
     };
   };
 
-  if (viewState.view.type === PrimaryRevenueWidgetViews.MINT_FAIL) {
-    console.log('viewState.view.data.errorType', viewState.view?.data?.errorType, getErrorViewProps());
-  }
-
   return (
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>
       <ViewContext.Provider value={viewReducerValues}>
