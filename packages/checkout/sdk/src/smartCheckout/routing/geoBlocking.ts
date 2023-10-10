@@ -4,4 +4,7 @@ export const isOnRampGeoBlocked = async (): Promise<boolean> => false;
 
 export const isSwapGeoBlocked = async (
   config: CheckoutConfiguration,
-): Promise<boolean> => await config.remote.checkDexAvailability();
+): Promise<boolean> => {
+  config.isDevelopment;
+  await config.remote.checkDexAvailability();
+};

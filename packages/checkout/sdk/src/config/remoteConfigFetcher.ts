@@ -6,7 +6,7 @@ import {
   ChainsTokensConfig,
   ENV_DEVELOPMENT,
   RemoteConfiguration,
-  ChainTokensConfig,
+  ChainTokensConfig, IMMUTABLE_API_BASE_URL,
 } from '../types';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 
@@ -14,10 +14,6 @@ export type RemoteConfigParams = {
   isDevelopment: boolean;
   isProduction: boolean;
 };
-
-export enum CheckoutServices {
-  SWAP = 'dex',
-}
 
 export class RemoteConfigFetcher {
   private isDevelopment: boolean;
@@ -32,6 +28,8 @@ export class RemoteConfigFetcher {
     this.isDevelopment = params.isDevelopment;
     this.isProduction = params.isProduction;
   }
+
+  private availability = availabilityService(this.isDevelopment, this.isProduction);
 
   private static async makeHttpRequest(url: string): Promise<AxiosResponse> {
     let response;
@@ -55,6 +53,12 @@ export class RemoteConfigFetcher {
     if (this.isDevelopment) return CHECKOUT_API_BASE_URL[ENV_DEVELOPMENT];
     if (this.isProduction) return CHECKOUT_API_BASE_URL[Environment.PRODUCTION];
     return CHECKOUT_API_BASE_URL[Environment.SANDBOX];
+  };
+
+  private postEndpoint = () => {
+    if (this.isDevelopment) return IMMUTABLE_API_BASE_URL[ENV_DEVELOPMENT];
+    if (this.isProduction) return IMMUTABLE_API_BASE_URL[Environment.PRODUCTION];
+    return IMMUTABLE_API_BASE_URL[Environment.SANDBOX];
   };
 
   private async loadConfig(): Promise<RemoteConfiguration | undefined> {
@@ -87,7 +91,7 @@ export class RemoteConfigFetcher {
     | undefined
     > {
     if (key === 'dex') {
-      const isDexAvailable = await this.checkDexAvailability();
+      const isDexAvailable = await this.availability.checkDexAvailability();
       if (!isDexAvailable) {
         throw new CheckoutError(CheckoutErrorType.SERVICE_UNAVAILABLE, CheckoutErrorType.SERVICE_UNAVAILABLE);
       }
@@ -102,30 +106,5 @@ export class RemoteConfigFetcher {
     const config = await this.loadConfigTokens();
     if (!config || !config[chainId]) return {};
     return config[chainId] ?? [];
-  }
-
-  public async checkDexAvailability(): Promise<boolean> {
-    let response;
-    let availability;
-
-    try {
-      response = await axios.post(`${this.getEndpoint()}/v1/availability/dex`);
-    } catch (error: any) {
-      throw new Error(`Error fetching from api: ${error.message}`);
-    }
-
-    if (response.status === 403) {
-      availability = false;
-    }
-
-    if (response.status === 200) {
-      availability = true;
-    } else {
-      throw new Error(
-        `Error fetching from api: ${response.status} ${response.statusText}`,
-      );
-    }
-
-    return availability;
   }
 }

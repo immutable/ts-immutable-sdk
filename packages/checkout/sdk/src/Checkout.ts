@@ -56,6 +56,7 @@ import { CancelParams } from './types/cancel';
 import { FiatRampService, FiatRampWidgetParams } from './fiatRamp';
 import { getItemRequirementsFromRequirements } from './smartCheckout/itemRequirements';
 import { CheckoutError, CheckoutErrorType } from './errors';
+import { availabilityService } from './config/availabilityService';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
@@ -70,6 +71,8 @@ export class Checkout {
 
   private readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>;
 
+  private availability: { checkOnRampAvailability: () => Promise<void>; checkDexAvailability: () => Promise<boolean> };
+
   /**
    * Constructs a new instance of the CheckoutModule class.
    * @param {CheckoutModuleConfiguration} [config=SANDBOX_CONFIGURATION] - The configuration object for the CheckoutModule.
@@ -80,7 +83,10 @@ export class Checkout {
     this.config = new CheckoutConfiguration(config);
     this.fiatRampService = new FiatRampService(this.config);
     this.readOnlyProviders = new Map<ChainId, ethers.providers.JsonRpcProvider>();
+    this.availability = availabilityService(this.config.isDevelopment, this.config.isProduction);
   }
+
+  public async isDexAvailable() {}
 
   /**
    * Creates a provider using the given parameters.

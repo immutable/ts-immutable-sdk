@@ -194,7 +194,7 @@ export function SwapWidget(props: SwapWidgetProps) {
           (await checkout.config.remote.getConfig('dex')) as DexConfig
         ).overrides;
       } catch (err: any) {
-        if (err.type === CheckoutErrorType.SERVICE_UNAVAILABLE) {
+        if (err.type === CheckoutErrorType.SERVICE_UNAUTHORISED) {
           showServiceUnavailableErrorView();
           return;
         }

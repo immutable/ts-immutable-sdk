@@ -11,6 +11,7 @@ import {
   DEFAULT_BRIDGE_ENABLED,
 } from '../types';
 import { RemoteConfigFetcher } from './remoteConfigFetcher';
+import { availabilityService } from './availabilityService';
 
 export class CheckoutConfigurationError extends Error {
   public message: string;
@@ -68,6 +69,8 @@ export class CheckoutConfiguration {
 
   readonly networkMap: NetworkMap;
 
+  // readonly availability: { checkOnRampAvailability: () => Promise<void>; checkDexAvailability: () => Promise<boolean> };
+
   constructor(config: CheckoutModuleConfiguration) {
     if (!Object.values(Environment).includes(config.baseConfig.environment)) {
       throw new CheckoutConfigurationError(
@@ -87,6 +90,8 @@ export class CheckoutConfiguration {
       this.isProduction,
       this.isDevelopment,
     );
+
+    // this.availability = availabilityService(this.isDevelopment, this.isProduction);
 
     this.remote = new RemoteConfigFetcher({
       isDevelopment: this.isDevelopment,
