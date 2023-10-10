@@ -168,11 +168,19 @@ export const useSignOrder = (input: SignOrderInput) => {
         await txnResponse?.wait(1);
 
         transactionHash = txnResponse?.hash;
-      } catch (e) {
+      } catch (e: unknown) {
         // TODO: check error type to send
         // MintErrorTypes.PASSPORT_REJECTED or MintErrorTypes.PASSPORT_REJECTED_NO_FUNDS
+
+        const reason = typeof e === 'string' ? e : (e as any).reason || '';
+        let errorType = MintErrorTypes.TRANSACTION_FAILED;
+
+        if (reason.includes('rejected') && reason.includes('user')) {
+          errorType = MintErrorTypes.PASSPORT_REJECTED;
+        }
+
         setError({
-          type: MintErrorTypes.PASSPORT_FAILED,
+          type: errorType,
           data: { error: e },
         });
       }
@@ -253,10 +261,7 @@ export const useSignOrder = (input: SignOrderInput) => {
       const transactionHash = await sendTx(to, data, gasEstimate);
 
       if (!transactionHash) {
-        setError({
-          type: MintErrorTypes.PASSPORT_FAILED,
-          data: { transactionHash },
-        });
+        break;
       }
 
       transactionHashes[method] = transactionHash;

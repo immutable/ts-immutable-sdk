@@ -28,6 +28,10 @@ export function PayWithCoins() {
     setLoading(true);
     try {
       const transactionHashes = await execute();
+      if (!Object.keys(transactionHashes).length) {
+        sendPrimaryRevenueFailedEvent(eventTarget, 'Transaction failed');
+      }
+
       sendPrimaryRevenueSuccessEvent(eventTarget, transactionHashes);
     } catch (error) {
       sendPrimaryRevenueFailedEvent(eventTarget, (error as Error).message);

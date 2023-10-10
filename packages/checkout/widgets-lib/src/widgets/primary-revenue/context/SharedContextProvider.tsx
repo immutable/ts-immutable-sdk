@@ -125,7 +125,7 @@ export function SharedContextProvider(props: {
   const goToErrorView = useCallback(
     (errorType: MintErrorTypes, data: Record<string, unknown> = {}) => {
       errorRetries.current += 1;
-      if (errorRetries.current >= MAX_ERROR_RETRIES) {
+      if (errorRetries.current > MAX_ERROR_RETRIES) {
         errorRetries.current = 0;
         setPaymentMethod(undefined);
       }
