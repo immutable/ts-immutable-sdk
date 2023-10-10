@@ -16,7 +16,6 @@ import {
   SharedViews,
 } from '../../context/view-context/ViewContext';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
-
 import { PrimaryRevenueWidgetViews } from '../../context/view-context/PrimaryRevenueViewContextTypes';
 import { Item, MintErrorTypes } from './types';
 import { widgetTheme } from '../../lib/theme';
@@ -24,10 +23,8 @@ import { SharedContextProvider } from './context/SharedContextProvider';
 import { PaymentMethods } from './views/PaymentMethods';
 import { PayWithCard } from './views/PayWithCard';
 import { PayWithCoins } from './views/PayWithCoins';
-import {
-  StatusView,
-  StatusViewProps,
-} from '../../components/Status/StatusView';
+import { ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
+import { StatusView, StatusViewProps } from '../../components/Status/StatusView';
 import { StatusType } from '../../components/Status/StatusType';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { sendPrimaryRevenueWidgetCloseEvent } from './PrimaryRevenueWidgetEvents';
@@ -54,11 +51,18 @@ export interface PrimaryRevenueWidgetProps {
   fromContractAddress: string;
   env: string;
   environmentId: string;
+  connectLoaderParams?: ConnectLoaderParams;
 }
 
 export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
   const {
-    config, amount, items, fromContractAddress, env, environmentId,
+    config,
+    amount,
+    items,
+    fromContractAddress,
+    env,
+    environmentId,
+    connectLoaderParams,
   } = props;
 
   console.log(
@@ -74,8 +78,6 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
 
-  const loadingText = text.views[SharedViews.LOADING_VIEW].text;
-
   const { theme } = config;
   const biomeTheme = useMemo(() => widgetTheme(theme), [theme]);
 
@@ -84,6 +86,9 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
     () => ({ viewState, viewDispatch }),
     [viewState, viewDispatch],
   );
+
+  const loadingText = viewState.view.data?.loadingText
+    || text.views[SharedViews.LOADING_VIEW].text;
 
   const {
     eventTargetState: { eventTarget },
@@ -209,6 +214,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
             environmentId,
             provider,
             checkout,
+            passport: connectLoaderParams?.passport,
           }}
         >
           {viewState.view.type === SharedViews.LOADING_VIEW && (

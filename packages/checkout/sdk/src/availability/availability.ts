@@ -2,14 +2,11 @@ import { Environment } from '@imtbl/config';
 import axios from 'axios';
 import { ENV_DEVELOPMENT, IMMUTABLE_API_BASE_URL } from '../types';
 
-type AvailabilityService = (
-  isDevelopment: boolean,
-  isProduction: boolean
-) => {
+export type AvailabilityService = {
   checkDexAvailability: () => Promise<boolean>
 };
 
-export const availabilityService: AvailabilityService = (
+export const availabilityService = (
   isDevelopment: boolean,
   isProduction: boolean,
 ) => {
@@ -21,20 +18,18 @@ export const availabilityService: AvailabilityService = (
   };
 
   const checkDexAvailability = async (): Promise<boolean> => {
-    let availability;
     try {
-      const response = await axios.post(`${postEndpoint()}/v1/availability/dex`);
+      const response = await axios.post(`${postEndpoint()}/v1/availability/checkout/swap`);
       if (response.status === 403) {
-        availability = false;
-      } else if (response.status === 204) {
-        availability = true;
-      } else {
-        throw new Error(`Error fetching from api: ${response.status} ${response.statusText}`);
+        return false;
       }
+      if (response.status === 204) {
+        return true;
+      }
+      throw new Error(`Error fetching from api: ${response.status} ${response.statusText}`);
     } catch (error: any) {
       throw new Error(`Error fetching from api: ${error.message}`);
     }
-    return availability;
   };
 
   return {
