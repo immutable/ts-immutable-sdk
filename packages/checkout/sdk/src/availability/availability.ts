@@ -1,6 +1,7 @@
 import { Environment } from '@imtbl/config';
 import axios from 'axios';
 import { ENV_DEVELOPMENT, IMMUTABLE_API_BASE_URL } from '../types';
+import { CheckoutError, CheckoutErrorType } from '../errors';
 
 export type AvailabilityService = {
   checkDexAvailability: () => Promise<boolean>
@@ -26,9 +27,12 @@ export const availabilityService = (
       if (response.status === 204) {
         return true;
       }
-      throw new Error(`Error fetching from api: ${response.status} ${response.statusText}`);
+      throw new CheckoutError(
+        `Error fetching from api: ${response.status} ${response.statusText}`,
+        CheckoutErrorType.SERVICE_UNAVAILABLE_ERROR,
+      );
     } catch (error: any) {
-      throw new Error(`Error fetching from api: ${error.message}`);
+      throw new CheckoutError(`Error fetching from api: ${error.message}`, CheckoutErrorType.SERVICE_UNAVAILABLE_ERROR);
     }
   };
 
