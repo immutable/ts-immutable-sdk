@@ -387,13 +387,11 @@ export type SmartCheckoutInsufficient = {
 
 /**
  * Represents the routing outcome for a transaction.
- * @property {boolean} isPassport - Indicates if the provider used was a passport provider.
  * @property {AvailableRoutingOptions} availableRoutingOptions - The routing options available to the user
  * @property {RoutingOutcome} routingOutcome - The routing outcome for the transaction which
  * includes the funding routes if routes were found
  */
 export type SmartCheckoutRouter = {
-  isPassport: boolean,
   availableRoutingOptions: AvailableRoutingOptions,
   routingOutcome: RoutingOutcome
 };
