@@ -13,16 +13,17 @@ const CURRENCY_IMAGE_URL = {
 export function OrderItem(props: OrderItemProps) {
   const { item } = props;
   const currencyIcon = CURRENCY_IMAGE_URL[item.currency.toLowerCase()] || CURRENCY_IMAGE_URL.eth;
+  const price = item.amount.reduce((v, p) => v + p, 0).toString();
 
   return (
     <MenuItem emphasized size="small" sx={{ pointerEvents: 'none', userSelect: 'none' }}>
       <MenuItem.FramedImage imageUrl={item.image} />
-      <MenuItem.Label>{item.name}</MenuItem.Label>
+      <MenuItem.Label>{`${item.name}${item.qty > 1 ? ` x${item.qty}` : ''}`}</MenuItem.Label>
       <MenuItem.Caption>{item.description}</MenuItem.Caption>
       {item.amount && (
         <MenuItem.PriceDisplay
-          fiatAmount={item.amount.toString()}
-          price={`${item.currency} ${item.amount}`}
+          fiatAmount={`USD $${price}`}
+          price={`${item.currency} ${price}`}
           currencyImageUrl={currencyIcon}
         />
       )}

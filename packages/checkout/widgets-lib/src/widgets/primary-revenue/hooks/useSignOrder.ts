@@ -93,7 +93,7 @@ const toSignedProduct = (
   productId: product.product_id,
   image: item?.image || '',
   qty: item?.qty || 1,
-  name: `${item?.name || ''}${item?.qty ? ` x${item.qty}` : ''}`,
+  name: item?.name || '',
   description: item?.description || '',
   currency,
   amount: product.detail.map(({ amount }) => amount),
@@ -112,11 +112,26 @@ const toSignResponse = (
         name: order.currency.name,
         erc20Address: order.currency.erc20_address,
       },
-      products: order.products.map((product) => toSignedProduct(
-        product,
-        order.currency.name,
-        items.find((item) => item.productId === product.product_id),
-      )),
+      products: order.products
+        .map((product) => toSignedProduct(
+          product,
+          order.currency.name,
+          items.find((item) => item.productId === product.product_id),
+        ))
+        .reduce((acc, product) => {
+          const index = acc.findIndex((n) => n.name === product.name);
+
+          if (index === -1) {
+            acc.push({ ...product });
+          }
+
+          if (index > -1) {
+            acc[index].amount = [...acc[index].amount, ...product.amount];
+            acc[index].tokenId = [...acc[index].tokenId, ...product.tokenId];
+          }
+
+          return acc;
+        }, [] as SignedOrderProduct[]),
       totalAmount: Number(order.total_amount),
     },
     transactions: transactions.map((transaction) => ({
@@ -192,7 +207,12 @@ export const useSignOrder = (input: SignOrderInput) => {
 
   const sign = useCallback(
     async (paymentType: PaymentTypes): Promise<SignResponse | undefined> => {
-      if (!provider || !recipientAddress || !fromContractAddress || !items.length) {
+      if (
+        !provider
+        || !recipientAddress
+        || !fromContractAddress
+        || !items.length
+      ) {
         return undefined;
       }
 
