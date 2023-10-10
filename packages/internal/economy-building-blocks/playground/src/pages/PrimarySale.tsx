@@ -167,7 +167,7 @@ const useOpenPopup = (
 
   const closePopup = useCallback(() => {
     if (popup.current && !popup.current.closed) {
-      // popup.current.close();
+      popup.current.close();
     }
   }, []);
 
