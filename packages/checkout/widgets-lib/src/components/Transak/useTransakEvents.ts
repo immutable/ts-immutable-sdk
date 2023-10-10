@@ -167,7 +167,10 @@ export const useTransakEvents = (props: UseTransakEventsProps) => {
 
   useEffect(() => {
     const unsubscribeEvents = subscribeEvents();
-    return () => unsubscribeEvents();
+    return () => {
+      clearTimeout(timeout.current);
+      unsubscribeEvents();
+    };
   }, []);
 
   return {
