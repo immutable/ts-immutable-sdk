@@ -5,9 +5,10 @@ import { text } from '../../resources/text/textConfig';
 import { SharedViews } from '../../context/view-context/ViewContext';
 import { NoServiceHero } from '../../components/Hero/NoServiceHero';
 import { FooterLogo } from '../../components/Footer/FooterLogo';
+import { ServiceType } from './serviceTypes';
 
 export interface ServiceUnavailableErrorViewProps {
-  service: string;
+  service: ServiceType;
   onCloseClick: () => void;
 }
 
@@ -16,6 +17,7 @@ export function ServiceUnavailableErrorView({
   onCloseClick,
 }: ServiceUnavailableErrorViewProps) {
   const errorText = text.views[SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW];
+  const headingText = errorText[service];
 
   return (
     <SimpleLayout
@@ -27,9 +29,7 @@ export function ServiceUnavailableErrorView({
       footer={<FooterLogo />}
       testId="service-unavailable-error-view"
     >
-      <SimpleTextBody heading={errorText.heading(service)}>
-        {errorText.body}
-      </SimpleTextBody>
+      <SimpleTextBody heading={headingText}>{errorText.body}</SimpleTextBody>
     </SimpleLayout>
   );
 }
