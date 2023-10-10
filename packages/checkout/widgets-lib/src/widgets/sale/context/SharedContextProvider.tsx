@@ -9,7 +9,7 @@ import {
 } from 'react';
 import { Passport } from '@imtbl/passport';
 
-import { PrimaryRevenueSuccess } from '@imtbl/checkout-widgets';
+import { SaleSuccess } from '@imtbl/checkout-widgets';
 
 import { Item, PaymentTypes, SignResponse } from '../types';
 import { useSignOrder } from '../hooks/useSignOrder';
@@ -30,7 +30,7 @@ type SharedContextProps = {
 
 type SharedContextValues = SharedContextProps & {
   sign: (paymentType: PaymentTypes, callback?: () => void) => Promise<SignResponse | undefined>;
-  execute: () => Promise<PrimaryRevenueSuccess>;
+  execute: () => Promise<SaleSuccess>;
   recipientAddress: string;
   recipientEmail: string;
   signResponse: SignResponse | undefined;
@@ -51,7 +51,7 @@ const SharedContext = createContext<SharedContextValues>({
   recipientAddress: '',
   recipientEmail: '',
   sign: () => Promise.resolve(undefined),
-  execute: () => Promise.resolve({} as PrimaryRevenueSuccess),
+  execute: () => Promise.resolve({} as SaleSuccess),
   signResponse: undefined,
   passport: undefined,
   isPassportWallet: false,
@@ -60,7 +60,7 @@ const SharedContext = createContext<SharedContextValues>({
   config: {} as StrongCheckoutWidgetsConfig,
 });
 
-SharedContext.displayName = 'PrimaryRevenueSharedContext';
+SharedContext.displayName = 'SaleSharedContext';
 
 export function SharedContextProvider(props: {
   children: ReactNode;

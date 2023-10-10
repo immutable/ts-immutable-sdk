@@ -1,7 +1,7 @@
 import { IconProps, MenuItem } from '@biom3/react';
 
 import { text } from '../../../resources/text/textConfig';
-import { PrimaryRevenueWidgetViews } from '../../../context/view-context/PrimaryRevenueViewContextTypes';
+import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 import { PaymentTypes } from '../types';
 
 export interface PaymentOptionProps {
@@ -12,7 +12,7 @@ export interface PaymentOptionProps {
 
 export function PaymentOption(props: PaymentOptionProps) {
   const { type, onClick, disabled } = props;
-  const { options } = text.views[PrimaryRevenueWidgetViews.PAYMENT_METHODS];
+  const { options } = text.views[SaleWidgetViews.PAYMENT_METHODS];
   const optionText = options[type];
 
   const icon: Record<string, IconProps['icon']> = {

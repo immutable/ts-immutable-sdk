@@ -5,7 +5,7 @@ import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { text as textConfig } from '../../../resources/text/textConfig';
-import { PrimaryRevenueWidgetViews } from '../../../context/view-context/PrimaryRevenueViewContextTypes';
+import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 
 import {
   ViewContext,
@@ -13,7 +13,7 @@ import {
   SharedViews,
 } from '../../../context/view-context/ViewContext';
 
-import { sendPrimaryRevenueWidgetCloseEvent } from '../PrimaryRevenueWidgetEvents';
+import { sendSaleWidgetCloseEvent } from '../SaleWidgetEvents';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { PaymentOptions } from '../components/PaymentOptions';
 
@@ -22,7 +22,7 @@ import { PaymentTypes } from '../types';
 
 export function PaymentMethods() {
   const text = {
-    methods: textConfig.views[PrimaryRevenueWidgetViews.PAYMENT_METHODS],
+    methods: textConfig.views[SaleWidgetViews.PAYMENT_METHODS],
   };
   const { viewDispatch } = useContext(ViewContext);
   const {
@@ -40,7 +40,7 @@ export function PaymentMethods() {
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
-            type: PrimaryRevenueWidgetViews.PAY_WITH_COINS,
+            type: SaleWidgetViews.PAY_WITH_COINS,
           },
         },
       });
@@ -51,7 +51,7 @@ export function PaymentMethods() {
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
-            type: PrimaryRevenueWidgetViews.PAY_WITH_CARD,
+            type: SaleWidgetViews.PAY_WITH_CARD,
           },
         },
       });
@@ -78,7 +78,7 @@ export function PaymentMethods() {
       testId="payment-methods"
       header={(
         <HeaderNavigation
-          onCloseButtonClick={() => sendPrimaryRevenueWidgetCloseEvent(eventTarget)}
+          onCloseButtonClick={() => sendSaleWidgetCloseEvent(eventTarget)}
         />
       )}
       footer={<FooterLogo />}

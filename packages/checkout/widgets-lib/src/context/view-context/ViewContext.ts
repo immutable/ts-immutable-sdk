@@ -3,7 +3,7 @@ import { ConnectWidgetView } from './ConnectViewContextTypes';
 import { WalletWidgetView } from './WalletViewContextTypes';
 import { PrefilledSwapForm, SwapWidgetView } from './SwapViewContextTypes';
 import { BridgeWidgetView, PrefilledBridgeForm } from './BridgeViewContextTypes';
-import { PrimaryRevenueWidgetView } from './PrimaryRevenueViewContextTypes';
+import { SaleWidgetView } from './SaleViewContextTypes';
 import { ViewType } from './ViewType';
 import { OnRampWidgetView } from './OnRampViewContextTypes';
 
@@ -41,7 +41,7 @@ export type View =
   | SwapWidgetView
   | BridgeWidgetView
   | OnRampWidgetView
-  | PrimaryRevenueWidgetView;
+  | SaleWidgetView;
 
 export interface ViewState {
   view: View;

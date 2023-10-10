@@ -6,8 +6,8 @@ import { SharedViews } from '../../context/view-context/ViewContext';
 import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
 import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextTypes';
-import { PrimaryRevenueWidgetViews } from '../../context/view-context/PrimaryRevenueViewContextTypes';
-import { MintErrorTypes, PaymentTypes } from '../../widgets/primary-revenue/types';
+import { SaleWidgetViews } from '../../context/view-context/SaleViewContextTypes';
+import { MintErrorTypes, PaymentTypes } from '../../widgets/sale/types';
 
 export const text = {
   views: {
@@ -311,7 +311,7 @@ export const text = {
         },
       },
     },
-    [PrimaryRevenueWidgetViews.PAYMENT_METHODS]: {
+    [SaleWidgetViews.PAYMENT_METHODS]: {
       header: {
         heading: 'How would you like to pay?',
       },
@@ -329,7 +329,7 @@ export const text = {
       },
       loading: 'Nice choice',
     },
-    [PrimaryRevenueWidgetViews.PAY_WITH_COINS]: {
+    [SaleWidgetViews.PAY_WITH_COINS]: {
       header: {
         heading: 'Pay with your',
         caption: 'Using the coins balance in your wallet',
@@ -338,10 +338,10 @@ export const text = {
         buyNow: 'Buy now',
       },
     },
-    [PrimaryRevenueWidgetViews.PAY_WITH_CARD]: {
+    [SaleWidgetViews.PAY_WITH_CARD]: {
       screenTitle: 'Pay with card',
     },
-    [PrimaryRevenueWidgetViews.MINT_FAIL]: {
+    [SaleWidgetViews.MINT_FAIL]: {
       errors: {
         [MintErrorTypes.TRANSACTION_FAILED]: {
           description: 'Transaction failed',
@@ -381,7 +381,7 @@ export const text = {
         },
       },
     },
-    [PrimaryRevenueWidgetViews.MINT_SUCCESS]: {
+    [SaleWidgetViews.MINT_SUCCESS]: {
       text: 'Order completed',
       actionText: 'Continue',
     },
