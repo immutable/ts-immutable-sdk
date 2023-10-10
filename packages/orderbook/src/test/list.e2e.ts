@@ -1,6 +1,6 @@
 import { providers, Wallet } from 'ethers';
 import { Environment } from '@imtbl/config';
-import { OrderStatus } from 'openapi/sdk';
+import { OrderStatusName } from 'openapi/sdk';
 import { Orderbook } from 'orderbook';
 import { getLocalhostProvider } from './helpers/provider';
 import { getOffererWallet } from './helpers/signers';
@@ -43,7 +43,7 @@ async function createListing(
     makerFees: [],
   });
 
-  return waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.ACTIVE);
+  return waitForOrderToBeOfStatus(sdk, orderId, OrderStatusName.ACTIVE);
 }
 
 describe('listListings e2e', () => {
@@ -105,7 +105,7 @@ describe('listListings e2e', () => {
   it('should list orders by collection', async () => {
     const ordersPage = await sdk.listListings({
       sellItemContractAddress: token1ContractAddress,
-      status: OrderStatus.ACTIVE,
+      status: OrderStatusName.ACTIVE,
     });
 
     expect(ordersPage.result.length).toBe(2);
@@ -119,7 +119,7 @@ describe('listListings e2e', () => {
     const ordersPage = await sdk.listListings({
       sellItemContractAddress: token2ContractAddress,
       sellItemTokenId: '0',
-      status: OrderStatus.ACTIVE,
+      status: OrderStatusName.ACTIVE,
     });
 
     expect(ordersPage.result.length).toBe(1);
@@ -131,7 +131,7 @@ describe('listListings e2e', () => {
   it('should sort orders by buy amount', async () => {
     const ordersPage = await sdk.listListings({
       sellItemContractAddress: token1ContractAddress,
-      status: OrderStatus.ACTIVE,
+      status: OrderStatusName.ACTIVE,
       sortBy: 'buy_item_amount',
     });
 
@@ -145,7 +145,7 @@ describe('listListings e2e', () => {
   it('should page orders', async () => {
     const ordersPage1 = await sdk.listListings({
       sellItemContractAddress: token1ContractAddress,
-      status: OrderStatus.ACTIVE,
+      status: OrderStatusName.ACTIVE,
       pageSize: 1,
     });
 
@@ -156,7 +156,7 @@ describe('listListings e2e', () => {
 
     const ordersPage2 = await sdk.listListings({
       sellItemContractAddress: token1ContractAddress,
-      status: OrderStatus.ACTIVE,
+      status: OrderStatusName.ACTIVE,
       pageSize: 1,
       pageCursor: ordersPage1.page!.nextCursor!,
     });
@@ -168,7 +168,7 @@ describe('listListings e2e', () => {
 
     const ordersPage3 = await sdk.listListings({
       sellItemContractAddress: token1ContractAddress,
-      status: OrderStatus.ACTIVE,
+      status: OrderStatusName.ACTIVE,
       pageSize: 1,
       pageCursor: ordersPage2.page!.nextCursor!,
     });

@@ -1,6 +1,4 @@
-import {
-  useCallback, useContext, useEffect, useState,
-} from 'react';
+import { useCallback, useContext, useState } from 'react';
 import { Body, Box, Button } from '@biom3/react';
 
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -16,17 +14,18 @@ import {
 } from '../PrimaryRevenueWidgetEvents';
 import { ViewContext } from '../../../context/view-context/ViewContext';
 import { useSharedContext } from '../context/SharedContextProvider';
-import { PaymentTypes } from '../types';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 
 export function PayWithCoins() {
   const text = textConfig.views[PrimaryRevenueWidgetViews.PAY_WITH_COINS];
   const [loading, setLoading] = useState(false);
   const { viewState } = useContext(ViewContext);
-  const { sign, execute, signResponse } = useSharedContext();
+  const { execute, signResponse } = useSharedContext();
   const currency = signResponse?.order.currency || '';
 
-  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+  const {
+    eventTargetState: { eventTarget },
+  } = useContext(EventTargetContext);
 
   const handlePayment = useCallback(async () => {
     setLoading(true);
@@ -39,10 +38,6 @@ export function PayWithCoins() {
 
     setLoading(false);
   }, [execute]);
-
-  useEffect(() => {
-    sign(PaymentTypes.CRYPTO);
-  }, [sign]);
 
   return (
     <SimpleLayout

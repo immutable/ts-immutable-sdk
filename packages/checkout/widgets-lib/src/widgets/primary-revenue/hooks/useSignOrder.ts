@@ -19,8 +19,31 @@ const PRIMARY_SALES_API_BASE_URL = {
     'https://api.immutable.com/v1/primary-sales/:environmentId/order/sign',
 };
 
-// TODO: this should be removed after next version of the /sign/order API is released
-const X_IMMUTABLE_API_KEY = 'sk_imapik-Ekz6cLnnwREtqjGn$xo6_fb97b8';
+type SignApiTransaction = {
+  contract_address: string;
+  gas_estimate: number;
+  method_call: string;
+  params: {
+    amount?: number;
+    spender?: string;
+    data?: string[];
+    deadline?: number;
+    multicallSigner?: string;
+    reference?: string;
+    signature?: string;
+    targets?: string[];
+  };
+  raw_data: string;
+};
+
+type SignApiProduct = {
+  detail: {
+    amount: number;
+    collection_address: string;
+    token_id: string;
+  }[];
+  product_id: string;
+};
 
 type SignApiResponse = {
   order: {
@@ -30,32 +53,10 @@ type SignApiResponse = {
       erc20_address: string;
     };
     currency_symbol: string;
-    products: {
-      detail: {
-        amount: number;
-        collection_address: string;
-        token_id: string;
-      }[];
-      product_id: string;
-    }[];
+    products: SignApiProduct[];
     total_amount: string;
   };
-  transactions: {
-    contract_address: string;
-    gas_estimate: number;
-    method_call: string;
-    params: {
-      amount?: number;
-      spender?: string;
-      data?: string[];
-      deadline?: number;
-      multicallSigner?: string;
-      reference?: string;
-      signature?: string;
-      targets?: string[];
-    };
-    raw_data: string;
-  }[];
+  transactions: SignApiTransaction[];
 };
 
 enum SignCurrencyFilter {
@@ -75,13 +76,13 @@ type SignApiRequest = {
 };
 
 const toSignedProduct = (
-  product: SignApiResponse['order']['products'][0],
+  product: SignApiProduct,
   currency: string,
   item?: Item,
 ): SignedOrderProduct => ({
   productId: product.product_id,
   image: item?.image || '',
-  qty: `${item?.qty || 1}`,
+  qty: item?.qty || 1,
   name: `${item?.name || ''}${item?.qty ? ` x${item.qty}` : ''}`,
   description: item?.description || '',
   currency,
@@ -113,8 +114,9 @@ const toSignResponse = (
       gasEstimate: transaction.gas_estimate,
       methodCall: transaction.method_call,
       params: {
-        amount: transaction.params.amount as number,
-        spender: transaction.params.spender as string,
+        reference: transaction.params.reference || '',
+        amount: transaction.params.amount || 0,
+        spender: transaction.params.spender || '',
       },
       rawData: transaction.raw_data,
     })),
@@ -194,7 +196,6 @@ export const useSignOrder = (input: SignOrderInput) => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'x-immutable-api-key': X_IMMUTABLE_API_KEY,
           },
           body: JSON.stringify(data),
         });
