@@ -157,19 +157,11 @@ export const useTransakEvents = (props: UseTransakEventsProps) => {
     [ref],
   );
 
-  const subscribeEvents = useCallback(() => {
-    window.addEventListener('message', handleMessageEvent);
-
-    return () => {
-      window.removeEventListener('message', handleMessageEvent);
-    };
-  }, []);
-
   useEffect(() => {
-    const unsubscribeEvents = subscribeEvents();
+    window.addEventListener('message', handleMessageEvent);
     return () => {
       clearTimeout(timeout.current);
-      unsubscribeEvents();
+      window.removeEventListener('message', handleMessageEvent);
     };
   }, []);
 
