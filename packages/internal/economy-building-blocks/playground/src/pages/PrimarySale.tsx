@@ -100,7 +100,7 @@ const useItems = (contract_address: string, pointer = 1) => {
           return {
             productId: `P${id.toString().padStart(4, "0")}`,
             token_id: id,
-            name: json.name,
+            name: json.name.replace(/[^\x00-\xFF]/g, ""),
             image: json.image,
             contract_address,
             price: price,
