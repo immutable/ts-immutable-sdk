@@ -1,31 +1,24 @@
 import { Box } from '@biom3/react';
 
-import { useState, useEffect } from 'react';
 import { PaymentOption } from './PaymentOption';
 
-import { PrimaryRevenueWidgetViews } from '../../../context/view-context/PrimaryRevenueViewContextTypes';
+import { PaymentTypes } from '../types';
 
-const defaultPaymentOptions: PrimaryRevenueWidgetViews[] = [
-  PrimaryRevenueWidgetViews.PAY_WITH_CARD,
-  PrimaryRevenueWidgetViews.PAY_WITH_COINS,
+const defaultPaymentOptions: PaymentTypes[] = [
+  PaymentTypes.CRYPTO,
+  PaymentTypes.FIAT,
 ];
 
 export interface PaymentOptionsProps {
-  onClick: (type: PrimaryRevenueWidgetViews) => void;
-  disabledOptions?: PrimaryRevenueWidgetViews[];
+  onClick: (type: PaymentTypes) => void;
+  disabledOptions?: PaymentTypes[];
 }
 
 export function PaymentOptions(props: PaymentOptionsProps) {
   const { disabledOptions = [], onClick } = props;
-
-  const [options, setOptions] = useState<PrimaryRevenueWidgetViews[]>(
-    defaultPaymentOptions,
+  const options = defaultPaymentOptions.filter(
+    (option) => !disabledOptions?.includes(option),
   );
-
-  useEffect(() => {
-    if (disabledOptions.length === 0) return;
-    setOptions((prev) => prev.filter((option) => !disabledOptions?.includes(option)));
-  }, []);
 
   return (
     <Box
