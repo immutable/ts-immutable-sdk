@@ -1,4 +1,4 @@
-import { useCallback, useContext } from 'react';
+import { useCallback, useContext, useEffect } from 'react';
 import { Box, Heading } from '@biom3/react';
 
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -17,56 +17,61 @@ import { sendPrimaryRevenueWidgetCloseEvent } from '../PrimaryRevenueWidgetEvent
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { PaymentOptions } from '../components/PaymentOptions';
 
+import { useSharedContext } from '../context/SharedContextProvider';
+import { PaymentTypes } from '../types';
+
 export function PaymentMethods() {
   const text = {
     methods: textConfig.views[PrimaryRevenueWidgetViews.PAYMENT_METHODS],
-    coins: textConfig.views[PrimaryRevenueWidgetViews.PAY_WITH_COINS],
-    card: textConfig.views[PrimaryRevenueWidgetViews.PAY_WITH_CARD],
   };
-  const { viewDispatch, viewState } = useContext(ViewContext);
-  const { amount, fromContractAddress } = viewState.view.data || {};
+  const { viewDispatch } = useContext(ViewContext);
   const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
+  const {
+    paymentMethod, setPaymentMethod, sign, signResponse,
+  } = useSharedContext();
 
-  const handleOptionClick = useCallback(
-    async (type: PrimaryRevenueWidgetViews) => {
-      if (type === PrimaryRevenueWidgetViews.PAY_WITH_CARD) {
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: {
-              type: PrimaryRevenueWidgetViews.PAY_WITH_CARD,
-            },
-          },
-        });
-        return;
-      }
+  const handleOptionClick = (type: PaymentTypes) => setPaymentMethod(type);
 
-      if (type === PrimaryRevenueWidgetViews.PAY_WITH_COINS) {
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: {
-              type: PrimaryRevenueWidgetViews.PAY_WITH_COINS,
-            },
-          },
-        });
-        return;
-      }
-
+  const handleGoToPaymentView = useCallback((type: PaymentTypes) => {
+    if (type === PaymentTypes.CRYPTO) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
-            type: SharedViews.ERROR_VIEW,
-            error: Error('Invalid payment type'),
+            type: PrimaryRevenueWidgetViews.PAY_WITH_COINS,
           },
         },
       });
-    },
-    [viewDispatch, amount, fromContractAddress],
-  );
+    }
+
+    if (type === PaymentTypes.FIAT) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: PrimaryRevenueWidgetViews.PAY_WITH_CARD,
+          },
+        },
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (paymentMethod && !signResponse) {
+      sign(paymentMethod, () => handleGoToPaymentView(paymentMethod));
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SharedViews.LOADING_VIEW,
+            data: { loadingText: text.methods.loading },
+          },
+        },
+      });
+    }
+  }, [paymentMethod]);
 
   return (
     <SimpleLayout
