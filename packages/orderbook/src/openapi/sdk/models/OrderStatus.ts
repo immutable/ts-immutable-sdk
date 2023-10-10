@@ -2,14 +2,15 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { ActiveOrderStatus } from './ActiveOrderStatus';
+import type { CancelledOrderStatus } from './CancelledOrderStatus';
+import type { ExpiredOrderStatus } from './ExpiredOrderStatus';
+import type { FilledOrderStatus } from './FilledOrderStatus';
+import type { InactiveOrderStatus } from './InactiveOrderStatus';
+import type { PendingOrderStatus } from './PendingOrderStatus';
+
 /**
  * The Order status
  */
-export enum OrderStatus {
-  PENDING = 'PENDING',
-  ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE',
-  FILLED = 'FILLED',
-  CANCELLED = 'CANCELLED',
-  EXPIRED = 'EXPIRED',
-}
+export type OrderStatus = (CancelledOrderStatus | PendingOrderStatus | ActiveOrderStatus | InactiveOrderStatus | FilledOrderStatus | ExpiredOrderStatus);
+
