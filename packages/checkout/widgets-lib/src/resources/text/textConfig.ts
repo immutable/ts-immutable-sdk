@@ -7,7 +7,7 @@ import { WalletWidgetViews } from '../../context/view-context/WalletViewContextT
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
 import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextTypes';
 import { PrimaryRevenueWidgetViews } from '../../context/view-context/PrimaryRevenueViewContextTypes';
-import { MintErrorTypes } from '../../widgets/primary-revenue/types';
+import { MintErrorTypes, PaymentTypes } from '../../widgets/primary-revenue/types';
 
 export const text = {
   views: {
@@ -320,20 +320,22 @@ export const text = {
         heading: 'How would you like to pay?',
       },
       options: {
-        [PrimaryRevenueWidgetViews.PAY_WITH_COINS]: {
+        [PaymentTypes.CRYPTO]: {
           heading: 'Coins',
           caption: 'Using the coins balance in your wallet',
           disabledCaption: "We can't see enough coins in your balance",
         },
-        [PrimaryRevenueWidgetViews.PAY_WITH_CARD]: {
+        [PaymentTypes.FIAT]: {
           heading: 'Card',
           caption: 'GooglePay also available with Transak',
+          disabledCaption: undefined,
         },
       },
+      loading: 'Nice choice',
     },
     [PrimaryRevenueWidgetViews.PAY_WITH_COINS]: {
       header: {
-        heading: 'Pay with your coins',
+        heading: 'Pay with your',
         caption: 'Using the coins balance in your wallet',
       },
       button: {
@@ -341,10 +343,7 @@ export const text = {
       },
     },
     [PrimaryRevenueWidgetViews.PAY_WITH_CARD]: {
-      header: {
-        heading: 'Pay with card',
-        caption: 'Powered by Transak',
-      },
+      screenTitle: 'Pay with card',
     },
     [PrimaryRevenueWidgetViews.MINT_FAIL]: {
       errors: {
