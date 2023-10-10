@@ -93,12 +93,13 @@ describe('AuthManager', () => {
   });
 
   describe('constructor', () => {
-    it('should initialise AuthManager with a configuration containing audience params', () => {
+    it('should initialise AuthManager with a configuration containing audience params and queryMode', () => {
       const configWithAudience = new PassportConfiguration({
         baseConfig,
         logoutRedirectUri: 'https://test.com',
         clientId: '11111',
         redirectUri: 'https://test.com',
+        responseMode: 'fragment',
         scope: 'email profile',
         audience: 'audience',
       });
@@ -122,6 +123,7 @@ describe('AuthManager', () => {
             )}`
             + `&client_id=${configWithAudience.oidcConfiguration.clientId}`,
         },
+        response_mode: 'fragment',
         popup_redirect_uri: configWithAudience.oidcConfiguration.redirectUri,
         redirect_uri: configWithAudience.oidcConfiguration.redirectUri,
         scope: configWithAudience.oidcConfiguration.scope,
@@ -153,6 +155,7 @@ describe('AuthManager', () => {
           )}`
           + `&client_id=${config.oidcConfiguration.clientId}`,
       },
+      response_mode: 'query',
       popup_redirect_uri: config.oidcConfiguration.redirectUri,
       redirect_uri: config.oidcConfiguration.redirectUri,
       scope: config.oidcConfiguration.scope,

@@ -50,6 +50,7 @@ const getAuthConfiguration = ({
         + `?returnTo=${encodeURIComponent(oidcConfiguration.logoutRedirectUri)}`
         + `&client_id=${oidcConfiguration.clientId}`,
     },
+    response_mode: oidcConfiguration.responseMode || 'query',
     mergeClaims: true,
     loadUserInfo: true,
     scope: oidcConfiguration.scope,

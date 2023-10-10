@@ -52,6 +52,7 @@ export interface OidcConfiguration {
   redirectUri: string;
   scope?: string;
   audience?: string;
+  responseMode?: 'fragment' | 'query';
 }
 
 export interface PassportOverrides {
