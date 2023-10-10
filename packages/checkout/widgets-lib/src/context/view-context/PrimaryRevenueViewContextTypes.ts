@@ -5,8 +5,8 @@ export enum PrimaryRevenueWidgetViews {
   PAY_WITH_COINS = 'PAY_WITH_COINS',
   PAY_WITH_CARD = 'PAY_WITH_CARD',
   FUND_WITH_SMART_CHECKOUT = 'FUND_WITH_SMART_CHECKOUT',
-  SUCCESS = 'SUCCESS',
-  FAIL = 'FAIL',
+  MINT_SUCCESS = 'MINT_SUCCESS',
+  MINT_FAIL = 'MINT_FAIL',
 }
 
 export type PrimaryRevenueWidgetView =
@@ -31,10 +31,10 @@ interface PrimaryRevenueSmartCheckoutView extends ViewType {
   subView: FundWithSmartCheckoutSubViews;
 }
 interface PrimaryRevenueSuccessView extends ViewType {
-  type: PrimaryRevenueWidgetViews.SUCCESS;
+  type: PrimaryRevenueWidgetViews.MINT_SUCCESS;
 }
 interface PrimaryRevenueFailView extends ViewType {
-  type: PrimaryRevenueWidgetViews.FAIL;
+  type: PrimaryRevenueWidgetViews.MINT_FAIL;
   reason?: string;
 }
 

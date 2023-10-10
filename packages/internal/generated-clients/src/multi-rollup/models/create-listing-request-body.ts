@@ -58,7 +58,7 @@ export interface CreateListingRequestBody {
      * @type {string}
      * @memberof CreateListingRequestBody
      */
-    'end_time': string;
+    'end_at': string;
     /**
      * 
      * @type {ProtocolData}
@@ -88,6 +88,6 @@ export interface CreateListingRequestBody {
      * @type {string}
      * @memberof CreateListingRequestBody
      */
-    'start_time': string;
+    'start_at': string;
 }
 

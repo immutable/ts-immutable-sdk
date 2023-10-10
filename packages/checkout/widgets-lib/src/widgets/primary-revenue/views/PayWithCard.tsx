@@ -1,42 +1,54 @@
-/* eslint-disable no-console */
-import { BiomeCombinedProviders, Box } from '@biom3/react';
-import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
-import { WidgetTheme } from '../../../lib';
-import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
+import { useContext, useMemo } from 'react';
+import { Box } from '@biom3/react';
+
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
-import { useSharedContext } from '../context/SharedContextProvider';
-
-export interface PayWithCardProps {
-  config: StrongCheckoutWidgetsConfig;
-
-}
+import { WithCard } from '../components/WithCard';
+import { PrimaryRevenueWidgetViews } from '../../../context/view-context/PrimaryRevenueViewContextTypes';
+import {
+  ViewActions,
+  ViewContext,
+} from '../../../context/view-context/ViewContext';
 
 export function PayWithCard() {
-  const { config: { theme } } = useSharedContext();
+  const { viewDispatch } = useContext(ViewContext);
 
-  const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
-    ? onLightBase
-    : onDarkBase;
+  const handleGoBack = useMemo(() => () => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: PrimaryRevenueWidgetViews.PAYMENT_METHODS,
+        },
+      },
+    });
+  }, []);
 
   return (
-    <BiomeCombinedProviders theme={{ base: biomeTheme }}>
-      <Box>
-        <SimpleLayout
-          header={(
-            <HeaderNavigation
-              showBack
-              title="Pay with Card"
-              onCloseButtonClick={() => {}}
-            />
-          )}
-          footerBackgroundColor="base.color.translucent.emphasis.200"
-        >
-          <Box>
-            Transak Iframe
-          </Box>
-        </SimpleLayout>
+    <SimpleLayout
+      header={(
+        <HeaderNavigation
+          showBack
+          onBackButtonClick={() => handleGoBack()}
+        />
+        )}
+      footerBackgroundColor="base.color.translucent.emphasis.200"
+    >
+      <Box
+        style={{
+          display: 'block',
+          position: 'relative',
+          maxWidth: '420px',
+          height: '565px',
+          backgroundColor: 'white',
+          borderRadius: '1%',
+          overflow: 'hidden',
+          margin: '0 auto',
+          width: '100%',
+        }}
+      >
+        <WithCard />
       </Box>
-    </BiomeCombinedProviders>
+    </SimpleLayout>
   );
 }
