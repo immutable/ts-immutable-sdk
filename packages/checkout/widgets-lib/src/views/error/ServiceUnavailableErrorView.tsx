@@ -6,14 +6,14 @@ import { SharedViews } from '../../context/view-context/ViewContext';
 import { NoServiceHero } from '../../components/Hero/NoServiceHero';
 import { FooterLogo } from '../../components/Footer/FooterLogo';
 
-export interface ServiceUnavailableErrorViewProps {
+export interface SwapUnavailableErrorViewProps {
   onCloseClick: () => void;
 }
 
-export function ServiceUnavailableErrorView({
+export function SwapUnavailableErrorView({
   onCloseClick,
-}: ServiceUnavailableErrorViewProps) {
-  const errorText = text.views[SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW];
+}: SwapUnavailableErrorViewProps) {
+  const errorText = text.views[SharedViews.SWAP_UNAVAILABLE_ERROR_VIEW];
 
   return (
     <SimpleLayout
@@ -23,7 +23,7 @@ export function ServiceUnavailableErrorView({
       heroContent={<NoServiceHero />}
       floatHeader
       footer={<FooterLogo />}
-      testId="service-unavailable-error-view"
+      testId="swap-unavailable-error-view"
     >
       <SimpleTextBody heading={errorText.heading}>
         {errorText.body}
