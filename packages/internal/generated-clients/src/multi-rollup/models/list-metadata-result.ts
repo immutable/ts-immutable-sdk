@@ -15,19 +15,28 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { FulfillmentData200ResponseResult } from './fulfillment-data200-response-result';
+import { Metadata } from './metadata';
+// May contain unused imports in some cases
+// @ts-ignore
+import { Page } from './page';
 
 /**
  * 
  * @export
- * @interface FulfillmentData200Response
+ * @interface ListMetadataResult
  */
-export interface FulfillmentData200Response {
+export interface ListMetadataResult {
+    /**
+     * List of metadata
+     * @type {Array<Metadata>}
+     * @memberof ListMetadataResult
+     */
+    'result': Array<Metadata>;
     /**
      * 
-     * @type {FulfillmentData200ResponseResult}
-     * @memberof FulfillmentData200Response
+     * @type {Page}
+     * @memberof ListMetadataResult
      */
-    'result': FulfillmentData200ResponseResult;
+    'page': Page;
 }
 
