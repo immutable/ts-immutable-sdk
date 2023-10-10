@@ -1,6 +1,6 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
-import { OrderStatus } from '@imtbl/orderbook';
+import { OrderStatusName } from '@imtbl/orderbook';
 import { PopulatedTransaction } from 'ethers';
 import { CheckoutConfiguration } from '../../config';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
@@ -36,7 +36,7 @@ describe('cancel', () => {
         getListing: jest.fn().mockResolvedValue({
           result: {
             accountAddress: '0x123',
-            status: OrderStatus.ACTIVE,
+            status: { name: OrderStatusName.ACTIVE },
           },
         }),
         cancelOrder: jest.fn().mockResolvedValue({
@@ -73,7 +73,7 @@ describe('cancel', () => {
         getListing: jest.fn().mockResolvedValue({
           result: {
             accountAddress: '0x123',
-            status: OrderStatus.ACTIVE,
+            status: { name: OrderStatusName.ACTIVE },
           },
         }),
         cancelOrder: jest.fn().mockResolvedValue({
@@ -114,7 +114,7 @@ describe('cancel', () => {
         getListing: jest.fn().mockResolvedValue({
           result: {
             accountAddress: '0x123',
-            status: OrderStatus.ACTIVE,
+            status: { name: OrderStatusName.ACTIVE },
           },
         }),
         cancelOrder: jest.fn().mockResolvedValue({

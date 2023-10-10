@@ -1,10 +1,10 @@
 import { Orderbook } from 'orderbook';
-import { Order, OrderStatus } from '../../types';
+import { Order, OrderStatusName } from '../../types';
 
 export async function waitForOrderToBeOfStatus(
   sdk: Orderbook,
   orderId: string,
-  status: OrderStatus,
+  status: OrderStatusName,
   attemps = 0,
 ): Promise<Order> {
   if (attemps > 50) {
@@ -12,7 +12,7 @@ export async function waitForOrderToBeOfStatus(
   }
 
   const { result: order } = await sdk.getListing(orderId);
-  if (order.status === status) {
+  if (order.status.name === status) {
     return order;
   }
 
