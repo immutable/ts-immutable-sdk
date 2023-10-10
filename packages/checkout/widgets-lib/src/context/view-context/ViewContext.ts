@@ -10,7 +10,7 @@ import { OnRampWidgetView } from './OnRampViewContextTypes';
 export enum SharedViews {
   LOADING_VIEW = 'LOADING_VIEW',
   ERROR_VIEW = 'ERROR_VIEW',
-  SWAP_UNAVAILABLE_ERROR_VIEW = 'SWAP_UNAVAILABLE_ERROR_VIEW',
+  SERVICE_UNAVAILABLE_ERROR_VIEW = 'SERVICE_UNAVAILABLE_ERROR_VIEW',
   TOP_UP_VIEW = 'TOP_UP_VIEW',
 }
 
@@ -31,7 +31,7 @@ export interface ErrorView extends ViewType {
 }
 
 export interface ServiceUnavailableErrorView extends ViewType {
-  type: SharedViews.SWAP_UNAVAILABLE_ERROR_VIEW;
+  type: SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW;
   error: Error;
 }
 
