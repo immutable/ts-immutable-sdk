@@ -215,7 +215,7 @@ export const buy = async (
         status: CheckoutStatus.FAILED,
         transactionHash: approvalResult.transactionHash,
         reason: approvalResult.reason,
-        smartCheckoutResult: [smartCheckoutResult],
+        smartCheckoutResult,
       };
     }
 
@@ -239,18 +239,18 @@ export const buy = async (
         status: CheckoutStatus.FAILED,
         transactionHash: fulfillmentResult.transactionHash,
         reason: fulfillmentResult.reason,
-        smartCheckoutResult: [smartCheckoutResult],
+        smartCheckoutResult,
       };
     }
 
     return {
       status: CheckoutStatus.SUCCESS,
-      smartCheckoutResult: [smartCheckoutResult],
+      smartCheckoutResult,
     };
   }
 
   return {
     status: CheckoutStatus.INSUFFICIENT_FUNDS,
-    smartCheckoutResult: [smartCheckoutResult],
+    smartCheckoutResult,
   };
 };

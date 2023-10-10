@@ -146,7 +146,7 @@ export const sell = async (
         status: CheckoutStatus.FAILED,
         transactionHash: approvalResult.transactionHash,
         reason: approvalResult.reason,
-        smartCheckoutResult: [smartCheckoutResult],
+        smartCheckoutResult,
       };
     }
 
@@ -210,12 +210,12 @@ export const sell = async (
     return {
       status: CheckoutStatus.SUCCESS,
       orderIds: [orderId],
-      smartCheckoutResult: [smartCheckoutResult],
+      smartCheckoutResult,
     };
   }
 
   return {
     status: CheckoutStatus.INSUFFICIENT_FUNDS,
-    smartCheckoutResult: [smartCheckoutResult],
+    smartCheckoutResult,
   };
 };
