@@ -1,38 +1,26 @@
-import { useContext, useMemo } from 'react';
+import { useState } from 'react';
 import { Box } from '@biom3/react';
 
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { WithCard } from '../components/WithCard';
-import { PrimaryRevenueWidgetViews } from '../../../context/view-context/PrimaryRevenueViewContextTypes';
-import {
-  ViewActions,
-  ViewContext,
-} from '../../../context/view-context/ViewContext';
+import { useSharedContext } from '../context/SharedContextProvider';
+import { FooterLogo } from '../../../components/Footer/FooterLogo';
 
 export function PayWithCard() {
-  const { viewDispatch } = useContext(ViewContext);
-
-  const handleGoBack = useMemo(() => () => {
-    viewDispatch({
-      payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: {
-          type: PrimaryRevenueWidgetViews.PAYMENT_METHODS,
-        },
-      },
-    });
-  }, []);
+  const [initialised, setInitialised] = useState(false);
+  const { goBackToPaymentMethods } = useSharedContext();
 
   return (
     <SimpleLayout
-      header={(
+      header={initialised && (
         <HeaderNavigation
-          showBack
-          onBackButtonClick={() => handleGoBack()}
+          onCloseButtonClick={() => goBackToPaymentMethods()}
         />
-        )}
-      footerBackgroundColor="base.color.translucent.emphasis.200"
+      )}
+      footer={(
+        <FooterLogo hideLogo={initialised} />
+      )}
     >
       <Box
         style={{
@@ -40,14 +28,13 @@ export function PayWithCard() {
           position: 'relative',
           maxWidth: '420px',
           height: '565px',
-          backgroundColor: 'white',
           borderRadius: '1%',
           overflow: 'hidden',
           margin: '0 auto',
           width: '100%',
         }}
       >
-        <WithCard />
+        <WithCard onInit={() => setInitialised(true)} />
       </Box>
     </SimpleLayout>
   );

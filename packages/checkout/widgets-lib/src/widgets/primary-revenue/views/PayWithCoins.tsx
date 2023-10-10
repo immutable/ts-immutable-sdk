@@ -20,13 +20,10 @@ export function PayWithCoins() {
   const text = textConfig.views[PrimaryRevenueWidgetViews.PAY_WITH_COINS];
   const [loading, setLoading] = useState(false);
   const { viewState } = useContext(ViewContext);
-  const { execute, signResponse } = useSharedContext();
+  const { execute, signResponse, goBackToPaymentMethods } = useSharedContext();
   const currency = signResponse?.order.currency || '';
 
-  const {
-    eventTargetState: { eventTarget },
-  } = useContext(EventTargetContext);
-
+  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
   const handlePayment = useCallback(async () => {
     setLoading(true);
     try {
@@ -45,6 +42,8 @@ export function PayWithCoins() {
       header={(
         <HeaderNavigation
           title={text.header.heading}
+          showBack
+          onBackButtonClick={() => goBackToPaymentMethods()}
           onCloseButtonClick={() => sendPrimaryRevenueWidgetCloseEvent(eventTarget)}
         />
       )}

@@ -1,22 +1,25 @@
-/* eslint-disable no-console */
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 
 import { useSharedContext } from '../context/SharedContextProvider';
 import { TransakIframe } from '../../../components/Transak/TransakIframe';
 import { TransakNFTData } from '../../../components/Transak/TransakTypes';
 import { text as textConfig } from '../../../resources/text/textConfig';
 import { PrimaryRevenueWidgetViews } from '../../../context/view-context/PrimaryRevenueViewContextTypes';
+import { MintErrorTypes } from '../types';
 
-export function WithCard() {
-  const { screenTitle } = textConfig.views[PrimaryRevenueWidgetViews.PAY_WITH_CARD];
+export type WithCardProps = {
+  onInit: () => void;
+};
+
+export function WithCard({ onInit }: WithCardProps) {
+  const { screenTitle, loading } = textConfig.views[PrimaryRevenueWidgetViews.PAY_WITH_CARD];
 
   const {
-    recipientEmail, recipientAddress, isPassportWallet, signResponse,
+    recipientEmail, recipientAddress, isPassportWallet, signResponse, goToErrorView,
   } = useSharedContext();
   const executeTxn = signResponse?.transactions.find((txn) => txn.methodCall.startsWith('execute'));
 
   if (!signResponse || !executeTxn) {
-    // TODO: dispatch error
     return null;
   }
 
@@ -33,34 +36,14 @@ export function WithCard() {
     [signResponse],
   );
 
-  const onOpen = useCallback(() => {
-    console.log('onOpen');
-  }, []);
-
-  const onOrderCreated = useCallback(() => {
-    console.log('onOrderCreated');
-  }, []);
-
-  const onOrderProcessing = useCallback(() => {
-    console.log('onOrderProcessing');
-  }, []);
-
-  const onOrderCompleted = useCallback(() => {
-    console.log('onOrderCompleted');
-  }, []);
-
-  const onOrderFailed = useCallback(() => {
-    console.log('onOrderFailed');
-  }, []);
-
   return (
-
     <TransakIframe
       id="transak-iframe"
       type="nft-checkout"
       email={recipientEmail}
       walletAddress={recipientAddress}
       isPassportWallet={isPassportWallet}
+      loadingText={loading}
       exchangeScreenTitle={screenTitle}
       nftData={nftData}
       calldata={executeTxn.rawData}
@@ -68,11 +51,8 @@ export function WithCard() {
       estimatedGasLimit={executeTxn.gasEstimate}
       smartContractAddress={executeTxn.contractAddress}
       partnerOrderId={executeTxn.params.reference}
-      onOpen={onOpen}
-      onOrderCreated={onOrderCreated}
-      onOrderProcessing={onOrderProcessing}
-      onOrderCompleted={onOrderCompleted}
-      onOrderFailed={onOrderFailed}
+      onInit={onInit}
+      onFailedToLoad={() => goToErrorView(MintErrorTypes.TRANSAK_FAILED)}
     />
   );
 }

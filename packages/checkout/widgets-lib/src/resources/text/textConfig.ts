@@ -340,6 +340,7 @@ export const text = {
     },
     [PrimaryRevenueWidgetViews.PAY_WITH_CARD]: {
       screenTitle: 'Pay with card',
+      loading: 'Taking you to Transak',
     },
     [PrimaryRevenueWidgetViews.MINT_FAIL]: {
       errors: {

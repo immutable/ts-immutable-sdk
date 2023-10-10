@@ -1,3 +1,4 @@
+import { MintErrorTypes } from '../../widgets/primary-revenue/types';
 import { ViewType } from './ViewType';
 
 export enum PrimaryRevenueWidgetViews {
@@ -34,5 +35,8 @@ interface PrimaryRevenueSuccessView extends ViewType {
 }
 interface PrimaryRevenueFailView extends ViewType {
   type: PrimaryRevenueWidgetViews.MINT_FAIL;
-  reason?: string;
+  data?: {
+    errorType: MintErrorTypes;
+    [key: string]: unknown;
+  };
 }

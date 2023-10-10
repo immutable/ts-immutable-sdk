@@ -25,12 +25,8 @@ export function PaymentMethods() {
     methods: textConfig.views[PrimaryRevenueWidgetViews.PAYMENT_METHODS],
   };
   const { viewDispatch } = useContext(ViewContext);
-  const {
-    eventTargetState: { eventTarget },
-  } = useContext(EventTargetContext);
-  const {
-    paymentMethod, setPaymentMethod, sign, signResponse,
-  } = useSharedContext();
+  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+  const { paymentMethod, setPaymentMethod, sign } = useSharedContext();
 
   const handleOptionClick = (type: PaymentTypes) => setPaymentMethod(type);
 
@@ -59,7 +55,7 @@ export function PaymentMethods() {
   }, []);
 
   useEffect(() => {
-    if (paymentMethod && !signResponse) {
+    if (paymentMethod) {
       sign(paymentMethod, () => handleGoToPaymentView(paymentMethod));
       viewDispatch({
         payload: {

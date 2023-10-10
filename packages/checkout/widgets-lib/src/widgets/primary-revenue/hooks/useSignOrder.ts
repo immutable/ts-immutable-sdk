@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable no-console */
+
 import { useCallback, useState } from 'react';
 import { PrimaryRevenueSuccess } from '@imtbl/checkout-widgets';
 
@@ -10,6 +10,8 @@ import {
   PaymentTypes,
   Item,
   SignedOrderProduct,
+  MintErrorTypes,
+  SignOrderError,
 } from '../types';
 
 const PRIMARY_SALES_API_BASE_URL = {
@@ -65,14 +67,22 @@ enum SignCurrencyFilter {
 }
 
 type SignApiRequest = {
-  recipient_address: string
+  recipient_address: string;
   currency_filter: SignCurrencyFilter;
-  currency_value: string
-  payment_type: string
+  currency_value: string;
+  payment_type: string;
   products: {
     product_id: string;
-    quantity: number
-  }[]
+    quantity: number;
+  }[];
+};
+
+type SignApiError = {
+  code: string;
+  details: any;
+  link: string;
+  message: string;
+  trace_id: string;
 };
 
 const toSignedProduct = (
@@ -132,6 +142,7 @@ export const useSignOrder = (input: SignOrderInput) => {
     env,
     environmentId,
   } = input;
+  const [error, setError] = useState<SignOrderError | undefined>(undefined);
   const [signResponse, setSignResponse] = useState<SignResponse | undefined>(
     undefined,
   );
@@ -153,16 +164,18 @@ export const useSignOrder = (input: SignOrderInput) => {
           gasPrice,
           gasLimit,
         });
-        console.info('@@@ [PENDING] txn:', txnResponse?.hash);
 
         await txnResponse?.wait(1);
 
         transactionHash = txnResponse?.hash;
-      } catch (error) {
-        throw new Error('failed');
+      } catch (e) {
+        // TODO: check error type and sent MintErrorTypes.PASSPORT_FAILED
+        setError({
+          type: MintErrorTypes.PASSPORT_FAILED,
+          data: { error: e },
+        });
       }
 
-      console.info('@@@ [SUBMITTED] txn:', transactionHash);
       return transactionHash;
     },
     [provider],
@@ -170,9 +183,12 @@ export const useSignOrder = (input: SignOrderInput) => {
 
   const sign = useCallback(
     async (paymentType: PaymentTypes): Promise<SignResponse | undefined> => {
-      console.log('@@@ paymentType', paymentType);
-
-      if (!provider || !recipientAddress || !fromContractAddress || !items.length) {
+      if (
+        !provider
+        || !recipientAddress
+        || !fromContractAddress
+        || !items.length
+      ) {
         return undefined;
       }
 
@@ -201,15 +217,19 @@ export const useSignOrder = (input: SignOrderInput) => {
         });
 
         if (!response.ok) {
-          throw new Error(`HTTP Error: ${response.statusText}`);
+          const { code, message } = (await response.json()) as SignApiError;
+          throw new Error(code, { cause: message });
         }
 
         const responseData = toSignResponse(await response.json(), items);
         setSignResponse(responseData);
 
         return responseData;
-      } catch (error) {
-        console.error('Signing order failed:', error);
+      } catch (e) {
+        setError({
+          type: MintErrorTypes.DEFAULT,
+          data: { error: e },
+        });
       }
       return undefined;
     },
@@ -218,7 +238,11 @@ export const useSignOrder = (input: SignOrderInput) => {
 
   const execute = useCallback(async (): Promise<PrimaryRevenueSuccess> => {
     if (!signResponse) {
-      throw new Error('No sign data, retry /sign/order');
+      setError({
+        type: MintErrorTypes.DEFAULT,
+        data: { reason: 'No sign data, retry /sign/order' },
+      });
+      return {};
     }
 
     const transactionHashes = {};
@@ -233,7 +257,10 @@ export const useSignOrder = (input: SignOrderInput) => {
       const transactionHash = await sendTx(to, data, gasEstimate);
 
       if (!transactionHash) {
-        throw new Error('failed');
+        setError({
+          type: MintErrorTypes.PASSPORT_FAILED,
+          data: { transactionHash },
+        });
       }
 
       transactionHashes[method] = transactionHash;
@@ -246,5 +273,6 @@ export const useSignOrder = (input: SignOrderInput) => {
     sign,
     execute,
     signResponse,
+    error,
   };
 };

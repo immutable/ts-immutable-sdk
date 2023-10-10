@@ -1,7 +1,12 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+
 export enum TransakEvents {
   /**
-   * transak widget initialised and loaded
+   * transak widget initialised
+   */
+  TRANSAK_WIDGET_INITIALISED = 'TRANSAK_WIDGET_INITIALISED',
+  /**
+   * transak widget loaded
    */
   TRANSAK_WIDGET_OPEN = 'TRANSAK_WIDGET_OPEN',
   /**

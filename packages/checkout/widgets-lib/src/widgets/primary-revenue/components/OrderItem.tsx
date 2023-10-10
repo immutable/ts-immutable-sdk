@@ -15,7 +15,7 @@ export function OrderItem(props: OrderItemProps) {
   const currencyIcon = CURRENCY_IMAGE_URL[item.currency.toLowerCase()] || CURRENCY_IMAGE_URL.eth;
 
   return (
-    <MenuItem emphasized size="small">
+    <MenuItem emphasized size="small" sx={{ pointerEvents: 'none', userSelect: 'none' }}>
       <MenuItem.FramedImage imageUrl={item.image} />
       <MenuItem.Label>{item.name}</MenuItem.Label>
       <MenuItem.Caption>{item.description}</MenuItem.Caption>

@@ -2,7 +2,6 @@
 import {
   useCallback, useContext, useEffect, useMemo, useReducer,
 } from 'react';
-
 import { BiomeCombinedProviders } from '@biom3/react';
 
 import { LoadingView } from '../../views/loading/LoadingView';
@@ -17,7 +16,7 @@ import {
 } from '../../context/view-context/ViewContext';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 import { PrimaryRevenueWidgetViews } from '../../context/view-context/PrimaryRevenueViewContextTypes';
-import { Item, MintErrorTypes } from './types';
+import { Item, MintErrorTypes, PaymentTypes } from './types';
 import { widgetTheme } from '../../lib/theme';
 import { SharedContextProvider } from './context/SharedContextProvider';
 import { PaymentMethods } from './views/PaymentMethods';
@@ -65,16 +64,6 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
     connectLoaderParams,
   } = props;
 
-  console.log(
-    '@@@ PrimaryRevenueWidget',
-    config,
-    amount,
-    items,
-    fromContractAddress,
-    env,
-    environmentId,
-  );
-
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
 
@@ -82,18 +71,12 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
   const biomeTheme = useMemo(() => widgetTheme(theme), [theme]);
 
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
-  const viewReducerValues = useMemo(
-    () => ({ viewState, viewDispatch }),
-    [viewState, viewDispatch],
-  );
+  const viewReducerValues = useMemo(() => ({ viewState, viewDispatch }), [viewState, viewDispatch]);
 
   const loadingText = viewState.view.data?.loadingText
     || text.views[SharedViews.LOADING_VIEW].text;
 
-  const {
-    eventTargetState: { eventTarget },
-  } = useContext(EventTargetContext);
-
+  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
   const onMount = useCallback(() => {
     if (!checkout || !provider) return;
 
@@ -113,12 +96,13 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
     onMount();
   }, [checkout, provider]);
 
-  const updateToPaymentMethods = () => {
+  const goBackToPaymentMethods = (type?: PaymentTypes | undefined) => {
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
         view: {
           type: PrimaryRevenueWidgetViews.PAYMENT_METHODS,
+          data: { paymentMethod: type },
         },
       },
     });
@@ -130,9 +114,10 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
 
   const errorHandlersConfig: Record<MintErrorTypes, ErrorHandlerConfig> = {
     [MintErrorTypes.TRANSACTION_FAILED]: {
-      onActionClick: updateToPaymentMethods,
+      onActionClick: goBackToPaymentMethods,
       onSecondaryActionClick: () => {
         /* TODO: redirects to Immutascan to check the transaction */
+        console.log({ transactionHash: viewState.view?.data?.transactionHash });
       },
       statusType: StatusType.FAILURE,
       statusIconStyles: {
@@ -147,14 +132,12 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
       },
     },
     [MintErrorTypes.TRANSAK_FAILED]: {
-      onActionClick: () => {
-        /* TODO: start over the transak flow */
-      },
+      onActionClick: goBackToPaymentMethods,
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
     },
     [MintErrorTypes.PASSPORT_FAILED]: {
-      onActionClick: updateToPaymentMethods,
+      onActionClick: goBackToPaymentMethods,
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
       statusIconStyles: {
@@ -162,28 +145,30 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
       },
     },
     [MintErrorTypes.PASSPORT_REJECTED_NO_FUNDS]: {
-      onActionClick: updateToPaymentMethods,
+      onActionClick: goBackToPaymentMethods,
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
     },
     [MintErrorTypes.PASSPORT_REJECTED]: {
       onActionClick: () => {
+        goBackToPaymentMethods(PaymentTypes.CRYPTO);
         /* TODO: trigger the approve and execute flow pop up flow again */
       },
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
     },
     [MintErrorTypes.DEFAULT]: {
-      onActionClick: updateToPaymentMethods,
+      onActionClick: goBackToPaymentMethods,
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
     },
   };
 
-  const errorViewProps = useMemo<StatusViewProps>(() => {
+  const getErrorViewProps = (): StatusViewProps => {
     const errorTextConfig: AllErrorTextConfigs = text.views[PrimaryRevenueWidgetViews.MINT_FAIL].errors;
-    const errorType = viewState.view.data?.error || MintErrorTypes.DEFAULT;
+    const errorType = viewState.view.data.errorType || MintErrorTypes.DEFAULT;
     const handlers = errorHandlersConfig[errorType] || {};
+
     return {
       testId: 'fail-view',
       statusText: errorTextConfig[errorType].description,
@@ -199,7 +184,11 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
         ...handlers.statusIconStyles,
       },
     };
-  }, [viewState.view.data?.error]);
+  };
+
+  if (viewState.view.type === PrimaryRevenueWidgetViews.MINT_FAIL) {
+    console.log('viewState.view.data.errorType', viewState.view?.data?.errorType, getErrorViewProps());
+  }
 
   return (
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>
@@ -218,10 +207,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
           }}
         >
           {viewState.view.type === SharedViews.LOADING_VIEW && (
-            <LoadingView loadingText={loadingText} />
-          )}
-          {viewState.view.type === SharedViews.ERROR_VIEW && (
-            <div>{viewState.view.error.message}</div>
+            <LoadingView loadingText={loadingText} showFooterLogo />
           )}
           {viewState.view.type
             === PrimaryRevenueWidgetViews.PAYMENT_METHODS && <PaymentMethods />}
@@ -232,7 +218,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
             <PayWithCoins />
           )}
           {viewState.view.type === PrimaryRevenueWidgetViews.MINT_FAIL && (
-            <StatusView {...errorViewProps} />
+            <StatusView {...getErrorViewProps()} />
           )}
           {viewState.view.type === PrimaryRevenueWidgetViews.MINT_SUCCESS
             && provider && (
