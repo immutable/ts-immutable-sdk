@@ -140,7 +140,7 @@ export class PassportImxProviderFactory {
 
       // User metadata is updated asynchronously. Poll userinfo endpoint until it is updated.
       const updatedUser = await retryWithDelay<User | null>(async () => {
-        const user = await this.authManager.loginSilent();
+        const user = await this.authManager.loginSilent({ forceRefresh: true }); // force refresh to get updated user info
         const metadataExists = !!user?.imx;
         if (metadataExists) {
           return user;

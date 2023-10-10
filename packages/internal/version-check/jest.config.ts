@@ -12,6 +12,7 @@ const config: Config = {
   testEnvironmentOptions: {
     url: 'http://localhost',
   },
+  verbose: true,
 };
 
 export default config;

@@ -91,10 +91,11 @@ export default function Sell({ checkout, provider }: SellProps) {
         }]
       }]
 
-      await checkout.sell({
+      const result = await checkout.sell({
         provider,
         orders,
       });
+      console.log('Sell result', result);
       setLoading(false);
     } catch (err: any) {
       setError(err);

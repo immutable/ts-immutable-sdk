@@ -54,8 +54,8 @@ export function mapFromOpenApiOrder(order: OpenApiOrder): Order {
       type: fee.fee_type as unknown as FeeType,
     })),
     chain: order.chain,
-    createTime: order.create_time,
-    endTime: order.end_time,
+    createdAt: order.created_at,
+    endAt: order.end_at,
     protocolData: {
       counter: order.protocol_data.counter,
       orderType: order.protocol_data.order_type,
@@ -65,9 +65,9 @@ export function mapFromOpenApiOrder(order: OpenApiOrder): Order {
     },
     salt: order.salt,
     signature: order.signature,
-    startTime: order.start_time,
+    startAt: order.start_at,
     status: order.status,
-    updateTime: order.update_time,
+    updatedAt: order.updated_at,
   };
 }
 

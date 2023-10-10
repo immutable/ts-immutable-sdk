@@ -16,8 +16,8 @@ export type { ERC20Item } from './models/ERC20Item';
 export type { ERC721Item } from './models/ERC721Item';
 export type { Error } from './models/Error';
 export { Fee } from './models/Fee';
+export type { FulfillableOrder } from './models/FulfillableOrder';
 export type { FulfillmentDataRequest } from './models/FulfillmentDataRequest';
-export type { FulfillmentDataResult } from './models/FulfillmentDataResult';
 export type { Item } from './models/Item';
 export type { ListingResult } from './models/ListingResult';
 export type { ListListingsResult } from './models/ListListingsResult';
@@ -32,5 +32,6 @@ export { ProtocolData } from './models/ProtocolData';
 export type { Trade } from './models/Trade';
 export type { TradeBlockchainMetadata } from './models/TradeBlockchainMetadata';
 export type { TradeResult } from './models/TradeResult';
+export type { UnfulfillableOrder } from './models/UnfulfillableOrder';
 
 export { OrdersService } from './services/OrdersService';

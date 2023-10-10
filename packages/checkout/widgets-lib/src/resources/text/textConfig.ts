@@ -6,6 +6,8 @@ import { SharedViews } from '../../context/view-context/ViewContext';
 import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
 import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextTypes';
+import { PrimaryRevenueWidgetViews } from '../../context/view-context/PrimaryRevenueViewContextTypes';
+import { MintErrorTypes, PaymentTypes } from '../../widgets/primary-revenue/types';
 
 export const text = {
   views: {
@@ -52,8 +54,7 @@ export const text = {
         },
       },
       zkEVM: {
-        heading:
-          'You’ll be asked to switch to the Immutable zkEVM network',
+        heading: 'You’ll be asked to switch to the Immutable zkEVM network',
         body: "Check for the pop-up from MetaMask and 'Approve' to switch. If this is the first time, MetaMask will also ask you to add the network.",
         button: {
           text: 'Ready to Switch',
@@ -99,7 +100,8 @@ export const text = {
       },
       passport: {
         heading: 'Coins and collectibles are native to networks',
-        body1: 'This network is called Immutable zkEVM. If you have other coins in your Passport and can’t see them here, they might be on another network. ',
+        body1:
+          'This network is called Immutable zkEVM. If you have other coins in your Passport and can’t see them here, they might be on another network. ',
         body2: ' for more info.',
         linkText: 'Visit our FAQs',
       },
@@ -167,14 +169,16 @@ export const text = {
       approveSpending: {
         content: {
           metamask: {
-            heading: "You'll be asked to set a spending cap for this transaction",
+            heading:
+              "You'll be asked to set a spending cap for this transaction",
             body: [
               'Input at least',
               'for this transaction and future transactions, then follow the prompts.',
             ],
           },
           passport: {
-            heading: "You'll be asked to approve a spending cap for this transaction",
+            heading:
+              "You'll be asked to approve a spending cap for this transaction",
             body: 'Follow the prompts in your wallet to approve the spending cap.',
           },
         },
@@ -215,7 +219,8 @@ export const text = {
     [BridgeWidgetViews.IN_PROGRESS]: {
       heading: 'Move in progress',
       body1: (symbol: string) => `Less than 3 mins until your ${symbol} lands on zkEVM.`,
-      body2: 'You can close this window, the transaction will be reflected in your wallet once complete.',
+      body2:
+        'You can close this window, the transaction will be reflected in your wallet once complete.',
     },
     [BridgeWidgetViews.APPROVE_ERC20]: {
       approveBridge: {
@@ -306,13 +311,86 @@ export const text = {
         },
       },
     },
+    [PrimaryRevenueWidgetViews.PAYMENT_METHODS]: {
+      header: {
+        heading: 'How would you like to pay?',
+      },
+      options: {
+        [PaymentTypes.CRYPTO]: {
+          heading: 'Coins',
+          caption: 'Using the coins balance in your wallet',
+          disabledCaption: "We can't see enough coins in your balance",
+        },
+        [PaymentTypes.FIAT]: {
+          heading: 'Card',
+          caption: 'GooglePay also available with Transak',
+          disabledCaption: undefined,
+        },
+      },
+      loading: 'Nice choice',
+    },
+    [PrimaryRevenueWidgetViews.PAY_WITH_COINS]: {
+      header: {
+        heading: 'Pay with your',
+        caption: 'Using the coins balance in your wallet',
+      },
+      button: {
+        buyNow: 'Buy now',
+      },
+    },
+    [PrimaryRevenueWidgetViews.PAY_WITH_CARD]: {
+      screenTitle: 'Pay with card',
+    },
+    [PrimaryRevenueWidgetViews.MINT_FAIL]: {
+      errors: {
+        [MintErrorTypes.TRANSACTION_FAILED]: {
+          description: 'Transaction failed',
+          primaryAction: 'Try again',
+          secondaryAction: 'View details',
+        },
+        [MintErrorTypes.SERVICE_BREAKDOWN]: {
+          description:
+            "Sorry, we're unable to process your payment right now. Please try again in a few minutes.",
+          secondaryAction: 'Dismiss',
+        },
+        [MintErrorTypes.TRANSAK_FAILED]: {
+          description: 'Sorry, something went wrong. Please try again.',
+          primaryAction: 'Try again',
+          secondaryAction: 'Dismiss',
+        },
+        [MintErrorTypes.PASSPORT_FAILED]: {
+          description: "Sorry, we're unable to process this right now.",
+          primaryAction: 'Go back',
+          secondaryAction: 'Dismiss',
+        },
+        [MintErrorTypes.PASSPORT_REJECTED_NO_FUNDS]: {
+          description: 'Sorry, something went wrong. Plese try again.',
+          primaryAction: 'Go back',
+          secondaryAction: 'Dismiss',
+        },
+        [MintErrorTypes.PASSPORT_REJECTED]: {
+          description:
+            "You'll need to approve the transaction in Passport to proceed.",
+          primaryAction: 'Try again',
+          secondaryAction: 'Cancel',
+        },
+        [MintErrorTypes.DEFAULT]: {
+          description: 'Sorry, something went wrong. Please try again.',
+          primaryAction: 'Try again',
+          secondaryAction: 'Dismiss',
+        },
+      },
+    },
+    [PrimaryRevenueWidgetViews.MINT_SUCCESS]: {
+      text: 'Order completed',
+      actionText: 'Continue',
+    },
   },
   wallets: {
     [WalletProviderName.PASSPORT]: {
       heading: 'Immutable Passport',
       accentText: 'Recommended',
-      description:
-        'digital wallet and identity',
+      description: 'digital wallet and identity',
     },
     [WalletProviderName.METAMASK]: {
       heading: 'MetaMask',

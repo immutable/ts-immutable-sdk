@@ -42,8 +42,8 @@ export interface Fee {
 
 export const FeeFeeTypeEnum = {
     Royalty: 'ROYALTY',
-    MakerMarketplace: 'MAKER_MARKETPLACE',
-    TakerMarketplace: 'TAKER_MARKETPLACE',
+    MakerEcosystem: 'MAKER_ECOSYSTEM',
+    TakerEcosystem: 'TAKER_ECOSYSTEM',
     Protocol: 'PROTOCOL'
 } as const;
 

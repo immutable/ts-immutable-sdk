@@ -1,7 +1,7 @@
 import React from 'react';
 import { WalletProviderName } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
-import { BiomeCombinedProviders } from '@biom3/react';
+import { BiomeCombinedProviders, BiomePortalIdProvider } from '@biom3/react';
 import { onDarkBase } from '@biom3/design-tokens';
 import { BridgeWidget, BridgeWidgetParams } from './BridgeWidget';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
@@ -97,27 +97,29 @@ export class ImmutableBridge extends ImmutableWebComponent {
 
     this.reactRoot.render(
       <React.StrictMode>
-        <CustomAnalyticsProvider
-          widgetConfig={this.widgetConfig!}
-        >
-          {showBridgeComingSoonScreen && (
-          <BiomeCombinedProviders theme={{ base: onDarkBase }}>
-            <BridgeComingSoon onCloseEvent={() => sendBridgeWidgetCloseEvent(window)} />
-          </BiomeCombinedProviders>
-          )}
-          {!showBridgeComingSoonScreen && (
-          <ConnectLoader
-            params={connectLoaderParams}
-            closeEvent={() => sendBridgeWidgetCloseEvent(window)}
+        <BiomePortalIdProvider>
+          <CustomAnalyticsProvider
             widgetConfig={this.widgetConfig!}
           >
-            <BridgeWidget
-              params={params}
-              config={this.widgetConfig!}
-            />
-          </ConnectLoader>
-          )}
-        </CustomAnalyticsProvider>
+            {showBridgeComingSoonScreen && (
+            <BiomeCombinedProviders theme={{ base: onDarkBase }}>
+              <BridgeComingSoon onCloseEvent={() => sendBridgeWidgetCloseEvent(window)} />
+            </BiomeCombinedProviders>
+            )}
+            {!showBridgeComingSoonScreen && (
+            <ConnectLoader
+              params={connectLoaderParams}
+              closeEvent={() => sendBridgeWidgetCloseEvent(window)}
+              widgetConfig={this.widgetConfig!}
+            >
+              <BridgeWidget
+                params={params}
+                config={this.widgetConfig!}
+              />
+            </ConnectLoader>
+            )}
+          </CustomAnalyticsProvider>
+        </BiomePortalIdProvider>
       </React.StrictMode>,
     );
   }

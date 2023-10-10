@@ -7,6 +7,7 @@ export enum UserJourney {
   ON_RAMP = 'OnRamp',
   SWAP = 'Swap',
   BRIDGE = 'Bridge',
+  MINT = 'Mint',
 }
 
 export type AnalyticsControlTypes = StandardAnalyticsControlTypes
