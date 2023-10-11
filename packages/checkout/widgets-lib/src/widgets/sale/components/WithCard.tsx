@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { useCallback, useMemo } from 'react';
 
-import { useSharedContext } from '../context/SharedContextProvider';
+import { useSaleContext } from '../context/SaleContextProvider';
 import { TransakIframe } from '../../../components/Transak/TransakIframe';
 import { TransakNFTData } from '../../../components/Transak/TransakTypes';
 import { text as textConfig } from '../../../resources/text/textConfig';
@@ -12,7 +12,7 @@ export function WithCard() {
 
   const {
     recipientEmail, recipientAddress, isPassportWallet, signResponse,
-  } = useSharedContext();
+  } = useSaleContext();
   const executeTxn = signResponse?.transactions.find((txn) => txn.methodCall.startsWith('execute'));
 
   if (!signResponse || !executeTxn) {
