@@ -26,7 +26,7 @@ import {
   ListListingsResult,
   ListTradesParams,
   ListTradesResult,
-  OrderStatus,
+  OrderStatusName,
   PrepareListingParams,
   PrepareListingResponse,
   TradeResult,
@@ -225,7 +225,7 @@ export class Orderbook {
     const extraData = fulfillmentDataRes.result.fulfillable_orders[0].extra_data;
     const orderResult = fulfillmentDataRes.result.fulfillable_orders[0].order;
 
-    if (orderResult.status !== OrderStatus.ACTIVE) {
+    if (orderResult.status.name !== OrderStatusName.ACTIVE) {
       throw new Error(
         `Cannot fulfil order that is not active. Current status: ${orderResult.status}`,
       );
@@ -281,9 +281,9 @@ export class Orderbook {
     const orderResult = await this.apiClient.getListing(listingId);
 
     if (
-      orderResult.result.status !== OrderStatus.ACTIVE
-      && orderResult.result.status !== OrderStatus.INACTIVE
-      && orderResult.result.status !== OrderStatus.PENDING
+      orderResult.result.status.name !== OrderStatusName.ACTIVE
+      && orderResult.result.status.name !== OrderStatusName.INACTIVE
+      && orderResult.result.status.name !== OrderStatusName.PENDING
     ) {
       throw new Error(
         `Cannot cancel order with status ${orderResult.result.status}`,

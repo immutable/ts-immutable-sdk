@@ -1,7 +1,7 @@
 import { log } from 'console';
 import { Environment } from '@imtbl/config';
 import { Wallet } from 'ethers';
-import { OrderStatus } from '../openapi/sdk/index';
+import { OrderStatusName } from 'openapi/sdk';
 import { Orderbook } from '../orderbook';
 import {
   deployTestToken,
@@ -115,8 +115,8 @@ describe('', () => {
       }],
     });
 
-    await waitForOrderToBeOfStatus(sdk, orderId1, OrderStatus.ACTIVE);
-    await waitForOrderToBeOfStatus(sdk, orderId2, OrderStatus.ACTIVE);
+    await waitForOrderToBeOfStatus(sdk, orderId1, OrderStatusName.ACTIVE);
+    await waitForOrderToBeOfStatus(sdk, orderId2, OrderStatusName.ACTIVE);
     log(`Listings ${orderId1} and ${orderId2} is now ACTIVE, fulfilling order...`);
 
     const { actions, expiration, fulfillableOrders } = await sdk.fulfillBulkOrders(
@@ -147,8 +147,8 @@ describe('', () => {
       `Fulfilment transaction sent, waiting for listing ${orderId2} to become FILLED`,
     );
 
-    await waitForOrderToBeOfStatus(sdk, orderId1, OrderStatus.FILLED);
-    await waitForOrderToBeOfStatus(sdk, orderId2, OrderStatus.FILLED);
+    await waitForOrderToBeOfStatus(sdk, orderId1, OrderStatusName.FILLED);
+    await waitForOrderToBeOfStatus(sdk, orderId2, OrderStatusName.FILLED);
     log('Listings are now FILLED');
 
     log('Listing all orders for the NFT collection');

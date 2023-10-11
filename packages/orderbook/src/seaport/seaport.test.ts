@@ -19,7 +19,7 @@ import {
   TransactionPurpose,
 } from 'types';
 import { BigNumber, PopulatedTransaction, providers } from 'ethers';
-import { ProtocolData, Order, OrderStatus } from 'openapi/sdk';
+import { ProtocolData, Order, OrderStatusName } from 'openapi/sdk';
 import {
   EIP_712_ORDER_TYPE,
   ItemType,
@@ -411,7 +411,7 @@ describe('Seaport', () => {
           },
         ],
         signature: randomAddress(),
-        status: OrderStatus.ACTIVE,
+        status: { name: OrderStatusName.ACTIVE },
         start_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
