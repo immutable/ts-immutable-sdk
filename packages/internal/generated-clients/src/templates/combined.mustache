@@ -1,0 +1,8 @@
+/* tslint:disable */
+/* eslint-disable */
+{{>licenseInfo}}
+
+{{#withSeparateModelsAndApi}}
+{{#apiInfo}}{{#apis}}{{#operations}}export * from '../{{tsApiPackage}}/{{classFilename}}-types';
+{{/operations}}{{/apis}}{{/apiInfo}}
+{{/withSeparateModelsAndApi}}
