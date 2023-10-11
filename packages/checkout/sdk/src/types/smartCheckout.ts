@@ -23,7 +23,7 @@ export type BuyResultSuccess = {
  * @property {CheckoutStatus.FAILED} status - The status to indicate failure
  * @property {string} transactionHash - The transaction hash of the failed transaction
  * @property {string} reason - The reason for the failure
- * @property {SmartCheckoutSufficient[]} smartCheckoutResult - The sufficient result of smart checkout
+ * @property {SmartCheckoutSufficient} smartCheckoutResult - The sufficient result of smart checkout
  */
 export type BuyResultFailed = {
   status: CheckoutStatus.FAILED,
