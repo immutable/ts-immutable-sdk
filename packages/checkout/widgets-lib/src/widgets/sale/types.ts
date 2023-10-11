@@ -59,6 +59,11 @@ export type SignOrderInput = {
   environmentId: string;
 };
 
+export type SignOrderError = {
+  type: MintErrorTypes;
+  data?: Record<string, unknown>;
+};
+
 export enum MintErrorTypes {
   TRANSACTION_FAILED = 'TRANSACTION_FAILED',
   SERVICE_BREAKDOWN = 'SERVICE_BREAK_DOWN',

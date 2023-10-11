@@ -378,7 +378,7 @@ export const text = {
         },
         [MintErrorTypes.PASSPORT_REJECTED]: {
           description:
-            "You'll need to approve the transaction in Passport to proceed.",
+            "You'll need to approve the transaction in your wallet to proceed.",
           primaryAction: 'Try again',
           secondaryAction: 'Cancel',
         },
