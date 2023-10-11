@@ -3,7 +3,7 @@ import { mount } from 'cypress/react18';
 import { cy, describe } from 'local-cypress';
 import { cySmartGet } from '../../../lib/testUtils';
 import { FundWithSmartCheckout } from './FundWithSmartCheckout';
-import { FundWithSmartCheckoutSubViews } from '../../../context/view-context/PrimaryRevenueViewContextTypes';
+import { FundWithSmartCheckoutSubViews } from '../../../context/view-context/SaleViewContextTypes';
 
 describe('FundWithSmartCheckout View', () => {
   beforeEach(() => {

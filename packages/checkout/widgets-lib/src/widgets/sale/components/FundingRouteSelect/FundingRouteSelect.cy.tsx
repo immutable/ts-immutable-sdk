@@ -95,7 +95,7 @@ describe('FundingRouteSelect View', () => {
     beforeEach(() => {
       mount(
         <BiomeCombinedProviders>
-          <FundingRouteSelect fundingRoutes={fundingRoutes} />
+          <FundingRouteSelect fundingRoutes={fundingRoutes} onFundingRouteSelected={() => {}} />
         </BiomeCombinedProviders>,
       );
     });
@@ -127,7 +127,7 @@ describe('FundingRouteSelect View', () => {
     beforeEach(() => {
       mount(
         <BiomeCombinedProviders>
-          <FundingRouteSelect fundingRoutes={fundingRoutes} />
+          <FundingRouteSelect fundingRoutes={fundingRoutes} onFundingRouteSelected={() => {}} />
         </BiomeCombinedProviders>,
       );
     });

@@ -3,23 +3,40 @@ import {
   Button, Heading,
 } from '@biom3/react';
 import { FundingRoute } from '@imtbl/checkout-sdk';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { FooterLogo } from '../../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../../components/SimpleLayout/SimpleLayout';
+import {
+  FundWithSmartCheckoutSubViews,
+  SaleWidgetViews,
+} from '../../../../context/view-context/SaleViewContextTypes';
+import { ViewActions, ViewContext } from '../../../../context/view-context/ViewContext';
 import { FundingRouteMenuItem } from '../FundingRouteMenuItem/FundingRouteMenuItem';
 import { FundingRouteDrawer } from '../FundingRouteSelectDrawer/FundingRouteDrawer';
 import { PurchaseMenuItem } from '../PurchaseMenuItem/PurchaseMenuItem';
 
 type FundingRouteSelectProps = {
   fundingRoutes: FundingRoute[];
+  onFundingRouteSelected: (fundingRoute: FundingRoute) => void;
 };
 
-export function FundingRouteSelect({ fundingRoutes }: FundingRouteSelectProps) {
+export function FundingRouteSelect({ fundingRoutes, onFundingRouteSelected }: FundingRouteSelectProps) {
   const [smartCheckoutDrawerVisible, setSmartCheckoutDrawerVisible] = useState(false);
   const [activeFundingRouteIndex, setActiveFundingRouteIndex] = useState(0);
+  const { viewDispatch } = useContext(ViewContext);
 
   const onClickContinue = () => {
+    onFundingRouteSelected(fundingRoutes[activeFundingRouteIndex]);
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: SaleWidgetViews.FUND_WITH_SMART_CHECKOUT,
+          subView: FundWithSmartCheckoutSubViews.FUNDING_ROUTE_EXECUTE,
+        },
+      },
+    });
   };
 
   const closeBottomSheet = (selectedFundingRouteIndex: number) => {
