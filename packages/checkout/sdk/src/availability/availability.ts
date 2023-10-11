@@ -29,10 +29,10 @@ export const availabilityService = (
       }
       throw new CheckoutError(
         `Error fetching from api: ${response.status} ${response.statusText}`,
-        CheckoutErrorType.SERVICE_UNAVAILABLE_ERROR,
+        CheckoutErrorType.API_ERROR,
       );
     } catch (error: any) {
-      throw new CheckoutError(`Error fetching from api: ${error.message}`, CheckoutErrorType.SERVICE_UNAVAILABLE_ERROR);
+      throw new CheckoutError(`Error fetching from api: ${error.message}`, CheckoutErrorType.API_ERROR);
     }
   };
 
