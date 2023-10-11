@@ -19,21 +19,24 @@ export const availabilityService = (
   };
 
   const checkDexAvailability = async (): Promise<boolean> => {
+    let response;
+
     try {
-      const response = await axios.post(`${postEndpoint()}/v1/availability/checkout/swap`);
-      if (response.status === 403) {
-        return false;
-      }
-      if (response.status === 204) {
-        return true;
-      }
-      throw new CheckoutError(
-        `Error fetching from api: ${response.status} ${response.statusText}`,
-        CheckoutErrorType.API_ERROR,
-      );
+      response = await axios.post(`${postEndpoint()}/v1/availability/checkout/swap`);
     } catch (error: any) {
       throw new CheckoutError(`Error fetching from api: ${error.message}`, CheckoutErrorType.API_ERROR);
     }
+
+    if (response.status === 403) {
+      return false;
+    }
+    if (response.status === 204) {
+      return true;
+    }
+    throw new CheckoutError(
+      `Error fetching from api: ${response.status} ${response.statusText}`,
+      CheckoutErrorType.API_ERROR,
+    );
   };
 
   return {
