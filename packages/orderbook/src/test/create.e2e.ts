@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
 import { Environment } from '@imtbl/config';
-import { OrderStatus } from 'openapi/sdk';
+import { OrderStatusName } from 'openapi/sdk';
 import { Orderbook } from 'orderbook';
 import { getLocalhostProvider } from './helpers/provider';
 import { getOffererWallet } from './helpers/signers';
@@ -52,6 +52,6 @@ describe('prepareListing and createOrder e2e', () => {
       makerFees: [],
     });
 
-    await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.ACTIVE);
+    await waitForOrderToBeOfStatus(sdk, orderId, OrderStatusName.ACTIVE);
   }, 30_000);
 });

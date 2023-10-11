@@ -28,7 +28,7 @@ FundingRouteDrawerProps) {
       headerBarTitle="Available balance"
     >
       <BottomSheet.Content>
-        {fundingRoutes.map((fundingRoute: any, i: number) => (
+        {fundingRoutes.map((fundingRoute: FundingRoute, i: number) => (
           <FundingRouteMenuItem
             onClick={() => onClickMenuItem(i)}
             fundingRoute={fundingRoute}

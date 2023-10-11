@@ -15,7 +15,7 @@ export enum PaymentTypes {
 
 export type SignedOrderProduct = {
   productId: string;
-  qty: string;
+  qty: number;
   image: string;
   name: string;
   description: string;
@@ -38,6 +38,7 @@ export type SignedTransaction = {
   gasEstimate: number;
   methodCall: string;
   params: {
+    reference: string;
     amount: number;
     spender: string;
   };
@@ -57,3 +58,13 @@ export type SignOrderInput = {
   env: string;
   environmentId: string;
 };
+
+export enum MintErrorTypes {
+  TRANSACTION_FAILED = 'TRANSACTION_FAILED',
+  SERVICE_BREAKDOWN = 'SERVICE_BREAK_DOWN',
+  TRANSAK_FAILED = 'TRANSAK_FAILED',
+  PASSPORT_FAILED = 'PASSPORT_FAILED',
+  PASSPORT_REJECTED_NO_FUNDS = 'PASSPORT_REJECTED_NO_FUNDS',
+  PASSPORT_REJECTED = 'PASSPORT_REJECTED',
+  DEFAULT = 'DEFAULT',
+}

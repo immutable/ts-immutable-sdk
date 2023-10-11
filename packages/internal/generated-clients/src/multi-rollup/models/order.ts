@@ -64,13 +64,13 @@ export interface Order {
      * @type {string}
      * @memberof Order
      */
-    'create_time': string;
+    'created_at': string;
     /**
      * Time after which the Order is considered expired
      * @type {string}
      * @memberof Order
      */
-    'end_time': string;
+    'end_at': string;
     /**
      * Global Order identifier
      * @type {string}
@@ -106,7 +106,7 @@ export interface Order {
      * @type {string}
      * @memberof Order
      */
-    'start_time': string;
+    'start_at': string;
     /**
      * 
      * @type {OrderStatus}
@@ -118,6 +118,6 @@ export interface Order {
      * @type {string}
      * @memberof Order
      */
-    'update_time': string;
+    'updated_at': string;
 }
 

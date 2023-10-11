@@ -35,7 +35,8 @@
     "lint:fix": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0 --fix",
     "run:demo": "jest --runInBand --testMatch \"**/?(*.)+(demo).[jt]s?(x)\"",
     "run:demo-expiry": "jest  --runInBand --testMatch \"**/(expiry.demo).[jt]s?(x)\"",
-    "run:demo-fulfil": "jest --runInBand --testMatch \"**/(fulfil.demo).[jt]s?(x)\"",
+    "run:demo-fulfill": "jest --runInBand --testMatch \"**/(fulfill.demo).[jt]s?(x)\"",
+    "run:demo-fulfill-bulk": "jest --runInBand --testMatch \"**/(fulfillBulk.demo).[jt]s?(x)\"",
     "test": "jest",
     "test:e2e": "jest --runInBand --testMatch \"**/?(*.)+(e2e).[jt]s?(x)\"",
     "typecheck": "tsc --noEmit --jsx preserve"

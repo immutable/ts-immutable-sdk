@@ -26,7 +26,7 @@ export function FundingRouteMenuItem({
         currencyImageUrl={ETH_TOKEN_IMAGE_URL}
       />
       <MenuItem.Label>
-        { fundingRoute.steps[0].fundingItem.token.symbol}
+        { fundingRoute.steps[0].fundingItem.token.symbol }
       </MenuItem.Label>
       <MenuItem.Caption>
         Fees - USD $0.10

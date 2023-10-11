@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { FulfillmentDataResult } from './fulfillment-data-result';
+import { FulfillmentData200ResponseResult } from './fulfillment-data200-response-result';
 
 /**
  * 
@@ -25,9 +25,9 @@ import { FulfillmentDataResult } from './fulfillment-data-result';
 export interface FulfillmentData200Response {
     /**
      * 
-     * @type {Array<FulfillmentDataResult>}
+     * @type {FulfillmentData200ResponseResult}
      * @memberof FulfillmentData200Response
      */
-    'result': Array<FulfillmentDataResult>;
+    'result': FulfillmentData200ResponseResult;
 }
 

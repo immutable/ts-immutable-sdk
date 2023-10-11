@@ -1,4 +1,4 @@
-import { Box, Button } from '@biom3/react';
+import { Button, Box } from '@biom3/react';
 import { FundingStep } from '@imtbl/checkout-sdk';
 
 import { FundingRouteExecuteSwap } from './FundingRouteExecuteSwap';
@@ -8,6 +8,7 @@ type FundingRouteExecuteProps = {
   fundingRouteStep: FundingStep;
   onFundingRouteExecuted: () => void;
 };
+
 export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }: FundingRouteExecuteProps) {
   return (
     <Box testId="funding-route-execute">

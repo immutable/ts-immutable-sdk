@@ -65,5 +65,11 @@ export interface Token {
      * @memberof Token
      */
     'name': string | null;
+    /**
+     * When the collection was last updated
+     * @type {string}
+     * @memberof Token
+     */
+    'updated_at': string;
 }
 

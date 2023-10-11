@@ -43,10 +43,8 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
+            subView: FundWithSmartCheckoutSubViews.DONE,
             type: PrimaryRevenueWidgetViews.FUND_WITH_SMART_CHECKOUT,
-            data: {
-              subView: FundWithSmartCheckoutSubViews.DONE,
-            },
           },
         },
       });

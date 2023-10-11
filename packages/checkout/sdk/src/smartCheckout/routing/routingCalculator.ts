@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import {
   BalanceCheckResult,
@@ -326,21 +325,6 @@ export const routingCalculator = async (
     response.fundingRoutes.push({
       priority,
       steps: [bridgeFundingStep],
-      // WT-1734 - Add fees
-      totalFees: {
-        gas: {
-          amount: BigNumber.from(0),
-          formattedAmount: '0',
-        },
-        other: {
-          amount: BigNumber.from(0),
-          formattedAmount: '0',
-        },
-        total: {
-          amount: BigNumber.from(0),
-          formattedAmount: '0',
-        },
-      },
     });
   }
 
@@ -350,21 +334,6 @@ export const routingCalculator = async (
       response.fundingRoutes.push({
         priority,
         steps: [swapFundingStep],
-        // WT-1734 - Add fees
-        totalFees: {
-          gas: {
-            amount: BigNumber.from(0),
-            formattedAmount: '0',
-          },
-          other: {
-            amount: BigNumber.from(0),
-            formattedAmount: '0',
-          },
-          total: {
-            amount: BigNumber.from(0),
-            formattedAmount: '0',
-          },
-        },
       });
     });
   }
@@ -385,21 +354,6 @@ export const routingCalculator = async (
       response.fundingRoutes.push({
         priority,
         steps: [bridgeStep, swapStep],
-        // WT-1734 - Add fees
-        totalFees: {
-          gas: {
-            amount: BigNumber.from(0),
-            formattedAmount: '0',
-          },
-          other: {
-            amount: BigNumber.from(0),
-            formattedAmount: '0',
-          },
-          total: {
-            amount: BigNumber.from(0),
-            formattedAmount: '0',
-          },
-        },
       });
     });
   }
