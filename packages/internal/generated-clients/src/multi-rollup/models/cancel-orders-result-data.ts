@@ -15,31 +15,31 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { CancelOrdersResultResultFailedCancellationsInner } from './cancel-orders-result-result-failed-cancellations-inner';
+import { FailedOrderCancellation } from './failed-order-cancellation';
 
 /**
  * 
  * @export
- * @interface CancelOrdersResultResult
+ * @interface CancelOrdersResultData
  */
-export interface CancelOrdersResultResult {
+export interface CancelOrdersResultData {
     /**
      * Orders which were successfully cancelled
      * @type {Array<string>}
-     * @memberof CancelOrdersResultResult
+     * @memberof CancelOrdersResultData
      */
     'successful_cancellations': Array<string>;
     /**
      * Orders which are marked for cancellation but the cancellation cannot be guaranteed
      * @type {Array<string>}
-     * @memberof CancelOrdersResultResult
+     * @memberof CancelOrdersResultData
      */
     'pending_cancellations': Array<string>;
     /**
      * Orders which failed to be cancelled
-     * @type {Array<CancelOrdersResultResultFailedCancellationsInner>}
-     * @memberof CancelOrdersResultResult
+     * @type {Array<FailedOrderCancellation>}
+     * @memberof CancelOrdersResultData
      */
-    'failed_cancellations': Array<CancelOrdersResultResultFailedCancellationsInner>;
+    'failed_cancellations': Array<FailedOrderCancellation>;
 }
 
