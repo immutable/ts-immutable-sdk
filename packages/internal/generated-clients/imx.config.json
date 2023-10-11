@@ -5,7 +5,6 @@
   "withSeparateModelsAndApi": true,
   "modelPackage": "models",
   "apiPackage": "domain",
-  "useSingleRequestParameter": true
+  "useSingleRequestParameter": true,
+  "outputDir": "src/imx"
 }
-
-

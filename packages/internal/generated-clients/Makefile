@@ -29,7 +29,7 @@ generate-imx-api-client:
     -i ./app/src/imx-openapi.json \
     -g typescript-axios \
     -o /app/src/imx \
-    -c /app/generator.config.json
+    -c /app/imx.config.json
 
 .PHONY: generate-mr-api-client
 generate-mr-api-client:
@@ -39,4 +39,4 @@ generate-mr-api-client:
     -i ./app/src/mr-openapi.json \
     -g typescript-axios \
     -o /app/src/multi-rollup \
-    -c /app/generator.config.json
+    -c /app/mr.config.json
