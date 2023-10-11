@@ -1,6 +1,10 @@
-import { useCallback, useContext, useEffect } from 'react';
+/* eslint-disable no-console */
+import {
+  useCallback, useContext, useEffect, useState,
+} from 'react';
 import { Box, Heading } from '@biom3/react';
 
+import { RoutingOutcomeType } from '@imtbl/checkout-sdk';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
@@ -21,6 +25,8 @@ import { useSaleContext } from '../context/SaleContextProvider';
 import { PaymentTypes } from '../types';
 
 export function PaymentMethods() {
+  const [payWithCryptoEnabled, setPayWithCryptoEnabled] = useState(false);
+
   const text = {
     methods: textConfig.views[SaleWidgetViews.PAYMENT_METHODS],
   };
@@ -29,7 +35,7 @@ export function PaymentMethods() {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
   const {
-    paymentMethod, setPaymentMethod, sign, signResponse,
+    paymentMethod, setPaymentMethod, sign, signResponse, querySmartCheckout,
   } = useSaleContext();
 
   const handleOptionClick = (type: PaymentTypes) => setPaymentMethod(type);
@@ -57,6 +63,26 @@ export function PaymentMethods() {
       });
     }
   }, []);
+
+  useEffect(() => {
+    if (!querySmartCheckout) {
+      return;
+    }
+    const callQuerySmartCheckout = async () => {
+      const smartCheckoutResult = await querySmartCheckout();
+      console.log('@@@@@@@@ querySmartCheckout', smartCheckoutResult);
+      if (smartCheckoutResult?.sufficient) {
+        setPayWithCryptoEnabled(true);
+      } else if (smartCheckoutResult?.router.routingOutcome?.type === RoutingOutcomeType.ROUTES_FOUND) {
+        setPayWithCryptoEnabled(true);
+      } else {
+        setPayWithCryptoEnabled(false);
+      }
+    };
+
+    callQuerySmartCheckout()
+      .catch(console.error);
+  }, [querySmartCheckout]);
 
   useEffect(() => {
     if (paymentMethod && !signResponse) {
@@ -102,7 +128,10 @@ export function PaymentMethods() {
           {text.methods.header.heading}
         </Heading>
         <Box sx={{ paddingX: 'base.spacing.x2' }}>
-          <PaymentOptions onClick={handleOptionClick} />
+          <PaymentOptions
+            disabledOptions={payWithCryptoEnabled ? undefined : [PaymentTypes.CRYPTO]}
+            onClick={handleOptionClick}
+          />
         </Box>
       </Box>
     </SimpleLayout>
