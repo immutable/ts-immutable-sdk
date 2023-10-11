@@ -13,7 +13,7 @@ import { Passport } from '@imtbl/passport';
 import { SaleSuccess } from '@imtbl/checkout-widgets';
 
 import {
-  Item, PaymentTypes, SignResponse, MintErrorTypes,
+  Item, PaymentTypes, SignResponse, MintErrorTypes, SignOrderError,
 } from '../types';
 import { useSignOrder } from '../hooks/useSignOrder';
 import { ConnectLoaderState } from '../../../context/connect-loader-context/ConnectLoaderContext';
@@ -42,6 +42,7 @@ type SaleContextValues = SaleContextProps & {
   recipientAddress: string;
   recipientEmail: string;
   signResponse: SignResponse | undefined;
+  signError: SignOrderError | undefined;
   isPassportWallet: boolean;
   paymentMethod: PaymentTypes | undefined;
   setPaymentMethod: (paymentMethod: PaymentTypes) => void;
@@ -63,6 +64,7 @@ const SaleContext = createContext<SaleContextValues>({
   sign: () => Promise.resolve(undefined),
   execute: () => Promise.resolve({} as SaleSuccess),
   signResponse: undefined,
+  signError: undefined,
   passport: undefined,
   isPassportWallet: false,
   paymentMethod: undefined,
@@ -151,7 +153,9 @@ export function SaleContextProvider(props: {
     getUserInfo();
   }, [provider]);
 
-  const { sign: signOrder, execute, signResponse } = useSignOrder({
+  const {
+    sign: signOrder, execute, signResponse, signError,
+  } = useSignOrder({
     items,
     provider,
     fromContractAddress,
@@ -174,6 +178,11 @@ export function SaleContextProvider(props: {
     [signOrder],
   );
 
+  useEffect(() => {
+    if (!signError) return;
+    goToErrorView(signError.type, signError.data);
+  }, [signError]);
+
   const values = useMemo(
     () => ({
       config,
@@ -183,6 +192,7 @@ export function SaleContextProvider(props: {
       sign,
       execute,
       signResponse,
+      signError,
       environmentId,
       env,
       provider,
@@ -209,6 +219,7 @@ export function SaleContextProvider(props: {
       signResponse,
       paymentMethod,
       signResponse,
+      signError,
       goBackToPaymentMethods,
       goToErrorView,
     ],

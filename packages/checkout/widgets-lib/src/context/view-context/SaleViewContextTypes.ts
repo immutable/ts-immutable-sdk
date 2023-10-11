@@ -1,3 +1,4 @@
+import { MintErrorTypes } from '../../widgets/sale/types';
 import { ViewType } from './ViewType';
 
 export enum SaleWidgetViews {
@@ -35,7 +36,10 @@ interface SaleSuccessView extends ViewType {
 }
 interface SaleFailView extends ViewType {
   type: SaleWidgetViews.MINT_FAIL;
-  reason?: string;
+  data?: {
+    errorType: MintErrorTypes;
+    [key: string]: unknown;
+  };
 }
 
 export enum FundWithSmartCheckoutSubViews {
