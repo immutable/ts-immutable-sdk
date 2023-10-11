@@ -13,23 +13,30 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import { ActiveOrderStatus } from './active-order-status';
+// May contain unused imports in some cases
+// @ts-ignore
+import { CancelledOrderStatus } from './cancelled-order-status';
+// May contain unused imports in some cases
+// @ts-ignore
+import { ExpiredOrderStatus } from './expired-order-status';
+// May contain unused imports in some cases
+// @ts-ignore
+import { FilledOrderStatus } from './filled-order-status';
+// May contain unused imports in some cases
+// @ts-ignore
+import { InactiveOrderStatus } from './inactive-order-status';
+// May contain unused imports in some cases
+// @ts-ignore
+import { PendingOrderStatus } from './pending-order-status';
 
 /**
+ * @type OrderStatus
  * The Order status
  * @export
- * @enum {string}
  */
-
-export const OrderStatus = {
-    Pending: 'PENDING',
-    Active: 'ACTIVE',
-    Inactive: 'INACTIVE',
-    Filled: 'FILLED',
-    Cancelled: 'CANCELLED',
-    Expired: 'EXPIRED'
-} as const;
-
-export type OrderStatus = typeof OrderStatus[keyof typeof OrderStatus];
-
+export type OrderStatus = { name: 'ACTIVE' } & ActiveOrderStatus | { name: 'CANCELLED' } & CancelledOrderStatus | { name: 'EXPIRED' } & ExpiredOrderStatus | { name: 'FILLED' } & FilledOrderStatus | { name: 'INACTIVE' } & InactiveOrderStatus | { name: 'PENDING' } & PendingOrderStatus;
 
 
