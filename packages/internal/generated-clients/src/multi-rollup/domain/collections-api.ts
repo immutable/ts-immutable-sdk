@@ -86,13 +86,14 @@ export const CollectionsApiAxiosParamCreator = function (configuration?: Configu
          * List all collections
          * @summary List all collections
          * @param {string} chainName The name of chain
+         * @param {Array<string>} [contractAddress] List of contract addresses to filter by
          * @param {string} [fromUpdatedAt] Datetime to use as the oldest updated timestamp
          * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {number} [pageSize] Maximum number of items to return
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listCollections: async (chainName: string, fromUpdatedAt?: string, pageCursor?: string, pageSize?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listCollections: async (chainName: string, contractAddress?: Array<string>, fromUpdatedAt?: string, pageCursor?: string, pageSize?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'chainName' is not null or undefined
             assertParamExists('listCollections', 'chainName', chainName)
             const localVarPath = `/v1/chains/{chain_name}/collections`
@@ -107,6 +108,10 @@ export const CollectionsApiAxiosParamCreator = function (configuration?: Configu
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            if (contractAddress) {
+                localVarQueryParameter['contract_address'] = contractAddress;
+            }
 
             if (fromUpdatedAt !== undefined) {
                 localVarQueryParameter['from_updated_at'] = (fromUpdatedAt as any instanceof Date) ?
@@ -254,14 +259,15 @@ export const CollectionsApiFp = function(configuration?: Configuration) {
          * List all collections
          * @summary List all collections
          * @param {string} chainName The name of chain
+         * @param {Array<string>} [contractAddress] List of contract addresses to filter by
          * @param {string} [fromUpdatedAt] Datetime to use as the oldest updated timestamp
          * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {number} [pageSize] Maximum number of items to return
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listCollections(chainName: string, fromUpdatedAt?: string, pageCursor?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListCollectionsResult>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listCollections(chainName, fromUpdatedAt, pageCursor, pageSize, options);
+        async listCollections(chainName: string, contractAddress?: Array<string>, fromUpdatedAt?: string, pageCursor?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListCollectionsResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listCollections(chainName, contractAddress, fromUpdatedAt, pageCursor, pageSize, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -316,14 +322,15 @@ export const CollectionsApiFactory = function (configuration?: Configuration, ba
          * List all collections
          * @summary List all collections
          * @param {string} chainName The name of chain
+         * @param {Array<string>} [contractAddress] List of contract addresses to filter by
          * @param {string} [fromUpdatedAt] Datetime to use as the oldest updated timestamp
          * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {number} [pageSize] Maximum number of items to return
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listCollections(chainName: string, fromUpdatedAt?: string, pageCursor?: string, pageSize?: number, options?: any): AxiosPromise<ListCollectionsResult> {
-            return localVarFp.listCollections(chainName, fromUpdatedAt, pageCursor, pageSize, options).then((request) => request(axios, basePath));
+        listCollections(chainName: string, contractAddress?: Array<string>, fromUpdatedAt?: string, pageCursor?: string, pageSize?: number, options?: any): AxiosPromise<ListCollectionsResult> {
+            return localVarFp.listCollections(chainName, contractAddress, fromUpdatedAt, pageCursor, pageSize, options).then((request) => request(axios, basePath));
         },
         /**
          * List collections by NFT owner account address
@@ -386,6 +393,13 @@ export interface CollectionsApiListCollectionsRequest {
      * @memberof CollectionsApiListCollections
      */
     readonly chainName: string
+
+    /**
+     * List of contract addresses to filter by
+     * @type {Array<string>}
+     * @memberof CollectionsApiListCollections
+     */
+    readonly contractAddress?: Array<string>
 
     /**
      * Datetime to use as the oldest updated timestamp
@@ -500,7 +514,7 @@ export class CollectionsApi extends BaseAPI {
      * @memberof CollectionsApi
      */
     public listCollections(requestParameters: CollectionsApiListCollectionsRequest, options?: AxiosRequestConfig) {
-        return CollectionsApiFp(this.configuration).listCollections(requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
+        return CollectionsApiFp(this.configuration).listCollections(requestParameters.chainName, requestParameters.contractAddress, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
