@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable no-console */
 import { useCallback, useState } from 'react';
-import { PrimaryRevenueSuccess } from '@imtbl/checkout-widgets';
+import { SaleSuccess } from '@imtbl/checkout-widgets';
 
 import { Environment } from '@imtbl/config';
 import {
@@ -216,7 +216,7 @@ export const useSignOrder = (input: SignOrderInput) => {
     [items, fromContractAddress, recipientAddress, environmentId, env],
   );
 
-  const execute = useCallback(async (): Promise<PrimaryRevenueSuccess> => {
+  const execute = useCallback(async (): Promise<SaleSuccess> => {
     if (!signResponse) {
       throw new Error('No sign data, retry /sign/order');
     }

@@ -9,8 +9,8 @@ import { HeaderNavigation } from '../../../../components/Header/HeaderNavigation
 import { SimpleLayout } from '../../../../components/SimpleLayout/SimpleLayout';
 import {
   FundWithSmartCheckoutSubViews,
-  PrimaryRevenueWidgetViews,
-} from '../../../../context/view-context/PrimaryRevenueViewContextTypes';
+  SaleWidgetViews,
+} from '../../../../context/view-context/SaleViewContextTypes';
 import { ViewActions, ViewContext } from '../../../../context/view-context/ViewContext';
 import { FundingRouteMenuItem } from '../FundingRouteMenuItem/FundingRouteMenuItem';
 import { FundingRouteDrawer } from '../FundingRouteSelectDrawer/FundingRouteDrawer';
@@ -32,7 +32,7 @@ export function FundingRouteSelect({ fundingRoutes, onFundingRouteSelected }: Fu
       payload: {
         type: ViewActions.UPDATE_VIEW,
         view: {
-          type: PrimaryRevenueWidgetViews.FUND_WITH_SMART_CHECKOUT,
+          type: SaleWidgetViews.FUND_WITH_SMART_CHECKOUT,
           subView: FundWithSmartCheckoutSubViews.FUNDING_ROUTE_EXECUTE,
         },
       },

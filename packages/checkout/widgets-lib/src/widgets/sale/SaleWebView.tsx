@@ -4,7 +4,7 @@ import { config, passport } from '@imtbl/sdk';
 
 import {
   IMTBLWidgetEvents,
-  PrimaryRevenueEventType,
+  SaleEventType,
 } from '@imtbl/checkout-widgets';
 import { WidgetTheme } from '../../lib';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
@@ -13,8 +13,8 @@ import { Item } from './types';
 const defaultPassportConfig = {
   environment: 'sandbox',
   clientId: 'XuGsHvMqMJrb73diq1fCswWwn4AYhcM6',
-  redirectUri: 'http://localhost:3001/primary-revenue?login=true',
-  logoutRedirectUri: 'http://localhost:3001/primary-revenue?logout=true',
+  redirectUri: 'http://localhost:3001/sale?login=true',
+  logoutRedirectUri: 'http://localhost:3001/sale?logout=true',
   audience: 'platform_api',
   scope: 'openid offline_access email transact',
 };
@@ -89,7 +89,7 @@ const usePassportInstance = (passportConfig: any) => {
   return passportInstance;
 };
 
-function PrimaryRevenueWebView() {
+function SaleWebView() {
   const params = useParams();
   const {
     login, amount, env, environmentId, fromContractAddress,
@@ -142,7 +142,7 @@ function PrimaryRevenueWebView() {
     console.log('@@@@@ event', event.detail);
 
     switch (event.detail.type) {
-      case PrimaryRevenueEventType.CLOSE_WIDGET: {
+      case SaleEventType.CLOSE_WIDGET: {
         setShowWidget(false);
         break;
       }
@@ -202,7 +202,7 @@ function PrimaryRevenueWebView() {
   return (
     <>
       {showWidget ? (
-        <imtbl-primary-revenue
+        <imtbl-sale
           ref={ref}
           widgetConfig={JSON.stringify(widgetConfig)}
           amount={amount}
@@ -238,4 +238,4 @@ function PrimaryRevenueWebView() {
   );
 }
 
-export default PrimaryRevenueWebView;
+export default SaleWebView;
