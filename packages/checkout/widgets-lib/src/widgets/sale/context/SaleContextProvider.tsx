@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import {
   useContext,
   createContext,
@@ -11,10 +12,12 @@ import { Passport } from '@imtbl/passport';
 
 import { SaleSuccess } from '@imtbl/checkout-widgets';
 
+import { SmartCheckoutResult } from '@imtbl/checkout-sdk';
 import { Item, PaymentTypes, SignResponse } from '../types';
 import { useSignOrder } from '../hooks/useSignOrder';
 import { ConnectLoaderState } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
+import { useSmartCheckout } from '../hooks/useSmartCheckout';
 
 type SaleContextProps = {
   config: StrongCheckoutWidgetsConfig;
@@ -37,6 +40,9 @@ type SaleContextValues = SaleContextProps & {
   isPassportWallet: boolean;
   paymentMethod: PaymentTypes | undefined;
   setPaymentMethod: (paymentMethod: PaymentTypes) => void;
+  querySmartCheckout: undefined |
+  ((callback?: (r?: SmartCheckoutResult) => void) => Promise<SmartCheckoutResult | undefined>);
+  smartCheckoutResult: SmartCheckoutResult | undefined;
 };
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -58,6 +64,8 @@ const SaleContext = createContext<SaleContextValues>({
   paymentMethod: undefined,
   setPaymentMethod: () => {},
   config: {} as StrongCheckoutWidgetsConfig,
+  querySmartCheckout: undefined,
+  smartCheckoutResult: undefined,
 });
 
 SaleContext.displayName = 'SaleSaleContext';
@@ -96,13 +104,37 @@ export function SaleContextProvider(props: {
     const getUserInfo = async () => {
       const signer = provider?.getSigner();
       const address = await signer?.getAddress() || '';
-      const email = (await passport?.getUserInfo())?.email || '';
+      let email;
+      try {
+        email = (await passport?.getUserInfo())?.email || '';
+      } catch (err) {
+        console.error('@@@ passport.getUserInfo error', err);
+      }
+
+      console.log('@@@@@@@ useEffect getUserInfo', email, signer, address);
 
       setUserInfo({ recipientEmail: email, recipientAddress: address });
     };
 
     getUserInfo();
   }, [provider]);
+
+  // ! Smart Checkout ----------------------------
+  const { smartCheckout, smartCheckoutResult } = useSmartCheckout({
+    provider,
+    checkout,
+    items,
+    amount,
+    contractAddress: fromContractAddress,
+    spenderAddress: recipientAddress,
+  });
+
+  const querySmartCheckout = useCallback(async (callback?: (r?: SmartCheckoutResult) => void) => {
+    const result = await smartCheckout();
+    callback?.(result);
+    return result;
+  }, [smartCheckout, recipientAddress]);
+  // ! Smart Checkout ----------------------------/
 
   const { sign: signOrder, execute, signResponse } = useSignOrder({
     items,
@@ -137,6 +169,8 @@ export function SaleContextProvider(props: {
       paymentMethod,
       setPaymentMethod,
       isPassportWallet: !!(provider?.provider as any)?.isPassport,
+      querySmartCheckout,
+      smartCheckoutResult,
     }),
     [
       config,
@@ -152,6 +186,8 @@ export function SaleContextProvider(props: {
       signResponse,
       paymentMethod,
       signResponse,
+      querySmartCheckout,
+      smartCheckoutResult,
     ],
   );
 
