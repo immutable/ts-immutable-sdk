@@ -8,11 +8,13 @@ function ItemCards({
   onClick,
   isSelected,
   onRefetch,
+  withQtySelector,
 }: {
   nfts: Array<NFT>;
-  onClick?: (nft: NFT) => void;
+  onClick?: (nft: NFT, quantity: number) => void;
   isSelected?: (nft: NFT) => boolean;
   onRefetch?: () => void;
+  withQtySelector?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -52,7 +54,13 @@ function ItemCards({
         {nfts &&
           nfts.map((nft, index) => (
             <Box sx={{ w: "100%", h: "100%" }}>
-              <ItemCard nft={nft} onClick={onClick} isSelected={isSelected} />
+              <ItemCard
+                nft={nft}
+                onClick={onClick}
+                isSelected={isSelected}
+                withQtySelector={withQtySelector}
+                key={index}
+              />
             </Box>
           ))}
         <span

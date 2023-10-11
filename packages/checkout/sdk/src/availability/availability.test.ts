@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { availabilityService } from './availability';
+import { CheckoutError, CheckoutErrorType } from '../errors';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -41,7 +42,12 @@ describe('availabilityService', () => {
 
       await expect(availabilityService(false, false).checkDexAvailability())
         .rejects
-        .toThrow('Error fetching from api: 500 error message');
+        .toThrow(
+          new CheckoutError(
+            'Error fetching from api: 500 error message',
+            CheckoutErrorType.API_ERROR,
+          ),
+        );
     });
 
     it('should throw error when error fetching availability', async () => {
@@ -51,7 +57,12 @@ describe('availabilityService', () => {
 
       await expect(availabilityService(false, false).checkDexAvailability())
         .rejects
-        .toThrow(new Error('Error fetching from api: error message'));
+        .toThrow(
+          new CheckoutError(
+            'Error fetching from api: error message',
+            CheckoutErrorType.API_ERROR,
+          ),
+        );
     });
   });
 });
