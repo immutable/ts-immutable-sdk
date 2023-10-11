@@ -1,6 +1,10 @@
-import { useCallback, useContext, useEffect } from 'react';
+/* eslint-disable no-console */
+import {
+  useCallback, useContext, useEffect, useState,
+} from 'react';
 import { Box, Heading } from '@biom3/react';
 
+import { RoutingOutcomeType } from '@imtbl/checkout-sdk';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
@@ -23,7 +27,10 @@ export function PaymentMethods() {
   const text = { methods: textConfig.views[SaleWidgetViews.PAYMENT_METHODS] };
   const { viewDispatch } = useContext(ViewContext);
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
-  const { paymentMethod, setPaymentMethod, sign } = useSaleContext();
+  const {
+    paymentMethod, setPaymentMethod, sign, querySmartCheckout,
+  } = useSaleContext();
+  const [payWithCryptoEnabled, setPayWithCryptoEnabled] = useState(false);
 
   const handleOptionClick = (type: PaymentTypes) => setPaymentMethod(type);
 
@@ -50,6 +57,26 @@ export function PaymentMethods() {
       });
     }
   }, []);
+
+  useEffect(() => {
+    if (!querySmartCheckout) {
+      return;
+    }
+    const callQuerySmartCheckout = async () => {
+      const smartCheckoutResult = await querySmartCheckout();
+      console.log('@@@@@@@@ querySmartCheckout', smartCheckoutResult);
+      if (smartCheckoutResult?.sufficient) {
+        setPayWithCryptoEnabled(true);
+      } else if (smartCheckoutResult?.router.routingOutcome?.type === RoutingOutcomeType.ROUTES_FOUND) {
+        setPayWithCryptoEnabled(true);
+      } else {
+        setPayWithCryptoEnabled(false);
+      }
+    };
+
+    callQuerySmartCheckout()
+      .catch(console.error);
+  }, [querySmartCheckout]);
 
   useEffect(() => {
     if (paymentMethod) {
@@ -87,7 +114,10 @@ export function PaymentMethods() {
           {text.methods.header.heading}
         </Heading>
         <Box sx={{ paddingX: 'base.spacing.x2' }}>
-          <PaymentOptions onClick={handleOptionClick} />
+          <PaymentOptions
+            disabledOptions={payWithCryptoEnabled ? undefined : [PaymentTypes.CRYPTO]}
+            onClick={handleOptionClick}
+          />
         </Box>
       </Box>
     </SimpleLayout>
