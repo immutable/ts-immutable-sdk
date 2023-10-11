@@ -9,14 +9,14 @@ import {
 } from 'react';
 import { Passport } from '@imtbl/passport';
 
-import { PrimaryRevenueSuccess } from '@imtbl/checkout-widgets';
+import { SaleSuccess } from '@imtbl/checkout-widgets';
 
 import { Item, PaymentTypes, SignResponse } from '../types';
 import { useSignOrder } from '../hooks/useSignOrder';
 import { ConnectLoaderState } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 
-type SharedContextProps = {
+type SaleContextProps = {
   config: StrongCheckoutWidgetsConfig;
   env: string;
   environmentId: string;
@@ -28,9 +28,9 @@ type SharedContextProps = {
   passport?: Passport;
 };
 
-type SharedContextValues = SharedContextProps & {
+type SaleContextValues = SaleContextProps & {
   sign: (paymentType: PaymentTypes, callback?: () => void) => Promise<SignResponse | undefined>;
-  execute: () => Promise<PrimaryRevenueSuccess>;
+  execute: () => Promise<SaleSuccess>;
   recipientAddress: string;
   recipientEmail: string;
   signResponse: SignResponse | undefined;
@@ -40,7 +40,7 @@ type SharedContextValues = SharedContextProps & {
 };
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-const SharedContext = createContext<SharedContextValues>({
+const SaleContext = createContext<SaleContextValues>({
   items: [],
   amount: '',
   fromContractAddress: '',
@@ -51,7 +51,7 @@ const SharedContext = createContext<SharedContextValues>({
   recipientAddress: '',
   recipientEmail: '',
   sign: () => Promise.resolve(undefined),
-  execute: () => Promise.resolve({} as PrimaryRevenueSuccess),
+  execute: () => Promise.resolve({} as SaleSuccess),
   signResponse: undefined,
   passport: undefined,
   isPassportWallet: false,
@@ -60,11 +60,11 @@ const SharedContext = createContext<SharedContextValues>({
   config: {} as StrongCheckoutWidgetsConfig,
 });
 
-SharedContext.displayName = 'PrimaryRevenueSharedContext';
+SaleContext.displayName = 'SaleSaleContext';
 
-export function SharedContextProvider(props: {
+export function SaleContextProvider(props: {
   children: ReactNode;
-  value: SharedContextProps;
+  value: SaleContextProps;
 }) {
   const {
     children,
@@ -156,10 +156,10 @@ export function SharedContextProvider(props: {
   );
 
   return (
-    <SharedContext.Provider value={values}>{children}</SharedContext.Provider>
+    <SaleContext.Provider value={values}>{children}</SaleContext.Provider>
   );
 }
 
-export function useSharedContext() {
-  return useContext(SharedContext);
+export function useSaleContext() {
+  return useContext(SaleContext);
 }

@@ -21,17 +21,15 @@ import { ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoade
 import { StatusType } from '../../components/Status/StatusType';
 import { StatusView, StatusViewProps } from '../../components/Status/StatusView';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
-import {
-  PrimaryRevenueWidgetViews,
-} from '../../context/view-context/PrimaryRevenueViewContextTypes';
-import { widgetTheme } from '../../lib/theme';
-import { sendPrimaryRevenueWidgetCloseEvent } from './PrimaryRevenueWidgetEvents';
-import { SharedContextProvider } from './context/SharedContextProvider';
+import { SaleWidgetViews } from '../../context/view-context/SaleViewContextTypes';
 import { Item, MintErrorTypes } from './types';
+import { widgetTheme } from '../../lib/theme';
+import { SaleContextProvider } from './context/SaleContextProvider';
 import { FundWithSmartCheckout } from './views/FundWithSmartCheckout';
 import { PayWithCard } from './views/PayWithCard';
 import { PayWithCoins } from './views/PayWithCoins';
 import { PaymentMethods } from './views/PaymentMethods';
+import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
 
 interface ErrorHandlerConfig {
   onActionClick?: () => void;
@@ -48,7 +46,7 @@ interface ErrorTextConfig {
 
 type AllErrorTextConfigs = Record<MintErrorTypes, ErrorTextConfig>;
 
-export interface PrimaryRevenueWidgetProps {
+export interface SaleWidgetProps {
   config: StrongCheckoutWidgetsConfig;
   amount: string;
   items: Item[];
@@ -58,7 +56,7 @@ export interface PrimaryRevenueWidgetProps {
   connectLoaderParams?: ConnectLoaderParams;
 }
 
-export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
+export function SaleWidget(props: SaleWidgetProps) {
   const {
     config,
     amount,
@@ -70,7 +68,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
   } = props;
 
   console.log(
-    '@@@ PrimaryRevenueWidget',
+    '@@@ SaleWidget',
     config,
     amount,
     items,
@@ -102,7 +100,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
       payload: {
         type: ViewActions.UPDATE_VIEW,
         view: {
-          type: PrimaryRevenueWidgetViews.PAYMENT_METHODS,
+          type: SaleWidgetViews.PAYMENT_METHODS,
         },
       },
     });
@@ -119,14 +117,14 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
       payload: {
         type: ViewActions.UPDATE_VIEW,
         view: {
-          type: PrimaryRevenueWidgetViews.PAYMENT_METHODS,
+          type: SaleWidgetViews.PAYMENT_METHODS,
         },
       },
     });
   };
 
   const closeWidget = () => {
-    sendPrimaryRevenueWidgetCloseEvent(eventTarget);
+    sendSaleWidgetCloseEvent(eventTarget);
   };
 
   const errorHandlersConfig: Record<MintErrorTypes, ErrorHandlerConfig> = {
@@ -182,7 +180,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
   };
 
   const errorViewProps = useMemo<StatusViewProps>(() => {
-    const errorTextConfig: AllErrorTextConfigs = text.views[PrimaryRevenueWidgetViews.MINT_FAIL].errors;
+    const errorTextConfig: AllErrorTextConfigs = text.views[SaleWidgetViews.MINT_FAIL].errors;
     const errorType = viewState.view.data?.error || MintErrorTypes.DEFAULT;
     const handlers = errorHandlersConfig[errorType] || {};
     return {
@@ -205,7 +203,7 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
   return (
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>
       <ViewContext.Provider value={viewReducerValues}>
-        <SharedContextProvider
+        <SaleContextProvider
           value={{
             config,
             items,
@@ -225,34 +223,34 @@ export function PrimaryRevenueWidget(props: PrimaryRevenueWidgetProps) {
             <div>{viewState.view.error.message}</div>
           )}
           {viewState.view.type
-            === PrimaryRevenueWidgetViews.PAYMENT_METHODS && <PaymentMethods />}
-          {viewState.view.type === PrimaryRevenueWidgetViews.PAY_WITH_CARD && (
+            === SaleWidgetViews.PAYMENT_METHODS && <PaymentMethods />}
+          {viewState.view.type === SaleWidgetViews.PAY_WITH_CARD && (
             <PayWithCard />
           )}
-          {viewState.view.type === PrimaryRevenueWidgetViews.PAY_WITH_COINS && (
+          {viewState.view.type === SaleWidgetViews.PAY_WITH_COINS && (
             <PayWithCoins />
           )}
-          {viewState.view.type === PrimaryRevenueWidgetViews.MINT_FAIL && (
+          {viewState.view.type === SaleWidgetViews.MINT_FAIL && (
             <StatusView {...errorViewProps} />
           )}
-          {viewState.view.type === PrimaryRevenueWidgetViews.MINT_SUCCESS
+          {viewState.view.type === SaleWidgetViews.MINT_SUCCESS
             && provider && (
               <StatusView
                 statusText={
-                  text.views[PrimaryRevenueWidgetViews.MINT_SUCCESS].text
+                  text.views[SaleWidgetViews.MINT_SUCCESS].text
                 }
                 actionText={
-                  text.views[PrimaryRevenueWidgetViews.MINT_SUCCESS].actionText
+                  text.views[SaleWidgetViews.MINT_SUCCESS].actionText
                 }
                 onActionClick={() => closeWidget()}
                 statusType={StatusType.SUCCESS}
                 testId="success-view"
               />
           )}
-          {viewState.view.type === PrimaryRevenueWidgetViews.FUND_WITH_SMART_CHECKOUT && (
+          {viewState.view.type === SaleWidgetViews.FUND_WITH_SMART_CHECKOUT && (
             <FundWithSmartCheckout subView={viewState.view.subView} />
           )}
-        </SharedContextProvider>
+        </SaleContextProvider>
       </ViewContext.Provider>
     </BiomeCombinedProviders>
   );

@@ -1,19 +1,19 @@
 import {
   WidgetEvent,
   IMTBLWidgetEvents,
-  PrimaryRevenueEventType,
-  PrimaryRevenueSuccess,
-  PrimaryRevenueFailed,
+  SaleEventType,
+  SaleSuccess,
+  SaleFailed,
 } from '@imtbl/checkout-widgets';
 
-export const sendPrimaryRevenueWidgetCloseEvent = (
+export const sendSaleWidgetCloseEvent = (
   eventTarget: Window | EventTarget,
 ) => {
   const event = new CustomEvent<WidgetEvent<any>>(
     IMTBLWidgetEvents.IMTBL_PRIMARY_REVENUE_WIDGET_EVENT,
     {
       detail: {
-        type: PrimaryRevenueEventType.CLOSE_WIDGET,
+        type: SaleEventType.CLOSE_WIDGET,
         data: {},
       },
     },
@@ -24,33 +24,33 @@ export const sendPrimaryRevenueWidgetCloseEvent = (
   if (eventTarget !== undefined) eventTarget.dispatchEvent(event);
 };
 
-export const sendPrimaryRevenueSuccessEvent = (
+export const sendSaleSuccessEvent = (
   eventTarget: Window | EventTarget,
   data: Record<string, string>,
 ) => {
-  const event = new CustomEvent<WidgetEvent<PrimaryRevenueSuccess>>(
+  const event = new CustomEvent<WidgetEvent<SaleSuccess>>(
     IMTBLWidgetEvents.IMTBL_PRIMARY_REVENUE_WIDGET_EVENT,
     {
       detail: {
-        type: PrimaryRevenueEventType.SUCCESS,
+        type: SaleEventType.SUCCESS,
         data,
       },
     },
   );
   // eslint-disable-next-line no-console
-  console.log('primary revenue success event:', event);
+  console.log('Sale success event:', event);
   if (eventTarget !== undefined) eventTarget.dispatchEvent(event);
 };
 
-export const sendPrimaryRevenueFailedEvent = (
+export const sendSaleFailedEvent = (
   eventTarget: Window | EventTarget,
   reason: string,
 ) => {
-  const event = new CustomEvent<WidgetEvent<PrimaryRevenueFailed>>(
+  const event = new CustomEvent<WidgetEvent<SaleFailed>>(
     IMTBLWidgetEvents.IMTBL_PRIMARY_REVENUE_WIDGET_EVENT,
     {
       detail: {
-        type: PrimaryRevenueEventType.FAILURE,
+        type: SaleEventType.FAILURE,
         data: {
           reason,
           timestamp: new Date().getTime(),
@@ -59,6 +59,6 @@ export const sendPrimaryRevenueFailedEvent = (
     },
   );
   // eslint-disable-next-line no-console
-  console.log('primary revenue failed event:', event);
+  console.log('Sale failed event:', event);
   if (eventTarget !== undefined) eventTarget.dispatchEvent(event);
 };

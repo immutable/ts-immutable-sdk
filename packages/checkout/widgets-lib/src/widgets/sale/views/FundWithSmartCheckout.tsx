@@ -5,14 +5,12 @@ import {
   useMemo, useState,
 } from 'react';
 import {
-  FundWithSmartCheckoutSubViews, PrimaryRevenueWidgetViews,
-} from '../../../context/view-context/PrimaryRevenueViewContextTypes';
+  FundWithSmartCheckoutSubViews, SaleWidgetViews,
+} from '../../../context/view-context/SaleViewContextTypes';
 import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { LoadingView } from '../../../views/loading/LoadingView';
-import {
-  FundingRouteExecute,
-} from '../components/FundingRouteExecute/FundingRouteExecute';
 import { FundingRouteSelect } from '../components/FundingRouteSelect/FundingRouteSelect';
+import { FundingRouteExecute } from '../components/FundingRouteExecute/FundingRouteExecute';
 
 type FundWithSmartCheckoutProps = {
   subView: FundWithSmartCheckoutSubViews;
@@ -44,7 +42,7 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
           type: ViewActions.UPDATE_VIEW,
           view: {
             subView: FundWithSmartCheckoutSubViews.DONE,
-            type: PrimaryRevenueWidgetViews.FUND_WITH_SMART_CHECKOUT,
+            type: SaleWidgetViews.FUND_WITH_SMART_CHECKOUT,
           },
         },
       });
