@@ -33,19 +33,12 @@ models/activity-nft.ts
 models/activity-token.ts
 models/activity-type.ts
 models/activity.ts
-models/apierror400-all-of.ts
 models/apierror400.ts
-models/apierror401-all-of.ts
 models/apierror401.ts
-models/apierror403-all-of.ts
 models/apierror403.ts
-models/apierror404-all-of.ts
 models/apierror404.ts
-models/apierror429-all-of.ts
 models/apierror429.ts
-models/apierror500-all-of.ts
 models/apierror500.ts
-models/apierror501-all-of.ts
 models/apierror501.ts
 models/basic-apierror.ts
 models/blockchain-metadata.ts
@@ -53,8 +46,11 @@ models/burn.ts
 models/cancel-orders-request-body.ts
 models/cancel-orders-result-data.ts
 models/cancel-orders-result.ts
+<<<<<<< HEAD
 models/cancelled-order-status.ts
 models/chain-with-details-all-of.ts
+=======
+>>>>>>> 5c52cefa (upgrade generator version)
 models/chain-with-details.ts
 models/chain.ts
 models/collection-contract-type.ts
@@ -116,10 +112,8 @@ models/protocol-data.ts
 models/refresh-collection-metadata-request.ts
 models/refresh-collection-metadata-result.ts
 models/refresh-metadata-by-id.ts
-models/refresh-metadata-by-idall-of.ts
 models/refresh-metadata-by-idrequest.ts
 models/refresh-metadata-by-token-id.ts
-models/refresh-metadata-by-token-idall-of.ts
 models/refresh-nftmetadata-by-token-idrequest.ts
 models/refreshable-nftattributes.ts
 models/sale-fee.ts

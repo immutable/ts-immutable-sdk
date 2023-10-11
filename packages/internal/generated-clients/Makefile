@@ -35,7 +35,7 @@ generate-imx-api-client:
 generate-mr-api-client:
 	rm -rf src/multi-rollup && \
     mkdir src/multi-rollup && \
-	docker run --rm -v $(shell pwd):/app openapitools/openapi-generator-cli:v6.2.1 generate \
+	docker run --rm -v $(shell pwd):/app openapitools/openapi-generator-cli:v7.0.1 generate \
     -i ./app/src/mr-openapi.json \
     -g typescript-axios \
     -o /app/src/multi-rollup \

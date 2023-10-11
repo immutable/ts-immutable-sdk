@@ -13,8 +13,9 @@
  */
 
 
-import globalAxios, { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
-import { Configuration } from '../configuration';
+import type { Configuration } from '../configuration';
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
@@ -316,52 +317,42 @@ export const MetadataApiFactory = function (configuration?: Configuration, baseP
         /**
          * Get metadata by ID
          * @summary Get metadata by ID
-         * @param {string} chainName The name of chain
-         * @param {string} contractAddress The address of metadata contract
-         * @param {string} metadataId The id of the metadata
+         * @param {MetadataApiGetMetadataRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getMetadata(chainName: string, contractAddress: string, metadataId: string, options?: any): AxiosPromise<GetMetadataResult> {
-            return localVarFp.getMetadata(chainName, contractAddress, metadataId, options).then((request) => request(axios, basePath));
+        getMetadata(requestParameters: MetadataApiGetMetadataRequest, options?: AxiosRequestConfig): AxiosPromise<GetMetadataResult> {
+            return localVarFp.getMetadata(requestParameters.chainName, requestParameters.contractAddress, requestParameters.metadataId, options).then((request) => request(axios, basePath));
         },
         /**
          * Get a list of metadata by from the a given contract
          * @summary Get a list of metadata by from the a given contract
-         * @param {string} chainName The name of chain
-         * @param {string} contractAddress The address of metadata contract
-         * @param {string} [fromUpdatedAt] Datetime to use as the oldest updated timestamp
-         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
-         * @param {number} [pageSize] Maximum number of items to return
+         * @param {MetadataApiListMetadataRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listMetadata(chainName: string, contractAddress: string, fromUpdatedAt?: string, pageCursor?: string, pageSize?: number, options?: any): AxiosPromise<ListMetadataResult> {
-            return localVarFp.listMetadata(chainName, contractAddress, fromUpdatedAt, pageCursor, pageSize, options).then((request) => request(axios, basePath));
+        listMetadata(requestParameters: MetadataApiListMetadataRequest, options?: AxiosRequestConfig): AxiosPromise<ListMetadataResult> {
+            return localVarFp.listMetadata(requestParameters.chainName, requestParameters.contractAddress, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
         },
         /**
          * Refresh stacked metadata
          * @summary Refresh stacked metadata
-         * @param {string} chainName The name of chain
-         * @param {string} contractAddress Contract address
-         * @param {RefreshMetadataByIDRequest} refreshMetadataByIDRequest NFT Metadata Refresh Request
+         * @param {MetadataApiRefreshMetadataByIDRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        refreshMetadataByID(chainName: string, contractAddress: string, refreshMetadataByIDRequest: RefreshMetadataByIDRequest, options?: any): AxiosPromise<MetadataRefreshRateLimitResult> {
-            return localVarFp.refreshMetadataByID(chainName, contractAddress, refreshMetadataByIDRequest, options).then((request) => request(axios, basePath));
+        refreshMetadataByID(requestParameters: MetadataApiRefreshMetadataByIDRequest, options?: AxiosRequestConfig): AxiosPromise<MetadataRefreshRateLimitResult> {
+            return localVarFp.refreshMetadataByID(requestParameters.chainName, requestParameters.contractAddress, requestParameters.refreshMetadataByIDRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * Refresh NFT metadata
          * @summary Refresh NFT metadata
-         * @param {string} contractAddress The address of contract
-         * @param {string} chainName The name of chain
-         * @param {RefreshNFTMetadataByTokenIDRequest} refreshNFTMetadataByTokenIDRequest the request body
+         * @param {MetadataApiRefreshNFTMetadataByTokenIDRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        refreshNFTMetadataByTokenID(contractAddress: string, chainName: string, refreshNFTMetadataByTokenIDRequest: RefreshNFTMetadataByTokenIDRequest, options?: any): AxiosPromise<MetadataRefreshRateLimitResult> {
-            return localVarFp.refreshNFTMetadataByTokenID(contractAddress, chainName, refreshNFTMetadataByTokenIDRequest, options).then((request) => request(axios, basePath));
+        refreshNFTMetadataByTokenID(requestParameters: MetadataApiRefreshNFTMetadataByTokenIDRequest, options?: AxiosRequestConfig): AxiosPromise<MetadataRefreshRateLimitResult> {
+            return localVarFp.refreshNFTMetadataByTokenID(requestParameters.contractAddress, requestParameters.chainName, requestParameters.refreshNFTMetadataByTokenIDRequest, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -547,3 +538,4 @@ export class MetadataApi extends BaseAPI {
         return MetadataApiFp(this.configuration).refreshNFTMetadataByTokenID(requestParameters.contractAddress, requestParameters.chainName, requestParameters.refreshNFTMetadataByTokenIDRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
+

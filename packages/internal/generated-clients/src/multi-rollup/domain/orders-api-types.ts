@@ -236,14 +236,14 @@ export interface OrdersApiListListingsRequest {
      * @type {'created_at' | 'updated_at' | 'buy_item_amount'}
      * @memberof OrdersApiListListings
      */
-    readonly sortBy?: SortByEnum
+    readonly sortBy?: ListListingsSortByEnum
 
     /**
      * Ascending or descending direction for sort
      * @type {'asc' | 'desc'}
      * @memberof OrdersApiListListings
      */
-    readonly sortDirection?: SortDirectionEnum
+    readonly sortDirection?: ListListingsSortDirectionEnum
 
     /**
      * Page cursor to retrieve previous or next page. Use the value returned in the response.
@@ -285,14 +285,14 @@ export interface OrdersApiListTradesRequest {
      * @type {'indexed_at'}
      * @memberof OrdersApiListTrades
      */
-    readonly sortBy?: SortByEnum
+    readonly sortBy?: ListTradesSortByEnum
 
     /**
      * Ascending or descending direction for sort
      * @type {'asc' | 'desc'}
      * @memberof OrdersApiListTrades
      */
-    readonly sortDirection?: SortDirectionEnum
+    readonly sortDirection?: ListTradesSortDirectionEnum
 
     /**
      * Page cursor to retrieve previous or next page. Use the value returned in the response.
