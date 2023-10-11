@@ -127,4 +127,3 @@ models/trade.ts
 models/transfer.ts
 models/unfulfillable-order.ts
 models/withdrawal.ts
-types/index.ts

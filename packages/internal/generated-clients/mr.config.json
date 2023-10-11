@@ -11,11 +11,6 @@
     "api-types.mustache": {
       "templateType": "API",
       "destinationFilename": "-types.ts"
-    },
-    "combined.mustache": {
-      "templateType": "SupportingFiles",
-      "folder": "types",
-      "destinationFilename": "index.ts"
     }
   }
 }
