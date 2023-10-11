@@ -35,6 +35,8 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: --max-old-space-size=14366
     steps:
       - name: Checkout
         uses: actions/checkout@v3
