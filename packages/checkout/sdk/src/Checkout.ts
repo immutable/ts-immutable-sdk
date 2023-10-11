@@ -292,6 +292,9 @@ export class Checkout {
     }
 
     // eslint-disable-next-line no-console
+    console.log('testing ci');
+
+    // eslint-disable-next-line no-console
     console.warn('This endpoint is currently under construction.');
 
     if (params.orders.length > 1) {
