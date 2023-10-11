@@ -1,8 +1,12 @@
 import { utils } from 'ethers';
-import React, { useCallback, useEffect, useState, } from 'react';
-import { Alert, Button, Form, Image, InputGroup, Offcanvas, Spinner, Stack, Table, } from 'react-bootstrap';
+import React, { useCallback, useEffect, useState } from 'react';
+import {
+  Alert, Button, Form, Image, InputGroup, Offcanvas, Spinner, Stack, Table,
+} from 'react-bootstrap';
 import { Heading } from '@biom3/react';
-import { Asset, Order as OrderType, TokenData, UnsignedOrderRequest } from '@imtbl/core-sdk';
+import {
+  Asset, Order as OrderType, TokenData, UnsignedOrderRequest,
+} from '@imtbl/core-sdk';
 import { ModalProps } from '@/types';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { useStatusProvider } from '@/context/StatusProvider';
@@ -10,12 +14,12 @@ import { usePassportProvider } from '@/context/PassportProvider';
 import ViewOffersModal from '@/components/imx/ViewOffersModal';
 
 type AssetWithSellOrder = { asset: Asset; sellOrder?: OrderType; };
-type AssetWithOffer = { asset: TokenData; offerOrder?: OrderType; }
+type AssetWithOffer = { asset: TokenData; offerOrder?: OrderType; };
 
 type AssetsWithOrders = {
   sellAssets: AssetWithSellOrder[];
   offerAssets: AssetWithOffer[];
-}
+};
 
 function Order({ showModal, setShowModal }: ModalProps) {
   const [showViewOffers, setShowViewOffers] = useState<boolean>(false);
@@ -37,23 +41,21 @@ function Order({ showModal, setShowModal }: ModalProps) {
       status: 'active',
     });
     const assetsWithOffers = orders.result.filter(
-      (order) => order.buy.type === "ERC721"
+      (order) => order.buy.type === 'ERC721',
     ).map((offerOrder) => ({
       asset: offerOrder.buy.data,
       offerOrder,
     }));
-    const sellOrders = assets?.result.map((asset) => {
-      return ({
-        asset,
-        sellOrder: orders.result.find(
-          (sellOrder) => sellOrder.sell.data.token_id === asset.token_id,
-        ),
-      });
-    });
+    const sellOrders = assets?.result.map((asset) => ({
+      asset,
+      sellOrder: orders.result.find(
+        (sellOrder) => sellOrder.sell.data.token_id === asset.token_id,
+      ),
+    }));
     return {
       sellAssets: sellOrders,
       offerAssets: assetsWithOffers,
-    }
+    };
   }, [coreSdkClient, imxProvider]);
 
   useEffect(() => {
@@ -61,10 +63,9 @@ function Order({ showModal, setShowModal }: ModalProps) {
       (async () => {
         setLoading(true);
         setUserAssets({
-            sellAssets: [],
-            offerAssets: [],
-          }
-        );
+          sellAssets: [],
+          offerAssets: [],
+        });
         const assetsWithOrder = await getUserAssetsWithOrder();
         setUserAssets(assetsWithOrder);
         setLoading(false);
@@ -126,12 +127,11 @@ function Order({ showModal, setShowModal }: ModalProps) {
     setShowViewOffers(true);
   }, []);
 
-  const getOrderList = (assets: AssetWithSellOrder[]) => {
-    return (
-      assets.length > 0
-        ? (
-          <Table striped bordered hover>
-            <thead>
+  const getOrderList = (assets: AssetWithSellOrder[]) => (
+    assets.length > 0
+      ? (
+        <Table striped bordered hover>
+          <thead>
             <tr>
               <th>ID</th>
               <th>Name</th>
@@ -139,8 +139,8 @@ function Order({ showModal, setShowModal }: ModalProps) {
               <th style={{ width: '200px' }}>Price</th>
               <th>Action</th>
             </tr>
-            </thead>
-            <tbody>
+          </thead>
+          <tbody>
             {
               assets.map((userAsset, index) => (
                 <tr key={userAsset.asset.id}>
@@ -210,19 +210,17 @@ function Order({ showModal, setShowModal }: ModalProps) {
                 </tr>
               ))
             }
-            </tbody>
-          </Table>
-        )
-        : <Alert>You have no assets available to order</Alert>
-    );
-  };
+          </tbody>
+        </Table>
+      )
+      : <Alert>You have no assets available to order</Alert>
+  );
 
-  const getOfferList = (assets: AssetWithOffer[]) => {
-    return (
-      assets.length > 0
-        ? (
-          <Table striped bordered hover>
-            <thead>
+  const getOfferList = (assets: AssetWithOffer[]) => (
+    assets.length > 0
+      ? (
+        <Table striped bordered hover>
+          <thead>
             <tr>
               <th>ID</th>
               <th>OrderID</th>
@@ -231,8 +229,8 @@ function Order({ showModal, setShowModal }: ModalProps) {
               <th style={{ width: '200px' }}>Offer Price</th>
               <th>Action</th>
             </tr>
-            </thead>
-            <tbody>
+          </thead>
+          <tbody>
             {
               assets.map((o, index) => (
                 <tr key={o.asset.id}>
@@ -253,7 +251,10 @@ function Order({ showModal, setShowModal }: ModalProps) {
                       : (
                         <InputGroup size="sm" className="mb-3">
                           <Stack>
-                            <Form.Label>{sellingPrice} ETH
+                            <Form.Label>
+                              {sellingPrice}
+                              {' '}
+                              ETH
                             </Form.Label>
                           </Stack>
                         </InputGroup>
@@ -262,26 +263,24 @@ function Order({ showModal, setShowModal }: ModalProps) {
                   <td>
                     <Stack gap={3}>
                       {o.offerOrder && (
-                        <>
-                          <Button
-                            size="sm"
-                            variant="danger"
-                            onClick={() => cancelOrder((o.offerOrder as OrderType).order_id)}
-                          >
-                            Cancel Offer</Button>
-                        </>
+                        <Button
+                          size="sm"
+                          variant="danger"
+                          onClick={() => cancelOrder((o.offerOrder as OrderType).order_id)}
+                        >
+                          Cancel Offer
+                        </Button>
                       )}
                     </Stack>
                   </td>
                 </tr>
               ))
             }
-            </tbody>
-          </Table>
-        )
-        : <Alert>You have no assets available to order</Alert>
-    );
-  };
+          </tbody>
+        </Table>
+      )
+      : <Alert>You have no assets available to order</Alert>
+  );
 
   return (
     <>
@@ -305,16 +304,17 @@ function Order({ showModal, setShowModal }: ModalProps) {
           </Offcanvas.Title>
         </Offcanvas.Header>
 
-        {loading ?
-          <Spinner animation="border" variant="dark"/> :
-          <Offcanvas.Body>
-            {getOrderList(userAssets?.sellAssets || [])}
-            <Offcanvas.Title>
-              <Heading>Offers</Heading>
-            </Offcanvas.Title>
-            {getOfferList(userAssets?.offerAssets || [])}
-          </Offcanvas.Body>
-        }
+        {loading
+          ? <Spinner animation="border" variant="dark" />
+          : (
+            <Offcanvas.Body>
+              {getOrderList(userAssets?.sellAssets || [])}
+              <Offcanvas.Title>
+                <Heading>Offers</Heading>
+              </Offcanvas.Title>
+              {getOfferList(userAssets?.offerAssets || [])}
+            </Offcanvas.Body>
+          )}
       </Offcanvas>
     </>
   );
