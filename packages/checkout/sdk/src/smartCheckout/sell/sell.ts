@@ -74,7 +74,7 @@ export const sell = async (
 
   if (orders.length === 0) {
     throw new CheckoutError(
-      'No orders were parsed, must parse at least one order',
+      'No orders were provided to the orders array. Please provide at least one order.',
       CheckoutErrorType.PREPARE_ORDER_LISTING_ERROR,
     );
   }

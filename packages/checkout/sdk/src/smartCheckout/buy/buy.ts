@@ -90,7 +90,7 @@ export const buy = async (
 
   if (orders.length === 0) {
     throw new CheckoutError(
-      'No orders were passed in, must pass at least one order',
+      'No orders were provided to the orders array. Please provide at least one order.',
       CheckoutErrorType.FULFILL_ORDER_LISTING_ERROR,
     );
   }
