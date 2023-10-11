@@ -87,7 +87,6 @@ describe('Orders', () => {
           asset_id_buy: getSignableOrderResponse.asset_id_buy,
           asset_id_sell: getSignableOrderResponse.asset_id_sell,
           expiration_timestamp: getSignableOrderResponse.expiration_timestamp,
-          include_fees: true,
           fees: signableOrderRequest.fees,
           nonce: getSignableOrderResponse.nonce,
           stark_key: getSignableOrderResponse.stark_key,

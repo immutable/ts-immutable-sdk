@@ -2,9 +2,9 @@ import {
   CancelOrderResponse,
   CreateOrderResponse,
   GetSignableCancelOrderRequest,
-  GetSignableOrderRequest,
+  GetSignableOrderRequestV3,
   OrdersApi,
-  OrdersApiCreateOrderRequest,
+  OrdersApiCreateOrderV3Request,
   UnsignedOrderRequest,
 } from '@imtbl/core-sdk';
 import { convertToSignableToken, signRaw } from '@imtbl/toolkit';
@@ -36,7 +36,7 @@ export async function createOrder({
 
   const amountSell = request.sell.type === 'ERC721' ? '1' : request.sell.amount;
   const amountBuy = request.buy.type === 'ERC721' ? '1' : request.buy.amount;
-  const getSignableOrderRequest: GetSignableOrderRequest = {
+  const getSignableOrderRequest: GetSignableOrderRequestV3 = {
     user: ethAddress,
     amount_buy: amountBuy,
     token_buy: convertToSignableToken(request.buy),
@@ -58,14 +58,13 @@ export async function createOrder({
 
   const resp = getSignableOrderResponse.data;
 
-  const orderParams: OrdersApiCreateOrderRequest = {
+  const orderParams: OrdersApiCreateOrderV3Request = {
     createOrderRequest: {
       amount_buy: resp.amount_buy,
       amount_sell: resp.amount_sell,
       asset_id_buy: resp.asset_id_buy,
       asset_id_sell: resp.asset_id_sell,
       expiration_timestamp: resp.expiration_timestamp,
-      include_fees: true,
       fees: request.fees,
       nonce: resp.nonce,
       stark_key: resp.stark_key,
