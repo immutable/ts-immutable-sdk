@@ -154,10 +154,10 @@ describe('sell', () => {
       );
 
       expect(result).toEqual({
-        smartCheckoutResult: [{
+        smartCheckoutResult: {
           sufficient: true,
           transactionRequirements: [erc721TransactionRequirement],
-        }],
+        },
         status: CheckoutStatus.SUCCESS,
         orderIds: ['1234'],
       });
@@ -307,10 +307,10 @@ describe('sell', () => {
 
       expect(result).toEqual({
         status: CheckoutStatus.INSUFFICIENT_FUNDS,
-        smartCheckoutResult: [{
+        smartCheckoutResult: {
           sufficient: false,
           transactionRequirements: [erc721TransactionRequirement],
-        }],
+        },
       });
 
       expect(smartCheckout).toBeCalledWith(
@@ -432,10 +432,10 @@ describe('sell', () => {
       );
 
       expect(result).toEqual({
-        smartCheckoutResult: [{
+        smartCheckoutResult: {
           sufficient: true,
           transactionRequirements: [erc721TransactionRequirement],
-        }],
+        },
         status: CheckoutStatus.FAILED,
         transactionHash: '0xHASH',
         reason: 'Approval transaction failed and was reverted',

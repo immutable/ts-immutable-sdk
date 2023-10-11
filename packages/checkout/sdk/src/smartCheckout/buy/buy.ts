@@ -90,7 +90,7 @@ export const buy = async (
 
   if (orders.length === 0) {
     throw new CheckoutError(
-      'No orders were passed in, must pass at least one order',
+      'No orders were provided to the orders array. Please provide at least one order.',
       CheckoutErrorType.FULFILL_ORDER_LISTING_ERROR,
     );
   }
@@ -215,7 +215,7 @@ export const buy = async (
         status: CheckoutStatus.FAILED,
         transactionHash: approvalResult.transactionHash,
         reason: approvalResult.reason,
-        smartCheckoutResult: [smartCheckoutResult],
+        smartCheckoutResult,
       };
     }
 
@@ -239,18 +239,18 @@ export const buy = async (
         status: CheckoutStatus.FAILED,
         transactionHash: fulfillmentResult.transactionHash,
         reason: fulfillmentResult.reason,
-        smartCheckoutResult: [smartCheckoutResult],
+        smartCheckoutResult,
       };
     }
 
     return {
       status: CheckoutStatus.SUCCESS,
-      smartCheckoutResult: [smartCheckoutResult],
+      smartCheckoutResult,
     };
   }
 
   return {
     status: CheckoutStatus.INSUFFICIENT_FUNDS,
-    smartCheckoutResult: [smartCheckoutResult],
+    smartCheckoutResult,
   };
 };
