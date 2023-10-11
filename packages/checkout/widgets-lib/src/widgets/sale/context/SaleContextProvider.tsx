@@ -1,31 +1,35 @@
-import {
-  useContext,
-  createContext,
-  useMemo,
-  ReactNode,
-  useEffect,
-  useState,
-  useCallback,
-  useRef,
-} from 'react';
+/* eslint-disable no-console */
+import { SmartCheckoutResult } from '@imtbl/checkout-sdk';
 import { Passport } from '@imtbl/passport';
 import {
-  Item,
-  PaymentTypes,
-  SignResponse,
-  SaleErrorTypes,
-  SignOrderError,
-  ExecutedTransaction,
-  ExecuteOrderResponse,
-} from '../types';
-import { useSignOrder } from '../hooks/useSignOrder';
+  ReactNode,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { ConnectLoaderState } from '../../../context/connect-loader-context/ConnectLoaderContext';
-import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
+import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 import {
   ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
-import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
+import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
+import { useSignOrder } from '../hooks/useSignOrder';
+import {
+  ExecuteOrderResponse,
+  ExecutedTransaction,
+  Item,
+  PaymentTypes,
+  SaleErrorTypes,
+  SignOrderError,
+  SignResponse,
+} from '../types';
+
+import { useSmartCheckout } from '../hooks/useSmartCheckout';
 
 type SaleContextProps = {
   config: StrongCheckoutWidgetsConfig;
@@ -58,6 +62,9 @@ type SaleContextValues = SaleContextProps & {
   goBackToPaymentMethods: (paymentMethod?: PaymentTypes | undefined) => void;
   goToErrorView: (type: SaleErrorTypes, data?: Record<string, unknown>) => void;
   goToSuccessView: () => void;
+  querySmartCheckout: undefined |
+  ((callback?: (r?: SmartCheckoutResult) => void) => Promise<SmartCheckoutResult | undefined>);
+  smartCheckoutResult: SmartCheckoutResult | undefined;
 };
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -84,6 +91,8 @@ const SaleContext = createContext<SaleContextValues>({
   goToErrorView: () => {},
   goToSuccessView: () => {},
   config: {} as StrongCheckoutWidgetsConfig,
+  querySmartCheckout: undefined,
+  smartCheckoutResult: undefined,
 });
 
 SaleContext.displayName = 'SaleSaleContext';
@@ -172,14 +181,38 @@ export function SaleContextProvider(props: {
   useEffect(() => {
     const getUserInfo = async () => {
       const signer = provider?.getSigner();
-      const address = (await signer?.getAddress()) || '';
-      const email = (await passport?.getUserInfo())?.email || '';
+      const address = await signer?.getAddress() || '';
+      let email;
+      try {
+        email = (await passport?.getUserInfo())?.email || '';
+      } catch (err) {
+        console.error('@@@ passport.getUserInfo error', err);
+      }
+
+      console.log('@@@@@@@ useEffect getUserInfo', email, signer, address);
 
       setUserInfo({ recipientEmail: email, recipientAddress: address });
     };
 
     getUserInfo();
   }, [provider]);
+
+  // ! Smart Checkout ----------------------------
+  const { smartCheckout, smartCheckoutResult } = useSmartCheckout({
+    provider,
+    checkout,
+    items,
+    amount,
+    contractAddress: fromContractAddress,
+    spenderAddress: recipientAddress,
+  });
+
+  const querySmartCheckout = useCallback(async (callback?: (r?: SmartCheckoutResult) => void) => {
+    const result = await smartCheckout();
+    callback?.(result);
+    return result;
+  }, [smartCheckout, recipientAddress]);
+    // ! Smart Checkout ----------------------------/
 
   const {
     sign: signOrder,
@@ -238,6 +271,8 @@ export function SaleContextProvider(props: {
       goToErrorView,
       goToSuccessView,
       isPassportWallet: !!(provider?.provider as any)?.isPassport,
+      querySmartCheckout,
+      smartCheckoutResult,
     }),
     [
       config,
@@ -257,6 +292,9 @@ export function SaleContextProvider(props: {
       goBackToPaymentMethods,
       goToErrorView,
       goToSuccessView,
+      signResponse,
+      querySmartCheckout,
+      smartCheckoutResult,
     ],
   );
 
