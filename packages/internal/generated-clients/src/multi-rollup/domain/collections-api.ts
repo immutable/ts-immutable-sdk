@@ -338,8 +338,12 @@ export const CollectionsApiFactory = function (configuration?: Configuration, ba
          * @throws {RequiredError}
          */
         listCollections(requestParameters: CollectionsApiListCollectionsRequest, options?: AxiosRequestConfig): AxiosPromise<ListCollectionsResult> {
+<<<<<<< HEAD
             return localVarFp.listCollections(requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
 >>>>>>> 5c52cefa (upgrade generator version)
+=======
+            return localVarFp.listCollections(requestParameters.chainName, requestParameters.contractAddress, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
+>>>>>>> 1f74dc19 (use latest spec)
         },
         /**
          * List collections by NFT owner account address

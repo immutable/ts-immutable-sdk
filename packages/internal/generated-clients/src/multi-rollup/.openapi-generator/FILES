@@ -47,10 +47,14 @@ models/cancel-orders-request-body.ts
 models/cancel-orders-result-data.ts
 models/cancel-orders-result.ts
 <<<<<<< HEAD
+<<<<<<< HEAD
 models/cancelled-order-status.ts
 models/chain-with-details-all-of.ts
 =======
 >>>>>>> 5c52cefa (upgrade generator version)
+=======
+models/cancelled-order-status.ts
+>>>>>>> 1f74dc19 (use latest spec)
 models/chain-with-details.ts
 models/chain.ts
 models/collection-contract-type.ts

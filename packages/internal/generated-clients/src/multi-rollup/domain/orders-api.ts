@@ -271,10 +271,14 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
          * @throws {RequiredError}
          */
 <<<<<<< HEAD
+<<<<<<< HEAD
         listListings: async (chainName: string, status?: OrderStatusName, sellItemContractAddress?: string, buyItemContractAddress?: string, sellItemTokenId?: string, pageSize?: number, sortBy?: 'created_at' | 'updated_at' | 'buy_item_amount', sortDirection?: 'asc' | 'desc', pageCursor?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
 =======
         listListings: async (chainName: string, status?: OrderStatus, sellItemContractAddress?: string, buyItemContractAddress?: string, sellItemTokenId?: string, pageSize?: number, sortBy?: ListListingsSortByEnum, sortDirection?: ListListingsSortDirectionEnum, pageCursor?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
 >>>>>>> 5c52cefa (upgrade generator version)
+=======
+        listListings: async (chainName: string, status?: OrderStatusName, sellItemContractAddress?: string, buyItemContractAddress?: string, sellItemTokenId?: string, pageSize?: number, sortBy?: ListListingsSortByEnum, sortDirection?: ListListingsSortDirectionEnum, pageCursor?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+>>>>>>> 1f74dc19 (use latest spec)
             // verify required parameter 'chainName' is not null or undefined
             assertParamExists('listListings', 'chainName', chainName)
             const localVarPath = `/v1/chains/{chain_name}/orders/listings`
@@ -478,10 +482,14 @@ export const OrdersApiFp = function(configuration?: Configuration) {
          * @throws {RequiredError}
          */
 <<<<<<< HEAD
+<<<<<<< HEAD
         async listListings(chainName: string, status?: OrderStatusName, sellItemContractAddress?: string, buyItemContractAddress?: string, sellItemTokenId?: string, pageSize?: number, sortBy?: 'created_at' | 'updated_at' | 'buy_item_amount', sortDirection?: 'asc' | 'desc', pageCursor?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListListingsResult>> {
 =======
         async listListings(chainName: string, status?: OrderStatus, sellItemContractAddress?: string, buyItemContractAddress?: string, sellItemTokenId?: string, pageSize?: number, sortBy?: ListListingsSortByEnum, sortDirection?: ListListingsSortDirectionEnum, pageCursor?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListListingsResult>> {
 >>>>>>> 5c52cefa (upgrade generator version)
+=======
+        async listListings(chainName: string, status?: OrderStatusName, sellItemContractAddress?: string, buyItemContractAddress?: string, sellItemTokenId?: string, pageSize?: number, sortBy?: ListListingsSortByEnum, sortDirection?: ListListingsSortDirectionEnum, pageCursor?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListListingsResult>> {
+>>>>>>> 1f74dc19 (use latest spec)
             const localVarAxiosArgs = await localVarAxiosParamCreator.listListings(chainName, status, sellItemContractAddress, buyItemContractAddress, sellItemTokenId, pageSize, sortBy, sortDirection, pageCursor, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },

@@ -85,6 +85,13 @@ export interface ListCollectionsRequest {
     readonly chainName: string
 
     /**
+     * List of contract addresses to filter by
+     * @type {Array<string>}
+     * @memberof ListCollections
+     */
+    readonly contractAddress?: Array<string>
+
+    /**
      * Datetime to use as the oldest updated timestamp
      * @type {string}
      * @memberof ListCollections

@@ -42,7 +42,7 @@ import { ListTradeResult } from '../models';
 // @ts-ignore
 import { ListingResult } from '../models';
 // @ts-ignore
-import { OrderStatus } from '../models';
+import { OrderStatusName } from '../models';
 // @ts-ignore
 import { TradeResult } from '../models';
 // @ts-ignore
@@ -74,7 +74,7 @@ export { ListTradeResult } from '../models';
 // @ts-ignore
 export { ListingResult } from '../models';
 // @ts-ignore
-export { OrderStatus } from '../models';
+export { OrderStatusName } from '../models';
 // @ts-ignore
 export { TradeResult } from '../models';
 
@@ -198,10 +198,10 @@ export interface ListListingsRequest {
 
     /**
      * Order status to filter by
-     * @type {OrderStatus}
+     * @type {OrderStatusName}
      * @memberof ListListings
      */
-    readonly status?: OrderStatus
+    readonly status?: OrderStatusName
 
     /**
      * Sell item contract address to filter by

@@ -6,10 +6,14 @@ export * from './apierror429';
 export * from './apierror500';
 export * from './apierror501';
 <<<<<<< HEAD
+<<<<<<< HEAD
 export * from './apierror501-all-of';
 export * from './active-order-status';
 =======
 >>>>>>> 5c52cefa (upgrade generator version)
+=======
+export * from './active-order-status';
+>>>>>>> 1f74dc19 (use latest spec)
 export * from './activity';
 export * from './activity-asset';
 export * from './activity-details';
