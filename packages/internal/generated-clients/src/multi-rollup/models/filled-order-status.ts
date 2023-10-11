@@ -13,21 +13,25 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import { CancelOrdersResultData } from './cancel-orders-result-data';
 
 /**
  * 
  * @export
- * @interface CancelOrdersResult
+ * @interface FilledOrderStatus
  */
-export interface CancelOrdersResult {
+export interface FilledOrderStatus {
     /**
-     * 
-     * @type {CancelOrdersResultData}
-     * @memberof CancelOrdersResult
+     * The order status
+     * @type {string}
+     * @memberof FilledOrderStatus
      */
-    'result': CancelOrdersResultData;
+    'name': FilledOrderStatusNameEnum;
 }
+
+export const FilledOrderStatusNameEnum = {
+    Filled: 'FILLED'
+} as const;
+
+export type FilledOrderStatusNameEnum = typeof FilledOrderStatusNameEnum[keyof typeof FilledOrderStatusNameEnum];
+
 
