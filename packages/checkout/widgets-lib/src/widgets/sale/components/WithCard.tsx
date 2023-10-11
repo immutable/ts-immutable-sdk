@@ -8,7 +8,7 @@ import { text as textConfig } from '../../../resources/text/textConfig';
 import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 
 export function WithCard() {
-  const { screenTitle } = textConfig.views[SaleWidgetViews.PAY_WITH_CARD];
+  const { screenTitle, loading } = textConfig.views[SaleWidgetViews.PAY_WITH_CARD];
 
   const {
     recipientEmail, recipientAddress, isPassportWallet, signResponse,
@@ -62,6 +62,7 @@ export function WithCard() {
       walletAddress={recipientAddress}
       isPassportWallet={isPassportWallet}
       exchangeScreenTitle={screenTitle}
+      loadingText={loading}
       nftData={nftData}
       calldata={executeTxn.rawData}
       cryptoCurrencyCode={signResponse.order.currency.name}
