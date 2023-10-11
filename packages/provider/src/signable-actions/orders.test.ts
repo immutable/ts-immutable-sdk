@@ -55,7 +55,7 @@ describe('Orders', () => {
       });
       (OrdersApi as jest.Mock).mockReturnValue({
         getSignableOrder: getSignableOrderMock,
-        createOrder: createOrderMock,
+        createOrderV3: createOrderMock,
       });
 
       (signRaw as jest.Mock).mockReturnValue('raw-eth-signature');
@@ -128,8 +128,8 @@ describe('Orders', () => {
         data: createCancelResponse,
       });
       (OrdersApi as jest.Mock).mockReturnValue({
-        getSignableCancelOrder: getSignableCancelOrderMock,
-        cancelOrder: cancelOrderMock,
+        getSignableCancelOrderV3: getSignableCancelOrderMock,
+        cancelOrderV3: cancelOrderMock,
       });
 
       (signRaw as jest.Mock).mockReturnValue('raw-eth-signature');

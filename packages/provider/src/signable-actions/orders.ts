@@ -77,7 +77,7 @@ export async function createOrder({
     xImxEthSignature: ethSignature,
   };
 
-  const createOrderResponse = await ordersApi.createOrder(orderParams);
+  const createOrderResponse = await ordersApi.createOrderV3(orderParams);
 
   return {
     ...createOrderResponse.data,
@@ -91,7 +91,7 @@ export async function cancelOrder({
 }: CancelOrderWorkflowParams): Promise<CancelOrderResponse> {
   const ordersApi = new OrdersApi(config.immutableXConfig.apiConfiguration);
 
-  const getSignableCancelOrderResponse = await ordersApi.getSignableCancelOrder(
+  const getSignableCancelOrderResponse = await ordersApi.getSignableCancelOrderV3(
     {
       getSignableCancelOrderRequest: {
         order_id: request.order_id,
@@ -107,7 +107,7 @@ export async function cancelOrder({
 
   const ethAddress = await signers.ethSigner.getAddress();
 
-  const cancelOrderResponse = await ordersApi.cancelOrder({
+  const cancelOrderResponse = await ordersApi.cancelOrderV3({
     id: request.order_id.toString(),
     cancelOrderRequest: {
       order_id: request.order_id,
