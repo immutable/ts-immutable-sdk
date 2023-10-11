@@ -4,7 +4,7 @@ import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
 import { Body, Box, FormControl, TextInput } from '@biom3/react';
-import { OrderStatus, Orderbook } from '@imtbl/orderbook';
+import { OrderStatusName, Orderbook } from '@imtbl/orderbook';
 import { Environment } from '@imtbl/config';
 
 interface ListingsProps {
@@ -37,7 +37,7 @@ export default function Listings({ checkout, provider }: ListingsProps) {
         const orderBook = new Orderbook({baseConfig: {environment: checkout.config.environment}})
         const listingsResult = await orderBook.listListings({
           sellItemContractAddress: sellContractAddress,
-          status: OrderStatus.ACTIVE
+          status: OrderStatusName.ACTIVE
         })
         console.log('listings:', listingsResult)
       setLoading(false);
