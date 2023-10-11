@@ -28,6 +28,7 @@ interface SaleWithCardView extends ViewType {
 }
 interface SaleSmartCheckoutView extends ViewType {
   type: SaleWidgetViews.FUND_WITH_SMART_CHECKOUT;
+  subView: FundWithSmartCheckoutSubViews;
 }
 interface SaleSuccessView extends ViewType {
   type: SaleWidgetViews.MINT_SUCCESS;
@@ -35,4 +36,12 @@ interface SaleSuccessView extends ViewType {
 interface SaleFailView extends ViewType {
   type: SaleWidgetViews.MINT_FAIL;
   reason?: string;
+}
+
+export enum FundWithSmartCheckoutSubViews {
+  INIT = 'INIT',
+  LOADING = 'LOADING',
+  FUNDING_ROUTE_SELECT = 'FUNDING_ROUTE_SELECT',
+  FUNDING_ROUTE_EXECUTE = 'FUNDING_ROUTE_EXECUTE',
+  DONE = 'DONE', // FIXME: todo remove once we have a success view
 }

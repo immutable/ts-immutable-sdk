@@ -5,28 +5,30 @@ import {
 
 import { BiomeCombinedProviders } from '@biom3/react';
 
-import { LoadingView } from '../../views/loading/LoadingView';
+import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
+import {
+  SharedViews,
+  ViewActions,
+  ViewContext,
+  initialViewState,
+  viewReducer,
+} from '../../context/view-context/ViewContext';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { text } from '../../resources/text/textConfig';
-import {
-  viewReducer,
-  initialViewState,
-  ViewContext,
-  ViewActions,
-  SharedViews,
-} from '../../context/view-context/ViewContext';
-import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
+import { LoadingView } from '../../views/loading/LoadingView';
+
+import { ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
+import { StatusType } from '../../components/Status/StatusType';
+import { StatusView, StatusViewProps } from '../../components/Status/StatusView';
+import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { SaleWidgetViews } from '../../context/view-context/SaleViewContextTypes';
 import { Item, MintErrorTypes } from './types';
 import { widgetTheme } from '../../lib/theme';
 import { SharedContextProvider } from './context/SharedContextProvider';
-import { PaymentMethods } from './views/PaymentMethods';
+import { FundWithSmartCheckout } from './views/FundWithSmartCheckout';
 import { PayWithCard } from './views/PayWithCard';
 import { PayWithCoins } from './views/PayWithCoins';
-import { ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
-import { StatusView, StatusViewProps } from '../../components/Status/StatusView';
-import { StatusType } from '../../components/Status/StatusType';
-import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
+import { PaymentMethods } from './views/PaymentMethods';
 import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
 
 interface ErrorHandlerConfig {
@@ -82,10 +84,7 @@ export function SaleWidget(props: SaleWidgetProps) {
   const biomeTheme = useMemo(() => widgetTheme(theme), [theme]);
 
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
-  const viewReducerValues = useMemo(
-    () => ({ viewState, viewDispatch }),
-    [viewState, viewDispatch],
-  );
+  const viewReducerValues = useMemo(() => ({ viewState, viewDispatch }), [viewState, viewDispatch]);
 
   const loadingText = viewState.view.data?.loadingText
     || text.views[SharedViews.LOADING_VIEW].text;
@@ -247,6 +246,9 @@ export function SaleWidget(props: SaleWidgetProps) {
                 statusType={StatusType.SUCCESS}
                 testId="success-view"
               />
+          )}
+          {viewState.view.type === SaleWidgetViews.FUND_WITH_SMART_CHECKOUT && (
+            <FundWithSmartCheckout subView={viewState.view.subView} />
           )}
         </SharedContextProvider>
       </ViewContext.Provider>

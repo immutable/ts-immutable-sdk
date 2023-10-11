@@ -8,6 +8,7 @@ import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextT
 import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextTypes';
 import { SaleWidgetViews } from '../../context/view-context/SaleViewContextTypes';
 import { MintErrorTypes, PaymentTypes } from '../../widgets/sale/types';
+import { ServiceType } from '../../views/error/serviceTypes';
 
 export const text = {
   views: {
@@ -66,6 +67,12 @@ export const text = {
       heading: "Something's gone wrong",
       body: ['You can try again or contact', 'support', 'for help.'],
       actionText: 'Try again',
+    },
+    [SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW]: {
+      heading: {
+        [ServiceType.SWAP]: 'Swapping is not available in your region',
+      },
+      body: 'We’re sorry we cannot provide this service in your region.',
     },
     [SharedViews.LOADING_VIEW]: {
       text: 'Loading',
