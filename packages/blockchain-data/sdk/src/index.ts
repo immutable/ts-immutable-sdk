@@ -1,4 +1,4 @@
-import { mr, mrTypes } from '@imtbl/generated-clients';
+import { mr, activitiesTypes, chainTypes } from '@imtbl/generated-clients';
 import { APIError } from './types/errors';
 import { BlockchainData } from './blockchain-data';
 import { BlockchainDataModuleConfiguration } from './config';
@@ -6,7 +6,8 @@ import { BlockchainDataModuleConfiguration } from './config';
 type ActivityType = mr.ActivityType;
 
 export {
-  mrTypes as types,
+  activitiesTypes as ActivitiesApi,
+  chainTypes as ChainsApi,
   APIError,
   BlockchainData,
   BlockchainDataModuleConfiguration,

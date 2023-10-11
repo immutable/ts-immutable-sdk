@@ -6,7 +6,7 @@ import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import {
   BlockchainData,
   BlockchainDataModuleConfiguration,
-  types,
+  ActivitiesApi,
 } from '@imtbl/blockchain-data';
 import { PageLayout } from '@/components/PageLayout';
 import { capitalizeFirstLetter } from '@/utils';
@@ -406,7 +406,8 @@ const endpointDomains = {
 };
 
 export default function Home() {
-  const [response, setResponse] = useState<types.ListChainsResult | null>(null);
+  const [response, setResponse] =
+    useState<ActivitiesApi.GetActivityResult | null>(null);
 
   useEffect(() => {
     async function getData() {
