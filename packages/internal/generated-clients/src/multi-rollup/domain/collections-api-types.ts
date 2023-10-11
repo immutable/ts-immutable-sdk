@@ -53,20 +53,20 @@ export { RefreshCollectionMetadataResult } from '../models';
 /**
  * Request parameters for getCollection operation in CollectionsApi.
  * @export
- * @interface CollectionsApiGetCollectionRequest
+ * @interface GetCollectionRequest
  */
-export interface CollectionsApiGetCollectionRequest {
+export interface GetCollectionRequest {
     /**
      * The address contract
      * @type {string}
-     * @memberof CollectionsApiGetCollection
+     * @memberof GetCollection
      */
     readonly contractAddress: string
 
     /**
      * The name of chain
      * @type {string}
-     * @memberof CollectionsApiGetCollection
+     * @memberof GetCollection
      */
     readonly chainName: string
 }
@@ -74,34 +74,34 @@ export interface CollectionsApiGetCollectionRequest {
 /**
  * Request parameters for listCollections operation in CollectionsApi.
  * @export
- * @interface CollectionsApiListCollectionsRequest
+ * @interface ListCollectionsRequest
  */
-export interface CollectionsApiListCollectionsRequest {
+export interface ListCollectionsRequest {
     /**
      * The name of chain
      * @type {string}
-     * @memberof CollectionsApiListCollections
+     * @memberof ListCollections
      */
     readonly chainName: string
 
     /**
      * Datetime to use as the oldest updated timestamp
      * @type {string}
-     * @memberof CollectionsApiListCollections
+     * @memberof ListCollections
      */
     readonly fromUpdatedAt?: string
 
     /**
      * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
      * @type {string}
-     * @memberof CollectionsApiListCollections
+     * @memberof ListCollections
      */
     readonly pageCursor?: string
 
     /**
      * Maximum number of items to return
      * @type {number}
-     * @memberof CollectionsApiListCollections
+     * @memberof ListCollections
      */
     readonly pageSize?: number
 }
@@ -109,34 +109,34 @@ export interface CollectionsApiListCollectionsRequest {
 /**
  * Request parameters for listCollectionsByNFTOwner operation in CollectionsApi.
  * @export
- * @interface CollectionsApiListCollectionsByNFTOwnerRequest
+ * @interface ListCollectionsByNFTOwnerRequest
  */
-export interface CollectionsApiListCollectionsByNFTOwnerRequest {
+export interface ListCollectionsByNFTOwnerRequest {
     /**
      * Account address
      * @type {string}
-     * @memberof CollectionsApiListCollectionsByNFTOwner
+     * @memberof ListCollectionsByNFTOwner
      */
     readonly accountAddress: string
 
     /**
      * The name of chain
      * @type {string}
-     * @memberof CollectionsApiListCollectionsByNFTOwner
+     * @memberof ListCollectionsByNFTOwner
      */
     readonly chainName: string
 
     /**
      * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
      * @type {string}
-     * @memberof CollectionsApiListCollectionsByNFTOwner
+     * @memberof ListCollectionsByNFTOwner
      */
     readonly pageCursor?: string
 
     /**
      * Maximum number of items to return
      * @type {number}
-     * @memberof CollectionsApiListCollectionsByNFTOwner
+     * @memberof ListCollectionsByNFTOwner
      */
     readonly pageSize?: number
 }
@@ -144,27 +144,27 @@ export interface CollectionsApiListCollectionsByNFTOwnerRequest {
 /**
  * Request parameters for refreshCollectionMetadata operation in CollectionsApi.
  * @export
- * @interface CollectionsApiRefreshCollectionMetadataRequest
+ * @interface RefreshCollectionMetadataRequest
  */
-export interface CollectionsApiRefreshCollectionMetadataRequest {
+export interface RefreshCollectionMetadataRequest {
     /**
      * The address contract
      * @type {string}
-     * @memberof CollectionsApiRefreshCollectionMetadata
+     * @memberof RefreshCollectionMetadata
      */
     readonly contractAddress: string
 
     /**
      * The name of chain
      * @type {string}
-     * @memberof CollectionsApiRefreshCollectionMetadata
+     * @memberof RefreshCollectionMetadata
      */
     readonly chainName: string
 
     /**
      * The request body
      * @type {RefreshCollectionMetadataRequest}
-     * @memberof CollectionsApiRefreshCollectionMetadata
+     * @memberof RefreshCollectionMetadata
      */
     readonly refreshCollectionMetadataRequest: RefreshCollectionMetadataRequest
 }

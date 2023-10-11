@@ -61,27 +61,27 @@ export { RefreshNFTMetadataByTokenIDRequest } from '../models';
 /**
  * Request parameters for getMetadata operation in MetadataApi.
  * @export
- * @interface MetadataApiGetMetadataRequest
+ * @interface GetMetadataRequest
  */
-export interface MetadataApiGetMetadataRequest {
+export interface GetMetadataRequest {
     /**
      * The name of chain
      * @type {string}
-     * @memberof MetadataApiGetMetadata
+     * @memberof GetMetadata
      */
     readonly chainName: string
 
     /**
      * The address of metadata contract
      * @type {string}
-     * @memberof MetadataApiGetMetadata
+     * @memberof GetMetadata
      */
     readonly contractAddress: string
 
     /**
      * The id of the metadata
      * @type {string}
-     * @memberof MetadataApiGetMetadata
+     * @memberof GetMetadata
      */
     readonly metadataId: string
 }
@@ -89,41 +89,41 @@ export interface MetadataApiGetMetadataRequest {
 /**
  * Request parameters for listMetadata operation in MetadataApi.
  * @export
- * @interface MetadataApiListMetadataRequest
+ * @interface ListMetadataRequest
  */
-export interface MetadataApiListMetadataRequest {
+export interface ListMetadataRequest {
     /**
      * The name of chain
      * @type {string}
-     * @memberof MetadataApiListMetadata
+     * @memberof ListMetadata
      */
     readonly chainName: string
 
     /**
      * The address of metadata contract
      * @type {string}
-     * @memberof MetadataApiListMetadata
+     * @memberof ListMetadata
      */
     readonly contractAddress: string
 
     /**
      * Datetime to use as the oldest updated timestamp
      * @type {string}
-     * @memberof MetadataApiListMetadata
+     * @memberof ListMetadata
      */
     readonly fromUpdatedAt?: string
 
     /**
      * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
      * @type {string}
-     * @memberof MetadataApiListMetadata
+     * @memberof ListMetadata
      */
     readonly pageCursor?: string
 
     /**
      * Maximum number of items to return
      * @type {number}
-     * @memberof MetadataApiListMetadata
+     * @memberof ListMetadata
      */
     readonly pageSize?: number
 }
@@ -131,27 +131,27 @@ export interface MetadataApiListMetadataRequest {
 /**
  * Request parameters for refreshMetadataByID operation in MetadataApi.
  * @export
- * @interface MetadataApiRefreshMetadataByIDRequest
+ * @interface RefreshMetadataByIDRequest
  */
-export interface MetadataApiRefreshMetadataByIDRequest {
+export interface RefreshMetadataByIDRequest {
     /**
      * The name of chain
      * @type {string}
-     * @memberof MetadataApiRefreshMetadataByID
+     * @memberof RefreshMetadataByID
      */
     readonly chainName: string
 
     /**
      * Contract address
      * @type {string}
-     * @memberof MetadataApiRefreshMetadataByID
+     * @memberof RefreshMetadataByID
      */
     readonly contractAddress: string
 
     /**
      * NFT Metadata Refresh Request
      * @type {RefreshMetadataByIDRequest}
-     * @memberof MetadataApiRefreshMetadataByID
+     * @memberof RefreshMetadataByID
      */
     readonly refreshMetadataByIDRequest: RefreshMetadataByIDRequest
 }
@@ -159,27 +159,27 @@ export interface MetadataApiRefreshMetadataByIDRequest {
 /**
  * Request parameters for refreshNFTMetadataByTokenID operation in MetadataApi.
  * @export
- * @interface MetadataApiRefreshNFTMetadataByTokenIDRequest
+ * @interface RefreshNFTMetadataByTokenIDRequest
  */
-export interface MetadataApiRefreshNFTMetadataByTokenIDRequest {
+export interface RefreshNFTMetadataByTokenIDRequest {
     /**
      * The address of contract
      * @type {string}
-     * @memberof MetadataApiRefreshNFTMetadataByTokenID
+     * @memberof RefreshNFTMetadataByTokenID
      */
     readonly contractAddress: string
 
     /**
      * The name of chain
      * @type {string}
-     * @memberof MetadataApiRefreshNFTMetadataByTokenID
+     * @memberof RefreshNFTMetadataByTokenID
      */
     readonly chainName: string
 
     /**
      * the request body
      * @type {RefreshNFTMetadataByTokenIDRequest}
-     * @memberof MetadataApiRefreshNFTMetadataByTokenID
+     * @memberof RefreshNFTMetadataByTokenID
      */
     readonly refreshNFTMetadataByTokenIDRequest: RefreshNFTMetadataByTokenIDRequest
 }

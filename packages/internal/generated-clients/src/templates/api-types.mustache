@@ -22,14 +22,14 @@ export { {{classname}} } from '{{apiRelativeToRoot}}{{tsModelPackage}}';
 /**
  * Request parameters for {{nickname}} operation in {{classname}}.
  * @export
- * @interface {{classname}}{{operationIdCamelCase}}Request
+ * @interface {{operationIdCamelCase}}Request
  */
-export interface {{classname}}{{operationIdCamelCase}}Request {
+export interface {{operationIdCamelCase}}Request {
     {{#allParams}}
     /**
      * {{description}}
      * @type {{=<% %>=}}{<%&dataType%>}<%={{ }}=%>
-     * @memberof {{classname}}{{operationIdCamelCase}}
+     * @memberof {{operationIdCamelCase}}
      */
     readonly {{paramName}}{{^required}}?{{/required}}: {{#isEnum}}{{{datatypeWithEnum}}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{#isNullable}} | null{{/isNullable}}{{/isEnum}}
     {{^-last}}

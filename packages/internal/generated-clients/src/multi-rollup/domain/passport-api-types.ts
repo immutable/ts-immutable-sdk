@@ -53,13 +53,13 @@ export { GetLinkedAddressesRes } from '../models';
 /**
  * Request parameters for createCounterfactualAddress operation in PassportApi.
  * @export
- * @interface PassportApiCreateCounterfactualAddressRequest
+ * @interface CreateCounterfactualAddressRequest
  */
-export interface PassportApiCreateCounterfactualAddressRequest {
+export interface CreateCounterfactualAddressRequest {
     /**
      * 
      * @type {CreateCounterfactualAddressRequest}
-     * @memberof PassportApiCreateCounterfactualAddress
+     * @memberof CreateCounterfactualAddress
      */
     readonly createCounterfactualAddressRequest: CreateCounterfactualAddressRequest
 }
@@ -67,13 +67,13 @@ export interface PassportApiCreateCounterfactualAddressRequest {
 /**
  * Request parameters for getLinkedAddresses operation in PassportApi.
  * @export
- * @interface PassportApiGetLinkedAddressesRequest
+ * @interface GetLinkedAddressesRequest
  */
-export interface PassportApiGetLinkedAddressesRequest {
+export interface GetLinkedAddressesRequest {
     /**
      * The user\&#39;s userId
      * @type {string}
-     * @memberof PassportApiGetLinkedAddresses
+     * @memberof GetLinkedAddresses
      */
     readonly userId: string
 }

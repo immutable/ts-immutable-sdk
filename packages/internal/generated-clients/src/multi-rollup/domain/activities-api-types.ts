@@ -41,20 +41,20 @@ export { ListActivitiesResult } from '../models';
 /**
  * Request parameters for getActivity operation in ActivitiesApi.
  * @export
- * @interface ActivitiesApiGetActivityRequest
+ * @interface GetActivityRequest
  */
-export interface ActivitiesApiGetActivityRequest {
+export interface GetActivityRequest {
     /**
      * The name of chain
      * @type {string}
-     * @memberof ActivitiesApiGetActivity
+     * @memberof GetActivity
      */
     readonly chainName: string
 
     /**
      * The id of activity
      * @type {string}
-     * @memberof ActivitiesApiGetActivity
+     * @memberof GetActivity
      */
     readonly activityId: string
 }
@@ -62,76 +62,76 @@ export interface ActivitiesApiGetActivityRequest {
 /**
  * Request parameters for listActivities operation in ActivitiesApi.
  * @export
- * @interface ActivitiesApiListActivitiesRequest
+ * @interface ListActivitiesRequest
  */
-export interface ActivitiesApiListActivitiesRequest {
+export interface ListActivitiesRequest {
     /**
      * The name of chain
      * @type {string}
-     * @memberof ActivitiesApiListActivities
+     * @memberof ListActivities
      */
     readonly chainName: string
 
     /**
      * The contract address of NFT or ERC20 Token
      * @type {string}
-     * @memberof ActivitiesApiListActivities
+     * @memberof ListActivities
      */
     readonly contractAddress?: string
 
     /**
      * An &#x60;uint256&#x60; token id as string
      * @type {string}
-     * @memberof ActivitiesApiListActivities
+     * @memberof ListActivities
      */
     readonly tokenId?: string
 
     /**
      * The account address activity contains
      * @type {string}
-     * @memberof ActivitiesApiListActivities
+     * @memberof ListActivities
      */
     readonly accountAddress?: string
 
     /**
      * The activity type
      * @type {ActivityType}
-     * @memberof ActivitiesApiListActivities
+     * @memberof ListActivities
      */
     readonly activityType?: ActivityType
 
     /**
      * From indexed at including given date
      * @type {string}
-     * @memberof ActivitiesApiListActivities
+     * @memberof ListActivities
      */
     readonly fromIndexedAt?: string
 
     /**
      * To indexed at including given date
      * @type {string}
-     * @memberof ActivitiesApiListActivities
+     * @memberof ListActivities
      */
     readonly toIndexedAt?: string
 
     /**
      * The transaction hash of activity
      * @type {string}
-     * @memberof ActivitiesApiListActivities
+     * @memberof ListActivities
      */
     readonly transactionHash?: string
 
     /**
      * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
      * @type {string}
-     * @memberof ActivitiesApiListActivities
+     * @memberof ListActivities
      */
     readonly pageCursor?: string
 
     /**
      * Maximum number of items to return
      * @type {number}
-     * @memberof ActivitiesApiListActivities
+     * @memberof ListActivities
      */
     readonly pageSize?: number
 }

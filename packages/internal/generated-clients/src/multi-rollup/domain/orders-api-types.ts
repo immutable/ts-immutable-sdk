@@ -81,20 +81,20 @@ export { TradeResult } from '../models';
 /**
  * Request parameters for cancelOrders operation in OrdersApi.
  * @export
- * @interface OrdersApiCancelOrdersRequest
+ * @interface CancelOrdersRequest
  */
-export interface OrdersApiCancelOrdersRequest {
+export interface CancelOrdersRequest {
     /**
      * 
      * @type {string}
-     * @memberof OrdersApiCancelOrders
+     * @memberof CancelOrders
      */
     readonly chainName: string
 
     /**
      * 
      * @type {CancelOrdersRequestBody}
-     * @memberof OrdersApiCancelOrders
+     * @memberof CancelOrders
      */
     readonly cancelOrdersRequestBody: CancelOrdersRequestBody
 }
@@ -102,20 +102,20 @@ export interface OrdersApiCancelOrdersRequest {
 /**
  * Request parameters for createListing operation in OrdersApi.
  * @export
- * @interface OrdersApiCreateListingRequest
+ * @interface CreateListingRequest
  */
-export interface OrdersApiCreateListingRequest {
+export interface CreateListingRequest {
     /**
      * 
      * @type {string}
-     * @memberof OrdersApiCreateListing
+     * @memberof CreateListing
      */
     readonly chainName: string
 
     /**
      * 
      * @type {CreateListingRequestBody}
-     * @memberof OrdersApiCreateListing
+     * @memberof CreateListing
      */
     readonly createListingRequestBody: CreateListingRequestBody
 }
@@ -123,20 +123,20 @@ export interface OrdersApiCreateListingRequest {
 /**
  * Request parameters for fulfillmentData operation in OrdersApi.
  * @export
- * @interface OrdersApiFulfillmentDataRequest
+ * @interface FulfillmentDataRequest
  */
-export interface OrdersApiFulfillmentDataRequest {
+export interface FulfillmentDataRequest {
     /**
      * 
      * @type {string}
-     * @memberof OrdersApiFulfillmentData
+     * @memberof FulfillmentData
      */
     readonly chainName: string
 
     /**
      * 
      * @type {Array<FulfillmentDataRequest>}
-     * @memberof OrdersApiFulfillmentData
+     * @memberof FulfillmentData
      */
     readonly fulfillmentDataRequest: Array<FulfillmentDataRequest>
 }
@@ -144,20 +144,20 @@ export interface OrdersApiFulfillmentDataRequest {
 /**
  * Request parameters for getListing operation in OrdersApi.
  * @export
- * @interface OrdersApiGetListingRequest
+ * @interface GetListingRequest
  */
-export interface OrdersApiGetListingRequest {
+export interface GetListingRequest {
     /**
      * 
      * @type {string}
-     * @memberof OrdersApiGetListing
+     * @memberof GetListing
      */
     readonly chainName: string
 
     /**
      * Global Order identifier
      * @type {string}
-     * @memberof OrdersApiGetListing
+     * @memberof GetListing
      */
     readonly listingId: string
 }
@@ -165,20 +165,20 @@ export interface OrdersApiGetListingRequest {
 /**
  * Request parameters for getTrade operation in OrdersApi.
  * @export
- * @interface OrdersApiGetTradeRequest
+ * @interface GetTradeRequest
  */
-export interface OrdersApiGetTradeRequest {
+export interface GetTradeRequest {
     /**
      * 
      * @type {string}
-     * @memberof OrdersApiGetTrade
+     * @memberof GetTrade
      */
     readonly chainName: string
 
     /**
      * Global Trade identifier
      * @type {string}
-     * @memberof OrdersApiGetTrade
+     * @memberof GetTrade
      */
     readonly tradeId: string
 }
@@ -186,69 +186,69 @@ export interface OrdersApiGetTradeRequest {
 /**
  * Request parameters for listListings operation in OrdersApi.
  * @export
- * @interface OrdersApiListListingsRequest
+ * @interface ListListingsRequest
  */
-export interface OrdersApiListListingsRequest {
+export interface ListListingsRequest {
     /**
      * 
      * @type {string}
-     * @memberof OrdersApiListListings
+     * @memberof ListListings
      */
     readonly chainName: string
 
     /**
      * Order status to filter by
      * @type {OrderStatus}
-     * @memberof OrdersApiListListings
+     * @memberof ListListings
      */
     readonly status?: OrderStatus
 
     /**
      * Sell item contract address to filter by
      * @type {string}
-     * @memberof OrdersApiListListings
+     * @memberof ListListings
      */
     readonly sellItemContractAddress?: string
 
     /**
      * Buy item contract address to filter by
      * @type {string}
-     * @memberof OrdersApiListListings
+     * @memberof ListListings
      */
     readonly buyItemContractAddress?: string
 
     /**
      * Sell item token identifier to filter by
      * @type {string}
-     * @memberof OrdersApiListListings
+     * @memberof ListListings
      */
     readonly sellItemTokenId?: string
 
     /**
      * Maximum number of orders to return per page
      * @type {number}
-     * @memberof OrdersApiListListings
+     * @memberof ListListings
      */
     readonly pageSize?: number
 
     /**
      * Order field to sort by
      * @type {'created_at' | 'updated_at' | 'buy_item_amount'}
-     * @memberof OrdersApiListListings
+     * @memberof ListListings
      */
     readonly sortBy?: ListListingsSortByEnum
 
     /**
      * Ascending or descending direction for sort
      * @type {'asc' | 'desc'}
-     * @memberof OrdersApiListListings
+     * @memberof ListListings
      */
     readonly sortDirection?: ListListingsSortDirectionEnum
 
     /**
      * Page cursor to retrieve previous or next page. Use the value returned in the response.
      * @type {string}
-     * @memberof OrdersApiListListings
+     * @memberof ListListings
      */
     readonly pageCursor?: string
 }
@@ -256,48 +256,48 @@ export interface OrdersApiListListingsRequest {
 /**
  * Request parameters for listTrades operation in OrdersApi.
  * @export
- * @interface OrdersApiListTradesRequest
+ * @interface ListTradesRequest
  */
-export interface OrdersApiListTradesRequest {
+export interface ListTradesRequest {
     /**
      * 
      * @type {string}
-     * @memberof OrdersApiListTrades
+     * @memberof ListTrades
      */
     readonly chainName: string
 
     /**
      * 
      * @type {string}
-     * @memberof OrdersApiListTrades
+     * @memberof ListTrades
      */
     readonly accountAddress?: string
 
     /**
      * Maximum number of trades to return per page
      * @type {number}
-     * @memberof OrdersApiListTrades
+     * @memberof ListTrades
      */
     readonly pageSize?: number
 
     /**
      * Trade field to sort by
      * @type {'indexed_at'}
-     * @memberof OrdersApiListTrades
+     * @memberof ListTrades
      */
     readonly sortBy?: ListTradesSortByEnum
 
     /**
      * Ascending or descending direction for sort
      * @type {'asc' | 'desc'}
-     * @memberof OrdersApiListTrades
+     * @memberof ListTrades
      */
     readonly sortDirection?: ListTradesSortDirectionEnum
 
     /**
      * Page cursor to retrieve previous or next page. Use the value returned in the response.
      * @type {string}
-     * @memberof OrdersApiListTrades
+     * @memberof ListTrades
      */
     readonly pageCursor?: string
 }

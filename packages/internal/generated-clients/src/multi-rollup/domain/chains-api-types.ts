@@ -33,20 +33,20 @@ export { ListChainsResult } from '../models';
 /**
  * Request parameters for listChains operation in ChainsApi.
  * @export
- * @interface ChainsApiListChainsRequest
+ * @interface ListChainsRequest
  */
-export interface ChainsApiListChainsRequest {
+export interface ListChainsRequest {
     /**
      * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
      * @type {string}
-     * @memberof ChainsApiListChains
+     * @memberof ListChains
      */
     readonly pageCursor?: string
 
     /**
      * Maximum number of items to return
      * @type {number}
-     * @memberof ChainsApiListChains
+     * @memberof ListChains
      */
     readonly pageSize?: number
 }

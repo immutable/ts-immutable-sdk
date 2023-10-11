@@ -41,27 +41,27 @@ export { ListNFTsResult } from '../models';
 /**
  * Request parameters for getNFT operation in NftsApi.
  * @export
- * @interface NftsApiGetNFTRequest
+ * @interface GetNFTRequest
  */
-export interface NftsApiGetNFTRequest {
+export interface GetNFTRequest {
     /**
      * The address of NFT contract
      * @type {string}
-     * @memberof NftsApiGetNFT
+     * @memberof GetNFT
      */
     readonly contractAddress: string
 
     /**
      * An &#x60;uint256&#x60; token id as string
      * @type {string}
-     * @memberof NftsApiGetNFT
+     * @memberof GetNFT
      */
     readonly tokenId: string
 
     /**
      * The name of chain
      * @type {string}
-     * @memberof NftsApiGetNFT
+     * @memberof GetNFT
      */
     readonly chainName: string
 }
@@ -69,34 +69,34 @@ export interface NftsApiGetNFTRequest {
 /**
  * Request parameters for listAllNFTOwners operation in NftsApi.
  * @export
- * @interface NftsApiListAllNFTOwnersRequest
+ * @interface ListAllNFTOwnersRequest
  */
-export interface NftsApiListAllNFTOwnersRequest {
+export interface ListAllNFTOwnersRequest {
     /**
      * The name of chain
      * @type {string}
-     * @memberof NftsApiListAllNFTOwners
+     * @memberof ListAllNFTOwners
      */
     readonly chainName: string
 
     /**
      * Datetime to use as the oldest updated timestamp
      * @type {string}
-     * @memberof NftsApiListAllNFTOwners
+     * @memberof ListAllNFTOwners
      */
     readonly fromUpdatedAt: string
 
     /**
      * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
      * @type {string}
-     * @memberof NftsApiListAllNFTOwners
+     * @memberof ListAllNFTOwners
      */
     readonly pageCursor?: string
 
     /**
      * Maximum number of items to return
      * @type {number}
-     * @memberof NftsApiListAllNFTOwners
+     * @memberof ListAllNFTOwners
      */
     readonly pageSize?: number
 }
@@ -104,34 +104,34 @@ export interface NftsApiListAllNFTOwnersRequest {
 /**
  * Request parameters for listAllNFTs operation in NftsApi.
  * @export
- * @interface NftsApiListAllNFTsRequest
+ * @interface ListAllNFTsRequest
  */
-export interface NftsApiListAllNFTsRequest {
+export interface ListAllNFTsRequest {
     /**
      * The name of chain
      * @type {string}
-     * @memberof NftsApiListAllNFTs
+     * @memberof ListAllNFTs
      */
     readonly chainName: string
 
     /**
      * Datetime to use as the oldest updated timestamp
      * @type {string}
-     * @memberof NftsApiListAllNFTs
+     * @memberof ListAllNFTs
      */
     readonly fromUpdatedAt?: string
 
     /**
      * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
      * @type {string}
-     * @memberof NftsApiListAllNFTs
+     * @memberof ListAllNFTs
      */
     readonly pageCursor?: string
 
     /**
      * Maximum number of items to return
      * @type {number}
-     * @memberof NftsApiListAllNFTs
+     * @memberof ListAllNFTs
      */
     readonly pageSize?: number
 }
@@ -139,41 +139,41 @@ export interface NftsApiListAllNFTsRequest {
 /**
  * Request parameters for listNFTs operation in NftsApi.
  * @export
- * @interface NftsApiListNFTsRequest
+ * @interface ListNFTsRequest
  */
-export interface NftsApiListNFTsRequest {
+export interface ListNFTsRequest {
     /**
      * Contract address
      * @type {string}
-     * @memberof NftsApiListNFTs
+     * @memberof ListNFTs
      */
     readonly contractAddress: string
 
     /**
      * The name of chain
      * @type {string}
-     * @memberof NftsApiListNFTs
+     * @memberof ListNFTs
      */
     readonly chainName: string
 
     /**
      * Datetime to use as the oldest updated timestamp
      * @type {string}
-     * @memberof NftsApiListNFTs
+     * @memberof ListNFTs
      */
     readonly fromUpdatedAt?: string
 
     /**
      * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
      * @type {string}
-     * @memberof NftsApiListNFTs
+     * @memberof ListNFTs
      */
     readonly pageCursor?: string
 
     /**
      * Maximum number of items to return
      * @type {number}
-     * @memberof NftsApiListNFTs
+     * @memberof ListNFTs
      */
     readonly pageSize?: number
 }
@@ -181,41 +181,41 @@ export interface NftsApiListNFTsRequest {
 /**
  * Request parameters for listNFTsByAccountAddress operation in NftsApi.
  * @export
- * @interface NftsApiListNFTsByAccountAddressRequest
+ * @interface ListNFTsByAccountAddressRequest
  */
-export interface NftsApiListNFTsByAccountAddressRequest {
+export interface ListNFTsByAccountAddressRequest {
     /**
      * Account address
      * @type {string}
-     * @memberof NftsApiListNFTsByAccountAddress
+     * @memberof ListNFTsByAccountAddress
      */
     readonly accountAddress: string
 
     /**
      * The name of chain
      * @type {string}
-     * @memberof NftsApiListNFTsByAccountAddress
+     * @memberof ListNFTsByAccountAddress
      */
     readonly chainName: string
 
     /**
      * The address of contract
      * @type {string}
-     * @memberof NftsApiListNFTsByAccountAddress
+     * @memberof ListNFTsByAccountAddress
      */
     readonly contractAddress?: string
 
     /**
      * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
      * @type {string}
-     * @memberof NftsApiListNFTsByAccountAddress
+     * @memberof ListNFTsByAccountAddress
      */
     readonly pageCursor?: string
 
     /**
      * Maximum number of items to return
      * @type {number}
-     * @memberof NftsApiListNFTsByAccountAddress
+     * @memberof ListNFTsByAccountAddress
      */
     readonly pageSize?: number
 }

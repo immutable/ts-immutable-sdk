@@ -37,41 +37,41 @@ export { ListNFTOwnersResult } from '../models';
 /**
  * Request parameters for listNFTOwners operation in NftOwnersApi.
  * @export
- * @interface NftOwnersApiListNFTOwnersRequest
+ * @interface ListNFTOwnersRequest
  */
-export interface NftOwnersApiListNFTOwnersRequest {
+export interface ListNFTOwnersRequest {
     /**
      * The address of contract
      * @type {string}
-     * @memberof NftOwnersApiListNFTOwners
+     * @memberof ListNFTOwners
      */
     readonly contractAddress: string
 
     /**
      * An &#x60;uint256&#x60; token id as string
      * @type {string}
-     * @memberof NftOwnersApiListNFTOwners
+     * @memberof ListNFTOwners
      */
     readonly tokenId: string
 
     /**
      * The name of chain
      * @type {string}
-     * @memberof NftOwnersApiListNFTOwners
+     * @memberof ListNFTOwners
      */
     readonly chainName: string
 
     /**
      * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
      * @type {string}
-     * @memberof NftOwnersApiListNFTOwners
+     * @memberof ListNFTOwners
      */
     readonly pageCursor?: string
 
     /**
      * Maximum number of items to return
      * @type {number}
-     * @memberof NftOwnersApiListNFTOwners
+     * @memberof ListNFTOwners
      */
     readonly pageSize?: number
 }
@@ -79,41 +79,41 @@ export interface NftOwnersApiListNFTOwnersRequest {
 /**
  * Request parameters for listOwnersByContractAddress operation in NftOwnersApi.
  * @export
- * @interface NftOwnersApiListOwnersByContractAddressRequest
+ * @interface ListOwnersByContractAddressRequest
  */
-export interface NftOwnersApiListOwnersByContractAddressRequest {
+export interface ListOwnersByContractAddressRequest {
     /**
      * The address of contract
      * @type {string}
-     * @memberof NftOwnersApiListOwnersByContractAddress
+     * @memberof ListOwnersByContractAddress
      */
     readonly contractAddress: string
 
     /**
      * The name of chain
      * @type {string}
-     * @memberof NftOwnersApiListOwnersByContractAddress
+     * @memberof ListOwnersByContractAddress
      */
     readonly chainName: string
 
     /**
      * Datetime to use as the oldest updated timestamp
      * @type {string}
-     * @memberof NftOwnersApiListOwnersByContractAddress
+     * @memberof ListOwnersByContractAddress
      */
     readonly fromUpdatedAt?: string
 
     /**
      * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
      * @type {string}
-     * @memberof NftOwnersApiListOwnersByContractAddress
+     * @memberof ListOwnersByContractAddress
      */
     readonly pageCursor?: string
 
     /**
      * Maximum number of items to return
      * @type {number}
-     * @memberof NftOwnersApiListOwnersByContractAddress
+     * @memberof ListOwnersByContractAddress
      */
     readonly pageSize?: number
 }

@@ -37,20 +37,20 @@ export { ListTokensResult } from '../models';
 /**
  * Request parameters for getERC20Token operation in TokensApi.
  * @export
- * @interface TokensApiGetERC20TokenRequest
+ * @interface GetERC20TokenRequest
  */
-export interface TokensApiGetERC20TokenRequest {
+export interface GetERC20TokenRequest {
     /**
      * The address of contract
      * @type {string}
-     * @memberof TokensApiGetERC20Token
+     * @memberof GetERC20Token
      */
     readonly contractAddress: string
 
     /**
      * The name of chain
      * @type {string}
-     * @memberof TokensApiGetERC20Token
+     * @memberof GetERC20Token
      */
     readonly chainName: string
 }
@@ -58,34 +58,34 @@ export interface TokensApiGetERC20TokenRequest {
 /**
  * Request parameters for listERC20Tokens operation in TokensApi.
  * @export
- * @interface TokensApiListERC20TokensRequest
+ * @interface ListERC20TokensRequest
  */
-export interface TokensApiListERC20TokensRequest {
+export interface ListERC20TokensRequest {
     /**
      * The name of chain
      * @type {string}
-     * @memberof TokensApiListERC20Tokens
+     * @memberof ListERC20Tokens
      */
     readonly chainName: string
 
     /**
      * Datetime to use as the oldest updated timestamp
      * @type {string}
-     * @memberof TokensApiListERC20Tokens
+     * @memberof ListERC20Tokens
      */
     readonly fromUpdatedAt?: string
 
     /**
      * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
      * @type {string}
-     * @memberof TokensApiListERC20Tokens
+     * @memberof ListERC20Tokens
      */
     readonly pageCursor?: string
 
     /**
      * Maximum number of items to return
      * @type {number}
-     * @memberof TokensApiListERC20Tokens
+     * @memberof ListERC20Tokens
      */
     readonly pageSize?: number
 }
