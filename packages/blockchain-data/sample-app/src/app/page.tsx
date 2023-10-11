@@ -428,7 +428,7 @@ export default function Home() {
       const client = new BlockchainData(config);
 
       try {
-        const request: ChainsApi.ChainsApiListChainsRequest = {};
+        const request: ChainsApi.ListChainsRequest = {};
         const response = await client.listChains(request);
         setResponse(response);
       } catch (error) {
