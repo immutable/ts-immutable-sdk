@@ -28,7 +28,7 @@ declare global {
       'imtbl-swap': ImtblSwapProps;
       'imtbl-bridge': ImtblBridgeProps;
       'imtbl-onramp': ImtblOnRampProps;
-      'imtbl-primary-revenue': ImtblPrimaryRevenueProps;
+      'imtbl-sale': ImtblSaleProps;
     }
   }
 
@@ -137,9 +137,9 @@ export interface ImtblOnRampProps
 }
 
 /**
- * Interface for the properties of the primary revenue web component.
+ * Interface for the properties of the Sale web component.
  * Extends the React.DetailedHTMLProps interface to inherit HTML attributes for an HTMLElement.
- * @interface ImtblPrimaryRevenueProps
+ * @interface ImtblSaleProps
  * @extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>
  * @property {string | undefined} widgetConfig - Optional string representing the widget configuration.
  * @property {string | undefined} amount - The amount to be paid.
@@ -148,7 +148,7 @@ export interface ImtblOnRampProps
  * @property {string | undefined} env - The environment to use: SANDBOX, DEV, PRODUCTION, ...
  * @property {string | undefined} environmentId - The environment id from Immutable Hub.
  */
-export interface ImtblPrimaryRevenueProps
+export interface ImtblSaleProps
   extends React.DetailedHTMLProps<
   React.HTMLAttributes<HTMLElement>,
   HTMLElement
