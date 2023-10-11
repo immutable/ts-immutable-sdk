@@ -5,6 +5,5 @@
   "withSeparateModelsAndApi": true,
   "modelPackage": "models",
   "apiPackage": "domain",
-  "useSingleRequestParameter": true,
-  "outputDir": "src/multi-rollup"
+  "useSingleRequestParameter": true
 }
