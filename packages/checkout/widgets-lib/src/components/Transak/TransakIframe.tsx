@@ -47,7 +47,7 @@ export function TransakIframe(props: TransactionIframeProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const { onLoad, initialised } = useTransakEvents({
-    userJourney: UserJourney.MINT,
+    userJourney: UserJourney.SALE,
     ref: iframeRef,
     email,
     userId: walletAddress,
