@@ -16,7 +16,7 @@ import { useSignOrder } from '../hooks/useSignOrder';
 import { ConnectLoaderState } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 
-type SharedContextProps = {
+type SaleContextProps = {
   config: StrongCheckoutWidgetsConfig;
   env: string;
   environmentId: string;
@@ -28,7 +28,7 @@ type SharedContextProps = {
   passport?: Passport;
 };
 
-type SharedContextValues = SharedContextProps & {
+type SaleContextValues = SaleContextProps & {
   sign: (paymentType: PaymentTypes, callback?: () => void) => Promise<SignResponse | undefined>;
   execute: () => Promise<SaleSuccess>;
   recipientAddress: string;
@@ -40,7 +40,7 @@ type SharedContextValues = SharedContextProps & {
 };
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-const SharedContext = createContext<SharedContextValues>({
+const SaleContext = createContext<SaleContextValues>({
   items: [],
   amount: '',
   fromContractAddress: '',
@@ -60,11 +60,11 @@ const SharedContext = createContext<SharedContextValues>({
   config: {} as StrongCheckoutWidgetsConfig,
 });
 
-SharedContext.displayName = 'SaleSharedContext';
+SaleContext.displayName = 'SaleSaleContext';
 
-export function SharedContextProvider(props: {
+export function SaleContextProvider(props: {
   children: ReactNode;
-  value: SharedContextProps;
+  value: SaleContextProps;
 }) {
   const {
     children,
@@ -156,10 +156,10 @@ export function SharedContextProvider(props: {
   );
 
   return (
-    <SharedContext.Provider value={values}>{children}</SharedContext.Provider>
+    <SaleContext.Provider value={values}>{children}</SaleContext.Provider>
   );
 }
 
-export function useSharedContext() {
-  return useContext(SharedContext);
+export function useSaleContext() {
+  return useContext(SaleContext);
 }

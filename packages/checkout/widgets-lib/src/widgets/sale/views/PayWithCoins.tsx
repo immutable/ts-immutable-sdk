@@ -13,14 +13,14 @@ import {
   sendSaleWidgetCloseEvent,
 } from '../SaleWidgetEvents';
 import { ViewContext } from '../../../context/view-context/ViewContext';
-import { useSharedContext } from '../context/SharedContextProvider';
+import { useSaleContext } from '../context/SaleContextProvider';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 
 export function PayWithCoins() {
   const text = textConfig.views[SaleWidgetViews.PAY_WITH_COINS];
   const [loading, setLoading] = useState(false);
   const { viewState } = useContext(ViewContext);
-  const { execute, signResponse } = useSharedContext();
+  const { execute, signResponse } = useSaleContext();
   const currency = signResponse?.order.currency || '';
 
   const {

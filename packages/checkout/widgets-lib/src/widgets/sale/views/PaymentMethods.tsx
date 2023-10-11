@@ -17,7 +17,7 @@ import { sendSaleWidgetCloseEvent } from '../SaleWidgetEvents';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { PaymentOptions } from '../components/PaymentOptions';
 
-import { useSharedContext } from '../context/SharedContextProvider';
+import { useSaleContext } from '../context/SaleContextProvider';
 import { PaymentTypes } from '../types';
 
 export function PaymentMethods() {
@@ -30,7 +30,7 @@ export function PaymentMethods() {
   } = useContext(EventTargetContext);
   const {
     paymentMethod, setPaymentMethod, sign, signResponse,
-  } = useSharedContext();
+  } = useSaleContext();
 
   const handleOptionClick = (type: PaymentTypes) => setPaymentMethod(type);
 
