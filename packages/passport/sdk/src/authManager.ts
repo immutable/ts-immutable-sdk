@@ -145,7 +145,7 @@ export default class AuthManager {
 
   public async login(): Promise<User> {
     return withPassportError<User>(async () => {
-      const popupWindowFeatures = { width: 410, height: 450 };
+      const popupWindowFeatures = { width: 485, height: 760 };
       const oidcUser = await this.userManager.signinPopup({
         popupWindowFeatures,
       });
