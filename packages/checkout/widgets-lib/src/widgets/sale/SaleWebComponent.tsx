@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { PrimaryRevenueWidget } from './PrimaryRevenueWidget';
+import { SaleWidget } from './SaleWidget';
 import {
   ConnectLoader,
   ConnectLoaderParams,
@@ -8,11 +8,11 @@ import {
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
 import { ConnectTargetLayer, getL1ChainId, getL2ChainId } from '../../lib';
 import { isValidAmount } from '../../lib/validations/widgetValidators';
-import { sendPrimaryRevenueWidgetCloseEvent } from './PrimaryRevenueWidgetEvents';
+import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
 import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 import { Item } from './types';
 
-export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
+export class ImmutableSale extends ImmutableWebComponent {
   /**
    * Amount to be paid
    */
@@ -41,7 +41,7 @@ export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
   private items: Item[] = [];
 
   constructor() {
-    console.log('ImmutablePrimaryRevenue constructor'); // eslint-disable-line no-console
+    console.log('ImmutableSale constructor'); // eslint-disable-line no-console
     super();
   }
 
@@ -164,10 +164,10 @@ export class ImmutablePrimaryRevenue extends ImmutableWebComponent {
             widgetConfig={this.widgetConfig!}
             params={connectLoaderParams}
             closeEvent={() => {
-              sendPrimaryRevenueWidgetCloseEvent(window);
+              sendSaleWidgetCloseEvent(window);
             }}
           >
-            <PrimaryRevenueWidget
+            <SaleWidget
               config={this.widgetConfig!}
               items={this.items}
               amount={this.amount}

@@ -13,9 +13,9 @@
   },
   "scripts": {
     "build": "yarn updateGameBridgeVersion && parcel build --no-cache --no-scope-hoist && yarn revertGameBridgeVersion",
+    "revertGameBridgeVersion": "./scripts/revertSdkVersion.sh",
     "start": "parcel",
-    "updateGameBridgeVersion": "./scripts/updateSdkVersion.sh",
-    "revertGameBridgeVersion": "./scripts/revertSdkVersion.sh"
+    "updateGameBridgeVersion": "./scripts/updateSdkVersion.sh"
   },
   "source": "src/index.html",
   "targets": {
