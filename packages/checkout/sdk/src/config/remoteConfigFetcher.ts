@@ -8,6 +8,7 @@ import {
   RemoteConfiguration,
   ChainTokensConfig,
 } from '../types';
+import { CheckoutError, CheckoutErrorType } from '../errors';
 
 export type RemoteConfigParams = {
   isDevelopment: boolean;
@@ -34,12 +35,13 @@ export class RemoteConfigFetcher {
     try {
       response = await axios.get(url);
     } catch (error: any) {
-      throw new Error(`Error fetching from api: ${error.message}`);
+      throw new CheckoutError(`Error fetching from api: ${error.message}`, CheckoutErrorType.API_ERROR);
     }
 
     if (response.status !== 200) {
-      throw new Error(
+      throw new CheckoutError(
         `Error fetching from api: ${response.status} ${response.statusText}`,
+        CheckoutErrorType.API_ERROR,
       );
     }
 
