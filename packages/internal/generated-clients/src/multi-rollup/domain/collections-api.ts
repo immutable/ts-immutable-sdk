@@ -321,29 +321,12 @@ export const CollectionsApiFactory = function (configuration?: Configuration, ba
         /**
          * List all collections
          * @summary List all collections
-<<<<<<< HEAD
-         * @param {string} chainName The name of chain
-         * @param {Array<string>} [contractAddress] List of contract addresses to filter by
-         * @param {string} [fromUpdatedAt] Datetime to use as the oldest updated timestamp
-         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
-         * @param {number} [pageSize] Maximum number of items to return
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        listCollections(chainName: string, contractAddress?: Array<string>, fromUpdatedAt?: string, pageCursor?: string, pageSize?: number, options?: any): AxiosPromise<ListCollectionsResult> {
-            return localVarFp.listCollections(chainName, contractAddress, fromUpdatedAt, pageCursor, pageSize, options).then((request) => request(axios, basePath));
-=======
          * @param {CollectionsApiListCollectionsRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         listCollections(requestParameters: CollectionsApiListCollectionsRequest, options?: AxiosRequestConfig): AxiosPromise<ListCollectionsResult> {
-<<<<<<< HEAD
-            return localVarFp.listCollections(requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
->>>>>>> 5c52cefa (upgrade generator version)
-=======
             return localVarFp.listCollections(requestParameters.chainName, requestParameters.contractAddress, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
->>>>>>> 1f74dc19 (use latest spec)
         },
         /**
          * List collections by NFT owner account address
