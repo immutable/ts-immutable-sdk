@@ -18,7 +18,7 @@ export const cancel = async (
   let unsignedCancelOrderTransaction: PopulatedTransaction;
   if (orderIds.length === 0) {
     throw new CheckoutError(
-      'No orderIds were passed in, must pass at least one orderId to cancel',
+      'No orderIds were provided to the orderIds array. Please provide at least one orderId.',
       CheckoutErrorType.CANCEL_ORDER_LISTING_ERROR,
     );
   }

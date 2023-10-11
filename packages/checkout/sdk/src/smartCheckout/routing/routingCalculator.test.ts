@@ -1034,11 +1034,11 @@ describe('routingCalculator', () => {
         fundingRoutes: [
           {
             priority: 1,
-            steps: [bridgeFundingStep],
+            steps: [swapFundingStep],
           },
           {
             priority: 2,
-            steps: [swapFundingStep],
+            steps: [bridgeFundingStep],
           },
           {
             priority: 3,
