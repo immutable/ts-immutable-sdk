@@ -16,6 +16,7 @@ domain/passport-api.ts
 domain/tokens-api.ts
 git_push.sh
 index.ts
+models/active-order-status.ts
 models/activity-asset.ts
 models/activity-details.ts
 models/activity-native-token.ts
@@ -41,9 +42,9 @@ models/basic-apierror.ts
 models/blockchain-metadata.ts
 models/burn.ts
 models/cancel-orders-request-body.ts
-models/cancel-orders-result-result-failed-cancellations-inner.ts
-models/cancel-orders-result-result.ts
+models/cancel-orders-result-data.ts
 models/cancel-orders-result.ts
+models/cancelled-order-status.ts
 models/chain-with-details-all-of.ts
 models/chain-with-details.ts
 models/chain.ts
@@ -56,7 +57,10 @@ models/create-listing-request-body.ts
 models/deposit.ts
 models/erc20-item.ts
 models/erc721-item.ts
+models/expired-order-status.ts
+models/failed-order-cancellation.ts
 models/fee.ts
+models/filled-order-status.ts
 models/fulfillable-order.ts
 models/fulfillment-data-request.ts
 models/fulfillment-data200-response-result.ts
@@ -67,6 +71,7 @@ models/get-linked-addresses-res.ts
 models/get-metadata-result.ts
 models/get-nftresult.ts
 models/get-token-result.ts
+models/inactive-order-status.ts
 models/index.ts
 models/item.ts
 models/list-activities-result.ts
@@ -93,9 +98,11 @@ models/nftowner.ts
 models/nftsale.ts
 models/nftwith-metadata-attributes.ts
 models/nftwith-owner.ts
+models/order-status-name.ts
 models/order-status.ts
 models/order.ts
 models/page.ts
+models/pending-order-status.ts
 models/protocol-data.ts
 models/refresh-collection-metadata-request.ts
 models/refresh-collection-metadata-result.ts

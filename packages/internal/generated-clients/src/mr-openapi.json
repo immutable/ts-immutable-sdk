@@ -292,6 +292,19 @@
             }
           },
           {
+            "name": "contract_address",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "List of contract addresses to filter by",
+            "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
+          },
+          {
             "name": "from_updated_at",
             "in": "query",
             "description": "Datetime to use as the oldest updated timestamp",
@@ -1713,7 +1726,7 @@
             "description": "Order status to filter by",
             "required": false,
             "schema": {
-              "$ref": "#/components/schemas/OrderStatus"
+              "$ref": "#/components/schemas/OrderStatusName"
             }
           },
           {
@@ -4673,7 +4686,9 @@
           ],
           "signature": "0x",
           "start_at": "2022-03-09T05:00:50.52Z",
-          "status": "ACTIVE",
+          "status": {
+            "value": "ACTIVE"
+          },
           "updated_at": "2022-03-07T07:20:50.52Z"
         },
         "required": [
@@ -4819,54 +4834,7 @@
         "type": "object",
         "properties": {
           "result": {
-            "type": "object",
-            "properties": {
-              "successful_cancellations": {
-                "type": "array",
-                "description": "Orders which were successfully cancelled",
-                "items": {
-                  "type": "string"
-                }
-              },
-              "pending_cancellations": {
-                "type": "array",
-                "description": "Orders which are marked for cancellation but the cancellation cannot be guaranteed",
-                "items": {
-                  "type": "string"
-                }
-              },
-              "failed_cancellations": {
-                "type": "array",
-                "description": "Orders which failed to be cancelled",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "order": {
-                      "type": "string",
-                      "description": "ID of the order which failed to be cancelled",
-                      "example": "7df3e99e-f7b3-459c-bef6-ffb66a18bb59"
-                    },
-                    "reason_code": {
-                      "type": "string",
-                      "enum": [
-                        "ALREADY_FILLED"
-                      ],
-                      "description": "Reason code indicating why the order failed to be cancelled",
-                      "example": "ALREADY_FILLED"
-                    }
-                  },
-                  "required": [
-                    "order",
-                    "reason_code"
-                  ]
-                }
-              }
-            },
-            "required": [
-              "successful_cancellations",
-              "pending_cancellations",
-              "failed_cancellations"
-            ]
+            "$ref": "#/components/schemas/CancelOrdersResultData"
           }
         },
         "required": [
@@ -4894,6 +4862,65 @@
             ]
           }
         }
+      },
+      "CancelOrdersResultData": {
+        "type": "object",
+        "properties": {
+          "successful_cancellations": {
+            "type": "array",
+            "description": "Orders which were successfully cancelled",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 0,
+            "maxItems": 10
+          },
+          "pending_cancellations": {
+            "type": "array",
+            "description": "Orders which are marked for cancellation but the cancellation cannot be guaranteed",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 0,
+            "maxItems": 10
+          },
+          "failed_cancellations": {
+            "type": "array",
+            "description": "Orders which failed to be cancelled",
+            "items": {
+              "$ref": "#/components/schemas/FailedOrderCancellation"
+            },
+            "minItems": 0,
+            "maxItems": 10
+          }
+        },
+        "required": [
+          "successful_cancellations",
+          "pending_cancellations",
+          "failed_cancellations"
+        ]
+      },
+      "FailedOrderCancellation": {
+        "type": "object",
+        "properties": {
+          "order": {
+            "type": "string",
+            "description": "ID of the order which failed to be cancelled",
+            "example": "7df3e99e-f7b3-459c-bef6-ffb66a18bb59"
+          },
+          "reason_code": {
+            "type": "string",
+            "enum": [
+              "ALREADY_FILLED"
+            ],
+            "description": "Reason code indicating why the order failed to be cancelled",
+            "example": "ALREADY_FILLED"
+          }
+        },
+        "required": [
+          "order",
+          "reason_code"
+        ]
       },
       "ListingResult": {
         "type": "object",
@@ -4940,7 +4967,9 @@
             ],
             "signature": "0x",
             "start_at": "2022-03-09T05:00:50.52Z",
-            "status": "EXPIRED",
+            "status": {
+              "value": "EXPIRED"
+            },
             "updated_at": "2022-03-07T07:20:50.52Z"
           }
         }
@@ -5004,7 +5033,9 @@
               ],
               "signature": "0x",
               "start_at": "2022-03-09T05:00:50.52Z",
-              "status": "EXPIRED",
+              "status": {
+                "value": "EXPIRED"
+              },
               "updated_at": "2022-03-07T07:20:50.52Z"
             },
             {
@@ -5041,7 +5072,9 @@
               ],
               "signature": "0x",
               "start_at": "2022-03-09T05:00:50.52Z",
-              "status": "EXPIRED",
+              "status": {
+                "value": "EXPIRED"
+              },
               "updated_at": "2022-03-07T07:20:50.52Z"
             }
           ]
@@ -5173,16 +5206,155 @@
         }
       },
       "OrderStatus": {
+        "description": "The Order status",
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/CancelledOrderStatus"
+          },
+          {
+            "$ref": "#/components/schemas/PendingOrderStatus"
+          },
+          {
+            "$ref": "#/components/schemas/ActiveOrderStatus"
+          },
+          {
+            "$ref": "#/components/schemas/InactiveOrderStatus"
+          },
+          {
+            "$ref": "#/components/schemas/FilledOrderStatus"
+          },
+          {
+            "$ref": "#/components/schemas/ExpiredOrderStatus"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "name",
+          "mapping": {
+            "CANCELLED": "#/components/schemas/CancelledOrderStatus",
+            "PENDING": "#/components/schemas/PendingOrderStatus",
+            "ACTIVE": "#/components/schemas/ActiveOrderStatus",
+            "INACTIVE": "#/components/schemas/InactiveOrderStatus",
+            "FILLED": "#/components/schemas/FilledOrderStatus",
+            "EXPIRED": "#/components/schemas/ExpiredOrderStatus"
+          }
+        }
+      },
+      "CancelledOrderStatus": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The order status",
+            "enum": [
+              "CANCELLED"
+            ]
+          },
+          "is_pending": {
+            "type": "boolean",
+            "description": "Whether the cancellation of the order is pending",
+            "example": false
+          },
+          "cancellation_type": {
+            "type": "string",
+            "description": "Whether the cancellation was done on-chain or off-chain",
+            "enum": [
+              "ON_CHAIN",
+              "OFF_CHAIN"
+            ],
+            "example": "ON_CHAIN"
+          }
+        },
+        "required": [
+          "name",
+          "is_pending",
+          "cancellation_type"
+        ]
+      },
+      "PendingOrderStatus": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The order status",
+            "enum": [
+              "PENDING"
+            ]
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "ActiveOrderStatus": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The order status",
+            "enum": [
+              "ACTIVE"
+            ]
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "InactiveOrderStatus": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The order status",
+            "enum": [
+              "INACTIVE"
+            ]
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "ExpiredOrderStatus": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The order status",
+            "enum": [
+              "EXPIRED"
+            ]
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "FilledOrderStatus": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The order status",
+            "enum": [
+              "FILLED"
+            ]
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "OrderStatusName": {
         "type": "string",
         "description": "The Order status",
-        "example": "ACTIVE",
         "enum": [
           "PENDING",
           "ACTIVE",
           "INACTIVE",
           "FILLED",
-          "CANCELLED",
-          "EXPIRED"
+          "EXPIRED",
+          "CANCELLED"
         ]
       },
       "ProtocolData": {
