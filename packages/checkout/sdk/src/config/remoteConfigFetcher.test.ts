@@ -2,6 +2,7 @@ import axios from 'axios';
 import { Environment } from '@imtbl/config';
 import { CHECKOUT_API_BASE_URL, ChainId, ENV_DEVELOPMENT } from '../types';
 import { RemoteConfigFetcher } from './remoteConfigFetcher';
+import { CheckoutError, CheckoutErrorType } from '../errors';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -117,7 +118,12 @@ describe('RemoteConfig', () => {
           isProduction: env !== ENV_DEVELOPMENT && env === Environment.PRODUCTION,
         });
 
-        await expect(fetcher.getConfig()).rejects.toThrowError(new Error('Error fetching from api: error message'));
+        await expect(fetcher.getConfig()).rejects.toThrow(
+          new CheckoutError(
+            'Error fetching from api: error message',
+            CheckoutErrorType.API_ERROR,
+          ),
+        );
       });
     });
 
@@ -192,7 +198,12 @@ describe('RemoteConfig', () => {
 
         await expect(fetcher.getTokensConfig(ChainId.SEPOLIA))
           .rejects
-          .toThrow(new Error('Error fetching from api: 500 error message'));
+          .toThrow(
+            new CheckoutError(
+              'Error fetching from api: 500 error message',
+              CheckoutErrorType.API_ERROR,
+            ),
+          );
       });
 
       it(`should throw error when error fetching [${env}]`, async () => {
@@ -207,7 +218,12 @@ describe('RemoteConfig', () => {
 
         await expect(fetcher.getTokensConfig(ChainId.SEPOLIA))
           .rejects
-          .toThrow(new Error('Error fetching from api: error message'));
+          .toThrow(
+            new CheckoutError(
+              'Error fetching from api: error message',
+              CheckoutErrorType.API_ERROR,
+            ),
+          );
       });
     });
   });

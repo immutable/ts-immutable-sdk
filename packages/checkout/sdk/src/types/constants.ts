@@ -16,6 +16,18 @@ const ZKEVM_NATIVE_TOKEN = {
 };
 
 /**
+ * Base URL for the Immutable API based on the environment.
+ * @property {string} DEVELOPMENT - The base URL for the development environment.
+ * @property {string} SANDBOX - The base URL for the sandbox environment.
+ * @property {string} PRODUCTION - The base URL for the production environment.
+ */
+export const IMMUTABLE_API_BASE_URL = {
+  [ENV_DEVELOPMENT]: 'https://api.dev.immutable.com',
+  [Environment.SANDBOX]: 'https://api.sandbox.immutable.com',
+  [Environment.PRODUCTION]: 'https://api.immutable.com',
+};
+
+/**
  * Base URL for the checkout API based on the environment.
  * @property {string} DEVELOPMENT - The base URL for the development environment.
  * @property {string} SANDBOX - The base URL for the sandbox environment.
