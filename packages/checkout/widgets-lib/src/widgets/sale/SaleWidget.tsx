@@ -24,7 +24,7 @@ import { EventTargetContext } from '../../context/event-target-context/EventTarg
 import { SaleWidgetViews } from '../../context/view-context/SaleViewContextTypes';
 import { Item, MintErrorTypes } from './types';
 import { widgetTheme } from '../../lib/theme';
-import { SharedContextProvider } from './context/SharedContextProvider';
+import { SaleContextProvider } from './context/SaleContextProvider';
 import { FundWithSmartCheckout } from './views/FundWithSmartCheckout';
 import { PayWithCard } from './views/PayWithCard';
 import { PayWithCoins } from './views/PayWithCoins';
@@ -203,7 +203,7 @@ export function SaleWidget(props: SaleWidgetProps) {
   return (
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>
       <ViewContext.Provider value={viewReducerValues}>
-        <SharedContextProvider
+        <SaleContextProvider
           value={{
             config,
             items,
@@ -250,7 +250,7 @@ export function SaleWidget(props: SaleWidgetProps) {
           {viewState.view.type === SaleWidgetViews.FUND_WITH_SMART_CHECKOUT && (
             <FundWithSmartCheckout subView={viewState.view.subView} />
           )}
-        </SharedContextProvider>
+        </SaleContextProvider>
       </ViewContext.Provider>
     </BiomeCombinedProviders>
   );
