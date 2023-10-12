@@ -40,7 +40,6 @@ export function PayWithCard() {
           position: 'relative',
           maxWidth: '420px',
           height: '565px',
-          backgroundColor: 'white',
           borderRadius: '1%',
           overflow: 'hidden',
           margin: '0 auto',
