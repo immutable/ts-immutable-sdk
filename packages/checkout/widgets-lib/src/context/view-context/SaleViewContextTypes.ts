@@ -5,8 +5,8 @@ export enum SaleWidgetViews {
   PAY_WITH_COINS = 'PAY_WITH_COINS',
   PAY_WITH_CARD = 'PAY_WITH_CARD',
   FUND_WITH_SMART_CHECKOUT = 'FUND_WITH_SMART_CHECKOUT',
-  MINT_SUCCESS = 'MINT_SUCCESS',
-  MINT_FAIL = 'MINT_FAIL',
+  SALE_SUCCESS = 'SALE_SUCCESS',
+  SALE_FAIL = 'SALE_FAIL',
 }
 
 export type SaleWidgetView =
@@ -31,10 +31,10 @@ interface SaleSmartCheckoutView extends ViewType {
   subView: FundWithSmartCheckoutSubViews;
 }
 interface SaleSuccessView extends ViewType {
-  type: SaleWidgetViews.MINT_SUCCESS;
+  type: SaleWidgetViews.SALE_SUCCESS;
 }
 interface SaleFailView extends ViewType {
-  type: SaleWidgetViews.MINT_FAIL;
+  type: SaleWidgetViews.SALE_FAIL;
   reason?: string;
 }
 
