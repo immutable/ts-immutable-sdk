@@ -24,14 +24,12 @@ export function PayWithCoins() {
 
   if (signResponse !== undefined) {
     loadingText = text.loading.confirm;
-  }
-
-  if (executedTxns > 0 && executedTxns === expectedTxns) {
+  } else if (executedTxns > 0 && executedTxns === expectedTxns) {
     loadingText = text.loading.processing;
   }
 
   if (signResponse !== undefined) {
-    loadingText = `${loadingText} ${executedTxns + 1}/${expectedTxns}`;
+    loadingText = `${loadingText} ${executedTxns}/${expectedTxns}`;
   }
 
   const sendTransaction = async () => {
