@@ -9,7 +9,7 @@ import {
   PaymentTypes,
   Item,
   SignedOrderProduct,
-  MintErrorTypes,
+  SaleErrorTypes,
   SignOrderError,
 } from '../types';
 
@@ -171,17 +171,17 @@ export const useSignOrder = (input: SignOrderInput) => {
         transactionHash = txnResponse?.hash;
       } catch (e) {
         // TODO: check error type to send
-        // MintErrorTypes.PASSPORT_REJECTED or MintErrorTypes.PASSPORT_REJECTED_NO_FUNDS
+        // SaleErrorTypes.WALLET_REJECTED or SaleErrorTypes.WALLET_REJECTED_NO_FUNDS
 
         const reason = typeof e === 'string' ? e : (e as any).reason || '';
-        let errorType = MintErrorTypes.TRANSACTION_FAILED;
+        let errorType = SaleErrorTypes.TRANSACTION_FAILED;
 
         if (reason.includes('rejected') && reason.includes('user')) {
-          errorType = MintErrorTypes.PASSPORT_REJECTED;
+          errorType = SaleErrorTypes.WALLET_REJECTED;
         }
 
         if (reason.includes('failed to submit') && reason.includes('highest gas limit')) {
-          errorType = MintErrorTypes.PASSPORT_REJECTED_NO_FUNDS;
+          errorType = SaleErrorTypes.WALLET_REJECTED_NO_FUNDS;
         }
 
         setSignError({
@@ -235,7 +235,7 @@ export const useSignOrder = (input: SignOrderInput) => {
 
         return responseData;
       } catch (e) {
-        setSignError({ type: MintErrorTypes.DEFAULT, data: { error: e } });
+        setSignError({ type: SaleErrorTypes.DEFAULT, data: { error: e } });
       }
       return undefined;
     },
@@ -245,7 +245,7 @@ export const useSignOrder = (input: SignOrderInput) => {
   const execute = useCallback(async (): Promise<SaleSuccess> => {
     if (!signResponse) {
       setSignError({
-        type: MintErrorTypes.DEFAULT,
+        type: SaleErrorTypes.DEFAULT,
         data: { reason: 'No signed response, try again' },
       });
       return {};

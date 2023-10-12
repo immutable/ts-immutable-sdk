@@ -7,7 +7,7 @@ import { WalletWidgetViews } from '../../context/view-context/WalletViewContextT
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
 import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextTypes';
 import { SaleWidgetViews } from '../../context/view-context/SaleViewContextTypes';
-import { MintErrorTypes, PaymentTypes } from '../../widgets/sale/types';
+import { SaleErrorTypes, PaymentTypes } from '../../widgets/sale/types';
 import { ServiceType } from '../../views/error/serviceTypes';
 
 export const text = {
@@ -349,47 +349,47 @@ export const text = {
       screenTitle: 'Pay with card',
       loading: 'Taking you to Transak',
     },
-    [SaleWidgetViews.MINT_FAIL]: {
+    [SaleWidgetViews.SALE_FAIL]: {
       errors: {
-        [MintErrorTypes.TRANSACTION_FAILED]: {
+        [SaleErrorTypes.TRANSACTION_FAILED]: {
           description: 'Transaction failed',
           primaryAction: 'Try again',
           secondaryAction: 'View details',
         },
-        [MintErrorTypes.SERVICE_BREAKDOWN]: {
+        [SaleErrorTypes.SERVICE_BREAKDOWN]: {
           description:
             "Sorry, we're unable to process your payment right now. Please try again in a few minutes.",
           secondaryAction: 'Dismiss',
         },
-        [MintErrorTypes.TRANSAK_FAILED]: {
+        [SaleErrorTypes.TRANSAK_FAILED]: {
           description: 'Sorry, something went wrong. Please try again.',
           primaryAction: 'Try again',
           secondaryAction: 'Dismiss',
         },
-        [MintErrorTypes.PASSPORT_FAILED]: {
+        [SaleErrorTypes.WALLET_FAILED]: {
           description: "Sorry, we're unable to process this right now.",
           primaryAction: 'Go back',
           secondaryAction: 'Dismiss',
         },
-        [MintErrorTypes.PASSPORT_REJECTED_NO_FUNDS]: {
+        [SaleErrorTypes.WALLET_REJECTED_NO_FUNDS]: {
           description: 'Sorry, something went wrong. Plese try again.',
           primaryAction: 'Go back',
           secondaryAction: 'Dismiss',
         },
-        [MintErrorTypes.PASSPORT_REJECTED]: {
+        [SaleErrorTypes.WALLET_REJECTED]: {
           description:
             "You'll need to approve the transaction in your wallet to proceed.",
           primaryAction: 'Try again',
           secondaryAction: 'Cancel',
         },
-        [MintErrorTypes.DEFAULT]: {
+        [SaleErrorTypes.DEFAULT]: {
           description: 'Sorry, something went wrong. Please try again.',
           primaryAction: 'Try again',
           secondaryAction: 'Dismiss',
         },
       },
     },
-    [SaleWidgetViews.MINT_SUCCESS]: {
+    [SaleWidgetViews.SALE_SUCCESS]: {
       text: 'Order completed',
       actionText: 'Continue',
     },

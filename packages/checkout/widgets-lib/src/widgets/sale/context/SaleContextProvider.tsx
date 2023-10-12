@@ -13,7 +13,7 @@ import { Passport } from '@imtbl/passport';
 import { SaleSuccess } from '@imtbl/checkout-widgets';
 
 import {
-  Item, PaymentTypes, SignResponse, MintErrorTypes, SignOrderError,
+  Item, PaymentTypes, SignResponse, SaleErrorTypes, SignOrderError,
 } from '../types';
 import { useSignOrder } from '../hooks/useSignOrder';
 import { ConnectLoaderState } from '../../../context/connect-loader-context/ConnectLoaderContext';
@@ -47,7 +47,7 @@ type SaleContextValues = SaleContextProps & {
   paymentMethod: PaymentTypes | undefined;
   setPaymentMethod: (paymentMethod: PaymentTypes) => void;
   goBackToPaymentMethods: (paymentMethod?: PaymentTypes | undefined) => void;
-  goToErrorView: (type: MintErrorTypes, data?: Record<string, unknown>) => void;
+  goToErrorView: (type: SaleErrorTypes, data?: Record<string, unknown>) => void;
 };
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -121,7 +121,7 @@ export function SaleContextProvider(props: {
   }, []);
 
   const goToErrorView = useCallback(
-    (errorType: MintErrorTypes, data: Record<string, unknown> = {}) => {
+    (errorType: SaleErrorTypes, data: Record<string, unknown> = {}) => {
       errorRetries.current += 1;
       if (errorRetries.current > MAX_ERROR_RETRIES) {
         errorRetries.current = 0;
@@ -132,7 +132,7 @@ export function SaleContextProvider(props: {
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
-            type: SaleWidgetViews.MINT_FAIL,
+            type: SaleWidgetViews.SALE_FAIL,
             data: { errorType, ...data },
           },
         },

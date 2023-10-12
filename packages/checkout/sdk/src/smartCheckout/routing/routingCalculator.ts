@@ -320,14 +320,6 @@ export const routingCalculator = async (
 
   let priority = 0;
 
-  if (bridgeFundingStep) {
-    priority++;
-    response.fundingRoutes.push({
-      priority,
-      steps: [bridgeFundingStep],
-    });
-  }
-
   if (swapFundingSteps.length > 0) {
     priority++;
     swapFundingSteps.forEach((swapFundingStep) => {
@@ -335,6 +327,14 @@ export const routingCalculator = async (
         priority,
         steps: [swapFundingStep],
       });
+    });
+  }
+
+  if (bridgeFundingStep) {
+    priority++;
+    response.fundingRoutes.push({
+      priority,
+      steps: [bridgeFundingStep],
     });
   }
 

@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import {
   useCallback, useContext, useEffect, useMemo, useReducer,
 } from 'react';
@@ -22,7 +21,7 @@ import { StatusType } from '../../components/Status/StatusType';
 import { StatusView, StatusViewProps } from '../../components/Status/StatusView';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { SaleWidgetViews } from '../../context/view-context/SaleViewContextTypes';
-import { Item, MintErrorTypes, PaymentTypes } from './types';
+import { Item, SaleErrorTypes, PaymentTypes } from './types';
 import { widgetTheme } from '../../lib/theme';
 import { SaleContextProvider } from './context/SaleContextProvider';
 import { FundWithSmartCheckout } from './views/FundWithSmartCheckout';
@@ -44,7 +43,7 @@ interface ErrorTextConfig {
   secondaryAction?: string;
 }
 
-type AllErrorTextConfigs = Record<MintErrorTypes, ErrorTextConfig>;
+type AllErrorTextConfigs = Record<SaleErrorTypes, ErrorTextConfig>;
 
 export interface SaleWidgetProps {
   config: StrongCheckoutWidgetsConfig;
@@ -66,16 +65,6 @@ export function SaleWidget(props: SaleWidgetProps) {
     environmentId,
     connectLoaderParams,
   } = props;
-
-  console.log(
-    '@@@ SaleWidget',
-    config,
-    amount,
-    items,
-    fromContractAddress,
-    env,
-    environmentId,
-  );
 
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
@@ -125,33 +114,33 @@ export function SaleWidget(props: SaleWidgetProps) {
     sendSaleWidgetCloseEvent(eventTarget);
   };
 
-  const errorHandlersConfig: Record<MintErrorTypes, ErrorHandlerConfig> = {
-    [MintErrorTypes.TRANSACTION_FAILED]: {
+  const errorHandlersConfig: Record<SaleErrorTypes, ErrorHandlerConfig> = {
+    [SaleErrorTypes.TRANSACTION_FAILED]: {
       onActionClick: goBackToPaymentMethods,
       onSecondaryActionClick: () => {
         /* TODO: redirects to Immutascan to check the transaction if has is given */
-        console.log({ transactionHash: viewState.view?.data?.transactionHash });
+        console.log({ transactionHash: viewState.view?.data?.transactionHash }); // eslint-disable-line no-console
       },
       statusType: StatusType.FAILURE,
       statusIconStyles: {
         fill: biomeTheme.color.status.destructive.dim,
       },
     },
-    [MintErrorTypes.SERVICE_BREAKDOWN]: {
+    [SaleErrorTypes.SERVICE_BREAKDOWN]: {
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
       statusIconStyles: {
         fill: biomeTheme.color.status.fatal.dim,
       },
     },
-    [MintErrorTypes.TRANSAK_FAILED]: {
+    [SaleErrorTypes.TRANSAK_FAILED]: {
       onActionClick: () => {
         /* TODO: start over the transak flow */
       },
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
     },
-    [MintErrorTypes.PASSPORT_FAILED]: {
+    [SaleErrorTypes.WALLET_FAILED]: {
       onActionClick: goBackToPaymentMethods,
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
@@ -159,19 +148,20 @@ export function SaleWidget(props: SaleWidgetProps) {
         fill: biomeTheme.color.status.fatal.dim,
       },
     },
-    [MintErrorTypes.PASSPORT_REJECTED_NO_FUNDS]: {
+    [SaleErrorTypes.WALLET_REJECTED_NO_FUNDS]: {
       onActionClick: goBackToPaymentMethods,
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
     },
-    [MintErrorTypes.PASSPORT_REJECTED]: {
+    [SaleErrorTypes.WALLET_REJECTED]: {
       onActionClick: () => {
         goBackToPaymentMethods(PaymentTypes.CRYPTO);
       },
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
     },
-    [MintErrorTypes.DEFAULT]: {
+
+    [SaleErrorTypes.DEFAULT]: {
       onActionClick: goBackToPaymentMethods,
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
@@ -179,9 +169,10 @@ export function SaleWidget(props: SaleWidgetProps) {
   };
 
   const getErrorViewProps = (): StatusViewProps => {
-    const errorTextConfig: AllErrorTextConfigs = text.views[SaleWidgetViews.MINT_FAIL].errors;
-    const errorType = viewState.view.data.errorType || MintErrorTypes.DEFAULT;
+    const errorTextConfig: AllErrorTextConfigs = text.views[SaleWidgetViews.SALE_FAIL].errors;
+    const errorType = viewState.view.data.errorType || SaleErrorTypes.DEFAULT;
     const handlers = errorHandlersConfig[errorType] || {};
+
     return {
       testId: 'fail-view',
       statusText: errorTextConfig[errorType].description,
@@ -226,17 +217,17 @@ export function SaleWidget(props: SaleWidgetProps) {
           {viewState.view.type === SaleWidgetViews.PAY_WITH_COINS && (
             <PayWithCoins />
           )}
-          {viewState.view.type === SaleWidgetViews.MINT_FAIL && (
+          {viewState.view.type === SaleWidgetViews.SALE_FAIL && (
             <StatusView {...getErrorViewProps()} />
           )}
-          {viewState.view.type === SaleWidgetViews.MINT_SUCCESS
+          {viewState.view.type === SaleWidgetViews.SALE_SUCCESS
             && provider && (
               <StatusView
                 statusText={
-                  text.views[SaleWidgetViews.MINT_SUCCESS].text
+                  text.views[SaleWidgetViews.SALE_SUCCESS].text
                 }
                 actionText={
-                  text.views[SaleWidgetViews.MINT_SUCCESS].actionText
+                  text.views[SaleWidgetViews.SALE_SUCCESS].actionText
                 }
                 onActionClick={() => closeWidget()}
                 statusType={StatusType.SUCCESS}
