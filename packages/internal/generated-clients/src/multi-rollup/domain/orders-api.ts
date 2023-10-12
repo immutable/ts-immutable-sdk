@@ -13,8 +13,9 @@
  */
 
 
-import globalAxios, { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
-import { Configuration } from '../configuration';
+import type { Configuration } from '../configuration';
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
@@ -263,13 +264,13 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
          * @param {string} [buyItemContractAddress] Buy item contract address to filter by
          * @param {string} [sellItemTokenId] Sell item token identifier to filter by
          * @param {number} [pageSize] Maximum number of orders to return per page
-         * @param {'created_at' | 'updated_at' | 'buy_item_amount'} [sortBy] Order field to sort by
-         * @param {'asc' | 'desc'} [sortDirection] Ascending or descending direction for sort
+         * @param {ListListingsSortByEnum} [sortBy] Order field to sort by
+         * @param {ListListingsSortDirectionEnum} [sortDirection] Ascending or descending direction for sort
          * @param {string} [pageCursor] Page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listListings: async (chainName: string, status?: OrderStatusName, sellItemContractAddress?: string, buyItemContractAddress?: string, sellItemTokenId?: string, pageSize?: number, sortBy?: 'created_at' | 'updated_at' | 'buy_item_amount', sortDirection?: 'asc' | 'desc', pageCursor?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listListings: async (chainName: string, status?: OrderStatusName, sellItemContractAddress?: string, buyItemContractAddress?: string, sellItemTokenId?: string, pageSize?: number, sortBy?: ListListingsSortByEnum, sortDirection?: ListListingsSortDirectionEnum, pageCursor?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'chainName' is not null or undefined
             assertParamExists('listListings', 'chainName', chainName)
             const localVarPath = `/v1/chains/{chain_name}/orders/listings`
@@ -334,13 +335,13 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
          * @param {string} chainName 
          * @param {string} [accountAddress] 
          * @param {number} [pageSize] Maximum number of trades to return per page
-         * @param {'indexed_at'} [sortBy] Trade field to sort by
-         * @param {'asc' | 'desc'} [sortDirection] Ascending or descending direction for sort
+         * @param {ListTradesSortByEnum} [sortBy] Trade field to sort by
+         * @param {ListTradesSortDirectionEnum} [sortDirection] Ascending or descending direction for sort
          * @param {string} [pageCursor] Page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listTrades: async (chainName: string, accountAddress?: string, pageSize?: number, sortBy?: 'indexed_at', sortDirection?: 'asc' | 'desc', pageCursor?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listTrades: async (chainName: string, accountAddress?: string, pageSize?: number, sortBy?: ListTradesSortByEnum, sortDirection?: ListTradesSortDirectionEnum, pageCursor?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'chainName' is not null or undefined
             assertParamExists('listTrades', 'chainName', chainName)
             const localVarPath = `/v1/chains/{chain_name}/trades`
@@ -466,13 +467,13 @@ export const OrdersApiFp = function(configuration?: Configuration) {
          * @param {string} [buyItemContractAddress] Buy item contract address to filter by
          * @param {string} [sellItemTokenId] Sell item token identifier to filter by
          * @param {number} [pageSize] Maximum number of orders to return per page
-         * @param {'created_at' | 'updated_at' | 'buy_item_amount'} [sortBy] Order field to sort by
-         * @param {'asc' | 'desc'} [sortDirection] Ascending or descending direction for sort
+         * @param {ListListingsSortByEnum} [sortBy] Order field to sort by
+         * @param {ListListingsSortDirectionEnum} [sortDirection] Ascending or descending direction for sort
          * @param {string} [pageCursor] Page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listListings(chainName: string, status?: OrderStatusName, sellItemContractAddress?: string, buyItemContractAddress?: string, sellItemTokenId?: string, pageSize?: number, sortBy?: 'created_at' | 'updated_at' | 'buy_item_amount', sortDirection?: 'asc' | 'desc', pageCursor?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListListingsResult>> {
+        async listListings(chainName: string, status?: OrderStatusName, sellItemContractAddress?: string, buyItemContractAddress?: string, sellItemTokenId?: string, pageSize?: number, sortBy?: ListListingsSortByEnum, sortDirection?: ListListingsSortDirectionEnum, pageCursor?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListListingsResult>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listListings(chainName, status, sellItemContractAddress, buyItemContractAddress, sellItemTokenId, pageSize, sortBy, sortDirection, pageCursor, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -482,13 +483,13 @@ export const OrdersApiFp = function(configuration?: Configuration) {
          * @param {string} chainName 
          * @param {string} [accountAddress] 
          * @param {number} [pageSize] Maximum number of trades to return per page
-         * @param {'indexed_at'} [sortBy] Trade field to sort by
-         * @param {'asc' | 'desc'} [sortDirection] Ascending or descending direction for sort
+         * @param {ListTradesSortByEnum} [sortBy] Trade field to sort by
+         * @param {ListTradesSortDirectionEnum} [sortDirection] Ascending or descending direction for sort
          * @param {string} [pageCursor] Page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listTrades(chainName: string, accountAddress?: string, pageSize?: number, sortBy?: 'indexed_at', sortDirection?: 'asc' | 'desc', pageCursor?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListTradeResult>> {
+        async listTrades(chainName: string, accountAddress?: string, pageSize?: number, sortBy?: ListTradesSortByEnum, sortDirection?: ListTradesSortDirectionEnum, pageCursor?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListTradeResult>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listTrades(chainName, accountAddress, pageSize, sortBy, sortDirection, pageCursor, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -505,90 +506,72 @@ export const OrdersApiFactory = function (configuration?: Configuration, basePat
         /**
          * Cancel one or more orders
          * @summary Cancel one or more orders
-         * @param {string} chainName 
-         * @param {CancelOrdersRequestBody} cancelOrdersRequestBody 
+         * @param {OrdersApiCancelOrdersRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        cancelOrders(chainName: string, cancelOrdersRequestBody: CancelOrdersRequestBody, options?: any): AxiosPromise<CancelOrdersResult> {
-            return localVarFp.cancelOrders(chainName, cancelOrdersRequestBody, options).then((request) => request(axios, basePath));
+        cancelOrders(requestParameters: OrdersApiCancelOrdersRequest, options?: AxiosRequestConfig): AxiosPromise<CancelOrdersResult> {
+            return localVarFp.cancelOrders(requestParameters.chainName, requestParameters.cancelOrdersRequestBody, options).then((request) => request(axios, basePath));
         },
         /**
          * Create a listing
          * @summary Create a listing
-         * @param {string} chainName 
-         * @param {CreateListingRequestBody} createListingRequestBody 
+         * @param {OrdersApiCreateListingRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createListing(chainName: string, createListingRequestBody: CreateListingRequestBody, options?: any): AxiosPromise<ListingResult> {
-            return localVarFp.createListing(chainName, createListingRequestBody, options).then((request) => request(axios, basePath));
+        createListing(requestParameters: OrdersApiCreateListingRequest, options?: AxiosRequestConfig): AxiosPromise<ListingResult> {
+            return localVarFp.createListing(requestParameters.chainName, requestParameters.createListingRequestBody, options).then((request) => request(axios, basePath));
         },
         /**
          * Retrieve signed fulfillment data based on the list of order IDs and corresponding fees.
          * @summary Retrieve fulfillment data for orders
-         * @param {string} chainName 
-         * @param {Array<FulfillmentDataRequest>} fulfillmentDataRequest 
+         * @param {OrdersApiFulfillmentDataRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        fulfillmentData(chainName: string, fulfillmentDataRequest: Array<FulfillmentDataRequest>, options?: any): AxiosPromise<FulfillmentData200Response> {
-            return localVarFp.fulfillmentData(chainName, fulfillmentDataRequest, options).then((request) => request(axios, basePath));
+        fulfillmentData(requestParameters: OrdersApiFulfillmentDataRequest, options?: AxiosRequestConfig): AxiosPromise<FulfillmentData200Response> {
+            return localVarFp.fulfillmentData(requestParameters.chainName, requestParameters.fulfillmentDataRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * Get a single listing by ID
          * @summary Get a single listing by ID
-         * @param {string} chainName 
-         * @param {string} listingId Global Order identifier
+         * @param {OrdersApiGetListingRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getListing(chainName: string, listingId: string, options?: any): AxiosPromise<ListingResult> {
-            return localVarFp.getListing(chainName, listingId, options).then((request) => request(axios, basePath));
+        getListing(requestParameters: OrdersApiGetListingRequest, options?: AxiosRequestConfig): AxiosPromise<ListingResult> {
+            return localVarFp.getListing(requestParameters.chainName, requestParameters.listingId, options).then((request) => request(axios, basePath));
         },
         /**
          * Get a single trade by ID
          * @summary Get a single trade by ID
-         * @param {string} chainName 
-         * @param {string} tradeId Global Trade identifier
+         * @param {OrdersApiGetTradeRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getTrade(chainName: string, tradeId: string, options?: any): AxiosPromise<TradeResult> {
-            return localVarFp.getTrade(chainName, tradeId, options).then((request) => request(axios, basePath));
+        getTrade(requestParameters: OrdersApiGetTradeRequest, options?: AxiosRequestConfig): AxiosPromise<TradeResult> {
+            return localVarFp.getTrade(requestParameters.chainName, requestParameters.tradeId, options).then((request) => request(axios, basePath));
         },
         /**
          * List all listings
          * @summary List all listings
-         * @param {string} chainName 
-         * @param {OrderStatusName} [status] Order status to filter by
-         * @param {string} [sellItemContractAddress] Sell item contract address to filter by
-         * @param {string} [buyItemContractAddress] Buy item contract address to filter by
-         * @param {string} [sellItemTokenId] Sell item token identifier to filter by
-         * @param {number} [pageSize] Maximum number of orders to return per page
-         * @param {'created_at' | 'updated_at' | 'buy_item_amount'} [sortBy] Order field to sort by
-         * @param {'asc' | 'desc'} [sortDirection] Ascending or descending direction for sort
-         * @param {string} [pageCursor] Page cursor to retrieve previous or next page. Use the value returned in the response.
+         * @param {OrdersApiListListingsRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listListings(chainName: string, status?: OrderStatusName, sellItemContractAddress?: string, buyItemContractAddress?: string, sellItemTokenId?: string, pageSize?: number, sortBy?: 'created_at' | 'updated_at' | 'buy_item_amount', sortDirection?: 'asc' | 'desc', pageCursor?: string, options?: any): AxiosPromise<ListListingsResult> {
-            return localVarFp.listListings(chainName, status, sellItemContractAddress, buyItemContractAddress, sellItemTokenId, pageSize, sortBy, sortDirection, pageCursor, options).then((request) => request(axios, basePath));
+        listListings(requestParameters: OrdersApiListListingsRequest, options?: AxiosRequestConfig): AxiosPromise<ListListingsResult> {
+            return localVarFp.listListings(requestParameters.chainName, requestParameters.status, requestParameters.sellItemContractAddress, requestParameters.buyItemContractAddress, requestParameters.sellItemTokenId, requestParameters.pageSize, requestParameters.sortBy, requestParameters.sortDirection, requestParameters.pageCursor, options).then((request) => request(axios, basePath));
         },
         /**
          * List all trades
          * @summary List all trades
-         * @param {string} chainName 
-         * @param {string} [accountAddress] 
-         * @param {number} [pageSize] Maximum number of trades to return per page
-         * @param {'indexed_at'} [sortBy] Trade field to sort by
-         * @param {'asc' | 'desc'} [sortDirection] Ascending or descending direction for sort
-         * @param {string} [pageCursor] Page cursor to retrieve previous or next page. Use the value returned in the response.
+         * @param {OrdersApiListTradesRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listTrades(chainName: string, accountAddress?: string, pageSize?: number, sortBy?: 'indexed_at', sortDirection?: 'asc' | 'desc', pageCursor?: string, options?: any): AxiosPromise<ListTradeResult> {
-            return localVarFp.listTrades(chainName, accountAddress, pageSize, sortBy, sortDirection, pageCursor, options).then((request) => request(axios, basePath));
+        listTrades(requestParameters: OrdersApiListTradesRequest, options?: AxiosRequestConfig): AxiosPromise<ListTradeResult> {
+            return localVarFp.listTrades(requestParameters.chainName, requestParameters.accountAddress, requestParameters.pageSize, requestParameters.sortBy, requestParameters.sortDirection, requestParameters.pageCursor, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -751,14 +734,14 @@ export interface OrdersApiListListingsRequest {
      * @type {'created_at' | 'updated_at' | 'buy_item_amount'}
      * @memberof OrdersApiListListings
      */
-    readonly sortBy?: 'created_at' | 'updated_at' | 'buy_item_amount'
+    readonly sortBy?: ListListingsSortByEnum
 
     /**
      * Ascending or descending direction for sort
      * @type {'asc' | 'desc'}
      * @memberof OrdersApiListListings
      */
-    readonly sortDirection?: 'asc' | 'desc'
+    readonly sortDirection?: ListListingsSortDirectionEnum
 
     /**
      * Page cursor to retrieve previous or next page. Use the value returned in the response.
@@ -800,14 +783,14 @@ export interface OrdersApiListTradesRequest {
      * @type {'indexed_at'}
      * @memberof OrdersApiListTrades
      */
-    readonly sortBy?: 'indexed_at'
+    readonly sortBy?: ListTradesSortByEnum
 
     /**
      * Ascending or descending direction for sort
      * @type {'asc' | 'desc'}
      * @memberof OrdersApiListTrades
      */
-    readonly sortDirection?: 'asc' | 'desc'
+    readonly sortDirection?: ListTradesSortDirectionEnum
 
     /**
      * Page cursor to retrieve previous or next page. Use the value returned in the response.
@@ -908,3 +891,36 @@ export class OrdersApi extends BaseAPI {
         return OrdersApiFp(this.configuration).listTrades(requestParameters.chainName, requestParameters.accountAddress, requestParameters.pageSize, requestParameters.sortBy, requestParameters.sortDirection, requestParameters.pageCursor, options).then((request) => request(this.axios, this.basePath));
     }
 }
+
+/**
+ * @export
+ */
+export const ListListingsSortByEnum = {
+    CreatedAt: 'created_at',
+    UpdatedAt: 'updated_at',
+    BuyItemAmount: 'buy_item_amount'
+} as const;
+export type ListListingsSortByEnum = typeof ListListingsSortByEnum[keyof typeof ListListingsSortByEnum];
+/**
+ * @export
+ */
+export const ListListingsSortDirectionEnum = {
+    Asc: 'asc',
+    Desc: 'desc'
+} as const;
+export type ListListingsSortDirectionEnum = typeof ListListingsSortDirectionEnum[keyof typeof ListListingsSortDirectionEnum];
+/**
+ * @export
+ */
+export const ListTradesSortByEnum = {
+    IndexedAt: 'indexed_at'
+} as const;
+export type ListTradesSortByEnum = typeof ListTradesSortByEnum[keyof typeof ListTradesSortByEnum];
+/**
+ * @export
+ */
+export const ListTradesSortDirectionEnum = {
+    Asc: 'asc',
+    Desc: 'desc'
+} as const;
+export type ListTradesSortDirectionEnum = typeof ListTradesSortDirectionEnum[keyof typeof ListTradesSortDirectionEnum];

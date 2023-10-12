@@ -4,7 +4,7 @@ generate-imx-openapi: get-imx-openapi generate-imx-api-client
 .PHONY: generate-mr-openapi
 generate-mr-openapi: get-mr-openapi generate-mr-api-client
 
-# Note: We generate clients with sandbox spec only as Prod and Sandbox are maintained to be same. 
+# Note: We generate clients with sandbox spec only as Prod and Sandbox are maintained to be same.
 #.      Prod url is passed in via config to talk to prod API.
 .PHONY: get-imx-openapi
 get-imx-openapi:
@@ -28,15 +28,15 @@ generate-imx-api-client:
 	docker run --rm -v $(shell pwd):/app openapitools/openapi-generator-cli:v6.2.1 generate \
     -i ./app/src/imx-openapi.json \
     -g typescript-axios \
-    --additional-properties=supportsES6=true,npmVersion=6.9.0,typescriptThreePlus=true,withSeparateModelsAndApi=true,modelPackage=models,apiPackage=domain,useSingleRequestParameter=true \
-    -o /app/src/imx
+    -o /app/src/imx \
+    -c /app/imx.config.json
 
 .PHONY: generate-mr-api-client
 generate-mr-api-client:
 	rm -rf src/multi-rollup && \
     mkdir src/multi-rollup && \
-	docker run --rm -v $(shell pwd):/app openapitools/openapi-generator-cli:v6.2.1 generate \
+	docker run --rm -v $(shell pwd):/app openapitools/openapi-generator-cli:v7.0.1 generate \
     -i ./app/src/mr-openapi.json \
     -g typescript-axios \
-    --additional-properties=supportsES6=true,npmVersion=6.9.0,typescriptThreePlus=true,withSeparateModelsAndApi=true,modelPackage=models,apiPackage=domain,useSingleRequestParameter=true \
-    -o /app/src/multi-rollup
+    -o /app/src/multi-rollup \
+    -c /app/mr.config.json
