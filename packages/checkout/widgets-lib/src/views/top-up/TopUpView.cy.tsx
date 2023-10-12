@@ -12,7 +12,7 @@ import { TopUpView } from './TopUpView';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { orchestrationEvents } from '../../lib/orchestrationEvents';
 import { WalletWidgetTestComponent } from '../../widgets/wallet/test-components/WalletWidgetTestComponent';
-import { WalletState } from '../../widgets/wallet/context/WalletContext';
+import { TopUpFeature, WalletState } from '../../widgets/wallet/context/WalletContext';
 import { ConnectionStatus } from '../../context/connect-loader-context/ConnectLoaderContext';
 import {
   ConnectLoaderTestComponent,
@@ -200,18 +200,11 @@ describe('Top Up View', () => {
     });
 
     it('should fire swap event with swap data on event when swap clicked', () => {
-      const cryptoConversions = new Map<string, number>([['eth', 2000], ['imx', 1.5], ['usdc', 1]]);
-
-      const baseWalletState: WalletState = {
-        network: null,
-        walletProvider: WalletProviderName.METAMASK,
-        tokenBalances: [],
-        supportedTopUps: {
-          isOnRampEnabled: true,
-          isSwapEnabled: true,
-          isBridgeEnabled: true,
-          isSwapAvailable: true,
-        },
+      const supportedTopUps: TopUpFeature = {
+        isOnRampEnabled: true,
+        isSwapEnabled: true,
+        isBridgeEnabled: true,
+        isSwapAvailable: true,
       };
 
       cy.stub(orchestrationEvents, 'sendRequestSwapEvent').as('sendRequestSwapEventStub');
@@ -221,20 +214,16 @@ describe('Top Up View', () => {
           <ConnectLoaderTestComponent
             initialStateOverride={connectLoaderState}
           >
-            <WalletWidgetTestComponent
-              initialStateOverride={baseWalletState}
-              cryptoConversionsOverride={cryptoConversions}
-            >
-              <TopUpView
-                showOnrampOption
-                showSwapOption
-                showBridgeOption
-                widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
-                tokenAddress="0x123"
-                amount="10"
-                onCloseButtonClick={() => {}}
-              />
-            </WalletWidgetTestComponent>
+            <TopUpView
+              showOnrampOption
+              showSwapOption
+              showBridgeOption
+              widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
+              tokenAddress="0x123"
+              amount="10"
+              onCloseButtonClick={() => {}}
+              supportedTopUps={supportedTopUps}
+            />
           </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
       );
@@ -287,19 +276,12 @@ describe('Top Up View', () => {
 
   describe('TopUpView render with disabled options', () => {
     describe('when swap is unavailable', () => {
-      it('should not fire swap event with swap data on event when swap clicked', () => {
-        const cryptoConversions = new Map<string, number>([['eth', 2000], ['imx', 1.5], ['usdc', 1]]);
-
-        const baseWalletState: WalletState = {
-          network: null,
-          walletProvider: WalletProviderName.METAMASK,
-          tokenBalances: [],
-          supportedTopUps: {
-            isOnRampEnabled: true,
-            isSwapEnabled: true,
-            isBridgeEnabled: true,
-            isSwapAvailable: false,
-          },
+      it('should not fire swap event', () => {
+        const supportedTopUps: TopUpFeature = {
+          isOnRampEnabled: true,
+          isSwapEnabled: true,
+          isBridgeEnabled: true,
+          isSwapAvailable: false,
         };
 
         cy.stub(orchestrationEvents, 'sendRequestSwapEvent').as('sendRequestSwapEventStub');
@@ -309,20 +291,16 @@ describe('Top Up View', () => {
             <ConnectLoaderTestComponent
               initialStateOverride={connectLoaderState}
             >
-              <WalletWidgetTestComponent
-                initialStateOverride={baseWalletState}
-                cryptoConversionsOverride={cryptoConversions}
-              >
-                <TopUpView
-                  showOnrampOption
-                  showSwapOption
-                  showBridgeOption
-                  widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
-                  tokenAddress="0x123"
-                  amount="10"
-                  onCloseButtonClick={() => {}}
-                />
-              </WalletWidgetTestComponent>
+              <TopUpView
+                showOnrampOption
+                showSwapOption
+                showBridgeOption
+                widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
+                tokenAddress="0x123"
+                amount="10"
+                onCloseButtonClick={() => {}}
+                supportedTopUps={supportedTopUps}
+              />
             </ConnectLoaderTestComponent>
           </BiomeCombinedProviders>,
         );
@@ -410,6 +388,7 @@ describe('Top Up View', () => {
               showBridgeOption
               widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
               onCloseButtonClick={() => {}}
+              supportedTopUps={baseWalletState.supportedTopUps}
             />
           </WalletWidgetTestComponent>
         </ConnectLoaderTestComponent>,
@@ -449,6 +428,7 @@ describe('Top Up View', () => {
               showBridgeOption
               widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
               onCloseButtonClick={() => {}}
+              supportedTopUps={baseWalletState.supportedTopUps}
             />
           </WalletWidgetTestComponent>
         </ConnectLoaderTestComponent>,
@@ -480,6 +460,7 @@ describe('Top Up View', () => {
                 showBridgeOption
                 widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
                 onCloseButtonClick={() => {}}
+                supportedTopUps={baseWalletState.supportedTopUps}
               />
 
             </CryptoFiatProvider>
