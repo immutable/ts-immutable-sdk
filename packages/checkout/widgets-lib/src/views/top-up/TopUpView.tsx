@@ -29,6 +29,7 @@ import { isPassportProvider } from '../../lib/providerUtils';
 import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextTypes';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { TopUpMenuItem } from './TopUpMenuItem';
+import { WalletContext } from '../../widgets/wallet/context/WalletContext';
 
 interface TopUpViewProps {
   widgetEvent: IMTBLWidgetEvents,
@@ -61,6 +62,8 @@ export function TopUpView({
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { conversions, fiatSymbol } = cryptoFiatState;
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+  const { walletState } = useContext(WalletContext);
+  const { supportedTopUps } = walletState;
 
   const [onRampFeesPercentage, setOnRampFeesPercentage] = useState('-.--');
   const [swapFeesInFiat, setSwapFeesInFiat] = useState('-.--');
@@ -222,6 +225,35 @@ export function TopUpView({
     return ` ≈ ${fees}%`;
   };
 
+  const topUpFeatures = [
+    {
+      testId: 'onramp',
+      icon: 'Wallet',
+      textConfig: onramp,
+      onClickEvent: onClickOnRamp,
+      fee: () => renderFeePercentage(onRampFeesPercentage, loadingOnRampFees),
+      isAvailable: true,
+      isEnabled: showOnrampOption,
+    }, {
+      testId: 'swap',
+      icon: 'Coins',
+      textConfig: swap,
+      onClickEvent: onClickSwap,
+      fee: () => renderFees(swapFeesInFiat, loadingSwapFees),
+      isAvailable: supportedTopUps?.isSwapAvailable,
+      isEnabled: showSwapOption,
+    },
+    {
+      testId: 'bridge',
+      icon: 'Minting',
+      textConfig: bridge,
+      onClickEvent: onClickBridge,
+      fee: () => renderFees(bridgeFeesInFiat, loadingBridgeFees),
+      isAvailable: true,
+      isEnabled: showBridgeOption && !isPassport,
+    },
+  ];
+
   return (
     <SimpleLayout
       header={(
@@ -238,39 +270,21 @@ export function TopUpView({
       <Box sx={{ paddingX: 'base.spacing.x4', paddingY: 'base.spacing.x4' }}>
         <Heading size="small">{header.title}</Heading>
         <Box sx={{ paddingY: 'base.spacing.x4' }}>
-          {showOnrampOption && (
-          <TopUpMenuItem
-            testId="onramp"
-            icon="Wallet"
-            heading={onramp.heading}
-            caption={onramp.caption}
-            subcaption={onramp.subcaption}
-            onClick={onClickOnRamp}
-            renderFeeFunction={() => renderFeePercentage(onRampFeesPercentage, loadingOnRampFees)}
-          />
-          )}
-          {showSwapOption && (
+          {topUpFeatures
+            .sort((a, b) => Number(b.isAvailable) - Number(a.isAvailable))
+            .map((element) => element.isEnabled && (
             <TopUpMenuItem
-              testId="swap"
-              icon="Coins"
-              heading={swap.heading}
-              caption={swap.caption}
-              subcaption={swap.subcaption}
-              onClick={onClickSwap}
-              renderFeeFunction={() => renderFees(swapFeesInFiat, loadingSwapFees)}
+              testId={element.testId}
+              icon={element.icon as 'Wallet' | 'Coins' | 'Minting'}
+              heading={element.textConfig.heading}
+              caption={element.textConfig.caption}
+              subcaption={element.textConfig.subcaption}
+              disabledCaption={element.textConfig.disabledCaption}
+              onClick={element.onClickEvent}
+              renderFeeFunction={element.fee}
+              isDisabled={!element.isAvailable}
             />
-          )}
-          {showBridgeOption && !isPassport && (
-            <TopUpMenuItem
-              testId="bridge"
-              icon="Minting"
-              heading={bridge.heading}
-              caption={bridge.caption}
-              subcaption={bridge.subcaption}
-              onClick={onClickBridge}
-              renderFeeFunction={() => renderFees(bridgeFeesInFiat, loadingBridgeFees)}
-            />
-          )}
+            ))}
         </Box>
       </Box>
     </SimpleLayout>
