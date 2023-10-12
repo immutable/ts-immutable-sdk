@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { useCallback, useState } from 'react';
-import { SaleSuccess } from '@imtbl/checkout-widgets';
 
 import { Environment } from '@imtbl/config';
 import {
@@ -9,8 +8,10 @@ import {
   PaymentTypes,
   Item,
   SignedOrderProduct,
-  SaleErrorTypes,
   SignOrderError,
+  ExecuteOrderResponse,
+  ExecutedTransaction,
+  SaleErrorTypes,
 } from '../types';
 
 const PRIMARY_SALES_API_BASE_URL = {
@@ -141,16 +142,29 @@ export const useSignOrder = (input: SignOrderInput) => {
     env,
     environmentId,
   } = input;
-  const [signError, setSignError] = useState<SignOrderError | undefined>(undefined);
+  const [signError, setSignError] = useState<SignOrderError | undefined>(
+    undefined,
+  );
   const [signResponse, setSignResponse] = useState<SignResponse | undefined>(
     undefined,
   );
+  const [executeResponse, setExecuteResponse] = useState<ExecuteOrderResponse>({
+    done: false,
+    transactions: [],
+  });
 
-  const sendTx = useCallback(
+  const setExecuteTransactions = (transaction: ExecutedTransaction) => {
+    setExecuteResponse((prev) => ({ ...prev, transactions: [...prev.transactions, transaction] }));
+  };
+
+  const setExecuteDone = () => setExecuteResponse((prev) => ({ ...prev, done: true }));
+
+  const sendTransaction = useCallback(
     async (
       to: string,
       data: string,
       gasLimit: number,
+      method: string,
     ): Promise<string | undefined> => {
       let transactionHash: string | undefined;
 
@@ -164,8 +178,7 @@ export const useSignOrder = (input: SignOrderInput) => {
           gasLimit,
         });
 
-        // TODO: call on processing handler to set new copy
-
+        setExecuteTransactions({ method, hash: txnResponse?.hash });
         await txnResponse?.wait(1);
 
         transactionHash = txnResponse?.hash;
@@ -180,7 +193,10 @@ export const useSignOrder = (input: SignOrderInput) => {
           errorType = SaleErrorTypes.WALLET_REJECTED;
         }
 
-        if (reason.includes('failed to submit') && reason.includes('highest gas limit')) {
+        if (
+          reason.includes('failed to submit')
+          && reason.includes('highest gas limit')
+        ) {
           errorType = SaleErrorTypes.WALLET_REJECTED_NO_FUNDS;
         }
 
@@ -197,7 +213,12 @@ export const useSignOrder = (input: SignOrderInput) => {
 
   const sign = useCallback(
     async (paymentType: PaymentTypes): Promise<SignResponse | undefined> => {
-      if (!provider || !recipientAddress || !fromContractAddress || !items.length) {
+      if (
+        !provider
+        || !recipientAddress
+        || !fromContractAddress
+        || !items.length
+      ) {
         return undefined;
       }
 
@@ -242,17 +263,19 @@ export const useSignOrder = (input: SignOrderInput) => {
     [items, fromContractAddress, recipientAddress, environmentId, env],
   );
 
-  const execute = useCallback(async (): Promise<SaleSuccess> => {
-    if (!signResponse) {
+  const execute = async (
+    signData: SignResponse | undefined,
+  ): Promise<ExecutedTransaction[]> => {
+    if (!signData) {
       setSignError({
         type: SaleErrorTypes.DEFAULT,
-        data: { reason: 'No signed response, try again' },
+        data: { reason: 'No sign data' },
       });
-      return {};
+      return [];
     }
 
-    const transactionHashes = {};
-    for (const transaction of signResponse.transactions) {
+    const execTransactions: ExecutedTransaction[] = [];
+    for (const transaction of signData.transactions) {
       const {
         contractAddress: to,
         rawData: data,
@@ -260,22 +283,24 @@ export const useSignOrder = (input: SignOrderInput) => {
         gasEstimate,
       } = transaction;
       // eslint-disable-next-line no-await-in-loop
-      const transactionHash = await sendTx(to, data, gasEstimate);
+      const hash = await sendTransaction(to, data, gasEstimate, method);
 
-      if (!transactionHash) {
+      if (!hash) {
         break;
       }
 
-      transactionHashes[method] = transactionHash;
+      execTransactions.push({ method, hash });
     }
 
-    return transactionHashes;
-  }, [signResponse]);
+    setExecuteDone();
+    return execTransactions;
+  };
 
   return {
     sign,
-    execute,
     signResponse,
     signError,
+    execute,
+    executeResponse,
   };
 };

@@ -5,7 +5,7 @@ import { TransakIframe } from '../../../components/Transak/TransakIframe';
 import { TransakNFTData } from '../../../components/Transak/TransakTypes';
 import { text as textConfig } from '../../../resources/text/textConfig';
 import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
-import { MintErrorTypes } from '../types';
+import { SaleErrorTypes } from '../types';
 
 export interface WithCardProps {
   onInit?: () => void;
@@ -18,17 +18,20 @@ export interface WithCardProps {
 
 export function WithCard(props: WithCardProps) {
   const {
-    onInit, onOpen, onOrderCreated, onOrderProcessing, onOrderCompleted, onOrderFailed,
+    onInit,
+    onOpen,
+    onOrderCreated,
+    onOrderProcessing,
+    onOrderCompleted,
+    onOrderFailed,
   } = props;
   const { screenTitle, loading } = textConfig.views[SaleWidgetViews.PAY_WITH_CARD];
-
   const {
     recipientEmail, recipientAddress, isPassportWallet, signResponse, goToErrorView,
   } = useSaleContext();
   const executeTxn = signResponse?.transactions.find((txn) => txn.methodCall.startsWith('execute'));
 
   if (!signResponse || !executeTxn) {
-    // TODO: dispatch error
     return null;
   }
 
@@ -46,7 +49,7 @@ export function WithCard(props: WithCardProps) {
   );
 
   const onFailedToLoad = () => {
-    goToErrorView(MintErrorTypes.TRANSACTION_FAILED);
+    goToErrorView(SaleErrorTypes.TRANSACTION_FAILED);
   };
 
   return (

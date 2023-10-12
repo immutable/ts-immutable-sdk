@@ -5,6 +5,7 @@ import {
   SaleSuccess,
   SaleFailed,
 } from '@imtbl/checkout-widgets';
+import { ExecuteOrderResponse } from './types';
 
 export const sendSaleWidgetCloseEvent = (
   eventTarget: Window | EventTarget,
@@ -26,7 +27,7 @@ export const sendSaleWidgetCloseEvent = (
 
 export const sendSaleSuccessEvent = (
   eventTarget: Window | EventTarget,
-  data: Record<string, string>,
+  data: ExecuteOrderResponse,
 ) => {
   const event = new CustomEvent<WidgetEvent<SaleSuccess>>(
     IMTBLWidgetEvents.IMTBL_PRIMARY_REVENUE_WIDGET_EVENT,
