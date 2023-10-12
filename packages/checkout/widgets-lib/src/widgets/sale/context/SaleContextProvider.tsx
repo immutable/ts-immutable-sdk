@@ -6,17 +6,25 @@ import {
   useEffect,
   useState,
   useCallback,
+  useRef,
 } from 'react';
 import { Passport } from '@imtbl/passport';
 
-import { PrimaryRevenueSuccess } from '@imtbl/checkout-widgets';
+import { SaleSuccess } from '@imtbl/checkout-widgets';
 
-import { Item, PaymentTypes, SignResponse } from '../types';
+import {
+  Item, PaymentTypes, SignResponse, SaleErrorTypes,
+} from '../types';
 import { useSignOrder } from '../hooks/useSignOrder';
 import { ConnectLoaderState } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
+import {
+  ViewActions,
+  ViewContext,
+} from '../../../context/view-context/ViewContext';
+import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 
-type SharedContextProps = {
+type SaleContextProps = {
   config: StrongCheckoutWidgetsConfig;
   env: string;
   environmentId: string;
@@ -28,19 +36,21 @@ type SharedContextProps = {
   passport?: Passport;
 };
 
-type SharedContextValues = SharedContextProps & {
+type SaleContextValues = SaleContextProps & {
   sign: (paymentType: PaymentTypes, callback?: () => void) => Promise<SignResponse | undefined>;
-  execute: () => Promise<PrimaryRevenueSuccess>;
+  execute: () => Promise<SaleSuccess>;
   recipientAddress: string;
   recipientEmail: string;
   signResponse: SignResponse | undefined;
   isPassportWallet: boolean;
   paymentMethod: PaymentTypes | undefined;
   setPaymentMethod: (paymentMethod: PaymentTypes) => void;
+  goBackToPaymentMethods: (paymentMethod?: PaymentTypes | undefined) => void;
+  goToErrorView: (type: SaleErrorTypes, data?: Record<string, unknown>) => void;
 };
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-const SharedContext = createContext<SharedContextValues>({
+const SaleContext = createContext<SaleContextValues>({
   items: [],
   amount: '',
   fromContractAddress: '',
@@ -51,20 +61,25 @@ const SharedContext = createContext<SharedContextValues>({
   recipientAddress: '',
   recipientEmail: '',
   sign: () => Promise.resolve(undefined),
-  execute: () => Promise.resolve({} as PrimaryRevenueSuccess),
+  execute: () => Promise.resolve({} as SaleSuccess),
   signResponse: undefined,
   passport: undefined,
   isPassportWallet: false,
   paymentMethod: undefined,
   setPaymentMethod: () => {},
+  goBackToPaymentMethods: () => {},
+  goToErrorView: () => {},
   config: {} as StrongCheckoutWidgetsConfig,
 });
 
-SharedContext.displayName = 'PrimaryRevenueSharedContext';
+SaleContext.displayName = 'SaleSaleContext';
 
-export function SharedContextProvider(props: {
+/** Max attemps to retry with same payment method */
+const MAX_ERROR_RETRIES = 1;
+
+export function SaleContextProvider(props: {
   children: ReactNode;
-  value: SharedContextProps;
+  value: SaleContextProps;
 }) {
   const {
     children,
@@ -81,6 +96,8 @@ export function SharedContextProvider(props: {
     },
   } = props;
 
+  const errorRetries = useRef(0);
+  const { viewDispatch } = useContext(ViewContext);
   const [{ recipientEmail, recipientAddress }, setUserInfo] = useState<{
     recipientEmail: string;
     recipientAddress: string;
@@ -91,11 +108,41 @@ export function SharedContextProvider(props: {
 
   const [paymentMethod, setPaymentMethod] = useState<PaymentTypes | undefined>(undefined);
 
-  // Get user info
+  const goBackToPaymentMethods = useCallback((type?: PaymentTypes | undefined) => {
+    setPaymentMethod(type);
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: { type: SaleWidgetViews.PAYMENT_METHODS },
+      },
+    });
+  }, []);
+
+  const goToErrorView = useCallback(
+    (errorType: SaleErrorTypes, data: Record<string, unknown> = {}) => {
+      errorRetries.current += 1;
+      if (errorRetries.current > MAX_ERROR_RETRIES) {
+        errorRetries.current = 0;
+        setPaymentMethod(undefined);
+      }
+
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SaleWidgetViews.SALE_FAIL,
+            data: { errorType, ...data },
+          },
+        },
+      });
+    },
+    [],
+  );
+
   useEffect(() => {
     const getUserInfo = async () => {
       const signer = provider?.getSigner();
-      const address = await signer?.getAddress() || '';
+      const address = (await signer?.getAddress()) || '';
       const email = (await passport?.getUserInfo())?.email || '';
 
       setUserInfo({ recipientEmail: email, recipientAddress: address });
@@ -113,11 +160,19 @@ export function SharedContextProvider(props: {
     env,
   });
 
-  const sign = useCallback(async (type: PaymentTypes, callback?: (r?: SignResponse) => void) => {
-    const response = await signOrder(type);
-    callback?.(response);
-    return response;
-  }, [signOrder]);
+  const sign = useCallback(
+    async (
+      type: PaymentTypes,
+      callback?: (r?: SignResponse) => void,
+    ): Promise<SignResponse | undefined> => {
+      const response = await signOrder(type);
+      if (!response) return undefined;
+
+      callback?.(response);
+      return response;
+    },
+    [signOrder],
+  );
 
   const values = useMemo(
     () => ({
@@ -136,6 +191,8 @@ export function SharedContextProvider(props: {
       recipientEmail,
       paymentMethod,
       setPaymentMethod,
+      goBackToPaymentMethods,
+      goToErrorView,
       isPassportWallet: !!(provider?.provider as any)?.isPassport,
     }),
     [
@@ -152,14 +209,16 @@ export function SharedContextProvider(props: {
       signResponse,
       paymentMethod,
       signResponse,
+      goBackToPaymentMethods,
+      goToErrorView,
     ],
   );
 
   return (
-    <SharedContext.Provider value={values}>{children}</SharedContext.Provider>
+    <SaleContext.Provider value={values}>{children}</SaleContext.Provider>
   );
 }
 
-export function useSharedContext() {
-  return useContext(SharedContext);
+export function useSaleContext() {
+  return useContext(SaleContext);
 }

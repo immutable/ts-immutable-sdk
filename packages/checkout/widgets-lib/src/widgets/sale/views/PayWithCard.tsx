@@ -4,7 +4,7 @@ import { Box } from '@biom3/react';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { WithCard } from '../components/WithCard';
-import { PrimaryRevenueWidgetViews } from '../../../context/view-context/PrimaryRevenueViewContextTypes';
+import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 import {
   ViewActions,
   ViewContext,
@@ -18,7 +18,7 @@ export function PayWithCard() {
       payload: {
         type: ViewActions.UPDATE_VIEW,
         view: {
-          type: PrimaryRevenueWidgetViews.PAYMENT_METHODS,
+          type: SaleWidgetViews.PAYMENT_METHODS,
         },
       },
     });
@@ -40,7 +40,6 @@ export function PayWithCard() {
           position: 'relative',
           maxWidth: '420px',
           height: '565px',
-          backgroundColor: 'white',
           borderRadius: '1%',
           overflow: 'hidden',
           margin: '0 auto',

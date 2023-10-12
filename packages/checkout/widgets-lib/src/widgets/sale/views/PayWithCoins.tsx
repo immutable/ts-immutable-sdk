@@ -5,22 +5,22 @@ import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { text as textConfig } from '../../../resources/text/textConfig';
-import { PrimaryRevenueWidgetViews } from '../../../context/view-context/PrimaryRevenueViewContextTypes';
+import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 import { OrderList } from '../components/OrderList';
 import {
-  sendPrimaryRevenueFailedEvent,
-  sendPrimaryRevenueSuccessEvent,
-  sendPrimaryRevenueWidgetCloseEvent,
-} from '../PrimaryRevenueWidgetEvents';
+  sendSaleFailedEvent,
+  sendSaleSuccessEvent,
+  sendSaleWidgetCloseEvent,
+} from '../SaleWidgetEvents';
 import { ViewContext } from '../../../context/view-context/ViewContext';
-import { useSharedContext } from '../context/SharedContextProvider';
+import { useSaleContext } from '../context/SaleContextProvider';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 
 export function PayWithCoins() {
-  const text = textConfig.views[PrimaryRevenueWidgetViews.PAY_WITH_COINS];
+  const text = textConfig.views[SaleWidgetViews.PAY_WITH_COINS];
   const [loading, setLoading] = useState(false);
   const { viewState } = useContext(ViewContext);
-  const { execute, signResponse } = useSharedContext();
+  const { execute, signResponse } = useSaleContext();
   const currency = signResponse?.order.currency || '';
 
   const {
@@ -31,9 +31,9 @@ export function PayWithCoins() {
     setLoading(true);
     try {
       const transactionHashes = await execute();
-      sendPrimaryRevenueSuccessEvent(eventTarget, transactionHashes);
+      sendSaleSuccessEvent(eventTarget, transactionHashes);
     } catch (error) {
-      sendPrimaryRevenueFailedEvent(eventTarget, (error as Error).message);
+      sendSaleFailedEvent(eventTarget, (error as Error).message);
     }
 
     setLoading(false);
@@ -45,7 +45,7 @@ export function PayWithCoins() {
       header={(
         <HeaderNavigation
           title={text.header.heading}
-          onCloseButtonClick={() => sendPrimaryRevenueWidgetCloseEvent(eventTarget)}
+          onCloseButtonClick={() => sendSaleWidgetCloseEvent(eventTarget)}
         />
       )}
       footer={<FooterLogo />}

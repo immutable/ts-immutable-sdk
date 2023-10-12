@@ -1,18 +1,18 @@
 /* eslint-disable no-console */
 import { useCallback, useMemo } from 'react';
 
-import { useSharedContext } from '../context/SharedContextProvider';
+import { useSaleContext } from '../context/SaleContextProvider';
 import { TransakIframe } from '../../../components/Transak/TransakIframe';
 import { TransakNFTData } from '../../../components/Transak/TransakTypes';
 import { text as textConfig } from '../../../resources/text/textConfig';
-import { PrimaryRevenueWidgetViews } from '../../../context/view-context/PrimaryRevenueViewContextTypes';
+import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 
 export function WithCard() {
-  const { screenTitle } = textConfig.views[PrimaryRevenueWidgetViews.PAY_WITH_CARD];
+  const { screenTitle, loading } = textConfig.views[SaleWidgetViews.PAY_WITH_CARD];
 
   const {
     recipientEmail, recipientAddress, isPassportWallet, signResponse,
-  } = useSharedContext();
+  } = useSaleContext();
   const executeTxn = signResponse?.transactions.find((txn) => txn.methodCall.startsWith('execute'));
 
   if (!signResponse || !executeTxn) {
@@ -62,6 +62,7 @@ export function WithCard() {
       walletAddress={recipientAddress}
       isPassportWallet={isPassportWallet}
       exchangeScreenTitle={screenTitle}
+      loadingText={loading}
       nftData={nftData}
       calldata={executeTxn.rawData}
       cryptoCurrencyCode={signResponse.order.currency.name}

@@ -55,12 +55,9 @@ export const useTransakIframe = (props: UseTransakIframeProps) => {
       ...restTransakParams
     } = transakParams;
 
-    // Default to first product
-    // FIXME: Remove this once transak supports multiple item minting
-    const nftData = nfts.map(({ nftName, ...nft }) => ({
-      ...nft,
-      nftName: nftName.replace(/x\d+$/, ''),
-    })).slice(0, 1);
+    // FIXME: defaulting to first nft in the list
+    // as transak currently only supports on nft at a time
+    const nftData = nfts?.slice(0, 1);
 
     // FIXME: Gas limit is not being calculated correctly, and cant be set to 0
     const gasLimit = estimatedGasLimit > 0 ? estimatedGasLimit : 300000;

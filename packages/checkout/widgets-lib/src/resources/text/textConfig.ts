@@ -6,8 +6,8 @@ import { SharedViews } from '../../context/view-context/ViewContext';
 import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
 import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextTypes';
-import { PrimaryRevenueWidgetViews } from '../../context/view-context/PrimaryRevenueViewContextTypes';
-import { MintErrorTypes, PaymentTypes } from '../../widgets/primary-revenue/types';
+import { SaleWidgetViews } from '../../context/view-context/SaleViewContextTypes';
+import { SaleErrorTypes, PaymentTypes } from '../../widgets/sale/types';
 import { ServiceType } from '../../views/error/serviceTypes';
 
 export const text = {
@@ -318,7 +318,7 @@ export const text = {
         },
       },
     },
-    [PrimaryRevenueWidgetViews.PAYMENT_METHODS]: {
+    [SaleWidgetViews.PAYMENT_METHODS]: {
       header: {
         heading: 'How would you like to pay?',
       },
@@ -336,7 +336,7 @@ export const text = {
       },
       loading: 'Nice choice',
     },
-    [PrimaryRevenueWidgetViews.PAY_WITH_COINS]: {
+    [SaleWidgetViews.PAY_WITH_COINS]: {
       header: {
         heading: 'Pay with your',
         caption: 'Using the coins balance in your wallet',
@@ -345,50 +345,51 @@ export const text = {
         buyNow: 'Buy now',
       },
     },
-    [PrimaryRevenueWidgetViews.PAY_WITH_CARD]: {
+    [SaleWidgetViews.PAY_WITH_CARD]: {
       screenTitle: 'Pay with card',
+      loading: 'Taking you to Transak',
     },
-    [PrimaryRevenueWidgetViews.MINT_FAIL]: {
+    [SaleWidgetViews.SALE_FAIL]: {
       errors: {
-        [MintErrorTypes.TRANSACTION_FAILED]: {
+        [SaleErrorTypes.TRANSACTION_FAILED]: {
           description: 'Transaction failed',
           primaryAction: 'Try again',
           secondaryAction: 'View details',
         },
-        [MintErrorTypes.SERVICE_BREAKDOWN]: {
+        [SaleErrorTypes.SERVICE_BREAKDOWN]: {
           description:
             "Sorry, we're unable to process your payment right now. Please try again in a few minutes.",
           secondaryAction: 'Dismiss',
         },
-        [MintErrorTypes.TRANSAK_FAILED]: {
+        [SaleErrorTypes.TRANSAK_FAILED]: {
           description: 'Sorry, something went wrong. Please try again.',
           primaryAction: 'Try again',
           secondaryAction: 'Dismiss',
         },
-        [MintErrorTypes.PASSPORT_FAILED]: {
+        [SaleErrorTypes.WALLET_FAILED]: {
           description: "Sorry, we're unable to process this right now.",
           primaryAction: 'Go back',
           secondaryAction: 'Dismiss',
         },
-        [MintErrorTypes.PASSPORT_REJECTED_NO_FUNDS]: {
+        [SaleErrorTypes.WALLET_REJECTED_NO_FUNDS]: {
           description: 'Sorry, something went wrong. Plese try again.',
           primaryAction: 'Go back',
           secondaryAction: 'Dismiss',
         },
-        [MintErrorTypes.PASSPORT_REJECTED]: {
+        [SaleErrorTypes.WALLET_REJECTED]: {
           description:
-            "You'll need to approve the transaction in Passport to proceed.",
+            "You'll need to approve the transaction in your wallet to proceed.",
           primaryAction: 'Try again',
           secondaryAction: 'Cancel',
         },
-        [MintErrorTypes.DEFAULT]: {
+        [SaleErrorTypes.DEFAULT]: {
           description: 'Sorry, something went wrong. Please try again.',
           primaryAction: 'Try again',
           secondaryAction: 'Dismiss',
         },
       },
     },
-    [PrimaryRevenueWidgetViews.MINT_SUCCESS]: {
+    [SaleWidgetViews.SALE_SUCCESS]: {
       text: 'Order completed',
       actionText: 'Continue',
     },
