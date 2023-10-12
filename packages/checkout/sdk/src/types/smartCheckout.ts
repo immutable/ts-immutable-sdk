@@ -11,11 +11,11 @@ export type BuyResult = BuyResultSuccess | BuyResultFailed | BuyResultInsufficie
 /**
  * Represents the result of {@link Checkout.buy}
  * @property {CheckoutStatus.SUCCESS} status - The status to indicate success
- * @property {SmartCheckoutSufficient[]} smartCheckoutResult - The sufficient result of smart checkout
+ * @property {SmartCheckoutSufficient} smartCheckoutResult - The sufficient result of smart checkout
  */
 export type BuyResultSuccess = {
   status: CheckoutStatus.SUCCESS,
-  smartCheckoutResult: SmartCheckoutSufficient[]
+  smartCheckoutResult: SmartCheckoutSufficient
 };
 
 /**
@@ -23,23 +23,23 @@ export type BuyResultSuccess = {
  * @property {CheckoutStatus.FAILED} status - The status to indicate failure
  * @property {string} transactionHash - The transaction hash of the failed transaction
  * @property {string} reason - The reason for the failure
- * @property {SmartCheckoutSufficient[]} smartCheckoutResult - The sufficient result of smart checkout
+ * @property {SmartCheckoutSufficient} smartCheckoutResult - The sufficient result of smart checkout
  */
 export type BuyResultFailed = {
   status: CheckoutStatus.FAILED,
   transactionHash: string,
   reason: string,
-  smartCheckoutResult: SmartCheckoutSufficient[]
+  smartCheckoutResult: SmartCheckoutSufficient
 };
 
 /**
  * Represents the result of {@link Checkout.buy}
  * @property {CheckoutStatus.INSUFFICIENT_FUNDS} status - The status to indicate insufficient funds
- * @property {SmartCheckoutInsufficient[]} smartCheckoutResult - The insufficient result of smart checkout
+ * @property {SmartCheckoutInsufficient} smartCheckoutResult - The insufficient result of smart checkout
  */
 export type BuyResultInsufficientFunds = {
   status: CheckoutStatus.INSUFFICIENT_FUNDS,
-  smartCheckoutResult: SmartCheckoutInsufficient[]
+  smartCheckoutResult: SmartCheckoutInsufficient
 };
 
 /*
@@ -50,12 +50,12 @@ export type SellResult = SellResultSuccess | SellResultFailed | SellResultInsuff
 /**
  * Represents the result of {@link Checkout.sell}
  * @property {CheckoutStatus.SUCCESS} status - The status to indicate success
- * @property {SmartCheckoutSufficient[]} smartCheckoutResult - The sufficient result of smart checkout
+ * @property {SmartCheckoutSufficient} smartCheckoutResult - The sufficient result of smart checkout
  */
 export type SellResultSuccess = {
   status: CheckoutStatus.SUCCESS,
   orderIds: string[],
-  smartCheckoutResult: SmartCheckoutSufficient[]
+  smartCheckoutResult: SmartCheckoutSufficient
 };
 
 /**
@@ -63,23 +63,23 @@ export type SellResultSuccess = {
  * @property {CheckoutStatus.FAILED} status - The status to indicate failure
  * @property {string} transactionHash - The transaction hash of the failed transaction
  * @property {string} reason - The reason for the failure
- * @property {SmartCheckoutSufficient[]} smartCheckoutResult - The sufficient result of smart checkout
+ * @property {SmartCheckoutSufficient} smartCheckoutResult - The sufficient result of smart checkout
  */
 export type SellResultFailed = {
   status: CheckoutStatus.FAILED,
   transactionHash: string,
   reason: string,
-  smartCheckoutResult: SmartCheckoutSufficient[]
+  smartCheckoutResult: SmartCheckoutSufficient
 };
 
 /**
  * Represents the result of {@link Checkout.sell}
  * @property {CheckoutStatus.INSUFFICIENT_FUNDS} status - The status to indicate insufficient funds
- * @property {SmartCheckoutInsufficient[]} smartCheckoutResult - The insufficient result of smart checkout
+ * @property {SmartCheckoutInsufficient} smartCheckoutResult - The insufficient result of smart checkout
  */
 export type SellResultInsufficientFunds = {
   status: CheckoutStatus.INSUFFICIENT_FUNDS,
-  smartCheckoutResult: SmartCheckoutInsufficient[]
+  smartCheckoutResult: SmartCheckoutInsufficient
 };
 
 /*
@@ -387,13 +387,11 @@ export type SmartCheckoutInsufficient = {
 
 /**
  * Represents the routing outcome for a transaction.
- * @property {boolean} isPassport - Indicates if the provider used was a passport provider.
  * @property {AvailableRoutingOptions} availableRoutingOptions - The routing options available to the user
  * @property {RoutingOutcome} routingOutcome - The routing outcome for the transaction which
  * includes the funding routes if routes were found
  */
 export type SmartCheckoutRouter = {
-  isPassport: boolean,
   availableRoutingOptions: AvailableRoutingOptions,
   routingOutcome: RoutingOutcome
 };

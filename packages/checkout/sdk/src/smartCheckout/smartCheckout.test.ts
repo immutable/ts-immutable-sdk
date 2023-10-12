@@ -433,7 +433,6 @@ describe('smartCheckout', () => {
           },
         ],
         router: {
-          isPassport: false,
           availableRoutingOptions: {
             onRamp: undefined,
             swap: undefined,
@@ -564,9 +563,6 @@ describe('smartCheckout', () => {
         getSigner: jest.fn().mockReturnValue({
           getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
         }),
-        provider: {
-          isPassport: true,
-        },
       } as unknown as Web3Provider;
 
       const result = await smartCheckout(
@@ -657,7 +653,6 @@ describe('smartCheckout', () => {
           },
         ],
         router: {
-          isPassport: true,
           availableRoutingOptions: {
             onRamp: undefined,
             swap: undefined,

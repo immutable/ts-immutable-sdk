@@ -49,7 +49,7 @@ import { ListTradeResult } from '../models';
 // @ts-ignore
 import { ListingResult } from '../models';
 // @ts-ignore
-import { OrderStatus } from '../models';
+import { OrderStatusName } from '../models';
 // @ts-ignore
 import { TradeResult } from '../models';
 /**
@@ -258,7 +258,7 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
          * List all listings
          * @summary List all listings
          * @param {string} chainName 
-         * @param {OrderStatus} [status] Order status to filter by
+         * @param {OrderStatusName} [status] Order status to filter by
          * @param {string} [sellItemContractAddress] Sell item contract address to filter by
          * @param {string} [buyItemContractAddress] Buy item contract address to filter by
          * @param {string} [sellItemTokenId] Sell item token identifier to filter by
@@ -269,7 +269,7 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listListings: async (chainName: string, status?: OrderStatus, sellItemContractAddress?: string, buyItemContractAddress?: string, sellItemTokenId?: string, pageSize?: number, sortBy?: 'created_at' | 'updated_at' | 'buy_item_amount', sortDirection?: 'asc' | 'desc', pageCursor?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listListings: async (chainName: string, status?: OrderStatusName, sellItemContractAddress?: string, buyItemContractAddress?: string, sellItemTokenId?: string, pageSize?: number, sortBy?: 'created_at' | 'updated_at' | 'buy_item_amount', sortDirection?: 'asc' | 'desc', pageCursor?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'chainName' is not null or undefined
             assertParamExists('listListings', 'chainName', chainName)
             const localVarPath = `/v1/chains/{chain_name}/orders/listings`
@@ -461,7 +461,7 @@ export const OrdersApiFp = function(configuration?: Configuration) {
          * List all listings
          * @summary List all listings
          * @param {string} chainName 
-         * @param {OrderStatus} [status] Order status to filter by
+         * @param {OrderStatusName} [status] Order status to filter by
          * @param {string} [sellItemContractAddress] Sell item contract address to filter by
          * @param {string} [buyItemContractAddress] Buy item contract address to filter by
          * @param {string} [sellItemTokenId] Sell item token identifier to filter by
@@ -472,7 +472,7 @@ export const OrdersApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listListings(chainName: string, status?: OrderStatus, sellItemContractAddress?: string, buyItemContractAddress?: string, sellItemTokenId?: string, pageSize?: number, sortBy?: 'created_at' | 'updated_at' | 'buy_item_amount', sortDirection?: 'asc' | 'desc', pageCursor?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListListingsResult>> {
+        async listListings(chainName: string, status?: OrderStatusName, sellItemContractAddress?: string, buyItemContractAddress?: string, sellItemTokenId?: string, pageSize?: number, sortBy?: 'created_at' | 'updated_at' | 'buy_item_amount', sortDirection?: 'asc' | 'desc', pageCursor?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListListingsResult>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listListings(chainName, status, sellItemContractAddress, buyItemContractAddress, sellItemTokenId, pageSize, sortBy, sortDirection, pageCursor, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -561,7 +561,7 @@ export const OrdersApiFactory = function (configuration?: Configuration, basePat
          * List all listings
          * @summary List all listings
          * @param {string} chainName 
-         * @param {OrderStatus} [status] Order status to filter by
+         * @param {OrderStatusName} [status] Order status to filter by
          * @param {string} [sellItemContractAddress] Sell item contract address to filter by
          * @param {string} [buyItemContractAddress] Buy item contract address to filter by
          * @param {string} [sellItemTokenId] Sell item token identifier to filter by
@@ -572,7 +572,7 @@ export const OrdersApiFactory = function (configuration?: Configuration, basePat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listListings(chainName: string, status?: OrderStatus, sellItemContractAddress?: string, buyItemContractAddress?: string, sellItemTokenId?: string, pageSize?: number, sortBy?: 'created_at' | 'updated_at' | 'buy_item_amount', sortDirection?: 'asc' | 'desc', pageCursor?: string, options?: any): AxiosPromise<ListListingsResult> {
+        listListings(chainName: string, status?: OrderStatusName, sellItemContractAddress?: string, buyItemContractAddress?: string, sellItemTokenId?: string, pageSize?: number, sortBy?: 'created_at' | 'updated_at' | 'buy_item_amount', sortDirection?: 'asc' | 'desc', pageCursor?: string, options?: any): AxiosPromise<ListListingsResult> {
             return localVarFp.listListings(chainName, status, sellItemContractAddress, buyItemContractAddress, sellItemTokenId, pageSize, sortBy, sortDirection, pageCursor, options).then((request) => request(axios, basePath));
         },
         /**
@@ -713,10 +713,10 @@ export interface OrdersApiListListingsRequest {
 
     /**
      * Order status to filter by
-     * @type {OrderStatus}
+     * @type {OrderStatusName}
      * @memberof OrdersApiListListings
      */
-    readonly status?: OrderStatus
+    readonly status?: OrderStatusName
 
     /**
      * Sell item contract address to filter by
