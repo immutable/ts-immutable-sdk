@@ -7,10 +7,13 @@ import {
 import { BiomeCombinedProviders, Heading } from '@biom3/react';
 import { ConnectButton } from './Components/connect-button';
 import { DisconnectButton } from './Components/disconnect-button';
-import { Environment } from '@imtbl/sdk';
+import { config } from '@imtbl/sdk';
 import { SignMessage } from './Components/sign-message';
 import { useEffect, useReducer } from 'react';
 import { WalletDisplay } from './Components/wallet-display';
+import { CreateOrder } from './Components/create-order';
+import { CancelOrder } from './Components/cancel-order';
+import { CreateTrade } from './Components/create-trade';
 
 export const App = () => {
   const [state, dispatch] = useReducer(appReducer, initialState);
@@ -19,7 +22,7 @@ export const App = () => {
     dispatch({
       payload: {
         type: Actions.SetEnvironment,
-        env: Environment.SANDBOX,
+        env: config.Environment.SANDBOX,
       },
     });
   }, []);
@@ -31,6 +34,9 @@ export const App = () => {
         <WalletDisplay />
         <ConnectButton />
         <SignMessage />
+        <CreateOrder />
+        <CancelOrder />
+        <CreateTrade />
         <DisconnectButton />
       </AppCtx.Provider>
     </BiomeCombinedProviders>
