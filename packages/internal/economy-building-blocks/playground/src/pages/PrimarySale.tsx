@@ -16,7 +16,7 @@ import ItemCards from "../components/ItemCards";
 import StatusCard from "../components/StatusCard";
 import ConfigForm from "../components/ConfigForm";
 import { useData } from "../context/DataProvider";
-import { PrimaryRevenueEventType } from "@imtbl/checkout-widgets";
+import { SaleEventType } from "@imtbl/checkout-widgets";
 import { config, passport } from "@imtbl/sdk";
 
 const approveFunction = "approve(address spender,uint256 amount)";
@@ -306,12 +306,12 @@ function PrimarySale() {
     }
 
     switch (data.type) {
-      case PrimaryRevenueEventType.CLOSE_WIDGET: {
+      case SaleEventType.CLOSE_WIDGET: {
         console.log("@@@ close widget");
         closePopup();
         break;
       }
-      case PrimaryRevenueEventType.SUCCESS: {
+      case SaleEventType.SUCCESS: {
         console.log("@@@ sucess event", data);
         setApprovedTx(data.data[approveFunction]);
         setExecutedTx(data.data[executeFunction]);
