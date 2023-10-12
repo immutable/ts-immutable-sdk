@@ -55,7 +55,7 @@ describe('Orders', () => {
       });
       (OrdersApi as jest.Mock).mockReturnValue({
         getSignableOrder: getSignableOrderMock,
-        createOrder: createOrderMock,
+        createOrderV3: createOrderMock,
       });
 
       (signRaw as jest.Mock).mockReturnValue('raw-eth-signature');
@@ -87,7 +87,6 @@ describe('Orders', () => {
           asset_id_buy: getSignableOrderResponse.asset_id_buy,
           asset_id_sell: getSignableOrderResponse.asset_id_sell,
           expiration_timestamp: getSignableOrderResponse.expiration_timestamp,
-          include_fees: true,
           fees: signableOrderRequest.fees,
           nonce: getSignableOrderResponse.nonce,
           stark_key: getSignableOrderResponse.stark_key,
@@ -128,8 +127,8 @@ describe('Orders', () => {
         data: createCancelResponse,
       });
       (OrdersApi as jest.Mock).mockReturnValue({
-        getSignableCancelOrder: getSignableCancelOrderMock,
-        cancelOrder: cancelOrderMock,
+        getSignableCancelOrderV3: getSignableCancelOrderMock,
+        cancelOrderV3: cancelOrderMock,
       });
 
       (signRaw as jest.Mock).mockReturnValue('raw-eth-signature');
