@@ -16,7 +16,6 @@ import ItemCards from "../components/ItemCards";
 import StatusCard from "../components/StatusCard";
 import ConfigForm from "../components/ConfigForm";
 import { useData } from "../context/DataProvider";
-import { SaleEventType } from "@imtbl/checkout-widgets";
 import { config, passport } from "@imtbl/sdk";
 
 const approveFunction = "approve(address spender,uint256 amount)";
@@ -95,6 +94,7 @@ const useItems = (contract_address: string, pointer = 1) => {
           );
           const json = await response.json();
           // const price = Math.floor(Math.random() * 25) + 1;
+          // const price = 1;
           const price = Math.round((Math.random() * 3 + 0.1) * 100) / 1000;
 
           return {
@@ -208,6 +208,7 @@ const useMint = (
   );
 
   const handleMint = useCallback(async () => {
+    console.log("🚀 ~ handleMint:");
     setLoading(true);
     openPopup();
   }, [amount, configFields, selectedItems]);
@@ -306,12 +307,12 @@ function PrimarySale() {
     }
 
     switch (data.type) {
-      case SaleEventType.CLOSE_WIDGET: {
+      case "close-widget": {
         console.log("@@@ close widget");
         closePopup();
         break;
       }
-      case SaleEventType.SUCCESS: {
+      case "success": {
         console.log("@@@ sucess event", data);
         setApprovedTx(data.data[approveFunction]);
         setExecutedTx(data.data[executeFunction]);
@@ -480,7 +481,7 @@ function PrimarySale() {
                         <MenuItem.Caption>{item.description}</MenuItem.Caption>
                         {item.price && (
                           <MenuItem.PriceDisplay
-                            price={item.price.toString()}
+                            price={`$${item.price * item.quantity}`}
                             currencyImageUrl="https://design-system.immutable.com/hosted-for-ds/currency-icons/currency--usdc.svg"
                           />
                         )}
@@ -498,8 +499,16 @@ function PrimarySale() {
                           justifyContent: "space-between",
                         }}
                       >
-                        <Heading size={"small"}>Subtotal</Heading>
-                        <Body> ${amount} USDC</Body>
+                        <Heading size={"small"}>Subtotal</Heading>${amount.toFixed(3)}
+                      </Box>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Heading size={"small"}>Fees (10%)</Heading>$
+                        {(amount * fee).toFixed(1)}
                       </Box>
 
                       <Box
@@ -508,10 +517,30 @@ function PrimarySale() {
                           justifyContent: "space-between",
                         }}
                       >
-                        <Heading size={"small"}>
-                          Total (+ fees {fee * 100}%):
-                        </Heading>
-                        ${amount * fee} USDC
+                        <Heading size={"small"}>Total:</Heading>
+                        <Body
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          <span
+                            style={{
+                              margin: "0 10px",
+                              display: "flex",
+                              alignItems: "center",
+                            }}
+                          >
+                            <img
+                              src="https://design-system.immutable.com/hosted-for-ds/currency-icons/currency--usdc.svg"
+                              style={{ margin: "0 5px" }}
+                            />
+                            USDC
+                          </span>
+                          {`$${(amount + amount * fee).toFixed(1)}`}
+                        </Body>
                       </Box>
                     </>
                   ) : null}

@@ -3379,6 +3379,7 @@ __metadata:
     "@types/uuid": ^9.0.2
     buffer: ^6.0.3
     crypto: "npm:crypto-browserify@^3.12.0"
+    disable-react-error-overlay: ^0.0.1
     http: "npm:stream-http@^3.2.0"
     https: "npm:https-browserify@^1.0.0"
     react: ^18.2.0
@@ -14979,6 +14980,13 @@ __metadata:
   dependencies:
     path-type: ^4.0.0
   checksum: fa05e18324510d7283f55862f3161c6759a3f2f8dbce491a2fc14c8324c498286c54282c1f0e933cb930da8419b30679389499b919122952a4f8592362ef4615
+  languageName: node
+  linkType: hard
+
+"disable-react-error-overlay@npm:^0.0.1":
+  version: 0.0.1
+  resolution: "disable-react-error-overlay@npm:0.0.1"
+  checksum: cfabfb122454f2dd7103e6e739cb9b11d9f3826f34f8fc0f317e3d7a183574a855641e1af08b233a472e61e95af900707e38d72f7ca3f494fe1de87beea0be2f
   languageName: node
   linkType: hard
 

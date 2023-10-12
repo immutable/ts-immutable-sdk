@@ -64,7 +64,7 @@ function PrimaryRevenueWidget() {
 
   useEffect(() => {
     window.addEventListener(
-      IMTBLWidgetEvents.IMTBL_PRIMARY_REVENUE_WIDGET_EVENT,
+      "imtbl-primary-revenue-widget", 
       handleEvent
     );
     window.addEventListener(
