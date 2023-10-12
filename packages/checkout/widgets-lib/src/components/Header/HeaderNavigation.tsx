@@ -5,7 +5,11 @@ import {
   ViewActions,
   ViewContext,
 } from '../../context/view-context/ViewContext';
-
+import { AppBar, Button, IconButton, Stack, Toolbar, Typography } from "@mui/material";
+import MenuIcon from '@mui/icons-material/Menu';
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import CloseIcon from '@mui/icons-material/Close';
+import SettingsIcon from '@mui/icons-material/Settings';
 export interface HeaderNavigationProps {
   title?: string;
   showBack?: boolean;
@@ -44,44 +48,48 @@ export function HeaderNavigation({
   };
 
   return (
-    <AppHeaderBar
-      testId="header-navigation-container"
-      sx={HeaderNavigationStyles(transparent)}
-      contentAlign={showBack ? 'center' : 'left'}
-      size="small"
-    >
-      {showBack && (
-        <AppHeaderBar.LeftButtCon
-          sx={ButtonNavigationStyles(transparent)}
-          icon="ArrowBackward"
-          iconVariant="bold"
-          onClick={handleBackButtonClick}
-          testId="back-button"
-        />
-      )}
-      <AppHeaderBar.Title testId="header-title" size="small">
-        {title}
-      </AppHeaderBar.Title>
-      <AppHeaderBar.RightHandButtons>
-        {showSettings && onSettingsClick && (
-          <ButtCon
-            icon="SettingsCog"
-            sx={ButtonNavigationStyles(transparent)}
-            iconVariant="bold"
-            onClick={onSettingsClick}
-            testId="settings-button"
-          />
-        )}
-        {onCloseButtonClick && (
-          <ButtCon
-            iconVariant="bold"
-            sx={ButtonNavigationStyles(transparent)}
-            icon="Close"
-            onClick={onCloseButtonClick}
-            testId="close-button"
-          />
-        )}
-      </AppHeaderBar.RightHandButtons>
-    </AppHeaderBar>
+    <>
+      <AppBar
+        position="static"
+        sx={HeaderNavigationStyles(true)}
+      >
+        <Toolbar disableGutters sx={{ px: 2, py: 2 }}>
+          {showBack && (
+            <IconButton
+              size="large"
+              edge="start"
+              color="inherit"
+              sx={ButtonNavigationStyles(transparent)}
+              onClick={handleBackButtonClick}
+            >
+              <ArrowBackIosNewIcon />
+            </IconButton>
+          )}
+
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }} test-id="header-title">
+            {title}
+          </Typography>
+          <Stack direction="row" spacing={1}>
+            {showSettings && onSettingsClick && (
+              <IconButton
+                size="large"
+                color="inherit"
+                test-id="settings-button"
+              >
+                <SettingsIcon fontSize='small' />
+              </IconButton>
+            )}
+            <IconButton
+              size="large"
+              color="inherit"
+              test-id="close-button"
+            >
+              <CloseIcon fontSize='small' />
+            </IconButton>
+          </Stack>
+        </Toolbar>
+      </AppBar>
+    </>
+
   );
 }

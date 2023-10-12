@@ -13,6 +13,8 @@ import {
 } from '../../../../context/view-context/ViewContext';
 import { WalletWidgetViews } from '../../../../context/view-context/WalletViewContextTypes';
 import { text } from '../../../../resources/text/textConfig';
+import { IconButton } from "@mui/material";
+import SvgIconInfo from "../../../../theme/icons/info";
 
 interface TotalTokenBalanceProps {
   totalBalance: number;
@@ -28,18 +30,14 @@ export function TotalTokenBalance(props: TotalTokenBalanceProps) {
       <Box sx={totalTokenBalanceValueStyle}>
         <Body size="medium">{totalTokenBalance.heading}</Body>
         <Box sx={{ pl: 'base.spacing.x1' }}>
-          <ButtCon
-            testId="coin-info-icon"
-            variant="tertiary"
-            icon="Information"
-            sx={coinInfoButtonStyle}
-            onClick={() => viewDispatch({
-              payload: {
-                type: ViewActions.UPDATE_VIEW,
-                view: { type: WalletWidgetViews.COIN_INFO },
-              },
-            })}
-          />
+          <IconButton size="small" onClick={() => viewDispatch({
+            payload: {
+              type: ViewActions.UPDATE_VIEW,
+              view: { type: WalletWidgetViews.COIN_INFO },
+            },
+          })}>
+            <SvgIconInfo />
+          </IconButton>
         </Box>
       </Box>
       <Box sx={totalTokenBalanceValueStyle}>

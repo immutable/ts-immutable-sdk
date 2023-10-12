@@ -1,7 +1,8 @@
 import {
-  Body, Box, Button, HorizontalMenu,
+  Body, Box, HorizontalMenu,
 } from '@biom3/react';
 import {
+  Fragment,
   useCallback, useContext, useEffect, useState,
 } from 'react';
 import {
@@ -32,6 +33,10 @@ import {
   ConnectLoaderContext,
 } from '../../../../context/connect-loader-context/ConnectLoaderContext';
 import { EventTargetContext } from '../../../../context/event-target-context/EventTargetContext';
+import { ButtonGroup, Button, Card } from "@mui/material";
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import SvgIconImmutable from "../../../../theme/icons/imx";
+import SvgIconChain from "../../../../theme/icons/chain";
 
 const logoColour = {
   [ChainId.IMTBL_ZKEVM_DEVNET]: 'base.color.text.link.primary',
@@ -43,11 +48,11 @@ const logoColour = {
 
 // todo: add corresponding network symbols
 const networkIcon = {
-  [ChainId.IMTBL_ZKEVM_DEVNET]: 'Immutable',
-  [ChainId.IMTBL_ZKEVM_MAINNET]: 'Immutable',
-  [ChainId.IMTBL_ZKEVM_TESTNET]: 'Immutable',
-  [ChainId.ETHEREUM]: 'EthToken',
-  [ChainId.SEPOLIA]: 'EthToken',
+  [ChainId.IMTBL_ZKEVM_DEVNET]: <SvgIconImmutable sx={{ fill: 'rgb(241, 145, 250)' }} />,
+  [ChainId.IMTBL_ZKEVM_MAINNET]: <SvgIconImmutable sx={{ fill: 'rgb(241, 145, 250)' }} />,
+  [ChainId.IMTBL_ZKEVM_TESTNET]: <SvgIconImmutable sx={{ fill: 'rgb(241, 145, 250)' }} />,
+  [ChainId.ETHEREUM]: <SvgIconChain sx={{ fill: 'rgb(182, 182, 182)' }} />,
+  [ChainId.SEPOLIA]: <SvgIconChain sx={{ fill: 'rgb(182, 182, 182)' }} />,
 };
 
 export interface NetworkMenuProps {
@@ -125,34 +130,35 @@ export function NetworkMenu({ setBalancesLoading }: NetworkMenuProps) {
       <Body testId="network-heading" size="medium" sx={networkHeadingStyle}>
         {networkStatus.heading}
       </Body>
-      <HorizontalMenu>
-        {checkout
-          && allowedNetworks
-            ?.sort((a: NetworkInfo, b: NetworkInfo) => sortNetworksCompareFn(a, b, checkout.config))
-            .map((networkItem) => (
-              <HorizontalMenu.Button
-                key={networkItem.chainId}
-                testId={`${networkItem.name}-network-button`}
-                sx={
-                  networkItem.chainId === network?.chainId
-                    ? activeNetworkButtonStyle
-                    : networkButtonStyle
-                }
-                size="small"
-                onClick={() => switchNetwork(networkItem.chainId)}
-              >
-                <Button.Icon
-                  icon={networkIcon[networkItem.chainId]}
-                  iconVariant="bold"
-                  sx={logoStyle(
-                    logoColour[networkItem.chainId],
-                    networkItem.chainId === network?.chainId,
-                  )}
-                />
+      <Box sx={{
+        justifyContent: "stretch",
+        background: "rgba(243, 243, 243, 0.08)",
+        position: "relative",
+        overflowY: "auto",
+        display: "flex",
+        width: "100%",
+        gap: "4px",
+        padding: "8px",
+        borderRadius: "16px",
+      }}>
+        {checkout && allowedNetworks?.sort((a: NetworkInfo, b: NetworkInfo) => sortNetworksCompareFn(a, b, checkout.config))
+          .map(networkItem => (
+            <Fragment key={networkItem.name}>
+              <Button variant="outlined" fullWidth size='small' color='inherit' startIcon={networkIcon[networkItem.chainId]}
+              sx={{
+              ...(networkItem.chainId === network?.chainId? {
+
+                  fontWeight: '700',
+                  borderColor: 'rgb(243, 243, 243)',
+                  borderStyle: 'solid',
+                  borderWidth: '2px',
+                } : {})
+              }}>
                 {networkItem.name}
-              </HorizontalMenu.Button>
-            ))}
-      </HorizontalMenu>
+              </Button>
+            </Fragment>
+          ))}
+      </Box>
     </Box>
   );
 }

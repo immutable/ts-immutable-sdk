@@ -12,19 +12,11 @@ import {
   CheckoutWidgetsConfig,
 } from '@imtbl/checkout-widgets';
 import { Environment } from '@imtbl/config';
+
 import { WalletProviderName } from '@imtbl/checkout-sdk';
 
 function ConnectUI() {
-  CheckoutWidgets({
-    theme: WidgetTheme.DARK,
-    environment: Environment.SANDBOX,
-  });
-  const widgetsConfig2: CheckoutWidgetsConfig = {
-    theme: WidgetTheme.DARK,
-    environment: Environment.SANDBOX,
-  };
-
-  UpdateConfig(widgetsConfig2);
+  CheckoutWidgets({ theme: WidgetTheme.DARK, environment: Environment.PRODUCTION });
   useEffect(() => {
     // Add event listeners for the IMXConnectWidget and handle event types appropriately
     const handleConnectEvent = ((event: CustomEvent) => {
@@ -46,15 +38,10 @@ function ConnectUI() {
       }
     }) as EventListener;
 
-    window.addEventListener(
-      IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
-      handleConnectEvent
-    );
+
+    window.addEventListener(IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT, handleConnectEvent);
     return () => {
-      window.removeEventListener(
-        IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
-        handleConnectEvent
-      );
+      window.removeEventListener(IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT, handleConnectEvent);
     };
   }, []);
 

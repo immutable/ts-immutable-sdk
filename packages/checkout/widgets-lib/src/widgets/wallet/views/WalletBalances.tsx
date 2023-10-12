@@ -35,7 +35,7 @@ import {
 } from '../../../context/view-context/ViewContext';
 import { fetchTokenSymbols } from '../../../lib/fetchTokenSymbols';
 import { NotEnoughGas } from '../../../components/NotEnoughGas/NotEnoughGas';
-import { isNativeToken } from '../../../lib/utils';
+import { isNativeToken, tokenValueFormat } from '../../../lib/utils';
 import {
   DEFAULT_BALANCE_RETRY_POLICY,
   DEFAULT_TOKEN_DECIMALS,
@@ -46,6 +46,10 @@ import { orchestrationEvents } from '../../../lib/orchestrationEvents';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import { isPassportProvider } from '../../../lib/providerUtils';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
+import { Avatar, ListItem, ListItemAvatar, ListItemButton, ListItemText, Stack, Typography } from "@mui/material";
+import AddIcon from '@mui/icons-material/Add';
+
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 export function WalletBalances() {
   const { connectLoaderState } = useContext(ConnectLoaderContext);
@@ -260,15 +264,15 @@ export function WalletBalances() {
           </Box>
         </Box>
         {showAddCoins && (
-          <MenuItem
-            testId="add-coins"
-            emphasized
-            onClick={handleAddCoinsClick}
-          >
-            <MenuItem.FramedIcon icon="Add" />
-            <MenuItem.Label>Add coins</MenuItem.Label>
-          </MenuItem>
-        )}
+          <ListItemButton onClick={handleAddCoinsClick}>
+            <ListItemAvatar>
+              <Avatar variant="square">
+                <AddIcon />
+              </Avatar>
+            </ListItemAvatar>
+            <ListItemText>Add Coins</ListItemText>
+          </ListItemButton>)
+        }
         <NotEnoughGas
           visible={showNotEnoughGasDrawer}
           showHeaderBar={false}
