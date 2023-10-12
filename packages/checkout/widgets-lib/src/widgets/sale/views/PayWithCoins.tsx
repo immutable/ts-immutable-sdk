@@ -1,5 +1,5 @@
 import {
-  useContext, useEffect, useRef, useState,
+  useContext, useEffect, useRef,
 } from 'react';
 
 import { text as textConfig } from '../../../resources/text/textConfig';
@@ -12,13 +12,27 @@ import { sendSaleFailedEvent, sendSaleSuccessEvent } from '../SaleWidgetEvents';
 export function PayWithCoins() {
   const processing = useRef(false);
   const text = textConfig.views[SaleWidgetViews.PAYMENT_METHODS];
-  const [loading, setLoading] = useState<string>(text.loading.ready);
 
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
   const {
     execute, signResponse, executeResponse, goToSuccessView,
   } = useSaleContext();
   const expectedTxns = signResponse?.transactions.length || 0;
+  const executedTxns = executeResponse?.transactions.length || 0;
+
+  let loadingText = text.loading.ready;
+
+  if (signResponse !== undefined) {
+    loadingText = text.loading.confirm;
+  }
+
+  if (executedTxns > 0 && executedTxns === expectedTxns) {
+    loadingText = text.loading.processing;
+  }
+
+  if (signResponse !== undefined) {
+    loadingText = `${loadingText} ${executedTxns + 1}/${expectedTxns}`;
+  }
 
   const sendTransaction = async () => {
     const transactions = await execute(signResponse);
@@ -30,21 +44,16 @@ export function PayWithCoins() {
   useEffect(() => {
     if (signResponse !== undefined && processing.current === false) {
       processing.current = true;
-      setLoading(text.loading.confirm);
       sendTransaction();
     }
   }, [signResponse]);
 
   useEffect(() => {
-    if (executeResponse?.transactions.length === expectedTxns) {
-      setLoading(text.loading.processing);
-    }
-
     if (executeResponse?.done === true) {
       sendSaleSuccessEvent(eventTarget, executeResponse);
       goToSuccessView();
     }
   }, [executeResponse]);
 
-  return <LoadingView loadingText={loading} showFooterLogo />;
+  return <LoadingView loadingText={loadingText} showFooterLogo />;
 }
