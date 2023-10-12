@@ -13,8 +13,9 @@
  */
 
 
-import globalAxios, { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
-import { Configuration } from '../configuration';
+import type { Configuration } from '../configuration';
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
@@ -174,26 +175,22 @@ export const TokensApiFactory = function (configuration?: Configuration, basePat
         /**
          * Get single ERC20 token
          * @summary Get single ERC20 token
-         * @param {string} contractAddress The address of contract
-         * @param {string} chainName The name of chain
+         * @param {TokensApiGetERC20TokenRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getERC20Token(contractAddress: string, chainName: string, options?: any): AxiosPromise<GetTokenResult> {
-            return localVarFp.getERC20Token(contractAddress, chainName, options).then((request) => request(axios, basePath));
+        getERC20Token(requestParameters: TokensApiGetERC20TokenRequest, options?: AxiosRequestConfig): AxiosPromise<GetTokenResult> {
+            return localVarFp.getERC20Token(requestParameters.contractAddress, requestParameters.chainName, options).then((request) => request(axios, basePath));
         },
         /**
          * List ERC20 tokens
          * @summary List ERC20 tokens
-         * @param {string} chainName The name of chain
-         * @param {string} [fromUpdatedAt] Datetime to use as the oldest updated timestamp
-         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
-         * @param {number} [pageSize] Maximum number of items to return
+         * @param {TokensApiListERC20TokensRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listERC20Tokens(chainName: string, fromUpdatedAt?: string, pageCursor?: string, pageSize?: number, options?: any): AxiosPromise<ListTokensResult> {
-            return localVarFp.listERC20Tokens(chainName, fromUpdatedAt, pageCursor, pageSize, options).then((request) => request(axios, basePath));
+        listERC20Tokens(requestParameters: TokensApiListERC20TokensRequest, options?: AxiosRequestConfig): AxiosPromise<ListTokensResult> {
+            return localVarFp.listERC20Tokens(requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -285,3 +282,4 @@ export class TokensApi extends BaseAPI {
         return TokensApiFp(this.configuration).listERC20Tokens(requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 }
+
