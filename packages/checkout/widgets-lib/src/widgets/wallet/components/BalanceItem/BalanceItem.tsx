@@ -1,15 +1,10 @@
-import {
-  Heading,
-  MenuItem,
-} from '@biom3/react';
+import { Heading, MenuItem } from '@biom3/react';
 import {
   useContext, useEffect, useMemo, useState,
 } from 'react';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import { TokenFilterTypes, TokenInfo } from '@imtbl/checkout-sdk';
-import {
-  ShowMenuItem,
-} from './BalanceItemStyles';
+import { ShowMenuItem } from './BalanceItemStyles';
 import { BalanceInfo } from '../../functions/tokenBalances';
 import { WalletContext } from '../../context/WalletContext';
 import { orchestrationEvents } from '../../../../lib/orchestrationEvents';
@@ -70,7 +65,8 @@ export function BalanceItem({
     setIsBridgeEnabled(enableMoveCoin);
 
     const enableSwapCoin = network.chainId === getL2ChainId(checkout.config)
-      && (supportedTopUps?.isSwapEnabled ?? true);
+        && (supportedTopUps?.isSwapEnabled ?? true)
+        && (supportedTopUps?.isSwapAvailable ?? true);
     setIsSwapEnabled(enableSwapCoin);
   }, [network, supportedTopUps, checkout, isPassport]);
 
@@ -98,45 +94,52 @@ export function BalanceItem({
         fiatAmount={fiatAmount}
       />
       {(isOnRampEnabled || isSwapEnabled || isBridgeEnabled) && (
-      <MenuItem.OverflowPopoverMenu size="small" testId="token-menu">
-        <MenuItem
-          testId="balance-item-add-option"
-          sx={ShowMenuItem(showAddMenuItem)}
-          onClick={() => {
-            orchestrationEvents.sendRequestOnrampEvent(eventTarget, IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {
-              tokenAddress: balanceInfo.address ?? '',
-              amount: '',
-            });
-          }}
-        >
-          <MenuItem.Icon icon="Add" />
-          <MenuItem.Label>{`Add ${balanceInfo.symbol}`}</MenuItem.Label>
-        </MenuItem>
-        <MenuItem
-          testId="balance-item-swap-option"
-          sx={ShowMenuItem(isSwapEnabled)}
-          onClick={() => {
-            orchestrationEvents.sendRequestSwapEvent(eventTarget, IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {
-              fromTokenAddress: balanceInfo.address ?? '',
-              toTokenAddress: '',
-              amount: '',
-            });
-          }}
-        >
-          <MenuItem.Icon icon="Exchange" />
-          <MenuItem.Label>{`Swap ${balanceInfo.symbol}`}</MenuItem.Label>
-        </MenuItem>
-        <MenuItem
-          testId="balance-item-move-option"
-          sx={ShowMenuItem(isBridgeEnabled)}
-          onClick={() => bridgeToL2OnClick(balanceInfo.address)}
-        >
-          <MenuItem.Icon icon="Minting" />
-          <MenuItem.Label>{`Move ${balanceInfo.symbol}`}</MenuItem.Label>
-        </MenuItem>
-      </MenuItem.OverflowPopoverMenu>
+        <MenuItem.OverflowPopoverMenu size="small" testId="token-menu">
+          <MenuItem
+            testId="balance-item-add-option"
+            sx={ShowMenuItem(showAddMenuItem)}
+            onClick={() => {
+              orchestrationEvents.sendRequestOnrampEvent(
+                eventTarget,
+                IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
+                {
+                  tokenAddress: balanceInfo.address ?? '',
+                  amount: '',
+                },
+              );
+            }}
+          >
+            <MenuItem.Icon icon="Add" />
+            <MenuItem.Label>{`Add ${balanceInfo.symbol}`}</MenuItem.Label>
+          </MenuItem>
+          <MenuItem
+            testId="balance-item-swap-option"
+            sx={ShowMenuItem(isSwapEnabled)}
+            onClick={() => {
+              orchestrationEvents.sendRequestSwapEvent(
+                eventTarget,
+                IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
+                {
+                  fromTokenAddress: balanceInfo.address ?? '',
+                  toTokenAddress: '',
+                  amount: '',
+                },
+              );
+            }}
+          >
+            <MenuItem.Icon icon="Exchange" />
+            <MenuItem.Label>{`Swap ${balanceInfo.symbol}`}</MenuItem.Label>
+          </MenuItem>
+          <MenuItem
+            testId="balance-item-move-option"
+            sx={ShowMenuItem(isBridgeEnabled)}
+            onClick={() => bridgeToL2OnClick(balanceInfo.address)}
+          >
+            <MenuItem.Icon icon="Minting" />
+            <MenuItem.Label>{`Move ${balanceInfo.symbol}`}</MenuItem.Label>
+          </MenuItem>
+        </MenuItem.OverflowPopoverMenu>
       )}
     </MenuItem>
-
   );
 }

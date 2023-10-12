@@ -17,7 +17,7 @@ export function ServiceUnavailableErrorView({
   onCloseClick,
 }: ServiceUnavailableErrorViewProps) {
   const errorText = text.views[SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW];
-  const headingText = errorText[service];
+  const headingText = errorText.heading[service];
 
   return (
     <SimpleLayout

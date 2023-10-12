@@ -89,6 +89,7 @@ describe('WalletContext', () => {
       isSwapEnabled: true,
       isBridgeEnabled: false,
       isOnRampEnabled: false,
+      isSwapAvailable: true,
     });
   });
 });
