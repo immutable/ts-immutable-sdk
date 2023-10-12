@@ -1,6 +1,5 @@
 import {
   Heading,
-  MenuItem,
 } from '@biom3/react';
 import {
   useContext, useEffect, useMemo, useState,
@@ -18,7 +17,24 @@ import { formatZeroAmount, tokenValueFormat } from '../../../../lib/utils';
 import { ConnectLoaderContext } from '../../../../context/connect-loader-context/ConnectLoaderContext';
 import { isPassportProvider } from '../../../../lib/providerUtils';
 import { EventTargetContext } from '../../../../context/event-target-context/EventTargetContext';
-
+import {
+  Avatar,
+  Box,
+  IconButton,
+  ListItem,
+  ListItemAvatar,
+  ListItemButton, ListItemIcon,
+  ListItemText, Menu,
+  MenuItem,
+  Stack,
+  Typography
+} from "@mui/material";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import SvgIconCoin from "../../../../theme/icons/coin";
+import CloseIcon from "@mui/icons-material/Close";
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import AddIcon from '@mui/icons-material/Add';
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 export interface BalanceItemProps {
   balanceInfo: BalanceInfo;
   bridgeToL2OnClick: (address?: string) => void;
@@ -86,57 +102,101 @@ export function BalanceItem({
     [isOnRampEnabled, onRampAllowedTokens],
   );
 
-  return (
-    <MenuItem testId={`balance-item-${balanceInfo.symbol}`} emphasized>
-      <MenuItem.FramedIcon icon="Coins" circularFrame />
-      <MenuItem.Label>{balanceInfo.symbol}</MenuItem.Label>
-      <MenuItem.Caption>{balanceInfo.description}</MenuItem.Caption>
-      <MenuItem.PriceDisplay
-        testId={`balance-item-${balanceInfo.symbol}`}
-        use={<Heading size="xSmall" />}
-        price={tokenValueFormat(balanceInfo.balance)}
-        fiatAmount={fiatAmount}
-      />
-      {(isOnRampEnabled || isSwapEnabled || isBridgeEnabled) && (
-      <MenuItem.OverflowPopoverMenu size="small" testId="token-menu">
-        <MenuItem
-          testId="balance-item-add-option"
-          sx={ShowMenuItem(showAddMenuItem)}
-          onClick={() => {
-            orchestrationEvents.sendRequestOnrampEvent(eventTarget, IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {
-              tokenAddress: balanceInfo.address ?? '',
-              amount: '',
-            });
-          }}
-        >
-          <MenuItem.Icon icon="Add" />
-          <MenuItem.Label>{`Add ${balanceInfo.symbol}`}</MenuItem.Label>
-        </MenuItem>
-        <MenuItem
-          testId="balance-item-swap-option"
-          sx={ShowMenuItem(isSwapEnabled)}
-          onClick={() => {
-            orchestrationEvents.sendRequestSwapEvent(eventTarget, IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {
-              fromTokenAddress: balanceInfo.address ?? '',
-              toTokenAddress: '',
-              amount: '',
-            });
-          }}
-        >
-          <MenuItem.Icon icon="Exchange" />
-          <MenuItem.Label>{`Swap ${balanceInfo.symbol}`}</MenuItem.Label>
-        </MenuItem>
-        <MenuItem
-          testId="balance-item-move-option"
-          sx={ShowMenuItem(isBridgeEnabled)}
-          onClick={() => bridgeToL2OnClick(balanceInfo.address)}
-        >
-          <MenuItem.Icon icon="Minting" />
-          <MenuItem.Label>{`Move ${balanceInfo.symbol}`}</MenuItem.Label>
-        </MenuItem>
-      </MenuItem.OverflowPopoverMenu>
-      )}
-    </MenuItem>
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
+
+  return (
+    <>
+      <ListItem>
+        <ListItemAvatar>
+          <Avatar>
+            <SvgIconCoin />
+          </Avatar>
+        </ListItemAvatar>
+        <ListItemText primary={balanceInfo.symbol} secondary={balanceInfo.description} />
+        <Stack direction='row'>
+          <Stack alignItems='flex-end'>
+            <Typography sx={{
+              fontSize: '16px',
+              fontWeight: '700',
+              color: 'rgb(243, 243, 243)',
+            }}>
+              {tokenValueFormat(balanceInfo.balance)}
+            </Typography>
+            <Typography sx={{
+              fontSize: '12px',
+              fontWeight: '400',
+              color: 'rgb(182, 182, 182)',
+            }}>
+              {fiatAmount}
+            </Typography>
+          </Stack>
+          <IconButton
+            color="inherit"
+            size='medium'
+            sx={{
+              marginLeft: '10px'
+            }}
+            onClick={handleClick}
+          >
+            <MoreVertIcon fontSize='small' />
+          </IconButton>
+        </Stack>
+      </ListItem>
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+      >
+        <MenuItem onClick={handleClose} sx={{ minHeight: '48px' }}>
+          <ListItemIcon>
+            <AddIcon sx={{
+              color: 'rgb(243, 243, 243)'
+            }} />
+          </ListItemIcon>
+          <ListItemText>
+            <Typography sx={{
+              fontSize: '16px',
+              fontWeight: '400',
+              color: 'rgb(243, 243, 243)'
+            }}>
+              Add IMX
+            </Typography>
+          </ListItemText>
+        </MenuItem>
+        <MenuItem onClick={handleClose} sx={{ minHeight: '48px' }}>
+          <ListItemIcon>
+            <SwapHorizIcon sx={{
+              color: 'rgb(243, 243, 243)'
+            }} />
+          </ListItemIcon>
+          <ListItemText sx={{
+            fontSize: '16px',
+            fontWeight: '400',
+          }}><Typography sx={{
+            fontSize: '16px',
+            fontWeight: '400',
+            color: 'rgb(243, 243, 243)'
+          }}>
+            Swap IMX
+          </Typography></ListItemText>
+        </MenuItem>
+      </Menu>
+    </>
   );
 }

@@ -148,6 +148,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
   }, [provider, identify]);
   return (
     <BiomeCombinedProviders theme={{ base: themeReducerValue }}>
+      <ThemeProvider>
         <ViewContext.Provider value={viewReducerValues}>
           <ConnectContext.Provider value={connectReducerValues}>
             <>
@@ -199,6 +200,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
             </>
           </ConnectContext.Provider>
         </ViewContext.Provider>
+      </ThemeProvider>
     </BiomeCombinedProviders>
   );
 }

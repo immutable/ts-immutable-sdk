@@ -34,11 +34,14 @@ export default function Button(theme) {
         }),
         // OUTLINED
         ...(outlinedVariant && {
-          borderColor: alpha(theme.palette.grey[500], 0.32),
+          color: 'rgb(243, 243, 243)',
+          border: 'none',
           borderRadius: '8px',
+          background: 'rgba(243, 243, 243, 0.04)',
           '&:hover': {
-            borderColor: theme.palette.text.primary,
-            backgroundColor: theme.palette.action.hover,
+            // borderColor: theme.palette.text.primary,
+            // backgroundColor: theme.palette.action.hover,
+            boxShadow: 'rgb(243, 243, 243) 0px 0px 0px 1px inset',
           },
         }),
         // TEXT
@@ -89,7 +92,7 @@ export default function Button(theme) {
     const size = {
       height: 48,
       padding: '0 24px',
-      fontSize: '16px',
+      textTransform: 'none',
       '&::before, &::after': {
         content: '""',
         position: 'absolute',
@@ -101,9 +104,10 @@ export default function Button(theme) {
         borderRadius: 'inherit',
         transition: 'border-color 0.3s ease', // Add a transition for smooth effect
       },
+
       ...(smallSize && {
         height: 30,
-        fontSize: 13,
+        fontSize: 12,
         padding: '0 16px',
         ...(softVariant && {
           padding: '4px 10px',

@@ -5,7 +5,7 @@ import {
   Avatar,
   IconButton,
   List,
-  ListItem,
+  ListItem, ListItemAvatar,
   ListItemButton,
   ListItemIcon,
   ListItemText,
@@ -38,7 +38,9 @@ export function WalletItem(props: WalletProps) {
     <>
       <ListItem>
         <ListItemButton onClick={() => onWalletClick(wallet.walletProvider)}>
-          <Avatar variant="square" src="metamask.png" />
+          <ListItemAvatar>
+            <Avatar variant="square" src="metamask.png" />
+          </ListItemAvatar>
           <ListItemText primary={wallets[wallet.walletProvider].heading} secondary={wallets[wallet.walletProvider].description} />
           <NavigateNextIcon />
         </ListItemButton>

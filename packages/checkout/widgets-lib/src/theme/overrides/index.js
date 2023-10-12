@@ -71,7 +71,7 @@ export default function ComponentsOverrides(theme) {
     // Drawer(theme),
     // Stepper(theme),
     // Tooltip(theme),
-    // Popover(theme),
+    Popover(theme),
     // SvgIcon(theme),
     // Checkbox(theme),
     // DataGrid(theme),

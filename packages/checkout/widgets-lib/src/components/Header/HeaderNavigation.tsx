@@ -53,7 +53,7 @@ export function HeaderNavigation({
         position="static"
         sx={HeaderNavigationStyles(true)}
       >
-        <Toolbar disableGutters sx={{ px: 2 }}>
+        <Toolbar disableGutters sx={{ px: 2, py: 2 }}>
           {showBack && (
             <IconButton
               size="large"
@@ -72,17 +72,19 @@ export function HeaderNavigation({
           <Stack direction="row" spacing={1}>
             {showSettings && onSettingsClick && (
               <IconButton
+                size="large"
                 color="inherit"
                 test-id="settings-button"
               >
-                <SettingsIcon />
+                <SettingsIcon fontSize='small' />
               </IconButton>
             )}
             <IconButton
+              size="large"
               color="inherit"
               test-id="close-button"
             >
-              <CloseIcon />
+              <CloseIcon fontSize='small' />
             </IconButton>
           </Stack>
         </Toolbar>
