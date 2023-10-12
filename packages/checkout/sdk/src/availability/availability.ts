@@ -24,7 +24,7 @@ export const availabilityService = (
     try {
       response = await axios.post(`${postEndpoint()}/v1/availability/checkout/swap`);
     } catch (error: any) {
-      throw new CheckoutError(`Error fetching from api: ${error.message}`, CheckoutErrorType.API_ERROR);
+      response = error.response;
     }
 
     if (response.status === 403) {
