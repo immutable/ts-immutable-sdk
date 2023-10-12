@@ -41,7 +41,7 @@ describe('Trades', () => {
       });
       (TradesApi as jest.Mock).mockReturnValue({
         getSignableTrade: getSignableTradeMock,
-        createTrade: createTradeMock,
+        createTradeV3: createTradeMock,
       });
 
       (signRaw as jest.Mock).mockReturnValue('raw-eth-signature');
