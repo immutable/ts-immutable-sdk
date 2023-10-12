@@ -60,16 +60,16 @@ export type SignOrderInput = {
 };
 
 export type SignOrderError = {
-  type: MintErrorTypes;
+  type: SaleErrorTypes;
   data?: Record<string, unknown>;
 };
 
-export enum MintErrorTypes {
+export enum SaleErrorTypes {
+  DEFAULT = 'DEFAULT',
   TRANSACTION_FAILED = 'TRANSACTION_FAILED',
   SERVICE_BREAKDOWN = 'SERVICE_BREAK_DOWN',
   TRANSAK_FAILED = 'TRANSAK_FAILED',
-  PASSPORT_FAILED = 'PASSPORT_FAILED',
-  PASSPORT_REJECTED_NO_FUNDS = 'PASSPORT_REJECTED_NO_FUNDS',
-  PASSPORT_REJECTED = 'PASSPORT_REJECTED',
-  DEFAULT = 'DEFAULT',
+  WALLET_FAILED = 'WALLET_FAILED',
+  WALLET_REJECTED = 'WALLET_REJECTED',
+  WALLET_REJECTED_NO_FUNDS = 'WALLET_REJECTED_NO_FUNDS',
 }

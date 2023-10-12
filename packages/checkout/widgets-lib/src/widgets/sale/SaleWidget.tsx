@@ -152,7 +152,7 @@ export function SaleWidget(props: SaleWidgetProps) {
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
     },
-    [MintErrorTypes.PASSPORT_FAILED]: {
+    [MintErrorTypes.WALLET_FAILED]: {
       onActionClick: updateToPaymentMethods,
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
@@ -160,12 +160,12 @@ export function SaleWidget(props: SaleWidgetProps) {
         fill: biomeTheme.color.status.fatal.dim,
       },
     },
-    [MintErrorTypes.PASSPORT_REJECTED_NO_FUNDS]: {
+    [MintErrorTypes.WALLET_REJECTED_NO_FUNDS]: {
       onActionClick: updateToPaymentMethods,
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
     },
-    [MintErrorTypes.PASSPORT_REJECTED]: {
+    [MintErrorTypes.WALLET_REJECTED]: {
       onActionClick: () => {
         /* TODO: trigger the approve and execute flow pop up flow again */
       },

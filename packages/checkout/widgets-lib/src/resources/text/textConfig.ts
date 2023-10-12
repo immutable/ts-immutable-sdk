@@ -366,17 +366,17 @@ export const text = {
           primaryAction: 'Try again',
           secondaryAction: 'Dismiss',
         },
-        [MintErrorTypes.PASSPORT_FAILED]: {
+        [MintErrorTypes.WALLET_FAILED]: {
           description: "Sorry, we're unable to process this right now.",
           primaryAction: 'Go back',
           secondaryAction: 'Dismiss',
         },
-        [MintErrorTypes.PASSPORT_REJECTED_NO_FUNDS]: {
+        [MintErrorTypes.WALLET_REJECTED_NO_FUNDS]: {
           description: 'Sorry, something went wrong. Plese try again.',
           primaryAction: 'Go back',
           secondaryAction: 'Dismiss',
         },
-        [MintErrorTypes.PASSPORT_REJECTED]: {
+        [MintErrorTypes.WALLET_REJECTED]: {
           description:
             "You'll need to approve the transaction in your wallet to proceed.",
           primaryAction: 'Try again',

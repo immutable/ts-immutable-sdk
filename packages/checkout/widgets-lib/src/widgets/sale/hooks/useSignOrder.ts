@@ -171,17 +171,17 @@ export const useSignOrder = (input: SignOrderInput) => {
         transactionHash = txnResponse?.hash;
       } catch (e) {
         // TODO: check error type to send
-        // MintErrorTypes.PASSPORT_REJECTED or MintErrorTypes.PASSPORT_REJECTED_NO_FUNDS
+        // MintErrorTypes.WALLET_REJECTED or MintErrorTypes.WALLET_REJECTED_NO_FUNDS
 
         const reason = typeof e === 'string' ? e : (e as any).reason || '';
         let errorType = MintErrorTypes.TRANSACTION_FAILED;
 
         if (reason.includes('rejected') && reason.includes('user')) {
-          errorType = MintErrorTypes.PASSPORT_REJECTED;
+          errorType = MintErrorTypes.WALLET_REJECTED;
         }
 
         if (reason.includes('failed to submit') && reason.includes('highest gas limit')) {
-          errorType = MintErrorTypes.PASSPORT_REJECTED_NO_FUNDS;
+          errorType = MintErrorTypes.WALLET_REJECTED_NO_FUNDS;
         }
 
         setSignError({
