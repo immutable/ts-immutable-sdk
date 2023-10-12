@@ -30,6 +30,7 @@ import { ConnectLoaderContext } from '../../context/connect-loader-context/Conne
 import { text } from '../../resources/text/textConfig';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { widgetTheme } from '../../lib/theme';
+import ThemeProvider from "../../theme";
 
 export interface WalletWidgetProps {
   config: StrongCheckoutWidgetsConfig,
@@ -137,38 +138,40 @@ export function WalletWidget(props: WalletWidgetProps) {
 
   return (
     <BiomeCombinedProviders theme={{ base: themeReducerValue }}>
-      <ViewContext.Provider value={viewReducerValues}>
-        <CryptoFiatProvider environment={environment}>
-          <WalletContext.Provider value={walletReducerValues}>
-            {viewState.view.type === SharedViews.LOADING_VIEW && (
-            <LoadingView loadingText={loadingText} />
-            )}
-            {viewState.view.type === WalletWidgetViews.WALLET_BALANCES && (
-            <WalletBalances />
-            )}
-            {viewState.view.type === WalletWidgetViews.SETTINGS && <Settings />}
-            {viewState.view.type === WalletWidgetViews.COIN_INFO && (
-            <CoinInfo />
-            )}
-            {viewState.view.type === SharedViews.ERROR_VIEW && (
-            <ErrorView
-              actionText={errorActionText}
-              onActionClick={errorAction}
-              onCloseClick={() => sendWalletWidgetCloseEvent(eventTarget)}
-            />
-            )}
-            {viewState.view.type === SharedViews.TOP_UP_VIEW && (
-            <TopUpView
-              widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
-              showOnrampOption={isOnRampEnabled}
-              showSwapOption={isSwapEnabled}
-              showBridgeOption={isBridgeEnabled}
-              onCloseButtonClick={() => sendWalletWidgetCloseEvent(eventTarget)}
-            />
-            )}
-          </WalletContext.Provider>
-        </CryptoFiatProvider>
-      </ViewContext.Provider>
+      <ThemeProvider>
+        <ViewContext.Provider value={viewReducerValues}>
+          <CryptoFiatProvider environment={environment}>
+            <WalletContext.Provider value={walletReducerValues}>
+              {viewState.view.type === SharedViews.LOADING_VIEW && (
+              <LoadingView loadingText={loadingText} />
+              )}
+              {viewState.view.type === WalletWidgetViews.WALLET_BALANCES && (
+              <WalletBalances />
+              )}
+              {viewState.view.type === WalletWidgetViews.SETTINGS && <Settings />}
+              {viewState.view.type === WalletWidgetViews.COIN_INFO && (
+              <CoinInfo />
+              )}
+              {viewState.view.type === SharedViews.ERROR_VIEW && (
+              <ErrorView
+                actionText={errorActionText}
+                onActionClick={errorAction}
+                onCloseClick={() => sendWalletWidgetCloseEvent(eventTarget)}
+              />
+              )}
+              {viewState.view.type === SharedViews.TOP_UP_VIEW && (
+              <TopUpView
+                widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
+                showOnrampOption={isOnRampEnabled}
+                showSwapOption={isSwapEnabled}
+                showBridgeOption={isBridgeEnabled}
+                onCloseButtonClick={() => sendWalletWidgetCloseEvent(eventTarget)}
+              />
+              )}
+            </WalletContext.Provider>
+          </CryptoFiatProvider>
+        </ViewContext.Provider>
+      </ThemeProvider>
     </BiomeCombinedProviders>
   );
 }

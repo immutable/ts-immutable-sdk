@@ -3,7 +3,7 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { BiomeCombinedProviders } from '@biom3/react';
 import { Checkout } from '@imtbl/checkout-sdk';
-import {
+import React, {
   useContext, useMemo, useEffect, useReducer, useCallback,
 } from 'react';
 import { Passport } from '@imtbl/passport';
@@ -42,6 +42,7 @@ import { EventTargetContext } from '../../context/event-target-context/EventTarg
 import { widgetTheme } from '../../lib/theme';
 import { useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { identifyUser } from '../../lib/analytics/identifyUser';
+import ThemeProvider from "../../theme";
 
 export interface ConnectWidgetProps {
   params?: ConnectWidgetParams;
@@ -145,60 +146,59 @@ export function ConnectWidget(props: ConnectWidgetProps) {
     await identifyUser(identify, provider);
     sendConnectSuccessEvent(eventTarget, provider, walletProviderName ?? undefined);
   }, [provider, identify]);
-
   return (
     <BiomeCombinedProviders theme={{ base: themeReducerValue }}>
-      <ViewContext.Provider value={viewReducerValues}>
-        <ConnectContext.Provider value={connectReducerValues}>
-          <>
-            {view.type === SharedViews.LOADING_VIEW && (
-              <LoadingView loadingText="Connecting" />
-            )}
-            {view.type === ConnectWidgetViews.CONNECT_WALLET && (
-              <ConnectWallet />
-            )}
-            {view.type === ConnectWidgetViews.READY_TO_CONNECT && (
-              <ReadyToConnect targetChainId={targetChainId} />
-            )}
-            {view.type === ConnectWidgetViews.SWITCH_NETWORK && networkToSwitchTo === ConnectTargetLayer.LAYER2 && (
-              <SwitchNetworkZkEVM />
-            )}
-            {view.type === ConnectWidgetViews.SWITCH_NETWORK && networkToSwitchTo === ConnectTargetLayer.LAYER1 && (
-              <SwitchNetworkEth />
-            )}
-            {view.type === ConnectWidgetViews.SUCCESS && provider && (
-              <ConnectLoaderSuccess>
-                <StatusView
-                  statusText="Connection secure"
-                  actionText="Continue"
-                  onActionClick={() => sendCloseEvent()}
-                  onRenderEvent={handleConnectSuccess}
-                  statusType={StatusType.SUCCESS}
-                  testId="success-view"
-                />
-              </ConnectLoaderSuccess>
-            )}
-            {((view.type === ConnectWidgetViews.SUCCESS && !provider)
-            || view.type === SharedViews.ERROR_VIEW)
-              && (
-                <ErrorView
-                  actionText={errorText}
-                  onActionClick={() => {
-                    viewDispatch({
-                      payload: {
-                        type: ViewActions.UPDATE_VIEW,
-                        view: {
-                          type: ConnectWidgetViews.CONNECT_WALLET,
-                        } as ConnectWidgetView,
-                      },
-                    });
-                  }}
-                  onCloseClick={() => sendCloseEvent()}
-                />
+        <ViewContext.Provider value={viewReducerValues}>
+          <ConnectContext.Provider value={connectReducerValues}>
+            <>
+              {view.type === SharedViews.LOADING_VIEW && (
+                <LoadingView loadingText="Connecting" />
               )}
-          </>
-        </ConnectContext.Provider>
-      </ViewContext.Provider>
+              {view.type === ConnectWidgetViews.CONNECT_WALLET && (
+                <ConnectWallet />
+              )}
+              {view.type === ConnectWidgetViews.READY_TO_CONNECT && (
+                <ReadyToConnect targetChainId={targetChainId} />
+              )}
+              {view.type === ConnectWidgetViews.SWITCH_NETWORK && networkToSwitchTo === ConnectTargetLayer.LAYER2 && (
+                <SwitchNetworkZkEVM />
+              )}
+              {view.type === ConnectWidgetViews.SWITCH_NETWORK && networkToSwitchTo === ConnectTargetLayer.LAYER1 && (
+                <SwitchNetworkEth />
+              )}
+              {view.type === ConnectWidgetViews.SUCCESS && provider && (
+                <ConnectLoaderSuccess>
+                  <StatusView
+                    statusText="Connection secure"
+                    actionText="Continue"
+                    onActionClick={() => sendCloseEvent()}
+                    onRenderEvent={handleConnectSuccess}
+                    statusType={StatusType.SUCCESS}
+                    testId="success-view"
+                  />
+                </ConnectLoaderSuccess>
+              )}
+              {((view.type === ConnectWidgetViews.SUCCESS && !provider)
+              || view.type === SharedViews.ERROR_VIEW)
+                && (
+                  <ErrorView
+                    actionText={errorText}
+                    onActionClick={() => {
+                      viewDispatch({
+                        payload: {
+                          type: ViewActions.UPDATE_VIEW,
+                          view: {
+                            type: ConnectWidgetViews.CONNECT_WALLET,
+                          } as ConnectWidgetView,
+                        },
+                      });
+                    }}
+                    onCloseClick={() => sendCloseEvent()}
+                  />
+                )}
+            </>
+          </ConnectContext.Provider>
+        </ViewContext.Provider>
     </BiomeCombinedProviders>
   );
 }
