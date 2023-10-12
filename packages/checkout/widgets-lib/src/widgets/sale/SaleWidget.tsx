@@ -160,7 +160,6 @@ export function SaleWidget(props: SaleWidgetProps) {
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
     },
-
     [SaleErrorTypes.DEFAULT]: {
       onActionClick: goBackToPaymentMethods,
       onSecondaryActionClick: closeWidget,
