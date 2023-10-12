@@ -1,4 +1,6 @@
-import { RefObject, useCallback, useEffect } from 'react';
+import {
+  RefObject, useCallback, useEffect, useRef, useState,
+} from 'react';
 import { StandardAnalyticsActions } from '@imtbl/react-analytics';
 
 import { TransakEvent, TransakEvents, TransakStatuses } from './TransakEvents';
@@ -9,13 +11,17 @@ import {
 } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 
 const TRANSAK_ORIGIN = 'transak.com';
+const FAILED_TO_LOAD_TIMEOUT_IN_MS = 5000;
 
 export type TransakEventHandlers = {
+  onInit?: () => void;
   onOpen?: () => void;
   onOrderCreated?: () => void;
   onOrderProcessing?: () => void;
   onOrderCompleted?: () => void;
   onOrderFailed?: () => void;
+  onFailedToLoad?: () => void;
+  failedToLoadTimeoutInMs?: number;
 };
 
 type AnalyticEvent = {
@@ -65,10 +71,30 @@ type UseTransakEventsProps = {
 } & TransakEventHandlers;
 
 export const useTransakEvents = (props: UseTransakEventsProps) => {
-  const {
-    userJourney, ref, email, userId, isPassportWallet,
-  } = props;
   const { track } = useAnalytics();
+  const {
+    userJourney, ref, email, userId, isPassportWallet, failedToLoadTimeoutInMs, onFailedToLoad,
+  } = props;
+  const [initialised, setInitialsed] = useState<boolean>(false);
+  const failedToLoadTimeout = failedToLoadTimeoutInMs || FAILED_TO_LOAD_TIMEOUT_IN_MS;
+
+  const timeout = useRef<NodeJS.Timeout | number>(0);
+
+  const onInit = () => {
+    setInitialsed(true);
+    clearTimeout(timeout.current);
+    props.onInit?.();
+  };
+
+  const onLoad = () => {
+    if (onFailedToLoad === undefined) return;
+
+    if (!initialised) {
+      timeout.current = setTimeout(() => {
+        if (!initialised) onFailedToLoad();
+      }, failedToLoadTimeout);
+    }
+  };
 
   const handleAnalyticsEvent = useCallback((event: TransakEvent) => {
     const type = event.event_id as TransakEvents;
@@ -91,6 +117,9 @@ export const useTransakEvents = (props: UseTransakEventsProps) => {
 
   const handleEvents = useCallback((event: TransakEvent) => {
     switch (event.event_id) {
+      case TransakEvents.TRANSAK_WIDGET_INITIALISED:
+        onInit();
+        break;
       case TransakEvents.TRANSAK_WIDGET_OPEN:
         props.onOpen?.();
         break;
@@ -128,16 +157,15 @@ export const useTransakEvents = (props: UseTransakEventsProps) => {
     [ref],
   );
 
-  const subscribeEvents = useCallback(() => {
+  useEffect(() => {
     window.addEventListener('message', handleMessageEvent);
-
     return () => {
+      clearTimeout(timeout.current);
       window.removeEventListener('message', handleMessageEvent);
     };
   }, []);
 
-  useEffect(() => {
-    const unsubscribeEvents = subscribeEvents();
-    return () => unsubscribeEvents();
-  }, []);
+  return {
+    initialised, onLoad,
+  };
 };

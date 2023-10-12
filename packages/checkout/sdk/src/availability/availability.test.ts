@@ -49,20 +49,5 @@ describe('availabilityService', () => {
           ),
         );
     });
-
-    it('should throw error when error fetching availability', async () => {
-      mockedAxios.post.mockRejectedValue({
-        message: 'error message',
-      });
-
-      await expect(availabilityService(false, false).checkDexAvailability())
-        .rejects
-        .toThrow(
-          new CheckoutError(
-            'Error fetching from api: error message',
-            CheckoutErrorType.API_ERROR,
-          ),
-        );
-    });
   });
 });

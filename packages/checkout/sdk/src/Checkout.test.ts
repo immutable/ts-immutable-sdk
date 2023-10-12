@@ -45,6 +45,7 @@ import { FiatRampService } from './fiatRamp';
 import { FiatRampParams, ExchangeType } from './types/fiatRamp';
 import { getItemRequirementsFromRequirements } from './smartCheckout/itemRequirements';
 import { CheckoutErrorType } from './errors';
+import { availabilityService } from './availability';
 
 jest.mock('./connect');
 jest.mock('./network');
@@ -61,6 +62,7 @@ jest.mock('./smartCheckout/cancel');
 jest.mock('./smartCheckout');
 jest.mock('./fiatRamp');
 jest.mock('./smartCheckout/itemRequirements');
+jest.mock('./availability');
 
 describe('Connect', () => {
   let providerMock: ExternalProvider;
@@ -884,6 +886,25 @@ describe('Connect', () => {
       await checkout.getExchangeFeeEstimate();
 
       expect(feeEstimateMock).toBeCalledTimes(1);
+    });
+  });
+
+  describe('isSwapAvailable', () => {
+    let checkout: Checkout;
+
+    beforeEach(() => {
+      (availabilityService as jest.Mock).mockReturnValue({
+        checkDexAvailability: jest.fn().mockResolvedValue(true),
+      });
+      checkout = new Checkout({
+        baseConfig: { environment: Environment.PRODUCTION },
+      });
+    });
+
+    it('should call availability.checkDexAvailability', async () => {
+      await checkout.isSwapAvailable();
+
+      expect(checkout.availability.checkDexAvailability).toBeCalledTimes(1);
     });
   });
 });
