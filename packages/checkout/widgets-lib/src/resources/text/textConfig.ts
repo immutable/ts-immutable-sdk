@@ -349,7 +349,7 @@ export const text = {
       screenTitle: 'Pay with card',
       loading: 'Taking you to Transak',
     },
-    [SaleWidgetViews.MINT_FAIL]: {
+    [SaleWidgetViews.SALE_FAIL]: {
       errors: {
         [MintErrorTypes.TRANSACTION_FAILED]: {
           description: 'Transaction failed',
@@ -389,7 +389,7 @@ export const text = {
         },
       },
     },
-    [SaleWidgetViews.MINT_SUCCESS]: {
+    [SaleWidgetViews.SALE_SUCCESS]: {
       text: 'Order completed',
       actionText: 'Continue',
     },

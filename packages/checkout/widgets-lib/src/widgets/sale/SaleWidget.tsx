@@ -180,7 +180,7 @@ export function SaleWidget(props: SaleWidgetProps) {
   };
 
   const errorViewProps = useMemo<StatusViewProps>(() => {
-    const errorTextConfig: AllErrorTextConfigs = text.views[SaleWidgetViews.MINT_FAIL].errors;
+    const errorTextConfig: AllErrorTextConfigs = text.views[SaleWidgetViews.SALE_FAIL].errors;
     const errorType = viewState.view.data?.error || MintErrorTypes.DEFAULT;
     const handlers = errorHandlersConfig[errorType] || {};
     return {
@@ -230,17 +230,17 @@ export function SaleWidget(props: SaleWidgetProps) {
           {viewState.view.type === SaleWidgetViews.PAY_WITH_COINS && (
             <PayWithCoins />
           )}
-          {viewState.view.type === SaleWidgetViews.MINT_FAIL && (
+          {viewState.view.type === SaleWidgetViews.SALE_FAIL && (
             <StatusView {...errorViewProps} />
           )}
-          {viewState.view.type === SaleWidgetViews.MINT_SUCCESS
+          {viewState.view.type === SaleWidgetViews.SALE_SUCCESS
             && provider && (
               <StatusView
                 statusText={
-                  text.views[SaleWidgetViews.MINT_SUCCESS].text
+                  text.views[SaleWidgetViews.SALE_SUCCESS].text
                 }
                 actionText={
-                  text.views[SaleWidgetViews.MINT_SUCCESS].actionText
+                  text.views[SaleWidgetViews.SALE_SUCCESS].actionText
                 }
                 onActionClick={() => closeWidget()}
                 statusType={StatusType.SUCCESS}

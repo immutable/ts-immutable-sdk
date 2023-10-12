@@ -130,7 +130,7 @@ export function SaleContextProvider(props: {
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
-            type: SaleWidgetViews.MINT_FAIL,
+            type: SaleWidgetViews.SALE_FAIL,
             data: { errorType, ...data },
           },
         },
