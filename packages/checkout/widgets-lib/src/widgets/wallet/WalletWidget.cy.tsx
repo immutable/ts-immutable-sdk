@@ -123,6 +123,10 @@ describe('WalletWidget tests', () => {
             symbol: 'eth',
           },
         });
+      const isSwapAvailableStub = cy
+        .stub(Checkout.prototype, 'isSwapAvailable')
+        .as('isSwapAvailableStub');
+      isSwapAvailableStub.resolves(true);
 
       mount(
         <ConnectLoaderTestComponent
