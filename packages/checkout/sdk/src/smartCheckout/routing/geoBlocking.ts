@@ -6,6 +6,13 @@ export const isOnRampGeoBlocked = async (): Promise<boolean> => false;
 export const isSwapGeoBlocked = async (
   config: CheckoutConfiguration,
 ): Promise<boolean> => {
+  let isSwapAvailable;
   const availability = availabilityService(config.isDevelopment, config.isProduction);
-  return await availability.checkDexAvailability();
+
+  try {
+    isSwapAvailable = await availability.checkDexAvailability();
+  } catch (err: any) {
+    isSwapAvailable = false;
+  }
+  return isSwapAvailable;
 };
