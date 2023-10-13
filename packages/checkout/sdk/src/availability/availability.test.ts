@@ -11,43 +11,54 @@ describe('availabilityService', () => {
   });
 
   describe('checkDexAvailability', () => {
-    it('should return true when status is 204', async () => {
-      const mockResponse = {
-        status: 204,
-      };
-      mockedAxios.post.mockResolvedValueOnce(mockResponse);
-      const response = await availabilityService(false, false).checkDexAvailability();
+    describe('when environment is development or production', () => {
+      it('should return true when status is 204', async () => {
+        const mockResponse = {
+          status: 204,
+        };
+        mockedAxios.post.mockResolvedValueOnce(mockResponse);
+        const response = await availabilityService(true, false).checkDexAvailability();
 
-      expect(mockedAxios.post).toHaveBeenCalledTimes(1);
-      expect(response).toEqual(true);
+        expect(mockedAxios.post).toHaveBeenCalledTimes(1);
+        expect(response).toEqual(true);
+      });
+
+      it('should return false when status is 403', async () => {
+        const mockResponse = {
+          status: 403,
+        };
+        mockedAxios.post.mockResolvedValueOnce(mockResponse);
+        const response = await availabilityService(true, false).checkDexAvailability();
+
+        expect(mockedAxios.post).toHaveBeenCalledTimes(1);
+        expect(response).toEqual(false);
+      });
+
+      it('should throw error when status is neither 204 or 403', async () => {
+        const mockResponse = {
+          status: 500,
+          statusText: 'error message',
+        };
+        mockedAxios.post.mockResolvedValueOnce(mockResponse);
+
+        await expect(availabilityService(true, false).checkDexAvailability())
+          .rejects
+          .toThrow(
+            new CheckoutError(
+              'Error fetching from api: 500 error message',
+              CheckoutErrorType.API_ERROR,
+            ),
+          );
+      });
     });
 
-    it('should return false when status is 403', async () => {
-      const mockResponse = {
-        status: 403,
-      };
-      mockedAxios.post.mockResolvedValueOnce(mockResponse);
-      const response = await availabilityService(false, false).checkDexAvailability();
+    describe('when environment is sandbox', () => {
+      it('should always return true', async () => {
+        const response = await availabilityService(false, false).checkDexAvailability();
 
-      expect(mockedAxios.post).toHaveBeenCalledTimes(1);
-      expect(response).toEqual(false);
-    });
-
-    it('should throw error when status is neither 204 or 403', async () => {
-      const mockResponse = {
-        status: 500,
-        statusText: 'error message',
-      };
-      mockedAxios.post.mockResolvedValueOnce(mockResponse);
-
-      await expect(availabilityService(false, false).checkDexAvailability())
-        .rejects
-        .toThrow(
-          new CheckoutError(
-            'Error fetching from api: 500 error message',
-            CheckoutErrorType.API_ERROR,
-          ),
-        );
+        expect(mockedAxios.post).not.toHaveBeenCalled();
+        expect(response).toEqual(true);
+      });
     });
   });
 });
