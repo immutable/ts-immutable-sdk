@@ -11,7 +11,7 @@ export const isSwapGeoBlocked = async (
 
   try {
     isSwapAvailable = await availability.checkDexAvailability();
-  } catch (err: any) {
+  } catch {
     isSwapAvailable = false;
   }
   return isSwapAvailable;
