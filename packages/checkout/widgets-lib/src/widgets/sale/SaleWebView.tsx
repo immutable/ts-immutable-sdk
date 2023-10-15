@@ -22,7 +22,7 @@ const defaultPassportConfig = {
 const defaultItems: Item[] = [
   {
     productId: 'P0001',
-    qty: 1,
+    qty: 3,
     name: 'Bulbasaur',
     image: 'https://pokemon-nfts.s3.ap-southeast-2.amazonaws.com/images/1.png',
     description: 'Bulbasaur',

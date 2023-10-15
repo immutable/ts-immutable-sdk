@@ -43,3 +43,5 @@ export interface ActivityNFT {
     'token_id': string;
 }
 
+
+

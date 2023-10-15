@@ -1,7 +1,8 @@
 import React from 'react';
 import { WalletProviderName } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
-import { BiomePortalIdProvider } from '@biom3/react';
+import { BiomeCombinedProviders, BiomePortalIdProvider } from '@biom3/react';
+import { onDarkBase } from '@biom3/design-tokens';
 import { SwapWidget, SwapWidgetParams } from './SwapWidget';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
 import {
@@ -10,8 +11,14 @@ import {
 } from '../../components/ConnectLoader/ConnectLoader';
 import { sendSwapWidgetCloseEvent } from './SwapWidgetEvents';
 import { ConnectTargetLayer, getL2ChainId } from '../../lib';
-import { isValidAddress, isValidAmount, isValidWalletProvider } from '../../lib/validations/widgetValidators';
+import {
+  isValidAddress,
+  isValidAmount,
+  isValidWalletProvider,
+} from '../../lib/validations/widgetValidators';
 import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
+import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
+import { ServiceType } from '../../views/error/serviceTypes';
 
 export class ImmutableSwap extends ImmutableWebComponent {
   walletProvider: WalletProviderName | undefined = undefined;
@@ -24,7 +31,13 @@ export class ImmutableSwap extends ImmutableWebComponent {
 
   static get observedAttributes(): string[] {
     const baseObservedAttributes = super.observedAttributes;
-    return [...baseObservedAttributes, 'amount', 'fromcontractaddress', 'tocontractaddress', 'walletprovider'];
+    return [
+      ...baseObservedAttributes,
+      'amount',
+      'fromcontractaddress',
+      'tocontractaddress',
+      'walletprovider',
+    ];
   }
 
   connectedCallback() {
@@ -89,9 +102,7 @@ export class ImmutableSwap extends ImmutableWebComponent {
       walletProvider: this.walletProvider,
       web3Provider: this.provider,
       passport: this.passport,
-      allowedChains: [
-        getL2ChainId(this.checkout!.config),
-      ],
+      allowedChains: [getL2ChainId(this.checkout!.config)],
     };
 
     const swapParams: SwapWidgetParams = {
@@ -100,27 +111,46 @@ export class ImmutableSwap extends ImmutableWebComponent {
       toContractAddress: this.toContractAddress,
     };
 
-    if (!this.reactRoot) {
-      this.reactRoot = ReactDOM.createRoot(this);
-    }
+    let isSwapAvailable = false;
 
-    this.reactRoot.render(
-      <React.StrictMode>
-        <BiomePortalIdProvider>
-          <CustomAnalyticsProvider widgetConfig={this.widgetConfig!}>
-            <ConnectLoader
-              params={connectLoaderParams}
-              widgetConfig={this.widgetConfig!}
-              closeEvent={() => sendSwapWidgetCloseEvent(window)}
-            >
-              <SwapWidget
-                params={swapParams}
-                config={this.widgetConfig!}
-              />
-            </ConnectLoader>
-          </CustomAnalyticsProvider>
-        </BiomePortalIdProvider>
-      </React.StrictMode>,
-    );
+    this.checkout
+      ?.isSwapAvailable()
+      .then((available) => {
+        isSwapAvailable = available;
+      })
+      .finally(() => {
+        if (!this.reactRoot) {
+          this.reactRoot = ReactDOM.createRoot(this);
+        }
+
+        this.reactRoot.render(
+          <React.StrictMode>
+            <BiomePortalIdProvider>
+              <CustomAnalyticsProvider widgetConfig={this.widgetConfig!}>
+                {!isSwapAvailable && (
+                  <BiomeCombinedProviders theme={{ base: onDarkBase }}>
+                    <ServiceUnavailableErrorView
+                      service={ServiceType.SWAP}
+                      onCloseClick={() => sendSwapWidgetCloseEvent(window)}
+                    />
+                  </BiomeCombinedProviders>
+                )}
+                {isSwapAvailable && (
+                  <ConnectLoader
+                    params={connectLoaderParams}
+                    widgetConfig={this.widgetConfig!}
+                    closeEvent={() => sendSwapWidgetCloseEvent(window)}
+                  >
+                    <SwapWidget
+                      params={swapParams}
+                      config={this.widgetConfig!}
+                    />
+                  </ConnectLoader>
+                )}
+              </CustomAnalyticsProvider>
+            </BiomePortalIdProvider>
+          </React.StrictMode>,
+        );
+      });
   }
 }

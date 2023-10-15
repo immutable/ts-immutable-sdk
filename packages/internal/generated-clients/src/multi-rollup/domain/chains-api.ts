@@ -13,8 +13,9 @@
  */
 
 
-import globalAxios, { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
-import { Configuration } from '../configuration';
+import type { Configuration } from '../configuration';
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
@@ -109,13 +110,12 @@ export const ChainsApiFactory = function (configuration?: Configuration, basePat
         /**
          * List supported chains
          * @summary List supported chains
-         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
-         * @param {number} [pageSize] Maximum number of items to return
+         * @param {ChainsApiListChainsRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listChains(pageCursor?: string, pageSize?: number, options?: any): AxiosPromise<ListChainsResult> {
-            return localVarFp.listChains(pageCursor, pageSize, options).then((request) => request(axios, basePath));
+        listChains(requestParameters: ChainsApiListChainsRequest = {}, options?: AxiosRequestConfig): AxiosPromise<ListChainsResult> {
+            return localVarFp.listChains(requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -160,3 +160,4 @@ export class ChainsApi extends BaseAPI {
         return ChainsApiFp(this.configuration).listChains(requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 }
+

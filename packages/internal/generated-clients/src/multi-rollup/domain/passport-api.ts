@@ -13,8 +13,9 @@
  */
 
 
-import globalAxios, { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
-import { Configuration } from '../configuration';
+import type { Configuration } from '../configuration';
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
@@ -167,22 +168,22 @@ export const PassportApiFactory = function (configuration?: Configuration, baseP
         /**
          * Create a counterfactual address for a user based on their Ethereum address
          * @summary Create a counterfactual address
-         * @param {CreateCounterfactualAddressRequest} createCounterfactualAddressRequest 
+         * @param {PassportApiCreateCounterfactualAddressRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createCounterfactualAddress(createCounterfactualAddressRequest: CreateCounterfactualAddressRequest, options?: any): AxiosPromise<CreateCounterfactualAddressRes> {
-            return localVarFp.createCounterfactualAddress(createCounterfactualAddressRequest, options).then((request) => request(axios, basePath));
+        createCounterfactualAddress(requestParameters: PassportApiCreateCounterfactualAddressRequest, options?: AxiosRequestConfig): AxiosPromise<CreateCounterfactualAddressRes> {
+            return localVarFp.createCounterfactualAddress(requestParameters.createCounterfactualAddressRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * Get all the Ethereum linked addresses for a user based on its userId
          * @summary Get Ethereum linked addresses for a user
-         * @param {string} userId The user\&#39;s userId
+         * @param {PassportApiGetLinkedAddressesRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getLinkedAddresses(userId: string, options?: any): AxiosPromise<GetLinkedAddressesRes> {
-            return localVarFp.getLinkedAddresses(userId, options).then((request) => request(axios, basePath));
+        getLinkedAddresses(requestParameters: PassportApiGetLinkedAddressesRequest, options?: AxiosRequestConfig): AxiosPromise<GetLinkedAddressesRes> {
+            return localVarFp.getLinkedAddresses(requestParameters.userId, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -246,3 +247,4 @@ export class PassportApi extends BaseAPI {
         return PassportApiFp(this.configuration).getLinkedAddresses(requestParameters.userId, options).then((request) => request(this.axios, this.basePath));
     }
 }
+

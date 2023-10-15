@@ -254,8 +254,6 @@ export function SaleContextProvider(props: {
       signError,
       executeResponse,
       paymentMethod,
-      signResponse,
-      signError,
       goBackToPaymentMethods,
       goToErrorView,
       goToSuccessView,
