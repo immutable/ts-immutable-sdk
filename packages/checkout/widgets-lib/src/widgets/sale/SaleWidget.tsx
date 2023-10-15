@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import {
   useCallback, useContext, useEffect, useMemo, useReducer,
 } from 'react';
@@ -22,7 +21,7 @@ import { StatusType } from '../../components/Status/StatusType';
 import { StatusView, StatusViewProps } from '../../components/Status/StatusView';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { SaleWidgetViews } from '../../context/view-context/SaleViewContextTypes';
-import { Item, SaleErrorTypes } from './types';
+import { Item, SaleErrorTypes, PaymentTypes } from './types';
 import { widgetTheme } from '../../lib/theme';
 import { SaleContextProvider } from './context/SaleContextProvider';
 import { FundWithSmartCheckout } from './views/FundWithSmartCheckout';
@@ -67,16 +66,6 @@ export function SaleWidget(props: SaleWidgetProps) {
     connectLoaderParams,
   } = props;
 
-  console.log(
-    '@@@ SaleWidget',
-    config,
-    amount,
-    items,
-    fromContractAddress,
-    env,
-    environmentId,
-  );
-
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
 
@@ -89,10 +78,7 @@ export function SaleWidget(props: SaleWidgetProps) {
   const loadingText = viewState.view.data?.loadingText
     || text.views[SharedViews.LOADING_VIEW].text;
 
-  const {
-    eventTargetState: { eventTarget },
-  } = useContext(EventTargetContext);
-
+  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
   const onMount = useCallback(() => {
     if (!checkout || !provider) return;
 
@@ -112,12 +98,13 @@ export function SaleWidget(props: SaleWidgetProps) {
     onMount();
   }, [checkout, provider]);
 
-  const updateToPaymentMethods = () => {
+  const goBackToPaymentMethods = (type?: PaymentTypes | undefined) => {
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
         view: {
           type: SaleWidgetViews.PAYMENT_METHODS,
+          data: { paymentMethod: type },
         },
       },
     });
@@ -129,9 +116,10 @@ export function SaleWidget(props: SaleWidgetProps) {
 
   const errorHandlersConfig: Record<SaleErrorTypes, ErrorHandlerConfig> = {
     [SaleErrorTypes.TRANSACTION_FAILED]: {
-      onActionClick: updateToPaymentMethods,
+      onActionClick: goBackToPaymentMethods,
       onSecondaryActionClick: () => {
-        /* TODO: redirects to Immutascan to check the transaction */
+        /* TODO: redirects to Immutascan to check the transaction if has is given */
+        console.log({ transactionHash: viewState.view?.data?.transactionHash }); // eslint-disable-line no-console
       },
       statusType: StatusType.FAILURE,
       statusIconStyles: {
@@ -153,7 +141,7 @@ export function SaleWidget(props: SaleWidgetProps) {
       statusType: StatusType.INFORMATION,
     },
     [SaleErrorTypes.WALLET_FAILED]: {
-      onActionClick: updateToPaymentMethods,
+      onActionClick: goBackToPaymentMethods,
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
       statusIconStyles: {
@@ -161,28 +149,29 @@ export function SaleWidget(props: SaleWidgetProps) {
       },
     },
     [SaleErrorTypes.WALLET_REJECTED_NO_FUNDS]: {
-      onActionClick: updateToPaymentMethods,
+      onActionClick: goBackToPaymentMethods,
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
     },
     [SaleErrorTypes.WALLET_REJECTED]: {
       onActionClick: () => {
-        /* TODO: trigger the approve and execute flow pop up flow again */
+        goBackToPaymentMethods(PaymentTypes.CRYPTO);
       },
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
     },
     [SaleErrorTypes.DEFAULT]: {
-      onActionClick: updateToPaymentMethods,
+      onActionClick: goBackToPaymentMethods,
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
     },
   };
 
-  const errorViewProps = useMemo<StatusViewProps>(() => {
+  const getErrorViewProps = (): StatusViewProps => {
     const errorTextConfig: AllErrorTextConfigs = text.views[SaleWidgetViews.SALE_FAIL].errors;
-    const errorType = viewState.view.data?.error || SaleErrorTypes.DEFAULT;
+    const errorType = viewState.view.data.errorType || SaleErrorTypes.DEFAULT;
     const handlers = errorHandlersConfig[errorType] || {};
+
     return {
       testId: 'fail-view',
       statusText: errorTextConfig[errorType].description,
@@ -198,7 +187,7 @@ export function SaleWidget(props: SaleWidgetProps) {
         ...handlers.statusIconStyles,
       },
     };
-  }, [viewState.view.data?.error]);
+  };
 
   return (
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>
@@ -219,9 +208,6 @@ export function SaleWidget(props: SaleWidgetProps) {
           {viewState.view.type === SharedViews.LOADING_VIEW && (
             <LoadingView loadingText={loadingText} />
           )}
-          {viewState.view.type === SharedViews.ERROR_VIEW && (
-            <div>{viewState.view.error.message}</div>
-          )}
           {viewState.view.type
             === SaleWidgetViews.PAYMENT_METHODS && <PaymentMethods />}
           {viewState.view.type === SaleWidgetViews.PAY_WITH_CARD && (
@@ -231,7 +217,7 @@ export function SaleWidget(props: SaleWidgetProps) {
             <PayWithCoins />
           )}
           {viewState.view.type === SaleWidgetViews.SALE_FAIL && (
-            <StatusView {...errorViewProps} />
+            <StatusView {...getErrorViewProps()} />
           )}
           {viewState.view.type === SaleWidgetViews.SALE_SUCCESS
             && provider && (

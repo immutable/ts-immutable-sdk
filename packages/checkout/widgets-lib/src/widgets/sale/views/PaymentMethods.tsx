@@ -21,16 +21,10 @@ import { useSaleContext } from '../context/SaleContextProvider';
 import { PaymentTypes } from '../types';
 
 export function PaymentMethods() {
-  const text = {
-    methods: textConfig.views[SaleWidgetViews.PAYMENT_METHODS],
-  };
+  const text = { methods: textConfig.views[SaleWidgetViews.PAYMENT_METHODS] };
   const { viewDispatch } = useContext(ViewContext);
-  const {
-    eventTargetState: { eventTarget },
-  } = useContext(EventTargetContext);
-  const {
-    paymentMethod, setPaymentMethod, sign, signResponse,
-  } = useSaleContext();
+  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+  const { paymentMethod, setPaymentMethod, sign } = useSaleContext();
 
   const handleOptionClick = (type: PaymentTypes) => setPaymentMethod(type);
 
@@ -59,7 +53,7 @@ export function PaymentMethods() {
   }, []);
 
   useEffect(() => {
-    if (paymentMethod && !signResponse) {
+    if (paymentMethod) {
       sign(paymentMethod, () => handleGoToPaymentView(paymentMethod));
       viewDispatch({
         payload: {

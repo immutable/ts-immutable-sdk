@@ -1,3 +1,4 @@
+import { SaleErrorTypes } from '../../widgets/sale/types';
 import { ViewType } from './ViewType';
 
 export enum SaleWidgetViews {
@@ -35,7 +36,10 @@ interface SaleSuccessView extends ViewType {
 }
 interface SaleFailView extends ViewType {
   type: SaleWidgetViews.SALE_FAIL;
-  reason?: string;
+  data?: {
+    errorType: SaleErrorTypes;
+    [key: string]: unknown;
+  };
 }
 
 export enum FundWithSmartCheckoutSubViews {
