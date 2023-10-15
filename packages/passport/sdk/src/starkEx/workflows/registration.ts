@@ -11,8 +11,10 @@ export default async function registerPassport(
   authorization: string,
 ): Promise<string> {
   return withPassportError<string>(async () => {
-    const userAddress = await ethSigner.getAddress();
-    const starkPublicKey = await starkSigner.getAddress();
+    const [userAddress, starkPublicKey] = await Promise.all([
+      ethSigner.getAddress(),
+      starkSigner.getAddress(),
+    ]);
 
     const signableResult = await usersApi.getSignableRegistrationOffchain({
       getSignableRegistrationRequest: {
@@ -22,8 +24,10 @@ export default async function registerPassport(
     });
 
     const { signable_message: signableMessage, payload_hash: payloadHash } = signableResult.data;
-    const ethSignature = await signRaw(signableMessage, ethSigner);
-    const starkSignature = await starkSigner.signMessage(payloadHash);
+    const [ethSignature, starkSignature] = await Promise.all([
+      signRaw(signableMessage, ethSigner),
+      starkSigner.signMessage(payloadHash),
+    ]);
 
     const response = await usersApi.registerPassportUser({
       authorization: `Bearer ${authorization}`,
