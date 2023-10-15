@@ -5,7 +5,7 @@ import { TransakIframe } from '../../../components/Transak/TransakIframe';
 import { TransakNFTData } from '../../../components/Transak/TransakTypes';
 import { text as textConfig } from '../../../resources/text/textConfig';
 import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
-import { MintErrorTypes } from '../types';
+import { SaleErrorTypes } from '../types';
 
 export interface WithCardProps {
   onInit?: () => void;
@@ -46,7 +46,7 @@ export function WithCard(props: WithCardProps) {
   );
 
   const onFailedToLoad = () => {
-    goToErrorView(MintErrorTypes.TRANSACTION_FAILED);
+    goToErrorView(SaleErrorTypes.TRANSACTION_FAILED);
   };
 
   return (
