@@ -100,7 +100,7 @@ describe('PassportImxProviderFactory', () => {
           );
 
           expect(authManagerMock.login).toHaveBeenCalledTimes(1);
-          expect(magicAdapterMock.login).toHaveBeenCalledWith(mockUser.idToken, config.network);
+          expect(magicAdapterMock.login).toHaveBeenCalledWith(mockUser.idToken);
           expect(getSignerMock).toHaveBeenCalledTimes(1);
           expect(registerPassportStarkEx).toHaveBeenCalledWith({
             ethSigner: ethSignerMock,
@@ -127,7 +127,7 @@ describe('PassportImxProviderFactory', () => {
 
           expect(result).toBe(passportImxProviderMock);
           expect(authManagerMock.login).toHaveBeenCalledTimes(1);
-          expect(magicAdapterMock.login).toHaveBeenCalledWith(mockUserImx.idToken, config.network);
+          expect(magicAdapterMock.login).toHaveBeenCalledWith(mockUserImx.idToken);
           expect(getSignerMock).toHaveBeenCalledTimes(1);
           expect(registerPassportStarkEx).toHaveBeenCalledWith({
             ethSigner: ethSignerMock,
@@ -160,7 +160,7 @@ describe('PassportImxProviderFactory', () => {
 
         expect(result).toBe(passportImxProviderMock);
         expect(authManagerMock.login).toHaveBeenCalledTimes(1);
-        expect(magicAdapterMock.login).toHaveBeenCalledWith(mockUserImx.idToken, config.network);
+        expect(magicAdapterMock.login).toHaveBeenCalledWith(mockUserImx.idToken);
         expect(getSignerMock).toHaveBeenCalledTimes(1);
         expect(registerPassportStarkEx).not.toHaveBeenCalled();
         expect(authManagerMock.loginSilent).not.toHaveBeenCalled();
