@@ -204,13 +204,15 @@ export class Exchange {
 
   private async getApproval(
     tradeType: TradeType,
-    amountSpecified: TokenAmount<ERC20 | Native>, // token is the specified amount
+    amountSpecified: TokenAmount<ERC20 | Native>, // token is the specified amount by the user
     amountWithMaxSlippage: TokenAmount<ERC20 | Native>, // token is the quoted one
     secondaryFees: SecondaryFee[],
     fromAddress: string,
     gasPrice: NativeAmount | null,
   ) {
-    if (isNativeAmount(amountSpecified)) {
+    // it's not about the amountSpecified, it's about the tokenIn
+    // if exact input is native then skip approvals
+    if (isNativeAmount(amountSpecified) && tradeType === TradeType.EXACT_INPUT) {
       return null;
     }
 

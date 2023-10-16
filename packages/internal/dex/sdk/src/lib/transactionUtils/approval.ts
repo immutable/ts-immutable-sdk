@@ -96,6 +96,9 @@ const getUnsignedERC20ApproveTransaction = (
 // EXACT_INPUT => I have 100 YEET, I want native IMX => tokenIn = YEET, tokenOut = IMX, tokenSpecified = YEET, otherToken = IMX
 // need to approve 100 YEET, will get native IMX - slippage
 
+// EXACT_OUTPUT => I want 100 YEET, I have native IMX => tokenIn = IMX, tokenOut = YEET, tokenSpecified = YEET, otherToken = IMX
+// No approval, will get exactly 100 YEET. BUT WE NEED TO SEND QUOTED IMX + SLIPPAGE, AND I'LL GET MY IMX CHANGE BACK
+
 export const prepareApproval = (
   tradeType: TradeType,
   amountSpecified: ERC20Amount,
