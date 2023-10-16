@@ -21,11 +21,10 @@ import {
 } from './constants';
 import { Router } from './lib/router';
 import {
-  getTokenDecimals, isNative, isNativeAmount, isValidNonZeroAddress, maybeWrapAmount, maybeWrapToken, newAmount,
+  getTokenDecimals, isNativeAmount, isValidNonZeroAddress, maybeWrapAmount, maybeWrapToken, newAmount,
 } from './lib/utils';
 import {
   ERC20,
-  ERC20Amount,
   ExchangeModuleConfiguration, Native, NativeAmount, SecondaryFee, TokenAmount, TokenLiteral, TransactionResponse,
 } from './types';
 import { getSwap, adjustQuoteWithFees } from './lib/transactionUtils/swap';
@@ -78,6 +77,7 @@ export class Exchange {
       address: tokenLiteral,
       chainId: this.chainId,
       decimals: tokenDecimals,
+      type: 'erc20',
     };
   }
 

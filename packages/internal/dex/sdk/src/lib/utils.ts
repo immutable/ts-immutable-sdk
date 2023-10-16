@@ -89,6 +89,7 @@ export const uniswapTokenToTokenInfo = (token: Token): ERC20 => ({
   decimals: token.decimals,
   symbol: token.symbol,
   name: token.name,
+  type: 'erc20',
 });
 
 export const toBigNumber = (amount: CurrencyAmount<Token>): ethers.BigNumber => (
