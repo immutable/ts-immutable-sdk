@@ -19,6 +19,9 @@ export const availabilityService = (
   };
 
   const checkDexAvailability = async (): Promise<boolean> => {
+    // TEMP FIX: Returns true for sandbox environment
+    if (!isDevelopment && !isProduction) return true;
+
     let response;
 
     try {
