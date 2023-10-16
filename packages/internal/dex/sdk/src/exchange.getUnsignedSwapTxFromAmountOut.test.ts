@@ -1,7 +1,7 @@
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { Contract } from '@ethersproject/contracts';
 import { BigNumber } from '@ethersproject/bignumber';
-import { SecondaryFee, uniswapTokenToTokenInfo } from 'lib';
+import { SecondaryFee } from 'lib';
 import { ethers } from 'ethers';
 import { ERC20__factory } from 'contracts/types';
 import { Exchange } from './exchange';
@@ -193,18 +193,16 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         newAmountFromString('1000', WETH_TEST_TOKEN).value,
       );
 
-      const tokenIn = { ...uniswapTokenToTokenInfo(USDC_TEST_TOKEN), name: undefined, symbol: undefined };
-
       expect(quote.fees).toEqual([
         {
           recipient: makeAddr('recipienta'),
           basisPoints: 200,
-          amount: newAmountFromString('2', tokenIn),
+          amount: newAmountFromString('2', USDC_TEST_TOKEN),
         },
         {
           recipient: makeAddr('recipientb'),
           basisPoints: 400,
-          amount: newAmountFromString('4', tokenIn),
+          amount: newAmountFromString('4', USDC_TEST_TOKEN),
         },
       ]);
     });
@@ -257,10 +255,10 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         newAmountFromString('1000', WETH_TEST_TOKEN).value,
       );
 
-      expect(quote.amount.token.address).toEqual(params.inputToken);
+      expect(quote.amount.currency.address).toEqual(params.inputToken);
       expect(quote.slippage).toBe(0.1);
       expect(formatAmount(quote.amount)).toEqual('100.0');
-      expect(quote.amountWithMaxSlippage.token.address).toEqual(
+      expect(quote.amountWithMaxSlippage.currency.address).toEqual(
         params.inputToken,
       );
       expect(formatAmount(quote.amountWithMaxSlippage)).toEqual(

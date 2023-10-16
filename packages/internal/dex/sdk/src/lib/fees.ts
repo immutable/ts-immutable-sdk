@@ -1,7 +1,7 @@
 import { BASIS_POINT_PRECISION } from 'constants/router';
 import { BigNumber } from 'ethers';
 import {
-  Fee, SecondaryFee, TokenInfo,
+  Fee, SecondaryFee,
 } from 'lib';
 import { CurrencyAmount, Token } from 'types/amount';
 
@@ -10,7 +10,7 @@ export class Fees {
 
   private amount: CurrencyAmount<Token>;
 
-  constructor(secondaryFees: SecondaryFee[], token: TokenInfo) {
+  constructor(secondaryFees: SecondaryFee[], token: Token) {
     this.secondaryFees = secondaryFees;
     this.amount = new CurrencyAmount(token, BigNumber.from(0));
   }

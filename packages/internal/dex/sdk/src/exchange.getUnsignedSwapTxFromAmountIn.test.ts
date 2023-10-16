@@ -31,7 +31,7 @@ import {
   formatTokenAmount,
 } from './test/utils';
 import {
-  addAmount, Router, SecondaryFee, uniswapTokenToTokenInfo,
+  Router, SecondaryFee,
 } from './lib';
 
 jest.mock('@ethersproject/providers');
@@ -82,7 +82,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
-      const amountIn = addAmount(APPROVED_AMOUNT, newAmountFromString('1', USDC_TEST_TOKEN));
+      const amountIn = APPROVED_AMOUNT.add(newAmountFromString('1', USDC_TEST_TOKEN));
       const tx = await exchange.getUnsignedSwapTxFromAmountIn(
         params.fromAddress,
         params.inputToken,
@@ -107,7 +107,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
-      const amountIn = addAmount(APPROVED_AMOUNT, newAmountFromString('1', USDC_TEST_TOKEN));
+      const amountIn = APPROVED_AMOUNT.add(newAmountFromString('1', USDC_TEST_TOKEN));
       const tx = await exchange.getUnsignedSwapTxFromAmountIn(
         params.fromAddress,
         params.inputToken,
@@ -117,11 +117,11 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       expectToBeDefined(tx.approval?.gasFeeEstimate);
       expect(tx.approval.gasFeeEstimate.value).toEqual(TEST_GAS_PRICE.mul(APPROVE_GAS_ESTIMATE));
-      expect(tx.approval.gasFeeEstimate.token.chainId).toEqual(IMX_TEST_TOKEN.chainId);
-      expect(tx.approval.gasFeeEstimate.token.address).toEqual(IMX_TEST_TOKEN.address);
-      expect(tx.approval.gasFeeEstimate.token.decimals).toEqual(IMX_TEST_TOKEN.decimals);
-      expect(tx.approval.gasFeeEstimate.token.symbol).toEqual(IMX_TEST_TOKEN.symbol);
-      expect(tx.approval.gasFeeEstimate.token.name).toEqual(IMX_TEST_TOKEN.name);
+      expect(tx.approval.gasFeeEstimate.currency.chainId).toEqual(IMX_TEST_TOKEN.chainId);
+      expect(tx.approval.gasFeeEstimate.currency.address).toEqual(IMX_TEST_TOKEN.address);
+      expect(tx.approval.gasFeeEstimate.currency.decimals).toEqual(IMX_TEST_TOKEN.decimals);
+      expect(tx.approval.gasFeeEstimate.currency.symbol).toEqual(IMX_TEST_TOKEN.symbol);
+      expect(tx.approval.gasFeeEstimate.currency.name).toEqual(IMX_TEST_TOKEN.name);
     });
   });
 
@@ -272,13 +272,11 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         newAmountFromString('100', USDC_TEST_TOKEN).value,
       );
 
-      const tokenIn = { ...uniswapTokenToTokenInfo(USDC_TEST_TOKEN), name: undefined, symbol: undefined };
-
       expect(quote.fees).toEqual([
         {
           recipient: TEST_FEE_RECIPIENT,
           basisPoints: TEST_MAX_FEE_BASIS_POINTS,
-          amount: newAmountFromString('10', tokenIn),
+          amount: newAmountFromString('10', USDC_TEST_TOKEN),
         },
       ]);
     });
@@ -429,11 +427,11 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expectToBeDefined(tx.swap.gasFeeEstimate);
 
       expect(tx.swap.gasFeeEstimate.value).toEqual(TEST_TRANSACTION_GAS_USAGE.mul(TEST_GAS_PRICE));
-      expect(tx.swap.gasFeeEstimate.token.chainId).toEqual(IMX_TEST_TOKEN.chainId);
-      expect(tx.swap.gasFeeEstimate.token.address).toEqual(IMX_TEST_TOKEN.address);
-      expect(tx.swap.gasFeeEstimate.token.decimals).toEqual(IMX_TEST_TOKEN.decimals);
-      expect(tx.swap.gasFeeEstimate.token.symbol).toEqual(IMX_TEST_TOKEN.symbol);
-      expect(tx.swap.gasFeeEstimate.token.name).toEqual(IMX_TEST_TOKEN.name);
+      expect(tx.swap.gasFeeEstimate.currency.chainId).toEqual(IMX_TEST_TOKEN.chainId);
+      expect(tx.swap.gasFeeEstimate.currency.address).toEqual(IMX_TEST_TOKEN.address);
+      expect(tx.swap.gasFeeEstimate.currency.decimals).toEqual(IMX_TEST_TOKEN.decimals);
+      expect(tx.swap.gasFeeEstimate.currency.symbol).toEqual(IMX_TEST_TOKEN.symbol);
+      expect(tx.swap.gasFeeEstimate.currency.name).toEqual(IMX_TEST_TOKEN.name);
     });
 
     it('returns valid quote', async () => {
@@ -451,10 +449,10 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       );
 
       expect(quote).not.toBe(undefined);
-      expect(quote.amount.token.address).toEqual(params.outputToken);
+      expect(quote.amount.currency.address).toEqual(params.outputToken);
       expect(quote.slippage).toBe(0.1);
       expect(formatAmount(quote.amount)).toEqual('1000.0');
-      expect(quote.amountWithMaxSlippage.token.address).toEqual(params.outputToken);
+      expect(quote.amountWithMaxSlippage.currency.address).toEqual(params.outputToken);
       expect(formatAmount(quote.amountWithMaxSlippage)).toEqual('999.000999000999000999'); // includes slippage
     });
   });
@@ -507,10 +505,10 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         HIGHER_SLIPPAGE,
       );
 
-      expect(quote.amount.token.address).toEqual(params.outputToken);
+      expect(quote.amount.currency.address).toEqual(params.outputToken);
       expect(quote.slippage).toBe(0.2);
       expect(formatAmount(quote.amount)).toEqual('1000.0');
-      expect(quote.amountWithMaxSlippage.token.address).toEqual(params.outputToken);
+      expect(quote.amountWithMaxSlippage.currency.address).toEqual(params.outputToken);
       expect(formatAmount(quote.amountWithMaxSlippage)).toEqual('998.003992015968063872'); // includes 0.2% slippage
     });
   });

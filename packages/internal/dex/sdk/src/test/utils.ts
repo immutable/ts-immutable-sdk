@@ -1,4 +1,4 @@
-import { Token, TradeType } from '@uniswap/sdk-core';
+import * as Uniswap from '@uniswap/sdk-core';
 import { BigNumber, BigNumberish, utils } from 'ethers';
 import JSBI from 'jsbi';
 import { Pool, Route, TickMath } from '@uniswap/v3-sdk';
@@ -8,13 +8,11 @@ import { SecondaryFee__factory } from 'contracts/types';
 import { IV3SwapRouter } from 'contracts/types/SecondaryFee';
 import { PromiseOrValue } from 'contracts/types/common';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
+import { CurrencyAmount, Token } from 'types/amount';
 import {
-  Amount,
-  newAmount,
   Router,
   RoutingContracts,
   SecondaryFee,
-  TokenInfo,
   tokenInfoToUniswapToken,
 } from '../lib';
 
@@ -363,47 +361,47 @@ type MockParams = {
   exchangeRate?: number;
 };
 
-export const amountOutFromAmountIn = (amountIn: Amount, tokenOut: TokenInfo, exchangeRate: number) => {
+export const amountOutFromAmountIn = (amountIn: CurrencyAmount<Token>, tokenOut: Token, exchangeRate: number) => {
   let amountOut = amountIn.value.mul(exchangeRate); // 10 * 10^18
 
-  if (amountIn.token.decimals > tokenOut.decimals) {
-    amountOut = amountOut.div(BigNumber.from(10).pow(amountIn.token.decimals - tokenOut.decimals)); // 10^(18-6) = 10^12
+  if (amountIn.currency.decimals > tokenOut.decimals) {
+    amountOut = amountOut.div(BigNumber.from(10).pow(amountIn.currency.decimals - tokenOut.decimals)); // 10^(18-6) = 10^12
   }
 
-  if (amountIn.token.decimals < tokenOut.decimals) {
-    amountOut = amountOut.mul(BigNumber.from(10).pow(tokenOut.decimals - amountIn.token.decimals)); // 10^(18-6) = 10^12
+  if (amountIn.currency.decimals < tokenOut.decimals) {
+    amountOut = amountOut.mul(BigNumber.from(10).pow(tokenOut.decimals - amountIn.currency.decimals)); // 10^(18-6) = 10^12
   }
 
-  return newAmount(amountOut, tokenOut);
+  return new CurrencyAmount(tokenOut, amountOut);
 };
 
-export const amountInFromAmountOut = (amountOut: Amount, tokenIn: TokenInfo, exchangeRate: number) => {
+export const amountInFromAmountOut = (amountOut: CurrencyAmount<Token>, tokenIn: Token, exchangeRate: number) => {
   let amountIn = amountOut.value.div(exchangeRate); // 1 * 10^6
 
-  if (tokenIn.decimals > amountOut.token.decimals) {
-    amountIn = amountIn.mul(BigNumber.from(10).pow(tokenIn.decimals - amountOut.token.decimals)); // 10^(18-6) = 10^12
+  if (tokenIn.decimals > amountOut.currency.decimals) {
+    amountIn = amountIn.mul(BigNumber.from(10).pow(tokenIn.decimals - amountOut.currency.decimals)); // 10^(18-6) = 10^12
   }
 
-  if (tokenIn.decimals < amountOut.token.decimals) {
-    amountIn = amountIn.div(BigNumber.from(10).pow(amountOut.token.decimals - tokenIn.decimals)); // 10^(18-6) = 10^12
+  if (tokenIn.decimals < amountOut.currency.decimals) {
+    amountIn = amountIn.div(BigNumber.from(10).pow(amountOut.currency.decimals - tokenIn.decimals)); // 10^(18-6) = 10^12
   }
 
-  return newAmount(amountIn, tokenIn);
+  return new CurrencyAmount(tokenIn, amountIn);
 };
 
 export function mockRouterImplementation(params: MockParams) {
   const exchangeRate = params.exchangeRate ?? 10; // 1 TokenIn = 10 TokenOut
   const findOptimalRoute = jest.fn((
-    amountSpecified: Amount,
-    otherToken: TokenInfo,
-    tradeType: TradeType,
+    amountSpecified: CurrencyAmount<Token>,
+    otherToken: Token,
+    tradeType: Uniswap.TradeType,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     secondaryFees: SecondaryFee[],
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     maxHops: number,
   ) => {
-    const tokenIn = tradeType === TradeType.EXACT_INPUT ? amountSpecified.token : otherToken;
-    const tokenOut = tradeType === TradeType.EXACT_OUTPUT ? amountSpecified.token : otherToken;
+    const tokenIn = tradeType === Uniswap.TradeType.EXACT_INPUT ? amountSpecified.currency : otherToken;
+    const tokenOut = tradeType === Uniswap.TradeType.EXACT_OUTPUT ? amountSpecified.currency : otherToken;
 
     const route = new Route(
       params.pools,
@@ -411,10 +409,10 @@ export function mockRouterImplementation(params: MockParams) {
       tokenInfoToUniswapToken(tokenOut),
     );
 
-    const amountIn = tradeType === TradeType.EXACT_INPUT
+    const amountIn = tradeType === Uniswap.TradeType.EXACT_INPUT
       ? amountSpecified : amountInFromAmountOut(amountSpecified, tokenIn, exchangeRate);
 
-    const amountOut = tradeType === TradeType.EXACT_INPUT
+    const amountOut = tradeType === Uniswap.TradeType.EXACT_INPUT
       ? amountOutFromAmountIn(amountSpecified, tokenOut, exchangeRate) : amountSpecified;
 
     const trade: QuoteResult = {
@@ -457,11 +455,11 @@ export function makeAddr(str: string): string {
   return utils.keccak256(utils.toUtf8Bytes(str)).slice(0, 42);
 }
 
-export function formatAmount(amount: Amount): string {
-  return utils.formatUnits(amount.value, amount.token.decimals);
+export function formatAmount(amount: CurrencyAmount<Token>): string {
+  return utils.formatUnits(amount.value, amount.currency.decimals);
 }
 
-export function formatTokenAmount(amount: BigNumberish, token: TokenInfo): string {
+export function formatTokenAmount(amount: BigNumberish, token: Token): string {
   return utils.formatUnits(amount, token.decimals);
 }
 
@@ -472,7 +470,7 @@ export function formatEther(bn: PromiseOrValue<BigNumberish>): string {
   throw new Error('formatEther: bn is not a BigNumber');
 }
 
-export function newAmountFromString(amount: string, token: TokenInfo): Amount {
+export function newAmountFromString(amount: string, token: Token): CurrencyAmount<Token> {
   const bn = utils.parseUnits(amount, token.decimals);
-  return newAmount(bn, token);
+  return new CurrencyAmount(token, bn);
 }

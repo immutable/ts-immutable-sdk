@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { ModuleConfiguration } from '@imtbl/config';
 import { ExchangeContracts } from 'config';
-import { CurrencyAmount, NativeCurrency, Token } from './amount';
+import { CurrencyAmount, Token } from './amount';
 
 /**
  * Interface representing a Chain
@@ -9,14 +9,14 @@ import { CurrencyAmount, NativeCurrency, Token } from './amount';
  * @property {string} rpcUrl - The RPC URL for the chain
  * @property {ExchangeContracts} contracts - The DEX contract addresses
  * @property {Token[]} commonRoutingTokens - The tokens used to find available pools for a swap
- * @property {TokenInfo} nativeToken - The native token of the chain
+ * @property {NativeCurrency} nativeToken - The native token of the chain
  */
 export type Chain = {
   chainId: number;
   rpcUrl: string;
   contracts: ExchangeContracts;
   commonRoutingTokens: Token[];
-  nativeToken: NativeCurrency;
+  nativeToken: Token;
 };
 
 /**
@@ -63,7 +63,7 @@ export type Quote = {
  */
 export type TransactionDetails = {
   transaction: ethers.providers.TransactionRequest;
-  gasFeeEstimate: CurrencyAmount<NativeCurrency> | null;
+  gasFeeEstimate: CurrencyAmount<Token> | null;
 };
 
 /**
@@ -82,7 +82,7 @@ export interface ExchangeOverrides {
   rpcURL: string;
   exchangeContracts: ExchangeContracts;
   commonRoutingTokens: Token[];
-  nativeToken: NativeCurrency;
+  nativeToken: Token;
 }
 
 export interface ExchangeModuleConfiguration

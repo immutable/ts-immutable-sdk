@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 import { BigNumber } from 'ethers';
 import { JsonRpcProvider, FeeData } from '@ethersproject/providers';
-import { CurrencyAmount, NativeCurrency } from 'types/amount';
+import { CurrencyAmount, Token } from 'types/amount';
 
 type EIP1559FeeData = {
   maxFeePerGas: BigNumber;
@@ -27,7 +27,7 @@ export const doesChainSupportEIP1559 = (fee: FeeData): fee is EIP1559FeeData => 
  * @returns {Amount | null} - The gas price in the smallest denomination of the chain's currency,
  * or null if no gas price is available
  */
-export const fetchGasPrice = async (provider: JsonRpcProvider, nativeToken: NativeCurrency): Promise<CurrencyAmount<NativeCurrency> | null> => {
+export const fetchGasPrice = async (provider: JsonRpcProvider, nativeToken: Token): Promise<CurrencyAmount<Token> | null> => {
   const feeData = await provider.getFeeData().catch(() => null);
   if (!feeData) return null;
 
@@ -45,6 +45,6 @@ export const fetchGasPrice = async (provider: JsonRpcProvider, nativeToken: Nati
  * @param {BigNumber} gasUsed - The total gas units that will be used for the transaction
  * @returns - The cost of the transaction in the gas token's smallest denomination (e.g. WEI)
  */
-export const calculateGasFee = (gasPrice: CurrencyAmount<NativeCurrency>, gasEstimate: BigNumber): CurrencyAmount<NativeCurrency> =>
+export const calculateGasFee = (gasPrice: CurrencyAmount<Token>, gasEstimate: BigNumber): CurrencyAmount<Token> =>
   // eslint-disable-next-line implicit-arrow-linebreak
   new CurrencyAmount(gasPrice.currency, gasEstimate.mul(gasPrice.value));

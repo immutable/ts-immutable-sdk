@@ -1,7 +1,8 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { ChainNotSupportedError, InvalidConfigurationError } from 'errors';
 import * as test from 'test/utils';
-import { ExchangeModuleConfiguration, ExchangeOverrides, TokenInfo } from '../types';
+import { Token } from 'types/amount';
+import { ExchangeModuleConfiguration, ExchangeOverrides } from '../types';
 import { ExchangeConfiguration, ExchangeContracts } from './index';
 import { IMMUTABLE_TESTNET_CHAIN_ID } from '../constants/chains';
 
@@ -9,14 +10,14 @@ describe('ExchangeConfiguration', () => {
   const chainId = 999999999;
   // This list can be updated with any Tokens that are deployed to the chain being configured
   // These tokens will be used to find available pools for a swap
-  const commonRoutingTokensSingle: TokenInfo[] = [
-    {
+  const commonRoutingTokensSingle: Token[] = [
+    new Token(
       chainId,
-      address: '0x12958b06abdf2701ace6ceb3ce0b8b1ce11e0851',
-      decimals: 18,
-      symbol: 'FUN',
-      name: 'The Fungibles Token',
-    },
+      '0x12958b06abdf2701ace6ceb3ce0b8b1ce11e0851',
+      18,
+      'FUN',
+      'The Fungibles Token',
+    ),
   ];
 
   const contractOverrides: ExchangeContracts = {
@@ -71,28 +72,28 @@ describe('ExchangeConfiguration', () => {
 
       // This list can be updated with any Tokens that are deployed to the chain being configured
       // These tokens will be used to find available pools for a swap
-      const commonRoutingTokens: TokenInfo[] = [
-        {
+      const commonRoutingTokens: Token[] = [
+        new Token(
           chainId,
-          address: '0x12958b06abdf2701ace6ceb3ce0b8b1ce11e0851',
-          decimals: 18,
-          symbol: 'FUN',
-          name: 'The Fungibles Token',
-        },
-        {
+          '0x12958b06abdf2701ace6ceb3ce0b8b1ce11e0851',
+          18,
+          'FUN',
+          'The Fungibles Token',
+        ),
+        new Token(
           chainId,
-          address: '0x22958b06abdf2701ace6ceb3ce0b8b1ce11e0851',
-          decimals: 18,
-          symbol: 'USDC',
-          name: 'US Dollar Coin',
-        },
-        {
+          '0x22958b06abdf2701ace6ceb3ce0b8b1ce11e0851',
+          18,
+          'USDC',
+          'US Dollar Coin',
+        ),
+        new Token(
           chainId,
-          address: '0x32958b06abdf2701ace6ceb3ce0b8b1ce11e0851',
-          decimals: 18,
-          symbol: 'WETH',
-          name: 'Wrapped Ether',
-        },
+          '0x32958b06abdf2701ace6ceb3ce0b8b1ce11e0851',
+          18,
+          'WETH',
+          'Wrapped Ether',
+        ),
       ];
 
       const secondaryFees = [
