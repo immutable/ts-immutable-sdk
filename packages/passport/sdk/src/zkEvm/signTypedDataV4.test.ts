@@ -140,9 +140,11 @@ describe('signTypedDataV4', () => {
           user: mockUserZkEvm,
           guardianClient: guardianClient as any,
         })
-      )).rejects.toThrow(
-        new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'Failed to parse typed data JSON: SyntaxError: Unexpected token * in JSON at position 0'),
-      );
+      )).rejects.toMatchObject({
+        code: RpcErrorCode.INVALID_PARAMS,
+        // Using stringMatching to avoid differing error message formats across Node
+        message: expect.stringMatching(/Failed to parse typed data JSON: SyntaxError: Unexpected token.*/),
+      });
     });
   });
 
