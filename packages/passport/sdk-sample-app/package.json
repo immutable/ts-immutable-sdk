@@ -10,6 +10,7 @@
     "@imtbl/passport": "0.0.0",
     "@imtbl/provider": "0.0.0",
     "@metamask/detect-provider": "^2.0.0",
+    "axios": "^1.5.1",
     "bootstrap": "^5.2.3",
     "bootstrap-icons": "^1.10.3",
     "ethers": "^5.7.2",

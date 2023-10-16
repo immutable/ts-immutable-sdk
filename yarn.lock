@@ -3629,6 +3629,7 @@ __metadata:
     "@types/react-dom": ^18.0.11
     "@typescript-eslint/eslint-plugin": ^5.57.1
     "@typescript-eslint/parser": ^5.57.1
+    axios: ^1.5.1
     bootstrap: ^5.2.3
     bootstrap-icons: ^1.10.3
     eslint: ^8.40.0
@@ -11998,6 +11999,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"auth0@npm:^4.0.1":
+  version: 4.0.1
+  resolution: "auth0@npm:4.0.1"
+  dependencies:
+    jose: ^4.13.2
+    uuid: ^9.0.0
+  checksum: 7dd0445505f7d2b890f2baffd1f38940dc65a3be2f307af327008d67711bc8142c732b68e47cb40cf4e03b8b453a7d3100e16521bcd82c5ceca5972f01ba2d27
+  languageName: node
+  linkType: hard
+
 "autoprefixer@npm:10.4.14, autoprefixer@npm:^10.4.13":
   version: 10.4.14
   resolution: "autoprefixer@npm:10.4.14"
@@ -12061,6 +12072,17 @@ __metadata:
   dependencies:
     follow-redirects: ^1.14.8
   checksum: d9eb58ff4bc0b36a04783fc9ff760e9245c829a5a1052ee7ca6013410d427036b1d10d04e7380c02f3508c5eaf3485b1ae67bd2adbfec3683704745c8d7a6e1a
+  languageName: node
+  linkType: hard
+
+"axios@npm:^1.5.1":
+  version: 1.5.1
+  resolution: "axios@npm:1.5.1"
+  dependencies:
+    follow-redirects: ^1.15.0
+    form-data: ^4.0.0
+    proxy-from-env: ^1.1.0
+  checksum: 4444f06601f4ede154183767863d2b8e472b4a6bfc5253597ed6d21899887e1fd0ee2b3de792ac4f8459fe2e359d2aa07c216e45fd8b9e4e0688a6ebf48a5a8d
   languageName: node
   linkType: hard
 
@@ -20685,6 +20707,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"jose@npm:^4.13.2":
+  version: 4.15.4
+  resolution: "jose@npm:4.15.4"
+  checksum: dccad91cb3357f36423774a0b89ad830dd84b31090de65cd139b85488439f16a00f8c59c0773825e8a1adb0dd9d13ad725ad66e6ea33880ecb3959bb99e1ea5b
+  languageName: node
+  linkType: hard
+
 "joycon@npm:^3.1.1":
   version: 3.1.1
   resolution: "joycon@npm:3.1.1"
@@ -28885,6 +28914,7 @@ __metadata:
     "@release-it-plugins/workspaces": ^3.2.0
     "@typescript-eslint/eslint-plugin": ^5.57.1
     "@typescript-eslint/parser": ^5.57.1
+    axios: ^1.5.1
     eslint: ^8.40.0
     eslint-config-airbnb: ^19.0.4
     eslint-config-airbnb-typescript: ^17.0.0

@@ -42,6 +42,7 @@ export function PassportProvider({
   const connectImx = useCallback(async () => {
     try {
       setIsLoading(true);
+      console.log("connet!!!!!")
       const provider = await passportClient?.connectImx();
       if (provider) {
         setImxProvider(provider);
@@ -179,6 +180,7 @@ export function usePassportProvider() {
     getUserInfo,
     getLinkedAddresses,
   } = useContext(PassportContext);
+
   return {
     imxProvider,
     zkEvmProvider,
