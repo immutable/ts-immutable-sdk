@@ -12,6 +12,7 @@ import { getApproval, prepareApproval } from 'lib/transactionUtils/approval';
 import { getOurQuoteReqAmount, prepareUserQuote } from 'lib/transactionUtils/getQuote';
 import { Fees } from 'lib/fees';
 import { SecondaryFee__factory } from 'contracts/types';
+import { CurrencyAmount, NativeCurrency, Token } from 'types/amount';
 import {
   DEFAULT_DEADLINE,
   DEFAULT_MAX_HOPS,
@@ -21,10 +22,10 @@ import {
 } from './constants';
 import { Router } from './lib/router';
 import {
-  getERC20Decimals, isValidNonZeroAddress, newAmount,
+  getERC20Decimals, isValidNonZeroAddress,
 } from './lib/utils';
 import {
-  ExchangeModuleConfiguration, SecondaryFee, TokenInfo, TransactionResponse,
+  ExchangeModuleConfiguration, SecondaryFee, TransactionResponse,
 } from './types';
 import { getSwap, prepareSwap } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
@@ -36,7 +37,9 @@ export class Exchange {
 
   private chainId: number;
 
-  private nativeToken: TokenInfo;
+  private nativeToken: NativeCurrency;
+
+  private wrappedNativeToken: Token;
 
   private secondaryFees: SecondaryFee[];
 
@@ -45,6 +48,7 @@ export class Exchange {
 
     this.chainId = config.chain.chainId;
     this.nativeToken = config.chain.nativeToken;
+    this.wrappedNativeToken = config.chain.wrappedNativeToken;
     this.secondaryFees = config.secondaryFees;
 
     this.provider = new ethers.providers.JsonRpcProvider(
@@ -118,39 +122,41 @@ export class Exchange {
       this.getSecondaryFees(),
     ]);
 
-    const tokenIn: TokenInfo = {
-      address: tokenInAddress,
-      chainId: this.chainId,
-      decimals: tokenInDecimals,
-    };
-    const tokenOut: TokenInfo = {
-      address: tokenOutAddress,
-      chainId: this.chainId,
-      decimals: tokenOutDecimals,
-    };
+    const tokenIn = tokenInAddress
+      ? new Token(this.chainId, tokenInAddress, tokenInDecimals)
+      : new NativeCurrency(this.chainId, this.nativeToken.decimals);
+
+    const tokenOut = tokenOutAddress
+      ? new Token(this.chainId, tokenOutAddress, tokenOutDecimals)
+      : new NativeCurrency(this.chainId, this.nativeToken.decimals);
 
     // determine which amount was specified for the swap from the TradeType
     const [tokenSpecified, otherToken] = tradeType === TradeType.EXACT_INPUT
       ? [tokenIn, tokenOut] : [tokenOut, tokenIn];
 
-    const amountSpecified = newAmount(amount, tokenSpecified);
+    const amountSpecified = new CurrencyAmount(tokenSpecified, amount);
 
     const fees = new Fees(secondaryFees, tokenIn);
 
-    const ourQuoteReqAmount = getOurQuoteReqAmount(amountSpecified, fees, tradeType);
+    const ourQuoteReqAmount = getOurQuoteReqAmount(amountSpecified, fees, tradeType, this.wrappedNativeToken);
 
     // get quote and gas details
     const [ourQuote, gasPrice] = await Promise.all([
       this.router.findOptimalRoute(
         ourQuoteReqAmount,
-        otherToken,
+        otherToken.wrap(this.wrappedNativeToken),
         tradeType,
         maxHops,
       ),
       fetchGasPrice(this.provider, this.nativeToken),
     ]);
 
-    const adjustedQuote = prepareSwap(ourQuote, amountSpecified, fees);
+    const adjustedQuote = prepareSwap(
+      ourQuote,
+      amountSpecified.wrap(this.wrappedNativeToken),
+      fees,
+      this.wrappedNativeToken,
+    );
 
     const swap = getSwap(
       adjustedQuote,
@@ -174,12 +180,12 @@ export class Exchange {
     );
 
     // preparedApproval always uses the tokenIn address because we are always selling the tokenIn
-    const approval = await getApproval(
+    const approval = preparedApproval ? await getApproval(
       this.provider,
       fromAddress,
       preparedApproval,
       gasPrice,
-    );
+    ) : null;
 
     return {
       approval,

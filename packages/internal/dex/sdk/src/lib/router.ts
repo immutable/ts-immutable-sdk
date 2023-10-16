@@ -1,8 +1,8 @@
 import { ethers } from 'ethers';
-import { Token, TradeType } from '@uniswap/sdk-core';
+import * as Uniswap from '@uniswap/sdk-core';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import { NoRoutesAvailableError } from 'errors';
-import { Amount, TokenInfo } from 'types';
+import { CurrencyAmount, Token } from 'types/amount';
 import { poolEquals, tokenInfoToUniswapToken } from './utils';
 import { getQuotesForRoutes, QuoteResult } from './getQuotesForRoutes';
 import { fetchValidPools } from './poolUtils/fetchValidPools';
@@ -20,13 +20,13 @@ export type RoutingContracts = {
 export class Router {
   public provider: ethers.providers.JsonRpcProvider;
 
-  public routingTokens: TokenInfo[];
+  public routingTokens: Token[];
 
   public routingContracts: RoutingContracts;
 
   constructor(
     provider: ethers.providers.JsonRpcProvider,
-    routingTokens: TokenInfo[],
+    routingTokens: Token[],
     routingContracts: RoutingContracts,
   ) {
     this.provider = provider;
@@ -35,9 +35,9 @@ export class Router {
   }
 
   public async findOptimalRoute(
-    amountSpecified: Amount,
-    otherToken: TokenInfo,
-    tradeType: TradeType,
+    amountSpecified: CurrencyAmount<Token>,
+    otherToken: Token,
+    tradeType: Uniswap.TradeType,
     maxHops: number = 2,
   ): Promise<QuoteResult> {
     const [tokenIn, tokenOut] = this.determineERC20InAndERC20Out(
@@ -69,13 +69,13 @@ export class Router {
     // TODO: Fix used before defined error
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     const routes = generateAllAcyclicPaths(
-      tokenIn,
-      tokenOut,
+      tokenInfoToUniswapToken(tokenIn),
+      tokenInfoToUniswapToken(tokenOut),
       pools,
       maxHops,
       [],
       [],
-      tokenIn,
+      tokenInfoToUniswapToken(tokenIn),
     );
 
     const noValidRoute = routes.length === 0;
@@ -94,9 +94,9 @@ export class Router {
 
   private async getBestQuoteFromRoutes(
     multicallContract: Multicall,
-    routes: Route<Token, Token>[],
-    amountSpecified: Amount,
-    tradeType: TradeType,
+    routes: Route<Uniswap.Token, Uniswap.Token>[],
+    amountSpecified: CurrencyAmount<Token>,
+    tradeType: Uniswap.TradeType,
   ): Promise<QuoteResult> {
     const quotes = await getQuotesForRoutes(
       multicallContract,
@@ -110,12 +110,12 @@ export class Router {
     }
 
     // We want to maximise the amountOut for the EXACT_INPUT type
-    if (tradeType === TradeType.EXACT_INPUT) {
+    if (tradeType === Uniswap.TradeType.EXACT_INPUT) {
       return this.bestQuoteForAmountIn(quotes);
     }
 
     // We want to minimise the amountIn for the EXACT_OUTPUT type
-    if (tradeType === TradeType.EXACT_OUTPUT) {
+    if (tradeType === Uniswap.TradeType.EXACT_OUTPUT) {
       return this.bestQuoteForAmountOut(quotes);
     }
 
@@ -150,46 +150,42 @@ export class Router {
 
   // eslint-disable-next-line class-methods-use-this
   private determineERC20InAndERC20Out(
-    tradeType: TradeType,
-    amountSpecified: Amount,
-    otherToken: TokenInfo,
-  ): [TokenInfo, TokenInfo] {
+    tradeType: Uniswap.TradeType,
+    amountSpecified: CurrencyAmount<Token>,
+    otherToken: Token,
+  ): [Token, Token] {
     // If the trade type is EXACT INPUT then we have specified the amount for the tokenIn
-    return tradeType === TradeType.EXACT_INPUT
-      ? [amountSpecified.token, otherToken]
-      : [otherToken, amountSpecified.token];
+    return tradeType === Uniswap.TradeType.EXACT_INPUT
+      ? [amountSpecified.currency, otherToken]
+      : [otherToken, amountSpecified.currency];
   }
 }
 
 export const generateAllAcyclicPaths = (
-  tokenIn: TokenInfo, // the currency we start with
-  tokenOut: TokenInfo, // the currency we want to end up with
+  tokenIn: Uniswap.Token, // the currency we start with
+  tokenOut: Uniswap.Token, // the currency we want to end up with
   pools: Pool[], // list of all available pools
   maxHops: number, // the maximum number of pools that can be traversed
   currentRoute: Pool[] = [], // list of pools already traversed
-  routes: Route<Token, Token>[] = [], // list of all routes found so far
-  startTokenIn: TokenInfo = tokenIn, // the currency we started with
-): Route<Token, Token>[] => {
-  const currencyIn = tokenInfoToUniswapToken(tokenIn);
-  const currencyOut = tokenInfoToUniswapToken(tokenOut);
-  const startCurrencyIn = tokenInfoToUniswapToken(startTokenIn);
-
+  routes: Route<Uniswap.Token, Uniswap.Token>[] = [], // list of all routes found so far
+  startTokenIn: Uniswap.Token = tokenIn, // the currency we started with
+): Route<Uniswap.Token, Uniswap.Token>[] => {
   for (const pool of pools) {
     // if the pool doesn't have the tokenIn or if it has already been traversed,
     // skip to the next pool
-    const poolHasTokenIn = pool.involvesToken(currencyIn);
+    const poolHasTokenIn = pool.involvesToken(tokenIn);
     const poolHasCycle = currentRoute.find((pathPool) => poolEquals(pool, pathPool));
     // eslint-disable-next-line no-continue
     if (!poolHasTokenIn || poolHasCycle) continue;
 
     // get the output token of the pool
-    const outputToken = pool.token0.equals(currencyIn) ? pool.token1 : pool.token0;
+    const outputToken = pool.token0.equals(tokenIn) ? pool.token1 : pool.token0;
 
     // if we have found a route to the target currency, add it to the list of routes
-    const routeFound = outputToken.equals(currencyOut);
+    const routeFound = outputToken.equals(tokenOut);
     if (routeFound) {
       routes.push(
-        new Route([...currentRoute, pool], startCurrencyIn, currencyOut),
+        new Route([...currentRoute, pool], startTokenIn, tokenOut),
       );
     } else if (maxHops > 1) {
       // otherwise, if we haven't exceeded the maximum number of pools that can be traversed,

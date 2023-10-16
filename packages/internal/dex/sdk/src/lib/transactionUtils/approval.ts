@@ -1,3 +1,4 @@
+/* eslint-disable no-lonely-if */
 import { JsonRpcProvider, TransactionRequest } from '@ethersproject/providers';
 import { BigNumber } from '@ethersproject/bignumber';
 import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
@@ -5,13 +6,18 @@ import { ApproveError, AlreadyApprovedError } from 'errors';
 import { ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
 import { RoutingContracts } from 'lib/router';
-import { newAmount } from 'lib/utils';
-import { Amount, SecondaryFee, TransactionDetails } from '../../types';
+import {
+  Currency,
+  CurrencyAmount,
+  NativeCurrency,
+  Token,
+} from 'types/amount';
+import { SecondaryFee, TransactionDetails } from '../../types';
 import { calculateGasFee } from './gas';
 
 type PreparedApproval = {
   spender: string;
-  amount: Amount;
+  amount: CurrencyAmount<Token>;
 };
 
 /**
@@ -27,11 +33,14 @@ type PreparedApproval = {
 const getERC20AmountToApprove = async (
   provider: JsonRpcProvider,
   ownerAddress: string,
-  tokenAmount: Amount,
+  tokenAmount: CurrencyAmount<Token>,
   spenderAddress: string,
-): Promise<Amount> => {
+): Promise<CurrencyAmount<Token>> => {
   // create an instance of the ERC20 token contract
-  const erc20Contract = ERC20__factory.connect(tokenAmount.token.address, provider);
+  const erc20Contract = ERC20__factory.connect(
+    tokenAmount.currency.address,
+    provider,
+  );
 
   // get the allowance for the token spender
   // minimum is 0 - no allowance
@@ -46,10 +55,14 @@ const getERC20AmountToApprove = async (
   // get the amount that needs to be approved
   const requiredAmount = tokenAmount.value.sub(allowance);
   if (requiredAmount.isNegative() || requiredAmount.isZero()) {
-    throw new AlreadyApprovedError(tokenAmount.toString(), tokenAmount.token.address, spenderAddress);
+    throw new AlreadyApprovedError(
+      tokenAmount.toString(),
+      tokenAmount.currency.address,
+      spenderAddress,
+    );
   }
 
-  return newAmount(requiredAmount, tokenAmount.token);
+  return new CurrencyAmount(tokenAmount.currency, requiredAmount);
 };
 
 /**
@@ -62,7 +75,7 @@ const getERC20AmountToApprove = async (
  */
 const getUnsignedERC20ApproveTransaction = (
   ownerAddress: string,
-  tokenAmount: Amount,
+  tokenAmount: CurrencyAmount<Token>,
   spenderAddress: string,
 ): TransactionRequest => {
   if (ownerAddress === spenderAddress) {
@@ -70,30 +83,57 @@ const getUnsignedERC20ApproveTransaction = (
   }
 
   const erc20Contract = ERC20__factory.createInterface();
-  const callData = erc20Contract.encodeFunctionData('approve', [spenderAddress, tokenAmount.value]);
+  const callData = erc20Contract.encodeFunctionData('approve', [
+    spenderAddress,
+    tokenAmount.value,
+  ]);
 
   return {
     data: callData,
-    to: tokenAmount.token.address,
+    to: tokenAmount.currency.address,
     value: 0,
     from: ownerAddress,
   };
 };
 
+const getAmountInToApprove = (
+  tradeType: TradeType,
+  amountSpecified: CurrencyAmount<Currency>,
+  amountWithSlippage: CurrencyAmount<Currency>,
+) => {
+  if (tradeType === TradeType.EXACT_INPUT && amountSpecified.isTokenAmount()) {
+    return amountSpecified;
+  }
+  if (
+    tradeType === TradeType.EXACT_OUTPUT
+    && amountWithSlippage.isTokenAmount()
+  ) {
+    return amountWithSlippage;
+  }
+  return null;
+};
+
 export const prepareApproval = (
   tradeType: TradeType,
-  amountSpecified: Amount,
-  amountWithSlippage: Amount,
+  amountSpecified: CurrencyAmount<Currency>,
+  amountWithSlippage: CurrencyAmount<Currency>,
   routingContracts: RoutingContracts,
   secondaryFees: SecondaryFee[],
-): PreparedApproval => {
-  const amountOfTokenIn = tradeType === TradeType.EXACT_INPUT ? amountSpecified : amountWithSlippage;
+): PreparedApproval | null => {
+  const amountInToApprove = getAmountInToApprove(
+    tradeType,
+    amountSpecified,
+    amountWithSlippage,
+  );
+  if (amountInToApprove == null) {
+    return null;
+  }
 
   const spender = secondaryFees.length === 0
     ? routingContracts.peripheryRouterAddress
     : routingContracts.secondaryFeeAddress;
 
-  return { spender, amount: amountOfTokenIn };
+  return { spender, amount: amountInToApprove };
 };
 
 /**
@@ -109,10 +149,10 @@ export const prepareApproval = (
 export const getApproveTransaction = async (
   provider: JsonRpcProvider,
   ownerAddress: string,
-  tokenAmount: Amount,
+  tokenAmount: CurrencyAmount<Token>,
   spenderAddress: string,
 ): Promise<TransactionRequest | null> => {
-  let amountToApprove: Amount;
+  let amountToApprove: CurrencyAmount<Token>;
   try {
     amountToApprove = await getERC20AmountToApprove(
       provider,
@@ -143,16 +183,20 @@ export async function getApproveGasEstimate(
   tokenAddress: string,
 ): Promise<ethers.BigNumber> {
   const erc20Contract = ERC20__factory.connect(tokenAddress, provider);
-  return await erc20Contract.estimateGas.approve(spenderAddress, ethers.constants.MaxUint256, {
-    from: ownerAddress,
-  });
+  return await erc20Contract.estimateGas.approve(
+    spenderAddress,
+    ethers.constants.MaxUint256,
+    {
+      from: ownerAddress,
+    },
+  );
 }
 
 export const getApproval = async (
   provider: JsonRpcProvider,
   ownerAddress: string,
   preparedApproval: PreparedApproval,
-  gasPrice: Amount | null,
+  gasPrice: CurrencyAmount<NativeCurrency> | null,
 ): Promise<TransactionDetails | null> => {
   const approveTransaction = await getApproveTransaction(
     provider,
@@ -169,10 +213,12 @@ export const getApproval = async (
     provider,
     ownerAddress,
     preparedApproval.spender,
-    preparedApproval.amount.token.address,
+    preparedApproval.amount.currency.address,
   );
 
-  const gasFeeEstimate = gasPrice ? calculateGasFee(gasPrice, gasEstimate) : null;
+  const gasFeeEstimate = gasPrice
+    ? calculateGasFee(gasPrice, gasEstimate)
+    : null;
 
   return {
     transaction: approveTransaction,

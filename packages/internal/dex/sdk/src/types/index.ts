@@ -1,6 +1,9 @@
 import { ethers } from 'ethers';
 import { ModuleConfiguration } from '@imtbl/config';
 import { ExchangeContracts } from 'config';
+import {
+  Currency, CurrencyAmount, NativeCurrency, Token,
+} from './amount';
 
 /**
  * Interface representing a Chain
@@ -8,14 +11,15 @@ import { ExchangeContracts } from 'config';
  * @property {string} rpcUrl - The RPC URL for the chain
  * @property {ExchangeContracts} contracts - The DEX contract addresses
  * @property {Token[]} commonRoutingTokens - The tokens used to find available pools for a swap
- * @property {TokenInfo} nativeToken - The native token of the chain
+ * @property {NativeCurrency} nativeToken - The native token of the chain
  */
 export type Chain = {
   chainId: number;
   rpcUrl: string;
   contracts: ExchangeContracts;
-  commonRoutingTokens: TokenInfo[];
-  nativeToken: TokenInfo;
+  commonRoutingTokens: Token[];
+  nativeToken: NativeCurrency;
+  wrappedNativeToken: Token;
 };
 
 /**
@@ -39,17 +43,7 @@ export type SecondaryFee = {
 export type Fee = {
   recipient: string;
   basisPoints: number;
-  amount: Amount;
-};
-
-/**
- * Interface representing an amount with the token information
- * @property {TokenInfo} token - The token information
- * @property {ethers.BigNumber} value - The amount
- */
-export type Amount = {
-  token: TokenInfo;
-  value: ethers.BigNumber;
+  amount: CurrencyAmount<Currency>;
 };
 
 /**
@@ -59,8 +53,8 @@ export type Amount = {
  * @property {number} slippage - The slippage percentage used to calculate the quote
  */
 export type Quote = {
-  amount: Amount;
-  amountWithMaxSlippage: Amount;
+  amount: CurrencyAmount<Currency>;
+  amountWithMaxSlippage: CurrencyAmount<Currency>;
   slippage: number;
   fees: Fee[];
 };
@@ -72,7 +66,7 @@ export type Quote = {
  */
 export type TransactionDetails = {
   transaction: ethers.providers.TransactionRequest;
-  gasFeeEstimate: Amount | null;
+  gasFeeEstimate: CurrencyAmount<NativeCurrency> | null;
 };
 
 /**
@@ -87,27 +81,12 @@ export type TransactionResponse = {
   quote: Quote;
 };
 
-/**
- * Interface representing a token
- * @property {number} chainId - The chain ID
- * @property {string} address - The token address
- * @property {number} decimals - The token decimals
- * @property {string | undefined} symbol - The token symbol or undefined if it is not available
- * @property {string | undefined} name - The token name or undefined if it is not available
- */
-export type TokenInfo = {
-  chainId: number;
-  address: string;
-  decimals: number;
-  symbol?: string;
-  name?: string;
-};
-
 export interface ExchangeOverrides {
   rpcURL: string;
   exchangeContracts: ExchangeContracts;
-  commonRoutingTokens: TokenInfo[];
-  nativeToken: TokenInfo;
+  commonRoutingTokens: Token[];
+  nativeToken: NativeCurrency;
+  wrappedNativeToken: Token;
 }
 
 export interface ExchangeModuleConfiguration

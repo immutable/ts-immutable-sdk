@@ -1,9 +1,10 @@
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { Contract } from '@ethersproject/contracts';
 import { BigNumber } from '@ethersproject/bignumber';
-import { SecondaryFee, uniswapTokenToTokenInfo } from 'lib';
+import { SecondaryFee } from 'lib';
 import { ethers } from 'ethers';
 import { ERC20__factory } from 'contracts/types';
+import { Token } from 'types/amount';
 import { Exchange } from './exchange';
 import {
   mockRouterImplementation,
@@ -53,22 +54,20 @@ const APPROVE_GAS_ESTIMATE = BigNumber.from('100000');
  */
 describe('getUnsignedSwapTxFromAmountOut', () => {
   beforeAll(() => {
-    (Contract as unknown as jest.Mock).mockImplementation(
-      () => ({
-        allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT),
-        estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
-        paused: jest.fn().mockResolvedValue(false),
-      }),
-    );
+    (Contract as unknown as jest.Mock).mockImplementation(() => ({
+      allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT),
+      estimateGas: {
+        approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE),
+      },
+      paused: jest.fn().mockResolvedValue(false),
+    }));
 
-    (JsonRpcProvider as unknown as jest.Mock).mockImplementation(
-      () => ({
-        getFeeData: async () => ({
-          maxFeePerGas: null,
-          gasPrice: TEST_GAS_PRICE,
-        }),
+    (JsonRpcProvider as unknown as jest.Mock).mockImplementation(() => ({
+      getFeeData: async () => ({
+        maxFeePerGas: null,
+        gasPrice: TEST_GAS_PRICE,
       }),
-    ) as unknown as JsonRpcProvider;
+    })) as unknown as JsonRpcProvider;
   });
 
   describe('Swap with single pool with fees', () => {
@@ -81,7 +80,10 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
 
       const findOptimalRouteMock = mockRouterImplementation(params);
 
-      const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
+      const exchange = new Exchange({
+        ...TEST_DEX_CONFIGURATION,
+        secondaryFees,
+      });
 
       const { swap, quote } = await exchange.getUnsignedSwapTxFromAmountOut(
         params.fromAddress,
@@ -112,7 +114,9 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       expect(swap.transaction.from).toBe(params.fromAddress); // from address
       expect(swap.transaction.value).toBe('0x00'); // refers to 0ETH
       expect(formatEther(swapParams.amountOut)).toBe('1000.0'); // amount out (1,000)
-      expect(formatTokenAmount(swapParams.amountInMaximum, USDC_TEST_TOKEN)).toBe('104.03'); // max amount in
+      expect(
+        formatTokenAmount(swapParams.amountInMaximum, USDC_TEST_TOKEN),
+      ).toBe('104.03'); // max amount in
       expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
     });
 
@@ -126,7 +130,10 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
 
       mockRouterImplementation(params);
 
-      const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
+      const exchange = new Exchange({
+        ...TEST_DEX_CONFIGURATION,
+        secondaryFees,
+      });
 
       const { approval, quote } = await exchange.getUnsignedSwapTxFromAmountOut(
         params.fromAddress,
@@ -138,10 +145,15 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
 
       expectToBeDefined(approval?.transaction.data);
 
-      const decodedResults = erc20ContractInterface.decodeFunctionData('approve', approval.transaction.data);
+      const decodedResults = erc20ContractInterface.decodeFunctionData(
+        'approve',
+        approval.transaction.data,
+      );
       const approvalAmount = decodedResults[1].toString();
 
-      expect(formatTokenAmount(approvalAmount, USDC_TEST_TOKEN)).toEqual('104.03');
+      expect(formatTokenAmount(approvalAmount, USDC_TEST_TOKEN)).toEqual(
+        '104.03',
+      );
       expect(approval.transaction.to).toEqual(params.inputToken);
       expect(approval.transaction.from).toEqual(params.fromAddress);
       expect(approval.transaction.value).toEqual(0); // we do not want to send any ETH
@@ -158,7 +170,10 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
 
       mockRouterImplementation(params);
 
-      const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
+      const exchange = new Exchange({
+        ...TEST_DEX_CONFIGURATION,
+        secondaryFees,
+      });
 
       const { approval } = await exchange.getUnsignedSwapTxFromAmountOut(
         params.fromAddress,
@@ -169,7 +184,10 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
 
       expectToBeDefined(approval?.transaction.data);
 
-      const decodedResults = erc20ContractInterface.decodeFunctionData('approve', approval.transaction.data);
+      const decodedResults = erc20ContractInterface.decodeFunctionData(
+        'approve',
+        approval.transaction.data,
+      );
       const spenderAddress: string = decodedResults[0].toString();
 
       expect(spenderAddress).toEqual(TEST_SECONDARY_FEE_ADDRESS);
@@ -184,7 +202,10 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         { recipient: makeAddr('recipientb'), basisPoints: 400 }, // 4% fee
       ];
 
-      const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
+      const exchange = new Exchange({
+        ...TEST_DEX_CONFIGURATION,
+        secondaryFees,
+      });
 
       const { quote } = await exchange.getUnsignedSwapTxFromAmountOut(
         params.fromAddress,
@@ -193,18 +214,16 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         newAmountFromString('1000', WETH_TEST_TOKEN).value,
       );
 
-      const tokenIn = { ...uniswapTokenToTokenInfo(USDC_TEST_TOKEN), name: undefined, symbol: undefined };
-
       expect(quote.fees).toEqual([
         {
           recipient: makeAddr('recipienta'),
           basisPoints: 200,
-          amount: newAmountFromString('2', tokenIn),
+          amount: newAmountFromString('2', USDC_TEST_TOKEN),
         },
         {
           recipient: makeAddr('recipientb'),
           basisPoints: 400,
-          amount: newAmountFromString('4', tokenIn),
+          amount: newAmountFromString('4', USDC_TEST_TOKEN),
         },
       ]);
     });
@@ -240,7 +259,9 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       expect(swap.transaction.from).toBe(params.fromAddress); // from address
       expect(swap.transaction.value).toBe('0x00'); // refers to 0ETH
       expect(formatEther(swapParams.amountOut)).toBe('1000.0'); // 1,000 amount out
-      expect(formatTokenAmount(swapParams.amountInMaximum, USDC_TEST_TOKEN)).toBe('100.1'); // 100.1 max amount in includes slippage
+      expect(
+        formatTokenAmount(swapParams.amountInMaximum, USDC_TEST_TOKEN),
+      ).toBe('100.1'); // 100.1 max amount in includes slippage
       expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
     });
 
@@ -257,12 +278,13 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         newAmountFromString('1000', WETH_TEST_TOKEN).value,
       );
 
-      expect(quote.amount.token.address).toEqual(params.inputToken);
+      expectInstanceOf(Token, quote.amount.currency);
+      expect(quote.amount.currency.address).toEqual(params.inputToken);
       expect(quote.slippage).toBe(0.1);
       expect(formatAmount(quote.amount)).toEqual('100.0');
-      expect(quote.amountWithMaxSlippage.token.address).toEqual(
-        params.inputToken,
-      );
+
+      expectInstanceOf(Token, quote.amountWithMaxSlippage.currency);
+      expect(quote.amountWithMaxSlippage.currency.address).toEqual(params.inputToken);
       expect(formatAmount(quote.amountWithMaxSlippage)).toEqual(
         '100.1', // (includes slippage)
       );
@@ -285,7 +307,10 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
 
       expectToBeDefined(approval?.transaction.data);
 
-      const decodedResults = erc20ContractInterface.decodeFunctionData('approve', approval.transaction.data);
+      const decodedResults = erc20ContractInterface.decodeFunctionData(
+        'approve',
+        approval.transaction.data,
+      );
       const spenderAddress: string = decodedResults[0].toString();
 
       expect(spenderAddress).toEqual(TEST_PERIPHERY_ROUTER_ADDRESS);
@@ -298,10 +323,16 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       mockRouterImplementation(params);
 
       const secondaryFees: SecondaryFee[] = [
-        { recipient: TEST_FEE_RECIPIENT, basisPoints: TEST_MAX_FEE_BASIS_POINTS },
+        {
+          recipient: TEST_FEE_RECIPIENT,
+          basisPoints: TEST_MAX_FEE_BASIS_POINTS,
+        },
       ];
 
-      const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
+      const exchange = new Exchange({
+        ...TEST_DEX_CONFIGURATION,
+        secondaryFees,
+      });
 
       const { swap } = await exchange.getUnsignedSwapTxFromAmountOut(
         params.fromAddress,
@@ -318,7 +349,9 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       expectInstanceOf(BigNumber, swapParams.amountInMaximum);
 
       expect(secondaryFeeParams[0].recipient).toBe(TEST_FEE_RECIPIENT);
-      expect(secondaryFeeParams[0].basisPoints.toString()).toBe(TEST_MAX_FEE_BASIS_POINTS.toString());
+      expect(secondaryFeeParams[0].basisPoints.toString()).toBe(
+        TEST_MAX_FEE_BASIS_POINTS.toString(),
+      );
 
       const decodedPath = decodePathForExactOutput(swapParams.path.toString());
 
@@ -326,15 +359,23 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       expect(swap.transaction.from).toBe(params.fromAddress); // from address
       expect(swap.transaction.value).toBe('0x00'); // refers to 0 amount of the native token
 
-      expect(ethers.utils.getAddress(decodedPath.inputToken)).toBe(params.inputToken);
-      expect(ethers.utils.getAddress(decodedPath.intermediaryToken)).toBe(params.intermediaryToken);
-      expect(ethers.utils.getAddress(decodedPath.outputToken)).toBe(params.outputToken);
+      expect(ethers.utils.getAddress(decodedPath.inputToken)).toBe(
+        params.inputToken,
+      );
+      expect(ethers.utils.getAddress(decodedPath.intermediaryToken)).toBe(
+        params.intermediaryToken,
+      );
+      expect(ethers.utils.getAddress(decodedPath.outputToken)).toBe(
+        params.outputToken,
+      );
 
       expect(decodedPath.firstPoolFee.toString()).toBe('10000');
       expect(decodedPath.secondPoolFee.toString()).toBe('10000');
 
       expect(swapParams.recipient).toBe(params.fromAddress); // recipient of swap
-      expect(formatTokenAmount(swapParams.amountInMaximum, USDC_TEST_TOKEN)).toBe('110.11'); // (includes fees and slippage)
+      expect(
+        formatTokenAmount(swapParams.amountInMaximum, USDC_TEST_TOKEN),
+      ).toBe('110.11'); // (includes fees and slippage)
       expect(formatEther(swapParams.amountOut)).toBe('1000.0');
     });
   });
