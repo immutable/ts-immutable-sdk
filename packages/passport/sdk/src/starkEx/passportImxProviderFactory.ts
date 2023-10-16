@@ -98,7 +98,7 @@ export class PassportImxProviderFactory {
       );
     }
 
-    const magicRpcProvider = await this.magicAdapter.login(user.idToken, this.config.network);
+    const magicRpcProvider = await this.magicAdapter.login(user.idToken);
     const web3Provider = new Web3Provider(
       magicRpcProvider,
     );
