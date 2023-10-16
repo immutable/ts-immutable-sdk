@@ -1,6 +1,7 @@
 import { ethers } from 'ethers';
 import { ModuleConfiguration } from '@imtbl/config';
 import { ExchangeContracts } from 'config';
+import { CurrencyAmount, Token } from './amount';
 
 /**
  * Interface representing a Chain
@@ -39,17 +40,7 @@ export type SecondaryFee = {
 export type Fee = {
   recipient: string;
   basisPoints: number;
-  amount: Amount;
-};
-
-/**
- * Interface representing an amount with the token information
- * @property {TokenInfo} token - The token information
- * @property {ethers.BigNumber} value - The amount
- */
-export type Amount = {
-  token: TokenInfo;
-  value: ethers.BigNumber;
+  amount: CurrencyAmount<Token>;
 };
 
 /**
@@ -59,8 +50,8 @@ export type Amount = {
  * @property {number} slippage - The slippage percentage used to calculate the quote
  */
 export type Quote = {
-  amount: Amount;
-  amountWithMaxSlippage: Amount;
+  amount: CurrencyAmount<Token>;
+  amountWithMaxSlippage: CurrencyAmount<Token>;
   slippage: number;
   fees: Fee[];
 };
@@ -72,7 +63,7 @@ export type Quote = {
  */
 export type TransactionDetails = {
   transaction: ethers.providers.TransactionRequest;
-  gasFeeEstimate: Amount | null;
+  gasFeeEstimate: CurrencyAmount<Token> | null;
 };
 
 /**

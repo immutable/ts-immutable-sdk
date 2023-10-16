@@ -1,30 +1,30 @@
 import { BASIS_POINT_PRECISION } from 'constants/router';
 import { BigNumber } from 'ethers';
 import {
-  Amount,
-  Fee, SecondaryFee, TokenInfo, addAmount, newAmount, subtractAmount,
+  Fee, SecondaryFee, TokenInfo,
 } from 'lib';
+import { CurrencyAmount, Token } from 'types/amount';
 
 export class Fees {
   private secondaryFees: SecondaryFee[];
 
-  private amount: Amount;
+  private amount: CurrencyAmount<Token>;
 
   constructor(secondaryFees: SecondaryFee[], token: TokenInfo) {
     this.secondaryFees = secondaryFees;
-    this.amount = newAmount(BigNumber.from(0), token);
+    this.amount = new CurrencyAmount(token, BigNumber.from(0));
   }
 
-  addAmount(amount: Amount): void {
-    this.amount = addAmount(this.amount, amount);
+  addAmount(amount: CurrencyAmount<Token>): void {
+    this.amount = this.amount.add(amount);
   }
 
-  amountWithFeesApplied(): Amount {
-    return addAmount(this.amount, this.total());
+  amountWithFeesApplied(): CurrencyAmount<Token> {
+    return this.amount.add(this.total());
   }
 
-  amountLessFees(): Amount {
-    return subtractAmount(this.amount, this.total());
+  amountLessFees(): CurrencyAmount<Token> {
+    return this.amount.sub(this.total());
   }
 
   withAmounts(): Fee[] {
@@ -35,19 +35,19 @@ export class Fees {
 
       return {
         ...fee,
-        amount: newAmount(feeAmount, this.amount.token),
+        amount: new CurrencyAmount(this.amount.currency, feeAmount),
       };
     });
   }
 
-  private total(): Amount {
-    let totalFees = newAmount(BigNumber.from(0), this.amount.token);
+  private total(): CurrencyAmount<Token> {
+    let totalFees = new CurrencyAmount(this.amount.currency, BigNumber.from(0));
 
     for (const fee of this.secondaryFees) {
       const feeAmount = this.amount.value
         .mul(fee.basisPoints)
         .div(BASIS_POINT_PRECISION);
-      totalFees = addAmount(totalFees, newAmount(feeAmount, this.amount.token));
+      totalFees = totalFees.add(new CurrencyAmount(this.amount.currency, feeAmount));
     }
 
     return totalFees;

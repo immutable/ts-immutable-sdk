@@ -2,12 +2,13 @@ import { TradeType } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
 import { Fees } from 'lib/fees';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
+import { CurrencyAmount, Token } from 'types/amount';
 import {
-  Amount, Quote, TokenInfo,
+  Quote, TokenInfo,
 } from '../../types';
 import { slippageToFraction } from './slippage';
 
-function getQuoteAmountFromTradeType(tradeInfo: QuoteResult): Amount {
+function getQuoteAmountFromTradeType(tradeInfo: QuoteResult): CurrencyAmount<Token> {
   if (tradeInfo.tradeType === TradeType.EXACT_INPUT) {
     return tradeInfo.amountOut;
   }
@@ -38,20 +39,17 @@ export function prepareUserQuote(
 
   return {
     amount: quote,
-    amountWithMaxSlippage: {
-      token: otherToken,
-      value: amountWithSlippage,
-    },
+    amountWithMaxSlippage: new CurrencyAmount(otherToken, amountWithSlippage),
     slippage,
     fees: fees.withAmounts(),
   };
 }
 
 export function getOurQuoteReqAmount(
-  amount: Amount,
+  amount: CurrencyAmount<Token>,
   fees: Fees,
   tradeType: TradeType,
-): Amount {
+): CurrencyAmount<Token> {
   if (tradeType === TradeType.EXACT_OUTPUT) {
     // For an exact output swap, we do not need to subtract fees from the given amount
     return amount;

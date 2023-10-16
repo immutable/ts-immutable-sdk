@@ -12,6 +12,7 @@ import { getApproval, prepareApproval } from 'lib/transactionUtils/approval';
 import { getOurQuoteReqAmount, prepareUserQuote } from 'lib/transactionUtils/getQuote';
 import { Fees } from 'lib/fees';
 import { SecondaryFee__factory } from 'contracts/types';
+import { CurrencyAmount, Token } from 'types/amount';
 import {
   DEFAULT_DEADLINE,
   DEFAULT_MAX_HOPS,
@@ -21,7 +22,7 @@ import {
 } from './constants';
 import { Router } from './lib/router';
 import {
-  getERC20Decimals, isValidNonZeroAddress, newAmount,
+  getERC20Decimals, isValidNonZeroAddress,
 } from './lib/utils';
 import {
   ExchangeModuleConfiguration, SecondaryFee, TokenInfo, TransactionResponse,
@@ -118,22 +119,14 @@ export class Exchange {
       this.getSecondaryFees(),
     ]);
 
-    const tokenIn: TokenInfo = {
-      address: tokenInAddress,
-      chainId: this.chainId,
-      decimals: tokenInDecimals,
-    };
-    const tokenOut: TokenInfo = {
-      address: tokenOutAddress,
-      chainId: this.chainId,
-      decimals: tokenOutDecimals,
-    };
+    const tokenIn = new Token(this.chainId, tokenInAddress, tokenInDecimals);
+    const tokenOut = new Token(this.chainId, tokenOutAddress, tokenOutDecimals);
 
     // determine which amount was specified for the swap from the TradeType
     const [tokenSpecified, otherToken] = tradeType === TradeType.EXACT_INPUT
       ? [tokenIn, tokenOut] : [tokenOut, tokenIn];
 
-    const amountSpecified = newAmount(amount, tokenSpecified);
+    const amountSpecified = new CurrencyAmount(tokenSpecified, amount);
 
     const fees = new Fees(secondaryFees, tokenIn);
 

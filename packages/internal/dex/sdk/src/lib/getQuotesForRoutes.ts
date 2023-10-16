@@ -1,29 +1,30 @@
+/* eslint-disable max-len */
 import { Route, SwapQuoter } from '@uniswap/v3-sdk';
-import { TradeType, Token } from '@uniswap/sdk-core';
+import * as Uniswap from '@uniswap/sdk-core';
 import { BigNumber, ethers } from 'ethers';
 import { ProviderCallError } from 'errors';
-import { Amount } from 'lib';
+import { CurrencyAmount, Token } from 'types/amount';
 import { multicallMultipleCallDataSingContract, MulticallResponse } from './multicall';
-import { newAmount, quoteReturnMapping, toCurrencyAmount } from './utils';
+import { quoteReturnMapping, toCurrencyAmount } from './utils';
 import { Multicall } from '../contracts/types';
 
 const amountIndex = 0;
 const gasEstimateIndex = 3;
 
 export type QuoteResult = {
-  route: Route<Token, Token>;
+  route: Route<Uniswap.Token, Uniswap.Token>;
   gasEstimate: ethers.BigNumber
-  amountIn: Amount;
-  amountOut: Amount;
-  tradeType: TradeType;
+  amountIn: CurrencyAmount<Token>;
+  amountOut: CurrencyAmount<Token>;
+  tradeType: Uniswap.TradeType;
 };
 
 export async function getQuotesForRoutes(
   multicallContract: Multicall,
   quoterContractAddress: string,
-  routes: Route<Token, Token>[],
-  amountSpecified: Amount,
-  tradeType: TradeType,
+  routes: Route<Uniswap.Token, Uniswap.Token>[],
+  amountSpecified: CurrencyAmount<Token>,
+  tradeType: Uniswap.TradeType,
 ): Promise<QuoteResult[]> {
   const callData = routes.map(
     (route) => SwapQuoter.quoteCallParameters(route, toCurrencyAmount(amountSpecified), tradeType, {
@@ -73,8 +74,8 @@ export async function getQuotesForRoutes(
 
         decodedQuoteResults.push({
           route: routes[i],
-          amountIn: tradeType === TradeType.EXACT_INPUT ? amountSpecified : newAmount(quoteAmount, routes[i].input),
-          amountOut: tradeType === TradeType.EXACT_INPUT ? newAmount(quoteAmount, routes[i].output) : amountSpecified,
+          amountIn: tradeType === Uniswap.TradeType.EXACT_INPUT ? amountSpecified : new CurrencyAmount(routes[i].input, quoteAmount),
+          amountOut: tradeType === Uniswap.TradeType.EXACT_INPUT ? new CurrencyAmount(routes[i].output, quoteAmount) : amountSpecified,
           gasEstimate: ethers.BigNumber.from(decodedQuoteResult[gasEstimateIndex]),
           tradeType,
         });

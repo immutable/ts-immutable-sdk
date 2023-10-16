@@ -2,18 +2,19 @@ import {
   Trade, toHex, encodeRouteToPath, Route,
 } from '@uniswap/v3-sdk';
 import { SwapRouter } from '@uniswap/router-sdk';
-import { Token, Percent, TradeType } from '@uniswap/sdk-core';
+import * as Uniswap from '@uniswap/sdk-core';
 import { SecondaryFee__factory } from 'contracts/types';
 import { ISecondaryFee, SecondaryFeeInterface } from 'contracts/types/SecondaryFee';
 import { Fees } from 'lib/fees';
 import { toCurrencyAmount } from 'lib/utils';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
+import { CurrencyAmount, Token } from 'types/amount';
 import { Amount, SecondaryFee, TransactionDetails } from '../../types';
 import { calculateGasFee } from './gas';
 import { slippageToFraction } from './slippage';
 
 type SwapOptions = {
-  slippageTolerance: Percent;
+  slippageTolerance: Uniswap.Percent;
   deadlineOrPreviousBlockhash: number;
   recipient: string;
 };
@@ -23,8 +24,8 @@ const multicallWithDeadlineFunctionSignature = 'multicall(uint256,bytes[])';
 
 function buildSwapParametersForSinglePoolSwap(
   fromAddress: string,
-  trade: Trade<Token, Token, TradeType>,
-  route: Route<Token, Token>,
+  trade: Trade<Uniswap.Token, Uniswap.Token, Uniswap.TradeType>,
+  route: Route<Uniswap.Token, Uniswap.Token>,
   amountIn: string,
   amountOut: string,
   secondaryFees: SecondaryFee[],
@@ -35,7 +36,7 @@ function buildSwapParametersForSinglePoolSwap(
     recipient: fee.recipient,
   }));
 
-  if (trade.tradeType === TradeType.EXACT_INPUT) {
+  if (trade.tradeType === Uniswap.TradeType.EXACT_INPUT) {
     return secondaryFeeContract.encodeFunctionData('exactInputSingleWithSecondaryFee', [secondaryFeeValues, {
       tokenIn: route.tokenPath[0].address,
       tokenOut: route.tokenPath[1].address,
@@ -60,21 +61,21 @@ function buildSwapParametersForSinglePoolSwap(
 
 function buildSwapParametersForMultiPoolSwap(
   fromAddress: string,
-  trade: Trade<Token, Token, TradeType>,
-  route: Route<Token, Token>,
+  trade: Trade<Uniswap.Token, Uniswap.Token, Uniswap.TradeType>,
+  route: Route<Uniswap.Token, Uniswap.Token>,
   amountIn: string,
   amountOut: string,
   secondaryFees: SecondaryFee[],
   secondaryFeeContract: SecondaryFeeInterface,
 ) {
-  const path: string = encodeRouteToPath(route, trade.tradeType === TradeType.EXACT_OUTPUT);
+  const path: string = encodeRouteToPath(route, trade.tradeType === Uniswap.TradeType.EXACT_OUTPUT);
 
   const secondaryFeeValues: ISecondaryFee.SecondaryFeeParamsStruct[] = secondaryFees.map((fee) => ({
     feeBasisPoints: fee.basisPoints,
     recipient: fee.recipient,
   }));
 
-  if (trade.tradeType === TradeType.EXACT_INPUT) {
+  if (trade.tradeType === Uniswap.TradeType.EXACT_INPUT) {
     return secondaryFeeContract.encodeFunctionData('exactInputWithSecondaryFee', [secondaryFeeValues, {
       path,
       recipient: fromAddress,
@@ -101,7 +102,7 @@ function buildSwapParametersForMultiPoolSwap(
  */
 function buildSwapParameters(
   fromAddress: string,
-  trade: Trade<Token, Token, TradeType>,
+  trade: Trade<Uniswap.Token, Uniswap.Token, Uniswap.TradeType>,
   options: SwapOptions,
   secondaryFees: SecondaryFee[],
   secondaryFeeContract: SecondaryFeeInterface,
@@ -138,7 +139,7 @@ function buildSwapParameters(
 }
 
 function createSwapCallParametersWithFees(
-  trade: Trade<Token, Token, TradeType>,
+  trade: Trade<Uniswap.Token, Uniswap.Token, Uniswap.TradeType>,
   fromAddress: string,
   swapOptions: SwapOptions,
   secondaryFees: SecondaryFee[],
@@ -224,10 +225,10 @@ export function getSwap(
 
 export function prepareSwap(
   ourQuote: QuoteResult,
-  amountSpecified: Amount,
+  amountSpecified: CurrencyAmount<Token>,
   fees: Fees,
 ): QuoteResult {
-  if (ourQuote.tradeType === TradeType.EXACT_OUTPUT) {
+  if (ourQuote.tradeType === Uniswap.TradeType.EXACT_OUTPUT) {
     fees.addAmount(ourQuote.amountIn);
 
     return {
