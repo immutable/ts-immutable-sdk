@@ -18,4 +18,20 @@ describe('utils', () => {
       expect(isValidNonZeroAddress(TEST_FROM_ADDRESS)).toBe(true);
     });
   });
+
+  describe('getDecimals', () => {
+    describe('when token is native', () => {
+      it('should return default native token decimals', () => {
+        // ...
+        expect(false).toBe(true);
+      });
+    });
+
+    describe('when token is ERC20', () => {
+      it('should call ERC20 contract for provided token address', () => {
+        // ...
+        expect(false).toBe(true);
+      });
+    });
+  });
 });

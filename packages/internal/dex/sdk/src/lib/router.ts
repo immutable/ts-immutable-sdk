@@ -2,7 +2,7 @@ import { ethers } from 'ethers';
 import { Token, TradeType } from '@uniswap/sdk-core';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import { NoRoutesAvailableError } from 'errors';
-import { Amount, TokenInfo } from 'types';
+import { ERC20, ERC20Amount } from 'types';
 import { poolEquals, tokenInfoToUniswapToken } from './utils';
 import { getQuotesForRoutes, QuoteResult } from './getQuotesForRoutes';
 import { fetchValidPools } from './poolUtils/fetchValidPools';
@@ -13,20 +13,19 @@ export type RoutingContracts = {
   multicallAddress: string;
   factoryAddress: string;
   quoterAddress: string;
-  peripheryRouterAddress: string;
-  secondaryFeeAddress: string;
 };
 
+// TODO: DumbQuoter... should implement IQuoter
 export class Router {
   public provider: ethers.providers.JsonRpcProvider;
 
-  public routingTokens: TokenInfo[];
+  public routingTokens: ERC20[];
 
   public routingContracts: RoutingContracts;
 
   constructor(
     provider: ethers.providers.JsonRpcProvider,
-    routingTokens: TokenInfo[],
+    routingTokens: ERC20[],
     routingContracts: RoutingContracts,
   ) {
     this.provider = provider;
@@ -35,8 +34,8 @@ export class Router {
   }
 
   public async findOptimalRoute(
-    amountSpecified: Amount,
-    otherToken: TokenInfo,
+    amountSpecified: ERC20Amount,
+    otherToken: ERC20,
     tradeType: TradeType,
     maxHops: number = 2,
   ): Promise<QuoteResult> {
@@ -95,7 +94,7 @@ export class Router {
   private async getBestQuoteFromRoutes(
     multicallContract: Multicall,
     routes: Route<Token, Token>[],
-    amountSpecified: Amount,
+    amountSpecified: ERC20Amount,
     tradeType: TradeType,
   ): Promise<QuoteResult> {
     const quotes = await getQuotesForRoutes(
@@ -151,9 +150,9 @@ export class Router {
   // eslint-disable-next-line class-methods-use-this
   private determineERC20InAndERC20Out(
     tradeType: TradeType,
-    amountSpecified: Amount,
-    otherToken: TokenInfo,
-  ): [TokenInfo, TokenInfo] {
+    amountSpecified: ERC20Amount,
+    otherToken: ERC20,
+  ): [ERC20, ERC20] {
     // If the trade type is EXACT INPUT then we have specified the amount for the tokenIn
     return tradeType === TradeType.EXACT_INPUT
       ? [amountSpecified.token, otherToken]
@@ -162,13 +161,13 @@ export class Router {
 }
 
 export const generateAllAcyclicPaths = (
-  tokenIn: TokenInfo, // the currency we start with
-  tokenOut: TokenInfo, // the currency we want to end up with
+  tokenIn: ERC20, // the currency we start with
+  tokenOut: ERC20, // the currency we want to end up with
   pools: Pool[], // list of all available pools
   maxHops: number, // the maximum number of pools that can be traversed
   currentRoute: Pool[] = [], // list of pools already traversed
   routes: Route<Token, Token>[] = [], // list of all routes found so far
-  startTokenIn: TokenInfo = tokenIn, // the currency we started with
+  startTokenIn: ERC20 = tokenIn, // the currency we started with
 ): Route<Token, Token>[] => {
   const currencyIn = tokenInfoToUniswapToken(tokenIn);
   const currencyOut = tokenInfoToUniswapToken(tokenOut);

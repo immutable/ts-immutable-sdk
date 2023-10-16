@@ -21,10 +21,11 @@ import {
 } from './constants';
 import { Router } from './lib/router';
 import {
-  getERC20Decimals, isValidNonZeroAddress, newAmount,
+  getTokenDecimals, isValidNonZeroAddress, newAmount,
 } from './lib/utils';
 import {
-  ExchangeModuleConfiguration, SecondaryFee, TokenInfo, TransactionResponse,
+  ERC20,
+  ExchangeModuleConfiguration, Native, SecondaryFee, TokenLiteral, TransactionResponse,
 } from './types';
 import { getSwap, prepareSwap } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
@@ -36,9 +37,13 @@ export class Exchange {
 
   private chainId: number;
 
-  private nativeToken: TokenInfo;
+  private nativeToken: Native;
 
   private secondaryFees: SecondaryFee[];
+
+  private secondaryFeeContract: string;
+
+  private routerContract: string;
 
   constructor(configuration: ExchangeModuleConfiguration) {
     const config = new ExchangeConfiguration(configuration);
@@ -46,6 +51,8 @@ export class Exchange {
     this.chainId = config.chain.chainId;
     this.nativeToken = config.chain.nativeToken;
     this.secondaryFees = config.secondaryFees;
+    this.routerContract = config.chain.contracts.peripheryRouter;
+    this.secondaryFeeContract = config.chain.contracts.secondaryFee;
 
     this.provider = new ethers.providers.JsonRpcProvider(
       config.chain.rpcUrl,
@@ -58,22 +65,33 @@ export class Exchange {
         multicallAddress: config.chain.contracts.multicall,
         factoryAddress: config.chain.contracts.coreFactory,
         quoterAddress: config.chain.contracts.quoterV2,
-        peripheryRouterAddress: config.chain.contracts.peripheryRouter,
-        secondaryFeeAddress: config.chain.contracts.secondaryFee,
       },
     );
   }
 
+  private toToken(tokenLiteral: TokenLiteral, tokenDecimals: number): ERC20 | Native {
+    return tokenLiteral === 'native' ? this.nativeToken : {
+      address: tokenLiteral,
+      chainId: this.chainId,
+      decimals: tokenDecimals,
+    };
+  }
+
   private static validate(
-    tokenInAddress: string,
-    tokenOutAddress: string,
+    tokenInAddress: TokenLiteral,
+    tokenOutAddress: TokenLiteral,
     maxHops: number,
     slippagePercent: number,
     fromAddress: string,
   ) {
+    if (tokenInAddress !== 'native') {
+      assert(isValidNonZeroAddress(tokenInAddress), new InvalidAddressError('invalid token in address'));
+    }
+    if (tokenOutAddress !== 'native') {
+      assert(isValidNonZeroAddress(tokenOutAddress), new InvalidAddressError('invalid token out address'));
+    }
+
     assert(isValidNonZeroAddress(fromAddress), new InvalidAddressError('invalid from address'));
-    assert(isValidNonZeroAddress(tokenInAddress), new InvalidAddressError('invalid token in address'));
-    assert(isValidNonZeroAddress(tokenOutAddress), new InvalidAddressError('invalid token out address'));
     assert(tokenInAddress.toLocaleLowerCase() !== tokenOutAddress.toLocaleLowerCase(), new DuplicateAddressesError());
     assert(maxHops <= MAX_MAX_HOPS, new InvalidMaxHopsError('max hops must be less than or equal to 10'));
     assert(maxHops >= MIN_MAX_HOPS, new InvalidMaxHopsError('max hops must be greater than or equal to 1'));
@@ -87,7 +105,7 @@ export class Exchange {
     }
 
     const secondaryFeeContract = SecondaryFee__factory.connect(
-      this.router.routingContracts.secondaryFeeAddress,
+      this.secondaryFeeContract,
       this.provider,
     );
 
@@ -101,33 +119,26 @@ export class Exchange {
 
   private async getUnsignedSwapTx(
     fromAddress: string,
-    tokenInAddress: string,
-    tokenOutAddress: string,
+    tokenInAddress: TokenLiteral,
+    tokenOutAddress: TokenLiteral,
     amount: ethers.BigNumber,
     slippagePercent: number,
     maxHops: number,
     deadline: number,
     tradeType: TradeType,
-  ): Promise<TransactionResponse> {
+  ): Promise<TransactionResponse<any, any>> { // TODO: Fix any shenanigans
     Exchange.validate(tokenInAddress, tokenOutAddress, maxHops, slippagePercent, fromAddress);
 
     // get the decimals of the tokens that will be swapped
     const [tokenInDecimals, tokenOutDecimals, secondaryFees] = await Promise.all([
-      getERC20Decimals(tokenInAddress, this.provider),
-      getERC20Decimals(tokenOutAddress, this.provider),
+      getTokenDecimals(tokenInAddress, this.nativeToken, this.provider),
+      getTokenDecimals(tokenOutAddress, this.nativeToken, this.provider),
       this.getSecondaryFees(),
     ]);
 
-    const tokenIn: TokenInfo = {
-      address: tokenInAddress,
-      chainId: this.chainId,
-      decimals: tokenInDecimals,
-    };
-    const tokenOut: TokenInfo = {
-      address: tokenOutAddress,
-      chainId: this.chainId,
-      decimals: tokenOutDecimals,
-    };
+    // Determine if tokenIn or tokenOut are native and construct either Native or ERC20 type
+    const tokenIn = this.toToken(tokenInAddress, tokenInDecimals);
+    const tokenOut = this.toToken(tokenOutAddress, tokenOutDecimals);
 
     // determine which amount was specified for the swap from the TradeType
     const [tokenSpecified, otherToken] = tradeType === TradeType.EXACT_INPUT
@@ -157,8 +168,8 @@ export class Exchange {
       fromAddress,
       slippagePercent,
       deadline,
-      this.router.routingContracts.peripheryRouterAddress,
-      this.router.routingContracts.secondaryFeeAddress,
+      this.routerContract,
+      this.secondaryFeeContract,
       gasPrice,
       secondaryFees,
     );
@@ -203,8 +214,8 @@ export class Exchange {
    */
   public async getUnsignedSwapTxFromAmountIn(
     fromAddress: string,
-    tokenInAddress: string,
-    tokenOutAddress: string,
+    tokenInAddress: TokenLiteral,
+    tokenOutAddress: TokenLiteral,
     amountIn: ethers.BigNumberish,
     slippagePercent: number = DEFAULT_SLIPPAGE,
     maxHops: number = DEFAULT_MAX_HOPS,
@@ -237,8 +248,8 @@ export class Exchange {
    */
   public async getUnsignedSwapTxFromAmountOut(
     fromAddress: string,
-    tokenInAddress: string,
-    tokenOutAddress: string,
+    tokenInAddress: TokenLiteral,
+    tokenOutAddress: TokenLiteral,
     amountOut: ethers.BigNumberish,
     slippagePercent: number = DEFAULT_SLIPPAGE,
     maxHops: number = DEFAULT_MAX_HOPS,
