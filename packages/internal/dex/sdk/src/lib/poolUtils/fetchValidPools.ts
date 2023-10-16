@@ -1,8 +1,8 @@
 import { Pool } from '@uniswap/v3-sdk';
 import { BigNumber } from 'ethers';
 import { ProviderCallError } from 'errors';
-import { TokenInfo } from 'types';
 import { tokenInfoToUniswapToken } from 'lib';
+import { Token } from 'types/amount';
 import { MulticallResponse, multicallSingleCallDataMultipleContracts } from '../multicall';
 import { generatePossiblePoolsFromERC20Pair } from './generatePossiblePoolsFromERC20Pairs';
 import { ERC20Pair } from './generateERC20Pairs';
@@ -28,7 +28,7 @@ const noDataResult = '0x';
 export const fetchValidPools = async (
   multicallContract: Multicall,
   erc20Pair: ERC20Pair,
-  commonRoutingERC20s: TokenInfo[],
+  commonRoutingERC20s: Token[],
   factoryAddress: string,
 ): Promise<Pool[]> => {
   const poolIDs = generatePossiblePoolsFromERC20Pair(

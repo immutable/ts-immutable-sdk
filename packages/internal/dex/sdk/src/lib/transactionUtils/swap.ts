@@ -8,8 +8,8 @@ import { ISecondaryFee, SecondaryFeeInterface } from 'contracts/types/SecondaryF
 import { Fees } from 'lib/fees';
 import { toCurrencyAmount } from 'lib/utils';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
-import { CurrencyAmount, Token } from 'types/amount';
-import { Amount, SecondaryFee, TransactionDetails } from '../../types';
+import { CurrencyAmount, NativeCurrency, Token } from 'types/amount';
+import { SecondaryFee, TransactionDetails } from '../../types';
 import { calculateGasFee } from './gas';
 import { slippageToFraction } from './slippage';
 
@@ -198,7 +198,7 @@ export function getSwap(
   deadline: number,
   peripheryRouterAddress: string,
   secondaryFeesAddress: string,
-  gasPrice: Amount | null,
+  gasPrice: CurrencyAmount<NativeCurrency> | null,
   secondaryFees: SecondaryFee[],
 ): TransactionDetails {
   const calldata = createSwapParameters(

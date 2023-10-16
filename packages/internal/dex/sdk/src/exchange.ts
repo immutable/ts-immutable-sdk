@@ -12,7 +12,7 @@ import { getApproval, prepareApproval } from 'lib/transactionUtils/approval';
 import { getOurQuoteReqAmount, prepareUserQuote } from 'lib/transactionUtils/getQuote';
 import { Fees } from 'lib/fees';
 import { SecondaryFee__factory } from 'contracts/types';
-import { CurrencyAmount, Token } from 'types/amount';
+import { CurrencyAmount, NativeCurrency, Token } from 'types/amount';
 import {
   DEFAULT_DEADLINE,
   DEFAULT_MAX_HOPS,
@@ -25,7 +25,7 @@ import {
   getERC20Decimals, isValidNonZeroAddress,
 } from './lib/utils';
 import {
-  ExchangeModuleConfiguration, SecondaryFee, TokenInfo, TransactionResponse,
+  ExchangeModuleConfiguration, SecondaryFee, TransactionResponse,
 } from './types';
 import { getSwap, prepareSwap } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
@@ -37,7 +37,7 @@ export class Exchange {
 
   private chainId: number;
 
-  private nativeToken: TokenInfo;
+  private nativeToken: NativeCurrency;
 
   private secondaryFees: SecondaryFee[];
 

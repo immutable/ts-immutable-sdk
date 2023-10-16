@@ -2,8 +2,7 @@ import { ethers } from 'ethers';
 import * as Uniswap from '@uniswap/sdk-core';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import { NoRoutesAvailableError } from 'errors';
-import { TokenInfo } from 'types';
-import { Currency, CurrencyAmount, Token } from 'types/amount';
+import { CurrencyAmount, Token } from 'types/amount';
 import { poolEquals, tokenInfoToUniswapToken } from './utils';
 import { getQuotesForRoutes, QuoteResult } from './getQuotesForRoutes';
 import { fetchValidPools } from './poolUtils/fetchValidPools';
@@ -21,13 +20,13 @@ export type RoutingContracts = {
 export class Router {
   public provider: ethers.providers.JsonRpcProvider;
 
-  public routingTokens: TokenInfo[];
+  public routingTokens: Token[];
 
   public routingContracts: RoutingContracts;
 
   constructor(
     provider: ethers.providers.JsonRpcProvider,
-    routingTokens: TokenInfo[],
+    routingTokens: Token[],
     routingContracts: RoutingContracts,
   ) {
     this.provider = provider;
@@ -36,8 +35,8 @@ export class Router {
   }
 
   public async findOptimalRoute(
-    amountSpecified: CurrencyAmount<Currency>,
-    otherToken: TokenInfo,
+    amountSpecified: CurrencyAmount<Token>,
+    otherToken: Token,
     tradeType: Uniswap.TradeType,
     maxHops: number = 2,
   ): Promise<QuoteResult> {
@@ -96,7 +95,7 @@ export class Router {
   private async getBestQuoteFromRoutes(
     multicallContract: Multicall,
     routes: Route<Uniswap.Token, Uniswap.Token>[],
-    amountSpecified: CurrencyAmount<Currency>,
+    amountSpecified: CurrencyAmount<Token>,
     tradeType: Uniswap.TradeType,
   ): Promise<QuoteResult> {
     const quotes = await getQuotesForRoutes(
@@ -163,13 +162,13 @@ export class Router {
 }
 
 export const generateAllAcyclicPaths = (
-  tokenIn: TokenInfo, // the currency we start with
-  tokenOut: TokenInfo, // the currency we want to end up with
+  tokenIn: Token, // the currency we start with
+  tokenOut: Token, // the currency we want to end up with
   pools: Pool[], // list of all available pools
   maxHops: number, // the maximum number of pools that can be traversed
   currentRoute: Pool[] = [], // list of pools already traversed
   routes: Route<Uniswap.Token, Uniswap.Token>[] = [], // list of all routes found so far
-  startTokenIn: TokenInfo = tokenIn, // the currency we started with
+  startTokenIn: Token = tokenIn, // the currency we started with
 ): Route<Uniswap.Token, Uniswap.Token>[] => {
   const currencyIn = tokenInfoToUniswapToken(tokenIn);
   const currencyOut = tokenInfoToUniswapToken(tokenOut);

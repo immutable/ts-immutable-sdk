@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { ModuleConfiguration } from '@imtbl/config';
 import { ExchangeContracts } from 'config';
-import { CurrencyAmount, Token } from './amount';
+import { CurrencyAmount, NativeCurrency, Token } from './amount';
 
 /**
  * Interface representing a Chain
@@ -15,8 +15,8 @@ export type Chain = {
   chainId: number;
   rpcUrl: string;
   contracts: ExchangeContracts;
-  commonRoutingTokens: TokenInfo[];
-  nativeToken: TokenInfo;
+  commonRoutingTokens: Token[];
+  nativeToken: NativeCurrency;
 };
 
 /**
@@ -63,7 +63,7 @@ export type Quote = {
  */
 export type TransactionDetails = {
   transaction: ethers.providers.TransactionRequest;
-  gasFeeEstimate: CurrencyAmount<Token> | null;
+  gasFeeEstimate: CurrencyAmount<NativeCurrency> | null;
 };
 
 /**
@@ -78,27 +78,11 @@ export type TransactionResponse = {
   quote: Quote;
 };
 
-/**
- * Interface representing a token
- * @property {number} chainId - The chain ID
- * @property {string} address - The token address
- * @property {number} decimals - The token decimals
- * @property {string | undefined} symbol - The token symbol or undefined if it is not available
- * @property {string | undefined} name - The token name or undefined if it is not available
- */
-export type TokenInfo = {
-  chainId: number;
-  address: string;
-  decimals: number;
-  symbol?: string;
-  name?: string;
-};
-
 export interface ExchangeOverrides {
   rpcURL: string;
   exchangeContracts: ExchangeContracts;
-  commonRoutingTokens: TokenInfo[];
-  nativeToken: TokenInfo;
+  commonRoutingTokens: Token[];
+  nativeToken: NativeCurrency;
 }
 
 export interface ExchangeModuleConfiguration

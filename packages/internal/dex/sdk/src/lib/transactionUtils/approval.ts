@@ -5,7 +5,7 @@ import { ApproveError, AlreadyApprovedError } from 'errors';
 import { ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
 import { RoutingContracts } from 'lib/router';
-import { CurrencyAmount, Token } from 'types/amount';
+import { CurrencyAmount, NativeCurrency, Token } from 'types/amount';
 import { SecondaryFee, TransactionDetails } from '../../types';
 import { calculateGasFee } from './gas';
 
@@ -152,7 +152,7 @@ export const getApproval = async (
   provider: JsonRpcProvider,
   ownerAddress: string,
   preparedApproval: PreparedApproval,
-  gasPrice: CurrencyAmount<Token> | null,
+  gasPrice: CurrencyAmount<NativeCurrency> | null,
 ): Promise<TransactionDetails | null> => {
   const approveTransaction = await getApproveTransaction(
     provider,

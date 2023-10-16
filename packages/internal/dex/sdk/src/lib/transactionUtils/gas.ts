@@ -1,6 +1,7 @@
+/* eslint-disable max-len */
 import { BigNumber } from 'ethers';
 import { JsonRpcProvider, FeeData } from '@ethersproject/providers';
-import { Amount, newAmount, TokenInfo } from 'lib';
+import { CurrencyAmount, NativeCurrency } from 'types/amount';
 
 type EIP1559FeeData = {
   maxFeePerGas: BigNumber;
@@ -26,15 +27,15 @@ export const doesChainSupportEIP1559 = (fee: FeeData): fee is EIP1559FeeData => 
  * @returns {Amount | null} - The gas price in the smallest denomination of the chain's currency,
  * or null if no gas price is available
  */
-export const fetchGasPrice = async (provider: JsonRpcProvider, nativeToken: TokenInfo): Promise<Amount | null> => {
+export const fetchGasPrice = async (provider: JsonRpcProvider, nativeToken: NativeCurrency): Promise<CurrencyAmount<NativeCurrency> | null> => {
   const feeData = await provider.getFeeData().catch(() => null);
   if (!feeData) return null;
 
   if (doesChainSupportEIP1559(feeData)) {
-    return newAmount(feeData.maxFeePerGas.add(feeData.maxPriorityFeePerGas), nativeToken);
+    return new CurrencyAmount(nativeToken, feeData.maxFeePerGas.add(feeData.maxPriorityFeePerGas));
   }
 
-  return feeData.gasPrice ? newAmount(feeData.gasPrice, nativeToken) : null;
+  return feeData.gasPrice ? new CurrencyAmount(nativeToken, feeData.gasPrice) : null;
 };
 
 /**
@@ -44,6 +45,6 @@ export const fetchGasPrice = async (provider: JsonRpcProvider, nativeToken: Toke
  * @param {BigNumber} gasUsed - The total gas units that will be used for the transaction
  * @returns - The cost of the transaction in the gas token's smallest denomination (e.g. WEI)
  */
-export const calculateGasFee = (gasPrice: Amount, gasEstimate: BigNumber): Amount =>
+export const calculateGasFee = (gasPrice: CurrencyAmount<NativeCurrency>, gasEstimate: BigNumber): CurrencyAmount<NativeCurrency> =>
   // eslint-disable-next-line implicit-arrow-linebreak
-  newAmount(gasEstimate.mul(gasPrice.value), gasPrice.token);
+  new CurrencyAmount(gasPrice.currency, gasEstimate.mul(gasPrice.value));
