@@ -201,7 +201,7 @@ export function Example() {
                   </h3>
                   <a  
                   className='underline text-blue-600 hover:text-blue-800 visited:text-purple-600'
-                  href={`https://immutable-testnet.blockscout.com/tx/${swapTransaction.transactionHash}`} target='_blank'>Transaction</a>
+                  href={`https://explorer.testnet.immutable.com/tx/${swapTransaction.transactionHash}`} target='_blank'>Transaction</a>
                 </>
               )}
             </>
