@@ -154,8 +154,12 @@ export class ImmutableSwap extends ImmutableWebComponent {
                     <ServiceUnavailableErrorView
                       service={ServiceType.SWAP}
                       onCloseClick={() => sendSwapWidgetCloseEvent(window)}
-                      primaryActionText={topUpOptions && topUpOptions[0].text}
-                      onPrimaryButtonClick={topUpOptions && topUpOptions[0].action}
+                      primaryActionText={topUpOptions && topUpOptions?.length > 0 ? topUpOptions[0].text : undefined}
+                      onPrimaryButtonClick={
+                      topUpOptions && topUpOptions?.length > 0
+                        ? topUpOptions[0].action
+                        : undefined
+}
                       secondaryActionText={topUpOptions?.length === 2 ? topUpOptions[1].text : undefined}
                       onSecondaryButtonClick={topUpOptions?.length === 2 ? topUpOptions[1].action : undefined}
                     />
