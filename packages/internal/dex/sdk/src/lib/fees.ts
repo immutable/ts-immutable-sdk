@@ -3,27 +3,27 @@ import { BigNumber } from 'ethers';
 import {
   Fee, SecondaryFee,
 } from 'lib';
-import { CurrencyAmount, Token } from 'types/amount';
+import { Currency, CurrencyAmount } from 'types/amount';
 
 export class Fees {
   private secondaryFees: SecondaryFee[];
 
-  private amount: CurrencyAmount<Token>;
+  private amount: CurrencyAmount<Currency>;
 
-  constructor(secondaryFees: SecondaryFee[], token: Token) {
+  constructor(secondaryFees: SecondaryFee[], token: Currency) {
     this.secondaryFees = secondaryFees;
     this.amount = new CurrencyAmount(token, BigNumber.from(0));
   }
 
-  addAmount(amount: CurrencyAmount<Token>): void {
+  addAmount(amount: CurrencyAmount<Currency>): void {
     this.amount = this.amount.add(amount);
   }
 
-  amountWithFeesApplied(): CurrencyAmount<Token> {
+  amountWithFeesApplied(): CurrencyAmount<Currency> {
     return this.amount.add(this.total());
   }
 
-  amountLessFees(): CurrencyAmount<Token> {
+  amountLessFees(): CurrencyAmount<Currency> {
     return this.amount.sub(this.total());
   }
 
@@ -40,7 +40,7 @@ export class Fees {
     });
   }
 
-  private total(): CurrencyAmount<Token> {
+  private total(): CurrencyAmount<Currency> {
     let totalFees = new CurrencyAmount(this.amount.currency, BigNumber.from(0));
 
     for (const fee of this.secondaryFees) {

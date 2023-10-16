@@ -12,7 +12,7 @@ import { getApproval, prepareApproval } from 'lib/transactionUtils/approval';
 import { getOurQuoteReqAmount, prepareUserQuote } from 'lib/transactionUtils/getQuote';
 import { Fees } from 'lib/fees';
 import { SecondaryFee__factory } from 'contracts/types';
-import { CurrencyAmount, Token } from 'types/amount';
+import { CurrencyAmount, NativeCurrency, Token } from 'types/amount';
 import {
   DEFAULT_DEADLINE,
   DEFAULT_MAX_HOPS,
@@ -37,7 +37,9 @@ export class Exchange {
 
   private chainId: number;
 
-  private nativeToken: Token;
+  private nativeToken: NativeCurrency;
+
+  private wrappedNativeToken: Token;
 
   private secondaryFees: SecondaryFee[];
 
@@ -46,6 +48,7 @@ export class Exchange {
 
     this.chainId = config.chain.chainId;
     this.nativeToken = config.chain.nativeToken;
+    this.wrappedNativeToken = config.chain.wrappedNativeToken;
     this.secondaryFees = config.secondaryFees;
 
     this.provider = new ethers.providers.JsonRpcProvider(
@@ -119,8 +122,13 @@ export class Exchange {
       this.getSecondaryFees(),
     ]);
 
-    const tokenIn = new Token(this.chainId, tokenInAddress, tokenInDecimals);
-    const tokenOut = new Token(this.chainId, tokenOutAddress, tokenOutDecimals);
+    const tokenIn = tokenInAddress
+      ? new Token(this.chainId, tokenInAddress, tokenInDecimals)
+      : new NativeCurrency(this.chainId, this.nativeToken.decimals);
+
+    const tokenOut = tokenOutAddress
+      ? new Token(this.chainId, tokenOutAddress, tokenOutDecimals)
+      : new NativeCurrency(this.chainId, this.nativeToken.decimals);
 
     // determine which amount was specified for the swap from the TradeType
     const [tokenSpecified, otherToken] = tradeType === TradeType.EXACT_INPUT
@@ -130,7 +138,7 @@ export class Exchange {
 
     const fees = new Fees(secondaryFees, tokenIn);
 
-    const ourQuoteReqAmount = getOurQuoteReqAmount(amountSpecified, fees, tradeType);
+    const ourQuoteReqAmount = getOurQuoteReqAmount(amountSpecified, fees, tradeType, this.wrappedNativeToken);
 
     // get quote and gas details
     const [ourQuote, gasPrice] = await Promise.all([

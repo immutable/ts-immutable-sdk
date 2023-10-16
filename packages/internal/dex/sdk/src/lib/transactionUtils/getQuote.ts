@@ -1,8 +1,9 @@
+/* eslint-disable arrow-body-style */
 import * as Uniswap from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
 import { Fees } from 'lib/fees';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
-import { CurrencyAmount, Token } from 'types/amount';
+import { Currency, CurrencyAmount, Token } from 'types/amount';
 import {
   Quote,
 } from '../../types';
@@ -29,7 +30,7 @@ export function applySlippage(
 }
 
 export function prepareUserQuote(
-  otherToken: Token,
+  otherToken: Currency,
   tradeInfo: QuoteResult,
   slippage: number,
   fees: Fees,
@@ -46,16 +47,17 @@ export function prepareUserQuote(
 }
 
 export function getOurQuoteReqAmount(
-  amount: CurrencyAmount<Token>,
+  amount: CurrencyAmount<Currency>,
   fees: Fees,
   tradeType: Uniswap.TradeType,
+  wrappedNativeToken: Token,
 ): CurrencyAmount<Token> {
   if (tradeType === Uniswap.TradeType.EXACT_OUTPUT) {
     // For an exact output swap, we do not need to subtract fees from the given amount
-    return amount;
+    return amount.wrap(wrappedNativeToken);
   }
 
   fees.addAmount(amount);
 
-  return fees.amountLessFees();
+  return fees.amountLessFees().wrap(wrappedNativeToken);
 }

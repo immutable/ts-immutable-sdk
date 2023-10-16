@@ -8,7 +8,7 @@ import { ISecondaryFee, SecondaryFeeInterface } from 'contracts/types/SecondaryF
 import { Fees } from 'lib/fees';
 import { toCurrencyAmount } from 'lib/utils';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
-import { CurrencyAmount, Token } from 'types/amount';
+import { Currency, CurrencyAmount, NativeCurrency } from 'types/amount';
 import { SecondaryFee, TransactionDetails } from '../../types';
 import { calculateGasFee } from './gas';
 import { slippageToFraction } from './slippage';
@@ -198,7 +198,7 @@ export function getSwap(
   deadline: number,
   peripheryRouterAddress: string,
   secondaryFeesAddress: string,
-  gasPrice: CurrencyAmount<Token> | null,
+  gasPrice: CurrencyAmount<NativeCurrency> | null,
   secondaryFees: SecondaryFee[],
 ): TransactionDetails {
   const calldata = createSwapParameters(
@@ -225,7 +225,7 @@ export function getSwap(
 
 export function prepareSwap(
   ourQuote: QuoteResult,
-  amountSpecified: CurrencyAmount<Token>,
+  amountSpecified: CurrencyAmount<Currency>,
   fees: Fees,
 ): QuoteResult {
   if (ourQuote.tradeType === Uniswap.TradeType.EXACT_OUTPUT) {

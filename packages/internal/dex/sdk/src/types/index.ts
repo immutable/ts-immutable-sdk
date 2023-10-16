@@ -1,7 +1,9 @@
 import { ethers } from 'ethers';
 import { ModuleConfiguration } from '@imtbl/config';
 import { ExchangeContracts } from 'config';
-import { CurrencyAmount, Token } from './amount';
+import {
+  Currency, CurrencyAmount, NativeCurrency, Token,
+} from './amount';
 
 /**
  * Interface representing a Chain
@@ -16,7 +18,8 @@ export type Chain = {
   rpcUrl: string;
   contracts: ExchangeContracts;
   commonRoutingTokens: Token[];
-  nativeToken: Token;
+  nativeToken: NativeCurrency;
+  wrappedNativeToken: Token;
 };
 
 /**
@@ -40,7 +43,7 @@ export type SecondaryFee = {
 export type Fee = {
   recipient: string;
   basisPoints: number;
-  amount: CurrencyAmount<Token>;
+  amount: CurrencyAmount<Currency>;
 };
 
 /**
@@ -63,7 +66,7 @@ export type Quote = {
  */
 export type TransactionDetails = {
   transaction: ethers.providers.TransactionRequest;
-  gasFeeEstimate: CurrencyAmount<Token> | null;
+  gasFeeEstimate: CurrencyAmount<NativeCurrency> | null;
 };
 
 /**
