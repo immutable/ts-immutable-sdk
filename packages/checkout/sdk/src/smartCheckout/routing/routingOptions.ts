@@ -29,7 +29,7 @@ export const getAvailableRoutingOptions = async (
     geoBlockingChecks.push({ id: 'onRamp', promise: isOnRampGeoBlocked() });
   }
   if (availableRoutingOptions.swap) {
-    geoBlockingChecks.push({ id: 'swap', promise: isSwapGeoBlocked() });
+    geoBlockingChecks.push({ id: 'swap', promise: isSwapGeoBlocked(config) });
   }
 
   if (geoBlockingChecks.length > 0) {
