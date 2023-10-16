@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 import { Box, Heading } from '@biom3/react';
 
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -10,6 +10,7 @@ import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTy
 import {
   ViewContext,
   ViewActions,
+  SharedViews,
 } from '../../../context/view-context/ViewContext';
 
 import { sendSaleWidgetCloseEvent } from '../SaleWidgetEvents';
@@ -23,12 +24,14 @@ export function PaymentMethods() {
   const text = { methods: textConfig.views[SaleWidgetViews.PAYMENT_METHODS] };
   const { viewDispatch } = useContext(ViewContext);
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
-  const { paymentMethod, setPaymentMethod, sign } = useSaleContext();
+  const {
+    paymentMethod, setPaymentMethod, sign,
+  } = useSaleContext();
 
   const handleOptionClick = (type: PaymentTypes) => setPaymentMethod(type);
 
-  const handleGoToPaymentView = useCallback((type: PaymentTypes) => {
-    if (type === PaymentTypes.CRYPTO) {
+  const handleGoToPaymentView = (type: PaymentTypes, signed = false) => {
+    if (type === PaymentTypes.CRYPTO && !signed) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -39,7 +42,19 @@ export function PaymentMethods() {
       });
     }
 
-    if (type === PaymentTypes.FIAT) {
+    if (type === PaymentTypes.FIAT && !signed) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SharedViews.LOADING_VIEW,
+            data: { loadingText: text.methods.loading.ready },
+          },
+        },
+      });
+    }
+
+    if (type === PaymentTypes.FIAT && signed) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -49,11 +64,11 @@ export function PaymentMethods() {
         },
       });
     }
-  }, []);
+  };
 
   useEffect(() => {
     if (paymentMethod) {
-      sign(paymentMethod);
+      sign(paymentMethod, (response) => handleGoToPaymentView(paymentMethod, !!response));
       handleGoToPaymentView(paymentMethod);
     }
   }, [paymentMethod]);
