@@ -21,13 +21,14 @@ import {
 } from './constants';
 import { Router } from './lib/router';
 import {
-  getTokenDecimals, isValidNonZeroAddress, newAmount,
+  getTokenDecimals, isNative, isNativeAmount, isValidNonZeroAddress, maybeWrapAmount, maybeWrapToken, newAmount,
 } from './lib/utils';
 import {
   ERC20,
-  ExchangeModuleConfiguration, Native, SecondaryFee, TokenLiteral, TransactionResponse,
+  ERC20Amount,
+  ExchangeModuleConfiguration, Native, NativeAmount, SecondaryFee, TokenAmount, TokenLiteral, TransactionResponse,
 } from './types';
-import { getSwap, prepareSwap } from './lib/transactionUtils/swap';
+import { getSwap, adjustQuoteWithFees } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
 
 export class Exchange {
@@ -38,6 +39,8 @@ export class Exchange {
   private chainId: number;
 
   private nativeToken: Native;
+
+  private wrappedNativeToken: ERC20;
 
   private secondaryFees: SecondaryFee[];
 
@@ -50,6 +53,7 @@ export class Exchange {
 
     this.chainId = config.chain.chainId;
     this.nativeToken = config.chain.nativeToken;
+    this.wrappedNativeToken = config.chain.wrappedNativeToken;
     this.secondaryFees = config.secondaryFees;
     this.routerContract = config.chain.contracts.peripheryRouter;
     this.secondaryFeeContract = config.chain.contracts.secondaryFee;
@@ -146,22 +150,27 @@ export class Exchange {
 
     const amountSpecified = newAmount(amount, tokenSpecified);
 
-    const fees = new Fees(secondaryFees, tokenIn);
+    // Gotcha, fees are always ERC20 (wrapped if native)...
+    const fees = new Fees(secondaryFees, maybeWrapToken(tokenIn, this.wrappedNativeToken));
 
-    const ourQuoteReqAmount = getOurQuoteReqAmount(amountSpecified, fees, tradeType);
+    const ourQuoteReqAmount = getOurQuoteReqAmount(amountSpecified, fees, tradeType, this.wrappedNativeToken);
 
     // get quote and gas details
     const [ourQuote, gasPrice] = await Promise.all([
       this.router.findOptimalRoute(
         ourQuoteReqAmount,
-        otherToken,
+        maybeWrapToken(otherToken, this.wrappedNativeToken),
         tradeType,
         maxHops,
       ),
       fetchGasPrice(this.provider, this.nativeToken),
     ]);
 
-    const adjustedQuote = prepareSwap(ourQuote, amountSpecified, fees);
+    const adjustedQuote = adjustQuoteWithFees(
+      ourQuote,
+      maybeWrapAmount(amountSpecified, this.wrappedNativeToken),
+      fees,
+    );
 
     const swap = getSwap(
       adjustedQuote,
@@ -174,13 +183,45 @@ export class Exchange {
       secondaryFees,
     );
 
-    const userQuote = prepareUserQuote(otherToken, adjustedQuote, slippagePercent, fees);
+    const userQuote = prepareUserQuote(otherToken, adjustedQuote, slippagePercent, fees, this.nativeToken);
+
+    // preparedApproval always uses the tokenIn address because we are always selling the tokenIn
+    const approval = await this.getApproval(
+      tradeType,
+      amountSpecified, // 1000 YEET
+      userQuote.amountWithMaxSlippage, // IMX - slippage
+      secondaryFees,
+      fromAddress,
+      gasPrice,
+    );
+
+    return {
+      approval,
+      swap,
+      quote: userQuote,
+    };
+  }
+
+  private async getApproval(
+    tradeType: TradeType,
+    amountSpecified: TokenAmount<ERC20 | Native>, // token is the specified amount
+    amountWithMaxSlippage: TokenAmount<ERC20 | Native>, // token is the quoted one
+    secondaryFees: SecondaryFee[],
+    fromAddress: string,
+    gasPrice: NativeAmount | null,
+  ) {
+    if (isNativeAmount(amountSpecified)) {
+      return null;
+    }
 
     const preparedApproval = prepareApproval(
       tradeType,
       amountSpecified,
-      userQuote.amountWithMaxSlippage,
-      this.router.routingContracts,
+      amountWithMaxSlippage,
+      {
+        routerAddress: this.routerContract,
+        secondaryFeeAddress: this.secondaryFeeContract,
+      },
       secondaryFees,
     );
 
@@ -190,13 +231,9 @@ export class Exchange {
       fromAddress,
       preparedApproval,
       gasPrice,
-    );
+    ); 
 
-    return {
-      approval,
-      swap,
-      quote: userQuote,
-    };
+    return approval
   }
 
   /**

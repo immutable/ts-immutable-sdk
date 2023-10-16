@@ -1,13 +1,15 @@
+/* eslint-disable max-len */
 import { TradeType } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
 import { Fees } from 'lib/fees';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
+import { isNative, maybeWrapAmount, newAmount } from 'lib/utils';
 import {
-  Amount, Quote, TokenInfo,
+  ERC20, ERC20Amount, Native, NativeAmount, Quote, TokenAmount,
 } from '../../types';
 import { slippageToFraction } from './slippage';
 
-function getQuoteAmountFromTradeType(tradeInfo: QuoteResult): Amount {
+function getQuoteAmountFromTradeType(tradeInfo: QuoteResult): TokenAmount<ERC20> {
   if (tradeInfo.tradeType === TradeType.EXACT_INPUT) {
     return tradeInfo.amountOut;
   }
@@ -27,19 +29,25 @@ export function applySlippage(
   return ethers.BigNumber.from(amountWithSlippage.toString());
 }
 
-export function prepareUserQuote(
-  otherToken: TokenInfo,
+const unwrapAmount = (amount: ERC20Amount, nativeToken: Native): TokenAmount<Native> => newAmount(amount.value, nativeToken);
+
+export function prepareUserQuote<T extends Native | ERC20>(
+  tokenOfQuotedAmount: T,
   tradeInfo: QuoteResult,
   slippage: number,
   fees: Fees,
-): Quote {
-  const quote = getQuoteAmountFromTradeType(tradeInfo);
-  const amountWithSlippage = applySlippage(tradeInfo.tradeType, quote.value, slippage);
+  nativeToken: Native,
+): Quote<T, any> { // TODO: How to get this???
+  const erc20QuoteAmount = getQuoteAmountFromTradeType(tradeInfo);
+
+  const maybeUnwrappedQuoteAmount = isNative(tokenOfQuotedAmount) ? unwrapAmount(erc20QuoteAmount, nativeToken) : erc20QuoteAmount;
+
+  const amountWithSlippage = applySlippage(tradeInfo.tradeType, maybeUnwrappedQuoteAmount.value, slippage);
 
   return {
-    amount: quote,
+    amount: maybeUnwrappedQuoteAmount as TokenAmount<T>, // TODO: Make it better?
     amountWithMaxSlippage: {
-      token: otherToken,
+      token: tokenOfQuotedAmount,
       value: amountWithSlippage,
     },
     slippage,
@@ -48,16 +56,17 @@ export function prepareUserQuote(
 }
 
 export function getOurQuoteReqAmount(
-  amount: Amount,
-  fees: Fees,
+  amountSpecified: TokenAmount<ERC20 | Native>, // the amount specified by the user, either exactIn or exactOut
+  fees: Fees<ERC20 | Native>,
   tradeType: TradeType,
-): Amount {
+  wrappedNativeToken: ERC20,
+): ERC20Amount {
   if (tradeType === TradeType.EXACT_OUTPUT) {
     // For an exact output swap, we do not need to subtract fees from the given amount
-    return amount;
+    return maybeWrapAmount(amountSpecified, wrappedNativeToken);
   }
 
-  fees.addAmount(amount);
+  fees.addAmount(amountSpecified);
 
-  return fees.amountLessFees();
+  return maybeWrapAmount(fees.amountLessFees(), wrappedNativeToken);
 }

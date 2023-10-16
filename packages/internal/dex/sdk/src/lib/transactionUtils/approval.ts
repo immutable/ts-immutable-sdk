@@ -4,14 +4,15 @@ import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
 import { ApproveError, AlreadyApprovedError } from 'errors';
 import { ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
-import { RoutingContracts } from 'lib/router';
 import { newAmount } from 'lib/utils';
-import { Amount, SecondaryFee, TransactionDetails } from '../../types';
+import {
+  Amount, ERC20Amount, NativeAmount, SecondaryFee, TransactionDetails,
+} from '../../types';
 import { calculateGasFee } from './gas';
 
 type PreparedApproval = {
   spender: string;
-  amount: Amount;
+  amount: ERC20Amount;
 };
 
 /**
@@ -80,18 +81,36 @@ const getUnsignedERC20ApproveTransaction = (
   };
 };
 
+// EXACT_INPUT  => I have 100 IMX (ERC20), I want YEET => tokenIn = IMX, tokenOut = YEET, tokenSpecified = IMX, otherToken = YEET
+// need to approve 100 IMX, will get YEET - slippage.
+
+// EXACT_OUTPUT => I want 100 IMX, I have YEET => tokenIn = YEET, tokenOut = IMX, tokenSpecified = IMX, otherToken = YEET
+// need to approve quoted YEET + slippage
+
+// EXACT_INPUT  => I have 100 native IMX, I want YEET => tokenIn = IMX, tokenOut = YEET, tokenSpecified = IMX, otherToken = YEET
+// No approval, will get YEET - slippage.
+
+// EXACT_OUTPUT => I want 100 native IMX, I have YEET = tokenIn = YEET, tokenOut = IMX, tokenSpecified = IMX, otherToken (quoted) = YEET
+// need to approve quoted YEET + slippage
+
+// EXACT_INPUT => I have 100 YEET, I want native IMX => tokenIn = YEET, tokenOut = IMX, tokenSpecified = YEET, otherToken = IMX
+// need to approve 100 YEET, will get native IMX - slippage
+
 export const prepareApproval = (
   tradeType: TradeType,
-  amountSpecified: Amount,
-  amountWithSlippage: Amount,
-  routingContracts: RoutingContracts,
+  amountSpecified: ERC20Amount,
+  amountWithSlippage: ERC20Amount,
+  contracts: {
+    routerAddress: string,
+    secondaryFeeAddress: string,
+  },
   secondaryFees: SecondaryFee[],
 ): PreparedApproval => {
   const amountOfTokenIn = tradeType === TradeType.EXACT_INPUT ? amountSpecified : amountWithSlippage;
 
   const spender = secondaryFees.length === 0
-    ? routingContracts.peripheryRouterAddress
-    : routingContracts.secondaryFeeAddress;
+    ? contracts.routerAddress
+    : contracts.secondaryFeeAddress;
 
   return { spender, amount: amountOfTokenIn };
 };

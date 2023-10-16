@@ -4,7 +4,7 @@ import { CurrencyAmount, Token } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
 import { ProviderCallError } from 'errors';
 import {
-  ERC20, ERC20Amount, Native, TokenAmount, TokenLiteral,
+  ERC20, ERC20Amount, Native, NativeAmount, TokenAmount, TokenLiteral,
 } from '../types';
 
 export const quoteReturnMapping: { [signature: string]: string[] } = {
@@ -110,7 +110,13 @@ export const newAmount = <T extends ERC20 | Native>(amount: ethers.BigNumber, to
   token,
 });
 
-const isERC20 = (token: ERC20 | Native): token is ERC20 => ('address' in token);
+export const isERC20 = (token: ERC20 | Native): token is ERC20 => ('address' in token);
+
+export const isERC20Amount = (amount: ERC20Amount | NativeAmount): amount is ERC20Amount => ('address' in amount.token);
+
+export const isNative = (token: ERC20 | Native): token is Native => !('address' in token);
+
+export const isNativeAmount = (amount: ERC20Amount | NativeAmount): amount is NativeAmount => !('address' in amount.token);
 
 export const addAmount = <T extends ERC20 | Native>(a: TokenAmount<T>, b: TokenAmount<T>) => {
   if (isERC20(a.token) && isERC20(b.token)) {
@@ -133,3 +139,15 @@ export const subtractAmount = <T extends ERC20 | Native>(a: TokenAmount<T>, b: T
   // Native tokens have no address so there is nothing to validate
   return { value: a.value.sub(b.value), token: a.token };
 };
+
+export function maybeWrapToken(token: ERC20 | Native, wrappedNativeToken: ERC20): ERC20 {
+  // if it's already an ERC20, we don't need to wrap it, just return it
+  if (isERC20(token)) return token;
+
+  // if it's the native token, return it's wrapped version
+  return wrappedNativeToken;
+}
+
+export function maybeWrapAmount(amount: TokenAmount<ERC20 | Native>, wrappedNativeToken: ERC20): TokenAmount<ERC20> {
+  return newAmount(amount.value, maybeWrapToken(amount.token, wrappedNativeToken));
+}

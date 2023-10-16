@@ -129,7 +129,8 @@ export type TokenLiteral = `0x${string}` | 'native';
  * @property {string | undefined} symbol - The token symbol or undefined if it is not available
  * @property {string | undefined} name - The token name or undefined if it is not available
  */
-export type ERC20 = {
+export type ERC20 = { // TODO: Instead make it Native & { address: string } maybe?
+  type: 'erc20';
   chainId: number;
   address: string;
   decimals: number;
@@ -145,6 +146,7 @@ export type ERC20 = {
  * @property {string | undefined} name - The token name or undefined if it is not available
  */
 export type Native = {
+  type: 'native';
   chainId: number;
   decimals: number;
   symbol?: string;

@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import {
   Trade, toHex, encodeRouteToPath, Route,
 } from '@uniswap/v3-sdk';
@@ -6,9 +7,9 @@ import { Token, Percent, TradeType } from '@uniswap/sdk-core';
 import { SecondaryFee__factory } from 'contracts/types';
 import { ISecondaryFee, SecondaryFeeInterface } from 'contracts/types/SecondaryFee';
 import { Fees } from 'lib/fees';
-import { toCurrencyAmount } from 'lib/utils';
+import { maybeWrapAmount, toCurrencyAmount } from 'lib/utils';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
-import { Amount, SecondaryFee, TransactionDetails } from '../../types';
+import { Amount, ERC20, ERC20Amount, Native, NativeAmount, SecondaryFee, TokenAmount, TransactionDetails } from '../../types';
 import { calculateGasFee } from './gas';
 import { slippageToFraction } from './slippage';
 
@@ -109,8 +110,8 @@ function buildSwapParameters(
   // @dev we don't support multiple swaps in a single transaction
   // there will always be only one swap in the trade regardless of the trade type
   const { route, inputAmount, outputAmount } = trade.swaps[0];
-  const amountIn: string = toHex(trade.maximumAmountIn(options.slippageTolerance, inputAmount).quotient);
-  const amountOut: string = toHex(trade.minimumAmountOut(options.slippageTolerance, outputAmount).quotient);
+  // const amountIn: string = toHex(trade.maximumAmountIn(options.slippageTolerance, inputAmount).quotient);
+  // const amountOut: string = toHex(trade.minimumAmountOut(options.slippageTolerance, outputAmount).quotient);
 
   const isSinglePoolSwap = route.pools.length === 1;
 
@@ -182,6 +183,8 @@ function createSwapParameters(
     deadlineOrPreviousBlockhash: deadline,
   };
 
+  // TODO: Calculate amountIn and amountOut based on slippage tolerance and return it.
+
   if (secondaryFees.length === 0) {
     // Generate swap parameters without secondary fee contract details
     return SwapRouter.swapCallParameters([uncheckedTrade], options).calldata;
@@ -197,7 +200,7 @@ export function getSwap(
   deadline: number,
   peripheryRouterAddress: string,
   secondaryFeesAddress: string,
-  gasPrice: Amount | null,
+  gasPrice: NativeAmount | null,
   secondaryFees: SecondaryFee[],
 ): TransactionDetails {
   const calldata = createSwapParameters(
@@ -211,6 +214,8 @@ export function getSwap(
   // TODO: Add additional gas fee estimates for secondary fees
   const gasFeeEstimate = gasPrice ? calculateGasFee(gasPrice, adjustedQuote.gasEstimate) : null;
 
+  // TODO: Mirror the amountIn as the value for native swaps... taking into account slippage...
+
   return {
     transaction: {
       data: calldata,
@@ -222,12 +227,13 @@ export function getSwap(
   };
 }
 
-export function prepareSwap(
+export function adjustQuoteWithFees(
   ourQuote: QuoteResult,
-  amountSpecified: Amount,
+  amountSpecified: ERC20Amount,
   fees: Fees,
 ): QuoteResult {
   if (ourQuote.tradeType === TradeType.EXACT_OUTPUT) {
+    // when doing exact output, calaculate the fees based on the amountIn
     fees.addAmount(ourQuote.amountIn);
 
     return {

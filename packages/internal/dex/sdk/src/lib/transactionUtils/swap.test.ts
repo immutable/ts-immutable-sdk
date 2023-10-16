@@ -10,7 +10,7 @@ import { Pool, Route } from '@uniswap/v3-sdk';
 import { Fees } from 'lib/fees';
 import { newAmount } from 'lib';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
-import { getSwap, prepareSwap } from './swap';
+import { getSwap, adjustQuoteWithFees } from './swap';
 
 const testPool = new Pool(
   IMX_TEST_TOKEN,
@@ -142,7 +142,7 @@ describe('prepareSwap', () => {
     it('should use the specified amount for the amountIn', async () => {
       const quote = buildExactInputQuote();
 
-      const preparedSwap = prepareSwap(quote, quote.amountIn, new Fees([], IMX_TEST_TOKEN));
+      const preparedSwap = adjustQuoteWithFees(quote, quote.amountIn, new Fees([], IMX_TEST_TOKEN));
 
       expect(formatAmount(preparedSwap.amountIn)).toEqual(formatAmount(quote.amountIn));
     });
@@ -150,7 +150,7 @@ describe('prepareSwap', () => {
     it('should use the quoted amount for the amountOut', async () => {
       const quote = buildExactInputQuote();
 
-      const preparedSwap = prepareSwap(quote, quote.amountIn, new Fees([], IMX_TEST_TOKEN));
+      const preparedSwap = adjustQuoteWithFees(quote, quote.amountIn, new Fees([], IMX_TEST_TOKEN));
 
       expect(formatAmount(preparedSwap.amountOut)).toEqual(formatAmount(quote.amountOut));
     });
@@ -159,7 +159,7 @@ describe('prepareSwap', () => {
       it('does not apply fees to any amount', async () => {
         const quote = buildExactInputQuote();
 
-        const preparedSwap = prepareSwap(
+        const preparedSwap = adjustQuoteWithFees(
           quote,
           quote.amountIn,
           new Fees([{ recipient: TEST_FEE_RECIPIENT, basisPoints: 1000 }], IMX_TEST_TOKEN), // 1% fee
@@ -175,7 +175,7 @@ describe('prepareSwap', () => {
     it('should use the quoted amount for the amountIn', async () => {
       const quote = buildExactOutputQuote();
 
-      const preparedSwap = prepareSwap(quote, quote.amountOut, new Fees([], IMX_TEST_TOKEN));
+      const preparedSwap = adjustQuoteWithFees(quote, quote.amountOut, new Fees([], IMX_TEST_TOKEN));
 
       expect(formatAmount(preparedSwap.amountIn)).toEqual(formatAmount(quote.amountIn));
     });
@@ -183,7 +183,7 @@ describe('prepareSwap', () => {
     it('should use the specified amount for the amountOut', async () => {
       const quote = buildExactOutputQuote();
 
-      const preparedSwap = prepareSwap(quote, quote.amountOut, new Fees([], IMX_TEST_TOKEN));
+      const preparedSwap = adjustQuoteWithFees(quote, quote.amountOut, new Fees([], IMX_TEST_TOKEN));
 
       expect(formatAmount(preparedSwap.amountOut)).toEqual(formatAmount(quote.amountOut));
     });
@@ -193,7 +193,7 @@ describe('prepareSwap', () => {
         const quote = buildExactOutputQuote();
         quote.amountOut.value = utils.parseEther('100');
 
-        const preparedSwap = prepareSwap(
+        const preparedSwap = adjustQuoteWithFees(
           quote,
           quote.amountOut,
           new Fees([{ recipient: TEST_FEE_RECIPIENT, basisPoints: 1000 }], IMX_TEST_TOKEN), // 1% fee
