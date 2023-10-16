@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useCallback, useContext, useEffect } from 'react';
 import { Box, Heading } from '@biom3/react';
 
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -24,13 +24,11 @@ export function PaymentMethods() {
   const text = { methods: textConfig.views[SaleWidgetViews.PAYMENT_METHODS] };
   const { viewDispatch } = useContext(ViewContext);
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
-  const {
-    paymentMethod, setPaymentMethod, sign,
-  } = useSaleContext();
+  const { paymentMethod, setPaymentMethod, sign } = useSaleContext();
 
   const handleOptionClick = (type: PaymentTypes) => setPaymentMethod(type);
 
-  const handleGoToPaymentView = (type: PaymentTypes, signed = false) => {
+  const handleGoToPaymentView = useCallback((type: PaymentTypes, signed = false) => {
     if (type === PaymentTypes.CRYPTO && !signed) {
       viewDispatch({
         payload: {
@@ -64,7 +62,7 @@ export function PaymentMethods() {
         },
       });
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (paymentMethod) {
