@@ -18,17 +18,20 @@ export interface WithCardProps {
 
 export function WithCard(props: WithCardProps) {
   const {
-    onInit, onOpen, onOrderCreated, onOrderProcessing, onOrderCompleted, onOrderFailed,
+    onInit,
+    onOpen,
+    onOrderCreated,
+    onOrderProcessing,
+    onOrderCompleted,
+    onOrderFailed,
   } = props;
   const { screenTitle, loading } = textConfig.views[SaleWidgetViews.PAY_WITH_CARD];
-
   const {
     recipientEmail, recipientAddress, isPassportWallet, signResponse, goToErrorView,
   } = useSaleContext();
   const executeTxn = signResponse?.transactions.find((txn) => txn.methodCall.startsWith('execute'));
 
   if (!signResponse || !executeTxn) {
-    // TODO: dispatch error
     return null;
   }
 
