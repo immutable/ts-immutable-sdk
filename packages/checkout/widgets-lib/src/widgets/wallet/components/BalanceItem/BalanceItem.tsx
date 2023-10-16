@@ -77,8 +77,7 @@ export function BalanceItem({
       isOnRampEnabled
           && onRampAllowedTokens.length > 0
           && onRampAllowedTokens.find(
-            (token) => token.address?.toLowerCase()
-              === balanceInfo.address?.toLowerCase(),
+            (token) => token.address?.toLowerCase() === balanceInfo.address?.toLowerCase(),
           ),
     ),
     [isOnRampEnabled, onRampAllowedTokens],
