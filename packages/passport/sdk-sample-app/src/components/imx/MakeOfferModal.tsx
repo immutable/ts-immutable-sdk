@@ -43,6 +43,10 @@ function MakeOfferModal({
           tokenAddress: order.sell.data.token_address || '',
         },
         expiration_timestamp: expirationTimestamp,
+        fees: [{
+          address: '0x8e70719571e87a328696ad099a7d9f6adc120892',
+          fee_percentage: 1,
+        }],
       };
 
       const createOrderResponse = await imxProvider?.createOrder(request);
