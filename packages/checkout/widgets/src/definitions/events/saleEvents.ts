@@ -13,7 +13,11 @@ export enum SaleEventType {
  * @property {string} transactionHash - The hash of the successful transaction.
  */
 export type SaleSuccess = {
-  [key: string]: string;
+  transactions: {
+    method: string;
+    hash: string | undefined;
+  }[];
+  [key: string]: unknown;
 };
 
 /**

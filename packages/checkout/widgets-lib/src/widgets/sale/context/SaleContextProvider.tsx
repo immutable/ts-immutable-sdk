@@ -9,11 +9,14 @@ import {
   useRef,
 } from 'react';
 import { Passport } from '@imtbl/passport';
-
-import { SaleSuccess } from '@imtbl/checkout-widgets';
-
 import {
-  Item, PaymentTypes, SignResponse, SaleErrorTypes, SignOrderError,
+  Item,
+  PaymentTypes,
+  SignResponse,
+  SaleErrorTypes,
+  SignOrderError,
+  ExecutedTransaction,
+  ExecuteOrderResponse,
 } from '../types';
 import { useSignOrder } from '../hooks/useSignOrder';
 import { ConnectLoaderState } from '../../../context/connect-loader-context/ConnectLoaderContext';
@@ -37,17 +40,24 @@ type SaleContextProps = {
 };
 
 type SaleContextValues = SaleContextProps & {
-  sign: (paymentType: PaymentTypes, callback?: () => void) => Promise<SignResponse | undefined>;
-  execute: () => Promise<SaleSuccess>;
+  sign: (
+    paymentType: PaymentTypes,
+    callback?: () => void
+  ) => Promise<SignResponse | undefined>;
+  execute: (
+    signResponse: SignResponse | undefined
+  ) => Promise<ExecutedTransaction[]>;
   recipientAddress: string;
   recipientEmail: string;
   signResponse: SignResponse | undefined;
   signError: SignOrderError | undefined;
+  executeResponse: ExecuteOrderResponse | undefined;
   isPassportWallet: boolean;
   paymentMethod: PaymentTypes | undefined;
   setPaymentMethod: (paymentMethod: PaymentTypes) => void;
   goBackToPaymentMethods: (paymentMethod?: PaymentTypes | undefined) => void;
   goToErrorView: (type: SaleErrorTypes, data?: Record<string, unknown>) => void;
+  goToSuccessView: () => void;
 };
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -62,15 +72,17 @@ const SaleContext = createContext<SaleContextValues>({
   recipientAddress: '',
   recipientEmail: '',
   sign: () => Promise.resolve(undefined),
-  execute: () => Promise.resolve({} as SaleSuccess),
+  execute: () => Promise.resolve([]),
   signResponse: undefined,
   signError: undefined,
+  executeResponse: undefined,
   passport: undefined,
   isPassportWallet: false,
   paymentMethod: undefined,
   setPaymentMethod: () => {},
   goBackToPaymentMethods: () => {},
   goToErrorView: () => {},
+  goToSuccessView: () => {},
   config: {} as StrongCheckoutWidgetsConfig,
 });
 
@@ -108,17 +120,22 @@ export function SaleContextProvider(props: {
     recipientAddress: '',
   });
 
-  const [paymentMethod, setPaymentMethod] = useState<PaymentTypes | undefined>(undefined);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentTypes | undefined>(
+    undefined,
+  );
 
-  const goBackToPaymentMethods = useCallback((type?: PaymentTypes | undefined) => {
-    setPaymentMethod(type);
-    viewDispatch({
-      payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: { type: SaleWidgetViews.PAYMENT_METHODS },
-      },
-    });
-  }, []);
+  const goBackToPaymentMethods = useCallback(
+    (type?: PaymentTypes | undefined) => {
+      setPaymentMethod(type);
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: { type: SaleWidgetViews.PAYMENT_METHODS },
+        },
+      });
+    },
+    [],
+  );
 
   const goToErrorView = useCallback(
     (errorType: SaleErrorTypes, data: Record<string, unknown> = {}) => {
@@ -141,6 +158,17 @@ export function SaleContextProvider(props: {
     [],
   );
 
+  const goToSuccessView = useCallback(() => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: SaleWidgetViews.SALE_SUCCESS,
+        },
+      },
+    });
+  }, []);
+
   useEffect(() => {
     const getUserInfo = async () => {
       const signer = provider?.getSigner();
@@ -154,7 +182,11 @@ export function SaleContextProvider(props: {
   }, [provider]);
 
   const {
-    sign: signOrder, execute, signResponse, signError,
+    sign: signOrder,
+    execute,
+    signResponse,
+    signError,
+    executeResponse,
   } = useSignOrder({
     items,
     provider,
@@ -190,9 +222,10 @@ export function SaleContextProvider(props: {
       amount,
       fromContractAddress,
       sign,
-      execute,
       signResponse,
       signError,
+      execute,
+      executeResponse,
       environmentId,
       env,
       provider,
@@ -203,6 +236,7 @@ export function SaleContextProvider(props: {
       setPaymentMethod,
       goBackToPaymentMethods,
       goToErrorView,
+      goToSuccessView,
       isPassportWallet: !!(provider?.provider as any)?.isPassport,
     }),
     [
@@ -217,17 +251,16 @@ export function SaleContextProvider(props: {
       recipientAddress,
       recipientEmail,
       signResponse,
-      paymentMethod,
-      signResponse,
       signError,
+      executeResponse,
+      paymentMethod,
       goBackToPaymentMethods,
       goToErrorView,
+      goToSuccessView,
     ],
   );
 
-  return (
-    <SaleContext.Provider value={values}>{children}</SaleContext.Provider>
-  );
+  return <SaleContext.Provider value={values}>{children}</SaleContext.Provider>;
 }
 
 export function useSaleContext() {
