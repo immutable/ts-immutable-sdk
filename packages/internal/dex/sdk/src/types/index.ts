@@ -153,6 +153,8 @@ export type Native = {
   name?: string;
 };
 
+export type Currency = ERC20 | Native;
+
 /**
  * @deprecated
  * Interface representing a token

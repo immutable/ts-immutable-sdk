@@ -4,6 +4,7 @@ import { CurrencyAmount, Token } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
 import { ProviderCallError } from 'errors';
 import {
+  Currency,
   ERC20, ERC20Amount, Native, NativeAmount, TokenAmount, TokenLiteral,
 } from '../types';
 
@@ -106,20 +107,20 @@ export const toCurrencyAmount = (amount: ERC20Amount): CurrencyAmount<Token> => 
   return CurrencyAmount.fromRawAmount(token, amount.value.toString());
 };
 
-export const newAmount = <T extends ERC20 | Native>(amount: ethers.BigNumber, token: T): TokenAmount<T> => ({
+export const newAmount = <T extends Currency>(amount: ethers.BigNumber, token: T): TokenAmount<T> => ({
   value: amount,
   token,
 });
 
-export const isERC20 = (token: ERC20 | Native): token is ERC20 => ('address' in token);
+export const isERC20 = (token: Currency): token is ERC20 => ('address' in token);
 
-export const isERC20Amount = (amount: ERC20Amount | NativeAmount): amount is ERC20Amount => ('address' in amount.token);
+export const isERC20Amount = (amount: TokenAmount<Currency>): amount is ERC20Amount => ('address' in amount.token);
 
-export const isNative = (token: ERC20 | Native): token is Native => !('address' in token);
+export const isNative = (token: Currency): token is Native => !('address' in token);
 
-export const isNativeAmount = (amount: ERC20Amount | NativeAmount): amount is NativeAmount => !('address' in amount.token);
+export const isNativeAmount = (amount: TokenAmount<Currency>): amount is NativeAmount => !('address' in amount.token);
 
-export const addAmount = <T extends ERC20 | Native>(a: TokenAmount<T>, b: TokenAmount<T>) => {
+export const addAmount = <T extends Currency>(a: TokenAmount<T>, b: TokenAmount<T>) => {
   if (isERC20(a.token) && isERC20(b.token)) {
     // Make sure the ERC20s have the same address
     if (a.token.address !== b.token.address) throw new Error('Token mismatch: token addresses must be the same');

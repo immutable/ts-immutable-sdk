@@ -1,11 +1,9 @@
+/* eslint-disable max-len */
 import { ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
 import assert from 'assert';
 import {
-  DuplicateAddressesError,
-  InvalidAddressError,
-  InvalidMaxHopsError,
-  InvalidSlippageError,
+  DuplicateAddressesError, InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError,
 } from 'errors';
 import { fetchGasPrice } from 'lib/transactionUtils/gas';
 import { getApproval, prepareApproval } from 'lib/transactionUtils/approval';
@@ -13,19 +11,21 @@ import { getOurQuoteReqAmount, prepareUserQuote } from 'lib/transactionUtils/get
 import { Fees } from 'lib/fees';
 import { SecondaryFee__factory } from 'contracts/types';
 import {
-  DEFAULT_DEADLINE,
-  DEFAULT_MAX_HOPS,
-  DEFAULT_SLIPPAGE,
-  MAX_MAX_HOPS,
-  MIN_MAX_HOPS,
+  DEFAULT_DEADLINE, DEFAULT_MAX_HOPS, DEFAULT_SLIPPAGE, MAX_MAX_HOPS, MIN_MAX_HOPS,
 } from './constants';
 import { Router } from './lib/router';
 import {
-  getTokenDecimals, isNativeAmount, isValidNonZeroAddress, maybeWrapAmount, maybeWrapToken, newAmount,
+  getTokenDecimals, isValidNonZeroAddress, maybeWrapAmount, maybeWrapToken, newAmount,
 } from './lib/utils';
 import {
   ERC20,
-  ExchangeModuleConfiguration, Native, NativeAmount, SecondaryFee, TokenAmount, TokenLiteral, TransactionResponse,
+  ExchangeModuleConfiguration,
+  Native,
+  NativeAmount,
+  SecondaryFee,
+  TokenAmount,
+  TokenLiteral,
+  TransactionResponse,
 } from './types';
 import { getSwap, adjustQuoteWithFees } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
@@ -57,28 +57,24 @@ export class Exchange {
     this.routerContract = config.chain.contracts.peripheryRouter;
     this.secondaryFeeContract = config.chain.contracts.secondaryFee;
 
-    this.provider = new ethers.providers.JsonRpcProvider(
-      config.chain.rpcUrl,
-    );
+    this.provider = new ethers.providers.JsonRpcProvider(config.chain.rpcUrl);
 
-    this.router = new Router(
-      this.provider,
-      config.chain.commonRoutingTokens,
-      {
-        multicallAddress: config.chain.contracts.multicall,
-        factoryAddress: config.chain.contracts.coreFactory,
-        quoterAddress: config.chain.contracts.quoterV2,
-      },
-    );
+    this.router = new Router(this.provider, config.chain.commonRoutingTokens, {
+      multicallAddress: config.chain.contracts.multicall,
+      factoryAddress: config.chain.contracts.coreFactory,
+      quoterAddress: config.chain.contracts.quoterV2,
+    });
   }
 
   private toToken(tokenLiteral: TokenLiteral, tokenDecimals: number): ERC20 | Native {
-    return tokenLiteral === 'native' ? this.nativeToken : {
-      address: tokenLiteral,
-      chainId: this.chainId,
-      decimals: tokenDecimals,
-      type: 'erc20',
-    };
+    return tokenLiteral === 'native'
+      ? this.nativeToken
+      : {
+        address: tokenLiteral,
+        chainId: this.chainId,
+        decimals: tokenDecimals,
+        type: 'erc20',
+      };
   }
 
   private static validate(
@@ -108,10 +104,7 @@ export class Exchange {
       return [];
     }
 
-    const secondaryFeeContract = SecondaryFee__factory.connect(
-      this.secondaryFeeContract,
-      this.provider,
-    );
+    const secondaryFeeContract = SecondaryFee__factory.connect(this.secondaryFeeContract, this.provider);
 
     if (await secondaryFeeContract.paused()) {
       // Do not use secondary fees if the contract is paused
@@ -130,7 +123,8 @@ export class Exchange {
     maxHops: number,
     deadline: number,
     tradeType: TradeType,
-  ): Promise<TransactionResponse<any, any>> { // TODO: Fix any shenanigans
+  ): Promise<TransactionResponse<any, any>> {
+    // TODO: Fix any shenanigans
     Exchange.validate(tokenInAddress, tokenOutAddress, maxHops, slippagePercent, fromAddress);
 
     // get the decimals of the tokens that will be swapped
@@ -145,8 +139,7 @@ export class Exchange {
     const tokenOut = this.toToken(tokenOutAddress, tokenOutDecimals);
 
     // determine which amount was specified for the swap from the TradeType
-    const [tokenSpecified, otherToken] = tradeType === TradeType.EXACT_INPUT
-      ? [tokenIn, tokenOut] : [tokenOut, tokenIn];
+    const [tokenSpecified, otherToken] = tradeType === TradeType.EXACT_INPUT ? [tokenIn, tokenOut] : [tokenOut, tokenIn];
 
     const amountSpecified = newAmount(amount, tokenSpecified);
 
@@ -212,9 +205,6 @@ export class Exchange {
   ) {
     // it's not about the amountSpecified, it's about the tokenIn
     // if exact input is native then skip approvals
-    if (isNativeAmount(amountSpecified) && tradeType === TradeType.EXACT_INPUT) {
-      return null;
-    }
 
     const preparedApproval = prepareApproval(
       tradeType,
@@ -228,14 +218,11 @@ export class Exchange {
     );
 
     // preparedApproval always uses the tokenIn address because we are always selling the tokenIn
-    const approval = await getApproval(
-      this.provider,
-      fromAddress,
-      preparedApproval,
-      gasPrice,
-    ); 
+    const approval = preparedApproval
+      ? await getApproval(this.provider, fromAddress, preparedApproval, gasPrice)
+      : null;
 
-    return approval
+    return approval;
   }
 
   /**

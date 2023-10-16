@@ -4,9 +4,9 @@ import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
 import { ApproveError, AlreadyApprovedError } from 'errors';
 import { ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
-import { newAmount } from 'lib/utils';
+import { isERC20Amount, newAmount } from 'lib/utils';
 import {
-  Amount, ERC20Amount, NativeAmount, SecondaryFee, TransactionDetails,
+  Amount, Currency, ERC20Amount, SecondaryFee, TokenAmount, TransactionDetails,
 } from '../../types';
 import { calculateGasFee } from './gas';
 
@@ -81,6 +81,20 @@ const getUnsignedERC20ApproveTransaction = (
   };
 };
 
+export const getAmountInToApprove = (
+  tradeType: TradeType,
+  amountSpecified: TokenAmount<Currency>,
+  amountWithSlippage: TokenAmount<Currency>,
+) => {
+  if (tradeType === TradeType.EXACT_INPUT && isERC20Amount(amountSpecified)) {
+    return amountSpecified;
+  }
+  if (tradeType === TradeType.EXACT_OUTPUT && isERC20Amount(amountWithSlippage)) {
+    return amountWithSlippage;
+  }
+  return null;
+};
+
 // EXACT_INPUT  => I have 100 IMX (ERC20), I want YEET => tokenIn = IMX, tokenOut = YEET, tokenSpecified = IMX, otherToken = YEET
 // need to approve 100 IMX, will get YEET - slippage.
 
@@ -101,21 +115,22 @@ const getUnsignedERC20ApproveTransaction = (
 
 export const prepareApproval = (
   tradeType: TradeType,
-  amountSpecified: ERC20Amount,
-  amountWithSlippage: ERC20Amount,
+  amountSpecified: TokenAmount<Currency>,
+  amountWithSlippage: TokenAmount<Currency>,
   contracts: {
-    routerAddress: string,
-    secondaryFeeAddress: string,
+    routerAddress: string;
+    secondaryFeeAddress: string;
   },
   secondaryFees: SecondaryFee[],
-): PreparedApproval => {
-  const amountOfTokenIn = tradeType === TradeType.EXACT_INPUT ? amountSpecified : amountWithSlippage;
+): PreparedApproval | null => {
+  const amountToApprove = getAmountInToApprove(tradeType, amountSpecified, amountWithSlippage);
+  if (amountToApprove === null) {
+    return null;
+  }
 
-  const spender = secondaryFees.length === 0
-    ? contracts.routerAddress
-    : contracts.secondaryFeeAddress;
+  const spender = secondaryFees.length === 0 ? contracts.routerAddress : contracts.secondaryFeeAddress;
 
-  return { spender, amount: amountOfTokenIn };
+  return { spender, amount: amountToApprove };
 };
 
 /**
@@ -136,12 +151,7 @@ export const getApproveTransaction = async (
 ): Promise<TransactionRequest | null> => {
   let amountToApprove: Amount;
   try {
-    amountToApprove = await getERC20AmountToApprove(
-      provider,
-      ownerAddress,
-      tokenAmount,
-      spenderAddress,
-    );
+    amountToApprove = await getERC20AmountToApprove(provider, ownerAddress, tokenAmount, spenderAddress);
   } catch (e) {
     if (e instanceof AlreadyApprovedError) {
       // already approved for the required amount, nothing to do
@@ -151,11 +161,7 @@ export const getApproveTransaction = async (
     throw e;
   }
 
-  return getUnsignedERC20ApproveTransaction(
-    ownerAddress,
-    amountToApprove,
-    spenderAddress,
-  );
+  return getUnsignedERC20ApproveTransaction(ownerAddress, amountToApprove, spenderAddress);
 };
 
 export async function getApproveGasEstimate(
