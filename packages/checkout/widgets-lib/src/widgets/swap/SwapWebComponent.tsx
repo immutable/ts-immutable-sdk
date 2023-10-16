@@ -3,7 +3,6 @@ import { WalletProviderName } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
 import { BiomeCombinedProviders, BiomePortalIdProvider } from '@biom3/react';
 import { onDarkBase } from '@biom3/design-tokens';
-import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import { SwapWidget, SwapWidgetParams } from './SwapWidget';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
 import {
@@ -20,7 +19,8 @@ import {
 import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
 import { ServiceType } from '../../views/error/serviceTypes';
-import { orchestrationEvents } from '../../lib/orchestrationEvents';
+import { isPassportProvider } from '../../lib/providerUtils';
+import { topUpBridgeOption, topUpOnRampOption } from './helpers';
 
 export class ImmutableSwap extends ImmutableWebComponent {
   walletProvider: WalletProviderName | undefined = undefined;
@@ -97,6 +97,24 @@ export class ImmutableSwap extends ImmutableWebComponent {
     }
   }
 
+  private isNotPassport = !isPassportProvider(this.provider)
+    || this.walletProvider !== WalletProviderName.PASSPORT;
+
+  private topUpOptions(): { text:string, action: ()=>void }[] | undefined {
+    const optionsArray: { text:string, action: ()=>void }[] = [];
+
+    const isOnramp = topUpOnRampOption(this.widgetConfig!.isOnRampEnabled);
+    if (isOnramp) {
+      optionsArray.push({ text: isOnramp.text, action: isOnramp.action });
+    }
+    const isBridge = topUpBridgeOption(this.widgetConfig!.isBridgeEnabled, this.isNotPassport);
+    if (isBridge) {
+      optionsArray.push({ text: isBridge.text, action: isBridge.action });
+    }
+
+    return optionsArray;
+  }
+
   renderWidget() {
     this.validateInputs();
     const connectLoaderParams: ConnectLoaderParams = {
@@ -114,6 +132,8 @@ export class ImmutableSwap extends ImmutableWebComponent {
     };
 
     let isSwapAvailable = false;
+
+    const topUpOptions = this.topUpOptions();
 
     this.checkout
       ?.isSwapAvailable()
@@ -134,28 +154,10 @@ export class ImmutableSwap extends ImmutableWebComponent {
                     <ServiceUnavailableErrorView
                       service={ServiceType.SWAP}
                       onCloseClick={() => sendSwapWidgetCloseEvent(window)}
-                      primaryActionText="Buy with card"
-                      onPrimaryButtonClick={() => {
-                        orchestrationEvents.sendRequestOnrampEvent(
-                          window,
-                          IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT,
-                          {
-                            tokenAddress: '',
-                            amount: '',
-                          },
-                        );
-                      }}
-                      secondaryActionText="bridge"
-                      onSecondaryButtonClick={() => {
-                        orchestrationEvents.sendRequestBridgeEvent(
-                          window,
-                          IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT,
-                          {
-                            tokenAddress: '',
-                            amount: '',
-                          },
-                        );
-                      }}
+                      primaryActionText={topUpOptions && topUpOptions[0].text}
+                      onPrimaryButtonClick={topUpOptions && topUpOptions[0].action}
+                      secondaryActionText={topUpOptions?.length === 2 ? topUpOptions[1].text : undefined}
+                      onSecondaryButtonClick={topUpOptions?.length === 2 ? topUpOptions[1].action : undefined}
                     />
                   </BiomeCombinedProviders>
                 )}
