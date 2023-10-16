@@ -5,7 +5,7 @@ import { ethers } from 'ethers';
 import { ProviderCallError } from 'errors';
 import {
   Currency,
-  ERC20, ERC20Amount, Native, NativeAmount, TokenAmount, TokenLiteral,
+  ERC20, Native, TokenAmount, TokenLiteral,
 } from '../types';
 
 export const quoteReturnMapping: { [signature: string]: string[] } = {
@@ -97,12 +97,12 @@ export const toBigNumber = (amount: CurrencyAmount<Token>): ethers.BigNumber => 
   ethers.BigNumber.from(amount.multiply(amount.decimalScale).toExact())
 );
 
-export const toAmount = (amount: CurrencyAmount<Token>): ERC20Amount => ({
+export const toAmount = (amount: CurrencyAmount<Token>): TokenAmount<ERC20> => ({
   token: uniswapTokenToTokenInfo(amount.currency),
   value: toBigNumber(amount),
 });
 
-export const toCurrencyAmount = (amount: ERC20Amount): CurrencyAmount<Token> => {
+export const toCurrencyAmount = (amount: TokenAmount<ERC20>): CurrencyAmount<Token> => {
   const token = tokenInfoToUniswapToken(amount.token);
   return CurrencyAmount.fromRawAmount(token, amount.value.toString());
 };
@@ -114,11 +114,11 @@ export const newAmount = <T extends Currency>(amount: ethers.BigNumber, token: T
 
 export const isERC20 = (token: Currency): token is ERC20 => ('address' in token);
 
-export const isERC20Amount = (amount: TokenAmount<Currency>): amount is ERC20Amount => ('address' in amount.token);
+export const isERC20Amount = (amount: TokenAmount<Currency>): amount is TokenAmount<ERC20> => ('address' in amount.token);
 
 export const isNative = (token: Currency): token is Native => !('address' in token);
 
-export const isNativeAmount = (amount: TokenAmount<Currency>): amount is NativeAmount => !('address' in amount.token);
+export const isNativeAmount = (amount: TokenAmount<Currency>): amount is TokenAmount<Native> => !('address' in amount.token);
 
 export const addAmount = <T extends Currency>(a: TokenAmount<T>, b: TokenAmount<T>) => {
   if (isERC20(a.token) && isERC20(b.token)) {
@@ -131,7 +131,7 @@ export const addAmount = <T extends Currency>(a: TokenAmount<T>, b: TokenAmount<
   return { value: a.value.add(b.value), token: a.token };
 };
 
-export const subtractAmount = <T extends ERC20 | Native>(a: TokenAmount<T>, b: TokenAmount<T>) => {
+export const subtractAmount = <T extends Currency>(a: TokenAmount<T>, b: TokenAmount<T>) => {
   if (isERC20(a.token) && isERC20(b.token)) {
     // Make sure the ERC20s have the same address
     if (a.token.address !== b.token.address) throw new Error('Token mismatch: token addresses must be the same');
@@ -142,7 +142,7 @@ export const subtractAmount = <T extends ERC20 | Native>(a: TokenAmount<T>, b: T
   return { value: a.value.sub(b.value), token: a.token };
 };
 
-export function maybeWrapToken(token: ERC20 | Native, wrappedNativeToken: ERC20): ERC20 {
+export function maybeWrapToken(token: Currency, wrappedNativeToken: ERC20): ERC20 {
   // if it's already an ERC20, we don't need to wrap it, just return it
   if (isERC20(token)) return token;
 
@@ -150,6 +150,6 @@ export function maybeWrapToken(token: ERC20 | Native, wrappedNativeToken: ERC20)
   return wrappedNativeToken;
 }
 
-export function maybeWrapAmount(amount: TokenAmount<ERC20 | Native>, wrappedNativeToken: ERC20): TokenAmount<ERC20> {
+export function maybeWrapAmount(amount: TokenAmount<Currency>, wrappedNativeToken: ERC20): TokenAmount<ERC20> {
   return newAmount(amount.value, maybeWrapToken(amount.token, wrappedNativeToken));
 }

@@ -6,13 +6,13 @@ import { ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
 import { isERC20Amount, newAmount } from 'lib/utils';
 import {
-  Amount, Currency, ERC20Amount, SecondaryFee, TokenAmount, TransactionDetails,
+  Amount, Currency, ERC20, SecondaryFee, TokenAmount, TransactionDetails,
 } from '../../types';
 import { calculateGasFee } from './gas';
 
 type PreparedApproval = {
   spender: string;
-  amount: ERC20Amount;
+  amount: TokenAmount<ERC20>;
 };
 
 /**

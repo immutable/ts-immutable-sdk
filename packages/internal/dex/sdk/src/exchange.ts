@@ -18,10 +18,10 @@ import {
   getTokenDecimals, isValidNonZeroAddress, maybeWrapAmount, maybeWrapToken, newAmount,
 } from './lib/utils';
 import {
+  Currency,
   ERC20,
   ExchangeModuleConfiguration,
   Native,
-  NativeAmount,
   SecondaryFee,
   TokenAmount,
   TokenLiteral,
@@ -66,7 +66,7 @@ export class Exchange {
     });
   }
 
-  private toToken(tokenLiteral: TokenLiteral, tokenDecimals: number): ERC20 | Native {
+  private toToken(tokenLiteral: TokenLiteral, tokenDecimals: number): Currency {
     return tokenLiteral === 'native'
       ? this.nativeToken
       : {
@@ -123,7 +123,7 @@ export class Exchange {
     maxHops: number,
     deadline: number,
     tradeType: TradeType,
-  ): Promise<TransactionResponse<any, any>> {
+  ): Promise<TransactionResponse> {
     // TODO: Fix any shenanigans
     Exchange.validate(tokenInAddress, tokenOutAddress, maxHops, slippagePercent, fromAddress);
 
@@ -197,11 +197,11 @@ export class Exchange {
 
   private async getApproval(
     tradeType: TradeType,
-    amountSpecified: TokenAmount<ERC20 | Native>, // token is the specified amount by the user
-    amountWithMaxSlippage: TokenAmount<ERC20 | Native>, // token is the quoted one
+    amountSpecified: TokenAmount<Currency>, // token is the specified amount by the user
+    amountWithMaxSlippage: TokenAmount<Currency>, // token is the quoted one
     secondaryFees: SecondaryFee[],
     fromAddress: string,
-    gasPrice: NativeAmount | null,
+    gasPrice: TokenAmount<Native> | null,
   ) {
     // it's not about the amountSpecified, it's about the tokenIn
     // if exact input is native then skip approvals

@@ -38,14 +38,14 @@ export type SecondaryFee = {
  * @property {Amount} amount - The amount of the fee
  * @example 100 basis points = 1% = 1 IMX
  */
-export type Fee<T extends ERC20 | Native> = {
+export type Fee = {
   recipient: string;
   basisPoints: number;
-  amount: TokenAmount<T>;
+  amount: TokenAmount<Currency>;
 };
 
 // TODO: Replace `Amount` and rename
-export type TokenAmount<T extends ERC20 | Native> = {
+export type TokenAmount<T extends Currency> = {
   token: T;
   value: ethers.BigNumber;
 };
@@ -62,36 +62,16 @@ export type Amount = {
 };
 
 /**
- * Interface representing an ERC20 amount with the token information
- * @property {ERC20} token - The ERC20 token information
- * @property {ethers.BigNumber} value - The amount
- */
-export type ERC20Amount = {
-  token: ERC20;
-  value: ethers.BigNumber;
-};
-
-/**
- * Interface representing a native amount with the token information
- * @property {Native} token - The native token information
- * @property {ethers.BigNumber} value - The amount
- */
-export type NativeAmount = {
-  token: Native;
-  value: ethers.BigNumber;
-};
-
-/**
  * Interface representing a quote for a swap
  * @property {Amount} amount - The quoted amount
  * @property {Amount} amountWithMaxSlippage - The quoted amount with the max slippage applied
  * @property {number} slippage - The slippage percentage used to calculate the quote
  */
-export type Quote<T extends ERC20 | Native, U extends ERC20 | Native > = {
-  amount: TokenAmount<T>;
-  amountWithMaxSlippage: TokenAmount<T>;
+export type Quote = {
+  amount: TokenAmount<Currency>;
+  amountWithMaxSlippage: TokenAmount<Currency>;
   slippage: number;
-  fees: Fee<U>[];
+  fees: Fee[];
 };
 
 /**
@@ -101,7 +81,7 @@ export type Quote<T extends ERC20 | Native, U extends ERC20 | Native > = {
  */
 export type TransactionDetails = {
   transaction: ethers.providers.TransactionRequest;
-  gasFeeEstimate: NativeAmount | null;
+  gasFeeEstimate: TokenAmount<Native> | null;
 };
 
 /**
@@ -110,10 +90,10 @@ export type TransactionDetails = {
  * @property {TransactionDetails} swap - The swap transaction
  * @property {Quote} quote - The quote details for the swap
  */
-export type TransactionResponse<T extends ERC20 | Native, U extends ERC20 | Native > = {
+export type TransactionResponse = {
   approval: TransactionDetails | null;
   swap: TransactionDetails;
-  quote: Quote<T, U>;
+  quote: Quote;
 };
 
 /**
