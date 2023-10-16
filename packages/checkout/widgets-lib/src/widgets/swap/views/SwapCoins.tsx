@@ -4,7 +4,7 @@ import {
 } from 'react';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
-import { FooterLogo } from '../../../components/Footer/FooterLogo';
+import { QuickswapFooter } from '../../../components/Footer/QuickswapFooter';
 import { sendSwapWidgetCloseEvent } from '../SwapWidgetEvents';
 import { text } from '../../../resources/text/textConfig';
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
@@ -59,7 +59,7 @@ export function SwapCoins({
           onCloseButtonClick={() => sendSwapWidgetCloseEvent(eventTarget)}
         />
       )}
-      footer={<FooterLogo />}
+      footer={<QuickswapFooter />}
       footerBackgroundColor="base.color.translucent.emphasis.200"
     >
       <Box
