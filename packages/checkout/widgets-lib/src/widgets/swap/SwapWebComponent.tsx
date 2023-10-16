@@ -3,6 +3,7 @@ import { WalletProviderName } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
 import { BiomeCombinedProviders, BiomePortalIdProvider } from '@biom3/react';
 import { onDarkBase } from '@biom3/design-tokens';
+import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import { SwapWidget, SwapWidgetParams } from './SwapWidget';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
 import {
@@ -19,6 +20,7 @@ import {
 import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
 import { ServiceType } from '../../views/error/serviceTypes';
+import { orchestrationEvents } from '../../lib/orchestrationEvents';
 
 export class ImmutableSwap extends ImmutableWebComponent {
   walletProvider: WalletProviderName | undefined = undefined;
@@ -132,6 +134,28 @@ export class ImmutableSwap extends ImmutableWebComponent {
                     <ServiceUnavailableErrorView
                       service={ServiceType.SWAP}
                       onCloseClick={() => sendSwapWidgetCloseEvent(window)}
+                      primaryActionText="Buy with card"
+                      onPrimaryButtonClick={() => {
+                        orchestrationEvents.sendRequestOnrampEvent(
+                          window,
+                          IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT,
+                          {
+                            tokenAddress: '',
+                            amount: '',
+                          },
+                        );
+                      }}
+                      secondaryActionText="bridge"
+                      onSecondaryButtonClick={() => {
+                        orchestrationEvents.sendRequestBridgeEvent(
+                          window,
+                          IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT,
+                          {
+                            tokenAddress: '',
+                            amount: '',
+                          },
+                        );
+                      }}
                     />
                   </BiomeCombinedProviders>
                 )}
