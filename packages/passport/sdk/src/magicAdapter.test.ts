@@ -26,6 +26,7 @@ describe('MagicWallet', () => {
     magicProviderId: providerId,
   } as PassportConfiguration;
   const idToken = 'e30=.e30=.e30=';
+  const preload = jest.fn();
 
   beforeEach(() => {
     jest.resetAllMocks();
@@ -37,13 +38,20 @@ describe('MagicWallet', () => {
         logout: logoutMock,
       },
       rpcProvider,
+      preload,
     }));
     magicWallet = new MagicAdapter(config);
   });
 
+  describe('preload', () => {
+    it('should have called the magic client preload method', () => {
+      expect(preload).toHaveBeenCalled();
+    });
+  });
+
   describe('login', () => {
     it('should call loginWithOIDC and initialise the provider with the correct arguments', async () => {
-      const magicProvider = await magicWallet.login(idToken, config.network);
+      const magicProvider = await magicWallet.login(idToken);
 
       expect(Magic).toHaveBeenCalledWith(apiKey, {
         network: config.network,
@@ -64,7 +72,7 @@ describe('MagicWallet', () => {
       });
 
       await expect(async () => {
-        await magicWallet.login(idToken, config.network);
+        await magicWallet.login(idToken);
       }).rejects.toThrow(
         new PassportError(
           'oops',
@@ -76,7 +84,7 @@ describe('MagicWallet', () => {
 
   describe('logout', () => {
     it('calls the logout function', async () => {
-      await magicWallet.login(idToken, config.network);
+      await magicWallet.login(idToken);
       await magicWallet.logout();
 
       expect(logoutMock).toHaveBeenCalled();
