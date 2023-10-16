@@ -8,8 +8,11 @@ import { SecondaryFee__factory } from 'contracts/types';
 import { IV3SwapRouter } from 'contracts/types/SecondaryFee';
 import { PromiseOrValue } from 'contracts/types/common';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
-import { CurrencyAmount, Token } from 'types/amount';
 import {
+  Currency, CurrencyAmount, NativeCurrency, Token,
+} from 'types/amount';
+import {
+  ExchangeModuleConfiguration,
   Router,
   RoutingContracts,
   SecondaryFee,
@@ -60,12 +63,25 @@ export const WETH_TEST_TOKEN = new Token(
   'Wrapped Ether',
 );
 
+export const WIMX_TEST_TOKEN = new Token(
+  TEST_CHAIN_ID,
+  '0x4F062A3EAeC3730560aB89b5CE5aC0ab2C5517aF',
+  18,
+  'WIMX',
+  'Wrapped IMX',
+);
+
+export const NATIVE_IMX_TEST_TOKEN = new NativeCurrency(
+  TEST_CHAIN_ID,
+  18,
+  'IMX',
+  'Native IMX',
+);
+
 export const USDC_TEST_TOKEN = new Token(
   TEST_CHAIN_ID,
   '0x93733225CCc07Ba02b1449aA3379418Ddc37F6EC',
   6,
-  'USDC',
-  'USD Coin',
 );
 
 export const FUN_TEST_TOKEN = new Token(
@@ -80,7 +96,7 @@ export const TEST_IMMUTABLE_CONFIGURATION: ImmutableConfiguration = new Immutabl
   environment: Environment.SANDBOX,
 });
 
-export const TEST_DEX_CONFIGURATION = {
+export const TEST_DEX_CONFIGURATION: ExchangeModuleConfiguration = {
   baseConfig: TEST_IMMUTABLE_CONFIGURATION,
   chainId: TEST_CHAIN_ID,
   overrides: {
@@ -93,13 +109,8 @@ export const TEST_DEX_CONFIGURATION = {
       secondaryFee: TEST_SECONDARY_FEE_ADDRESS,
     },
     commonRoutingTokens: [],
-    nativeToken: {
-      chainId: IMX_TEST_TOKEN.chainId,
-      address: IMX_TEST_TOKEN.address,
-      decimals: IMX_TEST_TOKEN.decimals,
-      symbol: IMX_TEST_TOKEN.symbol,
-      name: IMX_TEST_TOKEN.name,
-    },
+    nativeToken: NATIVE_IMX_TEST_TOKEN,
+    wrappedNativeToken: WIMX_TEST_TOKEN,
   },
 };
 
@@ -108,7 +119,7 @@ export type SwapTest = {
 
   chainId: number;
 
-  pools: Pool[],
+  pools: Pool[];
 
   arbitraryTick: number;
   arbitraryLiquidity: number;
@@ -155,25 +166,38 @@ export function decodePathForExactOutput(path: string) {
   };
 }
 
-type SecondaryFeeFunctionName = 'exactInputSingleWithSecondaryFee' |
-'exactOutputSingleWithSecondaryFee' |
-'exactInputWithSecondaryFee' |
-'exactOutputWithSecondaryFee';
+type SecondaryFeeFunctionName =
+  | 'exactInputSingleWithSecondaryFee'
+  | 'exactOutputSingleWithSecondaryFee'
+  | 'exactInputWithSecondaryFee'
+  | 'exactOutputWithSecondaryFee';
 
 type SwapRouterFunctionName = 'exactInputSingle' | 'exactOutputSingle';
 
-function decodeSecondaryFeeCall(calldata: utils.BytesLike, functionName: SecondaryFeeFunctionName) {
+function decodeSecondaryFeeCall(
+  calldata: utils.BytesLike,
+  functionName: SecondaryFeeFunctionName,
+) {
   const iface = SecondaryFee__factory.createInterface();
-  const topLevelParams = iface.decodeFunctionData('multicall(uint256,bytes[])', calldata);
+  const topLevelParams = iface.decodeFunctionData(
+    'multicall(uint256,bytes[])',
+    calldata,
+  );
   const data = topLevelParams.data[0];
   if (typeof data !== 'string') throw new Error();
 
   return iface.decodeFunctionData(functionName, data);
 }
 
-function decodeSwapRouterCall(calldata: utils.BytesLike, functionName: SwapRouterFunctionName) {
+function decodeSwapRouterCall(
+  calldata: utils.BytesLike,
+  functionName: SwapRouterFunctionName,
+) {
   const iface = SwapRouter.INTERFACE;
-  const topLevelParams = iface.decodeFunctionData('multicall(uint256,bytes[])', calldata);
+  const topLevelParams = iface.decodeFunctionData(
+    'multicall(uint256,bytes[])',
+    calldata,
+  );
   const data = topLevelParams.data[0];
   if (typeof data !== 'string') throw new Error();
 
@@ -181,12 +205,17 @@ function decodeSwapRouterCall(calldata: utils.BytesLike, functionName: SwapRoute
 }
 
 export function decodeMulticallExactInputWithFees(data: utils.BytesLike) {
-  const decodedParams = decodeSecondaryFeeCall(data, 'exactInputWithSecondaryFee');
+  const decodedParams = decodeSecondaryFeeCall(
+    data,
+    'exactInputWithSecondaryFee',
+  );
 
-  const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map((x: [string, number]) => ({
-    recipient: x[0],
-    basisPoints: x[1],
-  }));
+  const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map(
+    (x: [string, number]) => ({
+      recipient: x[0],
+      basisPoints: x[1],
+    }),
+  );
 
   const swapParams: IV3SwapRouter.ExactInputParamsStruct = {
     path: decodedParams[1][0],
@@ -199,12 +228,17 @@ export function decodeMulticallExactInputWithFees(data: utils.BytesLike) {
 }
 
 export function decodeMulticallExactOutputWithFees(data: utils.BytesLike) {
-  const decodedParams = decodeSecondaryFeeCall(data, 'exactOutputWithSecondaryFee');
+  const decodedParams = decodeSecondaryFeeCall(
+    data,
+    'exactOutputWithSecondaryFee',
+  );
 
-  const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map((x: [string, number]) => ({
-    recipient: x[0],
-    basisPoints: x[1],
-  }));
+  const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map(
+    (x: [string, number]) => ({
+      recipient: x[0],
+      basisPoints: x[1],
+    }),
+  );
 
   const swapParams: IV3SwapRouter.ExactOutputParamsStruct = {
     path: decodedParams[1][0],
@@ -217,12 +251,17 @@ export function decodeMulticallExactOutputWithFees(data: utils.BytesLike) {
 }
 
 export function decodeMulticallExactInputSingleWithFees(data: utils.BytesLike) {
-  const decodedParams = decodeSecondaryFeeCall(data, 'exactInputSingleWithSecondaryFee');
+  const decodedParams = decodeSecondaryFeeCall(
+    data,
+    'exactInputSingleWithSecondaryFee',
+  );
 
-  const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map((x: [string, number]) => ({
-    recipient: x[0],
-    basisPoints: x[1],
-  }));
+  const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map(
+    (x: [string, number]) => ({
+      recipient: x[0],
+      basisPoints: x[1],
+    }),
+  );
 
   const swapParams: IV3SwapRouter.ExactInputSingleParamsStruct = {
     tokenIn: decodedParams[1][0],
@@ -237,13 +276,20 @@ export function decodeMulticallExactInputSingleWithFees(data: utils.BytesLike) {
   return { secondaryFeeParams, swapParams };
 }
 
-export function decodeMulticallExactOutputSingleWithFees(data: utils.BytesLike) {
-  const decodedParams = decodeSecondaryFeeCall(data, 'exactOutputSingleWithSecondaryFee');
+export function decodeMulticallExactOutputSingleWithFees(
+  data: utils.BytesLike,
+) {
+  const decodedParams = decodeSecondaryFeeCall(
+    data,
+    'exactOutputSingleWithSecondaryFee',
+  );
 
-  const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map((x: [string, number]) => ({
-    recipient: x[0],
-    basisPoints: x[1],
-  }));
+  const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map(
+    (x: [string, number]) => ({
+      recipient: x[0],
+      basisPoints: x[1],
+    }),
+  );
 
   const swapParams: IV3SwapRouter.ExactOutputSingleParamsStruct = {
     tokenIn: decodedParams[1][0],
@@ -258,7 +304,9 @@ export function decodeMulticallExactOutputSingleWithFees(data: utils.BytesLike) 
   return { secondaryFeeParams, swapParams };
 }
 
-export function decodeMulticallExactInputSingleWithoutFees(data: utils.BytesLike) {
+export function decodeMulticallExactInputSingleWithoutFees(
+  data: utils.BytesLike,
+) {
   const decodedParams = decodeSwapRouterCall(data, 'exactInputSingle');
 
   const swapParams: IV3SwapRouter.ExactInputSingleParamsStruct = {
@@ -274,7 +322,9 @@ export function decodeMulticallExactInputSingleWithoutFees(data: utils.BytesLike
   return { swapParams };
 }
 
-export function decodeMulticallExactOutputSingleWithoutFees(data: utils.BytesLike) {
+export function decodeMulticallExactOutputSingleWithoutFees(
+  data: utils.BytesLike,
+) {
   const decodedParams = decodeSwapRouterCall(data, 'exactOutputSingle');
 
   const swapParams: IV3SwapRouter.ExactOutputSingleParamsStruct = {
@@ -290,7 +340,9 @@ export function decodeMulticallExactOutputSingleWithoutFees(data: utils.BytesLik
   return { swapParams };
 }
 
-export function setupSwapTxTest(params?: { multiPoolSwap?: boolean }): SwapTest {
+export function setupSwapTxTest(params?: {
+  multiPoolSwap?: boolean;
+}): SwapTest {
   const multiPoolSwap = params?.multiPoolSwap ?? false;
   const fromAddress = TEST_FROM_ADDRESS;
 
@@ -361,29 +413,45 @@ type MockParams = {
   exchangeRate?: number;
 };
 
-export const amountOutFromAmountIn = (amountIn: CurrencyAmount<Token>, tokenOut: Token, exchangeRate: number) => {
+export const amountOutFromAmountIn = (
+  amountIn: CurrencyAmount<Token>,
+  tokenOut: Token,
+  exchangeRate: number,
+) => {
   let amountOut = amountIn.value.mul(exchangeRate); // 10 * 10^18
 
   if (amountIn.currency.decimals > tokenOut.decimals) {
-    amountOut = amountOut.div(BigNumber.from(10).pow(amountIn.currency.decimals - tokenOut.decimals)); // 10^(18-6) = 10^12
+    amountOut = amountOut.div(
+      BigNumber.from(10).pow(amountIn.currency.decimals - tokenOut.decimals),
+    ); // 10^(18-6) = 10^12
   }
 
   if (amountIn.currency.decimals < tokenOut.decimals) {
-    amountOut = amountOut.mul(BigNumber.from(10).pow(tokenOut.decimals - amountIn.currency.decimals)); // 10^(18-6) = 10^12
+    amountOut = amountOut.mul(
+      BigNumber.from(10).pow(tokenOut.decimals - amountIn.currency.decimals),
+    ); // 10^(18-6) = 10^12
   }
 
   return new CurrencyAmount(tokenOut, amountOut);
 };
 
-export const amountInFromAmountOut = (amountOut: CurrencyAmount<Token>, tokenIn: Token, exchangeRate: number) => {
+export const amountInFromAmountOut = (
+  amountOut: CurrencyAmount<Token>,
+  tokenIn: Token,
+  exchangeRate: number,
+) => {
   let amountIn = amountOut.value.div(exchangeRate); // 1 * 10^6
 
   if (tokenIn.decimals > amountOut.currency.decimals) {
-    amountIn = amountIn.mul(BigNumber.from(10).pow(tokenIn.decimals - amountOut.currency.decimals)); // 10^(18-6) = 10^12
+    amountIn = amountIn.mul(
+      BigNumber.from(10).pow(tokenIn.decimals - amountOut.currency.decimals),
+    ); // 10^(18-6) = 10^12
   }
 
   if (tokenIn.decimals < amountOut.currency.decimals) {
-    amountIn = amountIn.div(BigNumber.from(10).pow(amountOut.currency.decimals - tokenIn.decimals)); // 10^(18-6) = 10^12
+    amountIn = amountIn.div(
+      BigNumber.from(10).pow(amountOut.currency.decimals - tokenIn.decimals),
+    ); // 10^(18-6) = 10^12
   }
 
   return new CurrencyAmount(tokenIn, amountIn);
@@ -391,40 +459,48 @@ export const amountInFromAmountOut = (amountOut: CurrencyAmount<Token>, tokenIn:
 
 export function mockRouterImplementation(params: MockParams) {
   const exchangeRate = params.exchangeRate ?? 10; // 1 TokenIn = 10 TokenOut
-  const findOptimalRoute = jest.fn((
-    amountSpecified: CurrencyAmount<Token>,
-    otherToken: Token,
-    tradeType: Uniswap.TradeType,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    secondaryFees: SecondaryFee[],
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    maxHops: number,
-  ) => {
-    const tokenIn = tradeType === Uniswap.TradeType.EXACT_INPUT ? amountSpecified.currency : otherToken;
-    const tokenOut = tradeType === Uniswap.TradeType.EXACT_OUTPUT ? amountSpecified.currency : otherToken;
+  const findOptimalRoute = jest.fn(
+    (
+      amountSpecified: CurrencyAmount<Token>,
+      otherToken: Token,
+      tradeType: Uniswap.TradeType,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      secondaryFees: SecondaryFee[],
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      maxHops: number,
+    ) => {
+      const tokenIn = tradeType === Uniswap.TradeType.EXACT_INPUT
+        ? amountSpecified.currency
+        : otherToken;
+      const tokenOut = tradeType === Uniswap.TradeType.EXACT_OUTPUT
+        ? amountSpecified.currency
+        : otherToken;
 
-    const route = new Route(
-      params.pools,
-      tokenInfoToUniswapToken(tokenIn),
-      tokenInfoToUniswapToken(tokenOut),
-    );
+      const route = new Route(
+        params.pools,
+        tokenInfoToUniswapToken(tokenIn),
+        tokenInfoToUniswapToken(tokenOut),
+      );
 
-    const amountIn = tradeType === Uniswap.TradeType.EXACT_INPUT
-      ? amountSpecified : amountInFromAmountOut(amountSpecified, tokenIn, exchangeRate);
+      const amountIn = tradeType === Uniswap.TradeType.EXACT_INPUT
+        ? amountSpecified
+        : amountInFromAmountOut(amountSpecified, tokenIn, exchangeRate);
 
-    const amountOut = tradeType === Uniswap.TradeType.EXACT_INPUT
-      ? amountOutFromAmountIn(amountSpecified, tokenOut, exchangeRate) : amountSpecified;
+      const amountOut = tradeType === Uniswap.TradeType.EXACT_INPUT
+        ? amountOutFromAmountIn(amountSpecified, tokenOut, exchangeRate)
+        : amountSpecified;
 
-    const trade: QuoteResult = {
-      route,
-      amountIn,
-      amountOut,
-      tradeType,
-      gasEstimate: TEST_TRANSACTION_GAS_USAGE,
-    };
+      const trade: QuoteResult = {
+        route,
+        amountIn,
+        amountOut,
+        tradeType,
+        gasEstimate: TEST_TRANSACTION_GAS_USAGE,
+      };
 
-    return trade;
-  });
+      return trade;
+    },
+  );
 
   (Router as unknown as jest.Mock).mockImplementationOnce(() => ({
     routingContracts: TEST_ROUTING_CONTRACTS,
@@ -436,14 +512,17 @@ export function mockRouterImplementation(params: MockParams) {
 
 // expectToBeDefined ensures that a variable is not null or undefined, while
 // also narrowing its type.
-export function expectToBeDefined <T>(x: T): asserts x is NonNullable<T> {
+export function expectToBeDefined<T>(x: T): asserts x is NonNullable<T> {
   expect(x).toBeDefined();
   expect(x).not.toBeNull();
 }
 
 // expectInstanceOf ensurance that a variable is an instance of a class, while
 // also narrowing its type.
-export function expectInstanceOf <T>(className: { new(...args: any[]): T }, x: unknown): asserts x is T {
+export function expectInstanceOf<T>(
+  className: { new (...args: any[]): T },
+  x: unknown,
+): asserts x is T {
   expect(x).toBeInstanceOf(className);
 }
 
@@ -455,7 +534,7 @@ export function makeAddr(str: string): string {
   return utils.keccak256(utils.toUtf8Bytes(str)).slice(0, 42);
 }
 
-export function formatAmount(amount: CurrencyAmount<Token>): string {
+export function formatAmount(amount: CurrencyAmount<Currency>): string {
   return utils.formatUnits(amount.value, amount.currency.decimals);
 }
 
@@ -470,7 +549,10 @@ export function formatEther(bn: PromiseOrValue<BigNumberish>): string {
   throw new Error('formatEther: bn is not a BigNumber');
 }
 
-export function newAmountFromString(amount: string, token: Token): CurrencyAmount<Token> {
+export function newAmountFromString(
+  amount: string,
+  token: Token,
+): CurrencyAmount<Token> {
   const bn = utils.parseUnits(amount, token.decimals);
   return new CurrencyAmount(token, bn);
 }

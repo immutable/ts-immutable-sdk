@@ -69,13 +69,13 @@ export class Router {
     // TODO: Fix used before defined error
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     const routes = generateAllAcyclicPaths(
-      tokenIn,
-      tokenOut,
+      tokenInfoToUniswapToken(tokenIn),
+      tokenInfoToUniswapToken(tokenOut),
       pools,
       maxHops,
       [],
       [],
-      tokenIn,
+      tokenInfoToUniswapToken(tokenIn),
     );
 
     const noValidRoute = routes.length === 0;
@@ -162,34 +162,30 @@ export class Router {
 }
 
 export const generateAllAcyclicPaths = (
-  tokenIn: Token, // the currency we start with
-  tokenOut: Token, // the currency we want to end up with
+  tokenIn: Uniswap.Token, // the currency we start with
+  tokenOut: Uniswap.Token, // the currency we want to end up with
   pools: Pool[], // list of all available pools
   maxHops: number, // the maximum number of pools that can be traversed
   currentRoute: Pool[] = [], // list of pools already traversed
   routes: Route<Uniswap.Token, Uniswap.Token>[] = [], // list of all routes found so far
-  startTokenIn: Token = tokenIn, // the currency we started with
+  startTokenIn: Uniswap.Token = tokenIn, // the currency we started with
 ): Route<Uniswap.Token, Uniswap.Token>[] => {
-  const currencyIn = tokenInfoToUniswapToken(tokenIn);
-  const currencyOut = tokenInfoToUniswapToken(tokenOut);
-  const startCurrencyIn = tokenInfoToUniswapToken(startTokenIn);
-
   for (const pool of pools) {
     // if the pool doesn't have the tokenIn or if it has already been traversed,
     // skip to the next pool
-    const poolHasTokenIn = pool.involvesToken(currencyIn);
+    const poolHasTokenIn = pool.involvesToken(tokenIn);
     const poolHasCycle = currentRoute.find((pathPool) => poolEquals(pool, pathPool));
     // eslint-disable-next-line no-continue
     if (!poolHasTokenIn || poolHasCycle) continue;
 
     // get the output token of the pool
-    const outputToken = pool.token0.equals(currencyIn) ? pool.token1 : pool.token0;
+    const outputToken = pool.token0.equals(tokenIn) ? pool.token1 : pool.token0;
 
     // if we have found a route to the target currency, add it to the list of routes
-    const routeFound = outputToken.equals(currencyOut);
+    const routeFound = outputToken.equals(tokenOut);
     if (routeFound) {
       routes.push(
-        new Route([...currentRoute, pool], startCurrencyIn, currencyOut),
+        new Route([...currentRoute, pool], startTokenIn, tokenOut),
       );
     } else if (maxHops > 1) {
       // otherwise, if we haven't exceeded the maximum number of pools that can be traversed,

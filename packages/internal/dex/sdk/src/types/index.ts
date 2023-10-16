@@ -53,8 +53,8 @@ export type Fee = {
  * @property {number} slippage - The slippage percentage used to calculate the quote
  */
 export type Quote = {
-  amount: CurrencyAmount<Token>;
-  amountWithMaxSlippage: CurrencyAmount<Token>;
+  amount: CurrencyAmount<Currency>;
+  amountWithMaxSlippage: CurrencyAmount<Currency>;
   slippage: number;
   fees: Fee[];
 };
@@ -85,7 +85,8 @@ export interface ExchangeOverrides {
   rpcURL: string;
   exchangeContracts: ExchangeContracts;
   commonRoutingTokens: Token[];
-  nativeToken: Token;
+  nativeToken: NativeCurrency;
+  wrappedNativeToken: Token;
 }
 
 export interface ExchangeModuleConfiguration

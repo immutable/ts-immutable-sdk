@@ -6,7 +6,12 @@ export class NativeCurrency {
   readonly isNative: true;
   readonly isToken: false;
 
-  constructor(readonly chainId: number, readonly decimals: number, readonly symbol?: string, readonly name?: string) {
+  constructor(
+    readonly chainId: number,
+    readonly decimals: number,
+    readonly symbol?: string,
+    readonly name?: string,
+  ) {
     this.chainId = chainId;
     this.decimals = decimals;
     this.symbol = symbol;
@@ -19,15 +24,11 @@ export class NativeCurrency {
   wrap(wrappedNativeToken: Token) {
     return wrappedNativeToken;
   }
-
-  // get wrap(wrappedNativeToken: Token): Token {
-  //   return new Token(this.chainId, ethers.constants.AddressZero, this.decimals, this.symbol, this.name);
-  // }
 }
 
 export class Token {
-  // readonly isNative: false;
-  // readonly isToken: true;
+  readonly isNative: false;
+  readonly isToken: true;
 
   constructor(
     readonly chainId: number,
@@ -41,8 +42,8 @@ export class Token {
     this.decimals = decimals;
     this.symbol = symbol;
     this.name = name;
-    // this.isNative = false;
-    // this.isToken = true;
+    this.isNative = false;
+    this.isToken = true;
   }
 
   wrap(): Token {
@@ -72,5 +73,9 @@ export class CurrencyAmount<T extends Currency> {
   wrap(wrappedNativeToken: Token): CurrencyAmount<Token> {
     const token = this.currency.wrap(wrappedNativeToken);
     return new CurrencyAmount(token, this.value);
+  }
+
+  isTokenAmount(): this is CurrencyAmount<Token> {
+    return this.currency.isToken;
   }
 }

@@ -144,14 +144,19 @@ export class Exchange {
     const [ourQuote, gasPrice] = await Promise.all([
       this.router.findOptimalRoute(
         ourQuoteReqAmount,
-        otherToken,
+        otherToken.wrap(this.wrappedNativeToken),
         tradeType,
         maxHops,
       ),
       fetchGasPrice(this.provider, this.nativeToken),
     ]);
 
-    const adjustedQuote = prepareSwap(ourQuote, amountSpecified, fees);
+    const adjustedQuote = prepareSwap(
+      ourQuote,
+      amountSpecified.wrap(this.wrappedNativeToken),
+      fees,
+      this.wrappedNativeToken,
+    );
 
     const swap = getSwap(
       adjustedQuote,
@@ -175,12 +180,12 @@ export class Exchange {
     );
 
     // preparedApproval always uses the tokenIn address because we are always selling the tokenIn
-    const approval = await getApproval(
+    const approval = preparedApproval ? await getApproval(
       this.provider,
       fromAddress,
       preparedApproval,
       gasPrice,
-    );
+    ) : null;
 
     return {
       approval,

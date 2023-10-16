@@ -72,10 +72,13 @@ export async function getQuotesForRoutes(
         const quoteAmount = decodedQuoteResult[amountIndex];
         if (!(quoteAmount instanceof BigNumber)) throw new Error('Expected BigNumber');
 
+        const tokenIn = new Token(routes[i].chainId, routes[i].input.address, routes[i].input.decimals, routes[i].input.symbol, routes[i].input.name);
+        const tokenOut = new Token(routes[i].chainId, routes[i].output.address, routes[i].output.decimals, routes[i].output.symbol, routes[i].output.name);
+
         decodedQuoteResults.push({
           route: routes[i],
-          amountIn: tradeType === Uniswap.TradeType.EXACT_INPUT ? amountSpecified : new CurrencyAmount(routes[i].input, quoteAmount),
-          amountOut: tradeType === Uniswap.TradeType.EXACT_INPUT ? new CurrencyAmount(routes[i].output, quoteAmount) : amountSpecified,
+          amountIn: tradeType === Uniswap.TradeType.EXACT_INPUT ? amountSpecified : new CurrencyAmount(tokenIn, quoteAmount),
+          amountOut: tradeType === Uniswap.TradeType.EXACT_INPUT ? new CurrencyAmount(tokenOut, quoteAmount) : amountSpecified,
           gasEstimate: ethers.BigNumber.from(decodedQuoteResult[gasEstimateIndex]),
           tradeType,
         });

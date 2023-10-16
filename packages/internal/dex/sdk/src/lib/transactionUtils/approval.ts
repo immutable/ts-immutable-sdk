@@ -1,3 +1,4 @@
+/* eslint-disable no-lonely-if */
 import { JsonRpcProvider, TransactionRequest } from '@ethersproject/providers';
 import { BigNumber } from '@ethersproject/bignumber';
 import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
@@ -6,7 +7,10 @@ import { ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
 import { RoutingContracts } from 'lib/router';
 import {
-  Currency, CurrencyAmount, NativeCurrency, Token,
+  Currency,
+  CurrencyAmount,
+  NativeCurrency,
+  Token,
 } from 'types/amount';
 import { SecondaryFee, TransactionDetails } from '../../types';
 import { calculateGasFee } from './gas';
@@ -33,7 +37,10 @@ const getERC20AmountToApprove = async (
   spenderAddress: string,
 ): Promise<CurrencyAmount<Token>> => {
   // create an instance of the ERC20 token contract
-  const erc20Contract = ERC20__factory.connect(tokenAmount.currency.address, provider);
+  const erc20Contract = ERC20__factory.connect(
+    tokenAmount.currency.address,
+    provider,
+  );
 
   // get the allowance for the token spender
   // minimum is 0 - no allowance
@@ -48,7 +55,11 @@ const getERC20AmountToApprove = async (
   // get the amount that needs to be approved
   const requiredAmount = tokenAmount.value.sub(allowance);
   if (requiredAmount.isNegative() || requiredAmount.isZero()) {
-    throw new AlreadyApprovedError(tokenAmount.toString(), tokenAmount.currency.address, spenderAddress);
+    throw new AlreadyApprovedError(
+      tokenAmount.toString(),
+      tokenAmount.currency.address,
+      spenderAddress,
+    );
   }
 
   return new CurrencyAmount(tokenAmount.currency, requiredAmount);
@@ -72,7 +83,10 @@ const getUnsignedERC20ApproveTransaction = (
   }
 
   const erc20Contract = ERC20__factory.createInterface();
-  const callData = erc20Contract.encodeFunctionData('approve', [spenderAddress, tokenAmount.value]);
+  const callData = erc20Contract.encodeFunctionData('approve', [
+    spenderAddress,
+    tokenAmount.value,
+  ]);
 
   return {
     data: callData,
@@ -82,20 +96,44 @@ const getUnsignedERC20ApproveTransaction = (
   };
 };
 
+const getAmountInToApprove = (
+  tradeType: TradeType,
+  amountSpecified: CurrencyAmount<Currency>,
+  amountWithSlippage: CurrencyAmount<Currency>,
+) => {
+  if (tradeType === TradeType.EXACT_INPUT && amountSpecified.isTokenAmount()) {
+    return amountSpecified;
+  }
+  if (
+    tradeType === TradeType.EXACT_OUTPUT
+    && amountWithSlippage.isTokenAmount()
+  ) {
+    return amountWithSlippage;
+  }
+  return null;
+};
+
 export const prepareApproval = (
   tradeType: TradeType,
   amountSpecified: CurrencyAmount<Currency>,
-  amountWithSlippage: CurrencyAmount<Token>,
+  amountWithSlippage: CurrencyAmount<Currency>,
   routingContracts: RoutingContracts,
   secondaryFees: SecondaryFee[],
-): PreparedApproval => {
-  const amountOfTokenIn = tradeType === TradeType.EXACT_INPUT ? amountSpecified : amountWithSlippage;
+): PreparedApproval | null => {
+  const amountInToApprove = getAmountInToApprove(
+    tradeType,
+    amountSpecified,
+    amountWithSlippage,
+  );
+  if (amountInToApprove == null) {
+    return null;
+  }
 
   const spender = secondaryFees.length === 0
     ? routingContracts.peripheryRouterAddress
     : routingContracts.secondaryFeeAddress;
 
-  return { spender, amount: amountOfTokenIn };
+  return { spender, amount: amountInToApprove };
 };
 
 /**
@@ -145,9 +183,13 @@ export async function getApproveGasEstimate(
   tokenAddress: string,
 ): Promise<ethers.BigNumber> {
   const erc20Contract = ERC20__factory.connect(tokenAddress, provider);
-  return await erc20Contract.estimateGas.approve(spenderAddress, ethers.constants.MaxUint256, {
-    from: ownerAddress,
-  });
+  return await erc20Contract.estimateGas.approve(
+    spenderAddress,
+    ethers.constants.MaxUint256,
+    {
+      from: ownerAddress,
+    },
+  );
 }
 
 export const getApproval = async (
@@ -174,7 +216,9 @@ export const getApproval = async (
     preparedApproval.amount.currency.address,
   );
 
-  const gasFeeEstimate = gasPrice ? calculateGasFee(gasPrice, gasEstimate) : null;
+  const gasFeeEstimate = gasPrice
+    ? calculateGasFee(gasPrice, gasEstimate)
+    : null;
 
   return {
     transaction: approveTransaction,

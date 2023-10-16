@@ -75,14 +75,6 @@ export const tokenInfoToUniswapToken = (tokenInfo: Token): Uniswap.Token => new 
   tokenInfo.name,
 );
 
-export const uniswapTokenToTokenInfo = (token: Uniswap.Token): Token => ({
-  chainId: token.chainId,
-  address: token.address,
-  decimals: token.decimals,
-  symbol: token.symbol,
-  name: token.name,
-});
-
 export const toAmount = (amount: Uniswap.CurrencyAmount<Uniswap.Token>): CurrencyAmount<Token> => {
   const token = new Token(
     amount.currency.chainId,

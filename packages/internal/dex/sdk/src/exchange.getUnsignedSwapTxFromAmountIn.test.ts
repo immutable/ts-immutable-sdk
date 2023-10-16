@@ -6,6 +6,7 @@ import {
 } from 'errors';
 import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
 import { constants, utils } from 'ethers';
+import { Token } from 'types/amount';
 import { Exchange } from './exchange';
 import {
   mockRouterImplementation,
@@ -13,7 +14,6 @@ import {
   TEST_PERIPHERY_ROUTER_ADDRESS,
   TEST_DEX_CONFIGURATION,
   TEST_GAS_PRICE,
-  IMX_TEST_TOKEN,
   TEST_TRANSACTION_GAS_USAGE,
   TEST_FEE_RECIPIENT,
   TEST_MAX_FEE_BASIS_POINTS,
@@ -29,6 +29,7 @@ import {
   expectInstanceOf,
   newAmountFromString,
   formatTokenAmount,
+  NATIVE_IMX_TEST_TOKEN,
 } from './test/utils';
 import {
   Router, SecondaryFee,
@@ -117,11 +118,10 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       expectToBeDefined(tx.approval?.gasFeeEstimate);
       expect(tx.approval.gasFeeEstimate.value).toEqual(TEST_GAS_PRICE.mul(APPROVE_GAS_ESTIMATE));
-      expect(tx.approval.gasFeeEstimate.currency.chainId).toEqual(IMX_TEST_TOKEN.chainId);
-      expect(tx.approval.gasFeeEstimate.currency.address).toEqual(IMX_TEST_TOKEN.address);
-      expect(tx.approval.gasFeeEstimate.currency.decimals).toEqual(IMX_TEST_TOKEN.decimals);
-      expect(tx.approval.gasFeeEstimate.currency.symbol).toEqual(IMX_TEST_TOKEN.symbol);
-      expect(tx.approval.gasFeeEstimate.currency.name).toEqual(IMX_TEST_TOKEN.name);
+      expect(tx.approval.gasFeeEstimate.currency.chainId).toEqual(NATIVE_IMX_TEST_TOKEN.chainId);
+      expect(tx.approval.gasFeeEstimate.currency.decimals).toEqual(NATIVE_IMX_TEST_TOKEN.decimals);
+      expect(tx.approval.gasFeeEstimate.currency.symbol).toEqual(NATIVE_IMX_TEST_TOKEN.symbol);
+      expect(tx.approval.gasFeeEstimate.currency.name).toEqual(NATIVE_IMX_TEST_TOKEN.name);
     });
   });
 
@@ -427,11 +427,10 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expectToBeDefined(tx.swap.gasFeeEstimate);
 
       expect(tx.swap.gasFeeEstimate.value).toEqual(TEST_TRANSACTION_GAS_USAGE.mul(TEST_GAS_PRICE));
-      expect(tx.swap.gasFeeEstimate.currency.chainId).toEqual(IMX_TEST_TOKEN.chainId);
-      expect(tx.swap.gasFeeEstimate.currency.address).toEqual(IMX_TEST_TOKEN.address);
-      expect(tx.swap.gasFeeEstimate.currency.decimals).toEqual(IMX_TEST_TOKEN.decimals);
-      expect(tx.swap.gasFeeEstimate.currency.symbol).toEqual(IMX_TEST_TOKEN.symbol);
-      expect(tx.swap.gasFeeEstimate.currency.name).toEqual(IMX_TEST_TOKEN.name);
+      expect(tx.swap.gasFeeEstimate.currency.chainId).toEqual(NATIVE_IMX_TEST_TOKEN.chainId);
+      expect(tx.swap.gasFeeEstimate.currency.decimals).toEqual(NATIVE_IMX_TEST_TOKEN.decimals);
+      expect(tx.swap.gasFeeEstimate.currency.symbol).toEqual(NATIVE_IMX_TEST_TOKEN.symbol);
+      expect(tx.swap.gasFeeEstimate.currency.name).toEqual(NATIVE_IMX_TEST_TOKEN.name);
     });
 
     it('returns valid quote', async () => {
@@ -448,10 +447,13 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         newAmountFromString('100', USDC_TEST_TOKEN).value,
       );
 
-      expect(quote).not.toBe(undefined);
+      expectToBeDefined(quote);
+      expectInstanceOf(Token, quote.amount.currency);
       expect(quote.amount.currency.address).toEqual(params.outputToken);
       expect(quote.slippage).toBe(0.1);
       expect(formatAmount(quote.amount)).toEqual('1000.0');
+
+      expectInstanceOf(Token, quote.amountWithMaxSlippage.currency);
       expect(quote.amountWithMaxSlippage.currency.address).toEqual(params.outputToken);
       expect(formatAmount(quote.amountWithMaxSlippage)).toEqual('999.000999000999000999'); // includes slippage
     });
@@ -505,9 +507,12 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         HIGHER_SLIPPAGE,
       );
 
+      expectInstanceOf(Token, quote.amount.currency);
       expect(quote.amount.currency.address).toEqual(params.outputToken);
       expect(quote.slippage).toBe(0.2);
       expect(formatAmount(quote.amount)).toEqual('1000.0');
+
+      expectInstanceOf(Token, quote.amountWithMaxSlippage.currency);
       expect(quote.amountWithMaxSlippage.currency.address).toEqual(params.outputToken);
       expect(formatAmount(quote.amountWithMaxSlippage)).toEqual('998.003992015968063872'); // includes 0.2% slippage
     });
