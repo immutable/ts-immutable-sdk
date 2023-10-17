@@ -19,7 +19,6 @@ import { LoadingView } from '../../views/loading/LoadingView';
 import { ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
 import { StatusType } from '../../components/Status/StatusType';
 import { StatusView, StatusViewProps } from '../../components/Status/StatusView';
-import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { SaleWidgetViews } from '../../context/view-context/SaleViewContextTypes';
 import { Item, SaleErrorTypes, PaymentTypes } from './types';
 import { widgetTheme } from '../../lib/theme';
@@ -28,7 +27,7 @@ import { FundWithSmartCheckout } from './views/FundWithSmartCheckout';
 import { PayWithCard } from './views/PayWithCard';
 import { PayWithCoins } from './views/PayWithCoins';
 import { PaymentMethods } from './views/PaymentMethods';
-import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
+import { useSaleEvent } from './hooks/useSaleEvents';
 
 interface ErrorHandlerConfig {
   onActionClick?: () => void;
@@ -68,6 +67,7 @@ export function SaleWidget(props: SaleWidgetProps) {
 
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
+  const { sendCloseEvent } = useSaleEvent();
 
   const { theme } = config;
   const biomeTheme = useMemo(() => widgetTheme(theme), [theme]);
@@ -78,7 +78,6 @@ export function SaleWidget(props: SaleWidgetProps) {
   const loadingText = viewState.view.data?.loadingText
     || text.views[SharedViews.LOADING_VIEW].text;
 
-  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
   const onMount = useCallback(() => {
     if (!checkout || !provider) return;
 
@@ -110,10 +109,6 @@ export function SaleWidget(props: SaleWidgetProps) {
     });
   };
 
-  const closeWidget = () => {
-    sendSaleWidgetCloseEvent(eventTarget);
-  };
-
   const errorHandlersConfig: Record<SaleErrorTypes, ErrorHandlerConfig> = {
     [SaleErrorTypes.TRANSACTION_FAILED]: {
       onActionClick: goBackToPaymentMethods,
@@ -127,7 +122,7 @@ export function SaleWidget(props: SaleWidgetProps) {
       },
     },
     [SaleErrorTypes.SERVICE_BREAKDOWN]: {
-      onSecondaryActionClick: closeWidget,
+      onSecondaryActionClick: () => sendCloseEvent(SaleErrorTypes.SERVICE_BREAKDOWN),
       statusType: StatusType.INFORMATION,
       statusIconStyles: {
         fill: biomeTheme.color.status.fatal.dim,
@@ -137,12 +132,12 @@ export function SaleWidget(props: SaleWidgetProps) {
       onActionClick: () => {
         /* TODO: start over the transak flow */
       },
-      onSecondaryActionClick: closeWidget,
+      onSecondaryActionClick: () => sendCloseEvent(SaleErrorTypes.TRANSAK_FAILED),
       statusType: StatusType.INFORMATION,
     },
     [SaleErrorTypes.WALLET_FAILED]: {
       onActionClick: goBackToPaymentMethods,
-      onSecondaryActionClick: closeWidget,
+      onSecondaryActionClick: () => sendCloseEvent(SaleErrorTypes.WALLET_FAILED),
       statusType: StatusType.INFORMATION,
       statusIconStyles: {
         fill: biomeTheme.color.status.fatal.dim,
@@ -150,19 +145,19 @@ export function SaleWidget(props: SaleWidgetProps) {
     },
     [SaleErrorTypes.WALLET_REJECTED_NO_FUNDS]: {
       onActionClick: goBackToPaymentMethods,
-      onSecondaryActionClick: closeWidget,
+      onSecondaryActionClick: () => sendCloseEvent(SaleErrorTypes.WALLET_REJECTED_NO_FUNDS),
       statusType: StatusType.INFORMATION,
     },
     [SaleErrorTypes.WALLET_REJECTED]: {
       onActionClick: () => {
         goBackToPaymentMethods(PaymentTypes.CRYPTO);
       },
-      onSecondaryActionClick: closeWidget,
+      onSecondaryActionClick: () => sendCloseEvent(SaleErrorTypes.WALLET_REJECTED),
       statusType: StatusType.INFORMATION,
     },
     [SaleErrorTypes.DEFAULT]: {
       onActionClick: goBackToPaymentMethods,
-      onSecondaryActionClick: closeWidget,
+      onSecondaryActionClick: () => sendCloseEvent(SaleErrorTypes.DEFAULT),
       statusType: StatusType.INFORMATION,
     },
   };
@@ -179,7 +174,7 @@ export function SaleWidget(props: SaleWidgetProps) {
       onActionClick: handlers?.onActionClick,
       secondaryActionText: errorTextConfig[errorType].secondaryAction,
       onSecondaryActionClick: handlers?.onSecondaryActionClick,
-      onCloseClick: closeWidget,
+      onCloseClick: () => sendCloseEvent(errorType),
       statusType: handlers.statusType,
       statusIconStyles: {
         transform: 'rotate(180deg)',
@@ -228,7 +223,7 @@ export function SaleWidget(props: SaleWidgetProps) {
                 actionText={
                   text.views[SaleWidgetViews.SALE_SUCCESS].actionText
                 }
-                onActionClick={() => closeWidget()}
+                onActionClick={() => sendCloseEvent(SaleWidgetViews.SALE_SUCCESS)}
                 statusType={StatusType.SUCCESS}
                 testId="success-view"
               />

@@ -12,18 +12,17 @@ import {
   ViewActions,
 } from '../../../context/view-context/ViewContext';
 
-import { sendSaleWidgetCloseEvent } from '../SaleWidgetEvents';
-import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { PaymentOptions } from '../components/PaymentOptions';
 
 import { useSaleContext } from '../context/SaleContextProvider';
 import { PaymentTypes } from '../types';
+import { useSaleEvent } from '../hooks/useSaleEvents';
 
 export function PaymentMethods() {
   const text = { methods: textConfig.views[SaleWidgetViews.PAYMENT_METHODS] };
   const { viewDispatch } = useContext(ViewContext);
-  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
   const { paymentMethod, setPaymentMethod, sign } = useSaleContext();
+  const { sendCloseEvent } = useSaleEvent();
 
   const handleOptionClick = (type: PaymentTypes) => setPaymentMethod(type);
 
@@ -63,13 +62,12 @@ export function PaymentMethods() {
       testId="payment-methods"
       header={(
         <HeaderNavigation
-          onCloseButtonClick={() => sendSaleWidgetCloseEvent(eventTarget)}
+          onCloseButtonClick={() => sendCloseEvent(SaleWidgetViews.PAYMENT_METHODS)}
         />
       )}
       footer={<FooterLogo />}
     >
       <Box
-        id="payment-methods-content"
         sx={{
           display: 'flex',
           flexDirection: 'column',
