@@ -48,7 +48,8 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
 
   const { page, track } = useAnalytics();
 
-  // TODO: review how to capture this event specifically for Approve Spending and then Approve Transaction
+  // TODO WT-1795: review how to capture this event specifically for Approve Spending and then Approve Transaction
+  // https://immutable.atlassian.net/browse/WT-1795
   useEffect(() => {
     page({
       userJourney: UserJourney.SWAP,

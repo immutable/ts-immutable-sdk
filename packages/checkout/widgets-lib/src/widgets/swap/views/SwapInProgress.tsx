@@ -23,7 +23,6 @@ export function SwapInProgress({ transactionResponse, swapForm }: SwapInProgress
 
   const { page } = useAnalytics();
 
-  // TODO: review how to capture this event specifically for Approve Spending and then Approve Transaction
   useEffect(() => {
     page({
       userJourney: UserJourney.SWAP,

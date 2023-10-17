@@ -72,7 +72,6 @@ export function NetworkMenu({ setBalancesLoading }: NetworkMenuProps) {
   const switchNetwork = useCallback(
     async (chainId: ChainId) => {
       if (!checkout || !provider || !network || network.chainId === chainId) return;
-      // TODO: check that extra properties come through as expected in Segment
       track({
         userJourney: UserJourney.WALLET,
         screen: 'WalletBalances',
