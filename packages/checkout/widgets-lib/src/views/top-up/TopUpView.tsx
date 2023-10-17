@@ -29,6 +29,7 @@ import { isPassportProvider } from '../../lib/providerUtils';
 import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextTypes';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { TopUpMenuItem } from './TopUpMenuItem';
+import { LoadingView } from '../loading/LoadingView';
 
 interface TopUpViewProps {
   widgetEvent: IMTBLWidgetEvents,
@@ -61,6 +62,7 @@ export function TopUpView({
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { conversions, fiatSymbol } = cryptoFiatState;
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+  const loadingText = text.views[SharedViews.LOADING_VIEW].text;
 
   const [onRampFeesPercentage, setOnRampFeesPercentage] = useState('-.--');
   const [swapFeesInFiat, setSwapFeesInFiat] = useState('-.--');
@@ -69,22 +71,25 @@ export function TopUpView({
   const [loadingSwapFees, setLoadingSwapFees] = useState(false);
   const [loadingBridgeFees, setLoadingBridgeFees] = useState(false);
   const [isSwapAvailable, setIsSwapAvailable] = useState(true);
+  const [loadingSwapAvailability, setLoadingSwapAvailability] = useState(false);
 
   const isPassport = isPassportProvider(provider);
 
   useEffect(() => {
     (async () => {
       if (!checkout) return;
+      setLoadingSwapAvailability(true);
       setIsSwapAvailable(await checkout.isSwapAvailable());
-    })();
+      setLoadingSwapAvailability(false);
 
-    if (!cryptoFiatDispatch) return;
-    cryptoFiatDispatch({
-      payload: {
-        type: CryptoFiatActions.SET_TOKEN_SYMBOLS,
-        tokenSymbols: DEFAULT_TOKEN_SYMBOLS,
-      },
-    });
+      if (!cryptoFiatDispatch) return;
+      cryptoFiatDispatch({
+        payload: {
+          type: CryptoFiatActions.SET_TOKEN_SYMBOLS,
+          tokenSymbols: DEFAULT_TOKEN_SYMBOLS,
+        },
+      });
+    })();
   }, [checkout, cryptoFiatDispatch]);
 
   const refreshFees = async (silent: boolean = false) => {
@@ -257,38 +262,45 @@ export function TopUpView({
   ];
 
   return (
-    <SimpleLayout
-      header={(
-        <HeaderNavigation
-          onBackButtonClick={onBackButtonClick}
-          onCloseButtonClick={onCloseButtonClick}
-          showBack
-        />
+    <>
+      {loadingSwapAvailability && (
+        <LoadingView loadingText={loadingText} showFooterLogo />
       )}
-      footer={(
-        <FooterLogo />
-      )}
-    >
-      <Box sx={{ paddingX: 'base.spacing.x4', paddingY: 'base.spacing.x4' }}>
-        <Heading size="small">{header.title}</Heading>
-        <Box sx={{ paddingY: 'base.spacing.x4' }}>
-          {topUpFeatures
-            .sort((a, b) => Number(b.isAvailable) - Number(a.isAvailable))
-            .map((element) => element.isEnabled && (
-            <TopUpMenuItem
-              testId={element.testId}
-              icon={element.icon as 'Wallet' | 'Coins' | 'Minting'}
-              heading={element.textConfig.heading}
-              caption={element.textConfig.caption}
-              subcaption={element.textConfig.subcaption}
-              disabledCaption={element.textConfig.disabledCaption}
-              onClick={element.onClickEvent}
-              renderFeeFunction={element.fee}
-              isDisabled={!element.isAvailable}
+      {!loadingSwapAvailability && (
+        <SimpleLayout
+          header={(
+            <HeaderNavigation
+              onBackButtonClick={onBackButtonClick}
+              onCloseButtonClick={onCloseButtonClick}
+              showBack
             />
-            ))}
-        </Box>
-      </Box>
-    </SimpleLayout>
+        )}
+          footer={(
+            <FooterLogo />
+        )}
+        >
+          <Box sx={{ paddingX: 'base.spacing.x4', paddingY: 'base.spacing.x4' }}>
+            <Heading size="small">{header.title}</Heading>
+            <Box sx={{ paddingY: 'base.spacing.x4' }}>
+              {topUpFeatures
+                .sort((a, b) => Number(b.isAvailable) - Number(a.isAvailable))
+                .map((element) => element.isEnabled && (
+                <TopUpMenuItem
+                  testId={element.testId}
+                  icon={element.icon as 'Wallet' | 'Coins' | 'Minting'}
+                  heading={element.textConfig.heading}
+                  caption={element.textConfig.caption}
+                  subcaption={element.textConfig.subcaption}
+                  disabledCaption={element.textConfig.disabledCaption}
+                  onClick={element.onClickEvent}
+                  renderFeeFunction={element.fee}
+                  isDisabled={!element.isAvailable}
+                />
+                ))}
+            </Box>
+          </Box>
+        </SimpleLayout>
+      )}
+    </>
   );
 }
