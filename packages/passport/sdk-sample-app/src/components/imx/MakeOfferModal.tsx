@@ -9,6 +9,7 @@ import WorkflowButton from '@/components/WorkflowButton';
 import { usePassportProvider } from '@/context/PassportProvider';
 import { UnsignedOrderRequest } from '@imtbl/core-sdk';
 import { useStatusProvider } from '@/context/StatusProvider';
+import { MARKETPLACE_FEE_PERCENTAGE, MARKETPLACE_FEE_RECIPIENT } from '@/config';
 
 function MakeOfferModal({
   showModal, setShowModal, onClose, order,
@@ -44,8 +45,8 @@ function MakeOfferModal({
         },
         expiration_timestamp: expirationTimestamp,
         fees: [{
-          address: '0x8e70719571e87a328696ad099a7d9f6adc120892',
-          fee_percentage: 1,
+          address: MARKETPLACE_FEE_RECIPIENT,
+          fee_percentage: MARKETPLACE_FEE_PERCENTAGE,
         }],
       };
 
