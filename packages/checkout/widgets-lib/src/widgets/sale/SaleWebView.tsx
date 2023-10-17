@@ -5,8 +5,8 @@ import { config, passport } from '@imtbl/sdk';
 import {
   IMTBLWidgetEvents,
   SaleEventType,
-} from '@imtbl/checkout-widgets';
-import { WidgetTheme } from '../../lib';
+  WidgetTheme,
+} from '@imtbl/checkout-sdk';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
 import { Item } from './types';
 

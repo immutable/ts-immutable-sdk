@@ -11,7 +11,7 @@ import {
   ImtblInnerWidgetExampleProps,
   ImtblOuterWidgetExampleProps,
   ImtblSaleProps,
-} from '@imtbl/checkout-widgets';
+} from '@imtbl/checkout-sdk';
 
 declare global {
   interface Window {

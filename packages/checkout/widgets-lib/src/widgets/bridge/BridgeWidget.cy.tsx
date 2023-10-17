@@ -5,7 +5,7 @@ import {
 import { mount } from 'cypress/react18';
 import {
   ChainId,
-  Checkout, CheckoutErrorType, GasEstimateType, TokenAmountEstimate,
+  Checkout, CheckoutErrorType, GasEstimateType, TokenAmountEstimate, WidgetTheme,
 } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
@@ -18,7 +18,7 @@ import {
   BridgeWidgetParams,
 } from './BridgeWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { IMX_ADDRESS_ZKEVM, WidgetTheme } from '../../lib';
+import { IMX_ADDRESS_ZKEVM } from '../../lib';
 import { text } from '../../resources/text/textConfig';
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
 import { ConnectionStatus } from '../../context/connect-loader-context/ConnectLoaderContext';

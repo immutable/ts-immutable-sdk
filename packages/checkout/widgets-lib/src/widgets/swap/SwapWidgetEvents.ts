@@ -5,7 +5,7 @@ import {
   IMTBLWidgetEvents,
   SwapFailed,
   SwapRejected,
-} from '@imtbl/checkout-widgets';
+} from '@imtbl/checkout-sdk';
 
 export function sendSwapWidgetCloseEvent(eventTarget: Window | EventTarget) {
   const closeWidgetEvent = new CustomEvent<WidgetEvent<any>>(

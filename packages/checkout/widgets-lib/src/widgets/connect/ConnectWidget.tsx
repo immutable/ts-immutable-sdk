@@ -1,12 +1,9 @@
 /* eslint-disable react/jsx-no-constructed-context-values */
-
-import { Web3Provider } from '@ethersproject/providers';
 import { BiomeCombinedProviders } from '@biom3/react';
-import { Checkout } from '@imtbl/checkout-sdk';
+import { Checkout, ConnectTargetLayer, ConnectWidgetProps } from '@imtbl/checkout-sdk';
 import {
   useContext, useMemo, useEffect, useReducer, useCallback,
 } from 'react';
-import { Passport } from '@imtbl/passport';
 import {
   sendCloseWidgetEvent,
   sendConnectFailedEvent,
@@ -34,7 +31,7 @@ import {
 import { StatusType } from '../../components/Status/StatusType';
 import { StatusView } from '../../components/Status/StatusView';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { ConnectTargetLayer, getTargetLayerChainId } from '../../lib';
+import { getTargetLayerChainId } from '../../lib';
 import { SwitchNetworkEth } from './views/SwitchNetworkEth';
 import { ErrorView } from '../../views/error/ErrorView';
 import { text } from '../../resources/text/textConfig';
@@ -43,22 +40,17 @@ import { widgetTheme } from '../../lib/theme';
 import { UserJourney, useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { identifyUser } from '../../lib/analytics/identifyUser';
 
-export interface ConnectWidgetProps {
-  params?: ConnectWidgetParams;
+export type ConnectWidgetInputs = ConnectWidgetProps & {
   config: StrongCheckoutWidgetsConfig
   deepLink?: ConnectWidgetViews;
   sendCloseEventOverride?: () => void;
-}
+};
 
-export interface ConnectWidgetParams {
-  targetLayer?: ConnectTargetLayer
-  web3Provider?: Web3Provider;
-  passport?: Passport;
-}
+export function ConnectWidget(props: ConnectWidgetInputs) {
+  const {
+    config, sendCloseEventOverride, targetLayer, web3Provider, passport,
+  } = props;
 
-export function ConnectWidget(props: ConnectWidgetProps) {
-  const { config, sendCloseEventOverride, params } = props;
-  const { targetLayer, web3Provider, passport } = params ?? {}; // nullish operator handles if params is undefined
   const { deepLink = ConnectWidgetViews.CONNECT_WALLET } = props;
   const { environment, theme } = config;
 

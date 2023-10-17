@@ -4,7 +4,7 @@ import {
   SaleEventType,
   SaleSuccess,
   SaleFailed,
-} from '@imtbl/checkout-widgets';
+} from '@imtbl/checkout-sdk';
 import { ExecuteOrderResponse } from './types';
 
 export const sendSaleWidgetCloseEvent = (

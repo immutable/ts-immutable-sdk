@@ -1,7 +1,7 @@
 import {
   IMTBLWidgetEvents, OnRampEventType, OnRampSuccess, WalletEventType, WidgetEvent,
-} from '@imtbl/checkout-widgets';
-import { OnRampFailed } from '@imtbl/checkout-widgets/src';
+  OnRampFailed,
+} from '@imtbl/checkout-sdk';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function sendOnRampWidgetCloseEvent(eventTarget: Window | EventTarget) {

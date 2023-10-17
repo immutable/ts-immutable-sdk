@@ -1,5 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { WalletProviderName } from '@imtbl/checkout-sdk';
+import { WalletProviderName } from '../../../types';
 
 /**
  * Enum representing possible Connect Widget event types.

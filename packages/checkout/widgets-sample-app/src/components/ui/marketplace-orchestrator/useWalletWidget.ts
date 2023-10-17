@@ -4,7 +4,7 @@ import {
   OrchestrationEventType,
   WalletEventType,
   WalletNetworkSwitchEvent,
-} from '@imtbl/checkout-widgets';
+} from '@imtbl/checkout-sdk';
 import { useContext, useEffect, useState } from 'react';
 import { WidgetContext, hideAllWidgets } from './WidgetProvider';
 import { handleOrchestrationEvent } from './orchestration';

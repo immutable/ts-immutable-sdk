@@ -2,8 +2,7 @@ import { Heading, MenuItem } from '@biom3/react';
 import {
   useContext, useEffect, useMemo, useState,
 } from 'react';
-import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
-import { TokenFilterTypes, TokenInfo } from '@imtbl/checkout-sdk';
+import { IMTBLWidgetEvents, TokenFilterTypes, TokenInfo } from '@imtbl/checkout-sdk';
 import { ShowMenuItem } from './BalanceItemStyles';
 import { BalanceInfo } from '../../functions/tokenBalances';
 import { WalletContext } from '../../context/WalletContext';

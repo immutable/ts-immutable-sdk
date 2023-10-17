@@ -4,10 +4,10 @@ import {
   ConnectionSuccess,
   ConnectionFailed,
   ConnectEventType,
-} from '@imtbl/checkout-widgets';
+  WalletProviderName,
+} from '@imtbl/checkout-sdk';
 
 import { Web3Provider } from '@ethersproject/providers';
-import { WalletProviderName } from '@imtbl/checkout-sdk';
 
 export function sendConnectSuccessEvent(
   eventTarget: Window | EventTarget,

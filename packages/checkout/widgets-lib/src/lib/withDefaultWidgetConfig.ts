@@ -1,4 +1,5 @@
 import { Environment } from '@imtbl/config';
+import { WidgetTheme } from '@imtbl/checkout-sdk';
 import {
   DEFAULT_BRIDGE_ENABLED,
   DEFAULT_ENV,
@@ -6,7 +7,6 @@ import {
   DEFAULT_SWAP_ENABLED,
   DEFAULT_THEME,
 } from './constants';
-import { WidgetTheme } from './types';
 
 export type StrongCheckoutWidgetsConfig = {
   theme: WidgetTheme;

@@ -1,11 +1,11 @@
 import React from 'react';
-import { WalletProviderName } from '@imtbl/checkout-sdk';
+import { ConnectTargetLayer, WalletProviderName } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
 import { BiomeCombinedProviders, BiomePortalIdProvider } from '@biom3/react';
 import { onDarkBase } from '@biom3/design-tokens';
 import { BridgeWidget, BridgeWidgetParams } from './BridgeWidget';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
-import { ConnectTargetLayer, getL1ChainId } from '../../lib';
+import { getL1ChainId } from '../../lib';
 import { ConnectLoader, ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
 import { sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
 import { isValidAddress, isValidAmount, isValidWalletProvider } from '../../lib/validations/widgetValidators';

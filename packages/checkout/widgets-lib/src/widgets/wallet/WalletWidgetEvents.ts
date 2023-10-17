@@ -1,11 +1,11 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { NetworkInfo } from '@imtbl/checkout-sdk';
 import {
+  NetworkInfo,
   IMTBLWidgetEvents,
   WidgetEvent,
   WalletEventType,
   WalletNetworkSwitchEvent,
-} from '@imtbl/checkout-widgets';
+} from '@imtbl/checkout-sdk';
 
 export function sendWalletWidgetCloseEvent(eventTarget: Window | EventTarget) {
   const closeWidgetEvent = new CustomEvent<WidgetEvent<any>>(

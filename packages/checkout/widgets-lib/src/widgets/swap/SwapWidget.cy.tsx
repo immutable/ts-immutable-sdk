@@ -3,7 +3,7 @@ import {
 } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import {
-  ChainId, ChainName, Checkout,
+  ChainId, ChainName, Checkout, WidgetTheme,
 } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
@@ -12,7 +12,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { SwapWidget, SwapWidgetParams } from './SwapWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { IMX_ADDRESS_ZKEVM, WidgetTheme } from '../../lib';
+import { IMX_ADDRESS_ZKEVM } from '../../lib';
 import { quotesProcessor } from './functions/FetchQuote';
 import { text } from '../../resources/text/textConfig';
 import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';

@@ -1,6 +1,6 @@
 import { Environment } from '@imtbl/config';
 import { CheckoutConfigurationError, getL1ChainId, getL2ChainId } from './config';
-import { Checkout } from '../Checkout';
+import { Checkout } from '../sdk';
 import {
   ChainId,
   CheckoutModuleConfiguration,

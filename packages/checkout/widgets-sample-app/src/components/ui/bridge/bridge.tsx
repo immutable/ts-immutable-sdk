@@ -1,35 +1,25 @@
-import { WalletProviderName } from '@imtbl/checkout-sdk';
-import {
-  WidgetTheme,
-  BridgeReact,
-  CheckoutWidgets,
-  CheckoutWidgetsConfig,
-  UpdateConfig,
-} from '@imtbl/checkout-widgets';
-import { Environment } from '@imtbl/config';
+import { Checkout } from '@imtbl/checkout-sdk';
+import { Bridge, Connect } from '@imtbl/checkout-widgets'
+import { useEffect, useMemo } from 'react';
 
 function BridgeUI() {
-  CheckoutWidgets({
-    theme: WidgetTheme.DARK,
-    environment: Environment.SANDBOX,
-  });
+  const checkout = useMemo(() => new Checkout(), []);
 
-  const widgetsConfig2: CheckoutWidgetsConfig = {
-    theme: WidgetTheme.DARK,
-    environment: Environment.SANDBOX,
-  };
+  const connect = useMemo(() => new Connect(checkout, {}, {}),[checkout])
+  const bridge = useMemo(() => new Bridge(checkout, {}, {fromContractAddress: '0x2Fa06C6672dDCc066Ab04631192738799231dE4a'}),[checkout])
+  
+  useEffect(() => {
+    connect.mount('connect');
+    bridge.mount("bridge")
+  }, [bridge])
+  
 
-  UpdateConfig(widgetsConfig2);
 
   return (
-    <div className="Swap">
-      <h1 className="sample-heading">Checkout Bridge (Web Component)</h1>
-
-      <BridgeReact
-        walletProvider={WalletProviderName.METAMASK}
-        amount="50"
-        fromContractAddress="0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0"
-      />
+    <div>
+      <h1 className="sample-heading">Checkout Bridge</h1>
+      <div id="connect"></div>
+      <div id="bridge"></div>
     </div>
   );
 }

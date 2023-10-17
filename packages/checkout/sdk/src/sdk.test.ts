@@ -7,7 +7,7 @@ import { BigNumber, ethers } from 'ethers';
 import { Passport, UserProfile } from '@imtbl/passport';
 import { getNetworkAllowList, getNetworkInfo, switchWalletNetwork } from './network';
 
-import { Checkout } from './Checkout';
+import { Checkout } from './sdk';
 import {
   ChainId,
   GetBalanceParams,
@@ -69,6 +69,8 @@ describe('Connect', () => {
 
   beforeEach(() => {
     jest.resetAllMocks();
+
+    jest.spyOn(console, 'warn').mockImplementation(() => {});
 
     const requestMock = jest.fn();
     providerMock = {

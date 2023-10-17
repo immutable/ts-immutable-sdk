@@ -2,6 +2,9 @@ import {
   ChainId,
   ChainName,
   Checkout,
+  WidgetTheme,
+  ConnectTargetLayer,
+  ConnectWidgetProps,
 } from '@imtbl/checkout-sdk';
 import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
@@ -9,9 +12,8 @@ import { Environment } from '@imtbl/config';
 import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
 import { Passport } from '@imtbl/passport';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
-import { ConnectWidget, ConnectWidgetParams } from './ConnectWidget';
+import { ConnectWidget } from './ConnectWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { ConnectTargetLayer, WidgetTheme } from '../../lib';
 import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 
 describe('ConnectWidget tests', () => {
@@ -35,14 +37,11 @@ describe('ConnectWidget tests', () => {
 
   /** mounting the connect widget should be done to start all tests */
   const mountConnectWidget = () => {
-    const params = {} as ConnectWidgetParams;
+    const props = {} as ConnectWidgetProps;
 
     mount(
       <CustomAnalyticsProvider widgetConfig={config}>
-        <ConnectWidget
-          params={params}
-          config={config}
-        />
+        <ConnectWidget config={config} {...props} />
       </CustomAnalyticsProvider>,
     );
   };
@@ -75,12 +74,12 @@ describe('ConnectWidget tests', () => {
     } as any as Passport;
     const passportParams = {
       passport: testPassportInstance,
-    } as ConnectWidgetParams;
+    } as ConnectWidgetProps;
 
     mount(
       <CustomAnalyticsProvider widgetConfig={config}>
         <ConnectWidget
-          params={passportParams}
+          {...passportParams}
           config={config}
         />
       </CustomAnalyticsProvider>,
@@ -429,12 +428,12 @@ describe('ConnectWidget tests', () => {
       const passportParams = {
         passport: testPassportInstance,
         targetLayer: ConnectTargetLayer.LAYER1,
-      } as ConnectWidgetParams;
+      } as ConnectWidgetProps;
 
       mount(
         <CustomAnalyticsProvider widgetConfig={config}>
           <ConnectWidget
-            params={passportParams}
+            {...passportParams}
             config={config}
           />
         </CustomAnalyticsProvider>,
@@ -453,12 +452,12 @@ describe('ConnectWidget tests', () => {
         .as('createProviderStub')
         .rejects({});
 
-      const params = {} as ConnectWidgetParams;
+      const props = {} as ConnectWidgetProps;
 
       mount(
         <CustomAnalyticsProvider widgetConfig={config}>
           <ConnectWidget
-            params={params}
+            {...props}
             config={config}
           />
         </CustomAnalyticsProvider>,

@@ -3,9 +3,9 @@ import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
   useContext, useEffect, useMemo, useReducer, useState,
 } from 'react';
-import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
+import { IMTBLWidgetEvents, WidgetTheme } from '@imtbl/checkout-sdk';
 import { Passport } from '@imtbl/passport';
-import { IMX_ADDRESS_ZKEVM, NATIVE, WidgetTheme } from '../../lib';
+import { IMX_ADDRESS_ZKEVM, NATIVE } from '../../lib';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
   SharedViews,

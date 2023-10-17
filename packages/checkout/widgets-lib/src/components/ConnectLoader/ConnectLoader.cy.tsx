@@ -1,5 +1,5 @@
 import {
-  ChainId, ChainName, Checkout,
+  ChainId, ChainName, Checkout, WidgetTheme,
 } from '@imtbl/checkout-sdk';
 import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
@@ -8,7 +8,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { ConnectLoader, ConnectLoaderParams } from './ConnectLoader';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { ProviderEvent, WidgetTheme } from '../../lib';
+import { ProviderEvent } from '../../lib';
 import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 
 describe('ConnectLoader', () => {

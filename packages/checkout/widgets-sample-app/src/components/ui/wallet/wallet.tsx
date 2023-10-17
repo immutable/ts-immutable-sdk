@@ -1,32 +1,10 @@
 import { useEffect } from 'react';
-import {
-  CheckoutWidgetsConfig,
-  UpdateConfig,
-} from '@imtbl/checkout-widgets';
 
-import {
-  WalletEventType,
-  IMTBLWidgetEvents,
-  WidgetTheme,
-  WalletNetworkSwitchEvent,
-  CheckoutWidgets,
-  WalletReact,
-} from '@imtbl/checkout-widgets';
 import { Environment } from '@imtbl/config';
-import { WalletProviderName } from '@imtbl/checkout-sdk';
+import { IMTBLWidgetEvents, WalletEventType, WalletNetworkSwitchEvent, WalletProviderName } from '@imtbl/checkout-sdk';
 
 function WalletUI() {
-  CheckoutWidgets({
-    theme: WidgetTheme.DARK,
-    environment: Environment.SANDBOX,
-  });
 
-  const widgetsConfig2: CheckoutWidgetsConfig = {
-    theme: WidgetTheme.DARK,
-    environment: Environment.SANDBOX,
-  };
-
-  UpdateConfig(widgetsConfig2);
 
   useEffect(() => {
     const handleWalletWidgetEvents = ((event: CustomEvent) => {
@@ -58,9 +36,9 @@ function WalletUI() {
     };
   }, []);
   return (
-    <div className="Connect">
-      <h1 className="sample-heading">Checkout Wallet (Web Component)</h1>
-      <WalletReact walletProvider={WalletProviderName.METAMASK} />
+    <div>
+      <h1 className="sample-heading">Checkout Wallet</h1>
+      <div id="wallet"></div>
     </div>
   );
 }
