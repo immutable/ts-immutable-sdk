@@ -19,6 +19,8 @@ import {
 import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
 import { ServiceType } from '../../views/error/serviceTypes';
+import { isPassportProvider } from '../../lib/providerUtils';
+import { topUpBridgeOption, topUpOnRampOption } from './helpers';
 
 export class ImmutableSwap extends ImmutableWebComponent {
   walletProvider: WalletProviderName | undefined = undefined;
@@ -95,6 +97,27 @@ export class ImmutableSwap extends ImmutableWebComponent {
     }
   }
 
+  private isNotPassport = !isPassportProvider(this.provider)
+    || this.walletProvider !== WalletProviderName.PASSPORT;
+
+  private topUpOptions(): { text: string; action: () => void }[] | undefined {
+    const optionsArray: { text: string; action: () => void }[] = [];
+
+    const isOnramp = topUpOnRampOption(this.widgetConfig!.isOnRampEnabled);
+    if (isOnramp) {
+      optionsArray.push({ text: isOnramp.text, action: isOnramp.action });
+    }
+    const isBridge = topUpBridgeOption(
+      this.widgetConfig!.isBridgeEnabled,
+      this.isNotPassport,
+    );
+    if (isBridge) {
+      optionsArray.push({ text: isBridge.text, action: isBridge.action });
+    }
+
+    return optionsArray;
+  }
+
   renderWidget() {
     this.validateInputs();
     const connectLoaderParams: ConnectLoaderParams = {
@@ -112,6 +135,8 @@ export class ImmutableSwap extends ImmutableWebComponent {
     };
 
     let isSwapAvailable = false;
+
+    const topUpOptions = this.topUpOptions();
 
     this.checkout
       ?.isSwapAvailable()
@@ -132,6 +157,26 @@ export class ImmutableSwap extends ImmutableWebComponent {
                     <ServiceUnavailableErrorView
                       service={ServiceType.SWAP}
                       onCloseClick={() => sendSwapWidgetCloseEvent(window)}
+                      primaryActionText={
+                        topUpOptions && topUpOptions?.length > 0
+                          ? topUpOptions[0].text
+                          : undefined
+                      }
+                      onPrimaryButtonClick={
+                        topUpOptions && topUpOptions?.length > 0
+                          ? topUpOptions[0].action
+                          : undefined
+                      }
+                      secondaryActionText={
+                        topUpOptions?.length === 2
+                          ? topUpOptions[1].text
+                          : undefined
+                      }
+                      onSecondaryButtonClick={
+                        topUpOptions?.length === 2
+                          ? topUpOptions[1].action
+                          : undefined
+                      }
                     />
                   </BiomeCombinedProviders>
                 )}
