@@ -4,14 +4,13 @@ import { text } from '../../resources/text/textConfig';
 import { SharedViews } from '../../context/view-context/ViewContext';
 import { orchestrationEvents } from '../../lib/orchestrationEvents';
 
-export const alphaSortTokensList = (
-  tokens: TokenInfo[],
-): TokenInfo[] => tokens.sort((a, b) => a.symbol.localeCompare(b.symbol));
+// eslint-disable-next-line max-len
+export const alphaSortTokensList = (tokens: TokenInfo[]): TokenInfo[] => tokens.sort((a, b) => a.symbol.localeCompare(b.symbol));
 
 export const topUpBridgeOption = (
-  isBridgeEnabled:boolean,
-  isNotPassport:boolean,
-): { text:string, action: ()=>void } | undefined => {
+  isBridgeEnabled: boolean,
+  isNotPassport: boolean,
+): { text: string, action: () => void } | undefined => {
   if (isBridgeEnabled && isNotPassport) {
     return {
       text: text.views[SharedViews.TOP_UP_VIEW].topUpOptions.bridge.heading,
@@ -30,7 +29,7 @@ export const topUpBridgeOption = (
   return undefined;
 };
 
-export const topUpOnRampOption = (isOnRampEnabled:boolean): { text:string, action: ()=>void } | undefined => {
+export const topUpOnRampOption = (isOnRampEnabled: boolean): { text: string, action: () => void } | undefined => {
   if (isOnRampEnabled) {
     return {
       text: text.views[SharedViews.TOP_UP_VIEW].topUpOptions.onramp.heading,
