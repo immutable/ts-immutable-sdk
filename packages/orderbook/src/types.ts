@@ -114,9 +114,19 @@ export interface FulfillmentListing {
   takerFees: Array<FeeValue>
 }
 
-export interface FulfillBulkOrdersResponse {
+export type FulfillBulkOrdersResponse
+  = FulfillBulkOrdersInsufficientBalanceResponse | FulfillBulkOrdersSufficientBalanceResponse;
+
+export interface FulfillBulkOrdersSufficientBalanceResponse {
+  sufficientBalance: true;
   actions: Action[];
   expiration: string;
+  fulfillableOrders: Order[];
+  unfulfillableOrders: UnfulfillableOrder[];
+}
+
+export interface FulfillBulkOrdersInsufficientBalanceResponse {
+  sufficientBalance: false;
   fulfillableOrders: Order[];
   unfulfillableOrders: UnfulfillableOrder[];
 }

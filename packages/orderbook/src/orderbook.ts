@@ -250,21 +250,45 @@ export class Orderbook {
       })),
     );
 
-    return {
-      ...(await this.seaport.fulfillBulkOrders(
-        fulfillmentDataRes.result.fulfillable_orders,
-        takerAddress,
-      )),
-      fulfillableOrders: fulfillmentDataRes.result.fulfillable_orders.map(
-        (o) => mapFromOpenApiOrder(o.order),
-      ),
-      unfulfillableOrders: fulfillmentDataRes.result.unfulfillable_orders.map(
-        (o) => ({
-          orderId: o.order_id,
-          reason: o.reason,
-        }),
-      ),
-    };
+    try {
+      return {
+        ...(await this.seaport.fulfillBulkOrders(
+          fulfillmentDataRes.result.fulfillable_orders,
+          takerAddress,
+        )),
+        fulfillableOrders: fulfillmentDataRes.result.fulfillable_orders.map(
+          (o) => mapFromOpenApiOrder(o.order),
+        ),
+        unfulfillableOrders: fulfillmentDataRes.result.unfulfillable_orders.map(
+          (o) => ({
+            orderId: o.order_id,
+            reason: o.reason,
+          }),
+        ),
+        sufficientBalance: true,
+      };
+    } catch (e: any) {
+      // if insufficient balance error, we return FulfillBulkOrdersInsufficientBalanceResponse
+      if (String(e).includes('The fulfiller does not have the balances needed to fulfill.')) {
+        return {
+          fulfillableOrders: fulfillmentDataRes.result.fulfillable_orders.map(
+            (o) => mapFromOpenApiOrder(o.order),
+          ),
+          unfulfillableOrders: fulfillmentDataRes.result.unfulfillable_orders.map(
+            (o) => ({
+              orderId: o.order_id,
+              reason: o.reason,
+            }),
+          ),
+          sufficientBalance: false,
+        };
+      }
+
+      // if some other error is thrown,
+      // there likely is a race condition of the original order validity
+      // we throw the error back out
+      throw e;
+    }
   }
 
   /**
