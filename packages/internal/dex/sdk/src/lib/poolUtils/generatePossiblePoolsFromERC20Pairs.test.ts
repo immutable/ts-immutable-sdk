@@ -24,23 +24,21 @@ describe('generatePoolsFromTokenPairs', () => {
         [
           {
             "erc20Pair": [
-              Token {
+              {
                 "address": "0x72958b06abdF2701AcE6ceb3cE0B8B1CE11E0851",
                 "chainId": 999,
                 "decimals": 18,
-                "isNative": false,
-                "isToken": true,
                 "name": "Immutable X",
                 "symbol": "IMX",
+                "type": "erc20",
               },
-              Token {
+              {
                 "address": "0x93733225CCc07Ba02b1449aA3379418Ddc37F6EC",
                 "chainId": 999,
                 "decimals": 6,
-                "isNative": false,
-                "isToken": true,
                 "name": "USD Coin",
                 "symbol": "USDC",
+                "type": "erc20",
               },
             ],
             "fee": 100,
@@ -48,23 +46,21 @@ describe('generatePoolsFromTokenPairs', () => {
           },
           {
             "erc20Pair": [
-              Token {
+              {
                 "address": "0x72958b06abdF2701AcE6ceb3cE0B8B1CE11E0851",
                 "chainId": 999,
                 "decimals": 18,
-                "isNative": false,
-                "isToken": true,
                 "name": "Immutable X",
                 "symbol": "IMX",
+                "type": "erc20",
               },
-              Token {
+              {
                 "address": "0x93733225CCc07Ba02b1449aA3379418Ddc37F6EC",
                 "chainId": 999,
                 "decimals": 6,
-                "isNative": false,
-                "isToken": true,
                 "name": "USD Coin",
                 "symbol": "USDC",
+                "type": "erc20",
               },
             ],
             "fee": 500,
@@ -72,23 +68,21 @@ describe('generatePoolsFromTokenPairs', () => {
           },
           {
             "erc20Pair": [
-              Token {
+              {
                 "address": "0x72958b06abdF2701AcE6ceb3cE0B8B1CE11E0851",
                 "chainId": 999,
                 "decimals": 18,
-                "isNative": false,
-                "isToken": true,
                 "name": "Immutable X",
                 "symbol": "IMX",
+                "type": "erc20",
               },
-              Token {
+              {
                 "address": "0x93733225CCc07Ba02b1449aA3379418Ddc37F6EC",
                 "chainId": 999,
                 "decimals": 6,
-                "isNative": false,
-                "isToken": true,
                 "name": "USD Coin",
                 "symbol": "USDC",
+                "type": "erc20",
               },
             ],
             "fee": 3000,
@@ -96,23 +90,21 @@ describe('generatePoolsFromTokenPairs', () => {
           },
           {
             "erc20Pair": [
-              Token {
+              {
                 "address": "0x72958b06abdF2701AcE6ceb3cE0B8B1CE11E0851",
                 "chainId": 999,
                 "decimals": 18,
-                "isNative": false,
-                "isToken": true,
                 "name": "Immutable X",
                 "symbol": "IMX",
+                "type": "erc20",
               },
-              Token {
+              {
                 "address": "0x93733225CCc07Ba02b1449aA3379418Ddc37F6EC",
                 "chainId": 999,
                 "decimals": 6,
-                "isNative": false,
-                "isToken": true,
                 "name": "USD Coin",
                 "symbol": "USDC",
+                "type": "erc20",
               },
             ],
             "fee": 10000,
