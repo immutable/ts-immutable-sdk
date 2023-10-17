@@ -4,8 +4,7 @@ import { CurrencyAmount, Token } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
 import { ProviderCallError } from 'errors';
 import {
-  Coin,
-  ERC20, Native, Amount,
+  Coin, ERC20, Native, Amount,
 } from '../types';
 
 export const quoteReturnMapping: { [signature: string]: string[] } = {
@@ -27,9 +26,7 @@ export const quoteReturnMapping: { [signature: string]: string[] } = {
 export function poolEquals(poolA: Pool, poolB: Pool): boolean {
   return (
     poolA === poolB
-    || (poolA.token0.equals(poolB.token0)
-      && poolA.token1.equals(poolB.token1)
-      && poolA.fee === poolB.fee)
+    || (poolA.token0.equals(poolB.token0) && poolA.token1.equals(poolB.token1) && poolA.fee === poolB.fee)
   );
 }
 
@@ -50,10 +47,7 @@ export async function getTokenDecimals(
       data: decimalsFunctionSig,
     });
 
-    return parseInt(
-      decimalsResult,
-      16,
-    );
+    return parseInt(decimalsResult, 16);
   } catch (e) {
     const message = e instanceof Error ? e.message : 'Unknown Error';
     throw new ProviderCallError(`failed to get ERC20 decimals: ${message}`);
@@ -76,13 +70,7 @@ export function isValidNonZeroAddress(address: string): boolean {
   }
 }
 
-export const erc20ToUniswapToken = (token: ERC20): Token => new Token(
-  token.chainId,
-  token.address,
-  token.decimals,
-  token.symbol,
-  token.name,
-);
+export const erc20ToUniswapToken = (token: ERC20): Token => new Token(token.chainId, token.address, token.decimals, token.symbol, token.name);
 
 export const uniswapTokenToERC20 = (token: Token): ERC20 => ({
   chainId: token.chainId,
@@ -93,9 +81,7 @@ export const uniswapTokenToERC20 = (token: Token): ERC20 => ({
   type: 'erc20',
 });
 
-export const toBigNumber = (amount: CurrencyAmount<Token>): ethers.BigNumber => (
-  ethers.BigNumber.from(amount.multiply(amount.decimalScale).toExact())
-);
+export const toBigNumber = (amount: CurrencyAmount<Token>): ethers.BigNumber => ethers.BigNumber.from(amount.multiply(amount.decimalScale).toExact());
 
 export const toAmount = (amount: CurrencyAmount<Token>): Amount<ERC20> => ({
   token: uniswapTokenToERC20(amount.currency),
@@ -112,36 +98,53 @@ export const newAmount = <T extends Coin>(amount: ethers.BigNumber, token: T): A
   token,
 });
 
-export const isERC20 = (token: Coin): token is ERC20 => ('address' in token);
+// export const isERC20 = (token: Coin): token is ERC20 => 'address' in token;
 
-export const isERC20Amount = (amount: Amount<Coin>): amount is Amount<ERC20> => ('address' in amount.token);
+export const isERC20Amount = (amount: Amount<Coin>): amount is Amount<ERC20> => amount.token.type === 'erc20';
+export const isNativeAmount = (amount: Amount<Coin>): amount is Amount<Native> => amount.token.type === 'native';
 
-export const isNative = (token: Coin): token is Native => !('address' in token);
-
-export const addAmount = <T extends Coin>(a: Amount<T>, b: Amount<T>) => {
-  if (isERC20(a.token) && isERC20(b.token)) {
-    // Make sure the ERC20s have the same address
-    if (a.token.address !== b.token.address) throw new Error('Token mismatch: token addresses must be the same');
-    return { value: a.value.add(b.value), token: a.token };
-  }
-
-  if (isNative(a.token) && isNative(b.token)) {
-    return { value: a.value.add(b.value), token: a.token };
-  }
-
-  throw new Error('Token mismatch: cannot add native and ERC20 tokens together');
+const addERC20Amount = (a: Amount<ERC20>, b: Amount<ERC20>) => {
+  // Make sure the ERC20s have the same address
+  if (a.token.address !== b.token.address) throw new Error('Token mismatch: token addresses must be the same');
+  return { value: a.value.add(b.value), token: a.token };
 };
 
+const addNativeAmount = (a: Amount<Native>, b: Amount<Native>) => ({
+  value: a.value.add(b.value),
+  token: a.token,
+});
+
+export const addAmount = <T extends Coin>(a: Amount<T>, b: Amount<T>) => {
+  if (isERC20Amount(a) && isERC20Amount(b)) {
+    return addERC20Amount(a, b);
+  }
+
+  if (isNativeAmount(a) && isNativeAmount(b)) {
+    return addNativeAmount(a, b);
+  }
+
+  throw new Error('Token mismatch: token types must be the same');
+};
+
+const subtractERC20Amount = (a: Amount<ERC20>, b: Amount<ERC20>) => {
+  // Make sure the ERC20s have the same address
+  if (a.token.address !== b.token.address) throw new Error('Token mismatch: token addresses must be the same');
+  return { value: a.value.sub(b.value), token: a.token };
+};
+
+const subtractNativeAmount = (a: Amount<Native>, b: Amount<Native>) => ({
+  value: a.value.sub(b.value),
+  token: a.token,
+});
+
 export const subtractAmount = <T extends Coin>(a: Amount<T>, b: Amount<T>) => {
-  if (isERC20(a.token) && isERC20(b.token)) {
-    // Make sure the ERC20s have the same address
-    if (a.token.address !== b.token.address) throw new Error('Token mismatch: token addresses must be the same');
-    return { value: a.value.sub(b.value), token: a.token };
+  if (isERC20Amount(a) && isERC20Amount(b)) {
+    return subtractERC20Amount(a, b);
   }
 
-  if (isNative(a.token) && isNative(b.token)) {
-    return { value: a.value.sub(b.value), token: a.token };
+  if (isNativeAmount(a) && isNativeAmount(b)) {
+    return subtractNativeAmount(a, b);
   }
 
-  throw new Error('Token mismatch: cannot subtract a native from an ERC20');
+  throw new Error('Token mismatch: token types must be the same');
 };

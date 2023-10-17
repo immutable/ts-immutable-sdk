@@ -7,6 +7,7 @@ import { SecondaryFee__factory } from 'contracts/types';
 import { IV3SwapRouter } from 'contracts/types/SecondaryFee';
 import { PromiseOrValue } from 'contracts/types/common';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
+import { TokenWrapper } from 'lib/tokenWrapper';
 import {
   newAmount,
   Router,
@@ -89,6 +90,8 @@ export const FUN_TEST_TOKEN: ERC20 = {
   symbol: 'FUN',
   name: 'Fun Token',
 };
+
+export const tokenWrapper = new TokenWrapper(NATIVE_TEST_TOKEN, WIMX_TEST_TOKEN);
 
 export const TEST_IMMUTABLE_CONFIGURATION: ImmutableConfiguration = new ImmutableConfiguration({
   environment: Environment.SANDBOX,

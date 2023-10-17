@@ -1,14 +1,12 @@
 import { ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
 import {
-  expectERC20, formatAmount, NATIVE_TEST_TOKEN, newAmountFromString, WIMX_TEST_TOKEN,
+  expectERC20, formatAmount, NATIVE_TEST_TOKEN, newAmountFromString, tokenWrapper, WIMX_TEST_TOKEN,
 } from 'test/utils';
 import { Fees } from 'lib/fees';
-import { TokenWrapper } from 'lib/tokenWrapper';
 import { applySlippage, getOurQuoteReqAmount } from './getQuote';
 
 const DEFAULT_SLIPPAGE = 0.1;
-const tokenWrapper = new TokenWrapper(NATIVE_TEST_TOKEN, WIMX_TEST_TOKEN);
 
 describe('applySlippage', () => {
   describe('when trade type is EXACT_INPUT', () => {

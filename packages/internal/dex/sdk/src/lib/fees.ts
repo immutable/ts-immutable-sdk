@@ -2,7 +2,7 @@
 import { BASIS_POINT_PRECISION } from 'constants/router';
 import { BigNumber } from 'ethers';
 import {
-  Amount, Fee, SecondaryFee, addAmount, newAmount, subtractAmount, Coin,
+  Amount, Fee, SecondaryFee, newAmount, Coin, addAmount, subtractAmount,
 } from 'lib';
 import { TokenWrapper } from './tokenWrapper';
 

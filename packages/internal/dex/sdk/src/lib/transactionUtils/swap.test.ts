@@ -15,12 +15,12 @@ import {
   newAmountFromString,
   NATIVE_TEST_TOKEN,
   expectERC20,
+  tokenWrapper,
 } from 'test/utils';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import { Fees } from 'lib/fees';
 import { erc20ToUniswapToken, newAmount, uniswapTokenToERC20 } from 'lib';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
-import { TokenWrapper } from 'lib/tokenWrapper';
 import { getSwap, adjustQuoteWithFees } from './swap';
 
 const wimx = erc20ToUniswapToken(WIMX_TEST_TOKEN);
@@ -28,7 +28,6 @@ const fun = erc20ToUniswapToken(FUN_TEST_TOKEN);
 const testPool = new Pool(wimx, fun, 10000, '79625275426524748796330556128', '10000000000000000', 100);
 const route = new Route([testPool], wimx, fun);
 const gasEstimate = BigNumber.from(0);
-const tokenWrapper = new TokenWrapper(NATIVE_TEST_TOKEN, WIMX_TEST_TOKEN);
 
 const buildExactInputQuote = (): QuoteResult => ({
   gasEstimate,
