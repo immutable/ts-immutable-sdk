@@ -103,54 +103,48 @@ export function TopUpView({
     }
 
     try {
-      const [swapEstimate, bridgeEstimate, onRampFeesEstimate] = await Promise.all([
-        ((): Promise<any> | undefined => {
+      await Promise.all([
+        (async (): Promise<any> => {
           if (showSwapOption && supportedTopUps?.isSwapAvailable) {
-            return checkout.gasEstimate({
+            const swapEstimate = await checkout.gasEstimate({
               gasEstimateType: GasEstimateType.SWAP,
             });
+            const swapFeeInFiat = getSwapFeeEstimation(
+              swapEstimate as GasEstimateSwapResult,
+              conversions,
+            );
+            setSwapFeesInFiat(swapFeeInFiat);
+            setLoadingSwapFees(false);
           }
           return undefined;
         })(),
-        ((): Promise<any> | undefined => {
+        (async (): Promise<any> => {
           if (showBridgeOption) {
-            return checkout.gasEstimate({
+            const bridgeEstimate = await checkout.gasEstimate({
               gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
               isSpendingCapApprovalRequired: true,
             });
+            const bridgeFeeInFiat = getBridgeFeeEstimation(
+              bridgeEstimate as GasEstimateBridgeToL2Result,
+              conversions,
+            );
+            setBridgeFeesInFiat(bridgeFeeInFiat);
+            setLoadingBridgeFees(false);
           }
           return undefined;
         })(),
-        ((): Promise<any> | undefined => {
+        (async (): Promise<any> => {
           if (showOnrampOption) {
-            return checkout.getExchangeFeeEstimate();
+            const onRampFeesEstimate = await checkout.getExchangeFeeEstimate();
+            const onRampFees = getOnRampFeeEstimation(
+              onRampFeesEstimate as OnRampProviderFees,
+            );
+            setOnRampFeesPercentage(onRampFees);
+            setLoadingOnRampFees(false);
           }
           return undefined;
         })(),
       ]);
-
-      if (onRampFeesEstimate) {
-        const onRampFees = getOnRampFeeEstimation(
-          onRampFeesEstimate as OnRampProviderFees,
-        );
-        setOnRampFeesPercentage(onRampFees);
-      }
-
-      if (swapEstimate) {
-        const swapFeeInFiat = getSwapFeeEstimation(
-          swapEstimate as GasEstimateSwapResult,
-          conversions,
-        );
-        setSwapFeesInFiat(swapFeeInFiat);
-      }
-
-      if (bridgeEstimate) {
-        const bridgeFeeInFiat = getBridgeFeeEstimation(
-          bridgeEstimate as GasEstimateBridgeToL2Result,
-          conversions,
-        );
-        setBridgeFeesInFiat(bridgeFeeInFiat);
-      }
     } catch {
       setOnRampFeesPercentage('-.--');
       setSwapFeesInFiat('-.--');
