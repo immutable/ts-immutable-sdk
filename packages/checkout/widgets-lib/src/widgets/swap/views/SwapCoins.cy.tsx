@@ -4,6 +4,7 @@ import {
 import { mount } from 'cypress/react18';
 import { BigNumber } from 'ethers';
 import { ChainId, ChainName } from '@imtbl/checkout-sdk';
+import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { cySmartGet } from '../../../lib/testUtils';
 import { SwapWidgetTestComponent } from '../test-components/SwapWidgetTestComponent';
 import { SwapCoins } from './SwapCoins';
@@ -65,7 +66,7 @@ describe('SwapCoins tests', () => {
         initialStateOverride={initialSwapState}
         cryptoConversionsOverride={cryptoConversions}
       >
-        <SwapCoins />
+        <SwapCoins theme={WidgetTheme.LIGHT} />
       </SwapWidgetTestComponent>,
     );
   });

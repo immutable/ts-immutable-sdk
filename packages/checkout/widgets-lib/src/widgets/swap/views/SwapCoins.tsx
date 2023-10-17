@@ -2,6 +2,7 @@ import { Box } from '@biom3/react';
 import {
   useContext, useEffect, useMemo, useState,
 } from 'react';
+import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { QuickswapFooter } from '../../../components/Footer/QuickswapFooter';
@@ -17,6 +18,7 @@ import { IMX_TOKEN_SYMBOL } from '../../../lib';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 
 export interface SwapCoinsProps {
+  theme: WidgetTheme;
   fromAmount?: string;
   toAmount?: string;
   fromContractAddress?: string;
@@ -24,6 +26,7 @@ export interface SwapCoinsProps {
 }
 
 export function SwapCoins({
+  theme,
   fromAmount,
   toAmount,
   fromContractAddress,
@@ -59,7 +62,7 @@ export function SwapCoins({
           onCloseButtonClick={() => sendSwapWidgetCloseEvent(eventTarget)}
         />
       )}
-      footer={<QuickswapFooter />}
+      footer={<QuickswapFooter theme={theme} />}
       footerBackgroundColor="base.color.translucent.emphasis.200"
     >
       <Box
