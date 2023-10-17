@@ -23,7 +23,6 @@ import {
   ExchangeModuleConfiguration,
   Native,
   SecondaryFee,
-  TokenLiteral,
   TransactionResponse,
 } from './types';
 import { getSwap, adjustQuoteWithFees } from './lib/transactionUtils/swap';
@@ -65,7 +64,7 @@ export class Exchange {
     });
   }
 
-  private toToken(tokenLiteral: TokenLiteral, tokenDecimals: number): Coin {
+  private toToken(tokenLiteral: string, tokenDecimals: number): Coin {
     return tokenLiteral === 'native'
       ? this.nativeToken
       : {
@@ -77,8 +76,8 @@ export class Exchange {
   }
 
   private static validate(
-    tokenInAddress: TokenLiteral,
-    tokenOutAddress: TokenLiteral,
+    tokenInAddress: string,
+    tokenOutAddress: string,
     maxHops: number,
     slippagePercent: number,
     fromAddress: string,
@@ -115,8 +114,8 @@ export class Exchange {
 
   private async getUnsignedSwapTx(
     fromAddress: string,
-    tokenInAddress: TokenLiteral,
-    tokenOutAddress: TokenLiteral,
+    tokenInAddress: string,
+    tokenOutAddress: string,
     amount: ethers.BigNumber,
     slippagePercent: number,
     maxHops: number,
@@ -213,8 +212,8 @@ export class Exchange {
    */
   public async getUnsignedSwapTxFromAmountIn(
     fromAddress: string,
-    tokenInAddress: TokenLiteral,
-    tokenOutAddress: TokenLiteral,
+    tokenInAddress: string,
+    tokenOutAddress: string,
     amountIn: ethers.BigNumberish,
     slippagePercent: number = DEFAULT_SLIPPAGE,
     maxHops: number = DEFAULT_MAX_HOPS,
@@ -247,8 +246,8 @@ export class Exchange {
    */
   public async getUnsignedSwapTxFromAmountOut(
     fromAddress: string,
-    tokenInAddress: TokenLiteral,
-    tokenOutAddress: TokenLiteral,
+    tokenInAddress: string,
+    tokenOutAddress: string,
     amountOut: ethers.BigNumberish,
     slippagePercent: number = DEFAULT_SLIPPAGE,
     maxHops: number = DEFAULT_MAX_HOPS,

@@ -5,7 +5,7 @@ import { ethers } from 'ethers';
 import { ProviderCallError } from 'errors';
 import {
   Coin,
-  ERC20, Native, Amount, TokenLiteral,
+  ERC20, Native, Amount,
 } from '../types';
 
 export const quoteReturnMapping: { [signature: string]: string[] } = {
@@ -34,7 +34,7 @@ export function poolEquals(poolA: Pool, poolB: Pool): boolean {
 }
 
 export async function getTokenDecimals(
-  tokenAddress: TokenLiteral,
+  tokenAddress: string,
   nativeToken: Native,
   provider: ethers.providers.JsonRpcProvider,
 ): Promise<number> {

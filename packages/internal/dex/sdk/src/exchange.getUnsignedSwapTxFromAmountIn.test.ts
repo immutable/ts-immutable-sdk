@@ -30,6 +30,11 @@ import {
   formatTokenAmount,
   NATIVE_TEST_TOKEN,
   expectERC20,
+  expectNative,
+  createPool,
+  WIMX_TEST_TOKEN,
+  makeAddr,
+  FUN_TEST_TOKEN,
 } from './test/utils';
 import { addAmount, Router, SecondaryFee } from './lib';
 
@@ -501,6 +506,89 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expectERC20(quote.amountWithMaxSlippage.token);
       expect(quote.amountWithMaxSlippage.token.address).toEqual(params.outputToken);
       expect(formatAmount(quote.amountWithMaxSlippage)).toEqual('998.003992015968063872'); // includes 0.2% slippage
+    });
+  });
+
+  describe('With an Exact Input, and native Token In', () => {
+    it('uses the wrapped native pool to quote', async () => {
+      mockRouterImplementation({
+        pools: [createPool(WIMX_TEST_TOKEN, FUN_TEST_TOKEN)],
+      });
+
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+
+      const { quote } = await exchange.getUnsignedSwapTxFromAmountIn(
+        makeAddr('sicko'),
+        'native',
+        FUN_TEST_TOKEN.address,
+        utils.parseEther('1'), // 1 native IMX
+      );
+
+      expectERC20(quote.amount.token, FUN_TEST_TOKEN.address);
+      expectERC20(quote.amountWithMaxSlippage.token, FUN_TEST_TOKEN.address);
+      expect(formatAmount(quote.amount)).toEqual('10.0');
+    });
+
+    it('calculates fees in the native token', async () => {
+      mockRouterImplementation({
+        pools: [createPool(WIMX_TEST_TOKEN, FUN_TEST_TOKEN)],
+      });
+
+      const exchange = new Exchange({
+        ...TEST_DEX_CONFIGURATION,
+        secondaryFees: [{ recipient: TEST_FEE_RECIPIENT, basisPoints: 100 }],
+      });
+
+      const { quote } = await exchange.getUnsignedSwapTxFromAmountIn(
+        makeAddr('sicko'),
+        'native',
+        FUN_TEST_TOKEN.address,
+        utils.parseEther('1'), // 1 native IMX
+      );
+
+      expectNative(quote.fees[0].amount.token);
+    });
+  });
+
+  describe('With an Exact Input, and native Token Out', () => {
+    it('returns a quote amount in the native token', async () => {
+      mockRouterImplementation({
+        pools: [createPool(WIMX_TEST_TOKEN, FUN_TEST_TOKEN)],
+      });
+
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+
+      const { quote } = await exchange.getUnsignedSwapTxFromAmountIn(
+        makeAddr('sicko'),
+        FUN_TEST_TOKEN.address,
+        'native',
+        utils.parseEther('1'), // 1 FUN
+      );
+
+      expectNative(quote.amount.token);
+      expectNative(quote.amountWithMaxSlippage.token);
+      expect(formatAmount(quote.amount)).toEqual('10.0');
+    });
+  });
+
+  describe('With an Exact Input, and wrapped native Token Out', () => {
+    it('returns a quote amount in the wrapped native token', async () => {
+      mockRouterImplementation({
+        pools: [createPool(WIMX_TEST_TOKEN, FUN_TEST_TOKEN)],
+      });
+
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+
+      const { quote } = await exchange.getUnsignedSwapTxFromAmountIn(
+        makeAddr('sicko'),
+        FUN_TEST_TOKEN.address,
+        WIMX_TEST_TOKEN.address,
+        utils.parseEther('1'), // 1 FUN
+      );
+
+      expectERC20(quote.amount.token);
+      expectERC20(quote.amountWithMaxSlippage.token);
+      expect(formatAmount(quote.amount)).toEqual('10.0');
     });
   });
 

@@ -85,11 +85,6 @@ export type TransactionResponse = {
 };
 
 /**
- * Type representing a token contract address or 'native'
- */
-export type TokenLiteral = `0x${string}` | 'native';
-
-/**
  * Interface representing an ERC20 token
  * @property {number} chainId - The chain ID
  * @property {string} address - The token address

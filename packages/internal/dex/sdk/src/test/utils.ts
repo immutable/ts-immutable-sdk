@@ -1,6 +1,5 @@
 import { TradeType } from '@uniswap/sdk-core';
 import { BigNumber, BigNumberish, utils } from 'ethers';
-import JSBI from 'jsbi';
 import { Pool, Route, TickMath } from '@uniswap/v3-sdk';
 import { SwapRouter } from '@uniswap/router-sdk';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
@@ -19,7 +18,6 @@ import {
   ERC20,
   Native,
   ExchangeModuleConfiguration,
-  TokenLiteral,
 } from '../lib';
 
 export const TEST_GAS_PRICE = BigNumber.from('1500000000'); // 1.5 gwei or 1500000000 wei
@@ -116,24 +114,11 @@ export const TEST_DEX_CONFIGURATION: ExchangeModuleConfiguration = {
 
 export type SwapTest = {
   fromAddress: string;
-
   chainId: number;
-
   pools: Pool[];
-
-  arbitraryTick: number;
-  arbitraryLiquidity: number;
-  sqrtPriceAtTick: JSBI;
-
-  inputToken: TokenLiteral;
-  outputToken: TokenLiteral;
+  inputToken: string;
+  outputToken: string;
   intermediaryToken: string | undefined;
-};
-
-const toLiteral = (s: string): TokenLiteral => {
-  if (s === 'native') return 'native';
-  if (s.startsWith('0x')) return s as TokenLiteral;
-  throw new Error('invalid token literal');
 };
 
 // uniqBy returns the unique items in an array using the given comparator
@@ -305,50 +290,47 @@ export function decodeMulticallExactOutputSingleWithoutFees(data: utils.BytesLik
   return { swapParams };
 }
 
-export function setupSwapTxTest(params?: { multiPoolSwap?: boolean }): SwapTest {
-  const multiPoolSwap = params?.multiPoolSwap ?? false;
-  const fromAddress = TEST_FROM_ADDRESS;
-
+export function createPool(tokenIn: ERC20, tokenOut: ERC20) {
   const arbitraryTick = 100;
   const arbitraryLiquidity = 10;
   const sqrtPriceAtTick = TickMath.getSqrtRatioAtTick(arbitraryTick);
-
-  const tokenIn = erc20ToUniswapToken(USDC_TEST_TOKEN);
-  const intermediaryToken = erc20ToUniswapToken(FUN_TEST_TOKEN);
-  const tokenOut = erc20ToUniswapToken(WETH_TEST_TOKEN);
-
   const fee = 10000;
+
+  return new Pool(
+    erc20ToUniswapToken(tokenIn),
+    erc20ToUniswapToken(tokenOut),
+    fee,
+    sqrtPriceAtTick,
+    arbitraryLiquidity,
+    arbitraryTick,
+  );
+}
+
+export function setupSwapTxTest(params?: { multiPoolSwap?: boolean }): SwapTest {
+  const multiPoolSwap = params?.multiPoolSwap ?? false;
+  const fromAddress = TEST_FROM_ADDRESS;
+  const tokenIn = USDC_TEST_TOKEN;
+  const intermediaryToken = FUN_TEST_TOKEN;
+  const tokenOut = WETH_TEST_TOKEN;
 
   let pools: Pool[] = [];
   if (multiPoolSwap) {
-    pools = [
-      new Pool(tokenIn, intermediaryToken, fee, sqrtPriceAtTick, arbitraryLiquidity, arbitraryTick),
-      new Pool(intermediaryToken, tokenOut, fee, sqrtPriceAtTick, arbitraryLiquidity, arbitraryTick),
-    ];
+    pools = [createPool(tokenIn, intermediaryToken), createPool(intermediaryToken, tokenOut)];
   } else {
-    pools = [new Pool(tokenIn, tokenOut, fee, sqrtPriceAtTick, arbitraryLiquidity, arbitraryTick)];
+    pools = [createPool(tokenIn, tokenOut)];
   }
 
   return {
     fromAddress,
     chainId: TEST_CHAIN_ID,
-
     pools,
-
-    arbitraryTick,
-    arbitraryLiquidity,
-    sqrtPriceAtTick,
-
-    inputToken: toLiteral(tokenIn.address),
+    inputToken: tokenIn.address,
     intermediaryToken: multiPoolSwap ? intermediaryToken.address : undefined,
-    outputToken: toLiteral(tokenOut.address),
+    outputToken: tokenOut.address,
   };
 }
 
 type MockParams = {
-  chainId: number;
-  inputToken: string;
-  outputToken: string;
   pools: Pool[];
   exchangeRate?: number;
 };
@@ -439,8 +421,13 @@ export function expectInstanceOf<T>(className: { new (...args: any[]): T }, x: u
   expect(x).toBeInstanceOf(className);
 }
 
-export function expectERC20(token: Coin): asserts token is ERC20 {
+export function expectERC20(token: Coin, expectedAddress?: string): asserts token is ERC20 {
   expect(token.type).toBe('erc20');
+  if (expectedAddress) expect((token as ERC20).address).toBe(expectedAddress);
+}
+
+export function expectNative(token: Coin): asserts token is Native {
+  expect(token.type).toBe('native');
 }
 
 /**
