@@ -106,6 +106,7 @@ export function TopUpView({
       const [swapEstimate, bridgeEstimate, onRampFeesEstimate] = await Promise.all([
         ((): Promise<any> | undefined => {
           if (showSwapOption) {
+            // console.log('executing fee fetch for swap');
             return checkout.gasEstimate({
               gasEstimateType: GasEstimateType.SWAP,
             });
@@ -113,7 +114,8 @@ export function TopUpView({
           return undefined;
         })(),
         ((): Promise<any> | undefined => {
-          if (showSwapOption) {
+          if (showBridgeOption) {
+            // console.log('executing fee fetch for bridge');
             return checkout.gasEstimate({
               gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
               isSpendingCapApprovalRequired: true,
@@ -122,7 +124,8 @@ export function TopUpView({
           return undefined;
         })(),
         ((): Promise<any> | undefined => {
-          if (showSwapOption) {
+          if (showOnrampOption) {
+            // console.log('executing fee fetch for on-ramp');
             return checkout.getExchangeFeeEstimate();
           }
           return undefined;
@@ -138,7 +141,7 @@ export function TopUpView({
 
       if (swapEstimate) {
         const swapFeeInFiat = getSwapFeeEstimation(
-          swapEstimate as unknown as GasEstimateSwapResult,
+          swapEstimate as GasEstimateSwapResult,
           conversions,
         );
         setSwapFeesInFiat(swapFeeInFiat);
@@ -307,6 +310,7 @@ export function TopUpView({
             .map((element) => element.isEnabled && (
             <TopUpMenuItem
               testId={element.testId}
+              key={element.testId}
               icon={element.icon as 'Wallet' | 'Coins' | 'Minting'}
               heading={element.textConfig.heading}
               caption={!element.isAvailable ? element.textConfig.disabledCaption : element.textConfig.caption}
