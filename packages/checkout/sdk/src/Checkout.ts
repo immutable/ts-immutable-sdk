@@ -291,13 +291,6 @@ export class Checkout {
   public async buy(
     params: BuyParams,
   ): Promise<BuyResult> {
-    if (this.config.isProduction) {
-      throw new Error('This endpoint is not currently available.');
-    }
-
-    // eslint-disable-next-line no-console
-    console.warn('This endpoint is currently under construction.');
-
     if (params.orders.length > 1) {
       // eslint-disable-next-line no-console
       console.warn('This endpoint currently only processes the first order in the array.');
@@ -320,13 +313,6 @@ export class Checkout {
   public async sell(
     params: SellParams,
   ): Promise<SellResult> {
-    if (this.config.isProduction) {
-      throw new Error('This endpoint is not currently available.');
-    }
-
-    // eslint-disable-next-line no-console
-    console.warn('This endpoint is currently under construction.');
-
     if (params.orders.length > 1) {
       // eslint-disable-next-line no-console
       console.warn('This endpoint currently only processes the first order in the array.');
@@ -351,13 +337,6 @@ export class Checkout {
   public async cancel(
     params: CancelParams,
   ): Promise<CancelResult> {
-    if (this.config.isProduction) {
-      throw new Error('This endpoint is not currently available.');
-    }
-
-    // eslint-disable-next-line no-console
-    console.warn('This endpoint is currently under construction.');
-
     // eslint-disable-next-line no-console
     console.warn('This endpoint currently only processes the first order in the array.');
 
@@ -376,13 +355,6 @@ export class Checkout {
   public async smartCheckout(
     params: SmartCheckoutParams,
   ): Promise<SmartCheckoutResult> {
-    if (this.config.isProduction) {
-      throw new Error('This endpoint is not currently available.');
-    }
-
-    // eslint-disable-next-line no-console
-    console.warn('This endpoint is currently under construction.');
-
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,

@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { Link } from '@biom3/react';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
@@ -10,6 +10,7 @@ import { IMXCoinsHero } from '../../../components/Hero/IMXCoinsHero';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import { isPassportProvider } from '../../../lib/providerUtils';
 import { FAQS_LINK } from '../../../lib';
+import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 export function CoinInfo() {
   const { connectLoaderState: { provider } } = useContext(ConnectLoaderContext);
@@ -19,6 +20,15 @@ export function CoinInfo() {
   const {
     heading: passportHeading, body1, body2, linkText,
   } = coinInfoText.passport;
+
+  const { page } = useAnalytics();
+
+  useEffect(() => {
+    page({
+      userJourney: UserJourney.WALLET,
+      screen: 'CoinInfo',
+    });
+  }, []);
 
   return (
     <SimpleLayout

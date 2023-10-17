@@ -10,6 +10,7 @@ import { usePassportProvider } from '@/context/PassportProvider';
 import { useStatusProvider } from '@/context/StatusProvider';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { ViewOffersModalProps } from '@/types';
+import { MARKETPLACE_FEE_PERCENTAGE, MARKETPLACE_FEE_RECIPIENT } from '@/config';
 
 function ViewOffersModal({
   showModal, setShowModal, buyTokenAddress, buyTokenId, onClose,
@@ -44,6 +45,8 @@ function ViewOffersModal({
           status: 'active',
           sellTokenAddress: undefined,
           sellTokenType: 'ETH',
+          auxiliaryFeePercentages: MARKETPLACE_FEE_PERCENTAGE.toString(),
+          auxiliaryFeeRecipients: MARKETPLACE_FEE_RECIPIENT,
         });
         setOffers(result.result);
       } catch (err) {
@@ -66,8 +69,8 @@ function ViewOffersModal({
         order_id: orderId,
         user,
         fees: [{
-          address: '0x8e70719571e87a328696ad099a7d9f6adc120892',
-          fee_percentage: 1,
+          address: MARKETPLACE_FEE_RECIPIENT,
+          fee_percentage: MARKETPLACE_FEE_PERCENTAGE,
         }],
       });
       addMessage('Create Trade', createTradeResponse);

@@ -18,6 +18,8 @@ import {
   ConnectLoaderTestComponent,
 } from '../../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
 import { IMX_ADDRESS_ZKEVM } from '../../../lib';
+import { CustomAnalyticsProvider } from '../../../context/analytics-provider/CustomAnalyticsProvider';
+import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 
 describe('WalletBalances', () => {
   beforeEach(() => {
@@ -90,16 +92,18 @@ describe('WalletBalances', () => {
         });
 
       mount(
-        <ConnectLoaderTestComponent
-          initialStateOverride={connectLoaderState}
-        >
-          <WalletWidgetTestComponent
-            initialStateOverride={baseWalletState}
-            cryptoConversionsOverride={cryptoConversions}
+        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <WalletBalances />
-          </WalletWidgetTestComponent>
-        </ConnectLoaderTestComponent>,
+            <WalletWidgetTestComponent
+              initialStateOverride={baseWalletState}
+              cryptoConversionsOverride={cryptoConversions}
+            >
+              <WalletBalances />
+            </WalletWidgetTestComponent>
+          </ConnectLoaderTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('balance-item-IMX').should('exist');
@@ -110,16 +114,18 @@ describe('WalletBalances', () => {
       cy.stub(Checkout.prototype, 'getAllBalances').as('getAllBalances').rejects();
 
       mount(
-        <ConnectLoaderTestComponent
-          initialStateOverride={connectLoaderState}
-        >
-          <WalletWidgetTestComponent
-            initialStateOverride={baseWalletState}
-            cryptoConversionsOverride={cryptoConversions}
+        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <WalletBalances />
-          </WalletWidgetTestComponent>
-        </ConnectLoaderTestComponent>,
+            <WalletWidgetTestComponent
+              initialStateOverride={baseWalletState}
+              cryptoConversionsOverride={cryptoConversions}
+            >
+              <WalletBalances />
+            </WalletWidgetTestComponent>
+          </ConnectLoaderTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('balance-item-shimmer--1__shimmer').should('be.visible');
@@ -132,16 +138,18 @@ describe('WalletBalances', () => {
       cy.stub(Checkout.prototype, 'getAllBalances').as('getAllBalances');
 
       mount(
-        <ConnectLoaderTestComponent
-          initialStateOverride={connectLoaderState}
-        >
-          <WalletWidgetTestComponent
-            initialStateOverride={baseWalletState}
-            cryptoConversionsOverride={cryptoConversions}
+        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <WalletBalances />
-          </WalletWidgetTestComponent>
-        </ConnectLoaderTestComponent>,
+            <WalletWidgetTestComponent
+              initialStateOverride={baseWalletState}
+              cryptoConversionsOverride={cryptoConversions}
+            >
+              <WalletBalances />
+            </WalletWidgetTestComponent>
+          </ConnectLoaderTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('balance-item-shimmer--1__shimmer').should('not.exist');
@@ -182,16 +190,18 @@ describe('WalletBalances', () => {
         });
 
       mount(
-        <ConnectLoaderTestComponent
-          initialStateOverride={connectLoaderState}
-        >
-          <WalletWidgetTestComponent
-            initialStateOverride={baseWalletState}
-            cryptoConversionsOverride={cryptoConversions}
+        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <WalletBalances />
-          </WalletWidgetTestComponent>
-        </ConnectLoaderTestComponent>,
+            <WalletWidgetTestComponent
+              initialStateOverride={baseWalletState}
+              cryptoConversionsOverride={cryptoConversions}
+            >
+              <WalletBalances />
+            </WalletWidgetTestComponent>
+          </ConnectLoaderTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('balance-item-IMX').should('exist');
@@ -205,16 +215,18 @@ describe('WalletBalances', () => {
         .resolves({ balances: [] });
 
       mount(
-        <ConnectLoaderTestComponent
-          initialStateOverride={connectLoaderState}
-        >
-          <WalletWidgetTestComponent
-            initialStateOverride={baseWalletState}
-            cryptoConversionsOverride={cryptoConversions}
+        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <WalletBalances />
-          </WalletWidgetTestComponent>
-        </ConnectLoaderTestComponent>,
+            <WalletWidgetTestComponent
+              initialStateOverride={baseWalletState}
+              cryptoConversionsOverride={cryptoConversions}
+            >
+              <WalletBalances />
+            </WalletWidgetTestComponent>
+          </ConnectLoaderTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('no-tokens-found').should('exist');
@@ -263,16 +275,18 @@ describe('WalletBalances', () => {
         });
 
       mount(
-        <ConnectLoaderTestComponent
-          initialStateOverride={connectLoaderState}
-        >
-          <WalletWidgetTestComponent
-            initialStateOverride={baseWalletState}
-            cryptoConversionsOverride={cryptoConversions}
+        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <WalletBalances />
-          </WalletWidgetTestComponent>
-        </ConnectLoaderTestComponent>,
+            <WalletWidgetTestComponent
+              initialStateOverride={baseWalletState}
+              cryptoConversionsOverride={cryptoConversions}
+            >
+              <WalletBalances />
+            </WalletWidgetTestComponent>
+          </ConnectLoaderTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('token-menu').click();
@@ -334,16 +348,18 @@ describe('WalletBalances', () => {
       };
 
       mount(
-        <ConnectLoaderTestComponent
-          initialStateOverride={connectLoaderState}
-        >
-          <WalletWidgetTestComponent
-            initialStateOverride={walletState}
-            cryptoConversionsOverride={cryptoConversions}
+        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <WalletBalances />
-          </WalletWidgetTestComponent>
-        </ConnectLoaderTestComponent>,
+            <WalletWidgetTestComponent
+              initialStateOverride={walletState}
+              cryptoConversionsOverride={cryptoConversions}
+            >
+              <WalletBalances />
+            </WalletWidgetTestComponent>
+          </ConnectLoaderTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('token-menu').click();
@@ -407,16 +423,18 @@ describe('WalletBalances', () => {
       };
 
       mount(
-        <ConnectLoaderTestComponent
-          initialStateOverride={connectLoaderState}
-        >
-          <WalletWidgetTestComponent
-            initialStateOverride={walletState}
-            cryptoConversionsOverride={cryptoConversions}
+        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <WalletBalances />
-          </WalletWidgetTestComponent>
-        </ConnectLoaderTestComponent>,
+            <WalletWidgetTestComponent
+              initialStateOverride={walletState}
+              cryptoConversionsOverride={cryptoConversions}
+            >
+              <WalletBalances />
+            </WalletWidgetTestComponent>
+          </ConnectLoaderTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('token-menu').click();
@@ -475,15 +493,17 @@ describe('WalletBalances', () => {
         };
         mount(
           <BiomeCombinedProviders>
-            <ConnectLoaderTestComponent
-              initialStateOverride={connectLoaderState}
-            >
-              <WalletContext.Provider
-                value={{ walletState: testWalletState, walletDispatch: () => {} }}
+            <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+              <ConnectLoaderTestComponent
+                initialStateOverride={connectLoaderState}
               >
-                <WalletBalances />
-              </WalletContext.Provider>
-            </ConnectLoaderTestComponent>
+                <WalletContext.Provider
+                  value={{ walletState: testWalletState, walletDispatch: () => {} }}
+                >
+                  <WalletBalances />
+                </WalletContext.Provider>
+              </ConnectLoaderTestComponent>
+            </CustomAnalyticsProvider>
           </BiomeCombinedProviders>,
         );
         cySmartGet('add-coins').should('exist');
@@ -501,15 +521,17 @@ describe('WalletBalances', () => {
       };
       mount(
         <BiomeCombinedProviders>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <WalletContext.Provider
-              value={{ walletState: testWalletState, walletDispatch: () => {} }}
+          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+            <ConnectLoaderTestComponent
+              initialStateOverride={connectLoaderState}
             >
-              <WalletBalances />
-            </WalletContext.Provider>
-          </ConnectLoaderTestComponent>
+              <WalletContext.Provider
+                value={{ walletState: testWalletState, walletDispatch: () => {} }}
+              >
+                <WalletBalances />
+              </WalletContext.Provider>
+            </ConnectLoaderTestComponent>
+          </CustomAnalyticsProvider>
         </BiomeCombinedProviders>,
       );
       cySmartGet('add-coins').should('not.exist');
@@ -533,15 +555,17 @@ describe('WalletBalances', () => {
       };
       mount(
         <BiomeCombinedProviders>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <WalletContext.Provider
-              value={{ walletState, walletDispatch: () => {} }}
+          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+            <ConnectLoaderTestComponent
+              initialStateOverride={connectLoaderState}
             >
-              <WalletBalances />
-            </WalletContext.Provider>
-          </ConnectLoaderTestComponent>
+              <WalletContext.Provider
+                value={{ walletState, walletDispatch: () => {} }}
+              >
+                <WalletBalances />
+              </WalletContext.Provider>
+            </ConnectLoaderTestComponent>
+          </CustomAnalyticsProvider>
         </BiomeCombinedProviders>,
       );
       cySmartGet('add-coins').should('not.exist');

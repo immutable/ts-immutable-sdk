@@ -18,6 +18,7 @@ import {
   ConnectLoaderTestComponent,
 } from '../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
 import { ConnectionStatus } from '../../context/connect-loader-context/ConnectLoaderContext';
+import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 
 describe('WalletWidget tests', () => {
   beforeEach(() => {
@@ -78,13 +79,15 @@ describe('WalletWidget tests', () => {
         });
 
       mount(
-        <ConnectLoaderTestComponent
-          initialStateOverride={connectLoaderState}
-        >
-          <WalletWidget
-            config={widgetConfig}
-          />
-        </ConnectLoaderTestComponent>,
+        <CustomAnalyticsProvider widgetConfig={widgetConfig}>
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <WalletWidget
+              config={widgetConfig}
+            />
+          </ConnectLoaderTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('loading-view').should('be.visible');
@@ -129,13 +132,15 @@ describe('WalletWidget tests', () => {
       isSwapAvailableStub.resolves(true);
 
       mount(
-        <ConnectLoaderTestComponent
-          initialStateOverride={connectLoaderState}
-        >
-          <WalletWidget
-            config={widgetConfig}
-          />
-        </ConnectLoaderTestComponent>,
+        <CustomAnalyticsProvider widgetConfig={widgetConfig}>
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <WalletWidget
+              config={widgetConfig}
+            />
+          </ConnectLoaderTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('error-view').should('be.visible');
@@ -298,14 +303,16 @@ describe('WalletWidget tests', () => {
         } as StrongCheckoutWidgetsConfig;
 
         mount(
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <WalletWidget
-              config={widgetConfig}
-            />
-            ,
-          </ConnectLoaderTestComponent>,
+          <CustomAnalyticsProvider widgetConfig={widgetConfig}>
+            <ConnectLoaderTestComponent
+              initialStateOverride={connectLoaderState}
+            >
+              <WalletWidget
+                config={widgetConfig}
+              />
+              ,
+            </ConnectLoaderTestComponent>
+          </CustomAnalyticsProvider>,
         );
 
         cySmartGet('@balanceStub').should('have.been.called');
@@ -338,14 +345,16 @@ describe('WalletWidget tests', () => {
         } as StrongCheckoutWidgetsConfig;
 
         mount(
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <WalletWidget
-              config={widgetConfig}
-            />
-            ,
-          </ConnectLoaderTestComponent>,
+          <CustomAnalyticsProvider widgetConfig={widgetConfig}>
+            <ConnectLoaderTestComponent
+              initialStateOverride={connectLoaderState}
+            >
+              <WalletWidget
+                config={widgetConfig}
+              />
+              ,
+            </ConnectLoaderTestComponent>
+          </CustomAnalyticsProvider>,
         );
 
         cySmartGet('@balanceStub').should('have.been.called');
@@ -399,13 +408,15 @@ describe('WalletWidget tests', () => {
           });
 
         mount(
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <WalletWidget
-              config={widgetConfig}
-            />
-          </ConnectLoaderTestComponent>,
+          <CustomAnalyticsProvider widgetConfig={widgetConfig}>
+            <ConnectLoaderTestComponent
+              initialStateOverride={connectLoaderState}
+            >
+              <WalletWidget
+                config={widgetConfig}
+              />
+            </ConnectLoaderTestComponent>
+          </CustomAnalyticsProvider>,
         );
 
         cySmartGet('error-view').should('be.visible');
@@ -426,14 +437,16 @@ describe('WalletWidget tests', () => {
         } as StrongCheckoutWidgetsConfig;
 
         mount(
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <WalletWidget
-              config={widgetConfig}
-            />
-            ,
-          </ConnectLoaderTestComponent>,
+          <CustomAnalyticsProvider widgetConfig={widgetConfig}>
+            <ConnectLoaderTestComponent
+              initialStateOverride={connectLoaderState}
+            >
+              <WalletWidget
+                config={widgetConfig}
+              />
+              ,
+            </ConnectLoaderTestComponent>
+          </CustomAnalyticsProvider>,
         );
 
         cySmartGet('settings-button').click();
@@ -452,14 +465,16 @@ describe('WalletWidget tests', () => {
         } as StrongCheckoutWidgetsConfig;
 
         mount(
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <WalletWidget
-              config={widgetConfig}
-            />
-            ,
-          </ConnectLoaderTestComponent>,
+          <CustomAnalyticsProvider widgetConfig={widgetConfig}>
+            <ConnectLoaderTestComponent
+              initialStateOverride={connectLoaderState}
+            >
+              <WalletWidget
+                config={widgetConfig}
+              />
+              ,
+            </ConnectLoaderTestComponent>
+          </CustomAnalyticsProvider>,
         );
         cySmartGet('settings-button').click();
         cySmartGet('wallet-address').should('have.text', '0xwalletAddress');
@@ -475,14 +490,16 @@ describe('WalletWidget tests', () => {
         } as StrongCheckoutWidgetsConfig;
 
         mount(
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <WalletWidget
-              config={widgetConfig}
-            />
-            ,x
-          </ConnectLoaderTestComponent>,
+          <CustomAnalyticsProvider widgetConfig={widgetConfig}>
+            <ConnectLoaderTestComponent
+              initialStateOverride={connectLoaderState}
+            >
+              <WalletWidget
+                config={widgetConfig}
+              />
+              ,x
+            </ConnectLoaderTestComponent>
+          </CustomAnalyticsProvider>,
         );
         cySmartGet('settings-button').click();
         cySmartGet('disconnect-button').should(
@@ -507,19 +524,20 @@ describe('WalletWidget tests', () => {
         } as StrongCheckoutWidgetsConfig;
 
         mount(
-          <ConnectLoaderTestComponent
-            initialStateOverride={
+          <CustomAnalyticsProvider widgetConfig={widgetConfig}>
+            <ConnectLoaderTestComponent
+              initialStateOverride={
               {
                 ...connectLoaderState,
                 provider: mockPassportProvider,
               }
             }
-          >
-            <WalletWidget
-              config={widgetConfig}
-            />
-            ,x
-          </ConnectLoaderTestComponent>,
+            >
+              <WalletWidget
+                config={widgetConfig}
+              />
+            </ConnectLoaderTestComponent>
+          </CustomAnalyticsProvider>,
         );
         cySmartGet('settings-button').click();
         cySmartGet('disconnect-button').should(
@@ -548,14 +566,16 @@ describe('WalletWidget tests', () => {
         } as StrongCheckoutWidgetsConfig;
 
         mount(
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <WalletWidget
-              config={widgetConfig}
-            />
-            ,
-          </ConnectLoaderTestComponent>,
+          <CustomAnalyticsProvider widgetConfig={widgetConfig}>
+            <ConnectLoaderTestComponent
+              initialStateOverride={connectLoaderState}
+            >
+              <WalletWidget
+                config={widgetConfig}
+              />
+              ,
+            </ConnectLoaderTestComponent>
+          </CustomAnalyticsProvider>,
         );
 
         const { metamask: { heading, body } } = text.views[WalletWidgetViews.COIN_INFO];
@@ -581,14 +601,16 @@ describe('WalletWidget tests', () => {
           } as any as Web3Provider,
         };
         mount(
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderStateWithPassport}
-          >
-            <WalletWidget
-              config={widgetConfig}
-            />
-            ,
-          </ConnectLoaderTestComponent>,
+          <CustomAnalyticsProvider widgetConfig={widgetConfig}>
+            <ConnectLoaderTestComponent
+              initialStateOverride={connectLoaderStateWithPassport}
+            >
+              <WalletWidget
+                config={widgetConfig}
+              />
+              ,
+            </ConnectLoaderTestComponent>
+          </CustomAnalyticsProvider>,
         );
 
         const {
@@ -624,13 +646,15 @@ describe('WalletWidget tests', () => {
         } as StrongCheckoutWidgetsConfig;
 
         mount(
-          <ConnectLoaderTestComponent
-            initialStateOverride={passportConnectLoaderState}
-          >
-            <WalletWidget
-              config={widgetConfig}
-            />
-          </ConnectLoaderTestComponent>,
+          <CustomAnalyticsProvider widgetConfig={widgetConfig}>
+            <ConnectLoaderTestComponent
+              initialStateOverride={passportConnectLoaderState}
+            >
+              <WalletWidget
+                config={widgetConfig}
+              />
+            </ConnectLoaderTestComponent>
+          </CustomAnalyticsProvider>,
         );
 
         cySmartGet('wallet-balances').should('exist');
