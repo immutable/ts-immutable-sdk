@@ -5,6 +5,7 @@ import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
 import { cySmartGet } from '../../lib/testUtils';
 import { QuickswapFooter } from './QuickswapFooter';
+import { text } from '../../resources/text/textConfig';
 
 describe('Quickswap Footer', () => {
   it('should show the Quickswap logo', () => {
@@ -28,7 +29,7 @@ describe('Quickswap Footer', () => {
       'quickswap-footer-disclaimer-text',
     ).should(
       'have.text',
-      'Quickswap is a third party application. Immutable neither builds, owns, operates or deploys Quickswap.',
+      text.footers.quickswapFooter,
     );
   });
 });

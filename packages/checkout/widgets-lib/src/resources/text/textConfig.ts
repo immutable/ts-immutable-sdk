@@ -403,7 +403,7 @@ export const text = {
   },
   footers: {
     quickswapFooter: {
-      disclaimerText: 'Quickswap is a third party application. Immutable neither builds, owns, operates or deploys Quickswap.',
+      disclaimerText: 'Quickswap is a third party app. Immutable neither builds, owns, operates or deploys Quickswap. For further info, refer to Quickswap’s website.',
     },
   },
   wallets: {
