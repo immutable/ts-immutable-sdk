@@ -21,8 +21,9 @@ import {
   WalletState,
 } from '../../widgets/wallet/context/WalletContext';
 import { ConnectionStatus } from '../../context/connect-loader-context/ConnectLoaderContext';
-// eslint-disable-next-line max-len
-import { ConnectLoaderTestComponent } from '../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
+import {
+  ConnectLoaderTestComponent,
+} from '../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 
 describe('Top Up View', () => {
