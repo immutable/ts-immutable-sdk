@@ -105,7 +105,7 @@ export function TopUpView({
     try {
       const [swapEstimate, bridgeEstimate, onRampFeesEstimate] = await Promise.all([
         ((): Promise<any> | undefined => {
-          if (showSwapOption) {
+          if (showSwapOption && supportedTopUps?.isSwapAvailable) {
             // console.log('executing fee fetch for swap');
             return checkout.gasEstimate({
               gasEstimateType: GasEstimateType.SWAP,
