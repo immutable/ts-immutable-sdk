@@ -11,6 +11,7 @@ import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { useStatusProvider } from '@/context/StatusProvider';
 import EthBalance from '@/components/imx/EthBalance';
 import MakeOfferModal from '@/components/imx/MakeOfferModal';
+import { MARKETPLACE_FEE_PERCENTAGE, MARKETPLACE_FEE_RECIPIENT } from '@/config';
 
 function Trade({ showModal: showTradeModal, setShowModal: setShowTradeModal }: ModalProps) {
   const [sellTokenName, setSellTokenName] = useState<string>('');
@@ -35,9 +36,11 @@ function Trade({ showModal: showTradeModal, setShowModal: setShowTradeModal }: M
       const result = await coreSdkClient.listOrders({
         status: 'active',
         orderBy: 'updated_at',
-        direction: 'asc',
+        direction: 'desc',
         sellTokenType: 'ERC721',
         sellTokenName,
+        auxiliaryFeePercentages: MARKETPLACE_FEE_PERCENTAGE.toString(),
+        auxiliaryFeeRecipients: MARKETPLACE_FEE_RECIPIENT,
       });
       setOrders(result.result);
       setLoadingOrders(false);
@@ -62,8 +65,8 @@ function Trade({ showModal: showTradeModal, setShowModal: setShowTradeModal }: M
         order_id: id,
         user,
         fees: [{
-          address: '0x8e70719571e87a328696ad099a7d9f6adc120892',
-          fee_percentage: 1,
+          address: MARKETPLACE_FEE_RECIPIENT,
+          fee_percentage: MARKETPLACE_FEE_PERCENTAGE,
         }],
       };
       const createTradeResponse = await imxProvider?.createTrade(request);

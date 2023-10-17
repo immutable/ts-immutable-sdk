@@ -12,6 +12,7 @@ import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { useStatusProvider } from '@/context/StatusProvider';
 import { usePassportProvider } from '@/context/PassportProvider';
 import ViewOffersModal from '@/components/imx/ViewOffersModal';
+import { MARKETPLACE_FEE_PERCENTAGE, MARKETPLACE_FEE_RECIPIENT } from '@/config';
 
 type AssetWithSellOrder = { asset: Asset; sellOrder?: OrderType; };
 type AssetWithOffer = { asset: TokenData; offerOrder?: OrderType; };
@@ -39,6 +40,8 @@ function Order({ showModal, setShowModal }: ModalProps) {
     const orders = await coreSdkClient.listOrders({
       user: imxWalletAddress,
       status: 'active',
+      auxiliaryFeePercentages: MARKETPLACE_FEE_PERCENTAGE.toString(),
+      auxiliaryFeeRecipients: MARKETPLACE_FEE_RECIPIENT,
     });
     const assetsWithOffers = orders.result.filter(
       (order) => order.buy.type === 'ERC721',
@@ -102,8 +105,8 @@ function Order({ showModal, setShowModal }: ModalProps) {
         tokenAddress: asset.token_address,
       },
       fees: [{
-        address: '0x8e70719571e87a328696ad099a7d9f6adc120892',
-        fee_percentage: 1,
+        address: MARKETPLACE_FEE_RECIPIENT,
+        fee_percentage: MARKETPLACE_FEE_PERCENTAGE,
       }],
     };
     try {
