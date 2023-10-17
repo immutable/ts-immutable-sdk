@@ -12,7 +12,7 @@ import { TopUpView } from './TopUpView';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { orchestrationEvents } from '../../lib/orchestrationEvents';
 import { WalletWidgetTestComponent } from '../../widgets/wallet/test-components/WalletWidgetTestComponent';
-import { TopUpFeature, WalletState } from '../../widgets/wallet/context/WalletContext';
+import { WalletState } from '../../widgets/wallet/context/WalletContext';
 import { ConnectionStatus } from '../../context/connect-loader-context/ConnectLoaderContext';
 import {
   ConnectLoaderTestComponent,
@@ -200,13 +200,6 @@ describe('Top Up View', () => {
     });
 
     it('should fire swap event with swap data on event when swap clicked', () => {
-      const supportedTopUps: TopUpFeature = {
-        isOnRampEnabled: true,
-        isSwapEnabled: true,
-        isBridgeEnabled: true,
-        isSwapAvailable: true,
-      };
-
       cy.stub(orchestrationEvents, 'sendRequestSwapEvent').as('sendRequestSwapEventStub');
 
       mount(
@@ -222,7 +215,6 @@ describe('Top Up View', () => {
               tokenAddress="0x123"
               amount="10"
               onCloseButtonClick={() => {}}
-              supportedTopUps={supportedTopUps}
             />
           </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
@@ -276,14 +268,11 @@ describe('Top Up View', () => {
 
   describe('TopUpView render with disabled options', () => {
     describe('when swap is unavailable', () => {
-      it('should not fire swap event', () => {
-        const supportedTopUps: TopUpFeature = {
-          isOnRampEnabled: true,
-          isSwapEnabled: true,
-          isBridgeEnabled: true,
-          isSwapAvailable: false,
-        };
+      beforeEach(() => {
+        cy.stub(Checkout.prototype, 'isSwapAvailable').as('isSwapAvailableStub').returns(false);
+      });
 
+      it('should not fire swap event', () => {
         cy.stub(orchestrationEvents, 'sendRequestSwapEvent').as('sendRequestSwapEventStub');
 
         mount(
@@ -299,7 +288,6 @@ describe('Top Up View', () => {
                 tokenAddress="0x123"
                 amount="10"
                 onCloseButtonClick={() => {}}
-                supportedTopUps={supportedTopUps}
               />
             </ConnectLoaderTestComponent>
           </BiomeCombinedProviders>,
@@ -388,7 +376,6 @@ describe('Top Up View', () => {
               showBridgeOption
               widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
               onCloseButtonClick={() => {}}
-              supportedTopUps={baseWalletState.supportedTopUps}
             />
           </WalletWidgetTestComponent>
         </ConnectLoaderTestComponent>,
@@ -428,7 +415,6 @@ describe('Top Up View', () => {
               showBridgeOption
               widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
               onCloseButtonClick={() => {}}
-              supportedTopUps={baseWalletState.supportedTopUps}
             />
           </WalletWidgetTestComponent>
         </ConnectLoaderTestComponent>,
@@ -460,9 +446,7 @@ describe('Top Up View', () => {
                 showBridgeOption
                 widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
                 onCloseButtonClick={() => {}}
-                supportedTopUps={baseWalletState.supportedTopUps}
               />
-
             </CryptoFiatProvider>
           </WalletWidgetTestComponent>
         </ConnectLoaderTestComponent>,
