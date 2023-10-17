@@ -5,14 +5,13 @@ import {
   Checkout,
   GetNetworkParams,
   WalletProviderName,
+
+  ConnectEventType, ConnectionSuccess, IMTBLWidgetEvents, WidgetTheme, ConnectTargetLayer,
 } from '@imtbl/checkout-sdk';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import React, {
   useCallback, useEffect, useMemo, useReducer, useState,
 } from 'react';
-import {
-  ConnectEventType, ConnectionSuccess, IMTBLWidgetEvents,
-} from '@imtbl/checkout-widgets';
 import { Passport } from '@imtbl/passport';
 import {
   ConnectLoaderActions,
@@ -27,8 +26,6 @@ import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContex
 import { ErrorView } from '../../views/error/ErrorView';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
-  WidgetTheme,
-  ConnectTargetLayer,
   addAccountsChangedListener,
   addChainChangedListener,
   removeAccountsChangedListener,
@@ -304,12 +301,13 @@ export function ConnectLoader({
           break;
         }
         default:
-          connectLoaderDispatch({
-            payload: {
-              type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
-              connectionStatus: ConnectionStatus.ERROR,
-            },
-          });
+
+          // connectLoaderDispatch({
+          //   payload: {
+          //     type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
+          //     connectionStatus: ConnectionStatus.ERROR,
+          //   },
+          // });
       }
     }) as EventListener;
 
@@ -348,9 +346,9 @@ export function ConnectLoader({
         || connectionStatus === ConnectionStatus.CONNECTED_WRONG_NETWORK) && (
           <ConnectWidget
             config={widgetConfig}
-            params={{
-              ...params, targetLayer: networkToSwitchTo, web3Provider: provider, passport,
-            }}
+            targetLayer={networkToSwitchTo}
+            web3Provider={provider}
+            passport={passport}
             deepLink={deepLink}
             sendCloseEventOverride={closeEvent}
           />

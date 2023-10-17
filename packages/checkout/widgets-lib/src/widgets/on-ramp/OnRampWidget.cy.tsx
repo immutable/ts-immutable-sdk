@@ -1,12 +1,13 @@
 import { cy, describe, it } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { Environment } from '@imtbl/config';
-import { ChainId, ChainName, Checkout } from '@imtbl/checkout-sdk';
+import {
+  ChainId, ChainName, Checkout, WidgetTheme,
+} from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { cySmartGet } from '../../lib/testUtils';
 import { OnRampWidget, OnRampWidgetParams } from './OnRampWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { WidgetTheme } from '../../lib';
 import {
   ConnectLoaderTestComponent,
 } from '../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';

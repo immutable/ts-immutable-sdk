@@ -1,12 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { ConnectTargetLayer } from '@imtbl/checkout-sdk';
 import { SaleWidget } from './SaleWidget';
 import {
   ConnectLoader,
   ConnectLoaderParams,
 } from '../../components/ConnectLoader/ConnectLoader';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
-import { ConnectTargetLayer, getL1ChainId, getL2ChainId } from '../../lib';
+import { getL1ChainId, getL2ChainId } from '../../lib';
 import { isValidAmount } from '../../lib/validations/widgetValidators';
 import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
 import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';

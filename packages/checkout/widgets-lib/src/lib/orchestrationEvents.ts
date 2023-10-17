@@ -5,7 +5,7 @@ import {
   RequestOnrampEvent,
   RequestSwapEvent,
   WidgetEvent,
-} from '@imtbl/checkout-widgets';
+} from '@imtbl/checkout-sdk';
 
 function sendRequestOnrampEvent(
   eventTarget: Window | EventTarget,

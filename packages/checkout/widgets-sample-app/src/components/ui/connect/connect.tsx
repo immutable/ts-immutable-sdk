@@ -1,67 +1,59 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import {
-  ConnectEventType,
-  ConnectionSuccess,
-  ConnectionFailed,
-  IMTBLWidgetEvents,
+  Checkout,
+  ConnectTargetLayer,
+  WidgetType,
   WidgetTheme,
-  ConnectReact,
-  CheckoutWidgets,
-  UpdateConfig,
-  CheckoutWidgetsConfig,
-} from '@imtbl/checkout-widgets';
-import { Environment } from '@imtbl/config';
-import { WalletProviderName } from '@imtbl/checkout-sdk';
+  Widget
+} from '@imtbl/checkout-sdk';
+import { WidgetsFactory } from '@imtbl/checkout-widgets';
 
 function ConnectUI() {
-  CheckoutWidgets({
-    theme: WidgetTheme.DARK,
-    environment: Environment.SANDBOX,
-  });
-  const widgetsConfig2: CheckoutWidgetsConfig = {
-    theme: WidgetTheme.DARK,
-    environment: Environment.SANDBOX,
-  };
-
-  UpdateConfig(widgetsConfig2);
+  const [provider, setProvider] = useState();
+  const checkout = useMemo(() => new Checkout(), []);
+  
+  const [connectWidget, setConnectWidget] = useState<Widget | undefined>();
+  const [factory, setFactory] = useState<any>();
+  const [theme, setTheme] = useState(WidgetTheme.DARK);
+  const firstRender = useRef(true);
+  
   useEffect(() => {
-    // Add event listeners for the IMXConnectWidget and handle event types appropriately
-    const handleConnectEvent = ((event: CustomEvent) => {
-      console.log(event);
-      console.log('Getting data from within the event');
-      switch (event.detail.type) {
-        case ConnectEventType.SUCCESS: {
-          const eventData = event.detail.data as ConnectionSuccess;
-          console.log(eventData.provider);
-          break;
-        }
-        case ConnectEventType.FAILURE: {
-          const eventData = event.detail.data as ConnectionFailed;
-          console.log(eventData.reason);
-          break;
-        }
-        default:
-          console.log('did not match any expected event type');
-      }
-    }) as EventListener;
+    if(firstRender.current){
+      firstRender.current = false;
+      (async () => {
+        const factory = new WidgetsFactory(checkout, {theme: WidgetTheme.DARK})
+        const connect = factory.create(WidgetType.CONNECT, {targetLayer: ConnectTargetLayer.LAYER2})
+        const bridge = factory.create(WidgetType.BRIDGE, {fromContractAddress: "0x2Fa06C6672dDCc066Ab04631192738799231dE4a"})
 
-    window.addEventListener(
-      IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
-      handleConnectEvent
-    );
-    return () => {
-      window.removeEventListener(
-        IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
-        handleConnectEvent
-      );
-    };
-  }, []);
+        setFactory(factory);
+        setConnectWidget(connect);
+        connect.mount("connect", {})
+        bridge.mount("bridge", {})
+        
+      })()
+    }
+    
+  }, [checkout, firstRender])
+
+  const updateTheme = useCallback((widgetTheme: WidgetTheme) => {
+    let newTheme = widgetTheme === WidgetTheme.DARK ? WidgetTheme.LIGHT : WidgetTheme.DARK;
+    connectWidget?.updateConfig({theme: newTheme});
+    setTheme(newTheme);
+  }, [connectWidget])
+
+  const updateThemeForAll = useCallback((widgetTheme: WidgetTheme) => {
+    let newTheme = widgetTheme === WidgetTheme.DARK ? WidgetTheme.LIGHT : WidgetTheme.DARK;
+    factory?.update({theme: newTheme});
+    setTheme(newTheme);
+  }, [factory])
 
   return (
-    <div className="Connect">
-      <h1 className="sample-heading">Checkout Connect (Web Component)</h1>
-      <ConnectReact />
+    <div>
+      <h1 className="sample-heading">Checkout Connect</h1>
+      <div id="connect"></div>
+      <div id="bridge"></div>
+      <button onClick={() => updateThemeForAll(theme)}>Toggle theme</button>
     </div>
   );
 }

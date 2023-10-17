@@ -1,5 +1,5 @@
 import React from 'react';
-import { WalletProviderName } from '@imtbl/checkout-sdk';
+import { ConnectTargetLayer, WalletProviderName } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
 import { BiomeCombinedProviders, BiomePortalIdProvider } from '@biom3/react';
 import { onDarkBase } from '@biom3/design-tokens';
@@ -10,7 +10,7 @@ import {
   ConnectLoaderParams,
 } from '../../components/ConnectLoader/ConnectLoader';
 import { sendSwapWidgetCloseEvent } from './SwapWidgetEvents';
-import { ConnectTargetLayer, getL2ChainId } from '../../lib';
+import { getL2ChainId } from '../../lib';
 import {
   isValidAddress,
   isValidAmount,

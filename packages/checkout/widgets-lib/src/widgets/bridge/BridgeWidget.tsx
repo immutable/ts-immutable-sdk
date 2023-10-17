@@ -2,6 +2,7 @@ import {
   BiomeCombinedProviders,
 } from '@biom3/react';
 import {
+  BridgeWidgetProps,
   NetworkFilterTypes, TokenFilterTypes,
 } from '@imtbl/checkout-sdk';
 import {
@@ -51,18 +52,22 @@ import { EventTargetContext } from '../../context/event-target-context/EventTarg
 import { GetAllowedBalancesResultType, getAllowedBalances } from '../../lib/balance';
 import { widgetTheme } from '../../lib/theme';
 
-export interface BridgeWidgetProps {
-  params: BridgeWidgetParams;
+// export interface BridgeWidgetProps {
+//   params: BridgeWidgetParams;
+//   config: StrongCheckoutWidgetsConfig
+// }
+
+export type BridgeWidgetInputs = BridgeWidgetProps & {
   config: StrongCheckoutWidgetsConfig
-}
+};
 
 export interface BridgeWidgetParams {
   fromContractAddress?: string;
   amount?: string;
 }
 
-export function BridgeWidget(props: BridgeWidgetProps) {
-  const { params, config } = props;
+export function BridgeWidget(props: BridgeWidgetInputs) {
+  const { amount, fromContractAddress, config } = props;
   const { environment, theme } = config;
   const successText = text.views[BridgeWidgetViews.SUCCESS];
   const failText = text.views[BridgeWidgetViews.FAIL];
@@ -86,10 +91,6 @@ export function BridgeWidget(props: BridgeWidgetProps) {
   const [errorViewLoading, setErrorViewLoading] = useState(false);
 
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
-
-  const {
-    amount, fromContractAddress,
-  } = params;
 
   const showErrorView = useCallback((error: any, tryAgain?: () => Promise<boolean>) => {
     viewDispatch({

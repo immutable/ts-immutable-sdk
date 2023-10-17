@@ -1,5 +1,5 @@
 import React from 'react';
-import { WalletProviderName } from '@imtbl/checkout-sdk';
+import { ConnectTargetLayer, WalletProviderName } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
 import { BiomePortalIdProvider } from '@biom3/react';
 import { OnRampWidget, OnRampWidgetParams } from './OnRampWidget';
@@ -7,7 +7,7 @@ import { ImmutableWebComponent } from '../ImmutableWebComponent';
 import { isValidAddress, isValidAmount, isValidWalletProvider } from '../../lib/validations/widgetValidators';
 import { ConnectLoader, ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
 import { sendOnRampWidgetCloseEvent } from './OnRampWidgetEvents';
-import { ConnectTargetLayer, getL1ChainId, getL2ChainId } from '../../lib';
+import { getL1ChainId, getL2ChainId } from '../../lib';
 import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 
 export class ImmutableOnRamp extends ImmutableWebComponent {

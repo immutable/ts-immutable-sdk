@@ -61,6 +61,8 @@ import { FiatRampService, FiatRampWidgetParams } from './fiatRamp';
 import { getItemRequirementsFromRequirements } from './smartCheckout/itemRequirements';
 import { CheckoutError, CheckoutErrorType } from './errors';
 import { AvailabilityService, availabilityService } from './availability';
+import { load } from './widgets/load';
+import { SemanticVersion, WidgetConfiguration } from './widgets/definitions/types';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
@@ -68,12 +70,13 @@ const SANDBOX_CONFIGURATION = {
   },
 };
 
+// Checkout SDK
 export class Checkout {
+  private readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>;
+
   readonly config: CheckoutConfiguration;
 
   readonly fiatRampService: FiatRampService;
-
-  private readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>;
 
   readonly availability: AvailabilityService;
 
@@ -88,6 +91,14 @@ export class Checkout {
     this.fiatRampService = new FiatRampService(this.config);
     this.readOnlyProviders = new Map<ChainId, ethers.providers.JsonRpcProvider>();
     this.availability = availabilityService(this.config.isDevelopment, this.config.isProduction);
+  }
+
+  /**
+   * Loads the widgets bundle and initiate the widgets factory.
+   */
+  public async widgets(config: WidgetConfiguration, version?: SemanticVersion) {
+    await load(version);
+    return new ImmutableCheckoutWidgets.WidgetsFactory(this, config);
   }
 
   /**

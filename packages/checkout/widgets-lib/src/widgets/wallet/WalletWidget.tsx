@@ -2,7 +2,7 @@ import { BiomeCombinedProviders } from '@biom3/react';
 import {
   useContext, useEffect, useMemo, useReducer,
 } from 'react';
-import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
+import { IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
 import {
   initialWalletState,
   WalletActions,

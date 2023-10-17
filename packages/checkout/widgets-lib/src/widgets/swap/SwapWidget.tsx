@@ -7,10 +7,9 @@ import {
   useState,
 } from 'react';
 import { BiomeCombinedProviders } from '@biom3/react';
-import { DexConfig, TokenFilterTypes } from '@imtbl/checkout-sdk';
+import { DexConfig, TokenFilterTypes, IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
 import { ImmutableConfiguration } from '@imtbl/config';
 import { Exchange, ExchangeOverrides } from '@imtbl/dex-sdk';
-import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import { SwapCoins } from './views/SwapCoins';
 import { LoadingView } from '../../views/loading/LoadingView';
 import {

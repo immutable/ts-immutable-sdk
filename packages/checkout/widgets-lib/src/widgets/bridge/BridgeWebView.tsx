@@ -1,5 +1,5 @@
 import { Environment } from '@imtbl/config';
-import { WidgetTheme } from '../../lib';
+import { WidgetTheme } from '@imtbl/checkout-sdk';
 
 function BridgeWebView() {
   const config = {

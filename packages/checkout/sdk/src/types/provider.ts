@@ -1,5 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { Passport } from '@imtbl/passport';
+// import { Passport } from '@imtbl/passport';
 
 /**
  * Enum representing the names of different wallet providers.
@@ -18,7 +18,7 @@ export enum WalletProviderName {
  */
 export interface CreateProviderParams {
   walletProvider: WalletProviderName;
-  passport?: Passport;
+  passport?: any; // TODO: investigate Some build issue with Provider | undefined not working in Connect Loader
 }
 
 /**

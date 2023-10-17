@@ -3,11 +3,8 @@ import {
 } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { BiomeCombinedProviders } from '@biom3/react';
-import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import {
-  Checkout,
-  GasEstimateType,
-  WalletProviderName,
+  IMTBLWidgetEvents, Checkout, GasEstimateType, WalletProviderName,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { BigNumber } from 'ethers';

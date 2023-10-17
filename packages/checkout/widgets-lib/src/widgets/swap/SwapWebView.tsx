@@ -1,5 +1,5 @@
+import { WidgetTheme } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
-import { WidgetTheme } from '../../lib';
 
 function SwapWebView() {
   const config = {
