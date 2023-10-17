@@ -5,15 +5,14 @@ import { ReactComponent as QuickswapLogo } from '../../assets/QuickswapLogo.svg'
 export function QuickswapFooter() {
   return (
     <Box testId="quickswap-footer-container" sx={quickswapFooterStyles}>
-      <Box sx={quickswapFooterLogoStyles}>
+      <Box testId="quickswap-logo" sx={quickswapFooterLogoStyles}>
         <Body size="xSmall">
-          Powered by
+          By
         </Body>
         <QuickswapLogo />
       </Box>
-      <Body size="xSmall" sx={quickswapFooterDisclaimerTextStyles}>
-        Quickswap is a third party application. Immutable neither builds, owns, operates or
-        deploys Quickswap. For further info, please refer to Quickswap’s website.
+      <Body testId="quickswap-footer-disclaimer-text" size="xSmall" sx={quickswapFooterDisclaimerTextStyles}>
+        Quickswap is a third party application. Immutable neither builds, owns, operates or deploys Quickswap.
       </Body>
     </Box>
   );
