@@ -71,14 +71,13 @@ export function TopUpView({
   const [loadingSwapFees, setLoadingSwapFees] = useState(false);
   const [loadingBridgeFees, setLoadingBridgeFees] = useState(false);
   const [isSwapAvailable, setIsSwapAvailable] = useState(true);
-  const [loadingSwapAvailability, setLoadingSwapAvailability] = useState(false);
+  const [loadingSwapAvailability, setLoadingSwapAvailability] = useState(true);
 
   const isPassport = isPassportProvider(provider);
 
   useEffect(() => {
     (async () => {
       if (!checkout) return;
-      setLoadingSwapAvailability(true);
       setIsSwapAvailable(await checkout.isSwapAvailable());
       setLoadingSwapAvailability(false);
 
