@@ -28,4 +28,8 @@ export type SaleSuccess = {
 export type SaleFailed = {
   reason: string;
   timestamp: number;
+  transactions: {
+    method: string;
+    hash: string | undefined;
+  }[];
 };

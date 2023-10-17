@@ -75,7 +75,7 @@ export type ExecuteOrderResponse = {
 };
 
 export enum SaleErrorTypes {
-  DEFAULT = 'DEFAULT',
+  DEFAULT = 'DEFAULT_ERROR',
   TRANSACTION_FAILED = 'TRANSACTION_FAILED',
   SERVICE_BREAKDOWN = 'SERVICE_BREAK_DOWN',
   TRANSAK_FAILED = 'TRANSAK_FAILED',

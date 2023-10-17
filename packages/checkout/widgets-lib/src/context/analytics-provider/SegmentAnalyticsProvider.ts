@@ -11,7 +11,16 @@ export enum UserJourney {
 }
 
 export type AnalyticsControlTypes = StandardAnalyticsControlTypes
-| 'IframeEvent';
+| 'IframeEvent' | 'Event';
+
+export type TrackEventProps = {
+  screen: string;
+  userJourney: UserJourney;
+  control: string;
+  controlType: AnalyticsControlTypes;
+  action?: StandardAnalyticsActions | undefined;
+  userId?: string | undefined;
+} & Record<string, unknown>;
 
 const SEGMENT_ANALYTICS_WRITE_KEY = {
   [Environment.SANDBOX]: 'b69BcXnFXdaiFC6MqRQiHvjcPrTxftZl',
