@@ -1,7 +1,8 @@
 import { Box } from '@biom3/react';
-import { FundingRoute } from '@imtbl/checkout-sdk';
+import { FundingRoute, RoutingOutcomeType } from '@imtbl/checkout-sdk';
 import {
   useContext,
+  useEffect,
   useMemo, useState,
 } from 'react';
 import {
@@ -11,6 +12,7 @@ import { ViewActions, ViewContext } from '../../../context/view-context/ViewCont
 import { LoadingView } from '../../../views/loading/LoadingView';
 import { FundingRouteSelect } from '../components/FundingRouteSelect/FundingRouteSelect';
 import { FundingRouteExecute } from '../components/FundingRouteExecute/FundingRouteExecute';
+import { useSaleContext } from '../context/SaleContextProvider';
 
 type FundWithSmartCheckoutProps = {
   subView: FundWithSmartCheckoutSubViews;
@@ -18,12 +20,26 @@ type FundWithSmartCheckoutProps = {
 
 export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
   const { viewDispatch } = useContext(ViewContext);
+  const [fundingRoutes, setFundingRoutes] = useState<FundingRoute[]>([]);
   const [selectedFundingRoute, setSelectedFundingRoute] = useState<FundingRoute | undefined>(undefined);
   const [fundingRouteStepIndex, setFundingRouteStepIndex] = useState<number>(0);
+
+  const { smartCheckoutResult } = useSaleContext();
 
   const onFundingRouteSelected = (fundingRoute: FundingRoute) => {
     setSelectedFundingRoute(fundingRoute);
   };
+
+  useEffect(() => {
+    if (!smartCheckoutResult || smartCheckoutResult.sufficient) {
+      return;
+    }
+    if (!smartCheckoutResult.sufficient
+      && smartCheckoutResult.router.routingOutcome.type === RoutingOutcomeType.ROUTES_FOUND
+    ) {
+      setFundingRoutes(smartCheckoutResult.router.routingOutcome.fundingRoutes);
+    }
+  }, [smartCheckoutResult]);
 
   const fundingRouteStep = useMemo(() => {
     if (!selectedFundingRoute) {
@@ -59,7 +75,7 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
       { subView === FundWithSmartCheckoutSubViews.FUNDING_ROUTE_SELECT && (
         <FundingRouteSelect
           onFundingRouteSelected={onFundingRouteSelected}
-          fundingRoutes={[]}
+          fundingRoutes={fundingRoutes}
         />
       )}
       { subView === FundWithSmartCheckoutSubViews.FUNDING_ROUTE_EXECUTE && (
