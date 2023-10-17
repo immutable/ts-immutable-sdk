@@ -16,6 +16,7 @@ import { SwapContext } from '../context/SwapContext';
 import { NotEnoughImx } from '../../../components/NotEnoughImx/NotEnoughImx';
 import { IMX_TOKEN_SYMBOL } from '../../../lib';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
+import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 export interface SwapCoinsProps {
   theme: WidgetTheme;
@@ -46,6 +47,15 @@ export function SwapCoins({
   } = useContext(SwapContext);
 
   const [showNotEnoughImxDrawer, setShowNotEnoughImxDrawer] = useState(false);
+
+  const { page } = useAnalytics();
+
+  useEffect(() => {
+    page({
+      userJourney: UserJourney.SWAP,
+      screen: 'SwapCoins',
+    });
+  }, []);
 
   useEffect(() => {
     if (hasZeroBalance(tokenBalances, IMX_TOKEN_SYMBOL)) {
