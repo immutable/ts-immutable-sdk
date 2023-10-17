@@ -160,6 +160,15 @@ export function SaleWidget(props: SaleWidgetProps) {
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
     },
+    [SaleErrorTypes.INSUFFICIENT_BALANCE]: {
+      // ! TODO PaymentMethods doesn't reset as state persists between renders
+      // ! Reset PaymentMethods to undefined
+      onActionClick: () => {
+        goBackToPaymentMethods();
+      },
+      onSecondaryActionClick: closeWidget,
+      statusType: StatusType.INFORMATION,
+    },
     [SaleErrorTypes.DEFAULT]: {
       onActionClick: goBackToPaymentMethods,
       onSecondaryActionClick: closeWidget,
