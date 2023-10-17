@@ -81,39 +81,24 @@ const getUnsignedERC20ApproveTransaction = (
   };
 };
 
-export const getAmountInToApprove = (
-  tradeType: TradeType,
-  amountSpecified: Amount<Coin>,
-  amountWithSlippage: Amount<Coin>,
-) => {
-  if (tradeType === TradeType.EXACT_INPUT && isERC20Amount(amountSpecified)) {
-    return amountSpecified;
-  }
-  if (tradeType === TradeType.EXACT_OUTPUT && isERC20Amount(amountWithSlippage)) {
-    return amountWithSlippage;
-  }
-  // Don't approve native input tokens.
-  return null;
-};
-
 export const prepareApproval = (
   tradeType: TradeType,
-  amountSpecified: Amount<Coin>,
-  amountWithSlippage: Amount<Coin>,
+  amountSpecified: Amount<Coin>, // EXACT_IN => TOKEN_IN, EXACT_OUT => TOKEN_OUT
+  quotedAmountWithSlippage: Amount<Coin>, // EXACT_IN => TOKEN_OUT, EXACT_OUT => TOKEN_IN
   contracts: {
     routerAddress: string;
     secondaryFeeAddress: string;
   },
   secondaryFees: SecondaryFee[],
 ): PreparedApproval | null => {
-  const amountToApprove = getAmountInToApprove(tradeType, amountSpecified, amountWithSlippage);
-  if (amountToApprove === null) {
+  const amountInToApprove = tradeType === TradeType.EXACT_INPUT ? amountSpecified : quotedAmountWithSlippage;
+  if (!isERC20Amount(amountInToApprove)) {
     return null;
   }
 
   const spender = secondaryFees.length === 0 ? contracts.routerAddress : contracts.secondaryFeeAddress;
 
-  return { spender, amount: amountToApprove };
+  return { spender, amount: amountInToApprove };
 };
 
 /**

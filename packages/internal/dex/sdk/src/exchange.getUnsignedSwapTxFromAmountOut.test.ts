@@ -131,8 +131,8 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
 
       const { approval, quote } = await exchange.getUnsignedSwapTxFromAmountOut(
         params.fromAddress,
-        params.inputToken,
-        params.outputToken,
+        params.inputToken, // USDC
+        params.outputToken, // WETH
         newAmountFromString('1000', WETH_TEST_TOKEN).value,
         3, // 3% Slippage
       );

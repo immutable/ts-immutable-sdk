@@ -2,6 +2,8 @@ import { JsonRpcProvider } from '@ethersproject/providers';
 import { BigNumber } from '@ethersproject/bignumber';
 import {
   expectToBeDefined,
+  FUN_TEST_TOKEN,
+  NATIVE_TEST_TOKEN,
   newAmountFromString,
   TEST_FROM_ADDRESS,
   TEST_PERIPHERY_ROUTER_ADDRESS,
@@ -205,7 +207,7 @@ describe('prepareApproval', () => {
   describe('when exact input amount is specified', () => {
     it('uses the amount specified by the user', () => {
       const amountSpecified = newAmountFromString('1', WETH_TEST_TOKEN);
-      const amountWithSlippage = newAmountFromString('2', WETH_TEST_TOKEN);
+      const amountWithSlippage = newAmountFromString('2', FUN_TEST_TOKEN);
       const secondaryFees = [{ basisPoints: 0, recipient: TEST_FROM_ADDRESS }];
       const approval = prepareApproval(
         TradeType.EXACT_INPUT,
@@ -222,7 +224,7 @@ describe('prepareApproval', () => {
   describe('when exact output amount is specified', () => {
     it('uses the amount calculated with slippage', () => {
       const amountSpecified = newAmountFromString('1', WETH_TEST_TOKEN);
-      const amountWithSlippage = newAmountFromString('2', WETH_TEST_TOKEN);
+      const amountWithSlippage = newAmountFromString('2', FUN_TEST_TOKEN);
       const secondaryFees = [{ basisPoints: 0, recipient: TEST_FROM_ADDRESS }];
       const approval = prepareApproval(
         TradeType.EXACT_OUTPUT,
@@ -239,7 +241,7 @@ describe('prepareApproval', () => {
   describe('when secondary fees are specified', () => {
     it('uses the secondary fee address as the spender', () => {
       const amountSpecified = newAmountFromString('2', WETH_TEST_TOKEN);
-      const amountWithSlippage = newAmountFromString('2', WETH_TEST_TOKEN);
+      const amountWithSlippage = newAmountFromString('2', FUN_TEST_TOKEN);
       const secondaryFees = [{ basisPoints: 0, recipient: TEST_FROM_ADDRESS }];
       const approval = prepareApproval(
         TradeType.EXACT_OUTPUT,
@@ -256,7 +258,7 @@ describe('prepareApproval', () => {
   describe('when no secondary fees are specified', () => {
     it('uses the periphery router address as the spender', () => {
       const amountSpecified = newAmountFromString('1', WETH_TEST_TOKEN);
-      const amountWithSlippage = newAmountFromString('2', WETH_TEST_TOKEN);
+      const amountWithSlippage = newAmountFromString('2', FUN_TEST_TOKEN);
       const secondaryFees: SecondaryFee[] = [];
       const approval = prepareApproval(
         TradeType.EXACT_OUTPUT,
@@ -267,6 +269,38 @@ describe('prepareApproval', () => {
       );
       expectToBeDefined(approval);
       expect(approval.spender).toEqual(TEST_PERIPHERY_ROUTER_ADDRESS);
+    });
+  });
+
+  describe('when the specified amount in is native', () => {
+    it('does not require approval', () => {
+      const amountSpecified = newAmountFromString('1', NATIVE_TEST_TOKEN);
+      const quotedAmountWithSlippage = newAmountFromString('10', FUN_TEST_TOKEN);
+
+      const approval = prepareApproval(
+        TradeType.EXACT_INPUT,
+        amountSpecified,
+        quotedAmountWithSlippage,
+        { routerAddress: TEST_PERIPHERY_ROUTER_ADDRESS, secondaryFeeAddress: TEST_SECONDARY_FEE_ADDRESS },
+        [],
+      );
+      expect(approval).toBeNull();
+    });
+  });
+
+  describe('when the quoted amount in is native', () => {
+    it('does not require approval', () => {
+      const amountSpecified = newAmountFromString('1', FUN_TEST_TOKEN);
+      const quotedAmountWithSlippage = newAmountFromString('10', NATIVE_TEST_TOKEN);
+
+      const approval = prepareApproval(
+        TradeType.EXACT_OUTPUT,
+        amountSpecified,
+        quotedAmountWithSlippage,
+        { routerAddress: TEST_PERIPHERY_ROUTER_ADDRESS, secondaryFeeAddress: TEST_SECONDARY_FEE_ADDRESS },
+        [],
+      );
+      expect(approval).toBeNull();
     });
   });
 });
