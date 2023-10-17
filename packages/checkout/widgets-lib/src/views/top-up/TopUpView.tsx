@@ -1,27 +1,35 @@
-import {
-  Body, Box, Heading,
-} from '@biom3/react';
-import {
-  IMTBLWidgetEvents,
-} from '@imtbl/checkout-widgets';
+import { Body, Box, Heading } from '@biom3/react';
+import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import {
   ReactNode, useContext, useEffect, useState,
 } from 'react';
 import {
-  GasEstimateBridgeToL2Result, GasEstimateSwapResult, GasEstimateType, OnRampProviderFees,
+  GasEstimateBridgeToL2Result,
+  GasEstimateSwapResult,
+  GasEstimateType,
+  OnRampProviderFees,
 } from '@imtbl/checkout-sdk';
 import { FooterLogo } from '../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
-import { SharedViews, ViewActions, ViewContext } from '../../context/view-context/ViewContext';
-import { text } from '../../resources/text/textConfig';
 import {
-  orchestrationEvents,
-} from '../../lib/orchestrationEvents';
+  SharedViews,
+  ViewActions,
+  ViewContext,
+} from '../../context/view-context/ViewContext';
+import { text } from '../../resources/text/textConfig';
+import { orchestrationEvents } from '../../lib/orchestrationEvents';
 import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
-import { getBridgeFeeEstimation, getOnRampFeeEstimation, getSwapFeeEstimation } from '../../lib/feeEstimation';
-import { CryptoFiatActions, CryptoFiatContext } from '../../context/crypto-fiat-context/CryptoFiatContext';
+import {
+  getBridgeFeeEstimation,
+  getOnRampFeeEstimation,
+  getSwapFeeEstimation,
+} from '../../lib/feeEstimation';
+import {
+  CryptoFiatActions,
+  CryptoFiatContext,
+} from '../../context/crypto-fiat-context/CryptoFiatContext';
 import { useInterval } from '../../lib/hooks/useInterval';
 import { DEFAULT_TOKEN_SYMBOLS } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
@@ -101,30 +109,48 @@ export function TopUpView({
     }
 
     try {
-      const [swapEstimate, bridgeEstimate, onRampFeesEstimate] = await Promise.all([
-        checkout.gasEstimate({
-          gasEstimateType: GasEstimateType.SWAP,
-        }),
-        checkout.gasEstimate({
-          gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-          isSpendingCapApprovalRequired: true,
-        }),
-        checkout.getExchangeFeeEstimate(),
+      await Promise.all([
+        (async (): Promise<any> => {
+          if (showSwapOption && isSwapAvailable) {
+            const swapEstimate = await checkout.gasEstimate({
+              gasEstimateType: GasEstimateType.SWAP,
+            });
+            const swapFeeInFiat = getSwapFeeEstimation(
+              swapEstimate as GasEstimateSwapResult,
+              conversions,
+            );
+            setSwapFeesInFiat(swapFeeInFiat);
+            setLoadingSwapFees(false);
+          }
+          return undefined;
+        })(),
+        (async (): Promise<any> => {
+          if (showBridgeOption) {
+            const bridgeEstimate = await checkout.gasEstimate({
+              gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+              isSpendingCapApprovalRequired: true,
+            });
+            const bridgeFeeInFiat = getBridgeFeeEstimation(
+              bridgeEstimate as GasEstimateBridgeToL2Result,
+              conversions,
+            );
+            setBridgeFeesInFiat(bridgeFeeInFiat);
+            setLoadingBridgeFees(false);
+          }
+          return undefined;
+        })(),
+        (async (): Promise<any> => {
+          if (showOnrampOption) {
+            const onRampFeesEstimate = await checkout.getExchangeFeeEstimate();
+            const onRampFees = getOnRampFeeEstimation(
+              onRampFeesEstimate as OnRampProviderFees,
+            );
+            setOnRampFeesPercentage(onRampFees);
+            setLoadingOnRampFees(false);
+          }
+          return undefined;
+        })(),
       ]);
-      const onRampFees = getOnRampFeeEstimation(
-        onRampFeesEstimate as OnRampProviderFees,
-      );
-      setOnRampFeesPercentage(onRampFees);
-      const swapFeeInFiat = getSwapFeeEstimation(
-        swapEstimate as GasEstimateSwapResult,
-        conversions,
-      );
-      setSwapFeesInFiat(swapFeeInFiat);
-      const bridgeFeeInFiat = getBridgeFeeEstimation(
-        bridgeEstimate as GasEstimateBridgeToL2Result,
-        conversions,
-      );
-      setBridgeFeesInFiat(bridgeFeeInFiat);
     } catch {
       setOnRampFeesPercentage('-.--');
       setSwapFeesInFiat('-.--');
@@ -276,7 +302,7 @@ export function TopUpView({
         )}
           footer={(
             <FooterLogo />
-        )}
+            )}
         >
           <Box sx={{ paddingX: 'base.spacing.x4', paddingY: 'base.spacing.x4' }}>
             <Heading size="small">{header.title}</Heading>
@@ -284,17 +310,16 @@ export function TopUpView({
               {topUpFeatures
                 .sort((a, b) => Number(b.isAvailable) - Number(a.isAvailable))
                 .map((element) => element.isEnabled && (
-                <TopUpMenuItem
-                  testId={element.testId}
-                  icon={element.icon as 'Wallet' | 'Coins' | 'Minting'}
-                  heading={element.textConfig.heading}
-                  caption={element.textConfig.caption}
-                  subcaption={element.textConfig.subcaption}
-                  disabledCaption={element.textConfig.disabledCaption}
-                  onClick={element.onClickEvent}
-                  renderFeeFunction={element.fee}
-                  isDisabled={!element.isAvailable}
-                />
+                  <TopUpMenuItem
+                    testId={element.testId}
+                    icon={element.icon as 'Wallet' | 'Coins' | 'Minting'}
+                    heading={element.textConfig.heading}
+                    caption={!element.isAvailable ? element.textConfig.disabledCaption : element.textConfig.caption}
+                    subcaption={element.textConfig.subcaption}
+                    onClick={element.onClickEvent}
+                    renderFeeFunction={element.fee}
+                    isDisabled={!element.isAvailable}
+                  />
                 ))}
             </Box>
           </Box>
