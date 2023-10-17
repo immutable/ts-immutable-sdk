@@ -21,8 +21,8 @@ import {
 } from '../../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
 import { IMX_ADDRESS_ZKEVM, NATIVE } from '../../../lib/constants';
 import { CustomAnalyticsProvider } from '../../../context/analytics-provider/CustomAnalyticsProvider';
-import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 import { WidgetTheme } from '../../../lib';
+import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 
 describe('SwapForm', () => {
   let testSwapState: SwapState;
@@ -902,40 +902,42 @@ describe('SwapForm', () => {
 
       it('should show not enough imx drawer if user does not have enough imx', () => {
         mount(
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <SwapWidgetTestComponent
-              initialStateOverride={{
-                ...testSwapState,
-                tokenBalances: [
-                  {
-                    balance: BigNumber.from('1000000000000000000'),
-                    formattedBalance: '1',
-                    token: {
-                      name: 'Ethereum',
-                      symbol: 'ETH',
-                      decimals: 18,
-                      address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-                    },
-                  },
-                  {
-                    balance: BigNumber.from('100000'),
-                    formattedBalance: '0.0001',
-                    token: {
-                      name: 'ImmutableX',
-                      symbol: 'IMX',
-                      decimals: 18,
-                      address: IMX_ADDRESS_ZKEVM,
-                    },
-                  },
-                ],
-              }}
-              cryptoConversionsOverride={cryptoConversions}
+          <CustomAnalyticsProvider widgetConfig={config}>
+            <ConnectLoaderTestComponent
+              initialStateOverride={connectLoaderState}
             >
-              <SwapCoins theme={WidgetTheme.LIGHT} />
-            </SwapWidgetTestComponent>
-          </ConnectLoaderTestComponent>,
+              <SwapWidgetTestComponent
+                initialStateOverride={{
+                  ...testSwapState,
+                  tokenBalances: [
+                    {
+                      balance: BigNumber.from('1000000000000000000'),
+                      formattedBalance: '1',
+                      token: {
+                        name: 'Ethereum',
+                        symbol: 'ETH',
+                        decimals: 18,
+                        address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+                      },
+                    },
+                    {
+                      balance: BigNumber.from('100000'),
+                      formattedBalance: '0.0001',
+                      token: {
+                        name: 'ImmutableX',
+                        symbol: 'IMX',
+                        decimals: 18,
+                        address: IMX_ADDRESS_ZKEVM,
+                      },
+                    },
+                  ],
+                }}
+                cryptoConversionsOverride={cryptoConversions}
+              >
+                <SwapCoins theme={WidgetTheme.LIGHT} />
+              </SwapWidgetTestComponent>
+            </ConnectLoaderTestComponent>
+          </CustomAnalyticsProvider>,
         );
 
         cySmartGet('fromTokenInputs-select-form-select__target').click();
