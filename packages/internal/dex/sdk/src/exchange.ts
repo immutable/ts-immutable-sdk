@@ -161,7 +161,6 @@ export class Exchange {
 
     const adjustedQuote = adjustQuoteWithFees(
       ourQuote,
-      amountSpecified,
       fees,
       this.tokenWrapper,
     );

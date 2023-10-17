@@ -11,7 +11,7 @@ import { toCurrencyAmount } from 'lib/utils';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
 import { TokenWrapper } from 'lib/tokenWrapper';
 import {
-  Native, SecondaryFee, Amount, TransactionDetails, Coin,
+  Native, SecondaryFee, Amount, TransactionDetails,
 } from '../../types';
 import { calculateGasFee } from './gas';
 import { slippageToFraction } from './slippage';
@@ -238,7 +238,6 @@ export function getSwap(
 
 export function adjustQuoteWithFees(
   ourQuote: QuoteResult,
-  amountSpecified: Amount<Coin>,
   fees: Fees,
   tokenWrapper: TokenWrapper,
 ): QuoteResult {
@@ -251,16 +250,10 @@ export function adjustQuoteWithFees(
       gasEstimate: ourQuote.gasEstimate,
       route: ourQuote.route,
       amountIn: tokenWrapper.maybeWrapAmount(fees.amountWithFeesApplied()),
-      amountOut: tokenWrapper.maybeWrapAmount(amountSpecified),
+      amountOut: ourQuote.amountOut,
       tradeType: ourQuote.tradeType,
     };
   }
 
-  return {
-    gasEstimate: ourQuote.gasEstimate,
-    route: ourQuote.route,
-    amountIn: tokenWrapper.maybeWrapAmount(amountSpecified),
-    amountOut: ourQuote.amountOut,
-    tradeType: ourQuote.tradeType,
-  };
+  return ourQuote;
 }
