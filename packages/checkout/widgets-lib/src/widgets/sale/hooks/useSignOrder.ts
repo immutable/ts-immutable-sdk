@@ -197,11 +197,11 @@ export const useSignOrder = (input: SignOrderInput) => {
         await txnResponse?.wait(1);
 
         transactionHash = txnResponse?.hash;
-      } catch (e) {
+      } catch (err) {
         // TODO: check error type to send
         // SaleErrorTypes.WALLET_REJECTED or SaleErrorTypes.WALLET_REJECTED_NO_FUNDS
 
-        const reason = typeof e === 'string' ? e : (e as any).reason || '';
+        const reason = typeof err === 'string' ? err : (err as any).reason || '';
         let errorType = SaleErrorTypes.TRANSACTION_FAILED;
 
         if (reason.includes('rejected') && reason.includes('user')) {
@@ -217,7 +217,7 @@ export const useSignOrder = (input: SignOrderInput) => {
 
         setSignError({
           type: errorType,
-          data: { error: e },
+          data: { error: err, reason },
         });
       }
 

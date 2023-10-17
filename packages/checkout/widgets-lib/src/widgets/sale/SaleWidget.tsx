@@ -67,7 +67,7 @@ export function SaleWidget(props: SaleWidgetProps) {
 
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
-  const { sendCloseEvent } = useSaleEvent();
+  const { sendCloseEvent, sendSuccessEvent, sendFailedEvent } = useSaleEvent();
 
   const { theme } = config;
   const biomeTheme = useMemo(() => widgetTheme(theme), [theme]);
@@ -212,7 +212,15 @@ export function SaleWidget(props: SaleWidgetProps) {
             <PayWithCoins />
           )}
           {viewState.view.type === SaleWidgetViews.SALE_FAIL && (
-            <StatusView {...getErrorViewProps()} />
+            <StatusView
+              onRenderEvent={() => sendFailedEvent(
+                viewState.view.data?.reason,
+                viewState.view.data?.transactions,
+                viewState.view.data?.paymentMethod,
+                SaleWidgetViews.SALE_FAIL,
+              )}
+              {...getErrorViewProps()}
+            />
           )}
           {viewState.view.type === SaleWidgetViews.SALE_SUCCESS
             && provider && (
@@ -223,6 +231,11 @@ export function SaleWidget(props: SaleWidgetProps) {
                 actionText={
                   text.views[SaleWidgetViews.SALE_SUCCESS].actionText
                 }
+                onRenderEvent={() => sendSuccessEvent(
+                  viewState.view.data?.transactions,
+                  viewState.view.data?.paymentMethod,
+                  SaleWidgetViews.SALE_SUCCESS,
+                )}
                 onActionClick={() => sendCloseEvent(SaleWidgetViews.SALE_SUCCESS)}
                 statusType={StatusType.SUCCESS}
                 testId="success-view"

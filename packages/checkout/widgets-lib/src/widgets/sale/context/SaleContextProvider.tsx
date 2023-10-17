@@ -137,38 +137,6 @@ export function SaleContextProvider(props: {
     [],
   );
 
-  const goToErrorView = useCallback(
-    (errorType: SaleErrorTypes, data: Record<string, unknown> = {}) => {
-      errorRetries.current += 1;
-      if (errorRetries.current > MAX_ERROR_RETRIES) {
-        errorRetries.current = 0;
-        setPaymentMethod(undefined);
-      }
-
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: SaleWidgetViews.SALE_FAIL,
-            data: { errorType, ...data },
-          },
-        },
-      });
-    },
-    [],
-  );
-
-  const goToSuccessView = useCallback(() => {
-    viewDispatch({
-      payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: {
-          type: SaleWidgetViews.SALE_SUCCESS,
-        },
-      },
-    });
-  }, []);
-
   useEffect(() => {
     const getUserInfo = async () => {
       const signer = provider?.getSigner();
@@ -209,6 +177,47 @@ export function SaleContextProvider(props: {
     },
     [signOrder],
   );
+
+  const goToErrorView = useCallback(
+    (errorType: SaleErrorTypes, data: Record<string, unknown> = {}) => {
+      errorRetries.current += 1;
+      if (errorRetries.current > MAX_ERROR_RETRIES) {
+        errorRetries.current = 0;
+        setPaymentMethod(undefined);
+      }
+
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SaleWidgetViews.SALE_FAIL,
+            data: {
+              ...data,
+              errorType,
+              paymentMethod,
+              transactions: executeResponse.transactions,
+            },
+          },
+        },
+      });
+    },
+    [],
+  );
+
+  const goToSuccessView = useCallback(() => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: SaleWidgetViews.SALE_SUCCESS,
+          data: {
+            paymentMethod,
+            transactions: executeResponse.transactions,
+          },
+        },
+      },
+    });
+  }, []);
 
   useEffect(() => {
     if (!signError) return;

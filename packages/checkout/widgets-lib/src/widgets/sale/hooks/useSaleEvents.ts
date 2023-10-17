@@ -9,6 +9,7 @@ import {
   sendSaleFailedEvent,
   sendSaleSuccessEvent,
   sendSaleWidgetCloseEvent,
+  sendSaleTransactionSuccessEvent,
 } from '../SaleWidgetEvents';
 import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 import { ExecutedTransaction } from '../types';
@@ -44,6 +45,7 @@ export const useSaleEvent = () => {
 
   const sendSuccessEvent = (
     transactions: ExecutedTransaction[] = [],
+    paymentType = '',
     screen: TrackEventProps['screen'] = defaultView,
   ) => {
     track({
@@ -54,6 +56,7 @@ export const useSaleEvent = () => {
       userJourney: UserJourney.SALE,
       userId,
       email,
+      paymentType,
       transactions: toStringifyTransactions(transactions),
     });
     sendSaleSuccessEvent(eventTarget, transactions);
@@ -61,8 +64,9 @@ export const useSaleEvent = () => {
 
   const sendFailedEvent = (
     reason: string,
-    screen: TrackEventProps['screen'] = defaultView,
     transactions: ExecutedTransaction[] = [],
+    paymentType = '',
+    screen: TrackEventProps['screen'] = defaultView,
   ) => {
     track({
       screen,
@@ -73,9 +77,14 @@ export const useSaleEvent = () => {
       userId,
       email,
       reason,
+      paymentType,
       transactions: toStringifyTransactions(transactions),
     });
-    sendSaleFailedEvent(eventTarget, reason);
+    sendSaleFailedEvent(eventTarget, reason, transactions);
+  };
+
+  const sendTransactionSuccessEvent = (transactions: ExecutedTransaction[]) => {
+    sendSaleTransactionSuccessEvent(eventTarget, transactions);
   };
 
   return {
@@ -83,5 +92,6 @@ export const useSaleEvent = () => {
     sendCloseEvent,
     sendSuccessEvent,
     sendFailedEvent,
+    sendTransactionSuccessEvent,
   };
 };
