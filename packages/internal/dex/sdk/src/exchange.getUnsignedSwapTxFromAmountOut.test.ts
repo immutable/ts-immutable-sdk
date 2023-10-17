@@ -2,7 +2,7 @@ import { JsonRpcProvider } from '@ethersproject/providers';
 import { Contract } from '@ethersproject/contracts';
 import { BigNumber } from '@ethersproject/bignumber';
 import { SecondaryFee } from 'lib';
-import { ethers } from 'ethers';
+import { ethers, utils } from 'ethers';
 import { ERC20__factory } from 'contracts/types';
 import { Exchange } from './exchange';
 import {
@@ -28,6 +28,10 @@ import {
   WETH_TEST_TOKEN,
   formatTokenAmount,
   expectERC20,
+  createPool,
+  WIMX_TEST_TOKEN,
+  FUN_TEST_TOKEN,
+  expectNative,
 } from './test/utils';
 
 jest.mock('@ethersproject/providers');
@@ -332,6 +336,48 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       expect(swapParams.recipient).toBe(params.fromAddress); // recipient of swap
       expect(formatTokenAmount(swapParams.amountInMaximum, USDC_TEST_TOKEN)).toBe('110.11'); // (includes fees and slippage)
       expect(formatEther(swapParams.amountOut)).toBe('1000.0');
+    });
+  });
+
+  describe('With an Exact Output, and native Token In', () => {
+    it('uses the wrapped native pool to quote', async () => {
+      mockRouterImplementation({
+        pools: [createPool(WIMX_TEST_TOKEN, FUN_TEST_TOKEN)],
+      });
+
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+
+      const { quote } = await exchange.getUnsignedSwapTxFromAmountOut(
+        makeAddr('sicko'),
+        'native',
+        FUN_TEST_TOKEN.address,
+        utils.parseEther('1'), // want 1 FUN
+      );
+
+      expectNative(quote.amount.token);
+      expectNative(quote.amountWithMaxSlippage.token);
+      expect(formatAmount(quote.amount)).toEqual('0.1');
+    });
+  });
+
+  describe('With an Exact Output, and native Token Out', () => {
+    it('uses the wrapped native pool to quote', async () => {
+      mockRouterImplementation({
+        pools: [createPool(WIMX_TEST_TOKEN, FUN_TEST_TOKEN)],
+      });
+
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+
+      const { quote } = await exchange.getUnsignedSwapTxFromAmountOut(
+        makeAddr('sicko'),
+        FUN_TEST_TOKEN.address,
+        'native',
+        utils.parseEther('1'), // want 1 native IMX
+      );
+
+      expectERC20(quote.amount.token, FUN_TEST_TOKEN.address);
+      expectERC20(quote.amountWithMaxSlippage.token, FUN_TEST_TOKEN.address);
+      expect(formatAmount(quote.amount)).toEqual('0.1');
     });
   });
 });
