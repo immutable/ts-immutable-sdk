@@ -201,7 +201,7 @@ export function TopUpView({
       });
       return;
     }
-    orchestrationEvents.sendRequestOnrampEvent(window, widgetEvent, {
+    orchestrationEvents.sendRequestOnrampEvent(eventTarget, widgetEvent, {
       tokenAddress: tokenAddress ?? '',
       amount: amount ?? '',
     });

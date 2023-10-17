@@ -16,6 +16,7 @@ import {
 import { SwapFormData } from './swapFormTypes';
 import { TransactionRejected } from '../../../components/TransactionRejected/TransactionRejected';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
+import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 export interface SwapButtonProps {
   loading: boolean
@@ -35,10 +36,26 @@ export function SwapButton({
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
   const { buttonText } = text.views[SwapWidgetViews.SWAP].swapForm;
+  const { track } = useAnalytics();
   const sendTransaction = async () => {
-    if (!validator()) return;
+    const isValid = validator();
+    // Tracking swap from data here and is valid or not to understand behaviour
+    track({
+      userJourney: UserJourney.SWAP,
+      screen: 'SwapCoins',
+      control: 'Swap',
+      controlType: 'Button',
+      swapFromAddress: data?.fromContractAddress,
+      swapFromAmount: data?.fromAmount,
+      swapFromTokenSymbol: data?.fromTokenSymbol,
+      swapToAddress: data?.toContractAddress,
+      swapToAmount: data?.toAmount,
+      swapToTokenSymbol: data?.toTokenSymbol,
+      isSwapFormValid: isValid,
+      hasFundsForGas: !insufficientFundsForGas,
+    });
+    if (!isValid) return;
     if (!checkout || !provider || !transaction) return;
-
     if (insufficientFundsForGas) {
       openNotEnoughImxDrawer();
       return;
@@ -47,6 +64,11 @@ export function SwapButton({
     if (!transaction) return;
     try {
       updateLoading(true);
+      const prefilledSwapData:PrefilledSwapForm = {
+        fromAmount: data?.fromAmount || '',
+        fromContractAddress: data?.fromContractAddress || '',
+        toContractAddress: data?.toContractAddress || '',
+      };
 
       if (transaction.approval) {
         // If we need to approve a spending limit first
@@ -60,7 +82,7 @@ export function SwapButton({
                 approveTransaction: transaction.approval.transaction,
                 transaction: transaction.swap.transaction,
                 info: transaction.quote,
-                swapFormInfo: data as PrefilledSwapForm,
+                swapFormInfo: prefilledSwapData,
               },
             },
           },
@@ -79,7 +101,7 @@ export function SwapButton({
             type: SwapWidgetViews.IN_PROGRESS,
             data: {
               transactionResponse: txn.transactionResponse,
-              swapForm: data as PrefilledSwapForm,
+              swapForm: prefilledSwapData as PrefilledSwapForm,
             },
           },
         },
