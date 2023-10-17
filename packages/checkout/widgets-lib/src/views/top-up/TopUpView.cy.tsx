@@ -293,6 +293,8 @@ describe('Top Up View', () => {
           </BiomeCombinedProviders>,
         );
 
+        cySmartGet('loading-view').should('be.visible');
+        cy.wait(1000);
         cySmartGet('menu-item-caption-swap').should('have.text', 'Not available in your region ');
         cySmartGet('menu-item-swap').click();
         cy.get('@sendRequestSwapEventStub').should('not.have.been.called');
