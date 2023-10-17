@@ -9,16 +9,7 @@ describe('ExchangeConfiguration', () => {
   const chainId = 999999999;
   // This list can be updated with any Tokens that are deployed to the chain being configured
   // These tokens will be used to find available pools for a swap
-  const commonRoutingTokensSingle: ERC20[] = [
-    {
-      chainId,
-      address: '0x12958b06abdf2701ace6ceb3ce0b8b1ce11e0851',
-      decimals: 18,
-      symbol: 'FUN',
-      name: 'The Fungibles Token',
-      type: 'erc20',
-    },
-  ];
+  const commonRoutingTokensSingle: ERC20[] = [test.FUN_TEST_TOKEN];
 
   const contractOverrides: ExchangeContracts = {
     multicall: test.TEST_MULTICALL_ADDRESS,
@@ -73,30 +64,9 @@ describe('ExchangeConfiguration', () => {
       // This list can be updated with any Tokens that are deployed to the chain being configured
       // These tokens will be used to find available pools for a swap
       const commonRoutingTokens: ERC20[] = [
-        {
-          chainId,
-          address: '0x12958b06abdf2701ace6ceb3ce0b8b1ce11e0851',
-          decimals: 18,
-          symbol: 'FUN',
-          name: 'The Fungibles Token',
-          type: 'erc20',
-        },
-        {
-          chainId,
-          address: '0x22958b06abdf2701ace6ceb3ce0b8b1ce11e0851',
-          decimals: 18,
-          symbol: 'USDC',
-          name: 'US Dollar Coin',
-          type: 'erc20',
-        },
-        {
-          chainId,
-          address: '0x32958b06abdf2701ace6ceb3ce0b8b1ce11e0851',
-          decimals: 18,
-          symbol: 'WETH',
-          name: 'Wrapped Ether',
-          type: 'erc20',
-        },
+        test.FUN_TEST_TOKEN,
+        test.USDC_TEST_TOKEN,
+        test.WETH_TEST_TOKEN,
       ];
 
       const secondaryFees = [
