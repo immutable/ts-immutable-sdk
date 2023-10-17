@@ -242,8 +242,8 @@ export function adjustQuoteWithFees(
   tokenWrapper: TokenWrapper,
 ): QuoteResult {
   if (ourQuote.tradeType === TradeType.EXACT_OUTPUT) {
-    // when doing exact output, calaculate the fees based on the amountIn
-    const amountToAdd = fees.areNative() ? tokenWrapper.unwrapAmount(ourQuote.amountIn) : ourQuote.amountIn;
+    // when doing exact output, calculate the fees based on the amountIn
+    const amountToAdd = tokenWrapper.isNativeToken(fees.token) ? tokenWrapper.unwrapAmount(ourQuote.amountIn) : ourQuote.amountIn;
     fees.addAmount(amountToAdd);
 
     return {

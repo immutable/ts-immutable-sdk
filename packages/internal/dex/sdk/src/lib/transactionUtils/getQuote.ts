@@ -4,6 +4,7 @@ import { ethers } from 'ethers';
 import { Fees } from 'lib/fees';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
 import { TokenWrapper } from 'lib/tokenWrapper';
+import { newAmount } from 'lib/utils';
 import {
   Coin, ERC20, Quote, Amount,
 } from '../../types';
@@ -37,15 +38,12 @@ export function prepareUserQuote(
   tokenWrapper: TokenWrapper,
 ): Quote {
   const erc20QuoteAmount = getQuoteAmountFromTradeType(tradeInfo);
-  const maybeUnwrappedQuoteAmount = tokenWrapper.isNativeToken(tokenOfQuotedAmount) ? tokenWrapper.unwrapAmount(erc20QuoteAmount) : erc20QuoteAmount;
-  const amountWithSlippage = applySlippage(tradeInfo.tradeType, maybeUnwrappedQuoteAmount.value, slippage);
+  const amountWithMaxSlippage = applySlippage(tradeInfo.tradeType, erc20QuoteAmount.value, slippage);
+  const amount = tokenWrapper.isNativeToken(tokenOfQuotedAmount) ? tokenWrapper.unwrapAmount(erc20QuoteAmount) : erc20QuoteAmount;
 
   return {
-    amount: maybeUnwrappedQuoteAmount,
-    amountWithMaxSlippage: {
-      token: tokenOfQuotedAmount,
-      value: amountWithSlippage,
-    },
+    amount,
+    amountWithMaxSlippage: newAmount(amountWithMaxSlippage, tokenOfQuotedAmount),
     slippage,
     fees: fees.withAmounts(),
   };

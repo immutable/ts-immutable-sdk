@@ -4,18 +4,17 @@ import { BigNumber } from 'ethers';
 import {
   Amount, Fee, SecondaryFee, newAmount, Coin, addAmount, subtractAmount,
 } from 'lib';
-import { TokenWrapper } from './tokenWrapper';
 
 export class Fees {
   private amount: Amount<Coin>;
 
-  constructor(private secondaryFees: SecondaryFee[], token: Coin, private tokenWrapper: TokenWrapper) {
+  constructor(private secondaryFees: SecondaryFee[], token: Coin) {
     this.secondaryFees = secondaryFees;
     this.amount = newAmount(BigNumber.from(0), token);
   }
 
-  areNative(): boolean {
-    return this.tokenWrapper.isNativeToken(this.amount.token);
+  get token(): Coin {
+    return this.amount.token;
   }
 
   addAmount(amount: Amount<Coin>): void {
