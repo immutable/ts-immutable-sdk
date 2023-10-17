@@ -64,7 +64,7 @@ then
   echo "PR=$PR" >> $GITHUB_ENV
 
   echo "Merging a pull request"
-  PR_MERGE=$(gh pr merge "$PR" --admin)
+  PR_MERGE=$(gh pr merge "https://github.com/immutable/imx-docs/pull/612" --admin)
   echo "PR_MERGE=$PR_MERGE" >> $GITHUB_ENV
 else
   echo "No changes detected"
