@@ -8,16 +8,16 @@ import {
 import { ProviderCallError } from 'errors';
 import { getQuotesForRoutes } from './getQuotesForRoutes';
 import {
-  IMX_TEST_TOKEN,
   TEST_CHAIN_ID,
   TEST_MULTICALL_ADDRESS,
   TEST_QUOTER_ADDRESS,
   TEST_RPC_URL,
   WETH_TEST_TOKEN,
   formatAmount,
+  WIMX_TEST_TOKEN,
 } from '../test/utils';
 import { Multicall__factory } from '../contracts/types';
-import { newAmount } from './utils';
+import { erc20ToUniswapToken, newAmount } from './utils';
 
 jest.mock('@ethersproject/contracts');
 
@@ -27,6 +27,9 @@ const types = [
   'uint32', // ticks crossed
   'uint256', // gasEstimate
 ];
+
+const weth = erc20ToUniswapToken(WETH_TEST_TOKEN);
+const wimx = erc20ToUniswapToken(WIMX_TEST_TOKEN);
 
 describe('getQuotesForRoutes', () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -57,15 +60,15 @@ describe('getQuotesForRoutes', () => {
       // Since we will be mocking the multicall, routes doesn't matter,
       // as long as the length is correct.
       const pool0 = new Pool(
-        WETH_TEST_TOKEN,
-        IMX_TEST_TOKEN,
+        weth,
+        wimx,
         FeeAmount.HIGH,
         sqrtPriceAtTick,
         1000,
         arbitraryTick,
       );
-      dummyRoutes.push(new Route([pool0], WETH_TEST_TOKEN, IMX_TEST_TOKEN));
-      dummyRoutes.push(new Route([pool0], WETH_TEST_TOKEN, IMX_TEST_TOKEN));
+      dummyRoutes.push(new Route([pool0], weth, wimx));
+      dummyRoutes.push(new Route([pool0], weth, wimx));
 
       const amount = newAmount(BigNumber.from('123123'), WETH_TEST_TOKEN);
 
@@ -113,14 +116,14 @@ describe('getQuotesForRoutes', () => {
       // Since we will be mocking the multicall, routes doesn't matter,
       // as long as the length is correct.
       const pool0 = new Pool(
-        WETH_TEST_TOKEN,
-        IMX_TEST_TOKEN,
+        weth,
+        wimx,
         FeeAmount.HIGH,
         sqrtPriceAtTick,
         1000,
         arbitraryTick,
       );
-      dummyRoutes.push(new Route([pool0], WETH_TEST_TOKEN, IMX_TEST_TOKEN));
+      dummyRoutes.push(new Route([pool0], weth, wimx));
 
       const provider = new providers.JsonRpcProvider(
         TEST_RPC_URL,
@@ -191,15 +194,15 @@ describe('getQuotesForRoutes', () => {
       // Since we will be mocking the multicall, routes doesn't matter,
       // as long as the length is correct.
       const pool0 = new Pool(
-        WETH_TEST_TOKEN,
-        IMX_TEST_TOKEN,
+        weth,
+        wimx,
         FeeAmount.HIGH,
         sqrtPriceAtTick,
         1000,
         arbitraryTick,
       );
-      dummyRoutes.push(new Route([pool0], WETH_TEST_TOKEN, IMX_TEST_TOKEN));
-      dummyRoutes.push(new Route([pool0], WETH_TEST_TOKEN, IMX_TEST_TOKEN));
+      dummyRoutes.push(new Route([pool0], weth, wimx));
+      dummyRoutes.push(new Route([pool0], weth, wimx));
 
       const provider = new providers.JsonRpcProvider(
         TEST_RPC_URL,

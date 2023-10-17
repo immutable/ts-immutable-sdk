@@ -2,8 +2,8 @@ import { ethers } from 'ethers';
 import { Token, TradeType } from '@uniswap/sdk-core';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import { NoRoutesAvailableError } from 'errors';
-import { ERC20, TokenAmount } from 'types';
-import { poolEquals, tokenInfoToUniswapToken } from './utils';
+import { ERC20, Amount } from 'types';
+import { poolEquals, erc20ToUniswapToken, uniswapTokenToERC20 } from './utils';
 import { getQuotesForRoutes, QuoteResult } from './getQuotesForRoutes';
 import { fetchValidPools } from './poolUtils/fetchValidPools';
 import { ERC20Pair } from './poolUtils/generateERC20Pairs';
@@ -34,7 +34,7 @@ export class Router {
   }
 
   public async findOptimalRoute(
-    amountSpecified: TokenAmount<ERC20>,
+    amountSpecified: Amount<ERC20>,
     otherToken: ERC20,
     tradeType: TradeType,
     maxHops: number = 2,
@@ -94,7 +94,7 @@ export class Router {
   private async getBestQuoteFromRoutes(
     multicallContract: Multicall,
     routes: Route<Token, Token>[],
-    amountSpecified: TokenAmount<ERC20>,
+    amountSpecified: Amount<ERC20>,
     tradeType: TradeType,
   ): Promise<QuoteResult> {
     const quotes = await getQuotesForRoutes(
@@ -150,7 +150,7 @@ export class Router {
   // eslint-disable-next-line class-methods-use-this
   private determineERC20InAndERC20Out(
     tradeType: TradeType,
-    amountSpecified: TokenAmount<ERC20>,
+    amountSpecified: Amount<ERC20>,
     otherToken: ERC20,
   ): [ERC20, ERC20] {
     // If the trade type is EXACT INPUT then we have specified the amount for the tokenIn
@@ -169,9 +169,9 @@ export const generateAllAcyclicPaths = (
   routes: Route<Token, Token>[] = [], // list of all routes found so far
   startTokenIn: ERC20 = tokenIn, // the currency we started with
 ): Route<Token, Token>[] => {
-  const currencyIn = tokenInfoToUniswapToken(tokenIn);
-  const currencyOut = tokenInfoToUniswapToken(tokenOut);
-  const startCurrencyIn = tokenInfoToUniswapToken(startTokenIn);
+  const currencyIn = erc20ToUniswapToken(tokenIn);
+  const currencyOut = erc20ToUniswapToken(tokenOut);
+  const startCurrencyIn = erc20ToUniswapToken(startTokenIn);
 
   for (const pool of pools) {
     // if the pool doesn't have the tokenIn or if it has already been traversed,
@@ -194,7 +194,7 @@ export const generateAllAcyclicPaths = (
       // otherwise, if we haven't exceeded the maximum number of pools that can be traversed,
       // recursively call this function with the output token as the new starting currency
       generateAllAcyclicPaths(
-        outputToken,
+        uniswapTokenToERC20(outputToken),
         tokenOut,
         pools,
         maxHops - 1,

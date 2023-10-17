@@ -8,7 +8,7 @@ import {
   multicallMultipleCallDataSingContract,
 } from './multicall';
 import {
-  IMX_TEST_TOKEN,
+  WIMX_TEST_TOKEN,
   TEST_CHAIN_ID,
   TEST_MULTICALL_ADDRESS,
   TEST_RPC_URL,
@@ -29,7 +29,6 @@ describe('multicallSingleCallDataMultipleContracts', () => {
     mockedContract = (Contract as unknown as jest.Mock).mockImplementationOnce(
       () => ({
         callStatic: {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           multicall: async () => ({
             returnData: [
               {
@@ -61,7 +60,7 @@ describe('multicallSingleCallDataMultipleContracts', () => {
           [
             defaultAbiCoder.encode(
               ['address', 'address', 'uint24'],
-              [WETH_TEST_TOKEN.address, IMX_TEST_TOKEN.address, '3000'],
+              [WETH_TEST_TOKEN.address, WIMX_TEST_TOKEN.address, '3000'],
             ),
           ],
         ),
@@ -74,7 +73,7 @@ describe('multicallSingleCallDataMultipleContracts', () => {
           [
             defaultAbiCoder.encode(
               ['address', 'address', 'uint24'],
-              [WETH_TEST_TOKEN.address, IMX_TEST_TOKEN.address, '10000'],
+              [WETH_TEST_TOKEN.address, WIMX_TEST_TOKEN.address, '10000'],
             ),
           ],
         ),
@@ -108,7 +107,7 @@ describe('multicallSingleCallDataMultipleContracts', () => {
         encodedToken0Second,
       )[0];
 
-      expect(decodedToken0First === IMX_TEST_TOKEN);
+      expect(decodedToken0First === WIMX_TEST_TOKEN);
       expect(decodedToken0Second === WETH_TEST_TOKEN);
       expect(mockedContract).toBeCalledTimes(1);
     });

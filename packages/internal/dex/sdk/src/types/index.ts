@@ -41,23 +41,11 @@ export type SecondaryFee = {
 export type Fee = {
   recipient: string;
   basisPoints: number;
-  amount: TokenAmount<Currency>;
+  amount: Amount<Coin>;
 };
 
-// TODO: Replace `Amount` and rename
-export type TokenAmount<T extends Currency> = {
+export type Amount<T extends Coin> = {
   token: T;
-  value: ethers.BigNumber;
-};
-
-/**
- * @deprecated
- * Interface representing an amount with the token information
- * @property {TokenInfo} token - The token information
- * @property {ethers.BigNumber} value - The amount
- */
-export type Amount = {
-  token: TokenInfo;
   value: ethers.BigNumber;
 };
 
@@ -68,8 +56,8 @@ export type Amount = {
  * @property {number} slippage - The slippage percentage used to calculate the quote
  */
 export type Quote = {
-  amount: TokenAmount<Currency>;
-  amountWithMaxSlippage: TokenAmount<Currency>;
+  amount: Amount<Coin>;
+  amountWithMaxSlippage: Amount<Coin>;
   slippage: number;
   fees: Fee[];
 };
@@ -81,7 +69,7 @@ export type Quote = {
  */
 export type TransactionDetails = {
   transaction: ethers.providers.TransactionRequest;
-  gasFeeEstimate: TokenAmount<Native> | null;
+  gasFeeEstimate: Amount<Native> | null;
 };
 
 /**
@@ -133,31 +121,14 @@ export type Native = {
   name?: string;
 };
 
-export type Currency = ERC20 | Native;
-
-/**
- * @deprecated
- * Interface representing a token
- * @property {number} chainId - The chain ID
- * @property {string} address - The token address
- * @property {number} decimals - The token decimals
- * @property {string | undefined} symbol - The token symbol or undefined if it is not available
- * @property {string | undefined} name - The token name or undefined if it is not available
- */
-export type TokenInfo = {
-  chainId: number;
-  address: TokenLiteral;
-  decimals: number;
-  symbol?: string;
-  name?: string;
-};
+export type Coin = ERC20 | Native;
 
 export interface ExchangeOverrides {
   rpcURL: string;
   exchangeContracts: ExchangeContracts;
-  commonRoutingTokens: TokenInfo[];
-  nativeToken: TokenInfo;
-  wrappedNativeToken: TokenInfo;
+  commonRoutingTokens: ERC20[];
+  nativeToken: Native;
+  wrappedNativeToken: ERC20;
 }
 
 export interface ExchangeModuleConfiguration

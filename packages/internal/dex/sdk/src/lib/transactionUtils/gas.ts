@@ -1,12 +1,12 @@
 import { BigNumber } from 'ethers';
 import { JsonRpcProvider, FeeData } from '@ethersproject/providers';
-import { Native, NativeAmount, newNativeAmount } from 'lib';
+import { Native, newAmount, Amount } from 'lib';
 
 type EIP1559FeeData = {
   maxFeePerGas: BigNumber;
   maxPriorityFeePerGas: BigNumber;
   lastBaseFeePerGas: BigNumber;
-  gasPrice: null
+  gasPrice: null;
 };
 
 /**
@@ -26,15 +26,18 @@ export const doesChainSupportEIP1559 = (fee: FeeData): fee is EIP1559FeeData => 
  * @returns {NativeAmount | null} - The gas price in the smallest denomination of the chain's currency,
  * or null if no gas price is available
  */
-export const fetchGasPrice = async (provider: JsonRpcProvider, nativeToken: Native): Promise<NativeAmount | null> => {
+export const fetchGasPrice = async (
+  provider: JsonRpcProvider,
+  nativeToken: Native,
+): Promise<Amount<Native> | null> => {
   const feeData = await provider.getFeeData().catch(() => null);
   if (!feeData) return null;
 
   if (doesChainSupportEIP1559(feeData)) {
-    return newNativeAmount(feeData.maxFeePerGas.add(feeData.maxPriorityFeePerGas), nativeToken);
+    return newAmount(feeData.maxFeePerGas.add(feeData.maxPriorityFeePerGas), nativeToken);
   }
 
-  return feeData.gasPrice ? newNativeAmount(feeData.gasPrice, nativeToken) : null;
+  return feeData.gasPrice ? newAmount(feeData.gasPrice, nativeToken) : null;
 };
 
 /**
@@ -44,6 +47,6 @@ export const fetchGasPrice = async (provider: JsonRpcProvider, nativeToken: Nati
  * @param {BigNumber} gasUsed - The total gas units that will be used for the transaction
  * @returns - The cost of the transaction in the gas token's smallest denomination (e.g. WEI)
  */
-export const calculateGasFee = (gasPrice: NativeAmount, gasEstimate: BigNumber): NativeAmount =>
+export const calculateGasFee = (gasPrice: Amount<Native>, gasEstimate: BigNumber): Amount<Native> =>
   // eslint-disable-next-line implicit-arrow-linebreak
-  newNativeAmount(gasEstimate.mul(gasPrice.value), gasPrice.token);
+  newAmount(gasEstimate.mul(gasPrice.value), gasPrice.token);

@@ -6,13 +6,13 @@ import { ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
 import { isERC20Amount, newAmount } from 'lib/utils';
 import {
-  Amount, Currency, ERC20, SecondaryFee, TokenAmount, TransactionDetails,
+  Coin, ERC20, Native, SecondaryFee, Amount, TransactionDetails,
 } from '../../types';
 import { calculateGasFee } from './gas';
 
 type PreparedApproval = {
   spender: string;
-  amount: TokenAmount<ERC20>;
+  amount: Amount<ERC20>;
 };
 
 /**
@@ -28,9 +28,9 @@ type PreparedApproval = {
 const getERC20AmountToApprove = async (
   provider: JsonRpcProvider,
   ownerAddress: string,
-  tokenAmount: Amount,
+  tokenAmount: Amount<ERC20>,
   spenderAddress: string,
-): Promise<Amount> => {
+): Promise<Amount<ERC20>> => {
   // create an instance of the ERC20 token contract
   const erc20Contract = ERC20__factory.connect(tokenAmount.token.address, provider);
 
@@ -63,7 +63,7 @@ const getERC20AmountToApprove = async (
  */
 const getUnsignedERC20ApproveTransaction = (
   ownerAddress: string,
-  tokenAmount: Amount,
+  tokenAmount: Amount<ERC20>,
   spenderAddress: string,
 ): TransactionRequest => {
   if (ownerAddress === spenderAddress) {
@@ -83,8 +83,8 @@ const getUnsignedERC20ApproveTransaction = (
 
 export const getAmountInToApprove = (
   tradeType: TradeType,
-  amountSpecified: TokenAmount<Currency>,
-  amountWithSlippage: TokenAmount<Currency>,
+  amountSpecified: Amount<Coin>,
+  amountWithSlippage: Amount<Coin>,
 ) => {
   if (tradeType === TradeType.EXACT_INPUT && isERC20Amount(amountSpecified)) {
     return amountSpecified;
@@ -92,13 +92,14 @@ export const getAmountInToApprove = (
   if (tradeType === TradeType.EXACT_OUTPUT && isERC20Amount(amountWithSlippage)) {
     return amountWithSlippage;
   }
+  // Don't approve native input tokens.
   return null;
 };
 
 // EXACT_INPUT  => I have 100 IMX (ERC20), I want YEET => tokenIn = IMX, tokenOut = YEET, tokenSpecified = IMX, otherToken = YEET
 // need to approve 100 IMX, will get YEET - slippage.
 
-// EXACT_OUTPUT => I want 100 IMX, I have YEET => tokenIn = YEET, tokenOut = IMX, tokenSpecified = IMX, otherToken = YEET
+// EXACT_OUTPUT => I want 100 WIMX, I have YEET => tokenIn = YEET, tokenOut = IMX, tokenSpecified = IMX, otherToken = YEET
 // need to approve quoted YEET + slippage
 
 // EXACT_INPUT  => I have 100 native IMX, I want YEET => tokenIn = IMX, tokenOut = YEET, tokenSpecified = IMX, otherToken = YEET
@@ -115,8 +116,8 @@ export const getAmountInToApprove = (
 
 export const prepareApproval = (
   tradeType: TradeType,
-  amountSpecified: TokenAmount<Currency>,
-  amountWithSlippage: TokenAmount<Currency>,
+  amountSpecified: Amount<Coin>,
+  amountWithSlippage: Amount<Coin>,
   contracts: {
     routerAddress: string;
     secondaryFeeAddress: string;
@@ -146,10 +147,10 @@ export const prepareApproval = (
 export const getApproveTransaction = async (
   provider: JsonRpcProvider,
   ownerAddress: string,
-  tokenAmount: Amount,
+  tokenAmount: Amount<ERC20>,
   spenderAddress: string,
 ): Promise<TransactionRequest | null> => {
-  let amountToApprove: Amount;
+  let amountToApprove: Amount<ERC20>;
   try {
     amountToApprove = await getERC20AmountToApprove(provider, ownerAddress, tokenAmount, spenderAddress);
   } catch (e) {
@@ -180,7 +181,7 @@ export const getApproval = async (
   provider: JsonRpcProvider,
   ownerAddress: string,
   preparedApproval: PreparedApproval,
-  gasPrice: Amount | null,
+  gasPrice: Amount<Native> | null,
 ): Promise<TransactionDetails | null> => {
   const approveTransaction = await getApproveTransaction(
     provider,

@@ -18,12 +18,12 @@ import {
   getTokenDecimals, isValidNonZeroAddress, maybeWrapAmount, maybeWrapToken, newAmount,
 } from './lib/utils';
 import {
-  Currency,
+  Coin,
   ERC20,
   ExchangeModuleConfiguration,
   Native,
   SecondaryFee,
-  TokenAmount,
+  Amount,
   TokenLiteral,
   TransactionResponse,
 } from './types';
@@ -66,7 +66,7 @@ export class Exchange {
     });
   }
 
-  private toToken(tokenLiteral: TokenLiteral, tokenDecimals: number): Currency {
+  private toToken(tokenLiteral: TokenLiteral, tokenDecimals: number): Coin {
     return tokenLiteral === 'native'
       ? this.nativeToken
       : {
@@ -163,6 +163,7 @@ export class Exchange {
       ourQuote,
       maybeWrapAmount(amountSpecified, this.wrappedNativeToken),
       fees,
+      this.wrappedNativeToken,
     );
 
     const swap = getSwap(
@@ -197,11 +198,11 @@ export class Exchange {
 
   private async getApproval(
     tradeType: TradeType,
-    amountSpecified: TokenAmount<Currency>, // token is the specified amount by the user
-    amountWithMaxSlippage: TokenAmount<Currency>, // token is the quoted one
+    amountSpecified: Amount<Coin>, // token is the specified amount by the user
+    amountWithMaxSlippage: Amount<Coin>, // token is the quoted one
     secondaryFees: SecondaryFee[],
     fromAddress: string,
-    gasPrice: TokenAmount<Native> | null,
+    gasPrice: Amount<Native> | null,
   ) {
     // it's not about the amountSpecified, it's about the tokenIn
     // if exact input is native then skip approvals

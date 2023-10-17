@@ -1,4 +1,4 @@
-import { Token, TradeType } from '@uniswap/sdk-core';
+import { TradeType } from '@uniswap/sdk-core';
 import { BigNumber, BigNumberish, utils } from 'ethers';
 import JSBI from 'jsbi';
 import { Pool, Route, TickMath } from '@uniswap/v3-sdk';
@@ -9,13 +9,17 @@ import { IV3SwapRouter } from 'contracts/types/SecondaryFee';
 import { PromiseOrValue } from 'contracts/types/common';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
 import {
-  Amount,
   newAmount,
   Router,
   RoutingContracts,
   SecondaryFee,
-  TokenInfo,
-  tokenInfoToUniswapToken,
+  erc20ToUniswapToken,
+  Amount,
+  Coin,
+  ERC20,
+  Native,
+  ExchangeModuleConfiguration,
+  TokenLiteral,
 } from '../lib';
 
 export const TEST_GAS_PRICE = BigNumber.from('1500000000'); // 1.5 gwei or 1500000000 wei
@@ -41,48 +45,58 @@ export const TEST_SECONDARY_FEE_ADDRESS = '0x8dBE1f0900C5e92ad87A54521902a33ba15
 export const TEST_ROUTING_CONTRACTS: RoutingContracts = {
   factoryAddress: TEST_V3_CORE_FACTORY_ADDRESS,
   quoterAddress: TEST_QUOTER_ADDRESS,
-  peripheryRouterAddress: TEST_PERIPHERY_ROUTER_ADDRESS,
-  secondaryFeeAddress: TEST_SECONDARY_FEE_ADDRESS,
   multicallAddress: TEST_MULTICALL_ADDRESS,
 };
 
-export const IMX_TEST_TOKEN = new Token(
-  TEST_CHAIN_ID,
-  '0x72958b06abdF2701AcE6ceb3cE0B8B1CE11E0851',
-  18,
-  'IMX',
-  'Immutable X',
-);
+export const NATIVE_TEST_TOKEN: Native = {
+  type: 'native',
+  chainId: TEST_CHAIN_ID,
+  decimals: 18,
+  symbol: 'IMX',
+  name: 'Native Immutable X',
+};
 
-export const WETH_TEST_TOKEN = new Token(
-  TEST_CHAIN_ID,
-  '0x4F062A3EAeC3730560aB89b5CE5aC0ab2C5517aE',
-  18,
-  'WETH',
-  'Wrapped Ether',
-);
+export const WIMX_TEST_TOKEN: ERC20 = {
+  type: 'erc20',
+  chainId: TEST_CHAIN_ID,
+  address: '0x72958b06abdF2701AcE6ceb3cE0B8B1CE11E0851',
+  decimals: 18,
+  symbol: 'WIMX',
+  name: 'Wrapped Immutable X',
+};
 
-export const USDC_TEST_TOKEN = new Token(
-  TEST_CHAIN_ID,
-  '0x93733225CCc07Ba02b1449aA3379418Ddc37F6EC',
-  6,
-  'USDC',
-  'USD Coin',
-);
+export const WETH_TEST_TOKEN: ERC20 = {
+  type: 'erc20',
+  chainId: TEST_CHAIN_ID,
+  address: '0x4F062A3EAeC3730560aB89b5CE5aC0ab2C5517aE',
+  decimals: 18,
+  symbol: 'WETH',
+  name: 'Wrapped Ether',
+};
 
-export const FUN_TEST_TOKEN = new Token(
-  TEST_CHAIN_ID,
-  '0xCc7bb2D219A0FC08033E130629C2B854b7bA9195',
-  18,
-  'FUN',
-  'The Fungibles Token',
-);
+export const USDC_TEST_TOKEN: ERC20 = {
+  type: 'erc20',
+  chainId: TEST_CHAIN_ID,
+  address: '0x93733225CCc07Ba02b1449aA3379418Ddc37F6EC',
+  decimals: 6,
+  symbol: 'USDC',
+  name: 'USD Coin',
+};
+
+export const FUN_TEST_TOKEN: ERC20 = {
+  type: 'erc20',
+  chainId: TEST_CHAIN_ID,
+  address: '0xCc7bb2D219A0FC08033E130629C2B854b7bA9195',
+  decimals: 18,
+  symbol: 'FUN',
+  name: 'Fun Token',
+};
 
 export const TEST_IMMUTABLE_CONFIGURATION: ImmutableConfiguration = new ImmutableConfiguration({
   environment: Environment.SANDBOX,
 });
 
-export const TEST_DEX_CONFIGURATION = {
+export const TEST_DEX_CONFIGURATION: ExchangeModuleConfiguration = {
   baseConfig: TEST_IMMUTABLE_CONFIGURATION,
   chainId: TEST_CHAIN_ID,
   overrides: {
@@ -95,13 +109,8 @@ export const TEST_DEX_CONFIGURATION = {
       secondaryFee: TEST_SECONDARY_FEE_ADDRESS,
     },
     commonRoutingTokens: [],
-    nativeToken: {
-      chainId: IMX_TEST_TOKEN.chainId,
-      address: IMX_TEST_TOKEN.address,
-      decimals: IMX_TEST_TOKEN.decimals,
-      symbol: IMX_TEST_TOKEN.symbol,
-      name: IMX_TEST_TOKEN.name,
-    },
+    nativeToken: NATIVE_TEST_TOKEN,
+    wrappedNativeToken: WIMX_TEST_TOKEN,
   },
 };
 
@@ -110,22 +119,25 @@ export type SwapTest = {
 
   chainId: number;
 
-  pools: Pool[],
+  pools: Pool[];
 
   arbitraryTick: number;
   arbitraryLiquidity: number;
   sqrtPriceAtTick: JSBI;
 
-  inputToken: string;
-  outputToken: string;
+  inputToken: TokenLiteral;
+  outputToken: TokenLiteral;
   intermediaryToken: string | undefined;
 };
 
+const toLiteral = (s: string): TokenLiteral => {
+  if (s === 'native') return 'native';
+  if (s.startsWith('0x')) return s as TokenLiteral;
+  throw new Error('invalid token literal');
+};
+
 // uniqBy returns the unique items in an array using the given comparator
-export function uniqBy<K, T extends string | number>(
-  array: K[],
-  comparator: (arg: K) => T,
-): K[] {
+export function uniqBy<K, T extends string | number>(array: K[], comparator: (arg: K) => T): K[] {
   const uniqArr: Partial<Record<T, K>> = {};
 
   for (let i = 0; i < array.length; i++) {
@@ -157,10 +169,11 @@ export function decodePathForExactOutput(path: string) {
   };
 }
 
-type SecondaryFeeFunctionName = 'exactInputSingleWithSecondaryFee' |
-'exactOutputSingleWithSecondaryFee' |
-'exactInputWithSecondaryFee' |
-'exactOutputWithSecondaryFee';
+type SecondaryFeeFunctionName =
+  | 'exactInputSingleWithSecondaryFee'
+  | 'exactOutputSingleWithSecondaryFee'
+  | 'exactInputWithSecondaryFee'
+  | 'exactOutputWithSecondaryFee';
 
 type SwapRouterFunctionName = 'exactInputSingle' | 'exactOutputSingle';
 
@@ -300,43 +313,20 @@ export function setupSwapTxTest(params?: { multiPoolSwap?: boolean }): SwapTest 
   const arbitraryLiquidity = 10;
   const sqrtPriceAtTick = TickMath.getSqrtRatioAtTick(arbitraryTick);
 
-  const tokenIn = tokenInfoToUniswapToken(USDC_TEST_TOKEN);
-  const intermediaryToken = tokenInfoToUniswapToken(FUN_TEST_TOKEN);
-  const tokenOut = tokenInfoToUniswapToken(WETH_TEST_TOKEN);
+  const tokenIn = erc20ToUniswapToken(USDC_TEST_TOKEN);
+  const intermediaryToken = erc20ToUniswapToken(FUN_TEST_TOKEN);
+  const tokenOut = erc20ToUniswapToken(WETH_TEST_TOKEN);
 
   const fee = 10000;
 
   let pools: Pool[] = [];
   if (multiPoolSwap) {
     pools = [
-      new Pool(
-        tokenIn,
-        intermediaryToken,
-        fee,
-        sqrtPriceAtTick,
-        arbitraryLiquidity,
-        arbitraryTick,
-      ),
-      new Pool(
-        intermediaryToken,
-        tokenOut,
-        fee,
-        sqrtPriceAtTick,
-        arbitraryLiquidity,
-        arbitraryTick,
-      ),
+      new Pool(tokenIn, intermediaryToken, fee, sqrtPriceAtTick, arbitraryLiquidity, arbitraryTick),
+      new Pool(intermediaryToken, tokenOut, fee, sqrtPriceAtTick, arbitraryLiquidity, arbitraryTick),
     ];
   } else {
-    pools = [
-      new Pool(
-        tokenIn,
-        tokenOut,
-        fee,
-        sqrtPriceAtTick,
-        arbitraryLiquidity,
-        arbitraryTick,
-      ),
-    ];
+    pools = [new Pool(tokenIn, tokenOut, fee, sqrtPriceAtTick, arbitraryLiquidity, arbitraryTick)];
   }
 
   return {
@@ -349,9 +339,9 @@ export function setupSwapTxTest(params?: { multiPoolSwap?: boolean }): SwapTest 
     arbitraryLiquidity,
     sqrtPriceAtTick,
 
-    inputToken: tokenIn.address,
+    inputToken: toLiteral(tokenIn.address),
     intermediaryToken: multiPoolSwap ? intermediaryToken.address : undefined,
-    outputToken: tokenOut.address,
+    outputToken: toLiteral(tokenOut.address),
   };
 }
 
@@ -363,7 +353,7 @@ type MockParams = {
   exchangeRate?: number;
 };
 
-export const amountOutFromAmountIn = (amountIn: Amount, tokenOut: TokenInfo, exchangeRate: number) => {
+export const amountOutFromAmountIn = (amountIn: Amount<ERC20>, tokenOut: ERC20, exchangeRate: number) => {
   let amountOut = amountIn.value.mul(exchangeRate); // 10 * 10^18
 
   if (amountIn.token.decimals > tokenOut.decimals) {
@@ -377,7 +367,7 @@ export const amountOutFromAmountIn = (amountIn: Amount, tokenOut: TokenInfo, exc
   return newAmount(amountOut, tokenOut);
 };
 
-export const amountInFromAmountOut = (amountOut: Amount, tokenIn: TokenInfo, exchangeRate: number) => {
+export const amountInFromAmountOut = (amountOut: Amount<ERC20>, tokenIn: ERC20, exchangeRate: number) => {
   let amountIn = amountOut.value.div(exchangeRate); // 1 * 10^6
 
   if (tokenIn.decimals > amountOut.token.decimals) {
@@ -393,40 +383,40 @@ export const amountInFromAmountOut = (amountOut: Amount, tokenIn: TokenInfo, exc
 
 export function mockRouterImplementation(params: MockParams) {
   const exchangeRate = params.exchangeRate ?? 10; // 1 TokenIn = 10 TokenOut
-  const findOptimalRoute = jest.fn((
-    amountSpecified: Amount,
-    otherToken: TokenInfo,
-    tradeType: TradeType,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    secondaryFees: SecondaryFee[],
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    maxHops: number,
-  ) => {
-    const tokenIn = tradeType === TradeType.EXACT_INPUT ? amountSpecified.token : otherToken;
-    const tokenOut = tradeType === TradeType.EXACT_OUTPUT ? amountSpecified.token : otherToken;
+  const findOptimalRoute = jest.fn(
+    (
+      amountSpecified: Amount<ERC20>,
+      otherToken: ERC20,
+      tradeType: TradeType,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      secondaryFees: SecondaryFee[],
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      maxHops: number,
+    ) => {
+      const tokenIn = tradeType === TradeType.EXACT_INPUT ? amountSpecified.token : otherToken;
+      const tokenOut = tradeType === TradeType.EXACT_OUTPUT ? amountSpecified.token : otherToken;
 
-    const route = new Route(
-      params.pools,
-      tokenInfoToUniswapToken(tokenIn),
-      tokenInfoToUniswapToken(tokenOut),
-    );
+      const route = new Route(params.pools, erc20ToUniswapToken(tokenIn), erc20ToUniswapToken(tokenOut));
 
-    const amountIn = tradeType === TradeType.EXACT_INPUT
-      ? amountSpecified : amountInFromAmountOut(amountSpecified, tokenIn, exchangeRate);
+      const amountIn = tradeType === TradeType.EXACT_INPUT
+        ? amountSpecified
+        : amountInFromAmountOut(amountSpecified, tokenIn, exchangeRate);
 
-    const amountOut = tradeType === TradeType.EXACT_INPUT
-      ? amountOutFromAmountIn(amountSpecified, tokenOut, exchangeRate) : amountSpecified;
+      const amountOut = tradeType === TradeType.EXACT_INPUT
+        ? amountOutFromAmountIn(amountSpecified, tokenOut, exchangeRate)
+        : amountSpecified;
 
-    const trade: QuoteResult = {
-      route,
-      amountIn,
-      amountOut,
-      tradeType,
-      gasEstimate: TEST_TRANSACTION_GAS_USAGE,
-    };
+      const trade: QuoteResult = {
+        route,
+        amountIn,
+        amountOut,
+        tradeType,
+        gasEstimate: TEST_TRANSACTION_GAS_USAGE,
+      };
 
-    return trade;
-  });
+      return trade;
+    },
+  );
 
   (Router as unknown as jest.Mock).mockImplementationOnce(() => ({
     routingContracts: TEST_ROUTING_CONTRACTS,
@@ -438,15 +428,19 @@ export function mockRouterImplementation(params: MockParams) {
 
 // expectToBeDefined ensures that a variable is not null or undefined, while
 // also narrowing its type.
-export function expectToBeDefined <T>(x: T): asserts x is NonNullable<T> {
+export function expectToBeDefined<T>(x: T): asserts x is NonNullable<T> {
   expect(x).toBeDefined();
   expect(x).not.toBeNull();
 }
 
 // expectInstanceOf ensurance that a variable is an instance of a class, while
 // also narrowing its type.
-export function expectInstanceOf <T>(className: { new(...args: any[]): T }, x: unknown): asserts x is T {
+export function expectInstanceOf<T>(className: { new (...args: any[]): T }, x: unknown): asserts x is T {
   expect(x).toBeInstanceOf(className);
+}
+
+export function expectERC20(token: Coin): asserts token is ERC20 {
+  expect(token.type).toBe('erc20');
 }
 
 /**
@@ -457,11 +451,11 @@ export function makeAddr(str: string): string {
   return utils.keccak256(utils.toUtf8Bytes(str)).slice(0, 42);
 }
 
-export function formatAmount(amount: Amount): string {
+export function formatAmount(amount: Amount<Coin>): string {
   return utils.formatUnits(amount.value, amount.token.decimals);
 }
 
-export function formatTokenAmount(amount: BigNumberish, token: TokenInfo): string {
+export function formatTokenAmount(amount: BigNumberish, token: Coin): string {
   return utils.formatUnits(amount, token.decimals);
 }
 
@@ -472,7 +466,7 @@ export function formatEther(bn: PromiseOrValue<BigNumberish>): string {
   throw new Error('formatEther: bn is not a BigNumber');
 }
 
-export function newAmountFromString(amount: string, token: TokenInfo): Amount {
+export function newAmountFromString<T extends Coin>(amount: string, token: T): Amount<T> {
   const bn = utils.parseUnits(amount, token.decimals);
   return newAmount(bn, token);
 }

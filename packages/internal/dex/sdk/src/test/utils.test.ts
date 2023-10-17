@@ -1,6 +1,6 @@
 import {
-  amountOutFromAmountIn, amountInFromAmountOut, formatAmount, IMX_TEST_TOKEN, uniqBy,
-  USDC_TEST_TOKEN, WETH_TEST_TOKEN, newAmountFromString,
+  amountOutFromAmountIn, amountInFromAmountOut, formatAmount, uniqBy,
+  USDC_TEST_TOKEN, WETH_TEST_TOKEN, newAmountFromString, WIMX_TEST_TOKEN,
 } from './utils';
 
 describe('exchangeAmount', () => {
@@ -8,7 +8,7 @@ describe('exchangeAmount', () => {
     describe('when amount-in', () => {
       it('should multiply the amount-in by the exchange rate', () => {
         const exchangeRate = 10;
-        const imxAmount = newAmountFromString('1', IMX_TEST_TOKEN);
+        const imxAmount = newAmountFromString('1', WIMX_TEST_TOKEN);
         const wethAmount = amountOutFromAmountIn(imxAmount, WETH_TEST_TOKEN, exchangeRate);
         expect(formatAmount(wethAmount)).toEqual('10.0');
       });
@@ -18,7 +18,7 @@ describe('exchangeAmount', () => {
       it('should divide the amount-out by the exchange rate', () => {
         const exchangeRate = 10;
         const wethAmount = newAmountFromString('10', WETH_TEST_TOKEN);
-        const imxAmount = amountInFromAmountOut(wethAmount, IMX_TEST_TOKEN, exchangeRate);
+        const imxAmount = amountInFromAmountOut(wethAmount, WIMX_TEST_TOKEN, exchangeRate);
         expect(formatAmount(imxAmount)).toEqual('1.0');
       });
     });
@@ -28,7 +28,7 @@ describe('exchangeAmount', () => {
     describe('when amount-in has higher decimals', () => {
       it('should multiply the amount-in by the exchange rate', () => {
         const exchangeRate = 10; // 1 IMX = 10 USDC
-        const imxAmount = newAmountFromString('1', IMX_TEST_TOKEN);
+        const imxAmount = newAmountFromString('1', WIMX_TEST_TOKEN);
         const usdcAmount = amountOutFromAmountIn(imxAmount, USDC_TEST_TOKEN, exchangeRate);
         expect(formatAmount(usdcAmount)).toEqual('10.0');
       });
@@ -38,7 +38,7 @@ describe('exchangeAmount', () => {
       it('should multiply the amount-in by the exchange rate', () => {
         const exchangeRate = 10; // 1 USDC = 10 IMX
         const usdcAmount = newAmountFromString('1', USDC_TEST_TOKEN);
-        const imxAmount = amountOutFromAmountIn(usdcAmount, IMX_TEST_TOKEN, exchangeRate);
+        const imxAmount = amountOutFromAmountIn(usdcAmount, WIMX_TEST_TOKEN, exchangeRate);
         expect(formatAmount(imxAmount)).toEqual('10.0');
       });
     });
@@ -46,7 +46,7 @@ describe('exchangeAmount', () => {
     describe('when amount-out has higher decimals', () => {
       it('should divide the amount-out by the exchange rate', () => {
         const exchangeRate = 10; // 1 IMX = 10 USDC
-        const imxAmount = newAmountFromString('10', IMX_TEST_TOKEN);
+        const imxAmount = newAmountFromString('10', WIMX_TEST_TOKEN);
         const usdcAmount = amountInFromAmountOut(imxAmount, USDC_TEST_TOKEN, exchangeRate);
         expect(formatAmount(usdcAmount)).toEqual('1.0');
       });
@@ -56,7 +56,7 @@ describe('exchangeAmount', () => {
       it('should divide the amount-out by the exchange rate', () => {
         const exchangeRate = 10; // 1 USDC = 0.1 IMX
         const usdcAmount = newAmountFromString('10', USDC_TEST_TOKEN);
-        const imxAmount = amountInFromAmountOut(usdcAmount, IMX_TEST_TOKEN, exchangeRate);
+        const imxAmount = amountInFromAmountOut(usdcAmount, WIMX_TEST_TOKEN, exchangeRate);
         expect(formatAmount(imxAmount)).toEqual('1.0');
       });
     });

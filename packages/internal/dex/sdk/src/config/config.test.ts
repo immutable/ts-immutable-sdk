@@ -1,7 +1,7 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { ChainNotSupportedError, InvalidConfigurationError } from 'errors';
 import * as test from 'test/utils';
-import { ExchangeModuleConfiguration, ExchangeOverrides, TokenInfo } from '../types';
+import { ERC20, ExchangeModuleConfiguration, ExchangeOverrides } from '../types';
 import { ExchangeConfiguration, ExchangeContracts } from './index';
 import { IMMUTABLE_TESTNET_CHAIN_ID } from '../constants/chains';
 
@@ -9,13 +9,14 @@ describe('ExchangeConfiguration', () => {
   const chainId = 999999999;
   // This list can be updated with any Tokens that are deployed to the chain being configured
   // These tokens will be used to find available pools for a swap
-  const commonRoutingTokensSingle: TokenInfo[] = [
+  const commonRoutingTokensSingle: ERC20[] = [
     {
       chainId,
       address: '0x12958b06abdf2701ace6ceb3ce0b8b1ce11e0851',
       decimals: 18,
       symbol: 'FUN',
       name: 'The Fungibles Token',
+      type: 'erc20',
     },
   ];
 
@@ -71,13 +72,14 @@ describe('ExchangeConfiguration', () => {
 
       // This list can be updated with any Tokens that are deployed to the chain being configured
       // These tokens will be used to find available pools for a swap
-      const commonRoutingTokens: TokenInfo[] = [
+      const commonRoutingTokens: ERC20[] = [
         {
           chainId,
           address: '0x12958b06abdf2701ace6ceb3ce0b8b1ce11e0851',
           decimals: 18,
           symbol: 'FUN',
           name: 'The Fungibles Token',
+          type: 'erc20',
         },
         {
           chainId,
@@ -85,6 +87,7 @@ describe('ExchangeConfiguration', () => {
           decimals: 18,
           symbol: 'USDC',
           name: 'US Dollar Coin',
+          type: 'erc20',
         },
         {
           chainId,
@@ -92,6 +95,7 @@ describe('ExchangeConfiguration', () => {
           decimals: 18,
           symbol: 'WETH',
           name: 'Wrapped Ether',
+          type: 'erc20',
         },
       ];
 
@@ -107,7 +111,8 @@ describe('ExchangeConfiguration', () => {
         rpcURL,
         exchangeContracts: contractOverrides,
         commonRoutingTokens,
-        nativeToken: test.IMX_TEST_TOKEN,
+        nativeToken: test.NATIVE_TEST_TOKEN,
+        wrappedNativeToken: test.WIMX_TEST_TOKEN,
       };
 
       const config = new ExchangeConfiguration({
@@ -164,7 +169,8 @@ describe('ExchangeConfiguration', () => {
         rpcURL,
         exchangeContracts: invalidContractOverrides,
         commonRoutingTokens: commonRoutingTokensSingle,
-        nativeToken: test.IMX_TEST_TOKEN,
+        nativeToken: test.NATIVE_TEST_TOKEN,
+        wrappedNativeToken: test.WIMX_TEST_TOKEN,
       };
 
       expect(() => new ExchangeConfiguration({
@@ -184,7 +190,8 @@ describe('ExchangeConfiguration', () => {
         rpcURL,
         exchangeContracts: contractOverrides,
         commonRoutingTokens: commonRoutingTokensSingle,
-        nativeToken: test.IMX_TEST_TOKEN,
+        nativeToken: test.NATIVE_TEST_TOKEN,
+        wrappedNativeToken: test.WIMX_TEST_TOKEN,
       };
 
       expect(() => new ExchangeConfiguration({
@@ -213,7 +220,8 @@ describe('ExchangeConfiguration', () => {
         rpcURL,
         exchangeContracts: contractOverrides,
         commonRoutingTokens: commonRoutingTokensSingle,
-        nativeToken: test.IMX_TEST_TOKEN,
+        nativeToken: test.NATIVE_TEST_TOKEN,
+        wrappedNativeToken: test.WIMX_TEST_TOKEN,
       };
 
       expect(() => new ExchangeConfiguration({
@@ -267,7 +275,8 @@ describe('ExchangeConfiguration', () => {
         rpcURL,
         exchangeContracts: contractOverrides,
         commonRoutingTokens: commonRoutingTokensSingle,
-        nativeToken: test.IMX_TEST_TOKEN,
+        nativeToken: test.NATIVE_TEST_TOKEN,
+        wrappedNativeToken: test.WIMX_TEST_TOKEN,
       };
 
       expect(() => new ExchangeConfiguration({
@@ -308,7 +317,8 @@ describe('ExchangeConfiguration', () => {
         rpcURL,
         exchangeContracts: contractOverrides,
         commonRoutingTokens: commonRoutingTokensSingle,
-        nativeToken: test.IMX_TEST_TOKEN,
+        nativeToken: test.NATIVE_TEST_TOKEN,
+        wrappedNativeToken: test.WIMX_TEST_TOKEN,
       };
 
       const config = new ExchangeConfiguration({

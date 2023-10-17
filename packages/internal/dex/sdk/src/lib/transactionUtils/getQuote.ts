@@ -5,12 +5,12 @@ import { Fees } from 'lib/fees';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
 import { isNative, maybeWrapAmount, newAmount } from 'lib/utils';
 import {
-  Currency,
-  ERC20, Native, Quote, TokenAmount,
+  Coin,
+  ERC20, Native, Quote, Amount,
 } from '../../types';
 import { slippageToFraction } from './slippage';
 
-function getQuoteAmountFromTradeType(tradeInfo: QuoteResult): TokenAmount<ERC20> {
+function getQuoteAmountFromTradeType(tradeInfo: QuoteResult): Amount<ERC20> {
   if (tradeInfo.tradeType === TradeType.EXACT_INPUT) {
     return tradeInfo.amountOut;
   }
@@ -30,7 +30,7 @@ export function applySlippage(
   return ethers.BigNumber.from(amountWithSlippage.toString());
 }
 
-const unwrapAmount = (amount: TokenAmount<ERC20>, nativeToken: Native): TokenAmount<Native> => newAmount(amount.value, nativeToken);
+const unwrapAmount = (amount: Amount<ERC20>, nativeToken: Native): Amount<Native> => newAmount(amount.value, nativeToken);
 
 export function prepareUserQuote<T extends Native | ERC20>(
   tokenOfQuotedAmount: T,
@@ -46,7 +46,7 @@ export function prepareUserQuote<T extends Native | ERC20>(
   const amountWithSlippage = applySlippage(tradeInfo.tradeType, maybeUnwrappedQuoteAmount.value, slippage);
 
   return {
-    amount: maybeUnwrappedQuoteAmount as TokenAmount<T>, // TODO: Make it better?
+    amount: maybeUnwrappedQuoteAmount as Amount<T>, // TODO: Make it better?
     amountWithMaxSlippage: {
       token: tokenOfQuotedAmount,
       value: amountWithSlippage,
@@ -57,11 +57,11 @@ export function prepareUserQuote<T extends Native | ERC20>(
 }
 
 export function getOurQuoteReqAmount(
-  amountSpecified: TokenAmount<Currency>, // the amount specified by the user, either exactIn or exactOut
+  amountSpecified: Amount<Coin>, // the amount specified by the user, either exactIn or exactOut
   fees: Fees,
   tradeType: TradeType,
   wrappedNativeToken: ERC20,
-): TokenAmount<ERC20> {
+): Amount<ERC20> {
   if (tradeType === TradeType.EXACT_OUTPUT) {
     // For an exact output swap, we do not need to subtract fees from the given amount
     return maybeWrapAmount(amountSpecified, wrappedNativeToken);

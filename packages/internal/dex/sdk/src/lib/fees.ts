@@ -1,29 +1,29 @@
 import { BASIS_POINT_PRECISION } from 'constants/router';
 import { BigNumber } from 'ethers';
 import {
-  ERC20, TokenAmount,
-  Fee, SecondaryFee, addAmount, newAmount, subtractAmount, Currency,
+  ERC20, Amount,
+  Fee, SecondaryFee, addAmount, newAmount, subtractAmount, Coin,
 } from 'lib';
 
 export class Fees {
   private secondaryFees: SecondaryFee[];
 
-  private amount: TokenAmount<Currency>;
+  private amount: Amount<Coin>;
 
   constructor(secondaryFees: SecondaryFee[], token: ERC20) {
     this.secondaryFees = secondaryFees;
     this.amount = newAmount(BigNumber.from(0), token);
   }
 
-  addAmount(amount: TokenAmount<Currency>): void {
+  addAmount(amount: Amount<Coin>): void {
     this.amount = addAmount(this.amount, amount);
   }
 
-  amountWithFeesApplied(): TokenAmount<Currency> {
+  amountWithFeesApplied(): Amount<Coin> {
     return addAmount(this.amount, this.total());
   }
 
-  amountLessFees(): TokenAmount<Currency> {
+  amountLessFees(): Amount<Coin> {
     return subtractAmount(this.amount, this.total());
   }
 
@@ -41,7 +41,7 @@ export class Fees {
     });
   }
 
-  private total(): TokenAmount<Currency> {
+  private total(): Amount<Coin> {
     let totalFees = newAmount(BigNumber.from(0), this.amount.token);
 
     for (const fee of this.secondaryFees) {

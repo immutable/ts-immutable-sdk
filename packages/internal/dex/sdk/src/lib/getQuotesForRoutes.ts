@@ -3,10 +3,10 @@ import { Route, SwapQuoter } from '@uniswap/v3-sdk';
 import { TradeType, Token } from '@uniswap/sdk-core';
 import { BigNumber, ethers } from 'ethers';
 import { ProviderCallError } from 'errors';
-import { ERC20, TokenAmount } from 'types';
+import { ERC20, Amount } from 'types';
 import { multicallMultipleCallDataSingContract, MulticallResponse } from './multicall';
 import {
-  newAmount, quoteReturnMapping, toCurrencyAmount,
+  newAmount, quoteReturnMapping, toCurrencyAmount, uniswapTokenToERC20,
 } from './utils';
 import { Multicall } from '../contracts/types';
 
@@ -16,8 +16,8 @@ const gasEstimateIndex = 3;
 export type QuoteResult = {
   route: Route<Token, Token>;
   gasEstimate: ethers.BigNumber
-  amountIn: TokenAmount<ERC20>;
-  amountOut: TokenAmount<ERC20>;
+  amountIn: Amount<ERC20>;
+  amountOut: Amount<ERC20>;
   tradeType: TradeType;
 };
 
@@ -25,7 +25,7 @@ export async function getQuotesForRoutes(
   multicallContract: Multicall,
   quoterContractAddress: string,
   routes: Route<Token, Token>[],
-  amountSpecified: TokenAmount<ERC20>,
+  amountSpecified: Amount<ERC20>,
   tradeType: TradeType,
 ): Promise<QuoteResult[]> {
   const callData = routes.map(
@@ -74,10 +74,13 @@ export async function getQuotesForRoutes(
         const quoteAmount = decodedQuoteResult[amountIndex];
         if (!(quoteAmount instanceof BigNumber)) throw new Error('Expected BigNumber');
 
+        const input = uniswapTokenToERC20(routes[i].input);
+        const output = uniswapTokenToERC20(routes[i].output);
+
         decodedQuoteResults.push({
           route: routes[i],
-          amountIn: tradeType === TradeType.EXACT_INPUT ? amountSpecified : newAmount(quoteAmount, routes[i].input),
-          amountOut: tradeType === TradeType.EXACT_INPUT ? newAmount(quoteAmount, routes[i].output) : amountSpecified,
+          amountIn: tradeType === TradeType.EXACT_INPUT ? amountSpecified : newAmount(quoteAmount, input),
+          amountOut: tradeType === TradeType.EXACT_INPUT ? newAmount(quoteAmount, output) : amountSpecified,
           gasEstimate: ethers.BigNumber.from(decodedQuoteResult[gasEstimateIndex]),
           tradeType,
         });
