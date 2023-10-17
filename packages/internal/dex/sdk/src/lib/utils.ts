@@ -118,8 +118,6 @@ export const isERC20Amount = (amount: Amount<Coin>): amount is Amount<ERC20> => 
 
 export const isNative = (token: Coin): token is Native => !('address' in token);
 
-export const isNativeAmount = (amount: Amount<Coin>): amount is Amount<Native> => !('address' in amount.token);
-
 export const addAmount = <T extends Coin>(a: Amount<T>, b: Amount<T>) => {
   if (isERC20(a.token) && isERC20(b.token)) {
     // Make sure the ERC20s have the same address
