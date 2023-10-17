@@ -29,7 +29,6 @@ import { isPassportProvider } from '../../lib/providerUtils';
 import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextTypes';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { TopUpMenuItem } from './TopUpMenuItem';
-import { TopUpFeature } from '../../widgets/wallet/context/WalletContext';
 
 interface TopUpViewProps {
   widgetEvent: IMTBLWidgetEvents,
@@ -40,7 +39,6 @@ interface TopUpViewProps {
   amount?: string,
   onCloseButtonClick: () => void,
   onBackButtonClick?: () => void,
-  supportedTopUps?: TopUpFeature | null,
 }
 
 const DEFAULT_FEE_REFRESH_INTERVAL = 30000;
@@ -54,7 +52,6 @@ export function TopUpView({
   amount,
   onCloseButtonClick,
   onBackButtonClick,
-  supportedTopUps,
 }: TopUpViewProps) {
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
@@ -71,11 +68,16 @@ export function TopUpView({
   const [loadingOnRampFees, setLoadingOnRampFees] = useState(false);
   const [loadingSwapFees, setLoadingSwapFees] = useState(false);
   const [loadingBridgeFees, setLoadingBridgeFees] = useState(false);
+  const [isSwapAvailable, setIsSwapAvailable] = useState(true);
 
   const isPassport = isPassportProvider(provider);
 
   useEffect(() => {
-    if (!checkout) return;
+    (async () => {
+      if (!checkout) return;
+      setIsSwapAvailable(await checkout.isSwapAvailable());
+    })();
+
     if (!cryptoFiatDispatch) return;
     cryptoFiatDispatch({
       payload: {
@@ -240,7 +242,7 @@ export function TopUpView({
       textConfig: swap,
       onClickEvent: onClickSwap,
       fee: () => renderFees(swapFeesInFiat, loadingSwapFees),
-      isAvailable: supportedTopUps?.isSwapAvailable,
+      isAvailable: isSwapAvailable,
       isEnabled: showSwapOption,
     },
     {
