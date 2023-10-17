@@ -30,6 +30,8 @@ export function poolEquals(poolA: Pool, poolB: Pool): boolean {
   );
 }
 
+export const decimalsFunctionSig = ethers.utils.id('decimals()').substring(0, 10);
+
 export async function getTokenDecimals(
   tokenAddress: string,
   nativeToken: Native,
@@ -38,8 +40,6 @@ export async function getTokenDecimals(
   if (tokenAddress === 'native') {
     return nativeToken.decimals;
   }
-
-  const decimalsFunctionSig = ethers.utils.id('decimals()').substring(0, 10);
 
   try {
     const decimalsResult = await provider.call({
