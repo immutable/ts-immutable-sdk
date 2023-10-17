@@ -389,6 +389,12 @@ export const text = {
           primaryAction: 'Try again',
           secondaryAction: 'Cancel',
         },
+        [SaleErrorTypes.INSUFFICIENT_BALANCE]: {
+          description:
+            'Your wallet has insufficent balance. Try paying with card instead.',
+          primaryAction: 'Try again',
+          secondaryAction: 'Cancel',
+        },
         [SaleErrorTypes.DEFAULT]: {
           description: 'Sorry, something went wrong. Please try again.',
           primaryAction: 'Try again',
