@@ -8,40 +8,39 @@ import {
 } from 'test/utils';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import { Fees } from 'lib/fees';
-import { newAmount } from 'lib';
+import { erc20ToUniswapToken, newAmount, uniswapTokenToERC20 } from 'lib';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
 import { getSwap, prepareSwap } from './swap';
 
+const UNISWAP_IMX = erc20ToUniswapToken(IMX_TEST_TOKEN);
+const UNISWAP_FUN = erc20ToUniswapToken(FUN_TEST_TOKEN);
+
 const testPool = new Pool(
-  IMX_TEST_TOKEN,
-  FUN_TEST_TOKEN,
+  UNISWAP_IMX,
+  UNISWAP_FUN,
   10000,
   '79625275426524748796330556128',
   '10000000000000000',
   100,
 );
 
-const buildExactInputQuote = (): QuoteResult => {
-  const route = new Route([testPool], IMX_TEST_TOKEN, FUN_TEST_TOKEN);
-  return {
-    gasEstimate: BigNumber.from(0),
-    route,
-    amountIn: newAmountFromString('99', route.input),
-    amountOut: newAmountFromString('990', route.output),
-    tradeType: TradeType.EXACT_INPUT,
-  };
-};
+const route = new Route([testPool], UNISWAP_IMX, UNISWAP_FUN);
 
-const buildExactOutputQuote = (): QuoteResult => {
-  const route = new Route([testPool], IMX_TEST_TOKEN, FUN_TEST_TOKEN);
-  return {
-    gasEstimate: BigNumber.from(0),
-    route,
-    amountIn: newAmountFromString('100', route.input),
-    amountOut: newAmountFromString('1000', route.output),
-    tradeType: TradeType.EXACT_OUTPUT,
-  };
-};
+const buildExactInputQuote = (): QuoteResult => ({
+  gasEstimate: BigNumber.from(0),
+  route,
+  amountIn: newAmountFromString('99', uniswapTokenToERC20(route.input)),
+  amountOut: newAmountFromString('990', uniswapTokenToERC20(route.output)),
+  tradeType: TradeType.EXACT_INPUT,
+});
+
+const buildExactOutputQuote = (): QuoteResult => ({
+  gasEstimate: BigNumber.from(0),
+  route,
+  amountIn: newAmountFromString('100', uniswapTokenToERC20(route.input)),
+  amountOut: newAmountFromString('1000', uniswapTokenToERC20(route.output)),
+  tradeType: TradeType.EXACT_OUTPUT,
+});
 
 describe('getSwap', () => {
   describe('without fees', () => {

@@ -31,7 +31,7 @@ import {
   formatTokenAmount,
 } from './test/utils';
 import {
-  addAmount, Router, SecondaryFee, uniswapTokenToTokenInfo,
+  addAmount, Router, SecondaryFee,
 } from './lib';
 
 jest.mock('@ethersproject/providers');
@@ -272,7 +272,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         newAmountFromString('100', USDC_TEST_TOKEN).value,
       );
 
-      const tokenIn = { ...uniswapTokenToTokenInfo(USDC_TEST_TOKEN), name: undefined, symbol: undefined };
+      const tokenIn = { ...USDC_TEST_TOKEN, name: undefined, symbol: undefined };
 
       expect(quote.fees).toEqual([
         {

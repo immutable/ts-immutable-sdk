@@ -1,7 +1,7 @@
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { Contract } from '@ethersproject/contracts';
 import { BigNumber } from '@ethersproject/bignumber';
-import { SecondaryFee, uniswapTokenToTokenInfo } from 'lib';
+import { SecondaryFee } from 'lib';
 import { ethers } from 'ethers';
 import { ERC20__factory } from 'contracts/types';
 import { Exchange } from './exchange';
@@ -193,7 +193,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         newAmountFromString('1000', WETH_TEST_TOKEN).value,
       );
 
-      const tokenIn = { ...uniswapTokenToTokenInfo(USDC_TEST_TOKEN), name: undefined, symbol: undefined };
+      const tokenIn = { ...USDC_TEST_TOKEN, name: undefined, symbol: undefined };
 
       expect(quote.fees).toEqual([
         {

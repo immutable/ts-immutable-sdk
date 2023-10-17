@@ -17,9 +17,12 @@ import {
   formatAmount,
 } from '../test/utils';
 import { Multicall__factory } from '../contracts/types';
-import { newAmount } from './utils';
+import { erc20ToUniswapToken, newAmount } from './utils';
 
 jest.mock('@ethersproject/contracts');
+
+const UNISWAP_IMX = erc20ToUniswapToken(IMX_TEST_TOKEN);
+const UNISWAP_WETH = erc20ToUniswapToken(WETH_TEST_TOKEN);
 
 const types = [
   'uint256', // amountOut/amountIn
@@ -57,15 +60,15 @@ describe('getQuotesForRoutes', () => {
       // Since we will be mocking the multicall, routes doesn't matter,
       // as long as the length is correct.
       const pool0 = new Pool(
-        WETH_TEST_TOKEN,
-        IMX_TEST_TOKEN,
+        UNISWAP_WETH,
+        UNISWAP_IMX,
         FeeAmount.HIGH,
         sqrtPriceAtTick,
         1000,
         arbitraryTick,
       );
-      dummyRoutes.push(new Route([pool0], WETH_TEST_TOKEN, IMX_TEST_TOKEN));
-      dummyRoutes.push(new Route([pool0], WETH_TEST_TOKEN, IMX_TEST_TOKEN));
+      dummyRoutes.push(new Route([pool0], UNISWAP_WETH, UNISWAP_IMX));
+      dummyRoutes.push(new Route([pool0], UNISWAP_WETH, UNISWAP_IMX));
 
       const amount = newAmount(BigNumber.from('123123'), WETH_TEST_TOKEN);
 
@@ -113,14 +116,14 @@ describe('getQuotesForRoutes', () => {
       // Since we will be mocking the multicall, routes doesn't matter,
       // as long as the length is correct.
       const pool0 = new Pool(
-        WETH_TEST_TOKEN,
-        IMX_TEST_TOKEN,
+        UNISWAP_WETH,
+        UNISWAP_IMX,
         FeeAmount.HIGH,
         sqrtPriceAtTick,
         1000,
         arbitraryTick,
       );
-      dummyRoutes.push(new Route([pool0], WETH_TEST_TOKEN, IMX_TEST_TOKEN));
+      dummyRoutes.push(new Route([pool0], UNISWAP_WETH, UNISWAP_IMX));
 
       const provider = new providers.JsonRpcProvider(
         TEST_RPC_URL,
@@ -191,15 +194,15 @@ describe('getQuotesForRoutes', () => {
       // Since we will be mocking the multicall, routes doesn't matter,
       // as long as the length is correct.
       const pool0 = new Pool(
-        WETH_TEST_TOKEN,
-        IMX_TEST_TOKEN,
+        UNISWAP_WETH,
+        UNISWAP_IMX,
         FeeAmount.HIGH,
         sqrtPriceAtTick,
         1000,
         arbitraryTick,
       );
-      dummyRoutes.push(new Route([pool0], WETH_TEST_TOKEN, IMX_TEST_TOKEN));
-      dummyRoutes.push(new Route([pool0], WETH_TEST_TOKEN, IMX_TEST_TOKEN));
+      dummyRoutes.push(new Route([pool0], UNISWAP_WETH, UNISWAP_IMX));
+      dummyRoutes.push(new Route([pool0], UNISWAP_WETH, UNISWAP_IMX));
 
       const provider = new providers.JsonRpcProvider(
         TEST_RPC_URL,
