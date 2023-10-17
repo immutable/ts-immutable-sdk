@@ -62,6 +62,10 @@ then
                --body "Released from ts-immutable-sdk" \
                --reviewer "$GITHUB_ACTOR")
   echo "PR=$PR" >> $GITHUB_ENV
+
+  echo "Merging a pull request"
+  PR_MERGE=$(gh pr merge "$PR" --admin)
+  echo "PR_MERGE=$PR_MERGE" >> $GITHUB_ENV
 else
   echo "No changes detected"
 fi
