@@ -181,15 +181,8 @@ export function SaleContextProvider(props: {
   useEffect(() => {
     const getUserInfo = async () => {
       const signer = provider?.getSigner();
-      const address = await signer?.getAddress() || '';
-      let email;
-      try {
-        email = (await passport?.getUserInfo())?.email || '';
-      } catch (err) {
-        console.error('@@@ passport.getUserInfo error', err);
-      }
-
-      console.log('@@@@@@@ useEffect getUserInfo', email, signer, address);
+      const address = (await signer?.getAddress()) || '';
+      const email = (await passport?.getUserInfo())?.email || '';
 
       setUserInfo({ recipientEmail: email, recipientAddress: address });
     };
@@ -245,7 +238,6 @@ export function SaleContextProvider(props: {
 
   useEffect(() => {
     if (!signError) return;
-    console.log('@@@@@@@ SaleContextProvider', signError);
     goToErrorView(signError.type, signError.data);
   }, [signError]);
 
