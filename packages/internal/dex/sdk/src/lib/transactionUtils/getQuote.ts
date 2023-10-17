@@ -3,10 +3,10 @@ import { TradeType } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
 import { Fees } from 'lib/fees';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
-import { isNative, maybeWrapAmount, newAmount } from 'lib/utils';
+import { TokenWrapper } from 'lib/tokenWrapper';
+import { isNative } from 'lib/utils';
 import {
-  Coin,
-  ERC20, Native, Quote, Amount,
+  Coin, ERC20, Quote, Amount,
 } from '../../types';
 import { slippageToFraction } from './slippage';
 
@@ -30,17 +30,15 @@ export function applySlippage(
   return ethers.BigNumber.from(amountWithSlippage.toString());
 }
 
-const unwrapAmount = (amount: Amount<ERC20>, nativeToken: Native): Amount<Native> => newAmount(amount.value, nativeToken);
-
 export function prepareUserQuote(
   tokenOfQuotedAmount: Coin,
   tradeInfo: QuoteResult,
   slippage: number,
   fees: Fees,
-  nativeToken: Native,
+  tokenWrapper: TokenWrapper,
 ): Quote {
   const erc20QuoteAmount = getQuoteAmountFromTradeType(tradeInfo);
-  const maybeUnwrappedQuoteAmount = isNative(tokenOfQuotedAmount) ? unwrapAmount(erc20QuoteAmount, nativeToken) : erc20QuoteAmount;
+  const maybeUnwrappedQuoteAmount = isNative(tokenOfQuotedAmount) ? tokenWrapper.unwrapAmount(erc20QuoteAmount) : erc20QuoteAmount;
   const amountWithSlippage = applySlippage(tradeInfo.tradeType, maybeUnwrappedQuoteAmount.value, slippage);
 
   return {
@@ -58,14 +56,14 @@ export function getOurQuoteReqAmount(
   amountSpecified: Amount<Coin>, // the amount specified by the user, either exactIn or exactOut
   fees: Fees,
   tradeType: TradeType,
-  wrappedNativeToken: ERC20,
+  tokenWrapper: TokenWrapper,
 ): Amount<ERC20> {
   if (tradeType === TradeType.EXACT_OUTPUT) {
     // For an exact output swap, we do not need to subtract fees from the given amount
-    return maybeWrapAmount(amountSpecified, wrappedNativeToken);
+    return tokenWrapper.maybeWrapAmount(amountSpecified);
   }
 
   fees.addAmount(amountSpecified);
 
-  return maybeWrapAmount(fees.amountLessFees(), wrappedNativeToken);
+  return tokenWrapper.maybeWrapAmount(fees.amountLessFees());
 }

@@ -4,9 +4,11 @@ import {
   expectERC20, formatAmount, NATIVE_TEST_TOKEN, newAmountFromString, WIMX_TEST_TOKEN,
 } from 'test/utils';
 import { Fees } from 'lib/fees';
+import { TokenWrapper } from 'lib/tokenWrapper';
 import { applySlippage, getOurQuoteReqAmount } from './getQuote';
 
 const DEFAULT_SLIPPAGE = 0.1;
+const tokenWrapper = new TokenWrapper(NATIVE_TEST_TOKEN, WIMX_TEST_TOKEN);
 
 describe('applySlippage', () => {
   describe('when trade type is EXACT_INPUT', () => {
@@ -80,8 +82,8 @@ describe('getOurQuoteReqAmount', () => {
   describe('when trade is EXACT_INPUT, and amountSpecified is native, and no fees', () => {
     it('wraps the amount', () => {
       const amountSpecified = newAmountFromString('1', NATIVE_TEST_TOKEN);
-      const noFees = new Fees([], NATIVE_TEST_TOKEN);
-      const quoteReqAmount = getOurQuoteReqAmount(amountSpecified, noFees, TradeType.EXACT_INPUT, WIMX_TEST_TOKEN);
+      const noFees = new Fees([], NATIVE_TEST_TOKEN, tokenWrapper);
+      const quoteReqAmount = getOurQuoteReqAmount(amountSpecified, noFees, TradeType.EXACT_INPUT, tokenWrapper);
       expectERC20(quoteReqAmount.token, WIMX_TEST_TOKEN.address);
       expect(formatAmount(quoteReqAmount)).toEqual('1.0');
     });
@@ -90,8 +92,8 @@ describe('getOurQuoteReqAmount', () => {
   describe('when trade is EXACT_OUTPUT, and amountSpecified is native, and no fees', () => {
     it('wraps the amount unchanged', () => {
       const amountSpecified = newAmountFromString('1', NATIVE_TEST_TOKEN);
-      const noFees = new Fees([], NATIVE_TEST_TOKEN);
-      const quoteReqAmount = getOurQuoteReqAmount(amountSpecified, noFees, TradeType.EXACT_OUTPUT, WIMX_TEST_TOKEN);
+      const noFees = new Fees([], NATIVE_TEST_TOKEN, tokenWrapper);
+      const quoteReqAmount = getOurQuoteReqAmount(amountSpecified, noFees, TradeType.EXACT_OUTPUT, tokenWrapper);
       expectERC20(quoteReqAmount.token, WIMX_TEST_TOKEN.address);
       expect(formatAmount(quoteReqAmount)).toEqual('1.0');
     });

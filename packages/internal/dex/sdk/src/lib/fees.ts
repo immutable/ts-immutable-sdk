@@ -1,17 +1,21 @@
+/* eslint-disable @typescript-eslint/lines-between-class-members */
 import { BASIS_POINT_PRECISION } from 'constants/router';
 import { BigNumber } from 'ethers';
 import {
   Amount, Fee, SecondaryFee, addAmount, newAmount, subtractAmount, Coin,
 } from 'lib';
+import { TokenWrapper } from './tokenWrapper';
 
 export class Fees {
-  private secondaryFees: SecondaryFee[];
-
   private amount: Amount<Coin>;
 
-  constructor(secondaryFees: SecondaryFee[], token: Coin) {
+  constructor(private secondaryFees: SecondaryFee[], token: Coin, private tokenWrapper: TokenWrapper) {
     this.secondaryFees = secondaryFees;
     this.amount = newAmount(BigNumber.from(0), token);
+  }
+
+  areNative(): boolean {
+    return this.tokenWrapper.isNativeToken(this.amount.token);
   }
 
   addAmount(amount: Amount<Coin>): void {
@@ -28,9 +32,7 @@ export class Fees {
 
   withAmounts(): Fee[] {
     return this.secondaryFees.map((fee) => {
-      const feeAmount = this.amount.value
-        .mul(fee.basisPoints)
-        .div(BASIS_POINT_PRECISION);
+      const feeAmount = this.amount.value.mul(fee.basisPoints).div(BASIS_POINT_PRECISION);
 
       return {
         ...fee,
@@ -43,9 +45,7 @@ export class Fees {
     let totalFees = newAmount(BigNumber.from(0), this.amount.token);
 
     for (const fee of this.secondaryFees) {
-      const feeAmount = this.amount.value
-        .mul(fee.basisPoints)
-        .div(BASIS_POINT_PRECISION);
+      const feeAmount = this.amount.value.mul(fee.basisPoints).div(BASIS_POINT_PRECISION);
       totalFees = addAmount(totalFees, newAmount(feeAmount, this.amount.token));
     }
 

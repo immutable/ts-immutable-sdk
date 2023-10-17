@@ -125,8 +125,11 @@ export const addAmount = <T extends Coin>(a: Amount<T>, b: Amount<T>) => {
     return { value: a.value.add(b.value), token: a.token };
   }
 
-  // Native tokens have no address so there is nothing to validate
-  return { value: a.value.add(b.value), token: a.token };
+  if (isNative(a.token) && isNative(b.token)) {
+    return { value: a.value.add(b.value), token: a.token };
+  }
+
+  throw new Error('Token mismatch: cannot add native and ERC20 tokens together');
 };
 
 export const subtractAmount = <T extends Coin>(a: Amount<T>, b: Amount<T>) => {
@@ -136,18 +139,9 @@ export const subtractAmount = <T extends Coin>(a: Amount<T>, b: Amount<T>) => {
     return { value: a.value.sub(b.value), token: a.token };
   }
 
-  // Native tokens have no address so there is nothing to validate
-  return { value: a.value.sub(b.value), token: a.token };
+  if (isNative(a.token) && isNative(b.token)) {
+    return { value: a.value.sub(b.value), token: a.token };
+  }
+
+  throw new Error('Token mismatch: cannot subtract a native from an ERC20');
 };
-
-export function maybeWrapToken(token: Coin, wrappedNativeToken: ERC20): ERC20 {
-  // if it's already an ERC20, we don't need to wrap it, just return it
-  if (isERC20(token)) return token;
-
-  // if it's the native token, return it's wrapped version
-  return wrappedNativeToken;
-}
-
-export function maybeWrapAmount(amount: Amount<Coin>, wrappedNativeToken: ERC20): Amount<ERC20> {
-  return newAmount(amount.value, maybeWrapToken(amount.token, wrappedNativeToken));
-}

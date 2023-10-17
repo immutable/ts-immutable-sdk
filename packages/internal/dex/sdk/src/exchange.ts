@@ -10,12 +10,13 @@ import { getApproval, prepareApproval } from 'lib/transactionUtils/approval';
 import { getOurQuoteReqAmount, prepareUserQuote } from 'lib/transactionUtils/getQuote';
 import { Fees } from 'lib/fees';
 import { SecondaryFee__factory } from 'contracts/types';
+import { TokenWrapper } from 'lib/tokenWrapper';
 import {
   DEFAULT_DEADLINE, DEFAULT_MAX_HOPS, DEFAULT_SLIPPAGE, MAX_MAX_HOPS, MIN_MAX_HOPS,
 } from './constants';
 import { Router } from './lib/router';
 import {
-  getTokenDecimals, isValidNonZeroAddress, maybeWrapAmount, maybeWrapToken, newAmount,
+  getTokenDecimals, isValidNonZeroAddress, newAmount,
 } from './lib/utils';
 import {
   Coin,
@@ -39,6 +40,8 @@ export class Exchange {
 
   private wrappedNativeToken: ERC20;
 
+  private tokenWrapper: TokenWrapper;
+
   private secondaryFees: SecondaryFee[];
 
   private secondaryFeeContract: string;
@@ -51,6 +54,7 @@ export class Exchange {
     this.chainId = config.chain.chainId;
     this.nativeToken = config.chain.nativeToken;
     this.wrappedNativeToken = config.chain.wrappedNativeToken;
+    this.tokenWrapper = new TokenWrapper(this.nativeToken, this.wrappedNativeToken);
     this.secondaryFees = config.secondaryFees;
     this.routerContract = config.chain.contracts.peripheryRouter;
     this.secondaryFeeContract = config.chain.contracts.secondaryFee;
@@ -140,15 +144,15 @@ export class Exchange {
 
     const amountSpecified = newAmount(amount, tokenSpecified);
 
-    const fees = new Fees(secondaryFees, tokenIn);
+    const fees = new Fees(secondaryFees, tokenIn, this.tokenWrapper);
 
-    const ourQuoteReqAmount = getOurQuoteReqAmount(amountSpecified, fees, tradeType, this.wrappedNativeToken);
+    const ourQuoteReqAmount = getOurQuoteReqAmount(amountSpecified, fees, tradeType, this.tokenWrapper);
 
     // get quote and gas details
     const [ourQuote, gasPrice] = await Promise.all([
       this.router.findOptimalRoute(
         ourQuoteReqAmount,
-        maybeWrapToken(otherToken, this.wrappedNativeToken),
+        this.tokenWrapper.maybeWrapToken(otherToken),
         tradeType,
         maxHops,
       ),
@@ -157,9 +161,9 @@ export class Exchange {
 
     const adjustedQuote = adjustQuoteWithFees(
       ourQuote,
-      maybeWrapAmount(amountSpecified, this.wrappedNativeToken),
+      amountSpecified,
       fees,
-      this.wrappedNativeToken,
+      this.tokenWrapper,
     );
 
     const swap = getSwap(
@@ -173,7 +177,7 @@ export class Exchange {
       secondaryFees,
     );
 
-    const userQuote = prepareUserQuote(otherToken, adjustedQuote, slippagePercent, fees, this.nativeToken);
+    const userQuote = prepareUserQuote(otherToken, adjustedQuote, slippagePercent, fees, this.tokenWrapper);
 
     const preparedApproval = prepareApproval(
       tradeType,

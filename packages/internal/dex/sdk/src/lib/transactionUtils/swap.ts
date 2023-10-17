@@ -7,10 +7,11 @@ import { Token, Percent, TradeType } from '@uniswap/sdk-core';
 import { SecondaryFee__factory } from 'contracts/types';
 import { ISecondaryFee, SecondaryFeeInterface } from 'contracts/types/SecondaryFee';
 import { Fees } from 'lib/fees';
-import { maybeWrapAmount, toCurrencyAmount } from 'lib/utils';
+import { toCurrencyAmount } from 'lib/utils';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
+import { TokenWrapper } from 'lib/tokenWrapper';
 import {
-  ERC20, Native, SecondaryFee, Amount, TransactionDetails,
+  Native, SecondaryFee, Amount, TransactionDetails, Coin,
 } from '../../types';
 import { calculateGasFee } from './gas';
 import { slippageToFraction } from './slippage';
@@ -237,19 +238,20 @@ export function getSwap(
 
 export function adjustQuoteWithFees(
   ourQuote: QuoteResult,
-  amountSpecified: Amount<ERC20>,
+  amountSpecified: Amount<Coin>,
   fees: Fees,
-  wrappedNativeToken: ERC20,
+  tokenWrapper: TokenWrapper,
 ): QuoteResult {
   if (ourQuote.tradeType === TradeType.EXACT_OUTPUT) {
     // when doing exact output, calaculate the fees based on the amountIn
-    fees.addAmount(ourQuote.amountIn);
+    const amountToAdd = fees.areNative() ? tokenWrapper.unwrapAmount(ourQuote.amountIn) : ourQuote.amountIn;
+    fees.addAmount(amountToAdd);
 
     return {
       gasEstimate: ourQuote.gasEstimate,
       route: ourQuote.route,
-      amountIn: maybeWrapAmount(fees.amountWithFeesApplied(), wrappedNativeToken),
-      amountOut: amountSpecified,
+      amountIn: tokenWrapper.maybeWrapAmount(fees.amountWithFeesApplied()),
+      amountOut: tokenWrapper.maybeWrapAmount(amountSpecified),
       tradeType: ourQuote.tradeType,
     };
   }
@@ -257,7 +259,7 @@ export function adjustQuoteWithFees(
   return {
     gasEstimate: ourQuote.gasEstimate,
     route: ourQuote.route,
-    amountIn: amountSpecified,
+    amountIn: tokenWrapper.maybeWrapAmount(amountSpecified),
     amountOut: ourQuote.amountOut,
     tradeType: ourQuote.tradeType,
   };
