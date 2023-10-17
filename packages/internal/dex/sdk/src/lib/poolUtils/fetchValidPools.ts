@@ -1,8 +1,8 @@
 import { Pool } from '@uniswap/v3-sdk';
 import { BigNumber } from 'ethers';
 import { ProviderCallError } from 'errors';
-import { TokenInfo } from 'types';
-import { tokenInfoToUniswapToken } from 'lib';
+import { erc20ToUniswapToken } from 'lib/utils';
+import { ERC20 } from 'types';
 import { MulticallResponse, multicallSingleCallDataMultipleContracts } from '../multicall';
 import { generatePossiblePoolsFromERC20Pair } from './generatePossiblePoolsFromERC20Pairs';
 import { ERC20Pair } from './generateERC20Pairs';
@@ -28,7 +28,7 @@ const noDataResult = '0x';
 export const fetchValidPools = async (
   multicallContract: Multicall,
   erc20Pair: ERC20Pair,
-  commonRoutingERC20s: TokenInfo[],
+  commonRoutingERC20s: ERC20[],
   factoryAddress: string,
 ): Promise<Pool[]> => {
   const poolIDs = generatePossiblePoolsFromERC20Pair(
@@ -94,8 +94,8 @@ export const fetchValidPools = async (
     }
 
     const validPool = new Pool(
-      tokenInfoToUniswapToken(poolID.erc20Pair[0]),
-      tokenInfoToUniswapToken(poolID.erc20Pair[1]),
+      erc20ToUniswapToken(poolID.erc20Pair[0]),
+      erc20ToUniswapToken(poolID.erc20Pair[1]),
       poolID.fee,
       poolSlot0.sqrtPriceX96.toString(),
       poolLiquidity.toString(),
