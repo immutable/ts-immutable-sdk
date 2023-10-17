@@ -1,16 +1,11 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-console */
-import {
-  useCallback, useContext, useEffect,
-} from 'react';
+import { useCallback, useContext, useEffect } from 'react';
 import { Box, Heading } from '@biom3/react';
 
-import { RoutingOutcomeType } from '@imtbl/checkout-sdk';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { text as textConfig } from '../../../resources/text/textConfig';
-import { FundWithSmartCheckoutSubViews, SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
+import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 
 import {
   ViewContext,
@@ -23,69 +18,41 @@ import { EventTargetContext } from '../../../context/event-target-context/EventT
 import { PaymentOptions } from '../components/PaymentOptions';
 
 import { useSaleContext } from '../context/SaleContextProvider';
-import { PaymentTypes, SaleErrorTypes } from '../types';
+import { PaymentTypes } from '../types';
 
 export function PaymentMethods() {
   const text = { methods: textConfig.views[SaleWidgetViews.PAYMENT_METHODS] };
   const { viewDispatch } = useContext(ViewContext);
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
-  const {
-    paymentMethod, setPaymentMethod, sign, querySmartCheckout,
-  } = useSaleContext();
+  const { paymentMethod, setPaymentMethod, sign } = useSaleContext();
 
   const handleOptionClick = (type: PaymentTypes) => setPaymentMethod(type);
 
-  const handleGoToPaymentView = useCallback((type: PaymentTypes) => {
-    if (type === PaymentTypes.CRYPTO) {
-      if (!querySmartCheckout) {
-        // we need this, not sure what should happen for the user if not defined
-        return;
-      }
-      querySmartCheckout((res) => {
-        if (res?.sufficient) {
-          viewDispatch({
-            payload: {
-              type: ViewActions.UPDATE_VIEW,
-              view: {
-                type: SaleWidgetViews.PAY_WITH_COINS,
-              },
-            },
-          });
-        } else if (res?.router.routingOutcome?.type === RoutingOutcomeType.ROUTES_FOUND) {
-          viewDispatch({
-            payload: {
-              type: ViewActions.UPDATE_VIEW,
-              view: {
-                type: SaleWidgetViews.FUND_WITH_SMART_CHECKOUT,
-                subView: FundWithSmartCheckoutSubViews.FUNDING_ROUTE_SELECT,
-              },
-            },
-          });
-        } else {
-          viewDispatch({
-            payload: {
-              type: ViewActions.UPDATE_VIEW,
-              view: {
-                type: SaleWidgetViews.SALE_FAIL,
-                data: {
-                  errorType: SaleErrorTypes.INSUFFICIENT_BALANCE,
-                },
-              },
-            },
-          });
-        }
-      });
+  const handleGoToPaymentView = useCallback((type: PaymentTypes, signed = false) => {
+    if (type === PaymentTypes.CRYPTO && !signed) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
-            type: SharedViews.LOADING_VIEW,
+            type: SaleWidgetViews.PAY_WITH_COINS,
           },
         },
       });
     }
 
-    if (type === PaymentTypes.FIAT) {
+    if (type === PaymentTypes.FIAT && !signed) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SharedViews.LOADING_VIEW,
+            data: { loadingText: text.methods.loading.ready },
+          },
+        },
+      });
+    }
+
+    if (type === PaymentTypes.FIAT && signed) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -95,14 +62,14 @@ export function PaymentMethods() {
         },
       });
     }
-  }, [querySmartCheckout]);
+  }, []);
 
   useEffect(() => {
     if (paymentMethod) {
-      sign(paymentMethod);
+      sign(paymentMethod, (response) => handleGoToPaymentView(paymentMethod, !!response));
       handleGoToPaymentView(paymentMethod);
     }
-  }, [paymentMethod, querySmartCheckout]);
+  }, [paymentMethod]);
 
   return (
     <SimpleLayout
@@ -133,9 +100,7 @@ export function PaymentMethods() {
           {text.methods.header.heading}
         </Heading>
         <Box sx={{ paddingX: 'base.spacing.x2' }}>
-          <PaymentOptions
-            onClick={handleOptionClick}
-          />
+          <PaymentOptions onClick={handleOptionClick} />
         </Box>
       </Box>
     </SimpleLayout>

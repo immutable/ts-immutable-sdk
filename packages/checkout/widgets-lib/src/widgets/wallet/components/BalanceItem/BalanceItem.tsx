@@ -13,6 +13,7 @@ import { formatZeroAmount, tokenValueFormat } from '../../../../lib/utils';
 import { ConnectLoaderContext } from '../../../../context/connect-loader-context/ConnectLoaderContext';
 import { isPassportProvider } from '../../../../lib/providerUtils';
 import { EventTargetContext } from '../../../../context/event-target-context/EventTargetContext';
+import { UserJourney, useAnalytics } from '../../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 export interface BalanceItemProps {
   balanceInfo: BalanceInfo;
@@ -24,6 +25,7 @@ export function BalanceItem({
   bridgeToL2OnClick,
 }: BalanceItemProps) {
   const { connectLoaderState } = useContext(ConnectLoaderContext);
+  const { track } = useAnalytics();
   const { checkout, provider } = connectLoaderState;
   const fiatAmount = `≈ USD $${formatZeroAmount(balanceInfo.fiatAmount)}`;
   const { walletState } = useContext(WalletContext);
@@ -75,8 +77,7 @@ export function BalanceItem({
       isOnRampEnabled
           && onRampAllowedTokens.length > 0
           && onRampAllowedTokens.find(
-            (token) => token.address?.toLowerCase()
-              === balanceInfo.address?.toLowerCase(),
+            (token) => token.address?.toLowerCase() === balanceInfo.address?.toLowerCase(),
           ),
     ),
     [isOnRampEnabled, onRampAllowedTokens],
@@ -94,11 +95,32 @@ export function BalanceItem({
         fiatAmount={fiatAmount}
       />
       {(isOnRampEnabled || isSwapEnabled || isBridgeEnabled) && (
-        <MenuItem.OverflowPopoverMenu size="small" testId="token-menu">
+        <MenuItem.OverflowPopoverMenu
+          size="small"
+          testId="token-menu"
+          onClick={() => {
+            track({
+              userJourney: UserJourney.WALLET,
+              screen: 'WalletBalances',
+              control: 'BalanceItem',
+              controlType: 'Button',
+              tokenSymbol: balanceInfo.symbol,
+              tokenAddress: balanceInfo.address,
+            });
+          }}
+        >
           <MenuItem
             testId="balance-item-add-option"
             sx={ShowMenuItem(showAddMenuItem)}
             onClick={() => {
+              track({
+                userJourney: UserJourney.WALLET,
+                screen: 'WalletBalances',
+                control: 'AddTokens',
+                controlType: 'Button',
+                tokenSymbol: balanceInfo.symbol,
+                tokenAddress: balanceInfo.address,
+              });
               orchestrationEvents.sendRequestOnrampEvent(
                 eventTarget,
                 IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
@@ -116,6 +138,14 @@ export function BalanceItem({
             testId="balance-item-swap-option"
             sx={ShowMenuItem(isSwapEnabled)}
             onClick={() => {
+              track({
+                userJourney: UserJourney.WALLET,
+                screen: 'WalletBalances',
+                control: 'SwapTokens',
+                controlType: 'Button',
+                tokenSymbol: balanceInfo.symbol,
+                tokenAddress: balanceInfo.address,
+              });
               orchestrationEvents.sendRequestSwapEvent(
                 eventTarget,
                 IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
@@ -133,7 +163,17 @@ export function BalanceItem({
           <MenuItem
             testId="balance-item-move-option"
             sx={ShowMenuItem(isBridgeEnabled)}
-            onClick={() => bridgeToL2OnClick(balanceInfo.address)}
+            onClick={() => {
+              track({
+                userJourney: UserJourney.WALLET,
+                screen: 'WalletBalances',
+                control: 'MoveTokens',
+                controlType: 'Button',
+                tokenSymbol: balanceInfo.symbol,
+                tokenAddress: balanceInfo.address,
+              });
+              bridgeToL2OnClick(balanceInfo.address);
+            }}
           >
             <MenuItem.Icon icon="Minting" />
             <MenuItem.Label>{`Move ${balanceInfo.symbol}`}</MenuItem.Label>
