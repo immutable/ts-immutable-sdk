@@ -3,12 +3,15 @@ import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { quickswapFooterStyles, quickswapFooterDisclaimerTextStyles, quickswapFooterLogoStyles } from './FooterStyles';
 import { ReactComponent as QuickswapLogoDark } from '../../assets/QuickswapLogoDark.svg';
 import { ReactComponent as QuickswapLogoLight } from '../../assets/QuickswapLogoLight.svg';
+import { text } from '../../resources/text/textConfig';
 
 export interface QuickswapFooterProps {
   theme: WidgetTheme;
 }
 
 export function QuickswapFooter({ theme }: QuickswapFooterProps) {
+  const { disclaimerText } = text.footers.quickswapFooter;
+
   return (
     <Box testId="quickswap-footer-container" sx={quickswapFooterStyles}>
       <Box testId="quickswap-logo" sx={quickswapFooterLogoStyles}>
@@ -18,7 +21,7 @@ export function QuickswapFooter({ theme }: QuickswapFooterProps) {
         {theme === WidgetTheme.DARK ? <QuickswapLogoDark /> : <QuickswapLogoLight />}
       </Box>
       <Body testId="quickswap-footer-disclaimer-text" size="xSmall" sx={quickswapFooterDisclaimerTextStyles}>
-        Quickswap is a third party application. Immutable neither builds, owns, operates or deploys Quickswap.
+        {disclaimerText}
       </Body>
     </Box>
   );
