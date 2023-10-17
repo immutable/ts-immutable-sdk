@@ -1,7 +1,7 @@
 import { ChainId, ChainName } from '@imtbl/checkout-sdk';
 import { getChainNameById } from './chainName';
 
-describe('getChainName', () => {
+describe('getChainNameById', () => {
   const chainNameTestCases = [
     { id: ChainId.IMTBL_ZKEVM_DEVNET, expectedName: ChainName.IMTBL_ZKEVM_DEVNET },
     { id: ChainId.IMTBL_ZKEVM_TESTNET, expectedName: ChainName.IMTBL_ZKEVM_TESTNET },
