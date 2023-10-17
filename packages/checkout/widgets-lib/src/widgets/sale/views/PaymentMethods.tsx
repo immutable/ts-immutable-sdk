@@ -10,7 +10,6 @@ import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTy
 import {
   ViewContext,
   ViewActions,
-  SharedViews,
 } from '../../../context/view-context/ViewContext';
 
 import { sendSaleWidgetCloseEvent } from '../SaleWidgetEvents';
@@ -54,16 +53,8 @@ export function PaymentMethods() {
 
   useEffect(() => {
     if (paymentMethod) {
-      sign(paymentMethod, () => handleGoToPaymentView(paymentMethod));
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: SharedViews.LOADING_VIEW,
-            data: { loadingText: text.methods.loading },
-          },
-        },
-      });
+      sign(paymentMethod);
+      handleGoToPaymentView(paymentMethod);
     }
   }, [paymentMethod]);
 

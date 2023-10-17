@@ -90,7 +90,7 @@ export const cyIntercept = (overrides?: {
       201811419111: {
         tokens: [
           {
-            address: 0x0000000000000000000000000000000000001010,
+            address: '0x0000000000000000000000000000000000001010',
             name: 'IMX',
             symbol: 'IMX',
             decimals: 18,

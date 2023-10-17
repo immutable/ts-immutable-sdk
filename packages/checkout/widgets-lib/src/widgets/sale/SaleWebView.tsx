@@ -12,7 +12,7 @@ import { Item } from './types';
 
 const defaultPassportConfig = {
   environment: 'sandbox',
-  clientId: 'XuGsHvMqMJrb73diq1fCswWwn4AYhcM6',
+  clientId: 'sWMLNvDrK5F8ibNWOqYgdKWsUtdLLz4J',
   redirectUri: 'http://localhost:3001/sale?login=true',
   logoutRedirectUri: 'http://localhost:3001/sale?logout=true',
   audience: 'platform_api',

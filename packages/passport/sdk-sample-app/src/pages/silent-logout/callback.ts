@@ -1,11 +1,11 @@
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { useEffect } from 'react';
-import { silentLogoutParentUri } from '@/config';
+import { SILENT_LOGOUT_PARENT_URI } from '@/config';
 
 export default function HandleCallback() {
   const { passportClient } = useImmutableProvider();
 
   useEffect(() => {
-    passportClient?.logoutSilentCallback(silentLogoutParentUri);
+    passportClient?.logoutSilentCallback(SILENT_LOGOUT_PARENT_URI);
   }, [passportClient]);
 }
