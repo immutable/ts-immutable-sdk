@@ -211,8 +211,8 @@ export function SaleContextProvider(props: {
     const result = await smartCheckout();
     callback?.(result);
     return result;
-  }, [smartCheckout, recipientAddress]);
-    // ! Smart Checkout ----------------------------/
+  }, [smartCheckout]);
+  // ! Smart Checkout ----------------------------/
 
   const {
     sign: signOrder,
@@ -245,6 +245,7 @@ export function SaleContextProvider(props: {
 
   useEffect(() => {
     if (!signError) return;
+    console.log('@@@@@@@ SaleContextProvider', signError);
     goToErrorView(signError.type, signError.data);
   }, [signError]);
 

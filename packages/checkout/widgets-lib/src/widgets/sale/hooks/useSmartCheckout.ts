@@ -1,10 +1,17 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
-import {
-  Checkout, GasAmount, ERC20ItemRequirement, ItemType, TransactionOrGasType, GasTokenType, SmartCheckoutResult,
-} from '@imtbl/checkout-sdk';
-import { useCallback, useState } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
-import { BigNumber, utils } from 'ethers';
+import {
+  Checkout,
+  ERC20ItemRequirement,
+  GasAmount,
+  GasTokenType,
+  ItemType,
+  SmartCheckoutResult,
+  TransactionOrGasType,
+} from '@imtbl/checkout-sdk';
+import { BigNumber } from 'ethers';
+import { useCallback, useState } from 'react';
 import { Item } from '../types';
 
 type UseSmartCheckoutInput = {
@@ -18,14 +25,13 @@ type UseSmartCheckoutInput = {
 
 const MAX_GAS_LIMIT = '30000000';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const getItemRequirements = (amount: string, spenderAddress: string, contractAddress: string)
 : ERC20ItemRequirement[] => [
   {
     type: ItemType.ERC20,
-    contractAddress: '0x21B51Ec6fB7654B7e59e832F9e9687f29dF94Fb8',
+    contractAddress,
     spenderAddress,
-    amount: utils.parseUnits(amount, 6).toString(),
+    amount,
   },
 ];
 
@@ -38,21 +44,25 @@ const getGasEstimate = (): GasAmount => ({
 });
 
 export const useSmartCheckout = ({
-  checkout, provider, items, amount, spenderAddress, contractAddress,
+  checkout, provider, items, amount, contractAddress,
 }: UseSmartCheckoutInput) => {
   const [smartCheckoutResult, setSmartCheckoutResult] = useState<SmartCheckoutResult | undefined>(
     undefined,
   );
 
-  const smartCheckout = useCallback(async () => {
-    if (!checkout || !provider || !spenderAddress) {
+  const smartCheckout = useCallback(async (callback?: (r?: SmartCheckoutResult) => void) => {
+    if (!checkout || !provider) {
       return undefined;
     }
+
+    const signer = provider.getSigner();
+    const spenderAddress = await signer?.getAddress() || '';
 
     // ! Generate ItemRequirements
     const itemRequirements = getItemRequirements(amount, spenderAddress, contractAddress);
     // ! Generate GasEstimate
     const gasEstimate = getGasEstimate();
+
     try {
       const res = await checkout.smartCheckout(
         {
@@ -61,14 +71,13 @@ export const useSmartCheckout = ({
           transactionOrGasAmount: gasEstimate,
         },
       );
+
       setSmartCheckoutResult(res);
-      // eslint-disable-next-line no-console
-      console.log('@@@@@@ useSmartCheckout SmartCheckout res', res);
       return res;
     } catch (err: any) {
       throw new Error('Smart Checkout failed', err);
     }
-  }, [checkout, provider, items, amount, spenderAddress, contractAddress]);
+  }, [checkout, provider, items, amount, contractAddress]);
 
   return {
     smartCheckout, smartCheckoutResult,
