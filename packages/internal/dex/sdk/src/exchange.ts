@@ -23,7 +23,6 @@ import {
   ExchangeModuleConfiguration,
   Native,
   SecondaryFee,
-  Amount,
   TokenLiteral,
   TransactionResponse,
 } from './types';
@@ -124,7 +123,6 @@ export class Exchange {
     deadline: number,
     tradeType: TradeType,
   ): Promise<TransactionResponse> {
-    // TODO: Fix any shenanigans
     Exchange.validate(tokenInAddress, tokenOutAddress, maxHops, slippagePercent, fromAddress);
 
     // get the decimals of the tokens that will be swapped
@@ -143,8 +141,7 @@ export class Exchange {
 
     const amountSpecified = newAmount(amount, tokenSpecified);
 
-    // Gotcha, fees are always ERC20 (wrapped if native)...
-    const fees = new Fees(secondaryFees, maybeWrapToken(tokenIn, this.wrappedNativeToken));
+    const fees = new Fees(secondaryFees, tokenIn);
 
     const ourQuoteReqAmount = getOurQuoteReqAmount(amountSpecified, fees, tradeType, this.wrappedNativeToken);
 
@@ -179,38 +176,10 @@ export class Exchange {
 
     const userQuote = prepareUserQuote(otherToken, adjustedQuote, slippagePercent, fees, this.nativeToken);
 
-    // preparedApproval always uses the tokenIn address because we are always selling the tokenIn
-    const approval = await this.getApproval(
-      tradeType,
-      amountSpecified, // 1000 YEET
-      userQuote.amountWithMaxSlippage, // IMX - slippage
-      secondaryFees,
-      fromAddress,
-      gasPrice,
-    );
-
-    return {
-      approval,
-      swap,
-      quote: userQuote,
-    };
-  }
-
-  private async getApproval(
-    tradeType: TradeType,
-    amountSpecified: Amount<Coin>, // token is the specified amount by the user
-    amountWithMaxSlippage: Amount<Coin>, // token is the quoted one
-    secondaryFees: SecondaryFee[],
-    fromAddress: string,
-    gasPrice: Amount<Native> | null,
-  ) {
-    // it's not about the amountSpecified, it's about the tokenIn
-    // if exact input is native then skip approvals
-
     const preparedApproval = prepareApproval(
       tradeType,
       amountSpecified,
-      amountWithMaxSlippage,
+      userQuote.amountWithMaxSlippage,
       {
         routerAddress: this.routerContract,
         secondaryFeeAddress: this.secondaryFeeContract,
@@ -218,12 +187,15 @@ export class Exchange {
       secondaryFees,
     );
 
-    // preparedApproval always uses the tokenIn address because we are always selling the tokenIn
     const approval = preparedApproval
       ? await getApproval(this.provider, fromAddress, preparedApproval, gasPrice)
       : null;
 
-    return approval;
+    return {
+      approval,
+      swap,
+      quote: userQuote,
+    };
   }
 
   /**

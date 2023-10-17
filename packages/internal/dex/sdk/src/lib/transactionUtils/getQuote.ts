@@ -32,21 +32,19 @@ export function applySlippage(
 
 const unwrapAmount = (amount: Amount<ERC20>, nativeToken: Native): Amount<Native> => newAmount(amount.value, nativeToken);
 
-export function prepareUserQuote<T extends Native | ERC20>(
-  tokenOfQuotedAmount: T,
+export function prepareUserQuote(
+  tokenOfQuotedAmount: Coin,
   tradeInfo: QuoteResult,
   slippage: number,
   fees: Fees,
   nativeToken: Native,
 ): Quote {
   const erc20QuoteAmount = getQuoteAmountFromTradeType(tradeInfo);
-
   const maybeUnwrappedQuoteAmount = isNative(tokenOfQuotedAmount) ? unwrapAmount(erc20QuoteAmount, nativeToken) : erc20QuoteAmount;
-
   const amountWithSlippage = applySlippage(tradeInfo.tradeType, maybeUnwrappedQuoteAmount.value, slippage);
 
   return {
-    amount: maybeUnwrappedQuoteAmount as Amount<T>, // TODO: Make it better?
+    amount: maybeUnwrappedQuoteAmount,
     amountWithMaxSlippage: {
       token: tokenOfQuotedAmount,
       value: amountWithSlippage,

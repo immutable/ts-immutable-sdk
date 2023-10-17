@@ -1,8 +1,7 @@
 import { BASIS_POINT_PRECISION } from 'constants/router';
 import { BigNumber } from 'ethers';
 import {
-  ERC20, Amount,
-  Fee, SecondaryFee, addAmount, newAmount, subtractAmount, Coin,
+  Amount, Fee, SecondaryFee, addAmount, newAmount, subtractAmount, Coin,
 } from 'lib';
 
 export class Fees {
@@ -10,7 +9,7 @@ export class Fees {
 
   private amount: Amount<Coin>;
 
-  constructor(secondaryFees: SecondaryFee[], token: ERC20) {
+  constructor(secondaryFees: SecondaryFee[], token: Coin) {
     this.secondaryFees = secondaryFees;
     this.amount = newAmount(BigNumber.from(0), token);
   }
@@ -27,7 +26,6 @@ export class Fees {
     return subtractAmount(this.amount, this.total());
   }
 
-  // TODO: Maybe take native indicator
   withAmounts(): Fee[] {
     return this.secondaryFees.map((fee) => {
       const feeAmount = this.amount.value

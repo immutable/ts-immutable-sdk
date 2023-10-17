@@ -96,24 +96,6 @@ export const getAmountInToApprove = (
   return null;
 };
 
-// EXACT_INPUT  => I have 100 IMX (ERC20), I want YEET => tokenIn = IMX, tokenOut = YEET, tokenSpecified = IMX, otherToken = YEET
-// need to approve 100 IMX, will get YEET - slippage.
-
-// EXACT_OUTPUT => I want 100 WIMX, I have YEET => tokenIn = YEET, tokenOut = IMX, tokenSpecified = IMX, otherToken = YEET
-// need to approve quoted YEET + slippage
-
-// EXACT_INPUT  => I have 100 native IMX, I want YEET => tokenIn = IMX, tokenOut = YEET, tokenSpecified = IMX, otherToken = YEET
-// No approval, will get YEET - slippage.
-
-// EXACT_OUTPUT => I want 100 native IMX, I have YEET = tokenIn = YEET, tokenOut = IMX, tokenSpecified = IMX, otherToken (quoted) = YEET
-// need to approve quoted YEET + slippage
-
-// EXACT_INPUT => I have 100 YEET, I want native IMX => tokenIn = YEET, tokenOut = IMX, tokenSpecified = YEET, otherToken = IMX
-// need to approve 100 YEET, will get native IMX - slippage
-
-// EXACT_OUTPUT => I want 100 YEET, I have native IMX => tokenIn = IMX, tokenOut = YEET, tokenSpecified = YEET, otherToken = IMX
-// No approval, will get exactly 100 YEET. BUT WE NEED TO SEND QUOTED IMX + SLIPPAGE, AND I'LL GET MY IMX CHANGE BACK
-
 export const prepareApproval = (
   tradeType: TradeType,
   amountSpecified: Amount<Coin>,
