@@ -5,6 +5,7 @@ import {
   decodeMulticallExactInputSingleWithFees, decodeMulticallExactInputSingleWithoutFees,
   decodeMulticallExactOutputSingleWithFees, decodeMulticallExactOutputSingleWithoutFees,
   expectInstanceOf, expectToBeDefined, makeAddr, formatAmount, newAmountFromString,
+  nativeTokenService, NATIVE_TEST_TOKEN,
 } from 'test/utils';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import { Fees } from 'lib/fees';
@@ -55,8 +56,9 @@ describe('getSwap', () => {
         0,
         makeAddr('periphery'),
         makeAddr('secondaryFeeContract'),
-        newAmount(BigNumber.from(0), IMX_TEST_TOKEN),
+        newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
         [],
+        nativeTokenService,
       );
 
       expectToBeDefined(swap.transaction.data);
@@ -77,8 +79,9 @@ describe('getSwap', () => {
         0,
         makeAddr('periphery'),
         makeAddr('secondaryFeeContract'),
-        newAmount(BigNumber.from(0), IMX_TEST_TOKEN),
+        newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
         [],
+        nativeTokenService,
       );
 
       expectToBeDefined(swap.transaction.data);
@@ -101,8 +104,9 @@ describe('getSwap', () => {
         0,
         makeAddr('periphery'),
         makeAddr('secondaryFeeContract'),
-        newAmount(BigNumber.from(0), IMX_TEST_TOKEN),
+        newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
         [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
+        nativeTokenService,
       );
 
       expectToBeDefined(swap.transaction.data);
@@ -123,8 +127,9 @@ describe('getSwap', () => {
         0,
         makeAddr('periphery'),
         makeAddr('secondaryFeeContract'),
-        newAmount(BigNumber.from(0), IMX_TEST_TOKEN),
+        newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
         [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
+        nativeTokenService,
       );
 
       expectToBeDefined(swap.transaction.data);

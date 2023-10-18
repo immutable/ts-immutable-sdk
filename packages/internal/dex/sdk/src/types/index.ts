@@ -15,7 +15,8 @@ export type Chain = {
   rpcUrl: string;
   contracts: ExchangeContracts;
   commonRoutingTokens: ERC20[];
-  nativeToken: ERC20;
+  nativeToken: Native;
+  wrappedNativeToken: ERC20;
 };
 
 /**
@@ -39,7 +40,7 @@ export type SecondaryFee = {
 export type Fee = {
   recipient: string;
   basisPoints: number;
-  amount: Amount<Coin>;
+  amount: Amount<ERC20>;
 };
 
 /**
@@ -125,7 +126,8 @@ export interface ExchangeOverrides {
   rpcURL: string;
   exchangeContracts: ExchangeContracts;
   commonRoutingTokens: ERC20[];
-  nativeToken: ERC20;
+  nativeToken: Native;
+  wrappedNativeToken: ERC20;
 }
 
 export interface ExchangeModuleConfiguration

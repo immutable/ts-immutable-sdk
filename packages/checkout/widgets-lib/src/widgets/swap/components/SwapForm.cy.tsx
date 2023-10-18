@@ -334,7 +334,7 @@ describe('SwapForm', () => {
             initialStateOverride={testSwapState}
             cryptoConversionsOverride={cryptoConversions}
           >
-            <SwapCoins />
+            <SwapCoins theme={WidgetTheme.LIGHT} />
           </SwapWidgetTestComponent>
         </CustomAnalyticsProvider>,
       );
@@ -365,7 +365,7 @@ describe('SwapForm', () => {
             initialStateOverride={testSwapState}
             cryptoConversionsOverride={cryptoConversions}
           >
-            <SwapCoins />
+            <SwapCoins theme={WidgetTheme.LIGHT} />
           </SwapWidgetTestComponent>
         </CustomAnalyticsProvider>,
       );
@@ -389,7 +389,7 @@ describe('SwapForm', () => {
             initialStateOverride={testSwapState}
             cryptoConversionsOverride={cryptoConversions}
           >
-            <SwapCoins />
+            <SwapCoins theme={WidgetTheme.LIGHT} />
           </SwapWidgetTestComponent>
         </CustomAnalyticsProvider>,
       );
@@ -412,7 +412,7 @@ describe('SwapForm', () => {
             initialStateOverride={testSwapState}
             cryptoConversionsOverride={cryptoConversions}
           >
-            <SwapCoins />
+            <SwapCoins theme={WidgetTheme.LIGHT} />
           </SwapWidgetTestComponent>
         </CustomAnalyticsProvider>,
       );
@@ -439,7 +439,7 @@ describe('SwapForm', () => {
             initialStateOverride={testSwapState}
             cryptoConversionsOverride={cryptoConversions}
           >
-            <SwapCoins />
+            <SwapCoins theme={WidgetTheme.LIGHT} />
           </SwapWidgetTestComponent>
         </CustomAnalyticsProvider>,
       );
@@ -530,7 +530,7 @@ describe('SwapForm', () => {
               initialStateOverride={testSwapState}
               cryptoConversionsOverride={cryptoConversions}
             >
-              <SwapCoins />
+              <SwapCoins theme={WidgetTheme.LIGHT} />
             </SwapWidgetTestComponent>
           </ConnectLoaderTestComponent>
         </CustomAnalyticsProvider>,
@@ -579,7 +579,7 @@ describe('SwapForm', () => {
               initialStateOverride={testSwapState}
               cryptoConversionsOverride={cryptoConversions}
             >
-              <SwapCoins />
+              <SwapCoins theme={WidgetTheme.LIGHT} />
             </SwapWidgetTestComponent>
           </ConnectLoaderTestComponent>
         </CustomAnalyticsProvider>,
@@ -633,7 +633,7 @@ describe('SwapForm', () => {
               initialStateOverride={testSwapState}
               cryptoConversionsOverride={cryptoConversions}
             >
-              <SwapCoins />
+              <SwapCoins theme={WidgetTheme.LIGHT} />
             </SwapWidgetTestComponent>
           </ConnectLoaderTestComponent>
         </CustomAnalyticsProvider>,
@@ -682,7 +682,7 @@ describe('SwapForm', () => {
               initialStateOverride={testSwapState}
               cryptoConversionsOverride={cryptoConversions}
             >
-              <SwapCoins />
+              <SwapCoins theme={WidgetTheme.LIGHT} />
             </SwapWidgetTestComponent>
           </ConnectLoaderTestComponent>
         </CustomAnalyticsProvider>,
@@ -709,7 +709,7 @@ describe('SwapForm', () => {
               initialStateOverride={testSwapState}
               cryptoConversionsOverride={cryptoConversions}
             >
-              <SwapCoins />
+              <SwapCoins theme={WidgetTheme.LIGHT} />
             </SwapWidgetTestComponent>
           </ConnectLoaderTestComponent>
         </CustomAnalyticsProvider>,
@@ -736,7 +736,7 @@ describe('SwapForm', () => {
               initialStateOverride={testSwapState}
               cryptoConversionsOverride={cryptoConversions}
             >
-              <SwapCoins />
+              <SwapCoins theme={WidgetTheme.LIGHT} />
             </SwapWidgetTestComponent>
           </ConnectLoaderTestComponent>
         </CustomAnalyticsProvider>,
@@ -880,7 +880,7 @@ describe('SwapForm', () => {
                 }}
                 cryptoConversionsOverride={cryptoConversions}
               >
-                <SwapCoins />
+                <SwapCoins theme={WidgetTheme.LIGHT} />
               </SwapWidgetTestComponent>
             </ConnectLoaderTestComponent>
           </CustomAnalyticsProvider>,
@@ -934,7 +934,7 @@ describe('SwapForm', () => {
                 }}
                 cryptoConversionsOverride={cryptoConversions}
               >
-                <SwapCoins />
+                <SwapCoins theme={WidgetTheme.LIGHT} />
               </SwapWidgetTestComponent>
             </ConnectLoaderTestComponent>
           </CustomAnalyticsProvider>,
@@ -991,7 +991,7 @@ describe('SwapForm', () => {
                 }}
                 cryptoConversionsOverride={cryptoConversions}
               >
-                <SwapCoins />
+                <SwapCoins theme={WidgetTheme.LIGHT} />
               </SwapWidgetTestComponent>
             </ConnectLoaderTestComponent>
           </CustomAnalyticsProvider>,
@@ -1054,7 +1054,7 @@ describe('SwapForm', () => {
                 }}
                 cryptoConversionsOverride={cryptoConversions}
               >
-                <SwapCoins />
+                <SwapCoins theme={WidgetTheme.LIGHT} />
               </SwapWidgetTestComponent>
             </ConnectLoaderTestComponent>
           </CustomAnalyticsProvider>,
@@ -1094,7 +1094,7 @@ describe('SwapForm', () => {
                 }}
                 cryptoConversionsOverride={cryptoConversions}
               >
-                <SwapCoins />
+                <SwapCoins theme={WidgetTheme.LIGHT} />
               </SwapWidgetTestComponent>
             </ConnectLoaderTestComponent>
           </CustomAnalyticsProvider>,

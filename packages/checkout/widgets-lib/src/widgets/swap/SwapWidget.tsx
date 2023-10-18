@@ -230,6 +230,7 @@ export function SwapWidget(props: SwapWidgetProps) {
             )}
             {viewState.view.type === SwapWidgetViews.SWAP && (
               <SwapCoins
+                theme={theme}
                 fromAmount={viewState.view.data?.fromAmount ?? amount}
                 fromContractAddress={
                   viewState.view.data?.fromContractAddress
