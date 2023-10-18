@@ -76,7 +76,7 @@ describe('quoteFetcher', () => {
     approval?: number,
   ) => {
     const dexQuote: DexQuote = {
-      approval: undefined,
+      approval: null,
       swap: null,
       quote: {
         amount: {
