@@ -1,5 +1,6 @@
+/* eslint-disable no-console */
 import { Box } from '@biom3/react';
-import { FundingRoute, RoutingOutcomeType } from '@imtbl/checkout-sdk';
+import { FundingRoute } from '@imtbl/checkout-sdk';
 import {
   useContext,
   useEffect,
@@ -10,8 +11,8 @@ import {
 } from '../../../context/view-context/SaleViewContextTypes';
 import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { LoadingView } from '../../../views/loading/LoadingView';
-import { FundingRouteSelect } from '../components/FundingRouteSelect/FundingRouteSelect';
 import { FundingRouteExecute } from '../components/FundingRouteExecute/FundingRouteExecute';
+import { FundingRouteSelect } from '../components/FundingRouteSelect/FundingRouteSelect';
 import { useSaleContext } from '../context/SaleContextProvider';
 
 type FundWithSmartCheckoutProps = {
@@ -20,26 +21,26 @@ type FundWithSmartCheckoutProps = {
 
 export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
   const { viewDispatch } = useContext(ViewContext);
-  const [fundingRoutes, setFundingRoutes] = useState<FundingRoute[]>([]);
   const [selectedFundingRoute, setSelectedFundingRoute] = useState<FundingRoute | undefined>(undefined);
   const [fundingRouteStepIndex, setFundingRouteStepIndex] = useState<number>(0);
 
-  const { smartCheckoutResult } = useSaleContext();
+  const { querySmartCheckout, fundingRoutes } = useSaleContext();
+
+  let smartCheckoutLoading = false;
 
   const onFundingRouteSelected = (fundingRoute: FundingRoute) => {
     setSelectedFundingRoute(fundingRoute);
   };
 
   useEffect(() => {
-    if (!smartCheckoutResult || smartCheckoutResult.sufficient) {
-      return;
+    // ! maybe consider using a promise.resolve(undefined).
+    if (subView === FundWithSmartCheckoutSubViews.INIT && querySmartCheckout && !smartCheckoutLoading) {
+      smartCheckoutLoading = true;
+      querySmartCheckout().finally(() => {
+        smartCheckoutLoading = false;
+      });
     }
-    if (!smartCheckoutResult.sufficient
-      && smartCheckoutResult.router.routingOutcome.type === RoutingOutcomeType.ROUTES_FOUND
-    ) {
-      setFundingRoutes(smartCheckoutResult.router.routingOutcome.fundingRoutes);
-    }
-  }, [smartCheckoutResult]);
+  }, []);
 
   const fundingRouteStep = useMemo(() => {
     if (!selectedFundingRoute) {
@@ -70,7 +71,7 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
   return (
     <Box>
       { subView === FundWithSmartCheckoutSubViews.INIT && (
-        <LoadingView loadingText="Loading" />
+        <LoadingView loadingText="TODO COPY -> waiting for Smart Checkout..." />
       )}
       { subView === FundWithSmartCheckoutSubViews.FUNDING_ROUTE_SELECT && (
         <FundingRouteSelect

@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
-import { SmartCheckoutResult } from '@imtbl/checkout-sdk';
+import { FundingRoute, RoutingOutcomeType, SmartCheckoutResult } from '@imtbl/checkout-sdk';
 import { Passport } from '@imtbl/passport';
 import {
   ReactNode,
@@ -12,7 +13,7 @@ import {
   useState,
 } from 'react';
 import { ConnectLoaderState } from '../../../context/connect-loader-context/ConnectLoaderContext';
-import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
+import { FundWithSmartCheckoutSubViews, SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 import {
   ViewActions,
   ViewContext,
@@ -65,6 +66,7 @@ type SaleContextValues = SaleContextProps & {
   querySmartCheckout: undefined |
   ((callback?: (r?: SmartCheckoutResult) => void) => Promise<SmartCheckoutResult | undefined>);
   smartCheckoutResult: SmartCheckoutResult | undefined;
+  fundingRoutes: FundingRoute[];
 };
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -93,6 +95,7 @@ const SaleContext = createContext<SaleContextValues>({
   config: {} as StrongCheckoutWidgetsConfig,
   querySmartCheckout: undefined,
   smartCheckoutResult: undefined,
+  fundingRoutes: [],
 });
 
 SaleContext.displayName = 'SaleSaleContext';
@@ -132,6 +135,8 @@ export function SaleContextProvider(props: {
   const [paymentMethod, setPaymentMethod] = useState<PaymentTypes | undefined>(
     undefined,
   );
+
+  const [fundingRoutes, setFundingRoutes] = useState<FundingRoute[]>([]);
 
   const goBackToPaymentMethods = useCallback(
     (type?: PaymentTypes | undefined) => {
@@ -182,30 +187,15 @@ export function SaleContextProvider(props: {
     const getUserInfo = async () => {
       const signer = provider?.getSigner();
       const address = (await signer?.getAddress()) || '';
-      const email = (await passport?.getUserInfo())?.email || '';
+      // ! dont commit this
+      // const email = (await passport?.getUserInfo())?.email || '';
+      const email = '';
 
       setUserInfo({ recipientEmail: email, recipientAddress: address });
     };
 
     getUserInfo();
   }, [provider]);
-
-  // ! Smart Checkout ----------------------------
-  const { smartCheckout, smartCheckoutResult } = useSmartCheckout({
-    provider,
-    checkout,
-    items,
-    amount,
-    contractAddress: fromContractAddress,
-    spenderAddress: recipientAddress,
-  });
-
-  const querySmartCheckout = useCallback(async (callback?: (r?: SmartCheckoutResult) => void) => {
-    const result = await smartCheckout();
-    callback?.(result);
-    return result;
-  }, [smartCheckout]);
-  // ! Smart Checkout ----------------------------/
 
   const {
     sign: signOrder,
@@ -241,6 +231,69 @@ export function SaleContextProvider(props: {
     goToErrorView(signError.type, signError.data);
   }, [signError]);
 
+  // ! Smart Checkout ----------------------------
+  const { smartCheckout, smartCheckoutResult } = useSmartCheckout({
+    provider,
+    checkout,
+    items,
+    amount,
+    contractAddress: fromContractAddress,
+    spenderAddress: recipientAddress,
+  });
+
+  const querySmartCheckout = useCallback(async (callback?: (r?: SmartCheckoutResult) => void) => {
+    const result = await smartCheckout();
+    callback?.(result);
+    return result;
+  }, [smartCheckout]);
+
+  useEffect(() => {
+    // ! Handle all state changes from SmartCheckoutResult
+    if (!smartCheckoutResult) {
+      setFundingRoutes([]);
+      return;
+    }
+    if (smartCheckoutResult.sufficient) {
+      // Go to PayWithCoins
+      sign(PaymentTypes.CRYPTO);
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SaleWidgetViews.PAY_WITH_COINS,
+          },
+        },
+      });
+    }
+    if (!smartCheckoutResult.sufficient) {
+      switch (smartCheckoutResult.router.routingOutcome.type) {
+        case RoutingOutcomeType.ROUTES_FOUND:
+          // Set FundingRoutes
+          // Go to FundingRouteSelect
+          setFundingRoutes(smartCheckoutResult.router.routingOutcome.fundingRoutes);
+          viewDispatch({
+            payload: {
+              type: ViewActions.UPDATE_VIEW,
+              view: {
+                type: SaleWidgetViews.FUND_WITH_SMART_CHECKOUT,
+                subView: FundWithSmartCheckoutSubViews.FUNDING_ROUTE_SELECT,
+              },
+            },
+          });
+
+          break;
+        case RoutingOutcomeType.NO_ROUTES_FOUND:
+        case RoutingOutcomeType.NO_ROUTE_OPTIONS:
+        default:
+          // Show INSUFFICIENT_BALANCE
+          setFundingRoutes([]);
+          goToErrorView(SaleErrorTypes.INSUFFICIENT_BALANCE);
+          break;
+      }
+    }
+  }, [smartCheckoutResult]);
+  // ! Smart Checkout ----------------------------/
+
   const values = useMemo(
     () => ({
       config,
@@ -266,6 +319,7 @@ export function SaleContextProvider(props: {
       isPassportWallet: !!(provider?.provider as any)?.isPassport,
       querySmartCheckout,
       smartCheckoutResult,
+      fundingRoutes,
     }),
     [
       config,
@@ -288,6 +342,7 @@ export function SaleContextProvider(props: {
       signResponse,
       querySmartCheckout,
       smartCheckoutResult,
+      fundingRoutes,
     ],
   );
 

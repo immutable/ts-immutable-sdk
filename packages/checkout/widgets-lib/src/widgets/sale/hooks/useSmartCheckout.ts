@@ -4,9 +4,11 @@ import { Web3Provider } from '@ethersproject/providers';
 import {
   Checkout,
   ERC20ItemRequirement,
+  FundingRoute,
   GasAmount,
   GasTokenType,
   ItemType,
+  RoutingOutcomeType,
   SmartCheckoutResult,
   TransactionOrGasType,
 } from '@imtbl/checkout-sdk';
@@ -62,6 +64,8 @@ export const useSmartCheckout = ({
     const itemRequirements = getItemRequirements(amount, spenderAddress, contractAddress);
     // ! Generate GasEstimate
     const gasEstimate = getGasEstimate();
+    // eslint-disable-next-line no-debugger
+    // debugger;
 
     try {
       const res = await checkout.smartCheckout(

@@ -5,7 +5,7 @@ import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { text as textConfig } from '../../../resources/text/textConfig';
-import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
+import { FundWithSmartCheckoutSubViews, SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 
 import {
   ViewContext,
@@ -29,18 +29,21 @@ export function PaymentMethods() {
   const handleOptionClick = (type: PaymentTypes) => setPaymentMethod(type);
 
   const handleGoToPaymentView = useCallback((type: PaymentTypes, signed = false) => {
-    if (type === PaymentTypes.CRYPTO && !signed) {
+    if (type === PaymentTypes.CRYPTO) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
-            type: SaleWidgetViews.PAY_WITH_COINS,
+            type: SaleWidgetViews.FUND_WITH_SMART_CHECKOUT,
+            subView: FundWithSmartCheckoutSubViews.INIT,
           },
         },
       });
     }
 
     if (type === PaymentTypes.FIAT && !signed) {
+      sign(type, (response) => handleGoToPaymentView(type, !!response));
+
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -66,7 +69,7 @@ export function PaymentMethods() {
 
   useEffect(() => {
     if (paymentMethod) {
-      sign(paymentMethod, (response) => handleGoToPaymentView(paymentMethod, !!response));
+      // sign(paymentMethod, (response) => handleGoToPaymentView(paymentMethod, !!response));
       handleGoToPaymentView(paymentMethod);
     }
   }, [paymentMethod]);
