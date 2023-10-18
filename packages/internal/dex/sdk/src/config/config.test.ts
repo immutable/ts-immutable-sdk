@@ -111,7 +111,8 @@ describe('ExchangeConfiguration', () => {
         rpcURL,
         exchangeContracts: contractOverrides,
         commonRoutingTokens,
-        nativeToken: test.IMX_TEST_TOKEN,
+        nativeToken: test.NATIVE_TEST_TOKEN,
+        wrappedNativeToken: test.WIMX_TEST_TOKEN,
       };
 
       const config = new ExchangeConfiguration({
@@ -169,7 +170,8 @@ describe('ExchangeConfiguration', () => {
         rpcURL,
         exchangeContracts: invalidContractOverrides,
         commonRoutingTokens: commonRoutingTokensSingle,
-        nativeToken: test.IMX_TEST_TOKEN,
+        nativeToken: test.NATIVE_TEST_TOKEN,
+        wrappedNativeToken: test.WIMX_TEST_TOKEN,
       };
 
       expect(
@@ -192,7 +194,8 @@ describe('ExchangeConfiguration', () => {
         rpcURL,
         exchangeContracts: contractOverrides,
         commonRoutingTokens: commonRoutingTokensSingle,
-        nativeToken: test.IMX_TEST_TOKEN,
+        nativeToken: test.NATIVE_TEST_TOKEN,
+        wrappedNativeToken: test.WIMX_TEST_TOKEN,
       };
 
       expect(
@@ -224,7 +227,8 @@ describe('ExchangeConfiguration', () => {
         rpcURL,
         exchangeContracts: contractOverrides,
         commonRoutingTokens: commonRoutingTokensSingle,
-        nativeToken: test.IMX_TEST_TOKEN,
+        nativeToken: test.NATIVE_TEST_TOKEN,
+        wrappedNativeToken: test.WIMX_TEST_TOKEN,
       };
 
       expect(
@@ -281,7 +285,8 @@ describe('ExchangeConfiguration', () => {
         rpcURL,
         exchangeContracts: contractOverrides,
         commonRoutingTokens: commonRoutingTokensSingle,
-        nativeToken: test.IMX_TEST_TOKEN,
+        nativeToken: test.NATIVE_TEST_TOKEN,
+        wrappedNativeToken: test.WIMX_TEST_TOKEN,
       };
 
       expect(
@@ -329,7 +334,8 @@ describe('ExchangeConfiguration', () => {
         rpcURL,
         exchangeContracts: contractOverrides,
         commonRoutingTokens: commonRoutingTokensSingle,
-        nativeToken: test.IMX_TEST_TOKEN,
+        nativeToken: test.NATIVE_TEST_TOKEN,
+        wrappedNativeToken: test.WIMX_TEST_TOKEN,
       };
 
       const config = new ExchangeConfiguration({

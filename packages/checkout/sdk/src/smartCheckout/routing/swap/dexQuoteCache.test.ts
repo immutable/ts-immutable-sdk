@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { TokenInfo } from '@imtbl/dex-sdk';
+import { ERC20 } from '@imtbl/dex-sdk';
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { getOrSetQuotesFromCache } from './dexQuoteCache';
@@ -27,18 +27,18 @@ describe('dexQuoteCache', () => {
                 quote: {
                   amount: {
                     value: BigNumber.from(1),
-                    token: {} as TokenInfo,
+                    token: {} as ERC20,
                   },
                   amountWithMaxSlippage: {
                     value: BigNumber.from(1),
-                    token: {} as TokenInfo,
+                    token: {} as ERC20,
                   },
                   slippage: 0,
                   fees: [
                     {
                       amount: {
                         value: BigNumber.from(1),
-                        token: {} as TokenInfo,
+                        token: {} as ERC20,
                       },
                       recipient: '',
                       basisPoints: 0,
@@ -47,11 +47,11 @@ describe('dexQuoteCache', () => {
                 },
                 approval: {
                   value: BigNumber.from(1),
-                  token: {} as TokenInfo,
+                  token: {} as ERC20,
                 },
                 swap: {
                   value: BigNumber.from(1),
-                  token: {} as TokenInfo,
+                  token: {} as ERC20,
                 },
               },
             ],
@@ -65,18 +65,18 @@ describe('dexQuoteCache', () => {
                 quote: {
                   amount: {
                     value: BigNumber.from(2),
-                    token: {} as TokenInfo,
+                    token: {} as ERC20,
                   },
                   amountWithMaxSlippage: {
                     value: BigNumber.from(2),
-                    token: {} as TokenInfo,
+                    token: {} as ERC20,
                   },
                   slippage: 0,
                   fees: [
                     {
                       amount: {
                         value: BigNumber.from(2),
-                        token: {} as TokenInfo,
+                        token: {} as ERC20,
                       },
                       recipient: '',
                       basisPoints: 0,
@@ -85,11 +85,11 @@ describe('dexQuoteCache', () => {
                 },
                 approval: {
                   value: BigNumber.from(2),
-                  token: {} as TokenInfo,
+                  token: {} as ERC20,
                 },
                 swap: {
                   value: BigNumber.from(2),
-                  token: {} as TokenInfo,
+                  token: {} as ERC20,
                 },
               },
             ],
@@ -120,18 +120,18 @@ describe('dexQuoteCache', () => {
           quote: {
             amount: {
               value: BigNumber.from(1),
-              token: {} as TokenInfo,
+              token: {} as ERC20,
             },
             amountWithMaxSlippage: {
               value: BigNumber.from(1),
-              token: {} as TokenInfo,
+              token: {} as ERC20,
             },
             slippage: 0,
             fees: [
               {
                 amount: {
                   value: BigNumber.from(1),
-                  token: {} as TokenInfo,
+                  token: {} as ERC20,
                 },
                 recipient: '',
                 basisPoints: 0,
@@ -140,11 +140,11 @@ describe('dexQuoteCache', () => {
           },
           approval: {
             value: BigNumber.from(1),
-            token: {} as TokenInfo,
+            token: {} as ERC20,
           },
           swap: {
             value: BigNumber.from(1),
-            token: {} as TokenInfo,
+            token: {} as ERC20,
           },
         },
       ],
@@ -166,18 +166,18 @@ describe('dexQuoteCache', () => {
                 quote: {
                   amount: {
                     value: BigNumber.from(2),
-                    token: {} as TokenInfo,
+                    token: {} as ERC20,
                   },
                   amountWithMaxSlippage: {
                     value: BigNumber.from(2),
-                    token: {} as TokenInfo,
+                    token: {} as ERC20,
                   },
                   slippage: 0,
                   fees: [
                     {
                       amount: {
                         value: BigNumber.from(2),
-                        token: {} as TokenInfo,
+                        token: {} as ERC20,
                       },
                       recipient: '',
                       basisPoints: 0,
@@ -186,11 +186,11 @@ describe('dexQuoteCache', () => {
                 },
                 approval: {
                   value: BigNumber.from(2),
-                  token: {} as TokenInfo,
+                  token: {} as ERC20,
                 },
                 swap: {
                   value: BigNumber.from(2),
-                  token: {} as TokenInfo,
+                  token: {} as ERC20,
                 },
               },
             ],
@@ -222,18 +222,18 @@ describe('dexQuoteCache', () => {
           quote: {
             amount: {
               value: BigNumber.from(1),
-              token: {} as TokenInfo,
+              token: {} as ERC20,
             },
             amountWithMaxSlippage: {
               value: BigNumber.from(1),
-              token: {} as TokenInfo,
+              token: {} as ERC20,
             },
             slippage: 0,
             fees: [
               {
                 amount: {
                   value: BigNumber.from(1),
-                  token: {} as TokenInfo,
+                  token: {} as ERC20,
                 },
                 recipient: '',
                 basisPoints: 0,
@@ -242,11 +242,11 @@ describe('dexQuoteCache', () => {
           },
           approval: {
             value: BigNumber.from(1),
-            token: {} as TokenInfo,
+            token: {} as ERC20,
           },
           swap: {
             value: BigNumber.from(1),
-            token: {} as TokenInfo,
+            token: {} as ERC20,
           },
         },
       ],

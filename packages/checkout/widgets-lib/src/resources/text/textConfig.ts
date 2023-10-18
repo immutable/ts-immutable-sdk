@@ -401,6 +401,11 @@ export const text = {
       actionText: 'Continue',
     },
   },
+  footers: {
+    quickswapFooter: {
+      disclaimerText: 'Quickswap is a third party app. Immutable neither builds, owns, operates or deploys Quickswap. For further info, refer to Quickswap’s website.',
+    },
+  },
   wallets: {
     [WalletProviderName.PASSPORT]: {
       heading: 'Immutable Passport',
