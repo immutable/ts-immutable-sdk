@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useCallback, useContext, useEffect } from 'react';
 import { Box, Heading } from '@biom3/react';
 
@@ -68,10 +69,78 @@ export function PaymentMethods() {
   }, []);
 
   useEffect(() => {
-    if (paymentMethod) {
-      handleGoToPaymentView(paymentMethod);
+    if (paymentMethod === PaymentTypes.FIAT) {
+      sign(paymentMethod, () => {
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: {
+              type: SaleWidgetViews.PAY_WITH_CARD,
+            },
+          },
+        });
+      });
+
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SharedViews.LOADING_VIEW,
+            data: { loadingText: text.methods.loading.ready },
+          },
+        },
+      });
+    }
+
+    if (paymentMethod === PaymentTypes.CRYPTO) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SaleWidgetViews.FUND_WITH_SMART_CHECKOUT,
+            subView: FundWithSmartCheckoutSubViews.INIT,
+          },
+        },
+      });
     }
   }, [paymentMethod]);
+
+  // useEffect(() => {
+  //   if (paymentMethod === PaymentTypes.FIAT) {
+  //     sign(paymentMethod, () => {
+  //       viewDispatch({
+  //         payload: {
+  //           type: ViewActions.UPDATE_VIEW,
+  //           view: {
+  //             type: SaleWidgetViews.PAY_WITH_CARD,
+  //           },
+  //         },
+  //       });
+  //     });
+
+  //     viewDispatch({
+  //       payload: {
+  //         type: ViewActions.UPDATE_VIEW,
+  //         view: {
+  //           type: SharedViews.LOADING_VIEW,
+  //           data: { loadingText: text.methods.loading.ready },
+  //         },
+  //       },
+  //     });
+  //   }
+
+  //   if (paymentMethod === PaymentTypes.CRYPTO) {
+  //     viewDispatch({
+  //       payload: {
+  //         type: ViewActions.UPDATE_VIEW,
+  //         view: {
+  //           type: SaleWidgetViews.FUND_WITH_SMART_CHECKOUT,
+  //           subView: FundWithSmartCheckoutSubViews.INIT,
+  //         },
+  //       },
+  //     });
+  //   }
+  // }, [paymentMethod]);
 
   return (
     <SimpleLayout

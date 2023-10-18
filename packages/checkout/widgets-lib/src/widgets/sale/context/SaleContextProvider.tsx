@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { FundingRoute, RoutingOutcomeType, SmartCheckoutResult } from '@imtbl/checkout-sdk';
 import { Passport } from '@imtbl/passport';
 import {
@@ -129,6 +130,10 @@ export function SaleContextProvider(props: {
     recipientAddress: '',
   });
 
+  // const recipientEmail = '';
+
+  // const [recipientAddress, setRecipientAddress] = useState('');
+
   const [paymentMethod, setPaymentMethod] = useState<PaymentTypes | undefined>(
     undefined,
   );
@@ -184,10 +189,17 @@ export function SaleContextProvider(props: {
     const getUserInfo = async () => {
       const signer = provider?.getSigner();
       const address = (await signer?.getAddress()) || '';
-      const email = (await passport?.getUserInfo())?.email || '';
-
-      setUserInfo({ recipientEmail: email, recipientAddress: address });
+      // const email = (await passport?.getUserInfo())?.email || '';
+      // const email = (await passport?.getUserInfo())?.email || '';
+      const email = '';
+      // eslint-disable-next-line no-console
+      // console.log('@@@@@ SetUserInfo recipientAddress', address);
+      setUserInfo({ recipientEmail: 'email', recipientAddress: address });
+      // setRecipientAddress(address1);
     };
+    // eslint-disable-next-line no-console
+    // console.log('@@@@@ SetUserInfo recipientAddress', 'address');
+    // setUserInfo({ recipientEmail: 'email', recipientAddress: '0xrandomaddress' });
 
     getUserInfo();
   }, [provider]);
@@ -198,6 +210,7 @@ export function SaleContextProvider(props: {
     signResponse,
     signError,
     executeResponse,
+    // addressMemo,
   } = useSignOrder({
     items,
     provider,
@@ -207,15 +220,18 @@ export function SaleContextProvider(props: {
     env,
   });
 
+  // useEffect(() => {
+  //   // eslint-disable-next-line no-console
+  //   addressMemo();
+  //   console.log('@@@@@@ sign remoimised', new Date().getTime());
+  // }, [sign]);
+
   const sign = useCallback(
     async (
       type: PaymentTypes,
       callback?: (r?: SignResponse) => void,
     ): Promise<SignResponse | undefined> => {
-      const response = await signOrder(type);
-      if (!response) return undefined;
-
-      callback?.(response);
+      const response = await signOrder(type, callback);
       return response;
     },
     [signOrder],
@@ -330,7 +346,7 @@ export function SaleContextProvider(props: {
       goBackToPaymentMethods,
       goToErrorView,
       goToSuccessView,
-      signResponse,
+      sign,
       querySmartCheckout,
       smartCheckoutResult,
       fundingRoutes,

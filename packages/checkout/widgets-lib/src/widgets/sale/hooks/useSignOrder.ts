@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/naming-convention */
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { Environment } from '@imtbl/config';
 import {
@@ -226,11 +228,25 @@ export const useSignOrder = (input: SignOrderInput) => {
     [provider],
   );
 
+  // console.log('@@@@@@@@@ useSignOrder outside of sign recipientAddress', recipientAddress);
+
+  // const addressMemo = useMemo(() => async () => {
+  //   console.log('@@@@@@ addressMemo', recipientAddress);
+  // }, [items, fromContractAddress, recipientAddress, environmentId, env, input]);
+
   const sign = useCallback(
-    async (paymentType: PaymentTypes): Promise<SignResponse | undefined> => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    async (paymentType: PaymentTypes, callback?: (r?: SignResponse) => void):
+    Promise<SignResponse | undefined> => {
+      console.log('@@@@@@@@@ useSignOrder sign');
+      console.log('@@@@@@@@@ useSignOrder sign recipientAddress', recipientAddress);
+      console.log('@@@@@@@@@ useSignOrder sign provider', provider);
+
+      // addressMemo();
+      // eslint-disable-next-line no-debugger
+      // debugger;
       if (
-        !provider
-        || !recipientAddress
+        !recipientAddress
         || !fromContractAddress
         || !items.length
       ) {
@@ -253,6 +269,8 @@ export const useSignOrder = (input: SignOrderInput) => {
           ':environmentId',
           environmentId,
         );
+        // eslint-disable-next-line no-console
+        console.log('@@@@@ calling sign');
         const response = await fetch(baseUrl, {
           method: 'POST',
           headers: {
@@ -268,6 +286,8 @@ export const useSignOrder = (input: SignOrderInput) => {
 
         const responseData = toSignResponse(await response.json(), items);
         setSignResponse(responseData);
+
+        callback?.(responseData);
 
         return responseData;
       } catch (e) {
@@ -317,5 +337,6 @@ export const useSignOrder = (input: SignOrderInput) => {
     signError,
     execute,
     executeResponse,
+    // addressMemo,
   };
 };
