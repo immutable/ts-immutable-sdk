@@ -8,7 +8,7 @@ import {
   IMMUTABLE_TESTNET_RPC_URL,
   MAX_SECONDARY_FEE_BASIS_POINTS,
   NATIVE_IMX_IMMUTABLE_TESTNET,
-  WIMX_IMMUTABLE_TESTNET,
+  TIMX_IMMUTABLE_TESTNET,
 } from '../constants';
 
 export type ExchangeContracts = {
@@ -36,7 +36,7 @@ export const SUPPORTED_SANDBOX_CHAINS: Record<number, Chain> = {
     contracts: CONTRACTS_FOR_CHAIN_ID[IMMUTABLE_TESTNET_CHAIN_ID],
     commonRoutingTokens: IMMUTABLE_TESTNET_COMMON_ROUTING_TOKENS,
     nativeToken: NATIVE_IMX_IMMUTABLE_TESTNET,
-    wrappedNativeToken: WIMX_IMMUTABLE_TESTNET,
+    wrappedNativeToken: TIMX_IMMUTABLE_TESTNET, // TODO: TP-1649: Change to WIMX when ready.
   },
 };
 
