@@ -612,10 +612,11 @@ export type TokenBalance = {
 };
 
 /**
- * Represents the balance for an ERC20.
+ * Represents the balance for an ERC721.
  * @property {BigNumber} balance - The balance of the item.
  * @property {string} formattedBalance - The formatted balance of the item.
- * @property {TokenInfo} token - The token info of the item.
+ * @property {string} contractAddress - The collection address for the ERC721.
+ * @property {string} id - The ID of the ERC721 in the collection.
  */
 export type ERC721Balance = {
   type: ItemType.ERC721,
