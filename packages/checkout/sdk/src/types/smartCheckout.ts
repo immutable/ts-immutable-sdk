@@ -617,7 +617,7 @@ export type TokenBalance = {
  * @property {ItemType.ERC721} type - Type to indicate this is an ERC721 token.
  * @property {BigNumber} balance - The balance of the item.
  * @property {string} formattedBalance - The formatted balance of the item.
- * @property {string} contractAddress - The collection address for the ERC721.
+ * @property {string} contractAddress - The contract address of the ERC721 collection.
  * @property {string} id - The ID of the ERC721 in the collection.
  */
 export type ERC721Balance = {
