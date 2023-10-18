@@ -401,6 +401,7 @@ describe('Top Up View', () => {
           isSwapAvailable: false,
         },
       };
+      cy.stub(Checkout.prototype, 'isSwapAvailable').as('isSwapAvailableStub').returns(false);
       cy.stub(Checkout.prototype, 'getExchangeFeeEstimate')
         .as('getExchangeFeeEstimateStub')
         .onFirstCall()
@@ -411,6 +412,18 @@ describe('Top Up View', () => {
       cy.stub(Checkout.prototype, 'gasEstimate')
         .as('gasEstimateStub')
         .onFirstCall()
+        .resolves({
+          gasEstimateType: GasEstimateType.SWAP,
+          gasFee: {
+            estimatedAmount: BigNumber.from(100000000000000),
+            token: {
+              name: 'Ethereum',
+              symbol: 'ETH',
+              decimals: 18,
+            },
+          },
+        })
+        .onSecondCall()
         .resolves({
           gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
           gasFee: {

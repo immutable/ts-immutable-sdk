@@ -84,19 +84,13 @@ export function TopUpView({
   const isPassport = isPassportProvider(provider);
 
   useEffect(() => {
-    (async () => {
-      if (!checkout) return;
-      setIsSwapAvailable(await checkout.isSwapAvailable());
-      setLoadingSwapAvailability(false);
-
-      if (!cryptoFiatDispatch) return;
-      cryptoFiatDispatch({
-        payload: {
-          type: CryptoFiatActions.SET_TOKEN_SYMBOLS,
-          tokenSymbols: DEFAULT_TOKEN_SYMBOLS,
-        },
-      });
-    })();
+    if (!cryptoFiatDispatch) return;
+    cryptoFiatDispatch({
+      payload: {
+        type: CryptoFiatActions.SET_TOKEN_SYMBOLS,
+        tokenSymbols: DEFAULT_TOKEN_SYMBOLS,
+      },
+    });
   }, [checkout, cryptoFiatDispatch]);
 
   const refreshFees = async (silent: boolean = false) => {
@@ -166,7 +160,13 @@ export function TopUpView({
   useInterval(() => refreshFees(true), DEFAULT_FEE_REFRESH_INTERVAL);
 
   useEffect(() => {
-    if (!checkout) return;
+    (async () => {
+      if (!checkout) return;
+      try {
+        setIsSwapAvailable(await checkout.isSwapAvailable());
+      } catch { /* empty */ }
+      setLoadingSwapAvailability(false);
+    })();
     if (conversions.size === 0) return;
     refreshFees();
   }, [checkout, conversions.size === 0]);
