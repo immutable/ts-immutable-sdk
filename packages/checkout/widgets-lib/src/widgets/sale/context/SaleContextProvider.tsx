@@ -210,12 +210,12 @@ export function SaleContextProvider(props: {
   const sign = useCallback(
     async (
       type: PaymentTypes,
-      callback?: (r?: SignResponse) => void,
+      // callback?: (r?: SignResponse) => void,
     ): Promise<SignResponse | undefined> => {
       const response = await signOrder(type);
       if (!response) return undefined;
 
-      callback?.(response);
+      // callback?.(response);
       return response;
     },
     [signOrder],
@@ -330,7 +330,7 @@ export function SaleContextProvider(props: {
       goBackToPaymentMethods,
       goToErrorView,
       goToSuccessView,
-      signResponse,
+      sign,
       querySmartCheckout,
       smartCheckoutResult,
       fundingRoutes,

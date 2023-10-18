@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/naming-convention */
 import { useCallback, useState } from 'react';
 
@@ -227,7 +228,9 @@ export const useSignOrder = (input: SignOrderInput) => {
   );
 
   const sign = useCallback(
-    async (paymentType: PaymentTypes): Promise<SignResponse | undefined> => {
+    async (paymentType: PaymentTypes, callback?: (r?: SignResponse) => void): Promise<SignResponse | undefined> => {
+      console.log('@@@@@@ useSignOrder sign recipientAddress', recipientAddress);
+
       if (
         !provider
         || !recipientAddress
@@ -268,6 +271,7 @@ export const useSignOrder = (input: SignOrderInput) => {
 
         const responseData = toSignResponse(await response.json(), items);
         setSignResponse(responseData);
+        callback?.(responseData);
 
         return responseData;
       } catch (e) {
