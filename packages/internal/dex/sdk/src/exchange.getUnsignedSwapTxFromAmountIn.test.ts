@@ -8,7 +8,7 @@ import { Exchange } from './exchange';
 import {
   mockRouterImplementation,
   setupSwapTxTest,
-  TEST_PERIPHERY_ROUTER_ADDRESS,
+  TEST_ROUTER_ADDRESS,
   TEST_DEX_CONFIGURATION,
   TEST_GAS_PRICE,
   TEST_TRANSACTION_GAS_USAGE,
@@ -85,7 +85,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expectToBeDefined(tx.approval?.transaction.data);
 
       const decodedResults = erc20ContractInterface.decodeFunctionData('approve', tx.approval.transaction.data);
-      expect(decodedResults[0]).toEqual(TEST_PERIPHERY_ROUTER_ADDRESS);
+      expect(decodedResults[0]).toEqual(TEST_ROUTER_ADDRESS);
       // we have already approved 1000000000000000000, so we expect to approve 1000000000000000000 more
       expect(decodedResults[1].toString()).toEqual(APPROVED_AMOUNT.value.toString());
       expect(tx.approval.transaction.to).toEqual(params.inputToken);
@@ -302,7 +302,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const { swapParams } = decodeMulticallExactInputSingleWithoutFees(data);
 
       expect(formatEther(swapParams.amountOutMinimum)).toBe(formatEther(quote.amountWithMaxSlippage.value));
-      expect(swap.transaction.to).toBe(TEST_PERIPHERY_ROUTER_ADDRESS); // expect the default router contract to be used
+      expect(swap.transaction.to).toBe(TEST_ROUTER_ADDRESS); // expect the default router contract to be used
     });
 
     describe('when the secondary fee contract is unpaused after a swap request', () => {
@@ -384,7 +384,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(swapParams.tokenOut).toBe(params.outputToken); // output token
       expect(swapParams.fee).toBe(10000); // fee
       expect(swapParams.recipient).toBe(params.fromAddress); // recipient
-      expect(swap.transaction.to).toBe(TEST_PERIPHERY_ROUTER_ADDRESS); // to address
+      expect(swap.transaction.to).toBe(TEST_ROUTER_ADDRESS); // to address
       expect(swap.transaction.from).toBe(params.fromAddress); // from address
       expect(swap.transaction.value).toBe('0x00'); // refers to 0ETH
       expect(formatTokenAmount(swapParams.amountIn, USDC_TEST_TOKEN)).toBe('100.0'); // amount in
@@ -461,7 +461,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(swapParams.tokenOut).toBe(params.outputToken); // output token
       expect(swapParams.fee).toBe(10000); // fee
       expect(swapParams.recipient).toBe(params.fromAddress); // recipient
-      expect(swap.transaction.to).toBe(TEST_PERIPHERY_ROUTER_ADDRESS); // to address
+      expect(swap.transaction.to).toBe(TEST_ROUTER_ADDRESS); // to address
       expect(swap.transaction.from).toBe(params.fromAddress); // from address
       expect(swap.transaction.value).toBe('0x00'); // refers to 0ETH
       expect(formatTokenAmount(swapParams.amountIn, USDC_TEST_TOKEN)).toBe('100.0'); // amount in

@@ -153,7 +153,10 @@ export class Exchange {
       tradeType,
       amountSpecified,
       userQuote.amountWithMaxSlippage,
-      this.router.routingContracts,
+      {
+        routerAddress: this.routerContractAddress,
+        secondaryFeeAddress: this.secondaryFeeContractAddress,
+      },
       secondaryFees,
     );
 
