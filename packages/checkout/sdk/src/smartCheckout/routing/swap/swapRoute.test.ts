@@ -1275,7 +1275,7 @@ describe('swapRoute', () => {
             },
           },
         ],
-        undefined,
+        null,
       );
 
       expect(approvalFees).toEqual(
