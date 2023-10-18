@@ -1,5 +1,5 @@
 import { BigNumber, utils } from 'ethers';
-import { Amount, Fee } from '@imtbl/dex-sdk';
+import { Amount, ERC20, Fee } from '@imtbl/dex-sdk';
 import { CheckoutConfiguration, getL2ChainId } from '../../../config';
 import {
   AvailableRoutingOptions,
@@ -17,8 +17,8 @@ import { DexQuoteCache, TokenBalanceResult } from '../types';
 import { getOrSetQuotesFromCache } from './dexQuoteCache';
 
 const constructFees = (
-  approvalGasFees: Amount | null | undefined,
-  swapGasFees: Amount | null,
+  approvalGasFees: Amount<ERC20> | null | undefined,
+  swapGasFees: Amount<ERC20> | null,
   swapFees: Fee[],
 ): SwapFees => {
   let approvalGasFeeAmount = BigNumber.from(0);
@@ -137,7 +137,7 @@ export const getRequiredToken = (
 type SufficientApprovalFees = { sufficient: boolean, approvalGasFee: BigNumber, approvalGasTokenAddress: string };
 export const checkUserCanCoverApprovalFees = (
   l2Balances: GetBalanceResult[],
-  approval: Amount | null | undefined,
+  approval: Amount<ERC20> | null,
 ): SufficientApprovalFees => {
   // Check if approval required
   if (!approval) return { sufficient: true, approvalGasFee: BigNumber.from(0), approvalGasTokenAddress: '' };
