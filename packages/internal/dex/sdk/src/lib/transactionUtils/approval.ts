@@ -4,7 +4,6 @@ import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
 import { ApproveError, AlreadyApprovedError } from 'errors';
 import { ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
-import { RoutingContracts } from 'lib/router';
 import { newAmount } from 'lib/utils';
 import { NativeTokenService } from 'lib/nativeTokenService';
 import {
@@ -87,14 +86,17 @@ export const prepareApproval = (
   tradeType: TradeType,
   amountSpecified: Amount<ERC20>,
   amountWithSlippage: Amount<ERC20>,
-  routingContracts: RoutingContracts,
+  contracts: {
+    routerAddress: string;
+    secondaryFeeAddress: string;
+  },
   secondaryFees: SecondaryFee[],
 ): PreparedApproval => {
   const amountOfTokenIn = tradeType === TradeType.EXACT_INPUT ? amountSpecified : amountWithSlippage;
 
   const spender = secondaryFees.length === 0
-    ? routingContracts.peripheryRouterAddress
-    : routingContracts.secondaryFeeAddress;
+    ? contracts.routerAddress
+    : contracts.secondaryFeeAddress;
 
   return { spender, amount: amountOfTokenIn };
 };
