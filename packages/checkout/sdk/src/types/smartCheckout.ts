@@ -617,13 +617,13 @@ export type TokenBalance = {
  * @property {string} formattedBalance - The formatted balance of the item.
  * @property {TokenInfo} token - The token info of the item.
  */
-export interface ERC721Balance {
+export type ERC721Balance = {
   type: ItemType.ERC721,
   balance: BigNumber;
   formattedBalance: string;
   contractAddress: string;
   id: string;
-}
+};
 
 /**
  * Type representing the balance of an item.
