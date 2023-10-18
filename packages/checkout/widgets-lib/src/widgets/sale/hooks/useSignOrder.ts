@@ -93,7 +93,7 @@ const toSignedProduct = (
   productId: product.product_id,
   image: item?.image || '',
   qty: item?.qty || 1,
-  name: item?.name || '',
+  name: `${item?.name || ''}${item?.qty ? ` x${item.qty}` : ''}`,
   description: item?.description || '',
   currency,
   amount: product.detail.map(({ amount }) => amount),
