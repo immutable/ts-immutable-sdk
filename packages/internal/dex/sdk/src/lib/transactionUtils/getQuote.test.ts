@@ -1,6 +1,10 @@
 import { ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
-import { applySlippage } from './getQuote';
+import { Fees } from 'lib/fees';
+import {
+  newAmountFromString, expectERC20, formatAmount, nativeTokenService, FUN_TEST_TOKEN,
+} from 'test/utils';
+import { applySlippage, getOurQuoteReqAmount } from './getQuote';
 
 const DEFAULT_SLIPPAGE = 0.1;
 
@@ -68,6 +72,22 @@ describe('applySlippage', () => {
 
         expect(formattedResult).toEqual('100.0');
       });
+    });
+  });
+});
+
+describe('getOurQuoteReqAmount', () => {
+  describe('when trade is EXACT_INPUT, and amountSpecified is native, and no fees', () => {
+    it.todo('wraps the amount');
+  });
+
+  describe('when trade is EXACT_OUTPUT, and amountSpecified is native, and no fees', () => {
+    it.skip('wraps the amount unchanged', () => {
+      const amountSpecified = newAmountFromString('1', nativeTokenService.nativeToken);
+      const noFees = new Fees([], FUN_TEST_TOKEN);
+      const quoteReqAmount = getOurQuoteReqAmount(amountSpecified, noFees, TradeType.EXACT_OUTPUT, nativeTokenService);
+      expectERC20(quoteReqAmount.token, nativeTokenService.wrappedToken.address);
+      expect(formatAmount(quoteReqAmount)).toEqual('1.0');
     });
   });
 });
