@@ -171,7 +171,7 @@ export type ERC20BuyToken = {
 };
 
 /**
- * Interface of the SellToken
+ * The SellToken type
  * @property {string} id - The ERC721 token id
  * @property {string} collectionAddress - The ERC721 collection address
  */
