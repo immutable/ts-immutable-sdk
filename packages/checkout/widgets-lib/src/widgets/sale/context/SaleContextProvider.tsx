@@ -247,7 +247,6 @@ export function SaleContextProvider(props: {
 
   useEffect(() => {
     if (!smartCheckoutResult) {
-      setFundingRoutes([]);
       return;
     }
     if (smartCheckoutResult.sufficient) {
