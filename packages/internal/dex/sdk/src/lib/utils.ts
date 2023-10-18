@@ -4,7 +4,7 @@ import { CurrencyAmount, Token } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
 import { ProviderCallError } from 'errors';
 import {
-  Coin, ERC20, Native, Amount,
+  Amount, Coin, ERC20, Native,
 } from '../types';
 
 export const quoteReturnMapping: { [signature: string]: string[] } = {
@@ -70,7 +70,9 @@ export function isValidNonZeroAddress(address: string): boolean {
   }
 }
 
-export const erc20ToUniswapToken = (token: ERC20): Token => new Token(token.chainId, token.address, token.decimals, token.symbol, token.name);
+export const erc20ToUniswapToken = (token: ERC20): Token =>
+  // eslint-disable-next-line implicit-arrow-linebreak
+  new Token(token.chainId, token.address, token.decimals, token.symbol, token.name);
 
 export const uniswapTokenToERC20 = (token: Token): ERC20 => ({
   chainId: token.chainId,
@@ -97,8 +99,6 @@ export const newAmount = <T extends Coin>(amount: ethers.BigNumber, token: T): A
   value: amount,
   token,
 });
-
-// export const isERC20 = (token: Coin): token is ERC20 => 'address' in token;
 
 export const isERC20Amount = (amount: Amount<Coin>): amount is Amount<ERC20> => amount.token.type === 'erc20';
 export const isNativeAmount = (amount: Amount<Coin>): amount is Amount<Native> => amount.token.type === 'native';

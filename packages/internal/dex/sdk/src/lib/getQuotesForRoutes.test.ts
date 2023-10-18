@@ -21,15 +21,15 @@ import { erc20ToUniswapToken, newAmount } from './utils';
 
 jest.mock('@ethersproject/contracts');
 
+const UNISWAP_WIMX = erc20ToUniswapToken(WIMX_TEST_TOKEN);
+const UNISWAP_WETH = erc20ToUniswapToken(WETH_TEST_TOKEN);
+
 const types = [
   'uint256', // amountOut/amountIn
   'uint160', // sqrtPrice after
   'uint32', // ticks crossed
   'uint256', // gasEstimate
 ];
-
-const weth = erc20ToUniswapToken(WETH_TEST_TOKEN);
-const wimx = erc20ToUniswapToken(WIMX_TEST_TOKEN);
 
 describe('getQuotesForRoutes', () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -60,15 +60,15 @@ describe('getQuotesForRoutes', () => {
       // Since we will be mocking the multicall, routes doesn't matter,
       // as long as the length is correct.
       const pool0 = new Pool(
-        weth,
-        wimx,
+        UNISWAP_WETH,
+        UNISWAP_WIMX,
         FeeAmount.HIGH,
         sqrtPriceAtTick,
         1000,
         arbitraryTick,
       );
-      dummyRoutes.push(new Route([pool0], weth, wimx));
-      dummyRoutes.push(new Route([pool0], weth, wimx));
+      dummyRoutes.push(new Route([pool0], UNISWAP_WETH, UNISWAP_WIMX));
+      dummyRoutes.push(new Route([pool0], UNISWAP_WETH, UNISWAP_WIMX));
 
       const amount = newAmount(BigNumber.from('123123'), WETH_TEST_TOKEN);
 
@@ -116,14 +116,14 @@ describe('getQuotesForRoutes', () => {
       // Since we will be mocking the multicall, routes doesn't matter,
       // as long as the length is correct.
       const pool0 = new Pool(
-        weth,
-        wimx,
+        UNISWAP_WETH,
+        UNISWAP_WIMX,
         FeeAmount.HIGH,
         sqrtPriceAtTick,
         1000,
         arbitraryTick,
       );
-      dummyRoutes.push(new Route([pool0], weth, wimx));
+      dummyRoutes.push(new Route([pool0], UNISWAP_WETH, UNISWAP_WIMX));
 
       const provider = new providers.JsonRpcProvider(
         TEST_RPC_URL,
@@ -194,15 +194,15 @@ describe('getQuotesForRoutes', () => {
       // Since we will be mocking the multicall, routes doesn't matter,
       // as long as the length is correct.
       const pool0 = new Pool(
-        weth,
-        wimx,
+        UNISWAP_WETH,
+        UNISWAP_WIMX,
         FeeAmount.HIGH,
         sqrtPriceAtTick,
         1000,
         arbitraryTick,
       );
-      dummyRoutes.push(new Route([pool0], weth, wimx));
-      dummyRoutes.push(new Route([pool0], weth, wimx));
+      dummyRoutes.push(new Route([pool0], UNISWAP_WETH, UNISWAP_WIMX));
+      dummyRoutes.push(new Route([pool0], UNISWAP_WETH, UNISWAP_WIMX));
 
       const provider = new providers.JsonRpcProvider(
         TEST_RPC_URL,

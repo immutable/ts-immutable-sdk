@@ -1,7 +1,5 @@
 /* eslint-disable max-len */
-import {
-  Trade, encodeRouteToPath, Route, toHex,
-} from '@uniswap/v3-sdk';
+import { Trade, encodeRouteToPath, Route, toHex } from '@uniswap/v3-sdk';
 import { SwapRouter } from '@uniswap/router-sdk';
 import { Token, Percent, TradeType } from '@uniswap/sdk-core';
 import { SecondaryFee__factory } from 'contracts/types';
@@ -10,9 +8,7 @@ import { Fees } from 'lib/fees';
 import { toCurrencyAmount } from 'lib/utils';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
 import { TokenWrapper } from 'lib/tokenWrapper';
-import {
-  Native, SecondaryFee, Amount, TransactionDetails,
-} from '../../types';
+import { Native, SecondaryFee, Amount, TransactionDetails, Coin } from '../../types';
 import { calculateGasFee } from './gas';
 import { slippageToFraction } from './slippage';
 
@@ -236,24 +232,48 @@ export function getSwap(
   };
 }
 
+const adjustAmountIn = (
+  ourQuote: QuoteResult,
+  amountSpecified: Amount<Coin>,
+  fees: Fees,
+  tokenWrapper: TokenWrapper,
+) => {
+  if (ourQuote.tradeType === TradeType.EXACT_OUTPUT) {
+    // when doing exact output, calculate the fees based on the amountIn
+    const amountToAdd = tokenWrapper.isNativeToken(fees.token)
+      ? tokenWrapper.unwrapAmount(ourQuote.amountIn)
+      : ourQuote.amountIn;
+    fees.addAmount(amountToAdd);
+
+    return tokenWrapper.maybeWrapAmount(fees.amountWithFeesApplied());
+  }
+
+  return tokenWrapper.maybeWrapAmount(amountSpecified);
+};
+
+/**
+ * adjustQuoteWithFees adjusts the amountIn of the quote to account for fees
+ * EXACT_OUTPUT swaps will have the fees added to the amountIn if there are fees specified
+ * EXACT_INPUT swaps will have amountIn set to the user-specified amount
+ * @param ourQuote The quote from calling the Quoter contract
+ * @param amountSpecified The user-specified amount for the swap (EXACT...)
+ * @param fees The fees applied to the swap
+ * @param tokenWrapper Helper class for the native token and associated ERC20
+ * @returns {QuoteResult} The adjusted quote
+ */
 export function adjustQuoteWithFees(
   ourQuote: QuoteResult,
+  amountSpecified: Amount<Coin>,
   fees: Fees,
   tokenWrapper: TokenWrapper,
 ): QuoteResult {
-  if (ourQuote.tradeType === TradeType.EXACT_OUTPUT) {
-    // when doing exact output, calculate the fees based on the amountIn
-    const amountToAdd = tokenWrapper.isNativeToken(fees.token) ? tokenWrapper.unwrapAmount(ourQuote.amountIn) : ourQuote.amountIn;
-    fees.addAmount(amountToAdd);
+  const adjustedAmountIn = adjustAmountIn(ourQuote, amountSpecified, fees, tokenWrapper);
 
-    return {
-      gasEstimate: ourQuote.gasEstimate,
-      route: ourQuote.route,
-      amountIn: tokenWrapper.maybeWrapAmount(fees.amountWithFeesApplied()),
-      amountOut: ourQuote.amountOut,
-      tradeType: ourQuote.tradeType,
-    };
-  }
-
-  return ourQuote;
+  return {
+    gasEstimate: ourQuote.gasEstimate,
+    route: ourQuote.route,
+    amountIn: adjustedAmountIn,
+    amountOut: ourQuote.amountOut,
+    tradeType: ourQuote.tradeType,
+  };
 }

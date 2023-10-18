@@ -88,7 +88,7 @@ export const FUN_TEST_TOKEN: ERC20 = {
   address: '0xCc7bb2D219A0FC08033E130629C2B854b7bA9195',
   decimals: 18,
   symbol: 'FUN',
-  name: 'Fun Token',
+  name: 'The Fungibles Token',
 };
 
 export const tokenWrapper = new TokenWrapper(NATIVE_TEST_TOKEN, WIMX_TEST_TOKEN);

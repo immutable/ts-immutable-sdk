@@ -4,9 +4,7 @@ import {
 import { newAmount } from './utils';
 
 export class TokenWrapper {
-  constructor(readonly nativeToken: Native, readonly wrappedToken: ERC20) {
-
-  }
+  constructor(readonly nativeToken: Native, readonly wrappedToken: ERC20) {}
 
   wrapAmount(amount: Amount<Native>): Amount<ERC20> {
     return newAmount(amount.value, this.wrappedToken);

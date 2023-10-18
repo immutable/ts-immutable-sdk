@@ -20,16 +20,14 @@ import {
 } from 'test/utils';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import { Fees } from 'lib/fees';
-import {
-  Coin, erc20ToUniswapToken, newAmount, uniswapTokenToERC20,
-} from 'lib';
+import { Coin, erc20ToUniswapToken, newAmount, uniswapTokenToERC20 } from 'lib';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
 import { getSwap, adjustQuoteWithFees } from './swap';
 
-const wimx = erc20ToUniswapToken(WIMX_TEST_TOKEN);
-const fun = erc20ToUniswapToken(FUN_TEST_TOKEN);
-const testPool = new Pool(wimx, fun, 10000, '79625275426524748796330556128', '10000000000000000', 100);
-const route = new Route([testPool], wimx, fun);
+const UNISWAP_WIMX = erc20ToUniswapToken(WIMX_TEST_TOKEN);
+const UNISWAP_FUN = erc20ToUniswapToken(FUN_TEST_TOKEN);
+const testPool = new Pool(UNISWAP_WIMX, UNISWAP_FUN, 10000, '79625275426524748796330556128', '10000000000000000', 100);
+const route = new Route([testPool], UNISWAP_WIMX, UNISWAP_FUN);
 const gasEstimate = BigNumber.from(0);
 
 const buildExactInputQuote = (): QuoteResult => ({
@@ -150,16 +148,28 @@ describe('adjustQuoteWithFees', () => {
   describe('when the trade type is exact input', () => {
     it('should use the specified amount for the amountIn', async () => {
       const quote = buildExactInputQuote();
+      const userSpecifiedAmountIn = newAmountFromString('100', quote.amountIn.token);
 
-      const preparedSwap = adjustQuoteWithFees(quote, new Fees([], WIMX_TEST_TOKEN), tokenWrapper);
+      const preparedSwap = adjustQuoteWithFees(
+        quote,
+        userSpecifiedAmountIn,
+        new Fees([], WIMX_TEST_TOKEN),
+        tokenWrapper,
+      );
 
-      expect(formatAmount(preparedSwap.amountIn)).toEqual(formatAmount(quote.amountIn));
+      expect(formatAmount(preparedSwap.amountIn)).toEqual(formatAmount(userSpecifiedAmountIn));
     });
 
     it('should use the quoted amount for the amountOut', async () => {
       const quote = buildExactInputQuote();
+      const userSpecifiedAmountIn = newAmountFromString('100', quote.amountIn.token);
 
-      const preparedSwap = adjustQuoteWithFees(quote, new Fees([], WIMX_TEST_TOKEN), tokenWrapper);
+      const preparedSwap = adjustQuoteWithFees(
+        quote,
+        userSpecifiedAmountIn,
+        new Fees([], WIMX_TEST_TOKEN),
+        tokenWrapper,
+      );
 
       expect(formatAmount(preparedSwap.amountOut)).toEqual(formatAmount(quote.amountOut));
     });
@@ -167,14 +177,16 @@ describe('adjustQuoteWithFees', () => {
     describe('with fees', () => {
       it('does not apply fees to any amount', async () => {
         const quote = buildExactInputQuote();
+        const userSpecifiedAmountIn = newAmountFromString('100', quote.amountIn.token);
 
         const preparedSwap = adjustQuoteWithFees(
           quote,
-          new Fees([{ recipient: TEST_FEE_RECIPIENT, basisPoints: 1000 }], WIMX_TEST_TOKEN), // 1% fee
+          userSpecifiedAmountIn,
+          new Fees([{ recipient: TEST_FEE_RECIPIENT, basisPoints: 1000 }], quote.amountIn.token), // 1% fee
           tokenWrapper,
         );
 
-        expect(formatAmount(preparedSwap.amountIn)).toEqual(formatAmount(quote.amountIn));
+        expect(formatAmount(preparedSwap.amountIn)).toEqual(formatAmount(userSpecifiedAmountIn));
         expect(formatAmount(preparedSwap.amountOut)).toEqual(formatAmount(quote.amountOut));
       });
     });
@@ -183,16 +195,30 @@ describe('adjustQuoteWithFees', () => {
   describe('when the trade type is exact output', () => {
     it('should use the quoted amount for the amountIn', async () => {
       const quote = buildExactOutputQuote();
+      // In this case, the user-specified amount is always equal to the amountOut in the quote
+      const userSpecifiedAmountOut = quote.amountOut;
 
-      const preparedSwap = adjustQuoteWithFees(quote, new Fees([], WIMX_TEST_TOKEN), tokenWrapper);
+      const preparedSwap = adjustQuoteWithFees(
+        quote,
+        userSpecifiedAmountOut,
+        new Fees([], quote.amountIn.token),
+        tokenWrapper,
+      );
 
       expect(formatAmount(preparedSwap.amountIn)).toEqual(formatAmount(quote.amountIn));
     });
 
-    it('should use the specified amount for the amountOut', async () => {
+    it('should use the amountOut from the quote for the amountOut', async () => {
       const quote = buildExactOutputQuote();
+      // In this case, the user-specified amount is always equal to the amountOut in the quote
+      const userSpecifiedAmountOut = quote.amountOut;
 
-      const preparedSwap = adjustQuoteWithFees(quote, new Fees([], WIMX_TEST_TOKEN), tokenWrapper);
+      const preparedSwap = adjustQuoteWithFees(
+        quote,
+        userSpecifiedAmountOut,
+        new Fees([], quote.amountIn.token),
+        tokenWrapper,
+      );
 
       expect(formatAmount(preparedSwap.amountOut)).toEqual(formatAmount(quote.amountOut));
     });
@@ -201,54 +227,18 @@ describe('adjustQuoteWithFees', () => {
       it('applies fees to the quoted amount', async () => {
         const quote = buildExactOutputQuote();
         quote.amountOut.value = utils.parseEther('100');
+        // In this case, the user-specified amount is always equal to the amountOut in the quote
+        const userSpecifiedAmountOut = quote.amountOut;
 
         const preparedSwap = adjustQuoteWithFees(
           quote,
-          new Fees([{ recipient: TEST_FEE_RECIPIENT, basisPoints: 1000 }], WIMX_TEST_TOKEN), // 1% fee
+          userSpecifiedAmountOut,
+          new Fees([{ recipient: TEST_FEE_RECIPIENT, basisPoints: 1000 }], WIMX_TEST_TOKEN), // 10% fee
           tokenWrapper,
         );
 
         expect(formatAmount(preparedSwap.amountIn)).toEqual('110.0'); // quotedAmount + 1% fee
         expect(formatAmount(preparedSwap.amountOut)).toEqual(formatAmount(quote.amountOut));
-      });
-    });
-
-    describe('when the tokenIn is an ERC20', () => {
-      // Want to buy 1 Native IMX in exchange for FUN
-      it('applies fees to the amountIn', async () => {
-        const quote: QuoteResult = {
-          gasEstimate,
-          route,
-          amountIn: newAmountFromString('10', FUN_TEST_TOKEN),
-          amountOut: newAmountFromString('1', WIMX_TEST_TOKEN),
-          tradeType: TradeType.EXACT_OUTPUT,
-        };
-
-        const fees = tenPercentFees(FUN_TEST_TOKEN);
-        const preparedSwap = adjustQuoteWithFees(quote, fees, tokenWrapper);
-
-        expectERC20(preparedSwap.amountIn.token, FUN_TEST_TOKEN.address);
-        expect(formatAmount(preparedSwap.amountIn)).toEqual('11.0');
-
-        expectERC20(preparedSwap.amountOut.token, WIMX_TEST_TOKEN.address);
-        expect(formatAmount(preparedSwap.amountOut)).toEqual('1.0');
-      });
-
-      it('charges fees in the ERC20 currency', () => {
-        const quote: QuoteResult = {
-          gasEstimate,
-          route,
-          amountIn: newAmountFromString('10', FUN_TEST_TOKEN),
-          amountOut: newAmountFromString('1', WIMX_TEST_TOKEN),
-          tradeType: TradeType.EXACT_OUTPUT,
-        };
-
-        const fees = tenPercentFees(FUN_TEST_TOKEN);
-        adjustQuoteWithFees(quote, fees, tokenWrapper);
-
-        expect(fees.withAmounts()).toHaveLength(1);
-        expectERC20(fees.withAmounts()[0].amount.token, FUN_TEST_TOKEN.address);
-        expect(formatAmount(fees.withAmounts()[0].amount)).toEqual('1.0');
       });
     });
 
@@ -262,9 +252,10 @@ describe('adjustQuoteWithFees', () => {
           amountOut: newAmountFromString('1', FUN_TEST_TOKEN),
           tradeType: TradeType.EXACT_OUTPUT,
         };
+        const userSpecifiedAmountOut = quote.amountOut;
 
         const fees = tenPercentFees(NATIVE_TEST_TOKEN);
-        const preparedSwap = adjustQuoteWithFees(quote, fees, tokenWrapper);
+        const preparedSwap = adjustQuoteWithFees(quote, userSpecifiedAmountOut, fees, tokenWrapper);
 
         expectERC20(preparedSwap.amountIn.token, WIMX_TEST_TOKEN.address);
         expect(formatAmount(preparedSwap.amountIn)).toEqual('11.0');
@@ -281,9 +272,10 @@ describe('adjustQuoteWithFees', () => {
           amountOut: newAmountFromString('1', FUN_TEST_TOKEN),
           tradeType: TradeType.EXACT_OUTPUT,
         };
+        const userSpecifiedAmountOut = quote.amountOut;
 
         const fees = tenPercentFees(NATIVE_TEST_TOKEN);
-        adjustQuoteWithFees(quote, fees, tokenWrapper);
+        adjustQuoteWithFees(quote, userSpecifiedAmountOut, fees, tokenWrapper);
 
         expect(fees.withAmounts()).toHaveLength(1);
         expectNative(fees.withAmounts()[0].amount.token);

@@ -17,4 +17,4 @@ export const MIN_MAX_HOPS: number = 1;
 export const BASIS_POINT_PRECISION = 10_000;
 
 // 10% maximum secondary fee
-export const MAX_SECONDARY_FEE_BASIS_POINTS = 10000;
+export const MAX_SECONDARY_FEE_BASIS_POINTS = 1000;

@@ -36,7 +36,9 @@ import {
   makeAddr,
   FUN_TEST_TOKEN,
 } from './test/utils';
-import { addAmount, Router, SecondaryFee } from './lib';
+import {
+  addAmount, Router, SecondaryFee,
+} from './lib';
 
 jest.mock('@ethersproject/providers');
 jest.mock('@ethersproject/contracts');
@@ -202,6 +204,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(swapParams.fee).toBe(10000);
       expect(swapParams.recipient).toBe(params.fromAddress);
       expect(formatTokenAmount(swapParams.amountIn, USDC_TEST_TOKEN)).toBe('100.0'); // swap.amountIn = userQuoteReq.amountIn
+
       expect(formatEther(swapParams.amountOutMinimum)).toBe('961.165048543689320388'); // swap.amountOutMinimum = ourQuoteRes.amountOut - slippage
       expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0');
 

@@ -63,11 +63,7 @@ describe('ExchangeConfiguration', () => {
 
       // This list can be updated with any Tokens that are deployed to the chain being configured
       // These tokens will be used to find available pools for a swap
-      const commonRoutingTokens: ERC20[] = [
-        test.FUN_TEST_TOKEN,
-        test.USDC_TEST_TOKEN,
-        test.WETH_TEST_TOKEN,
-      ];
+      const commonRoutingTokens: ERC20[] = [test.FUN_TEST_TOKEN, test.USDC_TEST_TOKEN, test.WETH_TEST_TOKEN];
 
       const secondaryFees = [
         {
@@ -101,24 +97,25 @@ describe('ExchangeConfiguration', () => {
       expect(config.chain.contracts.peripheryRouter).toBe(contractOverrides.peripheryRouter);
       expect(config.chain.contracts.quoterV2).toBe(contractOverrides.quoterV2);
       // tokens
-      expect(config.chain.commonRoutingTokens[0].address.toLocaleLowerCase())
-        .toEqual(commonRoutingTokens[0].address.toLocaleLowerCase());
+      expect(config.chain.commonRoutingTokens[0].address.toLocaleLowerCase()).toEqual(
+        commonRoutingTokens[0].address.toLocaleLowerCase(),
+      );
 
-      expect(config.chain.commonRoutingTokens[1].address.toLowerCase())
-        .toEqual(commonRoutingTokens[1].address.toLowerCase());
+      expect(config.chain.commonRoutingTokens[1].address.toLowerCase()).toEqual(
+        commonRoutingTokens[1].address.toLowerCase(),
+      );
 
-      expect(config.chain.commonRoutingTokens[2].address.toLowerCase())
-        .toEqual(commonRoutingTokens[2].address.toLowerCase());
+      expect(config.chain.commonRoutingTokens[2].address.toLowerCase()).toEqual(
+        commonRoutingTokens[2].address.toLowerCase(),
+      );
 
       expect(config.secondaryFees).toBeDefined();
       if (!config.secondaryFees) {
         // This should never happen
         throw new Error('Secondary fees should be defined');
       }
-      expect(config.secondaryFees[0].recipient.toLowerCase())
-        .toEqual(dummyFeeRecipient.toLowerCase());
-      expect(config.secondaryFees[0].basisPoints.toString())
-        .toEqual(secondaryFees[0].basisPoints.toString());
+      expect(config.secondaryFees[0].recipient.toLowerCase()).toEqual(dummyFeeRecipient.toLowerCase());
+      expect(config.secondaryFees[0].basisPoints.toString()).toEqual(secondaryFees[0].basisPoints.toString());
     });
 
     it('should throw when missing configuration', () => {
@@ -143,11 +140,14 @@ describe('ExchangeConfiguration', () => {
         wrappedNativeToken: test.WIMX_TEST_TOKEN,
       };
 
-      expect(() => new ExchangeConfiguration({
-        chainId,
-        baseConfig: immutableConfig,
-        overrides,
-      })).toThrow(new InvalidConfigurationError('Invalid exchange contract address for multicall'));
+      expect(
+        () =>
+          new ExchangeConfiguration({
+            chainId,
+            baseConfig: immutableConfig,
+            overrides,
+          }),
+      ).toThrow(new InvalidConfigurationError('Invalid exchange contract address for multicall'));
     });
 
     it('show throw when given an invalid RPC URL', () => {
@@ -164,11 +164,14 @@ describe('ExchangeConfiguration', () => {
         wrappedNativeToken: test.WIMX_TEST_TOKEN,
       };
 
-      expect(() => new ExchangeConfiguration({
-        chainId,
-        baseConfig: immutableConfig,
-        overrides,
-      })).toThrow(new InvalidConfigurationError('Missing override: rpcURL'));
+      expect(
+        () =>
+          new ExchangeConfiguration({
+            chainId,
+            baseConfig: immutableConfig,
+            overrides,
+          }),
+      ).toThrow(new InvalidConfigurationError('Missing override: rpcURL'));
     });
 
     it('should throw when given an invalid secondary fee recipient address', () => {
@@ -194,14 +197,17 @@ describe('ExchangeConfiguration', () => {
         wrappedNativeToken: test.WIMX_TEST_TOKEN,
       };
 
-      expect(() => new ExchangeConfiguration({
-        baseConfig: immutableConfig,
-        chainId,
-        secondaryFees,
-        overrides,
-      })).toThrow(new InvalidConfigurationError(
-        `Invalid secondary fee recipient address: ${secondaryFees[0].recipient}`,
-      ));
+      expect(
+        () =>
+          new ExchangeConfiguration({
+            baseConfig: immutableConfig,
+            chainId,
+            secondaryFees,
+            overrides,
+          }),
+      ).toThrow(
+        new InvalidConfigurationError(`Invalid secondary fee recipient address: ${secondaryFees[0].recipient}`),
+      );
     });
 
     it('should throw when given invalid secondary fee basis points', () => {
@@ -214,22 +220,22 @@ describe('ExchangeConfiguration', () => {
       const secondaryFeesOneRecipient = [
         {
           recipient: dummyFeeRecipient,
-          basisPoints: 10001,
+          basisPoints: 1001,
         },
       ];
 
       const secondaryFeesMultipleRecipients = [
         {
           recipient: dummyFeeRecipient,
-          basisPoints: 5000,
+          basisPoints: 500,
         },
         {
           recipient: dummyFeeRecipient,
-          basisPoints: 5000,
+          basisPoints: 500,
         },
         {
           recipient: dummyFeeRecipient,
-          basisPoints: 1000,
+          basisPoints: 100,
         },
       ];
 
@@ -249,32 +255,39 @@ describe('ExchangeConfiguration', () => {
         wrappedNativeToken: test.WIMX_TEST_TOKEN,
       };
 
-      expect(() => new ExchangeConfiguration({
-        baseConfig: immutableConfig,
-        chainId,
-        secondaryFees: secondaryFeesOneRecipient,
-        overrides,
-      })).toThrow(new InvalidConfigurationError(
-        `Invalid secondary fee basis points: ${secondaryFeesOneRecipient[0].basisPoints}`,
-      ));
+      expect(
+        () =>
+          new ExchangeConfiguration({
+            baseConfig: immutableConfig,
+            chainId,
+            secondaryFees: secondaryFeesOneRecipient,
+            overrides,
+          }),
+      ).toThrow(
+        new InvalidConfigurationError(
+          `Invalid secondary fee basis points: ${secondaryFeesOneRecipient[0].basisPoints}`,
+        ),
+      );
 
-      expect(() => new ExchangeConfiguration({
-        baseConfig: immutableConfig,
-        chainId,
-        secondaryFees: secondaryFeesMultipleRecipients,
-        overrides,
-      })).toThrow(new InvalidConfigurationError(
-        'Invalid total secondary fee basis points: 11000',
-      ));
+      expect(
+        () =>
+          new ExchangeConfiguration({
+            baseConfig: immutableConfig,
+            chainId,
+            secondaryFees: secondaryFeesMultipleRecipients,
+            overrides,
+          }),
+      ).toThrow(new InvalidConfigurationError('Invalid total secondary fee basis points: 1100'));
 
-      expect(() => new ExchangeConfiguration({
-        baseConfig: immutableConfig,
-        chainId,
-        secondaryFees: secondaryFeesWithZeroBasisPoints,
-        overrides,
-      })).toThrow(new InvalidConfigurationError(
-        'Invalid secondary fee basis points: 0',
-      ));
+      expect(
+        () =>
+          new ExchangeConfiguration({
+            baseConfig: immutableConfig,
+            chainId,
+            secondaryFees: secondaryFeesWithZeroBasisPoints,
+            overrides,
+          }),
+      ).toThrow(new InvalidConfigurationError('Invalid secondary fee basis points: 0'));
     });
 
     it('should not set secondary fees when not given', () => {

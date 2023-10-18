@@ -2,30 +2,17 @@
 import { ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
 import assert from 'assert';
-import {
-  DuplicateAddressesError, InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError,
-} from 'errors';
+import { DuplicateAddressesError, InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError } from 'errors';
 import { fetchGasPrice } from 'lib/transactionUtils/gas';
 import { getApproval, prepareApproval } from 'lib/transactionUtils/approval';
 import { getOurQuoteReqAmount, prepareUserQuote } from 'lib/transactionUtils/getQuote';
 import { Fees } from 'lib/fees';
 import { SecondaryFee__factory } from 'contracts/types';
 import { TokenWrapper } from 'lib/tokenWrapper';
-import {
-  DEFAULT_DEADLINE, DEFAULT_MAX_HOPS, DEFAULT_SLIPPAGE, MAX_MAX_HOPS, MIN_MAX_HOPS,
-} from './constants';
+import { DEFAULT_DEADLINE, DEFAULT_MAX_HOPS, DEFAULT_SLIPPAGE, MAX_MAX_HOPS, MIN_MAX_HOPS } from './constants';
 import { Router } from './lib/router';
-import {
-  getTokenDecimals, isValidNonZeroAddress, newAmount,
-} from './lib/utils';
-import {
-  Coin,
-  ERC20,
-  ExchangeModuleConfiguration,
-  Native,
-  SecondaryFee,
-  TransactionResponse,
-} from './types';
+import { getTokenDecimals, isValidNonZeroAddress, newAmount } from './lib/utils';
+import { Coin, ERC20, ExchangeModuleConfiguration, Native, SecondaryFee, TransactionResponse } from './types';
 import { getSwap, adjustQuoteWithFees } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
 
@@ -72,11 +59,11 @@ export class Exchange {
     return tokenLiteral === 'native'
       ? this.nativeToken
       : {
-        address: tokenLiteral,
-        chainId: this.chainId,
-        decimals: tokenDecimals,
-        type: 'erc20',
-      };
+          address: tokenLiteral,
+          chainId: this.chainId,
+          decimals: tokenDecimals,
+          type: 'erc20',
+        };
   }
 
   private static validate(
@@ -140,7 +127,8 @@ export class Exchange {
     const tokenOut = this.toToken(tokenOutAddress, tokenOutDecimals);
 
     // determine which amount was specified for the swap from the TradeType
-    const [tokenSpecified, otherToken] = tradeType === TradeType.EXACT_INPUT ? [tokenIn, tokenOut] : [tokenOut, tokenIn];
+    const [tokenSpecified, otherToken] =
+      tradeType === TradeType.EXACT_INPUT ? [tokenIn, tokenOut] : [tokenOut, tokenIn];
 
     const amountSpecified = newAmount(amount, tokenSpecified);
 
@@ -150,20 +138,11 @@ export class Exchange {
 
     // get quote and gas details
     const [ourQuote, gasPrice] = await Promise.all([
-      this.router.findOptimalRoute(
-        ourQuoteReqAmount,
-        this.tokenWrapper.maybeWrapToken(otherToken),
-        tradeType,
-        maxHops,
-      ),
+      this.router.findOptimalRoute(ourQuoteReqAmount, this.tokenWrapper.maybeWrapToken(otherToken), tradeType, maxHops),
       fetchGasPrice(this.provider, this.nativeToken),
     ]);
 
-    const adjustedQuote = adjustQuoteWithFees(
-      ourQuote,
-      fees,
-      this.tokenWrapper,
-    );
+    const adjustedQuote = adjustQuoteWithFees(ourQuote, amountSpecified, fees, this.tokenWrapper);
 
     const swap = getSwap(
       adjustedQuote,

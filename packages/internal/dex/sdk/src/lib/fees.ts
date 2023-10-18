@@ -2,7 +2,8 @@
 import { BASIS_POINT_PRECISION } from 'constants/router';
 import { BigNumber } from 'ethers';
 import {
-  Amount, Fee, SecondaryFee, newAmount, Coin, addAmount, subtractAmount,
+  Amount,
+  Fee, SecondaryFee, newAmount, Coin, subtractAmount, addAmount,
 } from 'lib';
 
 export class Fees {

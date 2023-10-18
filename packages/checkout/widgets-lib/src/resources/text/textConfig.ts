@@ -337,7 +337,11 @@ export const text = {
           disabledCaption: undefined,
         },
       },
-      loading: 'Nice choice',
+      loading: {
+        ready: 'Ready to purchase',
+        confirm: 'Confirm in your wallet',
+        processing: 'Processing purchase',
+      },
     },
     [SaleWidgetViews.PAY_WITH_COINS]: {
       header: {

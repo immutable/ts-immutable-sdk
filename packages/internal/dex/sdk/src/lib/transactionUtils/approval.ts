@@ -6,7 +6,7 @@ import { ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
 import { isERC20Amount, newAmount } from 'lib/utils';
 import {
-  Coin, ERC20, Native, SecondaryFee, Amount, TransactionDetails,
+  Amount, Coin, ERC20, Native, SecondaryFee, TransactionDetails,
 } from '../../types';
 import { calculateGasFee } from './gas';
 
