@@ -586,9 +586,9 @@ export type UserBalance = {
  * Represents the transaction requirement for a transaction.
  * @property {ItemType} type - The type of the transaction requirement.
  * @property {boolean} sufficient - If the user address has sufficient funds to cover the transaction.
- * @property {TransactionRequirementItem} required - The required item balance.
- * @property {TransactionRequirementItem} current - The current item balance.
- * @property {TransactionRequirementDelta} delta - The delta between the required and current balances.
+ * @property {ItemBalance} required - The required item balance.
+ * @property {ItemBalance} current - The current item balance.
+ * @property {BalanceDelta} delta - The delta between the required and current balances.
  */
 export type TransactionRequirement = {
   type: ItemType,
