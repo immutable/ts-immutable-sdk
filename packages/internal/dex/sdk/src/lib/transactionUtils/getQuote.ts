@@ -3,7 +3,6 @@ import { ethers } from 'ethers';
 import { Fees } from 'lib/fees';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
 import { NativeTokenService } from 'lib/nativeTokenService';
-import { isERC20Amount } from 'lib/utils';
 import {
   Amount, Coin, ERC20, Quote,
 } from '../../types';
@@ -34,6 +33,7 @@ export function prepareUserQuote(
   tradeInfo: QuoteResult,
   slippage: number,
   fees: Fees,
+  nativeTokenService: NativeTokenService,
 ): Quote {
   const quote = getQuoteAmountFromTradeType(tradeInfo);
   const amountWithSlippage = applySlippage(tradeInfo.tradeType, quote.value, slippage);
@@ -45,7 +45,10 @@ export function prepareUserQuote(
       value: amountWithSlippage,
     },
     slippage,
-    fees: fees.withAmounts(),
+    fees: fees.withAmounts().map((fee) => ({
+      ...fee,
+      amount: nativeTokenService.maybeWrapAmount(fee.amount),
+    })),
   };
 }
 
@@ -55,11 +58,6 @@ export function getOurQuoteReqAmount(
   tradeType: TradeType,
   nativeTokenService: NativeTokenService,
 ): Amount<ERC20> {
-  // TODO: TP-1649: Remove this when we support Native
-  if (!isERC20Amount(amountSpecified)) {
-    throw new Error('Not implemented yet!');
-  }
-
   if (tradeType === TradeType.EXACT_OUTPUT) {
     // For an exact output swap, we do not need to subtract fees from the given amount
     return nativeTokenService.maybeWrapAmount(amountSpecified);
