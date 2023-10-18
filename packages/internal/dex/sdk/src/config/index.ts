@@ -7,7 +7,8 @@ import {
   IMMUTABLE_TESTNET_COMMON_ROUTING_TOKENS,
   IMMUTABLE_TESTNET_RPC_URL,
   MAX_SECONDARY_FEE_BASIS_POINTS,
-  TIMX_IMMUTABLE_TESTNET,
+  NATIVE_IMX_IMMUTABLE_TESTNET,
+  WIMX_IMMUTABLE_TESTNET,
 } from '../constants';
 
 export type ExchangeContracts = {
@@ -34,7 +35,8 @@ export const SUPPORTED_SANDBOX_CHAINS: Record<number, Chain> = {
     rpcUrl: IMMUTABLE_TESTNET_RPC_URL,
     contracts: CONTRACTS_FOR_CHAIN_ID[IMMUTABLE_TESTNET_CHAIN_ID],
     commonRoutingTokens: IMMUTABLE_TESTNET_COMMON_ROUTING_TOKENS,
-    nativeToken: TIMX_IMMUTABLE_TESTNET,
+    nativeToken: NATIVE_IMX_IMMUTABLE_TESTNET,
+    wrappedNativeToken: WIMX_IMMUTABLE_TESTNET,
   },
 };
 
@@ -108,6 +110,7 @@ export class ExchangeConfiguration {
         contracts: overrides.exchangeContracts,
         commonRoutingTokens: overrides.commonRoutingTokens,
         nativeToken: overrides.nativeToken,
+        wrappedNativeToken: overrides.wrappedNativeToken,
       };
 
       this.secondaryFees = secondaryFees || [];
