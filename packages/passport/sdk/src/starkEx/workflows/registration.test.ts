@@ -11,10 +11,11 @@ describe('registerPassportWorkflow', () => {
   const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ';
 
   it('registerPassportWorkflow successfully called api client to register passport user', async () => {
+    const transactionHash = 'a1b2c3';
     const mockUserApi = {
       registerPassportUser: jest
         .fn()
-        .mockResolvedValue({ statusText: 'No Content' }),
+        .mockResolvedValue({ data: { tx_hash: transactionHash } }),
       getSignableRegistrationOffchain: jest.fn().mockReturnValue({
         data: {
           payload_hash: '0x34',
@@ -38,7 +39,7 @@ describe('registerPassportWorkflow', () => {
 
     const res = await registerPassport(request, mockToken);
 
-    expect(res).toEqual('No Content');
+    expect(res).toEqual({ tx_hash: transactionHash });
     expect(mockStarkSigner.signMessage).toHaveBeenCalled();
     expect(mockEthSigner.signMessage).toHaveBeenCalled();
     expect(mockUserApi.registerPassportUser).toHaveBeenCalledWith({
