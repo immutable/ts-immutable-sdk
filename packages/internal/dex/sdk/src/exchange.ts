@@ -12,6 +12,7 @@ import { getApproval, prepareApproval } from 'lib/transactionUtils/approval';
 import { getOurQuoteReqAmount, prepareUserQuote } from 'lib/transactionUtils/getQuote';
 import { Fees } from 'lib/fees';
 import { SecondaryFee__factory } from 'contracts/types';
+import { NativeTokenService } from 'lib/nativeTokenService';
 import {
   DEFAULT_DEADLINE,
   DEFAULT_MAX_HOPS,
@@ -24,7 +25,8 @@ import {
   getERC20Decimals, isValidNonZeroAddress, newAmount,
 } from './lib/utils';
 import {
-  ExchangeModuleConfiguration, SecondaryFee, TokenInfo, TransactionResponse,
+  ERC20,
+  ExchangeModuleConfiguration, Native, SecondaryFee, TransactionResponse,
 } from './types';
 import { getSwap, prepareSwap } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
@@ -36,15 +38,21 @@ export class Exchange {
 
   private chainId: number;
 
-  private nativeToken: TokenInfo;
+  private nativeToken: Native;
+
+  private wrappedNativeToken: ERC20;
 
   private secondaryFees: SecondaryFee[];
+
+  private nativeTokenService: NativeTokenService;
 
   constructor(configuration: ExchangeModuleConfiguration) {
     const config = new ExchangeConfiguration(configuration);
 
     this.chainId = config.chain.chainId;
     this.nativeToken = config.chain.nativeToken;
+    this.wrappedNativeToken = config.chain.wrappedNativeToken;
+    this.nativeTokenService = new NativeTokenService(this.nativeToken, this.wrappedNativeToken);
     this.secondaryFees = config.secondaryFees;
 
     this.provider = new ethers.providers.JsonRpcProvider(
@@ -118,12 +126,14 @@ export class Exchange {
       this.getSecondaryFees(),
     ]);
 
-    const tokenIn: TokenInfo = {
+    const tokenIn: ERC20 = {
+      type: 'erc20',
       address: tokenInAddress,
       chainId: this.chainId,
       decimals: tokenInDecimals,
     };
-    const tokenOut: TokenInfo = {
+    const tokenOut: ERC20 = {
+      type: 'erc20',
       address: tokenOutAddress,
       chainId: this.chainId,
       decimals: tokenOutDecimals,
@@ -137,7 +147,7 @@ export class Exchange {
 
     const fees = new Fees(secondaryFees, tokenIn);
 
-    const ourQuoteReqAmount = getOurQuoteReqAmount(amountSpecified, fees, tradeType);
+    const ourQuoteReqAmount = getOurQuoteReqAmount(amountSpecified, fees, tradeType, this.nativeTokenService);
 
     // get quote and gas details
     const [ourQuote, gasPrice] = await Promise.all([
@@ -161,6 +171,7 @@ export class Exchange {
       this.router.routingContracts.secondaryFeeAddress,
       gasPrice,
       secondaryFees,
+      this.nativeTokenService,
     );
 
     const userQuote = prepareUserQuote(otherToken, adjustedQuote, slippagePercent, fees);
@@ -179,6 +190,7 @@ export class Exchange {
       fromAddress,
       preparedApproval,
       gasPrice,
+      this.nativeTokenService,
     );
 
     return {

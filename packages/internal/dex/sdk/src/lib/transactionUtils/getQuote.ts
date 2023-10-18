@@ -2,12 +2,14 @@ import { TradeType } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
 import { Fees } from 'lib/fees';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
+import { NativeTokenService } from 'lib/nativeTokenService';
+import { isERC20Amount } from 'lib/utils';
 import {
-  Amount, Quote, TokenInfo,
+  Amount, Coin, ERC20, Quote,
 } from '../../types';
 import { slippageToFraction } from './slippage';
 
-function getQuoteAmountFromTradeType(tradeInfo: QuoteResult): Amount {
+function getQuoteAmountFromTradeType(tradeInfo: QuoteResult): Amount<ERC20> {
   if (tradeInfo.tradeType === TradeType.EXACT_INPUT) {
     return tradeInfo.amountOut;
   }
@@ -28,7 +30,7 @@ export function applySlippage(
 }
 
 export function prepareUserQuote(
-  otherToken: TokenInfo,
+  otherToken: ERC20,
   tradeInfo: QuoteResult,
   slippage: number,
   fees: Fees,
@@ -48,16 +50,22 @@ export function prepareUserQuote(
 }
 
 export function getOurQuoteReqAmount(
-  amount: Amount,
+  amountSpecified: Amount<Coin>, // the amount specified by the user, either exactIn or exactOut
   fees: Fees,
   tradeType: TradeType,
-): Amount {
-  if (tradeType === TradeType.EXACT_OUTPUT) {
-    // For an exact output swap, we do not need to subtract fees from the given amount
-    return amount;
+  nativeTokenService: NativeTokenService,
+): Amount<ERC20> {
+  // TODO: TP-1649: Remove this when we support Native
+  if (!isERC20Amount(amountSpecified)) {
+    throw new Error('Not implemented yet!');
   }
 
-  fees.addAmount(amount);
+  if (tradeType === TradeType.EXACT_OUTPUT) {
+    // For an exact output swap, we do not need to subtract fees from the given amount
+    return nativeTokenService.maybeWrapAmount(amountSpecified);
+  }
 
-  return fees.amountLessFees();
+  fees.addAmount(amountSpecified);
+
+  return nativeTokenService.maybeWrapAmount(fees.amountLessFees());
 }

@@ -8,7 +8,10 @@ import { ISecondaryFee, SecondaryFeeInterface } from 'contracts/types/SecondaryF
 import { Fees } from 'lib/fees';
 import { toCurrencyAmount } from 'lib/utils';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
-import { Amount, SecondaryFee, TransactionDetails } from '../../types';
+import { NativeTokenService } from 'lib/nativeTokenService';
+import {
+  Amount, ERC20, Native, SecondaryFee, TransactionDetails,
+} from '../../types';
 import { calculateGasFee } from './gas';
 import { slippageToFraction } from './slippage';
 
@@ -197,8 +200,9 @@ export function getSwap(
   deadline: number,
   peripheryRouterAddress: string,
   secondaryFeesAddress: string,
-  gasPrice: Amount | null,
+  gasPrice: Amount<Native> | null,
   secondaryFees: SecondaryFee[],
+  nativeTokenService: NativeTokenService,
 ): TransactionDetails {
   const calldata = createSwapParameters(
     adjustedQuote,
@@ -218,13 +222,14 @@ export function getSwap(
       value: zeroNativeCurrencyValue, // we should never send the native currency to the router for a swap
       from: fromAddress,
     },
-    gasFeeEstimate,
+    // TODO: TP-1649: Remove the wrapping here
+    gasFeeEstimate: gasFeeEstimate ? nativeTokenService.maybeWrapAmount(gasFeeEstimate) : null,
   };
 }
 
 export function prepareSwap(
   ourQuote: QuoteResult,
-  amountSpecified: Amount,
+  amountSpecified: Amount<ERC20>,
   fees: Fees,
 ): QuoteResult {
   if (ourQuote.tradeType === TradeType.EXACT_OUTPUT) {
