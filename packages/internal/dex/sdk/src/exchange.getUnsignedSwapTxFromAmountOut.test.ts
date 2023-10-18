@@ -8,7 +8,7 @@ import { Exchange } from './exchange';
 import {
   mockRouterImplementation,
   setupSwapTxTest,
-  TEST_PERIPHERY_ROUTER_ADDRESS,
+  TEST_ROUTER_ADDRESS,
   TEST_DEX_CONFIGURATION,
   TEST_GAS_PRICE,
   TEST_FEE_RECIPIENT,
@@ -53,22 +53,18 @@ const APPROVE_GAS_ESTIMATE = BigNumber.from('100000');
  */
 describe('getUnsignedSwapTxFromAmountOut', () => {
   beforeAll(() => {
-    (Contract as unknown as jest.Mock).mockImplementation(
-      () => ({
-        allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT),
-        estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
-        paused: jest.fn().mockResolvedValue(false),
-      }),
-    );
+    (Contract as unknown as jest.Mock).mockImplementation(() => ({
+      allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT),
+      estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
+      paused: jest.fn().mockResolvedValue(false),
+    }));
 
-    (JsonRpcProvider as unknown as jest.Mock).mockImplementation(
-      () => ({
-        getFeeData: async () => ({
-          maxFeePerGas: null,
-          gasPrice: TEST_GAS_PRICE,
-        }),
+    (JsonRpcProvider as unknown as jest.Mock).mockImplementation(() => ({
+      getFeeData: async () => ({
+        maxFeePerGas: null,
+        gasPrice: TEST_GAS_PRICE,
       }),
-    ) as unknown as JsonRpcProvider;
+    })) as unknown as JsonRpcProvider;
   });
 
   describe('Swap with single pool with fees', () => {
@@ -236,7 +232,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       expect(swapParams.tokenOut).toBe(params.outputToken); // output token
       expect(swapParams.fee).toBe(10000); // fee
       expect(swapParams.recipient).toBe(params.fromAddress); // recipient
-      expect(swap.transaction.to).toBe(TEST_PERIPHERY_ROUTER_ADDRESS); // to address
+      expect(swap.transaction.to).toBe(TEST_ROUTER_ADDRESS); // to address
       expect(swap.transaction.from).toBe(params.fromAddress); // from address
       expect(swap.transaction.value).toBe('0x00'); // refers to 0ETH
       expect(formatEther(swapParams.amountOut)).toBe('1000.0'); // 1,000 amount out
@@ -260,9 +256,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       expect(quote.amount.token.address).toEqual(params.inputToken);
       expect(quote.slippage).toBe(0.1);
       expect(formatAmount(quote.amount)).toEqual('100.0');
-      expect(quote.amountWithMaxSlippage.token.address).toEqual(
-        params.inputToken,
-      );
+      expect(quote.amountWithMaxSlippage.token.address).toEqual(params.inputToken);
       expect(formatAmount(quote.amountWithMaxSlippage)).toEqual(
         '100.1', // (includes slippage)
       );
@@ -288,7 +282,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       const decodedResults = erc20ContractInterface.decodeFunctionData('approve', approval.transaction.data);
       const spenderAddress: string = decodedResults[0].toString();
 
-      expect(spenderAddress).toEqual(TEST_PERIPHERY_ROUTER_ADDRESS);
+      expect(spenderAddress).toEqual(TEST_ROUTER_ADDRESS);
     });
   });
 
@@ -297,9 +291,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       const params = setupSwapTxTest({ multiPoolSwap: true });
       mockRouterImplementation(params);
 
-      const secondaryFees: SecondaryFee[] = [
-        { recipient: TEST_FEE_RECIPIENT, basisPoints: TEST_MAX_FEE_BASIS_POINTS },
-      ];
+      const secondaryFees: SecondaryFee[] = [{ recipient: TEST_FEE_RECIPIENT, basisPoints: TEST_MAX_FEE_BASIS_POINTS }];
 
       const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
 

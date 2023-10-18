@@ -1,14 +1,11 @@
-import { Amount, ERC20, Quote } from '@imtbl/dex-sdk';
-import {
-  ChainId,
-  GetBalanceResult,
-} from '../../types';
+import { Amount, Native, Quote } from '@imtbl/dex-sdk';
+import { ChainId, GetBalanceResult } from '../../types';
 import { CheckoutError } from '../../errors';
 
 export type TokenBalanceResult = {
-  success: boolean,
-  balances: GetBalanceResult[],
-  error?: CheckoutError,
+  success: boolean;
+  balances: GetBalanceResult[];
+  error?: CheckoutError;
 };
 
 export type TokenBalances = Map<ChainId, TokenBalanceResult>;
@@ -18,7 +15,8 @@ export type TokenBalances = Map<ChainId, TokenBalanceResult>;
 export type DexQuoteCache = Map<string, DexQuotes>;
 export type DexQuotes = Map<string, DexQuote>;
 export type DexQuote = {
-  quote: Quote,
-  approval: Amount<ERC20> | null,
-  swap: Amount<ERC20> | null,
+  quote: Quote;
+  // All gas fees are quoted in the chain's native token
+  approvalGasFee: Amount<Native> | null;
+  swapGasFee: Amount<Native> | null;
 };

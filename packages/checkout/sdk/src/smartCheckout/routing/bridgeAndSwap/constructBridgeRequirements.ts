@@ -1,5 +1,5 @@
 import { BigNumber, utils } from 'ethers';
-import { GetBalanceResult, ItemType } from '../../../types';
+import { GetBalanceResult, IMX_ADDRESS_ZKEVM, ItemType } from '../../../types';
 import { BridgeRequirement } from '../bridge/bridgeRoute';
 import { DexQuote, DexQuotes } from '../types';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS, L1ToL2TokenAddressMapping } from '../indexer/fetchL1Representation';
@@ -11,19 +11,24 @@ import { BalanceCheckResult } from '../../balanceCheck/types';
 // will be bridged over to cover the amount to swap and any fees associated with the swap
 export const getFeesForTokenAddress = (
   dexQuote: DexQuote,
-  tokenAddress: string,
+  tokenAddress: string, // TODO: When DEX supports native, then this could be 'native' or a tokenAddress
 ): BigNumber => {
   let fees = BigNumber.from(0);
 
+  // Secondary Fees
   dexQuote.quote.fees.forEach((fee) => {
+    // Has secondary fee in the same token as the token being swapped
     if (fee.amount.token.address === tokenAddress) {
       fees = fees.add(fee.amount.value);
     }
   });
 
-  if (dexQuote.approval) {
-    if (dexQuote.approval.token.address === tokenAddress) {
-      fees = fees.add(dexQuote.approval.value);
+  if (dexQuote.approvalGasFee) {
+    // TODO: When DEX supports native then remove check for Edge contract address (0x...1010) and replace with check for 'native'
+    // Check if the token is also the gas token for the chain
+    // If it is, we need to add the approval gas fee to the amount to bridge
+    if (tokenAddress === IMX_ADDRESS_ZKEVM) {
+      fees = fees.add(dexQuote.approvalGasFee.value);
     }
   }
 
@@ -98,9 +103,7 @@ export const constructBridgeRequirements = (
   for (const [tokenAddress, quote] of dexQuotes) {
     // Get the L2 balance for the token address
     const l2balance = l2balances.find((balance) => balance.token.address === tokenAddress);
-    const l1tol2TokenMapping = l1tol2addresses.find(
-      (token) => token.l2address === tokenAddress,
-    );
+    const l1tol2TokenMapping = l1tol2addresses.find((token) => token.l2address === tokenAddress);
     if (!l1tol2TokenMapping) continue;
 
     const { l1address, l2address } = l1tol2TokenMapping;
@@ -108,8 +111,7 @@ export const constructBridgeRequirements = (
 
     // If the user does not have any L1 balance for this token then cannot bridge
     const l1balance = l1balances.find((balance) => {
-      if (balance.token.address === undefined
-        && l1address === INDEXER_ETH_ROOT_CONTRACT_ADDRESS) {
+      if (balance.token.address === undefined && l1address === INDEXER_ETH_ROOT_CONTRACT_ADDRESS) {
         return true;
       }
       return balance.token.address === l1address;
@@ -123,10 +125,7 @@ export const constructBridgeRequirements = (
     const quotedAmountWithFees = quotedAmount.add(fees);
 
     // Get the amount from the balance requirement if the token is also a balance requirement
-    const amountFromBalanceRequirement = getAmountFromBalanceRequirement(
-      balanceRequirements,
-      tokenAddress,
-    );
+    const amountFromBalanceRequirement = getAmountFromBalanceRequirement(balanceRequirements, tokenAddress);
 
     // Get the amount to bridge factoring in any balance requirements for this swappable token
     // and the current balance on L2

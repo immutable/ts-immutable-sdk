@@ -10,8 +10,8 @@ export const quoteFetcher = async (
   chainId: ChainId,
   walletAddress: string,
   requiredToken: {
-    address: string,
-    amount: BigNumber,
+    address: string;
+    amount: BigNumber;
   },
   swappableTokens: string[],
 ): Promise<DexQuotes> => {
@@ -27,13 +27,15 @@ export const quoteFetcher = async (
     // Create a quote for each swappable token
     for (const swappableToken of swappableTokens) {
       if (swappableToken === requiredToken.address) continue;
-      dexTransactionResponsePromises.push(exchange.getUnsignedSwapTxFromAmountOut(
-        walletAddress,
-        swappableToken,
-        requiredToken.address,
-        requiredToken.amount,
-        slippagePercent,
-      ));
+      dexTransactionResponsePromises.push(
+        exchange.getUnsignedSwapTxFromAmountOut(
+          walletAddress,
+          swappableToken,
+          requiredToken.address,
+          requiredToken.amount,
+          slippagePercent,
+        ),
+      );
       fromToken.push(swappableToken);
     }
 
@@ -46,8 +48,8 @@ export const quoteFetcher = async (
       const swappableToken = fromToken[index];
       dexQuotes.set(swappableToken, {
         quote: response.value.quote,
-        approval: response.value.approval?.gasFeeEstimate ?? null,
-        swap: response.value.swap.gasFeeEstimate,
+        approvalGasFee: response.value.approval?.gasFeeEstimate ?? null,
+        swapGasFee: response.value.swap.gasFeeEstimate,
       });
     });
 
