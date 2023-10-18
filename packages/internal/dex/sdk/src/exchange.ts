@@ -24,7 +24,8 @@ import {
   getERC20Decimals, isValidNonZeroAddress, newAmount,
 } from './lib/utils';
 import {
-  ExchangeModuleConfiguration, SecondaryFee, TokenInfo, TransactionResponse,
+  ERC20,
+  ExchangeModuleConfiguration, SecondaryFee, TransactionResponse,
 } from './types';
 import { getSwap, prepareSwap } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
@@ -36,7 +37,7 @@ export class Exchange {
 
   private chainId: number;
 
-  private nativeToken: TokenInfo;
+  private nativeToken: ERC20;
 
   private secondaryFees: SecondaryFee[];
 
@@ -118,12 +119,14 @@ export class Exchange {
       this.getSecondaryFees(),
     ]);
 
-    const tokenIn: TokenInfo = {
+    const tokenIn: ERC20 = {
+      type: 'erc20',
       address: tokenInAddress,
       chainId: this.chainId,
       decimals: tokenInDecimals,
     };
-    const tokenOut: TokenInfo = {
+    const tokenOut: ERC20 = {
+      type: 'erc20',
       address: tokenOutAddress,
       chainId: this.chainId,
       decimals: tokenOutDecimals,
