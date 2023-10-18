@@ -1,27 +1,22 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-console */
 import { Web3Provider } from '@ethersproject/providers';
 import {
   Checkout,
   ERC20ItemRequirement,
-  FundingRoute,
   GasAmount,
   GasTokenType,
   ItemType,
-  RoutingOutcomeType,
   SmartCheckoutResult,
   TransactionOrGasType,
 } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import { useCallback, useState } from 'react';
-import { Item } from '../types';
+import { Item, SaleErrorTypes, SmartCheckoutError } from '../types';
 
 type UseSmartCheckoutInput = {
   checkout: Checkout | undefined;
   provider: Web3Provider | undefined;
   items: Item[],
   amount: string,
-  spenderAddress: string,
   contractAddress: string,
 };
 
@@ -51,6 +46,9 @@ export const useSmartCheckout = ({
   const [smartCheckoutResult, setSmartCheckoutResult] = useState<SmartCheckoutResult | undefined>(
     undefined,
   );
+  const [smartCheckoutError, setSmartCheckoutError] = useState<SmartCheckoutError | undefined>(
+    undefined,
+  );
 
   const smartCheckout = useCallback(async () => {
     if (!checkout || !provider) {
@@ -60,12 +58,8 @@ export const useSmartCheckout = ({
     const signer = provider.getSigner();
     const spenderAddress = await signer?.getAddress() || '';
 
-    // ! Generate ItemRequirements
     const itemRequirements = getItemRequirements(amount, spenderAddress, contractAddress);
-    // ! Generate GasEstimate
     const gasEstimate = getGasEstimate();
-    // eslint-disable-next-line no-debugger
-    // debugger;
 
     try {
       const res = await checkout.smartCheckout(
@@ -79,11 +73,15 @@ export const useSmartCheckout = ({
       setSmartCheckoutResult(res);
       return res;
     } catch (err: any) {
-      throw new Error('Smart Checkout failed', err);
+      setSmartCheckoutError({
+        type: SaleErrorTypes.SMART_CHECKOUT_ERROR,
+        data: { error: err },
+      });
     }
+    return undefined;
   }, [checkout, provider, items, amount, contractAddress]);
 
   return {
-    smartCheckout, smartCheckoutResult,
+    smartCheckout, smartCheckoutResult, smartCheckoutError,
   };
 };

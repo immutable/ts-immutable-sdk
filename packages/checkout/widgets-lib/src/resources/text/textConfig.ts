@@ -379,7 +379,7 @@ export const text = {
           secondaryAction: 'Dismiss',
         },
         [SaleErrorTypes.WALLET_REJECTED_NO_FUNDS]: {
-          description: 'Sorry, something went wrong. Plese try again.',
+          description: 'Sorry, something went wrong. Please try again.',
           primaryAction: 'Go back',
           secondaryAction: 'Dismiss',
         },
@@ -389,9 +389,15 @@ export const text = {
           primaryAction: 'Try again',
           secondaryAction: 'Cancel',
         },
-        [SaleErrorTypes.INSUFFICIENT_BALANCE]: {
+        [SaleErrorTypes.SMART_CHECKOUT_NO_ROUTES_FOUND]: {
           description:
             'Your wallet has insufficent balance. Try paying with card instead.',
+          primaryAction: 'Try again',
+          secondaryAction: 'Cancel',
+        },
+        [SaleErrorTypes.SMART_CHECKOUT_ERROR]: {
+          description:
+            'Unable to check your wallets balance. Please try again.',
           primaryAction: 'Try again',
           secondaryAction: 'Cancel',
         },

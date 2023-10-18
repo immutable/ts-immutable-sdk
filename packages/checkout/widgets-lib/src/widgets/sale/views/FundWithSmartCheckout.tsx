@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { Box } from '@biom3/react';
 import { FundingRoute } from '@imtbl/checkout-sdk';
 import {

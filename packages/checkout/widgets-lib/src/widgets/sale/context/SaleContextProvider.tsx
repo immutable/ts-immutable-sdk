@@ -231,15 +231,18 @@ export function SaleContextProvider(props: {
     goToErrorView(signError.type, signError.data);
   }, [signError]);
 
-  // ! Smart Checkout ----------------------------
-  const { smartCheckout, smartCheckoutResult } = useSmartCheckout({
+  const { smartCheckout, smartCheckoutResult, smartCheckoutError } = useSmartCheckout({
     provider,
     checkout,
     items,
     amount,
     contractAddress: fromContractAddress,
-    spenderAddress: recipientAddress,
   });
+
+  useEffect(() => {
+    if (!smartCheckoutError) return;
+    goToErrorView(smartCheckoutError.type, smartCheckoutError.data);
+  }, [smartCheckoutError]);
 
   const querySmartCheckout = useCallback(async (callback?: (r?: SmartCheckoutResult) => void) => {
     const result = await smartCheckout();
@@ -248,13 +251,11 @@ export function SaleContextProvider(props: {
   }, [smartCheckout]);
 
   useEffect(() => {
-    // ! Handle all state changes from SmartCheckoutResult
     if (!smartCheckoutResult) {
       setFundingRoutes([]);
       return;
     }
     if (smartCheckoutResult.sufficient) {
-      // Go to PayWithCoins
       sign(PaymentTypes.CRYPTO);
       viewDispatch({
         payload: {
@@ -268,8 +269,6 @@ export function SaleContextProvider(props: {
     if (!smartCheckoutResult.sufficient) {
       switch (smartCheckoutResult.router.routingOutcome.type) {
         case RoutingOutcomeType.ROUTES_FOUND:
-          // Set FundingRoutes
-          // Go to FundingRouteSelect
           setFundingRoutes(smartCheckoutResult.router.routingOutcome.fundingRoutes);
           viewDispatch({
             payload: {
@@ -285,14 +284,12 @@ export function SaleContextProvider(props: {
         case RoutingOutcomeType.NO_ROUTES_FOUND:
         case RoutingOutcomeType.NO_ROUTE_OPTIONS:
         default:
-          // Show INSUFFICIENT_BALANCE
           setFundingRoutes([]);
-          goToErrorView(SaleErrorTypes.INSUFFICIENT_BALANCE);
+          goToErrorView(SaleErrorTypes.SMART_CHECKOUT_NO_ROUTES_FOUND);
           break;
       }
     }
   }, [smartCheckoutResult]);
-  // ! Smart Checkout ----------------------------/
 
   const values = useMemo(
     () => ({
