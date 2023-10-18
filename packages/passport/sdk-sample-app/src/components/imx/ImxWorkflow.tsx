@@ -26,6 +26,10 @@ function ImxWorkflow() {
     addMessage('Get Address', address);
   }, [addMessage, imxProvider]);
 
+  const registerUser = async () => {
+    await imxProvider?.registerOffchain();
+  };
+
   const handleBulkTransfer = () => {
     setShowBulkTransfer(true);
   };
@@ -120,6 +124,13 @@ function ImxWorkflow() {
               onClick={getAddress}
             >
               Get Address
+            </WorkflowButton>
+
+            <WorkflowButton
+              disabled={isLoading}
+              onClick={registerUser}
+            >
+              Register User
             </WorkflowButton>
           </>
         )}

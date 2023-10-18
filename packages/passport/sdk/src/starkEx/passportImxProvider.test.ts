@@ -6,6 +6,7 @@ import {
   CreateTradeResponse,
   CreateTransferResponse,
   CreateTransferResponseV1,
+  EthSigner,
   GetSignableCancelOrderRequest,
   GetSignableTradeRequest,
   NftTransferDetails,
@@ -13,7 +14,9 @@ import {
   UnsignedOrderRequest,
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
-import { mockUserImx, testConfig } from '../test/mocks';
+import AuthManager from 'authManager';
+import registerPassportStarkEx from './workflows/registration';
+import { mockUserImx, testConfig, mockUser } from '../test/mocks';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import { PassportImxProvider } from './passportImxProvider';
 import {
@@ -30,6 +33,7 @@ import { PassportEventMap, PassportEvents } from '../types';
 import TypedEventEmitter from '../typedEventEmitter';
 
 jest.mock('./workflows');
+jest.mock('./workflows/registration');
 describe('PassportImxProvider', () => {
   afterEach(jest.resetAllMocks);
 
@@ -48,13 +52,34 @@ describe('PassportImxProvider', () => {
     getAddress: jest.fn(),
   };
 
+  const mockEthSigner = {
+    signMessage: jest.fn(),
+    getAddress: jest.fn(),
+  };
+
+  const authManagerMock = {
+    loginSilent: jest.fn(),
+    login: jest.fn(),
+  };
+
+  const magicAdapterMock = {
+    login: jest.fn(),
+  };
+
+  const getSignerMock = jest.fn();
+
   let passportEventEmitter: TypedEventEmitter<PassportEventMap>;
 
   beforeEach(() => {
+    jest.restoreAllMocks();
+    getSignerMock.mockReturnValue(mockEthSigner);
+    (registerPassportStarkEx as jest.Mock).mockResolvedValue(null);
     passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
     passportImxProvider = new PassportImxProvider({
       user: mockUserImx,
       starkSigner: mockStarkSigner,
+      ethSigner: mockEthSigner as unknown as EthSigner,
+      authManager: authManagerMock as unknown as AuthManager,
       confirmationScreen,
       immutableXClient,
       config: testConfig,
@@ -92,17 +117,6 @@ describe('PassportImxProvider', () => {
         guardianClient: passportImxProvider.guardianClient,
       });
       expect(result).toEqual(returnValue);
-    });
-  });
-
-  describe('registerOffchain', () => {
-    it('should throw error', async () => {
-      expect(passportImxProvider.registerOffchain).toThrow(
-        new PassportError(
-          'Operation not supported',
-          PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR,
-        ),
-      );
     });
   });
 
@@ -348,6 +362,57 @@ describe('PassportImxProvider', () => {
             PassportErrorType.NOT_LOGGED_IN_ERROR,
           ),
         );
+      });
+    });
+  });
+
+  describe('when the user has not registered', () => {
+    describe('when we exceed the number of attempts to obtain a user with the correct metadata', () => {
+      it('should throw an error', async () => {
+        const magicProviderMock = {};
+
+        authManagerMock.login.mockResolvedValue(mockUser);
+        magicAdapterMock.login.mockResolvedValue(magicProviderMock);
+        authManagerMock.loginSilent.mockResolvedValue(mockUser);
+
+        await expect(() => passportImxProvider.registerOffchain()).rejects.toThrow(
+          new PassportError(
+            'Retry failed',
+            PassportErrorType.REFRESH_TOKEN_ERROR,
+          ),
+        );
+
+        expect(registerPassportStarkEx).toHaveBeenCalledWith({
+          ethSigner: mockEthSigner,
+          starkSigner: mockStarkSigner,
+          usersApi: immutableXClient.usersApi,
+        }, mockUser.accessToken);
+        expect(authManagerMock.loginSilent).toHaveBeenCalledTimes(4);
+        expect(authManagerMock.loginSilent).toHaveBeenNthCalledWith(1, { forceRefresh: true });
+        expect(authManagerMock.loginSilent).toHaveBeenNthCalledWith(2, { forceRefresh: true });
+        expect(authManagerMock.loginSilent).toHaveBeenNthCalledWith(3, { forceRefresh: true });
+        expect(authManagerMock.loginSilent).toHaveBeenCalledWith({ forceRefresh: true });
+      });
+    });
+
+    describe('when registration is successful', () => {
+      it('should register the user and update the provider instance user', async () => {
+        const magicProviderMock = {};
+
+        authManagerMock.login.mockResolvedValue(mockUser);
+        magicAdapterMock.login.mockResolvedValue(magicProviderMock);
+        authManagerMock.loginSilent.mockResolvedValue(mockUserImx);
+
+        await passportImxProvider.registerOffchain();
+
+        // expect(passportImxProvider).toBe(passportImxProviderMock);
+        expect(registerPassportStarkEx).toHaveBeenCalledWith({
+          ethSigner: mockEthSigner,
+          starkSigner: mockStarkSigner,
+          usersApi: immutableXClient.usersApi,
+        }, mockUserImx.accessToken);
+        expect(authManagerMock.loginSilent).toHaveBeenCalledTimes(1);
+        expect(authManagerMock.loginSilent).toHaveBeenCalledWith({ forceRefresh: true });
       });
     });
   });

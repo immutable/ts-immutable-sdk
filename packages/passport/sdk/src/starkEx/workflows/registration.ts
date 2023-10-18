@@ -1,5 +1,5 @@
 import { signRaw } from '@imtbl/toolkit';
-import { UsersApi, WalletConnection } from '@imtbl/core-sdk';
+import { RegisterUserResponse, UsersApi, WalletConnection } from '@imtbl/core-sdk';
 import { PassportErrorType, withPassportError } from '../../errors/passportError';
 
 export type RegisterPassportParams = WalletConnection & {
@@ -9,8 +9,8 @@ export type RegisterPassportParams = WalletConnection & {
 export default async function registerPassport(
   { ethSigner, starkSigner, usersApi }: RegisterPassportParams,
   authorization: string,
-): Promise<string> {
-  return withPassportError<string>(async () => {
+): Promise<RegisterUserResponse> {
+  return withPassportError<RegisterUserResponse>(async () => {
     const [userAddress, starkPublicKey] = await Promise.all([
       ethSigner.getAddress(),
       starkSigner.getAddress(),
@@ -38,6 +38,6 @@ export default async function registerPassport(
         stark_key: starkPublicKey,
       },
     });
-    return response.statusText;
+    return response.data as RegisterUserResponse;
   }, PassportErrorType.USER_REGISTRATION_ERROR);
 }

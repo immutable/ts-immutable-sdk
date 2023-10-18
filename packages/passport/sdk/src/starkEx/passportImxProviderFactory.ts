@@ -1,9 +1,6 @@
-import { EthSigner, StarkSigner } from '@imtbl/core-sdk';
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 import { Web3Provider } from '@ethersproject/providers';
-import registerPassportStarkEx from './workflows/registration';
-import { retryWithDelay } from '../network/retry';
-import { PassportError, PassportErrorType, withPassportError } from '../errors/passportError';
+import { PassportError, PassportErrorType } from '../errors/passportError';
 import { PassportConfiguration } from '../config';
 import AuthManager from '../authManager';
 import { ConfirmationScreen } from '../confirmation';
@@ -106,10 +103,18 @@ export class PassportImxProviderFactory {
     const starkSigner = await getStarkSigner(ethSigner);
 
     if (!user.imx?.ethAddress) {
-      const userImx = await this.registerStarkEx(ethSigner, starkSigner, user.accessToken);
+      // Default the address fields to empty strings if the user has not been registered
+      const userImx: UserImx = {
+        ...user,
+        imx: {
+          ...user.imx, ethAddress: '', starkAddress: '', userAdminAddress: '',
+        },
+      };
       return new PassportImxProvider({
         user: userImx,
         starkSigner,
+        ethSigner,
+        authManager: this.authManager,
         immutableXClient: this.immutableXClient,
         confirmationScreen: this.confirmationScreen,
         config: this.config,
@@ -120,35 +125,12 @@ export class PassportImxProviderFactory {
     return new PassportImxProvider({
       user: user as UserImx,
       starkSigner,
+      ethSigner,
+      authManager: this.authManager,
       immutableXClient: this.immutableXClient,
       confirmationScreen: this.confirmationScreen,
       config: this.config,
       passportEventEmitter: this.passportEventEmitter,
     });
-  }
-
-  private async registerStarkEx(userAdminKeySigner: EthSigner, starkSigner: StarkSigner, jwt: string) {
-    return withPassportError<UserImx>(async () => {
-      await registerPassportStarkEx(
-        {
-          ethSigner: userAdminKeySigner,
-          starkSigner,
-          usersApi: this.immutableXClient.usersApi,
-        },
-        jwt,
-      );
-
-      // User metadata is updated asynchronously. Poll userinfo endpoint until it is updated.
-      const updatedUser = await retryWithDelay<User | null>(async () => {
-        const user = await this.authManager.loginSilent({ forceRefresh: true }); // force refresh to get updated user info
-        const metadataExists = !!user?.imx;
-        if (metadataExists) {
-          return user;
-        }
-        return Promise.reject(new Error('user wallet addresses not exist'));
-      });
-
-      return updatedUser as UserImx;
-    }, PassportErrorType.REFRESH_TOKEN_ERROR);
   }
 }

@@ -9,7 +9,7 @@ import { PassportError, PassportErrorType } from '../errors/passportError';
 import { PassportEventMap } from '../types';
 import { PassportImxProvider } from './passportImxProvider';
 import { getStarkSigner } from './getStarkSigner';
-import { mockUser, mockUserImx, testConfig } from '../test/mocks';
+import { mockUserImx, testConfig } from '../test/mocks';
 import TypedEventEmitter from '../typedEventEmitter';
 
 jest.mock('@ethersproject/providers');
@@ -83,71 +83,6 @@ describe('PassportImxProviderFactory', () => {
       });
     });
 
-    describe('when the user has not registered', () => {
-      describe('when we exceed the number of attempts to obtain a user with the correct metadata', () => {
-        it('should throw an error', async () => {
-          const magicProviderMock = {};
-
-          authManagerMock.login.mockResolvedValue(mockUser);
-          magicAdapterMock.login.mockResolvedValue(magicProviderMock);
-          authManagerMock.loginSilent.mockResolvedValue(mockUser);
-
-          await expect(() => passportImxProviderFactory.getProvider()).rejects.toThrow(
-            new PassportError(
-              'Retry failed',
-              PassportErrorType.REFRESH_TOKEN_ERROR,
-            ),
-          );
-
-          expect(authManagerMock.login).toHaveBeenCalledTimes(1);
-          expect(magicAdapterMock.login).toHaveBeenCalledWith(mockUser.idToken);
-          expect(getSignerMock).toHaveBeenCalledTimes(1);
-          expect(registerPassportStarkEx).toHaveBeenCalledWith({
-            ethSigner: ethSignerMock,
-            starkSigner: starkSignerMock,
-            usersApi: immutableXClient.usersApi,
-          }, mockUser.accessToken);
-          expect(authManagerMock.loginSilent).toHaveBeenCalledTimes(4);
-          expect(authManagerMock.loginSilent).toHaveBeenNthCalledWith(1, { forceRefresh: true });
-          expect(authManagerMock.loginSilent).toHaveBeenNthCalledWith(2, { forceRefresh: true });
-          expect(authManagerMock.loginSilent).toHaveBeenNthCalledWith(3, { forceRefresh: true });
-          expect(authManagerMock.loginSilent).toHaveBeenCalledWith({ forceRefresh: true });
-        });
-      });
-
-      describe('when registration is successful', () => {
-        it('should register the user and return a PassportImxProvider instance', async () => {
-          const magicProviderMock = {};
-
-          authManagerMock.login.mockResolvedValue(mockUser);
-          magicAdapterMock.login.mockResolvedValue(magicProviderMock);
-          authManagerMock.loginSilent.mockResolvedValue(mockUserImx);
-
-          const result = await passportImxProviderFactory.getProvider();
-
-          expect(result).toBe(passportImxProviderMock);
-          expect(authManagerMock.login).toHaveBeenCalledTimes(1);
-          expect(magicAdapterMock.login).toHaveBeenCalledWith(mockUserImx.idToken);
-          expect(getSignerMock).toHaveBeenCalledTimes(1);
-          expect(registerPassportStarkEx).toHaveBeenCalledWith({
-            ethSigner: ethSignerMock,
-            starkSigner: starkSignerMock,
-            usersApi: immutableXClient.usersApi,
-          }, mockUserImx.accessToken);
-          expect(authManagerMock.loginSilent).toHaveBeenCalledTimes(1);
-          expect(authManagerMock.loginSilent).toHaveBeenCalledWith({ forceRefresh: true });
-          expect(PassportImxProvider).toHaveBeenCalledWith({
-            user: mockUserImx,
-            starkSigner: starkSignerMock,
-            immutableXClient,
-            config,
-            confirmationScreen,
-            passportEventEmitter,
-          });
-        });
-      });
-    });
-
     describe('when the user has registered previously', () => {
       it('should return a PassportImxProvider instance', async () => {
         const magicProviderMock = {};
@@ -167,6 +102,38 @@ describe('PassportImxProviderFactory', () => {
         expect(PassportImxProvider).toHaveBeenCalledWith({
           user: mockUserImx,
           starkSigner: starkSignerMock,
+          ethSigner: ethSignerMock,
+          authManager: authManagerMock,
+          immutableXClient,
+          config,
+          confirmationScreen,
+          passportEventEmitter,
+        });
+      });
+    });
+
+    describe('when the user has not previously registered', () => {
+      it('should return a PassportImxProviderInstance with empty address fields', async () => {
+        const magicProviderMock = {};
+        const mockUserImxNoAddress = { ...mockUserImx, imx: {} };
+        const mockUserImxEmptyAddresses = { ...mockUserImx, imx: { ethAddress: '', starkAddress: '', userAdminAddress: '' } };
+        authManagerMock.login.mockResolvedValue(mockUserImxNoAddress);
+        magicAdapterMock.login.mockResolvedValue(magicProviderMock);
+        authManagerMock.loginSilent.mockResolvedValue(mockUserImxNoAddress);
+
+        const result = await passportImxProviderFactory.getProvider();
+
+        expect(result).toBe(passportImxProviderMock);
+        expect(authManagerMock.login).toHaveBeenCalledTimes(1);
+        expect(magicAdapterMock.login).toHaveBeenCalledWith(mockUserImx.idToken);
+        expect(getSignerMock).toHaveBeenCalledTimes(1);
+        expect(registerPassportStarkEx).not.toHaveBeenCalled();
+        expect(authManagerMock.loginSilent).not.toHaveBeenCalled();
+        expect(PassportImxProvider).toHaveBeenCalledWith({
+          user: mockUserImxEmptyAddresses,
+          starkSigner: starkSignerMock,
+          ethSigner: ethSignerMock,
+          authManager: authManagerMock,
           immutableXClient,
           config,
           confirmationScreen,
