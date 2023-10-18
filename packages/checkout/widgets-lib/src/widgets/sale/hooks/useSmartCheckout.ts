@@ -52,7 +52,7 @@ export const useSmartCheckout = ({
     undefined,
   );
 
-  const smartCheckout = useCallback(async (callback?: (r?: SmartCheckoutResult) => void) => {
+  const smartCheckout = useCallback(async () => {
     if (!checkout || !provider) {
       return undefined;
     }
