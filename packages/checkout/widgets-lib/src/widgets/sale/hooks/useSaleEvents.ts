@@ -20,7 +20,7 @@ const toStringifyTransactions = (transactions: ExecutedTransaction[]) => transac
   .join(' | ');
 
 export const useSaleEvent = () => {
-  const { track } = useAnalytics();
+  const { track, page } = useAnalytics();
   const { recipientAddress: userId, recipientEmail: email } = useSaleContext();
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
   const defaultView = SaleWidgetViews.PAYMENT_METHODS;
@@ -87,11 +87,37 @@ export const useSaleEvent = () => {
     sendSaleTransactionSuccessEvent(eventTarget, transactions);
   };
 
+  const sendSelectedPaymentMethod = (paymentType: string, screen: string) => {
+    track({
+      userJourney: UserJourney.CONNECT,
+      screen,
+      control: 'Select',
+      controlType: 'MenuItem',
+      userId,
+      email,
+      paymentType,
+    });
+  };
+
+  const sendPageView = (screen: string, data?: Record<string, unknown>) => {
+    page({
+      userJourney: UserJourney.SALE,
+      screen,
+      userId,
+      email,
+      action: 'Viewed',
+      ...data,
+    });
+  };
+
   return {
     track,
+    page,
+    sendPageView,
     sendCloseEvent,
     sendSuccessEvent,
     sendFailedEvent,
     sendTransactionSuccessEvent,
+    sendSelectedPaymentMethod,
   };
 };

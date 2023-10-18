@@ -22,7 +22,7 @@ export function PaymentMethods() {
   const text = { methods: textConfig.views[SaleWidgetViews.PAYMENT_METHODS] };
   const { viewDispatch } = useContext(ViewContext);
   const { paymentMethod, setPaymentMethod, sign } = useSaleContext();
-  const { sendCloseEvent } = useSaleEvent();
+  const { sendPageView, sendCloseEvent, sendSelectedPaymentMethod } = useSaleEvent();
 
   const handleOptionClick = (type: PaymentTypes) => setPaymentMethod(type);
 
@@ -52,10 +52,13 @@ export function PaymentMethods() {
 
   useEffect(() => {
     if (paymentMethod) {
+      sendSelectedPaymentMethod(paymentMethod, SaleWidgetViews.PAYMENT_METHODS);
       sign(paymentMethod);
       handleGoToPaymentView(paymentMethod);
     }
   }, [paymentMethod]);
+
+  useEffect(() => sendPageView(SaleWidgetViews.PAYMENT_METHODS), []);
 
   return (
     <SimpleLayout

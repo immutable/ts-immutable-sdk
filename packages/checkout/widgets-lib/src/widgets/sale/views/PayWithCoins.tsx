@@ -9,7 +9,8 @@ import { useSaleEvent } from '../hooks/useSaleEvents';
 export function PayWithCoins() {
   const processing = useRef(false);
   const text = textConfig.views[SaleWidgetViews.PAYMENT_METHODS];
-  const { sendTransactionSuccessEvent } = useSaleEvent();
+
+  const { sendPageView, sendTransactionSuccessEvent } = useSaleEvent();
   const {
     execute, signResponse, executeResponse, goToSuccessView,
   } = useSaleContext();
@@ -47,6 +48,8 @@ export function PayWithCoins() {
       goToSuccessView();
     }
   }, [executeResponse]);
+
+  useEffect(() => sendPageView(SaleWidgetViews.PAY_WITH_COINS), []);
 
   return <LoadingView loadingText={loadingText} showFooterLogo />;
 }
