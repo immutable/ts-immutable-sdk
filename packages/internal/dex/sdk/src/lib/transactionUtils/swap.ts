@@ -10,7 +10,7 @@ import { toCurrencyAmount } from 'lib/utils';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
 import { NativeTokenService } from 'lib/nativeTokenService';
 import {
-  Amount, ERC20, Native, SecondaryFee, TransactionDetails,
+  Amount, Coin, Native, SecondaryFee, TransactionDetails,
 } from '../../types';
 import { calculateGasFee } from './gas';
 import { slippageToFraction } from './slippage';
@@ -227,27 +227,47 @@ export function getSwap(
   };
 }
 
-export function prepareSwap(
+const adjustAmountIn = (
   ourQuote: QuoteResult,
-  amountSpecified: Amount<ERC20>,
+  amountSpecified: Amount<Coin>,
   fees: Fees,
-): QuoteResult {
+  nativeTokenService: NativeTokenService,
+) => {
   if (ourQuote.tradeType === TradeType.EXACT_OUTPUT) {
-    fees.addAmount(ourQuote.amountIn);
+    // when doing exact output, calculate the fees based on the amountIn
+    const amountToAdd = nativeTokenService.isNativeToken(fees.token)
+      ? nativeTokenService.unwrapAmount(ourQuote.amountIn)
+      : ourQuote.amountIn;
+    fees.addAmount(amountToAdd);
 
-    return {
-      gasEstimate: ourQuote.gasEstimate,
-      route: ourQuote.route,
-      amountIn: fees.amountWithFeesApplied(),
-      amountOut: amountSpecified,
-      tradeType: ourQuote.tradeType,
-    };
+    return nativeTokenService.maybeWrapAmount(fees.amountWithFeesApplied());
   }
+
+  return nativeTokenService.maybeWrapAmount(amountSpecified);
+};
+
+/**
+ * adjustQuoteWithFees adjusts the amountIn of the quote to account for fees
+ * EXACT_OUTPUT swaps will have the fees added to the amountIn if there are fees specified
+ * EXACT_INPUT swaps will have amountIn set to the user-specified amount
+ * @param ourQuote The quote from calling the Quoter contract
+ * @param amountSpecified The user-specified amount for the swap (EXACT...)
+ * @param fees The fees applied to the swap
+ * @param tokenWrapper Helper class for the native token and associated ERC20
+ * @returns {QuoteResult} The adjusted quote
+ */
+export function adjustQuoteWithFees(
+  ourQuote: QuoteResult,
+  amountSpecified: Amount<Coin>,
+  fees: Fees,
+  nativeTokenService: NativeTokenService,
+): QuoteResult {
+  const adjustedAmountIn = adjustAmountIn(ourQuote, amountSpecified, fees, nativeTokenService);
 
   return {
     gasEstimate: ourQuote.gasEstimate,
     route: ourQuote.route,
-    amountIn: amountSpecified,
+    amountIn: adjustedAmountIn,
     amountOut: ourQuote.amountOut,
     tradeType: ourQuote.tradeType,
   };

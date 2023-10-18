@@ -28,7 +28,7 @@ import {
   ERC20,
   ExchangeModuleConfiguration, Native, SecondaryFee, TransactionResponse,
 } from './types';
-import { getSwap, prepareSwap } from './lib/transactionUtils/swap';
+import { getSwap, adjustQuoteWithFees } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
 
 export class Exchange {
@@ -160,7 +160,7 @@ export class Exchange {
       fetchGasPrice(this.provider, this.nativeToken),
     ]);
 
-    const adjustedQuote = prepareSwap(ourQuote, amountSpecified, fees);
+    const adjustedQuote = adjustQuoteWithFees(ourQuote, amountSpecified, fees, this.nativeTokenService);
 
     const swap = getSwap(
       adjustedQuote,
@@ -174,7 +174,7 @@ export class Exchange {
       this.nativeTokenService,
     );
 
-    const userQuote = prepareUserQuote(otherToken, adjustedQuote, slippagePercent, fees);
+    const userQuote = prepareUserQuote(otherToken, adjustedQuote, slippagePercent, fees, this.nativeTokenService);
 
     const preparedApproval = prepareApproval(
       tradeType,
