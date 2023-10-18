@@ -29,7 +29,7 @@ describe('Quickswap Footer', () => {
       'quickswap-footer-disclaimer-text',
     ).should(
       'have.text',
-      text.footers.quickswapFooter,
+      text.footers.quickswapFooter.disclaimerText,
     );
   });
 });
