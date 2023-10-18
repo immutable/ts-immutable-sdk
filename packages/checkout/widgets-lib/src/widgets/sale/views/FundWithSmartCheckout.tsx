@@ -32,8 +32,7 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
   };
 
   useEffect(() => {
-    // ! maybe consider using a promise.resolve(undefined).
-    if (subView === FundWithSmartCheckoutSubViews.INIT && querySmartCheckout && !smartCheckoutLoading) {
+    if (subView === FundWithSmartCheckoutSubViews.INIT && !smartCheckoutLoading) {
       smartCheckoutLoading = true;
       querySmartCheckout().finally(() => {
         smartCheckoutLoading = false;
