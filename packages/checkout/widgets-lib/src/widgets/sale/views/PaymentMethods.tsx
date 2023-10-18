@@ -10,6 +10,7 @@ import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTy
 import {
   ViewContext,
   ViewActions,
+  SharedViews,
 } from '../../../context/view-context/ViewContext';
 
 import { PaymentOptions } from '../components/PaymentOptions';
@@ -26,8 +27,8 @@ export function PaymentMethods() {
 
   const handleOptionClick = (type: PaymentTypes) => setPaymentMethod(type);
 
-  const handleGoToPaymentView = useCallback((type: PaymentTypes) => {
-    if (type === PaymentTypes.CRYPTO) {
+  const handleGoToPaymentView = useCallback((type: PaymentTypes, signed = false) => {
+    if (type === PaymentTypes.CRYPTO && !signed) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -38,7 +39,19 @@ export function PaymentMethods() {
       });
     }
 
-    if (type === PaymentTypes.FIAT) {
+    if (type === PaymentTypes.FIAT && !signed) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SharedViews.LOADING_VIEW,
+            data: { loadingText: text.methods.loading.ready },
+          },
+        },
+      });
+    }
+
+    if (type === PaymentTypes.FIAT && signed) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -53,7 +66,7 @@ export function PaymentMethods() {
   useEffect(() => {
     if (paymentMethod) {
       sendSelectedPaymentMethod(paymentMethod, SaleWidgetViews.PAYMENT_METHODS);
-      sign(paymentMethod);
+      sign(paymentMethod, (response) => handleGoToPaymentView(paymentMethod, !!response));
       handleGoToPaymentView(paymentMethod);
     }
   }, [paymentMethod]);

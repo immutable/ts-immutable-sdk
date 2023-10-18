@@ -689,7 +689,10 @@ export function SwapForm({ data }: SwapFromProps) {
         transaction={quote}
         data={{
           fromAmount,
+          toAmount,
+          fromTokenSymbol: fromToken?.symbol,
           fromContractAddress: fromToken?.address,
+          toTokenSymbol: toToken?.symbol,
           toContractAddress: toToken?.address,
         }}
         insufficientFundsForGas={insufficientFundsForGas}

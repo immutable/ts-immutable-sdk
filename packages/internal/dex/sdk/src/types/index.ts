@@ -14,8 +14,9 @@ export type Chain = {
   chainId: number;
   rpcUrl: string;
   contracts: ExchangeContracts;
-  commonRoutingTokens: TokenInfo[];
-  nativeToken: TokenInfo;
+  commonRoutingTokens: ERC20[];
+  nativeToken: Native;
+  wrappedNativeToken: ERC20;
 };
 
 /**
@@ -39,7 +40,7 @@ export type SecondaryFee = {
 export type Fee = {
   recipient: string;
   basisPoints: number;
-  amount: Amount;
+  amount: Amount<ERC20>;
 };
 
 /**
@@ -47,8 +48,8 @@ export type Fee = {
  * @property {TokenInfo} token - The token information
  * @property {ethers.BigNumber} value - The amount
  */
-export type Amount = {
-  token: TokenInfo;
+export type Amount<T extends Coin> = {
+  token: T;
   value: ethers.BigNumber;
 };
 
@@ -59,8 +60,8 @@ export type Amount = {
  * @property {number} slippage - The slippage percentage used to calculate the quote
  */
 export type Quote = {
-  amount: Amount;
-  amountWithMaxSlippage: Amount;
+  amount: Amount<ERC20>;
+  amountWithMaxSlippage: Amount<ERC20>;
   slippage: number;
   fees: Fee[];
 };
@@ -72,7 +73,7 @@ export type Quote = {
  */
 export type TransactionDetails = {
   transaction: ethers.providers.TransactionRequest;
-  gasFeeEstimate: Amount | null;
+  gasFeeEstimate: Amount<ERC20> | null;
 };
 
 /**
@@ -88,14 +89,15 @@ export type TransactionResponse = {
 };
 
 /**
- * Interface representing a token
+ * Interface representing an ERC20 token
  * @property {number} chainId - The chain ID
  * @property {string} address - The token address
  * @property {number} decimals - The token decimals
  * @property {string | undefined} symbol - The token symbol or undefined if it is not available
  * @property {string | undefined} name - The token name or undefined if it is not available
  */
-export type TokenInfo = {
+export type ERC20 = {
+  type: 'erc20';
   chainId: number;
   address: string;
   decimals: number;
@@ -103,11 +105,29 @@ export type TokenInfo = {
   name?: string;
 };
 
+/**
+ * Interface representing a native token
+ * @property {number} chainId - The chain ID
+ * @property {number} decimals - The token decimals
+ * @property {string | undefined} symbol - The token symbol or undefined if it is not available
+ * @property {string | undefined} name - The token name or undefined if it is not available
+ */
+export type Native = {
+  type: 'native';
+  chainId: number;
+  decimals: number;
+  symbol?: string;
+  name?: string;
+};
+
+export type Coin = ERC20 | Native;
+
 export interface ExchangeOverrides {
   rpcURL: string;
   exchangeContracts: ExchangeContracts;
-  commonRoutingTokens: TokenInfo[];
-  nativeToken: TokenInfo;
+  commonRoutingTokens: ERC20[];
+  nativeToken: Native;
+  wrappedNativeToken: ERC20;
 }
 
 export interface ExchangeModuleConfiguration

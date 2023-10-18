@@ -42,7 +42,7 @@ type SaleContextProps = {
 type SaleContextValues = SaleContextProps & {
   sign: (
     paymentType: PaymentTypes,
-    callback?: () => void
+    callback?: (response: SignResponse | undefined) => void
   ) => Promise<SignResponse | undefined>;
   execute: (
     signResponse: SignResponse | undefined

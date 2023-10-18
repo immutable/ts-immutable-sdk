@@ -54,6 +54,7 @@ import {
   getAllowedBalances,
 } from '../../lib/balance';
 import { widgetTheme } from '../../lib/theme';
+import { UserJourney, useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 // import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
 // import { ServiceType } from '../../views/error/serviceTypes';
 
@@ -92,6 +93,8 @@ export function SwapWidget(props: SwapWidgetProps) {
   } = useContext(ConnectLoaderContext);
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
   const [swapState, swapDispatch] = useReducer(swapReducer, initialSwapState);
+
+  const { page } = useAnalytics();
 
   const [errorViewLoading, setErrorViewLoading] = useState(false);
 
@@ -227,6 +230,7 @@ export function SwapWidget(props: SwapWidgetProps) {
             )}
             {viewState.view.type === SwapWidgetViews.SWAP && (
               <SwapCoins
+                theme={theme}
                 fromAmount={viewState.view.data?.fromAmount ?? amount}
                 fromContractAddress={
                   viewState.view.data?.fromContractAddress
@@ -250,10 +254,16 @@ export function SwapWidget(props: SwapWidgetProps) {
               <StatusView
                 statusText={success.text}
                 actionText={success.actionText}
-                onRenderEvent={() => sendSwapSuccessEvent(
-                  eventTarget,
-                  (viewState.view as SwapSuccessView).data.transactionHash,
-                )}
+                onRenderEvent={() => {
+                  page({
+                    userJourney: UserJourney.SWAP,
+                    screen: 'SwapSuccess',
+                  });
+                  sendSwapSuccessEvent(
+                    eventTarget,
+                    (viewState.view as SwapSuccessView).data.transactionHash,
+                  );
+                }}
                 onActionClick={() => sendSwapWidgetCloseEvent(eventTarget)}
                 statusType={StatusType.SUCCESS}
                 testId="success-view"
@@ -263,7 +273,13 @@ export function SwapWidget(props: SwapWidgetProps) {
               <StatusView
                 statusText={failed.text}
                 actionText={failed.actionText}
-                onRenderEvent={() => sendSwapFailedEvent(eventTarget, 'Transaction failed')}
+                onRenderEvent={() => {
+                  page({
+                    userJourney: UserJourney.SWAP,
+                    screen: 'SwapFailed',
+                  });
+                  sendSwapFailedEvent(eventTarget, 'Transaction failed');
+                }}
                 onActionClick={() => {
                   if (viewState.view.type === SwapWidgetViews.FAIL) {
                     viewDispatch({
@@ -286,7 +302,13 @@ export function SwapWidget(props: SwapWidgetProps) {
               <StatusView
                 statusText={rejected.text}
                 actionText={rejected.actionText}
-                onRenderEvent={() => sendSwapRejectedEvent(eventTarget, 'Price surge')}
+                onRenderEvent={() => {
+                  page({
+                    userJourney: UserJourney.SWAP,
+                    screen: 'PriceSurge',
+                  });
+                  sendSwapRejectedEvent(eventTarget, 'Price surge');
+                }}
                 onActionClick={() => {
                   if (viewState.view.type === SwapWidgetViews.PRICE_SURGE) {
                     viewDispatch({
