@@ -2,17 +2,17 @@ import { ERC20 } from 'types';
 import { ERC20Pair } from './generateERC20Pairs';
 import { generatePossiblePoolsFromERC20Pair } from './generatePossiblePoolsFromERC20Pairs';
 import {
-  IMX_TEST_TOKEN,
   TEST_V3_CORE_FACTORY_ADDRESS,
   USDC_TEST_TOKEN,
   WETH_TEST_TOKEN,
   uniqBy,
+  WIMX_TEST_TOKEN,
 } from '../../test/utils';
 
 describe('generatePoolsFromTokenPairs', () => {
   describe('when given one TokenPair and one CommonRoutingTokens', () => {
     it('should return one combination', () => {
-      const erc20Pair: ERC20Pair = [IMX_TEST_TOKEN, USDC_TEST_TOKEN];
+      const erc20Pair: ERC20Pair = [WIMX_TEST_TOKEN, USDC_TEST_TOKEN];
       const commonRoutingERC20s: ERC20[] = [];
 
       const pools = generatePossiblePoolsFromERC20Pair(
@@ -28,8 +28,8 @@ describe('generatePoolsFromTokenPairs', () => {
                 "address": "0x72958b06abdF2701AcE6ceb3cE0B8B1CE11E0851",
                 "chainId": 999,
                 "decimals": 18,
-                "name": "Immutable X",
-                "symbol": "IMX",
+                "name": "Wrapped Immutable X",
+                "symbol": "WIMX",
                 "type": "erc20",
               },
               {
@@ -50,8 +50,8 @@ describe('generatePoolsFromTokenPairs', () => {
                 "address": "0x72958b06abdF2701AcE6ceb3cE0B8B1CE11E0851",
                 "chainId": 999,
                 "decimals": 18,
-                "name": "Immutable X",
-                "symbol": "IMX",
+                "name": "Wrapped Immutable X",
+                "symbol": "WIMX",
                 "type": "erc20",
               },
               {
@@ -72,8 +72,8 @@ describe('generatePoolsFromTokenPairs', () => {
                 "address": "0x72958b06abdF2701AcE6ceb3cE0B8B1CE11E0851",
                 "chainId": 999,
                 "decimals": 18,
-                "name": "Immutable X",
-                "symbol": "IMX",
+                "name": "Wrapped Immutable X",
+                "symbol": "WIMX",
                 "type": "erc20",
               },
               {
@@ -94,8 +94,8 @@ describe('generatePoolsFromTokenPairs', () => {
                 "address": "0x72958b06abdF2701AcE6ceb3cE0B8B1CE11E0851",
                 "chainId": 999,
                 "decimals": 18,
-                "name": "Immutable X",
-                "symbol": "IMX",
+                "name": "Wrapped Immutable X",
+                "symbol": "WIMX",
                 "type": "erc20",
               },
               {
@@ -117,7 +117,7 @@ describe('generatePoolsFromTokenPairs', () => {
 
   describe('when given one TokenPair and four fees', () => {
     it('should return twelve unique combinations', () => {
-      const erc20Pair: ERC20Pair = [IMX_TEST_TOKEN, USDC_TEST_TOKEN];
+      const erc20Pair: ERC20Pair = [WIMX_TEST_TOKEN, USDC_TEST_TOKEN];
       const commonRoutingERC20s: ERC20[] = [WETH_TEST_TOKEN];
 
       const pools = generatePossiblePoolsFromERC20Pair(

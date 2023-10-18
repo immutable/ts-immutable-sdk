@@ -4,10 +4,9 @@ import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
 import { ApproveError, AlreadyApprovedError } from 'errors';
 import { ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
-import { RoutingContracts } from 'lib/router';
-import { newAmount } from 'lib/utils';
+import { isERC20Amount, newAmount } from 'lib/utils';
 import {
-  Amount, ERC20, SecondaryFee, TransactionDetails,
+  Amount, Coin, ERC20, Native, SecondaryFee, TransactionDetails,
 } from '../../types';
 import { calculateGasFee } from './gas';
 
@@ -84,18 +83,22 @@ const getUnsignedERC20ApproveTransaction = (
 
 export const prepareApproval = (
   tradeType: TradeType,
-  amountSpecified: Amount<ERC20>,
-  amountWithSlippage: Amount<ERC20>,
-  routingContracts: RoutingContracts,
+  amountSpecified: Amount<Coin>, // EXACT_IN => TOKEN_IN, EXACT_OUT => TOKEN_OUT
+  quotedAmountWithSlippage: Amount<Coin>, // EXACT_IN => TOKEN_OUT, EXACT_OUT => TOKEN_IN
+  contracts: {
+    routerAddress: string;
+    secondaryFeeAddress: string;
+  },
   secondaryFees: SecondaryFee[],
-): PreparedApproval => {
-  const amountOfTokenIn = tradeType === TradeType.EXACT_INPUT ? amountSpecified : amountWithSlippage;
+): PreparedApproval | null => {
+  const amountInToApprove = tradeType === TradeType.EXACT_INPUT ? amountSpecified : quotedAmountWithSlippage;
+  if (!isERC20Amount(amountInToApprove)) {
+    return null;
+  }
 
-  const spender = secondaryFees.length === 0
-    ? routingContracts.peripheryRouterAddress
-    : routingContracts.secondaryFeeAddress;
+  const spender = secondaryFees.length === 0 ? contracts.routerAddress : contracts.secondaryFeeAddress;
 
-  return { spender, amount: amountOfTokenIn };
+  return { spender, amount: amountInToApprove };
 };
 
 /**
@@ -116,12 +119,7 @@ export const getApproveTransaction = async (
 ): Promise<TransactionRequest | null> => {
   let amountToApprove: Amount<ERC20>;
   try {
-    amountToApprove = await getERC20AmountToApprove(
-      provider,
-      ownerAddress,
-      tokenAmount,
-      spenderAddress,
-    );
+    amountToApprove = await getERC20AmountToApprove(provider, ownerAddress, tokenAmount, spenderAddress);
   } catch (e) {
     if (e instanceof AlreadyApprovedError) {
       // already approved for the required amount, nothing to do
@@ -131,11 +129,7 @@ export const getApproveTransaction = async (
     throw e;
   }
 
-  return getUnsignedERC20ApproveTransaction(
-    ownerAddress,
-    amountToApprove,
-    spenderAddress,
-  );
+  return getUnsignedERC20ApproveTransaction(ownerAddress, amountToApprove, spenderAddress);
 };
 
 export async function getApproveGasEstimate(
@@ -154,7 +148,7 @@ export const getApproval = async (
   provider: JsonRpcProvider,
   ownerAddress: string,
   preparedApproval: PreparedApproval,
-  gasPrice: Amount<ERC20> | null,
+  gasPrice: Amount<Native> | null,
 ): Promise<TransactionDetails | null> => {
   const approveTransaction = await getApproveTransaction(
     provider,

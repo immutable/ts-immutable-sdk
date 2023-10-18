@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { Route, SwapQuoter } from '@uniswap/v3-sdk';
 import { TradeType, Token } from '@uniswap/sdk-core';
 import { BigNumber, ethers } from 'ethers';

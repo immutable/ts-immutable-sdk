@@ -1,37 +1,38 @@
+/* eslint-disable @typescript-eslint/lines-between-class-members */
 import { BASIS_POINT_PRECISION } from 'constants/router';
 import { BigNumber } from 'ethers';
 import {
   Amount,
-  Fee, SecondaryFee, newAmount, ERC20, subtractERC20Amount, addERC20Amount,
+  Fee, SecondaryFee, newAmount, Coin, subtractAmount, addAmount,
 } from 'lib';
 
 export class Fees {
-  private secondaryFees: SecondaryFee[];
+  private amount: Amount<Coin>;
 
-  private amount: Amount<ERC20>;
-
-  constructor(secondaryFees: SecondaryFee[], token: ERC20) {
+  constructor(private secondaryFees: SecondaryFee[], token: Coin) {
     this.secondaryFees = secondaryFees;
     this.amount = newAmount(BigNumber.from(0), token);
   }
 
-  addAmount(amount: Amount<ERC20>): void {
-    this.amount = addERC20Amount(this.amount, amount);
+  get token(): Coin {
+    return this.amount.token;
   }
 
-  amountWithFeesApplied(): Amount<ERC20> {
-    return addERC20Amount(this.amount, this.total());
+  addAmount(amount: Amount<Coin>): void {
+    this.amount = addAmount(this.amount, amount);
   }
 
-  amountLessFees(): Amount<ERC20> {
-    return subtractERC20Amount(this.amount, this.total());
+  amountWithFeesApplied(): Amount<Coin> {
+    return addAmount(this.amount, this.total());
+  }
+
+  amountLessFees(): Amount<Coin> {
+    return subtractAmount(this.amount, this.total());
   }
 
   withAmounts(): Fee[] {
     return this.secondaryFees.map((fee) => {
-      const feeAmount = this.amount.value
-        .mul(fee.basisPoints)
-        .div(BASIS_POINT_PRECISION);
+      const feeAmount = this.amount.value.mul(fee.basisPoints).div(BASIS_POINT_PRECISION);
 
       return {
         ...fee,
@@ -40,14 +41,12 @@ export class Fees {
     });
   }
 
-  private total(): Amount<ERC20> {
+  private total(): Amount<Coin> {
     let totalFees = newAmount(BigNumber.from(0), this.amount.token);
 
     for (const fee of this.secondaryFees) {
-      const feeAmount = this.amount.value
-        .mul(fee.basisPoints)
-        .div(BASIS_POINT_PRECISION);
-      totalFees = addERC20Amount(totalFees, newAmount(feeAmount, this.amount.token));
+      const feeAmount = this.amount.value.mul(fee.basisPoints).div(BASIS_POINT_PRECISION);
+      totalFees = addAmount(totalFees, newAmount(feeAmount, this.amount.token));
     }
 
     return totalFees;

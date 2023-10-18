@@ -2,10 +2,10 @@ import { ERC20 } from 'types';
 import { generateERC20Pairs, ERC20Pair } from './generateERC20Pairs';
 import {
   FUN_TEST_TOKEN,
-  IMX_TEST_TOKEN,
   USDC_TEST_TOKEN,
   WETH_TEST_TOKEN,
   uniqBy,
+  WIMX_TEST_TOKEN,
 } from '../../test/utils';
 import { ensureCorrectERC20AddressOrder } from './computePoolAddress';
 
@@ -17,7 +17,7 @@ import { ensureCorrectERC20AddressOrder } from './computePoolAddress';
 describe('generateERC20Pairs', () => {
   describe('when no CommonRoutingTokens exist', () => {
     it('should only return the TokenIn/TokenOut pair', async () => {
-      const tokenPair: ERC20Pair = [IMX_TEST_TOKEN, USDC_TEST_TOKEN];
+      const tokenPair: ERC20Pair = [WIMX_TEST_TOKEN, USDC_TEST_TOKEN];
       const commonRoutingTokens: ERC20[] = [];
 
       const tokenPairs = generateERC20Pairs(tokenPair, commonRoutingTokens);
@@ -29,8 +29,8 @@ describe('generateERC20Pairs', () => {
               "address": "0x72958b06abdF2701AcE6ceb3cE0B8B1CE11E0851",
               "chainId": 999,
               "decimals": 18,
-              "name": "Immutable X",
-              "symbol": "IMX",
+              "name": "Wrapped Immutable X",
+              "symbol": "WIMX",
               "type": "erc20",
             },
             {
@@ -51,7 +51,7 @@ describe('generateERC20Pairs', () => {
     it('should create three pairs', async () => {
       // We expect...
       // TI TO [TX] = [TI / TO, TI / TX, TO / TX]
-      const tokenPair: ERC20Pair = [IMX_TEST_TOKEN, USDC_TEST_TOKEN];
+      const tokenPair: ERC20Pair = [WIMX_TEST_TOKEN, USDC_TEST_TOKEN];
       const commonRoutingTokens: ERC20[] = [WETH_TEST_TOKEN];
 
       const tokenPairs = generateERC20Pairs(tokenPair, commonRoutingTokens);
@@ -63,8 +63,8 @@ describe('generateERC20Pairs', () => {
               "address": "0x72958b06abdF2701AcE6ceb3cE0B8B1CE11E0851",
               "chainId": 999,
               "decimals": 18,
-              "name": "Immutable X",
-              "symbol": "IMX",
+              "name": "Wrapped Immutable X",
+              "symbol": "WIMX",
               "type": "erc20",
             },
             {
@@ -81,8 +81,8 @@ describe('generateERC20Pairs', () => {
               "address": "0x72958b06abdF2701AcE6ceb3cE0B8B1CE11E0851",
               "chainId": 999,
               "decimals": 18,
-              "name": "Immutable X",
-              "symbol": "IMX",
+              "name": "Wrapped Immutable X",
+              "symbol": "WIMX",
               "type": "erc20",
             },
             {
@@ -121,7 +121,7 @@ describe('generateERC20Pairs', () => {
     it('should create one pair', () => {
       // We expect...
       // TI TO [TI] = [TI / TO]
-      const tokenPair: ERC20Pair = [IMX_TEST_TOKEN, USDC_TEST_TOKEN];
+      const tokenPair: ERC20Pair = [WIMX_TEST_TOKEN, USDC_TEST_TOKEN];
 
       // Create a copy of the Token object so that we do not have the same
       // instance of the object in the tokenPair and commonRoutingTokens
@@ -137,8 +137,8 @@ describe('generateERC20Pairs', () => {
               "address": "0x72958b06abdF2701AcE6ceb3cE0B8B1CE11E0851",
               "chainId": 999,
               "decimals": 18,
-              "name": "Immutable X",
-              "symbol": "IMX",
+              "name": "Wrapped Immutable X",
+              "symbol": "WIMX",
               "type": "erc20",
             },
             {
@@ -160,7 +160,7 @@ describe('generateERC20Pairs', () => {
     it('should create six pairs', () => {
       // We expect...
       // TI TO [TX, TZ] = [TI / TO, TI / TX, TI / TZ, TO / TX, TO / TZ, TX / TZ]
-      const tokenPair: ERC20Pair = [IMX_TEST_TOKEN, USDC_TEST_TOKEN];
+      const tokenPair: ERC20Pair = [WIMX_TEST_TOKEN, USDC_TEST_TOKEN];
       const commonRoutingTokens: ERC20[] = [WETH_TEST_TOKEN, FUN_TEST_TOKEN];
 
       const tokenPairs = generateERC20Pairs(tokenPair, commonRoutingTokens);
@@ -170,7 +170,7 @@ describe('generateERC20Pairs', () => {
     it('should not repeat pairs', async () => {
       // We expect...
       // TI TO [TX, TZ] = [TI / TO, TI / TX, TI / TZ, TO / TX, TO / TZ, TX / TZ]
-      const tokenPair: ERC20Pair = [IMX_TEST_TOKEN, USDC_TEST_TOKEN];
+      const tokenPair: ERC20Pair = [WIMX_TEST_TOKEN, USDC_TEST_TOKEN];
       const commonRoutingTokens: ERC20[] = [WETH_TEST_TOKEN, FUN_TEST_TOKEN];
 
       const tokenPairs = generateERC20Pairs(tokenPair, commonRoutingTokens);

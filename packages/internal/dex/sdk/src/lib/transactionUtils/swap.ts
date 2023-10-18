@@ -1,6 +1,5 @@
-import {
-  Trade, toHex, encodeRouteToPath, Route,
-} from '@uniswap/v3-sdk';
+/* eslint-disable max-len */
+import { Trade, encodeRouteToPath, Route, toHex } from '@uniswap/v3-sdk';
 import { SwapRouter } from '@uniswap/router-sdk';
 import { Token, Percent, TradeType } from '@uniswap/sdk-core';
 import { SecondaryFee__factory } from 'contracts/types';
@@ -8,9 +7,8 @@ import { ISecondaryFee, SecondaryFeeInterface } from 'contracts/types/SecondaryF
 import { Fees } from 'lib/fees';
 import { toCurrencyAmount } from 'lib/utils';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
-import {
-  Amount, ERC20, SecondaryFee, TransactionDetails,
-} from '../../types';
+import { TokenWrapper } from 'lib/tokenWrapper';
+import { Native, SecondaryFee, Amount, TransactionDetails, Coin } from '../../types';
 import { calculateGasFee } from './gas';
 import { slippageToFraction } from './slippage';
 
@@ -38,26 +36,32 @@ function buildSwapParametersForSinglePoolSwap(
   }));
 
   if (trade.tradeType === TradeType.EXACT_INPUT) {
-    return secondaryFeeContract.encodeFunctionData('exactInputSingleWithSecondaryFee', [secondaryFeeValues, {
+    return secondaryFeeContract.encodeFunctionData('exactInputSingleWithSecondaryFee', [
+      secondaryFeeValues,
+      {
+        tokenIn: route.tokenPath[0].address,
+        tokenOut: route.tokenPath[1].address,
+        fee: route.pools[0].fee,
+        recipient: fromAddress,
+        amountIn,
+        amountOutMinimum: amountOut,
+        sqrtPriceLimitX96: 0,
+      },
+    ]);
+  }
+
+  return secondaryFeeContract.encodeFunctionData('exactOutputSingleWithSecondaryFee', [
+    secondaryFeeValues,
+    {
       tokenIn: route.tokenPath[0].address,
       tokenOut: route.tokenPath[1].address,
       fee: route.pools[0].fee,
       recipient: fromAddress,
-      amountIn,
-      amountOutMinimum: amountOut,
+      amountInMaximum: amountIn,
+      amountOut,
       sqrtPriceLimitX96: 0,
-    }]);
-  }
-
-  return secondaryFeeContract.encodeFunctionData('exactOutputSingleWithSecondaryFee', [secondaryFeeValues, {
-    tokenIn: route.tokenPath[0].address,
-    tokenOut: route.tokenPath[1].address,
-    fee: route.pools[0].fee,
-    recipient: fromAddress,
-    amountInMaximum: amountIn,
-    amountOut,
-    sqrtPriceLimitX96: 0,
-  }]);
+    },
+  ]);
 }
 
 function buildSwapParametersForMultiPoolSwap(
@@ -77,20 +81,26 @@ function buildSwapParametersForMultiPoolSwap(
   }));
 
   if (trade.tradeType === TradeType.EXACT_INPUT) {
-    return secondaryFeeContract.encodeFunctionData('exactInputWithSecondaryFee', [secondaryFeeValues, {
-      path,
-      recipient: fromAddress,
-      amountIn,
-      amountOutMinimum: amountOut,
-    }]);
+    return secondaryFeeContract.encodeFunctionData('exactInputWithSecondaryFee', [
+      secondaryFeeValues,
+      {
+        path,
+        recipient: fromAddress,
+        amountIn,
+        amountOutMinimum: amountOut,
+      },
+    ]);
   }
 
-  return secondaryFeeContract.encodeFunctionData('exactOutputWithSecondaryFee', [secondaryFeeValues, {
-    path,
-    recipient: fromAddress,
-    amountInMaximum: amountIn,
-    amountOut,
-  }]);
+  return secondaryFeeContract.encodeFunctionData('exactOutputWithSecondaryFee', [
+    secondaryFeeValues,
+    {
+      path,
+      recipient: fromAddress,
+      amountInMaximum: amountIn,
+      amountOut,
+    },
+  ]);
 }
 
 /**
@@ -155,10 +165,10 @@ function createSwapCallParametersWithFees(
     secondaryFeeContract,
   );
 
-  return secondaryFeeContract.encodeFunctionData(
-    multicallWithDeadlineFunctionSignature,
-    [swapOptions.deadlineOrPreviousBlockhash, [swapWithFeesCalldata]],
-  );
+  return secondaryFeeContract.encodeFunctionData(multicallWithDeadlineFunctionSignature, [
+    swapOptions.deadlineOrPreviousBlockhash,
+    [swapWithFeesCalldata],
+  ]);
 }
 
 function createSwapParameters(
@@ -184,6 +194,8 @@ function createSwapParameters(
     deadlineOrPreviousBlockhash: deadline,
   };
 
+  // TODO: Calculate amountIn and amountOut based on slippage tolerance and return it.
+
   if (secondaryFees.length === 0) {
     // Generate swap parameters without secondary fee contract details
     return SwapRouter.swapCallParameters([uncheckedTrade], options).calldata;
@@ -199,19 +211,15 @@ export function getSwap(
   deadline: number,
   peripheryRouterAddress: string,
   secondaryFeesAddress: string,
-  gasPrice: Amount<ERC20> | null,
+  gasPrice: Amount<Native> | null,
   secondaryFees: SecondaryFee[],
 ): TransactionDetails {
-  const calldata = createSwapParameters(
-    adjustedQuote,
-    fromAddress,
-    slippage,
-    deadline,
-    secondaryFees,
-  );
+  const calldata = createSwapParameters(adjustedQuote, fromAddress, slippage, deadline, secondaryFees);
 
   // TODO: Add additional gas fee estimates for secondary fees
   const gasFeeEstimate = gasPrice ? calculateGasFee(gasPrice, adjustedQuote.gasEstimate) : null;
+
+  // TODO: Mirror the amountIn as the value for native swaps... taking into account slippage...
 
   return {
     transaction: {
@@ -224,27 +232,47 @@ export function getSwap(
   };
 }
 
-export function prepareSwap(
+const adjustAmountIn = (
   ourQuote: QuoteResult,
-  amountSpecified: Amount<ERC20>,
+  amountSpecified: Amount<Coin>,
   fees: Fees,
-): QuoteResult {
+  tokenWrapper: TokenWrapper,
+) => {
   if (ourQuote.tradeType === TradeType.EXACT_OUTPUT) {
-    fees.addAmount(ourQuote.amountIn);
+    // when doing exact output, calculate the fees based on the amountIn
+    const amountToAdd = tokenWrapper.isNativeToken(fees.token)
+      ? tokenWrapper.unwrapAmount(ourQuote.amountIn)
+      : ourQuote.amountIn;
+    fees.addAmount(amountToAdd);
 
-    return {
-      gasEstimate: ourQuote.gasEstimate,
-      route: ourQuote.route,
-      amountIn: fees.amountWithFeesApplied(),
-      amountOut: amountSpecified,
-      tradeType: ourQuote.tradeType,
-    };
+    return tokenWrapper.maybeWrapAmount(fees.amountWithFeesApplied());
   }
+
+  return tokenWrapper.maybeWrapAmount(amountSpecified);
+};
+
+/**
+ * adjustQuoteWithFees adjusts the amountIn of the quote to account for fees
+ * EXACT_OUTPUT swaps will have the fees added to the amountIn if there are fees specified
+ * EXACT_INPUT swaps will have amountIn set to the user-specified amount
+ * @param ourQuote The quote from calling the Quoter contract
+ * @param amountSpecified The user-specified amount for the swap (EXACT...)
+ * @param fees The fees applied to the swap
+ * @param tokenWrapper Helper class for the native token and associated ERC20
+ * @returns {QuoteResult} The adjusted quote
+ */
+export function adjustQuoteWithFees(
+  ourQuote: QuoteResult,
+  amountSpecified: Amount<Coin>,
+  fees: Fees,
+  tokenWrapper: TokenWrapper,
+): QuoteResult {
+  const adjustedAmountIn = adjustAmountIn(ourQuote, amountSpecified, fees, tokenWrapper);
 
   return {
     gasEstimate: ourQuote.gasEstimate,
     route: ourQuote.route,
-    amountIn: amountSpecified,
+    amountIn: adjustedAmountIn,
     amountOut: ourQuote.amountOut,
     tradeType: ourQuote.tradeType,
   };

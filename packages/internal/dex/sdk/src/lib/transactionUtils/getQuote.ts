@@ -1,9 +1,12 @@
+/* eslint-disable max-len */
 import { TradeType } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
 import { Fees } from 'lib/fees';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
+import { TokenWrapper } from 'lib/tokenWrapper';
+import { newAmount } from 'lib/utils';
 import {
-  Amount, ERC20, Quote,
+  Coin, ERC20, Quote, Amount,
 } from '../../types';
 import { slippageToFraction } from './slippage';
 
@@ -28,36 +31,36 @@ export function applySlippage(
 }
 
 export function prepareUserQuote(
-  otherToken: ERC20,
+  tokenOfQuotedAmount: Coin,
   tradeInfo: QuoteResult,
   slippage: number,
   fees: Fees,
+  tokenWrapper: TokenWrapper,
 ): Quote {
-  const quote = getQuoteAmountFromTradeType(tradeInfo);
-  const amountWithSlippage = applySlippage(tradeInfo.tradeType, quote.value, slippage);
+  const erc20QuoteAmount = getQuoteAmountFromTradeType(tradeInfo);
+  const amountWithMaxSlippage = applySlippage(tradeInfo.tradeType, erc20QuoteAmount.value, slippage);
+  const amount = tokenWrapper.isNativeToken(tokenOfQuotedAmount) ? tokenWrapper.unwrapAmount(erc20QuoteAmount) : erc20QuoteAmount;
 
   return {
-    amount: quote,
-    amountWithMaxSlippage: {
-      token: otherToken,
-      value: amountWithSlippage,
-    },
+    amount,
+    amountWithMaxSlippage: newAmount(amountWithMaxSlippage, tokenOfQuotedAmount),
     slippage,
     fees: fees.withAmounts(),
   };
 }
 
 export function getOurQuoteReqAmount(
-  amount: Amount<ERC20>,
+  amountSpecified: Amount<Coin>, // the amount specified by the user, either exactIn or exactOut
   fees: Fees,
   tradeType: TradeType,
+  tokenWrapper: TokenWrapper,
 ): Amount<ERC20> {
   if (tradeType === TradeType.EXACT_OUTPUT) {
     // For an exact output swap, we do not need to subtract fees from the given amount
-    return amount;
+    return tokenWrapper.maybeWrapAmount(amountSpecified);
   }
 
-  fees.addAmount(amount);
+  fees.addAmount(amountSpecified);
 
-  return fees.amountLessFees();
+  return tokenWrapper.maybeWrapAmount(fees.amountLessFees());
 }

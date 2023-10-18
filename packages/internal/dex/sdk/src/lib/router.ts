@@ -13,10 +13,9 @@ export type RoutingContracts = {
   multicallAddress: string;
   factoryAddress: string;
   quoterAddress: string;
-  peripheryRouterAddress: string;
-  secondaryFeeAddress: string;
 };
 
+// TODO: DumbQuoter... should implement IQuoter
 export class Router {
   public provider: ethers.providers.JsonRpcProvider;
 

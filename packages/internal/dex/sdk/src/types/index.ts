@@ -7,15 +7,17 @@ import { ExchangeContracts } from 'config';
  * @property {number} chainId - The chain ID
  * @property {string} rpcUrl - The RPC URL for the chain
  * @property {ExchangeContracts} contracts - The DEX contract addresses
- * @property {Token[]} commonRoutingTokens - The tokens used to find available pools for a swap
- * @property {TokenInfo} nativeToken - The native token of the chain
+ * @property {ERC20[]} commonRoutingTokens - The tokens used to find available pools for a swap
+ * @property {Native} nativeToken - The native token of the chain
+ * @property {ERC20} wrappedNativeToken - The wrapped native token details of the chain
  */
 export type Chain = {
   chainId: number;
   rpcUrl: string;
   contracts: ExchangeContracts;
   commonRoutingTokens: ERC20[];
-  nativeToken: ERC20;
+  nativeToken: Native;
+  wrappedNativeToken: ERC20;
 };
 
 /**
@@ -42,11 +44,6 @@ export type Fee = {
   amount: Amount<Coin>;
 };
 
-/**
- * Interface representing an amount with the token information
- * @property {TokenInfo} token - The token information
- * @property {ethers.BigNumber} value - The amount
- */
 export type Amount<T extends Coin> = {
   token: T;
   value: ethers.BigNumber;
@@ -59,8 +56,8 @@ export type Amount<T extends Coin> = {
  * @property {number} slippage - The slippage percentage used to calculate the quote
  */
 export type Quote = {
-  amount: Amount<ERC20>;
-  amountWithMaxSlippage: Amount<ERC20>;
+  amount: Amount<Coin>;
+  amountWithMaxSlippage: Amount<Coin>;
   slippage: number;
   fees: Fee[];
 };
@@ -72,7 +69,7 @@ export type Quote = {
  */
 export type TransactionDetails = {
   transaction: ethers.providers.TransactionRequest;
-  gasFeeEstimate: Amount<ERC20> | null;
+  gasFeeEstimate: Amount<Native> | null;
 };
 
 /**
@@ -95,7 +92,7 @@ export type TransactionResponse = {
  * @property {string | undefined} symbol - The token symbol or undefined if it is not available
  * @property {string | undefined} name - The token name or undefined if it is not available
  */
-export type ERC20 = {
+export type ERC20 = { // TODO: Instead make it Native & { address: string } maybe?
   type: 'erc20';
   chainId: number;
   address: string;
@@ -125,7 +122,8 @@ export interface ExchangeOverrides {
   rpcURL: string;
   exchangeContracts: ExchangeContracts;
   commonRoutingTokens: ERC20[];
-  nativeToken: ERC20;
+  nativeToken: Native;
+  wrappedNativeToken: ERC20;
 }
 
 export interface ExchangeModuleConfiguration

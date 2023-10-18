@@ -2,7 +2,7 @@ import { JsonRpcProvider } from '@ethersproject/providers';
 import { Contract } from '@ethersproject/contracts';
 import { BigNumber } from '@ethersproject/bignumber';
 import { SecondaryFee } from 'lib';
-import { ethers } from 'ethers';
+import { ethers, utils } from 'ethers';
 import { ERC20__factory } from 'contracts/types';
 import { Exchange } from './exchange';
 import {
@@ -27,6 +27,11 @@ import {
   expectInstanceOf,
   WETH_TEST_TOKEN,
   formatTokenAmount,
+  expectERC20,
+  createPool,
+  WIMX_TEST_TOKEN,
+  FUN_TEST_TOKEN,
+  expectNative,
 } from './test/utils';
 
 jest.mock('@ethersproject/providers');
@@ -37,7 +42,7 @@ jest.mock('./lib/utils', () => ({
   __esmodule: true,
   ...jest.requireActual('./lib/utils'),
   // eslint-disable-next-line arrow-body-style
-  getERC20Decimals: async (address: string) => {
+  getTokenDecimals: async (address: string) => {
     return address === USDC_TEST_TOKEN.address ? USDC_TEST_TOKEN.decimals : 18;
   },
 }));
@@ -53,22 +58,18 @@ const APPROVE_GAS_ESTIMATE = BigNumber.from('100000');
  */
 describe('getUnsignedSwapTxFromAmountOut', () => {
   beforeAll(() => {
-    (Contract as unknown as jest.Mock).mockImplementation(
-      () => ({
-        allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT),
-        estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
-        paused: jest.fn().mockResolvedValue(false),
-      }),
-    );
+    (Contract as unknown as jest.Mock).mockImplementation(() => ({
+      allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT),
+      estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
+      paused: jest.fn().mockResolvedValue(false),
+    }));
 
-    (JsonRpcProvider as unknown as jest.Mock).mockImplementation(
-      () => ({
-        getFeeData: async () => ({
-          maxFeePerGas: null,
-          gasPrice: TEST_GAS_PRICE,
-        }),
+    (JsonRpcProvider as unknown as jest.Mock).mockImplementation(() => ({
+      getFeeData: async () => ({
+        maxFeePerGas: null,
+        gasPrice: TEST_GAS_PRICE,
       }),
-    ) as unknown as JsonRpcProvider;
+    })) as unknown as JsonRpcProvider;
   });
 
   describe('Swap with single pool with fees', () => {
@@ -130,8 +131,8 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
 
       const { approval, quote } = await exchange.getUnsignedSwapTxFromAmountOut(
         params.fromAddress,
-        params.inputToken,
-        params.outputToken,
+        params.inputToken, // USDC
+        params.outputToken, // WETH
         newAmountFromString('1000', WETH_TEST_TOKEN).value,
         3, // 3% Slippage
       );
@@ -257,12 +258,13 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         newAmountFromString('1000', WETH_TEST_TOKEN).value,
       );
 
+      expectERC20(quote.amount.token);
       expect(quote.amount.token.address).toEqual(params.inputToken);
       expect(quote.slippage).toBe(0.1);
       expect(formatAmount(quote.amount)).toEqual('100.0');
-      expect(quote.amountWithMaxSlippage.token.address).toEqual(
-        params.inputToken,
-      );
+
+      expectERC20(quote.amountWithMaxSlippage.token);
+      expect(quote.amountWithMaxSlippage.token.address).toEqual(params.inputToken);
       expect(formatAmount(quote.amountWithMaxSlippage)).toEqual(
         '100.1', // (includes slippage)
       );
@@ -297,9 +299,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       const params = setupSwapTxTest({ multiPoolSwap: true });
       mockRouterImplementation(params);
 
-      const secondaryFees: SecondaryFee[] = [
-        { recipient: TEST_FEE_RECIPIENT, basisPoints: TEST_MAX_FEE_BASIS_POINTS },
-      ];
+      const secondaryFees: SecondaryFee[] = [{ recipient: TEST_FEE_RECIPIENT, basisPoints: TEST_MAX_FEE_BASIS_POINTS }];
 
       const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
 
@@ -336,6 +336,48 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       expect(swapParams.recipient).toBe(params.fromAddress); // recipient of swap
       expect(formatTokenAmount(swapParams.amountInMaximum, USDC_TEST_TOKEN)).toBe('110.11'); // (includes fees and slippage)
       expect(formatEther(swapParams.amountOut)).toBe('1000.0');
+    });
+  });
+
+  describe('With an Exact Output, and native Token In', () => {
+    it('uses the wrapped native pool to quote', async () => {
+      mockRouterImplementation({
+        pools: [createPool(WIMX_TEST_TOKEN, FUN_TEST_TOKEN)],
+      });
+
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+
+      const { quote } = await exchange.getUnsignedSwapTxFromAmountOut(
+        makeAddr('sicko'),
+        'native',
+        FUN_TEST_TOKEN.address,
+        utils.parseEther('1'), // want 1 FUN
+      );
+
+      expectNative(quote.amount.token);
+      expectNative(quote.amountWithMaxSlippage.token);
+      expect(formatAmount(quote.amount)).toEqual('0.1');
+    });
+  });
+
+  describe('With an Exact Output, and native Token Out', () => {
+    it('uses the wrapped native pool to quote', async () => {
+      mockRouterImplementation({
+        pools: [createPool(WIMX_TEST_TOKEN, FUN_TEST_TOKEN)],
+      });
+
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+
+      const { quote } = await exchange.getUnsignedSwapTxFromAmountOut(
+        makeAddr('sicko'),
+        FUN_TEST_TOKEN.address,
+        'native',
+        utils.parseEther('1'), // want 1 native IMX
+      );
+
+      expectERC20(quote.amount.token, FUN_TEST_TOKEN.address);
+      expectERC20(quote.amountWithMaxSlippage.token, FUN_TEST_TOKEN.address);
+      expect(formatAmount(quote.amount)).toEqual('0.1');
     });
   });
 });

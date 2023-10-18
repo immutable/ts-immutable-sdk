@@ -7,17 +7,18 @@ import { SecondaryFee__factory } from 'contracts/types';
 import { IV3SwapRouter } from 'contracts/types/SecondaryFee';
 import { PromiseOrValue } from 'contracts/types/common';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
+import { TokenWrapper } from 'lib/tokenWrapper';
 import {
-  Amount,
-  Coin,
-  ERC20,
-  erc20ToUniswapToken,
-  ExchangeModuleConfiguration,
-  Native,
   newAmount,
   Router,
   RoutingContracts,
   SecondaryFee,
+  erc20ToUniswapToken,
+  Amount,
+  Coin,
+  ERC20,
+  Native,
+  ExchangeModuleConfiguration,
 } from '../lib';
 
 export const TEST_GAS_PRICE = BigNumber.from('1500000000'); // 1.5 gwei or 1500000000 wei
@@ -43,46 +44,54 @@ export const TEST_SECONDARY_FEE_ADDRESS = '0x8dBE1f0900C5e92ad87A54521902a33ba15
 export const TEST_ROUTING_CONTRACTS: RoutingContracts = {
   factoryAddress: TEST_V3_CORE_FACTORY_ADDRESS,
   quoterAddress: TEST_QUOTER_ADDRESS,
-  peripheryRouterAddress: TEST_PERIPHERY_ROUTER_ADDRESS,
-  secondaryFeeAddress: TEST_SECONDARY_FEE_ADDRESS,
   multicallAddress: TEST_MULTICALL_ADDRESS,
 };
 
-export const IMX_TEST_TOKEN: ERC20 = {
+export const NATIVE_TEST_TOKEN: Native = {
+  type: 'native',
+  chainId: TEST_CHAIN_ID,
+  decimals: 18,
+  symbol: 'IMX',
+  name: 'Native Immutable X',
+};
+
+export const WIMX_TEST_TOKEN: ERC20 = {
+  type: 'erc20',
   chainId: TEST_CHAIN_ID,
   address: '0x72958b06abdF2701AcE6ceb3cE0B8B1CE11E0851',
   decimals: 18,
-  symbol: 'IMX',
-  name: 'Immutable X',
-  type: 'erc20',
+  symbol: 'WIMX',
+  name: 'Wrapped Immutable X',
 };
 
 export const WETH_TEST_TOKEN: ERC20 = {
+  type: 'erc20',
   chainId: TEST_CHAIN_ID,
   address: '0x4F062A3EAeC3730560aB89b5CE5aC0ab2C5517aE',
   decimals: 18,
   symbol: 'WETH',
   name: 'Wrapped Ether',
-  type: 'erc20',
 };
 
 export const USDC_TEST_TOKEN: ERC20 = {
+  type: 'erc20',
   chainId: TEST_CHAIN_ID,
   address: '0x93733225CCc07Ba02b1449aA3379418Ddc37F6EC',
   decimals: 6,
   symbol: 'USDC',
   name: 'USD Coin',
-  type: 'erc20',
 };
 
 export const FUN_TEST_TOKEN: ERC20 = {
+  type: 'erc20',
   chainId: TEST_CHAIN_ID,
   address: '0xCc7bb2D219A0FC08033E130629C2B854b7bA9195',
   decimals: 18,
   symbol: 'FUN',
   name: 'The Fungibles Token',
-  type: 'erc20',
 };
+
+export const tokenWrapper = new TokenWrapper(NATIVE_TEST_TOKEN, WIMX_TEST_TOKEN);
 
 export const TEST_IMMUTABLE_CONFIGURATION: ImmutableConfiguration = new ImmutableConfiguration({
   environment: Environment.SANDBOX,
@@ -101,30 +110,22 @@ export const TEST_DEX_CONFIGURATION: ExchangeModuleConfiguration = {
       secondaryFee: TEST_SECONDARY_FEE_ADDRESS,
     },
     commonRoutingTokens: [],
-    nativeToken: {
-      chainId: IMX_TEST_TOKEN.chainId,
-      address: IMX_TEST_TOKEN.address,
-      decimals: IMX_TEST_TOKEN.decimals,
-      symbol: IMX_TEST_TOKEN.symbol,
-      name: IMX_TEST_TOKEN.name,
-      type: 'erc20',
-    },
+    nativeToken: NATIVE_TEST_TOKEN,
+    wrappedNativeToken: WIMX_TEST_TOKEN,
   },
 };
 
 export type SwapTest = {
   fromAddress: string;
-  pools: Pool[],
+  chainId: number;
+  pools: Pool[];
   inputToken: string;
   outputToken: string;
   intermediaryToken: string | undefined;
 };
 
 // uniqBy returns the unique items in an array using the given comparator
-export function uniqBy<K, T extends string | number>(
-  array: K[],
-  comparator: (arg: K) => T,
-): K[] {
+export function uniqBy<K, T extends string | number>(array: K[], comparator: (arg: K) => T): K[] {
   const uniqArr: Partial<Record<T, K>> = {};
 
   for (let i = 0; i < array.length; i++) {
@@ -156,10 +157,11 @@ export function decodePathForExactOutput(path: string) {
   };
 }
 
-type SecondaryFeeFunctionName = 'exactInputSingleWithSecondaryFee' |
-'exactOutputSingleWithSecondaryFee' |
-'exactInputWithSecondaryFee' |
-'exactOutputWithSecondaryFee';
+type SecondaryFeeFunctionName =
+  | 'exactInputSingleWithSecondaryFee'
+  | 'exactOutputSingleWithSecondaryFee'
+  | 'exactInputWithSecondaryFee'
+  | 'exactOutputWithSecondaryFee';
 
 type SwapRouterFunctionName = 'exactInputSingle' | 'exactOutputSingle';
 
@@ -310,25 +312,20 @@ export function createPool(tokenIn: ERC20, tokenOut: ERC20) {
 export function setupSwapTxTest(params?: { multiPoolSwap?: boolean }): SwapTest {
   const multiPoolSwap = params?.multiPoolSwap ?? false;
   const fromAddress = TEST_FROM_ADDRESS;
-
   const tokenIn = USDC_TEST_TOKEN;
   const intermediaryToken = FUN_TEST_TOKEN;
   const tokenOut = WETH_TEST_TOKEN;
 
   let pools: Pool[] = [];
   if (multiPoolSwap) {
-    pools = [
-      createPool(tokenIn, intermediaryToken),
-      createPool(intermediaryToken, tokenOut),
-    ];
+    pools = [createPool(tokenIn, intermediaryToken), createPool(intermediaryToken, tokenOut)];
   } else {
-    pools = [
-      createPool(tokenIn, tokenOut),
-    ];
+    pools = [createPool(tokenIn, tokenOut)];
   }
 
   return {
     fromAddress,
+    chainId: TEST_CHAIN_ID,
     pools,
     inputToken: tokenIn.address,
     intermediaryToken: multiPoolSwap ? intermediaryToken.address : undefined,
@@ -371,40 +368,40 @@ export const amountInFromAmountOut = (amountOut: Amount<ERC20>, tokenIn: ERC20, 
 
 export function mockRouterImplementation(params: MockParams) {
   const exchangeRate = params.exchangeRate ?? 10; // 1 TokenIn = 10 TokenOut
-  const findOptimalRoute = jest.fn((
-    amountSpecified: Amount<ERC20>,
-    otherToken: ERC20,
-    tradeType: TradeType,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    secondaryFees: SecondaryFee[],
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    maxHops: number,
-  ) => {
-    const tokenIn = tradeType === TradeType.EXACT_INPUT ? amountSpecified.token : otherToken;
-    const tokenOut = tradeType === TradeType.EXACT_OUTPUT ? amountSpecified.token : otherToken;
+  const findOptimalRoute = jest.fn(
+    (
+      amountSpecified: Amount<ERC20>,
+      otherToken: ERC20,
+      tradeType: TradeType,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      secondaryFees: SecondaryFee[],
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      maxHops: number,
+    ) => {
+      const tokenIn = tradeType === TradeType.EXACT_INPUT ? amountSpecified.token : otherToken;
+      const tokenOut = tradeType === TradeType.EXACT_OUTPUT ? amountSpecified.token : otherToken;
 
-    const route = new Route(
-      params.pools,
-      erc20ToUniswapToken(tokenIn),
-      erc20ToUniswapToken(tokenOut),
-    );
+      const route = new Route(params.pools, erc20ToUniswapToken(tokenIn), erc20ToUniswapToken(tokenOut));
 
-    const amountIn = tradeType === TradeType.EXACT_INPUT
-      ? amountSpecified : amountInFromAmountOut(amountSpecified, tokenIn, exchangeRate);
+      const amountIn = tradeType === TradeType.EXACT_INPUT
+        ? amountSpecified
+        : amountInFromAmountOut(amountSpecified, tokenIn, exchangeRate);
 
-    const amountOut = tradeType === TradeType.EXACT_INPUT
-      ? amountOutFromAmountIn(amountSpecified, tokenOut, exchangeRate) : amountSpecified;
+      const amountOut = tradeType === TradeType.EXACT_INPUT
+        ? amountOutFromAmountIn(amountSpecified, tokenOut, exchangeRate)
+        : amountSpecified;
 
-    const trade: QuoteResult = {
-      route,
-      amountIn,
-      amountOut,
-      tradeType,
-      gasEstimate: TEST_TRANSACTION_GAS_USAGE,
-    };
+      const trade: QuoteResult = {
+        route,
+        amountIn,
+        amountOut,
+        tradeType,
+        gasEstimate: TEST_TRANSACTION_GAS_USAGE,
+      };
 
-    return trade;
-  });
+      return trade;
+    },
+  );
 
   (Router as unknown as jest.Mock).mockImplementationOnce(() => ({
     routingContracts: TEST_ROUTING_CONTRACTS,
@@ -416,14 +413,14 @@ export function mockRouterImplementation(params: MockParams) {
 
 // expectToBeDefined ensures that a variable is not null or undefined, while
 // also narrowing its type.
-export function expectToBeDefined <T>(x: T): asserts x is NonNullable<T> {
+export function expectToBeDefined<T>(x: T): asserts x is NonNullable<T> {
   expect(x).toBeDefined();
   expect(x).not.toBeNull();
 }
 
 // expectInstanceOf ensurance that a variable is an instance of a class, while
 // also narrowing its type.
-export function expectInstanceOf <T>(className: { new(...args: any[]): T }, x: unknown): asserts x is T {
+export function expectInstanceOf<T>(className: { new (...args: any[]): T }, x: unknown): asserts x is T {
   expect(x).toBeInstanceOf(className);
 }
 
@@ -444,11 +441,11 @@ export function makeAddr(str: string): string {
   return utils.keccak256(utils.toUtf8Bytes(str)).slice(0, 42);
 }
 
-export function formatAmount(amount: Amount<ERC20>): string {
+export function formatAmount(amount: Amount<Coin>): string {
   return utils.formatUnits(amount.value, amount.token.decimals);
 }
 
-export function formatTokenAmount(amount: BigNumberish, token: ERC20): string {
+export function formatTokenAmount(amount: BigNumberish, token: Coin): string {
   return utils.formatUnits(amount, token.decimals);
 }
 

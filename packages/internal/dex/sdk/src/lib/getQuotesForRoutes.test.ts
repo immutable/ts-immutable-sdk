@@ -8,20 +8,20 @@ import {
 import { ProviderCallError } from 'errors';
 import { getQuotesForRoutes } from './getQuotesForRoutes';
 import {
-  IMX_TEST_TOKEN,
   TEST_CHAIN_ID,
   TEST_MULTICALL_ADDRESS,
   TEST_QUOTER_ADDRESS,
   TEST_RPC_URL,
   WETH_TEST_TOKEN,
   formatAmount,
+  WIMX_TEST_TOKEN,
 } from '../test/utils';
 import { Multicall__factory } from '../contracts/types';
 import { erc20ToUniswapToken, newAmount } from './utils';
 
 jest.mock('@ethersproject/contracts');
 
-const UNISWAP_IMX = erc20ToUniswapToken(IMX_TEST_TOKEN);
+const UNISWAP_WIMX = erc20ToUniswapToken(WIMX_TEST_TOKEN);
 const UNISWAP_WETH = erc20ToUniswapToken(WETH_TEST_TOKEN);
 
 const types = [
@@ -61,14 +61,14 @@ describe('getQuotesForRoutes', () => {
       // as long as the length is correct.
       const pool0 = new Pool(
         UNISWAP_WETH,
-        UNISWAP_IMX,
+        UNISWAP_WIMX,
         FeeAmount.HIGH,
         sqrtPriceAtTick,
         1000,
         arbitraryTick,
       );
-      dummyRoutes.push(new Route([pool0], UNISWAP_WETH, UNISWAP_IMX));
-      dummyRoutes.push(new Route([pool0], UNISWAP_WETH, UNISWAP_IMX));
+      dummyRoutes.push(new Route([pool0], UNISWAP_WETH, UNISWAP_WIMX));
+      dummyRoutes.push(new Route([pool0], UNISWAP_WETH, UNISWAP_WIMX));
 
       const amount = newAmount(BigNumber.from('123123'), WETH_TEST_TOKEN);
 
@@ -117,13 +117,13 @@ describe('getQuotesForRoutes', () => {
       // as long as the length is correct.
       const pool0 = new Pool(
         UNISWAP_WETH,
-        UNISWAP_IMX,
+        UNISWAP_WIMX,
         FeeAmount.HIGH,
         sqrtPriceAtTick,
         1000,
         arbitraryTick,
       );
-      dummyRoutes.push(new Route([pool0], UNISWAP_WETH, UNISWAP_IMX));
+      dummyRoutes.push(new Route([pool0], UNISWAP_WETH, UNISWAP_WIMX));
 
       const provider = new providers.JsonRpcProvider(
         TEST_RPC_URL,
@@ -195,14 +195,14 @@ describe('getQuotesForRoutes', () => {
       // as long as the length is correct.
       const pool0 = new Pool(
         UNISWAP_WETH,
-        UNISWAP_IMX,
+        UNISWAP_WIMX,
         FeeAmount.HIGH,
         sqrtPriceAtTick,
         1000,
         arbitraryTick,
       );
-      dummyRoutes.push(new Route([pool0], UNISWAP_WETH, UNISWAP_IMX));
-      dummyRoutes.push(new Route([pool0], UNISWAP_WETH, UNISWAP_IMX));
+      dummyRoutes.push(new Route([pool0], UNISWAP_WETH, UNISWAP_WIMX));
+      dummyRoutes.push(new Route([pool0], UNISWAP_WETH, UNISWAP_WIMX));
 
       const provider = new providers.JsonRpcProvider(
         TEST_RPC_URL,
