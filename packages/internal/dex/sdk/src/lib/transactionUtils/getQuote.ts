@@ -55,6 +55,7 @@ export function getOurQuoteReqAmount(
   tradeType: TradeType,
   nativeTokenService: NativeTokenService,
 ): Amount<ERC20> {
+  // TODO: TP-1649: Remove this when we support Native
   if (!isERC20Amount(amountSpecified)) {
     throw new Error('Not implemented yet!');
   }
