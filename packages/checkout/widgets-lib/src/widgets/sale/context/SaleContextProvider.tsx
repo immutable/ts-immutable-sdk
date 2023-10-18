@@ -330,7 +330,7 @@ export function SaleContextProvider(props: {
       goBackToPaymentMethods,
       goToErrorView,
       goToSuccessView,
-      signResponse,
+      sign,
       querySmartCheckout,
       smartCheckoutResult,
       fundingRoutes,
