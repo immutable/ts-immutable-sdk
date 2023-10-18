@@ -321,6 +321,11 @@ export const text = {
         },
       },
     },
+    [SaleWidgetViews.FUND_WITH_SMART_CHECKOUT]: {
+      loading: {
+        checkingBalances: 'Checking balances',
+      },
+    },
     [SaleWidgetViews.PAYMENT_METHODS]: {
       header: {
         heading: 'How would you like to pay?',

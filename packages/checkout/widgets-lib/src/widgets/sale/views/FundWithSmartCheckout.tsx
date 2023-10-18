@@ -13,6 +13,7 @@ import { LoadingView } from '../../../views/loading/LoadingView';
 import { FundingRouteExecute } from '../components/FundingRouteExecute/FundingRouteExecute';
 import { FundingRouteSelect } from '../components/FundingRouteSelect/FundingRouteSelect';
 import { useSaleContext } from '../context/SaleContextProvider';
+import { text as textConfig } from '../../../resources/text/textConfig';
 
 type FundWithSmartCheckoutProps = {
   subView: FundWithSmartCheckoutSubViews;
@@ -22,6 +23,7 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
   const { viewDispatch } = useContext(ViewContext);
   const [selectedFundingRoute, setSelectedFundingRoute] = useState<FundingRoute | undefined>(undefined);
   const [fundingRouteStepIndex, setFundingRouteStepIndex] = useState<number>(0);
+  const text = textConfig.views[SaleWidgetViews.FUND_WITH_SMART_CHECKOUT];
 
   const { querySmartCheckout, fundingRoutes } = useSaleContext();
 
@@ -69,7 +71,7 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
   return (
     <Box>
       { subView === FundWithSmartCheckoutSubViews.INIT && (
-        <LoadingView loadingText="TODO COPY -> waiting for Smart Checkout..." />
+        <LoadingView loadingText={text.loading.checkingBalances} />
       )}
       { subView === FundWithSmartCheckoutSubViews.FUNDING_ROUTE_SELECT && (
         <FundingRouteSelect
