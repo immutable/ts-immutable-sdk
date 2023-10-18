@@ -78,11 +78,17 @@ describe('applySlippage', () => {
 
 describe('getOurQuoteReqAmount', () => {
   describe('when trade is EXACT_INPUT, and amountSpecified is native, and no fees', () => {
-    it.todo('wraps the amount');
+    it('wraps the amount', () => {
+      const amountSpecified = newAmountFromString('1', nativeTokenService.nativeToken);
+      const noFees = new Fees([], amountSpecified.token);
+      const quoteReqAmount = getOurQuoteReqAmount(amountSpecified, noFees, TradeType.EXACT_INPUT, nativeTokenService);
+      expectERC20(quoteReqAmount.token, nativeTokenService.wrappedToken.address);
+      expect(formatAmount(quoteReqAmount)).toEqual('1.0');
+    });
   });
 
   describe('when trade is EXACT_OUTPUT, and amountSpecified is native, and no fees', () => {
-    it.skip('wraps the amount unchanged', () => {
+    it('wraps the amount unchanged', () => {
       const amountSpecified = newAmountFromString('1', nativeTokenService.nativeToken);
       const noFees = new Fees([], FUN_TEST_TOKEN);
       const quoteReqAmount = getOurQuoteReqAmount(amountSpecified, noFees, TradeType.EXACT_OUTPUT, nativeTokenService);

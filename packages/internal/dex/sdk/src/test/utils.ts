@@ -97,8 +97,8 @@ export const FUN_TEST_TOKEN: ERC20 = {
 export const NATIVE_TEST_TOKEN: Native = {
   chainId: TEST_CHAIN_ID,
   decimals: 18,
-  symbol: 'WIMX',
-  name: 'Wrapped Immutable X',
+  symbol: 'IMX',
+  name: 'Native Immutable X',
   type: 'native',
 };
 
