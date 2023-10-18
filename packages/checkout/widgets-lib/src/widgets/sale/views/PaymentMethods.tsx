@@ -69,7 +69,6 @@ export function PaymentMethods() {
 
   useEffect(() => {
     if (paymentMethod) {
-      // sign(paymentMethod, (response) => handleGoToPaymentView(paymentMethod, !!response));
       handleGoToPaymentView(paymentMethod);
     }
   }, [paymentMethod]);

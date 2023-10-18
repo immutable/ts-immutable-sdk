@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-console */
 import { FundingRoute, RoutingOutcomeType, SmartCheckoutResult } from '@imtbl/checkout-sdk';
 import { Passport } from '@imtbl/passport';
 import {
@@ -186,9 +184,7 @@ export function SaleContextProvider(props: {
     const getUserInfo = async () => {
       const signer = provider?.getSigner();
       const address = (await signer?.getAddress()) || '';
-      // ! dont commit this
-      // const email = (await passport?.getUserInfo())?.email || '';
-      const email = '';
+      const email = (await passport?.getUserInfo())?.email || '';
 
       setUserInfo({ recipientEmail: email, recipientAddress: address });
     };
