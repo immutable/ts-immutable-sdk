@@ -201,7 +201,7 @@ export function SaleContextProvider(props: {
         },
       });
     },
-    [],
+    [paymentMethod, setPaymentMethod, executeResponse],
   );
 
   const goToSuccessView = useCallback(() => {
@@ -217,7 +217,7 @@ export function SaleContextProvider(props: {
         },
       },
     });
-  }, []);
+  }, [[paymentMethod, executeResponse]]);
 
   useEffect(() => {
     if (!signError) return;
