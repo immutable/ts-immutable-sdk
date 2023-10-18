@@ -13,7 +13,6 @@ import {
   TEST_PERIPHERY_ROUTER_ADDRESS,
   TEST_DEX_CONFIGURATION,
   TEST_GAS_PRICE,
-  IMX_TEST_TOKEN,
   TEST_TRANSACTION_GAS_USAGE,
   TEST_FEE_RECIPIENT,
   TEST_MAX_FEE_BASIS_POINTS,
@@ -29,6 +28,7 @@ import {
   expectInstanceOf,
   newAmountFromString,
   formatTokenAmount,
+  WIMX_TEST_TOKEN,
 } from './test/utils';
 import {
   addAmount, Router, SecondaryFee,
@@ -117,11 +117,11 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       expectToBeDefined(tx.approval?.gasFeeEstimate);
       expect(tx.approval.gasFeeEstimate.value).toEqual(TEST_GAS_PRICE.mul(APPROVE_GAS_ESTIMATE));
-      expect(tx.approval.gasFeeEstimate.token.chainId).toEqual(IMX_TEST_TOKEN.chainId);
-      expect(tx.approval.gasFeeEstimate.token.address).toEqual(IMX_TEST_TOKEN.address);
-      expect(tx.approval.gasFeeEstimate.token.decimals).toEqual(IMX_TEST_TOKEN.decimals);
-      expect(tx.approval.gasFeeEstimate.token.symbol).toEqual(IMX_TEST_TOKEN.symbol);
-      expect(tx.approval.gasFeeEstimate.token.name).toEqual(IMX_TEST_TOKEN.name);
+      expect(tx.approval.gasFeeEstimate.token.chainId).toEqual(WIMX_TEST_TOKEN.chainId);
+      expect(tx.approval.gasFeeEstimate.token.address).toEqual(WIMX_TEST_TOKEN.address);
+      expect(tx.approval.gasFeeEstimate.token.decimals).toEqual(WIMX_TEST_TOKEN.decimals);
+      expect(tx.approval.gasFeeEstimate.token.symbol).toEqual(WIMX_TEST_TOKEN.symbol);
+      expect(tx.approval.gasFeeEstimate.token.name).toEqual(WIMX_TEST_TOKEN.name);
     });
   });
 
@@ -429,11 +429,11 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expectToBeDefined(tx.swap.gasFeeEstimate);
 
       expect(tx.swap.gasFeeEstimate.value).toEqual(TEST_TRANSACTION_GAS_USAGE.mul(TEST_GAS_PRICE));
-      expect(tx.swap.gasFeeEstimate.token.chainId).toEqual(IMX_TEST_TOKEN.chainId);
-      expect(tx.swap.gasFeeEstimate.token.address).toEqual(IMX_TEST_TOKEN.address);
-      expect(tx.swap.gasFeeEstimate.token.decimals).toEqual(IMX_TEST_TOKEN.decimals);
-      expect(tx.swap.gasFeeEstimate.token.symbol).toEqual(IMX_TEST_TOKEN.symbol);
-      expect(tx.swap.gasFeeEstimate.token.name).toEqual(IMX_TEST_TOKEN.name);
+      expect(tx.swap.gasFeeEstimate.token.chainId).toEqual(WIMX_TEST_TOKEN.chainId);
+      expect(tx.swap.gasFeeEstimate.token.address).toEqual(WIMX_TEST_TOKEN.address);
+      expect(tx.swap.gasFeeEstimate.token.decimals).toEqual(WIMX_TEST_TOKEN.decimals);
+      expect(tx.swap.gasFeeEstimate.token.symbol).toEqual(WIMX_TEST_TOKEN.symbol);
+      expect(tx.swap.gasFeeEstimate.token.name).toEqual(WIMX_TEST_TOKEN.name);
     });
 
     it('returns valid quote', async () => {

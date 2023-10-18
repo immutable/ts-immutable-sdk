@@ -6,8 +6,9 @@ import { ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
 import { RoutingContracts } from 'lib/router';
 import { newAmount } from 'lib/utils';
+import { NativeTokenService } from 'lib/nativeTokenService';
 import {
-  Amount, ERC20, SecondaryFee, TransactionDetails,
+  Amount, ERC20, Native, SecondaryFee, TransactionDetails,
 } from '../../types';
 import { calculateGasFee } from './gas';
 
@@ -154,7 +155,8 @@ export const getApproval = async (
   provider: JsonRpcProvider,
   ownerAddress: string,
   preparedApproval: PreparedApproval,
-  gasPrice: Amount<ERC20> | null,
+  gasPrice: Amount<Native> | null,
+  nativeTokenService: NativeTokenService,
 ): Promise<TransactionDetails | null> => {
   const approveTransaction = await getApproveTransaction(
     provider,
@@ -178,6 +180,7 @@ export const getApproval = async (
 
   return {
     transaction: approveTransaction,
-    gasFeeEstimate,
+    // TODO: TP-1649: Remove the wrapping here
+    gasFeeEstimate: gasFeeEstimate ? nativeTokenService.maybeWrapAmount(gasFeeEstimate) : null,
   };
 };
