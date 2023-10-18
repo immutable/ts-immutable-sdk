@@ -145,7 +145,6 @@ export class Exchange {
       this.secondaryFeeContractAddress,
       gasPrice,
       secondaryFees,
-      this.nativeTokenService,
     );
 
     const userQuote = prepareUserQuote(otherToken, adjustedQuote, slippagePercent, fees, this.nativeTokenService);
@@ -159,7 +158,7 @@ export class Exchange {
     );
 
     // preparedApproval always uses the tokenIn address because we are always selling the tokenIn
-    const approval = await getApproval(this.provider, fromAddress, preparedApproval, gasPrice, this.nativeTokenService);
+    const approval = await getApproval(this.provider, fromAddress, preparedApproval, gasPrice);
 
     return {
       approval,

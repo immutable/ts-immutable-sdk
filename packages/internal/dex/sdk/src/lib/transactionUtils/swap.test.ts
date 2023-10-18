@@ -1,31 +1,32 @@
 import { BigNumber, utils } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
 import {
-  FUN_TEST_TOKEN, IMX_TEST_TOKEN, TEST_FEE_RECIPIENT,
-  decodeMulticallExactInputSingleWithFees, decodeMulticallExactInputSingleWithoutFees,
-  decodeMulticallExactOutputSingleWithFees, decodeMulticallExactOutputSingleWithoutFees,
-  expectInstanceOf, expectToBeDefined, makeAddr, formatAmount, newAmountFromString,
-  nativeTokenService, NATIVE_TEST_TOKEN, expectERC20,
+  FUN_TEST_TOKEN,
+  IMX_TEST_TOKEN,
+  TEST_FEE_RECIPIENT,
+  decodeMulticallExactInputSingleWithFees,
+  decodeMulticallExactInputSingleWithoutFees,
+  decodeMulticallExactOutputSingleWithFees,
+  decodeMulticallExactOutputSingleWithoutFees,
+  expectInstanceOf,
+  expectToBeDefined,
+  makeAddr,
+  formatAmount,
+  newAmountFromString,
+  nativeTokenService,
+  NATIVE_TEST_TOKEN,
+  expectERC20,
 } from 'test/utils';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import { Fees } from 'lib/fees';
-import {
-  Coin, erc20ToUniswapToken, newAmount, uniswapTokenToERC20,
-} from 'lib';
+import { Coin, erc20ToUniswapToken, newAmount, uniswapTokenToERC20 } from 'lib';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
 import { getSwap, adjustQuoteWithFees } from './swap';
 
 const UNISWAP_IMX = erc20ToUniswapToken(IMX_TEST_TOKEN);
 const UNISWAP_FUN = erc20ToUniswapToken(FUN_TEST_TOKEN);
 
-const testPool = new Pool(
-  UNISWAP_IMX,
-  UNISWAP_FUN,
-  10000,
-  '79625275426524748796330556128',
-  '10000000000000000',
-  100,
-);
+const testPool = new Pool(UNISWAP_IMX, UNISWAP_FUN, 10000, '79625275426524748796330556128', '10000000000000000', 100);
 
 const route = new Route([testPool], UNISWAP_IMX, UNISWAP_FUN);
 const gasEstimate = BigNumber.from(0);
@@ -65,7 +66,6 @@ describe('getSwap', () => {
         makeAddr('secondaryFeeContract'),
         newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
         [],
-        nativeTokenService,
       );
 
       expectToBeDefined(swap.transaction.data);
@@ -88,7 +88,6 @@ describe('getSwap', () => {
         makeAddr('secondaryFeeContract'),
         newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
         [],
-        nativeTokenService,
       );
 
       expectToBeDefined(swap.transaction.data);
@@ -113,7 +112,6 @@ describe('getSwap', () => {
         makeAddr('secondaryFeeContract'),
         newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
         [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
-        nativeTokenService,
       );
 
       expectToBeDefined(swap.transaction.data);
@@ -136,7 +134,6 @@ describe('getSwap', () => {
         makeAddr('secondaryFeeContract'),
         newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
         [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
-        nativeTokenService,
       );
 
       expectToBeDefined(swap.transaction.data);

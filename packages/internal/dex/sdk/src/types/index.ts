@@ -73,7 +73,7 @@ export type Quote = {
  */
 export type TransactionDetails = {
   transaction: ethers.providers.TransactionRequest;
-  gasFeeEstimate: Amount<ERC20> | null;
+  gasFeeEstimate: Amount<Native> | null;
 };
 
 /**
@@ -130,8 +130,7 @@ export interface ExchangeOverrides {
   wrappedNativeToken: ERC20;
 }
 
-export interface ExchangeModuleConfiguration
-  extends ModuleConfiguration<ExchangeOverrides> {
+export interface ExchangeModuleConfiguration extends ModuleConfiguration<ExchangeOverrides> {
   chainId: number;
   secondaryFees?: SecondaryFee[];
 }
