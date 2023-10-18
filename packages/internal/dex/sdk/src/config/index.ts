@@ -7,6 +7,7 @@ import {
   IMMUTABLE_TESTNET_COMMON_ROUTING_TOKENS,
   IMMUTABLE_TESTNET_RPC_URL,
   MAX_SECONDARY_FEE_BASIS_POINTS,
+  NATIVE_IMX_IMMUTABLE_TESTNET,
   TIMX_IMMUTABLE_TESTNET,
 } from '../constants';
 
@@ -23,7 +24,7 @@ export const CONTRACTS_FOR_CHAIN_ID: Record<number, ExchangeContracts> = {
     multicall: '0xD17c98b38bA28c7eA1080317EB9AB2b9663BEd92',
     coreFactory: '0x8AC26EfCbf5D700b37A27aA00E6934e6904e7B8e',
     quoterV2: '0x0Afe6F5f4DC34461A801420634239FFaD50A2e44',
-    peripheryRouter: '0x5893A5c7bc615Dfd36D7383366d00FFFca5f7178',
+    peripheryRouter: '0x57c73281f2697a632AEF1A48CD6ff600f49ee344',
     secondaryFee: '0x5893A5c7bc615Dfd36D7383366d00FFFca5f7178',
   },
 };
@@ -34,7 +35,8 @@ export const SUPPORTED_SANDBOX_CHAINS: Record<number, Chain> = {
     rpcUrl: IMMUTABLE_TESTNET_RPC_URL,
     contracts: CONTRACTS_FOR_CHAIN_ID[IMMUTABLE_TESTNET_CHAIN_ID],
     commonRoutingTokens: IMMUTABLE_TESTNET_COMMON_ROUTING_TOKENS,
-    nativeToken: TIMX_IMMUTABLE_TESTNET,
+    nativeToken: NATIVE_IMX_IMMUTABLE_TESTNET,
+    wrappedNativeToken: TIMX_IMMUTABLE_TESTNET, // TODO: TP-1649: Change to WIMX when ready.
   },
 };
 
@@ -108,6 +110,7 @@ export class ExchangeConfiguration {
         contracts: overrides.exchangeContracts,
         commonRoutingTokens: overrides.commonRoutingTokens,
         nativeToken: overrides.nativeToken,
+        wrappedNativeToken: overrides.wrappedNativeToken,
       };
 
       this.secondaryFees = secondaryFees || [];

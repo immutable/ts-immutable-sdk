@@ -337,7 +337,11 @@ export const text = {
           disabledCaption: undefined,
         },
       },
-      loading: 'Nice choice',
+      loading: {
+        ready: 'Ready to purchase',
+        confirm: 'Confirm in your wallet',
+        processing: 'Processing purchase',
+      },
     },
     [SaleWidgetViews.PAY_WITH_COINS]: {
       header: {
@@ -395,6 +399,11 @@ export const text = {
     [SaleWidgetViews.SALE_SUCCESS]: {
       text: 'Order completed',
       actionText: 'Continue',
+    },
+  },
+  footers: {
+    quickswapFooter: {
+      disclaimerText: 'Quickswap is a third party app. Immutable neither builds, owns, operates or deploys Quickswap. For further info, refer to Quickswap’s website.',
     },
   },
   wallets: {

@@ -7,7 +7,7 @@ import Message from '@/components/Message';
 import Environment from '@/components/Environment';
 import { usePassportProvider } from '@/context/PassportProvider';
 import { useStatusProvider } from '@/context/StatusProvider';
-import { basePath } from '@/config';
+import { BASE_PATH } from '@/config';
 import PassportMethods from '@/components/PassportMethods';
 import ZkEvmWorkflow from '@/components/zkevm/ZkEvmWorkflow';
 
@@ -21,7 +21,7 @@ export default function Home() {
         <title>Passport Sample Application</title>
         <meta name="description" content="Passport sample application" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href={`${basePath}/images/favicon.ico`} />
+        <link rel="icon" href={`${BASE_PATH}/images/favicon.ico`} />
       </Head>
       <main>
         <Container>

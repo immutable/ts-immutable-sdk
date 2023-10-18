@@ -64,6 +64,16 @@ export type SignOrderError = {
   data?: Record<string, unknown>;
 };
 
+export type ExecutedTransaction = {
+  method: string;
+  hash: string | undefined;
+};
+
+export type ExecuteOrderResponse = {
+  done: boolean;
+  transactions:ExecutedTransaction[]
+};
+
 export enum SaleErrorTypes {
   DEFAULT = 'DEFAULT',
   TRANSACTION_FAILED = 'TRANSACTION_FAILED',
