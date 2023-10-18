@@ -646,6 +646,9 @@ export type BalanceDelta = {
 /**
  * A type representing the Smart Checkout routing options available for a user
  * if they are configured and enabled (not geo-blocked etc.)
+ * @property {boolean | undefined} onRamp - If the user can use onramp
+ * @property {boolean | undefined} swap - If the user can use swap
+ * @property {boolean | undefined} bridge - If the user can use bridge
  */
 export type AvailableRoutingOptions = {
   onRamp?: boolean;
