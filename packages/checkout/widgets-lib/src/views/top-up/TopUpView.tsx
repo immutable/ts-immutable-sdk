@@ -79,7 +79,7 @@ export function TopUpView({
   const [loadingSwapFees, setLoadingSwapFees] = useState(false);
   const [loadingBridgeFees, setLoadingBridgeFees] = useState(false);
   const [isSwapAvailable, setIsSwapAvailable] = useState(true);
-  const [loadingSwapAvailability, setLoadingSwapAvailability] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   const isPassport = isPassportProvider(provider);
 
@@ -91,7 +91,7 @@ export function TopUpView({
         tokenSymbols: DEFAULT_TOKEN_SYMBOLS,
       },
     });
-  }, [checkout, cryptoFiatDispatch]);
+  }, [cryptoFiatDispatch]);
 
   const refreshFees = async (silent: boolean = false) => {
     if (!checkout) return;
@@ -165,7 +165,7 @@ export function TopUpView({
       try {
         setIsSwapAvailable(await checkout.isSwapAvailable());
       } catch { /* empty */ }
-      setLoadingSwapAvailability(false);
+      setIsLoading(false);
     })();
     if (conversions.size === 0) return;
     refreshFees();
@@ -288,10 +288,10 @@ export function TopUpView({
 
   return (
     <>
-      {loadingSwapAvailability && (
+      {isLoading && (
         <LoadingView loadingText={loadingText} showFooterLogo />
       )}
-      {!loadingSwapAvailability && (
+      {!isLoading && (
         <SimpleLayout
           header={(
             <HeaderNavigation
