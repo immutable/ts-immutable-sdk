@@ -6,6 +6,7 @@ import {
 import { InsufficientERC20, InsufficientERC721 } from '../allowance/types';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { getGasPriceInWei } from '../../utils/gasPriceInWei';
+import { performanceAsyncSnapshot } from '../../utils/performance';
 
 export const estimateGas = async (
   provider: Web3Provider,
@@ -41,7 +42,7 @@ export const getGasItemRequirement = (
   };
 };
 
-export const gasCalculator = async (
+export const gasCalculator = performanceAsyncSnapshot(async (
   provider: Web3Provider,
   insufficientItems: (InsufficientERC20 | InsufficientERC721)[],
   transactionOrGas: FulfillmentTransaction | GasAmount,
@@ -76,4 +77,4 @@ export const gasCalculator = async (
 
   if (totalGas.eq(0)) return null;
   return getGasItemRequirement(totalGas, transactionOrGas);
-};
+}, 'gasCalculator');

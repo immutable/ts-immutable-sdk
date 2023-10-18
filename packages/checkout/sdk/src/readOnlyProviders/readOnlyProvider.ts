@@ -2,11 +2,12 @@ import { JsonRpcProvider } from '@ethersproject/providers';
 import * as network from '../network';
 import { ChainId, NetworkFilterTypes } from '../types';
 import { CheckoutConfiguration } from '../config';
+import { performanceAsyncSnapshot } from '../utils/performance';
 
-export async function createReadOnlyProviders(
+export const createReadOnlyProviders = performanceAsyncSnapshot(async (
   config: CheckoutConfiguration,
   existingReadOnlyProviders?: Map<ChainId, JsonRpcProvider>,
-): Promise<Map<ChainId, JsonRpcProvider>> {
+): Promise<Map<ChainId, JsonRpcProvider>> => {
   if (config.isProduction && existingReadOnlyProviders?.has(ChainId.ETHEREUM)) return existingReadOnlyProviders;
   if (existingReadOnlyProviders?.has(ChainId.SEPOLIA)) return existingReadOnlyProviders;
 
@@ -23,4 +24,4 @@ export async function createReadOnlyProviders(
   });
 
   return readOnlyProviders;
-}
+}, 'readOnlyProviders');

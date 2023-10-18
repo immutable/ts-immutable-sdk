@@ -31,6 +31,7 @@ import {
 } from '../actions';
 import { SignTransactionStatusType } from '../actions/types';
 import { calculateFees } from '../fees/fees';
+import { performanceAsyncSnapshot } from '../../utils/performance';
 
 export const getERC721Requirement = (
   id: string,
@@ -63,7 +64,7 @@ export const getBuyToken = (
   };
 };
 
-export const sell = async (
+export const sell = performanceAsyncSnapshot(async (
   config: CheckoutConfiguration,
   provider: Web3Provider,
   orders: Array<SellOrder>,
@@ -94,12 +95,12 @@ export const sell = async (
   }
 
   const buyTokenOrNative = getBuyToken(buyToken, decimals);
-
   try {
     const walletAddress = await provider.getSigner().getAddress();
     orderbook = await instance.createOrderbookInstance(config);
     const { seaportContractAddress } = orderbook.config();
     spenderAddress = seaportContractAddress;
+    performance.mark('orderbook-prepareListing-start');
     listing = await orderbook.prepareListing({
       makerAddress: walletAddress,
       buy: buyTokenOrNative,
@@ -109,7 +110,11 @@ export const sell = async (
         tokenId: sellToken.id,
       },
     });
+    performance.mark('orderbook-prepareListing-end');
+    performance.measure('orderbook-prepareListing', 'orderbook-prepareListing-start', 'orderbook-prepareListing-end');
   } catch (err: any) {
+    performance.mark('orderbook-prepareListing-end');
+    performance.measure('orderbook-prepareListing', 'orderbook-prepareListing-start', 'orderbook-prepareListing-end');
     throw new CheckoutError(
       'An error occurred while preparing the listing',
       CheckoutErrorType.PREPARE_ORDER_LISTING_ERROR,
@@ -124,7 +129,6 @@ export const sell = async (
   const itemRequirements = [
     getERC721Requirement(sellToken.id, sellToken.collectionAddress, spenderAddress),
   ];
-
   const smartCheckoutResult = await smartCheckout(
     config,
     provider,
@@ -167,13 +171,13 @@ export const sell = async (
         },
       );
     }
+
     const signedMessage = await signMessage(
       provider,
       unsignedMessage,
     );
 
     let orderId = '';
-
     const createListingParams:CreateListingParams = {
       orderComponents: signedMessage.orderComponents,
       orderHash: signedMessage.orderHash,
@@ -193,9 +197,14 @@ export const sell = async (
     }
 
     try {
+      performance.mark('orderbook-createListing-start');
       const order = await orderbook.createListing(createListingParams);
+      performance.mark('orderbook-createListing-end');
+      performance.measure('orderbook-createListing', 'orderbook-createListing-start', 'orderbook-createListing-end');
       orderId = order.result.id;
     } catch (err: any) {
+      performance.mark('orderbook-createListing-end');
+      performance.measure('orderbook-createListing', 'orderbook-createListing-start', 'orderbook-createListing-end');
       throw new CheckoutError(
         'An error occurred while creating the listing',
         CheckoutErrorType.CREATE_ORDER_LISTING_ERROR,
@@ -218,4 +227,4 @@ export const sell = async (
     status: CheckoutStatus.INSUFFICIENT_FUNDS,
     smartCheckoutResult,
   };
-};
+}, 'sell');

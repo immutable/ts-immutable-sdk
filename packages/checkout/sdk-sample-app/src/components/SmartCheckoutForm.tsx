@@ -129,7 +129,7 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
     setItemRequirementsError('');
     setError('');
     setLoading(true);
-
+    performance.mark('sample-smart-start');
     try {
       const result = await checkout.smartCheckout(
         {
@@ -149,6 +149,8 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
       console.log(err.data);
       console.log(err.stack);
     }
+    performance.mark('sample-smart-end');
+    performance.measure('sample-smartcheckout', 'sample-smart-start', 'sample-smart-end');
   }
 
   const updateItemRequirements = (itemRequirement: (NativeItemRequirement | ERC20ItemRequirement | ERC721ItemRequirement)) => {

@@ -37,6 +37,7 @@ import { BridgeAndSwapRoute, bridgeAndSwapRoute } from './bridgeAndSwap/bridgeAn
 import { BridgeRequirement, bridgeRoute } from './bridge/bridgeRoute';
 import { onRampRoute } from './onRamp';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from './indexer/fetchL1Representation';
+import { performanceAsyncSnapshot } from '../../utils/performance';
 
 const hasAvailableRoutingOptions = (availableRoutingOptions: AvailableRoutingOptions) => (
   availableRoutingOptions.bridge || availableRoutingOptions.swap || availableRoutingOptions.onRamp
@@ -58,7 +59,7 @@ export const getInsufficientRequirement = (
   return undefined;
 };
 
-export const getBridgeFundingStep = async (
+export const getBridgeFundingStep = performanceAsyncSnapshot(async (
   config: CheckoutConfiguration,
   readOnlyProviders: Map<ChainId, JsonRpcProvider>,
   availableRoutingOptions: AvailableRoutingOptions,
@@ -93,9 +94,9 @@ export const getBridgeFundingStep = async (
   }
 
   return bridgeFundingStep;
-};
+}, 'BridgeFunding');
 
-export const getSwapFundingSteps = async (
+export const getSwapFundingSteps = performanceAsyncSnapshot(async (
   config: CheckoutConfiguration,
   availableRoutingOptions: AvailableRoutingOptions,
   insufficientRequirement: BalanceRequirement | undefined,
@@ -120,7 +121,7 @@ export const getSwapFundingSteps = async (
 
   if (swappableTokens.length === 0) return fundingSteps;
 
-  return await swapRoute(
+  const swapResult = await swapRoute(
     config,
     availableRoutingOptions,
     dexQuoteCache,
@@ -130,9 +131,10 @@ export const getSwapFundingSteps = async (
     swappableTokens,
     balanceRequirements,
   );
-};
+  return swapResult;
+}, 'SwapFunding');
 
-export const getBridgeAndSwapFundingSteps = async (
+export const getBridgeAndSwapFundingSteps = performanceAsyncSnapshot(async (
   config: CheckoutConfiguration,
   readOnlyProviders: Map<ChainId, JsonRpcProvider>,
   availableRoutingOptions: AvailableRoutingOptions,
@@ -183,9 +185,9 @@ export const getBridgeAndSwapFundingSteps = async (
   );
 
   return routes;
-};
+}, 'BridgeAndSwapFunding');
 
-export const getOnRampFundingStep = async (
+export const getOnRampFundingStep = performanceAsyncSnapshot(async (
   config: CheckoutConfiguration,
   availableRoutingOptions: AvailableRoutingOptions,
   insufficientRequirement: BalanceRequirement | undefined,
@@ -200,9 +202,9 @@ export const getOnRampFundingStep = async (
   );
 
   return onRampFundingStep;
-};
+}, 'OnRampFunding');
 
-export const routingCalculator = async (
+export const routingCalculator = performanceAsyncSnapshot(async (
   config: CheckoutConfiguration,
   ownerAddress: string,
   balanceRequirements: BalanceCheckResult,
@@ -359,4 +361,4 @@ export const routingCalculator = async (
   }
 
   return response;
-};
+}, 'routingCalculator');

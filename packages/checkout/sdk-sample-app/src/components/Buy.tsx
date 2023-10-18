@@ -33,6 +33,8 @@ export default function Buy({ checkout, provider }: BuyProps) {
     }
     setError(null);
     setLoading(true);
+
+    performance.mark('sample-buy-start');
     try {
       const buyResult = await checkout.buy({
         provider,
@@ -49,6 +51,8 @@ export default function Buy({ checkout, provider }: BuyProps) {
       console.log(err.data);
       console.log(err.stack);
     }
+    performance.mark('sample-buy-end');
+    performance.measure('sample-buy', 'sample-buy-start', 'sample-buy-end');
   }
 
   const updateOrderId = (event: any) => {

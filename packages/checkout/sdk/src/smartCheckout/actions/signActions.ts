@@ -7,8 +7,9 @@ import { CheckoutError, CheckoutErrorType } from '../../errors';
 import {
   SignTransactionResult, SignTransactionStatusType, SignedMessage, UnsignedMessage,
 } from './types';
+import { performanceAsyncSnapshot } from '../../utils/performance';
 
-export const signApprovalTransactions = async (
+export const signApprovalTransactions = performanceAsyncSnapshot(async (
   provider: Web3Provider,
   approvalTransactions: TransactionRequest[],
 ): Promise<SignTransactionResult> => {
@@ -42,9 +43,9 @@ export const signApprovalTransactions = async (
   return {
     type: SignTransactionStatusType.SUCCESS,
   };
-};
+}, 'signApproval');
 
-export const signFulfillmentTransactions = async (
+export const signFulfillmentTransactions = performanceAsyncSnapshot(async (
   provider: Web3Provider,
   fulfillmentTransactions: TransactionRequest[],
 ): Promise<SignTransactionResult> => {
@@ -78,9 +79,9 @@ export const signFulfillmentTransactions = async (
   return {
     type: SignTransactionStatusType.SUCCESS,
   };
-};
+}, 'signFulfillment');
 
-export const signMessage = async (
+export const signMessage = performanceAsyncSnapshot(async (
   provider: Web3Provider,
   unsignedMessage: UnsignedMessage,
 ): Promise<SignedMessage> => {
@@ -105,4 +106,4 @@ export const signMessage = async (
       },
     );
   }
-};
+}, 'signMessage');

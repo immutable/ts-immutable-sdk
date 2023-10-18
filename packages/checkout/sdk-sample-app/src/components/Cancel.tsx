@@ -18,6 +18,7 @@ export default function Cancel({ checkout, provider }: CancelProps) {
   const [loading, setLoading] = useState<boolean>(false);
 
   async function cancelClick() {
+    performance.mark('sample-cancel-start');
     if (!orderId) {
       setOrderIdError('Please enter an order ID');
       return;
@@ -47,6 +48,8 @@ export default function Cancel({ checkout, provider }: CancelProps) {
       console.log(err.data);
       console.log(err.stack);
     }
+    performance.mark('sample-cancel-end');
+    performance.measure('sample-cancel', 'sample-cancel-start', 'sample-cancel-end');
   }
 
   const updateOrderId = (event: any) => {

@@ -67,15 +67,15 @@ export async function createExchangeInstance(
   });
 }
 
-export async function createOrderbookInstance(
+export const createOrderbookInstance = (
   config: CheckoutConfiguration,
-): Promise<Orderbook> {
-  return new Orderbook({
+): Orderbook => (
+  new Orderbook({
     baseConfig: {
       environment: config.environment,
     },
-  });
-}
+  })
+);
 
 export function createBlockchainDataInstance(
   config: CheckoutConfiguration,

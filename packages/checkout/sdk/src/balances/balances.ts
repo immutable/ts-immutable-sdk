@@ -20,8 +20,9 @@ import {
   BlockscoutTokens,
   BlockscoutTokenType,
 } from '../client';
+import { performanceAsyncSnapshot } from '../utils/performance';
 
-export const getBalance = async (
+export const getBalance = performanceAsyncSnapshot(async (
   config: CheckoutConfiguration,
   web3Provider: Web3Provider,
   walletAddress: string,
@@ -48,14 +49,14 @@ export const getBalance = async (
     };
   },
   { type: CheckoutErrorType.GET_BALANCE_ERROR },
-);
+), 'getBalance');
 
-export async function getERC20Balance(
+export const getERC20Balance = performanceAsyncSnapshot(async (
   web3Provider: Web3Provider,
   walletAddress: string,
   contractAddress: string,
-) {
-  return await withCheckoutError<GetBalanceResult>(
+) => (
+  await withCheckoutError<GetBalanceResult>(
     async () => {
       const contract = new Contract(
         contractAddress,
@@ -84,13 +85,13 @@ export async function getERC20Balance(
         });
     },
     { type: CheckoutErrorType.GET_ERC20_BALANCE_ERROR },
-  );
-}
+  )
+), 'getERC20Balance');
 
 // Blockscout client singleton
 let blockscoutClient: Blockscout;
 
-export const getIndexerBalance = async (
+export const getIndexerBalance = performanceAsyncSnapshot(async (
   walletAddress: string,
   chainId: ChainId,
   rename: TokenInfo[],
@@ -175,9 +176,9 @@ export const getIndexerBalance = async (
       return { balance, formattedBalance, token } as GetBalanceResult;
     }),
   };
-};
+}, 'getIndexerBalance');
 
-export const getBalances = async (
+export const getBalances = performanceAsyncSnapshot(async (
   config: CheckoutConfiguration,
   web3Provider: Web3Provider,
   walletAddress: string,
@@ -205,9 +206,9 @@ export const getBalances = async (
   ).map((result) => result.value);
 
   return { balances };
-};
+}, 'getBalances');
 
-export const getAllBalances = async (
+export const getAllBalances = performanceAsyncSnapshot(async (
   config: CheckoutConfiguration,
   web3Provider: Web3Provider,
   walletAddress: string,
@@ -240,4 +241,4 @@ export const getAllBalances = async (
   // Fails in fetching data from the RCP calls might result in some
   // missing data.
   return await getBalances(config, web3Provider, walletAddress, tokens);
-};
+}, 'getAllBalances');

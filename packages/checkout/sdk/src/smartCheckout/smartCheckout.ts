@@ -16,8 +16,9 @@ import { allowanceAggregator } from './aggregators/allowanceAggregator';
 import { gasCalculator } from './gas';
 import { getAvailableRoutingOptions } from './routing';
 import { routingCalculator } from './routing/routingCalculator';
+import { performanceAsyncSnapshot } from '../utils/performance';
 
-export const smartCheckout = async (
+export const smartCheckout = performanceAsyncSnapshot(async (
   config: CheckoutConfiguration,
   provider: Web3Provider,
   itemRequirements: ItemRequirement[],
@@ -63,4 +64,4 @@ export const smartCheckout = async (
       routingOutcome,
     },
   };
-};
+}, 'smartCheckout');

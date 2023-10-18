@@ -1,6 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { CheckoutConfiguration } from '../../config';
 import { isOnRampGeoBlocked, isSwapGeoBlocked } from './geoBlocking';
+import { performanceAsyncSnapshot } from '../../utils/performance';
 import { AvailableRoutingOptions } from '../../types';
 
 const isPassportProvider = (provider: Web3Provider) => (provider.provider as any)?.isPassport === true ?? false;
@@ -13,7 +14,7 @@ type GeoBlockingCheck = {
 /**
  * Determines which routing options are available.
  */
-export const getAvailableRoutingOptions = async (
+export const getAvailableRoutingOptions = performanceAsyncSnapshot(async (
   config: CheckoutConfiguration,
   provider: Web3Provider,
 ) : Promise<AvailableRoutingOptions> => {
@@ -48,4 +49,4 @@ export const getAvailableRoutingOptions = async (
   availableRoutingOptions.bridge = availableRoutingOptions.bridge && !isPassportProvider(provider);
 
   return availableRoutingOptions;
-};
+}, 'routingOptions');
