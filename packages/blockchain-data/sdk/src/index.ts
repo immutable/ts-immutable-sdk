@@ -1,13 +1,5 @@
-import {
-  mr,
-  ActivitiesApi,
-  ChainsApi,
-  CollectionsApi,
-  MetadataApi,
-  NFTOwnersApi,
-  NFTsApi,
-  TokensApi,
-} from '@imtbl/generated-clients';
+import { mr } from '@imtbl/generated-clients';
+import * as Types from './types/api';
 import { APIError } from './types/errors';
 import { BlockchainData } from './blockchain-data';
 import { BlockchainDataModuleConfiguration } from './config';
@@ -15,13 +7,7 @@ import { BlockchainDataModuleConfiguration } from './config';
 type ActivityType = mr.ActivityType;
 
 export {
-  ActivitiesApi,
-  ChainsApi,
-  CollectionsApi,
-  MetadataApi,
-  NFTOwnersApi,
-  NFTsApi,
-  TokensApi,
+  Types,
   APIError,
   BlockchainData,
   BlockchainDataModuleConfiguration,
