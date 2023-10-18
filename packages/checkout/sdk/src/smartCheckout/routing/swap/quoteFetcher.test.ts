@@ -1,7 +1,7 @@
 import { Environment } from '@imtbl/config';
 import { BigNumber } from 'ethers';
 import {
-  TokenInfo,
+  ERC20,
   TransactionDetails,
   TransactionResponse,
 } from '@imtbl/dex-sdk';
@@ -29,18 +29,18 @@ describe('quoteFetcher', () => {
       quote: {
         amount: {
           value: BigNumber.from(quoteAmount),
-          token: {} as TokenInfo,
+          token: {} as ERC20,
         },
         amountWithMaxSlippage: {
           value: BigNumber.from(quoteAmount),
-          token: {} as TokenInfo,
+          token: {} as ERC20,
         },
         slippage: 0,
         fees: [
           {
             amount: {
               value: BigNumber.from(feeAmount),
-              token: {} as TokenInfo,
+              token: {} as ERC20,
             },
             recipient: '',
             basisPoints: 0,
@@ -53,7 +53,7 @@ describe('quoteFetcher', () => {
     if (swapGasFeeEstimate) {
       transactionResponse.swap.gasFeeEstimate = {
         value: BigNumber.from(swapGasFeeEstimate),
-        token: {} as TokenInfo,
+        token: {} as ERC20,
       };
     }
 
@@ -61,7 +61,7 @@ describe('quoteFetcher', () => {
       transactionResponse.approval = {
         gasFeeEstimate: {
           value: BigNumber.from(approvalGasFeeEstimate),
-          token: {} as TokenInfo,
+          token: {} as ERC20,
         },
       } as TransactionDetails;
     }
@@ -81,18 +81,18 @@ describe('quoteFetcher', () => {
       quote: {
         amount: {
           value: BigNumber.from(quoteAmount),
-          token: {} as TokenInfo,
+          token: {} as ERC20,
         },
         amountWithMaxSlippage: {
           value: BigNumber.from(quoteAmount),
-          token: {} as TokenInfo,
+          token: {} as ERC20,
         },
         slippage: 0,
         fees: [
           {
             amount: {
               value: BigNumber.from(feeAmount),
-              token: {} as TokenInfo,
+              token: {} as ERC20,
             },
             recipient: '',
             basisPoints: 0,
@@ -104,14 +104,14 @@ describe('quoteFetcher', () => {
     if (swap) {
       dexQuote.swap = {
         value: BigNumber.from(swap),
-        token: {} as TokenInfo,
+        token: {} as ERC20,
       };
     }
 
     if (approval) {
       dexQuote.approval = {
         value: BigNumber.from(approval),
-        token: {} as TokenInfo,
+        token: {} as ERC20,
       };
     }
 

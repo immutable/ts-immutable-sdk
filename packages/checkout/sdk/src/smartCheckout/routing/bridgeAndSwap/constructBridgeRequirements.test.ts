@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers';
-import { TokenInfo as DexTokenInfo } from '@imtbl/dex-sdk';
+import { ERC20 as DexTokenInfo } from '@imtbl/dex-sdk';
 import { DexQuote } from '../types';
 import {
   ChainId,
@@ -75,6 +75,7 @@ describe('constructBridgeRequirements', () => {
       decimals: 18,
       symbol: 'ERC20',
       name: 'ERC20',
+      type: 'erc20',
     };
 
     const swapTokenInfoB: DexTokenInfo = {
@@ -83,6 +84,7 @@ describe('constructBridgeRequirements', () => {
       decimals: 18,
       symbol: 'ERC20',
       name: 'ERC20',
+      type: 'erc20',
     };
 
     const feesTokenInfo: DexTokenInfo = {
@@ -91,6 +93,7 @@ describe('constructBridgeRequirements', () => {
       decimals: 18,
       symbol: 'ERC20',
       name: 'ERC20',
+      type: 'erc20',
     };
 
     const dexQuoteA = constructDexQuote(
@@ -195,6 +198,7 @@ describe('constructBridgeRequirements', () => {
       decimals: 18,
       symbol: 'ETH',
       name: 'ETH',
+      type: 'erc20',
     };
 
     const feesTokenInfo: DexTokenInfo = {
@@ -203,6 +207,7 @@ describe('constructBridgeRequirements', () => {
       decimals: 18,
       symbol: 'IMX',
       name: 'IMX',
+      type: 'erc20',
     };
 
     const ethDexQuote = constructDexQuote(
@@ -278,6 +283,7 @@ describe('constructBridgeRequirements', () => {
       decimals: 18,
       symbol: 'ERC20',
       name: 'ERC20',
+      type: 'erc20',
     };
 
     const swapTokenInfoB: DexTokenInfo = {
@@ -286,6 +292,7 @@ describe('constructBridgeRequirements', () => {
       decimals: 18,
       symbol: 'ERC20',
       name: 'ERC20',
+      type: 'erc20',
     };
 
     const feesTokenInfo: DexTokenInfo = {
@@ -294,6 +301,7 @@ describe('constructBridgeRequirements', () => {
       decimals: 18,
       symbol: 'ERC20',
       name: 'ERC20',
+      type: 'erc20',
     };
 
     const dexQuoteA = constructDexQuote(
@@ -394,6 +402,7 @@ describe('constructBridgeRequirements', () => {
       decimals: 18,
       symbol: '0xIMX',
       name: '0xIMX',
+      type: 'erc20',
     };
 
     const feesTokenInfo: DexTokenInfo = {
@@ -402,6 +411,7 @@ describe('constructBridgeRequirements', () => {
       decimals: 18,
       symbol: '0xIMX',
       name: '0xIMX',
+      type: 'erc20',
     };
 
     const dexQuote = constructDexQuote(
@@ -487,6 +497,7 @@ describe('constructBridgeRequirements', () => {
       decimals: 18,
       symbol: '0xL2',
       name: '0xL2',
+      type: 'erc20',
     };
 
     const feesTokenInfo: DexTokenInfo = {
@@ -495,6 +506,7 @@ describe('constructBridgeRequirements', () => {
       decimals: 18,
       symbol: '0xIMX',
       name: '0xIMX',
+      type: 'erc20',
     };
 
     const dexQuote = constructDexQuote(

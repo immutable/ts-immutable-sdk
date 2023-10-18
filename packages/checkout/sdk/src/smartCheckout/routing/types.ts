@@ -1,4 +1,4 @@
-import { Amount, Quote } from '@imtbl/dex-sdk';
+import { Amount, ERC20, Quote } from '@imtbl/dex-sdk';
 import {
   ChainId,
   GetBalanceResult,
@@ -19,6 +19,6 @@ export type DexQuoteCache = Map<string, DexQuotes>;
 export type DexQuotes = Map<string, DexQuote>;
 export type DexQuote = {
   quote: Quote,
-  approval: Amount | null | undefined,
-  swap: Amount | null,
+  approval: Amount<ERC20> | null | undefined,
+  swap: Amount<ERC20> | null,
 };

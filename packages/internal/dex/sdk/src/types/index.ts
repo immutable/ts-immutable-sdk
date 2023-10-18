@@ -39,7 +39,7 @@ export type SecondaryFee = {
 export type Fee = {
   recipient: string;
   basisPoints: number;
-  amount: Amount<Coin>;
+  amount: Amount<ERC20>;
 };
 
 /**
