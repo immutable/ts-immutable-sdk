@@ -600,6 +600,7 @@ export type TransactionRequirement = {
 
 /**
  * Represents the balance for either a native or ERC20 token.
+ * @property {ItemType.NATIVE | ItemType.ERC20} type - Type to indicate this is a native or ERC20 token.
  * @property {BigNumber} balance - The balance of the item.
  * @property {string} formattedBalance - The formatted balance of the item.
  * @property {TokenInfo} token - The token info of the item.
@@ -613,6 +614,7 @@ export type TokenBalance = {
 
 /**
  * Represents the balance for an ERC721.
+ * @property {ItemType.ERC721} type - Type to indicate this is an ERC721 token.
  * @property {BigNumber} balance - The balance of the item.
  * @property {string} formattedBalance - The formatted balance of the item.
  * @property {string} contractAddress - The collection address for the ERC721.
