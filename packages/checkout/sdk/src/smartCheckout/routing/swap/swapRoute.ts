@@ -137,7 +137,7 @@ export const getRequiredToken = (
 type SufficientApprovalFees = { sufficient: boolean, approvalGasFee: BigNumber, approvalGasTokenAddress: string };
 export const checkUserCanCoverApprovalFees = (
   l2Balances: GetBalanceResult[],
-  approval: Amount<ERC20> | null | undefined,
+  approval: Amount<ERC20> | null,
 ): SufficientApprovalFees => {
   // Check if approval required
   if (!approval) return { sufficient: true, approvalGasFee: BigNumber.from(0), approvalGasTokenAddress: '' };
