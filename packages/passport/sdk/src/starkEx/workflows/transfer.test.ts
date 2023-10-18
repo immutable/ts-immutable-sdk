@@ -46,7 +46,7 @@ describe('transfer', () => {
       } as unknown as TransfersApi;
     });
 
-    it('should returns success transfer result', async () => {
+    it('should return success transfer result', async () => {
       const mockSignableTransferRequest = {
         getSignableTransferRequest: {
           amount: '1',
@@ -113,11 +113,9 @@ describe('transfer', () => {
       expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
       expect(getSignableTransferV1Mock).toBeCalledWith(mockSignableTransferRequest, mockHeader);
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
-      expect(mockGuardianClient.validate).toBeCalledWith({ payloadHash: mockPayloadHash });
-      expect(createTransferV1Mock).toBeCalledWith(
-        mockCreateTransferRequest,
-        mockHeader,
-      );
+      expect(mockGuardianClient.evaluateImxTransaction)
+        .toBeCalledWith({ payloadHash: mockPayloadHash, user: mockUserImx });
+      expect(createTransferV1Mock).toBeCalledWith(mockCreateTransferRequest, mockHeader);
       expect(result).toEqual(mockReturnValue);
     });
 
@@ -156,7 +154,9 @@ describe('transfer', () => {
         mockSignableTransferV1Response,
       );
 
-      (mockGuardianClient.validate as jest.Mock).mockRejectedValue(new Error('Transaction rejected by user'));
+      (mockGuardianClient.evaluateImxTransaction as jest.Mock)
+        .mockRejectedValue(new Error('Transaction rejected by user'));
+
       await expect(() => transfer({
         transfersApi: transferApiMock,
         starkSigner: mockStarkSigner,
@@ -171,9 +171,9 @@ describe('transfer', () => {
   });
 
   describe('batchNftTransfer', () => {
-    let getSignableTransferMock: jest.Mock;
-    let createTransferMock: jest.Mock;
-    let transferApiMock: TransfersApi;
+    let mockGetSignableTransfer: jest.Mock;
+    let mockCreateTransfer: jest.Mock;
+    let mockTransferApi: TransfersApi;
 
     const transferRequest = [
       {
@@ -183,17 +183,14 @@ describe('transfer', () => {
       },
     ];
 
-    const popupOptions = {
-      height: 784,
-      width: 480,
-    };
+    const popupOptions = { height: 784, width: 480 };
 
     beforeEach(() => {
-      getSignableTransferMock = jest.fn();
-      createTransferMock = jest.fn();
-      transferApiMock = {
-        getSignableTransfer: getSignableTransferMock,
-        createTransfer: createTransferMock,
+      mockGetSignableTransfer = jest.fn();
+      mockCreateTransfer = jest.fn();
+      mockTransferApi = {
+        getSignableTransfer: mockGetSignableTransfer,
+        createTransfer: mockCreateTransfer,
       } as unknown as TransfersApi;
     });
 
@@ -236,22 +233,22 @@ describe('transfer', () => {
         },
       };
 
-      getSignableTransferMock.mockResolvedValue(mockSignableTransferResponse);
+      mockGetSignableTransfer.mockResolvedValue(mockSignableTransferResponse);
       mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
-      createTransferMock.mockResolvedValue(mockTransferResponse);
+      mockCreateTransfer.mockResolvedValue(mockTransferResponse);
 
       const result = await batchNftTransfer({
         user: mockUserImx,
         starkSigner: mockStarkSigner,
         request: transferRequest,
-        transfersApi: transferApiMock,
+        transfersApi: mockTransferApi,
         guardianClient: mockGuardianClient,
       });
 
       expect(result).toEqual({
         transfer_ids: mockTransferResponse.data.transfer_ids,
       });
-      expect(getSignableTransferMock).toHaveBeenCalledWith({
+      expect(mockGetSignableTransfer).toHaveBeenCalledWith({
         getSignableTransferRequestV2: {
           sender_ether_key: mockUserImx.imx.ethAddress,
           signable_requests: [
@@ -271,10 +268,9 @@ describe('transfer', () => {
       }, mockHeader);
       expect(mockStarkSigner.signMessage).toHaveBeenCalled();
       expect(mockGuardianClient.withConfirmationScreenTask).toBeCalledWith(popupOptions);
-      expect(mockGuardianClient.validate).toBeCalledWith({
-        payloadHash: payload_hash,
-      });
-      expect(createTransferMock).toHaveBeenCalledWith(
+      expect(mockGuardianClient.evaluateImxTransaction)
+        .toBeCalledWith({ payloadHash: payload_hash, user: mockUserImx });
+      expect(mockCreateTransfer).toHaveBeenCalledWith(
         {
           createTransferRequestV2: {
             sender_stark_key,
@@ -297,13 +293,13 @@ describe('transfer', () => {
     });
 
     it('should return error if failed to call public api', async () => {
-      getSignableTransferMock.mockRejectedValue(new Error(mockErrorMessage));
+      mockGetSignableTransfer.mockRejectedValue(new Error(mockErrorMessage));
 
       await expect(() => batchNftTransfer({
         user: mockUserImx,
         starkSigner: mockStarkSigner,
         request: transferRequest,
-        transfersApi: transferApiMock,
+        transfersApi: mockTransferApi,
         guardianClient: mockGuardianClient,
       })).rejects.toThrow(
         new PassportError(
@@ -340,14 +336,14 @@ describe('transfer', () => {
           ],
         },
       };
-      getSignableTransferMock.mockResolvedValue(mockSignableTransferResponse);
+      mockGetSignableTransfer.mockResolvedValue(mockSignableTransferResponse);
 
-      (mockGuardianClient.validate as jest.Mock).mockRejectedValue(new Error('Transaction rejected by user'));
+      (mockGuardianClient.evaluateImxTransaction as jest.Mock).mockRejectedValue(new Error('Transaction rejected by user'));
       await expect(() => batchNftTransfer({
         user: mockUserImx,
         starkSigner: mockStarkSigner,
         request: transferRequest,
-        transfersApi: transferApiMock,
+        transfersApi: mockTransferApi,
         guardianClient: mockGuardianClient,
       })).rejects.toThrow(
         new PassportError(

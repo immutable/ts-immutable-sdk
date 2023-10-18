@@ -96,7 +96,7 @@ describe('trades', () => {
       expect(getSignableTradeMock).toBeCalledWith(mockSignableTradeRequest, mockHeader);
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
       expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
-      expect(mockGuardianClient.validate).toBeCalledWith({ payloadHash: mockPayloadHash });
+      expect(mockGuardianClient.evaluateImxTransaction).toBeCalledWith({ payloadHash: mockPayloadHash });
       expect(createTradeMock).toBeCalledWith(
         mockCreateTradeRequest,
         mockHeader,
@@ -106,7 +106,7 @@ describe('trades', () => {
 
     it('should return error if transfer is rejected by user', async () => {
       getSignableTradeMock.mockResolvedValue(mockSignableTradeResponse);
-      (mockGuardianClient.validate as jest.Mock).mockRejectedValue(new Error('Transaction rejected by user'));
+      (mockGuardianClient.evaluateImxTransaction as jest.Mock).mockRejectedValue(new Error('Transaction rejected by user'));
       await expect(() => createTrade({
         tradesApi: tradesApiMock,
         starkSigner: mockStarkSigner,
@@ -115,7 +115,7 @@ describe('trades', () => {
         guardianClient: mockGuardianClient,
       })).rejects.toThrowError('Transaction rejected by user');
       expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
-      expect(mockGuardianClient.validate).toBeCalledWith({ payloadHash: mockPayloadHash });
+      expect(mockGuardianClient.evaluateImxTransaction).toBeCalledWith({ payloadHash: mockPayloadHash });
     });
 
     it('should return error if failed to call public api', async () => {
