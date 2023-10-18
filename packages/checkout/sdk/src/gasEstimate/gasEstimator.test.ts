@@ -273,10 +273,7 @@ describe('gasServiceEstimator', () => {
         }),
       } as unknown as TokenBridge);
 
-      const readOnlyProvidersUndefinedFees = new Map<
-      ChainId,
-      ethers.providers.JsonRpcProvider
-      >([
+      const readOnlyProvidersUndefinedFees = new Map<ChainId, ethers.providers.JsonRpcProvider>([
         [
           ChainId.SEPOLIA,
           {
@@ -308,10 +305,7 @@ describe('gasServiceEstimator', () => {
         }),
       } as unknown as TokenBridge);
 
-      const readOnlyProvidersUndefinedFees = new Map<
-      ChainId,
-      ethers.providers.JsonRpcProvider
-      >([
+      const readOnlyProvidersUndefinedFees = new Map<ChainId, ethers.providers.JsonRpcProvider>([
         [
           ChainId.SEPOLIA,
           {
@@ -366,10 +360,7 @@ describe('gasServiceEstimator', () => {
         config,
       ),
     ).rejects.toThrow(
-      new CheckoutError(
-        'Invalid type provided for gasEstimateType',
-        CheckoutErrorType.INVALID_GAS_ESTIMATE_TYPE,
-      ),
+      new CheckoutError('Invalid type provided for gasEstimateType', CheckoutErrorType.INVALID_GAS_ESTIMATE_TYPE),
     );
   });
 });

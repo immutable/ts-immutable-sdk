@@ -1,9 +1,4 @@
-import {
-  BigNumber,
-  utils,
-  Contract,
-  ethers,
-} from 'ethers';
+import { BigNumber, utils, Contract, ethers } from 'ethers';
 import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { FungibleToken } from '@imtbl/bridge-sdk';
 import { CheckoutError, CheckoutErrorType } from '../errors';
@@ -19,10 +14,7 @@ import {
   GasEstimateType,
   TokenInfo,
 } from '../types';
-import {
-  getBridgeEstimatedGas,
-  getBridgeFeeEstimate,
-} from './bridgeGasEstimate';
+import { getBridgeEstimatedGas, getBridgeFeeEstimate } from './bridgeGasEstimate';
 import * as instance from '../instance';
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../config';
 
@@ -39,11 +31,7 @@ async function getTokenInfoByAddress(
     return config.networkMap.get(chainId)?.nativeCurrency;
   }
 
-  const contract = new Contract(
-    tokenAddress,
-    JSON.stringify(ERC20ABI),
-    provider,
-  );
+  const contract = new Contract(tokenAddress, JSON.stringify(ERC20ABI), provider);
   const name = await contract.name();
   const symbol = await contract.symbol();
   const decimals = await contract.decimals();
@@ -64,22 +52,16 @@ async function bridgeToL2GasEstimator(
   const fromChainId = getL1ChainId(config);
   const toChainId = getL2ChainId(config);
 
-  const gasEstimateTokensConfig = (await config.remote.getConfig(
-    'gasEstimateTokens',
-  )) as GasEstimateTokenConfig;
+  const gasEstimateTokensConfig = (await config.remote.getConfig('gasEstimateTokens')) as GasEstimateTokenConfig;
 
-  const { gasTokenAddress, fromAddress } = gasEstimateTokensConfig[
-    fromChainId
-  ].bridgeToL2Addresses as GasEstimateBridgeToL2TokenConfig;
+  const { gasTokenAddress, fromAddress } = gasEstimateTokensConfig[fromChainId]
+    .bridgeToL2Addresses as GasEstimateBridgeToL2TokenConfig;
 
   const provider = readOnlyProviders.get(fromChainId);
   if (!provider) throw new Error(`Missing JsonRpcProvider for chain id: ${fromChainId}`);
 
   try {
-    const gasFee = await getBridgeEstimatedGas(
-      provider as Web3Provider,
-      isSpendingCapApprovalRequired,
-    );
+    const gasFee = await getBridgeEstimatedGas(provider as Web3Provider, isSpendingCapApprovalRequired);
     gasFee.token = await getTokenInfoByAddress(
       config,
       tokenAddress ?? (gasTokenAddress || 'NATIVE'),
@@ -87,17 +69,9 @@ async function bridgeToL2GasEstimator(
       provider,
     );
 
-    const tokenBridge = await instance.createBridgeInstance(
-      fromChainId,
-      toChainId,
-      readOnlyProviders,
-      config,
-    );
+    const tokenBridge = await instance.createBridgeInstance(fromChainId, toChainId, readOnlyProviders, config);
 
-    const { bridgeFee, bridgeable } = await getBridgeFeeEstimate(
-      tokenBridge,
-      fromAddress,
-    );
+    const { bridgeFee, bridgeable } = await getBridgeFeeEstimate(tokenBridge, fromAddress);
 
     return {
       gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
@@ -119,17 +93,12 @@ async function bridgeToL2GasEstimator(
   }
 }
 
-async function swapGasEstimator(
-  config: CheckoutConfiguration,
-): Promise<GasEstimateSwapResult> {
+async function swapGasEstimator(config: CheckoutConfiguration): Promise<GasEstimateSwapResult> {
   const chainId = getL2ChainId(config);
 
-  const gasEstimateTokensConfig = (await config.remote.getConfig(
-    'gasEstimateTokens',
-  )) as GasEstimateTokenConfig;
+  const gasEstimateTokensConfig = (await config.remote.getConfig('gasEstimateTokens')) as GasEstimateTokenConfig;
 
-  const { inAddress, outAddress } = gasEstimateTokensConfig[chainId]
-    .swapAddresses as GasEstimateSwapTokenConfig;
+  const { inAddress, outAddress } = gasEstimateTokensConfig[chainId].swapAddresses as GasEstimateSwapTokenConfig;
 
   try {
     const exchange = await instance.createExchangeInstance(chainId, config);
@@ -159,11 +128,9 @@ async function swapGasEstimator(
       gasFee: {
         estimatedAmount,
         token: {
-          address: swap.gasFeeEstimate?.token.address,
           symbol: swap.gasFeeEstimate?.token.symbol ?? '',
           name: swap.gasFeeEstimate?.token.name ?? '',
-          decimals:
-            swap.gasFeeEstimate?.token.decimals ?? DEFAULT_TOKEN_DECIMALS,
+          decimals: swap.gasFeeEstimate?.token.decimals ?? DEFAULT_TOKEN_DECIMALS,
         },
       },
     };
@@ -192,9 +159,6 @@ export async function gasEstimator(
     case GasEstimateType.SWAP:
       return await swapGasEstimator(config);
     default:
-      throw new CheckoutError(
-        'Invalid type provided for gasEstimateType',
-        CheckoutErrorType.INVALID_GAS_ESTIMATE_TYPE,
-      );
+      throw new CheckoutError('Invalid type provided for gasEstimateType', CheckoutErrorType.INVALID_GAS_ESTIMATE_TYPE);
   }
 }
