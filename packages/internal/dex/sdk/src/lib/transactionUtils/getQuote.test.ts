@@ -2,7 +2,7 @@ import { ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
 import { Fees } from 'lib/fees';
 import {
-  newAmountFromString, expectERC20, formatAmount, nativeTokenService, FUN_TEST_TOKEN,
+  newAmountFromString, expectERC20, formatAmount, nativeTokenService, FUN_TEST_TOKEN, makeAddr,
 } from 'test/utils';
 import { applySlippage, getOurQuoteReqAmount } from './getQuote';
 
@@ -87,6 +87,36 @@ describe('getOurQuoteReqAmount', () => {
       const noFees = new Fees([], FUN_TEST_TOKEN);
       const quoteReqAmount = getOurQuoteReqAmount(amountSpecified, noFees, TradeType.EXACT_OUTPUT, nativeTokenService);
       expectERC20(quoteReqAmount.token, nativeTokenService.wrappedToken.address);
+      expect(formatAmount(quoteReqAmount)).toEqual('1.0');
+    });
+  });
+
+  describe('when the trade is EXACT_INPUT, and amountSpecified is ERC20, and there are fees', () => {
+    it('subtracts fees from the amount to request in the quote', () => {
+      const amountSpecified = newAmountFromString('1', FUN_TEST_TOKEN);
+      const tenPercentFees = new Fees([{ basisPoints: 1000, recipient: makeAddr('hello') }], FUN_TEST_TOKEN);
+      const quoteReqAmount = getOurQuoteReqAmount(
+        amountSpecified,
+        tenPercentFees,
+        TradeType.EXACT_INPUT,
+        nativeTokenService,
+      );
+      expectERC20(quoteReqAmount.token, FUN_TEST_TOKEN.address);
+      expect(formatAmount(quoteReqAmount)).toEqual('0.9');
+    });
+  });
+
+  describe('when the trade is EXACT_OUTPUT, and amountSpecified is ERC20, and there are fees', () => {
+    it('puts the amount specified unchanged in to the quote request', () => {
+      const amountSpecified = newAmountFromString('1', FUN_TEST_TOKEN);
+      const tenPercentFees = new Fees([{ basisPoints: 1000, recipient: makeAddr('hello') }], FUN_TEST_TOKEN);
+      const quoteReqAmount = getOurQuoteReqAmount(
+        amountSpecified,
+        tenPercentFees,
+        TradeType.EXACT_OUTPUT,
+        nativeTokenService,
+      );
+      expectERC20(quoteReqAmount.token, FUN_TEST_TOKEN.address);
       expect(formatAmount(quoteReqAmount)).toEqual('1.0');
     });
   });
