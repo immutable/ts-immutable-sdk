@@ -2,9 +2,10 @@ import { Box } from '@biom3/react';
 import {
   useContext, useEffect, useMemo, useState,
 } from 'react';
+import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
-import { FooterLogo } from '../../../components/Footer/FooterLogo';
+import { QuickswapFooter } from '../../../components/Footer/QuickswapFooter';
 import { sendSwapWidgetCloseEvent } from '../SwapWidgetEvents';
 import { text } from '../../../resources/text/textConfig';
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
@@ -18,6 +19,7 @@ import { EventTargetContext } from '../../../context/event-target-context/EventT
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 export interface SwapCoinsProps {
+  theme: WidgetTheme;
   fromAmount?: string;
   toAmount?: string;
   fromContractAddress?: string;
@@ -25,6 +27,7 @@ export interface SwapCoinsProps {
 }
 
 export function SwapCoins({
+  theme,
   fromAmount,
   toAmount,
   fromContractAddress,
@@ -69,7 +72,7 @@ export function SwapCoins({
           onCloseButtonClick={() => sendSwapWidgetCloseEvent(eventTarget)}
         />
       )}
-      footer={<FooterLogo />}
+      footer={<QuickswapFooter theme={theme} />}
       footerBackgroundColor="base.color.translucent.emphasis.200"
     >
       <Box

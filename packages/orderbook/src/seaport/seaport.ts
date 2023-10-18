@@ -159,10 +159,6 @@ export class Seaport {
       actions: Action[];
       expiration: string;
     }> {
-    // TODO: this function right now does not handle errors from the seaport.js
-    // we should figure out why orders are rejected and return a submission
-    // transaction on best efforts basis
-
     const fulfillOrderDetails = fulfillingOrders.map((o) => {
       const { orderComponents, tips } = this.mapImmutableOrderToSeaportOrderComponents(o.order);
 

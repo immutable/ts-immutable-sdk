@@ -1,5 +1,5 @@
 import { FeeAmount } from '@uniswap/v3-sdk';
-import { TokenInfo } from 'types';
+import { ERC20 } from 'types';
 import { computePoolAddress } from './computePoolAddress';
 import {
   generateERC20Pairs,
@@ -24,7 +24,7 @@ const poolFees = [
 // from the erc20Pair, commonRoutingERC20s and PoolFees
 export const generatePossiblePoolsFromERC20Pair = (
   erc20Pair: ERC20Pair,
-  commonRoutingERC20s: TokenInfo[],
+  commonRoutingERC20s: ERC20[],
   factoryAddress: string,
 ): PoolIDs => {
   const erc20Pairs = generateERC20Pairs(erc20Pair, commonRoutingERC20s);
