@@ -163,7 +163,7 @@ describe('bridgeAndSwapRoute', () => {
           },
         ],
       } as Quote,
-      approval: undefined,
+      approval: null,
       swap: null,
     };
     const dexQuoteETH: DexQuote = {
@@ -194,7 +194,7 @@ describe('bridgeAndSwapRoute', () => {
           },
         ],
       } as Quote,
-      approval: undefined,
+      approval: null,
       swap: null,
     };
 
