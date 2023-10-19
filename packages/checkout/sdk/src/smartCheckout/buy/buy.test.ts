@@ -97,7 +97,7 @@ describe('buy', () => {
       });
 
       (smartCheckout as jest.Mock).mockResolvedValue(smartCheckoutResult);
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         getListing: jest.fn().mockResolvedValue({
           result: {
             buy: [
@@ -247,7 +247,7 @@ describe('buy', () => {
       });
 
       (smartCheckout as jest.Mock).mockResolvedValue(smartCheckoutResult);
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         getListing: jest.fn().mockResolvedValue({
           result: {
             buy: [
@@ -410,7 +410,7 @@ describe('buy', () => {
         });
 
         (smartCheckout as jest.Mock).mockResolvedValue(smartCheckoutResult);
-        (createOrderbookInstance as jest.Mock).mockResolvedValue({
+        (createOrderbookInstance as jest.Mock).mockReturnValue({
           getListing: jest.fn().mockResolvedValue({
             result: {
               buy: [
@@ -497,7 +497,7 @@ describe('buy', () => {
       (getUnsignedERC20ApprovalTransactions as jest.Mock).mockResolvedValue([{ from: '0xAPPROVAL' }]);
       (getUnsignedFulfillmentTransactions as jest.Mock).mockResolvedValue([]);
       (smartCheckout as jest.Mock).mockResolvedValue({});
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         getListing: jest.fn().mockResolvedValue({
           result: {
             buy: [
@@ -549,7 +549,7 @@ describe('buy', () => {
     it('should call smart checkout with an erc20 requirement', async () => {
       (getUnsignedERC20ApprovalTransactions as jest.Mock).mockResolvedValue([{ from: '0xAPPROVAL' }]);
       (getUnsignedFulfillmentTransactions as jest.Mock).mockResolvedValue([]);
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         getListing: jest.fn().mockResolvedValue({
           result: {
             buy: [
@@ -679,7 +679,7 @@ describe('buy', () => {
         }],
       };
       (smartCheckout as jest.Mock).mockResolvedValue(smartCheckoutResult);
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         getListing: jest.fn().mockResolvedValue({
           result: {
             buy: [
@@ -784,7 +784,7 @@ describe('buy', () => {
         }],
       };
       (smartCheckout as jest.Mock).mockResolvedValue(smartCheckoutResult);
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         getListing: jest.fn().mockResolvedValue({
           result: {
             buy: [
@@ -900,7 +900,7 @@ describe('buy', () => {
         }],
       };
       (smartCheckout as jest.Mock).mockResolvedValue(smartCheckoutResult);
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         getListing: jest.fn().mockResolvedValue({
           result: {
             buy: [
@@ -982,7 +982,7 @@ describe('buy', () => {
     });
 
     it('should throw error if orderbook returns erc721', async () => {
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         getListing: jest.fn().mockResolvedValue({
           result: {
             buy: [
@@ -1026,7 +1026,7 @@ describe('buy', () => {
     });
 
     it('should throw error if orderbook returns unsupported item type', async () => {
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         getListing: jest.fn().mockResolvedValue({
           result: {
             buy: [
@@ -1069,7 +1069,7 @@ describe('buy', () => {
     });
 
     it('should throw error if orderbook returns error', async () => {
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         getListing: jest.fn().mockRejectedValue(new Error('error from orderbook')),
       });
 
@@ -1248,7 +1248,7 @@ describe('buy', () => {
         });
 
         (smartCheckout as jest.Mock).mockResolvedValue(smartCheckoutResult);
-        (createOrderbookInstance as jest.Mock).mockResolvedValue({
+        (createOrderbookInstance as jest.Mock).mockReturnValue({
           getListing: jest.fn().mockResolvedValue({
             result: {
               buy: [
@@ -1448,7 +1448,7 @@ describe('buy', () => {
         });
 
         (smartCheckout as jest.Mock).mockResolvedValue(smartCheckoutResult);
-        (createOrderbookInstance as jest.Mock).mockResolvedValue({
+        (createOrderbookInstance as jest.Mock).mockReturnValue({
           getListing: jest.fn().mockResolvedValue({
             result: {
               buy: [
