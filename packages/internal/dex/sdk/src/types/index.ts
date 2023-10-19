@@ -122,14 +122,29 @@ export type Native = {
 
 export type Coin = ERC20 | Native;
 
+/**
+ * Interface representing a token
+ * @property {number} chainId - The chain ID
+ * @property {string} address - The token address, or the empty string for the native token
+ * @property {number} decimals - The token decimals
+ * @property {string | undefined} symbol - The token symbol or undefined if it is not available
+ * @property {string | undefined} name - The token name or undefined if it is not available
+ * @deprecated Use {@link Coin} instead
+ */
 export type Token = {
-  address: string; // either empty or "native" for native
+  address: string;
   chainId: number;
   decimals: number;
   symbol?: string;
   name?: string;
 };
 
+/**
+ * Interface representing a token amount
+ * @property {Token} token - The token
+ * @property {ethers.BigNumber} value - The amount
+ * @deprecated Use {@link CoinAmount} instead
+ */
 export type Amount = {
   token: Token;
   value: ethers.BigNumber;
