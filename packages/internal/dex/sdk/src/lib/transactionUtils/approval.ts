@@ -5,7 +5,7 @@ import { ApproveError, AlreadyApprovedError } from 'errors';
 import { ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
 import { newAmount, toPublicAmount } from 'lib/utils';
-import { Amount, Coin, ERC20 } from 'types/private';
+import { CoinAmount, Coin, ERC20 } from 'types';
 import {
   SecondaryFee, TransactionDetails,
 } from '../../types';
@@ -13,7 +13,7 @@ import { calculateGasFee } from './gas';
 
 type PreparedApproval = {
   spender: string;
-  amount: Amount<ERC20>;
+  amount: CoinAmount<ERC20>;
 };
 
 /**
@@ -29,9 +29,9 @@ type PreparedApproval = {
 const getERC20AmountToApprove = async (
   provider: JsonRpcProvider,
   ownerAddress: string,
-  tokenAmount: Amount<ERC20>,
+  tokenAmount: CoinAmount<ERC20>,
   spenderAddress: string,
-): Promise<Amount<ERC20>> => {
+): Promise<CoinAmount<ERC20>> => {
   // create an instance of the ERC20 token contract
   const erc20Contract = ERC20__factory.connect(tokenAmount.token.address, provider);
 
@@ -64,7 +64,7 @@ const getERC20AmountToApprove = async (
  */
 const getUnsignedERC20ApproveTransaction = (
   ownerAddress: string,
-  tokenAmount: Amount<ERC20>,
+  tokenAmount: CoinAmount<ERC20>,
   spenderAddress: string,
 ): TransactionRequest => {
   if (ownerAddress === spenderAddress) {
@@ -84,8 +84,8 @@ const getUnsignedERC20ApproveTransaction = (
 
 export const prepareApproval = (
   tradeType: TradeType,
-  amountSpecified: Amount<ERC20>,
-  amountWithSlippage: Amount<ERC20>,
+  amountSpecified: CoinAmount<ERC20>,
+  amountWithSlippage: CoinAmount<ERC20>,
   contracts: {
     routerAddress: string;
     secondaryFeeAddress: string;
@@ -114,10 +114,10 @@ export const prepareApproval = (
 export const getApproveTransaction = async (
   provider: JsonRpcProvider,
   ownerAddress: string,
-  tokenAmount: Amount<ERC20>,
+  tokenAmount: CoinAmount<ERC20>,
   spenderAddress: string,
 ): Promise<TransactionRequest | null> => {
-  let amountToApprove: Amount<ERC20>;
+  let amountToApprove: CoinAmount<ERC20>;
   try {
     amountToApprove = await getERC20AmountToApprove(
       provider,
@@ -157,7 +157,7 @@ export const getApproval = async (
   provider: JsonRpcProvider,
   ownerAddress: string,
   preparedApproval: PreparedApproval,
-  gasPrice: Amount<Coin> | null,
+  gasPrice: CoinAmount<Coin> | null,
 ): Promise<TransactionDetails | null> => {
   const approveTransaction = await getApproveTransaction(
     provider,

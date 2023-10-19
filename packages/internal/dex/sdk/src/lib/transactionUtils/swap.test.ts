@@ -13,7 +13,7 @@ import {
   erc20ToUniswapToken, newAmount, uniswapTokenToERC20,
 } from 'lib';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
-import { Coin } from 'types/private';
+import { Coin } from 'types';
 import { getSwap, adjustQuoteWithFees } from './swap';
 
 const UNISWAP_IMX = erc20ToUniswapToken(IMX_TEST_TOKEN);

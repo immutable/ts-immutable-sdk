@@ -9,7 +9,7 @@ import { Fees } from 'lib/fees';
 import { toCurrencyAmount } from 'lib/utils';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
 import { NativeTokenService } from 'lib/nativeTokenService';
-import { Amount, Coin } from 'types/private';
+import { Coin, CoinAmount } from 'types';
 import {
   SecondaryFee, TransactionDetails,
 } from '../../types';
@@ -201,7 +201,7 @@ export function getSwap(
   deadline: number,
   peripheryRouterAddress: string,
   secondaryFeesAddress: string,
-  gasPrice: Amount<Coin> | null,
+  gasPrice: CoinAmount<Coin> | null,
   secondaryFees: SecondaryFee[],
   nativeTokenService: NativeTokenService,
 ): TransactionDetails {
@@ -230,7 +230,7 @@ export function getSwap(
 
 const adjustAmountIn = (
   ourQuote: QuoteResult,
-  amountSpecified: Amount<Coin>,
+  amountSpecified: CoinAmount<Coin>,
   fees: Fees,
   nativeTokenService: NativeTokenService,
 ) => {
@@ -259,7 +259,7 @@ const adjustAmountIn = (
  */
 export function adjustQuoteWithFees(
   ourQuote: QuoteResult,
-  amountSpecified: Amount<Coin>,
+  amountSpecified: CoinAmount<Coin>,
   fees: Fees,
   nativeTokenService: NativeTokenService,
 ): QuoteResult {

@@ -2,7 +2,7 @@ import { ethers } from 'ethers';
 import { Token, TradeType } from '@uniswap/sdk-core';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import { NoRoutesAvailableError } from 'errors';
-import { Amount, ERC20 } from 'types/private';
+import { CoinAmount, ERC20 } from 'types';
 import { erc20ToUniswapToken, poolEquals, uniswapTokenToERC20 } from './utils';
 import { getQuotesForRoutes, QuoteResult } from './getQuotesForRoutes';
 import { fetchValidPools } from './poolUtils/fetchValidPools';
@@ -29,7 +29,7 @@ export class Router {
   }
 
   public async findOptimalRoute(
-    amountSpecified: Amount<ERC20>,
+    amountSpecified: CoinAmount<ERC20>,
     otherToken: ERC20,
     tradeType: TradeType,
     maxHops: number = 2,
@@ -69,7 +69,7 @@ export class Router {
   private async getBestQuoteFromRoutes(
     multicallContract: Multicall,
     routes: Route<Token, Token>[],
-    amountSpecified: Amount<ERC20>,
+    amountSpecified: CoinAmount<ERC20>,
     tradeType: TradeType,
   ): Promise<QuoteResult> {
     const quotes = await getQuotesForRoutes(
@@ -125,7 +125,7 @@ export class Router {
   // eslint-disable-next-line class-methods-use-this
   private determineERC20InAndERC20Out(
     tradeType: TradeType,
-    amountSpecified: Amount<ERC20>,
+    amountSpecified: CoinAmount<ERC20>,
     otherToken: ERC20,
   ): [ERC20, ERC20] {
     // If the trade type is EXACT INPUT then we have specified the amount for the tokenIn

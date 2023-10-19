@@ -1,4 +1,4 @@
-import { ERC20 } from 'types/private';
+import { ERC20 } from 'types';
 
 export type Provider = {
   chainId: number;

@@ -1,16 +1,17 @@
 import {
-  Amount, Coin, ERC20, Native,
-} from 'types/private';
+  Coin, CoinAmount, ERC20, Native,
+} from 'types';
 import { newAmount } from './utils';
 
 export class NativeTokenService {
-  constructor(readonly nativeToken: Native, readonly wrappedToken: ERC20) {}
+  constructor(readonly nativeToken: Coin, readonly wrappedToken: ERC20) {}
 
-  wrapAmount(amount: Amount<Native>): Amount<ERC20> {
+  wrapAmount(amount: CoinAmount<Coin>): CoinAmount<ERC20> {
+    // TODO: Extra logic and tests to protect against wrapping a non-native token
     return newAmount(amount.value, this.wrappedToken);
   }
 
-  unwrapAmount(amount: Amount<ERC20>): Amount<Native> {
+  unwrapAmount(amount: CoinAmount<ERC20>): CoinAmount<Coin> {
     if (amount.token !== this.wrappedToken) {
       throw new Error(`token ${amount.token.address} is not wrapped`);
     }
@@ -24,7 +25,7 @@ export class NativeTokenService {
     return token as ERC20;
   }
 
-  maybeWrapAmount(amount: Amount<Coin>): Amount<ERC20> {
+  maybeWrapAmount(amount: CoinAmount<Coin>): CoinAmount<ERC20> {
     return newAmount(amount.value, this.maybeWrapToken(amount.token));
   }
 

@@ -2,7 +2,7 @@ import { Route, SwapQuoter } from '@uniswap/v3-sdk';
 import { TradeType, Token } from '@uniswap/sdk-core';
 import { BigNumber, ethers } from 'ethers';
 import { ProviderCallError } from 'errors';
-import { Amount, ERC20 } from 'types/private';
+import { CoinAmount, ERC20 } from 'types';
 import { multicallMultipleCallDataSingContract, MulticallResponse } from './multicall';
 import {
   newAmount, quoteReturnMapping, toCurrencyAmount, uniswapTokenToERC20,
@@ -15,8 +15,8 @@ const gasEstimateIndex = 3;
 export type QuoteResult = {
   route: Route<Token, Token>;
   gasEstimate: ethers.BigNumber
-  amountIn: Amount<ERC20>;
-  amountOut: Amount<ERC20>;
+  amountIn: CoinAmount<ERC20>;
+  amountOut: CoinAmount<ERC20>;
   tradeType: TradeType;
 };
 
@@ -24,7 +24,7 @@ export async function getQuotesForRoutes(
   multicallContract: Multicall,
   quoterContractAddress: string,
   routes: Route<Token, Token>[],
-  amountSpecified: Amount<ERC20>,
+  amountSpecified: CoinAmount<ERC20>,
   tradeType: TradeType,
 ): Promise<QuoteResult[]> {
   const callData = routes.map(

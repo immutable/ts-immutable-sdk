@@ -3,10 +3,10 @@ import { ethers } from 'ethers';
 import { Fees } from 'lib/fees';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
 import { NativeTokenService } from 'lib/nativeTokenService';
-import { Amount, Coin, ERC20 } from 'types/private';
+import { Coin, CoinAmount, ERC20 } from 'types';
 import { slippageToFraction } from './slippage';
 
-export function getQuoteAmountFromTradeType(tradeInfo: QuoteResult): Amount<ERC20> {
+export function getQuoteAmountFromTradeType(tradeInfo: QuoteResult): CoinAmount<ERC20> {
   if (tradeInfo.tradeType === TradeType.EXACT_INPUT) {
     return tradeInfo.amountOut;
   }
@@ -27,11 +27,11 @@ export function applySlippage(
 }
 
 export function getOurQuoteReqAmount(
-  amountSpecified: Amount<Coin>, // the amount specified by the user, either exactIn or exactOut
+  amountSpecified: CoinAmount<Coin>, // the amount specified by the user, either exactIn or exactOut
   fees: Fees,
   tradeType: TradeType,
   nativeTokenService: NativeTokenService,
-): Amount<ERC20> {
+): CoinAmount<ERC20> {
   if (tradeType === TradeType.EXACT_OUTPUT) {
     // For an exact output swap, we do not need to subtract fees from the given amount
     return nativeTokenService.maybeWrapAmount(amountSpecified);
