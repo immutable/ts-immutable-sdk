@@ -30,6 +30,7 @@ import {
   newAmountFromString,
   formatTokenAmount,
   WIMX_TEST_TOKEN,
+  NATIVE_TEST_TOKEN,
 } from './test/utils';
 import {
   addAmount, Router,
@@ -118,11 +119,11 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       expectToBeDefined(tx.approval?.gasFeeEstimate);
       expect(tx.approval.gasFeeEstimate.value).toEqual(TEST_GAS_PRICE.mul(APPROVE_GAS_ESTIMATE));
-      expect(tx.approval.gasFeeEstimate.token.chainId).toEqual(WIMX_TEST_TOKEN.chainId);
-      expect(tx.approval.gasFeeEstimate.token.address).toEqual(WIMX_TEST_TOKEN.address);
-      expect(tx.approval.gasFeeEstimate.token.decimals).toEqual(WIMX_TEST_TOKEN.decimals);
-      expect(tx.approval.gasFeeEstimate.token.symbol).toEqual(WIMX_TEST_TOKEN.symbol);
-      expect(tx.approval.gasFeeEstimate.token.name).toEqual(WIMX_TEST_TOKEN.name);
+      expect(tx.approval.gasFeeEstimate.token.chainId).toEqual(NATIVE_TEST_TOKEN.chainId);
+      expect(tx.approval.gasFeeEstimate.token.address).toEqual('');
+      expect(tx.approval.gasFeeEstimate.token.decimals).toEqual(NATIVE_TEST_TOKEN.decimals);
+      expect(tx.approval.gasFeeEstimate.token.symbol).toEqual(NATIVE_TEST_TOKEN.symbol);
+      expect(tx.approval.gasFeeEstimate.token.name).toEqual(NATIVE_TEST_TOKEN.name);
     });
   });
 

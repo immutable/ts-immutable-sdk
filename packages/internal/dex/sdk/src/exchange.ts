@@ -12,7 +12,7 @@ import { DEFAULT_DEADLINE, DEFAULT_MAX_HOPS, DEFAULT_SLIPPAGE, MAX_MAX_HOPS, MIN
 import { Router } from './lib/router';
 import { getERC20Decimals, isValidNonZeroAddress, newAmount, toPublicAmount } from './lib/utils';
 import { ExchangeModuleConfiguration, Quote, SecondaryFee, TransactionResponse } from './types';
-import { Amount, ERC20, Native } from './types/private';
+import { Amount, Coin, ERC20 } from './types/private';
 import { getSwap, adjustQuoteWithFees } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
 
@@ -21,14 +21,13 @@ const toPublicQuote = (
   amountWithMaxSlippage: Amount<ERC20>,
   slippage: number,
   fees: Fees,
-  nativeTokenService: NativeTokenService,
 ): Quote => ({
   amount: toPublicAmount(amount),
   amountWithMaxSlippage,
   slippage,
   fees: fees.withAmounts().map((fee) => ({
     ...fee,
-    amount: nativeTokenService.maybeWrapAmount(fee.amount),
+    amount: toPublicAmount(fee.amount),
   })),
 });
 
@@ -39,7 +38,7 @@ export class Exchange {
 
   private chainId: number;
 
-  private nativeToken: Native;
+  private nativeToken: Coin;
 
   private wrappedNativeToken: ERC20;
 
@@ -183,14 +182,13 @@ export class Exchange {
     );
 
     // preparedApproval always uses the tokenIn address because we are always selling the tokenIn
-    const approval = await getApproval(this.provider, fromAddress, preparedApproval, gasPrice, this.nativeTokenService);
+    const approval = await getApproval(this.provider, fromAddress, preparedApproval, gasPrice);
 
     const quote = toPublicQuote(
       quotedAmount,
       amountWithMaxSlippage,
       slippagePercent,
       fees,
-      this.nativeTokenService,
     );
 
     return { quote, approval, swap };

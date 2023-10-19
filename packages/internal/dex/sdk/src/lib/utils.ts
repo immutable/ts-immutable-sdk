@@ -188,13 +188,7 @@ export const toPublicTokenType = (token: Coin): Token => {
     };
   }
 
-  return {
-    address: token.address,
-    chainId: token.chainId,
-    decimals: token.decimals,
-    symbol: token.symbol,
-    name: token.name,
-  };
+  return token;
 };
 
 export const toPublicAmount = (amount: Amount<Coin>): PublicAmount => ({

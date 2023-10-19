@@ -4,9 +4,8 @@ import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
 import { ApproveError, AlreadyApprovedError } from 'errors';
 import { ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
-import { newAmount } from 'lib/utils';
-import { NativeTokenService } from 'lib/nativeTokenService';
-import { Amount, ERC20, Native } from 'types/private';
+import { newAmount, toPublicAmount } from 'lib/utils';
+import { Amount, Coin, ERC20 } from 'types/private';
 import {
   SecondaryFee, TransactionDetails,
 } from '../../types';
@@ -158,8 +157,7 @@ export const getApproval = async (
   provider: JsonRpcProvider,
   ownerAddress: string,
   preparedApproval: PreparedApproval,
-  gasPrice: Amount<Native> | null,
-  nativeTokenService: NativeTokenService,
+  gasPrice: Amount<Coin> | null,
 ): Promise<TransactionDetails | null> => {
   const approveTransaction = await getApproveTransaction(
     provider,
@@ -183,7 +181,6 @@ export const getApproval = async (
 
   return {
     transaction: approveTransaction,
-    // TODO: TP-1649: Remove the wrapping here
-    gasFeeEstimate: gasFeeEstimate ? nativeTokenService.maybeWrapAmount(gasFeeEstimate) : null,
+    gasFeeEstimate: gasFeeEstimate ? toPublicAmount(gasFeeEstimate) : null,
   };
 };

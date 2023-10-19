@@ -9,7 +9,7 @@ import { Fees } from 'lib/fees';
 import { toCurrencyAmount } from 'lib/utils';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
 import { NativeTokenService } from 'lib/nativeTokenService';
-import { Amount, Coin, Native } from 'types/private';
+import { Amount, Coin } from 'types/private';
 import {
   SecondaryFee, TransactionDetails,
 } from '../../types';
@@ -201,7 +201,7 @@ export function getSwap(
   deadline: number,
   peripheryRouterAddress: string,
   secondaryFeesAddress: string,
-  gasPrice: Amount<Native> | null,
+  gasPrice: Amount<Coin> | null,
   secondaryFees: SecondaryFee[],
   nativeTokenService: NativeTokenService,
 ): TransactionDetails {
