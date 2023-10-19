@@ -5,7 +5,10 @@ export default {
   input: 'src/index.ts',
   output: {
     dir: 'dist',
-    format: 'es',
+    format: 'cjs',
   },
-  plugins: [typescript(), commonjs({ extensions: ['.js', '.ts'] })],
+  plugins: [
+    typescript({ module: 'CommonJS' }),
+    commonjs({ extensions: ['.js', '.ts'] }),
+  ],
 };
