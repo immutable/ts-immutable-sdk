@@ -15,6 +15,20 @@ describe('NativeTokenService', () => {
       expectERC20(wrappedEquivalent.token, nativeTokenService.wrappedToken.address);
       expect(formatAmount(wrappedEquivalent)).toEqual('1.0');
     });
+
+    it('throws an error if the token is not a native amount', () => {
+      const erc20Amount = newAmountFromString('1', FUN_TEST_TOKEN);
+      expect(() => nativeTokenService.wrapAmount(erc20Amount)).toThrowError(
+        'cannot wrap non-native token: 0xCc7bb2D219A0FC08033E130629C2B854b7bA9195',
+      );
+    });
+
+    it('throws an error if the token is a wrapped native amount', () => {
+      const erc20Amount = newAmountFromString('1', nativeTokenService.wrappedToken);
+      expect(() => nativeTokenService.wrapAmount(erc20Amount)).toThrowError(
+        'cannot wrap non-native token: 0xAf7cf5D4Af0BFAa85d384d42b8D410762Ccbce69',
+      );
+    });
   });
 
   describe('unwrapAmount', () => {

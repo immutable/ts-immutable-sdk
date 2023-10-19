@@ -7,13 +7,15 @@ export class NativeTokenService {
   constructor(readonly nativeToken: Coin, readonly wrappedToken: ERC20) {}
 
   wrapAmount(amount: CoinAmount<Coin>): CoinAmount<ERC20> {
-    // TODO: Extra logic and tests to protect against wrapping a non-native token
+    if (!this.isNativeToken(amount.token)) {
+      throw new Error(`cannot wrap non-native token: ${amount.token.address}`);
+    }
     return newAmount(amount.value, this.wrappedToken);
   }
 
   unwrapAmount(amount: CoinAmount<ERC20>): CoinAmount<Coin> {
     if (amount.token !== this.wrappedToken) {
-      throw new Error(`token ${amount.token.address} is not wrapped`);
+      throw new Error(`cannot unwrap non-wrapped token ${amount.token.address}`);
     }
     return newAmount(amount.value, this.nativeToken);
   }
