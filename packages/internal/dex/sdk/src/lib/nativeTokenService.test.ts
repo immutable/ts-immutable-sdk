@@ -42,7 +42,7 @@ describe('NativeTokenService', () => {
     it('throws an error if the token is not a wrapped native amount', () => {
       const erc20Amount = newAmountFromString('1', FUN_TEST_TOKEN);
       expect(() => nativeTokenService.unwrapAmount(erc20Amount)).toThrowError(
-        'token 0xCc7bb2D219A0FC08033E130629C2B854b7bA9195 is not wrapped',
+        'cannot unwrap non-wrapped token 0xCc7bb2D219A0FC08033E130629C2B854b7bA9195',
       );
     });
   });
