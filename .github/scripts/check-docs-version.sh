@@ -21,8 +21,8 @@ echo "There is already a docs folder for v$VERSION"
   exit 1
 fi
 
-# check the version doesn't contain `alpha` string
-if [[ $VERSION == *alpha* ]]; then
+# check the version contains `alpha` string
+if echo "$VERSION" | grep -q "alpha"; then
   echo "Skipping docs generation for alpha version"
   exit 1
 fi
