@@ -12,12 +12,14 @@ export abstract class TradeRequest {
     readonly secondaryFees: SecondaryFee[],
     readonly slippagePercentage: number,
     readonly maxHops: number,
+    readonly tradeType: TradeType,
     protected nativeTokenService: NativeTokenService,
   ) {
     this.quote = null;
     this.secondaryFees = secondaryFees;
     this.slippagePercentage = slippagePercentage;
     this.maxHops = maxHops;
+    this.tradeType = tradeType;
     this.nativeTokenService = nativeTokenService;
   }
 
@@ -28,5 +30,4 @@ export abstract class TradeRequest {
   abstract ourQuoteReqAmount: CoinAmount<ERC20>;
   abstract otherToken: ERC20;
   abstract specifiedAmount: CoinAmount<ERC20>;
-  abstract tradeType: TradeType;
 }

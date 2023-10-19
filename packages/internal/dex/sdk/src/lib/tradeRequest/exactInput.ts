@@ -1,4 +1,3 @@
-/* eslint-disable class-methods-use-this */
 import { TradeType } from '@uniswap/sdk-core';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
 import { NativeTokenService } from 'lib/nativeTokenService';
@@ -18,7 +17,7 @@ export class ExactInput extends TradeRequest {
     maxHops: number,
     nativeTokenService: NativeTokenService,
   ) {
-    super(secondaryFees, slippagePercentage, maxHops, nativeTokenService);
+    super(secondaryFees, slippagePercentage, maxHops, TradeType.EXACT_INPUT, nativeTokenService);
     this.amountIn = amountIn;
     this.tokenOut = tokenOut;
   }
@@ -35,7 +34,7 @@ export class ExactInput extends TradeRequest {
     return new ExactInputQuote(this, bestQuote, this.nativeTokenService);
   }
 
-  get amountLessFees() {
+  private get amountLessFees() {
     let amount = this.amountIn;
 
     for (const fee of this.secondaryFees) {
@@ -60,9 +59,5 @@ export class ExactInput extends TradeRequest {
 
   get specifiedAmount() {
     return this.amountIn;
-  }
-
-  get tradeType() {
-    return TradeType.EXACT_INPUT;
   }
 }
