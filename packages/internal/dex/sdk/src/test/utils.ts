@@ -44,8 +44,6 @@ export const TEST_SECONDARY_FEE_ADDRESS = '0x8dBE1f0900C5e92ad87A54521902a33ba15
 export const TEST_ROUTING_CONTRACTS: RoutingContracts = {
   factoryAddress: TEST_V3_CORE_FACTORY_ADDRESS,
   quoterAddress: TEST_QUOTER_ADDRESS,
-  peripheryRouterAddress: TEST_PERIPHERY_ROUTER_ADDRESS,
-  secondaryFeeAddress: TEST_SECONDARY_FEE_ADDRESS,
   multicallAddress: TEST_MULTICALL_ADDRESS,
 };
 
@@ -97,8 +95,8 @@ export const FUN_TEST_TOKEN: ERC20 = {
 export const NATIVE_TEST_TOKEN: Native = {
   chainId: TEST_CHAIN_ID,
   decimals: 18,
-  symbol: 'WIMX',
-  name: 'Wrapped Immutable X',
+  symbol: 'IMX',
+  name: 'Native Immutable X',
   type: 'native',
 };
 
