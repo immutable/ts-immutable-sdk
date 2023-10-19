@@ -58,4 +58,3 @@ then
 else
   echo "No changes detected"
 fi
-
