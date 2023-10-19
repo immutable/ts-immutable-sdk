@@ -177,6 +177,12 @@ export const toERC20 = (token: Token): ERC20 => {
   };
 };
 
+/**
+ * Converts our internal token type which could be ERC20 or Native
+ * into a format consumable by Checkout. They require an address to be
+ * present. We populate the address with empty string if it's Native.
+ * If it's ERC20, we don't need to change it.
+ */
 export const toPublicTokenType = (token: Coin): Token => {
   if (token.type === 'native') {
     return {
