@@ -1,10 +1,11 @@
 name: Publish SDK Reference Docs
 
 on:
-  workflow_run:
-    workflows: ["Publish to NPM"]
-    types:
-      - completed
+  push:
+  # workflow_run:
+  #   workflows: ["Publish to NPM"]
+  #   types:
+  #     - completed
 
 jobs:
   PublishDocs:
@@ -33,9 +34,9 @@ jobs:
           echo "VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
           echo "CLONE_DIR=./imx-docs" >> $GITHUB_ENV
 
-      - name: Docs version check
-        run: ./.github/scripts/check-docs-version.sh
-        shell: bash
+      # - name: Docs version check
+      #   run: ./.github/scripts/check-docs-version.sh
+      #   shell: bash
 
       - name: Setup Github
         run: |
@@ -48,41 +49,50 @@ jobs:
           node-version: lts/*
           cache: 'yarn'
 
-      - name: Update SDK package.json version
-        run: |
-          tmp=$(mktemp)
-          jq '.version = "${{ env.VERSION }}"' ./package.json > "$tmp" && mv "$tmp" ./package.json
-        shell: bash
+      # - name: Update SDK package.json version
+      #   run: |
+      #     tmp=$(mktemp)
+      #     jq '.version = "${{ env.VERSION }}"' ./package.json > "$tmp" && mv "$tmp" ./package.json
+      #   shell: bash
 
-      - name: Install dependencies
-        run: yarn install --immutable
+      # - name: Install dependencies
+      #   run: yarn install --immutable
 
-      - name: Build
-        run: export NODE_OPTIONS=--max-old-space-size=6144 && yarn build
+      # - name: Build
+      #   run: export NODE_OPTIONS=--max-old-space-size=6144 && yarn build
 
-      - name: Build SDK Docs
-        run: yarn docs:build
+      # - name: Build SDK Docs
+      #   run: yarn docs:build
 
-      - name: Update version link
-        run: ./.github/scripts/update-docs-link.sh
+      # - name: Update version link
+      #   run: ./.github/scripts/update-docs-link.sh
 
-      - name: Create SDK Docs PR
-        id: docs_pr 
-        run: ./.github/scripts/push-docs-pr.sh
-        shell: bash
+      # - name: Push SDK Docs to imx-docs
+      #   id: docs_push 
+      #   run: ./.github/scripts/push-docs.sh
+      #   shell: bash
 
       - name: Trigger Netlify Build and Deploy
         id: netlify_build
         run: curl -X POST -d '{}' ${{ env.NETLIFY_BUILD_HOOK }}
 
-      - name: Notify SDK Slack Docs PR Success
-        if: ${{ success() && steps.docs_pr.conclusion == 'success' && steps.netlify_build.conclusion == 'success' }}
+      - name: Wait for 10 minutes
+        run: sleep 600
+
+      - name: Check Netlify Site Deployed
+        id: netlify_deploy
+        run: ./.github/scripts/check-docs-deployed.sh
+        shell: bash
+
+      - name: Notify SDK Slack Docs Publish Success
+        # if: ${{ success() && steps.docs_push.conclusion == 'success' && steps.netlify_build.conclusion == 'success' && steps.netlify_deploy.conclusion == 'success' }}
+        if: ${{ success() && steps.netlify_build.conclusion == 'success' && steps.netlify_deploy.conclusion == 'success' }}
         uses: ./.github/actions/notify-slack-publish-status
         with:
-          message: "✅ SDK reference documents PR created successfully - please review and merge ${{ env.PR }} into main."
+          message: "✅ SDK reference documents published successfully - https://docs.immutable.com/sdk-references/ts-immutable-sdk/$VERSION/modules/_imtbl_sdk.html"
 
-      - name: Notify SDK Slack Docs PR Failure
+      - name: Notify SDK Slack Docs Publish Failure
         if: ${{ failure() }}
         uses: ./.github/actions/notify-slack-publish-status
         with:
-          message: "❌ Failed to create SDK reference documents PR. Please check the logs for more details."
+          message: "❌ Failed to publish SDK reference documents. Please check the logs for more details."
