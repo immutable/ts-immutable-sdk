@@ -67,27 +67,27 @@ describe('AuthManager', () => {
   afterEach(jest.resetAllMocks);
 
   let authManager: AuthManager;
-  let signInMock: jest.Mock;
-  let signinPopupCallbackMock: jest.Mock;
-  let signoutRedirectMock: jest.Mock;
-  let getUserMock: jest.Mock;
-  let signinSilentMock: jest.Mock;
-  let signoutSilentMock: jest.Mock;
+  let mockSignIn: jest.Mock;
+  let mockSigninPopupCallback: jest.Mock;
+  let mockSignoutRedirect: jest.Mock;
+  let mockGetUser: jest.Mock;
+  let mockSigninSilent: jest.Mock;
+  let mockSignoutSilent: jest.Mock;
 
   beforeEach(() => {
-    signInMock = jest.fn();
-    signinPopupCallbackMock = jest.fn();
-    signoutRedirectMock = jest.fn();
-    getUserMock = jest.fn();
-    signinSilentMock = jest.fn();
-    signoutSilentMock = jest.fn();
+    mockSignIn = jest.fn();
+    mockSigninPopupCallback = jest.fn();
+    mockSignoutRedirect = jest.fn();
+    mockGetUser = jest.fn();
+    mockSigninSilent = jest.fn();
+    mockSignoutSilent = jest.fn();
     (UserManager as jest.Mock).mockReturnValue({
-      signinPopup: signInMock,
-      signinPopupCallback: signinPopupCallbackMock,
-      signoutRedirect: signoutRedirectMock,
-      signoutSilent: signoutSilentMock,
-      getUser: getUserMock,
-      signinSilent: signinSilentMock,
+      signinPopup: mockSignIn,
+      signinPopupCallback: mockSigninPopupCallback,
+      signoutRedirect: mockSignoutRedirect,
+      signoutSilent: mockSignoutSilent,
+      getUser: mockGetUser,
+      signinSilent: mockSigninSilent,
     });
     authManager = new AuthManager(config);
   });
@@ -163,7 +163,7 @@ describe('AuthManager', () => {
   describe('login', () => {
     describe('when the user has not registered for any rollup', () => {
       it('should get the login user and return the domain model', async () => {
-        signInMock.mockResolvedValue(mockOidcUser);
+        mockSignIn.mockResolvedValue(mockOidcUser);
 
         const result = await authManager.login();
 
@@ -173,7 +173,7 @@ describe('AuthManager', () => {
 
     describe('when the user has registered for imx', () => {
       it('should populate the imx object', async () => {
-        signInMock.mockResolvedValue({
+        mockSignIn.mockResolvedValue({
           ...mockOidcUser,
           profile: {
             ...mockOidcUser.profile,
@@ -191,7 +191,7 @@ describe('AuthManager', () => {
 
     describe('when the user has registered for zkEvm', () => {
       it('should populate the zkEvm object', async () => {
-        signInMock.mockResolvedValue({
+        mockSignIn.mockResolvedValue({
           ...mockOidcUser,
           profile: {
             ...mockOidcUser.profile,
@@ -209,7 +209,7 @@ describe('AuthManager', () => {
 
     describe('when the user has registered for imx & zkEvm', () => {
       it('should populate the imx & zkEvm objects', async () => {
-        signInMock.mockResolvedValue({
+        mockSignIn.mockResolvedValue({
           ...mockOidcUser,
           profile: {
             ...mockOidcUser.profile,
@@ -238,7 +238,7 @@ describe('AuthManager', () => {
     });
 
     it('should throw the error if user is failed to login', async () => {
-      signInMock.mockRejectedValue(new Error(mockErrorMsg));
+      mockSignIn.mockRejectedValue(new Error(mockErrorMsg));
 
       await expect(() => authManager.login()).rejects.toThrow(
         new PassportError(
@@ -251,8 +251,8 @@ describe('AuthManager', () => {
 
   describe('loginSilent', () => {
     it('should get the login user and return the domain model', async () => {
-      getUserMock.mockReturnValue(mockOidcUser);
-      signinSilentMock.mockResolvedValue(mockOidcUser);
+      mockGetUser.mockReturnValue(mockOidcUser);
+      mockSigninSilent.mockResolvedValue(mockOidcUser);
 
       const result = await authManager.loginSilent();
 
@@ -260,7 +260,7 @@ describe('AuthManager', () => {
     });
 
     it('should return null if there is no existed user', async () => {
-      getUserMock.mockReturnValue(null);
+      mockGetUser.mockReturnValue(null);
 
       const result = await authManager.loginSilent();
 
@@ -268,9 +268,9 @@ describe('AuthManager', () => {
     });
 
     it('should return null if user is returned', async () => {
-      getUserMock.mockReturnValue(mockOidcExpiredUser);
+      mockGetUser.mockReturnValue(mockOidcExpiredUser);
       (isTokenExpired as jest.Mock).mockReturnValue(true);
-      signinSilentMock.mockResolvedValue(null);
+      mockSigninSilent.mockResolvedValue(null);
 
       const result = await authManager.loginSilent();
 
@@ -282,7 +282,7 @@ describe('AuthManager', () => {
     it('should call login callback', async () => {
       await authManager.loginCallback();
 
-      expect(signinPopupCallbackMock).toBeCalled();
+      expect(mockSigninPopupCallback).toBeCalled();
     });
   });
 
@@ -294,7 +294,7 @@ describe('AuthManager', () => {
 
       await manager.logout();
 
-      expect(signoutRedirectMock).toBeCalled();
+      expect(mockSignoutRedirect).toBeCalled();
     });
 
     it('should call redirect logout if logout mode is not set', async () => {
@@ -304,7 +304,7 @@ describe('AuthManager', () => {
 
       await manager.logout();
 
-      expect(signoutRedirectMock).toBeCalled();
+      expect(mockSignoutRedirect).toBeCalled();
     });
 
     it('should call silent logout if logout mode is silent', async () => {
@@ -314,7 +314,7 @@ describe('AuthManager', () => {
 
       await manager.logout();
 
-      expect(signoutSilentMock).toBeCalled();
+      expect(mockSignoutSilent).toBeCalled();
     });
 
     it('should throw an error if user is failed to logout', async () => {
@@ -322,7 +322,7 @@ describe('AuthManager', () => {
       configuration.oidcConfiguration.logoutMode = 'redirect';
       const manager = new AuthManager(configuration);
 
-      signoutRedirectMock.mockRejectedValue(new Error(mockErrorMsg));
+      mockSignoutRedirect.mockRejectedValue(new Error(mockErrorMsg));
 
       await expect(() => manager.logout()).rejects.toThrow(
         new PassportError(
@@ -336,18 +336,18 @@ describe('AuthManager', () => {
   describe('getUser', () => {
     describe('when forceRefresh is set to true', () => {
       it('should call signinSilent and return the domain model', async () => {
-        signinSilentMock.mockReturnValue(mockOidcUser);
+        mockSigninSilent.mockReturnValue(mockOidcUser);
 
         const result = await authManager.getUser({ forceRefresh: true });
 
         expect(result).toEqual(mockUser);
-        expect(signinSilentMock).toBeCalled();
-        expect(getUserMock).not.toBeCalled();
+        expect(mockSigninSilent).toBeCalled();
+        expect(mockGetUser).not.toBeCalled();
       });
     });
 
     it('should retrieve the user from the userManager and return the domain model', async () => {
-      getUserMock.mockReturnValue(mockOidcUser);
+      mockGetUser.mockReturnValue(mockOidcUser);
       (isTokenExpired as jest.Mock).mockReturnValue(false);
 
       const result = await authManager.getUser();
@@ -356,40 +356,70 @@ describe('AuthManager', () => {
     });
 
     it('should call signinSilent and returns user when user token is expired with the refresh token', async () => {
-      getUserMock.mockReturnValue(mockOidcExpiredUser);
+      mockGetUser.mockReturnValue(mockOidcExpiredUser);
       (isTokenExpired as jest.Mock).mockReturnValue(true);
-      signinSilentMock.mockResolvedValue(mockOidcUser);
+      mockSigninSilent.mockResolvedValue(mockOidcUser);
 
       const result = await authManager.getUser();
 
-      expect(signinSilentMock).toBeCalledTimes(1);
+      expect(mockSigninSilent).toBeCalledTimes(1);
       expect(result).toEqual(mockUser);
     });
 
     it('should return null when the user token is expired without refresh token', async () => {
-      getUserMock.mockReturnValue(mockOidcExpiredNoRefreshTokenUser);
+      mockGetUser.mockReturnValue(mockOidcExpiredNoRefreshTokenUser);
       (isTokenExpired as jest.Mock).mockReturnValue(true);
 
       const result = await authManager.getUser();
 
-      expect(signinSilentMock).toBeCalledTimes(0);
+      expect(mockSigninSilent).toBeCalledTimes(0);
       expect(result).toEqual(null);
     });
 
     it('should return null when the user token is expired with the refresh token, but signinSilent returns null', async () => {
-      getUserMock.mockReturnValue(mockOidcExpiredUser);
+      mockGetUser.mockReturnValue(mockOidcExpiredUser);
       (isTokenExpired as jest.Mock).mockReturnValue(true);
-      signinSilentMock.mockResolvedValue(null);
+      mockSigninSilent.mockResolvedValue(null);
       const result = await authManager.getUser();
 
-      expect(signinSilentMock).toBeCalledTimes(1);
+      expect(mockSigninSilent).toBeCalledTimes(1);
       expect(result).toEqual(null);
     });
 
     it('should return null if no user is returned', async () => {
-      getUserMock.mockReturnValue(null);
+      mockGetUser.mockReturnValue(null);
 
       expect(await authManager.getUser()).toBeNull();
+    });
+
+    describe('when concurrent requests getUser are made', () => {
+      describe('when forceRefresh is set to true', () => {
+        it('should only call refresh the token once', async () => {
+          mockSigninSilent.mockReturnValue(mockOidcUser);
+
+          await Promise.allSettled([
+            authManager.getUser({ forceRefresh: true }),
+            authManager.getUser({ forceRefresh: true }),
+          ]);
+
+          expect(mockSigninSilent).toBeCalledTimes(1);
+        });
+      });
+
+      describe('when forceRefresh is set to false and the user is expired', () => {
+        it('should only call refresh the token once', async () => {
+          mockGetUser.mockReturnValue(mockOidcExpiredUser);
+          (isTokenExpired as jest.Mock).mockReturnValue(true);
+          mockSigninSilent.mockReturnValue(mockOidcUser);
+
+          await Promise.allSettled([
+            authManager.getUser(),
+            authManager.getUser(),
+          ]);
+
+          expect(mockSigninSilent).toBeCalledTimes(1);
+        });
+      });
     });
   });
 });

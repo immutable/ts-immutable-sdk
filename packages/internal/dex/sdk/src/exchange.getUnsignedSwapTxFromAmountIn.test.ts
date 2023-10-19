@@ -6,6 +6,9 @@ import {
 } from 'errors';
 import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
 import { constants, utils } from 'ethers';
+import { SecondaryFee } from 'types';
+import { Environment } from '@imtbl/config';
+import { IMMUTABLE_TESTNET_CHAIN_ID, TIMX_IMMUTABLE_TESTNET } from './constants';
 import { Exchange } from './exchange';
 import {
   mockRouterImplementation,
@@ -29,9 +32,13 @@ import {
   newAmountFromString,
   formatTokenAmount,
   WIMX_TEST_TOKEN,
+  NATIVE_TEST_TOKEN,
+  makeAddr,
+  createPool,
+  WETH_TEST_TOKEN,
 } from './test/utils';
 import {
-  addAmount, Router, SecondaryFee,
+  addAmount, Router,
 } from './lib';
 
 jest.mock('@ethersproject/providers');
@@ -72,6 +79,34 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         connect: jest.fn().mockResolvedValue(erc20Contract),
       }),
     ) as unknown as JsonRpcProvider;
+  });
+
+  describe('with the out-of-the-box minimal configuration', () => {
+    it('uses the edge tIMX as the gas token', async () => {
+      const tokenIn = { ...USDC_TEST_TOKEN, chainId: IMMUTABLE_TESTNET_CHAIN_ID };
+      const tokenOut = { ...WETH_TEST_TOKEN, chainId: IMMUTABLE_TESTNET_CHAIN_ID };
+      const params = { pools: [createPool(tokenIn, tokenOut)] };
+
+      mockRouterImplementation(params);
+
+      const exchange = new Exchange({
+        baseConfig: {
+          environment: Environment.SANDBOX,
+        },
+        chainId: IMMUTABLE_TESTNET_CHAIN_ID,
+      });
+
+      const result = await exchange.getUnsignedSwapTxFromAmountIn(
+        makeAddr('fromAddress'),
+        tokenIn.address,
+        tokenOut.address,
+        BigNumber.from(1),
+      );
+
+      expectToBeDefined(result.swap.gasFeeEstimate);
+      expect(result.swap.gasFeeEstimate.token).toEqual(TIMX_IMMUTABLE_TESTNET);
+      expect(result.swap.gasFeeEstimate.token.address).toEqual('0x0000000000000000000000000000000000001010');
+    });
   });
 
   describe('When the swap transaction requires approval', () => {
@@ -117,11 +152,11 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       expectToBeDefined(tx.approval?.gasFeeEstimate);
       expect(tx.approval.gasFeeEstimate.value).toEqual(TEST_GAS_PRICE.mul(APPROVE_GAS_ESTIMATE));
-      expect(tx.approval.gasFeeEstimate.token.chainId).toEqual(WIMX_TEST_TOKEN.chainId);
-      expect(tx.approval.gasFeeEstimate.token.address).toEqual(WIMX_TEST_TOKEN.address);
-      expect(tx.approval.gasFeeEstimate.token.decimals).toEqual(WIMX_TEST_TOKEN.decimals);
-      expect(tx.approval.gasFeeEstimate.token.symbol).toEqual(WIMX_TEST_TOKEN.symbol);
-      expect(tx.approval.gasFeeEstimate.token.name).toEqual(WIMX_TEST_TOKEN.name);
+      expect(tx.approval.gasFeeEstimate.token.chainId).toEqual(NATIVE_TEST_TOKEN.chainId);
+      expect(tx.approval.gasFeeEstimate.token.address).toEqual('');
+      expect(tx.approval.gasFeeEstimate.token.decimals).toEqual(NATIVE_TEST_TOKEN.decimals);
+      expect(tx.approval.gasFeeEstimate.token.symbol).toEqual(NATIVE_TEST_TOKEN.symbol);
+      expect(tx.approval.gasFeeEstimate.token.name).toEqual(NATIVE_TEST_TOKEN.name);
     });
   });
 

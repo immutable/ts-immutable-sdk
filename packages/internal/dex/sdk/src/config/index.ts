@@ -1,13 +1,12 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { ChainNotSupportedError, InvalidConfigurationError } from 'errors';
-import { SecondaryFee, isValidNonZeroAddress } from 'lib';
-import { Chain, ExchangeModuleConfiguration, ExchangeOverrides } from '../types';
+import { isValidNonZeroAddress } from 'lib';
+import { ExchangeModuleConfiguration, ExchangeOverrides, SecondaryFee, Chain } from '../types';
 import {
   IMMUTABLE_TESTNET_CHAIN_ID,
   IMMUTABLE_TESTNET_COMMON_ROUTING_TOKENS,
   IMMUTABLE_TESTNET_RPC_URL,
   MAX_SECONDARY_FEE_BASIS_POINTS,
-  NATIVE_IMX_IMMUTABLE_TESTNET,
   TIMX_IMMUTABLE_TESTNET,
 } from '../constants';
 
@@ -35,7 +34,7 @@ export const SUPPORTED_SANDBOX_CHAINS: Record<number, Chain> = {
     rpcUrl: IMMUTABLE_TESTNET_RPC_URL,
     contracts: CONTRACTS_FOR_CHAIN_ID[IMMUTABLE_TESTNET_CHAIN_ID],
     commonRoutingTokens: IMMUTABLE_TESTNET_COMMON_ROUTING_TOKENS,
-    nativeToken: NATIVE_IMX_IMMUTABLE_TESTNET,
+    nativeToken: TIMX_IMMUTABLE_TESTNET, // TODO: TP-1649: Change to Native when ready.
     wrappedNativeToken: TIMX_IMMUTABLE_TESTNET, // TODO: TP-1649: Change to WIMX when ready.
   },
 };

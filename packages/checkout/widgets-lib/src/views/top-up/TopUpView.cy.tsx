@@ -16,10 +16,7 @@ import { TopUpView } from './TopUpView';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { orchestrationEvents } from '../../lib/orchestrationEvents';
 import { WalletWidgetTestComponent } from '../../widgets/wallet/test-components/WalletWidgetTestComponent';
-import {
-  TopUpFeature,
-  WalletState,
-} from '../../widgets/wallet/context/WalletContext';
+import { WalletState } from '../../widgets/wallet/context/WalletContext';
 import { ConnectionStatus } from '../../context/connect-loader-context/ConnectLoaderContext';
 import {
   ConnectLoaderTestComponent,
@@ -196,16 +193,7 @@ describe('Top Up View', () => {
     });
 
     it('should fire swap event with swap data on event when swap clicked', () => {
-      const supportedTopUps: TopUpFeature = {
-        isOnRampEnabled: true,
-        isSwapEnabled: true,
-        isBridgeEnabled: true,
-        isSwapAvailable: true,
-      };
-
-      cy.stub(orchestrationEvents, 'sendRequestSwapEvent').as(
-        'sendRequestSwapEventStub',
-      );
+      cy.stub(orchestrationEvents, 'sendRequestSwapEvent').as('sendRequestSwapEventStub');
 
       mount(
         <BiomeCombinedProviders>
@@ -218,7 +206,6 @@ describe('Top Up View', () => {
               tokenAddress="0x123"
               amount="10"
               onCloseButtonClick={() => {}}
-              supportedTopUps={supportedTopUps}
             />
           </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
@@ -270,17 +257,12 @@ describe('Top Up View', () => {
 
   describe('TopUpView render with disabled options', () => {
     describe('when swap is unavailable', () => {
-      it('should not fire swap event', () => {
-        const supportedTopUps: TopUpFeature = {
-          isOnRampEnabled: true,
-          isSwapEnabled: true,
-          isBridgeEnabled: true,
-          isSwapAvailable: false,
-        };
+      beforeEach(() => {
+        cy.stub(Checkout.prototype, 'isSwapAvailable').as('isSwapAvailableStub').returns(false);
+      });
 
-        cy.stub(orchestrationEvents, 'sendRequestSwapEvent').as(
-          'sendRequestSwapEventStub',
-        );
+      it('should not fire swap event', () => {
+        cy.stub(orchestrationEvents, 'sendRequestSwapEvent').as('sendRequestSwapEventStub');
 
         mount(
           <BiomeCombinedProviders>
@@ -295,16 +277,14 @@ describe('Top Up View', () => {
                 tokenAddress="0x123"
                 amount="10"
                 onCloseButtonClick={() => {}}
-                supportedTopUps={supportedTopUps}
               />
             </ConnectLoaderTestComponent>
           </BiomeCombinedProviders>,
         );
 
-        cySmartGet('menu-item-caption-swap').should(
-          'have.text',
-          'Not available in your region ',
-        );
+        cySmartGet('loading-view').should('be.visible');
+        cy.wait(1000);
+        cySmartGet('menu-item-caption-swap').should('have.text', 'Not available in your region ');
         cySmartGet('menu-item-swap').click();
         cy.get('@sendRequestSwapEventStub').should('not.have.been.called');
       });
@@ -388,7 +368,6 @@ describe('Top Up View', () => {
               showBridgeOption
               widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
               onCloseButtonClick={() => {}}
-              supportedTopUps={baseWalletState.supportedTopUps}
             />
           </WalletWidgetTestComponent>
         </ConnectLoaderTestComponent>,
@@ -422,6 +401,7 @@ describe('Top Up View', () => {
           isSwapAvailable: false,
         },
       };
+      cy.stub(Checkout.prototype, 'isSwapAvailable').as('isSwapAvailableStub').returns(false);
       cy.stub(Checkout.prototype, 'getExchangeFeeEstimate')
         .as('getExchangeFeeEstimateStub')
         .onFirstCall()
@@ -432,6 +412,18 @@ describe('Top Up View', () => {
       cy.stub(Checkout.prototype, 'gasEstimate')
         .as('gasEstimateStub')
         .onFirstCall()
+        .resolves({
+          gasEstimateType: GasEstimateType.SWAP,
+          gasFee: {
+            estimatedAmount: BigNumber.from(100000000000000),
+            token: {
+              name: 'Ethereum',
+              symbol: 'ETH',
+              decimals: 18,
+            },
+          },
+        })
+        .onSecondCall()
         .resolves({
           gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
           gasFee: {
@@ -464,7 +456,6 @@ describe('Top Up View', () => {
               showBridgeOption
               widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
               onCloseButtonClick={() => {}}
-              supportedTopUps={baseWalletState.supportedTopUps}
             />
           </WalletWidgetTestComponent>
         </ConnectLoaderTestComponent>,
@@ -519,7 +510,6 @@ describe('Top Up View', () => {
               showBridgeOption
               widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
               onCloseButtonClick={() => {}}
-              supportedTopUps={baseWalletState.supportedTopUps}
             />
           </WalletWidgetTestComponent>
         </ConnectLoaderTestComponent>,
@@ -561,7 +551,6 @@ describe('Top Up View', () => {
                 showBridgeOption
                 widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
                 onCloseButtonClick={() => {}}
-                supportedTopUps={baseWalletState.supportedTopUps}
               />
             </CryptoFiatProvider>
           </WalletWidgetTestComponent>
