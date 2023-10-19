@@ -8,17 +8,12 @@ import { IV3SwapRouter } from 'contracts/types/SecondaryFee';
 import { PromiseOrValue } from 'contracts/types/common';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
 import { NativeTokenService } from 'lib/nativeTokenService';
+import { ExchangeModuleConfiguration, SecondaryFee, CoinAmount, Coin, ERC20, Native, Amount } from 'types';
 import {
-  Amount,
-  Coin,
-  ERC20,
   erc20ToUniswapToken,
-  ExchangeModuleConfiguration,
-  Native,
   newAmount,
   Router,
   RoutingContracts,
-  SecondaryFee,
 } from '../lib';
 
 export const TEST_GAS_PRICE = BigNumber.from('1500000000'); // 1.5 gwei or 1500000000 wei
@@ -353,7 +348,7 @@ type MockParams = {
   exchangeRate?: number;
 };
 
-export const amountOutFromAmountIn = (amountIn: Amount<ERC20>, tokenOut: ERC20, exchangeRate: number) => {
+export const amountOutFromAmountIn = (amountIn: CoinAmount<ERC20>, tokenOut: ERC20, exchangeRate: number) => {
   let amountOut = amountIn.value.mul(exchangeRate); // 10 * 10^18
 
   if (amountIn.token.decimals > tokenOut.decimals) {
@@ -367,7 +362,7 @@ export const amountOutFromAmountIn = (amountIn: Amount<ERC20>, tokenOut: ERC20, 
   return newAmount(amountOut, tokenOut);
 };
 
-export const amountInFromAmountOut = (amountOut: Amount<ERC20>, tokenIn: ERC20, exchangeRate: number) => {
+export const amountInFromAmountOut = (amountOut: CoinAmount<ERC20>, tokenIn: ERC20, exchangeRate: number) => {
   let amountIn = amountOut.value.div(exchangeRate); // 1 * 10^6
 
   if (tokenIn.decimals > amountOut.token.decimals) {
@@ -384,7 +379,7 @@ export const amountInFromAmountOut = (amountOut: Amount<ERC20>, tokenIn: ERC20, 
 export function mockRouterImplementation(params: MockParams) {
   const exchangeRate = params.exchangeRate ?? 10; // 1 TokenIn = 10 TokenOut
   const findOptimalRoute = jest.fn((
-    amountSpecified: Amount<ERC20>,
+    amountSpecified: CoinAmount<ERC20>,
     otherToken: ERC20,
     tradeType: TradeType,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -456,7 +451,7 @@ export function makeAddr(str: string): string {
   return utils.keccak256(utils.toUtf8Bytes(str)).slice(0, 42);
 }
 
-export function formatAmount(amount: Amount<Coin>): string {
+export function formatAmount(amount: CoinAmount<Coin> | Amount): string {
   return utils.formatUnits(amount.value, amount.token.decimals);
 }
 
@@ -471,7 +466,7 @@ export function formatEther(bn: PromiseOrValue<BigNumberish>): string {
   throw new Error('formatEther: bn is not a BigNumber');
 }
 
-export function newAmountFromString<T extends Coin>(amount: string, token: T): Amount<T> {
+export function newAmountFromString<T extends Coin>(amount: string, token: T): CoinAmount<T> {
   const bn = utils.parseUnits(amount, token.decimals);
   return newAmount(bn, token);
 }
