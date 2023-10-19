@@ -323,7 +323,7 @@ export const text = {
     },
     [SaleWidgetViews.FUND_WITH_SMART_CHECKOUT]: {
       loading: {
-        checkingBalances: 'Checking balances',
+        checkingBalances: 'Crunching numbers',
       },
     },
     [SaleWidgetViews.PAYMENT_METHODS]: {
