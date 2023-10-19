@@ -24,9 +24,11 @@ export class ImmutableSmart extends ImmutableWebComponent {
     this.walletProvider = this.getAttribute(
       'walletProvider',
     )?.toLowerCase() as WalletProviderName;
+    this.renderWidget();
+  }
 
-    console.log('this.walletProvider', this.walletProvider);
-
+  attributeChangedCallback(name: string, oldValue: any, newValue: any): void {
+    super.attributeChangedCallback(name, oldValue, newValue);
     this.renderWidget();
   }
 
@@ -65,7 +67,6 @@ export class ImmutableSmart extends ImmutableWebComponent {
     const params: SmartWidgetParams = {
       fromContractAddress: this.fromContractAddress,
       amount: this.amount,
-      // connectLoaderParams,
     };
 
     if (!this.reactRoot) {
