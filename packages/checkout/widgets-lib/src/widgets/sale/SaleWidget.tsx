@@ -160,6 +160,20 @@ export function SaleWidget(props: SaleWidgetProps) {
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
     },
+    [SaleErrorTypes.SMART_CHECKOUT_NO_ROUTES_FOUND]: {
+      onActionClick: () => {
+        goBackToPaymentMethods();
+      },
+      onSecondaryActionClick: closeWidget,
+      statusType: StatusType.INFORMATION,
+    },
+    [SaleErrorTypes.SMART_CHECKOUT_ERROR]: {
+      onActionClick: () => {
+        goBackToPaymentMethods();
+      },
+      onSecondaryActionClick: closeWidget,
+      statusType: StatusType.INFORMATION,
+    },
     [SaleErrorTypes.DEFAULT]: {
       onActionClick: goBackToPaymentMethods,
       onSecondaryActionClick: closeWidget,
