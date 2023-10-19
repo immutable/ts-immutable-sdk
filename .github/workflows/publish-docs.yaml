@@ -33,9 +33,9 @@ jobs:
           echo "VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
           echo "CLONE_DIR=./imx-docs" >> $GITHUB_ENV
 
-      # - name: Pending release check
-      #   run: ./.github/scripts/check-pending-release.sh
-      #   shell: bash
+      - name: Docs version check
+        run: ./.github/scripts/check-docs-version.sh
+        shell: bash      
 
       - name: Setup Github
         run: |
