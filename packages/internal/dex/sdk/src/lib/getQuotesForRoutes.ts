@@ -4,7 +4,7 @@ import { BigNumber, ethers } from 'ethers';
 import { ProviderCallError } from 'errors';
 import { CoinAmount, ERC20 } from 'types';
 import { multicallMultipleCallDataSingContract, MulticallResponse } from './multicall';
-import { quoteReturnMapping, toCurrencyAmount, uniswapTokenToERC20 } from './utils';
+import { newAmount, quoteReturnMapping, toCurrencyAmount, uniswapTokenToERC20 } from './utils';
 import { Multicall } from '../contracts/types';
 import { TradeRequest } from './tradeRequest/base';
 
@@ -14,9 +14,7 @@ const gasEstimateIndex = 3;
 export type QuoteResult = {
   route: Route<Token, Token>;
   gasEstimate: ethers.BigNumber;
-  amountIn: CoinAmount<ERC20>;
-  amountOut: CoinAmount<ERC20>;
-  tradeType: TradeType;
+  amount: CoinAmount<ERC20>;
 };
 
 export async function getQuotesForRoutes(
@@ -68,15 +66,16 @@ export async function getQuotesForRoutes(
         const quoteAmount = decodedQuoteResult[amountIndex];
         if (!(quoteAmount instanceof BigNumber)) throw new Error('Expected BigNumber');
 
-        const input = uniswapTokenToERC20(routes[i].input);
-        const output = uniswapTokenToERC20(routes[i].output);
+        const amount = tradeRequest.tradeType === TradeType.EXACT_INPUT
+          ? newAmount(quoteAmount, uniswapTokenToERC20(routes[i].output))
+          : newAmount(quoteAmount, uniswapTokenToERC20(routes[i].input));
+
+        const gasEstimate = ethers.BigNumber.from(decodedQuoteResult[gasEstimateIndex]);
 
         decodedQuoteResults.push({
           route: routes[i],
-          amountIn: tradeRequest.buildQuoteAmountIn(quoteAmount, input), // tradeType === TradeType.EXACT_INPUT ? amountSpecified : newAmount(quoteAmount, input),
-          amountOut: tradeRequest.buildQuoteAmountOut(quoteAmount, output), // tradeType === TradeType.EXACT_INPUT ? newAmount(quoteAmount, output) : amountSpecified,
-          gasEstimate: ethers.BigNumber.from(decodedQuoteResult[gasEstimateIndex]),
-          tradeType: tradeRequest.tradeType,
+          amount,
+          gasEstimate,
         });
       }
     } catch {

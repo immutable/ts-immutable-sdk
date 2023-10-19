@@ -20,7 +20,7 @@ export class ExactOutputQuote extends Quote {
   }
 
   get quotedAmount() {
-    return addAmount(this.quoteResult.amountIn, this.totalFees);
+    return addAmount(this.quoteResult.amount, this.totalFees);
   }
 
   get amountInForApproval() {
@@ -37,8 +37,8 @@ export class ExactOutputQuote extends Quote {
 
   get amountInSubjectToFees(): CoinAmount<Coin> {
     return this.nativeTokenService.isNativeToken(this.tokenIn)
-      ? this.nativeTokenService.unwrapAmount(this.quoteResult.amountIn)
-      : this.quoteResult.amountIn;
+      ? this.nativeTokenService.unwrapAmount(this.quoteResult.amount)
+      : this.quoteResult.amount;
   }
 
   get slippageMultiplier() {

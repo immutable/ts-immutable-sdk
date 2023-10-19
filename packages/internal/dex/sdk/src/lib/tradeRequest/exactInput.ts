@@ -28,7 +28,7 @@ export class ExactInput extends TradeRequest {
     let bestQuote = quotes[0];
 
     for (let i = 1; i < quotes.length; i++) {
-      if (quotes[i].amountOut.value.gt(bestQuote.amountOut.value)) {
+      if (quotes[i].amount.value.gt(bestQuote.amount.value)) {
         bestQuote = quotes[i];
       }
     }

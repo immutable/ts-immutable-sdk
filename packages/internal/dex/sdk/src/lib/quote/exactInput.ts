@@ -19,12 +19,12 @@ export class ExactInputQuote extends Quote {
   }
 
   get amountOut() {
-    return this.quoteResult.amountOut;
+    return this.quoteResult.amount;
   }
 
   // fees have already been taken into account
   get quotedAmount() {
-    return this.quoteResult.amountOut;
+    return this.quoteResult.amount;
   }
 
   get amountInForApproval() {

@@ -58,7 +58,7 @@ export abstract class Quote {
   }
 
   get tradeType() {
-    return this.quoteResult.tradeType;
+    return this.tradeRequest.tradeType;
   }
 
   get gasEstimate() {

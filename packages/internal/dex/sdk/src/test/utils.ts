@@ -373,22 +373,15 @@ export function mockRouterImplementation(params: MockParams) {
       erc20ToUniswapToken(tradeRequest.tokenOut),
     );
 
-    const amountIn =
-      tradeRequest.tradeType === TradeType.EXACT_INPUT
-        ? tradeRequest.specifiedAmount
-        : amountInFromAmountOut(tradeRequest.ourQuoteReqAmount, tradeRequest.tokenIn, exchangeRate);
-
-    const amountOut =
+    const amount =
       tradeRequest.tradeType === TradeType.EXACT_INPUT
         ? amountOutFromAmountIn(tradeRequest.ourQuoteReqAmount, tradeRequest.tokenOut, exchangeRate)
-        : tradeRequest.specifiedAmount;
+        : amountInFromAmountOut(tradeRequest.ourQuoteReqAmount, tradeRequest.tokenIn, exchangeRate);
 
     const quote = tradeRequest.addBestQuote([
       {
         route,
-        amountIn,
-        amountOut,
-        tradeType: tradeRequest.tradeType,
+        amount,
         gasEstimate: TEST_TRANSACTION_GAS_USAGE,
       },
     ]);
