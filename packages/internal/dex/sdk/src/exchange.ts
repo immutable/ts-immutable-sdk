@@ -4,16 +4,39 @@ import assert from 'assert';
 import { DuplicateAddressesError, InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError } from 'errors';
 import { fetchGasPrice } from 'lib/transactionUtils/gas';
 import { getApproval, prepareApproval } from 'lib/transactionUtils/approval';
-import { getOurQuoteReqAmount, prepareUserQuote } from 'lib/transactionUtils/getQuote';
+import { applySlippage, getOurQuoteReqAmount, getQuoteAmountFromTradeType } from 'lib/transactionUtils/getQuote';
 import { Fees } from 'lib/fees';
 import { SecondaryFee__factory } from 'contracts/types';
 import { NativeTokenService } from 'lib/nativeTokenService';
 import { DEFAULT_DEADLINE, DEFAULT_MAX_HOPS, DEFAULT_SLIPPAGE, MAX_MAX_HOPS, MIN_MAX_HOPS } from './constants';
 import { Router } from './lib/router';
-import { getERC20Decimals, isValidNonZeroAddress, newAmount } from './lib/utils';
-import { ERC20, ExchangeModuleConfiguration, Native, SecondaryFee, TransactionResponse } from './types';
+import { getERC20Decimals, isValidNonZeroAddress, newAmount, toPublicAmount } from './lib/utils';
+import {
+  Coin,
+  CoinAmount,
+  ERC20,
+  ExchangeModuleConfiguration,
+  Quote,
+  SecondaryFee,
+  TransactionResponse,
+} from './types';
 import { getSwap, adjustQuoteWithFees } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
+
+const toPublicQuote = (
+  amount: CoinAmount<ERC20>,
+  amountWithMaxSlippage: CoinAmount<ERC20>,
+  slippage: number,
+  fees: Fees,
+): Quote => ({
+  amount,
+  amountWithMaxSlippage,
+  slippage,
+  fees: fees.withAmounts().map((fee) => ({
+    ...fee,
+    amount: toPublicAmount(fee.amount),
+  })),
+});
 
 export class Exchange {
   private provider: ethers.providers.JsonRpcProvider;
@@ -22,7 +45,7 @@ export class Exchange {
 
   private chainId: number;
 
-  private nativeToken: Native;
+  private nativeToken: Coin;
 
   private wrappedNativeToken: ERC20;
 
@@ -148,24 +171,29 @@ export class Exchange {
       this.nativeTokenService,
     );
 
-    const userQuote = prepareUserQuote(otherToken, adjustedQuote, slippagePercent, fees, this.nativeTokenService);
+    const quotedAmount = getQuoteAmountFromTradeType(adjustedQuote);
+    const amountWithMaxSlippage = newAmount(
+      applySlippage(adjustedQuote.tradeType, quotedAmount.value, slippagePercent),
+      otherToken,
+    );
 
     const preparedApproval = prepareApproval(
       tradeType,
       amountSpecified,
-      userQuote.amountWithMaxSlippage,
-      this.router.routingContracts,
+      amountWithMaxSlippage,
+      {
+        routerAddress: this.routerContractAddress,
+        secondaryFeeAddress: this.secondaryFeeContractAddress,
+      },
       secondaryFees,
     );
 
     // preparedApproval always uses the tokenIn address because we are always selling the tokenIn
-    const approval = await getApproval(this.provider, fromAddress, preparedApproval, gasPrice, this.nativeTokenService);
+    const approval = await getApproval(this.provider, fromAddress, preparedApproval, gasPrice);
 
-    return {
-      approval,
-      swap,
-      quote: userQuote,
-    };
+    const quote = toPublicQuote(quotedAmount, amountWithMaxSlippage, slippagePercent, fees);
+
+    return { quote, approval, swap };
   }
 
   /**
