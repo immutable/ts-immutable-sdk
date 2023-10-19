@@ -76,7 +76,7 @@ export const smartCheckout = async (
 
   const routingOutcome = await measureAsyncExecution<RoutingOutcome>(
     config,
-    'Time to calculate the routes',
+    'Total time to run the routing calculator',
     routingCalculator(
       config,
       ownerAddress,
