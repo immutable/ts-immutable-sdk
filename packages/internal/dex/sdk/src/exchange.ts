@@ -22,7 +22,7 @@ const toPublicQuote = (
   slippage: number,
   fees: Fees,
 ): Quote => ({
-  amount: toPublicAmount(amount),
+  amount,
   amountWithMaxSlippage,
   slippage,
   fees: fees.withAmounts().map((fee) => ({
