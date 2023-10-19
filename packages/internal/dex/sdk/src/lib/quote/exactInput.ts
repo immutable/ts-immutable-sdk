@@ -22,7 +22,7 @@ export class ExactInputQuote extends Quote {
     return this.quoteResult.amount;
   }
 
-  // fees have already been taken into account
+  // Fees were already taken before the quote, so nothing further to do here.
   get quotedAmount() {
     return this.quoteResult.amount;
   }

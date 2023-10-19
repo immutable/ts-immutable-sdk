@@ -13,16 +13,21 @@ export abstract class Quote {
   nativeTokenService: NativeTokenService;
 
   abstract tradeRequest: TradeRequest;
-  abstract amountInForSwap: CoinAmount<ERC20>;
-  abstract amountOut: CoinAmount<ERC20>;
 
-  // Amount that should be quoted to the user without slippage but including fees
+  // Amount of tokenIn to be used for the swap.
+  abstract amountInForSwap: CoinAmount<ERC20>;
+
+  // Amount of tokenIn to be used for the approval.
+  abstract amountInForApproval: CoinAmount<ERC20>;
+
+  // Amount to be quoted to the user without slippage but including fees
   abstract quotedAmount: CoinAmount<Coin>;
 
-  // Amount that should be used as the base amount to calculate fees
+  // Amount of tokenIn to be used as the base amount to calculate fees
   abstract amountInSubjectToFees: CoinAmount<Coin>;
+
+  abstract amountOut: CoinAmount<ERC20>;
   abstract slippageMultiplier: Fraction;
-  abstract amountInForApproval: CoinAmount<ERC20>;
 
   constructor(quoteResult: QuoteResult, nativeTokenService: NativeTokenService) {
     this.quoteResult = quoteResult;
@@ -48,7 +53,7 @@ export abstract class Quote {
   }
 
   // slippage is always on the quoted amount
-  get amountWithMaxSlippage(): CoinAmount<ERC20> {
+  get quotedAmountWithMaxSlippage(): CoinAmount<ERC20> {
     const amountWithSlippage = this.slippageMultiplier.multiply(this.quotedAmount.value.toString()).quotient;
     return newAmount(ethers.BigNumber.from(amountWithSlippage.toString()), this.tradeRequest.otherToken);
   }

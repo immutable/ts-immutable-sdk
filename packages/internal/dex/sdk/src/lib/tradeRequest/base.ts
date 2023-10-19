@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/lines-between-class-members */
 import { TradeType } from '@uniswap/sdk-core';
-import { ethers } from 'ethers';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
 import { NativeTokenService } from 'lib/nativeTokenService';
 import { Quote } from 'lib/quote/base';
@@ -22,9 +21,7 @@ export abstract class TradeRequest {
     this.nativeTokenService = nativeTokenService;
   }
 
-  abstract buildQuoteAmountIn(value: ethers.BigNumber, token: ERC20): CoinAmount<ERC20>;
-  abstract buildQuoteAmountOut(value: ethers.BigNumber, token: ERC20): CoinAmount<ERC20>;
-  abstract addBestQuote(quotes: QuoteResult[]): Quote;
+  abstract getBestQuote(quotes: QuoteResult[]): Quote;
 
   abstract tokenIn: ERC20;
   abstract tokenOut: ERC20;

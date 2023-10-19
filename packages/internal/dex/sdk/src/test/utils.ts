@@ -378,7 +378,7 @@ export function mockRouterImplementation(params: MockParams) {
         ? amountOutFromAmountIn(tradeRequest.ourQuoteReqAmount, tradeRequest.tokenOut, exchangeRate)
         : amountInFromAmountOut(tradeRequest.ourQuoteReqAmount, tradeRequest.tokenIn, exchangeRate);
 
-    const quote = tradeRequest.addBestQuote([
+    const quote = tradeRequest.getBestQuote([
       {
         route,
         amount,

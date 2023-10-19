@@ -4,7 +4,6 @@ import { NativeTokenService } from 'lib/nativeTokenService';
 import { ExactOutput } from 'lib/tradeRequest/exactOutput';
 import { slippageToFraction } from 'lib/transactionUtils/slippage';
 import { addAmount, newAmount } from 'lib/utils';
-import { Coin, CoinAmount } from 'types';
 import { Quote } from './base';
 
 export class ExactOutputQuote extends Quote {
@@ -24,10 +23,10 @@ export class ExactOutputQuote extends Quote {
   }
 
   get amountInForApproval() {
-    if (this.nativeTokenService.isNativeToken(this.amountWithMaxSlippage.token)) {
+    if (this.nativeTokenService.isNativeToken(this.quotedAmountWithMaxSlippage.token)) {
       return newAmount(BigNumber.from(0), this.tokenIn);
     }
-    return this.amountWithMaxSlippage;
+    return this.quotedAmountWithMaxSlippage;
   }
 
   get amountInForSwap() {
@@ -35,7 +34,7 @@ export class ExactOutputQuote extends Quote {
     return this.nativeTokenService.maybeWrapAmount(amountWithFeesApplied);
   }
 
-  get amountInSubjectToFees(): CoinAmount<Coin> {
+  get amountInSubjectToFees() {
     return this.nativeTokenService.isNativeToken(this.tokenIn)
       ? this.nativeTokenService.unwrapAmount(this.quoteResult.amount)
       : this.quoteResult.amount;

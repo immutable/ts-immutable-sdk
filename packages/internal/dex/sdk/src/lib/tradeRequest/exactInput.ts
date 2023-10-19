@@ -1,6 +1,5 @@
 /* eslint-disable class-methods-use-this */
 import { TradeType } from '@uniswap/sdk-core';
-import { ethers } from 'ethers';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
 import { NativeTokenService } from 'lib/nativeTokenService';
 import { Quote } from 'lib/quote/base';
@@ -24,7 +23,7 @@ export class ExactInput extends TradeRequest {
     this.tokenOut = tokenOut;
   }
 
-  addBestQuote(quotes: QuoteResult[]): Quote {
+  getBestQuote(quotes: QuoteResult[]): Quote {
     let bestQuote = quotes[0];
 
     for (let i = 1; i < quotes.length; i++) {
@@ -34,14 +33,6 @@ export class ExactInput extends TradeRequest {
     }
 
     return new ExactInputQuote(this, bestQuote, this.nativeTokenService);
-  }
-
-  buildQuoteAmountIn(): CoinAmount<ERC20> {
-    return this.specifiedAmount;
-  }
-
-  buildQuoteAmountOut(value: ethers.BigNumber, token: ERC20): CoinAmount<ERC20> {
-    return newAmount(value, token);
   }
 
   get amountLessFees() {

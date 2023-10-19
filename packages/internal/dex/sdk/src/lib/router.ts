@@ -75,7 +75,7 @@ export class Router {
       throw new NoRoutesAvailableError();
     }
 
-    return tradeRequest.addBestQuote(quotes);
+    return tradeRequest.getBestQuote(quotes);
   }
 }
 

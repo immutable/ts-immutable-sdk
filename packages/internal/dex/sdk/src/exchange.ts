@@ -18,7 +18,7 @@ import { ExchangeConfiguration } from './config';
 
 const toPublicQuote = (quote: Quote): PublicQuote => ({
   amount: toPublicAmount(quote.quotedAmount),
-  amountWithMaxSlippage: quote.amountWithMaxSlippage,
+  amountWithMaxSlippage: quote.quotedAmountWithMaxSlippage,
   slippage: quote.slippagePercentage,
   fees: quote.secondaryFees.map((fee) => ({
     ...fee,

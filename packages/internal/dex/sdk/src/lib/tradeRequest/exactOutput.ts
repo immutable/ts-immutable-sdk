@@ -31,7 +31,7 @@ export class ExactOutput extends TradeRequest {
     return this.specifiedAmount;
   }
 
-  addBestQuote(quotes: QuoteResult[]): Quote {
+  getBestQuote(quotes: QuoteResult[]): Quote {
     let bestQuote = quotes[0];
 
     for (let i = 1; i < quotes.length; i++) {
