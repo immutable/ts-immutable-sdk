@@ -8,6 +8,7 @@ import { getL1ChainId, getL2ChainId } from '../../lib';
 import { ConnectLoader, ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
 import { sendSmartWidgetCloseEvent } from './SmartWidgetEvents';
 import { isValidAddress, isValidAmount, isValidWalletProvider } from '../../lib/validations/widgetValidators';
+import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 
 export class ImmutableSmart extends ImmutableWebComponent {
   fromContractAddress = '';
@@ -73,17 +74,21 @@ export class ImmutableSmart extends ImmutableWebComponent {
 
     this.reactRoot.render(
       <React.StrictMode>
-
-        <ConnectLoader
-          params={connectLoaderParams}
-          closeEvent={sendSmartWidgetCloseEvent}
+        <CustomAnalyticsProvider
           widgetConfig={this.widgetConfig!}
         >
-          <SmartWidget
-            params={params}
-            config={this.widgetConfig!}
-          />
-        </ConnectLoader>
+          <ConnectLoader
+            params={connectLoaderParams}
+            closeEvent={sendSmartWidgetCloseEvent}
+            widgetConfig={this.widgetConfig!}
+          >
+            <SmartWidget
+              params={params}
+              config={this.widgetConfig!}
+            />
+          </ConnectLoader>
+        </CustomAnalyticsProvider>
+
       </React.StrictMode>,
     );
   }

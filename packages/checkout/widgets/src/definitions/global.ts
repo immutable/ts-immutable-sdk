@@ -132,6 +132,8 @@ export interface ImtblSmartProps
   React.HTMLAttributes<HTMLElement>,
   HTMLElement
   > {
+  walletProvider?: string;
+  widgetConfig?: string;
   amount?: string;
   contractAddress?: string;
 }

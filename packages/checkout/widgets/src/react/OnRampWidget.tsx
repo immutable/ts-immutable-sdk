@@ -53,7 +53,7 @@ export function OnRampReact(props: OnRampReactProps): JSX.Element {
       widgetConfig={config}
       walletProvider={walletProvider}
       amount={amount ?? ''}
-      contractAddress={contractAddress ?? ''}
+      fromContractAddress={contractAddress ?? ''}
     />
   );
 }

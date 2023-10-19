@@ -12,10 +12,7 @@ import { ConnectEventType, ConnectionSuccess, IMTBLWidgetEvents } from '@imtbl/c
 
 import {
   ConnectTargetLayer,
-  // ConnectTargetLayer,
   WidgetTheme, getL1ChainId, getL2ChainId,
-  // getL1ChainId,
-  // getL2ChainId,
 } from '../../lib';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
@@ -32,9 +29,7 @@ import {
   ConnectLoaderActions,
   ConnectLoaderContext,
 } from '../../context/connect-loader-context/ConnectLoaderContext';
-// import { ConnectLoader, ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
 import { BridgeWidget, BridgeWidgetParams } from '../bridge/BridgeWidget';
-// import { sendBridgeWidgetCloseEvent } from '../bridge/BridgeWidgetEvents';
 import { text } from '../../resources/text/textConfig';
 import { LoadingView } from '../../views/loading/LoadingView';
 import { SmartWidgetViews } from '../../context/view-context/SmartViewContextType';
@@ -43,7 +38,6 @@ import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
 import { SimpleTextBody } from '../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../components/Footer/FooterButton';
 import { SmartCheckoutHero } from '../../components/Hero/SmartCheckoutHero';
-// import { sendSwapWidgetCloseEvent } from '../swap/SwapWidgetEvents';
 import {
   EventTargetActions, EventTargetContext, eventTargetReducer, initialEventTargetState,
 } from '../../context/event-target-context/EventTargetContext';
@@ -121,7 +115,6 @@ export function SmartWidget(props: SmartWidgetProps) {
       type: SmartWidgetViews.SMART_SWAP,
       data: viewState.view.data,
     };
-    console.log('setNextView swap', nextView);
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
@@ -131,7 +124,6 @@ export function SmartWidget(props: SmartWidgetProps) {
         },
       },
     });
-    // await switchNetwork(getL2ChainId(checkout!.config));
   }, [provider]);
 
   const bridgeClick = useCallback(async () => {
@@ -156,7 +148,6 @@ export function SmartWidget(props: SmartWidgetProps) {
       type: SmartWidgetViews.SMART_BRIDGE,
       data: viewState.view.data,
     };
-    console.log('setNextView bridge', nextView);
 
     viewDispatch({
       payload: {
@@ -167,7 +158,6 @@ export function SmartWidget(props: SmartWidgetProps) {
         },
       },
     });
-    // await switchNetwork(getL2ChainId(checkout!.config));
   }, [provider]);
 
   const walletClick = () => {
@@ -197,7 +187,6 @@ export function SmartWidget(props: SmartWidgetProps) {
   };
 
   const handleConnectEvent = (event) => {
-    console.log('Connect event triggered!', event);
     switch (event.detail.type) {
       case ConnectEventType.SUCCESS: {
         const eventData = event.detail.data as ConnectionSuccess;
@@ -207,7 +196,6 @@ export function SmartWidget(props: SmartWidgetProps) {
             provider: eventData.provider,
           },
         });
-        console.log('nextView', nextView);
         if (nextView.current !== false) {
           viewDispatch({
             payload: {
@@ -225,9 +213,10 @@ export function SmartWidget(props: SmartWidgetProps) {
   };
 
   useEffect(() => {
-    console.log('nextView set listener', nextView);
-    // Add a custom event listener when the component mounts
+    // Handle the connect event when switching networks
     eventTarget.addEventListener(IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT, handleConnectEvent);
+
+    // Handle the other widget events
     eventTarget.addEventListener(IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT, handleCustomEvent);
     eventTarget.addEventListener(IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT, handleCustomEvent);
     eventTarget.addEventListener(IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, handleCustomEvent);
