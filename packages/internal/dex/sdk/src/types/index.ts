@@ -61,7 +61,7 @@ export type CoinAmount<T extends Coin> = {
  * @property {number} slippage - The slippage percentage used to calculate the quote
  * @property {Fee[]} fees - The secondary fees applied to the swap
  */
-export type Quote = {
+export type PublicQuote = {
   amount: Amount;
   amountWithMaxSlippage: Amount;
   slippage: number;
@@ -87,7 +87,7 @@ export type TransactionDetails = {
 export type TransactionResponse = {
   approval: TransactionDetails | null;
   swap: TransactionDetails;
-  quote: Quote;
+  quote: PublicQuote;
 };
 
 /**

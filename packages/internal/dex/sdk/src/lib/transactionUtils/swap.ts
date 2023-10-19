@@ -5,11 +5,9 @@ import { SwapRouter } from '@uniswap/router-sdk';
 import { Token, Percent, TradeType } from '@uniswap/sdk-core';
 import { SecondaryFee__factory } from 'contracts/types';
 import { ISecondaryFee, SecondaryFeeInterface } from 'contracts/types/SecondaryFee';
-import { Fees } from 'lib/fees';
-import { toCurrencyAmount } from 'lib/utils';
-import { QuoteResult } from 'lib/getQuotesForRoutes';
-import { NativeTokenService } from 'lib/nativeTokenService';
+import { toCurrencyAmount, toPublicAmount } from 'lib/utils';
 import { Coin, CoinAmount } from 'types';
+import { Quote } from 'lib/quote/base';
 import {
   SecondaryFee, TransactionDetails,
 } from '../../types';
@@ -164,21 +162,19 @@ function createSwapCallParametersWithFees(
 }
 
 function createSwapParameters(
-  adjustedQuote: QuoteResult,
+  quote: Quote,
   fromAddress: string,
-  slippage: number,
   deadline: number,
-  secondaryFees: SecondaryFee[],
 ): string {
   // Create an unchecked trade to be used in generating swap parameters.
   const uncheckedTrade = Trade.createUncheckedTrade({
-    route: adjustedQuote.route,
-    inputAmount: toCurrencyAmount(adjustedQuote.amountIn),
-    outputAmount: toCurrencyAmount(adjustedQuote.amountOut),
-    tradeType: adjustedQuote.tradeType,
+    route: quote.route,
+    inputAmount: toCurrencyAmount(quote.amountInForSwap),
+    outputAmount: toCurrencyAmount(quote.amountOut),
+    tradeType: quote.tradeType,
   });
 
-  const slippageTolerance = slippageToFraction(slippage);
+  const slippageTolerance = slippageToFraction(quote.slippagePercentage);
 
   const options: SwapOptions = {
     slippageTolerance,
@@ -186,90 +182,38 @@ function createSwapParameters(
     deadlineOrPreviousBlockhash: deadline,
   };
 
-  if (secondaryFees.length === 0) {
+  if (quote.secondaryFees.length === 0) {
     // Generate swap parameters without secondary fee contract details
     return SwapRouter.swapCallParameters([uncheckedTrade], options).calldata;
   }
 
-  return createSwapCallParametersWithFees(uncheckedTrade, fromAddress, options, secondaryFees);
+  return createSwapCallParametersWithFees(uncheckedTrade, fromAddress, options, quote.secondaryFees);
 }
 
 export function getSwap(
-  adjustedQuote: QuoteResult,
+  quote: Quote,
   fromAddress: string,
-  slippage: number,
   deadline: number,
   peripheryRouterAddress: string,
   secondaryFeesAddress: string,
   gasPrice: CoinAmount<Coin> | null,
-  secondaryFees: SecondaryFee[],
-  nativeTokenService: NativeTokenService,
 ): TransactionDetails {
   const calldata = createSwapParameters(
-    adjustedQuote,
+    quote,
     fromAddress,
-    slippage,
     deadline,
-    secondaryFees,
   );
 
   // TODO: Add additional gas fee estimates for secondary fees
-  const gasFeeEstimate = gasPrice ? calculateGasFee(gasPrice, adjustedQuote.gasEstimate) : null;
+  const gasFeeEstimate = gasPrice ? calculateGasFee(gasPrice, quote.gasEstimate) : null;
 
   return {
     transaction: {
       data: calldata,
-      to: secondaryFees.length > 0 ? secondaryFeesAddress : peripheryRouterAddress,
+      to: quote.secondaryFees.length > 0 ? secondaryFeesAddress : peripheryRouterAddress,
       value: zeroNativeCurrencyValue, // we should never send the native currency to the router for a swap
       from: fromAddress,
     },
-    // TODO: TP-1649: Remove the wrapping here
-    gasFeeEstimate: gasFeeEstimate ? nativeTokenService.maybeWrapAmount(gasFeeEstimate) : null,
-  };
-}
-
-const adjustAmountIn = (
-  ourQuote: QuoteResult,
-  amountSpecified: CoinAmount<Coin>,
-  fees: Fees,
-  nativeTokenService: NativeTokenService,
-) => {
-  if (ourQuote.tradeType === TradeType.EXACT_OUTPUT) {
-    // when doing exact output, calculate the fees based on the amountIn
-    const amountToAdd = nativeTokenService.isNativeToken(fees.token)
-      ? nativeTokenService.unwrapAmount(ourQuote.amountIn)
-      : ourQuote.amountIn;
-    fees.addAmount(amountToAdd);
-
-    return nativeTokenService.maybeWrapAmount(fees.amountWithFeesApplied());
-  }
-
-  return nativeTokenService.maybeWrapAmount(amountSpecified);
-};
-
-/**
- * adjustQuoteWithFees adjusts the amountIn of the quote to account for fees
- * EXACT_OUTPUT swaps will have the fees added to the amountIn if there are fees specified
- * EXACT_INPUT swaps will have amountIn set to the user-specified amount
- * @param ourQuote The quote from calling the Quoter contract
- * @param amountSpecified The user-specified amount for the swap (EXACT...)
- * @param fees The fees applied to the swap
- * @param tokenWrapper Helper class for the native token and associated ERC20
- * @returns {QuoteResult} The adjusted quote
- */
-export function adjustQuoteWithFees(
-  ourQuote: QuoteResult,
-  amountSpecified: CoinAmount<Coin>,
-  fees: Fees,
-  nativeTokenService: NativeTokenService,
-): QuoteResult {
-  const adjustedAmountIn = adjustAmountIn(ourQuote, amountSpecified, fees, nativeTokenService);
-
-  return {
-    gasEstimate: ourQuote.gasEstimate,
-    route: ourQuote.route,
-    amountIn: adjustedAmountIn,
-    amountOut: ourQuote.amountOut,
-    tradeType: ourQuote.tradeType,
+    gasFeeEstimate: gasFeeEstimate ? toPublicAmount(gasFeeEstimate) : null,
   };
 }
