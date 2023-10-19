@@ -157,7 +157,11 @@ export const buy = async (
 
   const fulfillOrderStartTime = new Date().getTime();
   try {
-    const fulfillerAddress = await provider.getSigner().getAddress();
+    const fulfillerAddress = await measureAsyncExecution<string>(
+      config,
+      'Time to get the address from the provider',
+      provider.getSigner().getAddress(),
+    );
     const { actions } = await measureAsyncExecution<FulfillOrderResponse>(
       config,
       'Time to call fulfillOrder from the orderbook',
