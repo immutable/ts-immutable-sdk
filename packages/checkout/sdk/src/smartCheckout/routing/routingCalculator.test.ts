@@ -1,7 +1,7 @@
 import { BigNumber, utils } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { JsonRpcProvider } from '@ethersproject/providers';
-import { ERC20 } from '@imtbl/dex-sdk';
+import { Token } from '@imtbl/dex-sdk';
 import {
   getBridgeAndSwapFundingSteps,
   getSwapFundingSteps,
@@ -67,11 +67,11 @@ describe('routingCalculator', () => {
                     symbol: 'ERC20_2',
                     decimals: 18,
                     address: '0xERC20_2',
-                  } as ERC20,
+                  } as Token,
                 },
                 amountWithMaxSlippage: {
                   value: BigNumber.from(1),
-                  token: {} as ERC20,
+                  token: {} as Token,
                 },
                 slippage: 0,
                 fees: [
@@ -84,7 +84,7 @@ describe('routingCalculator', () => {
                         symbol: 'IMX',
                         decimals: 18,
                         address: IMX_ADDRESS_ZKEVM,
-                      } as ERC20,
+                      } as Token,
                     },
                     recipient: '',
                     basisPoints: 0,
@@ -99,11 +99,11 @@ describe('routingCalculator', () => {
                   symbol: 'IMX',
                   decimals: 18,
                   address: IMX_ADDRESS_ZKEVM,
-                } as ERC20,
+                } as Token,
               },
               swap: {
                 value: BigNumber.from(1),
-                token: {} as ERC20,
+                token: {} as Token,
               },
             },
           ],
@@ -123,11 +123,11 @@ describe('routingCalculator', () => {
                     symbol: 'ERC20_1',
                     decimals: 18,
                     address: '0xERC20_1',
-                  } as ERC20,
+                  } as Token,
                 },
                 amountWithMaxSlippage: {
                   value: BigNumber.from(2),
-                  token: {} as ERC20,
+                  token: {} as Token,
                 },
                 slippage: 0,
                 fees: [
@@ -140,7 +140,7 @@ describe('routingCalculator', () => {
                         symbol: 'IMX',
                         decimals: 18,
                         address: IMX_ADDRESS_ZKEVM,
-                      } as ERC20,
+                      } as Token,
                     },
                     recipient: '',
                     basisPoints: 0,
@@ -155,11 +155,11 @@ describe('routingCalculator', () => {
                   symbol: 'IMX',
                   decimals: 18,
                   address: IMX_ADDRESS_ZKEVM,
-                } as ERC20,
+                } as Token,
               },
               swap: {
                 value: BigNumber.from(2),
-                token: {} as ERC20,
+                token: {} as Token,
               },
             },
           ],
