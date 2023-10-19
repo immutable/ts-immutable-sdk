@@ -2,8 +2,8 @@ import { OrderComponents } from '@opensea/seaport-js/lib/types';
 import { PopulatedTransaction, TypedDataDomain, TypedDataField } from 'ethers';
 import { Fee as OpenapiFee, OrdersService, OrderStatus } from './openapi/sdk';
 
-// Strictly re-export only the OrderStatus enum from the openapi types
-export { OrderStatus } from './openapi/sdk';
+// Strictly re-export only the OrderStatusName enum from the openapi types
+export { OrderStatusName } from './openapi/sdk';
 
 export interface ERC721Item {
   type: 'ERC721';
@@ -108,6 +108,33 @@ export interface SignableAction {
 }
 
 export type Action = TransactionAction | SignableAction;
+
+export interface FulfillmentListing {
+  listingId: string,
+  takerFees: Array<FeeValue>
+}
+
+export type FulfillBulkOrdersResponse
+  = FulfillBulkOrdersInsufficientBalanceResponse | FulfillBulkOrdersSufficientBalanceResponse;
+
+export interface FulfillBulkOrdersSufficientBalanceResponse {
+  sufficientBalance: true;
+  actions: Action[];
+  expiration: string;
+  fulfillableOrders: Order[];
+  unfulfillableOrders: UnfulfillableOrder[];
+}
+
+export interface FulfillBulkOrdersInsufficientBalanceResponse {
+  sufficientBalance: false;
+  fulfillableOrders: Order[];
+  unfulfillableOrders: UnfulfillableOrder[];
+}
+
+export interface UnfulfillableOrder {
+  orderId: string,
+  reason: string,
+}
 
 export interface FulfillOrderResponse {
   actions: Action[];

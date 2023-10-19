@@ -9,6 +9,7 @@ import WorkflowButton from '@/components/WorkflowButton';
 import { usePassportProvider } from '@/context/PassportProvider';
 import { UnsignedOrderRequest } from '@imtbl/core-sdk';
 import { useStatusProvider } from '@/context/StatusProvider';
+import { MARKETPLACE_FEE_PERCENTAGE, MARKETPLACE_FEE_RECIPIENT } from '@/config';
 
 function MakeOfferModal({
   showModal, setShowModal, onClose, order,
@@ -43,6 +44,10 @@ function MakeOfferModal({
           tokenAddress: order.sell.data.token_address || '',
         },
         expiration_timestamp: expirationTimestamp,
+        fees: [{
+          address: MARKETPLACE_FEE_RECIPIENT,
+          fee_percentage: MARKETPLACE_FEE_PERCENTAGE,
+        }],
       };
 
       const createOrderResponse = await imxProvider?.createOrder(request);
@@ -109,7 +114,7 @@ function MakeOfferModal({
                 required
                 type="date"
                 onChange={(e) => {
-                  setExpirationTimestamp(new Date(e.target.value).getTime());
+                  setExpirationTimestamp(new Date(e.target.value).getTime() / 1000);
                 }}
               />
             </Form.Group>

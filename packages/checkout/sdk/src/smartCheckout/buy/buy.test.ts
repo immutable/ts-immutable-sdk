@@ -153,7 +153,7 @@ describe('buy', () => {
 
       expect(buyResult).toEqual({
         status: CheckoutStatus.SUCCESS,
-        smartCheckoutResult: [smartCheckoutResult],
+        smartCheckoutResult,
       });
       expect(getUnsignedERC20ApprovalTransactions).toBeCalledTimes(1);
       expect(getUnsignedFulfillmentTransactions).toBeCalledTimes(1);
@@ -313,7 +313,7 @@ describe('buy', () => {
       );
       expect(buyResult).toEqual({
         status: CheckoutStatus.SUCCESS,
-        smartCheckoutResult: [smartCheckoutResult],
+        smartCheckoutResult,
       });
       expect(getUnsignedERC20ApprovalTransactions).toBeCalledTimes(1);
       expect(getUnsignedFulfillmentTransactions).toBeCalledTimes(2);
@@ -745,7 +745,7 @@ describe('buy', () => {
       expect(signFulfillmentTransactions).toBeCalledTimes(0);
       expect(buyResult).toEqual({
         status: CheckoutStatus.INSUFFICIENT_FUNDS,
-        smartCheckoutResult: [smartCheckoutResult],
+        smartCheckoutResult,
       });
     });
 
@@ -857,7 +857,7 @@ describe('buy', () => {
         status: CheckoutStatus.FAILED,
         transactionHash: '0xHASH',
         reason: 'approval error',
-        smartCheckoutResult: [smartCheckoutResult],
+        smartCheckoutResult,
       });
       expect(getUnsignedERC20ApprovalTransactions).toBeCalledTimes(1);
       expect(getUnsignedFulfillmentTransactions).toBeCalledTimes(1);
@@ -973,7 +973,7 @@ describe('buy', () => {
         status: CheckoutStatus.FAILED,
         transactionHash: '0xHASH',
         reason: 'fulfillment error',
-        smartCheckoutResult: [smartCheckoutResult],
+        smartCheckoutResult,
       });
       expect(getUnsignedERC20ApprovalTransactions).toBeCalledTimes(1);
       expect(getUnsignedFulfillmentTransactions).toBeCalledTimes(1);
@@ -1296,7 +1296,7 @@ describe('buy', () => {
         );
         expect(buyResult).toEqual({
           status: CheckoutStatus.SUCCESS,
-          smartCheckoutResult: [smartCheckoutResult],
+          smartCheckoutResult,
         });
         expect(getUnsignedERC20ApprovalTransactions).toBeCalledTimes(1);
         expect(getUnsignedFulfillmentTransactions).toBeCalledTimes(1);
@@ -1500,7 +1500,7 @@ describe('buy', () => {
         );
         expect(buyResult).toEqual({
           status: CheckoutStatus.SUCCESS,
-          smartCheckoutResult: [smartCheckoutResult],
+          smartCheckoutResult,
         });
         expect(getUnsignedERC20ApprovalTransactions).toBeCalledTimes(1);
         expect(getUnsignedFulfillmentTransactions).toBeCalledTimes(1);

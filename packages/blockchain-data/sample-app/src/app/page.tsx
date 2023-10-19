@@ -6,6 +6,7 @@ import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import {
   BlockchainData,
   BlockchainDataModuleConfiguration,
+  ChainsApi,
 } from '@imtbl/blockchain-data';
 import { PageLayout } from '@/components/PageLayout';
 import { capitalizeFirstLetter } from '@/utils';
@@ -405,7 +406,9 @@ const endpointDomains = {
 };
 
 export default function Home() {
-  const [response, setResponse] = useState('');
+  const [response, setResponse] = useState<ChainsApi.ListChainsResult | null>(
+    null,
+  );
 
   useEffect(() => {
     async function getData() {
@@ -425,8 +428,9 @@ export default function Home() {
       const client = new BlockchainData(config);
 
       try {
-        const response = await client.listChains();
-        setResponse(response.result);
+        const request: ChainsApi.ListChainsRequest = {};
+        const response = await client.listChains(request);
+        setResponse(response);
       } catch (error) {
         console.error(error);
       }
@@ -466,9 +470,11 @@ export default function Home() {
           })}
         </div>
         <div className="flex-1 bg-gray w-full h-full">
-          <pre className="p-4 bg-neutral-800/50 rounded-lg">
-            {JSON.stringify(response, null, 2)}
-          </pre>
+          {response !== null && (
+            <pre className="p-4 bg-neutral-800/50 rounded-lg">
+              {JSON.stringify(response.result, null, 2)}
+            </pre>
+          )}
         </div>
       </div>
     </PageLayout>

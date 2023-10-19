@@ -1,4 +1,6 @@
-import { useCallback, useContext, useState } from 'react';
+import {
+  useCallback, useContext, useEffect, useState,
+} from 'react';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../../components/Footer/FooterButton';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
@@ -14,6 +16,7 @@ import {
 } from '../../../context/view-context/ViewContext';
 import { isPassportProvider } from '../../../lib/providerUtils';
 import { BridgeComingSoon } from '../../bridge/views/BridgeComingSoon';
+import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 export function SwitchNetworkEth() {
   const { viewDispatch } = useContext(ViewContext);
@@ -23,9 +26,24 @@ export function SwitchNetworkEth() {
 
   const [buttonText, setButtonText] = useState(button.text);
 
+  const { page, track } = useAnalytics();
+
+  useEffect(() => {
+    page({
+      userJourney: UserJourney.CONNECT,
+      screen: 'SwitchNetworkEth',
+    });
+  }, []);
+
   const switchNetwork = useCallback(async () => {
     if (!provider || !checkout) return;
 
+    track({
+      userJourney: UserJourney.CONNECT,
+      screen: 'SwitchNetworkEth',
+      control: 'Switch',
+      controlType: 'Button',
+    });
     try {
       const switchRes = await checkout.switchNetwork({
         provider,
@@ -50,7 +68,7 @@ export function SwitchNetworkEth() {
     } catch (err: any) {
       setButtonText(button.retryText);
     }
-  }, [provider, checkout]);
+  }, [provider, checkout, track]);
 
   if (isPassportProvider(provider)) {
     return (

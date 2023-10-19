@@ -74,7 +74,7 @@ export const sell = async (
 
   if (orders.length === 0) {
     throw new CheckoutError(
-      'No orders were parsed, must parse at least one order',
+      'No orders were provided to the orders array. Please provide at least one order.',
       CheckoutErrorType.PREPARE_ORDER_LISTING_ERROR,
     );
   }
@@ -146,7 +146,7 @@ export const sell = async (
         status: CheckoutStatus.FAILED,
         transactionHash: approvalResult.transactionHash,
         reason: approvalResult.reason,
-        smartCheckoutResult: [smartCheckoutResult],
+        smartCheckoutResult,
       };
     }
 
@@ -210,12 +210,12 @@ export const sell = async (
     return {
       status: CheckoutStatus.SUCCESS,
       orderIds: [orderId],
-      smartCheckoutResult: [smartCheckoutResult],
+      smartCheckoutResult,
     };
   }
 
   return {
     status: CheckoutStatus.INSUFFICIENT_FUNDS,
-    smartCheckoutResult: [smartCheckoutResult],
+    smartCheckoutResult,
   };
 };

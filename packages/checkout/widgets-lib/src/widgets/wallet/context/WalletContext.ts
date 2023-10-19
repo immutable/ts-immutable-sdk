@@ -16,6 +16,7 @@ export interface TopUpFeature {
   isOnRampEnabled?: boolean;
   isSwapEnabled?: boolean;
   isBridgeEnabled?: boolean;
+  isSwapAvailable?: boolean;
 }
 
 export const initialWalletState: WalletState = {
@@ -106,6 +107,8 @@ export const walletReducer: Reducer<WalletState, WalletAction> = (
             action.payload.supportedTopUps.isOnRampEnabled ?? true,
           isBridgeEnabled:
             action.payload.supportedTopUps.isBridgeEnabled ?? true,
+          isSwapAvailable:
+            action.payload.supportedTopUps.isSwapAvailable ?? true,
         },
       };
     default:

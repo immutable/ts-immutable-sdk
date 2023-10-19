@@ -1,5 +1,5 @@
 import { BigNumber, utils } from 'ethers';
-import { Amount, Fee } from '@imtbl/dex-sdk';
+import { Amount, ERC20, Fee } from '@imtbl/dex-sdk';
 import { CheckoutConfiguration, getL2ChainId } from '../../../config';
 import {
   AvailableRoutingOptions,
@@ -8,16 +8,81 @@ import {
   GetBalanceResult,
   IMX_ADDRESS_ZKEVM,
   ItemType,
+  SwapFees,
   SwapFundingStep,
+  TokenInfo,
 } from '../../../types';
 import { BalanceCheckResult, BalanceRequirement } from '../../balanceCheck/types';
 import { DexQuoteCache, TokenBalanceResult } from '../types';
 import { getOrSetQuotesFromCache } from './dexQuoteCache';
 
+const constructFees = (
+  approvalGasFees: Amount<ERC20> | null | undefined,
+  swapGasFees: Amount<ERC20> | null,
+  swapFees: Fee[],
+): SwapFees => {
+  let approvalGasFeeAmount = BigNumber.from(0);
+  let approvalGasFeeFormatted = '0';
+  let approvalToken: TokenInfo | undefined;
+  if (approvalGasFees) {
+    approvalGasFeeAmount = approvalGasFees.value;
+    approvalGasFeeFormatted = utils.formatUnits(approvalGasFees.value, approvalGasFees.token.decimals);
+    approvalToken = {
+      name: approvalGasFees.token.name ?? '',
+      symbol: approvalGasFees.token.symbol ?? '',
+      address: approvalGasFees.token.address,
+      decimals: approvalGasFees.token.decimals,
+    };
+  }
+
+  let swapGasFeeAmount = BigNumber.from(0);
+  let swapGasFeeFormatted = '0';
+  let swapGasToken: TokenInfo | undefined;
+  if (swapGasFees) {
+    swapGasFeeAmount = swapGasFees.value;
+    swapGasFeeFormatted = utils.formatUnits(swapGasFees.value, swapGasFees.token.decimals);
+    swapGasToken = {
+      name: swapGasFees.token.name ?? '',
+      symbol: swapGasFees.token.symbol ?? '',
+      address: swapGasFees.token.address,
+      decimals: swapGasFees.token.decimals,
+    };
+  }
+
+  const fees = [];
+  for (const swapFee of swapFees) {
+    fees.push({
+      amount: swapFee.amount.value,
+      formattedAmount: utils.formatUnits(swapFee.amount.value, swapFee.amount.token.decimals),
+      token: {
+        name: swapFee.amount.token.name ?? '',
+        symbol: swapFee.amount.token.symbol ?? '',
+        address: swapFee.amount.token.address,
+        decimals: swapFee.amount.token.decimals,
+      },
+    });
+  }
+
+  return {
+    approvalGasFees: {
+      amount: approvalGasFeeAmount,
+      formattedAmount: approvalGasFeeFormatted,
+      token: approvalToken,
+    },
+    swapGasFees: {
+      amount: swapGasFeeAmount,
+      formattedAmount: swapGasFeeFormatted,
+      token: swapGasToken,
+    },
+    swapFees: fees,
+  };
+};
+
 export const constructSwapRoute = (
   chainId: ChainId,
   fundsRequired: BigNumber,
   userBalance: GetBalanceResult,
+  fees: SwapFees,
 ): SwapFundingStep => {
   const tokenAddress = userBalance.token.address;
 
@@ -44,21 +109,7 @@ export const constructSwapRoute = (
       },
       token: userBalance.token,
     },
-    // WT-1734 - Add fees
-    fees: {
-      approvalGasFees: {
-        amount: BigNumber.from(0),
-        formattedAmount: '0',
-      },
-      swapGasFees: {
-        amount: BigNumber.from(0),
-        formattedAmount: '0',
-      },
-      swapFees: [{
-        amount: BigNumber.from(0),
-        formattedAmount: '0',
-      }],
-    },
+    fees,
   };
 };
 
@@ -86,7 +137,7 @@ export const getRequiredToken = (
 type SufficientApprovalFees = { sufficient: boolean, approvalGasFee: BigNumber, approvalGasTokenAddress: string };
 export const checkUserCanCoverApprovalFees = (
   l2Balances: GetBalanceResult[],
-  approval: Amount | null | undefined,
+  approval: Amount<ERC20> | null,
 ): SufficientApprovalFees => {
   // Check if approval required
   if (!approval) return { sufficient: true, approvalGasFee: BigNumber.from(0), approvalGasTokenAddress: '' };
@@ -286,6 +337,8 @@ export const swapRoute = async (
       quote.quote.fees,
     )) continue;
 
+    const fees = constructFees(quote.approval, quote.swap, quote.quote.fees);
+
     // User has sufficient funds of this token to cover any gas fees, swap fees and balance requirements
     // so add this token to the possible swap options
     fundingSteps.push(
@@ -293,6 +346,7 @@ export const swapRoute = async (
         chainId,
         amountOfQuoteTokenRequired.value,
         userBalanceOfQuotedToken,
+        fees,
       ),
     );
   }

@@ -3,7 +3,7 @@ import { ConnectWidgetView } from './ConnectViewContextTypes';
 import { WalletWidgetView } from './WalletViewContextTypes';
 import { PrefilledSwapForm, SwapWidgetView } from './SwapViewContextTypes';
 import { BridgeWidgetView, PrefilledBridgeForm } from './BridgeViewContextTypes';
-import { PrimaryRevenueWidgetView } from './PrimaryRevenueViewContextTypes';
+import { SaleWidgetView } from './SaleViewContextTypes';
 import { ViewType } from './ViewType';
 import { SmartWidgetView } from './SmartViewContextType';
 import { OnRampWidgetView } from './OnRampViewContextTypes';
@@ -11,12 +11,14 @@ import { OnRampWidgetView } from './OnRampViewContextTypes';
 export enum SharedViews {
   LOADING_VIEW = 'LOADING_VIEW',
   ERROR_VIEW = 'ERROR_VIEW',
+  SERVICE_UNAVAILABLE_ERROR_VIEW = 'SERVICE_UNAVAILABLE_ERROR_VIEW',
   TOP_UP_VIEW = 'TOP_UP_VIEW',
 }
 
 export type SharedView =
 LoadingView
 | ErrorView
+| ServiceUnavailableErrorView
 | TopUpView;
 
 interface LoadingView extends ViewType {
@@ -27,6 +29,11 @@ export interface ErrorView extends ViewType {
   type: SharedViews.ERROR_VIEW;
   error: Error;
   tryAgain?: () => Promise<any>
+}
+
+export interface ServiceUnavailableErrorView extends ViewType {
+  type: SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW;
+  error: Error;
 }
 
 interface TopUpView extends ViewType {
@@ -43,7 +50,7 @@ export type View =
   | BridgeWidgetView
   | SmartWidgetView
   | OnRampWidgetView
-  | PrimaryRevenueWidgetView;
+  | SaleWidgetView;
 
 export interface ViewState {
   view: View;

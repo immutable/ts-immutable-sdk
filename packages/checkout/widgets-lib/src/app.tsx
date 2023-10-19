@@ -8,7 +8,7 @@ import SwapWebView from './widgets/swap/SwapWebView';
 import BridgeWebView from './widgets/bridge/BridgeWebView';
 import WalletWebView from './widgets/wallet/WalletWebView';
 import OnRampWebView from './widgets/on-ramp/OnRampWebView';
-import PrimaryRevenueWebView from './widgets/primary-revenue/PrimaryRevenueWebView';
+import SaleWebView from './widgets/sale/SaleWebView';
 
 import './build';
 import SmartWebView from './widgets/smart-checkout/SmartWebView';
@@ -43,7 +43,7 @@ function App() {
       </h2>
       <br />
       <h2>
-        <a href="/primary-revenue">Primary Revenue Widget</a>
+        <a href="/sale">Sale Widget</a>
       </h2>
       <br />
     </div>
@@ -80,8 +80,8 @@ const router = createBrowserRouter([
     element: <SmartWebView />,
   },
   {
-    path: '/primary-revenue',
-    element: <PrimaryRevenueWebView />,
+    path: '/sale',
+    element: <SaleWebView />,
   },
 ]);
 

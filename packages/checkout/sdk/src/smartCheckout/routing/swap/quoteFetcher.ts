@@ -22,9 +22,11 @@ export const quoteFetcher = async (
   try {
     const exchange = await instance.createExchangeInstance(chainId, config);
     const dexTransactionResponsePromises: Promise<TransactionResponse>[] = [];
+    const fromToken: string[] = [];
 
     // Create a quote for each swappable token
     for (const swappableToken of swappableTokens) {
+      if (swappableToken === requiredToken.address) continue;
       dexTransactionResponsePromises.push(exchange.getUnsignedSwapTxFromAmountOut(
         walletAddress,
         swappableToken,
@@ -32,17 +34,20 @@ export const quoteFetcher = async (
         requiredToken.amount,
         slippagePercent,
       ));
+      fromToken.push(swappableToken);
     }
 
     // Resolve all the quotes and link them back to the swappable token
     // The swappable token array is in the same position in the array as the quote in the promise array
-    const dexTransactionResponse = await Promise.all(dexTransactionResponsePromises);
+    const dexTransactionResponse = await Promise.allSettled(dexTransactionResponsePromises);
+
     dexTransactionResponse.forEach((response, index) => {
-      const swappableToken = swappableTokens[index];
+      if (response.status === 'rejected') return; // Ignore any requests to dex that failed to resolve
+      const swappableToken = fromToken[index];
       dexQuotes.set(swappableToken, {
-        quote: response.quote,
-        approval: response.approval?.gasFeeEstimate,
-        swap: response.swap.gasFeeEstimate,
+        quote: response.value.quote,
+        approval: response.value.approval?.gasFeeEstimate ?? null,
+        swap: response.value.swap.gasFeeEstimate,
       });
     });
 

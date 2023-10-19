@@ -83,6 +83,7 @@ describe('Passport', () => {
       rpcProvider: {
         request: mockMagicRequest,
       },
+      preload: jest.fn(),
     }));
   });
 
