@@ -8,21 +8,23 @@ import { PassportConfiguration } from './config';
 export default class MagicAdapter {
   private readonly config: PassportConfiguration;
 
-  private magicClient: InstanceWithExtensions<SDKBase, [OpenIdExtension]>;
+  private magicClient?: InstanceWithExtensions<SDKBase, [OpenIdExtension]>;
 
   constructor(config: PassportConfiguration) {
     this.config = config;
-    this.magicClient = new Magic(this.config.magicPublishableApiKey, {
-      extensions: [new OpenIdExtension()],
-      network: config.network,
-    });
-    this.magicClient.preload();
+    if (window) {
+      this.magicClient = this.initMagicClient();
+      this.magicClient.preload();
+    }
   }
 
   async login(
     idToken: string,
   ): Promise<ethers.providers.ExternalProvider> {
     return withPassportError<ethers.providers.ExternalProvider>(async () => {
+      if (!this.magicClient) {
+        this.magicClient = this.initMagicClient();
+      }
       await this.magicClient.openid.loginWithOIDC({
         jwt: idToken,
         providerId: this.config.magicProviderId,
@@ -33,8 +35,15 @@ export default class MagicAdapter {
   }
 
   async logout() {
-    if (this.magicClient.user) {
+    if (this.magicClient?.user) {
       await this.magicClient.user.logout();
     }
+  }
+
+  initMagicClient() {
+    return new Magic(this.config.magicPublishableApiKey, {
+      extensions: [new OpenIdExtension()],
+      network: this.config.network,
+    });
   }
 }
