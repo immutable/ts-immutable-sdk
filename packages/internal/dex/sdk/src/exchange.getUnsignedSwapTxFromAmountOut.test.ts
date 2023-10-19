@@ -96,8 +96,8 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       expect(formatAmount(quote.amountWithMaxSlippage)).toEqual('104.03'); // userQuoteRes.amountInMaximum = swap.amountInMaximum
 
       // The maxAmountIn is the amount out + fees + slippage
-      const ourQuoteReqAmountOut = findOptimalRouteMock.mock.calls[0][0];
-      expect(formatAmount(ourQuoteReqAmountOut)).toEqual('1000.0'); // ourQuoteReq.amountOut = userQuoteReq.amountOut
+      const tradeRequest = findOptimalRouteMock.mock.calls[0][0];
+      expect(formatAmount(tradeRequest.ourQuoteReqAmount)).toEqual('1000.0'); // ourQuoteReq.amountOut = userQuoteReq.amountOut
 
       const data = swap.transaction.data.toString();
 

@@ -1,38 +1,26 @@
 import { ethers } from 'ethers';
-import { TradeType } from '@uniswap/sdk-core';
 import assert from 'assert';
 import { DuplicateAddressesError, InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError } from 'errors';
 import { fetchGasPrice } from 'lib/transactionUtils/gas';
 import { getApproval, prepareApproval } from 'lib/transactionUtils/approval';
-import { applySlippage, getOurQuoteReqAmount, getQuoteAmountFromTradeType } from 'lib/transactionUtils/getQuote';
-import { Fees } from 'lib/fees';
 import { SecondaryFee__factory } from 'contracts/types';
 import { NativeTokenService } from 'lib/nativeTokenService';
+import { Quote } from 'lib/quote/base';
+import { TradeRequest } from 'lib/tradeRequest/base';
+import { ExactInput } from 'lib/tradeRequest/exactInput';
+import { ExactOutput } from 'lib/tradeRequest/exactOutput';
 import { DEFAULT_DEADLINE, DEFAULT_MAX_HOPS, DEFAULT_SLIPPAGE, MAX_MAX_HOPS, MIN_MAX_HOPS } from './constants';
 import { Router } from './lib/router';
 import { getERC20Decimals, isValidNonZeroAddress, newAmount, toPublicAmount } from './lib/utils';
-import {
-  Coin,
-  CoinAmount,
-  ERC20,
-  ExchangeModuleConfiguration,
-  Quote,
-  SecondaryFee,
-  TransactionResponse,
-} from './types';
-import { getSwap, adjustQuoteWithFees } from './lib/transactionUtils/swap';
+import { Coin, ERC20, ExchangeModuleConfiguration, PublicQuote, SecondaryFee, TransactionResponse } from './types';
+import { getSwap } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
 
-const toPublicQuote = (
-  amount: CoinAmount<ERC20>,
-  amountWithMaxSlippage: CoinAmount<ERC20>,
-  slippage: number,
-  fees: Fees,
-): Quote => ({
-  amount,
-  amountWithMaxSlippage,
-  slippage,
-  fees: fees.withAmounts().map((fee) => ({
+const toPublicQuote = (quote: Quote): PublicQuote => ({
+  amount: toPublicAmount(quote.quotedAmount),
+  amountWithMaxSlippage: quote.amountWithMaxSlippage,
+  slippage: quote.slippagePercentage,
+  fees: quote.secondaryFees.map((fee) => ({
     ...fee,
     amount: toPublicAmount(fee.amount),
   })),
@@ -111,89 +99,43 @@ export class Exchange {
 
   private async getUnsignedSwapTx(
     fromAddress: string,
-    tokenInAddress: string,
-    tokenOutAddress: string,
-    amount: ethers.BigNumber,
-    slippagePercent: number,
-    maxHops: number,
+    tradeRequest: TradeRequest,
     deadline: number,
-    tradeType: TradeType,
   ): Promise<TransactionResponse> {
-    Exchange.validate(tokenInAddress, tokenOutAddress, maxHops, slippagePercent, fromAddress);
-
-    // get the decimals of the tokens that will be swapped
-    const [tokenInDecimals, tokenOutDecimals, secondaryFees] = await Promise.all([
-      getERC20Decimals(tokenInAddress, this.provider),
-      getERC20Decimals(tokenOutAddress, this.provider),
-      this.getSecondaryFees(),
-    ]);
-
-    const tokenIn: ERC20 = {
-      type: 'erc20',
-      address: tokenInAddress,
-      chainId: this.chainId,
-      decimals: tokenInDecimals,
-    };
-    const tokenOut: ERC20 = {
-      type: 'erc20',
-      address: tokenOutAddress,
-      chainId: this.chainId,
-      decimals: tokenOutDecimals,
-    };
-
-    // determine which amount was specified for the swap from the TradeType
-    const [tokenSpecified, otherToken] =
-      tradeType === TradeType.EXACT_INPUT ? [tokenIn, tokenOut] : [tokenOut, tokenIn];
-
-    const amountSpecified = newAmount(amount, tokenSpecified);
-
-    const fees = new Fees(secondaryFees, tokenIn);
-
-    const ourQuoteReqAmount = getOurQuoteReqAmount(amountSpecified, fees, tradeType, this.nativeTokenService);
+    Exchange.validate(
+      tradeRequest.tokenIn.address,
+      tradeRequest.tokenOut.address,
+      tradeRequest.maxHops,
+      tradeRequest.slippagePercentage,
+      fromAddress,
+    );
 
     // get quote and gas details
-    const [ourQuote, gasPrice] = await Promise.all([
-      this.router.findOptimalRoute(ourQuoteReqAmount, otherToken, tradeType, maxHops),
+    const [quote, gasPrice] = await Promise.all([
+      this.router.findOptimalRoute(tradeRequest),
       fetchGasPrice(this.provider, this.nativeToken),
     ]);
 
-    const adjustedQuote = adjustQuoteWithFees(ourQuote, amountSpecified, fees, this.nativeTokenService);
-
     const swap = getSwap(
-      adjustedQuote,
+      quote,
       fromAddress,
-      slippagePercent,
       deadline,
       this.routerContractAddress,
       this.secondaryFeeContractAddress,
       gasPrice,
-      secondaryFees,
-      this.nativeTokenService,
     );
 
-    const quotedAmount = getQuoteAmountFromTradeType(adjustedQuote);
-    const amountWithMaxSlippage = newAmount(
-      applySlippage(adjustedQuote.tradeType, quotedAmount.value, slippagePercent),
-      otherToken,
-    );
-
-    const preparedApproval = prepareApproval(
-      tradeType,
-      amountSpecified,
-      amountWithMaxSlippage,
-      {
-        routerAddress: this.routerContractAddress,
-        secondaryFeeAddress: this.secondaryFeeContractAddress,
-      },
-      secondaryFees,
-    );
+    const preparedApproval = prepareApproval(quote, {
+      routerAddress: this.routerContractAddress,
+      secondaryFeeAddress: this.secondaryFeeContractAddress,
+    });
 
     // preparedApproval always uses the tokenIn address because we are always selling the tokenIn
     const approval = await getApproval(this.provider, fromAddress, preparedApproval, gasPrice);
 
-    const quote = toPublicQuote(quotedAmount, amountWithMaxSlippage, slippagePercent, fees);
+    const publicQuote = toPublicQuote(quote);
 
-    return { quote, approval, swap };
+    return { quote: publicQuote, approval, swap };
   }
 
   /**
@@ -218,16 +160,29 @@ export class Exchange {
     maxHops: number = DEFAULT_MAX_HOPS,
     deadline: number = DEFAULT_DEADLINE,
   ): Promise<TransactionResponse> {
-    return await this.getUnsignedSwapTx(
-      fromAddress,
-      tokenInAddress,
-      tokenOutAddress,
-      ethers.BigNumber.from(amountIn),
+    const tokenIn = {
+      type: 'erc20',
+      address: tokenInAddress,
+      chainId: this.chainId,
+      decimals: await getERC20Decimals(tokenInAddress, this.provider),
+    } as const;
+    const tokenOut = {
+      type: 'erc20',
+      address: tokenOutAddress,
+      chainId: this.chainId,
+      decimals: await getERC20Decimals(tokenOutAddress, this.provider),
+    } as const;
+    const coinAmountIn = newAmount(ethers.BigNumber.from(amountIn), tokenIn);
+    const tradeRequest = new ExactInput(
+      coinAmountIn,
+      tokenOut,
+      await this.getSecondaryFees(),
       slippagePercent,
       maxHops,
-      deadline,
-      TradeType.EXACT_INPUT,
+      this.nativeTokenService,
     );
+
+    return await this.getUnsignedSwapTx(fromAddress, tradeRequest, deadline);
   }
 
   /**
@@ -252,15 +207,27 @@ export class Exchange {
     maxHops: number = DEFAULT_MAX_HOPS,
     deadline: number = DEFAULT_DEADLINE,
   ): Promise<TransactionResponse> {
-    return await this.getUnsignedSwapTx(
-      fromAddress,
-      tokenInAddress,
-      tokenOutAddress,
-      ethers.BigNumber.from(amountOut),
+    const tokenIn = {
+      type: 'erc20',
+      address: tokenInAddress,
+      chainId: this.chainId,
+      decimals: await getERC20Decimals(tokenInAddress, this.provider),
+    } as const;
+    const tokenOut = {
+      type: 'erc20',
+      address: tokenOutAddress,
+      chainId: this.chainId,
+      decimals: await getERC20Decimals(tokenOutAddress, this.provider),
+    } as const;
+    const coinAmountOut = newAmount(ethers.BigNumber.from(amountOut), tokenOut);
+    const tradeRequest = new ExactOutput(
+      coinAmountOut,
+      tokenIn,
+      await this.getSecondaryFees(),
       slippagePercent,
       maxHops,
-      deadline,
-      TradeType.EXACT_OUTPUT,
+      this.nativeTokenService,
     );
+    return await this.getUnsignedSwapTx(fromAddress, tradeRequest, deadline);
   }
 }

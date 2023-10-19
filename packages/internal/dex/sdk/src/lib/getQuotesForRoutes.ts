@@ -4,17 +4,16 @@ import { BigNumber, ethers } from 'ethers';
 import { ProviderCallError } from 'errors';
 import { CoinAmount, ERC20 } from 'types';
 import { multicallMultipleCallDataSingContract, MulticallResponse } from './multicall';
-import {
-  newAmount, quoteReturnMapping, toCurrencyAmount, uniswapTokenToERC20,
-} from './utils';
+import { quoteReturnMapping, toCurrencyAmount, uniswapTokenToERC20 } from './utils';
 import { Multicall } from '../contracts/types';
+import { TradeRequest } from './tradeRequest/base';
 
 const amountIndex = 0;
 const gasEstimateIndex = 3;
 
 export type QuoteResult = {
   route: Route<Token, Token>;
-  gasEstimate: ethers.BigNumber
+  gasEstimate: ethers.BigNumber;
   amountIn: CoinAmount<ERC20>;
   amountOut: CoinAmount<ERC20>;
   tradeType: TradeType;
@@ -24,22 +23,18 @@ export async function getQuotesForRoutes(
   multicallContract: Multicall,
   quoterContractAddress: string,
   routes: Route<Token, Token>[],
-  amountSpecified: CoinAmount<ERC20>,
-  tradeType: TradeType,
+  tradeRequest: TradeRequest,
 ): Promise<QuoteResult[]> {
   const callData = routes.map(
-    (route) => SwapQuoter.quoteCallParameters(route, toCurrencyAmount(amountSpecified), tradeType, {
-      useQuoterV2: true,
-    }).calldata,
+    (route) =>
+      SwapQuoter.quoteCallParameters(route, toCurrencyAmount(tradeRequest.ourQuoteReqAmount), tradeRequest.tradeType, {
+        useQuoterV2: true,
+      }).calldata,
   );
 
   let quoteResults: MulticallResponse;
   try {
-    quoteResults = await multicallMultipleCallDataSingContract(
-      multicallContract,
-      callData,
-      quoterContractAddress,
-    );
+    quoteResults = await multicallMultipleCallDataSingContract(multicallContract, callData, quoterContractAddress);
   } catch (e) {
     const message = e instanceof Error ? e.message : 'Unknown Error';
     throw new ProviderCallError(`failed multicall: ${message}`);
@@ -78,10 +73,10 @@ export async function getQuotesForRoutes(
 
         decodedQuoteResults.push({
           route: routes[i],
-          amountIn: tradeType === TradeType.EXACT_INPUT ? amountSpecified : newAmount(quoteAmount, input),
-          amountOut: tradeType === TradeType.EXACT_INPUT ? newAmount(quoteAmount, output) : amountSpecified,
+          amountIn: tradeRequest.buildQuoteAmountIn(quoteAmount, input), // tradeType === TradeType.EXACT_INPUT ? amountSpecified : newAmount(quoteAmount, input),
+          amountOut: tradeRequest.buildQuoteAmountOut(quoteAmount, output), // tradeType === TradeType.EXACT_INPUT ? newAmount(quoteAmount, output) : amountSpecified,
           gasEstimate: ethers.BigNumber.from(decodedQuoteResult[gasEstimateIndex]),
-          tradeType,
+          tradeType: tradeRequest.tradeType,
         });
       }
     } catch {

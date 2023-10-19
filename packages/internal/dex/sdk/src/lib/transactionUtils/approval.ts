@@ -3,11 +3,11 @@ import { BigNumber } from '@ethersproject/bignumber';
 import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
 import { ApproveError, AlreadyApprovedError } from 'errors';
 import { ethers } from 'ethers';
-import { TradeType } from '@uniswap/sdk-core';
 import { newAmount, toPublicAmount } from 'lib/utils';
 import { CoinAmount, Coin, ERC20 } from 'types';
+import { Quote } from 'lib/quote/base';
 import {
-  SecondaryFee, TransactionDetails,
+  TransactionDetails,
 } from '../../types';
 import { calculateGasFee } from './gas';
 
@@ -83,22 +83,17 @@ const getUnsignedERC20ApproveTransaction = (
 };
 
 export const prepareApproval = (
-  tradeType: TradeType,
-  amountSpecified: CoinAmount<ERC20>,
-  amountWithSlippage: CoinAmount<ERC20>,
+  quote: Quote,
   contracts: {
     routerAddress: string;
     secondaryFeeAddress: string;
   },
-  secondaryFees: SecondaryFee[],
 ): PreparedApproval => {
-  const amountOfTokenIn = tradeType === TradeType.EXACT_INPUT ? amountSpecified : amountWithSlippage;
-
-  const spender = secondaryFees.length === 0
+  const spender = quote.secondaryFees.length === 0
     ? contracts.routerAddress
     : contracts.secondaryFeeAddress;
 
-  return { spender, amount: amountOfTokenIn };
+  return { spender, amount: quote.amountInForApproval };
 };
 
 /**

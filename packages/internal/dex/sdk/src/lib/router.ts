@@ -1,13 +1,15 @@
 import { ethers } from 'ethers';
-import { Token, TradeType } from '@uniswap/sdk-core';
+import { Token } from '@uniswap/sdk-core';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import { NoRoutesAvailableError } from 'errors';
-import { CoinAmount, ERC20 } from 'types';
+import { ERC20 } from 'types';
 import { erc20ToUniswapToken, poolEquals, uniswapTokenToERC20 } from './utils';
-import { getQuotesForRoutes, QuoteResult } from './getQuotesForRoutes';
+import { getQuotesForRoutes } from './getQuotesForRoutes';
 import { fetchValidPools } from './poolUtils/fetchValidPools';
 import { ERC20Pair } from './poolUtils/generateERC20Pairs';
-import { Multicall, Multicall__factory } from '../contracts/types';
+import { Multicall__factory } from '../contracts/types';
+import { TradeRequest } from './tradeRequest/base';
+import { Quote } from './quote/base';
 
 export type RoutingContracts = {
   multicallAddress: string;
@@ -28,16 +30,9 @@ export class Router {
     this.routingContracts = routingContracts;
   }
 
-  public async findOptimalRoute(
-    amountSpecified: CoinAmount<ERC20>,
-    otherToken: ERC20,
-    tradeType: TradeType,
-    maxHops: number = 2,
-  ): Promise<QuoteResult> {
-    const [tokenIn, tokenOut] = this.determineERC20InAndERC20Out(tradeType, amountSpecified, otherToken);
-
+  public async findOptimalRoute(tradeRequest: TradeRequest, maxHops: number = 2): Promise<Quote> {
     const multicallContract = Multicall__factory.connect(this.routingContracts.multicallAddress, this.provider);
-    const erc20Pair: ERC20Pair = [tokenIn, tokenOut];
+    const erc20Pair: ERC20Pair = [tradeRequest.tokenIn, tradeRequest.tokenOut];
 
     // Get all pools and use these to get all possible routes.
     const pools = await fetchValidPools(
@@ -55,83 +50,32 @@ export class Router {
     // Get all the possible routes from the given pools
     // TODO: Fix used before defined error
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    const routes = generateAllAcyclicPaths(tokenIn, tokenOut, pools, maxHops, [], [], tokenIn);
+    const routes = generateAllAcyclicPaths(
+      tradeRequest.tokenIn,
+      tradeRequest.tokenOut,
+      pools,
+      maxHops,
+      [],
+      [],
+      tradeRequest.tokenOut,
+    );
 
     const noValidRoute = routes.length === 0;
     if (noValidRoute) {
       throw new NoRoutesAvailableError();
     }
 
-    // Get the best quote from all of the given routes
-    return await this.getBestQuoteFromRoutes(multicallContract, routes, amountSpecified, tradeType);
-  }
-
-  private async getBestQuoteFromRoutes(
-    multicallContract: Multicall,
-    routes: Route<Token, Token>[],
-    amountSpecified: CoinAmount<ERC20>,
-    tradeType: TradeType,
-  ): Promise<QuoteResult> {
     const quotes = await getQuotesForRoutes(
       multicallContract,
       this.routingContracts.quoterAddress,
       routes,
-      amountSpecified,
-      tradeType,
+      tradeRequest,
     );
     if (quotes.length === 0) {
       throw new NoRoutesAvailableError();
     }
 
-    // We want to maximise the amountOut for the EXACT_INPUT type
-    if (tradeType === TradeType.EXACT_INPUT) {
-      return this.bestQuoteForAmountIn(quotes);
-    }
-
-    // We want to minimise the amountIn for the EXACT_OUTPUT type
-    if (tradeType === TradeType.EXACT_OUTPUT) {
-      return this.bestQuoteForAmountOut(quotes);
-    }
-
-    throw new Error('Invalid trade type');
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  private bestQuoteForAmountIn(quotes: QuoteResult[]): QuoteResult {
-    let bestQuote = quotes[0];
-
-    for (let i = 1; i < quotes.length; i++) {
-      if (quotes[i].amountOut.value.gt(bestQuote.amountOut.value)) {
-        bestQuote = quotes[i];
-      }
-    }
-
-    return bestQuote;
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  private bestQuoteForAmountOut(quotes: QuoteResult[]): QuoteResult {
-    let bestQuote = quotes[0];
-
-    for (let i = 1; i < quotes.length; i++) {
-      if (quotes[i].amountIn.value.lt(bestQuote.amountIn.value)) {
-        bestQuote = quotes[i];
-      }
-    }
-
-    return bestQuote;
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  private determineERC20InAndERC20Out(
-    tradeType: TradeType,
-    amountSpecified: CoinAmount<ERC20>,
-    otherToken: ERC20,
-  ): [ERC20, ERC20] {
-    // If the trade type is EXACT INPUT then we have specified the amount for the tokenIn
-    return tradeType === TradeType.EXACT_INPUT
-      ? [amountSpecified.token, otherToken]
-      : [otherToken, amountSpecified.token];
+    return tradeRequest.addBestQuote(quotes);
   }
 }
 

@@ -31,7 +31,6 @@ import {
   expectInstanceOf,
   newAmountFromString,
   formatTokenAmount,
-  WIMX_TEST_TOKEN,
   NATIVE_TEST_TOKEN,
   makeAddr,
   createPool,
@@ -220,8 +219,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       expect(formatAmount(quote.amountWithMaxSlippage)).toEqual('961.165048543689320388'); // userQuoteRes.amountOutMinimum = swapReq.amountOutMinimum
 
-      const ourQuoteReqAmountIn = findOptimalRouteMock.mock.calls[0][0];
-      expect(formatAmount(ourQuoteReqAmountIn)).toEqual('99.0'); // ourQuoteReq.amountIn = the amount specified less the fee
+      const tradeRequest = findOptimalRouteMock.mock.calls[0][0];
+      expect(formatAmount(tradeRequest.ourQuoteReqAmount)).toEqual('99.0'); // ourQuoteReq.amountIn = the amount specified less the fee
 
       const data = swap.transaction.data.toString();
 
@@ -464,11 +463,11 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expectToBeDefined(tx.swap.gasFeeEstimate);
 
       expect(tx.swap.gasFeeEstimate.value).toEqual(TEST_TRANSACTION_GAS_USAGE.mul(TEST_GAS_PRICE));
-      expect(tx.swap.gasFeeEstimate.token.chainId).toEqual(WIMX_TEST_TOKEN.chainId);
-      expect(tx.swap.gasFeeEstimate.token.address).toEqual(WIMX_TEST_TOKEN.address);
-      expect(tx.swap.gasFeeEstimate.token.decimals).toEqual(WIMX_TEST_TOKEN.decimals);
-      expect(tx.swap.gasFeeEstimate.token.symbol).toEqual(WIMX_TEST_TOKEN.symbol);
-      expect(tx.swap.gasFeeEstimate.token.name).toEqual(WIMX_TEST_TOKEN.name);
+      expect(tx.swap.gasFeeEstimate.token.chainId).toEqual(NATIVE_TEST_TOKEN.chainId);
+      expect(tx.swap.gasFeeEstimate.token.address).toEqual('');
+      expect(tx.swap.gasFeeEstimate.token.decimals).toEqual(NATIVE_TEST_TOKEN.decimals);
+      expect(tx.swap.gasFeeEstimate.token.symbol).toEqual(NATIVE_TEST_TOKEN.symbol);
+      expect(tx.swap.gasFeeEstimate.token.name).toEqual(NATIVE_TEST_TOKEN.name);
     });
 
     it('returns valid quote', async () => {

@@ -6,15 +6,10 @@ import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { SecondaryFee__factory } from 'contracts/types';
 import { IV3SwapRouter } from 'contracts/types/SecondaryFee';
 import { PromiseOrValue } from 'contracts/types/common';
-import { QuoteResult } from 'lib/getQuotesForRoutes';
 import { NativeTokenService } from 'lib/nativeTokenService';
 import { ExchangeModuleConfiguration, SecondaryFee, CoinAmount, Coin, ERC20, Native, Amount } from 'types';
-import {
-  erc20ToUniswapToken,
-  newAmount,
-  Router,
-  RoutingContracts,
-} from '../lib';
+import { TradeRequest } from 'lib/tradeRequest/base';
+import { erc20ToUniswapToken, newAmount, Router, RoutingContracts } from '../lib';
 
 export const TEST_GAS_PRICE = BigNumber.from('1500000000'); // 1.5 gwei or 1500000000 wei
 export const TEST_TRANSACTION_GAS_USAGE = BigNumber.from('200000'); // 200,000 gas units
@@ -121,17 +116,14 @@ export const TEST_DEX_CONFIGURATION: ExchangeModuleConfiguration = {
 
 export type SwapTest = {
   fromAddress: string;
-  pools: Pool[],
+  pools: Pool[];
   inputToken: string;
   outputToken: string;
   intermediaryToken: string | undefined;
 };
 
 // uniqBy returns the unique items in an array using the given comparator
-export function uniqBy<K, T extends string | number>(
-  array: K[],
-  comparator: (arg: K) => T,
-): K[] {
+export function uniqBy<K, T extends string | number>(array: K[], comparator: (arg: K) => T): K[] {
   const uniqArr: Partial<Record<T, K>> = {};
 
   for (let i = 0; i < array.length; i++) {
@@ -163,10 +155,11 @@ export function decodePathForExactOutput(path: string) {
   };
 }
 
-type SecondaryFeeFunctionName = 'exactInputSingleWithSecondaryFee' |
-'exactOutputSingleWithSecondaryFee' |
-'exactInputWithSecondaryFee' |
-'exactOutputWithSecondaryFee';
+type SecondaryFeeFunctionName =
+  | 'exactInputSingleWithSecondaryFee'
+  | 'exactOutputSingleWithSecondaryFee'
+  | 'exactInputWithSecondaryFee'
+  | 'exactOutputWithSecondaryFee';
 
 type SwapRouterFunctionName = 'exactInputSingle' | 'exactOutputSingle';
 
@@ -324,14 +317,9 @@ export function setupSwapTxTest(params?: { multiPoolSwap?: boolean }): SwapTest 
 
   let pools: Pool[] = [];
   if (multiPoolSwap) {
-    pools = [
-      createPool(tokenIn, intermediaryToken),
-      createPool(intermediaryToken, tokenOut),
-    ];
+    pools = [createPool(tokenIn, intermediaryToken), createPool(intermediaryToken, tokenOut)];
   } else {
-    pools = [
-      createPool(tokenIn, tokenOut),
-    ];
+    pools = [createPool(tokenIn, tokenOut)];
   }
 
   return {
@@ -378,39 +366,34 @@ export const amountInFromAmountOut = (amountOut: CoinAmount<ERC20>, tokenIn: ERC
 
 export function mockRouterImplementation(params: MockParams) {
   const exchangeRate = params.exchangeRate ?? 10; // 1 TokenIn = 10 TokenOut
-  const findOptimalRoute = jest.fn((
-    amountSpecified: CoinAmount<ERC20>,
-    otherToken: ERC20,
-    tradeType: TradeType,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    secondaryFees: SecondaryFee[],
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    maxHops: number,
-  ) => {
-    const tokenIn = tradeType === TradeType.EXACT_INPUT ? amountSpecified.token : otherToken;
-    const tokenOut = tradeType === TradeType.EXACT_OUTPUT ? amountSpecified.token : otherToken;
-
+  const findOptimalRoute = jest.fn((tradeRequest: TradeRequest) => {
     const route = new Route(
       params.pools,
-      erc20ToUniswapToken(tokenIn),
-      erc20ToUniswapToken(tokenOut),
+      erc20ToUniswapToken(tradeRequest.tokenIn),
+      erc20ToUniswapToken(tradeRequest.tokenOut),
     );
 
-    const amountIn = tradeType === TradeType.EXACT_INPUT
-      ? amountSpecified : amountInFromAmountOut(amountSpecified, tokenIn, exchangeRate);
+    const amountIn =
+      tradeRequest.tradeType === TradeType.EXACT_INPUT
+        ? tradeRequest.specifiedAmount
+        : amountInFromAmountOut(tradeRequest.ourQuoteReqAmount, tradeRequest.tokenIn, exchangeRate);
 
-    const amountOut = tradeType === TradeType.EXACT_INPUT
-      ? amountOutFromAmountIn(amountSpecified, tokenOut, exchangeRate) : amountSpecified;
+    const amountOut =
+      tradeRequest.tradeType === TradeType.EXACT_INPUT
+        ? amountOutFromAmountIn(tradeRequest.ourQuoteReqAmount, tradeRequest.tokenOut, exchangeRate)
+        : tradeRequest.specifiedAmount;
 
-    const trade: QuoteResult = {
-      route,
-      amountIn,
-      amountOut,
-      tradeType,
-      gasEstimate: TEST_TRANSACTION_GAS_USAGE,
-    };
+    const quote = tradeRequest.addBestQuote([
+      {
+        route,
+        amountIn,
+        amountOut,
+        tradeType: tradeRequest.tradeType,
+        gasEstimate: TEST_TRANSACTION_GAS_USAGE,
+      },
+    ]);
 
-    return trade;
+    return quote;
   });
 
   (Router as unknown as jest.Mock).mockImplementationOnce(() => ({
@@ -423,14 +406,14 @@ export function mockRouterImplementation(params: MockParams) {
 
 // expectToBeDefined ensures that a variable is not null or undefined, while
 // also narrowing its type.
-export function expectToBeDefined <T>(x: T): asserts x is NonNullable<T> {
+export function expectToBeDefined<T>(x: T): asserts x is NonNullable<T> {
   expect(x).toBeDefined();
   expect(x).not.toBeNull();
 }
 
 // expectInstanceOf ensurance that a variable is an instance of a class, while
 // also narrowing its type.
-export function expectInstanceOf <T>(className: { new(...args: any[]): T }, x: unknown): asserts x is T {
+export function expectInstanceOf<T>(className: { new (...args: any[]): T }, x: unknown): asserts x is T {
   expect(x).toBeInstanceOf(className);
 }
 
