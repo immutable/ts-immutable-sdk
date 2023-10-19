@@ -3,50 +3,6 @@ import { ModuleConfiguration } from '@imtbl/config';
 import { ExchangeContracts } from 'config';
 
 /**
- * Interface representing an ERC20 token
- * @property {number} chainId - The chain ID
- * @property {string} address - The token address
- * @property {number} decimals - The token decimals
- * @property {string | undefined} symbol - The token symbol or undefined if it is not available
- * @property {string | undefined} name - The token name or undefined if it is not available
- */
-export type ERC20 = {
-  type: 'erc20';
-  chainId: number;
-  address: string;
-  decimals: number;
-  symbol?: string;
-  name?: string;
-};
-
-/**
- * Interface representing a native token
- * @property {number} chainId - The chain ID
- * @property {number} decimals - The token decimals
- * @property {string | undefined} symbol - The token symbol or undefined if it is not available
- * @property {string | undefined} name - The token name or undefined if it is not available
- */
-export type Native = {
-  type: 'native';
-  chainId: number;
-  decimals: number;
-  symbol?: string;
-  name?: string;
-};
-
-export type Coin = ERC20 | Native;
-
-/**
- * Interface representing an amount with the token information
- * @property {Coin} token - The token information
- * @property {ethers.BigNumber} value - The amount
- */
-export type CoinAmount<T extends Coin> = {
-  token: T;
-  value: ethers.BigNumber;
-};
-
-/**
  * Interface representing a Chain
  * @property {number} chainId - The chain ID
  * @property {string} rpcUrl - The RPC URL for the chain
@@ -88,6 +44,16 @@ export type Fee = {
 };
 
 /**
+ * Interface representing an amount with the token information
+ * @property {Coin} token - The token information
+ * @property {ethers.BigNumber} value - The amount
+ */
+export type CoinAmount<T extends Coin> = {
+  token: T;
+  value: ethers.BigNumber;
+};
+
+/**
  * Interface representing a quote for a swap
  * @property {Amount} amount - The quoted amount
  * @property {Amount} amountWithMaxSlippage - The quoted amount with the max slippage applied
@@ -121,6 +87,40 @@ export type TransactionResponse = {
   swap: TransactionDetails;
   quote: Quote;
 };
+
+/**
+ * Interface representing an ERC20 token
+ * @property {number} chainId - The chain ID
+ * @property {string} address - The token address
+ * @property {number} decimals - The token decimals
+ * @property {string | undefined} symbol - The token symbol or undefined if it is not available
+ * @property {string | undefined} name - The token name or undefined if it is not available
+ */
+export type ERC20 = {
+  type: 'erc20';
+  chainId: number;
+  address: string;
+  decimals: number;
+  symbol?: string;
+  name?: string;
+};
+
+/**
+ * Interface representing a native token
+ * @property {number} chainId - The chain ID
+ * @property {number} decimals - The token decimals
+ * @property {string | undefined} symbol - The token symbol or undefined if it is not available
+ * @property {string | undefined} name - The token name or undefined if it is not available
+ */
+export type Native = {
+  type: 'native';
+  chainId: number;
+  decimals: number;
+  symbol?: string;
+  name?: string;
+};
+
+export type Coin = ERC20 | Native;
 
 export type Token = {
   address: string; // either empty or "native" for native
