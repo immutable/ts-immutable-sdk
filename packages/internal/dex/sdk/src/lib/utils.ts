@@ -62,6 +62,9 @@ export function isValidNonZeroAddress(address: string): boolean {
   }
 }
 
+export const isValidTokenLiteral = (address: string): boolean =>
+  (address === 'native' ? true : isValidNonZeroAddress(address));
+
 export const erc20ToUniswapToken = (token: ERC20): Uniswap.Token =>
   // eslint-disable-next-line implicit-arrow-linebreak
   new Uniswap.Token(token.chainId, token.address, token.decimals, token.symbol, token.name);

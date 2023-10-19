@@ -36,6 +36,8 @@ import {
   makeAddr,
   createPool,
   WETH_TEST_TOKEN,
+  FUN_TEST_TOKEN,
+  nativeTokenService,
 } from './test/utils';
 import {
   addAmount, Router,
@@ -85,9 +87,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
     it('uses the edge tIMX as the gas token', async () => {
       const tokenIn = { ...USDC_TEST_TOKEN, chainId: IMMUTABLE_TESTNET_CHAIN_ID };
       const tokenOut = { ...WETH_TEST_TOKEN, chainId: IMMUTABLE_TESTNET_CHAIN_ID };
-      const params = { pools: [createPool(tokenIn, tokenOut)] };
 
-      mockRouterImplementation(params);
+      mockRouterImplementation({ pools: [createPool(tokenIn, tokenOut)] });
 
       const exchange = new Exchange({
         baseConfig: {
@@ -106,6 +107,38 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expectToBeDefined(result.swap.gasFeeEstimate);
       expect(result.swap.gasFeeEstimate.token).toEqual(TIMX_IMMUTABLE_TESTNET);
       expect(result.swap.gasFeeEstimate.token.address).toEqual('0x0000000000000000000000000000000000001010');
+    });
+  });
+
+  describe('with a native token in', () => {
+    it('uses the wrapped token pool to get the quote', async () => {
+      mockRouterImplementation({
+        pools: [createPool(nativeTokenService.wrappedToken, FUN_TEST_TOKEN)],
+      });
+
+      const result = await new Exchange(TEST_DEX_CONFIGURATION).getUnsignedSwapTxFromAmountIn(
+        makeAddr('fromAddress'),
+        'native',
+        FUN_TEST_TOKEN.address,
+        BigNumber.from(1),
+      );
+
+      expect(result.quote.amount.token.address).toEqual(FUN_TEST_TOKEN.address);
+    });
+
+    it('does not require approval', async () => {
+      mockRouterImplementation({
+        pools: [createPool(nativeTokenService.wrappedToken, FUN_TEST_TOKEN)],
+      });
+
+      const result = await new Exchange(TEST_DEX_CONFIGURATION).getUnsignedSwapTxFromAmountIn(
+        makeAddr('fromAddress'),
+        'native',
+        FUN_TEST_TOKEN.address,
+        BigNumber.from(1),
+      );
+
+      expect(result.approval).toBeNull();
     });
   });
 

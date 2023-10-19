@@ -10,7 +10,7 @@ import { SecondaryFee__factory } from 'contracts/types';
 import { NativeTokenService } from 'lib/nativeTokenService';
 import { DEFAULT_DEADLINE, DEFAULT_MAX_HOPS, DEFAULT_SLIPPAGE, MAX_MAX_HOPS, MIN_MAX_HOPS } from './constants';
 import { Router } from './lib/router';
-import { getERC20Decimals, isValidNonZeroAddress, newAmount, toPublicAmount } from './lib/utils';
+import { getERC20Decimals, isValidNonZeroAddress, isValidTokenLiteral, newAmount, toPublicAmount } from './lib/utils';
 import {
   Coin,
   CoinAmount,
@@ -25,12 +25,12 @@ import { ExchangeConfiguration } from './config';
 
 const toPublicQuote = (
   amount: CoinAmount<ERC20>,
-  amountWithMaxSlippage: CoinAmount<ERC20>,
+  amountWithMaxSlippage: CoinAmount<Coin>,
   slippage: number,
   fees: Fees,
 ): Quote => ({
   amount,
-  amountWithMaxSlippage,
+  amountWithMaxSlippage: toPublicAmount(amountWithMaxSlippage),
   slippage,
   fees: fees.withAmounts().map((fee) => ({
     ...fee,
@@ -85,8 +85,8 @@ export class Exchange {
     fromAddress: string,
   ) {
     assert(isValidNonZeroAddress(fromAddress), new InvalidAddressError('invalid from address'));
-    assert(isValidNonZeroAddress(tokenInAddress), new InvalidAddressError('invalid token in address'));
-    assert(isValidNonZeroAddress(tokenOutAddress), new InvalidAddressError('invalid token out address'));
+    assert(isValidTokenLiteral(tokenInAddress), new InvalidAddressError('invalid token in address'));
+    assert(isValidTokenLiteral(tokenOutAddress), new InvalidAddressError('invalid token out address'));
     assert(tokenInAddress.toLocaleLowerCase() !== tokenOutAddress.toLocaleLowerCase(), new DuplicateAddressesError());
     assert(maxHops <= MAX_MAX_HOPS, new InvalidMaxHopsError('max hops must be less than or equal to 10'));
     assert(maxHops >= MIN_MAX_HOPS, new InvalidMaxHopsError('max hops must be greater than or equal to 1'));
@@ -109,37 +109,40 @@ export class Exchange {
     return this.secondaryFees;
   }
 
+  private parseTokenLiteral(tokenLiteral: string, decimals: number): Coin {
+    if (tokenLiteral === 'native') {
+      return this.nativeToken;
+    }
+
+    return {
+      type: 'erc20',
+      address: tokenLiteral,
+      chainId: this.chainId,
+      decimals,
+    };
+  }
+
   private async getUnsignedSwapTx(
     fromAddress: string,
-    tokenInAddress: string,
-    tokenOutAddress: string,
+    tokenInLiteral: string,
+    tokenOutLiteral: string,
     amount: ethers.BigNumber,
     slippagePercent: number,
     maxHops: number,
     deadline: number,
     tradeType: TradeType,
   ): Promise<TransactionResponse> {
-    Exchange.validate(tokenInAddress, tokenOutAddress, maxHops, slippagePercent, fromAddress);
+    Exchange.validate(tokenInLiteral, tokenOutLiteral, maxHops, slippagePercent, fromAddress);
 
     // get the decimals of the tokens that will be swapped
     const [tokenInDecimals, tokenOutDecimals, secondaryFees] = await Promise.all([
-      getERC20Decimals(tokenInAddress, this.provider),
-      getERC20Decimals(tokenOutAddress, this.provider),
+      getERC20Decimals(tokenInLiteral, this.provider),
+      getERC20Decimals(tokenOutLiteral, this.provider),
       this.getSecondaryFees(),
     ]);
 
-    const tokenIn: ERC20 = {
-      type: 'erc20',
-      address: tokenInAddress,
-      chainId: this.chainId,
-      decimals: tokenInDecimals,
-    };
-    const tokenOut: ERC20 = {
-      type: 'erc20',
-      address: tokenOutAddress,
-      chainId: this.chainId,
-      decimals: tokenOutDecimals,
-    };
+    const tokenIn = this.parseTokenLiteral(tokenInLiteral, tokenInDecimals);
+    const tokenOut = this.parseTokenLiteral(tokenOutLiteral, tokenOutDecimals);
 
     // determine which amount was specified for the swap from the TradeType
     const [tokenSpecified, otherToken] =
@@ -153,7 +156,12 @@ export class Exchange {
 
     // get quote and gas details
     const [ourQuote, gasPrice] = await Promise.all([
-      this.router.findOptimalRoute(ourQuoteReqAmount, otherToken, tradeType, maxHops),
+      this.router.findOptimalRoute(
+        ourQuoteReqAmount,
+        this.nativeTokenService.maybeWrapToken(otherToken),
+        tradeType,
+        maxHops,
+      ),
       fetchGasPrice(this.provider, this.nativeToken),
     ]);
 
@@ -189,7 +197,9 @@ export class Exchange {
     );
 
     // preparedApproval always uses the tokenIn address because we are always selling the tokenIn
-    const approval = await getApproval(this.provider, fromAddress, preparedApproval, gasPrice);
+    const approval = preparedApproval
+      ? await getApproval(this.provider, fromAddress, preparedApproval, gasPrice)
+      : null;
 
     const quote = toPublicQuote(quotedAmount, amountWithMaxSlippage, slippagePercent, fees);
 
