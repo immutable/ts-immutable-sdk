@@ -49,14 +49,14 @@ jobs:
           node-version: lts/*
           cache: 'yarn'
 
-      # - name: Update SDK package.json version
-      #   run: |
-      #     tmp=$(mktemp)
-      #     jq '.version = "${{ env.VERSION }}"' ./package.json > "$tmp" && mv "$tmp" ./package.json
-      #   shell: bash
+      - name: Update SDK package.json version
+        run: |
+          tmp=$(mktemp)
+          jq '.version = "${{ env.VERSION }}"' ./package.json > "$tmp" && mv "$tmp" ./package.json
+        shell: bash
 
-      # - name: Install dependencies
-      #   run: yarn install --immutable
+      - name: Install dependencies
+        run: yarn install --immutable
 
       # - name: Build
       #   run: export NODE_OPTIONS=--max-old-space-size=6144 && yarn build
