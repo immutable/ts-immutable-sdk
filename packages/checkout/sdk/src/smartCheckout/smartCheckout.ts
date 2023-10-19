@@ -5,7 +5,7 @@ import {
   ItemRequirement,
   SmartCheckoutResult,
 } from '../types/smartCheckout';
-import { itemAggregator } from './aggregators/itemAggregator';
+import { itemAggregator } from './aggregators';
 import {
   hasERC20Allowances,
   hasERC721Allowances,
