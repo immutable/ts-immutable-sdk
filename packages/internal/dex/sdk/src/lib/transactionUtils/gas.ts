@@ -1,8 +1,9 @@
 import { BigNumber } from 'ethers';
 import { JsonRpcProvider, FeeData } from '@ethersproject/providers';
 import {
-  Amount, newAmount, Native,
+  newAmount,
 } from 'lib';
+import { Amount, Native } from 'types/private';
 
 type EIP1559FeeData = {
   maxFeePerGas: BigNumber;

@@ -6,6 +6,7 @@ import {
 } from 'errors';
 import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
 import { constants, utils } from 'ethers';
+import { SecondaryFee } from 'types';
 import { Exchange } from './exchange';
 import {
   mockRouterImplementation,
@@ -31,7 +32,7 @@ import {
   WIMX_TEST_TOKEN,
 } from './test/utils';
 import {
-  addAmount, Router, SecondaryFee,
+  addAmount, Router,
 } from './lib';
 
 jest.mock('@ethersproject/providers');

@@ -8,18 +8,15 @@ import { IV3SwapRouter } from 'contracts/types/SecondaryFee';
 import { PromiseOrValue } from 'contracts/types/common';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
 import { NativeTokenService } from 'lib/nativeTokenService';
+import { Amount, Coin, ERC20, Native } from 'types/private';
+import { ExchangeModuleConfiguration, SecondaryFee } from 'types';
 import {
-  Amount,
-  Coin,
-  ERC20,
   erc20ToUniswapToken,
-  ExchangeModuleConfiguration,
-  Native,
   newAmount,
   Router,
   RoutingContracts,
-  SecondaryFee,
 } from '../lib';
+import { Amount as PublicAmount } from '../types/public';
 
 export const TEST_GAS_PRICE = BigNumber.from('1500000000'); // 1.5 gwei or 1500000000 wei
 export const TEST_TRANSACTION_GAS_USAGE = BigNumber.from('200000'); // 200,000 gas units
@@ -456,7 +453,7 @@ export function makeAddr(str: string): string {
   return utils.keccak256(utils.toUtf8Bytes(str)).slice(0, 42);
 }
 
-export function formatAmount(amount: Amount<Coin>): string {
+export function formatAmount(amount: Amount<Coin> | PublicAmount): string {
   return utils.formatUnits(amount.value, amount.token.decimals);
 }
 

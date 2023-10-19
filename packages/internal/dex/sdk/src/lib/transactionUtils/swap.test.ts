@@ -10,9 +10,10 @@ import {
 import { Pool, Route } from '@uniswap/v3-sdk';
 import { Fees } from 'lib/fees';
 import {
-  Coin, erc20ToUniswapToken, newAmount, uniswapTokenToERC20,
+  erc20ToUniswapToken, newAmount, uniswapTokenToERC20,
 } from 'lib';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
+import { Coin } from 'types/private';
 import { getSwap, adjustQuoteWithFees } from './swap';
 
 const UNISWAP_IMX = erc20ToUniswapToken(IMX_TEST_TOKEN);

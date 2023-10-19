@@ -1,10 +1,9 @@
 import { Pool } from '@uniswap/v3-sdk';
-import { CurrencyAmount, Token } from '@uniswap/sdk-core';
+import * as Uniswap from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
 import { ProviderCallError } from 'errors';
-import {
-  Amount, Coin, ERC20, Native,
-} from '../types';
+import { Amount, Coin, ERC20, Native } from 'types/private';
+import { Amount as PublicAmount, Token } from 'types';
 
 export const quoteReturnMapping: { [signature: string]: string[] } = {
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -69,11 +68,11 @@ export function isValidNonZeroAddress(address: string): boolean {
   }
 }
 
-export const erc20ToUniswapToken = (token: ERC20): Token =>
+export const erc20ToUniswapToken = (token: ERC20): Uniswap.Token =>
   // eslint-disable-next-line implicit-arrow-linebreak
-  new Token(token.chainId, token.address, token.decimals, token.symbol, token.name);
+  new Uniswap.Token(token.chainId, token.address, token.decimals, token.symbol, token.name);
 
-export const uniswapTokenToERC20 = (token: Token): ERC20 => ({
+export const uniswapTokenToERC20 = (token: Uniswap.Token): ERC20 => ({
   chainId: token.chainId,
   address: token.address,
   decimals: token.decimals,
@@ -82,18 +81,18 @@ export const uniswapTokenToERC20 = (token: Token): ERC20 => ({
   type: 'erc20',
 });
 
-export const toBigNumber = (amount: CurrencyAmount<Token>): ethers.BigNumber => (
+export const toBigNumber = (amount: Uniswap.CurrencyAmount<Uniswap.Token>): ethers.BigNumber => (
   ethers.BigNumber.from(amount.multiply(amount.decimalScale).toExact())
 );
 
-export const toAmount = (amount: CurrencyAmount<Token>): Amount<ERC20> => ({
+export const toAmount = (amount: Uniswap.CurrencyAmount<Uniswap.Token>): Amount<ERC20> => ({
   token: uniswapTokenToERC20(amount.currency),
   value: toBigNumber(amount),
 });
 
-export const toCurrencyAmount = (amount: Amount<ERC20>): CurrencyAmount<Token> => {
+export const toCurrencyAmount = (amount: Amount<ERC20>): Uniswap.CurrencyAmount<Uniswap.Token> => {
   const token = erc20ToUniswapToken(amount.token);
-  return CurrencyAmount.fromRawAmount(token, amount.value.toString());
+  return Uniswap.CurrencyAmount.fromRawAmount(token, amount.value.toString());
 };
 
 export const newAmount = <T extends Coin>(amount: ethers.BigNumber, token: T): Amount<T> => ({
@@ -149,3 +148,56 @@ export const subtractAmount = <T extends Coin>(a: Amount<T>, b: Amount<T>) => {
 
   throw new Error('Token mismatch: token types must be the same');
 };
+
+export const toNative = (token: Token): Native => {
+  if (token.address) {
+    throw new Error('native tokens must not have an address');
+  }
+
+  return {
+    type: 'native',
+    chainId: token.chainId,
+    decimals: token.decimals,
+    symbol: token.symbol,
+    name: token.name,
+  };
+};
+
+export const toERC20 = (token: Token): ERC20 => {
+  if (!token.address) {
+    throw new Error('ERC20 tokens must have an address');
+  }
+  return {
+    type: 'erc20',
+    address: token.address,
+    chainId: token.chainId,
+    decimals: token.decimals,
+    symbol: token.symbol,
+    name: token.name,
+  };
+};
+
+export const toPublicTokenType = (token: Coin): Token => {
+  if (token.type === 'native') {
+    return {
+      address: '',
+      chainId: token.chainId,
+      decimals: token.decimals,
+      symbol: token.symbol,
+      name: token.name,
+    };
+  }
+
+  return {
+    address: token.address,
+    chainId: token.chainId,
+    decimals: token.decimals,
+    symbol: token.symbol,
+    name: token.name,
+  };
+};
+
+export const toPublicAmount = (amount: Amount<Coin>): PublicAmount => ({
+  token: toPublicTokenType(amount.token),
+  value: amount.value,
+});

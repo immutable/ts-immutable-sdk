@@ -3,12 +3,10 @@ import { ethers } from 'ethers';
 import { Fees } from 'lib/fees';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
 import { NativeTokenService } from 'lib/nativeTokenService';
-import {
-  Amount, Coin, ERC20, Quote,
-} from '../../types';
+import { Amount, Coin, ERC20 } from 'types/private';
 import { slippageToFraction } from './slippage';
 
-function getQuoteAmountFromTradeType(tradeInfo: QuoteResult): Amount<ERC20> {
+export function getQuoteAmountFromTradeType(tradeInfo: QuoteResult): Amount<ERC20> {
   if (tradeInfo.tradeType === TradeType.EXACT_INPUT) {
     return tradeInfo.amountOut;
   }
@@ -26,30 +24,6 @@ export function applySlippage(
   const maybeInverted = tradeType === TradeType.EXACT_INPUT ? slippagePlusOne.invert() : slippagePlusOne;
   const amountWithSlippage = maybeInverted.multiply(amount.toString()).quotient;
   return ethers.BigNumber.from(amountWithSlippage.toString());
-}
-
-export function prepareUserQuote(
-  otherToken: ERC20,
-  tradeInfo: QuoteResult,
-  slippage: number,
-  fees: Fees,
-  nativeTokenService: NativeTokenService,
-): Quote {
-  const quote = getQuoteAmountFromTradeType(tradeInfo);
-  const amountWithSlippage = applySlippage(tradeInfo.tradeType, quote.value, slippage);
-
-  return {
-    amount: quote,
-    amountWithMaxSlippage: {
-      token: otherToken,
-      value: amountWithSlippage,
-    },
-    slippage,
-    fees: fees.withAmounts().map((fee) => ({
-      ...fee,
-      amount: nativeTokenService.maybeWrapAmount(fee.amount),
-    })),
-  };
 }
 
 export function getOurQuoteReqAmount(

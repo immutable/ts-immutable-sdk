@@ -2,7 +2,7 @@ import { ethers } from 'ethers';
 import { Token, TradeType } from '@uniswap/sdk-core';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import { NoRoutesAvailableError } from 'errors';
-import { Amount, ERC20 } from 'types';
+import { Amount, ERC20 } from 'types/private';
 import { erc20ToUniswapToken, poolEquals, uniswapTokenToERC20 } from './utils';
 import { getQuotesForRoutes, QuoteResult } from './getQuotesForRoutes';
 import { fetchValidPools } from './poolUtils/fetchValidPools';

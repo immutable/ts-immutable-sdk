@@ -1,9 +1,8 @@
 import { BASIS_POINT_PRECISION } from 'constants/router';
 import { BigNumber } from 'ethers';
-import {
-  Amount,
-  SecondaryFee, newAmount, addAmount, Coin, subtractAmount,
-} from 'lib';
+import { SecondaryFee } from 'types';
+import { Amount, Coin } from 'types/private';
+import { addAmount, newAmount, subtractAmount } from './utils';
 
 export class Fees {
   private secondaryFees: SecondaryFee[];

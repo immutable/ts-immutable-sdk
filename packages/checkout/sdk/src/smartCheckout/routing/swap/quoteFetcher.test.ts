@@ -1,7 +1,7 @@
 import { Environment } from '@imtbl/config';
 import { BigNumber } from 'ethers';
 import {
-  ERC20,
+  Token,
   TransactionDetails,
   TransactionResponse,
 } from '@imtbl/dex-sdk';
@@ -29,18 +29,18 @@ describe('quoteFetcher', () => {
       quote: {
         amount: {
           value: BigNumber.from(quoteAmount),
-          token: {} as ERC20,
+          token: {} as Token,
         },
         amountWithMaxSlippage: {
           value: BigNumber.from(quoteAmount),
-          token: {} as ERC20,
+          token: {} as Token,
         },
         slippage: 0,
         fees: [
           {
             amount: {
               value: BigNumber.from(feeAmount),
-              token: {} as ERC20,
+              token: {} as Token,
             },
             recipient: '',
             basisPoints: 0,
@@ -53,7 +53,7 @@ describe('quoteFetcher', () => {
     if (swapGasFeeEstimate) {
       transactionResponse.swap.gasFeeEstimate = {
         value: BigNumber.from(swapGasFeeEstimate),
-        token: {} as ERC20,
+        token: {} as Token,
       };
     }
 
@@ -61,7 +61,7 @@ describe('quoteFetcher', () => {
       transactionResponse.approval = {
         gasFeeEstimate: {
           value: BigNumber.from(approvalGasFeeEstimate),
-          token: {} as ERC20,
+          token: {} as Token,
         },
       } as TransactionDetails;
     }
@@ -81,18 +81,18 @@ describe('quoteFetcher', () => {
       quote: {
         amount: {
           value: BigNumber.from(quoteAmount),
-          token: {} as ERC20,
+          token: {} as Token,
         },
         amountWithMaxSlippage: {
           value: BigNumber.from(quoteAmount),
-          token: {} as ERC20,
+          token: {} as Token,
         },
         slippage: 0,
         fees: [
           {
             amount: {
               value: BigNumber.from(feeAmount),
-              token: {} as ERC20,
+              token: {} as Token,
             },
             recipient: '',
             basisPoints: 0,
@@ -104,14 +104,14 @@ describe('quoteFetcher', () => {
     if (swap) {
       dexQuote.swap = {
         value: BigNumber.from(swap),
-        token: {} as ERC20,
+        token: {} as Token,
       };
     }
 
     if (approval) {
       dexQuote.approval = {
         value: BigNumber.from(approval),
-        token: {} as ERC20,
+        token: {} as Token,
       };
     }
 

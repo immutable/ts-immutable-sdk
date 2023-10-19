@@ -9,8 +9,9 @@ import { Fees } from 'lib/fees';
 import { toCurrencyAmount } from 'lib/utils';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
 import { NativeTokenService } from 'lib/nativeTokenService';
+import { Amount, Coin, Native } from 'types/private';
 import {
-  Amount, Coin, Native, SecondaryFee, TransactionDetails,
+  SecondaryFee, TransactionDetails,
 } from '../../types';
 import { calculateGasFee } from './gas';
 import { slippageToFraction } from './slippage';

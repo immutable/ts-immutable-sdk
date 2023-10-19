@@ -2,7 +2,7 @@ import { Route, SwapQuoter } from '@uniswap/v3-sdk';
 import { TradeType, Token } from '@uniswap/sdk-core';
 import { BigNumber, ethers } from 'ethers';
 import { ProviderCallError } from 'errors';
-import { Amount, ERC20 } from 'lib';
+import { Amount, ERC20 } from 'types/private';
 import { multicallMultipleCallDataSingContract, MulticallResponse } from './multicall';
 import {
   newAmount, quoteReturnMapping, toCurrencyAmount, uniswapTokenToERC20,

@@ -6,6 +6,8 @@
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "devDependencies": {
     "@actions/core": "^1.10.1",
+    "@parcel/packager-ts": "2.10.0",
+    "@parcel/transformer-typescript-types": "2.10.0",
     "@release-it-plugins/workspaces": "^3.2.0",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
@@ -19,6 +21,7 @@
     "release-it": "^15.10.1",
     "syncpack": "^9.8.4",
     "typedoc": "^0.24.8",
+    "typescript": ">=3.0.0",
     "wsrun": "^5.2.4"
   },
   "engines": {

@@ -1,6 +1,6 @@
 import {
   Amount, Coin, ERC20, Native,
-} from 'types';
+} from 'types/private';
 import { newAmount } from './utils';
 
 export class NativeTokenService {
