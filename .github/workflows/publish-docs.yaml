@@ -54,17 +54,17 @@ jobs:
           jq '.version = "${{ env.VERSION }}"' ./package.json > "$tmp" && mv "$tmp" ./package.json
         shell: bash
 
-      # - name: Install dependencies
-      #   run: yarn install --immutable
+      - name: Install dependencies
+        run: yarn install --immutable
 
-      # - name: Build
-      #   run: export NODE_OPTIONS=--max-old-space-size=6144 && yarn build
+      - name: Build
+        run: export NODE_OPTIONS=--max-old-space-size=6144 && yarn build
 
-      # - name: Build SDK Docs
-      #   run: yarn docs:build
+      - name: Build SDK Docs
+        run: yarn docs:build
 
-      # - name: Update version link
-      #   run: ./.github/scripts/update-docs-link.sh
+      - name: Update version link
+        run: ./.github/scripts/update-docs-link.sh
 
       - name: Create SDK Docs PR
         id: docs_pr 
