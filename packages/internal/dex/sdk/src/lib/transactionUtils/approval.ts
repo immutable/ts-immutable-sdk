@@ -4,10 +4,10 @@ import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
 import { ApproveError, AlreadyApprovedError } from 'errors';
 import { ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
-import { RoutingContracts } from 'lib/router';
 import { newAmount } from 'lib/utils';
+import { NativeTokenService } from 'lib/nativeTokenService';
 import {
-  Amount, ERC20, SecondaryFee, TransactionDetails,
+  Amount, ERC20, Native, SecondaryFee, TransactionDetails,
 } from '../../types';
 import { calculateGasFee } from './gas';
 
@@ -86,14 +86,17 @@ export const prepareApproval = (
   tradeType: TradeType,
   amountSpecified: Amount<ERC20>,
   amountWithSlippage: Amount<ERC20>,
-  routingContracts: RoutingContracts,
+  contracts: {
+    routerAddress: string;
+    secondaryFeeAddress: string;
+  },
   secondaryFees: SecondaryFee[],
 ): PreparedApproval => {
   const amountOfTokenIn = tradeType === TradeType.EXACT_INPUT ? amountSpecified : amountWithSlippage;
 
   const spender = secondaryFees.length === 0
-    ? routingContracts.peripheryRouterAddress
-    : routingContracts.secondaryFeeAddress;
+    ? contracts.routerAddress
+    : contracts.secondaryFeeAddress;
 
   return { spender, amount: amountOfTokenIn };
 };
@@ -154,7 +157,8 @@ export const getApproval = async (
   provider: JsonRpcProvider,
   ownerAddress: string,
   preparedApproval: PreparedApproval,
-  gasPrice: Amount<ERC20> | null,
+  gasPrice: Amount<Native> | null,
+  nativeTokenService: NativeTokenService,
 ): Promise<TransactionDetails | null> => {
   const approveTransaction = await getApproveTransaction(
     provider,
@@ -178,6 +182,7 @@ export const getApproval = async (
 
   return {
     transaction: approveTransaction,
-    gasFeeEstimate,
+    // TODO: TP-1649: Remove the wrapping here
+    gasFeeEstimate: gasFeeEstimate ? nativeTokenService.maybeWrapAmount(gasFeeEstimate) : null,
   };
 };

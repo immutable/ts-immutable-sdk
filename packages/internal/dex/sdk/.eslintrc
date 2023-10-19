@@ -5,5 +5,10 @@
   "parserOptions": {
     "project": "./tsconfig.json",
     "tsconfigRootDir": "."
+  },
+  "rules": {
+    "implicit-arrow-linebreak": "off",
+    "operator-linebreak": "off",
+    "object-curly-newline": "off"
   }
 }

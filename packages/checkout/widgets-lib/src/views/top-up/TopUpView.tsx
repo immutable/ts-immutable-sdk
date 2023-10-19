@@ -37,18 +37,17 @@ import { isPassportProvider } from '../../lib/providerUtils';
 import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextTypes';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { TopUpMenuItem } from './TopUpMenuItem';
-import { TopUpFeature } from '../../widgets/wallet/context/WalletContext';
+import { LoadingView } from '../loading/LoadingView';
 
 interface TopUpViewProps {
-  widgetEvent: IMTBLWidgetEvents;
-  showOnrampOption: boolean;
-  showSwapOption: boolean;
-  showBridgeOption: boolean;
-  tokenAddress?: string;
-  amount?: string;
-  onCloseButtonClick: () => void;
-  onBackButtonClick?: () => void;
-  supportedTopUps?: TopUpFeature | null;
+  widgetEvent: IMTBLWidgetEvents,
+  showOnrampOption: boolean,
+  showSwapOption: boolean,
+  showBridgeOption: boolean,
+  tokenAddress?: string,
+  amount?: string,
+  onCloseButtonClick: () => void,
+  onBackButtonClick?: () => void,
 }
 
 const DEFAULT_FEE_REFRESH_INTERVAL = 30000;
@@ -62,7 +61,6 @@ export function TopUpView({
   amount,
   onCloseButtonClick,
   onBackButtonClick,
-  supportedTopUps,
 }: TopUpViewProps) {
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
@@ -72,6 +70,7 @@ export function TopUpView({
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { conversions, fiatSymbol } = cryptoFiatState;
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+  const loadingText = text.views[SharedViews.LOADING_VIEW].text;
 
   const [onRampFeesPercentage, setOnRampFeesPercentage] = useState('-.--');
   const [swapFeesInFiat, setSwapFeesInFiat] = useState('-.--');
@@ -79,11 +78,12 @@ export function TopUpView({
   const [loadingOnRampFees, setLoadingOnRampFees] = useState(false);
   const [loadingSwapFees, setLoadingSwapFees] = useState(false);
   const [loadingBridgeFees, setLoadingBridgeFees] = useState(false);
+  const [isSwapAvailable, setIsSwapAvailable] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   const isPassport = isPassportProvider(provider);
 
   useEffect(() => {
-    if (!checkout) return;
     if (!cryptoFiatDispatch) return;
     cryptoFiatDispatch({
       payload: {
@@ -91,7 +91,7 @@ export function TopUpView({
         tokenSymbols: DEFAULT_TOKEN_SYMBOLS,
       },
     });
-  }, [checkout, cryptoFiatDispatch]);
+  }, [cryptoFiatDispatch]);
 
   const refreshFees = async (silent: boolean = false) => {
     if (!checkout) return;
@@ -105,7 +105,7 @@ export function TopUpView({
     try {
       await Promise.all([
         (async (): Promise<any> => {
-          if (showSwapOption && supportedTopUps?.isSwapAvailable) {
+          if (showSwapOption && isSwapAvailable) {
             const swapEstimate = await checkout.gasEstimate({
               gasEstimateType: GasEstimateType.SWAP,
             });
@@ -160,7 +160,13 @@ export function TopUpView({
   useInterval(() => refreshFees(true), DEFAULT_FEE_REFRESH_INTERVAL);
 
   useEffect(() => {
-    if (!checkout) return;
+    (async () => {
+      if (!checkout) return;
+      try {
+        setIsSwapAvailable(await checkout.isSwapAvailable());
+      } catch { /* empty */ }
+      setIsLoading(false);
+    })();
     if (conversions.size === 0) return;
     refreshFees();
   }, [checkout, conversions.size === 0]);
@@ -266,7 +272,7 @@ export function TopUpView({
       textConfig: swap,
       onClickEvent: onClickSwap,
       fee: () => renderFees(swapFeesInFiat, loadingSwapFees),
-      isAvailable: supportedTopUps?.isSwapAvailable,
+      isAvailable: isSwapAvailable,
       isEnabled: showSwapOption,
     },
     {
@@ -281,38 +287,44 @@ export function TopUpView({
   ];
 
   return (
-    <SimpleLayout
-      header={(
-        <HeaderNavigation
-          onBackButtonClick={onBackButtonClick}
-          onCloseButtonClick={onCloseButtonClick}
-          showBack
-        />
+    <>
+      {isLoading && (
+        <LoadingView loadingText={loadingText} showFooterLogo />
       )}
-      footer={(
-        <FooterLogo />
-      )}
-    >
-      <Box sx={{ paddingX: 'base.spacing.x4', paddingY: 'base.spacing.x4' }}>
-        <Heading size="small">{header.title}</Heading>
-        <Box sx={{ paddingY: 'base.spacing.x4' }}>
-          {topUpFeatures
-            .sort((a, b) => Number(b.isAvailable) - Number(a.isAvailable))
-            .map((element) => element.isEnabled && (
-            <TopUpMenuItem
-              testId={element.testId}
-              key={element.testId}
-              icon={element.icon as 'Wallet' | 'Coins' | 'Minting'}
-              heading={element.textConfig.heading}
-              caption={!element.isAvailable ? element.textConfig.disabledCaption : element.textConfig.caption}
-              subcaption={element.textConfig.subcaption}
-              onClick={element.onClickEvent}
-              renderFeeFunction={element.fee}
-              isDisabled={!element.isAvailable}
+      {!isLoading && (
+        <SimpleLayout
+          header={(
+            <HeaderNavigation
+              onBackButtonClick={onBackButtonClick}
+              onCloseButtonClick={onCloseButtonClick}
+              showBack
             />
-            ))}
-        </Box>
-      </Box>
-    </SimpleLayout>
+        )}
+          footer={(
+            <FooterLogo />
+            )}
+        >
+          <Box sx={{ paddingX: 'base.spacing.x4', paddingY: 'base.spacing.x4' }}>
+            <Heading size="small">{header.title}</Heading>
+            <Box sx={{ paddingY: 'base.spacing.x4' }}>
+              {topUpFeatures
+                .sort((a, b) => Number(b.isAvailable) - Number(a.isAvailable))
+                .map((element) => element.isEnabled && (
+                  <TopUpMenuItem
+                    testId={element.testId}
+                    icon={element.icon as 'Wallet' | 'Coins' | 'Minting'}
+                    heading={element.textConfig.heading}
+                    caption={!element.isAvailable ? element.textConfig.disabledCaption : element.textConfig.caption}
+                    subcaption={element.textConfig.subcaption}
+                    onClick={element.onClickEvent}
+                    renderFeeFunction={element.fee}
+                    isDisabled={!element.isAvailable}
+                  />
+                ))}
+            </Box>
+          </Box>
+        </SimpleLayout>
+      )}
+    </>
   );
 }

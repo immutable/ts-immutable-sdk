@@ -46,7 +46,7 @@ export const quoteFetcher = async (
       const swappableToken = fromToken[index];
       dexQuotes.set(swappableToken, {
         quote: response.value.quote,
-        approval: response.value.approval?.gasFeeEstimate,
+        approval: response.value.approval?.gasFeeEstimate ?? null,
         swap: response.value.swap.gasFeeEstimate,
       });
     });

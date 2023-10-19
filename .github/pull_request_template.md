@@ -2,8 +2,35 @@
 <!--- A short summary about what this PR is doing. -->
 
 
-# Why the changes
-<!--- State the reason/context for the change. -->
+# Customer Impact
+<!-- How this change will impact customers. Make sure to highlight any breaking changes. -->
+
+
+<!-- Remove the H2 sections as required -->
+## Added 
+<!-- Section for new features. -->
+
+
+## Changed
+<!-- Section for changes in existing functionality. -->
+
+
+## Deprecated
+<!-- Section for soon-to-be removed features. -->
+
+
+## Removed
+<!-- Section for now removed features. -->
+
+
+## Fixed
+<!-- Section for any bug fixes. -->
+
+
+## Security
+<!-- Section in case of vulnerabilities. -->
+
+
 
 
 # Things worth calling out
