@@ -1,4 +1,5 @@
 import typescript from '@rollup/plugin-typescript';
+import commonjs from '@rollup/plugin-commonjs';
 
 export default {
   input: 'src/index.ts',
@@ -6,7 +7,5 @@ export default {
     dir: 'dist',
     format: 'es',
   },
-  plugins: [
-    typescript(),
-  ],
+  plugins: [typescript(), commonjs({ extensions: ['.js', '.ts'] })],
 };
