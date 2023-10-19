@@ -22,7 +22,14 @@
   "exports": {
     ".": "./dist/index.js",
     "./dist/multi-rollup/domain/activities-api-types": "./dist/multi-rollup/domain/activities-api-types.d.ts",
-    "./dist/multi-rollup/domain/chains-api-types": "./dist/multi-rollup/domain/chains-api-types.d.ts"
+    "./dist/multi-rollup/domain/chains-api-types": "./dist/multi-rollup/domain/chains-api-types.d.ts",
+    "./dist/multi-rollup/domain/collections-api-types": "./dist/multi-rollup/domain/collections-api-types.d.ts",
+    "./dist/multi-rollup/domain/metadata-api-types": "./dist/multi-rollup/domain/metadata-api-types.d.ts",
+    "./dist/multi-rollup/domain/nft-owners-api-types": "./dist/multi-rollup/domain/nft-owners-api-types.d.ts",
+    "./dist/multi-rollup/domain/nfts-api-types": "./dist/multi-rollup/domain/nfts-api-types.d.ts",
+    "./dist/multi-rollup/domain/orders-api-types": "./dist/multi-rollup/domain/orders-api-types.d.ts",
+    "./dist/multi-rollup/domain/passport-api-types": "./dist/multi-rollup/domain/passport-api-types.d.ts",
+    "./dist/multi-rollup/domain/tokens-api-types": "./dist/multi-rollup/domain/tokens-api-types.d.ts"
   },
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
