@@ -29,6 +29,7 @@ export const sendSaleWidgetCloseEvent = (
 export const sendSaleSuccessEvent = (
   eventTarget: Window | EventTarget,
   transactions: ExecutedTransaction[] = [],
+  data?: Record<string, unknown>,
 ) => {
   const event = new CustomEvent<WidgetEvent<SaleSuccess>>(
     IMTBLWidgetEvents.IMTBL_SALE_WIDGET_EVENT,
@@ -36,6 +37,7 @@ export const sendSaleSuccessEvent = (
       detail: {
         type: SaleEventType.SUCCESS,
         data: {
+          ...data,
           transactions,
         },
       },
@@ -50,6 +52,7 @@ export const sendSaleFailedEvent = (
   eventTarget: Window | EventTarget,
   reason: string,
   transactions: ExecutedTransaction[] = [],
+  data?: Record<string, unknown>,
 ) => {
   const event = new CustomEvent<WidgetEvent<SaleFailed>>(
     IMTBLWidgetEvents.IMTBL_SALE_WIDGET_EVENT,
@@ -57,6 +60,7 @@ export const sendSaleFailedEvent = (
       detail: {
         type: SaleEventType.FAILURE,
         data: {
+          ...data,
           reason,
           timestamp: new Date().getTime(),
           transactions,

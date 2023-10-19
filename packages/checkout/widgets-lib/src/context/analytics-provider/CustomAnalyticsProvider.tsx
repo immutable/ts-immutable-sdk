@@ -1,22 +1,19 @@
-import {
-  AnalyticsProvider,
-} from './SegmentAnalyticsProvider';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { SetupAnalytics } from './SetupAnalytics';
+import { createCustomAnalytics } from './SetupAnalytics';
 
 type CustomAnalyticsProps = {
-  widgetConfig: StrongCheckoutWidgetsConfig
   children: React.ReactNode;
+  productName: 'checkout' | 'sale';
+  widgetConfig: StrongCheckoutWidgetsConfig
 };
 
 export function CustomAnalyticsProvider(
-  { widgetConfig, children }: CustomAnalyticsProps,
+  { productName, widgetConfig, children }: CustomAnalyticsProps,
 ) {
+  const { AnalyticsProvider } = createCustomAnalytics({ widgetConfig, productName });
   return (
     <AnalyticsProvider>
-      <SetupAnalytics widgetConfig={widgetConfig}>
-        {children}
-      </SetupAnalytics>
+      {children}
     </AnalyticsProvider>
   );
 }

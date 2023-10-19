@@ -14,12 +14,12 @@ const TRANSAK_ORIGIN = 'transak.com';
 const FAILED_TO_LOAD_TIMEOUT_IN_MS = 5000;
 
 export type TransakEventHandlers = {
-  onInit?: () => void;
-  onOpen?: () => void;
-  onOrderCreated?: () => void;
-  onOrderProcessing?: () => void;
-  onOrderCompleted?: () => void;
-  onOrderFailed?: () => void;
+  onInit?: (data: Record<string, unknown>) => void;
+  onOpen?: (data: Record<string, unknown>) => void;
+  onOrderCreated?: (data: Record<string, unknown>) => void;
+  onOrderProcessing?: (data: Record<string, unknown>) => void;
+  onOrderCompleted?: (data: Record<string, unknown>) => void;
+  onOrderFailed?: (data: Record<string, unknown>) => void;
   onFailedToLoad?: () => void;
   failedToLoadTimeoutInMs?: number;
 };
@@ -80,10 +80,10 @@ export const useTransakEvents = (props: UseTransakEventsProps) => {
 
   const timeout = useRef<NodeJS.Timeout | number>(0);
 
-  const onInit = () => {
+  const onInit = (data: Record<string, unknown>) => {
     setInitialsed(true);
     clearTimeout(timeout.current);
-    props.onInit?.();
+    props.onInit?.(data);
   };
 
   const onLoad = () => {
@@ -118,24 +118,24 @@ export const useTransakEvents = (props: UseTransakEventsProps) => {
   const handleEvents = useCallback((event: TransakEvent) => {
     switch (event.event_id) {
       case TransakEvents.TRANSAK_WIDGET_INITIALISED:
-        onInit();
+        onInit(event.data);
         break;
       case TransakEvents.TRANSAK_WIDGET_OPEN:
-        props.onOpen?.();
+        props.onOpen?.(event.data);
         break;
       case TransakEvents.TRANSAK_ORDER_CREATED:
-        props.onOrderCreated?.();
+        props.onOrderCreated?.(event.data);
         break;
       case TransakEvents.TRANSAK_ORDER_SUCCESSFUL:
         if (event.data.status === TransakStatuses.PROCESSING) {
-          props.onOrderProcessing?.();
+          props.onOrderProcessing?.(event.data);
         }
         if (event.data.status === TransakStatuses.COMPLETED) {
-          props.onOrderCompleted?.();
+          props.onOrderCompleted?.(event.data);
         }
         break;
       case TransakEvents.TRANSAK_ORDER_FAILED:
-        props.onOrderFailed?.();
+        props.onOrderFailed?.(event.data);
         break;
       default:
         break;

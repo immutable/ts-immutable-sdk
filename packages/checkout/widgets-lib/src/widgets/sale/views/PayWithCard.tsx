@@ -7,14 +7,33 @@ import { WithCard } from '../components/WithCard';
 import { useSaleContext } from '../context/SaleContextProvider';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
+import { PaymentTypes, SaleErrorTypes } from '../types';
 import { useSaleEvent } from '../hooks/useSaleEvents';
 
 export function PayWithCard() {
-  const { sendPageView } = useSaleEvent();
-  const { goBackToPaymentMethods } = useSaleContext();
   const [initialised, setInitialised] = useState(false);
+  const { goBackToPaymentMethods, goToErrorView, goToSuccessView } = useSaleContext();
+  const { sendPageView, sendSuccessEvent } = useSaleEvent();
 
   const onInit = () => setInitialised(true);
+
+  const onOrderFailed = (data: Record<string, unknown>) => {
+    console.log('🚀 ~ data:', data);
+    goToErrorView(SaleErrorTypes.TRANSAK_FAILED);
+  };
+
+  const onOrderProcessing = (data: Record<string, unknown>) => {
+    console.log('🚀 ~ data:', data);
+    goToSuccessView({
+      onRenderEvent: () => {
+        sendSuccessEvent(
+          [],
+          PaymentTypes.FIAT,
+          SaleWidgetViews.SALE_SUCCESS,
+        );
+      },
+    });
+  };
 
   useEffect(() => sendPageView(SaleWidgetViews.PAY_WITH_CARD), []);
 
@@ -41,7 +60,12 @@ export function PayWithCard() {
           width: '100%',
         }}
       >
-        <WithCard onInit={onInit} />
+        <WithCard
+          onInit={onInit}
+          onOrderFailed={onOrderFailed}
+          onOrderCompleted={onOrderProcessing}
+          onOrderProcessing={onOrderProcessing}
+        />
       </Box>
     </SimpleLayout>
   );

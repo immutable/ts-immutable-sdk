@@ -16,14 +16,27 @@ import { ExecutedTransaction } from '../types';
 import { useSaleContext } from '../context/SaleContextProvider';
 
 const toStringifyTransactions = (transactions: ExecutedTransaction[]) => transactions
-  .map(({ method, hash }) => `${method}: ${hash}`)
-  .join(' | ');
+  .map(({ method, hash }) => `${method}: ${hash}`).join(' | ');
 
 export const useSaleEvent = () => {
   const { track, page } = useAnalytics();
-  const { recipientAddress: userId, recipientEmail: email } = useSaleContext();
-  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+  const {
+    recipientAddress: userId,
+    recipientEmail: email,
+    signResponse,
+  } = useSaleContext();
+  const {
+    eventTargetState: { eventTarget },
+  } = useContext(EventTargetContext);
   const defaultView = SaleWidgetViews.PAYMENT_METHODS;
+  const userProps = {
+    userId,
+    email,
+  };
+  const orderProps = {
+    amount: signResponse?.order.totalAmount,
+    currency: signResponse?.order.currency.name,
+  };
 
   const sendCloseEvent = (
     screen: TrackEventProps['screen'] = defaultView,
@@ -36,8 +49,7 @@ export const useSaleEvent = () => {
       controlType,
       action,
       userJourney: UserJourney.SALE,
-      email,
-      userId,
+      ...userProps,
     };
     track(props);
     sendSaleWidgetCloseEvent(eventTarget);
@@ -47,19 +59,21 @@ export const useSaleEvent = () => {
     transactions: ExecutedTransaction[] = [],
     paymentType = '',
     screen: TrackEventProps['screen'] = defaultView,
+    data?: Record<string, unknown>,
   ) => {
     track({
+      ...data,
       screen,
       control: 'Success',
       controlType: 'Event',
       action: 'Succeeded',
       userJourney: UserJourney.SALE,
-      userId,
-      email,
       paymentType,
+      ...userProps,
+      ...orderProps,
       transactions: toStringifyTransactions(transactions),
     });
-    sendSaleSuccessEvent(eventTarget, transactions);
+    sendSaleSuccessEvent(eventTarget, transactions, data);
   };
 
   const sendFailedEvent = (
@@ -67,20 +81,22 @@ export const useSaleEvent = () => {
     transactions: ExecutedTransaction[] = [],
     paymentType = '',
     screen: TrackEventProps['screen'] = defaultView,
+    data?: Record<string, unknown>,
   ) => {
     track({
+      ...data,
       screen,
       control: 'Fail',
       controlType: 'Event',
       action: 'Failed',
       userJourney: UserJourney.SALE,
-      userId,
-      email,
       reason,
       paymentType,
+      ...userProps,
+      ...orderProps,
       transactions: toStringifyTransactions(transactions),
     });
-    sendSaleFailedEvent(eventTarget, reason, transactions);
+    sendSaleFailedEvent(eventTarget, reason, transactions, data);
   };
 
   const sendTransactionSuccessEvent = (transactions: ExecutedTransaction[]) => {
@@ -93,20 +109,18 @@ export const useSaleEvent = () => {
       screen,
       control: 'Select',
       controlType: 'MenuItem',
-      userId,
-      email,
       paymentType,
+      ...userProps,
     });
   };
 
   const sendPageView = (screen: string, data?: Record<string, unknown>) => {
     page({
+      ...data,
       userJourney: UserJourney.SALE,
       screen,
-      userId,
-      email,
       action: 'Viewed',
-      ...data,
+      ...userProps,
     });
   };
 

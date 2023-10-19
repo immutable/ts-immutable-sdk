@@ -213,12 +213,15 @@ export function SaleWidget(props: SaleWidgetProps) {
           )}
           {viewState.view.type === SaleWidgetViews.SALE_FAIL && (
             <StatusView
-              onRenderEvent={() => sendFailedEvent(
-                viewState.view.data?.reason,
-                viewState.view.data?.transactions,
-                viewState.view.data?.paymentMethod,
-                SaleWidgetViews.SALE_FAIL,
-              )}
+              onRenderEvent={() => {
+                sendFailedEvent(
+                  viewState.view.data?.reason,
+                  viewState.view.data?.transactions,
+                  viewState.view.data?.paymentMethod,
+                  SaleWidgetViews.SALE_FAIL,
+                  viewState.view.data?.eventData,
+                );
+              }}
               {...getErrorViewProps()}
             />
           )}
@@ -231,11 +234,14 @@ export function SaleWidget(props: SaleWidgetProps) {
                 actionText={
                   text.views[SaleWidgetViews.SALE_SUCCESS].actionText
                 }
-                onRenderEvent={() => sendSuccessEvent(
-                  viewState.view.data?.transactions,
-                  viewState.view.data?.paymentMethod,
-                  SaleWidgetViews.SALE_SUCCESS,
-                )}
+                onRenderEvent={() => {
+                  sendSuccessEvent(
+                    viewState.view.data?.transactions,
+                    viewState.view.data?.paymentMethod,
+                    SaleWidgetViews.SALE_SUCCESS,
+                    viewState.view.data?.eventData,
+                  );
+                }}
                 onActionClick={() => sendCloseEvent(SaleWidgetViews.SALE_SUCCESS)}
                 statusType={StatusType.SUCCESS}
                 testId="success-view"

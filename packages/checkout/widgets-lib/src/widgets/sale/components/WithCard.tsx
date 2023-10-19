@@ -8,12 +8,12 @@ import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTy
 import { SaleErrorTypes } from '../types';
 
 export interface WithCardProps {
-  onInit?: () => void;
-  onOpen?: () => void;
-  onOrderCreated?: () => void;
-  onOrderProcessing?: () => void;
-  onOrderCompleted?: () => void;
-  onOrderFailed?: () => void;
+  onInit?: (data: Record<string, unknown>) => void;
+  onOpen?: (data: Record<string, unknown>) => void;
+  onOrderCreated?: (data: Record<string, unknown>) => void;
+  onOrderProcessing?: (data: Record<string, unknown>) => void;
+  onOrderCompleted?: (data: Record<string, unknown>) => void;
+  onOrderFailed?: (data: Record<string, unknown>) => void;
 }
 
 export function WithCard(props: WithCardProps) {

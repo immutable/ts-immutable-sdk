@@ -57,7 +57,7 @@ type SaleContextValues = SaleContextProps & {
   setPaymentMethod: (paymentMethod: PaymentTypes) => void;
   goBackToPaymentMethods: (paymentMethod?: PaymentTypes | undefined) => void;
   goToErrorView: (type: SaleErrorTypes, data?: Record<string, unknown>) => void;
-  goToSuccessView: () => void;
+  goToSuccessView: (data?: Record<string, unknown>) => void;
 };
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -204,13 +204,14 @@ export function SaleContextProvider(props: {
     [paymentMethod, setPaymentMethod, executeResponse],
   );
 
-  const goToSuccessView = useCallback(() => {
+  const goToSuccessView = useCallback((data: Record<string, unknown> = {}) => {
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
         view: {
           type: SaleWidgetViews.SALE_SUCCESS,
           data: {
+            ...data,
             paymentMethod,
             transactions: executeResponse.transactions,
           },
