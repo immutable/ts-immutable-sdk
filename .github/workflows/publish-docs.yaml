@@ -15,6 +15,7 @@ jobs:
       GH_TOKEN: ${{ secrets.PLATFORM_SA_GITHUB_TOKEN }}
       SDK_PUBLISH_SLACK_WEBHOOK: ${{ secrets.SDK_PUBLISH_SLACK_WEBHOOK }}
       NETLIFY_BUILD_HOOK: ${{ secrets.NETLIFY_BUILD_HOOK }}
+      GITHUB_USER: ${{ github.actor }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -80,17 +81,17 @@ jobs:
       # # TODO - revert to 10 mins
       #   run: sleep 300
 
-      - name: Check Netlify Site Deployed
-        id: netlify_deploy
-        run: ./.github/scripts/check-docs-deployed.sh
-        shell: bash
+      # - name: Check Netlify Site Deployed
+      #   id: netlify_deploy
+      #   run: ./.github/scripts/check-docs-deployed.sh
+      #   shell: bash
 
       - name: Notify SDK Slack Docs Publish Success
         # if: ${{ success() && steps.docs_push.conclusion == 'success' && steps.netlify_build.conclusion == 'success' && steps.netlify_deploy.conclusion == 'success' }}
         if: ${{ success() && steps.netlify_deploy.conclusion == 'success' }}
         uses: ./.github/actions/notify-slack-publish-status
         with:
-          message: "✅ SDK reference documents published successfully - https://docs.immutable.com/sdk-references/ts-immutable-sdk/${{ env.VERSION }}/modules/_imtbl_sdk.html\n\n*Please ensure you and the team updated all Sample Code + Guides on the <https://docs.immutable.com|imx-docs site> to reflect the change.*"
+          message: "✅ SDK reference documents published successfully - https://docs.immutable.com/sdk-references/ts-immutable-sdk/${{ env.VERSION }}/modules/_imtbl_sdk.html\n\n>*${{ env.GITHUB_USER }} Please ensure you and the team updated all Sample Code + Guides on the <https://docs.immutable.com|imx-docs site> to reflect the change.*"
 
       - name: Notify SDK Slack Docs Publish Failure
         if: ${{ failure() }}
