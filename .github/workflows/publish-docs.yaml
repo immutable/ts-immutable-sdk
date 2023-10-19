@@ -14,62 +14,67 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.PLATFORM_SA_GITHUB_TOKEN }}
       SDK_PUBLISH_SLACK_WEBHOOK: ${{ secrets.SDK_PUBLISH_SLACK_WEBHOOK }}
+      NETLIFY_BUILD_HOOK: ${{ secrets.NETLIFY_BUILD_HOOK }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+      # - name: Checkout
+      #   uses: actions/checkout@v3
+      #   with:
+      #     fetch-depth: 0
 
-      - name: Checkout Docs Repo
-        uses: actions/checkout@v3
-        with:
-          repository: immutable/imx-docs
-          token: ${{ secrets.PLATFORM_SA_GITHUB_TOKEN }}
-          path: imx-docs
-          ref: main
+      # - name: Checkout Docs Repo
+      #   uses: actions/checkout@v3
+      #   with:
+      #     repository: immutable/imx-docs
+      #     token: ${{ secrets.PLATFORM_SA_GITHUB_TOKEN }}
+      #     path: imx-docs
+      #     ref: main
 
-      - name: Setup environment variables
-        run: |
-          echo "VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
-          echo "CLONE_DIR=./imx-docs" >> $GITHUB_ENV
+      # - name: Setup environment variables
+      #   run: |
+      #     echo "VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
+      #     echo "CLONE_DIR=./imx-docs" >> $GITHUB_ENV
 
-      - name: Docs version check
-        run: ./.github/scripts/check-docs-version.sh
-        shell: bash      
+      # - name: Docs version check
+      #   run: ./.github/scripts/check-docs-version.sh
+      #   shell: bash
 
-      - name: Setup Github
-        run: |
-          git config --global user.name "${GITHUB_ACTOR}"
-          git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+      # - name: Setup Github
+      #   run: |
+      #     git config --global user.name "${GITHUB_ACTOR}"
+      #     git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
 
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: lts/*
-          cache: 'yarn'
+      # - name: Setup Node
+      #   uses: actions/setup-node@v3
+      #   with:
+      #     node-version: lts/*
+      #     cache: 'yarn'
 
-      - name: Update SDK package.json version
-        run: |
-          tmp=$(mktemp)
-          jq '.version = "${{ env.VERSION }}"' ./package.json > "$tmp" && mv "$tmp" ./package.json
-        shell: bash
+      # - name: Update SDK package.json version
+      #   run: |
+      #     tmp=$(mktemp)
+      #     jq '.version = "${{ env.VERSION }}"' ./package.json > "$tmp" && mv "$tmp" ./package.json
+      #   shell: bash
 
-      - name: Install dependencies
-        run: yarn install --immutable
+      # - name: Install dependencies
+      #   run: yarn install --immutable
 
-      - name: Build
-        run: export NODE_OPTIONS=--max-old-space-size=6144 && yarn build
+      # - name: Build
+      #   run: export NODE_OPTIONS=--max-old-space-size=6144 && yarn build
 
-      - name: Build SDK Docs
-        run: yarn docs:build
+      # - name: Build SDK Docs
+      #   run: yarn docs:build
 
-      - name: Update version link
-        run: ./.github/scripts/update-docs-link.sh
+      # - name: Update version link
+      #   run: ./.github/scripts/update-docs-link.sh
 
-      - name: Create SDK Docs PR
-        id: docs_pr 
-        run: ./.github/scripts/push-docs-pr.sh
-        shell: bash
+      # - name: Create SDK Docs PR
+      #   id: docs_pr 
+      #   run: ./.github/scripts/push-docs-pr.sh
+      #   shell: bash
+
+      - name: Trigger Netlify Build and Deploy
+        id: netlify_build
+        run: curl -X POST -d '{}' ${{ env.NETLIFY_BUILD_HOOK }}
 
       # - name: Notify SDK Slack Docs PR Success
       #   if: ${{ success() && steps.docs_pr.conclusion == 'success' }}
