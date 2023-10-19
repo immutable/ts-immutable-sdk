@@ -16,8 +16,8 @@ then
 fi
 
 # check a docs folder with the same version exists in $CLONE_DIR
-if [ -d "$CLONE_DIR/api-docs/sdk-references/ts-immutable-sdk/v$VERSION" ]; then
-echo "There is already a docs folder for v$VERSION"
+if [ -d "$CLONE_DIR/api-docs/sdk-references/ts-immutable-sdk/$VERSION" ]; then
+  echo "There is already a docs folder for v$VERSION"
   exit 1
 fi
 
