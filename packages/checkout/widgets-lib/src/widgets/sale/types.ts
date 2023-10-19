@@ -22,6 +22,7 @@ export type SignedOrderProduct = {
   amount: number[];
   tokenId: number[];
   currency: string;
+  collectionAddress: string;
 };
 
 export type SignedOrder = {

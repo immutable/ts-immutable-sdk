@@ -96,6 +96,7 @@ const toSignedProduct = (
   name: item?.name || '',
   description: item?.description || '',
   currency,
+  collectionAddress: product.detail[0].collection_address,
   amount: product.detail.map(({ amount }) => amount),
   tokenId: product.detail.map(({ token_id: tokenId }) => Number(tokenId)),
 });
