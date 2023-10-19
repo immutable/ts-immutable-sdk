@@ -48,6 +48,9 @@ describe('WalletWidget tests', () => {
   };
 
   describe('WalletWidget initialisation', () => {
+    beforeEach(() => {
+    });
+
     it('should show loading screen when component is mounted', () => {
       const widgetConfig = {
         theme: WidgetTheme.DARK,
@@ -102,6 +105,8 @@ describe('WalletWidget tests', () => {
         isSwapEnabled: false,
         isOnRampEnabled: false,
       } as StrongCheckoutWidgetsConfig;
+
+      cyIntercept();
 
       const balanceStub = cy
         .stub(Checkout.prototype, 'getBalance')

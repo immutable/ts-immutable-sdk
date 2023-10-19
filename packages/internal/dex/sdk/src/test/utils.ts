@@ -7,6 +7,7 @@ import { SecondaryFee__factory } from 'contracts/types';
 import { IV3SwapRouter } from 'contracts/types/SecondaryFee';
 import { PromiseOrValue } from 'contracts/types/common';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
+import { NativeTokenService } from 'lib/nativeTokenService';
 import {
   Amount,
   Coin,
@@ -43,8 +44,6 @@ export const TEST_SECONDARY_FEE_ADDRESS = '0x8dBE1f0900C5e92ad87A54521902a33ba15
 export const TEST_ROUTING_CONTRACTS: RoutingContracts = {
   factoryAddress: TEST_V3_CORE_FACTORY_ADDRESS,
   quoterAddress: TEST_QUOTER_ADDRESS,
-  peripheryRouterAddress: TEST_PERIPHERY_ROUTER_ADDRESS,
-  secondaryFeeAddress: TEST_SECONDARY_FEE_ADDRESS,
   multicallAddress: TEST_MULTICALL_ADDRESS,
 };
 
@@ -54,6 +53,15 @@ export const IMX_TEST_TOKEN: ERC20 = {
   decimals: 18,
   symbol: 'IMX',
   name: 'Immutable X',
+  type: 'erc20',
+};
+
+export const WIMX_TEST_TOKEN: ERC20 = {
+  chainId: TEST_CHAIN_ID,
+  address: '0xAf7cf5D4Af0BFAa85d384d42b8D410762Ccbce69',
+  decimals: 18,
+  symbol: 'WIMX',
+  name: 'Wrapped Immutable X',
   type: 'erc20',
 };
 
@@ -84,6 +92,16 @@ export const FUN_TEST_TOKEN: ERC20 = {
   type: 'erc20',
 };
 
+export const NATIVE_TEST_TOKEN: Native = {
+  chainId: TEST_CHAIN_ID,
+  decimals: 18,
+  symbol: 'IMX',
+  name: 'Native Immutable X',
+  type: 'native',
+};
+
+export const nativeTokenService = new NativeTokenService(NATIVE_TEST_TOKEN, WIMX_TEST_TOKEN);
+
 export const TEST_IMMUTABLE_CONFIGURATION: ImmutableConfiguration = new ImmutableConfiguration({
   environment: Environment.SANDBOX,
 });
@@ -101,14 +119,8 @@ export const TEST_DEX_CONFIGURATION: ExchangeModuleConfiguration = {
       secondaryFee: TEST_SECONDARY_FEE_ADDRESS,
     },
     commonRoutingTokens: [],
-    nativeToken: {
-      chainId: IMX_TEST_TOKEN.chainId,
-      address: IMX_TEST_TOKEN.address,
-      decimals: IMX_TEST_TOKEN.decimals,
-      symbol: IMX_TEST_TOKEN.symbol,
-      name: IMX_TEST_TOKEN.name,
-      type: 'erc20',
-    },
+    nativeToken: NATIVE_TEST_TOKEN,
+    wrappedNativeToken: WIMX_TEST_TOKEN,
   },
 };
 
@@ -444,7 +456,7 @@ export function makeAddr(str: string): string {
   return utils.keccak256(utils.toUtf8Bytes(str)).slice(0, 42);
 }
 
-export function formatAmount(amount: Amount<ERC20>): string {
+export function formatAmount(amount: Amount<Coin>): string {
   return utils.formatUnits(amount.value, amount.token.decimals);
 }
 

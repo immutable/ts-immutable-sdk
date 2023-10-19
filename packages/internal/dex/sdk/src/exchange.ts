@@ -1,33 +1,18 @@
 import { ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
 import assert from 'assert';
-import {
-  DuplicateAddressesError,
-  InvalidAddressError,
-  InvalidMaxHopsError,
-  InvalidSlippageError,
-} from 'errors';
+import { DuplicateAddressesError, InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError } from 'errors';
 import { fetchGasPrice } from 'lib/transactionUtils/gas';
 import { getApproval, prepareApproval } from 'lib/transactionUtils/approval';
 import { getOurQuoteReqAmount, prepareUserQuote } from 'lib/transactionUtils/getQuote';
 import { Fees } from 'lib/fees';
 import { SecondaryFee__factory } from 'contracts/types';
-import {
-  DEFAULT_DEADLINE,
-  DEFAULT_MAX_HOPS,
-  DEFAULT_SLIPPAGE,
-  MAX_MAX_HOPS,
-  MIN_MAX_HOPS,
-} from './constants';
+import { NativeTokenService } from 'lib/nativeTokenService';
+import { DEFAULT_DEADLINE, DEFAULT_MAX_HOPS, DEFAULT_SLIPPAGE, MAX_MAX_HOPS, MIN_MAX_HOPS } from './constants';
 import { Router } from './lib/router';
-import {
-  getERC20Decimals, isValidNonZeroAddress, newAmount,
-} from './lib/utils';
-import {
-  ERC20,
-  ExchangeModuleConfiguration, SecondaryFee, TransactionResponse,
-} from './types';
-import { getSwap, prepareSwap } from './lib/transactionUtils/swap';
+import { getERC20Decimals, isValidNonZeroAddress, newAmount } from './lib/utils';
+import { ERC20, ExchangeModuleConfiguration, Native, SecondaryFee, TransactionResponse } from './types';
+import { getSwap, adjustQuoteWithFees } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
 
 export class Exchange {
@@ -37,32 +22,36 @@ export class Exchange {
 
   private chainId: number;
 
-  private nativeToken: ERC20;
+  private nativeToken: Native;
+
+  private wrappedNativeToken: ERC20;
 
   private secondaryFees: SecondaryFee[];
+
+  private nativeTokenService: NativeTokenService;
+
+  private secondaryFeeContractAddress: string;
+
+  private routerContractAddress: string;
 
   constructor(configuration: ExchangeModuleConfiguration) {
     const config = new ExchangeConfiguration(configuration);
 
     this.chainId = config.chain.chainId;
     this.nativeToken = config.chain.nativeToken;
+    this.wrappedNativeToken = config.chain.wrappedNativeToken;
+    this.nativeTokenService = new NativeTokenService(this.nativeToken, this.wrappedNativeToken);
     this.secondaryFees = config.secondaryFees;
+    this.routerContractAddress = config.chain.contracts.peripheryRouter;
+    this.secondaryFeeContractAddress = config.chain.contracts.secondaryFee;
 
-    this.provider = new ethers.providers.JsonRpcProvider(
-      config.chain.rpcUrl,
-    );
+    this.provider = new ethers.providers.JsonRpcProvider(config.chain.rpcUrl);
 
-    this.router = new Router(
-      this.provider,
-      config.chain.commonRoutingTokens,
-      {
-        multicallAddress: config.chain.contracts.multicall,
-        factoryAddress: config.chain.contracts.coreFactory,
-        quoterAddress: config.chain.contracts.quoterV2,
-        peripheryRouterAddress: config.chain.contracts.peripheryRouter,
-        secondaryFeeAddress: config.chain.contracts.secondaryFee,
-      },
-    );
+    this.router = new Router(this.provider, config.chain.commonRoutingTokens, {
+      multicallAddress: config.chain.contracts.multicall,
+      factoryAddress: config.chain.contracts.coreFactory,
+      quoterAddress: config.chain.contracts.quoterV2,
+    });
   }
 
   private static validate(
@@ -87,10 +76,7 @@ export class Exchange {
       return [];
     }
 
-    const secondaryFeeContract = SecondaryFee__factory.connect(
-      this.router.routingContracts.secondaryFeeAddress,
-      this.provider,
-    );
+    const secondaryFeeContract = SecondaryFee__factory.connect(this.secondaryFeeContractAddress, this.provider);
 
     if (await secondaryFeeContract.paused()) {
       // Do not use secondary fees if the contract is paused
@@ -133,56 +119,50 @@ export class Exchange {
     };
 
     // determine which amount was specified for the swap from the TradeType
-    const [tokenSpecified, otherToken] = tradeType === TradeType.EXACT_INPUT
-      ? [tokenIn, tokenOut] : [tokenOut, tokenIn];
+    const [tokenSpecified, otherToken] =
+      tradeType === TradeType.EXACT_INPUT ? [tokenIn, tokenOut] : [tokenOut, tokenIn];
 
     const amountSpecified = newAmount(amount, tokenSpecified);
 
     const fees = new Fees(secondaryFees, tokenIn);
 
-    const ourQuoteReqAmount = getOurQuoteReqAmount(amountSpecified, fees, tradeType);
+    const ourQuoteReqAmount = getOurQuoteReqAmount(amountSpecified, fees, tradeType, this.nativeTokenService);
 
     // get quote and gas details
     const [ourQuote, gasPrice] = await Promise.all([
-      this.router.findOptimalRoute(
-        ourQuoteReqAmount,
-        otherToken,
-        tradeType,
-        maxHops,
-      ),
+      this.router.findOptimalRoute(ourQuoteReqAmount, otherToken, tradeType, maxHops),
       fetchGasPrice(this.provider, this.nativeToken),
     ]);
 
-    const adjustedQuote = prepareSwap(ourQuote, amountSpecified, fees);
+    const adjustedQuote = adjustQuoteWithFees(ourQuote, amountSpecified, fees, this.nativeTokenService);
 
     const swap = getSwap(
       adjustedQuote,
       fromAddress,
       slippagePercent,
       deadline,
-      this.router.routingContracts.peripheryRouterAddress,
-      this.router.routingContracts.secondaryFeeAddress,
+      this.routerContractAddress,
+      this.secondaryFeeContractAddress,
       gasPrice,
       secondaryFees,
+      this.nativeTokenService,
     );
 
-    const userQuote = prepareUserQuote(otherToken, adjustedQuote, slippagePercent, fees);
+    const userQuote = prepareUserQuote(otherToken, adjustedQuote, slippagePercent, fees, this.nativeTokenService);
 
     const preparedApproval = prepareApproval(
       tradeType,
       amountSpecified,
       userQuote.amountWithMaxSlippage,
-      this.router.routingContracts,
+      {
+        routerAddress: this.routerContractAddress,
+        secondaryFeeAddress: this.secondaryFeeContractAddress,
+      },
       secondaryFees,
     );
 
     // preparedApproval always uses the tokenIn address because we are always selling the tokenIn
-    const approval = await getApproval(
-      this.provider,
-      fromAddress,
-      preparedApproval,
-      gasPrice,
-    );
+    const approval = await getApproval(this.provider, fromAddress, preparedApproval, gasPrice, this.nativeTokenService);
 
     return {
       approval,
