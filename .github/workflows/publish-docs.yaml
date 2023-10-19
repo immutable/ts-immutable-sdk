@@ -1,7 +1,6 @@
 name: Publish SDK Reference Docs
 
 on:
-  # push:
   workflow_run:
     workflows: ["Publish to NPM"]
     types:
@@ -36,6 +35,7 @@ jobs:
           echo "CLONE_DIR=./imx-docs" >> $GITHUB_ENV
 
       - name: Docs version check
+        id: docs_version_check
         run: ./.github/scripts/check-docs-version.sh
         shell: bash
 
@@ -87,13 +87,13 @@ jobs:
         shell: bash
 
       - name: Notify SDK Slack Docs Publish Success
-        # if: ${{ success() && steps.docs_push.conclusion == 'success' && steps.netlify_build.conclusion == 'success' && steps.netlify_deploy.conclusion == 'success' }}
+        if: ${{ success() && steps.docs_push.conclusion == 'success' && steps.netlify_build.conclusion == 'success' && steps.netlify_deploy.conclusion == 'success' }}
         uses: ./.github/actions/notify-slack-publish-status
         with:
           message: "✅ SDK reference documents published successfully - https://docs.immutable.com/sdk-references/ts-immutable-sdk/${{ env.VERSION }}/modules/_imtbl_sdk.html\n\n>*`${{ env.GITHUB_USER }}` Please ensure you and the team updated all Sample Code + Guides on the <https://docs.immutable.com|imx-docs site> to reflect the change.*"
 
       - name: Notify SDK Slack Docs Publish Failure
-        if: ${{ failure() }}
+        if: ${{ failure() && steps.docs_version_check.conclusion == 'success' }}
         uses: ./.github/actions/notify-slack-publish-status
         with:
           message: "❌ Failed to publish SDK reference documents. Please check the logs for more details."
