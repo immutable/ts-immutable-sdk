@@ -1,4 +1,4 @@
-export * from '@imtbl/generated-clients/dist/multi-rollup/domain/activities-api';
+export * from '@imtbl/generated-clients/dist/multi-rollup/domain/activities-api-types';
 export * from '@imtbl/generated-clients/dist/multi-rollup/domain/chains-api-types';
 export * from '@imtbl/generated-clients/dist/multi-rollup/domain/collections-api-types';
 export * from '@imtbl/generated-clients/dist/multi-rollup/domain/metadata-api-types';

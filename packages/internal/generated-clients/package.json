@@ -21,7 +21,8 @@
   "main": "dist/index.js",
   "exports": {
     ".": "./dist/index.js",
-    "./dist/multi-rollup/domain/activities-api": "./dist/multi-rollup/domain/activities-api.d.ts"
+    "./dist/multi-rollup/domain/activities-api-types": "./dist/multi-rollup/domain/activities-api-types.d.ts",
+    "./dist/multi-rollup/domain/chains-api-types": "./dist/multi-rollup/domain/chains-api-types.d.ts"
   },
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
