@@ -42,27 +42,19 @@ else
 fi
 
 cd "$CLONE_DIR"
-git checkout -b "$INPUT_DESTINATION_HEAD_BRANCH"
 
 echo "Adding git commit"
 git add .
 if git status | grep -q "Changes to be committed"
 then
-  git commit --message "Update from https://github.com/$GITHUB_REPOSITORY/commit/$GITHUB_SHA"
+  git commit --message "SDK reference docs update from https://github.com/$GITHUB_REPOSITORY/commit/$GITHUB_SHA"
   echo "Pushing git commit"
-  git push -u origin HEAD:$INPUT_DESTINATION_HEAD_BRANCH
+  git push -u origin main
 
   # Without this sleep, the checks on the imx-docs repo fail
   # but pass on a re-run from within Netlify
   echo "Waiting for 1 minute to allow Netlify to catch up"
   sleep 60
-
-  echo "Creating a pull request"
-  PR=$(gh pr create --title "Release SDK reference docs v$VERSION" \
-               --body "Released from ts-immutable-sdk" \
-               --reviewer "$GITHUB_ACTOR")
-  echo "PR=$PR" >> $GITHUB_ENV
 else
   echo "No changes detected"
 fi
-
