@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - DX-2403/fix-build-not-failing-on-type-errors
   pull_request:
 
 jobs:
