@@ -3,6 +3,7 @@ import { BigNumber, Contract, utils } from 'ethers';
 import { HttpStatusCode } from 'axios';
 import {
   ChainId,
+  DEFAULT_TOKEN_DECIMALS,
   ERC20ABI,
   GetAllBalancesResult,
   GetBalanceResult,
@@ -88,7 +89,7 @@ export async function getERC20Balance(
 }
 
 // Blockscout client singleton
-let blockscoutClient: Blockscout;
+let blockscoutClient: Blockscout; // todo: make this a map
 
 export const getIndexerBalance = async (
   walletAddress: string,
@@ -99,7 +100,7 @@ export const getIndexerBalance = async (
   // for faster access to tokens config objects.
   const mapRename = Object.assign({}, ...(rename.map((t) => ({ [t.address || '']: t }))));
 
-  // Ensure singleton is present and match the selected chain
+  // Ensure singleton is present and match the selected chain // todo: make this a map
   if (!blockscoutClient || blockscoutClient.chainId !== chainId) blockscoutClient = new Blockscout({ chainId });
 
   // Hold the items in an array for post-fetching processing
@@ -163,11 +164,17 @@ export const getIndexerBalance = async (
       const balance = BigNumber.from(item.value);
 
       const renamed = (mapRename[tokenData.address] || {}) as TokenInfo;
+
+      let decimals = parseInt(tokenData.decimals, 10);
+      if (Number.isNaN(decimals)) {
+        decimals = DEFAULT_TOKEN_DECIMALS;
+      }
+
       const token = {
         ...tokenData,
         name: renamed.name ?? tokenData.name,
         symbol: renamed.symbol ?? tokenData.symbol,
-        decimals: parseInt(tokenData.decimals, 10),
+        decimals,
       };
 
       const formattedBalance = utils.formatUnits(item.value, token.decimals);
