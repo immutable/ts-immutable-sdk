@@ -154,7 +154,7 @@ export class Exchange {
 
     const ourQuoteReqAmount = getOurQuoteReqAmount(amountSpecified, fees, tradeType, this.nativeTokenService);
 
-    // get quote and gas details
+    // Quotes will always use ERC20s. If the user-specified token is Native, we use the Wrapped Native Token pool
     const [ourQuote, gasPrice] = await Promise.all([
       this.router.findOptimalRoute(
         ourQuoteReqAmount,
