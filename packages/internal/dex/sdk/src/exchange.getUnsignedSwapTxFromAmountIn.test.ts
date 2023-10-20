@@ -134,6 +134,25 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
     });
   });
 
+  describe('with native token out', () => {
+    it('should unwrap the quoted amount', async () => {
+      mockRouterImplementation({
+        pools: [createPool(nativeTokenService.wrappedToken, FUN_TEST_TOKEN)],
+      });
+
+      const result = await new Exchange(TEST_DEX_CONFIGURATION).getUnsignedSwapTxFromAmountIn(
+        makeAddr('fromAddress'),
+        FUN_TEST_TOKEN.address,
+        'native',
+        BigNumber.from(1),
+      );
+
+      expect(result.quote.amount.token.address).toEqual('');
+      expect(result.quote.amount.token.chainId).toEqual(nativeTokenService.nativeToken.chainId);
+      expect(result.quote.amount.token.decimals).toEqual(nativeTokenService.nativeToken.decimals);
+    });
+  });
+
   describe('When the swap transaction requires approval', () => {
     it('should include the unsigned approval transaction', async () => {
       const params = setupSwapTxTest();

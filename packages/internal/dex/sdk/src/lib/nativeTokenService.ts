@@ -1,6 +1,4 @@
-import {
-  Coin, CoinAmount, ERC20, Native,
-} from 'types';
+import { Coin, CoinAmount, ERC20, Native } from 'types';
 import { newAmount } from './utils';
 
 export class NativeTokenService {
@@ -14,7 +12,7 @@ export class NativeTokenService {
   }
 
   unwrapAmount(amount: CoinAmount<ERC20>): CoinAmount<Coin> {
-    if (amount.token !== this.wrappedToken) {
+    if (amount.token.address.toLowerCase() !== this.wrappedToken.address.toLowerCase()) {
       throw new Error(`cannot unwrap non-wrapped token ${amount.token.address}`);
     }
     return newAmount(amount.value, this.nativeToken);
@@ -32,6 +30,6 @@ export class NativeTokenService {
   }
 
   isNativeToken(token: Coin): token is Native {
-    return token === this.nativeToken;
+    return token.type === this.nativeToken.type;
   }
 }

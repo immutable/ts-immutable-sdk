@@ -4,7 +4,7 @@ import assert from 'assert';
 import { DuplicateAddressesError, InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError } from 'errors';
 import { fetchGasPrice } from 'lib/transactionUtils/gas';
 import { getApproval, prepareApproval } from 'lib/transactionUtils/approval';
-import { applySlippage, getOurQuoteReqAmount, getQuoteAmountFromTradeType } from 'lib/transactionUtils/getQuote';
+import { getOurQuoteReqAmount, prepareUserQuote } from 'lib/transactionUtils/getQuote';
 import { Fees } from 'lib/fees';
 import { SecondaryFee__factory } from 'contracts/types';
 import { NativeTokenService } from 'lib/nativeTokenService';
@@ -24,12 +24,12 @@ import { getSwap, adjustQuoteWithFees } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
 
 const toPublicQuote = (
-  amount: CoinAmount<ERC20>,
+  amount: CoinAmount<Coin>,
   amountWithMaxSlippage: CoinAmount<Coin>,
   slippage: number,
   fees: Fees,
 ): Quote => ({
-  amount,
+  amount: toPublicAmount(amount),
   amountWithMaxSlippage: toPublicAmount(amountWithMaxSlippage),
   slippage,
   fees: fees.withAmounts().map((fee) => ({
@@ -179,16 +179,17 @@ export class Exchange {
       this.nativeTokenService,
     );
 
-    const quotedAmount = getQuoteAmountFromTradeType(adjustedQuote);
-    const amountWithMaxSlippage = newAmount(
-      applySlippage(adjustedQuote.tradeType, quotedAmount.value, slippagePercent),
+    const { quotedAmount, quotedAmountWithMaxSlippage } = prepareUserQuote(
+      this.nativeTokenService,
+      adjustedQuote,
+      slippagePercent,
       otherToken,
     );
 
     const preparedApproval = prepareApproval(
       tradeType,
       amountSpecified,
-      amountWithMaxSlippage,
+      quotedAmountWithMaxSlippage,
       {
         routerAddress: this.routerContractAddress,
         secondaryFeeAddress: this.secondaryFeeContractAddress,
@@ -201,7 +202,7 @@ export class Exchange {
       ? await getApproval(this.provider, fromAddress, preparedApproval, gasPrice)
       : null;
 
-    const quote = toPublicQuote(quotedAmount, amountWithMaxSlippage, slippagePercent, fees);
+    const quote = toPublicQuote(quotedAmount, quotedAmountWithMaxSlippage, slippagePercent, fees);
 
     return { quote, approval, swap };
   }

@@ -32,9 +32,30 @@ describe('NativeTokenService', () => {
   });
 
   describe('unwrapAmount', () => {
+    it('should convert when object references are different', () => {
+      // Make a new wrappedToken instance
+      const wrappedAmount = newAmountFromString('1', { ...nativeTokenService.wrappedToken });
+      const nativeEquivalent = nativeTokenService.unwrapAmount(wrappedAmount);
+
+      expectNative(nativeEquivalent.token);
+      expect(formatAmount(nativeEquivalent)).toEqual('1.0');
+    });
+
+    it('should convert when token addresses have mixed casing', () => {
+      const newWrappedToken = { ...nativeTokenService.wrappedToken };
+      newWrappedToken.address = newWrappedToken.address.toUpperCase();
+
+      const wrappedAmount = newAmountFromString('1', newWrappedToken);
+      const nativeEquivalent = nativeTokenService.unwrapAmount(wrappedAmount);
+
+      expectNative(nativeEquivalent.token);
+      expect(formatAmount(nativeEquivalent)).toEqual('1.0');
+    });
+
     it('converts wrapped token amounts to their native equivalent', () => {
       const wrappedAmount = newAmountFromString('1', nativeTokenService.wrappedToken);
       const nativeEquivalent = nativeTokenService.unwrapAmount(wrappedAmount);
+
       expectNative(nativeEquivalent.token);
       expect(formatAmount(nativeEquivalent)).toEqual('1.0');
     });
@@ -86,6 +107,10 @@ describe('NativeTokenService', () => {
   });
 
   describe('isNativeToken', () => {
+    it('should return true when object references are different', () => {
+      expect(nativeTokenService.isNativeToken({ ...nativeTokenService.nativeToken })).toEqual(true);
+    });
+
     it('returns true for the native token', () => {
       expect(nativeTokenService.isNativeToken(nativeTokenService.nativeToken)).toEqual(true);
     });
