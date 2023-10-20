@@ -89,7 +89,7 @@ export async function getERC20Balance(
 }
 
 // Blockscout client singleton
-let blockscoutClient: Blockscout; // todo: make this a map
+const blockscoutClientMap: Map<ChainId, Blockscout> = new Map();
 
 export const getIndexerBalance = async (
   walletAddress: string,
@@ -100,8 +100,12 @@ export const getIndexerBalance = async (
   // for faster access to tokens config objects.
   const mapRename = Object.assign({}, ...(rename.map((t) => ({ [t.address || '']: t }))));
 
-  // Ensure singleton is present and match the selected chain // todo: make this a map
-  if (!blockscoutClient || blockscoutClient.chainId !== chainId) blockscoutClient = new Blockscout({ chainId });
+  // Ensure singleton is present and match the selected chain
+  let blockscoutClient = blockscoutClientMap.get(chainId);
+  if (!blockscoutClient) {
+    blockscoutClient = new Blockscout({ chainId });
+    blockscoutClientMap.set(chainId, blockscoutClient);
+  }
 
   // Hold the items in an array for post-fetching processing
   const items = [];
@@ -231,7 +235,7 @@ export const getAllBalances = async (
   // In order to prevent unnecessary RPC calls
   // let's use the Indexer if available for the
   // given chain.
-  let flag = false;
+  let flag = true;
   try {
     flag = (await config.remote.getTokensConfig(chainId)).blockscout || flag;
   } catch (err: any) {
