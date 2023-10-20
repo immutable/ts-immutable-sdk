@@ -3,7 +3,7 @@ import { FundingRoute } from '@imtbl/checkout-sdk';
 import {
   useContext,
   useEffect,
-  useMemo, useState,
+  useMemo, useRef, useState,
 } from 'react';
 import {
   FundWithSmartCheckoutSubViews, SaleWidgetViews,
@@ -27,20 +27,20 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
 
   const { querySmartCheckout, fundingRoutes } = useSaleContext();
 
-  let smartCheckoutLoading = false;
+  const smartCheckoutLoading = useRef(false);
 
   const onFundingRouteSelected = (fundingRoute: FundingRoute) => {
     setSelectedFundingRoute(fundingRoute);
   };
 
   useEffect(() => {
-    if (subView === FundWithSmartCheckoutSubViews.INIT && !smartCheckoutLoading) {
-      smartCheckoutLoading = true;
+    if (subView === FundWithSmartCheckoutSubViews.INIT && !smartCheckoutLoading.current) {
+      smartCheckoutLoading.current = true;
       querySmartCheckout().finally(() => {
-        smartCheckoutLoading = false;
+        smartCheckoutLoading.current = false;
       });
     }
-  }, []);
+  }, [subView]);
 
   const fundingRouteStep = useMemo(() => {
     if (!selectedFundingRoute) {
