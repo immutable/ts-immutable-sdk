@@ -197,6 +197,7 @@ export const useSignOrder = (input: SignOrderInput) => {
         await txnResponse?.wait(1);
 
         transactionHash = txnResponse?.hash;
+        return transactionHash;
       } catch (e) {
         // TODO: check error type to send
         // SaleErrorTypes.WALLET_REJECTED or SaleErrorTypes.WALLET_REJECTED_NO_FUNDS
@@ -219,9 +220,8 @@ export const useSignOrder = (input: SignOrderInput) => {
           type: errorType,
           data: { error: e },
         });
+        return undefined;
       }
-
-      return transactionHash;
     },
     [provider],
   );
@@ -288,8 +288,8 @@ export const useSignOrder = (input: SignOrderInput) => {
       });
       return [];
     }
-
     const execTransactions: ExecutedTransaction[] = [];
+    let failed = false;
     for (const transaction of signData.transactions) {
       const {
         contractAddress: to,
@@ -298,16 +298,19 @@ export const useSignOrder = (input: SignOrderInput) => {
         gasEstimate,
       } = transaction;
       // eslint-disable-next-line no-await-in-loop
-      const hash = await sendTransaction(to, data, gasEstimate, method);
+      const hash = await sendTransaction(to, data, 2 * gasEstimate, method);
 
       if (!hash) {
+        failed = true;
         break;
       }
 
       execTransactions.push({ method, hash });
     }
 
-    setExecuteDone();
+    if (!failed) {
+      setExecuteDone();
+    }
     return execTransactions;
   };
 
