@@ -123,9 +123,7 @@ export class ZkEvmProvider implements Provider {
           user: this.user,
         });
         this.guardianClient = new GuardianClient({
-          accessToken: this.user.accessToken,
           confirmationScreen: this.confirmationScreen,
-          imxEtherAddress: this.user.zkEvm.ethAddress,
           config: this.config,
         });
 

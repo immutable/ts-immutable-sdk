@@ -1,9 +1,9 @@
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { Contract } from '@ethersproject/contracts';
 import { BigNumber } from '@ethersproject/bignumber';
-import { SecondaryFee } from 'lib';
 import { ethers } from 'ethers';
 import { ERC20__factory } from 'contracts/types';
+import { SecondaryFee } from './types';
 import { Exchange } from './exchange';
 import {
   mockRouterImplementation,

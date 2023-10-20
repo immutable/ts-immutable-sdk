@@ -42,10 +42,7 @@ export async function createOrder({
     const { ethAddress } = user.imx;
     const amountSell = request.sell.type === ERC721 ? '1' : request.sell.amount;
     const amountBuy = request.buy.type === ERC721 ? '1' : request.buy.amount;
-    const headers = {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      Authorization: `Bearer ${user.accessToken}`,
-    };
+    const headers = { Authorization: `Bearer ${user.accessToken}` };
 
     const getSignableOrderRequestV3: GetSignableOrderRequest = {
       user: ethAddress,
@@ -65,7 +62,8 @@ export async function createOrder({
       { headers },
     );
 
-    await guardianClient.validate({
+    await guardianClient.evaluateImxTransaction({
+      user,
       payloadHash: getSignableOrderResponse.data.payload_hash,
     });
 
@@ -123,7 +121,8 @@ export async function cancelOrder({
       getSignableCancelOrderRequest,
     }, { headers });
 
-    await guardianClient.validate({
+    await guardianClient.evaluateImxTransaction({
+      user,
       payloadHash: getSignableCancelOrderResponse.data.payload_hash,
     });
 

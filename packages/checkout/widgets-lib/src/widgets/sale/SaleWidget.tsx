@@ -155,6 +155,20 @@ export function SaleWidget(props: SaleWidgetProps) {
       onSecondaryActionClick: () => sendCloseEvent(SaleErrorTypes.WALLET_REJECTED),
       statusType: StatusType.INFORMATION,
     },
+    [SaleErrorTypes.SMART_CHECKOUT_NO_ROUTES_FOUND]: {
+      onActionClick: () => {
+        goBackToPaymentMethods();
+      },
+      onSecondaryActionClick: closeWidget,
+      statusType: StatusType.INFORMATION,
+    },
+    [SaleErrorTypes.SMART_CHECKOUT_ERROR]: {
+      onActionClick: () => {
+        goBackToPaymentMethods();
+      },
+      onSecondaryActionClick: closeWidget,
+      statusType: StatusType.INFORMATION,
+    },
     [SaleErrorTypes.DEFAULT]: {
       onActionClick: goBackToPaymentMethods,
       onSecondaryActionClick: () => sendCloseEvent(SaleErrorTypes.DEFAULT),

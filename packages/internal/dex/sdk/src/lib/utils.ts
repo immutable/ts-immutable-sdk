@@ -1,10 +1,8 @@
 import { Pool } from '@uniswap/v3-sdk';
-import { CurrencyAmount, Token } from '@uniswap/sdk-core';
+import * as Uniswap from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
 import { ProviderCallError } from 'errors';
-import {
-  Amount, Coin, ERC20, Native,
-} from '../types';
+import { Amount, Coin, CoinAmount, ERC20, Native, Token } from 'types';
 
 export const quoteReturnMapping: { [signature: string]: string[] } = {
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -24,10 +22,8 @@ export const quoteReturnMapping: { [signature: string]: string[] } = {
  */
 export function poolEquals(poolA: Pool, poolB: Pool): boolean {
   return (
-    poolA === poolB
-    || (poolA.token0.equals(poolB.token0)
-      && poolA.token1.equals(poolB.token1)
-      && poolA.fee === poolB.fee)
+    poolA === poolB ||
+    (poolA.token0.equals(poolB.token0) && poolA.token1.equals(poolB.token1) && poolA.fee === poolB.fee)
   );
 }
 
@@ -43,10 +39,7 @@ export async function getERC20Decimals(
       data: decimalsFunctionSig,
     });
 
-    return parseInt(
-      decimalsResult,
-      16,
-    );
+    return parseInt(decimalsResult, 16);
   } catch (e) {
     const message = e instanceof Error ? e.message : 'Unknown Error';
     throw new ProviderCallError(`failed to get ERC20 decimals: ${message}`);
@@ -69,11 +62,11 @@ export function isValidNonZeroAddress(address: string): boolean {
   }
 }
 
-export const erc20ToUniswapToken = (token: ERC20): Token =>
+export const erc20ToUniswapToken = (token: ERC20): Uniswap.Token =>
   // eslint-disable-next-line implicit-arrow-linebreak
-  new Token(token.chainId, token.address, token.decimals, token.symbol, token.name);
+  new Uniswap.Token(token.chainId, token.address, token.decimals, token.symbol, token.name);
 
-export const uniswapTokenToERC20 = (token: Token): ERC20 => ({
+export const uniswapTokenToERC20 = (token: Uniswap.Token): ERC20 => ({
   chainId: token.chainId,
   address: token.address,
   decimals: token.decimals,
@@ -82,40 +75,41 @@ export const uniswapTokenToERC20 = (token: Token): ERC20 => ({
   type: 'erc20',
 });
 
-export const toBigNumber = (amount: CurrencyAmount<Token>): ethers.BigNumber => (
-  ethers.BigNumber.from(amount.multiply(amount.decimalScale).toExact())
-);
+export const toBigNumber = (amount: Uniswap.CurrencyAmount<Uniswap.Token>): ethers.BigNumber =>
+  ethers.BigNumber.from(amount.multiply(amount.decimalScale).toExact());
 
-export const toAmount = (amount: CurrencyAmount<Token>): Amount<ERC20> => ({
+export const toAmount = (amount: Uniswap.CurrencyAmount<Uniswap.Token>): CoinAmount<ERC20> => ({
   token: uniswapTokenToERC20(amount.currency),
   value: toBigNumber(amount),
 });
 
-export const toCurrencyAmount = (amount: Amount<ERC20>): CurrencyAmount<Token> => {
+export const toCurrencyAmount = (amount: CoinAmount<ERC20>): Uniswap.CurrencyAmount<Uniswap.Token> => {
   const token = erc20ToUniswapToken(amount.token);
-  return CurrencyAmount.fromRawAmount(token, amount.value.toString());
+  return Uniswap.CurrencyAmount.fromRawAmount(token, amount.value.toString());
 };
 
-export const newAmount = <T extends Coin>(amount: ethers.BigNumber, token: T): Amount<T> => ({
+export const newAmount = <T extends Coin>(amount: ethers.BigNumber, token: T): CoinAmount<T> => ({
   value: amount,
   token,
 });
 
-export const isERC20Amount = (amount: Amount<Coin>): amount is Amount<ERC20> => amount.token.type === 'erc20';
-export const isNativeAmount = (amount: Amount<Coin>): amount is Amount<Native> => amount.token.type === 'native';
+export const isERC20Amount = (amount: CoinAmount<Coin>): amount is CoinAmount<ERC20> => amount.token.type === 'erc20';
 
-export const addERC20Amount = (a: Amount<ERC20>, b: Amount<ERC20>) => {
+export const isNativeAmount = (amount: CoinAmount<Coin>): amount is CoinAmount<Native> =>
+  amount.token.type === 'native';
+
+export const addERC20Amount = (a: CoinAmount<ERC20>, b: CoinAmount<ERC20>) => {
   // Make sure the ERC20s have the same address
   if (a.token.address !== b.token.address) throw new Error('Token mismatch: token addresses must be the same');
   return { value: a.value.add(b.value), token: a.token };
 };
 
-const addNativeAmount = (a: Amount<Native>, b: Amount<Native>) => ({
+const addNativeAmount = (a: CoinAmount<Native>, b: CoinAmount<Native>) => ({
   value: a.value.add(b.value),
   token: a.token,
 });
 
-export const addAmount = <T extends Coin>(a: Amount<T>, b: Amount<T>) => {
+export const addAmount = <T extends Coin>(a: CoinAmount<T>, b: CoinAmount<T>) => {
   if (isERC20Amount(a) && isERC20Amount(b)) {
     return addERC20Amount(a, b);
   }
@@ -127,18 +121,18 @@ export const addAmount = <T extends Coin>(a: Amount<T>, b: Amount<T>) => {
   throw new Error('Token mismatch: token types must be the same');
 };
 
-export const subtractERC20Amount = (a: Amount<ERC20>, b: Amount<ERC20>) => {
+export const subtractERC20Amount = (a: CoinAmount<ERC20>, b: CoinAmount<ERC20>) => {
   // Make sure the ERC20s have the same address
   if (a.token.address !== b.token.address) throw new Error('Token mismatch: token addresses must be the same');
   return { value: a.value.sub(b.value), token: a.token };
 };
 
-const subtractNativeAmount = (a: Amount<Native>, b: Amount<Native>) => ({
+const subtractNativeAmount = (a: CoinAmount<Native>, b: CoinAmount<Native>) => ({
   value: a.value.sub(b.value),
   token: a.token,
 });
 
-export const subtractAmount = <T extends Coin>(a: Amount<T>, b: Amount<T>) => {
+export const subtractAmount = <T extends Coin>(a: CoinAmount<T>, b: CoinAmount<T>) => {
   if (isERC20Amount(a) && isERC20Amount(b)) {
     return subtractERC20Amount(a, b);
   }
@@ -149,3 +143,28 @@ export const subtractAmount = <T extends Coin>(a: Amount<T>, b: Amount<T>) => {
 
   throw new Error('Token mismatch: token types must be the same');
 };
+
+/**
+ * Converts our internal token type which could be ERC20 or Native
+ * into a format consumable by Checkout. They require an address to be
+ * present. We populate the address with empty string if it's Native.
+ * If it's ERC20, we don't need to change it.
+ */
+export const toPublicTokenType = (token: Coin): Token => {
+  if (token.type === 'native') {
+    return {
+      address: '',
+      chainId: token.chainId,
+      decimals: token.decimals,
+      symbol: token.symbol,
+      name: token.name,
+    };
+  }
+
+  return token;
+};
+
+export const toPublicAmount = (amount: CoinAmount<Coin>): Amount => ({
+  token: toPublicTokenType(amount.token),
+  value: amount.value,
+});
