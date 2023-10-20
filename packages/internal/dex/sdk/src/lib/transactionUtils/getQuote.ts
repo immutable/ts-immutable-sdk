@@ -2,7 +2,7 @@ import { TradeType } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
 import { Fees } from 'lib/fees';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
-import { NativeTokenService } from 'lib/nativeTokenService';
+import { NativeTokenService, canUnwrapToken } from 'lib/nativeTokenService';
 import { newAmount } from 'lib/utils';
 import { Coin, CoinAmount, ERC20 } from 'types';
 import { slippageToFraction } from './slippage';
@@ -32,7 +32,7 @@ export const prepareUserQuote = (
   const erc20QuoteAmount = getQuoteAmountFromTradeType(routerQuote);
 
   // If the quote amount is the native token, we need to unwrap it if the user originally specified the native token
-  const quotedAmount = nativeTokenService.isNativeToken(tokenOfQuotedAmount)
+  const quotedAmount = canUnwrapToken(tokenOfQuotedAmount)
     ? nativeTokenService.unwrapAmount(erc20QuoteAmount)
     : erc20QuoteAmount;
 
