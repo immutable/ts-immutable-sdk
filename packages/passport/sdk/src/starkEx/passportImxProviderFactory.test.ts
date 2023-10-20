@@ -110,34 +110,5 @@ describe('PassportImxProviderFactory', () => {
         });
       });
     });
-
-    describe('when the user has not previously registered', () => {
-      it('should return a PassportImxProviderInstance with empty address fields', async () => {
-        const magicProviderMock = {};
-        const mockUserImxNoAddress = { ...mockUserImx, imx: {} };
-        // const mockUserImxEmptyAddresses = { ...mockUserImx, imx: { ethAddress: '', starkAddress: '', userAdminAddress: '' } };
-        mockAuthManager.login.mockResolvedValue(mockUserImxNoAddress);
-        mockMagicAdapter.login.mockResolvedValue(magicProviderMock);
-        mockAuthManager.loginSilent.mockResolvedValue(mockUserImxNoAddress);
-
-        const result = await passportImxProviderFactory.getProvider();
-
-        expect(result).toBe(mockPassportImxProvider);
-        expect(mockAuthManager.login).toHaveBeenCalledTimes(1);
-        expect(mockMagicAdapter.login).toHaveBeenCalledWith(mockUserImx.idToken);
-        expect(mockGetSigner).toHaveBeenCalledTimes(1);
-        expect(registerPassportStarkEx).not.toHaveBeenCalled();
-        expect(mockAuthManager.loginSilent).not.toHaveBeenCalled();
-        expect(PassportImxProvider).toHaveBeenCalledWith({
-          starkSigner: mockStarkSigner,
-          ethSigner: mockEthSigner,
-          authManager: mockAuthManager,
-          immutableXClient,
-          config,
-          confirmationScreen,
-          passportEventEmitter,
-        });
-      });
-    });
   });
 });

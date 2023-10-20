@@ -360,7 +360,6 @@ describe('PassportImxProvider', () => {
 
         await passportImxProvider.registerOffchain();
 
-        // expect(passportImxProvider).toBe(passportImxProviderMock);
         expect(registerPassportStarkEx).toHaveBeenCalledWith({
           ethSigner: mockEthSigner,
           starkSigner: mockStarkSigner,

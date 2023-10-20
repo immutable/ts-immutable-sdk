@@ -50,6 +50,8 @@ const mockOidcExpiredNoRefreshTokenUser: OidcUser = {
   expired: true,
 } as OidcUser;
 
+const mockEmptyImx = { ethAddress: '', starkAddress: '', userAdminAddress: '' };
+
 const imxProfileData = {
   imx_eth_address: mockUserImx.imx.ethAddress,
   imx_stark_address: mockUserImx.imx.starkAddress,
@@ -189,6 +191,23 @@ describe('AuthManager', () => {
       });
     });
 
+    describe('when the user has not registered for imx', () => {
+      it('should return an imx object with empty address strings', async () => {
+        mockSignIn.mockResolvedValue({
+          ...mockOidcUser,
+          profile: {
+            ...mockOidcUser.profile,
+            passport: {
+            },
+          },
+        });
+
+        const result = await authManager.login();
+
+        expect(result.imx).toEqual(mockEmptyImx);
+      });
+    });
+
     describe('when the user has registered for zkEvm', () => {
       it('should populate the zkEvm object', async () => {
         mockSignIn.mockResolvedValue({
@@ -203,7 +222,7 @@ describe('AuthManager', () => {
 
         const result = await authManager.login();
 
-        expect(result).toEqual(mockUserZkEvm);
+        expect(result).toEqual({ ...mockUserZkEvm, imx: mockEmptyImx });
       });
     });
 
