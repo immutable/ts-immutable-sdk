@@ -88,7 +88,7 @@ export async function getERC20Balance(
   );
 }
 
-// Blockscout client singleton
+// Blockscout client singleton per chain id
 const blockscoutClientMap: Map<ChainId, Blockscout> = new Map();
 
 export const getIndexerBalance = async (
@@ -100,7 +100,7 @@ export const getIndexerBalance = async (
   // for faster access to tokens config objects.
   const mapRename = Object.assign({}, ...(rename.map((t) => ({ [t.address || '']: t }))));
 
-  // Ensure singleton is present and match the selected chain
+  // Get blockscout client for the given chain
   let blockscoutClient = blockscoutClientMap.get(chainId);
   if (!blockscoutClient) {
     blockscoutClient = new Blockscout({ chainId });
