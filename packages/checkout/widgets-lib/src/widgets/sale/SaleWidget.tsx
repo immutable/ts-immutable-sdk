@@ -1,5 +1,5 @@
 import {
-  useCallback, useContext, useEffect, useMemo, useReducer,
+  useCallback, useContext, useEffect, useMemo, useReducer, useRef,
 } from 'react';
 
 import { BiomeCombinedProviders } from '@biom3/react';
@@ -79,17 +79,22 @@ export function SaleWidget(props: SaleWidgetProps) {
     || text.views[SharedViews.LOADING_VIEW].text;
 
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+
+  const mounted = useRef(false);
   const onMount = useCallback(() => {
     if (!checkout || !provider) return;
 
-    viewDispatch({
-      payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: {
-          type: SaleWidgetViews.PAYMENT_METHODS,
+    if (!mounted.current) {
+      mounted.current = true;
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SaleWidgetViews.PAYMENT_METHODS,
+          },
         },
-      },
-    });
+      });
+    }
   }, [checkout, provider]);
 
   useEffect(() => {
