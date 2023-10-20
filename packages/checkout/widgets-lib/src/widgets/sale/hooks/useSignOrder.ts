@@ -197,6 +197,7 @@ export const useSignOrder = (input: SignOrderInput) => {
         await txnResponse?.wait(1);
 
         transactionHash = txnResponse?.hash;
+        return transactionHash;
       } catch (e) {
         // TODO: check error type to send
         // SaleErrorTypes.WALLET_REJECTED or SaleErrorTypes.WALLET_REJECTED_NO_FUNDS
@@ -219,9 +220,8 @@ export const useSignOrder = (input: SignOrderInput) => {
           type: errorType,
           data: { error: e },
         });
+        return undefined;
       }
-
-      return transactionHash;
     },
     [provider],
   );
@@ -288,7 +288,7 @@ export const useSignOrder = (input: SignOrderInput) => {
       });
       return [];
     }
-
+    let successfull = true;
     const execTransactions: ExecutedTransaction[] = [];
     for (const transaction of signData.transactions) {
       const {
@@ -301,13 +301,16 @@ export const useSignOrder = (input: SignOrderInput) => {
       const hash = await sendTransaction(to, data, gasEstimate, method);
 
       if (!hash) {
+        successfull = false;
         break;
       }
 
       execTransactions.push({ method, hash });
     }
 
-    setExecuteDone();
+    if (successfull) {
+      setExecuteDone();
+    }
     return execTransactions;
   };
 
