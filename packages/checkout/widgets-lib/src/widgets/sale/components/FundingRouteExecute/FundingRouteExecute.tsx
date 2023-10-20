@@ -1,33 +1,27 @@
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { Button, Box } from '@biom3/react';
+import { Box, Button } from '@biom3/react';
 import { FundingStep, FundingStepType } from '@imtbl/checkout-sdk';
+import {
+  BridgeEventType, ConnectEventType, ConnectionSuccess, IMTBLWidgetEvents, SwapEventType,
+} from '@imtbl/checkout-widgets';
 import {
   useCallback,
   useContext,
   useEffect, useMemo, useReducer, useRef, useState,
 } from 'react';
 import {
-  BridgeEventType, ConnectEventType, ConnectionSuccess, IMTBLWidgetEvents, SwapEventType,
-} from '@imtbl/checkout-widgets';
-import { useSaleContext } from '../../context/SaleContextProvider';
-import {
-  EventTargetActions, EventTargetContext, eventTargetReducer, initialEventTargetState,
-} from '../../../../context/event-target-context/EventTargetContext';
-import {
-  View, ViewActions, initialViewState, viewReducer,
-} from '../../../../context/view-context/ViewContext';
-import { LoadingView } from '../../../../views/loading/LoadingView';
-import { ConnectTargetLayer, getL1ChainId, getL2ChainId } from '../../../../lib/networkUtils';
-import {
   ConnectLoaderActions,
   ConnectLoaderContext,
 } from '../../../../context/connect-loader-context/ConnectLoaderContext';
+import {
+  EventTargetActions, EventTargetContext, eventTargetReducer, initialEventTargetState,
+} from '../../../../context/event-target-context/EventTargetContext';
 import { ConnectWidgetViews } from '../../../../context/view-context/ConnectViewContextTypes';
+import { ConnectTargetLayer, getL1ChainId, getL2ChainId } from '../../../../lib/networkUtils';
+import { LoadingView } from '../../../../views/loading/LoadingView';
+import { BridgeWidget, BridgeWidgetParams } from '../../../bridge/BridgeWidget';
 import { ConnectWidget } from '../../../connect/ConnectWidget';
-import { BridgeWidgetParams, BridgeWidget } from '../../../bridge/BridgeWidget';
-import { SwapWidgetParams, SwapWidget } from '../../../swap/SwapWidget';
-import { FundWithSmartCheckoutSubViews, SaleWidgetViews } from '../../../../context/view-context/SaleViewContextTypes';
+import { SwapWidget, SwapWidgetParams } from '../../../swap/SwapWidget';
+import { useSaleContext } from '../../context/SaleContextProvider';
 
 type FundingRouteExecuteProps = {
   fundingRouteStep?: FundingStep;
@@ -43,27 +37,17 @@ enum FundingRouteExecuteViews {
 }
 
 export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }: FundingRouteExecuteProps) {
-  const { config, provider, checkout } = useSaleContext();
+  const {
+    config, provider, checkout, fromContractAddress: requiredTokenAddress,
+  } = useSaleContext();
 
   const { connectLoaderDispatch } = useContext(ConnectLoaderContext);
 
-  const bridgeParams: BridgeWidgetParams = {
-    amount: '1',
-    fromContractAddress: '0x2Fa06C6672dDCc066Ab04631192738799231dE4a',
-  };
-
-  const swapParams: SwapWidgetParams = {
-    amount: '100',
-    fromContractAddress: '0xaC953a0d7B67Fae17c87abf79f09D0f818AC66A2',
-    toContractAddress: '0x12739A8f1A8035F439092D016DAE19A2874F30d2',
-
-  };
+  const [swapParams, setSwapParams] = useState<SwapWidgetParams | undefined>(undefined);
+  const [bridgeParams, setBridgeParams] = useState<BridgeWidgetParams | undefined>(undefined);
 
   const [view, setView] = useState<FundingRouteExecuteViews>(FundingRouteExecuteViews.LOADING);
-  console.log('@@@@ FundingRouteExecute', view, fundingRouteStep);
   const nextView = useRef<FundingRouteExecuteViews | false>(false);
-
-  const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
 
   const [eventTargetState, eventTargetDispatch] = useReducer(eventTargetReducer, initialEventTargetState);
   const eventTargetReducerValues = useMemo(() => (
@@ -72,17 +56,18 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
 
   const handleStep = useCallback(async (step: FundingStep) => {
     if (!checkout || !provider) {
-      console.log('@@@@ FundingRouteExecute handleStep if (!checkout || !provider)', checkout, provider);
       return;
     }
     const network = await checkout.getNetworkInfo({
       provider,
     });
-    console.log('@@@@ FundingRouteExecute handleStep', step, network.chainId, network.name);
 
     if (step.type === FundingStepType.BRIDGE) {
-      // bridge
       if (network.chainId === getL1ChainId(checkout!.config)) {
+        setBridgeParams({
+          fromContractAddress: step.fundingItem.token.address,
+          amount: step.fundingItem.fundsRequired.formattedAmount,
+        });
         setView(FundingRouteExecuteViews.EXECUTE_BRIDGE);
         return;
       }
@@ -91,8 +76,12 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
       setView(FundingRouteExecuteViews.SWITCH_NETWORK_ETH);
     }
     if (step.type === FundingStepType.SWAP) {
-      // swap stuff
       if (network.chainId === getL2ChainId(checkout!.config)) {
+        setSwapParams({
+          amount: step.fundingItem.fundsRequired.formattedAmount,
+          fromContractAddress: step.fundingItem.token.address,
+          toContractAddress: requiredTokenAddress,
+        });
         setView(FundingRouteExecuteViews.EXECUTE_SWAP);
         return;
       }
@@ -102,8 +91,6 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
     }
   }, [provider, checkout]);
 
-  // ! useEffect [fundingRouteStep]
-  // orchestrate execute views on swap, bridge, network switch
   useEffect(() => {
     if (!fundingRouteStep) {
       return;
@@ -112,12 +99,9 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
   }, [fundingRouteStep]);
 
   const handleCustomEvent = (event) => {
-    console.log('@@@@ Custom event triggered!', event);
-    // Handle the custom event here
     switch (event.detail.type) {
       case BridgeEventType.SUCCESS: {
-        console.log('@@@@  BridgeEventType.SUCCESS', event);
-        // const eventData = event.detail.data as BridgeSuccess;
+        // ! Need to clarify behaviour here - wait for user to click or automatically move them on.
         setTimeout(() => {
           onFundingRouteExecuted();
         }, 1000);
@@ -132,7 +116,6 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
       }
       case SwapEventType.SUCCESS: {
         // const eventData = event.detail.data as SwapSuccess;
-        console.log('@@@@  SwapEventType.SUCCESS', event);
         setTimeout(() => {
           onFundingRouteExecuted();
         }, 1000);
@@ -171,6 +154,7 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
         break;
       }
       default:
+        // eslint-disable-next-line no-console
         console.log('invalid event');
     }
   };
@@ -182,14 +166,12 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
     // Handle the other widget events
     eventTarget.addEventListener(IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT, handleCustomEvent);
     eventTarget.addEventListener(IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT, handleCustomEvent);
-    eventTarget.addEventListener(IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, handleCustomEvent);
 
     // Remove the custom event listener when the component unmounts
     return () => {
-      eventTarget.removeEventListener(IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT, handleCustomEvent);
+      eventTarget.removeEventListener(IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT, handleConnectEvent);
       eventTarget.removeEventListener(IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT, handleCustomEvent);
       eventTarget.removeEventListener(IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT, handleCustomEvent);
-      eventTarget.removeEventListener(IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, handleCustomEvent);
     };
   }, []);
 
@@ -198,15 +180,6 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
       payload: {
         type: EventTargetActions.SET_EVENT_TARGET,
         eventTarget,
-      },
-    });
-    viewDispatch({
-      payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: {
-          subView: FundWithSmartCheckoutSubViews.FUNDING_ROUTE_EXECUTE,
-          type: SaleWidgetViews.FUND_WITH_SMART_CHECKOUT,
-        },
       },
     });
   }, [checkout]);
@@ -218,13 +191,13 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
       )}
       { view === FundingRouteExecuteViews.EXECUTE_BRIDGE && (
         <BridgeWidget
-          params={bridgeParams}
+          params={bridgeParams!}
           config={config}
         />
       )}
       { view === FundingRouteExecuteViews.EXECUTE_SWAP && (
         <SwapWidget
-          params={swapParams}
+          params={swapParams!}
           config={config}
         />
       )}
@@ -246,10 +219,9 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
           deepLink={ConnectWidgetViews.SWITCH_NETWORK}
         />
       )}
+
+      {/* Below for dev purposes to skip steps if necessary */}
       <Box testId="funding-route-execute">
-        <p>
-          hello world from FundingRouteExecute
-        </p>
         { fundingRouteStep?.type }
         {' '}
         -
