@@ -22,6 +22,8 @@ import { BridgeWidget, BridgeWidgetParams } from '../../../bridge/BridgeWidget';
 import { ConnectWidget } from '../../../connect/ConnectWidget';
 import { SwapWidget, SwapWidgetParams } from '../../../swap/SwapWidget';
 import { useSaleContext } from '../../context/SaleContextProvider';
+import { text as textConfig } from '../../../../resources/text/textConfig';
+import { SaleWidgetViews } from '../../../../context/view-context/SaleViewContextTypes';
 
 type FundingRouteExecuteProps = {
   fundingRouteStep?: FundingStep;
@@ -42,6 +44,7 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
   } = useSaleContext();
 
   const { connectLoaderDispatch } = useContext(ConnectLoaderContext);
+  const text = textConfig.views[SaleWidgetViews.FUND_WITH_SMART_CHECKOUT];
 
   const [swapParams, setSwapParams] = useState<SwapWidgetParams | undefined>(undefined);
   const [bridgeParams, setBridgeParams] = useState<BridgeWidgetParams | undefined>(undefined);
@@ -187,7 +190,7 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
   return (
     <EventTargetContext.Provider value={eventTargetReducerValues}>
       { view === FundingRouteExecuteViews.LOADING && (
-        <LoadingView loadingText="todo execute loading" />
+        <LoadingView loadingText={text.loading.checkingBalances} />
       )}
       { view === FundingRouteExecuteViews.EXECUTE_BRIDGE && (
         <BridgeWidget
