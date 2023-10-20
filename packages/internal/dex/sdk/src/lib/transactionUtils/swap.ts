@@ -4,7 +4,7 @@ import { Token, Percent, TradeType } from '@uniswap/sdk-core';
 import { SecondaryFee__factory } from 'contracts/types';
 import { ISecondaryFee, SecondaryFeeInterface } from 'contracts/types/SecondaryFee';
 import { Fees } from 'lib/fees';
-import { toCurrencyAmount } from 'lib/utils';
+import { toCurrencyAmount, toPublicAmount } from 'lib/utils';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
 import { NativeTokenService, canUnwrapToken } from 'lib/nativeTokenService';
 import { Coin, CoinAmount } from 'types';
@@ -117,12 +117,12 @@ function buildSwapParameters(
   options: SwapOptions,
   secondaryFees: SecondaryFee[],
   secondaryFeeContract: SecondaryFeeInterface,
+  maximumAmountIn: string,
+  minimumAmountOut: string,
 ) {
   // @dev we don't support multiple swaps in a single transaction
   // there will always be only one swap in the trade regardless of the trade type
-  const { route, inputAmount, outputAmount } = trade.swaps[0];
-  const amountIn: string = toHex(trade.maximumAmountIn(options.slippageTolerance, inputAmount).quotient);
-  const amountOut: string = toHex(trade.minimumAmountOut(options.slippageTolerance, outputAmount).quotient);
+  const { route } = trade.swaps[0];
 
   const isSinglePoolSwap = route.pools.length === 1;
 
@@ -131,8 +131,8 @@ function buildSwapParameters(
       fromAddress,
       trade,
       route,
-      amountIn,
-      amountOut,
+      maximumAmountIn,
+      minimumAmountOut,
       secondaryFees,
       secondaryFeeContract,
     );
@@ -142,8 +142,8 @@ function buildSwapParameters(
     fromAddress,
     trade,
     route,
-    amountIn,
-    amountOut,
+    maximumAmountIn,
+    minimumAmountOut,
     secondaryFees,
     secondaryFeeContract,
   );
@@ -154,6 +154,8 @@ function createSwapCallParametersWithFees(
   fromAddress: string,
   swapOptions: SwapOptions,
   secondaryFees: SecondaryFee[],
+  maximumAmountIn: string,
+  minimumAmountOut: string,
 ): string {
   const secondaryFeeContract = SecondaryFee__factory.createInterface();
 
@@ -163,6 +165,8 @@ function createSwapCallParametersWithFees(
     swapOptions,
     secondaryFees,
     secondaryFeeContract,
+    maximumAmountIn,
+    minimumAmountOut,
   );
 
   return secondaryFeeContract.encodeFunctionData(multicallWithDeadlineFunctionSignature, [
@@ -177,7 +181,7 @@ function createSwapParameters(
   slippage: number,
   deadline: number,
   secondaryFees: SecondaryFee[],
-): string {
+): { calldata: string; maximumAmountIn: string } {
   // Create an unchecked trade to be used in generating swap parameters.
   const uncheckedTrade = Trade.createUncheckedTrade({
     route: adjustedQuote.route,
@@ -194,15 +198,41 @@ function createSwapParameters(
     deadlineOrPreviousBlockhash: deadline,
   };
 
+  const maximumAmountIn = toHex(uncheckedTrade.maximumAmountIn(options.slippageTolerance).quotient);
+  const minimumAmountOut = toHex(uncheckedTrade.minimumAmountOut(options.slippageTolerance).quotient);
+
   if (secondaryFees.length === 0) {
     // Generate swap parameters without secondary fee contract details
-    return SwapRouter.swapCallParameters([uncheckedTrade], options).calldata;
+    return { calldata: SwapRouter.swapCallParameters([uncheckedTrade], options).calldata, maximumAmountIn };
   }
 
-  return createSwapCallParametersWithFees(uncheckedTrade, fromAddress, options, secondaryFees);
+  return {
+    calldata: createSwapCallParametersWithFees(
+      uncheckedTrade,
+      fromAddress,
+      options,
+      secondaryFees,
+      maximumAmountIn,
+      minimumAmountOut,
+    ),
+    maximumAmountIn,
+  };
 }
 
+const getTransactionValue = (amountSpecified: CoinAmount<Coin>, tradeType: TradeType, maximumAmountIn: string) => {
+  if (canUnwrapToken(amountSpecified.token)) {
+    // The user specified native as the input token
+    return tradeType === TradeType.EXACT_INPUT
+      ? amountSpecified.value.toHexString() // trade is exact input, so use the user-specified amount
+      : maximumAmountIn; // trade is exact output so use the max slippage amount
+  }
+
+  // The user did not specify native as the input token
+  return zeroNativeCurrencyValue;
+};
+
 export function getSwap(
+  amountSpecified: CoinAmount<Coin>,
   adjustedQuote: QuoteResult,
   fromAddress: string,
   slippage: number,
@@ -211,22 +241,29 @@ export function getSwap(
   secondaryFeesAddress: string,
   gasPrice: CoinAmount<Coin> | null,
   secondaryFees: SecondaryFee[],
-  nativeTokenService: NativeTokenService,
 ): TransactionDetails {
-  const calldata = createSwapParameters(adjustedQuote, fromAddress, slippage, deadline, secondaryFees);
+  // TODO: TP-1651: Include `refundETH` transaction as final step for native Exact Output swaps
+  const { calldata, maximumAmountIn } = createSwapParameters(
+    adjustedQuote,
+    fromAddress,
+    slippage,
+    deadline,
+    secondaryFees,
+  );
 
   // TODO: Add additional gas fee estimates for secondary fees
   const gasFeeEstimate = gasPrice ? calculateGasFee(gasPrice, adjustedQuote.gasEstimate) : null;
+
+  const transactionValue = getTransactionValue(amountSpecified, adjustedQuote.tradeType, maximumAmountIn);
 
   return {
     transaction: {
       data: calldata,
       to: secondaryFees.length > 0 ? secondaryFeesAddress : peripheryRouterAddress,
-      value: zeroNativeCurrencyValue, // we should never send the native currency to the router for a swap
+      value: transactionValue,
       from: fromAddress,
     },
-    // TODO: TP-1649: Remove the wrapping here
-    gasFeeEstimate: gasFeeEstimate ? nativeTokenService.maybeWrapAmount(gasFeeEstimate) : null,
+    gasFeeEstimate: gasFeeEstimate ? toPublicAmount(gasFeeEstimate) : null,
   };
 }
 
