@@ -10,6 +10,7 @@ import {
   GetSignableCancelOrderRequest,
   GetSignableTradeRequest,
   NftTransferDetails,
+  StarkSigner,
   UnsignedExchangeTransferRequest,
   UnsignedOrderRequest,
   UnsignedTransferRequest,
@@ -20,12 +21,7 @@ import { mockUserImx, testConfig, mockUser } from '../test/mocks';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import { PassportImxProvider } from './passportImxProvider';
 import {
-  batchNftTransfer,
-  transfer,
-  cancelOrder,
-  createOrder,
-  exchangeTransfer,
-  createTrade,
+  batchNftTransfer, cancelOrder, createOrder, createTrade, exchangeTransfer, transfer,
 } from './workflows';
 import { ConfirmationScreen } from '../confirmation';
 import { PassportConfiguration } from '../config';
@@ -47,19 +43,20 @@ describe('PassportImxProvider', () => {
 
   const confirmationScreen = new ConfirmationScreen({} as PassportConfiguration);
 
+  const mockAuthManager = {
+    loginSilent: jest.fn(),
+    login: jest.fn(),
+    getUser: jest.fn(),
+  };
+
   const mockStarkSigner = {
     signMessage: jest.fn(),
     getAddress: jest.fn(),
-  };
+  } as StarkSigner;
 
   const mockEthSigner = {
     signMessage: jest.fn(),
     getAddress: jest.fn(),
-  };
-
-  const authManagerMock = {
-    loginSilent: jest.fn(),
-    login: jest.fn(),
   };
 
   const magicAdapterMock = {
@@ -75,28 +72,16 @@ describe('PassportImxProvider', () => {
     getSignerMock.mockReturnValue(mockEthSigner);
     (registerPassportStarkEx as jest.Mock).mockResolvedValue(null);
     passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
+    mockAuthManager.getUser.mockResolvedValue(mockUserImx);
+
     passportImxProvider = new PassportImxProvider({
-      user: mockUserImx,
+      authManager: mockAuthManager as unknown as AuthManager,
       starkSigner: mockStarkSigner,
       ethSigner: mockEthSigner as unknown as EthSigner,
-      authManager: authManagerMock as unknown as AuthManager,
       confirmationScreen,
       immutableXClient,
       config: testConfig,
       passportEventEmitter,
-    });
-  });
-
-  describe('constructor', () => {
-    it('sets the private properties', () => {
-      // @ts-ignore
-      expect(passportImxProvider.user).toEqual(mockUserImx);
-      // @ts-ignore
-      expect(passportImxProvider.starkSigner).toEqual(mockStarkSigner);
-      // @ts-ignore
-      expect(passportImxProvider.confirmationScreen).toEqual(confirmationScreen);
-      // @ts-ignore
-      expect(passportImxProvider.immutableXClient).toEqual(immutableXClient);
     });
   });
 
@@ -108,26 +93,29 @@ describe('PassportImxProvider', () => {
       (transfer as jest.Mock).mockResolvedValue(returnValue);
       const result = await passportImxProvider.transfer(request);
 
-      expect(transfer as jest.Mock).toHaveBeenCalledWith({
-        request,
-        user: mockUserImx,
-        starkSigner: mockStarkSigner,
-        transfersApi: immutableXClient.transfersApi,
-        // @ts-ignore
-        guardianClient: passportImxProvider.guardianClient,
-      });
-      expect(result).toEqual(returnValue);
+      expect(transfer as jest.Mock)
+        .toHaveBeenCalledWith({
+          request,
+          user: mockUserImx,
+          starkSigner: mockStarkSigner,
+          transfersApi: immutableXClient.transfersApi,
+          // @ts-ignore
+          guardianClient: passportImxProvider.guardianClient,
+        });
+      expect(result)
+        .toEqual(returnValue);
     });
   });
 
   describe('isRegisteredOnchain', () => {
     it('should throw error', async () => {
-      expect(passportImxProvider.isRegisteredOnchain).toThrow(
-        new PassportError(
-          'Operation not supported',
-          PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR,
-        ),
-      );
+      expect(passportImxProvider.isRegisteredOnchain)
+        .toThrow(
+          new PassportError(
+            'Operation not supported',
+            PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR,
+          ),
+        );
     });
   });
 
@@ -139,15 +127,17 @@ describe('PassportImxProvider', () => {
       (createOrder as jest.Mock).mockResolvedValue(returnValue);
       const result = await passportImxProvider.createOrder(request);
 
-      expect(createOrder).toHaveBeenCalledWith({
-        request,
-        user: mockUserImx,
-        starkSigner: mockStarkSigner,
-        ordersApi: immutableXClient.ordersApi,
-        // @ts-ignore
-        guardianClient: passportImxProvider.guardianClient,
-      });
-      expect(result).toEqual(returnValue);
+      expect(createOrder)
+        .toHaveBeenCalledWith({
+          request,
+          user: mockUserImx,
+          starkSigner: mockStarkSigner,
+          ordersApi: immutableXClient.ordersApi,
+          // @ts-ignore
+          guardianClient: passportImxProvider.guardianClient,
+        });
+      expect(result)
+        .toEqual(returnValue);
     });
   });
 
@@ -159,15 +149,17 @@ describe('PassportImxProvider', () => {
       (cancelOrder as jest.Mock).mockResolvedValue(returnValue);
       const result = await passportImxProvider.cancelOrder(request);
 
-      expect(cancelOrder).toHaveBeenCalledWith({
-        request,
-        user: mockUserImx,
-        starkSigner: mockStarkSigner,
-        ordersApi: immutableXClient.ordersApi,
-        // @ts-ignore
-        guardianClient: passportImxProvider.guardianClient,
-      });
-      expect(result).toEqual(returnValue);
+      expect(cancelOrder)
+        .toHaveBeenCalledWith({
+          request,
+          user: mockUserImx,
+          starkSigner: mockStarkSigner,
+          ordersApi: immutableXClient.ordersApi,
+          // @ts-ignore
+          guardianClient: passportImxProvider.guardianClient,
+        });
+      expect(result)
+        .toEqual(returnValue);
     });
   });
 
@@ -179,15 +171,17 @@ describe('PassportImxProvider', () => {
       (createTrade as jest.Mock).mockResolvedValue(returnValue);
       const result = await passportImxProvider.createTrade(request);
 
-      expect(createTrade).toHaveBeenCalledWith({
-        request,
-        user: mockUserImx,
-        starkSigner: mockStarkSigner,
-        tradesApi: immutableXClient.tradesApi,
-        // @ts-ignore
-        guardianClient: passportImxProvider.guardianClient,
-      });
-      expect(result).toEqual(returnValue);
+      expect(createTrade)
+        .toHaveBeenCalledWith({
+          request,
+          user: mockUserImx,
+          starkSigner: mockStarkSigner,
+          tradesApi: immutableXClient.tradesApi,
+          // @ts-ignore
+          guardianClient: passportImxProvider.guardianClient,
+        });
+      expect(result)
+        .toEqual(returnValue);
     });
   });
 
@@ -199,15 +193,17 @@ describe('PassportImxProvider', () => {
       (batchNftTransfer as jest.Mock).mockResolvedValue(returnValue);
       const result = await passportImxProvider.batchNftTransfer(request);
 
-      expect(batchNftTransfer).toHaveBeenCalledWith({
-        request,
-        user: mockUserImx,
-        starkSigner: mockStarkSigner,
-        transfersApi: immutableXClient.transfersApi,
-        // @ts-ignore
-        guardianClient: passportImxProvider.guardianClient,
-      });
-      expect(result).toEqual(returnValue);
+      expect(batchNftTransfer)
+        .toHaveBeenCalledWith({
+          request,
+          user: mockUserImx,
+          starkSigner: mockStarkSigner,
+          transfersApi: immutableXClient.transfersApi,
+          // @ts-ignore
+          guardianClient: passportImxProvider.guardianClient,
+        });
+      expect(result)
+        .toEqual(returnValue);
     });
   });
 
@@ -219,150 +215,109 @@ describe('PassportImxProvider', () => {
       (exchangeTransfer as jest.Mock).mockResolvedValue(returnValue);
       const result = await passportImxProvider.exchangeTransfer(request);
 
-      expect(exchangeTransfer).toHaveBeenCalledWith({
-        request,
-        user: mockUserImx,
-        starkSigner: mockStarkSigner,
-        exchangesApi: immutableXClient.exchangeApi,
-      });
-      expect(result).toEqual(returnValue);
+      expect(exchangeTransfer)
+        .toHaveBeenCalledWith({
+          request,
+          user: mockUserImx,
+          starkSigner: mockStarkSigner,
+          exchangesApi: immutableXClient.exchangeApi,
+        });
+      expect(result)
+        .toEqual(returnValue);
     });
   });
 
   describe('deposit', () => {
     it('should throw error', async () => {
-      expect(passportImxProvider.deposit).toThrow(
-        new PassportError(
-          'Operation not supported',
-          PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR,
-        ),
-      );
+      expect(passportImxProvider.deposit)
+        .toThrow(
+          new PassportError(
+            'Operation not supported',
+            PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR,
+          ),
+        );
     });
   });
 
   describe('prepareWithdrawal', () => {
     it('should throw error', async () => {
-      expect(passportImxProvider.prepareWithdrawal).toThrow(
-        new PassportError(
-          'Operation not supported',
-          PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR,
-        ),
-      );
+      expect(passportImxProvider.prepareWithdrawal)
+        .toThrow(
+          new PassportError(
+            'Operation not supported',
+            PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR,
+          ),
+        );
     });
   });
 
   describe('completeWithdrawal', () => {
     it('should throw error', async () => {
-      expect(passportImxProvider.completeWithdrawal).toThrow(
-        new PassportError(
-          'Operation not supported',
-          PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR,
-        ),
-      );
+      expect(passportImxProvider.completeWithdrawal)
+        .toThrow(
+          new PassportError(
+            'Operation not supported',
+            PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR,
+          ),
+        );
     });
   });
 
   describe('getAddress', () => {
     it('should return user ether key address', async () => {
       const response = await passportImxProvider.getAddress();
-      expect(response).toEqual(mockUserImx.imx.ethAddress);
+      expect(response)
+        .toEqual(mockUserImx.imx.ethAddress);
     });
   });
 
-  describe('when the user has been logged out', () => {
+  describe.each([
+    ['transfer' as const, {} as UnsignedTransferRequest],
+    ['createOrder' as const, {} as UnsignedOrderRequest],
+    ['cancelOrder' as const, {} as GetSignableCancelOrderRequest],
+    ['createTrade' as const, {} as GetSignableTradeRequest],
+    ['batchNftTransfer' as const, [] as NftTransferDetails[]],
+    ['exchangeTransfer' as const, {} as UnsignedExchangeTransferRequest],
+    ['getAddress' as const, {} as any],
+  ])('when the user has been logged out - %s', (methodName, args) => {
     beforeEach(() => {
       passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
     });
 
-    describe('transfer', () => {
-      it('returns an error', async () => {
-        await expect(async () => (
-          await passportImxProvider.transfer({} as UnsignedTransferRequest)
-        )).rejects.toThrow(
+    it(`should return an error for ${methodName}`, async () => {
+      await expect(async () => passportImxProvider[methodName!](args))
+        .rejects
+        .toThrow(
           new PassportError(
             'User has been logged out',
             PassportErrorType.NOT_LOGGED_IN_ERROR,
           ),
         );
-      });
+    });
+  });
+
+  describe.each([
+    ['transfer' as const, {} as UnsignedTransferRequest],
+    ['createOrder' as const, {} as UnsignedOrderRequest],
+    ['cancelOrder' as const, {} as GetSignableCancelOrderRequest],
+    ['createTrade' as const, {} as GetSignableTradeRequest],
+    ['batchNftTransfer' as const, [] as NftTransferDetails[]],
+    ['exchangeTransfer' as const, {} as UnsignedExchangeTransferRequest],
+    ['getAddress' as const, {} as any],
+  ])('when the user\'s access token is expired and cannot be retrieved', (methodName, args) => {
+    beforeEach(() => {
+      mockAuthManager.getUser.mockResolvedValue(null);
     });
 
-    describe('createOrder', () => {
-      it('returns an error', async () => {
-        await expect(async () => (
-          await passportImxProvider.createOrder({} as UnsignedOrderRequest)
-        )).rejects.toThrow(
+    it(`should return an error for ${methodName}`, async () => {
+      await expect(async () => passportImxProvider[methodName!](args))
+        .rejects
+        .toThrow(
           new PassportError(
             'User has been logged out',
             PassportErrorType.NOT_LOGGED_IN_ERROR,
           ),
         );
-      });
-    });
-
-    describe('cancelOrder', () => {
-      it('returns an error', async () => {
-        await expect(async () => (
-          await passportImxProvider.cancelOrder({} as GetSignableCancelOrderRequest)
-        )).rejects.toThrow(
-          new PassportError(
-            'User has been logged out',
-            PassportErrorType.NOT_LOGGED_IN_ERROR,
-          ),
-        );
-      });
-    });
-
-    describe('createTrade', () => {
-      it('returns an error', async () => {
-        await expect(async () => (
-          await passportImxProvider.createTrade({} as GetSignableTradeRequest)
-        )).rejects.toThrow(
-          new PassportError(
-            'User has been logged out',
-            PassportErrorType.NOT_LOGGED_IN_ERROR,
-          ),
-        );
-      });
-    });
-
-    describe('batchNftTransfer', () => {
-      it('returns an error', async () => {
-        await expect(async () => (
-          await passportImxProvider.batchNftTransfer([] as NftTransferDetails[])
-        )).rejects.toThrow(
-          new PassportError(
-            'User has been logged out',
-            PassportErrorType.NOT_LOGGED_IN_ERROR,
-          ),
-        );
-      });
-    });
-
-    describe('exchangeTransfer', () => {
-      it('returns an error', async () => {
-        await expect(async () => (
-          await passportImxProvider.exchangeTransfer({} as UnsignedExchangeTransferRequest)
-        )).rejects.toThrow(
-          new PassportError(
-            'User has been logged out',
-            PassportErrorType.NOT_LOGGED_IN_ERROR,
-          ),
-        );
-      });
-    });
-
-    describe('getAddress', () => {
-      it('returns an error', async () => {
-        await expect(async () => (
-          await passportImxProvider.getAddress()
-        )).rejects.toThrow(
-          new PassportError(
-            'User has been logged out',
-            PassportErrorType.NOT_LOGGED_IN_ERROR,
-          ),
-        );
-      });
     });
   });
 
@@ -371,9 +326,9 @@ describe('PassportImxProvider', () => {
       it('should throw an error', async () => {
         const magicProviderMock = {};
 
-        authManagerMock.login.mockResolvedValue(mockUser);
+        mockAuthManager.login.mockResolvedValue(mockUser);
         magicAdapterMock.login.mockResolvedValue(magicProviderMock);
-        authManagerMock.loginSilent.mockResolvedValue(mockUser);
+        mockAuthManager.loginSilent.mockResolvedValue(mockUser);
 
         await expect(() => passportImxProvider.registerOffchain()).rejects.toThrow(
           new PassportError(
@@ -387,11 +342,11 @@ describe('PassportImxProvider', () => {
           starkSigner: mockStarkSigner,
           usersApi: immutableXClient.usersApi,
         }, mockUser.accessToken);
-        expect(authManagerMock.loginSilent).toHaveBeenCalledTimes(4);
-        expect(authManagerMock.loginSilent).toHaveBeenNthCalledWith(1, { forceRefresh: true });
-        expect(authManagerMock.loginSilent).toHaveBeenNthCalledWith(2, { forceRefresh: true });
-        expect(authManagerMock.loginSilent).toHaveBeenNthCalledWith(3, { forceRefresh: true });
-        expect(authManagerMock.loginSilent).toHaveBeenCalledWith({ forceRefresh: true });
+        expect(mockAuthManager.loginSilent).toHaveBeenCalledTimes(4);
+        expect(mockAuthManager.loginSilent).toHaveBeenNthCalledWith(1, { forceRefresh: true });
+        expect(mockAuthManager.loginSilent).toHaveBeenNthCalledWith(2, { forceRefresh: true });
+        expect(mockAuthManager.loginSilent).toHaveBeenNthCalledWith(3, { forceRefresh: true });
+        expect(mockAuthManager.loginSilent).toHaveBeenCalledWith({ forceRefresh: true });
       });
     });
 
@@ -399,9 +354,9 @@ describe('PassportImxProvider', () => {
       it('should register the user and update the provider instance user', async () => {
         const magicProviderMock = {};
 
-        authManagerMock.login.mockResolvedValue(mockUser);
+        mockAuthManager.login.mockResolvedValue(mockUser);
         magicAdapterMock.login.mockResolvedValue(magicProviderMock);
-        authManagerMock.loginSilent.mockResolvedValue(mockUserImx);
+        mockAuthManager.loginSilent.mockResolvedValue(mockUserImx);
 
         await passportImxProvider.registerOffchain();
 
@@ -411,8 +366,8 @@ describe('PassportImxProvider', () => {
           starkSigner: mockStarkSigner,
           usersApi: immutableXClient.usersApi,
         }, mockUserImx.accessToken);
-        expect(authManagerMock.loginSilent).toHaveBeenCalledTimes(1);
-        expect(authManagerMock.loginSilent).toHaveBeenCalledWith({ forceRefresh: true });
+        expect(mockAuthManager.loginSilent).toHaveBeenCalledTimes(1);
+        expect(mockAuthManager.loginSilent).toHaveBeenCalledWith({ forceRefresh: true });
       });
     });
   });

@@ -6,7 +6,7 @@ import AuthManager from '../authManager';
 import { ConfirmationScreen } from '../confirmation';
 import MagicAdapter from '../magicAdapter';
 import {
-  DeviceTokenResponse, PassportEventMap, User, UserImx,
+  DeviceTokenResponse, PassportEventMap, User,
 } from '../types';
 import { PassportImxProvider } from './passportImxProvider';
 import { getStarkSigner } from './getStarkSigner';
@@ -102,31 +102,10 @@ export class PassportImxProviderFactory {
     const ethSigner = web3Provider.getSigner();
     const starkSigner = await getStarkSigner(ethSigner);
 
-    if (!user.imx?.ethAddress) {
-      // Default the address fields to empty strings if the user has not been registered
-      const userImx: UserImx = {
-        ...user,
-        imx: {
-          ...user.imx, ethAddress: '', starkAddress: '', userAdminAddress: '',
-        },
-      };
-      return new PassportImxProvider({
-        user: userImx,
-        starkSigner,
-        ethSigner,
-        authManager: this.authManager,
-        immutableXClient: this.immutableXClient,
-        confirmationScreen: this.confirmationScreen,
-        config: this.config,
-        passportEventEmitter: this.passportEventEmitter,
-      });
-    }
-
     return new PassportImxProvider({
-      user: user as UserImx,
+      authManager: this.authManager,
       starkSigner,
       ethSigner,
-      authManager: this.authManager,
       immutableXClient: this.immutableXClient,
       confirmationScreen: this.confirmationScreen,
       config: this.config,

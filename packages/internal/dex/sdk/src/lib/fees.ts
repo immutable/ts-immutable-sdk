@@ -1,33 +1,35 @@
 import { BASIS_POINT_PRECISION } from 'constants/router';
 import { BigNumber } from 'ethers';
-import {
-  Amount,
-  Fee, SecondaryFee, newAmount, ERC20, subtractERC20Amount, addERC20Amount,
-} from 'lib';
+import { Coin, CoinAmount, SecondaryFee } from 'types';
+import { addAmount, newAmount, subtractAmount } from './utils';
 
 export class Fees {
   private secondaryFees: SecondaryFee[];
 
-  private amount: Amount<ERC20>;
+  private amount: CoinAmount<Coin>;
 
-  constructor(secondaryFees: SecondaryFee[], token: ERC20) {
+  constructor(secondaryFees: SecondaryFee[], token: Coin) {
     this.secondaryFees = secondaryFees;
     this.amount = newAmount(BigNumber.from(0), token);
   }
 
-  addAmount(amount: Amount<ERC20>): void {
-    this.amount = addERC20Amount(this.amount, amount);
+  get token(): Coin {
+    return this.amount.token;
   }
 
-  amountWithFeesApplied(): Amount<ERC20> {
-    return addERC20Amount(this.amount, this.total());
+  addAmount(amount: CoinAmount<Coin>): void {
+    this.amount = addAmount(this.amount, amount);
   }
 
-  amountLessFees(): Amount<ERC20> {
-    return subtractERC20Amount(this.amount, this.total());
+  amountWithFeesApplied(): CoinAmount<Coin> {
+    return addAmount(this.amount, this.total());
   }
 
-  withAmounts(): Fee[] {
+  amountLessFees(): CoinAmount<Coin> {
+    return subtractAmount(this.amount, this.total());
+  }
+
+  withAmounts() {
     return this.secondaryFees.map((fee) => {
       const feeAmount = this.amount.value
         .mul(fee.basisPoints)
@@ -40,14 +42,14 @@ export class Fees {
     });
   }
 
-  private total(): Amount<ERC20> {
+  private total(): CoinAmount<Coin> {
     let totalFees = newAmount(BigNumber.from(0), this.amount.token);
 
     for (const fee of this.secondaryFees) {
       const feeAmount = this.amount.value
         .mul(fee.basisPoints)
         .div(BASIS_POINT_PRECISION);
-      totalFees = addERC20Amount(totalFees, newAmount(feeAmount, this.amount.token));
+      totalFees = addAmount(totalFees, newAmount(feeAmount, this.amount.token));
     }
 
     return totalFees;

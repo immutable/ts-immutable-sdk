@@ -2,7 +2,7 @@ import { ethers } from 'ethers';
 import { Token, TradeType } from '@uniswap/sdk-core';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import { NoRoutesAvailableError } from 'errors';
-import { Amount, ERC20 } from 'types';
+import { CoinAmount, ERC20 } from 'types';
 import { erc20ToUniswapToken, poolEquals, uniswapTokenToERC20 } from './utils';
 import { getQuotesForRoutes, QuoteResult } from './getQuotesForRoutes';
 import { fetchValidPools } from './poolUtils/fetchValidPools';
@@ -13,8 +13,6 @@ export type RoutingContracts = {
   multicallAddress: string;
   factoryAddress: string;
   quoterAddress: string;
-  peripheryRouterAddress: string;
-  secondaryFeeAddress: string;
 };
 
 export class Router {
@@ -24,32 +22,21 @@ export class Router {
 
   public routingContracts: RoutingContracts;
 
-  constructor(
-    provider: ethers.providers.JsonRpcProvider,
-    routingTokens: ERC20[],
-    routingContracts: RoutingContracts,
-  ) {
+  constructor(provider: ethers.providers.JsonRpcProvider, routingTokens: ERC20[], routingContracts: RoutingContracts) {
     this.provider = provider;
     this.routingTokens = routingTokens;
     this.routingContracts = routingContracts;
   }
 
   public async findOptimalRoute(
-    amountSpecified: Amount<ERC20>,
+    amountSpecified: CoinAmount<ERC20>,
     otherToken: ERC20,
     tradeType: TradeType,
     maxHops: number = 2,
   ): Promise<QuoteResult> {
-    const [tokenIn, tokenOut] = this.determineERC20InAndERC20Out(
-      tradeType,
-      amountSpecified,
-      otherToken,
-    );
+    const [tokenIn, tokenOut] = this.determineERC20InAndERC20Out(tradeType, amountSpecified, otherToken);
 
-    const multicallContract = Multicall__factory.connect(
-      this.routingContracts.multicallAddress,
-      this.provider,
-    );
+    const multicallContract = Multicall__factory.connect(this.routingContracts.multicallAddress, this.provider);
     const erc20Pair: ERC20Pair = [tokenIn, tokenOut];
 
     // Get all pools and use these to get all possible routes.
@@ -68,15 +55,7 @@ export class Router {
     // Get all the possible routes from the given pools
     // TODO: Fix used before defined error
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    const routes = generateAllAcyclicPaths(
-      tokenIn,
-      tokenOut,
-      pools,
-      maxHops,
-      [],
-      [],
-      tokenIn,
-    );
+    const routes = generateAllAcyclicPaths(tokenIn, tokenOut, pools, maxHops, [], [], tokenIn);
 
     const noValidRoute = routes.length === 0;
     if (noValidRoute) {
@@ -84,18 +63,13 @@ export class Router {
     }
 
     // Get the best quote from all of the given routes
-    return await this.getBestQuoteFromRoutes(
-      multicallContract,
-      routes,
-      amountSpecified,
-      tradeType,
-    );
+    return await this.getBestQuoteFromRoutes(multicallContract, routes, amountSpecified, tradeType);
   }
 
   private async getBestQuoteFromRoutes(
     multicallContract: Multicall,
     routes: Route<Token, Token>[],
-    amountSpecified: Amount<ERC20>,
+    amountSpecified: CoinAmount<ERC20>,
     tradeType: TradeType,
   ): Promise<QuoteResult> {
     const quotes = await getQuotesForRoutes(
@@ -151,7 +125,7 @@ export class Router {
   // eslint-disable-next-line class-methods-use-this
   private determineERC20InAndERC20Out(
     tradeType: TradeType,
-    amountSpecified: Amount<ERC20>,
+    amountSpecified: CoinAmount<ERC20>,
     otherToken: ERC20,
   ): [ERC20, ERC20] {
     // If the trade type is EXACT INPUT then we have specified the amount for the tokenIn
@@ -188,9 +162,7 @@ export const generateAllAcyclicPaths = (
     // if we have found a route to the target currency, add it to the list of routes
     const routeFound = outputToken.equals(currencyOut);
     if (routeFound) {
-      routes.push(
-        new Route([...currentRoute, pool], startCurrencyIn, currencyOut),
-      );
+      routes.push(new Route([...currentRoute, pool], startCurrencyIn, currencyOut));
     } else if (maxHops > 1) {
       // otherwise, if we haven't exceeded the maximum number of pools that can be traversed,
       // recursively call this function with the output token as the new starting currency

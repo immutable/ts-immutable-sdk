@@ -185,7 +185,6 @@ export function WalletWidget(props: WalletWidgetProps) {
                 showSwapOption={isSwapEnabled}
                 showBridgeOption={isBridgeEnabled}
                 onCloseButtonClick={() => sendWalletWidgetCloseEvent(eventTarget)}
-                supportedTopUps={walletState.supportedTopUps}
               />
             )}
           </WalletContext.Provider>

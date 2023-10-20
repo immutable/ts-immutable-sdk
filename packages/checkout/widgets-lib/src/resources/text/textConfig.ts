@@ -321,6 +321,11 @@ export const text = {
         },
       },
     },
+    [SaleWidgetViews.FUND_WITH_SMART_CHECKOUT]: {
+      loading: {
+        checkingBalances: 'Crunching numbers',
+      },
+    },
     [SaleWidgetViews.PAYMENT_METHODS]: {
       header: {
         heading: 'How would you like to pay?',
@@ -379,13 +384,25 @@ export const text = {
           secondaryAction: 'Dismiss',
         },
         [SaleErrorTypes.WALLET_REJECTED_NO_FUNDS]: {
-          description: 'Sorry, something went wrong. Plese try again.',
+          description: 'Sorry, something went wrong. Please try again.',
           primaryAction: 'Go back',
           secondaryAction: 'Dismiss',
         },
         [SaleErrorTypes.WALLET_REJECTED]: {
           description:
             "You'll need to approve the transaction in your wallet to proceed.",
+          primaryAction: 'Try again',
+          secondaryAction: 'Cancel',
+        },
+        [SaleErrorTypes.SMART_CHECKOUT_NO_ROUTES_FOUND]: {
+          description:
+            'Your wallet has insufficent balance. Try paying with card instead.',
+          primaryAction: 'Try again',
+          secondaryAction: 'Cancel',
+        },
+        [SaleErrorTypes.SMART_CHECKOUT_ERROR]: {
+          description:
+            'Unable to check your wallets balance. Please try again.',
           primaryAction: 'Try again',
           secondaryAction: 'Cancel',
         },
