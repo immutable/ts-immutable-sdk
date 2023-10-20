@@ -159,14 +159,14 @@ export function SaleWidget(props: SaleWidgetProps) {
       onActionClick: () => {
         goBackToPaymentMethods();
       },
-      onSecondaryActionClick: closeWidget,
+      onSecondaryActionClick: () => sendCloseEvent(SaleErrorTypes.SMART_CHECKOUT_NO_ROUTES_FOUND),
       statusType: StatusType.INFORMATION,
     },
     [SaleErrorTypes.SMART_CHECKOUT_ERROR]: {
       onActionClick: () => {
         goBackToPaymentMethods();
       },
-      onSecondaryActionClick: closeWidget,
+      onSecondaryActionClick: () => sendCloseEvent(SaleErrorTypes.SMART_CHECKOUT_ERROR),
       statusType: StatusType.INFORMATION,
     },
     [SaleErrorTypes.DEFAULT]: {
