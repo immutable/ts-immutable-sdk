@@ -13,6 +13,8 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.PLATFORM_SA_GITHUB_TOKEN }}
       SDK_PUBLISH_SLACK_WEBHOOK: ${{ secrets.SDK_PUBLISH_SLACK_WEBHOOK }}
+      NETLIFY_BUILD_HOOK: ${{ secrets.NETLIFY_BUILD_HOOK }}
+      GITHUB_USER: ${{ github.actor }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -32,8 +34,9 @@ jobs:
           echo "VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
           echo "CLONE_DIR=./imx-docs" >> $GITHUB_ENV
 
-      - name: Pending release check
-        run: ./.github/scripts/check-pending-release.sh
+      - name: Docs version check
+        id: docs_version_check
+        run: ./.github/scripts/check-docs-version.sh
         shell: bash
 
       - name: Setup Github
@@ -65,19 +68,32 @@ jobs:
       - name: Update version link
         run: ./.github/scripts/update-docs-link.sh
 
-      - name: Create SDK Docs PR
-        id: docs_pr 
-        run: ./.github/scripts/push-docs-pr.sh
+      - name: Push SDK Docs to imx-docs
+        id: docs_push 
+        run: ./.github/scripts/push-docs.sh
         shell: bash
 
-      - name: Notify SDK Slack Docs PR Success
-        if: ${{ success() && steps.docs_pr.conclusion == 'success' }}
-        uses: ./.github/actions/notify-slack-publish-status
-        with:
-          message: "✅ SDK reference documents PR created successfully - please review and merge ${{ env.PR }} into main."
+      - name: Trigger Netlify Build and Deploy
+        id: netlify_build
+        run: curl -X POST -d '{}' ${{ env.NETLIFY_BUILD_HOOK }}
 
-      - name: Notify SDK Slack Docs PR Failure
-        if: ${{ failure() }}
+      - name: Wait for 10 minutes
+        # allow Netlify time to build and deploy
+        run: sleep 600
+
+      - name: Check Netlify Site Deployed
+        id: netlify_deploy
+        run: ./.github/scripts/check-docs-deployed.sh
+        shell: bash
+
+      - name: Notify SDK Slack Docs Publish Success
+        if: ${{ success() && steps.docs_push.conclusion == 'success' && steps.netlify_build.conclusion == 'success' && steps.netlify_deploy.conclusion == 'success' }}
         uses: ./.github/actions/notify-slack-publish-status
         with:
-          message: "❌ Failed to create SDK reference documents PR. Please check the logs for more details."
+          message: "✅ SDK reference documents published successfully - https://docs.immutable.com/sdk-references/ts-immutable-sdk/${{ env.VERSION }}/modules/_imtbl_sdk.html\n\n>*`${{ env.GITHUB_USER }}` Please ensure you and the team updated all Sample Code + Guides on the <https://docs.immutable.com|imx-docs site> to reflect the change.*"
+
+      - name: Notify SDK Slack Docs Publish Failure
+        if: ${{ failure() && steps.docs_version_check.conclusion == 'success' }}
+        uses: ./.github/actions/notify-slack-publish-status
+        with:
+          message: "❌ Failed to publish SDK reference documents. Please check the logs for more details."
