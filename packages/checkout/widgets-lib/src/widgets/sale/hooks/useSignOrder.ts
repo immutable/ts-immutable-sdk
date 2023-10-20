@@ -289,7 +289,7 @@ export const useSignOrder = (input: SignOrderInput) => {
       });
       return [];
     }
-    let successfull = true;
+    let successful = true;
     const execTransactions: ExecutedTransaction[] = [];
     for (const transaction of signData.transactions) {
       const {
@@ -302,14 +302,14 @@ export const useSignOrder = (input: SignOrderInput) => {
       const hash = await sendTransaction(to, data, gasEstimate, method);
 
       if (!hash) {
-        successfull = false;
+        successful = false;
         break;
       }
 
       execTransactions.push({ method, hash });
     }
 
-    if (successfull) {
+    if (successful) {
       setExecuteDone();
     }
     return execTransactions;
