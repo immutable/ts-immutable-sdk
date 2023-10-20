@@ -9,11 +9,11 @@ import {
   FundWithSmartCheckoutSubViews, SaleWidgetViews,
 } from '../../../context/view-context/SaleViewContextTypes';
 import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import { text as textConfig } from '../../../resources/text/textConfig';
 import { LoadingView } from '../../../views/loading/LoadingView';
 import { FundingRouteExecute } from '../components/FundingRouteExecute/FundingRouteExecute';
 import { FundingRouteSelect } from '../components/FundingRouteSelect/FundingRouteSelect';
 import { useSaleContext } from '../context/SaleContextProvider';
-import { text as textConfig } from '../../../resources/text/textConfig';
 
 type FundWithSmartCheckoutProps = {
   subView: FundWithSmartCheckoutSubViews;
@@ -54,12 +54,15 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
       return;
     }
     if (fundingRouteStepIndex === selectedFundingRoute.steps.length - 1) {
+      setFundingRouteStepIndex(0);
+      setSelectedFundingRoute(undefined);
+      // ! Recurse with SC to trigger another query and confirm they have the required balance
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
-            subView: FundWithSmartCheckoutSubViews.DONE,
             type: SaleWidgetViews.FUND_WITH_SMART_CHECKOUT,
+            subView: FundWithSmartCheckoutSubViews.INIT,
           },
         },
       });
@@ -84,11 +87,6 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
           onFundingRouteExecuted={onFundingRouteExecuted}
           fundingRouteStep={fundingRouteStep}
         />
-      )}
-      { subView === FundWithSmartCheckoutSubViews.DONE && (
-      <p>
-        FundWithSmartCheckout done!
-      </p>
       )}
     </Box>
   );
