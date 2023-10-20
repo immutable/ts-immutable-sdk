@@ -37,7 +37,7 @@ export function WithCard(props: WithCardProps) {
 
   const nftData: TransakNFTData[] = useMemo(
     () => signResponse.order.products.map((product) => ({
-      collectionAddress: executeTxn?.contractAddress || '',
+      collectionAddress: product.collectionAddress,
       imageURL: product.image,
       nftName: product.name,
       price: product.amount,

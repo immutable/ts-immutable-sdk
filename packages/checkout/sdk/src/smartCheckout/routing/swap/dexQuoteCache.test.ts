@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-import { ERC20 } from '@imtbl/dex-sdk';
+import { Token } from '@imtbl/dex-sdk';
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { getOrSetQuotesFromCache } from './dexQuoteCache';
@@ -27,18 +26,18 @@ describe('dexQuoteCache', () => {
                 quote: {
                   amount: {
                     value: BigNumber.from(1),
-                    token: {} as ERC20,
+                    token: {} as Token,
                   },
                   amountWithMaxSlippage: {
                     value: BigNumber.from(1),
-                    token: {} as ERC20,
+                    token: {} as Token,
                   },
                   slippage: 0,
                   fees: [
                     {
                       amount: {
                         value: BigNumber.from(1),
-                        token: {} as ERC20,
+                        token: {} as Token,
                       },
                       recipient: '',
                       basisPoints: 0,
@@ -47,11 +46,11 @@ describe('dexQuoteCache', () => {
                 },
                 approval: {
                   value: BigNumber.from(1),
-                  token: {} as ERC20,
+                  token: {} as Token,
                 },
                 swap: {
                   value: BigNumber.from(1),
-                  token: {} as ERC20,
+                  token: {} as Token,
                 },
               },
             ],
@@ -65,18 +64,18 @@ describe('dexQuoteCache', () => {
                 quote: {
                   amount: {
                     value: BigNumber.from(2),
-                    token: {} as ERC20,
+                    token: {} as Token,
                   },
                   amountWithMaxSlippage: {
                     value: BigNumber.from(2),
-                    token: {} as ERC20,
+                    token: {} as Token,
                   },
                   slippage: 0,
                   fees: [
                     {
                       amount: {
                         value: BigNumber.from(2),
-                        token: {} as ERC20,
+                        token: {} as Token,
                       },
                       recipient: '',
                       basisPoints: 0,
@@ -85,11 +84,11 @@ describe('dexQuoteCache', () => {
                 },
                 approval: {
                   value: BigNumber.from(2),
-                  token: {} as ERC20,
+                  token: {} as Token,
                 },
                 swap: {
                   value: BigNumber.from(2),
-                  token: {} as ERC20,
+                  token: {} as Token,
                 },
               },
             ],
@@ -120,18 +119,18 @@ describe('dexQuoteCache', () => {
           quote: {
             amount: {
               value: BigNumber.from(1),
-              token: {} as ERC20,
+              token: {} as Token,
             },
             amountWithMaxSlippage: {
               value: BigNumber.from(1),
-              token: {} as ERC20,
+              token: {} as Token,
             },
             slippage: 0,
             fees: [
               {
                 amount: {
                   value: BigNumber.from(1),
-                  token: {} as ERC20,
+                  token: {} as Token,
                 },
                 recipient: '',
                 basisPoints: 0,
@@ -140,11 +139,11 @@ describe('dexQuoteCache', () => {
           },
           approval: {
             value: BigNumber.from(1),
-            token: {} as ERC20,
+            token: {} as Token,
           },
           swap: {
             value: BigNumber.from(1),
-            token: {} as ERC20,
+            token: {} as Token,
           },
         },
       ],
@@ -166,18 +165,18 @@ describe('dexQuoteCache', () => {
                 quote: {
                   amount: {
                     value: BigNumber.from(2),
-                    token: {} as ERC20,
+                    token: {} as Token,
                   },
                   amountWithMaxSlippage: {
                     value: BigNumber.from(2),
-                    token: {} as ERC20,
+                    token: {} as Token,
                   },
                   slippage: 0,
                   fees: [
                     {
                       amount: {
                         value: BigNumber.from(2),
-                        token: {} as ERC20,
+                        token: {} as Token,
                       },
                       recipient: '',
                       basisPoints: 0,
@@ -186,11 +185,11 @@ describe('dexQuoteCache', () => {
                 },
                 approval: {
                   value: BigNumber.from(2),
-                  token: {} as ERC20,
+                  token: {} as Token,
                 },
                 swap: {
                   value: BigNumber.from(2),
-                  token: {} as ERC20,
+                  token: {} as Token,
                 },
               },
             ],
@@ -222,18 +221,18 @@ describe('dexQuoteCache', () => {
           quote: {
             amount: {
               value: BigNumber.from(1),
-              token: {} as ERC20,
+              token: {} as Token,
             },
             amountWithMaxSlippage: {
               value: BigNumber.from(1),
-              token: {} as ERC20,
+              token: {} as Token,
             },
             slippage: 0,
             fees: [
               {
                 amount: {
                   value: BigNumber.from(1),
-                  token: {} as ERC20,
+                  token: {} as Token,
                 },
                 recipient: '',
                 basisPoints: 0,
@@ -242,11 +241,11 @@ describe('dexQuoteCache', () => {
           },
           approval: {
             value: BigNumber.from(1),
-            token: {} as ERC20,
+            token: {} as Token,
           },
           swap: {
             value: BigNumber.from(1),
-            token: {} as ERC20,
+            token: {} as Token,
           },
         },
       ],
