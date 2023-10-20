@@ -173,8 +173,9 @@ export const checkUserCanCoverApprovalFees = (
 
 export const checkUserCanCoverSwapFees = (
   l2Balances: GetBalanceResult[],
-  swapFees: Fee[],
   approvalFees: SufficientApprovalFees,
+  swapGasFees: Amount | null,
+  swapFees: Fee[],
   tokenBeingSwapped: { amount: BigNumber, address: string },
 ): boolean => {
   // Set up a map of token addresses to amounts for each of the swap fees
@@ -185,10 +186,20 @@ export const checkUserCanCoverSwapFees = (
     feeMap.set(approvalFees.approvalGasTokenAddress, approvalFees.approvalGasFee);
   }
 
+  // Add the swap gas fee to list of fees
+  if (swapGasFees) {
+    const fee = feeMap.get(swapGasFees.token.address);
+    if (fee) {
+      feeMap.set(swapGasFees.token.address, fee.add(swapGasFees.value));
+    } else {
+      feeMap.set(swapGasFees.token.address, swapGasFees.value);
+    }
+  }
+
   // Add the token being swapped to list of fees to ensure the user can cover the fee + the token swap
   if (tokenBeingSwapped) {
     const fee = feeMap.get(tokenBeingSwapped.address);
-    if (fee) { // Token being swapped is the same as approval token
+    if (fee) { // Token being swapped is the same as gas token
       feeMap.set(tokenBeingSwapped.address, fee.add(tokenBeingSwapped.amount));
     } else {
       feeMap.set(tokenBeingSwapped.address, tokenBeingSwapped.amount);
@@ -290,7 +301,6 @@ export const swapRoute = async (
   const l2Balances = l2TokenBalanceResult.balances;
   if (l2Balances.length === 0) return fundingSteps;
 
-  console.log('requiredToken', requiredToken);
   const quotes = await quoteFetcher(
     config,
     getL2ChainId(config),
@@ -320,8 +330,9 @@ export const swapRoute = async (
     // If user does not have enough to cover swap fees then continue
     if (!checkUserCanCoverSwapFees(
       l2Balances,
-      quote.quote.fees,
       approvalFees,
+      quote.swap,
+      quote.quote.fees,
       {
         amount: amountOfQuoteTokenRequired.value,
         address: quoteTokenAddress,

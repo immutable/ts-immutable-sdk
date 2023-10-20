@@ -1352,7 +1352,7 @@ describe('swapRoute', () => {
   });
 
   describe('checkUserCanCoverSwapFees', () => {
-    it('should return true if user has enough balance to cover the swap fees', () => {
+    it('should return true if user has enough balance to cover gas fees', () => {
       const l2Balances = [
         {
           balance: BigNumber.from(2),
@@ -1366,27 +1366,21 @@ describe('swapRoute', () => {
         },
       ];
 
-      const swapFees: Fee[] = [
-        {
-          recipient: '',
-          basisPoints: 0,
-          amount: {
-            value: BigNumber.from(1),
-            token: {
-              chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-              name: 'IMX',
-              symbol: 'IMX',
-              decimals: 18,
-              address: IMX_ADDRESS_ZKEVM,
-            },
-          },
-        },
-      ];
+      const swapFees: Fee[] = [];
 
       const approvalFees = {
         sufficient: true,
         approvalGasFee: BigNumber.from(0),
         approvalGasTokenAddress: '',
+      };
+
+      const swapGasFees = {
+        token: {
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+          address: IMX_ADDRESS_ZKEVM,
+          decimals: 18,
+        },
+        value: BigNumber.from(1),
       };
 
       const tokenBeingSwapped = {
@@ -1396,15 +1390,16 @@ describe('swapRoute', () => {
 
       const canCoverSwapFees = checkUserCanCoverSwapFees(
         l2Balances,
-        swapFees,
         approvalFees,
+        swapGasFees,
+        swapFees,
         tokenBeingSwapped,
       );
 
       expect(canCoverSwapFees).toBeTruthy();
     });
 
-    it('should return true if user has enough balance to cover the approval and swap fees', () => {
+    it('should return true if user has enough balance to cover gas and swap fees', () => {
       const l2Balances = [
         {
           balance: BigNumber.from(3),
@@ -1437,8 +1432,17 @@ describe('swapRoute', () => {
 
       const approvalFees = {
         sufficient: true,
-        approvalGasFee: BigNumber.from(1),
-        approvalGasTokenAddress: IMX_ADDRESS_ZKEVM,
+        approvalGasFee: BigNumber.from(0),
+        approvalGasTokenAddress: '',
+      };
+
+      const swapGasFees = {
+        token: {
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+          address: IMX_ADDRESS_ZKEVM,
+          decimals: 18,
+        },
+        value: BigNumber.from(1),
       };
 
       const tokenBeingSwapped = {
@@ -1448,8 +1452,71 @@ describe('swapRoute', () => {
 
       const canCoverSwapFees = checkUserCanCoverSwapFees(
         l2Balances,
-        swapFees,
         approvalFees,
+        swapGasFees,
+        swapFees,
+        tokenBeingSwapped,
+      );
+
+      expect(canCoverSwapFees).toBeTruthy();
+    });
+
+    it('should return true if user has enough balance to cover the approval, gas and swap fees', () => {
+      const l2Balances = [
+        {
+          balance: BigNumber.from(4),
+          formattedBalance: '4',
+          token: {
+            name: 'IMX',
+            symbol: 'IMX',
+            decimals: 18,
+            address: IMX_ADDRESS_ZKEVM,
+          },
+        },
+      ];
+
+      const swapFees: Fee[] = [
+        {
+          recipient: '',
+          basisPoints: 0,
+          amount: {
+            value: BigNumber.from(1),
+            token: {
+              chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+              name: 'IMX',
+              symbol: 'IMX',
+              decimals: 18,
+              address: IMX_ADDRESS_ZKEVM,
+            },
+          },
+        },
+      ];
+
+      const approvalFees = {
+        sufficient: true,
+        approvalGasFee: BigNumber.from(1),
+        approvalGasTokenAddress: IMX_ADDRESS_ZKEVM,
+      };
+
+      const swapGasFees = {
+        token: {
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+          address: IMX_ADDRESS_ZKEVM,
+          decimals: 18,
+        },
+        value: BigNumber.from(1),
+      };
+
+      const tokenBeingSwapped = {
+        amount: BigNumber.from(1),
+        address: IMX_ADDRESS_ZKEVM,
+      };
+
+      const canCoverSwapFees = checkUserCanCoverSwapFees(
+        l2Balances,
+        approvalFees,
+        swapGasFees,
+        swapFees,
         tokenBeingSwapped,
       );
 
@@ -1462,8 +1529,8 @@ describe('swapRoute', () => {
       () => {
         const l2Balances = [
           {
-            balance: BigNumber.from(5),
-            formattedBalance: '5',
+            balance: BigNumber.from(6),
+            formattedBalance: '6',
             token: {
               name: 'IMX',
               symbol: 'IMX',
@@ -1544,6 +1611,15 @@ describe('swapRoute', () => {
           approvalGasTokenAddress: '0xERC20_1',
         };
 
+        const swapGasFees = {
+          token: {
+            chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+            address: '0xERC20_1',
+            decimals: 18,
+          },
+          value: BigNumber.from(1),
+        };
+
         const tokenBeingSwapped = {
           amount: BigNumber.from(3),
           address: '0xERC20_1',
@@ -1551,8 +1627,9 @@ describe('swapRoute', () => {
 
         const canCoverSwapFees = checkUserCanCoverSwapFees(
           l2Balances,
-          swapFees,
           approvalFees,
+          swapGasFees,
+          swapFees,
           tokenBeingSwapped,
         );
 
@@ -1560,7 +1637,7 @@ describe('swapRoute', () => {
       },
     );
 
-    it('should return false if user does not have enough balance to cover the fee', () => {
+    it('should return false if user does not have enough balance to cover gas', () => {
       const l2Balances = [
         {
           balance: BigNumber.from(1),
@@ -1574,27 +1651,21 @@ describe('swapRoute', () => {
         },
       ];
 
-      const swapFees: Fee[] = [
-        {
-          recipient: '',
-          basisPoints: 0,
-          amount: {
-            value: BigNumber.from(1),
-            token: {
-              chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-              name: 'IMX',
-              symbol: 'IMX',
-              decimals: 18,
-              address: IMX_ADDRESS_ZKEVM,
-            },
-          },
-        },
-      ];
+      const swapFees: Fee[] = [];
 
       const approvalFees = {
         sufficient: true,
         approvalGasFee: BigNumber.from(0),
         approvalGasTokenAddress: '',
+      };
+
+      const swapGasFees = {
+        token: {
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+          address: IMX_ADDRESS_ZKEVM,
+          decimals: 18,
+        },
+        value: BigNumber.from(1),
       };
 
       const tokenBeingSwapped = {
@@ -1604,15 +1675,16 @@ describe('swapRoute', () => {
 
       const canCoverSwapFees = checkUserCanCoverSwapFees(
         l2Balances,
-        swapFees,
         approvalFees,
+        swapGasFees,
+        swapFees,
         tokenBeingSwapped,
       );
 
       expect(canCoverSwapFees).toBeFalsy();
     });
 
-    it('should return false if user does not have enough balance to cover the approval and fees', () => {
+    it('should return false if user does not have enough balance to cover the fee', () => {
       const l2Balances = [
         {
           balance: BigNumber.from(2),
@@ -1645,6 +1717,77 @@ describe('swapRoute', () => {
 
       const approvalFees = {
         sufficient: true,
+        approvalGasFee: BigNumber.from(0),
+        approvalGasTokenAddress: '',
+      };
+
+      const swapGasFees = {
+        token: {
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+          address: IMX_ADDRESS_ZKEVM,
+          decimals: 18,
+        },
+        value: BigNumber.from(1),
+      };
+
+      const tokenBeingSwapped = {
+        amount: BigNumber.from(1),
+        address: IMX_ADDRESS_ZKEVM,
+      };
+
+      const canCoverSwapFees = checkUserCanCoverSwapFees(
+        l2Balances,
+        approvalFees,
+        swapGasFees,
+        swapFees,
+        tokenBeingSwapped,
+      );
+
+      expect(canCoverSwapFees).toBeFalsy();
+    });
+
+    it('should return false if user does not have enough balance to cover the approval, gas and fees', () => {
+      const l2Balances = [
+        {
+          balance: BigNumber.from(3),
+          formattedBalance: '3',
+          token: {
+            name: 'IMX',
+            symbol: 'IMX',
+            decimals: 18,
+            address: IMX_ADDRESS_ZKEVM,
+          },
+        },
+      ];
+
+      const swapFees: Fee[] = [
+        {
+          recipient: '',
+          basisPoints: 0,
+          amount: {
+            value: BigNumber.from(1),
+            token: {
+              chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+              name: 'IMX',
+              symbol: 'IMX',
+              decimals: 18,
+              address: IMX_ADDRESS_ZKEVM,
+            },
+          },
+        },
+      ];
+
+      const swapGasFees = {
+        token: {
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+          address: IMX_ADDRESS_ZKEVM,
+          decimals: 18,
+        },
+        value: BigNumber.from(1),
+      };
+
+      const approvalFees = {
+        sufficient: true,
         approvalGasFee: BigNumber.from(1),
         approvalGasTokenAddress: IMX_ADDRESS_ZKEVM,
       };
@@ -1656,8 +1799,9 @@ describe('swapRoute', () => {
 
       const canCoverSwapFees = checkUserCanCoverSwapFees(
         l2Balances,
-        swapFees,
         approvalFees,
+        swapGasFees,
+        swapFees,
         tokenBeingSwapped,
       );
 
@@ -1701,6 +1845,15 @@ describe('swapRoute', () => {
         approvalGasTokenAddress: IMX_ADDRESS_ZKEVM,
       };
 
+      const swapGasFees = {
+        token: {
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+          address: IMX_ADDRESS_ZKEVM,
+          decimals: 18,
+        },
+        value: BigNumber.from(1),
+      };
+
       const tokenBeingSwapped = {
         amount: BigNumber.from(1),
         address: IMX_ADDRESS_ZKEVM,
@@ -1708,8 +1861,9 @@ describe('swapRoute', () => {
 
       const canCoverSwapFees = checkUserCanCoverSwapFees(
         l2Balances,
-        swapFees,
         approvalFees,
+        swapGasFees,
+        swapFees,
         tokenBeingSwapped,
       );
 
