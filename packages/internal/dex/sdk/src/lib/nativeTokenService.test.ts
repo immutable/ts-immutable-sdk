@@ -6,6 +6,7 @@ import {
   nativeTokenService,
   newAmountFromString,
 } from 'test/utils';
+import { canUnwrapToken } from './nativeTokenService';
 
 describe('NativeTokenService', () => {
   describe('wrapAmount', () => {
@@ -106,21 +107,17 @@ describe('NativeTokenService', () => {
     });
   });
 
-  describe('isNativeToken', () => {
-    it('should return true when object references are different', () => {
-      expect(nativeTokenService.isNativeToken({ ...nativeTokenService.nativeToken })).toEqual(true);
-    });
-
+  describe('canUnwrapToken', () => {
     it('returns true for the native token', () => {
-      expect(nativeTokenService.isNativeToken(nativeTokenService.nativeToken)).toEqual(true);
+      expect(canUnwrapToken(nativeTokenService.nativeToken)).toEqual(true);
     });
 
     it('returns false for the wrapped token', () => {
-      expect(nativeTokenService.isNativeToken(nativeTokenService.wrappedToken)).toEqual(false);
+      expect(canUnwrapToken(nativeTokenService.wrappedToken)).toEqual(false);
     });
 
     it('returns false for a normal ERC20 token', () => {
-      expect(nativeTokenService.isNativeToken(FUN_TEST_TOKEN)).toEqual(false);
+      expect(canUnwrapToken(FUN_TEST_TOKEN)).toEqual(false);
     });
   });
 });
