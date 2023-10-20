@@ -32,6 +32,10 @@ jobs:
       - name: Build
         run: yarn build
 
+      - name: Typecheck
+        run: yarn typecheck
+
+
   test:
     name: Test
     runs-on: ubuntu-latest-4-cores
