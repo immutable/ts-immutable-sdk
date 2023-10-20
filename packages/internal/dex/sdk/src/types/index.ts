@@ -6,10 +6,10 @@ import { ExchangeContracts } from 'config';
  * Type representing a Chain
  * @property {number} chainId - The chain ID
  * @property {string} rpcUrl - The RPC URL for the chain
- * @property {ExchangeContracts} contracts - The DEX contract addresses
- * @property {ERC20[]} commonRoutingTokens - The tokens used to find available pools for a swap
- * @property {Coin} nativeToken - The native token of the chain
- * @property {ERC20} wrappedNativeToken - The wrapped native token of the chain
+ * @property {@link ExchangeContracts} contracts - The DEX contract addresses
+ * @property {@link ERC20[]} commonRoutingTokens - The tokens used to find available pools for a swap
+ * @property {@link Coin} nativeToken - The native token of the chain
+ * @property {@link ERC20} wrappedNativeToken - The wrapped native token of the chain
  */
 export type Chain = {
   chainId: number;
@@ -35,7 +35,7 @@ export type SecondaryFee = {
  * Type representing the fees returned in the quote
  * @property {string} recipient - The fee recipient address
  * @property {number} basisPoints - The fee percentage in basis points
- * @property {Amount} amount - The amount of the fee
+ * @property {@link Amount} amount - The amount of the fee
  * @example 100 basis points = 1% = 1 IMX
  */
 export type Fee = {
@@ -46,7 +46,7 @@ export type Fee = {
 
 /**
  * Type representing an amount with the token information
- * @property {Coin} token - The coin for the amount, either a {@link Native} or {@link ERC20}
+ * @property {@link Coin} token - The coin for the amount, either a {@link Native} or {@link ERC20}
  * @property {ethers.BigNumber} value - The value of the amount in the token's smallest unit
  */
 export type CoinAmount<T extends Coin> = {
@@ -56,10 +56,10 @@ export type CoinAmount<T extends Coin> = {
 
 /**
  * Type representing a quote for a swap
- * @property {Amount} amount - The quoted amount with fees applied
- * @property {Amount} amountWithMaxSlippage - The quoted amount with the max slippage and fees applied
+ * @property {@link Amount} amount - The quoted amount with fees applied
+ * @property {@link Amount} amountWithMaxSlippage - The quoted amount with the max slippage and fees applied
  * @property {number} slippage - The slippage percentage used to calculate the quote
- * @property {Fee[]} fees - The secondary fees applied to the swap
+ * @property {@link Fee[]} fees - The secondary fees applied to the swap
  */
 export type Quote = {
   amount: Amount;
@@ -70,8 +70,8 @@ export type Quote = {
 
 /**
  * Type representing the details of a transaction
- * @property {ethers.providers.TransactionRequest} transaction - The unsigned transaction
- * @property {Amount | null} gasFeeEstimate - The gas fee estimate or null if it is not available
+ * @property {@link ethers.providers.TransactionRequest} transaction - The unsigned transaction
+ * @property {@link Amount | null} gasFeeEstimate - The gas fee estimate or null if it is not available
  */
 export type TransactionDetails = {
   transaction: ethers.providers.TransactionRequest;
@@ -80,9 +80,9 @@ export type TransactionDetails = {
 
 /**
  * Type representing the results of {@link Exchange.getUnsignedSwapTxFromAmountIn} {@link Exchange.getUnsignedSwapTxFromAmountOut}
- * @property {TransactionDetails | null} approval - The approval transaction or null if it is not required
- * @property {TransactionDetails} swap - The swap transaction
- * @property {Quote} quote - The quote details for the swap
+ * @property {@link TransactionDetails | null} approval - The approval transaction or null if it is not required
+ * @property {@link TransactionDetails} swap - The swap transaction
+ * @property {@link Quote} quote - The quote details for the swap
  */
 export type TransactionResponse = {
   approval: TransactionDetails | null;
@@ -147,8 +147,8 @@ export type Token = {
 
 /**
  * Interface representing a token amount
- * @property {Token} token - The token
- * @property {ethers.BigNumber} value - The amount
+ * @property {@link Token} token - The token
+ * @property {@link ethers.BigNumber} value - The amount
  */
 export type Amount = {
   token: Token;
@@ -174,10 +174,9 @@ export type ExchangeOverrides = {
 /**
  * Interface representing the configuration for the {@link Exchange} module
  * @property {number} chainId - The chain ID
- * @property {SecondaryFee[]} secondaryFees - The secondary fees for a swap
+ * @property {@link SecondaryFee[]} secondaryFees - The secondary fees for a swap
  */
-export interface ExchangeModuleConfiguration
-  extends ModuleConfiguration<ExchangeOverrides> {
+export interface ExchangeModuleConfiguration extends ModuleConfiguration<ExchangeOverrides> {
   chainId: number;
   secondaryFees?: SecondaryFee[];
 }

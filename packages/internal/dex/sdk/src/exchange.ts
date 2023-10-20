@@ -10,7 +10,7 @@ import { SecondaryFee__factory } from 'contracts/types';
 import { NativeTokenService } from 'lib/nativeTokenService';
 import { DEFAULT_DEADLINE, DEFAULT_MAX_HOPS, DEFAULT_SLIPPAGE, MAX_MAX_HOPS, MIN_MAX_HOPS } from './constants';
 import { Router } from './lib/router';
-import { getERC20Decimals, isValidNonZeroAddress, isValidTokenLiteral, newAmount, toPublicAmount } from './lib/utils';
+import { getTokenDecimals, isValidNonZeroAddress, isValidTokenLiteral, newAmount, toPublicAmount } from './lib/utils';
 import {
   Coin,
   CoinAmount,
@@ -136,8 +136,8 @@ export class Exchange {
 
     // get the decimals of the tokens that will be swapped
     const [tokenInDecimals, tokenOutDecimals, secondaryFees] = await Promise.all([
-      getERC20Decimals(tokenInLiteral, this.provider),
-      getERC20Decimals(tokenOutLiteral, this.provider),
+      getTokenDecimals(tokenInLiteral, this.provider, this.nativeToken),
+      getTokenDecimals(tokenOutLiteral, this.provider, this.nativeToken),
       this.getSecondaryFees(),
     ]);
 
@@ -210,14 +210,14 @@ export class Exchange {
    * Get the unsigned swap transaction given the amount to sell.
    * Includes quote details for the swap.
    *
-   * @param {string} fromAddress The public address that will sign and submit the transaction.
-   * @param {string} tokenInAddress Token address to sell.
-   * @param {string} tokenOutAddress Token address to buy.
-   * @param {ethers.BigNumberish} amountIn Amount to sell.
-   * @param {number} slippagePercent (optional) The percentage of slippage tolerance. Default = 0.1. Max = 50. Min = 0.
-   * @param {number} maxHops (optional) Maximum hops allowed in optimal route. Default is 2.
-   * @param {number} deadline (optional) Latest time swap can execute. Default is 15 minutes.
-   * @return {TransactionResponse} The result containing the unsigned transaction and details of the swap.
+   * @param {string} fromAddress The public address that will sign and submit the transaction
+   * @param {string} tokenInAddress Token address or 'native' to sell
+   * @param {string} tokenOutAddress Token address or 'native' to buy
+   * @param {ethers.BigNumberish} amountIn Amount to sell in the smallest unit of the token-in
+   * @param {number} slippagePercent (optional) The percentage of slippage tolerance. Default = 0.1. Max = 50. Min = 0
+   * @param {number} maxHops (optional) Maximum hops allowed in optimal route. Default is 2
+   * @param {number} deadline (optional) Latest time swap can execute. Default is 15 minutes
+   * @return {TransactionResponse} The result containing the unsigned transaction and details of the swap
    */
   public async getUnsignedSwapTxFromAmountIn(
     fromAddress: string,
@@ -244,14 +244,14 @@ export class Exchange {
    * Get the unsigned swap transaction given the amount to buy.
    * Includes quote details for the swap.
    *
-   * @param {string} fromAddress The public address that will sign and submit the transaction.
-   * @param {string} tokenInAddress Token address to sell.
-   * @param {string} tokenOutAddress Token address to buy.
-   * @param {ethers.BigNumberish} amountOut Amount to buy.
-   * @param {number} slippagePercent (optional) The percentage of slippage tolerance. Default = 0.1. Max = 50. Min = 0.
-   * @param {number} maxHops (optional) Maximum hops allowed in optimal route. Default is 2.
-   * @param {number} deadline (optional) Latest time swap can execute. Default is 15 minutes.
-   * @return {TransactionResponse} The result containing the unsigned transaction and details of the swap.
+   * @param {string} fromAddress The public address that will sign and submit the transaction
+   * @param {string} tokenInAddress ERC20 contract address or 'native' to sell
+   * @param {string} tokenOutAddress ERC20 contract address or 'native' to buy
+   * @param {ethers.BigNumberish} amountOut Amount to buy in the smallest unit of the token-out
+   * @param {number} slippagePercent (optional) The percentage of slippage tolerance. Default = 0.1. Max = 50. Min = 0
+   * @param {number} maxHops (optional) Maximum hops allowed in optimal route. Default is 2
+   * @param {number} deadline (optional) Latest time swap can execute. Default is 15 minutes
+   * @return {TransactionResponse} The result containing the unsigned transaction and details of the swap
    */
   public async getUnsignedSwapTxFromAmountOut(
     fromAddress: string,
