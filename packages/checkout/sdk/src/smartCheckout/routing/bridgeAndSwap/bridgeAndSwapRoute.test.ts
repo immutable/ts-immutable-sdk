@@ -203,15 +203,6 @@ describe('bridgeAndSwapRoute', () => {
     return dexQuotes;
   };
 
-  const getTestDexQuoteCache = (): Map<string, DexQuotes> => {
-    const dexQuoteCache = new Map<string, DexQuotes>([]);
-    const dexQuotes = getTestDexQuotes();
-
-    dexQuoteCache.set('0xYEET', dexQuotes);
-
-    return dexQuoteCache;
-  };
-
   it('should return bridge and swap routes', async () => {
     (fetchL1ToL2Mappings as jest.Mock).mockResolvedValue(
       [
@@ -452,7 +443,6 @@ describe('bridgeAndSwapRoute', () => {
       readonlyProviders,
       availableRoutingOptions,
       insufficientRequirement,
-      getTestDexQuoteCache(),
       ownerAddress,
       feeEstimates,
       tokenBalances,
@@ -652,7 +642,6 @@ describe('bridgeAndSwapRoute', () => {
       readonlyProviders,
       availableRoutingOptions,
       insufficientRequirement,
-      getTestDexQuoteCache(),
       ownerAddress,
       feeEstimates,
       tokenBalances,

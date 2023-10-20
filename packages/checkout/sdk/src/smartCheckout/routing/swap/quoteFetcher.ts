@@ -51,6 +51,8 @@ export const quoteFetcher = async (
       });
     });
 
+    console.log('dexQuotes', dexQuotes);
+
     return dexQuotes;
   } catch {
     return dexQuotes;

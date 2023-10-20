@@ -13,8 +13,8 @@ import {
   TokenInfo,
 } from '../../../types';
 import { BalanceCheckResult, BalanceRequirement } from '../../balanceCheck/types';
-import { DexQuoteCache, TokenBalanceResult } from '../types';
-import { getOrSetQuotesFromCache } from './dexQuoteCache';
+import { TokenBalanceResult } from '../types';
+import { quoteFetcher } from './quoteFetcher';
 
 const constructFees = (
   approvalGasFees: Amount | null | undefined,
@@ -271,7 +271,6 @@ export const checkIfUserCanCoverRequirement = (
 export const swapRoute = async (
   config: CheckoutConfiguration,
   availableRoutingOptions: AvailableRoutingOptions,
-  dexQuoteCache: DexQuoteCache,
   walletAddress: string,
   balanceRequirement: BalanceRequirement,
   tokenBalanceResults: Map<ChainId, TokenBalanceResult>,
@@ -291,9 +290,10 @@ export const swapRoute = async (
   const l2Balances = l2TokenBalanceResult.balances;
   if (l2Balances.length === 0) return fundingSteps;
 
-  const quotes = await getOrSetQuotesFromCache(
+  console.log('requiredToken', requiredToken);
+  const quotes = await quoteFetcher(
     config,
-    dexQuoteCache,
+    getL2ChainId(config),
     walletAddress,
     requiredToken,
     swappableTokens,

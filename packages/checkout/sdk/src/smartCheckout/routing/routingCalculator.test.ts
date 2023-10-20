@@ -1,7 +1,6 @@
 import { BigNumber, utils } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { JsonRpcProvider } from '@ethersproject/providers';
-import { Token } from '@imtbl/dex-sdk';
 import {
   getBridgeAndSwapFundingSteps,
   getSwapFundingSteps,
@@ -10,9 +9,6 @@ import {
 import { CheckoutConfiguration } from '../../config';
 import { getAllTokenBalances } from './tokenBalances';
 import {
-  DexQuote,
-  DexQuoteCache,
-  DexQuotes,
   TokenBalanceResult,
 } from './types';
 import { bridgeRoute } from './bridge/bridgeRoute';
@@ -50,123 +46,6 @@ jest.mock('./bridgeAndSwap/bridgeAndSwapRoute');
 
 describe('routingCalculator', () => {
   let config: CheckoutConfiguration;
-
-  const cache: DexQuoteCache = new Map<string, DexQuotes>(
-    [
-      [
-        '0xERC20_1',
-        new Map<string, DexQuote>([
-          ['0xERC20_2',
-            {
-              quote: {
-                amount: {
-                  value: BigNumber.from(1),
-                  token: {
-                    chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-                    name: 'ERC20_2',
-                    symbol: 'ERC20_2',
-                    decimals: 18,
-                    address: '0xERC20_2',
-                  } as Token,
-                },
-                amountWithMaxSlippage: {
-                  value: BigNumber.from(1),
-                  token: {} as Token,
-                },
-                slippage: 0,
-                fees: [
-                  {
-                    amount: {
-                      value: BigNumber.from(1),
-                      token: {
-                        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-                        name: 'IMX',
-                        symbol: 'IMX',
-                        decimals: 18,
-                        address: IMX_ADDRESS_ZKEVM,
-                      } as Token,
-                    },
-                    recipient: '',
-                    basisPoints: 0,
-                  },
-                ],
-              },
-              approval: {
-                value: BigNumber.from(1),
-                token: {
-                  chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-                  name: 'IMX',
-                  symbol: 'IMX',
-                  decimals: 18,
-                  address: IMX_ADDRESS_ZKEVM,
-                } as Token,
-              },
-              swap: {
-                value: BigNumber.from(1),
-                token: {} as Token,
-              },
-            },
-          ],
-        ]),
-      ],
-      [
-        '0xERC20_2',
-        new Map<string, DexQuote>([
-          ['0xERC20_1',
-            {
-              quote: {
-                amount: {
-                  value: BigNumber.from(2),
-                  token: {
-                    chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-                    name: 'ERC20_1',
-                    symbol: 'ERC20_1',
-                    decimals: 18,
-                    address: '0xERC20_1',
-                  } as Token,
-                },
-                amountWithMaxSlippage: {
-                  value: BigNumber.from(2),
-                  token: {} as Token,
-                },
-                slippage: 0,
-                fees: [
-                  {
-                    amount: {
-                      value: BigNumber.from(2),
-                      token: {
-                        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-                        name: 'IMX',
-                        symbol: 'IMX',
-                        decimals: 18,
-                        address: IMX_ADDRESS_ZKEVM,
-                      } as Token,
-                    },
-                    recipient: '',
-                    basisPoints: 0,
-                  },
-                ],
-              },
-              approval: {
-                value: BigNumber.from(2),
-                token: {
-                  chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-                  name: 'IMX',
-                  symbol: 'IMX',
-                  decimals: 18,
-                  address: IMX_ADDRESS_ZKEVM,
-                } as Token,
-              },
-              swap: {
-                value: BigNumber.from(2),
-                token: {} as Token,
-              },
-            },
-          ],
-        ]),
-      ],
-    ],
-  );
 
   const readonlyProviders = new Map<ChainId, JsonRpcProvider>([
     [ChainId.SEPOLIA, {} as JsonRpcProvider],
@@ -1341,7 +1220,6 @@ describe('routingCalculator', () => {
         config,
         { swap: true },
         balanceRequirement,
-        cache,
         '0xADDRESS',
         balances,
         [
@@ -1400,7 +1278,6 @@ describe('routingCalculator', () => {
         config,
         { swap: true },
         undefined,
-        cache,
         '0xADDRESS',
         balances,
         [
@@ -1490,7 +1367,6 @@ describe('routingCalculator', () => {
         config,
         { swap: true },
         balanceRequirement,
-        cache,
         '0xADDRESS',
         balances,
         [
@@ -1581,7 +1457,6 @@ describe('routingCalculator', () => {
         config,
         { swap: true },
         balanceRequirement,
-        cache,
         '0xADDRESS',
         balances,
         [
@@ -1671,7 +1546,6 @@ describe('routingCalculator', () => {
         config,
         { swap: true },
         balanceRequirement,
-        cache,
         '0xADDRESS',
         balances,
         [
@@ -1776,7 +1650,6 @@ describe('routingCalculator', () => {
         config,
         { swap: true },
         balanceRequirement,
-        cache,
         '0xADDRESS',
         balances,
         [],
@@ -1791,7 +1664,6 @@ describe('routingCalculator', () => {
   });
 
   describe('getBridgeAndSwapFundingSteps', () => {
-    const dexQuoteCache = {} as DexQuoteCache;
     const insufficientRequirement = {
       type: ItemType.NATIVE,
       sufficient: false,
@@ -1905,7 +1777,6 @@ describe('routingCalculator', () => {
         readonlyProviders,
         { swap: true, bridge: true },
         undefined,
-        dexQuoteCache,
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
@@ -1921,7 +1792,6 @@ describe('routingCalculator', () => {
         readonlyProviders,
         { swap: true, bridge: true },
         insufficientRequirement,
-        dexQuoteCache,
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
@@ -1945,7 +1815,6 @@ describe('routingCalculator', () => {
         readonlyProviders,
         { swap: true, bridge: true },
         insufficientRequirement,
-        dexQuoteCache,
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
@@ -1968,7 +1837,6 @@ describe('routingCalculator', () => {
         readonlyProviders,
         { swap: true, bridge: true },
         insufficientRequirement,
-        dexQuoteCache,
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
@@ -1985,7 +1853,6 @@ describe('routingCalculator', () => {
         readonlyProviders,
         { swap: true, bridge: true },
         insufficientRequirement,
-        dexQuoteCache,
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
@@ -2010,7 +1877,6 @@ describe('routingCalculator', () => {
         readonlyProviders,
         { swap: true, bridge: true },
         insufficientRequirement,
-        dexQuoteCache,
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
@@ -2034,7 +1900,6 @@ describe('routingCalculator', () => {
         readonlyProviders,
         { swap: true, bridge: true },
         insufficientRequirement,
-        dexQuoteCache,
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
@@ -2054,7 +1919,6 @@ describe('routingCalculator', () => {
         {
           type: ItemType.ERC721,
         } as BalanceERC721Requirement,
-        dexQuoteCache,
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
@@ -2121,7 +1985,6 @@ describe('routingCalculator', () => {
         readonlyProviders,
         { swap: true, bridge: true },
         insufficientRequirement,
-        dexQuoteCache,
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
@@ -2140,7 +2003,6 @@ describe('routingCalculator', () => {
         readonlyProviders,
         { bridge: true, swap: true },
         insufficientRequirement,
-        dexQuoteCache,
         '0xADDRESS',
         feeEstimates,
         tokenBalances,
