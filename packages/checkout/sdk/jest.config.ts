@@ -16,8 +16,7 @@ const config: Config = {
   transform: {
     '^.+\\.(t|j)sx?$': '@swc/jest',
   },
-  transformIgnorePatterns: [],
-  testMatch: ["**/src/balances/*.ts"]
+  transformIgnorePatterns: []
 };
 
 export default config;
