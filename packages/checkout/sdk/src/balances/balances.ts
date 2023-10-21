@@ -17,6 +17,7 @@ import { getTokenAllowList } from '../tokens';
 import { CheckoutConfiguration } from '../config';
 import {
   Blockscout,
+  BlockscoutToken,
   BlockscoutTokens,
   BlockscoutTokenType,
 } from '../client';
@@ -103,43 +104,25 @@ export const getIndexerBalance = async (
   if (!blockscoutClient || blockscoutClient.chainId !== chainId) blockscoutClient = new Blockscout({ chainId });
 
   // Hold the items in an array for post-fetching processing
-  const items = [];
+  const items: BlockscoutToken[] = [];
 
   const tokenType = BlockscoutTokenType.ERC20;
-  // Given that the widgets aren't yet designed to support pagination,
-  // fetch all the possible tokens associated to a given wallet address.
-  let resp: BlockscoutTokens | undefined;
-  try {
-    do {
-      // eslint-disable-next-line no-await-in-loop
-      resp = await blockscoutClient.getTokensByWalletAddress({
-        walletAddress,
-        tokenType,
-        nextPage: resp?.next_page_params,
-      });
-      items.push(...resp.items);
-    } while (resp.next_page_params);
-  } catch (err: any) {
-    // In case of a 404, the wallet is a new wallet that hasn't been indexed by
-    // the Blockscout just yet. This happens when a wallet hasn't had any
-    // activity on the chain. In this case, simply ignore the error and return
-    // no currencies.
-    // In case of a malformed wallet address, Blockscout returns a 422, which
-    // means we are safe to assume that a 404 is a missing wallet due to inactivity
-    // or simply an incorrect wallet address was provided.
-    if (err?.code !== HttpStatusCode.NotFound) {
-      throw new CheckoutError(
-        err.message || 'InternalServerError | getTokensByWalletAddress',
-        CheckoutErrorType.GET_INDEXER_BALANCE_ERROR,
-        err,
-      );
-    }
-  }
 
-  try {
-    const respNative = await blockscoutClient.getNativeTokenByWalletAddress({ walletAddress });
-    items.push(respNative);
-  } catch (err: any) {
+  const erc20Balances = async () => {
+    // Given that the widgets aren't yet designed to support pagination,
+    // fetch all the possible tokens associated to a given wallet address.
+    let resp: BlockscoutTokens | undefined;
+    try {
+      do {
+      // eslint-disable-next-line no-await-in-loop
+        resp = await blockscoutClient.getTokensByWalletAddress({
+          walletAddress,
+          tokenType,
+          nextPage: resp?.next_page_params,
+        });
+        items.push(...resp.items);
+      } while (resp.next_page_params);
+    } catch (err: any) {
     // In case of a 404, the wallet is a new wallet that hasn't been indexed by
     // the Blockscout just yet. This happens when a wallet hasn't had any
     // activity on the chain. In this case, simply ignore the error and return
@@ -147,14 +130,40 @@ export const getIndexerBalance = async (
     // In case of a malformed wallet address, Blockscout returns a 422, which
     // means we are safe to assume that a 404 is a missing wallet due to inactivity
     // or simply an incorrect wallet address was provided.
-    if (err?.code !== HttpStatusCode.NotFound) {
-      throw new CheckoutError(
-        err.message || 'InternalServerError | getNativeTokenByWalletAddress',
-        CheckoutErrorType.GET_INDEXER_BALANCE_ERROR,
-        err,
-      );
+      if (err?.code !== HttpStatusCode.NotFound) {
+        throw new CheckoutError(
+          err.message || 'InternalServerError | getTokensByWalletAddress',
+          CheckoutErrorType.GET_INDEXER_BALANCE_ERROR,
+          err,
+        );
+      }
     }
-  }
+  };
+
+  const nativeBalances = async () => {
+    try {
+      const respNative = await blockscoutClient.getNativeTokenByWalletAddress({ walletAddress });
+      items.push(respNative);
+    } catch (err: any) {
+      // In case of a 404, the wallet is a new wallet that hasn't been indexed by
+      // the Blockscout just yet. This happens when a wallet hasn't had any
+      // activity on the chain. In this case, simply ignore the error and return
+      // no currencies.
+      // In case of a malformed wallet address, Blockscout returns a 422, which
+      // means we are safe to assume that a 404 is a missing wallet due to inactivity
+      // or simply an incorrect wallet address was provided.
+      if (err?.code !== HttpStatusCode.NotFound) {
+        throw new CheckoutError(
+          err.message || 'InternalServerError | getNativeTokenByWalletAddress',
+          CheckoutErrorType.GET_INDEXER_BALANCE_ERROR,
+          err,
+        );
+      }
+    }
+  };
+
+  // Promise all() rather than allSettled() so that the function can fail fast.
+  await Promise.all([erc20Balances(), nativeBalances()]);
 
   return {
     balances: items.map((item) => {
