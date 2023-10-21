@@ -565,21 +565,21 @@ describe('balances', () => {
       expect(getAllBalancesResult.balances).toEqual([]);
     });
 
-    it('should call getIndexerBalance and throw error', async () => {
-      const testCases = [{
-        errorMessage: 'test',
-        expectedErrorMessage: 'test',
-      },
-      {
-        errorMessage: '',
-        expectedErrorMessage: 'InternalServerError | getTokensByWalletAddress',
-      },
-      {
-        errorMessage: undefined,
-        expectedErrorMessage: 'InternalServerError | getTokensByWalletAddress',
-      }];
+    const testCases = [{
+      errorMessage: 'test',
+      expectedErrorMessage: 'test',
+    },
+    {
+      errorMessage: '',
+      expectedErrorMessage: 'InternalServerError | getTokensByWalletAddress',
+    },
+    {
+      errorMessage: undefined,
+      expectedErrorMessage: 'InternalServerError | getTokensByWalletAddress',
+    }];
 
-      testCases.forEach(async (testCase) => {
+    testCases.forEach(async (testCase) => {
+      it('should call getIndexerBalance and throw error', async () => {
         getTokensByWalletAddressMock = jest.fn().mockRejectedValue(
           { code: HttpStatusCode.Forbidden, message: testCase.errorMessage },
         );
