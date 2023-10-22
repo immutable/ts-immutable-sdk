@@ -12,7 +12,7 @@ export default class MagicAdapter {
 
   constructor(config: PassportConfiguration) {
     this.config = config;
-    if (window) {
+    if (typeof window !== 'undefined') {
       this.magicClient = this.initMagicClient();
       this.magicClient.preload();
     }
