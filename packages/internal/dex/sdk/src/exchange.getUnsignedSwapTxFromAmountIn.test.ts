@@ -163,7 +163,32 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   });
 
   describe('with native token out', () => {
-    it.todo('should not include any amount as the value of the transaction');
+    it('should not include any amount as the value of the transaction', async () => {
+      mockRouterImplementation({
+        pools: [createPool(nativeTokenService.wrappedToken, FUN_TEST_TOKEN)],
+      });
+
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+
+      const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
+        TEST_FROM_ADDRESS,
+        FUN_TEST_TOKEN.address,
+        'native',
+        newAmountFromString('100', FUN_TEST_TOKEN).value,
+      );
+
+      expectToBeDefined(swap.transaction.data);
+      expectToBeDefined(swap.transaction.value);
+      const data = swap.transaction.data.toString();
+
+      const { swapParams } = decodeMulticallExactInputSingleWithoutFees(data);
+      expectInstanceOf(BigNumber, swapParams.amountIn);
+
+      expect(swapParams.tokenIn).toBe(FUN_TEST_TOKEN.address); // should be the token-in
+      expect(swapParams.tokenOut).toBe(WIMX_TEST_TOKEN.address); // should be the wrapped native token
+      expect(swap.transaction.value).toBe('0x00'); // should not have a value
+      expect(formatTokenAmount(swapParams.amountIn, WIMX_TEST_TOKEN)).toBe('100.0'); // amount in
+    });
 
     it('should unwrap the quoted amount', async () => {
       mockRouterImplementation({

@@ -15,7 +15,7 @@ type mapping = {
 export function Example() {
   // Instead of hard-coding these tokens, you can optionally retrieve available tokens from the user's wallet
   const TEST_IMX_TOKEN = '0x0000000000000000000000000000000000001010';
-  const ZKCATS_TOKEN = '0x12739A8f1A8035F439092D016DAE19A2874F30d2';
+  const ZKCATS_TOKEN = '0xaC953a0d7B67Fae17c87abf79f09D0f818AC66A2';
 
   const [ethereumAccount, setEthereumAccount] = useState<string | null>(null);
   const [isFetching, setIsFetching] = useState(false);
@@ -64,12 +64,10 @@ export function Example() {
 
       const txn = await exchange.getUnsignedSwapTxFromAmountIn(
         ethereumAccount,
-        'native',
+        inputToken,
         outputToken,
         ethers.utils.parseEther(`${inputAmount}`),
       );
-
-      console.log(txn.swap.transaction.value);
 
       setResult(txn);
 
