@@ -108,14 +108,15 @@ describe('PassportImxProvider', () => {
   });
 
   describe('isRegisteredOnchain', () => {
-    it('should throw error', async () => {
-      expect(passportImxProvider.isRegisteredOnchain)
-        .toThrow(
-          new PassportError(
-            'Operation not supported',
-            PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR,
-          ),
-        );
+    it('should return true when a user is registered', async () => {
+      const isLoggedIn = await passportImxProvider.isRegisteredOnchain();
+      expect(isLoggedIn).toEqual(true);
+    });
+
+    it('should return false when a user is not registered', async () => {
+      mockAuthManager.getUser.mockResolvedValue({});
+      const isLoggedIn = await passportImxProvider.isRegisteredOnchain();
+      expect(isLoggedIn).toEqual(false);
     });
   });
 
@@ -356,7 +357,7 @@ describe('PassportImxProvider', () => {
 
         mockAuthManager.login.mockResolvedValue(mockUser);
         magicAdapterMock.login.mockResolvedValue(magicProviderMock);
-        mockAuthManager.loginSilent.mockResolvedValue(mockUserImx);
+        mockAuthManager.loginSilent.mockResolvedValue({ ...mockUser, imx: { ethAddress: '', starkAddress: '', userAdminAddress: '' } });
 
         await passportImxProvider.registerOffchain();
 

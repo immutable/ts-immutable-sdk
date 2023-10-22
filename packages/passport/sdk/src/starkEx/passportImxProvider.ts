@@ -21,19 +21,18 @@ import {
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 import { IMXProvider } from '@imtbl/provider';
 import AuthManager from 'authManager';
-import registerPassportStarkEx from './workflows/registration';
-import { retryWithDelay } from '../network/retry';
 import GuardianClient from '../guardian/guardian';
 import {
   PassportEventMap, PassportEvents, UserImx, User,
 } from '../types';
-import { PassportError, PassportErrorType, withPassportError } from '../errors/passportError';
+import { PassportError, PassportErrorType } from '../errors/passportError';
 import {
   batchNftTransfer, cancelOrder, createOrder, createTrade, exchangeTransfer, transfer,
 } from './workflows';
 import { ConfirmationScreen } from '../confirmation';
 import { PassportConfiguration } from '../config';
 import TypedEventEmitter from '../typedEventEmitter';
+import registerStarkEx from './workflows/registerStarkEx';
 
 export interface PassportImxProviderInput {
   authManager: AuthManager;
@@ -88,7 +87,7 @@ export class PassportImxProvider implements IMXProvider {
     this.ethSigner = undefined;
   };
 
-  protected async getAuthenticatedUserSigner(): Promise<AuthenticatedUserSigner> {
+  protected async checkIsLoggedIn() {
     const user = await this.authManager.getUser();
     if (!user || this.starkSigner === undefined || this.ethSigner === undefined) {
       throw new PassportError(
@@ -96,6 +95,21 @@ export class PassportImxProvider implements IMXProvider {
         PassportErrorType.NOT_LOGGED_IN_ERROR,
       );
     }
+  }
+
+  protected async checkUserAndSignersDefined() {
+    const user = await this.authManager.getUser();
+    if (!user || this.starkSigner === undefined || this.ethSigner === undefined) {
+      throw new PassportError(
+        'User has been logged out',
+        PassportErrorType.NOT_LOGGED_IN_ERROR,
+      );
+    }
+    return { user, starkSigner: this.starkSigner, ethSigner: this.ethSigner };
+  }
+
+  protected async getAuthenticatedUserSigner(): Promise<AuthenticatedUserSigner> {
+    const { user, starkSigner, ethSigner } = await this.checkUserAndSignersDefined();
     const isUserImx = (oidcUser: User | null): oidcUser is UserImx => oidcUser?.imx !== undefined;
 
     if (!isUserImx(user)) {
@@ -105,7 +119,7 @@ export class PassportImxProvider implements IMXProvider {
       );
     }
 
-    return { user, starkSigner: this.starkSigner, ethSigner: this.ethSigner };
+    return { user, starkSigner, ethSigner };
   }
 
   async transfer(request: UnsignedTransferRequest): Promise<CreateTransferResponseV1> {
@@ -120,43 +134,25 @@ export class PassportImxProvider implements IMXProvider {
     });
   }
 
-  private async registerStarkEx(userAdminKeySigner: EthSigner, starkSigner: StarkSigner, jwt: string) {
-    return withPassportError<RegisterUserResponse>(async () => {
-      const registerResponse = await registerPassportStarkEx(
-        {
-          ethSigner: userAdminKeySigner,
-          starkSigner,
-          usersApi: this.immutableXClient.usersApi,
-        },
-        jwt,
-      );
-
-      // User metadata is updated asynchronously. Poll userinfo endpoint until it is updated.
-      await retryWithDelay<User | null>(async () => {
-        const user = await this.authManager.loginSilent({ forceRefresh: true }); // force refresh to get updated user info
-        const metadataExists = !!user?.imx;
-        if (metadataExists) {
-          return user;
-        }
-        return Promise.reject(new Error('user wallet addresses not exist'));
-      });
-
-      return registerResponse;
-    }, PassportErrorType.REFRESH_TOKEN_ERROR);
-  }
-
   async registerOffchain(): Promise<RegisterUserResponse> {
-    const { ethSigner, starkSigner, user } = await this.getAuthenticatedUserSigner();
-    return await this.registerStarkEx(ethSigner, starkSigner, user.accessToken);
+    const { user, ethSigner, starkSigner } = await this.checkUserAndSignersDefined();
+    return await registerStarkEx(
+      ethSigner,
+      starkSigner,
+      user.accessToken,
+      this.authManager,
+      this.immutableXClient.usersApi,
+    );
   }
 
-  // TODO: Remove once implemented
-  // eslint-disable-next-line class-methods-use-this
-  isRegisteredOnchain(): Promise<boolean> {
-    throw new PassportError(
-      'Operation not supported',
-      PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR,
-    );
+  async isRegisteredOnchain(): Promise<boolean> {
+    try {
+      const { user } = await this.getAuthenticatedUserSigner();
+      const { ethAddress, starkAddress, userAdminAddress } = user.imx;
+      return !!(ethAddress && starkAddress && userAdminAddress);
+    } catch (err) {
+      return false;
+    }
   }
 
   async createOrder(request: UnsignedOrderRequest): Promise<CreateOrderResponse> {

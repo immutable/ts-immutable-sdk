@@ -18,7 +18,7 @@ function ImxWorkflow() {
   const [showTransfer, setShowTransfer] = useState<boolean>(false);
   const [showOrder, setShowOrder] = useState<boolean>(false);
 
-  const { addMessage, isLoading } = useStatusProvider();
+  const { addMessage, isLoading, setIsLoading } = useStatusProvider();
   const { connectImx, connectImxSilent, imxProvider } = usePassportProvider();
 
   const getAddress = useCallback(async () => {
@@ -27,7 +27,16 @@ function ImxWorkflow() {
   }, [addMessage, imxProvider]);
 
   const registerUser = async () => {
-    await imxProvider?.registerOffchain();
+    const result = await imxProvider?.registerOffchain();
+    // try {
+    //  setIsLoading(true);
+    //  const result = await imxProvider?.registerOffchain();
+    //  addMessage('Register off chain', result);
+    // } catch (err) {
+    //  addMessage('Error egistering off chain', err);
+    // } finally {
+    //  setIsLoading(false);
+    // }
   };
 
   const handleBulkTransfer = () => {
