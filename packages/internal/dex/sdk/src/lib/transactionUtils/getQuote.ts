@@ -2,29 +2,50 @@ import { TradeType } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
 import { Fees } from 'lib/fees';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
-import { NativeTokenService } from 'lib/nativeTokenService';
+import { NativeTokenService, canUnwrapToken } from 'lib/nativeTokenService';
+import { newAmount } from 'lib/utils';
 import { Coin, CoinAmount, ERC20 } from 'types';
 import { slippageToFraction } from './slippage';
 
-export function getQuoteAmountFromTradeType(tradeInfo: QuoteResult): CoinAmount<ERC20> {
-  if (tradeInfo.tradeType === TradeType.EXACT_INPUT) {
-    return tradeInfo.amountOut;
+export function getQuoteAmountFromTradeType(routerQuote: QuoteResult): CoinAmount<ERC20> {
+  if (routerQuote.tradeType === TradeType.EXACT_INPUT) {
+    return routerQuote.amountOut;
   }
 
-  return tradeInfo.amountIn;
+  return routerQuote.amountIn;
 }
 
-export function applySlippage(
-  tradeType: TradeType,
-  amount: ethers.BigNumber,
-  slippage: number,
-): ethers.BigNumber {
+export function applySlippage(tradeType: TradeType, amount: ethers.BigNumber, slippage: number): ethers.BigNumber {
   const slippageTolerance = slippageToFraction(slippage);
   const slippagePlusOne = slippageTolerance.add(1);
   const maybeInverted = tradeType === TradeType.EXACT_INPUT ? slippagePlusOne.invert() : slippagePlusOne;
   const amountWithSlippage = maybeInverted.multiply(amount.toString()).quotient;
   return ethers.BigNumber.from(amountWithSlippage.toString());
 }
+
+export const prepareUserQuote = (
+  nativeTokenService: NativeTokenService,
+  routerQuote: QuoteResult,
+  slippage: number,
+  tokenOfQuotedAmount: Coin,
+) => {
+  const erc20QuoteAmount = getQuoteAmountFromTradeType(routerQuote);
+
+  // If the quote amount is the native token, we need to unwrap it if the user originally specified the native token
+  const quotedAmount = canUnwrapToken(tokenOfQuotedAmount)
+    ? nativeTokenService.unwrapAmount(erc20QuoteAmount)
+    : erc20QuoteAmount;
+
+  const quotedAmountWithMaxSlippage = newAmount(
+    applySlippage(routerQuote.tradeType, quotedAmount.value, slippage),
+    tokenOfQuotedAmount,
+  );
+
+  return {
+    quotedAmount,
+    quotedAmountWithMaxSlippage,
+  };
+};
 
 export function getOurQuoteReqAmount(
   amountSpecified: CoinAmount<Coin>, // the amount specified by the user, either exactIn or exactOut
