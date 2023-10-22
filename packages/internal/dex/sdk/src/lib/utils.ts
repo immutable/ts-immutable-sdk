@@ -27,11 +27,16 @@ export function poolEquals(poolA: Pool, poolB: Pool): boolean {
   );
 }
 
-export async function getERC20Decimals(
+export const decimalsFunctionSig = ethers.utils.id('decimals()').substring(0, 10);
+
+export async function getTokenDecimals(
   tokenAddress: string,
   provider: ethers.providers.JsonRpcProvider,
+  nativeToken: Coin,
 ): Promise<number> {
-  const decimalsFunctionSig = ethers.utils.id('decimals()').substring(0, 10);
+  if (tokenAddress === 'native') {
+    return nativeToken.decimals;
+  }
 
   try {
     const decimalsResult = await provider.call({
@@ -61,6 +66,9 @@ export function isValidNonZeroAddress(address: string): boolean {
     return false;
   }
 }
+
+export const isValidTokenLiteral = (address: string): boolean =>
+  address === 'native' ? true : isValidNonZeroAddress(address);
 
 export const erc20ToUniswapToken = (token: ERC20): Uniswap.Token =>
   // eslint-disable-next-line implicit-arrow-linebreak

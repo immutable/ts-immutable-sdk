@@ -260,7 +260,8 @@ describe('prepareApproval', () => {
         },
         secondaryFees,
       );
-      expect(approval.amount).toEqual(amountSpecified);
+      expect(approval).not.toBeNull();
+      expect(approval?.amount).toEqual(amountSpecified);
     });
   });
 
@@ -279,7 +280,8 @@ describe('prepareApproval', () => {
         },
         secondaryFees,
       );
-      expect(approval.amount).toEqual(amountWithSlippage);
+      expect(approval).not.toBeNull();
+      expect(approval?.amount).toEqual(amountWithSlippage);
     });
   });
 
@@ -298,7 +300,8 @@ describe('prepareApproval', () => {
         },
         secondaryFees,
       );
-      expect(approval.spender).toEqual(TEST_SECONDARY_FEE_ADDRESS);
+      expect(approval).not.toBeNull();
+      expect(approval?.spender).toEqual(TEST_SECONDARY_FEE_ADDRESS);
     });
   });
 
@@ -317,7 +320,8 @@ describe('prepareApproval', () => {
         },
         secondaryFees,
       );
-      expect(approval.spender).toEqual(TEST_PERIPHERY_ROUTER_ADDRESS);
+      expect(approval).not.toBeNull();
+      expect(approval?.spender).toEqual(TEST_PERIPHERY_ROUTER_ADDRESS);
     });
   });
 });
