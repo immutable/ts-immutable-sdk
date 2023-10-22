@@ -379,9 +379,6 @@ export function mockRouterImplementation(params: MockParams) {
       const tokenIn = tradeType === TradeType.EXACT_INPUT ? amountSpecified.token : otherToken;
       const tokenOut = tradeType === TradeType.EXACT_OUTPUT ? amountSpecified.token : otherToken;
 
-      console.log({ tokenIn });
-      console.log({ tokenOut });
-
       const route = new Route(params.pools, erc20ToUniswapToken(tokenIn), erc20ToUniswapToken(tokenOut));
 
       const amountIn =
