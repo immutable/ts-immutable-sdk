@@ -3,6 +3,7 @@ import { BigNumber, Contract, utils } from 'ethers';
 import { HttpStatusCode } from 'axios';
 import {
   ChainId,
+  DEFAULT_TOKEN_DECIMALS,
   ERC20ABI,
   GetAllBalancesResult,
   GetBalanceResult,
@@ -14,7 +15,7 @@ import {
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 import { getNetworkInfo } from '../network';
 import { getTokenAllowList } from '../tokens';
-import { CheckoutConfiguration } from '../config';
+import { CheckoutConfiguration, getL1ChainId } from '../config';
 import {
   Blockscout,
   BlockscoutTokens,
@@ -87,20 +88,29 @@ export async function getERC20Balance(
   );
 }
 
-// Blockscout client singleton
-let blockscoutClient: Blockscout;
+// Blockscout client singleton per chain id
+const blockscoutClientMap: Map<ChainId, Blockscout> = new Map();
+
+// This function is a utility function that can be used to reset the
+// blockscout map and therefore clear all the cache.
+export const resetBlockscoutClientMap = () => blockscoutClientMap.clear();
 
 export const getIndexerBalance = async (
   walletAddress: string,
   chainId: ChainId,
-  rename: TokenInfo[],
+  filterTokens: TokenInfo[],
 ): Promise<GetAllBalancesResult> => {
   // Shuffle the mapping of the tokens configuration so it is a hashmap
   // for faster access to tokens config objects.
-  const mapRename = Object.assign({}, ...(rename.map((t) => ({ [t.address || '']: t }))));
+  const shouldFilter = filterTokens.length > 0;
+  const mapFilterTokens = Object.assign({}, ...(filterTokens.map((t) => ({ [t.address || '']: t }))));
 
-  // Ensure singleton is present and match the selected chain
-  if (!blockscoutClient || blockscoutClient.chainId !== chainId) blockscoutClient = new Blockscout({ chainId });
+  // Get blockscout client for the given chain
+  let blockscoutClient = blockscoutClientMap.get(chainId);
+  if (!blockscoutClient) {
+    blockscoutClient = new Blockscout({ chainId });
+    blockscoutClientMap.set(chainId, blockscoutClient);
+  }
 
   // Hold the items in an array for post-fetching processing
   const items = [];
@@ -156,25 +166,28 @@ export const getIndexerBalance = async (
     }
   }
 
-  return {
-    balances: items.map((item) => {
-      const tokenData = item.token || {};
+  const balances: GetBalanceResult[] = [];
+  items.forEach((item) => {
+    if (shouldFilter && !mapFilterTokens[item.token.address]) return;
 
-      const balance = BigNumber.from(item.value);
+    const tokenData = item.token || {};
 
-      const renamed = (mapRename[tokenData.address] || {}) as TokenInfo;
-      const token = {
-        ...tokenData,
-        name: renamed.name ?? tokenData.name,
-        symbol: renamed.symbol ?? tokenData.symbol,
-        decimals: parseInt(tokenData.decimals, 10),
-      };
+    const balance = BigNumber.from(item.value);
 
-      const formattedBalance = utils.formatUnits(item.value, token.decimals);
+    let decimals = parseInt(tokenData.decimals, 10);
+    if (Number.isNaN(decimals)) decimals = DEFAULT_TOKEN_DECIMALS;
 
-      return { balance, formattedBalance, token } as GetBalanceResult;
-    }),
-  };
+    const token = {
+      ...tokenData,
+      decimals,
+    };
+
+    const formattedBalance = utils.formatUnits(item.value, token.decimals);
+
+    balances.push({ balance, formattedBalance, token } as GetBalanceResult);
+  });
+
+  return { balances };
 };
 
 export const getBalances = async (
@@ -233,7 +246,13 @@ export const getAllBalances = async (
   }
 
   if (flag && Blockscout.isChainSupported(chainId)) {
-    return await getIndexerBalance(walletAddress, chainId, tokens);
+    // This is a hack because the widgets are still using the tokens symbol
+    // to drive the conversions. If we remove all the token symbols from e.g. zkevm
+    // then we would not have fiat conversions.
+    // Please remove this hack once https://immutable.atlassian.net/browse/WT-1710
+    // is done.
+    const isL1Chain = getL1ChainId(config) === chainId;
+    return await getIndexerBalance(walletAddress, chainId, isL1Chain ? tokens : []);
   }
 
   // This fallback to use ERC20s calls which is a best effort solution

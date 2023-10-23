@@ -7,6 +7,7 @@ import {
   getBalance,
   getBalances,
   getERC20Balance,
+  resetBlockscoutClientMap,
 } from './balances';
 import {
   BLOCKSCOUT_CHAIN_URL_MAP,
@@ -218,6 +219,7 @@ describe('balances', () => {
 
     beforeEach(() => {
       jest.restoreAllMocks();
+      resetBlockscoutClientMap();
       getTokenAllowListMock = jest.fn().mockReturnValue({
         tokens: [
           {
