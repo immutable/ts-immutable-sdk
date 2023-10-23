@@ -118,14 +118,14 @@ export const getIndexerBalance = async (
 
   const tokenType = BlockscoutTokenType.ERC20;
 
-  const erc20Balances = async () => {
+  const erc20Balances = async (client: Blockscout) => {
     // Given that the widgets aren't yet designed to support pagination,
     // fetch all the possible tokens associated to a given wallet address.
     let resp: BlockscoutTokens | undefined;
     try {
       do {
       // eslint-disable-next-line no-await-in-loop
-        resp = await blockscoutClient.getTokensByWalletAddress({
+        resp = await client.getTokensByWalletAddress({
           walletAddress,
           tokenType,
           nextPage: resp?.next_page_params,
@@ -150,9 +150,9 @@ export const getIndexerBalance = async (
     }
   };
 
-  const nativeBalances = async () => {
+  const nativeBalances = async (client: Blockscout) => {
     try {
-      const respNative = await blockscoutClient.getNativeTokenByWalletAddress({ walletAddress });
+      const respNative = await client.getNativeTokenByWalletAddress({ walletAddress });
       items.push(respNative);
     } catch (err: any) {
       // In case of a 404, the wallet is a new wallet that hasn't been indexed by
@@ -173,7 +173,10 @@ export const getIndexerBalance = async (
   };
 
   // Promise all() rather than allSettled() so that the function can fail fast.
-  await Promise.all([erc20Balances(), nativeBalances()]);
+  await Promise.all([
+    erc20Balances(blockscoutClient),
+    nativeBalances(blockscoutClient),
+  ]);
 
   const balances: GetBalanceResult[] = [];
   items.forEach((item) => {
