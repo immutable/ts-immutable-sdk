@@ -1,9 +1,8 @@
-import { Environment } from '@imtbl/config';
 import { CheckoutConfiguration } from '../config';
 
 export const debugLogger = (config: CheckoutConfiguration, debugString: string, seconds: number) => {
   // eslint-disable-next-line no-console
-  if (config.environment === Environment.SANDBOX) console.debug(debugString, seconds);
+  if (!config.isProduction) console.debug(debugString, seconds);
 };
 
 export const measureAsyncExecution = async <T> (

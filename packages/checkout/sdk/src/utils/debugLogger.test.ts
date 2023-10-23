@@ -1,10 +1,9 @@
-import { Environment } from '@imtbl/config';
 import { debugLogger, measureAsyncExecution } from './debugLogger';
 import { CheckoutConfiguration } from '../config';
 
 describe('debugLogger', () => {
   it('should call underlying function and return result of the promise', async () => {
-    const testCheckoutConfig = { environment: Environment.SANDBOX } as CheckoutConfiguration;
+    const testCheckoutConfig = { isProduction: false } as CheckoutConfiguration;
     const debugString = 'Test Debug String';
     const mockResult = 'Mock Result';
     const mockPromise = new Promise<string>((resolve) => {
@@ -14,8 +13,8 @@ describe('debugLogger', () => {
     expect(result).toEqual(mockResult);
   });
 
-  it('should call console.debug in SANDBOX environment', () => {
-    const testCheckoutConfig = { environment: Environment.SANDBOX } as CheckoutConfiguration;
+  it('should call console.debug if production false', () => {
+    const testCheckoutConfig = { isProduction: false } as CheckoutConfiguration;
     const consoleDebugSpy = jest.spyOn(console, 'debug').mockImplementation();
     const debugString = 'Test Debug String';
     debugLogger(testCheckoutConfig, debugString, 1);
@@ -23,8 +22,8 @@ describe('debugLogger', () => {
     consoleDebugSpy.mockRestore();
   });
 
-  it('should not call console.debug in PRODUCTION environment', () => {
-    const testCheckoutConfig = { environment: Environment.PRODUCTION } as CheckoutConfiguration;
+  it('should not call console.debug if production', () => {
+    const testCheckoutConfig = { isProduction: true } as CheckoutConfiguration;
     const consoleDebugSpy = jest.spyOn(console, 'debug').mockImplementation();
     const debugString = 'Test Debug String';
     debugLogger(testCheckoutConfig, debugString, 1);
