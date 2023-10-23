@@ -219,20 +219,11 @@ function createSwapParameters(
   };
 }
 
-const getTransactionValue = (amountSpecified: CoinAmount<Coin>, tradeType: TradeType, maximumAmountIn: string) => {
-  if (canUnwrapToken(amountSpecified.token)) {
-    // The user specified native as the input token
-    return tradeType === TradeType.EXACT_INPUT
-      ? amountSpecified.value.toHexString() // trade is exact input, so use the user-specified amount
-      : maximumAmountIn; // trade is exact output so use the max slippage amount
-  }
-
-  // The user did not specify native as the input token
-  return zeroNativeCurrencyValue;
-};
+const getTransactionValue = (tokenIn: Coin, maximumAmountIn: string) =>
+  tokenIn.type === 'native' ? maximumAmountIn : zeroNativeCurrencyValue;
 
 export function getSwap(
-  amountSpecified: CoinAmount<Coin>,
+  tokenIn: Coin,
   adjustedQuote: QuoteResult,
   fromAddress: string,
   slippage: number,
@@ -254,7 +245,7 @@ export function getSwap(
   // TODO: Add additional gas fee estimates for secondary fees
   const gasFeeEstimate = gasPrice ? calculateGasFee(gasPrice, adjustedQuote.gasEstimate) : null;
 
-  const transactionValue = getTransactionValue(amountSpecified, adjustedQuote.tradeType, maximumAmountIn);
+  const transactionValue = getTransactionValue(tokenIn, maximumAmountIn);
 
   return {
     transaction: {

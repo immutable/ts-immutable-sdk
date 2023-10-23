@@ -168,7 +168,7 @@ export class Exchange {
     const adjustedQuote = adjustQuoteWithFees(ourQuote, amountSpecified, fees, this.nativeTokenService);
 
     const swap = getSwap(
-      amountSpecified,
+      tokenIn,
       adjustedQuote,
       fromAddress,
       slippagePercent,

@@ -16,43 +16,53 @@ import {
   nativeTokenService,
   NATIVE_TEST_TOKEN,
   expectERC20,
+  WIMX_TEST_TOKEN,
+  formatEther,
 } from 'test/utils';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import { Fees } from 'lib/fees';
-import { erc20ToUniswapToken, newAmount, uniswapTokenToERC20 } from 'lib';
+import { erc20ToUniswapToken, newAmount } from 'lib';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
-import { Coin } from 'types';
+import { Coin, ERC20 } from 'types';
 import { getSwap, adjustQuoteWithFees } from './swap';
 
-const UNISWAP_IMX = erc20ToUniswapToken(IMX_TEST_TOKEN);
-const UNISWAP_FUN = erc20ToUniswapToken(FUN_TEST_TOKEN);
-
-const testPool = new Pool(UNISWAP_IMX, UNISWAP_FUN, 10000, '79625275426524748796330556128', '10000000000000000', 100);
-
-const route = new Route([testPool], UNISWAP_IMX, UNISWAP_FUN);
 const gasEstimate = BigNumber.from(0);
-const exactInputAmountIn = newAmountFromString('99', uniswapTokenToERC20(route.input));
-const exactOutputAmountIn = newAmountFromString('100', uniswapTokenToERC20(route.input));
+const slippagePercentage = 3;
+const deadline = 0;
+
+const buildRoute = (tokenIn: ERC20, tokenOut: ERC20) => {
+  const uniswapTokenIn = erc20ToUniswapToken(tokenIn);
+  const uniswapTokenOut = erc20ToUniswapToken(tokenOut);
+  const pool = new Pool(
+    uniswapTokenIn,
+    uniswapTokenOut,
+    10000,
+    '79625275426524748796330556128',
+    '10000000000000000',
+    100,
+  );
+  return new Route([pool], uniswapTokenIn, uniswapTokenOut);
+};
+
+const buildExactInputQuote = (tokenIn = IMX_TEST_TOKEN, tokenOut = FUN_TEST_TOKEN): QuoteResult => ({
+  gasEstimate,
+  route: buildRoute(tokenIn, tokenOut),
+  amountIn: newAmountFromString('99', tokenIn),
+  amountOut: newAmountFromString('990', tokenOut),
+  tradeType: TradeType.EXACT_INPUT,
+});
+
+const buildExactOutputQuote = (tokenIn = IMX_TEST_TOKEN, tokenOut = FUN_TEST_TOKEN): QuoteResult => ({
+  gasEstimate,
+  route: buildRoute(tokenIn, tokenOut),
+  amountIn: newAmountFromString('100', tokenIn),
+  amountOut: newAmountFromString('1000', tokenOut),
+  tradeType: TradeType.EXACT_OUTPUT,
+});
 
 const tenPercentFees = (tokenIn: Coin): Fees =>
   // eslint-disable-next-line implicit-arrow-linebreak
   new Fees([{ recipient: TEST_FEE_RECIPIENT, basisPoints: 1000 }], tokenIn);
-
-const buildExactInputQuote = (): QuoteResult => ({
-  gasEstimate,
-  route,
-  amountIn: exactInputAmountIn,
-  amountOut: newAmountFromString('990', uniswapTokenToERC20(route.output)),
-  tradeType: TradeType.EXACT_INPUT,
-});
-
-const buildExactOutputQuote = (): QuoteResult => ({
-  gasEstimate,
-  route,
-  amountIn: exactOutputAmountIn,
-  amountOut: newAmountFromString('1000', uniswapTokenToERC20(route.output)),
-  tradeType: TradeType.EXACT_OUTPUT,
-});
 
 describe('getSwap', () => {
   describe('without fees', () => {
@@ -61,11 +71,11 @@ describe('getSwap', () => {
       quote.amountOut.value = utils.parseEther('990');
 
       const swap = getSwap(
-        exactInputAmountIn,
+        quote.amountIn.token,
         quote,
         makeAddr('fromAddress'),
-        3,
-        0,
+        slippagePercentage,
+        deadline,
         makeAddr('periphery'),
         makeAddr('secondaryFeeContract'),
         newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
@@ -84,11 +94,11 @@ describe('getSwap', () => {
       quote.amountIn.value = utils.parseEther('100');
 
       const swap = getSwap(
-        exactOutputAmountIn,
+        quote.amountIn.token,
         quote,
         makeAddr('fromAddress'),
-        3,
-        0,
+        slippagePercentage,
+        deadline,
         makeAddr('periphery'),
         makeAddr('secondaryFeeContract'),
         newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
@@ -109,11 +119,11 @@ describe('getSwap', () => {
       quote.amountOut.value = utils.parseEther('990');
 
       const swap = getSwap(
-        exactInputAmountIn,
+        quote.amountIn.token,
         quote,
         makeAddr('fromAddress'),
-        3,
-        0,
+        slippagePercentage,
+        deadline,
         makeAddr('periphery'),
         makeAddr('secondaryFeeContract'),
         newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
@@ -132,11 +142,11 @@ describe('getSwap', () => {
       quote.amountIn.value = utils.parseEther('100');
 
       const swap = getSwap(
-        exactOutputAmountIn,
+        quote.amountIn.token,
         quote,
         makeAddr('fromAddress'),
-        3,
-        0,
+        slippagePercentage,
+        deadline,
         makeAddr('periphery'),
         makeAddr('secondaryFeeContract'),
         newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
@@ -148,6 +158,92 @@ describe('getSwap', () => {
 
       expectInstanceOf(BigNumber, swapParams.amountInMaximum);
       expect(utils.formatEther(swapParams.amountInMaximum)).toEqual('103.0');
+    });
+  });
+
+  describe('with EXACT_INPUT + native amount in', () => {
+    it('uses the amountSpecified as the transaction value', () => {
+      const originalTokenIn = nativeTokenService.nativeToken;
+      const quote = buildExactInputQuote(nativeTokenService.wrappedToken, FUN_TEST_TOKEN);
+      quote.amountIn.value = utils.parseEther('99');
+
+      const swap = getSwap(
+        originalTokenIn,
+        quote,
+        makeAddr('fromAddress'),
+        slippagePercentage,
+        deadline,
+        makeAddr('periphery'),
+        makeAddr('secondaryFeeContract'),
+        newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
+        [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
+      );
+
+      expect(formatEther(BigNumber.from(swap.transaction.value))).toEqual('99.0');
+    });
+  });
+
+  describe('with EXACT_INPUT + native amount out', () => {
+    it('sets a transaction value of zero', () => {
+      const originalTokenIn = FUN_TEST_TOKEN;
+      const quote = buildExactInputQuote(FUN_TEST_TOKEN, nativeTokenService.wrappedToken);
+
+      const swap = getSwap(
+        originalTokenIn,
+        quote,
+        makeAddr('fromAddress'),
+        slippagePercentage,
+        deadline,
+        makeAddr('periphery'),
+        makeAddr('secondaryFeeContract'),
+        newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
+        [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
+      );
+
+      expect(swap.transaction.value).toEqual('0x00');
+    });
+  });
+
+  describe('with EXACT_OUTPUT + native amount in', () => {
+    it('sets the transaction value to the max amount in including slippage', () => {
+      const originalTokenIn = nativeTokenService.nativeToken;
+      const quote = buildExactOutputQuote(nativeTokenService.wrappedToken, FUN_TEST_TOKEN);
+      quote.amountIn.value = utils.parseEther('100');
+
+      const swap = getSwap(
+        originalTokenIn,
+        quote,
+        makeAddr('fromAddress'),
+        slippagePercentage,
+        deadline,
+        makeAddr('periphery'),
+        makeAddr('secondaryFeeContract'),
+        newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
+        [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
+      );
+
+      expect(formatEther(BigNumber.from(swap.transaction.value))).toEqual('103.0');
+    });
+  });
+
+  describe('with EXACT_OUTPUT + native amount out', () => {
+    it('sets a transaction value of zero', () => {
+      const originalTokenIn = FUN_TEST_TOKEN;
+      const quote = buildExactOutputQuote(FUN_TEST_TOKEN, nativeTokenService.wrappedToken);
+
+      const swap = getSwap(
+        originalTokenIn,
+        quote,
+        makeAddr('fromAddress'),
+        slippagePercentage,
+        deadline,
+        makeAddr('periphery'),
+        makeAddr('secondaryFeeContract'),
+        newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
+        [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
+      );
+
+      expect(swap.transaction.value).toEqual('0x00');
     });
   });
 });
@@ -203,7 +299,7 @@ describe('adjustQuoteWithFees', () => {
       it('wraps it and uses it as the amountIn', () => {
         const quote: QuoteResult = {
           gasEstimate,
-          route,
+          route: buildRoute(WIMX_TEST_TOKEN, FUN_TEST_TOKEN),
           amountIn: newAmountFromString('9', nativeTokenService.wrappedToken), // has been wrapped
           amountOut: newAmountFromString('1', FUN_TEST_TOKEN),
           tradeType: TradeType.EXACT_INPUT,
@@ -277,7 +373,7 @@ describe('adjustQuoteWithFees', () => {
       it('applies fees to the amountIn', () => {
         const quote: QuoteResult = {
           gasEstimate,
-          route,
+          route: buildRoute(WIMX_TEST_TOKEN, FUN_TEST_TOKEN),
           amountIn: newAmountFromString('10', nativeTokenService.wrappedToken), // has been wrapped
           amountOut: newAmountFromString('1', FUN_TEST_TOKEN),
           tradeType: TradeType.EXACT_OUTPUT,
