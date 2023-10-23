@@ -289,8 +289,8 @@ export const useSignOrder = (input: SignOrderInput) => {
       });
       return [];
     }
+    let successful = true;
     const execTransactions: ExecutedTransaction[] = [];
-    let failed = false;
     for (const transaction of signData.transactions) {
       const {
         contractAddress: to,
@@ -302,14 +302,14 @@ export const useSignOrder = (input: SignOrderInput) => {
       const hash = await sendTransaction(to, data, 2 * gasEstimate, method);
 
       if (!hash) {
-        failed = true;
+        successful = false;
         break;
       }
 
       execTransactions.push({ method, hash });
     }
 
-    if (!failed) {
+    if (successful) {
       setExecuteDone();
     }
     return execTransactions;
