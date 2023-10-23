@@ -233,7 +233,7 @@ export const routingCalculator = async (
     availableRoutingOptions,
   );
 
-  // Bridge and swap fee cache
+  // Fee estimate cache
   const feeEstimates = new Map<FundingStepType, FundingRouteFeeEstimate>();
 
   // Ensures only 1 balance requirement is insufficient
