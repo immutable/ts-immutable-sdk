@@ -198,6 +198,8 @@ function createSwapParameters(
     deadlineOrPreviousBlockhash: deadline,
   };
 
+  // If the trade type is EXACT_INPUT, then the maximum amount-in is the user-specified amount (no slippage applied)
+  // https://github.com/Uniswap/v3-sdk/blob/81d66099f07d1ec350767f497ef73222575fe032/src/entities/trade.ts#L456
   const maximumAmountIn = toHex(uncheckedTrade.maximumAmountIn(options.slippageTolerance).quotient);
   const minimumAmountOut = toHex(uncheckedTrade.minimumAmountOut(options.slippageTolerance).quotient);
 

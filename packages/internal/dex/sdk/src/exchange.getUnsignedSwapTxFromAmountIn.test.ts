@@ -162,7 +162,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
     });
   });
 
-  describe('with native token out', () => {
+  describe('with a native token out', () => {
     it('should not include any amount as the value of the transaction', async () => {
       mockRouterImplementation({
         pools: [createPool(nativeTokenService.wrappedToken, FUN_TEST_TOKEN)],
