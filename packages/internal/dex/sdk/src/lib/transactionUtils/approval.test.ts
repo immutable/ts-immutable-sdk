@@ -3,14 +3,14 @@ import { BigNumber } from '@ethersproject/bignumber';
 import {
   expectToBeDefined,
   newAmountFromString,
-  TEST_FROM_ADDRESS, TEST_PERIPHERY_ROUTER_ADDRESS, TEST_ROUTING_CONTRACTS, WETH_TEST_TOKEN,
+  TEST_FROM_ADDRESS, TEST_PERIPHERY_ROUTER_ADDRESS, TEST_SECONDARY_FEE_ADDRESS, WETH_TEST_TOKEN,
 } from 'test/utils';
 import { Contract } from '@ethersproject/contracts';
 import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
 import { ApproveError } from 'errors';
 import { ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
-import { SecondaryFee } from 'lib';
+import { SecondaryFee } from 'types';
 import { getApproveGasEstimate, getApproveTransaction, prepareApproval } from './approval';
 
 jest.mock('@ethersproject/providers');
@@ -254,10 +254,14 @@ describe('prepareApproval', () => {
         TradeType.EXACT_INPUT,
         amountSpecified,
         amountWithSlippage,
-        TEST_ROUTING_CONTRACTS,
+        {
+          routerAddress: TEST_PERIPHERY_ROUTER_ADDRESS,
+          secondaryFeeAddress: TEST_SECONDARY_FEE_ADDRESS,
+        },
         secondaryFees,
       );
-      expect(approval.amount).toEqual(amountSpecified);
+      expect(approval).not.toBeNull();
+      expect(approval?.amount).toEqual(amountSpecified);
     });
   });
 
@@ -270,10 +274,14 @@ describe('prepareApproval', () => {
         TradeType.EXACT_OUTPUT,
         amountSpecified,
         amountWithSlippage,
-        TEST_ROUTING_CONTRACTS,
+        {
+          routerAddress: TEST_PERIPHERY_ROUTER_ADDRESS,
+          secondaryFeeAddress: TEST_SECONDARY_FEE_ADDRESS,
+        },
         secondaryFees,
       );
-      expect(approval.amount).toEqual(amountWithSlippage);
+      expect(approval).not.toBeNull();
+      expect(approval?.amount).toEqual(amountWithSlippage);
     });
   });
 
@@ -286,10 +294,14 @@ describe('prepareApproval', () => {
         TradeType.EXACT_OUTPUT,
         amountSpecified,
         amountWithSlippage,
-        TEST_ROUTING_CONTRACTS,
+        {
+          routerAddress: TEST_PERIPHERY_ROUTER_ADDRESS,
+          secondaryFeeAddress: TEST_SECONDARY_FEE_ADDRESS,
+        },
         secondaryFees,
       );
-      expect(approval.spender).toEqual(TEST_ROUTING_CONTRACTS.secondaryFeeAddress);
+      expect(approval).not.toBeNull();
+      expect(approval?.spender).toEqual(TEST_SECONDARY_FEE_ADDRESS);
     });
   });
 
@@ -302,10 +314,14 @@ describe('prepareApproval', () => {
         TradeType.EXACT_OUTPUT,
         amountSpecified,
         amountWithSlippage,
-        TEST_ROUTING_CONTRACTS,
+        {
+          routerAddress: TEST_PERIPHERY_ROUTER_ADDRESS,
+          secondaryFeeAddress: TEST_SECONDARY_FEE_ADDRESS,
+        },
         secondaryFees,
       );
-      expect(approval.spender).toEqual(TEST_ROUTING_CONTRACTS.peripheryRouterAddress);
+      expect(approval).not.toBeNull();
+      expect(approval?.spender).toEqual(TEST_PERIPHERY_ROUTER_ADDRESS);
     });
   });
 });

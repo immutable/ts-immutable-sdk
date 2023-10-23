@@ -9,6 +9,7 @@ import WorkflowButton from '@/components/WorkflowButton';
 import { usePassportProvider } from '@/context/PassportProvider';
 import { UnsignedOrderRequest } from '@imtbl/core-sdk';
 import { useStatusProvider } from '@/context/StatusProvider';
+import { MARKETPLACE_FEE_PERCENTAGE, MARKETPLACE_FEE_RECIPIENT } from '@/config';
 
 function MakeOfferModal({
   showModal, setShowModal, onClose, order,
@@ -20,10 +21,6 @@ function MakeOfferModal({
   const { imxProvider } = usePassportProvider();
   const { addMessage } = useStatusProvider();
 
-  if (!order) {
-    return <Spinner />;
-  }
-
   const handleClose = () => {
     setShowModal(false);
     if (onClose) {
@@ -32,8 +29,9 @@ function MakeOfferModal({
   };
 
   const handleSubmit = async () => {
-    setIsLoading(true);
+    if (!order) return;
 
+    setIsLoading(true);
     try {
       const request: UnsignedOrderRequest = {
         sell: {
@@ -46,12 +44,17 @@ function MakeOfferModal({
           tokenAddress: order.sell.data.token_address || '',
         },
         expiration_timestamp: expirationTimestamp,
+        fees: [{
+          address: MARKETPLACE_FEE_RECIPIENT,
+          fee_percentage: MARKETPLACE_FEE_PERCENTAGE,
+        }],
       };
 
       const createOrderResponse = await imxProvider?.createOrder(request);
       addMessage('Create Order', createOrderResponse);
     } catch (err) {
       addMessage('Create Order', err);
+    } finally {
       handleClose();
     }
   };
@@ -69,7 +72,7 @@ function MakeOfferModal({
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        { isLoading ? <Spinner /> : (
+        { isLoading || !order ? <Spinner /> : (
           <Stack gap={2}>
             <dl>
               <dt>Image</dt>
@@ -111,7 +114,7 @@ function MakeOfferModal({
                 required
                 type="date"
                 onChange={(e) => {
-                  setExpirationTimestamp(new Date(e.target.value).getTime());
+                  setExpirationTimestamp(new Date(e.target.value).getTime() / 1000);
                 }}
               />
             </Form.Group>
@@ -122,7 +125,7 @@ function MakeOfferModal({
         <WorkflowButton onClick={handleSubmit} disabled={isLoading}>
           Make Offer
         </WorkflowButton>
-        <WorkflowButton disabled={isLoading} onClick={() => setShowModal(false)}>
+        <WorkflowButton disabled={isLoading} onClick={handleClose}>
           Cancel
         </WorkflowButton>
       </Modal.Footer>

@@ -10,23 +10,29 @@ import { statusContainerStyles } from './StatusViewStyles';
 import { HeaderNavigation } from '../Header/HeaderNavigation';
 
 export interface StatusViewProps {
-  actionText: string;
-  onActionClick: () => void;
+  actionText?: string;
+  onActionClick?: () => void;
+  secondaryActionText?: string;
+  onSecondaryActionClick?: () => void;
   onRenderEvent?: () => void;
   onCloseClick?: () => void;
   testId: string;
   statusText: string;
   statusType: StatusType;
+  statusIconStyles?: Record<string, string>;
 }
 
 export function StatusView({
   actionText,
   onActionClick,
+  secondaryActionText,
+  onSecondaryActionClick,
   onRenderEvent,
   onCloseClick,
   testId,
   statusText,
   statusType,
+  statusIconStyles,
 }: StatusViewProps) {
   const firstRender = useRef(true);
   useEffect(() => {
@@ -44,34 +50,52 @@ export function StatusView({
 
   return (
     <SimpleLayout
-      footer={(
-        <FooterLogo />
-      )}
-      header={
-        <HeaderNavigation onCloseButtonClick={onCloseClick} />
-      }
+      footer={<FooterLogo />}
+      header={<HeaderNavigation onCloseButtonClick={onCloseClick} />}
       floatHeader
     >
-      <Box
-        testId="status-view-container"
-        sx={statusContainerStyles}
-      >
+      <Box testId="status-view-container" sx={statusContainerStyles}>
         <CenteredBoxContent testId={testId}>
-          <StatusBox statusText={statusText} statusType={statusType} />
+          <StatusBox statusText={statusText} statusType={statusType} iconStyles={statusIconStyles} />
         </CenteredBoxContent>
 
-        <Box sx={{ paddingX: 'base.spacing.x4' }}>
-          <Button
-            sx={{ width: '100%' }}
-            testId="status-action-button"
-            variant="secondary"
-            size="large"
-            onClick={onStatusActionClick}
+        {actionText && onActionClick && (
+          <Box
+            sx={{
+              paddingX: 'base.spacing.x4',
+              paddingBottom: 'base.spacing.x2',
+            }}
           >
-            {actionText}
-          </Button>
-        </Box>
+            <Button
+              sx={{ width: '100%' }}
+              testId="status-action-button"
+              variant="secondary"
+              size="large"
+              onClick={onStatusActionClick}
+            >
+              {actionText}
+            </Button>
+          </Box>
+        )}
 
+        {secondaryActionText && onSecondaryActionClick && (
+          <Box
+            sx={{
+              paddingX: 'base.spacing.x4',
+              paddingBottom: 'base.spacing.x4',
+            }}
+          >
+            <Button
+              sx={{ width: '100%' }}
+              testId="status-action-button"
+              variant="tertiary"
+              size="large"
+              onClick={onSecondaryActionClick}
+            >
+              {secondaryActionText}
+            </Button>
+          </Box>
+        )}
       </Box>
     </SimpleLayout>
   );

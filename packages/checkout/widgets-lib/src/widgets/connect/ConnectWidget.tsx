@@ -40,7 +40,7 @@ import { ErrorView } from '../../views/error/ErrorView';
 import { text } from '../../resources/text/textConfig';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { widgetTheme } from '../../lib/theme';
-import { useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import { UserJourney, useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { identifyUser } from '../../lib/analytics/identifyUser';
 
 export interface ConnectWidgetProps {
@@ -87,7 +87,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
   const checkout = new Checkout({ baseConfig: { environment } });
   const targetChainId = getTargetLayerChainId(checkout.config, targetLayer ?? ConnectTargetLayer.LAYER2);
 
-  const { identify } = useAnalytics();
+  const { identify, page } = useAnalytics();
 
   useEffect(() => {
     if (!web3Provider) return;
@@ -142,6 +142,10 @@ export function ConnectWidget(props: ConnectWidgetProps) {
   const handleConnectSuccess = useCallback(async () => {
     if (!provider) return;
     // WT-1698 Analytics - Identify user here
+    page({
+      userJourney: UserJourney.CONNECT,
+      screen: 'ConnectSuccess',
+    });
     await identifyUser(identify, provider);
     sendConnectSuccessEvent(eventTarget, provider, walletProviderName ?? undefined);
   }, [provider, identify]);

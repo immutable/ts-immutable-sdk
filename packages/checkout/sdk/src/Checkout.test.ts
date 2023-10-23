@@ -43,6 +43,9 @@ import { smartCheckout } from './smartCheckout';
 import { cancel } from './smartCheckout/cancel';
 import { FiatRampService } from './fiatRamp';
 import { FiatRampParams, ExchangeType } from './types/fiatRamp';
+import { getItemRequirementsFromRequirements } from './smartCheckout/itemRequirements';
+import { CheckoutErrorType } from './errors';
+import { availabilityService } from './availability';
 
 jest.mock('./connect');
 jest.mock('./network');
@@ -58,6 +61,8 @@ jest.mock('./smartCheckout/sell');
 jest.mock('./smartCheckout/cancel');
 jest.mock('./smartCheckout');
 jest.mock('./fiatRamp');
+jest.mock('./smartCheckout/itemRequirements');
+jest.mock('./availability');
 
 describe('Connect', () => {
   let providerMock: ExternalProvider;
@@ -453,28 +458,11 @@ describe('Connect', () => {
 
     await checkout.buy({
       provider,
-      orderId: '1',
+      orders: [{ id: '1', takerFees: [] }],
     });
 
     expect(buy).toBeCalledTimes(1);
-    expect(buy).toBeCalledWith(checkout.config, provider, '1');
-  });
-
-  it('should throw error for buy function if is production', async () => {
-    const provider = new Web3Provider(providerMock, ChainId.SEPOLIA);
-
-    (validateProvider as jest.Mock).mockResolvedValue(provider);
-
-    const checkout = new Checkout({
-      baseConfig: { environment: Environment.PRODUCTION },
-    });
-
-    await expect(checkout.buy({
-      provider,
-      orderId: '1',
-    })).rejects.toThrow('This endpoint is not currently available.');
-
-    expect(buy).toBeCalledTimes(0);
+    expect(buy).toBeCalledWith(checkout.config, provider, [{ id: '1', takerFees: [] }]);
   });
 
   it('should call sell function', async () => {
@@ -518,38 +506,6 @@ describe('Connect', () => {
     );
   });
 
-  it('should throw error for sell function if is production', async () => {
-    const provider = new Web3Provider(providerMock, ChainId.SEPOLIA);
-    (validateProvider as jest.Mock).mockResolvedValue(provider);
-
-    const checkout = new Checkout({
-      baseConfig: { environment: Environment.PRODUCTION },
-    });
-
-    await expect(checkout.sell({
-      provider,
-      orders: [{
-        sellToken: {
-          id: '0',
-          collectionAddress: '0xERC721',
-        },
-        buyToken: {
-          type: ItemType.NATIVE,
-          amount: '10',
-        },
-        makerFees: [
-          {
-            amount: { percentageDecimal: 0.025 },
-            recipient: '0x222',
-          },
-        ],
-      }],
-
-    })).rejects.toThrow('This endpoint is not currently available.');
-
-    expect(sell).toBeCalledTimes(0);
-  });
-
   it('should call cancel function', async () => {
     const provider = new Web3Provider(providerMock, ChainId.SEPOLIA);
 
@@ -562,31 +518,15 @@ describe('Connect', () => {
 
     await checkout.cancel({
       provider,
-      orderId: '1234',
+      orderIds: ['1234'],
     });
 
     expect(cancel).toBeCalledTimes(1);
     expect(cancel).toBeCalledWith(
       checkout.config,
       provider,
-      '1234',
+      ['1234'],
     );
-  });
-
-  it('should throw error for cancel function if is production', async () => {
-    const provider = new Web3Provider(providerMock, ChainId.SEPOLIA);
-    (validateProvider as jest.Mock).mockResolvedValue(provider);
-
-    const checkout = new Checkout({
-      baseConfig: { environment: Environment.PRODUCTION },
-    });
-
-    await expect(checkout.cancel({
-      provider,
-      orderId: '1234',
-    })).rejects.toThrow('This endpoint is not currently available.');
-
-    expect(cancel).toBeCalledTimes(0);
   });
 
   it('should call smartCheckout function', async () => {
@@ -595,6 +535,7 @@ describe('Connect', () => {
 
     (validateProvider as jest.Mock).mockResolvedValue(provider);
     (smartCheckout as jest.Mock).mockResolvedValue(smartCheckoutResult);
+    (getItemRequirementsFromRequirements as jest.Mock).mockResolvedValue([]);
 
     const checkout = new Checkout({
       baseConfig: { environment: Environment.SANDBOX },
@@ -622,20 +563,26 @@ describe('Connect', () => {
     );
   });
 
-  it('should throw error for smartCheckout function if is production', async () => {
-    const provider = new Web3Provider(providerMock, ChainId.SEPOLIA);
+  it('should throw error for smartCheckout function if cannot get itemRequirements', async () => {
+    const provider = new Web3Provider(providerMock, ChainId.IMTBL_ZKEVM_TESTNET);
     const smartCheckoutResult = {};
 
     (validateProvider as jest.Mock).mockResolvedValue(provider);
+    (getItemRequirementsFromRequirements as jest.Mock).mockRejectedValue(new Error('Unable to get decimals'));
     (smartCheckout as jest.Mock).mockResolvedValue(smartCheckoutResult);
 
     const checkout = new Checkout({
-      baseConfig: { environment: Environment.PRODUCTION },
+      baseConfig: { environment: Environment.SANDBOX },
     });
 
     const params: SmartCheckoutParams = {
       provider,
-      itemRequirements: [],
+      itemRequirements: [{
+        type: ItemType.ERC20,
+        contractAddress: '0xNOADDRESS',
+        spenderAddress: '0xSPENDER',
+        amount: '1.5',
+      }],
       transactionOrGasAmount: {
         type: TransactionOrGasType.GAS,
         gasToken: {
@@ -645,8 +592,16 @@ describe('Connect', () => {
       },
     };
 
-    await expect(checkout.smartCheckout(params)).rejects.toThrow('This endpoint is not currently available.');
-
+    let errMessage;
+    let errType;
+    try {
+      await checkout.smartCheckout(params);
+    } catch (err:any) {
+      errMessage = err.message;
+      errType = err.type;
+    }
+    expect(errMessage).toEqual('Failed to map item requirements');
+    expect(errType).toEqual(CheckoutErrorType.ITEM_REQUIREMENTS_ERROR);
     expect(smartCheckout).toBeCalledTimes(0);
   });
 
@@ -838,6 +793,25 @@ describe('Connect', () => {
       await checkout.getExchangeFeeEstimate();
 
       expect(feeEstimateMock).toBeCalledTimes(1);
+    });
+  });
+
+  describe('isSwapAvailable', () => {
+    let checkout: Checkout;
+
+    beforeEach(() => {
+      (availabilityService as jest.Mock).mockReturnValue({
+        checkDexAvailability: jest.fn().mockResolvedValue(true),
+      });
+      checkout = new Checkout({
+        baseConfig: { environment: Environment.PRODUCTION },
+      });
+    });
+
+    it('should call availability.checkDexAvailability', async () => {
+      await checkout.isSwapAvailable();
+
+      expect(checkout.availability.checkDexAvailability).toBeCalledTimes(1);
     });
   });
 });

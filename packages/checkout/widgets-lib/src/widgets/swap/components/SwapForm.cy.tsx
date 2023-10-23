@@ -20,10 +20,20 @@ import {
   ConnectLoaderTestComponent,
 } from '../../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
 import { IMX_ADDRESS_ZKEVM, NATIVE } from '../../../lib/constants';
+import { CustomAnalyticsProvider } from '../../../context/analytics-provider/CustomAnalyticsProvider';
+import { WidgetTheme } from '../../../lib';
+import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 
 describe('SwapForm', () => {
   let testSwapState: SwapState;
   let cryptoConversions;
+  const config = {
+    environment: Environment.SANDBOX,
+    theme: WidgetTheme.DARK,
+    isBridgeEnabled: true,
+    isSwapEnabled: true,
+    isOnRampEnabled: true,
+  } as StrongCheckoutWidgetsConfig;
 
   beforeEach(() => {
     cy.viewport('ipad-2');
@@ -94,12 +104,14 @@ describe('SwapForm', () => {
   describe('initial form state', () => {
     it('should show all swap inputs with initial state', () => {
       mount(
-        <SwapWidgetTestComponent
-          initialStateOverride={testSwapState}
-          cryptoConversionsOverride={cryptoConversions}
-        >
-          <SwapForm />
-        </SwapWidgetTestComponent>,
+        <CustomAnalyticsProvider widgetConfig={config}>
+          <SwapWidgetTestComponent
+            initialStateOverride={testSwapState}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <SwapForm />
+          </SwapWidgetTestComponent>
+        </CustomAnalyticsProvider>,
       );
       cySmartGet('fromTokenInputs-select-form-select__target').should('be.visible');
       cySmartGet('fromTokenInputs-select-form-select__target').should('have.text', 'Select coin');
@@ -115,15 +127,17 @@ describe('SwapForm', () => {
 
     it('should set native token as from if native token is provided in from address', () => {
       mount(
-        <SwapWidgetTestComponent
-          initialStateOverride={testSwapState}
-          cryptoConversionsOverride={cryptoConversions}
-        >
-          <SwapForm data={{
-            fromContractAddress: NATIVE,
-          }}
-          />
-        </SwapWidgetTestComponent>,
+        <CustomAnalyticsProvider widgetConfig={config}>
+          <SwapWidgetTestComponent
+            initialStateOverride={testSwapState}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <SwapForm data={{
+              fromContractAddress: NATIVE,
+            }}
+            />
+          </SwapWidgetTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').should('be.visible');
@@ -132,15 +146,17 @@ describe('SwapForm', () => {
 
     it('should set native token as to if native token is provided in to address', () => {
       mount(
-        <SwapWidgetTestComponent
-          initialStateOverride={testSwapState}
-          cryptoConversionsOverride={cryptoConversions}
-        >
-          <SwapForm data={{
-            toContractAddress: NATIVE,
-          }}
-          />
-        </SwapWidgetTestComponent>,
+        <CustomAnalyticsProvider widgetConfig={config}>
+          <SwapWidgetTestComponent
+            initialStateOverride={testSwapState}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <SwapForm data={{
+              toContractAddress: NATIVE,
+            }}
+            />
+          </SwapWidgetTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('toTokenInputs-select-form-select__target').should('be.visible');
@@ -149,15 +165,17 @@ describe('SwapForm', () => {
 
     it('should set from token matching the from token address provided', () => {
       mount(
-        <SwapWidgetTestComponent
-          initialStateOverride={testSwapState}
-          cryptoConversionsOverride={cryptoConversions}
-        >
-          <SwapForm data={{
-            fromContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-          }}
-          />
-        </SwapWidgetTestComponent>,
+        <CustomAnalyticsProvider widgetConfig={config}>
+          <SwapWidgetTestComponent
+            initialStateOverride={testSwapState}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <SwapForm data={{
+              fromContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+            }}
+            />
+          </SwapWidgetTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').should('be.visible');
@@ -166,15 +184,17 @@ describe('SwapForm', () => {
 
     it('should set to token matching the to token address provided', () => {
       mount(
-        <SwapWidgetTestComponent
-          initialStateOverride={testSwapState}
-          cryptoConversionsOverride={cryptoConversions}
-        >
-          <SwapForm data={{
-            toContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-          }}
-          />
-        </SwapWidgetTestComponent>,
+        <CustomAnalyticsProvider widgetConfig={config}>
+          <SwapWidgetTestComponent
+            initialStateOverride={testSwapState}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <SwapForm data={{
+              toContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+            }}
+            />
+          </SwapWidgetTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('toTokenInputs-select-form-select__target').should('be.visible');
@@ -183,16 +203,18 @@ describe('SwapForm', () => {
 
     it('should set both from and to token when token addresses are unique', () => {
       mount(
-        <SwapWidgetTestComponent
-          initialStateOverride={testSwapState}
-          cryptoConversionsOverride={cryptoConversions}
-        >
-          <SwapForm data={{
-            fromContractAddress: IMX_ADDRESS_ZKEVM,
-            toContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-          }}
-          />
-        </SwapWidgetTestComponent>,
+        <CustomAnalyticsProvider widgetConfig={config}>
+          <SwapWidgetTestComponent
+            initialStateOverride={testSwapState}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <SwapForm data={{
+              fromContractAddress: IMX_ADDRESS_ZKEVM,
+              toContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+            }}
+            />
+          </SwapWidgetTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').should('be.visible');
@@ -203,16 +225,18 @@ describe('SwapForm', () => {
 
     it('should set only from token when to and from token addresses match', () => {
       mount(
-        <SwapWidgetTestComponent
-          initialStateOverride={testSwapState}
-          cryptoConversionsOverride={cryptoConversions}
-        >
-          <SwapForm data={{
-            fromContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-            toContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-          }}
-          />
-        </SwapWidgetTestComponent>,
+        <CustomAnalyticsProvider widgetConfig={config}>
+          <SwapWidgetTestComponent
+            initialStateOverride={testSwapState}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <SwapForm data={{
+              fromContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+              toContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+            }}
+            />
+          </SwapWidgetTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').should('be.visible');
@@ -288,9 +312,11 @@ describe('SwapForm', () => {
     swapFromAmountTestCases.forEach((testCase) => {
       it(`should only allow numbers with 6 decimal places in the swapFromAmount input - ${testCase.name}`, () => {
         mount(
-          <SwapWidgetTestComponent>
-            <SwapForm />
-          </SwapWidgetTestComponent>,
+          <CustomAnalyticsProvider widgetConfig={config}>
+            <SwapWidgetTestComponent>
+              <SwapForm />
+            </SwapWidgetTestComponent>
+          </CustomAnalyticsProvider>,
         );
 
         // Have had to modify the onChange method to reset to previous state if input is not valid
@@ -303,12 +329,14 @@ describe('SwapForm', () => {
   describe('swap form behaviour', () => {
     it('should validate all inputs when Swap Button is clicked', () => {
       mount(
-        <SwapWidgetTestComponent
-          initialStateOverride={testSwapState}
-          cryptoConversionsOverride={cryptoConversions}
-        >
-          <SwapCoins />
-        </SwapWidgetTestComponent>,
+        <CustomAnalyticsProvider widgetConfig={config}>
+          <SwapWidgetTestComponent
+            initialStateOverride={testSwapState}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <SwapCoins theme={WidgetTheme.LIGHT} />
+          </SwapWidgetTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('swap-button').click();
@@ -332,12 +360,14 @@ describe('SwapForm', () => {
 
     it('should show insufficient balance error when swap from amount is larger than token balance', () => {
       mount(
-        <SwapWidgetTestComponent
-          initialStateOverride={testSwapState}
-          cryptoConversionsOverride={cryptoConversions}
-        >
-          <SwapCoins />
-        </SwapWidgetTestComponent>,
+        <CustomAnalyticsProvider widgetConfig={config}>
+          <SwapWidgetTestComponent
+            initialStateOverride={testSwapState}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <SwapCoins theme={WidgetTheme.LIGHT} />
+          </SwapWidgetTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
@@ -354,12 +384,14 @@ describe('SwapForm', () => {
 
     it('should show no amount error when swap from amount missing', () => {
       mount(
-        <SwapWidgetTestComponent
-          initialStateOverride={testSwapState}
-          cryptoConversionsOverride={cryptoConversions}
-        >
-          <SwapCoins />
-        </SwapWidgetTestComponent>,
+        <CustomAnalyticsProvider widgetConfig={config}>
+          <SwapWidgetTestComponent
+            initialStateOverride={testSwapState}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <SwapCoins theme={WidgetTheme.LIGHT} />
+          </SwapWidgetTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
@@ -375,12 +407,14 @@ describe('SwapForm', () => {
 
     it('should remove validation error when swap from amount is fixed', () => {
       mount(
-        <SwapWidgetTestComponent
-          initialStateOverride={testSwapState}
-          cryptoConversionsOverride={cryptoConversions}
-        >
-          <SwapCoins />
-        </SwapWidgetTestComponent>,
+        <CustomAnalyticsProvider widgetConfig={config}>
+          <SwapWidgetTestComponent
+            initialStateOverride={testSwapState}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <SwapCoins theme={WidgetTheme.LIGHT} />
+          </SwapWidgetTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
@@ -400,12 +434,14 @@ describe('SwapForm', () => {
 
     it('should remove validation error when swap from token is chosen', () => {
       mount(
-        <SwapWidgetTestComponent
-          initialStateOverride={testSwapState}
-          cryptoConversionsOverride={cryptoConversions}
-        >
-          <SwapCoins />
-        </SwapWidgetTestComponent>,
+        <CustomAnalyticsProvider widgetConfig={config}>
+          <SwapWidgetTestComponent
+            initialStateOverride={testSwapState}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <SwapCoins theme={WidgetTheme.LIGHT} />
+          </SwapWidgetTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('toTokenInputs-select-form-select__target').click();
@@ -486,16 +522,18 @@ describe('SwapForm', () => {
 
     it('should only fetch a quote when from token and to token are selected and swap amount has value', () => {
       mount(
-        <ConnectLoaderTestComponent
-          initialStateOverride={connectLoaderState}
-        >
-          <SwapWidgetTestComponent
-            initialStateOverride={testSwapState}
-            cryptoConversionsOverride={cryptoConversions}
+        <CustomAnalyticsProvider widgetConfig={config}>
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <SwapCoins />
-          </SwapWidgetTestComponent>
-        </ConnectLoaderTestComponent>,
+            <SwapWidgetTestComponent
+              initialStateOverride={testSwapState}
+              cryptoConversionsOverride={cryptoConversions}
+            >
+              <SwapCoins theme={WidgetTheme.LIGHT} />
+            </SwapWidgetTestComponent>
+          </ConnectLoaderTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
@@ -533,16 +571,18 @@ describe('SwapForm', () => {
 
     it('should set to amount and fees after quote is fetched', () => {
       mount(
-        <ConnectLoaderTestComponent
-          initialStateOverride={connectLoaderState}
-        >
-          <SwapWidgetTestComponent
-            initialStateOverride={testSwapState}
-            cryptoConversionsOverride={cryptoConversions}
+        <CustomAnalyticsProvider widgetConfig={config}>
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <SwapCoins />
-          </SwapWidgetTestComponent>
-        </ConnectLoaderTestComponent>,
+            <SwapWidgetTestComponent
+              initialStateOverride={testSwapState}
+              cryptoConversionsOverride={cryptoConversions}
+            >
+              <SwapCoins theme={WidgetTheme.LIGHT} />
+            </SwapWidgetTestComponent>
+          </ConnectLoaderTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
@@ -585,16 +625,18 @@ describe('SwapForm', () => {
 
     it('should fetch a quote after from amount max button is clicked', () => {
       mount(
-        <ConnectLoaderTestComponent
-          initialStateOverride={connectLoaderState}
-        >
-          <SwapWidgetTestComponent
-            initialStateOverride={testSwapState}
-            cryptoConversionsOverride={cryptoConversions}
+        <CustomAnalyticsProvider widgetConfig={config}>
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <SwapCoins />
-          </SwapWidgetTestComponent>
-        </ConnectLoaderTestComponent>,
+            <SwapWidgetTestComponent
+              initialStateOverride={testSwapState}
+              cryptoConversionsOverride={cryptoConversions}
+            >
+              <SwapCoins theme={WidgetTheme.LIGHT} />
+            </SwapWidgetTestComponent>
+          </ConnectLoaderTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
@@ -632,16 +674,18 @@ describe('SwapForm', () => {
 
     it('should not fetch a quote when to token is not selected', () => {
       mount(
-        <ConnectLoaderTestComponent
-          initialStateOverride={connectLoaderState}
-        >
-          <SwapWidgetTestComponent
-            initialStateOverride={testSwapState}
-            cryptoConversionsOverride={cryptoConversions}
+        <CustomAnalyticsProvider widgetConfig={config}>
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <SwapCoins />
-          </SwapWidgetTestComponent>
-        </ConnectLoaderTestComponent>,
+            <SwapWidgetTestComponent
+              initialStateOverride={testSwapState}
+              cryptoConversionsOverride={cryptoConversions}
+            >
+              <SwapCoins theme={WidgetTheme.LIGHT} />
+            </SwapWidgetTestComponent>
+          </ConnectLoaderTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
@@ -657,16 +701,18 @@ describe('SwapForm', () => {
 
     it('should not fetch a quote when from token is not selected', () => {
       mount(
-        <ConnectLoaderTestComponent
-          initialStateOverride={connectLoaderState}
-        >
-          <SwapWidgetTestComponent
-            initialStateOverride={testSwapState}
-            cryptoConversionsOverride={cryptoConversions}
+        <CustomAnalyticsProvider widgetConfig={config}>
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <SwapCoins />
-          </SwapWidgetTestComponent>
-        </ConnectLoaderTestComponent>,
+            <SwapWidgetTestComponent
+              initialStateOverride={testSwapState}
+              cryptoConversionsOverride={cryptoConversions}
+            >
+              <SwapCoins theme={WidgetTheme.LIGHT} />
+            </SwapWidgetTestComponent>
+          </ConnectLoaderTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('toTokenInputs-select-form-select__target').click();
@@ -682,16 +728,18 @@ describe('SwapForm', () => {
 
     it('should not fetch a quote when from amount is 0', () => {
       mount(
-        <ConnectLoaderTestComponent
-          initialStateOverride={connectLoaderState}
-        >
-          <SwapWidgetTestComponent
-            initialStateOverride={testSwapState}
-            cryptoConversionsOverride={cryptoConversions}
+        <CustomAnalyticsProvider widgetConfig={config}>
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <SwapCoins />
-          </SwapWidgetTestComponent>
-        </ConnectLoaderTestComponent>,
+            <SwapWidgetTestComponent
+              initialStateOverride={testSwapState}
+              cryptoConversionsOverride={cryptoConversions}
+            >
+              <SwapCoins theme={WidgetTheme.LIGHT} />
+            </SwapWidgetTestComponent>
+          </ConnectLoaderTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
@@ -800,40 +848,42 @@ describe('SwapForm', () => {
           });
 
         mount(
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <SwapWidgetTestComponent
-              initialStateOverride={{
-                ...testSwapState,
-                tokenBalances: [
-                  {
-                    balance: BigNumber.from('1000000000000000000'),
-                    formattedBalance: '1',
-                    token: {
-                      name: 'Ethereum',
-                      symbol: 'ETH',
-                      decimals: 18,
-                      address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-                    },
-                  },
-                  {
-                    balance: BigNumber.from('1000000000000000000'),
-                    formattedBalance: '1',
-                    token: {
-                      name: 'ImmutableX',
-                      symbol: 'IMX',
-                      decimals: 18,
-                      address: IMX_ADDRESS_ZKEVM,
-                    },
-                  },
-                ],
-              }}
-              cryptoConversionsOverride={cryptoConversions}
+          <CustomAnalyticsProvider widgetConfig={config}>
+            <ConnectLoaderTestComponent
+              initialStateOverride={connectLoaderState}
             >
-              <SwapCoins />
-            </SwapWidgetTestComponent>
-          </ConnectLoaderTestComponent>,
+              <SwapWidgetTestComponent
+                initialStateOverride={{
+                  ...testSwapState,
+                  tokenBalances: [
+                    {
+                      balance: BigNumber.from('1000000000000000000'),
+                      formattedBalance: '1',
+                      token: {
+                        name: 'Ethereum',
+                        symbol: 'ETH',
+                        decimals: 18,
+                        address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+                      },
+                    },
+                    {
+                      balance: BigNumber.from('1000000000000000000'),
+                      formattedBalance: '1',
+                      token: {
+                        name: 'ImmutableX',
+                        symbol: 'IMX',
+                        decimals: 18,
+                        address: IMX_ADDRESS_ZKEVM,
+                      },
+                    },
+                  ],
+                }}
+                cryptoConversionsOverride={cryptoConversions}
+              >
+                <SwapCoins theme={WidgetTheme.LIGHT} />
+              </SwapWidgetTestComponent>
+            </ConnectLoaderTestComponent>
+          </CustomAnalyticsProvider>,
         );
 
         cySmartGet('fromTokenInputs-select-form-select__target').click();
@@ -852,40 +902,42 @@ describe('SwapForm', () => {
 
       it('should show not enough imx drawer if user does not have enough imx', () => {
         mount(
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <SwapWidgetTestComponent
-              initialStateOverride={{
-                ...testSwapState,
-                tokenBalances: [
-                  {
-                    balance: BigNumber.from('1000000000000000000'),
-                    formattedBalance: '1',
-                    token: {
-                      name: 'Ethereum',
-                      symbol: 'ETH',
-                      decimals: 18,
-                      address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-                    },
-                  },
-                  {
-                    balance: BigNumber.from('100000'),
-                    formattedBalance: '0.0001',
-                    token: {
-                      name: 'ImmutableX',
-                      symbol: 'IMX',
-                      decimals: 18,
-                      address: IMX_ADDRESS_ZKEVM,
-                    },
-                  },
-                ],
-              }}
-              cryptoConversionsOverride={cryptoConversions}
+          <CustomAnalyticsProvider widgetConfig={config}>
+            <ConnectLoaderTestComponent
+              initialStateOverride={connectLoaderState}
             >
-              <SwapCoins />
-            </SwapWidgetTestComponent>
-          </ConnectLoaderTestComponent>,
+              <SwapWidgetTestComponent
+                initialStateOverride={{
+                  ...testSwapState,
+                  tokenBalances: [
+                    {
+                      balance: BigNumber.from('1000000000000000000'),
+                      formattedBalance: '1',
+                      token: {
+                        name: 'Ethereum',
+                        symbol: 'ETH',
+                        decimals: 18,
+                        address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+                      },
+                    },
+                    {
+                      balance: BigNumber.from('100000'),
+                      formattedBalance: '0.0001',
+                      token: {
+                        name: 'ImmutableX',
+                        symbol: 'IMX',
+                        decimals: 18,
+                        address: IMX_ADDRESS_ZKEVM,
+                      },
+                    },
+                  ],
+                }}
+                cryptoConversionsOverride={cryptoConversions}
+              >
+                <SwapCoins theme={WidgetTheme.LIGHT} />
+              </SwapWidgetTestComponent>
+            </ConnectLoaderTestComponent>
+          </CustomAnalyticsProvider>,
         );
 
         cySmartGet('fromTokenInputs-select-form-select__target').click();
@@ -907,40 +959,42 @@ describe('SwapForm', () => {
 
       it('should show adjust button if user does not have enough imx and imx is in from', () => {
         mount(
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <SwapWidgetTestComponent
-              initialStateOverride={{
-                ...testSwapState,
-                tokenBalances: [
-                  {
-                    balance: BigNumber.from('1000000000000000000'),
-                    formattedBalance: '1',
-                    token: {
-                      name: 'Ethereum',
-                      symbol: 'ETH',
-                      decimals: 18,
-                      address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-                    },
-                  },
-                  {
-                    balance: BigNumber.from('100000'),
-                    formattedBalance: '0.0001',
-                    token: {
-                      name: 'ImmutableX',
-                      symbol: 'IMX',
-                      decimals: 18,
-                      address: IMX_ADDRESS_ZKEVM,
-                    },
-                  },
-                ],
-              }}
-              cryptoConversionsOverride={cryptoConversions}
+          <CustomAnalyticsProvider widgetConfig={config}>
+            <ConnectLoaderTestComponent
+              initialStateOverride={connectLoaderState}
             >
-              <SwapCoins />
-            </SwapWidgetTestComponent>
-          </ConnectLoaderTestComponent>,
+              <SwapWidgetTestComponent
+                initialStateOverride={{
+                  ...testSwapState,
+                  tokenBalances: [
+                    {
+                      balance: BigNumber.from('1000000000000000000'),
+                      formattedBalance: '1',
+                      token: {
+                        name: 'Ethereum',
+                        symbol: 'ETH',
+                        decimals: 18,
+                        address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+                      },
+                    },
+                    {
+                      balance: BigNumber.from('100000'),
+                      formattedBalance: '0.0001',
+                      token: {
+                        name: 'ImmutableX',
+                        symbol: 'IMX',
+                        decimals: 18,
+                        address: IMX_ADDRESS_ZKEVM,
+                      },
+                    },
+                  ],
+                }}
+                cryptoConversionsOverride={cryptoConversions}
+              >
+                <SwapCoins theme={WidgetTheme.LIGHT} />
+              </SwapWidgetTestComponent>
+            </ConnectLoaderTestComponent>
+          </CustomAnalyticsProvider>,
         );
 
         cySmartGet('toTokenInputs-select-form-select__target').click();
@@ -968,40 +1022,42 @@ describe('SwapForm', () => {
           .resolves({});
 
         mount(
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <SwapWidgetTestComponent
-              initialStateOverride={{
-                ...testSwapState,
-                tokenBalances: [
-                  {
-                    balance: BigNumber.from('1000000000000000000'),
-                    formattedBalance: '1',
-                    token: {
-                      name: 'Ethereum',
-                      symbol: 'ETH',
-                      decimals: 18,
-                      address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-                    },
-                  },
-                  {
-                    balance: BigNumber.from('1000000000000000000'),
-                    formattedBalance: '1',
-                    token: {
-                      name: 'ImmutableX',
-                      symbol: 'IMX',
-                      decimals: 18,
-                      address: IMX_ADDRESS_ZKEVM,
-                    },
-                  },
-                ],
-              }}
-              cryptoConversionsOverride={cryptoConversions}
+          <CustomAnalyticsProvider widgetConfig={config}>
+            <ConnectLoaderTestComponent
+              initialStateOverride={connectLoaderState}
             >
-              <SwapCoins />
-            </SwapWidgetTestComponent>
-          </ConnectLoaderTestComponent>,
+              <SwapWidgetTestComponent
+                initialStateOverride={{
+                  ...testSwapState,
+                  tokenBalances: [
+                    {
+                      balance: BigNumber.from('1000000000000000000'),
+                      formattedBalance: '1',
+                      token: {
+                        name: 'Ethereum',
+                        symbol: 'ETH',
+                        decimals: 18,
+                        address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+                      },
+                    },
+                    {
+                      balance: BigNumber.from('1000000000000000000'),
+                      formattedBalance: '1',
+                      token: {
+                        name: 'ImmutableX',
+                        symbol: 'IMX',
+                        decimals: 18,
+                        address: IMX_ADDRESS_ZKEVM,
+                      },
+                    },
+                  ],
+                }}
+                cryptoConversionsOverride={cryptoConversions}
+              >
+                <SwapCoins theme={WidgetTheme.LIGHT} />
+              </SwapWidgetTestComponent>
+            </ConnectLoaderTestComponent>
+          </CustomAnalyticsProvider>,
         );
 
         cySmartGet('fromTokenInputs-select-form-select__target').click();
@@ -1028,18 +1084,20 @@ describe('SwapForm', () => {
           .rejects({});
 
         mount(
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <SwapWidgetTestComponent
-              initialStateOverride={{
-                ...testSwapState,
-              }}
-              cryptoConversionsOverride={cryptoConversions}
+          <CustomAnalyticsProvider widgetConfig={config}>
+            <ConnectLoaderTestComponent
+              initialStateOverride={connectLoaderState}
             >
-              <SwapCoins />
-            </SwapWidgetTestComponent>
-          </ConnectLoaderTestComponent>,
+              <SwapWidgetTestComponent
+                initialStateOverride={{
+                  ...testSwapState,
+                }}
+                cryptoConversionsOverride={cryptoConversions}
+              >
+                <SwapCoins theme={WidgetTheme.LIGHT} />
+              </SwapWidgetTestComponent>
+            </ConnectLoaderTestComponent>
+          </CustomAnalyticsProvider>,
         );
 
         cySmartGet('fromTokenInputs-select-form-select__target').click();

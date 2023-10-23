@@ -6,6 +6,9 @@ import { SharedViews } from '../../context/view-context/ViewContext';
 import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
 import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextTypes';
+import { SaleWidgetViews } from '../../context/view-context/SaleViewContextTypes';
+import { SaleErrorTypes, PaymentTypes } from '../../widgets/sale/types';
+import { ServiceType } from '../../views/error/serviceTypes';
 
 export const text = {
   views: {
@@ -52,8 +55,7 @@ export const text = {
         },
       },
       zkEVM: {
-        heading:
-          'You’ll be asked to switch to the Immutable zkEVM network',
+        heading: 'You’ll be asked to switch to the Immutable zkEVM network',
         body: "Check for the pop-up from MetaMask and 'Approve' to switch. If this is the first time, MetaMask will also ask you to add the network.",
         button: {
           text: 'Ready to Switch',
@@ -65,6 +67,12 @@ export const text = {
       heading: "Something's gone wrong",
       body: ['You can try again or contact', 'support', 'for help.'],
       actionText: 'Try again',
+    },
+    [SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW]: {
+      heading: {
+        [ServiceType.SWAP]: 'Swapping is not available in your region',
+      },
+      body: 'We’re sorry we cannot provide this service in your region.',
     },
     [SharedViews.LOADING_VIEW]: {
       text: 'Loading',
@@ -99,7 +107,8 @@ export const text = {
       },
       passport: {
         heading: 'Coins and collectibles are native to networks',
-        body1: 'This network is called Immutable zkEVM. If you have other coins in your Passport and can’t see them here, they might be on another network. ',
+        body1:
+          'This network is called Immutable zkEVM. If you have other coins in your Passport and can’t see them here, they might be on another network. ',
         body2: ' for more info.',
         linkText: 'Visit our FAQs',
       },
@@ -167,14 +176,16 @@ export const text = {
       approveSpending: {
         content: {
           metamask: {
-            heading: "You'll be asked to set a spending cap for this transaction",
+            heading:
+              "You'll be asked to set a spending cap for this transaction",
             body: [
               'Input at least',
               'for this transaction and future transactions, then follow the prompts.',
             ],
           },
           passport: {
-            heading: "You'll be asked to approve a spending cap for this transaction",
+            heading:
+              "You'll be asked to approve a spending cap for this transaction",
             body: 'Follow the prompts in your wallet to approve the spending cap.',
           },
         },
@@ -215,7 +226,8 @@ export const text = {
     [BridgeWidgetViews.IN_PROGRESS]: {
       heading: 'Move in progress',
       body1: (symbol: string) => `Less than 3 mins until your ${symbol} lands on zkEVM.`,
-      body2: 'You can close this window, the transaction will be reflected in your wallet once complete.',
+      body2:
+        'You can close this window, the transaction will be reflected in your wallet once complete.',
     },
     [BridgeWidgetViews.APPROVE_ERC20]: {
       approveBridge: {
@@ -292,27 +304,130 @@ export const text = {
         onramp: {
           heading: 'Buy with card',
           caption: 'Google pay & Apple pay available. Minimum $5.',
-          subcaption: 'Fees ≈',
+          subcaption: 'Fees',
+          disabledCaption: '',
         },
         swap: {
           heading: 'Swap my coins',
           caption: 'Using the coins I have on the same network',
-          subcaption: 'Fees ≈',
+          subcaption: 'Fees',
+          disabledCaption: 'Not available in your region',
         },
         bridge: {
           heading: 'Move my coins',
           caption: 'From the coins I have on a different network',
-          subcaption: 'Fees ≈',
+          subcaption: 'Fees ',
+          disabledCaption: '',
         },
       },
+    },
+    [SaleWidgetViews.FUND_WITH_SMART_CHECKOUT]: {
+      loading: {
+        checkingBalances: 'Crunching numbers',
+      },
+    },
+    [SaleWidgetViews.PAYMENT_METHODS]: {
+      header: {
+        heading: 'How would you like to pay?',
+      },
+      options: {
+        [PaymentTypes.CRYPTO]: {
+          heading: 'Coins',
+          caption: 'Using the coins balance in your wallet',
+          disabledCaption: "We can't see enough coins in your balance",
+        },
+        [PaymentTypes.FIAT]: {
+          heading: 'Card',
+          caption: 'GooglePay also available with Transak',
+          disabledCaption: undefined,
+        },
+      },
+      loading: {
+        ready: 'Ready to purchase',
+        confirm: 'Confirm in your wallet',
+        processing: 'Processing purchase',
+      },
+    },
+    [SaleWidgetViews.PAY_WITH_COINS]: {
+      header: {
+        heading: 'Pay with your',
+        caption: 'Using the coins balance in your wallet',
+      },
+      button: {
+        buyNow: 'Buy now',
+      },
+    },
+    [SaleWidgetViews.PAY_WITH_CARD]: {
+      screenTitle: 'Pay with card',
+      loading: 'Taking you to Transak',
+    },
+    [SaleWidgetViews.SALE_FAIL]: {
+      errors: {
+        [SaleErrorTypes.TRANSACTION_FAILED]: {
+          description: 'Transaction failed',
+          primaryAction: 'Try again',
+          secondaryAction: 'View details',
+        },
+        [SaleErrorTypes.SERVICE_BREAKDOWN]: {
+          description:
+            "Sorry, we're unable to process your payment right now. Please try again in a few minutes.",
+          secondaryAction: 'Dismiss',
+        },
+        [SaleErrorTypes.TRANSAK_FAILED]: {
+          description: 'Sorry, something went wrong. Please try again.',
+          primaryAction: 'Try again',
+          secondaryAction: 'Dismiss',
+        },
+        [SaleErrorTypes.WALLET_FAILED]: {
+          description: "Sorry, we're unable to process this right now.",
+          primaryAction: 'Go back',
+          secondaryAction: 'Dismiss',
+        },
+        [SaleErrorTypes.WALLET_REJECTED_NO_FUNDS]: {
+          description: 'Sorry, something went wrong. Please try again.',
+          primaryAction: 'Go back',
+          secondaryAction: 'Dismiss',
+        },
+        [SaleErrorTypes.WALLET_REJECTED]: {
+          description:
+            "You'll need to approve the transaction in your wallet to proceed.",
+          primaryAction: 'Try again',
+          secondaryAction: 'Cancel',
+        },
+        [SaleErrorTypes.SMART_CHECKOUT_NO_ROUTES_FOUND]: {
+          description:
+            'Your wallet has insufficent balance. Try paying with card instead.',
+          primaryAction: 'Try again',
+          secondaryAction: 'Cancel',
+        },
+        [SaleErrorTypes.SMART_CHECKOUT_ERROR]: {
+          description:
+            'Unable to check your wallets balance. Please try again.',
+          primaryAction: 'Try again',
+          secondaryAction: 'Cancel',
+        },
+        [SaleErrorTypes.DEFAULT]: {
+          description: 'Sorry, something went wrong. Please try again.',
+          primaryAction: 'Try again',
+          secondaryAction: 'Dismiss',
+        },
+      },
+    },
+    [SaleWidgetViews.SALE_SUCCESS]: {
+      text: 'Order completed',
+      actionText: 'Continue',
+    },
+  },
+  footers: {
+    quickswapFooter: {
+      disclaimerText: 'Quickswap is a third party app. Immutable neither builds, owns, operates or deploys Quickswap. For further info, refer to Quickswap’s website.',
     },
   },
   wallets: {
     [WalletProviderName.PASSPORT]: {
       heading: 'Immutable Passport',
       accentText: 'Recommended',
-      description:
-        'digital wallet and identity',
+      description: 'digital wallet and identity',
     },
     [WalletProviderName.METAMASK]: {
       heading: 'MetaMask',

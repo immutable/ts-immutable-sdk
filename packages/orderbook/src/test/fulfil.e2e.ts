@@ -1,5 +1,5 @@
 import { Environment } from '@imtbl/config';
-import { OrderStatus } from 'openapi/sdk';
+import { OrderStatusName } from 'openapi/sdk';
 import { Orderbook } from 'orderbook';
 import { getLocalhostProvider } from './helpers/provider';
 import { getFulfillerWallet, getOffererWallet } from './helpers/signers';
@@ -48,17 +48,19 @@ describe('fulfil order', () => {
       orderComponents: listing.orderComponents,
       orderHash: listing.orderHash,
       orderSignature: signatures[0],
+      makerFees: [],
     });
 
-    await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.ACTIVE);
+    await waitForOrderToBeOfStatus(sdk, orderId, OrderStatusName.ACTIVE);
 
     const fulfillment = await sdk.fulfillOrder(
       orderId,
       fulfiller.address,
+      [],
     );
 
     await actionAll(fulfillment.actions, fulfiller, provider);
 
-    await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.FILLED);
+    await waitForOrderToBeOfStatus(sdk, orderId, OrderStatusName.FILLED);
   }, 60_000);
 });

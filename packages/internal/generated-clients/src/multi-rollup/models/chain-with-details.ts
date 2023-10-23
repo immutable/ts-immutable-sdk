@@ -16,14 +16,11 @@
 // May contain unused imports in some cases
 // @ts-ignore
 import { Chain } from './chain';
-// May contain unused imports in some cases
-// @ts-ignore
-import { ChainWithDetailsAllOf } from './chain-with-details-all-of';
 
 /**
  * @type ChainWithDetails
  * @export
  */
-export type ChainWithDetails = Chain & ChainWithDetailsAllOf;
+export type ChainWithDetails = Chain;
 
 

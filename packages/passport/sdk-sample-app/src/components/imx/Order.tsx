@@ -1,24 +1,32 @@
 import { utils } from 'ethers';
-import React, {
-  useCallback,
-  useEffect,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
-  Alert, Button, Form, Image, InputGroup, Offcanvas, Spinner, Table,
+  Alert, Button, Form, Image, InputGroup, Offcanvas, Spinner, Stack, Table,
 } from 'react-bootstrap';
 import { Heading } from '@biom3/react';
-import { Asset, Order as OrderType, UnsignedOrderRequest } from '@imtbl/core-sdk';
+import {
+  Asset, Order as OrderType, TokenData, UnsignedOrderRequest,
+} from '@imtbl/core-sdk';
 import { ModalProps } from '@/types';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { useStatusProvider } from '@/context/StatusProvider';
 import { usePassportProvider } from '@/context/PassportProvider';
+import ViewOffersModal from '@/components/imx/ViewOffersModal';
+import { MARKETPLACE_FEE_PERCENTAGE, MARKETPLACE_FEE_RECIPIENT } from '@/config';
 
-type AssetWithSellOrder = { asset: Asset; sellOrder?: OrderType };
+type AssetWithSellOrder = { asset: Asset; sellOrder?: OrderType; };
+type AssetWithOffer = { asset: TokenData; offerOrder?: OrderType; };
+
+type AssetsWithOrders = {
+  sellAssets: AssetWithSellOrder[];
+  offerAssets: AssetWithOffer[];
+};
 
 function Order({ showModal, setShowModal }: ModalProps) {
-  const [userAssets, setUserAssets] = useState<AssetWithSellOrder[]>([]);
-  const [needReload, setNeedReload] = useState(false);
+  const [showViewOffers, setShowViewOffers] = useState<boolean>(false);
+  const [offerBuyTokenAddress, setOfferBuyTokenAddress] = useState<string>('');
+  const [offerBuyTokenId, setOfferBuyTokenId] = useState<string>('');
+  const [userAssets, setUserAssets] = useState<AssetsWithOrders>();
   const [loading, setLoading] = useState(true);
   const [sellingPrice, setSellingPrice] = useState<string>('0.01');
 
@@ -32,71 +40,59 @@ function Order({ showModal, setShowModal }: ModalProps) {
     const orders = await coreSdkClient.listOrders({
       user: imxWalletAddress,
       status: 'active',
+      auxiliaryFeePercentages: MARKETPLACE_FEE_PERCENTAGE.toString(),
+      auxiliaryFeeRecipients: MARKETPLACE_FEE_RECIPIENT,
     });
-    return assets?.result.map((asset) => ({
+    const assetsWithOffers = orders.result.filter(
+      (order) => order.buy.type === 'ERC721',
+    ).map((offerOrder) => ({
+      asset: offerOrder.buy.data,
+      offerOrder,
+    }));
+    const sellOrders = assets?.result.map((asset) => ({
       asset,
       sellOrder: orders.result.find(
         (sellOrder) => sellOrder.sell.data.token_id === asset.token_id,
       ),
     }));
+    return {
+      sellAssets: sellOrders,
+      offerAssets: assetsWithOffers,
+    };
   }, [coreSdkClient, imxProvider]);
 
   useEffect(() => {
     if (showModal) {
       (async () => {
         setLoading(true);
-        setUserAssets([]);
+        setUserAssets({
+          sellAssets: [],
+          offerAssets: [],
+        });
         const assetsWithOrder = await getUserAssetsWithOrder();
         setUserAssets(assetsWithOrder);
-        setNeedReload(false);
         setLoading(false);
       })();
     }
   }, [getUserAssetsWithOrder, showModal]);
-
-  useEffect(() => {
-    if (needReload) {
-      setTimeout(() => {
-        (async () => {
-          const assetsWithOrder = await getUserAssetsWithOrder();
-          setUserAssets(assetsWithOrder);
-          setNeedReload(false);
-          setLoading(false);
-        })();
-      }, 2000);
-    }
-  }, [getUserAssetsWithOrder, needReload]);
-
-  useEffect(() => {
-    (async () => {
-      const assetsWithOrder = await getUserAssetsWithOrder();
-      setUserAssets(assetsWithOrder);
-      setLoading(false);
-    })();
-  }, [getUserAssetsWithOrder]);
 
   const handleClose = useCallback(() => {
     setShowModal(false);
   }, [setShowModal]);
 
   const cancelOrder = useCallback(async (id: number) => {
-    if (!imxProvider) {
-      return;
-    }
     setLoading(true);
     try {
-      await imxProvider.cancelOrder({ order_id: id });
-      setNeedReload(true);
+      const result = await imxProvider?.cancelOrder({ order_id: id });
+      addMessage('Cancel Order', result);
     } catch (err) {
       addMessage('Cancel Order', err);
+    } finally {
       handleClose();
     }
   }, [imxProvider, handleClose, addMessage]);
 
   const createOrder = useCallback(async (asset: Asset) => {
-    if (!imxProvider) {
-      return;
-    }
     setLoading(true);
     const request: UnsignedOrderRequest = {
       buy: {
@@ -109,45 +105,50 @@ function Order({ showModal, setShowModal }: ModalProps) {
         tokenAddress: asset.token_address,
       },
       fees: [{
-        address: '0x8e70719571e87a328696ad099a7d9f6adc120892',
-        fee_percentage: 1,
+        address: MARKETPLACE_FEE_RECIPIENT,
+        fee_percentage: MARKETPLACE_FEE_PERCENTAGE,
       }],
     };
     try {
-      await imxProvider.createOrder(request);
-      setNeedReload(true);
+      const result = await imxProvider?.createOrder(request);
+      addMessage('Create Order', result);
     } catch (err) {
       addMessage('Create Order', err);
+    } finally {
       handleClose();
     }
   }, [imxProvider, sellingPrice, addMessage, handleClose]);
 
-  const getOrderList = (assets: AssetWithSellOrder[]) => {
-    if (loading) {
-      return (
-        <Spinner animation="border" variant="dark" />
-      );
-    }
+  const handleViewOffersClosed = () => {
+    handleClose();
+  };
 
-    return (
-      assets.length > 0
-        ? (
-          <Table striped bordered hover>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Name</th>
-                <th>Image Url</th>
-                <th>Price</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {
+  const viewOffers = useCallback(async (buyTokenAddress: string, buyTokenId: string) => {
+    setLoading(true);
+    setOfferBuyTokenAddress(buyTokenAddress);
+    setOfferBuyTokenId(buyTokenId);
+    setShowViewOffers(true);
+  }, []);
+
+  const getOrderList = (assets: AssetWithSellOrder[]) => (
+    assets.length > 0
+      ? (
+        <Table striped bordered hover>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Image</th>
+              <th style={{ width: '200px' }}>Price</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
               assets.map((userAsset, index) => (
                 <tr key={userAsset.asset.id}>
-                  <td>{ index }</td>
-                  <td>{ userAsset.asset.name }</td>
+                  <td>{index}</td>
+                  <td>{userAsset.asset.name}</td>
                   <td>
                     <Image
                       src={userAsset.asset.image_url || undefined}
@@ -157,66 +158,168 @@ function Order({ showModal, setShowModal }: ModalProps) {
                     />
                   </td>
                   <td>
-                    { userAsset.sellOrder?.buy.data.quantity_with_fees
+                    {userAsset.sellOrder?.buy.data.quantity_with_fees
                       ? utils.formatEther(userAsset.sellOrder?.buy.data.quantity_with_fees)
                       : (
                         <InputGroup size="sm" className="mb-3">
-                          <Form.Control
-                            placeholder="Selling Price"
-                            aria-label="Selling Price"
-                            aria-describedby="basic-addon"
-                            onChange={(e) => setSellingPrice(e.target.value)}
-                          />
-                          <InputGroup.Text id="basic-addon">Eth</InputGroup.Text>
-                          <InputGroup.Text>Default: 0.01</InputGroup.Text>
+                          <Stack>
+                            <Form.Label>
+                              Selling Price
+                            </Form.Label>
+                            <Stack direction="horizontal">
+                              <Form.Control
+                                defaultValue={sellingPrice}
+                                placeholder="Selling Price"
+                                aria-label="Selling Price"
+                                aria-describedby="basic-addon"
+                                onChange={(e) => setSellingPrice(e.target.value)}
+                              />
+                              <InputGroup.Text id="basic-addon">Eth</InputGroup.Text>
+                            </Stack>
+                          </Stack>
                         </InputGroup>
                       )}
                   </td>
                   <td>
-                    { !userAsset.sellOrder
-                      ? (
-                        <Button size="sm" variant="dark" onClick={() => createOrder(userAsset.asset)}>
-                          List for
-                          Sell
-                        </Button>
-                      )
-                      : (
-                        <Button
-                          size="sm"
-                          variant="danger"
-                          onClick={() => cancelOrder((userAsset.sellOrder as OrderType).order_id)}
-                        >
-                          Cancel Order
-                        </Button>
-                      ) }
+                    <Stack gap={3}>
+                      {!userAsset.sellOrder
+                        ? (
+                          <Button size="sm" variant="dark" onClick={() => createOrder(userAsset.asset)}>
+                            Sell
+                          </Button>
+                        )
+                        : (
+                          <>
+                            <Button
+                              size="sm"
+                              variant="danger"
+                              onClick={() => cancelOrder((userAsset.sellOrder as OrderType).order_id)}
+                            >
+                              Cancel
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="dark"
+                              onClick={() => (
+                                viewOffers(userAsset.asset.token_address, userAsset.asset.token_id)
+                              )}
+                            >
+                              Offers
+                            </Button>
+                          </>
+                        )}
+                    </Stack>
                   </td>
                 </tr>
               ))
             }
-            </tbody>
-          </Table>
-        )
-        : <Alert>You have no assets available to order</Alert>
-    );
-  };
+          </tbody>
+        </Table>
+      )
+      : <Alert>You have no assets available to order</Alert>
+  );
+
+  const getOfferList = (assets: AssetWithOffer[]) => (
+    assets.length > 0
+      ? (
+        <Table striped bordered hover>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>OrderID</th>
+              <th>Name</th>
+              <th>Image</th>
+              <th style={{ width: '200px' }}>Offer Price</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              assets.map((o, index) => (
+                <tr key={o.asset.id}>
+                  <td>{index}</td>
+                  <td>{o.offerOrder?.order_id}</td>
+                  <td>{o.asset?.properties?.name}</td>
+                  <td>
+                    <Image
+                      src={o.asset?.properties?.image_url || undefined}
+                      alt={o.asset?.properties?.name || ''}
+                      width="150"
+                      thumbnail
+                    />
+                  </td>
+                  <td>
+                    {o.offerOrder?.buy.data.quantity_with_fees
+                      ? utils.formatEther(o.offerOrder?.buy?.data.quantity_with_fees)
+                      : (
+                        <InputGroup size="sm" className="mb-3">
+                          <Stack>
+                            <Form.Label>
+                              {sellingPrice}
+                              {' '}
+                              ETH
+                            </Form.Label>
+                          </Stack>
+                        </InputGroup>
+                      )}
+                  </td>
+                  <td>
+                    <Stack gap={3}>
+                      {o.offerOrder && (
+                        <Button
+                          size="sm"
+                          variant="danger"
+                          onClick={() => cancelOrder((o.offerOrder as OrderType).order_id)}
+                        >
+                          Cancel Offer
+                        </Button>
+                      )}
+                    </Stack>
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </Table>
+      )
+      : <Alert>You have no assets available to order</Alert>
+  );
 
   return (
-    <Offcanvas
-      show={showModal}
-      onHide={handleClose}
-      backdrop="static"
-      placement="end"
-      style={{ width: '50%' }}
-    >
-      <Offcanvas.Header closeButton>
-        <Offcanvas.Title>
-          <Heading>Orders</Heading>
-        </Offcanvas.Title>
-      </Offcanvas.Header>
-      <Offcanvas.Body>
-        { getOrderList(userAssets) }
-      </Offcanvas.Body>
-    </Offcanvas>
+    <>
+      <ViewOffersModal
+        showModal={showViewOffers}
+        setShowModal={setShowViewOffers}
+        buyTokenAddress={offerBuyTokenAddress}
+        buyTokenId={offerBuyTokenId}
+        onClose={handleViewOffersClosed}
+      />
+      <Offcanvas
+        show={showModal}
+        onHide={handleClose}
+        backdrop="static"
+        placement="end"
+        style={{ width: '50%' }}
+      >
+        <Offcanvas.Header closeButton>
+          <Offcanvas.Title>
+            <Heading>Orders</Heading>
+          </Offcanvas.Title>
+        </Offcanvas.Header>
+
+        {loading
+          ? <Spinner animation="border" variant="dark" />
+          : (
+            <Offcanvas.Body>
+              {getOrderList(userAssets?.sellAssets || [])}
+              <Offcanvas.Title>
+                <Heading>Offers</Heading>
+              </Offcanvas.Title>
+              {getOfferList(userAssets?.offerAssets || [])}
+            </Offcanvas.Body>
+          )}
+      </Offcanvas>
+    </>
   );
 }
 

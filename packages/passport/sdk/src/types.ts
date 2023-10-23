@@ -119,6 +119,7 @@ export type IdTokenPayload = {
   nickname: string;
   aud: string;
   sub: string;
+  exp: number;
 };
 
 export type DeviceErrorResponse = {

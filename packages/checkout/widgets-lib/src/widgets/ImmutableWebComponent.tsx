@@ -1,5 +1,6 @@
 import ReactDOM from 'react-dom/client';
 import { Web3Provider } from '@ethersproject/providers';
+import { sdkVersionCheck, sdkVersion } from '@imtbl/version-check';
 import { Checkout } from '@imtbl/checkout-sdk';
 import { Passport } from '@imtbl/passport';
 import { StrongCheckoutWidgetsConfig, withDefaultWidgetConfigs } from '../lib/withDefaultWidgetConfig';
@@ -44,6 +45,8 @@ export abstract class ImmutableWebComponent extends HTMLElement {
     const widgetConfig = this.getAttribute('widgetconfig') || undefined;
     this.widgetConfig = this.parseWidgetConfig(widgetConfig);
     this.updateCheckout();
+    // Leave version at the end so the widgets will load even if the next call fails
+    sdkVersionCheck('checkout-widgets', sdkVersion);
   }
 
   private parseWidgetConfig(widgetsConfig?: string): StrongCheckoutWidgetsConfig {

@@ -70,3 +70,5 @@ export interface Activity {
     'blockchain_metadata': BlockchainMetadata | null;
 }
 
+
+

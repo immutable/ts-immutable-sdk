@@ -4,13 +4,22 @@ import { ActionType, SignablePurpose, constants } from '@imtbl/orderbook';
 import { BigNumber, TypedDataDomain } from 'ethers';
 import { getBuyToken, getERC721Requirement, sell } from './sell';
 import { CheckoutConfiguration } from '../../config';
-import { GasTokenType, ItemType, TransactionOrGasType } from '../../types';
+import {
+  CheckoutStatus,
+  BuyToken,
+  GasTokenType,
+  ItemType,
+  SellOrder,
+  TransactionOrGasType,
+} from '../../types';
 import { smartCheckout } from '../smartCheckout';
 import { createOrderbookInstance } from '../../instance';
-import { BuyToken, SellOrder, SellStatusType } from '../../types/sell';
 import { CheckoutErrorType } from '../../errors';
 import {
-  getUnsignedMessage, getUnsignedTransactions, signApprovalTransactions, signMessage,
+  getUnsignedMessage,
+  getUnsignedERC721Transactions,
+  signApprovalTransactions,
+  signMessage,
 } from '../actions';
 import { SignTransactionStatusType } from '../actions/types';
 
@@ -116,7 +125,7 @@ describe('sell', () => {
         orderComponents: {},
         signedMessage: '0xSIGNED',
       });
-      (getUnsignedTransactions as jest.Mock).mockResolvedValue({
+      (getUnsignedERC721Transactions as jest.Mock).mockResolvedValue({
         approvalTransactions: [{ from: '0xAPPROVAL' }],
       });
       (signApprovalTransactions as jest.Mock).mockResolvedValue({
@@ -145,16 +154,12 @@ describe('sell', () => {
       );
 
       expect(result).toEqual({
-        id,
-        collectionAddress: contractAddress,
         smartCheckoutResult: {
           sufficient: true,
           transactionRequirements: [erc721TransactionRequirement],
         },
-        status: {
-          type: SellStatusType.SUCCESS,
-          orderId: '1234',
-        },
+        status: CheckoutStatus.SUCCESS,
+        orderIds: ['1234'],
       });
 
       expect(smartCheckout).toBeCalledWith(
@@ -187,10 +192,10 @@ describe('sell', () => {
       );
       expect(mockCreateListing).toBeCalledWith(
         {
-          makerFee: {
+          makerFees: [{
             amount: '25000000000000000',
             recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
-          },
+          }],
           orderComponents: {},
           orderHash: 'hash',
           orderSignature: '0xSIGNED',
@@ -274,7 +279,7 @@ describe('sell', () => {
         orderComponents: {},
         signedMessage: '0xSIGNED',
       });
-      (getUnsignedTransactions as jest.Mock).mockResolvedValue({
+      (getUnsignedERC721Transactions as jest.Mock).mockResolvedValue({
         approvalTransactions: [{ from: '0xAPPROVAL' }],
       });
       (signApprovalTransactions as jest.Mock).mockResolvedValue({});
@@ -301,8 +306,7 @@ describe('sell', () => {
       );
 
       expect(result).toEqual({
-        id,
-        collectionAddress: contractAddress,
+        status: CheckoutStatus.INSUFFICIENT_FUNDS,
         smartCheckoutResult: {
           sufficient: false,
           transactionRequirements: [erc721TransactionRequirement],
@@ -397,12 +401,7 @@ describe('sell', () => {
           },
         },
       );
-      (signMessage as jest.Mock).mockResolvedValue({
-        orderHash: 'hash',
-        orderComponents: {},
-        signedMessage: '0xSIGNED',
-      });
-      (getUnsignedTransactions as jest.Mock).mockResolvedValue({
+      (getUnsignedERC721Transactions as jest.Mock).mockResolvedValue({
         approvalTransactions: [{ from: '0xAPPROVAL' }],
       });
       (signApprovalTransactions as jest.Mock).mockResolvedValue({
@@ -433,17 +432,13 @@ describe('sell', () => {
       );
 
       expect(result).toEqual({
-        id,
-        collectionAddress: contractAddress,
         smartCheckoutResult: {
           sufficient: true,
           transactionRequirements: [erc721TransactionRequirement],
         },
-        status: {
-          type: SellStatusType.FAILED,
-          transactionHash: '0xHASH',
-          reason: 'Approval transaction failed and was reverted',
-        },
+        status: CheckoutStatus.FAILED,
+        transactionHash: '0xHASH',
+        reason: 'Approval transaction failed and was reverted',
       });
 
       expect(smartCheckout).toBeCalledWith(
@@ -458,23 +453,12 @@ describe('sell', () => {
           },
         },
       );
-      expect(signMessage).toBeCalledWith(
-        mockProvider,
-        {
-          orderHash: 'hash',
-          orderComponents: {},
-          unsignedMessage: {
-            domain: {} as TypedDataDomain,
-            types: { types: [] },
-            value: { values: '' },
-          },
-        },
-      );
       expect(signApprovalTransactions).toBeCalledWith(
         mockProvider,
         [{ from: '0xAPPROVAL' }],
       );
-      expect(mockCreateListing).toBeCalledTimes(0);
+      expect(signMessage).not.toBeCalled();
+      expect(mockCreateListing).not.toBeCalled();
     });
 
     it('should throw error if prepare listing fails', async () => {
@@ -654,22 +638,23 @@ describe('sell', () => {
         }),
         createListing: mockCreateListing,
       });
-      (getUnsignedMessage as jest.Mock).mockReturnValue(
-        {
-          orderHash: 'hash',
-          orderComponents: {},
-          unsignedMessage: {
-            domain: {} as TypedDataDomain,
-            types: { types: [] },
-            value: { values: '' },
-          },
+      const unsignedMessage = {
+        orderHash: 'hash',
+        orderComponents: {},
+        unsignedMessage: {
+          domain: {} as TypedDataDomain,
+          types: { types: [] },
+          value: { values: '' },
         },
-      );
+      };
+      (getUnsignedMessage as jest.Mock).mockReturnValue(unsignedMessage);
       (signMessage as jest.Mock).mockRejectedValue(new Error('error from sign message'));
-      (getUnsignedTransactions as jest.Mock).mockResolvedValue({
+      (getUnsignedERC721Transactions as jest.Mock).mockResolvedValue({
         approvalTransactions: [{ from: '0xAPPROVAL' }],
       });
-      (signApprovalTransactions as jest.Mock).mockResolvedValue({});
+      (signApprovalTransactions as jest.Mock).mockResolvedValue({
+        type: SignTransactionStatusType.SUCCESS,
+      });
 
       const orders:Array<SellOrder> = [{
         sellToken: {
@@ -696,7 +681,12 @@ describe('sell', () => {
 
       expect(smartCheckout).toBeCalledTimes(1);
       expect(signMessage).toBeCalledTimes(1);
-      expect(signApprovalTransactions).toBeCalledTimes(0);
+      expect(signMessage).toBeCalledWith(mockProvider, unsignedMessage);
+      expect(signApprovalTransactions).toBeCalledTimes(1);
+      expect(signApprovalTransactions).toBeCalledWith(
+        mockProvider,
+        [{ from: '0xAPPROVAL' }],
+      );
       expect(mockCreateListing).toBeCalledTimes(0);
     });
 
@@ -753,23 +743,9 @@ describe('sell', () => {
         }),
         createListing: mockCreateListing,
       });
-      (getUnsignedMessage as jest.Mock).mockReturnValue(
-        {
-          orderHash: 'hash',
-          orderComponents: {},
-          unsignedMessage: {
-            domain: {} as TypedDataDomain,
-            types: { types: [] },
-            value: { values: '' },
-          },
-        },
-      );
-      (signMessage as jest.Mock).mockResolvedValue({
-        orderHash: 'hash',
-        orderComponents: {},
-        signedMessage: '0xSIGNED',
-      });
-      (getUnsignedTransactions as jest.Mock).mockRejectedValue(new Error('error from get unsigned transactions'));
+      (getUnsignedMessage as jest.Mock).mockReturnValue({});
+      (signMessage as jest.Mock).mockResolvedValue({});
+      (getUnsignedERC721Transactions as jest.Mock).mockRejectedValue(new Error('error from get unsigned transactions'));
       (signApprovalTransactions as jest.Mock).mockResolvedValue({});
 
       const orders:Array<SellOrder> = [{
@@ -796,8 +772,8 @@ describe('sell', () => {
       ).rejects.toThrowError('error from get unsigned transactions');
 
       expect(smartCheckout).toBeCalledTimes(1);
-      expect(signMessage).toBeCalledTimes(1);
-      expect(getUnsignedTransactions).toBeCalledTimes(1);
+      expect(getUnsignedERC721Transactions).toBeCalledTimes(1);
+      expect(signMessage).toBeCalledTimes(0);
       expect(signApprovalTransactions).toBeCalledTimes(0);
       expect(mockCreateListing).toBeCalledTimes(0);
     });
@@ -855,23 +831,9 @@ describe('sell', () => {
         }),
         createListing: mockCreateListing,
       });
-      (getUnsignedMessage as jest.Mock).mockReturnValue(
-        {
-          orderHash: 'hash',
-          orderComponents: {},
-          unsignedMessage: {
-            domain: {} as TypedDataDomain,
-            types: { types: [] },
-            value: { values: '' },
-          },
-        },
-      );
-      (signMessage as jest.Mock).mockResolvedValue({
-        orderHash: 'hash',
-        orderComponents: {},
-        signedMessage: '0xSIGNED',
-      });
-      (getUnsignedTransactions as jest.Mock).mockResolvedValue({
+      (getUnsignedMessage as jest.Mock).mockReturnValue({});
+      (signMessage as jest.Mock).mockResolvedValue({});
+      (getUnsignedERC721Transactions as jest.Mock).mockResolvedValue({
         approvalTransactions: [{ from: '0xAPPROVAL' }],
       });
       (signApprovalTransactions as jest.Mock).mockRejectedValue(new Error('error from sign approval transactions'));
@@ -900,9 +862,9 @@ describe('sell', () => {
       ).rejects.toThrowError('error from sign approval transactions');
 
       expect(smartCheckout).toBeCalledTimes(1);
-      expect(signMessage).toBeCalledTimes(1);
       expect(signApprovalTransactions).toBeCalledTimes(1);
-      expect(getUnsignedTransactions).toBeCalledTimes(1);
+      expect(getUnsignedERC721Transactions).toBeCalledTimes(1);
+      expect(signMessage).toBeCalledTimes(0);
       expect(mockCreateListing).toBeCalledTimes(0);
     });
 
@@ -951,8 +913,10 @@ describe('sell', () => {
       });
       (getUnsignedMessage as jest.Mock).mockReturnValue(undefined);
       (signMessage as jest.Mock).mockResolvedValue({});
-      (getUnsignedTransactions as jest.Mock).mockResolvedValue({});
-      (signApprovalTransactions as jest.Mock).mockResolvedValue({});
+      (getUnsignedERC721Transactions as jest.Mock).mockResolvedValue({});
+      (signApprovalTransactions as jest.Mock).mockResolvedValue({
+        type: SignTransactionStatusType.SUCCESS,
+      });
 
       let message;
       let type;
@@ -993,8 +957,8 @@ describe('sell', () => {
       });
 
       expect(smartCheckout).toBeCalledTimes(1);
+      expect(signApprovalTransactions).toBeCalledTimes(1);
       expect(signMessage).toBeCalledTimes(0);
-      expect(signApprovalTransactions).toBeCalledTimes(0);
       expect(mockCreateListing).toBeCalledTimes(0);
     });
 
@@ -1067,7 +1031,7 @@ describe('sell', () => {
         orderComponents: {},
         signedMessage: '0xSIGNED',
       });
-      (getUnsignedTransactions as jest.Mock).mockResolvedValue({
+      (getUnsignedERC721Transactions as jest.Mock).mockResolvedValue({
         approvalTransactions: [{ from: '0xAPPROVAL' }],
       });
       (signApprovalTransactions as jest.Mock).mockResolvedValue({});

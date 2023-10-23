@@ -6,22 +6,27 @@ import {
   OrderbookOverrides,
 } from './config/config';
 import { Fee as OpenApiFee } from './openapi/sdk';
-import { mapFromOpenApiOrder, mapFromOpenApiPage, mapFromOpenApiTrade } from './openapi/mapper';
+import {
+  mapFromOpenApiOrder,
+  mapFromOpenApiPage,
+  mapFromOpenApiTrade,
+} from './openapi/mapper';
 import { Seaport } from './seaport';
 import { SeaportLibFactory } from './seaport/seaport-lib-factory';
 import {
   CancelOrderResponse,
   CreateListingParams,
-  Fee,
   FeeType,
   FeeValue,
+  FulfillBulkOrdersResponse,
+  FulfillmentListing,
   FulfillOrderResponse,
+  ListingResult,
   ListListingsParams,
   ListListingsResult,
   ListTradesParams,
   ListTradesResult,
-  ListingResult,
-  OrderStatus,
+  OrderStatusName,
   PrepareListingParams,
   PrepareListingResponse,
   TradeResult,
@@ -175,16 +180,8 @@ export class Orderbook {
   async createListing(
     createListingParams: CreateListingParams,
   ): Promise<ListingResult> {
-    const makerFee: Fee | undefined = createListingParams.makerFee
-      ? {
-        ...createListingParams.makerFee,
-        type: FeeType.MAKER_MARKETPLACE,
-      }
-      : undefined;
-
     const apiListingResponse = await this.apiClient.createListing({
       ...createListingParams,
-      makerFee,
     });
 
     return {
@@ -203,35 +200,95 @@ export class Orderbook {
   async fulfillOrder(
     listingId: string,
     takerAddress: string,
-    takerFee?: FeeValue,
+    takerFees: FeeValue[],
   ): Promise<FulfillOrderResponse> {
     const fulfillmentDataRes = await this.apiClient.fulfillmentData([
       {
         order_id: listingId,
-        fee: takerFee
-          ? {
-            amount: takerFee.amount,
-            fee_type: FeeType.TAKER_MARKETPLACE as unknown as OpenApiFee.fee_type.TAKER_MARKETPLACE,
-            recipient: takerFee.recipient,
-          }
-          : undefined,
+        fees: takerFees.map((fee) => ({
+          amount: fee.amount,
+          fee_type:
+            FeeType.TAKER_ECOSYSTEM as unknown as OpenApiFee.fee_type.TAKER_ECOSYSTEM,
+          recipient: fee.recipient,
+        })),
       },
     ]);
 
-    if (fulfillmentDataRes.result.length !== 1) {
-      throw new Error('unexpected fulfillment data result length');
+    if (fulfillmentDataRes.result.unfulfillable_orders?.length > 0) {
+      throw new Error(
+        `Unable to prepare fulfillment date: ${fulfillmentDataRes.result.unfulfillable_orders[0].reason}`,
+      );
+    } else if (fulfillmentDataRes.result.fulfillable_orders?.length !== 1) {
+      throw new Error('unexpected fulfillable order result length');
     }
 
-    const extraData = fulfillmentDataRes.result[0].extra_data;
-    const orderResult = fulfillmentDataRes.result[0].order;
+    const extraData = fulfillmentDataRes.result.fulfillable_orders[0].extra_data;
+    const orderResult = fulfillmentDataRes.result.fulfillable_orders[0].order;
 
-    if (orderResult.status !== OrderStatus.ACTIVE) {
+    if (orderResult.status.name !== OrderStatusName.ACTIVE) {
       throw new Error(
         `Cannot fulfil order that is not active. Current status: ${orderResult.status}`,
       );
     }
 
     return this.seaport.fulfillOrder(orderResult, takerAddress, extraData);
+  }
+
+  async fulfillBulkOrders(
+    listings: Array<FulfillmentListing>,
+    takerAddress: string,
+  ): Promise<FulfillBulkOrdersResponse> {
+    const fulfillmentDataRes = await this.apiClient.fulfillmentData(
+      listings.map((listingRequest) => ({
+        order_id: listingRequest.listingId,
+        fees: listingRequest.takerFees.map((fee) => ({
+          amount: fee.amount,
+          fee_type:
+            FeeType.TAKER_ECOSYSTEM as unknown as OpenApiFee.fee_type.TAKER_ECOSYSTEM,
+          recipient: fee.recipient,
+        })),
+      })),
+    );
+
+    try {
+      return {
+        ...(await this.seaport.fulfillBulkOrders(
+          fulfillmentDataRes.result.fulfillable_orders,
+          takerAddress,
+        )),
+        fulfillableOrders: fulfillmentDataRes.result.fulfillable_orders.map(
+          (o) => mapFromOpenApiOrder(o.order),
+        ),
+        unfulfillableOrders: fulfillmentDataRes.result.unfulfillable_orders.map(
+          (o) => ({
+            orderId: o.order_id,
+            reason: o.reason,
+          }),
+        ),
+        sufficientBalance: true,
+      };
+    } catch (e: any) {
+      // if insufficient balance error, we return FulfillBulkOrdersInsufficientBalanceResponse
+      if (String(e).includes('The fulfiller does not have the balances needed to fulfill.')) {
+        return {
+          fulfillableOrders: fulfillmentDataRes.result.fulfillable_orders.map(
+            (o) => mapFromOpenApiOrder(o.order),
+          ),
+          unfulfillableOrders: fulfillmentDataRes.result.unfulfillable_orders.map(
+            (o) => ({
+              orderId: o.order_id,
+              reason: o.reason,
+            }),
+          ),
+          sufficientBalance: false,
+        };
+      }
+
+      // if some other error is thrown,
+      // there likely is a race condition of the original order validity
+      // we throw the error back out
+      throw e;
+    }
   }
 
   /**
@@ -248,9 +305,9 @@ export class Orderbook {
     const orderResult = await this.apiClient.getListing(listingId);
 
     if (
-      orderResult.result.status !== OrderStatus.ACTIVE
-      && orderResult.result.status !== OrderStatus.INACTIVE
-      && orderResult.result.status !== OrderStatus.PENDING
+      orderResult.result.status.name !== OrderStatusName.ACTIVE
+      && orderResult.result.status.name !== OrderStatusName.INACTIVE
+      && orderResult.result.status.name !== OrderStatusName.PENDING
     ) {
       throw new Error(
         `Cannot cancel order with status ${orderResult.result.status}`,

@@ -1,5 +1,5 @@
 import { Environment } from '@imtbl/config';
-import { OrderStatus } from 'openapi/sdk';
+import { OrderStatusName } from 'openapi/sdk';
 import { Orderbook } from 'orderbook';
 import { getLocalhostProvider } from './helpers/provider';
 import { getOffererWallet } from './helpers/signers';
@@ -48,9 +48,10 @@ describe('cancel order', () => {
       orderComponents: listing.orderComponents,
       orderHash: listing.orderHash,
       orderSignature: signatures[0],
+      makerFees: [],
     });
 
-    await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.ACTIVE);
+    await waitForOrderToBeOfStatus(sdk, orderId, OrderStatusName.ACTIVE);
 
     const { unsignedCancelOrderTransaction } = await sdk.cancelOrder(
       orderId,
@@ -58,6 +59,6 @@ describe('cancel order', () => {
     );
     await signAndSubmitTx(unsignedCancelOrderTransaction, offerer, provider);
 
-    await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.CANCELLED);
+    await waitForOrderToBeOfStatus(sdk, orderId, OrderStatusName.CANCELLED);
   }, 60_000);
 });

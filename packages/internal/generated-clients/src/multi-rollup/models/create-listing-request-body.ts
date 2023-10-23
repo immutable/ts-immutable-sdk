@@ -48,17 +48,17 @@ export interface CreateListingRequestBody {
      */
     'buy': Array<Item>;
     /**
-     * 
-     * @type {Fee}
+     * Buy fees should only include maker marketplace fees and should be no more than two entries as more entires will incur more gas. It is best practice to have this as few as possible.
+     * @type {Array<Fee>}
      * @memberof CreateListingRequestBody
      */
-    'fee'?: Fee;
+    'fees': Array<Fee>;
     /**
      * Time after which the Order is considered expired
      * @type {string}
      * @memberof CreateListingRequestBody
      */
-    'end_time': string;
+    'end_at': string;
     /**
      * 
      * @type {ProtocolData}
@@ -88,6 +88,6 @@ export interface CreateListingRequestBody {
      * @type {string}
      * @memberof CreateListingRequestBody
      */
-    'start_time': string;
+    'start_at': string;
 }
 

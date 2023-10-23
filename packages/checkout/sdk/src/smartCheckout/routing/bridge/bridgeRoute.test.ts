@@ -1,32 +1,34 @@
 import { Environment } from '@imtbl/config';
 import { JsonRpcProvider } from '@ethersproject/providers';
-import { BigNumber } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 import {
+  BridgeRequirement,
   bridgeRoute,
-  fetchL1Representation,
   getBridgeGasEstimate,
   hasSufficientL1Eth,
   isNativeEth,
 } from './bridgeRoute';
 import { CheckoutConfiguration } from '../../../config';
 import {
+  BridgeRouteFeeEstimate,
   ChainId,
-  FundingRouteType,
+  DEFAULT_TOKEN_DECIMALS,
+  FundingRouteFeeEstimate,
+  FundingStepType,
   ItemType,
 } from '../../../types';
-import { BalanceRequirement } from '../../balanceCheck/types';
 import { TokenBalanceResult } from '../types';
 import { createBlockchainDataInstance } from '../../../instance';
 import { estimateGasForBridgeApproval } from './estimateApprovalGas';
-import { bridgeGasEstimate } from './bridgeGasEstimate';
-import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from './constants';
+import { getBridgeFeeEstimate } from './getBridgeFeeEstimate';
 import { CheckoutErrorType } from '../../../errors';
 import { allowListCheckForBridge } from '../../allowList/allowListCheck';
+import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from '../indexer/fetchL1Representation';
 
 jest.mock('../../../gasEstimate');
 jest.mock('../../../instance');
 jest.mock('./estimateApprovalGas');
-jest.mock('./bridgeGasEstimate');
+jest.mock('./getBridgeFeeEstimate');
 jest.mock('../../allowList/allowListCheck');
 
 describe('bridgeRoute', () => {
@@ -40,40 +42,37 @@ describe('bridgeRoute', () => {
   ]);
 
   describe('bridgeRoute', () => {
-    const feeEstimates = new Map<FundingRouteType, BigNumber>([
-      [FundingRouteType.BRIDGE, BigNumber.from(1)],
+    const feeEstimates = new Map<FundingStepType, FundingRouteFeeEstimate>([
+      [
+        FundingStepType.BRIDGE,
+        {
+          type: FundingStepType.BRIDGE,
+          gasFee: {
+            estimatedAmount: BigNumber.from(2),
+            token: {
+              name: 'Ethereum',
+              symbol: 'ETH',
+              decimals: 18,
+            },
+          },
+          bridgeFee: {
+            estimatedAmount: BigNumber.from(3),
+            token: {
+              name: 'Ethereum',
+              symbol: 'ETH',
+              decimals: 18,
+            },
+          },
+          totalFees: BigNumber.from(5),
+        },
+      ],
     ]);
 
     describe('Bridge ETH ERC20', () => {
-      const balanceRequirement: BalanceRequirement = {
-        type: ItemType.ERC20,
-        sufficient: false,
-        delta: {
-          balance: BigNumber.from(10),
-          formattedBalance: '10',
-        },
-        current: {
-          type: ItemType.ERC20,
-          balance: BigNumber.from(0),
-          formattedBalance: '0',
-          token: {
-            name: 'ETH-ERC20',
-            symbol: 'ETH-ERC20',
-            decimals: 18,
-            address: '0x123',
-          },
-        },
-        required: {
-          type: ItemType.ERC20,
-          balance: BigNumber.from(10),
-          formattedBalance: '10',
-          token: {
-            name: 'ETH-ERC20',
-            symbol: 'ETH-ERC20',
-            decimals: 18,
-            address: '0x123',
-          },
-        },
+      const bridgeRequirement: BridgeRequirement = {
+        amount: BigNumber.from(10),
+        formattedAmount: '10',
+        l2address: '0xL2ADDRESS',
       };
 
       beforeEach(() => {
@@ -112,8 +111,8 @@ describe('bridgeRoute', () => {
                 },
               },
               {
-                balance: BigNumber.from(12),
-                formattedBalance: '12',
+                balance: BigNumber.from(16),
+                formattedBalance: '16',
                 token: {
                   name: 'Ethereum',
                   symbol: 'ETH',
@@ -131,22 +130,59 @@ describe('bridgeRoute', () => {
           {
             bridge: true,
           },
-          balanceRequirement,
+          bridgeRequirement,
           balances,
           feeEstimates,
         );
 
         expect(route).toEqual({
-          type: FundingRouteType.BRIDGE,
+          type: FundingStepType.BRIDGE,
           chainId: ChainId.SEPOLIA,
-          asset: {
-            balance: BigNumber.from(12),
-            formattedBalance: '12',
+          fundingItem: {
+            type: ItemType.NATIVE,
+            fundsRequired: {
+              amount: BigNumber.from(10),
+              formattedAmount: '10',
+            },
+            userBalance: {
+              balance: BigNumber.from(16),
+              formattedBalance: '16',
+            },
             token: {
               name: 'Ethereum',
               symbol: 'ETH',
               decimals: 18,
+              address: undefined,
             },
+          },
+          fees: {
+            approvalGasFees: {
+              amount: BigNumber.from(0),
+              formattedAmount: utils.formatUnits(BigNumber.from(0), DEFAULT_TOKEN_DECIMALS),
+              token: {
+                name: 'Ethereum',
+                symbol: 'ETH',
+                decimals: 18,
+              },
+            },
+            bridgeGasFees: {
+              amount: BigNumber.from(2),
+              formattedAmount: utils.formatUnits(BigNumber.from(2), DEFAULT_TOKEN_DECIMALS),
+              token: {
+                name: 'Ethereum',
+                symbol: 'ETH',
+                decimals: 18,
+              },
+            },
+            bridgeFees: [{
+              amount: BigNumber.from(3),
+              formattedAmount: utils.formatUnits(BigNumber.from(3), DEFAULT_TOKEN_DECIMALS),
+              token: {
+                name: 'Ethereum',
+                symbol: 'ETH',
+                decimals: 18,
+              },
+            }],
           },
         });
       });
@@ -157,8 +193,8 @@ describe('bridgeRoute', () => {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(11),
-                formattedBalance: '11',
+                balance: BigNumber.from(15),
+                formattedBalance: '15',
                 token: {
                   name: 'Ethereum',
                   symbol: 'ETH',
@@ -176,22 +212,59 @@ describe('bridgeRoute', () => {
           {
             bridge: true,
           },
-          balanceRequirement,
+          bridgeRequirement,
           balances,
           feeEstimates,
         );
 
         expect(route).toEqual({
-          type: FundingRouteType.BRIDGE,
+          type: FundingStepType.BRIDGE,
           chainId: ChainId.SEPOLIA,
-          asset: {
-            balance: BigNumber.from(11),
-            formattedBalance: '11',
+          fundingItem: {
+            type: ItemType.NATIVE,
+            fundsRequired: {
+              amount: BigNumber.from(10),
+              formattedAmount: '10',
+            },
+            userBalance: {
+              balance: BigNumber.from(15),
+              formattedBalance: '15',
+            },
             token: {
               name: 'Ethereum',
               symbol: 'ETH',
               decimals: 18,
+              address: undefined,
             },
+          },
+          fees: {
+            approvalGasFees: {
+              amount: BigNumber.from(0),
+              formattedAmount: utils.formatUnits(BigNumber.from(0), DEFAULT_TOKEN_DECIMALS),
+              token: {
+                name: 'Ethereum',
+                symbol: 'ETH',
+                decimals: 18,
+              },
+            },
+            bridgeGasFees: {
+              amount: BigNumber.from(2),
+              formattedAmount: utils.formatUnits(BigNumber.from(2), DEFAULT_TOKEN_DECIMALS),
+              token: {
+                name: 'Ethereum',
+                symbol: 'ETH',
+                decimals: 18,
+              },
+            },
+            bridgeFees: [{
+              amount: BigNumber.from(3),
+              formattedAmount: utils.formatUnits(BigNumber.from(3), DEFAULT_TOKEN_DECIMALS),
+              token: {
+                name: 'Ethereum',
+                symbol: 'ETH',
+                decimals: 18,
+              },
+            }],
           },
         });
       });
@@ -202,8 +275,8 @@ describe('bridgeRoute', () => {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(10),
-                formattedBalance: '10',
+                balance: BigNumber.from(14),
+                formattedBalance: '14',
                 token: {
                   name: 'Ethereum',
                   symbol: 'ETH',
@@ -221,7 +294,7 @@ describe('bridgeRoute', () => {
           {
             bridge: true,
           },
-          balanceRequirement,
+          bridgeRequirement,
           balances,
           feeEstimates,
         );
@@ -245,8 +318,8 @@ describe('bridgeRoute', () => {
                 },
               },
               {
-                balance: BigNumber.from(12),
-                formattedBalance: '12',
+                balance: BigNumber.from(20),
+                formattedBalance: '20',
                 token: {
                   name: 'Ethereum',
                   symbol: 'ETH',
@@ -265,7 +338,7 @@ describe('bridgeRoute', () => {
           {
             bridge: true,
           },
-          balanceRequirement,
+          bridgeRequirement,
           balances,
           feeEstimates,
         );
@@ -276,35 +349,10 @@ describe('bridgeRoute', () => {
     });
 
     describe('Bridge non-ETH ERC20', () => {
-      const balanceRequirement: BalanceRequirement = {
-        type: ItemType.ERC20,
-        sufficient: false,
-        delta: {
-          balance: BigNumber.from(10),
-          formattedBalance: '10',
-        },
-        current: {
-          type: ItemType.ERC20,
-          balance: BigNumber.from(0),
-          formattedBalance: '0',
-          token: {
-            name: '0xERC20',
-            symbol: '0xERC20',
-            decimals: 18,
-            address: '0x123',
-          },
-        },
-        required: {
-          type: ItemType.ERC20,
-          balance: BigNumber.from(10),
-          formattedBalance: '10',
-          token: {
-            name: '0xERC20',
-            symbol: '0xERC20',
-            decimals: 18,
-            address: '0x123',
-          },
-        },
+      const bridgeRequirement = {
+        amount: BigNumber.from(10),
+        formattedAmount: '10',
+        l2address: '0xL2ADDRESS',
       };
 
       beforeEach(() => {
@@ -334,8 +382,8 @@ describe('bridgeRoute', () => {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(10),
-                formattedBalance: '10',
+                balance: BigNumber.from(7),
+                formattedBalance: '7',
                 token: {
                   name: 'Ethereum',
                   symbol: 'ETH',
@@ -343,8 +391,8 @@ describe('bridgeRoute', () => {
                 },
               },
               {
-                balance: BigNumber.from(11),
-                formattedBalance: '11',
+                balance: BigNumber.from(10),
+                formattedBalance: '10',
                 token: {
                   name: '0xERC20',
                   symbol: '0xERC20',
@@ -363,23 +411,59 @@ describe('bridgeRoute', () => {
           {
             bridge: true,
           },
-          balanceRequirement,
+          bridgeRequirement,
           balances,
           feeEstimates,
         );
 
         expect(route).toEqual({
-          type: FundingRouteType.BRIDGE,
+          type: FundingStepType.BRIDGE,
           chainId: ChainId.SEPOLIA,
-          asset: {
-            balance: BigNumber.from(11),
-            formattedBalance: '11',
+          fundingItem: {
+            type: ItemType.ERC20,
+            fundsRequired: {
+              amount: BigNumber.from(10),
+              formattedAmount: '10',
+            },
+            userBalance: {
+              balance: BigNumber.from(10),
+              formattedBalance: '10',
+            },
             token: {
               name: '0xERC20',
               symbol: '0xERC20',
               address: '0xROOT_ADDRESS',
               decimals: 18,
             },
+          },
+          fees: {
+            approvalGasFees: {
+              amount: BigNumber.from(1),
+              formattedAmount: utils.formatUnits(BigNumber.from(1), DEFAULT_TOKEN_DECIMALS),
+              token: {
+                name: 'Ethereum',
+                symbol: 'ETH',
+                decimals: 18,
+              },
+            },
+            bridgeGasFees: {
+              amount: BigNumber.from(2),
+              formattedAmount: utils.formatUnits(BigNumber.from(2), DEFAULT_TOKEN_DECIMALS),
+              token: {
+                name: 'Ethereum',
+                symbol: 'ETH',
+                decimals: 18,
+              },
+            },
+            bridgeFees: [{
+              amount: BigNumber.from(3),
+              formattedAmount: utils.formatUnits(BigNumber.from(3), DEFAULT_TOKEN_DECIMALS),
+              token: {
+                name: 'Ethereum',
+                symbol: 'ETH',
+                decimals: 18,
+              },
+            }],
           },
         });
       });
@@ -390,8 +474,8 @@ describe('bridgeRoute', () => {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(2),
-                formattedBalance: '2',
+                balance: BigNumber.from(6),
+                formattedBalance: '6',
                 token: {
                   name: 'Ethereum',
                   symbol: 'ETH',
@@ -419,23 +503,59 @@ describe('bridgeRoute', () => {
           {
             bridge: true,
           },
-          balanceRequirement,
+          bridgeRequirement,
           balances,
           feeEstimates,
         );
 
         expect(route).toEqual({
-          type: FundingRouteType.BRIDGE,
+          type: FundingStepType.BRIDGE,
           chainId: ChainId.SEPOLIA,
-          asset: {
-            balance: BigNumber.from(10),
-            formattedBalance: '10',
+          fundingItem: {
+            type: ItemType.ERC20,
+            fundsRequired: {
+              amount: BigNumber.from(10),
+              formattedAmount: '10',
+            },
+            userBalance: {
+              balance: BigNumber.from(10),
+              formattedBalance: '10',
+            },
             token: {
               name: '0xERC20',
               symbol: '0xERC20',
               address: '0xROOT_ADDRESS',
               decimals: 18,
             },
+          },
+          fees: {
+            approvalGasFees: {
+              amount: BigNumber.from(1),
+              formattedAmount: utils.formatUnits(BigNumber.from(1), DEFAULT_TOKEN_DECIMALS),
+              token: {
+                name: 'Ethereum',
+                symbol: 'ETH',
+                decimals: 18,
+              },
+            },
+            bridgeGasFees: {
+              amount: BigNumber.from(2),
+              formattedAmount: utils.formatUnits(BigNumber.from(2), DEFAULT_TOKEN_DECIMALS),
+              token: {
+                name: 'Ethereum',
+                symbol: 'ETH',
+                decimals: 18,
+              },
+            },
+            bridgeFees: [{
+              amount: BigNumber.from(3),
+              formattedAmount: utils.formatUnits(BigNumber.from(3), DEFAULT_TOKEN_DECIMALS),
+              token: {
+                name: 'Ethereum',
+                symbol: 'ETH',
+                decimals: 18,
+              },
+            }],
           },
         });
       });
@@ -446,8 +566,8 @@ describe('bridgeRoute', () => {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(2),
-                formattedBalance: '2',
+                balance: BigNumber.from(10),
+                formattedBalance: '10',
                 token: {
                   name: 'Ethereum',
                   symbol: 'ETH',
@@ -475,7 +595,7 @@ describe('bridgeRoute', () => {
           {
             bridge: true,
           },
-          balanceRequirement,
+          bridgeRequirement,
           balances,
           feeEstimates,
         );
@@ -489,8 +609,8 @@ describe('bridgeRoute', () => {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(1),
-                formattedBalance: '1',
+                balance: BigNumber.from(4),
+                formattedBalance: '4',
                 token: {
                   name: 'Ethereum',
                   symbol: 'ETH',
@@ -518,7 +638,7 @@ describe('bridgeRoute', () => {
           {
             bridge: true,
           },
-          balanceRequirement,
+          bridgeRequirement,
           balances,
           feeEstimates,
         );
@@ -562,7 +682,7 @@ describe('bridgeRoute', () => {
           {
             bridge: true,
           },
-          balanceRequirement,
+          bridgeRequirement,
           balances,
           feeEstimates,
         );
@@ -573,36 +693,19 @@ describe('bridgeRoute', () => {
     });
 
     it('should return undefined if no balance on layer 1', async () => {
-      const balanceRequirement: BalanceRequirement = {
-        type: ItemType.ERC20,
-        sufficient: false,
-        delta: {
-          balance: BigNumber.from(10),
-          formattedBalance: '10',
-        },
-        current: {
-          type: ItemType.ERC20,
-          balance: BigNumber.from(0),
-          formattedBalance: '0',
-          token: {
-            name: '0xERC20',
-            symbol: '0xERC20',
-            decimals: 18,
-            address: '0x123',
-          },
-        },
-        required: {
-          type: ItemType.ERC20,
-          balance: BigNumber.from(10),
-          formattedBalance: '10',
-          token: {
-            name: '0xERC20',
-            symbol: '0xERC20',
-            decimals: 18,
-            address: '0x123',
-          },
-        },
+      const bridgeRequirement = {
+        amount: BigNumber.from(10),
+        formattedAmount: '10',
+        l2address: '0xL2ADDRESS',
       };
+
+      (allowListCheckForBridge as jest.Mock).mockResolvedValue([
+        {
+          name: 'Ethereum',
+          symbol: 'ETH',
+          decimals: 18,
+        },
+      ]);
 
       const balances = new Map<ChainId, TokenBalanceResult>([
         [ChainId.SEPOLIA, {
@@ -618,7 +721,7 @@ describe('bridgeRoute', () => {
         {
           bridge: true,
         },
-        balanceRequirement,
+        bridgeRequirement,
         balances,
         feeEstimates,
       );
@@ -627,35 +730,10 @@ describe('bridgeRoute', () => {
     });
 
     it('should return undefined if no token balance result for L1', async () => {
-      const balanceRequirement: BalanceRequirement = {
-        type: ItemType.ERC20,
-        sufficient: false,
-        delta: {
-          balance: BigNumber.from(10),
-          formattedBalance: '10',
-        },
-        current: {
-          type: ItemType.ERC20,
-          balance: BigNumber.from(0),
-          formattedBalance: '0',
-          token: {
-            name: '0xERC20',
-            symbol: '0xERC20',
-            decimals: 18,
-            address: '0x123',
-          },
-        },
-        required: {
-          type: ItemType.ERC20,
-          balance: BigNumber.from(10),
-          formattedBalance: '10',
-          token: {
-            name: '0xERC20',
-            symbol: '0xERC20',
-            decimals: 18,
-            address: '0x123',
-          },
-        },
+      const bridgeRequirement = {
+        amount: BigNumber.from(10),
+        formattedAmount: '10',
+        l2address: '0xL2ADDRESS',
       };
 
       const balances = new Map<ChainId, TokenBalanceResult>([
@@ -672,7 +750,7 @@ describe('bridgeRoute', () => {
         {
           bridge: true,
         },
-        balanceRequirement,
+        bridgeRequirement,
         balances,
         feeEstimates,
       );
@@ -681,35 +759,10 @@ describe('bridgeRoute', () => {
     });
 
     it('should return undefined if token balance returned unsuccessful on L1', async () => {
-      const balanceRequirement: BalanceRequirement = {
-        type: ItemType.ERC20,
-        sufficient: false,
-        delta: {
-          balance: BigNumber.from(10),
-          formattedBalance: '10',
-        },
-        current: {
-          type: ItemType.ERC20,
-          balance: BigNumber.from(0),
-          formattedBalance: '0',
-          token: {
-            name: '0xERC20',
-            symbol: '0xERC20',
-            decimals: 18,
-            address: '0x123',
-          },
-        },
-        required: {
-          type: ItemType.ERC20,
-          balance: BigNumber.from(10),
-          formattedBalance: '10',
-          token: {
-            name: '0xERC20',
-            symbol: '0xERC20',
-            decimals: 18,
-            address: '0x123',
-          },
-        },
+      const bridgeRequirement = {
+        amount: BigNumber.from(10),
+        formattedAmount: '10',
+        l2address: '0xL2ADDRESS',
       };
 
       const balances = new Map<ChainId, TokenBalanceResult>([
@@ -726,7 +779,7 @@ describe('bridgeRoute', () => {
         {
           bridge: true,
         },
-        balanceRequirement,
+        bridgeRequirement,
         balances,
         feeEstimates,
       );
@@ -735,35 +788,10 @@ describe('bridgeRoute', () => {
     });
 
     it('should throw error if readonly providers missing L1', async () => {
-      const balanceRequirement: BalanceRequirement = {
-        type: ItemType.ERC20,
-        sufficient: false,
-        delta: {
-          balance: BigNumber.from(10),
-          formattedBalance: '10',
-        },
-        current: {
-          type: ItemType.ERC20,
-          balance: BigNumber.from(0),
-          formattedBalance: '0',
-          token: {
-            name: '0xERC20',
-            symbol: '0xERC20',
-            decimals: 18,
-            address: '0x123',
-          },
-        },
-        required: {
-          type: ItemType.ERC20,
-          balance: BigNumber.from(10),
-          formattedBalance: '10',
-          token: {
-            name: '0xERC20',
-            symbol: '0xERC20',
-            decimals: 18,
-            address: '0x123',
-          },
-        },
+      const bridgeRequirement = {
+        amount: BigNumber.from(10),
+        formattedAmount: '10',
+        l2address: '0xL2ADDRESS',
       };
 
       const balances = new Map<ChainId, TokenBalanceResult>([
@@ -786,7 +814,7 @@ describe('bridgeRoute', () => {
           {
             bridge: true,
           },
-          balanceRequirement,
+          bridgeRequirement,
           balances,
           feeEstimates,
         );
@@ -868,245 +896,54 @@ describe('bridgeRoute', () => {
     });
   });
 
-  describe('fetchL1Representation', () => {
-    it('should fetch L1 representation of ERC20', async () => {
-      const balanceRequirement: BalanceRequirement = {
-        type: ItemType.ERC20,
-        sufficient: false,
-        delta: {
-          balance: BigNumber.from(10),
-          formattedBalance: '10',
-        },
-        current: {
-          type: ItemType.ERC20,
-          balance: BigNumber.from(0),
-          formattedBalance: '0',
-          token: {
-            name: '0xERC20',
-            symbol: '0xERC20',
-            decimals: 18,
-            address: '0x123',
-          },
-        },
-        required: {
-          type: ItemType.ERC20,
-          balance: BigNumber.from(10),
-          formattedBalance: '10',
-          token: {
-            name: '0xERC20',
-            symbol: '0xERC20',
-            decimals: 18,
-            address: '0x123',
-          },
-        },
-      };
-
-      (createBlockchainDataInstance as jest.Mock).mockReturnValue({
-        getToken: jest.fn().mockResolvedValue({
-          result: {
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            root_contract_address: '0xROOT_ADDRESS',
-          },
-        }),
-      });
-
-      const l1Address = await fetchL1Representation(
-        config,
-        balanceRequirement,
-      );
-
-      expect(l1Address).toEqual('0xROOT_ADDRESS');
-    });
-
-    it('should fetch L1 representation of NATIVE', async () => {
-      const balanceRequirement: BalanceRequirement = {
-        type: ItemType.NATIVE,
-        sufficient: false,
-        delta: {
-          balance: BigNumber.from(10),
-          formattedBalance: '10',
-        },
-        current: {
-          type: ItemType.NATIVE,
-          balance: BigNumber.from(0),
-          formattedBalance: '0',
-          token: {
-            name: '0xNATIVE',
-            symbol: '0xNATIVE',
-            decimals: 18,
-          },
-        },
-        required: {
-          type: ItemType.NATIVE,
-          balance: BigNumber.from(10),
-          formattedBalance: '10',
-          token: {
-            name: '0xNATIVE',
-            symbol: '0xNATIVE',
-            decimals: 18,
-          },
-        },
-      };
-
-      (createBlockchainDataInstance as jest.Mock).mockReturnValue({
-        getToken: jest.fn().mockResolvedValue({}),
-      });
-
-      const l1Address = await fetchL1Representation(
-        config,
-        balanceRequirement,
-      );
-
-      expect(l1Address).toEqual('0x2Fa06C6672dDCc066Ab04631192738799231dE4a');
-      expect(createBlockchainDataInstance).not.toHaveBeenCalled();
-    });
-
-    it('should return empty string if indexer returns null', async () => {
-      const balanceRequirement: BalanceRequirement = {
-        type: ItemType.ERC20,
-        sufficient: false,
-        delta: {
-          balance: BigNumber.from(10),
-          formattedBalance: '10',
-        },
-        current: {
-          type: ItemType.ERC20,
-          balance: BigNumber.from(0),
-          formattedBalance: '0',
-          token: {
-            name: '0xERC20',
-            symbol: '0xERC20',
-            decimals: 18,
-            address: '0x123',
-          },
-        },
-        required: {
-          type: ItemType.ERC20,
-          balance: BigNumber.from(10),
-          formattedBalance: '10',
-          token: {
-            name: '0xERC20',
-            symbol: '0xERC20',
-            decimals: 18,
-            address: '0x123',
-          },
-        },
-      };
-
-      (createBlockchainDataInstance as jest.Mock).mockReturnValue({
-        getToken: jest.fn().mockResolvedValue({
-          result: {
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            root_contract_address: null,
-          },
-        }),
-      });
-
-      const l1Address = await fetchL1Representation(
-        config,
-        balanceRequirement,
-      );
-
-      expect(l1Address).toEqual('');
-    });
-
-    it('should return empty string if no address in ERC20 requirement', async () => {
-      const balanceRequirement: BalanceRequirement = {
-        type: ItemType.ERC20,
-        sufficient: false,
-        delta: {
-          balance: BigNumber.from(10),
-          formattedBalance: '10',
-        },
-        current: {
-          type: ItemType.ERC20,
-          balance: BigNumber.from(0),
-          formattedBalance: '0',
-          token: {
-            name: '0xERC20',
-            symbol: '0xERC20',
-            decimals: 18,
-          },
-        },
-        required: {
-          type: ItemType.ERC20,
-          balance: BigNumber.from(10),
-          formattedBalance: '10',
-          token: {
-            name: '0xERC20',
-            symbol: '0xERC20',
-            decimals: 18,
-          },
-        },
-      };
-
-      (createBlockchainDataInstance as jest.Mock).mockReturnValue({
-        getToken: jest.fn().mockResolvedValue({
-          result: {
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            root_contract_address: '0xROOT_ADDRESS',
-          },
-        }),
-      });
-
-      const l1Address = await fetchL1Representation(
-        config,
-        balanceRequirement,
-      );
-
-      expect(l1Address).toEqual('');
-      expect(createBlockchainDataInstance).not.toHaveBeenCalled();
-    });
-
-    it('should return empty string if ERC721 requirement', async () => {
-      const balanceRequirement: BalanceRequirement = {
-        type: ItemType.ERC721,
-        sufficient: false,
-        delta: {
-          balance: BigNumber.from(10),
-          formattedBalance: '10',
-        },
-        current: {
-          type: ItemType.ERC721,
-          balance: BigNumber.from(0),
-          formattedBalance: '0',
-          id: '0',
-          contractAddress: '0xERC721',
-        },
-        required: {
-          type: ItemType.ERC721,
-          balance: BigNumber.from(10),
-          formattedBalance: '10',
-          id: '0',
-          contractAddress: '0xERC721',
-        },
-      };
-
-      (createBlockchainDataInstance as jest.Mock).mockReturnValue({
-        getToken: jest.fn().mockResolvedValue({
-          result: {
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            root_contract_address: '0xROOT_ADDRESS',
-          },
-        }),
-      });
-
-      const l1Address = await fetchL1Representation(
-        config,
-        balanceRequirement,
-      );
-
-      expect(l1Address).toEqual('');
-      expect(createBlockchainDataInstance).not.toHaveBeenCalled();
-    });
-  });
-
   describe('getBridgeGasEstimate', () => {
     it('should get from cache if already fetched', async () => {
-      (bridgeGasEstimate as jest.Mock).mockResolvedValue(BigNumber.from(1));
+      const bridgeRouteFeeEstimate: BridgeRouteFeeEstimate = {
+        type: FundingStepType.BRIDGE,
+        gasFee: {
+          estimatedAmount: BigNumber.from(1),
+          token: {
+            name: 'Ethereum',
+            symbol: 'ETH',
+            decimals: 18,
+          },
+        },
+        bridgeFee: {
+          estimatedAmount: BigNumber.from(1),
+          token: {
+            name: 'Ethereum',
+            symbol: 'ETH',
+            decimals: 18,
+          },
+        },
+        totalFees: BigNumber.from(2),
+      };
+      (getBridgeFeeEstimate as jest.Mock).mockResolvedValue(bridgeRouteFeeEstimate);
 
-      const feeEstimates = new Map<FundingRouteType, BigNumber>([
-        [FundingRouteType.BRIDGE, BigNumber.from(1)],
+      const feeEstimates = new Map<FundingStepType, FundingRouteFeeEstimate>([
+        [
+          FundingStepType.BRIDGE,
+          {
+            type: FundingStepType.BRIDGE,
+            gasFee: {
+              estimatedAmount: BigNumber.from(1),
+              token: {
+                name: 'Ethereum',
+                symbol: 'ETH',
+                decimals: 18,
+              },
+            },
+            bridgeFee: {
+              estimatedAmount: BigNumber.from(1),
+              token: {
+                name: 'Ethereum',
+                symbol: 'ETH',
+                decimals: 18,
+              },
+            },
+            totalFees: BigNumber.from(2),
+          },
+        ],
       ]);
 
       const bridgeFeeEstimate = await getBridgeGasEstimate(
@@ -1115,14 +952,34 @@ describe('bridgeRoute', () => {
         feeEstimates,
       );
 
-      expect(bridgeFeeEstimate).toEqual(BigNumber.from(1));
-      expect(bridgeGasEstimate).not.toHaveBeenCalled();
+      expect(bridgeFeeEstimate).toEqual(bridgeRouteFeeEstimate);
+      expect(getBridgeFeeEstimate).not.toHaveBeenCalled();
     });
 
     it('should fetch from cache if not already cached and set in cache', async () => {
-      (bridgeGasEstimate as jest.Mock).mockResolvedValue(BigNumber.from(1));
+      const bridgeRouteFeeEstimate: BridgeRouteFeeEstimate = {
+        type: FundingStepType.BRIDGE,
+        gasFee: {
+          estimatedAmount: BigNumber.from(1),
+          token: {
+            name: 'Ethereum',
+            symbol: 'ETH',
+            decimals: 18,
+          },
+        },
+        bridgeFee: {
+          estimatedAmount: BigNumber.from(1),
+          token: {
+            name: 'Ethereum',
+            symbol: 'ETH',
+            decimals: 18,
+          },
+        },
+        totalFees: BigNumber.from(2),
+      };
+      (getBridgeFeeEstimate as jest.Mock).mockResolvedValue(bridgeRouteFeeEstimate);
 
-      const feeEstimates = new Map<FundingRouteType, BigNumber>([]);
+      const feeEstimates = new Map<FundingStepType, FundingRouteFeeEstimate>([]);
 
       const bridgeFeeEstimate = await getBridgeGasEstimate(
         config,
@@ -1130,11 +987,9 @@ describe('bridgeRoute', () => {
         feeEstimates,
       );
 
-      expect(bridgeFeeEstimate).toEqual(BigNumber.from(1));
-      expect(bridgeGasEstimate).toHaveBeenCalledTimes(1);
-      expect(feeEstimates).toEqual(new Map<FundingRouteType, BigNumber>([
-        [FundingRouteType.BRIDGE, BigNumber.from(1)],
-      ]));
+      expect(bridgeFeeEstimate).toEqual(bridgeRouteFeeEstimate);
+      expect(getBridgeFeeEstimate).toHaveBeenCalledTimes(1);
+      expect(feeEstimates).toEqual(new Map<FundingStepType, FundingRouteFeeEstimate>(feeEstimates));
     });
   });
 

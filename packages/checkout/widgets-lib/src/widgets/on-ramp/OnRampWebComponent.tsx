@@ -1,6 +1,7 @@
 import React from 'react';
 import { WalletProviderName } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
+import { BiomePortalIdProvider } from '@biom3/react';
 import { OnRampWidget, OnRampWidgetParams } from './OnRampWidget';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
 import { isValidAddress, isValidAmount, isValidWalletProvider } from '../../lib/validations/widgetValidators';
@@ -90,20 +91,22 @@ export class ImmutableOnRamp extends ImmutableWebComponent {
 
     this.reactRoot.render(
       <React.StrictMode>
-        <CustomAnalyticsProvider
-          widgetConfig={this.widgetConfig!}
-        >
-          <ConnectLoader
-            params={connectLoaderParams}
+        <BiomePortalIdProvider>
+          <CustomAnalyticsProvider
             widgetConfig={this.widgetConfig!}
-            closeEvent={() => sendOnRampWidgetCloseEvent(window)}
           >
-            <OnRampWidget
-              params={params}
-              config={this.widgetConfig!}
-            />
-          </ConnectLoader>
-        </CustomAnalyticsProvider>
+            <ConnectLoader
+              params={connectLoaderParams}
+              widgetConfig={this.widgetConfig!}
+              closeEvent={() => sendOnRampWidgetCloseEvent(window)}
+            >
+              <OnRampWidget
+                params={params}
+                config={this.widgetConfig!}
+              />
+            </ConnectLoader>
+          </CustomAnalyticsProvider>
+        </BiomePortalIdProvider>
       </React.StrictMode>,
     );
   }

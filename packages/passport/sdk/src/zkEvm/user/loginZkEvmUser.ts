@@ -31,7 +31,6 @@ export const loginZkEvmUser = async ({
 
   const magicProvider = await magicAdapter.login(
     user.idToken,
-    config.network,
   );
 
   if (!user.zkEvm) {

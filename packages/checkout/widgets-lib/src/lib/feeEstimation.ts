@@ -1,7 +1,11 @@
 import {
-  GasEstimateBridgeToL2Result, GasEstimateSwapResult, OnRampProviderFees, TokenInfo,
+  GasEstimateBridgeToL2Result,
+  GasEstimateSwapResult,
+  OnRampProviderFees,
+  TokenInfo,
 } from '@imtbl/checkout-sdk';
 import { BigNumber, ethers } from 'ethers';
+import { IMX_ADDRESS_ZKEVM, IMX_TOKEN_SYMBOL } from './constants';
 
 const convertFeeToFiat = (
   fee: BigNumber | undefined,
@@ -12,7 +16,12 @@ const convertFeeToFiat = (
 
   if (fee && token) {
     const formattedAmount = ethers.utils.formatUnits(fee, token.decimals);
-    const gasFeeTokenConversion = conversions.get(token.symbol.toLocaleLowerCase());
+    const tokenSymbol = token.address === IMX_ADDRESS_ZKEVM
+      ? IMX_TOKEN_SYMBOL
+      : token.symbol;
+    const gasFeeTokenConversion = conversions.get(
+      tokenSymbol.toLocaleLowerCase(),
+    );
     if (gasFeeTokenConversion) {
       const parsedAmount = parseFloat(formattedAmount);
       if (Number.isNaN(parsedAmount)) return feeAmountInFiat;

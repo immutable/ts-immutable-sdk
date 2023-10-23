@@ -7,24 +7,24 @@ import {
   PrepareListingResponse,
   constants,
 } from '@imtbl/orderbook';
-import { BigNumber, Contract } from 'ethers';
-import { parseUnits } from 'ethers/lib/utils';
-import {
-  BuyToken, SellOrder, SellResult, SellStatusType,
-} from '../../types/sell';
+import { BigNumber, Contract, utils } from 'ethers';
 import {
   ERC721Item,
   GasTokenType,
   ItemType,
   TransactionOrGasType,
   ERC20ABI,
+  SellOrder,
+  BuyToken,
+  SellResult,
+  CheckoutStatus,
 } from '../../types';
 import * as instance from '../../instance';
 import { CheckoutConfiguration } from '../../config';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { smartCheckout } from '../smartCheckout';
 import {
-  getUnsignedTransactions,
+  getUnsignedERC721Transactions,
   getUnsignedMessage,
   signApprovalTransactions,
   signMessage,
@@ -47,7 +47,7 @@ export const getBuyToken = (
   buyToken: BuyToken,
   decimals: number = 18,
 ): ERC20Item | NativeItem => {
-  const bnAmount = parseUnits(buyToken.amount, decimals);
+  const bnAmount = utils.parseUnits(buyToken.amount, decimals);
 
   if (buyToken.type === ItemType.NATIVE) {
     return {
@@ -74,7 +74,7 @@ export const sell = async (
 
   if (orders.length === 0) {
     throw new CheckoutError(
-      'No orders were parsed, must parse at least one order',
+      'No orders were provided to the orders array. Please provide at least one order.',
       CheckoutErrorType.PREPARE_ORDER_LISTING_ERROR,
     );
   }
@@ -90,7 +90,7 @@ export const sell = async (
       provider,
     );
 
-    decimals = buyTokenContract.decimals();
+    decimals = await buyTokenContract.decimals();
   }
 
   const buyTokenOrNative = getBuyToken(buyToken, decimals);
@@ -139,6 +139,17 @@ export const sell = async (
   );
 
   if (smartCheckoutResult.sufficient) {
+    const unsignedTransactions = await getUnsignedERC721Transactions(listing.actions);
+    const approvalResult = await signApprovalTransactions(provider, unsignedTransactions.approvalTransactions);
+    if (approvalResult.type === SignTransactionStatusType.FAILED) {
+      return {
+        status: CheckoutStatus.FAILED,
+        transactionHash: approvalResult.transactionHash,
+        reason: approvalResult.reason,
+        smartCheckoutResult,
+      };
+    }
+
     const unsignedMessage = getUnsignedMessage(
       listing.orderHash,
       listing.orderComponents,
@@ -160,20 +171,6 @@ export const sell = async (
       provider,
       unsignedMessage,
     );
-    const unsignedTransactions = await getUnsignedTransactions(listing.actions);
-    const approvalResult = await signApprovalTransactions(provider, unsignedTransactions.approvalTransactions);
-    if (approvalResult.type === SignTransactionStatusType.FAILED) {
-      return {
-        id: sellToken.id,
-        collectionAddress: sellToken.collectionAddress,
-        smartCheckoutResult,
-        status: {
-          type: SellStatusType.FAILED,
-          transactionHash: approvalResult.transactionHash,
-          reason: approvalResult.reason,
-        },
-      };
-    }
 
     let orderId = '';
 
@@ -181,19 +178,18 @@ export const sell = async (
       orderComponents: signedMessage.orderComponents,
       orderHash: signedMessage.orderHash,
       orderSignature: signedMessage.signedMessage,
+      makerFees: [],
     };
 
     if (makerFees !== undefined) {
       const orderBookFees = calculateFees(makerFees, buyTokenOrNative.amount, decimals);
-      // @TODO add support for an array of fees when the orderbook enables it
       if (orderBookFees.length !== makerFees.length) {
         throw new CheckoutError(
           'One of the fees is too small, must be greater than 0.000001',
           CheckoutErrorType.CREATE_ORDER_LISTING_ERROR,
         );
       }
-      const [makerFee] = orderBookFees;
-      createListingParams.makerFee = makerFee;
+      createListingParams.makerFees = orderBookFees;
     }
 
     try {
@@ -212,19 +208,14 @@ export const sell = async (
     }
 
     return {
-      id: sellToken.id,
-      collectionAddress: sellToken.collectionAddress,
+      status: CheckoutStatus.SUCCESS,
+      orderIds: [orderId],
       smartCheckoutResult,
-      status: {
-        type: SellStatusType.SUCCESS,
-        orderId,
-      },
     };
   }
 
   return {
-    id: sellToken.id,
-    collectionAddress: sellToken.collectionAddress,
+    status: CheckoutStatus.INSUFFICIENT_FUNDS,
     smartCheckoutResult,
   };
 };

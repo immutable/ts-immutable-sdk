@@ -48,11 +48,23 @@ export interface NFT {
      */
     'indexed_at': string;
     /**
+     * When the NFT owner was last updated
+     * @type {string}
+     * @memberof NFT
+     */
+    'updated_at': string;
+    /**
      * When NFT metadata was last synced
      * @type {string}
      * @memberof NFT
      */
     'metadata_synced_at': string | null;
+    /**
+     * The id of the metadata of this NFT
+     * @type {string}
+     * @memberof NFT
+     */
+    'metadata_id'?: string | null;
     /**
      * The name of the NFT
      * @type {string}

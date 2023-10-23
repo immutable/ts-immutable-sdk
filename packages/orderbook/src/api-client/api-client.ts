@@ -1,10 +1,10 @@
 import {
-  ProtocolData,
+  Fee,
   ListingResult,
   ListListingsResult,
   ListTradeResult,
   OrdersService,
-  Fee,
+  ProtocolData,
   TradeResult,
 } from 'openapi/sdk';
 import {
@@ -13,7 +13,8 @@ import {
   ListListingsParams,
   ListTradesParams,
 } from '../types';
-import { FulfillmentDataResult } from '../openapi/sdk/models/FulfillmentDataResult';
+import { FulfillableOrder } from '../openapi/sdk/models/FulfillableOrder';
+import { UnfulfillableOrder } from '../openapi/sdk/models/UnfulfillableOrder';
 import { FulfillmentDataRequest } from '../openapi/sdk/models/FulfillmentDataRequest';
 import { ItemType, SEAPORT_CONTRACT_VERSION_V1_5 } from '../seaport';
 
@@ -24,8 +25,14 @@ export class ImmutableApiClient {
     private readonly seaportAddress: string,
   ) {}
 
-  async fulfillmentData(requests: Array<FulfillmentDataRequest>):
-  Promise<{ result: FulfillmentDataResult[] }> {
+  async fulfillmentData(
+    requests: Array<FulfillmentDataRequest>,
+  ): Promise<{
+      result: {
+        fulfillable_orders: Array<FulfillableOrder>;
+        unfulfillable_orders: Array<UnfulfillableOrder>;
+      };
+    }> {
     return this.orderbookService.fulfillmentData({
       chainName: this.chainName,
       requestBody: requests,
@@ -68,7 +75,7 @@ export class ImmutableApiClient {
     orderHash,
     orderComponents,
     orderSignature,
-    makerFee,
+    makerFees,
   }: CreateListingParams): Promise<ListingResult> {
     if (orderComponents.offer.length !== 1) {
       throw new Error('Only one item can be listed at a time');
@@ -102,12 +109,12 @@ export class ImmutableApiClient {
             contract_address: orderComponents.consideration[0].token,
           },
         ],
-        fee: makerFee ? {
-          amount: makerFee.amount,
-          fee_type: FeeType.MAKER_MARKETPLACE as unknown as Fee.fee_type,
-          recipient: makerFee.recipient,
-        } : undefined,
-        end_time: new Date(
+        fees: makerFees.map((x) => ({
+          amount: x.amount,
+          fee_type: FeeType.MAKER_ECOSYSTEM as unknown as Fee.fee_type,
+          recipient: x.recipient,
+        })),
+        end_at: new Date(
           parseInt(`${orderComponents.endTime.toString()}000`, 10),
         ).toISOString(),
         protocol_data: {
@@ -126,7 +133,7 @@ export class ImmutableApiClient {
           },
         ],
         signature: orderSignature,
-        start_time: new Date(
+        start_at: new Date(
           parseInt(`${orderComponents.startTime.toString()}000`, 10),
         ).toISOString(),
       },

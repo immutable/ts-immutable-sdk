@@ -4,7 +4,11 @@ import {
 import { mount } from 'cypress/react18';
 import { BiomeCombinedProviders } from '@biom3/react';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
-import { Checkout, GasEstimateType, WalletProviderName } from '@imtbl/checkout-sdk';
+import {
+  Checkout,
+  GasEstimateType,
+  WalletProviderName,
+} from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { BigNumber } from 'ethers';
 import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
@@ -17,6 +21,7 @@ import { ConnectionStatus } from '../../context/connect-loader-context/ConnectLo
 import {
   ConnectLoaderTestComponent,
 } from '../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
+import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 
 describe('Top Up View', () => {
   const connectLoaderState = {
@@ -35,9 +40,7 @@ describe('Top Up View', () => {
     it('should render the top up view', () => {
       mount(
         <BiomeCombinedProviders>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
+          <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
             <TopUpView
               showOnrampOption
               showSwapOption
@@ -56,9 +59,7 @@ describe('Top Up View', () => {
     it('should hide onramp option', () => {
       mount(
         <BiomeCombinedProviders>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
+          <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
             <TopUpView
               showOnrampOption={false}
               showSwapOption
@@ -77,9 +78,7 @@ describe('Top Up View', () => {
     it('should hide swap option', () => {
       mount(
         <BiomeCombinedProviders>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
+          <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
             <TopUpView
               showOnrampOption
               showSwapOption={false}
@@ -98,9 +97,7 @@ describe('Top Up View', () => {
     it('should hide bridge option', () => {
       mount(
         <BiomeCombinedProviders>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
+          <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
             <TopUpView
               showOnrampOption
               showSwapOption
@@ -120,12 +117,12 @@ describe('Top Up View', () => {
       mount(
         <BiomeCombinedProviders>
           <ConnectLoaderTestComponent
-            initialStateOverride={
-              {
-                ...connectLoaderState,
-                provider: { provider: { isPassport: true } as any as ExternalProvider } as Web3Provider,
-              }
-            }
+            initialStateOverride={{
+              ...connectLoaderState,
+              provider: {
+                provider: { isPassport: true } as any as ExternalProvider,
+              } as Web3Provider,
+            }}
           >
             <TopUpView
               showOnrampOption
@@ -146,9 +143,7 @@ describe('Top Up View', () => {
       const closeFunction = cy.stub().as('closeFunction');
       mount(
         <BiomeCombinedProviders>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
+          <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
             <TopUpView
               showOnrampOption
               showSwapOption
@@ -167,13 +162,13 @@ describe('Top Up View', () => {
     });
 
     it('should fire onramp event with onramp data on event when onramp clicked', () => {
-      cy.stub(orchestrationEvents, 'sendRequestOnrampEvent').as('sendRequestOnrampEventStub');
+      cy.stub(orchestrationEvents, 'sendRequestOnrampEvent').as(
+        'sendRequestOnrampEventStub',
+      );
 
       mount(
         <BiomeCombinedProviders>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
+          <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
             <TopUpView
               showOnrampOption
               showSwapOption
@@ -189,13 +184,12 @@ describe('Top Up View', () => {
 
       cySmartGet('menu-item-onramp').click();
       cy.get('@sendRequestOnrampEventStub').should('have.been.called');
-      cy.get('@sendRequestOnrampEventStub')
-        .should(
-          'have.been.calledWith',
-          window,
-          IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
-          { tokenAddress: '0x123', amount: '10' },
-        );
+      cy.get('@sendRequestOnrampEventStub').should(
+        'have.been.calledWith',
+        window,
+        IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
+        { tokenAddress: '0x123', amount: '10' },
+      );
     });
 
     it('should fire swap event with swap data on event when swap clicked', () => {
@@ -203,9 +197,7 @@ describe('Top Up View', () => {
 
       mount(
         <BiomeCombinedProviders>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
+          <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
             <TopUpView
               showOnrampOption
               showSwapOption
@@ -221,24 +213,23 @@ describe('Top Up View', () => {
 
       cySmartGet('menu-item-swap').click();
       cy.get('@sendRequestSwapEventStub').should('have.been.called');
-      cy.get('@sendRequestSwapEventStub')
-        .should(
-          'have.been.calledWith',
-          window,
-          IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
-          // fromToken and amount should be empty for swap in top up
-          { fromTokenAddress: '', toTokenAddress: '0x123', amount: '' },
-        );
+      cy.get('@sendRequestSwapEventStub').should(
+        'have.been.calledWith',
+        window,
+        IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
+        // fromToken and amount should be empty for swap in top up
+        { fromTokenAddress: '', toTokenAddress: '0x123', amount: '' },
+      );
     });
 
     it('should fire bridge event with bridge data on event when bridge clicked', () => {
-      cy.stub(orchestrationEvents, 'sendRequestBridgeEvent').as('sendRequestBridgeEventStub');
+      cy.stub(orchestrationEvents, 'sendRequestBridgeEvent').as(
+        'sendRequestBridgeEventStub',
+      );
 
       mount(
         <BiomeCombinedProviders>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
+          <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
             <TopUpView
               showOnrampOption
               showSwapOption
@@ -254,32 +245,75 @@ describe('Top Up View', () => {
 
       cySmartGet('menu-item-bridge').click();
       cy.get('@sendRequestBridgeEventStub').should('have.been.called');
-      cy.get('@sendRequestBridgeEventStub')
-        .should(
-          'have.been.calledWith',
-          window,
-          IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
-          // tokenAddress and amount should be empty for bridging in top up
-          { tokenAddress: '', amount: '' },
+      cy.get('@sendRequestBridgeEventStub').should(
+        'have.been.calledWith',
+        window,
+        IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
+        // tokenAddress and amount should be empty for bridging in top up
+        { tokenAddress: '', amount: '' },
+      );
+    });
+  });
+
+  describe('TopUpView render with disabled options', () => {
+    describe('when swap is unavailable', () => {
+      beforeEach(() => {
+        cy.stub(Checkout.prototype, 'isSwapAvailable').as('isSwapAvailableStub').returns(false);
+      });
+
+      it('should not fire swap event', () => {
+        cy.stub(orchestrationEvents, 'sendRequestSwapEvent').as('sendRequestSwapEventStub');
+
+        mount(
+          <BiomeCombinedProviders>
+            <ConnectLoaderTestComponent
+              initialStateOverride={connectLoaderState}
+            >
+              <TopUpView
+                showOnrampOption
+                showSwapOption
+                showBridgeOption
+                widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
+                tokenAddress="0x123"
+                amount="10"
+                onCloseButtonClick={() => {}}
+              />
+            </ConnectLoaderTestComponent>
+          </BiomeCombinedProviders>,
         );
+
+        cySmartGet('loading-view').should('be.visible');
+        cy.wait(1000);
+        cySmartGet('menu-item-caption-swap').should('have.text', 'Not available in your region ');
+        cySmartGet('menu-item-swap').click();
+        cy.get('@sendRequestSwapEventStub').should('not.have.been.called');
+      });
     });
   });
 
   describe('Fee display', () => {
-    const cryptoConversions = new Map<string, number>([['eth', 2000], ['imx', 1.5], ['usdc', 1]]);
-
-    const baseWalletState: WalletState = {
-      network: null,
-      walletProvider: WalletProviderName.METAMASK,
-      tokenBalances: [],
-      supportedTopUps: null,
-    };
+    const cryptoConversions = new Map<string, number>([
+      ['eth', 2000],
+      ['imx', 1.5],
+      ['usdc', 1],
+    ]);
 
     beforeEach(() => {
       cyIntercept();
     });
 
     it('should display fees for onramp, swap and bridge', () => {
+      const baseWalletState: WalletState = {
+        network: null,
+        walletProvider: WalletProviderName.METAMASK,
+        tokenBalances: [],
+        supportedTopUps: {
+          isOnRampEnabled: true,
+          isSwapEnabled: true,
+          isBridgeEnabled: true,
+          isSwapAvailable: true,
+        },
+      };
       cy.stub(Checkout.prototype, 'getExchangeFeeEstimate')
         .as('getExchangeFeeEstimateStub')
         .onFirstCall()
@@ -323,9 +357,7 @@ describe('Top Up View', () => {
         });
 
       mount(
-        <ConnectLoaderTestComponent
-          initialStateOverride={connectLoaderState}
-        >
+        <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
           <WalletWidgetTestComponent
             initialStateOverride={baseWalletState}
             cryptoConversionsOverride={cryptoConversions}
@@ -341,17 +373,122 @@ describe('Top Up View', () => {
         </ConnectLoaderTestComponent>,
       );
 
-      cySmartGet('menu-item-caption-swap').contains('Using the coins I have on the same network');
+      cySmartGet('menu-item-caption-swap').contains(
+        'Using the coins I have on the same network',
+      );
       cySmartGet('menu-item-caption-swap').contains('$0.20 USD');
 
-      cySmartGet('menu-item-caption-bridge').contains('From the coins I have on a different network');
+      cySmartGet('menu-item-caption-bridge').contains(
+        'From the coins I have on a different network',
+      );
       cySmartGet('menu-item-caption-bridge').contains('$0.40 USD');
 
-      cySmartGet('menu-item-caption-onramp').contains('Google pay & Apple pay available. Minimum $5.');
+      cySmartGet('menu-item-caption-onramp').contains(
+        'Google pay & Apple pay available. Minimum $5.',
+      );
+      cySmartGet('menu-item-caption-onramp').contains('3.5% to 5.5%');
+    });
+
+    it('should not fetch swap fees for geo-blocked region', () => {
+      const baseWalletState: WalletState = {
+        network: null,
+        walletProvider: WalletProviderName.METAMASK,
+        tokenBalances: [],
+        supportedTopUps: {
+          isOnRampEnabled: true,
+          isSwapEnabled: true,
+          isBridgeEnabled: true,
+          isSwapAvailable: false,
+        },
+      };
+      cy.stub(Checkout.prototype, 'isSwapAvailable').as('isSwapAvailableStub').returns(false);
+      cy.stub(Checkout.prototype, 'getExchangeFeeEstimate')
+        .as('getExchangeFeeEstimateStub')
+        .onFirstCall()
+        .resolves({
+          minPercentage: '3.5',
+          maxPercentage: '5.5',
+        });
+      cy.stub(Checkout.prototype, 'gasEstimate')
+        .as('gasEstimateStub')
+        .onFirstCall()
+        .resolves({
+          gasEstimateType: GasEstimateType.SWAP,
+          gasFee: {
+            estimatedAmount: BigNumber.from(100000000000000),
+            token: {
+              name: 'Ethereum',
+              symbol: 'ETH',
+              decimals: 18,
+            },
+          },
+        })
+        .onSecondCall()
+        .resolves({
+          gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+          gasFee: {
+            estimatedAmount: BigNumber.from(100000000000000),
+            token: {
+              name: 'Ethereum',
+              symbol: 'ETH',
+              decimals: 18,
+            },
+          },
+          bridgeFee: {
+            estimatedAmount: BigNumber.from(100000000000000),
+            token: {
+              name: 'Ethereum',
+              symbol: 'ETH',
+              decimals: 18,
+            },
+          },
+        });
+
+      mount(
+        <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
+          <WalletWidgetTestComponent
+            initialStateOverride={baseWalletState}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <TopUpView
+              showOnrampOption
+              showSwapOption
+              showBridgeOption
+              widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
+              onCloseButtonClick={() => {}}
+            />
+          </WalletWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
+      );
+
+      cySmartGet('menu-item-caption-swap').contains(
+        'Not available in your region',
+      );
+
+      cySmartGet('menu-item-caption-bridge').contains(
+        'From the coins I have on a different network',
+      );
+      cySmartGet('menu-item-caption-bridge').contains('$0.40 USD');
+
+      cySmartGet('menu-item-caption-onramp').contains(
+        'Google pay & Apple pay available. Minimum $5.',
+      );
       cySmartGet('menu-item-caption-onramp').contains('3.5% to 5.5%');
     });
 
     it('should display placeholder fees for onramp, swap and bridge', () => {
+      const baseWalletState: WalletState = {
+        network: null,
+        walletProvider: WalletProviderName.METAMASK,
+        tokenBalances: [],
+        supportedTopUps: {
+          isOnRampEnabled: true,
+          isSwapEnabled: true,
+          isBridgeEnabled: true,
+          isSwapAvailable: true,
+        },
+      };
+
       cy.stub(Checkout.prototype, 'getExchangeFeeEstimate')
         .as('getExchangeFeeEstimateStub')
         .onFirstCall()
@@ -362,9 +499,7 @@ describe('Top Up View', () => {
         .rejects();
 
       mount(
-        <ConnectLoaderTestComponent
-          initialStateOverride={connectLoaderState}
-        >
+        <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
           <WalletWidgetTestComponent
             initialStateOverride={baseWalletState}
             cryptoConversionsOverride={cryptoConversions}
@@ -383,6 +518,48 @@ describe('Top Up View', () => {
       cySmartGet('menu-item-caption-swap').contains('$-.-- USD');
       cySmartGet('menu-item-caption-bridge').contains('$-.-- USD');
       cySmartGet('menu-item-caption-onramp').contains('-.--%');
+    });
+
+    it('should show shimmer for fees for onramp, swap and bridge', () => {
+      const baseWalletState: WalletState = {
+        network: null,
+        walletProvider: WalletProviderName.METAMASK,
+        tokenBalances: [],
+        supportedTopUps: {
+          isOnRampEnabled: true,
+          isSwapEnabled: true,
+          isBridgeEnabled: true,
+          isSwapAvailable: true,
+        },
+      };
+
+      // @NOTE: return a promise that never resolves...
+      cy.stub(Checkout.prototype, 'gasEstimate')
+        .as('gasEstimateStub')
+        .returns(new Promise(() => {}));
+
+      mount(
+        <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
+          <WalletWidgetTestComponent
+            initialStateOverride={baseWalletState}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <CryptoFiatProvider environment={Environment.SANDBOX}>
+              <TopUpView
+                showOnrampOption
+                showSwapOption
+                showBridgeOption
+                widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
+                onCloseButtonClick={() => {}}
+              />
+            </CryptoFiatProvider>
+          </WalletWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
+      );
+      cySmartGet('fee-percentage-shimmer__shimmer').should('be.visible');
+      cySmartGet('fees-shimmer__shimmer')
+        .should('have.length', 2)
+        .and('be.visible');
     });
   });
 });

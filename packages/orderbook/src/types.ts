@@ -1,13 +1,9 @@
 import { OrderComponents } from '@opensea/seaport-js/lib/types';
 import { PopulatedTransaction, TypedDataDomain, TypedDataField } from 'ethers';
-import {
-  Fee as OpenapiFee,
-  OrdersService,
-  OrderStatus,
-} from './openapi/sdk';
+import { Fee as OpenapiFee, OrdersService, OrderStatus } from './openapi/sdk';
 
-// Strictly re-export only the OrderStatus enum from the openapi types
-export { OrderStatus } from './openapi/sdk';
+// Strictly re-export only the OrderStatusName enum from the openapi types
+export { OrderStatusName } from './openapi/sdk';
 
 export interface ERC721Item {
   type: 'ERC721';
@@ -48,7 +44,7 @@ export interface CreateListingParams {
   orderComponents: OrderComponents;
   orderHash: string;
   orderSignature: string;
-  makerFee?: FeeValue
+  makerFees: FeeValue[];
 }
 
 // Expose the list order filtering and ordering directly from the openAPI SDK, except
@@ -64,8 +60,8 @@ Parameters<typeof OrdersService.prototype.listTrades>[0],
 >;
 
 export enum FeeType {
-  MAKER_MARKETPLACE = OpenapiFee.fee_type.MAKER_MARKETPLACE,
-  TAKER_MARKETPLACE = OpenapiFee.fee_type.TAKER_MARKETPLACE,
+  MAKER_ECOSYSTEM = OpenapiFee.fee_type.MAKER_ECOSYSTEM,
+  TAKER_ECOSYSTEM = OpenapiFee.fee_type.TAKER_ECOSYSTEM,
   PROTOCOL = OpenapiFee.fee_type.PROTOCOL,
   ROYALTY = OpenapiFee.fee_type.ROYALTY,
 }
@@ -108,10 +104,37 @@ export interface SignableAction {
     domain: TypedDataDomain;
     types: Record<string, TypedDataField[]>;
     value: Record<string, any>;
-  }
+  };
 }
 
 export type Action = TransactionAction | SignableAction;
+
+export interface FulfillmentListing {
+  listingId: string,
+  takerFees: Array<FeeValue>
+}
+
+export type FulfillBulkOrdersResponse
+  = FulfillBulkOrdersInsufficientBalanceResponse | FulfillBulkOrdersSufficientBalanceResponse;
+
+export interface FulfillBulkOrdersSufficientBalanceResponse {
+  sufficientBalance: true;
+  actions: Action[];
+  expiration: string;
+  fulfillableOrders: Order[];
+  unfulfillableOrders: UnfulfillableOrder[];
+}
+
+export interface FulfillBulkOrdersInsufficientBalanceResponse {
+  sufficientBalance: false;
+  fulfillableOrders: Order[];
+  unfulfillableOrders: UnfulfillableOrder[];
+}
+
+export interface UnfulfillableOrder {
+  orderId: string,
+  reason: string,
+}
 
 export interface FulfillOrderResponse {
   actions: Action[];
@@ -138,23 +161,23 @@ export interface Order {
     id: string;
     name: string;
   };
-  createTime: string;
-  updateTime: string;
+  createdAt: string;
+  updatedAt: string;
   /**
    * Time after which the Order is considered active
    */
-  startTime: string;
+  startAt: string;
   /**
    * Time after which the Order is expired
    */
-  endTime: string;
+  endAt: string;
   protocolData: {
     orderType: 'FULL_RESTRICTED';
     zoneAddress: string;
     counter: string;
     seaportAddress: string;
     seaportVersion: string;
-  }
+  };
   salt: string;
   signature: string;
   status: OrderStatus;
@@ -190,10 +213,10 @@ export interface Trade {
   buy: (ERC20Item | NativeItem)[];
   sell: ERC721Item[];
   buyerFees: Fee[];
-  sellerAddress: string
-  buyerAddress: string
-  makerAddress: string
-  takerAddress: string
+  sellerAddress: string;
+  buyerAddress: string;
+  makerAddress: string;
+  takerAddress: string;
   /**
    * Time the on-chain event was indexed by the Immutable order book service
    */
@@ -215,7 +238,7 @@ export interface Trade {
      * The log index of the fulfillment event in a block (uint32 as string)
      */
     logIndex: string;
-  }
+  };
 }
 
 export interface TradeResult {

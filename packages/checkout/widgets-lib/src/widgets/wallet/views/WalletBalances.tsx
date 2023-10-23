@@ -1,4 +1,4 @@
-import { Box, Icon, MenuItem } from '@biom3/react';
+import { Box, MenuItem } from '@biom3/react';
 import {
   useCallback,
   useContext, useEffect, useMemo, useState,
@@ -46,6 +46,7 @@ import { orchestrationEvents } from '../../../lib/orchestrationEvents';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import { isPassportProvider } from '../../../lib/providerUtils';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
+import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 export function WalletBalances() {
   const { connectLoaderState } = useContext(ConnectLoaderContext);
@@ -69,6 +70,15 @@ export function WalletBalances() {
   const [insufficientFundsForBridgeToL2Gas, setInsufficientFundsForBridgeToL2Gas] = useState(false);
   const isPassport = isPassportProvider(provider);
   const showNetworkMenu = !isPassport;
+
+  const { track, page } = useAnalytics();
+
+  useEffect(() => {
+    page({
+      userJourney: UserJourney.WALLET,
+      screen: 'WalletBalances',
+    });
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -196,6 +206,12 @@ export function WalletBalances() {
   }, [checkout, network, supportedTopUps]);
 
   const handleAddCoinsClick = () => {
+    track({
+      userJourney: UserJourney.WALLET,
+      screen: 'WalletBalances',
+      control: 'AddCoins',
+      controlType: 'Button',
+    });
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
@@ -223,6 +239,12 @@ export function WalletBalances() {
           title={header.title}
           showSettings
           onSettingsClick={() => {
+            track({
+              userJourney: UserJourney.WALLET,
+              screen: 'WalletBalances',
+              control: 'Settings',
+              controlType: 'Button',
+            });
             viewDispatch({
               payload: {
                 type: ViewActions.UPDATE_VIEW,
@@ -240,17 +262,15 @@ export function WalletBalances() {
       >
         <Box sx={walletBalanceContainerStyles}>
           {showNetworkMenu && <NetworkMenu setBalancesLoading={setBalancesLoading} />}
-          <TotalTokenBalance totalBalance={totalFiatAmount} />
+          <TotalTokenBalance totalBalance={totalFiatAmount} loading={balancesLoading} />
           <Box
             sx={walletBalanceListContainerStyles(showNetworkMenu, showAddCoins)}
           >
             {balancesLoading && (
             <Box sx={walletBalanceLoadingIconStyles}>
-              <Icon
-                testId="loading-icon"
-                icon="Loading"
-                sx={{ w: 'base.icon.size.500' }}
-              />
+              <MenuItem shimmer emphasized testId="balance-item-shimmer--1" />
+              <MenuItem shimmer emphasized testId="balance-item-shimmer--2" />
+              <MenuItem shimmer emphasized testId="balance-item-shimmer--3" />
             </Box>
             )}
             {!balancesLoading && (

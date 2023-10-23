@@ -22,7 +22,7 @@ import {
   TransactionAction,
   TransactionPurpose,
 } from '../types';
-import { Order } from '../openapi/sdk';
+import { FulfillableOrder, Order } from '../openapi/sdk';
 import {
   EIP_712_ORDER_TYPE,
   ItemType,
@@ -59,9 +59,9 @@ export class Seaport {
 
     const listingActions: Action[] = [];
 
-    const approvalAction = seaportActions.find(
-      (action) => action.type === 'approval',
-    ) as ApprovalAction | undefined;
+    const approvalAction = seaportActions.find((action) => action.type === 'approval') as
+      | ApprovalAction
+      | undefined;
 
     if (approvalAction) {
       listingActions.push({
@@ -119,9 +119,9 @@ export class Seaport {
 
     const fulfillmentActions: TransactionAction[] = [];
 
-    const approvalAction = seaportActions.find(
-      (action) => action.type === 'approval',
-    ) as ApprovalAction | undefined;
+    const approvalAction = seaportActions.find((action) => action.type === 'approval') as
+      | ApprovalAction
+      | undefined;
 
     if (approvalAction) {
       fulfillmentActions.push({
@@ -141,50 +141,94 @@ export class Seaport {
 
     fulfillmentActions.push({
       type: ActionType.TRANSACTION,
-      buildTransaction: prepareTransaction(
-        fulfilOrderAction.transactionMethods,
-      ),
+      buildTransaction: prepareTransaction(fulfilOrderAction.transactionMethods),
       purpose: TransactionPurpose.FULFILL_ORDER,
     });
 
-    // Expirtaion bytes in SIP7 extra data [21:29]
-    // In hex string -> [21 * 2 + 2 (0x) : 29 * 2]
-    // In JS slice (start, end_inclusive), (44,60)
-    // 8 bytes uint64 epoch time in seconds
-    const expirationHex = extraData.slice(44, 60);
-    const expirationInSeconds = parseInt(expirationHex, 16);
-
     return {
       actions: fulfillmentActions,
-      expiration: (new Date(expirationInSeconds * 1000)).toISOString(),
+      expiration: Seaport.getExpirationISOTimeFromExtraData(extraData),
       order: mapFromOpenApiOrder(order),
     };
   }
 
-  async cancelOrder(
-    order: Order,
+  async fulfillBulkOrders(
+    fulfillingOrders: Array<FulfillableOrder>,
     account: string,
-  ): Promise<PopulatedTransaction> {
+  ): Promise<{
+      actions: Action[];
+      expiration: string;
+    }> {
+    const fulfillOrderDetails = fulfillingOrders.map((o) => {
+      const { orderComponents, tips } = this.mapImmutableOrderToSeaportOrderComponents(o.order);
+
+      return {
+        order: {
+          parameters: orderComponents,
+          signature: o.order.signature,
+        },
+        extraData: o.extra_data,
+        tips,
+      };
+    });
+
+    const { actions: seaportActions } = await this.getSeaportLib().fulfillOrders({
+      fulfillOrderDetails,
+      accountAddress: account,
+    });
+
+    const fulfillmentActions: TransactionAction[] = [];
+
+    const approvalAction = seaportActions.find((action) => action.type === 'approval') as
+      | ApprovalAction
+      | undefined;
+
+    if (approvalAction) {
+      fulfillmentActions.push({
+        type: ActionType.TRANSACTION,
+        buildTransaction: prepareTransaction(approvalAction.transactionMethods),
+        purpose: TransactionPurpose.APPROVAL,
+      });
+    }
+
+    const fulfilOrderAction: ExchangeAction | undefined = seaportActions.find(
+      (action) => action.type === 'exchange',
+    ) as ExchangeAction | undefined;
+
+    if (!fulfilOrderAction) {
+      throw new Error('No exchange action found');
+    }
+
+    fulfillmentActions.push({
+      type: ActionType.TRANSACTION,
+      buildTransaction: prepareTransaction(fulfilOrderAction.transactionMethods),
+      purpose: TransactionPurpose.FULFILL_ORDER,
+    });
+
+    return {
+      actions: fulfillmentActions,
+      // return the shortest expiration out of all extraData - they should be very close
+      expiration: fulfillOrderDetails
+        .map((d) => Seaport.getExpirationISOTimeFromExtraData(d.extraData))
+        .reduce((p, c) => (new Date(p) < new Date(c) ? p : c)),
+    };
+  }
+
+  async cancelOrder(order: Order, account: string): Promise<PopulatedTransaction> {
     const { orderComponents } = this.mapImmutableOrderToSeaportOrderComponents(order);
     const seaportLib = this.getSeaportLib(order);
 
-    const cancellationTransaction = await seaportLib.cancelOrders(
-      [orderComponents],
-      account,
-    );
+    const cancellationTransaction = await seaportLib.cancelOrders([orderComponents], account);
 
     return prepareTransaction(cancellationTransaction)();
   }
 
-  private mapImmutableOrderToSeaportOrderComponents(
-    order: Order,
-  ): { orderComponents: OrderComponents, tips: Array<TipInputItem> } {
+  private mapImmutableOrderToSeaportOrderComponents(order: Order): {
+    orderComponents: OrderComponents;
+    tips: Array<TipInputItem>;
+  } {
     const orderCounter = order.protocol_data.counter;
-    return mapImmutableOrderToSeaportOrderComponents(
-      order,
-      orderCounter,
-      this.zoneContractAddress,
-    );
+    return mapImmutableOrderToSeaportOrderComponents(order, orderCounter, this.zoneContractAddress);
   }
 
   private createSeaportOrder(
@@ -208,9 +252,7 @@ export class Seaport {
         consideration: [
           {
             token:
-              considerationItem.type === 'ERC20'
-                ? considerationItem.contractAddress
-                : undefined,
+              considerationItem.type === 'ERC20' ? considerationItem.contractAddress : undefined,
             amount: considerationItem.amount,
             recipient: offerer,
           },
@@ -252,5 +294,16 @@ export class Seaport {
     // }
 
     return this.seaportLibFactory.create(seaportVersion, seaportAddress);
+  }
+
+  private static getExpirationISOTimeFromExtraData(extraData: string): string {
+    // Expirtaion bytes in SIP7 extra data [21:29]
+    // In hex string -> [21 * 2 + 2 (0x) : 29 * 2]
+    // In JS slice (start, end_inclusive), (44,60)
+    // 8 bytes uint64 epoch time in seconds
+    const expirationHex = extraData.slice(44, 60);
+    const expirationInSeconds = parseInt(expirationHex, 16);
+
+    return new Date(expirationInSeconds * 1000).toISOString();
   }
 }

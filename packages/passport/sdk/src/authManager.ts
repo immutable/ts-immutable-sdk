@@ -6,9 +6,10 @@ import {
   WebStorageStateStore,
 } from 'oidc-client-ts';
 import axios from 'axios';
-import jwt_decode from 'jwt-decode';
 import DeviceCredentialsManager from 'storage/device_credentials_manager';
 import * as crypto from 'crypto';
+import jwt_decode from 'jwt-decode';
+import { isTokenExpired } from './token';
 import { PassportErrorType, withPassportError } from './errors/passportError';
 import {
   PassportMetadata,
@@ -77,6 +78,11 @@ export default class AuthManager {
   private deviceCredentialsManager: DeviceCredentialsManager;
 
   private readonly logoutMode: Exclude<OidcConfiguration['logoutMode'], undefined>;
+
+  /**
+   * Promise that is used to prevent multiple concurrent calls to the refresh token endpoint.
+   */
+  private refreshingPromise: Promise<User | null> | null = null;
 
   constructor(config: PassportConfiguration) {
     this.config = config;
@@ -368,26 +374,67 @@ export default class AuthManager {
     }, PassportErrorType.LOGOUT_ERROR);
   }
 
-  public async loginSilent(): Promise<User | null> {
+  public async loginSilent({ forceRefresh } = { forceRefresh: false }): Promise<User | null> {
+    // eslint-disable-next-line arrow-body-style
     return withPassportError<User | null>(async () => {
-      const existedUser = await this.getUser();
-      if (!existedUser) {
-        return null;
-      }
-      const oidcUser = await this.userManager.signinSilent();
-      if (!oidcUser) {
-        return null;
-      }
-      return AuthManager.mapOidcUserToDomainModel(oidcUser);
+      return this.getUser({ forceRefresh });
     }, PassportErrorType.SILENT_LOGIN_ERROR);
   }
 
-  public async getUser(): Promise<User | null> {
-    return withPassportError<User | null>(async () => {
-      const oidcUser = await this.userManager.getUser();
-      if (oidcUser) {
-        return AuthManager.mapOidcUserToDomainModel(oidcUser);
+  /**
+   * Get the user from the cache or refresh the token if it's expired.
+   * @param forceRefresh If set to true, force an HTTP call to the OIDC server's authorization endpoint. This call will
+   * throw an error if there's no refresh token.
+   */
+  private async getAuthenticatedUser({ forceRefresh = false }: { forceRefresh: boolean }): Promise<User | null> {
+    if (forceRefresh) {
+      return this.refreshTokenAndUpdatePromise();
+    }
+
+    const oidcUser = await this.userManager.getUser();
+    if (!oidcUser) return null;
+
+    if (!isTokenExpired(oidcUser)) {
+      return AuthManager.mapOidcUserToDomainModel(oidcUser);
+    }
+
+    if (oidcUser.refresh_token) {
+      return this.refreshTokenAndUpdatePromise();
+    }
+
+    return null;
+  }
+
+  /**
+   * Refreshes the token and returns the user.
+   * If the token is already being refreshed, returns the existing promise.
+   */
+  private async refreshTokenAndUpdatePromise(): Promise<User | null> {
+    if (this.refreshingPromise) return this.refreshingPromise;
+
+    // eslint-disable-next-line no-async-promise-executor
+    this.refreshingPromise = new Promise(async (resolve, reject) => {
+      try {
+        const newOidcUser = await this.userManager.signinSilent();
+        if (newOidcUser) {
+          resolve(AuthManager.mapOidcUserToDomainModel(newOidcUser));
+          return;
+        }
+        resolve(null);
+      } catch (err) {
+        reject(err);
+      } finally {
+        this.refreshingPromise = null; // Reset the promise after completion
       }
+    });
+
+    return this.refreshingPromise;
+  }
+
+  public async getUser({ forceRefresh } = { forceRefresh: false }): Promise<User | null> {
+    return withPassportError<User | null>(async () => {
+      const user = await this.getAuthenticatedUser({ forceRefresh });
+      if (user) return user;
 
       const deviceToken = this.deviceCredentialsManager.getCredentials();
       if (deviceToken) {

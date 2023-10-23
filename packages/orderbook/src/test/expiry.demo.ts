@@ -1,7 +1,7 @@
 import { Environment } from '@imtbl/config';
 import { Wallet } from 'ethers';
 import { log } from 'console';
-import { OrderStatus } from '../openapi/sdk/index';
+import { OrderStatusName } from 'openapi/sdk';
 import { Orderbook } from '../orderbook';
 import {
   deployTestToken,
@@ -83,21 +83,22 @@ describe('', () => {
       orderComponents: soonToExpireListing.orderComponents,
       orderHash: soonToExpireListing.orderHash,
       orderSignature: signatures[0],
+      makerFees: [],
     });
     log('Submitted order to orderbook API with expiry time set in the future');
 
-    await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.ACTIVE);
+    await waitForOrderToBeOfStatus(sdk, orderId, OrderStatusName.ACTIVE);
     log(
       `Listing ${orderId} is now ACTIVE, it will soon transition to EXPIRED, waiting...`,
     );
 
-    await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.EXPIRED);
+    await waitForOrderToBeOfStatus(sdk, orderId, OrderStatusName.EXPIRED);
     log(
       `Listing ${orderId} is now EXPIRED. Attempting to fulfill the expired listing...`,
     );
 
     try {
-      await sdk.fulfillOrder(orderId, fulfiller.address);
+      await sdk.fulfillOrder(orderId, fulfiller.address, []);
     } catch (e) {
       log('Fulfillment failed as expected. The error is:');
       log(e);

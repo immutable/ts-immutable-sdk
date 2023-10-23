@@ -14,7 +14,7 @@ To install yalc run
 npm i -g yalc
 ```
 
-From the root directory of the `@imtbl/sdk` run
+From the `sdk` folder in the root of the repository (`ts-immutable-sdk/sdk`).
 
 ```
 yalc publish
@@ -27,7 +27,7 @@ yalc add @imtbl/sdk
 npm install
 ```
 
-If changes are made to `@imtbl/sdk` in the root directory of the sdk after already publishing run
+If changes are made to `@imtbl/sdk` from `ts-immutable-sdk/sdk`
 
 ```
 yalc push
