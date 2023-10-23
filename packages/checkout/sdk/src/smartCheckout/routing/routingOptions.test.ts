@@ -5,10 +5,7 @@ import { CheckoutConfiguration } from '../../config';
 import * as geoBlocking from './geoBlocking';
 import { DEFAULT_BRIDGE_ENABLED, DEFAULT_ON_RAMP_ENABLED, DEFAULT_SWAP_ENABLED } from '../../types';
 
-jest.mock('./geoBlocking', () => ({
-  isOnRampGeoBlocked: jest.fn().mockResolvedValue(false),
-  isSwapGeoBlocked: jest.fn().mockResolvedValue(false),
-}));
+jest.mock('./geoBlocking');
 
 describe('getAvailableRoutingOptions', () => {
   let mockProvider: Web3Provider;
@@ -26,22 +23,13 @@ describe('getAvailableRoutingOptions', () => {
     });
 
     // Default to no geo-blocking
-    (geoBlocking.isOnRampGeoBlocked as jest.Mock).mockResolvedValue(false);
-    (geoBlocking.isSwapGeoBlocked as jest.Mock).mockResolvedValue(false);
-  });
-
-  it('should return default routing options if no routing availability overrides configured', async () => {
-    const routingOptions = await getAvailableRoutingOptions(config, mockProvider);
-    expect(routingOptions).toEqual({
-      onRamp: DEFAULT_ON_RAMP_ENABLED,
-      swap: DEFAULT_SWAP_ENABLED,
-      bridge: DEFAULT_BRIDGE_ENABLED,
-    });
+    (geoBlocking.isOnRampAvailable as jest.Mock).mockResolvedValue(false);
+    (geoBlocking.isSwapAvailable as jest.Mock).mockResolvedValue(false);
   });
 
   it('should return default routing options if no geo-blocking', async () => {
-    (geoBlocking.isOnRampGeoBlocked as jest.Mock).mockResolvedValue(false);
-    (geoBlocking.isSwapGeoBlocked as jest.Mock).mockResolvedValue(false);
+    (geoBlocking.isOnRampAvailable as jest.Mock).mockResolvedValue(true);
+    (geoBlocking.isSwapAvailable as jest.Mock).mockResolvedValue(true);
 
     const routingOptions = await getAvailableRoutingOptions(config, mockProvider);
     expect(routingOptions).toEqual({
@@ -68,45 +56,45 @@ describe('getAvailableRoutingOptions', () => {
   });
 
   it('should disable onRamp options if OnRamp is geo-blocked', async () => {
-    (geoBlocking.isOnRampGeoBlocked as jest.Mock).mockResolvedValue(true);
+    (geoBlocking.isOnRampAvailable as jest.Mock).mockResolvedValue(false);
 
     const routingOptions = await getAvailableRoutingOptions(config, mockProvider);
     expect(routingOptions.onRamp).toEqual(false);
   });
 
   it('should disable OnRamp options if OnRamp geo-blocked checks are rejected', async () => {
-    (geoBlocking.isOnRampGeoBlocked as jest.Mock).mockRejectedValue({ error: '404' });
+    (geoBlocking.isOnRampAvailable as jest.Mock).mockRejectedValue({ error: '404' });
 
     const routingOptions = await getAvailableRoutingOptions(config, mockProvider);
     expect(routingOptions.onRamp).toEqual(false);
   });
 
   it('should disable Swap options if Swap is geo-blocked', async () => {
-    (geoBlocking.isSwapGeoBlocked as jest.Mock).mockResolvedValue(true);
+    (geoBlocking.isSwapAvailable as jest.Mock).mockResolvedValue(false);
 
     const routingOptions = await getAvailableRoutingOptions(config, mockProvider);
     expect(routingOptions.swap).toEqual(false);
   });
 
   it('should disable Swap options if Swap geo-blocked checks are rejected', async () => {
-    (geoBlocking.isSwapGeoBlocked as jest.Mock).mockRejectedValue({ error: '404' });
+    (geoBlocking.isSwapAvailable as jest.Mock).mockRejectedValue({ error: '404' });
 
     const routingOptions = await getAvailableRoutingOptions(config, mockProvider);
     expect(routingOptions.swap).toEqual(false);
   });
 
-  it('should disable both options if OnRamp and Bridge is geo-blocked', async () => {
-    (geoBlocking.isOnRampGeoBlocked as jest.Mock).mockResolvedValue(true);
-    (geoBlocking.isSwapGeoBlocked as jest.Mock).mockResolvedValue(true);
+  it('should disable both options if OnRamp and Swap is geo-blocked', async () => {
+    (geoBlocking.isOnRampAvailable as jest.Mock).mockResolvedValue(false);
+    (geoBlocking.isSwapAvailable as jest.Mock).mockResolvedValue(false);
 
     const routingOptions = await getAvailableRoutingOptions(config, mockProvider);
     expect(routingOptions.onRamp).toEqual(false);
     expect(routingOptions.swap).toEqual(false);
   });
 
-  it('should disable both options if OnRamp and Bridge geo-blocked checks are rejected', async () => {
-    (geoBlocking.isOnRampGeoBlocked as jest.Mock).mockRejectedValue({ error: '404' });
-    (geoBlocking.isSwapGeoBlocked as jest.Mock).mockRejectedValue({ error: '404' });
+  it('should disable both options if OnRamp and Swap geo-blocked checks are rejected', async () => {
+    (geoBlocking.isOnRampAvailable as jest.Mock).mockRejectedValue({ error: '404' });
+    (geoBlocking.isSwapAvailable as jest.Mock).mockRejectedValue({ error: '404' });
 
     const routingOptions = await getAvailableRoutingOptions(config, mockProvider);
     expect(routingOptions.onRamp).toEqual(false);
