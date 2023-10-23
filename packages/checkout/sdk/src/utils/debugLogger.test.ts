@@ -2,6 +2,10 @@ import { debugLogger, measureAsyncExecution } from './debugLogger';
 import { CheckoutConfiguration } from '../config';
 
 describe('debugLogger', () => {
+  beforeEach(() => {
+    jest.spyOn(console, 'debug').mockImplementation(() => {});
+  });
+
   it('should call underlying function and return result of the promise', async () => {
     const testCheckoutConfig = { isProduction: false } as CheckoutConfiguration;
     const debugString = 'Test Debug String';

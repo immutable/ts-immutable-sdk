@@ -177,6 +177,7 @@ describe('routingCalculator', () => {
     config = new CheckoutConfiguration({
       baseConfig: { environment: Environment.SANDBOX },
     });
+    jest.spyOn(console, 'debug').mockImplementation(() => {});
   });
 
   it('should return no options if no routing options are available', async () => {

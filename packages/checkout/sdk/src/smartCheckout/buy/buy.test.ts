@@ -33,6 +33,10 @@ describe('buy', () => {
   const gasLimit = constants.estimatedFulfillmentGasGwei;
   const seaportContractAddress = '0xSEAPORT';
 
+  beforeEach(() => {
+    jest.spyOn(console, 'debug').mockImplementation(() => {});
+  });
+
   describe('buy', () => {
     let config: CheckoutConfiguration;
     let mockProvider: Web3Provider;

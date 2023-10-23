@@ -61,6 +61,10 @@ describe('balances', () => {
     getNetwork: mockGetNetwork,
   } as unknown as Web3Provider));
 
+  beforeEach(() => {
+    jest.spyOn(console, 'debug').mockImplementation(() => {});
+  });
+
   describe('getBalance()', () => {
     it('should call getBalance() on provider and return the balance', async () => {
       const balanceResult = await getBalance(
@@ -220,6 +224,7 @@ describe('balances', () => {
     beforeEach(() => {
       jest.restoreAllMocks();
       resetBlockscoutClientMap();
+      jest.spyOn(console, 'debug').mockImplementation(() => {});
       getTokenAllowListMock = jest.fn().mockReturnValue({
         tokens: [
           {

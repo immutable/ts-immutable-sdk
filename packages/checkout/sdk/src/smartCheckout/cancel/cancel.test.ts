@@ -28,6 +28,8 @@ describe('cancel', () => {
       config = new CheckoutConfiguration({
         baseConfig: { environment: Environment.SANDBOX },
       });
+
+      jest.spyOn(console, 'debug').mockImplementation(() => {});
     });
 
     it('should sign the cancel transaction', async () => {

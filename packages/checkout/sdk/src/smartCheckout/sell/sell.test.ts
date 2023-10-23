@@ -42,6 +42,8 @@ describe('sell', () => {
     config = new CheckoutConfiguration({
       baseConfig: { environment: Environment.SANDBOX },
     });
+
+    jest.spyOn(console, 'debug').mockImplementation(() => {});
   });
 
   describe('sell', () => {
