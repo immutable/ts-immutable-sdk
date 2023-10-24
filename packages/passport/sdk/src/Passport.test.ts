@@ -247,4 +247,12 @@ describe('Passport', () => {
       expect(result).toHaveLength(0);
     });
   });
+
+  describe('signIn', () => {
+    it('should execute signIn', async () => {
+      await passport.signIn();
+
+      expect(authLoginMock).toBeCalledTimes(1);
+    });
+  });
 });

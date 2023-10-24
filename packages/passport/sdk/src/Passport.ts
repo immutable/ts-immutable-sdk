@@ -12,6 +12,7 @@ import {
   PassportEventMap,
   PassportEvents,
   PassportModuleConfiguration,
+  User,
   UserProfile,
 } from './types';
 import { ConfirmationScreen } from './confirmation';
@@ -55,6 +56,10 @@ export class Passport {
       magicAdapter: this.magicAdapter,
       passportEventEmitter: this.passportEventEmitter,
     });
+  }
+
+  public async signIn(): Promise<User> {
+    return this.authManager.login();
   }
 
   public async connectImxSilent(): Promise<IMXProvider | null> {

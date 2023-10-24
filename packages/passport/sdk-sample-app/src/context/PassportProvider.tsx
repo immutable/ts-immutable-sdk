@@ -5,6 +5,7 @@ import { IMXProvider } from '@imtbl/provider';
 import { Provider, UserProfile } from '@imtbl/passport';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { useStatusProvider } from '@/context/StatusProvider';
+import { User } from '@imtbl/passport/dist/types';
 
 const PassportContext = createContext<{
   imxProvider: IMXProvider | undefined;
@@ -13,6 +14,7 @@ const PassportContext = createContext<{
   connectImxSilent: () => void;
   connectZkEvm: () => void;
   logout: () => void;
+  signIn: () => void;
   getIdToken: () => Promise<string | undefined>;
   getAccessToken: () => Promise<string | undefined>;
   getUserInfo: () => Promise<UserProfile | undefined>;
@@ -24,6 +26,7 @@ const PassportContext = createContext<{
       connectImxSilent: () => undefined,
       connectZkEvm: () => undefined,
       logout: () => undefined,
+      signIn: () => Promise.resolve(undefined),
       getIdToken: () => Promise.resolve(undefined),
       getAccessToken: () => Promise.resolve(undefined),
       getUserInfo: () => Promise.resolve(undefined),
@@ -33,6 +36,7 @@ const PassportContext = createContext<{
 export function PassportProvider({
   children,
 }: { children: JSX.Element | JSX.Element[] }) {
+  const [user, setUser] = useState<User | undefined>();
   const [imxProvider, setImxProvider] = useState<IMXProvider | undefined>();
   const [zkEvmProvider, setZkEvmProvider] = useState<Provider | undefined>();
 
@@ -135,6 +139,19 @@ export function PassportProvider({
     }
   }, [addMessage, passportClient, setIsLoading]);
 
+  const signIn = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const user = await passportClient?.signIn();
+      setUser(user);
+    } catch (err) {
+      addMessage('Logout', err);
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [addMessage, passportClient, setIsLoading])
+
   const providerValues = useMemo(() => ({
     imxProvider,
     zkEvmProvider,
@@ -142,6 +159,7 @@ export function PassportProvider({
     connectImxSilent,
     connectZkEvm,
     logout,
+    signIn,
     getIdToken,
     getAccessToken,
     getUserInfo,
@@ -153,6 +171,7 @@ export function PassportProvider({
     connectImxSilent,
     connectZkEvm,
     logout,
+    signIn,
     getIdToken,
     getAccessToken,
     getUserInfo,
@@ -173,6 +192,7 @@ export function usePassportProvider() {
     connectImx,
     connectImxSilent,
     connectZkEvm,
+    signIn,
     logout,
     getIdToken,
     getAccessToken,
@@ -185,6 +205,7 @@ export function usePassportProvider() {
     connectImx,
     connectImxSilent,
     connectZkEvm,
+    signIn,
     logout,
     getIdToken,
     getAccessToken,
