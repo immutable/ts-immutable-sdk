@@ -37,7 +37,9 @@ export class Base<T extends WidgetType> implements Widget<T> {
 
   protected eventHandlers: Map<WidgetEventTypes[T], Function> = new Map<WidgetEventTypes[T], Function>();
 
-  protected eventTarget: string = '';
+  protected eventHandlersFunction?: (event: any) => void;
+
+  protected eventTopic: string = '';
 
   constructor(sdk: Checkout, props: WidgetProperties<T>) {
     this.validate(props);
@@ -90,33 +92,42 @@ export class Base<T extends WidgetType> implements Widget<T> {
         ...(props.config ?? {}),
       },
     };
+
     this.rerender();
   }
 
   on(type: WidgetEventTypes[T], callback: (data: any) => void): void {
     this.eventHandlers.set(type, callback);
 
-    const handler = (event: any) => this.eventHandler(this.eventHandlers, event);
-
-    // clear listeners
-    if (this.eventHandlers) {
-      window.removeEventListener(this.eventTarget, handler);
+    if (this.eventHandlersFunction) {
+      window.removeEventListener(this.eventTopic, this.eventHandlersFunction);
     }
 
-    window.addEventListener(this.eventTarget, handler);
+    this.eventHandlersFunction = (event: any) => {
+      const matchingHandler = this.eventHandlers.get(event.detail.type);
+      if (matchingHandler) matchingHandler(event.detail.data);
+    };
+    window.addEventListener(this.eventTopic, this.eventHandlersFunction);
   }
 
   removeListener(type: WidgetEventTypes[T]): void {
     this.eventHandlers.delete(type);
-  }
 
-  protected eventHandler(eventHandlers: Map<WidgetEventTypes[T], Function>, event: any): void {
-    const matchingHandler = eventHandlers.get(event.detail.type);
-    if (matchingHandler) matchingHandler(event.detail.data);
+    if (this.eventHandlersFunction) {
+      window.removeEventListener(this.eventTopic, this.eventHandlersFunction);
+    }
+
+    if (this.eventHandlers.size <= 0) return;
+
+    this.eventHandlersFunction = (event: any) => {
+      const matchingHandler = this.eventHandlers.get(event.detail.type);
+      if (matchingHandler) matchingHandler(event.detail.data);
+    };
+    window.addEventListener(this.eventTopic, this.eventHandlersFunction);
   }
 
   protected rerender(): void {
-    console.warn(this.eventTarget, 'missing rerender');
+    console.warn(this.eventTopic, 'missing rerender');
   }
 
   protected strongConfig(): StrongCheckoutWidgetsConfig {
@@ -130,7 +141,7 @@ export class Base<T extends WidgetType> implements Widget<T> {
   }
 
   protected validate(props: WidgetProperties<T>): void {
-    console.warn(this.eventTarget, 'missing validations');
+    console.warn(this.eventTopic, 'missing validations');
   }
 }
 
