@@ -62,7 +62,7 @@ export function PaymentMethods() {
         },
       });
     }
-  }, []);
+  }, [paymentMethod]);
 
   useEffect(() => sendPageView(SaleWidgetViews.PAYMENT_METHODS), []);
 
