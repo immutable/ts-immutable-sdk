@@ -54,9 +54,8 @@ import {
   getAllowedBalances,
 } from '../../lib/balance';
 import { widgetTheme } from '../../lib/theme';
-import { UserJourney, useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
-// import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
-// import { ServiceType } from '../../views/error/serviceTypes';
+import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import { useAnalytics } from '../../context/analytics-provider/CustomAnalyticsProvider';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;

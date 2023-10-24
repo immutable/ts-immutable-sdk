@@ -40,8 +40,9 @@ import { ErrorView } from '../../views/error/ErrorView';
 import { text } from '../../resources/text/textConfig';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { widgetTheme } from '../../lib/theme';
-import { UserJourney, useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { identifyUser } from '../../lib/analytics/identifyUser';
+import { useAnalytics } from '../../context/analytics-provider/CustomAnalyticsProvider';
 
 export interface ConnectWidgetProps {
   params?: ConnectWidgetParams;

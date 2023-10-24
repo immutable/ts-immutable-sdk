@@ -16,7 +16,8 @@ import {
 } from '../../../context/view-context/ViewContext';
 import { isPassportProvider } from '../../../lib/providerUtils';
 import { BridgeComingSoon } from '../../bridge/views/BridgeComingSoon';
-import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { useAnalytics } from '../../../context/analytics-provider/CustomAnalyticsProvider';
 
 export function SwitchNetworkEth() {
   const { viewDispatch } = useContext(ViewContext);

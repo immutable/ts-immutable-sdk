@@ -1,4 +1,8 @@
-import { createAnalytics, StandardAnalyticsActions, StandardAnalyticsControlTypes } from '@imtbl/react-analytics';
+import {
+  createAnalytics,
+  StandardAnalyticsActions,
+  StandardAnalyticsControlTypes,
+} from '@imtbl/react-analytics';
 import { Environment } from '@imtbl/config';
 
 export enum UserJourney {
@@ -10,8 +14,10 @@ export enum UserJourney {
   SALE = 'Sale',
 }
 
-export type AnalyticsControlTypes = StandardAnalyticsControlTypes
-| 'IframeEvent' | 'Event';
+export type AnalyticsControlTypes =
+  | StandardAnalyticsControlTypes
+  | 'IframeEvent'
+  | 'Event';
 
 export type TrackEventProps = {
   screen: string;
@@ -22,12 +28,26 @@ export type TrackEventProps = {
   userId?: string | undefined;
 } & Record<string, unknown>;
 
-const SEGMENT_ANALYTICS_WRITE_KEY = {
-  [Environment.SANDBOX]: 'b69BcXnFXdaiFC6MqRQiHvjcPrTxftZl',
-  [Environment.PRODUCTION]: 'hecEjBUtJP8IvC9rBx9IkBFR0UuDiIos',
+export enum SegmentAppName {
+  CHECKOUT = 'checkout',
+  SALE = 'portfoliogame',
+}
+
+const SEGMENT_ANALYTICS_WRITE_KEYS = {
+  [SegmentAppName.CHECKOUT]: {
+    [Environment.SANDBOX]: 'b69BcXnFXdaiFC6MqRQiHvjcPrTxftZl',
+    [Environment.PRODUCTION]: 'hecEjBUtJP8IvC9rBx9IkBFR0UuDiIos',
+  },
+  [SegmentAppName.SALE]: {
+    [Environment.SANDBOX]: 'b69BcXnFXdaiFC6MqRQiHvjcPrTxftZl',
+    [Environment.PRODUCTION]: 'hecEjBUtJP8IvC9rBx9IkBFR0UuDiIos',
+  },
 };
 
-export const getSegmentWriteKey = (env: Environment) => SEGMENT_ANALYTICS_WRITE_KEY[env];
+export const getSegmentWriteKey = (
+  environment: Environment,
+  writeKey: SegmentAppName = SegmentAppName.CHECKOUT,
+): string => SEGMENT_ANALYTICS_WRITE_KEYS[writeKey][environment];
 
 const productName = 'checkout';
 
@@ -41,4 +61,15 @@ StandardAnalyticsActions
 >({
   writeKey: '',
   appName: productName,
+});
+
+export const createAnalyticsInstance = (writeKey: string, appName: any) => createAnalytics<
+UserJourney,
+string,
+string,
+AnalyticsControlTypes,
+StandardAnalyticsActions
+>({
+  writeKey,
+  appName,
 });

@@ -16,7 +16,8 @@ import {
 import { SwapFormData } from './swapFormTypes';
 import { TransactionRejected } from '../../../components/TransactionRejected/TransactionRejected';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
-import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { useAnalytics } from '../../../context/analytics-provider/CustomAnalyticsProvider';
 
 export interface SwapButtonProps {
   loading: boolean

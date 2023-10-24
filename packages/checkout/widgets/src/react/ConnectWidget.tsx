@@ -1,5 +1,5 @@
 import { Passport } from '@imtbl/passport';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { CheckoutWidgetTagNames } from '../definitions/types';
 import { AddPassportOption } from './internal/AddPassportOption';
 

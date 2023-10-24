@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
-import { useAnalytics, getSegmentWriteKey } from './SegmentAnalyticsProvider';
+import { getSegmentWriteKey } from './SegmentAnalyticsProvider';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { useAnalytics } from './CustomAnalyticsProvider';
 
 type SetupAnalyticsProps = {
   widgetConfig: StrongCheckoutWidgetsConfig

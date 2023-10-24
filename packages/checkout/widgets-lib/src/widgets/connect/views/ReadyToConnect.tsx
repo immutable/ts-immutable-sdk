@@ -17,8 +17,9 @@ import {
   ViewActions,
 } from '../../../context/view-context/ViewContext';
 import { isMetaMaskProvider, isPassportProvider } from '../../../lib/providerUtils';
-import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { identifyUser } from '../../../lib/analytics/identifyUser';
+import { useAnalytics } from '../../../context/analytics-provider/CustomAnalyticsProvider';
 
 export interface ReadyToConnectProps {
   targetChainId: ChainId;

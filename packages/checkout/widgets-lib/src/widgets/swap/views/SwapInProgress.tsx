@@ -10,7 +10,8 @@ import {
 } from '../../../context/view-context/SwapViewContextTypes';
 import { LoadingView } from '../../../views/loading/LoadingView';
 import { text } from '../../../resources/text/textConfig';
-import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { useAnalytics } from '../../../context/analytics-provider/CustomAnalyticsProvider';
 
 interface SwapInProgressProps {
   transactionResponse: TransactionResponse;
