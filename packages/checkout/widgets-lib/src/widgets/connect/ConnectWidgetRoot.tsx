@@ -4,7 +4,7 @@ import { ConnectWidget } from './ConnectWidget';
 import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 import { Base } from '../BaseWidgetRoot';
 
-export class Connect<T extends WidgetType> extends Base<T> {
+export class Connect extends Base<WidgetType.CONNECT> {
   protected eventTopic: string = 'imtbl-connect-widget';
 
   protected rerender() {
