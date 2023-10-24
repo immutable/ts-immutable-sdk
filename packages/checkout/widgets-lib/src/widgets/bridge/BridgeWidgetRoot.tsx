@@ -10,7 +10,7 @@ export type BridgeWidgetInputs = BridgeWidgetParams & {
   config: StrongCheckoutWidgetsConfig
 };
 
-export class Bridge<T extends WidgetType> extends Base<T> {
+export class Bridge extends Base<WidgetType.BRIDGE> {
   protected eventTarget: string = 'imtbl-bridge-widget';
 
   protected rerender() {
