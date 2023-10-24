@@ -184,7 +184,7 @@ export function SwapWidget(props: SwapWidgetProps) {
       let overrides: ExchangeOverrides | undefined;
       try {
         overrides = (
-          (await checkout!.config.remote.getConfig('dex')) as DexConfig
+          (await checkout.config.remote.getConfig('dex')) as DexConfig
         ).overrides;
       } catch (err: any) {
         showErrorView(err);
