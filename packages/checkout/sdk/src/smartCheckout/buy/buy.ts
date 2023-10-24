@@ -10,6 +10,7 @@ import {
   FeeValue,
   Action,
   FulfillOrderResponse,
+  OrderStatusName,
 } from '@imtbl/orderbook';
 import * as instance from '../../instance';
 import { CheckoutConfiguration } from '../../config';
@@ -155,7 +156,7 @@ export const buy = async (
   let unsignedFulfillmentTransactions: TransactionRequest[] = [];
   let orderActions: Action[] = [];
 
-  const fulfillOrderStartTime = new Date().getTime();
+  const fulfillOrderStartTime = performance.now();
   try {
     const fulfillerAddress = await measureAsyncExecution<string>(
       config,
@@ -174,9 +175,25 @@ export const buy = async (
       getUnsignedERC20ApprovalTransactions(actions),
     );
   } catch (err: any) {
-    // Silently ignore error as this is usually thrown if user does not have enough balance
-    const elapsedTimeInSeconds = (new Date().getTime() - fulfillOrderStartTime) / 1000;
+    const elapsedTimeInSeconds = (performance.now() - fulfillOrderStartTime) / 1000;
     debugLogger(config, 'Time to call fulfillOrder from the orderbook', elapsedTimeInSeconds);
+
+    if (err.message.includes(OrderStatusName.EXPIRED)) {
+      throw new CheckoutError('Order is expired', CheckoutErrorType.ORDER_EXPIRED_ERROR, { orderId: id });
+    }
+
+    // The balances error will be handled by bulk order fulfillment but for now we
+    // need to assert on this string to check that the error is not a balances error
+    if (!err.message.includes('The fulfiller does not have the balances needed to fulfill')) {
+      throw new CheckoutError(
+        'Error occurred while trying to fulfill the order',
+        CheckoutErrorType.FULFILL_ORDER_LISTING_ERROR,
+        {
+          orderId: id,
+          message: err.message,
+        },
+      );
+    }
   }
 
   try {
