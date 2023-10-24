@@ -175,6 +175,14 @@ export const BLOCKSCOUT_CHAIN_URL_MAP: {
     url: 'https://explorer.mainnet.immutable.com',
     nativeToken: PRODUCTION_CHAIN_ID_NETWORK_MAP.get(ChainId.IMTBL_ZKEVM_MAINNET)!.nativeCurrency,
   },
+  [ChainId.SEPOLIA]: {
+    url: 'https://eth-sepolia.blockscout.com',
+    nativeToken: SANDBOX_CHAIN_ID_NETWORK_MAP.get(ChainId.SEPOLIA)!.nativeCurrency,
+  },
+  [ChainId.ETHEREUM]: {
+    url: 'https://eth.blockscout.com/',
+    nativeToken: PRODUCTION_CHAIN_ID_NETWORK_MAP.get(ChainId.ETHEREUM)!.nativeCurrency,
+  },
 };
 
 export const ERC20ABI = [
