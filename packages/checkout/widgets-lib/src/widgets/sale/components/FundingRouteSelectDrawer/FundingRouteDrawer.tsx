@@ -33,7 +33,7 @@ FundingRouteDrawerProps) {
             onClick={() => onClickMenuItem(i)}
             fundingRoute={fundingRoute}
             selected={activeFundingRouteIndex === i}
-            key={fundingRoute.priority}
+            key={fundingRoute.steps[0].fundingItem.type + fundingRoute.steps[0].fundingItem.token}
           />
         ))}
       </BottomSheet.Content>

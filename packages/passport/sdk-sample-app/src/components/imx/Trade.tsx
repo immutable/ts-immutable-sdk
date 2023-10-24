@@ -78,7 +78,7 @@ function Trade({ showModal: showTradeModal, setShowModal: setShowTradeModal }: M
     }
   };
 
-  const makeOffer = async (id: number, index: number) => {
+  const makeOffer = async (index: number) => {
     setLoadingTrade(true);
     setTradeIndex(index);
     setShowMakeOffer(true);
@@ -93,7 +93,7 @@ function Trade({ showModal: showTradeModal, setShowModal: setShowTradeModal }: M
       <MakeOfferModal
         showModal={showMakeOffer}
         setShowModal={setShowMakeOffer}
-        order={tradeIndex ? orders[tradeIndex] : undefined}
+        order={tradeIndex !== null ? orders[tradeIndex] : undefined}
         onClose={handleMakeOfferClosed}
       />
       <Offcanvas
@@ -162,7 +162,7 @@ function Trade({ showModal: showTradeModal, setShowModal: setShowTradeModal }: M
                               <Button
                                 size="sm"
                                 variant="dark"
-                                onClick={() => makeOffer(order.order_id, index)}
+                                onClick={() => makeOffer(index)}
                               >
                                 Offer
                               </Button>

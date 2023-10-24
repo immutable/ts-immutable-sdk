@@ -22,6 +22,7 @@ export type SignedOrderProduct = {
   amount: number[];
   tokenId: number[];
   currency: string;
+  collectionAddress: string;
 };
 
 export type SignedOrder = {
@@ -64,6 +65,11 @@ export type SignOrderError = {
   data?: Record<string, unknown>;
 };
 
+export type SmartCheckoutError = {
+  type: SaleErrorTypes;
+  data?: Record<string, unknown>;
+};
+
 export type ExecutedTransaction = {
   method: string;
   hash: string | undefined;
@@ -82,4 +88,6 @@ export enum SaleErrorTypes {
   WALLET_FAILED = 'WALLET_FAILED',
   WALLET_REJECTED = 'WALLET_REJECTED',
   WALLET_REJECTED_NO_FUNDS = 'WALLET_REJECTED_NO_FUNDS',
+  SMART_CHECKOUT_NO_ROUTES_FOUND = 'SMART_CHECKOUT_NO_ROUTES_FOUND',
+  SMART_CHECKOUT_ERROR = 'SMART_CHECKOUT_ERROR',
 }

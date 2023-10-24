@@ -79,6 +79,11 @@ export default class AuthManager {
 
   private readonly logoutMode: Exclude<OidcConfiguration['logoutMode'], undefined>;
 
+  /**
+   * Promise that is used to prevent multiple concurrent calls to the refresh token endpoint.
+   */
+  private refreshingPromise: Promise<User | null> | null = null;
+
   constructor(config: PassportConfiguration) {
     this.config = config;
     this.userManager = new UserManager(getAuthConfiguration(config));
@@ -381,34 +386,55 @@ export default class AuthManager {
    * @param forceRefresh If set to true, force an HTTP call to the OIDC server's authorization endpoint. This call will
    * throw an error if there's no refresh token.
    */
-  private async getWebUser({ forceRefresh = false }: { forceRefresh: boolean }) : Promise<User | null> {
+  private async getAuthenticatedUser({ forceRefresh = false }: { forceRefresh: boolean }): Promise<User | null> {
     if (forceRefresh) {
-      const newOidcUser = await this.userManager.signinSilent();
-      return newOidcUser ? AuthManager.mapOidcUserToDomainModel(newOidcUser) : null;
+      return this.refreshTokenAndUpdatePromise();
     }
 
     const oidcUser = await this.userManager.getUser();
     if (!oidcUser) return null;
 
-    const tokenExpired = isTokenExpired(oidcUser);
-    if (!tokenExpired) {
+    if (!isTokenExpired(oidcUser)) {
       return AuthManager.mapOidcUserToDomainModel(oidcUser);
     }
+
     if (oidcUser.refresh_token) {
-      const newOidcUser = await this.userManager.signinSilent();
-      if (newOidcUser) {
-        return AuthManager.mapOidcUserToDomainModel(newOidcUser);
-      }
+      return this.refreshTokenAndUpdatePromise();
     }
+
     return null;
+  }
+
+  /**
+   * Refreshes the token and returns the user.
+   * If the token is already being refreshed, returns the existing promise.
+   */
+  private async refreshTokenAndUpdatePromise(): Promise<User | null> {
+    if (this.refreshingPromise) return this.refreshingPromise;
+
+    // eslint-disable-next-line no-async-promise-executor
+    this.refreshingPromise = new Promise(async (resolve, reject) => {
+      try {
+        const newOidcUser = await this.userManager.signinSilent();
+        if (newOidcUser) {
+          resolve(AuthManager.mapOidcUserToDomainModel(newOidcUser));
+          return;
+        }
+        resolve(null);
+      } catch (err) {
+        reject(err);
+      } finally {
+        this.refreshingPromise = null; // Reset the promise after completion
+      }
+    });
+
+    return this.refreshingPromise;
   }
 
   public async getUser({ forceRefresh } = { forceRefresh: false }): Promise<User | null> {
     return withPassportError<User | null>(async () => {
-      const user = await this.getWebUser({ forceRefresh });
-      if (user) {
-        return user;
-      }
+      const user = await this.getAuthenticatedUser({ forceRefresh });
+      if (user) return user;
 
       const deviceToken = this.deviceCredentialsManager.getCredentials();
       if (deviceToken) {

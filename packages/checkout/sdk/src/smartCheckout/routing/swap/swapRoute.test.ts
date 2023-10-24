@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { Environment } from '@imtbl/config';
-import { Fee, ERC20 } from '@imtbl/dex-sdk';
+import { Fee, Token } from '@imtbl/dex-sdk';
 import { BigNumber, utils } from 'ethers';
 import { CheckoutConfiguration } from '../../../config';
 import { BalanceRequirement, BalanceCheckResult } from '../../balanceCheck/types';
@@ -14,7 +14,6 @@ import {
 } from './swapRoute';
 import {
   DexQuote,
-  DexQuoteCache,
   DexQuotes,
   TokenBalanceResult,
 } from '../types';
@@ -24,195 +23,140 @@ import {
   IMX_ADDRESS_ZKEVM,
   ItemType,
 } from '../../../types';
+import { quoteFetcher } from './quoteFetcher';
 
 jest.mock('../../../config/remoteConfigFetcher');
+jest.mock('./quoteFetcher');
 
 describe('swapRoute', () => {
   const config = new CheckoutConfiguration({
     baseConfig: { environment: Environment.SANDBOX },
   });
 
-  const cache: DexQuoteCache = new Map<string, DexQuotes>(
+  const dexQuotes: DexQuotes = new Map<string, DexQuote>(
     [
-      [
-        '0xERC20_1',
-        new Map<string, DexQuote>([
-          ['0xERC20_2',
-            {
-              quote: {
+      ['0xERC20_2',
+        {
+          quote: {
+            amount: {
+              value: BigNumber.from(1),
+              token: {
+                chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+                name: 'ERC20_2',
+                symbol: 'ERC20_2',
+                decimals: 18,
+                address: '0xERC20_2',
+              } as Token,
+            },
+            amountWithMaxSlippage: {
+              value: BigNumber.from(1),
+              token: {} as Token,
+            },
+            slippage: 0,
+            fees: [
+              {
                 amount: {
-                  value: BigNumber.from(1),
+                  value: BigNumber.from(3),
                   token: {
                     chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-                    name: 'ERC20_2',
-                    symbol: 'ERC20_2',
+                    name: 'IMX',
+                    symbol: 'IMX',
                     decimals: 18,
-                    address: '0xERC20_2',
-                  } as ERC20,
+                    address: IMX_ADDRESS_ZKEVM,
+                  } as Token,
                 },
-                amountWithMaxSlippage: {
-                  value: BigNumber.from(1),
-                  token: {} as ERC20,
-                },
-                slippage: 0,
-                fees: [
-                  {
-                    amount: {
-                      value: BigNumber.from(3),
-                      token: {
-                        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-                        name: 'IMX',
-                        symbol: 'IMX',
-                        decimals: 18,
-                        address: IMX_ADDRESS_ZKEVM,
-                      } as ERC20,
-                    },
-                    recipient: '',
-                    basisPoints: 0,
-                  },
-                ],
+                recipient: '',
+                basisPoints: 0,
               },
-              approval: {
-                value: BigNumber.from(1),
-                token: {
-                  chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-                  name: 'IMX',
-                  symbol: 'IMX',
-                  decimals: 18,
-                  address: IMX_ADDRESS_ZKEVM,
-                } as ERC20,
-              },
-              swap: {
-                value: BigNumber.from(2),
-                token: {
-                  chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-                  name: 'IMX',
-                  symbol: 'IMX',
-                  decimals: 18,
-                  address: IMX_ADDRESS_ZKEVM,
-                } as ERC20,
-              },
-            },
-          ],
-          ['0xERC20_3',
-            {
-              quote: {
-                amount: {
-                  value: BigNumber.from(1),
-                  token: {
-                    chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-                    name: 'ERC20_3',
-                    symbol: 'ERC20_3',
-                    decimals: 18,
-                    address: '0xERC20_3',
-                  } as ERC20,
-                },
-                amountWithMaxSlippage: {
-                  value: BigNumber.from(1),
-                  token: {} as ERC20,
-                },
-                slippage: 0,
-                fees: [
-                  {
-                    amount: {
-                      value: BigNumber.from(3),
-                      token: {
-                        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-                        name: 'IMX',
-                        symbol: 'IMX',
-                        decimals: 18,
-                        address: IMX_ADDRESS_ZKEVM,
-                      } as ERC20,
-                    },
-                    recipient: '',
-                    basisPoints: 0,
-                  },
-                ],
-              },
-              approval: {
-                value: BigNumber.from(1),
-                token: {
-                  chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-                  name: 'IMX',
-                  symbol: 'IMX',
-                  decimals: 18,
-                  address: IMX_ADDRESS_ZKEVM,
-                } as ERC20,
-              },
-              swap: {
-                value: BigNumber.from(2),
-                token: {
-                  chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-                  name: 'IMX',
-                  symbol: 'IMX',
-                  decimals: 18,
-                  address: IMX_ADDRESS_ZKEVM,
-                } as ERC20,
-              },
-            },
-          ],
-        ]),
+            ],
+          },
+          approval: {
+            value: BigNumber.from(1),
+            token: {
+              chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+              name: 'IMX',
+              symbol: 'IMX',
+              decimals: 18,
+              address: IMX_ADDRESS_ZKEVM,
+            } as Token,
+          },
+          swap: {
+            value: BigNumber.from(2),
+            token: {
+              chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+              name: 'IMX',
+              symbol: 'IMX',
+              decimals: 18,
+              address: IMX_ADDRESS_ZKEVM,
+            } as Token,
+          },
+        },
       ],
-      [
-        '0xERC20_2',
-        new Map<string, DexQuote>([
-          ['0xERC20_1',
-            {
-              quote: {
+      ['0xERC20_3',
+        {
+          quote: {
+            amount: {
+              value: BigNumber.from(1),
+              token: {
+                chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+                name: 'ERC20_3',
+                symbol: 'ERC20_3',
+                decimals: 18,
+                address: '0xERC20_3',
+              } as Token,
+            },
+            amountWithMaxSlippage: {
+              value: BigNumber.from(1),
+              token: {} as Token,
+            },
+            slippage: 0,
+            fees: [
+              {
                 amount: {
-                  value: BigNumber.from(2),
+                  value: BigNumber.from(3),
                   token: {
                     chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-                    name: 'ERC20_1',
-                    symbol: 'ERC20_1',
+                    name: 'IMX',
+                    symbol: 'IMX',
                     decimals: 18,
-                    address: '0xERC20_1',
-                  } as ERC20,
+                    address: IMX_ADDRESS_ZKEVM,
+                  } as Token,
                 },
-                amountWithMaxSlippage: {
-                  value: BigNumber.from(2),
-                  token: {} as ERC20,
-                },
-                slippage: 0,
-                fees: [
-                  {
-                    amount: {
-                      value: BigNumber.from(2),
-                      token: {
-                        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-                        name: 'IMX',
-                        symbol: 'IMX',
-                        decimals: 18,
-                        address: IMX_ADDRESS_ZKEVM,
-                      } as ERC20,
-                    },
-                    recipient: '',
-                    basisPoints: 0,
-                  },
-                ],
+                recipient: '',
+                basisPoints: 0,
               },
-              approval: {
-                value: BigNumber.from(2),
-                token: {
-                  chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-                  name: 'IMX',
-                  symbol: 'IMX',
-                  decimals: 18,
-                  address: IMX_ADDRESS_ZKEVM,
-                } as ERC20,
-              },
-              swap: {
-                value: BigNumber.from(2),
-                token: {} as ERC20,
-              },
-            },
-          ],
-        ]),
+            ],
+          },
+          approval: {
+            value: BigNumber.from(1),
+            token: {
+              chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+              name: 'IMX',
+              symbol: 'IMX',
+              decimals: 18,
+              address: IMX_ADDRESS_ZKEVM,
+            } as Token,
+          },
+          swap: {
+            value: BigNumber.from(2),
+            token: {
+              chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+              name: 'IMX',
+              symbol: 'IMX',
+              decimals: 18,
+              address: IMX_ADDRESS_ZKEVM,
+            } as Token,
+          },
+        },
       ],
     ],
   );
 
   describe('swapRoute', () => {
+    beforeEach(() => {
+      (quoteFetcher as jest.Mock).mockResolvedValue(dexQuotes);
+    });
+
     it('should recommend swap route', async () => {
       const balanceRequirement = {
         type: ItemType.ERC20,
@@ -282,7 +226,6 @@ describe('swapRoute', () => {
         {
           swap: true,
         },
-        cache,
         '0xADDRESS',
         balanceRequirement,
         balances,
@@ -426,7 +369,6 @@ describe('swapRoute', () => {
         {
           swap: true,
         },
-        cache,
         '0xADDRESS',
         balanceRequirement,
         balances,
@@ -573,7 +515,6 @@ describe('swapRoute', () => {
         {
           swap: false,
         },
-        cache,
         '0xADDRESS',
         balanceRequirement,
         balances,
@@ -612,7 +553,6 @@ describe('swapRoute', () => {
         {
           swap: true,
         },
-        cache,
         '0xADDRESS',
         balanceRequirement,
         balances,
@@ -676,7 +616,6 @@ describe('swapRoute', () => {
         {
           swap: true,
         },
-        cache,
         '0xADDRESS',
         balanceRequirement,
         balances,
@@ -745,7 +684,6 @@ describe('swapRoute', () => {
         {
           swap: true,
         },
-        cache,
         '0xADDRESS',
         balanceRequirement,
         balances,
@@ -824,7 +762,6 @@ describe('swapRoute', () => {
         {
           swap: true,
         },
-        cache,
         '0xADDRESS',
         balanceRequirement,
         balances,
@@ -904,7 +841,6 @@ describe('swapRoute', () => {
         {
           swap: true,
         },
-        cache,
         '0xADDRESS',
         balanceRequirement,
         balances,
@@ -974,7 +910,6 @@ describe('swapRoute', () => {
         {
           swap: true,
         },
-        cache,
         '0xADDRESS',
         balanceRequirement,
         balances,
@@ -1054,7 +989,6 @@ describe('swapRoute', () => {
         {
           swap: true,
         },
-        cache,
         '0xADDRESS',
         balanceRequirement,
         balances,
@@ -1298,7 +1232,6 @@ describe('swapRoute', () => {
             symbol: 'IMX',
             decimals: 18,
             address: IMX_ADDRESS_ZKEVM,
-            type: 'erc20',
           },
         },
       );
@@ -1334,7 +1267,6 @@ describe('swapRoute', () => {
             symbol: 'IMX',
             decimals: 18,
             address: IMX_ADDRESS_ZKEVM,
-            type: 'erc20',
           },
         },
       );
@@ -1370,7 +1302,6 @@ describe('swapRoute', () => {
             symbol: 'IMX',
             decimals: 18,
             address: IMX_ADDRESS_ZKEVM,
-            type: 'erc20',
           },
         },
       );
@@ -1406,7 +1337,6 @@ describe('swapRoute', () => {
             symbol: 'IMX',
             decimals: 18,
             address: IMX_ADDRESS_ZKEVM,
-            type: 'erc20',
           },
         },
       );
@@ -1422,7 +1352,7 @@ describe('swapRoute', () => {
   });
 
   describe('checkUserCanCoverSwapFees', () => {
-    it('should return true if user has enough balance to cover the swap fees', () => {
+    it('should return true if user has enough balance to cover gas fees', () => {
       const l2Balances = [
         {
           balance: BigNumber.from(2),
@@ -1436,28 +1366,21 @@ describe('swapRoute', () => {
         },
       ];
 
-      const swapFees: Fee[] = [
-        {
-          recipient: '',
-          basisPoints: 0,
-          amount: {
-            value: BigNumber.from(1),
-            token: {
-              chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-              name: 'IMX',
-              symbol: 'IMX',
-              decimals: 18,
-              address: IMX_ADDRESS_ZKEVM,
-              type: 'erc20',
-            },
-          },
-        },
-      ];
+      const swapFees: Fee[] = [];
 
       const approvalFees = {
         sufficient: true,
         approvalGasFee: BigNumber.from(0),
         approvalGasTokenAddress: '',
+      };
+
+      const swapGasFees = {
+        token: {
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+          address: IMX_ADDRESS_ZKEVM,
+          decimals: 18,
+        },
+        value: BigNumber.from(1),
       };
 
       const tokenBeingSwapped = {
@@ -1467,15 +1390,16 @@ describe('swapRoute', () => {
 
       const canCoverSwapFees = checkUserCanCoverSwapFees(
         l2Balances,
-        swapFees,
         approvalFees,
+        swapGasFees,
+        swapFees,
         tokenBeingSwapped,
       );
 
       expect(canCoverSwapFees).toBeTruthy();
     });
 
-    it('should return true if user has enough balance to cover the approval and swap fees', () => {
+    it('should return true if user has enough balance to cover gas and swap fees', () => {
       const l2Balances = [
         {
           balance: BigNumber.from(3),
@@ -1501,7 +1425,68 @@ describe('swapRoute', () => {
               symbol: 'IMX',
               decimals: 18,
               address: IMX_ADDRESS_ZKEVM,
-              type: 'erc20',
+            },
+          },
+        },
+      ];
+
+      const approvalFees = {
+        sufficient: true,
+        approvalGasFee: BigNumber.from(0),
+        approvalGasTokenAddress: '',
+      };
+
+      const swapGasFees = {
+        token: {
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+          address: IMX_ADDRESS_ZKEVM,
+          decimals: 18,
+        },
+        value: BigNumber.from(1),
+      };
+
+      const tokenBeingSwapped = {
+        amount: BigNumber.from(1),
+        address: IMX_ADDRESS_ZKEVM,
+      };
+
+      const canCoverSwapFees = checkUserCanCoverSwapFees(
+        l2Balances,
+        approvalFees,
+        swapGasFees,
+        swapFees,
+        tokenBeingSwapped,
+      );
+
+      expect(canCoverSwapFees).toBeTruthy();
+    });
+
+    it('should return true if user has enough balance to cover the approval, gas and swap fees', () => {
+      const l2Balances = [
+        {
+          balance: BigNumber.from(4),
+          formattedBalance: '4',
+          token: {
+            name: 'IMX',
+            symbol: 'IMX',
+            decimals: 18,
+            address: IMX_ADDRESS_ZKEVM,
+          },
+        },
+      ];
+
+      const swapFees: Fee[] = [
+        {
+          recipient: '',
+          basisPoints: 0,
+          amount: {
+            value: BigNumber.from(1),
+            token: {
+              chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+              name: 'IMX',
+              symbol: 'IMX',
+              decimals: 18,
+              address: IMX_ADDRESS_ZKEVM,
             },
           },
         },
@@ -1513,6 +1498,15 @@ describe('swapRoute', () => {
         approvalGasTokenAddress: IMX_ADDRESS_ZKEVM,
       };
 
+      const swapGasFees = {
+        token: {
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+          address: IMX_ADDRESS_ZKEVM,
+          decimals: 18,
+        },
+        value: BigNumber.from(1),
+      };
+
       const tokenBeingSwapped = {
         amount: BigNumber.from(1),
         address: IMX_ADDRESS_ZKEVM,
@@ -1520,8 +1514,9 @@ describe('swapRoute', () => {
 
       const canCoverSwapFees = checkUserCanCoverSwapFees(
         l2Balances,
-        swapFees,
         approvalFees,
+        swapGasFees,
+        swapFees,
         tokenBeingSwapped,
       );
 
@@ -1534,8 +1529,8 @@ describe('swapRoute', () => {
       () => {
         const l2Balances = [
           {
-            balance: BigNumber.from(5),
-            formattedBalance: '5',
+            balance: BigNumber.from(6),
+            formattedBalance: '6',
             token: {
               name: 'IMX',
               symbol: 'IMX',
@@ -1577,7 +1572,6 @@ describe('swapRoute', () => {
                 symbol: 'IMX',
                 decimals: 18,
                 address: '0xERC20_1',
-                type: 'erc20',
               },
             },
           },
@@ -1592,7 +1586,6 @@ describe('swapRoute', () => {
                 symbol: 'IMX',
                 decimals: 18,
                 address: '0xERC20_2',
-                type: 'erc20',
               },
             },
           },
@@ -1607,7 +1600,6 @@ describe('swapRoute', () => {
                 symbol: 'IMX',
                 decimals: 18,
                 address: '0xERC20_3',
-                type: 'erc20',
               },
             },
           },
@@ -1619,6 +1611,15 @@ describe('swapRoute', () => {
           approvalGasTokenAddress: '0xERC20_1',
         };
 
+        const swapGasFees = {
+          token: {
+            chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+            address: '0xERC20_1',
+            decimals: 18,
+          },
+          value: BigNumber.from(1),
+        };
+
         const tokenBeingSwapped = {
           amount: BigNumber.from(3),
           address: '0xERC20_1',
@@ -1626,8 +1627,9 @@ describe('swapRoute', () => {
 
         const canCoverSwapFees = checkUserCanCoverSwapFees(
           l2Balances,
-          swapFees,
           approvalFees,
+          swapGasFees,
+          swapFees,
           tokenBeingSwapped,
         );
 
@@ -1635,7 +1637,7 @@ describe('swapRoute', () => {
       },
     );
 
-    it('should return false if user does not have enough balance to cover the fee', () => {
+    it('should return false if user does not have enough balance to cover gas', () => {
       const l2Balances = [
         {
           balance: BigNumber.from(1),
@@ -1649,28 +1651,21 @@ describe('swapRoute', () => {
         },
       ];
 
-      const swapFees: Fee[] = [
-        {
-          recipient: '',
-          basisPoints: 0,
-          amount: {
-            value: BigNumber.from(1),
-            token: {
-              chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-              name: 'IMX',
-              symbol: 'IMX',
-              decimals: 18,
-              address: IMX_ADDRESS_ZKEVM,
-              type: 'erc20',
-            },
-          },
-        },
-      ];
+      const swapFees: Fee[] = [];
 
       const approvalFees = {
         sufficient: true,
         approvalGasFee: BigNumber.from(0),
         approvalGasTokenAddress: '',
+      };
+
+      const swapGasFees = {
+        token: {
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+          address: IMX_ADDRESS_ZKEVM,
+          decimals: 18,
+        },
+        value: BigNumber.from(1),
       };
 
       const tokenBeingSwapped = {
@@ -1680,15 +1675,16 @@ describe('swapRoute', () => {
 
       const canCoverSwapFees = checkUserCanCoverSwapFees(
         l2Balances,
-        swapFees,
         approvalFees,
+        swapGasFees,
+        swapFees,
         tokenBeingSwapped,
       );
 
       expect(canCoverSwapFees).toBeFalsy();
     });
 
-    it('should return false if user does not have enough balance to cover the approval and fees', () => {
+    it('should return false if user does not have enough balance to cover the fee', () => {
       const l2Balances = [
         {
           balance: BigNumber.from(2),
@@ -1714,11 +1710,81 @@ describe('swapRoute', () => {
               symbol: 'IMX',
               decimals: 18,
               address: IMX_ADDRESS_ZKEVM,
-              type: 'erc20',
             },
           },
         },
       ];
+
+      const approvalFees = {
+        sufficient: true,
+        approvalGasFee: BigNumber.from(0),
+        approvalGasTokenAddress: '',
+      };
+
+      const swapGasFees = {
+        token: {
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+          address: IMX_ADDRESS_ZKEVM,
+          decimals: 18,
+        },
+        value: BigNumber.from(1),
+      };
+
+      const tokenBeingSwapped = {
+        amount: BigNumber.from(1),
+        address: IMX_ADDRESS_ZKEVM,
+      };
+
+      const canCoverSwapFees = checkUserCanCoverSwapFees(
+        l2Balances,
+        approvalFees,
+        swapGasFees,
+        swapFees,
+        tokenBeingSwapped,
+      );
+
+      expect(canCoverSwapFees).toBeFalsy();
+    });
+
+    it('should return false if user does not have enough balance to cover the approval, gas and fees', () => {
+      const l2Balances = [
+        {
+          balance: BigNumber.from(3),
+          formattedBalance: '3',
+          token: {
+            name: 'IMX',
+            symbol: 'IMX',
+            decimals: 18,
+            address: IMX_ADDRESS_ZKEVM,
+          },
+        },
+      ];
+
+      const swapFees: Fee[] = [
+        {
+          recipient: '',
+          basisPoints: 0,
+          amount: {
+            value: BigNumber.from(1),
+            token: {
+              chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+              name: 'IMX',
+              symbol: 'IMX',
+              decimals: 18,
+              address: IMX_ADDRESS_ZKEVM,
+            },
+          },
+        },
+      ];
+
+      const swapGasFees = {
+        token: {
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+          address: IMX_ADDRESS_ZKEVM,
+          decimals: 18,
+        },
+        value: BigNumber.from(1),
+      };
 
       const approvalFees = {
         sufficient: true,
@@ -1733,8 +1799,9 @@ describe('swapRoute', () => {
 
       const canCoverSwapFees = checkUserCanCoverSwapFees(
         l2Balances,
-        swapFees,
         approvalFees,
+        swapGasFees,
+        swapFees,
         tokenBeingSwapped,
       );
 
@@ -1767,7 +1834,6 @@ describe('swapRoute', () => {
               symbol: 'IMX',
               decimals: 18,
               address: '0xERC20',
-              type: 'erc20',
             },
           },
         },
@@ -1779,6 +1845,15 @@ describe('swapRoute', () => {
         approvalGasTokenAddress: IMX_ADDRESS_ZKEVM,
       };
 
+      const swapGasFees = {
+        token: {
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+          address: IMX_ADDRESS_ZKEVM,
+          decimals: 18,
+        },
+        value: BigNumber.from(1),
+      };
+
       const tokenBeingSwapped = {
         amount: BigNumber.from(1),
         address: IMX_ADDRESS_ZKEVM,
@@ -1786,8 +1861,9 @@ describe('swapRoute', () => {
 
       const canCoverSwapFees = checkUserCanCoverSwapFees(
         l2Balances,
-        swapFees,
         approvalFees,
+        swapGasFees,
+        swapFees,
         tokenBeingSwapped,
       );
 
@@ -1921,7 +1997,6 @@ describe('swapRoute', () => {
                 symbol: 'ERC20',
                 decimals: 18,
                 address: '0xERC20',
-                type: 'erc20',
               },
             },
           },
@@ -1936,7 +2011,6 @@ describe('swapRoute', () => {
                 symbol: 'ERC20',
                 decimals: 18,
                 address: '0xERC20',
-                type: 'erc20',
               },
             },
           },
@@ -2043,7 +2117,6 @@ describe('swapRoute', () => {
                 symbol: 'ERC20',
                 decimals: 18,
                 address: '0xERC20',
-                type: 'erc20',
               },
             },
           },
@@ -2058,7 +2131,6 @@ describe('swapRoute', () => {
                 symbol: 'ERC20',
                 decimals: 18,
                 address: '0xERC20',
-                type: 'erc20',
               },
             },
           },
