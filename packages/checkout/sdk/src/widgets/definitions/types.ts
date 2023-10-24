@@ -1,5 +1,6 @@
 import { Environment } from '@imtbl/config';
 import { WidgetEventTypes } from './events';
+import { BridgeWidgetParams, ConnectWidgetParams } from './widgetParameters';
 
 /**
  * Enum representing the themes for the widgets.
@@ -19,17 +20,26 @@ export enum WidgetType {
   BRIDGE = 'bridge',
   ONRAMP = 'onramp',
 }
+
+export type WidgetParameters = {
+  params: ConnectWidgetParams | BridgeWidgetParams;
+  config: WidgetConfiguration;
+};
+
+export type CreateWidgetParams = {
+  [WidgetType.CONNECT]: ConnectWidgetParams,
+  [WidgetType.WALLET]: any,
+  [WidgetType.SWAP]: any,
+  [WidgetType.BRIDGE]: BridgeWidgetParams,
+  [WidgetType.ONRAMP]: any,
+};
+
 export interface IWidgetsFactory {
   /**
    * Create a new widget instance.
    * @param type widget type to instantiate.
    */
-  create(type: WidgetType, params: any): Widget;
-  /**
-   * Update new widget instance configuration.
-   * @param config widgets configuration.
-   */
-  updateConfig(config: WidgetConfiguration): void;
+  create<T extends WidgetType>(type: T, params: CreateWidgetParams[T]): Widget;
 }
 
 /**
@@ -39,9 +49,8 @@ export interface Widget {
   /**
    * Mount a widget to a DOM ref element.
    * @param id ID of the DOM element where the widget will be mounted.
-   * @param params Widget specific configuration parameters.
    */
-  mount(id: string, params: any): void;
+  mount(id: string): void;
   /**
    * Unmount a widget without losing state.
    */
@@ -52,20 +61,22 @@ export interface Widget {
   destroy(): void;
   /**
    * Update the widget parameters
-   * @param params Widget specific parameters.
+   * @param params Widget specific parameters including configuration
    */
-  update(params: any): void;
-  /**
-   * Update the widget configuration
-   * @param config Widget specific configuration.
-   */
-  updateConfig(config: WidgetConfiguration): void;
+  update(widgetParams: WidgetParameters): void;
   /**
    * Add a listener for a widget event.
    * @param event Widget specific event name.
    * @param callback function to execute when the event is received.
    */
   on(type: WidgetEventTypes, callback: (data:any) => void): void;
+
+  /**
+   * Removes an event listener for a widget event
+   * @param type Widget specific event name
+   * @param callback function to execute when the event is received.
+   */
+  removeListener(type: WidgetEventTypes, callback: (data:any) => void):void;
 }
 
 /**

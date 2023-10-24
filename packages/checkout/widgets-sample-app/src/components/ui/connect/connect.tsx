@@ -18,8 +18,8 @@ function ConnectUI() {
   const [provider, setProvider] = useState();
   
   useEffect(() => {
-    connect.mount(CONNECT_TARGET_ID, {})
-    connect.on(ConnectEventType.SUCCESS, (data) => {
+    connect.mount(CONNECT_TARGET_ID)
+    connect.on(ConnectEventType.SUCCESS,(data) => {
       setProvider(data.provider);
     })
   }, [connect])
@@ -28,7 +28,7 @@ function ConnectUI() {
     <div>
       <h1 className="sample-heading">Checkout Connect</h1>
       <div id={CONNECT_TARGET_ID}></div>
-      <button onClick={() => connect.mount(CONNECT_TARGET_ID, {})}>Mount</button>
+      <button onClick={() => connect.mount(CONNECT_TARGET_ID)}>Mount</button>
       <button onClick={() => connect.unmount()}>Unmount</button>
     </div>
   );

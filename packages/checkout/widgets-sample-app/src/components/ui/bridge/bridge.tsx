@@ -1,4 +1,4 @@
-import { Checkout, WidgetTheme } from '@imtbl/checkout-sdk';
+import { Checkout, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
 import { Bridge, Connect, WidgetsFactory } from '@imtbl/checkout-widgets'
 import { useEffect, useMemo, useState } from 'react';
 
@@ -6,7 +6,7 @@ const BRIDGE_TARGET_ID = 'bridge-widget-target';
 function BridgeUI() {
   const checkout = useMemo(() => new Checkout(), []);
   const factory = useMemo(() => new WidgetsFactory(checkout, {theme: WidgetTheme.DARK}), []);
-  const bridge = useMemo(() => new Bridge(checkout, {}, {fromContractAddress: '0x2Fa06C6672dDCc066Ab04631192738799231dE4a'}),[checkout])
+  const bridge = useMemo(() => factory.create(WidgetType.BRIDGE, {fromContractAddress: '0x2Fa06C6672dDCc066Ab04631192738799231dE4a'}),[checkout])
   const [provider, setProvider] = useState();
   
   useEffect(() => {

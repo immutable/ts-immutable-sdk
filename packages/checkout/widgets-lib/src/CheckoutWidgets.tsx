@@ -4,10 +4,12 @@ import React from 'react';
 import {
   Widget, CheckoutWidgetsConfig, Checkout, ConnectEventType,
   ConnectTargetLayer,
-  ConnectWidgetProps,
-  BridgeWidgetProps,
+  ConnectWidgetParams,
+  BridgeWidgetParams,
   WalletProviderName,
   WidgetConfiguration,
+  OrchestrationEventType,
+  BridgeEventType,
 } from '@imtbl/checkout-sdk';
 import { ConnectWidget } from './widgets/connect/ConnectWidget';
 import { CustomAnalyticsProvider } from './context/analytics-provider/CustomAnalyticsProvider';
@@ -51,13 +53,13 @@ class BaseWidget {
 }
 
 export class Connect extends BaseWidget implements Widget {
-  connectParams: ConnectWidgetProps;
+  connectParams: ConnectWidgetParams;
 
   eventHandlers: Map<ConnectEventType, Function> = new Map<ConnectEventType, Function>();
 
   connectEventsHandler?: (event: any) => void;
 
-  constructor(sdk: Checkout, config: CheckoutWidgetsConfig, params: ConnectWidgetProps) {
+  constructor(sdk: Checkout, config: CheckoutWidgetsConfig, params: ConnectWidgetParams) {
     super(sdk, config);
     this.connectParams = params;
   }
@@ -111,8 +113,7 @@ export class Connect extends BaseWidget implements Widget {
     this.renderConnectWidget();
   }
 
-  on(event: ConnectEventType, callback: (data: any) => void) {
-    console.log(`adding event listener for ${event}`);
+  on(event: ConnectEventType | OrchestrationEventType, callback: (data: any) => void) {
     this.eventHandlers.set(event as ConnectEventType, callback);
 
     // we need to remove the main window event listner for this widget with old event handlers
@@ -131,12 +132,17 @@ export class Connect extends BaseWidget implements Widget {
     // add new main window event listner with the new event handlers
     window.addEventListener('imtbl-connect-widget', this.connectEventsHandler);
   }
+
+  removeListener(type: ConnectEventType | OrchestrationEventType, callback: (data: any) => void): void {
+    // To be implemented
+    console.log('To be implemented ', type, callback);
+  }
 }
 
 export class Bridge extends BaseWidget implements Widget {
-  bridgeParams: BridgeWidgetProps;
+  bridgeParams: BridgeWidgetParams;
 
-  constructor(sdk: Checkout, config: CheckoutWidgetsConfig, params: BridgeWidgetProps) {
+  constructor(sdk: Checkout, config: CheckoutWidgetsConfig, params: BridgeWidgetParams) {
     super(sdk, config);
     this.bridgeParams = params;
   }
@@ -206,7 +212,13 @@ export class Bridge extends BaseWidget implements Widget {
     this.renderBridgeWidget();
   }
 
-  on(event: string, callback: (data:any) => void) {
+  on(event: BridgeEventType | OrchestrationEventType, callback: (data:any) => void) {
+    // To be implemented
     console.log(`event ${event} with callback ${callback}`);
+  }
+
+  removeListener(type: BridgeEventType | OrchestrationEventType, callback: (data: any) => void): void {
+    // To be implemented
+    console.log('To be implemented ', type, callback);
   }
 }
