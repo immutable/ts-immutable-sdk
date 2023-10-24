@@ -5,7 +5,8 @@ import { NFT } from "@imtbl/generated-clients/dist/multi-rollup";
 function ItemCard({
   nft,
   onClick,
-  withQtySelector
+  withQtySelector,
+  isSelected
 }: {
   nft: any;
   onClick?: (nft: NFT, quantity: number) => void;
@@ -22,7 +23,7 @@ function ItemCard({
 
   return (
     <Box>
-      <Card>
+      <Card sx={{ display: 'none' }}>
         <Card.Title>
           <div>{nft.name}</div>
           <div>Token {nft.token_id}</div>
@@ -34,7 +35,34 @@ function ItemCard({
           relativeImageSizeInLayout="60vw"
         />
       </Card>
-      {withQtySelector && (<Box>
+      <div className="css-cqup3" onClick={() => onCardClick(nft)}
+      style={{
+        outlineWidth: isSelected?.(nft) ? '2px' : '0px',
+        outlineStyle: 'solid',
+        outlineColor: 'white',
+        borderRadius: '10px',
+      }}>
+        <div className="css-1u8qly9">
+          <article className="css-zpyvxu">
+            <span className="cardAssetImage css-amte1t">
+              <span className="css-zgpek2">
+                <img className="css-fw1t4m" loading="lazy" src={nft.image} />
+              </span>
+            </span>
+            <span
+              className="textContainer css-tybo5r"
+              data-testid="undefined__textContainer"
+            >
+              <span className="css-g4id49">
+                <div>{nft.name}</div>
+                <div>Token {nft.token_id}</div>
+              </span>
+              <span className="css-1uc40v0">DC ${nft.price}</span>
+            </span>
+          </article>
+        </div>
+      </div>
+      {/* {withQtySelector && (<Box>
         <Box
           sx={{
             display: "flex",
@@ -58,7 +86,7 @@ function ItemCard({
             Add
           </Button>
         </Box>
-      </Box>)}
+      </Box>)} */}
     </Box>
   );
 }

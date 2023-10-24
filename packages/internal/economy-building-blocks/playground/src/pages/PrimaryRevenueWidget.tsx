@@ -63,10 +63,7 @@ function PrimaryRevenueWidget() {
   const componentRef = useRef(null);
 
   useEffect(() => {
-    window.addEventListener(
-      "imtbl-primary-revenue-widget", 
-      handleEvent
-    );
+    window.addEventListener("imtbl-primary-revenue-widget", handleEvent);
     window.addEventListener(
       IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
       handleEvent
@@ -89,14 +86,14 @@ function PrimaryRevenueWidget() {
         handleEvent
       );
       window.removeEventListener(
-        IMTBLWidgetEvents.IMTBL_PRIMARY_REVENUE_WIDGET_EVENT,
+        IMTBLWidgetEvents.IMTBL_SALE_WIDGET_EVENT,
         handleEvent
       );
     };
   }, []);
 
   return (
-    <imtbl-primary-revenue
+    <imtbl-sale
       ref={componentRef}
       widgetConfig={JSON.stringify({
         theme,
