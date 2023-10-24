@@ -102,16 +102,21 @@ describe('confirmation', () => {
       confirmationScreen.loading();
 
       expect(res.confirmed).toEqual(false);
-      expect(mockNewWindow.location.href).toEqual('https://passport.sandbox.immutable.com/transaction-confirmation/transaction?transactionId=transactionId123&imxEtherAddress=0x1234&chainType=starkex');
+      expect(mockNewWindow.location.href).toEqual('https://passport.sandbox.immutable.com/transaction-confirmation/transaction?transactionId=transactionId123&etherAddress=0x1234&chainType=starkex');
     });
   });
 
   describe('requestMessageConfirmation', () => {
     it('should open a window when confirmation is required', async () => {
-      const res = await confirmationScreen.requestMessageConfirmation('asd123');
+      const messageId = 'transactionId123';
+      const etherKey = 'etherKey123';
+      const res = await confirmationScreen.requestMessageConfirmation(messageId, etherKey);
       confirmationScreen.loading();
       expect(res.confirmed).toEqual(false);
-      expect(mockNewWindow.location.href).toEqual('https://passport.sandbox.immutable.com/transaction-confirmation/zkevm/message?messageID=asd123');
+      expect(mockNewWindow.location.href).toEqual(
+        'https://passport.sandbox.immutable.com/'
+        + `transaction-confirmation/zkevm/message?messageID=${messageId}&etherKey=${etherKey}`,
+      );
     });
   });
 });
