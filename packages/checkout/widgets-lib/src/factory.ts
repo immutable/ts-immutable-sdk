@@ -10,7 +10,7 @@ import {
   IWidgetsFactory,
   WidgetParameters,
 } from '@imtbl/checkout-sdk';
-import { Connect } from 'widgets/Connect';
+import { Connect } from 'widgets/connect/ConnectWidgetRoot';
 
 export class WidgetsFactory implements IWidgetsFactory {
   private sdk: Checkout;
