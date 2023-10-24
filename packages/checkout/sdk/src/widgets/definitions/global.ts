@@ -4,7 +4,7 @@ import {
 } from './types';
 import {
   BridgeWidgetParams, ConnectWidgetParams,
-} from './widgetParameters';
+} from './parameters';
 import { WidgetEventTypes } from './events';
 /**
  * Declares global interfaces and namespaces for the application.

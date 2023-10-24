@@ -1,6 +1,6 @@
 import { Environment } from '@imtbl/config';
 import { WidgetEventTypes } from './events';
-import { BridgeWidgetParams, ConnectWidgetParams } from './widgetParameters';
+import { BridgeWidgetParams, ConnectWidgetParams } from './parameters';
 
 /**
  * Enum representing the themes for the widgets.
