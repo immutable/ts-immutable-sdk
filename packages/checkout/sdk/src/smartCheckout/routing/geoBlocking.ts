@@ -7,6 +7,7 @@ export const isSwapAvailable = async (
   config: CheckoutConfiguration,
 ): Promise<boolean> => {
   const availability = availabilityService(config.isDevelopment, config.isProduction);
+
   try {
     return await availability.checkDexAvailability();
   } catch {
