@@ -58,7 +58,7 @@ export const getTokenAddress = (symbol: string): string => {
     },
     {
       symbol: 'IMX',
-      tokenAddress: '0x2Fa06C6672dDCc066Ab04631192738799231dE4a', // IMX address in goerli
+      tokenAddress: '0x2Fa06C6672dDCc066Ab04631192738799231dE4a', // IMX address in sepolia
     },
   ];
   const token = tokenAddresses.find((tkn) => tkn.symbol === symbol);
