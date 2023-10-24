@@ -1,16 +1,16 @@
-import { Checkout } from '@imtbl/checkout-sdk';
-import { Bridge, Connect } from '@imtbl/checkout-widgets'
-import { useEffect, useMemo } from 'react';
+import { Checkout, WidgetTheme } from '@imtbl/checkout-sdk';
+import { Bridge, Connect, WidgetsFactory } from '@imtbl/checkout-widgets'
+import { useEffect, useMemo, useState } from 'react';
 
+const BRIDGE_TARGET_ID = 'bridge-widget-target';
 function BridgeUI() {
   const checkout = useMemo(() => new Checkout(), []);
-
-  const connect = useMemo(() => new Connect(checkout, {}, {}),[checkout])
+  const factory = useMemo(() => new WidgetsFactory(checkout, {theme: WidgetTheme.DARK}), []);
   const bridge = useMemo(() => new Bridge(checkout, {}, {fromContractAddress: '0x2Fa06C6672dDCc066Ab04631192738799231dE4a'}),[checkout])
+  const [provider, setProvider] = useState();
   
   useEffect(() => {
-    connect.mount('connect');
-    bridge.mount("bridge")
+    bridge.mount(BRIDGE_TARGET_ID)
   }, [bridge])
   
 
@@ -18,8 +18,9 @@ function BridgeUI() {
   return (
     <div>
       <h1 className="sample-heading">Checkout Bridge</h1>
-      <div id="connect"></div>
-      <div id="bridge"></div>
+      <div id={BRIDGE_TARGET_ID}></div>
+      <button onClick={() => bridge.mount(BRIDGE_TARGET_ID)}>Mount</button>
+      <button onClick={() => bridge.unmount()}>Unmount</button>
     </div>
   );
 }
