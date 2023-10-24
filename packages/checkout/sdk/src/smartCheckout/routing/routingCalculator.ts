@@ -18,8 +18,6 @@ import {
   TokenInfo,
 } from '../../types';
 import {
-  DexQuoteCache,
-  DexQuotes,
   TokenBalanceResult,
 } from './types';
 import { getAllTokenBalances } from './tokenBalances';
@@ -100,7 +98,6 @@ export const getSwapFundingSteps = async (
   config: CheckoutConfiguration,
   availableRoutingOptions: AvailableRoutingOptions,
   insufficientRequirement: BalanceRequirement | undefined,
-  dexQuoteCache: DexQuoteCache,
   ownerAddress: string,
   tokenBalances: Map<ChainId, TokenBalanceResult>,
   swapTokenAllowList: TokenInfo[] | undefined,
@@ -124,7 +121,6 @@ export const getSwapFundingSteps = async (
   return await swapRoute(
     config,
     availableRoutingOptions,
-    dexQuoteCache,
     ownerAddress,
     insufficientRequirement,
     tokenBalances,
@@ -138,7 +134,6 @@ export const getBridgeAndSwapFundingSteps = async (
   readOnlyProviders: Map<ChainId, JsonRpcProvider>,
   availableRoutingOptions: AvailableRoutingOptions,
   insufficientRequirement: BalanceRequirement | undefined,
-  dexQuoteCache: DexQuoteCache,
   ownerAddress: string,
   tokenBalances: Map<ChainId, TokenBalanceResult>,
   tokenAllowList: RoutingTokensAllowList | undefined,
@@ -174,7 +169,6 @@ export const getBridgeAndSwapFundingSteps = async (
     readOnlyProviders,
     availableRoutingOptions,
     insufficientRequirement,
-    dexQuoteCache,
     ownerAddress,
     feeEstimates,
     tokenBalances,
@@ -248,11 +242,8 @@ export const routingCalculator = async (
     ),
   );
 
-  // Bridge and swap fee cache
+  // Fee estimate cache
   const feeEstimates = new Map<FundingStepType, FundingRouteFeeEstimate>();
-
-  // Dex quotes cache
-  const dexQuoteCache: DexQuoteCache = new Map<string, DexQuotes>();
 
   // Ensures only 1 balance requirement is insufficient
   const insufficientRequirement = getInsufficientRequirement(balanceRequirements);
@@ -273,7 +264,6 @@ export const routingCalculator = async (
     config,
     availableRoutingOptions,
     insufficientRequirement,
-    dexQuoteCache,
     ownerAddress,
     tokenBalances,
     allowList.swap,
@@ -291,7 +281,6 @@ export const routingCalculator = async (
     readOnlyProviders,
     availableRoutingOptions,
     insufficientRequirement,
-    dexQuoteCache,
     ownerAddress,
     tokenBalances,
     allowList,

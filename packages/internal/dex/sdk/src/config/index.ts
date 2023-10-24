@@ -93,9 +93,7 @@ export class ExchangeConfiguration {
 
   public secondaryFees: SecondaryFee[] = [];
 
-  constructor({
-    chainId, baseConfig, secondaryFees, overrides,
-  }: ExchangeModuleConfiguration) {
+  constructor({ chainId, baseConfig, secondaryFees, overrides }: ExchangeModuleConfiguration) {
     this.baseConfig = baseConfig;
     this.secondaryFees = secondaryFees || [];
 
