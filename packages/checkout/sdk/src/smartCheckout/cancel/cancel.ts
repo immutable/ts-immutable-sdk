@@ -1,5 +1,6 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { PopulatedTransaction } from 'ethers';
+import { CancelOrderResponse } from '@imtbl/orderbook';
 import { CheckoutConfiguration } from '../../config';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import * as instance from '../../instance';
@@ -9,6 +10,7 @@ import {
   CheckoutStatus,
 } from '../../types';
 import { SignTransactionStatusType } from '../actions/types';
+import { measureAsyncExecution } from '../../utils/debugLogger';
 
 export const cancel = async (
   config: CheckoutConfiguration,
@@ -25,12 +27,21 @@ export const cancel = async (
   // Update this when bulk cancel is supported
   const orderId = orderIds[0];
   try {
-    const offererAddress = await provider.getSigner().getAddress();
-    const orderbook = await instance.createOrderbookInstance(config);
-    const cancelOrderResponse = await orderbook.cancelOrder(
-      orderId,
-      offererAddress,
+    const offererAddress = await measureAsyncExecution<string>(
+      config,
+      'Time to get the address from the provider',
+      provider.getSigner().getAddress(),
     );
+    const orderbook = instance.createOrderbookInstance(config);
+    const cancelOrderResponse = await measureAsyncExecution<CancelOrderResponse>(
+      config,
+      'Time to get the cancel order from the orderbook',
+      orderbook.cancelOrder(
+        orderId,
+        offererAddress,
+      ),
+    );
+
     unsignedCancelOrderTransaction = cancelOrderResponse.unsignedCancelOrderTransaction;
   } catch (err: any) {
     throw new CheckoutError(

@@ -1,9 +1,9 @@
 import { availabilityService } from '../../availability';
 import { CheckoutConfiguration } from '../../config';
 
-export const isOnRampGeoBlocked = async (): Promise<boolean> => false;
+export const isOnRampAvailable = async (): Promise<boolean> => true;
 
-export const isSwapGeoBlocked = async (
+export const isSwapAvailable = async (
   config: CheckoutConfiguration,
 ): Promise<boolean> => {
   const availability = availabilityService(config.isDevelopment, config.isProduction);
