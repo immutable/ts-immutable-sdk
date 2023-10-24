@@ -10,6 +10,7 @@ import {
   IWidgetsFactory,
   WidgetParameters,
 } from '@imtbl/checkout-sdk';
+import { Bridge } from 'widgets/bridge/BridgeWidgetRoot';
 import { Connect } from 'widgets/connect/ConnectWidgetRoot';
 
 export class WidgetsFactory implements IWidgetsFactory {
@@ -25,17 +26,19 @@ export class WidgetsFactory implements IWidgetsFactory {
   create<T extends WidgetType>(type: T, params: WidgetParameters[T]): Widget<T> {
     switch (type) {
       case WidgetType.CONNECT: {
-        return new Connect(this.sdk, {
+        // @ts-ignore
+        return new Connect<WidgetType.CONNECT>(this.sdk, {
           config: this.widgetConfig,
-          params: params as ConnectWidgetParams,
+          params,
         });
       }
-      // case WidgetType.BRIDGE: {
-      //   // validate props here
-      //   const bridgeParams = params as BridgeWidgetParams;
-      //   const bridge = new Bridge(this.sdk, this.widgetConfig, bridgeParams);
-      //   return bridge;
-      // }
+      case WidgetType.BRIDGE: {
+        // @ts-ignore
+        return new Bridge<WidgetType.BRIDGE>(this.sdk, {
+          config: this.widgetConfig,
+          params,
+        });
+      }
       default:
         throw new Error('widget type not supported');
     }

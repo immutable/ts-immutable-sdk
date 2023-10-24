@@ -24,7 +24,7 @@ import { ConnectLoader, ConnectLoaderParams } from '../components/ConnectLoader/
 import { BridgeWidget } from './bridge/BridgeWidget';
 import { sendBridgeWidgetCloseEvent } from './bridge/BridgeWidgetEvents';
 
-export class Base<T extends WidgetType> implements Widget<T> {
+export abstract class Base<T extends WidgetType> implements Widget<T> {
   protected checkout: Checkout;
 
   protected targetId?: string;
@@ -79,17 +79,17 @@ export class Base<T extends WidgetType> implements Widget<T> {
     this.rerender();
   }
 
-  update(props: WidgetProperties<T>): void {
-    this.validate(props);
+  update(params: WidgetProperties<T>): void {
+    this.validate(params);
 
     this.properties = {
       params: {
         ...(this.properties.params ?? {}),
-        ...(props.params ?? {}),
+        ...(params.params ?? {}),
       },
       config: {
         ...(this.properties.config ?? {}),
-        ...(props.config ?? {}),
+        ...(params.config ?? {}),
       },
     };
 

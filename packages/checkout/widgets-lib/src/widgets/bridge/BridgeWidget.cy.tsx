@@ -4,6 +4,7 @@ import {
 } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import {
+  BridgeWidgetParams,
   ChainId,
   Checkout, CheckoutErrorType, GasEstimateType, TokenAmountEstimate, WidgetTheme,
 } from '@imtbl/checkout-sdk';
@@ -13,10 +14,7 @@ import { CompletionStatus, TokenBridge } from '@imtbl/bridge-sdk';
 import { BiomeCombinedProviders } from '@biom3/react';
 import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
-import {
-  BridgeWidget,
-  BridgeWidgetParams,
-} from './BridgeWidget';
+import { BridgeWidget } from './BridgeWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { IMX_ADDRESS_ZKEVM } from '../../lib';
 import { text } from '../../resources/text/textConfig';

@@ -2,7 +2,6 @@ import {
   BiomeCombinedProviders,
 } from '@biom3/react';
 import {
-  BridgeWidgetProps,
   NetworkFilterTypes, TokenFilterTypes,
 } from '@imtbl/checkout-sdk';
 import {
@@ -24,7 +23,6 @@ import {
   getL1ChainId,
   getL2ChainId,
 } from '../../lib';
-import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
   ErrorView as ErrorViewType,
   SharedViews,
@@ -51,20 +49,7 @@ import { ConnectLoaderContext } from '../../context/connect-loader-context/Conne
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { GetAllowedBalancesResultType, getAllowedBalances } from '../../lib/balance';
 import { widgetTheme } from '../../lib/theme';
-
-// export interface BridgeWidgetProps {
-//   params: BridgeWidgetParams;
-//   config: StrongCheckoutWidgetsConfig
-// }
-
-export type BridgeWidgetInputs = BridgeWidgetProps & {
-  config: StrongCheckoutWidgetsConfig
-};
-
-export interface BridgeWidgetParams {
-  fromContractAddress?: string;
-  amount?: string;
-}
+import { BridgeWidgetInputs } from './BridgeWidgetRoot';
 
 export function BridgeWidget(props: BridgeWidgetInputs) {
   const { amount, fromContractAddress, config } = props;

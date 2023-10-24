@@ -1,6 +1,8 @@
 import { Environment } from '@imtbl/config';
 import {
   BridgeEventType,
+  BridgeFailed,
+  BridgeSuccess,
   ConnectEventType,
   ConnectionFailed,
   ConnectionSuccess,
@@ -58,7 +60,7 @@ export type WidgetEventData = {
   [WidgetType.CONNECT]: ConnectionSuccess | ConnectionFailed,
   [WidgetType.WALLET]: any, // TODO
   [WidgetType.SWAP]: any, // TODO
-  [WidgetType.BRIDGE]: any, // TODO
+  [WidgetType.BRIDGE]: BridgeSuccess | BridgeFailed;
   [WidgetType.ONRAMP]: any, // TODO
 };
 
