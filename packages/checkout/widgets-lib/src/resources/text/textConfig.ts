@@ -342,6 +342,9 @@ export const text = {
           disabledCaption: undefined,
         },
       },
+      insufficientCoinsBanner: {
+        caption: 'Insufficient coin balance. Please proceed with card instead.',
+      },
       loading: {
         ready: 'Ready to purchase',
         confirm: 'Confirm in your wallet',

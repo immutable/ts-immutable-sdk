@@ -1,6 +1,7 @@
-import { Box, Heading } from '@biom3/react';
+import { Banner, Box, Heading } from '@biom3/react';
 import { useContext, useEffect } from 'react';
 
+import { RoutingOutcomeType } from '@imtbl/checkout-sdk';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -22,9 +23,11 @@ import { PaymentTypes } from '../types';
 
 export function PaymentMethods() {
   const text = { methods: textConfig.views[SaleWidgetViews.PAYMENT_METHODS] };
-  const { viewDispatch } = useContext(ViewContext);
+  const { viewState, viewDispatch } = useContext(ViewContext);
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
-  const { paymentMethod, setPaymentMethod, sign } = useSaleContext();
+  const {
+    paymentMethod, setPaymentMethod, sign, smartCheckoutResult,
+  } = useSaleContext();
 
   const handleOptionClick = (type: PaymentTypes) => setPaymentMethod(type);
 
@@ -65,6 +68,28 @@ export function PaymentMethods() {
     }
   }, [paymentMethod]);
 
+  const insufficientCoinsBanner = () => (
+    <Box sx={{ paddingX: 'base.spacing.x2' }}>
+      <Banner>
+        <Banner.Icon icon="InformationCircle" />
+        <Banner.Caption>
+          {text.methods.insufficientCoinsBanner.caption}
+        </Banner.Caption>
+      </Banner>
+    </Box>
+  );
+
+  const disabledOptions = () => {
+    if (smartCheckoutResult?.sufficient) {
+      return [];
+    }
+    if (smartCheckoutResult?.router.routingOutcome.type === RoutingOutcomeType.NO_ROUTES_FOUND
+      || smartCheckoutResult?.router.routingOutcome.type === RoutingOutcomeType.NO_ROUTE_OPTIONS) {
+      return [PaymentTypes.CRYPTO];
+    }
+    return [];
+  };
+
   return (
     <SimpleLayout
       testId="payment-methods"
@@ -94,8 +119,9 @@ export function PaymentMethods() {
           {text.methods.header.heading}
         </Heading>
         <Box sx={{ paddingX: 'base.spacing.x2' }}>
-          <PaymentOptions onClick={handleOptionClick} />
+          <PaymentOptions disabledOptions={disabledOptions()} onClick={handleOptionClick} />
         </Box>
+        {viewState.view.data?.showInsufficientCoinsBanner ? insufficientCoinsBanner() : null}
       </Box>
     </SimpleLayout>
   );

@@ -20,6 +20,9 @@ export type SaleWidgetView =
 
 interface SaleMethodsView extends ViewType {
   type: SaleWidgetViews.PAYMENT_METHODS;
+  data?: {
+    showInsufficientCoinsBanner?: boolean;
+  }
 }
 interface SaleWithCoinsView extends ViewType {
   type: SaleWidgetViews.PAY_WITH_COINS;
