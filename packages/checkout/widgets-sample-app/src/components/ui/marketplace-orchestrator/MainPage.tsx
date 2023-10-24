@@ -3,7 +3,7 @@ import { Box, Button, Card, GridBox, Heading } from "@biom3/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Passport } from '@imtbl/passport';
 import { passportConfig } from './passportConfig';
-import { Bridge, Connect, WidgetsFactory } from '@imtbl/checkout-widgets';
+import {  WidgetsFactory } from '@imtbl/checkout-widgets';
 import { Checkout, ConnectEventType, OrchestrationEventType, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 

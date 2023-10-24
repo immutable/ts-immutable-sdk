@@ -9,15 +9,17 @@ import {
   ConnectEventType
 } from '@imtbl/checkout-sdk';
 import { WidgetsFactory } from '@imtbl/checkout-widgets';
+import { Environment } from '@imtbl/config';
 
 const CONNECT_TARGET_ID = "connect-widget-target";
 function ConnectUI() {
-  const checkout = useMemo(() => new Checkout(), []);
+  const checkout = useMemo(() => new Checkout({ baseConfig: { environment: Environment.SANDBOX } }), []);
   const factory = useMemo(() => new WidgetsFactory(checkout, {theme: WidgetTheme.DARK}), []);
   const connect = useMemo(() => factory.create(WidgetType.CONNECT, {targetLayer: ConnectTargetLayer.LAYER2}), [factory]);
   const [provider, setProvider] = useState();
   
   useEffect(() => {
+    connect.update({ config: { theme: WidgetTheme.LIGHT }})
     connect.mount(CONNECT_TARGET_ID)
     connect.on(ConnectEventType.SUCCESS,(data) => {
       setProvider(data.provider);

@@ -1,5 +1,5 @@
 import { Body, Box } from '@biom3/react';
-import { WidgetTheme } from '@imtbl/checkout-widgets';
+import { WidgetTheme } from '@imtbl/checkout-sdk';
 import { quickswapFooterStyles, quickswapFooterDisclaimerTextStyles, quickswapFooterLogoStyles } from './FooterStyles';
 import { ReactComponent as QuickswapLogoDark } from '../../assets/QuickswapLogoDark.svg';
 import { ReactComponent as QuickswapLogoLight } from '../../assets/QuickswapLogoLight.svg';

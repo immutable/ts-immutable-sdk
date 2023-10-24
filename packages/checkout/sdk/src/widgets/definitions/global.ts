@@ -1,11 +1,14 @@
 import { Checkout } from '../../sdk';
 import {
-  CheckoutWidgetsConfig, CreateWidgetParams, IWidgetsFactory, Widget, WidgetConfiguration, WidgetParameters, WidgetType,
+  CheckoutWidgetsConfig,
+  WidgetParameters,
+  IWidgetsFactory,
+  Widget,
+  WidgetProperties,
+  WidgetType,
+  WidgetEventTypes,
 } from './types';
-import {
-  BridgeWidgetParams, ConnectWidgetParams,
-} from './parameters';
-import { WidgetEventTypes } from './events';
+
 /**
  * Declares global interfaces and namespaces for the application.
  * @global
@@ -15,27 +18,27 @@ declare global {
   namespace ImmutableCheckoutWidgets {
     class WidgetsFactory implements IWidgetsFactory {
       constructor(sdk: Checkout, config: CheckoutWidgetsConfig);
-      create<T extends WidgetType>(type: T, params: CreateWidgetParams[T]): Widget;
+      create<T extends WidgetType>(type: T, params: WidgetParameters[T]): Widget<T>;
     }
 
-    class Connect implements Widget {
-      constructor(sdk: Checkout, config: WidgetConfiguration, params?: ConnectWidgetParams);
+    class Connect<T extends WidgetType> implements Widget<T> {
+      constructor(sdk: Checkout, props: WidgetProperties<T>);
       mount(id: string): void;
       unmount(): void;
       destroy(): void;
-      update(params: WidgetParameters): void;
-      on(type: WidgetEventTypes, callback: (data: any) => void): void;
-      removeListener(type: WidgetEventTypes, callback: (data: any) => void): void;
+      update(props: WidgetProperties<T>): void;
+      on(type: WidgetEventTypes[T], callback: (data: any) => void): void;
+      removeListener(type: WidgetEventTypes[T]): void;
     }
 
-    class Bridge implements Widget {
-      constructor(sdk: Checkout, config: WidgetConfiguration, params?: BridgeWidgetParams);
+    class Bridge<T extends WidgetType> implements Widget<T> {
+      constructor(sdk: Checkout, props: WidgetProperties<T>);
       mount(id: string): void;
       unmount(): void;
       destroy(): void;
-      update(params: WidgetParameters): void;
-      on(type: WidgetEventTypes, callback: (data: any) => void): void;
-      removeListener(type: WidgetEventTypes, callback: (data: any) => void): void;
+      update(props: WidgetProperties<T>): void;
+      on(type: WidgetEventTypes[T], callback: (data: any) => void): void;
+      removeListener(type: WidgetEventTypes[T]): void;
     }
   }
 }

@@ -18,15 +18,16 @@ const defaultPlugin = [
 ]
 
 export default [{
+  watch: true,
   input: 'src/index.ts',
   output: {
     dir: 'dist',
     format: 'es'
   },
-  watch: true, // watch for changes on the es module for sample app dev
   plugins: [ ...defaultPlugin ]
 },
 {
+  watch: false,
   input: 'src/index.ts',
   output: {
     file: 'dist/browser.js',
@@ -34,7 +35,6 @@ export default [{
     name: 'ImmutableCheckout'
   },
   context: 'window',
-  watch: false, // don't watch for changes on minified browser bundle
   plugins: [
     json(),
     nodeResolve({ browser: true }),

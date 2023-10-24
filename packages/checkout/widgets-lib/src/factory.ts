@@ -1,33 +1,41 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable max-len */
 import {
-  Widget, Checkout, ConnectWidgetParams, BridgeWidgetParams, WidgetType, WidgetConfiguration, IWidgetsFactory, CreateWidgetParams,
+  Widget,
+  Checkout,
+  ConnectWidgetParams,
+  BridgeWidgetParams,
+  WidgetType,
+  WidgetConfigurations,
+  IWidgetsFactory,
+  WidgetParameters,
 } from '@imtbl/checkout-sdk';
-import { Bridge, Connect } from 'CheckoutWidgets';
+import { Connect } from 'widgets/Connect';
 
 export class WidgetsFactory implements IWidgetsFactory {
   private sdk: Checkout;
 
-  private widgetConfig: WidgetConfiguration;
+  private widgetConfig: WidgetConfigurations;
 
-  constructor(sdk: Checkout, widgetConfig: WidgetConfiguration) {
+  constructor(sdk: Checkout, widgetConfig: WidgetConfigurations) {
     this.sdk = sdk;
     this.widgetConfig = widgetConfig;
   }
 
-  create<T extends WidgetType>(widgetType: T, params: CreateWidgetParams[T]): Widget {
-    switch (widgetType) {
-      case 'connect': {
-        // validate props here
-        const connectParams = params as ConnectWidgetParams;
-        const connect = new Connect(this.sdk, this.widgetConfig, connectParams);
-        return connect;
+  create<T extends WidgetType>(type: T, params: WidgetParameters[T]): Widget<T> {
+    switch (type) {
+      case WidgetType.CONNECT: {
+        return new Connect(this.sdk, {
+          config: this.widgetConfig,
+          params: params as ConnectWidgetParams,
+        });
       }
-      case 'bridge': {
-        // validate props here
-        const bridgeParams = params as BridgeWidgetParams;
-        const bridge = new Bridge(this.sdk, this.widgetConfig, bridgeParams);
-        return bridge;
-      }
+      // case WidgetType.BRIDGE: {
+      //   // validate props here
+      //   const bridgeParams = params as BridgeWidgetParams;
+      //   const bridge = new Bridge(this.sdk, this.widgetConfig, bridgeParams);
+      //   return bridge;
+      // }
       default:
         throw new Error('widget type not supported');
     }

@@ -3,8 +3,7 @@ import {
 } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { BigNumber } from 'ethers';
-import { ChainId, ChainName } from '@imtbl/checkout-sdk';
-import { WidgetTheme } from '@imtbl/checkout-widgets';
+import { ChainId, ChainName, WidgetTheme } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { cyIntercept, cySmartGet } from '../../../lib/testUtils';
 import { SwapWidgetTestComponent } from '../test-components/SwapWidgetTestComponent';

@@ -4,7 +4,7 @@ import {
   Checkout,
   WidgetTheme,
   ConnectTargetLayer,
-  ConnectWidgetProps,
+  ConnectWidgetParams,
 } from '@imtbl/checkout-sdk';
 import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
@@ -37,7 +37,7 @@ describe('ConnectWidget tests', () => {
 
   /** mounting the connect widget should be done to start all tests */
   const mountConnectWidget = () => {
-    const props = {} as ConnectWidgetProps;
+    const props = {} as ConnectWidgetParams;
 
     mount(
       <CustomAnalyticsProvider widgetConfig={config}>
@@ -74,7 +74,7 @@ describe('ConnectWidget tests', () => {
     } as any as Passport;
     const passportParams = {
       passport: testPassportInstance,
-    } as ConnectWidgetProps;
+    } as ConnectWidgetParams;
 
     mount(
       <CustomAnalyticsProvider widgetConfig={config}>
@@ -428,7 +428,7 @@ describe('ConnectWidget tests', () => {
       const passportParams = {
         passport: testPassportInstance,
         targetLayer: ConnectTargetLayer.LAYER1,
-      } as ConnectWidgetProps;
+      } as ConnectWidgetParams;
 
       mount(
         <CustomAnalyticsProvider widgetConfig={config}>
@@ -452,7 +452,7 @@ describe('ConnectWidget tests', () => {
         .as('createProviderStub')
         .rejects({});
 
-      const props = {} as ConnectWidgetProps;
+      const props = {} as ConnectWidgetParams;
 
       mount(
         <CustomAnalyticsProvider widgetConfig={config}>

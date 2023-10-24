@@ -6,17 +6,26 @@ import {
   WalletProviderName,
 } from '@imtbl/checkout-sdk';
 import {
-  useContext, useState, useEffect, useCallback,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
 } from 'react';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
-import { ConnectContext, ConnectActions } from '../context/ConnectContext';
+import {
+  ConnectContext,
+  ConnectActions,
+} from '../context/ConnectContext';
 import { WalletItem } from './WalletItem';
 import {
   ViewContext,
   ViewActions,
   SharedViews,
 } from '../../../context/view-context/ViewContext';
-import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import {
+  UserJourney,
+  useAnalytics,
+} from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 export interface WalletListProps {
   walletFilterTypes?: WalletFilterTypes;

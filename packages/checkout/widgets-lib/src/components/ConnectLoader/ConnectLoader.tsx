@@ -6,7 +6,7 @@ import {
   GetNetworkParams,
   WalletProviderName,
 
-  ConnectEventType, ConnectionSuccess, IMTBLWidgetEvents, WidgetTheme, ConnectTargetLayer,
+  ConnectEventType, ConnectionSuccess, WidgetTheme, ConnectTargetLayer, IMTBLWidgetEvents,
 } from '@imtbl/checkout-sdk';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import React, {

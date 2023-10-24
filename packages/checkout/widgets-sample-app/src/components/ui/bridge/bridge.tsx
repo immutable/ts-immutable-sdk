@@ -1,5 +1,5 @@
 import { Checkout, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
-import { Bridge, Connect, WidgetsFactory } from '@imtbl/checkout-widgets'
+import { WidgetsFactory } from '@imtbl/checkout-widgets'
 import { useEffect, useMemo, useState } from 'react';
 
 const BRIDGE_TARGET_ID = 'bridge-widget-target';
