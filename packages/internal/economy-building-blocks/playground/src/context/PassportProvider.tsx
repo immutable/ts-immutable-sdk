@@ -27,10 +27,10 @@ const getCoreSdkConfig = (environment: EnvironmentNames) => {
     case EnvironmentNames.DEV: {
       return Config.createConfig({
         basePath: "https://api.dev.x.immutable.com",
-        chainID: 5,
-        coreContractAddress: "0xd05323731807A35599BF9798a1DE15e89d6D6eF1",
+        chainID: 11155111,
+        coreContractAddress: "0x590C809bd5FF50DCb39e4320b60139B29B880174",
         registrationContractAddress:
-          "0x7EB840223a3b1E0e8D54bF8A6cd83df5AFfC88B2",
+          "0x2F76E4e48A5f9e517765B70a4DEc67781d35A199",
       });
     }
     default: {

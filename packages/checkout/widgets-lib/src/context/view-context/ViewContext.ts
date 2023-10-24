@@ -107,6 +107,10 @@ export const viewReducer: Reducer<ViewState, ViewAction> = (
     case ViewActions.UPDATE_VIEW:
       // eslint-disable-next-line no-case-declarations
       const { view, currentViewData } = action.payload;
+      if (view.type === SharedViews.ERROR_VIEW) {
+        // eslint-disable-next-line no-console
+        console.error((view as ErrorView).error);
+      }
       // eslint-disable-next-line no-case-declarations
       const { history } = state;
       if (
