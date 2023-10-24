@@ -397,12 +397,6 @@ export const text = {
           primaryAction: 'Try again',
           secondaryAction: 'Cancel',
         },
-        [SaleErrorTypes.SMART_CHECKOUT_NO_ROUTES_FOUND]: {
-          description:
-            'Your wallet has insufficent balance. Try paying with card instead.',
-          primaryAction: 'Try again',
-          secondaryAction: 'Cancel',
-        },
         [SaleErrorTypes.SMART_CHECKOUT_ERROR]: {
           description:
             'Unable to check your wallets balance. Please try again.',
