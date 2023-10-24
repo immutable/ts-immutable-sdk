@@ -171,7 +171,7 @@ export type ERC20BuyToken = {
 };
 
 /**
- * Interface of the SellToken
+ * The SellToken type
  * @property {string} id - The ERC721 token id
  * @property {string} collectionAddress - The ERC721 collection address
  */
@@ -586,9 +586,9 @@ export type UserBalance = {
  * Represents the transaction requirement for a transaction.
  * @property {ItemType} type - The type of the transaction requirement.
  * @property {boolean} sufficient - If the user address has sufficient funds to cover the transaction.
- * @property {TransactionRequirementItem} required - The required item balance.
- * @property {TransactionRequirementItem} current - The current item balance.
- * @property {TransactionRequirementDelta} delta - The delta between the required and current balances.
+ * @property {ItemBalance} required - The required item balance.
+ * @property {ItemBalance} current - The current item balance.
+ * @property {BalanceDelta} delta - The delta between the required and current balances.
  */
 export type TransactionRequirement = {
   type: ItemType,
@@ -600,6 +600,7 @@ export type TransactionRequirement = {
 
 /**
  * Represents the balance for either a native or ERC20 token.
+ * @property {ItemType.NATIVE | ItemType.ERC20} type - Type to indicate this is a native or ERC20 token.
  * @property {BigNumber} balance - The balance of the item.
  * @property {string} formattedBalance - The formatted balance of the item.
  * @property {TokenInfo} token - The token info of the item.
@@ -612,18 +613,20 @@ export type TokenBalance = {
 };
 
 /**
- * Represents the balance for an ERC20.
+ * Represents the balance for an ERC721.
+ * @property {ItemType.ERC721} type - Type to indicate this is an ERC721 token.
  * @property {BigNumber} balance - The balance of the item.
  * @property {string} formattedBalance - The formatted balance of the item.
- * @property {TokenInfo} token - The token info of the item.
+ * @property {string} contractAddress - The contract address of the ERC721 collection.
+ * @property {string} id - The ID of the ERC721 in the collection.
  */
-export interface ERC721Balance {
+export type ERC721Balance = {
   type: ItemType.ERC721,
   balance: BigNumber;
   formattedBalance: string;
   contractAddress: string;
   id: string;
-}
+};
 
 /**
  * Type representing the balance of an item.
@@ -643,6 +646,9 @@ export type BalanceDelta = {
 /**
  * A type representing the Smart Checkout routing options available for a user
  * if they are configured and enabled (not geo-blocked etc.)
+ * @property {boolean | undefined} onRamp - If the user can use onramp
+ * @property {boolean | undefined} swap - If the user can use swap
+ * @property {boolean | undefined} bridge - If the user can use bridge
  */
 export type AvailableRoutingOptions = {
   onRamp?: boolean;

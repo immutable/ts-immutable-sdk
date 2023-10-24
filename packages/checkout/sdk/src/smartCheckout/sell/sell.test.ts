@@ -42,6 +42,8 @@ describe('sell', () => {
     config = new CheckoutConfiguration({
       baseConfig: { environment: Environment.SANDBOX },
     });
+
+    jest.spyOn(console, 'debug').mockImplementation(() => {});
   });
 
   describe('sell', () => {
@@ -90,7 +92,7 @@ describe('sell', () => {
           id: '1234',
         },
       });
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         config: jest.fn().mockReturnValue({
           seaportContractAddress,
         }),
@@ -244,7 +246,7 @@ describe('sell', () => {
         ],
       });
       const mockCreateListing = jest.fn().mockResolvedValue({});
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         config: jest.fn().mockReturnValue({
           seaportContractAddress,
         }),
@@ -371,7 +373,7 @@ describe('sell', () => {
         ],
       });
       const mockCreateListing = jest.fn().mockResolvedValue({});
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         config: jest.fn().mockReturnValue({
           seaportContractAddress,
         }),
@@ -465,7 +467,7 @@ describe('sell', () => {
       const id = '0';
       const contractAddress = '0xERC721';
 
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         config: jest.fn().mockReturnValue({
           seaportContractAddress,
         }),
@@ -518,7 +520,7 @@ describe('sell', () => {
       const id = '0';
       const contractAddress = '0xERC721';
 
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         config: jest.fn().mockReturnValue({
           seaportContractAddress,
         }),
@@ -619,7 +621,7 @@ describe('sell', () => {
         ],
       });
       const mockCreateListing = jest.fn().mockResolvedValue({});
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         config: jest.fn().mockReturnValue({
           seaportContractAddress,
         }),
@@ -724,7 +726,7 @@ describe('sell', () => {
         ],
       });
       const mockCreateListing = jest.fn().mockResolvedValue({});
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         config: jest.fn().mockReturnValue({
           seaportContractAddress,
         }),
@@ -812,7 +814,7 @@ describe('sell', () => {
         ],
       });
       const mockCreateListing = jest.fn().mockResolvedValue({});
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         config: jest.fn().mockReturnValue({
           seaportContractAddress,
         }),
@@ -902,7 +904,7 @@ describe('sell', () => {
         ],
       });
       const mockCreateListing = jest.fn().mockResolvedValue({});
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         config: jest.fn().mockReturnValue({
           seaportContractAddress,
         }),
@@ -996,7 +998,7 @@ describe('sell', () => {
         ],
       });
       const mockCreateListing = jest.fn().mockRejectedValue(new Error('error from create listing'));
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         config: jest.fn().mockReturnValue({
           seaportContractAddress,
         }),

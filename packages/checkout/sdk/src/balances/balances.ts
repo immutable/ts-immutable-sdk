@@ -21,6 +21,7 @@ import {
   BlockscoutTokens,
   BlockscoutTokenType,
 } from '../client';
+import { measureAsyncExecution } from '../utils/debugLogger';
 
 export const getBalance = async (
   config: CheckoutConfiguration,
@@ -252,11 +253,19 @@ export const getAllBalances = async (
     // Please remove this hack once https://immutable.atlassian.net/browse/WT-1710
     // is done.
     const isL1Chain = getL1ChainId(config) === chainId;
-    return await getIndexerBalance(walletAddress, chainId, isL1Chain ? tokens : []);
+    return measureAsyncExecution<GetAllBalancesResult>(
+      config,
+      `Time to fetch balances using blockscout for ${chainId}`,
+      getIndexerBalance(walletAddress, chainId, isL1Chain ? tokens : []),
+    );
   }
 
   // This fallback to use ERC20s calls which is a best effort solution
   // Fails in fetching data from the RCP calls might result in some
   // missing data.
-  return await getBalances(config, web3Provider, walletAddress, tokens);
+  return await measureAsyncExecution<GetBalancesResult>(
+    config,
+    `Time to fetch balances using RPC for ${chainId}`,
+    getBalances(config, web3Provider, walletAddress, tokens),
+  );
 };
