@@ -1,8 +1,4 @@
-import {
-  createAnalytics as _createAnalytics,
-  StandardAnalyticsActions,
-  StandardAnalyticsControlTypes,
-} from '@imtbl/react-analytics';
+import { createAnalytics, StandardAnalyticsActions, StandardAnalyticsControlTypes } from '@imtbl/react-analytics';
 import { Environment } from '@imtbl/config';
 
 export enum UserJourney {
@@ -14,10 +10,8 @@ export enum UserJourney {
   SALE = 'Sale',
 }
 
-export type AnalyticsControlTypes =
-  | StandardAnalyticsControlTypes
-  | 'IframeEvent'
-  | 'Event';
+export type AnalyticsControlTypes = StandardAnalyticsControlTypes
+| 'IframeEvent' | 'Event';
 
 export type TrackEventProps = {
   screen: string;
@@ -35,13 +29,16 @@ const SEGMENT_ANALYTICS_WRITE_KEY = {
 
 export const getSegmentWriteKey = (env: Environment) => SEGMENT_ANALYTICS_WRITE_KEY[env];
 
-export const createAnalytics = (appName = 'checkout') => _createAnalytics<
+const productName = 'checkout';
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export const { AnalyticsProvider, useAnalytics } = createAnalytics<
 UserJourney,
 string,
 string,
 AnalyticsControlTypes,
 StandardAnalyticsActions
 >({
-  appName,
   writeKey: '',
+  appName: productName,
 });
