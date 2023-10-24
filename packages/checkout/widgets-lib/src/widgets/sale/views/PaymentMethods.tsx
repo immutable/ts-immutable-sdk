@@ -68,7 +68,7 @@ export function PaymentMethods() {
     }
   }, [paymentMethod]);
 
-  const insufficientCoinsBanner = () => (
+  const insufficientCoinsBanner = (
     <Box sx={{ paddingX: 'base.spacing.x2' }}>
       <Banner>
         <Banner.Icon icon="InformationCircle" />
@@ -121,7 +121,7 @@ export function PaymentMethods() {
         <Box sx={{ paddingX: 'base.spacing.x2' }}>
           <PaymentOptions disabledOptions={disabledOptions()} onClick={handleOptionClick} />
         </Box>
-        {viewState.view.data?.showInsufficientCoinsBanner ? insufficientCoinsBanner() : null}
+        {viewState.view.data?.showInsufficientCoinsBanner ? insufficientCoinsBanner : null}
       </Box>
     </SimpleLayout>
   );
