@@ -425,7 +425,7 @@ export class Checkout {
     }
 
     const tokenList = await tokens.getTokenAllowList(this.config, { type: TokenFilterTypes.ONRAMP });
-    const token = tokenList.tokens.find((t) => t.address?.toLowerCase() === params.tokenAddress?.toLowerCase());
+    const token = tokenList.tokens?.find((t) => t.address?.toLowerCase() === params.tokenAddress?.toLowerCase());
     if (token) {
       tokenAmount = params.tokenAmount;
       tokenSymbol = token.symbol;
