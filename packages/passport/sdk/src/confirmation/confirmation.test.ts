@@ -109,13 +109,13 @@ describe('confirmation', () => {
   describe('requestMessageConfirmation', () => {
     it('should open a window when confirmation is required', async () => {
       const messageId = 'transactionId123';
-      const etherKey = 'etherKey123';
-      const res = await confirmationScreen.requestMessageConfirmation(messageId, etherKey);
+      const etherAddress = 'etherAddress123';
+      const res = await confirmationScreen.requestMessageConfirmation(messageId, etherAddress);
       confirmationScreen.loading();
       expect(res.confirmed).toEqual(false);
       expect(mockNewWindow.location.href).toEqual(
         'https://passport.sandbox.immutable.com/'
-        + `transaction-confirmation/zkevm/message?messageID=${messageId}&etherKey=${etherKey}`,
+        + `transaction-confirmation/zkevm/message?messageID=${messageId}&etherAddress=${etherAddress}`,
       );
     });
   });
