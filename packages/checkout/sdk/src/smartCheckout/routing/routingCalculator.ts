@@ -35,6 +35,7 @@ import { BridgeAndSwapRoute, bridgeAndSwapRoute } from './bridgeAndSwap/bridgeAn
 import { BridgeRequirement, bridgeRoute } from './bridge/bridgeRoute';
 import { onRampRoute } from './onRamp';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from './indexer/fetchL1Representation';
+import { measureAsyncExecution } from '../../utils/debugLogger';
 
 const hasAvailableRoutingOptions = (availableRoutingOptions: AvailableRoutingOptions) => (
   availableRoutingOptions.bridge || availableRoutingOptions.swap || availableRoutingOptions.onRamp
@@ -220,17 +221,25 @@ export const routingCalculator = async (
     );
   }
 
-  const tokenBalances = await getAllTokenBalances(
+  const tokenBalances = await measureAsyncExecution<Map<ChainId, TokenBalanceResult>>(
     config,
-    readOnlyProviders,
-    ownerAddress,
-    availableRoutingOptions,
+    'Time to get token balances inside router',
+    getAllTokenBalances(
+      config,
+      readOnlyProviders,
+      ownerAddress,
+      availableRoutingOptions,
+    ),
   );
 
-  const allowList = await allowListCheck(
+  const allowList = await measureAsyncExecution<RoutingTokensAllowList>(
     config,
-    tokenBalances,
-    availableRoutingOptions,
+    'Time to get routing allowlist',
+    allowListCheck(
+      config,
+      tokenBalances,
+      availableRoutingOptions,
+    ),
   );
 
   // Fee estimate cache
@@ -279,7 +288,11 @@ export const routingCalculator = async (
     balanceRequirements,
   ));
 
-  const resolved = await Promise.all(routePromises);
+  const resolved = await measureAsyncExecution<any[]>(
+    config,
+    'Time to resolve all routes',
+    Promise.all(routePromises),
+  );
 
   let bridgeFundingStep: BridgeFundingStep | undefined;
   let swapFundingSteps: SwapFundingStep[] = [];

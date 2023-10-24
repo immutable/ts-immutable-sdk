@@ -9,6 +9,7 @@ import {
   ListingResult,
   FeeValue,
   Action,
+  FulfillOrderResponse,
 } from '@imtbl/orderbook';
 import * as instance from '../../instance';
 import { CheckoutConfiguration } from '../../config';
@@ -23,6 +24,7 @@ import {
   BuyResult,
   CheckoutStatus,
   BuyOrder,
+  SmartCheckoutResult,
 } from '../../types/smartCheckout';
 import { smartCheckout } from '..';
 import {
@@ -34,6 +36,7 @@ import {
 import { SignTransactionStatusType } from '../actions/types';
 import { ERC20ABI } from '../../types';
 import { calculateFees } from '../fees/fees';
+import { debugLogger, measureAsyncExecution } from '../../utils/debugLogger';
 
 export const getItemRequirement = (
   type: ItemType,
@@ -98,8 +101,12 @@ export const buy = async (
   const { id, takerFees } = orders[0];
 
   try {
-    orderbook = await instance.createOrderbookInstance(config);
-    order = await orderbook.getListing(id);
+    orderbook = instance.createOrderbookInstance(config);
+    order = await measureAsyncExecution<ListingResult>(
+      config,
+      'Time to fetch the listing from the orderbook',
+      orderbook.getListing(id),
+    );
     const { seaportContractAddress } = orderbook.config();
     spenderAddress = seaportContractAddress;
   } catch (err: any) {
@@ -131,7 +138,12 @@ export const buy = async (
       ERC20ABI,
       provider,
     );
-    decimals = await tokenContract.decimals();
+
+    decimals = await measureAsyncExecution<number>(
+      config,
+      'Time to get decimals of token contract for the buy token',
+      tokenContract.decimals(),
+    );
   }
 
   let fees: FeeValue[] = [];
@@ -142,17 +154,37 @@ export const buy = async (
   let unsignedApprovalTransactions: TransactionRequest[] = [];
   let unsignedFulfillmentTransactions: TransactionRequest[] = [];
   let orderActions: Action[] = [];
+
+  const fulfillOrderStartTime = new Date().getTime();
   try {
-    const fulfillerAddress = await provider.getSigner().getAddress();
-    const { actions } = await orderbook.fulfillOrder(id, fulfillerAddress, fees);
+    const fulfillerAddress = await measureAsyncExecution<string>(
+      config,
+      'Time to get the address from the provider',
+      provider.getSigner().getAddress(),
+    );
+    const { actions } = await measureAsyncExecution<FulfillOrderResponse>(
+      config,
+      'Time to call fulfillOrder from the orderbook',
+      orderbook.fulfillOrder(id, fulfillerAddress, fees),
+    );
     orderActions = actions;
-    unsignedApprovalTransactions = await getUnsignedERC20ApprovalTransactions(actions);
-  } catch {
+    unsignedApprovalTransactions = await measureAsyncExecution<TransactionRequest[]>(
+      config,
+      'Time to construct the unsigned approval transactions',
+      getUnsignedERC20ApprovalTransactions(actions),
+    );
+  } catch (err: any) {
     // Silently ignore error as this is usually thrown if user does not have enough balance
+    const elapsedTimeInSeconds = (new Date().getTime() - fulfillOrderStartTime) / 1000;
+    debugLogger(config, 'Time to call fulfillOrder from the orderbook', elapsedTimeInSeconds);
   }
 
   try {
-    unsignedFulfillmentTransactions = await getUnsignedFulfillmentTransactions(orderActions);
+    unsignedFulfillmentTransactions = await measureAsyncExecution<TransactionRequest[]>(
+      config,
+      'Time to construct the unsigned fulfillment transactions',
+      getUnsignedFulfillmentTransactions(orderActions),
+    );
   } catch {
     // if cannot estimate gas then silently continue and use gas limit in smartCheckout
     // but get the fulfillment transactions after they have approved the spending
@@ -198,13 +230,17 @@ export const buy = async (
     getItemRequirement(type, contractAddress, amount, spenderAddress),
   ];
 
-  const smartCheckoutResult = await smartCheckout(
+  const smartCheckoutResult = await measureAsyncExecution<SmartCheckoutResult>(
     config,
-    provider,
-    itemRequirements,
-    getTransactionOrGas(
-      gasLimit,
-      unsignedFulfillmentTransactions,
+    'Total time running smart checkout',
+    smartCheckout(
+      config,
+      provider,
+      itemRequirements,
+      getTransactionOrGas(
+        gasLimit,
+        unsignedFulfillmentTransactions,
+      ),
     ),
   );
 
