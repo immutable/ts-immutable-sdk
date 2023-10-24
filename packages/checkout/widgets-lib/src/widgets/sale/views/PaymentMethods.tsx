@@ -1,72 +1,64 @@
-import { useCallback, useContext, useEffect } from 'react';
 import { Box, Heading } from '@biom3/react';
+import { useContext, useEffect } from 'react';
 
-import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
+import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
+import { FundWithSmartCheckoutSubViews, SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 import { text as textConfig } from '../../../resources/text/textConfig';
-import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 
 import {
-  ViewContext,
-  ViewActions,
   SharedViews,
+  ViewActions,
+  ViewContext,
 } from '../../../context/view-context/ViewContext';
 
-import { sendSaleWidgetCloseEvent } from '../SaleWidgetEvents';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
+import { sendSaleWidgetCloseEvent } from '../SaleWidgetEvents';
 import { PaymentOptions } from '../components/PaymentOptions';
 
 import { useSaleContext } from '../context/SaleContextProvider';
 import { PaymentTypes } from '../types';
 
 export function PaymentMethods() {
-  const text = {
-    methods: textConfig.views[SaleWidgetViews.PAYMENT_METHODS],
-  };
+  const text = { methods: textConfig.views[SaleWidgetViews.PAYMENT_METHODS] };
   const { viewDispatch } = useContext(ViewContext);
-  const {
-    eventTargetState: { eventTarget },
-  } = useContext(EventTargetContext);
-  const {
-    paymentMethod, setPaymentMethod, sign, signResponse,
-  } = useSaleContext();
+  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+  const { paymentMethod, setPaymentMethod, sign } = useSaleContext();
 
   const handleOptionClick = (type: PaymentTypes) => setPaymentMethod(type);
 
-  const handleGoToPaymentView = useCallback((type: PaymentTypes) => {
-    if (type === PaymentTypes.CRYPTO) {
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: SaleWidgetViews.PAY_WITH_COINS,
-          },
-        },
-      });
-    }
-
-    if (type === PaymentTypes.FIAT) {
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: SaleWidgetViews.PAY_WITH_CARD,
-          },
-        },
-      });
-    }
-  }, []);
-
   useEffect(() => {
-    if (paymentMethod && !signResponse) {
-      sign(paymentMethod, () => handleGoToPaymentView(paymentMethod));
+    if (paymentMethod === PaymentTypes.FIAT) {
+      sign(paymentMethod, () => {
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: {
+              type: SaleWidgetViews.PAY_WITH_CARD,
+            },
+          },
+        });
+      });
+
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
             type: SharedViews.LOADING_VIEW,
-            data: { loadingText: text.methods.loading },
+            data: { loadingText: text.methods.loading.ready },
+          },
+        },
+      });
+    }
+
+    if (paymentMethod === PaymentTypes.CRYPTO) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SaleWidgetViews.FUND_WITH_SMART_CHECKOUT,
+            subView: FundWithSmartCheckoutSubViews.INIT,
           },
         },
       });

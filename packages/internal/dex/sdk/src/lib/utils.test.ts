@@ -1,8 +1,20 @@
-import { constants } from 'ethers';
-import { TEST_FROM_ADDRESS } from '../test/utils';
-import { isValidNonZeroAddress } from './utils';
+import { constants, providers } from 'ethers';
+import { TEST_FROM_ADDRESS, USDC_TEST_TOKEN, nativeTokenService } from '../test/utils';
+import { decimalsFunctionSig, getTokenDecimals, isValidNonZeroAddress } from './utils';
 
 jest.mock('@ethersproject/contracts');
+
+const provider = {
+  call: jest.fn().mockImplementation(async (payload: providers.TransactionRequest) => {
+    if (payload.data === decimalsFunctionSig) {
+      if (payload.to === USDC_TEST_TOKEN.address) {
+        return USDC_TEST_TOKEN.decimals.toString(16);
+      }
+      throw new Error(`Unrecognized ERC20: ${payload.to}`);
+    }
+    throw new Error(`Call not supported: ${payload.data}`);
+  }),
+};
 
 describe('utils', () => {
   describe('isValidNonZeroAddress', () => {
@@ -16,6 +28,26 @@ describe('utils', () => {
 
     it('should return true for valid address', () => {
       expect(isValidNonZeroAddress(TEST_FROM_ADDRESS)).toBe(true);
+    });
+  });
+
+  describe('getTokenDecimals', () => {
+    describe('when token is native', () => {
+      it('should return default native token decimals', async () => {
+        const decimals = await getTokenDecimals('native', provider as any, nativeTokenService.nativeToken);
+        expect(decimals).toEqual(18);
+      });
+    });
+
+    describe('when token is ERC20', () => {
+      it('should call ERC20 contract for provided token address', async () => {
+        const decimals = await getTokenDecimals(
+          USDC_TEST_TOKEN.address,
+          provider as any,
+          nativeTokenService.nativeToken,
+        );
+        expect(decimals).toEqual(6);
+      });
     });
   });
 });

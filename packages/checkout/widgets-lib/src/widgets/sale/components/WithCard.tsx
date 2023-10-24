@@ -1,28 +1,43 @@
-/* eslint-disable no-console */
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 
 import { useSaleContext } from '../context/SaleContextProvider';
 import { TransakIframe } from '../../../components/Transak/TransakIframe';
 import { TransakNFTData } from '../../../components/Transak/TransakTypes';
 import { text as textConfig } from '../../../resources/text/textConfig';
 import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
+import { SaleErrorTypes } from '../types';
 
-export function WithCard() {
-  const { screenTitle } = textConfig.views[SaleWidgetViews.PAY_WITH_CARD];
+export interface WithCardProps {
+  onInit?: () => void;
+  onOpen?: () => void;
+  onOrderCreated?: () => void;
+  onOrderProcessing?: () => void;
+  onOrderCompleted?: () => void;
+  onOrderFailed?: () => void;
+}
 
+export function WithCard(props: WithCardProps) {
   const {
-    recipientEmail, recipientAddress, isPassportWallet, signResponse,
+    onInit,
+    onOpen,
+    onOrderCreated,
+    onOrderProcessing,
+    onOrderCompleted,
+    onOrderFailed,
+  } = props;
+  const { screenTitle, loading } = textConfig.views[SaleWidgetViews.PAY_WITH_CARD];
+  const {
+    recipientEmail, recipientAddress, isPassportWallet, signResponse, goToErrorView,
   } = useSaleContext();
   const executeTxn = signResponse?.transactions.find((txn) => txn.methodCall.startsWith('execute'));
 
   if (!signResponse || !executeTxn) {
-    // TODO: dispatch error
     return null;
   }
 
   const nftData: TransakNFTData[] = useMemo(
     () => signResponse.order.products.map((product) => ({
-      collectionAddress: executeTxn?.contractAddress || '',
+      collectionAddress: product.collectionAddress,
       imageURL: product.image,
       nftName: product.name,
       price: product.amount,
@@ -33,28 +48,11 @@ export function WithCard() {
     [signResponse],
   );
 
-  const onOpen = useCallback(() => {
-    console.log('onOpen');
-  }, []);
-
-  const onOrderCreated = useCallback(() => {
-    console.log('onOrderCreated');
-  }, []);
-
-  const onOrderProcessing = useCallback(() => {
-    console.log('onOrderProcessing');
-  }, []);
-
-  const onOrderCompleted = useCallback(() => {
-    console.log('onOrderCompleted');
-  }, []);
-
-  const onOrderFailed = useCallback(() => {
-    console.log('onOrderFailed');
-  }, []);
+  const onFailedToLoad = () => {
+    goToErrorView(SaleErrorTypes.TRANSACTION_FAILED);
+  };
 
   return (
-
     <TransakIframe
       id="transak-iframe"
       type="nft-checkout"
@@ -62,17 +60,20 @@ export function WithCard() {
       walletAddress={recipientAddress}
       isPassportWallet={isPassportWallet}
       exchangeScreenTitle={screenTitle}
+      loadingText={loading}
       nftData={nftData}
       calldata={executeTxn.rawData}
       cryptoCurrencyCode={signResponse.order.currency.name}
       estimatedGasLimit={executeTxn.gasEstimate}
       smartContractAddress={executeTxn.contractAddress}
       partnerOrderId={executeTxn.params.reference}
+      onInit={onInit}
       onOpen={onOpen}
       onOrderCreated={onOrderCreated}
       onOrderProcessing={onOrderProcessing}
       onOrderCompleted={onOrderCompleted}
       onOrderFailed={onOrderFailed}
+      onFailedToLoad={onFailedToLoad}
     />
   );
 }

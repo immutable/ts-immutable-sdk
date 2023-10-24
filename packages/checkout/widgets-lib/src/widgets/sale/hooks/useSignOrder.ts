@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable no-console */
 import { useCallback, useState } from 'react';
-import { SaleSuccess } from '@imtbl/checkout-widgets';
 
 import { Environment } from '@imtbl/config';
 import {
@@ -10,6 +8,10 @@ import {
   PaymentTypes,
   Item,
   SignedOrderProduct,
+  SignOrderError,
+  ExecuteOrderResponse,
+  ExecutedTransaction,
+  SaleErrorTypes,
 } from '../types';
 
 const PRIMARY_SALES_API_BASE_URL = {
@@ -65,14 +67,22 @@ enum SignCurrencyFilter {
 }
 
 type SignApiRequest = {
-  recipient_address: string
+  recipient_address: string;
   currency_filter: SignCurrencyFilter;
-  currency_value: string
-  payment_type: string
+  currency_value: string;
+  payment_type: string;
   products: {
     product_id: string;
-    quantity: number
-  }[]
+    quantity: number;
+  }[];
+};
+
+type SignApiError = {
+  code: string;
+  details: any;
+  link: string;
+  message: string;
+  trace_id: string;
 };
 
 const toSignedProduct = (
@@ -83,9 +93,10 @@ const toSignedProduct = (
   productId: product.product_id,
   image: item?.image || '',
   qty: item?.qty || 1,
-  name: `${item?.name || ''}${item?.qty ? ` x${item.qty}` : ''}`,
+  name: item?.name || '',
   description: item?.description || '',
   currency,
+  collectionAddress: product.detail[0]?.collection_address,
   amount: product.detail.map(({ amount }) => amount),
   tokenId: product.detail.map(({ token_id: tokenId }) => Number(tokenId)),
 });
@@ -102,11 +113,26 @@ const toSignResponse = (
         name: order.currency.name,
         erc20Address: order.currency.erc20_address,
       },
-      products: order.products.map((product) => toSignedProduct(
-        product,
-        order.currency.name,
-        items.find((item) => item.productId === product.product_id),
-      )),
+      products: order.products
+        .map((product) => toSignedProduct(
+          product,
+          order.currency.name,
+          items.find((item) => item.productId === product.product_id),
+        ))
+        .reduce((acc, product) => {
+          const index = acc.findIndex((n) => n.name === product.name);
+
+          if (index === -1) {
+            acc.push({ ...product });
+          }
+
+          if (index > -1) {
+            acc[index].amount = [...acc[index].amount, ...product.amount];
+            acc[index].tokenId = [...acc[index].tokenId, ...product.tokenId];
+          }
+
+          return acc;
+        }, [] as SignedOrderProduct[]),
       totalAmount: Number(order.total_amount),
     },
     transactions: transactions.map((transaction) => ({
@@ -132,15 +158,29 @@ export const useSignOrder = (input: SignOrderInput) => {
     env,
     environmentId,
   } = input;
+  const [signError, setSignError] = useState<SignOrderError | undefined>(
+    undefined,
+  );
   const [signResponse, setSignResponse] = useState<SignResponse | undefined>(
     undefined,
   );
+  const [executeResponse, setExecuteResponse] = useState<ExecuteOrderResponse>({
+    done: false,
+    transactions: [],
+  });
 
-  const sendTx = useCallback(
+  const setExecuteTransactions = (transaction: ExecutedTransaction) => {
+    setExecuteResponse((prev) => ({ ...prev, transactions: [...prev.transactions, transaction] }));
+  };
+
+  const setExecuteDone = () => setExecuteResponse((prev) => ({ ...prev, done: true }));
+
+  const sendTransaction = useCallback(
     async (
       to: string,
       data: string,
       gasLimit: number,
+      method: string,
     ): Promise<string | undefined> => {
       let transactionHash: string | undefined;
 
@@ -153,26 +193,48 @@ export const useSignOrder = (input: SignOrderInput) => {
           gasPrice,
           gasLimit,
         });
-        console.info('@@@ [PENDING] txn:', txnResponse?.hash);
 
+        setExecuteTransactions({ method, hash: txnResponse?.hash });
         await txnResponse?.wait(1);
 
         transactionHash = txnResponse?.hash;
-      } catch (error) {
-        throw new Error('failed');
-      }
+        return transactionHash;
+      } catch (e) {
+        // TODO: check error type to send
+        // SaleErrorTypes.WALLET_REJECTED or SaleErrorTypes.WALLET_REJECTED_NO_FUNDS
 
-      console.info('@@@ [SUBMITTED] txn:', transactionHash);
-      return transactionHash;
+        const reason = typeof e === 'string' ? e : (e as any).reason || '';
+        let errorType = SaleErrorTypes.TRANSACTION_FAILED;
+
+        if (reason.includes('rejected') && reason.includes('user')) {
+          errorType = SaleErrorTypes.WALLET_REJECTED;
+        }
+
+        if (
+          reason.includes('failed to submit')
+          && reason.includes('highest gas limit')
+        ) {
+          errorType = SaleErrorTypes.WALLET_REJECTED_NO_FUNDS;
+        }
+
+        setSignError({
+          type: errorType,
+          data: { error: e },
+        });
+        return undefined;
+      }
     },
     [provider],
   );
 
   const sign = useCallback(
     async (paymentType: PaymentTypes): Promise<SignResponse | undefined> => {
-      console.log('@@@ paymentType', paymentType);
-
-      if (!provider || !recipientAddress || !fromContractAddress || !items.length) {
+      if (
+        !provider
+        || !recipientAddress
+        || !fromContractAddress
+        || !items.length
+      ) {
         return undefined;
       }
 
@@ -201,28 +263,35 @@ export const useSignOrder = (input: SignOrderInput) => {
         });
 
         if (!response.ok) {
-          throw new Error(`HTTP Error: ${response.statusText}`);
+          const { code, message } = (await response.json()) as SignApiError;
+          throw new Error(code, { cause: message });
         }
 
         const responseData = toSignResponse(await response.json(), items);
         setSignResponse(responseData);
 
         return responseData;
-      } catch (error) {
-        console.error('Signing order failed:', error);
+      } catch (e) {
+        setSignError({ type: SaleErrorTypes.DEFAULT, data: { error: e } });
       }
       return undefined;
     },
     [items, fromContractAddress, recipientAddress, environmentId, env],
   );
 
-  const execute = useCallback(async (): Promise<SaleSuccess> => {
-    if (!signResponse) {
-      throw new Error('No sign data, retry /sign/order');
+  const execute = async (
+    signData: SignResponse | undefined,
+  ): Promise<ExecutedTransaction[]> => {
+    if (!signData) {
+      setSignError({
+        type: SaleErrorTypes.DEFAULT,
+        data: { reason: 'No sign data' },
+      });
+      return [];
     }
-
-    const transactionHashes = {};
-    for (const transaction of signResponse.transactions) {
+    let successful = true;
+    const execTransactions: ExecutedTransaction[] = [];
+    for (const transaction of signData.transactions) {
       const {
         contractAddress: to,
         rawData: data,
@@ -230,21 +299,27 @@ export const useSignOrder = (input: SignOrderInput) => {
         gasEstimate,
       } = transaction;
       // eslint-disable-next-line no-await-in-loop
-      const transactionHash = await sendTx(to, data, gasEstimate);
+      const hash = await sendTransaction(to, data, gasEstimate, method);
 
-      if (!transactionHash) {
-        throw new Error('failed');
+      if (!hash) {
+        successful = false;
+        break;
       }
 
-      transactionHashes[method] = transactionHash;
+      execTransactions.push({ method, hash });
     }
 
-    return transactionHashes;
-  }, [signResponse]);
+    if (successful) {
+      setExecuteDone();
+    }
+    return execTransactions;
+  };
 
   return {
     sign,
-    execute,
     signResponse,
+    signError,
+    execute,
+    executeResponse,
   };
 };

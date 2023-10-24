@@ -7,7 +7,7 @@ import { WalletWidgetViews } from '../../context/view-context/WalletViewContextT
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
 import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextTypes';
 import { SaleWidgetViews } from '../../context/view-context/SaleViewContextTypes';
-import { MintErrorTypes, PaymentTypes } from '../../widgets/sale/types';
+import { SaleErrorTypes, PaymentTypes } from '../../widgets/sale/types';
 import { ServiceType } from '../../views/error/serviceTypes';
 
 export const text = {
@@ -305,17 +305,25 @@ export const text = {
           heading: 'Buy with card',
           caption: 'Google pay & Apple pay available. Minimum $5.',
           subcaption: 'Fees',
+          disabledCaption: '',
         },
         swap: {
           heading: 'Swap my coins',
           caption: 'Using the coins I have on the same network',
           subcaption: 'Fees',
+          disabledCaption: 'Not available in your region',
         },
         bridge: {
           heading: 'Move my coins',
           caption: 'From the coins I have on a different network',
           subcaption: 'Fees ',
+          disabledCaption: '',
         },
+      },
+    },
+    [SaleWidgetViews.FUND_WITH_SMART_CHECKOUT]: {
+      loading: {
+        checkingBalances: 'Crunching numbers',
       },
     },
     [SaleWidgetViews.PAYMENT_METHODS]: {
@@ -334,7 +342,11 @@ export const text = {
           disabledCaption: undefined,
         },
       },
-      loading: 'Nice choice',
+      loading: {
+        ready: 'Ready to purchase',
+        confirm: 'Confirm in your wallet',
+        processing: 'Processing purchase',
+      },
     },
     [SaleWidgetViews.PAY_WITH_COINS]: {
       header: {
@@ -347,50 +359,68 @@ export const text = {
     },
     [SaleWidgetViews.PAY_WITH_CARD]: {
       screenTitle: 'Pay with card',
+      loading: 'Taking you to Transak',
     },
-    [SaleWidgetViews.MINT_FAIL]: {
+    [SaleWidgetViews.SALE_FAIL]: {
       errors: {
-        [MintErrorTypes.TRANSACTION_FAILED]: {
+        [SaleErrorTypes.TRANSACTION_FAILED]: {
           description: 'Transaction failed',
           primaryAction: 'Try again',
           secondaryAction: 'View details',
         },
-        [MintErrorTypes.SERVICE_BREAKDOWN]: {
+        [SaleErrorTypes.SERVICE_BREAKDOWN]: {
           description:
             "Sorry, we're unable to process your payment right now. Please try again in a few minutes.",
           secondaryAction: 'Dismiss',
         },
-        [MintErrorTypes.TRANSAK_FAILED]: {
+        [SaleErrorTypes.TRANSAK_FAILED]: {
           description: 'Sorry, something went wrong. Please try again.',
           primaryAction: 'Try again',
           secondaryAction: 'Dismiss',
         },
-        [MintErrorTypes.PASSPORT_FAILED]: {
+        [SaleErrorTypes.WALLET_FAILED]: {
           description: "Sorry, we're unable to process this right now.",
           primaryAction: 'Go back',
           secondaryAction: 'Dismiss',
         },
-        [MintErrorTypes.PASSPORT_REJECTED_NO_FUNDS]: {
-          description: 'Sorry, something went wrong. Plese try again.',
+        [SaleErrorTypes.WALLET_REJECTED_NO_FUNDS]: {
+          description: 'Sorry, something went wrong. Please try again.',
           primaryAction: 'Go back',
           secondaryAction: 'Dismiss',
         },
-        [MintErrorTypes.PASSPORT_REJECTED]: {
+        [SaleErrorTypes.WALLET_REJECTED]: {
           description:
-            "You'll need to approve the transaction in Passport to proceed.",
+            "You'll need to approve the transaction in your wallet to proceed.",
           primaryAction: 'Try again',
           secondaryAction: 'Cancel',
         },
-        [MintErrorTypes.DEFAULT]: {
+        [SaleErrorTypes.SMART_CHECKOUT_NO_ROUTES_FOUND]: {
+          description:
+            'Your wallet has insufficent balance. Try paying with card instead.',
+          primaryAction: 'Try again',
+          secondaryAction: 'Cancel',
+        },
+        [SaleErrorTypes.SMART_CHECKOUT_ERROR]: {
+          description:
+            'Unable to check your wallets balance. Please try again.',
+          primaryAction: 'Try again',
+          secondaryAction: 'Cancel',
+        },
+        [SaleErrorTypes.DEFAULT]: {
           description: 'Sorry, something went wrong. Please try again.',
           primaryAction: 'Try again',
           secondaryAction: 'Dismiss',
         },
       },
     },
-    [SaleWidgetViews.MINT_SUCCESS]: {
+    [SaleWidgetViews.SALE_SUCCESS]: {
       text: 'Order completed',
       actionText: 'Continue',
+    },
+  },
+  footers: {
+    quickswapFooter: {
+      disclaimerText: 'Quickswap is a third party app. Immutable neither builds, owns, operates or deploys Quickswap. For further info, refer to Quickswap’s website.',
     },
   },
   wallets: {

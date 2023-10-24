@@ -1,5 +1,6 @@
 import { FeeAmount, Pool, TickMath } from '@uniswap/v3-sdk';
 import { Token } from '@uniswap/sdk-core';
+import { uniswapTokenToERC20 } from 'lib/utils';
 import { generateAllAcyclicPaths } from '../router';
 
 const token0 = new Token(
@@ -72,13 +73,13 @@ describe('generateAllAcyclicPaths', () => {
       );
 
       const routes = generateAllAcyclicPaths(
-        token0,
-        token3,
+        uniswapTokenToERC20(token0),
+        uniswapTokenToERC20(token3),
         pools,
         maxHops,
         [],
         [],
-        token0,
+        uniswapTokenToERC20(token0),
       );
 
       // There are two routes of maxHops = 3 that go from token0 to token3.
@@ -155,13 +156,13 @@ describe('generateAllAcyclicPaths', () => {
       );
 
       const routes = generateAllAcyclicPaths(
-        token0,
-        token3,
+        uniswapTokenToERC20(token0),
+        uniswapTokenToERC20(token3),
         pools,
         maxHops,
         [],
         [],
-        token0,
+        uniswapTokenToERC20(token0),
       );
 
       // There is one route of maxHops = 2 that goes from token0 to token3.
@@ -234,13 +235,13 @@ describe('generateAllAcyclicPaths', () => {
       );
 
       const routes = generateAllAcyclicPaths(
-        token0,
-        token3,
+        uniswapTokenToERC20(token0),
+        uniswapTokenToERC20(token3),
         pools,
         maxHops,
         [],
         [],
-        token0,
+        uniswapTokenToERC20(token0),
       );
 
       // There are five route of maxHops = 4 that goes from token0 to token3.

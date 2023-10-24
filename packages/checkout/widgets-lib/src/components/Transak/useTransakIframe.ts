@@ -1,5 +1,6 @@
-import { Environment } from '@imtbl/config';
 import { useCallback, useEffect, useState } from 'react';
+import { Environment } from '@imtbl/config';
+import pako from 'pako';
 
 export type TransakNFTData = {
   imageURL: string;
@@ -29,6 +30,8 @@ type UseTransakIframeProps = {
   type: TransakWidgetType;
 } & TransakNFTCheckoutParams;
 
+const MAX_GAS_LIMIT = '30000000';
+
 // TODO: Move to common config file inside Checkout SDK while refactoring onRamp
 // const { baseUrl, apiKey } = checkout.fiatExchangeConfig('transak')
 export const TRANSAK_API_BASE_URL = {
@@ -50,20 +53,17 @@ export const useTransakIframe = (props: UseTransakIframeProps) => {
 
   const getNFTCheckoutURL = useCallback(() => {
     const {
+      calldata,
       nftData: nfts,
       estimatedGasLimit,
       ...restTransakParams
     } = transakParams;
 
-    // Default to first product
-    // FIXME: Remove this once transak supports multiple item minting
-    const nftData = nfts.map(({ nftName, ...nft }) => ({
-      ...nft,
-      nftName: nftName.replace(/x\d+$/, ''),
-    })).slice(0, 1);
+    // FIXME: defaulting to first nft in the list
+    // as transak currently only supports on nft at a time
+    const nftData = nfts?.slice(0, 1);
 
-    // FIXME: Gas limit is not being calculated correctly, and cant be set to 0
-    const gasLimit = estimatedGasLimit > 0 ? estimatedGasLimit : 300000;
+    const gasLimit = estimatedGasLimit > 0 ? estimatedGasLimit : MAX_GAS_LIMIT;
 
     const params = {
       apiKey,
@@ -71,6 +71,7 @@ export const useTransakIframe = (props: UseTransakIframeProps) => {
       isNFT: 'true',
       disableWalletAddressForm: 'true',
       environment: 'STAGING',
+      calldata: btoa(String.fromCharCode.apply(null, pako.deflate(calldata))),
       nftData: btoa(JSON.stringify(nftData)),
       estimatedGasLimit: gasLimit.toString(),
       ...restTransakParams,

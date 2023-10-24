@@ -11,6 +11,7 @@ import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { useStatusProvider } from '@/context/StatusProvider';
 import EthBalance from '@/components/imx/EthBalance';
 import MakeOfferModal from '@/components/imx/MakeOfferModal';
+import { MARKETPLACE_FEE_PERCENTAGE, MARKETPLACE_FEE_RECIPIENT } from '@/config';
 
 function Trade({ showModal: showTradeModal, setShowModal: setShowTradeModal }: ModalProps) {
   const [sellTokenName, setSellTokenName] = useState<string>('');
@@ -35,9 +36,11 @@ function Trade({ showModal: showTradeModal, setShowModal: setShowTradeModal }: M
       const result = await coreSdkClient.listOrders({
         status: 'active',
         orderBy: 'updated_at',
-        direction: 'asc',
+        direction: 'desc',
         sellTokenType: 'ERC721',
         sellTokenName,
+        auxiliaryFeePercentages: MARKETPLACE_FEE_PERCENTAGE.toString(),
+        auxiliaryFeeRecipients: MARKETPLACE_FEE_RECIPIENT,
       });
       setOrders(result.result);
       setLoadingOrders(false);
@@ -62,8 +65,8 @@ function Trade({ showModal: showTradeModal, setShowModal: setShowTradeModal }: M
         order_id: id,
         user,
         fees: [{
-          address: '0x8e70719571e87a328696ad099a7d9f6adc120892',
-          fee_percentage: 1,
+          address: MARKETPLACE_FEE_RECIPIENT,
+          fee_percentage: MARKETPLACE_FEE_PERCENTAGE,
         }],
       };
       const createTradeResponse = await imxProvider?.createTrade(request);
@@ -75,7 +78,7 @@ function Trade({ showModal: showTradeModal, setShowModal: setShowTradeModal }: M
     }
   };
 
-  const makeOffer = async (id: number, index: number) => {
+  const makeOffer = async (index: number) => {
     setLoadingTrade(true);
     setTradeIndex(index);
     setShowMakeOffer(true);
@@ -90,7 +93,7 @@ function Trade({ showModal: showTradeModal, setShowModal: setShowTradeModal }: M
       <MakeOfferModal
         showModal={showMakeOffer}
         setShowModal={setShowMakeOffer}
-        order={tradeIndex ? orders[tradeIndex] : undefined}
+        order={tradeIndex !== null ? orders[tradeIndex] : undefined}
         onClose={handleMakeOfferClosed}
       />
       <Offcanvas
@@ -159,7 +162,7 @@ function Trade({ showModal: showTradeModal, setShowModal: setShowTradeModal }: M
                               <Button
                                 size="sm"
                                 variant="dark"
-                                onClick={() => makeOffer(order.order_id, index)}
+                                onClick={() => makeOffer(index)}
                               >
                                 Offer
                               </Button>

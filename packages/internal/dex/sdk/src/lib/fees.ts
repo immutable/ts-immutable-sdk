@@ -1,33 +1,35 @@
 import { BASIS_POINT_PRECISION } from 'constants/router';
 import { BigNumber } from 'ethers';
-import {
-  Amount,
-  Fee, SecondaryFee, TokenInfo, addAmount, newAmount, subtractAmount,
-} from 'lib';
+import { Coin, CoinAmount, SecondaryFee } from 'types';
+import { addAmount, newAmount, subtractAmount } from './utils';
 
 export class Fees {
   private secondaryFees: SecondaryFee[];
 
-  private amount: Amount;
+  private amount: CoinAmount<Coin>;
 
-  constructor(secondaryFees: SecondaryFee[], token: TokenInfo) {
+  constructor(secondaryFees: SecondaryFee[], token: Coin) {
     this.secondaryFees = secondaryFees;
     this.amount = newAmount(BigNumber.from(0), token);
   }
 
-  addAmount(amount: Amount): void {
+  get token(): Coin {
+    return this.amount.token;
+  }
+
+  addAmount(amount: CoinAmount<Coin>): void {
     this.amount = addAmount(this.amount, amount);
   }
 
-  amountWithFeesApplied(): Amount {
+  amountWithFeesApplied(): CoinAmount<Coin> {
     return addAmount(this.amount, this.total());
   }
 
-  amountLessFees(): Amount {
+  amountLessFees(): CoinAmount<Coin> {
     return subtractAmount(this.amount, this.total());
   }
 
-  withAmounts(): Fee[] {
+  withAmounts() {
     return this.secondaryFees.map((fee) => {
       const feeAmount = this.amount.value
         .mul(fee.basisPoints)
@@ -40,7 +42,7 @@ export class Fees {
     });
   }
 
-  private total(): Amount {
+  private total(): CoinAmount<Coin> {
     let totalFees = newAmount(BigNumber.from(0), this.amount.token);
 
     for (const fee of this.secondaryFees) {

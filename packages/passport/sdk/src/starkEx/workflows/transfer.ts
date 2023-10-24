@@ -63,7 +63,8 @@ export async function transfer({
         { headers },
       );
 
-      await guardianClient.validate({
+      await guardianClient.evaluateImxTransaction({
+        user,
         payloadHash: signableResult.data.payload_hash,
       });
 
@@ -135,10 +136,7 @@ export async function batchNftTransfer({
         signable_requests: signableRequests,
       };
 
-      const headers = {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        Authorization: `Bearer ${user.accessToken}`,
-      };
+      const headers = { Authorization: `Bearer ${user.accessToken}` };
 
       const signableResult = await transfersApi.getSignableTransfer(
         {
@@ -147,7 +145,8 @@ export async function batchNftTransfer({
         { headers },
       );
 
-      await guardianClient.validate({
+      await guardianClient.evaluateImxTransaction({
+        user,
         payloadHash: signableResult.data.signable_responses[0]?.payload_hash,
       });
 

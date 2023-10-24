@@ -1,12 +1,13 @@
 import { BigNumber } from 'ethers';
 import { JsonRpcProvider, FeeData } from '@ethersproject/providers';
-import { Amount, newAmount, TokenInfo } from 'lib';
+import { newAmount } from 'lib';
+import { CoinAmount, Coin } from 'types';
 
 type EIP1559FeeData = {
   maxFeePerGas: BigNumber;
   maxPriorityFeePerGas: BigNumber;
   lastBaseFeePerGas: BigNumber;
-  gasPrice: null
+  gasPrice: null;
 };
 
 /**
@@ -23,10 +24,11 @@ export const doesChainSupportEIP1559 = (fee: FeeData): fee is EIP1559FeeData => 
 /**
  * Fetch the current gas price estimate. Supports both EIP-1559 and non-EIP1559 chains
  * @param {JsonRpcProvider} provider - The JSON RPC provider used to fetch fee data
+ * @param {Coin} nativeToken - The native token of the chain. Gas prices will be denominated in this token
  * @returns {Amount | null} - The gas price in the smallest denomination of the chain's currency,
- * or null if no gas price is available
+ *  or null if no gas price is available
  */
-export const fetchGasPrice = async (provider: JsonRpcProvider, nativeToken: TokenInfo): Promise<Amount | null> => {
+export const fetchGasPrice = async (provider: JsonRpcProvider, nativeToken: Coin): Promise<CoinAmount<Coin> | null> => {
   const feeData = await provider.getFeeData().catch(() => null);
   if (!feeData) return null;
 
@@ -40,10 +42,10 @@ export const fetchGasPrice = async (provider: JsonRpcProvider, nativeToken: Toke
 /**
  * Calculate the gas fee from the gas price and gas units used for the transaction
  *
- * @param {Amount} gasPriceInWei - The price of gas
- * @param {BigNumber} gasUsed - The total gas units that will be used for the transaction
+ * @param {Amount} gasPrice - The price of gas
+ * @param {BigNumber} gasEstimate - The total gas units that will be used for the transaction
  * @returns - The cost of the transaction in the gas token's smallest denomination (e.g. WEI)
  */
-export const calculateGasFee = (gasPrice: Amount, gasEstimate: BigNumber): Amount =>
+export const calculateGasFee = (gasPrice: CoinAmount<Coin>, gasEstimate: BigNumber): CoinAmount<Coin> =>
   // eslint-disable-next-line implicit-arrow-linebreak
   newAmount(gasEstimate.mul(gasPrice.value), gasPrice.token);

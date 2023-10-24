@@ -7,6 +7,7 @@ import {
   getBalance,
   getBalances,
   getERC20Balance,
+  resetBlockscoutClientMap,
 } from './balances';
 import {
   BLOCKSCOUT_CHAIN_URL_MAP,
@@ -59,6 +60,10 @@ describe('balances', () => {
     getBalance: mockGetBalance,
     getNetwork: mockGetNetwork,
   } as unknown as Web3Provider));
+
+  beforeEach(() => {
+    jest.spyOn(console, 'debug').mockImplementation(() => {});
+  });
 
   describe('getBalance()', () => {
     it('should call getBalance() on provider and return the balance', async () => {
@@ -218,6 +223,8 @@ describe('balances', () => {
 
     beforeEach(() => {
       jest.restoreAllMocks();
+      resetBlockscoutClientMap();
+      jest.spyOn(console, 'debug').mockImplementation(() => {});
       getTokenAllowListMock = jest.fn().mockReturnValue({
         tokens: [
           {

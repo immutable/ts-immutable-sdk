@@ -13,8 +13,9 @@
  */
 
 
-import globalAxios, { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
-import { Configuration } from '../configuration';
+import type { Configuration } from '../configuration';
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
@@ -196,30 +197,22 @@ export const NftOwnersApiFactory = function (configuration?: Configuration, base
         /**
          * List NFT owners by token ID
          * @summary List NFT owners by token ID
-         * @param {string} contractAddress The address of contract
-         * @param {string} tokenId An &#x60;uint256&#x60; token id as string
-         * @param {string} chainName The name of chain
-         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
-         * @param {number} [pageSize] Maximum number of items to return
+         * @param {NftOwnersApiListNFTOwnersRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listNFTOwners(contractAddress: string, tokenId: string, chainName: string, pageCursor?: string, pageSize?: number, options?: any): AxiosPromise<ListNFTOwnersResult> {
-            return localVarFp.listNFTOwners(contractAddress, tokenId, chainName, pageCursor, pageSize, options).then((request) => request(axios, basePath));
+        listNFTOwners(requestParameters: NftOwnersApiListNFTOwnersRequest, options?: AxiosRequestConfig): AxiosPromise<ListNFTOwnersResult> {
+            return localVarFp.listNFTOwners(requestParameters.contractAddress, requestParameters.tokenId, requestParameters.chainName, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
         },
         /**
          * List owners by contract address
          * @summary List owners by contract address
-         * @param {string} contractAddress The address of contract
-         * @param {string} chainName The name of chain
-         * @param {string} [fromUpdatedAt] Datetime to use as the oldest updated timestamp
-         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
-         * @param {number} [pageSize] Maximum number of items to return
+         * @param {NftOwnersApiListOwnersByContractAddressRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listOwnersByContractAddress(contractAddress: string, chainName: string, fromUpdatedAt?: string, pageCursor?: string, pageSize?: number, options?: any): AxiosPromise<ListCollectionOwnersResult> {
-            return localVarFp.listOwnersByContractAddress(contractAddress, chainName, fromUpdatedAt, pageCursor, pageSize, options).then((request) => request(axios, basePath));
+        listOwnersByContractAddress(requestParameters: NftOwnersApiListOwnersByContractAddressRequest, options?: AxiosRequestConfig): AxiosPromise<ListCollectionOwnersResult> {
+            return localVarFp.listOwnersByContractAddress(requestParameters.contractAddress, requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -339,3 +332,4 @@ export class NftOwnersApi extends BaseAPI {
         return NftOwnersApiFp(this.configuration).listOwnersByContractAddress(requestParameters.contractAddress, requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 }
+

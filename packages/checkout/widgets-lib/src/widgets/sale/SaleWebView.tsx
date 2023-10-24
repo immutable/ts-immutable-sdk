@@ -12,7 +12,7 @@ import { Item } from './types';
 
 const defaultPassportConfig = {
   environment: 'sandbox',
-  clientId: 'XuGsHvMqMJrb73diq1fCswWwn4AYhcM6',
+  clientId: 'sWMLNvDrK5F8ibNWOqYgdKWsUtdLLz4J',
   redirectUri: 'http://localhost:3001/sale?login=true',
   logoutRedirectUri: 'http://localhost:3001/sale?logout=true',
   audience: 'platform_api',
@@ -22,24 +22,24 @@ const defaultPassportConfig = {
 const defaultItems: Item[] = [
   {
     productId: 'P0001',
-    qty: 1,
-    name: 'Poliwag',
-    image: 'https://pokemon-nfts.s3.ap-southeast-2.amazonaws.com/images/60.png',
-    description: 'Poliwag',
+    qty: 3,
+    name: 'Bulbasaur',
+    image: 'https://pokemon-nfts.s3.ap-southeast-2.amazonaws.com/images/1.png',
+    description: 'Bulbasaur',
   },
   {
     productId: 'P0002',
-    qty: 1,
-    name: 'Poliwhirl',
-    image: 'https://pokemon-nfts.s3.ap-southeast-2.amazonaws.com/images/61.png',
-    description: 'Poliwhirl',
+    qty: 2,
+    name: 'Ivyasaur',
+    image: 'https://pokemon-nfts.s3.ap-southeast-2.amazonaws.com/images/2.png',
+    description: 'Ivyasaur',
   },
   {
     productId: 'P0003',
     qty: 1,
-    name: 'Poliwrath',
-    image: 'https://pokemon-nfts.s3.ap-southeast-2.amazonaws.com/images/62.png',
-    description: 'Poliwrath',
+    name: 'Venusaur',
+    image: 'https://pokemon-nfts.s3.ap-southeast-2.amazonaws.com/images/3.png',
+    description: 'Venusaur',
   },
 ];
 
@@ -180,13 +180,13 @@ function SaleWebView() {
 
   useEffect(() => {
     window.addEventListener(
-      IMTBLWidgetEvents.IMTBL_PRIMARY_REVENUE_WIDGET_EVENT,
+      IMTBLWidgetEvents.IMTBL_SALE_WIDGET_EVENT,
       handleEvent,
     );
 
     return () => {
       window.removeEventListener(
-        IMTBLWidgetEvents.IMTBL_PRIMARY_REVENUE_WIDGET_EVENT,
+        IMTBLWidgetEvents.IMTBL_SALE_WIDGET_EVENT,
         handleEvent,
       );
     };

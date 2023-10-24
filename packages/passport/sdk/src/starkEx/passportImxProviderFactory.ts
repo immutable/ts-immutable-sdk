@@ -98,7 +98,7 @@ export class PassportImxProviderFactory {
       );
     }
 
-    const magicRpcProvider = await this.magicAdapter.login(user.idToken, this.config.network);
+    const magicRpcProvider = await this.magicAdapter.login(user.idToken);
     const web3Provider = new Web3Provider(
       magicRpcProvider,
     );
@@ -106,9 +106,9 @@ export class PassportImxProviderFactory {
     const starkSigner = await getStarkSigner(ethSigner);
 
     if (!user.imx?.ethAddress) {
-      const userImx = await this.registerStarkEx(ethSigner, starkSigner, user.accessToken);
+      await this.registerStarkEx(ethSigner, starkSigner, user.accessToken);
       return new PassportImxProvider({
-        user: userImx,
+        authManager: this.authManager,
         starkSigner,
         immutableXClient: this.immutableXClient,
         confirmationScreen: this.confirmationScreen,
@@ -118,7 +118,7 @@ export class PassportImxProviderFactory {
     }
 
     return new PassportImxProvider({
-      user: user as UserImx,
+      authManager: this.authManager,
       starkSigner,
       immutableXClient: this.immutableXClient,
       confirmationScreen: this.confirmationScreen,

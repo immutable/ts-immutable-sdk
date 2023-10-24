@@ -1,7 +1,7 @@
 import { Environment } from '@imtbl/config';
 import { BigNumber } from 'ethers';
 import {
-  TokenInfo,
+  Token,
   TransactionDetails,
   TransactionResponse,
 } from '@imtbl/dex-sdk';
@@ -29,18 +29,18 @@ describe('quoteFetcher', () => {
       quote: {
         amount: {
           value: BigNumber.from(quoteAmount),
-          token: {} as TokenInfo,
+          token: {} as Token,
         },
         amountWithMaxSlippage: {
           value: BigNumber.from(quoteAmount),
-          token: {} as TokenInfo,
+          token: {} as Token,
         },
         slippage: 0,
         fees: [
           {
             amount: {
               value: BigNumber.from(feeAmount),
-              token: {} as TokenInfo,
+              token: {} as Token,
             },
             recipient: '',
             basisPoints: 0,
@@ -53,7 +53,7 @@ describe('quoteFetcher', () => {
     if (swapGasFeeEstimate) {
       transactionResponse.swap.gasFeeEstimate = {
         value: BigNumber.from(swapGasFeeEstimate),
-        token: {} as TokenInfo,
+        token: {} as Token,
       };
     }
 
@@ -61,7 +61,7 @@ describe('quoteFetcher', () => {
       transactionResponse.approval = {
         gasFeeEstimate: {
           value: BigNumber.from(approvalGasFeeEstimate),
-          token: {} as TokenInfo,
+          token: {} as Token,
         },
       } as TransactionDetails;
     }
@@ -76,23 +76,23 @@ describe('quoteFetcher', () => {
     approval?: number,
   ) => {
     const dexQuote: DexQuote = {
-      approval: undefined,
+      approval: null,
       swap: null,
       quote: {
         amount: {
           value: BigNumber.from(quoteAmount),
-          token: {} as TokenInfo,
+          token: {} as Token,
         },
         amountWithMaxSlippage: {
           value: BigNumber.from(quoteAmount),
-          token: {} as TokenInfo,
+          token: {} as Token,
         },
         slippage: 0,
         fees: [
           {
             amount: {
               value: BigNumber.from(feeAmount),
-              token: {} as TokenInfo,
+              token: {} as Token,
             },
             recipient: '',
             basisPoints: 0,
@@ -104,14 +104,14 @@ describe('quoteFetcher', () => {
     if (swap) {
       dexQuote.swap = {
         value: BigNumber.from(swap),
-        token: {} as TokenInfo,
+        token: {} as Token,
       };
     }
 
     if (approval) {
       dexQuote.approval = {
         value: BigNumber.from(approval),
-        token: {} as TokenInfo,
+        token: {} as Token,
       };
     }
 
@@ -120,6 +120,10 @@ describe('quoteFetcher', () => {
 
   const config = new CheckoutConfiguration({
     baseConfig: { environment: Environment.SANDBOX },
+  });
+
+  beforeEach(() => {
+    jest.spyOn(console, 'debug').mockImplementation(() => {});
   });
 
   it('should fetch quotes', async () => {

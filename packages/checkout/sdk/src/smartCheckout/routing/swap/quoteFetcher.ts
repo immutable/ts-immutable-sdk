@@ -4,6 +4,7 @@ import { CheckoutConfiguration } from '../../../config';
 import * as instance from '../../../instance';
 import { ChainId } from '../../../types';
 import { DexQuote, DexQuotes } from '../types';
+import { measureAsyncExecution } from '../../../utils/debugLogger';
 
 export const quoteFetcher = async (
   config: CheckoutConfiguration,
@@ -39,14 +40,18 @@ export const quoteFetcher = async (
 
     // Resolve all the quotes and link them back to the swappable token
     // The swappable token array is in the same position in the array as the quote in the promise array
-    const dexTransactionResponse = await Promise.allSettled(dexTransactionResponsePromises);
+    const dexTransactionResponse = await measureAsyncExecution<PromiseSettledResult<TransactionResponse>[]>(
+      config,
+      'Time to resolve swap quotes from the dex',
+      Promise.allSettled(dexTransactionResponsePromises),
+    );
 
     dexTransactionResponse.forEach((response, index) => {
       if (response.status === 'rejected') return; // Ignore any requests to dex that failed to resolve
       const swappableToken = fromToken[index];
       dexQuotes.set(swappableToken, {
         quote: response.value.quote,
-        approval: response.value.approval?.gasFeeEstimate,
+        approval: response.value.approval?.gasFeeEstimate ?? null,
         swap: response.value.swap.gasFeeEstimate,
       });
     });

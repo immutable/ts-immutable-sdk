@@ -60,6 +60,7 @@ import { CancelParams } from './types/cancel';
 import { FiatRampService, FiatRampWidgetParams } from './fiatRamp';
 import { getItemRequirementsFromRequirements } from './smartCheckout/itemRequirements';
 import { CheckoutError, CheckoutErrorType } from './errors';
+import { AvailabilityService, availabilityService } from './availability';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
@@ -74,6 +75,8 @@ export class Checkout {
 
   private readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>;
 
+  readonly availability: AvailabilityService;
+
   /**
    * Constructs a new instance of the CheckoutModule class.
    * @param {CheckoutModuleConfiguration} [config=SANDBOX_CONFIGURATION] - The configuration object for the CheckoutModule.
@@ -84,6 +87,7 @@ export class Checkout {
     this.config = new CheckoutConfiguration(config);
     this.fiatRampService = new FiatRampService(this.config);
     this.readOnlyProviders = new Map<ChainId, ethers.providers.JsonRpcProvider>();
+    this.availability = availabilityService(this.config.isDevelopment, this.config.isProduction);
   }
 
   /**
@@ -287,13 +291,6 @@ export class Checkout {
   public async buy(
     params: BuyParams,
   ): Promise<BuyResult> {
-    if (this.config.isProduction) {
-      throw new Error('This endpoint is not currently available.');
-    }
-
-    // eslint-disable-next-line no-console
-    console.warn('This endpoint is currently under construction.');
-
     if (params.orders.length > 1) {
       // eslint-disable-next-line no-console
       console.warn('This endpoint currently only processes the first order in the array.');
@@ -316,13 +313,6 @@ export class Checkout {
   public async sell(
     params: SellParams,
   ): Promise<SellResult> {
-    if (this.config.isProduction) {
-      throw new Error('This endpoint is not currently available.');
-    }
-
-    // eslint-disable-next-line no-console
-    console.warn('This endpoint is currently under construction.');
-
     if (params.orders.length > 1) {
       // eslint-disable-next-line no-console
       console.warn('This endpoint currently only processes the first order in the array.');
@@ -347,13 +337,6 @@ export class Checkout {
   public async cancel(
     params: CancelParams,
   ): Promise<CancelResult> {
-    if (this.config.isProduction) {
-      throw new Error('This endpoint is not currently available.');
-    }
-
-    // eslint-disable-next-line no-console
-    console.warn('This endpoint is currently under construction.');
-
     // eslint-disable-next-line no-console
     console.warn('This endpoint currently only processes the first order in the array.');
 
@@ -372,13 +355,6 @@ export class Checkout {
   public async smartCheckout(
     params: SmartCheckoutParams,
   ): Promise<SmartCheckoutResult> {
-    if (this.config.isProduction) {
-      throw new Error('This endpoint is not currently available.');
-    }
-
-    // eslint-disable-next-line no-console
-    console.warn('This endpoint is currently under construction.');
-
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
@@ -449,7 +425,7 @@ export class Checkout {
     }
 
     const tokenList = await tokens.getTokenAllowList(this.config, { type: TokenFilterTypes.ONRAMP });
-    const token = tokenList.tokens.find((t) => t.address?.toLowerCase() === params.tokenAddress?.toLowerCase());
+    const token = tokenList.tokens?.find((t) => t.address?.toLowerCase() === params.tokenAddress?.toLowerCase());
     if (token) {
       tokenAmount = params.tokenAmount;
       tokenSymbol = token.symbol;
@@ -471,5 +447,13 @@ export class Checkout {
    */
   public async getExchangeFeeEstimate(): Promise<OnRampProviderFees> {
     return await this.fiatRampService.feeEstimate();
+  }
+
+  /**
+   * Fetches Swap widget availability.
+   * @returns {Promise<boolean>} - A promise that resolves to a boolean.
+   */
+  public async isSwapAvailable(): Promise<boolean> {
+    return this.availability.checkDexAvailability();
   }
 }

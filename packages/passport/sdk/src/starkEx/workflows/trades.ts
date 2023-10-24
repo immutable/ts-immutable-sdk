@@ -40,7 +40,8 @@ export async function createTrade({
 
     }, { headers });
 
-    await guardianClient.validate({
+    await guardianClient.evaluateImxTransaction({
+      user,
       payloadHash: getSignableTradeResponse.data.payload_hash,
     });
 

@@ -4,7 +4,6 @@ import { OpenIdExtension } from '@magic-ext/oidc';
 import { ethers } from 'ethers';
 import { PassportErrorType, withPassportError } from './errors/passportError';
 import { PassportConfiguration } from './config';
-import { Networks } from './types';
 
 export default class MagicAdapter {
   private readonly config: PassportConfiguration;
@@ -13,17 +12,19 @@ export default class MagicAdapter {
 
   constructor(config: PassportConfiguration) {
     this.config = config;
+    if (window) {
+      this.magicClient = this.initMagicClient();
+      this.magicClient.preload();
+    }
   }
 
   async login(
     idToken: string,
-    network: Networks,
   ): Promise<ethers.providers.ExternalProvider> {
     return withPassportError<ethers.providers.ExternalProvider>(async () => {
-      this.magicClient = new Magic(this.config.magicPublishableApiKey, {
-        extensions: [new OpenIdExtension()],
-        network,
-      });
+      if (!this.magicClient) {
+        this.magicClient = this.initMagicClient();
+      }
       await this.magicClient.openid.loginWithOIDC({
         jwt: idToken,
         providerId: this.config.magicProviderId,
@@ -37,5 +38,12 @@ export default class MagicAdapter {
     if (this.magicClient?.user) {
       await this.magicClient.user.logout();
     }
+  }
+
+  initMagicClient() {
+    return new Magic(this.config.magicPublishableApiKey, {
+      extensions: [new OpenIdExtension()],
+      network: this.config.network,
+    });
   }
 }

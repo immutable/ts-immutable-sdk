@@ -36,6 +36,7 @@ describe('', () => {
     const provider = getLocalhostProvider();
     const offerer = getOffererWallet(provider);
     const fulfiller = getFulfillerWallet(provider);
+    const newFulfiller = Wallet.createRandom().connect(provider);
 
     log('Deploying a new NFT collection and minting a token...');
     // Deploy an NFT contract and mint a token for the offerer
@@ -59,7 +60,7 @@ describe('', () => {
     const validListing1 = await sdk.prepareListing({
       makerAddress: offerer.address,
       buy: {
-        amount: '1000000',
+        amount: '100000',
         type: 'NATIVE',
       },
       sell: {
@@ -74,7 +75,7 @@ describe('', () => {
     const validListing2 = await sdk.prepareListing({
       makerAddress: offerer.address,
       buy: {
-        amount: '1000000',
+        amount: '100000',
         type: 'NATIVE',
       },
       sell: {
@@ -119,7 +120,35 @@ describe('', () => {
     await waitForOrderToBeOfStatus(sdk, orderId2, OrderStatusName.ACTIVE);
     log(`Listings ${orderId1} and ${orderId2} is now ACTIVE, fulfilling order...`);
 
-    const { actions, expiration, fulfillableOrders } = await sdk.fulfillBulkOrders(
+    log(`new fulfiller has ${(await newFulfiller.getBalance()).toString()} balance`);
+
+    const fulfillResponse1 = await sdk.fulfillBulkOrders(
+      [
+        {
+          listingId: orderId1,
+          takerFees: [{
+            amount: '1',
+            recipient: offerer.address,
+          }],
+        },
+        {
+          listingId: orderId2,
+          takerFees: [{
+            amount: '1',
+            recipient: offerer.address,
+          }],
+        },
+      ],
+      newFulfiller.address,
+    );
+
+    log(`Fulfilling listing without sufficient balance - fulfill response ${JSON.stringify(fulfillResponse1)}`);
+    // assert the insufficient balance flag is correctly set
+    if (fulfillResponse1.sufficientBalance) {
+      throw new Error('Insufficient balance fulfillment request response had sufficient balance');
+    }
+
+    const fulfillResponse = await sdk.fulfillBulkOrders(
       [
         {
           listingId: orderId1,
@@ -139,25 +168,29 @@ describe('', () => {
       fulfiller.address,
     );
 
-    log(`Fulfilling listings ${fulfillableOrders[0].id}, ${fulfillableOrders[1].id} fulfillment transaction valid till ${expiration}`);
+    if (fulfillResponse.sufficientBalance) {
+      const { fulfillableOrders, expiration, actions } = fulfillResponse;
 
-    await actionAll(actions, fulfiller, provider);
+      log(`Fulfilling listings ${fulfillableOrders[0].id}, ${fulfillableOrders[1].id} fulfillment transaction valid till ${expiration}`);
 
-    log(
-      `Fulfilment transaction sent, waiting for listing ${orderId2} to become FILLED`,
-    );
+      await actionAll(actions, fulfiller, provider);
 
-    await waitForOrderToBeOfStatus(sdk, orderId1, OrderStatusName.FILLED);
-    await waitForOrderToBeOfStatus(sdk, orderId2, OrderStatusName.FILLED);
-    log('Listings are now FILLED');
+      log(
+        `Fulfilment transaction sent, waiting for listing ${orderId2} to become FILLED`,
+      );
 
-    log('Listing all orders for the NFT collection');
+      await waitForOrderToBeOfStatus(sdk, orderId1, OrderStatusName.FILLED);
+      await waitForOrderToBeOfStatus(sdk, orderId2, OrderStatusName.FILLED);
+      log('Listings are now FILLED');
 
-    const listOfOrders = await sdk.listListings({
-      sellItemContractAddress: nftContract.address,
-    });
+      log('Listing all orders for the NFT collection');
 
-    log(`List of orders for contract ${nftContract.address}:`);
-    log(JSON.stringify(listOfOrders, null, 2));
+      const listOfOrders = await sdk.listListings({
+        sellItemContractAddress: nftContract.address,
+      });
+
+      log(`List of orders for contract ${nftContract.address}:`);
+      log(JSON.stringify(listOfOrders, null, 2));
+    }
   }, 200_000);
 });

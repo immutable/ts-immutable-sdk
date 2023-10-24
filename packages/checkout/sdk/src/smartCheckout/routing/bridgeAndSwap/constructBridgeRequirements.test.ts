@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers';
-import { TokenInfo as DexTokenInfo } from '@imtbl/dex-sdk';
+import { Token as DexTokenInfo } from '@imtbl/dex-sdk';
 import { DexQuote } from '../types';
 import {
   ChainId,
@@ -26,7 +26,7 @@ describe('constructBridgeRequirements', () => {
     approval?: number,
   ) => {
     const dexQuote: DexQuote = {
-      approval: undefined,
+      approval: null,
       swap: null,
       quote: {
         amount: {
