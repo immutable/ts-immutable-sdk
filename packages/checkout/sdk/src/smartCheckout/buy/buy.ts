@@ -175,7 +175,6 @@ export const buy = async (
       getUnsignedERC20ApprovalTransactions(actions),
     );
   } catch (err: any) {
-    // Silently ignore error as this is usually thrown if user does not have enough balance
     const elapsedTimeInSeconds = (performance.now() - fulfillOrderStartTime) / 1000;
     debugLogger(config, 'Time to call fulfillOrder from the orderbook', elapsedTimeInSeconds);
 

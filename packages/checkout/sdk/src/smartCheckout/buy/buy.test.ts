@@ -503,7 +503,7 @@ describe('buy', () => {
         (getUnsignedERC20ApprovalTransactions as jest.Mock).mockResolvedValue([{ from: '0xAPPROVAL' }]);
         (getUnsignedFulfillmentTransactions as jest.Mock).mockResolvedValue([]);
         (smartCheckout as jest.Mock).mockResolvedValue({});
-        (createOrderbookInstance as jest.Mock).mockResolvedValue({
+        (createOrderbookInstance as jest.Mock).mockReturnValue({
           getListing: jest.fn().mockResolvedValue({
             result: {
               buy: [
@@ -1084,7 +1084,7 @@ describe('buy', () => {
     });
 
     it('should throw expired error if orderbook fulfillOrder returns expired error', async () => {
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         getListing: jest.fn().mockResolvedValue({
           result: {
             buy: [
@@ -1133,7 +1133,7 @@ describe('buy', () => {
     });
 
     it('should throw error if orderbook fulfillOrder returns error other than expired or balances', async () => {
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         getListing: jest.fn().mockResolvedValue({
           result: {
             buy: [
