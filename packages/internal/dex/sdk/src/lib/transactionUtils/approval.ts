@@ -4,16 +4,14 @@ import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
 import { ApproveError, AlreadyApprovedError } from 'errors';
 import { ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
-import { newAmount } from 'lib/utils';
-import { NativeTokenService } from 'lib/nativeTokenService';
-import {
-  Amount, ERC20, Native, SecondaryFee, TransactionDetails,
-} from '../../types';
+import { isERC20Amount, newAmount, toPublicAmount } from 'lib/utils';
+import { CoinAmount, Coin, ERC20 } from 'types';
+import { SecondaryFee, TransactionDetails } from '../../types';
 import { calculateGasFee } from './gas';
 
 type PreparedApproval = {
   spender: string;
-  amount: Amount<ERC20>;
+  amount: CoinAmount<ERC20>;
 };
 
 /**
@@ -29,9 +27,9 @@ type PreparedApproval = {
 const getERC20AmountToApprove = async (
   provider: JsonRpcProvider,
   ownerAddress: string,
-  tokenAmount: Amount<ERC20>,
+  tokenAmount: CoinAmount<ERC20>,
   spenderAddress: string,
-): Promise<Amount<ERC20>> => {
+): Promise<CoinAmount<ERC20>> => {
   // create an instance of the ERC20 token contract
   const erc20Contract = ERC20__factory.connect(tokenAmount.token.address, provider);
 
@@ -64,7 +62,7 @@ const getERC20AmountToApprove = async (
  */
 const getUnsignedERC20ApproveTransaction = (
   ownerAddress: string,
-  tokenAmount: Amount<ERC20>,
+  tokenAmount: CoinAmount<ERC20>,
   spenderAddress: string,
 ): TransactionRequest => {
   if (ownerAddress === spenderAddress) {
@@ -84,21 +82,22 @@ const getUnsignedERC20ApproveTransaction = (
 
 export const prepareApproval = (
   tradeType: TradeType,
-  amountSpecified: Amount<ERC20>,
-  amountWithSlippage: Amount<ERC20>,
+  userSpecifiedAmount: CoinAmount<Coin>,
+  quotedAmountWithSlippage: CoinAmount<Coin>,
   contracts: {
     routerAddress: string;
     secondaryFeeAddress: string;
   },
   secondaryFees: SecondaryFee[],
-): PreparedApproval => {
-  const amountOfTokenIn = tradeType === TradeType.EXACT_INPUT ? amountSpecified : amountWithSlippage;
+): PreparedApproval | null => {
+  const amountInToApprove = tradeType === TradeType.EXACT_INPUT ? userSpecifiedAmount : quotedAmountWithSlippage;
+  if (!isERC20Amount(amountInToApprove)) {
+    return null;
+  }
 
-  const spender = secondaryFees.length === 0
-    ? contracts.routerAddress
-    : contracts.secondaryFeeAddress;
+  const spender = secondaryFees.length === 0 ? contracts.routerAddress : contracts.secondaryFeeAddress;
 
-  return { spender, amount: amountOfTokenIn };
+  return { spender, amount: amountInToApprove };
 };
 
 /**
@@ -114,17 +113,12 @@ export const prepareApproval = (
 export const getApproveTransaction = async (
   provider: JsonRpcProvider,
   ownerAddress: string,
-  tokenAmount: Amount<ERC20>,
+  tokenAmount: CoinAmount<ERC20>,
   spenderAddress: string,
 ): Promise<TransactionRequest | null> => {
-  let amountToApprove: Amount<ERC20>;
+  let amountToApprove: CoinAmount<ERC20>;
   try {
-    amountToApprove = await getERC20AmountToApprove(
-      provider,
-      ownerAddress,
-      tokenAmount,
-      spenderAddress,
-    );
+    amountToApprove = await getERC20AmountToApprove(provider, ownerAddress, tokenAmount, spenderAddress);
   } catch (e) {
     if (e instanceof AlreadyApprovedError) {
       // already approved for the required amount, nothing to do
@@ -134,11 +128,7 @@ export const getApproveTransaction = async (
     throw e;
   }
 
-  return getUnsignedERC20ApproveTransaction(
-    ownerAddress,
-    amountToApprove,
-    spenderAddress,
-  );
+  return getUnsignedERC20ApproveTransaction(ownerAddress, amountToApprove, spenderAddress);
 };
 
 export async function getApproveGasEstimate(
@@ -157,8 +147,7 @@ export const getApproval = async (
   provider: JsonRpcProvider,
   ownerAddress: string,
   preparedApproval: PreparedApproval,
-  gasPrice: Amount<Native> | null,
-  nativeTokenService: NativeTokenService,
+  gasPrice: CoinAmount<Coin> | null,
 ): Promise<TransactionDetails | null> => {
   const approveTransaction = await getApproveTransaction(
     provider,
@@ -182,7 +171,6 @@ export const getApproval = async (
 
   return {
     transaction: approveTransaction,
-    // TODO: TP-1649: Remove the wrapping here
-    gasFeeEstimate: gasFeeEstimate ? nativeTokenService.maybeWrapAmount(gasFeeEstimate) : null,
+    gasFeeEstimate: gasFeeEstimate ? toPublicAmount(gasFeeEstimate) : null,
   };
 };

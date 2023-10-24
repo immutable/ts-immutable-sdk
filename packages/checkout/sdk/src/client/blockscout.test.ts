@@ -25,7 +25,7 @@ describe('Blockscout', () => {
       });
     });
     it('not supported', () => {
-      expect(Blockscout.isChainSupported(ChainId.SEPOLIA)).toBe(false);
+      expect(Blockscout.isChainSupported('aaa' as unknown as ChainId)).toBe(false);
     });
   });
 

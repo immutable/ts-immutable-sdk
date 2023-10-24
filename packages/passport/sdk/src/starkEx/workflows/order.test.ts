@@ -21,9 +21,9 @@ describe('order', () => {
   };
 
   describe('createOrder', () => {
-    let getSignableCreateOrderMock: jest.Mock;
-    let createOrderMock: jest.Mock;
-    let ordersApiMock: OrdersApi;
+    let mockGetSignableCreateOrder: jest.Mock;
+    let mockCreateOrder: jest.Mock;
+    let mockOrdersApi: OrdersApi;
 
     const buy = { type: 'ETH', amount: '2' } as ETHAmount;
     const sell = { type: 'ERC721', tokenId: '123', tokenAddress: '0x9999' };
@@ -35,11 +35,11 @@ describe('order', () => {
     };
 
     beforeEach(() => {
-      getSignableCreateOrderMock = jest.fn();
-      createOrderMock = jest.fn();
-      ordersApiMock = {
-        getSignableOrder: getSignableCreateOrderMock,
-        createOrderV3: createOrderMock,
+      mockGetSignableCreateOrder = jest.fn();
+      mockCreateOrder = jest.fn();
+      mockOrdersApi = {
+        getSignableOrder: mockGetSignableCreateOrder,
+        createOrderV3: mockCreateOrder,
       } as unknown as OrdersApi;
     });
 
@@ -108,28 +108,26 @@ describe('order', () => {
         order_id: 123,
       };
 
-      getSignableCreateOrderMock.mockResolvedValue(mockSignableOrderResponse);
+      mockGetSignableCreateOrder.mockResolvedValue(mockSignableOrderResponse);
       mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
-      createOrderMock.mockResolvedValue({
+      mockCreateOrder.mockResolvedValue({
         data: mockReturnValue,
       });
 
       const result = await createOrder({
-        ordersApi: ordersApiMock,
+        ordersApi: mockOrdersApi,
         starkSigner: mockStarkSigner,
         user: mockUserImx,
         request: orderRequest as UnsignedOrderRequest,
         guardianClient: mockGuardianClient,
       });
 
-      expect(getSignableCreateOrderMock).toBeCalledWith(
-        mockSignableOrderRequest,
-        mockHeader,
-      );
+      expect(mockGetSignableCreateOrder).toBeCalledWith(mockSignableOrderRequest, mockHeader);
       expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
-      expect(mockGuardianClient.validate).toBeCalledWith({ payloadHash: mockSignableOrderResponse.data.payload_hash });
+      expect(mockGuardianClient.evaluateImxTransaction)
+        .toBeCalledWith({ payloadHash: mockSignableOrderResponse.data.payload_hash, user: mockUserImx });
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
-      expect(createOrderMock).toBeCalledWith(
+      expect(mockCreateOrder).toBeCalledWith(
         mockCreateOrderRequest,
         mockHeader,
       );
@@ -137,10 +135,10 @@ describe('order', () => {
     });
 
     it('should return error if failed to call public api', async () => {
-      getSignableCreateOrderMock.mockRejectedValue(new Error(mockErrorMessage));
+      mockGetSignableCreateOrder.mockRejectedValue(new Error(mockErrorMessage));
 
       await expect(() => createOrder({
-        ordersApi: ordersApiMock,
+        ordersApi: mockOrdersApi,
         starkSigner: mockStarkSigner,
         user: mockUserImx,
         request: orderRequest as UnsignedOrderRequest,
@@ -154,7 +152,7 @@ describe('order', () => {
     });
 
     it('should return error if transfer is rejected by user', async () => {
-      getSignableCreateOrderMock.mockRejectedValue(new Error(mockErrorMessage));
+      mockGetSignableCreateOrder.mockRejectedValue(new Error(mockErrorMessage));
       const mockSignableOrderResponse = {
         data: {
           payload_hash: '123123',
@@ -172,12 +170,13 @@ describe('order', () => {
         },
       };
 
-      getSignableCreateOrderMock.mockResolvedValue(mockSignableOrderResponse);
+      mockGetSignableCreateOrder.mockResolvedValue(mockSignableOrderResponse);
       mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
+      (mockGuardianClient.evaluateImxTransaction as jest.Mock)
+        .mockRejectedValue(new Error('Transaction rejected by user'));
 
-      (mockGuardianClient.validate as jest.Mock).mockRejectedValue(new Error('Transaction rejected by user'));
       await expect(() => createOrder({
-        ordersApi: ordersApiMock,
+        ordersApi: mockOrdersApi,
         starkSigner: mockStarkSigner,
         user: mockUserImx,
         request: orderRequest as UnsignedOrderRequest,
@@ -187,25 +186,26 @@ describe('order', () => {
         PassportErrorType.CREATE_ORDER_ERROR,
       ));
       expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
-      expect(mockGuardianClient.validate).toBeCalledWith({ payloadHash: mockSignableOrderResponse.data.payload_hash });
+      expect(mockGuardianClient.evaluateImxTransaction)
+        .toBeCalledWith({ payloadHash: mockSignableOrderResponse.data.payload_hash, user: mockUserImx });
     });
   });
 
   describe('cancelOrder', () => {
-    let getSignableCancelOrderMock: jest.Mock;
-    let cancelOrderMock: jest.Mock;
-    let ordersApiMock: OrdersApi;
+    let mockGetSignableCancelOrder: jest.Mock;
+    let mockCancelOrder: jest.Mock;
+    let mockOrdersApi: OrdersApi;
     const orderId = 54321;
     const cancelOrderRequest = {
       order_id: orderId,
     };
 
     beforeEach(() => {
-      getSignableCancelOrderMock = jest.fn();
-      cancelOrderMock = jest.fn();
-      ordersApiMock = {
-        getSignableCancelOrderV3: getSignableCancelOrderMock,
-        cancelOrderV3: cancelOrderMock,
+      mockGetSignableCancelOrder = jest.fn();
+      mockCancelOrder = jest.fn();
+      mockOrdersApi = {
+        getSignableCancelOrderV3: mockGetSignableCancelOrder,
+        cancelOrderV3: mockCancelOrder,
       } as unknown as OrdersApi;
     });
 
@@ -243,30 +243,31 @@ describe('order', () => {
         status: 'success',
       };
 
-      getSignableCancelOrderMock.mockResolvedValue(
+      mockGetSignableCancelOrder.mockResolvedValue(
         mockSignableCancelOrderResponse,
       );
       mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
-      cancelOrderMock.mockResolvedValue({
+      mockCancelOrder.mockResolvedValue({
         data: mockReturnValue,
       });
 
       const result = await cancelOrder({
-        ordersApi: ordersApiMock,
+        ordersApi: mockOrdersApi,
         starkSigner: mockStarkSigner,
         user: mockUserImx,
         request: cancelOrderRequest,
         guardianClient: mockGuardianClient,
       });
 
-      expect(getSignableCancelOrderMock).toBeCalledWith(
+      expect(mockGetSignableCancelOrder).toBeCalledWith(
         mockSignableCancelOrderRequest,
         mockHeader,
       );
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
       expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
-      expect(mockGuardianClient.validate).toBeCalledWith({ payloadHash: mockPayloadHash });
-      expect(cancelOrderMock).toBeCalledWith(
+      expect(mockGuardianClient.evaluateImxTransaction)
+        .toBeCalledWith({ payloadHash: mockPayloadHash, user: mockUserImx });
+      expect(mockCancelOrder).toBeCalledWith(
         mockCancelOrderRequest,
         mockHeader,
       );
@@ -280,14 +281,13 @@ describe('order', () => {
         },
       };
 
-      getSignableCancelOrderMock.mockResolvedValue(
-        mockSignableCancelOrderResponse,
-      );
+      mockGetSignableCancelOrder.mockResolvedValue(mockSignableCancelOrderResponse);
       mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
-      (mockGuardianClient.validate as jest.Mock).mockRejectedValue(new Error('Transaction rejected by user'));
+      (mockGuardianClient.evaluateImxTransaction as jest.Mock)
+        .mockRejectedValue(new Error('Transaction rejected by user'));
 
       await expect(() => cancelOrder({
-        ordersApi: ordersApiMock,
+        ordersApi: mockOrdersApi,
         starkSigner: mockStarkSigner,
         user: mockUserImx,
         request: cancelOrderRequest,
@@ -299,10 +299,10 @@ describe('order', () => {
     });
 
     it('should return error if failed to call public api', async () => {
-      getSignableCancelOrderMock.mockRejectedValue(new Error(mockErrorMessage));
+      mockGetSignableCancelOrder.mockRejectedValue(new Error(mockErrorMessage));
 
       await expect(() => cancelOrder({
-        ordersApi: ordersApiMock,
+        ordersApi: mockOrdersApi,
         starkSigner: mockStarkSigner,
         user: mockUserImx,
         request: cancelOrderRequest,

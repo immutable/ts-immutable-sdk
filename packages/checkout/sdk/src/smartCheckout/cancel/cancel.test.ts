@@ -28,11 +28,13 @@ describe('cancel', () => {
       config = new CheckoutConfiguration({
         baseConfig: { environment: Environment.SANDBOX },
       });
+
+      jest.spyOn(console, 'debug').mockImplementation(() => {});
     });
 
     it('should sign the cancel transaction', async () => {
       const orderId = '1';
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         getListing: jest.fn().mockResolvedValue({
           result: {
             accountAddress: '0x123',
@@ -69,7 +71,7 @@ describe('cancel', () => {
 
     it('should return failed status when transaction reverts', async () => {
       const orderId = '1';
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         getListing: jest.fn().mockResolvedValue({
           result: {
             accountAddress: '0x123',
@@ -110,7 +112,7 @@ describe('cancel', () => {
 
     it('should throw error when sign rejects', async () => {
       const orderId = '1';
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         getListing: jest.fn().mockResolvedValue({
           result: {
             accountAddress: '0x123',
@@ -144,7 +146,7 @@ describe('cancel', () => {
     it('should handle errors from orderbook', async () => {
       const orderId = '1';
 
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         cancelOrder: jest.fn().mockRejectedValue(
           new CheckoutError(
             'An error occurred while cancelling the order listing',
