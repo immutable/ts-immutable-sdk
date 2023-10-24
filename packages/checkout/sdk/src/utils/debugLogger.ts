@@ -5,14 +5,14 @@ export const debugLogger = (config: CheckoutConfiguration, debugString: string, 
   if (!config.isProduction) console.debug(debugString, seconds);
 };
 
-export const measureAsyncExecution = async <T> (
+export const measureAsyncExecution = async <T>(
   config: CheckoutConfiguration,
   debugString: string,
   promise: Promise<T>,
 ): Promise<T> => {
-  const startTime = new Date().getTime();
+  const startTime = performance.now();
   const result = await promise;
-  const endTime = new Date().getTime();
+  const endTime = performance.now();
   const elapsedTimeInSeconds = (endTime - startTime) / 1000;
   debugLogger(config, debugString, elapsedTimeInSeconds);
   return result;
