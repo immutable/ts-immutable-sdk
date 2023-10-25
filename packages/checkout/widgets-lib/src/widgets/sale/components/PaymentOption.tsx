@@ -29,7 +29,10 @@ export function PaymentOption(props: PaymentOptionProps) {
       size="medium"
       emphasized
       onClick={disabled ? undefined : handleClick}
-      sx={{ marginBottom: 'base.spacing.x1' }}
+      sx={{
+        ...(disabled && { opacity: '0.5', cursor: 'not-allowed' }),
+        marginBottom: 'base.spacing.x1',
+      }}
       disabled={disabled}
     >
       <MenuItem.FramedIcon icon={icon[type]} />
