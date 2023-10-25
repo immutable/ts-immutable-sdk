@@ -24,7 +24,7 @@ export const MainPage = () => {
   useEffect(() => {
     connectWidget.on(ConnectEventType.CLOSE_WIDGET, () => connectWidget.unmount());
     connectWidget.on(ConnectEventType.SUCCESS, (data: any) => {
-      setWeb3Provider(data)
+      setWeb3Provider(data.provider)
     });
     }, [connectWidget])
 
