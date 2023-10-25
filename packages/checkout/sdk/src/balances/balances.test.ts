@@ -7,6 +7,7 @@ import {
   getBalance,
   getBalances,
   getERC20Balance,
+  resetBlockscoutClientMap,
 } from './balances';
 import {
   BLOCKSCOUT_CHAIN_URL_MAP,
@@ -59,6 +60,10 @@ describe('balances', () => {
     getBalance: mockGetBalance,
     getNetwork: mockGetNetwork,
   } as unknown as Web3Provider));
+
+  beforeEach(() => {
+    jest.spyOn(console, 'debug').mockImplementation(() => {});
+  });
 
   describe('getBalance()', () => {
     it('should call getBalance() on provider and return the balance', async () => {
@@ -218,6 +223,8 @@ describe('balances', () => {
 
     beforeEach(() => {
       jest.restoreAllMocks();
+      resetBlockscoutClientMap();
+      jest.spyOn(console, 'debug').mockImplementation(() => {});
       getTokenAllowListMock = jest.fn().mockReturnValue({
         tokens: [
           {
@@ -565,7 +572,7 @@ describe('balances', () => {
       expect(getAllBalancesResult.balances).toEqual([]);
     });
 
-    const testcases = [{
+    const testCases = [{
       errorMessage: 'test',
       expectedErrorMessage: 'test',
     },
@@ -578,14 +585,15 @@ describe('balances', () => {
       expectedErrorMessage: 'InternalServerError | getTokensByWalletAddress',
     }];
 
-    testcases.forEach((testcase) => {
+    testCases.forEach(async (testCase) => {
       it('should call getIndexerBalance and throw error', async () => {
         getTokensByWalletAddressMock = jest.fn().mockRejectedValue(
-          { code: HttpStatusCode.Forbidden, message: testcase.errorMessage },
+          { code: HttpStatusCode.Forbidden, message: testCase.errorMessage },
         );
 
         (Blockscout as unknown as jest.Mock).mockReturnValue({
           getTokensByWalletAddress: getTokensByWalletAddressMock,
+          getNativeTokenByWalletAddress: getNativeTokenByWalletAddressMock,
         });
 
         const chainId = Object.keys(BLOCKSCOUT_CHAIN_URL_MAP)[0] as unknown as ChainId;
@@ -614,11 +622,11 @@ describe('balances', () => {
 
         expect(getTokensByWalletAddressMock).toHaveBeenCalledTimes(1);
 
-        expect(message).toEqual(testcase.expectedErrorMessage);
+        expect(message).toEqual(testCase.expectedErrorMessage);
         expect(type).toEqual(CheckoutErrorType.GET_INDEXER_BALANCE_ERROR);
         expect(data).toEqual({
           code: HttpStatusCode.Forbidden,
-          message: testcase.errorMessage,
+          message: testCase.errorMessage,
         });
       });
     });
