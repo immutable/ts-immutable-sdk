@@ -249,6 +249,7 @@ export default class GuardianClient {
     if (confirmationRequired && !!messageId) {
       const confirmationResult = await this.confirmationScreen.requestMessageConfirmation(
         messageId,
+        user.zkEvm.ethAddress,
       );
 
       if (!confirmationResult.confirmed) {
