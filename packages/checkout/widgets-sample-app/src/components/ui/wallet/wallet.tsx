@@ -1,44 +1,31 @@
-import { useEffect } from 'react';
-
-import { Environment } from '@imtbl/config';
-import { IMTBLWidgetEvents, WalletEventType, WalletNetworkSwitchEvent, WalletProviderName } from '@imtbl/checkout-sdk';
+import { useEffect, useMemo } from 'react';
+import { Checkout, WalletEventType, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
+import { WidgetsFactory } from '@imtbl/checkout-widgets';
 
 function WalletUI() {
+  const checkout = useMemo(() => new Checkout(), [])
+  const wallet = useMemo(() => new WidgetsFactory(checkout, {}).create(WidgetType.WALLET, {}), [checkout])  
 
-
+  const unmount = () => {wallet.unmount()}
+  const mount = () => {wallet.mount('wallet')}
+  const update = (theme: WidgetTheme) => {wallet.update({config: {theme}})}
+  const destroy = () => {wallet.destroy()}
+  
   useEffect(() => {
-    const handleWalletWidgetEvents = ((event: CustomEvent) => {
-      console.log(event);
-      switch (event.detail.type) {
-        case WalletEventType.CLOSE_WIDGET: {
-          const eventData = event.detail.data as any;
-          console.log(eventData);
-          break;
-        }
-        case WalletEventType.NETWORK_SWITCH: {
-          const eventData = event.detail.data as WalletNetworkSwitchEvent;
-          console.log(eventData.network);
-          break;
-        }
-        default:
-          console.log('did not match any expected event type');
-      }
-    }) as EventListener;
-    window.addEventListener(
-      IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
-      handleWalletWidgetEvents
-    );
-    return () => {
-      window.removeEventListener(
-        IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
-        handleWalletWidgetEvents
-      );
-    };
+    mount()
+    wallet.on(WalletEventType.NETWORK_SWITCH, (data) => {console.log('NETWORK_SWITCH', data)})
+    wallet.on(WalletEventType.CLOSE_WIDGET, () => {destroy()})
   }, []);
+
   return (
     <div>
       <h1 className="sample-heading">Checkout Wallet</h1>
       <div id="wallet"></div>
+      <button onClick={unmount}>Unmount</button>
+      <button onClick={mount}>Mount</button>
+      <button onClick={() => update(WidgetTheme.LIGHT)}>Light theme</button>
+      <button onClick={() => update(WidgetTheme.DARK)}>Dark theme</button>
+      <button onClick={destroy}>Destroy</button>
     </div>
   );
 }
