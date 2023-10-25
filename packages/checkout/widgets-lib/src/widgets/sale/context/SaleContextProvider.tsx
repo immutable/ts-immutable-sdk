@@ -57,7 +57,7 @@ type SaleContextValues = SaleContextProps & {
   executeResponse: ExecuteOrderResponse | undefined;
   isPassportWallet: boolean;
   paymentMethod: PaymentTypes | undefined;
-  setPaymentMethod: (paymentMethod: PaymentTypes) => void;
+  setPaymentMethod: (paymentMethod: PaymentTypes | undefined) => void;
   goBackToPaymentMethods: (paymentMethod?: PaymentTypes | undefined) => void;
   goToErrorView: (type: SaleErrorTypes, data?: Record<string, unknown>) => void;
   goToSuccessView: () => void;
@@ -279,7 +279,18 @@ export function SaleContextProvider(props: {
         case RoutingOutcomeType.NO_ROUTE_OPTIONS:
         default:
           setFundingRoutes([]);
-          goToErrorView(SaleErrorTypes.SMART_CHECKOUT_NO_ROUTES_FOUND);
+          setPaymentMethod(undefined);
+          viewDispatch({
+            payload: {
+              type: ViewActions.UPDATE_VIEW,
+              view: {
+                type: SaleWidgetViews.PAYMENT_METHODS,
+                data: {
+                  showInsufficientCoinsBanner: true,
+                },
+              },
+            },
+          });
           break;
       }
     }

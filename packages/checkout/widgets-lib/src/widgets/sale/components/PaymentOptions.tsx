@@ -5,8 +5,8 @@ import { PaymentOption } from './PaymentOption';
 import { PaymentTypes } from '../types';
 
 const defaultPaymentOptions: PaymentTypes[] = [
-  PaymentTypes.CRYPTO,
   PaymentTypes.FIAT,
+  PaymentTypes.CRYPTO,
 ];
 
 export interface PaymentOptionsProps {
@@ -16,9 +16,6 @@ export interface PaymentOptionsProps {
 
 export function PaymentOptions(props: PaymentOptionsProps) {
   const { disabledOptions = [], onClick } = props;
-  const options = defaultPaymentOptions.filter(
-    (option) => !disabledOptions?.includes(option),
-  );
 
   return (
     <Box
@@ -31,9 +28,13 @@ export function PaymentOptions(props: PaymentOptionsProps) {
         alignItems: 'flex-start',
       }}
     >
-      {/* TODO: based on Smart Checkout result pass disabled={true/false} for Coins option */}
-      {options.map((type) => (
-        <PaymentOption onClick={onClick} type={type} key={type} />
+      {defaultPaymentOptions.map((type) => (
+        <PaymentOption
+          disabled={disabledOptions.includes(type)}
+          onClick={onClick}
+          type={type}
+          key={type}
+        />
       ))}
     </Box>
   );
