@@ -27,16 +27,15 @@ function ImxWorkflow() {
   }, [addMessage, imxProvider]);
 
   const registerUser = async () => {
-    const result = await imxProvider?.registerOffchain();
-    // try {
-    //  setIsLoading(true);
-    //  const result = await imxProvider?.registerOffchain();
-    //  addMessage('Register off chain', result);
-    // } catch (err) {
-    //  addMessage('Error egistering off chain', err);
-    // } finally {
-    //  setIsLoading(false);
-    // }
+    try {
+      setIsLoading(true);
+      const result = await imxProvider?.registerOffchain();
+      addMessage('Register off chain', result);
+    } catch (err) {
+      addMessage('Error egistering off chain', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleBulkTransfer = () => {

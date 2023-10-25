@@ -254,13 +254,6 @@ export class PassportImxProvider implements IMXProvider {
 
   async getAddress(): Promise<string> {
     const { user } = await this.getAuthenticatedUserSigner();
-    if (!user.imx.ethAddress) {
-      throw new PassportError(
-        'User has not been registered',
-        PassportErrorType.USER_NOT_REGISTERED_ERROR,
-      );
-    }
-
     return Promise.resolve(user.imx.ethAddress);
   }
 }
