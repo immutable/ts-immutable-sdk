@@ -17,31 +17,32 @@ const defaultPlugin = [
   typescript()
 ]
 
-export default [{
-  watch: true,
-  input: 'src/index.ts',
-  output: {
-    dir: 'dist',
-    format: 'es'
+export default [
+  {
+    watch: true,
+    input: 'src/index.ts',
+    output: {
+      dir: 'dist',
+      format: 'es'
+    },
+    plugins: [ ...defaultPlugin ]
   },
-  plugins: [ ...defaultPlugin ]
-},
-{
-  watch: false,
-  input: 'src/index.ts',
-  output: {
-    file: 'dist/browser.js',
-    format: 'umd',
-    name: 'ImmutableCheckout'
-  },
-  context: 'window',
-  plugins: [
-    json(),
-    nodeResolve({ browser: true }),
-    commonjs(),
-    nodePolyfills(),
-    terser(),
-    ...defaultPlugin,
-  ],
-}
+  {
+    watch: false,
+    input: 'src/index.ts',
+    output: {
+      file: 'dist/browser.js',
+      format: 'umd',
+      name: 'ImmutableCheckout'
+    },
+    context: 'window',
+    plugins: [
+      json(),
+      nodeResolve({ browser: true }),
+      commonjs(),
+      nodePolyfills(),
+      terser(),
+      ...defaultPlugin,
+    ],
+  }
 ]
