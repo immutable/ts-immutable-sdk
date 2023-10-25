@@ -7,7 +7,7 @@ import { ConfirmationScreen } from './confirmation';
 import { Passport } from './Passport';
 import { PassportImxProvider, PassportImxProviderFactory } from './starkEx';
 import { Networks, OidcConfiguration } from './types';
-import { mockUser, mockLinkedAddresses } from './test/mocks';
+import { mockUser, mockLinkedAddresses, mockUserImx } from './test/mocks';
 
 jest.mock('./authManager');
 jest.mock('./magicAdapter');
@@ -250,9 +250,15 @@ describe('Passport', () => {
 
   describe('signIn', () => {
     it('should execute signIn', async () => {
-      await passport.signIn();
+      authLoginMock.mockReturnValue(mockUserImx);
+      const user = await passport.signIn();
 
       expect(authLoginMock).toBeCalledTimes(1);
+      expect(user).toEqual({
+        idToken: user.idToken,
+        accessToken: user.accessToken,
+        profile: user.profile,
+      });
     });
   });
 });

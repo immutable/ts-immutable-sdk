@@ -12,7 +12,7 @@ import {
   PassportEventMap,
   PassportEvents,
   PassportModuleConfiguration,
-  User,
+  PassportUser,
   UserProfile,
 } from './types';
 import { ConfirmationScreen } from './confirmation';
@@ -58,8 +58,13 @@ export class Passport {
     });
   }
 
-  public async signIn(): Promise<User> {
-    return this.authManager.login();
+  public async signIn(): Promise<PassportUser> {
+    const user = await this.authManager.login();
+    return {
+      idToken: user.idToken,
+      accessToken: user.accessToken,
+      profile: user.profile,
+    };
   }
 
   public async connectImxSilent(): Promise<IMXProvider | null> {
