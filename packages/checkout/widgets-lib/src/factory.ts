@@ -6,7 +6,7 @@ import {
   ConnectWidgetParams,
   BridgeWidgetParams,
   WidgetType,
-  WidgetConfigurations,
+  WidgetConfiguration,
   IWidgetsFactory,
   WidgetParameters,
 } from '@imtbl/checkout-sdk';
@@ -16,9 +16,9 @@ import { Connect } from 'widgets/connect/ConnectWidgetRoot';
 export class WidgetsFactory implements IWidgetsFactory {
   private sdk: Checkout;
 
-  private widgetConfig: WidgetConfigurations;
+  private widgetConfig: WidgetConfiguration;
 
-  constructor(sdk: Checkout, widgetConfig: WidgetConfigurations) {
+  constructor(sdk: Checkout, widgetConfig: WidgetConfiguration) {
     this.sdk = sdk;
     this.widgetConfig = widgetConfig;
   }
@@ -32,8 +32,7 @@ export class WidgetsFactory implements IWidgetsFactory {
         }) as Widget<WidgetType.CONNECT> as Widget<T>;
       }
       case WidgetType.BRIDGE: {
-        // @ts-ignore
-        return new Bridge<WidgetType.BRIDGE>(this.sdk, {
+        return new Bridge(this.sdk, {
           config: this.widgetConfig,
           params,
         }) as Widget<WidgetType.BRIDGE> as Widget<T>;

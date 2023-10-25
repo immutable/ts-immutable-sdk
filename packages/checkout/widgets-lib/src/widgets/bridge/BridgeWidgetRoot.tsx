@@ -1,8 +1,12 @@
 import React from 'react';
 import {
+  BridgeWidgetParams,
   ConnectTargetLayer,
   IMTBLWidgetEvents,
   WalletProviderName,
+  WidgetConfiguration,
+  WidgetProperties,
+  WidgetTheme,
   WidgetType,
 } from '@imtbl/checkout-sdk';
 import { Base } from 'widgets/BaseWidgetRoot';
@@ -12,12 +16,50 @@ import { isPassportProvider } from 'lib/providerUtils';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
 import { BiomeCombinedProviders } from '@biom3/react';
 import { widgetTheme } from 'lib/theme';
+import { isValidWalletProvider, isValidAmount, isValidAddress } from 'lib/validations/widgetValidators';
 import { BridgeComingSoon } from './views/BridgeComingSoon';
 import { sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
 import { BridgeWidget } from './BridgeWidget';
 
 export class Bridge extends Base<WidgetType.BRIDGE> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT;
+
+  protected validate({ params, config }: WidgetProperties<WidgetType.BRIDGE>): WidgetProperties<WidgetType.BRIDGE> {
+    let validatedParams: BridgeWidgetParams | undefined;
+    let validatedConfig: WidgetConfiguration | undefined;
+
+    if (params) {
+      validatedParams = params;
+      if (!isValidWalletProvider(params.walletProvider)) {
+        // eslint-disable-next-line no-console
+        console.warn('[IMTBL]: invalid "walletProvider" widget input');
+        validatedParams.walletProvider = undefined;
+      }
+
+      if (!isValidAmount(params.amount)) {
+        // eslint-disable-next-line no-console
+        console.warn('[IMTBL]: invalid "amount" widget input');
+        validatedParams.amount = '';
+      }
+
+      if (!isValidAddress(params.fromContractAddress)) {
+        // eslint-disable-next-line no-console
+        console.warn('[IMTBL]: invalid "fromContractAddress" widget input');
+        validatedParams.fromContractAddress = '';
+      }
+    }
+
+    if (config) {
+      validatedConfig = config;
+      if (config.theme === WidgetTheme.LIGHT) validatedConfig.theme = WidgetTheme.LIGHT;
+      else validatedConfig.theme = WidgetTheme.DARK;
+    }
+
+    return {
+      params: validatedParams,
+      config: validatedConfig,
+    };
+  }
 
   protected render() {
     this.validate(this.properties);

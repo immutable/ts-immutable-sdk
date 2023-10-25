@@ -56,10 +56,11 @@ export type BridgeWidgetInputs = BridgeWidgetParams & {
   config: StrongCheckoutWidgetsConfig
 };
 
-export function BridgeWidget(props: BridgeWidgetInputs) {
-  const {
-    amount, fromContractAddress, config,
-  } = props;
+export function BridgeWidget({
+  amount,
+  fromContractAddress,
+  config,
+}: BridgeWidgetInputs) {
   const { environment, theme } = config;
   const successText = text.views[BridgeWidgetViews.SUCCESS];
   const failText = text.views[BridgeWidgetViews.FAIL];

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Passport } from '@imtbl/passport';
 import { passportConfig } from './passportConfig';
 import {  WidgetsFactory } from '@imtbl/checkout-widgets';
-import { Checkout, ConnectEventType, OrchestrationEventType, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
+import { Checkout, ConnectEventType, ConnectionFailed, ConnectionSuccess, OrchestrationEventType, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 
 export const MainPage = () => {
@@ -19,7 +19,7 @@ export const MainPage = () => {
   const widgetsFactory = useMemo(() => new WidgetsFactory(checkout, {theme: WidgetTheme.DARK}), [checkout]);
 
   const connectWidget = useMemo(() => widgetsFactory.create(WidgetType.CONNECT, {passport}), [widgetsFactory]);
-  const bridgeWidget = useMemo(() => widgetsFactory.create(WidgetType.BRIDGE, {}), [widgetsFactory]);
+  const bridgeWidget = useMemo(() => widgetsFactory.create(WidgetType.BRIDGE, {passport}), [widgetsFactory]);
 
   useEffect(() => {
     connectWidget.on(ConnectEventType.CLOSE_WIDGET, () => connectWidget.unmount());
