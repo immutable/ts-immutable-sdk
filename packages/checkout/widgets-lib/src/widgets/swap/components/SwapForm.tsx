@@ -717,11 +717,11 @@ export function SwapForm({ data }: SwapFromProps) {
             },
           });
         }}
-        onCloseBottomSheet={() => setShowNotEnoughImxDrawer(false)}
+        onCloseDrawer={() => setShowNotEnoughImxDrawer(false)}
       />
       <UnableToSwap
         visible={showUnableToSwapDrawer}
-        onCloseBottomSheet={() => {
+        onCloseDrawer={() => {
           setShowUnableToSwapDrawer(false);
           setFromToken(undefined);
           setFromAmount('');
