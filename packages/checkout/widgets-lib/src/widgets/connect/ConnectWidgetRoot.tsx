@@ -7,7 +7,7 @@ import { Base } from '../BaseWidgetRoot';
 export class Connect extends Base<WidgetType.CONNECT> {
   protected eventTopic: string = 'imtbl-connect-widget';
 
-  protected rerender() {
+  protected render() {
     if (!this.reactRoot) return;
 
     this.reactRoot.render(

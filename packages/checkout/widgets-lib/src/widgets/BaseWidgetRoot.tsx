@@ -76,7 +76,7 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
       this.reactRoot = createRoot(this.widgetElement);
     }
 
-    this.rerender();
+    this.render();
   }
 
   update(params: WidgetProperties<T>): void {
@@ -93,7 +93,7 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
       },
     };
 
-    this.rerender();
+    this.render();
   }
 
   on(type: WidgetEventTypes[T], callback: (data: any) => void): void {
@@ -126,8 +126,8 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
     window.addEventListener(this.eventTopic, this.eventHandlersFunction);
   }
 
-  protected rerender(): void {
-    console.warn(this.eventTopic, 'missing rerender');
+  protected render(): void {
+    console.warn(this.eventTopic, 'missing render');
   }
 
   protected strongConfig(): StrongCheckoutWidgetsConfig {
