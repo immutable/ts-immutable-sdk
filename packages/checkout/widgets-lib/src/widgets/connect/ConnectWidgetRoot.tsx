@@ -1,11 +1,11 @@
 import React from 'react';
-import { WidgetType } from '@imtbl/checkout-sdk';
+import { IMTBLWidgetEvents, WidgetType } from '@imtbl/checkout-sdk';
 import { ConnectWidget } from './ConnectWidget';
 import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 import { Base } from '../BaseWidgetRoot';
 
 export class Connect extends Base<WidgetType.CONNECT> {
-  protected eventTopic: string = 'imtbl-connect-widget';
+  protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT;
 
   protected render() {
     if (!this.reactRoot) return;

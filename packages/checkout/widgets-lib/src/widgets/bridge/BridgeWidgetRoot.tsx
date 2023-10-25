@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import {
   ConnectTargetLayer,
+  IMTBLWidgetEvents,
   WalletProviderName,
   WidgetType,
 } from '@imtbl/checkout-sdk';
@@ -16,7 +17,7 @@ import { sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
 import { BridgeWidget } from './BridgeWidget';
 
 export class Bridge extends Base<WidgetType.BRIDGE> {
-  protected eventTarget: string = 'imtbl-bridge-widget';
+  protected eventTarget: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT;
 
   protected render() {
     this.validate(this.properties);
