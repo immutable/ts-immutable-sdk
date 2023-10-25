@@ -11,6 +11,7 @@ import { isValidAmount } from '../../lib/validations/widgetValidators';
 import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
 import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 import { Item } from './types';
+import { SegmentAppName } from '../../context/analytics-provider/segmentAnalyticsConfig';
 
 export class ImmutableSale extends ImmutableWebComponent {
   /**
@@ -159,7 +160,7 @@ export class ImmutableSale extends ImmutableWebComponent {
 
     this.reactRoot.render(
       <React.StrictMode>
-        <CustomAnalyticsProvider widgetConfig={this.widgetConfig!}>
+        <CustomAnalyticsProvider widgetConfig={this.widgetConfig!} appName={SegmentAppName.SALE}>
           <ConnectLoader
             widgetConfig={this.widgetConfig!}
             params={connectLoaderParams}
