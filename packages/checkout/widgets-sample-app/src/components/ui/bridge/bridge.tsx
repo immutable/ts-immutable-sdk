@@ -13,8 +13,6 @@ function BridgeUI() {
     bridge.mount(BRIDGE_TARGET_ID)
   }, [bridge])
   
-
-
   return (
     <div>
       <h1 className="sample-heading">Checkout Bridge</h1>

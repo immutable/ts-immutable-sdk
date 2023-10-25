@@ -46,14 +46,17 @@ export type ConnectWidgetInputs = ConnectWidgetParams & {
   config: StrongCheckoutWidgetsConfig
   deepLink?: ConnectWidgetViews;
   sendCloseEventOverride?: () => void;
+  targetLayer?: ConnectTargetLayer;
 };
 
-export function ConnectWidget(props: ConnectWidgetInputs) {
-  const {
-    config, sendCloseEventOverride, targetLayer, web3Provider, passport,
-  } = props;
-
-  const { deepLink = ConnectWidgetViews.CONNECT_WALLET } = props;
+export function ConnectWidget({
+  config,
+  sendCloseEventOverride,
+  web3Provider,
+  passport,
+  targetLayer,
+  deepLink = ConnectWidgetViews.CONNECT_WALLET,
+}: ConnectWidgetInputs) {
   const { environment, theme } = config;
 
   const errorText = text.views[SharedViews.ERROR_VIEW].actionText;

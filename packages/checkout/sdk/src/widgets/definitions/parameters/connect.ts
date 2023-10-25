@@ -7,7 +7,6 @@ export enum ConnectTargetLayer {
 }
 
 export type ConnectWidgetParams = {
-  targetLayer?: ConnectTargetLayer
   web3Provider?: Web3Provider;
   passport?: Passport;
 };
