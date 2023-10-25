@@ -34,7 +34,7 @@ export enum WidgetType {
 
 export type WidgetProperties<T extends WidgetType> = {
   params?: WidgetParameters[T];
-  config?: WidgetConfigurations;
+  config?: WidgetConfiguration;
 };
 
 export type WidgetParameters = {
@@ -163,6 +163,6 @@ export type CheckoutWidgetsConfig = {
  * Represents the local configuration options for the Checkout Widgets.
  * @property {WidgetTheme | undefined} theme - The theme of the Checkout Widget (default: "DARK")
  */
-export type WidgetConfigurations = {
+export type WidgetConfiguration = {
   theme?: WidgetTheme;
 };

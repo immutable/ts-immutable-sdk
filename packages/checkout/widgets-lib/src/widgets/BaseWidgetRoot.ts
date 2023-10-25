@@ -9,7 +9,7 @@ import {
   ConnectWidgetParams,
   BridgeWidgetParams,
   WalletProviderName,
-  WidgetConfigurations,
+  WidgetConfiguration,
   OrchestrationEventType,
   BridgeEventType,
   WidgetProperties,
@@ -42,10 +42,10 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
   protected eventTopic: string = '';
 
   constructor(sdk: Checkout, props: WidgetProperties<T>) {
-    this.validate(props);
+    const validatedProps = this.validate(props);
 
     this.checkout = sdk;
-    this.properties = props;
+    this.properties = validatedProps;
   }
 
   unmount() {
@@ -79,19 +79,17 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
     this.render();
   }
 
-  update(params: WidgetProperties<T>): void {
-    this.validate(params);
-
-    this.properties = {
+  update(properties: WidgetProperties<T>): void {
+    this.properties = this.validate({
       params: {
         ...(this.properties.params ?? {}),
-        ...(params.params ?? {}),
+        ...(properties.params ?? {}),
       },
       config: {
         ...(this.properties.config ?? {}),
-        ...(params.config ?? {}),
+        ...(properties.config ?? {}),
       },
-    };
+    });
 
     this.render();
   }
@@ -140,8 +138,9 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
     });
   }
 
-  protected validate(props: WidgetProperties<T>): void {
+  protected validate(props: WidgetProperties<T>): WidgetProperties<T> {
     console.warn(this.eventTopic, 'missing validations');
+    return {};
   }
 }
 
