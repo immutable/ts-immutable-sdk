@@ -15,11 +15,10 @@ const CONNECT_TARGET_ID = "connect-widget-target";
 function ConnectUI() {
   const checkout = useMemo(() => new Checkout({ baseConfig: { environment: Environment.SANDBOX } }), []);
   const factory = useMemo(() => new WidgetsFactory(checkout, {theme: WidgetTheme.DARK}), [checkout]);
-  const connect = useMemo(() => factory.create(WidgetType.CONNECT, {targetLayer: ConnectTargetLayer.LAYER2}), [factory]);
+  const connect = useMemo(() => factory.create(WidgetType.CONNECT, {}), [factory]);
   const [provider, setProvider] = useState();
   
   useEffect(() => {
-    connect.update({ config: { theme: WidgetTheme.LIGHT }})
     connect.mount(CONNECT_TARGET_ID)
     connect.on(ConnectEventType.SUCCESS,(data: any) => {
       console.log('SUCCESS')
