@@ -2,7 +2,6 @@ import { ConfirmationScreen } from 'confirmation';
 import * as guardian from '@imtbl/guardian';
 import { TransactionRequest } from '@ethersproject/providers';
 import { ImmutableConfiguration } from '@imtbl/config';
-import { UserZkEvm } from 'types';
 import GuardianClient from './guardian';
 import { mockUser, mockUserImx, mockUserZkEvm } from '../test/mocks';
 import { JsonRpcError, RpcErrorCode } from '../zkEvm/JsonRpcError';
@@ -303,7 +302,7 @@ describe('Guardian', () => {
   });
 
   describe('validateMessage', () => {
-    const mockPayload = { chainID: '0x1234', payload: {} as guardian.EIP712Message, user: { accessToken: ':(' } as UserZkEvm };
+    const mockPayload = { chainID: '0x1234', payload: {} as guardian.EIP712Message, user: mockUserZkEvm };
     it('surfaces error message if message evaluation fails', async () => {
       mockEvaluateMessage.mockRejectedValueOnce(new Error('401: Unauthorized'));
       await expect(guardianClient.validateMessage(mockPayload))
