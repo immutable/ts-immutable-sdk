@@ -178,7 +178,6 @@ function decodeSecondaryFeeCall(calldata: utils.BytesLike, functionName: Seconda
 function decodeSwapRouterCall(calldata: utils.BytesLike, functionName: SwapRouterFunctionName) {
   const iface = SwapRouter.INTERFACE;
   const topLevelParams = iface.decodeFunctionData('multicall(uint256,bytes[])', calldata);
-  console.log({ decodeSwapRouterCall: topLevelParams.data });
   const data = topLevelParams.data[0];
   if (typeof data !== 'string') throw new Error();
 

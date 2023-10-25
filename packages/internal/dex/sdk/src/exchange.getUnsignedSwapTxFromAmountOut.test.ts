@@ -3,7 +3,7 @@ import { Contract } from '@ethersproject/contracts';
 import { BigNumber } from '@ethersproject/bignumber';
 import { ethers } from 'ethers';
 import { ERC20__factory } from 'contracts/types';
-import { SwapRouter, PaymentsExtended } from '@uniswap/router-sdk'; // TODO: Use actual ABI and not SDK ABIs - they are out of date :)
+import { SwapRouter, PaymentsExtended } from '@uniswap/router-sdk';
 import { SecondaryFee } from './types';
 import { Exchange } from './exchange';
 import {
