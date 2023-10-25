@@ -21,11 +21,11 @@ function ConnectUI() {
   useEffect(() => {
     connect.update({ config: { theme: WidgetTheme.LIGHT }})
     connect.mount(CONNECT_TARGET_ID)
-    connect.on(ConnectEventType.SUCCESS,(data) => {
+    connect.on(ConnectEventType.SUCCESS,(data: any) => {
       console.log('SUCCESS')
       setProvider(data.provider);
     })
-    connect.on(ConnectEventType.CLOSE_WIDGET,(data) => {
+    connect.on(ConnectEventType.CLOSE_WIDGET,(data: any) => {
       console.log('CLOSE_WIDGET')
     })
     connect.removeListener(ConnectEventType.CLOSE_WIDGET)
