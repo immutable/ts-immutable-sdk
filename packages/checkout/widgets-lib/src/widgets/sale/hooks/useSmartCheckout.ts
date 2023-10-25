@@ -51,20 +51,15 @@ export const useSmartCheckout = ({
   );
 
   const smartCheckout = useCallback(async () => {
-    if (!checkout || !provider) {
-      return undefined;
-    }
-
-    const signer = provider.getSigner();
-    const spenderAddress = await signer?.getAddress() || '';
-
-    const itemRequirements = getItemRequirements(amount, spenderAddress, contractAddress);
-    const gasEstimate = getGasEstimate();
-
     try {
-      const res = await checkout.smartCheckout(
+      const signer = provider?.getSigner();
+      const spenderAddress = await signer?.getAddress() || '';
+
+      const itemRequirements = getItemRequirements(amount, spenderAddress, contractAddress);
+      const gasEstimate = getGasEstimate();
+      const res = await checkout?.smartCheckout(
         {
-          provider,
+          provider: provider!,
           itemRequirements,
           transactionOrGasAmount: gasEstimate,
         },

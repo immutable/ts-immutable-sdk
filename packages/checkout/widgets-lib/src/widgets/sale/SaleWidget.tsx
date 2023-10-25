@@ -1,5 +1,5 @@
 import {
-  useCallback, useContext, useEffect, useMemo, useReducer,
+  useCallback, useContext, useEffect, useMemo, useReducer, useRef,
 } from 'react';
 
 import { BiomeCombinedProviders } from '@biom3/react';
@@ -21,7 +21,7 @@ import { StatusType } from '../../components/Status/StatusType';
 import { StatusView, StatusViewProps } from '../../components/Status/StatusView';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { SaleWidgetViews } from '../../context/view-context/SaleViewContextTypes';
-import { Item, SaleErrorTypes, PaymentTypes } from './types';
+import { Item, SaleErrorTypes } from './types';
 import { widgetTheme } from '../../lib/theme';
 import { SaleContextProvider } from './context/SaleContextProvider';
 import { FundWithSmartCheckout } from './views/FundWithSmartCheckout';
@@ -79,17 +79,22 @@ export function SaleWidget(props: SaleWidgetProps) {
     || text.views[SharedViews.LOADING_VIEW].text;
 
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+
+  const mounted = useRef(false);
   const onMount = useCallback(() => {
     if (!checkout || !provider) return;
 
-    viewDispatch({
-      payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: {
-          type: SaleWidgetViews.PAYMENT_METHODS,
+    if (!mounted.current) {
+      mounted.current = true;
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SaleWidgetViews.PAYMENT_METHODS,
+          },
         },
-      },
-    });
+      });
+    }
   }, [checkout, provider]);
 
   useEffect(() => {
@@ -98,13 +103,12 @@ export function SaleWidget(props: SaleWidgetProps) {
     onMount();
   }, [checkout, provider]);
 
-  const goBackToPaymentMethods = (type?: PaymentTypes | undefined) => {
+  const goBackToPaymentMethods = () => {
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
         view: {
           type: SaleWidgetViews.PAYMENT_METHODS,
-          data: { paymentMethod: type },
         },
       },
     });
@@ -154,13 +158,6 @@ export function SaleWidget(props: SaleWidgetProps) {
       statusType: StatusType.INFORMATION,
     },
     [SaleErrorTypes.WALLET_REJECTED]: {
-      onActionClick: () => {
-        goBackToPaymentMethods(PaymentTypes.CRYPTO);
-      },
-      onSecondaryActionClick: closeWidget,
-      statusType: StatusType.INFORMATION,
-    },
-    [SaleErrorTypes.SMART_CHECKOUT_NO_ROUTES_FOUND]: {
       onActionClick: () => {
         goBackToPaymentMethods();
       },
