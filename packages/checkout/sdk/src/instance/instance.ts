@@ -67,9 +67,9 @@ export async function createExchangeInstance(
   });
 }
 
-export async function createOrderbookInstance(
+export function createOrderbookInstance(
   config: CheckoutConfiguration,
-): Promise<Orderbook> {
+): Orderbook {
   return new Orderbook({
     baseConfig: {
       environment: config.environment,

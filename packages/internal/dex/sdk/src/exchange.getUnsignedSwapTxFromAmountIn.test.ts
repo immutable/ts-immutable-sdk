@@ -6,6 +6,7 @@ import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
 import { constants, utils } from 'ethers';
 import { SecondaryFee } from 'types';
 import { Environment } from '@imtbl/config';
+import { Router, addAmount } from 'lib';
 import { IMMUTABLE_TESTNET_CHAIN_ID, TIMX_IMMUTABLE_TESTNET } from './constants';
 import { Exchange } from './exchange';
 import {
@@ -36,8 +37,8 @@ import {
   WETH_TEST_TOKEN,
   FUN_TEST_TOKEN,
   nativeTokenService,
+  TEST_FROM_ADDRESS,
 } from './test/utils';
-import { addAmount, Router } from './lib';
 
 jest.mock('@ethersproject/providers');
 jest.mock('@ethersproject/contracts');
@@ -103,6 +104,33 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   });
 
   describe('with a native token in', () => {
+    it('should include the user-specified amount as the value of the transaction', async () => {
+      mockRouterImplementation({
+        pools: [createPool(nativeTokenService.wrappedToken, FUN_TEST_TOKEN)],
+      });
+
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+
+      const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
+        TEST_FROM_ADDRESS,
+        'native',
+        FUN_TEST_TOKEN.address,
+        newAmountFromString('100', FUN_TEST_TOKEN).value,
+      );
+
+      expectToBeDefined(swap.transaction.data);
+      expectToBeDefined(swap.transaction.value);
+      const data = swap.transaction.data.toString();
+
+      const { swapParams } = decodeMulticallExactInputSingleWithoutFees(data);
+      expectInstanceOf(BigNumber, swapParams.amountIn);
+
+      expect(swapParams.tokenIn).toBe(WIMX_TEST_TOKEN.address); // should be the wrapped native token
+      expect(swapParams.tokenOut).toBe(FUN_TEST_TOKEN.address);
+      expect(swap.transaction.value).toBe('0x056bc75e2d63100000'); // should be a hex
+      expect(formatTokenAmount(swapParams.amountIn, WIMX_TEST_TOKEN)).toBe('100.0'); // amount in
+    });
+
     it('uses the wrapped token pool to get the quote', async () => {
       mockRouterImplementation({
         pools: [createPool(nativeTokenService.wrappedToken, FUN_TEST_TOKEN)],
@@ -134,7 +162,34 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
     });
   });
 
-  describe('with native token out', () => {
+  describe('with a native token out', () => {
+    it('should not include any amount as the value of the transaction', async () => {
+      mockRouterImplementation({
+        pools: [createPool(nativeTokenService.wrappedToken, FUN_TEST_TOKEN)],
+      });
+
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+
+      const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
+        TEST_FROM_ADDRESS,
+        FUN_TEST_TOKEN.address,
+        'native',
+        newAmountFromString('100', FUN_TEST_TOKEN).value,
+      );
+
+      expectToBeDefined(swap.transaction.data);
+      expectToBeDefined(swap.transaction.value);
+      const data = swap.transaction.data.toString();
+
+      const { swapParams } = decodeMulticallExactInputSingleWithoutFees(data);
+      expectInstanceOf(BigNumber, swapParams.amountIn);
+
+      expect(swapParams.tokenIn).toBe(FUN_TEST_TOKEN.address); // should be the token-in
+      expect(swapParams.tokenOut).toBe(WIMX_TEST_TOKEN.address); // should be the wrapped native token
+      expect(swap.transaction.value).toBe('0x00'); // should not have a value
+      expect(formatTokenAmount(swapParams.amountIn, WIMX_TEST_TOKEN)).toBe('100.0'); // amount in
+    });
+
     it('should unwrap the quoted amount', async () => {
       mockRouterImplementation({
         pools: [createPool(nativeTokenService.wrappedToken, FUN_TEST_TOKEN)],
@@ -500,11 +555,11 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expectToBeDefined(tx.swap.gasFeeEstimate);
 
       expect(tx.swap.gasFeeEstimate.value).toEqual(TEST_TRANSACTION_GAS_USAGE.mul(TEST_GAS_PRICE));
-      expect(tx.swap.gasFeeEstimate.token.chainId).toEqual(WIMX_TEST_TOKEN.chainId);
-      expect(tx.swap.gasFeeEstimate.token.address).toEqual(WIMX_TEST_TOKEN.address);
-      expect(tx.swap.gasFeeEstimate.token.decimals).toEqual(WIMX_TEST_TOKEN.decimals);
-      expect(tx.swap.gasFeeEstimate.token.symbol).toEqual(WIMX_TEST_TOKEN.symbol);
-      expect(tx.swap.gasFeeEstimate.token.name).toEqual(WIMX_TEST_TOKEN.name);
+      expect(tx.swap.gasFeeEstimate.token.chainId).toEqual(NATIVE_TEST_TOKEN.chainId);
+      expect(tx.swap.gasFeeEstimate.token.address).toEqual(''); // Default configuration is a native token for gas and not an ERC20
+      expect(tx.swap.gasFeeEstimate.token.decimals).toEqual(NATIVE_TEST_TOKEN.decimals);
+      expect(tx.swap.gasFeeEstimate.token.symbol).toEqual(NATIVE_TEST_TOKEN.symbol);
+      expect(tx.swap.gasFeeEstimate.token.name).toEqual(NATIVE_TEST_TOKEN.name);
     });
 
     it('returns valid quote', async () => {
