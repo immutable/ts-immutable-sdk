@@ -5,7 +5,7 @@ import {
   OrderbookModuleConfiguration,
   OrderbookOverrides,
 } from './config/config';
-import { Fee as OpenApiFee } from './openapi/sdk';
+import { CancelOrdersResult, Fee as OpenApiFee } from './openapi/sdk';
 import {
   mapFromOpenApiOrder,
   mapFromOpenApiPage,
@@ -14,6 +14,7 @@ import {
 import { Seaport } from './seaport';
 import { SeaportLibFactory } from './seaport/seaport-lib-factory';
 import {
+  ActionType,
   CancelOrderResponse,
   CreateListingParams,
   FeeType,
@@ -27,8 +28,10 @@ import {
   ListTradesParams,
   ListTradesResult,
   OrderStatusName,
+  PrepareCancelOrdersOffchainResponse,
   PrepareListingParams,
   PrepareListingResponse,
+  SignablePurpose,
   TradeResult,
 } from './types';
 
@@ -292,38 +295,118 @@ export class Orderbook {
   }
 
   /**
-   * Get an unsigned cancel order transaction. Orders can only be cancelled by
-   * the account that created them.
-   * @param {string} listingId - The listingId to cancel.
-   * @param {string} accountAddress - The address of the account cancelling the order.
-   * @return {CancelOrderResponse} The unsigned cancel order transaction
+   * Cancelling orders off-chain is gasless alternative to on-chain cancellation exposed with
+   * `cancelOrder`. For the orderbook to authenticate the cancellation, the creator of the orders
+   * must sign an EIP712 message containing the orderIds
+   * @param {string} orderIds - The orderIds to attempt to cancel.
+   * @return {PrepareCancelOrdersOffchainResponse} The signable action to cancel the orders.
    */
-  async cancelOrder(
-    listingId: string,
+  async prepareOffchainOrderCancellations(
+    orderIds: string[],
+  ): Promise<PrepareCancelOrdersOffchainResponse> {
+    const network = await this.orderbookConfig.provider.getNetwork();
+    const domain = {
+      name: 'imtbl-order-book',
+      chainId: network.chainId,
+      verifyingContract: this.orderbookConfig.seaportContractAddress,
+    };
+
+    const types = {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      CancelPayload: [
+        { name: 'orders', type: 'Order[]' },
+      ],
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      Order: [
+        { name: 'id', type: 'string' },
+      ],
+    };
+
+    const cancelMessage = {
+      orders: orderIds.map((id) => ({ id })),
+    };
+
+    return {
+      signableAction: {
+        purpose: SignablePurpose.OFF_CHAIN_CANCELLATION,
+        type: ActionType.SIGNABLE,
+        message: {
+          domain,
+          types,
+          value: cancelMessage,
+        },
+      },
+    };
+  }
+
+  /**
+   * Cancelling orders off-chain is a gasless alternative to on-chain cancellation exposed with
+   * `cancelOrders`. Orders cancelled this way cannot be fulfilled and will be removed from the
+   * orderbook. If there is pending fulfillment data outstanding for the order, its cancellation
+   * will be pending until the fulfillment window has passed. `prepareOffchainOrderCancellations`
+   * can be used to get the signable action that is signed to get the signature required for this
+   * call.
+   * @param {string[]} orderIds - The orderIds to attempt to cancel.
+   * @param {string} accountAddress - The address of the account cancelling the orders.
+   * @param {string} accountAddress - The address of the account cancelling the orders.
+   * @return {PrepareCancelOrdersOffchainResponse} The signable action to cancel the orders.
+   */
+  async cancelOrdersOffchain(
+    orderIds: string[],
+    accountAddress: string,
+    signature: string,
+  ): Promise<CancelOrdersResult> {
+    return this.apiClient.cancelOrdersOffchain(
+      orderIds,
+      accountAddress,
+      signature,
+    );
+  }
+
+  /**
+   * Get an unsigned cancel orders transaction. Orders can only be cancelled by
+   * the account that created them. All of the orders must be from the same seaport contract.
+   * If trying to cancel orders from multiple seaport contracts, group the orderIds by seaport
+   * contract and call this method for each group.
+   * @param {string[]} orderIds - The orderIds to cancel.
+   * @param {string} accountAddress - The address of the account cancelling the order.
+   * @return {CancelOrderResponse} The unsigned cancel order action
+   */
+  async cancelOrders(
+    orderIds: string[],
     accountAddress: string,
   ): Promise<CancelOrderResponse> {
-    const orderResult = await this.apiClient.getListing(listingId);
+    const orderResults = await Promise.all(orderIds.map((id) => this.apiClient.getListing(id)));
 
-    if (
-      orderResult.result.status.name !== OrderStatusName.ACTIVE
-      && orderResult.result.status.name !== OrderStatusName.INACTIVE
-      && orderResult.result.status.name !== OrderStatusName.PENDING
-    ) {
-      throw new Error(
-        `Cannot cancel order with status ${orderResult.result.status}`,
-      );
+    // eslint-disable-next-line no-restricted-syntax
+    for (const orderResult of orderResults) {
+      if (
+        orderResult.result.status.name !== OrderStatusName.ACTIVE
+        && orderResult.result.status.name !== OrderStatusName.INACTIVE
+        && orderResult.result.status.name !== OrderStatusName.PENDING
+      ) {
+        throw new Error(
+          `Cannot cancel order with status ${orderResult.result.status}`,
+        );
+      }
+
+      if (orderResult.result.account_address !== accountAddress.toLowerCase()) {
+        throw new Error(
+          `Only account ${orderResult.result.account_address} can cancel order ${orderResult.result.id}`,
+        );
+      }
     }
 
-    if (orderResult.result.account_address !== accountAddress.toLowerCase()) {
-      throw new Error(
-        `Only account ${orderResult.result.account_address} can cancel order ${listingId}`,
-      );
+    const orders = orderResults.map((orderResult) => orderResult.result);
+    const distinctSeaportVersions = new Set(...orders.map((o) => o.protocol_data.seaport_address));
+    if (distinctSeaportVersions.size !== 1) {
+      throw new Error('Cannot cancel multiple orders from different seaport contracts. Please group your orderIds accordingly');
     }
 
-    const cancelOrderTransaction = await this.seaport.cancelOrder(
-      orderResult.result,
+    const cancellationAction = await this.seaport.cancelOrders(
+      orders,
       accountAddress,
     );
-    return { unsignedCancelOrderTransaction: cancelOrderTransaction };
+    return { cancellationAction };
   }
 }

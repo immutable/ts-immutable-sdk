@@ -40,6 +40,10 @@ export interface PrepareListingResponse {
   orderHash: string;
 }
 
+export interface PrepareCancelOrdersOffchainResponse {
+  signableAction: SignableAction;
+}
+
 export interface CreateListingParams {
   orderComponents: OrderComponents;
   orderHash: string;
@@ -78,10 +82,12 @@ export interface Fee extends FeeValue {
 export enum TransactionPurpose {
   APPROVAL = 'APPROVAL',
   FULFILL_ORDER = 'FULFILL_ORDER',
+  CANCEL = 'CANCEL',
 }
 
 export enum SignablePurpose {
   CREATE_LISTING = 'CREATE_LISTING',
+  OFF_CHAIN_CANCELLATION = 'OFF_CHAIN_CANCELLATION',
 }
 
 export enum ActionType {
@@ -148,7 +154,7 @@ export interface FulfillOrderResponse {
 }
 
 export interface CancelOrderResponse {
-  unsignedCancelOrderTransaction: PopulatedTransaction;
+  cancellationAction: TransactionAction
 }
 
 export interface Order {

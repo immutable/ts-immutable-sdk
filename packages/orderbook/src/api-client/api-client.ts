@@ -6,6 +6,7 @@ import {
   OrdersService,
   ProtocolData,
   TradeResult,
+  CancelOrdersResult,
 } from 'openapi/sdk';
 import {
   CreateListingParams,
@@ -68,6 +69,21 @@ export class ImmutableApiClient {
     return this.orderbookService.listTrades({
       chainName: this.chainName,
       ...listTradesParams,
+    });
+  }
+
+  async cancelOrdersOffchain(
+    orderIds: string[],
+    accountAddress: string,
+    signature: string,
+  ): Promise<CancelOrdersResult> {
+    return this.orderbookService.cancelOrders({
+      chainName: this.chainName,
+      requestBody: {
+        account_address: accountAddress,
+        orders: orderIds,
+        signature,
+      },
     });
   }
 
