@@ -46,8 +46,6 @@ export class Wallet extends Base<WidgetType.WALLET> {
   }
 
   protected render() {
-    this.validate(this.properties);
-
     const { params } = this.properties;
 
     const connectLoaderParams: ConnectLoaderParams = {
