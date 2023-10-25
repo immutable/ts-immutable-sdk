@@ -5,21 +5,31 @@ import { AxiosRequestConfig } from 'axios';
 import { ImxConfiguration, ImxModuleConfiguration, createImmutableXConfiguration } from './config';
 
 describe('ImmutableXClient', () => {
-  it.skip('should instantiate a SANDBOX ImmutableXClient', async () => {
+  it('should instantiate a SANDBOX ImmutableXClient', async () => {
     const imtblConfig = new ImmutableConfiguration({
       environment: Environment.SANDBOX,
     });
 
-    const { assetApi } = new ImmutableXClient({
+    const client = new ImmutableXClient({
       baseConfig: imtblConfig,
     });
 
-    const assetsResponse = await assetApi.listAssets();
-
-    expect(assetsResponse.status).toEqual(200);
-    expect(assetsResponse.config.headers?.['x-sdk-version']).toContain(
-      'ts-immutable-sdk',
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    let axiosRequest: AxiosRequestConfig = {};
+    const adapter = jest.fn().mockImplementation(
+      async (request: AxiosRequestConfig) => {
+        axiosRequest = request;
+        return { status: 200 };
+      },
     );
+
+    const reqConfig : AxiosRequestConfig = {
+      adapter,
+    };
+
+    // @ts-ignore
+    await client.assetApi.listAssets({}, reqConfig);
+    expect(axiosRequest.headers?.['x-sdk-version']).toEqual('ts-immutable-sdk-__SDK_VERSION__');
   });
 
   it('should instantiate a PRODUCTION ImmutableXClient', async () => {

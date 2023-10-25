@@ -1,13 +1,12 @@
-import { CheckoutConfiguration } from '../../../config';
-import { getOrSetQuotesFromCache } from '../swap/dexQuoteCache';
-import { DexQuotes, DexQuoteCache } from '../types';
+import { CheckoutConfiguration, getL2ChainId } from '../../../config';
+import { DexQuotes } from '../types';
 import { BalanceNativeRequirement, BalanceERC20Requirement } from '../../balanceCheck/types';
 import { TokenInfo } from '../../../types';
+import { quoteFetcher } from '../swap/quoteFetcher';
 
 // Fetch all the dex quotes from the list of swappable tokens
 export const getDexQuotes = async (
   config: CheckoutConfiguration,
-  dexQuoteCache: DexQuoteCache,
   ownerAddress: string,
   requiredTokenAddress: string,
   insufficientRequirement: BalanceNativeRequirement | BalanceERC20Requirement,
@@ -19,9 +18,9 @@ export const getDexQuotes = async (
     filteredSwappableTokensAddresses.push(token.address);
   }
 
-  const dexQuotes = await getOrSetQuotesFromCache(
+  const dexQuotes = await quoteFetcher(
     config,
-    dexQuoteCache,
+    getL2ChainId(config),
     ownerAddress,
     {
       address: requiredTokenAddress as string,
