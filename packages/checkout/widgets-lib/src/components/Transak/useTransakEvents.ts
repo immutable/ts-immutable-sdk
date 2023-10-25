@@ -7,8 +7,8 @@ import { TransakEvent, TransakEvents, TransakStatuses } from './TransakEvents';
 import {
   AnalyticsControlTypes,
   UserJourney,
-  useAnalytics,
-} from '../../context/analytics-provider/SegmentAnalyticsProvider';
+} from '../../context/analytics-provider/segmentAnalyticsConfig';
+import { useAnalytics } from '../../context/analytics-provider/CustomAnalyticsProvider';
 
 const TRANSAK_ORIGIN = 'transak.com';
 const FAILED_TO_LOAD_TIMEOUT_IN_MS = 5000;

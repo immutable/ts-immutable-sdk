@@ -32,8 +32,9 @@ import {
   ConnectLoaderContext,
 } from '../../../../context/connect-loader-context/ConnectLoaderContext';
 import { EventTargetContext } from '../../../../context/event-target-context/EventTargetContext';
-import { UserJourney, useAnalytics } from '../../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { UserJourney } from '../../../../context/analytics-provider/segmentAnalyticsConfig';
 import { getChainNameById } from '../../../../lib/chainName';
+import { useAnalytics } from '../../../../context/analytics-provider/CustomAnalyticsProvider';
 
 const logoColour = {
   [ChainId.IMTBL_ZKEVM_DEVNET]: 'base.color.text.link.primary',

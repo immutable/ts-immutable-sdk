@@ -14,7 +14,8 @@ import {
 } from '../../../context/view-context/ViewContext';
 import { getL2ChainId } from '../../../lib';
 import { ImmutablePlanetHero } from '../../../components/Hero/ImmutablePlanetHero';
-import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { UserJourney } from '../../../context/analytics-provider/segmentAnalyticsConfig';
+import { useAnalytics } from '../../../context/analytics-provider/CustomAnalyticsProvider';
 
 export function SwitchNetworkZkEVM() {
   const { viewDispatch } = useContext(ViewContext);

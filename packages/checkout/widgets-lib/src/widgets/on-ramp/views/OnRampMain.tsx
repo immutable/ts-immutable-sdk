@@ -12,11 +12,12 @@ import { OnRampWidgetViews } from '../../../context/view-context/OnRampViewConte
 import { text } from '../../../resources/text/textConfig';
 import { boxMainStyle, containerStyle } from './onRampStyles';
 import {
-  useAnalytics, UserJourney,
-} from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+  UserJourney,
+} from '../../../context/analytics-provider/segmentAnalyticsConfig';
 import { TransakEventData, TransakEvents, TransakStatuses } from '../TransakEvents';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
+import { useAnalytics } from '../../../context/analytics-provider/CustomAnalyticsProvider';
 
 const transakIframeId = 'transak-iframe';
 const transakOrigin = 'transak.com';

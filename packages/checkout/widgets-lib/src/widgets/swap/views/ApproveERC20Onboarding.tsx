@@ -22,7 +22,8 @@ import { isPassportProvider } from '../../../lib/providerUtils';
 import { SpendingCapHero } from '../../../components/Hero/SpendingCapHero';
 import { WalletApproveHero } from '../../../components/Hero/WalletApproveHero';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
-import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { UserJourney } from '../../../context/analytics-provider/segmentAnalyticsConfig';
+import { useAnalytics } from '../../../context/analytics-provider/CustomAnalyticsProvider';
 
 export interface ApproveERC20Props {
   data: ApproveERC20SwapData;

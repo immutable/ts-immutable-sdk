@@ -35,8 +35,8 @@ import {
   removeChainChangedListener,
 } from '../../lib';
 import { useInterval } from '../../lib/hooks/useInterval';
-import { useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { identifyUser } from '../../lib/analytics/identifyUser';
+import { useAnalytics } from '../../context/analytics-provider/CustomAnalyticsProvider';
 
 export interface ConnectLoaderProps {
   children?: React.ReactNode;

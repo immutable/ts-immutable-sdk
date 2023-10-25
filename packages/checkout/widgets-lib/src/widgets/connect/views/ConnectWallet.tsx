@@ -7,7 +7,8 @@ import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewCon
 import { text } from '../../../resources/text/textConfig';
 import { WalletList } from '../components/WalletList';
 import { ConnectContext } from '../context/ConnectContext';
-import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { UserJourney } from '../../../context/analytics-provider/segmentAnalyticsConfig';
+import { useAnalytics } from '../../../context/analytics-provider/CustomAnalyticsProvider';
 
 export function ConnectWallet() {
   const { body } = text.views[ConnectWidgetViews.CONNECT_WALLET];

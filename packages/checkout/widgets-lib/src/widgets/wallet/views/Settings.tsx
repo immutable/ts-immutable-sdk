@@ -11,7 +11,8 @@ import { settingsBoxStyle, settingsDisconnectButtonStyle } from './SettingsStyle
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import { isPassportProvider } from '../../../lib/providerUtils';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
-import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { UserJourney } from '../../../context/analytics-provider/segmentAnalyticsConfig';
+import { useAnalytics } from '../../../context/analytics-provider/CustomAnalyticsProvider';
 
 export function Settings() {
   const { connectLoaderState } = useContext(ConnectLoaderContext);

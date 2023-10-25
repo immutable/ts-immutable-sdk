@@ -1,22 +1,46 @@
 import {
-  AnalyticsProvider,
-} from './SegmentAnalyticsProvider';
+  createContext, useContext, useMemo,
+} from 'react';
+import {
+  SegmentAppName,
+  createAnalyticsInstance,
+  getSegmentWriteKey,
+} from './segmentAnalyticsConfig';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { SetupAnalytics } from './SetupAnalytics';
 
 type CustomAnalyticsProps = {
-  widgetConfig: StrongCheckoutWidgetsConfig
+  widgetConfig: StrongCheckoutWidgetsConfig;
   children: React.ReactNode;
+  appName?: SegmentAppName;
 };
 
-export function CustomAnalyticsProvider(
-  { widgetConfig, children }: CustomAnalyticsProps,
-) {
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export const CustomAnalyticsContext = createContext({
+  useAnalytics: () => ({}),
+} as {
+  useAnalytics: ReturnType<typeof createAnalyticsInstance>['useAnalytics'];
+});
+
+export function CustomAnalyticsProvider({
+  widgetConfig,
+  appName,
+  children,
+}: CustomAnalyticsProps) {
+  const writeKey = getSegmentWriteKey(widgetConfig.environment, appName);
+  const { AnalyticsProvider, useAnalytics } = createAnalyticsInstance(
+    writeKey,
+    appName,
+  );
+
+  const value = useMemo(() => ({ useAnalytics }), [useAnalytics]);
+
   return (
-    <AnalyticsProvider>
-      <SetupAnalytics widgetConfig={widgetConfig}>
-        {children}
-      </SetupAnalytics>
-    </AnalyticsProvider>
+    <CustomAnalyticsContext.Provider value={value}>
+      <AnalyticsProvider>{children}</AnalyticsProvider>
+    </CustomAnalyticsContext.Provider>
   );
 }
+
+export const useAnalyticsContext = () => useContext(CustomAnalyticsContext);
+
+export const useAnalytics = () => useAnalyticsContext().useAnalytics();
