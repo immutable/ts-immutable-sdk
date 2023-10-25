@@ -299,7 +299,7 @@ export const useSignOrder = (input: SignOrderInput) => {
         gasEstimate,
       } = transaction;
       // eslint-disable-next-line no-await-in-loop
-      const hash = await sendTransaction(to, data, 2 * gasEstimate, method);
+      const hash = await sendTransaction(to, data, gasEstimate, method);
 
       if (!hash) {
         successful = false;
