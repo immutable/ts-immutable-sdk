@@ -50,5 +50,4 @@ export enum FundWithSmartCheckoutSubViews {
   LOADING = 'LOADING',
   FUNDING_ROUTE_SELECT = 'FUNDING_ROUTE_SELECT',
   FUNDING_ROUTE_EXECUTE = 'FUNDING_ROUTE_EXECUTE',
-  DONE = 'DONE', // FIXME: todo remove once we have a success view
 }
