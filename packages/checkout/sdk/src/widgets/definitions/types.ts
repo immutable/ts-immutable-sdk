@@ -1,5 +1,17 @@
 import { Environment } from '@imtbl/config';
-import { WidgetEventTypes } from './events';
+import {
+  BridgeEventType,
+  BridgeFailed,
+  BridgeSuccess,
+  ConnectEventType,
+  ConnectionFailed,
+  ConnectionSuccess,
+  OrchestrationEventType,
+  SaleEventType,
+  SwapEventType,
+  WalletEventType,
+} from './events';
+import { BridgeWidgetParams, ConnectWidgetParams } from './parameters';
 
 /**
  * Enum representing the themes for the widgets.
@@ -19,29 +31,67 @@ export enum WidgetType {
   BRIDGE = 'bridge',
   ONRAMP = 'onramp',
 }
+
+export type WidgetProperties<T extends WidgetType> = {
+  params?: WidgetParameters[T];
+  config?: WidgetConfigurations;
+};
+
+export type WidgetParameters = {
+  [WidgetType.CONNECT]: ConnectWidgetParams,
+  [WidgetType.WALLET]: any,
+  [WidgetType.SWAP]: any,
+  [WidgetType.BRIDGE]: BridgeWidgetParams,
+  [WidgetType.ONRAMP]: any,
+};
+
+/**
+ * Represents all the possible event types that are emitted by the widgets.
+ */
+export type WidgetEventTypes = {
+  [WidgetType.CONNECT]: ConnectEventType | OrchestrationEventType,
+  [WidgetType.WALLET]: WalletEventType | OrchestrationEventType,
+  [WidgetType.SWAP]: SwapEventType | OrchestrationEventType,
+  [WidgetType.BRIDGE]: BridgeEventType | OrchestrationEventType,
+  [WidgetType.ONRAMP]: SaleEventType | OrchestrationEventType,
+};
+
+export type WidgetEventData = {
+  [WidgetType.CONNECT]: ConnectionSuccess | ConnectionFailed,
+  [WidgetType.WALLET]: any, // TODO
+  [WidgetType.SWAP]: any, // TODO
+  [WidgetType.BRIDGE]: BridgeSuccess | BridgeFailed;
+  [WidgetType.ONRAMP]: any, // TODO
+};
+
+/**
+ * Represents an event emitted by a widget.
+ * @template T - The type of data associated with the event.
+ * @property {WidgetEventTypes} type - The type of the event.
+ * @property {T} data - The data associated with the event.
+ */
+export type WidgetEvent<T extends WidgetType> = {
+  type: WidgetEventTypes[T],
+  data: WidgetEventData[T];
+};
+
 export interface IWidgetsFactory {
   /**
    * Create a new widget instance.
    * @param type widget type to instantiate.
    */
-  create(type: WidgetType, params: any): Widget;
-  /**
-   * Update new widget instance configuration.
-   * @param config widgets configuration.
-   */
-  updateConfig(config: WidgetConfiguration): void;
+  create<T extends WidgetType>(type: T, params: WidgetParameters[T]): Widget<T>;
 }
 
 /**
  * Widget interface. Every widget implements this interface.
  */
-export interface Widget {
+export interface Widget<T extends WidgetType> {
   /**
    * Mount a widget to a DOM ref element.
    * @param id ID of the DOM element where the widget will be mounted.
-   * @param params Widget specific configuration parameters.
    */
-  mount(id: string, params: any): void;
+  mount(id: string): void;
   /**
    * Unmount a widget without losing state.
    */
@@ -52,20 +102,21 @@ export interface Widget {
   destroy(): void;
   /**
    * Update the widget parameters
-   * @param params Widget specific parameters.
+   * @param params Widget specific parameters including configuration
    */
-  update(params: any): void;
-  /**
-   * Update the widget configuration
-   * @param config Widget specific configuration.
-   */
-  updateConfig(config: WidgetConfiguration): void;
+  update(params: WidgetProperties<T>): void
   /**
    * Add a listener for a widget event.
    * @param event Widget specific event name.
    * @param callback function to execute when the event is received.
    */
-  on(type: WidgetEventTypes, callback: (data:any) => void): void;
+  on(type: WidgetEventTypes[T], callback: (data: any) => void): void
+
+  /**
+   * Removes an event listener for a widget event.
+   * @param type Widget specific event name.
+   */
+  removeListener(type: WidgetEventTypes[T]): void
 }
 
 /**
@@ -91,7 +142,7 @@ export type SemanticVersion = {
 };
 
 /**
- * Represents the configuration options for the Checkout Widgets.
+ * Represents the global configuration options for the Checkout Widgets.
  * @property {WidgetTheme | undefined} theme - The theme of the Checkout Widget (default: "DARK")
  * @property {Environment | undefined} environment - The environment configuration (default: "SANDBOX")
  * @property {SemanticVersion | undefined} version - The version of the checkout widgets js file to use (default: "0.1.x")
@@ -108,6 +159,10 @@ export type CheckoutWidgetsConfig = {
   isBridgeEnabled?: boolean;
 };
 
-export type WidgetConfiguration = {
+/**
+ * Represents the local configuration options for the Checkout Widgets.
+ * @property {WidgetTheme | undefined} theme - The theme of the Checkout Widget (default: "DARK")
+ */
+export type WidgetConfigurations = {
   theme?: WidgetTheme;
 };

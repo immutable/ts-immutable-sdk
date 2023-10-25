@@ -1,24 +1,39 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { Box, Button, Card, GridBox, Heading } from "@biom3/react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Passport } from '@imtbl/passport';
 import { passportConfig } from './passportConfig';
-import { Bridge, Connect } from '@imtbl/checkout-widgets';
-import { Checkout } from '@imtbl/checkout-sdk';
+import {  WidgetsFactory } from '@imtbl/checkout-widgets';
+import { Checkout, ConnectEventType, OrchestrationEventType, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 
 export const MainPage = () => {
+  const passport = useMemo(() => new Passport(passportConfig), [passportConfig]);
+
   const checkout = useMemo(() => new Checkout({
     baseConfig: {environment: Environment.SANDBOX},
     isBridgeEnabled: true,
     isSwapEnabled: true,
     isOnRampEnabled: true
-  }), [])
+  }), []);
+  const widgetsFactory = useMemo(() => new WidgetsFactory(checkout, {theme: WidgetTheme.DARK}), [checkout]);
+
+  const connectWidget = useMemo(() => widgetsFactory.create(WidgetType.CONNECT, {passport}), [widgetsFactory]);
+  const bridgeWidget = useMemo(() => widgetsFactory.create(WidgetType.BRIDGE, {}), [widgetsFactory]);
+
+  useEffect(() => {
+    connectWidget.on(ConnectEventType.CLOSE_WIDGET, () => connectWidget.unmount());
+    connectWidget.on(ConnectEventType.SUCCESS, (data: any) => {
+      setWeb3Provider(data.provider)
+    });
+    connectWidget.on(ConnectEventType.FAILURE, (data) => console.log('Connect Widget failure event', data));
+  }, [connectWidget])
+
   // local state for enabling/disabling and changing buttons
   const [doneSwap, setDoneSwap] = useState<boolean>(false);
   const [web3Provider, setWeb3Provider] = useState<Web3Provider|undefined>(undefined);
 
-  const passport = useMemo(() => new Passport(passportConfig), [passportConfig]);
+  
   // const [passportInstance, setpassportInstance]= useState<Passport|undefined>(undefined);
 
   const setPassportProvider = useCallback(() => {
@@ -51,10 +66,6 @@ export const MainPage = () => {
   // useSwapWidget(setDoneSwap);
   // useBridgeWidget();
   // useOnRampWidget()
-
-  const connectWidget = useMemo(() => new Connect(checkout, {}, {}), [checkout])
-  const bridgeWidget = useMemo(() => new Bridge(checkout, {}, {}), [checkout])
-
 
   // button click functions to open/close widgets
   const openConnectWidget = useCallback(() => {

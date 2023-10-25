@@ -62,7 +62,7 @@ import { getItemRequirementsFromRequirements } from './smartCheckout/itemRequire
 import { CheckoutError, CheckoutErrorType } from './errors';
 import { AvailabilityService, availabilityService } from './availability';
 import { load } from './widgets/load';
-import { SemanticVersion, WidgetConfiguration } from './widgets/definitions/types';
+import { WidgetsInit } from './types/widgets';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
@@ -95,10 +95,11 @@ export class Checkout {
 
   /**
    * Loads the widgets bundle and initiate the widgets factory.
+   * @param {WidgetsInit} init - The initialisation parameters for loading the widgets bundle and applying configuration
    */
-  public async widgets(config: WidgetConfiguration, version?: SemanticVersion) {
-    await load(version);
-    return new ImmutableCheckoutWidgets.WidgetsFactory(this, config);
+  public async widgets(init: WidgetsInit) {
+    await load(init.version);
+    return new ImmutableCheckoutWidgets.WidgetsFactory(this, init.config);
   }
 
   /**
