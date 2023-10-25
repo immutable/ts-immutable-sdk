@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Passport } from '@imtbl/passport';
 import { passportConfig } from './passportConfig';
 import {  WidgetsFactory } from '@imtbl/checkout-widgets';
-import { Checkout, ConnectEventType, ConnectionFailed, ConnectionSuccess, OrchestrationEventType, WalletEventType, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
+import { BridgeEventType, Checkout, ConnectEventType, ConnectionFailed, ConnectionSuccess, OrchestrationEventType, RequestBridgeEvent, WalletEventType, WalletNetworkSwitchEvent, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 
 export const MainPage = () => {
@@ -19,8 +19,12 @@ export const MainPage = () => {
   const widgetsFactory = useMemo(() => new WidgetsFactory(checkout, {theme: WidgetTheme.DARK}), [checkout]);
 
   const connectWidget = useMemo(() => widgetsFactory.create(WidgetType.CONNECT, {passport}), [widgetsFactory]);
-  const bridgeWidget = useMemo(() => widgetsFactory.create(WidgetType.BRIDGE, {passport}), [widgetsFactory]);
   const walletWidget = useMemo(() => widgetsFactory.create(WidgetType.WALLET, {passport}), [widgetsFactory]);
+  const bridgeWidget = useMemo(() => widgetsFactory.create(WidgetType.BRIDGE, {passport}), [widgetsFactory]);
+  
+  connectWidget.on(ConnectEventType.CLOSE_WIDGET, () => {connectWidget.destroy()});
+  walletWidget.on(WalletEventType.CLOSE_WIDGET, () => {walletWidget.destroy()});
+  bridgeWidget.on(BridgeEventType.CLOSE_WIDGET, () => {bridgeWidget.destroy()});
 
   // local state for enabling/disabling and changing buttons
   const [doneSwap, setDoneSwap] = useState<boolean>(false);
@@ -28,25 +32,24 @@ export const MainPage = () => {
 
   useEffect(() => {
     connectWidget.on(ConnectEventType.CLOSE_WIDGET, () => connectWidget.unmount());
-    connectWidget.on(ConnectEventType.SUCCESS, (data: any) => {
-      setWeb3Provider(data.provider)
-      walletWidget.update({params: {web3Provider: data.provider}})
-      walletWidget.mount('widget-target');
+    connectWidget.on(ConnectEventType.SUCCESS, (eventData: ConnectionSuccess) => {
+      walletWidget.update({params: {web3Provider: eventData.provider}})
+      walletWidget.mount('widget-target')
+      setWeb3Provider(eventData.provider);
     });
   }, [connectWidget, walletWidget]);
   
   useEffect(() => {
-    walletWidget.on(WalletEventType.NETWORK_SWITCH, (data: any) => {
-      bridgeWidget.update({params: {web3Provider: data.provider}}) 
+    walletWidget.on(WalletEventType.NETWORK_SWITCH, (eventData: WalletNetworkSwitchEvent) => {
+      bridgeWidget.update({params: {web3Provider: eventData.provider}})
+      setWeb3Provider(eventData.provider)
     })
-    walletWidget.on(OrchestrationEventType.REQUEST_BRIDGE, (data: any) => {
+    walletWidget.on(OrchestrationEventType.REQUEST_BRIDGE, (eventData: RequestBridgeEvent) => {
       walletWidget.unmount();
-      bridgeWidget.update({params: {fromContractAddress: data.tokenAddress, amount: data.amount}})
+      bridgeWidget.update({params: {fromContractAddress: eventData.tokenAddress, amount: eventData.amount}})
       bridgeWidget.mount('widget-target');
     })
-  }, [walletWidget, bridgeWidget, web3Provider]);
-  
-  // const [passportInstance, setpassportInstance]= useState<Passport|undefined>(undefined);
+  }, [walletWidget, bridgeWidget]);
 
   const setPassportProvider = useCallback(() => {
     if(passport) {
@@ -55,50 +58,18 @@ export const MainPage = () => {
     }
   }, [passport]);
 
-  // const passPassportInstance = useCallback(() => {
-  //   setpassportInstance(passport)
-  // }, [passport]);
-  
-  // const removePassportInstance = useCallback(() => {
-  //   setpassportInstance(undefined);
-  // }, []);
-  
-  // // widget context state for showing/hiding widgets
-  // const {showWidgets: {
-  //   showConnect,
-  //   showWallet,
-  //   showSwap,
-  //   showBridge,
-  //   showOnRamp
-  // }, setShowWidgets} = useContext(WidgetContext);
-
-  // // hooks for each widget set up event listeners and orchestration logic
-  // useConnectWidget(setWeb3Provider);
-  // useWalletWidget(setWeb3Provider);
-  // useSwapWidget(setDoneSwap);
-  // useBridgeWidget();
-  // useOnRampWidget()
-
   // button click functions to open/close widgets
   const openConnectWidget = useCallback(() => {
     connectWidget.mount('widget-target');
   }, [connectWidget])
 
-  // const openWalletWidget = useCallback(() => {
-  //   setShowWidgets({...hideAllWidgets, showWallet: {show: true, data: {}}});
-  // }, [setShowWidgets])
-
-  // const openSwapWidget = useCallback(() => {
-  //   setShowWidgets({...hideAllWidgets, showSwap: {show: true, data: {}}});
-  // }, [setShowWidgets])
+  const openWalletWidget = useCallback(() => {
+    walletWidget.mount('widget-target');
+  }, [walletWidget])
 
   const openBridgeWidget = useCallback(() => {
     bridgeWidget.mount('widget-target')
   }, [bridgeWidget])
-
-  // const openOnRampWidget = useCallback(() => {
-  //   setShowWidgets({...hideAllWidgets, showOnRamp: {show: true, data: {}}});
-  // }, [setShowWidgets])
 
   const handleBuyClick = () => {
     alert("you can buy now");
@@ -114,9 +85,8 @@ export const MainPage = () => {
     <Box sx={{minWidth: '100vw', minHeight: '100vh', width: '100%', height: '100%', backgroundColor: 'base.color.brand.6'}}>
       <Box sx={{width: '100%',padding: 'base.spacing.x4', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
         <Heading>Immutable Checkout Marketplace</Heading>
-        {!web3Provider && (
         <Button onClick={openConnectWidget}>Connect Wallet</Button>
-      )}
+        <Button onClick={openWalletWidget}>Open Wallet</Button>
       <Button onClick={openBridgeWidget}>Open Bridge</Button>
       {passport && web3Provider && (web3Provider.provider as any)?.isPassport && <Button onClick={logout}>Passport Logout</Button>}
       </Box>
