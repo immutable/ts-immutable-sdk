@@ -33,7 +33,7 @@ describe('WalletBalances', () => {
     }),
     provider: {
       getSigner: () => ({
-        getAddress: async () => Promise.resolve(''),
+        getAddress: async () => Promise.resolve('0x1E8dC77BEd0da06621e819fa0AFb59D50F76CfDf'),
       }),
       getNetwork: async () => ({
         chainId: ChainId.IMTBL_ZKEVM_TESTNET,
