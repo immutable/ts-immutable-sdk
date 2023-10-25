@@ -41,7 +41,6 @@ export function loadUnresolved(
 export const load = (version?: SemanticVersion): Promise<void> => new Promise((resolve, reject) => {
   try {
     const script = loadUnresolved(version);
-    console.log(script);
     if (script.loaded) {
       resolve();
     } else {
