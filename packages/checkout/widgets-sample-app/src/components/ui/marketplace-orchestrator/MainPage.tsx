@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Passport } from '@imtbl/passport';
 import { passportConfig } from './passportConfig';
 import {  WidgetsFactory } from '@imtbl/checkout-widgets';
-import { Checkout, ConnectEventType, ConnectionFailed, ConnectionSuccess, OrchestrationEventType, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
+import { Checkout, ConnectEventType, ConnectionFailed, ConnectionSuccess, OrchestrationEventType, WalletEventType, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 
 export const MainPage = () => {
@@ -20,18 +20,31 @@ export const MainPage = () => {
 
   const connectWidget = useMemo(() => widgetsFactory.create(WidgetType.CONNECT, {passport}), [widgetsFactory]);
   const bridgeWidget = useMemo(() => widgetsFactory.create(WidgetType.BRIDGE, {passport}), [widgetsFactory]);
-
-  useEffect(() => {
-    connectWidget.on(ConnectEventType.CLOSE_WIDGET, () => connectWidget.unmount());
-    connectWidget.on(ConnectEventType.SUCCESS, (data: any) => {
-      setWeb3Provider(data.provider)
-    });
-    }, [connectWidget])
+  const walletWidget = useMemo(() => widgetsFactory.create(WidgetType.WALLET, {passport}), [widgetsFactory]);
 
   // local state for enabling/disabling and changing buttons
   const [doneSwap, setDoneSwap] = useState<boolean>(false);
   const [web3Provider, setWeb3Provider] = useState<Web3Provider|undefined>(undefined);
 
+  useEffect(() => {
+    connectWidget.on(ConnectEventType.CLOSE_WIDGET, () => connectWidget.unmount());
+    connectWidget.on(ConnectEventType.SUCCESS, (data: any) => {
+      setWeb3Provider(data.provider)
+      walletWidget.update({params: {web3Provider: data.provider}})
+      walletWidget.mount('widget-target');
+    });
+  }, [connectWidget, walletWidget]);
+  
+  useEffect(() => {
+    walletWidget.on(WalletEventType.NETWORK_SWITCH, (data: any) => {
+      bridgeWidget.update({params: {web3Provider: data.provider}}) 
+    })
+    walletWidget.on(OrchestrationEventType.REQUEST_BRIDGE, (data: any) => {
+      walletWidget.unmount();
+      bridgeWidget.update({params: {fromContractAddress: data.tokenAddress, amount: data.amount}})
+      bridgeWidget.mount('widget-target');
+    })
+  }, [walletWidget, bridgeWidget, web3Provider]);
   
   // const [passportInstance, setpassportInstance]= useState<Passport|undefined>(undefined);
 

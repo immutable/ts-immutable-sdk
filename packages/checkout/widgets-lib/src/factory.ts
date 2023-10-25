@@ -3,8 +3,6 @@
 import {
   Widget,
   Checkout,
-  ConnectWidgetParams,
-  BridgeWidgetParams,
   WidgetType,
   WidgetConfiguration,
   IWidgetsFactory,
@@ -12,6 +10,7 @@ import {
 } from '@imtbl/checkout-sdk';
 import { Bridge } from 'widgets/bridge/BridgeWidgetRoot';
 import { Connect } from 'widgets/connect/ConnectWidgetRoot';
+import { Wallet } from 'widgets/wallet/WalletWidgetRoot';
 
 export class WidgetsFactory implements IWidgetsFactory {
   private sdk: Checkout;
@@ -36,6 +35,12 @@ export class WidgetsFactory implements IWidgetsFactory {
           config: this.widgetConfig,
           params,
         }) as Widget<WidgetType.BRIDGE> as Widget<T>;
+      }
+      case WidgetType.WALLET: {
+        return new Wallet(this.sdk, {
+          config: this.widgetConfig,
+          params,
+        }) as Widget<WidgetType.WALLET> as Widget<T>;
       }
       default:
         throw new Error('widget type not supported');
