@@ -1,33 +1,33 @@
 import {
-  BottomSheet,
+  Drawer,
 } from '@biom3/react';
 import { FundingRoute } from '@imtbl/checkout-sdk';
 import { FundingRouteMenuItem } from '../FundingRouteMenuItem/FundingRouteMenuItem';
 
 type FundingRouteDrawerProps = {
   visible: boolean;
-  onCloseBottomSheet: (selectedFundingRouteIndex: number) => void;
+  onCloseDrawer: (selectedFundingRouteIndex: number) => void;
   fundingRoutes: FundingRoute[];
   activeFundingRouteIndex: number;
 };
 
 export function FundingRouteDrawer({
-  visible, onCloseBottomSheet, fundingRoutes, activeFundingRouteIndex,
+  visible, onCloseDrawer, fundingRoutes, activeFundingRouteIndex,
 }:
 FundingRouteDrawerProps) {
   const onClickMenuItem = (selectedFundingRouteIndex: number) => {
-    onCloseBottomSheet(selectedFundingRouteIndex);
+    onCloseDrawer(selectedFundingRouteIndex);
   };
 
   return (
-    <BottomSheet
+    <Drawer
       size="full"
-      onCloseBottomSheet={() => onCloseBottomSheet(activeFundingRouteIndex)}
+      onCloseDrawer={() => onCloseDrawer(activeFundingRouteIndex)}
       visible={visible}
       showHeaderBar
       headerBarTitle="Available balance"
     >
-      <BottomSheet.Content>
+      <Drawer.Content>
         {fundingRoutes.map((fundingRoute: FundingRoute, i: number) => (
           <FundingRouteMenuItem
             onClick={() => onClickMenuItem(i)}
@@ -36,7 +36,7 @@ FundingRouteDrawerProps) {
             key={fundingRoute.steps[0].fundingItem.type + fundingRoute.steps[0].fundingItem.token}
           />
         ))}
-      </BottomSheet.Content>
-    </BottomSheet>
+      </Drawer.Content>
+    </Drawer>
   );
 }

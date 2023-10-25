@@ -294,7 +294,7 @@ export function WalletBalances() {
         <NotEnoughGas
           visible={showNotEnoughGasDrawer}
           showHeaderBar={false}
-          onCloseBottomSheet={() => setShowNotEnoughGasDrawer(false)}
+          onCloseDrawer={() => setShowNotEnoughGasDrawer(false)}
           walletAddress={walletAddress}
           showAdjustAmount={false}
         />

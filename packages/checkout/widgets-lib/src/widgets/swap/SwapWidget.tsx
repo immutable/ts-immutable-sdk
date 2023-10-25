@@ -220,7 +220,7 @@ export function SwapWidget(props: SwapWidgetProps) {
   return (
     <BiomeCombinedProviders
       theme={{ base: themeReducerValue }}
-      bottomSheetContainerId="bottom-sheet-container"
+      drawerContainerId="bottom-sheet-container"
     >
       <ViewContext.Provider value={viewReducerValues}>
         <SwapContext.Provider value={swapReducerValues}>

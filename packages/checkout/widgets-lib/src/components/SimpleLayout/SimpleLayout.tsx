@@ -1,7 +1,7 @@
 import {
+  BiomeCombinedProviders,
   BiomePortalIdContext,
   Box,
-  MountedOverlaysAndProvider,
 } from '@biom3/react';
 import { useContext } from 'react';
 import {
@@ -36,7 +36,7 @@ export function SimpleLayout({
   const portalId = useContext(BiomePortalIdContext);
 
   return (
-    <MountedOverlaysAndProvider bottomSheetContainerId={`layout-container${portalId}`}>
+    <BiomeCombinedProviders drawerContainerId={`layout-container${portalId}`}>
       <Box sx={responsiveStyles} id={`layout-container${portalId}`}>
         <Box testId={testId} sx={simpleLayoutStyle}>
           {header && (
@@ -63,6 +63,6 @@ export function SimpleLayout({
           )}
         </Box>
       </Box>
-    </MountedOverlaysAndProvider>
+    </BiomeCombinedProviders>
   );
 }
