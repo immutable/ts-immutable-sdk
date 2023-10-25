@@ -29,7 +29,6 @@ export interface CryptoFiatAction {
 }
 
 type CryptoFiatActionPayload =
-  | SetCryptoFiatPayload
   | SetFiatSymbolPayload
   | SetTokenSymbolsPayload
   | SetConversionsPayload;
@@ -39,11 +38,6 @@ export enum CryptoFiatActions {
   SET_FIAT_SYMBOL = 'SET_FIAT_SYMBOL',
   SET_TOKEN_SYMBOLS = 'SET_TOKEN_SYMBOLS',
   SET_CONVERSIONS = 'SET_CONVERSIONS',
-}
-
-export interface SetCryptoFiatPayload {
-  type: CryptoFiatActions.SET_CRYPTO_FIAT;
-  cryptoFiat: CryptoFiat;
 }
 
 export interface SetFiatSymbolPayload {
@@ -74,11 +68,6 @@ export const cryptoFiatReducer: Reducer<CryptoFiatState, CryptoFiatAction> = (
   action: CryptoFiatAction,
 ) => {
   switch (action.payload.type) {
-    case CryptoFiatActions.SET_CRYPTO_FIAT:
-      return {
-        ...state,
-        cryptoFiat: action.payload.cryptoFiat,
-      };
     case CryptoFiatActions.SET_FIAT_SYMBOL:
       return {
         ...state,

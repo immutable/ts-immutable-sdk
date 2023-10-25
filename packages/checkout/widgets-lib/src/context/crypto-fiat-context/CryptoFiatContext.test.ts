@@ -1,8 +1,6 @@
-import { CryptoFiat, CryptoFiatConfiguration } from '@imtbl/cryptofiat';
 import {
   CryptoFiatActions,
   FiatSymbols,
-  SetCryptoFiatPayload,
   SetFiatSymbolPayload,
   cryptoFiatReducer,
   initialCryptoFiatState,
@@ -11,20 +9,6 @@ import {
 } from './CryptoFiatContext';
 
 describe('CryptoFiatContext', () => {
-  it('should update state with cryptoFiat when reducer called with SET_CRYPTO_FIAT action', () => {
-    const setCryptoFiatPayload: SetCryptoFiatPayload = {
-      type: CryptoFiatActions.SET_CRYPTO_FIAT,
-      cryptoFiat: new CryptoFiat(new CryptoFiatConfiguration({})),
-    };
-
-    expect(initialCryptoFiatState.cryptoFiat).toBeNull();
-    const { cryptoFiat } = cryptoFiatReducer(initialCryptoFiatState, {
-      payload: setCryptoFiatPayload,
-    });
-
-    expect(cryptoFiat).toBeInstanceOf(CryptoFiat);
-  });
-
   it('should update state with fiat symbol when reducer called with SET_FIAT_SYMBOL action', () => {
     const setFiatSymbolPayload: SetFiatSymbolPayload = {
       type: CryptoFiatActions.SET_FIAT_SYMBOL,

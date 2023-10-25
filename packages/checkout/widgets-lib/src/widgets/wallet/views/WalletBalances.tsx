@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Box, MenuItem } from '@biom3/react';
 import {
   useCallback,
@@ -40,7 +41,6 @@ import {
   DEFAULT_BALANCE_RETRY_POLICY,
   DEFAULT_TOKEN_DECIMALS,
   ETH_TOKEN_SYMBOL,
-  ZERO_BALANCE_STRING,
 } from '../../../lib';
 import { orchestrationEvents } from '../../../lib/orchestrationEvents';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
@@ -81,13 +81,12 @@ export function WalletBalances() {
   }, []);
 
   useEffect(() => {
+    if (!checkout) return;
+    if (!cryptoFiatDispatch) return;
+    if (!network?.chainId) return;
+
     (async () => {
-      if (!checkout) return;
-      if (!cryptoFiatDispatch) return;
-      if (!network) return;
-
       const tokenSymbols = await fetchTokenSymbols(checkout, network.chainId);
-
       cryptoFiatDispatch({
         payload: {
           type: CryptoFiatActions.SET_TOKEN_SYMBOLS,
@@ -95,14 +94,14 @@ export function WalletBalances() {
         },
       });
     })();
-  }, [checkout, cryptoFiatDispatch, network]);
+  }, [checkout, cryptoFiatDispatch, network?.chainId]);
 
   useEffect(() => {
-    const setWalletAddressFromProvider = async () => {
-      if (!provider) return;
-      setWalletAddress(await provider.getSigner().getAddress());
-    };
-    setWalletAddressFromProvider();
+    if (!provider) return;
+    (async () => {
+      const address = await provider.getSigner().getAddress();
+      setWalletAddress(address);
+    })();
   }, [provider]);
 
   useEffect(() => {
@@ -120,41 +119,38 @@ export function WalletBalances() {
   // This is to prevent the user having to wait for the gas estimate to complete to use the UI
   // As a trade-off there is a slight delay between when the gas estimate is fetched and checked
   // against the user balance, so 'move' can be selected before the gas estimate is completed
-  useEffect(() => {
-    const bridgeToL2GasCheck = async () => {
-      if (!checkout) return;
-      if (!network) return;
-      if (network.chainId !== getL1ChainId(checkout.config)) return;
+  const bridgeToL2GasCheck = async () => {
+    if (!checkout) return;
+    if (getL1ChainId(checkout.config) !== network?.chainId) return;
 
-      const ethBalance = tokenBalances
-        .find((balance) => isNativeToken(balance.address) && balance.symbol === ETH_TOKEN_SYMBOL);
-      if (!ethBalance) return;
+    const ethBalance = tokenBalances.find(
+      (balance) => isNativeToken(balance.address) && balance.symbol === ETH_TOKEN_SYMBOL,
+    );
 
-      if (ethBalance.balance === ZERO_BALANCE_STRING) {
-        setInsufficientFundsForBridgeToL2Gas(true);
+    if (!ethBalance) return;
+
+    if (parseFloat(ethBalance.balance) === 0) {
+      setInsufficientFundsForBridgeToL2Gas(true);
+      return;
+    }
+
+    try {
+      const { gasFee } = await checkout!.gasEstimate({
+        gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+        isSpendingCapApprovalRequired: false,
+      });
+
+      if (!gasFee.estimatedAmount) {
+        setInsufficientFundsForBridgeToL2Gas(false);
         return;
       }
 
-      try {
-        const { gasFee } = await checkout.gasEstimate({
-          gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-          isSpendingCapApprovalRequired: false,
-        });
-
-        if (!gasFee.estimatedAmount) {
-          setInsufficientFundsForBridgeToL2Gas(false);
-          return;
-        }
-
-        setInsufficientFundsForBridgeToL2Gas(
-          gasFee.estimatedAmount.gt(utils.parseUnits(ethBalance.balance, DEFAULT_TOKEN_DECIMALS)),
-        );
-      } catch {
-        setInsufficientFundsForBridgeToL2Gas(false);
-      }
-    };
-    bridgeToL2GasCheck();
-  }, [tokenBalances, checkout, network]);
+      const hasEnough = gasFee.estimatedAmount.gt(utils.parseUnits(ethBalance.balance, DEFAULT_TOKEN_DECIMALS));
+      setInsufficientFundsForBridgeToL2Gas(hasEnough);
+    } catch {
+      setInsufficientFundsForBridgeToL2Gas(false);
+    }
+  };
 
   const showErrorView = useCallback(() => {
     viewDispatch({
@@ -169,13 +165,15 @@ export function WalletBalances() {
   }, [viewDispatch]);
 
   useEffect(() => {
-    if (!checkout || !provider || !network || !conversions) return;
-    if (conversions.size <= 0) return; // Prevent unnecessary re-rendering
+    if (!checkout) return;
+    if (!walletAddress) return;
+    if (!network?.chainId) return;
+    if (!conversions || conversions.size <= 0) return;
 
     (async () => {
       let balances: BalanceInfo[] = [];
       try {
-        balances = await getTokenBalances(checkout, provider, network.chainId, conversions);
+        balances = await getTokenBalances(checkout, provider!, network.chainId, conversions);
       } catch (error: any) {
         if (DEFAULT_BALANCE_RETRY_POLICY.nonRetryable!(error)) {
           showErrorView();
@@ -190,11 +188,18 @@ export function WalletBalances() {
         },
       });
       setBalancesLoading(false);
+
+      // Data has been loaded, fetch gas estimations to improve
+      // the UX -- e.g. show top up ETH view if needed.
+      bridgeToL2GasCheck();
     })();
-  }, [checkout, provider, network, conversions]);
+  }, [checkout, walletAddress, network?.chainId, conversions]);
 
   const showAddCoins = useMemo(() => {
-    if (!checkout || !network) return false;
+    if (!checkout) return false;
+    if (!supportedTopUps) return false;
+    if (!network?.chainId) return false;
+
     return (
       network.chainId === getL2ChainId(checkout.config)
         && Boolean(
@@ -203,7 +208,7 @@ export function WalletBalances() {
             || supportedTopUps?.isOnRampEnabled,
         )
     );
-  }, [checkout, network, supportedTopUps]);
+  }, [checkout, network?.chainId, supportedTopUps]);
 
   const handleAddCoinsClick = () => {
     track({
