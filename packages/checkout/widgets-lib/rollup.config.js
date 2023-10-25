@@ -18,15 +18,16 @@ const defaultPlugin = [
 
 export default [
   {
+    watch: true,
     input: 'src/index.ts',
     output: {
       dir: 'dist',
       format: 'es'
     },
-    watch: true, // watch for changes on the es module for sample app dev
     plugins: [ ...defaultPlugin ],
   },
   {
+    watch: false,
     input: 'src/index.ts',
     output: {
       file: 'dist/widgets.js',
@@ -34,7 +35,6 @@ export default [
       name: 'ImmutableCheckoutWidgets',
       inlineDynamicImports: true
     },
-    watch: false, // don't watch for changes on minified browser bundle
     context: 'window',
     plugins: [
       resolve({

@@ -1,10 +1,9 @@
 import {
   IMTBLWidgetEvents,
   WidgetEvent,
-  ConnectionSuccess,
-  ConnectionFailed,
   ConnectEventType,
   WalletProviderName,
+  WidgetType,
 } from '@imtbl/checkout-sdk';
 
 import { Web3Provider } from '@ethersproject/providers';
@@ -14,7 +13,7 @@ export function sendConnectSuccessEvent(
   provider: Web3Provider,
   walletProvider?: WalletProviderName,
 ) {
-  const successEvent = new CustomEvent<WidgetEvent<ConnectionSuccess>>(
+  const successEvent = new CustomEvent<WidgetEvent<WidgetType.CONNECT>>(
     IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
     {
       detail: {
@@ -47,7 +46,7 @@ export function sendCloseWidgetEvent(eventTarget: Window | EventTarget) {
 }
 
 export function sendConnectFailedEvent(eventTarget: Window | EventTarget, reason: string) {
-  const failedEvent = new CustomEvent<WidgetEvent<ConnectionFailed>>(
+  const failedEvent = new CustomEvent<WidgetEvent<WidgetType.CONNECT>>(
     IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
     {
       detail: {

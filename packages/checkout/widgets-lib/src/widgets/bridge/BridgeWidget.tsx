@@ -2,7 +2,7 @@ import {
   BiomeCombinedProviders,
 } from '@biom3/react';
 import {
-  BridgeWidgetProps,
+  BridgeWidgetParams,
   NetworkFilterTypes, TokenFilterTypes,
 } from '@imtbl/checkout-sdk';
 import {
@@ -19,12 +19,12 @@ import {
   ETH_SEPOLIA_TO_ZKEVM_TESTNET,
   TokenBridge,
 } from '@imtbl/bridge-sdk';
+import { StrongCheckoutWidgetsConfig } from 'lib/withDefaultWidgetConfig';
 import {
   DEFAULT_BALANCE_RETRY_POLICY,
   getL1ChainId,
   getL2ChainId,
 } from '../../lib';
-import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
   ErrorView as ErrorViewType,
   SharedViews,
@@ -52,22 +52,14 @@ import { EventTargetContext } from '../../context/event-target-context/EventTarg
 import { GetAllowedBalancesResultType, getAllowedBalances } from '../../lib/balance';
 import { widgetTheme } from '../../lib/theme';
 
-// export interface BridgeWidgetProps {
-//   params: BridgeWidgetParams;
-//   config: StrongCheckoutWidgetsConfig
-// }
-
-export type BridgeWidgetInputs = BridgeWidgetProps & {
+export type BridgeWidgetInputs = BridgeWidgetParams & {
   config: StrongCheckoutWidgetsConfig
 };
 
-export interface BridgeWidgetParams {
-  fromContractAddress?: string;
-  amount?: string;
-}
-
 export function BridgeWidget(props: BridgeWidgetInputs) {
-  const { amount, fromContractAddress, config } = props;
+  const {
+    amount, fromContractAddress, config,
+  } = props;
   const { environment, theme } = config;
   const successText = text.views[BridgeWidgetViews.SUCCESS];
   const failText = text.views[BridgeWidgetViews.FAIL];

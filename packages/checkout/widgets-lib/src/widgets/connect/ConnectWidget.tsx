@@ -1,14 +1,16 @@
 /* eslint-disable react/jsx-no-constructed-context-values */
-import { BiomeCombinedProviders } from '@biom3/react';
-import { Checkout, ConnectTargetLayer, ConnectWidgetProps } from '@imtbl/checkout-sdk';
-import {
+import React, {
   useContext, useMemo, useEffect, useReducer, useCallback,
 } from 'react';
+import { BiomeCombinedProviders } from '@biom3/react';
+import {
+  Checkout, ConnectTargetLayer, ConnectWidgetParams,
+} from '@imtbl/checkout-sdk';
 import {
   sendCloseWidgetEvent,
   sendConnectFailedEvent,
   sendConnectSuccessEvent,
-} from './ConnectWidgetEvents';
+} from './connectWidgetEvents';
 import {
   ConnectActions,
   ConnectContext,
@@ -40,7 +42,7 @@ import { widgetTheme } from '../../lib/theme';
 import { UserJourney, useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { identifyUser } from '../../lib/analytics/identifyUser';
 
-export type ConnectWidgetInputs = ConnectWidgetProps & {
+export type ConnectWidgetInputs = ConnectWidgetParams & {
   config: StrongCheckoutWidgetsConfig
   deepLink?: ConnectWidgetViews;
   sendCloseEventOverride?: () => void;
@@ -148,31 +150,31 @@ export function ConnectWidget(props: ConnectWidgetInputs) {
         <ConnectContext.Provider value={connectReducerValues}>
           <>
             {view.type === SharedViews.LOADING_VIEW && (
-              <LoadingView loadingText="Connecting" />
+            <LoadingView loadingText="Connecting" />
             )}
             {view.type === ConnectWidgetViews.CONNECT_WALLET && (
-              <ConnectWallet />
+            <ConnectWallet />
             )}
             {view.type === ConnectWidgetViews.READY_TO_CONNECT && (
-              <ReadyToConnect targetChainId={targetChainId} />
+            <ReadyToConnect targetChainId={targetChainId} />
             )}
             {view.type === ConnectWidgetViews.SWITCH_NETWORK && networkToSwitchTo === ConnectTargetLayer.LAYER2 && (
-              <SwitchNetworkZkEVM />
+            <SwitchNetworkZkEVM />
             )}
             {view.type === ConnectWidgetViews.SWITCH_NETWORK && networkToSwitchTo === ConnectTargetLayer.LAYER1 && (
-              <SwitchNetworkEth />
+            <SwitchNetworkEth />
             )}
             {view.type === ConnectWidgetViews.SUCCESS && provider && (
-              <ConnectLoaderSuccess>
-                <StatusView
-                  statusText="Connection secure"
-                  actionText="Continue"
-                  onActionClick={() => sendCloseEvent()}
-                  onRenderEvent={handleConnectSuccess}
-                  statusType={StatusType.SUCCESS}
-                  testId="success-view"
-                />
-              </ConnectLoaderSuccess>
+            <ConnectLoaderSuccess>
+              <StatusView
+                statusText="Connection secure"
+                actionText="Continue"
+                onActionClick={() => sendCloseEvent()}
+                onRenderEvent={handleConnectSuccess}
+                statusType={StatusType.SUCCESS}
+                testId="success-view"
+              />
+            </ConnectLoaderSuccess>
             )}
             {((view.type === ConnectWidgetViews.SUCCESS && !provider)
             || view.type === SharedViews.ERROR_VIEW)

@@ -1,47 +1,45 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable max-len */
 import {
-  Widget, Checkout, ConnectWidgetProps, BridgeWidgetProps, WidgetType, WidgetProps, WidgetConfiguration,
+  Widget,
+  Checkout,
+  ConnectWidgetParams,
+  BridgeWidgetParams,
+  WidgetType,
+  WidgetConfigurations,
+  IWidgetsFactory,
+  WidgetParameters,
 } from '@imtbl/checkout-sdk';
-import { Bridge, Connect } from 'CheckoutWidgets';
+import { Bridge } from 'widgets/bridge/BridgeWidgetRoot';
+import { Connect } from 'widgets/connect/ConnectWidgetRoot';
 
-export class WidgetsFactory {
+export class WidgetsFactory implements IWidgetsFactory {
   private sdk: Checkout;
 
-  private widgetConfig: WidgetConfiguration;
+  private widgetConfig: WidgetConfigurations;
 
-  private createdWidgets: Widget[] = [];
-
-  constructor(sdk: Checkout, widgetConfig: WidgetConfiguration) {
+  constructor(sdk: Checkout, widgetConfig: WidgetConfigurations) {
     this.sdk = sdk;
     this.widgetConfig = widgetConfig;
   }
 
-  create(widgetType: WidgetType, params: WidgetProps): Widget {
-    switch (widgetType) {
-      case 'connect': {
-        // validate props here
-        const connectProps = params;
-        const connect = new Connect(this.sdk, this.widgetConfig, connectProps as ConnectWidgetProps);
-        this.createdWidgets.push(connect);
-        return connect;
+  create<T extends WidgetType>(type: T, params: WidgetParameters[T]): Widget<T> {
+    switch (type) {
+      case WidgetType.CONNECT: {
+        return new Connect(this.sdk, {
+          config: this.widgetConfig,
+          params,
+        }) as Widget<WidgetType.CONNECT> as Widget<T>;
       }
-      case 'bridge': {
-        // validate props here
-        const bridgeProps = params;
-        const bridge = new Bridge(this.sdk, this.widgetConfig, bridgeProps as BridgeWidgetProps);
-        this.createdWidgets.push(bridge);
-        return bridge;
+      case WidgetType.BRIDGE: {
+        // @ts-ignore
+        return new Bridge<WidgetType.BRIDGE>(this.sdk, {
+          config: this.widgetConfig,
+          params,
+        }) as Widget<WidgetType.BRIDGE> as Widget<T>;
       }
       default:
         throw new Error('widget type not supported');
     }
-  }
-
-  updateConfig(config: WidgetConfiguration) {
-    this.widgetConfig = config;
-    // update all configs
-    this.createdWidgets.forEach((widget) => {
-      widget.updateConfig(this.widgetConfig);
-    });
   }
 }
