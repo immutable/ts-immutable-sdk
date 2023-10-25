@@ -18,7 +18,7 @@ import { BridgeWidget } from './BridgeWidget';
 export class Bridge extends Base<WidgetType.BRIDGE> {
   protected eventTarget: string = 'imtbl-bridge-widget';
 
-  protected rerender() {
+  protected render() {
     this.validate(this.properties);
 
     const { params } = this.properties;
