@@ -26,8 +26,7 @@ export const MainPage = () => {
     connectWidget.on(ConnectEventType.SUCCESS, (data: any) => {
       setWeb3Provider(data.provider)
     });
-    connectWidget.on(ConnectEventType.FAILURE, (data) => console.log('Connect Widget failure event', data));
-  }, [connectWidget])
+    }, [connectWidget])
 
   // local state for enabling/disabling and changing buttons
   const [doneSwap, setDoneSwap] = useState<boolean>(false);

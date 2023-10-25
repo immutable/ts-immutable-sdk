@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import {
   ConnectTargetLayer,
   IMTBLWidgetEvents,
@@ -17,7 +17,7 @@ import { sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
 import { BridgeWidget } from './BridgeWidget';
 
 export class Bridge extends Base<WidgetType.BRIDGE> {
-  protected eventTarget: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT;
+  protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT;
 
   protected render() {
     this.validate(this.properties);
@@ -37,10 +37,7 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
 
     if (!this.reactRoot) return;
 
-    const themeReducerValue = useMemo(
-      () => widgetTheme(this.strongConfig().theme),
-      [this.strongConfig().theme],
-    );
+    const theme = widgetTheme(this.strongConfig().theme);
 
     this.reactRoot.render(
       <React.StrictMode>
@@ -48,7 +45,7 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
           widgetConfig={this.strongConfig()}
         >
           {showBridgeComingSoonScreen && (
-            <BiomeCombinedProviders theme={{ base: themeReducerValue }}>
+            <BiomeCombinedProviders theme={{ base: theme }}>
               <BridgeComingSoon onCloseEvent={() => sendBridgeWidgetCloseEvent(window)} />
             </BiomeCombinedProviders>
           )}
