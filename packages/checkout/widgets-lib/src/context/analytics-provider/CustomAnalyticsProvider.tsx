@@ -5,7 +5,7 @@ import {
   SegmentAppName,
   createAnalyticsInstance,
   getSegmentWriteKey,
-} from './SegmentAnalyticsProvider';
+} from './segmentAnalyticsConfig';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 
 type CustomAnalyticsProps = {

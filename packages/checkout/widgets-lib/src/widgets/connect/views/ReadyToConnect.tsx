@@ -17,7 +17,7 @@ import {
   ViewActions,
 } from '../../../context/view-context/ViewContext';
 import { isMetaMaskProvider, isPassportProvider } from '../../../lib/providerUtils';
-import { UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { UserJourney } from '../../../context/analytics-provider/segmentAnalyticsConfig';
 import { identifyUser } from '../../../lib/analytics/identifyUser';
 import { useAnalytics } from '../../../context/analytics-provider/CustomAnalyticsProvider';
 

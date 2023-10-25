@@ -1,7 +1,8 @@
 import { Box, ButtCon } from '@biom3/react';
 import { useState } from 'react';
 import { isCopiedStyle } from './CopyButtonStyles';
-import { UserJourney, useAnalytics } from '../../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { UserJourney } from '../../../../context/analytics-provider/segmentAnalyticsConfig';
+import { useAnalytics } from '../../../../context/analytics-provider/CustomAnalyticsProvider';
 
 export function CopyButton({
   textToCopy,

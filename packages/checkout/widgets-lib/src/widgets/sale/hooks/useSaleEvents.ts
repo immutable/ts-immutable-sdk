@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import { useAnalytics } from '../../../context/analytics-provider/CustomAnalyticsProvider';
-import { TrackEventProps, UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { TrackEventProps, UserJourney } from '../../../context/analytics-provider/segmentAnalyticsConfig';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import {
   sendSaleFailedEvent,

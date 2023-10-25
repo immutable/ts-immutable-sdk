@@ -16,7 +16,7 @@ import {
   ViewActions,
   SharedViews,
 } from '../../../context/view-context/ViewContext';
-import { UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { UserJourney } from '../../../context/analytics-provider/segmentAnalyticsConfig';
 import { useAnalytics } from '../../../context/analytics-provider/CustomAnalyticsProvider';
 
 export interface WalletListProps {

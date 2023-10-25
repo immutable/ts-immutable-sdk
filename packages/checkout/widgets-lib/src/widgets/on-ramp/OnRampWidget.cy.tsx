@@ -11,9 +11,10 @@ import {
   ConnectLoaderTestComponent,
 } from '../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
 import { ConnectionStatus } from '../../context/connect-loader-context/ConnectLoaderContext';
-import { AnalyticsProvider } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import { createAnalyticsInstance } from '../../context/analytics-provider/segmentAnalyticsConfig';
 
 describe('OnRampWidget tests', () => {
+  const { AnalyticsProvider } = createAnalyticsInstance('', 'checkout');
   const widgetsConfig: StrongCheckoutWidgetsConfig = {
     environment: Environment.SANDBOX,
     theme: WidgetTheme.DARK,

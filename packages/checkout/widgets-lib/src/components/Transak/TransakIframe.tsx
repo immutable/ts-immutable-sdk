@@ -6,7 +6,7 @@ import {
   TransakWidgetType,
   TransakNFTCheckoutParams,
 } from './useTransakIframe';
-import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import { UserJourney } from '../../context/analytics-provider/segmentAnalyticsConfig';
 import { CenteredBoxContent } from '../CenteredBoxContent/CenteredBoxContent';
 import { LoadingBox } from '../../views/loading/LoadingBox';
 

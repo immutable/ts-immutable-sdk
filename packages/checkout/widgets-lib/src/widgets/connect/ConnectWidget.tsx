@@ -40,7 +40,7 @@ import { ErrorView } from '../../views/error/ErrorView';
 import { text } from '../../resources/text/textConfig';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { widgetTheme } from '../../lib/theme';
-import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import { UserJourney } from '../../context/analytics-provider/segmentAnalyticsConfig';
 import { identifyUser } from '../../lib/analytics/identifyUser';
 import { useAnalytics } from '../../context/analytics-provider/CustomAnalyticsProvider';
 

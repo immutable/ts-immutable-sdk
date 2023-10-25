@@ -16,7 +16,7 @@ import { SwapContext } from '../context/SwapContext';
 import { NotEnoughImx } from '../../../components/NotEnoughImx/NotEnoughImx';
 import { IMX_TOKEN_SYMBOL } from '../../../lib';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
-import { UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { UserJourney } from '../../../context/analytics-provider/segmentAnalyticsConfig';
 import { useAnalytics } from '../../../context/analytics-provider/CustomAnalyticsProvider';
 
 export interface SwapCoinsProps {

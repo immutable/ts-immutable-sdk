@@ -13,7 +13,7 @@ import { text } from '../../../resources/text/textConfig';
 import { boxMainStyle, containerStyle } from './onRampStyles';
 import {
   UserJourney,
-} from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+} from '../../../context/analytics-provider/segmentAnalyticsConfig';
 import { TransakEventData, TransakEvents, TransakStatuses } from '../TransakEvents';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';

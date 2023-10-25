@@ -33,6 +33,9 @@ export enum SegmentAppName {
   SALE = 'portfoliogame',
 }
 
+/**
+ * Segment write keys for each app and environment
+ */
 const SEGMENT_ANALYTICS_WRITE_KEYS = {
   [SegmentAppName.CHECKOUT]: {
     [Environment.SANDBOX]: 'b69BcXnFXdaiFC6MqRQiHvjcPrTxftZl',
@@ -44,25 +47,23 @@ const SEGMENT_ANALYTICS_WRITE_KEYS = {
   },
 };
 
+/**
+ * Get the segment write key for the given app and environment
+ * @param environment
+ * @param appName
+ * @returns string
+ */
 export const getSegmentWriteKey = (
   environment: Environment,
-  writeKey: SegmentAppName = SegmentAppName.CHECKOUT,
-): string => SEGMENT_ANALYTICS_WRITE_KEYS[writeKey][environment];
+  appName: SegmentAppName = SegmentAppName.CHECKOUT,
+): string => SEGMENT_ANALYTICS_WRITE_KEYS[appName][environment];
 
-const productName = 'checkout';
-
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export const { AnalyticsProvider, useAnalytics } = createAnalytics<
-UserJourney,
-string,
-string,
-AnalyticsControlTypes,
-StandardAnalyticsActions
->({
-  writeKey: '',
-  appName: productName,
-});
-
+/**
+ * Create an instance of the analytics provider
+ * @param writeKey
+ * @param appName
+ * @returns { AnalyticsProvider, useAnalytics }
+ */
 export const createAnalyticsInstance = (writeKey: string, appName: any) => createAnalytics<
 UserJourney,
 string,
