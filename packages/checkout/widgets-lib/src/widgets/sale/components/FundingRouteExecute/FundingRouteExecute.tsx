@@ -1,4 +1,3 @@
-import { Box, Button } from '@biom3/react';
 import { FundingStep, FundingStepType } from '@imtbl/checkout-sdk';
 import {
   BridgeEventType, ConnectEventType, ConnectionSuccess, IMTBLWidgetEvents, SwapEventType,
@@ -16,14 +15,14 @@ import {
   EventTargetActions, EventTargetContext, eventTargetReducer, initialEventTargetState,
 } from '../../../../context/event-target-context/EventTargetContext';
 import { ConnectWidgetViews } from '../../../../context/view-context/ConnectViewContextTypes';
+import { SaleWidgetViews } from '../../../../context/view-context/SaleViewContextTypes';
 import { ConnectTargetLayer, getL1ChainId, getL2ChainId } from '../../../../lib/networkUtils';
+import { text as textConfig } from '../../../../resources/text/textConfig';
 import { LoadingView } from '../../../../views/loading/LoadingView';
 import { BridgeWidget, BridgeWidgetParams } from '../../../bridge/BridgeWidget';
 import { ConnectWidget } from '../../../connect/ConnectWidget';
 import { SwapWidget, SwapWidgetParams } from '../../../swap/SwapWidget';
 import { useSaleContext } from '../../context/SaleContextProvider';
-import { text as textConfig } from '../../../../resources/text/textConfig';
-import { SaleWidgetViews } from '../../../../context/view-context/SaleViewContextTypes';
 
 type FundingRouteExecuteProps = {
   fundingRouteStep?: FundingStep;
@@ -85,6 +84,7 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
           fromContractAddress: step.fundingItem.token.address,
           toContractAddress: requiredTokenAddress,
         });
+
         setView(FundingRouteExecuteViews.EXECUTE_SWAP);
         return;
       }
@@ -222,18 +222,6 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
           deepLink={ConnectWidgetViews.SWITCH_NETWORK}
         />
       )}
-
-      {/* Below for dev purposes to skip steps if necessary */}
-      <Box testId="funding-route-execute">
-        { fundingRouteStep?.type }
-        {' '}
-        -
-        {' '}
-        { fundingRouteStep?.fundingItem.token.symbol }
-        <Button sx={{ mt: 'auto' }} variant="primary" onClick={onFundingRouteExecuted}>
-          next
-        </Button>
-      </Box>
     </EventTargetContext.Provider>
   );
 }
