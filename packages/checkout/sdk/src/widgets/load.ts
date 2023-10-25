@@ -1,4 +1,4 @@
-import { isDevMode } from '../lib/env';
+import { useLocalBundle } from '../lib/env';
 import { SemanticVersion } from './definitions/types';
 import { validateAndBuildVersion } from './version';
 
@@ -23,7 +23,7 @@ export function loadUnresolved(
   const tag = document.createElement('script');
 
   let cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${validVersion}/dist/browser/checkout.js`;
-  if (isDevMode()) cdnUrl = `http://${window.location.host}/lib/js/widgets.js`;
+  if (useLocalBundle()) cdnUrl = `http://${window.location.host}/lib/js/widgets.js`;
 
   tag.setAttribute('data-product', 'checkout');
   tag.setAttribute('data-version', validVersion);
