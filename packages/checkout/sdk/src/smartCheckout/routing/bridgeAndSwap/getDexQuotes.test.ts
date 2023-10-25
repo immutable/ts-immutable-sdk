@@ -3,22 +3,21 @@ import { BigNumber } from 'ethers';
 import { CheckoutConfiguration } from '../../../config';
 import { getDexQuotes } from './getDexQuotes';
 import { BalanceNativeRequirement } from '../../balanceCheck/types';
-import { DexQuoteCache } from '../types';
-import { getOrSetQuotesFromCache } from '../swap/dexQuoteCache';
+import { quoteFetcher } from '../swap/quoteFetcher';
+import { ChainId } from '../../../types';
 
-jest.mock('../swap/dexQuoteCache');
+jest.mock('../swap/quoteFetcher');
 
 describe('getDexQuotes', () => {
   const config = new CheckoutConfiguration({
     baseConfig: { environment: Environment.SANDBOX },
   });
 
-  it('should send token addresses to getOrSetQuotesFromCache', async () => {
-    (getOrSetQuotesFromCache as jest.Mock).mockResolvedValue({});
+  it('should send token addresses to the quote fetcher', async () => {
+    (quoteFetcher as jest.Mock).mockResolvedValue({});
 
     await getDexQuotes(
       config,
-      {} as DexQuoteCache,
       '0xOWNER',
       '0xREQUIRED',
       {
@@ -42,10 +41,10 @@ describe('getDexQuotes', () => {
       ],
     );
 
-    expect(getOrSetQuotesFromCache).toBeCalledTimes(1);
-    expect(getOrSetQuotesFromCache).toBeCalledWith(
+    expect(quoteFetcher).toBeCalledTimes(1);
+    expect(quoteFetcher).toBeCalledWith(
       config,
-      {},
+      ChainId.IMTBL_ZKEVM_TESTNET,
       '0xOWNER',
       {
         address: '0xREQUIRED',
