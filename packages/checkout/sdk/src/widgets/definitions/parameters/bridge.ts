@@ -1,4 +1,6 @@
 /* eslint-disable max-len */
+import { Web3Provider } from '@ethersproject/providers';
+import { Passport } from '@imtbl/passport';
 import { WalletProviderName } from '../../../types';
 
 /**
@@ -10,4 +12,6 @@ export type BridgeWidgetParams = {
   fromContractAddress?: string;
   amount?: string;
   walletProvider?: WalletProviderName
+  web3Provider?: Web3Provider
+  passport?: Passport
 };

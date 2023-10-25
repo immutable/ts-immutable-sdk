@@ -1,14 +1,19 @@
+import React, { useMemo } from 'react';
 import {
-  BridgeWidgetParams, ConnectTargetLayer, WidgetType,
+  ConnectTargetLayer,
+  WalletProviderName,
+  WidgetType,
 } from '@imtbl/checkout-sdk';
 import { Base } from 'widgets/BaseWidgetRoot';
-import { StrongCheckoutWidgetsConfig } from 'lib/withDefaultWidgetConfig';
-import { ConnectLoaderParams } from 'components/ConnectLoader/ConnectLoader';
+import { ConnectLoader, ConnectLoaderParams } from 'components/ConnectLoader/ConnectLoader';
 import { getL1ChainId } from 'lib';
-
-export type BridgeWidgetInputs = BridgeWidgetParams & {
-  config: StrongCheckoutWidgetsConfig
-};
+import { isPassportProvider } from 'lib/providerUtils';
+import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
+import { BiomeCombinedProviders } from '@biom3/react';
+import { widgetTheme } from 'lib/theme';
+import { BridgeComingSoon } from './views/BridgeComingSoon';
+import { sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
+import { BridgeWidget } from './BridgeWidget';
 
 export class Bridge extends Base<WidgetType.BRIDGE> {
   protected eventTarget: string = 'imtbl-bridge-widget';
@@ -16,53 +21,50 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
   protected rerender() {
     this.validate(this.properties);
 
+    const { params } = this.properties;
+
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER1,
-      walletProvider: this.properties.params?.walletProvider,
-      // web3Provider: this.provider,
-      // passport: this.passport,
-      allowedChains: [
-        getL1ChainId(this.checkout!.config),
-      ],
+      walletProvider: params?.walletProvider,
+      web3Provider: params?.web3Provider,
+      passport: params?.passport,
+      allowedChains: [getL1ChainId(this.checkout.config)],
     };
-    console.log(connectLoaderParams);
-    // const params: BridgeWidgetParams = {
-    //   fromContractAddress: this.fromContractAddress,
-    //   amount: this.amount,
-    // };
 
-    //   if (!this.reactRoot) {
-    //     this.reactRoot = ReactDOM.createRoot(this);
-    //   }
-    //   const showBridgeComingSoonScreen = isPassportProvider(this.provider)
-    //   || this.walletProvider === WalletProviderName.PASSPORT;
+    const showBridgeComingSoonScreen = isPassportProvider(params?.web3Provider)
+      || params?.walletProvider === WalletProviderName.PASSPORT;
 
-  //   this.reactRoot.render(
-  //     <React.StrictMode>
-  //       <BiomePortalIdProvider>
-  //         <CustomAnalyticsProvider
-  //           widgetConfig={this.widgetConfig!}
-  //         >
-  //           {showBridgeComingSoonScreen && (
-  //           <BiomeCombinedProviders theme={{ base: onDarkBase }}>
-  //             <BridgeComingSoon onCloseEvent={() => sendBridgeWidgetCloseEvent(window)} />
-  //           </BiomeCombinedProviders>
-  //           )}
-  //           {!showBridgeComingSoonScreen && (
-  //           <ConnectLoader
-  //             params={connectLoaderParams}
-  //             closeEvent={() => sendBridgeWidgetCloseEvent(window)}
-  //             widgetConfig={this.widgetConfig!}
-  //           >
-  //             <BridgeWidget
-  //               params={params}
-  //               config={this.widgetConfig!}
-  //             />
-  //           </ConnectLoader>
-  //           )}
-  //         </CustomAnalyticsProvider>
-  //       </BiomePortalIdProvider>
-  //     </React.StrictMode>,
-  //   );
+    if (!this.reactRoot) return;
+
+    const themeReducerValue = useMemo(
+      () => widgetTheme(this.strongConfig().theme),
+      [this.strongConfig().theme],
+    );
+
+    this.reactRoot.render(
+      <React.StrictMode>
+        <CustomAnalyticsProvider
+          widgetConfig={this.strongConfig()}
+        >
+          {showBridgeComingSoonScreen && (
+            <BiomeCombinedProviders theme={{ base: themeReducerValue }}>
+              <BridgeComingSoon onCloseEvent={() => sendBridgeWidgetCloseEvent(window)} />
+            </BiomeCombinedProviders>
+          )}
+          {!showBridgeComingSoonScreen && (
+            <ConnectLoader
+              params={connectLoaderParams}
+              closeEvent={() => sendBridgeWidgetCloseEvent(window)}
+              widgetConfig={this.strongConfig()}
+            >
+              <BridgeWidget
+                {...this.properties.params}
+                config={this.strongConfig()}
+              />
+            </ConnectLoader>
+          )}
+        </CustomAnalyticsProvider>
+      </React.StrictMode>,
+    );
   }
 }
