@@ -36,9 +36,11 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
   useEffect(() => {
     if (subView === FundWithSmartCheckoutSubViews.INIT && !smartCheckoutLoading.current) {
       smartCheckoutLoading.current = true;
-      querySmartCheckout().finally(() => {
+      try {
+        querySmartCheckout();
+      } finally {
         smartCheckoutLoading.current = false;
-      });
+      }
     }
   }, [subView]);
 
