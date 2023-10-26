@@ -103,13 +103,23 @@ export class Checkout {
       try {
         const script = loadUnresolved(init.version);
         if (script.loaded) {
-          resolve(
-            new ImmutableCheckoutWidgets.WidgetsFactory(checkout, init.config),
-          );
+          // eslint-disable-next-line no-constant-condition
+          while (true) {
+            try {
+              const f = new ImmutableCheckoutWidgets.WidgetsFactory(checkout, init.config);
+              resolve(f);
+            } catch { /* Empty */ }
+          }
         } else {
-          script.element.onload = () => resolve(
-            new ImmutableCheckoutWidgets.WidgetsFactory(checkout, init.config),
-          );
+          script.element.onload = () => {
+            // eslint-disable-next-line no-constant-condition
+            while (true) {
+              try {
+                const f = new ImmutableCheckoutWidgets.WidgetsFactory(checkout, init.config);
+                resolve(f);
+              } catch { /* Empty */ }
+            }
+          };
         }
       } catch (err) {
         reject(err);
