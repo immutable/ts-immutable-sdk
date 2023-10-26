@@ -34,5 +34,3 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Ignore any dev env config files
-devnet.ts

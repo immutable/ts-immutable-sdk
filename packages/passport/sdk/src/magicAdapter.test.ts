@@ -49,6 +49,20 @@ describe('MagicWallet', () => {
     });
   });
 
+  describe('window is not defined', () => {
+    const { window } = global;
+    beforeAll(() => {
+    // @ts-expect-error
+      delete global.window;
+    });
+    afterAll(() => {
+      global.window = window;
+    });
+    it('does not call the magic preload method', () => {
+      expect(preload).toBeCalledTimes(0);
+    });
+  });
+
   describe('login', () => {
     it('should call loginWithOIDC and initialise the provider with the correct arguments', async () => {
       const magicProvider = await magicWallet.login(idToken);
