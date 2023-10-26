@@ -356,7 +356,7 @@ export class Orderbook {
     accountAddress: string,
     signature: string,
   ): Promise<CancelOrdersResult> {
-    return this.apiClient.cancelOrdersOffchain(
+    return this.apiClient.cancelOrders(
       orderIds,
       accountAddress,
       signature,

@@ -72,7 +72,7 @@ export class ImmutableApiClient {
     });
   }
 
-  async cancelOrdersOffchain(
+  async cancelOrders(
     orderIds: string[],
     accountAddress: string,
     signature: string,
