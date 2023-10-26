@@ -103,22 +103,12 @@ export class Checkout {
       try {
         const script = loadUnresolved(init.version);
         if (script.loaded) {
-          // eslint-disable-next-line no-constant-condition
-          while (true) {
-            try {
-              const f = new ImmutableCheckoutWidgets.WidgetsFactory(checkout, init.config);
-              resolve(f);
-            } catch { /* Empty */ }
-          }
+          while (ImmutableCheckoutWidgets === undefined);
+          resolve(new ImmutableCheckoutWidgets.WidgetsFactory(checkout, init.config));
         } else {
           script.element.onload = () => {
-            // eslint-disable-next-line no-constant-condition
-            while (true) {
-              try {
-                const f = new ImmutableCheckoutWidgets.WidgetsFactory(checkout, init.config);
-                resolve(f);
-              } catch { /* Empty */ }
-            }
+            while (ImmutableCheckoutWidgets === undefined);
+            resolve(new ImmutableCheckoutWidgets.WidgetsFactory(checkout, init.config));
           };
         }
       } catch (err) {
