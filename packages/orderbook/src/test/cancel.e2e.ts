@@ -70,7 +70,7 @@ describe('cancel order', () => {
     await receipt2.wait();
     const orderId2 = await createOrder(sdk, offerer, contract.address, '1');
 
-    const { cancellationAction } = await sdk.cancelOrders(
+    const { cancellationAction } = await sdk.cancelOrdersOnChain(
       [orderId1, orderId2],
       offerer.address,
     );
@@ -104,13 +104,13 @@ describe('cancel order', () => {
     await receipt2.wait();
     const orderId2 = await createOrder(sdk, offerer, contract.address, '1');
 
-    const { signableAction } = await sdk.prepareOffchainOrderCancellations(
+    const { signableAction } = await sdk.prepareOrderCancellations(
       [orderId1, orderId2],
     );
 
     const signatures = await actionAll([signableAction], offerer);
 
-    await sdk.cancelOrdersOffchain([orderId1, orderId2], offerer.address, signatures[0]);
+    await sdk.cancelOrders([orderId1, orderId2], offerer.address, signatures[0]);
 
     await waitForOrderToBeOfStatus(sdk, orderId1, OrderStatusName.CANCELLED);
     await waitForOrderToBeOfStatus(sdk, orderId2, OrderStatusName.CANCELLED);

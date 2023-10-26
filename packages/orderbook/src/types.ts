@@ -40,7 +40,7 @@ export interface PrepareListingResponse {
   orderHash: string;
 }
 
-export interface PrepareCancelOrdersOffchainResponse {
+export interface PrepareCancelOrdersResponse {
   signableAction: SignableAction;
 }
 
@@ -153,7 +153,7 @@ export interface FulfillOrderResponse {
   order: Order;
 }
 
-export interface CancelOrderResponse {
+export interface CancelOrdersOnChainResponse {
   cancellationAction: TransactionAction
 }
 

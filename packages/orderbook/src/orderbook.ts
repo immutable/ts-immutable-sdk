@@ -15,7 +15,7 @@ import { Seaport } from './seaport';
 import { SeaportLibFactory } from './seaport/seaport-lib-factory';
 import {
   ActionType,
-  CancelOrderResponse,
+  CancelOrdersOnChainResponse,
   CreateListingParams,
   FeeType,
   FeeValue,
@@ -28,7 +28,7 @@ import {
   ListTradesParams,
   ListTradesResult,
   OrderStatusName,
-  PrepareCancelOrdersOffchainResponse,
+  PrepareCancelOrdersResponse,
   PrepareListingParams,
   PrepareListingResponse,
   SignablePurpose,
@@ -295,15 +295,15 @@ export class Orderbook {
   }
 
   /**
-   * Cancelling orders off-chain is gasless alternative to on-chain cancellation exposed with
-   * `cancelOrder`. For the orderbook to authenticate the cancellation, the creator of the orders
-   * must sign an EIP712 message containing the orderIds
+   * Cancelling orders is a gasless alternative to on-chain cancellation exposed with
+   * `cancelOrdersOnChain`. For the orderbook to authenticate the cancellation, the creator
+   * of the orders must sign an EIP712 message containing the orderIds
    * @param {string} orderIds - The orderIds to attempt to cancel.
-   * @return {PrepareCancelOrdersOffchainResponse} The signable action to cancel the orders.
+   * @return {PrepareCancelOrdersResponse} The signable action to cancel the orders.
    */
-  async prepareOffchainOrderCancellations(
+  async prepareOrderCancellations(
     orderIds: string[],
-  ): Promise<PrepareCancelOrdersOffchainResponse> {
+  ): Promise<PrepareCancelOrdersResponse> {
     const network = await this.orderbookConfig.provider.getNetwork();
     const domain = {
       name: 'imtbl-order-book',
@@ -340,18 +340,18 @@ export class Orderbook {
   }
 
   /**
-   * Cancelling orders off-chain is a gasless alternative to on-chain cancellation exposed with
-   * `cancelOrders`. Orders cancelled this way cannot be fulfilled and will be removed from the
-   * orderbook. If there is pending fulfillment data outstanding for the order, its cancellation
-   * will be pending until the fulfillment window has passed. `prepareOffchainOrderCancellations`
-   * can be used to get the signable action that is signed to get the signature required for this
-   * call.
+   * Cancelling orders is a gasless alternative to on-chain cancellation exposed with
+   * `cancelOrdersOnChain`. Orders cancelled this way cannot be fulfilled and will be removed
+   * from the orderbook. If there is pending fulfillment data outstanding for the order, its
+   * cancellation will be pending until the fulfillment window has passed.
+   * `prepareOffchainOrderCancellations` can be used to get the signable action that is signed
+   * to get the signature required for this call.
    * @param {string[]} orderIds - The orderIds to attempt to cancel.
    * @param {string} accountAddress - The address of the account cancelling the orders.
    * @param {string} accountAddress - The address of the account cancelling the orders.
-   * @return {PrepareCancelOrdersOffchainResponse} The signable action to cancel the orders.
+   * @return {CancelOrdersResult} The result of the off-chain cancellation request
    */
-  async cancelOrdersOffchain(
+  async cancelOrders(
     orderIds: string[],
     accountAddress: string,
     signature: string,
@@ -364,18 +364,18 @@ export class Orderbook {
   }
 
   /**
-   * Get an unsigned cancel orders transaction. Orders can only be cancelled by
+   * Get an unsigned order cancellation transaction. Orders can only be cancelled by
    * the account that created them. All of the orders must be from the same seaport contract.
    * If trying to cancel orders from multiple seaport contracts, group the orderIds by seaport
    * contract and call this method for each group.
    * @param {string[]} orderIds - The orderIds to cancel.
    * @param {string} accountAddress - The address of the account cancelling the order.
-   * @return {CancelOrderResponse} The unsigned cancel order action
+   * @return {CancelOrdersOnChainResponse} The unsigned cancel order action
    */
-  async cancelOrders(
+  async cancelOrdersOnChain(
     orderIds: string[],
     accountAddress: string,
-  ): Promise<CancelOrderResponse> {
+  ): Promise<CancelOrdersOnChainResponse> {
     const orderResults = await Promise.all(orderIds.map((id) => this.apiClient.getListing(id)));
 
     // eslint-disable-next-line no-restricted-syntax
