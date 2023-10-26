@@ -55,6 +55,7 @@
     "lint:fix": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0 --fix",
     "start": "rollup --config rollup.config.js --watch",
     "start:dev": "CHECKOUT_DEV_MODE=true yarn start",
+    "start:local": "CHECKOUT_LOCAL_MODE=true yarn start",
     "test": "jest test",
     "test:coverage": "jest --coverage",
     "test:watch": "jest test --watch",
