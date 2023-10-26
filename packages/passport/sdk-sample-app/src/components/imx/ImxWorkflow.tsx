@@ -1,5 +1,6 @@
 import React, {
   useCallback,
+  useEffect,
   useState,
 } from 'react';
 import { Stack } from 'react-bootstrap';
@@ -17,6 +18,7 @@ function ImxWorkflow() {
   const [showTrade, setShowTrade] = useState<boolean>(false);
   const [showTransfer, setShowTransfer] = useState<boolean>(false);
   const [showOrder, setShowOrder] = useState<boolean>(false);
+  const [isRegistered, setIsRegistered] = useState<boolean>(false);
 
   const { addMessage, isLoading, setIsLoading } = useStatusProvider();
   const { connectImx, connectImxSilent, imxProvider } = usePassportProvider();
@@ -31,6 +33,7 @@ function ImxWorkflow() {
       setIsLoading(true);
       const result = await imxProvider?.registerOffchain();
       addMessage('Register off chain', result);
+      setIsRegistered(true);
     } catch (err) {
       addMessage('Error egistering off chain', err);
     } finally {
@@ -54,6 +57,12 @@ function ImxWorkflow() {
     setShowOrder(true);
   }, []);
 
+  const notLoadingAndIsRegistered = !isLoading && isRegistered;
+
+  useEffect(() => {
+    imxProvider?.isRegisteredOnchain().then((res) => setIsRegistered(res)).catch(() => setIsRegistered(false));
+  }, [imxProvider, isRegistered]);
+
   return (
     <CardStack title="Imx Workflow">
       <Stack direction="horizontal" style={{ flexWrap: 'wrap' }} gap={3}>
@@ -76,7 +85,7 @@ function ImxWorkflow() {
         {imxProvider && (
           <>
             <WorkflowButton
-              disabled={isLoading}
+              disabled={!notLoadingAndIsRegistered}
               onClick={handleTrade}
             >
               Buy
@@ -89,7 +98,7 @@ function ImxWorkflow() {
                 />
               )}
             <WorkflowButton
-              disabled={isLoading}
+              disabled={!notLoadingAndIsRegistered}
               onClick={handleOrder}
             >
               Order
@@ -102,7 +111,7 @@ function ImxWorkflow() {
                 />
               )}
             <WorkflowButton
-              disabled={isLoading}
+              disabled={!notLoadingAndIsRegistered}
               onClick={handleTransfer}
             >
               Transfer
@@ -115,7 +124,7 @@ function ImxWorkflow() {
                 />
               )}
             <WorkflowButton
-              disabled={isLoading}
+              disabled={!notLoadingAndIsRegistered}
               onClick={handleBulkTransfer}
             >
               Bulk Transfer
@@ -128,14 +137,14 @@ function ImxWorkflow() {
                 />
               )}
             <WorkflowButton
-              disabled={isLoading}
+              disabled={!notLoadingAndIsRegistered}
               onClick={getAddress}
             >
               Get Address
             </WorkflowButton>
 
             <WorkflowButton
-              disabled={isLoading}
+              disabled={isLoading || isRegistered}
               onClick={registerUser}
             >
               Register User
