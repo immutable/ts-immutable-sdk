@@ -20,7 +20,9 @@ import { sendWalletWidgetCloseEvent } from './WalletWidgetEvents';
 export class Wallet extends Base<WidgetType.WALLET> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT;
 
-  protected validate({ params, config }: WidgetProperties<WidgetType.WALLET>): WidgetProperties<WidgetType.WALLET> {
+  protected getValidatedProperties(
+    { params, config }: WidgetProperties<WidgetType.WALLET>,
+  ): WidgetProperties<WidgetType.WALLET> {
     let validatedParams: WalletWidgetParams | undefined;
     let validatedConfig: WidgetConfiguration | undefined;
 

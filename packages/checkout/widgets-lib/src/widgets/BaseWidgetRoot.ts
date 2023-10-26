@@ -42,7 +42,7 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
   protected eventTopic: string = '';
 
   constructor(sdk: Checkout, props: WidgetProperties<T>) {
-    const validatedProps = this.validate(props);
+    const validatedProps = this.getValidatedProperties(props);
 
     this.checkout = sdk;
     this.properties = validatedProps;
@@ -80,7 +80,7 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
   }
 
   update(properties: WidgetProperties<T>): void {
-    this.properties = this.validate({
+    this.properties = this.getValidatedProperties({
       params: {
         ...(this.properties.params ?? {}),
         ...(properties.params ?? {}),
@@ -124,10 +124,6 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
     window.addEventListener(this.eventTopic, this.eventHandlersFunction);
   }
 
-  protected render(): void {
-    console.warn(this.eventTopic, 'missing render');
-  }
-
   protected strongConfig(): StrongCheckoutWidgetsConfig {
     return withDefaultWidgetConfigs({
       theme: this.properties.config?.theme,
@@ -138,10 +134,8 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
     });
   }
 
-  protected validate(props: WidgetProperties<T>): WidgetProperties<T> {
-    console.warn(this.eventTopic, 'missing validations');
-    return {};
-  }
+  protected abstract render(): void;
+  protected abstract getValidatedProperties(props: WidgetProperties<T>): WidgetProperties<T>;
 }
 
 // export class Connect extends BaseWidget implements Widget {
