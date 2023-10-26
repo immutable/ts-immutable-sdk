@@ -151,7 +151,10 @@ export class PassportImxProvider implements IMXProvider {
       const { ethAddress, starkAddress, userAdminAddress } = user.imx;
       return !!(ethAddress && starkAddress && userAdminAddress);
     } catch (err) {
-      return false;
+      if (err instanceof PassportError && err.type === PassportErrorType.USER_NOT_REGISTERED_ERROR) {
+        return false;
+      }
+      throw err;
     }
   }
 

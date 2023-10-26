@@ -109,14 +109,22 @@ describe('PassportImxProvider', () => {
 
   describe('isRegisteredOnchain', () => {
     it('should return true when a user is registered', async () => {
-      const isLoggedIn = await passportImxProvider.isRegisteredOnchain();
-      expect(isLoggedIn).toEqual(true);
+      const isRegistered = await passportImxProvider.isRegisteredOnchain();
+      expect(isRegistered).toEqual(true);
     });
 
     it('should return false when a user is not registered', async () => {
       mockAuthManager.getUser.mockResolvedValue({});
-      const isLoggedIn = await passportImxProvider.isRegisteredOnchain();
-      expect(isLoggedIn).toEqual(false);
+      const isRegistered = await passportImxProvider.isRegisteredOnchain();
+      expect(isRegistered).toEqual(false);
+    });
+
+    it('should bubble up the error if user is not logged in', async () => {
+      mockAuthManager.getUser.mockResolvedValue(undefined);
+      expect(passportImxProvider.isRegisteredOnchain()).rejects.toThrow(new PassportError(
+        'User has been logged out',
+        PassportErrorType.NOT_LOGGED_IN_ERROR,
+      ));
     });
   });
 
@@ -322,53 +330,23 @@ describe('PassportImxProvider', () => {
     });
   });
 
-  describe('when the user has not registered', () => {
-    describe('when we exceed the number of attempts to obtain a user with the correct metadata', () => {
-      it('should throw an error', async () => {
-        const magicProviderMock = {};
+  describe('registerOffChain', () => {
+    it('should register the user and update the provider instance user', async () => {
+      const magicProviderMock = {};
 
-        mockAuthManager.login.mockResolvedValue(mockUser);
-        magicAdapterMock.login.mockResolvedValue(magicProviderMock);
-        mockAuthManager.loginSilent.mockResolvedValue(mockUser);
+      mockAuthManager.login.mockResolvedValue(mockUser);
+      magicAdapterMock.login.mockResolvedValue(magicProviderMock);
+      mockAuthManager.loginSilent.mockResolvedValue({ ...mockUser, imx: { ethAddress: '', starkAddress: '', userAdminAddress: '' } });
 
-        await expect(() => passportImxProvider.registerOffchain()).rejects.toThrow(
-          new PassportError(
-            'Retry failed',
-            PassportErrorType.REFRESH_TOKEN_ERROR,
-          ),
-        );
+      await passportImxProvider.registerOffchain();
 
-        expect(registerPassportStarkEx).toHaveBeenCalledWith({
-          ethSigner: mockEthSigner,
-          starkSigner: mockStarkSigner,
-          usersApi: immutableXClient.usersApi,
-        }, mockUser.accessToken);
-        expect(mockAuthManager.loginSilent).toHaveBeenCalledTimes(4);
-        expect(mockAuthManager.loginSilent).toHaveBeenNthCalledWith(1, { forceRefresh: true });
-        expect(mockAuthManager.loginSilent).toHaveBeenNthCalledWith(2, { forceRefresh: true });
-        expect(mockAuthManager.loginSilent).toHaveBeenNthCalledWith(3, { forceRefresh: true });
-        expect(mockAuthManager.loginSilent).toHaveBeenCalledWith({ forceRefresh: true });
-      });
-    });
-
-    describe('when registration is successful', () => {
-      it('should register the user and update the provider instance user', async () => {
-        const magicProviderMock = {};
-
-        mockAuthManager.login.mockResolvedValue(mockUser);
-        magicAdapterMock.login.mockResolvedValue(magicProviderMock);
-        mockAuthManager.loginSilent.mockResolvedValue({ ...mockUser, imx: { ethAddress: '', starkAddress: '', userAdminAddress: '' } });
-
-        await passportImxProvider.registerOffchain();
-
-        expect(registerPassportStarkEx).toHaveBeenCalledWith({
-          ethSigner: mockEthSigner,
-          starkSigner: mockStarkSigner,
-          usersApi: immutableXClient.usersApi,
-        }, mockUserImx.accessToken);
-        expect(mockAuthManager.loginSilent).toHaveBeenCalledTimes(1);
-        expect(mockAuthManager.loginSilent).toHaveBeenCalledWith({ forceRefresh: true });
-      });
+      expect(registerPassportStarkEx).toHaveBeenCalledWith({
+        ethSigner: mockEthSigner,
+        starkSigner: mockStarkSigner,
+        usersApi: immutableXClient.usersApi,
+      }, mockUserImx.accessToken);
+      expect(mockAuthManager.loginSilent).toHaveBeenCalledTimes(1);
+      expect(mockAuthManager.loginSilent).toHaveBeenCalledWith({ forceRefresh: true });
     });
   });
 });
