@@ -7,7 +7,9 @@ import {
   useState,
 } from 'react';
 import { BiomeCombinedProviders } from '@biom3/react';
-import { DexConfig, TokenFilterTypes, IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
+import {
+  DexConfig, TokenFilterTypes, IMTBLWidgetEvents, SwapWidgetParams,
+} from '@imtbl/checkout-sdk';
 import { ImmutableConfiguration } from '@imtbl/config';
 import { Exchange, ExchangeOverrides } from '@imtbl/dex-sdk';
 import { SwapCoins } from './views/SwapCoins';
@@ -54,21 +56,17 @@ import {
 } from '../../lib/balance';
 import { widgetTheme } from '../../lib/theme';
 import { UserJourney, useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
-// import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
-// import { ServiceType } from '../../views/error/serviceTypes';
 
-export interface SwapWidgetProps {
-  params: SwapWidgetParams;
+export type SwapWidgetInputs = SwapWidgetParams & {
   config: StrongCheckoutWidgetsConfig;
-}
+};
 
-export interface SwapWidgetParams {
-  amount?: string;
-  fromContractAddress?: string;
-  toContractAddress?: string;
-}
-
-export function SwapWidget(props: SwapWidgetProps) {
+export function SwapWidget({
+  amount,
+  fromContractAddress,
+  toContractAddress,
+  config,
+}: SwapWidgetInputs) {
   const { success, failed, rejected } = text.views[SwapWidgetViews.SWAP];
   const loadingText = text.views[SharedViews.LOADING_VIEW].text;
   const { actionText } = text.views[SharedViews.ERROR_VIEW];
@@ -77,7 +75,6 @@ export function SwapWidget(props: SwapWidgetProps) {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
 
-  const { params, config } = props;
   const {
     environment,
     theme,
@@ -85,7 +82,6 @@ export function SwapWidget(props: SwapWidgetProps) {
     isSwapEnabled,
     isBridgeEnabled,
   } = config;
-  const { amount, fromContractAddress, toContractAddress } = params;
 
   const {
     connectLoaderState: { checkout, provider },

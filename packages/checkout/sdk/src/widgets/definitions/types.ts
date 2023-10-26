@@ -5,17 +5,25 @@ import {
   BridgeSuccess,
   ConnectEventType,
   ConnectionFailed,
-  ConnectionSuccess, OnRampEventType,
+  ConnectionSuccess,
+  OnRampEventType,
   OnRampFailed,
   OnRampSuccess,
   OrchestrationEventType,
   SwapEventType,
+  SwapFailed,
+  SwapRejected,
+  SwapSuccess,
   WalletDisconnectWalletEvent,
   WalletEventType,
   WalletNetworkSwitchEvent,
 } from './events';
 import {
-  BridgeWidgetParams, ConnectWidgetParams, OnRampWidgetParams, WalletWidgetParams,
+  BridgeWidgetParams,
+  ConnectWidgetParams,
+  SwapWidgetParams,
+  WalletWidgetParams,
+  OnRampWidgetParams,
 } from './parameters';
 
 /**
@@ -45,7 +53,7 @@ export type WidgetProperties<T extends WidgetType> = {
 export type WidgetParameters = {
   [WidgetType.CONNECT]: ConnectWidgetParams,
   [WidgetType.WALLET]: WalletWidgetParams,
-  [WidgetType.SWAP]: any,
+  [WidgetType.SWAP]: SwapWidgetParams,
   [WidgetType.BRIDGE]: BridgeWidgetParams,
   [WidgetType.ONRAMP]: OnRampWidgetParams,
 };
@@ -64,7 +72,7 @@ export type WidgetEventTypes = {
 export type WidgetEventData = {
   [WidgetType.CONNECT]: ConnectionSuccess | ConnectionFailed,
   [WidgetType.WALLET]: WalletNetworkSwitchEvent | WalletDisconnectWalletEvent,
-  [WidgetType.SWAP]: any, // TODO
+  [WidgetType.SWAP]: SwapSuccess | SwapFailed | SwapRejected,
   [WidgetType.BRIDGE]: BridgeSuccess | BridgeFailed,
   [WidgetType.ONRAMP]: OnRampSuccess | OnRampFailed,
 };
