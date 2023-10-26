@@ -3,7 +3,7 @@ import { CheckoutConfiguration } from '../config';
 
 describe('debugLogger', () => {
   beforeEach(() => {
-    jest.spyOn(console, 'debug').mockImplementation(() => {});
+    jest.spyOn(console, 'info').mockImplementation(() => {});
   });
 
   it('should call underlying function and return result of the promise', async () => {
