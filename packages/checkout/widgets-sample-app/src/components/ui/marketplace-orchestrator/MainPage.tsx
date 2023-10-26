@@ -71,7 +71,7 @@ export const MainPage = () => {
     })
     walletWidget.on(OrchestrationEventType.REQUEST_ONRAMP, (eventData: RequestOnrampEvent) => {
       walletWidget.unmount();
-      onRampWidget.update({params: {contractAddress: eventData.tokenAddress, amount: eventData.amount}})
+      onRampWidget.update({params: {contractAddress: eventData.tokenAddress, amount: eventData.amount, web3Provider}})
       onRampWidget.mount('widget-target');
     })
   }, [walletWidget, bridgeWidget, onRampWidget, web3Provider]);
