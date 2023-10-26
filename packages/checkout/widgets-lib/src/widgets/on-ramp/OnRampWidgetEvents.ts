@@ -1,5 +1,5 @@
 import {
-  IMTBLWidgetEvents, OnRampEventType, WalletEventType, WidgetEvent,
+  IMTBLWidgetEvents, OnRampEventType, WidgetEvent,
   WidgetType,
 } from '@imtbl/checkout-sdk';
 
@@ -9,7 +9,7 @@ export function sendOnRampWidgetCloseEvent(eventTarget: Window | EventTarget) {
     IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT,
     {
       detail: {
-        type: WalletEventType.CLOSE_WIDGET,
+        type: OnRampEventType.CLOSE_WIDGET,
         data: {},
       },
     },
