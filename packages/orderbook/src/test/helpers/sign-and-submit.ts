@@ -1,19 +1,19 @@
 import {
   PopulatedTransaction, Signer, TypedDataDomain,
-  providers, Wallet,
+  Wallet,
 } from 'ethers';
+import { GAS_OVERRIDES } from './gas';
 
 export async function signAndSubmitTx(
   transaction: PopulatedTransaction,
   signer: Signer,
-  provider: providers.Provider,
 ) {
   const rawTx = transaction;
   rawTx.nonce = await signer.getTransactionCount();
-  rawTx.gasPrice = (await provider.getGasPrice()).mul(2);
-  const signedTx = await signer.signTransaction(rawTx);
-  const receipt = await provider.sendTransaction(signedTx);
-  await receipt.wait();
+  rawTx.maxFeePerGas = GAS_OVERRIDES.maxFeePerGas;
+  rawTx.maxPriorityFeePerGas = GAS_OVERRIDES.maxPriorityFeePerGas;
+  const signedTx = await signer.sendTransaction(rawTx);
+  await signedTx.wait();
 }
 
 export async function signMessage(

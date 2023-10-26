@@ -398,8 +398,9 @@ export class Orderbook {
     }
 
     const orders = orderResults.map((orderResult) => orderResult.result);
-    const distinctSeaportVersions = new Set(...orders.map((o) => o.protocol_data.seaport_address));
-    if (distinctSeaportVersions.size !== 1) {
+    const seaportAddresses = orders.map((o) => o.protocol_data.seaport_address);
+    const distinctSeaportAddresses = new Set(...[seaportAddresses]);
+    if (distinctSeaportAddresses.size !== 1) {
       throw new Error('Cannot cancel multiple orders from different seaport contracts. Please group your orderIds accordingly');
     }
 
