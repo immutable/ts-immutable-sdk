@@ -24,7 +24,9 @@ import { BridgeWidget } from './BridgeWidget';
 export class Bridge extends Base<WidgetType.BRIDGE> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT;
 
-  protected validate({ params, config }: WidgetProperties<WidgetType.BRIDGE>): WidgetProperties<WidgetType.BRIDGE> {
+  protected getValidatedProperties(
+    { params, config }: WidgetProperties<WidgetType.BRIDGE>,
+  ): WidgetProperties<WidgetType.BRIDGE> {
     let validatedParams: BridgeWidgetParams | undefined;
     let validatedConfig: WidgetConfiguration | undefined;
 
@@ -62,8 +64,6 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
   }
 
   protected render() {
-    this.validate(this.properties);
-
     const { params } = this.properties;
 
     const connectLoaderParams: ConnectLoaderParams = {
