@@ -18,6 +18,7 @@ import {
   expectERC20,
   WIMX_TEST_TOKEN,
   formatEther,
+  TEST_ROUTER_ADDRESS,
 } from 'test/utils';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import { Fees } from 'lib/fees';
@@ -202,6 +203,25 @@ describe('getSwap', () => {
 
       expect(swap.transaction.value).toEqual('0x00');
     });
+
+    it('sets the recipient as the Router contract', () => {
+      const originalTokenIn = FUN_TEST_TOKEN;
+      const quote = buildExactInputQuote(FUN_TEST_TOKEN, nativeTokenService.wrappedToken);
+
+      const swap = getSwap(
+        originalTokenIn,
+        quote,
+        makeAddr('fromAddress'),
+        slippagePercentage,
+        deadline,
+        makeAddr('routerContract'),
+        makeAddr('secondaryFeeContract'),
+        newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
+        [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
+      );
+
+      expect(swap.transaction.to).toEqual(TEST_ROUTER_ADDRESS);
+    });
   });
 
   describe('with EXACT_OUTPUT + native amount in', () => {
@@ -244,6 +264,25 @@ describe('getSwap', () => {
       );
 
       expect(swap.transaction.value).toEqual('0x00');
+    });
+
+    it('sets the recipient as the Router contract', () => {
+      const originalTokenIn = FUN_TEST_TOKEN;
+      const quote = buildExactOutputQuote(FUN_TEST_TOKEN, nativeTokenService.wrappedToken);
+
+      const swap = getSwap(
+        originalTokenIn,
+        quote,
+        makeAddr('fromAddress'),
+        slippagePercentage,
+        deadline,
+        makeAddr('routerContract'),
+        makeAddr('secondaryFeeContract'),
+        newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
+        [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
+      );
+
+      expect(swap.transaction.to).toEqual(TEST_ROUTER_ADDRESS);
     });
   });
 });

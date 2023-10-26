@@ -7,6 +7,7 @@ import { constants, utils } from 'ethers';
 import { SecondaryFee } from 'types';
 import { Environment } from '@imtbl/config';
 import { Router, addAmount } from 'lib';
+import { PaymentsExtended, SwapRouter } from '@uniswap/router-sdk';
 import { IMMUTABLE_TESTNET_CHAIN_ID, TIMX_IMMUTABLE_TESTNET } from './constants';
 import { Exchange } from './exchange';
 import {
@@ -38,6 +39,8 @@ import {
   FUN_TEST_TOKEN,
   nativeTokenService,
   TEST_FROM_ADDRESS,
+  unwrapWETHFunctionSignature,
+  expectToBeString,
 } from './test/utils';
 
 jest.mock('@ethersproject/providers');
@@ -205,6 +208,129 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(result.quote.amount.token.address).toEqual('');
       expect(result.quote.amount.token.chainId).toEqual(nativeTokenService.nativeToken.chainId);
       expect(result.quote.amount.token.decimals).toEqual(nativeTokenService.nativeToken.decimals);
+    });
+
+    it('should include a call to unwrapWETH9 as the final method call of the calldata', async () => {
+      mockRouterImplementation({
+        pools: [createPool(nativeTokenService.wrappedToken, FUN_TEST_TOKEN)],
+      });
+
+      const swapRouterInterface = SwapRouter.INTERFACE;
+      const paymentsInterface = PaymentsExtended.INTERFACE;
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+
+      // Buy 100 native tokens for X amount of FUN where the exchange rate is 1 token-in : 10 token-out
+      const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
+        TEST_FROM_ADDRESS,
+        FUN_TEST_TOKEN.address,
+        'native',
+        newAmountFromString('100', NATIVE_TEST_TOKEN).value,
+        3, // 3 % slippage
+      );
+
+      expectToBeDefined(swap.transaction.data);
+      expectToBeDefined(swap.transaction.value);
+      const calldata = swap.transaction.data.toString();
+
+      const topLevelParams = swapRouterInterface.decodeFunctionData('multicall(uint256,bytes[])', calldata);
+
+      expect(topLevelParams.data.length).toBe(2); // expect that there are two calls in the multicall
+      const swapFunctionCalldata = topLevelParams.data[0];
+      const unwrapWETHFunctionCalldata = topLevelParams.data[1];
+
+      expectToBeString(swapFunctionCalldata);
+      expectToBeString(unwrapWETHFunctionCalldata);
+
+      const decodedUnwrapWETH9FunctionData = paymentsInterface.decodeFunctionData(
+        'unwrapWETH9(uint256,address)',
+        unwrapWETHFunctionCalldata,
+      );
+
+      expect(topLevelParams.data[1]).toEqual(unwrapWETHFunctionSignature);
+      expect(decodedUnwrapWETH9FunctionData).toEqual(0);
+    });
+
+    it('should specify the user address as the recipient of the unwrapWETH9 function call', async () => {
+      mockRouterImplementation({
+        pools: [createPool(nativeTokenService.wrappedToken, FUN_TEST_TOKEN)],
+      });
+
+      const swapRouterInterface = SwapRouter.INTERFACE;
+      const paymentsInterface = PaymentsExtended.INTERFACE;
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+
+      // Buy 100 native tokens for X amount of FUN where the exchange rate is 1 token-in : 10 token-out
+      const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
+        TEST_FROM_ADDRESS,
+        FUN_TEST_TOKEN.address,
+        'native',
+        newAmountFromString('100', NATIVE_TEST_TOKEN).value,
+        3, // 3 % slippage
+      );
+
+      expectToBeDefined(swap.transaction.data);
+      expectToBeDefined(swap.transaction.value);
+      const calldata = swap.transaction.data.toString();
+
+      const topLevelParams = swapRouterInterface.decodeFunctionData('multicall(uint256,bytes[])', calldata);
+
+      expect(topLevelParams.data.length).toBe(2); // expect that there are two calls in the multicall
+      const swapFunctionCalldata = topLevelParams.data[0];
+      const unwrapWETHFunctionCalldata = topLevelParams.data[1];
+
+      expectToBeString(swapFunctionCalldata);
+      expectToBeString(unwrapWETHFunctionCalldata);
+
+      const decodedUnwrapWETH9FunctionData = paymentsInterface.decodeFunctionData(
+        'unwrapWETH9(uint256,address)',
+        unwrapWETHFunctionCalldata,
+      );
+
+      expect(topLevelParams.data[1]).toEqual(unwrapWETHFunctionSignature);
+      expect(decodedUnwrapWETH9FunctionData).toEqual(0);
+      expect(decodedUnwrapWETH9FunctionData[1]).toEqual(TEST_FROM_ADDRESS);
+    });
+
+    it('should specify the quoted amount with slippage applied in the unwrapWETH9 function calldata', async () => {
+      mockRouterImplementation({
+        pools: [createPool(nativeTokenService.wrappedToken, FUN_TEST_TOKEN)],
+      });
+
+      const swapRouterInterface = SwapRouter.INTERFACE;
+      const paymentsInterface = PaymentsExtended.INTERFACE;
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+
+      // Buy 100 native tokens for X amount of FUN where the exchange rate is 1 token-in : 10 token-out
+      const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
+        TEST_FROM_ADDRESS,
+        FUN_TEST_TOKEN.address,
+        'native',
+        newAmountFromString('100', NATIVE_TEST_TOKEN).value,
+        3, // 3 % slippage
+      );
+
+      expectToBeDefined(swap.transaction.data);
+      expectToBeDefined(swap.transaction.value);
+      const calldata = swap.transaction.data.toString();
+
+      const topLevelParams = swapRouterInterface.decodeFunctionData('multicall(uint256,bytes[])', calldata);
+
+      expect(topLevelParams.data.length).toBe(2); // expect that there are two calls in the multicall
+      const swapFunctionCalldata = topLevelParams.data[0];
+      const unwrapWETHFunctionCalldata = topLevelParams.data[1];
+
+      expectToBeString(swapFunctionCalldata);
+      expectToBeString(unwrapWETHFunctionCalldata);
+
+      const decodedUnwrapWETH9FunctionData = paymentsInterface.decodeFunctionData(
+        'unwrapWETH9(uint256,address)',
+        unwrapWETHFunctionCalldata,
+      );
+
+      expect(topLevelParams.data[1]).toEqual(unwrapWETHFunctionSignature);
+      expect(decodedUnwrapWETH9FunctionData).toEqual(0);
+      expect(decodedUnwrapWETH9FunctionData[0]).toEqual('0x056bc75e2d63100000'); // should be the quoted amount with slippage applied
+      expect(BigNumber.from(decodedUnwrapWETH9FunctionData[0]).toString()).toEqual('1000');
     });
   });
 
