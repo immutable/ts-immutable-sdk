@@ -17,8 +17,8 @@ import { BiomeCombinedProviders, BiomePortalIdProvider } from '@biom3/react';
 import { isPassportProvider } from 'lib/providerUtils';
 import { ServiceUnavailableErrorView } from 'views/error/ServiceUnavailableErrorView';
 import { ServiceType } from 'views/error/serviceTypes';
-import { onDarkBase } from '@biom3/design-tokens';
 import { isValidAddress, isValidAmount, isValidWalletProvider } from 'lib/validations/widgetValidators';
+import { widgetTheme } from 'lib/theme';
 import { topUpBridgeOption, topUpOnRampOption } from './helpers';
 import { sendSwapWidgetCloseEvent } from './SwapWidgetEvents';
 import { SwapWidget } from './SwapWidget';
@@ -106,6 +106,8 @@ export class Swap extends Base<WidgetType.SWAP> {
 
     const topUpOptions = this.topUpOptions();
 
+    const themeBase = widgetTheme(this.strongConfig().theme);
+
     if (!this.reactRoot) return;
 
     this.checkout
@@ -119,7 +121,7 @@ export class Swap extends Base<WidgetType.SWAP> {
             <BiomePortalIdProvider>
               <CustomAnalyticsProvider widgetConfig={this.strongConfig()}>
                 {!isSwapAvailable && (
-                  <BiomeCombinedProviders theme={{ base: onDarkBase }}>
+                  <BiomeCombinedProviders theme={{ base: themeBase }}>
                     <ServiceUnavailableErrorView
                       service={ServiceType.SWAP}
                       onCloseClick={() => sendSwapWidgetCloseEvent(window)}
