@@ -1,8 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Body, Box } from '@biom3/react';
 import { WidgetTheme } from '@imtbl/checkout-sdk';
 import { quickswapFooterStyles, quickswapFooterDisclaimerTextStyles, quickswapFooterLogoStyles } from './FooterStyles';
-import { ReactComponent as QuickswapLogoDark } from '../../assets/QuickswapLogoDark.svg';
-import { ReactComponent as QuickswapLogoLight } from '../../assets/QuickswapLogoLight.svg';
 import { text } from '../../resources/text/textConfig';
 
 export interface QuickswapFooterProps {
@@ -18,7 +17,6 @@ export function QuickswapFooter({ theme }: QuickswapFooterProps) {
         <Body size="xSmall" sx={{ paddingRight: 'base.spacing.x1' }}>
           By
         </Body>
-        {theme === WidgetTheme.DARK ? <QuickswapLogoDark /> : <QuickswapLogoLight />}
       </Box>
       <Body testId="quickswap-footer-disclaimer-text" size="xSmall" sx={quickswapFooterDisclaimerTextStyles}>
         {disclaimerText}
