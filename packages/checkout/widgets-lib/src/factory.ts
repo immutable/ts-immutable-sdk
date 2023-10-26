@@ -10,6 +10,7 @@ import {
 } from '@imtbl/checkout-sdk';
 import { Bridge } from 'widgets/bridge/BridgeWidgetRoot';
 import { Connect } from 'widgets/connect/ConnectWidgetRoot';
+import { Swap } from 'widgets/swap/SwapWidgetRoot';
 import { Wallet } from 'widgets/wallet/WalletWidgetRoot';
 
 export class WidgetsFactory implements IWidgetsFactory {
@@ -41,6 +42,12 @@ export class WidgetsFactory implements IWidgetsFactory {
           config: this.widgetConfig,
           params,
         }) as Widget<WidgetType.WALLET> as Widget<T>;
+      }
+      case WidgetType.SWAP: {
+        return new Swap(this.sdk, {
+          config: this.widgetConfig,
+          params,
+        }) as Widget<WidgetType.SWAP> as Widget<T>;
       }
       default:
         throw new Error('widget type not supported');
