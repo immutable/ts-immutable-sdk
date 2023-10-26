@@ -12,7 +12,6 @@ import {
   PassportEventMap,
   PassportEvents,
   PassportModuleConfiguration,
-  PassportUser,
   UserProfile,
 } from './types';
 import { ConfirmationScreen } from './confirmation';
@@ -58,15 +57,14 @@ export class Passport {
     });
   }
 
-  public async signIn(): Promise<PassportUser> {
-    const user = await this.authManager.login();
-    return {
-      idToken: user.idToken,
-      accessToken: user.accessToken,
-      profile: user.profile,
-    };
+  public async signIn(): Promise<UserProfile> {
+    const user = await this.authManager.loginSilent() || await this.authManager.login();
+    return user.profile;
   }
 
+  /**
+ * @deprecated The method connectImx should be used instead
+ */
   public async connectImxSilent(): Promise<IMXProvider | null> {
     return this.passportImxProviderFactory.getProviderSilent();
   }

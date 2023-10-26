@@ -15,12 +15,6 @@ export type UserProfile = {
   sub: string;
 };
 
-export type PassportUser = {
-  idToken?: string;
-  accessToken: string;
-  profile: UserProfile;
-};
-
 export type User = {
   idToken?: string;
   accessToken: string;

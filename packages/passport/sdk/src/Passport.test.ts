@@ -249,16 +249,23 @@ describe('Passport', () => {
   });
 
   describe('signIn', () => {
-    it('should execute signIn', async () => {
+    it('should login silently if there is a user', async () => {
+      loginSilentMock.mockReturnValue(mockUserImx);
+      const user = await passport.signIn();
+
+      expect(loginSilentMock).toBeCalledTimes(1);
+      expect(authLoginMock).toBeCalledTimes(0);
+      expect(user).toEqual(mockUser.profile);
+    });
+
+    it('should signIn and get a user', async () => {
+      loginSilentMock.mockReturnValue(null);
       authLoginMock.mockReturnValue(mockUserImx);
       const user = await passport.signIn();
 
+      expect(loginSilentMock).toBeCalledTimes(1);
       expect(authLoginMock).toBeCalledTimes(1);
-      expect(user).toEqual({
-        idToken: user.idToken,
-        accessToken: user.accessToken,
-        profile: user.profile,
-      });
+      expect(user).toEqual(mockUserImx.profile);
     });
   });
 });
