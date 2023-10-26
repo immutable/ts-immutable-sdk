@@ -22,46 +22,19 @@ type SwapOptions = {
 const zeroNativeCurrencyValue = '0x00';
 const multicallWithDeadlineFunctionSignature = 'multicall(uint256,bytes[])';
 
-function buildSwapParametersForSinglePoolSwap(
+function buildSinglePoolSwap(
   tokenIn: Coin,
   fromAddress: string,
   trade: Trade<Uniswap.Token, Uniswap.Token, Uniswap.TradeType>,
   route: Route<Uniswap.Token, Uniswap.Token>,
   amountIn: string,
   amountOut: string,
-  secondaryFees: SecondaryFee[],
-  secondaryFeeContract: SecondaryFeeInterface,
   routerContract: Interface,
   paymentsContract: Interface,
 ) {
-  const hasSecondaryFees = secondaryFees.length > 0;
-  const secondaryFeeValues: ISecondaryFee.SecondaryFeeParamsStruct[] = secondaryFees.map((fee) => ({
-    feeBasisPoints: fee.basisPoints,
-    recipient: fee.recipient,
-  }));
-
   const calldatas: string[] = [];
 
   if (trade.tradeType === Uniswap.TradeType.EXACT_INPUT) {
-    if (hasSecondaryFees) {
-      calldatas.push(
-        secondaryFeeContract.encodeFunctionData('exactInputSingleWithSecondaryFee', [
-          secondaryFeeValues,
-          {
-            tokenIn: route.tokenPath[0].address,
-            tokenOut: route.tokenPath[1].address,
-            fee: route.pools[0].fee,
-            recipient: fromAddress,
-            amountIn,
-            amountOutMinimum: amountOut,
-            sqrtPriceLimitX96: 0,
-          },
-        ]),
-      );
-
-      return calldatas;
-    }
-
     calldatas.push(
       routerContract.encodeFunctionData('exactInputSingle', [
         {
@@ -75,27 +48,6 @@ function buildSwapParametersForSinglePoolSwap(
         },
       ]),
     );
-
-    return calldatas;
-  }
-
-  if (hasSecondaryFees) {
-    calldatas.push(
-      secondaryFeeContract.encodeFunctionData('exactOutputSingleWithSecondaryFee', [
-        secondaryFeeValues,
-        {
-          tokenIn: route.tokenPath[0].address,
-          tokenOut: route.tokenPath[1].address,
-          fee: route.pools[0].fee,
-          recipient: fromAddress,
-          amountInMaximum: amountIn,
-          amountOut,
-          sqrtPriceLimitX96: 0,
-        },
-      ]),
-    );
-
-    // TODO: Add refundETH method when support is added in SecondaryFee contract
 
     return calldatas;
   }
@@ -122,8 +74,7 @@ function buildSwapParametersForSinglePoolSwap(
   return calldatas;
 }
 
-function buildSwapParametersForMultiPoolSwap(
-  tokenIn: Coin,
+function buildSinglePoolSwapWithFees(
   fromAddress: string,
   trade: Trade<Uniswap.Token, Uniswap.Token, Uniswap.TradeType>,
   route: Route<Uniswap.Token, Uniswap.Token>,
@@ -131,12 +82,7 @@ function buildSwapParametersForMultiPoolSwap(
   amountOut: string,
   secondaryFees: SecondaryFee[],
   secondaryFeeContract: SecondaryFeeInterface,
-  routerContract: Interface,
-  paymentsContract: Interface,
 ) {
-  const hasSecondaryFees = secondaryFees.length > 0;
-  const path: string = encodeRouteToPath(route, trade.tradeType === Uniswap.TradeType.EXACT_OUTPUT);
-
   const secondaryFeeValues: ISecondaryFee.SecondaryFeeParamsStruct[] = secondaryFees.map((fee) => ({
     feeBasisPoints: fee.basisPoints,
     recipient: fee.recipient,
@@ -145,22 +91,58 @@ function buildSwapParametersForMultiPoolSwap(
   const calldatas: string[] = [];
 
   if (trade.tradeType === Uniswap.TradeType.EXACT_INPUT) {
-    if (hasSecondaryFees) {
-      calldatas.push(
-        secondaryFeeContract.encodeFunctionData('exactInputWithSecondaryFee', [
-          secondaryFeeValues,
-          {
-            path,
-            recipient: fromAddress,
-            amountIn,
-            amountOutMinimum: amountOut,
-          },
-        ]),
-      );
+    calldatas.push(
+      secondaryFeeContract.encodeFunctionData('exactInputSingleWithSecondaryFee', [
+        secondaryFeeValues,
+        {
+          tokenIn: route.tokenPath[0].address,
+          tokenOut: route.tokenPath[1].address,
+          fee: route.pools[0].fee,
+          recipient: fromAddress,
+          amountIn,
+          amountOutMinimum: amountOut,
+          sqrtPriceLimitX96: 0,
+        },
+      ]),
+    );
 
-      return calldatas;
-    }
+    return calldatas;
+  }
 
+  calldatas.push(
+    secondaryFeeContract.encodeFunctionData('exactOutputSingleWithSecondaryFee', [
+      secondaryFeeValues,
+      {
+        tokenIn: route.tokenPath[0].address,
+        tokenOut: route.tokenPath[1].address,
+        fee: route.pools[0].fee,
+        recipient: fromAddress,
+        amountInMaximum: amountIn,
+        amountOut,
+        sqrtPriceLimitX96: 0,
+      },
+    ]),
+  );
+
+  // TODO: Add refundETH method when support is added in SecondaryFee contract
+
+  return calldatas;
+}
+
+function buildMultiPoolSwap(
+  tokenIn: Coin,
+  fromAddress: string,
+  trade: Trade<Uniswap.Token, Uniswap.Token, Uniswap.TradeType>,
+  route: Route<Uniswap.Token, Uniswap.Token>,
+  amountIn: string,
+  amountOut: string,
+  routerContract: Interface,
+  paymentsContract: Interface,
+) {
+  const path: string = encodeRouteToPath(route, trade.tradeType === Uniswap.TradeType.EXACT_OUTPUT);
+  const calldatas: string[] = [];
+
+  if (trade.tradeType === Uniswap.TradeType.EXACT_INPUT) {
     calldatas.push(
       routerContract.encodeFunctionData('exactInput', [
         {
@@ -171,24 +153,6 @@ function buildSwapParametersForMultiPoolSwap(
         },
       ]),
     );
-
-    return calldatas;
-  }
-
-  if (hasSecondaryFees) {
-    calldatas.push(
-      secondaryFeeContract.encodeFunctionData('exactOutputWithSecondaryFee', [
-        secondaryFeeValues,
-        {
-          path,
-          recipient: fromAddress,
-          amountInMaximum: amountIn,
-          amountOut,
-        },
-      ]),
-    );
-
-    // TODO: Add refundETH method when support is added in SecondaryFee contract
 
     return calldatas;
   }
@@ -208,6 +172,57 @@ function buildSwapParametersForMultiPoolSwap(
     // Refund ETH if the input token is native and the swap is exact output
     calldatas.push(paymentsContract.encodeFunctionData('refundETH'));
   }
+
+  return calldatas;
+}
+
+function buildMultiPoolSwapWithFees(
+  fromAddress: string,
+  trade: Trade<Uniswap.Token, Uniswap.Token, Uniswap.TradeType>,
+  route: Route<Uniswap.Token, Uniswap.Token>,
+  amountIn: string,
+  amountOut: string,
+  secondaryFees: SecondaryFee[],
+  secondaryFeeContract: SecondaryFeeInterface,
+) {
+  const path: string = encodeRouteToPath(route, trade.tradeType === Uniswap.TradeType.EXACT_OUTPUT);
+
+  const secondaryFeeValues: ISecondaryFee.SecondaryFeeParamsStruct[] = secondaryFees.map((fee) => ({
+    feeBasisPoints: fee.basisPoints,
+    recipient: fee.recipient,
+  }));
+
+  const calldatas: string[] = [];
+
+  if (trade.tradeType === Uniswap.TradeType.EXACT_INPUT) {
+    calldatas.push(
+      secondaryFeeContract.encodeFunctionData('exactInputWithSecondaryFee', [
+        secondaryFeeValues,
+        {
+          path,
+          recipient: fromAddress,
+          amountIn,
+          amountOutMinimum: amountOut,
+        },
+      ]),
+    );
+
+    return calldatas;
+  }
+
+  calldatas.push(
+    secondaryFeeContract.encodeFunctionData('exactOutputWithSecondaryFee', [
+      secondaryFeeValues,
+      {
+        path,
+        recipient: fromAddress,
+        amountInMaximum: amountIn,
+        amountOut,
+      },
+    ]),
+  );
+
+  // TODO: Add refundETH method when support is added in SecondaryFee contract
 
   return calldatas;
 }
@@ -241,10 +256,35 @@ function buildSwapParameters(
   const { route } = trade.swaps[0];
 
   const isSinglePoolSwap = route.pools.length === 1;
+  const hasSecondaryFees = secondaryFees.length > 0;
 
   if (isSinglePoolSwap) {
-    return buildSwapParametersForSinglePoolSwap(
+    if (hasSecondaryFees) {
+      return buildSinglePoolSwapWithFees(
+        fromAddress,
+        trade,
+        route,
+        maximumAmountIn,
+        minimumAmountOut,
+        secondaryFees,
+        secondaryFeeContract,
+      );
+    }
+
+    return buildSinglePoolSwap(
       tokenIn,
+      fromAddress,
+      trade,
+      route,
+      maximumAmountIn,
+      minimumAmountOut,
+      routerContract,
+      paymentsContract,
+    );
+  }
+
+  if (hasSecondaryFees) {
+    return buildMultiPoolSwapWithFees(
       fromAddress,
       trade,
       route,
@@ -252,20 +292,16 @@ function buildSwapParameters(
       minimumAmountOut,
       secondaryFees,
       secondaryFeeContract,
-      routerContract,
-      paymentsContract,
     );
   }
 
-  return buildSwapParametersForMultiPoolSwap(
+  return buildMultiPoolSwap(
     tokenIn,
     fromAddress,
     trade,
     route,
     maximumAmountIn,
     minimumAmountOut,
-    secondaryFees,
-    secondaryFeeContract,
     routerContract,
     paymentsContract,
   );
