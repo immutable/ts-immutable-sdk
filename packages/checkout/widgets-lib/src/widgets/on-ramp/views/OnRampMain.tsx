@@ -210,9 +210,11 @@ export function OnRampMain({
 
     const domIframe:HTMLIFrameElement = document.getElementById(transakIframeId) as HTMLIFrameElement;
 
-    if (domIframe === undefined) return;
+    if (!domIframe) return;
 
     const handleTransakEvents = (event: any) => {
+      if (!domIframe) return;
+
       if (event.source === domIframe.contentWindow
         && event.origin.toLowerCase().includes(transakOrigin)) {
         trackSegmentEvents(event.data, userWalletAddress, userEmail);

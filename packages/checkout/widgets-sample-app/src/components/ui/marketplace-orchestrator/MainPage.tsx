@@ -53,6 +53,7 @@ export const MainPage = () => {
       bridgeWidget.update({params: {web3Provider: eventData.provider}})
       setWeb3Provider(eventData.provider)
     })
+
     walletWidget.on(OrchestrationEventType.REQUEST_BRIDGE, (eventData: RequestBridgeEvent) => {
       walletWidget.unmount();
       bridgeWidget.update({params: {fromContractAddress: eventData.tokenAddress, amount: eventData.amount}})
