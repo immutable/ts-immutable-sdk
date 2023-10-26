@@ -18,7 +18,6 @@ import {
   expectERC20,
   WIMX_TEST_TOKEN,
   formatEther,
-  TEST_ROUTER_ADDRESS,
 } from 'test/utils';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import { Fees } from 'lib/fees';
@@ -73,6 +72,7 @@ describe('getSwap', () => {
 
       const swap = getSwap(
         quote.amountIn.token,
+        quote.amountOut.token,
         quote,
         makeAddr('fromAddress'),
         slippagePercentage,
@@ -96,6 +96,7 @@ describe('getSwap', () => {
 
       const swap = getSwap(
         quote.amountIn.token,
+        quote.amountOut.token,
         quote,
         makeAddr('fromAddress'),
         slippagePercentage,
@@ -121,6 +122,7 @@ describe('getSwap', () => {
 
       const swap = getSwap(
         quote.amountIn.token,
+        quote.amountOut.token,
         quote,
         makeAddr('fromAddress'),
         slippagePercentage,
@@ -144,6 +146,7 @@ describe('getSwap', () => {
 
       const swap = getSwap(
         quote.amountIn.token,
+        quote.amountOut.token,
         quote,
         makeAddr('fromAddress'),
         slippagePercentage,
@@ -165,11 +168,13 @@ describe('getSwap', () => {
   describe('with EXACT_INPUT + native amount in', () => {
     it('uses the amountSpecified as the transaction value', () => {
       const originalTokenIn = nativeTokenService.nativeToken;
+      const originalTokenOut = FUN_TEST_TOKEN;
       const quote = buildExactInputQuote(nativeTokenService.wrappedToken, FUN_TEST_TOKEN);
       quote.amountIn.value = utils.parseEther('99');
 
       const swap = getSwap(
         originalTokenIn,
+        originalTokenOut,
         quote,
         makeAddr('fromAddress'),
         slippagePercentage,
@@ -187,10 +192,12 @@ describe('getSwap', () => {
   describe('with EXACT_INPUT + native amount out', () => {
     it('sets a transaction value of zero', () => {
       const originalTokenIn = FUN_TEST_TOKEN;
+      const originalTokenOut = NATIVE_TEST_TOKEN;
       const quote = buildExactInputQuote(FUN_TEST_TOKEN, nativeTokenService.wrappedToken);
 
       const swap = getSwap(
         originalTokenIn,
+        originalTokenOut,
         quote,
         makeAddr('fromAddress'),
         slippagePercentage,
@@ -203,35 +210,18 @@ describe('getSwap', () => {
 
       expect(swap.transaction.value).toEqual('0x00');
     });
-
-    it('sets the recipient as the Router contract', () => {
-      const originalTokenIn = FUN_TEST_TOKEN;
-      const quote = buildExactInputQuote(FUN_TEST_TOKEN, nativeTokenService.wrappedToken);
-
-      const swap = getSwap(
-        originalTokenIn,
-        quote,
-        makeAddr('fromAddress'),
-        slippagePercentage,
-        deadline,
-        makeAddr('routerContract'),
-        makeAddr('secondaryFeeContract'),
-        newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
-        [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
-      );
-
-      expect(swap.transaction.to).toEqual(TEST_ROUTER_ADDRESS);
-    });
   });
 
   describe('with EXACT_OUTPUT + native amount in', () => {
     it('sets the transaction value to the max amount in including slippage', () => {
       const originalTokenIn = nativeTokenService.nativeToken;
+      const originalTokenOut = FUN_TEST_TOKEN;
       const quote = buildExactOutputQuote(nativeTokenService.wrappedToken, FUN_TEST_TOKEN);
       quote.amountIn.value = utils.parseEther('100');
 
       const swap = getSwap(
         originalTokenIn,
+        originalTokenOut,
         quote,
         makeAddr('fromAddress'),
         slippagePercentage,
@@ -249,10 +239,12 @@ describe('getSwap', () => {
   describe('with EXACT_OUTPUT + native amount out', () => {
     it('sets a transaction value of zero', () => {
       const originalTokenIn = FUN_TEST_TOKEN;
+      const originalTokenOut = NATIVE_TEST_TOKEN;
       const quote = buildExactOutputQuote(FUN_TEST_TOKEN, nativeTokenService.wrappedToken);
 
       const swap = getSwap(
         originalTokenIn,
+        originalTokenOut,
         quote,
         makeAddr('fromAddress'),
         slippagePercentage,
@@ -264,25 +256,6 @@ describe('getSwap', () => {
       );
 
       expect(swap.transaction.value).toEqual('0x00');
-    });
-
-    it('sets the recipient as the Router contract', () => {
-      const originalTokenIn = FUN_TEST_TOKEN;
-      const quote = buildExactOutputQuote(FUN_TEST_TOKEN, nativeTokenService.wrappedToken);
-
-      const swap = getSwap(
-        originalTokenIn,
-        quote,
-        makeAddr('fromAddress'),
-        slippagePercentage,
-        deadline,
-        makeAddr('routerContract'),
-        makeAddr('secondaryFeeContract'),
-        newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
-        [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
-      );
-
-      expect(swap.transaction.to).toEqual(TEST_ROUTER_ADDRESS);
     });
   });
 });

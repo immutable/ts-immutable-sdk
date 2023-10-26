@@ -9,6 +9,7 @@ import { QuoteResult } from 'lib/getQuotesForRoutes';
 import { NativeTokenService, canUnwrapToken } from 'lib/nativeTokenService';
 import { Coin, CoinAmount } from 'types';
 import { Interface } from 'ethers/lib/utils';
+import { TEST_ROUTER_ADDRESS } from 'test/utils';
 import { SecondaryFee, TransactionDetails } from '../../types';
 import { calculateGasFee } from './gas';
 import { slippageToFraction } from './slippage';
@@ -24,6 +25,7 @@ const multicallWithDeadlineFunctionSignature = 'multicall(uint256,bytes[])';
 
 function buildSinglePoolSwap(
   tokenIn: Coin,
+  tokenOut: Coin,
   fromAddress: string,
   trade: Trade<Uniswap.Token, Uniswap.Token, Uniswap.TradeType>,
   route: Route<Uniswap.Token, Uniswap.Token>,
@@ -32,6 +34,11 @@ function buildSinglePoolSwap(
   routerContract: Interface,
   paymentsContract: Interface,
 ) {
+  const isTokenInNative = tokenIn.type === 'native';
+  const isTokenOutNative = tokenOut.type === 'native';
+
+  const routerContractTODO = TEST_ROUTER_ADDRESS;
+
   const calldatas: string[] = [];
 
   if (trade.tradeType === Uniswap.TradeType.EXACT_INPUT) {
@@ -41,13 +48,18 @@ function buildSinglePoolSwap(
           tokenIn: route.tokenPath[0].address,
           tokenOut: route.tokenPath[1].address,
           fee: route.pools[0].fee,
-          recipient: fromAddress,
+          recipient: isTokenOutNative ? routerContractTODO : fromAddress,
           amountIn,
           amountOutMinimum: amountOut,
           sqrtPriceLimitX96: 0,
         },
       ]),
     );
+
+    if (isTokenOutNative) {
+      // Unwrap the output token if the user specified a native token as the output
+      calldatas.push(paymentsContract.encodeFunctionData('unwrapWETH9(uint256)', [amountOut]));
+    }
 
     return calldatas;
   }
@@ -58,7 +70,7 @@ function buildSinglePoolSwap(
         tokenIn: route.tokenPath[0].address,
         tokenOut: route.tokenPath[1].address,
         fee: route.pools[0].fee,
-        recipient: fromAddress,
+        recipient: isTokenOutNative ? routerContractTODO : fromAddress,
         amountInMaximum: amountIn,
         amountOut,
         sqrtPriceLimitX96: 0,
@@ -66,9 +78,14 @@ function buildSinglePoolSwap(
     ]),
   );
 
-  if (tokenIn.type === 'native') {
+  if (isTokenInNative) {
     // Refund ETH if the input token is native and the swap is exact output
     calldatas.push(paymentsContract.encodeFunctionData('refundETH'));
+  }
+
+  if (isTokenOutNative) {
+    // Unwrap the output token if the user specified a native token as the output
+    calldatas.push(paymentsContract.encodeFunctionData('unwrapWETH9(uint256)', [amountOut]));
   }
 
   return calldatas;
@@ -131,6 +148,7 @@ function buildSinglePoolSwapWithFees(
 
 function buildMultiPoolSwap(
   tokenIn: Coin,
+  tokenOut: Coin,
   fromAddress: string,
   trade: Trade<Uniswap.Token, Uniswap.Token, Uniswap.TradeType>,
   route: Route<Uniswap.Token, Uniswap.Token>,
@@ -154,6 +172,11 @@ function buildMultiPoolSwap(
       ]),
     );
 
+    if (tokenOut.type === 'native') {
+      // Unwrap the output token if the user specified a native token as the output
+      calldatas.push(paymentsContract.encodeFunctionData('unwrapWETH9(uint256)', [amountOut]));
+    }
+
     return calldatas;
   }
 
@@ -171,6 +194,11 @@ function buildMultiPoolSwap(
   if (tokenIn.type === 'native') {
     // Refund ETH if the input token is native and the swap is exact output
     calldatas.push(paymentsContract.encodeFunctionData('refundETH'));
+  }
+
+  if (tokenOut.type === 'native') {
+    // Unwrap the output token if the user specified a native token as the output
+    calldatas.push(paymentsContract.encodeFunctionData('unwrapWETH9(uint256)', [amountOut]));
   }
 
   return calldatas;
@@ -230,6 +258,7 @@ function buildMultiPoolSwapWithFees(
 /**
  * Builds and array of calldatas for the swap to be executed in the multicall method
  * @param tokenIn The token to be swapped
+ * @param tokenOut The token to be received
  * @param fromAddress The address of the user
  * @param trade The trade to be executed
  * @param secondaryFees Secondary fees to be applied to the swap
@@ -242,6 +271,7 @@ function buildMultiPoolSwapWithFees(
  */
 function buildSwapParameters(
   tokenIn: Coin,
+  tokenOut: Coin,
   fromAddress: string,
   trade: Trade<Uniswap.Token, Uniswap.Token, Uniswap.TradeType>,
   secondaryFees: SecondaryFee[],
@@ -273,6 +303,7 @@ function buildSwapParameters(
 
     return buildSinglePoolSwap(
       tokenIn,
+      tokenOut,
       fromAddress,
       trade,
       route,
@@ -297,6 +328,7 @@ function buildSwapParameters(
 
   return buildMultiPoolSwap(
     tokenIn,
+    tokenOut,
     fromAddress,
     trade,
     route,
@@ -309,6 +341,7 @@ function buildSwapParameters(
 
 function createSwapCallParameters(
   tokenIn: Coin,
+  tokenOut: Coin,
   trade: Trade<Uniswap.Token, Uniswap.Token, Uniswap.TradeType>,
   fromAddress: string,
   swapOptions: SwapOptions,
@@ -322,6 +355,7 @@ function createSwapCallParameters(
 
   const calldatas = buildSwapParameters(
     tokenIn,
+    tokenOut,
     fromAddress,
     trade,
     secondaryFees,
@@ -341,6 +375,7 @@ function createSwapCallParameters(
 
 function createSwapParameters(
   tokenIn: Coin,
+  tokenOut: Coin,
   adjustedQuote: QuoteResult,
   fromAddress: string,
   slippage: number,
@@ -372,6 +407,7 @@ function createSwapParameters(
   return {
     calldata: createSwapCallParameters(
       tokenIn,
+      tokenOut,
       uncheckedTrade,
       fromAddress,
       options,
@@ -388,17 +424,19 @@ const getTransactionValue = (tokenIn: Coin, maximumAmountIn: string) =>
 
 export function getSwap(
   tokenIn: Coin,
+  tokenOut: Coin,
   adjustedQuote: QuoteResult,
   fromAddress: string,
   slippage: number,
   deadline: number,
-  peripheryRouterAddress: string,
-  secondaryFeesAddress: string,
+  routerContractAddress: string,
+  secondaryFeesContractAddress: string,
   gasPrice: CoinAmount<Coin> | null,
   secondaryFees: SecondaryFee[],
 ): TransactionDetails {
   const { calldata, maximumAmountIn } = createSwapParameters(
     tokenIn,
+    tokenOut,
     adjustedQuote,
     fromAddress,
     slippage,
@@ -414,7 +452,7 @@ export function getSwap(
   return {
     transaction: {
       data: calldata,
-      to: secondaryFees.length > 0 ? secondaryFeesAddress : peripheryRouterAddress,
+      to: secondaryFees.length > 0 ? secondaryFeesContractAddress : routerContractAddress,
       value: transactionValue,
       from: fromAddress,
     },

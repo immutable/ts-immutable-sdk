@@ -116,7 +116,6 @@ export const TEST_DEX_CONFIGURATION: ExchangeModuleConfiguration = {
 };
 
 export const refundETHFunctionSignature = '0x12210e8a';
-export const unwrapWETHFunctionSignature = '0x0d9d34d8';
 
 export type SwapTest = {
   fromAddress: string;
