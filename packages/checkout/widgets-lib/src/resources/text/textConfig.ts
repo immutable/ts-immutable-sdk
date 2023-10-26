@@ -342,6 +342,9 @@ export const text = {
           disabledCaption: undefined,
         },
       },
+      insufficientCoinsBanner: {
+        caption: 'Insufficient coin balance. Please proceed with card instead.',
+      },
       loading: {
         ready: 'Ready to purchase',
         confirm: 'Confirm in your wallet',
@@ -391,12 +394,6 @@ export const text = {
         [SaleErrorTypes.WALLET_REJECTED]: {
           description:
             "You'll need to approve the transaction in your wallet to proceed.",
-          primaryAction: 'Try again',
-          secondaryAction: 'Cancel',
-        },
-        [SaleErrorTypes.SMART_CHECKOUT_NO_ROUTES_FOUND]: {
-          description:
-            'Your wallet has insufficent balance. Try paying with card instead.',
           primaryAction: 'Try again',
           secondaryAction: 'Cancel',
         },
