@@ -2,6 +2,8 @@ import { JsonRpcProvider } from '@ethersproject/providers';
 import { BigNumber } from '@ethersproject/bignumber';
 import {
   expectToBeDefined,
+  FUN_TEST_TOKEN,
+  NATIVE_TEST_TOKEN,
   newAmountFromString,
   TEST_FROM_ADDRESS,
   TEST_ROUTER_ADDRESS,
@@ -202,6 +204,46 @@ describe('getApproveGasEstimate', () => {
 });
 
 describe('prepareApproval', () => {
+  describe('when the input token is native and the trade is EXACT_INPUT', () => {
+    it('should return null', () => {
+      const amountSpecified = newAmountFromString('1', NATIVE_TEST_TOKEN);
+      const amountWithSlippage = newAmountFromString('2', FUN_TEST_TOKEN);
+      const secondaryFees = [{ basisPoints: 0, recipient: TEST_FROM_ADDRESS }];
+      const approval = prepareApproval(
+        TradeType.EXACT_INPUT,
+        amountSpecified, // token in
+        amountWithSlippage,
+        {
+          routerAddress: TEST_ROUTER_ADDRESS,
+          secondaryFeeAddress: TEST_SECONDARY_FEE_ADDRESS,
+        },
+        secondaryFees,
+      );
+
+      expect(approval).toBeNull();
+    });
+  });
+
+  describe('when the input token is native and the trade is EXACT_OUTPUT', () => {
+    it('should return null', () => {
+      const amountSpecified = newAmountFromString('1', FUN_TEST_TOKEN);
+      const amountWithSlippage = newAmountFromString('2', NATIVE_TEST_TOKEN);
+      const secondaryFees = [{ basisPoints: 0, recipient: TEST_FROM_ADDRESS }];
+      const approval = prepareApproval(
+        TradeType.EXACT_OUTPUT,
+        amountSpecified,
+        amountWithSlippage, // token in
+        {
+          routerAddress: TEST_ROUTER_ADDRESS,
+          secondaryFeeAddress: TEST_SECONDARY_FEE_ADDRESS,
+        },
+        secondaryFees,
+      );
+
+      expect(approval).toBeNull();
+    });
+  });
+
   describe('when exact input amount is specified', () => {
     it('uses the amount specified by the user', () => {
       const amountSpecified = newAmountFromString('1', WETH_TEST_TOKEN);
