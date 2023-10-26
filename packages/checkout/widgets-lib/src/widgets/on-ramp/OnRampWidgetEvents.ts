@@ -1,6 +1,6 @@
 import {
-  IMTBLWidgetEvents, OnRampEventType, OnRampSuccess, WalletEventType, WidgetEvent,
-  OnRampFailed,
+  IMTBLWidgetEvents, OnRampEventType, WalletEventType, WidgetEvent,
+  WidgetType,
 } from '@imtbl/checkout-sdk';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -21,7 +21,7 @@ export function sendOnRampWidgetCloseEvent(eventTarget: Window | EventTarget) {
 }
 
 export const sendOnRampSuccessEvent = (eventTarget: Window | EventTarget, transactionHash: string) => {
-  const successEvent = new CustomEvent<WidgetEvent<OnRampSuccess>>(
+  const successEvent = new CustomEvent<WidgetEvent<WidgetType.ONRAMP>>(
     IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT,
     {
       detail: {
@@ -38,7 +38,7 @@ export const sendOnRampSuccessEvent = (eventTarget: Window | EventTarget, transa
 };
 
 export const sendOnRampFailedEvent = (eventTarget: Window | EventTarget, reason: string) => {
-  const failedEvent = new CustomEvent<WidgetEvent<OnRampFailed>>(
+  const failedEvent = new CustomEvent<WidgetEvent<WidgetType.ONRAMP>>(
     IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT,
     {
       detail: {

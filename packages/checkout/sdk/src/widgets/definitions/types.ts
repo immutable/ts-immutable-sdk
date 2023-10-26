@@ -5,11 +5,10 @@ import {
   BridgeSuccess,
   ConnectEventType,
   ConnectionFailed,
-  ConnectionSuccess,
+  ConnectionSuccess, OnRampEventType,
   OnRampFailed,
   OnRampSuccess,
   OrchestrationEventType,
-  SaleEventType,
   SwapEventType,
   WalletDisconnectWalletEvent,
   WalletEventType,
@@ -59,7 +58,7 @@ export type WidgetEventTypes = {
   [WidgetType.WALLET]: WalletEventType | OrchestrationEventType,
   [WidgetType.SWAP]: SwapEventType | OrchestrationEventType,
   [WidgetType.BRIDGE]: BridgeEventType | OrchestrationEventType,
-  [WidgetType.ONRAMP]: SaleEventType | OrchestrationEventType,
+  [WidgetType.ONRAMP]: OnRampEventType | OrchestrationEventType,
 };
 
 export type WidgetEventData = {
