@@ -12,7 +12,7 @@ function sendRequestOnrampEvent(
   imtblWidgetEvent: IMTBLWidgetEvents,
   eventData: RequestOnrampEvent,
 ) {
-  const requestOnrampEvent = new CustomEvent<WidgetEvent<RequestOnrampEvent>>(
+  const requestOnrampEvent = new CustomEvent<WidgetEvent<any>>(
     imtblWidgetEvent,
     {
       detail: {
@@ -32,7 +32,7 @@ function sendRequestSwapEvent(
   imtblWidgetEvent: IMTBLWidgetEvents,
   eventData: RequestSwapEvent,
 ) {
-  const requestSwapEvent = new CustomEvent<WidgetEvent<RequestSwapEvent>>(
+  const requestSwapEvent = new CustomEvent<WidgetEvent<any>>(
     imtblWidgetEvent,
     {
       detail: {
@@ -52,7 +52,7 @@ function sendRequestBridgeEvent(
   imtblWidgetEvent: IMTBLWidgetEvents,
   eventData: RequestBridgeEvent,
 ) {
-  const requestBridgeEvent = new CustomEvent<WidgetEvent<RequestBridgeEvent>>(imtblWidgetEvent, {
+  const requestBridgeEvent = new CustomEvent<WidgetEvent<any>>(imtblWidgetEvent, {
     detail: {
       type: OrchestrationEventType.REQUEST_BRIDGE,
       data: eventData,
