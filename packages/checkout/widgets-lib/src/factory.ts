@@ -10,6 +10,7 @@ import {
 } from '@imtbl/checkout-sdk';
 import { Bridge } from 'widgets/bridge/BridgeWidgetRoot';
 import { Connect } from 'widgets/connect/ConnectWidgetRoot';
+import { OnRamp } from 'widgets/on-ramp/OnRampWidgetRoot';
 import { Wallet } from 'widgets/wallet/WalletWidgetRoot';
 
 export class WidgetsFactory implements IWidgetsFactory {
@@ -41,6 +42,12 @@ export class WidgetsFactory implements IWidgetsFactory {
           config: this.widgetConfig,
           params,
         }) as Widget<WidgetType.WALLET> as Widget<T>;
+      }
+      case WidgetType.ONRAMP: {
+        return new OnRamp(this.sdk, {
+          config: this.widgetConfig,
+          params,
+        }) as Widget<WidgetType.ONRAMP> as Widget<T>;
       }
       default:
         throw new Error('widget type not supported');

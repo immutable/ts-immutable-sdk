@@ -6,6 +6,8 @@ import {
   ConnectEventType,
   ConnectionFailed,
   ConnectionSuccess,
+  OnRampFailed,
+  OnRampSuccess,
   OrchestrationEventType,
   SaleEventType,
   SwapEventType,
@@ -13,7 +15,9 @@ import {
   WalletEventType,
   WalletNetworkSwitchEvent,
 } from './events';
-import { BridgeWidgetParams, ConnectWidgetParams, WalletWidgetParams } from './parameters';
+import {
+  BridgeWidgetParams, ConnectWidgetParams, OnRampWidgetParams, WalletWidgetParams,
+} from './parameters';
 
 /**
  * Enum representing the themes for the widgets.
@@ -44,7 +48,7 @@ export type WidgetParameters = {
   [WidgetType.WALLET]: WalletWidgetParams,
   [WidgetType.SWAP]: any,
   [WidgetType.BRIDGE]: BridgeWidgetParams,
-  [WidgetType.ONRAMP]: any,
+  [WidgetType.ONRAMP]: OnRampWidgetParams,
 };
 
 /**
@@ -62,8 +66,8 @@ export type WidgetEventData = {
   [WidgetType.CONNECT]: ConnectionSuccess | ConnectionFailed,
   [WidgetType.WALLET]: WalletNetworkSwitchEvent | WalletDisconnectWalletEvent,
   [WidgetType.SWAP]: any, // TODO
-  [WidgetType.BRIDGE]: BridgeSuccess | BridgeFailed;
-  [WidgetType.ONRAMP]: any, // TODO
+  [WidgetType.BRIDGE]: BridgeSuccess | BridgeFailed,
+  [WidgetType.ONRAMP]: OnRampSuccess | OnRampFailed,
 };
 
 /**
