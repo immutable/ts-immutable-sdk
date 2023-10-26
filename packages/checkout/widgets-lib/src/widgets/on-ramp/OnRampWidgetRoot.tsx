@@ -20,7 +20,9 @@ import { sendOnRampWidgetCloseEvent } from './OnRampWidgetEvents';
 export class OnRamp extends Base<WidgetType.ONRAMP> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT;
 
-  protected validate({ params, config }: WidgetProperties<WidgetType.ONRAMP>): WidgetProperties<WidgetType.ONRAMP> {
+  protected getValidatedProperties(
+    { params, config }: WidgetProperties<WidgetType.ONRAMP>,
+  ): WidgetProperties<WidgetType.ONRAMP> {
     let validatedParams: OnRampWidgetParams | undefined;
     let validatedConfig: WidgetConfiguration | undefined;
 
