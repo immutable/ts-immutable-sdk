@@ -75,7 +75,18 @@ export class ZkEvmProvider implements Provider {
     this.magicAdapter = magicAdapter;
     this.config = config;
     this.confirmationScreen = confirmationScreen;
-    this.jsonRpcProvider = new JsonRpcProvider(this.config.zkEvmRpcUrl);
+
+    if (config.crossSdkBridgeEnabled) {
+      // JsonRpcProvider by default sets the referrer as "client".
+      // On Unreal 4 this errors as the browser used is expecting a valid URL.
+      this.jsonRpcProvider = new JsonRpcProvider({
+        url: this.config.zkEvmRpcUrl,
+        fetchOptions: { referrer: 'http://imtblgamesdk.local' },
+      });
+    } else {
+      this.jsonRpcProvider = new JsonRpcProvider(this.config.zkEvmRpcUrl);
+    }
+
     this.multiRollupApiClients = multiRollupApiClients;
     this.eventEmitter = new TypedEventEmitter<ProviderEventMap>();
 

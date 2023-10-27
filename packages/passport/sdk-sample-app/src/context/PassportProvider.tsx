@@ -9,10 +9,12 @@ import { useStatusProvider } from '@/context/StatusProvider';
 const PassportContext = createContext<{
   imxProvider: IMXProvider | undefined;
   zkEvmProvider: Provider | undefined;
+  userProfile: UserProfile | undefined;
   connectImx:() => void;
   connectImxSilent: () => void;
   connectZkEvm: () => void;
   logout: () => void;
+  signIn: () => void;
   getIdToken: () => Promise<string | undefined>;
   getAccessToken: () => Promise<string | undefined>;
   getUserInfo: () => Promise<UserProfile | undefined>;
@@ -20,10 +22,12 @@ const PassportContext = createContext<{
 }>({
       imxProvider: undefined,
       zkEvmProvider: undefined,
+      userProfile: undefined,
       connectImx: () => undefined,
       connectImxSilent: () => undefined,
       connectZkEvm: () => undefined,
       logout: () => undefined,
+      signIn: () => Promise.resolve(undefined),
       getIdToken: () => Promise.resolve(undefined),
       getAccessToken: () => Promise.resolve(undefined),
       getUserInfo: () => Promise.resolve(undefined),
@@ -35,6 +39,7 @@ export function PassportProvider({
 }: { children: JSX.Element | JSX.Element[] }) {
   const [imxProvider, setImxProvider] = useState<IMXProvider | undefined>();
   const [zkEvmProvider, setZkEvmProvider] = useState<Provider | undefined>();
+  const [userProfile, setUserProfile] = useState<UserProfile | undefined>();
 
   const { addMessage, setIsLoading } = useStatusProvider();
   const { passportClient } = useImmutableProvider();
@@ -127,6 +132,20 @@ export function PassportProvider({
       await passportClient?.logout();
       setImxProvider(undefined);
       setZkEvmProvider(undefined);
+      setUserProfile(undefined);
+    } catch (err) {
+      addMessage('Logout', err);
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [addMessage, passportClient, setIsLoading]);
+
+  const signIn = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const signInuser = await passportClient?.signIn();
+      setUserProfile(signInuser);
     } catch (err) {
       addMessage('Logout', err);
       console.error(err);
@@ -138,10 +157,12 @@ export function PassportProvider({
   const providerValues = useMemo(() => ({
     imxProvider,
     zkEvmProvider,
+    userProfile,
     connectImx,
     connectImxSilent,
     connectZkEvm,
     logout,
+    signIn,
     getIdToken,
     getAccessToken,
     getUserInfo,
@@ -149,10 +170,12 @@ export function PassportProvider({
   }), [
     imxProvider,
     zkEvmProvider,
+    userProfile,
     connectImx,
     connectImxSilent,
     connectZkEvm,
     logout,
+    signIn,
     getIdToken,
     getAccessToken,
     getUserInfo,
@@ -168,11 +191,13 @@ export function PassportProvider({
 
 export function usePassportProvider() {
   const {
+    userProfile,
     imxProvider,
     zkEvmProvider,
     connectImx,
     connectImxSilent,
     connectZkEvm,
+    signIn,
     logout,
     getIdToken,
     getAccessToken,
@@ -180,11 +205,13 @@ export function usePassportProvider() {
     getLinkedAddresses,
   } = useContext(PassportContext);
   return {
+    userProfile,
     imxProvider,
     zkEvmProvider,
     connectImx,
     connectImxSilent,
     connectZkEvm,
+    signIn,
     logout,
     getIdToken,
     getAccessToken,

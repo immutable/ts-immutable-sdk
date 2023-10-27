@@ -89,16 +89,17 @@ describe('PassportImxProviderFactory', () => {
 
         mockAuthManager.login.mockResolvedValue(mockUserImx);
         mockMagicAdapter.login.mockResolvedValue(mockMagicProvider);
-        mockAuthManager.loginSilent.mockResolvedValue(mockUserImx);
+        mockAuthManager.loginSilent.mockResolvedValue(null);
+        mockAuthManager.login.mockResolvedValue(mockUserImx);
 
         const result = await passportImxProviderFactory.getProvider();
 
         expect(result).toBe(mockPassportImxProvider);
+        expect(mockAuthManager.loginSilent).toHaveBeenCalledTimes(1);
         expect(mockAuthManager.login).toHaveBeenCalledTimes(1);
         expect(mockMagicAdapter.login).toHaveBeenCalledWith(mockUserImx.idToken);
         expect(mockGetSigner).toHaveBeenCalledTimes(1);
         expect(registerPassportStarkEx).not.toHaveBeenCalled();
-        expect(mockAuthManager.loginSilent).not.toHaveBeenCalled();
         expect(PassportImxProvider).toHaveBeenCalledWith({
           starkSigner: mockStarkSigner,
           ethSigner: mockEthSigner,

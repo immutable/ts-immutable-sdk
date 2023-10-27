@@ -1,6 +1,6 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { CheckoutConfiguration } from '../../config';
-import { isOnRampGeoBlocked, isSwapGeoBlocked } from './geoBlocking';
+import { isOnRampAvailable, isSwapAvailable } from './geoBlocking';
 import { AvailableRoutingOptions } from '../../types';
 
 const isPassportProvider = (provider: Web3Provider) => (provider.provider as any)?.isPassport === true ?? false;
@@ -26,10 +26,10 @@ export const getAvailableRoutingOptions = async (
   // Geo-blocking checks
   const geoBlockingChecks: GeoBlockingCheck[] = [];
   if (availableRoutingOptions.onRamp) {
-    geoBlockingChecks.push({ id: 'onRamp', promise: isOnRampGeoBlocked() });
+    geoBlockingChecks.push({ id: 'onRamp', promise: isOnRampAvailable() });
   }
   if (availableRoutingOptions.swap) {
-    geoBlockingChecks.push({ id: 'swap', promise: isSwapGeoBlocked(config) });
+    geoBlockingChecks.push({ id: 'swap', promise: isSwapAvailable(config) });
   }
 
   if (geoBlockingChecks.length > 0) {
@@ -40,7 +40,7 @@ export const getAvailableRoutingOptions = async (
       const statusId = geoBlockingChecks[index].id;
       availableRoutingOptions[statusId] = availableRoutingOptions[statusId]
         && result.status === 'fulfilled'
-        && !result.value;
+        && result.value;
     });
   }
 

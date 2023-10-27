@@ -180,13 +180,13 @@ function SaleWebView() {
 
   useEffect(() => {
     window.addEventListener(
-      IMTBLWidgetEvents.IMTBL_PRIMARY_REVENUE_WIDGET_EVENT,
+      IMTBLWidgetEvents.IMTBL_SALE_WIDGET_EVENT,
       handleEvent,
     );
 
     return () => {
       window.removeEventListener(
-        IMTBLWidgetEvents.IMTBL_PRIMARY_REVENUE_WIDGET_EVENT,
+        IMTBLWidgetEvents.IMTBL_SALE_WIDGET_EVENT,
         handleEvent,
       );
     };

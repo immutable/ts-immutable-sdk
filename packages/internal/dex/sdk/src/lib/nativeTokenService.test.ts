@@ -6,6 +6,7 @@ import {
   nativeTokenService,
   newAmountFromString,
 } from 'test/utils';
+import { canUnwrapToken } from './nativeTokenService';
 
 describe('NativeTokenService', () => {
   describe('wrapAmount', () => {
@@ -32,9 +33,30 @@ describe('NativeTokenService', () => {
   });
 
   describe('unwrapAmount', () => {
+    it('should convert when object references are different', () => {
+      // Make a new wrappedToken instance
+      const wrappedAmount = newAmountFromString('1', { ...nativeTokenService.wrappedToken });
+      const nativeEquivalent = nativeTokenService.unwrapAmount(wrappedAmount);
+
+      expectNative(nativeEquivalent.token);
+      expect(formatAmount(nativeEquivalent)).toEqual('1.0');
+    });
+
+    it('should convert when token addresses have mixed casing', () => {
+      const newWrappedToken = { ...nativeTokenService.wrappedToken };
+      newWrappedToken.address = newWrappedToken.address.toUpperCase();
+
+      const wrappedAmount = newAmountFromString('1', newWrappedToken);
+      const nativeEquivalent = nativeTokenService.unwrapAmount(wrappedAmount);
+
+      expectNative(nativeEquivalent.token);
+      expect(formatAmount(nativeEquivalent)).toEqual('1.0');
+    });
+
     it('converts wrapped token amounts to their native equivalent', () => {
       const wrappedAmount = newAmountFromString('1', nativeTokenService.wrappedToken);
       const nativeEquivalent = nativeTokenService.unwrapAmount(wrappedAmount);
+
       expectNative(nativeEquivalent.token);
       expect(formatAmount(nativeEquivalent)).toEqual('1.0');
     });
@@ -85,17 +107,17 @@ describe('NativeTokenService', () => {
     });
   });
 
-  describe('isNativeToken', () => {
+  describe('canUnwrapToken', () => {
     it('returns true for the native token', () => {
-      expect(nativeTokenService.isNativeToken(nativeTokenService.nativeToken)).toEqual(true);
+      expect(canUnwrapToken(nativeTokenService.nativeToken)).toEqual(true);
     });
 
     it('returns false for the wrapped token', () => {
-      expect(nativeTokenService.isNativeToken(nativeTokenService.wrappedToken)).toEqual(false);
+      expect(canUnwrapToken(nativeTokenService.wrappedToken)).toEqual(false);
     });
 
     it('returns false for a normal ERC20 token', () => {
-      expect(nativeTokenService.isNativeToken(FUN_TEST_TOKEN)).toEqual(false);
+      expect(canUnwrapToken(FUN_TEST_TOKEN)).toEqual(false);
     });
   });
 });

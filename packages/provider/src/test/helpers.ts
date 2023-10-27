@@ -6,7 +6,7 @@ import { ProviderConfiguration } from '../config';
 
 export const privateKey1 = 'd90915fa5bce418a23184c9asdfasfasdf5c8e900e3035cf34e2dd36';
 export const privateKey2 = '013fe4a5265bc6deb3f3b524b987sdf987f8c7a8ec2a998ae0512f493d763c8f';
-const testChainId = 5;
+const testChainId = 11155111;
 export const transactionResponse = {
   hash: 'some-hash',
 };
@@ -14,8 +14,8 @@ export const transactionResponse = {
 const imxConfig: ImmutableXConfiguration = {
   ethConfiguration: {
     chainID: testChainId,
-    coreContractAddress: '0x7917eDb51ecD6CdB3F9854c3cc593F33de10c623',
-    registrationContractAddress: '0x1C97Ada273C9A52253f463042f29117090Cd7D83',
+    coreContractAddress: '0x2d5C349fD8464DA06a3f90b4B0E9195F3d1b7F98',
+    registrationContractAddress: '0xDbA6129C02E69405622fAdc3d5A7f8d23eac3b97',
   },
   apiConfiguration: {
     accessToken: undefined,
@@ -58,7 +58,7 @@ export const getTokenAddress = (symbol: string): string => {
     },
     {
       symbol: 'IMX',
-      tokenAddress: '0x1facdd0165489f373255a90304650e15481b2c85', // IMX address in goerli
+      tokenAddress: '0x2Fa06C6672dDCc066Ab04631192738799231dE4a', // IMX address in sepolia
     },
   ];
   const token = tokenAddresses.find((tkn) => tkn.symbol === symbol);

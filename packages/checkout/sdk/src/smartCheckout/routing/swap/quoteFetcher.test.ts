@@ -122,6 +122,10 @@ describe('quoteFetcher', () => {
     baseConfig: { environment: Environment.SANDBOX },
   });
 
+  beforeEach(() => {
+    jest.spyOn(console, 'debug').mockImplementation(() => {});
+  });
+
   it('should fetch quotes', async () => {
     (createExchangeInstance as jest.Mock).mockReturnValue({
       getUnsignedSwapTxFromAmountOut: jest.fn()

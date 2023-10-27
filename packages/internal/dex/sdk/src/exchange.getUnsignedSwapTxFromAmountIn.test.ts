@@ -1,19 +1,19 @@
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { Contract } from '@ethersproject/contracts';
 import { BigNumber } from '@ethersproject/bignumber';
-import {
-  InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError, NoRoutesAvailableError,
-} from 'errors';
+import { InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError, NoRoutesAvailableError } from 'errors';
 import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
 import { constants, utils } from 'ethers';
 import { SecondaryFee } from 'types';
 import { Environment } from '@imtbl/config';
+import { Router, addAmount } from 'lib';
+import { PaymentsExtended, SwapRouter } from '@uniswap/router-sdk';
 import { IMMUTABLE_TESTNET_CHAIN_ID, TIMX_IMMUTABLE_TESTNET } from './constants';
 import { Exchange } from './exchange';
 import {
   mockRouterImplementation,
   setupSwapTxTest,
-  TEST_PERIPHERY_ROUTER_ADDRESS,
+  TEST_ROUTER_ADDRESS,
   TEST_DEX_CONFIGURATION,
   TEST_GAS_PRICE,
   TEST_TRANSACTION_GAS_USAGE,
@@ -36,10 +36,12 @@ import {
   makeAddr,
   createPool,
   WETH_TEST_TOKEN,
+  FUN_TEST_TOKEN,
+  nativeTokenService,
+  TEST_FROM_ADDRESS,
+  expectToBeString,
+  decodeMulticallExactInputWithoutFees,
 } from './test/utils';
-import {
-  addAmount, Router,
-} from './lib';
 
 jest.mock('@ethersproject/providers');
 jest.mock('@ethersproject/contracts');
@@ -49,7 +51,7 @@ jest.mock('./lib/utils', () => ({
   __esmodule: true,
   ...jest.requireActual('./lib/utils'),
   // eslint-disable-next-line arrow-body-style
-  getERC20Decimals: async (address: string) => {
+  getTokenDecimals: async (address: string) => {
     return address === USDC_TEST_TOKEN.address ? USDC_TEST_TOKEN.decimals : 18;
   },
 }));
@@ -62,32 +64,27 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   let erc20Contract: jest.Mock<any, any, any>;
 
   beforeAll(() => {
-    erc20Contract = (Contract as unknown as jest.Mock).mockImplementation(
-      () => ({
-        allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT.value),
-        estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
-        paused: jest.fn().mockResolvedValue(false),
-      }),
-    );
+    erc20Contract = (Contract as unknown as jest.Mock).mockImplementation(() => ({
+      allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT.value),
+      estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
+      paused: jest.fn().mockResolvedValue(false),
+    }));
 
-    (JsonRpcProvider as unknown as jest.Mock).mockImplementation(
-      () => ({
-        getFeeData: async () => ({
-          maxFeePerGas: null,
-          gasPrice: TEST_GAS_PRICE,
-        }),
-        connect: jest.fn().mockResolvedValue(erc20Contract),
+    (JsonRpcProvider as unknown as jest.Mock).mockImplementation(() => ({
+      getFeeData: async () => ({
+        maxFeePerGas: null,
+        gasPrice: TEST_GAS_PRICE,
       }),
-    ) as unknown as JsonRpcProvider;
+      connect: jest.fn().mockResolvedValue(erc20Contract),
+    })) as unknown as JsonRpcProvider;
   });
 
   describe('with the out-of-the-box minimal configuration', () => {
     it('uses the edge tIMX as the gas token', async () => {
       const tokenIn = { ...USDC_TEST_TOKEN, chainId: IMMUTABLE_TESTNET_CHAIN_ID };
       const tokenOut = { ...WETH_TEST_TOKEN, chainId: IMMUTABLE_TESTNET_CHAIN_ID };
-      const params = { pools: [createPool(tokenIn, tokenOut)] };
 
-      mockRouterImplementation(params);
+      mockRouterImplementation({ pools: [createPool(tokenIn, tokenOut)] });
 
       const exchange = new Exchange({
         baseConfig: {
@@ -109,287 +106,343 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
     });
   });
 
-  describe('When the swap transaction requires approval', () => {
-    it('should include the unsigned approval transaction', async () => {
-      const params = setupSwapTxTest();
-      mockRouterImplementation(params);
-      const erc20ContractInterface = ERC20__factory.createInterface();
+  describe('with a native token in', () => {
+    it('should include the user-specified amount as the value of the transaction', async () => {
+      mockRouterImplementation({
+        pools: [createPool(nativeTokenService.wrappedToken, FUN_TEST_TOKEN)],
+      });
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
-
-      const amountIn = addAmount(APPROVED_AMOUNT, newAmountFromString('1', USDC_TEST_TOKEN));
-      const tx = await exchange.getUnsignedSwapTxFromAmountIn(
-        params.fromAddress,
-        params.inputToken,
-        params.outputToken,
-        amountIn.value,
-      );
-
-      expectToBeDefined(tx.approval?.transaction.data);
-
-      const decodedResults = erc20ContractInterface.decodeFunctionData('approve', tx.approval.transaction.data);
-      expect(decodedResults[0]).toEqual(TEST_PERIPHERY_ROUTER_ADDRESS);
-      // we have already approved 1000000000000000000, so we expect to approve 1000000000000000000 more
-      expect(decodedResults[1].toString()).toEqual(APPROVED_AMOUNT.value.toString());
-      expect(tx.approval.transaction.to).toEqual(params.inputToken);
-      expect(tx.approval.transaction.from).toEqual(params.fromAddress);
-      expect(tx.approval.transaction.value).toEqual(0); // we do not want to send any ETH
-    });
-
-    it('should include the gas estimate for the approval transaction', async () => {
-      const params = setupSwapTxTest();
-      mockRouterImplementation(params);
-
-      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
-
-      const amountIn = addAmount(APPROVED_AMOUNT, newAmountFromString('1', USDC_TEST_TOKEN));
-      const tx = await exchange.getUnsignedSwapTxFromAmountIn(
-        params.fromAddress,
-        params.inputToken,
-        params.outputToken,
-        amountIn.value,
-      );
-
-      expectToBeDefined(tx.approval?.gasFeeEstimate);
-      expect(tx.approval.gasFeeEstimate.value).toEqual(TEST_GAS_PRICE.mul(APPROVE_GAS_ESTIMATE));
-      expect(tx.approval.gasFeeEstimate.token.chainId).toEqual(NATIVE_TEST_TOKEN.chainId);
-      expect(tx.approval.gasFeeEstimate.token.address).toEqual('');
-      expect(tx.approval.gasFeeEstimate.token.decimals).toEqual(NATIVE_TEST_TOKEN.decimals);
-      expect(tx.approval.gasFeeEstimate.token.symbol).toEqual(NATIVE_TEST_TOKEN.symbol);
-      expect(tx.approval.gasFeeEstimate.token.name).toEqual(NATIVE_TEST_TOKEN.name);
-    });
-  });
-
-  describe('When the swap transaction does not require approval', () => {
-    it('should not include the unsigned approval transaction', async () => {
-      const params = setupSwapTxTest();
-      mockRouterImplementation(params);
-
-      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
-
-      // Set the amountIn to be the same as the APPROVED_AMOUNT
-      const tx = await exchange.getUnsignedSwapTxFromAmountIn(
-        params.fromAddress,
-        params.inputToken,
-        params.outputToken,
-        APPROVED_AMOUNT.value,
-      );
-
-      // we have already approved 1000000000000000000, so we don't expect to approve anything
-      expect(tx.approval).toBe(null);
-    });
-  });
-
-  describe('When no route found', () => {
-    it('throws NoRoutesAvailableError', async () => {
-      const params = setupSwapTxTest();
-
-      (Router as unknown as jest.Mock).mockImplementationOnce(() => ({
-        findOptimalRoute: jest.fn().mockRejectedValue(new NoRoutesAvailableError()),
-      }));
-
-      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
-      await expect(exchange.getUnsignedSwapTxFromAmountIn(
-        params.fromAddress,
-        params.inputToken,
-        params.outputToken,
-        newAmountFromString('100', USDC_TEST_TOKEN).value,
-      )).rejects.toThrow(new NoRoutesAvailableError());
-    });
-  });
-
-  describe('Swap with single pool and secondary fees', () => {
-    it('generates valid swap calldata', async () => {
-      const params = setupSwapTxTest();
-      const findOptimalRouteMock = mockRouterImplementation(params);
-
-      const secondaryFees: SecondaryFee[] = [
-        { recipient: TEST_FEE_RECIPIENT, basisPoints: 100 }, // 1% Fee
-      ];
-      const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
-
-      const { swap, quote } = await exchange.getUnsignedSwapTxFromAmountIn(
-        params.fromAddress,
-        params.inputToken,
-        params.outputToken,
-        newAmountFromString('100', USDC_TEST_TOKEN).value,
-        3, // 3% Slippage
-      );
-
-      expectToBeDefined(swap.transaction.data);
-
-      expect(formatAmount(quote.amountWithMaxSlippage)).toEqual('961.165048543689320388'); // userQuoteRes.amountOutMinimum = swapReq.amountOutMinimum
-
-      const ourQuoteReqAmountIn = findOptimalRouteMock.mock.calls[0][0];
-      expect(formatAmount(ourQuoteReqAmountIn)).toEqual('99.0'); // ourQuoteReq.amountIn = the amount specified less the fee
-
-      const data = swap.transaction.data.toString();
-
-      const { swapParams, secondaryFeeParams } = decodeMulticallExactInputSingleWithFees(data);
-      expectInstanceOf(BigNumber, swapParams.amountIn);
-
-      expect(secondaryFeeParams[0].recipient).toBe(TEST_FEE_RECIPIENT);
-      expect(secondaryFeeParams[0].basisPoints.toString()).toBe('100');
-
-      expect(swapParams.tokenIn).toBe(params.inputToken);
-      expect(swapParams.tokenOut).toBe(params.outputToken);
-      expect(swapParams.fee).toBe(10000);
-      expect(swapParams.recipient).toBe(params.fromAddress);
-      expect(formatTokenAmount(swapParams.amountIn, USDC_TEST_TOKEN)).toBe('100.0'); // swap.amountIn = userQuoteReq.amountIn
-      expect(formatEther(swapParams.amountOutMinimum)).toBe('961.165048543689320388'); // swap.amountOutMinimum = ourQuoteRes.amountOut - slippage
-      expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0');
-
-      expect(swap.transaction.to).toBe(TEST_SECONDARY_FEE_ADDRESS);
-      expect(swap.transaction.from).toBe(params.fromAddress);
-      expect(swap.transaction.value).toBe('0x00');
-    });
-  });
-
-  describe('Swap with multiple pools and secondary fees', () => {
-    it('generates valid swap calldata', async () => {
-      const params = setupSwapTxTest({ multiPoolSwap: true });
-      mockRouterImplementation(params);
-
-      const secondaryFees: SecondaryFee[] = [
-        { recipient: TEST_FEE_RECIPIENT, basisPoints: TEST_MAX_FEE_BASIS_POINTS },
-      ];
-
-      const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
 
       const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
-        params.fromAddress,
-        params.inputToken,
-        params.outputToken,
-        newAmountFromString('100', USDC_TEST_TOKEN).value,
+        TEST_FROM_ADDRESS,
+        'native',
+        FUN_TEST_TOKEN.address,
+        newAmountFromString('100', FUN_TEST_TOKEN).value,
       );
 
       expectToBeDefined(swap.transaction.data);
-
+      expectToBeDefined(swap.transaction.value);
       const data = swap.transaction.data.toString();
 
-      const { swapParams, secondaryFeeParams } = decodeMulticallExactInputWithFees(data);
+      const { swapParams } = decodeMulticallExactInputSingleWithoutFees(data);
       expectInstanceOf(BigNumber, swapParams.amountIn);
 
-      expect(secondaryFeeParams[0].recipient).toBe(TEST_FEE_RECIPIENT);
-      expect(secondaryFeeParams[0].basisPoints.toString()).toBe(TEST_MAX_FEE_BASIS_POINTS.toString());
-
-      const decodedPath = decodePathForExactInput(swapParams.path.toString());
-
-      expect(swap.transaction.to).toBe(TEST_SECONDARY_FEE_ADDRESS); // to address
-      expect(swap.transaction.from).toBe(params.fromAddress); // from address
-      expect(swap.transaction.value).toBe('0x00'); // refers to 0 amount of the native token
-
-      expect(utils.getAddress(decodedPath.inputToken)).toBe(params.inputToken);
-      expect(utils.getAddress(decodedPath.intermediaryToken)).toBe(params.intermediaryToken);
-      expect(utils.getAddress(decodedPath.outputToken)).toBe(params.outputToken);
-      expect(decodedPath.firstPoolFee.toString()).toBe('10000');
-      expect(decodedPath.secondPoolFee.toString()).toBe('10000');
-
-      expect(swapParams.recipient).toBe(params.fromAddress); // recipient of swap
-      expect(formatTokenAmount(swapParams.amountIn, USDC_TEST_TOKEN)).toBe('100.0');
-      expect(formatEther(swapParams.amountOutMinimum)).toBe('899.100899100899100899'); // includes slippage and fees
+      expect(swapParams.tokenIn).toBe(WIMX_TEST_TOKEN.address); // should be the wrapped native token
+      expect(swapParams.tokenOut).toBe(FUN_TEST_TOKEN.address);
+      expect(swap.transaction.value).toBe('0x056bc75e2d63100000'); // should be a hex
+      expect(formatTokenAmount(swapParams.amountIn, WIMX_TEST_TOKEN)).toBe('100.0'); // amount in
     });
 
-    it('returns a quote', async () => {
-      const params = setupSwapTxTest({ multiPoolSwap: true });
-      mockRouterImplementation(params);
+    it('uses the wrapped token pool to get the quote', async () => {
+      mockRouterImplementation({
+        pools: [createPool(nativeTokenService.wrappedToken, FUN_TEST_TOKEN)],
+      });
 
-      const secondaryFees: SecondaryFee[] = [
-        { recipient: TEST_FEE_RECIPIENT, basisPoints: TEST_MAX_FEE_BASIS_POINTS },
-      ];
-
-      const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
-
-      const { quote } = await exchange.getUnsignedSwapTxFromAmountIn(
-        params.fromAddress,
-        params.inputToken,
-        params.outputToken,
-        newAmountFromString('100', USDC_TEST_TOKEN).value,
+      const result = await new Exchange(TEST_DEX_CONFIGURATION).getUnsignedSwapTxFromAmountIn(
+        makeAddr('fromAddress'),
+        'native',
+        FUN_TEST_TOKEN.address,
+        BigNumber.from(1),
       );
 
-      const tokenIn = { ...USDC_TEST_TOKEN, name: undefined, symbol: undefined };
+      expect(result.quote.amount.token.address).toEqual(FUN_TEST_TOKEN.address);
+    });
 
-      expect(quote.fees).toEqual([
-        {
-          recipient: TEST_FEE_RECIPIENT,
-          basisPoints: TEST_MAX_FEE_BASIS_POINTS,
-          amount: newAmountFromString('10', tokenIn),
-        },
-      ]);
+    it('does not require approval', async () => {
+      mockRouterImplementation({
+        pools: [createPool(nativeTokenService.wrappedToken, FUN_TEST_TOKEN)],
+      });
+
+      const result = await new Exchange(TEST_DEX_CONFIGURATION).getUnsignedSwapTxFromAmountIn(
+        makeAddr('fromAddress'),
+        'native',
+        FUN_TEST_TOKEN.address,
+        BigNumber.from(1),
+      );
+
+      expect(result.approval).toBeNull();
     });
   });
 
-  describe('Swap with secondary fees and paused secondary fee contract', () => {
-    it('should use the default router contract with no fees applied to the swap', async () => {
-      erc20Contract = (Contract as unknown as jest.Mock).mockImplementation(
-        () => ({
-          allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT.value),
-          estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
-          paused: jest.fn().mockResolvedValue(true),
-        }),
-      );
+  describe('with a single pool and a native token out', () => {
+    it('should not include any amount as the value of the transaction', async () => {
+      mockRouterImplementation({
+        pools: [createPool(nativeTokenService.wrappedToken, FUN_TEST_TOKEN)],
+      });
 
-      const params = setupSwapTxTest();
-      mockRouterImplementation(params);
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
-      const secondaryFees: SecondaryFee[] = [
-        { recipient: TEST_FEE_RECIPIENT, basisPoints: 100 }, // 1% Fee
-      ];
-      const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
-
-      const { swap, quote } = await exchange.getUnsignedSwapTxFromAmountIn(
-        params.fromAddress,
-        params.inputToken,
-        params.outputToken,
-        newAmountFromString('100', USDC_TEST_TOKEN).value,
+      const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
+        TEST_FROM_ADDRESS,
+        FUN_TEST_TOKEN.address,
+        'native',
+        newAmountFromString('100', FUN_TEST_TOKEN).value,
       );
 
       expectToBeDefined(swap.transaction.data);
-
-      expect(formatAmount(quote.amountWithMaxSlippage)).toEqual('999.000999000999000999'); // min amount out (includes slippage)
-      expect(quote.fees.length).toBe(0); // expect no fees to be applied
-
+      expectToBeDefined(swap.transaction.value);
       const data = swap.transaction.data.toString();
-      const { swapParams } = decodeMulticallExactInputSingleWithoutFees(data);
 
-      expect(formatEther(swapParams.amountOutMinimum)).toBe(formatEther(quote.amountWithMaxSlippage.value));
-      expect(swap.transaction.to).toBe(TEST_PERIPHERY_ROUTER_ADDRESS); // expect the default router contract to be used
+      const { swapParams } = decodeMulticallExactInputSingleWithoutFees(data);
+      expectInstanceOf(BigNumber, swapParams.amountIn);
+
+      expect(swapParams.tokenIn).toBe(FUN_TEST_TOKEN.address); // should be the token-in
+      expect(swapParams.tokenOut).toBe(WIMX_TEST_TOKEN.address); // should be the wrapped native token
+      expect(swap.transaction.value).toBe('0x00'); // should not have a value
+      expect(formatTokenAmount(swapParams.amountIn, WIMX_TEST_TOKEN)).toBe('100.0'); // amount in
     });
 
-    describe('when the secondary fee contract is unpaused after a swap request', () => {
-      it('should apply secondary fees to a subsequent swap request', async () => {
-        erc20Contract = (Contract as unknown as jest.Mock).mockImplementation(
-          () => ({
-            allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT.value),
-            estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
-            paused: jest.fn().mockResolvedValue(true),
-          }),
+    it('should unwrap the quoted amount', async () => {
+      mockRouterImplementation({
+        pools: [createPool(nativeTokenService.wrappedToken, FUN_TEST_TOKEN)],
+      });
+
+      const result = await new Exchange(TEST_DEX_CONFIGURATION).getUnsignedSwapTxFromAmountIn(
+        makeAddr('fromAddress'),
+        FUN_TEST_TOKEN.address,
+        'native',
+        BigNumber.from(1),
+      );
+
+      expect(result.quote.amount.token.address).toEqual('');
+      expect(result.quote.amount.token.chainId).toEqual(nativeTokenService.nativeToken.chainId);
+      expect(result.quote.amount.token.decimals).toEqual(nativeTokenService.nativeToken.decimals);
+    });
+
+    it('should include a call to unwrapWETH9 as the final method call of the calldata', async () => {
+      mockRouterImplementation({
+        pools: [createPool(nativeTokenService.wrappedToken, FUN_TEST_TOKEN)],
+      });
+
+      const swapRouterInterface = SwapRouter.INTERFACE;
+      const paymentsInterface = PaymentsExtended.INTERFACE;
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+
+      // Buy 100 native tokens for X amount of FUN where the exchange rate is 1 token-in : 10 token-out
+      const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
+        TEST_FROM_ADDRESS,
+        FUN_TEST_TOKEN.address,
+        'native',
+        newAmountFromString('100', NATIVE_TEST_TOKEN).value,
+      );
+
+      expectToBeDefined(swap.transaction.data);
+      expectToBeDefined(swap.transaction.value);
+      const calldata = swap.transaction.data.toString();
+
+      const topLevelParams = swapRouterInterface.decodeFunctionData('multicall(uint256,bytes[])', calldata);
+
+      expect(topLevelParams.data.length).toBe(2); // expect that there are two calls in the multicall
+      const swapFunctionCalldata = topLevelParams.data[0];
+      const unwrapWETHFunctionCalldata = topLevelParams.data[1];
+
+      expectToBeString(swapFunctionCalldata);
+      expectToBeString(unwrapWETHFunctionCalldata);
+
+      // Get the first 4 bytes of the swap and unwrap function calldata to get the function selector
+      const swapFunctionFragment = swapRouterInterface.getFunction(swapFunctionCalldata.slice(0, 10));
+      const unwrapFunctionFragment = paymentsInterface.getFunction(unwrapWETHFunctionCalldata.slice(0, 10));
+
+      expect(swapFunctionFragment.name).toEqual('exactInputSingle');
+      expect(unwrapFunctionFragment.name).toEqual('unwrapWETH9');
+    });
+
+    it('should specify the quoted amount with slippage applied in the unwrapWETH9 function calldata', async () => {
+      mockRouterImplementation({
+        pools: [createPool(nativeTokenService.wrappedToken, FUN_TEST_TOKEN)],
+      });
+
+      const swapRouterInterface = SwapRouter.INTERFACE;
+      const paymentsInterface = PaymentsExtended.INTERFACE;
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+
+      // Buy 100 native tokens for X amount of FUN where the exchange rate is 1 token-in : 10 token-out
+      const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
+        TEST_FROM_ADDRESS,
+        FUN_TEST_TOKEN.address,
+        'native',
+        newAmountFromString('100', NATIVE_TEST_TOKEN).value,
+        10, // 10 % slippage for easier test math
+      );
+
+      expectToBeDefined(swap.transaction.data);
+      expectToBeDefined(swap.transaction.value);
+      const calldata = swap.transaction.data.toString();
+
+      const topLevelParams = swapRouterInterface.decodeFunctionData('multicall(uint256,bytes[])', calldata);
+
+      expect(topLevelParams.data.length).toBe(2); // expect that there are two calls in the multicall
+      const swapFunctionCalldata = topLevelParams.data[0];
+      const unwrapWETHFunctionCalldata = topLevelParams.data[1];
+
+      expectToBeString(swapFunctionCalldata);
+      expectToBeString(unwrapWETHFunctionCalldata);
+
+      const decodedUnwrapWETH9FunctionData = paymentsInterface.decodeFunctionData(
+        'unwrapWETH9(uint256)',
+        unwrapWETHFunctionCalldata,
+      );
+
+      expect(formatEther(decodedUnwrapWETH9FunctionData.toString())).toEqual('909.090909090909090909'); // expect the quoted amount with slippage applied i.e. minimum amount out
+    });
+
+    it('should specify the Router contract as the recipient of the swap function call', async () => {
+      mockRouterImplementation({
+        pools: [createPool(nativeTokenService.wrappedToken, FUN_TEST_TOKEN)],
+      });
+
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+
+      // Buy 100 native tokens for X amount of FUN where the exchange rate is 1 token-in : 10 token-out
+      const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
+        TEST_FROM_ADDRESS,
+        FUN_TEST_TOKEN.address,
+        'native',
+        newAmountFromString('100', NATIVE_TEST_TOKEN).value,
+        3, // 3 % slippage
+      );
+
+      expectToBeDefined(swap.transaction.data);
+      expectToBeDefined(swap.transaction.value);
+
+      const { swapParams } = decodeMulticallExactInputSingleWithoutFees(swap.transaction.data);
+
+      expect(swapParams.recipient).toEqual(TEST_ROUTER_ADDRESS);
+    });
+  });
+
+  describe('with multiple pools and a native token out', () => {
+    describe('with a native token out', () => {
+      it('should specify the Router contract as the recipient of the swap function call', async () => {
+        mockRouterImplementation({
+          pools: [
+            createPool(USDC_TEST_TOKEN, FUN_TEST_TOKEN),
+            createPool(nativeTokenService.wrappedToken, USDC_TEST_TOKEN),
+          ],
+        });
+
+        const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+
+        // Buy 100 native tokens for X amount of FUN where the exchange rate is 1 token-in : 10 token-out
+        // Route is FUN > USDC > WIMX
+        const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
+          TEST_FROM_ADDRESS,
+          FUN_TEST_TOKEN.address,
+          'native',
+          newAmountFromString('100', NATIVE_TEST_TOKEN).value,
+          3, // 3 % slippage
         );
 
+        expectToBeDefined(swap.transaction.data);
+        expectToBeDefined(swap.transaction.value);
+
+        const { swapParams } = decodeMulticallExactInputWithoutFees(swap.transaction.data);
+
+        expect(swapParams.recipient).toEqual(TEST_ROUTER_ADDRESS);
+      });
+    });
+
+    describe('When the swap transaction requires approval', () => {
+      it('should include the unsigned approval transaction', async () => {
         const params = setupSwapTxTest();
         mockRouterImplementation(params);
+        const erc20ContractInterface = ERC20__factory.createInterface();
+
+        const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+
+        const amountIn = addAmount(APPROVED_AMOUNT, newAmountFromString('1', USDC_TEST_TOKEN));
+        const tx = await exchange.getUnsignedSwapTxFromAmountIn(
+          params.fromAddress,
+          params.inputToken,
+          params.outputToken,
+          amountIn.value,
+        );
+
+        expectToBeDefined(tx.approval?.transaction.data);
+
+        const decodedResults = erc20ContractInterface.decodeFunctionData('approve', tx.approval.transaction.data);
+        expect(decodedResults[0]).toEqual(TEST_ROUTER_ADDRESS);
+        // we have already approved 1000000000000000000 but this is not enough, so we expect to approve the full amount
+        expect(decodedResults[1].toString()).toEqual(amountIn.value.toString());
+        expect(tx.approval.transaction.to).toEqual(params.inputToken);
+        expect(tx.approval.transaction.from).toEqual(params.fromAddress);
+        expect(tx.approval.transaction.value).toEqual(0); // we do not want to send any ETH
+      });
+
+      it('should include the gas estimate for the approval transaction', async () => {
+        const params = setupSwapTxTest();
+        mockRouterImplementation(params);
+
+        const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+
+        const amountIn = addAmount(APPROVED_AMOUNT, newAmountFromString('1', USDC_TEST_TOKEN));
+        const tx = await exchange.getUnsignedSwapTxFromAmountIn(
+          params.fromAddress,
+          params.inputToken,
+          params.outputToken,
+          amountIn.value,
+        );
+
+        expectToBeDefined(tx.approval?.gasFeeEstimate);
+        expect(tx.approval.gasFeeEstimate.value).toEqual(TEST_GAS_PRICE.mul(APPROVE_GAS_ESTIMATE));
+        expect(tx.approval.gasFeeEstimate.token.chainId).toEqual(NATIVE_TEST_TOKEN.chainId);
+        expect(tx.approval.gasFeeEstimate.token.address).toEqual('');
+        expect(tx.approval.gasFeeEstimate.token.decimals).toEqual(NATIVE_TEST_TOKEN.decimals);
+        expect(tx.approval.gasFeeEstimate.token.symbol).toEqual(NATIVE_TEST_TOKEN.symbol);
+        expect(tx.approval.gasFeeEstimate.token.name).toEqual(NATIVE_TEST_TOKEN.name);
+      });
+    });
+
+    describe('When the swap transaction does not require approval', () => {
+      it('should not include the unsigned approval transaction', async () => {
+        const params = setupSwapTxTest();
+        mockRouterImplementation(params);
+
+        const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+
+        // Set the amountIn to be the same as the APPROVED_AMOUNT
+        const tx = await exchange.getUnsignedSwapTxFromAmountIn(
+          params.fromAddress,
+          params.inputToken,
+          params.outputToken,
+          APPROVED_AMOUNT.value,
+        );
+
+        // we have already approved 1000000000000000000, so we don't expect to approve anything
+        expect(tx.approval).toBe(null);
+      });
+    });
+
+    describe('When no route found', () => {
+      it('throws NoRoutesAvailableError', async () => {
+        const params = setupSwapTxTest();
+
+        (Router as unknown as jest.Mock).mockImplementationOnce(() => ({
+          findOptimalRoute: jest.fn().mockRejectedValue(new NoRoutesAvailableError()),
+        }));
+
+        const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+        await expect(
+          exchange.getUnsignedSwapTxFromAmountIn(
+            params.fromAddress,
+            params.inputToken,
+            params.outputToken,
+            newAmountFromString('100', USDC_TEST_TOKEN).value,
+          ),
+        ).rejects.toThrow(new NoRoutesAvailableError());
+      });
+    });
+
+    describe('Swap with single pool and secondary fees', () => {
+      it('generates valid swap calldata', async () => {
+        const params = setupSwapTxTest();
+        const findOptimalRouteMock = mockRouterImplementation(params);
 
         const secondaryFees: SecondaryFee[] = [
           { recipient: TEST_FEE_RECIPIENT, basisPoints: 100 }, // 1% Fee
         ];
         const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
-
-        await exchange.getUnsignedSwapTxFromAmountIn(
-          params.fromAddress,
-          params.inputToken,
-          params.outputToken,
-          newAmountFromString('100', USDC_TEST_TOKEN).value,
-          3, // 3% Slippage
-        );
-
-        // Unpause the secondary fee contract
-        erc20Contract = (Contract as unknown as jest.Mock).mockImplementation(
-          () => ({
-            allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT.value),
-            estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
-            paused: jest.fn().mockResolvedValue(false),
-          }),
-        );
 
         const { swap, quote } = await exchange.getUnsignedSwapTxFromAmountIn(
           params.fromAddress,
@@ -401,316 +454,490 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
         expectToBeDefined(swap.transaction.data);
 
-        expect(formatAmount(quote.amountWithMaxSlippage)).toEqual('961.165048543689320388'); // min amount out (includes slippage)
-        expect(quote.fees.length).toBe(1); // expect no fees to be applied
+        expect(formatAmount(quote.amountWithMaxSlippage)).toEqual('961.165048543689320388'); // userQuoteRes.amountOutMinimum = swapReq.amountOutMinimum
+
+        const ourQuoteReqAmountIn = findOptimalRouteMock.mock.calls[0][0];
+        expect(formatAmount(ourQuoteReqAmountIn)).toEqual('99.0'); // ourQuoteReq.amountIn = the amount specified less the fee
 
         const data = swap.transaction.data.toString();
-        const { swapParams } = decodeMulticallExactInputSingleWithFees(data);
 
-        expect(formatEther(swapParams.amountOutMinimum)).toBe(formatEther(quote.amountWithMaxSlippage.value));
-        expect(swap.transaction.to).toBe(TEST_SECONDARY_FEE_ADDRESS); // expect the secondary fee contract to be used
+        const { swapParams, secondaryFeeParams } = decodeMulticallExactInputSingleWithFees(data);
+        expectInstanceOf(BigNumber, swapParams.amountIn);
+
+        expect(secondaryFeeParams[0].recipient).toBe(TEST_FEE_RECIPIENT);
+        expect(secondaryFeeParams[0].basisPoints.toString()).toBe('100');
+
+        expect(swapParams.tokenIn).toBe(params.inputToken);
+        expect(swapParams.tokenOut).toBe(params.outputToken);
+        expect(swapParams.fee).toBe(10000);
+        expect(swapParams.recipient).toBe(params.fromAddress);
+        expect(formatTokenAmount(swapParams.amountIn, USDC_TEST_TOKEN)).toBe('100.0'); // swap.amountIn = userQuoteReq.amountIn
+        expect(formatEther(swapParams.amountOutMinimum)).toBe('961.165048543689320388'); // swap.amountOutMinimum = ourQuoteRes.amountOut - slippage
+        expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0');
+
+        expect(swap.transaction.to).toBe(TEST_SECONDARY_FEE_ADDRESS);
+        expect(swap.transaction.from).toBe(params.fromAddress);
+        expect(swap.transaction.value).toBe('0x00');
       });
     });
-  });
 
-  describe('Swap with single pool without fees and default slippage tolerance', () => {
-    it('generates valid swap calldata', async () => {
-      const params = setupSwapTxTest();
+    describe('Swap with multiple pools and secondary fees', () => {
+      it('generates valid swap calldata', async () => {
+        const params = setupSwapTxTest({ multiPoolSwap: true });
+        mockRouterImplementation(params);
 
-      mockRouterImplementation(params);
+        const secondaryFees: SecondaryFee[] = [
+          { recipient: TEST_FEE_RECIPIENT, basisPoints: TEST_MAX_FEE_BASIS_POINTS },
+        ];
 
-      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+        const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
 
-      const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
-        params.fromAddress,
-        params.inputToken,
-        params.outputToken,
-        newAmountFromString('100', USDC_TEST_TOKEN).value,
-      );
-
-      expectToBeDefined(swap.transaction.data);
-
-      const data = swap.transaction.data.toString();
-
-      const { swapParams } = decodeMulticallExactInputSingleWithoutFees(data);
-      expectInstanceOf(BigNumber, swapParams.amountIn);
-
-      expect(swapParams.tokenIn).toBe(params.inputToken); // input token
-      expect(swapParams.tokenOut).toBe(params.outputToken); // output token
-      expect(swapParams.fee).toBe(10000); // fee
-      expect(swapParams.recipient).toBe(params.fromAddress); // recipient
-      expect(swap.transaction.to).toBe(TEST_PERIPHERY_ROUTER_ADDRESS); // to address
-      expect(swap.transaction.from).toBe(params.fromAddress); // from address
-      expect(swap.transaction.value).toBe('0x00'); // refers to 0ETH
-      expect(formatTokenAmount(swapParams.amountIn, USDC_TEST_TOKEN)).toBe('100.0'); // amount in
-      expect(formatEther(swapParams.amountOutMinimum)).toBe('999.000999000999000999'); // min amount out (includes slippage)
-      expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
-    });
-
-    it('returns the gas estimate for the swap', async () => {
-      const params = setupSwapTxTest();
-
-      mockRouterImplementation(params);
-
-      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
-
-      const tx = await exchange.getUnsignedSwapTxFromAmountIn(
-        params.fromAddress,
-        params.inputToken,
-        params.outputToken,
-        newAmountFromString('100', USDC_TEST_TOKEN).value,
-      );
-
-      expectToBeDefined(tx.swap.gasFeeEstimate);
-
-      expect(tx.swap.gasFeeEstimate.value).toEqual(TEST_TRANSACTION_GAS_USAGE.mul(TEST_GAS_PRICE));
-      expect(tx.swap.gasFeeEstimate.token.chainId).toEqual(WIMX_TEST_TOKEN.chainId);
-      expect(tx.swap.gasFeeEstimate.token.address).toEqual(WIMX_TEST_TOKEN.address);
-      expect(tx.swap.gasFeeEstimate.token.decimals).toEqual(WIMX_TEST_TOKEN.decimals);
-      expect(tx.swap.gasFeeEstimate.token.symbol).toEqual(WIMX_TEST_TOKEN.symbol);
-      expect(tx.swap.gasFeeEstimate.token.name).toEqual(WIMX_TEST_TOKEN.name);
-    });
-
-    it('returns valid quote', async () => {
-      const params = setupSwapTxTest();
-
-      mockRouterImplementation(params);
-
-      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
-
-      const { quote } = await exchange.getUnsignedSwapTxFromAmountIn(
-        params.fromAddress,
-        params.inputToken,
-        params.outputToken,
-        newAmountFromString('100', USDC_TEST_TOKEN).value,
-      );
-
-      expect(quote).not.toBe(undefined);
-      expect(quote.amount.token.address).toEqual(params.outputToken);
-      expect(quote.slippage).toBe(0.1);
-      expect(formatAmount(quote.amount)).toEqual('1000.0');
-      expect(quote.amountWithMaxSlippage.token.address).toEqual(params.outputToken);
-      expect(formatAmount(quote.amountWithMaxSlippage)).toEqual('999.000999000999000999'); // includes slippage
-    });
-  });
-
-  describe('Swap with single pool without fees and high slippage tolerance', () => {
-    it('generates valid calldata', async () => {
-      const params = setupSwapTxTest();
-      mockRouterImplementation(params);
-
-      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
-
-      const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
-        params.fromAddress,
-        params.inputToken,
-        params.outputToken,
-        newAmountFromString('100', USDC_TEST_TOKEN).value,
-        HIGHER_SLIPPAGE,
-      );
-
-      expectToBeDefined(swap.transaction.data);
-
-      const data = swap.transaction.data.toString();
-
-      const { swapParams } = decodeMulticallExactInputSingleWithoutFees(data);
-      expectInstanceOf(BigNumber, swapParams.amountIn);
-
-      expect(swapParams.tokenIn).toBe(params.inputToken); // input token
-      expect(swapParams.tokenOut).toBe(params.outputToken); // output token
-      expect(swapParams.fee).toBe(10000); // fee
-      expect(swapParams.recipient).toBe(params.fromAddress); // recipient
-      expect(swap.transaction.to).toBe(TEST_PERIPHERY_ROUTER_ADDRESS); // to address
-      expect(swap.transaction.from).toBe(params.fromAddress); // from address
-      expect(swap.transaction.value).toBe('0x00'); // refers to 0ETH
-      expect(formatTokenAmount(swapParams.amountIn, USDC_TEST_TOKEN)).toBe('100.0'); // amount in
-      expect(formatEther(swapParams.amountOutMinimum)).toBe('998.003992015968063872'); // min amount out (includes 0.2% slippage)
-      expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
-    });
-
-    it('returns valid quote', async () => {
-      const params = setupSwapTxTest();
-      mockRouterImplementation(params);
-
-      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
-
-      const { quote } = await exchange.getUnsignedSwapTxFromAmountIn(
-        params.fromAddress,
-        params.inputToken,
-        params.outputToken,
-        newAmountFromString('100', USDC_TEST_TOKEN).value,
-        HIGHER_SLIPPAGE,
-      );
-
-      expect(quote.amount.token.address).toEqual(params.outputToken);
-      expect(quote.slippage).toBe(0.2);
-      expect(formatAmount(quote.amount)).toEqual('1000.0');
-      expect(quote.amountWithMaxSlippage.token.address).toEqual(params.outputToken);
-      expect(formatAmount(quote.amountWithMaxSlippage)).toEqual('998.003992015968063872'); // includes 0.2% slippage
-    });
-  });
-
-  describe('Pass in zero address', () => {
-    it('throws InvalidAddressError', async () => {
-      const params = setupSwapTxTest();
-
-      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
-
-      const invalidAddress = constants.AddressZero;
-
-      await expect(
-        exchange.getUnsignedSwapTxFromAmountIn(
-          invalidAddress,
-          params.inputToken,
-          params.outputToken,
-          newAmountFromString('100', USDC_TEST_TOKEN).value,
-          HIGHER_SLIPPAGE,
-        ),
-      ).rejects.toThrow(
-        new InvalidAddressError('Error: invalid from address'),
-      );
-
-      await expect(
-        exchange.getUnsignedSwapTxFromAmountIn(
-          params.fromAddress,
-          invalidAddress,
-          params.outputToken,
-          newAmountFromString('100', USDC_TEST_TOKEN).value,
-          HIGHER_SLIPPAGE,
-        ),
-      ).rejects.toThrow(new InvalidAddressError('Error: invalid token in address'));
-
-      await expect(
-        exchange.getUnsignedSwapTxFromAmountIn(
-          params.fromAddress,
-          params.inputToken,
-          invalidAddress,
-          newAmountFromString('100', USDC_TEST_TOKEN).value,
-          HIGHER_SLIPPAGE,
-        ),
-      ).rejects.toThrow(new InvalidAddressError('Error: invalid token out address'));
-    });
-  });
-
-  describe('Pass in invalid addresses', () => {
-    it('throws InvalidAddressError', async () => {
-      const params = setupSwapTxTest();
-
-      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
-
-      const invalidAddress = '0x0123abcdef';
-
-      await expect(
-        exchange.getUnsignedSwapTxFromAmountIn(
-          invalidAddress,
-          params.inputToken,
-          params.outputToken,
-          newAmountFromString('100', USDC_TEST_TOKEN).value,
-          HIGHER_SLIPPAGE,
-        ),
-      ).rejects.toThrow(
-        new InvalidAddressError('Error: invalid from address'),
-      );
-
-      await expect(
-        exchange.getUnsignedSwapTxFromAmountIn(
-          params.fromAddress,
-          invalidAddress,
-          params.outputToken,
-          newAmountFromString('100', USDC_TEST_TOKEN).value,
-          HIGHER_SLIPPAGE,
-        ),
-      ).rejects.toThrow(new InvalidAddressError('Error: invalid token in address'));
-
-      await expect(
-        exchange.getUnsignedSwapTxFromAmountIn(
-          params.fromAddress,
-          params.inputToken,
-          invalidAddress,
-          newAmountFromString('100', USDC_TEST_TOKEN).value,
-          HIGHER_SLIPPAGE,
-        ),
-      ).rejects.toThrow(new InvalidAddressError('Error: invalid token out address'));
-    });
-  });
-
-  describe('Pass in maxHops > 10', () => {
-    it('throws InvalidMaxHopsError', async () => {
-      const params = setupSwapTxTest();
-      mockRouterImplementation(params);
-
-      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
-
-      await expect(
-        exchange.getUnsignedSwapTxFromAmountIn(
+        const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
           params.fromAddress,
           params.inputToken,
           params.outputToken,
           newAmountFromString('100', USDC_TEST_TOKEN).value,
-          HIGHER_SLIPPAGE,
-          11,
-        ),
-      ).rejects.toThrow(new InvalidMaxHopsError('Error: max hops must be less than or equal to 10'));
+        );
+
+        expectToBeDefined(swap.transaction.data);
+
+        const data = swap.transaction.data.toString();
+
+        const { swapParams, secondaryFeeParams } = decodeMulticallExactInputWithFees(data);
+        expectInstanceOf(BigNumber, swapParams.amountIn);
+
+        expect(secondaryFeeParams[0].recipient).toBe(TEST_FEE_RECIPIENT);
+        expect(secondaryFeeParams[0].basisPoints.toString()).toBe(TEST_MAX_FEE_BASIS_POINTS.toString());
+
+        const decodedPath = decodePathForExactInput(swapParams.path.toString());
+
+        expect(swap.transaction.to).toBe(TEST_SECONDARY_FEE_ADDRESS); // to address
+        expect(swap.transaction.from).toBe(params.fromAddress); // from address
+        expect(swap.transaction.value).toBe('0x00'); // refers to 0 amount of the native token
+
+        expect(utils.getAddress(decodedPath.inputToken)).toBe(params.inputToken);
+        expect(utils.getAddress(decodedPath.intermediaryToken)).toBe(params.intermediaryToken);
+        expect(utils.getAddress(decodedPath.outputToken)).toBe(params.outputToken);
+        expect(decodedPath.firstPoolFee.toString()).toBe('10000');
+        expect(decodedPath.secondPoolFee.toString()).toBe('10000');
+
+        expect(swapParams.recipient).toBe(params.fromAddress); // recipient of swap
+        expect(formatTokenAmount(swapParams.amountIn, USDC_TEST_TOKEN)).toBe('100.0');
+        expect(formatEther(swapParams.amountOutMinimum)).toBe('899.100899100899100899'); // includes slippage and fees
+      });
+
+      it('returns a quote', async () => {
+        const params = setupSwapTxTest({ multiPoolSwap: true });
+        mockRouterImplementation(params);
+
+        const secondaryFees: SecondaryFee[] = [
+          { recipient: TEST_FEE_RECIPIENT, basisPoints: TEST_MAX_FEE_BASIS_POINTS },
+        ];
+
+        const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
+
+        const { quote } = await exchange.getUnsignedSwapTxFromAmountIn(
+          params.fromAddress,
+          params.inputToken,
+          params.outputToken,
+          newAmountFromString('100', USDC_TEST_TOKEN).value,
+        );
+
+        const tokenIn = { ...USDC_TEST_TOKEN, name: undefined, symbol: undefined };
+
+        expect(quote.fees).toEqual([
+          {
+            recipient: TEST_FEE_RECIPIENT,
+            basisPoints: TEST_MAX_FEE_BASIS_POINTS,
+            amount: newAmountFromString('10', tokenIn),
+          },
+        ]);
+      });
     });
-  });
 
-  describe('Pass in maxHops < 1', () => {
-    it('throws InvalidMaxHopsError', async () => {
-      const params = setupSwapTxTest();
-      mockRouterImplementation(params);
+    describe('Swap with secondary fees and paused secondary fee contract', () => {
+      it('should use the default router contract with no fees applied to the swap', async () => {
+        erc20Contract = (Contract as unknown as jest.Mock).mockImplementation(() => ({
+          allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT.value),
+          estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
+          paused: jest.fn().mockResolvedValue(true),
+        }));
 
-      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+        const params = setupSwapTxTest();
+        mockRouterImplementation(params);
 
-      await expect(
-        exchange.getUnsignedSwapTxFromAmountIn(
+        const secondaryFees: SecondaryFee[] = [
+          { recipient: TEST_FEE_RECIPIENT, basisPoints: 100 }, // 1% Fee
+        ];
+        const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
+
+        const { swap, quote } = await exchange.getUnsignedSwapTxFromAmountIn(
+          params.fromAddress,
+          params.inputToken,
+          params.outputToken,
+          newAmountFromString('100', USDC_TEST_TOKEN).value,
+        );
+
+        expectToBeDefined(swap.transaction.data);
+
+        expect(formatAmount(quote.amountWithMaxSlippage)).toEqual('999.000999000999000999'); // min amount out (includes slippage)
+        expect(quote.fees.length).toBe(0); // expect no fees to be applied
+
+        const data = swap.transaction.data.toString();
+        const { swapParams } = decodeMulticallExactInputSingleWithoutFees(data);
+
+        expect(formatEther(swapParams.amountOutMinimum)).toBe(formatEther(quote.amountWithMaxSlippage.value));
+        expect(swap.transaction.to).toBe(TEST_ROUTER_ADDRESS); // expect the default router contract to be used
+      });
+
+      describe('when the secondary fee contract is unpaused after a swap request', () => {
+        it('should apply secondary fees to a subsequent swap request', async () => {
+          erc20Contract = (Contract as unknown as jest.Mock).mockImplementation(() => ({
+            allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT.value),
+            estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
+            paused: jest.fn().mockResolvedValue(true),
+          }));
+
+          const params = setupSwapTxTest();
+          mockRouterImplementation(params);
+
+          const secondaryFees: SecondaryFee[] = [
+            { recipient: TEST_FEE_RECIPIENT, basisPoints: 100 }, // 1% Fee
+          ];
+          const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
+
+          await exchange.getUnsignedSwapTxFromAmountIn(
+            params.fromAddress,
+            params.inputToken,
+            params.outputToken,
+            newAmountFromString('100', USDC_TEST_TOKEN).value,
+            3, // 3% Slippage
+          );
+
+          // Unpause the secondary fee contract
+          erc20Contract = (Contract as unknown as jest.Mock).mockImplementation(() => ({
+            allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT.value),
+            estimateGas: { approve: jest.fn().mockResolvedValue(APPROVE_GAS_ESTIMATE) },
+            paused: jest.fn().mockResolvedValue(false),
+          }));
+
+          const { swap, quote } = await exchange.getUnsignedSwapTxFromAmountIn(
+            params.fromAddress,
+            params.inputToken,
+            params.outputToken,
+            newAmountFromString('100', USDC_TEST_TOKEN).value,
+            3, // 3% Slippage
+          );
+
+          expectToBeDefined(swap.transaction.data);
+
+          expect(formatAmount(quote.amountWithMaxSlippage)).toEqual('961.165048543689320388'); // min amount out (includes slippage)
+          expect(quote.fees.length).toBe(1); // expect no fees to be applied
+
+          const data = swap.transaction.data.toString();
+          const { swapParams } = decodeMulticallExactInputSingleWithFees(data);
+
+          expect(formatEther(swapParams.amountOutMinimum)).toBe(formatEther(quote.amountWithMaxSlippage.value));
+          expect(swap.transaction.to).toBe(TEST_SECONDARY_FEE_ADDRESS); // expect the secondary fee contract to be used
+        });
+      });
+    });
+
+    describe('Swap with single pool without fees and default slippage tolerance', () => {
+      it('generates valid swap calldata', async () => {
+        const params = setupSwapTxTest();
+
+        mockRouterImplementation(params);
+
+        const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+
+        const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
+          params.fromAddress,
+          params.inputToken,
+          params.outputToken,
+          newAmountFromString('100', USDC_TEST_TOKEN).value,
+        );
+
+        expectToBeDefined(swap.transaction.data);
+
+        const data = swap.transaction.data.toString();
+
+        const { swapParams } = decodeMulticallExactInputSingleWithoutFees(data);
+        expectInstanceOf(BigNumber, swapParams.amountIn);
+
+        expect(swapParams.tokenIn).toBe(params.inputToken); // input token
+        expect(swapParams.tokenOut).toBe(params.outputToken); // output token
+        expect(swapParams.fee).toBe(10000); // fee
+        expect(swapParams.recipient).toBe(params.fromAddress); // recipient
+        expect(swap.transaction.to).toBe(TEST_ROUTER_ADDRESS); // to address
+        expect(swap.transaction.from).toBe(params.fromAddress); // from address
+        expect(swap.transaction.value).toBe('0x00'); // refers to 0ETH
+        expect(formatTokenAmount(swapParams.amountIn, USDC_TEST_TOKEN)).toBe('100.0'); // amount in
+        expect(formatEther(swapParams.amountOutMinimum)).toBe('999.000999000999000999'); // min amount out (includes slippage)
+        expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
+      });
+
+      it('returns the gas estimate for the swap', async () => {
+        const params = setupSwapTxTest();
+
+        mockRouterImplementation(params);
+
+        const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+
+        const tx = await exchange.getUnsignedSwapTxFromAmountIn(
+          params.fromAddress,
+          params.inputToken,
+          params.outputToken,
+          newAmountFromString('100', USDC_TEST_TOKEN).value,
+        );
+
+        expectToBeDefined(tx.swap.gasFeeEstimate);
+
+        expect(tx.swap.gasFeeEstimate.value).toEqual(TEST_TRANSACTION_GAS_USAGE.mul(TEST_GAS_PRICE));
+        expect(tx.swap.gasFeeEstimate.token.chainId).toEqual(NATIVE_TEST_TOKEN.chainId);
+        expect(tx.swap.gasFeeEstimate.token.address).toEqual(''); // Default configuration is a native token for gas and not an ERC20
+        expect(tx.swap.gasFeeEstimate.token.decimals).toEqual(NATIVE_TEST_TOKEN.decimals);
+        expect(tx.swap.gasFeeEstimate.token.symbol).toEqual(NATIVE_TEST_TOKEN.symbol);
+        expect(tx.swap.gasFeeEstimate.token.name).toEqual(NATIVE_TEST_TOKEN.name);
+      });
+
+      it('returns valid quote', async () => {
+        const params = setupSwapTxTest();
+
+        mockRouterImplementation(params);
+
+        const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+
+        const { quote } = await exchange.getUnsignedSwapTxFromAmountIn(
+          params.fromAddress,
+          params.inputToken,
+          params.outputToken,
+          newAmountFromString('100', USDC_TEST_TOKEN).value,
+        );
+
+        expect(quote).not.toBe(undefined);
+        expect(quote.amount.token.address).toEqual(params.outputToken);
+        expect(quote.slippage).toBe(0.1);
+        expect(formatAmount(quote.amount)).toEqual('1000.0');
+        expect(quote.amountWithMaxSlippage.token.address).toEqual(params.outputToken);
+        expect(formatAmount(quote.amountWithMaxSlippage)).toEqual('999.000999000999000999'); // includes slippage
+      });
+    });
+
+    describe('Swap with single pool without fees and high slippage tolerance', () => {
+      it('generates valid calldata', async () => {
+        const params = setupSwapTxTest();
+        mockRouterImplementation(params);
+
+        const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+
+        const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
           params.fromAddress,
           params.inputToken,
           params.outputToken,
           newAmountFromString('100', USDC_TEST_TOKEN).value,
           HIGHER_SLIPPAGE,
-          0,
-        ),
-      ).rejects.toThrow(new InvalidMaxHopsError('Error: max hops must be greater than or equal to 1'));
-    });
-  });
+        );
 
-  describe('With slippage greater than 50', () => {
-    it('throws InvalidSlippageError', async () => {
-      const params = setupSwapTxTest();
-      mockRouterImplementation(params);
+        expectToBeDefined(swap.transaction.data);
 
-      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+        const data = swap.transaction.data.toString();
 
-      await expect(
-        exchange.getUnsignedSwapTxFromAmountIn(
+        const { swapParams } = decodeMulticallExactInputSingleWithoutFees(data);
+        expectInstanceOf(BigNumber, swapParams.amountIn);
+
+        expect(swapParams.tokenIn).toBe(params.inputToken); // input token
+        expect(swapParams.tokenOut).toBe(params.outputToken); // output token
+        expect(swapParams.fee).toBe(10000); // fee
+        expect(swapParams.recipient).toBe(params.fromAddress); // recipient
+        expect(swap.transaction.to).toBe(TEST_ROUTER_ADDRESS); // to address
+        expect(swap.transaction.from).toBe(params.fromAddress); // from address
+        expect(swap.transaction.value).toBe('0x00'); // refers to 0ETH
+        expect(formatTokenAmount(swapParams.amountIn, USDC_TEST_TOKEN)).toBe('100.0'); // amount in
+        expect(formatEther(swapParams.amountOutMinimum)).toBe('998.003992015968063872'); // min amount out (includes 0.2% slippage)
+        expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
+      });
+
+      it('returns valid quote', async () => {
+        const params = setupSwapTxTest();
+        mockRouterImplementation(params);
+
+        const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+
+        const { quote } = await exchange.getUnsignedSwapTxFromAmountIn(
           params.fromAddress,
           params.inputToken,
           params.outputToken,
           newAmountFromString('100', USDC_TEST_TOKEN).value,
-          100,
-          2,
-        ),
-      ).rejects.toThrow(new InvalidSlippageError('Error: slippage percent must be less than or equal to 50'));
+          HIGHER_SLIPPAGE,
+        );
+
+        expect(quote.amount.token.address).toEqual(params.outputToken);
+        expect(quote.slippage).toBe(0.2);
+        expect(formatAmount(quote.amount)).toEqual('1000.0');
+        expect(quote.amountWithMaxSlippage.token.address).toEqual(params.outputToken);
+        expect(formatAmount(quote.amountWithMaxSlippage)).toEqual('998.003992015968063872'); // includes 0.2% slippage
+      });
     });
-  });
 
-  describe('With slippage less than 0', () => {
-    it('throws InvalidSlippageError', async () => {
-      const params = setupSwapTxTest();
-      mockRouterImplementation(params);
+    describe('Pass in zero address', () => {
+      it('throws InvalidAddressError', async () => {
+        const params = setupSwapTxTest();
 
-      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+        const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
-      await expect(
-        exchange.getUnsignedSwapTxFromAmountIn(
-          params.fromAddress,
-          params.inputToken,
-          params.outputToken,
-          newAmountFromString('100', USDC_TEST_TOKEN).value,
-          -5,
-          2,
-        ),
-      ).rejects.toThrow(new InvalidSlippageError('Error: slippage percent must be greater than or equal to 0'));
+        const invalidAddress = constants.AddressZero;
+
+        await expect(
+          exchange.getUnsignedSwapTxFromAmountIn(
+            invalidAddress,
+            params.inputToken,
+            params.outputToken,
+            newAmountFromString('100', USDC_TEST_TOKEN).value,
+            HIGHER_SLIPPAGE,
+          ),
+        ).rejects.toThrow(new InvalidAddressError('Error: invalid from address'));
+
+        await expect(
+          exchange.getUnsignedSwapTxFromAmountIn(
+            params.fromAddress,
+            invalidAddress,
+            params.outputToken,
+            newAmountFromString('100', USDC_TEST_TOKEN).value,
+            HIGHER_SLIPPAGE,
+          ),
+        ).rejects.toThrow(new InvalidAddressError('Error: invalid token in address'));
+
+        await expect(
+          exchange.getUnsignedSwapTxFromAmountIn(
+            params.fromAddress,
+            params.inputToken,
+            invalidAddress,
+            newAmountFromString('100', USDC_TEST_TOKEN).value,
+            HIGHER_SLIPPAGE,
+          ),
+        ).rejects.toThrow(new InvalidAddressError('Error: invalid token out address'));
+      });
+    });
+
+    describe('Pass in invalid addresses', () => {
+      it('throws InvalidAddressError', async () => {
+        const params = setupSwapTxTest();
+
+        const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+
+        const invalidAddress = '0x0123abcdef';
+
+        await expect(
+          exchange.getUnsignedSwapTxFromAmountIn(
+            invalidAddress,
+            params.inputToken,
+            params.outputToken,
+            newAmountFromString('100', USDC_TEST_TOKEN).value,
+            HIGHER_SLIPPAGE,
+          ),
+        ).rejects.toThrow(new InvalidAddressError('Error: invalid from address'));
+
+        await expect(
+          exchange.getUnsignedSwapTxFromAmountIn(
+            params.fromAddress,
+            invalidAddress,
+            params.outputToken,
+            newAmountFromString('100', USDC_TEST_TOKEN).value,
+            HIGHER_SLIPPAGE,
+          ),
+        ).rejects.toThrow(new InvalidAddressError('Error: invalid token in address'));
+
+        await expect(
+          exchange.getUnsignedSwapTxFromAmountIn(
+            params.fromAddress,
+            params.inputToken,
+            invalidAddress,
+            newAmountFromString('100', USDC_TEST_TOKEN).value,
+            HIGHER_SLIPPAGE,
+          ),
+        ).rejects.toThrow(new InvalidAddressError('Error: invalid token out address'));
+      });
+    });
+
+    describe('Pass in maxHops > 10', () => {
+      it('throws InvalidMaxHopsError', async () => {
+        const params = setupSwapTxTest();
+        mockRouterImplementation(params);
+
+        const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+
+        await expect(
+          exchange.getUnsignedSwapTxFromAmountIn(
+            params.fromAddress,
+            params.inputToken,
+            params.outputToken,
+            newAmountFromString('100', USDC_TEST_TOKEN).value,
+            HIGHER_SLIPPAGE,
+            11,
+          ),
+        ).rejects.toThrow(new InvalidMaxHopsError('Error: max hops must be less than or equal to 10'));
+      });
+    });
+
+    describe('Pass in maxHops < 1', () => {
+      it('throws InvalidMaxHopsError', async () => {
+        const params = setupSwapTxTest();
+        mockRouterImplementation(params);
+
+        const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+
+        await expect(
+          exchange.getUnsignedSwapTxFromAmountIn(
+            params.fromAddress,
+            params.inputToken,
+            params.outputToken,
+            newAmountFromString('100', USDC_TEST_TOKEN).value,
+            HIGHER_SLIPPAGE,
+            0,
+          ),
+        ).rejects.toThrow(new InvalidMaxHopsError('Error: max hops must be greater than or equal to 1'));
+      });
+    });
+
+    describe('With slippage greater than 50', () => {
+      it('throws InvalidSlippageError', async () => {
+        const params = setupSwapTxTest();
+        mockRouterImplementation(params);
+
+        const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+
+        await expect(
+          exchange.getUnsignedSwapTxFromAmountIn(
+            params.fromAddress,
+            params.inputToken,
+            params.outputToken,
+            newAmountFromString('100', USDC_TEST_TOKEN).value,
+            100,
+            2,
+          ),
+        ).rejects.toThrow(new InvalidSlippageError('Error: slippage percent must be less than or equal to 50'));
+      });
+    });
+
+    describe('With slippage less than 0', () => {
+      it('throws InvalidSlippageError', async () => {
+        const params = setupSwapTxTest();
+        mockRouterImplementation(params);
+
+        const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+
+        await expect(
+          exchange.getUnsignedSwapTxFromAmountIn(
+            params.fromAddress,
+            params.inputToken,
+            params.outputToken,
+            newAmountFromString('100', USDC_TEST_TOKEN).value,
+            -5,
+            2,
+          ),
+        ).rejects.toThrow(new InvalidSlippageError('Error: slippage percent must be greater than or equal to 0'));
+      });
     });
   });
 });

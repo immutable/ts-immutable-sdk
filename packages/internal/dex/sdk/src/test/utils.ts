@@ -9,12 +9,7 @@ import { PromiseOrValue } from 'contracts/types/common';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
 import { NativeTokenService } from 'lib/nativeTokenService';
 import { ExchangeModuleConfiguration, SecondaryFee, CoinAmount, Coin, ERC20, Native, Amount } from 'types';
-import {
-  erc20ToUniswapToken,
-  newAmount,
-  Router,
-  RoutingContracts,
-} from '../lib';
+import { erc20ToUniswapToken, newAmount, Router, RoutingContracts } from '../lib';
 
 export const TEST_GAS_PRICE = BigNumber.from('1500000000'); // 1.5 gwei or 1500000000 wei
 export const TEST_TRANSACTION_GAS_USAGE = BigNumber.from('200000'); // 200,000 gas units
@@ -27,10 +22,11 @@ export const TEST_FEE_RECIPIENT = '0xe3ece548F1DD4B1536Eb6eE188fE35350bc1dd16';
 
 export const TEST_MAX_FEE_BASIS_POINTS = 1000; // 10%
 
+// Contracts
 export const TEST_MULTICALL_ADDRESS = '0x66d0aB680ACEe44308edA2062b910405CC51A190';
 export const TEST_V3_CORE_FACTORY_ADDRESS = '0x23490b262829ACDAD3EF40e555F23d77D1B69e4e';
 export const TEST_QUOTER_ADDRESS = '0x9B323E56215aAdcD4f45a6Be660f287DE154AFC5';
-export const TEST_PERIPHERY_ROUTER_ADDRESS = '0x615FFbea2af24C55d737dD4264895A56624Da072';
+export const TEST_ROUTER_ADDRESS = '0x615FFbea2af24C55d737dD4264895A56624Da072';
 export const TEST_V3_MIGRATOR_ADDRESSES = '0x0Df0d2d5Cf4739C0b579C33Fdb3d8B04Bee85729';
 export const TEST_NONFUNGIBLE_POSITION_MANAGER_ADDRESSES = '0x446c78D97b1E78bC35864FC49AcE1f7404F163F6';
 export const TEST_TICK_LENS_ADDRESSES = '0x3aC4F8094b21A6c5945453007d9c52B7e15340c0';
@@ -110,7 +106,7 @@ export const TEST_DEX_CONFIGURATION: ExchangeModuleConfiguration = {
       multicall: TEST_MULTICALL_ADDRESS,
       coreFactory: TEST_V3_CORE_FACTORY_ADDRESS,
       quoterV2: TEST_QUOTER_ADDRESS,
-      peripheryRouter: TEST_PERIPHERY_ROUTER_ADDRESS,
+      peripheryRouter: TEST_ROUTER_ADDRESS,
       secondaryFee: TEST_SECONDARY_FEE_ADDRESS,
     },
     commonRoutingTokens: [],
@@ -119,19 +115,18 @@ export const TEST_DEX_CONFIGURATION: ExchangeModuleConfiguration = {
   },
 };
 
+export const refundETHFunctionSignature = '0x12210e8a';
+
 export type SwapTest = {
   fromAddress: string;
-  pools: Pool[],
+  pools: Pool[];
   inputToken: string;
   outputToken: string;
   intermediaryToken: string | undefined;
 };
 
 // uniqBy returns the unique items in an array using the given comparator
-export function uniqBy<K, T extends string | number>(
-  array: K[],
-  comparator: (arg: K) => T,
-): K[] {
+export function uniqBy<K, T extends string | number>(array: K[], comparator: (arg: K) => T): K[] {
   const uniqArr: Partial<Record<T, K>> = {};
 
   for (let i = 0; i < array.length; i++) {
@@ -163,12 +158,13 @@ export function decodePathForExactOutput(path: string) {
   };
 }
 
-type SecondaryFeeFunctionName = 'exactInputSingleWithSecondaryFee' |
-'exactOutputSingleWithSecondaryFee' |
-'exactInputWithSecondaryFee' |
-'exactOutputWithSecondaryFee';
+type SecondaryFeeFunctionName =
+  | 'exactInputSingleWithSecondaryFee'
+  | 'exactOutputSingleWithSecondaryFee'
+  | 'exactInputWithSecondaryFee'
+  | 'exactOutputWithSecondaryFee';
 
-type SwapRouterFunctionName = 'exactInputSingle' | 'exactOutputSingle';
+type SwapRouterFunctionName = 'exactInputSingle' | 'exactOutputSingle' | 'exactInput' | 'exactOutput';
 
 function decodeSecondaryFeeCall(calldata: utils.BytesLike, functionName: SecondaryFeeFunctionName) {
   const iface = SecondaryFee__factory.createInterface();
@@ -204,6 +200,19 @@ export function decodeMulticallExactInputWithFees(data: utils.BytesLike) {
   };
 
   return { secondaryFeeParams, swapParams };
+}
+
+export function decodeMulticallExactInputWithoutFees(data: utils.BytesLike) {
+  const decodedParams = decodeSwapRouterCall(data, 'exactInput');
+
+  const swapParams: IV3SwapRouter.ExactInputParamsStruct = {
+    path: decodedParams[0][0],
+    recipient: decodedParams[0][1],
+    amountIn: decodedParams[0][2],
+    amountOutMinimum: decodedParams[0][3],
+  };
+
+  return { swapParams };
 }
 
 export function decodeMulticallExactOutputWithFees(data: utils.BytesLike) {
@@ -324,14 +333,9 @@ export function setupSwapTxTest(params?: { multiPoolSwap?: boolean }): SwapTest 
 
   let pools: Pool[] = [];
   if (multiPoolSwap) {
-    pools = [
-      createPool(tokenIn, intermediaryToken),
-      createPool(intermediaryToken, tokenOut),
-    ];
+    pools = [createPool(tokenIn, intermediaryToken), createPool(intermediaryToken, tokenOut)];
   } else {
-    pools = [
-      createPool(tokenIn, tokenOut),
-    ];
+    pools = [createPool(tokenIn, tokenOut)];
   }
 
   return {
@@ -378,40 +382,42 @@ export const amountInFromAmountOut = (amountOut: CoinAmount<ERC20>, tokenIn: ERC
 
 export function mockRouterImplementation(params: MockParams) {
   const exchangeRate = params.exchangeRate ?? 10; // 1 TokenIn = 10 TokenOut
-  const findOptimalRoute = jest.fn((
-    amountSpecified: CoinAmount<ERC20>,
-    otherToken: ERC20,
-    tradeType: TradeType,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    secondaryFees: SecondaryFee[],
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    maxHops: number,
-  ) => {
-    const tokenIn = tradeType === TradeType.EXACT_INPUT ? amountSpecified.token : otherToken;
-    const tokenOut = tradeType === TradeType.EXACT_OUTPUT ? amountSpecified.token : otherToken;
+  const findOptimalRoute = jest.fn(
+    (
+      amountSpecified: CoinAmount<ERC20>,
+      otherToken: ERC20,
+      tradeType: TradeType,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      secondaryFees: SecondaryFee[],
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      maxHops: number,
+    ) => {
+      const tokenIn = tradeType === TradeType.EXACT_INPUT ? amountSpecified.token : otherToken;
+      const tokenOut = tradeType === TradeType.EXACT_OUTPUT ? amountSpecified.token : otherToken;
 
-    const route = new Route(
-      params.pools,
-      erc20ToUniswapToken(tokenIn),
-      erc20ToUniswapToken(tokenOut),
-    );
+      const route = new Route(params.pools, erc20ToUniswapToken(tokenIn), erc20ToUniswapToken(tokenOut));
 
-    const amountIn = tradeType === TradeType.EXACT_INPUT
-      ? amountSpecified : amountInFromAmountOut(amountSpecified, tokenIn, exchangeRate);
+      const amountIn =
+        tradeType === TradeType.EXACT_INPUT
+          ? amountSpecified
+          : amountInFromAmountOut(amountSpecified, tokenIn, exchangeRate);
 
-    const amountOut = tradeType === TradeType.EXACT_INPUT
-      ? amountOutFromAmountIn(amountSpecified, tokenOut, exchangeRate) : amountSpecified;
+      const amountOut =
+        tradeType === TradeType.EXACT_INPUT
+          ? amountOutFromAmountIn(amountSpecified, tokenOut, exchangeRate)
+          : amountSpecified;
 
-    const trade: QuoteResult = {
-      route,
-      amountIn,
-      amountOut,
-      tradeType,
-      gasEstimate: TEST_TRANSACTION_GAS_USAGE,
-    };
+      const trade: QuoteResult = {
+        route,
+        amountIn,
+        amountOut,
+        tradeType,
+        gasEstimate: TEST_TRANSACTION_GAS_USAGE,
+      };
 
-    return trade;
-  });
+      return trade;
+    },
+  );
 
   (Router as unknown as jest.Mock).mockImplementationOnce(() => ({
     routingContracts: TEST_ROUTING_CONTRACTS,
@@ -423,14 +429,20 @@ export function mockRouterImplementation(params: MockParams) {
 
 // expectToBeDefined ensures that a variable is not null or undefined, while
 // also narrowing its type.
-export function expectToBeDefined <T>(x: T): asserts x is NonNullable<T> {
+export function expectToBeDefined<T>(x: T): asserts x is NonNullable<T> {
   expect(x).toBeDefined();
   expect(x).not.toBeNull();
 }
 
+// expectToBeDefined ensures that x is a string, while
+// also narrowing its type.
+export function expectToBeString(x: string): asserts x is string {
+  expect(typeof x).toBe('string');
+}
+
 // expectInstanceOf ensurance that a variable is an instance of a class, while
 // also narrowing its type.
-export function expectInstanceOf <T>(className: { new(...args: any[]): T }, x: unknown): asserts x is T {
+export function expectInstanceOf<T>(className: { new (...args: any[]): T }, x: unknown): asserts x is T {
   expect(x).toBeInstanceOf(className);
 }
 

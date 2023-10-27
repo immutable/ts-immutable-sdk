@@ -96,6 +96,7 @@ const toSignedProduct = (
   name: item?.name || '',
   description: item?.description || '',
   currency,
+  collectionAddress: product.detail[0]?.collection_address,
   amount: product.detail.map(({ amount }) => amount),
   tokenId: product.detail.map(({ token_id: tokenId }) => Number(tokenId)),
 });
@@ -197,6 +198,7 @@ export const useSignOrder = (input: SignOrderInput) => {
         await txnResponse?.wait(1);
 
         transactionHash = txnResponse?.hash;
+        return transactionHash;
       } catch (e) {
         // TODO: check error type to send
         // SaleErrorTypes.WALLET_REJECTED or SaleErrorTypes.WALLET_REJECTED_NO_FUNDS
@@ -219,36 +221,25 @@ export const useSignOrder = (input: SignOrderInput) => {
           type: errorType,
           data: { error: e },
         });
+        return undefined;
       }
-
-      return transactionHash;
     },
     [provider],
   );
 
   const sign = useCallback(
     async (paymentType: PaymentTypes): Promise<SignResponse | undefined> => {
-      if (
-        !provider
-        || !recipientAddress
-        || !fromContractAddress
-        || !items.length
-      ) {
-        return undefined;
-      }
-
-      const data: SignApiRequest = {
-        recipient_address: recipientAddress,
-        payment_type: paymentType,
-        currency_filter: SignCurrencyFilter.CONTRACT_ADDRESS,
-        currency_value: fromContractAddress,
-        products: items.map((item) => ({
-          product_id: item.productId,
-          quantity: item.qty,
-        })),
-      };
-
       try {
+        const data: SignApiRequest = {
+          recipient_address: recipientAddress,
+          payment_type: paymentType,
+          currency_filter: SignCurrencyFilter.CONTRACT_ADDRESS,
+          currency_value: fromContractAddress,
+          products: items.map((item) => ({
+            product_id: item.productId,
+            quantity: item.qty,
+          })),
+        };
         const baseUrl = PRIMARY_SALES_API_BASE_URL[env].replace(
           ':environmentId',
           environmentId,
@@ -275,7 +266,7 @@ export const useSignOrder = (input: SignOrderInput) => {
       }
       return undefined;
     },
-    [items, fromContractAddress, recipientAddress, environmentId, env],
+    [items, fromContractAddress, recipientAddress, environmentId, env, provider],
   );
 
   const execute = async (
@@ -288,7 +279,7 @@ export const useSignOrder = (input: SignOrderInput) => {
       });
       return [];
     }
-
+    let successful = true;
     const execTransactions: ExecutedTransaction[] = [];
     for (const transaction of signData.transactions) {
       const {
@@ -301,13 +292,16 @@ export const useSignOrder = (input: SignOrderInput) => {
       const hash = await sendTransaction(to, data, gasEstimate, method);
 
       if (!hash) {
+        successful = false;
         break;
       }
 
       execTransactions.push({ method, hash });
     }
 
-    setExecuteDone();
+    if (successful) {
+      setExecuteDone();
+    }
     return execTransactions;
   };
 

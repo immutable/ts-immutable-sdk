@@ -4,13 +4,13 @@ import assert from 'assert';
 import { DuplicateAddressesError, InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError } from 'errors';
 import { fetchGasPrice } from 'lib/transactionUtils/gas';
 import { getApproval, prepareApproval } from 'lib/transactionUtils/approval';
-import { applySlippage, getOurQuoteReqAmount, getQuoteAmountFromTradeType } from 'lib/transactionUtils/getQuote';
+import { getOurQuoteReqAmount, prepareUserQuote } from 'lib/transactionUtils/getQuote';
 import { Fees } from 'lib/fees';
 import { SecondaryFee__factory } from 'contracts/types';
 import { NativeTokenService } from 'lib/nativeTokenService';
 import { DEFAULT_DEADLINE, DEFAULT_MAX_HOPS, DEFAULT_SLIPPAGE, MAX_MAX_HOPS, MIN_MAX_HOPS } from './constants';
 import { Router } from './lib/router';
-import { getERC20Decimals, isValidNonZeroAddress, newAmount, toPublicAmount } from './lib/utils';
+import { getTokenDecimals, isValidNonZeroAddress, isValidTokenLiteral, newAmount, toPublicAmount } from './lib/utils';
 import {
   Coin,
   CoinAmount,
@@ -24,13 +24,13 @@ import { getSwap, adjustQuoteWithFees } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
 
 const toPublicQuote = (
-  amount: CoinAmount<ERC20>,
-  amountWithMaxSlippage: CoinAmount<ERC20>,
+  amount: CoinAmount<Coin>,
+  amountWithMaxSlippage: CoinAmount<Coin>,
   slippage: number,
   fees: Fees,
 ): Quote => ({
-  amount,
-  amountWithMaxSlippage,
+  amount: toPublicAmount(amount),
+  amountWithMaxSlippage: toPublicAmount(amountWithMaxSlippage),
   slippage,
   fees: fees.withAmounts().map((fee) => ({
     ...fee,
@@ -85,8 +85,8 @@ export class Exchange {
     fromAddress: string,
   ) {
     assert(isValidNonZeroAddress(fromAddress), new InvalidAddressError('invalid from address'));
-    assert(isValidNonZeroAddress(tokenInAddress), new InvalidAddressError('invalid token in address'));
-    assert(isValidNonZeroAddress(tokenOutAddress), new InvalidAddressError('invalid token out address'));
+    assert(isValidTokenLiteral(tokenInAddress), new InvalidAddressError('invalid token in address'));
+    assert(isValidTokenLiteral(tokenOutAddress), new InvalidAddressError('invalid token out address'));
     assert(tokenInAddress.toLocaleLowerCase() !== tokenOutAddress.toLocaleLowerCase(), new DuplicateAddressesError());
     assert(maxHops <= MAX_MAX_HOPS, new InvalidMaxHopsError('max hops must be less than or equal to 10'));
     assert(maxHops >= MIN_MAX_HOPS, new InvalidMaxHopsError('max hops must be greater than or equal to 1'));
@@ -109,37 +109,40 @@ export class Exchange {
     return this.secondaryFees;
   }
 
+  private parseTokenLiteral(tokenLiteral: string, decimals: number): Coin {
+    if (tokenLiteral === 'native') {
+      return this.nativeToken;
+    }
+
+    return {
+      type: 'erc20',
+      address: tokenLiteral,
+      chainId: this.chainId,
+      decimals,
+    };
+  }
+
   private async getUnsignedSwapTx(
     fromAddress: string,
-    tokenInAddress: string,
-    tokenOutAddress: string,
+    tokenInLiteral: string,
+    tokenOutLiteral: string,
     amount: ethers.BigNumber,
     slippagePercent: number,
     maxHops: number,
     deadline: number,
     tradeType: TradeType,
   ): Promise<TransactionResponse> {
-    Exchange.validate(tokenInAddress, tokenOutAddress, maxHops, slippagePercent, fromAddress);
+    Exchange.validate(tokenInLiteral, tokenOutLiteral, maxHops, slippagePercent, fromAddress);
 
     // get the decimals of the tokens that will be swapped
     const [tokenInDecimals, tokenOutDecimals, secondaryFees] = await Promise.all([
-      getERC20Decimals(tokenInAddress, this.provider),
-      getERC20Decimals(tokenOutAddress, this.provider),
+      getTokenDecimals(tokenInLiteral, this.provider, this.nativeToken),
+      getTokenDecimals(tokenOutLiteral, this.provider, this.nativeToken),
       this.getSecondaryFees(),
     ]);
 
-    const tokenIn: ERC20 = {
-      type: 'erc20',
-      address: tokenInAddress,
-      chainId: this.chainId,
-      decimals: tokenInDecimals,
-    };
-    const tokenOut: ERC20 = {
-      type: 'erc20',
-      address: tokenOutAddress,
-      chainId: this.chainId,
-      decimals: tokenOutDecimals,
-    };
+    const tokenIn = this.parseTokenLiteral(tokenInLiteral, tokenInDecimals);
+    const tokenOut = this.parseTokenLiteral(tokenOutLiteral, tokenOutDecimals);
 
     // determine which amount was specified for the swap from the TradeType
     const [tokenSpecified, otherToken] =
@@ -151,15 +154,22 @@ export class Exchange {
 
     const ourQuoteReqAmount = getOurQuoteReqAmount(amountSpecified, fees, tradeType, this.nativeTokenService);
 
-    // get quote and gas details
+    // Quotes will always use ERC20s. If the user-specified token is Native, we use the Wrapped Native Token pool
     const [ourQuote, gasPrice] = await Promise.all([
-      this.router.findOptimalRoute(ourQuoteReqAmount, otherToken, tradeType, maxHops),
+      this.router.findOptimalRoute(
+        ourQuoteReqAmount,
+        this.nativeTokenService.maybeWrapToken(otherToken),
+        tradeType,
+        maxHops,
+      ),
       fetchGasPrice(this.provider, this.nativeToken),
     ]);
 
     const adjustedQuote = adjustQuoteWithFees(ourQuote, amountSpecified, fees, this.nativeTokenService);
 
     const swap = getSwap(
+      tokenIn,
+      tokenOut,
       adjustedQuote,
       fromAddress,
       slippagePercent,
@@ -168,19 +178,19 @@ export class Exchange {
       this.secondaryFeeContractAddress,
       gasPrice,
       secondaryFees,
-      this.nativeTokenService,
     );
 
-    const quotedAmount = getQuoteAmountFromTradeType(adjustedQuote);
-    const amountWithMaxSlippage = newAmount(
-      applySlippage(adjustedQuote.tradeType, quotedAmount.value, slippagePercent),
+    const { quotedAmount, quotedAmountWithMaxSlippage } = prepareUserQuote(
+      this.nativeTokenService,
+      adjustedQuote,
+      slippagePercent,
       otherToken,
     );
 
     const preparedApproval = prepareApproval(
       tradeType,
       amountSpecified,
-      amountWithMaxSlippage,
+      quotedAmountWithMaxSlippage,
       {
         routerAddress: this.routerContractAddress,
         secondaryFeeAddress: this.secondaryFeeContractAddress,
@@ -189,9 +199,11 @@ export class Exchange {
     );
 
     // preparedApproval always uses the tokenIn address because we are always selling the tokenIn
-    const approval = await getApproval(this.provider, fromAddress, preparedApproval, gasPrice);
+    const approval = preparedApproval
+      ? await getApproval(this.provider, fromAddress, preparedApproval, gasPrice)
+      : null;
 
-    const quote = toPublicQuote(quotedAmount, amountWithMaxSlippage, slippagePercent, fees);
+    const quote = toPublicQuote(quotedAmount, quotedAmountWithMaxSlippage, slippagePercent, fees);
 
     return { quote, approval, swap };
   }
@@ -200,14 +212,14 @@ export class Exchange {
    * Get the unsigned swap transaction given the amount to sell.
    * Includes quote details for the swap.
    *
-   * @param {string} fromAddress The public address that will sign and submit the transaction.
-   * @param {string} tokenInAddress Token address to sell.
-   * @param {string} tokenOutAddress Token address to buy.
-   * @param {ethers.BigNumberish} amountIn Amount to sell.
-   * @param {number} slippagePercent (optional) The percentage of slippage tolerance. Default = 0.1. Max = 50. Min = 0.
-   * @param {number} maxHops (optional) Maximum hops allowed in optimal route. Default is 2.
-   * @param {number} deadline (optional) Latest time swap can execute. Default is 15 minutes.
-   * @return {TransactionResponse} The result containing the unsigned transaction and details of the swap.
+   * @param {string} fromAddress The public address that will sign and submit the transaction
+   * @param {string} tokenInAddress Token address or 'native' to sell
+   * @param {string} tokenOutAddress Token address or 'native' to buy
+   * @param {ethers.BigNumberish} amountIn Amount to sell in the smallest unit of the token-in
+   * @param {number} slippagePercent (optional) The percentage of slippage tolerance. Default = 0.1. Max = 50. Min = 0
+   * @param {number} maxHops (optional) Maximum hops allowed in optimal route. Default is 2
+   * @param {number} deadline (optional) Latest time swap can execute. Default is 15 minutes
+   * @return {TransactionResponse} The result containing the unsigned transaction and details of the swap
    */
   public async getUnsignedSwapTxFromAmountIn(
     fromAddress: string,
@@ -234,14 +246,14 @@ export class Exchange {
    * Get the unsigned swap transaction given the amount to buy.
    * Includes quote details for the swap.
    *
-   * @param {string} fromAddress The public address that will sign and submit the transaction.
-   * @param {string} tokenInAddress Token address to sell.
-   * @param {string} tokenOutAddress Token address to buy.
-   * @param {ethers.BigNumberish} amountOut Amount to buy.
-   * @param {number} slippagePercent (optional) The percentage of slippage tolerance. Default = 0.1. Max = 50. Min = 0.
-   * @param {number} maxHops (optional) Maximum hops allowed in optimal route. Default is 2.
-   * @param {number} deadline (optional) Latest time swap can execute. Default is 15 minutes.
-   * @return {TransactionResponse} The result containing the unsigned transaction and details of the swap.
+   * @param {string} fromAddress The public address that will sign and submit the transaction
+   * @param {string} tokenInAddress ERC20 contract address or 'native' to sell
+   * @param {string} tokenOutAddress ERC20 contract address or 'native' to buy
+   * @param {ethers.BigNumberish} amountOut Amount to buy in the smallest unit of the token-out
+   * @param {number} slippagePercent (optional) The percentage of slippage tolerance. Default = 0.1. Max = 50. Min = 0
+   * @param {number} maxHops (optional) Maximum hops allowed in optimal route. Default is 2
+   * @param {number} deadline (optional) Latest time swap can execute. Default is 15 minutes
+   * @return {TransactionResponse} The result containing the unsigned transaction and details of the swap
    */
   public async getUnsignedSwapTxFromAmountOut(
     fromAddress: string,

@@ -26,9 +26,25 @@ export default class ConfirmationScreen {
     this.config = config;
   }
 
+  private getHref(relativePath: string, queryStringParams?: { [key: string]: any }) {
+    let href = `${this.config.passportDomain}/transaction-confirmation/${relativePath}`;
+
+    if (queryStringParams) {
+      const queryString = queryStringParams
+        ? Object.keys(queryStringParams)
+          .map((key) => `${key}=${queryStringParams[key]}`)
+          .join('&')
+        : '';
+
+      href = `${href}?${queryString}`;
+    }
+
+    return href;
+  }
+
   requestConfirmation(
     transactionId: string,
-    imxEtherAddress: string,
+    etherAddress: string,
     chainType: TransactionApprovalRequestChainTypeEnum,
     chainId?: string,
   ): Promise<ConfirmationResult> {
@@ -64,17 +80,17 @@ export default class ConfirmationScreen {
 
       let href = '';
       if (chainType === TransactionApprovalRequestChainTypeEnum.Starkex) {
-        // eslint-disable-next-line max-len
-        href = `${this.config.passportDomain}/transaction-confirmation/transaction?transactionId=${transactionId}&imxEtherAddress=${imxEtherAddress}&chainType=starkex`;
+        href = this.getHref('transaction', { transactionId, etherAddress, chainType });
       } else {
-        // eslint-disable-next-line max-len
-        href = `${this.config.passportDomain}/transaction-confirmation/zkevm?transactionId=${transactionId}&imxEtherAddress=${imxEtherAddress}&chainType=evm&chainId=${chainId}`;
+        href = this.getHref('zkevm', {
+          transactionId, etherAddress, chainType, chainId,
+        });
       }
       this.showConfirmationScreen(href, messageHandler, resolve);
     });
   }
 
-  requestMessageConfirmation(messageId: string): Promise<ConfirmationResult> {
+  requestMessageConfirmation(messageID: string, etherAddress: string): Promise<ConfirmationResult> {
     return new Promise((resolve, reject) => {
       const messageHandler = ({ data, origin }: MessageEvent) => {
         if (
@@ -105,9 +121,7 @@ export default class ConfirmationScreen {
         return;
       }
       window.addEventListener('message', messageHandler);
-
-      const href = `${this.config.passportDomain}/transaction-confirmation/zkevm/message?messageID=${messageId}`;
-
+      const href = this.getHref('zkevm/message', { messageID, etherAddress });
       this.showConfirmationScreen(href, messageHandler, resolve);
     });
   }
@@ -119,7 +133,7 @@ export default class ConfirmationScreen {
     }
 
     this.confirmationWindow = openPopupCenter({
-      url: `${this.config.passportDomain}/transaction-confirmation/loading`,
+      url: this.getHref('loading'),
       title: CONFIRMATION_WINDOW_TITLE,
       width: popupOptions?.width || CONFIRMATION_WINDOW_WIDTH,
       height: popupOptions?.height || CONFIRMATION_WINDOW_HEIGHT,
@@ -134,7 +148,7 @@ export default class ConfirmationScreen {
     return new Promise((resolve, rejects) => {
       const iframe = document.createElement('iframe');
       iframe.setAttribute('id', CONFIRMATION_IFRAME_ID);
-      iframe.setAttribute('src', `${this.config.passportDomain}/transaction-confirmation/logout`);
+      iframe.setAttribute('src', this.getHref('logout'));
       iframe.setAttribute('style', CONFIRMATION_IFRAME_STYLE);
       const logoutHandler = ({ data, origin }: MessageEvent) => {
         if (

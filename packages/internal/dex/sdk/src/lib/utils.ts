@@ -27,11 +27,16 @@ export function poolEquals(poolA: Pool, poolB: Pool): boolean {
   );
 }
 
-export async function getERC20Decimals(
+export const decimalsFunctionSig = ethers.utils.id('decimals()').substring(0, 10);
+
+export async function getTokenDecimals(
   tokenAddress: string,
   provider: ethers.providers.JsonRpcProvider,
+  nativeToken: Coin,
 ): Promise<number> {
-  const decimalsFunctionSig = ethers.utils.id('decimals()').substring(0, 10);
+  if (tokenAddress === 'native') {
+    return nativeToken.decimals;
+  }
 
   try {
     const decimalsResult = await provider.call({
@@ -61,6 +66,9 @@ export function isValidNonZeroAddress(address: string): boolean {
     return false;
   }
 }
+
+export const isValidTokenLiteral = (address: string): boolean =>
+  address === 'native' ? true : isValidNonZeroAddress(address);
 
 export const erc20ToUniswapToken = (token: ERC20): Uniswap.Token =>
   // eslint-disable-next-line implicit-arrow-linebreak
@@ -97,6 +105,8 @@ export const isERC20Amount = (amount: CoinAmount<Coin>): amount is CoinAmount<ER
 
 export const isNativeAmount = (amount: CoinAmount<Coin>): amount is CoinAmount<Native> =>
   amount.token.type === 'native';
+
+export const isNative = (token: Coin): token is Native => token.type === 'native';
 
 export const addERC20Amount = (a: CoinAmount<ERC20>, b: CoinAmount<ERC20>) => {
   // Make sure the ERC20s have the same address
