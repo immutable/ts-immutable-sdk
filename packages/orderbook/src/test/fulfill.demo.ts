@@ -1,6 +1,6 @@
 import { log } from 'console';
 import { Environment } from '@imtbl/config';
-import { Wallet } from 'ethers';
+import { BigNumber, Wallet } from 'ethers';
 import { OrderStatusName } from 'openapi/sdk';
 import { Orderbook } from '../orderbook';
 import {
@@ -16,9 +16,13 @@ import {
 import { actionAll } from './helpers/actions';
 
 async function deployAndMintNftContract(wallet: Wallet): Promise<TestToken> {
+  log(await wallet.getTransactionCount());
   const { contract } = await deployTestToken(wallet);
   log('contract deployed');
-  const receipt = await contract.safeMint(wallet.address);
+  const receipt = await contract.safeMint(wallet.address, {
+    maxFeePerGas: BigNumber.from(102e9),
+    maxPriorityFeePerGas: BigNumber.from(101e9),
+  });
   await receipt.wait();
   log('token minted');
   return contract;
@@ -73,7 +77,7 @@ describe('', () => {
       orderExpiry: new Date(Date.now() + 1000000 * 30),
     });
 
-    const signatures = await actionAll(validListing.actions, offerer, provider);
+    const signatures = await actionAll(validListing.actions, offerer);
     log('Creating new listing to be fulfilled...');
 
     // Submit the order creation request to the order book API
@@ -89,6 +93,7 @@ describe('', () => {
       }],
     });
 
+    log(`Listing of ${orderId2} submitted to orderbook API`);
     await waitForOrderToBeOfStatus(sdk, orderId2, OrderStatusName.ACTIVE);
     log(`Listing ${orderId2} is now ACTIVE, fulfilling order...`);
 
@@ -103,7 +108,7 @@ describe('', () => {
 
     log(`Fulfilling listing ${order.id}, fulfillment transaction valid till ${expiration}`);
 
-    await actionAll(actions, fulfiller, provider);
+    await actionAll(actions, fulfiller);
 
     log(
       `Fulfilment transaction sent, waiting for listing ${orderId2} to become FILLED`,
