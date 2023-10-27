@@ -16,7 +16,7 @@ const config: Config = {
   transform: {
     '^.+\\.(t|j)sx?$': '@swc/jest',
   },
-  transformIgnorePatterns: [],
+  transformIgnorePatterns: []
 };
 
 export default config;

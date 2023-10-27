@@ -67,6 +67,7 @@ export class OrdersService {
     sellItemContractAddress,
     buyItemContractAddress,
     sellItemTokenId,
+    fromUpdatedAt,
     pageSize,
     sortBy,
     sortDirection,
@@ -89,6 +90,10 @@ export class OrdersService {
      * Sell item token identifier to filter by
      */
     sellItemTokenId?: string,
+    /**
+     * From updated at including given date
+     */
+    fromUpdatedAt?: string,
     /**
      * Maximum number of orders to return per page
      */
@@ -117,6 +122,7 @@ export class OrdersService {
         'sell_item_contract_address': sellItemContractAddress,
         'buy_item_contract_address': buyItemContractAddress,
         'sell_item_token_id': sellItemTokenId,
+        'from_updated_at': fromUpdatedAt,
         'page_size': pageSize,
         'sort_by': sortBy,
         'sort_direction': sortDirection,
@@ -233,6 +239,7 @@ export class OrdersService {
   public listTrades({
     chainName,
     accountAddress,
+    fromIndexedAt,
     pageSize,
     sortBy,
     sortDirection,
@@ -240,6 +247,10 @@ export class OrdersService {
   }: {
     chainName: ChainName,
     accountAddress?: string,
+    /**
+     * From indexed at including given date
+     */
+    fromIndexedAt?: string,
     /**
      * Maximum number of trades to return per page
      */
@@ -265,6 +276,7 @@ export class OrdersService {
       },
       query: {
         'account_address': accountAddress,
+        'from_indexed_at': fromIndexedAt,
         'page_size': pageSize,
         'sort_by': sortBy,
         'sort_direction': sortDirection,

@@ -229,27 +229,17 @@ export const useSignOrder = (input: SignOrderInput) => {
 
   const sign = useCallback(
     async (paymentType: PaymentTypes): Promise<SignResponse | undefined> => {
-      if (
-        !provider
-        || !recipientAddress
-        || !fromContractAddress
-        || !items.length
-      ) {
-        return undefined;
-      }
-
-      const data: SignApiRequest = {
-        recipient_address: recipientAddress,
-        payment_type: paymentType,
-        currency_filter: SignCurrencyFilter.CONTRACT_ADDRESS,
-        currency_value: fromContractAddress,
-        products: items.map((item) => ({
-          product_id: item.productId,
-          quantity: item.qty,
-        })),
-      };
-
       try {
+        const data: SignApiRequest = {
+          recipient_address: recipientAddress,
+          payment_type: paymentType,
+          currency_filter: SignCurrencyFilter.CONTRACT_ADDRESS,
+          currency_value: fromContractAddress,
+          products: items.map((item) => ({
+            product_id: item.productId,
+            quantity: item.qty,
+          })),
+        };
         const baseUrl = PRIMARY_SALES_API_BASE_URL[env].replace(
           ':environmentId',
           environmentId,
@@ -276,7 +266,7 @@ export const useSignOrder = (input: SignOrderInput) => {
       }
       return undefined;
     },
-    [items, fromContractAddress, recipientAddress, environmentId, env],
+    [items, fromContractAddress, recipientAddress, environmentId, env, provider],
   );
 
   const execute = async (

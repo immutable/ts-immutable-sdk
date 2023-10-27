@@ -106,6 +106,8 @@ export const isERC20Amount = (amount: CoinAmount<Coin>): amount is CoinAmount<ER
 export const isNativeAmount = (amount: CoinAmount<Coin>): amount is CoinAmount<Native> =>
   amount.token.type === 'native';
 
+export const isNative = (token: Coin): token is Native => token.type === 'native';
+
 export const addERC20Amount = (a: CoinAmount<ERC20>, b: CoinAmount<ERC20>) => {
   // Make sure the ERC20s have the same address
   if (a.token.address !== b.token.address) throw new Error('Token mismatch: token addresses must be the same');
