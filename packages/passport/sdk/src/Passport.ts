@@ -76,11 +76,7 @@ export class Passport {
     return this.passportImxProviderFactory.getProviderSilent();
   }
 
-  public async connectImx(options?: { useCachedSession: boolean }): Promise<IMXProvider | null> {
-    const { useCachedSession = false } = options || {};
-    if (useCachedSession) {
-      return this.passportImxProviderFactory.getProviderSilent();
-    }
+  public async connectImx(): Promise<IMXProvider | null> {
     return this.passportImxProviderFactory.getProvider();
   }
 
