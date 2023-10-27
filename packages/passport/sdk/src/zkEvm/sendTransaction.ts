@@ -1,7 +1,7 @@
 import {
   ExternalProvider, JsonRpcProvider, JsonRpcSigner, TransactionRequest, Web3Provider,
 } from '@ethersproject/providers';
-import { BigNumber } from 'ethers';
+import { BigNumber, BigNumberish } from 'ethers';
 import { getEip155ChainId, getNonce, getSignedMetaTransactions } from './walletHelpers';
 import { MetaTransaction, RelayerTransactionStatus } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
@@ -24,7 +24,7 @@ export type EthSendTransactionParams = {
 
 const getMetaTransactions = async (
   metaTransaction: MetaTransaction,
-  nonce: number,
+  nonce: BigNumberish,
   chainId: BigNumber,
   walletAddress: string,
   signer: JsonRpcSigner,
