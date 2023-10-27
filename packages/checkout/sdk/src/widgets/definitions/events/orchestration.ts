@@ -56,3 +56,6 @@ export type RequestOnrampEvent = {
   tokenAddress: string;
   amount: string;
 };
+
+// eslint-disable-next-line max-len
+export type OrchestrationEventData = RequestConnectEvent | RequestWalletEvent | RequestSwapEvent | RequestBridgeEvent | RequestOnrampEvent;

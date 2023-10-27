@@ -8,17 +8,26 @@ import {
   Widget,
   ConnectEventType
 } from '@imtbl/checkout-sdk';
-import { WidgetsFactory } from '@imtbl/checkout-widgets';
 import { Environment } from '@imtbl/config';
 
 const CONNECT_TARGET_ID = "connect-widget-target";
 function ConnectUI() {
   const checkout = useMemo(() => new Checkout({ baseConfig: { environment: Environment.SANDBOX } }), []);
-  const factory = useMemo(() => new WidgetsFactory(checkout, {theme: WidgetTheme.DARK}), [checkout]);
-  const connect = useMemo(() => factory.create(WidgetType.CONNECT, {}), [factory]);
+  const [factory, setFactory] = useState<ImmutableCheckoutWidgets.WidgetsFactory>();
+  const connect = useMemo(() => {
+    if(!factory) return;
+    return (factory as any).create(WidgetType.CONNECT, {})
+  }, [factory]);
   const [provider, setProvider] = useState();
-  
+
   useEffect(() => {
+    (async () => {
+      setFactory(await checkout.widgets({config: {theme: WidgetTheme.DARK}}));
+    })()
+  }, [checkout]);
+
+  useEffect(() => {
+    if(!connect) return;
     connect.mount(CONNECT_TARGET_ID)
     connect.on(ConnectEventType.SUCCESS, (data: any) => {
       console.log('SUCCESS')
