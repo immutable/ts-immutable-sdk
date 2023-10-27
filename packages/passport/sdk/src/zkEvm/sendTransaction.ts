@@ -28,7 +28,8 @@ const getMetaTransactions = async (
   chainIdBigNumber: BigNumber,
   zkEthAddress: string,
   signer: JsonRpcSigner,
-  relayerClient: RelayerClient): Promise<MetaTransaction[]> => {
+  relayerClient: RelayerClient,
+): Promise<MetaTransaction[]> => {
   // NOTE: We sign the transaction before getting the fee options because
   // accurate estimation of a transaction gas cost is only possible if the smart
   // wallet contract can actually execute it (in a simulated environment) - and
@@ -61,10 +62,10 @@ const getMetaTransactions = async (
     revertOnError: true,
   };
   if (BigNumber.from(feeMetaTransaction.value).isZero()) {
-    return [metaTransaction]
+    return [metaTransaction];
   }
   return [metaTransaction, feeMetaTransaction];
-}
+};
 
 export const sendTransaction = ({
   params,
@@ -100,13 +101,14 @@ export const sendTransaction = ({
       chainIdBigNumber,
       user.zkEvm.ethAddress,
       signer,
-      relayerClient);
+      relayerClient,
+    );
 
     await guardianClient.validateEVMTransaction({
       chainId: getEip155ChainId(chainId),
       nonce: convertBigNumberishToString(nonce),
       user,
-      metaTransactions: metaTransactions,
+      metaTransactions,
     });
 
     // NOTE: We sign again because we now are adding the fee transaction, so the
