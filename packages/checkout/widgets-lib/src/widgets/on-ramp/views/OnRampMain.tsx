@@ -35,8 +35,7 @@ export function OnRampMain({
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const { header } = text.views[OnRampWidgetViews.ONRAMP];
-  const { viewState } = useContext(ViewContext);
-  const { viewDispatch } = useContext(ViewContext);
+  const { viewState, viewDispatch } = useContext(ViewContext);
   const [widgetUrl, setWidgetUrl] = useState<string>('');
 
   const isPassport = !!passport && (provider?.provider as any)?.isPassport;

@@ -79,7 +79,11 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
       },
     });
 
-    this.render();
+    if (this.targetId) {
+      this.mount(this.targetId);
+    } else {
+      this.render();
+    }
   }
 
   on(type: WidgetEventTypes[T], callback: (data: any) => void): void {
