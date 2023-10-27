@@ -225,6 +225,7 @@ export function OnRampMain({
     // eslint-disable-next-line consistent-return
     return () => {
       window.removeEventListener('message', handleTransakEvents);
+      setWidgetUrl('');
     };
   }, [checkout, provider, tokenAmount, tokenAddress, passport]);
 

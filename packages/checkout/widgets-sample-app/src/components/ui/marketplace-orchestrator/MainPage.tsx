@@ -74,7 +74,7 @@ export const MainPage = () => {
       onRampWidget.update({params: {contractAddress: eventData.tokenAddress, amount: eventData.amount, web3Provider}})
       onRampWidget.mount('widget-target');
     })
-  }, [walletWidget, bridgeWidget, onRampWidget, web3Provider]);
+  }, [walletWidget, bridgeWidget, onRampWidget, swapWidget, web3Provider]);
 
   // button click functions to open/close widgets
   const openConnectWidget = useCallback(() => {
