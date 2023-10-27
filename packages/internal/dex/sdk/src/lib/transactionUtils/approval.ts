@@ -1,10 +1,10 @@
 import { JsonRpcProvider, TransactionRequest } from '@ethersproject/providers';
 import { BigNumber } from '@ethersproject/bignumber';
 import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
-import { ApproveError, AlreadyApprovedError } from 'errors';
+import { ApproveError } from 'errors';
 import { ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
-import { isERC20Amount, newAmount, toPublicAmount } from 'lib/utils';
+import { isERC20Amount, toPublicAmount } from 'lib/utils';
 import { CoinAmount, Coin, ERC20 } from 'types';
 import { SecondaryFee, TransactionDetails } from '../../types';
 import { calculateGasFee } from './gas';
@@ -15,8 +15,7 @@ type PreparedApproval = {
 };
 
 /**
- * Get the amount of an ERC20 token that needs to be approved by
- * checking the existing allowance for the spender
+ * Check if the spender needs approval for the token
  *
  * @param provider - The provider to use for the call
  * @param ownerAddress - The address of the owner of the token
@@ -24,17 +23,17 @@ type PreparedApproval = {
  * @param spenderAddress - The address of the spender
  * @returns - The amount of the token that needs to be approved
  */
-const getERC20AmountToApprove = async (
+const doesSpenderNeedApproval = async (
   provider: JsonRpcProvider,
   ownerAddress: string,
   tokenAmount: CoinAmount<ERC20>,
   spenderAddress: string,
-): Promise<CoinAmount<ERC20>> => {
+): Promise<boolean> => {
   // create an instance of the ERC20 token contract
   const erc20Contract = ERC20__factory.connect(tokenAmount.token.address, provider);
 
   // get the allowance for the token spender
-  // minimum is 0 - no allowance
+  // the minimum allowance is 0 - no allowance
   let allowance: BigNumber;
   try {
     allowance = await erc20Contract.allowance(ownerAddress, spenderAddress);
@@ -43,13 +42,13 @@ const getERC20AmountToApprove = async (
     throw new ApproveError(`failed to get allowance: ${message}`);
   }
 
-  // get the amount that needs to be approved
+  // check if approval is needed
   const requiredAmount = tokenAmount.value.sub(allowance);
   if (requiredAmount.isNegative() || requiredAmount.isZero()) {
-    throw new AlreadyApprovedError(tokenAmount.toString(), tokenAmount.token.address, spenderAddress);
+    return false;
   }
 
-  return newAmount(requiredAmount, tokenAmount.token);
+  return true;
 };
 
 /**
@@ -116,19 +115,10 @@ export const getApproveTransaction = async (
   tokenAmount: CoinAmount<ERC20>,
   spenderAddress: string,
 ): Promise<TransactionRequest | null> => {
-  let amountToApprove: CoinAmount<ERC20>;
-  try {
-    amountToApprove = await getERC20AmountToApprove(provider, ownerAddress, tokenAmount, spenderAddress);
-  } catch (e) {
-    if (e instanceof AlreadyApprovedError) {
-      // already approved for the required amount, nothing to do
-      return null;
-    }
+  const needsApproval = await doesSpenderNeedApproval(provider, ownerAddress, tokenAmount, spenderAddress);
 
-    throw e;
-  }
-
-  return getUnsignedERC20ApproveTransaction(ownerAddress, amountToApprove, spenderAddress);
+  // @dev approvals are not additive, so we need to approve the full amount
+  return needsApproval ? getUnsignedERC20ApproveTransaction(ownerAddress, tokenAmount, spenderAddress) : null;
 };
 
 export async function getApproveGasEstimate(
