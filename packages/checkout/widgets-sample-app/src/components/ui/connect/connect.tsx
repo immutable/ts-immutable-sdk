@@ -13,7 +13,6 @@ import { Environment } from '@imtbl/config';
 const CONNECT_TARGET_ID = "connect-widget-target";
 function ConnectUI() {
   const checkout = useMemo(() => new Checkout({ baseConfig: { environment: Environment.SANDBOX } }), []);
-  // const factory = useMemo(() => new WidgetsFactory(checkout, {theme: WidgetTheme.DARK}), [checkout]);
   const [factory, setFactory] = useState<ImmutableCheckoutWidgets.WidgetsFactory>();
   const connect = useMemo(() => {
     if(!factory) return;
