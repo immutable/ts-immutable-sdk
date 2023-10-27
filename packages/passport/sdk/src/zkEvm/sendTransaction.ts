@@ -25,8 +25,8 @@ export type EthSendTransactionParams = {
 const getMetaTransactions = async (
   metaTransaction: MetaTransaction,
   nonce: number,
-  chainIdBigNumber: BigNumber,
-  zkEthAddress: string,
+  chainId: BigNumber,
+  walletAddress: string,
   signer: JsonRpcSigner,
   relayerClient: RelayerClient,
 ): Promise<MetaTransaction[]> => {
@@ -37,8 +37,8 @@ const getMetaTransactions = async (
   const signedTransaction = await getSignedMetaTransactions(
     [metaTransaction],
     nonce,
-    chainIdBigNumber,
-    zkEthAddress,
+    chainId,
+    walletAddress,
     signer,
   );
 
@@ -49,7 +49,7 @@ const getMetaTransactions = async (
   // should transfer the payment to, an amount and a currency. We choose one
   // option and build a transaction that sends the expected currency amount for
   // that option to the specified address.
-  const feeOptions = await relayerClient.imGetFeeOptions(zkEthAddress, signedTransaction);
+  const feeOptions = await relayerClient.imGetFeeOptions(walletAddress, signedTransaction);
   const imxFeeOption = feeOptions.find((feeOption) => feeOption.tokenSymbol === 'IMX');
   if (!imxFeeOption) {
     throw new Error('Failed to retrieve fees for IMX token');
