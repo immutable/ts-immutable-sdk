@@ -284,7 +284,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         unwrapWETHFunctionCalldata,
       );
 
-      expect(decodedUnwrapWETH9FunctionData.toString()).toEqual('909090909090909090909'); // expect the quoted amount with slippage applied i.e. minimum amount out
+      expect(formatEther(decodedUnwrapWETH9FunctionData.toString())).toEqual('909.090909090909090909'); // expect the quoted amount with slippage applied i.e. minimum amount out
     });
 
     it('should specify the Router contract as the recipient of the swap function call', async () => {

@@ -494,7 +494,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
           unwrapWETHFunctionCalldata,
         );
 
-        expect(decodedUnwrapWETH9FunctionData.toString()).toEqual('100000000000000000000'); // expect the user-specified amount
+        expect(formatEther(decodedUnwrapWETH9FunctionData.toString())).toEqual('100.0'); // expect the user-specified amount
       });
     });
   });
