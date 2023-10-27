@@ -4,7 +4,15 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Passport } from '@imtbl/passport';
 import { passportConfig } from './passportConfig';
 import {  WidgetsFactory } from '@imtbl/checkout-widgets';
-import { BridgeEventType, Checkout, ConnectEventType, ConnectionFailed, ConnectionSuccess, OrchestrationEventType, RequestBridgeEvent, RequestSwapEvent, SwapEventType, WalletEventType, WalletNetworkSwitchEvent, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
+import { Checkout,
+  ConnectEventType,
+  ConnectionSuccess, OrchestrationEventType,
+  RequestBridgeEvent, BridgeEventType,
+  RequestOnrampEvent, OnRampEventType,
+  RequestSwapEvent, SwapEventType,
+  WalletEventType,
+  WalletNetworkSwitchEvent,
+  WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 
 export const MainPage = () => {
@@ -22,11 +30,13 @@ export const MainPage = () => {
   const walletWidget = useMemo(() => widgetsFactory.create(WidgetType.WALLET, {passport}), [widgetsFactory]);
   const bridgeWidget = useMemo(() => widgetsFactory.create(WidgetType.BRIDGE, {passport}), [widgetsFactory]);
   const swapWidget = useMemo(() => widgetsFactory.create(WidgetType.SWAP, {passport}), [widgetsFactory]);
-  
+  const onRampWidget = useMemo(() => widgetsFactory.create(WidgetType.ONRAMP, {passport}), [widgetsFactory]);
+
   connectWidget.on(ConnectEventType.CLOSE_WIDGET, () => {connectWidget.destroy()});
   walletWidget.on(WalletEventType.CLOSE_WIDGET, () => {walletWidget.destroy()});
   bridgeWidget.on(BridgeEventType.CLOSE_WIDGET, () => {bridgeWidget.destroy()});
   swapWidget.on(SwapEventType.CLOSE_WIDGET, () => swapWidget.destroy());
+  onRampWidget.on(OnRampEventType.CLOSE_WIDGET, () => {onRampWidget.destroy()});
 
   // local state for enabling/disabling and changing buttons
   const [doneSwap, setDoneSwap] = useState<boolean>(false);
@@ -46,7 +56,7 @@ export const MainPage = () => {
     walletWidget.update({params: {web3Provider}})
   }, [web3Provider])
 
-  
+
   // Orchestration
   useEffect(() => {
     walletWidget.on(OrchestrationEventType.REQUEST_BRIDGE, (eventData: RequestBridgeEvent) => {
@@ -59,7 +69,12 @@ export const MainPage = () => {
       swapWidget.update({params: {fromContractAddress: eventData.fromTokenAddress, amount: eventData.amount, web3Provider}})
       swapWidget.mount('widget-target');
     })
-  }, [walletWidget, bridgeWidget, web3Provider]);
+    walletWidget.on(OrchestrationEventType.REQUEST_ONRAMP, (eventData: RequestOnrampEvent) => {
+      walletWidget.unmount();
+      onRampWidget.update({params: {contractAddress: eventData.tokenAddress, amount: eventData.amount, web3Provider}})
+      onRampWidget.mount('widget-target');
+    })
+  }, [walletWidget, bridgeWidget, onRampWidget, swapWidget, web3Provider]);
 
   // button click functions to open/close widgets
   const openConnectWidget = useCallback(() => {
@@ -77,6 +92,10 @@ export const MainPage = () => {
   const openSwapWidget = useCallback(() => {
     swapWidget.mount('widget-target')
   }, [bridgeWidget])
+
+  const openOnRampWidget = useCallback(() => {
+    onRampWidget.mount('widget-target')
+  }, [onRampWidget])
 
   const handleBuyClick = () => {
     alert("you can buy now");
@@ -96,7 +115,8 @@ export const MainPage = () => {
           <Button onClick={openConnectWidget}>Connect</Button>
           <Button onClick={openWalletWidget}>Wallet</Button>
           <Button onClick={openSwapWidget}>Swap</Button>
-        <Button onClick={openBridgeWidget}>Bridge</Button>
+          <Button onClick={openBridgeWidget}>Bridge</Button>
+          <Button onClick={openOnRampWidget}>On-ramp</Button>
       </Box>
       {passport && web3Provider && (web3Provider.provider as any)?.isPassport && <Button onClick={logout}>Passport Logout</Button>}
       </Box>
