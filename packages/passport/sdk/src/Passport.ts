@@ -57,19 +57,30 @@ export class Passport {
     });
   }
 
-  public async signIn(): Promise<UserProfile> {
-    const user = await this.authManager.loginSilent() || await this.authManager.login();
+  public async signIn(options?: { useCachedSession: boolean }): Promise<UserProfile | null> {
+    const { useCachedSession = false } = options || {};
+    let user = await this.authManager.loginSilent();
+    if (!user && !useCachedSession) {
+      user = await this.authManager.login();
+    }
+    if (!user) {
+      return null;
+    }
     return user.profile;
   }
 
   /**
- * @deprecated The method connectImx should be used instead
- */
+   * @deprecated The method connectImx(useCachedSession) should be used instead
+   */
   public async connectImxSilent(): Promise<IMXProvider | null> {
     return this.passportImxProviderFactory.getProviderSilent();
   }
 
-  public async connectImx(): Promise<IMXProvider> {
+  public async connectImx(options?: { useCachedSession: boolean }): Promise<IMXProvider | null> {
+    const { useCachedSession = false } = options || {};
+    if (useCachedSession) {
+      return this.passportImxProviderFactory.getProviderSilent();
+    }
     return this.passportImxProviderFactory.getProvider();
   }
 

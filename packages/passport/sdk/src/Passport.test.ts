@@ -126,6 +126,17 @@ describe('Passport', () => {
       expect(result).toBe(passportImxProvider);
       expect(getProviderMock).toHaveBeenCalled();
     });
+
+    it('should call getProviderSilent if useCachedSession is true', async () => {
+      const passportImxProvider = {} as PassportImxProvider;
+      getProviderSilentMock.mockResolvedValue(passportImxProvider);
+
+      const result = await passport.connectImx({ useCachedSession: true });
+
+      expect(result).toBe(passportImxProvider);
+      expect(getProviderSilentMock).toHaveBeenCalled();
+      expect(getProviderMock).not.toHaveBeenCalled();
+    });
   });
 
   describe('connectImxSilent', () => {
@@ -266,6 +277,15 @@ describe('Passport', () => {
       expect(loginSilentMock).toBeCalledTimes(1);
       expect(authLoginMock).toBeCalledTimes(1);
       expect(user).toEqual(mockUserImx.profile);
+    });
+
+    it('should only login silently if useCachedSession is true', async () => {
+      loginSilentMock.mockReturnValue(mockUserImx);
+      const user = await passport.signIn({ useCachedSession: true });
+
+      expect(loginSilentMock).toBeCalledTimes(1);
+      expect(authLoginMock).toBeCalledTimes(0);
+      expect(user).toEqual(mockUser.profile);
     });
   });
 });
