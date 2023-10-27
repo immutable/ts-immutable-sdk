@@ -4,13 +4,13 @@
 
 export type CancelledOrderStatus = {
   /**
-   * The order status
+   * The order status indicating a order is has been cancelled or about to be cancelled.
    */
   name: 'CANCELLED';
   /**
    * Whether the cancellation of the order is pending
    */
-  is_pending: boolean;
+  pending: boolean;
   /**
    * Whether the cancellation was done on-chain or off-chain
    */
