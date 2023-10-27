@@ -61,7 +61,7 @@ import { FiatRampService, FiatRampWidgetParams } from './fiatRamp';
 import { getItemRequirementsFromRequirements } from './smartCheckout/itemRequirements';
 import { CheckoutError, CheckoutErrorType } from './errors';
 import { AvailabilityService, availabilityService } from './availability';
-import { load } from './widgets/load';
+import { loadUnresolved } from './widgets/load';
 import { WidgetsInit } from './types/widgets';
 
 const SANDBOX_CONFIGURATION = {
@@ -97,9 +97,35 @@ export class Checkout {
    * Loads the widgets bundle and initiate the widgets factory.
    * @param {WidgetsInit} init - The initialisation parameters for loading the widgets bundle and applying configuration
    */
-  public async widgets(init: WidgetsInit) {
-    await load(init.version);
-    return new ImmutableCheckoutWidgets.WidgetsFactory(this, init.config);
+  public async widgets(init: WidgetsInit): Promise<ImmutableCheckoutWidgets.WidgetsFactory> {
+    const checkout = this;
+    const factory = new Promise<ImmutableCheckoutWidgets.WidgetsFactory>((resolve, reject) => {
+      function checkForWidgetsFactory() {
+        if (typeof ImmutableCheckoutWidgets !== 'undefined') {
+          resolve(new ImmutableCheckoutWidgets.WidgetsFactory(checkout, init.config));
+        }
+      }
+
+      try {
+        const script = loadUnresolved(init.version);
+        if (script.loaded) {
+          // eslint-disable-next-line no-console
+          console.warn('Checkout widgets script is already loaded');
+          checkForWidgetsFactory();
+        } else {
+          const observer = new MutationObserver((_, obs) => {
+            checkForWidgetsFactory();
+            obs.disconnect();
+          });
+
+          observer.observe(document.head, { childList: true, subtree: true });
+        }
+      } catch (err) {
+        reject(err);
+      }
+    });
+
+    return factory;
   }
 
   /**

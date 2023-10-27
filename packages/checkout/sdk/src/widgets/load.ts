@@ -22,7 +22,7 @@ export function loadUnresolved(
 
   const tag = document.createElement('script');
 
-  let cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${validVersion}/dist/browser/checkout.js`;
+  let cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${validVersion}/dist/browser/checkout/widgets.js`;
   if (useLocalBundle()) cdnUrl = `http://${window.location.host}/lib/js/widgets.js`;
 
   tag.setAttribute('data-product', 'checkout');
@@ -33,20 +33,3 @@ export function loadUnresolved(
 
   return { loaded: false, element: tag };
 }
-
-/**
- * Creates and appends a checkout widget script to the document head.
- * @param version - The desired widgets bundle version.
- */
-export const load = (version?: SemanticVersion): Promise<void> => new Promise((resolve, reject) => {
-  try {
-    const script = loadUnresolved(version);
-    if (script.loaded) {
-      resolve();
-    } else {
-      script.element.onload = () => resolve();
-    }
-  } catch (err) {
-    reject(err);
-  }
-});
