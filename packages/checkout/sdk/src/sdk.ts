@@ -1,4 +1,3 @@
-/* eslint-disable eqeqeq */
 /* eslint-disable class-methods-use-this */
 import { Web3Provider } from '@ethersproject/providers';
 import { ethers } from 'ethers';
