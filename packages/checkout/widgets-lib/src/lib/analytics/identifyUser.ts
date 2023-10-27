@@ -14,8 +14,13 @@ export async function identifyUser(
   const walletAddress = (await provider.getSigner().getAddress()).toLowerCase();
   const isMetaMask = isMetaMaskProvider(provider);
   const isPassport = isPassportProvider(provider);
-  identify(walletAddress, {
-    isMetaMask,
-    isPassportWallet: isPassport,
-  });
+  try {
+    identify(walletAddress, {
+      isMetaMask,
+      isPassportWallet: isPassport,
+    });
+  } catch (err: any) {
+    // eslint-disable-next-line no-console
+    console.log('identifyUser', err);
+  }
 }
