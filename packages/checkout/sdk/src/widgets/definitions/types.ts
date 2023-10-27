@@ -9,6 +9,7 @@ import {
   OnRampEventType,
   OnRampFailed,
   OnRampSuccess,
+  OrchestrationEventData,
   OrchestrationEventType,
   SwapEventType,
   SwapFailed,
@@ -70,11 +71,11 @@ export type WidgetEventTypes = {
 };
 
 export type WidgetEventData = {
-  [WidgetType.CONNECT]: ConnectionSuccess | ConnectionFailed,
-  [WidgetType.WALLET]: WalletNetworkSwitchEvent | WalletDisconnectWalletEvent,
-  [WidgetType.SWAP]: SwapSuccess | SwapFailed | SwapRejected,
-  [WidgetType.BRIDGE]: BridgeSuccess | BridgeFailed,
-  [WidgetType.ONRAMP]: OnRampSuccess | OnRampFailed,
+  [WidgetType.CONNECT]: ConnectionSuccess | ConnectionFailed | OrchestrationEventData,
+  [WidgetType.WALLET]: WalletNetworkSwitchEvent | WalletDisconnectWalletEvent | OrchestrationEventData,
+  [WidgetType.SWAP]: SwapSuccess | SwapFailed | SwapRejected | OrchestrationEventData,
+  [WidgetType.BRIDGE]: BridgeSuccess | BridgeFailed | OrchestrationEventData,
+  [WidgetType.ONRAMP]: OnRampSuccess | OnRampFailed | OrchestrationEventData,
 };
 
 /**
