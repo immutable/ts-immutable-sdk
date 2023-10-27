@@ -140,17 +140,17 @@ export default [
   // Export ES Modules
   ...buildBundles(),
 
-  // build global.d.ts
-  {
-    input: `../packages/checkout/widgets-lib/src/global.d.ts`,
-    output: {
-      file: `./dist/global.d.ts`,
-      format: 'es',
-    },
-    plugins: [
-      dts({
-        respectExternal: true,
-      }),
-    ],
-  },
+  // // build global.d.ts
+  // {
+  //   input: `../packages/checkout/widgets-lib/src/global.d.ts`,
+  //   output: {
+  //     file: `./dist/global.d.ts`,
+  //     format: 'es',
+  //   },
+  //   plugins: [
+  //     dts({
+  //       respectExternal: true,
+  //     }),
+  //   ],
+  // },
 ];
