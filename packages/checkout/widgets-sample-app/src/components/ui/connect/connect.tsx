@@ -19,13 +19,13 @@ function ConnectUI() {
     return (factory as any).create(WidgetType.CONNECT, {})
   }, [factory]);
   const [provider, setProvider] = useState();
-  
+
   useEffect(() => {
-    if(!checkout) return;
     (async () => {
-      setFactory(await checkout.widgets({config: {theme: WidgetTheme.DARK}}))
+      setFactory(await checkout.widgets({config: {theme: WidgetTheme.DARK}}));
     })()
-  }, [checkout])
+  }, [checkout]);
+
   useEffect(() => {
     if(!connect) return;
     connect.mount(CONNECT_TARGET_ID)
