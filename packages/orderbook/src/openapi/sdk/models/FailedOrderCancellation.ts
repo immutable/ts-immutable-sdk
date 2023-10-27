@@ -19,7 +19,7 @@ export namespace FailedOrderCancellation {
    * Reason code indicating why the order failed to be cancelled
    */
   export enum reason_code {
-    ALREADY_FILLED = 'ALREADY_FILLED',
+    FILLED = 'FILLED',
   }
 
 

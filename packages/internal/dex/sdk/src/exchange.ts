@@ -169,6 +169,7 @@ export class Exchange {
 
     const swap = getSwap(
       tokenIn,
+      tokenOut,
       adjustedQuote,
       fromAddress,
       slippagePercent,
