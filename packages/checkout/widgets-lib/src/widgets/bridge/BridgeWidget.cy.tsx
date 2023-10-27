@@ -220,7 +220,7 @@ describe('Bridge Widget tests', () => {
         >
           <BridgeWidget
             config={config}
-            params={params}
+            {...params}
           />
         </ConnectLoaderTestComponent>,
       );
@@ -258,7 +258,7 @@ describe('Bridge Widget tests', () => {
         >
           <BridgeWidget
             config={config}
-            params={params}
+            {...params}
           />
         </ConnectLoaderTestComponent>,
       );
@@ -296,7 +296,7 @@ describe('Bridge Widget tests', () => {
         >
           <BridgeWidget
             config={config}
-            params={params}
+            {...params}
           />
         </ConnectLoaderTestComponent>,
       );
@@ -316,7 +316,7 @@ describe('Bridge Widget tests', () => {
         >
           <BridgeWidget
             config={config}
-            params={params}
+            {...params}
           />
         </ConnectLoaderTestComponent>,
       );
@@ -397,7 +397,7 @@ describe('Bridge Widget tests', () => {
               isSwapEnabled: true,
               isOnRampEnabled: true,
             }}
-            params={params}
+            {...params}
           />
         </ConnectLoaderTestComponent>,
       );
@@ -476,7 +476,7 @@ describe('Bridge Widget tests', () => {
                 isSwapEnabled: true,
                 isOnRampEnabled: true,
               }}
-              params={params}
+              {...params}
             />
           </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
@@ -527,7 +527,7 @@ describe('Bridge Widget tests', () => {
                 isSwapEnabled: true,
                 isOnRampEnabled: true,
               }}
-              params={params}
+              {...params}
             />
           </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
@@ -584,7 +584,7 @@ describe('Bridge Widget tests', () => {
                 isSwapEnabled: true,
                 isOnRampEnabled: true,
               }}
-              params={params}
+              {...params}
             />
           </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
@@ -638,7 +638,7 @@ describe('Bridge Widget tests', () => {
                 isSwapEnabled: true,
                 isOnRampEnabled: true,
               }}
-              params={params}
+              {...params}
             />
           </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
@@ -692,7 +692,7 @@ describe('Bridge Widget tests', () => {
                 isSwapEnabled: true,
                 isOnRampEnabled: true,
               }}
-              params={params}
+              {...params}
             />
           </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,

@@ -3,14 +3,14 @@ import {
 } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import {
-  ChainId, ChainName, Checkout, WidgetTheme,
+  ChainId, ChainName, Checkout, SwapWidgetParams, WidgetTheme,
 } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { BiomeCombinedProviders } from '@biom3/react';
 import { Web3Provider } from '@ethersproject/providers';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
-import { SwapWidget, SwapWidgetParams } from './SwapWidget';
+import { SwapWidget } from './SwapWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { IMX_ADDRESS_ZKEVM } from '../../lib';
 import { quotesProcessor } from './functions/FetchQuote';
@@ -128,7 +128,7 @@ describe('SwapWidget tests', () => {
             initialStateOverride={connectLoaderState}
           >
             <SwapWidget
-              params={params}
+              {...params}
               config={config}
             />
           </ConnectLoaderTestComponent>
@@ -169,7 +169,7 @@ describe('SwapWidget tests', () => {
             initialStateOverride={connectLoaderState}
           >
             <SwapWidget
-              params={params}
+              {...params}
               config={config}
             />
           </ConnectLoaderTestComponent>
@@ -210,7 +210,7 @@ describe('SwapWidget tests', () => {
             initialStateOverride={connectLoaderState}
           >
             <SwapWidget
-              params={params}
+              {...params}
               config={config}
             />
           </ConnectLoaderTestComponent>
@@ -246,7 +246,7 @@ describe('SwapWidget tests', () => {
             initialStateOverride={connectLoaderState}
           >
             <SwapWidget
-              params={params}
+              {...params}
               config={config}
             />
           </ConnectLoaderTestComponent>
@@ -308,7 +308,7 @@ describe('SwapWidget tests', () => {
             initialStateOverride={connectLoaderState}
           >
             <SwapWidget
-              params={params}
+              {...params}
               config={config}
             />
           </ConnectLoaderTestComponent>
@@ -346,7 +346,7 @@ describe('SwapWidget tests', () => {
           >
             <SwapWidget
               config={config}
-              params={params}
+              {...params}
             />
           </ConnectLoaderTestComponent>
           ,
@@ -385,7 +385,7 @@ describe('SwapWidget tests', () => {
           >
             <SwapWidget
               config={config}
-              params={params}
+              {...params}
             />
           </ConnectLoaderTestComponent>
           ,
@@ -408,7 +408,7 @@ describe('SwapWidget tests', () => {
           >
             <SwapWidget
               config={config}
-              params={params}
+              {...params}
             />
           </ConnectLoaderTestComponent>
         </CustomAnalyticsProvider>,
@@ -488,7 +488,7 @@ describe('SwapWidget tests', () => {
               <ConnectLoaderTestComponent
                 initialStateOverride={connectLoaderState}
               >
-                <SwapWidget params={params} config={config} />
+                <SwapWidget {...params} config={config} />
               </ConnectLoaderTestComponent>
             </CustomAnalyticsProvider>
           </BiomeCombinedProviders>,
