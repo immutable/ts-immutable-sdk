@@ -2,8 +2,6 @@ import {
   WidgetEvent,
   IMTBLWidgetEvents,
   SaleEventType,
-  SaleSuccess,
-  SaleFailed,
 } from '@imtbl/checkout-sdk';
 import { ExecuteOrderResponse } from './types';
 
@@ -29,7 +27,7 @@ export const sendSaleSuccessEvent = (
   eventTarget: Window | EventTarget,
   data: ExecuteOrderResponse,
 ) => {
-  const event = new CustomEvent<WidgetEvent<SaleSuccess>>(
+  const event = new CustomEvent<WidgetEvent<any>>(
     IMTBLWidgetEvents.IMTBL_SALE_WIDGET_EVENT,
     {
       detail: {
@@ -47,7 +45,7 @@ export const sendSaleFailedEvent = (
   eventTarget: Window | EventTarget,
   reason: string,
 ) => {
-  const event = new CustomEvent<WidgetEvent<SaleFailed>>(
+  const event = new CustomEvent<WidgetEvent<any>>(
     IMTBLWidgetEvents.IMTBL_SALE_WIDGET_EVENT,
     {
       detail: {
