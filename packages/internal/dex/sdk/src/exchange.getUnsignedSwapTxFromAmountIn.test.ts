@@ -228,8 +228,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       const decodedResults = erc20ContractInterface.decodeFunctionData('approve', tx.approval.transaction.data);
       expect(decodedResults[0]).toEqual(TEST_ROUTER_ADDRESS);
-      // we have already approved 1000000000000000000, so we expect to approve 1000000000000000000 more
-      expect(decodedResults[1].toString()).toEqual(APPROVED_AMOUNT.value.toString());
+      // we have already approved 1000000000000000000 but this is not enough, so we expect to approve the full amount
+      expect(decodedResults[1].toString()).toEqual(amountIn.value.toString());
       expect(tx.approval.transaction.to).toEqual(params.inputToken);
       expect(tx.approval.transaction.from).toEqual(params.fromAddress);
       expect(tx.approval.transaction.value).toEqual(0); // we do not want to send any ETH
