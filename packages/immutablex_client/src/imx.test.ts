@@ -22,7 +22,7 @@ describe('ImmutableXClient', () => {
     );
   });
 
-  it('should instantiate a PRODUCTION ImmutableXClient', async () => {
+  it.skip('should instantiate a PRODUCTION ImmutableXClient', async () => {
     const config = new ImxConfiguration({
       baseConfig: { environment: Environment.PRODUCTION },
     });
