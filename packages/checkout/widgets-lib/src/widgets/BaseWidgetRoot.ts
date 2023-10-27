@@ -41,6 +41,10 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
   }
 
   destroy(): void {
+    this.properties = this.getValidatedProperties({
+      params: {},
+      config: {},
+    });
     this.reactRoot?.unmount();
     document.getElementById(this.targetId as string)?.replaceChildren();
     this.reactRoot = undefined;
