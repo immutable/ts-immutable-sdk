@@ -14,7 +14,7 @@ describe('load', () => {
       expect(document.head.innerHTML).toBe(
         '<script data-product="checkout" '
         + 'data-version="__SDK_VERSION__" '
-        + `src="https://cdn.jsdelivr.net/npm/@imtbl/sdk@${SDK_VERSION}/dist/browser/checkout.js"></script>`,
+        + `src="https://cdn.jsdelivr.net/npm/@imtbl/sdk@${SDK_VERSION}/dist/browser/checkout/widgets.js"></script>`,
       );
     });
 
@@ -25,7 +25,7 @@ describe('load', () => {
       expect(document.head.innerHTML).toBe(
         '<script data-product="checkout" '
         + 'data-version="__SDK_VERSION__" '
-        + `src="https://cdn.jsdelivr.net/npm/@imtbl/sdk@${SDK_VERSION}/dist/browser/checkout.js"></script>`,
+        + `src="https://cdn.jsdelivr.net/npm/@imtbl/sdk@${SDK_VERSION}/dist/browser/checkout/widgets.js"></script>`,
       );
     });
 
@@ -38,7 +38,7 @@ describe('load', () => {
       expect(document.head.innerHTML).toBe(
         '<script data-product="checkout" '
         + 'data-version="__SDK_VERSION__" '
-        + `src="https://cdn.jsdelivr.net/npm/@imtbl/sdk@${SDK_VERSION}/dist/browser/checkout.js"></script>`,
+        + `src="https://cdn.jsdelivr.net/npm/@imtbl/sdk@${SDK_VERSION}/dist/browser/checkout/widgets.js"></script>`,
       );
     });
   });
