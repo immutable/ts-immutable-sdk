@@ -9,7 +9,6 @@ import { QuoteResult } from 'lib/getQuotesForRoutes';
 import { NativeTokenService, canUnwrapToken } from 'lib/nativeTokenService';
 import { Coin, CoinAmount } from 'types';
 import { Interface } from 'ethers/lib/utils';
-import { TEST_ROUTER_ADDRESS } from 'test/utils';
 import { SecondaryFee, TransactionDetails } from '../../types';
 import { calculateGasFee } from './gas';
 import { slippageToFraction } from './slippage';
@@ -33,11 +32,10 @@ function buildSinglePoolSwap(
   amountOut: string,
   routerContract: Interface,
   paymentsContract: Interface,
+  routerContractAddress: string,
 ) {
   const isTokenInNative = tokenIn.type === 'native';
   const isTokenOutNative = tokenOut.type === 'native';
-
-  const routerContractTODO = TEST_ROUTER_ADDRESS;
 
   const calldatas: string[] = [];
 
@@ -48,7 +46,7 @@ function buildSinglePoolSwap(
           tokenIn: route.tokenPath[0].address,
           tokenOut: route.tokenPath[1].address,
           fee: route.pools[0].fee,
-          recipient: isTokenOutNative ? routerContractTODO : fromAddress,
+          recipient: isTokenOutNative ? routerContractAddress : fromAddress,
           amountIn,
           amountOutMinimum: amountOut,
           sqrtPriceLimitX96: 0,
@@ -70,7 +68,7 @@ function buildSinglePoolSwap(
         tokenIn: route.tokenPath[0].address,
         tokenOut: route.tokenPath[1].address,
         fee: route.pools[0].fee,
-        recipient: isTokenOutNative ? routerContractTODO : fromAddress,
+        recipient: isTokenOutNative ? routerContractAddress : fromAddress,
         amountInMaximum: amountIn,
         amountOut,
         sqrtPriceLimitX96: 0,
@@ -156,23 +154,26 @@ function buildMultiPoolSwap(
   amountOut: string,
   routerContract: Interface,
   paymentsContract: Interface,
+  routerContractAddress: string,
 ) {
   const path: string = encodeRouteToPath(route, trade.tradeType === Uniswap.TradeType.EXACT_OUTPUT);
   const calldatas: string[] = [];
+  const isTokenInNative = tokenIn.type === 'native';
+  const isTokenOutNative = tokenOut.type === 'native';
 
   if (trade.tradeType === Uniswap.TradeType.EXACT_INPUT) {
     calldatas.push(
       routerContract.encodeFunctionData('exactInput', [
         {
           path,
-          recipient: fromAddress,
+          recipient: isTokenOutNative ? routerContractAddress : fromAddress,
           amountIn,
           amountOutMinimum: amountOut,
         },
       ]),
     );
 
-    if (tokenOut.type === 'native') {
+    if (isTokenOutNative) {
       // Unwrap the output token if the user specified a native token as the output
       calldatas.push(paymentsContract.encodeFunctionData('unwrapWETH9(uint256)', [amountOut]));
     }
@@ -184,19 +185,19 @@ function buildMultiPoolSwap(
     routerContract.encodeFunctionData('exactOutput', [
       {
         path,
-        recipient: fromAddress,
+        recipient: isTokenOutNative ? routerContractAddress : fromAddress,
         amountInMaximum: amountIn,
         amountOut,
       },
     ]),
   );
 
-  if (tokenIn.type === 'native') {
+  if (isTokenInNative) {
     // Refund ETH if the input token is native and the swap is exact output
     calldatas.push(paymentsContract.encodeFunctionData('refundETH'));
   }
 
-  if (tokenOut.type === 'native') {
+  if (isTokenOutNative) {
     // Unwrap the output token if the user specified a native token as the output
     calldatas.push(paymentsContract.encodeFunctionData('unwrapWETH9(uint256)', [amountOut]));
   }
@@ -280,6 +281,7 @@ function buildSwapParameters(
   paymentsContract: Interface,
   maximumAmountIn: string,
   minimumAmountOut: string,
+  routerContractAddress: string,
 ) {
   // @dev we don't support multiple swaps in a single transaction
   // there will always be only one swap in the trade regardless of the trade type
@@ -311,6 +313,7 @@ function buildSwapParameters(
       minimumAmountOut,
       routerContract,
       paymentsContract,
+      routerContractAddress,
     );
   }
 
@@ -336,6 +339,7 @@ function buildSwapParameters(
     minimumAmountOut,
     routerContract,
     paymentsContract,
+    routerContractAddress,
   );
 }
 
@@ -348,6 +352,7 @@ function createSwapCallParameters(
   secondaryFees: SecondaryFee[],
   maximumAmountIn: string,
   minimumAmountOut: string,
+  routerContractAddress: string,
 ): string {
   const secondaryFeeContract = SecondaryFee__factory.createInterface();
   const routerContract = SwapRouter.INTERFACE;
@@ -364,6 +369,7 @@ function createSwapCallParameters(
     paymentsContract,
     maximumAmountIn,
     minimumAmountOut,
+    routerContractAddress,
   );
 
   // Create the multicall transaction using the calldatas generated above
@@ -381,6 +387,7 @@ function createSwapParameters(
   slippage: number,
   deadline: number,
   secondaryFees: SecondaryFee[],
+  routerContractAddress: string,
 ): { calldata: string; maximumAmountIn: string } {
   // Create an unchecked trade to be used in generating swap parameters.
   const uncheckedTrade = Trade.createUncheckedTrade({
@@ -414,6 +421,7 @@ function createSwapParameters(
       secondaryFees,
       maximumAmountIn,
       minimumAmountOut,
+      routerContractAddress,
     ),
     maximumAmountIn,
   };
@@ -442,6 +450,7 @@ export function getSwap(
     slippage,
     deadline,
     secondaryFees,
+    routerContractAddress,
   );
 
   // TODO: Add additional gas fee estimates for secondary fees
