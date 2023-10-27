@@ -1,3 +1,4 @@
+/* eslint-disable eqeqeq */
 /* eslint-disable class-methods-use-this */
 import { Web3Provider } from '@ethersproject/providers';
 import { ethers } from 'ethers';
@@ -100,24 +101,31 @@ export class Checkout {
   public async widgets(init: WidgetsInit): Promise<ImmutableCheckoutWidgets.WidgetsFactory> {
     const checkout = this;
     const factory = new Promise<ImmutableCheckoutWidgets.WidgetsFactory>((resolve, reject) => {
+      function checkForWidgetsFactory() {
+        if (typeof ImmutableCheckoutWidgets !== 'undefined') {
+          resolve(new ImmutableCheckoutWidgets.WidgetsFactory(checkout, init.config));
+        }
+      }
+
       try {
         const script = loadUnresolved(init.version);
         if (script.loaded) {
-          while (ImmutableCheckoutWidgets === undefined);
-          resolve(new ImmutableCheckoutWidgets.WidgetsFactory(checkout, init.config));
+          // eslint-disable-next-line no-console
+          console.warn('Checkout widgets script is already loaded');
+          checkForWidgetsFactory();
         } else {
-          script.element.onload = () => {
-            while (ImmutableCheckoutWidgets === undefined);
-            resolve(new ImmutableCheckoutWidgets.WidgetsFactory(checkout, init.config));
-          };
+          const observer = new MutationObserver((_, obs) => {
+            checkForWidgetsFactory();
+            obs.disconnect();
+          });
+
+          observer.observe(document.head, { childList: true, subtree: true });
         }
       } catch (err) {
         reject(err);
       }
     });
 
-    // eslint-disable-next-line no-console
-    console.log('factory', factory);
     return factory;
   }
 
