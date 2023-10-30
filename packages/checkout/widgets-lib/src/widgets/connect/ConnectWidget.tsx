@@ -47,13 +47,14 @@ export type ConnectWidgetInputs = ConnectWidgetParams & {
   deepLink?: ConnectWidgetViews;
   sendCloseEventOverride?: () => void;
   targetLayer?: ConnectTargetLayer;
+  checkout: Checkout;
 };
 
 export function ConnectWidget({
   config,
   sendCloseEventOverride,
   web3Provider,
-  passport,
+  checkout,
   targetLayer,
   deepLink = ConnectWidgetViews.CONNECT_WALLET,
 }: ConnectWidgetInputs) {
@@ -81,7 +82,6 @@ export function ConnectWidget({
 
   const networkToSwitchTo = targetLayer ?? ConnectTargetLayer.LAYER2;
 
-  const checkout = new Checkout({ baseConfig: { environment } });
   const targetChainId = getTargetLayerChainId(checkout.config, targetLayer ?? ConnectTargetLayer.LAYER2);
 
   const { identify, page } = useAnalytics();
@@ -97,23 +97,21 @@ export function ConnectWidget({
   }, [web3Provider]);
 
   useEffect(() => {
-    if (!passport) return;
-
-    connectDispatch({
-      payload: {
-        type: ConnectActions.SET_PASSPORT,
-        passport,
-      },
-    });
-  }, [passport]);
-
-  useEffect(() => {
     connectDispatch({
       payload: {
         type: ConnectActions.SET_CHECKOUT,
         checkout,
       },
     });
+
+    if (checkout.passport) {
+      connectDispatch({
+        payload: {
+          type: ConnectActions.SET_PASSPORT,
+          passport: checkout.passport,
+        },
+      });
+    }
 
     connectDispatch({
       payload: {

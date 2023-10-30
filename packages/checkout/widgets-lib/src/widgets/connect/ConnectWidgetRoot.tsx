@@ -26,6 +26,7 @@ export class Connect extends Base<WidgetType.CONNECT> {
         >
           <ConnectWidget
             config={this.strongConfig()}
+            checkout={this.checkout}
             {...this.properties.params}
           />
         </CustomAnalyticsProvider>

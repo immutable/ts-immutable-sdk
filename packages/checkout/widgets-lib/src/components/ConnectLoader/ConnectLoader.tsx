@@ -12,7 +12,6 @@ import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import React, {
   useCallback, useEffect, useMemo, useReducer, useState,
 } from 'react';
-import { Passport } from '@imtbl/passport';
 import {
   ConnectLoaderActions,
   ConnectLoaderContext,
@@ -46,7 +45,7 @@ export interface ConnectLoaderParams {
   targetLayer?: ConnectTargetLayer;
   walletProvider?: WalletProviderName;
   web3Provider?: Web3Provider;
-  passport?: Passport;
+  checkout: Checkout;
   allowedChains: ChainId[];
 }
 
@@ -65,11 +64,12 @@ export function ConnectLoader({
     connectLoaderDispatch,
   }), [connectLoaderState, connectLoaderDispatch]);
   const {
-    connectionStatus, deepLink, checkout, provider,
+    connectionStatus, deepLink, provider,
   } = connectLoaderState;
   const {
-    targetLayer, walletProvider, allowedChains, passport,
+    targetLayer, walletProvider, allowedChains, checkout,
   } = params;
+  const { passport } = checkout;
   const networkToSwitchTo = targetLayer ?? ConnectTargetLayer.LAYER2;
 
   const biomeTheme: BaseTokens = widgetConfig.theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
@@ -162,15 +162,6 @@ export function ConnectLoader({
       removeChainChangedListener(provider, handleChainChanged);
     };
   }, [provider, identify]);
-
-  useEffect(() => {
-    connectLoaderDispatch({
-      payload: {
-        type: ConnectLoaderActions.SET_CHECKOUT,
-        checkout: new Checkout({ baseConfig: { environment: widgetConfig.environment } }),
-      },
-    });
-  }, [widgetConfig]);
 
   useEffect(() => {
     if (window === undefined) {
@@ -301,13 +292,6 @@ export function ConnectLoader({
           break;
         }
         default:
-
-          // connectLoaderDispatch({
-          //   payload: {
-          //     type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
-          //     connectionStatus: ConnectionStatus.ERROR,
-          //   },
-          // });
       }
     }) as EventListener;
 
@@ -348,7 +332,7 @@ export function ConnectLoader({
             config={widgetConfig}
             targetLayer={networkToSwitchTo}
             web3Provider={provider}
-            passport={passport}
+            checkout={checkout}
             deepLink={deepLink}
             sendCloseEventOverride={closeEvent}
           />
