@@ -2,6 +2,7 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { ethers } from 'ethers';
 import { Environment } from '@imtbl/config';
+import { Passport } from '@imtbl/passport';
 import * as balances from './balances';
 import * as tokens from './tokens';
 import * as connect from './connect';
@@ -68,6 +69,7 @@ const SANDBOX_CONFIGURATION = {
   baseConfig: {
     environment: Environment.SANDBOX,
   },
+  passport: undefined,
 };
 
 // Checkout SDK
@@ -80,6 +82,8 @@ export class Checkout {
 
   readonly availability: AvailabilityService;
 
+  readonly passport?: Passport;
+
   /**
    * Constructs a new instance of the CheckoutModule class.
    * @param {CheckoutModuleConfiguration} [config=SANDBOX_CONFIGURATION] - The configuration object for the CheckoutModule.
@@ -91,6 +95,7 @@ export class Checkout {
     this.fiatRampService = new FiatRampService(this.config);
     this.readOnlyProviders = new Map<ChainId, ethers.providers.JsonRpcProvider>();
     this.availability = availabilityService(this.config.isDevelopment, this.config.isProduction);
+    this.passport = config.passport;
   }
 
   /**
@@ -138,7 +143,7 @@ export class Checkout {
   ): Promise<CreateProviderResult> {
     return await provider.createProvider(
       params.walletProvider,
-      params.passport,
+      this.passport,
     );
   }
 

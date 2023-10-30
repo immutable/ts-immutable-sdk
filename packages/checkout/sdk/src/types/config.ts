@@ -1,13 +1,22 @@
 import { ModuleConfiguration } from '@imtbl/config';
 import { ExchangeOverrides } from '@imtbl/dex-sdk';
+import { Passport } from '@imtbl/passport';
 import { TokenInfo } from './tokenInfo';
 import { ChainId } from './chains';
 
 export interface CheckoutOverrides {}
+/**
+ * A type representing checkout SDK configurations.
+ * @property {boolean} isOnRampEnabled - To enable on-ramp feature in Checkout sdk.
+ * @property {boolean} isSwapEnabled - To enable swap feature in Checkout sdk.
+ * @property {boolean} isBridgeEnabled - To enable bridge feature in Checkout sdk.
+ * @property {Passport} passport - To enable passport wallet with Checkout sdk.
+*/
 export interface CheckoutModuleConfiguration extends ModuleConfiguration<CheckoutOverrides> {
   isOnRampEnabled?: boolean,
   isSwapEnabled?: boolean,
   isBridgeEnabled?: boolean,
+  passport?: Passport
 }
 
 /**
