@@ -35,7 +35,7 @@ function ImxWorkflow() {
       addMessage('Register off chain', result);
       setIsRegistered(true);
     } catch (err) {
-      addMessage('Error egistering off chain', err);
+      addMessage('Register off chain', err);
     } finally {
       setIsLoading(false);
     }
