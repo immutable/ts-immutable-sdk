@@ -126,17 +126,6 @@ describe('Passport', () => {
       expect(result).toBe(passportImxProvider);
       expect(getProviderMock).toHaveBeenCalled();
     });
-
-    it('should call getProviderSilent if useCachedSession is true', async () => {
-      const passportImxProvider = {} as PassportImxProvider;
-      getProviderSilentMock.mockResolvedValue(passportImxProvider);
-
-      const result = await passport.connectImx({ useCachedSession: true });
-
-      expect(result).toBe(passportImxProvider);
-      expect(getProviderSilentMock).toHaveBeenCalled();
-      expect(getProviderMock).not.toHaveBeenCalled();
-    });
   });
 
   describe('connectImxSilent', () => {
@@ -259,10 +248,10 @@ describe('Passport', () => {
     });
   });
 
-  describe('signIn', () => {
+  describe('login', () => {
     it('should login silently if there is a user', async () => {
       loginSilentMock.mockReturnValue(mockUserImx);
-      const user = await passport.signIn();
+      const user = await passport.login();
 
       expect(loginSilentMock).toBeCalledTimes(1);
       expect(authLoginMock).toBeCalledTimes(0);
@@ -272,7 +261,7 @@ describe('Passport', () => {
     it('should signIn and get a user', async () => {
       loginSilentMock.mockReturnValue(null);
       authLoginMock.mockReturnValue(mockUserImx);
-      const user = await passport.signIn();
+      const user = await passport.login();
 
       expect(loginSilentMock).toBeCalledTimes(1);
       expect(authLoginMock).toBeCalledTimes(1);
@@ -281,7 +270,7 @@ describe('Passport', () => {
 
     it('should only login silently if useCachedSession is true', async () => {
       loginSilentMock.mockReturnValue(mockUserImx);
-      const user = await passport.signIn({ useCachedSession: true });
+      const user = await passport.login({ useCachedSession: true });
 
       expect(loginSilentMock).toBeCalledTimes(1);
       expect(authLoginMock).toBeCalledTimes(0);
