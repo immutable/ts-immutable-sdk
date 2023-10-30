@@ -4,6 +4,7 @@ import resolve from '@rollup/plugin-node-resolve';
 import json from '@rollup/plugin-json';
 import terser from '@rollup/plugin-terser';
 import replace from '@rollup/plugin-replace';
+import nodePolyfills from 'rollup-plugin-polyfill-node';
 
 const defaultPlugin = [
   replace({
@@ -40,6 +41,7 @@ export default [
       }),
       json(),
       commonjs(),
+      nodePolyfills(),
       ...defaultPlugin,
       terser(),
     ]
