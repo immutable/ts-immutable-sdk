@@ -3,7 +3,7 @@ import {
   GetSignableTradeRequest,
   StarkSigner,
   TradesApi,
-  TradesApiCreateTradeRequest,
+  TradesApiCreateTradeV3Request,
 } from '@imtbl/core-sdk';
 import { PassportErrorType, withPassportError } from '../../errors/passportError';
 import { UserImx } from '../../types';
@@ -49,7 +49,7 @@ export async function createTrade({
     const starkSignature = await starkSigner.signMessage(payloadHash);
     const { data: signableResultData } = getSignableTradeResponse;
 
-    const tradeParams: TradesApiCreateTradeRequest = {
+    const tradeParams: TradesApiCreateTradeV3Request = {
       createTradeRequest: {
         include_fees: true,
         fees: request?.fees,

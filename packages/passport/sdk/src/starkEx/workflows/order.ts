@@ -4,7 +4,7 @@ import {
   GetSignableCancelOrderRequest,
   GetSignableOrderRequest,
   OrdersApi,
-  OrdersApiCreateOrderRequest,
+  OrdersApiCreateOrderV3Request,
   StarkSigner,
   UnsignedOrderRequest,
 } from '@imtbl/core-sdk';
@@ -73,7 +73,7 @@ export async function createOrder({
 
     const signableResultData = getSignableOrderResponse.data;
 
-    const orderParams: OrdersApiCreateOrderRequest = {
+    const orderParams: OrdersApiCreateOrderV3Request = {
       createOrderRequest: {
         include_fees: true,
         fees: request.fees,
