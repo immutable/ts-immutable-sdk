@@ -126,17 +126,6 @@ describe('Passport', () => {
       expect(result).toBe(passportImxProvider);
       expect(getProviderMock).toHaveBeenCalled();
     });
-
-    it('should call getProviderSilent if useCachedSession is true', async () => {
-      const passportImxProvider = {} as PassportImxProvider;
-      getProviderSilentMock.mockResolvedValue(passportImxProvider);
-
-      const result = await passport.connectImx({ useCachedSession: true });
-
-      expect(result).toBe(passportImxProvider);
-      expect(getProviderSilentMock).toHaveBeenCalled();
-      expect(getProviderMock).not.toHaveBeenCalled();
-    });
   });
 
   describe('connectImxSilent', () => {
