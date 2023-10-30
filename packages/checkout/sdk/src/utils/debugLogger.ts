@@ -2,7 +2,7 @@ import { CheckoutConfiguration } from '../config';
 
 export const debugLogger = (config: CheckoutConfiguration, debugString: string, seconds: number) => {
   // eslint-disable-next-line no-console
-  if (!config.isProduction) console.debug(debugString, seconds);
+  if (!config.isProduction) console.info(debugString, seconds);
 };
 
 export const measureAsyncExecution = async <T>(

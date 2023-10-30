@@ -7,7 +7,7 @@ import { ConfirmationScreen } from './confirmation';
 import { Passport } from './Passport';
 import { PassportImxProvider, PassportImxProviderFactory } from './starkEx';
 import { Networks, OidcConfiguration } from './types';
-import { mockUser, mockLinkedAddresses } from './test/mocks';
+import { mockUser, mockLinkedAddresses, mockUserImx } from './test/mocks';
 
 jest.mock('./authManager');
 jest.mock('./magicAdapter');
@@ -245,6 +245,36 @@ describe('Passport', () => {
       const result = await passport.getLinkedAddresses();
 
       expect(result).toHaveLength(0);
+    });
+  });
+
+  describe('login', () => {
+    it('should login silently if there is a user', async () => {
+      loginSilentMock.mockReturnValue(mockUserImx);
+      const user = await passport.login();
+
+      expect(loginSilentMock).toBeCalledTimes(1);
+      expect(authLoginMock).toBeCalledTimes(0);
+      expect(user).toEqual(mockUser.profile);
+    });
+
+    it('should signIn and get a user', async () => {
+      loginSilentMock.mockReturnValue(null);
+      authLoginMock.mockReturnValue(mockUserImx);
+      const user = await passport.login();
+
+      expect(loginSilentMock).toBeCalledTimes(1);
+      expect(authLoginMock).toBeCalledTimes(1);
+      expect(user).toEqual(mockUserImx.profile);
+    });
+
+    it('should only login silently if useCachedSession is true', async () => {
+      loginSilentMock.mockReturnValue(mockUserImx);
+      const user = await passport.login({ useCachedSession: true });
+
+      expect(loginSilentMock).toBeCalledTimes(1);
+      expect(authLoginMock).toBeCalledTimes(0);
+      expect(user).toEqual(mockUser.profile);
     });
   });
 });
