@@ -40,7 +40,7 @@ describe('fulfil order', () => {
       },
     });
 
-    const signatures = await actionAll(listing.actions, offerer, provider);
+    const signatures = await actionAll(listing.actions, offerer);
 
     const {
       result: { id: orderId },
@@ -59,7 +59,7 @@ describe('fulfil order', () => {
       [],
     );
 
-    await actionAll(fulfillment.actions, fulfiller, provider);
+    await actionAll(fulfillment.actions, fulfiller);
 
     await waitForOrderToBeOfStatus(sdk, orderId, OrderStatusName.FILLED);
   }, 60_000);

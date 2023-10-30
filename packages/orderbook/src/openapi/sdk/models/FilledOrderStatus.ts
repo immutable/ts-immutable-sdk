@@ -4,7 +4,7 @@
 
 export type FilledOrderStatus = {
   /**
-   * The order status
+   * A terminal order status indicating that an order has been fulfilled.
    */
   name: 'FILLED';
 };

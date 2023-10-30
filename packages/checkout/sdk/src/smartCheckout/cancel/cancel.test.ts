@@ -41,12 +41,14 @@ describe('cancel', () => {
             status: { name: OrderStatusName.ACTIVE },
           },
         }),
-        cancelOrder: jest.fn().mockResolvedValue({
-          unsignedCancelOrderTransaction: {
-            to: '0xTO',
-            from: '0xFROM',
-            nonce: 1,
-          } as PopulatedTransaction,
+        cancelOrdersOnChain: jest.fn().mockResolvedValue({
+          cancellationAction: {
+            buildTransaction: async () => ({
+              to: '0xTO',
+              from: '0xFROM',
+              nonce: 1,
+            }) as PopulatedTransaction,
+          },
         }),
       });
       (signFulfillmentTransactions as jest.Mock).mockResolvedValue({
@@ -78,12 +80,14 @@ describe('cancel', () => {
             status: { name: OrderStatusName.ACTIVE },
           },
         }),
-        cancelOrder: jest.fn().mockResolvedValue({
-          unsignedCancelOrderTransaction: {
-            to: '0xTO',
-            from: '0xFROM',
-            nonce: 1,
-          } as PopulatedTransaction,
+        cancelOrdersOnChain: jest.fn().mockResolvedValue({
+          cancellationAction: {
+            buildTransaction: async () => ({
+              to: '0xTO',
+              from: '0xFROM',
+              nonce: 1,
+            }) as PopulatedTransaction,
+          },
         }),
       });
       (signFulfillmentTransactions as jest.Mock).mockResolvedValue({
@@ -119,12 +123,14 @@ describe('cancel', () => {
             status: { name: OrderStatusName.ACTIVE },
           },
         }),
-        cancelOrder: jest.fn().mockResolvedValue({
-          unsignedCancelOrderTransaction: {
-            to: '0xTO',
-            from: '0xFROM',
-            nonce: 1,
-          } as PopulatedTransaction,
+        cancelOrdersOnChain: jest.fn().mockResolvedValue({
+          cancellationAction: {
+            buildTransaction: async () => ({
+              to: '0xTO',
+              from: '0xFROM',
+              nonce: 1,
+            }) as PopulatedTransaction,
+          },
         }),
       });
       (signFulfillmentTransactions as jest.Mock).mockRejectedValue(new Error('ERROR'));
@@ -147,7 +153,7 @@ describe('cancel', () => {
       const orderId = '1';
 
       (createOrderbookInstance as jest.Mock).mockReturnValue({
-        cancelOrder: jest.fn().mockRejectedValue(
+        cancelOrdersOnChain: jest.fn().mockRejectedValue(
           new CheckoutError(
             'An error occurred while cancelling the order listing',
             CheckoutErrorType.CANCEL_ORDER_LISTING_ERROR,

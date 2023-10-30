@@ -1,6 +1,6 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
-import { providers, Wallet } from 'ethers';
+import { Wallet } from 'ethers';
 import { Action, ActionType } from 'types';
 import { signAndSubmitTx, signMessage } from './sign-and-submit';
 
@@ -8,7 +8,6 @@ import { signAndSubmitTx, signMessage } from './sign-and-submit';
 export async function actionAll(
   actions: Action[],
   wallet: Wallet,
-  provider: providers.Provider,
 ): Promise<string[]> {
   const signatures: string[] = [];
   for (const action of actions) {
@@ -16,7 +15,6 @@ export async function actionAll(
       await signAndSubmitTx(
         await (action.buildTransaction()),
         wallet,
-        provider,
       );
     }
     if (action.type === ActionType.SIGNABLE) {
