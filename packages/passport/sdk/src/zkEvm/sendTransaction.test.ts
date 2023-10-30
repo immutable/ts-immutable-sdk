@@ -87,6 +87,55 @@ describe('sendTransaction', () => {
     );
   });
 
+  it('calls relayerClient.ethSendTransaction with sponsored meta transaction', async () => {
+    (retryWithDelay as jest.Mock).mockResolvedValue({
+      status: RelayerTransactionStatus.SUCCESSFUL,
+      hash: transactionHash,
+    } as RelayerTransaction);
+
+    const mockImxFeeOption = {
+      tokenPrice: '0',
+      tokenSymbol: 'IMX',
+      tokenDecimals: 18,
+      tokenAddress: '0x1337',
+      recipientAddress: '0x7331',
+    };
+
+    relayerClient.imGetFeeOptions.mockResolvedValue([mockImxFeeOption]);
+
+    const result = await sendTransaction({
+      params: [transactionRequest],
+      magicProvider,
+      jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
+      relayerClient: relayerClient as unknown as RelayerClient,
+      user: mockUserZkEvm,
+      guardianClient: guardianClient as unknown as GuardianClient,
+    });
+
+    expect(result).toEqual(transactionHash);
+    expect(guardianClient.validateEVMTransaction).toHaveBeenCalledWith(
+      {
+        chainId: chainIdEip155,
+        nonce,
+        user: mockUserZkEvm,
+        metaTransactions: [
+          {
+            data: transactionRequest.data,
+            revertOnError: true,
+            to: mockUserZkEvm.zkEvm.ethAddress,
+            value: '0x00',
+            nonce,
+          },
+        ],
+      },
+    );
+
+    expect(relayerClient.ethSendTransaction).toHaveBeenCalledWith(
+      mockUserZkEvm.zkEvm.ethAddress,
+      signedTransactions,
+    );
+  });
+
   it('calls guardian.evaluateTransaction with the correct arguments', async () => {
     (retryWithDelay as jest.Mock).mockResolvedValue({
       status: RelayerTransactionStatus.SUCCESSFUL,
