@@ -20,7 +20,7 @@ describe('smartCheckout', () => {
 
   beforeEach(() => {
     jest.resetAllMocks();
-    jest.spyOn(console, 'debug').mockImplementation(() => {});
+    jest.spyOn(console, 'info').mockImplementation(() => {});
     mockProvider = {
       getSigner: jest.fn().mockReturnValue({
         getAddress: jest.fn().mockResolvedValue('0xADDRESS'),

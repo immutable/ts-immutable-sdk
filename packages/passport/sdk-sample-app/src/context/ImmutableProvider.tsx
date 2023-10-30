@@ -104,12 +104,13 @@ const getPassportConfig = (environment: EnvironmentNames): PassportModuleConfigu
 };
 
 const ImmutableContext = createContext<{
-  passportClient?: Passport,
+  passportClient: Passport,
   coreSdkClient: ImmutableX,
   environment: EnvironmentNames,
   setEnvironment?:(environment: EnvironmentNames) => void;
 }>({
       coreSdkClient: new ImmutableX(getCoreSdkConfig(EnvironmentNames.DEV)),
+      passportClient: new Passport(getPassportConfig(EnvironmentNames.DEV)),
       environment: EnvironmentNames.DEV,
     });
 
@@ -123,7 +124,9 @@ export function ImmutableProvider({
   const [coreSdkClient, setCoreSdkClient] = useState<ImmutableX>(
     useContext(ImmutableContext).coreSdkClient,
   );
-  const [passportClient, setPassportClient] = useState<Passport>();
+  const [passportClient, setPassportClient] = useState<Passport>(
+    useContext(ImmutableContext).passportClient,
+  );
 
   useEffect(() => {
     setCoreSdkClient(new ImmutableX(getCoreSdkConfig(environment)));

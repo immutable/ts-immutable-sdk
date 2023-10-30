@@ -62,7 +62,7 @@ describe('balances', () => {
   } as unknown as Web3Provider));
 
   beforeEach(() => {
-    jest.spyOn(console, 'debug').mockImplementation(() => {});
+    jest.spyOn(console, 'info').mockImplementation(() => {});
   });
 
   describe('getBalance()', () => {
@@ -224,7 +224,7 @@ describe('balances', () => {
     beforeEach(() => {
       jest.restoreAllMocks();
       resetBlockscoutClientMap();
-      jest.spyOn(console, 'debug').mockImplementation(() => {});
+      jest.spyOn(console, 'info').mockImplementation(() => {});
       getTokenAllowListMock = jest.fn().mockReturnValue({
         tokens: [
           {

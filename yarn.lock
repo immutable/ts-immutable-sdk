@@ -3254,7 +3254,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/config@workspace:packages/config"
   dependencies:
-    "@imtbl/core-sdk": ^2.0.2
+    "@imtbl/core-sdk": ^2.4.0
     "@magic-ext/oidc": ^1.0.1
     "@metamask/detect-provider": ^2.0.0
     "@rollup/plugin-typescript": ^11.0.0
@@ -3293,9 +3293,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/core-sdk@npm:^2.0.2":
-  version: 2.0.2
-  resolution: "@imtbl/core-sdk@npm:2.0.2"
+"@imtbl/core-sdk@npm:^2.4.0":
+  version: 2.4.0
+  resolution: "@imtbl/core-sdk@npm:2.4.0"
   dependencies:
     "@ethersproject/abi": ^5.0.0
     "@ethersproject/bytes": ^5.0.0
@@ -3305,9 +3305,9 @@ __metadata:
     elliptic: ^6.5.4
     enc-utils: ^3.0.0
     ethereumjs-wallet: ^1.0.2
-    ethers: ^5.6.9
+    ethers: ^5.7.1
     hash.js: ^1.1.7
-  checksum: 181ad3a9bb4811f9f95f1228147ca9e64088efa98c142e507357e5108f232ebfdae12dbe13b7df5cf88b1d4fcf1d0b4a97edbf1f043d45961e4808fe3443561a
+  checksum: 348939509b461551c4664f32f6194a2bd659c0b7cf8c3c3689e3fa183ee6db810f3dc82a16979d01e4c0e6231f98a10ea67aeb1cb7bdc5501bb0c5aa6ade1fe6
   languageName: node
   linkType: hard
 
@@ -3576,7 +3576,7 @@ __metadata:
   resolution: "@imtbl/immutablex-client@workspace:packages/immutablex_client"
   dependencies:
     "@imtbl/config": 0.0.0
-    "@imtbl/core-sdk": ^2.0.2
+    "@imtbl/core-sdk": ^2.4.0
     "@rollup/plugin-typescript": ^11.0.0
     "@swc/jest": ^0.2.24
     "@types/jest": ^29.4.3
@@ -3618,7 +3618,7 @@ __metadata:
     "@biom3/design-tokens": 0.2.4-beta
     "@biom3/react": ^0.10.12
     "@imtbl/config": 0.0.0
-    "@imtbl/core-sdk": ^2.0.2
+    "@imtbl/core-sdk": ^2.4.0
     "@imtbl/immutablex-client": 0.0.0
     "@imtbl/passport": 0.0.0
     "@imtbl/provider": 0.0.0
@@ -3651,7 +3651,7 @@ __metadata:
     "@0xsequence/config": ^0.43.34
     "@ethersproject/providers": ^5.7.2
     "@imtbl/config": 0.0.0
-    "@imtbl/core-sdk": ^2.0.2
+    "@imtbl/core-sdk": ^2.4.0
     "@imtbl/generated-clients": 0.0.0
     "@imtbl/guardian": 0.0.0
     "@imtbl/immutablex-client": 0.0.0
@@ -3693,7 +3693,7 @@ __metadata:
   resolution: "@imtbl/provider@workspace:packages/provider"
   dependencies:
     "@imtbl/config": 0.0.0
-    "@imtbl/core-sdk": ^2.0.2
+    "@imtbl/core-sdk": ^2.4.0
     "@imtbl/toolkit": 0.0.0
     "@magic-ext/oidc": ^1.0.1
     "@metamask/detect-provider": ^2.0.0
@@ -3745,7 +3745,7 @@ __metadata:
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
-    "@imtbl/core-sdk": ^2.0.2
+    "@imtbl/core-sdk": ^2.4.0
     "@imtbl/cryptofiat": 0.0.0
     "@imtbl/generated-clients": 0.0.0
     "@imtbl/guardian": 0.0.0
@@ -3796,7 +3796,7 @@ __metadata:
     "@ethersproject/abstract-signer": ^5.7.0
     "@ethersproject/providers": ^5.7.2
     "@ethersproject/wallet": ^5.7.0
-    "@imtbl/core-sdk": ^2.0.2
+    "@imtbl/core-sdk": ^2.4.0
     "@magic-ext/oidc": ^1.0.1
     "@metamask/detect-provider": ^2.0.0
     "@rollup/plugin-typescript": ^11.0.0
@@ -16395,7 +16395,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ethers@npm:^5.6.9, ethers@npm:^5.7.1, ethers@npm:^5.7.2":
+"ethers@npm:^5.7.1, ethers@npm:^5.7.2":
   version: 5.7.2
   resolution: "ethers@npm:5.7.2"
   dependencies:
@@ -26761,7 +26761,7 @@ __metadata:
   resolution: "sample-app@workspace:packages/provider/src/sample-app"
   dependencies:
     "@biom3/react": ^0.10.12
-    "@imtbl/core-sdk": ^2.0.2
+    "@imtbl/core-sdk": ^2.4.0
     "@imtbl/sdk": 0.0.0
     "@svgr/webpack": ^8.0.1
     "@testing-library/jest-dom": ^5.16.5
