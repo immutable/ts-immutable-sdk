@@ -237,8 +237,11 @@ export const getAllBalances = async (
   config: CheckoutConfiguration,
   web3Provider: Web3Provider,
   walletAddress: string,
-  chainId: ChainId,
+  chainId?: ChainId,
 ): Promise<GetAllBalancesResult> => {
+  // eslint-disable-next-line no-param-reassign
+  chainId ||= await web3Provider.getSigner().getChainId();
+
   const { tokens } = await getTokenAllowList(
     config,
     {

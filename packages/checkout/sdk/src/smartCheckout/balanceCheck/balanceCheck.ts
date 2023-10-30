@@ -1,4 +1,3 @@
-/* eslint-disable arrow-body-style */
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber, Contract } from 'ethers';
 import {
@@ -13,7 +12,7 @@ import {
   NativeItem,
   ERC20Item,
 } from '../../types';
-import { getBalances } from '../../balances';
+import { getAllBalances } from '../../balances';
 import { CheckoutConfiguration } from '../../config';
 import {
   BalanceCheckResult,
@@ -36,22 +35,21 @@ const getTokenBalances = async (
   ownerAddress: string,
   itemRequirements: ItemRequirement[],
 ) : Promise<ItemBalance[]> => {
-  let tokenBalances: TokenBalance[] = [];
-
   try {
-    const tokenList: TokenInfo[] = getTokensFromRequirements(itemRequirements);
-    const { balances } = await getBalances(config, provider, ownerAddress, tokenList);
-    tokenBalances = [
-      ...balances.map((balance) => balance as TokenBalance),
-    ];
+    const tokenMap = new Map<string, TokenInfo>();
+    getTokensFromRequirements(itemRequirements).forEach(
+      (item) => tokenMap.set((item.address || '').toLocaleLowerCase(), item),
+    );
+    const { balances } = await getAllBalances(config, provider, ownerAddress);
+    return balances.filter(
+      (balance) => tokenMap.get((balance.token.address || '').toLocaleLowerCase()),
+    ) as TokenBalance[];
   } catch (error: any) {
     throw new CheckoutError(
       'Failed to get balances',
       CheckoutErrorType.GET_BALANCE_ERROR,
     );
   }
-
-  return tokenBalances;
 };
 
 /**
@@ -118,11 +116,24 @@ export const balanceCheck = async (
   itemRequirements: ItemRequirement[],
 ) : Promise<BalanceCheckResult> => {
   const aggregatedItems = balanceAggregator(itemRequirements);
-  if (aggregatedItems.filter((itemRequirement) => {
-    return itemRequirement.type !== ItemType.ERC721
-      && itemRequirement.type !== ItemType.ERC20
-      && itemRequirement.type !== ItemType.NATIVE;
-  }).length > 0) {
+
+  const requiredToken: ItemRequirement[] = [];
+  const requiredERC721: ItemRequirement[] = [];
+
+  aggregatedItems.forEach((item) => {
+    switch (item.type) {
+      case ItemType.ERC20:
+      case ItemType.NATIVE:
+        requiredToken.push(item);
+        break;
+      case ItemType.ERC721:
+        requiredERC721.push(item);
+        break;
+      default:
+    }
+  });
+
+  if (requiredERC721.length === 0 && requiredToken.length === 0) {
     throw new CheckoutError(
       'Unsupported item requirement balance check',
       CheckoutErrorType.UNSUPPORTED_BALANCE_REQUIREMENT_ERROR,
@@ -130,47 +141,46 @@ export const balanceCheck = async (
   }
 
   // Get all ERC20 and NATIVE balances
-  const currentBalances: Promise<ItemBalance[]>[] = [];
-  const tokenItemRequirements: ItemRequirement[] = aggregatedItems
-    .filter((itemRequirement) => itemRequirement.type === ItemType.ERC20 || itemRequirement.type === ItemType.NATIVE);
-  if (tokenItemRequirements.length > 0) {
-    currentBalances.push(getTokenBalances(config, provider, ownerAddress, aggregatedItems));
+  const balancePromises: Promise<ItemBalance[]>[] = [];
+  if (requiredToken.length > 0) {
+    balancePromises.push(getTokenBalances(config, provider, ownerAddress, aggregatedItems));
   }
 
   // Get all ERC721 balances
-  const erc721ItemRequirements: ItemRequirement[] = aggregatedItems
-    .filter((itemRequirement) => itemRequirement.type === ItemType.ERC721);
-  if (erc721ItemRequirements.length > 0) {
-    currentBalances.push(getERC721Balances(provider, ownerAddress, aggregatedItems));
+  if (requiredERC721.length > 0) {
+    balancePromises.push(getERC721Balances(provider, ownerAddress, aggregatedItems));
   }
 
   // Wait for all balances and calculate the requirements
-  const balanceRequirements: BalanceRequirement[] = await Promise.all(currentBalances).then((balances) => {
-    const requirements: BalanceRequirement[] = [];
-    if (balances.length > 1 || tokenItemRequirements.length > 0) {
-      const tokenBalances = balances[0];
-      tokenItemRequirements.forEach((tokenItemRequirement) => {
-        requirements.push(getTokenBalanceRequirement(tokenItemRequirement as (NativeItem | ERC20Item), tokenBalances));
-      });
-      if (erc721ItemRequirements.length > 0) {
-        const erc721Balances = balances[1];
-        erc721ItemRequirements.forEach((erc721ItemRequirement) => {
-          requirements.push(getERC721BalanceRequirement(erc721ItemRequirement as ERC721Item, erc721Balances));
-        });
-      }
-    } else if (erc721ItemRequirements.length > 0) {
-      // Only erc721
-      const erc721Balances = balances[0];
-      erc721ItemRequirements.forEach((erc721ItemRequirement) => {
-        requirements.push(getERC721BalanceRequirement(erc721ItemRequirement as ERC721Item, erc721Balances));
+  const promisesResponses = await Promise.all(balancePromises);
+
+  const balanceRequirements: BalanceRequirement[] = [];
+
+  // Get all ERC20 and NATIVE balances
+  if (requiredToken.length > 0 && promisesResponses.length > 0) {
+    const result = promisesResponses.pop();
+    if (result) {
+      requiredToken.forEach((item) => {
+        balanceRequirements.push(getTokenBalanceRequirement(item as (NativeItem | ERC20Item), result));
       });
     }
-    return requirements;
-  });
+  }
 
-  const sufficient = balanceRequirements.reduce((acc, balanceRequirement) => {
-    return acc && balanceRequirement.sufficient;
-  }, true);
+  // Get all ERC721 balances
+  if (requiredERC721.length > 0 && promisesResponses.length > 0) {
+    const result = promisesResponses.pop();
+    if (result) {
+      requiredERC721.forEach((item) => {
+        balanceRequirements.push(getERC721BalanceRequirement(item as (ERC721Item), result));
+      });
+    }
+  }
+
+  // Find if there are any requirements that aren't sufficient.
+  // If there is not item with sufficient === false then the requirements
+  // are satisfied.
+  const sufficient = balanceRequirements.find((req) => req.sufficient === false) === undefined;
+
   return {
     sufficient,
     balanceRequirements,
