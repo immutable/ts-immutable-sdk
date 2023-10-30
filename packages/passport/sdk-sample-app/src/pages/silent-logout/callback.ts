@@ -6,6 +6,6 @@ export default function HandleCallback() {
   const { passportClient } = useImmutableProvider();
 
   useEffect(() => {
-    passportClient?.logoutSilentCallback(SILENT_LOGOUT_PARENT_URI);
+    passportClient.logoutSilentCallback(SILENT_LOGOUT_PARENT_URI);
   }, [passportClient]);
 }

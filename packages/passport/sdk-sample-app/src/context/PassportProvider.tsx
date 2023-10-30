@@ -10,9 +10,9 @@ const PassportContext = createContext<{
   imxProvider: IMXProvider | undefined;
   zkEvmProvider: Provider | undefined;
   connectImx:() => void;
-  connectImxSilent: () => void;
   connectZkEvm: () => void;
   logout: () => void;
+  login: () => void;
   getIdToken: () => Promise<string | undefined>;
   getAccessToken: () => Promise<string | undefined>;
   getUserInfo: () => Promise<UserProfile | undefined>;
@@ -21,9 +21,9 @@ const PassportContext = createContext<{
       imxProvider: undefined,
       zkEvmProvider: undefined,
       connectImx: () => undefined,
-      connectImxSilent: () => undefined,
       connectZkEvm: () => undefined,
       logout: () => undefined,
+      login: () => Promise.resolve(undefined),
       getIdToken: () => Promise.resolve(undefined),
       getAccessToken: () => Promise.resolve(undefined),
       getUserInfo: () => Promise.resolve(undefined),
@@ -42,7 +42,7 @@ export function PassportProvider({
   const connectImx = useCallback(async () => {
     try {
       setIsLoading(true);
-      const provider = await passportClient?.connectImx();
+      const provider = await passportClient.connectImx();
       if (provider) {
         setImxProvider(provider);
         addMessage('ConnectImx', 'Connected');
@@ -56,26 +56,9 @@ export function PassportProvider({
     }
   }, [passportClient, setIsLoading, addMessage]);
 
-  const connectImxSilent = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const provider = await passportClient?.connectImxSilent();
-      if (provider) {
-        setImxProvider(provider);
-        addMessage('ConnectImxSilent', 'Connected');
-      } else {
-        addMessage('ConnectImxSilent', 'Failed to connect. Ensure you have logged in before.');
-      }
-    } catch (err) {
-      addMessage('ConnectImxSilent', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [passportClient, setIsLoading, addMessage]);
-
   const connectZkEvm = useCallback(async () => {
     setIsLoading(true);
-    const provider = passportClient?.connectEvm();
+    const provider = passportClient.connectEvm();
     if (provider) {
       setZkEvmProvider(provider);
       addMessage('ConnectZkEvm', 'Connected');
@@ -87,7 +70,7 @@ export function PassportProvider({
 
   const getIdToken = useCallback(async () => {
     setIsLoading(true);
-    const idToken = await passportClient?.getIdToken();
+    const idToken = await passportClient.getIdToken();
     addMessage('Get ID token', idToken);
     setIsLoading(false);
 
@@ -96,7 +79,7 @@ export function PassportProvider({
 
   const getAccessToken = useCallback(async () => {
     setIsLoading(true);
-    const accessToken = await passportClient?.getAccessToken();
+    const accessToken = await passportClient.getAccessToken();
     addMessage('Get Access token', accessToken);
     setIsLoading(false);
 
@@ -105,7 +88,7 @@ export function PassportProvider({
 
   const getUserInfo = useCallback(async () => {
     setIsLoading(true);
-    const userInfo = await passportClient?.getUserInfo();
+    const userInfo = await passportClient.getUserInfo();
     addMessage('Get User Info', userInfo);
     setIsLoading(false);
 
@@ -114,7 +97,7 @@ export function PassportProvider({
 
   const getLinkedAddresses = useCallback(async () => {
     setIsLoading(true);
-    const linkedAddresses = await passportClient?.getLinkedAddresses();
+    const linkedAddresses = await passportClient.getLinkedAddresses();
     addMessage('Get Linked Addresses', linkedAddresses);
     setIsLoading(false);
 
@@ -124,7 +107,7 @@ export function PassportProvider({
   const logout = useCallback(async () => {
     try {
       setIsLoading(true);
-      await passportClient?.logout();
+      await passportClient.logout();
       setImxProvider(undefined);
       setZkEvmProvider(undefined);
     } catch (err) {
@@ -135,13 +118,26 @@ export function PassportProvider({
     }
   }, [addMessage, passportClient, setIsLoading]);
 
+  const login = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const userProfile = await passportClient.login();
+      addMessage('Login', userProfile);
+    } catch (err) {
+      addMessage('Login', err);
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [addMessage, passportClient, setIsLoading]);
+
   const providerValues = useMemo(() => ({
     imxProvider,
     zkEvmProvider,
     connectImx,
-    connectImxSilent,
     connectZkEvm,
     logout,
+    login,
     getIdToken,
     getAccessToken,
     getUserInfo,
@@ -150,9 +146,9 @@ export function PassportProvider({
     imxProvider,
     zkEvmProvider,
     connectImx,
-    connectImxSilent,
     connectZkEvm,
     logout,
+    login,
     getIdToken,
     getAccessToken,
     getUserInfo,
@@ -171,8 +167,8 @@ export function usePassportProvider() {
     imxProvider,
     zkEvmProvider,
     connectImx,
-    connectImxSilent,
     connectZkEvm,
+    login,
     logout,
     getIdToken,
     getAccessToken,
@@ -183,8 +179,8 @@ export function usePassportProvider() {
     imxProvider,
     zkEvmProvider,
     connectImx,
-    connectImxSilent,
     connectZkEvm,
+    login,
     logout,
     getIdToken,
     getAccessToken,

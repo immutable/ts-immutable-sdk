@@ -57,16 +57,16 @@ export class Passport {
     });
   }
 
+  /**
+   * @deprecated The method `login` with an argument of `{ useCachedSession: true }` should be used in conjunction with
+   * `connectImx` instead.
+   */
   public async connectImxSilent(): Promise<IMXProvider | null> {
     return this.passportImxProviderFactory.getProviderSilent();
   }
 
   public async connectImx(): Promise<IMXProvider> {
     return this.passportImxProviderFactory.getProvider();
-  }
-
-  public async loginWithDeviceFlow(): Promise<DeviceConnectResponse> {
-    return this.authManager.loginWithDeviceFlow();
   }
 
   public async connectImxDeviceFlow(
@@ -109,6 +109,28 @@ export class Passport {
       confirmationScreen: this.confirmationScreen,
       multiRollupApiClients: this.multiRollupApiClients,
     });
+  }
+
+  /**
+   *
+   * Initiates the authorisation flow.
+   *
+   * @param options.useCachedSession = false - If true, and no active session exists, then the user will not be
+   * prompted to log in and the Promise will resolve with a null value.
+   * @returns {Promise<UserProfile | null>} the user profile if the user is logged in, otherwise null
+   */
+  public async login(options?: { useCachedSession: boolean }): Promise<UserProfile | null> {
+    const { useCachedSession = false } = options || {};
+    let user = await this.authManager.loginSilent();
+    if (!user && !useCachedSession) {
+      user = await this.authManager.login();
+    }
+
+    return user ? user.profile : null;
+  }
+
+  public async loginWithDeviceFlow(): Promise<DeviceConnectResponse> {
+    return this.authManager.loginWithDeviceFlow();
   }
 
   public async loginCallback(): Promise<void> {

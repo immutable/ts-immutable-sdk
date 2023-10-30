@@ -54,7 +54,7 @@ export class PassportImxProviderFactory {
   }
 
   public async getProvider(): Promise<PassportImxProvider> {
-    const user = await this.authManager.login();
+    const user = await this.authManager.loginSilent() || await this.authManager.login();
     return this.createProviderInstance(user);
   }
 

@@ -4,7 +4,7 @@
 
 export type ActiveOrderStatus = {
   /**
-   * The order status
+   * The order status that indicates an order can be fulfilled.
    */
   name: 'ACTIVE';
 };
