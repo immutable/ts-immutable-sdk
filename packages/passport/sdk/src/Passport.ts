@@ -76,7 +76,7 @@ export class Passport {
     return this.passportImxProviderFactory.getProviderSilent();
   }
 
-  public async connectImx(): Promise<IMXProvider | null> {
+  public async connectImx(): Promise<IMXProvider> {
     return this.passportImxProviderFactory.getProvider();
   }
 
