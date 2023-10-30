@@ -3150,7 +3150,7 @@ __metadata:
     "@imtbl/cryptofiat": 0.0.0
     "@imtbl/dex-sdk": 0.0.0
     "@imtbl/passport": 0.0.0
-    "@imtbl/react-analytics": 0.0.5-alpha
+    "@imtbl/react-analytics": 0.2.1-alpha
     "@imtbl/version-check": 0.0.0
     "@svgr/webpack": ^8.0.1
     "@testing-library/jest-dom": ^5.16.5
@@ -3721,13 +3721,13 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/react-analytics@npm:0.0.5-alpha":
-  version: 0.0.5-alpha
-  resolution: "@imtbl/react-analytics@npm:0.0.5-alpha"
+"@imtbl/react-analytics@npm:0.2.1-alpha":
+  version: 0.2.1-alpha
+  resolution: "@imtbl/react-analytics@npm:0.2.1-alpha"
   dependencies:
     "@segment/analytics-next": ^1.53.2
     react: ^18.2.0
-  checksum: 1682cedb7a2b55c1626dd3d785de07b7cbccaa764432755ecfc4bafd018950bae414a615bd3a94182f36e2a2b639f255c626fe56d53bbab0c3091ec36721bd64
+  checksum: 1039f8b3dc01dba9a3b5c0d9a5985f0ef0b44ea74efa4a0d216d682272aa8677aeb23a6c94344dac06ae944218a567c490e1acf228ee777c0c8fc1773e30c66a
   languageName: node
   linkType: hard
 
