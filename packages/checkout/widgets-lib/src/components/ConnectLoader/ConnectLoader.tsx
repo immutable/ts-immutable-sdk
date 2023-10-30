@@ -69,7 +69,6 @@ export function ConnectLoader({
   const {
     targetLayer, walletProvider, allowedChains, checkout,
   } = params;
-  const { passport } = checkout;
   const networkToSwitchTo = targetLayer ?? ConnectTargetLayer.LAYER2;
 
   // TODO: Pass in theme from root class
@@ -198,7 +197,6 @@ export function ConnectLoader({
         if (!provider && walletProvider) {
           const createProviderResult = await checkout.createProvider({
             walletProvider,
-            passport,
           });
           connectLoaderDispatch({
             payload: {
