@@ -34,7 +34,7 @@ describe('buy', () => {
   const seaportContractAddress = '0xSEAPORT';
 
   beforeEach(() => {
-    jest.spyOn(console, 'debug').mockImplementation(() => {});
+    jest.spyOn(console, 'info').mockImplementation(() => {});
   });
 
   describe('buy', () => {
