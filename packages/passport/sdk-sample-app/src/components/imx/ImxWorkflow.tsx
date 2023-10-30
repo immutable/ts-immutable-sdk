@@ -19,7 +19,7 @@ function ImxWorkflow() {
   const [showOrder, setShowOrder] = useState<boolean>(false);
 
   const { addMessage, isLoading } = useStatusProvider();
-  const { connectImx, connectImxSilent, imxProvider } = usePassportProvider();
+  const { connectImx, imxProvider } = usePassportProvider();
 
   const getAddress = useCallback(async () => {
     const address = await imxProvider?.getAddress();
@@ -52,12 +52,6 @@ function ImxWorkflow() {
               onClick={connectImx}
             >
               Connect
-            </WorkflowButton>
-            <WorkflowButton
-              disabled={isLoading}
-              onClick={connectImxSilent}
-            >
-              Connect Silent
             </WorkflowButton>
           </>
         )}

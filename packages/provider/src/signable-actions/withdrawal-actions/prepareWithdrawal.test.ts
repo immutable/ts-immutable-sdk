@@ -25,6 +25,8 @@ describe('prepareWithdrawal', () => {
       vault_id: 123,
       amount: '1',
       asset_id: '22',
+      readable_transaction: '',
+      verification_signature: '',
     };
     const createWithdrawalResponse: CreateWithdrawalResponse = {
       time: 0,
