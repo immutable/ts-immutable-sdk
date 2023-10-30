@@ -7,12 +7,19 @@ export enum Environment {
 export class ImmutableConfiguration {
   readonly environment: Environment;
 
+  readonly rateLimitingKey?: string;
+
   readonly apiKey?: string;
 
   readonly clientAppId?: string;
 
-  constructor(options: { environment: Environment; apiKey?: string; clientAppId?: string }) {
+  constructor(options: { environment: Environment; rateLimitingKey?: string; apiKey?: string; clientAppId?: string }) {
     this.environment = options.environment;
+
+    if (options.rateLimitingKey) {
+      this.rateLimitingKey = options.rateLimitingKey;
+      axios.defaults.headers.common['x-api-key'] = this.rateLimitingKey;
+    }
 
     if (options.apiKey) {
       if (!options.apiKey.startsWith('sk_imapik-')) {
