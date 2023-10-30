@@ -14,7 +14,6 @@ export function SetupAnalytics(
 
   useEffect(() => {
     const writeKey = getSegmentWriteKey(widgetConfig.environment);
-    console.log(writeKey);
     updateWriteKey(writeKey);
   }, [widgetConfig]);
 
