@@ -403,6 +403,12 @@ export const text = {
           primaryAction: 'Try again',
           secondaryAction: 'Cancel',
         },
+        [SaleErrorTypes.SMART_CHECKOUT_EXECUTE_ERROR]: {
+          description:
+            'Sorry, something went wrong while moving funds. Please try again.',
+          primaryAction: 'Try again',
+          secondaryAction: 'Cancel',
+        },
         [SaleErrorTypes.DEFAULT]: {
           description: 'Sorry, something went wrong. Please try again.',
           primaryAction: 'Try again',
