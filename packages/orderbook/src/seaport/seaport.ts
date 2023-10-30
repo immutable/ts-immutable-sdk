@@ -7,7 +7,7 @@ import {
   OrderUseCase,
   TipInputItem,
 } from '@opensea/seaport-js/lib/types';
-import { PopulatedTransaction, providers } from 'ethers';
+import { providers } from 'ethers';
 import { mapFromOpenApiOrder } from 'openapi/mapper';
 import {
   Action,
@@ -214,13 +214,19 @@ export class Seaport {
     };
   }
 
-  async cancelOrder(order: Order, account: string): Promise<PopulatedTransaction> {
-    const { orderComponents } = this.mapImmutableOrderToSeaportOrderComponents(order);
-    const seaportLib = this.getSeaportLib(order);
+  async cancelOrders(orders: Order[], account: string): Promise<TransactionAction> {
+    const orderComponents = orders.map(
+      (order) => this.mapImmutableOrderToSeaportOrderComponents(order).orderComponents,
+    );
+    const seaportLib = this.getSeaportLib(orders[0]);
 
-    const cancellationTransaction = await seaportLib.cancelOrders([orderComponents], account);
+    const cancellationTransaction = await seaportLib.cancelOrders(orderComponents, account);
 
-    return prepareTransaction(cancellationTransaction)();
+    return {
+      type: ActionType.TRANSACTION,
+      buildTransaction: prepareTransaction(cancellationTransaction),
+      purpose: TransactionPurpose.CANCEL,
+    };
   }
 
   private mapImmutableOrderToSeaportOrderComponents(order: Order): {

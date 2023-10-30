@@ -7,7 +7,7 @@ import { ConfirmationScreen } from './confirmation';
 import { Passport } from './Passport';
 import { PassportImxProvider, PassportImxProviderFactory } from './starkEx';
 import { Networks, OidcConfiguration } from './types';
-import { mockUser, mockLinkedAddresses } from './test/mocks';
+import { mockUser, mockLinkedAddresses, mockUserImx } from './test/mocks';
 
 jest.mock('./authManager');
 jest.mock('./magicAdapter');
@@ -125,6 +125,17 @@ describe('Passport', () => {
 
       expect(result).toBe(passportImxProvider);
       expect(getProviderMock).toHaveBeenCalled();
+    });
+
+    it('should call getProviderSilent if useCachedSession is true', async () => {
+      const passportImxProvider = {} as PassportImxProvider;
+      getProviderSilentMock.mockResolvedValue(passportImxProvider);
+
+      const result = await passport.connectImx({ useCachedSession: true });
+
+      expect(result).toBe(passportImxProvider);
+      expect(getProviderSilentMock).toHaveBeenCalled();
+      expect(getProviderMock).not.toHaveBeenCalled();
     });
   });
 
@@ -245,6 +256,36 @@ describe('Passport', () => {
       const result = await passport.getLinkedAddresses();
 
       expect(result).toHaveLength(0);
+    });
+  });
+
+  describe('signIn', () => {
+    it('should login silently if there is a user', async () => {
+      loginSilentMock.mockReturnValue(mockUserImx);
+      const user = await passport.signIn();
+
+      expect(loginSilentMock).toBeCalledTimes(1);
+      expect(authLoginMock).toBeCalledTimes(0);
+      expect(user).toEqual(mockUser.profile);
+    });
+
+    it('should signIn and get a user', async () => {
+      loginSilentMock.mockReturnValue(null);
+      authLoginMock.mockReturnValue(mockUserImx);
+      const user = await passport.signIn();
+
+      expect(loginSilentMock).toBeCalledTimes(1);
+      expect(authLoginMock).toBeCalledTimes(1);
+      expect(user).toEqual(mockUserImx.profile);
+    });
+
+    it('should only login silently if useCachedSession is true', async () => {
+      loginSilentMock.mockReturnValue(mockUserImx);
+      const user = await passport.signIn({ useCachedSession: true });
+
+      expect(loginSilentMock).toBeCalledTimes(1);
+      expect(authLoginMock).toBeCalledTimes(0);
+      expect(user).toEqual(mockUser.profile);
     });
   });
 });

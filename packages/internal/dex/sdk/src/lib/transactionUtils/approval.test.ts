@@ -63,7 +63,7 @@ describe('getApprovalTransaction', () => {
   });
 
   describe('when the allowance is less than the given amount', () => {
-    it('should create an unsigned approve transaction with the difference as the amount to approve', async () => {
+    it('should create an unsigned approve transaction with the full amount of the input token', async () => {
       const erc20Contract = (Contract as unknown as jest.Mock).mockImplementation(() => ({
         allowance: jest.fn().mockResolvedValue(BigNumber.from('1000000000000000000')),
       }));
@@ -85,8 +85,6 @@ describe('getApprovalTransaction', () => {
       // Mock the contract instance creation
       erc20ContractFactory.connect.mockReturnValue(erc20Contract);
 
-      const expectedAmountToApprove = tokenInAmount.value.sub(existingAllowance);
-
       const result = await getApproveTransaction(provider, TEST_FROM_ADDRESS, tokenInAmount, spenderAddress);
 
       expectToBeDefined(result?.data);
@@ -97,7 +95,7 @@ describe('getApprovalTransaction', () => {
       const erc20ContractInterface = ERC20__factory.createInterface();
       const decodedResults = erc20ContractInterface.decodeFunctionData('approve', result.data);
       expect(decodedResults[0]).toEqual(TEST_ROUTER_ADDRESS);
-      expect(decodedResults[1].toString()).toEqual(expectedAmountToApprove.toString());
+      expect(decodedResults[1].toString()).toEqual(tokenInAmount.value.toString());
       expect(erc20Contract.mock.calls.length).toEqual(1);
     });
   });

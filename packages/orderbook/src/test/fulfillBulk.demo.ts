@@ -87,8 +87,8 @@ describe('', () => {
       orderExpiry: new Date(Date.now() + 1000000 * 30),
     });
 
-    const signatures1 = await actionAll(validListing1.actions, offerer, provider);
-    const signatures2 = await actionAll(validListing2.actions, offerer, provider);
+    const signatures1 = await actionAll(validListing1.actions, offerer);
+    const signatures2 = await actionAll(validListing2.actions, offerer);
     log('Creating new listing to be fulfilled...');
 
     // Submit the order creation request to the order book API
@@ -173,7 +173,7 @@ describe('', () => {
 
       log(`Fulfilling listings ${fulfillableOrders[0].id}, ${fulfillableOrders[1].id} fulfillment transaction valid till ${expiration}`);
 
-      await actionAll(actions, fulfiller, provider);
+      await actionAll(actions, fulfiller);
 
       log(
         `Fulfilment transaction sent, waiting for listing ${orderId2} to become FILLED`,
