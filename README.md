@@ -123,7 +123,7 @@ export NODE_OPTIONS=--max-old-space-size=14366
 
 ### API keys and Client App Id
 
-API keys and Client App ID are used to authenticate and tracking usage respectively per partner/project/environment.
+API keys and Client App ID are used to authenticate and track usage respectively per partner/project/environment.
 
 Once created from hub, they can be optionally passed into base config as followed:
 
