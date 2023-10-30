@@ -38,10 +38,10 @@ import {
   MintsApiListMintsRequest,
   WithdrawalsApiListWithdrawalsRequest,
   WithdrawalsApiGetWithdrawalRequest,
-  OrdersApiGetOrderRequest,
-  OrdersApiListOrdersRequest,
-  TradesApiGetTradeRequest,
-  TradesApiListTradesRequest,
+  OrdersApiGetOrderV3Request,
+  OrdersApiListOrdersV3Request,
+  TradesApiGetTradeV3Request,
+  TradesApiListTradesV3Request,
   TokensApiGetTokenRequest,
   TokensApiListTokensRequest,
   TransfersApiGetTransferRequest,
@@ -511,7 +511,7 @@ export class ImmutableXClient {
    * @returns a promise that resolves with the requested Order
    * @throws {@link index.IMXError}
    */
-  public getOrder(request: OrdersApiGetOrderRequest) {
+  public getOrder(request: OrdersApiGetOrderV3Request) {
     return this.immutableX.getOrder(request);
   }
 
@@ -521,7 +521,7 @@ export class ImmutableXClient {
    * @returns a promise that resolves with the requested list of Orders
    * @throws {@link index.IMXError}
    */
-  public listOrders(request?: OrdersApiListOrdersRequest) {
+  public listOrders(request?: OrdersApiListOrdersV3Request) {
     return this.immutableX.listOrders(request);
   }
 
@@ -531,7 +531,7 @@ export class ImmutableXClient {
    * @returns a promise that resolves with the requested Trade
    * @throws {@link index.IMXError}
    */
-  public getTrade(request: TradesApiGetTradeRequest) {
+  public getTrade(request: TradesApiGetTradeV3Request) {
     return this.immutableX.getTrade(request);
   }
 
@@ -541,7 +541,7 @@ export class ImmutableXClient {
    * @returns a promise that resolves with the requested list of Trades
    * @throws {@link index.IMXError}
    */
-  public listTrades(request?: TradesApiListTradesRequest) {
+  public listTrades(request?: TradesApiListTradesV3Request) {
     return this.immutableX.listTrades(request);
   }
 

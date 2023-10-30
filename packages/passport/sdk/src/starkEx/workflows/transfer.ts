@@ -1,7 +1,6 @@
 import {
   CreateTransferResponse,
   CreateTransferResponseV1,
-  GetSignableTransferRequest,
   GetSignableTransferRequestV1,
   NftTransferDetails,
   SignableTransferDetails,
@@ -131,16 +130,13 @@ export async function batchNftTransfer({
         }),
       );
 
-      const getSignableTransferRequestV2: GetSignableTransferRequest = {
-        sender_ether_key: ethAddress,
-        signable_requests: signableRequests,
-      };
-
       const headers = { Authorization: `Bearer ${user.accessToken}` };
-
       const signableResult = await transfersApi.getSignableTransfer(
         {
-          getSignableTransferRequestV2,
+          getSignableTransferRequestV2: {
+            sender_ether_key: ethAddress,
+            signable_requests: signableRequests,
+          },
         },
         { headers },
       );
