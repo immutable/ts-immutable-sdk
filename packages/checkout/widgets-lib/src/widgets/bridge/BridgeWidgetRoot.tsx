@@ -70,7 +70,7 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
       targetLayer: ConnectTargetLayer.LAYER1,
       walletProvider: params?.walletProvider,
       web3Provider: params?.web3Provider,
-      passport: params?.passport,
+      checkout: this.checkout,
       allowedChains: [getL1ChainId(this.checkout.config)],
     };
 

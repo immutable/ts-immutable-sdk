@@ -1,4 +1,5 @@
 import { createContext } from 'react';
+import { Checkout } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { ConnectWidgetViews } from '../view-context/ConnectViewContextTypes';
 
@@ -14,11 +15,13 @@ export enum ConnectionStatus {
 export interface ConnectLoaderState {
   connectionStatus: ConnectionStatus;
   deepLink?: ConnectWidgetViews;
+  checkout?: Checkout,
   provider?: Web3Provider,
 }
 
 export const initialConnectLoaderState: ConnectLoaderState = {
   connectionStatus: ConnectionStatus.LOADING,
+  checkout: undefined,
   provider: undefined,
 };
 
@@ -31,10 +34,11 @@ export interface ConnectLoaderAction {
   payload: ConnectLoaderActionPayload;
 }
 
-type ConnectLoaderActionPayload = UpdateConnectionStatusPayload | SetProviderPayload;
+type ConnectLoaderActionPayload = UpdateConnectionStatusPayload | SetCheckoutPayload | SetProviderPayload;
 
 export enum ConnectLoaderActions {
   UPDATE_CONNECTION_STATUS = 'UPDATE_CONNECTION_STATUS',
+  SET_CHECKOUT = 'SET_CHECKOUT',
   SET_PROVIDER = 'SET_PROVIDER',
 }
 
@@ -42,6 +46,11 @@ export interface UpdateConnectionStatusPayload {
   type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS;
   connectionStatus: ConnectionStatus;
   deepLink?: ConnectWidgetViews;
+}
+
+export interface SetCheckoutPayload {
+  type: ConnectLoaderActions.SET_CHECKOUT;
+  checkout: Checkout;
 }
 
 export interface SetProviderPayload {
@@ -67,6 +76,11 @@ ConnectLoaderAction
         ...state,
         connectionStatus: action.payload.connectionStatus,
         deepLink: action.payload.deepLink,
+      };
+    case ConnectLoaderActions.SET_CHECKOUT:
+      return {
+        ...state,
+        checkout: action.payload.checkout,
       };
     case ConnectLoaderActions.SET_PROVIDER:
       return {

@@ -53,7 +53,7 @@ import { GetAllowedBalancesResultType, getAllowedBalances } from '../../lib/bala
 import { widgetTheme } from '../../lib/theme';
 
 export type BridgeWidgetInputs = BridgeWidgetParams & {
-  config: StrongCheckoutWidgetsConfig
+  config: StrongCheckoutWidgetsConfig,
 };
 
 export function BridgeWidget({
@@ -67,7 +67,7 @@ export function BridgeWidget({
   const loadingText = text.views[SharedViews.LOADING_VIEW].text;
   const errorText = text.views[SharedViews.ERROR_VIEW];
 
-  const { connectLoaderState: { checkout, provider } } = useContext(ConnectLoaderContext);
+  const { connectLoaderState: { provider, checkout } } = useContext(ConnectLoaderContext);
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
   const [bridgeState, bridgeDispatch] = useReducer(bridgeReducer, initialBridgeState);
 

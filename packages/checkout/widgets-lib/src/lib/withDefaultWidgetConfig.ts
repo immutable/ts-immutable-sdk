@@ -8,6 +8,7 @@ import {
   DEFAULT_THEME,
 } from './constants';
 
+// TODO: Remove isEnabled<> and env props, only keep theme.
 export type StrongCheckoutWidgetsConfig = {
   theme: WidgetTheme;
   environment: Environment;

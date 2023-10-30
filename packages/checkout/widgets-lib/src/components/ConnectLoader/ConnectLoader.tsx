@@ -72,6 +72,7 @@ export function ConnectLoader({
   const { passport } = checkout;
   const networkToSwitchTo = targetLayer ?? ConnectTargetLayer.LAYER2;
 
+  // TODO: Pass in theme from root class
   const biomeTheme: BaseTokens = widgetConfig.theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
     : onDarkBase;
@@ -162,6 +163,15 @@ export function ConnectLoader({
       removeChainChangedListener(provider, handleChainChanged);
     };
   }, [provider, identify]);
+
+  useEffect(() => {
+    connectLoaderDispatch({
+      payload: {
+        type: ConnectLoaderActions.SET_CHECKOUT,
+        checkout,
+      },
+    });
+  }, []);
 
   useEffect(() => {
     if (window === undefined) {
