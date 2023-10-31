@@ -11,6 +11,7 @@ import {
   OnRampSuccess,
   OrchestrationEventData,
   OrchestrationEventType,
+  SaleEventType,
   SwapEventType,
   SwapFailed,
   SwapRejected,
@@ -26,6 +27,7 @@ import {
   WalletWidgetParams,
   OnRampWidgetParams,
 } from './parameters';
+import { SaleWidgetParams } from './parameters/sale';
 
 /**
  * Enum representing the themes for the widgets.
@@ -44,6 +46,7 @@ export enum WidgetType {
   SWAP = 'swap',
   BRIDGE = 'bridge',
   ONRAMP = 'onramp',
+  SALE = 'sale',
 }
 
 export type WidgetProperties<T extends WidgetType> = {
@@ -57,6 +60,7 @@ export type WidgetParameters = {
   [WidgetType.SWAP]: SwapWidgetParams,
   [WidgetType.BRIDGE]: BridgeWidgetParams,
   [WidgetType.ONRAMP]: OnRampWidgetParams,
+  [WidgetType.SALE]: SaleWidgetParams
 };
 
 /**
@@ -68,6 +72,7 @@ export type WidgetEventTypes = {
   [WidgetType.SWAP]: SwapEventType | OrchestrationEventType,
   [WidgetType.BRIDGE]: BridgeEventType | OrchestrationEventType,
   [WidgetType.ONRAMP]: OnRampEventType | OrchestrationEventType,
+  [WidgetType.SALE]: SaleEventType | OrchestrationEventType
 };
 
 export type WidgetEventData = {
@@ -76,6 +81,7 @@ export type WidgetEventData = {
   [WidgetType.SWAP]: SwapSuccess | SwapFailed | SwapRejected | OrchestrationEventData,
   [WidgetType.BRIDGE]: BridgeSuccess | BridgeFailed | OrchestrationEventData,
   [WidgetType.ONRAMP]: OnRampSuccess | OnRampFailed | OrchestrationEventData,
+  [WidgetType.SALE]: any
 };
 
 /**

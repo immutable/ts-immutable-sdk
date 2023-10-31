@@ -3198,7 +3198,7 @@ __metadata:
     "@imtbl/cryptofiat": 0.0.0
     "@imtbl/dex-sdk": 0.0.0
     "@imtbl/passport": 0.0.0
-    "@imtbl/react-analytics": 0.0.5-alpha
+    "@imtbl/react-analytics": 0.2.1-alpha
     "@imtbl/version-check": 0.0.0
     "@rollup/plugin-commonjs": ^24.0.1
     "@rollup/plugin-json": ^6.0.0
@@ -3734,7 +3734,7 @@ __metadata:
     "@imtbl/orderbook": 0.0.0
     "@imtbl/passport": 0.0.0
     "@imtbl/provider": 0.0.0
-    "@imtbl/react-analytics": 0.0.5-alpha
+    "@imtbl/react-analytics": 0.2.1-alpha
     "@imtbl/version-check": 0.0.0
     "@jest/globals": ^29.5.0
     "@magic-ext/oidc": ^1.0.1
