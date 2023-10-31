@@ -4,13 +4,14 @@ import {
   ERC20ItemRequirement,
   GasAmount,
   GasTokenType,
+  Item,
   ItemType,
   SmartCheckoutResult,
   TransactionOrGasType,
 } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import { useCallback, useState } from 'react';
-import { Item, SaleErrorTypes, SmartCheckoutError } from '../types';
+import { SaleErrorTypes, SmartCheckoutError } from '../types';
 
 type UseSmartCheckoutInput = {
   checkout: Checkout | undefined;

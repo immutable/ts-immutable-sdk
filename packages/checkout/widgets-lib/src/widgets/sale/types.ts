@@ -1,12 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
-
-export type Item = {
-  productId: string;
-  qty: number;
-  name: string;
-  image: string;
-  description: string;
-};
+import { Item } from '@imtbl/checkout-sdk';
 
 export enum PaymentTypes {
   CRYPTO = 'crypto',

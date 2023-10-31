@@ -12,6 +12,7 @@ import { BiomeCombinedProviders } from '@biom3/react';
 import { PassportLoginCallback } from './components/ui/marketplace-orchestrator/PassportLoginCallback';
 import { Marketplace } from './components/ui/marketplace-orchestrator';
 import { onDarkBase } from '@biom3/design-tokens';
+import { SaleUI } from './components/ui/sale/sale';
 
 const router = createBrowserRouter([
   {
@@ -37,6 +38,10 @@ const router = createBrowserRouter([
   {
     path: '/on-ramp',
     element: <OnRampUI />,
+  },
+  {
+    path: '/sale',
+    element: <SaleUI />,
   },
   {
     path: '/marketplace-orchestrator',

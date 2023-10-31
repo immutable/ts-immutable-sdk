@@ -28,6 +28,10 @@ function App() {
         </div>
         <br />
         <div>
+          <a href={'/sale'}>Sale Widget</a>
+        </div>
+        <br />
+        <div>
           <a href={'/marketplace-orchestrator'}>Marketplace Orchestrator</a>
         </div>
         <br />

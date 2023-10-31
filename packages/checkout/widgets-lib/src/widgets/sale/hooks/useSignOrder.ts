@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { useCallback, useState } from 'react';
+import { Item } from '@imtbl/checkout-sdk';
 
 import { Environment } from '@imtbl/config';
 import {
   SignResponse,
   SignOrderInput,
   PaymentTypes,
-  Item,
+
   SignedOrderProduct,
   SignOrderError,
   ExecuteOrderResponse,

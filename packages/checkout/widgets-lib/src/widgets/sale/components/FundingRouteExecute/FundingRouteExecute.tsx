@@ -1,8 +1,19 @@
-import { FundingStep, FundingStepType } from '@imtbl/checkout-sdk';
 import {
-  BridgeEventType, BridgeFailed, BridgeSuccess,
-  ConnectEventType, ConnectionSuccess, IMTBLWidgetEvents, SwapEventType, SwapFailed, SwapSuccess,
-} from '@imtbl/checkout-widgets';
+  FundingStep,
+  FundingStepType,
+  BridgeEventType,
+  BridgeFailed,
+  BridgeSuccess,
+  BridgeWidgetParams,
+  ConnectEventType,
+  ConnectionSuccess,
+  ConnectTargetLayer,
+  IMTBLWidgetEvents,
+  SwapEventType,
+  SwapFailed,
+  SwapSuccess,
+  SwapWidgetParams,
+} from '@imtbl/checkout-sdk';
 import {
   useCallback,
   useContext,
@@ -18,12 +29,12 @@ import {
 import { ConnectWidgetViews } from '../../../../context/view-context/ConnectViewContextTypes';
 import { SaleWidgetViews } from '../../../../context/view-context/SaleViewContextTypes';
 import { ViewActions, ViewContext } from '../../../../context/view-context/ViewContext';
-import { ConnectTargetLayer, getL1ChainId, getL2ChainId } from '../../../../lib/networkUtils';
+import { getL1ChainId, getL2ChainId } from '../../../../lib/networkUtils';
 import { text as textConfig } from '../../../../resources/text/textConfig';
 import { LoadingView } from '../../../../views/loading/LoadingView';
-import { BridgeWidget, BridgeWidgetParams } from '../../../bridge/BridgeWidget';
+import { BridgeWidget } from '../../../bridge/BridgeWidget';
 import { ConnectWidget } from '../../../connect/ConnectWidget';
-import { SwapWidget, SwapWidgetParams } from '../../../swap/SwapWidget';
+import { SwapWidget } from '../../../swap/SwapWidget';
 import { useSaleContext } from '../../context/SaleContextProvider';
 import { SaleErrorTypes } from '../../types';
 
@@ -219,31 +230,34 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
       )}
       {view === FundingRouteExecuteViews.EXECUTE_BRIDGE && (
         <BridgeWidget
-          params={bridgeParams!}
+          {...bridgeParams!}
           config={config}
         />
       )}
       {view === FundingRouteExecuteViews.EXECUTE_SWAP && (
         <SwapWidget
-          params={swapParams!}
+          {...swapParams!}
           config={config}
         />
       )}
       {view === FundingRouteExecuteViews.SWITCH_NETWORK_ETH && (
         <ConnectWidget
           config={config}
-          params={{
-            targetLayer: ConnectTargetLayer.LAYER1, web3Provider: provider,
+          {...{
+            targetLayer: ConnectTargetLayer.LAYER1,
+            web3Provider: provider,
           }}
+          checkout={checkout!}
           deepLink={ConnectWidgetViews.SWITCH_NETWORK}
         />
       )}
       {view === FundingRouteExecuteViews.SWITCH_NETWORK_ZKEVM && (
         <ConnectWidget
           config={config}
-          params={{
+          {...{
             targetLayer: ConnectTargetLayer.LAYER2, web3Provider: provider,
           }}
+          checkout={checkout!}
           deepLink={ConnectWidgetViews.SWITCH_NETWORK}
         />
       )}

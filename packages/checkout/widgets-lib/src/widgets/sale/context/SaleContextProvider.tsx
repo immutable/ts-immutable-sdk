@@ -1,4 +1,6 @@
-import { FundingRoute, RoutingOutcomeType, SmartCheckoutResult } from '@imtbl/checkout-sdk';
+import {
+  FundingRoute, Item, RoutingOutcomeType, SmartCheckoutResult,
+} from '@imtbl/checkout-sdk';
 import { Passport } from '@imtbl/passport';
 import {
   ReactNode,
@@ -21,7 +23,7 @@ import { useSignOrder } from '../hooks/useSignOrder';
 import {
   ExecuteOrderResponse,
   ExecutedTransaction,
-  Item,
+
   PaymentTypes,
   SaleErrorTypes,
   SignOrderError,

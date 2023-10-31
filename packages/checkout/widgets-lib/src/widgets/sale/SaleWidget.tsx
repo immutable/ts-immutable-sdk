@@ -4,6 +4,7 @@ import {
 
 import { BiomeCombinedProviders } from '@biom3/react';
 
+import { Item } from '@imtbl/checkout-sdk';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 import {
   SharedViews,
@@ -16,7 +17,6 @@ import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { text } from '../../resources/text/textConfig';
 import { LoadingView } from '../../views/loading/LoadingView';
 
-import { ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
 import { StatusType } from '../../components/Status/StatusType';
 import { StatusView } from '../../components/Status/StatusView';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
@@ -24,7 +24,6 @@ import { SaleWidgetViews } from '../../context/view-context/SaleViewContextTypes
 import { widgetTheme } from '../../lib/theme';
 import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
 import { SaleContextProvider } from './context/SaleContextProvider';
-import { Item } from './types';
 import { FundWithSmartCheckout } from './views/FundWithSmartCheckout';
 import { PayWithCard } from './views/PayWithCard';
 import { PayWithCoins } from './views/PayWithCoins';
@@ -38,7 +37,7 @@ export interface SaleWidgetProps {
   fromContractAddress: string;
   env: string;
   environmentId: string;
-  connectLoaderParams?: ConnectLoaderParams;
+  // connectLoaderParams?: ConnectLoaderParams; // Do we need this at all if it's not used, it should give provider and checkout from context
 }
 
 export function SaleWidget(props: SaleWidgetProps) {
@@ -53,6 +52,8 @@ export function SaleWidget(props: SaleWidgetProps) {
 
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
+
+  console.log('INSIDE SALE WIDGET. provider and checkout ', provider, checkout);
 
   const { theme } = config;
   const biomeTheme = useMemo(() => widgetTheme(theme), [theme]);
