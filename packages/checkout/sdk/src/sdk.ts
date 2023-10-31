@@ -113,7 +113,7 @@ export class Checkout {
         if (script.loaded && typeof ImmutableCheckoutWidgets !== 'undefined') {
           // eslint-disable-next-line no-console
           console.warn('Checkout widgets script is already loaded');
-          checkForWidgetsFactory();
+          resolve(new ImmutableCheckoutWidgets.WidgetsFactory(checkout, init.config));
         } else {
           checkForWidgetsFactory();
         }
