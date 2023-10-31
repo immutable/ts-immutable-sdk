@@ -1,4 +1,8 @@
-import { createAnalytics, StandardAnalyticsActions, StandardAnalyticsControlTypes } from '@imtbl/react-analytics';
+import {
+  createAnalytics,
+  StandardAnalyticsActions,
+  StandardAnalyticsControlTypes,
+} from '@imtbl/react-analytics';
 import { Environment } from '@imtbl/config';
 
 export enum UserJourney {
@@ -7,11 +11,22 @@ export enum UserJourney {
   ON_RAMP = 'OnRamp',
   SWAP = 'Swap',
   BRIDGE = 'Bridge',
-  SALE = 'Sale',
+  SALE = 'PrimarySale',
 }
 
-export type AnalyticsControlTypes = StandardAnalyticsControlTypes
-| 'IframeEvent';
+export type TrackEventProps = {
+  screen: string;
+  userJourney: UserJourney;
+  control: string;
+  controlType: AnalyticsControlTypes;
+  action?: StandardAnalyticsActions | undefined;
+  userId?: string | undefined;
+} & Record<string, unknown>;
+
+export type AnalyticsControlTypes =
+  | StandardAnalyticsControlTypes
+  | 'IframeEvent'
+  | 'Event';
 
 const SEGMENT_ANALYTICS_WRITE_KEY = {
   [Environment.SANDBOX]: 'b69BcXnFXdaiFC6MqRQiHvjcPrTxftZl',
