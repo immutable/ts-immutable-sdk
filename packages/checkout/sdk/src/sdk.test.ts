@@ -258,6 +258,25 @@ describe('Connect', () => {
     expect(result).toEqual(createProviderResult);
   });
 
+  it('should call createProvider function for Passport wallet', async () => {
+    (createProvider as jest.Mock).mockResolvedValue({});
+
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.SANDBOX },
+      passport: {} as unknown as Passport,
+    });
+
+    await checkout.createProvider({
+      walletProvider: WalletProviderName.PASSPORT,
+    });
+
+    expect(createProvider).toBeCalledTimes(1);
+    expect(createProvider).toBeCalledWith(
+      WalletProviderName.PASSPORT,
+      {} as unknown as Passport,
+    );
+  });
+
   it('should call checkIsWalletConnected function', async () => {
     const provider = new Web3Provider(providerMock, ChainId.ETHEREUM);
     const checkIsWalletConnectedResult = {

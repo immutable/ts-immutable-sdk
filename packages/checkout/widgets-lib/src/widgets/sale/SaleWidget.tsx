@@ -49,7 +49,6 @@ export function SaleWidget(props: SaleWidgetProps) {
     fromContractAddress,
     env,
     environmentId,
-    connectLoaderParams,
   } = props;
 
   const { connectLoaderState } = useContext(ConnectLoaderContext);
@@ -106,7 +105,7 @@ export function SaleWidget(props: SaleWidgetProps) {
             environmentId,
             provider,
             checkout,
-            passport: connectLoaderParams?.passport,
+            passport: checkout?.passport,
           }}
         >
           {viewState.view.type === SharedViews.LOADING_VIEW && (

@@ -61,7 +61,7 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
       targetLayer: ConnectTargetLayer.LAYER2,
       walletProvider: params?.walletProvider,
       web3Provider: params?.web3Provider,
-      passport: params?.passport,
+      checkout: this.checkout,
       allowedChains: [getL1ChainId(this.checkout.config), getL2ChainId(this.checkout.config)],
     };
 
@@ -79,7 +79,6 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
               <OnRampWidget
                 contractAddress={params?.contractAddress}
                 amount={params?.amount}
-                passport={params?.passport}
                 config={this.strongConfig()}
               />
             </ConnectLoader>

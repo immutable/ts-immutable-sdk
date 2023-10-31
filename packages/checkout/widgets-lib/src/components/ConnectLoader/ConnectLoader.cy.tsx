@@ -22,16 +22,19 @@ describe('ConnectLoader', () => {
 
   let providerOnStub;
   let providerRemoveListenerStub;
+  let checkout;
   beforeEach(() => {
     cy.viewport('ipad-2');
     cyIntercept();
     providerOnStub = cy.stub().as('providerOnStub');
     providerRemoveListenerStub = cy.stub().as('providerRemoveListenerStub');
+    checkout = new Checkout();
   });
 
   it('should show connect widget when no provider', () => {
     const params = {
       allowedChains: [ChainId.IMTBL_ZKEVM_TESTNET],
+      checkout,
     } as ConnectLoaderParams;
     mount(
       <CustomAnalyticsProvider widgetConfig={config}>
@@ -61,7 +64,8 @@ describe('ConnectLoader', () => {
     const params = {
       web3Provider: { provider } as any as Web3Provider,
       allowedChains: [ChainId.IMTBL_ZKEVM_TESTNET],
-    };
+      checkout,
+    } as ConnectLoaderParams;
 
     cy.stub(Checkout.prototype, 'checkIsWalletConnected')
       .as('checkIsWalletConnectedStub')
@@ -90,6 +94,7 @@ describe('ConnectLoader', () => {
     const params = {
       web3Provider: { provider } as any as Web3Provider,
       allowedChains: [ChainId.IMTBL_ZKEVM_TESTNET],
+      checkout,
     };
 
     cy.stub(Checkout.prototype, 'checkIsWalletConnected')
@@ -154,6 +159,7 @@ describe('ConnectLoader', () => {
         isMetaMask: true,
       } as any as Web3Provider,
       allowedChains: [ChainId.IMTBL_ZKEVM_TESTNET],
+      checkout,
     };
 
     cy.stub(Checkout.prototype, 'checkIsWalletConnected')
@@ -235,7 +241,8 @@ describe('ConnectLoader', () => {
         }),
       } as any as Web3Provider,
       allowedChains: [ChainId.IMTBL_ZKEVM_TESTNET],
-    } as ConnectLoaderParams;
+      checkout,
+    };
 
     cy.stub(Checkout.prototype, 'checkIsWalletConnected')
       .as('checkIsWalletConnectedStub')
@@ -302,7 +309,8 @@ describe('ConnectLoader', () => {
           }),
         } as any as Web3Provider,
         allowedChains: [ChainId.IMTBL_ZKEVM_TESTNET],
-      } as ConnectLoaderParams;
+        checkout,
+      };
 
       cy.stub(Checkout.prototype, 'checkIsWalletConnected')
         .as('checkIsWalletConnectedStub')

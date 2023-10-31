@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import detectEthereumProvider from '@metamask/detect-provider';
 import { Web3Provider, ExternalProvider } from '@ethersproject/providers';
-// import { Passport } from '@imtbl/passport';
+import { Passport } from '@imtbl/passport';
 import {
   CreateProviderResult,
   WalletProviderName,
@@ -26,7 +26,7 @@ async function getMetaMaskProvider(): Promise<Web3Provider> {
 
 export async function createProvider(
   walletProviderName: WalletProviderName,
-  passport?: any,
+  passport?: Passport,
 ): Promise<CreateProviderResult> {
   let provider: Web3Provider | null = null;
   switch (walletProviderName) {
@@ -34,6 +34,10 @@ export async function createProvider(
       if (passport) {
         provider = new Web3Provider(passport.connectEvm());
       } else {
+        // eslint-disable-next-line no-console
+        console.error(
+          'WalletProviderName was PASSPORT but the passport instance was not provided to the Checkout constructor',
+        );
         throw new CheckoutError(
           'Passport not provided',
           CheckoutErrorType.DEFAULT_PROVIDER_ERROR,

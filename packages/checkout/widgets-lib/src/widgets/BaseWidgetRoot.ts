@@ -1,8 +1,5 @@
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable class-methods-use-this */
 import { Root, createRoot } from 'react-dom/client';
-import React from 'react';
 import {
   Widget,
   Checkout,
