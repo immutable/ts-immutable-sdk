@@ -22,15 +22,16 @@ export const MainPage = () => {
     baseConfig: {environment: Environment.SANDBOX},
     isBridgeEnabled: true,
     isSwapEnabled: true,
-    isOnRampEnabled: true
+    isOnRampEnabled: true,
+    passport,
   }), []);
   const widgetsFactory = useMemo(() => new WidgetsFactory(checkout, {theme: WidgetTheme.DARK}), [checkout]);
 
-  const connectWidget = useMemo(() => widgetsFactory.create(WidgetType.CONNECT, {passport}), [widgetsFactory]);
-  const walletWidget = useMemo(() => widgetsFactory.create(WidgetType.WALLET, {passport}), [widgetsFactory]);
-  const bridgeWidget = useMemo(() => widgetsFactory.create(WidgetType.BRIDGE, {passport}), [widgetsFactory]);
-  const swapWidget = useMemo(() => widgetsFactory.create(WidgetType.SWAP, {passport}), [widgetsFactory]);
-  const onRampWidget = useMemo(() => widgetsFactory.create(WidgetType.ONRAMP, {passport}), [widgetsFactory]);
+  const connectWidget = useMemo(() => widgetsFactory.create(WidgetType.CONNECT, {}), [widgetsFactory]);
+  const walletWidget = useMemo(() => widgetsFactory.create(WidgetType.WALLET, {}), [widgetsFactory]);
+  const bridgeWidget = useMemo(() => widgetsFactory.create(WidgetType.BRIDGE, {}), [widgetsFactory]);
+  const swapWidget = useMemo(() => widgetsFactory.create(WidgetType.SWAP, {}), [widgetsFactory]);
+  const onRampWidget = useMemo(() => widgetsFactory.create(WidgetType.ONRAMP, {}), [widgetsFactory]);
 
   connectWidget.on(ConnectEventType.CLOSE_WIDGET, () => {connectWidget.destroy()});
   walletWidget.on(WalletEventType.CLOSE_WIDGET, () => {walletWidget.destroy()});

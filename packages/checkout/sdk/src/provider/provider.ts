@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import detectEthereumProvider from '@metamask/detect-provider';
 import { Web3Provider, ExternalProvider } from '@ethersproject/providers';
-// import { Passport } from '@imtbl/passport';
 import { Passport } from '@imtbl/passport';
 import {
   CreateProviderResult,

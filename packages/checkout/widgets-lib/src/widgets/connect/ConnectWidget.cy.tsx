@@ -38,10 +38,11 @@ describe('ConnectWidget tests', () => {
   /** mounting the connect widget should be done to start all tests */
   const mountConnectWidget = () => {
     const props = {} as ConnectWidgetParams;
+    const checkout = new Checkout({ baseConfig: { environment: Environment.SANDBOX } });
 
     mount(
       <CustomAnalyticsProvider widgetConfig={config}>
-        <ConnectWidget config={config} {...props} />
+        <ConnectWidget config={config} checkout={checkout} {...props} />
       </CustomAnalyticsProvider>,
     );
   };
@@ -72,15 +73,13 @@ describe('ConnectWidget tests', () => {
     const testPassportInstance = {
       connectEvm: cy.stub().as('connectEvmStub').returns(passportProvider),
     } as any as Passport;
-    const passportParams = {
-      passport: testPassportInstance,
-    } as ConnectWidgetParams;
+    const checkout = new Checkout({ baseConfig: { environment: Environment.SANDBOX }, passport: testPassportInstance });
 
     mount(
       <CustomAnalyticsProvider widgetConfig={config}>
         <ConnectWidget
-          {...passportParams}
           config={config}
+          checkout={checkout}
         />
       </CustomAnalyticsProvider>,
     );
@@ -425,16 +424,19 @@ describe('ConnectWidget tests', () => {
       const testPassportInstance = {
         connectEvm: cy.stub().as('connectEvmStub').returns(passportProvider),
       } as any as Passport;
-      const passportParams = {
-        passport: testPassportInstance,
+      const connectParams = {
         targetLayer: ConnectTargetLayer.LAYER1,
       } as ConnectWidgetParams;
+      const checkout = new Checkout(
+        { baseConfig: { environment: Environment.SANDBOX }, passport: testPassportInstance },
+      );
 
       mount(
         <CustomAnalyticsProvider widgetConfig={config}>
           <ConnectWidget
-            {...passportParams}
             config={config}
+            checkout={checkout}
+            {...connectParams}
           />
         </CustomAnalyticsProvider>,
       );
@@ -453,11 +455,13 @@ describe('ConnectWidget tests', () => {
         .rejects({});
 
       const props = {} as ConnectWidgetParams;
+      const checkout = new Checkout({ baseConfig: { environment: Environment.SANDBOX } });
 
       mount(
         <CustomAnalyticsProvider widgetConfig={config}>
           <ConnectWidget
             {...props}
+            checkout={checkout}
             config={config}
           />
         </CustomAnalyticsProvider>,

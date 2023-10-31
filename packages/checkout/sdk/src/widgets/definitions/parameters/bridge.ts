@@ -1,6 +1,5 @@
 /* eslint-disable max-len */
 import { Web3Provider } from '@ethersproject/providers';
-import { Passport } from '@imtbl/passport';
 import { WalletProviderName } from '../../../types';
 
 /**
@@ -9,12 +8,10 @@ import { WalletProviderName } from '../../../types';
  * @property {string | undefined} amount - The formatted amount to bridge, used to populate the bridge form amount field
  * @property {WalletProviderName | undefined} walletProvider - The wallet provider to use for the bridge widget
  * @property {Web3Provider | undefined} web3Provider - The ethers Web3Provider
- * @property {Passport | undefined} passport - The passport instance
  */
 export type BridgeWidgetParams = {
   fromContractAddress?: string;
   amount?: string;
   walletProvider?: WalletProviderName
   web3Provider?: Web3Provider
-  passport?: Passport
 };

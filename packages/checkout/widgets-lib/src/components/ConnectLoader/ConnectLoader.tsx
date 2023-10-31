@@ -6,12 +6,13 @@ import {
   GetNetworkParams,
   WalletProviderName,
 
-  ConnectEventType, ConnectionSuccess, WidgetTheme, ConnectTargetLayer, IMTBLWidgetEvents,
+  ConnectEventType, ConnectionSuccess, ConnectTargetLayer, IMTBLWidgetEvents,
 } from '@imtbl/checkout-sdk';
-import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
+import { BaseTokens } from '@biom3/design-tokens';
 import React, {
   useCallback, useEffect, useMemo, useReducer, useState,
 } from 'react';
+import { widgetTheme } from 'lib/theme';
 import {
   ConnectLoaderActions,
   ConnectLoaderContext,
@@ -71,10 +72,7 @@ export function ConnectLoader({
   } = params;
   const networkToSwitchTo = targetLayer ?? ConnectTargetLayer.LAYER2;
 
-  // TODO: Pass in theme from root class
-  const biomeTheme: BaseTokens = widgetConfig.theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
-    ? onLightBase
-    : onDarkBase;
+  const biomeTheme: BaseTokens = widgetTheme(widgetConfig.theme);
 
   const [hasWeb3Provider, setHasWeb3Provider] = useState<boolean | undefined>();
 

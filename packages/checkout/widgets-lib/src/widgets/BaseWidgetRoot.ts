@@ -72,6 +72,7 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
   }
 
   update(properties: WidgetProperties<T>): void {
+    console.log(typeof properties);
     this.properties = this.getValidatedProperties({
       params: {
         ...(this.properties.params ?? {}),
