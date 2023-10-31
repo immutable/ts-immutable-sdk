@@ -3255,7 +3255,7 @@ __metadata:
   resolution: "@imtbl/config@workspace:packages/config"
   dependencies:
     "@imtbl/core-sdk": ^2.4.0
-    "@magic-ext/oidc": ^1.0.1
+    "@magic-ext/oidc": ^4.2.0
     "@metamask/detect-provider": ^2.0.0
     "@rollup/plugin-typescript": ^11.0.0
     "@swc/core": ^1.3.36
@@ -3272,7 +3272,7 @@ __metadata:
     ethers: ^5.7.2
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
-    magic-sdk: ^13.3.1
+    magic-sdk: ^21.2.0
     oidc-client-ts: ^2.2.1
     prettier: ^2.8.7
     rollup: ^3.17.2
@@ -3695,7 +3695,7 @@ __metadata:
     "@imtbl/config": 0.0.0
     "@imtbl/core-sdk": ^2.4.0
     "@imtbl/toolkit": 0.0.0
-    "@magic-ext/oidc": ^1.0.1
+    "@magic-ext/oidc": ^4.2.0
     "@metamask/detect-provider": ^2.0.0
     "@rollup/plugin-typescript": ^11.0.0
     "@swc/core": ^1.3.36
@@ -3712,7 +3712,7 @@ __metadata:
     ethers: ^5.7.2
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
-    magic-sdk: ^13.3.1
+    magic-sdk: ^21.2.0
     oidc-client-ts: ^2.2.1
     prettier: ^2.8.7
     rollup: ^3.17.2
@@ -3755,7 +3755,7 @@ __metadata:
     "@imtbl/provider": 0.0.0
     "@imtbl/version-check": 0.0.0
     "@jest/globals": ^29.5.0
-    "@magic-ext/oidc": ^1.0.1
+    "@magic-ext/oidc": ^4.2.0
     "@metamask/detect-provider": ^2.0.0
     "@opensea/seaport-js": 2.0.7
     "@rollup/plugin-commonjs": ^24.0.1
@@ -3776,7 +3776,7 @@ __metadata:
     ethers: ^5.7.2
     glob: ^10.2.3
     jwt-decode: ^3.1.2
-    magic-sdk: ^13.3.1
+    magic-sdk: ^21.2.0
     oidc-client-ts: ^2.2.1
     rollup: ^3.17.2
     rollup-plugin-dts: ^5.3.0
@@ -3797,7 +3797,7 @@ __metadata:
     "@ethersproject/providers": ^5.7.2
     "@ethersproject/wallet": ^5.7.0
     "@imtbl/core-sdk": ^2.4.0
-    "@magic-ext/oidc": ^1.0.1
+    "@magic-ext/oidc": ^4.2.0
     "@metamask/detect-provider": ^2.0.0
     "@rollup/plugin-typescript": ^11.0.0
     "@swc/core": ^1.3.36
@@ -3816,7 +3816,7 @@ __metadata:
     ethers: ^5.7.2
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
-    magic-sdk: ^13.3.1
+    magic-sdk: ^21.2.0
     oidc-client-ts: ^2.2.1
     prettier: ^2.8.7
     rollup: ^3.17.2
@@ -4556,13 +4556,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@magic-ext/oidc@npm:^1.0.1":
-  version: 1.3.1
-  resolution: "@magic-ext/oidc@npm:1.3.1"
-  checksum: 482dae6be2c8331ad184fd9ce720521b4a84df1cfdac7eb79ad88ece88ce0f3eac78d5896d33956a524d838e20c2c94fccaa1de67e995c793996076b5b7f0c35
-  languageName: node
-  linkType: hard
-
 "@magic-ext/oidc@npm:^4.2.0":
   version: 4.2.0
   resolution: "@magic-ext/oidc@npm:4.2.0"
@@ -4580,29 +4573,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@magic-sdk/commons@npm:^9.6.2":
-  version: 9.6.2
-  resolution: "@magic-sdk/commons@npm:9.6.2"
-  peerDependencies:
-    "@magic-sdk/provider": ">=4.3.0"
-    "@magic-sdk/types": ">=3.1.1"
-  checksum: d1c8803f1239a037bf723b733cedb50a61a7d0ba8f4acebca59e9c788a0a442e55960dd53679248d2497c80538c029f831d9043cdf242bda5c3262b60e5f7bbd
-  languageName: node
-  linkType: hard
-
-"@magic-sdk/provider@npm:^13.6.2":
-  version: 13.6.2
-  resolution: "@magic-sdk/provider@npm:13.6.2"
-  dependencies:
-    "@magic-sdk/types": ^11.6.2
-    eventemitter3: ^4.0.4
-    web3-core: 1.5.2
-  peerDependencies:
-    localforage: ^1.7.4
-  checksum: 4704e12550527a0b1c5e610309898239723bd457c473487d726899d2c7903cde966b059be038805d5f6fe85fa8cc8611f082d45f6306e37935c77050ff0e3b93
-  languageName: node
-  linkType: hard
-
 "@magic-sdk/provider@npm:^21.2.0":
   version: 21.2.0
   resolution: "@magic-sdk/provider@npm:21.2.0"
@@ -4613,13 +4583,6 @@ __metadata:
   peerDependencies:
     localforage: ^1.7.4
   checksum: 90be4c30d00274f4824a5a23e0fabde5e9f8eafc3f6ce2cf6617791d7d03a7d856edfa810deab994f65cd03699fd5a915af5b73a473496f85dd90485759656a5
-  languageName: node
-  linkType: hard
-
-"@magic-sdk/types@npm:^11.6.2":
-  version: 11.6.2
-  resolution: "@magic-sdk/types@npm:11.6.2"
-  checksum: e07ae7f2e267475f76b5cf0c7dfbc3739681759663ca5ddb5626c3d817025cb308a54fea88187585ce6c932ad0e90666a9449722e45cffd258444b77e2aed05c
   languageName: node
   linkType: hard
 
@@ -21840,18 +21803,6 @@ __metadata:
   version: 3.2.0
   resolution: "macos-release@npm:3.2.0"
   checksum: e780af4a8dcfdb4d7b5e717f866baf19f81798772b1f422ca5409c0a6b39baeb80827976fa498b8582409100c2d8c10cb89498dd557d777218cb40733c771843
-  languageName: node
-  linkType: hard
-
-"magic-sdk@npm:^13.3.1":
-  version: 13.6.2
-  resolution: "magic-sdk@npm:13.6.2"
-  dependencies:
-    "@magic-sdk/commons": ^9.6.2
-    "@magic-sdk/provider": ^13.6.2
-    "@magic-sdk/types": ^11.6.2
-    localforage: ^1.7.4
-  checksum: 63527b00b333cc59a841d49cbbaf80eb309e6b2d368ad354656721494bbc0d2f3d372b9c0343191b2da63437a35d648e0cb9c75a481cfa290e419fcde6e8b67c
   languageName: node
   linkType: hard
 
