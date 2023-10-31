@@ -107,10 +107,12 @@ export const useTransakEvents = (props: UseTransakEventsProps) => {
     if (Object.keys(eventData).length >= 0) {
       track({
         ...eventData,
-        email,
-        userId,
         userJourney,
-        isPassportWallet,
+        extras: {
+          email,
+          userId,
+          isPassportWallet,
+        },
       });
     }
   }, []);

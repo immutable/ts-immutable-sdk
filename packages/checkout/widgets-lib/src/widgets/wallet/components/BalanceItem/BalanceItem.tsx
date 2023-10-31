@@ -104,8 +104,10 @@ export function BalanceItem({
               screen: 'WalletBalances',
               control: 'BalanceItem',
               controlType: 'Button',
-              tokenSymbol: balanceInfo.symbol,
-              tokenAddress: balanceInfo.address,
+              extras: {
+                tokenSymbol: balanceInfo.symbol,
+                tokenAddress: balanceInfo.address,
+              },
             });
           }}
         >
@@ -118,8 +120,10 @@ export function BalanceItem({
                 screen: 'WalletBalances',
                 control: 'AddTokens',
                 controlType: 'Button',
-                tokenSymbol: balanceInfo.symbol,
-                tokenAddress: balanceInfo.address,
+                extras: {
+                  tokenSymbol: balanceInfo.symbol,
+                  tokenAddress: balanceInfo.address,
+                },
               });
               orchestrationEvents.sendRequestOnrampEvent(
                 eventTarget,
@@ -143,8 +147,10 @@ export function BalanceItem({
                 screen: 'WalletBalances',
                 control: 'SwapTokens',
                 controlType: 'Button',
-                tokenSymbol: balanceInfo.symbol,
-                tokenAddress: balanceInfo.address,
+                extras: {
+                  tokenSymbol: balanceInfo.symbol,
+                  tokenAddress: balanceInfo.address,
+                },
               });
               orchestrationEvents.sendRequestSwapEvent(
                 eventTarget,
@@ -169,8 +175,10 @@ export function BalanceItem({
                 screen: 'WalletBalances',
                 control: 'MoveTokens',
                 controlType: 'Button',
-                tokenSymbol: balanceInfo.symbol,
-                tokenAddress: balanceInfo.address,
+                extras: {
+                  tokenSymbol: balanceInfo.symbol,
+                  tokenAddress: balanceInfo.address,
+                },
               });
               bridgeToL2OnClick(balanceInfo.address);
             }}
