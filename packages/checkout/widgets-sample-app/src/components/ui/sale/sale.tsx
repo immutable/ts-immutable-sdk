@@ -14,8 +14,8 @@ import { Passport } from '@imtbl/passport';
 const defaultPassportConfig = {
   environment: 'sandbox',
   clientId: 'sWMLNvDrK5F8ibNWOqYgdKWsUtdLLz4J',
-  redirectUri: 'http://localhost:3000/sale?login=true',
-  logoutRedirectUri: 'http://localhost:3000/sale?logout=true',
+  redirectUri: 'http://localhost:3001/sale?login=true',
+  logoutRedirectUri: 'http://localhost:3001/sale?logout=true',
   audience: 'platform_api',
   scope: 'openid offline_access email transact',
 };
@@ -177,12 +177,12 @@ export function SaleUI() {
   // }, [passportConfig, items]);
 
   // I think this should go in where the login is called
-  // useEffect(() => {
-  //   // const passportInstance = usePassportInstance(JSON.parse(passportConfig));
-  //   if (passportInstance) {
-  //     passportInstance.loginCallback();
-  //   }
-  // }, [login, passportInstance]);
+  useEffect(() => {
+    // const passportInstance = usePassportInstance(JSON.parse(passportConfig));
+    if (passportInstance && login) {
+      passportInstance.loginCallback();
+    }
+  }, [login, passportInstance]);
 
   useEffect(() => {
     const lsPassportConfig = localStorage.getItem('imtbl/prw_passportConfig');
