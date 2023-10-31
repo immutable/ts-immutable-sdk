@@ -3,8 +3,14 @@ import { ImmutableXClient } from '@imtbl/immutablex-client';
 import {
   CreateOrderResponse,
   CreateTransferResponseV1,
-  EthSigner, GetSignableCancelOrderRequest, GetSignableTradeRequest, NftTransferDetails,
-  StarkSigner, UnsignedExchangeTransferRequest, UnsignedOrderRequest, UnsignedTransferRequest,
+  EthSigner,
+  GetSignableCancelOrderRequest,
+  GetSignableTradeRequest,
+  NftTransferDetails,
+  StarkSigner,
+  UnsignedExchangeTransferRequest,
+  UnsignedOrderRequest,
+  UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
 import AuthManager from 'authManager';
 import { testConfig } from '../test/mocks';
