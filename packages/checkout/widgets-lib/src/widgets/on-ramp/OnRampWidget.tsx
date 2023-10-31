@@ -31,7 +31,7 @@ export type OnRampWidgetInputs = OnRampWidgetParams & {
 };
 
 export function OnRampWidget({
-  passport, amount, contractAddress, config,
+  amount, contractAddress, config,
 }: OnRampWidgetInputs) {
   const {
     theme, isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
@@ -146,7 +146,7 @@ export function OnRampWidget({
         && viewState.view.type !== OnRampWidgetViews.FAIL
         ) && (
         <OnRampMain
-          passport={passport}
+          passport={checkout?.passport}
           showIframe={showIframe}
           tokenAmount={viewState.view.data?.amount ?? amount}
           tokenAddress={

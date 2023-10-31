@@ -79,7 +79,6 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
               <OnRampWidget
                 contractAddress={params?.contractAddress}
                 amount={params?.amount}
-                passport={params?.passport}
                 config={this.strongConfig()}
               />
             </ConnectLoader>

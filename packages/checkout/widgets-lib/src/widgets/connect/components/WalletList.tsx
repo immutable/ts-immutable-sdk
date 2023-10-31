@@ -76,7 +76,6 @@ export function WalletList(props: WalletListProps) {
       try {
         const providerResult = await checkout.createProvider({
           walletProvider: walletProviderName,
-          passport,
         });
         const web3Provider = providerResult.provider;
 

@@ -53,8 +53,12 @@ export const MainPage = () => {
     })
   }, [connectWidget, walletWidget]);
 
+  // keep provider updated in widgets
   useEffect(() => {
     walletWidget.update({params: {web3Provider}})
+    swapWidget.update({params: {web3Provider}})
+    bridgeWidget.update({params: {web3Provider}})
+    onRampWidget.update({params: {web3Provider}})
   }, [web3Provider])
 
 
