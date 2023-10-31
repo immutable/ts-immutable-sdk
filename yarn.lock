@@ -3657,7 +3657,7 @@ __metadata:
     "@imtbl/immutablex-client": 0.0.0
     "@imtbl/provider": 0.0.0
     "@imtbl/toolkit": 0.0.0
-    "@magic-ext/oidc": ^1.0.1
+    "@magic-ext/oidc": ^4.2.0
     "@metamask/detect-provider": ^2.0.0
     "@rollup/plugin-typescript": ^11.0.0
     "@swc/core": ^1.3.36
@@ -3678,7 +3678,7 @@ __metadata:
     jest-environment-jsdom: ^29.4.3
     jwt-decode: ^3.1.2
     jwt-encode: ^1.0.1
-    magic-sdk: ^13.3.1
+    magic-sdk: ^21.2.0
     msw: ^1.2.2
     oidc-client-ts: ^2.2.1
     prettier: ^2.8.7
@@ -4563,6 +4563,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@magic-ext/oidc@npm:^4.2.0":
+  version: 4.2.0
+  resolution: "@magic-ext/oidc@npm:4.2.0"
+  checksum: 7bd51bf45168b7456a963f87c9118617f73c9a7e2c427b4bd786775f5fb80c90e90cbb10069e8a670587a8b20871bf4aa706f9fdef7f5981f007550b2adfc947
+  languageName: node
+  linkType: hard
+
+"@magic-sdk/commons@npm:^17.2.0":
+  version: 17.2.0
+  resolution: "@magic-sdk/commons@npm:17.2.0"
+  peerDependencies:
+    "@magic-sdk/provider": ">=18.6.0"
+    "@magic-sdk/types": ">=15.8.0"
+  checksum: 29adbb1d3274c39a9c75603b5db83b22b6e7e7cc129a4fdc590f994e05b4fd37685a3fce305b5df94e4917535429572f07ad08d6f2821b301b900e365ac18129
+  languageName: node
+  linkType: hard
+
 "@magic-sdk/commons@npm:^9.6.2":
   version: 9.6.2
   resolution: "@magic-sdk/commons@npm:9.6.2"
@@ -4586,10 +4603,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@magic-sdk/provider@npm:^21.2.0":
+  version: 21.2.0
+  resolution: "@magic-sdk/provider@npm:21.2.0"
+  dependencies:
+    "@magic-sdk/types": ^17.2.0
+    eventemitter3: ^4.0.4
+    web3-core: 1.5.2
+  peerDependencies:
+    localforage: ^1.7.4
+  checksum: 90be4c30d00274f4824a5a23e0fabde5e9f8eafc3f6ce2cf6617791d7d03a7d856edfa810deab994f65cd03699fd5a915af5b73a473496f85dd90485759656a5
+  languageName: node
+  linkType: hard
+
 "@magic-sdk/types@npm:^11.6.2":
   version: 11.6.2
   resolution: "@magic-sdk/types@npm:11.6.2"
   checksum: e07ae7f2e267475f76b5cf0c7dfbc3739681759663ca5ddb5626c3d817025cb308a54fea88187585ce6c932ad0e90666a9449722e45cffd258444b77e2aed05c
+  languageName: node
+  linkType: hard
+
+"@magic-sdk/types@npm:^17.2.0":
+  version: 17.2.0
+  resolution: "@magic-sdk/types@npm:17.2.0"
+  checksum: a3e4dbbe59f6f8a8eb67fb2c158fe829098945c64781be393ab0b10efad7a236d26b2ff749edde51910a4aae15d9ba9f5ba30572c8c594c5256fb5c6b0d03b45
   languageName: node
   linkType: hard
 
@@ -21815,6 +21852,18 @@ __metadata:
     "@magic-sdk/types": ^11.6.2
     localforage: ^1.7.4
   checksum: 63527b00b333cc59a841d49cbbaf80eb309e6b2d368ad354656721494bbc0d2f3d372b9c0343191b2da63437a35d648e0cb9c75a481cfa290e419fcde6e8b67c
+  languageName: node
+  linkType: hard
+
+"magic-sdk@npm:^21.2.0":
+  version: 21.2.0
+  resolution: "magic-sdk@npm:21.2.0"
+  dependencies:
+    "@magic-sdk/commons": ^17.2.0
+    "@magic-sdk/provider": ^21.2.0
+    "@magic-sdk/types": ^17.2.0
+    localforage: ^1.7.4
+  checksum: 6db2c2ad005a87875fc0cd7d65fd81937390a71971d763164bfd2f8a7c2d134c9c51852c6cbb54aba74c52a8cdb1e5e7db576690e55c75279234e2320b3605af
   languageName: node
   linkType: hard
 
