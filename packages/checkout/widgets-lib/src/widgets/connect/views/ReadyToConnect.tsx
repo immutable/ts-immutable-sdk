@@ -1,5 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { ChainId, Checkout, WalletProviderName } from '@imtbl/checkout-sdk';
+import { ChainId, WalletProviderName } from '@imtbl/checkout-sdk';
 import {
   useContext, useState, useCallback, useMemo, useEffect,
 } from 'react';
@@ -88,16 +88,10 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
     return true;
   }, [history]);
 
-  const handleConnectViewUpdate = async (
-    // TODO: variable is already declared above
-    // eslint-disable-next-line
-    checkout: Checkout,
-    // eslint-disable-next-line
-    provider: Web3Provider,
-  ) => {
-    const networkInfo = await checkout.getNetworkInfo({ provider });
-
-    if (networkInfo.chainId !== targetChainId) {
+  // eslint-disable-next-line @typescript-eslint/no-shadow
+  const handleConnectViewUpdate = async (provider: Web3Provider) => {
+    const chainId = await provider.getSigner().getChainId();
+    if (chainId !== targetChainId) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -118,30 +112,32 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
   const onConnectClick = useCallback(async () => {
     if (loading) return;
     setLoading(true);
-    if (checkout && provider) {
-      try {
-        track({
-          userJourney: UserJourney.CONNECT,
-          screen: 'ReadyToConnect',
-          control: 'Connect',
-          controlType: 'Button',
-        });
-        const connectResult = await checkout.connect({
-          provider,
-        });
-        await identifyUser(identify, connectResult.provider);
+    if (!checkout) return;
+    if (!provider) return;
 
-        connectDispatch({
-          payload: {
-            type: ConnectActions.SET_PROVIDER,
-            provider: connectResult.provider,
-          },
-        });
-        handleConnectViewUpdate(checkout, provider);
-      } catch (err: any) {
-        setLoading(false);
-        setFooterButtonText(footer.buttonText2);
-      }
+    try {
+      track({
+        userJourney: UserJourney.CONNECT,
+        screen: 'ReadyToConnect',
+        control: 'Connect',
+        controlType: 'Button',
+      });
+      const connectResult = await checkout.connect({
+        provider,
+      });
+
+      identifyUser(identify, connectResult.provider);
+
+      connectDispatch({
+        payload: {
+          type: ConnectActions.SET_PROVIDER,
+          provider: connectResult.provider,
+        },
+      });
+      handleConnectViewUpdate(provider);
+    } catch (err: any) {
+      setLoading(false);
+      setFooterButtonText(footer.buttonText2);
     }
   }, [checkout, provider, connectDispatch, viewDispatch, footer.buttonText2, identify]);
 
