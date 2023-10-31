@@ -46,14 +46,12 @@ function ImxWorkflow() {
     <CardStack title="Imx Workflow">
       <Stack direction="horizontal" style={{ flexWrap: 'wrap' }} gap={3}>
         {!imxProvider && (
-          <>
-            <WorkflowButton
-              disabled={isLoading}
-              onClick={connectImx}
-            >
-              Connect
-            </WorkflowButton>
-          </>
+          <WorkflowButton
+            disabled={isLoading}
+            onClick={connectImx}
+          >
+            Connect
+          </WorkflowButton>
         )}
         {imxProvider && (
           <>
