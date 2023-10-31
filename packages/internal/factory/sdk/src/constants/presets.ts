@@ -3,7 +3,7 @@ export const PRESETS = [
     name: 'ImmutableERC721',
     group: 'NFT',
     description: 'A simple NFT Preset',
-    link: 'https://github.com/immutable/zkevm-contracts/blob/main/contracts/token/erc721/preset/ImmutableERC721.sol',
+    link: 'https://github.com/immutable/contracts/blob/main/contracts/token/erc721/preset/ImmutableERC721.sol',
     creationABI: {
       inputs: [
         {
@@ -48,7 +48,7 @@ export const PRESETS = [
     group: 'NFT',
     description: 'A simple NFT Preset that lets you mint by ID',
     // eslint-disable-next-line max-len
-    link: 'https://github.com/immutable/zkevm-contracts/blob/main/contracts/token/erc721/preset/ImmutableERC721MintByID.sol',
+    link: 'https://github.com/immutable/contracts/blob/main/contracts/token/erc721/preset/ImmutableERC721MintByID.sol',
     creationABI: {
       inputs: [
         {
@@ -94,7 +94,7 @@ export const PRESETS = [
     group: 'NFT',
     description: 'A simple NFT Preset called ERC721Psi',
     // eslint-disable-next-line max-len
-    link: 'https://github.com/immutable/zkevm-contracts/blob/main/contracts/token/erc721/erc721psi/ERC721Psi.sol',
+    link: 'https://github.com/immutable/contracts/blob/main/contracts/token/erc721/erc721psi/ERC721Psi.sol',
     creationABI: {
       inputs: [
         {
