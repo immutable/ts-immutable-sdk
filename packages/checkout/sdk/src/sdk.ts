@@ -104,7 +104,7 @@ export class Checkout {
         if (typeof ImmutableCheckoutWidgets !== 'undefined') {
           resolve(new ImmutableCheckoutWidgets.WidgetsFactory(checkout, init.config));
         } else {
-          setTimeout(checkForWidgetsFactory, 10);
+          setTimeout(checkForWidgetsFactory, 100);
         }
       }
 

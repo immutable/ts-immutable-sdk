@@ -13,11 +13,12 @@ export function loadUnresolved(
     throw new Error('missing document object: please run Checkout client side');
   }
 
+  const scriptId = 'immutable-checkout-widgets-bundle';
   const validVersion = validateAndBuildVersion(version);
 
   // Prevent the script to be loaded more than once
   // by checking the presence of the script and its version.
-  const initScript = document.querySelector('[data-product="checkout"]') as HTMLScriptElement;
+  const initScript = document.getElementById(scriptId) as HTMLScriptElement;
   if (initScript) return { loaded: true, element: initScript };
 
   const tag = document.createElement('script');
@@ -25,8 +26,7 @@ export function loadUnresolved(
   let cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${validVersion}/dist/browser/checkout/widgets.js`;
   if (useLocalBundle()) cdnUrl = `http://${window.location.host}/lib/js/widgets.js`;
 
-  tag.setAttribute('id', 'immutable-checkout-widgets-bundle');
-  tag.setAttribute('data-product', 'checkout');
+  tag.setAttribute('id', scriptId);
   tag.setAttribute('data-version', validVersion);
   tag.setAttribute('src', cdnUrl);
 

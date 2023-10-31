@@ -12,7 +12,7 @@ describe('load', () => {
     it('should validate the versioning', () => {
       loadUnresolved();
       expect(document.head.innerHTML).toBe(
-        '<script id="immutable-checkout-widgets-bundle" data-product="checkout" '
+        '<script id="immutable-checkout-widgets-bundle" '
         + 'data-version="__SDK_VERSION__" '
         + `src="https://cdn.jsdelivr.net/npm/@imtbl/sdk@${SDK_VERSION}/dist/browser/checkout/widgets.js"></script>`,
       );
@@ -23,7 +23,7 @@ describe('load', () => {
       loadUnresolved();
       loadUnresolved();
       expect(document.head.innerHTML).toBe(
-        '<script id="immutable-checkout-widgets-bundle" data-product="checkout" '
+        '<script id="immutable-checkout-widgets-bundle" '
         + 'data-version="__SDK_VERSION__" '
         + `src="https://cdn.jsdelivr.net/npm/@imtbl/sdk@${SDK_VERSION}/dist/browser/checkout/widgets.js"></script>`,
       );
@@ -36,7 +36,7 @@ describe('load', () => {
         minor: 2,
       });
       expect(document.head.innerHTML).toBe(
-        '<script id="immutable-checkout-widgets-bundle" data-product="checkout" '
+        '<script id="immutable-checkout-widgets-bundle" '
         + 'data-version="__SDK_VERSION__" '
         + `src="https://cdn.jsdelivr.net/npm/@imtbl/sdk@${SDK_VERSION}/dist/browser/checkout/widgets.js"></script>`,
       );
