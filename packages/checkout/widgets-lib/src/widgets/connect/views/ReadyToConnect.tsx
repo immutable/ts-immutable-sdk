@@ -111,9 +111,10 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
 
   const onConnectClick = useCallback(async () => {
     if (loading) return;
-    setLoading(true);
     if (!checkout) return;
     if (!provider) return;
+
+    setLoading(true);
 
     try {
       track({
@@ -126,7 +127,7 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
         provider,
       });
 
-      identifyUser(identify, connectResult.provider);
+      await identifyUser(identify, connectResult.provider);
 
       connectDispatch({
         payload: {
