@@ -34,7 +34,7 @@ import { ConfirmationScreen } from '../confirmation';
 import { PassportConfiguration } from '../config';
 import registerStarkEx from './workflows/registerStarkEx';
 
-export interface PassportImxProviderInput {
+export interface PassportImxProviderOptions {
   authManager: AuthManager;
   starkSigner: StarkSigner;
   immutableXClient: ImmutableXClient;
@@ -69,7 +69,7 @@ export class PassportImxProvider implements IMXProvider {
     config,
     passportEventEmitter,
     ethSigner,
-  }: PassportImxProviderInput) {
+  }: PassportImxProviderOptions) {
     this.authManager = authManager;
     this.starkSigner = starkSigner;
     this.ethSigner = ethSigner;
@@ -87,17 +87,7 @@ export class PassportImxProvider implements IMXProvider {
     this.ethSigner = undefined;
   };
 
-  protected async checkIsLoggedIn() {
-    const user = await this.authManager.getUser();
-    if (!user || this.starkSigner === undefined || this.ethSigner === undefined) {
-      throw new PassportError(
-        'User has been logged out',
-        PassportErrorType.NOT_LOGGED_IN_ERROR,
-      );
-    }
-  }
-
-  protected async checkUserAndSignersDefined() {
+  protected async getAuthenticatedUserAndSigners() {
     const user = await this.authManager.getUser();
     if (!user || this.starkSigner === undefined || this.ethSigner === undefined) {
       throw new PassportError(
@@ -108,8 +98,8 @@ export class PassportImxProvider implements IMXProvider {
     return { user, starkSigner: this.starkSigner, ethSigner: this.ethSigner };
   }
 
-  protected async getAuthenticatedUserSigner(): Promise<AuthenticatedUserSigner> {
-    const { user, starkSigner, ethSigner } = await this.checkUserAndSignersDefined();
+  protected async getRegisteredImxUserAndSigners(): Promise<AuthenticatedUserSigner> {
+    const { user, starkSigner, ethSigner } = await this.getAuthenticatedUserAndSigners();
     const isUserImx = (oidcUser: User | null): oidcUser is UserImx => oidcUser?.imx !== undefined;
 
     if (!isUserImx(user)) {
@@ -123,7 +113,7 @@ export class PassportImxProvider implements IMXProvider {
   }
 
   async transfer(request: UnsignedTransferRequest): Promise<CreateTransferResponseV1> {
-    const { user, starkSigner } = await this.getAuthenticatedUserSigner();
+    const { user, starkSigner } = await this.getRegisteredImxUserAndSigners();
 
     return transfer({
       request,
@@ -135,11 +125,11 @@ export class PassportImxProvider implements IMXProvider {
   }
 
   async registerOffchain(): Promise<RegisterUserResponse> {
-    const { user, ethSigner, starkSigner } = await this.checkUserAndSignersDefined();
+    const { user, ethSigner, starkSigner } = await this.getAuthenticatedUserAndSigners();
     return await registerStarkEx(
       ethSigner,
       starkSigner,
-      user.accessToken,
+      user,
       this.authManager,
       this.immutableXClient.usersApi,
     );
@@ -147,7 +137,7 @@ export class PassportImxProvider implements IMXProvider {
 
   async isRegisteredOffchain(): Promise<boolean> {
     try {
-      const { user } = await this.getAuthenticatedUserSigner();
+      const { user } = await this.getRegisteredImxUserAndSigners();
       const { ethAddress, starkAddress, userAdminAddress } = user.imx;
       return !!(ethAddress && starkAddress && userAdminAddress);
     } catch (err) {
@@ -168,7 +158,7 @@ export class PassportImxProvider implements IMXProvider {
   }
 
   async createOrder(request: UnsignedOrderRequest): Promise<CreateOrderResponse> {
-    const { user, starkSigner } = await this.getAuthenticatedUserSigner();
+    const { user, starkSigner } = await this.getRegisteredImxUserAndSigners();
 
     return createOrder({
       request,
@@ -182,7 +172,7 @@ export class PassportImxProvider implements IMXProvider {
   async cancelOrder(
     request: GetSignableCancelOrderRequest,
   ): Promise<CancelOrderResponse> {
-    const { user, starkSigner } = await this.getAuthenticatedUserSigner();
+    const { user, starkSigner } = await this.getRegisteredImxUserAndSigners();
 
     return cancelOrder({
       request,
@@ -194,7 +184,7 @@ export class PassportImxProvider implements IMXProvider {
   }
 
   async createTrade(request: GetSignableTradeRequest): Promise<CreateTradeResponse> {
-    const { user, starkSigner } = await this.getAuthenticatedUserSigner();
+    const { user, starkSigner } = await this.getRegisteredImxUserAndSigners();
 
     return createTrade({
       request,
@@ -208,7 +198,7 @@ export class PassportImxProvider implements IMXProvider {
   async batchNftTransfer(
     request: NftTransferDetails[],
   ): Promise<CreateTransferResponse> {
-    const { user, starkSigner } = await this.getAuthenticatedUserSigner();
+    const { user, starkSigner } = await this.getRegisteredImxUserAndSigners();
 
     return batchNftTransfer({
       request,
@@ -222,7 +212,7 @@ export class PassportImxProvider implements IMXProvider {
   async exchangeTransfer(
     request: UnsignedExchangeTransferRequest,
   ): Promise<CreateTransferResponseV1> {
-    const { user, starkSigner } = await this.getAuthenticatedUserSigner();
+    const { user, starkSigner } = await this.getRegisteredImxUserAndSigners();
 
     return exchangeTransfer({
       request,
@@ -265,7 +255,7 @@ export class PassportImxProvider implements IMXProvider {
   }
 
   async getAddress(): Promise<string> {
-    const { user } = await this.getAuthenticatedUserSigner();
+    const { user } = await this.getRegisteredImxUserAndSigners();
     return Promise.resolve(user.imx.ethAddress);
   }
 }

@@ -14,7 +14,7 @@ import { PassportErrorType, withPassportError } from './errors/passportError';
 import {
   PassportMetadata,
   User,
-  DeviceCodeReponse,
+  DeviceCodeResponse,
   DeviceConnectResponse,
   DeviceTokenResponse,
   DeviceErrorResponse,
@@ -168,7 +168,7 @@ export default class AuthManager {
 
   public async loginWithDeviceFlow(): Promise<DeviceConnectResponse> {
     return withPassportError<DeviceConnectResponse>(async () => {
-      const response = await axios.post<DeviceCodeReponse>(
+      const response = await axios.post<DeviceCodeResponse>(
         `${this.config.authenticationDomain}/oauth/device/code`,
         {
           client_id: this.config.oidcConfiguration.clientId,

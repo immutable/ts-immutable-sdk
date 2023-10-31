@@ -10,7 +10,7 @@ import registerPassportStarkEx from './registration';
 export default async function registerStarkEx(
   userAdminKeySigner: EthSigner,
   starkSigner: StarkSigner,
-  jwt: string,
+  unregisteredUser: User,
   authManager: AuthManager,
   usersApi: UsersApi,
 ) {
@@ -21,7 +21,7 @@ export default async function registerStarkEx(
         starkSigner,
         usersApi,
       },
-      jwt,
+      unregisteredUser.accessToken,
     );
 
     // User metadata is updated asynchronously. Poll userinfo endpoint until it is updated.

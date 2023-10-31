@@ -1,5 +1,4 @@
 import { ImmutableXClient } from '@imtbl/immutablex-client';
-import { mockValidIdToken } from 'utils/token.test';
 import { Web3Provider } from '@ethersproject/providers';
 import { Signer } from 'ethers';
 import AuthManager from 'authManager';
@@ -44,7 +43,7 @@ describe('when we exceed the number of attempts to obtain a user with the correc
     await (expect(() => registerStarkEx(
       mockEthSigner,
       mockStarkSigner,
-      mockValidIdToken,
+      mockUserImx,
       mockAuthManager,
       mockImmutableXClient.usersApi,
     )).rejects.toThrow(new PassportError(
@@ -54,7 +53,7 @@ describe('when we exceed the number of attempts to obtain a user with the correc
 
     expect(registerPassportStarkEx).toHaveBeenCalledWith(
       { ethSigner: mockEthSigner, starkSigner: mockStarkSigner, usersApi: mockImmutableXClient.usersApi },
-      mockValidIdToken,
+      mockUserImx.accessToken,
     );
 
     expect(mockAuthManager.loginSilent).toHaveBeenCalledTimes(4);
@@ -71,7 +70,7 @@ describe('when registration is successful', () => {
     const txHash = await registerStarkEx(
       mockEthSigner,
       mockStarkSigner,
-      mockValidIdToken,
+      mockUserImx,
       mockAuthManager,
       mockImmutableXClient.usersApi,
     );
@@ -80,7 +79,7 @@ describe('when registration is successful', () => {
       ethSigner: mockEthSigner,
       starkSigner: mockStarkSigner,
       usersApi: mockImmutableXClient.usersApi,
-    }, mockValidIdToken);
+    }, mockUserImx.accessToken);
     expect(mockAuthManager.loginSilent).toHaveBeenCalledTimes(1);
     expect(mockAuthManager.loginSilent).toHaveBeenCalledWith({ forceRefresh: true });
   });

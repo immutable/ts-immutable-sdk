@@ -1,16 +1,20 @@
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 import { Web3Provider } from '@ethersproject/providers';
+import { IMXProvider } from '@imtbl/provider';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import { PassportConfiguration } from '../config';
 import AuthManager from '../authManager';
 import { ConfirmationScreen } from '../confirmation';
 import MagicAdapter from '../magicAdapter';
 import {
-  DeviceTokenResponse, PassportEventMap, User,
+  DeviceTokenResponse,
+  PassportEventMap,
+  User,
+  IMXSigners,
 } from '../types';
-import { PassportImxProvider } from './passportImxProvider';
 import { getStarkSigner } from './getStarkSigner';
 import TypedEventEmitter from '../utils/typedEventEmitter';
+import { LazyPassportImxProvider } from './LazyPassportImxProvider';
 
 export type PassportImxProviderFactoryInput = {
   authManager: AuthManager;
@@ -50,7 +54,7 @@ export class PassportImxProviderFactory {
     this.passportEventEmitter = passportEventEmitter;
   }
 
-  public async getProvider(): Promise<PassportImxProvider> {
+  public async getProvider(): Promise<IMXProvider> {
     let user = null;
     try {
       user = await this.authManager.loginSilent();
@@ -64,7 +68,7 @@ export class PassportImxProviderFactory {
     return this.createProviderInstance(user);
   }
 
-  public async getProviderSilent(): Promise<PassportImxProvider | null> {
+  public async getProviderSilent(): Promise<IMXProvider | null> {
     const user = await this.authManager.loginSilent();
     if (!user) {
       return null;
@@ -77,17 +81,17 @@ export class PassportImxProviderFactory {
     deviceCode: string,
     interval: number,
     timeoutMs?: number,
-  ): Promise<PassportImxProvider> {
+  ): Promise<IMXProvider> {
     const user = await this.authManager.connectImxDeviceFlow(deviceCode, interval, timeoutMs);
     return this.createProviderInstance(user);
   }
 
-  public async getProviderWithPKCEFlow(authorizationCode: string, state: string): Promise<PassportImxProvider> {
+  public async getProviderWithPKCEFlow(authorizationCode: string, state: string): Promise<IMXProvider> {
     const user = await this.authManager.connectImxPKCEFlow(authorizationCode, state);
     return this.createProviderInstance(user);
   }
 
-  public async getProviderWithCredentials(tokenResponse: DeviceTokenResponse): Promise<PassportImxProvider | null> {
+  public async getProviderWithCredentials(tokenResponse: DeviceTokenResponse): Promise<IMXProvider | null> {
     const user = await this.authManager.connectImxWithCredentials(tokenResponse);
     if (!user) {
       return null;
@@ -96,7 +100,17 @@ export class PassportImxProviderFactory {
     return this.createProviderInstance(user);
   }
 
-  private async createProviderInstance(user: User): Promise<PassportImxProvider> {
+  private async createSingers(idToken: string): Promise<IMXSigners> {
+    const magicRpcProvider = await this.magicAdapter.login(idToken);
+    const web3Provider = new Web3Provider(magicRpcProvider);
+
+    const ethSigner = web3Provider.getSigner();
+    const starkSigner = await getStarkSigner(ethSigner);
+
+    return { ethSigner, starkSigner };
+  }
+
+  private async createProviderInstance(user: User): Promise<IMXProvider> {
     if (!user.idToken) {
       throw new PassportError(
         'Failed to initialise',
@@ -104,21 +118,13 @@ export class PassportImxProviderFactory {
       );
     }
 
-    const magicRpcProvider = await this.magicAdapter.login(user.idToken);
-    const web3Provider = new Web3Provider(
-      magicRpcProvider,
-    );
-    const ethSigner = web3Provider.getSigner();
-    const starkSigner = await getStarkSigner(ethSigner);
-
-    return new PassportImxProvider({
+    return new LazyPassportImxProvider({
+      config: this.config,
       authManager: this.authManager,
-      starkSigner,
-      ethSigner,
       immutableXClient: this.immutableXClient,
       confirmationScreen: this.confirmationScreen,
-      config: this.config,
       passportEventEmitter: this.passportEventEmitter,
+      signersPromise: this.createSingers(user.idToken),
     });
   }
 }

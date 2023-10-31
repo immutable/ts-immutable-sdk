@@ -1,6 +1,5 @@
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 import { Web3Provider } from '@ethersproject/providers';
-import TypedEventEmitter from 'utils/typedEventEmitter';
 import { ConfirmationScreen } from '../confirmation';
 import registerPassportStarkEx from './workflows/registration';
 import { PassportImxProviderFactory } from './passportImxProviderFactory';
@@ -8,14 +7,15 @@ import MagicAdapter from '../magicAdapter';
 import AuthManager from '../authManager';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import { PassportEventMap } from '../types';
-import { PassportImxProvider } from './passportImxProvider';
 import { getStarkSigner } from './getStarkSigner';
 import { mockUserImx, testConfig } from '../test/mocks';
+import TypedEventEmitter from '../utils/typedEventEmitter';
+import { LazyPassportImxProvider } from './LazyPassportImxProvider';
 
 jest.mock('@ethersproject/providers');
 jest.mock('./workflows/registration');
 jest.mock('./getStarkSigner');
-jest.mock('./passportImxProvider');
+jest.mock('./LazyPassportImxProvider');
 
 describe('PassportImxProviderFactory', () => {
   const mockAuthManager = {
@@ -52,7 +52,7 @@ describe('PassportImxProviderFactory', () => {
     });
     (registerPassportStarkEx as jest.Mock).mockResolvedValue(null);
     (getStarkSigner as jest.Mock).mockResolvedValue(mockStarkSigner);
-    (PassportImxProvider as jest.Mock).mockImplementation(() => mockPassportImxProvider);
+    (LazyPassportImxProvider as jest.Mock).mockImplementation(() => mockPassportImxProvider);
   });
 
   describe('getProviderSilent', () => {
@@ -84,7 +84,7 @@ describe('PassportImxProviderFactory', () => {
     });
 
     describe('when the user has registered previously', () => {
-      it('should return a PassportImxProvider instance', async () => {
+      it('should return a lazy IMXProvider instance', async () => {
         const mockMagicProvider = {};
 
         mockAuthManager.login.mockResolvedValue(mockUserImx);
@@ -100,9 +100,8 @@ describe('PassportImxProviderFactory', () => {
         expect(mockMagicAdapter.login).toHaveBeenCalledWith(mockUserImx.idToken);
         expect(mockGetSigner).toHaveBeenCalledTimes(1);
         expect(registerPassportStarkEx).not.toHaveBeenCalled();
-        expect(PassportImxProvider).toHaveBeenCalledWith({
-          starkSigner: mockStarkSigner,
-          ethSigner: mockEthSigner,
+        expect(LazyPassportImxProvider).toHaveBeenCalledWith({
+          signersPromise: Promise.resolve({ mockEthSigner, mockStarkSigner }),
           authManager: mockAuthManager,
           immutableXClient,
           config,
@@ -127,10 +126,9 @@ describe('PassportImxProviderFactory', () => {
         expect(mockMagicAdapter.login).toHaveBeenCalledWith(mockUserImx.idToken);
         expect(mockGetSigner).toHaveBeenCalledTimes(1);
         expect(registerPassportStarkEx).not.toHaveBeenCalled();
-        expect(PassportImxProvider).toHaveBeenCalledWith({
+        expect(LazyPassportImxProvider).toHaveBeenCalledWith({
+          signersPromise: Promise.resolve({ mockEthSigner, mockStarkSigner }),
           authManager: mockAuthManager,
-          starkSigner: mockStarkSigner,
-          ethSigner: mockEthSigner,
           immutableXClient,
           config,
           confirmationScreen,
