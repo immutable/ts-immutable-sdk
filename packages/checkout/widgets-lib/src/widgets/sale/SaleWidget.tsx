@@ -37,7 +37,6 @@ export interface SaleWidgetProps {
   fromContractAddress: string;
   env: string;
   environmentId: string;
-  // connectLoaderParams?: ConnectLoaderParams; // Do we need this at all if it's not used, it should give provider and checkout from context
 }
 
 export function SaleWidget(props: SaleWidgetProps) {
@@ -52,8 +51,6 @@ export function SaleWidget(props: SaleWidgetProps) {
 
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
-
-  console.log('INSIDE SALE WIDGET. provider and checkout ', provider, checkout);
 
   const { theme } = config;
   const biomeTheme = useMemo(() => widgetTheme(theme), [theme]);
