@@ -33,7 +33,6 @@ import {
 } from '../../../../context/connect-loader-context/ConnectLoaderContext';
 import { EventTargetContext } from '../../../../context/event-target-context/EventTargetContext';
 import { UserJourney, useAnalytics } from '../../../../context/analytics-provider/SegmentAnalyticsProvider';
-import { getChainNameById } from '../../../../lib/chainName';
 
 const logoColour = {
   [ChainId.IMTBL_ZKEVM_DEVNET]: 'base.color.text.link.primary',
@@ -77,8 +76,9 @@ export function NetworkMenu({ setBalancesLoading }: NetworkMenuProps) {
         screen: 'WalletBalances',
         control: 'SwitchNetwork',
         controlType: 'Button',
-        chainId,
-        chainName: getChainNameById(chainId),
+        extras: {
+          chainId,
+        },
       });
       setBalancesLoading(true);
       try {

@@ -87,6 +87,11 @@ export function SaleErrorView({ errorType = SaleErrorTypes.DEFAULT, biomeTheme }
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
     },
+    [SaleErrorTypes.SMART_CHECKOUT_EXECUTE_ERROR]: {
+      onActionClick: goBackToPaymentMethods,
+      onSecondaryActionClick: closeWidget,
+      statusType: StatusType.INFORMATION,
+    },
     [SaleErrorTypes.DEFAULT]: {
       onActionClick: goBackToPaymentMethods,
       onSecondaryActionClick: closeWidget,
