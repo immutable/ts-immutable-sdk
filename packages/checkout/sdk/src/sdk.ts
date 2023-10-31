@@ -69,6 +69,7 @@ const SANDBOX_CONFIGURATION = {
     environment: Environment.SANDBOX,
   },
 };
+const WIDGETS_SCRIPT_TIMEOUT = 100;
 
 // Checkout SDK
 export class Checkout {
@@ -100,28 +101,34 @@ export class Checkout {
   public async widgets(init: WidgetsInit): Promise<ImmutableCheckoutWidgets.WidgetsFactory> {
     const checkout = this;
     const factory = new Promise<ImmutableCheckoutWidgets.WidgetsFactory>((resolve, reject) => {
-      function checkForWidgetsFactory() {
+      function checkForWidgetsBundleLoaded() {
         if (typeof ImmutableCheckoutWidgets !== 'undefined') {
           resolve(new ImmutableCheckoutWidgets.WidgetsFactory(checkout, init.config));
+        } else {
+          // If ImmutableCheckoutWidgets is not defined, wait for set amount of time.
+          // When time has elapsed, check again if ImmutableCheckoutWidgets is defined.
+          // Once it's defined, the promise will resolve and setTimeout won't be called again.
+          setTimeout(checkForWidgetsBundleLoaded, WIDGETS_SCRIPT_TIMEOUT);
         }
       }
 
       try {
         const script = loadUnresolved(init.version);
-        if (script.loaded) {
+        if (script.loaded && typeof ImmutableCheckoutWidgets !== 'undefined') {
           // eslint-disable-next-line no-console
           console.warn('Checkout widgets script is already loaded');
-          checkForWidgetsFactory();
+          resolve(new ImmutableCheckoutWidgets.WidgetsFactory(checkout, init.config));
         } else {
-          const observer = new MutationObserver((_, obs) => {
-            checkForWidgetsFactory();
-            obs.disconnect();
-          });
-
-          observer.observe(document.head, { childList: true, subtree: true });
+          checkForWidgetsBundleLoaded();
         }
-      } catch (err) {
-        reject(err);
+      } catch (err: any) {
+        reject(
+          new CheckoutError(
+            'Failed to load widgets script',
+            CheckoutErrorType.WIDGETS_SCRIPT_LOAD_ERROR,
+            { message: err.message },
+          ),
+        );
       }
     });
 
