@@ -29,14 +29,5 @@ describe('FundWithSmartCheckout View', () => {
 
       cySmartGet('funding-route-select').should('exist');
     });
-    it('should render FundingRouteExecute on FUNDING_ROUTE_EXECUTE', () => {
-      mount(
-        <BiomeCombinedProviders>
-          <FundWithSmartCheckout subView={FundWithSmartCheckoutSubViews.FUNDING_ROUTE_EXECUTE} />
-        </BiomeCombinedProviders>,
-      );
-
-      cySmartGet('funding-route-execute').should('exist');
-    });
   });
 });

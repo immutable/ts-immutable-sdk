@@ -41,7 +41,7 @@ describe('prepareListing and createOrder e2e', () => {
       },
     });
 
-    const signatures = await actionAll(listing.actions, offerer, provider);
+    const signatures = await actionAll(listing.actions, offerer);
 
     const {
       result: { id: orderId },

@@ -22,10 +22,11 @@ export const TEST_FEE_RECIPIENT = '0xe3ece548F1DD4B1536Eb6eE188fE35350bc1dd16';
 
 export const TEST_MAX_FEE_BASIS_POINTS = 1000; // 10%
 
+// Contracts
 export const TEST_MULTICALL_ADDRESS = '0x66d0aB680ACEe44308edA2062b910405CC51A190';
 export const TEST_V3_CORE_FACTORY_ADDRESS = '0x23490b262829ACDAD3EF40e555F23d77D1B69e4e';
 export const TEST_QUOTER_ADDRESS = '0x9B323E56215aAdcD4f45a6Be660f287DE154AFC5';
-export const TEST_PERIPHERY_ROUTER_ADDRESS = '0x615FFbea2af24C55d737dD4264895A56624Da072';
+export const TEST_ROUTER_ADDRESS = '0x615FFbea2af24C55d737dD4264895A56624Da072';
 export const TEST_V3_MIGRATOR_ADDRESSES = '0x0Df0d2d5Cf4739C0b579C33Fdb3d8B04Bee85729';
 export const TEST_NONFUNGIBLE_POSITION_MANAGER_ADDRESSES = '0x446c78D97b1E78bC35864FC49AcE1f7404F163F6';
 export const TEST_TICK_LENS_ADDRESSES = '0x3aC4F8094b21A6c5945453007d9c52B7e15340c0';
@@ -105,7 +106,7 @@ export const TEST_DEX_CONFIGURATION: ExchangeModuleConfiguration = {
       multicall: TEST_MULTICALL_ADDRESS,
       coreFactory: TEST_V3_CORE_FACTORY_ADDRESS,
       quoterV2: TEST_QUOTER_ADDRESS,
-      peripheryRouter: TEST_PERIPHERY_ROUTER_ADDRESS,
+      peripheryRouter: TEST_ROUTER_ADDRESS,
       secondaryFee: TEST_SECONDARY_FEE_ADDRESS,
     },
     commonRoutingTokens: [],
@@ -113,6 +114,8 @@ export const TEST_DEX_CONFIGURATION: ExchangeModuleConfiguration = {
     wrappedNativeToken: WIMX_TEST_TOKEN,
   },
 };
+
+export const refundETHFunctionSignature = '0x12210e8a';
 
 export type SwapTest = {
   fromAddress: string;
@@ -161,7 +164,7 @@ type SecondaryFeeFunctionName =
   | 'exactInputWithSecondaryFee'
   | 'exactOutputWithSecondaryFee';
 
-type SwapRouterFunctionName = 'exactInputSingle' | 'exactOutputSingle';
+type SwapRouterFunctionName = 'exactInputSingle' | 'exactOutputSingle' | 'exactInput' | 'exactOutput';
 
 function decodeSecondaryFeeCall(calldata: utils.BytesLike, functionName: SecondaryFeeFunctionName) {
   const iface = SecondaryFee__factory.createInterface();
@@ -197,6 +200,19 @@ export function decodeMulticallExactInputWithFees(data: utils.BytesLike) {
   };
 
   return { secondaryFeeParams, swapParams };
+}
+
+export function decodeMulticallExactInputWithoutFees(data: utils.BytesLike) {
+  const decodedParams = decodeSwapRouterCall(data, 'exactInput');
+
+  const swapParams: IV3SwapRouter.ExactInputParamsStruct = {
+    path: decodedParams[0][0],
+    recipient: decodedParams[0][1],
+    amountIn: decodedParams[0][2],
+    amountOutMinimum: decodedParams[0][3],
+  };
+
+  return { swapParams };
 }
 
 export function decodeMulticallExactOutputWithFees(data: utils.BytesLike) {
@@ -416,6 +432,12 @@ export function mockRouterImplementation(params: MockParams) {
 export function expectToBeDefined<T>(x: T): asserts x is NonNullable<T> {
   expect(x).toBeDefined();
   expect(x).not.toBeNull();
+}
+
+// expectToBeDefined ensures that x is a string, while
+// also narrowing its type.
+export function expectToBeString(x: string): asserts x is string {
+  expect(typeof x).toBe('string');
 }
 
 // expectInstanceOf ensurance that a variable is an instance of a class, while

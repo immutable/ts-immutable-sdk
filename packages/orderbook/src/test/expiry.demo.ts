@@ -73,7 +73,7 @@ describe('', () => {
     // Sign the EIP712 order message for the offerer. This is the signature that the order book API
     // stores and allows the fulfiller to fulfil the order, as long as they also have a valid
     // operator signature
-    const signatures = await actionAll(soonToExpireListing.actions, offerer, provider);
+    const signatures = await actionAll(soonToExpireListing.actions, offerer);
 
     log('Submitting order to orderbook API...');
     // Submit the order creation request to the order book API

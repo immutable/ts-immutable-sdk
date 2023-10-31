@@ -1,4 +1,4 @@
-import { providers, Wallet } from 'ethers';
+import { Wallet } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { OrderStatusName } from 'openapi/sdk';
 import { Orderbook } from 'orderbook';
@@ -17,7 +17,6 @@ async function createListing(
   tokenId: string,
   considerationAmount: string,
   offerer: Wallet,
-  provider: providers.Provider,
 ): Promise<Order> {
   const listing = await sdk.prepareListing({
     makerAddress: offerer.address,
@@ -32,7 +31,7 @@ async function createListing(
     },
   });
 
-  const signatures = await actionAll(listing.actions, offerer, provider);
+  const signatures = await actionAll(listing.actions, offerer);
 
   const {
     result: { id: orderId },
@@ -82,7 +81,6 @@ describe('listListings e2e', () => {
       '0',
       '2000000',
       offerer,
-      provider,
     );
     token1Order2 = await createListing(
       sdk,
@@ -90,7 +88,6 @@ describe('listListings e2e', () => {
       '1',
       '1000000',
       offerer,
-      provider,
     );
     token2Order1 = await createListing(
       sdk,
@@ -98,7 +95,6 @@ describe('listListings e2e', () => {
       '0',
       '1000000',
       offerer,
-      provider,
     );
   }, 90_000);
 

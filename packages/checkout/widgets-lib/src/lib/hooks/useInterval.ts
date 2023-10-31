@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react';
 // Inspired by https://usehooks-ts.com/react-hook/use-interval
 export function useInterval(callback: () => void, delay: number | null): () => void {
   const savedCallback = useRef(callback);
-  const interval = useRef<NodeJS.Timer | null>(null);
+  const interval = useRef<number>(0);
 
   // Remember the latest callback if it changes.
   useBrowserLayoutEffect(() => {
@@ -18,10 +18,10 @@ export function useInterval(callback: () => void, delay: number | null): () => v
       return;
     }
 
-    interval.current = setInterval(() => savedCallback.current(), delay);
+    interval.current = setInterval(() => savedCallback.current(), delay) as unknown as number;
 
     // eslint-disable-next-line consistent-return
-    return () => { clearInterval(interval.current as NodeJS.Timer); };
+    return () => { clearInterval(interval.current); };
   }, [delay]);
 
   return () => {

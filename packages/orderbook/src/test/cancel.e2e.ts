@@ -1,16 +1,52 @@
+import { Wallet } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { OrderStatusName } from 'openapi/sdk';
 import { Orderbook } from 'orderbook';
 import { getLocalhostProvider } from './helpers/provider';
 import { getOffererWallet } from './helpers/signers';
 import { deployTestToken } from './helpers/erc721';
-import { signAndSubmitTx } from './helpers/sign-and-submit';
 import { waitForOrderToBeOfStatus } from './helpers/order';
 import { getConfigFromEnv } from './helpers';
 import { actionAll } from './helpers/actions';
+import { GAS_OVERRIDES } from './helpers/gas';
+
+async function createOrder(
+  sdk: Orderbook,
+  offerer: Wallet,
+  tokenAddress: string,
+  tokenId: string,
+): Promise<string> {
+  const listing = await sdk.prepareListing({
+    makerAddress: offerer.address,
+    buy: {
+      amount: '1000000',
+      type: 'NATIVE',
+    },
+    sell: {
+      contractAddress: tokenAddress,
+      tokenId,
+      type: 'ERC721',
+    },
+  });
+
+  const signatures = await actionAll(listing.actions, offerer);
+
+  const {
+    result: { id: orderId },
+  } = await sdk.createListing({
+    orderComponents: listing.orderComponents,
+    orderHash: listing.orderHash,
+    orderSignature: signatures[0],
+    makerFees: [],
+  });
+
+  await waitForOrderToBeOfStatus(sdk, orderId, OrderStatusName.ACTIVE);
+
+  return orderId;
+}
 
 describe('cancel order', () => {
-  it('should cancel the order', async () => {
+  it('should cancel orders on-chain', async () => {
     const provider = getLocalhostProvider();
     const offerer = getOffererWallet(provider);
 
@@ -25,40 +61,58 @@ describe('cancel order', () => {
     });
 
     const { contract } = await deployTestToken(offerer);
-    await contract.safeMint(offerer.address);
 
-    const listing = await sdk.prepareListing({
-      makerAddress: offerer.address,
-      buy: {
-        amount: '1000000',
-        type: 'NATIVE',
-      },
-      sell: {
-        contractAddress: contract.address,
-        tokenId: '0',
-        type: 'ERC721',
-      },
-    });
+    const receipt = await contract.safeMint(offerer.address, GAS_OVERRIDES);
+    await receipt.wait();
+    const orderId1 = await createOrder(sdk, offerer, contract.address, '0');
 
-    const signatures = await actionAll(listing.actions, offerer, provider);
+    const receipt2 = await contract.safeMint(offerer.address, GAS_OVERRIDES);
+    await receipt2.wait();
+    const orderId2 = await createOrder(sdk, offerer, contract.address, '1');
 
-    const {
-      result: { id: orderId },
-    } = await sdk.createListing({
-      orderComponents: listing.orderComponents,
-      orderHash: listing.orderHash,
-      orderSignature: signatures[0],
-      makerFees: [],
-    });
-
-    await waitForOrderToBeOfStatus(sdk, orderId, OrderStatusName.ACTIVE);
-
-    const { unsignedCancelOrderTransaction } = await sdk.cancelOrder(
-      orderId,
+    const { cancellationAction } = await sdk.cancelOrdersOnChain(
+      [orderId1, orderId2],
       offerer.address,
     );
-    await signAndSubmitTx(unsignedCancelOrderTransaction, offerer, provider);
+    await actionAll([cancellationAction], offerer);
 
-    await waitForOrderToBeOfStatus(sdk, orderId, OrderStatusName.CANCELLED);
+    await waitForOrderToBeOfStatus(sdk, orderId1, OrderStatusName.CANCELLED);
+    await waitForOrderToBeOfStatus(sdk, orderId2, OrderStatusName.CANCELLED);
+  }, 60_000);
+
+  it('should cancel orders off-chain', async () => {
+    const provider = getLocalhostProvider();
+    const offerer = getOffererWallet(provider);
+
+    const localConfigOverrides = getConfigFromEnv();
+    const sdk = new Orderbook({
+      baseConfig: {
+        environment: Environment.SANDBOX,
+      },
+      overrides: {
+        ...localConfigOverrides,
+      },
+    });
+
+    const { contract } = await deployTestToken(offerer);
+
+    const receipt = await contract.safeMint(offerer.address, GAS_OVERRIDES);
+    await receipt.wait();
+    const orderId1 = await createOrder(sdk, offerer, contract.address, '0');
+
+    const receipt2 = await contract.safeMint(offerer.address, GAS_OVERRIDES);
+    await receipt2.wait();
+    const orderId2 = await createOrder(sdk, offerer, contract.address, '1');
+
+    const { signableAction } = await sdk.prepareOrderCancellations(
+      [orderId1, orderId2],
+    );
+
+    const signatures = await actionAll([signableAction], offerer);
+
+    await sdk.cancelOrders([orderId1, orderId2], offerer.address, signatures[0]);
+
+    await waitForOrderToBeOfStatus(sdk, orderId1, OrderStatusName.CANCELLED);
+    await waitForOrderToBeOfStatus(sdk, orderId2, OrderStatusName.CANCELLED);
   }, 60_000);
 });
