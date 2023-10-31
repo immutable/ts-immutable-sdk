@@ -1,8 +1,5 @@
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable class-methods-use-this */
 import { Root, createRoot } from 'react-dom/client';
-import React from 'react';
 import {
   Widget,
   Checkout,
@@ -72,7 +69,6 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
   }
 
   update(properties: WidgetProperties<T>): void {
-    console.log(typeof properties);
     this.properties = this.getValidatedProperties({
       params: {
         ...(this.properties.params ?? {}),
