@@ -69,6 +69,7 @@ const SANDBOX_CONFIGURATION = {
     environment: Environment.SANDBOX,
   },
 };
+const WIDGETS_SCRIPT_TIMEOUT = 100;
 
 // Checkout SDK
 export class Checkout {
@@ -100,11 +101,14 @@ export class Checkout {
   public async widgets(init: WidgetsInit): Promise<ImmutableCheckoutWidgets.WidgetsFactory> {
     const checkout = this;
     const factory = new Promise<ImmutableCheckoutWidgets.WidgetsFactory>((resolve, reject) => {
-      function checkForWidgetsFactory() {
+      function checkForWidgetsBundleLoaded() {
         if (typeof ImmutableCheckoutWidgets !== 'undefined') {
           resolve(new ImmutableCheckoutWidgets.WidgetsFactory(checkout, init.config));
         } else {
-          setTimeout(checkForWidgetsFactory, 100);
+          // If ImmutableCheckoutWidgets is not defined, wait for set amount of time.
+          // When time has elapsed, check again if ImmutableCheckoutWidgets is defined.
+          // Once it's defined, the promise will resolve and setTimeout won't be called again.
+          setTimeout(checkForWidgetsBundleLoaded, WIDGETS_SCRIPT_TIMEOUT);
         }
       }
 
@@ -115,7 +119,7 @@ export class Checkout {
           console.warn('Checkout widgets script is already loaded');
           resolve(new ImmutableCheckoutWidgets.WidgetsFactory(checkout, init.config));
         } else {
-          checkForWidgetsFactory();
+          checkForWidgetsBundleLoaded();
         }
       } catch (err: any) {
         reject(
