@@ -121,21 +121,46 @@ If you run out of memory, set NODE_OPTIONS to limit Node's use of memory (this a
 export NODE_OPTIONS=--max-old-space-size=14366
 ```
 
-### API keys and Client App Id
+### API key and Client App Id
 
-API keys and Client App ID are used to authenticate and track usage respectively per partner/project/environment.
-
-Once created from hub, they can be optionally passed into base config as followed:
-
+You can mark api key and/or client app id as required field for your sdk module configration:
+```ts
+// We use checkout sdk as an example.
+export interface CheckoutOverrides {
+  // Mark your module config to require api key and/or client app id.
+  requireApiKey: true;
+  requireClientAppId: true;
+}
+export interface CheckoutModuleConfiguration extends ModuleConfiguration<CheckoutOverrides> {}
 ```
-import { config } from '@imtbl/sdk';
 
-const baseConfig = new config.ImmutableConfiguration({
-  environment: config.Environment.PRODUCTION,
-  clientAppId: '....',
-  apiKey: '....',
-});
+`Api key` and `client app id` are meant to be added to request headers. To make sure they are attached to headers properly, we can do the following:
+
+```ts
+export class Checkout {
+  constructor(
+    config: CheckoutModuleConfiguration,
+  ) {
+    // ImmutableConfiguration constructor will add client app id and api key to global axois default headers.
+    config.baseConfig = new ImmutableConfiguration(config.baseConfig);
+    /// ....
+
+    // You can optionally remove these headers.
+    axios.defaults.headers.common['x-api-key'] = undefined;
+    axios.defaults.headers.common['x-immutable-api-key'] = undefined;
+    axios.defaults.headers.common['x-immutable-client-app-id'] = undefined;
+
+    // Or apply them to particular request methods
+    axios.defaults.headers.get['x-api-key'] = undefined;
+    axios.defaults.headers.post['x-immutable-api-key'] = undefined;
+    axios.defaults.headers.delete['x-immutable-client-app-id'] = undefined;
+
+    // Or you can save the config in the instance of this class and reference them in individual methods.
+  }
+}
 ```
+
+Please make sure your sdk still works properly after the step above. Because extra headers may make your request invalid in the infrastructure you use. e.g. cloudfront.
 
 ### Linting
 

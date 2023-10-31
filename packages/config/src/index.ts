@@ -40,6 +40,8 @@ export class ImmutableConfiguration {
 }
 
 export interface ModuleConfiguration<T> {
-  baseConfig: ImmutableConfiguration;
+  baseConfig: ImmutableConfiguration &
+  (T extends { requireApiKey: true; } ? Required<{ apiKey: string; }> : {}) &
+  (T extends { requireClientAppId: true; } ? Required<{ clientAppId: string; }> : {});
   overrides?: T;
 }
