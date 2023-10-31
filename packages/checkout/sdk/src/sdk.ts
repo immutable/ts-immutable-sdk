@@ -103,25 +103,28 @@ export class Checkout {
       function checkForWidgetsFactory() {
         if (typeof ImmutableCheckoutWidgets !== 'undefined') {
           resolve(new ImmutableCheckoutWidgets.WidgetsFactory(checkout, init.config));
+        } else {
+          setTimeout(checkForWidgetsFactory, 10);
         }
       }
 
       try {
         const script = loadUnresolved(init.version);
-        if (script.loaded) {
+        if (script.loaded && typeof ImmutableCheckoutWidgets !== 'undefined') {
           // eslint-disable-next-line no-console
           console.warn('Checkout widgets script is already loaded');
           checkForWidgetsFactory();
         } else {
-          const observer = new MutationObserver((_, obs) => {
-            checkForWidgetsFactory();
-            obs.disconnect();
-          });
-
-          observer.observe(document.head, { childList: true, subtree: true });
+          checkForWidgetsFactory();
         }
-      } catch (err) {
-        reject(err);
+      } catch (err: any) {
+        reject(
+          new CheckoutError(
+            'Failed to load widgets script',
+            CheckoutErrorType.WIDGETS_SCRIPT_LOAD_ERROR,
+            { message: err.message },
+          ),
+        );
       }
     });
 

@@ -25,6 +25,7 @@ export function loadUnresolved(
   let cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${validVersion}/dist/browser/checkout/widgets.js`;
   if (useLocalBundle()) cdnUrl = `http://${window.location.host}/lib/js/widgets.js`;
 
+  tag.setAttribute('id', 'immutable-checkout-widgets-bundle');
   tag.setAttribute('data-product', 'checkout');
   tag.setAttribute('data-version', validVersion);
   tag.setAttribute('src', cdnUrl);
