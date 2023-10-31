@@ -153,7 +153,6 @@ export const balanceCheck = async (
 
   // Wait for all balances and calculate the requirements
   const promisesResponses = await Promise.all(balancePromises);
-
   const balanceRequirements: BalanceRequirement[] = [];
 
   // Get all ERC20 and NATIVE balances

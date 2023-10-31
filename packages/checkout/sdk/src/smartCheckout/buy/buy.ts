@@ -38,7 +38,7 @@ import {
 import { SignTransactionStatusType } from '../actions/types';
 import { calculateFees } from '../fees/fees';
 import { debugLogger, measureAsyncExecution } from '../../utils/debugLogger';
-import { getAllBalances } from '../../balances';
+import { getAllBalances, resetBlockscoutClientMap } from '../../balances';
 
 export const getItemRequirement = (
   type: ItemType,
@@ -109,7 +109,8 @@ export const buy = async (
     provider.getSigner().getAddress(),
   );
 
-  // Prefetch balances and store them in memory
+  // Prefetch balances and store them in memor
+  resetBlockscoutClientMap();
   getAllBalances(config, provider, fulfillerAddress, getL1ChainId(config));
   getAllBalances(config, provider, fulfillerAddress, getL2ChainId(config));
 

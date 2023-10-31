@@ -268,7 +268,7 @@ export const getAllBalances = async (
     // Please remove this hack once https://immutable.atlassian.net/browse/WT-1710
     // is done.
     const isL1Chain = getL1ChainId(config) === chainId;
-    return measureAsyncExecution<GetAllBalancesResult>(
+    return await measureAsyncExecution<GetAllBalancesResult>(
       config,
       `Time to fetch balances using blockscout for ${chainId}`,
       getIndexerBalance(walletAddress, chainId, isL1Chain ? tokens : []),
