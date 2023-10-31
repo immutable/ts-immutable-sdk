@@ -163,7 +163,7 @@ export class Checkout {
 Please make sure your sdk still works properly after the step above. Because extra headers may make your request invalid in the infrastructure you use. e.g. cloudfront.
 
 #### Client app id usage data
-Client app id usage together with the relevant org id, project id and environment id will be available in segement under event source `Onboarding - API - ${Dev|Sandbox|Prod}`. You can set up event destination (data lack/looker) together with appropriate filters to surface endpoint usages called by your sdk per customer/project/environment.
+Client app id usage together with the relevant org id, project id and environment id will be available in segement under event source `Onboarding - API - ${Dev|Sandbox|Prod}`. You can set up event destination (data lake/looker) together with appropriate filters to surface endpoint usages called by your sdk per customer/project/environment.
 
 ### Linting
 
