@@ -89,7 +89,7 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
   }, [history]);
 
   // eslint-disable-next-line @typescript-eslint/no-shadow
-  const handleConnectViewUpdate = async (provider: Web3Provider) => {
+  const handleSwitchNetworkViewUpdate = async (provider: Web3Provider) => {
     const chainId = await provider.getSigner().getChainId();
     if (chainId !== targetChainId) {
       viewDispatch({
@@ -98,6 +98,13 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
           view: { type: ConnectWidgetViews.SWITCH_NETWORK },
         },
       });
+    }
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-shadow
+  const handleConnectViewUpdate = async (provider: Web3Provider) => {
+    if (!isPassport) {
+      await handleSwitchNetworkViewUpdate(provider);
       return;
     }
 
