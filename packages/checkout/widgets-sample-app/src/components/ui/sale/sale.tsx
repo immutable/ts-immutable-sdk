@@ -48,13 +48,11 @@ const useParams = () => {
   const login = urlParams.get('login') as string;
   const amount = urlParams.get('amount') as string;
   const environmentId = urlParams.get('environmentId') as string;
-  const env = urlParams.get('env') as string;
   const fromContractAddress = urlParams.get('fromContractAddress') as string;
 
   return {
     login,
     amount,
-    env,
     environmentId,
     fromContractAddress,
   };
@@ -91,7 +89,7 @@ const usePassportInstance = (passportConfig: any) => {
 export function SaleUI() {
   const params = useParams();
   const {
-    login, amount, env, environmentId, fromContractAddress,
+    login, amount, environmentId, fromContractAddress,
   } = params;
   const [passportConfig, setPassportConfig] = useState(
     JSON.stringify(defaultPassportConfig, null, 2),
