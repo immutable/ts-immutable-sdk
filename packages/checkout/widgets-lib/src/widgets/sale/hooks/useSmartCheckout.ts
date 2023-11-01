@@ -4,7 +4,7 @@ import {
   ERC20ItemRequirement,
   GasAmount,
   GasTokenType,
-  Item,
+  SaleItem,
   ItemType,
   SmartCheckoutResult,
   TransactionOrGasType,
@@ -16,7 +16,7 @@ import { SaleErrorTypes, SmartCheckoutError } from '../types';
 type UseSmartCheckoutInput = {
   checkout: Checkout | undefined;
   provider: Web3Provider | undefined;
-  items: Item[],
+  items: SaleItem[],
   amount: string,
   contractAddress: string,
 };

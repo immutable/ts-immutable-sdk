@@ -1,5 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { Item } from '@imtbl/checkout-sdk';
+import { SaleItem } from '@imtbl/checkout-sdk';
 
 export enum PaymentTypes {
   CRYPTO = 'crypto',
@@ -46,7 +46,7 @@ export type SignResponse = {
 
 export type SignOrderInput = {
   provider: Web3Provider | undefined;
-  items: Item[];
+  items: SaleItem[];
   fromContractAddress: string;
   recipientAddress: string;
   env: string;
