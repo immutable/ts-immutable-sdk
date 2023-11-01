@@ -29,16 +29,17 @@ export interface FundingRouteMenuItemProps {
   fundingRoute: FundingRoute;
   toggleVisible?: boolean;
   selected?: boolean;
+  size?: 'small' | 'medium';
 }
 export function FundingRouteMenuItem({
-  onClick, fundingRoute, toggleVisible, selected,
+  onClick, fundingRoute, toggleVisible, selected, size = 'small',
 }: FundingRouteMenuItemProps) {
   const firstFundingStep = fundingRoute.steps[0];
 
   const { isPassportWallet } = useSaleContext();
 
   // todo - calculate these in useSmartCheckout hook - later PR
-  const usdAmount = '2.49';
+  const usdBalance = '102.49';
   const totalFees = '5.01';
 
   const networkLabel = () => (
@@ -50,7 +51,8 @@ export function FundingRouteMenuItem({
         height: '100%',
         marginLeft: 'base.spacing.x2',
         fontSize: designTokens.base.text.body.xSmall.regular.fontSize,
-        paddingX: 'base.spacing.x2',
+        paddingLeft: 'base.spacing.x2',
+        paddingRight: '0',
       }}
       size="small"
     >
@@ -71,18 +73,18 @@ export function FundingRouteMenuItem({
       testId="funding-route-menu-item"
       onClick={onClick}
       selected={selected}
-      size="small"
+      size={size}
     >
       {toggleVisible && <MenuItem.IntentIcon icon="ChevronExpand" />}
       <MenuItem.FramedIcon icon="Coins" circularFrame />
       <MenuItem.PriceDisplay
         use={<Heading size="xSmall" />}
-        fiatAmount={`≈ USD $${usdAmount}`}
-        price={tokenValueFormat(firstFundingStep.fundingItem.fundsRequired.formattedAmount)}
+        fiatAmount={`≈ USD $${usdBalance}`}
+        price={tokenValueFormat(firstFundingStep.fundingItem.userBalance.formattedBalance)}
       />
       <MenuItem.Label sx={{ display: 'flex', wordBreak: 'default' }}>
-        { firstFundingStep.fundingItem.token.symbol }
-        { isPassportWallet ? null : networkLabel()}
+        {firstFundingStep.fundingItem.token.symbol}
+        {isPassportWallet ? null : networkLabel()}
       </MenuItem.Label>
       <MenuItem.Caption>
         Fees ≈ USD $

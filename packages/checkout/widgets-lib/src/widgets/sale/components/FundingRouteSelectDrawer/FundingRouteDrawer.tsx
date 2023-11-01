@@ -34,6 +34,7 @@ FundingRouteDrawerProps) {
             fundingRoute={fundingRoute}
             selected={activeFundingRouteIndex === i}
             key={fundingRoute.steps[0].fundingItem.type + fundingRoute.steps[0].fundingItem.token}
+            size="medium"
           />
         ))}
       </BottomSheet.Content>

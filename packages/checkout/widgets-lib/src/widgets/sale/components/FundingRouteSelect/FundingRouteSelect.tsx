@@ -85,7 +85,7 @@ export function FundingRouteSelect({ fundingRoutes, onFundingRouteSelected }: Fu
             />
           ) }
 
-        <PurchaseMenuItem />
+        <PurchaseMenuItem fundingRoute={fundingRoutes[activeFundingRouteIndex]} />
 
         <Button sx={{ mt: 'auto' }} variant="primary" onClick={onClickContinue}>
           {/* {options.continue.text} */}
