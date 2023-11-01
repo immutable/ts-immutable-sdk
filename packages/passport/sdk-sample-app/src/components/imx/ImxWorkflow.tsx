@@ -21,7 +21,7 @@ function ImxWorkflow() {
   const [isRegistered, setIsRegistered] = useState<boolean>(false);
 
   const { addMessage, isLoading, setIsLoading } = useStatusProvider();
-  const { connectImx, connectImxSilent, imxProvider } = usePassportProvider();
+  const { connectImx, imxProvider } = usePassportProvider();
 
   const getAddress = useCallback(async () => {
     const address = await imxProvider?.getAddress();
@@ -67,20 +67,12 @@ function ImxWorkflow() {
     <CardStack title="Imx Workflow">
       <Stack direction="horizontal" style={{ flexWrap: 'wrap' }} gap={3}>
         {!imxProvider && (
-          <>
-            <WorkflowButton
-              disabled={isLoading}
-              onClick={connectImx}
-            >
-              Connect
-            </WorkflowButton>
-            <WorkflowButton
-              disabled={isLoading}
-              onClick={connectImxSilent}
-            >
-              Connect Silent
-            </WorkflowButton>
-          </>
+          <WorkflowButton
+            disabled={isLoading}
+            onClick={connectImx}
+          >
+            Connect
+          </WorkflowButton>
         )}
         {imxProvider && (
           <>
