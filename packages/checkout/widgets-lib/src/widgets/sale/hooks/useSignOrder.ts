@@ -253,7 +253,6 @@ export const useSignOrder = (input: SignOrderInput) => {
 
   const sign = useCallback(
     async (paymentType: PaymentTypes): Promise<SignResponse | undefined> => {
-
       try {
         await expirePrevSignedOrder();
 
