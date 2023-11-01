@@ -10,12 +10,11 @@ import { Checkbox } from '@biom3/react';
 import { Checkout } from '@imtbl/checkout-sdk';
 import { Passport } from '@imtbl/passport';
 
-// TODO: sale passport config in hub needs to update the redirct uris to port 3000
 const defaultPassportConfig = {
   environment: 'sandbox',
-  clientId: 'sWMLNvDrK5F8ibNWOqYgdKWsUtdLLz4J',
-  redirectUri: 'http://localhost:3001/sale?login=true',
-  logoutRedirectUri: 'http://localhost:3001/sale?logout=true',
+  clientId: 'XuGsHvMqMJrb73diq1fCswWwn4AYhcM6',
+  redirectUri: 'http://localhost:3000/sale?login=true',
+  logoutRedirectUri: 'http://localhost:3000/sale?logout=true',
   audience: 'platform_api',
   scope: 'openid offline_access email transact',
 };
