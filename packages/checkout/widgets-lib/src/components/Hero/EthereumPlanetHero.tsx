@@ -1,12 +1,13 @@
 /* eslint-disable max-len */
 import { Box } from '@biom3/react';
 import { heroBackGroundStyles, heroImageStyles } from './HeroImageStyles';
+import EthereumPlanet from '../../assets/EthereumPlanet.svg';
 
 export function EthereumPlanetHero() {
   return (
     <Box sx={{ ...heroBackGroundStyles, background: 'base.color.translucent.emphasis.100' }}>
       <Box sx={heroImageStyles}>
-        <svg width="430" height="305" viewBox="0 0 430 305" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {/* <svg width="430" height="305" viewBox="0 0 430 305" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M302.671 165.007C302.671 209.819 266.343 246.147 221.53 246.147C176.717 246.147 140.39 209.819 140.39 165.007C140.39 120.194 176.717 83.8662 221.53 83.8662C266.343 83.8662 302.671 120.194 302.671 165.007Z" fill="url(#paint0_linear_7858_3468)" stroke="black" />
           <path fillRule="evenodd" clipRule="evenodd" d="M221.585 223.507L254.099 166.971L221.585 183.46L189.072 166.971L221.585 223.507Z" fill="white" />
           <path d="M189.075 162.433L221.589 105.897L254.102 162.433H221.589L189.075 162.433Z" fill="white" />
@@ -38,8 +39,8 @@ export function EthereumPlanetHero() {
               <stop offset="1" stopColor="#AFBAEB" />
             </linearGradient>
           </defs>
-        </svg>
-
+        </svg> */}
+        <EthereumPlanet />
       </Box>
     </Box>
   );
