@@ -243,10 +243,8 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
       {view === FundingRouteExecuteViews.SWITCH_NETWORK_ETH && (
         <ConnectWidget
           config={config}
-          {...{
-            targetLayer: ConnectTargetLayer.LAYER1,
-            web3Provider: provider,
-          }}
+          targetLayer={ConnectTargetLayer.LAYER1}
+          web3Provider={provider}
           checkout={checkout!}
           deepLink={ConnectWidgetViews.SWITCH_NETWORK}
         />
@@ -254,9 +252,8 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
       {view === FundingRouteExecuteViews.SWITCH_NETWORK_ZKEVM && (
         <ConnectWidget
           config={config}
-          {...{
-            targetLayer: ConnectTargetLayer.LAYER2, web3Provider: provider,
-          }}
+          targetLayer={ConnectTargetLayer.LAYER2}
+          web3Provider={provider}
           checkout={checkout!}
           deepLink={ConnectWidgetViews.SWITCH_NETWORK}
         />
