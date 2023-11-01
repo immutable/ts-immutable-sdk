@@ -43,19 +43,25 @@ describe('MagicWallet', () => {
 
   describe('constructor', () => {
     describe('when window defined', () => {
-      const { window } = global;
+      let originalDocument: Document | undefined;
+
       beforeAll(() => {
-        Object.defineProperty(global, 'window', {
-          value: {},
-        });
+        originalDocument = window.document;
+        const mockDocument = {
+          ...window.document,
+          readyState: 'complete',
+        };
+        (window as any).document = mockDocument;
       });
       afterAll(() => {
-        global.window = window;
+        (window as any).document = originalDocument;
       });
       it('starts initialising the magicClient', () => {
+        jest.spyOn(window.document, 'readyState', 'get').mockReturnValue('complete');
+        preload.mockResolvedValue(Promise.resolve());
         const magicAdapter = new MagicAdapter(config);
         // @ts-ignore
-        expect(magicAdapter.magicClientPromise).toBeDefined();
+        expect(magicAdapter.lazyMagicClient).toBeDefined();
       });
     });
 
@@ -79,6 +85,7 @@ describe('MagicWallet', () => {
 
   describe('login', () => {
     it('should call loginWithOIDC and initialise the provider with the correct arguments', async () => {
+      preload.mockResolvedValue(Promise.resolve());
       const magicAdapter = new MagicAdapter(config);
       const magicProvider = await magicAdapter.login(idToken);
 
@@ -96,6 +103,7 @@ describe('MagicWallet', () => {
     });
 
     it('should throw a PassportError when an error is thrown', async () => {
+      preload.mockResolvedValue(Promise.resolve());
       const magicAdapter = new MagicAdapter(config);
 
       loginWithOIDCMock.mockImplementation(() => {
@@ -115,6 +123,7 @@ describe('MagicWallet', () => {
 
   describe('logout', () => {
     it('calls the logout function', async () => {
+      preload.mockResolvedValue(Promise.resolve());
       const magicAdapter = new MagicAdapter(config);
       await magicAdapter.login(idToken);
       await magicAdapter.logout();
