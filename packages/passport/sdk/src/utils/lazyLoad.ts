@@ -1,12 +1,21 @@
-export default class LazyLoad<T, Dependency = void> {
-  private readonly resolvedValue: Promise<T>;
+export const lazyLoad = <T, Y = void>(promiseToAwait: () => Promise<Y>, initialiseFunction: () => T): Promise<T> => (
+  promiseToAwait().then(initialiseFunction)
+);
 
-  constructor(promiseToAwait: () => Promise<Dependency>, initialiseFunction: (args?: Dependency) => T) {
-    this.resolvedValue = promiseToAwait()
-      .then((args) => initialiseFunction(args));
-  }
+export const lazyDocumentReady = <T>(initialiseFunction: () => T): Promise<T> => {
+  const documentReadyPromise = () => new Promise<void>((resolve) => {
+    if (window.document.readyState === 'complete') {
+      resolve();
+    } else {
+      const onReadyStateChange = () => {
+        if (window.document.readyState === 'complete') {
+          resolve();
+          window.document.removeEventListener('readystatechange', onReadyStateChange);
+        }
+      };
+      window.document.addEventListener('readystatechange', onReadyStateChange);
+    }
+  });
 
-  public getResolvedValue(): Promise<T> {
-    return this.resolvedValue;
-  }
-}
+  return lazyLoad(documentReadyPromise, initialiseFunction);
+};
