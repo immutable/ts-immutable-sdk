@@ -1,4 +1,9 @@
 import { useContext } from 'react';
+import {
+  TrackEventProps,
+  UserJourney,
+  useAnalytics,
+} from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import {
   sendSaleFailedEvent,
@@ -10,25 +15,26 @@ import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTy
 import { ExecutedTransaction } from '../types';
 import { useSaleContext } from '../context/SaleContextProvider';
 import { toPascalCase, toStringifyTransactions } from '../functions/utils';
-import {
-  UserJourney,
-  useAnalytics,
-  TrackEventProps,
-} from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 export const useSaleEvent = () => {
   const { track, page } = useAnalytics();
-  const { recipientAddress: userId, recipientEmail: email } = useSaleContext();
   const {
-    eventTargetState: { eventTarget },
-  } = useContext(EventTargetContext);
+    recipientAddress: userId, recipientEmail: email, signResponse, paymentMethod,
+  } = useSaleContext();
+  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
   const defaultView = SaleWidgetViews.PAYMENT_METHODS;
 
   const common = {
     email,
     userId,
+    paymentMethod,
     location: 'web',
     userJourney: UserJourney.SALE,
+  };
+
+  const orderProps = {
+    amount: signResponse?.order.totalAmount,
+    currency: signResponse?.order.currency.name,
   };
 
   const sendCloseEvent = (
@@ -48,18 +54,19 @@ export const useSaleEvent = () => {
   };
 
   const sendSuccessEvent = (
-    transactions: ExecutedTransaction[] = [],
-    paymentType = '',
     screen: TrackEventProps['screen'] = defaultView,
+    transactions: ExecutedTransaction[] = [],
+    details?: Record<string, unknown>,
   ) => {
     track({
+      ...details,
       screen: toPascalCase(screen),
       control: 'Success',
       controlType: 'Event',
       action: 'Succeeded',
-      paymentType,
       transactions: toStringifyTransactions(transactions),
       ...common,
+      ...orderProps,
     });
     sendSaleSuccessEvent(eventTarget, transactions);
   };
@@ -67,18 +74,19 @@ export const useSaleEvent = () => {
   const sendFailedEvent = (
     reason: string,
     transactions: ExecutedTransaction[] = [],
-    paymentType = '',
     screen: TrackEventProps['screen'] = defaultView,
+    details?: Record<string, unknown>,
   ) => {
     track({
+      ...details,
       screen: toPascalCase(screen),
       control: 'Fail',
       controlType: 'Event',
       action: 'Failed',
       reason,
-      paymentType,
       transactions: toStringifyTransactions(transactions),
       ...common,
+      ...orderProps,
     });
     sendSaleFailedEvent(eventTarget, reason, transactions);
   };
@@ -87,13 +95,13 @@ export const useSaleEvent = () => {
     sendSaleTransactionSuccessEvent(eventTarget, transactions);
   };
 
-  const sendSelectedPaymentMethod = (paymentType: string, screen: string) => {
+  const sendSelectedPaymentMethod = (type: string, screen: string) => {
     track({
       screen: toPascalCase(screen),
       control: 'Select',
       controlType: 'MenuItem',
-      paymentType,
       ...common,
+      paymentMethod: type,
     });
   };
 
@@ -106,6 +114,16 @@ export const useSaleEvent = () => {
     });
   };
 
+  const sendOrderCreated = (screen: string, details: Record<string, unknown>) => {
+    track({
+      ...details,
+      screen: toPascalCase(screen),
+      control: 'OrderCreated',
+      controlType: 'Event',
+      ...common,
+    });
+  };
+
   return {
     track,
     page,
@@ -114,6 +132,7 @@ export const useSaleEvent = () => {
     sendSuccessEvent,
     sendFailedEvent,
     sendTransactionSuccessEvent,
+    sendOrderCreated,
     sendSelectedPaymentMethod,
   };
 };
