@@ -200,8 +200,8 @@ export const useSignOrder = (input: SignOrderInput) => {
         transactionHash = txnResponse?.hash;
         return transactionHash;
       } catch (e) {
-      // TODO: check error type to send
-      // SaleErrorTypes.WALLET_REJECTED or SaleErrorTypes.WALLET_REJECTED_NO_FUNDS
+        // TODO: check error type to send
+        // SaleErrorTypes.WALLET_REJECTED or SaleErrorTypes.WALLET_REJECTED_NO_FUNDS
 
         const reason = typeof e === 'string' ? e : (e as any).reason || '';
         let errorType = SaleErrorTypes.TRANSACTION_FAILED;
