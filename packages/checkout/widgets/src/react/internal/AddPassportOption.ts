@@ -31,7 +31,7 @@ export function AddPassportOption(
       if (attempts >= maxAttempts) {
         window.clearInterval(timer);
         // eslint-disable-next-line no-console
-        console.error('failed to set the provider');
+        console.error('failed to set the provider', err);
       }
     }
   };

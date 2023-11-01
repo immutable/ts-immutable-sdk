@@ -45,14 +45,16 @@ export function SwapButton({
       screen: 'SwapCoins',
       control: 'Swap',
       controlType: 'Button',
-      swapFromAddress: data?.fromContractAddress,
-      swapFromAmount: data?.fromAmount,
-      swapFromTokenSymbol: data?.fromTokenSymbol,
-      swapToAddress: data?.toContractAddress,
-      swapToAmount: data?.toAmount,
-      swapToTokenSymbol: data?.toTokenSymbol,
-      isSwapFormValid: isValid,
-      hasFundsForGas: !insufficientFundsForGas,
+      extras: {
+        swapFromAddress: data?.fromContractAddress,
+        swapFromAmount: data?.fromAmount,
+        swapFromTokenSymbol: data?.fromTokenSymbol,
+        swapToAddress: data?.toContractAddress,
+        swapToAmount: data?.toAmount,
+        swapToTokenSymbol: data?.toTokenSymbol,
+        isSwapFormValid: isValid,
+        hasFundsForGas: !insufficientFundsForGas,
+      },
     });
     if (!isValid) return;
     if (!checkout || !provider || !transaction) return;
