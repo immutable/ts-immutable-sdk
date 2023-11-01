@@ -1,4 +1,5 @@
 import {
+  Body,
   Box,
   Button, Heading,
 } from '@biom3/react';
@@ -15,6 +16,7 @@ import { ViewActions, ViewContext } from '../../../../context/view-context/ViewC
 import { FundingRouteMenuItem } from '../FundingRouteMenuItem/FundingRouteMenuItem';
 import { FundingRouteDrawer } from '../FundingRouteSelectDrawer/FundingRouteDrawer';
 import { PurchaseMenuItem } from '../PurchaseMenuItem/PurchaseMenuItem';
+import { text } from '../../../../resources/text/textConfig';
 
 type FundingRouteSelectProps = {
   fundingRoutes: FundingRoute[];
@@ -22,6 +24,7 @@ type FundingRouteSelectProps = {
 };
 
 export function FundingRouteSelect({ fundingRoutes, onFundingRouteSelected }: FundingRouteSelectProps) {
+  const textConfig = text.views[SaleWidgetViews.FUND_WITH_SMART_CHECKOUT];
   const [smartCheckoutDrawerVisible, setSmartCheckoutDrawerVisible] = useState(false);
   const [activeFundingRouteIndex, setActiveFundingRouteIndex] = useState(0);
   const { viewDispatch } = useContext(ViewContext);
@@ -65,36 +68,37 @@ export function FundingRouteSelect({ fundingRoutes, onFundingRouteSelected }: Fu
           height: '100%',
         }}
       >
+
         <Heading size="small">
-          Pay with your
+          {textConfig.fundingRouteSelect.heading}
         </Heading>
 
         {fundingRoutes.length === 0
-          ? (
-            <Heading size="small">
-              No funding routes available
-            </Heading>
-          )
-          : (
+          ? [
+            <Body size="small">
+              {textConfig.fundingRouteSelect.noRoutesAvailable}
+            </Body>,
+            <Button variant="tertiary">
+              {textConfig.fundingRouteSelect.payWithCard}
+            </Button>,
+          ]
+          : [
             <FundingRouteMenuItem
               data-testid="funding-route-select-selected-route"
               onClick={fundingRoutes.length > 1 ? onSmartCheckoutDropdownClick : () => {}}
               fundingRoute={fundingRoutes[activeFundingRouteIndex]}
               selected
               toggleVisible={fundingRoutes.length > 1}
-            />
-          ) }
+            />,
+            <PurchaseMenuItem fundingRoute={fundingRoutes[activeFundingRouteIndex]} />,
+            <Button sx={{ mt: 'auto' }} variant="primary" onClick={onClickContinue}>
+              {textConfig.fundingRouteSelect.continue}
+            </Button>,
+            <Button variant="tertiary">
+              {textConfig.fundingRouteSelect.payWithCardInstead}
+            </Button>,
+          ] }
 
-        <PurchaseMenuItem fundingRoute={fundingRoutes[activeFundingRouteIndex]} />
-
-        <Button sx={{ mt: 'auto' }} variant="primary" onClick={onClickContinue}>
-          {/* {options.continue.text} */}
-          continue
-        </Button>
-        <Button variant="tertiary">
-          {/* {options.payWithCard.text} */}
-          pay with card
-        </Button>
       </Box>
       <FundingRouteDrawer
         visible={smartCheckoutDrawerVisible}

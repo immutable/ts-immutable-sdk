@@ -2,12 +2,15 @@ import { Heading, MenuItem } from '@biom3/react';
 import { FundingRoute } from '@imtbl/checkout-sdk';
 import { useSaleContext } from '../../context/SaleContextProvider';
 import { tokenValueFormat } from '../../../../lib/utils';
+import { text } from '../../../../resources/text/textConfig';
+import { SaleWidgetViews } from '../../../../context/view-context/SaleViewContextTypes';
 
 type PurchaseMenuItemProps = {
   fundingRoute: FundingRoute;
 };
 
 export function PurchaseMenuItem({ fundingRoute }: PurchaseMenuItemProps) {
+  const textConfig = text.views[SaleWidgetViews.FUND_WITH_SMART_CHECKOUT];
   const { items } = useSaleContext();
   const firstItem = items[0];
   const firstFundingStep = fundingRoute.steps[0];
@@ -32,7 +35,7 @@ export function PurchaseMenuItem({ fundingRoute }: PurchaseMenuItemProps) {
         use={<Heading size="xSmall" />}
         price={`${firstFundingStep.fundingItem.token.symbol} 
           ${tokenValueFormat(purchaseAmount)}`}
-        fiatAmount={`≈ USD $${usdPurchaseAmount}`}
+        fiatAmount={`${textConfig.currency.usdEstimate}${usdPurchaseAmount}`}
       />
       <MenuItem.Label>
         {firstItem.name}

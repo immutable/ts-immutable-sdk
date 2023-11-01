@@ -6,6 +6,8 @@ import { designTokens } from '@biom3/design-tokens';
 import { tokenValueFormat } from '../../../../lib/utils';
 import { useSaleContext } from '../../context/SaleContextProvider';
 import { getChainNameById } from '../../../../lib/chainName';
+import { text } from '../../../../resources/text/textConfig';
+import { SaleWidgetViews } from '../../../../context/view-context/SaleViewContextTypes';
 
 // Taken from packages/checkout/widgets-lib/src/widgets/wallet/components/NetworkMenu/NetworkMenu.tsx
 const networkIcon = {
@@ -34,6 +36,7 @@ export interface FundingRouteMenuItemProps {
 export function FundingRouteMenuItem({
   onClick, fundingRoute, toggleVisible, selected, size = 'small',
 }: FundingRouteMenuItemProps) {
+  const textConfig = text.views[SaleWidgetViews.FUND_WITH_SMART_CHECKOUT];
   const firstFundingStep = fundingRoute.steps[0];
 
   const { isPassportWallet } = useSaleContext();
@@ -79,7 +82,7 @@ export function FundingRouteMenuItem({
       <MenuItem.FramedIcon icon="Coins" circularFrame />
       <MenuItem.PriceDisplay
         use={<Heading size="xSmall" />}
-        fiatAmount={`≈ USD $${usdBalance}`}
+        fiatAmount={`${textConfig.currency.usdEstimate}${usdBalance}`}
         price={tokenValueFormat(firstFundingStep.fundingItem.userBalance.formattedBalance)}
       />
       <MenuItem.Label sx={{ display: 'flex', wordBreak: 'default' }}>
