@@ -15,7 +15,7 @@ export function PurchaseMenuItem({ fundingRoute }: PurchaseMenuItemProps) {
   const firstItem = items[0];
   const firstFundingStep = fundingRoute.steps[0];
 
-  // todo - grab from url params
+  // todo - grab from url params, waiting for changes to how widgets are being loaded wt-1860
   const collection = 'Metalcore';
 
   // todo - calculate these in useSmartCheckout hook - later PR
