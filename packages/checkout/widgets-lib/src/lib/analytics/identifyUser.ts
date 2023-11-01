@@ -14,8 +14,11 @@ export async function identifyUser(
   const walletAddress = (await provider.getSigner().getAddress()).toLowerCase();
   const isMetaMask = isMetaMaskProvider(provider);
   const isPassport = isPassportProvider(provider);
-  identify(walletAddress, {
-    isMetaMask,
-    isPassportWallet: isPassport,
-  });
+  try {
+    identify(walletAddress, {
+      isMetaMask,
+      isPassportWallet: isPassport,
+    });
+  // eslint-disable-next-line no-console
+  } catch (error: any) { console.error('analytics: unable to identify user: ', error); }
 }
