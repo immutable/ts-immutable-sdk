@@ -2,7 +2,6 @@ import {
   Button, Heading, HorizontalMenu, MenuItem,
 } from '@biom3/react';
 import { ChainId, FundingRoute } from '@imtbl/checkout-sdk';
-import { designTokens } from '@biom3/design-tokens';
 import { tokenValueFormat } from '../../../../lib/utils';
 import { useSaleContext } from '../../context/SaleContextProvider';
 import { getChainNameById } from '../../../../lib/chainName';
@@ -53,9 +52,11 @@ export function FundingRouteMenuItem({
         cursor: 'default',
         height: '100%',
         marginLeft: 'base.spacing.x2',
-        fontSize: designTokens.base.text.body.xSmall.regular.fontSize,
+        fontSize: 'base.text.body.xxSmall.regular.fontSize',
+        fontWeight: 'base.text.body.xxSmall.regular.fontWeight',
+        color: 'base.color.brand.4',
         paddingLeft: 'base.spacing.x2',
-        paddingRight: '0',
+        paddingRight: 'base.spacing.x2',
       }}
       size="small"
     >
