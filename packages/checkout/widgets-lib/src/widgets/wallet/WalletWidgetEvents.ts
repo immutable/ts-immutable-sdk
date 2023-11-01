@@ -8,7 +8,7 @@ import {
 } from '@imtbl/checkout-sdk';
 
 export function sendWalletWidgetCloseEvent(eventTarget: Window | EventTarget) {
-  const closeWidgetEvent = new CustomEvent<WidgetEvent<any>>(
+  const closeWidgetEvent = new CustomEvent<WidgetEvent<WidgetType.WALLET, WalletEventType.CLOSE_WIDGET>>(
     IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
     {
       detail: {
@@ -29,7 +29,7 @@ export function sendNetworkSwitchEvent(
   network: NetworkInfo,
 ) {
   const walletWidgetSwitchNetworkEvent = new CustomEvent<
-  WidgetEvent<WidgetType.WALLET>
+  WidgetEvent<WidgetType.WALLET, WalletEventType.NETWORK_SWITCH>
   >(IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {
     detail: {
       type: WalletEventType.NETWORK_SWITCH,
@@ -46,7 +46,7 @@ export function sendNetworkSwitchEvent(
 }
 
 export function sendDisconnectWalletEvent(eventTarget: Window | EventTarget) {
-  const disconnectWalletEvent = new CustomEvent<WidgetEvent<any>>(
+  const disconnectWalletEvent = new CustomEvent<WidgetEvent<WidgetType.WALLET, WalletEventType.DISCONNECT_WALLET>>(
     IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
     {
       detail: {

@@ -4,8 +4,8 @@ import {
   Widget,
   Checkout,
   WidgetProperties,
-  WidgetEventTypes,
   WidgetType,
+  WidgetEventData,
 } from '@imtbl/checkout-sdk';
 import { StrongCheckoutWidgetsConfig, withDefaultWidgetConfigs } from '../lib/withDefaultWidgetConfig';
 
@@ -20,7 +20,7 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
 
   protected properties: WidgetProperties<T>;
 
-  protected eventHandlers: Map<WidgetEventTypes[T], Function> = new Map<WidgetEventTypes[T], Function>();
+  protected eventHandlers: Map<keyof WidgetEventData[T], Function> = new Map<keyof WidgetEventData[T], Function>();
 
   protected eventHandlersFunction?: (event: any) => void;
 
@@ -83,7 +83,8 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
     this.render();
   }
 
-  on(type: WidgetEventTypes[T], callback: (data: any) => void): void {
+  // eslint-disable-next-line max-len
+  on<KEventName extends keyof WidgetEventData[T]>(type: KEventName, callback: (data: WidgetEventData[T][KEventName]) => void): void {
     this.eventHandlers.set(type, callback);
 
     if (this.eventHandlersFunction) {
@@ -97,7 +98,7 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
     window.addEventListener(this.eventTopic, this.eventHandlersFunction);
   }
 
-  removeListener(type: WidgetEventTypes[T]): void {
+  removeListener<KEventName extends keyof WidgetEventData[T]>(type: KEventName): void {
     this.eventHandlers.delete(type);
 
     if (this.eventHandlersFunction) {

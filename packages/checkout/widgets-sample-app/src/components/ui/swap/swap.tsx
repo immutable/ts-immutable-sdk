@@ -1,4 +1,4 @@
-import { Checkout, SwapEventType, WalletProviderName, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
+import { Checkout, OrchestrationEventType, SwapEventType, SwapSuccess, WalletProviderName, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
 import { WidgetsFactory } from '@imtbl/checkout-widgets';
 import { useEffect, useMemo } from 'react';
 
@@ -13,9 +13,8 @@ function SwapUI() {
   
   useEffect(() => {
     swap.mount(SWAP_TARGET_ID);
-    swap.on(SwapEventType.SUCCESS, (data: any) => {
-      console.log('SUCCESS', data);
-    });
+    swap.on(SwapEventType.SUCCESS, (data: SwapSuccess) => {
+    })
     swap.on(SwapEventType.FAILURE, (data: any) => {
       console.log('FAILURE', data);
     });

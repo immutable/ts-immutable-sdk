@@ -12,7 +12,7 @@ import { Checkout,
   RequestSwapEvent, SwapEventType,
   WalletEventType,
   WalletNetworkSwitchEvent,
-  WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
+  WidgetTheme, WidgetType, SwapSuccess } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 
 export const MainPage = () => {
@@ -69,14 +69,14 @@ export const MainPage = () => {
       bridgeWidget.update({params: {fromContractAddress: eventData.tokenAddress, amount: eventData.amount, web3Provider}})
       bridgeWidget.mount('widget-target');
     })
-    walletWidget.on(OrchestrationEventType.REQUEST_SWAP, (eventData: RequestSwapEvent) => {
+    walletWidget.on(OrchestrationEventType.REQUEST_SWAP, (data: RequestSwapEvent) => {
       walletWidget.unmount();
-      swapWidget.update({params: {fromContractAddress: eventData.fromTokenAddress, amount: eventData.amount, web3Provider}})
+      swapWidget.update({params: {fromContractAddress: data.fromTokenAddress, amount: data.amount, web3Provider}})
       swapWidget.mount('widget-target');
     })
-    walletWidget.on(OrchestrationEventType.REQUEST_ONRAMP, (eventData: RequestOnrampEvent) => {
+    walletWidget.on(OrchestrationEventType.REQUEST_ONRAMP, (data: RequestOnrampEvent) => {
       walletWidget.unmount();
-      onRampWidget.update({params: {contractAddress: eventData.tokenAddress, amount: eventData.amount, web3Provider}})
+      onRampWidget.update({params: {contractAddress: data.tokenAddress, amount: data.amount, web3Provider}})
       onRampWidget.mount('widget-target');
     })
   }, [walletWidget, bridgeWidget, onRampWidget, swapWidget, web3Provider]);

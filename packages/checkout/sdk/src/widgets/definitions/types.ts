@@ -9,9 +9,15 @@ import {
   OnRampEventType,
   OnRampFailed,
   OnRampSuccess,
-  OrchestrationEventData,
   OrchestrationEventType,
+  RequestBridgeEvent,
+  RequestConnectEvent,
+  RequestOnrampEvent,
+  RequestSwapEvent,
+  RequestWalletEvent,
   SaleEventType,
+  SaleFailed,
+  SaleSuccess,
   SwapEventType,
   SwapFailed,
   SwapRejected,
@@ -75,13 +81,66 @@ export type WidgetEventTypes = {
   [WidgetType.SALE]: SaleEventType | OrchestrationEventType
 };
 
+type OrchestrationMapping = {
+  // orchestration event type to data
+  [OrchestrationEventType.REQUEST_CONNECT]: RequestConnectEvent,
+  [OrchestrationEventType.REQUEST_WALLET]: RequestWalletEvent,
+  [OrchestrationEventType.REQUEST_SWAP]: RequestSwapEvent,
+  [OrchestrationEventType.REQUEST_BRIDGE]: RequestBridgeEvent,
+  [OrchestrationEventType.REQUEST_ONRAMP]: RequestOnrampEvent,
+};
+
 export type WidgetEventData = {
-  [WidgetType.CONNECT]: ConnectionSuccess | ConnectionFailed | OrchestrationEventData,
-  [WidgetType.WALLET]: WalletNetworkSwitchEvent | WalletDisconnectWalletEvent | OrchestrationEventData,
-  [WidgetType.SWAP]: SwapSuccess | SwapFailed | SwapRejected | OrchestrationEventData,
-  [WidgetType.BRIDGE]: BridgeSuccess | BridgeFailed | OrchestrationEventData,
-  [WidgetType.ONRAMP]: OnRampSuccess | OnRampFailed | OrchestrationEventData,
-  [WidgetType.SALE]: any
+  [WidgetType.CONNECT]: {
+    // Connect Event type to data
+    [ConnectEventType.SUCCESS]: ConnectionSuccess,
+    [ConnectEventType.FAILURE]: ConnectionFailed,
+    [ConnectEventType.CLOSE_WIDGET]: any,
+  } & OrchestrationMapping,
+
+  [WidgetType.WALLET]: {
+    // Wallet event type to data
+    [WalletEventType.NETWORK_SWITCH]: WalletNetworkSwitchEvent
+    [WalletEventType.DISCONNECT_WALLET]: WalletDisconnectWalletEvent
+    [WalletEventType.CLOSE_WIDGET]: any
+  } & OrchestrationMapping,
+
+  [WidgetType.SWAP]: {
+    // Swap event type to data
+    [SwapEventType.SUCCESS]: SwapSuccess,
+    [SwapEventType.FAILURE]: SwapFailed,
+    [SwapEventType.REJECTED]: SwapRejected,
+    [SwapEventType.CLOSE_WIDGET]: any,
+  } & OrchestrationMapping
+
+  [WidgetType.BRIDGE]: {
+    // Bridge event type to data
+    [BridgeEventType.SUCCESS]: BridgeSuccess,
+    [BridgeEventType.FAILURE]: BridgeFailed,
+    [BridgeEventType.CLOSE_WIDGET]: any
+  } & OrchestrationMapping,
+
+  [WidgetType.ONRAMP]: {
+    // Onramp event type data
+    [OnRampEventType.SUCCESS]: OnRampSuccess,
+    [OnRampEventType.FAILURE]: OnRampFailed,
+    [OnRampEventType.CLOSE_WIDGET]: any,
+  } & OrchestrationMapping,
+
+  [WidgetType.SALE]: {
+    [SaleEventType.SUCCESS]: SaleSuccess,
+    [SaleEventType.FAILURE]: SaleFailed,
+    [SaleEventType.REJECTED]: any,
+    [SaleEventType.CLOSE_WIDGET]: any,
+  } & OrchestrationMapping
+};
+
+/**
+ * Represents an event emitted by a widget. The event type should match the event data
+ */
+export type WidgetEvent<T extends WidgetType, KEventName extends keyof WidgetEventData[T]> = {
+  type: KEventName,
+  data: WidgetEventData[T][KEventName];
 };
 
 /**
@@ -90,9 +149,9 @@ export type WidgetEventData = {
  * @property {WidgetEventTypes} type - The type of the event.
  * @property {T} data - The data associated with the event.
  */
-export type WidgetEvent<T extends WidgetType> = {
-  type: WidgetEventTypes[T],
-  data: WidgetEventData[T];
+export type OrchestrationEvent<KEventName extends keyof OrchestrationMapping> = {
+  type: KEventName,
+  data: OrchestrationMapping[KEventName];
 };
 
 export interface IWidgetsFactory {
@@ -130,13 +189,14 @@ export interface Widget<T extends WidgetType> {
    * @param event Widget specific event name.
    * @param callback function to execute when the event is received.
    */
-  on(type: WidgetEventTypes[T], callback: (data: any) => void): void
+  // eslint-disable-next-line max-len
+  on<KEventName extends keyof WidgetEventData[T]>(type: KEventName, callback: (data: WidgetEventData[T][KEventName]) => void): void
 
   /**
    * Removes an event listener for a widget event.
    * @param type Widget specific event name.
    */
-  removeListener(type: WidgetEventTypes[T]): void
+  removeListener<KEventName extends keyof WidgetEventData[T]>(type: KEventName): void;
 }
 
 /**

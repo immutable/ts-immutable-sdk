@@ -13,7 +13,7 @@ export function sendConnectSuccessEvent(
   provider: Web3Provider,
   walletProvider?: WalletProviderName,
 ) {
-  const successEvent = new CustomEvent<WidgetEvent<WidgetType.CONNECT>>(
+  const successEvent = new CustomEvent<WidgetEvent<WidgetType.CONNECT, ConnectEventType.SUCCESS>>(
     IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
     {
       detail: {
@@ -31,7 +31,7 @@ export function sendConnectSuccessEvent(
 }
 
 export function sendCloseWidgetEvent(eventTarget: Window | EventTarget) {
-  const closeWidgetEvent = new CustomEvent<WidgetEvent<any>>(
+  const closeWidgetEvent = new CustomEvent<WidgetEvent<WidgetType.CONNECT, ConnectEventType.CLOSE_WIDGET>>(
     IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
     {
       detail: {
@@ -46,7 +46,7 @@ export function sendCloseWidgetEvent(eventTarget: Window | EventTarget) {
 }
 
 export function sendConnectFailedEvent(eventTarget: Window | EventTarget, reason: string) {
-  const failedEvent = new CustomEvent<WidgetEvent<WidgetType.CONNECT>>(
+  const failedEvent = new CustomEvent<WidgetEvent<WidgetType.CONNECT, ConnectEventType.FAILURE>>(
     IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
     {
       detail: {

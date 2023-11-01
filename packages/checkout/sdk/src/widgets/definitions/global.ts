@@ -6,7 +6,7 @@ import {
   Widget,
   WidgetProperties,
   WidgetType,
-  WidgetEventTypes,
+  WidgetEventData,
 } from './types';
 
 /**
@@ -27,8 +27,9 @@ declare global {
       unmount(): void;
       destroy(): void;
       update(props: WidgetProperties<T>): void;
-      on(type: WidgetEventTypes[T], callback: (data: any) => void): void;
-      removeListener(type: WidgetEventTypes[T]): void;
+      // eslint-disable-next-line max-len
+      on<KEventName extends keyof WidgetEventData[T]>(type: KEventName, callback: (data: WidgetEventData[T][KEventName]) => void): void;
+      removeListener<KEventName extends keyof WidgetEventData[T]>(type: KEventName): void;
     }
 
     class Bridge<T extends WidgetType> implements Widget<T> {
@@ -37,8 +38,9 @@ declare global {
       unmount(): void;
       destroy(): void;
       update(props: WidgetProperties<T>): void;
-      on(type: WidgetEventTypes[T], callback: (data: any) => void): void;
-      removeListener(type: WidgetEventTypes[T]): void;
+      // eslint-disable-next-line max-len
+      on<KEventName extends keyof WidgetEventData[T]>(type: KEventName, callback: (data: WidgetEventData[T][KEventName]) => void): void;
+      removeListener<KEventName extends keyof WidgetEventData[T]>(type: KEventName): void;
     }
 
     class Wallet<T extends WidgetType> implements Widget<T> {
@@ -47,8 +49,9 @@ declare global {
       unmount(): void;
       destroy(): void;
       update(props: WidgetProperties<T>): void;
-      on(type: WidgetEventTypes[T], callback: (data: any) => void): void;
-      removeListener(type: WidgetEventTypes[T]): void;
+      // eslint-disable-next-line max-len
+      on<KEventName extends keyof WidgetEventData[T]>(type: KEventName, callback: (data: WidgetEventData[T][KEventName]) => void): void;
+      removeListener<KEventName extends keyof WidgetEventData[T]>(type: KEventName): void;
     }
 
     class Swap<T extends WidgetType> implements Widget<T> {
@@ -57,8 +60,9 @@ declare global {
       unmount(): void;
       destroy(): void;
       update(props: WidgetProperties<T>): void;
-      on(type: WidgetEventTypes[T], callback: (data: any) => void): void;
-      removeListener(type: WidgetEventTypes[T]): void;
+      // eslint-disable-next-line max-len
+      on<KEventName extends keyof WidgetEventData[T]>(type: KEventName, callback: (data: WidgetEventData[T][KEventName]) => void): void;
+      removeListener<KEventName extends keyof WidgetEventData[T]>(type: KEventName): void;
     }
 
     class OnRamp<T extends WidgetType> implements Widget<T> {
@@ -67,8 +71,20 @@ declare global {
       unmount(): void;
       destroy(): void;
       update(props: WidgetProperties<T>): void;
-      on(type: WidgetEventTypes[T], callback: (data: any) => void): void;
-      removeListener(type: WidgetEventTypes[T]): void;
+      // eslint-disable-next-line max-len
+      on<KEventName extends keyof WidgetEventData[T]>(type: KEventName, callback: (data: WidgetEventData[T][KEventName]) => void): void;
+      removeListener<KEventName extends keyof WidgetEventData[T]>(type: KEventName): void;
+    }
+
+    class Sale<T extends WidgetType> implements Widget<T> {
+      constructor(sdk: Checkout, props: WidgetProperties<T>);
+      mount(id: string): void;
+      unmount(): void;
+      destroy(): void;
+      update(props: WidgetProperties<T>): void;
+      // eslint-disable-next-line max-len
+      on<KEventName extends keyof WidgetEventData[T]>(type: KEventName, callback: (data: WidgetEventData[T][KEventName]) => void): void;
+      removeListener<KEventName extends keyof WidgetEventData[T]>(type: KEventName): void;
     }
 
     class Sale<T extends WidgetType> implements Widget<T> {
