@@ -75,16 +75,16 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
 
   return (
     <Box>
-      { subView === FundWithSmartCheckoutSubViews.INIT && (
+      {subView === FundWithSmartCheckoutSubViews.INIT && (
         <LoadingView loadingText={textConfig.loading.checkingBalances} />
       )}
-      { subView === FundWithSmartCheckoutSubViews.FUNDING_ROUTE_SELECT && (
+      {subView === FundWithSmartCheckoutSubViews.FUNDING_ROUTE_SELECT && (
         <FundingRouteSelect
           onFundingRouteSelected={onFundingRouteSelected}
           fundingRoutes={fundingRoutes}
         />
       )}
-      { subView === FundWithSmartCheckoutSubViews.FUNDING_ROUTE_EXECUTE && (
+      {subView === FundWithSmartCheckoutSubViews.FUNDING_ROUTE_EXECUTE && (
         <FundingRouteExecute
           onFundingRouteExecuted={onFundingRouteExecuted}
           fundingRouteStep={fundingRouteStep}
