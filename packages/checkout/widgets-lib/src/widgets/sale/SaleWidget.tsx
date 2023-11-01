@@ -4,7 +4,8 @@ import {
 
 import { BiomeCombinedProviders } from '@biom3/react';
 
-import { Item } from '@imtbl/checkout-sdk';
+import { SaleItem } from '@imtbl/checkout-sdk';
+import { Environment } from '@imtbl/config';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 import {
   SharedViews,
@@ -33,9 +34,8 @@ import { SaleErrorView } from './views/SaleErrorView';
 export interface SaleWidgetProps {
   config: StrongCheckoutWidgetsConfig;
   amount: string;
-  items: Item[];
+  items: SaleItem[];
   fromContractAddress: string;
-  env: string;
   environmentId: string;
 }
 
@@ -45,7 +45,6 @@ export function SaleWidget(props: SaleWidgetProps) {
     amount,
     items,
     fromContractAddress,
-    env,
     environmentId,
   } = props;
 
@@ -99,7 +98,7 @@ export function SaleWidget(props: SaleWidgetProps) {
             items,
             amount,
             fromContractAddress,
-            env,
+            env: checkout!.config.environment ?? Environment.SANDBOX,
             environmentId,
             provider,
             checkout,

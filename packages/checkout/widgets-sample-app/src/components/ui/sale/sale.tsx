@@ -1,12 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Environment } from '@imtbl/config';
 import { config, passport } from '@imtbl/sdk';
 
 import {
   WidgetsFactory,
 } from '@imtbl/checkout-widgets';
-import { ConnectEventType, ConnectionSuccess, Item, SaleEventType, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
-import { Checkbox } from '@biom3/react';
+import { ConnectEventType, ConnectionSuccess, SaleEventType, SaleItem, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
 import { Checkout } from '@imtbl/checkout-sdk';
 import { Passport } from '@imtbl/passport';
 
@@ -19,7 +18,7 @@ const defaultPassportConfig = {
   scope: 'openid offline_access email transact',
 };
 
-const defaultItems: Item[] = [
+const defaultItems: SaleItem[] = [
   {
     productId: 'P0001',
     qty: 3,
@@ -98,21 +97,26 @@ export function SaleUI() {
     JSON.stringify(defaultPassportConfig, null, 2),
   );
   const [items, setItems] = useState(JSON.stringify(defaultItems, null, 2));
-  // const [showWidget, setShowWidget] = useState(true);
-  // const ref = useRef<ImmutableWebComponent>(null);
 
-  // New code for doing checkout here
   const passportInstance = useMemo(() => usePassportInstance(JSON.parse(passportConfig)), []);
   const checkout = useMemo(() => new Checkout({baseConfig: {environment: Environment.SANDBOX}, passport: passportInstance as unknown as Passport}), [])
   const factory = useMemo(() => new WidgetsFactory(checkout, {theme: WidgetTheme.DARK}), [checkout])
   const connectWidget = useMemo(() => factory.create(WidgetType.CONNECT, {}), [factory])
-  const saleWidget = useMemo(() => factory.create(WidgetType.SALE, {amount, env, environmentId, fromContractAddress, products: defaultItems}), [factory])
+  const saleWidget = useMemo(() => factory.create(WidgetType.SALE, {
+      amount, 
+      environmentId, 
+      fromContractAddress, 
+      items: defaultItems
+    }), 
+  [factory, amount, environmentId, fromContractAddress, defaultItems]
+  )
 
   connectWidget.on(ConnectEventType.SUCCESS, (data: ConnectionSuccess) => {
     console.log('event')
     saleWidget.update({params: {web3Provider: data.provider}})
   })
 
+  // mount sale widget and subscribe to close event
   useEffect(() => {
     saleWidget.mount("sale");
     saleWidget.on(SaleEventType.CLOSE_WIDGET, () => { saleWidget.destroy()})
@@ -154,30 +158,7 @@ export function SaleUI() {
     }
   };
 
-  // const handleEvent = ((event: CustomEvent) => {
-  //   // eslint-disable-next-line no-console
-  //   console.log('@@@@@ event', event.detail);
-
-  //   switch (event.detail.type) {
-  //     case SaleEventType.CLOSE_WIDGET: {
-  //       setShowWidget(false);
-  //       break;
-  //     }
-  //     default:
-  //       // eslint-disable-next-line no-console
-  //       console.log('Does not match any expected event type');
-  //   }
-  // }) as EventListener;
-
-  // useEffect(() => {
-  //   const widget = ref.current;
-  //   const passportInstance = usePassportInstance(JSON.parse(passportConfig));
-  //   widget?.addPassportOption(passportInstance as any);
-  // }, [passportConfig, items]);
-
-  // I think this should go in where the login is called
   useEffect(() => {
-    // const passportInstance = usePassportInstance(JSON.parse(passportConfig));
     if (passportInstance && login) {
       passportInstance.loginCallback();
     }
@@ -195,26 +176,7 @@ export function SaleUI() {
     }
   }, []);
 
-  // useEffect(() => {
-  //   window.addEventListener(
-  //     IMTBLWidgetEvents.IMTBL_SALE_WIDGET_EVENT,
-  //     handleEvent,
-  //   );
 
-  //   return () => {
-  //     window.removeEventListener(
-  //       IMTBLWidgetEvents.IMTBL_SALE_WIDGET_EVENT,
-  //       handleEvent,
-  //     );
-  //   };
-  // }, []);
-
-  // const widgetConfig = {
-  //   theme: WidgetTheme.DARK,
-  //   environment: Environment.SANDBOX,
-  // };
-
-  // const products = btoa(JSON.stringify(JSON.parse(items)));
 
   return (
     <>
@@ -224,18 +186,6 @@ export function SaleUI() {
     <button onClick={() => saleWidget.update({config: {theme: WidgetTheme.LIGHT}})}>Light theme</button>
     <button onClick={() => saleWidget.update({config: {theme: WidgetTheme.DARK}})}>Dark theme</button>
     <button onClick={() => saleWidget.destroy()}>Destory</button>
-      {/* {showWidget ? (
-        <imtbl-sale
-          ref={ref}
-          widgetConfig={JSON.stringify(widgetConfig)}
-          amount={amount}
-          products={products}
-          fromContractAddress={fromContractAddress}
-          environmentId={environmentId}
-          env={env}
-        />
-      ) : undefined} */}
-
       <br />
       <br />
       <br />

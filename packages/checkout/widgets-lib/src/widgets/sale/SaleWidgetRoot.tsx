@@ -2,7 +2,7 @@ import React from 'react';
 import {
   ConnectTargetLayer,
   IMTBLWidgetEvents,
-  Item,
+  SaleItem,
   SaleWidgetParams,
   WidgetConfiguration,
   WidgetProperties,
@@ -20,15 +20,8 @@ import { SaleWidget } from './SaleWidget';
 export class Sale extends Base<WidgetType.SALE> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_SALE_WIDGET_EVENT;
 
-  // private setItems(products: string) {
-  //   try {
-  //     this.items = JSON.parse(atob(products));
-  //   } catch {
-  //     this.items = [];
-  //   }
-  // }
-
-  private isValidProucts(products: Item[]): boolean {
+  // TODO: add specific validation logic for the sale items
+  private isValidProucts(products: SaleItem[]): boolean {
     try {
       return Array.isArray(products);
     } catch {
@@ -55,16 +48,11 @@ export class Sale extends Base<WidgetType.SALE> {
         validatedParams.amount = '';
       }
 
-      if (this.isValidProucts(params.products ?? [])) {
+      // TODO: fix the logic here when proper , currently saying if valid then reset to empty array.
+      if (this.isValidProucts(params.items ?? [])) {
         // eslint-disable-next-line no-console
-        console.warn('[IMTBL]: invalid "products" widget input. It must be a base64 encoded Item[]');
-        validatedParams.products = [];
-      }
-
-      if (!params.env) {
-        // eslint-disable-next-line no-console
-        console.warn('[IMTBL]: invalid "env" widget input');
-        validatedParams.env = '';
+        console.warn('[IMTBL]: invalid "items" widget input.');
+        validatedParams.items = [];
       }
 
       if (!params.environmentId) {
@@ -99,7 +87,6 @@ export class Sale extends Base<WidgetType.SALE> {
       web3Provider: this.properties.params?.web3Provider,
       checkout: this.checkout,
       allowedChains: [
-        // getL1ChainId(this.checkout!.config),
         getL2ChainId(this.checkout!.config),
       ],
     };
@@ -119,11 +106,9 @@ export class Sale extends Base<WidgetType.SALE> {
             <SaleWidget
               config={this.strongConfig()}
               amount={params!.amount!}
-              items={params!.products!}
+              items={params!.items!}
               fromContractAddress={params!.fromContractAddress!}
               environmentId={params!.environmentId!}
-              env={params!.env!}
-              // connectLoaderParams={connectLoaderParams}
             />
           </ConnectLoader>
         </CustomAnalyticsProvider>
