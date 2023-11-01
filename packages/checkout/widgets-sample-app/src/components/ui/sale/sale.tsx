@@ -1,11 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Environment } from '@imtbl/config';
 import { config, passport } from '@imtbl/sdk';
-
-import {
-  WidgetsFactory,
-} from '@imtbl/checkout-widgets';
-import { ConnectEventType, ConnectionSuccess, SaleEventType, SaleItem, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
+import { WidgetsFactory } from '@imtbl/checkout-widgets';
+import { SaleEventType, SaleItem, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
 import { Checkout } from '@imtbl/checkout-sdk';
 import { Passport } from '@imtbl/passport';
 
@@ -69,7 +66,7 @@ const usePassportInstance = (passportConfig: any) => {
   } = passportConfig;
 
   if (!clientId || !redirectUri || !logoutRedirectUri || !audience || !scope) {
-    return null;
+    return undefined;
   }
 
   const passportInstance = new passport.Passport({
@@ -97,9 +94,8 @@ export function SaleUI() {
   const [items, setItems] = useState(JSON.stringify(defaultItems, null, 2));
 
   const passportInstance = useMemo(() => usePassportInstance(JSON.parse(passportConfig)), []);
-  const checkout = useMemo(() => new Checkout({baseConfig: {environment: Environment.SANDBOX}, passport: passportInstance as unknown as Passport}), [])
+  const checkout = useMemo(() => new Checkout({baseConfig: {environment: Environment.SANDBOX}, passport: passportInstance as unknown as Passport}), [passportInstance])
   const factory = useMemo(() => new WidgetsFactory(checkout, {theme: WidgetTheme.DARK}), [checkout])
-  const connectWidget = useMemo(() => factory.create(WidgetType.CONNECT, {}), [factory])
   const saleWidget = useMemo(() => factory.create(WidgetType.SALE, {
       amount, 
       environmentId, 
@@ -108,11 +104,6 @@ export function SaleUI() {
     }), 
   [factory, amount, environmentId, fromContractAddress, defaultItems]
   )
-
-  connectWidget.on(ConnectEventType.SUCCESS, (data: ConnectionSuccess) => {
-    console.log('event')
-    saleWidget.update({params: {web3Provider: data.provider}})
-  })
 
   // mount sale widget and subscribe to close event
   useEffect(() => {
