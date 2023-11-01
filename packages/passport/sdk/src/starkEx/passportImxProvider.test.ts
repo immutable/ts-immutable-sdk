@@ -23,7 +23,7 @@ import {
 import { ConfirmationScreen } from '../confirmation';
 import { PassportConfiguration } from '../config';
 import { PassportEventMap, PassportEvents } from '../types';
-import TypedEventEmitter from '../typedEventEmitter';
+import TypedEventEmitter from '../utils/typedEventEmitter';
 import AuthManager from '../authManager';
 
 jest.mock('./workflows');

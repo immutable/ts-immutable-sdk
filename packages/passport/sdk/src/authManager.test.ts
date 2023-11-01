@@ -4,10 +4,10 @@ import AuthManager from './authManager';
 import { PassportError, PassportErrorType } from './errors/passportError';
 import { PassportConfiguration } from './config';
 import { mockUser, mockUserImx, mockUserZkEvm } from './test/mocks';
-import { isTokenExpired } from './token';
+import { isTokenExpired } from './utils/token';
 
 jest.mock('oidc-client-ts');
-jest.mock('./token');
+jest.mock('./utils/token');
 
 const baseConfig = new ImmutableConfiguration({
   environment: Environment.SANDBOX,

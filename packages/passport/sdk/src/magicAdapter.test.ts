@@ -17,7 +17,6 @@ jest.mock('@magic-ext/oidc', () => ({
 }));
 
 describe('MagicWallet', () => {
-  let magicWallet: MagicAdapter;
   const apiKey = 'pk_live_A7D9211D7547A338';
   const providerId = 'mPGZAvZsFkyfT6OWfML1HgTKjPqYOPkhhOj-8qCGeqI=';
   const config: PassportConfiguration = {
@@ -40,32 +39,48 @@ describe('MagicWallet', () => {
       rpcProvider,
       preload,
     }));
-    magicWallet = new MagicAdapter(config);
   });
 
-  describe('preload', () => {
-    it('should have called the magic client preload method', () => {
-      expect(preload).toHaveBeenCalled();
+  describe('constructor', () => {
+    describe('when window defined', () => {
+      const { window } = global;
+      beforeAll(() => {
+        Object.defineProperty(global, 'window', {
+          value: {},
+        });
+      });
+      afterAll(() => {
+        global.window = window;
+      });
+      it('starts initialising the magicClient', () => {
+        const magicAdapter = new MagicAdapter(config);
+        // @ts-ignore
+        expect(magicAdapter.magicClientPromise).toBeDefined();
+      });
     });
-  });
 
-  describe('window is not defined', () => {
-    const { window } = global;
-    beforeAll(() => {
-    // @ts-expect-error
-      delete global.window;
-    });
-    afterAll(() => {
-      global.window = window;
-    });
-    it('does not call the magic preload method', () => {
-      expect(preload).toBeCalledTimes(0);
+    describe('when window is undefined', () => {
+      const { window } = global;
+      beforeAll(() => {
+        // @ts-expect-error
+        delete global.window;
+      });
+      afterAll(() => {
+        global.window = window;
+      });
+
+      it('does nothing', () => {
+        const magicAdapter = new MagicAdapter(config);
+        // @ts-ignore
+        expect(magicAdapter.magicClientPromise).toBeUndefined();
+      });
     });
   });
 
   describe('login', () => {
     it('should call loginWithOIDC and initialise the provider with the correct arguments', async () => {
-      const magicProvider = await magicWallet.login(idToken);
+      const magicAdapter = new MagicAdapter(config);
+      const magicProvider = await magicAdapter.login(idToken);
 
       expect(Magic).toHaveBeenCalledWith(apiKey, {
         network: config.network,
@@ -81,12 +96,14 @@ describe('MagicWallet', () => {
     });
 
     it('should throw a PassportError when an error is thrown', async () => {
+      const magicAdapter = new MagicAdapter(config);
+
       loginWithOIDCMock.mockImplementation(() => {
         throw new Error('oops');
       });
 
       await expect(async () => {
-        await magicWallet.login(idToken);
+        await magicAdapter.login(idToken);
       }).rejects.toThrow(
         new PassportError(
           'oops',
@@ -98,8 +115,9 @@ describe('MagicWallet', () => {
 
   describe('logout', () => {
     it('calls the logout function', async () => {
-      await magicWallet.login(idToken);
-      await magicWallet.logout();
+      const magicAdapter = new MagicAdapter(config);
+      await magicAdapter.login(idToken);
+      await magicAdapter.logout();
 
       expect(logoutMock).toHaveBeenCalled();
     });
