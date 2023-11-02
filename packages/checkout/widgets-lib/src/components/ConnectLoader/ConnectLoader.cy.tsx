@@ -150,6 +150,7 @@ describe('ConnectLoader', () => {
         provider,
         getSigner: () => ({
           getAddress: async () => Promise.resolve(''),
+          getChainId: async () => Promise.resolve(ChainId.IMTBL_ZKEVM_TESTNET),
         }),
         isMetaMask: true,
       } as any as Web3Provider,
