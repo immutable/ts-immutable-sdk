@@ -9,8 +9,8 @@ import {
   FundWithSmartCheckoutSubViews,
   SaleWidgetViews,
 } from '../../../context/view-context/SaleViewContextTypes';
-import { text } from '../../../resources/text/textConfig';
 import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import { text } from '../../../resources/text/textConfig';
 import { LoadingView } from '../../../views/loading/LoadingView';
 import { FundingRouteExecute } from '../components/FundingRouteExecute/FundingRouteExecute';
 import { FundingRouteSelect } from '../components/FundingRouteSelect/FundingRouteSelect';

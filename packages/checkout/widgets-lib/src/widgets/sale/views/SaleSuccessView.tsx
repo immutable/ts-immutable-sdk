@@ -19,9 +19,7 @@ export function SaleSuccessView({ data }: SaleSuccessViewProps) {
       statusText={text.views[SaleWidgetViews.SALE_SUCCESS].text}
       actionText={text.views[SaleWidgetViews.SALE_SUCCESS].actionText}
       onRenderEvent={() => {
-        const {
-          reason, transactions, paymentMethod, ...rest
-        } = data;
+        const { transactions, ...rest } = data;
         sendSuccessEvent(SaleWidgetViews.SALE_SUCCESS, transactions, rest);
       }}
       onActionClick={() => closeWidget()}
