@@ -142,6 +142,13 @@ export type WidgetEventData = {
 /**
  * Represents an event emitted by a widget. The event type should match the event data
  */
+/**
+ * Represents an event emitted by a widget.
+ * @template T - The widget type
+ * @template KEventName - The widget event name.
+ * @property {KEventName} type - The type of the event.
+ * @property {WidgetEventData[T][KEventName]} data - The data associated with the widget event.
+ */
 export type WidgetEvent<T extends WidgetType, KEventName extends keyof WidgetEventData[T]> = {
   type: KEventName,
   data: WidgetEventData[T][KEventName];
@@ -149,9 +156,9 @@ export type WidgetEvent<T extends WidgetType, KEventName extends keyof WidgetEve
 
 /**
  * Represents an event emitted by a widget.
- * @template T - The type of data associated with the event.
- * @property {WidgetEventTypes} type - The type of the event.
- * @property {T} data - The data associated with the event.
+ * @template KEventName - The orchestration event name.
+ * @property {KEventName} type - The type of the event.
+ * @property {OrchestrationMapping[KEventName]} data - The data associated with the event.
  */
 export type OrchestrationEvent<KEventName extends keyof OrchestrationMapping> = {
   type: KEventName,
