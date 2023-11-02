@@ -19,8 +19,9 @@ import { identifyUser } from '../../../lib/analytics/identifyUser';
 
 export interface ReadyToConnectProps {
   targetChainId: ChainId;
+  allowedChains: ChainId[];
 }
-export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
+export function ReadyToConnect({ targetChainId, allowedChains }: ReadyToConnectProps) {
   const {
     connectState: { checkout, provider, sendCloseEvent },
     connectDispatch,
@@ -94,7 +95,7 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
   ) => {
     const networkInfo = await checkout.getNetworkInfo({ provider });
 
-    if (networkInfo.chainId !== targetChainId) {
+    if (networkInfo.chainId !== targetChainId && !allowedChains.includes(networkInfo.chainId)) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,

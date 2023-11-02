@@ -4,6 +4,7 @@ import React, {
 } from 'react';
 import { BiomeCombinedProviders } from '@biom3/react';
 import {
+  ChainId,
   Checkout, ConnectTargetLayer, ConnectWidgetParams,
 } from '@imtbl/checkout-sdk';
 import {
@@ -47,6 +48,7 @@ export type ConnectWidgetInputs = ConnectWidgetParams & {
   deepLink?: ConnectWidgetViews;
   sendCloseEventOverride?: () => void;
   targetLayer?: ConnectTargetLayer;
+  allowedChains?: ChainId[];
   checkout: Checkout;
 };
 
@@ -56,6 +58,7 @@ export function ConnectWidget({
   web3Provider,
   checkout,
   targetLayer,
+  allowedChains,
   deepLink = ConnectWidgetViews.CONNECT_WALLET,
 }: ConnectWidgetInputs) {
   const { environment, theme } = config;
@@ -157,7 +160,7 @@ export function ConnectWidget({
             <ConnectWallet />
             )}
             {view.type === ConnectWidgetViews.READY_TO_CONNECT && (
-            <ReadyToConnect targetChainId={targetChainId} />
+            <ReadyToConnect targetChainId={targetChainId} allowedChains={allowedChains ?? [targetChainId]} />
             )}
             {view.type === ConnectWidgetViews.SWITCH_NETWORK && networkToSwitchTo === ConnectTargetLayer.LAYER2 && (
             <SwitchNetworkZkEVM />

@@ -50,6 +50,10 @@ export async function createProvider(
       break;
     }
     default:
+      // eslint-disable-next-line no-console
+      console.error(
+        'The WalletProviderName that was provided is not supported',
+      );
       throw new CheckoutError(
         'Provider not supported',
         CheckoutErrorType.DEFAULT_PROVIDER_ERROR,
