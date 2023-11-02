@@ -1570,7 +1570,13 @@ describe('buy', () => {
           }),
           fulfillOrder: fulfillOrderMock,
         });
-
+        (createBlockchainDataInstance as jest.Mock).mockReturnValue({
+          getToken: jest.fn().mockResolvedValue({
+            result: {
+              decimals: 6,
+            },
+          }),
+        });
         (signApprovalTransactions as jest.Mock).mockResolvedValue({
           type: SignTransactionStatusType.SUCCESS,
         });

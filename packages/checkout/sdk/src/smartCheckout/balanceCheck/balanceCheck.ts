@@ -157,7 +157,7 @@ export const balanceCheck = async (
 
   // Get all ERC20 and NATIVE balances
   if (requiredToken.length > 0 && promisesResponses.length > 0) {
-    const result = promisesResponses.pop();
+    const result = promisesResponses.shift();
     if (result) {
       requiredToken.forEach((item) => {
         balanceRequirements.push(getTokenBalanceRequirement(item as (NativeItem | ERC20Item), result));
@@ -167,7 +167,7 @@ export const balanceCheck = async (
 
   // Get all ERC721 balances
   if (requiredERC721.length > 0 && promisesResponses.length > 0) {
-    const result = promisesResponses.pop();
+    const result = promisesResponses.shift();
     if (result) {
       requiredERC721.forEach((item) => {
         balanceRequirements.push(getERC721BalanceRequirement(item as (ERC721Item), result));

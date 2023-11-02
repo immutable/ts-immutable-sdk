@@ -392,21 +392,21 @@ describe('balanceCheck', () => {
       const itemRequirements: ItemRequirement[] = [
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigNumber.from('1'),
         },
         {
           type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+          amount: BigNumber.from('1'),
         },
         {
           type: ItemType.ERC20,
-          amount: BigNumber.from(10),
+          amount: BigNumber.from('10'),
           contractAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
         },
         {
           type: ItemType.ERC20,
-          amount: BigNumber.from(10),
+          amount: BigNumber.from('10'),
           contractAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
         },
@@ -426,7 +426,7 @@ describe('balanceCheck', () => {
       const getAllBalancesResult = {
         balances: [
           {
-            type: ItemType.ERC20,
+            type: ItemType.NATIVE,
             balance: BigNumber.from(1),
             formattedBalance: '0.000000000000000001',
             token: {
@@ -460,8 +460,8 @@ describe('balanceCheck', () => {
               token: {
                 address: IMX_ADDRESS_ZKEVM,
                 decimals: 18,
-                name: 'IMX',
-                symbol: 'IMX',
+                name: '',
+                symbol: '',
               },
             },
             delta: {
@@ -473,8 +473,8 @@ describe('balanceCheck', () => {
               balance: BigNumber.from(2),
               formattedBalance: '0.000000000000000002',
               token: {
-                name: 'IMX',
-                symbol: 'IMX',
+                name: '',
+                symbol: '',
                 decimals: 18,
                 address: IMX_ADDRESS_ZKEVM,
               },

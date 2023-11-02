@@ -109,7 +109,7 @@ export const buy = async (
     provider.getSigner().getAddress(),
   );
 
-  // Prefetch balances and store them in memor
+  // Prefetch balances and store them in memory
   resetBlockscoutClientMap();
   getAllBalances(config, provider, fulfillerAddress, getL1ChainId(config));
   getAllBalances(config, provider, fulfillerAddress, getL2ChainId(config));
