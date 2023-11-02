@@ -1,35 +1,98 @@
-import { ETH_TOKEN_IMAGE_URL, Heading, MenuItem } from '@biom3/react';
-import { FundingRoute } from '@imtbl/checkout-sdk';
+import {
+  Button, Heading, HorizontalMenu, MenuItem,
+} from '@biom3/react';
+import { ChainId, FundingRoute } from '@imtbl/checkout-sdk';
+import { tokenValueFormat } from '../../../../lib/utils';
+import { useSaleContext } from '../../context/SaleContextProvider';
+import { getChainNameById } from '../../../../lib/chainName';
+import { text } from '../../../../resources/text/textConfig';
+import { SaleWidgetViews } from '../../../../context/view-context/SaleViewContextTypes';
+
+// Taken from packages/checkout/widgets-lib/src/widgets/wallet/components/NetworkMenu/NetworkMenu.tsx
+const networkIcon = {
+  [ChainId.IMTBL_ZKEVM_DEVNET]: 'Immutable',
+  [ChainId.IMTBL_ZKEVM_MAINNET]: 'Immutable',
+  [ChainId.IMTBL_ZKEVM_TESTNET]: 'Immutable',
+  [ChainId.ETHEREUM]: 'EthToken',
+  [ChainId.SEPOLIA]: 'EthToken',
+};
+
+const logoColour = {
+  [ChainId.IMTBL_ZKEVM_DEVNET]: 'base.color.text.link.primary',
+  [ChainId.IMTBL_ZKEVM_TESTNET]: 'base.color.text.link.primary',
+  [ChainId.IMTBL_ZKEVM_MAINNET]: 'base.color.text.link.primary',
+  [ChainId.ETHEREUM]: 'base.color.accent.5',
+  [ChainId.SEPOLIA]: 'base.color.accent.5',
+};
 
 export interface FundingRouteMenuItemProps {
   onClick: () => void;
   fundingRoute: FundingRoute;
   toggleVisible?: boolean;
   selected?: boolean;
+  size?: 'small' | 'medium';
 }
 export function FundingRouteMenuItem({
-  onClick, fundingRoute, toggleVisible, selected,
+  onClick, fundingRoute, toggleVisible, selected, size = 'small',
 }: FundingRouteMenuItemProps) {
+  const textConfig = text.views[SaleWidgetViews.FUND_WITH_SMART_CHECKOUT];
+  const firstFundingStep = fundingRoute.steps[0];
+
+  const { isPassportWallet } = useSaleContext();
+
+  // todo - calculate these in useSmartCheckout hook - later PR
+  const usdBalance = '102.49';
+  const totalFees = '5.01';
+
+  const networkLabel = () => (
+    <HorizontalMenu.Button
+      rc={<a />}
+      sx={{
+        pointerEvents: 'none',
+        cursor: 'default',
+        height: '100%',
+        marginLeft: 'base.spacing.x2',
+        fontSize: 'base.text.body.xxSmall.regular.fontSize',
+        fontWeight: 'base.text.body.xxSmall.regular.fontWeight',
+        color: 'base.color.brand.4',
+        paddingLeft: 'base.spacing.x2',
+        paddingRight: 'base.spacing.x2',
+      }}
+      size="small"
+    >
+      <Button.Icon
+        icon={networkIcon[firstFundingStep.chainId]}
+        sx={{
+          width: '14px',
+          fill: logoColour[firstFundingStep.chainId],
+        }}
+      />
+      {getChainNameById(firstFundingStep.chainId)}
+    </HorizontalMenu.Button>
+  );
+
   return (
     <MenuItem
+      emphasized
       testId="funding-route-menu-item"
       onClick={onClick}
       selected={selected}
-      size="small"
+      size={size}
     >
       {toggleVisible && <MenuItem.IntentIcon icon="ChevronExpand" />}
-      <MenuItem.FramedImage imageUrl={ETH_TOKEN_IMAGE_URL} />
+      <MenuItem.FramedIcon icon="Coins" circularFrame />
       <MenuItem.PriceDisplay
         use={<Heading size="xSmall" />}
-        price="0.0252565"
-        fiatAmount="USD $2.49"
-        currencyImageUrl={ETH_TOKEN_IMAGE_URL}
+        fiatAmount={`${textConfig.currency.usdEstimate}${usdBalance}`}
+        price={tokenValueFormat(firstFundingStep.fundingItem.userBalance.formattedBalance)}
       />
-      <MenuItem.Label>
-        { fundingRoute.steps[0].fundingItem.token.symbol }
+      <MenuItem.Label sx={{ display: 'flex', wordBreak: 'default' }}>
+        {firstFundingStep.fundingItem.token.symbol}
+        {isPassportWallet ? null : networkLabel()}
       </MenuItem.Label>
       <MenuItem.Caption>
-        Fees - USD $0.10
+        Fees ≈ USD $
+        {totalFees}
       </MenuItem.Caption>
     </MenuItem>
   );
