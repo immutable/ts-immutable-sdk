@@ -14,8 +14,6 @@ import {
   ViewContext,
   ViewActions,
 } from '../../../context/view-context/ViewContext';
-import { isPassportProvider } from '../../../lib/providerUtils';
-import { BridgeComingSoon } from '../../bridge/views/BridgeComingSoon';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 export function SwitchNetworkEth() {
@@ -69,12 +67,6 @@ export function SwitchNetworkEth() {
       setButtonText(button.retryText);
     }
   }, [provider, checkout, track]);
-
-  if (isPassportProvider(provider)) {
-    return (
-      <BridgeComingSoon onCloseEvent={sendCloseEvent} />
-    );
-  }
 
   return (
     <SimpleLayout

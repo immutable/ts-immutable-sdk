@@ -11,7 +11,7 @@ import { Passport } from '@imtbl/passport';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { ConnectWidget, ConnectWidgetParams } from './ConnectWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { ConnectTargetLayer, WidgetTheme } from '../../lib';
+import { WidgetTheme } from '../../lib';
 import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 
 describe('ConnectWidget tests', () => {
@@ -452,37 +452,6 @@ describe('ConnectWidget tests', () => {
               }),
             },
           });
-      });
-
-      it('should show BridgeComingSoon for Passport users if trying to switch to L1', () => {
-        cy.stub(Checkout.prototype, 'getNetworkInfo')
-          .as('getNetworkInfoStub')
-          .resolves({
-            name: ChainName.IMTBL_ZKEVM_TESTNET,
-            chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-          });
-
-        const passportProvider = mockPassportProvider('resolve');
-        const testPassportInstance = {
-          connectEvm: cy.stub().as('connectEvmStub').returns(passportProvider),
-        } as any as Passport;
-        const passportParams = {
-          passport: testPassportInstance,
-          targetLayer: ConnectTargetLayer.LAYER1,
-        } as ConnectWidgetParams;
-
-        mount(
-          <CustomAnalyticsProvider widgetConfig={config}>
-            <ConnectWidget
-              params={passportParams}
-              config={config}
-            />
-          </CustomAnalyticsProvider>,
-        );
-        cySmartGet('wallet-list-passport').click();
-        cySmartGet('footer-button').click();
-
-        cySmartGet('bridge-coming-soon').should('be.visible');
       });
     });
 
