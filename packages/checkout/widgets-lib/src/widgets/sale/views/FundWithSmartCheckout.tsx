@@ -6,7 +6,8 @@ import {
   useMemo, useRef, useState,
 } from 'react';
 import {
-  FundWithSmartCheckoutSubViews, SaleWidgetViews,
+  FundWithSmartCheckoutSubViews,
+  SaleWidgetViews,
 } from '../../../context/view-context/SaleViewContextTypes';
 import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { text } from '../../../resources/text/textConfig';
@@ -14,14 +15,18 @@ import { LoadingView } from '../../../views/loading/LoadingView';
 import { FundingRouteExecute } from '../components/FundingRouteExecute/FundingRouteExecute';
 import { FundingRouteSelect } from '../components/FundingRouteSelect/FundingRouteSelect';
 import { useSaleContext } from '../context/SaleContextProvider';
+import { useSaleEvent } from '../hooks/useSaleEvents';
 
 type FundWithSmartCheckoutProps = {
   subView: FundWithSmartCheckoutSubViews;
 };
 
 export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
+  const { sendPageView } = useSaleEvent();
   const { viewDispatch } = useContext(ViewContext);
-  const [selectedFundingRoute, setSelectedFundingRoute] = useState<FundingRoute | undefined>(undefined);
+  const [selectedFundingRoute, setSelectedFundingRoute] = useState<
+  FundingRoute | undefined
+  >(undefined);
   const [fundingRouteStepIndex, setFundingRouteStepIndex] = useState<number>(0);
   const textConfig = text.views[SaleWidgetViews.FUND_WITH_SMART_CHECKOUT];
 
@@ -72,6 +77,14 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
       setFundingRouteStepIndex(fundingRouteStepIndex + 1);
     }
   };
+
+  useEffect(
+    () => sendPageView(SaleWidgetViews.FUND_WITH_SMART_CHECKOUT, {
+      subView,
+      ...(!!fundingRouteStep && { fundingStep: fundingRouteStep.type }),
+    }),
+    [],
+  );
 
   return (
     <Box>
