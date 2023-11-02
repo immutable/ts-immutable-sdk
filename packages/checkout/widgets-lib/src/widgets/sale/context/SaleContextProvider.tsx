@@ -203,9 +203,9 @@ export function SaleContextProvider(props: {
           view: {
             type: SaleWidgetViews.SALE_FAIL,
             data: {
+              ...data,
               errorType,
               paymentMethod,
-              ...data,
               transactions: executeResponse.transactions,
             },
           },

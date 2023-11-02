@@ -325,6 +325,20 @@ export const text = {
       loading: {
         checkingBalances: 'Crunching numbers',
       },
+      currency: {
+        usdEstimate: '≈ USD $',
+        fees: 'Fees',
+      },
+      fundingRouteDrawer: {
+        header: 'Available balance',
+      },
+      fundingRouteSelect: {
+        heading: 'Pay with your',
+        noRoutesAvailable: 'Insufficient coin balance. Please proceed with card instead.',
+        continue: 'Continue',
+        payWithCardInstead: "No thanks, I'll pay with card",
+        payWithCard: 'Pay with card',
+      },
     },
     [SaleWidgetViews.PAYMENT_METHODS]: {
       header: {
