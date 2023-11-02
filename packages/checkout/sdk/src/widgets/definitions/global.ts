@@ -27,7 +27,6 @@ declare global {
       unmount(): void;
       destroy(): void;
       update(props: WidgetProperties<T>): void;
-      // eslint-disable-next-line max-len
       on<KEventName extends keyof WidgetEventData[T]>(
         type: KEventName,
         callback: (data: WidgetEventData[T][KEventName]) => void
@@ -41,7 +40,6 @@ declare global {
       unmount(): void;
       destroy(): void;
       update(props: WidgetProperties<T>): void;
-      // eslint-disable-next-line max-len
       on<KEventName extends keyof WidgetEventData[T]>(
         type: KEventName,
         callback: (data: WidgetEventData[T][KEventName]) => void
@@ -55,7 +53,6 @@ declare global {
       unmount(): void;
       destroy(): void;
       update(props: WidgetProperties<T>): void;
-      // eslint-disable-next-line max-len
       on<KEventName extends keyof WidgetEventData[T]>(
         type: KEventName,
         callback: (data: WidgetEventData[T][KEventName]) => void
@@ -69,7 +66,6 @@ declare global {
       unmount(): void;
       destroy(): void;
       update(props: WidgetProperties<T>): void;
-      // eslint-disable-next-line max-len
       on<KEventName extends keyof WidgetEventData[T]>(
         type: KEventName,
         callback: (data: WidgetEventData[T][KEventName]) => void
@@ -83,7 +79,6 @@ declare global {
       unmount(): void;
       destroy(): void;
       update(props: WidgetProperties<T>): void;
-      // eslint-disable-next-line max-len
       on<KEventName extends keyof WidgetEventData[T]>(
         type: KEventName,
         callback: (data: WidgetEventData[T][KEventName]) => void
@@ -97,7 +92,6 @@ declare global {
       unmount(): void;
       destroy(): void;
       update(props: WidgetProperties<T>): void;
-      // eslint-disable-next-line max-len
       on<KEventName extends keyof WidgetEventData[T]>(
         type: KEventName,
         callback: (data: WidgetEventData[T][KEventName]) => void
