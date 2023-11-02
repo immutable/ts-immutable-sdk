@@ -21,7 +21,7 @@ export default class MagicAdapter {
           extensions: [new OpenIdExtension()],
           network: this.config.network,
         });
-        client.preload().catch(console.error);
+        client.preload();
         return client;
       });
     }
