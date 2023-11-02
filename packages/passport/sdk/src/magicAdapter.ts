@@ -6,15 +6,17 @@ import { PassportErrorType, withPassportError } from './errors/passportError';
 import { PassportConfiguration } from './config';
 import { lazyDocumentReady } from './utils/lazyLoad';
 
+type MagicClient = InstanceWithExtensions<SDKBase, [OpenIdExtension]>;
+
 export default class MagicAdapter {
   private readonly config: PassportConfiguration;
 
-  private readonly lazyMagicClient?: Promise<InstanceWithExtensions<SDKBase, [OpenIdExtension]>>;
+  private readonly lazyMagicClient?: Promise<MagicClient>;
 
   constructor(config: PassportConfiguration) {
     this.config = config;
     if (typeof window !== 'undefined') {
-      this.lazyMagicClient = lazyDocumentReady<InstanceWithExtensions<SDKBase, [OpenIdExtension]>>(() => {
+      this.lazyMagicClient = lazyDocumentReady<MagicClient>(() => {
         const client = new Magic(this.config.magicPublishableApiKey, {
           extensions: [new OpenIdExtension()],
           network: this.config.network,
@@ -25,7 +27,7 @@ export default class MagicAdapter {
     }
   }
 
-  private get magicClient(): Promise<InstanceWithExtensions<SDKBase, [OpenIdExtension]>> {
+  private get magicClient(): Promise<MagicClient> {
     if (!this.lazyMagicClient) {
       throw new Error('Cannot perform this action outside of the browser');
     }
