@@ -294,14 +294,44 @@ describe('ConnectWidget tests', () => {
       cy.stub(Checkout.prototype, 'getNetworkInfo')
         .as('getNetworkInfoStub')
         .resolves({
-          name: 'Ethereum',
-          chainId: ChainId.ETHEREUM,
+          name: 'Sepolia',
+          chainId: ChainId.SEPOLIA,
         });
       mountConnectWidgetAndGoToReadyToConnect();
       cySmartGet('ready-to-connect').should('be.visible');
       cySmartGet('footer-button').should('have.text', 'Ready to connect');
       cySmartGet('footer-button').click();
       cySmartGet('switch-network-view').should('be.visible');
+    });
+
+    it('should not show switch network if chain is part of allowed chains', () => {
+      cy.stub(Checkout.prototype, 'getNetworkInfo')
+        .as('getNetworkInfoStub')
+        .resolves({
+          name: 'Sepolia',
+          chainId: ChainId.SEPOLIA,
+        });
+
+      const props = {} as ConnectWidgetParams;
+      const checkout = new Checkout({ baseConfig: { environment: Environment.SANDBOX } });
+
+      mount(
+        <CustomAnalyticsProvider widgetConfig={config}>
+          <ConnectWidget
+            config={config}
+            checkout={checkout}
+            {...props}
+            targetLayer={ConnectTargetLayer.LAYER2}
+            allowedChains={[ChainId.IMTBL_ZKEVM_TESTNET, ChainId.SEPOLIA]}
+          />
+        </CustomAnalyticsProvider>,
+      );
+
+      cySmartGet('wallet-list-metamask').click();
+      cySmartGet('ready-to-connect').should('be.visible');
+      cySmartGet('footer-button').should('have.text', 'Ready to connect');
+      cySmartGet('footer-button').click();
+      cySmartGet('success-box').should('be.visible');
     });
 
     it('should show success when ready to connect pressed and network switched', () => {
