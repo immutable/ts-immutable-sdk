@@ -134,13 +134,10 @@ export class Checkout {
       params.provider,
       { allowUnsupportedProvider: true } as ValidateProviderOptions,
     );
-    await connect.connectSite(web3Provider);
-    const networkInfo = await network.getNetworkInfo(this.config, web3Provider);
 
-    return {
-      provider: web3Provider,
-      network: networkInfo,
-    };
+    await connect.connectSite(web3Provider);
+
+    return { provider: web3Provider };
   }
 
   /**
