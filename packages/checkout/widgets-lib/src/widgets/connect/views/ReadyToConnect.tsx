@@ -90,14 +90,19 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
 
   // eslint-disable-next-line @typescript-eslint/no-shadow
   const handleConnectViewUpdate = async (provider: Web3Provider) => {
-    if (await provider.getSigner().getChainId() !== targetChainId) {
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: { type: ConnectWidgetViews.SWITCH_NETWORK },
-        },
-      });
-      return;
+    // Skip checks for Passport. Passport will be shipped with the
+    // zkEVM network pre-configured and changes of networks are handled
+    // by the specific widgets.
+    if (!isPassport) {
+      if (await provider.getSigner().getChainId() !== targetChainId) {
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: { type: ConnectWidgetViews.SWITCH_NETWORK },
+          },
+        });
+        return;
+      }
     }
 
     viewDispatch({
