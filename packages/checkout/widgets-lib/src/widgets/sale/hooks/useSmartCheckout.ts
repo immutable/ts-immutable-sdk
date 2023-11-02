@@ -101,9 +101,12 @@ export const useSmartCheckout = ({
           transactionOrGasAmount: gasEstimate,
         },
       );
-
-      setSmartCheckoutResult(res);
-      return res;
+      if (!res) {
+        throw new Error();
+      }
+      const result = { ...res };
+      setSmartCheckoutResult(result);
+      return result;
     } catch (err: any) {
       setSmartCheckoutError({
         type: SaleErrorTypes.SMART_CHECKOUT_ERROR,
