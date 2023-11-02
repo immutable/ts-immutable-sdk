@@ -34,7 +34,7 @@ import {
 } from '../../context/view-context/SwapViewContextTypes';
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { DEFAULT_BALANCE_RETRY_POLICY } from '../../lib';
+import { DEFAULT_BALANCE_RETRY_POLICY, getL2ChainId } from '../../lib';
 import { StatusView } from '../../components/Status/StatusView';
 import { StatusType } from '../../components/Status/StatusType';
 import { text } from '../../resources/text/textConfig';
@@ -172,9 +172,9 @@ export function SwapWidget({
 
       const network = await checkout.getNetworkInfo({ provider });
 
-      // If the provider's network is not supported, return out of this and let the
+      // If the provider's network is not the correct network, return out of this and let the
       // connect loader handle the switch network functionality
-      if (!network.isSupported) return;
+      if (network.chainId !== getL2ChainId(checkout.config)) return;
 
       let overrides: ExchangeOverrides | undefined;
       try {

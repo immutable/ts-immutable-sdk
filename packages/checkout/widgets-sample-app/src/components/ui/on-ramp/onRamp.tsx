@@ -1,5 +1,5 @@
-import { Checkout, OnRampEventType, WalletEventType, WidgetTheme, WidgetType } from "@imtbl/checkout-sdk";
-import { useEffect, useMemo } from "react";
+import { Checkout, ConnectEventType, ConnectionSuccess, OnRampEventType, WalletEventType, WidgetTheme, WidgetType } from "@imtbl/checkout-sdk";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { WidgetsFactory } from "@imtbl/checkout-widgets";
 
 function OnRampUI() {
@@ -7,7 +7,8 @@ function OnRampUI() {
   const onRamp = useMemo(() => new WidgetsFactory(checkout, {}).create(WidgetType.ONRAMP, {}), [checkout])
 
   const unmount = () => {onRamp.unmount()}
-  const mount = () => {onRamp.mount('onramp')}
+  const mount = () => {
+    onRamp.mount('onramp')}
   const update = (theme: WidgetTheme) => {onRamp.update({config: {theme}})}
   const updateParams = () => onRamp.update({params: {amount: '55', contractAddress: '0x0000000000000000000000000000000000001010'}})
   const destroy = () => {onRamp.destroy()}

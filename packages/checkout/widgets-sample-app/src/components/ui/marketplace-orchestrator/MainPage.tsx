@@ -33,11 +33,11 @@ export const MainPage = () => {
   const swapWidget = useMemo(() => widgetsFactory.create(WidgetType.SWAP, {}), [widgetsFactory]);
   const onRampWidget = useMemo(() => widgetsFactory.create(WidgetType.ONRAMP, {}), [widgetsFactory]);
 
-  connectWidget.on(ConnectEventType.CLOSE_WIDGET, () => {connectWidget.destroy()});
-  walletWidget.on(WalletEventType.CLOSE_WIDGET, () => {walletWidget.destroy()});
-  bridgeWidget.on(BridgeEventType.CLOSE_WIDGET, () => {bridgeWidget.destroy()});
-  swapWidget.on(SwapEventType.CLOSE_WIDGET, () => swapWidget.destroy());
-  onRampWidget.on(OnRampEventType.CLOSE_WIDGET, () => {onRampWidget.destroy()});
+  connectWidget.on(ConnectEventType.CLOSE_WIDGET, () => {connectWidget.unmount()});
+  walletWidget.on(WalletEventType.CLOSE_WIDGET, () => {walletWidget.unmount()});
+  bridgeWidget.on(BridgeEventType.CLOSE_WIDGET, () => {bridgeWidget.unmount()});
+  swapWidget.on(SwapEventType.CLOSE_WIDGET, () => swapWidget.unmount());
+  onRampWidget.on(OnRampEventType.CLOSE_WIDGET, () => {onRampWidget.unmount()});
 
   // local state for enabling/disabling and changing buttons
   const [doneSwap, setDoneSwap] = useState<boolean>(false);
@@ -53,13 +53,13 @@ export const MainPage = () => {
     })
   }, [connectWidget, walletWidget]);
 
-  // keep provider updated in widgets
-  useEffect(() => {
-    walletWidget.update({params: {web3Provider}})
-    swapWidget.update({params: {web3Provider}})
-    bridgeWidget.update({params: {web3Provider}})
-    onRampWidget.update({params: {web3Provider}})
-  }, [web3Provider])
+  // // keep provider updated in widgets
+  // useEffect(() => {
+  //   walletWidget.update({params: {web3Provider}})
+  //   swapWidget.update({params: {web3Provider}})
+  //   bridgeWidget.update({params: {web3Provider}})
+  //   onRampWidget.update({params: {web3Provider}})
+  // }, [web3Provider])
 
 
   // Orchestration
@@ -83,24 +83,25 @@ export const MainPage = () => {
 
   // button click functions to open/close widgets
   const openConnectWidget = useCallback(() => {
-    connectWidget.mount('widget-target');
+    connectWidget.mount('connect-target');
   }, [connectWidget])
 
   const openWalletWidget = useCallback(() => {
-    walletWidget.mount('widget-target');
+    walletWidget.mount('wallet-target');
   }, [walletWidget])
 
   const openBridgeWidget = useCallback(() => {
-    bridgeWidget.mount('widget-target')
+    bridgeWidget.mount('bridge-target')
   }, [bridgeWidget])
 
   const openSwapWidget = useCallback(() => {
-    swapWidget.mount('widget-target')
-  }, [bridgeWidget])
+    swapWidget.mount('swap-target')
+  }, [swapWidget])
 
   const openOnRampWidget = useCallback(() => {
-    onRampWidget.mount('widget-target')
-  }, [onRampWidget])
+    onRampWidget.update({params: {web3Provider}})
+    onRampWidget.mount('onramp-target')
+  }, [onRampWidget, web3Provider])
 
   const handleBuyClick = () => {
     alert("you can buy now");
@@ -125,8 +126,12 @@ export const MainPage = () => {
       </Box>
       {passport && web3Provider && (web3Provider.provider as any)?.isPassport && <Button onClick={logout}>Passport Logout</Button>}
       </Box>
-      <Box sx={{paddingX: 'base.spacing.x4'}}>
-        <GridBox minColumnWidth="40%">
+      <Box sx={{display: 'flex', flexDirection: 'row', gap: 'base.spacing.x3', flexWrap: 'wrap'}}>
+        <div id="connect-target"></div>
+          <div id="wallet-target"></div>
+          <div id="swap-target"></div>
+          <div id="bridge-target"></div>
+          <div id="onramp-target"></div>
           <Box sx={{display: 'flex', flexDirection: 'row', gap: 'base.spacing.x4', flexWrap: 'wrap'}}>
               {cardKeys.map((val) => (
                 <Box key={val} sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
@@ -140,8 +145,6 @@ export const MainPage = () => {
                 </Box>
               ))}
           </Box>
-          <div id="widget-target"></div>
-        </GridBox>  
       </Box>
     </Box>
   );

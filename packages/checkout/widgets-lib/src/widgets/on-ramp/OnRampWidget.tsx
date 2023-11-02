@@ -59,7 +59,7 @@ export function OnRampWidget({
   );
 
   useEffect(() => {
-    if (!checkout || !provider) return () => {};
+    if (!checkout || !provider) return;
     (async () => {
       const network = await checkout.getNetworkInfo({
         provider,
@@ -75,16 +75,6 @@ export function OnRampWidget({
 
       setTokenAddress(tknAddr);
     })();
-    return () => {
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: SharedViews.LOADING_VIEW,
-          },
-        },
-      });
-    };
   }, [checkout, provider, viewDispatch]);
 
   return (

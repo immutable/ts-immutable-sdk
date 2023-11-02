@@ -34,7 +34,9 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
   }
 
   unmount() {
+    this.reactRoot?.unmount();
     document.getElementById(this.targetId as string)?.replaceChildren();
+    this.reactRoot = undefined;
   }
 
   destroy(): void {

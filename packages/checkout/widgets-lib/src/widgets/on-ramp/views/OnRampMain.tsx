@@ -221,12 +221,6 @@ export function OnRampMain({
       }
     };
     window.addEventListener('message', handleTransakEvents);
-
-    // eslint-disable-next-line consistent-return
-    return () => {
-      window.removeEventListener('message', handleTransakEvents);
-      setWidgetUrl('');
-    };
   }, [checkout, provider, tokenAmount, tokenAddress, passport]);
 
   return (
