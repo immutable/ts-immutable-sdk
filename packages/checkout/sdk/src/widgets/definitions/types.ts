@@ -9,9 +9,15 @@ import {
   OnRampEventType,
   OnRampFailed,
   OnRampSuccess,
-  OrchestrationEventData,
   OrchestrationEventType,
+  RequestBridgeEvent,
+  RequestConnectEvent,
+  RequestOnrampEvent,
+  RequestSwapEvent,
+  RequestWalletEvent,
   SaleEventType,
+  SaleFailed,
+  SaleSuccess,
   SwapEventType,
   SwapFailed,
   SwapRejected,
@@ -49,11 +55,15 @@ export enum WidgetType {
   SALE = 'sale',
 }
 
+/**
+ * Widget properties definition for each widget. Used for creating and updating widgets
+ */
 export type WidgetProperties<T extends WidgetType> = {
   params?: WidgetParameters[T];
   config?: WidgetConfiguration;
 };
 
+// Mapping each widget type to their parameters
 export type WidgetParameters = {
   [WidgetType.CONNECT]: ConnectWidgetParams,
   [WidgetType.WALLET]: WalletWidgetParams,
@@ -75,24 +85,84 @@ export type WidgetEventTypes = {
   [WidgetType.SALE]: SaleEventType | OrchestrationEventType
 };
 
+// Mapping of Orchestration events to their payloads
+type OrchestrationMapping = {
+  [OrchestrationEventType.REQUEST_CONNECT]: RequestConnectEvent,
+  [OrchestrationEventType.REQUEST_WALLET]: RequestWalletEvent,
+  [OrchestrationEventType.REQUEST_SWAP]: RequestSwapEvent,
+  [OrchestrationEventType.REQUEST_BRIDGE]: RequestBridgeEvent,
+  [OrchestrationEventType.REQUEST_ONRAMP]: RequestOnrampEvent,
+};
+
+/**
+ * Mapping of widget type, to each of it's events and then each event's payload
+ * Update this whenever a new event is created and used by a widget
+ * Each widget also has all of the orchestration events
+*/
 export type WidgetEventData = {
-  [WidgetType.CONNECT]: ConnectionSuccess | ConnectionFailed | OrchestrationEventData,
-  [WidgetType.WALLET]: WalletNetworkSwitchEvent | WalletDisconnectWalletEvent | OrchestrationEventData,
-  [WidgetType.SWAP]: SwapSuccess | SwapFailed | SwapRejected | OrchestrationEventData,
-  [WidgetType.BRIDGE]: BridgeSuccess | BridgeFailed | OrchestrationEventData,
-  [WidgetType.ONRAMP]: OnRampSuccess | OnRampFailed | OrchestrationEventData,
-  [WidgetType.SALE]: any
+  [WidgetType.CONNECT]: {
+    [ConnectEventType.SUCCESS]: ConnectionSuccess,
+    [ConnectEventType.FAILURE]: ConnectionFailed,
+    [ConnectEventType.CLOSE_WIDGET]: {},
+  } & OrchestrationMapping,
+
+  [WidgetType.WALLET]: {
+    [WalletEventType.NETWORK_SWITCH]: WalletNetworkSwitchEvent
+    [WalletEventType.DISCONNECT_WALLET]: WalletDisconnectWalletEvent
+    [WalletEventType.CLOSE_WIDGET]: {}
+  } & OrchestrationMapping,
+
+  [WidgetType.SWAP]: {
+    [SwapEventType.SUCCESS]: SwapSuccess,
+    [SwapEventType.FAILURE]: SwapFailed,
+    [SwapEventType.REJECTED]: SwapRejected,
+    [SwapEventType.CLOSE_WIDGET]: {},
+  } & OrchestrationMapping
+
+  [WidgetType.BRIDGE]: {
+    [BridgeEventType.SUCCESS]: BridgeSuccess,
+    [BridgeEventType.FAILURE]: BridgeFailed,
+    [BridgeEventType.CLOSE_WIDGET]: {}
+  } & OrchestrationMapping,
+
+  [WidgetType.ONRAMP]: {
+    [OnRampEventType.SUCCESS]: OnRampSuccess,
+    [OnRampEventType.FAILURE]: OnRampFailed,
+    [OnRampEventType.CLOSE_WIDGET]: {},
+  } & OrchestrationMapping,
+
+  [WidgetType.SALE]: {
+    [SaleEventType.SUCCESS]: SaleSuccess,
+    [SaleEventType.FAILURE]: SaleFailed,
+    [SaleEventType.REJECTED]: any,
+    [SaleEventType.CLOSE_WIDGET]: {},
+  } & OrchestrationMapping
+};
+
+/**
+ * Represents an event emitted by a widget. The event type should match the event data
+ */
+/**
+ * Represents an event emitted by a widget.
+ * @template T - The widget type
+ * @template KEventName - The widget event name.
+ * @property {KEventName} type - The type of the event.
+ * @property {WidgetEventData[T][KEventName]} data - The data associated with the widget event.
+ */
+export type WidgetEvent<T extends WidgetType, KEventName extends keyof WidgetEventData[T]> = {
+  type: KEventName,
+  data: WidgetEventData[T][KEventName];
 };
 
 /**
  * Represents an event emitted by a widget.
- * @template T - The type of data associated with the event.
- * @property {WidgetEventTypes} type - The type of the event.
- * @property {T} data - The data associated with the event.
+ * @template KEventName - The orchestration event name.
+ * @property {KEventName} type - The type of the event.
+ * @property {OrchestrationMapping[KEventName]} data - The data associated with the event.
  */
-export type WidgetEvent<T extends WidgetType> = {
-  type: WidgetEventTypes[T],
-  data: WidgetEventData[T];
+export type OrchestrationEvent<KEventName extends keyof OrchestrationMapping> = {
+  type: KEventName,
+  data: OrchestrationMapping[KEventName];
 };
 
 export interface IWidgetsFactory {
@@ -130,13 +200,14 @@ export interface Widget<T extends WidgetType> {
    * @param event Widget specific event name.
    * @param callback function to execute when the event is received.
    */
-  on(type: WidgetEventTypes[T], callback: (data: any) => void): void
+  // eslint-disable-next-line max-len
+  on<KEventName extends keyof WidgetEventData[T]>(type: KEventName, callback: (data: WidgetEventData[T][KEventName]) => void): void
 
   /**
    * Removes an event listener for a widget event.
    * @param type Widget specific event name.
    */
-  removeListener(type: WidgetEventTypes[T]): void
+  removeListener<KEventName extends keyof WidgetEventData[T]>(type: KEventName): void;
 }
 
 /**

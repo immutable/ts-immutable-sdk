@@ -5,8 +5,10 @@ import json from '@rollup/plugin-json';
 import terser from '@rollup/plugin-terser';
 import replace from '@rollup/plugin-replace';
 import nodePolyfills from 'rollup-plugin-polyfill-node';
+import svgr from '@svgr/rollup';
 
 const defaultPlugin = [
+  svgr(),
   replace({
     preventAssignment: true,
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
@@ -22,7 +24,7 @@ export default [
       dir: 'dist',
       format: 'es'
     },
-    plugins: [ ...defaultPlugin ],
+    plugins: [...defaultPlugin ],
   },
   {
     watch: false,
@@ -39,9 +41,9 @@ export default [
         browser: true,
         dedupe: ['react', 'react-dom'],
       }),
-      json(),
-      commonjs(),
       nodePolyfills(),
+      commonjs(),
+      json(),
       ...defaultPlugin,
       terser(),
     ]
