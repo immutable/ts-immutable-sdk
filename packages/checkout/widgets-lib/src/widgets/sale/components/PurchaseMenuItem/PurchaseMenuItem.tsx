@@ -29,17 +29,17 @@ export function PurchaseMenuItem({ fundingRoute }: PurchaseMenuItemProps) {
       size="medium"
     >
       <MenuItem.FramedImage
-        imageUrl={firstItem.image}
+        imageUrl={firstItem?.image}
       />
       <MenuItem.PriceDisplay
         use={<Heading size="xSmall" />}
-        price={`${firstFundingStep.fundingItem.token.symbol} 
+        price={`${firstFundingStep?.fundingItem.token.symbol} 
           ${tokenValueFormat(purchaseAmount)}`}
         fiatAmount={`${textConfig.currency.usdEstimate}${usdPurchaseAmount}`}
       />
       <MenuItem.Label>
-        {firstItem.name}
-        {firstItem.qty > 1 ? ` x${firstItem.qty}` : null}
+        {firstItem?.name}
+        {firstItem?.qty > 1 ? ` x${firstItem.qty}` : null}
       </MenuItem.Label>
       <MenuItem.Caption>
         {collection}
