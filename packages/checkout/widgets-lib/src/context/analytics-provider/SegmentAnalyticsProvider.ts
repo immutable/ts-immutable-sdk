@@ -14,15 +14,6 @@ export enum UserJourney {
   SALE = 'PrimarySale',
 }
 
-export type TrackEventProps = {
-  screen: string;
-  userJourney: UserJourney;
-  control: string;
-  controlType: AnalyticsControlTypes;
-  action?: StandardAnalyticsActions | undefined;
-  userId?: string | undefined;
-} & Record<string, unknown>;
-
 export type AnalyticsControlTypes =
   | StandardAnalyticsControlTypes
   | 'IframeEvent'
