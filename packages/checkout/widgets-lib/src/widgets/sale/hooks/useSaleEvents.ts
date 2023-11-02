@@ -1,8 +1,9 @@
 import { useContext } from 'react';
+import { StandardAnalyticsActions } from '@imtbl/react-analytics';
 import {
-  TrackEventProps,
   UserJourney,
   useAnalytics,
+  AnalyticsControlTypes,
 } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import {
@@ -19,54 +20,64 @@ import { toPascalCase, toStringifyTransactions } from '../functions/utils';
 export const useSaleEvent = () => {
   const { track, page } = useAnalytics();
   const {
-    recipientAddress: userId, recipientEmail: email, signResponse, paymentMethod,
-  } = useSaleContext();
-  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
-  const defaultView = SaleWidgetViews.PAYMENT_METHODS;
-
-  const common = {
-    email,
-    userId,
+    recipientAddress: userId,
+    recipientEmail: email,
+    signResponse,
     paymentMethod,
+  } = useSaleContext();
+  const {
+    eventTargetState: { eventTarget },
+  } = useContext(EventTargetContext);
+  const defaultView = SaleWidgetViews.PAYMENT_METHODS;
+  const commonProps = {
     location: 'web',
     userJourney: UserJourney.SALE,
   };
-
+  const userProps = {
+    email,
+    userId,
+    paymentMethod,
+  };
   const orderProps = {
     amount: signResponse?.order.totalAmount,
     currency: signResponse?.order.currency.name,
   };
 
   const sendCloseEvent = (
-    screen: TrackEventProps['screen'] = defaultView,
-    controlType: TrackEventProps['controlType'] = 'Button',
-    action: TrackEventProps['action'] = 'Pressed',
+    screen: string = defaultView,
+    controlType: AnalyticsControlTypes = 'Button',
+    action: StandardAnalyticsActions = 'Pressed',
   ) => {
-    const props: TrackEventProps = {
+    track({
+      ...commonProps,
       screen: toPascalCase(screen),
       control: 'Close',
       controlType,
       action,
-      ...common,
-    };
-    track(props);
+      extras: {
+        ...userProps,
+      },
+    });
     sendSaleWidgetCloseEvent(eventTarget);
   };
 
   const sendSuccessEvent = (
-    screen: TrackEventProps['screen'] = defaultView,
+    screen: string = defaultView,
     transactions: ExecutedTransaction[] = [],
     details?: Record<string, unknown>,
   ) => {
     track({
-      ...details,
+      ...commonProps,
       screen: toPascalCase(screen),
       control: 'Success',
       controlType: 'Event',
       action: 'Succeeded',
-      transactions: toStringifyTransactions(transactions),
-      ...common,
-      ...orderProps,
+      extras: {
+        ...details,
+        ...userProps,
+        transactions: toStringifyTransactions(transactions),
+        ...orderProps,
+      },
     });
     sendSaleSuccessEvent(eventTarget, transactions);
   };
@@ -74,19 +85,22 @@ export const useSaleEvent = () => {
   const sendFailedEvent = (
     reason: string,
     transactions: ExecutedTransaction[] = [],
-    screen: TrackEventProps['screen'] = defaultView,
+    screen: string = defaultView,
     details?: Record<string, unknown>,
   ) => {
     track({
-      ...details,
+      ...commonProps,
       screen: toPascalCase(screen),
       control: 'Fail',
       controlType: 'Event',
       action: 'Failed',
-      reason,
-      transactions: toStringifyTransactions(transactions),
-      ...common,
-      ...orderProps,
+      extras: {
+        transactions: toStringifyTransactions(transactions),
+        ...details,
+        ...orderProps,
+        ...userProps,
+        reason,
+      },
     });
     sendSaleFailedEvent(eventTarget, reason, transactions);
   };
@@ -97,30 +111,37 @@ export const useSaleEvent = () => {
 
   const sendSelectedPaymentMethod = (type: string, screen: string) => {
     track({
+      ...commonProps,
       screen: toPascalCase(screen),
       control: 'Select',
       controlType: 'MenuItem',
-      ...common,
-      paymentMethod: type,
+      extras: {
+        paymentMethod: type,
+      },
     });
   };
 
   const sendPageView = (screen: string, data?: Record<string, unknown>) => {
     page({
+      ...commonProps,
       screen: toPascalCase(screen),
       action: 'Viewed',
       ...data,
-      ...common,
     });
   };
 
-  const sendOrderCreated = (screen: string, details: Record<string, unknown>) => {
+  const sendOrderCreated = (
+    screen: string,
+    details: Record<string, unknown>,
+  ) => {
     track({
-      ...details,
+      ...commonProps,
       screen: toPascalCase(screen),
       control: 'OrderCreated',
       controlType: 'Event',
-      ...common,
+      extras: {
+        ...details,
+      },
     });
   };
 

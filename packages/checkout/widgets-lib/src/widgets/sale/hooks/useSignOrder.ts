@@ -16,9 +16,9 @@ import {
 
 const PRIMARY_SALES_API_BASE_URL = {
   [Environment.SANDBOX]:
-    'https://api.sandbox.immutable.com/v1/primary-sales/:environmentId/order/sign',
+    'https://api.sandbox.immutable.com/v1/primary-sales',
   [Environment.PRODUCTION]:
-    'https://api.immutable.com/v1/primary-sales/:environmentId/order/sign',
+    'https://api.immutable.com/v1/primary-sales',
 };
 
 type SignApiTransaction = {
@@ -227,9 +227,35 @@ export const useSignOrder = (input: SignOrderInput) => {
     [provider],
   );
 
+  const expirePrevSignedOrder = useCallback(async () => {
+    const reference = signResponse?.transactions
+      .find((txn) => txn.methodCall.startsWith('execute'))?.params.reference;
+
+    if (!reference) return;
+
+    try {
+      const baseUrl = `${PRIMARY_SALES_API_BASE_URL[env]}/${environmentId}/order/expire`;
+      const response = await fetch(baseUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reference }),
+      });
+
+      if (!response.ok) {
+        const { code, message } = (await response.json()) as SignApiError;
+        throw new Error(code, { cause: message });
+      }
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.warn(`Failed to expire transaction with ref: '${reference}'`, e);
+    }
+  }, [signResponse, env, environmentId]);
+
   const sign = useCallback(
     async (paymentType: PaymentTypes): Promise<SignResponse | undefined> => {
       try {
+        await expirePrevSignedOrder();
+
         const data: SignApiRequest = {
           recipient_address: recipientAddress,
           payment_type: paymentType,
@@ -240,10 +266,8 @@ export const useSignOrder = (input: SignOrderInput) => {
             quantity: item.qty,
           })),
         };
-        const baseUrl = PRIMARY_SALES_API_BASE_URL[env].replace(
-          ':environmentId',
-          environmentId,
-        );
+
+        const baseUrl = `${PRIMARY_SALES_API_BASE_URL[env]}/${environmentId}/order/sign`;
         const response = await fetch(baseUrl, {
           method: 'POST',
           headers: {
@@ -266,7 +290,7 @@ export const useSignOrder = (input: SignOrderInput) => {
       }
       return undefined;
     },
-    [items, fromContractAddress, recipientAddress, environmentId, env, provider],
+    [items, fromContractAddress, recipientAddress, environmentId, env, provider, expirePrevSignedOrder],
   );
 
   const execute = async (
