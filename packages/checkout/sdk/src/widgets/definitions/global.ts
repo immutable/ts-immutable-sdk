@@ -28,7 +28,10 @@ declare global {
       destroy(): void;
       update(props: WidgetProperties<T>): void;
       // eslint-disable-next-line max-len
-      on<KEventName extends keyof WidgetEventData[T]>(type: KEventName, callback: (data: WidgetEventData[T][KEventName]) => void): void;
+      on<KEventName extends keyof WidgetEventData[T]>(
+        type: KEventName,
+        callback: (data: WidgetEventData[T][KEventName]) => void
+      ): void;
       removeListener<KEventName extends keyof WidgetEventData[T]>(type: KEventName): void;
     }
 
@@ -39,7 +42,10 @@ declare global {
       destroy(): void;
       update(props: WidgetProperties<T>): void;
       // eslint-disable-next-line max-len
-      on<KEventName extends keyof WidgetEventData[T]>(type: KEventName, callback: (data: WidgetEventData[T][KEventName]) => void): void;
+      on<KEventName extends keyof WidgetEventData[T]>(
+        type: KEventName,
+        callback: (data: WidgetEventData[T][KEventName]) => void
+      ): void;
       removeListener<KEventName extends keyof WidgetEventData[T]>(type: KEventName): void;
     }
 
@@ -50,7 +56,10 @@ declare global {
       destroy(): void;
       update(props: WidgetProperties<T>): void;
       // eslint-disable-next-line max-len
-      on<KEventName extends keyof WidgetEventData[T]>(type: KEventName, callback: (data: WidgetEventData[T][KEventName]) => void): void;
+      on<KEventName extends keyof WidgetEventData[T]>(
+        type: KEventName,
+        callback: (data: WidgetEventData[T][KEventName]) => void
+      ): void;
       removeListener<KEventName extends keyof WidgetEventData[T]>(type: KEventName): void;
     }
 
@@ -61,7 +70,10 @@ declare global {
       destroy(): void;
       update(props: WidgetProperties<T>): void;
       // eslint-disable-next-line max-len
-      on<KEventName extends keyof WidgetEventData[T]>(type: KEventName, callback: (data: WidgetEventData[T][KEventName]) => void): void;
+      on<KEventName extends keyof WidgetEventData[T]>(
+        type: KEventName,
+        callback: (data: WidgetEventData[T][KEventName]) => void
+      ): void;
       removeListener<KEventName extends keyof WidgetEventData[T]>(type: KEventName): void;
     }
 
@@ -72,7 +84,10 @@ declare global {
       destroy(): void;
       update(props: WidgetProperties<T>): void;
       // eslint-disable-next-line max-len
-      on<KEventName extends keyof WidgetEventData[T]>(type: KEventName, callback: (data: WidgetEventData[T][KEventName]) => void): void;
+      on<KEventName extends keyof WidgetEventData[T]>(
+        type: KEventName,
+        callback: (data: WidgetEventData[T][KEventName]) => void
+      ): void;
       removeListener<KEventName extends keyof WidgetEventData[T]>(type: KEventName): void;
     }
 
@@ -83,7 +98,10 @@ declare global {
       destroy(): void;
       update(props: WidgetProperties<T>): void;
       // eslint-disable-next-line max-len
-      on<KEventName extends keyof WidgetEventData[T]>(type: KEventName, callback: (data: WidgetEventData[T][KEventName]) => void): void;
+      on<KEventName extends keyof WidgetEventData[T]>(
+        type: KEventName,
+        callback: (data: WidgetEventData[T][KEventName]) => void
+      ): void;
       removeListener<KEventName extends keyof WidgetEventData[T]>(type: KEventName): void;
     }
   }

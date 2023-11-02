@@ -55,11 +55,15 @@ export enum WidgetType {
   SALE = 'sale',
 }
 
+/**
+ * Widget properties definition for each widget. Used for creating and updating widgets
+ */
 export type WidgetProperties<T extends WidgetType> = {
   params?: WidgetParameters[T];
   config?: WidgetConfiguration;
 };
 
+// Mapping each widget type to their parameters
 export type WidgetParameters = {
   [WidgetType.CONNECT]: ConnectWidgetParams,
   [WidgetType.WALLET]: WalletWidgetParams,
@@ -81,8 +85,8 @@ export type WidgetEventTypes = {
   [WidgetType.SALE]: SaleEventType | OrchestrationEventType
 };
 
+// Mapping of Orchestration events to their payloads
 type OrchestrationMapping = {
-  // orchestration event type to data
   [OrchestrationEventType.REQUEST_CONNECT]: RequestConnectEvent,
   [OrchestrationEventType.REQUEST_WALLET]: RequestWalletEvent,
   [OrchestrationEventType.REQUEST_SWAP]: RequestSwapEvent,
@@ -90,48 +94,48 @@ type OrchestrationMapping = {
   [OrchestrationEventType.REQUEST_ONRAMP]: RequestOnrampEvent,
 };
 
+/**
+ * Mapping of widget type, to each of it's events and then each event's payload
+ * Update this whenever a new event is created and used by a widget
+ * Each widget also has all of the orchestration events
+*/
 export type WidgetEventData = {
   [WidgetType.CONNECT]: {
-    // Connect Event type to data
     [ConnectEventType.SUCCESS]: ConnectionSuccess,
     [ConnectEventType.FAILURE]: ConnectionFailed,
-    [ConnectEventType.CLOSE_WIDGET]: any,
+    [ConnectEventType.CLOSE_WIDGET]: {},
   } & OrchestrationMapping,
 
   [WidgetType.WALLET]: {
-    // Wallet event type to data
     [WalletEventType.NETWORK_SWITCH]: WalletNetworkSwitchEvent
     [WalletEventType.DISCONNECT_WALLET]: WalletDisconnectWalletEvent
-    [WalletEventType.CLOSE_WIDGET]: any
+    [WalletEventType.CLOSE_WIDGET]: {}
   } & OrchestrationMapping,
 
   [WidgetType.SWAP]: {
-    // Swap event type to data
     [SwapEventType.SUCCESS]: SwapSuccess,
     [SwapEventType.FAILURE]: SwapFailed,
     [SwapEventType.REJECTED]: SwapRejected,
-    [SwapEventType.CLOSE_WIDGET]: any,
+    [SwapEventType.CLOSE_WIDGET]: {},
   } & OrchestrationMapping
 
   [WidgetType.BRIDGE]: {
-    // Bridge event type to data
     [BridgeEventType.SUCCESS]: BridgeSuccess,
     [BridgeEventType.FAILURE]: BridgeFailed,
-    [BridgeEventType.CLOSE_WIDGET]: any
+    [BridgeEventType.CLOSE_WIDGET]: {}
   } & OrchestrationMapping,
 
   [WidgetType.ONRAMP]: {
-    // Onramp event type data
     [OnRampEventType.SUCCESS]: OnRampSuccess,
     [OnRampEventType.FAILURE]: OnRampFailed,
-    [OnRampEventType.CLOSE_WIDGET]: any,
+    [OnRampEventType.CLOSE_WIDGET]: {},
   } & OrchestrationMapping,
 
   [WidgetType.SALE]: {
     [SaleEventType.SUCCESS]: SaleSuccess,
     [SaleEventType.FAILURE]: SaleFailed,
     [SaleEventType.REJECTED]: any,
-    [SaleEventType.CLOSE_WIDGET]: any,
+    [SaleEventType.CLOSE_WIDGET]: {},
   } & OrchestrationMapping
 };
 
