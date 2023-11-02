@@ -346,6 +346,7 @@ export function ConnectLoader({
             checkout={checkout}
             deepLink={deepLink}
             sendCloseEventOverride={closeEvent}
+            allowedChains={allowedChains}
           />
         )}
         {/* If the user has connected then render the widget */}
