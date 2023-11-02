@@ -1,4 +1,9 @@
-import { FundingRoute, RoutingOutcomeType, SmartCheckoutResult } from '@imtbl/checkout-sdk';
+import {
+  FundingRoute,
+  SaleItem,
+  RoutingOutcomeType,
+  SmartCheckoutResult,
+} from '@imtbl/checkout-sdk';
 import { Passport } from '@imtbl/passport';
 import {
   ReactNode,
@@ -21,7 +26,6 @@ import { useSignOrder } from '../hooks/useSignOrder';
 import {
   ExecuteOrderResponse,
   ExecutedTransaction,
-  Item,
   PaymentTypes,
   SaleErrorTypes,
   SignOrderError,
@@ -34,7 +38,7 @@ type SaleContextProps = {
   config: StrongCheckoutWidgetsConfig;
   env: string;
   environmentId: string;
-  items: Item[];
+  items: SaleItem[];
   amount: string;
   fromContractAddress: string;
   provider: ConnectLoaderState['provider'];

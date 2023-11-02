@@ -13,6 +13,7 @@ import { Connect } from 'widgets/connect/ConnectWidgetRoot';
 import { Swap } from 'widgets/swap/SwapWidgetRoot';
 import { OnRamp } from 'widgets/on-ramp/OnRampWidgetRoot';
 import { Wallet } from 'widgets/wallet/WalletWidgetRoot';
+import { Sale } from 'widgets/sale/SaleWidgetRoot';
 
 export class WidgetsFactory implements IWidgetsFactory {
   private sdk: Checkout;
@@ -55,6 +56,12 @@ export class WidgetsFactory implements IWidgetsFactory {
           config: this.widgetConfig,
           params,
         }) as Widget<WidgetType.ONRAMP> as Widget<T>;
+      }
+      case WidgetType.SALE: {
+        return new Sale(this.sdk, {
+          config: this.widgetConfig,
+          params,
+        }) as Widget<WidgetType.SALE> as Widget<T>;
       }
       default:
         throw new Error('widget type not supported');

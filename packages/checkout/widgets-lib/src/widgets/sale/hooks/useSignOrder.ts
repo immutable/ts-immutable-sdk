@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { useCallback, useState } from 'react';
+import { SaleItem } from '@imtbl/checkout-sdk';
 
 import { Environment } from '@imtbl/config';
 import {
   SignResponse,
   SignOrderInput,
   PaymentTypes,
-  Item,
+
   SignedOrderProduct,
   SignOrderError,
   ExecuteOrderResponse,
@@ -88,7 +89,7 @@ type SignApiError = {
 const toSignedProduct = (
   product: SignApiProduct,
   currency: string,
-  item?: Item,
+  item?: SaleItem,
 ): SignedOrderProduct => ({
   productId: product.product_id,
   image: item?.image || '',
@@ -103,7 +104,7 @@ const toSignedProduct = (
 
 const toSignResponse = (
   signApiResponse: SignApiResponse,
-  items: Item[],
+  items: SaleItem[],
 ): SignResponse => {
   const { order, transactions } = signApiResponse;
 
