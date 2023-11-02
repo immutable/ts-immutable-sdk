@@ -17,12 +17,8 @@ import { text } from '../../resources/text/textConfig';
 import { LoadingView } from '../../views/loading/LoadingView';
 
 import { ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
-import { StatusType } from '../../components/Status/StatusType';
-import { StatusView } from '../../components/Status/StatusView';
-import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { SaleWidgetViews } from '../../context/view-context/SaleViewContextTypes';
 import { widgetTheme } from '../../lib/theme';
-import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
 import { SaleContextProvider } from './context/SaleContextProvider';
 import { Item } from './types';
 import { FundWithSmartCheckout } from './views/FundWithSmartCheckout';
@@ -30,6 +26,7 @@ import { PayWithCard } from './views/PayWithCard';
 import { PayWithCoins } from './views/PayWithCoins';
 import { PaymentMethods } from './views/PaymentMethods';
 import { SaleErrorView } from './views/SaleErrorView';
+import { SaleSuccessView } from './views/SaleSuccessView';
 
 export interface SaleWidgetProps {
   config: StrongCheckoutWidgetsConfig;
@@ -64,8 +61,6 @@ export function SaleWidget(props: SaleWidgetProps) {
   const loadingText = viewState.view.data?.loadingText
     || text.views[SharedViews.LOADING_VIEW].text;
 
-  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
-
   const mounted = useRef(false);
   const onMount = useCallback(() => {
     if (!checkout || !provider) return;
@@ -89,10 +84,6 @@ export function SaleWidget(props: SaleWidgetProps) {
     onMount();
   }, [checkout, provider]);
 
-  const closeWidget = () => {
-    sendSaleWidgetCloseEvent(eventTarget);
-  };
-
   return (
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>
       <ViewContext.Provider value={viewReducerValues}>
@@ -112,8 +103,9 @@ export function SaleWidget(props: SaleWidgetProps) {
           {viewState.view.type === SharedViews.LOADING_VIEW && (
             <LoadingView loadingText={loadingText} />
           )}
-          {viewState.view.type
-            === SaleWidgetViews.PAYMENT_METHODS && <PaymentMethods />}
+          {viewState.view.type === SaleWidgetViews.PAYMENT_METHODS && (
+            <PaymentMethods />
+          )}
           {viewState.view.type === SaleWidgetViews.PAY_WITH_CARD && (
             <PayWithCard />
           )}
@@ -123,19 +115,8 @@ export function SaleWidget(props: SaleWidgetProps) {
           {viewState.view.type === SaleWidgetViews.SALE_FAIL && (
             <SaleErrorView biomeTheme={biomeTheme} errorType={viewState.view.data?.errorType} />
           )}
-          {viewState.view.type === SaleWidgetViews.SALE_SUCCESS
-            && provider && (
-              <StatusView
-                statusText={
-                  text.views[SaleWidgetViews.SALE_SUCCESS].text
-                }
-                actionText={
-                  text.views[SaleWidgetViews.SALE_SUCCESS].actionText
-                }
-                onActionClick={() => closeWidget()}
-                statusType={StatusType.SUCCESS}
-                testId="success-view"
-              />
+          {viewState.view.type === SaleWidgetViews.SALE_SUCCESS && provider && (
+            <SaleSuccessView data={viewState.view.data} />
           )}
           {viewState.view.type === SaleWidgetViews.FUND_WITH_SMART_CHECKOUT && (
             <FundWithSmartCheckout subView={viewState.view.subView} />

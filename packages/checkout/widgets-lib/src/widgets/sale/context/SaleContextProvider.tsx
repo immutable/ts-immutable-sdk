@@ -60,7 +60,7 @@ type SaleContextValues = SaleContextProps & {
   setPaymentMethod: (paymentMethod: PaymentTypes | undefined) => void;
   goBackToPaymentMethods: (paymentMethod?: PaymentTypes | undefined) => void;
   goToErrorView: (type: SaleErrorTypes, data?: Record<string, unknown>) => void;
-  goToSuccessView: () => void;
+  goToSuccessView: (data?: Record<string, unknown>) => void;
   querySmartCheckout: ((callback?: (r?: SmartCheckoutResult) => void) => Promise<SmartCheckoutResult | undefined>);
   smartCheckoutResult: SmartCheckoutResult | undefined;
   fundingRoutes: FundingRoute[];
@@ -215,7 +215,7 @@ export function SaleContextProvider(props: {
     [paymentMethod, setPaymentMethod, executeResponse],
   );
 
-  const goToSuccessView = useCallback(() => {
+  const goToSuccessView = useCallback((data?: Record<string, unknown>) => {
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
@@ -224,6 +224,7 @@ export function SaleContextProvider(props: {
           data: {
             paymentMethod,
             transactions: executeResponse.transactions,
+            ...data,
           },
         },
       },
