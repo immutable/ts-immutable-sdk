@@ -18,14 +18,6 @@ export interface SaleWidgetParams {
   web3Provider?: Web3Provider
 }
 
-/**
- * SaleItem describes the items to be purchased
- * @property {string} productId -
- * @property {number} qty -
- * @property {string} name -
- * @property {string} image -
- * @property {string} description -
- */
 export type SaleItem = {
   productId: string;
   qty: number;
