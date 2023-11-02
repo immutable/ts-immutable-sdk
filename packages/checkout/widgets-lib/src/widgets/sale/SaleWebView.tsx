@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { Environment } from '@imtbl/config';
 import { config, passport } from '@imtbl/sdk';
 
 import {
@@ -194,7 +193,7 @@ function SaleWebView() {
 
   const widgetConfig = {
     theme: WidgetTheme.DARK,
-    environment: Environment.SANDBOX,
+    environment: env,
   };
 
   const products = btoa(JSON.stringify(JSON.parse(items)));
