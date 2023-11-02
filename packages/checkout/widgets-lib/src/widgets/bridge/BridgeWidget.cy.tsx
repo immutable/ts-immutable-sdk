@@ -336,7 +336,7 @@ describe('Bridge Widget tests', () => {
       cySmartGet('@getTokenAllowListStub').should('have.been.called');
     });
 
-    it.only('should show BridgeComingSoon for Passport users if trying to switch to L1', () => {
+    it('should show BridgeComingSoon for Passport users if trying to switch to L1', () => {
       const params = {} as BridgeWidgetParams;
       mount(
         <ConnectLoaderTestComponent
