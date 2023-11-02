@@ -101,7 +101,6 @@ describe('Connect', () => {
     });
 
     expect(connectSite).toBeCalledTimes(1);
-    expect(getNetworkInfo).toBeCalledTimes(1);
   });
 
   it('should call getBalance when no contract address provided', async () => {

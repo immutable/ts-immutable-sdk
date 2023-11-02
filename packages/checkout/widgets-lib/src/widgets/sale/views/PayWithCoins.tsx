@@ -1,19 +1,16 @@
-import {
-  useContext, useEffect, useRef,
-} from 'react';
+import { useEffect, useRef } from 'react';
 
 import { text as textConfig } from '../../../resources/text/textConfig';
 import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 import { useSaleContext } from '../context/SaleContextProvider';
-import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { LoadingView } from '../../../views/loading/LoadingView';
-import { sendSaleFailedEvent, sendSaleSuccessEvent } from '../SaleWidgetEvents';
+import { useSaleEvent } from '../hooks/useSaleEvents';
 
 export function PayWithCoins() {
   const processing = useRef(false);
   const text = textConfig.views[SaleWidgetViews.PAYMENT_METHODS];
 
-  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+  const { sendPageView, sendTransactionSuccessEvent } = useSaleEvent();
   const {
     execute, signResponse, executeResponse, goToSuccessView,
   } = useSaleContext();
@@ -35,7 +32,7 @@ export function PayWithCoins() {
   const sendTransaction = async () => {
     const transactions = await execute(signResponse);
     if (transactions.length !== expectedTxns) {
-      sendSaleFailedEvent(eventTarget, 'Transactions failed to execute');
+      sendTransactionSuccessEvent(transactions);
     }
   };
 
@@ -48,10 +45,11 @@ export function PayWithCoins() {
 
   useEffect(() => {
     if (executeResponse?.done === true) {
-      sendSaleSuccessEvent(eventTarget, executeResponse);
       goToSuccessView();
     }
   }, [executeResponse]);
+
+  useEffect(() => sendPageView(SaleWidgetViews.PAY_WITH_COINS), []);
 
   return <LoadingView loadingText={loadingText} showFooterLogo />;
 }
