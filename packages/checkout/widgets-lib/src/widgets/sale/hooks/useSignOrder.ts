@@ -6,147 +6,21 @@ import {
   SignResponse,
   SignOrderInput,
   PaymentTypes,
-  Item,
-  SignedOrderProduct,
   SignOrderError,
   ExecuteOrderResponse,
   ExecutedTransaction,
   SaleErrorTypes,
+  SignApiRequest,
+  SignCurrencyFilter,
+  SignApiError,
 } from '../types';
+import { toSignResponse } from '../functions/utils';
 
 const PRIMARY_SALES_API_BASE_URL = {
   [Environment.SANDBOX]:
     'https://api.sandbox.immutable.com/v1/primary-sales',
   [Environment.PRODUCTION]:
     'https://api.immutable.com/v1/primary-sales',
-};
-
-type SignApiTransaction = {
-  contract_address: string;
-  gas_estimate: number;
-  method_call: string;
-  params: {
-    amount?: number;
-    spender?: string;
-    data?: string[];
-    deadline?: number;
-    multicallSigner?: string;
-    reference?: string;
-    signature?: string;
-    targets?: string[];
-  };
-  raw_data: string;
-};
-
-type SignApiProduct = {
-  detail: {
-    amount: number;
-    collection_address: string;
-    token_id: string;
-  }[];
-  product_id: string;
-};
-
-type SignApiResponse = {
-  order: {
-    currency: {
-      name: string;
-      decimals: number;
-      erc20_address: string;
-    };
-    currency_symbol: string;
-    products: SignApiProduct[];
-    total_amount: string;
-  };
-  transactions: SignApiTransaction[];
-};
-
-enum SignCurrencyFilter {
-  CONTRACT_ADDRESS = 'contract_address',
-  CURRENCY_SYMBOL = 'currency_symbol',
-}
-
-type SignApiRequest = {
-  recipient_address: string;
-  currency_filter: SignCurrencyFilter;
-  currency_value: string;
-  payment_type: string;
-  products: {
-    product_id: string;
-    quantity: number;
-  }[];
-};
-
-type SignApiError = {
-  code: string;
-  details: any;
-  link: string;
-  message: string;
-  trace_id: string;
-};
-
-const toSignedProduct = (
-  product: SignApiProduct,
-  currency: string,
-  item?: Item,
-): SignedOrderProduct => ({
-  productId: product.product_id,
-  image: item?.image || '',
-  qty: item?.qty || 1,
-  name: item?.name || '',
-  description: item?.description || '',
-  currency,
-  collectionAddress: product.detail[0]?.collection_address,
-  amount: product.detail.map(({ amount }) => amount),
-  tokenId: product.detail.map(({ token_id: tokenId }) => Number(tokenId)),
-});
-
-const toSignResponse = (
-  signApiResponse: SignApiResponse,
-  items: Item[],
-): SignResponse => {
-  const { order, transactions } = signApiResponse;
-
-  return {
-    order: {
-      currency: {
-        name: order.currency.name,
-        erc20Address: order.currency.erc20_address,
-      },
-      products: order.products
-        .map((product) => toSignedProduct(
-          product,
-          order.currency.name,
-          items.find((item) => item.productId === product.product_id),
-        ))
-        .reduce((acc, product) => {
-          const index = acc.findIndex((n) => n.name === product.name);
-
-          if (index === -1) {
-            acc.push({ ...product });
-          }
-
-          if (index > -1) {
-            acc[index].amount = [...acc[index].amount, ...product.amount];
-            acc[index].tokenId = [...acc[index].tokenId, ...product.tokenId];
-          }
-
-          return acc;
-        }, [] as SignedOrderProduct[]),
-      totalAmount: Number(order.total_amount),
-    },
-    transactions: transactions.map((transaction) => ({
-      contractAddress: transaction.contract_address,
-      gasEstimate: transaction.gas_estimate,
-      methodCall: transaction.method_call,
-      params: {
-        reference: transaction.params.reference || '',
-        amount: transaction.params.amount || 0,
-        spender: transaction.params.spender || '',
-      },
-      rawData: transaction.raw_data,
-    })),
-  };
 };
 
 export const useSignOrder = (input: SignOrderInput) => {
@@ -282,6 +156,7 @@ export const useSignOrder = (input: SignOrderInput) => {
         }
 
         const responseData = toSignResponse(await response.json(), items);
+        console.log('🚀 ~ responseData:', items);
         setSignResponse(responseData);
 
         return responseData;

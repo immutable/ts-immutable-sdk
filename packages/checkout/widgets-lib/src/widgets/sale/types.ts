@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { Web3Provider } from '@ethersproject/providers';
 
 export type Item = {
@@ -91,3 +92,66 @@ export enum SaleErrorTypes {
   SMART_CHECKOUT_ERROR = 'SMART_CHECKOUT_ERROR',
   SMART_CHECKOUT_EXECUTE_ERROR = 'SMART_CHECKOUT_EXECUTE_ERROR',
 }
+
+export type SignApiTransaction = {
+  contract_address: string;
+  gas_estimate: number;
+  method_call: string;
+  params: {
+    amount?: number;
+    spender?: string;
+    data?: string[];
+    deadline?: number;
+    multicallSigner?: string;
+    reference?: string;
+    signature?: string;
+    targets?: string[];
+  };
+  raw_data: string;
+};
+
+export type SignApiProduct = {
+  detail: {
+    amount: number;
+    collection_address: string;
+    token_id: string;
+  }[];
+  product_id: string;
+};
+
+export type SignApiResponse = {
+  order: {
+    currency: {
+      name: string;
+      decimals: number;
+      erc20_address: string;
+    };
+    products: SignApiProduct[];
+    total_amount: string;
+  };
+  transactions: SignApiTransaction[];
+};
+
+export enum SignCurrencyFilter {
+  CONTRACT_ADDRESS = 'contract_address',
+  CURRENCY_SYMBOL = 'currency_symbol',
+}
+
+export type SignApiRequest = {
+  recipient_address: string;
+  currency_filter: SignCurrencyFilter;
+  currency_value: string;
+  payment_type: string;
+  products: {
+    product_id: string;
+    quantity: number;
+  }[];
+};
+
+export type SignApiError = {
+  code: string;
+  details: any;
+  link: string;
+  message: string;
+  trace_id: string;
+};
