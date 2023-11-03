@@ -60,7 +60,7 @@ type SaleContextValues = SaleContextProps & {
   setPaymentMethod: (paymentMethod: PaymentTypes | undefined) => void;
   goBackToPaymentMethods: (paymentMethod?: PaymentTypes | undefined) => void;
   goToErrorView: (type: SaleErrorTypes, data?: Record<string, unknown>) => void;
-  goToSuccessView: () => void;
+  goToSuccessView: (data?: Record<string, unknown>) => void;
   querySmartCheckout: ((callback?: (r?: SmartCheckoutResult) => void) => Promise<SmartCheckoutResult | undefined>);
   smartCheckoutResult: SmartCheckoutResult | undefined;
   fundingRoutes: FundingRoute[];
@@ -148,38 +148,6 @@ export function SaleContextProvider(props: {
     [],
   );
 
-  const goToErrorView = useCallback(
-    (errorType: SaleErrorTypes, data: Record<string, unknown> = {}) => {
-      errorRetries.current += 1;
-      if (errorRetries.current > MAX_ERROR_RETRIES) {
-        errorRetries.current = 0;
-        setPaymentMethod(undefined);
-      }
-
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: SaleWidgetViews.SALE_FAIL,
-            data: { errorType, ...data },
-          },
-        },
-      });
-    },
-    [],
-  );
-
-  const goToSuccessView = useCallback(() => {
-    viewDispatch({
-      payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: {
-          type: SaleWidgetViews.SALE_SUCCESS,
-        },
-      },
-    });
-  }, []);
-
   useEffect(() => {
     const getUserInfo = async () => {
       const signer = provider?.getSigner();
@@ -220,6 +188,48 @@ export function SaleContextProvider(props: {
     },
     [signOrder],
   );
+
+  const goToErrorView = useCallback(
+    (errorType: SaleErrorTypes, data: Record<string, unknown> = {}) => {
+      errorRetries.current += 1;
+      if (errorRetries.current > MAX_ERROR_RETRIES) {
+        errorRetries.current = 0;
+        setPaymentMethod(undefined);
+      }
+
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SaleWidgetViews.SALE_FAIL,
+            data: {
+              ...data,
+              errorType,
+              paymentMethod,
+              transactions: executeResponse.transactions,
+            },
+          },
+        },
+      });
+    },
+    [paymentMethod, setPaymentMethod, executeResponse],
+  );
+
+  const goToSuccessView = useCallback((data?: Record<string, unknown>) => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: SaleWidgetViews.SALE_SUCCESS,
+          data: {
+            paymentMethod,
+            transactions: executeResponse.transactions,
+            ...data,
+          },
+        },
+      },
+    });
+  }, [[paymentMethod, executeResponse]]);
 
   useEffect(() => {
     if (!signError) return;
