@@ -5,7 +5,7 @@ import { WalletProviderName } from '../../../types';
  * Sale Widget parameters
  * @property {string} amount - The total price to pay for the items in the sale
  * @property {SaleItem[]} items - The list of products to be purchased
- * @property {WalletProviderName | undefined} walletProvider - The wallet provider to default to if no web3Provider is passed
+ * @property {WalletProviderName | undefined} walletProviderName - The wallet provider name to default to if no web3Provider is passed
  * @property {Web3Provider | undefined} web3Provider - The ethers Web3Provider
  */
 export type SaleWidgetParams = {
@@ -14,7 +14,7 @@ export type SaleWidgetParams = {
   environmentId?: string;
   fromContractAddress?: string;
   items?: SaleItem[];
-  walletProvider?: WalletProviderName;
+  walletProviderName?: WalletProviderName;
   web3Provider?: Web3Provider
 };
 

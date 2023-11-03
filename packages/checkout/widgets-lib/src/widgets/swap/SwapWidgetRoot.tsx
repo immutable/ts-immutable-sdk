@@ -34,10 +34,10 @@ export class Swap extends Base<WidgetType.SWAP> {
 
     if (params) {
       validatedParams = params;
-      if (!isValidWalletProvider(params.walletProvider)) {
+      if (!isValidWalletProvider(params.walletProviderName)) {
         // eslint-disable-next-line no-console
-        console.warn('[IMTBL]: invalid "walletProvider" widget input');
-        validatedParams.walletProvider = undefined;
+        console.warn('[IMTBL]: invalid "walletProviderName" widget input');
+        validatedParams.walletProviderName = undefined;
       }
       if (!isValidAmount(params.amount)) {
         // eslint-disable-next-line no-console
@@ -71,7 +71,7 @@ export class Swap extends Base<WidgetType.SWAP> {
   }
 
   private isNotPassport = !isPassportProvider(this.properties.params?.web3Provider)
-    || this.properties.params?.walletProvider !== WalletProviderName.PASSPORT;
+    || this.properties.params?.walletProviderName !== WalletProviderName.PASSPORT;
 
   private topUpOptions(): { text: string; action: () => void }[] | undefined {
     const optionsArray: { text: string; action: () => void }[] = [];
@@ -96,7 +96,7 @@ export class Swap extends Base<WidgetType.SWAP> {
 
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER2,
-      walletProvider: params!.walletProvider,
+      walletProviderName: params!.walletProviderName,
       web3Provider: params!.web3Provider,
       checkout: this.checkout,
       allowedChains: [getL2ChainId(this.checkout!.config)],

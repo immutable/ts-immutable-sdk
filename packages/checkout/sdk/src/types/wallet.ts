@@ -10,10 +10,10 @@ export enum WalletAction {
 
 /**
  * Interface representing a wallet filter to be used in {@link GetWalletAllowListParams}.
- * @property {WalletProviderName} connectionProvider - The connection provider to filter wallets by.
+ * @property {WalletProviderName} walletProviderName - The wallet provider name to filter wallets by.
  */
 export interface WalletFilter {
-  walletProvider: WalletProviderName;
+  walletProviderName: WalletProviderName;
 }
 
 /**
@@ -28,13 +28,13 @@ export interface GetWalletAllowListParams {
 
 /**
  * Interface representing information about a wallet used in {@link GetWalletAllowListResult}.
- * @property {WalletProviderName} walletProvider - The connection provider for the wallet.
+ * @property {WalletProviderName} walletProviderName - The wallet provider name for the wallet.
  * @property {string} name - The name of the wallet.
  * @property {string | undefined} description - A description of the wallet.
  * @property {string | undefined} icon - The URL/data:image of an icon for the wallet.
  */
 export interface WalletInfo {
-  walletProvider: WalletProviderName;
+  walletProviderName: WalletProviderName;
   name: string;
   description?: string;
   icon?: string;

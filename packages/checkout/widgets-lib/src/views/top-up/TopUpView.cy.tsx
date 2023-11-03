@@ -302,7 +302,7 @@ describe('Top Up View', () => {
     it('should display fees for onramp, swap and bridge', () => {
       const baseWalletState: WalletState = {
         network: null,
-        walletProvider: WalletProviderName.METAMASK,
+        walletProviderName: WalletProviderName.METAMASK,
         tokenBalances: [],
         supportedTopUps: {
           isOnRampEnabled: true,
@@ -389,7 +389,7 @@ describe('Top Up View', () => {
     it('should not fetch swap fees for geo-blocked region', () => {
       const baseWalletState: WalletState = {
         network: null,
-        walletProvider: WalletProviderName.METAMASK,
+        walletProviderName: WalletProviderName.METAMASK,
         tokenBalances: [],
         supportedTopUps: {
           isOnRampEnabled: true,
@@ -476,7 +476,7 @@ describe('Top Up View', () => {
     it('should display placeholder fees for onramp, swap and bridge', () => {
       const baseWalletState: WalletState = {
         network: null,
-        walletProvider: WalletProviderName.METAMASK,
+        walletProviderName: WalletProviderName.METAMASK,
         tokenBalances: [],
         supportedTopUps: {
           isOnRampEnabled: true,
@@ -520,7 +520,7 @@ describe('Top Up View', () => {
     it('should show shimmer for fees for onramp, swap and bridge', () => {
       const baseWalletState: WalletState = {
         network: null,
-        walletProvider: WalletProviderName.METAMASK,
+        walletProviderName: WalletProviderName.METAMASK,
         tokenBalances: [],
         supportedTopUps: {
           isOnRampEnabled: true,

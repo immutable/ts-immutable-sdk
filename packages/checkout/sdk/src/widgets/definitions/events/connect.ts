@@ -13,11 +13,11 @@ export enum ConnectEventType {
 /**
  * Represents a successful connection to a Web3 provider.
  * @property {Web3Provider} provider - The connected Web3 provider.
- * @property {WalletProviderName | undefined} walletProvider - The name of the wallet provider, if available.
+ * @property {WalletProviderName | undefined} walletProviderName - The name of the wallet provider
  */
 export type ConnectionSuccess = {
   provider: Web3Provider;
-  walletProvider: WalletProviderName | undefined;
+  walletProviderName: WalletProviderName | undefined;
 };
 
 /**

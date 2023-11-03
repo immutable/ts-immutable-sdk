@@ -247,7 +247,7 @@ describe('Connect', () => {
     });
 
     const result = await checkout.createProvider({
-      walletProvider: WalletProviderName.METAMASK,
+      walletProviderName: WalletProviderName.METAMASK,
     });
 
     expect(createProvider).toBeCalledTimes(1);
@@ -267,7 +267,7 @@ describe('Connect', () => {
     });
 
     await checkout.createProvider({
-      walletProvider: WalletProviderName.PASSPORT,
+      walletProviderName: WalletProviderName.PASSPORT,
     });
 
     expect(createProvider).toBeCalledTimes(1);

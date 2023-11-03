@@ -32,10 +32,10 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
 
     if (params) {
       validatedParams = params;
-      if (!isValidWalletProvider(params.walletProvider)) {
+      if (!isValidWalletProvider(params.walletProviderName)) {
         // eslint-disable-next-line no-console
-        console.warn('[IMTBL]: invalid "walletProvider" widget input');
-        validatedParams.walletProvider = undefined;
+        console.warn('[IMTBL]: invalid "walletProviderName" widget input');
+        validatedParams.walletProviderName = undefined;
       }
 
       if (!isValidAmount(params.amount)) {
@@ -68,14 +68,14 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
 
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER1,
-      walletProvider: params?.walletProvider,
+      walletProviderName: params?.walletProviderName,
       web3Provider: params?.web3Provider,
       checkout: this.checkout,
       allowedChains: [getL1ChainId(this.checkout.config)],
     };
 
     const showBridgeComingSoonScreen = isPassportProvider(params?.web3Provider)
-      || params?.walletProvider === WalletProviderName.PASSPORT;
+      || params?.walletProviderName === WalletProviderName.PASSPORT;
 
     if (!this.reactRoot) return;
 

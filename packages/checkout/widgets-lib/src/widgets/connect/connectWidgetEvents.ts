@@ -11,7 +11,7 @@ import { Web3Provider } from '@ethersproject/providers';
 export function sendConnectSuccessEvent(
   eventTarget: Window | EventTarget,
   provider: Web3Provider,
-  walletProvider?: WalletProviderName,
+  walletProviderName?: WalletProviderName,
 ) {
   const successEvent = new CustomEvent<WidgetEvent<WidgetType.CONNECT, ConnectEventType.SUCCESS>>(
     IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
@@ -20,7 +20,7 @@ export function sendConnectSuccessEvent(
         type: ConnectEventType.SUCCESS,
         data: {
           provider,
-          walletProvider,
+          walletProviderName,
         },
       },
     },

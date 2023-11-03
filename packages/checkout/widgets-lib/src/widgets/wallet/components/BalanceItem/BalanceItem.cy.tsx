@@ -35,7 +35,7 @@ describe('BalanceItem', () => {
 
   const baseWalletState: WalletState = {
     network: null,
-    walletProvider: WalletProviderName.METAMASK,
+    walletProviderName: WalletProviderName.METAMASK,
     tokenBalances: [],
     supportedTopUps: null,
   };

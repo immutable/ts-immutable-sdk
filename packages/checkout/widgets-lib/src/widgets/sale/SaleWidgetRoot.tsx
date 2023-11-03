@@ -37,10 +37,10 @@ export class Sale extends Base<WidgetType.SALE> {
 
     if (params) {
       validatedParams = params;
-      if (!isValidWalletProvider(params.walletProvider)) {
+      if (!isValidWalletProvider(params.walletProviderName)) {
         // eslint-disable-next-line no-console
-        console.warn('[IMTBL]: invalid "walletProvider" widget input');
-        validatedParams.walletProvider = undefined;
+        console.warn('[IMTBL]: invalid "walletProviderName" widget input');
+        validatedParams.walletProviderName = undefined;
       }
       if (!isValidAmount(params.amount)) {
         // eslint-disable-next-line no-console

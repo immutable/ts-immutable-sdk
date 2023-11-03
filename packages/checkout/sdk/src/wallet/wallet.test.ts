@@ -9,11 +9,11 @@ describe('getWalletAllowList', () => {
       exclude: [],
       result: [
         {
-          walletProvider: WalletProviderName.PASSPORT,
+          walletProviderName: WalletProviderName.PASSPORT,
           name: WalletProviderName.PASSPORT,
         },
         {
-          walletProvider: WalletProviderName.METAMASK,
+          walletProviderName: WalletProviderName.METAMASK,
           name: WalletProviderName.METAMASK,
         },
       ],
@@ -23,12 +23,12 @@ describe('getWalletAllowList', () => {
       type: WalletFilterTypes.ALL,
       exclude: [
         {
-          walletProvider: WalletProviderName.METAMASK,
+          walletProviderName: WalletProviderName.METAMASK,
         },
       ],
       result: [
         {
-          walletProvider: WalletProviderName.PASSPORT,
+          walletProviderName: WalletProviderName.PASSPORT,
           name: WalletProviderName.PASSPORT,
         },
       ],
@@ -38,11 +38,11 @@ describe('getWalletAllowList', () => {
       type: WalletFilterTypes.ALL,
       result: [
         {
-          walletProvider: WalletProviderName.PASSPORT,
+          walletProviderName: WalletProviderName.PASSPORT,
           name: WalletProviderName.PASSPORT,
         },
         {
-          walletProvider: WalletProviderName.METAMASK,
+          walletProviderName: WalletProviderName.METAMASK,
           name: WalletProviderName.METAMASK,
         },
       ],
