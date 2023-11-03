@@ -19,7 +19,6 @@ export async function getWalletAllowList(
   for (const value of walletProviderNames) {
     walletList.push({
       walletProviderName: value,
-      name: value,
     });
   }
 

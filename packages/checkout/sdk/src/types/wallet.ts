@@ -29,13 +29,11 @@ export interface GetWalletAllowListParams {
 /**
  * Interface representing information about a wallet used in {@link GetWalletAllowListResult}.
  * @property {WalletProviderName} walletProviderName - The wallet provider name for the wallet.
- * @property {string} name - The name of the wallet.
  * @property {string | undefined} description - A description of the wallet.
  * @property {string | undefined} icon - The URL/data:image of an icon for the wallet.
  */
 export interface WalletInfo {
   walletProviderName: WalletProviderName;
-  name: string;
   description?: string;
   icon?: string;
 }

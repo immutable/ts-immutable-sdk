@@ -10,11 +10,9 @@ describe('getWalletAllowList', () => {
       result: [
         {
           walletProviderName: WalletProviderName.PASSPORT,
-          name: WalletProviderName.PASSPORT,
         },
         {
           walletProviderName: WalletProviderName.METAMASK,
-          name: WalletProviderName.METAMASK,
         },
       ],
     },
@@ -29,7 +27,6 @@ describe('getWalletAllowList', () => {
       result: [
         {
           walletProviderName: WalletProviderName.PASSPORT,
-          name: WalletProviderName.PASSPORT,
         },
       ],
     },
@@ -39,11 +36,9 @@ describe('getWalletAllowList', () => {
       result: [
         {
           walletProviderName: WalletProviderName.PASSPORT,
-          name: WalletProviderName.PASSPORT,
         },
         {
           walletProviderName: WalletProviderName.METAMASK,
-          name: WalletProviderName.METAMASK,
         },
       ],
     },

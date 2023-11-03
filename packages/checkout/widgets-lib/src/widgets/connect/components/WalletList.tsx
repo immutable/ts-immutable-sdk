@@ -123,7 +123,7 @@ export function WalletList(props: WalletListProps) {
         <WalletItem
           onWalletClick={onWalletClick}
           wallet={wallet}
-          key={wallet.name}
+          key={wallet.walletProviderName}
         />
       ))}
     </Box>
