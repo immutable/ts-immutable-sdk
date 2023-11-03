@@ -141,9 +141,9 @@ export class Checkout {
   constructor(
     config: CheckoutModuleConfiguration,
   ) {
-    // imported from '@imtbl/config', addClientAppIdToAxoisHeader
-    // adds the x-immutable-client-app-id header to all axios requests
-    addClientAppIdToAxoisHeader(config.baseConfig.clientAppId); 
+    // imported from '@imtbl/config', addClientAppIdToAxiosHeader
+    // adds x-immutable-client-app-id header to all axios requests
+    addClientAppIdToAxiosHeader(config.baseConfig.clientAppId); 
 
     // You can also remove these headers.
     axios.defaults.headers.common['x-api-key'] = undefined;
@@ -159,7 +159,7 @@ export class Checkout {
   }
 }
 ```
-There is also `addApiKeyToAxoisHeader` function exposed by `@imtbl/config` package to add `x-immutable-api-key` header to all axios request
+There is also `addApiKeyToAxiosHeader` function exposed by `@imtbl/config` package to add `x-immutable-api-key` header to all axios request
 
 > **Warning**
 > Please make sure your sdk still works properly after the step above. Because extra headers may make your request invalid in the infrastructure you use. e.g. cloudfront.

@@ -18,21 +18,21 @@ export class ImmutableConfiguration {
   }
 }
 
-export const addApiKeyToAxoisHeader = (apiKey: string) => {
+export const addApiKeyToAxiosHeader = (apiKey: string) => {
   if (!apiKey.startsWith('sk_imapik-')) {
     throw new Error('Invalid API key');
   }
   axios.defaults.headers.common['x-immutable-api-key'] = apiKey;
 };
 
-export const addClientAppIdToAxoisHeader = (clientAppId: string) => {
+export const addClientAppIdToAxiosHeader = (clientAppId: string) => {
   if (!clientAppId.startsWith('cai_imapik-')) {
     throw new Error('Invalid Client App Id');
   }
   axios.defaults.headers.common['x-immutable-client-app-id'] = clientAppId;
 };
 
-export const addRateLimitingKeyToAxoisHeader = (rateLimitingKey: string) => {
+export const addRateLimitingKeyToAxiosHeader = (rateLimitingKey: string) => {
   axios.defaults.headers.common['x-api-key'] = rateLimitingKey;
 };
 
