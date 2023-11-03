@@ -123,13 +123,13 @@ export NODE_OPTIONS=--max-old-space-size=14366
 
 ### API key and Client App Id
 
-You can mark api key and/or client app id as required field for your sdk module configration:
+You can mark api key and/or client app id as required field or remove them for your sdk configration:
 ```ts
 // We use checkout sdk as an example.
 export interface CheckoutOverrides {
-  // Mark your module config to require api key and/or client app id.
-  requireApiKey: true;
-  requireClientAppId: true;
+  // The below marks CheckoutModuleConfiguration to have have clientAppId field required and apiKey field omitted.
+  apiKey: "omit";
+  clientAppId: "required";
 }
 export interface CheckoutModuleConfiguration extends ModuleConfiguration<CheckoutOverrides> {}
 ```
@@ -141,11 +141,11 @@ export class Checkout {
   constructor(
     config: CheckoutModuleConfiguration,
   ) {
-    // ImmutableConfiguration constructor will add client app id and api key to global axois default headers.
-    config.baseConfig = new ImmutableConfiguration(config.baseConfig);
-    /// ....
+    // imported from '@imtbl/config', addClientAppIdToAxoisHeader
+    // adds x-immutable-client-app-id header to all axios requests
+    addClientAppIdToAxoisHeader(config.baseConfig.clientAppId); 
 
-    // You can optionally remove these headers.
+    // You can also remove these headers.
     axios.defaults.headers.common['x-api-key'] = undefined;
     axios.defaults.headers.common['x-immutable-api-key'] = undefined;
     axios.defaults.headers.common['x-immutable-client-app-id'] = undefined;
@@ -159,8 +159,10 @@ export class Checkout {
   }
 }
 ```
+There is also `addApiKeyToAxoisHeader` function exposed by `@imtbl/config` package to add `x-immutable-api-key` header to all axios request
 
-Please make sure your sdk still works properly after the step above. Because extra headers may make your request invalid in the infrastructure you use. e.g. cloudfront.
+> **Warning**
+> Please make sure your sdk still works properly after the step above. Because extra headers may make your request invalid in the infrastructure you use. e.g. cloudfront.
 
 #### Client app id usage data
 Client app id usage together with the relevant org id, project id and environment id will be available in segement under event source `Onboarding - API - ${Dev|Sandbox|Prod}`. You can set up event destination (data lake/looker) together with appropriate filters to surface endpoint usages called by your sdk per customer/project/environment.
