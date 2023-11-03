@@ -9,11 +9,8 @@ import {
   FundWithSmartCheckoutSubViews,
   SaleWidgetViews,
 } from '../../../context/view-context/SaleViewContextTypes';
-import {
-  ViewActions,
-  ViewContext,
-} from '../../../context/view-context/ViewContext';
-import { text as textConfig } from '../../../resources/text/textConfig';
+import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import { text } from '../../../resources/text/textConfig';
 import { LoadingView } from '../../../views/loading/LoadingView';
 import { FundingRouteExecute } from '../components/FundingRouteExecute/FundingRouteExecute';
 import { FundingRouteSelect } from '../components/FundingRouteSelect/FundingRouteSelect';
@@ -31,7 +28,7 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
   FundingRoute | undefined
   >(undefined);
   const [fundingRouteStepIndex, setFundingRouteStepIndex] = useState<number>(0);
-  const text = textConfig.views[SaleWidgetViews.FUND_WITH_SMART_CHECKOUT];
+  const textConfig = text.views[SaleWidgetViews.FUND_WITH_SMART_CHECKOUT];
 
   const { querySmartCheckout, fundingRoutes } = useSaleContext();
 
@@ -92,7 +89,7 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
   return (
     <Box>
       {subView === FundWithSmartCheckoutSubViews.INIT && (
-        <LoadingView loadingText={text.loading.checkingBalances} />
+        <LoadingView loadingText={textConfig.loading.checkingBalances} />
       )}
       {subView === FundWithSmartCheckoutSubViews.FUNDING_ROUTE_SELECT && (
         <FundingRouteSelect

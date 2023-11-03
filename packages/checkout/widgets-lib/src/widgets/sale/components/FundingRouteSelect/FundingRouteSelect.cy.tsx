@@ -1,18 +1,30 @@
 import { BiomeCombinedProviders } from '@biom3/react';
-import { mount } from 'cypress/react18';
-import { cy, describe } from 'local-cypress';
 import {
   BridgeFundingStep,
   ChainId, FundingRoute, FundingStepType, ItemType, SwapFundingStep,
 } from '@imtbl/checkout-sdk';
+import { WidgetTheme } from '@imtbl/checkout-widgets';
+import { Environment } from '@imtbl/config';
+import { mount } from 'cypress/react18';
 import { BigNumber, utils } from 'ethers';
+import { cy, describe } from 'local-cypress';
+import { CustomAnalyticsProvider } from '../../../../context/analytics-provider/CustomAnalyticsProvider';
 import { cySmartGet } from '../../../../lib/testUtils';
+import { StrongCheckoutWidgetsConfig } from '../../../../lib/withDefaultWidgetConfig';
 import { FundingRouteSelect } from './FundingRouteSelect';
 
 describe('FundingRouteSelect View', () => {
   beforeEach(() => {
     cy.viewport('ipad-2');
   });
+
+  const config: StrongCheckoutWidgetsConfig = {
+    environment: Environment.SANDBOX,
+    theme: WidgetTheme.DARK,
+    isBridgeEnabled: true,
+    isSwapEnabled: true,
+    isOnRampEnabled: true,
+  };
 
   const bridgeFundingStep: BridgeFundingStep = {
     type: FundingStepType.BRIDGE,
@@ -94,9 +106,12 @@ describe('FundingRouteSelect View', () => {
     ];
     beforeEach(() => {
       mount(
-        <BiomeCombinedProviders>
-          <FundingRouteSelect fundingRoutes={fundingRoutes} onFundingRouteSelected={() => {}} />
-        </BiomeCombinedProviders>,
+        <CustomAnalyticsProvider widgetConfig={config}>
+          <BiomeCombinedProviders>
+            <FundingRouteSelect fundingRoutes={fundingRoutes} onFundingRouteSelected={() => {}} />
+          </BiomeCombinedProviders>
+        </CustomAnalyticsProvider>,
+
       );
     });
     it('should display first option, without chevron', () => {
@@ -126,9 +141,12 @@ describe('FundingRouteSelect View', () => {
     ];
     beforeEach(() => {
       mount(
-        <BiomeCombinedProviders>
-          <FundingRouteSelect fundingRoutes={fundingRoutes} onFundingRouteSelected={() => {}} />
-        </BiomeCombinedProviders>,
+        <CustomAnalyticsProvider widgetConfig={config}>
+          <BiomeCombinedProviders>
+            <FundingRouteSelect fundingRoutes={fundingRoutes} onFundingRouteSelected={() => {}} />
+          </BiomeCombinedProviders>
+        </CustomAnalyticsProvider>,
+
       );
     });
     it('should display first option, with chevron', () => {
