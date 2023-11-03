@@ -11,7 +11,7 @@ export enum WalletProviderName {
 /**
  * Interface for the parameters required to create a wallet provider {@link Checkout.createProvider}.
  * @interface CreateProviderParams
- * @property {WalletProviderName} walletProviderName - The name of the wallet provider.
+ * @property {WalletProviderName} walletProviderName - The wallet provider name to create a provider for.
  */
 export interface CreateProviderParams {
   walletProviderName: WalletProviderName;
@@ -20,7 +20,7 @@ export interface CreateProviderParams {
 /**
  * Represents the result of creating a Web3 provider {@link Checkout.createProvider}.
  * @property {Web3Provider} provider - The created Web3 provider.
- * @property {WalletProviderName} walletProviderName - The name of the wallet provider.
+ * @property {WalletProviderName} walletProviderName - The wallet provider name of the provider that was created.
  */
 export type CreateProviderResult = {
   provider: Web3Provider,
