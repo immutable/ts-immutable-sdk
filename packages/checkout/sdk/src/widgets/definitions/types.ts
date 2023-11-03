@@ -201,7 +201,7 @@ export interface Widget<T extends WidgetType> {
    * @param callback function to execute when the event is received.
    */
   // eslint-disable-next-line max-len
-  on<KEventName extends keyof WidgetEventData[T]>(type: KEventName, callback: (data: WidgetEventData[T][KEventName]) => void): void
+  addListener<KEventName extends keyof WidgetEventData[T]>(type: KEventName, callback: (data: WidgetEventData[T][KEventName]) => void): void
 
   /**
    * Removes an event listener for a widget event.

@@ -108,7 +108,7 @@ export function SaleUI() {
   // mount sale widget and subscribe to close event
   useEffect(() => {
     saleWidget.mount("sale");
-    saleWidget.on(SaleEventType.CLOSE_WIDGET, () => { saleWidget.destroy()})
+    saleWidget.addListener(SaleEventType.CLOSE_WIDGET, () => { saleWidget.destroy()})
   }, [saleWidget])
 
   const handlePassportConfigChange = (e: any) => {

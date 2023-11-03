@@ -7,7 +7,7 @@ export enum ProviderEvent {
 }
 
 export function addAccountsChangedListener(web3Provider: Web3Provider, handleAccountsChanged: (e:any) => void) {
-  (web3Provider.provider as any).on(ProviderEvent.ACCOUNTS_CHANGED, handleAccountsChanged);
+  (web3Provider.provider as any).addListener(ProviderEvent.ACCOUNTS_CHANGED, handleAccountsChanged);
 }
 
 export function removeAccountsChangedListener(web3Provider: Web3Provider, handleAccountsChanged: (e:any) => void) {
@@ -15,7 +15,7 @@ export function removeAccountsChangedListener(web3Provider: Web3Provider, handle
 }
 
 export function addChainChangedListener(web3Provider: Web3Provider, handleChainChanged: (e:any) => void) {
-  (web3Provider.provider as any).on(ProviderEvent.CHAIN_CHANGED, handleChainChanged);
+  (web3Provider.provider as any).addListener(ProviderEvent.CHAIN_CHANGED, handleChainChanged);
 }
 
 export function removeChainChangedListener(web3Provider: Web3Provider, handleChainChanged: (e:any) => void) {

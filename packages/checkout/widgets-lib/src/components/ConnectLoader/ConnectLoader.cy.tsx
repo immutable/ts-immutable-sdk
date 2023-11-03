@@ -20,13 +20,13 @@ describe('ConnectLoader', () => {
     isOnRampEnabled: true,
   };
 
-  let providerOnStub;
+  let providerAddListenerStub;
   let providerRemoveListenerStub;
   let checkout;
   beforeEach(() => {
     cy.viewport('ipad-2');
     cyIntercept();
-    providerOnStub = cy.stub().as('providerOnStub');
+    providerAddListenerStub = cy.stub().as('providerAddListenerStub');
     providerRemoveListenerStub = cy.stub().as('providerRemoveListenerStub');
     checkout = new Checkout();
   });
@@ -54,7 +54,7 @@ describe('ConnectLoader', () => {
 
   it('should show ready to connect view when provider but not connected', () => {
     const provider = {
-      on: providerOnStub,
+      addListener: providerAddListenerStub,
       removeListener: providerRemoveListenerStub,
       request: () => {},
       getSigner: () => ({
@@ -89,8 +89,12 @@ describe('ConnectLoader', () => {
     cy.get('#inner-widget').should('not.exist');
   });
 
-  it('should show connect widget switch network when user on wrong network', () => {
-    const provider = { on: providerOnStub, removeListener: providerRemoveListenerStub, request: () => {} };
+  it('should show connect widget switch network when user addListener wrong network', () => {
+    const provider = {
+      addListener: providerAddListenerStub,
+      removeListener: providerRemoveListenerStub,
+      request: () => {},
+    };
     const params = {
       web3Provider: { provider } as any as Web3Provider,
       allowedChains: [ChainId.IMTBL_ZKEVM_TESTNET],
@@ -115,7 +119,7 @@ describe('ConnectLoader', () => {
               chainId: ChainId.ETHEREUM,
               name: 'ETHEREUM',
             }),
-            on: providerOnStub,
+            addListener: providerAddListenerStub,
             removeListener: providerRemoveListenerStub,
           },
           network: { name: 'ETHEREUM' },
@@ -146,7 +150,7 @@ describe('ConnectLoader', () => {
 
   it('should go through connect flow and show inner widget if provider not connected', () => {
     const provider = {
-      on: providerOnStub,
+      addListener: providerAddListenerStub,
       removeListener: providerRemoveListenerStub,
       request: () => {},
     };
@@ -190,7 +194,7 @@ describe('ConnectLoader', () => {
       .resolves({
         provider: {
           provider: {
-            on: providerOnStub,
+            addListener: providerAddListenerStub,
             removeListener: providerRemoveListenerStub,
           },
           getSigner: () => ({
@@ -228,7 +232,11 @@ describe('ConnectLoader', () => {
   });
 
   it('should not show connect flow when user already connected', () => {
-    const provider = { on: providerOnStub, removeListener: providerRemoveListenerStub, request: () => {} };
+    const provider = {
+      addListener: providerAddListenerStub,
+      removeListener: providerRemoveListenerStub,
+      request: () => {},
+    };
     const params = {
       web3Provider: {
         provider,
@@ -255,7 +263,7 @@ describe('ConnectLoader', () => {
       .resolves({
         provider: {
           provider: {
-            on: providerOnStub,
+            addListener: providerAddListenerStub,
             removeListener: providerRemoveListenerStub,
           },
           getSigner: () => ({
@@ -296,7 +304,7 @@ describe('ConnectLoader', () => {
 
   describe('wallet events', () => {
     it('should set up event listeners for accountsChanged and chainChanged', () => {
-      const provider = { on: providerOnStub, removeListener: providerRemoveListenerStub };
+      const provider = { addListener: providerAddListenerStub, removeListener: providerRemoveListenerStub };
       const params = {
         web3Provider: {
           provider,
@@ -323,7 +331,7 @@ describe('ConnectLoader', () => {
         .resolves({
           provider: {
             provider: {
-              on: providerOnStub,
+              addListener: providerAddListenerStub,
               removeListener: providerRemoveListenerStub,
             },
             getSigner: () => ({
@@ -361,8 +369,8 @@ describe('ConnectLoader', () => {
 
       cy.get('#inner-widget').should('be.visible');
 
-      cySmartGet('@providerOnStub').should('have.been.calledWith', ProviderEvent.ACCOUNTS_CHANGED);
-      cySmartGet('@providerOnStub').should('have.been.calledWith', ProviderEvent.CHAIN_CHANGED);
+      cySmartGet('@providerAddListenerStub').should('have.been.calledWith', ProviderEvent.ACCOUNTS_CHANGED);
+      cySmartGet('@providerAddListenerStub').should('have.been.calledWith', ProviderEvent.CHAIN_CHANGED);
     });
   });
 });

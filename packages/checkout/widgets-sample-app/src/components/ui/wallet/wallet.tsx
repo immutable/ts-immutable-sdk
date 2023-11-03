@@ -13,8 +13,8 @@ function WalletUI() {
   
   useEffect(() => {
     mount()
-    wallet.on(WalletEventType.NETWORK_SWITCH, (data) => {console.log('NETWORK_SWITCH', data)})
-    wallet.on(WalletEventType.CLOSE_WIDGET, () => {destroy()})
+    wallet.addListener(WalletEventType.NETWORK_SWITCH, (data) => {console.log('NETWORK_SWITCH', data)})
+    wallet.addListener(WalletEventType.CLOSE_WIDGET, () => {destroy()})
   }, []);
 
   return (

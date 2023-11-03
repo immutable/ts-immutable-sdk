@@ -10,13 +10,13 @@ function BridgeUI() {
   
   useEffect(() => {
     bridge.mount(BRIDGE_TARGET_ID);
-    bridge.on(BridgeEventType.SUCCESS, (data: any) => {
+    bridge.addListener(BridgeEventType.SUCCESS, (data: any) => {
       console.log('SUCCESS', data);
     });
-    bridge.on(BridgeEventType.FAILURE, (data: any) => {
+    bridge.addListener(BridgeEventType.FAILURE, (data: any) => {
       console.log('FAILURE', data);
     });
-    bridge.on(BridgeEventType.CLOSE_WIDGET, (data: any) => {
+    bridge.addListener(BridgeEventType.CLOSE_WIDGET, (data: any) => {
       console.log('CLOSE_WIDGET', data);
       bridge.destroy();
     });
