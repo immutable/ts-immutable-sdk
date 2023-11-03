@@ -123,7 +123,7 @@ export NODE_OPTIONS=--max-old-space-size=14366
 
 ### API key and Client App Id
 
-You can mark api key and/or client app id as required field or remove them for your sdk configration:
+You can mark the API key and/or client app ID as required fields or remove them from your SDK configuration:
 ```ts
 // We use checkout sdk as an example.
 export interface CheckoutOverrides {
@@ -142,7 +142,7 @@ export class Checkout {
     config: CheckoutModuleConfiguration,
   ) {
     // imported from '@imtbl/config', addClientAppIdToAxoisHeader
-    // adds x-immutable-client-app-id header to all axios requests
+    // adds the x-immutable-client-app-id header to all axios requests
     addClientAppIdToAxoisHeader(config.baseConfig.clientAppId); 
 
     // You can also remove these headers.
