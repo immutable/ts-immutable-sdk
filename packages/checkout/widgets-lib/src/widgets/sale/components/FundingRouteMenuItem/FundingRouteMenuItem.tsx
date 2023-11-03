@@ -53,10 +53,10 @@ export function FundingRouteMenuItem({
       return;
     }
 
-    // ! cryptoFiatState not working currently - stubbing
-    cryptoFiatState.conversions = new Map<string, number>(
-      [['eth', 100], ['imx', 100000], ['zktkn', 100000], ['timx', 100000], ['zkone', 100000]],
-    );
+    // ! cryptoFiatState uncomment to see actual values.
+    // cryptoFiatState.conversions = new Map<string, number>(
+    //   [['eth', 100], ['imx', 100000], ['zktkn', 100000], ['timx', 100000], ['zkone', 100000]],
+    // );
 
     setFeesUsd(fundingRouteFees(fundingRoute, cryptoFiatState.conversions));
     setUsdBalance(
