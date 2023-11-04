@@ -20,14 +20,16 @@ export class ImmutableConfiguration {
 
 export const addApiKeyToAxiosHeader = (apiKey: string) => {
   if (!apiKey.startsWith('sk_imapik-')) {
-    throw new Error('Invalid API key');
+    throw new Error('Invalid API key. Create your api key in Immutable developer hub. https://hub.immutable.com');
   }
   axios.defaults.headers.common['x-immutable-api-key'] = apiKey;
 };
 
 export const addClientAppIdToAxiosHeader = (clientAppId: string) => {
   if (!clientAppId.startsWith('cai_imapik-')) {
-    throw new Error('Invalid Client App Id');
+    throw new Error(
+      'Invalid Client App Id. Create your client app id in Immutable developer hub. https://hub.immutable.com',
+    );
   }
   axios.defaults.headers.common['x-immutable-client-app-id'] = clientAppId;
 };
