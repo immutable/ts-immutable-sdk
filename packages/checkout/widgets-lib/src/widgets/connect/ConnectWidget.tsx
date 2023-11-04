@@ -156,7 +156,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
         <ConnectContext.Provider value={connectReducerValues}>
           <>
             {view.type === SharedViews.LOADING_VIEW && (
-              <LoadingView loadingText="Connecting" />
+              <LoadingView loadingText="Loading" />
             )}
             {view.type === ConnectWidgetViews.CONNECT_WALLET && (
               <ConnectWallet />
