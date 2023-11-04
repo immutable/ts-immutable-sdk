@@ -92,7 +92,8 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
   const handleConnectViewUpdate = async (provider: Web3Provider) => {
     // Skip checks for Passport. Passport will be shipped with the
     // zkEVM network pre-configured and changes of networks are handled
-    // by the specific widgets.
+    // by the ConnectLoader.
+    // TODO: Remove this check when Passport has support for L1.
     if (!isPassport) {
       if (await provider.getSigner().getChainId() !== targetChainId) {
         viewDispatch({
