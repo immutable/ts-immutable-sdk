@@ -6,14 +6,13 @@ export interface TopUpMenuItemProps {
   icon: 'Wallet' | 'Coins' | 'Minting';
   heading: string;
   caption: string;
-  subcaption: string;
   onClick: () => void;
   renderFeeFunction: (fees: string, feesLoading: boolean) => ReactNode;
   isDisabled: boolean;
 }
 
 export function TopUpMenuItem({
-  testId, icon, heading, caption, subcaption, onClick, renderFeeFunction, isDisabled,
+  testId, icon, heading, caption, onClick, renderFeeFunction, isDisabled,
 }: TopUpMenuItemProps) {
   return (
     <Box testId="top-up-view" sx={{ paddingY: '1px' }}>
@@ -34,8 +33,6 @@ export function TopUpMenuItem({
         <MenuItem.Caption testId={`menu-item-caption-${testId}`}>
           {caption}
           <br />
-          {isDisabled ? '' : subcaption}
-          {' '}
           {isDisabled ? '' : renderFeeFunction('-.--', false)}
         </MenuItem.Caption>
       </MenuItem>

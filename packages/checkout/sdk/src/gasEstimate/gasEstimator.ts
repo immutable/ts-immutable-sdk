@@ -14,6 +14,7 @@ import {
   GasEstimateSwapTokenConfig,
   GasEstimateTokenConfig,
   GasEstimateType,
+  TokenAmountEstimate,
 } from '../types';
 import {
   getBridgeEstimatedGas,
@@ -21,6 +22,7 @@ import {
 } from './bridgeGasEstimate';
 import * as instance from '../instance';
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../config';
+import { BridgeFeeEstimateResult } from './bridgeGasEstimateType';
 
 const DUMMY_WALLET_ADDRESS = '0x0000000000000000000000000000000000000001';
 const DEFAULT_TOKEN_DECIMALS = 18;
@@ -45,33 +47,46 @@ async function bridgeToL2GasEstimator(
   if (!provider) throw new Error(`Missing JsonRpcProvider for chain id: ${fromChainId}`);
 
   try {
-    const gasFee = await getBridgeEstimatedGas(
-      provider as Web3Provider,
-      isSpendingCapApprovalRequired,
-    );
+    let gasFees: TokenAmountEstimate = {};
+    const getGasFees = async () => {
+      gasFees = await getBridgeEstimatedGas(
+        provider as Web3Provider,
+        isSpendingCapApprovalRequired,
+      );
+      gasFees.token = config.networkMap.get(fromChainId)?.nativeCurrency;
+    };
 
-    gasFee.token = config.networkMap.get(fromChainId)?.nativeCurrency;
+    let bridgeFees: BridgeFeeEstimateResult = {
+      bridgeFee: {},
+      bridgeable: false,
+    };
+    const getBridgeFees = async () => {
+      const tokenBridge = await instance.createBridgeInstance(
+        fromChainId,
+        toChainId,
+        readOnlyProviders,
+        config,
+      );
 
-    const tokenBridge = await instance.createBridgeInstance(
-      fromChainId,
-      toChainId,
-      readOnlyProviders,
-      config,
-    );
+      bridgeFees = await getBridgeFeeEstimate(
+        tokenBridge,
+        fromAddress,
+      );
+    };
 
-    const { bridgeFee, bridgeable } = await getBridgeFeeEstimate(
-      tokenBridge,
-      fromAddress,
-    );
+    await Promise.all([
+      getGasFees(),
+      getBridgeFees(),
+    ]);
 
     return {
       gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-      gasFee,
+      gasFee: gasFees,
       bridgeFee: {
-        estimatedAmount: bridgeFee?.estimatedAmount,
-        token: bridgeFee?.token,
+        estimatedAmount: bridgeFees.bridgeFee?.estimatedAmount,
+        token: bridgeFees.bridgeFee?.token,
       },
-      bridgeable,
+      bridgeable: bridgeFees.bridgeable,
     };
   } catch {
     // In the case of an error, just return an empty gas & bridge fee estimate
