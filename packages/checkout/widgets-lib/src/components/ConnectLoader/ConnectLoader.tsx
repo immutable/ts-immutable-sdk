@@ -339,7 +339,7 @@ export function ConnectLoader({
     <>
       {connectionStatus === ConnectionStatus.LOADING && (
         <BiomeCombinedProviders theme={{ base: biomeTheme }}>
-          <LoadingView loadingText="Connecting" />
+          <LoadingView loadingText="Loading" />
         </BiomeCombinedProviders>
       )}
       <ConnectLoaderContext.Provider value={connectLoaderReducerValues}>
