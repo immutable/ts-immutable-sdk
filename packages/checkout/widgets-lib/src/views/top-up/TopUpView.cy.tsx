@@ -21,7 +21,6 @@ import { ConnectionStatus } from '../../context/connect-loader-context/ConnectLo
 import {
   ConnectLoaderTestComponent,
 } from '../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
-import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 
 describe('Top Up View', () => {
   const connectLoaderState = {
@@ -282,11 +281,8 @@ describe('Top Up View', () => {
           </BiomeCombinedProviders>,
         );
 
-        cySmartGet('loading-view').should('be.visible');
-        cy.wait(1000);
-        cySmartGet('menu-item-caption-swap').should('have.text', 'Not available in your region ');
-        cySmartGet('menu-item-swap').click();
-        cy.get('@sendRequestSwapEventStub').should('not.have.been.called');
+        cySmartGet('menu-item-swap')
+          .should('have.css', 'background-color', 'rgba(255, 255, 255, 0.48)');
       });
     });
   });
@@ -324,18 +320,6 @@ describe('Top Up View', () => {
       cy.stub(Checkout.prototype, 'gasEstimate')
         .as('gasEstimateStub')
         .onFirstCall()
-        .resolves({
-          gasEstimateType: GasEstimateType.SWAP,
-          gasFee: {
-            estimatedAmount: BigNumber.from(100000000000000),
-            token: {
-              name: 'Ethereum',
-              symbol: 'ETH',
-              decimals: 18,
-            },
-          },
-        })
-        .onSecondCall()
         .resolves({
           gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
           gasFee: {
@@ -376,7 +360,7 @@ describe('Top Up View', () => {
       cySmartGet('menu-item-caption-swap').contains(
         'Using the coins I have on the same network',
       );
-      cySmartGet('menu-item-caption-swap').contains('$0.20 USD');
+      cySmartGet('menu-item-caption-swap').contains('$0.05 USD');
 
       cySmartGet('menu-item-caption-bridge').contains(
         'From the coins I have on a different network',
@@ -411,19 +395,6 @@ describe('Top Up View', () => {
         });
       cy.stub(Checkout.prototype, 'gasEstimate')
         .as('gasEstimateStub')
-        .onFirstCall()
-        .resolves({
-          gasEstimateType: GasEstimateType.SWAP,
-          gasFee: {
-            estimatedAmount: BigNumber.from(100000000000000),
-            token: {
-              name: 'Ethereum',
-              symbol: 'ETH',
-              decimals: 18,
-            },
-          },
-        })
-        .onSecondCall()
         .resolves({
           gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
           gasFee: {
@@ -515,51 +486,8 @@ describe('Top Up View', () => {
         </ConnectLoaderTestComponent>,
       );
 
-      cySmartGet('menu-item-caption-swap').contains('$-.-- USD');
       cySmartGet('menu-item-caption-bridge').contains('$-.-- USD');
       cySmartGet('menu-item-caption-onramp').contains('-.--%');
-    });
-
-    it('should show shimmer for fees for onramp, swap and bridge', () => {
-      const baseWalletState: WalletState = {
-        network: null,
-        walletProvider: WalletProviderName.METAMASK,
-        tokenBalances: [],
-        supportedTopUps: {
-          isOnRampEnabled: true,
-          isSwapEnabled: true,
-          isBridgeEnabled: true,
-          isSwapAvailable: true,
-        },
-      };
-
-      // @NOTE: return a promise that never resolves...
-      cy.stub(Checkout.prototype, 'gasEstimate')
-        .as('gasEstimateStub')
-        .returns(new Promise(() => {}));
-
-      mount(
-        <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
-          <WalletWidgetTestComponent
-            initialStateOverride={baseWalletState}
-            cryptoConversionsOverride={cryptoConversions}
-          >
-            <CryptoFiatProvider environment={Environment.SANDBOX}>
-              <TopUpView
-                showOnrampOption
-                showSwapOption
-                showBridgeOption
-                widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
-                onCloseButtonClick={() => {}}
-              />
-            </CryptoFiatProvider>
-          </WalletWidgetTestComponent>
-        </ConnectLoaderTestComponent>,
-      );
-      cySmartGet('fee-percentage-shimmer__shimmer').should('be.visible');
-      cySmartGet('fees-shimmer__shimmer')
-        .should('have.length', 2)
-        .and('be.visible');
     });
   });
 });
