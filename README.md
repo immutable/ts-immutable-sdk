@@ -127,7 +127,7 @@ You can mark the API key and/or client app ID as required fields or remove them 
 ```ts
 // We use checkout sdk as an example.
 export interface CheckoutOverrides {
-  // The below marks CheckoutModuleConfiguration to have have clientAppId field required and apiKey field omitted.
+  // The below marks CheckoutModuleConfiguration to have clientAppId field required and apiKey field omitted.
   apiKey: "omit";
   clientAppId: "required";
 }
