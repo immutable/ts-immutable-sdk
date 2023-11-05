@@ -13,7 +13,7 @@ import {
 } from '../types';
 import { PassportImxProvider } from './passportImxProvider';
 import { getStarkSigner } from './getStarkSigner';
-import TypedEventEmitter from '../typedEventEmitter';
+import TypedEventEmitter from '../utils/typedEventEmitter';
 
 export type PassportImxProviderFactoryInput = {
   authManager: AuthManager;
