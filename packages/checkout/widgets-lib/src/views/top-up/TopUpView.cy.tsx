@@ -210,6 +210,10 @@ describe('Top Up View', () => {
           </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
       );
+      // cy.intercept(
+      //   'https://checkout-api.sandbox.immutable.com/v1/rpc/eth-sepolia',
+      //   { jsonrpc: '2.0', id: 44, result: '0xaa36a7' },
+      // ).as('interceptEthSepolia');
 
       cySmartGet('menu-item-swap').click();
       cy.get('@sendRequestSwapEventStub').should('have.been.called');
@@ -242,6 +246,10 @@ describe('Top Up View', () => {
           </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
       );
+      // cy.intercept(
+      //   'https://checkout-api.sandbox.immutable.com/v1/rpc/eth-sepolia',
+      //   { jsonrpc: '2.0', id: 44, result: '0xaa36a7' },
+      // ).as('interceptEthSepolia');
 
       cySmartGet('menu-item-bridge').click();
       cy.get('@sendRequestBridgeEventStub').should('have.been.called');

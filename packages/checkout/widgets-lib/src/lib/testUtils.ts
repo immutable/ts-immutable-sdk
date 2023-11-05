@@ -206,7 +206,8 @@ export const cyIntercept = (overrides?: {
       'immutable-x': { usd: 1.5 },
     },
   );
-  cy.intercept(`${checkoutApi}/rpc/eth-sepolia`, {});
+  cy.intercept(`${checkoutApi}/rpc/eth-sepolia`, { jsonrpc: '2.0', id: 44, result: '0xaa36a7' })
+    .as('interceptEthSepolia');
   cy.intercept(imtblZkEvmRpcUrl, {});
   cy.intercept('https://image-resizer-cache.dev.immutable.com/*', {});
 
