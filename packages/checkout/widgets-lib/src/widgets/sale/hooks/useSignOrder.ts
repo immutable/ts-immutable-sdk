@@ -156,7 +156,6 @@ export const useSignOrder = (input: SignOrderInput) => {
         }
 
         const responseData = toSignResponse(await response.json(), items);
-        console.log('🚀 ~ responseData:', items);
         setSignResponse(responseData);
 
         return responseData;
