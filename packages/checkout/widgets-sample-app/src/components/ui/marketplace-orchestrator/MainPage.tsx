@@ -33,22 +33,22 @@ export const MainPage = () => {
   const swapWidget = useMemo(() => widgetsFactory.create(WidgetType.SWAP, {}), [widgetsFactory]);
   const onRampWidget = useMemo(() => widgetsFactory.create(WidgetType.ONRAMP, {}), [widgetsFactory]);
 
-  connectWidget.on(ConnectEventType.CLOSE_WIDGET, () => {connectWidget.unmount()});
-  walletWidget.on(WalletEventType.CLOSE_WIDGET, () => {walletWidget.unmount()});
-  bridgeWidget.on(BridgeEventType.CLOSE_WIDGET, () => {bridgeWidget.unmount()});
-  swapWidget.on(SwapEventType.CLOSE_WIDGET, () => swapWidget.unmount());
-  onRampWidget.on(OnRampEventType.CLOSE_WIDGET, () => {onRampWidget.unmount()});
+  connectWidget.addListener(ConnectEventType.CLOSE_WIDGET, () => {connectWidget.unmount()});
+  walletWidget.addListener(WalletEventType.CLOSE_WIDGET, () => {walletWidget.unmount()});
+  bridgeWidget.addListener(BridgeEventType.CLOSE_WIDGET, () => {bridgeWidget.unmount()});
+  swapWidget.addListener(SwapEventType.CLOSE_WIDGET, () => swapWidget.unmount());
+  onRampWidget.addListener(OnRampEventType.CLOSE_WIDGET, () => {onRampWidget.unmount()});
 
   // local state for enabling/disabling and changing buttons
   const [doneSwap, setDoneSwap] = useState<boolean>(false);
   const [web3Provider, setWeb3Provider] = useState<Web3Provider|undefined>(undefined);
 
   useEffect(() => {
-    connectWidget.on(ConnectEventType.CLOSE_WIDGET, () => connectWidget.unmount());
-    connectWidget.on(ConnectEventType.SUCCESS, (eventData: ConnectionSuccess) => {
+    connectWidget.addListener(ConnectEventType.CLOSE_WIDGET, () => connectWidget.unmount());
+    connectWidget.addListener(ConnectEventType.SUCCESS, (eventData: ConnectionSuccess) => {
       setWeb3Provider(eventData.provider);
     });
-    walletWidget.on(WalletEventType.NETWORK_SWITCH, (eventData: WalletNetworkSwitchEvent) => {
+    walletWidget.addListener(WalletEventType.NETWORK_SWITCH, (eventData: WalletNetworkSwitchEvent) => {
       setWeb3Provider(eventData.provider)
     })
   }, [connectWidget, walletWidget]);
@@ -64,17 +64,17 @@ export const MainPage = () => {
 
   // Orchestration
   useEffect(() => {
-    walletWidget.on(OrchestrationEventType.REQUEST_BRIDGE, (eventData: RequestBridgeEvent) => {
+    walletWidget.addListener(OrchestrationEventType.REQUEST_BRIDGE, (eventData: RequestBridgeEvent) => {
       walletWidget.unmount();
       bridgeWidget.update({params: {fromContractAddress: eventData.tokenAddress, amount: eventData.amount, web3Provider}})
       bridgeWidget.mount('widget-target');
     })
-    walletWidget.on(OrchestrationEventType.REQUEST_SWAP, (data: RequestSwapEvent) => {
+    walletWidget.addListener(OrchestrationEventType.REQUEST_SWAP, (data: RequestSwapEvent) => {
       walletWidget.unmount();
       swapWidget.update({params: {fromContractAddress: data.fromTokenAddress, amount: data.amount, web3Provider}})
       swapWidget.mount('widget-target');
     })
-    walletWidget.on(OrchestrationEventType.REQUEST_ONRAMP, (data: RequestOnrampEvent) => {
+    walletWidget.addListener(OrchestrationEventType.REQUEST_ONRAMP, (data: RequestOnrampEvent) => {
       walletWidget.unmount();
       onRampWidget.update({params: {contractAddress: data.tokenAddress, amount: data.amount, web3Provider}})
       onRampWidget.mount('widget-target');

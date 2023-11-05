@@ -29,11 +29,11 @@ function ConnectUI() {
   useEffect(() => {
     if(!connect) return;
     connect.mount(CONNECT_TARGET_ID)
-    connect.on(ConnectEventType.SUCCESS, (data: any) => {
+    connect.addListener(ConnectEventType.SUCCESS, (data: any) => {
       console.log('SUCCESS')
       setProvider(data.provider);
     })
-    connect.on(ConnectEventType.CLOSE_WIDGET, (data: any) => {
+    connect.addListener(ConnectEventType.CLOSE_WIDGET, (data: any) => {
       console.log('CLOSE_WIDGET')
     })
     connect.removeListener(ConnectEventType.CLOSE_WIDGET)

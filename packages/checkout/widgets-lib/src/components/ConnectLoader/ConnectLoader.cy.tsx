@@ -89,8 +89,12 @@ describe('ConnectLoader', () => {
     cy.get('#inner-widget').should('not.exist');
   });
 
-  it('should show connect widget switch network when user on wrong network', () => {
-    const provider = { on: providerOnStub, removeListener: providerRemoveListenerStub, request: () => {} };
+  it('should show connect widget switch network when user addListener wrong network', () => {
+    const provider = {
+      on: providerOnStub,
+      removeListener: providerRemoveListenerStub,
+      request: () => {},
+    };
     const params = {
       web3Provider: { provider } as any as Web3Provider,
       allowedChains: [ChainId.IMTBL_ZKEVM_TESTNET],
@@ -228,7 +232,11 @@ describe('ConnectLoader', () => {
   });
 
   it('should not show connect flow when user already connected', () => {
-    const provider = { on: providerOnStub, removeListener: providerRemoveListenerStub, request: () => {} };
+    const provider = {
+      on: providerOnStub,
+      removeListener: providerRemoveListenerStub,
+      request: () => {},
+    };
     const params = {
       web3Provider: {
         provider,

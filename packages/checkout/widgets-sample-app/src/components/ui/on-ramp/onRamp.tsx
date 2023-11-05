@@ -15,13 +15,13 @@ function OnRampUI() {
 
   useEffect(() => {
     mount()
-    onRamp.on(OnRampEventType.SUCCESS, (data) => {
+    onRamp.addListener(OnRampEventType.SUCCESS, (data) => {
       console.log('SUCCESS', data)
     })
-    onRamp.on(OnRampEventType.FAILURE, (data) => {
+    onRamp.addListener(OnRampEventType.FAILURE, (data) => {
       console.log('FAILURE', data)
     })
-    onRamp.on(OnRampEventType.CLOSE_WIDGET, () => {
+    onRamp.addListener(OnRampEventType.CLOSE_WIDGET, () => {
       destroy()
     })
   }, []);

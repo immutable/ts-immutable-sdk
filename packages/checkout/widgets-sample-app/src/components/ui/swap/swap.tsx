@@ -13,12 +13,12 @@ function SwapUI() {
   
   useEffect(() => {
     swap.mount(SWAP_TARGET_ID);
-    swap.on(SwapEventType.SUCCESS, (data: SwapSuccess) => {
+    swap.addListener(SwapEventType.SUCCESS, (data: SwapSuccess) => {
     })
-    swap.on(SwapEventType.FAILURE, (data: any) => {
+    swap.addListener(SwapEventType.FAILURE, (data: any) => {
       console.log('FAILURE', data);
     });
-    swap.on(SwapEventType.CLOSE_WIDGET, (data: any) => {
+    swap.addListener(SwapEventType.CLOSE_WIDGET, (data: any) => {
       swap.destroy();
     });
   }, [swap])

@@ -27,7 +27,7 @@ declare global {
       unmount(): void;
       destroy(): void;
       update(props: WidgetProperties<T>): void;
-      on<KEventName extends keyof WidgetEventData[T]>(
+      addListener<KEventName extends keyof WidgetEventData[T]>(
         type: KEventName,
         callback: (data: WidgetEventData[T][KEventName]) => void
       ): void;
@@ -40,7 +40,7 @@ declare global {
       unmount(): void;
       destroy(): void;
       update(props: WidgetProperties<T>): void;
-      on<KEventName extends keyof WidgetEventData[T]>(
+      addListener<KEventName extends keyof WidgetEventData[T]>(
         type: KEventName,
         callback: (data: WidgetEventData[T][KEventName]) => void
       ): void;
@@ -53,7 +53,7 @@ declare global {
       unmount(): void;
       destroy(): void;
       update(props: WidgetProperties<T>): void;
-      on<KEventName extends keyof WidgetEventData[T]>(
+      addListener<KEventName extends keyof WidgetEventData[T]>(
         type: KEventName,
         callback: (data: WidgetEventData[T][KEventName]) => void
       ): void;
@@ -66,7 +66,7 @@ declare global {
       unmount(): void;
       destroy(): void;
       update(props: WidgetProperties<T>): void;
-      on<KEventName extends keyof WidgetEventData[T]>(
+      addListener<KEventName extends keyof WidgetEventData[T]>(
         type: KEventName,
         callback: (data: WidgetEventData[T][KEventName]) => void
       ): void;
@@ -79,7 +79,7 @@ declare global {
       unmount(): void;
       destroy(): void;
       update(props: WidgetProperties<T>): void;
-      on<KEventName extends keyof WidgetEventData[T]>(
+      addListener<KEventName extends keyof WidgetEventData[T]>(
         type: KEventName,
         callback: (data: WidgetEventData[T][KEventName]) => void
       ): void;
@@ -92,7 +92,7 @@ declare global {
       unmount(): void;
       destroy(): void;
       update(props: WidgetProperties<T>): void;
-      on<KEventName extends keyof WidgetEventData[T]>(
+      addListener<KEventName extends keyof WidgetEventData[T]>(
         type: KEventName,
         callback: (data: WidgetEventData[T][KEventName]) => void
       ): void;

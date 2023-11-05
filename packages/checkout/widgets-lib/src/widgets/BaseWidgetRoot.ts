@@ -86,7 +86,7 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
   }
 
   // eslint-disable-next-line max-len
-  on<KEventName extends keyof WidgetEventData[T]>(type: KEventName, callback: (data: WidgetEventData[T][KEventName]) => void): void {
+  addListener<KEventName extends keyof WidgetEventData[T]>(type: KEventName, callback: (data: WidgetEventData[T][KEventName]) => void): void {
     this.eventHandlers.set(type, callback);
 
     if (this.eventHandlersFunction) {
