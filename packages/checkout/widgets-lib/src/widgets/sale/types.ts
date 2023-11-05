@@ -71,6 +71,10 @@ export type SmartCheckoutError = {
   data?: Record<string, unknown>;
 };
 
+export enum SmartCheckoutErrorTypes {
+  FRACTIONAL_BALANCE_BLOCKED = 'FRACTIONAL_BALANCE_BLOCKED',
+}
+
 export type ExecutedTransaction = {
   method: string;
   hash: string | undefined;

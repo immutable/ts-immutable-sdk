@@ -237,8 +237,11 @@ export const getAllBalances = async (
   config: CheckoutConfiguration,
   web3Provider: Web3Provider,
   walletAddress: string,
-  chainId: ChainId,
+  chainId?: ChainId,
 ): Promise<GetAllBalancesResult> => {
+  // eslint-disable-next-line no-param-reassign
+  chainId ||= await web3Provider.getSigner().getChainId();
+
   const { tokens } = await getTokenAllowList(
     config,
     {
@@ -265,7 +268,7 @@ export const getAllBalances = async (
     // Please remove this hack once https://immutable.atlassian.net/browse/WT-1710
     // is done.
     const isL1Chain = getL1ChainId(config) === chainId;
-    return measureAsyncExecution<GetAllBalancesResult>(
+    return await measureAsyncExecution<GetAllBalancesResult>(
       config,
       `Time to fetch balances using blockscout for ${chainId}`,
       getIndexerBalance(walletAddress, chainId, isL1Chain ? tokens : []),

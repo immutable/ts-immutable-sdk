@@ -1,16 +1,13 @@
 import { Web3Provider } from '@ethersproject/providers';
 import {
   Checkout,
-  ERC20ItemRequirement,
-  GasAmount,
-  GasTokenType,
-  ItemType,
   SmartCheckoutResult,
-  TransactionOrGasType,
 } from '@imtbl/checkout-sdk';
-import { BigNumber } from 'ethers';
 import { useCallback, useState } from 'react';
-import { Item, SaleErrorTypes, SmartCheckoutError } from '../types';
+import { getGasEstimate, getItemRequirements, isUserFractionalBalanceBlocked } from '../functions/smartCheckoutUtils';
+import {
+  Item, SaleErrorTypes, SmartCheckoutError, SmartCheckoutErrorTypes,
+} from '../types';
 
 type UseSmartCheckoutInput = {
   checkout: Checkout | undefined;
@@ -19,26 +16,6 @@ type UseSmartCheckoutInput = {
   amount: string,
   contractAddress: string,
 };
-
-const MAX_GAS_LIMIT = '30000000';
-
-const getItemRequirements = (amount: string, spenderAddress: string, contractAddress: string)
-: ERC20ItemRequirement[] => [
-  {
-    type: ItemType.ERC20,
-    contractAddress,
-    spenderAddress,
-    amount,
-  },
-];
-
-const getGasEstimate = (): GasAmount => ({
-  type: TransactionOrGasType.GAS,
-  gasToken: {
-    type: GasTokenType.NATIVE,
-    limit: BigNumber.from(MAX_GAS_LIMIT),
-  },
-});
 
 export const useSmartCheckout = ({
   checkout, provider, items, amount, contractAddress,
@@ -54,6 +31,17 @@ export const useSmartCheckout = ({
     try {
       const signer = provider?.getSigner();
       const spenderAddress = await signer?.getAddress() || '';
+
+      const userFractionalBalanceBlocked = await isUserFractionalBalanceBlocked(
+        spenderAddress,
+        contractAddress,
+        amount,
+        checkout,
+        provider,
+      );
+      if (userFractionalBalanceBlocked) {
+        throw new Error(SmartCheckoutErrorTypes.FRACTIONAL_BALANCE_BLOCKED);
+      }
 
       const itemRequirements = getItemRequirements(amount, spenderAddress, contractAddress);
       const gasEstimate = getGasEstimate();
