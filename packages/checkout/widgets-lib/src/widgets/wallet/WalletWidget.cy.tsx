@@ -48,9 +48,6 @@ describe('WalletWidget tests', () => {
   };
 
   describe('WalletWidget initialisation', () => {
-    beforeEach(() => {
-    });
-
     it('should show loading screen when component is mounted', () => {
       const widgetConfig = {
         theme: WidgetTheme.DARK,
@@ -60,17 +57,17 @@ describe('WalletWidget tests', () => {
         isOnRampEnabled: false,
       } as StrongCheckoutWidgetsConfig;
 
-      const balanceStub = cy
-        .stub(Checkout.prototype, 'getBalance')
-        .as('balanceNoNetworkStub');
-      balanceStub.rejects({});
-      const connectStub = cy
-        .stub(Checkout.prototype, 'connect')
-        .as('connectNoNetworkStub');
-      connectStub.resolves({
-        provider: mockProvider,
-        network: { name: '' },
-      });
+      cy.stub(Checkout.prototype, 'getBalance')
+        .as('balanceNoNetworkStub')
+        .rejects({});
+
+      cy.stub(Checkout.prototype, 'connect')
+        .as('connectNoNetworkStub')
+        .resolves({
+          provider: mockProvider,
+          network: { name: '' },
+        });
+
       cy.stub(Checkout.prototype, 'getNetworkInfo')
         .as('getNetworkInfoStub')
         .resolves({
@@ -106,19 +103,17 @@ describe('WalletWidget tests', () => {
         isOnRampEnabled: false,
       } as StrongCheckoutWidgetsConfig;
 
-      cyIntercept();
+      cy.stub(Checkout.prototype, 'getBalance')
+        .as('balanceNoNetworkStub')
+        .rejects({});
 
-      const balanceStub = cy
-        .stub(Checkout.prototype, 'getBalance')
-        .as('balanceNoNetworkStub');
-      balanceStub.rejects({});
-      const connectStub = cy
-        .stub(Checkout.prototype, 'connect')
-        .as('connectNoNetworkStub');
-      connectStub.resolves({
-        provider: mockProvider,
-        network: { name: '' },
-      });
+      cy.stub(Checkout.prototype, 'connect')
+        .as('connectNoNetworkStub')
+        .resolves({
+          provider: mockProvider,
+          network: { name: '' },
+        });
+
       cy.stub(Checkout.prototype, 'getNetworkInfo')
         .as('getNetworkInfoStub')
         .onFirstCall()
@@ -131,10 +126,10 @@ describe('WalletWidget tests', () => {
             symbol: 'eth',
           },
         });
-      const isSwapAvailableStub = cy
-        .stub(Checkout.prototype, 'isSwapAvailable')
-        .as('isSwapAvailableStub');
-      isSwapAvailableStub.resolves(true);
+
+      cy.stub(Checkout.prototype, 'isSwapAvailable')
+        .as('isSwapAvailableStub')
+        .resolves(true);
 
       mount(
         <CustomAnalyticsProvider widgetConfig={widgetConfig}>
@@ -156,7 +151,6 @@ describe('WalletWidget tests', () => {
   });
 
   describe('Connected Wallet', () => {
-    let getAllBalancesStub;
     beforeEach(() => {
       cy.stub(Checkout.prototype, 'connect')
         .as('connectStub')
@@ -206,7 +200,7 @@ describe('WalletWidget tests', () => {
       cy.stub(Checkout.prototype, 'getNetworkInfo')
         .as('getNetworkInfoStub')
         .resolves({
-          chainId: ChainId.SEPOLIA,
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
           isSupported: true,
           nativeCurrency: {
             symbol: 'eth',
@@ -228,41 +222,6 @@ describe('WalletWidget tests', () => {
           ],
         });
 
-      getAllBalancesStub = cy
-        .stub(Checkout.prototype, 'getAllBalances')
-        .as('balanceStub');
-      getAllBalancesStub.resolves({
-        balances: [
-          {
-            balance: BigNumber.from(1),
-            formattedBalance: '12.12',
-            token: {
-              name: 'Ether',
-              symbol: 'ETH',
-              decimals: 18,
-            },
-          },
-          {
-            balance: BigNumber.from(2),
-            formattedBalance: '899',
-            token: {
-              name: 'Immutable X',
-              symbol: 'IMX',
-              decimals: 18,
-            },
-          },
-          {
-            balance: BigNumber.from(3),
-            formattedBalance: '100.2',
-            token: {
-              name: 'Gods Unchained',
-              symbol: 'GODS',
-              decimals: 18,
-            },
-          },
-        ],
-      });
-
       cy.stub(Checkout.prototype, 'switchNetwork')
         .as('switchNetworkStub')
         .resolves({
@@ -277,10 +236,9 @@ describe('WalletWidget tests', () => {
           },
         });
 
-      const signerStub = {
+      cy.stub(Web3Provider.prototype, 'getSigner').returns({
         getAddress: cy.stub().resolves('0x123'),
-      };
-      cy.stub(Web3Provider.prototype, 'getSigner').returns(signerStub);
+      });
 
       cy.stub(CryptoFiat.prototype, 'convert')
         .as('cryptoFiatStub')
@@ -306,6 +264,40 @@ describe('WalletWidget tests', () => {
           isSwapEnabled: false,
           isOnRampEnabled: false,
         } as StrongCheckoutWidgetsConfig;
+
+        cy.stub(Checkout.prototype, 'getAllBalances')
+          .as('balanceStub')
+          .resolves({
+            balances: [
+              {
+                balance: BigNumber.from(1),
+                formattedBalance: '12.12',
+                token: {
+                  name: 'Ether',
+                  symbol: 'ETH',
+                  decimals: 18,
+                },
+              },
+              {
+                balance: BigNumber.from(2),
+                formattedBalance: '899',
+                token: {
+                  name: 'Immutable X',
+                  symbol: 'IMX',
+                  decimals: 18,
+                },
+              },
+              {
+                balance: BigNumber.from(3),
+                formattedBalance: '100.2',
+                token: {
+                  name: 'Gods Unchained',
+                  symbol: 'GODS',
+                  decimals: 18,
+                },
+              },
+            ],
+          });
 
         mount(
           <CustomAnalyticsProvider widgetConfig={widgetConfig}>
@@ -348,6 +340,40 @@ describe('WalletWidget tests', () => {
           isSwapEnabled: false,
           isOnRampEnabled: false,
         } as StrongCheckoutWidgetsConfig;
+
+        cy.stub(Checkout.prototype, 'getAllBalances')
+          .as('balanceStub')
+          .resolves({
+            balances: [
+              {
+                balance: BigNumber.from(1),
+                formattedBalance: '12.12',
+                token: {
+                  name: 'Ether',
+                  symbol: 'ETH',
+                  decimals: 18,
+                },
+              },
+              {
+                balance: BigNumber.from(2),
+                formattedBalance: '899',
+                token: {
+                  name: 'Immutable X',
+                  symbol: 'IMX',
+                  decimals: 18,
+                },
+              },
+              {
+                balance: BigNumber.from(3),
+                formattedBalance: '100.2',
+                token: {
+                  name: 'Gods Unchained',
+                  symbol: 'GODS',
+                  decimals: 18,
+                },
+              },
+            ],
+          });
 
         mount(
           <CustomAnalyticsProvider widgetConfig={widgetConfig}>
@@ -392,7 +418,8 @@ describe('WalletWidget tests', () => {
           isOnRampEnabled: false,
         } as StrongCheckoutWidgetsConfig;
 
-        getAllBalancesStub
+        cy.stub(Checkout.prototype, 'getAllBalances')
+          .as('balanceStub')
           .onFirstCall()
           .rejects({ data: { code: 500 } })
           .onSecondCall()
@@ -507,9 +534,7 @@ describe('WalletWidget tests', () => {
           </CustomAnalyticsProvider>,
         );
         cySmartGet('settings-button').click();
-        cySmartGet('disconnect-button').should(
-          'not.exist',
-        );
+        cySmartGet('disconnect-button').should('not.exist');
       });
 
       it('should show a disconnect button for Passport that fires the right event when clicked', () => {
@@ -555,12 +580,6 @@ describe('WalletWidget tests', () => {
     });
 
     describe('WalletWidget coin info', () => {
-      let signerStub;
-      beforeEach(() => {
-        signerStub = {
-          getAddress: cy.stub().resolves('0x123'),
-        };
-      });
       it('should show the coin info view if the coin info icon is clicked', () => {
         const widgetConfig = {
           theme: WidgetTheme.DARK,
@@ -598,13 +617,12 @@ describe('WalletWidget tests', () => {
           isSwapEnabled: false,
           isOnRampEnabled: false,
         } as StrongCheckoutWidgetsConfig;
+
         const connectLoaderStateWithPassport = {
           ...connectLoaderState,
-          provider: {
-            provider: { isPassport: true } as ExternalProvider,
-            getSigner: () => signerStub,
-          } as any as Web3Provider,
+          provider: mockPassportProvider,
         };
+
         mount(
           <CustomAnalyticsProvider widgetConfig={widgetConfig}>
             <ConnectLoaderTestComponent

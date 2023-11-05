@@ -33,6 +33,7 @@ describe('Top Up View', () => {
 
   beforeEach(() => {
     cy.viewport('ipad-2');
+    cyIntercept();
   });
 
   describe('TopUpView render', () => {
@@ -293,10 +294,6 @@ describe('Top Up View', () => {
       ['imx', 1.5],
       ['usdc', 1],
     ]);
-
-    beforeEach(() => {
-      cyIntercept();
-    });
 
     it('should display fees for onramp, swap and bridge', () => {
       const baseWalletState: WalletState = {
