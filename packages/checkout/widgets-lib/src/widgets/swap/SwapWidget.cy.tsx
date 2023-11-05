@@ -68,6 +68,7 @@ describe('SwapWidget tests', () => {
     cy.stub(Checkout.prototype, 'getNetworkInfo')
       .as('getNetworkInfoStub')
       .resolves({
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
         isSupported: true,
         nativeCurrency: {
           symbol: 'eth',
