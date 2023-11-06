@@ -10,7 +10,7 @@ import { PassportEventMap } from '../types';
 import { PassportImxProvider } from './passportImxProvider';
 import { getStarkSigner } from './getStarkSigner';
 import { mockUser, mockUserImx, testConfig } from '../test/mocks';
-import TypedEventEmitter from '../typedEventEmitter';
+import TypedEventEmitter from '../utils/typedEventEmitter';
 
 jest.mock('@ethersproject/providers');
 jest.mock('./workflows/registration');
