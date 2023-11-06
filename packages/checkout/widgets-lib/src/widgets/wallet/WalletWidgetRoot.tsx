@@ -53,7 +53,7 @@ export class Wallet extends Base<WidgetType.WALLET> {
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER2,
       walletProviderName: params?.walletProviderName,
-      web3Provider: params?.web3Provider,
+      web3Provider: this.web3Provider,
       checkout: this.checkout,
       allowedChains: [getL1ChainId(this.checkout.config), getL2ChainId(this.checkout.config)],
     };

@@ -84,7 +84,7 @@ export class Sale extends Base<WidgetType.SALE> {
     const { params } = this.properties;
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER2,
-      web3Provider: this.properties.params?.web3Provider,
+      web3Provider: this.web3Provider,
       checkout: this.checkout,
       allowedChains: [
         getL2ChainId(this.checkout!.config),

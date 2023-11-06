@@ -6,7 +6,14 @@ import {
   WidgetProperties,
   WidgetType,
   WidgetEventData,
+  IMTBLWidgetEvents,
+  ProviderEventType,
+  ProviderUpdated,
 } from '@imtbl/checkout-sdk';
+import { Web3Provider } from '@ethersproject/providers';
+import {
+  addAccountsChangedListener, addChainChangedListener, removeAccountsChangedListener, removeChainChangedListener,
+} from 'lib';
 import { StrongCheckoutWidgetsConfig, withDefaultWidgetConfigs } from '../lib/withDefaultWidgetConfig';
 
 export abstract class Base<T extends WidgetType> implements Widget<T> {
@@ -20,6 +27,8 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
 
   protected properties: WidgetProperties<T>;
 
+  protected web3Provider: Web3Provider | undefined;
+
   protected eventHandlers: Map<keyof WidgetEventData[T], Function> = new Map<keyof WidgetEventData[T], Function>();
 
   protected eventHandlersFunction?: (event: any) => void;
@@ -31,6 +40,11 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
 
     this.checkout = sdk;
     this.properties = validatedProps;
+    this.web3Provider = validatedProps.params?.web3Provider;
+    if (this.web3Provider) {
+      this.subscribeToEIP1193Events();
+    }
+    this.setupProviderUpdatedListener();
   }
 
   unmount() {
@@ -128,4 +142,75 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
 
   protected abstract render(): void;
   protected abstract getValidatedProperties(props: WidgetProperties<T>): WidgetProperties<T>;
+
+  // Subscribe to PROVIDER_UPDATED events
+  private setupProviderUpdatedListener() {
+    window.addEventListener(
+      IMTBLWidgetEvents.IMTBL_WIDGETS_PROVIDER,
+      this.handleProviderUpdatedEvent,
+    );
+  }
+
+  // Handles the PROVIDER_UPDATED event by removing and re-adding EIP-1193 event listeners
+  private handleProviderUpdatedEvent = ((event: CustomEvent) => {
+    const widgetRoot = this;
+    switch (event.detail.type) {
+      case ProviderEventType.PROVIDER_UPDATED: {
+        const eventData = event.detail.data as ProviderUpdated;
+
+        if (widgetRoot.web3Provider) {
+          // eslint-disable-next-line max-len
+          removeAccountsChangedListener(widgetRoot.web3Provider, (e: string[]) => { widgetRoot.handleAccountsChanged(e, widgetRoot); });
+          removeChainChangedListener(widgetRoot.web3Provider, () => { widgetRoot.handleChainChanged(widgetRoot); });
+        }
+        widgetRoot.web3Provider = eventData.provider;
+        this.subscribeToEIP1193Events();
+        this.render();
+        break;
+      }
+      default:
+    }
+  }) as EventListener;
+
+  // Subscribe to EIP-1193 events if we have a web3Provider
+  private subscribeToEIP1193Events() {
+    const widgetRoot = this;
+    if (widgetRoot.web3Provider) {
+      addAccountsChangedListener(widgetRoot.web3Provider!, (e: string[]) => {
+        widgetRoot.handleAccountsChanged(e, widgetRoot);
+      });
+      addChainChangedListener(widgetRoot.web3Provider!, () => { widgetRoot.handleChainChanged(widgetRoot); });
+    }
+  }
+
+  /**
+   * Handles EIP-1193 accountsChanged event
+   * Sets the widget root provider with a new Web3Provider
+  */
+  private async handleAccountsChanged(e: string[], widgetRoot: Base<T>) {
+    if (e.length === 0) {
+      // TODO: when a user disconnects all accounts, send to the Ready To Connect screen
+      // Do we just do the same thing as below. Re-wrap the underlying provider
+      // eslint-disable-next-line no-param-reassign
+      widgetRoot.web3Provider = undefined;
+    } else {
+      if (!widgetRoot.web3Provider) return;
+      // eslint-disable-next-line no-param-reassign
+      widgetRoot.web3Provider = new Web3Provider(widgetRoot.web3Provider!.provider);
+    }
+    widgetRoot.render();
+  }
+
+  /**
+   * Handles EIP-1193 chainChanged event
+   * Sets the widget root provider with a new Web3Provider
+  */
+  private handleChainChanged(widgetRoot: Base<T>) {
+    // trigger a re-load of the connectLoader so that the widget re loads with a new provider
+    if (!widgetRoot.web3Provider) return;
+
+    // eslint-disable-next-line no-param-reassign
+    widgetRoot.web3Provider = new Web3Provider(widgetRoot.web3Provider!.provider);
+    widgetRoot.render();
+  }
 }

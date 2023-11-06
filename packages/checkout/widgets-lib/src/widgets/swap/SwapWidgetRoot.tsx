@@ -97,7 +97,7 @@ export class Swap extends Base<WidgetType.SWAP> {
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER2,
       walletProviderName: params!.walletProviderName,
-      web3Provider: params!.web3Provider,
+      web3Provider: this.web3Provider,
       checkout: this.checkout,
       allowedChains: [getL2ChainId(this.checkout!.config)],
     };

@@ -6,10 +6,8 @@ import {
   GetNetworkParams,
   WalletProviderName,
   ConnectTargetLayer,
-  IMTBLWidgetEvents,
   CheckoutErrorType,
-  ProviderEventType,
-  ProviderUpdated,
+
 } from '@imtbl/checkout-sdk';
 import { BaseTokens } from '@biom3/design-tokens';
 import React, {
@@ -18,6 +16,7 @@ import React, {
   useReducer,
 } from 'react';
 import { widgetTheme } from 'lib/theme';
+import { ErrorView } from 'views/error/ErrorView';
 import {
   ConnectLoaderActions,
   ConnectLoaderContext,
@@ -28,14 +27,7 @@ import {
 import { LoadingView } from '../../views/loading/LoadingView';
 import { ConnectWidget } from '../../widgets/connect/ConnectWidget';
 import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
-import { ErrorView } from '../../views/error/ErrorView';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import {
-  addAccountsChangedListener,
-  addChainChangedListener,
-  removeAccountsChangedListener,
-  removeChainChangedListener,
-} from '../../lib';
 import { useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { identifyUser } from '../../lib/analytics/identifyUser';
 
@@ -86,72 +78,8 @@ export function ConnectLoader({
 
   const { identify } = useAnalytics();
 
-  // Set the provider on the context for the widgets
-  useEffect(() => {
-    if (!web3Provider) {
-      return;
-    }
-    connectLoaderDispatch({
-      payload: {
-        type: ConnectLoaderActions.SET_PROVIDER,
-        provider: web3Provider,
-      },
-    });
-  }, [web3Provider]);
-
-  /** Handle wallet events as per EIP-1193 spec
-   * - listen for account changed manually in wallet
-   * - listen for network/chain changed manually in wallet
-   */
-  useEffect(() => {
-    if (!provider) return () => {};
-
-    async function handleAccountsChanged(e: string[]) {
-      if (e.length === 0) {
-        // when a user disconnects all accounts, send them back to the connect screen
-        connectLoaderDispatch({
-          payload: {
-            type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
-            connectionStatus: ConnectionStatus.NOT_CONNECTED,
-            deepLink: ConnectWidgetViews.READY_TO_CONNECT,
-          },
-        });
-      } else {
-        const newProvider = new Web3Provider(provider!.provider);
-        // WT-1698 Analytics - Identify new user as wallet address has changed
-        await identifyUser(identify, newProvider);
-
-        // trigger a re-load of the connectLoader so that the widget re loads with a new provider
-        connectLoaderDispatch({
-          payload: {
-            type: ConnectLoaderActions.SET_PROVIDER,
-            provider: newProvider,
-          },
-        });
-      }
-    }
-
-    function handleChainChanged() {
-      // trigger a re-load of the connectLoader so that the widget re loads with a new provider
-      connectLoaderDispatch({
-        payload: {
-          type: ConnectLoaderActions.SET_PROVIDER,
-          provider: new Web3Provider(provider!.provider),
-        },
-      });
-    }
-
-    addAccountsChangedListener(provider, handleAccountsChanged);
-    addChainChangedListener(provider, handleChainChanged);
-
-    return () => {
-      removeAccountsChangedListener(provider, handleAccountsChanged);
-      removeChainChangedListener(provider, handleChainChanged);
-    };
-  }, [provider, identify]);
-
-  const hasNoWalletProviderNameAndNoWeb3Provider = (): boolean => {
-    if (!walletProviderName && !provider) {
+  const hasNoWalletProviderNameAndNoWeb3Provider = (localProvider?: Web3Provider): boolean => {
+    if (!walletProviderName && !localProvider) {
       connectLoaderDispatch({
         payload: {
           type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
@@ -164,11 +92,11 @@ export function ConnectLoader({
     return false;
   };
 
-  const hasWalletProviderNameAndNoWeb3Provider = async (): Promise<boolean> => {
+  const hasWalletProviderNameAndNoWeb3Provider = async (localProvider?: Web3Provider): Promise<boolean> => {
     try {
       // If the wallet provider name was passed through but the provider was
       // not injected then create a provider using the wallet provider name
-      if (!provider && walletProviderName) {
+      if (!localProvider && walletProviderName) {
         const createProviderResult = await checkout.createProvider({
           walletProviderName,
         });
@@ -205,9 +133,9 @@ export function ConnectLoader({
     return false;
   };
 
-  const isWalletConnected = async (): Promise<boolean> => {
+  const isWalletConnected = async (localProvider: Web3Provider): Promise<boolean> => {
     const { isConnected } = await checkout.checkIsWalletConnected({
-      provider: provider!,
+      provider: localProvider!,
     });
 
     if (!isConnected) {
@@ -223,68 +151,63 @@ export function ConnectLoader({
     return true;
   };
 
-  const handleProviderUpdatedEvent = ((event: CustomEvent) => {
-    switch (event.detail.type) {
-      case ProviderEventType.PROVIDER_UPDATED: {
-        const eventData = event.detail.data as ProviderUpdated;
-
-        // connectLoaderDispatch({
-        //   payload: {
-        //     type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
-        //     connectionStatus: ConnectionStatus.LOADING,
-        //   },
-        // });
-
-        // WT-1698 Analytics - No need to call Identify here as it is
-        // called in the Connect Widget when raising the ConnectSuccess event
-        connectLoaderDispatch({
-          payload: {
-            type: ConnectLoaderActions.SET_PROVIDER,
-            provider: eventData.provider,
-          },
-        });
-
-        break;
-      }
-      default:
-    }
-  }) as EventListener;
-
   useEffect(() => {
     if (window === undefined) {
       // eslint-disable-next-line no-console
       console.error('missing window object: please run Checkout client side');
-      return () => {};
+      return;
     }
 
     (async () => {
       if (!checkout) return;
 
-      if (hasNoWalletProviderNameAndNoWeb3Provider()) return;
-      if (await hasWalletProviderNameAndNoWeb3Provider()) return;
+      if (hasNoWalletProviderNameAndNoWeb3Provider(web3Provider)) return;
+      if (await hasWalletProviderNameAndNoWeb3Provider(web3Provider)) return;
 
       try {
+        // TODO: handle all of the inner try catches with error handling
+        try {
         // At this point the Web3Provider exists
         // This will bypass the wallet list screen
-        if (!(await isWalletConnected())) return;
-
-        const currentNetworkInfo = await checkout.getNetworkInfo({ provider } as GetNetworkParams);
-
-        // If unsupported network or current network is not in the allowed chains
-        // then show the switch network screen
-        if (!currentNetworkInfo.isSupported || !allowedChains.includes(currentNetworkInfo.chainId)) {
-          connectLoaderDispatch({
-            payload: {
-              type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
-              connectionStatus: ConnectionStatus.CONNECTED_WRONG_NETWORK,
-              deepLink: ConnectWidgetViews.SWITCH_NETWORK,
-            },
-          });
+          const isConnected = (await isWalletConnected(web3Provider!));
+          if (!isConnected) return;
+        } catch (err) {
           return;
         }
 
-        // WT-1698 Analytics - Identify user here then progress to widget
-        await identifyUser(identify, provider!);
+        try {
+          const currentNetworkInfo = await checkout.getNetworkInfo({ provider: web3Provider } as GetNetworkParams);
+
+          // If unsupported network or current network is not in the allowed chains
+          // then show the switch network screen
+          if (!currentNetworkInfo.isSupported || !allowedChains.includes(currentNetworkInfo.chainId)) {
+            connectLoaderDispatch({
+              payload: {
+                type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
+                connectionStatus: ConnectionStatus.CONNECTED_WRONG_NETWORK,
+                deepLink: ConnectWidgetViews.SWITCH_NETWORK,
+              },
+            });
+            return;
+          }
+        } catch (err) {
+          return;
+        }
+
+        try {
+          // WT-1698 Analytics - Identify user here then progress to widget
+          // TODO: Identify user should be separated out into a use Effect with only the provider (from connect loader state) as dependency
+          await identifyUser(identify, web3Provider!);
+        } catch (err) {
+          return;
+        }
+
+        connectLoaderDispatch({
+          payload: {
+            type: ConnectLoaderActions.SET_PROVIDER,
+            provider: web3Provider!,
+          },
+        });
 
         // The user is connected and the widget will be shown
         connectLoaderDispatch({
@@ -302,19 +225,7 @@ export function ConnectLoader({
         });
       }
     })();
-
-    window.addEventListener(
-      IMTBLWidgetEvents.IMTBL_WIDGETS_PROVIDER,
-      handleProviderUpdatedEvent,
-    );
-
-    return () => {
-      window.removeEventListener(
-        IMTBLWidgetEvents.IMTBL_WIDGETS_PROVIDER,
-        handleProviderUpdatedEvent,
-      );
-    };
-  }, [checkout, walletProviderName, provider]);
+  }, [checkout, walletProviderName, web3Provider]);
 
   return (
     <>

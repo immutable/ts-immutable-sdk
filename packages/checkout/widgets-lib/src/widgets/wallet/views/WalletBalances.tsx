@@ -190,7 +190,12 @@ export function WalletBalances() {
       });
       setBalancesLoading(false);
     })();
-  }, [checkout, provider, network, conversions]);
+  }, [
+    checkout,
+    provider,
+    network,
+    conversions,
+  ]);
 
   const showAddCoins = useMemo(() => {
     if (!checkout || !network) return false;

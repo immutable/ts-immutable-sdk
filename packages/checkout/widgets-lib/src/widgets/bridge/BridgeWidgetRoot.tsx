@@ -69,7 +69,7 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER1,
       walletProviderName: params?.walletProviderName,
-      web3Provider: params?.web3Provider,
+      web3Provider: this.web3Provider,
       checkout: this.checkout,
       allowedChains: [getL1ChainId(this.checkout.config)],
     };
