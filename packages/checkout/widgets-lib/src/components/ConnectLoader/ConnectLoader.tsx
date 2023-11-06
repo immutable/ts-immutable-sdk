@@ -60,9 +60,17 @@ export function ConnectLoader({
   widgetConfig,
   closeEvent,
 }: ConnectLoaderProps) {
+  const {
+    checkout,
+    targetLayer,
+    walletProviderName,
+    allowedChains,
+    web3Provider,
+  } = params;
+
   const [connectLoaderState, connectLoaderDispatch] = useReducer(
     connectLoaderReducer,
-    initialConnectLoaderState,
+    { ...initialConnectLoaderState, checkout }, // set checkout instance here
   );
   const connectLoaderReducerValues = useMemo(() => ({
     connectLoaderState,
@@ -71,27 +79,12 @@ export function ConnectLoader({
   const {
     connectionStatus, deepLink, provider,
   } = connectLoaderState;
-  const {
-    checkout,
-    targetLayer,
-    walletProviderName,
-    allowedChains,
-    web3Provider,
-  } = params;
+
   const networkToSwitchTo = targetLayer ?? ConnectTargetLayer.LAYER2;
 
   const biomeTheme: BaseTokens = widgetTheme(widgetConfig.theme);
 
   const { identify } = useAnalytics();
-
-  useEffect(() => {
-    connectLoaderDispatch({
-      payload: {
-        type: ConnectLoaderActions.SET_CHECKOUT,
-        checkout,
-      },
-    });
-  }, []);
 
   // Set the provider on the context for the widgets
   useEffect(() => {
