@@ -5,8 +5,11 @@ import {
   Checkout,
   GetNetworkParams,
   WalletProviderName,
-
-  ConnectEventType, ConnectionSuccess, ConnectTargetLayer, IMTBLWidgetEvents, CheckoutErrorType,
+  ConnectTargetLayer,
+  IMTBLWidgetEvents,
+  CheckoutErrorType,
+  ProviderEventType,
+  ProviderUpdated,
 } from '@imtbl/checkout-sdk';
 import { BaseTokens } from '@biom3/design-tokens';
 import React, {
@@ -81,6 +84,15 @@ export function ConnectLoader({
 
   const { identify } = useAnalytics();
 
+  useEffect(() => {
+    connectLoaderDispatch({
+      payload: {
+        type: ConnectLoaderActions.SET_CHECKOUT,
+        checkout,
+      },
+    });
+  }, []);
+
   // Set the provider on the context for the widgets
   useEffect(() => {
     if (!web3Provider) {
@@ -144,15 +156,6 @@ export function ConnectLoader({
       removeChainChangedListener(provider, handleChainChanged);
     };
   }, [provider, identify]);
-
-  useEffect(() => {
-    connectLoaderDispatch({
-      payload: {
-        type: ConnectLoaderActions.SET_CHECKOUT,
-        checkout,
-      },
-    });
-  }, []);
 
   const hasNoWalletProviderNameAndNoWeb3Provider = (): boolean => {
     if (!walletProviderName && !provider) {
@@ -227,33 +230,24 @@ export function ConnectLoader({
     return true;
   };
 
-  const handleConnectEvent = ((event: CustomEvent) => {
+  const handleProviderUpdatedEvent = ((event: CustomEvent) => {
     switch (event.detail.type) {
-      case ConnectEventType.SUCCESS: {
-        const eventData = event.detail.data as ConnectionSuccess;
+      case ProviderEventType.PROVIDER_UPDATED: {
+        const eventData = event.detail.data as ProviderUpdated;
 
+        // WT-1698 Analytics - No need to call Identify here as it is
+        // called in the Connect Widget when raising the ConnectSuccess event
         connectLoaderDispatch({
           payload: {
             type: ConnectLoaderActions.SET_PROVIDER,
             provider: eventData.provider,
           },
         });
-        // WT-1698 Analytics - No need to call Identify here as it is
-        // called in the Connect Widget when raising the ConnectSuccess event
+
         connectLoaderDispatch({
           payload: {
             type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
             connectionStatus: ConnectionStatus.CONNECTED_WITH_NETWORK,
-          },
-        });
-        break;
-      }
-      case ConnectEventType.FAILURE: {
-        connectLoaderDispatch({
-          payload: {
-            type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
-            connectionStatus: ConnectionStatus.ERROR,
-
           },
         });
         break;
@@ -316,14 +310,14 @@ export function ConnectLoader({
     })();
 
     window.addEventListener(
-      IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
-      handleConnectEvent,
+      IMTBLWidgetEvents.IMTBL_WIDGETS_PROVIDER,
+      handleProviderUpdatedEvent,
     );
 
     return () => {
       window.removeEventListener(
-        IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
-        handleConnectEvent,
+        IMTBLWidgetEvents.IMTBL_WIDGETS_PROVIDER,
+        handleProviderUpdatedEvent,
       );
     };
   }, [checkout, walletProviderName, provider]);
