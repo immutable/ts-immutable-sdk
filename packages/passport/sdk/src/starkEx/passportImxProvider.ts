@@ -121,6 +121,15 @@ export class PassportImxProvider implements IMXProvider {
 
   // TODO: Remove once implemented
   // eslint-disable-next-line class-methods-use-this
+  isRegisteredOffchain(): Promise<RegisterUserResponse> {
+    throw new PassportError(
+      'Operation not supported',
+      PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR,
+    );
+  }
+
+  // TODO: Remove once implemented
+  // eslint-disable-next-line class-methods-use-this
   isRegisteredOnchain(): Promise<boolean> {
     throw new PassportError(
       'Operation not supported',

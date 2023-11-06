@@ -6,6 +6,7 @@ import {
   UsersApi,
 } from '@imtbl/core-sdk';
 import { signRaw } from '@imtbl/toolkit';
+import { AxiosError } from 'axios';
 import { Signers } from './types';
 import { validateChain } from './helpers';
 import { ProviderConfiguration } from '../config';
@@ -43,6 +44,23 @@ export async function registerOffchain(
   });
 
   return registeredUser.data;
+}
+
+export async function isRegisteredOffchain(ethAddress: string, config: ProviderConfiguration): Promise<boolean> {
+  try {
+    const usersApi = new UsersApi(config.immutableXConfig.apiConfiguration);
+    const getUsersResult = await usersApi.getUsers({
+      user: ethAddress,
+    });
+    const { accounts } = getUsersResult.data;
+
+    return accounts.length > 0;
+  } catch (ex) {
+    if (ex instanceof AxiosError && ex.response?.status === 404) {
+      return false;
+    }
+    throw ex;
+  }
 }
 
 interface IsRegisteredCheckError {

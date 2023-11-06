@@ -24,6 +24,7 @@ import { Signers } from './signable-actions/types';
 import { batchTransfer, transfer } from './signable-actions/transfer';
 import { cancelOrder, createOrder } from './signable-actions/orders';
 import {
+  isRegisteredOffchain,
   isRegisteredOnChain,
   registerOffchain,
 } from './signable-actions/registration';
@@ -50,7 +51,15 @@ export class GenericIMXProvider implements IMXProvider {
   }
 
   async getAddress(): Promise<string> {
-    return await this.signers.ethSigner.getAddress();
+    return this.signers.ethSigner.getAddress();
+  }
+
+  async isRegisteredOffchain(): Promise<boolean> {
+    const ethAddress = await this.signers.ethSigner.getAddress();
+    return isRegisteredOffchain(
+      ethAddress,
+      this.config,
+    );
   }
 
   registerOffchain(): Promise<RegisterUserResponse> {
