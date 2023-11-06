@@ -55,7 +55,7 @@ export class GenericIMXProvider implements IMXProvider {
   }
 
   async isRegisteredOffchain(): Promise<boolean> {
-    const ethAddress = await this.signers.ethSigner.getAddress();
+    const ethAddress = await this.getAddress();
     return isRegisteredOffchain(
       ethAddress,
       this.config,
