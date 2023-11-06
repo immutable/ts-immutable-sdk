@@ -29,6 +29,7 @@ export const smartCheckout = async (
   transactionOrGasAmount: FulfillmentTransaction | GasAmount,
 ): Promise<SmartCheckoutResult> => {
   const ownerAddress = await provider.getSigner().getAddress();
+
   let aggregatedItems = itemAggregator(itemRequirements);
 
   const erc20AllowancePromise = hasERC20Allowances(provider, ownerAddress, aggregatedItems);

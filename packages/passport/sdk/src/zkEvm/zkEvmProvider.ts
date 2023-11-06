@@ -11,7 +11,7 @@ import {
 } from './types';
 import AuthManager from '../authManager';
 import MagicAdapter from '../magicAdapter';
-import TypedEventEmitter from '../typedEventEmitter';
+import TypedEventEmitter from '../utils/typedEventEmitter';
 import { PassportConfiguration } from '../config';
 import { ConfirmationScreen } from '../confirmation';
 import { PassportEventMap, PassportEvents, UserZkEvm } from '../types';
