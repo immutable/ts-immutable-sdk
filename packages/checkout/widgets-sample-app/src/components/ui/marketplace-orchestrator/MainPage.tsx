@@ -14,8 +14,12 @@ import { Checkout,
   WalletNetworkSwitchEvent,
   WidgetTheme, WidgetType, SwapSuccess } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
+import { useWeb3Modal, useWeb3ModalSigner } from '@web3modal/ethers5/react';
 
 export const MainPage = () => {
+  const walletConnectModal = useWeb3Modal()
+  const walletConnectSigner = useWeb3ModalSigner()
+
   const passport = useMemo(() => new Passport(passportConfig), [passportConfig]);
 
   const checkout = useMemo(() => new Checkout({
@@ -81,6 +85,17 @@ export const MainPage = () => {
     })
   }, [walletWidget, bridgeWidget, onRampWidget, swapWidget, web3Provider]);
 
+  useEffect(() => {
+    if (!walletConnectSigner.walletProvider) return;
+    setWeb3Provider(walletConnectSigner.walletProvider as unknown as Web3Provider)
+    
+    // connectWidget.update({ params: { web3Provider } })
+    // walletWidget.update({ params: { web3Provider } })
+    // bridgeWidget.update({ params: { web3Provider } })
+    // swapWidget.update({ params: { web3Provider } })
+    // onRampWidget.update({ params: { web3Provider } })
+  }, [walletConnectSigner.walletProvider])
+
   // button click functions to open/close widgets
   const openConnectWidget = useCallback(() => {
     connectWidget.mount('connect-target');
@@ -103,6 +118,8 @@ export const MainPage = () => {
     onRampWidget.mount('onramp-target')
   }, [onRampWidget, web3Provider])
 
+  const walletConnectConnect = () => walletConnectModal.open()
+
   const handleBuyClick = () => {
     alert("you can buy now");
   }
@@ -123,6 +140,7 @@ export const MainPage = () => {
           <Button onClick={openSwapWidget}>Swap</Button>
           <Button onClick={openBridgeWidget}>Bridge</Button>
           <Button onClick={openOnRampWidget}>On-ramp</Button>
+          <Button onClick={walletConnectConnect}>Wallet Connect</Button>
       </Box>
       {passport && web3Provider && (web3Provider.provider as any)?.isPassport && <Button onClick={logout}>Passport Logout</Button>}
       </Box>
