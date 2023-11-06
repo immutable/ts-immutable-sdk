@@ -25,31 +25,9 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT;
 
   protected getValidatedProperties(
-    { params, config }: WidgetProperties<WidgetType.BRIDGE>,
+    { config }: WidgetProperties<WidgetType.BRIDGE>,
   ): WidgetProperties<WidgetType.BRIDGE> {
-    let validatedParams: BridgeWidgetParams | undefined;
     let validatedConfig: WidgetConfiguration | undefined;
-
-    if (params) {
-      validatedParams = params;
-      if (!isValidWalletProvider(params.walletProviderName)) {
-        // eslint-disable-next-line no-console
-        console.warn('[IMTBL]: invalid "walletProviderName" widget input');
-        validatedParams.walletProviderName = undefined;
-      }
-
-      if (!isValidAmount(params.amount)) {
-        // eslint-disable-next-line no-console
-        console.warn('[IMTBL]: invalid "amount" widget input');
-        validatedParams.amount = '';
-      }
-
-      if (!isValidAddress(params.fromContractAddress)) {
-        // eslint-disable-next-line no-console
-        console.warn('[IMTBL]: invalid "fromContractAddress" widget input');
-        validatedParams.fromContractAddress = '';
-      }
-    }
 
     if (config) {
       validatedConfig = config;
@@ -58,24 +36,44 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
     }
 
     return {
-      params: validatedParams,
       config: validatedConfig,
     };
   }
 
-  protected render() {
-    const { params } = this.properties;
+  protected getValidatedParameters(params: BridgeWidgetParams): BridgeWidgetParams {
+    const validatedParams = params;
+    if (!isValidWalletProvider(params.walletProviderName)) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "walletProviderName" widget input');
+      validatedParams.walletProviderName = undefined;
+    }
 
+    if (!isValidAmount(params.amount)) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "amount" widget input');
+      validatedParams.amount = '';
+    }
+
+    if (!isValidAddress(params.fromContractAddress)) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "fromContractAddress" widget input');
+      validatedParams.fromContractAddress = '';
+    }
+
+    return validatedParams;
+  }
+
+  protected render() {
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER1,
-      walletProviderName: params?.walletProviderName,
+      walletProviderName: this.parameters.walletProviderName,
       web3Provider: this.web3Provider,
       checkout: this.checkout,
       allowedChains: [getL1ChainId(this.checkout.config)],
     };
 
-    const showBridgeComingSoonScreen = isPassportProvider(params?.web3Provider)
-      || params?.walletProviderName === WalletProviderName.PASSPORT;
+    const showBridgeComingSoonScreen = isPassportProvider(this.web3Provider)
+      || this.parameters.walletProviderName === WalletProviderName.PASSPORT;
 
     if (!this.reactRoot) return;
 
@@ -98,7 +96,8 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
               widgetConfig={this.strongConfig()}
             >
               <BridgeWidget
-                {...this.properties.params}
+                amount={this.parameters.amount}
+                fromContractAddress={this.parameters.fromContractAddress}
                 config={this.strongConfig()}
               />
             </ConnectLoader>

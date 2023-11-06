@@ -8,10 +8,8 @@ function OnRampUI() {
 
   const unmount = () => {onRamp.unmount()}
   const mount = () => {
-    onRamp.mount('onramp')}
+    onRamp.mount('onramp', {amount: '55', contractAddress: '0x0000000000000000000000000000000000001010'})}
   const update = (theme: WidgetTheme) => {onRamp.update({config: {theme}})}
-  const updateParams = () => onRamp.update({params: {amount: '55', contractAddress: '0x0000000000000000000000000000000000001010'}})
-  const destroy = () => {onRamp.destroy()}
 
   useEffect(() => {
     mount()
@@ -22,7 +20,7 @@ function OnRampUI() {
       console.log('FAILURE', data)
     })
     onRamp.addListener(OnRampEventType.CLOSE_WIDGET, () => {
-      destroy()
+      unmount()
     })
   }, []);
 
@@ -32,10 +30,8 @@ function OnRampUI() {
     <div id="onramp"></div>
     <button onClick={unmount}>Unmount</button>
     <button onClick={mount}>Mount</button>
-    <button onClick={() => update(WidgetTheme.LIGHT)}>Light theme</button>
-    <button onClick={() => update(WidgetTheme.DARK)}>Dark theme</button>
-      <button onClick={() => updateParams()}>Update params</button>
-    <button onClick={destroy}>Destroy</button>
+    <button onClick={() => update(WidgetTheme.LIGHT)}>Update Config Light</button>
+    <button onClick={() => update(WidgetTheme.DARK)}>Update Config Dark</button>
   </div>
   );
 }

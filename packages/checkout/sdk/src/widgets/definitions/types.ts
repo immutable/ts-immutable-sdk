@@ -1,4 +1,5 @@
 import { Environment } from '@imtbl/config';
+import { Web3Provider } from '@ethersproject/providers';
 import {
   BridgeEventType,
   BridgeFailed,
@@ -36,14 +37,15 @@ import {
   OnRampWidgetParams,
 } from './parameters';
 import { SaleWidgetParams } from './parameters/sale';
-
-/**
- * Enum representing the themes for the widgets.
- */
-export enum WidgetTheme {
-  LIGHT = 'light',
-  DARK = 'dark',
-}
+import {
+  BridgeWidgetConfiguration,
+  ConnectWidgetConfiguration,
+  OnrampWidgetConfiguration,
+  SaleWidgetConfiguration,
+  SwapWidgetConfiguration,
+  WalletWidgetConfiguration,
+} from './configurations';
+import { WidgetTheme } from './configurations/theme';
 
 /**
  * Enum representing the list of widget types.
@@ -61,8 +63,17 @@ export enum WidgetType {
  * Widget properties definition for each widget. Used for creating and updating widgets
  */
 export type WidgetProperties<T extends WidgetType> = {
-  params?: WidgetParameters[T];
-  config?: WidgetConfiguration;
+  config?: WidgetConfigurations[T];
+  provider?: Web3Provider;
+};
+
+export type WidgetConfigurations = {
+  [WidgetType.CONNECT]: ConnectWidgetConfiguration,
+  [WidgetType.WALLET]: WalletWidgetConfiguration,
+  [WidgetType.SWAP]: SwapWidgetConfiguration,
+  [WidgetType.BRIDGE]: BridgeWidgetConfiguration,
+  [WidgetType.ONRAMP]: OnrampWidgetConfiguration,
+  [WidgetType.SALE]: SaleWidgetConfiguration
 };
 
 // Mapping each widget type to their parameters
@@ -187,7 +198,7 @@ export interface IWidgetsFactory {
    * Create a new widget instance.
    * @param type widget type to instantiate.
    */
-  create<T extends WidgetType>(type: T, params: WidgetParameters[T]): Widget<T>;
+  create<T extends WidgetType>(type: T, config: WidgetConfigurations[T], provider?: Web3Provider): Widget<T>;
 }
 
 /**
@@ -198,15 +209,11 @@ export interface Widget<T extends WidgetType> {
    * Mount a widget to a DOM ref element.
    * @param id ID of the DOM element where the widget will be mounted.
    */
-  mount(id: string): void;
+  mount(id: string, params: WidgetParameters[T]): void;
   /**
-   * Unmount a widget without losing state.
+   * Unmount a widget and reset parameters
    */
   unmount(): void;
-  /**
-   * Unmount a widget and destroy its state.
-   */
-  destroy(): void;
   /**
    * Update the widget parameters
    * @param params Widget specific parameters including configuration
@@ -265,12 +272,4 @@ export type CheckoutWidgetsConfig = {
   isOnRampEnabled?: boolean;
   isSwapEnabled?: boolean;
   isBridgeEnabled?: boolean;
-};
-
-/**
- * Represents the local configuration options for the Checkout Widgets.
- * @property {WidgetTheme | undefined} theme - The theme of the Checkout Widget (default: "DARK")
- */
-export type WidgetConfiguration = {
-  theme?: WidgetTheme;
 };

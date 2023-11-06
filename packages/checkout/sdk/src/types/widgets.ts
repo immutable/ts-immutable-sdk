@@ -1,4 +1,5 @@
-import { SemanticVersion, WidgetConfiguration } from '../widgets/definitions/types';
+import { WidgetConfiguration } from '../widgets/definitions/configurations/widget';
+import { SemanticVersion } from '../widgets/definitions/types';
 
 /**
  * Represents the configuration options for instantiating the Checkout Widgets factory.

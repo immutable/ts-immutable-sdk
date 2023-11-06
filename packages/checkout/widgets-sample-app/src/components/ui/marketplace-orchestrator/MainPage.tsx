@@ -6,13 +6,17 @@ import { passportConfig } from './passportConfig';
 import {  WidgetsFactory } from '@imtbl/checkout-widgets';
 import { Checkout,
   ConnectEventType,
-  ConnectionSuccess, OrchestrationEventType,
-  RequestBridgeEvent, BridgeEventType,
-  RequestOnrampEvent, OnRampEventType,
-  RequestSwapEvent, SwapEventType,
+  ConnectionSuccess, 
+  OrchestrationEventType,
+  RequestBridgeEvent, 
+  BridgeEventType,
+  RequestOnrampEvent, 
+  OnRampEventType,
+  RequestSwapEvent, 
+  SwapEventType,
   WalletEventType,
   WalletNetworkSwitchEvent,
-  WidgetTheme, WidgetType, SwapSuccess } from '@imtbl/checkout-sdk';
+  WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 
 export const MainPage = () => {
@@ -53,54 +57,41 @@ export const MainPage = () => {
     })
   }, [connectWidget, walletWidget]);
 
-  // // keep provider updated in widgets
-  // useEffect(() => {
-  //   walletWidget.update({params: {web3Provider}})
-  //   swapWidget.update({params: {web3Provider}})
-  //   bridgeWidget.update({params: {web3Provider}})
-  //   onRampWidget.update({params: {web3Provider}})
-  // }, [web3Provider])
-
-
   // Orchestration
   useEffect(() => {
     walletWidget.addListener(OrchestrationEventType.REQUEST_BRIDGE, (eventData: RequestBridgeEvent) => {
       walletWidget.unmount();
-      bridgeWidget.update({params: {fromContractAddress: eventData.tokenAddress, amount: eventData.amount, web3Provider}})
-      bridgeWidget.mount('widget-target');
+      bridgeWidget.mount('bridge-target', {fromContractAddress: eventData.tokenAddress, amount: eventData.amount, web3Provider});
     })
     walletWidget.addListener(OrchestrationEventType.REQUEST_SWAP, (data: RequestSwapEvent) => {
       walletWidget.unmount();
-      swapWidget.update({params: {fromContractAddress: data.fromTokenAddress, amount: data.amount, web3Provider}})
-      swapWidget.mount('widget-target');
+      swapWidget.mount('swap-target', {fromContractAddress: data.fromTokenAddress, amount: data.amount, web3Provider});
     })
     walletWidget.addListener(OrchestrationEventType.REQUEST_ONRAMP, (data: RequestOnrampEvent) => {
       walletWidget.unmount();
-      onRampWidget.update({params: {contractAddress: data.tokenAddress, amount: data.amount, web3Provider}})
-      onRampWidget.mount('widget-target');
+      onRampWidget.mount('onramp-target', {contractAddress: data.tokenAddress, amount: data.amount, web3Provider});
     })
   }, [walletWidget, bridgeWidget, onRampWidget, swapWidget, web3Provider]);
 
   // button click functions to open/close widgets
   const openConnectWidget = useCallback(() => {
-    connectWidget.mount('connect-target');
+    connectWidget.mount('connect-target', {});
   }, [connectWidget])
 
   const openWalletWidget = useCallback(() => {
-    walletWidget.mount('wallet-target');
+    walletWidget.mount('wallet-target', {});
   }, [walletWidget])
 
   const openBridgeWidget = useCallback(() => {
-    bridgeWidget.mount('bridge-target')
+    bridgeWidget.mount('bridge-target', {})
   }, [bridgeWidget])
 
   const openSwapWidget = useCallback(() => {
-    swapWidget.mount('swap-target')
+    swapWidget.mount('swap-target', {})
   }, [swapWidget])
 
   const openOnRampWidget = useCallback(() => {
-    onRampWidget.update({params: {web3Provider}})
-    onRampWidget.mount('onramp-target')
+    onRampWidget.mount('onramp-target', {})
   }, [onRampWidget, web3Provider])
 
   const handleBuyClick = () => {
@@ -132,7 +123,7 @@ export const MainPage = () => {
           <div id="swap-target"></div>
           <div id="bridge-target"></div>
           <div id="onramp-target"></div>
-          <Box sx={{display: 'flex', flexDirection: 'row', gap: 'base.spacing.x4', flexWrap: 'wrap'}}>
+          {/* <Box sx={{display: 'flex', flexDirection: 'row', gap: 'base.spacing.x4', flexWrap: 'wrap'}}>
               {cardKeys.map((val) => (
                 <Box key={val} sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
                   <Card sx={{width: '240px', marginBottom: 'base.spacing.x2'}}>
@@ -144,7 +135,7 @@ export const MainPage = () => {
                   <Button variant={doneSwap ? "primary" : "tertiary"} disabled={!doneSwap} onClick={handleBuyClick}>Buy</Button>
                 </Box>
               ))}
-          </Box>
+          </Box> */}
       </Box>
     </Box>
   );

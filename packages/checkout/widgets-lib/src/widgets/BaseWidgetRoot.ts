@@ -9,6 +9,7 @@ import {
   IMTBLWidgetEvents,
   ProviderEventType,
   ProviderUpdated,
+  WidgetParameters,
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import {
@@ -27,6 +28,8 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
 
   protected properties: WidgetProperties<T>;
 
+  protected parameters: WidgetParameters[T];
+
   protected web3Provider: Web3Provider | undefined;
 
   protected eventHandlers: Map<keyof WidgetEventData[T], Function> = new Map<keyof WidgetEventData[T], Function>();
@@ -37,10 +40,11 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
 
   constructor(sdk: Checkout, props: WidgetProperties<T>) {
     const validatedProps = this.getValidatedProperties(props);
+    this.parameters = {};
 
     this.checkout = sdk;
     this.properties = validatedProps;
-    this.web3Provider = validatedProps.params?.web3Provider;
+    this.web3Provider = props?.provider;
     if (this.web3Provider) {
       this.subscribeToEIP1193Events();
     }
@@ -48,22 +52,24 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
   }
 
   unmount() {
-    this.reactRoot?.unmount();
-    document.getElementById(this.targetId as string)?.replaceChildren();
-    this.reactRoot = undefined;
-  }
-
-  destroy(): void {
     this.properties = this.getValidatedProperties({
-      params: {},
       config: {},
-    });
+    }); // should keep properties
+    this.getValidatedParameters({}); // should clear params
+
     this.reactRoot?.unmount();
     document.getElementById(this.targetId as string)?.replaceChildren();
     this.reactRoot = undefined;
   }
 
-  mount(id: string) {
+  mount(id: string, params: WidgetParameters[T]) {
+    // validate and set params
+    console.log('validating and setting parameters');
+    this.parameters = this.getValidatedParameters({
+      ...(this.parameters ?? {}),
+      ...(params ?? {}),
+    });
+
     this.targetId = id;
     const targetElement = document.getElementById(id);
 
@@ -86,10 +92,6 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
 
   update(properties: WidgetProperties<T>): void {
     this.properties = this.getValidatedProperties({
-      params: {
-        ...(this.properties.params ?? {}),
-        ...(properties.params ?? {}),
-      },
       config: {
         ...(this.properties.config ?? {}),
         ...(properties.config ?? {}),
@@ -140,8 +142,14 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
     });
   }
 
+  // Abstract methods
   protected abstract render(): void;
-  protected abstract getValidatedProperties(props: WidgetProperties<T>): WidgetProperties<T>;
+  protected abstract getValidatedProperties(
+    props: WidgetProperties<T>
+  ): WidgetProperties<T>;
+  protected abstract getValidatedParameters(
+    params: WidgetParameters[T]
+  ): WidgetParameters[T];
 
   // Subscribe to PROVIDER_UPDATED events
   private setupProviderUpdatedListener() {

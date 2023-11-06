@@ -4,6 +4,7 @@ import './widgets/definitions/global';
 export * from './widgets/definitions/events';
 export * from './widgets/definitions/types';
 export * from './widgets/definitions/parameters';
+export * from './widgets/definitions/configurations';
 
 // SDKs
 
