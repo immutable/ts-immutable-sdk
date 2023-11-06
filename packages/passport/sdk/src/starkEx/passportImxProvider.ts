@@ -21,6 +21,7 @@ import {
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 import { IMXProvider } from '@imtbl/provider';
 import AuthManager from 'authManager';
+import TypedEventEmitter from 'utils/typedEventEmitter';
 import GuardianClient from '../guardian/guardian';
 import {
   PassportEventMap, PassportEvents, UserImx, User,
@@ -31,7 +32,6 @@ import {
 } from './workflows';
 import { ConfirmationScreen } from '../confirmation';
 import { PassportConfiguration } from '../config';
-import TypedEventEmitter from '../typedEventEmitter';
 import registerStarkEx from './workflows/registerStarkEx';
 
 export interface PassportImxProviderInput {

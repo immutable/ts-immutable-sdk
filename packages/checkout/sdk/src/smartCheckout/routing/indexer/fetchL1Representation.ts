@@ -6,7 +6,9 @@ import { ChainId, IMX_ADDRESS_ZKEVM, ImxAddressConfig } from '../../../types';
 export const INDEXER_ETH_ROOT_CONTRACT_ADDRESS = '0x0000000000000000000000000000000000000001';
 
 export const getIndexerChainName = (chainId: ChainId): string => {
+  if (chainId === ChainId.IMTBL_ZKEVM_MAINNET) return 'imtbl-zkevm-mainnet';
   if (chainId === ChainId.IMTBL_ZKEVM_TESTNET) return 'imtbl-zkevm-testnet';
+  if (chainId === ChainId.IMTBL_ZKEVM_DEVNET) return 'imtbl-zkevm-devent';
   return '';
 };
 

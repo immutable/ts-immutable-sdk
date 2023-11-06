@@ -1,5 +1,6 @@
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 import { Web3Provider } from '@ethersproject/providers';
+import TypedEventEmitter from 'utils/typedEventEmitter';
 import { ConfirmationScreen } from '../confirmation';
 import registerPassportStarkEx from './workflows/registration';
 import { PassportImxProviderFactory } from './passportImxProviderFactory';
@@ -10,7 +11,6 @@ import { PassportEventMap } from '../types';
 import { PassportImxProvider } from './passportImxProvider';
 import { getStarkSigner } from './getStarkSigner';
 import { mockUserImx, testConfig } from '../test/mocks';
-import TypedEventEmitter from '../typedEventEmitter';
 
 jest.mock('@ethersproject/providers');
 jest.mock('./workflows/registration');

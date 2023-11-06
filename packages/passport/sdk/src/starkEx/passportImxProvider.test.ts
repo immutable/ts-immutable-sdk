@@ -15,7 +15,6 @@ import {
   UnsignedOrderRequest,
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
-import AuthManager from 'authManager';
 import registerPassportStarkEx from './workflows/registration';
 import { mockUserImx, testConfig, mockUser } from '../test/mocks';
 import { PassportError, PassportErrorType } from '../errors/passportError';
@@ -26,7 +25,8 @@ import {
 import { ConfirmationScreen } from '../confirmation';
 import { PassportConfiguration } from '../config';
 import { PassportEventMap, PassportEvents } from '../types';
-import TypedEventEmitter from '../typedEventEmitter';
+import TypedEventEmitter from '../utils/typedEventEmitter';
+import AuthManager from '../authManager';
 
 jest.mock('./workflows');
 jest.mock('./workflows/registration');

@@ -9,7 +9,7 @@ import axios from 'axios';
 import DeviceCredentialsManager from 'storage/device_credentials_manager';
 import * as crypto from 'crypto';
 import jwt_decode from 'jwt-decode';
-import { isTokenExpired } from './token';
+import { isTokenExpired } from './utils/token';
 import { PassportErrorType, withPassportError } from './errors/passportError';
 import {
   PassportMetadata,
