@@ -24,7 +24,7 @@ describe('SwapCoins tests', () => {
     cryptoConversions = new Map<string, number>([['eth', 1800], ['imx', 0.75]]);
     const initialSwapState: SwapState = {
       exchange: null,
-      walletProvider: null,
+      walletProviderName: null,
       network: {
         name: ChainName.IMTBL_ZKEVM_TESTNET,
         chainId: ChainId.IMTBL_ZKEVM_TESTNET,

@@ -10,26 +10,26 @@ export enum OrchestrationEventType {
 }
 
 /**
- * Represents the event object for a request to connect to a wallet provider.
- * @property {string} walletProvider - The name of the wallet provider.
+ * Represents the connect event object when the connect widget is requested.
+ * @property {string} walletProviderName - The wallet provider name.
  */
 export type RequestConnectEvent = {
-  walletProvider: string;
+  walletProviderName: string;
 };
 
 /**
- * Represents an event that requests a wallet provider.
- * @property {string} walletProvider - The requested wallet provider.
+ * Represents the wallet event object when the wallet widget is requested.
+ * @property {string} walletProviderName - The wallet provider name.
  */
 export type RequestWalletEvent = {
-  walletProvider: string;
+  walletProviderName: string;
 };
 
 /**
- * Represents an event where a token swap is requested.
+ * Represents the swap event object when the swap widget is requested.
  * @property {string} fromTokenAddress - The address of the token to swap from.
  * @property {string} toTokenAddress - The address of the token to swap to.
- * @property {string} amount - The amount of tokens to swap.
+ * @property {string} amount - The amount of from tokens to swap.
  */
 export type RequestSwapEvent = {
   fromTokenAddress: string;
@@ -38,9 +38,9 @@ export type RequestSwapEvent = {
 };
 
 /**
- * Represents a request bridge event object.
- * @property {string} tokenAddress - The address of the token.
- * @property {string} amount - The amount of the token.
+ * Represents the bridge event object when the bridge widget is requested.
+ * @property {string} tokenAddress - The address of the token to bridge.
+ * @property {string} amount - The amount of tokens to bridge.
  */
 export type RequestBridgeEvent = {
   tokenAddress: string;
@@ -48,14 +48,21 @@ export type RequestBridgeEvent = {
 };
 
 /**
- * Represents an event that is triggered when a request is made to onboard a user onto a platform.
- * @property {string} tokenAddress - The address of the token to be used for onramping.
- * @property {string} amount - The amount of tokens to be onramped.
+ * Represents the onramp event object when the onramp widget is requested.
+ * @property {string} tokenAddress - The address of the token to be used for onramp.
+ * @property {string} amount - The amount of tokens to onramp.
  */
 export type RequestOnrampEvent = {
   tokenAddress: string;
   amount: string;
 };
 
-// eslint-disable-next-line max-len
-export type OrchestrationEventData = RequestConnectEvent | RequestWalletEvent | RequestSwapEvent | RequestBridgeEvent | RequestOnrampEvent;
+/*
+* Type representing the orchestration events.
+*/
+export type OrchestrationEventData =
+  RequestConnectEvent
+  | RequestWalletEvent
+  | RequestSwapEvent
+  | RequestBridgeEvent
+  | RequestOnrampEvent;

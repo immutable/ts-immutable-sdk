@@ -173,7 +173,7 @@ describe('ConnectWidget tests', () => {
         const provider = mockPassportProvider('reject');
         cy.stub(Checkout.prototype, 'connect').as('connectStub').onFirstCall().rejects({})
           .onSecondCall()
-          .resolves({ provider: { provider } as Web3Provider, walletProvider: 'passport' });
+          .resolves({ provider: { provider } as Web3Provider, walletProviderName: 'passport' });
         cy.stub(Checkout.prototype, 'getNetworkInfo')
           .as('getNetworkInfoStub')
           .resolves({});

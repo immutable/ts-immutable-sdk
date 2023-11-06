@@ -149,7 +149,7 @@ export class Checkout {
     params: CreateProviderParams,
   ): Promise<CreateProviderResult> {
     return await provider.createProvider(
-      params.walletProvider,
+      params.walletProviderName,
       this.passport,
     );
   }

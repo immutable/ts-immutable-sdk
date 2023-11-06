@@ -6,7 +6,7 @@ import { createContext } from 'react';
 import { BalanceInfo } from '../functions/tokenBalances';
 
 export interface WalletState {
-  walletProvider: WalletProviderName | null;
+  walletProviderName: WalletProviderName | null;
   network: NetworkInfo | null;
   tokenBalances: BalanceInfo[];
   supportedTopUps: TopUpFeature | null;
@@ -20,7 +20,7 @@ export interface TopUpFeature {
 }
 
 export const initialWalletState: WalletState = {
-  walletProvider: null,
+  walletProviderName: null,
   network: null,
   tokenBalances: [],
   supportedTopUps: null,
@@ -36,21 +36,21 @@ export interface WalletAction {
 }
 
 type ActionPayload =
-  | SetWalletProviderPayload
+  | SetWalletProviderNamePayload
   | SetSwitchNetworkPayload
   | SetTokenBalancesPayload
   | SetSupportedTopUpPayload;
 
 export enum WalletActions {
-  SET_WALLET_PROVIDER = 'SET_WALLET_PROVIDER',
+  SET_WALLET_PROVIDER_NAME = 'SET_WALLET_PROVIDER_NAME',
   SET_NETWORK = 'SET_NETWORK',
   SET_TOKEN_BALANCES = 'SET_TOKEN_BALANCES',
   SET_SUPPORTED_TOP_UPS = 'SUPPORTED_TOP_UPS',
 }
 
-export interface SetWalletProviderPayload {
-  type: WalletActions.SET_WALLET_PROVIDER;
-  walletProvider: WalletProviderName;
+export interface SetWalletProviderNamePayload {
+  type: WalletActions.SET_WALLET_PROVIDER_NAME;
+  walletProviderName: WalletProviderName;
 }
 
 export interface SetSwitchNetworkPayload {
@@ -83,10 +83,10 @@ export const walletReducer: Reducer<WalletState, WalletAction> = (
   action: WalletAction,
 ) => {
   switch (action.payload.type) {
-    case WalletActions.SET_WALLET_PROVIDER:
+    case WalletActions.SET_WALLET_PROVIDER_NAME:
       return {
         ...state,
-        walletProvider: action.payload.walletProvider,
+        walletProviderName: action.payload.walletProviderName,
       };
     case WalletActions.SET_NETWORK:
       return {

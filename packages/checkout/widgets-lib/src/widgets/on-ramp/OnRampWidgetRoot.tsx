@@ -59,7 +59,7 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
 
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER2,
-      walletProvider: params?.walletProvider,
+      walletProviderName: params?.walletProviderName,
       web3Provider: params?.web3Provider,
       checkout: this.checkout,
       allowedChains: [getL1ChainId(this.checkout.config), getL2ChainId(this.checkout.config)],

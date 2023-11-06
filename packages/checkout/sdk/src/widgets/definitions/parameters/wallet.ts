@@ -4,10 +4,10 @@ import { WalletProviderName } from '../../../types';
 
 /**
  * Wallet Widget parameters
- * @property {WalletProviderName | undefined} walletProvider - The wallet provider to use for the wallet widget
+ * @property {WalletProviderName | undefined} walletProviderName - The wallet provider name to use for the wallet widget
  * @property {Web3Provider | undefined} web3Provider - The ethers Web3Provider
  */
 export type WalletWidgetParams = {
-  walletProvider?: WalletProviderName
+  walletProviderName?: WalletProviderName
   web3Provider?: Web3Provider
 };

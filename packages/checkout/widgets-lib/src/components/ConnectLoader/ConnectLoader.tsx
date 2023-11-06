@@ -45,7 +45,7 @@ export interface ConnectLoaderProps {
 
 export interface ConnectLoaderParams {
   targetLayer?: ConnectTargetLayer;
-  walletProvider?: WalletProviderName;
+  walletProviderName?: WalletProviderName;
   web3Provider?: Web3Provider;
   checkout: Checkout;
   allowedChains: ChainId[];
@@ -71,7 +71,7 @@ export function ConnectLoader({
   const {
     checkout,
     targetLayer,
-    walletProvider,
+    walletProviderName,
     allowedChains,
     web3Provider,
   } = params;
@@ -155,7 +155,7 @@ export function ConnectLoader({
   }, []);
 
   const hasNoWalletProviderNameAndNoWeb3Provider = (): boolean => {
-    if (!walletProvider && !provider) {
+    if (!walletProviderName && !provider) {
       connectLoaderDispatch({
         payload: {
           type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
@@ -172,9 +172,9 @@ export function ConnectLoader({
     try {
       // If the wallet provider name was passed through but the provider was
       // not injected then create a provider using the wallet provider name
-      if (!provider && walletProvider) {
+      if (!provider && walletProviderName) {
         const createProviderResult = await checkout.createProvider({
-          walletProvider,
+          walletProviderName,
         });
         connectLoaderDispatch({
           payload: {
@@ -326,7 +326,7 @@ export function ConnectLoader({
         handleConnectEvent,
       );
     };
-  }, [checkout, walletProvider, provider]);
+  }, [checkout, walletProviderName, provider]);
 
   return (
     <>

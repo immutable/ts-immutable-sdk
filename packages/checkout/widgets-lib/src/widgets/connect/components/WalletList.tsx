@@ -43,7 +43,7 @@ export function WalletList(props: WalletListProps) {
   const { track } = useAnalytics();
 
   const excludedWallets = useCallback(() => {
-    const passportWalletProvider = { walletProvider: WalletProviderName.PASSPORT };
+    const passportWalletProvider = { walletProviderName: WalletProviderName.PASSPORT };
     if (!excludeWallets && !passport) {
       return [passportWalletProvider];
     }
@@ -75,7 +75,7 @@ export function WalletList(props: WalletListProps) {
     if (checkout) {
       try {
         const providerResult = await checkout.createProvider({
-          walletProvider: walletProviderName,
+          walletProviderName,
         });
         const web3Provider = providerResult.provider;
 
@@ -123,7 +123,7 @@ export function WalletList(props: WalletListProps) {
         <WalletItem
           onWalletClick={onWalletClick}
           wallet={wallet}
-          key={wallet.name}
+          key={wallet.walletProviderName}
         />
       ))}
     </Box>
