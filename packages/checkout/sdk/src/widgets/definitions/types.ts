@@ -10,6 +10,8 @@ import {
   OnRampFailed,
   OnRampSuccess,
   OrchestrationEventType,
+  ProviderEventType,
+  ProviderUpdated,
   RequestBridgeEvent,
   RequestConnectEvent,
   RequestOnrampEvent,
@@ -94,6 +96,10 @@ type OrchestrationMapping = {
   [OrchestrationEventType.REQUEST_ONRAMP]: RequestOnrampEvent,
 };
 
+type ProviderEventMapping = {
+  [ProviderEventType.PROVIDER_UPDATED]: ProviderUpdated
+};
+
 /**
  * Mapping of widget type, to each of it's events and then each event's payload
  * Update this whenever a new event is created and used by a widget
@@ -104,39 +110,39 @@ export type WidgetEventData = {
     [ConnectEventType.SUCCESS]: ConnectionSuccess,
     [ConnectEventType.FAILURE]: ConnectionFailed,
     [ConnectEventType.CLOSE_WIDGET]: {},
-  } & OrchestrationMapping,
+  } & OrchestrationMapping & ProviderEventMapping,
 
   [WidgetType.WALLET]: {
     [WalletEventType.NETWORK_SWITCH]: WalletNetworkSwitchEvent
     [WalletEventType.DISCONNECT_WALLET]: WalletDisconnectWalletEvent
     [WalletEventType.CLOSE_WIDGET]: {}
-  } & OrchestrationMapping,
+  } & OrchestrationMapping & ProviderEventMapping,
 
   [WidgetType.SWAP]: {
     [SwapEventType.SUCCESS]: SwapSuccess,
     [SwapEventType.FAILURE]: SwapFailed,
     [SwapEventType.REJECTED]: SwapRejected,
     [SwapEventType.CLOSE_WIDGET]: {},
-  } & OrchestrationMapping
+  } & OrchestrationMapping & ProviderEventMapping
 
   [WidgetType.BRIDGE]: {
     [BridgeEventType.SUCCESS]: BridgeSuccess,
     [BridgeEventType.FAILURE]: BridgeFailed,
     [BridgeEventType.CLOSE_WIDGET]: {}
-  } & OrchestrationMapping,
+  } & OrchestrationMapping & ProviderEventMapping,
 
   [WidgetType.ONRAMP]: {
     [OnRampEventType.SUCCESS]: OnRampSuccess,
     [OnRampEventType.FAILURE]: OnRampFailed,
     [OnRampEventType.CLOSE_WIDGET]: {},
-  } & OrchestrationMapping,
+  } & OrchestrationMapping & ProviderEventMapping,
 
   [WidgetType.SALE]: {
     [SaleEventType.SUCCESS]: SaleSuccess,
     [SaleEventType.FAILURE]: SaleFailed,
     [SaleEventType.REJECTED]: any,
     [SaleEventType.CLOSE_WIDGET]: {},
-  } & OrchestrationMapping
+  } & OrchestrationMapping & ProviderEventMapping
 };
 
 /**
@@ -163,6 +169,17 @@ export type WidgetEvent<T extends WidgetType, KEventName extends keyof WidgetEve
 export type OrchestrationEvent<KEventName extends keyof OrchestrationMapping> = {
   type: KEventName,
   data: OrchestrationMapping[KEventName];
+};
+
+/**
+ * Represents an event emitted by a widget.
+ * @template KEventName - The provider event name.
+ * @property {KEventName} type - The type of the event.
+ * @property {ProviderEventMapping[KEventName]} data - The data associated with the event.
+ */
+export type ProviderEvent<KEventName extends keyof ProviderEventMapping> = {
+  type: KEventName,
+  data: ProviderEventMapping[KEventName];
 };
 
 export interface IWidgetsFactory {

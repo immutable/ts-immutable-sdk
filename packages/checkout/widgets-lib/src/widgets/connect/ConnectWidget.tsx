@@ -34,7 +34,7 @@ import {
 import { StatusType } from '../../components/Status/StatusType';
 import { StatusView } from '../../components/Status/StatusView';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { getTargetLayerChainId } from '../../lib';
+import { getTargetLayerChainId, sendProviderUpdatedEvent } from '../../lib';
 import { SwitchNetworkEth } from './views/SwitchNetworkEth';
 import { ErrorView } from '../../views/error/ErrorView';
 import { text } from '../../resources/text/textConfig';
@@ -145,6 +145,7 @@ export function ConnectWidget({
       screen: 'ConnectSuccess',
     });
     await identifyUser(identify, provider);
+    sendProviderUpdatedEvent({ provider });
     sendConnectSuccessEvent(eventTarget, provider, walletProviderName ?? undefined);
   }, [provider, identify]);
 

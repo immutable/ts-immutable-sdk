@@ -10,6 +10,7 @@ import {
   NetworkInfo,
   SwitchNetworkParams,
 } from '@imtbl/checkout-sdk';
+import { sendProviderUpdatedEvent } from 'lib/providerEvents';
 import { WalletActions, WalletContext } from '../../context/WalletContext';
 import { text } from '../../../../resources/text/textConfig';
 import { sendNetworkSwitchEvent } from '../../WalletWidgetEvents';
@@ -100,6 +101,7 @@ export function NetworkMenu({ setBalancesLoading }: NetworkMenuProps) {
           },
         });
 
+        sendProviderUpdatedEvent({ provider });
         sendNetworkSwitchEvent(eventTarget, switchNetworkResult.provider, switchNetworkResult.network);
       } catch (err: any) {
         setBalancesLoading(false);
