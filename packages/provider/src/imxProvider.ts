@@ -31,6 +31,12 @@ export interface IMXProvider {
    */
   registerOffchain(): Promise<RegisterUserResponse>;
   /**
+   *  Checks if a User is registered off-chain
+   *
+   *  @return {Promise<boolean>} Returns a promise that resolves with true if the User is registered with IMX, false otherwise
+   */
+  isRegisteredOffchain(): Promise<boolean>;
+  /**
    * Checks if a User is registered on-chain
    *
    * @return {Promise<boolean>} Returns a promise that resolves with true if the User is registered, false otherwise
