@@ -17,7 +17,7 @@ import {
 import { ConfirmationScreen } from './confirmation';
 import { ZkEvmProvider } from './zkEvm';
 import { Provider } from './zkEvm/types';
-import TypedEventEmitter from './typedEventEmitter';
+import TypedEventEmitter from './utils/typedEventEmitter';
 
 export class Passport {
   private readonly authManager: AuthManager;
