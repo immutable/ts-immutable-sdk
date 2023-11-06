@@ -258,7 +258,17 @@ describe('Passport', () => {
       expect(user).toEqual(mockUser.profile);
     });
 
-    it('should signIn and get a user', async () => {
+    it('should login if login sliently returns error', async () => {
+      loginSilentMock.mockRejectedValue(new Error('Unknown or invalid refresh token.'));
+      authLoginMock.mockReturnValue(mockUserImx);
+      const user = await passport.login();
+
+      expect(loginSilentMock).toBeCalledTimes(1);
+      expect(authLoginMock).toBeCalledTimes(1);
+      expect(user).toEqual(mockUser.profile);
+    });
+
+    it('should login and get a user', async () => {
       loginSilentMock.mockReturnValue(null);
       authLoginMock.mockReturnValue(mockUserImx);
       const user = await passport.login();
