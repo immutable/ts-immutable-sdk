@@ -54,8 +54,8 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
   unmount() {
     this.properties = this.getValidatedProperties({
       config: {},
-    }); // should keep properties
-    this.getValidatedParameters({}); // should clear params
+    }); // TODO: should keep properties
+    this.getValidatedParameters({}); // TODO: should clear params
 
     this.reactRoot?.unmount();
     document.getElementById(this.targetId as string)?.replaceChildren();
@@ -63,8 +63,6 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
   }
 
   mount(id: string, params: WidgetParameters[T]) {
-    // validate and set params
-    console.log('validating and setting parameters');
     this.parameters = this.getValidatedParameters({
       ...(this.parameters ?? {}),
       ...(params ?? {}),

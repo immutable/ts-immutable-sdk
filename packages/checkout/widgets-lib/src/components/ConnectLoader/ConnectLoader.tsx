@@ -3,7 +3,6 @@ import { Web3Provider } from '@ethersproject/providers';
 import {
   ChainId,
   Checkout,
-  GetNetworkParams,
   WalletProviderName,
   ConnectTargetLayer,
   CheckoutErrorType,
@@ -175,8 +174,20 @@ export function ConnectLoader({
           return;
         }
 
+        // Set the provider in state once it is created and is connected
+        connectLoaderDispatch({
+          payload: {
+            type: ConnectLoaderActions.SET_PROVIDER,
+            provider: web3Provider!,
+          },
+        });
+
         try {
-          const currentNetworkInfo = await checkout.getNetworkInfo({ provider: web3Provider } as GetNetworkParams);
+          const currentNetworkInfo = await checkout.getNetworkInfo({ provider: web3Provider! });
+
+          // TODO: do this instead, replace chainId check with below code instead of checkout.getNetworkInfo
+          // Also, skip the entire section if it is Passport.
+          // const currentChainId = await web3Provider?.getSigner().getChainId();
 
           // If unsupported network or current network is not in the allowed chains
           // then show the switch network screen
@@ -202,13 +213,6 @@ export function ConnectLoader({
           return;
         }
 
-        connectLoaderDispatch({
-          payload: {
-            type: ConnectLoaderActions.SET_PROVIDER,
-            provider: web3Provider!,
-          },
-        });
-
         // The user is connected and the widget will be shown
         connectLoaderDispatch({
           payload: {
@@ -229,9 +233,9 @@ export function ConnectLoader({
 
   return (
     <>
-      {connectionStatus === ConnectionStatus.LOADING && (
+      {(connectionStatus === ConnectionStatus.LOADING) && (
         <BiomeCombinedProviders theme={{ base: biomeTheme }}>
-          <LoadingView loadingText="Connecting" />
+          <LoadingView loadingText="Loading" />
         </BiomeCombinedProviders>
       )}
       <ConnectLoaderContext.Provider value={connectLoaderReducerValues}>
