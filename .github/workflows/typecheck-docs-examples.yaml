@@ -1,0 +1,56 @@
+# typecheck the code snippets in the docs repo against the built version of the
+# sdk from the current branch to raise broken code examples in our docs
+name: Typecheck Docs Code Snippets
+
+on:
+  # TODO - remove push trigger
+  push:
+  # TODO - uncomment workflow_run trigger  
+  # workflow_run:
+  #   workflows: ["Publish to NPM"]
+  #   types:
+  #     - completed    
+
+jobs:
+  TypecheckDocsCodeSnippets:
+    name: Typecheck Docs Code Snippets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: lts/*
+          cache: 'yarn'
+
+      - name: Checkout Docs Repo
+        uses: actions/checkout@v3
+        with:
+          repository: immutable/imx-docs
+          token: ${{ secrets.PLATFORM_SA_GITHUB_TOKEN }}
+          path: imx-docs
+          ref: main
+
+      # Typecheck Code Snippets in Docs Repo with latest version of SDK
+      - name: Typecheck Code Snippets
+        id: docs_typecheck 
+        run: |
+          cd imx-docs
+          yarn add @imtbl/sdk@file:../sdk
+          yarn build-examples
+
+      - name: Notify SDK Slack Docs Typecheck Success
+        if: ${{ success() && steps.docs_typecheck.conclusion == 'success' }}
+        uses: ./.github/actions/notify-slack-publish-status
+        with:
+          message: "✅ Typecheck passed for docs.immutable.com code snippets."
+
+      - name: Notify SDK Slack Docs Typecheck Failure
+        if: ${{ failure() }}
+        uses: ./.github/actions/notify-slack-publish-status
+        with:
+          message: "❌ *`${{ env.GITHUB_USER }}`* Typecheck errors found in docs.immutable.com code snippets. Please check the logs for more details and fix!"
