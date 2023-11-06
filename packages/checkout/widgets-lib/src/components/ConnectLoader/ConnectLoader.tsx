@@ -228,6 +228,13 @@ export function ConnectLoader({
       case ProviderEventType.PROVIDER_UPDATED: {
         const eventData = event.detail.data as ProviderUpdated;
 
+        // connectLoaderDispatch({
+        //   payload: {
+        //     type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
+        //     connectionStatus: ConnectionStatus.LOADING,
+        //   },
+        // });
+
         // WT-1698 Analytics - No need to call Identify here as it is
         // called in the Connect Widget when raising the ConnectSuccess event
         connectLoaderDispatch({
@@ -237,12 +244,6 @@ export function ConnectLoader({
           },
         });
 
-        connectLoaderDispatch({
-          payload: {
-            type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
-            connectionStatus: ConnectionStatus.CONNECTED_WITH_NETWORK,
-          },
-        });
         break;
       }
       default:
