@@ -18,7 +18,7 @@ Table of contents
     - [Link packages to each other](#link-packages-to-each-other)
     - [Generate OpenAPI clients](#generate-openapi-clients)
     - [Building](#building)
-    - [API key and Client App Id](#API-key-and-Client-App-Id)
+    - [API key and Publishable API key](#API-key-and-Publishable-API-key)
     - [Linting](#linting)
       - [ESLint Tooling](#eslint-tooling)
       - [Exclude Lists](#exclude-lists)
@@ -122,39 +122,39 @@ If you run out of memory, set NODE_OPTIONS to limit Node's use of memory (this a
 export NODE_OPTIONS=--max-old-space-size=14366
 ```
 
-### API key and Client App Id
+### API key and Publishable API key
 
-You can mark the API key and/or client app ID as required fields or remove them from your SDK configuration:
+You can mark the API key and/or publishable API key as required fields or remove them from your SDK configuration:
 ```ts
 // We use checkout sdk as an example.
 export interface CheckoutOverrides {
-  // The below marks CheckoutModuleConfiguration to have clientAppId field required and apiKey field omitted.
+  // The below marks CheckoutModuleConfiguration to have publishableAPIKey field required and apiKey field omitted.
   apiKey: "omit";
-  clientAppId: "required";
+  publishableAPIKey: "required";
 }
 export interface CheckoutModuleConfiguration extends ModuleConfiguration<CheckoutOverrides> {}
 ```
 
-`Api key` and `client app id` are meant to be added to request headers. 
+`Api key` and `Publishable API key` are meant to be added to request headers. 
 
 For `Api key`, it's done automatically by generated client. No action required.
 
-For `client app id`, we can do the following:
+For `Publishable API key`, we can do the following:
 
 ```ts
 export class Checkout {
   constructor(
     config: CheckoutModuleConfiguration,
   ) {
-    // imported from '@imtbl/config', addClientAppIdToAxiosHeader
-    // adds x-immutable-client-app-id header to all axios requests
-    addClientAppIdToAxiosHeader(config.baseConfig.clientAppId); 
+    // imported from '@imtbl/config', addPublishableAPIKeyToAxiosHeader
+    // adds x-immutable-publishable-api-key header to all axios requests
+    addPublishableAPIKeyToAxiosHeader(config.baseConfig.publishableAPIKey); 
 
     // You can also remove these headers.
-    axios.defaults.headers.common['x-immutable-client-app-id'] = undefined;
+    axios.defaults.headers.common['x-immutable-publishable-api-key'] = undefined;
 
     // Or apply them to particular request methods
-    axios.defaults.headers.delete['x-immutable-client-app-id'] = undefined;
+    axios.defaults.headers.delete['x-immutable-publishable-api-key'] = undefined;
 
     // Or you can save the config in the instance of this class and reference them in individual methods.
   }
@@ -164,8 +164,8 @@ export class Checkout {
 > **Warning**
 > Please make sure your sdk still works properly after the step above. Because extra headers may make your request invalid in the infrastructure you use. e.g. cloudfront.
 
-#### Client app id usage data
-Client app id usage together with the relevant org id, project id and environment id will be available in segement under event source `Onboarding - API - ${Dev|Sandbox|Prod}`. You can set up event destination (data lake/looker) together with appropriate filters to surface endpoint usages called by your sdk per customer/project/environment.
+#### Publishable API key usage data
+Publishable API key usage together with the relevant org id, project id and environment id will be available in segement under event source `Onboarding - API - ${Dev|Sandbox|Prod}`. You can set up event destination (data lake/looker) together with appropriate filters to surface endpoint usages called by your sdk per customer/project/environment.
 
 ### Linting
 
