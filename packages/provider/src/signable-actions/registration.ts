@@ -54,7 +54,7 @@ export async function isRegisteredOffchain(ethAddress: string, config: ProviderC
     });
     const { accounts } = getUsersResult.data;
 
-    return accounts.length > 0;
+    return accounts?.length > 0;
   } catch (ex) {
     if (ex instanceof AxiosError && ex.response?.status === 404) {
       return false;
