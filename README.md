@@ -147,14 +147,14 @@ export class Checkout {
     config: CheckoutModuleConfiguration,
   ) {
     // imported from '@imtbl/config', addPublishableKeyToAxiosHeader
-    // adds x-immutable-publishable-api-key header to all axios requests
+    // adds x-immutable-publishable-key header to all axios requests
     addPublishableKeyToAxiosHeader(config.baseConfig.publishableKey); 
 
     // You can also remove these headers.
-    axios.defaults.headers.common['x-immutable-publishable-api-key'] = undefined;
+    axios.defaults.headers.common['x-immutable-publishable-key'] = undefined;
 
     // Or apply them to particular request methods
-    axios.defaults.headers.delete['x-immutable-publishable-api-key'] = undefined;
+    axios.defaults.headers.delete['x-immutable-publishable-key'] = undefined;
 
     // Or you can save the config in the instance of this class and reference them in individual methods.
   }

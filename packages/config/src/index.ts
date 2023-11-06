@@ -40,7 +40,7 @@ export const addPublishableKeyToAxiosHeader = (publishableKey: string) => {
       + ' https://hub.immutable.com',
     );
   }
-  axios.defaults.headers.common['x-immutable-publishable-api-key'] = publishableKey;
+  axios.defaults.headers.common['x-immutable-publishable-key'] = publishableKey;
 };
 
 export const addRateLimitingKeyToAxiosHeader = (rateLimitingKey: string) => {
