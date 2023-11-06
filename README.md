@@ -18,6 +18,7 @@ Table of contents
     - [Link packages to each other](#link-packages-to-each-other)
     - [Generate OpenAPI clients](#generate-openapi-clients)
     - [Building](#building)
+    - [API key and Client App Id](#API-key-and-Client-App-Id)
     - [Linting](#linting)
       - [ESLint Tooling](#eslint-tooling)
       - [Exclude Lists](#exclude-lists)
@@ -134,7 +135,11 @@ export interface CheckoutOverrides {
 export interface CheckoutModuleConfiguration extends ModuleConfiguration<CheckoutOverrides> {}
 ```
 
-`Api key` and `client app id` are meant to be added to request headers. To make sure they are attached to headers properly, we can do the following:
+`Api key` and `client app id` are meant to be added to request headers. 
+
+For `Api key`, it's done automatically by generated client. No action required.
+
+For `client app id`, we can do the following:
 
 ```ts
 export class Checkout {
@@ -146,20 +151,15 @@ export class Checkout {
     addClientAppIdToAxiosHeader(config.baseConfig.clientAppId); 
 
     // You can also remove these headers.
-    axios.defaults.headers.common['x-api-key'] = undefined;
-    axios.defaults.headers.common['x-immutable-api-key'] = undefined;
     axios.defaults.headers.common['x-immutable-client-app-id'] = undefined;
 
     // Or apply them to particular request methods
-    axios.defaults.headers.get['x-api-key'] = undefined;
-    axios.defaults.headers.post['x-immutable-api-key'] = undefined;
     axios.defaults.headers.delete['x-immutable-client-app-id'] = undefined;
 
     // Or you can save the config in the instance of this class and reference them in individual methods.
   }
 }
 ```
-There is also `addApiKeyToAxiosHeader` function exposed by `@imtbl/config` package to add `x-immutable-api-key` header to all axios request
 
 > **Warning**
 > Please make sure your sdk still works properly after the step above. Because extra headers may make your request invalid in the infrastructure you use. e.g. cloudfront.
