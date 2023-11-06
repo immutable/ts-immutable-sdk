@@ -38,6 +38,7 @@ export const getTokenBalances = async (
     }),
     DEFAULT_BALANCE_RETRY_POLICY,
   );
+  if (!getAllBalancesResult) return [];
 
   const sortedTokens = sortTokensByAmount(
     checkout.config,
