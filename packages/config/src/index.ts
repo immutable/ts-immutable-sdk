@@ -11,20 +11,20 @@ export class ImmutableConfiguration {
 
   readonly apiKey?: string;
 
-  readonly publishableAPIKey?: string;
+  readonly publishableKey?: string;
 
   constructor(options: {
     environment: Environment;
     rateLimitingKey?: string;
     apiKey?: string;
-    publishableAPIKey?: string;
+    publishableKey?: string;
   }) {
     this.environment = options.environment;
   }
 }
 
 const API_KEY_PREFIX = 'sk_imapik-';
-const PUBLISHABLE_API_KEY_PREFIX = 'cai_imapik-';
+const PUBLISHABLE_KEY_PREFIX = 'cai_imapik-';
 
 export const addApiKeyToAxiosHeader = (apiKey: string) => {
   if (!apiKey.startsWith(API_KEY_PREFIX)) {
@@ -33,14 +33,14 @@ export const addApiKeyToAxiosHeader = (apiKey: string) => {
   axios.defaults.headers.common['x-immutable-api-key'] = apiKey;
 };
 
-export const addPublishableAPIKeyToAxiosHeader = (publishableAPIKey: string) => {
-  if (!publishableAPIKey.startsWith(PUBLISHABLE_API_KEY_PREFIX)) {
+export const addPublishableKeyToAxiosHeader = (publishableKey: string) => {
+  if (!publishableKey.startsWith(PUBLISHABLE_KEY_PREFIX)) {
     throw new Error(
-      'Invalid Publishable API key. Create your Publishable API key in Immutable developer hub.'
+      'Invalid Publishable key. Create your Publishable key in Immutable developer hub.'
       + ' https://hub.immutable.com',
     );
   }
-  axios.defaults.headers.common['x-immutable-publishable-api-key'] = publishableAPIKey;
+  axios.defaults.headers.common['x-immutable-publishable-api-key'] = publishableKey;
 };
 
 export const addRateLimitingKeyToAxiosHeader = (rateLimitingKey: string) => {
@@ -49,7 +49,7 @@ export const addRateLimitingKeyToAxiosHeader = (rateLimitingKey: string) => {
 
 type ImmutableConfigurationWithRequireableFields<T> = ImmutableConfiguration &
 (T extends { apiKey: 'required'; } ? Required<{ apiKey: string; }> : {}) &
-(T extends { publishableAPIKey: 'required'; } ? Required<{ publishableAPIKey: string; }> : {});
+(T extends { publishableKey: 'required'; } ? Required<{ publishableKey: string; }> : {});
 
 type ImmutableConfigurationWithOmitableFields<T> =
   (T extends { apiKey: 'omit'; } ?
