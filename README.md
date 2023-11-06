@@ -18,7 +18,7 @@ Table of contents
     - [Link packages to each other](#link-packages-to-each-other)
     - [Generate OpenAPI clients](#generate-openapi-clients)
     - [Building](#building)
-    - [API key and Publishable key](#API-key-and-Publishable-API-key)
+    - [API key and Publishable key](#API-key-and-Publishable-key)
     - [Linting](#linting)
       - [ESLint Tooling](#eslint-tooling)
       - [Exclude Lists](#exclude-lists)
