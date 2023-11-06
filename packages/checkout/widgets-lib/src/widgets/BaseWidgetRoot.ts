@@ -52,10 +52,9 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
   }
 
   unmount() {
-    this.properties = this.getValidatedProperties({
-      config: {},
-    }); // TODO: should keep properties
-    this.getValidatedParameters({}); // TODO: should clear params
+    // We want to keep the properties (config and provider) across mounts
+    // Clear the parameters on unmount as we don't want to keep them across mounts
+    this.parameters = this.getValidatedParameters({});
 
     this.reactRoot?.unmount();
     document.getElementById(this.targetId as string)?.replaceChildren();
@@ -68,6 +67,8 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
       ...(params ?? {}),
     });
 
+    // TODO: log some sort of warning to console if we don't find a target element by it's id
+    // return early
     this.targetId = id;
     const targetElement = document.getElementById(id);
 
@@ -157,7 +158,11 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
     );
   }
 
-  // Handles the PROVIDER_UPDATED event by removing and re-adding EIP-1193 event listeners
+  /**
+   * Handles the PROVIDER_UPDATED event by and sets web3Provider on widgetRoot
+   * This must unsubscribe and re-subscribe to EIP-1193 events on the underlying provider
+   * After setting the new web3Provider, render the widget again.
+   */
   private handleProviderUpdatedEvent = ((event: CustomEvent) => {
     const widgetRoot = this;
     switch (event.detail.type) {
@@ -185,7 +190,9 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
       addAccountsChangedListener(widgetRoot.web3Provider!, (e: string[]) => {
         widgetRoot.handleAccountsChanged(e, widgetRoot);
       });
-      addChainChangedListener(widgetRoot.web3Provider!, () => { widgetRoot.handleChainChanged(widgetRoot); });
+      addChainChangedListener(widgetRoot.web3Provider!, () => {
+        widgetRoot.handleChainChanged(widgetRoot);
+      });
     }
   }
 
