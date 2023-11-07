@@ -106,7 +106,7 @@ jobs:
         if: ${{ contains(steps.reviewer-teams.outputs.teams, 'Wallets') && !contains(github.event.pull_request.title, 'SKIP-CY') }}
         run: yarn test:checkout:cypress
         env:
-          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_DASHBOARD_SECRET }}
+          CYPRESS_RECORD_KEY: ${{ secrets.CHECKOUT_CYPRESS_DASHBOARD_SECRET }}
           # Recommended: pass the GitHub token lets this action correctly
           # determine the unique run id necessary to re-run the checks
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
