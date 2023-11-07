@@ -27,11 +27,6 @@ export function PurchaseMenuItem({ fundingRoute }: PurchaseMenuItemProps) {
       return;
     }
 
-    // ! cryptoFiatState uncomment to see actual values.
-    // cryptoFiatState.conversions = new Map<string, number>(
-    //   [['eth', 100], ['imx', 100000], ['zktkn', 100000], ['timx', 100000], ['zkone', 100000]],
-    // );
-
     setUsdPurchaseAmount(
       calculateCryptoToFiat(
         firstFundingStep.fundingItem.fundsRequired.formattedAmount,
@@ -46,6 +41,7 @@ export function PurchaseMenuItem({ fundingRoute }: PurchaseMenuItemProps) {
       emphasized
       testId="funding-route-purchase-item"
       size="medium"
+      key={firstItem.name}
     >
       <MenuItem.FramedImage
         imageUrl={firstItem?.image}
