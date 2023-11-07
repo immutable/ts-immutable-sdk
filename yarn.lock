@@ -3699,7 +3699,6 @@ __metadata:
     "@jest/globals": ^29.5.0
     "@magic-ext/oidc": ^4.2.0
     "@metamask/detect-provider": ^2.0.0
-    "@opensea/seaport-js": 2.0.7
     "@rollup/plugin-commonjs": ^24.0.1
     "@rollup/plugin-json": ^6.0.0
     "@rollup/plugin-node-resolve": ^15.0.2
