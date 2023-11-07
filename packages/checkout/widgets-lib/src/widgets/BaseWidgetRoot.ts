@@ -17,9 +17,9 @@ import {
   addChainChangedListener,
   removeAccountsChangedListener,
   removeChainChangedListener,
-  sendProviderUpdatedEvent,
 } from 'lib';
 import { StrongCheckoutWidgetsConfig, withDefaultWidgetConfigs } from '../lib/withDefaultWidgetConfig';
+import { baseWidgetProviderEvent, handleAccountsChanged, handleChainChanged } from './eip1193Events';
 
 export abstract class Base<T extends WidgetType> implements Widget<T> {
   protected checkout: Checkout;
@@ -50,8 +50,8 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
     this.properties = validatedProps;
     this.web3Provider = props?.provider;
     if (this.web3Provider) {
-      this.subscribeToEIP1193Events();
-      //
+      addAccountsChangedListener(this.web3Provider, handleAccountsChanged);
+      addChainChangedListener(this.web3Provider, handleChainChanged);
     }
     this.setupProviderUpdatedListener();
   }
@@ -155,12 +155,22 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
     params: WidgetParameters[T]
   ): WidgetParameters[T];
 
-  // Subscribe to PROVIDER_UPDATED events
+  // Subscribe to PROVIDER_UPDATED events from our widgets
   private setupProviderUpdatedListener() {
     window.addEventListener(
       IMTBLWidgetEvents.IMTBL_WIDGETS_PROVIDER,
       this.handleProviderUpdatedEvent,
     );
+    const widgetRoot = this;
+    window.addEventListener(baseWidgetProviderEvent, () => widgetRoot.handleEIP1193ProviderEvents(widgetRoot));
+  }
+
+  private handleEIP1193ProviderEvents(widgetRoot: Base<T>) {
+    if (widgetRoot.web3Provider) {
+      // eslint-disable-next-line no-param-reassign
+      widgetRoot.web3Provider = new Web3Provider(widgetRoot.web3Provider!.provider);
+    }
+    widgetRoot.render();
   }
 
   /**
@@ -170,71 +180,26 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
    */
   private handleProviderUpdatedEvent = ((event: CustomEvent) => {
     const widgetRoot = this;
+
     switch (event.detail.type) {
       case ProviderEventType.PROVIDER_UPDATED: {
         const eventData = event.detail.data as ProviderUpdated;
 
         if (widgetRoot.web3Provider) {
-          // eslint-disable-next-line max-len
-          removeAccountsChangedListener(widgetRoot.web3Provider, this.handleProviderUpdate);
-          removeChainChangedListener(widgetRoot.web3Provider, this.handleProviderUpdate);
+          removeAccountsChangedListener(widgetRoot.web3Provider, handleAccountsChanged);
+          removeChainChangedListener(widgetRoot.web3Provider, handleChainChanged);
         }
+
         widgetRoot.web3Provider = eventData.provider;
-        this.subscribeToEIP1193Events();
+
+        if (widgetRoot.web3Provider) {
+          addAccountsChangedListener(widgetRoot.web3Provider, handleAccountsChanged);
+          addChainChangedListener(widgetRoot.web3Provider, handleChainChanged);
+        }
         this.render();
         break;
       }
       default:
     }
   }) as EventListener;
-
-  // Subscribe to EIP-1193 events if we have a web3Provider
-  private subscribeToEIP1193Events() {
-    const widgetRoot = this;
-    if (widgetRoot.web3Provider) {
-      addAccountsChangedListener(widgetRoot.web3Provider!, this.handleProviderUpdate);
-      addChainChangedListener(widgetRoot.web3Provider!, this.handleProviderUpdate);
-    }
-  }
-
-  private handleProviderUpdate(e: string[]) {
-    console.log('inside handle provider update');
-    if (this.web3Provider) {
-      console.log('inside handle provider update, got web3provider object');
-
-      const provider = new Web3Provider(this.web3Provider!.provider);
-      sendProviderUpdatedEvent({ provider });
-    }
-  }
-
-  /**
-   * Handles EIP-1193 accountsChanged event
-   * Sets the widget root provider with a new Web3Provider
-  */
-  private async handleAccountsChanged(e: string[], widgetRoot: Base<T>) {
-    if (e.length === 0) {
-      // TODO: when a user disconnects all accounts, send to the Ready To Connect screen
-      // Do we just do the same thing as below. Re-wrap the underlying provider
-      // eslint-disable-next-line no-param-reassign
-      widgetRoot.web3Provider = undefined;
-    } else {
-      if (!widgetRoot.web3Provider) return;
-      // eslint-disable-next-line no-param-reassign
-      widgetRoot.web3Provider = new Web3Provider(widgetRoot.web3Provider!.provider);
-    }
-    // widgetRoot.render();
-  }
-
-  /**
-   * Handles EIP-1193 chainChanged event
-   * Sets the widget root provider with a new Web3Provider
-  */
-  private handleChainChanged(widgetRoot: Base<T>) {
-    // trigger a re-load of the connectLoader so that the widget re loads with a new provider
-    if (!widgetRoot.web3Provider) return;
-
-    // eslint-disable-next-line no-param-reassign
-    widgetRoot.web3Provider = new Web3Provider(widgetRoot.web3Provider!.provider);
-    widgetRoot.render();
-  }
 }

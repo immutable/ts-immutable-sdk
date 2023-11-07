@@ -94,7 +94,7 @@ export function WalletBalances() {
         },
       });
     })();
-  }, [checkout, cryptoFiatDispatch, network]);
+  }, [checkout, cryptoFiatDispatch, network?.chainId]);
 
   useEffect(() => {
     const setWalletAddressFromProvider = async () => {
@@ -193,8 +193,8 @@ export function WalletBalances() {
   }, [
     checkout,
     provider,
-    network,
-    conversions,
+    network?.chainId,
+    conversions.size,
   ]);
 
   const showAddCoins = useMemo(() => {
