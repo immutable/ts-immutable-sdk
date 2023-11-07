@@ -10,7 +10,7 @@ import { PassportEventMap } from '../types';
 import { PassportImxProvider } from './passportImxProvider';
 import { getStarkSigner } from './getStarkSigner';
 import { mockUser, mockUserImx, testConfig } from '../test/mocks';
-import TypedEventEmitter from '../typedEventEmitter';
+import TypedEventEmitter from '../utils/typedEventEmitter';
 
 jest.mock('@ethersproject/providers');
 jest.mock('./workflows/registration');
@@ -158,6 +158,32 @@ describe('PassportImxProviderFactory', () => {
         mockAuthManager.login.mockResolvedValue(mockUserImx);
         mockMagicAdapter.login.mockResolvedValue(mockMagicProvider);
         mockAuthManager.loginSilent.mockResolvedValue(null);
+        mockAuthManager.login.mockResolvedValue(mockUserImx);
+
+        const result = await passportImxProviderFactory.getProvider();
+
+        expect(result).toBe(mockPassportImxProvider);
+        expect(mockAuthManager.loginSilent).toHaveBeenCalledTimes(1);
+        expect(mockAuthManager.login).toHaveBeenCalledTimes(1);
+        expect(mockMagicAdapter.login).toHaveBeenCalledWith(mockUserImx.idToken);
+        expect(mockGetSigner).toHaveBeenCalledTimes(1);
+        expect(registerPassportStarkEx).not.toHaveBeenCalled();
+        expect(PassportImxProvider).toHaveBeenCalledWith({
+          authManager: mockAuthManager,
+          starkSigner: mockStarkSigner,
+          immutableXClient,
+          config,
+          confirmationScreen,
+          passportEventEmitter,
+        });
+      });
+
+      it('should return a PassportImxProvider instance if slientLogin throws error', async () => {
+        const mockMagicProvider = {};
+
+        mockAuthManager.login.mockResolvedValue(mockUserImx);
+        mockMagicAdapter.login.mockResolvedValue(mockMagicProvider);
+        mockAuthManager.loginSilent.mockRejectedValue(new Error('error'));
         mockAuthManager.login.mockResolvedValue(mockUserImx);
 
         const result = await passportImxProviderFactory.getProvider();
