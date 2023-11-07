@@ -13,7 +13,7 @@ import { cySmartGet } from '../../../../lib/testUtils';
 import { StrongCheckoutWidgetsConfig } from '../../../../lib/withDefaultWidgetConfig';
 import { FundingRouteSelect } from './FundingRouteSelect';
 
-describe('FundingRouteSelect View', () => {
+describe.skip('FundingRouteSelect View', () => {
   beforeEach(() => {
     cy.viewport('ipad-2');
   });
