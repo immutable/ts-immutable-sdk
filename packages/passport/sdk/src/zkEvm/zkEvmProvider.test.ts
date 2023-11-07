@@ -7,7 +7,7 @@ import GuardianClient from '../guardian/guardian';
 import { RelayerClient } from './relayerClient';
 import { Provider } from './types';
 import { PassportEventMap, PassportEvents } from '../types';
-import TypedEventEmitter from '../typedEventEmitter';
+import TypedEventEmitter from '../utils/typedEventEmitter';
 import { mockUserZkEvm } from '../test/mocks';
 import { signTypedDataV4 } from './signTypedDataV4';
 
