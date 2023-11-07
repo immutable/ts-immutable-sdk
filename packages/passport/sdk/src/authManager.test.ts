@@ -386,6 +386,16 @@ describe('AuthManager', () => {
       expect(result).toEqual(null);
     });
 
+    it('should return null when the user token is expired and refresh token is invalid', async () => {
+      mockGetUser.mockReturnValue(mockOidcExpiredUser);
+      (isTokenExpired as jest.Mock).mockReturnValue(true);
+      mockSigninSilent.mockRejectedValue(new Error('invalid token'));
+      const result = await authManager.getUser();
+
+      expect(mockSigninSilent).toBeCalledTimes(1);
+      expect(result).toEqual(null);
+    });
+
     it('should return null if no user is returned', async () => {
       mockGetUser.mockReturnValue(null);
 

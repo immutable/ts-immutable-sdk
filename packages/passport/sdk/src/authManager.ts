@@ -413,7 +413,7 @@ export default class AuthManager {
     if (this.refreshingPromise) return this.refreshingPromise;
 
     // eslint-disable-next-line no-async-promise-executor
-    this.refreshingPromise = new Promise(async (resolve, reject) => {
+    this.refreshingPromise = new Promise(async (resolve) => {
       try {
         const newOidcUser = await this.userManager.signinSilent();
         if (newOidcUser) {
@@ -422,7 +422,9 @@ export default class AuthManager {
         }
         resolve(null);
       } catch (err) {
-        reject(err);
+        // eslint-disable-next-line no-console
+        console.warn(err);
+        resolve(null);
       } finally {
         this.refreshingPromise = null; // Reset the promise after completion
       }
