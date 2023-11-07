@@ -1,9 +1,14 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { Web3Provider } from '@ethersproject/providers';
-import { Checkout, FundingRoute, FundingStepType } from '@imtbl/checkout-sdk';
+import {
+  Checkout, FundingRoute, FundingStepType, RoutingOutcomeType, SmartCheckoutResult,
+} from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
-import { MAX_GAS_LIMIT, fundingRouteFees, isUserFractionalBalanceBlocked } from './smartCheckoutUtils';
 import { IMX_ADDRESS_ZKEVM } from '../../../lib';
+import {
+  MAX_GAS_LIMIT, fundingRouteFees,
+  isUserFractionalBalanceBlocked, smartCheckoutTokensList,
+} from './smartCheckoutUtils';
 
 const PURCHASE_CURRENCY_ADDRESS = '0x000000000000000000000000000000000000USDC';
 const USER_ADDRESS = '0x000000000000000000000000000000000000USER';
@@ -233,5 +238,85 @@ describe('fundingRouteFees', () => {
     const totalFees = fundingRouteFees(fundingRoute, conversions);
 
     expect(totalFees).toEqual('440.00');
+  });
+});
+
+describe('smartCheckoutTokensList', () => {
+  it('should aggregate all unique tokens within fundingRoutes', () => {
+    const smartCheckoutResult: SmartCheckoutResult = {
+      transactionRequirements: [
+        {
+          current: {
+            token: {
+              symbol: 'IMX',
+            },
+          },
+        },
+        {
+          current: {
+            token: {
+              symbol: 'zkTKN',
+            },
+          },
+        },
+      ],
+      router: {
+        routingOutcome: {
+          type: RoutingOutcomeType.ROUTES_FOUND,
+          fundingRoutes: [
+            {
+              priority: 1,
+              steps: [
+                {
+                  type: 'SWAP',
+                  fundingItem: {
+                    token: {
+                      symbol: 'IMX',
+                    },
+                  },
+                },
+              ],
+            },
+            {
+              priority: 1,
+              steps: [
+                {
+                  type: 'SWAP',
+                  fundingItem: {
+                    token: {
+                      symbol: 'ETH',
+                    },
+                  },
+                },
+              ],
+            },
+            {
+              priority: 1,
+              steps: [
+                {
+                  type: 'BRIDGE',
+                  fundingItem: {
+                    token: {
+                      symbol: 'ETH',
+                    },
+                  },
+                },
+                {
+                  type: 'SWAP',
+                  fundingItem: {
+                    token: {
+                      symbol: 'zkTKN',
+                    },
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      },
+    } as unknown as SmartCheckoutResult;
+
+    const tokens = smartCheckoutTokensList(smartCheckoutResult);
+    expect(tokens).toEqual(['IMX', 'zkTKN', 'ETH']);
   });
 });

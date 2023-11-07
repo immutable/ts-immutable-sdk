@@ -17,6 +17,7 @@ import { FundingRouteSelect } from '../components/FundingRouteSelect/FundingRout
 import { useSaleContext } from '../context/SaleContextProvider';
 import { useSaleEvent } from '../hooks/useSaleEvents';
 import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
+import { smartCheckoutTokensList } from '../functions/smartCheckoutUtils';
 
 type FundWithSmartCheckoutProps = {
   subView: FundWithSmartCheckoutSubViews;
@@ -31,19 +32,8 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
   const [fundingRouteStepIndex, setFundingRouteStepIndex] = useState<number>(0);
   const textConfig = text.views[SaleWidgetViews.FUND_WITH_SMART_CHECKOUT];
 
-  const { querySmartCheckout, fundingRoutes } = useSaleContext();
+  const { querySmartCheckout, fundingRoutes, smartCheckoutResult } = useSaleContext();
   const { cryptoFiatDispatch } = useContext(CryptoFiatContext);
-
-  // todo get real values?
-  const allowedTokens = [{
-    symbol: 'IMX',
-  }, {
-    symbol: 'ETH',
-  }, {
-    symbol: 'zkONE',
-  }, {
-    symbol: 'zkTKN',
-  }];
 
   const smartCheckoutLoading = useRef(false);
 
@@ -63,13 +53,17 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
   }, [subView]);
 
   useEffect(() => {
+    if (!cryptoFiatDispatch || !smartCheckoutResult) return;
+
+    const tokenSymbols = smartCheckoutTokensList(smartCheckoutResult);
+
     cryptoFiatDispatch({
       payload: {
         type: CryptoFiatActions.SET_TOKEN_SYMBOLS,
-        tokenSymbols: allowedTokens.map((allowedToken) => allowedToken.symbol),
+        tokenSymbols,
       },
     });
-  }, [cryptoFiatDispatch]);
+  }, [cryptoFiatDispatch, smartCheckoutResult]);
 
   const fundingRouteStep = useMemo(() => {
     if (!selectedFundingRoute) {

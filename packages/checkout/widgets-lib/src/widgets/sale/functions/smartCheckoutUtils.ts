@@ -1,11 +1,12 @@
 import { Web3Provider } from '@ethersproject/providers';
 import {
   Checkout, ERC20ItemRequirement, Fee, FundingRoute,
-  FundingStepType, GasAmount, GasTokenType, ItemType, TransactionOrGasType,
+  FundingStepType, GasAmount, GasTokenType, ItemType, RoutingOutcomeType, SmartCheckoutResult, TokenBalance,
+  TransactionOrGasType,
 } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import { parseUnits } from 'ethers/lib/utils';
-import { getL2ChainId, IMX_ADDRESS_ZKEVM } from '../../../lib';
+import { IMX_ADDRESS_ZKEVM, getL2ChainId } from '../../../lib';
 import { calculateCryptoToFiat, formatFiatString } from '../../../lib/utils';
 
 export const MAX_GAS_LIMIT = '30000000';
@@ -89,4 +90,29 @@ export const fundingRouteFees = (
     totalUsd += parseFloat(feeUsd);
   }
   return formatFiatString(totalUsd);
+};
+
+export const smartCheckoutTokensList = (
+  smartCheckoutResult: SmartCheckoutResult,
+) => {
+  if (smartCheckoutResult.sufficient
+    || smartCheckoutResult.router.routingOutcome.type !== RoutingOutcomeType.ROUTES_FOUND) {
+    return [];
+  }
+
+  const tokenSymbols: string[] = [];
+  for (const requirement of smartCheckoutResult.transactionRequirements) {
+    const { token } = (requirement.current as TokenBalance);
+    if (!tokenSymbols.includes(token.symbol)) {
+      tokenSymbols.push(token.symbol);
+    }
+  }
+  for (const fundingRoute of smartCheckoutResult.router.routingOutcome.fundingRoutes) {
+    for (const step of fundingRoute.steps) {
+      if (!tokenSymbols.includes(step.fundingItem.token.symbol)) {
+        tokenSymbols.push(step.fundingItem.token.symbol);
+      }
+    }
+  }
+  return tokenSymbols;
 };
