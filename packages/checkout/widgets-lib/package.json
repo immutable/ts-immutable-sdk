@@ -78,6 +78,7 @@
     "start": " cp src/app.tsx src/index.tsx && PORT=3001 GENERATE_SOURCEMAP=false PUBLIC_URL=/ react-app-rewired start",
     "test": "jest test --passWithNoTests",
     "test:cypress": "NODE_ENV=test cypress run --component --headless",
+    "test:cypress:ci": "NODE_ENV=test cypress run --component --headless --env coverage=true --record",
     "test:cypress:open": "NODE_ENV=test cypress open --component --browser electron",
     "test:watch": "jest test --passWithNoTests --watch",
     "typecheck": "tsc --noEmit"
