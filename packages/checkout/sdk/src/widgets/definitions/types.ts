@@ -199,6 +199,7 @@ export interface IWidgetsFactory {
    * @param type widget type to instantiate.
    */
   create<T extends WidgetType>(type: T, config: WidgetConfigurations[T], provider?: Web3Provider): Widget<T>;
+  updateProvider(provider: Web3Provider): void;
 }
 
 /**

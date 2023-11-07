@@ -13,7 +13,11 @@ import {
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import {
-  addAccountsChangedListener, addChainChangedListener, removeAccountsChangedListener, removeChainChangedListener,
+  addAccountsChangedListener,
+  addChainChangedListener,
+  removeAccountsChangedListener,
+  removeChainChangedListener,
+  sendProviderUpdatedEvent,
 } from 'lib';
 import { StrongCheckoutWidgetsConfig, withDefaultWidgetConfigs } from '../lib/withDefaultWidgetConfig';
 
@@ -47,6 +51,7 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
     this.web3Provider = props?.provider;
     if (this.web3Provider) {
       this.subscribeToEIP1193Events();
+      //
     }
     this.setupProviderUpdatedListener();
   }
@@ -171,8 +176,8 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
 
         if (widgetRoot.web3Provider) {
           // eslint-disable-next-line max-len
-          removeAccountsChangedListener(widgetRoot.web3Provider, (e: string[]) => { widgetRoot.handleAccountsChanged(e, widgetRoot); });
-          removeChainChangedListener(widgetRoot.web3Provider, () => { widgetRoot.handleChainChanged(widgetRoot); });
+          removeAccountsChangedListener(widgetRoot.web3Provider, this.handleProviderUpdate);
+          removeChainChangedListener(widgetRoot.web3Provider, this.handleProviderUpdate);
         }
         widgetRoot.web3Provider = eventData.provider;
         this.subscribeToEIP1193Events();
@@ -187,12 +192,18 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
   private subscribeToEIP1193Events() {
     const widgetRoot = this;
     if (widgetRoot.web3Provider) {
-      addAccountsChangedListener(widgetRoot.web3Provider!, (e: string[]) => {
-        widgetRoot.handleAccountsChanged(e, widgetRoot);
-      });
-      addChainChangedListener(widgetRoot.web3Provider!, () => {
-        widgetRoot.handleChainChanged(widgetRoot);
-      });
+      addAccountsChangedListener(widgetRoot.web3Provider!, this.handleProviderUpdate);
+      addChainChangedListener(widgetRoot.web3Provider!, this.handleProviderUpdate);
+    }
+  }
+
+  private handleProviderUpdate(e: string[]) {
+    console.log('inside handle provider update');
+    if (this.web3Provider) {
+      console.log('inside handle provider update, got web3provider object');
+
+      const provider = new Web3Provider(this.web3Provider!.provider);
+      sendProviderUpdatedEvent({ provider });
     }
   }
 
@@ -211,7 +222,7 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
       // eslint-disable-next-line no-param-reassign
       widgetRoot.web3Provider = new Web3Provider(widgetRoot.web3Provider!.provider);
     }
-    widgetRoot.render();
+    // widgetRoot.render();
   }
 
   /**

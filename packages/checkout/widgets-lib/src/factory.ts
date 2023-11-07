@@ -15,6 +15,7 @@ import { OnRamp } from 'widgets/on-ramp/OnRampWidgetRoot';
 import { Wallet } from 'widgets/wallet/WalletWidgetRoot';
 import { Sale } from 'widgets/sale/SaleWidgetRoot';
 import { Web3Provider } from '@ethersproject/providers';
+import { sendProviderUpdatedEvent } from './lib';
 
 export class WidgetsFactory implements IWidgetsFactory {
   private sdk: Checkout;
@@ -24,6 +25,10 @@ export class WidgetsFactory implements IWidgetsFactory {
   constructor(sdk: Checkout, widgetConfig: WidgetConfiguration) {
     this.sdk = sdk;
     this.widgetConfig = widgetConfig;
+  }
+
+  updateProvider(provider: Web3Provider) {
+    sendProviderUpdatedEvent({ provider });
   }
 
   create<T extends WidgetType>(type: T, config: WidgetConfigurations[T], provider?: Web3Provider): Widget<T> {
