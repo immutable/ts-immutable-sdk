@@ -120,6 +120,5 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
         />
       )}
     </Box>
-
   );
 }
