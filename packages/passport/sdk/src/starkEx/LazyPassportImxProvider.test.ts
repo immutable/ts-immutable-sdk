@@ -18,7 +18,7 @@ import { PassportImxProvider } from './passportImxProvider';
 import { ConfirmationScreen } from '../confirmation';
 import { PassportConfiguration } from '../config';
 import { PassportEventMap } from '../types';
-import TypedEventEmitter from '../typedEventEmitter';
+import TypedEventEmitter from '../utils/typedEventEmitter';
 import { LazyPassportImxProvider } from './LazyPassportImxProvider';
 
 let lazyProvider: LazyPassportImxProvider;
