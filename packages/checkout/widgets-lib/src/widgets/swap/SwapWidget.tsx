@@ -344,6 +344,7 @@ export function SwapWidget({
             )}
             {viewState.view.type === SharedViews.TOP_UP_VIEW && (
               <TopUpView
+                analytics={{ userJourney: UserJourney.SWAP }}
                 widgetEvent={IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT}
                 showOnrampOption={isOnRampEnabled}
                 showSwapOption={isSwapEnabled}
