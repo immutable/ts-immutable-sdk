@@ -61,17 +61,17 @@ export const MainPage = () => {
   useEffect(() => {
     walletWidget.addListener(OrchestrationEventType.REQUEST_BRIDGE, (eventData: RequestBridgeEvent) => {
       walletWidget.unmount();
-      bridgeWidget.mount('bridge-target', {fromContractAddress: eventData.tokenAddress, amount: eventData.amount, web3Provider});
+      bridgeWidget.mount('bridge-target', {fromContractAddress: eventData.tokenAddress, amount: eventData.amount});
     })
     walletWidget.addListener(OrchestrationEventType.REQUEST_SWAP, (data: RequestSwapEvent) => {
       walletWidget.unmount();
-      swapWidget.mount('swap-target', {fromContractAddress: data.fromTokenAddress, amount: data.amount, web3Provider});
+      swapWidget.mount('swap-target', {fromContractAddress: data.fromTokenAddress, amount: data.amount});
     })
     walletWidget.addListener(OrchestrationEventType.REQUEST_ONRAMP, (data: RequestOnrampEvent) => {
       walletWidget.unmount();
-      onRampWidget.mount('onramp-target', {contractAddress: data.tokenAddress, amount: data.amount, web3Provider});
+      onRampWidget.mount('onramp-target', {contractAddress: data.tokenAddress, amount: data.amount});
     })
-  }, [walletWidget, bridgeWidget, onRampWidget, swapWidget, web3Provider]);
+  }, [walletWidget, bridgeWidget, onRampWidget, swapWidget]);
 
   // button click functions to open/close widgets
   const openConnectWidget = useCallback(() => {
