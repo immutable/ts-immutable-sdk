@@ -2,11 +2,14 @@ import {
   Button, Heading, HorizontalMenu, MenuItem,
 } from '@biom3/react';
 import { ChainId, FundingRoute } from '@imtbl/checkout-sdk';
-import { tokenValueFormat } from '../../../../lib/utils';
-import { useSaleContext } from '../../context/SaleContextProvider';
-import { getChainNameById } from '../../../../lib/chainName';
-import { text } from '../../../../resources/text/textConfig';
+import { useContext, useEffect, useState } from 'react';
+import { CryptoFiatContext } from '../../../../context/crypto-fiat-context/CryptoFiatContext';
 import { SaleWidgetViews } from '../../../../context/view-context/SaleViewContextTypes';
+import { getChainNameById } from '../../../../lib/chainName';
+import { calculateCryptoToFiat, tokenValueFormat } from '../../../../lib/utils';
+import { text } from '../../../../resources/text/textConfig';
+import { useSaleContext } from '../../context/SaleContextProvider';
+import { fundingRouteFees } from '../../functions/smartCheckoutUtils';
 
 // Taken from packages/checkout/widgets-lib/src/widgets/wallet/components/NetworkMenu/NetworkMenu.tsx
 const networkIcon = {
@@ -38,11 +41,27 @@ export function FundingRouteMenuItem({
   const textConfig = text.views[SaleWidgetViews.FUND_WITH_SMART_CHECKOUT];
   const firstFundingStep = fundingRoute.steps[0];
 
+  const { cryptoFiatState } = useContext(CryptoFiatContext);
+
   const { isPassportWallet } = useSaleContext();
 
-  // todo - calculate these in useSmartCheckout hook - later PR
-  const usdBalance = '102.49';
-  const totalFees = '5.01';
+  const [feesUsd, setFeesUsd] = useState<string | undefined>(undefined);
+  const [usdBalance, setUsdBalance] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (!cryptoFiatState.conversions) {
+      return;
+    }
+
+    setFeesUsd(fundingRouteFees(fundingRoute, cryptoFiatState.conversions));
+    setUsdBalance(
+      calculateCryptoToFiat(
+        firstFundingStep.fundingItem.userBalance.formattedBalance,
+        firstFundingStep.fundingItem.token.symbol,
+        cryptoFiatState.conversions,
+      ),
+    );
+  }, [cryptoFiatState, fundingRoute]);
 
   const networkLabel = () => (
     <HorizontalMenu.Button
@@ -92,7 +111,7 @@ export function FundingRouteMenuItem({
       </MenuItem.Label>
       <MenuItem.Caption>
         Fees ≈ USD $
-        {totalFees}
+        {feesUsd}
       </MenuItem.Caption>
     </MenuItem>
   );

@@ -110,6 +110,32 @@ describe('PassportImxProviderFactory', () => {
           passportEventEmitter,
         });
       });
+
+      it('should return a PassportImxProvider instance if slientLogin throws error', async () => {
+        const mockMagicProvider = {};
+
+        mockAuthManager.login.mockResolvedValue(mockUserImx);
+        mockMagicAdapter.login.mockResolvedValue(mockMagicProvider);
+        mockAuthManager.loginSilent.mockRejectedValue(new Error('error'));
+        mockAuthManager.login.mockResolvedValue(mockUserImx);
+
+        const result = await passportImxProviderFactory.getProvider();
+
+        expect(result).toBe(mockPassportImxProvider);
+        expect(mockAuthManager.loginSilent).toHaveBeenCalledTimes(1);
+        expect(mockAuthManager.login).toHaveBeenCalledTimes(1);
+        expect(mockMagicAdapter.login).toHaveBeenCalledWith(mockUserImx.idToken);
+        expect(mockGetSigner).toHaveBeenCalledTimes(1);
+        expect(registerPassportStarkEx).not.toHaveBeenCalled();
+        expect(PassportImxProvider).toHaveBeenCalledWith({
+          authManager: mockAuthManager,
+          starkSigner: mockStarkSigner,
+          immutableXClient,
+          config,
+          confirmationScreen,
+          passportEventEmitter,
+        });
+      });
     });
   });
 });

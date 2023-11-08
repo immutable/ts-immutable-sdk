@@ -27,6 +27,7 @@ import { PayWithCoins } from './views/PayWithCoins';
 import { PaymentMethods } from './views/PaymentMethods';
 import { SaleErrorView } from './views/SaleErrorView';
 import { SaleSuccessView } from './views/SaleSuccessView';
+import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 
 export interface SaleWidgetProps {
   config: StrongCheckoutWidgetsConfig;
@@ -100,27 +101,31 @@ export function SaleWidget(props: SaleWidgetProps) {
             passport: connectLoaderParams?.passport,
           }}
         >
-          {viewState.view.type === SharedViews.LOADING_VIEW && (
+          <CryptoFiatProvider environment={config.environment}>
+
+            {viewState.view.type === SharedViews.LOADING_VIEW && (
             <LoadingView loadingText={loadingText} />
-          )}
-          {viewState.view.type === SaleWidgetViews.PAYMENT_METHODS && (
+            )}
+            {viewState.view.type === SaleWidgetViews.PAYMENT_METHODS && (
             <PaymentMethods />
-          )}
-          {viewState.view.type === SaleWidgetViews.PAY_WITH_CARD && (
+            )}
+            {viewState.view.type === SaleWidgetViews.PAY_WITH_CARD && (
             <PayWithCard />
-          )}
-          {viewState.view.type === SaleWidgetViews.PAY_WITH_COINS && (
+            )}
+            {viewState.view.type === SaleWidgetViews.PAY_WITH_COINS && (
             <PayWithCoins />
-          )}
-          {viewState.view.type === SaleWidgetViews.SALE_FAIL && (
+            )}
+            {viewState.view.type === SaleWidgetViews.SALE_FAIL && (
             <SaleErrorView biomeTheme={biomeTheme} errorType={viewState.view.data?.errorType} />
-          )}
-          {viewState.view.type === SaleWidgetViews.SALE_SUCCESS && provider && (
+            )}
+            {viewState.view.type === SaleWidgetViews.SALE_SUCCESS && provider && (
             <SaleSuccessView data={viewState.view.data} />
-          )}
-          {viewState.view.type === SaleWidgetViews.FUND_WITH_SMART_CHECKOUT && (
+            )}
+            {viewState.view.type === SaleWidgetViews.FUND_WITH_SMART_CHECKOUT && (
             <FundWithSmartCheckout subView={viewState.view.subView} />
-          )}
+            )}
+          </CryptoFiatProvider>
+
         </SaleContextProvider>
       </ViewContext.Provider>
     </BiomeCombinedProviders>
