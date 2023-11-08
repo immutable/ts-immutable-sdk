@@ -165,8 +165,6 @@ export function SaleUI() {
     }
   }, []);
 
-
-
   return (
     <>
     <div id="sale"></div>

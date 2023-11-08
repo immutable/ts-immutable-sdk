@@ -42,7 +42,7 @@ export type PassportMetadata = {
 
 export enum Networks {
   PRODUCTION = 'mainnet',
-  SANDBOX = 'goerli',
+  SANDBOX = 'sepolia',
 }
 
 export interface OidcConfiguration {

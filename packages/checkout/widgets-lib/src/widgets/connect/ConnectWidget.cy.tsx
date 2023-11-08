@@ -264,30 +264,168 @@ describe('ConnectWidget tests', () => {
   });
 
   describe('SwitchNetwork', () => {
-    beforeEach(() => {
-      cy.stub(Checkout.prototype, 'connect').as('connectStub').resolves({
-        provider: baseMockProvider as Web3Provider,
-      });
-      cy.stub(Checkout.prototype, 'createProvider')
-        .as('createProviderStub')
-        .resolves({
-          provider: baseMockProvider as Web3Provider,
+    describe('No Switch', () => {
+      beforeEach(() => {
+        cy.stub(Checkout.prototype, 'connect').as('connectStub').resolves({
+          provider: {
+            getSigner: () => ({
+              getAddress: () => Promise.resolve(''),
+              getChainId: async () => Promise.resolve(ChainId.IMTBL_ZKEVM_TESTNET),
+            }),
+          } as Web3Provider,
         });
+        cy.stub(Checkout.prototype, 'createProvider')
+          .as('createProviderStub')
+          .resolves({
+            provider: {
+              getSigner: () => ({
+                getAddress: () => Promise.resolve(''),
+                getChainId: async () => Promise.resolve(ChainId.IMTBL_ZKEVM_TESTNET),
+              }),
+            } as Web3Provider,
+          });
+      });
+
+      it('should not show switch to ZKEVM network if already connected to ZKEVM', () => {
+        mountConnectWidgetAndGoToReadyToConnect();
+        cySmartGet('ready-to-connect').should('be.visible');
+        cySmartGet('footer-button').should('have.text', 'Ready to connect');
+        cySmartGet('footer-button').click();
+        cySmartGet('switch-network-view').should('not.exist');
+        cySmartGet('success-view').should('be.visible');
+      });
     });
 
-    it('should not show switch to zkEVM network if already connected to immutable-zkevm', () => {
-      cy.stub(Checkout.prototype, 'getNetworkInfo')
-        .as('getNetworkInfoStub')
-        .resolves({
-          name: ChainName.IMTBL_ZKEVM_TESTNET,
-          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+    describe('Switch', () => {
+      beforeEach(() => {
+        cy.stub(Checkout.prototype, 'connect').as('connectStub').resolves({
+          provider: {
+            getSigner: () => ({
+              getAddress: () => Promise.resolve(''),
+              getChainId: async () => Promise.resolve(ChainId.SEPOLIA),
+            }),
+          } as Web3Provider,
         });
-      mountConnectWidgetAndGoToReadyToConnect();
-      cySmartGet('ready-to-connect').should('be.visible');
-      cySmartGet('footer-button').should('have.text', 'Ready to connect');
-      cySmartGet('footer-button').click();
-      cySmartGet('switch-network-view').should('not.exist');
-      cySmartGet('success-view').should('be.visible');
+        cy.stub(Checkout.prototype, 'createProvider')
+          .as('createProviderStub')
+          .resolves({
+            provider: {
+              getSigner: () => ({
+                getAddress: () => Promise.resolve(''),
+                getChainId: async () => Promise.resolve(ChainId.SEPOLIA),
+              }),
+            } as Web3Provider,
+          });
+      });
+
+      it('should show switch to zkEVM network if not connected to immutable-zkevm', () => {
+        cy.stub(Checkout.prototype, 'getNetworkInfo')
+          .as('getNetworkInfoStub')
+          .resolves({
+            name: 'Ethereum',
+            chainId: ChainId.ETHEREUM,
+          });
+        mountConnectWidgetAndGoToReadyToConnect();
+        cySmartGet('ready-to-connect').should('be.visible');
+        cySmartGet('footer-button').should('have.text', 'Ready to connect');
+        cySmartGet('footer-button').click();
+        cySmartGet('switch-network-view').should('be.visible');
+      });
+
+      it('should show success when ready to connect pressed and network switched', () => {
+        cy.stub(Checkout.prototype, 'getNetworkInfo')
+          .as('getNetworkInfoStub')
+          .resolves({
+            name: 'Ethereum',
+            chainId: ChainId.ETHEREUM,
+          });
+        cy.stub(Checkout.prototype, 'switchNetwork')
+          .as('switchNetworkStub')
+          .resolves({
+            provider: baseMockProvider as Web3Provider,
+            network: {
+              name: ChainName.IMTBL_ZKEVM_TESTNET,
+              chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+            },
+          });
+        mountConnectWidgetAndGoToReadyToConnect();
+        cySmartGet('ready-to-connect').should('be.visible');
+        cySmartGet('footer-button').should('have.text', 'Ready to connect');
+        cySmartGet('footer-button').click();
+        cySmartGet('switch-network-view').should('be.visible');
+        cySmartGet('footer-button').click();
+        cySmartGet('success-view').should('be.visible');
+      });
+
+      it('should show try again if network switch was rejected', () => {
+        cy.stub(Checkout.prototype, 'getNetworkInfo')
+          .as('getNetworkInfoStub')
+          .resolves({
+            name: 'Ethereum',
+            chainId: ChainId.ETHEREUM,
+          });
+        cy.stub(Checkout.prototype, 'switchNetwork')
+          .as('switchNetworkStub')
+          .rejects({});
+        mountConnectWidgetAndGoToReadyToConnect();
+        cySmartGet('ready-to-connect').should('be.visible');
+        cySmartGet('footer-button').should('have.text', 'Ready to connect');
+        cySmartGet('footer-button').click();
+        cySmartGet('switch-network-view').should('be.visible');
+        cySmartGet('footer-button').click();
+        cySmartGet('footer-button').should('have.text', 'Try Again');
+      });
+
+      it('should show success if try again and switch network succeeds', () => {
+        cy.stub(Checkout.prototype, 'getNetworkInfo')
+          .as('getNetworkInfoStub')
+          .resolves({
+            name: 'Ethereum',
+            chainId: ChainId.ETHEREUM,
+          });
+        cy.stub(Checkout.prototype, 'switchNetwork')
+          .as('switchNetworkStub')
+          .onFirstCall()
+          .rejects({})
+          .onSecondCall()
+          .resolves({
+            provider: baseMockProvider as Web3Provider,
+          });
+        mountConnectWidgetAndGoToReadyToConnect();
+        cySmartGet('ready-to-connect').should('be.visible');
+        cySmartGet('footer-button').should('have.text', 'Ready to connect');
+        cySmartGet('footer-button').click();
+        cySmartGet('switch-network-view').should('be.visible');
+        cySmartGet('footer-button').click();
+        cySmartGet('footer-button').should('have.text', 'Try Again');
+        cySmartGet('footer-button').click();
+        cySmartGet('success-view').should('be.visible');
+      });
+
+      it('should not show success if try again and switch network fails', () => {
+        cy.stub(Checkout.prototype, 'getNetworkInfo')
+          .as('getNetworkInfoStub')
+          .resolves({
+            name: 'Ethereum',
+            chainId: ChainId.ETHEREUM,
+          });
+        cy.stub(Checkout.prototype, 'switchNetwork')
+          .as('switchNetworkStub')
+          .onFirstCall()
+          .rejects({})
+          .onSecondCall()
+          .rejects({});
+        mountConnectWidgetAndGoToReadyToConnect();
+        cySmartGet('ready-to-connect').should('be.visible');
+        cySmartGet('footer-button').should('have.text', 'Ready to connect');
+        cySmartGet('footer-button').click();
+        cySmartGet('switch-network-view').should('be.visible');
+        cySmartGet('footer-button').click();
+        cySmartGet('footer-button').should('have.text', 'Try Again');
+        cySmartGet('footer-button').click();
+        cySmartGet('footer-button').should('have.text', 'Try Again');
+        cySmartGet('success-view').should('not.exist');
+      });
     });
 
     it('should show switch to zkEVM network if not connected to immutable-zkevm', () => {
@@ -350,95 +488,16 @@ describe('ConnectWidget tests', () => {
             chainId: ChainId.IMTBL_ZKEVM_TESTNET,
           },
         });
-      mountConnectWidgetAndGoToReadyToConnect();
-      cySmartGet('ready-to-connect').should('be.visible');
-      cySmartGet('footer-button').should('have.text', 'Ready to connect');
-      cySmartGet('footer-button').click();
-      cySmartGet('switch-network-view').should('be.visible');
-      cySmartGet('footer-button').click();
-      cySmartGet('success-view').should('be.visible');
-    });
-
-    it('should show try again if network switch was rejected', () => {
-      cy.stub(Checkout.prototype, 'getNetworkInfo')
-        .as('getNetworkInfoStub')
-        .resolves({
-          name: 'Ethereum',
-          chainId: ChainId.ETHEREUM,
-        });
-      cy.stub(Checkout.prototype, 'switchNetwork')
-        .as('switchNetworkStub')
-        .rejects({});
-      mountConnectWidgetAndGoToReadyToConnect();
-      cySmartGet('ready-to-connect').should('be.visible');
-      cySmartGet('footer-button').should('have.text', 'Ready to connect');
-      cySmartGet('footer-button').click();
-      cySmartGet('switch-network-view').should('be.visible');
-      cySmartGet('footer-button').click();
-      cySmartGet('footer-button').should('have.text', 'Try Again');
-    });
-
-    it('should show success if try again and switch network succeeds', () => {
-      cy.stub(Checkout.prototype, 'getNetworkInfo')
-        .as('getNetworkInfoStub')
-        .resolves({
-          name: 'Ethereum',
-          chainId: ChainId.ETHEREUM,
-        });
-      cy.stub(Checkout.prototype, 'switchNetwork')
-        .as('switchNetworkStub')
-        .onFirstCall()
-        .rejects({})
-        .onSecondCall()
-        .resolves({
-          provider: baseMockProvider as Web3Provider,
-        });
-      mountConnectWidgetAndGoToReadyToConnect();
-      cySmartGet('ready-to-connect').should('be.visible');
-      cySmartGet('footer-button').should('have.text', 'Ready to connect');
-      cySmartGet('footer-button').click();
-      cySmartGet('switch-network-view').should('be.visible');
-      cySmartGet('footer-button').click();
-      cySmartGet('footer-button').should('have.text', 'Try Again');
-      cySmartGet('footer-button').click();
-      cySmartGet('success-view').should('be.visible');
-    });
-
-    it('should not show success if try again and switch network fails', () => {
-      cy.stub(Checkout.prototype, 'getNetworkInfo')
-        .as('getNetworkInfoStub')
-        .resolves({
-          name: 'Ethereum',
-          chainId: ChainId.ETHEREUM,
-        });
-      cy.stub(Checkout.prototype, 'switchNetwork')
-        .as('switchNetworkStub')
-        .onFirstCall()
-        .rejects({})
-        .onSecondCall()
-        .rejects({});
-      mountConnectWidgetAndGoToReadyToConnect();
-      cySmartGet('ready-to-connect').should('be.visible');
-      cySmartGet('footer-button').should('have.text', 'Ready to connect');
-      cySmartGet('footer-button').click();
-      cySmartGet('switch-network-view').should('be.visible');
-      cySmartGet('footer-button').click();
-      cySmartGet('footer-button').should('have.text', 'Try Again');
-      cySmartGet('footer-button').click();
-      cySmartGet('footer-button').should('have.text', 'Try Again');
-      cySmartGet('success-view').should('not.exist');
-    });
-  });
-
-  describe('BridgeComingSoon for Passport', () => {
-    beforeEach(() => {
-      cy.stub(Checkout.prototype, 'connect').as('connectStub').resolves({
-        provider: { ...baseMockProvider, provider: { isPassport: true } as ExternalProvider } as Web3Provider,
-      });
       cy.stub(Checkout.prototype, 'createProvider')
         .as('createProviderStub')
         .resolves({
-          provider: { ...baseMockProvider, provider: { isPassport: true } as ExternalProvider } as Web3Provider,
+          provider: {
+            provider: { isPassport: true },
+            getSigner: () => ({
+              getAddress: () => Promise.resolve(''),
+              getChainId: async () => Promise.resolve(ChainId.IMTBL_ZKEVM_TESTNET),
+            }),
+          },
         });
     });
 
@@ -449,6 +508,40 @@ describe('ConnectWidget tests', () => {
           name: ChainName.IMTBL_ZKEVM_TESTNET,
           chainId: ChainId.IMTBL_ZKEVM_TESTNET,
         });
+
+      const passportProvider = mockPassportProvider('resolve');
+      const testPassportInstance = {
+        connectEvm: cy.stub().as('connectEvmStub').returns(passportProvider),
+      } as any as Passport;
+      const checkout = new Checkout(
+        {
+          baseConfig: { environment: Environment.SANDBOX },
+          passport: testPassportInstance,
+        },
+      );
+
+      mount(
+        <CustomAnalyticsProvider widgetConfig={config}>
+          <ConnectWidget
+            checkout={checkout}
+            targetLayer={ConnectTargetLayer.LAYER1}
+            config={config}
+          />
+        </CustomAnalyticsProvider>,
+      );
+      cySmartGet('wallet-list-passport').click();
+      cySmartGet('footer-button').click();
+
+      cySmartGet('bridge-coming-soon').should('be.visible');
+    });
+  });
+
+  describe('Error Connecting', () => {
+    it('should show error view if unable to create provider', () => {
+      cy.stub(Checkout.prototype, 'connect').as('connectStub').resolves({});
+      cy.stub(Checkout.prototype, 'createProvider')
+        .as('createProviderStub')
+        .rejects({});
 
       const passportProvider = mockPassportProvider('resolve');
       const testPassportInstance = {

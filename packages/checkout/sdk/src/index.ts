@@ -51,6 +51,7 @@ export type {
   ERC20ItemRequirement,
   ERC721Balance,
   ERC721ItemRequirement,
+  Fee,
   FeePercentage,
   FeeToken,
   FiatRampParams,

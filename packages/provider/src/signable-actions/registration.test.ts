@@ -1,7 +1,8 @@
 import { Contracts, UsersApi } from '@imtbl/core-sdk';
 import { signRaw } from '@imtbl/toolkit';
+import { AxiosError } from 'axios';
 import { generateSigners, privateKey1, testConfig } from '../test/helpers';
-import { isRegisteredOnChain, registerOffchain } from './registration';
+import { isRegisteredOffchain, isRegisteredOnChain, registerOffchain } from './registration';
 
 jest.mock('@imtbl/core-sdk');
 jest.mock('@imtbl/toolkit');
@@ -36,6 +37,67 @@ describe('Registration', () => {
       await expect(
         isRegisteredOnChain('stark-key', signers.ethSigner, testConfig),
       ).rejects.toThrowError(err);
+    });
+  });
+
+  describe('isRegisteredOffchain', () => {
+    const getUsersMock = jest.fn();
+    const ethAddress = '0x123';
+
+    beforeEach(() => {
+      jest.restoreAllMocks();
+
+      (UsersApi as jest.Mock).mockReturnValue({
+        getUsers: getUsersMock,
+      });
+    });
+
+    describe('when the user has registered with IMX', () => {
+      test('should return true', async () => {
+        getUsersMock.mockResolvedValue({
+          data: {
+            accounts: [ethAddress],
+          },
+        });
+
+        const result = await isRegisteredOffchain(ethAddress, testConfig);
+
+        expect(result).toEqual(true);
+        expect(getUsersMock).toHaveBeenCalledTimes(1);
+      });
+    });
+
+    describe('when the user has not registered with IMX', () => {
+      test('should return false', async () => {
+        const axiosError = new AxiosError();
+        axiosError.response = {
+          config: axiosError.config!,
+          data: undefined,
+          headers: {},
+          request: undefined,
+          status: 404,
+          statusText: '',
+        };
+        getUsersMock.mockImplementation(() => Promise.reject(axiosError));
+
+        const result = await isRegisteredOffchain(ethAddress, testConfig);
+
+        expect(result).toEqual(false);
+        expect(getUsersMock).toHaveBeenCalledTimes(1);
+      });
+    });
+
+    describe('when getUsers throws an error that is not a 404', () => {
+      test('should throw the error', async () => {
+        const axiosResponse = new Error('oops');
+        getUsersMock.mockImplementation(() => Promise.reject(axiosResponse));
+
+        await expect(
+          isRegisteredOffchain(ethAddress, testConfig),
+        ).rejects.toThrowError(axiosResponse);
+
+        expect(getUsersMock).toHaveBeenCalledTimes(1);
+      });
     });
   });
 

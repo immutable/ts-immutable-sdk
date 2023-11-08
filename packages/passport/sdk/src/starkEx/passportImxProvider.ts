@@ -29,7 +29,7 @@ import {
 } from './workflows';
 import { ConfirmationScreen } from '../confirmation';
 import { PassportConfiguration } from '../config';
-import TypedEventEmitter from '../typedEventEmitter';
+import TypedEventEmitter from '../utils/typedEventEmitter';
 import AuthManager from '../authManager';
 
 export interface PassportImxProviderInput {
@@ -113,6 +113,15 @@ export class PassportImxProvider implements IMXProvider {
   // TODO: Remove once implemented
   // eslint-disable-next-line class-methods-use-this
   registerOffchain(): Promise<RegisterUserResponse> {
+    throw new PassportError(
+      'Operation not supported',
+      PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR,
+    );
+  }
+
+  // TODO: Remove once implemented
+  // eslint-disable-next-line class-methods-use-this
+  isRegisteredOffchain(): Promise<boolean> {
     throw new PassportError(
       'Operation not supported',
       PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR,

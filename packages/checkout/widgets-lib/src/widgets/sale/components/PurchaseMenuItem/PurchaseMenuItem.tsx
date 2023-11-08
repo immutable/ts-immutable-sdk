@@ -1,25 +1,63 @@
 import { Heading, MenuItem } from '@biom3/react';
+import { FundingRoute } from '@imtbl/checkout-sdk';
+import { useContext, useEffect, useState } from 'react';
+import { useSaleContext } from '../../context/SaleContextProvider';
+import { calculateCryptoToFiat, tokenValueFormat } from '../../../../lib/utils';
+import { text } from '../../../../resources/text/textConfig';
+import { SaleWidgetViews } from '../../../../context/view-context/SaleViewContextTypes';
+import { CryptoFiatContext } from '../../../../context/crypto-fiat-context/CryptoFiatContext';
 
-export function PurchaseMenuItem() {
+type PurchaseMenuItemProps = {
+  fundingRoute: FundingRoute;
+};
+
+export function PurchaseMenuItem({ fundingRoute }: PurchaseMenuItemProps) {
+  const textConfig = text.views[SaleWidgetViews.FUND_WITH_SMART_CHECKOUT];
+  const { items } = useSaleContext();
+  const firstItem = items[0];
+  const firstFundingStep = fundingRoute.steps[0];
+  const { cryptoFiatState } = useContext(CryptoFiatContext);
+  const [usdPurchaseAmount, setUsdPurchaseAmount] = useState<string | undefined>(undefined);
+
+  // todo - grab from url params, waiting for changes to how widgets are being loaded wt-1860
+  const collection = 'Metalcore';
+
+  useEffect(() => {
+    if (!cryptoFiatState.conversions) {
+      return;
+    }
+
+    setUsdPurchaseAmount(
+      calculateCryptoToFiat(
+        firstFundingStep.fundingItem.fundsRequired.formattedAmount,
+        firstFundingStep.fundingItem.token.symbol,
+        cryptoFiatState.conversions,
+      ),
+    );
+  }, [cryptoFiatState, fundingRoute]);
+
   return (
     <MenuItem
+      emphasized
       testId="funding-route-purchase-item"
-      size="small"
+      size="medium"
+      key={firstItem.name}
     >
       <MenuItem.FramedImage
-        // eslint-disable-next-line max-len
-        imageUrl="https://uploads-ssl.webflow.com/628b4f4f8c89f8ba7f0966ea/64e6722c5d0ab7fd505ff7b6_Mech_Wardog_L_Uncommon_1.jpg"
+        imageUrl={firstItem?.image}
       />
       <MenuItem.PriceDisplay
         use={<Heading size="xSmall" />}
-        price="0.0252565"
-        fiatAmount="USD $2.49"
+        price={`${firstFundingStep?.fundingItem.token.symbol} 
+          ${tokenValueFormat(firstFundingStep.fundingItem.fundsRequired.formattedAmount)}`}
+        fiatAmount={`${textConfig.currency.usdEstimate}${usdPurchaseAmount}`}
       />
       <MenuItem.Label>
-        Starter Pack
+        {firstItem?.name}
+        {firstItem?.qty > 1 ? ` x${firstItem.qty}` : null}
       </MenuItem.Label>
       <MenuItem.Caption>
-        Metalcore
+        {collection}
       </MenuItem.Caption>
     </MenuItem>
   );

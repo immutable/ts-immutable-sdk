@@ -193,7 +193,10 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
         }
         break;
       }
+      case ConnectEventType.FAILURE:
+      case ConnectEventType.CLOSE_WIDGET:
       default:
+        onCloseWidget();
         break;
     }
   };

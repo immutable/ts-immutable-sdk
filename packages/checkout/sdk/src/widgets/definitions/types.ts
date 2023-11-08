@@ -21,6 +21,7 @@ import {
   SaleEventType,
   SaleFailed,
   SaleSuccess,
+  SaleTransactionSuccess,
   SwapEventType,
   SwapFailed,
   SwapRejected,
@@ -153,6 +154,7 @@ export type WidgetEventData = {
     [SaleEventType.FAILURE]: SaleFailed,
     [SaleEventType.REJECTED]: any,
     [SaleEventType.CLOSE_WIDGET]: {},
+    [SaleEventType.TRANSACTION_SUCCESS]: SaleTransactionSuccess
   } & OrchestrationMapping & ProviderEventMapping
 };
 

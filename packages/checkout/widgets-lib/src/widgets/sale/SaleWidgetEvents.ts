@@ -4,7 +4,7 @@ import {
   SaleEventType,
   WidgetType,
 } from '@imtbl/checkout-sdk';
-import { ExecuteOrderResponse } from './types';
+import { ExecutedTransaction } from './types';
 
 export const sendSaleWidgetCloseEvent = (
   eventTarget: Window | EventTarget,
@@ -26,14 +26,16 @@ export const sendSaleWidgetCloseEvent = (
 
 export const sendSaleSuccessEvent = (
   eventTarget: Window | EventTarget,
-  data: ExecuteOrderResponse,
+  transactions: ExecutedTransaction[] = [],
 ) => {
   const event = new CustomEvent<WidgetEvent<WidgetType.SALE, SaleEventType.SUCCESS>>(
     IMTBLWidgetEvents.IMTBL_SALE_WIDGET_EVENT,
     {
       detail: {
         type: SaleEventType.SUCCESS,
-        data,
+        data: {
+          transactions,
+        },
       },
     },
   );
@@ -45,6 +47,7 @@ export const sendSaleSuccessEvent = (
 export const sendSaleFailedEvent = (
   eventTarget: Window | EventTarget,
   reason: string,
+  transactions: ExecutedTransaction[] = [],
 ) => {
   const event = new CustomEvent<WidgetEvent<WidgetType.SALE, SaleEventType.FAILURE>>(
     IMTBLWidgetEvents.IMTBL_SALE_WIDGET_EVENT,
@@ -54,11 +57,30 @@ export const sendSaleFailedEvent = (
         data: {
           reason,
           timestamp: new Date().getTime(),
+          transactions,
         },
       },
     },
   );
   // eslint-disable-next-line no-console
   console.log('Sale failed event:', event);
+  if (eventTarget !== undefined) eventTarget.dispatchEvent(event);
+};
+
+export const sendSaleTransactionSuccessEvent = (
+  eventTarget: Window | EventTarget,
+  transactions: ExecutedTransaction[],
+) => {
+  const event = new CustomEvent<WidgetEvent<WidgetType.SALE, SaleEventType.TRANSACTION_SUCCESS>>(
+    IMTBLWidgetEvents.IMTBL_SALE_WIDGET_EVENT,
+    {
+      detail: {
+        type: SaleEventType.TRANSACTION_SUCCESS,
+        data: { transactions },
+      },
+    },
+  );
+  // eslint-disable-next-line no-console
+  console.log('Sale transaction success event:', event);
   if (eventTarget !== undefined) eventTarget.dispatchEvent(event);
 };

@@ -12,8 +12,9 @@ import {
   FulfillOrderResponse,
   OrderStatusName,
 } from '@imtbl/orderbook';
+import { GetTokenResult } from '@imtbl/generated-clients/dist/multi-rollup';
 import * as instance from '../../instance';
-import { CheckoutConfiguration } from '../../config';
+import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../config';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import {
   ItemType,
@@ -35,9 +36,9 @@ import {
   signFulfillmentTransactions,
 } from '../actions';
 import { SignTransactionStatusType } from '../actions/types';
-import { ERC20ABI } from '../../types';
 import { calculateFees } from '../fees/fees';
 import { debugLogger, measureAsyncExecution } from '../../utils/debugLogger';
+import { getAllBalances, resetBlockscoutClientMap } from '../../balances';
 
 export const getItemRequirement = (
   type: ItemType,
@@ -87,11 +88,6 @@ export const buy = async (
   provider: Web3Provider,
   orders: Array<BuyOrder>,
 ): Promise<BuyResult> => {
-  let orderbook;
-  let order: ListingResult;
-  let spenderAddress = '';
-  const gasLimit = constants.estimatedFulfillmentGasGwei;
-
   if (orders.length === 0) {
     throw new CheckoutError(
       'No orders were provided to the orders array. Please provide at least one order.',
@@ -99,16 +95,37 @@ export const buy = async (
     );
   }
 
+  let order: ListingResult;
+  let spenderAddress = '';
+  let decimals = 18;
+
+  const gasLimit = constants.estimatedFulfillmentGasGwei;
+  const orderbook = instance.createOrderbookInstance(config);
+  const blockchainClient = instance.createBlockchainDataInstance(config);
+
+  const fulfillerAddress = await measureAsyncExecution<string>(
+    config,
+    'Time to get the address from the provider',
+    provider.getSigner().getAddress(),
+  );
+
+  // Prefetch balances and store them in memory
+  resetBlockscoutClientMap();
+  getAllBalances(config, provider, fulfillerAddress, getL1ChainId(config));
+  getAllBalances(config, provider, fulfillerAddress, getL2ChainId(config));
+
   const { id, takerFees } = orders[0];
 
+  let orderChainName: string;
   try {
-    orderbook = instance.createOrderbookInstance(config);
     order = await measureAsyncExecution<ListingResult>(
       config,
       'Time to fetch the listing from the orderbook',
       orderbook.getListing(id),
     );
-    const { seaportContractAddress } = orderbook.config();
+    const { seaportContractAddress, chainName } = orderbook.config();
+
+    orderChainName = chainName;
     spenderAddress = seaportContractAddress;
   } catch (err: any) {
     throw new CheckoutError(
@@ -131,20 +148,16 @@ export const buy = async (
       },
     );
   }
-  const buyToken = order.result.buy[0];
-  let decimals = 18;
-  if (order.result.buy[0].type === 'ERC20') {
-    const tokenContract = instance.getTokenContract(
-      order.result.buy[0].contractAddress,
-      ERC20ABI,
-      provider,
-    );
 
-    decimals = await measureAsyncExecution<number>(
+  const buyToken = order.result.buy[0];
+  if (buyToken.type === 'ERC20') {
+    const token = await measureAsyncExecution<GetTokenResult>(
       config,
       'Time to get decimals of token contract for the buy token',
-      tokenContract.decimals(),
+      blockchainClient.getToken({ contractAddress: buyToken.contractAddress, chainName: orderChainName }),
     );
+
+    if (token.result.decimals) decimals = token.result.decimals;
   }
 
   let fees: FeeValue[] = [];
@@ -158,16 +171,12 @@ export const buy = async (
 
   const fulfillOrderStartTime = performance.now();
   try {
-    const fulfillerAddress = await measureAsyncExecution<string>(
-      config,
-      'Time to get the address from the provider',
-      provider.getSigner().getAddress(),
-    );
     const { actions } = await measureAsyncExecution<FulfillOrderResponse>(
       config,
       'Time to call fulfillOrder from the orderbook',
       orderbook.fulfillOrder(id, fulfillerAddress, fees),
     );
+
     orderActions = actions;
     unsignedApprovalTransactions = await measureAsyncExecution<TransactionRequest[]>(
       config,

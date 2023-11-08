@@ -30,6 +30,7 @@ import {
   SaleErrorTypes,
   SignOrderError,
   SignResponse,
+  SmartCheckoutErrorTypes,
 } from '../types';
 
 import { useSmartCheckout } from '../hooks/useSmartCheckout';
@@ -64,10 +65,11 @@ type SaleContextValues = SaleContextProps & {
   setPaymentMethod: (paymentMethod: PaymentTypes | undefined) => void;
   goBackToPaymentMethods: (paymentMethod?: PaymentTypes | undefined) => void;
   goToErrorView: (type: SaleErrorTypes, data?: Record<string, unknown>) => void;
-  goToSuccessView: () => void;
+  goToSuccessView: (data?: Record<string, unknown>) => void;
   querySmartCheckout: ((callback?: (r?: SmartCheckoutResult) => void) => Promise<SmartCheckoutResult | undefined>);
   smartCheckoutResult: SmartCheckoutResult | undefined;
   fundingRoutes: FundingRoute[];
+  disabledPaymentTypes: PaymentTypes[]
 };
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -97,6 +99,7 @@ const SaleContext = createContext<SaleContextValues>({
   querySmartCheckout: () => Promise.resolve(undefined),
   smartCheckoutResult: undefined,
   fundingRoutes: [],
+  disabledPaymentTypes: [],
 });
 
 SaleContext.displayName = 'SaleSaleContext';
@@ -138,51 +141,25 @@ export function SaleContextProvider(props: {
   );
 
   const [fundingRoutes, setFundingRoutes] = useState<FundingRoute[]>([]);
+  const [disabledPaymentTypes, setDisabledPaymentTypes] = useState<PaymentTypes[]>([]);
 
   const goBackToPaymentMethods = useCallback(
-    (type?: PaymentTypes | undefined) => {
+    (type?: PaymentTypes | undefined, showInsufficientCoinsBanner?: boolean) => {
       setPaymentMethod(type);
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
-          view: { type: SaleWidgetViews.PAYMENT_METHODS },
-        },
-      });
-    },
-    [],
-  );
-
-  const goToErrorView = useCallback(
-    (errorType: SaleErrorTypes, data: Record<string, unknown> = {}) => {
-      errorRetries.current += 1;
-      if (errorRetries.current > MAX_ERROR_RETRIES) {
-        errorRetries.current = 0;
-        setPaymentMethod(undefined);
-      }
-
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
           view: {
-            type: SaleWidgetViews.SALE_FAIL,
-            data: { errorType, ...data },
+            type: SaleWidgetViews.PAYMENT_METHODS,
+            data: {
+              showInsufficientCoinsBanner,
+            },
           },
         },
       });
     },
     [],
   );
-
-  const goToSuccessView = useCallback(() => {
-    viewDispatch({
-      payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: {
-          type: SaleWidgetViews.SALE_SUCCESS,
-        },
-      },
-    });
-  }, []);
 
   useEffect(() => {
     const getUserInfo = async () => {
@@ -225,6 +202,48 @@ export function SaleContextProvider(props: {
     [signOrder],
   );
 
+  const goToErrorView = useCallback(
+    (errorType: SaleErrorTypes, data: Record<string, unknown> = {}) => {
+      errorRetries.current += 1;
+      if (errorRetries.current > MAX_ERROR_RETRIES) {
+        errorRetries.current = 0;
+        setPaymentMethod(undefined);
+      }
+
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SaleWidgetViews.SALE_FAIL,
+            data: {
+              ...data,
+              errorType,
+              paymentMethod,
+              transactions: executeResponse.transactions,
+            },
+          },
+        },
+      });
+    },
+    [paymentMethod, setPaymentMethod, executeResponse],
+  );
+
+  const goToSuccessView = useCallback((data?: Record<string, unknown>) => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: SaleWidgetViews.SALE_SUCCESS,
+          data: {
+            paymentMethod,
+            transactions: executeResponse.transactions,
+            ...data,
+          },
+        },
+      },
+    });
+  }, [[paymentMethod, executeResponse]]);
+
   useEffect(() => {
     if (!signError) return;
     goToErrorView(signError.type, signError.data);
@@ -240,6 +259,11 @@ export function SaleContextProvider(props: {
 
   useEffect(() => {
     if (!smartCheckoutError) return;
+    if ((smartCheckoutError.data?.error as Error)?.message === SmartCheckoutErrorTypes.FRACTIONAL_BALANCE_BLOCKED) {
+      setDisabledPaymentTypes([PaymentTypes.CRYPTO]);
+      goBackToPaymentMethods(undefined, true);
+      return;
+    }
     goToErrorView(smartCheckoutError.type, smartCheckoutError.data);
   }, [smartCheckoutError]);
 
@@ -284,17 +308,8 @@ export function SaleContextProvider(props: {
         default:
           setFundingRoutes([]);
           setPaymentMethod(undefined);
-          viewDispatch({
-            payload: {
-              type: ViewActions.UPDATE_VIEW,
-              view: {
-                type: SaleWidgetViews.PAYMENT_METHODS,
-                data: {
-                  showInsufficientCoinsBanner: true,
-                },
-              },
-            },
-          });
+          setDisabledPaymentTypes([PaymentTypes.CRYPTO]);
+          goBackToPaymentMethods(undefined, true);
           break;
       }
     }
@@ -326,6 +341,7 @@ export function SaleContextProvider(props: {
       querySmartCheckout,
       smartCheckoutResult,
       fundingRoutes,
+      disabledPaymentTypes,
     }),
     [
       config,
@@ -349,6 +365,7 @@ export function SaleContextProvider(props: {
       querySmartCheckout,
       smartCheckoutResult,
       fundingRoutes,
+      disabledPaymentTypes,
     ],
   );
 
