@@ -8,6 +8,7 @@ import {
 import { BigNumber, utils } from 'ethers';
 import { TokenInfo } from '@imtbl/checkout-sdk';
 import { TransactionResponse } from '@imtbl/dex-sdk';
+import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { text } from '../../../resources/text/textConfig';
 import { amountInputValidation as textInputValidator } from '../../../lib/validations/amountInputValidations';
 import { SwapContext } from '../context/SwapContext';
@@ -112,6 +113,8 @@ export function SwapForm({ data }: SwapFromProps) {
   const [loading, setLoading] = useState(false);
   const [swapFromToConversionText, setSwapFromToConversionText] = useState('');
   const hasSetDefaultState = useRef(false);
+
+  const { track } = useAnalytics();
 
   // Form State
   const [fromAmount, setFromAmount] = useState<string>(data?.fromAmount || '');
@@ -498,6 +501,16 @@ export function SwapForm({ data }: SwapFromProps) {
     const fromBalanceTruncated = fromBalance.slice(0, fromBalance.indexOf('.') + DEFAULT_TOKEN_VALIDATION_DECIMALS + 1);
     setFromAmount(fromBalanceTruncated);
     setDirection(SwapDirection.FROM);
+    track({
+      userJourney: UserJourney.SWAP,
+      screen: 'SwapCoins',
+      control: 'MaxFrom',
+      controlType: 'Button',
+      extras: {
+        fromBalance,
+        fromBalanceTruncated,
+      },
+    });
   };
 
   // ------------//
@@ -547,12 +560,30 @@ export function SwapForm({ data }: SwapFromProps) {
     if (validateToTokenError) setToTokenError(validateToTokenError);
     if (validateToAmountError) setToAmountError(validateToAmountError);
 
+    let isSwapFormValid = true;
     if (
       validateFromTokenError
       || validateFromAmountError
       || validateToTokenError
-      || validateToAmountError) return false;
-    return true;
+      || validateToAmountError) isSwapFormValid = false;
+
+    track({
+      userJourney: UserJourney.SWAP,
+      screen: 'SwapCoins',
+      control: 'FormValid',
+      controlType: 'Button',
+      extras: {
+        isSwapFormValid,
+        swapFromAddress: fromToken?.address,
+        swapFromAmount: fromAmount,
+        swapFromTokenSymbol: fromToken?.symbol,
+        swapToAddress: toToken?.address,
+        swapToAmount: toAmount,
+        swapToTokenSymbol: toToken?.symbol,
+      },
+    });
+
+    return isSwapFormValid;
   };
 
   useEffect(() => {
