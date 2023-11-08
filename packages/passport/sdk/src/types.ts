@@ -120,6 +120,8 @@ export type IdTokenPayload = {
   aud: string;
   sub: string;
   exp: number;
+  iss: string;
+  iat: number;
 };
 
 export type DeviceErrorResponse = {

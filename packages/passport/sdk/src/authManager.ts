@@ -120,32 +120,25 @@ export default class AuthManager {
     return user;
   };
 
-  private static mapDeviceTokenResponseToDomainUserModel = (tokenResponse: DeviceTokenResponse): User => {
+  private static mapDeviceTokenResponseToOidcUser = (tokenResponse: DeviceTokenResponse): OidcUser => {
     const idTokenPayload: IdTokenPayload = jwt_decode(tokenResponse.id_token);
-    const user: User = {
-      idToken: tokenResponse.id_token,
-      accessToken: tokenResponse.access_token,
-      refreshToken: tokenResponse.refresh_token,
+
+    return new OidcUser({
+      id_token: tokenResponse.id_token,
+      access_token: tokenResponse.access_token,
+      refresh_token: tokenResponse.refresh_token,
+      token_type: tokenResponse.token_type,
       profile: {
         sub: idTokenPayload.sub,
+        iss: idTokenPayload.iss,
+        aud: idTokenPayload.aud,
+        exp: idTokenPayload.exp,
+        iat: idTokenPayload.iat,
         email: idTokenPayload.email,
         nickname: idTokenPayload.nickname,
+        passport: idTokenPayload.passport,
       },
-    };
-    if (idTokenPayload?.passport?.imx_eth_address) {
-      user.imx = {
-        ethAddress: idTokenPayload?.passport?.imx_eth_address,
-        starkAddress: idTokenPayload?.passport?.imx_stark_address,
-        userAdminAddress: idTokenPayload?.passport?.imx_user_admin_address,
-      };
-    }
-    if (idTokenPayload?.passport?.zkevm_eth_address) {
-      user.zkEvm = {
-        ethAddress: idTokenPayload?.passport?.zkevm_eth_address,
-        userAdminAddress: idTokenPayload?.passport?.zkevm_user_admin_address,
-      };
-    }
-    return user;
+    });
   };
 
   public async login(): Promise<User> {
@@ -201,11 +194,12 @@ export default class AuthManager {
 
         try {
           const tokenResponse = await this.getDeviceFlowToken(deviceCode);
-          const user = AuthManager.mapDeviceTokenResponseToDomainUserModel(tokenResponse);
+          const oidcUser = AuthManager.mapDeviceTokenResponseToOidcUser(tokenResponse);
+          const user = AuthManager.mapOidcUserToDomainModel(oidcUser);
 
           // Only persist credentials that contain the necessary data
           if (user.imx?.ethAddress && user.imx?.starkAddress && user.imx?.userAdminAddress) {
-            this.deviceCredentialsManager.saveCredentials(tokenResponse);
+            await this.userManager.storeUser(oidcUser);
           }
 
           return user;
@@ -291,11 +285,12 @@ export default class AuthManager {
       }
 
       const tokenResponse = await this.getPKCEToken(authorizationCode, pkceData.verifier);
-      const user = AuthManager.mapDeviceTokenResponseToDomainUserModel(tokenResponse);
+      const oidcUser = AuthManager.mapDeviceTokenResponseToOidcUser(tokenResponse);
+      const user = AuthManager.mapOidcUserToDomainModel(oidcUser);
 
       // Only persist credentials that contain the necessary data
       if (user.imx?.ethAddress && user.imx?.starkAddress && user.imx?.userAdminAddress) {
-        this.deviceCredentialsManager.saveCredentials(tokenResponse);
+        await this.userManager.storeUser(oidcUser);
       }
 
       return user;
@@ -318,37 +313,17 @@ export default class AuthManager {
     return response.data;
   }
 
-  public async connectImxWithCredentials(tokenResponse: DeviceTokenResponse): Promise<User | null> {
+  public async connectImxWithCredentials(tokenResponse: DeviceTokenResponse): Promise<User | null> { // TODO: Where / why is this used??
     return withPassportError<User | null>(async () => {
-      if (this.deviceCredentialsManager.areValid(tokenResponse)) {
-        // Credentials exist and are still valid
-        return AuthManager.mapDeviceTokenResponseToDomainUserModel(tokenResponse);
+      const oidcUser = AuthManager.mapDeviceTokenResponseToOidcUser(tokenResponse);
+      await this.userManager.storeUser(oidcUser);
+
+      if (isTokenExpired(oidcUser)) {
+        return this.loginSilent();
       }
 
-      const refreshToken = tokenResponse?.refresh_token ?? null;
-      if (refreshToken) {
-        // Token is no longer valid, but refresh token can be used to a new one
-        const user = await this.refreshToken(refreshToken);
-        return user;
-      }
-
-      return null;
+      return AuthManager.mapOidcUserToDomainModel(oidcUser);
     }, PassportErrorType.AUTHENTICATION_ERROR);
-  }
-
-  public async refreshToken(refreshToken: string): Promise<User | null> {
-    const response = await axios.post<DeviceTokenResponse>(
-      `${this.config.authenticationDomain}/oauth/token`,
-      {
-        client_id: this.config.oidcConfiguration.clientId,
-        grant_type: 'refresh_token',
-        refresh_token: refreshToken,
-      },
-      formUrlEncodedHeader,
-    );
-    const newTokenResponse = response.data;
-
-    return AuthManager.mapDeviceTokenResponseToDomainUserModel(newTokenResponse);
   }
 
   public async logout(): Promise<void> {
@@ -368,10 +343,11 @@ export default class AuthManager {
     return this.userManager.signoutSilentCallback(url);
   }
 
+  /**
+   * @deprecated Use `logout` instead
+   */
   public async logoutDeviceFlow(): Promise<void> {
-    return withPassportError<void>(async () => {
-      this.deviceCredentialsManager.clearCredentials();
-    }, PassportErrorType.LOGOUT_ERROR);
+    return this.logout();
   }
 
   public async loginSilent({ forceRefresh } = { forceRefresh: false }): Promise<User | null> {
@@ -432,29 +408,19 @@ export default class AuthManager {
   }
 
   public async getUser({ forceRefresh } = { forceRefresh: false }): Promise<User | null> {
-    return withPassportError<User | null>(async () => {
-      const user = await this.getAuthenticatedUser({ forceRefresh });
-      if (user) return user;
-
-      const deviceToken = this.deviceCredentialsManager.getCredentials();
-      if (deviceToken) {
-        return AuthManager.mapDeviceTokenResponseToDomainUserModel(deviceToken);
-      }
-      return null;
-    }, PassportErrorType.NOT_LOGGED_IN_ERROR);
+    return withPassportError<User | null>(async () => (
+      this.getAuthenticatedUser({ forceRefresh })
+    ), PassportErrorType.NOT_LOGGED_IN_ERROR);
   }
 
+  /**
+   * @deprecated Use `getUser` instead
+   */
   public async getUserDeviceFlow(): Promise<User | null> {
-    return withPassportError<User | null>(async () => {
-      const deviceToken = this.deviceCredentialsManager.getCredentials();
-      if (deviceToken) {
-        return AuthManager.mapDeviceTokenResponseToDomainUserModel(deviceToken);
-      }
-      return null;
-    }, PassportErrorType.NOT_LOGGED_IN_ERROR);
+    return this.getUser();
   }
 
-  public checkStoredDeviceFlowCredentials(): DeviceTokenResponse | null {
+  public checkStoredDeviceFlowCredentials(): DeviceTokenResponse | null { // TODO: Where / why is this used?? If this is used to call `connectImxWithCredentials`, then we can simplify
     return this.deviceCredentialsManager.getCredentials();
   }
 }

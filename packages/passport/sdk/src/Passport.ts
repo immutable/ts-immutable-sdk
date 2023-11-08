@@ -88,7 +88,7 @@ export class Passport {
   /**
    * @returns {boolean} the stored device flow credentials if they exist
    */
-  public checkStoredDeviceFlowCredentials(): DeviceTokenResponse | null {
+  public checkStoredDeviceFlowCredentials(): DeviceTokenResponse | null { // TODO: Where / why is this used?? Can `login({ useCachedSession: true })` & `connectImx` be used instead?
     return this.authManager.checkStoredDeviceFlowCredentials();
   }
 
@@ -159,6 +159,9 @@ export class Passport {
     return this.authManager.logoutSilentCallback(url);
   }
 
+  /**
+   * @deprecated Use `logout` instead
+   */
   public async logoutDeviceFlow(): Promise<void> {
     return this.authManager.logoutDeviceFlow();
   }
@@ -168,6 +171,9 @@ export class Passport {
     return user?.profile;
   }
 
+  /**
+   * @deprecated Use `getUserInfo` instead
+   */
   public async getUserInfoDeviceFlow(): Promise<UserProfile | undefined> {
     const user = await this.authManager.getUserDeviceFlow();
     return user?.profile;
