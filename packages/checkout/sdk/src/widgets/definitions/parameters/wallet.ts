@@ -1,5 +1,4 @@
 /* eslint-disable max-len */
-import { Web3Provider } from '@ethersproject/providers';
 import { WalletProviderName } from '../../../types';
 
 /**
@@ -9,5 +8,4 @@ import { WalletProviderName } from '../../../types';
  */
 export type WalletWidgetParams = {
   walletProviderName?: WalletProviderName
-  web3Provider?: Web3Provider
 };

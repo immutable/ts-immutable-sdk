@@ -7,6 +7,7 @@ import {
   ChainId,
   Checkout, ConnectTargetLayer, ConnectWidgetParams,
 } from '@imtbl/checkout-sdk';
+import { Web3Provider } from '@ethersproject/providers';
 import {
   sendCloseWidgetEvent,
   sendConnectFailedEvent,
@@ -50,6 +51,7 @@ export type ConnectWidgetInputs = ConnectWidgetParams & {
   targetLayer?: ConnectTargetLayer;
   allowedChains?: ChainId[];
   checkout: Checkout;
+  web3Provider?: Web3Provider;
 };
 
 export function ConnectWidget({
