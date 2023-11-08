@@ -137,8 +137,9 @@ export function ReadyToConnect({ targetChainId, allowedChains }: ReadyToConnectP
         });
         handleConnectViewUpdate(checkout, provider);
       } catch (err: any) {
-        setLoading(false);
         setFooterButtonText(footer.buttonText2);
+      } finally {
+        setLoading(false);
       }
     }
   }, [checkout, provider, connectDispatch, viewDispatch, footer.buttonText2, identify]);

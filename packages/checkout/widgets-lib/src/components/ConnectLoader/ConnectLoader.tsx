@@ -136,7 +136,6 @@ export function ConnectLoader({
     const { isConnected } = await checkout.checkIsWalletConnected({
       provider: localProvider!,
     });
-
     if (!isConnected) {
       connectLoaderDispatch({
         payload: {
@@ -164,23 +163,17 @@ export function ConnectLoader({
       if (await hasWalletProviderNameAndNoWeb3Provider(web3Provider)) return;
 
       try {
-        // TODO: handle all of the inner try catches with error handling
-        try {
-        // At this point the Web3Provider exists
-        // This will bypass the wallet list screen
-          const isConnected = (await isWalletConnected(web3Provider!));
-          if (!isConnected) return;
-        } catch (err) {
-          return;
-        }
-
-        // Set the provider in state once it is created and is connected
         connectLoaderDispatch({
           payload: {
             type: ConnectLoaderActions.SET_PROVIDER,
             provider: web3Provider!,
           },
         });
+        // TODO: handle all of the inner try catches with error handling
+        // At this point the Web3Provider exists
+        // This will bypass the wallet list screen
+        const isConnected = (await isWalletConnected(web3Provider!));
+        if (!isConnected) return;
 
         try {
           const currentNetworkInfo = await checkout.getNetworkInfo({ provider: web3Provider! });
