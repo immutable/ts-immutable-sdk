@@ -1,5 +1,5 @@
 import { ImmutableXClient } from '@imtbl/immutablex-client';
-import { mockValidIdToken } from 'token.test';
+import { mockValidIdToken } from 'utils/token.test';
 import { Web3Provider } from '@ethersproject/providers';
 import { Signer } from 'ethers';
 import AuthManager from 'authManager';

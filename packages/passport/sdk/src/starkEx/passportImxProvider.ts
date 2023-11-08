@@ -145,7 +145,7 @@ export class PassportImxProvider implements IMXProvider {
     );
   }
 
-  async isRegisteredOnchain(): Promise<boolean> {
+  async isRegisteredOffchain(): Promise<boolean> {
     try {
       const { user } = await this.getAuthenticatedUserSigner();
       const { ethAddress, starkAddress, userAdminAddress } = user.imx;
@@ -156,6 +156,15 @@ export class PassportImxProvider implements IMXProvider {
       }
       throw err;
     }
+  }
+
+  // TODO: Remove once implemented
+  // eslint-disable-next-line class-methods-use-this, @typescript-eslint/no-unused-vars
+  isRegisteredOnchain(): Promise<boolean> {
+    throw new PassportError(
+      'Operation not supported',
+      PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR,
+    );
   }
 
   async createOrder(request: UnsignedOrderRequest): Promise<CreateOrderResponse> {

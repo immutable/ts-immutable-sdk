@@ -107,21 +107,21 @@ describe('PassportImxProvider', () => {
     });
   });
 
-  describe('isRegisteredOnchain', () => {
+  describe('isRegisteredffchain', () => {
     it('should return true when a user is registered', async () => {
-      const isRegistered = await passportImxProvider.isRegisteredOnchain();
+      const isRegistered = await passportImxProvider.isRegisteredOffchain();
       expect(isRegistered).toEqual(true);
     });
 
     it('should return false when a user is not registered', async () => {
       mockAuthManager.getUser.mockResolvedValue({});
-      const isRegistered = await passportImxProvider.isRegisteredOnchain();
+      const isRegistered = await passportImxProvider.isRegisteredOffchain();
       expect(isRegistered).toEqual(false);
     });
 
     it('should bubble up the error if user is not logged in', async () => {
       mockAuthManager.getUser.mockResolvedValue(undefined);
-      expect(passportImxProvider.isRegisteredOnchain()).rejects.toThrow(new PassportError(
+      expect(passportImxProvider.isRegisteredOffchain()).rejects.toThrow(new PassportError(
         'User has been logged out',
         PassportErrorType.NOT_LOGGED_IN_ERROR,
       ));
