@@ -10,6 +10,7 @@ import {
   NetworkInfo,
   SwitchNetworkParams,
 } from '@imtbl/checkout-sdk';
+import { sendProviderUpdatedEvent } from 'lib/providerEvents';
 import { WalletActions, WalletContext } from '../../context/WalletContext';
 import { text } from '../../../../resources/text/textConfig';
 import { sendNetworkSwitchEvent } from '../../WalletWidgetEvents';
@@ -28,7 +29,6 @@ import {
 } from '../../../../context/view-context/ViewContext';
 import { WalletWidgetViews } from '../../../../context/view-context/WalletViewContextTypes';
 import {
-  ConnectLoaderActions,
   ConnectLoaderContext,
 } from '../../../../context/connect-loader-context/ConnectLoaderContext';
 import { EventTargetContext } from '../../../../context/event-target-context/EventTargetContext';
@@ -56,7 +56,7 @@ export interface NetworkMenuProps {
 }
 
 export function NetworkMenu({ setBalancesLoading }: NetworkMenuProps) {
-  const { connectLoaderState, connectLoaderDispatch } = useContext(ConnectLoaderContext);
+  const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
   const { checkout, provider } = connectLoaderState;
   const { viewDispatch } = useContext(ViewContext);
@@ -86,12 +86,6 @@ export function NetworkMenu({ setBalancesLoading }: NetworkMenuProps) {
           provider,
           chainId,
         } as SwitchNetworkParams);
-        connectLoaderDispatch({
-          payload: {
-            type: ConnectLoaderActions.SET_PROVIDER,
-            provider: switchNetworkResult.provider,
-          },
-        });
 
         walletDispatch({
           payload: {
@@ -100,6 +94,7 @@ export function NetworkMenu({ setBalancesLoading }: NetworkMenuProps) {
           },
         });
 
+        sendProviderUpdatedEvent({ provider: switchNetworkResult.provider });
         sendNetworkSwitchEvent(eventTarget, switchNetworkResult.provider, switchNetworkResult.network);
       } catch (err: any) {
         setBalancesLoading(false);

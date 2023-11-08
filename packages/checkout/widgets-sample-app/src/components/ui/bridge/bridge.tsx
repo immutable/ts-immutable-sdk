@@ -6,10 +6,10 @@ const BRIDGE_TARGET_ID = 'bridge-widget-target';
 function BridgeUI() {
   const checkout = useMemo(() => new Checkout(), []);
   const factory = useMemo(() => new WidgetsFactory(checkout, {theme: WidgetTheme.DARK}), [checkout]);
-  const bridge = useMemo(() => factory.create(WidgetType.BRIDGE, {}),[factory]);
+  const bridge = useMemo(() => factory.create(WidgetType.BRIDGE),[factory]);
   
   useEffect(() => {
-    bridge.mount(BRIDGE_TARGET_ID);
+    bridge.mount(BRIDGE_TARGET_ID, {amount: '10'});
     bridge.addListener(BridgeEventType.SUCCESS, (data: any) => {
       console.log('SUCCESS', data);
     });
@@ -18,7 +18,7 @@ function BridgeUI() {
     });
     bridge.addListener(BridgeEventType.CLOSE_WIDGET, (data: any) => {
       console.log('CLOSE_WIDGET', data);
-      bridge.destroy();
+      bridge.unmount();
     });
   }, [bridge])
   
@@ -26,14 +26,10 @@ function BridgeUI() {
     <div>
       <h1 className="sample-heading">Checkout Bridge</h1>
       <div id={BRIDGE_TARGET_ID}></div>
-      <button onClick={() => bridge.mount(BRIDGE_TARGET_ID)}>Mount</button>
+      <button onClick={() => bridge.mount(BRIDGE_TARGET_ID, {amount: '10'})}>Mount</button>
       <button onClick={() => bridge.unmount()}>Unmount</button>
-      <button onClick={() => bridge.update({ config: { theme: WidgetTheme.LIGHT } })}>Light Theme</button>
-      <button onClick={() => bridge.update({ config: { theme: WidgetTheme.DARK } })}>Dark Theme</button>
-      <button onClick={() => bridge.update({
-        params: { amount: '10', fromContractAddress: '0x2Fa06C6672dDCc066Ab04631192738799231dE4a' }
-      })}>Update Params</button>
-      <button onClick={() => bridge.destroy()}>Destroy</button>
+      <button onClick={() => bridge.update({ config: { theme: WidgetTheme.LIGHT } })}>Update Config Light</button>
+      <button onClick={() => bridge.update({ config: { theme: WidgetTheme.DARK } })}>Update Config Dark</button>
     </div>
   );
 }

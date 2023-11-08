@@ -30,43 +30,9 @@ export class Sale extends Base<WidgetType.SALE> {
   }
 
   protected getValidatedProperties(
-    { params, config }: WidgetProperties<WidgetType.SALE>,
+    { config }: WidgetProperties<WidgetType.SALE>,
   ): WidgetProperties<WidgetType.SALE> {
-    let validatedParams: SaleWidgetParams | undefined;
     let validatedConfig: WidgetConfiguration | undefined;
-
-    if (params) {
-      validatedParams = params;
-      if (!isValidWalletProvider(params.walletProviderName)) {
-        // eslint-disable-next-line no-console
-        console.warn('[IMTBL]: invalid "walletProviderName" widget input');
-        validatedParams.walletProviderName = undefined;
-      }
-      if (!isValidAmount(params.amount)) {
-        // eslint-disable-next-line no-console
-        console.warn('[IMTBL]: invalid "amount" widget input');
-        validatedParams.amount = '';
-      }
-
-      // TODO: fix the logic here when proper , currently saying if valid then reset to empty array.
-      if (this.isValidProucts(params.items ?? [])) {
-        // eslint-disable-next-line no-console
-        console.warn('[IMTBL]: invalid "items" widget input.');
-        validatedParams.items = [];
-      }
-
-      if (!params.environmentId) {
-        // eslint-disable-next-line no-console
-        console.warn('[IMTBL]: invalid "environmentId" widget input');
-        validatedParams.environmentId = '';
-      }
-
-      if (!params.fromContractAddress) {
-        // eslint-disable-next-line no-console
-        console.warn('[IMTBL]: invalid "fromContractAddress" widget input');
-        validatedParams.fromContractAddress = '';
-      }
-    }
 
     if (config) {
       validatedConfig = config;
@@ -75,16 +41,49 @@ export class Sale extends Base<WidgetType.SALE> {
     }
 
     return {
-      params: validatedParams,
       config: validatedConfig,
     };
   }
 
+  protected getValidatedParameters(params: SaleWidgetParams): SaleWidgetParams {
+    const validatedParams = params;
+    if (!isValidWalletProvider(params.walletProviderName)) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "walletProviderName" widget input');
+      validatedParams.walletProviderName = undefined;
+    }
+    if (!isValidAmount(params.amount)) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "amount" widget input');
+      validatedParams.amount = '';
+    }
+
+    // TODO: fix the logic here when proper , currently saying if valid then reset to empty array.
+    if (this.isValidProucts(params.items ?? [])) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "items" widget input.');
+      validatedParams.items = [];
+    }
+
+    if (!params.environmentId) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "environmentId" widget input');
+      validatedParams.environmentId = '';
+    }
+
+    if (!params.fromContractAddress) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "fromContractAddress" widget input');
+      validatedParams.fromContractAddress = '';
+    }
+
+    return validatedParams;
+  }
+
   protected render() {
-    const { params } = this.properties;
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER2,
-      web3Provider: this.properties.params?.web3Provider,
+      web3Provider: this.web3Provider,
       checkout: this.checkout,
       allowedChains: [
         getL2ChainId(this.checkout!.config),
@@ -105,10 +104,10 @@ export class Sale extends Base<WidgetType.SALE> {
           >
             <SaleWidget
               config={this.strongConfig()}
-              amount={params!.amount!}
-              items={params!.items!}
-              fromContractAddress={params!.fromContractAddress!}
-              environmentId={params!.environmentId!}
+              amount={this.parameters.amount!}
+              items={this.parameters.items!}
+              fromContractAddress={this.parameters.fromContractAddress!}
+              environmentId={this.parameters.environmentId!}
             />
           </ConnectLoader>
         </CustomAnalyticsProvider>

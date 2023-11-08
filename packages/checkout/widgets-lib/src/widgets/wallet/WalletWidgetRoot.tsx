@@ -21,19 +21,9 @@ export class Wallet extends Base<WidgetType.WALLET> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT;
 
   protected getValidatedProperties(
-    { params, config }: WidgetProperties<WidgetType.WALLET>,
+    { config }: WidgetProperties<WidgetType.WALLET>,
   ): WidgetProperties<WidgetType.WALLET> {
-    let validatedParams: WalletWidgetParams | undefined;
     let validatedConfig: WidgetConfiguration | undefined;
-
-    if (params) {
-      validatedParams = params;
-      if (!isValidWalletProvider(params.walletProviderName)) {
-        // eslint-disable-next-line no-console
-        console.warn('[IMTBL]: invalid "walletProviderName" widget input');
-        validatedParams.walletProviderName = undefined;
-      }
-    }
 
     if (config) {
       validatedConfig = config;
@@ -42,18 +32,26 @@ export class Wallet extends Base<WidgetType.WALLET> {
     }
 
     return {
-      params: validatedParams,
       config: validatedConfig,
     };
   }
 
-  protected render() {
-    const { params } = this.properties;
+  protected getValidatedParameters(params: WalletWidgetParams): WalletWidgetParams {
+    const validatedParams = params;
 
+    if (!isValidWalletProvider(params.walletProviderName)) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "walletProviderName" widget input');
+      validatedParams.walletProviderName = undefined;
+    }
+    return validatedParams;
+  }
+
+  protected render() {
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER2,
-      walletProviderName: params?.walletProviderName,
-      web3Provider: params?.web3Provider,
+      walletProviderName: this.parameters?.walletProviderName,
+      web3Provider: this.web3Provider,
       checkout: this.checkout,
       allowedChains: [getL1ChainId(this.checkout.config), getL2ChainId(this.checkout.config)],
     };

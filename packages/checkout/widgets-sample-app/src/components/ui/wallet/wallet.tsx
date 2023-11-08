@@ -4,17 +4,16 @@ import { WidgetsFactory } from '@imtbl/checkout-widgets';
 
 function WalletUI() {
   const checkout = useMemo(() => new Checkout(), [])
-  const wallet = useMemo(() => new WidgetsFactory(checkout, {}).create(WidgetType.WALLET, {}), [checkout])  
+  const wallet = useMemo(() => new WidgetsFactory(checkout, {}).create(WidgetType.WALLET), [checkout])  
 
   const unmount = () => {wallet.unmount()}
   const mount = () => {wallet.mount('wallet')}
   const update = (theme: WidgetTheme) => {wallet.update({config: {theme}})}
-  const destroy = () => {wallet.destroy()}
   
   useEffect(() => {
     mount()
     wallet.addListener(WalletEventType.NETWORK_SWITCH, (data) => {console.log('NETWORK_SWITCH', data)})
-    wallet.addListener(WalletEventType.CLOSE_WIDGET, () => {destroy()})
+    wallet.addListener(WalletEventType.CLOSE_WIDGET, () => {unmount()})
   }, []);
 
   return (
@@ -25,7 +24,6 @@ function WalletUI() {
       <button onClick={mount}>Mount</button>
       <button onClick={() => update(WidgetTheme.LIGHT)}>Light theme</button>
       <button onClick={() => update(WidgetTheme.DARK)}>Dark theme</button>
-      <button onClick={destroy}>Destroy</button>
     </div>
   );
 }

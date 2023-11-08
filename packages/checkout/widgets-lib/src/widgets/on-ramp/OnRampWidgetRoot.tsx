@@ -21,26 +21,9 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT;
 
   protected getValidatedProperties(
-    { params, config }: WidgetProperties<WidgetType.ONRAMP>,
+    { config }: WidgetProperties<WidgetType.ONRAMP>,
   ): WidgetProperties<WidgetType.ONRAMP> {
-    let validatedParams: OnRampWidgetParams | undefined;
     let validatedConfig: WidgetConfiguration | undefined;
-
-    if (params) {
-      validatedParams = params;
-
-      if (!isValidAmount(params.amount)) {
-      // eslint-disable-next-line no-console
-        console.warn('[IMTBL]: invalid "amount" widget input');
-        validatedParams.amount = '';
-      }
-
-      if (!isValidAddress(params.contractAddress)) {
-      // eslint-disable-next-line no-console
-        console.warn('[IMTBL]: invalid "contractAddress" widget input');
-        validatedParams.contractAddress = '';
-      }
-    }
 
     if (config) {
       validatedConfig = config;
@@ -49,18 +32,33 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
     }
 
     return {
-      params: validatedParams,
       config: validatedConfig,
     };
   }
 
-  protected render() {
-    const { params } = this.properties;
+  protected getValidatedParameters(params: OnRampWidgetParams): OnRampWidgetParams {
+    const validatedParams = params;
 
+    if (!isValidAmount(params.amount)) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "amount" widget input');
+      validatedParams.amount = '';
+    }
+
+    if (!isValidAddress(params.contractAddress)) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "contractAddress" widget input');
+      validatedParams.contractAddress = '';
+    }
+
+    return validatedParams;
+  }
+
+  protected render() {
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER2,
-      walletProviderName: params?.walletProviderName,
-      web3Provider: params?.web3Provider,
+      walletProviderName: this.parameters.walletProviderName,
+      web3Provider: this.web3Provider,
       checkout: this.checkout,
       allowedChains: [getL1ChainId(this.checkout.config), getL2ChainId(this.checkout.config)],
     };
@@ -77,8 +75,8 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
               closeEvent={() => sendOnRampWidgetCloseEvent(window)}
             >
               <OnRampWidget
-                contractAddress={params?.contractAddress}
-                amount={params?.amount}
+                contractAddress={this.parameters.contractAddress}
+                amount={this.parameters.amount}
                 config={this.strongConfig()}
               />
             </ConnectLoader>

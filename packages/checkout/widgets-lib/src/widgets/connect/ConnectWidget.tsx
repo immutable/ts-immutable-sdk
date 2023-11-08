@@ -7,6 +7,7 @@ import {
   ChainId,
   Checkout, ConnectTargetLayer, ConnectWidgetParams,
 } from '@imtbl/checkout-sdk';
+import { Web3Provider } from '@ethersproject/providers';
 import {
   sendCloseWidgetEvent,
   sendConnectFailedEvent,
@@ -34,7 +35,7 @@ import {
 import { StatusType } from '../../components/Status/StatusType';
 import { StatusView } from '../../components/Status/StatusView';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { getTargetLayerChainId } from '../../lib';
+import { getTargetLayerChainId, sendProviderUpdatedEvent } from '../../lib';
 import { SwitchNetworkEth } from './views/SwitchNetworkEth';
 import { ErrorView } from '../../views/error/ErrorView';
 import { text } from '../../resources/text/textConfig';
@@ -50,6 +51,7 @@ export type ConnectWidgetInputs = ConnectWidgetParams & {
   targetLayer?: ConnectTargetLayer;
   allowedChains?: ChainId[];
   checkout: Checkout;
+  web3Provider?: Web3Provider;
 };
 
 export function ConnectWidget({
@@ -145,6 +147,7 @@ export function ConnectWidget({
       screen: 'ConnectSuccess',
     });
     await identifyUser(identify, provider);
+    sendProviderUpdatedEvent({ provider });
     sendConnectSuccessEvent(eventTarget, provider, walletProviderName ?? undefined);
   }, [provider, identify]);
 

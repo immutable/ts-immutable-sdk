@@ -6,13 +6,17 @@ import { passportConfig } from './passportConfig';
 import {  WidgetsFactory } from '@imtbl/checkout-widgets';
 import { Checkout,
   ConnectEventType,
-  ConnectionSuccess, OrchestrationEventType,
-  RequestBridgeEvent, BridgeEventType,
-  RequestOnrampEvent, OnRampEventType,
-  RequestSwapEvent, SwapEventType,
+  ConnectionSuccess, 
+  OrchestrationEventType,
+  RequestBridgeEvent, 
+  BridgeEventType,
+  RequestOnrampEvent, 
+  OnRampEventType,
+  RequestSwapEvent, 
+  SwapEventType,
   WalletEventType,
   WalletNetworkSwitchEvent,
-  WidgetTheme, WidgetType, SwapSuccess } from '@imtbl/checkout-sdk';
+  WidgetTheme, WidgetType, ProviderEventType, ProviderUpdated } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 
 export const MainPage = () => {
@@ -27,11 +31,11 @@ export const MainPage = () => {
   }), []);
   const widgetsFactory = useMemo(() => new WidgetsFactory(checkout, {theme: WidgetTheme.DARK}), [checkout]);
 
-  const connectWidget = useMemo(() => widgetsFactory.create(WidgetType.CONNECT, {}), [widgetsFactory]);
-  const walletWidget = useMemo(() => widgetsFactory.create(WidgetType.WALLET, {}), [widgetsFactory]);
-  const bridgeWidget = useMemo(() => widgetsFactory.create(WidgetType.BRIDGE, {}), [widgetsFactory]);
-  const swapWidget = useMemo(() => widgetsFactory.create(WidgetType.SWAP, {}), [widgetsFactory]);
-  const onRampWidget = useMemo(() => widgetsFactory.create(WidgetType.ONRAMP, {}), [widgetsFactory]);
+  const connectWidget = useMemo(() => widgetsFactory.create(WidgetType.CONNECT), [widgetsFactory]);
+  const walletWidget = useMemo(() => widgetsFactory.create(WidgetType.WALLET), [widgetsFactory]);
+  const bridgeWidget = useMemo(() => widgetsFactory.create(WidgetType.BRIDGE), [widgetsFactory]);
+  const swapWidget = useMemo(() => widgetsFactory.create(WidgetType.SWAP), [widgetsFactory]);
+  const onRampWidget = useMemo(() => widgetsFactory.create(WidgetType.ONRAMP), [widgetsFactory]);
 
   connectWidget.addListener(ConnectEventType.CLOSE_WIDGET, () => {connectWidget.unmount()});
   walletWidget.addListener(WalletEventType.CLOSE_WIDGET, () => {walletWidget.unmount()});
@@ -50,36 +54,27 @@ export const MainPage = () => {
     });
     walletWidget.addListener(WalletEventType.NETWORK_SWITCH, (eventData: WalletNetworkSwitchEvent) => {
       setWeb3Provider(eventData.provider)
-    })
-  }, [connectWidget, walletWidget]);
-
-  // // keep provider updated in widgets
-  // useEffect(() => {
-  //   walletWidget.update({params: {web3Provider}})
-  //   swapWidget.update({params: {web3Provider}})
-  //   bridgeWidget.update({params: {web3Provider}})
-  //   onRampWidget.update({params: {web3Provider}})
-  // }, [web3Provider])
-
+    });
+    swapWidget.addListener(ProviderEventType.PROVIDER_UPDATED, (data: ProviderUpdated) => {
+      console.log("swap widget provider updated", data)
+    });
+  }, [connectWidget, walletWidget, swapWidget]);
 
   // Orchestration
   useEffect(() => {
     walletWidget.addListener(OrchestrationEventType.REQUEST_BRIDGE, (eventData: RequestBridgeEvent) => {
       walletWidget.unmount();
-      bridgeWidget.update({params: {fromContractAddress: eventData.tokenAddress, amount: eventData.amount, web3Provider}})
-      bridgeWidget.mount('widget-target');
+      bridgeWidget.mount('bridge-target', {fromContractAddress: eventData.tokenAddress, amount: eventData.amount});
     })
     walletWidget.addListener(OrchestrationEventType.REQUEST_SWAP, (data: RequestSwapEvent) => {
       walletWidget.unmount();
-      swapWidget.update({params: {fromContractAddress: data.fromTokenAddress, amount: data.amount, web3Provider}})
-      swapWidget.mount('widget-target');
+      swapWidget.mount('swap-target', {fromContractAddress: data.fromTokenAddress, amount: data.amount});
     })
     walletWidget.addListener(OrchestrationEventType.REQUEST_ONRAMP, (data: RequestOnrampEvent) => {
       walletWidget.unmount();
-      onRampWidget.update({params: {contractAddress: data.tokenAddress, amount: data.amount, web3Provider}})
-      onRampWidget.mount('widget-target');
+      onRampWidget.mount('onramp-target', {contractAddress: data.tokenAddress, amount: data.amount});
     })
-  }, [walletWidget, bridgeWidget, onRampWidget, swapWidget, web3Provider]);
+  }, [walletWidget, bridgeWidget, onRampWidget, swapWidget]);
 
   // button click functions to open/close widgets
   const openConnectWidget = useCallback(() => {
@@ -99,7 +94,6 @@ export const MainPage = () => {
   }, [swapWidget])
 
   const openOnRampWidget = useCallback(() => {
-    onRampWidget.update({params: {web3Provider}})
     onRampWidget.mount('onramp-target')
   }, [onRampWidget, web3Provider])
 
@@ -132,7 +126,7 @@ export const MainPage = () => {
           <div id="swap-target"></div>
           <div id="bridge-target"></div>
           <div id="onramp-target"></div>
-          <Box sx={{display: 'flex', flexDirection: 'row', gap: 'base.spacing.x4', flexWrap: 'wrap'}}>
+          {/* <Box sx={{display: 'flex', flexDirection: 'row', gap: 'base.spacing.x4', flexWrap: 'wrap'}}>
               {cardKeys.map((val) => (
                 <Box key={val} sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
                   <Card sx={{width: '240px', marginBottom: 'base.spacing.x2'}}>
@@ -144,7 +138,7 @@ export const MainPage = () => {
                   <Button variant={doneSwap ? "primary" : "tertiary"} disabled={!doneSwap} onClick={handleBuyClick}>Buy</Button>
                 </Box>
               ))}
-          </Box>
+          </Box> */}
       </Box>
     </Box>
   );

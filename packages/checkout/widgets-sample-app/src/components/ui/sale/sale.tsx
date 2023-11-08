@@ -96,19 +96,19 @@ export function SaleUI() {
   const passportInstance = useMemo(() => usePassportInstance(JSON.parse(passportConfig)), []);
   const checkout = useMemo(() => new Checkout({baseConfig: {environment: Environment.SANDBOX}, passport: passportInstance as unknown as Passport}), [passportInstance])
   const factory = useMemo(() => new WidgetsFactory(checkout, {theme: WidgetTheme.DARK}), [checkout])
-  const saleWidget = useMemo(() => factory.create(WidgetType.SALE, {
-      amount, 
-      environmentId, 
-      fromContractAddress, 
-      items: defaultItems
-    }), 
+  const saleWidget = useMemo(() => factory.create(WidgetType.SALE, {theme: WidgetTheme.DARK}), 
   [factory, amount, environmentId, fromContractAddress, defaultItems]
   )
 
   // mount sale widget and subscribe to close event
   useEffect(() => {
-    saleWidget.mount("sale");
-    saleWidget.addListener(SaleEventType.CLOSE_WIDGET, () => { saleWidget.destroy()})
+    saleWidget.mount("sale", {
+      amount, 
+      environmentId, 
+      fromContractAddress, 
+      items: defaultItems
+    });
+    saleWidget.addListener(SaleEventType.CLOSE_WIDGET, () => { saleWidget.unmount()})
   }, [saleWidget])
 
   const handlePassportConfigChange = (e: any) => {
@@ -170,11 +170,15 @@ export function SaleUI() {
   return (
     <>
     <div id="sale"></div>
-    <button onClick={() => saleWidget.mount('sale')}>Mount</button>
+    <button onClick={() => saleWidget.mount('sale', {
+      amount, 
+      environmentId, 
+      fromContractAddress, 
+      items: defaultItems
+    })}>Mount</button>
     <button onClick={() => saleWidget.unmount()}>Unmount</button>
-    <button onClick={() => saleWidget.update({config: {theme: WidgetTheme.LIGHT}})}>Light theme</button>
-    <button onClick={() => saleWidget.update({config: {theme: WidgetTheme.DARK}})}>Dark theme</button>
-    <button onClick={() => saleWidget.destroy()}>Destory</button>
+    <button onClick={() => saleWidget.update({config: {theme: WidgetTheme.LIGHT}})}>Update Config Light</button>
+    <button onClick={() => saleWidget.update({config: {theme: WidgetTheme.DARK}})}>Update Config Dark</button>
       <br />
       <br />
       <br />
