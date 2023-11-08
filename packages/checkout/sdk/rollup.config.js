@@ -13,7 +13,6 @@ const commonPlugins = [
     'process.env.CHECKOUT_DEV_MODE': JSON.stringify(process.env.CHECKOUT_DEV_MODE || 'false'),
     'process.env.CHECKOUT_LOCAL_MODE': JSON.stringify(process.env.CHECKOUT_LOCAL_MODE || 'false'),
     'process.versions': JSON.stringify(process.versions || {}),
-    __SDK_VERSION__: pkg.version,
   }),
   typescript()
 ]
