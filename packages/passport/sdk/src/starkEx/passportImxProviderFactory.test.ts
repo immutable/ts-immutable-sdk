@@ -130,6 +130,7 @@ describe('PassportImxProviderFactory', () => {
         expect(PassportImxProvider).toHaveBeenCalledWith({
           authManager: mockAuthManager,
           starkSigner: mockStarkSigner,
+          ethSigner: mockEthSigner,
           immutableXClient,
           config,
           confirmationScreen,
