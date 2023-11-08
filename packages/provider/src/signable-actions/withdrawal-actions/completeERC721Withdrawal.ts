@@ -8,7 +8,7 @@ import {
 } from '@imtbl/core-sdk';
 import * as encUtils from 'enc-utils';
 import { TransactionResponse } from '@ethersproject/providers';
-import { ProviderConfiguration } from 'config';
+import { ProviderConfiguration } from '../../config';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 import {
   getSignableRegistrationOnchain,
