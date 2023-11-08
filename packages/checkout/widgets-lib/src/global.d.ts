@@ -5,11 +5,11 @@ import {
   ImtblSwapProps,
   ImtblBridgeProps,
   ImtblOnRampProps,
-  ImtblExampleProps,
-  ImtblBuyProps,
-  ImtblTransitionExampleProps,
-  ImtblInnerWidgetExampleProps,
-  ImtblOuterWidgetExampleProps,
+  // ImtblExampleProps,
+  // ImtblBuyProps,
+  // ImtblTransitionExampleProps,
+  // ImtblInnerWidgetExampleProps,
+  // ImtblOuterWidgetExampleProps,
   ImtblSaleProps,
 } from '@imtbl/checkout-widgets';
 
@@ -24,12 +24,12 @@ declare global {
       'imtbl-swap': ImtblSwapProps;
       'imtbl-bridge': ImtblBridgeProps;
       'imtbl-onramp': ImtblOnRampProps;
-      'imtbl-buy': ImtblBuyProps;
+      // 'imtbl-buy': ImtblBuyProps;
       'imtbl-sale': ImtblSaleProps;
-      'imtbl-example': ImtblExampleProps;
-      'imtbl-transition-example': ImtblTransitionExampleProps;
-      'imtbl-inner-widget-example': ImtblInnerWidgetExampleProps;
-      'imtbl-outer-widget-example': ImtblOuterWidgetExampleProps;
+      // 'imtbl-example': ImtblExampleProps;
+      // 'imtbl-transition-example': ImtblTransitionExampleProps;
+      // 'imtbl-inner-widget-example': ImtblInnerWidgetExampleProps;
+      // 'imtbl-outer-widget-example': ImtblOuterWidgetExampleProps;
     }
   }
   interface ImmutableWebComponent {

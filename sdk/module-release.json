@@ -21,6 +21,11 @@
       "src": "../packages/checkout/widgets-lib/build/static/js/main.*.js",
       "dest": "./dist/browser/checkout.js",
       "stage": "prod"
-    }
+    },
+    {
+      "src": "../packages/checkout/widgets-lib/src/global.d.ts",
+      "dest": "./dist/global.d.ts",
+      "stage": "prod"
+    }    
   ]
 }
