@@ -111,13 +111,16 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
 
     if (this.eventHandlersFunction) {
       window.removeEventListener(this.eventTopic, this.eventHandlersFunction);
+      window.removeEventListener(IMTBLWidgetEvents.IMTBL_WIDGETS_PROVIDER, this.eventHandlersFunction);
     }
 
     this.eventHandlersFunction = (event: any) => {
       const matchingHandler = this.eventHandlers.get(event.detail.type);
       if (matchingHandler) matchingHandler(event.detail.data);
     };
+
     window.addEventListener(this.eventTopic, this.eventHandlersFunction);
+    window.addEventListener(IMTBLWidgetEvents.IMTBL_WIDGETS_PROVIDER, this.eventHandlersFunction);
   }
 
   removeListener<KEventName extends keyof WidgetEventData[T]>(type: KEventName): void {
@@ -125,6 +128,7 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
 
     if (this.eventHandlersFunction) {
       window.removeEventListener(this.eventTopic, this.eventHandlersFunction);
+      window.removeEventListener(IMTBLWidgetEvents.IMTBL_WIDGETS_PROVIDER, this.eventHandlersFunction);
     }
 
     if (this.eventHandlers.size <= 0) return;
@@ -133,7 +137,9 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
       const matchingHandler = this.eventHandlers.get(event.detail.type);
       if (matchingHandler) matchingHandler(event.detail.data);
     };
+
     window.addEventListener(this.eventTopic, this.eventHandlersFunction);
+    window.addEventListener(IMTBLWidgetEvents.IMTBL_WIDGETS_PROVIDER, this.eventHandlersFunction);
   }
 
   protected strongConfig(): StrongCheckoutWidgetsConfig {
