@@ -4,6 +4,8 @@ import {
 import { BigNumber, utils } from 'ethers';
 import { Web3Provider } from '@ethersproject/providers';
 import { TokenInfo } from '@imtbl/checkout-sdk';
+import { isNativeToken } from '../../../lib/utils';
+import { NATIVE } from '../../../lib';
 
 const fromAmountIn = async (
   exchange: Exchange,
@@ -15,8 +17,8 @@ const fromAmountIn = async (
   const address = await provider.getSigner().getAddress();
   return exchange.getUnsignedSwapTxFromAmountIn(
     address,
-    fromToken.address || '',
-    toToken.address || '',
+    isNativeToken(fromToken.address) ? NATIVE : fromToken.address as string,
+    isNativeToken(toToken.address) ? NATIVE : toToken.address as string,
     BigNumber.from(utils.parseUnits(fromAmount, fromToken.decimals)),
   );
 };
@@ -31,8 +33,8 @@ const fromAmountOut = async (
   const address = await provider.getSigner().getAddress();
   return exchange.getUnsignedSwapTxFromAmountOut(
     address,
-    fromToken.address || '',
-    toToken.address || '',
+    isNativeToken(fromToken.address) ? NATIVE : fromToken.address as string,
+    isNativeToken(toToken.address) ? NATIVE : toToken.address as string,
     BigNumber.from(utils.parseUnits(toAmount, toToken.decimals)),
   );
 };
