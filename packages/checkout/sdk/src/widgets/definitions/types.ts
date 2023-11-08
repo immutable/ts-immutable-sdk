@@ -216,10 +216,10 @@ export interface Widget<T extends WidgetType> {
    */
   unmount(): void;
   /**
-   * Update the widget parameters
-   * @param params Widget specific parameters including configuration
+   * Update the widget properties
+   * @param props Widget specific properties including configuration
    */
-  update(params: WidgetProperties<T>): void
+  update(props: WidgetProperties<T>): void
   /**
    * Add a listener for a widget event.
    * @param event Widget specific event name.

@@ -6,13 +6,14 @@ import terser from '@rollup/plugin-terser';
 import replace from '@rollup/plugin-replace';
 import nodePolyfills from 'rollup-plugin-polyfill-node';
 
-const defaultPlugin = [
+const commonPlugins = [
   replace({
     preventAssignment: true,
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
     'process.env.CHECKOUT_DEV_MODE': JSON.stringify(process.env.CHECKOUT_DEV_MODE || 'false'),
     'process.env.CHECKOUT_LOCAL_MODE': JSON.stringify(process.env.CHECKOUT_LOCAL_MODE || 'false'),
-    'process.versions': JSON.stringify(process.versions || {})
+    'process.versions': JSON.stringify(process.versions || {}),
+    __SDK_VERSION__: pkg.version,
   }),
   typescript()
 ]
@@ -25,7 +26,7 @@ export default [
       dir: 'dist',
       format: 'es'
     },
-    plugins: [ ...defaultPlugin ]
+    plugins: [ ...commonPlugins ]
   },
   {
     watch: false,
@@ -42,7 +43,7 @@ export default [
       commonjs(),
       nodePolyfills(),
       terser(),
-      ...defaultPlugin,
+      ...commonPlugins,
     ],
   }
 ]

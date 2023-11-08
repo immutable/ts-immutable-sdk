@@ -94,11 +94,11 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
     this.render();
   }
 
-  update(properties: WidgetProperties<T>): void {
+  update(props: WidgetProperties<T>): void {
     this.properties = this.getValidatedProperties({
       config: {
         ...(this.properties.config ?? {}),
-        ...(properties.config ?? {}),
+        ...(props.config ?? {}),
       },
     });
 
