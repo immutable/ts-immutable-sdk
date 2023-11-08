@@ -60,7 +60,7 @@ function ImxWorkflow() {
   const notLoadingAndIsRegistered = !isLoading && isRegistered;
 
   useEffect(() => {
-    imxProvider?.isRegisteredOnchain().then((res) => setIsRegistered(res)).catch(() => setIsRegistered(false));
+    imxProvider?.isRegisteredOffchain().then((res) => setIsRegistered(res)).catch(() => setIsRegistered(false));
   }, [imxProvider, isRegistered]);
 
   return (
