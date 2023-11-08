@@ -198,7 +198,7 @@ export interface IWidgetsFactory {
    * Create a new widget instance.
    * @param type widget type to instantiate.
    */
-  create<T extends WidgetType>(type: T, config: WidgetConfigurations[T], provider?: Web3Provider): Widget<T>;
+  create<T extends WidgetType>(type: T, config?: WidgetConfigurations[T], provider?: Web3Provider): Widget<T>;
   updateProvider(provider: Web3Provider): void;
 }
 
@@ -210,7 +210,7 @@ export interface Widget<T extends WidgetType> {
    * Mount a widget to a DOM ref element.
    * @param id ID of the DOM element where the widget will be mounted.
    */
-  mount(id: string, params: WidgetParameters[T]): void;
+  mount(id: string, params?: WidgetParameters[T]): void;
   /**
    * Unmount a widget and reset parameters
    */

@@ -20,13 +20,13 @@ declare global {
   namespace ImmutableCheckoutWidgets {
     class WidgetsFactory implements IWidgetsFactory {
       constructor(sdk: Checkout, config: CheckoutWidgetsConfig);
-      create<T extends WidgetType>(type: T, config: WidgetConfigurations[T], provider?: Web3Provider): Widget<T>;
+      create<T extends WidgetType>(type: T, config?: WidgetConfigurations[T], provider?: Web3Provider): Widget<T>;
       updateProvider(provider: Web3Provider): void;
     }
 
     class Connect<T extends WidgetType> implements Widget<T> {
       constructor(sdk: Checkout, props: WidgetProperties<T>);
-      mount(id: string, params: WidgetParameters[T]): void;
+      mount(id: string, params?: WidgetParameters[T]): void;
       unmount(): void;
       update(props: WidgetProperties<T>): void;
       addListener<KEventName extends keyof WidgetEventData[T]>(
@@ -38,7 +38,7 @@ declare global {
 
     class Bridge<T extends WidgetType> implements Widget<T> {
       constructor(sdk: Checkout, props: WidgetProperties<T>);
-      mount(id: string, params: WidgetParameters[T]): void;
+      mount(id: string, params?: WidgetParameters[T]): void;
       unmount(): void;
       update(props: WidgetProperties<T>): void;
       addListener<KEventName extends keyof WidgetEventData[T]>(
@@ -50,7 +50,7 @@ declare global {
 
     class Wallet<T extends WidgetType> implements Widget<T> {
       constructor(sdk: Checkout, props: WidgetProperties<T>);
-      mount(id: string, params: WidgetParameters[T]): void;
+      mount(id: string, params?: WidgetParameters[T]): void;
       unmount(): void;
       update(props: WidgetProperties<T>): void;
       addListener<KEventName extends keyof WidgetEventData[T]>(
@@ -62,7 +62,7 @@ declare global {
 
     class Swap<T extends WidgetType> implements Widget<T> {
       constructor(sdk: Checkout, props: WidgetProperties<T>);
-      mount(id: string, params: WidgetParameters[T]): void;
+      mount(id: string, params?: WidgetParameters[T]): void;
       unmount(): void;
       update(props: WidgetProperties<T>): void;
       addListener<KEventName extends keyof WidgetEventData[T]>(
@@ -74,7 +74,7 @@ declare global {
 
     class OnRamp<T extends WidgetType> implements Widget<T> {
       constructor(sdk: Checkout, props: WidgetProperties<T>);
-      mount(id: string, params: WidgetParameters[T]): void;
+      mount(id: string, params?: WidgetParameters[T]): void;
       unmount(): void;
       update(props: WidgetProperties<T>): void;
       addListener<KEventName extends keyof WidgetEventData[T]>(
@@ -86,7 +86,7 @@ declare global {
 
     class Sale<T extends WidgetType> implements Widget<T> {
       constructor(sdk: Checkout, props: WidgetProperties<T>);
-      mount(id: string, params: WidgetParameters[T]): void;
+      mount(id: string, params?: WidgetParameters[T]): void;
       unmount(): void;
       update(props: WidgetProperties<T>): void;
       addListener<KEventName extends keyof WidgetEventData[T]>(

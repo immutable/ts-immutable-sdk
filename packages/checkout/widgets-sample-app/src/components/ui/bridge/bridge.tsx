@@ -6,7 +6,7 @@ const BRIDGE_TARGET_ID = 'bridge-widget-target';
 function BridgeUI() {
   const checkout = useMemo(() => new Checkout(), []);
   const factory = useMemo(() => new WidgetsFactory(checkout, {theme: WidgetTheme.DARK}), [checkout]);
-  const bridge = useMemo(() => factory.create(WidgetType.BRIDGE, {}),[factory]);
+  const bridge = useMemo(() => factory.create(WidgetType.BRIDGE),[factory]);
   
   useEffect(() => {
     bridge.mount(BRIDGE_TARGET_ID, {amount: '10'});

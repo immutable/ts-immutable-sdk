@@ -4,10 +4,10 @@ import { WidgetsFactory } from '@imtbl/checkout-widgets';
 
 function WalletUI() {
   const checkout = useMemo(() => new Checkout(), [])
-  const wallet = useMemo(() => new WidgetsFactory(checkout, {}).create(WidgetType.WALLET, {}), [checkout])  
+  const wallet = useMemo(() => new WidgetsFactory(checkout, {}).create(WidgetType.WALLET), [checkout])  
 
   const unmount = () => {wallet.unmount()}
-  const mount = () => {wallet.mount('wallet', {})}
+  const mount = () => {wallet.mount('wallet')}
   const update = (theme: WidgetTheme) => {wallet.update({config: {theme}})}
   
   useEffect(() => {

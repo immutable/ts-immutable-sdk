@@ -66,7 +66,7 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
     this.reactRoot = undefined;
   }
 
-  mount(id: string, params: WidgetParameters[T]) {
+  mount(id: string, params?: WidgetParameters[T]) {
     this.parameters = this.getValidatedParameters({
       ...(this.parameters ?? {}),
       ...(params ?? {}),

@@ -32,7 +32,6 @@ export class Connect extends Base<WidgetType.CONNECT> {
           <ConnectWidget
             config={this.strongConfig()}
             checkout={this.checkout}
-            {...this.parameters}
           />
         </CustomAnalyticsProvider>
       </React.StrictMode>,

@@ -17,7 +17,7 @@ function ConnectUI() {
   const [factory, setFactory] = useState<ImmutableCheckoutWidgets.WidgetsFactory>();
   const connect = useMemo(() => {
     if(!factory) return;
-    return (factory).create(WidgetType.CONNECT, {})
+    return (factory).create(WidgetType.CONNECT)
   }, [factory]);
   const [provider, setProvider] = useState();
 
@@ -42,7 +42,7 @@ function ConnectUI() {
     <div>
       <h1 className="sample-heading">Checkout Connect</h1>
       <div id={CONNECT_TARGET_ID}></div>
-      <button onClick={() => connect?.mount(CONNECT_TARGET_ID, {})}>Mount</button>
+      <button onClick={() => connect?.mount(CONNECT_TARGET_ID)}>Mount</button>
       <button onClick={() => connect?.unmount()}>Unmount</button>
     </div>
   );

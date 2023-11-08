@@ -6,7 +6,7 @@ const SWAP_TARGET_ID = 'swap-target'
 function SwapUI() {
   const checkout = useMemo(() => new Checkout(), []);
   const factory = useMemo(() => new WidgetsFactory(checkout, {theme: WidgetTheme.DARK}), [checkout]);
-  const swap = useMemo(() => factory.create(WidgetType.SWAP, {}),[factory]);
+  const swap = useMemo(() => factory.create(WidgetType.SWAP),[factory]);
 
   const updateTheme = (theme: WidgetTheme) => swap.update({config: {theme}});
   
@@ -26,7 +26,7 @@ function SwapUI() {
     <div>
       <h1 className="sample-heading">Checkout Swap</h1>
       <div id={SWAP_TARGET_ID}></div>
-      <button onClick={() => swap.mount(SWAP_TARGET_ID, {})}>Mount</button>
+      <button onClick={() => swap.mount(SWAP_TARGET_ID)}>Mount</button>
       <button onClick={() => swap.unmount()}>Unmount</button>
       <button onClick={() => updateTheme(WidgetTheme.LIGHT)}>Light theme</button>
       <button onClick={() => updateTheme(WidgetTheme.DARK)}>Dark theme</button>

@@ -4,7 +4,7 @@ import { WidgetsFactory } from "@imtbl/checkout-widgets";
 
 function OnRampUI() {
   const checkout = useMemo(() => new Checkout(), [])
-  const onRamp = useMemo(() => new WidgetsFactory(checkout, {}).create(WidgetType.ONRAMP, {}), [checkout])
+  const onRamp = useMemo(() => new WidgetsFactory(checkout, {}).create(WidgetType.ONRAMP), [checkout])
 
   const unmount = () => {onRamp.unmount()}
   const mount = () => {

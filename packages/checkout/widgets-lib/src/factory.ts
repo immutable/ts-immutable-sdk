@@ -31,41 +31,41 @@ export class WidgetsFactory implements IWidgetsFactory {
     sendProviderUpdatedEvent({ provider });
   }
 
-  create<T extends WidgetType>(type: T, config: WidgetConfigurations[T], provider?: Web3Provider): Widget<T> {
+  create<T extends WidgetType>(type: T, config?: WidgetConfigurations[T], provider?: Web3Provider): Widget<T> {
     switch (type) {
       case WidgetType.CONNECT: {
         return new Connect(this.sdk, {
-          config: { ...this.widgetConfig, ...config },
+          config: { ...this.widgetConfig, ...(config) },
           provider,
         }) as Widget<WidgetType.CONNECT> as Widget<T>;
       }
       case WidgetType.BRIDGE: {
         return new Bridge(this.sdk, {
-          config: { ...this.widgetConfig, ...config },
+          config: { ...this.widgetConfig, ...(config) },
           provider,
         }) as Widget<WidgetType.BRIDGE> as Widget<T>;
       }
       case WidgetType.WALLET: {
         return new Wallet(this.sdk, {
-          config: { ...this.widgetConfig, ...config },
+          config: { ...this.widgetConfig, ...(config) },
           provider,
         }) as Widget<WidgetType.WALLET> as Widget<T>;
       }
       case WidgetType.SWAP: {
         return new Swap(this.sdk, {
-          config: { ...this.widgetConfig, ...config },
+          config: { ...this.widgetConfig, ...(config) },
           provider,
         }) as Widget<WidgetType.SWAP> as Widget<T>;
       }
       case WidgetType.ONRAMP: {
         return new OnRamp(this.sdk, {
-          config: { ...this.widgetConfig, ...config },
+          config: { ...this.widgetConfig, ...(config) },
           provider,
         }) as Widget<WidgetType.ONRAMP> as Widget<T>;
       }
       case WidgetType.SALE: {
         return new Sale(this.sdk, {
-          config: { ...this.widgetConfig, ...config },
+          config: { ...this.widgetConfig, ...(config) },
           provider,
         }) as Widget<WidgetType.SALE> as Widget<T>;
       }

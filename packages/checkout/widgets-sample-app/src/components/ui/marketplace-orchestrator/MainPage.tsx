@@ -31,11 +31,11 @@ export const MainPage = () => {
   }), []);
   const widgetsFactory = useMemo(() => new WidgetsFactory(checkout, {theme: WidgetTheme.DARK}), [checkout]);
 
-  const connectWidget = useMemo(() => widgetsFactory.create(WidgetType.CONNECT, {}), [widgetsFactory]);
-  const walletWidget = useMemo(() => widgetsFactory.create(WidgetType.WALLET, {}), [widgetsFactory]);
-  const bridgeWidget = useMemo(() => widgetsFactory.create(WidgetType.BRIDGE, {}), [widgetsFactory]);
-  const swapWidget = useMemo(() => widgetsFactory.create(WidgetType.SWAP, {}), [widgetsFactory]);
-  const onRampWidget = useMemo(() => widgetsFactory.create(WidgetType.ONRAMP, {}), [widgetsFactory]);
+  const connectWidget = useMemo(() => widgetsFactory.create(WidgetType.CONNECT), [widgetsFactory]);
+  const walletWidget = useMemo(() => widgetsFactory.create(WidgetType.WALLET), [widgetsFactory]);
+  const bridgeWidget = useMemo(() => widgetsFactory.create(WidgetType.BRIDGE), [widgetsFactory]);
+  const swapWidget = useMemo(() => widgetsFactory.create(WidgetType.SWAP), [widgetsFactory]);
+  const onRampWidget = useMemo(() => widgetsFactory.create(WidgetType.ONRAMP), [widgetsFactory]);
 
   connectWidget.addListener(ConnectEventType.CLOSE_WIDGET, () => {connectWidget.unmount()});
   walletWidget.addListener(WalletEventType.CLOSE_WIDGET, () => {walletWidget.unmount()});
@@ -75,23 +75,23 @@ export const MainPage = () => {
 
   // button click functions to open/close widgets
   const openConnectWidget = useCallback(() => {
-    connectWidget.mount('connect-target', {});
+    connectWidget.mount('connect-target');
   }, [connectWidget])
 
   const openWalletWidget = useCallback(() => {
-    walletWidget.mount('wallet-target', {});
+    walletWidget.mount('wallet-target');
   }, [walletWidget])
 
   const openBridgeWidget = useCallback(() => {
-    bridgeWidget.mount('bridge-target', {})
+    bridgeWidget.mount('bridge-target')
   }, [bridgeWidget])
 
   const openSwapWidget = useCallback(() => {
-    swapWidget.mount('swap-target', {})
+    swapWidget.mount('swap-target')
   }, [swapWidget])
 
   const openOnRampWidget = useCallback(() => {
-    onRampWidget.mount('onramp-target', {})
+    onRampWidget.mount('onramp-target')
   }, [onRampWidget, web3Provider])
 
   const handleBuyClick = () => {
