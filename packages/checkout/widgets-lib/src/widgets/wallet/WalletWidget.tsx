@@ -3,6 +3,7 @@ import {
   useContext, useEffect, useMemo, useReducer,
 } from 'react';
 import { IMTBLWidgetEvents, WalletWidgetParams } from '@imtbl/checkout-sdk';
+import { UserJourney } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import {
   initialWalletState,
   WalletActions,
@@ -180,6 +181,7 @@ export function WalletWidget(props: WalletWidgetInputs) {
             )}
             {viewState.view.type === SharedViews.TOP_UP_VIEW && (
               <TopUpView
+                analytics={{ userJourney: UserJourney.WALLET }}
                 widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
                 showOnrampOption={isOnRampEnabled}
                 showSwapOption={isSwapEnabled}
