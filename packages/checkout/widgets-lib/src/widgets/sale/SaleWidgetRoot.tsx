@@ -59,7 +59,7 @@ export class Sale extends Base<WidgetType.SALE> {
     }
 
     // TODO: fix the logic here when proper , currently saying if valid then reset to empty array.
-    if (this.isValidProucts(params.items ?? [])) {
+    if (!this.isValidProucts(params.items ?? [])) {
       // eslint-disable-next-line no-console
       console.warn('[IMTBL]: invalid "items" widget input.');
       validatedParams.items = [];
