@@ -72,6 +72,7 @@ describe('getSwap', () => {
 
       const swap = getSwap(
         quote.amountIn.token,
+        quote.amountOut.token,
         quote,
         makeAddr('fromAddress'),
         slippagePercentage,
@@ -95,6 +96,7 @@ describe('getSwap', () => {
 
       const swap = getSwap(
         quote.amountIn.token,
+        quote.amountOut.token,
         quote,
         makeAddr('fromAddress'),
         slippagePercentage,
@@ -120,6 +122,7 @@ describe('getSwap', () => {
 
       const swap = getSwap(
         quote.amountIn.token,
+        quote.amountOut.token,
         quote,
         makeAddr('fromAddress'),
         slippagePercentage,
@@ -143,6 +146,7 @@ describe('getSwap', () => {
 
       const swap = getSwap(
         quote.amountIn.token,
+        quote.amountOut.token,
         quote,
         makeAddr('fromAddress'),
         slippagePercentage,
@@ -164,11 +168,13 @@ describe('getSwap', () => {
   describe('with EXACT_INPUT + native amount in', () => {
     it('uses the amountSpecified as the transaction value', () => {
       const originalTokenIn = nativeTokenService.nativeToken;
+      const originalTokenOut = FUN_TEST_TOKEN;
       const quote = buildExactInputQuote(nativeTokenService.wrappedToken, FUN_TEST_TOKEN);
       quote.amountIn.value = utils.parseEther('99');
 
       const swap = getSwap(
         originalTokenIn,
+        originalTokenOut,
         quote,
         makeAddr('fromAddress'),
         slippagePercentage,
@@ -186,10 +192,12 @@ describe('getSwap', () => {
   describe('with EXACT_INPUT + native amount out', () => {
     it('sets a transaction value of zero', () => {
       const originalTokenIn = FUN_TEST_TOKEN;
+      const originalTokenOut = NATIVE_TEST_TOKEN;
       const quote = buildExactInputQuote(FUN_TEST_TOKEN, nativeTokenService.wrappedToken);
 
       const swap = getSwap(
         originalTokenIn,
+        originalTokenOut,
         quote,
         makeAddr('fromAddress'),
         slippagePercentage,
@@ -207,11 +215,13 @@ describe('getSwap', () => {
   describe('with EXACT_OUTPUT + native amount in', () => {
     it('sets the transaction value to the max amount in including slippage', () => {
       const originalTokenIn = nativeTokenService.nativeToken;
+      const originalTokenOut = FUN_TEST_TOKEN;
       const quote = buildExactOutputQuote(nativeTokenService.wrappedToken, FUN_TEST_TOKEN);
       quote.amountIn.value = utils.parseEther('100');
 
       const swap = getSwap(
         originalTokenIn,
+        originalTokenOut,
         quote,
         makeAddr('fromAddress'),
         slippagePercentage,
@@ -229,10 +239,12 @@ describe('getSwap', () => {
   describe('with EXACT_OUTPUT + native amount out', () => {
     it('sets a transaction value of zero', () => {
       const originalTokenIn = FUN_TEST_TOKEN;
+      const originalTokenOut = NATIVE_TEST_TOKEN;
       const quote = buildExactOutputQuote(FUN_TEST_TOKEN, nativeTokenService.wrappedToken);
 
       const swap = getSwap(
         originalTokenIn,
+        originalTokenOut,
         quote,
         makeAddr('fromAddress'),
         slippagePercentage,

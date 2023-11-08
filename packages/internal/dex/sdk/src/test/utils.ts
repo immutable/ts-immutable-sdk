@@ -164,7 +164,7 @@ type SecondaryFeeFunctionName =
   | 'exactInputWithSecondaryFee'
   | 'exactOutputWithSecondaryFee';
 
-type SwapRouterFunctionName = 'exactInputSingle' | 'exactOutputSingle';
+type SwapRouterFunctionName = 'exactInputSingle' | 'exactOutputSingle' | 'exactInput' | 'exactOutput';
 
 function decodeSecondaryFeeCall(calldata: utils.BytesLike, functionName: SecondaryFeeFunctionName) {
   const iface = SecondaryFee__factory.createInterface();
@@ -200,6 +200,19 @@ export function decodeMulticallExactInputWithFees(data: utils.BytesLike) {
   };
 
   return { secondaryFeeParams, swapParams };
+}
+
+export function decodeMulticallExactInputWithoutFees(data: utils.BytesLike) {
+  const decodedParams = decodeSwapRouterCall(data, 'exactInput');
+
+  const swapParams: IV3SwapRouter.ExactInputParamsStruct = {
+    path: decodedParams[0][0],
+    recipient: decodedParams[0][1],
+    amountIn: decodedParams[0][2],
+    amountOutMinimum: decodedParams[0][3],
+  };
+
+  return { swapParams };
 }
 
 export function decodeMulticallExactOutputWithFees(data: utils.BytesLike) {

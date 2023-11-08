@@ -1,6 +1,6 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { PopulatedTransaction } from 'ethers';
-import { CancelOrderResponse } from '@imtbl/orderbook';
+import { CancelOrdersOnChainResponse } from '@imtbl/orderbook';
 import { CheckoutConfiguration } from '../../config';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import * as instance from '../../instance';
@@ -33,16 +33,16 @@ export const cancel = async (
       provider.getSigner().getAddress(),
     );
     const orderbook = instance.createOrderbookInstance(config);
-    const cancelOrderResponse = await measureAsyncExecution<CancelOrderResponse>(
+    const cancelOrderResponse = await measureAsyncExecution<CancelOrdersOnChainResponse>(
       config,
       'Time to get the cancel order from the orderbook',
-      orderbook.cancelOrder(
-        orderId,
+      orderbook.cancelOrdersOnChain(
+        [orderId],
         offererAddress,
       ),
     );
 
-    unsignedCancelOrderTransaction = cancelOrderResponse.unsignedCancelOrderTransaction;
+    unsignedCancelOrderTransaction = await cancelOrderResponse.cancellationAction.buildTransaction();
   } catch (err: any) {
     throw new CheckoutError(
       'An error occurred while cancelling the order listing',
