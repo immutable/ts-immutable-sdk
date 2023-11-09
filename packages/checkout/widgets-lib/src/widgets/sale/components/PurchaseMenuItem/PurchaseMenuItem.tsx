@@ -41,7 +41,7 @@ export function PurchaseMenuItem({ fundingRoute }: PurchaseMenuItemProps) {
       emphasized
       testId="funding-route-purchase-item"
       size="medium"
-      key={firstItem.name}
+      key={firstItem?.name}
     >
       <MenuItem.FramedImage
         imageUrl={firstItem?.image}

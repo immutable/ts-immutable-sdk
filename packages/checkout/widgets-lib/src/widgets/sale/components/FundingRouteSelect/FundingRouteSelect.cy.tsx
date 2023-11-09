@@ -8,12 +8,13 @@ import { mount } from 'cypress/react18';
 import { BigNumber, utils } from 'ethers';
 import { cy, describe } from 'local-cypress';
 import { CustomAnalyticsProvider } from '../../../../context/analytics-provider/CustomAnalyticsProvider';
-import { cySmartGet } from '../../../../lib/testUtils';
+import { cyIntercept, cySmartGet } from '../../../../lib/testUtils';
 import { StrongCheckoutWidgetsConfig } from '../../../../lib/withDefaultWidgetConfig';
 import { FundingRouteSelect } from './FundingRouteSelect';
 
 describe('FundingRouteSelect View', () => {
   beforeEach(() => {
+    cyIntercept();
     cy.viewport('ipad-2');
   });
 

@@ -27,6 +27,7 @@ describe('ConnectWidget tests', () => {
 
   beforeEach(() => {
     cyIntercept();
+    cy.viewport('ipad-2');
   });
 
   const baseMockProvider = {
@@ -89,10 +90,6 @@ describe('ConnectWidget tests', () => {
     mountConnectWidgetWithPassport(passportProviderRequest);
     cySmartGet('wallet-list-passport').click();
   };
-
-  beforeEach(() => {
-    cy.viewport('ipad-2');
-  });
 
   describe('Connect Wallet screen', () => {
     it('should show MetaMask wallet option on desktop', () => {
@@ -294,6 +291,36 @@ describe('ConnectWidget tests', () => {
         cySmartGet('switch-network-view').should('not.exist');
         cySmartGet('success-view').should('be.visible');
       });
+
+      it('should not show switch network if chain is part of allowed chains', () => {
+        cy.stub(Checkout.prototype, 'getNetworkInfo')
+          .as('getNetworkInfoStub')
+          .resolves({
+            name: 'Sepolia',
+            chainId: ChainId.SEPOLIA,
+          });
+
+        const props = {} as ConnectWidgetParams;
+        const checkout = new Checkout({ baseConfig: { environment: Environment.SANDBOX } });
+
+        mount(
+          <CustomAnalyticsProvider widgetConfig={config}>
+            <ConnectWidget
+              config={config}
+              checkout={checkout}
+              {...props}
+              targetLayer={ConnectTargetLayer.LAYER2}
+              allowedChains={[ChainId.IMTBL_ZKEVM_TESTNET, ChainId.SEPOLIA]}
+            />
+          </CustomAnalyticsProvider>,
+        );
+
+        cySmartGet('wallet-list-metamask').click();
+        cySmartGet('ready-to-connect').should('be.visible');
+        cySmartGet('footer-button').should('have.text', 'Ready to connect');
+        cySmartGet('footer-button').click();
+        cySmartGet('success-box').should('be.visible');
+      });
     });
 
     describe('Switch', () => {
@@ -427,67 +454,19 @@ describe('ConnectWidget tests', () => {
         cySmartGet('success-view').should('not.exist');
       });
     });
+  });
 
-    it('should show switch to zkEVM network if not connected to immutable-zkevm', () => {
-      cy.stub(Checkout.prototype, 'getNetworkInfo')
-        .as('getNetworkInfoStub')
-        .resolves({
-          name: 'Sepolia',
-          chainId: ChainId.SEPOLIA,
-        });
-      mountConnectWidgetAndGoToReadyToConnect();
-      cySmartGet('ready-to-connect').should('be.visible');
-      cySmartGet('footer-button').should('have.text', 'Ready to connect');
-      cySmartGet('footer-button').click();
-      cySmartGet('switch-network-view').should('be.visible');
-    });
-
-    it('should not show switch network if chain is part of allowed chains', () => {
-      cy.stub(Checkout.prototype, 'getNetworkInfo')
-        .as('getNetworkInfoStub')
-        .resolves({
-          name: 'Sepolia',
-          chainId: ChainId.SEPOLIA,
-        });
-
-      const props = {} as ConnectWidgetParams;
-      const checkout = new Checkout({ baseConfig: { environment: Environment.SANDBOX } });
-
-      mount(
-        <CustomAnalyticsProvider widgetConfig={config}>
-          <ConnectWidget
-            config={config}
-            checkout={checkout}
-            {...props}
-            targetLayer={ConnectTargetLayer.LAYER2}
-            allowedChains={[ChainId.IMTBL_ZKEVM_TESTNET, ChainId.SEPOLIA]}
-          />
-        </CustomAnalyticsProvider>,
-      );
-
-      cySmartGet('wallet-list-metamask').click();
-      cySmartGet('ready-to-connect').should('be.visible');
-      cySmartGet('footer-button').should('have.text', 'Ready to connect');
-      cySmartGet('footer-button').click();
-      cySmartGet('success-box').should('be.visible');
-    });
-
-    it('should show success when ready to connect pressed and network switched', () => {
-      cy.stub(Checkout.prototype, 'getNetworkInfo')
-        .as('getNetworkInfoStub')
-        .resolves({
-          name: 'Ethereum',
-          chainId: ChainId.ETHEREUM,
-        });
-      cy.stub(Checkout.prototype, 'switchNetwork')
-        .as('switchNetworkStub')
-        .resolves({
-          provider: baseMockProvider as Web3Provider,
-          network: {
-            name: ChainName.IMTBL_ZKEVM_TESTNET,
-            chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-          },
-        });
+  describe('BridgeComingSoon for Passport', () => {
+    beforeEach(() => {
+      cy.stub(Checkout.prototype, 'connect').as('connectStub').resolves({
+        provider: {
+          provider: { isPassport: true },
+          getSigner: () => ({
+            getAddress: () => Promise.resolve(''),
+            getChainId: async () => Promise.resolve(ChainId.IMTBL_ZKEVM_TESTNET),
+          }),
+        },
+      });
       cy.stub(Checkout.prototype, 'createProvider')
         .as('createProviderStub')
         .resolves({
@@ -523,43 +502,9 @@ describe('ConnectWidget tests', () => {
       mount(
         <CustomAnalyticsProvider widgetConfig={config}>
           <ConnectWidget
-            checkout={checkout}
             targetLayer={ConnectTargetLayer.LAYER1}
-            config={config}
-          />
-        </CustomAnalyticsProvider>,
-      );
-      cySmartGet('wallet-list-passport').click();
-      cySmartGet('footer-button').click();
-
-      cySmartGet('bridge-coming-soon').should('be.visible');
-    });
-  });
-
-  describe('Error Connecting', () => {
-    it('should show error view if unable to create provider', () => {
-      cy.stub(Checkout.prototype, 'connect').as('connectStub').resolves({});
-      cy.stub(Checkout.prototype, 'createProvider')
-        .as('createProviderStub')
-        .rejects({});
-
-      const passportProvider = mockPassportProvider('resolve');
-      const testPassportInstance = {
-        connectEvm: cy.stub().as('connectEvmStub').returns(passportProvider),
-      } as any as Passport;
-      const connectParams = {
-        targetLayer: ConnectTargetLayer.LAYER1,
-      } as ConnectWidgetParams;
-      const checkout = new Checkout(
-        { baseConfig: { environment: Environment.SANDBOX }, passport: testPassportInstance },
-      );
-
-      mount(
-        <CustomAnalyticsProvider widgetConfig={config}>
-          <ConnectWidget
-            config={config}
             checkout={checkout}
-            {...connectParams}
+            config={config}
           />
         </CustomAnalyticsProvider>,
       );
