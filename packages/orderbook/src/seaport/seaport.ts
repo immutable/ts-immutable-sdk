@@ -35,18 +35,12 @@ import { prepareTransaction } from './transaction';
 import { mapImmutableOrderToSeaportOrderComponents } from './map-to-seaport-order';
 
 export class Seaport {
-  private chainId: number | undefined;
-
   constructor(
     private seaportLibFactory: SeaportLibFactory,
     private provider: providers.JsonRpcProvider,
     private seaportContractAddress: string,
     private zoneContractAddress: string,
-  ) {
-    provider.getNetwork().then((network) => {
-      this.chainId = network.chainId;
-    });
-  }
+  ) {}
 
   async prepareSeaportOrder(
     offerer: string,
@@ -75,7 +69,7 @@ export class Seaport {
         purpose: TransactionPurpose.APPROVAL,
         buildTransaction: prepareTransaction(
           approvalAction.transactionMethods,
-          this.chainId ?? 0,
+          (await this.provider.getNetwork()).chainId,
         ),
       });
     }
@@ -137,7 +131,7 @@ export class Seaport {
         type: ActionType.TRANSACTION,
         buildTransaction: prepareTransaction(
           approvalAction.transactionMethods,
-          this.chainId ?? 0,
+          (await this.provider.getNetwork()).chainId,
         ),
         purpose: TransactionPurpose.APPROVAL,
       });
@@ -155,7 +149,7 @@ export class Seaport {
       type: ActionType.TRANSACTION,
       buildTransaction: prepareTransaction(
         fulfilOrderAction.transactionMethods,
-        this.chainId ?? 0,
+        (await this.provider.getNetwork()).chainId,
       ),
       purpose: TransactionPurpose.FULFILL_ORDER,
     });
@@ -203,7 +197,7 @@ export class Seaport {
         type: ActionType.TRANSACTION,
         buildTransaction: prepareTransaction(
           approvalAction.transactionMethods,
-          this.chainId ?? 0,
+          (await this.provider.getNetwork()).chainId,
         ),
         purpose: TransactionPurpose.APPROVAL,
       });
@@ -221,7 +215,7 @@ export class Seaport {
       type: ActionType.TRANSACTION,
       buildTransaction: prepareTransaction(
         fulfilOrderAction.transactionMethods,
-        this.chainId ?? 0,
+        (await this.provider.getNetwork()).chainId,
       ),
       purpose: TransactionPurpose.FULFILL_ORDER,
     });
@@ -247,7 +241,7 @@ export class Seaport {
       type: ActionType.TRANSACTION,
       buildTransaction: prepareTransaction(
         cancellationTransaction,
-        this.chainId ?? 0,
+        (await this.provider.getNetwork()).chainId,
       ),
       purpose: TransactionPurpose.CANCEL,
     };
