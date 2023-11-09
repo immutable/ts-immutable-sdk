@@ -1,7 +1,7 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { ChainNotSupportedError, InvalidConfigurationError } from 'errors';
 import { isValidNonZeroAddress } from 'lib';
-import { ExchangeModuleConfiguration, ExchangeOverrides, SecondaryFee, Chain } from '../types';
+import { ExchangeContracts, ExchangeModuleConfiguration, ExchangeOverrides, SecondaryFee, Chain } from '../types';
 import {
   IMMUTABLE_TESTNET_CHAIN_ID,
   IMMUTABLE_TESTNET_COMMON_ROUTING_TOKENS,
@@ -9,14 +9,6 @@ import {
   MAX_SECONDARY_FEE_BASIS_POINTS,
   TIMX_IMMUTABLE_TESTNET,
 } from '../constants';
-
-export type ExchangeContracts = {
-  multicall: string;
-  coreFactory: string;
-  quoterV2: string;
-  peripheryRouter: string;
-  secondaryFee: string;
-};
 
 export const CONTRACTS_FOR_CHAIN_ID: Record<number, ExchangeContracts> = {
   [IMMUTABLE_TESTNET_CHAIN_ID]: {
