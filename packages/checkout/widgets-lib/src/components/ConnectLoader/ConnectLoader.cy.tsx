@@ -45,8 +45,10 @@ describe('ConnectLoader', () => {
         ,
       </CustomAnalyticsProvider>,
     );
-    cySmartGet('wallet-list-metamask').should('be.visible');
-    cy.get('#inner-widget').should('not.exist');
+
+    // make test fail on purpose
+    cySmartGet('wallet-list-metamask').should('not.be.visible');
+    cy.get('#inner-widget').should('exist');
   });
 
   it('should show ready to connect view when provider but not connected', () => {
