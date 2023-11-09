@@ -1,5 +1,4 @@
 import { ImmutableXClient } from '@imtbl/immutablex-client';
-import { Web3Provider } from '@ethersproject/providers';
 import { IMXProvider } from '@imtbl/provider';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import { PassportConfiguration } from '../config';
@@ -10,11 +9,9 @@ import {
   DeviceTokenResponse,
   PassportEventMap,
   User,
-  IMXSigners,
 } from '../types';
-import { getStarkSigner } from './getStarkSigner';
 import TypedEventEmitter from '../utils/typedEventEmitter';
-import { LazyPassportImxProvider } from './LazyPassportImxProvider';
+import { PassportImxProvider } from './passportImxProvider';
 
 export type PassportImxProviderFactoryInput = {
   authManager: AuthManager;
@@ -100,16 +97,6 @@ export class PassportImxProviderFactory {
     return this.createProviderInstance(user);
   }
 
-  private async createSingers(idToken: string): Promise<IMXSigners> {
-    const magicRpcProvider = await this.magicAdapter.login(idToken);
-    const web3Provider = new Web3Provider(magicRpcProvider);
-
-    const ethSigner = web3Provider.getSigner();
-    const starkSigner = await getStarkSigner(ethSigner);
-
-    return { ethSigner, starkSigner };
-  }
-
   private async createProviderInstance(user: User): Promise<IMXProvider> {
     if (!user.idToken) {
       throw new PassportError(
@@ -118,13 +105,13 @@ export class PassportImxProviderFactory {
       );
     }
 
-    return new LazyPassportImxProvider({
+    return new PassportImxProvider({
       config: this.config,
       authManager: this.authManager,
       immutableXClient: this.immutableXClient,
       confirmationScreen: this.confirmationScreen,
       passportEventEmitter: this.passportEventEmitter,
-      signersPromise: this.createSingers(user.idToken),
+      magicAdapter: this.magicAdapter,
     });
   }
 }
