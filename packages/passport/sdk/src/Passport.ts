@@ -7,7 +7,6 @@ import { PassportImxProviderFactory } from './starkEx';
 import { PassportConfiguration } from './config';
 import {
   DeviceConnectResponse,
-  DeviceTokenResponse,
   Networks,
   PassportEventMap,
   PassportEvents,
@@ -85,17 +84,6 @@ export class Passport {
     return this.passportImxProviderFactory.getProviderWithPKCEFlow(authorizationCode, state);
   }
 
-  /**
-   * @returns {boolean} the stored device flow credentials if they exist
-   */
-  public checkStoredDeviceFlowCredentials(): DeviceTokenResponse | null { // TODO: Where / why is this used?? Can `login({ useCachedSession: true })` & `connectImx` be used instead?
-    return this.authManager.checkStoredDeviceFlowCredentials();
-  }
-
-  public async connectImxWithCredentials(tokenResponse: DeviceTokenResponse): Promise<IMXProvider | null> {
-    return this.passportImxProviderFactory.getProviderWithCredentials(tokenResponse);
-  }
-
   public connectEvm(): Provider {
     if (this.config.network === Networks.PRODUCTION) {
       throw new Error('EVM is not supported on production network');
@@ -159,23 +147,8 @@ export class Passport {
     return this.authManager.logoutSilentCallback(url);
   }
 
-  /**
-   * @deprecated Use `logout` instead
-   */
-  public async logoutDeviceFlow(): Promise<void> {
-    return this.authManager.logoutDeviceFlow();
-  }
-
   public async getUserInfo(): Promise<UserProfile | undefined> {
     const user = await this.authManager.getUser();
-    return user?.profile;
-  }
-
-  /**
-   * @deprecated Use `getUserInfo` instead
-   */
-  public async getUserInfoDeviceFlow(): Promise<UserProfile | undefined> {
-    const user = await this.authManager.getUserDeviceFlow();
     return user?.profile;
   }
 

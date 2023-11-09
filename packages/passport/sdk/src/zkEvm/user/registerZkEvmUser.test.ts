@@ -52,7 +52,6 @@ describe('registerZkEvmUser', () => {
 
       await expect(async () => registerZkEvmUser({
         authManager: authManager as unknown as AuthManager,
-        config,
         magicProvider,
         multiRollupApiClients: multiRollupApiClients as unknown as MultiRollupApiClients,
         accessToken,
@@ -70,7 +69,6 @@ describe('registerZkEvmUser', () => {
 
       await expect(async () => registerZkEvmUser({
         authManager: authManager as unknown as AuthManager,
-        config,
         magicProvider,
         multiRollupApiClients: multiRollupApiClients as unknown as MultiRollupApiClients,
         accessToken,
@@ -88,7 +86,6 @@ describe('registerZkEvmUser', () => {
 
       await expect(async () => registerZkEvmUser({
         authManager: authManager as unknown as AuthManager,
-        config,
         magicProvider,
         multiRollupApiClients: multiRollupApiClients as unknown as MultiRollupApiClients,
         accessToken,
@@ -105,7 +102,6 @@ describe('registerZkEvmUser', () => {
 
     const result = await registerZkEvmUser({
       authManager: authManager as unknown as AuthManager,
-      config,
       magicProvider,
       multiRollupApiClients: multiRollupApiClients as unknown as MultiRollupApiClients,
       accessToken,

@@ -343,13 +343,6 @@ export default class AuthManager {
     return this.userManager.signoutSilentCallback(url);
   }
 
-  /**
-   * @deprecated Use `logout` instead
-   */
-  public async logoutDeviceFlow(): Promise<void> {
-    return this.logout();
-  }
-
   public async loginSilent({ forceRefresh } = { forceRefresh: false }): Promise<User | null> {
     // eslint-disable-next-line arrow-body-style
     return withPassportError<User | null>(async () => {
@@ -411,16 +404,5 @@ export default class AuthManager {
     return withPassportError<User | null>(async () => (
       this.getAuthenticatedUser({ forceRefresh })
     ), PassportErrorType.NOT_LOGGED_IN_ERROR);
-  }
-
-  /**
-   * @deprecated Use `getUser` instead
-   */
-  public async getUserDeviceFlow(): Promise<User | null> {
-    return this.getUser();
-  }
-
-  public checkStoredDeviceFlowCredentials(): DeviceTokenResponse | null { // TODO: Where / why is this used?? If this is used to call `connectImxWithCredentials`, then we can simplify
-    return this.deviceCredentialsManager.getCredentials();
   }
 }
