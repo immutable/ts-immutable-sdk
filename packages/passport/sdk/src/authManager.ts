@@ -104,11 +104,11 @@ export default class AuthManager {
         nickname: oidcUser.profile.nickname,
       },
     };
-    if (passport) {
+    if (passport?.imx_eth_address) {
       user.imx = {
-        ethAddress: passport?.imx_eth_address || '',
-        starkAddress: passport?.imx_stark_address || '',
-        userAdminAddress: passport?.imx_user_admin_address || '',
+        ethAddress: passport.imx_eth_address || '',
+        starkAddress: passport.imx_stark_address || '',
+        userAdminAddress: passport.imx_user_admin_address || '',
       };
     }
     if (passport?.zkevm_eth_address) {
@@ -132,11 +132,11 @@ export default class AuthManager {
         nickname: idTokenPayload.nickname,
       },
     };
-    if (idTokenPayload?.passport) {
+    if (idTokenPayload?.passport.imx_eth_address) {
       user.imx = {
-        ethAddress: idTokenPayload?.passport?.imx_eth_address || '',
-        starkAddress: idTokenPayload?.passport?.imx_stark_address || '',
-        userAdminAddress: idTokenPayload?.passport?.imx_user_admin_address || '',
+        ethAddress: idTokenPayload.passport.imx_eth_address,
+        starkAddress: idTokenPayload.passport.imx_stark_address,
+        userAdminAddress: idTokenPayload.passport.imx_user_admin_address,
       };
     }
     if (idTokenPayload?.passport?.zkevm_eth_address) {

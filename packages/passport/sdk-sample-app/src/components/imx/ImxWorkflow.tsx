@@ -138,7 +138,7 @@ function ImxWorkflow() {
             </WorkflowButton>
 
             <WorkflowButton
-              disabled={isLoading || isRegistered}
+              disabled={false}
               onClick={registerUser}
             >
               Register User

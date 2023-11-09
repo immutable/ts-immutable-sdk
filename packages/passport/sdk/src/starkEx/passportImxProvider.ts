@@ -33,7 +33,7 @@ import {
 } from './workflows';
 import { ConfirmationScreen } from '../confirmation';
 import { PassportConfiguration } from '../config';
-import registerStarkEx from './workflows/registerStarkEx';
+import registerOffchain from './workflows/registerOffchain';
 import MagicAdapter from '../magicAdapter';
 import { getStarkSigner } from './getStarkSigner';
 
@@ -46,7 +46,13 @@ export interface PassportImxProviderOptions {
   magicAdapter: MagicAdapter;
 }
 
-type AuthenticatedUserSigner = {
+type AuthenticatedUserAndSigners = {
+  user: User;
+  starkSigner: StarkSigner;
+  ethSigner: EthSigner;
+};
+
+type RegisteredUserAndSigners = {
   user: UserImx;
   starkSigner: StarkSigner;
   ethSigner: EthSigner;
@@ -107,7 +113,7 @@ export class PassportImxProvider implements IMXProvider {
    * @see getAuthenticatedUserAndSigners
    *
    */
-  private async initialiseSigners() {
+  private async initialiseSigners(): Promise<void> {
     const generateSigners = async (): Promise<IMXSigners> => {
       const user = await this.authManager.getUser();
       // The user will be present because the factory validates it
@@ -132,7 +138,7 @@ export class PassportImxProvider implements IMXProvider {
     });
   }
 
-  protected async getAuthenticatedUserAndSigners() {
+  protected async getAuthenticatedUserAndSigners(): Promise<AuthenticatedUserAndSigners> {
     const user = await this.authManager.getUser();
     if (!user || this.signers === undefined) {
       throw new PassportError(
@@ -153,7 +159,7 @@ export class PassportImxProvider implements IMXProvider {
     return { user, ...signers };
   }
 
-  protected async getRegisteredImxUserAndSigners(): Promise<AuthenticatedUserSigner> {
+  protected async getRegisteredImxUserAndSigners(): Promise<RegisteredUserAndSigners> {
     const { user, starkSigner, ethSigner } = await this.getAuthenticatedUserAndSigners();
     const isUserImx = (oidcUser: User | null): oidcUser is UserImx => oidcUser?.imx !== undefined;
 
@@ -181,7 +187,7 @@ export class PassportImxProvider implements IMXProvider {
 
   async registerOffchain(): Promise<RegisterUserResponse> {
     const { user, ethSigner, starkSigner } = await this.getAuthenticatedUserAndSigners();
-    return await registerStarkEx(
+    return await registerOffchain(
       ethSigner,
       starkSigner,
       user,
@@ -191,16 +197,8 @@ export class PassportImxProvider implements IMXProvider {
   }
 
   async isRegisteredOffchain(): Promise<boolean> {
-    try {
-      const { user } = await this.getRegisteredImxUserAndSigners();
-      const { ethAddress, starkAddress, userAdminAddress } = user.imx;
-      return !!(ethAddress && starkAddress && userAdminAddress);
-    } catch (err) {
-      if (err instanceof PassportError && err.type === PassportErrorType.USER_NOT_REGISTERED_ERROR) {
-        return false;
-      }
-      throw err;
-    }
+    const { user } = await this.getAuthenticatedUserAndSigners();
+    return !!user.imx;
   }
 
   // TODO: Remove once implemented

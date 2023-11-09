@@ -1,7 +1,6 @@
 import registerPassport, { RegisterPassportParams } from './registration';
-import { PassportError, PassportErrorType } from '../../errors/passportError';
 
-describe('registerPassportWorkflow', () => {
+describe('registration', () => {
   const requestBody = {
     ether_key: '0x232',
     stark_key: '0x567',
@@ -51,9 +50,10 @@ describe('registerPassportWorkflow', () => {
       },
     });
   });
-  it('registerPassportWorkflow failed to call api client to register passport user', async () => {
+
+  it('throws an error if the API returns an error', async () => {
     const mockUserApi = {
-      registerPassportUser: jest.fn().mockRejectedValue('error'),
+      registerPassportUser: jest.fn().mockRejectedValue(new Error('error')),
       getSignableRegistrationOffchain: jest.fn().mockReturnValue({
         data: {
           payload_hash: '0x34',
@@ -76,10 +76,7 @@ describe('registerPassportWorkflow', () => {
     };
 
     await expect(registerPassport(request, mockToken)).rejects.toThrow(
-      new PassportError(
-        '',
-        PassportErrorType.USER_REGISTRATION_ERROR,
-      ),
+      new Error('error'),
     );
 
     expect(mockStarkSigner.signMessage).toHaveBeenCalled();
