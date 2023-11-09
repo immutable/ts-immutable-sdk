@@ -117,7 +117,7 @@ describe('PassportImxProvider', () => {
       expect(getStarkSigner).toHaveBeenCalledTimes(1);
     });
 
-    it('re-trows the initialisation error when a method is called', async () => {
+    it('re-throws the initialisation error when a method is called', async () => {
       jest.resetAllMocks();
       jest.restoreAllMocks();
 
