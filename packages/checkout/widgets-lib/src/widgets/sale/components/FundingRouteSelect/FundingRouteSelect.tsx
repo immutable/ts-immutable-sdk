@@ -78,10 +78,10 @@ export function FundingRouteSelect({ fundingRoutes, onFundingRouteSelected }: Fu
 
         {fundingRoutes.length === 0
           ? [
-            <Body size="small">
+            <Body key="noRoutesAvailableText" size="small">
               {textConfig.fundingRouteSelect.noRoutesAvailable}
             </Body>,
-            <Button variant="tertiary">
+            <Button key="payWithCardButton" variant="tertiary">
               {textConfig.fundingRouteSelect.payWithCard}
             </Button>,
           ]
@@ -92,12 +92,13 @@ export function FundingRouteSelect({ fundingRoutes, onFundingRouteSelected }: Fu
               fundingRoute={fundingRoutes[activeFundingRouteIndex]}
               selected
               toggleVisible={fundingRoutes.length > 1}
+              key="selectedFundingRouteMenuItem"
             />,
-            <PurchaseMenuItem fundingRoute={fundingRoutes[activeFundingRouteIndex]} />,
-            <Button sx={{ mt: 'auto' }} variant="primary" onClick={onClickContinue}>
+            <PurchaseMenuItem key="purchaseMenuItem" fundingRoute={fundingRoutes[activeFundingRouteIndex]} />,
+            <Button key="continueButton" sx={{ mt: 'auto' }} variant="primary" onClick={onClickContinue}>
               {textConfig.fundingRouteSelect.continue}
             </Button>,
-            <Button variant="tertiary">
+            <Button key="payWithCardButton" variant="tertiary">
               {textConfig.fundingRouteSelect.payWithCardInstead}
             </Button>,
           ] }

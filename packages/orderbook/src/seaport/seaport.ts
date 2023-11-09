@@ -67,7 +67,10 @@ export class Seaport {
       listingActions.push({
         type: ActionType.TRANSACTION,
         purpose: TransactionPurpose.APPROVAL,
-        buildTransaction: prepareTransaction(approvalAction.transactionMethods),
+        buildTransaction: prepareTransaction(
+          approvalAction.transactionMethods,
+          (await this.provider.getNetwork()).chainId,
+        ),
       });
     }
 
@@ -126,7 +129,10 @@ export class Seaport {
     if (approvalAction) {
       fulfillmentActions.push({
         type: ActionType.TRANSACTION,
-        buildTransaction: prepareTransaction(approvalAction.transactionMethods),
+        buildTransaction: prepareTransaction(
+          approvalAction.transactionMethods,
+          (await this.provider.getNetwork()).chainId,
+        ),
         purpose: TransactionPurpose.APPROVAL,
       });
     }
@@ -141,7 +147,10 @@ export class Seaport {
 
     fulfillmentActions.push({
       type: ActionType.TRANSACTION,
-      buildTransaction: prepareTransaction(fulfilOrderAction.transactionMethods),
+      buildTransaction: prepareTransaction(
+        fulfilOrderAction.transactionMethods,
+        (await this.provider.getNetwork()).chainId,
+      ),
       purpose: TransactionPurpose.FULFILL_ORDER,
     });
 
@@ -186,7 +195,10 @@ export class Seaport {
     if (approvalAction) {
       fulfillmentActions.push({
         type: ActionType.TRANSACTION,
-        buildTransaction: prepareTransaction(approvalAction.transactionMethods),
+        buildTransaction: prepareTransaction(
+          approvalAction.transactionMethods,
+          (await this.provider.getNetwork()).chainId,
+        ),
         purpose: TransactionPurpose.APPROVAL,
       });
     }
@@ -201,7 +213,10 @@ export class Seaport {
 
     fulfillmentActions.push({
       type: ActionType.TRANSACTION,
-      buildTransaction: prepareTransaction(fulfilOrderAction.transactionMethods),
+      buildTransaction: prepareTransaction(
+        fulfilOrderAction.transactionMethods,
+        (await this.provider.getNetwork()).chainId,
+      ),
       purpose: TransactionPurpose.FULFILL_ORDER,
     });
 
@@ -224,7 +239,10 @@ export class Seaport {
 
     return {
       type: ActionType.TRANSACTION,
-      buildTransaction: prepareTransaction(cancellationTransaction),
+      buildTransaction: prepareTransaction(
+        cancellationTransaction,
+        (await this.provider.getNetwork()).chainId,
+      ),
       purpose: TransactionPurpose.CANCEL,
     };
   }

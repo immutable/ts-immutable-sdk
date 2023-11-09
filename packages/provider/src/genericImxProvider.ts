@@ -1,4 +1,3 @@
-import { ProviderConfiguration } from 'config';
 import {
   AnyToken,
   RegisterUserResponse,
@@ -19,6 +18,7 @@ import {
   EthSigner,
 } from '@imtbl/core-sdk';
 import { TransactionResponse } from '@ethersproject/providers';
+import { ProviderConfiguration } from './config';
 import { IMXProvider } from './imxProvider';
 import { Signers } from './signable-actions/types';
 import { batchTransfer, transfer } from './signable-actions/transfer';
