@@ -52,15 +52,19 @@ export function FundingRouteMenuItem({
     if (!cryptoFiatState.conversions) {
       return;
     }
-
-    setFeesUsd(fundingRouteFees(fundingRoute, cryptoFiatState.conversions));
-    setUsdBalance(
-      calculateCryptoToFiat(
-        firstFundingStep.fundingItem.userBalance.formattedBalance,
-        firstFundingStep.fundingItem.token.symbol,
-        cryptoFiatState.conversions,
-      ),
-    );
+    try {
+      setFeesUsd(fundingRouteFees(fundingRoute, cryptoFiatState.conversions));
+      setUsdBalance(
+        calculateCryptoToFiat(
+          firstFundingStep.fundingItem.userBalance.formattedBalance,
+          firstFundingStep.fundingItem.token.symbol,
+          cryptoFiatState.conversions,
+        ),
+      );
+    } catch {
+      setFeesUsd(undefined);
+      setUsdBalance(undefined);
+    }
   }, [cryptoFiatState, fundingRoute]);
 
   const networkLabel = () => (
