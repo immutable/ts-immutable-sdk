@@ -27,7 +27,7 @@ export type SwapFailed = {
 };
 
 /**
- * Type representing a Swap Widget with type FAILURE.
+ * Type representing a Swap Widget with type REJECTED.
  * @property {string} reason - The reason why the swap failed.
  * @property {number} timestamp - The timestamp of the failed swap.
  */
