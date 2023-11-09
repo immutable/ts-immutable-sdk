@@ -1,5 +1,5 @@
 import { TokenAmount, AnyToken } from '@imtbl/core-sdk';
-import { ProviderConfiguration } from 'config';
+import { ProviderConfiguration } from '../config';
 import { Signers } from './types';
 import {
   prepareWithdrawalAction,
