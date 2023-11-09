@@ -388,7 +388,7 @@ export default class AuthManager {
    */
   private async getAuthenticatedUser({ forceRefresh = false }: { forceRefresh: boolean }): Promise<User | null> {
     if (forceRefresh) {
-      return this.refreshTokenAndUpdatePromise();
+      return this.refreshTokenAndUpdatePromise({ forceRefresh });
     }
 
     const oidcUser = await this.userManager.getUser();
@@ -399,7 +399,7 @@ export default class AuthManager {
     }
 
     if (oidcUser.refresh_token) {
-      return this.refreshTokenAndUpdatePromise();
+      return this.refreshTokenAndUpdatePromise({ forceRefresh });
     }
 
     return null;
@@ -409,11 +409,12 @@ export default class AuthManager {
    * Refreshes the token and returns the user.
    * If the token is already being refreshed, returns the existing promise.
    */
-  private async refreshTokenAndUpdatePromise(): Promise<User | null> {
+  private async refreshTokenAndUpdatePromise({ forceRefresh = false }: { forceRefresh: boolean })
+    : Promise<User | null> {
     if (this.refreshingPromise) return this.refreshingPromise;
 
     // eslint-disable-next-line no-async-promise-executor
-    this.refreshingPromise = new Promise(async (resolve) => {
+    this.refreshingPromise = new Promise(async (resolve, reject) => {
       try {
         const newOidcUser = await this.userManager.signinSilent();
         if (newOidcUser) {
@@ -423,8 +424,11 @@ export default class AuthManager {
         resolve(null);
       } catch (err) {
         // eslint-disable-next-line no-console
-        console.warn(err);
-        resolve(null);
+        if ((err as Error).message === 'Unknow or invalid refresh token' && !forceRefresh) {
+          console.warn(err);
+          resolve(null);
+        }
+        reject(err);
       } finally {
         this.refreshingPromise = null; // Reset the promise after completion
       }
