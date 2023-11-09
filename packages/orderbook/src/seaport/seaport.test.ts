@@ -420,6 +420,11 @@ describe('Seaport', () => {
         const mockedSeaportJs = mock(SeaportLib);
         const mockedSeaportLibFactory = mock(SeaportLibFactory);
         const mockedProvider = mock(providers.JsonRpcProvider);
+        when(mockedProvider.getNetwork()).thenReturn(
+          Promise.resolve({
+            chainId: 0,
+          } as any),
+        );
 
         const exchangeTransactionMethods = mock<TransactionMethods<boolean>>();
         const exchangeAction = mock<ExchangeAction<any>>();
