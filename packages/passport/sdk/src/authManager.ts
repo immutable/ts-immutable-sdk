@@ -106,9 +106,9 @@ export default class AuthManager {
     };
     if (passport?.imx_eth_address) {
       user.imx = {
-        ethAddress: passport.imx_eth_address || '',
-        starkAddress: passport.imx_stark_address || '',
-        userAdminAddress: passport.imx_user_admin_address || '',
+        ethAddress: passport.imx_eth_address,
+        starkAddress: passport.imx_stark_address,
+        userAdminAddress: passport.imx_user_admin_address,
       };
     }
     if (passport?.zkevm_eth_address) {
