@@ -101,7 +101,7 @@ describe('PassportImxProvider', () => {
 
   describe('async signer initialisation', () => {
     it('initialises the eth and stark signers correctly', async () => {
-      // The promise is created in the constructed but not awaited until a method is called
+      // The promise is created in the constructor but not awaited until a method is called
       await passportImxProvider.getAddress();
 
       expect(magicAdapterMock.login).toHaveBeenCalledWith(mockUserImx.idToken);
