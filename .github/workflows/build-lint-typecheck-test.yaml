@@ -112,20 +112,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_ENV: test
 
-      # - name: Upload cypress videos artifacts
-      #   if: ${{ contains(steps.reviewer-teams.outputs.teams, 'Wallets') && !contains(github.event.pull_request.title, 'SKIP-CY') }}
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     name: checkout-widgets-cypress-videos
-      #     path: ./packages/checkout/widgets-lib/cypress/videos
-
-      # - name: Upload cypress screenshots artifacts
-      #   uses: actions/upload-artifact@v2
-      #   if: failure()
-      #   with:
-      #     name: checkout-widgets-cypress-screenshots
-      #     path: ./packages/checkout/widgets-lib/cypress/screenshots
-
   lint:
     name: Lint
     runs-on: ubuntu-latest-4-cores
