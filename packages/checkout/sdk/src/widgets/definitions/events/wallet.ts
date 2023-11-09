@@ -15,7 +15,7 @@ export enum WalletEventType {
  * @property {number} chainId - The chain ID of the network that the user switched to.
  * @property {Web3Provider} provider - The Web3 provider object for the switched network.
  */
-export type WalletNetworkSwitchEvent = {
+export type WalletNetworkSwitch = {
   network: string;
   chainId: number;
   provider: Web3Provider;
@@ -24,4 +24,4 @@ export type WalletNetworkSwitchEvent = {
 /**
  * Represents an event that is triggered when a wallet is disconnected.
  */
-export type WalletDisconnectWalletEvent = {};
+export type WalletDisconnect = {};

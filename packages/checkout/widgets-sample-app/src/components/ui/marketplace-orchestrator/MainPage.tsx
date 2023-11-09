@@ -15,7 +15,7 @@ import { Checkout,
   RequestSwapEvent, 
   SwapEventType,
   WalletEventType,
-  WalletNetworkSwitchEvent,
+  WalletNetworkSwitch,
   WidgetTheme, WidgetType, ProviderEventType, ProviderUpdated } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 
@@ -52,7 +52,7 @@ export const MainPage = () => {
     connectWidget.addListener(ConnectEventType.SUCCESS, (eventData: ConnectionSuccess) => {
       setWeb3Provider(eventData.provider);
     });
-    walletWidget.addListener(WalletEventType.NETWORK_SWITCH, (eventData: WalletNetworkSwitchEvent) => {
+    walletWidget.addListener(WalletEventType.NETWORK_SWITCH, (eventData: WalletNetworkSwitch) => {
       setWeb3Provider(eventData.provider)
     });
     swapWidget.addListener(ProviderEventType.PROVIDER_UPDATED, (data: ProviderUpdated) => {

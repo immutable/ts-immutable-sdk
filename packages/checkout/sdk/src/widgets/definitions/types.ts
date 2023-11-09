@@ -26,9 +26,9 @@ import {
   SwapFailed,
   SwapRejected,
   SwapSuccess,
-  WalletDisconnectWalletEvent,
+  WalletDisconnect,
   WalletEventType,
-  WalletNetworkSwitchEvent,
+  WalletNetworkSwitch,
 } from './events';
 import {
   BridgeWidgetParams,
@@ -125,8 +125,8 @@ export type WidgetEventData = {
   } & OrchestrationMapping & ProviderEventMapping,
 
   [WidgetType.WALLET]: {
-    [WalletEventType.NETWORK_SWITCH]: WalletNetworkSwitchEvent
-    [WalletEventType.DISCONNECT_WALLET]: WalletDisconnectWalletEvent
+    [WalletEventType.NETWORK_SWITCH]: WalletNetworkSwitch
+    [WalletEventType.DISCONNECT_WALLET]: WalletDisconnect
     [WalletEventType.CLOSE_WIDGET]: {}
   } & OrchestrationMapping & ProviderEventMapping,
 
