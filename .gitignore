@@ -5,6 +5,7 @@ coverage/
 .DS_Store
 .vscode
 .parcel-cache
+.rollup.cache
 
 .env
 .env.local
@@ -25,3 +26,5 @@ yalc.lock
 package-lock.json
 
 docs/
+
+tsconfig.tsbuildinfo
