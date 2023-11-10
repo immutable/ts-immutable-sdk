@@ -51,7 +51,7 @@
     "node": ">=16"
   },
   "files": [
-    "dist"
+    "src"
   ],
   "license": "Apache-2.0",
   "resolutions": {
@@ -70,5 +70,5 @@
     "start": "storybook dev -p 6006"
   },
   "type": "module",
-  "types": "dist/index.d.ts"
+  "types": "src/index.ts"
 }

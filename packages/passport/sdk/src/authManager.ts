@@ -6,9 +6,9 @@ import {
   WebStorageStateStore,
 } from 'oidc-client-ts';
 import axios from 'axios';
-import DeviceCredentialsManager from 'storage/device_credentials_manager';
 import * as crypto from 'crypto';
 import jwt_decode from 'jwt-decode';
+import DeviceCredentialsManager from './storage/device_credentials_manager';
 import { isTokenExpired } from './utils/token';
 import { PassportErrorType, withPassportError } from './errors/passportError';
 import {
