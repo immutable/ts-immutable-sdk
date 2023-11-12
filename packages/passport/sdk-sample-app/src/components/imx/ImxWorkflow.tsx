@@ -60,9 +60,7 @@ function ImxWorkflow() {
   const notLoadingAndIsRegistered = !isLoading && isRegistered;
 
   useEffect(() => {
-    // imxProvider?.isRegisteredOffchain().then((res) => setIsRegistered(res)).catch(() => setIsRegistered(false));
-    setIsLoading(false);
-    setIsRegistered(true);
+    imxProvider?.isRegisteredOffchain().then((res) => setIsRegistered(res)).catch(() => setIsRegistered(false));
   }, [imxProvider, isRegistered]);
 
   return (
@@ -138,7 +136,7 @@ function ImxWorkflow() {
             </WorkflowButton>
 
             <WorkflowButton
-              disabled={false}
+              disabled={isLoading || isRegistered}
               onClick={registerUser}
             >
               Register User
