@@ -96,7 +96,7 @@ export function SaleUI() {
   const passportInstance = useMemo(() => usePassportInstance(JSON.parse(passportConfig)), []);
   const checkout = useMemo(() => new Checkout({baseConfig: {environment: Environment.SANDBOX}, passport: passportInstance as unknown as Passport}), [passportInstance])
   const factory = useMemo(() => new WidgetsFactory(checkout, {theme: WidgetTheme.DARK}), [checkout])
-  const saleWidget = useMemo(() => factory.create(WidgetType.SALE, {theme: WidgetTheme.DARK}), 
+  const saleWidget = useMemo(() => factory.create(WidgetType.SALE, { config: { theme: WidgetTheme.DARK } }), 
   [factory, amount, environmentId, fromContractAddress, defaultItems]
   )
 
