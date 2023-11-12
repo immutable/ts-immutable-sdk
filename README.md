@@ -165,7 +165,7 @@ export class Checkout {
 > Please make sure your sdk still works properly after the step above. Because extra headers may make your request invalid in the infrastructure you use. e.g. cloudfront.
 
 #### Publishable key usage data
-Publishable key usage will be available in segement under event source `Onboarding - API - ${Dev|Sandbox|Prod}`. You can set up event destination (data lake/looker) together with appropriate filters to surface endpoint usages called by your sdk.
+Publishable key usage will be available in segment under event source `Onboarding - API - ${Dev|Sandbox|Prod}`. You can set up event destination (data lake/looker) together with appropriate filters to surface endpoint usages called by your sdk.
 
 ### Linting
 
