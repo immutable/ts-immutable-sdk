@@ -13,6 +13,7 @@ import { OnRamp } from 'widgets/on-ramp/OnRampWidgetRoot';
 import { Wallet } from 'widgets/wallet/WalletWidgetRoot';
 import { Sale } from 'widgets/sale/SaleWidgetRoot';
 import { Web3Provider } from '@ethersproject/providers';
+import { addProviderListenersForWidgetRoot } from 'widgets/eip1193Events';
 import { sendProviderUpdatedEvent } from './lib';
 
 export class WidgetsFactory implements IWidgetsFactory {
@@ -26,6 +27,7 @@ export class WidgetsFactory implements IWidgetsFactory {
   }
 
   updateProvider(provider: Web3Provider) {
+    addProviderListenersForWidgetRoot(provider);
     sendProviderUpdatedEvent({ provider });
   }
 

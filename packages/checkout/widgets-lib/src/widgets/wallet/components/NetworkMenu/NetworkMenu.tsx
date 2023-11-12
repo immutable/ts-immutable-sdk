@@ -6,11 +6,11 @@ import {
 } from 'react';
 import {
   ChainId,
+  CheckoutErrorType,
   NetworkFilterTypes,
   NetworkInfo,
   SwitchNetworkParams,
 } from '@imtbl/checkout-sdk';
-import { sendProviderUpdatedEvent } from 'lib/providerEvents';
 import { WalletActions, WalletContext } from '../../context/WalletContext';
 import { text } from '../../../../resources/text/textConfig';
 import { sendNetworkSwitchEvent } from '../../WalletWidgetEvents';
@@ -94,11 +94,10 @@ export function NetworkMenu({ setBalancesLoading }: NetworkMenuProps) {
           },
         });
 
-        sendProviderUpdatedEvent({ provider: switchNetworkResult.provider });
         sendNetworkSwitchEvent(eventTarget, switchNetworkResult.provider, switchNetworkResult.network);
       } catch (err: any) {
         setBalancesLoading(false);
-        if (err.type === 'USER_REJECTED_REQUEST_ERROR') {
+        if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
           // ignore error
         } else {
           viewDispatch({
