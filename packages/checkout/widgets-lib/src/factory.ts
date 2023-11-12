@@ -1,12 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable max-len */
 import {
   Widget,
   Checkout,
   WidgetType,
   IWidgetsFactory,
-  WidgetConfigurations,
   WidgetConfiguration,
+  WidgetProperties,
 } from '@imtbl/checkout-sdk';
 import { Bridge } from 'widgets/bridge/BridgeWidgetRoot';
 import { Connect } from 'widgets/connect/ConnectWidgetRoot';
@@ -31,7 +29,9 @@ export class WidgetsFactory implements IWidgetsFactory {
     sendProviderUpdatedEvent({ provider });
   }
 
-  create<T extends WidgetType>(type: T, config?: WidgetConfigurations[T], provider?: Web3Provider): Widget<T> {
+  create<T extends WidgetType>(type: T, props?: WidgetProperties<T>): Widget<T> {
+    const { config = {}, provider } = props ?? {};
+
     switch (type) {
       case WidgetType.CONNECT: {
         return new Connect(this.sdk, {
