@@ -1,10 +1,13 @@
 import { Web3Provider } from '@ethersproject/providers';
 import {
-  Checkout, ERC20ItemRequirement, GasAmount, GasTokenType, ItemType, TransactionOrGasType,
+  Checkout, ERC20ItemRequirement, Fee, FundingRoute,
+  FundingStepType, GasAmount, GasTokenType, ItemType, RoutingOutcomeType, SmartCheckoutResult, TokenBalance,
+  TransactionOrGasType,
 } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import { parseUnits } from 'ethers/lib/utils';
-import { getL2ChainId, IMX_ADDRESS_ZKEVM } from '../../../lib';
+import { IMX_ADDRESS_ZKEVM, getL2ChainId } from '../../../lib';
+import { calculateCryptoToFiat, formatFiatString } from '../../../lib/utils';
 
 export const MAX_GAS_LIMIT = '30000000';
 
@@ -57,4 +60,59 @@ export const isUserFractionalBalanceBlocked = async (
     return true;
   }
   return false;
+};
+
+export const fundingRouteFees = (
+  fundingRoute: FundingRoute,
+  conversions: Map<string, number>,
+) => {
+  const fees: Fee[] = [];
+
+  for (const step of fundingRoute.steps) {
+    switch (step.type) {
+      case FundingStepType.BRIDGE:
+        fees.push(step.fees.approvalGasFees);
+        fees.push(...step.fees.bridgeFees);
+        fees.push(step.fees.bridgeGasFees);
+        break;
+      case FundingStepType.SWAP:
+        fees.push(step.fees.approvalGasFees);
+        fees.push(...step.fees.swapFees);
+        fees.push(step.fees.swapGasFees);
+        break;
+      default:
+    }
+  }
+
+  let totalUsd: number = 0;
+  for (const fee of fees) {
+    const feeUsd = calculateCryptoToFiat(fee.formattedAmount, fee.token!.symbol, conversions);
+    totalUsd += parseFloat(feeUsd);
+  }
+  return formatFiatString(totalUsd);
+};
+
+export const smartCheckoutTokensList = (
+  smartCheckoutResult: SmartCheckoutResult,
+) => {
+  if (smartCheckoutResult.sufficient
+    || smartCheckoutResult.router.routingOutcome.type !== RoutingOutcomeType.ROUTES_FOUND) {
+    return [];
+  }
+
+  const tokenSymbols: string[] = [];
+  for (const requirement of smartCheckoutResult.transactionRequirements) {
+    const { token } = (requirement.current as TokenBalance);
+    if (!tokenSymbols.includes(token.symbol)) {
+      tokenSymbols.push(token.symbol);
+    }
+  }
+  for (const fundingRoute of smartCheckoutResult.router.routingOutcome.fundingRoutes) {
+    for (const step of fundingRoute.steps) {
+      if (!tokenSymbols.includes(step.fundingItem.token.symbol)) {
+        tokenSymbols.push(step.fundingItem.token.symbol);
+      }
+    }
+  }
+  return tokenSymbols;
 };

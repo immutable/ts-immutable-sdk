@@ -1,4 +1,4 @@
-import { ProviderConfiguration } from 'config';
+import { ProviderConfiguration } from '../config';
 import { connect } from './metaMask';
 import {
   connect as buildImxSigner,

@@ -1,6 +1,13 @@
 import { ethers } from 'ethers';
 import { ModuleConfiguration } from '@imtbl/config';
-import { ExchangeContracts } from 'config';
+
+export type ExchangeContracts = {
+  multicall: string;
+  coreFactory: string;
+  quoterV2: string;
+  peripheryRouter: string;
+  secondaryFee: string;
+};
 
 /**
  * Type representing a Chain
