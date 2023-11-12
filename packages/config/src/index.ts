@@ -22,7 +22,7 @@ export class ImmutableConfiguration {
 
 const API_KEY_PREFIX = 'sk_imapik-';
 const PUBLISHABLE_KEY_PREFIX = 'pk_imapik-';
-const PUBLISHABLE_KEY_LENGTH = 30
+const PUBLISHABLE_KEY_LENGTH = 30;
 
 export const addApiKeyToAxiosHeader = (apiKey: string) => {
   if (!apiKey.startsWith(API_KEY_PREFIX)) {
