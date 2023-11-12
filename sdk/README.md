@@ -30,13 +30,13 @@ yarn add @imtbl/sdk
 
 ## Changelog
 
-### [0.X.0] - 2023-11-XX
+### [0.29.0] - 13-11-2023
 
 #### Changed (breaking)
 
 ##### The `connectImx` method no longer registers users on Immutable X 
 
-It previously responsible for automatically [registering a user](https://docs.immutable.com/docs/x/how-to-register-users/)
+This method was previously responsible for automatically [registering a user](https://docs.immutable.com/docs/x/how-to-register-users/)
 the first time they connect to Immutable X.
 
 ###### Before
@@ -44,7 +44,6 @@ the first time they connect to Immutable X.
 ```ts
 const passport = new Passport(...);
 const provider = await passport.connectImx();
-
 ```
 
 ###### After
@@ -60,9 +59,9 @@ const passport = new Passport(...);
 const provider = await passport.connectImx();
 
 if (!await provider.isRegisteredOffchain()) {
-// Potentially inform the user the user that are about to be
-// registered on Immutable X
-await provider.registerOffchain();
+  // Potentially inform the user the user that are about to be
+  // registered on Immutable X
+  await provider.registerOffchain();
 }
 
 // The user's wallet is registered, they are now ready to use Immutable X
@@ -79,7 +78,7 @@ used in a client-side environment only.
 Depending on your framework, you may need to update how you were instantiating the Passport instance to ensure
 this happens on the client.
 
-### [0.X.0] - 2023-11-XX
+### [0.28.2] - 30-10-2023
 
 #### Added
 
@@ -143,11 +142,11 @@ const passport = new Passport(...);
 const provider = await passport.connectImx();
 ```
 
-Find more information about authenticating users here: <LINK TO DOCS>
+Find more information about authenticating users in the [Passport Login documentation](https://docs.immutable.com/docs/x/passport/identity/login#1-trigger-the-login-process).
 
 #### Deprecated
 
-Following the introduction of the login method, we have deprecated the `connectImxSilent` method.
+Following the introduction of the `login` method, we have deprecated the `connectImxSilent` method.
 
 This method was previously used for [rehydrating the session of previously authenticated users](https://docs.immutable.com/docs/x/passport/identity/login/#3-maintaining-the-login-status)
 on page reloads.
@@ -160,8 +159,8 @@ on page reloads.
 const provider = await passport.connectImxSilent();
 
 if (!provider) {
-    // The user session couldn't be recovered. The user will have to explicitly
-    // sign in again by clicking a button that trigger passport.connectImx()
+  // The user session couldn't be recovered. The user will have to explicitly
+  // sign in again by clicking a button that trigger passport.connectImx()
 }
 ```
 
@@ -171,8 +170,7 @@ if (!provider) {
 // sign in based on their cached session.
 const user = await passport.login({ useCachedSession: true });
 if (user) {
-    // The user session is still valid, we can now initialise the wallet
-    const provider = await passport.connectImx();
+  // The user session is still valid, we can now initialise the wallet
+  const provider = await passport.connectImx();
 }
 ```
-
