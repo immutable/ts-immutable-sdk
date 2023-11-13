@@ -18,29 +18,57 @@ function ImxWorkflow() {
   const [showTransfer, setShowTransfer] = useState<boolean>(false);
   const [showOrder, setShowOrder] = useState<boolean>(false);
 
-  const { addMessage, isLoading } = useStatusProvider();
+  const { addMessage, isLoading, setIsLoading } = useStatusProvider();
   const { connectImx, imxProvider } = usePassportProvider();
 
-  const getAddress = useCallback(async () => {
-    const address = await imxProvider?.getAddress();
-    addMessage('Get Address', address);
-  }, [addMessage, imxProvider]);
+  const ensureUserIsRegistered = useCallback(async (callback: Function) => {
+    setIsLoading(true);
+    try {
+      if (await imxProvider?.isRegisteredOffchain()) {
+        await callback();
+      } else {
+        addMessage('Please call `registerOffchain` before calling this method');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }, [addMessage, imxProvider, setIsLoading]);
 
-  const handleBulkTransfer = () => {
-    setShowBulkTransfer(true);
+  const getAddress = useCallback(async () => (
+    ensureUserIsRegistered(async () => {
+      const address = await imxProvider?.getAddress();
+      addMessage('Get Address', address);
+    })
+  ), [addMessage, ensureUserIsRegistered, imxProvider]);
+
+  const isRegisteredOffchain = async () => {
+    try {
+      setIsLoading(true);
+      const result = await imxProvider?.isRegisteredOffchain();
+      addMessage('Is Registered Offchain', result);
+    } catch (err) {
+      addMessage('Is Registered Offchain', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleTransfer = () => {
-    setShowTransfer(true);
+  const registerUser = async () => {
+    try {
+      setIsLoading(true);
+      const result = await imxProvider?.registerOffchain();
+      addMessage('Register off chain', result);
+    } catch (err) {
+      addMessage('Register off chain', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleTrade = () => {
-    setShowTrade(true);
-  };
-
-  const handleOrder = useCallback(() => {
-    setShowOrder(true);
-  }, []);
+  const handleBulkTransfer = () => ensureUserIsRegistered(() => setShowBulkTransfer(true));
+  const handleTransfer = () => ensureUserIsRegistered(() => setShowTransfer(true));
+  const handleTrade = () => ensureUserIsRegistered(() => setShowTrade(true));
+  const handleOrder = () => ensureUserIsRegistered(() => setShowOrder(true));
 
   return (
     <CardStack title="Imx Workflow">
@@ -112,6 +140,18 @@ function ImxWorkflow() {
               onClick={getAddress}
             >
               Get Address
+            </WorkflowButton>
+            <WorkflowButton
+              disabled={isLoading}
+              onClick={isRegisteredOffchain}
+            >
+              Is Registered Offchain
+            </WorkflowButton>
+            <WorkflowButton
+              disabled={isLoading}
+              onClick={registerUser}
+            >
+              Register User
             </WorkflowButton>
           </>
         )}
