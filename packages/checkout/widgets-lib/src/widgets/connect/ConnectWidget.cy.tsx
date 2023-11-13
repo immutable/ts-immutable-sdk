@@ -25,16 +25,25 @@ describe('ConnectWidget tests', () => {
     isOnRampEnabled: true,
   };
 
+  let providerOnStub;
+  let providerRemoveListenerStub;
+
   beforeEach(() => {
     cyIntercept();
     cy.viewport('ipad-2');
+    providerOnStub = cy.stub().as('providerOnStub').returns({});
+    providerRemoveListenerStub = cy.stub().as('providerRemoveListenerStub').returns({});
   });
 
-  const baseMockProvider = {
+  const mockWeb3Provider = {
+    provider: {
+      on: providerOnStub,
+      removeListener: providerRemoveListenerStub,
+    },
     getSigner: () => ({
       getAddress: () => Promise.resolve(''),
     }),
-  };
+  } as unknown as Web3Provider;
 
   /** mounting the connect widget should be done to start all tests */
   const mountConnectWidget = () => {
@@ -43,7 +52,7 @@ describe('ConnectWidget tests', () => {
 
     mount(
       <CustomAnalyticsProvider widgetConfig={config}>
-        <ConnectWidget config={config} checkout={checkout} {...props} />
+        <ConnectWidget config={config} checkout={checkout} {...props} web3Provider={mockWeb3Provider} />
       </CustomAnalyticsProvider>,
     );
   };
@@ -265,21 +274,29 @@ describe('ConnectWidget tests', () => {
       beforeEach(() => {
         cy.stub(Checkout.prototype, 'connect').as('connectStub').resolves({
           provider: {
+            provider: {
+              on: providerOnStub,
+              removeListener: providerRemoveListenerStub,
+            },
             getSigner: () => ({
               getAddress: () => Promise.resolve(''),
               getChainId: async () => Promise.resolve(ChainId.IMTBL_ZKEVM_TESTNET),
             }),
-          } as Web3Provider,
+          } as unknown as Web3Provider,
         });
         cy.stub(Checkout.prototype, 'createProvider')
           .as('createProviderStub')
           .resolves({
             provider: {
+              provider: {
+                on: providerOnStub,
+                removeListener: providerRemoveListenerStub,
+              },
               getSigner: () => ({
                 getAddress: () => Promise.resolve(''),
                 getChainId: async () => Promise.resolve(ChainId.IMTBL_ZKEVM_TESTNET),
               }),
-            } as Web3Provider,
+            } as unknown as Web3Provider,
           });
       });
 
@@ -327,21 +344,29 @@ describe('ConnectWidget tests', () => {
       beforeEach(() => {
         cy.stub(Checkout.prototype, 'connect').as('connectStub').resolves({
           provider: {
+            provider: {
+              on: providerOnStub,
+              removeListener: providerRemoveListenerStub,
+            },
             getSigner: () => ({
               getAddress: () => Promise.resolve(''),
               getChainId: async () => Promise.resolve(ChainId.SEPOLIA),
             }),
-          } as Web3Provider,
+          } as unknown as Web3Provider,
         });
         cy.stub(Checkout.prototype, 'createProvider')
           .as('createProviderStub')
           .resolves({
             provider: {
+              provider: {
+                on: providerOnStub,
+                removeListener: providerRemoveListenerStub,
+              },
               getSigner: () => ({
                 getAddress: () => Promise.resolve(''),
                 getChainId: async () => Promise.resolve(ChainId.SEPOLIA),
               }),
-            } as Web3Provider,
+            } as unknown as Web3Provider,
           });
       });
 
@@ -369,7 +394,7 @@ describe('ConnectWidget tests', () => {
         cy.stub(Checkout.prototype, 'switchNetwork')
           .as('switchNetworkStub')
           .resolves({
-            provider: baseMockProvider as Web3Provider,
+            provider: mockWeb3Provider as Web3Provider,
             network: {
               name: ChainName.IMTBL_ZKEVM_TESTNET,
               chainId: ChainId.IMTBL_ZKEVM_TESTNET,
@@ -416,7 +441,7 @@ describe('ConnectWidget tests', () => {
           .rejects({})
           .onSecondCall()
           .resolves({
-            provider: baseMockProvider as Web3Provider,
+            provider: mockWeb3Provider as Web3Provider,
           });
         mountConnectWidgetAndGoToReadyToConnect();
         cySmartGet('ready-to-connect').should('be.visible');
@@ -460,7 +485,11 @@ describe('ConnectWidget tests', () => {
     beforeEach(() => {
       cy.stub(Checkout.prototype, 'connect').as('connectStub').resolves({
         provider: {
-          provider: { isPassport: true },
+          provider: {
+            on: providerOnStub,
+            removeListener: providerRemoveListenerStub,
+            isPassport: true,
+          },
           getSigner: () => ({
             getAddress: () => Promise.resolve(''),
             getChainId: async () => Promise.resolve(ChainId.IMTBL_ZKEVM_TESTNET),
