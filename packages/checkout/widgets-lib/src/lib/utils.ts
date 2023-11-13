@@ -121,4 +121,4 @@ export const isZkEvmChainId = (chainId: ChainId) => chainId === ChainId.IMTBL_ZK
   || chainId === ChainId.IMTBL_ZKEVM_TESTNET
   || chainId === ChainId.IMTBL_ZKEVM_MAINNET;
 
-export const isNativeToken = (address?: string | undefined): boolean => !address || address === NATIVE;
+export const isNativeToken = (address: string | undefined): boolean => !address || address === NATIVE;
