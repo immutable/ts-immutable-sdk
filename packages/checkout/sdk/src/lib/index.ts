@@ -2,4 +2,3 @@
 export * from './constants';
 export * from './env';
 export * from './debugLogger';
-export * from './gasPriceInWei';
