@@ -175,7 +175,7 @@ export function SwapForm({ data }: SwapFromProps) {
           tokenBalances.find(
             (t) => (
               isNativeToken(t.token.address)
-                && data?.fromContractAddress?.toLocaleUpperCase() === NATIVE)
+                && data?.fromContractAddress?.toLowerCase() === NATIVE)
               || (t.token.address?.toLowerCase() === data?.fromContractAddress?.toLowerCase()),
           )?.formattedBalance ?? '',
         );
@@ -183,7 +183,7 @@ export function SwapForm({ data }: SwapFromProps) {
 
       if (shouldSetToAddress(data?.toContractAddress, data?.fromContractAddress)) {
         setToToken(allowedTokens.find((t) => (
-          isNativeToken(t.address) && data?.toContractAddress?.toLocaleUpperCase() === NATIVE
+          isNativeToken(t.address) && data?.toContractAddress?.toLowerCase() === NATIVE
         ) || (t.address?.toLowerCase() === data?.toContractAddress?.toLowerCase())));
       }
     }
