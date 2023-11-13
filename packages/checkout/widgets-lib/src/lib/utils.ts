@@ -5,7 +5,6 @@ import { getL1ChainId, getL2ChainId } from './networkUtils';
 import {
   DEFAULT_GT_ONE_TOKEN_FORMATTING_DECIMALS,
   DEFAULT_TOKEN_FORMATTING_DECIMALS,
-  IMX_ADDRESS_ZKEVM,
   NATIVE,
 } from './constants';
 
@@ -122,12 +121,4 @@ export const isZkEvmChainId = (chainId: ChainId) => chainId === ChainId.IMTBL_ZK
   || chainId === ChainId.IMTBL_ZKEVM_TESTNET
   || chainId === ChainId.IMTBL_ZKEVM_MAINNET;
 
-export const isNativeToken = (
-  address?: string,
-  chainId?: ChainId,
-): boolean => {
-  if (chainId && isZkEvmChainId(chainId)) {
-    return address === IMX_ADDRESS_ZKEVM;
-  }
-  return !address || address.toLocaleUpperCase() === NATIVE;
-};
+export const isNativeToken = (address: string | undefined): boolean => !address || address === NATIVE;

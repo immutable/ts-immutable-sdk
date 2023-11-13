@@ -2,7 +2,7 @@ import { Environment } from '@imtbl/config';
 import { CheckoutErrorType, WalletProviderName, WidgetTheme } from '@imtbl/checkout-sdk';
 import { RetryType } from './retry';
 
-export const NATIVE = 'NATIVE';
+export const NATIVE = 'native';
 
 export const DEFAULT_TOKEN_DECIMALS = 18;
 export const DEFAULT_TOKEN_FORMATTING_DECIMALS = 6;
