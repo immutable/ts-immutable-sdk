@@ -18,7 +18,7 @@ import { allowanceAggregator } from './aggregators/allowanceAggregator';
 import { gasCalculator } from './gas';
 import { getAvailableRoutingOptions } from './routing';
 import { routingCalculator } from './routing/routingCalculator';
-import { measureAsyncExecution } from '../utils/debugLogger';
+import { measureAsyncExecution } from '../lib';
 import { Allowance } from './allowance/types';
 import { BalanceCheckResult } from './balanceCheck/types';
 

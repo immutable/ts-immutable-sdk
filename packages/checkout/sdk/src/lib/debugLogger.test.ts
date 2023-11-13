@@ -1,5 +1,6 @@
-import { debugLogger, measureAsyncExecution } from './debugLogger';
+/* eslint-disable import/no-cycle */
 import { CheckoutConfiguration } from '../config';
+import { debugLogger, measureAsyncExecution } from './debugLogger';
 
 describe('debugLogger', () => {
   beforeEach(() => {
