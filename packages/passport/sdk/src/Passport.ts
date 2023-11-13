@@ -121,6 +121,11 @@ export class Passport {
    */
   public async login(options?: { useCachedSession: boolean }): Promise<UserProfile | null> {
     const { useCachedSession = false } = options || {};
+    if (useCachedSession) {
+      const cachedUser = await this.authManager.forceUserRefresh();
+      return cachedUser?.profile || null;
+    }
+
     let user = null;
     try {
       user = await this.authManager.getUser();
@@ -128,7 +133,7 @@ export class Passport {
       // eslint-disable-next-line no-console
       console.warn('getUser failed with error:', error);
     }
-    if (!user && !useCachedSession) {
+    if (!user) {
       user = await this.authManager.login();
     }
 
