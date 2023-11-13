@@ -36,7 +36,8 @@ import {
 } from '../actions';
 import { SignTransactionStatusType } from '../actions/types';
 import { calculateFees } from '../fees/fees';
-import { ERC20ABI, debugLogger, measureAsyncExecution } from '../../lib';
+import { debugLogger, measureAsyncExecution } from '../../logger/debugLogger';
+import { ERC20ABI } from '../../lib';
 
 export const getItemRequirement = (
   type: ItemType,

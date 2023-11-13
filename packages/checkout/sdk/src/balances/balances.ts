@@ -20,8 +20,9 @@ import {
   BlockscoutTokenType,
 } from '../client';
 import {
-  measureAsyncExecution, DEFAULT_TOKEN_DECIMALS, ERC20ABI, IMX_ADDRESS_ZKEVM,
+  DEFAULT_TOKEN_DECIMALS, ERC20ABI, IMX_ADDRESS_ZKEVM,
 } from '../lib';
+import { measureAsyncExecution } from '../logger/debugLogger';
 
 export const getBalance = async (
   config: CheckoutConfiguration,
