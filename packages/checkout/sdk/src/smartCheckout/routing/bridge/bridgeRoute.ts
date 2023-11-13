@@ -22,7 +22,7 @@ import { estimateGasForBridgeApproval } from './estimateApprovalGas';
 import { CheckoutError, CheckoutErrorType } from '../../../errors';
 import { allowListCheckForBridge } from '../../allowList/allowListCheck';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS, fetchL1Representation } from '../indexer/fetchL1Representation';
-import { DEFAULT_TOKEN_DECIMALS, IMX_ADDRESS_ZKEVM } from '../../../lib';
+import { DEFAULT_TOKEN_DECIMALS, IMX_ADDRESS_ZKEVM } from '../../../env';
 
 export const hasSufficientL1Eth = (
   tokenBalanceResult: TokenBalanceResult,

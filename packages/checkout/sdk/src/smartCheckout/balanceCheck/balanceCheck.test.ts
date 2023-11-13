@@ -9,7 +9,7 @@ import { balanceCheck } from './balanceCheck';
 import { CheckoutConfiguration } from '../../config';
 import { getBalances } from '../../balances';
 import { BalanceCheckResult } from './types';
-import { DEFAULT_TOKEN_DECIMALS, IMX_ADDRESS_ZKEVM } from '../../lib';
+import { DEFAULT_TOKEN_DECIMALS, IMX_ADDRESS_ZKEVM } from '../../env';
 
 jest.mock('../../balances');
 jest.mock('ethers', () => ({

@@ -113,4 +113,4 @@ export type {
 export type { ErrorType } from './errors';
 export { CheckoutErrorType } from './errors';
 export { CheckoutConfiguration } from './config';
-export { CHECKOUT_API_BASE_URL } from './lib';
+export { CHECKOUT_API_BASE_URL } from './env';

@@ -6,7 +6,7 @@ import {
 } from '../../../types';
 import { BalanceRequirement } from '../../balanceCheck/types';
 import { allowListCheckForOnRamp } from '../../allowList';
-import { IMX_ADDRESS_ZKEVM } from '../../../lib';
+import { IMX_ADDRESS_ZKEVM } from '../../../env';
 
 export const onRampRoute = async (
   config: CheckoutConfiguration,

@@ -7,7 +7,7 @@ import { ChainId } from '../../types';
 import { getAllBalances } from '../../balances';
 import { CheckoutErrorType } from '../../errors';
 import { TokenBalanceResult } from './types';
-import { IMX_ADDRESS_ZKEVM } from '../../lib';
+import { IMX_ADDRESS_ZKEVM } from '../../env';
 
 jest.mock('../../balances');
 jest.mock('../../config');

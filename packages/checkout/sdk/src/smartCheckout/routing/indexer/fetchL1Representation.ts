@@ -1,6 +1,6 @@
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../../config';
 import { createBlockchainDataInstance } from '../../../instance';
-import { IMX_ADDRESS_ZKEVM } from '../../../lib';
+import { IMX_ADDRESS_ZKEVM } from '../../../env';
 import { ChainId, ImxAddressConfig } from '../../../types';
 
 // If the root address evaluates to this then its ETH

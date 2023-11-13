@@ -10,7 +10,7 @@ import {
 import { allowListCheckForOnRamp } from '../../allowList';
 import { onRampRoute } from './onRampRoute';
 import { BalanceERC20Requirement, BalanceERC721Requirement } from '../../balanceCheck/types';
-import { IMX_ADDRESS_ZKEVM } from '../../../lib';
+import { IMX_ADDRESS_ZKEVM } from '../../../env';
 
 jest.mock('../../allowList/allowListCheck');
 

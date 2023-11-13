@@ -7,7 +7,7 @@ import {
   ChainTokensConfig,
 } from '../types';
 import { CheckoutError, CheckoutErrorType } from '../errors';
-import { CHECKOUT_API_BASE_URL, ENV_DEVELOPMENT } from '../lib';
+import { CHECKOUT_API_BASE_URL, ENV_DEVELOPMENT } from '../env';
 
 export type RemoteConfigParams = {
   isDevelopment: boolean;

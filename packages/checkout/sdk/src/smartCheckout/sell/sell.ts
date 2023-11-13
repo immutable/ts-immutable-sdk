@@ -31,7 +31,7 @@ import {
 } from '../actions';
 import { SignTransactionStatusType } from '../actions/types';
 import { calculateFees } from '../fees/fees';
-import { ERC20ABI } from '../../lib';
+import { ERC20ABI } from '../../env';
 import { measureAsyncExecution } from '../../logger/debugLogger';
 
 export const getERC721Requirement = (

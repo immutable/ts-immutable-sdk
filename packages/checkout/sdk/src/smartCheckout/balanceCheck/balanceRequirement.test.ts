@@ -7,7 +7,7 @@ import {
   getTokenBalanceRequirement,
   getTokensFromRequirements,
 } from './balanceRequirement';
-import { IMX_ADDRESS_ZKEVM } from '../../lib';
+import { IMX_ADDRESS_ZKEVM } from '../../env';
 
 describe('balanceRequirement', () => {
   describe('getTokensFromRequirements', () => {

@@ -25,7 +25,7 @@ import {
   getTokenBalanceRequirement,
   getTokensFromRequirements,
 } from './balanceRequirement';
-import { ERC721ABI } from '../../lib';
+import { ERC721ABI } from '../../env';
 
 /**
  * Gets the balances for all NATIVE and ERC20 balance requirements.

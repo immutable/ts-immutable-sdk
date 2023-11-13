@@ -23,7 +23,7 @@ import {
   ItemType,
 } from '../../../types';
 import { quoteFetcher } from './quoteFetcher';
-import { IMX_ADDRESS_ZKEVM } from '../../../lib';
+import { IMX_ADDRESS_ZKEVM } from '../../../env';
 
 jest.mock('../../../config/remoteConfigFetcher');
 jest.mock('./quoteFetcher');

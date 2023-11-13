@@ -3,7 +3,7 @@ import { CheckoutConfiguration } from '../../../config';
 import { createBlockchainDataInstance } from '../../../instance';
 import { ChainId } from '../../../types';
 import { fetchL1Representation } from './fetchL1Representation';
-import { IMX_ADDRESS_ZKEVM } from '../../../lib';
+import { IMX_ADDRESS_ZKEVM } from '../../../env';
 
 jest.mock('../../../instance');
 
