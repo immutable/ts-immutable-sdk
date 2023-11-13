@@ -8,7 +8,7 @@ import {
   TokenAmountEstimate,
 } from '../types/gasEstimate';
 import { BridgeFeeEstimateResult } from './bridgeGasEstimateType';
-import { getGasPriceInWei } from '../utils/gasPriceInWei';
+import { getGasPriceInWei } from '../lib/gasPriceInWei';
 
 const GAS_LIMIT = 140000;
 
