@@ -409,8 +409,7 @@ export default class AuthManager {
    * Refreshes the token and returns the user.
    * If the token is already being refreshed, returns the existing promise.
    */
-  private async refreshTokenAndUpdatePromise()
-  : Promise<User | null> {
+  private async refreshTokenAndUpdatePromise(): Promise<User | null> {
     if (this.refreshingPromise) return this.refreshingPromise;
 
     // eslint-disable-next-line no-async-promise-executor
