@@ -6,7 +6,7 @@ import {
 import {
   useContext, useState, useCallback, useMemo, useEffect,
 } from 'react';
-import { addProviderListenersForWidgetRoot } from 'lib/eip1193Events';
+import { addProviderListenersForWidgetRoot } from 'lib';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../../components/Footer/FooterButton';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
