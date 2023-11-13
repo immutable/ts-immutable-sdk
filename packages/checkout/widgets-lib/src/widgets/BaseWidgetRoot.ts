@@ -95,6 +95,11 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
       },
     });
 
+    if (props.provider) {
+      // eslint-disable-next-line no-console
+      console.warn('Updating a widget provider through the update() method is not supported yet');
+    }
+
     this.render();
   }
 
