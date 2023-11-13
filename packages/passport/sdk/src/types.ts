@@ -1,5 +1,6 @@
 import { ModuleConfiguration } from '@imtbl/config';
 import { ImmutableXClient } from '@imtbl/immutablex-client';
+import { EthSigner, StarkSigner } from '@imtbl/core-sdk';
 
 export enum PassportEvents {
   LOGGED_OUT = 'loggedOut',
@@ -92,7 +93,7 @@ export type DeviceConnectResponse = {
   interval: number;
 };
 
-export type DeviceCodeReponse = {
+export type DeviceCodeResponse = {
   device_code: string;
   user_code: string;
   verification_uri: string;
@@ -130,4 +131,9 @@ export type DeviceErrorResponse = {
 export type PKCEData = {
   state: string,
   verifier: string
+};
+
+export type IMXSigners = {
+  starkSigner: StarkSigner,
+  ethSigner: EthSigner;
 };

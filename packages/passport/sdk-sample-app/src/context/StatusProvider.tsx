@@ -23,17 +23,19 @@ export function StatusProvider({
 
   const addMessage = useCallback((operation: string, ...args: any[]) => {
     let messageString: string;
-    if (args[0] instanceof PassportError) {
-      messageString = `${args[0].type}: ${args[0].message}`;
+    if (!args?.length) {
+      messageString = operation;
+    } else if (args[0] instanceof PassportError) {
+      messageString = `${operation}: ${args[0].type} - ${args[0].message}`;
     } else {
-      messageString = args.map((arg) => {
+      messageString = `${operation}: ${args.map((arg) => {
         if (arg instanceof Error) {
           return arg.toString();
         }
         return JSON.stringify(arg, null, 2);
-      }).join(': ');
+      }).join(' - ')}`;
     }
-    setMessages((prevMessages) => [...prevMessages, `${operation}: ${messageString}`]);
+    setMessages((prevMessages) => [...prevMessages, messageString]);
   }, []);
 
   const providerValues = useMemo(() => ({
