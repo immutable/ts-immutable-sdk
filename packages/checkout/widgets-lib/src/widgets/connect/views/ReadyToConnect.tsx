@@ -6,6 +6,7 @@ import {
 import {
   useContext, useState, useCallback, useMemo, useEffect,
 } from 'react';
+import { addProviderListenersForWidgetRoot } from 'lib';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../../components/Footer/FooterButton';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
@@ -127,6 +128,9 @@ export function ReadyToConnect({ targetChainId, allowedChains }: ReadyToConnectP
       const connectResult = await checkout.connect({
         provider,
       });
+
+      // Set up EIP-1193 provider event listeners for widget root instances
+      addProviderListenersForWidgetRoot(connectResult.provider);
 
       await identifyUser(identify, connectResult.provider);
 

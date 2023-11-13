@@ -12,14 +12,8 @@ import {
   WidgetParameters,
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
-import {
-  addAccountsChangedListener,
-  addChainChangedListener,
-  removeAccountsChangedListener,
-  removeChainChangedListener,
-} from 'lib';
 import { StrongCheckoutWidgetsConfig, withDefaultWidgetConfigs } from '../lib/withDefaultWidgetConfig';
-import { baseWidgetProviderEvent, handleAccountsChanged, handleChainChanged } from './eip1193Events';
+import { addProviderListenersForWidgetRoot, baseWidgetProviderEvent } from '../lib';
 
 export abstract class Base<T extends WidgetType> implements Widget<T> {
   protected checkout: Checkout;
@@ -50,8 +44,7 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
     this.properties = validatedProps;
     this.web3Provider = props?.provider;
     if (this.web3Provider) {
-      addAccountsChangedListener(this.web3Provider, handleAccountsChanged);
-      addChainChangedListener(this.web3Provider, handleChainChanged);
+      addProviderListenersForWidgetRoot(this.web3Provider);
     }
     this.setupProviderUpdatedListener();
   }
@@ -101,6 +94,11 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
         ...(props.config ?? {}),
       },
     });
+
+    if (props.provider) {
+      // eslint-disable-next-line no-console
+      console.warn('Updating a widget provider through the update() method is not supported yet');
+    }
 
     this.render();
   }
@@ -190,18 +188,7 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
     switch (event.detail.type) {
       case ProviderEventType.PROVIDER_UPDATED: {
         const eventData = event.detail.data as ProviderUpdated;
-
-        if (widgetRoot.web3Provider) {
-          removeAccountsChangedListener(widgetRoot.web3Provider, handleAccountsChanged);
-          removeChainChangedListener(widgetRoot.web3Provider, handleChainChanged);
-        }
-
         widgetRoot.web3Provider = eventData.provider;
-
-        if (widgetRoot.web3Provider) {
-          addAccountsChangedListener(widgetRoot.web3Provider, handleAccountsChanged);
-          addChainChangedListener(widgetRoot.web3Provider, handleChainChanged);
-        }
         this.render();
         break;
       }
