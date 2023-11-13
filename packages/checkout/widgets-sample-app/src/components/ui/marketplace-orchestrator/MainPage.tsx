@@ -56,7 +56,7 @@ export const MainPage = () => {
       setWeb3Provider(eventData.provider)
     });
     swapWidget.addListener(ProviderEventType.PROVIDER_UPDATED, (data: ProviderUpdated) => {
-      console.log("swap widget provider updated", data)
+      // console.log("swap widget provider updated", data)
     });
   }, [connectWidget, walletWidget, swapWidget]);
 
@@ -101,6 +101,11 @@ export const MainPage = () => {
     alert("you can buy now");
   }
 
+  const updateProvider = () => {
+    const pr = new Web3Provider((window as any).ethereum)
+    widgetsFactory.updateProvider(pr)
+  }
+
   const cardKeys = useMemo(() => [140142,241916,345112,205410],[]);
 
   const logout = useCallback(async () => {
@@ -117,6 +122,7 @@ export const MainPage = () => {
           <Button onClick={openSwapWidget}>Swap</Button>
           <Button onClick={openBridgeWidget}>Bridge</Button>
           <Button onClick={openOnRampWidget}>On-ramp</Button>
+          <Button onClick={updateProvider}>Update Provider</Button>
       </Box>
       {passport && web3Provider && (web3Provider.provider as any)?.isPassport && <Button onClick={logout}>Passport Logout</Button>}
       </Box>

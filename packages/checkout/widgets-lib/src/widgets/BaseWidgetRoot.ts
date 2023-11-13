@@ -13,7 +13,7 @@ import {
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { StrongCheckoutWidgetsConfig, withDefaultWidgetConfigs } from '../lib/withDefaultWidgetConfig';
-import { addProviderListenersForWidgetRoot, baseWidgetProviderEvent } from './eip1193Events';
+import { addProviderListenersForWidgetRoot, baseWidgetProviderEvent } from '../lib';
 
 export abstract class Base<T extends WidgetType> implements Widget<T> {
   protected checkout: Checkout;
