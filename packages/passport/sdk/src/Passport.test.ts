@@ -286,5 +286,15 @@ describe('Passport', () => {
       expect(authLoginMock).toBeCalledTimes(0);
       expect(user).toEqual(mockUser.profile);
     });
+
+    it('should throw error if useCachedSession is true and getUser returns error', async () => {
+      const error = new Error('Unknown or invalid refresh token.');
+      getUserMock.mockRejectedValue(error);
+      authLoginMock.mockReturnValue(mockUserImx);
+
+      await expect(passport.login({ useCachedSession: true })).rejects.toThrow(error);
+      expect(getUserMock).toBeCalledTimes(1);
+      expect(authLoginMock).toBeCalledTimes(0);
+    });
   });
 });
