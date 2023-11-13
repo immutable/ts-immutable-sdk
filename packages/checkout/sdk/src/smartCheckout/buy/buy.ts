@@ -37,8 +37,8 @@ import {
 } from '../actions';
 import { SignTransactionStatusType } from '../actions/types';
 import { calculateFees } from '../fees/fees';
-import { debugLogger, measureAsyncExecution } from '../../lib';
 import { getAllBalances, resetBlockscoutClientMap } from '../../balances';
+import { debugLogger, measureAsyncExecution } from '../../logger/debugLogger';
 
 export const getItemRequirement = (
   type: ItemType,

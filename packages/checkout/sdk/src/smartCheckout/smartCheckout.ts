@@ -18,9 +18,9 @@ import { allowanceAggregator } from './aggregators/allowanceAggregator';
 import { gasCalculator } from './gas';
 import { getAvailableRoutingOptions } from './routing';
 import { routingCalculator } from './routing/routingCalculator';
-import { measureAsyncExecution } from '../lib';
 import { Allowance } from './allowance/types';
 import { BalanceCheckResult } from './balanceCheck/types';
+import { measureAsyncExecution } from '../logger/debugLogger';
 
 export const smartCheckout = async (
   config: CheckoutConfiguration,
