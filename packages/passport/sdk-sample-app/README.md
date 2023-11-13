@@ -3,14 +3,11 @@
 ## Running Locally
 
 ```bash
-# install deps & build the sdk at project root
+# Install deps
 yarn
-yarn build
 
-# install deps & run the sample app
-# cd packages/passport/sdk-sample-app
-yarn
-yarn dev
+# Build the passport SDK and run the sample app
+yarn workspace @imtbl/passport build && yarn workspace @imtbl/passport-sdk-sample-app dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
