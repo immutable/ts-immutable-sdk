@@ -56,7 +56,7 @@ export class PassportImxProviderFactory {
   public async getProvider(): Promise<PassportImxProvider> {
     let user = null;
     try {
-      user = await this.authManager.loginSilent();
+      user = await this.authManager.getUser();
     } catch (e) {
       // eslint-disable-next-line no-console
       console.warn(e);
@@ -68,7 +68,7 @@ export class PassportImxProviderFactory {
   }
 
   public async getProviderSilent(): Promise<PassportImxProvider | null> {
-    const user = await this.authManager.loginSilent();
+    const user = await this.authManager.getUser();
     if (!user) {
       return null;
     }
@@ -149,7 +149,7 @@ export class PassportImxProviderFactory {
 
       // User metadata is updated asynchronously. Poll userinfo endpoint until it is updated.
       const updatedUser = await retryWithDelay<User | null>(async () => {
-        const user = await this.authManager.loginSilent({ forceRefresh: true }); // force refresh to get updated user info
+        const user = await this.authManager.forceUserRefresh(); // force refresh to get updated user info
         const metadataExists = !!user?.imx;
         if (metadataExists) {
           return user;

@@ -33,7 +33,6 @@ describe('Passport', () => {
   let confirmationLogoutMock: jest.Mock;
   let getUserMock: jest.Mock;
   let requestRefreshTokenMock: jest.Mock;
-  let loginSilentMock: jest.Mock;
   let getProviderMock: jest.Mock;
   let getProviderSilentMock: jest.Mock;
   let getLinkedAddressesMock: jest.Mock;
@@ -47,7 +46,6 @@ describe('Passport', () => {
     logoutMock = jest.fn();
     getUserMock = jest.fn();
     requestRefreshTokenMock = jest.fn();
-    loginSilentMock = jest.fn();
     getProviderMock = jest.fn();
     getProviderSilentMock = jest.fn();
     getLinkedAddressesMock = jest.fn();
@@ -56,7 +54,6 @@ describe('Passport', () => {
       loginCallback: loginCallbackMock,
       logout: logoutMock,
       getUser: getUserMock,
-      loginSilent: loginSilentMock,
       requestRefreshTokenAfterRegistration: requestRefreshTokenMock,
     });
     (ConfirmationScreen as jest.Mock).mockReturnValue({
@@ -250,39 +247,39 @@ describe('Passport', () => {
 
   describe('login', () => {
     it('should login silently if there is a user', async () => {
-      loginSilentMock.mockReturnValue(mockUserImx);
+      getUserMock.mockReturnValue(mockUserImx);
       const user = await passport.login();
 
-      expect(loginSilentMock).toBeCalledTimes(1);
+      expect(getUserMock).toBeCalledTimes(1);
       expect(authLoginMock).toBeCalledTimes(0);
       expect(user).toEqual(mockUser.profile);
     });
 
     it('should login if login sliently returns error', async () => {
-      loginSilentMock.mockRejectedValue(new Error('Unknown or invalid refresh token.'));
+      getUserMock.mockRejectedValue(new Error('Unknown or invalid refresh token.'));
       authLoginMock.mockReturnValue(mockUserImx);
       const user = await passport.login();
 
-      expect(loginSilentMock).toBeCalledTimes(1);
+      expect(getUserMock).toBeCalledTimes(1);
       expect(authLoginMock).toBeCalledTimes(1);
       expect(user).toEqual(mockUser.profile);
     });
 
     it('should login and get a user', async () => {
-      loginSilentMock.mockReturnValue(null);
+      getUserMock.mockReturnValue(null);
       authLoginMock.mockReturnValue(mockUserImx);
       const user = await passport.login();
 
-      expect(loginSilentMock).toBeCalledTimes(1);
+      expect(getUserMock).toBeCalledTimes(1);
       expect(authLoginMock).toBeCalledTimes(1);
       expect(user).toEqual(mockUserImx.profile);
     });
 
     it('should only login silently if useCachedSession is true', async () => {
-      loginSilentMock.mockReturnValue(mockUserImx);
+      getUserMock.mockReturnValue(mockUserImx);
       const user = await passport.login({ useCachedSession: true });
 
-      expect(loginSilentMock).toBeCalledTimes(1);
+      expect(getUserMock).toBeCalledTimes(1);
       expect(authLoginMock).toBeCalledTimes(0);
       expect(user).toEqual(mockUser.profile);
     });

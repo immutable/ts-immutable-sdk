@@ -249,35 +249,6 @@ describe('AuthManager', () => {
     });
   });
 
-  describe('loginSilent', () => {
-    it('should get the login user and return the domain model', async () => {
-      mockGetUser.mockReturnValue(mockOidcUser);
-      mockSigninSilent.mockResolvedValue(mockOidcUser);
-
-      const result = await authManager.loginSilent();
-
-      expect(result).toEqual(mockUser);
-    });
-
-    it('should return null if there is no existed user', async () => {
-      mockGetUser.mockReturnValue(null);
-
-      const result = await authManager.loginSilent();
-
-      expect(result).toBeNull();
-    });
-
-    it('should return null if user is returned', async () => {
-      mockGetUser.mockReturnValue(mockOidcExpiredUser);
-      (isTokenExpired as jest.Mock).mockReturnValue(true);
-      mockSigninSilent.mockResolvedValue(null);
-
-      const result = await authManager.loginSilent();
-
-      expect(result).toBeNull();
-    });
-  });
-
   describe('loginCallback', () => {
     it('should call login callback', async () => {
       await authManager.loginCallback();
@@ -333,19 +304,19 @@ describe('AuthManager', () => {
     });
   });
 
-  describe('getUser', () => {
-    describe('when forceRefresh is set to true', () => {
-      it('should call signinSilent and return the domain model', async () => {
-        mockSigninSilent.mockReturnValue(mockOidcUser);
+  describe('forceUserRefresh', () => {
+    it('should call signinSilent and return the domain model', async () => {
+      mockSigninSilent.mockReturnValue(mockOidcUser);
 
-        const result = await authManager.getUser({ forceRefresh: true });
+      const result = await authManager.forceUserRefresh();
 
-        expect(result).toEqual(mockUser);
-        expect(mockSigninSilent).toBeCalled();
-        expect(mockGetUser).not.toBeCalled();
-      });
+      expect(result).toEqual(mockUser);
+      expect(mockSigninSilent).toBeCalled();
+      expect(mockGetUser).not.toBeCalled();
     });
+  });
 
+  describe('getUser', () => {
     it('should retrieve the user from the userManager and return the domain model', async () => {
       mockGetUser.mockReturnValue(mockOidcUser);
       (isTokenExpired as jest.Mock).mockReturnValue(false);
@@ -392,21 +363,21 @@ describe('AuthManager', () => {
       expect(await authManager.getUser()).toBeNull();
     });
 
-    describe('when concurrent requests getUser are made', () => {
-      describe('when forceRefresh is set to true', () => {
+    describe('when concurrent requests forceUserRefresh are made', () => {
+      describe('when forceUserRefresh', () => {
         it('should only call refresh the token once', async () => {
           mockSigninSilent.mockReturnValue(mockOidcUser);
 
           await Promise.allSettled([
-            authManager.getUser({ forceRefresh: true }),
-            authManager.getUser({ forceRefresh: true }),
+            authManager.forceUserRefresh(),
+            authManager.forceUserRefresh(),
           ]);
 
           expect(mockSigninSilent).toBeCalledTimes(1);
         });
       });
 
-      describe('when forceRefresh is set to false and the user is expired', () => {
+      describe('when the user is expired', () => {
         it('should only call refresh the token once', async () => {
           mockGetUser.mockReturnValue(mockOidcExpiredUser);
           (isTokenExpired as jest.Mock).mockReturnValue(true);

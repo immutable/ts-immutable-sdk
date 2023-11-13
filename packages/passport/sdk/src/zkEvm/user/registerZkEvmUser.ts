@@ -52,7 +52,7 @@ export async function registerZkEvmUser({
     }
     user = await authManager.refreshToken(credentials.refresh_token);
   } else {
-    user = await authManager.loginSilent({ forceRefresh: true });
+    user = await authManager.forceUserRefresh();
   }
   if (!user?.zkEvm) {
     throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, 'Failed to refresh user details');

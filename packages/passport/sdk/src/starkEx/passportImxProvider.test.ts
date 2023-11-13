@@ -42,7 +42,6 @@ describe('PassportImxProvider', () => {
   const confirmationScreen = new ConfirmationScreen({} as PassportConfiguration);
 
   const mockAuthManager = {
-    loginSilent: jest.fn(),
     login: jest.fn(),
     getUser: jest.fn(),
   };

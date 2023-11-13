@@ -19,7 +19,8 @@ jest.mock('./passportImxProvider');
 
 describe('PassportImxProviderFactory', () => {
   const mockAuthManager = {
-    loginSilent: jest.fn(),
+    getUser: jest.fn(),
+    forceUserRefresh: jest.fn(),
     login: jest.fn(),
   };
   const mockMagicAdapter = {
@@ -58,12 +59,12 @@ describe('PassportImxProviderFactory', () => {
   describe('getProviderSilent', () => {
     describe('when no user is logged in', () => {
       it('should return null', async () => {
-        mockAuthManager.loginSilent.mockResolvedValue(null);
+        mockAuthManager.getUser.mockResolvedValue(null);
 
         const result = await passportImxProviderFactory.getProviderSilent();
 
         expect(result).toBe(null);
-        expect(mockAuthManager.loginSilent).toHaveBeenCalledTimes(1);
+        expect(mockAuthManager.getUser).toHaveBeenCalledTimes(1);
       });
     });
   });
@@ -90,8 +91,8 @@ describe('PassportImxProviderFactory', () => {
 
           mockAuthManager.login.mockResolvedValue(mockUser);
           mockMagicAdapter.login.mockResolvedValue(mockMagicProvider);
-          mockAuthManager.loginSilent.mockResolvedValueOnce(null);
-          mockAuthManager.loginSilent.mockResolvedValue(mockUser);
+          mockAuthManager.getUser.mockResolvedValueOnce(null);
+          mockAuthManager.getUser.mockResolvedValue(mockUser);
 
           await expect(() => passportImxProviderFactory.getProvider()).rejects.toThrow(
             new PassportError(
@@ -108,12 +109,8 @@ describe('PassportImxProviderFactory', () => {
             starkSigner: mockStarkSigner,
             usersApi: immutableXClient.usersApi,
           }, mockUser.accessToken);
-          expect(mockAuthManager.loginSilent).toHaveBeenCalledTimes(5);
-          expect(mockAuthManager.loginSilent).toHaveBeenNthCalledWith(1);
-          expect(mockAuthManager.loginSilent).toHaveBeenNthCalledWith(2, { forceRefresh: true });
-          expect(mockAuthManager.loginSilent).toHaveBeenNthCalledWith(3, { forceRefresh: true });
-          expect(mockAuthManager.loginSilent).toHaveBeenNthCalledWith(4, { forceRefresh: true });
-          expect(mockAuthManager.loginSilent).toHaveBeenCalledWith({ forceRefresh: true });
+          expect(mockAuthManager.getUser).toHaveBeenCalledTimes(1);
+          expect(mockAuthManager.forceUserRefresh).toHaveBeenNthCalledWith(4);
         });
       });
 
@@ -123,8 +120,8 @@ describe('PassportImxProviderFactory', () => {
 
           mockAuthManager.login.mockResolvedValue(mockUser);
           mockMagicAdapter.login.mockResolvedValue(mockMagicProvider);
-          mockAuthManager.loginSilent.mockResolvedValueOnce(null);
-          mockAuthManager.loginSilent.mockResolvedValue(mockUserImx);
+          mockAuthManager.getUser.mockResolvedValueOnce(null);
+          mockAuthManager.forceUserRefresh.mockResolvedValue(mockUserImx);
 
           const result = await passportImxProviderFactory.getProvider();
 
@@ -137,8 +134,8 @@ describe('PassportImxProviderFactory', () => {
             starkSigner: mockStarkSigner,
             usersApi: immutableXClient.usersApi,
           }, mockUserImx.accessToken);
-          expect(mockAuthManager.loginSilent).toHaveBeenCalledTimes(2);
-          expect(mockAuthManager.loginSilent).toHaveBeenCalledWith({ forceRefresh: true });
+          expect(mockAuthManager.getUser).toHaveBeenCalledTimes(1);
+          expect(mockAuthManager.forceUserRefresh).toHaveBeenCalledTimes(1);
           expect(PassportImxProvider).toHaveBeenCalledWith({
             authManager: mockAuthManager,
             starkSigner: mockStarkSigner,
@@ -157,13 +154,13 @@ describe('PassportImxProviderFactory', () => {
 
         mockAuthManager.login.mockResolvedValue(mockUserImx);
         mockMagicAdapter.login.mockResolvedValue(mockMagicProvider);
-        mockAuthManager.loginSilent.mockResolvedValue(null);
+        mockAuthManager.getUser.mockResolvedValue(null);
         mockAuthManager.login.mockResolvedValue(mockUserImx);
 
         const result = await passportImxProviderFactory.getProvider();
 
         expect(result).toBe(mockPassportImxProvider);
-        expect(mockAuthManager.loginSilent).toHaveBeenCalledTimes(1);
+        expect(mockAuthManager.getUser).toHaveBeenCalledTimes(1);
         expect(mockAuthManager.login).toHaveBeenCalledTimes(1);
         expect(mockMagicAdapter.login).toHaveBeenCalledWith(mockUserImx.idToken);
         expect(mockGetSigner).toHaveBeenCalledTimes(1);
@@ -183,13 +180,13 @@ describe('PassportImxProviderFactory', () => {
 
         mockAuthManager.login.mockResolvedValue(mockUserImx);
         mockMagicAdapter.login.mockResolvedValue(mockMagicProvider);
-        mockAuthManager.loginSilent.mockRejectedValue(new Error('error'));
+        mockAuthManager.getUser.mockRejectedValue(new Error('error'));
         mockAuthManager.login.mockResolvedValue(mockUserImx);
 
         const result = await passportImxProviderFactory.getProvider();
 
         expect(result).toBe(mockPassportImxProvider);
-        expect(mockAuthManager.loginSilent).toHaveBeenCalledTimes(1);
+        expect(mockAuthManager.getUser).toHaveBeenCalledTimes(1);
         expect(mockAuthManager.login).toHaveBeenCalledTimes(1);
         expect(mockMagicAdapter.login).toHaveBeenCalledWith(mockUserImx.idToken);
         expect(mockGetSigner).toHaveBeenCalledTimes(1);

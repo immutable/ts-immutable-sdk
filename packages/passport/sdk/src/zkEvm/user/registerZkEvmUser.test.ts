@@ -16,7 +16,8 @@ describe('registerZkEvmUser', () => {
     getAddress: jest.fn(),
   };
   const authManager = {
-    loginSilent: jest.fn(),
+    getUser: jest.fn(),
+    forceUserRefresh: jest.fn(),
   };
   const magicProvider = {};
   const multiRollupApiClients = {
@@ -60,13 +61,13 @@ describe('registerZkEvmUser', () => {
     });
   });
 
-  describe('when loginSilent fails to return a user', () => {
+  describe('when getUser fails to return a user', () => {
     it('should throw an error', async () => {
       multiRollupApiClients.passportApi.createCounterfactualAddress.mockResolvedValue({
         status: 201,
       });
 
-      authManager.loginSilent.mockResolvedValue(null);
+      authManager.getUser.mockResolvedValue(null);
 
       await expect(async () => registerZkEvmUser({
         authManager: authManager as unknown as AuthManager,
@@ -78,13 +79,13 @@ describe('registerZkEvmUser', () => {
     });
   });
 
-  describe('when loginSilent returns a user that has not registered with zkEvm', () => {
+  describe('when getUser returns a user that has not registered with zkEvm', () => {
     it('should throw an error', async () => {
       multiRollupApiClients.passportApi.createCounterfactualAddress.mockResolvedValue({
         status: 201,
       });
 
-      authManager.loginSilent.mockResolvedValue(mockUser);
+      authManager.getUser.mockResolvedValue(mockUser);
 
       await expect(async () => registerZkEvmUser({
         authManager: authManager as unknown as AuthManager,
@@ -101,7 +102,7 @@ describe('registerZkEvmUser', () => {
       status: 201,
     });
 
-    authManager.loginSilent.mockResolvedValue(mockUserZkEvm);
+    authManager.forceUserRefresh.mockResolvedValue(mockUserZkEvm);
 
     const result = await registerZkEvmUser({
       authManager: authManager as unknown as AuthManager,
@@ -122,6 +123,6 @@ describe('registerZkEvmUser', () => {
         Authorization: `Bearer ${accessToken}`,
       },
     });
-    expect(authManager.loginSilent).toHaveBeenCalledWith({ forceRefresh: true });
+    expect(authManager.forceUserRefresh).toHaveBeenCalledTimes(1);
   });
 });
