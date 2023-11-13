@@ -167,7 +167,7 @@ export function SwapForm({ data }: SwapFromProps) {
       if (data?.fromContractAddress) {
         setFromToken(
           allowedTokens.find((t) => (
-            isNativeToken(t.address) && data?.fromContractAddress?.toLocaleUpperCase() === NATIVE
+            isNativeToken(t.address) && data?.fromContractAddress?.toLowerCase() === NATIVE
           )
           || (t.address?.toLowerCase() === data?.fromContractAddress?.toLowerCase())),
         );
