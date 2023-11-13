@@ -14,7 +14,7 @@ import {
 import { BalanceCheckResult, BalanceRequirement } from '../../balanceCheck/types';
 import { TokenBalanceResult } from '../types';
 import { quoteFetcher } from './quoteFetcher';
-import { IMX_ADDRESS_ZKEVM } from '../../../lib';
+import { IMX_ADDRESS_ZKEVM } from '../../../env';
 
 const constructFees = (
   approvalGasFees: Amount | null | undefined,

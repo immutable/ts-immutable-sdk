@@ -5,7 +5,7 @@ import {
   ChainId,
   CheckoutModuleConfiguration,
 } from '../types';
-import { PRODUCTION_CHAIN_ID_NETWORK_MAP, SANDBOX_CHAIN_ID_NETWORK_MAP } from '../lib';
+import { PRODUCTION_CHAIN_ID_NETWORK_MAP, SANDBOX_CHAIN_ID_NETWORK_MAP } from '../env';
 
 describe('config', () => {
   describe('CheckoutConfiguration class', () => {

@@ -11,7 +11,7 @@ import {
   NativeItemRequirement,
 } from '../../types';
 import { getTokenContract } from '../../instance';
-import { ERC20ABI } from '../../lib';
+import { ERC20ABI } from '../../env';
 
 export async function getItemRequirementsFromRequirements(
   provider: Web3Provider,

@@ -16,7 +16,7 @@ import {
   BalanceERC721Requirement,
   BalanceNativeRequirement,
 } from './types';
-import { DEFAULT_TOKEN_DECIMALS, IMX_ADDRESS_ZKEVM } from '../../lib';
+import { DEFAULT_TOKEN_DECIMALS, IMX_ADDRESS_ZKEVM } from '../../env';
 
 export const getTokensFromRequirements = (itemRequirements: ItemRequirement[]): TokenInfo[] => itemRequirements
   .map((itemRequirement) => {

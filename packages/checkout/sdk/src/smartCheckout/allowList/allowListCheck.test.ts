@@ -17,7 +17,7 @@ import {
 } from '../../types';
 import { TokenBalanceResult } from '../routing/types';
 import { RemoteConfigFetcher } from '../../config/remoteConfigFetcher';
-import { IMX_ADDRESS_ZKEVM } from '../../lib';
+import { IMX_ADDRESS_ZKEVM } from '../../env';
 
 jest.mock('../../config/remoteConfigFetcher');
 

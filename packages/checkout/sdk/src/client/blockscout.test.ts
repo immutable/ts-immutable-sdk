@@ -5,7 +5,7 @@ import {
   BlockscoutError,
   BlockscoutTokenType,
 } from './blockscoutType';
-import { BLOCKSCOUT_CHAIN_URL_MAP, IMX_ADDRESS_ZKEVM } from '../lib';
+import { BLOCKSCOUT_CHAIN_URL_MAP, IMX_ADDRESS_ZKEVM } from '../env';
 import { ChainId } from '../types';
 
 jest.mock('axios');

@@ -3,7 +3,7 @@ import { Environment } from '@imtbl/config';
 import { ChainId } from '../types';
 import { RemoteConfigFetcher } from './remoteConfigFetcher';
 import { CheckoutError, CheckoutErrorType } from '../errors';
-import { CHECKOUT_API_BASE_URL, ENV_DEVELOPMENT } from '../lib';
+import { CHECKOUT_API_BASE_URL, ENV_DEVELOPMENT } from '../env';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;

@@ -12,7 +12,7 @@ import {
   DEV_CHAIN_ID_NETWORK_MAP,
   PRODUCTION_CHAIN_ID_NETWORK_MAP,
   SANDBOX_CHAIN_ID_NETWORK_MAP,
-} from '../lib';
+} from '../env';
 
 export class CheckoutConfigurationError extends Error {
   public message: string;

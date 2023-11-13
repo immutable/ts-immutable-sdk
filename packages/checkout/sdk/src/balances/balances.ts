@@ -21,7 +21,7 @@ import {
 } from '../client';
 import {
   DEFAULT_TOKEN_DECIMALS, ERC20ABI, IMX_ADDRESS_ZKEVM,
-} from '../lib';
+} from '../env';
 import { measureAsyncExecution } from '../logger/debugLogger';
 
 export const getBalance = async (

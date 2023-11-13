@@ -11,7 +11,7 @@ import {
   BlockscoutTokens,
   BlockscoutTokenType,
 } from './blockscoutType';
-import { BLOCKSCOUT_CHAIN_URL_MAP } from '../lib';
+import { BLOCKSCOUT_CHAIN_URL_MAP } from '../env';
 
 type CacheData = {
   data: any,
