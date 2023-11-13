@@ -1,14 +1,12 @@
 /* eslint @typescript-eslint/naming-convention: off */
 import axios, { HttpStatusCode } from 'axios';
-import {
-  BLOCKSCOUT_CHAIN_URL_MAP,
-  ChainId, IMX_ADDRESS_ZKEVM,
-} from '../types';
 import { Blockscout } from './blockscout';
 import {
   BlockscoutError,
   BlockscoutTokenType,
 } from './blockscoutType';
+import { BLOCKSCOUT_CHAIN_URL_MAP, IMX_ADDRESS_ZKEVM } from '../lib';
+import { ChainId } from '../types';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;

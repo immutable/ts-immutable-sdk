@@ -1,6 +1,7 @@
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../../config';
 import { createBlockchainDataInstance } from '../../../instance';
-import { ChainId, IMX_ADDRESS_ZKEVM, ImxAddressConfig } from '../../../types';
+import { IMX_ADDRESS_ZKEVM } from '../../../lib';
+import { ChainId, ImxAddressConfig } from '../../../types';
 
 // If the root address evaluates to this then its ETH
 export const INDEXER_ETH_ROOT_CONTRACT_ADDRESS = '0x0000000000000000000000000000000000000001';

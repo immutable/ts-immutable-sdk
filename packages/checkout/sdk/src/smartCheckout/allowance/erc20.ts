@@ -1,8 +1,9 @@
 import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
 import { BigNumber, Contract } from 'ethers';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
-import { ERC20ABI, ItemRequirement, ItemType } from '../../types';
+import { ItemRequirement, ItemType } from '../../types';
 import { Allowance, InsufficientERC20 } from './types';
+import { ERC20ABI } from '../../lib';
 
 // Gets the amount an address has allowed to be spent by the spender for the ERC20.
 export const getERC20Allowance = async (

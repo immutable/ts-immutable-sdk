@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { Environment } from '@imtbl/config';
-import { CHECKOUT_API_BASE_URL, ChainId, ENV_DEVELOPMENT } from '../types';
+import { ChainId } from '../types';
 import { RemoteConfigFetcher } from './remoteConfigFetcher';
 import { CheckoutError, CheckoutErrorType } from '../errors';
+import { CHECKOUT_API_BASE_URL, ENV_DEVELOPMENT } from '../lib';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;

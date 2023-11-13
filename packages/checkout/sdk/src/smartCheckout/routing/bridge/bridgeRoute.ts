@@ -4,14 +4,12 @@ import {
   ChainId,
   FundingStepType,
   GetBalanceResult,
-  IMX_ADDRESS_ZKEVM,
   ItemType,
   AvailableRoutingOptions,
   BridgeRouteFeeEstimate,
   FundingRouteFeeEstimate,
   BridgeFees,
   TokenInfo,
-  DEFAULT_TOKEN_DECIMALS,
 } from '../../../types';
 import { CheckoutConfiguration, getL1ChainId } from '../../../config';
 import {
@@ -24,6 +22,7 @@ import { estimateGasForBridgeApproval } from './estimateApprovalGas';
 import { CheckoutError, CheckoutErrorType } from '../../../errors';
 import { allowListCheckForBridge } from '../../allowList/allowListCheck';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS, fetchL1Representation } from '../indexer/fetchL1Representation';
+import { DEFAULT_TOKEN_DECIMALS, IMX_ADDRESS_ZKEVM } from '../../../lib';
 
 export const hasSufficientL1Eth = (
   tokenBalanceResult: TokenBalanceResult,

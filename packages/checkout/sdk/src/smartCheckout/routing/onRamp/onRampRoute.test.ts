@@ -4,13 +4,13 @@ import { CheckoutConfiguration } from '../../../config';
 import {
   ChainId,
   FundingStepType,
-  IMX_ADDRESS_ZKEVM,
   ItemType,
   OnRampProvider,
 } from '../../../types';
 import { allowListCheckForOnRamp } from '../../allowList';
 import { onRampRoute } from './onRampRoute';
 import { BalanceERC20Requirement, BalanceERC721Requirement } from '../../balanceCheck/types';
+import { IMX_ADDRESS_ZKEVM } from '../../../lib';
 
 jest.mock('../../allowList/allowListCheck');
 

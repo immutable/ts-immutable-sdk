@@ -13,17 +13,15 @@ import {
   WalletProviderName,
   WalletAction,
   NetworkFilterTypes,
-  PRODUCTION_CHAIN_ID_NETWORK_MAP,
   ChainName,
   NetworkInfo,
-  SANDBOX_CHAIN_ID_NETWORK_MAP,
-  IMX_ADDRESS_ZKEVM,
 } from '../types';
 import { createProvider } from '../provider';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { CheckoutConfiguration } from '../config';
 import { RemoteConfigFetcher } from '../config/remoteConfigFetcher';
 import { getUnderlyingChainId } from '../provider/getUnderlyingProvider';
+import { IMX_ADDRESS_ZKEVM, PRODUCTION_CHAIN_ID_NETWORK_MAP, SANDBOX_CHAIN_ID_NETWORK_MAP } from '../lib';
 
 let windowSpy: any;
 const providerMock = {

@@ -9,7 +9,6 @@ import { FungibleToken } from '@imtbl/bridge-sdk';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import {
   ChainId,
-  ERC20ABI,
   GasEstimateBridgeToL2Result,
   GasEstimateBridgeToL2TokenConfig,
   GasEstimateParams,
@@ -25,6 +24,7 @@ import {
 } from './bridgeGasEstimate';
 import * as instance from '../instance';
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../config';
+import { ERC20ABI } from '../lib';
 
 const DUMMY_WALLET_ADDRESS = '0x0000000000000000000000000000000000000001';
 const DEFAULT_TOKEN_DECIMALS = 18;

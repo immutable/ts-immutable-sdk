@@ -10,11 +10,9 @@ import {
   resetBlockscoutClientMap,
 } from './balances';
 import {
-  BLOCKSCOUT_CHAIN_URL_MAP,
   ChainId,
   ChainName,
-  ERC20ABI,
-  GetTokenAllowListResult, IMX_ADDRESS_ZKEVM,
+  GetTokenAllowListResult,
   NetworkInfo,
   TokenInfo,
 } from '../types';
@@ -25,6 +23,7 @@ import {
   Blockscout,
   BlockscoutNativeTokenData, BlockscoutToken, BlockscoutTokens, BlockscoutTokenType,
 } from '../client';
+import { BLOCKSCOUT_CHAIN_URL_MAP, ERC20ABI, IMX_ADDRESS_ZKEVM } from '../lib';
 
 jest.mock('../tokens');
 jest.mock('../client');
