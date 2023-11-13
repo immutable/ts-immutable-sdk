@@ -1,12 +1,13 @@
 import { BigNumber } from 'ethers';
 import {
-  ERC20Item, ERC721Item, IMX_ADDRESS_ZKEVM, ItemBalance, ItemRequirement, ItemType, NativeItem,
+  ERC20Item, ERC721Item, ItemBalance, ItemRequirement, ItemType, NativeItem,
 } from '../../types';
 import {
   getERC721BalanceRequirement,
   getTokenBalanceRequirement,
   getTokensFromRequirements,
 } from './balanceRequirement';
+import { IMX_ADDRESS_ZKEVM } from '../../lib';
 
 describe('balanceRequirement', () => {
   describe('getTokensFromRequirements', () => {

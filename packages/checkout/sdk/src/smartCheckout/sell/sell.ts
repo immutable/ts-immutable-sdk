@@ -13,7 +13,6 @@ import {
   GasTokenType,
   ItemType,
   TransactionOrGasType,
-  ERC20ABI,
   SellOrder,
   BuyToken,
   SellResult,
@@ -33,6 +32,7 @@ import {
 import { SignTransactionStatusType } from '../actions/types';
 import { calculateFees } from '../fees/fees';
 import { measureAsyncExecution } from '../../utils/debugLogger';
+import { ERC20ABI } from '../../lib';
 
 export const getERC721Requirement = (
   id: string,

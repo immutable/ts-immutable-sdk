@@ -3,7 +3,7 @@ import axios, {
   AxiosResponse,
   HttpStatusCode,
 } from 'axios';
-import { BLOCKSCOUT_CHAIN_URL_MAP, ChainId } from '../types';
+import { ChainId } from '../types';
 import {
   BlockscoutNativeTokenData,
   BlockscoutToken,
@@ -11,6 +11,7 @@ import {
   BlockscoutTokens,
   BlockscoutTokenType,
 } from './blockscoutType';
+import { BLOCKSCOUT_CHAIN_URL_MAP } from '../lib';
 
 type CacheData = {
   data: any,

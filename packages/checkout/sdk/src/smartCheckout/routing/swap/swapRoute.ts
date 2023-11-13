@@ -6,7 +6,6 @@ import {
   ChainId,
   FundingStepType,
   GetBalanceResult,
-  IMX_ADDRESS_ZKEVM,
   ItemType,
   SwapFees,
   SwapFundingStep,
@@ -15,6 +14,7 @@ import {
 import { BalanceCheckResult, BalanceRequirement } from '../../balanceCheck/types';
 import { TokenBalanceResult } from '../types';
 import { quoteFetcher } from './quoteFetcher';
+import { IMX_ADDRESS_ZKEVM } from '../../../lib';
 
 const constructFees = (
   approvalGasFees: Amount | null | undefined,

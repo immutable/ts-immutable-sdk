@@ -20,10 +20,10 @@ import {
 import {
   ChainId,
   FundingStepType,
-  IMX_ADDRESS_ZKEVM,
   ItemType,
 } from '../../../types';
 import { quoteFetcher } from './quoteFetcher';
+import { IMX_ADDRESS_ZKEVM } from '../../../lib';
 
 jest.mock('../../../config/remoteConfigFetcher');
 jest.mock('./quoteFetcher');

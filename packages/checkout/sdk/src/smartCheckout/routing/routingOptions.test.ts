@@ -3,7 +3,7 @@ import { Environment } from '@imtbl/config';
 import { getAvailableRoutingOptions } from './routingOptions';
 import { CheckoutConfiguration } from '../../config';
 import * as geoBlocking from './geoBlocking';
-import { DEFAULT_BRIDGE_ENABLED, DEFAULT_ON_RAMP_ENABLED, DEFAULT_SWAP_ENABLED } from '../../types';
+import { DEFAULT_BRIDGE_ENABLED, DEFAULT_ON_RAMP_ENABLED, DEFAULT_SWAP_ENABLED } from '../../lib';
 
 jest.mock('./geoBlocking');
 

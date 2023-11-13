@@ -1,16 +1,18 @@
 import { Environment } from '@imtbl/config';
 import {
   CheckoutModuleConfiguration,
+  ChainId,
   NetworkMap,
+} from '../types';
+import { RemoteConfigFetcher } from './remoteConfigFetcher';
+import {
+  DEFAULT_BRIDGE_ENABLED,
+  DEFAULT_ON_RAMP_ENABLED,
+  DEFAULT_SWAP_ENABLED,
   DEV_CHAIN_ID_NETWORK_MAP,
   PRODUCTION_CHAIN_ID_NETWORK_MAP,
   SANDBOX_CHAIN_ID_NETWORK_MAP,
-  ChainId,
-  DEFAULT_ON_RAMP_ENABLED,
-  DEFAULT_SWAP_ENABLED,
-  DEFAULT_BRIDGE_ENABLED,
-} from '../types';
-import { RemoteConfigFetcher } from './remoteConfigFetcher';
+} from '../lib';
 
 export class CheckoutConfigurationError extends Error {
   public message: string;

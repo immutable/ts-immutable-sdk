@@ -1,11 +1,11 @@
 /* eslint-disable arrow-body-style */
 import { BigNumber, utils } from 'ethers';
 import {
-  DEFAULT_TOKEN_DECIMALS,
   ERC20Item,
   ERC721Balance,
   ERC721Item,
-  IMX_ADDRESS_ZKEVM, ItemBalance, ItemRequirement,
+  ItemBalance,
+  ItemRequirement,
   ItemType,
   NativeItem,
   TokenBalance,
@@ -16,6 +16,7 @@ import {
   BalanceERC721Requirement,
   BalanceNativeRequirement,
 } from './types';
+import { DEFAULT_TOKEN_DECIMALS, IMX_ADDRESS_ZKEVM } from '../../lib';
 
 export const getTokensFromRequirements = (itemRequirements: ItemRequirement[]): TokenInfo[] => itemRequirements
   .map((itemRequirement) => {

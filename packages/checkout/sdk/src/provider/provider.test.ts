@@ -21,6 +21,8 @@ describe('createProvider', () => {
       },
       removeEventListener: () => {},
     }));
+
+    jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
