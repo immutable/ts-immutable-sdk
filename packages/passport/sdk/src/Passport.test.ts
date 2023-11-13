@@ -36,7 +36,6 @@ describe('Passport', () => {
   let getProviderMock: jest.Mock;
   let getProviderSilentMock: jest.Mock;
   let getLinkedAddressesMock: jest.Mock;
-  let forceUserRefreshMock: jest.Mock;
 
   beforeEach(() => {
     authLoginMock = jest.fn().mockReturnValue(mockUser);
@@ -50,10 +49,8 @@ describe('Passport', () => {
     getProviderMock = jest.fn();
     getProviderSilentMock = jest.fn();
     getLinkedAddressesMock = jest.fn();
-    forceUserRefreshMock = jest.fn();
     (AuthManager as unknown as jest.Mock).mockReturnValue({
       login: authLoginMock,
-      forceUserRefresh: forceUserRefreshMock,
       loginCallback: loginCallbackMock,
       logout: logoutMock,
       getUser: getUserMock,
@@ -279,10 +276,10 @@ describe('Passport', () => {
     });
 
     it('should only login silently if useCachedSession is true', async () => {
-      forceUserRefreshMock.mockReturnValue(mockUserImx);
+      getUserMock.mockReturnValue(mockUserImx);
       const user = await passport.login({ useCachedSession: true });
 
-      expect(forceUserRefreshMock).toBeCalledTimes(1);
+      expect(getUserMock).toBeCalledTimes(1);
       expect(authLoginMock).toBeCalledTimes(0);
       expect(user).toEqual(mockUser.profile);
     });
