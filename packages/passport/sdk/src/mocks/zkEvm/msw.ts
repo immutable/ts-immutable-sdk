@@ -1,6 +1,7 @@
 import 'cross-fetch/polyfill';
 import { RequestHandler, rest } from 'msw';
 import { SetupServer, setupServer } from 'msw/node';
+import { ChainName } from 'network/chains';
 import { RelayerTransactionRequest } from '../../zkEvm/relayerClient';
 import { JsonRpcRequestPayload } from '../../zkEvm/types';
 import { chainId, chainIdHex } from '../../test/mocks';
@@ -30,8 +31,14 @@ const mandatoryHandlers = [
 
 export const mswHandlers = {
   counterfactualAddress: {
-    success: rest.post('https://api.sandbox.immutable.com/passport-mr/v1/counterfactual-address', (req, res, ctx) => res(ctx.status(201))),
-    internalServerError: rest.post('https://api.sandbox.immutable.com/passport-mr/v1/counterfactual-address', (req, res, ctx) => res(ctx.status(500))),
+    success: rest.post(
+      `https://api.sandbox.immutable.com/v1/chains/${ChainName.IMTBL_ZKEVM_TESTNET}/passport/counterfactual-address`,
+      (req, res, ctx) => res(ctx.status(201)),
+    ),
+    internalServerError: rest.post(
+      `https://api.sandbox.immutable.com/v1/chains/${ChainName.IMTBL_ZKEVM_TESTNET}/passport/counterfactual-address`,
+      (req, res, ctx) => res(ctx.status(500)),
+    ),
   },
   jsonRpcProvider: {
     success: rest.post('https://rpc.testnet.immutable.com', async (req, res, ctx) => {
