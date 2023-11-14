@@ -3,12 +3,15 @@ import { WalletProviderName } from '../../../types';
 
 /**
  * Bridge Widget parameters
- * @property {string | undefined} fromContractAddress - The contract address of the token to bridge from, used to populate the bridge form token field
- * @property {string | undefined} amount - The formatted amount to bridge, used to populate the bridge form amount field
- * @property {WalletProviderName | undefined} walletProviderName - The wallet provider name to use for the bridge widget
+ * @property {string | undefined} fromContractAddress
+ * @property {string | undefined} amount
+ * @property {WalletProviderName | undefined} walletProviderName
  */
 export type BridgeWidgetParams = {
+  /** The contract address of the token to bridge from, used to populate the bridge form token field */
   fromContractAddress?: string;
+  /** The formatted amount to bridge, used to populate the bridge form amount field */
   amount?: string;
+  /** The wallet provider name to use for the bridge widget */
   walletProviderName?: WalletProviderName
 };

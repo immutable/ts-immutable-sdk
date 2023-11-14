@@ -11,49 +11,58 @@ export enum OrchestrationEventType {
 
 /**
  * Represents the connect event object when the connect widget is requested.
- * @property {string} walletProviderName - The wallet provider name.
+ * @property {string} walletProviderName
  */
 export type RequestConnectEvent = {
+  /** The wallet provider name. */
   walletProviderName: string;
 };
 
 /**
  * Represents the wallet event object when the wallet widget is requested.
- * @property {string} walletProviderName - The wallet provider name.
+ * @property {string} walletProviderName
  */
 export type RequestWalletEvent = {
+  /** The wallet provider name. */
   walletProviderName: string;
 };
 
 /**
  * Represents the swap event object when the swap widget is requested.
- * @property {string} fromTokenAddress - The address of the token to swap from.
- * @property {string} toTokenAddress - The address of the token to swap to.
- * @property {string} amount - The amount of from tokens to swap.
+ * @property {string} fromTokenAddress
+ * @property {string} toTokenAddress
+ * @property {string} amount
  */
 export type RequestSwapEvent = {
+  /** The address of the token to swap from. */
   fromTokenAddress: string;
+  /** The address of the token to swap to. */
   toTokenAddress: string;
+  /** The amount of from tokens to swap. */
   amount: string;
 };
 
 /**
  * Represents the bridge event object when the bridge widget is requested.
- * @property {string} tokenAddress - The address of the token to bridge.
- * @property {string} amount - The amount of tokens to bridge.
+ * @property {string} tokenAddress
+ * @property {string} amount
  */
 export type RequestBridgeEvent = {
+  /** The address of the token to bridge. */
   tokenAddress: string;
+  /** The amount of tokens to bridge. */
   amount: string;
 };
 
 /**
  * Represents the onramp event object when the onramp widget is requested.
- * @property {string} tokenAddress - The address of the token to be used for onramp.
- * @property {string} amount - The amount of tokens to onramp.
+ * @property {string} tokenAddress
+ * @property {string} amount
  */
 export type RequestOnrampEvent = {
+  /** The address of the token to be used for onramp. */
   tokenAddress: string;
+  /** The amount of tokens to onramp. */
   amount: string;
 };
 
