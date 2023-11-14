@@ -11,7 +11,7 @@ export const DEFAULT_TOKEN_DECIMALS = 18;
 
 export const NATIVE = 'native';
 
-const ZKEVM_NATIVE_TOKEN = {
+export const ZKEVM_NATIVE_TOKEN = {
   name: 'IMX',
   symbol: 'IMX',
   decimals: DEFAULT_TOKEN_DECIMALS,
