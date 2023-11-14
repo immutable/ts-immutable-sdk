@@ -11,12 +11,13 @@ import {
   BridgeConfig,
   ChainId,
   DexConfig,
-  IMX_ADDRESS_ZKEVM,
-  OnRampConfig, OnRampProvider,
+  OnRampConfig,
+  OnRampProvider,
   OnRampProviderConfig,
 } from '../../types';
 import { TokenBalanceResult } from '../routing/types';
 import { RemoteConfigFetcher } from '../../config/remoteConfigFetcher';
+import { IMX_ADDRESS_ZKEVM } from '../../env';
 
 jest.mock('../../config/remoteConfigFetcher');
 

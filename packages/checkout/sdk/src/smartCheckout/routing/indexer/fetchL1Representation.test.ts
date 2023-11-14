@@ -1,8 +1,9 @@
 import { Environment } from '@imtbl/config';
 import { CheckoutConfiguration } from '../../../config';
 import { createBlockchainDataInstance } from '../../../instance';
-import { ChainId, IMX_ADDRESS_ZKEVM } from '../../../types';
+import { ChainId } from '../../../types';
 import { fetchL1Representation } from './fetchL1Representation';
+import { IMX_ADDRESS_ZKEVM } from '../../../env';
 
 jest.mock('../../../instance');
 

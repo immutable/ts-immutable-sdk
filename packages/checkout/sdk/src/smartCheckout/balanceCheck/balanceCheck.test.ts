@@ -2,8 +2,6 @@ import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
 import { BigNumber, Contract } from 'ethers';
 import {
-  DEFAULT_TOKEN_DECIMALS,
-  IMX_ADDRESS_ZKEVM,
   ItemRequirement,
   ItemType,
 } from '../../types';
@@ -11,6 +9,7 @@ import { balanceCheck } from './balanceCheck';
 import { CheckoutConfiguration } from '../../config';
 import { getAllBalances } from '../../balances';
 import { BalanceCheckResult } from './types';
+import { DEFAULT_TOKEN_DECIMALS, IMX_ADDRESS_ZKEVM } from '../../env';
 
 jest.mock('../../balances');
 jest.mock('ethers', () => ({

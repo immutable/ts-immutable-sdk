@@ -3,12 +3,9 @@ import { BigNumber, Contract, utils } from 'ethers';
 import { HttpStatusCode } from 'axios';
 import {
   ChainId,
-  DEFAULT_TOKEN_DECIMALS,
-  ERC20ABI,
   GetAllBalancesResult,
   GetBalanceResult,
   GetBalancesResult,
-  IMX_ADDRESS_ZKEVM,
   TokenFilterTypes,
   TokenInfo,
 } from '../types';
@@ -22,7 +19,10 @@ import {
   BlockscoutTokens,
   BlockscoutTokenType,
 } from '../client';
-import { measureAsyncExecution } from '../utils/debugLogger';
+import {
+  DEFAULT_TOKEN_DECIMALS, ERC20ABI, IMX_ADDRESS_ZKEVM,
+} from '../env';
+import { measureAsyncExecution } from '../logger/debugLogger';
 
 export const getBalance = async (
   config: CheckoutConfiguration,

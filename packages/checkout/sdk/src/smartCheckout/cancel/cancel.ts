@@ -10,7 +10,7 @@ import {
   CheckoutStatus,
 } from '../../types';
 import { SignTransactionStatusType } from '../actions/types';
-import { measureAsyncExecution } from '../../utils/debugLogger';
+import { measureAsyncExecution } from '../../logger/debugLogger';
 
 export const cancel = async (
   config: CheckoutConfiguration,

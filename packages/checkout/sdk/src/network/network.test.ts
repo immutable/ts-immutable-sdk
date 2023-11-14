@@ -6,6 +6,7 @@ import { Environment } from '@imtbl/config';
 import {
   getNetworkAllowList,
   getNetworkInfo,
+  isNativeToken,
   switchWalletNetwork,
 } from './network';
 import {
@@ -13,17 +14,17 @@ import {
   WalletProviderName,
   WalletAction,
   NetworkFilterTypes,
-  PRODUCTION_CHAIN_ID_NETWORK_MAP,
   ChainName,
   NetworkInfo,
-  SANDBOX_CHAIN_ID_NETWORK_MAP,
-  IMX_ADDRESS_ZKEVM,
 } from '../types';
 import { createProvider } from '../provider';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { CheckoutConfiguration } from '../config';
 import { RemoteConfigFetcher } from '../config/remoteConfigFetcher';
 import { getUnderlyingChainId } from '../provider/getUnderlyingProvider';
+import {
+  IMX_ADDRESS_ZKEVM, NATIVE, PRODUCTION_CHAIN_ID_NETWORK_MAP, SANDBOX_CHAIN_ID_NETWORK_MAP,
+} from '../env';
 
 let windowSpy: any;
 const providerMock = {
@@ -500,6 +501,24 @@ describe('network functions', () => {
           },
         ],
       });
+    });
+  });
+
+  describe('isNativeToken', () => {
+    it('should return true if address is undefined', () => {
+      expect(isNativeToken(undefined)).toBeTruthy();
+    });
+
+    it('should return true if address is empty', () => {
+      expect(isNativeToken('')).toBeTruthy();
+    });
+
+    it('should return true if address is NATIVE', () => {
+      expect(isNativeToken(NATIVE)).toBeTruthy();
+    });
+
+    it('should return false if address is not NATIVE', () => {
+      expect(isNativeToken('0x123')).toBeFalsy();
     });
   });
 });

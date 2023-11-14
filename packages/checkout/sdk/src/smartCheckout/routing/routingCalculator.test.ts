@@ -16,7 +16,6 @@ import {
   ChainId,
   FundingRouteFeeEstimate,
   FundingStepType,
-  IMX_ADDRESS_ZKEVM,
   ItemType,
   RoutingOutcomeType,
 } from '../../types';
@@ -34,6 +33,7 @@ import { onRampRoute } from './onRamp';
 import { bridgeAndSwapRoute } from './bridgeAndSwap/bridgeAndSwapRoute';
 import { RoutingTokensAllowList } from '../allowList/types';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from './indexer/fetchL1Representation';
+import { IMX_ADDRESS_ZKEVM } from '../../env';
 
 jest.mock('./tokenBalances');
 jest.mock('./bridge/bridgeRoute');
