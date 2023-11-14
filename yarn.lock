@@ -5,6 +5,13 @@ __metadata:
   version: 6
   cacheKey: 8
 
+"@0xsequence/abi@npm:1.3.0, @0xsequence/abi@npm:^1.2.4":
+  version: 1.3.0
+  resolution: "@0xsequence/abi@npm:1.3.0"
+  checksum: 4027973b551981433af5f506d98004bfb1271b81a6361db2fafd02906fc876e2479289af125f9a366ee5ca3831c44d43748471945444a953ce2bd26e27480abe
+  languageName: node
+  linkType: hard
+
 "@0xsequence/abi@npm:^0.43.34":
   version: 0.43.34
   resolution: "@0xsequence/abi@npm:0.43.34"
@@ -50,6 +57,17 @@ __metadata:
   peerDependencies:
     ethers: ">=5.5 < 6"
   checksum: f5b313f6d20e8105151e0dce18a47814d4f7378510db54a18ea9c561131695ecb517333f30051097e7bbbe4d24b16d33677e859f002196a36f3b372f551aa713
+  languageName: node
+  linkType: hard
+
+"@0xsequence/core@npm:^1.2.9":
+  version: 1.3.0
+  resolution: "@0xsequence/core@npm:1.3.0"
+  dependencies:
+    "@0xsequence/abi": 1.3.0
+  peerDependencies:
+    ethers: ">=5.5"
+  checksum: 8bae679b2ea485b2f045608d9f99da6b6f95d87ee39abe7b57ef46b21f7619bb9b62ffe60ea36dd81755942e264e1ef6f7bb2f78f415f4f1cbc7b4ffab8727c8
   languageName: node
   linkType: hard
 
@@ -3589,8 +3607,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/passport@workspace:packages/passport/sdk"
   dependencies:
-    "@0xsequence/abi": ^0.43.34
-    "@0xsequence/config": ^0.43.34
+    "@0xsequence/abi": ^1.2.4
+    "@0xsequence/core": ^1.2.9
     "@ethersproject/providers": ^5.7.2
     "@imtbl/config": 0.0.0
     "@imtbl/core-sdk": ^2.4.0
@@ -3677,8 +3695,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/sdk@workspace:sdk"
   dependencies:
-    "@0xsequence/abi": ^0.43.34
-    "@0xsequence/config": ^0.43.34
+    "@0xsequence/abi": ^1.2.4
+    "@0xsequence/core": ^1.2.9
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/abstract-signer": ^5.7.0
     "@ethersproject/providers": ^5.7.2

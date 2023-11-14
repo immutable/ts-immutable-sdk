@@ -1,8 +1,8 @@
 import { BigNumber, BigNumberish, ethers } from 'ethers';
 import { walletContracts } from '@0xsequence/abi';
-import { decodeSignature, encodeSignature } from '@0xsequence/config';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { Signer } from '@ethersproject/abstract-signer';
+import { v1 as sequenceCoreV1 } from '@0xsequence/core';
 import { MetaTransaction, MetaTransactionNormalised, TypedDataPayload } from './types';
 
 const SIGNATURE_WEIGHT = 1; // Weight of a single signature in the multi-sig
@@ -80,10 +80,13 @@ export const getSignedMetaTransactions = async (
   const signedDigest = `${ethsigNoType}${ETH_SIGN_FLAG}`;
 
   // Add metadata
-  const encodedSignature = encodeSignature({
+  const encodedSignature = sequenceCoreV1.signature.encodeSignature({
+    version: 1,
     threshold: TRANSACTION_SIGNATURE_THRESHOLD,
     signers: [
       {
+        isDynamic: false,
+        unrecovered: true,
         weight: SIGNATURE_WEIGHT,
         signature: signedDigest,
       },
@@ -100,8 +103,8 @@ export const getSignedMetaTransactions = async (
 };
 
 const decodeRelayerTypedDataSignature = (relayerSignature: string) => {
-  const signatureWithThreshold = `0000${relayerSignature}`;
-  return decodeSignature(signatureWithThreshold);
+  const signatureWithThreshold = `0x0000${relayerSignature}`;
+  return sequenceCoreV1.signature.decodeSignature(signatureWithThreshold);
 };
 
 export const getSignedTypedData = async (
@@ -129,11 +132,14 @@ export const getSignedTypedData = async (
 
   const { signers } = decodeRelayerTypedDataSignature(relayerSignature);
 
-  return encodeSignature({
+  return sequenceCoreV1.signature.encodeSignature({
+    version: 1,
     threshold: EIP712_SIGNATURE_THRESHOLD,
     signers: [
       ...signers,
       {
+        isDynamic: false,
+        unrecovered: true,
         weight: SIGNATURE_WEIGHT,
         signature: signedDigest,
       },
