@@ -7,9 +7,9 @@ import { WalletProviderName } from '../../../types';
  * @property {string | undefined} toContractAddress - The contract address of the token to swap to
  * @property {WalletProviderName | undefined} walletProviderName - The wallet provider name to use for the swap widget
  */
-export interface SwapWidgetParams {
+export type SwapWidgetParams = {
   amount?: string;
   fromContractAddress?: string;
   toContractAddress?: string;
   walletProviderName?: WalletProviderName;
-}
+};
