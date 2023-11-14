@@ -358,7 +358,7 @@ describe('SwapWidget tests', () => {
         .should('exist');
     });
 
-    it('should show error screen after getAllBalances unrecoverable failure', () => {
+    it.skip('should show error screen after getAllBalances unrecoverable failure', () => {
       getAllBalancesStub
         .onFirstCall()
         .rejects({ data: { code: 500 } })

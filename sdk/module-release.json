@@ -11,16 +11,9 @@
     "blockchain_data": "prod",
     "immutablex_client": "prod",
     "passport": "prod",
-    "orderbook": "prod",
-    "provider": "prod",
-    "checkout_sdk": "prod",
-    "checkout_widgets": "prod"
+    "orderbook": "prod",    
+    "provider": "prod"
   },
   "fileCopy": [
-    {
-      "src": "../packages/checkout/widgets-lib/build/static/js/main.*.js",
-      "dest": "./dist/browser/checkout.js",
-      "stage": "prod"
-    }
   ]
 }
