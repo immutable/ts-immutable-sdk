@@ -17,14 +17,14 @@
 /**
  * 
  * @export
- * @interface GetLinkedAddressesRes
+ * @interface CreateCounterfactualAddressResDeprecated
  */
-export interface GetLinkedAddressesRes {
+export interface CreateCounterfactualAddressResDeprecated {
     /**
-     * The user\'s list of linked addresses
-     * @type {Array<string>}
-     * @memberof GetLinkedAddressesRes
+     * The user\'s counterfactual address
+     * @type {string}
+     * @memberof CreateCounterfactualAddressResDeprecated
      */
-    'linked_addresses': Array<string>;
+    'counterfactualAddress': string;
 }
 

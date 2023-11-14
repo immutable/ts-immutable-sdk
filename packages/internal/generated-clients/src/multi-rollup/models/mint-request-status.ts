@@ -15,16 +15,18 @@
 
 
 /**
- * 
+ * The status of the mint request
  * @export
- * @interface GetLinkedAddressesRes
+ * @enum {string}
  */
-export interface GetLinkedAddressesRes {
-    /**
-     * The user\'s list of linked addresses
-     * @type {Array<string>}
-     * @memberof GetLinkedAddressesRes
-     */
-    'linked_addresses': Array<string>;
-}
+
+export const MintRequestStatus = {
+    Pending: 'pending',
+    Succeeded: 'succeeded',
+    Failed: 'failed'
+} as const;
+
+export type MintRequestStatus = typeof MintRequestStatus[keyof typeof MintRequestStatus];
+
+
 
