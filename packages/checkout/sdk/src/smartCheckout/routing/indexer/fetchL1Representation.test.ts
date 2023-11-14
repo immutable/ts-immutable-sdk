@@ -50,7 +50,7 @@ describe('fetchL1Representation', () => {
     expect(result).toEqual(
       {
         l1address: '0x2Fa06C6672dDCc066Ab04631192738799231dE4a',
-        l2address: '0x0000000000000000000000000000000000001010',
+        l2address: '',
       },
     );
     expect(createBlockchainDataInstance).not.toHaveBeenCalled();

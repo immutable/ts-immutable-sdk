@@ -412,7 +412,7 @@ describe('balances', () => {
           balance: BigNumber.from('777777777777777777'),
           formattedBalance: '0.777777777777777777',
           token: {
-            address: '0x0000000000000000000000000000000000001010',
+            address: '',
             decimals: 18,
             name: 'IMX',
             symbol: 'IMX',
@@ -465,7 +465,7 @@ describe('balances', () => {
           balance: BigNumber.from('777777777777777777'),
           formattedBalance: '0.777777777777777777',
           token: {
-            address: '0x0000000000000000000000000000000000001010',
+            address: '',
             decimals: 18,
             name: 'IMX',
             symbol: 'IMX',
