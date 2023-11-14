@@ -1,4 +1,4 @@
-import { useLocalBundle } from '../env/env';
+import { useLocalBundle } from '../env';
 import { SemanticVersion } from './definitions/types';
 import { validateAndBuildVersion } from './version';
 
