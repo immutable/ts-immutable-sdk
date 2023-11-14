@@ -9,6 +9,8 @@ export const IMX_ADDRESS_ZKEVM = '0x0000000000000000000000000000000000001010';
 
 export const DEFAULT_TOKEN_DECIMALS = 18;
 
+export const NATIVE = 'native';
+
 const ZKEVM_NATIVE_TOKEN = {
   name: 'IMX',
   symbol: 'IMX',
