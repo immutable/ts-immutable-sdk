@@ -16,14 +16,13 @@ import {
   BalanceERC721Requirement,
   BalanceNativeRequirement,
 } from './types';
-import { DEFAULT_TOKEN_DECIMALS, IMX_ADDRESS_ZKEVM } from '../../env';
+import { DEFAULT_TOKEN_DECIMALS } from '../../env';
+import { isNativeToken } from '../../network';
 
 export const getTokensFromRequirements = (itemRequirements: ItemRequirement[]): TokenInfo[] => itemRequirements
   .map((itemRequirement) => {
     if (itemRequirement.type === ItemType.NATIVE) {
-      return {
-        address: IMX_ADDRESS_ZKEVM,
-      } as TokenInfo;
+      return {} as TokenInfo;
     }
 
     return {
@@ -93,8 +92,7 @@ export const getTokenBalanceRequirement = (
     });
   } else if (itemRequirement.type === ItemType.NATIVE) {
     itemBalanceResult = balances.find((balance) => {
-      return (balance as TokenBalance).token?.address === ''
-        || (balance as TokenBalance).token?.address === IMX_ADDRESS_ZKEVM;
+      return isNativeToken((balance as TokenBalance).token?.address);
     });
   }
 
@@ -125,7 +123,6 @@ export const getTokenBalanceRequirement = (
           name,
           symbol,
           decimals: DEFAULT_TOKEN_DECIMALS,
-          address: IMX_ADDRESS_ZKEVM,
         },
       };
     }

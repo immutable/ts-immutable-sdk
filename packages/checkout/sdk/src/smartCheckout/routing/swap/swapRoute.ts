@@ -14,7 +14,7 @@ import {
 import { BalanceCheckResult, BalanceRequirement } from '../../balanceCheck/types';
 import { TokenBalanceResult } from '../types';
 import { quoteFetcher } from './quoteFetcher';
-import { IMX_ADDRESS_ZKEVM } from '../../../env';
+import { isNativeToken } from '../../../network';
 
 const constructFees = (
   approvalGasFees: Amount | null | undefined,
@@ -87,7 +87,7 @@ export const constructSwapRoute = (
   const tokenAddress = userBalance.token.address;
 
   let type = ItemType.ERC20;
-  if (tokenAddress === IMX_ADDRESS_ZKEVM) {
+  if (isNativeToken(tokenAddress)) {
     type = ItemType.NATIVE;
   }
 
@@ -125,7 +125,6 @@ export const getRequiredToken = (
       amount = balanceRequirement.delta.balance;
       break;
     case ItemType.NATIVE:
-      address = IMX_ADDRESS_ZKEVM;
       amount = balanceRequirement.delta.balance;
       break;
     default: break;

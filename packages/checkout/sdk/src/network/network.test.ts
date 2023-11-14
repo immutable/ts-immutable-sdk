@@ -23,7 +23,7 @@ import { CheckoutConfiguration } from '../config';
 import { RemoteConfigFetcher } from '../config/remoteConfigFetcher';
 import { getUnderlyingChainId } from '../provider/getUnderlyingProvider';
 import {
-  IMX_ADDRESS_ZKEVM, NATIVE, PRODUCTION_CHAIN_ID_NETWORK_MAP, SANDBOX_CHAIN_ID_NETWORK_MAP,
+  NATIVE, PRODUCTION_CHAIN_ID_NETWORK_MAP, SANDBOX_CHAIN_ID_NETWORK_MAP,
 } from '../env';
 
 let windowSpy: any;
@@ -50,7 +50,7 @@ const zkevmNetworkInfo = {
     name: 'IMX',
     symbol: 'IMX',
     decimals: 18,
-    address: IMX_ADDRESS_ZKEVM,
+    address: '',
   },
 };
 
@@ -474,7 +474,7 @@ describe('network functions', () => {
               name: 'IMX',
               symbol: 'IMX',
               decimals: 18,
-              address: IMX_ADDRESS_ZKEVM,
+              address: '',
             },
           },
         ],
@@ -513,8 +513,12 @@ describe('network functions', () => {
       expect(isNativeToken('')).toBeTruthy();
     });
 
-    it('should return true if address is NATIVE', () => {
+    it('should return true if address is `native`', () => {
       expect(isNativeToken(NATIVE)).toBeTruthy();
+    });
+
+    it('should return true if address is `NATIVE`', () => {
+      expect(isNativeToken('NATIVE')).toBeTruthy();
     });
 
     it('should return false if address is not NATIVE', () => {

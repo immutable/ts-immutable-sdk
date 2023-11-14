@@ -449,8 +449,12 @@ describe('utils', () => {
       expect(isNativeToken('')).toBeTruthy();
     });
 
-    it('should return true if address is NATIVE', () => {
+    it('should return true if address is `native`', () => {
       expect(isNativeToken(NATIVE)).toBeTruthy();
+    });
+
+    it('should return true if address is `NATIVE`', () => {
+      expect(isNativeToken('NATIVE')).toBeTruthy();
     });
 
     it('should return false if address is not NATIVE', () => {

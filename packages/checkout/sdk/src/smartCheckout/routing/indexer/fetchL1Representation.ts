@@ -1,6 +1,5 @@
-import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../../config';
+import { CheckoutConfiguration, getL2ChainId } from '../../../config';
 import { createBlockchainDataInstance } from '../../../instance';
-import { IMX_ADDRESS_ZKEVM } from '../../../env';
 import { ChainId, ImxAddressConfig } from '../../../types';
 
 // If the root address evaluates to this then its ETH
@@ -31,13 +30,16 @@ export const fetchL1Representation = async (
   config: CheckoutConfiguration,
   l2address: string,
 ): Promise<L1ToL2TokenAddressMapping> => {
+  // todo: Why is IMX-ZK address and empty strings are considered as two separate things??
+  // todo: What is native token check for this code?
   if (l2address === '') return { l1address: '', l2address };
-  if (l2address === IMX_ADDRESS_ZKEVM) {
-    return {
-      l1address: await getImxL1Representation(getL1ChainId(config), config),
-      l2address: IMX_ADDRESS_ZKEVM,
-    };
-  }
+  // todo: do we need to fetch L1 representation for L2 native???
+  // if (l2address === IMX_ADDRESS_ZKEVM) {
+  //   return {
+  //     l1address: await getImxL1Representation(getL1ChainId(config), config),
+  //     l2address: IMX_ADDRESS_ZKEVM,
+  //   };
+  // }
 
   const chainName = getIndexerChainName(getL2ChainId(config));
   if (chainName === '') return { l1address: '', l2address }; // Chain name not a valid indexer chain name

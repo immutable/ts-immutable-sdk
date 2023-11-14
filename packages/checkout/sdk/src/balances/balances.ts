@@ -10,7 +10,7 @@ import {
   TokenInfo,
 } from '../types';
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
-import { getNetworkInfo } from '../network';
+import { getNetworkInfo, isNativeToken } from '../network';
 import { getTokenAllowList } from '../tokens';
 import { CheckoutConfiguration, getL1ChainId } from '../config';
 import {
@@ -20,7 +20,7 @@ import {
   BlockscoutTokenType,
 } from '../client';
 import {
-  DEFAULT_TOKEN_DECIMALS, ERC20ABI, IMX_ADDRESS_ZKEVM,
+  DEFAULT_TOKEN_DECIMALS, ERC20ABI,
 } from '../env';
 import { measureAsyncExecution } from '../logger/debugLogger';
 
@@ -212,14 +212,13 @@ export const getBalances = async (
   const allBalancePromises: Promise<GetBalanceResult>[] = [];
   tokens
     .forEach((token: TokenInfo) => {
-      // Check for NATIVE token
-      if (!token.address || token.address === IMX_ADDRESS_ZKEVM) {
+      if (isNativeToken(token.address)) {
         allBalancePromises.push(
           getBalance(config, web3Provider, walletAddress),
         );
       } else {
         allBalancePromises.push(
-          getERC20Balance(web3Provider, walletAddress, token.address),
+          getERC20Balance(web3Provider, walletAddress, token.address!),
         );
       }
     });

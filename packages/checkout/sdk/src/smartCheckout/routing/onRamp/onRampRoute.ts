@@ -6,7 +6,7 @@ import {
 } from '../../../types';
 import { BalanceRequirement } from '../../balanceCheck/types';
 import { allowListCheckForOnRamp } from '../../allowList';
-import { IMX_ADDRESS_ZKEVM } from '../../../env';
+import { isNativeToken } from '../../../network';
 
 export const onRampRoute = async (
   config: CheckoutConfiguration,
@@ -30,7 +30,7 @@ export const onRampRoute = async (
     type: FundingStepType.ONRAMP,
     chainId: getL2ChainId(config),
     fundingItem: {
-      type: required.token.address === IMX_ADDRESS_ZKEVM ? ItemType.NATIVE : ItemType.ERC20,
+      type: isNativeToken(required.token.address) ? ItemType.NATIVE : ItemType.ERC20,
       fundsRequired: {
         amount: delta.balance,
         formattedAmount: delta.formattedBalance,

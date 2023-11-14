@@ -7,7 +7,6 @@ import {
   getTokenBalanceRequirement,
   getTokensFromRequirements,
 } from './balanceRequirement';
-import { IMX_ADDRESS_ZKEVM } from '../../env';
 
 describe('balanceRequirement', () => {
   describe('getTokensFromRequirements', () => {
@@ -32,9 +31,7 @@ describe('balanceRequirement', () => {
       ];
 
       expect(getTokensFromRequirements(itemRequirements)).toEqual([
-        {
-          address: IMX_ADDRESS_ZKEVM,
-        },
+        {},
         {
           address: '0xERC20',
         },
@@ -152,7 +149,6 @@ describe('balanceRequirement', () => {
             name: 'IMX',
             symbol: 'IMX',
             decimals: 18,
-            address: IMX_ADDRESS_ZKEVM,
           },
         },
       ];
@@ -173,7 +169,6 @@ describe('balanceRequirement', () => {
             name: 'IMX',
             symbol: 'IMX',
             decimals: 18,
-            address: IMX_ADDRESS_ZKEVM,
           },
         },
         current: {
@@ -184,7 +179,6 @@ describe('balanceRequirement', () => {
             name: 'IMX',
             symbol: 'IMX',
             decimals: 18,
-            address: IMX_ADDRESS_ZKEVM,
           },
         },
       });
@@ -258,7 +252,6 @@ describe('balanceRequirement', () => {
             name: 'IMX',
             symbol: 'IMX',
             decimals: 18,
-            address: IMX_ADDRESS_ZKEVM,
           },
         },
         {
@@ -290,7 +283,6 @@ describe('balanceRequirement', () => {
             name: 'IMX',
             symbol: 'IMX',
             decimals: 18,
-            address: IMX_ADDRESS_ZKEVM,
           },
         },
         current: {
@@ -301,7 +293,6 @@ describe('balanceRequirement', () => {
             name: 'IMX',
             symbol: 'IMX',
             decimals: 18,
-            address: IMX_ADDRESS_ZKEVM,
           },
         },
       });
