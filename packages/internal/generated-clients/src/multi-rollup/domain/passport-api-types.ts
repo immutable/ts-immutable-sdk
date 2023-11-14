@@ -28,9 +28,15 @@ import { BasicAPIError } from '../models';
 // @ts-ignore
 import { CreateCounterfactualAddressRequest } from '../models';
 // @ts-ignore
+import { CreateCounterfactualAddressRequestDeprecated } from '../models';
+// @ts-ignore
 import { CreateCounterfactualAddressRes } from '../models';
 // @ts-ignore
+import { CreateCounterfactualAddressResDeprecated } from '../models';
+// @ts-ignore
 import { GetLinkedAddressesRes } from '../models';
+// @ts-ignore
+import { GetLinkedAddressesResDeprecated } from '../models';
 // @ts-ignore
 export { APIError400 } from '../models';
 // @ts-ignore
@@ -44,11 +50,15 @@ export { APIError500 } from '../models';
 // @ts-ignore
 export { BasicAPIError } from '../models';
 // @ts-ignore
-export { CreateCounterfactualAddressRequest } from '../models';
+export { CreateCounterfactualAddressRequestDeprecated } from '../models';
 // @ts-ignore
 export { CreateCounterfactualAddressRes } from '../models';
 // @ts-ignore
+export { CreateCounterfactualAddressResDeprecated } from '../models';
+// @ts-ignore
 export { GetLinkedAddressesRes } from '../models';
+// @ts-ignore
+export { GetLinkedAddressesResDeprecated } from '../models';
 
 /**
  * Request parameters for createCounterfactualAddress operation in PassportApi.
@@ -57,11 +67,32 @@ export { GetLinkedAddressesRes } from '../models';
  */
 export interface CreateCounterfactualAddressRequest {
     /**
-     * 
+     *
+     * @type {string}
+     * @memberof CreateCounterfactualAddress
+     */
+    readonly chainName: string
+
+    /**
+     *
      * @type {CreateCounterfactualAddressRequest}
      * @memberof CreateCounterfactualAddress
      */
     readonly createCounterfactualAddressRequest: CreateCounterfactualAddressRequest
+}
+
+/**
+ * Request parameters for createCounterfactualAddressDeprecated operation in PassportApi.
+ * @export
+ * @interface CreateCounterfactualAddressDeprecatedRequest
+ */
+export interface CreateCounterfactualAddressDeprecatedRequest {
+    /**
+     *
+     * @type {CreateCounterfactualAddressRequestDeprecated}
+     * @memberof CreateCounterfactualAddressDeprecated
+     */
+    readonly createCounterfactualAddressRequestDeprecated: CreateCounterfactualAddressRequestDeprecated
 }
 
 /**
@@ -74,6 +105,27 @@ export interface GetLinkedAddressesRequest {
      * The user\&#39;s userId
      * @type {string}
      * @memberof GetLinkedAddresses
+     */
+    readonly userId: string
+
+    /**
+     *
+     * @type {string}
+     * @memberof GetLinkedAddresses
+     */
+    readonly chainName: string
+}
+
+/**
+ * Request parameters for getLinkedAddressesDeprecated operation in PassportApi.
+ * @export
+ * @interface GetLinkedAddressesDeprecatedRequest
+ */
+export interface GetLinkedAddressesDeprecatedRequest {
+    /**
+     * The user\&#39;s userId
+     * @type {string}
+     * @memberof GetLinkedAddressesDeprecated
      */
     readonly userId: string
 }

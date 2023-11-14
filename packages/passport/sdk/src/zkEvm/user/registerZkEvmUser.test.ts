@@ -1,8 +1,9 @@
 import { ImmutableConfiguration } from '@imtbl/config';
-import { Web3Provider } from '@ethersproject/providers';
+import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { signRaw } from '@imtbl/toolkit';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { PassportConfiguration } from 'config';
+import { ChainName } from 'network/chains';
 import { registerZkEvmUser } from './registerZkEvmUser';
 import AuthManager from '../../authManager';
 import { mockUser, mockUserZkEvm } from '../../test/mocks';
@@ -22,6 +23,11 @@ describe('registerZkEvmUser', () => {
   const multiRollupApiClients = {
     passportApi: {
       createCounterfactualAddress: jest.fn(),
+    },
+  };
+  const jsonRPCProvider = {
+    ready: {
+      chainId: 13472,
     },
   };
   const ethereumAddress = '0x3082e7c88f1c8b4e24be4a75dee018ad362d84d4';
@@ -56,6 +62,7 @@ describe('registerZkEvmUser', () => {
         magicProvider,
         multiRollupApiClients: multiRollupApiClients as unknown as MultiRollupApiClients,
         accessToken,
+        jsonRpcProvider: jsonRPCProvider as unknown as JsonRpcProvider,
       })).rejects.toThrow('Failed to create counterfactual address: Error: Internal server error');
     });
   });
@@ -74,6 +81,7 @@ describe('registerZkEvmUser', () => {
         magicProvider,
         multiRollupApiClients: multiRollupApiClients as unknown as MultiRollupApiClients,
         accessToken,
+        jsonRpcProvider: jsonRPCProvider as unknown as JsonRpcProvider,
       })).rejects.toThrow('Failed to refresh user details');
     });
   });
@@ -92,6 +100,7 @@ describe('registerZkEvmUser', () => {
         magicProvider,
         multiRollupApiClients: multiRollupApiClients as unknown as MultiRollupApiClients,
         accessToken,
+        jsonRpcProvider: jsonRPCProvider as unknown as JsonRpcProvider,
       })).rejects.toThrow('Failed to refresh user details');
     });
   });
@@ -109,13 +118,15 @@ describe('registerZkEvmUser', () => {
       magicProvider,
       multiRollupApiClients: multiRollupApiClients as unknown as MultiRollupApiClients,
       accessToken,
+      jsonRpcProvider: jsonRPCProvider as unknown as JsonRpcProvider,
     });
 
     expect(result).toEqual(mockUserZkEvm);
     expect(multiRollupApiClients.passportApi.createCounterfactualAddress).toHaveBeenCalledWith({
+      chainName: ChainName.IMTBL_ZKEVM_TESTNET,
       createCounterfactualAddressRequest: {
-        ethereumAddress,
-        ethereumSignature,
+        ethereum_address: ethereumAddress,
+        ethereum_signature: ethereumSignature,
       },
     }, {
       headers: {

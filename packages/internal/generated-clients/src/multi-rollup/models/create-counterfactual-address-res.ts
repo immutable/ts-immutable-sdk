@@ -25,6 +25,6 @@ export interface CreateCounterfactualAddressRes {
      * @type {string}
      * @memberof CreateCounterfactualAddressRes
      */
-    'counterfactualAddress': string;
+    'counterfactual_address': string;
 }
 
