@@ -32,11 +32,13 @@ const mandatoryHandlers = [
 export const mswHandlers = {
   counterfactualAddress: {
     success: rest.post(
-      `https://api.sandbox.immutable.com/v1/chains/${ChainName.IMTBL_ZKEVM_TESTNET}/passport/counterfactual-address`,
+      `https://api.sandbox.immutable.com/v1/chains/
+      ${encodeURIComponent(ChainName.IMTBL_ZKEVM_TESTNET)}/passport/counterfactual-address`,
       (req, res, ctx) => res(ctx.status(201)),
     ),
     internalServerError: rest.post(
-      `https://api.sandbox.immutable.com/v1/chains/${ChainName.IMTBL_ZKEVM_TESTNET}/passport/counterfactual-address`,
+      `https://api.sandbox.immutable.com/v1/chains/
+      ${encodeURIComponent(ChainName.IMTBL_ZKEVM_TESTNET)}/passport/counterfactual-address`,
       (req, res, ctx) => res(ctx.status(500)),
     ),
   },
