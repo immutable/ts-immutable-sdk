@@ -1,4 +1,4 @@
-import { globalPackageVersion } from '../env/env';
+import { globalPackageVersion } from '../env';
 import { SemanticVersion } from './definitions/types';
 
 /**
