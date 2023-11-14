@@ -1,12 +1,15 @@
 import { Environment } from '@imtbl/config';
-import { ChainId, ChainName } from './chains';
-import { TokenInfo } from './tokenInfo';
+import { ChainId, ChainName } from '../types/chains';
+import { TokenInfo } from '../types/tokenInfo';
+import { NetworkDetails, NetworkMap } from '../types';
 
 export const ENV_DEVELOPMENT = 'development' as Environment;
 
 export const IMX_ADDRESS_ZKEVM = '0x0000000000000000000000000000000000001010';
 
 export const DEFAULT_TOKEN_DECIMALS = 18;
+
+export const NATIVE = 'native';
 
 const ZKEVM_NATIVE_TOKEN = {
   name: 'IMX',
@@ -58,16 +61,6 @@ export const TRANSAK_API_BASE_URL = {
   [Environment.SANDBOX]: 'https://global-stg.transak.com',
   [Environment.PRODUCTION]: 'https://global.transak.com/',
 };
-
-type NetworkDetails = {
-  chainIdHex: string;
-  chainName: string;
-  rpcUrls: string[];
-  nativeCurrency: TokenInfo;
-  blockExplorerUrls?: string[];
-};
-
-export type NetworkMap = Map<ChainId, NetworkDetails>;
 
 export const PRODUCTION_CHAIN_ID_NETWORK_MAP: NetworkMap = new Map<
 ChainId,

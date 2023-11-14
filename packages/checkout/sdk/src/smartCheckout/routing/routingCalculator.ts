@@ -35,7 +35,7 @@ import { BridgeAndSwapRoute, bridgeAndSwapRoute } from './bridgeAndSwap/bridgeAn
 import { BridgeRequirement, bridgeRoute } from './bridge/bridgeRoute';
 import { onRampRoute } from './onRamp';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from './indexer/fetchL1Representation';
-import { measureAsyncExecution } from '../../utils/debugLogger';
+import { measureAsyncExecution } from '../../logger/debugLogger';
 
 const hasAvailableRoutingOptions = (availableRoutingOptions: AvailableRoutingOptions) => (
   availableRoutingOptions.bridge || availableRoutingOptions.swap || availableRoutingOptions.onRamp

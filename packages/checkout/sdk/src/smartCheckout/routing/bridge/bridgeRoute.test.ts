@@ -12,7 +12,6 @@ import { CheckoutConfiguration } from '../../../config';
 import {
   BridgeRouteFeeEstimate,
   ChainId,
-  DEFAULT_TOKEN_DECIMALS,
   FundingRouteFeeEstimate,
   FundingStepType,
   ItemType,
@@ -24,6 +23,7 @@ import { getBridgeFeeEstimate } from './getBridgeFeeEstimate';
 import { CheckoutErrorType } from '../../../errors';
 import { allowListCheckForBridge } from '../../allowList/allowListCheck';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from '../indexer/fetchL1Representation';
+import { DEFAULT_TOKEN_DECIMALS } from '../../../env';
 
 jest.mock('../../../gasEstimate');
 jest.mock('../../../instance');

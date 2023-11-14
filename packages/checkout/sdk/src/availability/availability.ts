@@ -1,7 +1,7 @@
 import { Environment } from '@imtbl/config';
 import axios from 'axios';
-import { ENV_DEVELOPMENT, IMMUTABLE_API_BASE_URL } from '../types';
 import { CheckoutError, CheckoutErrorType } from '../errors';
+import { ENV_DEVELOPMENT, IMMUTABLE_API_BASE_URL } from '../env';
 
 export type AvailabilityService = {
   checkDexAvailability: () => Promise<boolean>

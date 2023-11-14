@@ -2,13 +2,12 @@ import axios, { AxiosResponse } from 'axios';
 import { Environment } from '@imtbl/config';
 import {
   ChainId,
-  CHECKOUT_API_BASE_URL,
   ChainsTokensConfig,
-  ENV_DEVELOPMENT,
   RemoteConfiguration,
   ChainTokensConfig,
 } from '../types';
 import { CheckoutError, CheckoutErrorType } from '../errors';
+import { CHECKOUT_API_BASE_URL, ENV_DEVELOPMENT } from '../env';
 
 export type RemoteConfigParams = {
   isDevelopment: boolean;

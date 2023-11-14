@@ -2,11 +2,11 @@ import { CheckoutConfiguration, getL2ChainId } from '../../../config';
 import {
   AvailableRoutingOptions,
   FundingStepType,
-  IMX_ADDRESS_ZKEVM,
   ItemType, OnRampFundingStep,
 } from '../../../types';
 import { BalanceRequirement } from '../../balanceCheck/types';
 import { allowListCheckForOnRamp } from '../../allowList';
+import { IMX_ADDRESS_ZKEVM } from '../../../env';
 
 export const onRampRoute = async (
   config: CheckoutConfiguration,
