@@ -23,6 +23,8 @@ export class RemoteConfigFetcher {
 
   private tokensCache: ChainsTokensConfig | undefined;
 
+  private version: string = 'v2';
+
   constructor(params: RemoteConfigParams) {
     this.isDevelopment = params.isDevelopment;
     this.isProduction = params.isProduction;
@@ -57,7 +59,7 @@ export class RemoteConfigFetcher {
     if (this.configCache) return this.configCache;
 
     const response = await RemoteConfigFetcher.makeHttpRequest(
-      `${this.getEndpoint()}/v1/config`,
+      `${this.getEndpoint()}/${this.version}/config`,
     );
     this.configCache = response.data;
 
@@ -68,7 +70,7 @@ export class RemoteConfigFetcher {
     if (this.tokensCache) return this.tokensCache;
 
     const response = await RemoteConfigFetcher.makeHttpRequest(
-      `${this.getEndpoint()}/v1/config/tokens`,
+      `${this.getEndpoint()}/${this.version}/config/tokens`,
     );
     this.tokensCache = response.data;
 
