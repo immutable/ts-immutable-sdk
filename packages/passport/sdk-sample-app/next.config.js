@@ -11,6 +11,7 @@ if (basePath) {
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  transpilePackages: ['@imbtl/*'],
   ...pathConfig,
   reactStrictMode: true,
 };

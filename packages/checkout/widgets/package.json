@@ -52,5 +52,5 @@
     "test:watch": "jest test --watch"
   },
   "source": "src/index.ts",
-  "types": "dist/index.d.ts"
+  "types": "src/index.ts"
 }

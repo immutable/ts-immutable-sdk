@@ -29,14 +29,14 @@
     "node": ">=16.0.0"
   },
   "files": [
-    "dist"
+    "src"
   ],
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
   "keywords": [
     "immutablex"
   ],
   "license": "Apache-2.0",
-  "main": "dist/index.js",
+  "main": "src/index.ts",
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
@@ -50,5 +50,5 @@
   },
   "source": "src/index.ts",
   "type": "module",
-  "types": "dist/index.d.ts"
+  "types": "src/index.ts"
 }
