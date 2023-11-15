@@ -168,7 +168,12 @@ export const checkUserCanCoverApprovalFees = (
   }
 
   // Find the users balance of the approval token
-  const l2BalanceOfApprovalToken = l2Balances.find((balance) => balance.token.address === approvalGasTokenAddress);
+  const l2BalanceOfApprovalToken = l2Balances.find(
+    (balance) => (
+      isNativeToken(balance.token.address) && isNativeToken(approvalGasTokenAddress))
+    || balance.token.address === approvalGasTokenAddress,
+  );
+
   if (!l2BalanceOfApprovalToken) return { sufficient: false, approvalGasFee, approvalGasTokenAddress };
 
   // If the user does not have enough of the token to cover approval fees then return sufficient false
@@ -195,7 +200,7 @@ export const checkUserCanCoverSwapFees = (
   const feeMap = new Map<string, BigNumber>();
 
   // Add the approval fee to list of fees
-  if (approvalFees.approvalGasTokenAddress !== '') {
+  if (approvalFees.approvalGasFee.gt(BigNumber.from(0))) {
     feeMap.set(approvalFees.approvalGasTokenAddress, approvalFees.approvalGasFee);
   }
 
@@ -232,7 +237,11 @@ export const checkUserCanCoverSwapFees = (
   // Go through the map and for each token address check if the user has enough balance to cover the fee
   for (const [tokenAddress, fee] of feeMap.entries()) {
     if (fee === BigNumber.from(0)) continue;
-    const l2BalanceOfFeeToken = l2Balances.find((balance) => balance.token.address === tokenAddress);
+    const l2BalanceOfFeeToken = l2Balances.find(
+      (balance) => (
+        isNativeToken(balance.token.address) && isNativeToken(tokenAddress))
+        || balance.token.address === tokenAddress,
+    );
     if (!l2BalanceOfFeeToken) {
       return false;
     }

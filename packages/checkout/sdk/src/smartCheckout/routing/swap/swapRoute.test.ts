@@ -1428,7 +1428,7 @@ describe('swapRoute', () => {
             symbol: 'IMX',
             decimals: 18,
             address: '',
-          },
+          } as Token,
         },
       );
 
@@ -1559,7 +1559,6 @@ describe('swapRoute', () => {
             name: 'IMX',
             symbol: 'IMX',
             decimals: 18,
-            address: '',
           },
         },
       ];
