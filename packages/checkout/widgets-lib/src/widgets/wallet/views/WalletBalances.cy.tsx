@@ -1,11 +1,11 @@
 import {
   Checkout, WalletProviderName, TokenInfo, ChainId, ChainName, GasEstimateType,
+  IMTBLWidgetEvents,
 } from '@imtbl/checkout-sdk';
 import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { BiomeCombinedProviders } from '@biom3/react';
 import { BigNumber } from 'ethers';
-import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
 import { WalletBalances } from './WalletBalances';
@@ -56,7 +56,7 @@ describe('WalletBalances', () => {
         nativeCurrency: {} as unknown as TokenInfo,
         isSupported: true,
       },
-      walletProvider: WalletProviderName.METAMASK,
+      walletProviderName: WalletProviderName.METAMASK,
       tokenBalances: [],
       supportedTopUps: null,
     };
@@ -241,7 +241,7 @@ describe('WalletBalances', () => {
         nativeCurrency: {} as unknown as TokenInfo,
         isSupported: true,
       },
-      walletProvider: WalletProviderName.METAMASK,
+      walletProviderName: WalletProviderName.METAMASK,
       tokenBalances: [
         {
           id: 'eth',
@@ -333,7 +333,7 @@ describe('WalletBalances', () => {
           nativeCurrency: {} as unknown as TokenInfo,
           isSupported: true,
         },
-        walletProvider: WalletProviderName.METAMASK,
+        walletProviderName: WalletProviderName.METAMASK,
         tokenBalances: [
           {
             id: 'eth',
@@ -407,7 +407,7 @@ describe('WalletBalances', () => {
           nativeCurrency: {} as unknown as TokenInfo,
           isSupported: true,
         },
-        walletProvider: WalletProviderName.METAMASK,
+        walletProviderName: WalletProviderName.METAMASK,
         tokenBalances: [
           {
             id: 'eth',
@@ -461,7 +461,7 @@ describe('WalletBalances', () => {
         nativeCurrency: {} as unknown as TokenInfo,
         isSupported: true,
       },
-      walletProvider: WalletProviderName.METAMASK,
+      walletProviderName: WalletProviderName.METAMASK,
       tokenBalances: [],
       supportedTopUps: null,
     };
@@ -545,7 +545,7 @@ describe('WalletBalances', () => {
           nativeCurrency: {} as unknown as TokenInfo,
           isSupported: true,
         },
-        walletProvider: WalletProviderName.METAMASK,
+        walletProviderName: WalletProviderName.METAMASK,
         tokenBalances: [],
         supportedTopUps: {
           isOnRampEnabled: true,

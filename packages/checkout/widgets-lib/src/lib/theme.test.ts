@@ -1,5 +1,5 @@
 import { onDarkBase, onLightBase } from '@biom3/design-tokens';
-import { WidgetTheme } from './types';
+import { WidgetTheme } from '@imtbl/checkout-sdk';
 import { widgetTheme } from './theme';
 
 describe('widgetTheme', () => {

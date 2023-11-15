@@ -5,7 +5,7 @@ import {
   ConnectionSuccess,
   IMTBLWidgetEvents,
   OrchestrationEventType,
-} from '@imtbl/checkout-widgets';
+} from '@imtbl/checkout-sdk';
 import { useContext, useEffect, useState } from 'react';
 import { handleOrchestrationEvent } from './orchestration';
 import { WidgetContext, hideAllWidgets } from './WidgetProvider';

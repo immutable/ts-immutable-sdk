@@ -2,6 +2,7 @@ import {
   BiomeCombinedProviders,
 } from '@biom3/react';
 import {
+  BridgeWidgetParams,
   NetworkFilterTypes, TokenFilterTypes,
 } from '@imtbl/checkout-sdk';
 import {
@@ -18,12 +19,12 @@ import {
   ETH_SEPOLIA_TO_ZKEVM_TESTNET,
   TokenBridge,
 } from '@imtbl/bridge-sdk';
+import { StrongCheckoutWidgetsConfig } from 'lib/withDefaultWidgetConfig';
 import {
   DEFAULT_BALANCE_RETRY_POLICY,
   getL1ChainId,
   getL2ChainId,
 } from '../../lib';
-import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
   ErrorView as ErrorViewType,
   SharedViews,
@@ -51,25 +52,22 @@ import { EventTargetContext } from '../../context/event-target-context/EventTarg
 import { GetAllowedBalancesResultType, getAllowedBalances } from '../../lib/balance';
 import { widgetTheme } from '../../lib/theme';
 
-export interface BridgeWidgetProps {
-  params: BridgeWidgetParams;
-  config: StrongCheckoutWidgetsConfig
-}
+export type BridgeWidgetInputs = BridgeWidgetParams & {
+  config: StrongCheckoutWidgetsConfig,
+};
 
-export interface BridgeWidgetParams {
-  fromContractAddress?: string;
-  amount?: string;
-}
-
-export function BridgeWidget(props: BridgeWidgetProps) {
-  const { params, config } = props;
+export function BridgeWidget({
+  amount,
+  fromContractAddress,
+  config,
+}: BridgeWidgetInputs) {
   const { environment, theme } = config;
   const successText = text.views[BridgeWidgetViews.SUCCESS];
   const failText = text.views[BridgeWidgetViews.FAIL];
   const loadingText = text.views[SharedViews.LOADING_VIEW].text;
   const errorText = text.views[SharedViews.ERROR_VIEW];
 
-  const { connectLoaderState: { checkout, provider } } = useContext(ConnectLoaderContext);
+  const { connectLoaderState: { provider, checkout } } = useContext(ConnectLoaderContext);
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
   const [bridgeState, bridgeDispatch] = useReducer(bridgeReducer, initialBridgeState);
 
@@ -86,10 +84,6 @@ export function BridgeWidget(props: BridgeWidgetProps) {
   const [errorViewLoading, setErrorViewLoading] = useState(false);
 
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
-
-  const {
-    amount, fromContractAddress,
-  } = params;
 
   const showErrorView = useCallback((error: any, tryAgain?: () => Promise<boolean>) => {
     viewDispatch({

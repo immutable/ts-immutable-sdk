@@ -1,6 +1,7 @@
 import { IMXProvider } from '@imtbl/provider';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { ImmutableXClient } from '@imtbl/immutablex-client';
+import { ChainName } from 'network/chains';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
 import { PassportImxProviderFactory } from './starkEx';
@@ -119,7 +120,9 @@ export class Passport {
    * prompted to log in and the Promise will resolve with a null value.
    * @returns {Promise<UserProfile | null>} the user profile if the user is logged in, otherwise null
    */
-  public async login(options?: { useCachedSession: boolean }): Promise<UserProfile | null> {
+  public async login(options?: {
+    useCachedSession: boolean
+  }): Promise<UserProfile | null> {
     const { useCachedSession = false } = options || {};
     let user = null;
     try {
@@ -193,8 +196,9 @@ export class Passport {
     }
     const headers = { Authorization: `Bearer ${user.accessToken}` };
     const linkedAddressesResult = await this.multiRollupApiClients.passportApi.getLinkedAddresses({
+      chainName: ChainName.ETHEREUM,
       userId: user?.profile.sub,
     }, { headers });
-    return linkedAddressesResult.data.linkedAddresses;
+    return linkedAddressesResult.data.linked_addresses;
   }
 }

@@ -228,14 +228,14 @@ describe('Passport', () => {
 
       const result = await passport.getLinkedAddresses();
 
-      expect(result).toEqual(mockLinkedAddresses.data.linkedAddresses);
+      expect(result).toEqual(mockLinkedAddresses.data.linked_addresses);
     });
 
     it('should return empty array if there is no linked addresses', async () => {
       getUserMock.mockReturnValue(mockUser);
       getLinkedAddressesMock.mockReturnValue({
         data: {
-          linkedAddresses: [],
+          linked_addresses: [],
         },
       });
 

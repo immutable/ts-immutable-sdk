@@ -1,67 +1,49 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import {
-  ConnectEventType,
-  ConnectionSuccess,
-  ConnectionFailed,
-  IMTBLWidgetEvents,
+  Checkout,
+  ConnectTargetLayer,
+  WidgetType,
   WidgetTheme,
-  ConnectReact,
-  CheckoutWidgets,
-  UpdateConfig,
-  CheckoutWidgetsConfig,
-} from '@imtbl/checkout-widgets';
+  Widget,
+  ConnectEventType
+} from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
-import { WalletProviderName } from '@imtbl/checkout-sdk';
+import { WidgetsFactory } from '@imtbl/checkout-widgets';
 
+const CONNECT_TARGET_ID = "connect-widget-target";
 function ConnectUI() {
-  CheckoutWidgets({
-    theme: WidgetTheme.DARK,
-    environment: Environment.SANDBOX,
-  });
-  const widgetsConfig2: CheckoutWidgetsConfig = {
-    theme: WidgetTheme.DARK,
-    environment: Environment.SANDBOX,
-  };
+  const checkout = useMemo(() => new Checkout({ baseConfig: { environment: Environment.SANDBOX } }), []);
+  const [factory, setFactory] = useState<ImmutableCheckoutWidgets.WidgetsFactory>();
+  const connect = useMemo(() => {
+    if(!factory) return;
+    return (factory).create(WidgetType.CONNECT)
+  }, [factory]);
+  const [provider, setProvider] = useState();
 
-  UpdateConfig(widgetsConfig2);
   useEffect(() => {
-    // Add event listeners for the IMXConnectWidget and handle event types appropriately
-    const handleConnectEvent = ((event: CustomEvent) => {
-      console.log(event);
-      console.log('Getting data from within the event');
-      switch (event.detail.type) {
-        case ConnectEventType.SUCCESS: {
-          const eventData = event.detail.data as ConnectionSuccess;
-          console.log(eventData.provider);
-          break;
-        }
-        case ConnectEventType.FAILURE: {
-          const eventData = event.detail.data as ConnectionFailed;
-          console.log(eventData.reason);
-          break;
-        }
-        default:
-          console.log('did not match any expected event type');
-      }
-    }) as EventListener;
+    (async () => {
+      setFactory(new WidgetsFactory(checkout, {theme: WidgetTheme.DARK}));
+    })()
+  }, [checkout]);
 
-    window.addEventListener(
-      IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
-      handleConnectEvent
-    );
-    return () => {
-      window.removeEventListener(
-        IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
-        handleConnectEvent
-      );
-    };
-  }, []);
+  useEffect(() => {
+    if(!connect) return;
+    connect.mount(CONNECT_TARGET_ID, {})
+    connect.addListener(ConnectEventType.SUCCESS, (data: any) => {
+      setProvider(data.provider);
+    })
+    connect.addListener(ConnectEventType.CLOSE_WIDGET, (data: any) => {
+      connect.unmount();
+    })
+  }, [connect])
 
   return (
-    <div className="Connect">
-      <h1 className="sample-heading">Checkout Connect (Web Component)</h1>
-      <ConnectReact />
+    <div>
+      <h1 className="sample-heading">Checkout Connect</h1>
+      <div id={CONNECT_TARGET_ID}></div>
+      <button onClick={() => connect?.mount(CONNECT_TARGET_ID)}>Mount</button>
+      <button onClick={() => connect?.unmount()}>Unmount</button>
     </div>
   );
 }

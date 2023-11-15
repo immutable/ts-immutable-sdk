@@ -1,7 +1,7 @@
 import { BiomeCombinedProviders } from '@biom3/react';
 import { mount } from 'cypress/react18';
 import { cy, describe } from 'local-cypress';
-import { WidgetTheme } from '@imtbl/checkout-widgets';
+import { WidgetTheme } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { cySmartGet } from '../../../lib/testUtils';
 import { FundWithSmartCheckout } from './FundWithSmartCheckout';

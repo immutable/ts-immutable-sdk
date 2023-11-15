@@ -25,12 +25,12 @@ export interface CreateCounterfactualAddressRequest {
      * @type {string}
      * @memberof CreateCounterfactualAddressRequest
      */
-    'ethereumAddress': string;
+    'ethereum_address': string;
     /**
      * The signature generated with the UAK
      * @type {string}
      * @memberof CreateCounterfactualAddressRequest
      */
-    'ethereumSignature': string;
+    'ethereum_signature': string;
 }
 

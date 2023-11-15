@@ -3,11 +3,8 @@ import {
 } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { BiomeCombinedProviders } from '@biom3/react';
-import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import {
-  Checkout,
-  GasEstimateType,
-  WalletProviderName,
+  IMTBLWidgetEvents, Checkout, GasEstimateType, WalletProviderName,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { BigNumber } from 'ethers';
@@ -305,7 +302,7 @@ describe('Top Up View', () => {
     it('should display fees for onramp, swap and bridge', () => {
       const baseWalletState: WalletState = {
         network: null,
-        walletProvider: WalletProviderName.METAMASK,
+        walletProviderName: WalletProviderName.METAMASK,
         tokenBalances: [],
         supportedTopUps: {
           isOnRampEnabled: true,
@@ -392,7 +389,7 @@ describe('Top Up View', () => {
     it('should not fetch swap fees for geo-blocked region', () => {
       const baseWalletState: WalletState = {
         network: null,
-        walletProvider: WalletProviderName.METAMASK,
+        walletProviderName: WalletProviderName.METAMASK,
         tokenBalances: [],
         supportedTopUps: {
           isOnRampEnabled: true,
@@ -479,7 +476,7 @@ describe('Top Up View', () => {
     it('should display placeholder fees for onramp, swap and bridge', () => {
       const baseWalletState: WalletState = {
         network: null,
-        walletProvider: WalletProviderName.METAMASK,
+        walletProviderName: WalletProviderName.METAMASK,
         tokenBalances: [],
         supportedTopUps: {
           isOnRampEnabled: true,
@@ -523,7 +520,7 @@ describe('Top Up View', () => {
     it('should show shimmer for fees for onramp, swap and bridge', () => {
       const baseWalletState: WalletState = {
         network: null,
-        walletProvider: WalletProviderName.METAMASK,
+        walletProviderName: WalletProviderName.METAMASK,
         tokenBalances: [],
         supportedTopUps: {
           isOnRampEnabled: true,

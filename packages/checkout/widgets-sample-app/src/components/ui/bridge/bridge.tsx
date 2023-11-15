@@ -1,35 +1,35 @@
-import { WalletProviderName } from '@imtbl/checkout-sdk';
-import {
-  WidgetTheme,
-  BridgeReact,
-  CheckoutWidgets,
-  CheckoutWidgetsConfig,
-  UpdateConfig,
-} from '@imtbl/checkout-widgets';
-import { Environment } from '@imtbl/config';
+import { BridgeEventType, Checkout, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
+import { WidgetsFactory } from '@imtbl/checkout-widgets'
+import { useEffect, useMemo } from 'react';
 
+const BRIDGE_TARGET_ID = 'bridge-widget-target';
 function BridgeUI() {
-  CheckoutWidgets({
-    theme: WidgetTheme.DARK,
-    environment: Environment.SANDBOX,
-  });
-
-  const widgetsConfig2: CheckoutWidgetsConfig = {
-    theme: WidgetTheme.DARK,
-    environment: Environment.SANDBOX,
-  };
-
-  UpdateConfig(widgetsConfig2);
-
+  const checkout = useMemo(() => new Checkout(), []);
+  const factory = useMemo(() => new WidgetsFactory(checkout, {theme: WidgetTheme.DARK}), [checkout]);
+  const bridge = useMemo(() => factory.create(WidgetType.BRIDGE),[factory]);
+  
+  useEffect(() => {
+    bridge.mount(BRIDGE_TARGET_ID, {amount: '10'});
+    bridge.addListener(BridgeEventType.SUCCESS, (data: any) => {
+      console.log('SUCCESS', data);
+    });
+    bridge.addListener(BridgeEventType.FAILURE, (data: any) => {
+      console.log('FAILURE', data);
+    });
+    bridge.addListener(BridgeEventType.CLOSE_WIDGET, (data: any) => {
+      console.log('CLOSE_WIDGET', data);
+      bridge.unmount();
+    });
+  }, [bridge])
+  
   return (
-    <div className="Swap">
-      <h1 className="sample-heading">Checkout Bridge (Web Component)</h1>
-
-      <BridgeReact
-        walletProvider={WalletProviderName.METAMASK}
-        amount="50"
-        fromContractAddress="0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0"
-      />
+    <div>
+      <h1 className="sample-heading">Checkout Bridge</h1>
+      <div id={BRIDGE_TARGET_ID}></div>
+      <button onClick={() => bridge.mount(BRIDGE_TARGET_ID, {amount: '10'})}>Mount</button>
+      <button onClick={() => bridge.unmount()}>Unmount</button>
+      <button onClick={() => bridge.update({ config: { theme: WidgetTheme.LIGHT } })}>Update Config Light</button>
+      <button onClick={() => bridge.update({ config: { theme: WidgetTheme.DARK } })}>Update Config Dark</button>
     </div>
   );
 }

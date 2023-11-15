@@ -1,14 +1,14 @@
-import { Body, Box, Heading } from '@biom3/react';
-import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
+import {
+  Body, Box, Heading,
+} from '@biom3/react';
+import {
+  IMTBLWidgetEvents,
+
+  GasEstimateBridgeToL2Result, GasEstimateSwapResult, GasEstimateType, OnRampProviderFees,
+} from '@imtbl/checkout-sdk';
 import {
   ReactNode, useContext, useEffect, useState,
 } from 'react';
-import {
-  GasEstimateBridgeToL2Result,
-  GasEstimateSwapResult,
-  GasEstimateType,
-  OnRampProviderFees,
-} from '@imtbl/checkout-sdk';
 import { FooterLogo } from '../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
