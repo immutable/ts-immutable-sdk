@@ -132,7 +132,7 @@ export default class AuthManager {
         nickname: idTokenPayload.nickname,
       },
     };
-    if (idTokenPayload?.passport.imx_eth_address) {
+    if (idTokenPayload?.passport?.imx_eth_address) {
       user.imx = {
         ethAddress: idTokenPayload.passport.imx_eth_address,
         starkAddress: idTokenPayload.passport.imx_stark_address,
