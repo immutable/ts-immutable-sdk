@@ -3176,10 +3176,7 @@ __metadata:
     local-cypress: ^1.2.6
     os-browserify: ^0.3.0
     pako: ^2.1.0
-    react: ^18.2.0
     react-app-rewired: ^2.2.1
-    react-dom: ^18.2.0
-    react-router-dom: ^6.11.0
     react-scripts: 5.0.1
     rollup: ^3.17.2
     rollup-plugin-svg: ^2.0.0
@@ -3717,9 +3714,6 @@ __metadata:
     oidc-client-ts: ^2.2.1
     os-browserify: ^0.3.0
     pako: ^2.1.0
-    react: ^18.2.0
-    react-dom: ^18.2.0
-    react-router-dom: ^6.11.0
     rollup: ^3.17.2
     rollup-plugin-dts: ^5.3.0
     rollup-plugin-polyfill-node: ^0.12.0
