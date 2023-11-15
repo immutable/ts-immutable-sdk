@@ -376,7 +376,7 @@ export default class AuthManager {
 
   /**
    * Get the user from the cache or refresh the token if it's expired.
-   * throw an error if there's no refresh token.
+   * return null if there's no refresh token.
    */
   private async getAuthenticatedUser(): Promise<User | null> {
     const oidcUser = await this.userManager.getUser();

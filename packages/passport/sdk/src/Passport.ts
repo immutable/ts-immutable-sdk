@@ -129,9 +129,9 @@ export class Passport {
         throw error;
       }
       // eslint-disable-next-line no-console
-      console.warn('getUser failed with error:', error);
+      console.warn('login failed to retrieve a cached user session', error);
     }
-    if (!user) {
+    if (!user && !useCachedSession) {
       user = await this.authManager.login();
     }
 
