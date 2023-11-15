@@ -113,6 +113,20 @@ export const constructSwapRoute = (
   };
 };
 
+export const isBalanceRequirementTokenValid = (
+  balanceRequirement: BalanceRequirement,
+): boolean => {
+  if (balanceRequirement.type === ItemType.ERC20) {
+    return !!balanceRequirement.required.token.address;
+  }
+
+  if (balanceRequirement.type === ItemType.NATIVE) {
+    return isNativeToken(balanceRequirement.required.token.address);
+  }
+
+  return false;
+};
+
 export const getRequiredToken = (
   balanceRequirement: BalanceRequirement,
 ): { address: string, amount: BigNumber } => {
@@ -121,7 +135,7 @@ export const getRequiredToken = (
 
   switch (balanceRequirement.type) {
     case ItemType.ERC20:
-      address = balanceRequirement.required.token.address ?? '';
+      address = balanceRequirement.required.token.address!;
       amount = balanceRequirement.delta.balance;
       break;
     case ItemType.NATIVE:
@@ -290,9 +304,9 @@ export const swapRoute = async (
   const fundingSteps: SwapFundingStep[] = [];
   if (!availableRoutingOptions.swap) return fundingSteps;
   if (swappableTokens.length === 0) return fundingSteps;
+  if (!isBalanceRequirementTokenValid(balanceRequirement)) return fundingSteps;
 
   const requiredToken = getRequiredToken(balanceRequirement);
-  if (requiredToken.address === '') return fundingSteps;
 
   const chainId = getL2ChainId(config);
   const l2TokenBalanceResult = tokenBalanceResults.get(chainId);

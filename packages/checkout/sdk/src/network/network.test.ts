@@ -50,7 +50,6 @@ const zkevmNetworkInfo = {
     name: 'IMX',
     symbol: 'IMX',
     decimals: 18,
-    address: '',
   },
 };
 
@@ -474,7 +473,6 @@ describe('network functions', () => {
               name: 'IMX',
               symbol: 'IMX',
               decimals: 18,
-              address: '',
             },
           },
         ],

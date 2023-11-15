@@ -150,7 +150,7 @@ describe('swapRoute', () => {
       (quoteFetcher as jest.Mock).mockResolvedValue(dexQuotes);
     });
 
-    it('should recommend swap route', async () => {
+    it('should recommend swap route for ERC20', async () => {
       const balanceRequirement = {
         type: ItemType.ERC20,
         sufficient: false,
@@ -199,6 +199,123 @@ describe('swapRoute', () => {
             {
               balance: BigNumber.from(10),
               formattedBalance: '10',
+              token: {
+                name: 'IMX',
+                symbol: 'IMX',
+                decimals: 18,
+              },
+            },
+          ],
+        }],
+      ]);
+
+      const balanceRequirements = {
+        sufficient: false,
+        balanceRequirements: [balanceRequirement],
+      };
+      const route = await swapRoute(
+        config,
+        {
+          swap: true,
+        },
+        '0xADDRESS',
+        balanceRequirement,
+        balances,
+        ['0xERC20_1', '0xERC20_2'],
+        balanceRequirements,
+      );
+
+      expect(route).toEqual([
+        {
+          type: FundingStepType.SWAP,
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+          fundingItem: {
+            type: ItemType.ERC20,
+            fundsRequired: {
+              amount: BigNumber.from(1),
+              formattedAmount: utils.formatUnits(BigNumber.from(1), 18),
+            },
+            userBalance: {
+              balance: BigNumber.from(10),
+              formattedBalance: '10',
+            },
+            token: {
+              address: '0xERC20_2',
+              decimals: 18,
+              name: 'ERC20',
+              symbol: 'ERC20',
+            },
+          },
+          fees: {
+            approvalGasFees: {
+              amount: BigNumber.from(1),
+              formattedAmount: utils.formatUnits(BigNumber.from(1), 18),
+              token: {
+                decimals: 18,
+                name: 'IMX',
+                symbol: 'IMX',
+              },
+            },
+            swapGasFees: {
+              amount: BigNumber.from(2),
+              formattedAmount: utils.formatUnits(BigNumber.from(2), 18),
+              token: {
+                decimals: 18,
+                name: 'IMX',
+                symbol: 'IMX',
+              },
+            },
+            swapFees: [{
+              amount: BigNumber.from(3),
+              formattedAmount: utils.formatUnits(BigNumber.from(3), 18),
+              token: {
+                decimals: 18,
+                name: 'IMX',
+                symbol: 'IMX',
+              },
+            }],
+          },
+        },
+      ]);
+    });
+
+    xit('should recommend swap route for NATIVE', async () => {
+      const balanceRequirement = {
+        type: ItemType.NATIVE,
+        sufficient: false,
+        delta: {
+          balance: BigNumber.from(1),
+          formattedBalance: '1',
+        },
+        current: {
+          type: ItemType.NATIVE,
+          balance: BigNumber.from(1),
+          formattedBalance: '10',
+          token: {
+            name: 'IMX',
+            symbol: 'IMX',
+            decimals: 18,
+          },
+        },
+        required: {
+          type: ItemType.NATIVE,
+          balance: BigNumber.from(2),
+          formattedBalance: '20',
+          token: {
+            name: 'IMX',
+            symbol: 'IMX',
+            decimals: 18,
+          },
+        },
+      } as BalanceRequirement;
+
+      const balances = new Map<ChainId, TokenBalanceResult>([
+        [ChainId.IMTBL_ZKEVM_TESTNET, {
+          success: true,
+          balances: [
+            {
+              balance: BigNumber.from(10),
+              formattedBalance: '18',
               token: {
                 name: 'IMX',
                 symbol: 'IMX',
@@ -1727,7 +1844,6 @@ describe('swapRoute', () => {
             name: 'IMX',
             symbol: 'IMX',
             decimals: 18,
-            address: '',
           },
         },
       ];
