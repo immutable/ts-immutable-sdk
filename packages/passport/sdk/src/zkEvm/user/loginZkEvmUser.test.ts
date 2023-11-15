@@ -2,6 +2,7 @@ import { mockUser, mockUserZkEvm } from 'test/mocks';
 import { PassportConfiguration } from 'config';
 import { ImmutableConfiguration } from '@imtbl/config';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
+import { JsonRpcProvider } from '@ethersproject/providers';
 import { loginZkEvmUser } from './loginZkEvmUser';
 import AuthManager from '../../authManager';
 import MagicAdapter from '../../magicAdapter';
@@ -40,6 +41,7 @@ describe('loginZkEvmUser', () => {
       config,
       magicAdapter,
       multiRollupApiClients,
+      jsonRpcProvider: {} as JsonRpcProvider,
     });
 
     expect(result).toEqual({
@@ -60,6 +62,7 @@ describe('loginZkEvmUser', () => {
       config,
       magicAdapter,
       multiRollupApiClients,
+      jsonRpcProvider: {} as JsonRpcProvider,
     });
 
     expect(result).toEqual({
@@ -80,6 +83,7 @@ describe('loginZkEvmUser', () => {
       config,
       magicAdapter,
       multiRollupApiClients,
+      jsonRpcProvider: {} as JsonRpcProvider,
     });
 
     expect(result).toEqual({
@@ -100,6 +104,7 @@ describe('loginZkEvmUser', () => {
       config,
       magicAdapter,
       multiRollupApiClients,
+      jsonRpcProvider: {} as JsonRpcProvider,
     });
 
     expect(result).toEqual({
