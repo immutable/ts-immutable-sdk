@@ -124,6 +124,7 @@ export class ZkEvmProvider implements Provider {
           config: this.config,
           magicAdapter: this.magicAdapter,
           multiRollupApiClients: this.multiRollupApiClients,
+          jsonRpcProvider: this.jsonRpcProvider,
         });
 
         this.user = user;

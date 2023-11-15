@@ -17,14 +17,14 @@
 /**
  * 
  * @export
- * @interface GetLinkedAddressesRes
+ * @interface GetLinkedAddressesResDeprecated
  */
-export interface GetLinkedAddressesRes {
+export interface GetLinkedAddressesResDeprecated {
     /**
      * The user\'s list of linked addresses
      * @type {Array<string>}
-     * @memberof GetLinkedAddressesRes
+     * @memberof GetLinkedAddressesResDeprecated
      */
-    'linked_addresses': Array<string>;
+    'linkedAddresses': Array<string>;
 }
 

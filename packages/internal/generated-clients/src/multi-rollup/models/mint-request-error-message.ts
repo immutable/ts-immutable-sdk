@@ -17,14 +17,14 @@
 /**
  * 
  * @export
- * @interface GetLinkedAddressesRes
+ * @interface MintRequestErrorMessage
  */
-export interface GetLinkedAddressesRes {
+export interface MintRequestErrorMessage {
     /**
-     * The user\'s list of linked addresses
-     * @type {Array<string>}
-     * @memberof GetLinkedAddressesRes
+     * An error message in case the mint request fails
+     * @type {string}
+     * @memberof MintRequestErrorMessage
      */
-    'linked_addresses': Array<string>;
+    'message'?: string;
 }
 
