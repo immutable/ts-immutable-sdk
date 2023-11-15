@@ -31,7 +31,7 @@ export const loginZkEvmUser = async ({
     user = await authManager.getUser();
   } catch (err) {
     // eslint-disable-next-line no-console
-    console.warn('loginZkEvmUser failed with error:', err);
+    console.warn('eth_requestAccounts` failed to retrieve a cached user session:', err);
   }
   if (!user) {
     user = await authManager.getUserDeviceFlow() || await authManager.login();
