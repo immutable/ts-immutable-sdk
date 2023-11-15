@@ -7,7 +7,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import {
   getItemRequirement, buy, getTransactionOrGas,
 } from './buy';
-import { createOrderbookInstance, getTokenContract } from '../../instance';
+import { createBlockchainDataInstance, createOrderbookInstance, getTokenContract } from '../../instance';
 import { CheckoutConfiguration } from '../../config';
 import { CheckoutErrorType } from '../../errors';
 import {
@@ -24,6 +24,7 @@ import {
 } from '../actions';
 import { BuyOrder, OrderFee } from '../../types';
 import { SignTransactionStatusType } from '../actions/types';
+import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from '../routing/indexer/fetchL1Representation';
 
 jest.mock('../../instance');
 jest.mock('../smartCheckout');
@@ -34,7 +35,7 @@ describe('buy', () => {
   const seaportContractAddress = '0xSEAPORT';
 
   beforeEach(() => {
-    jest.spyOn(console, 'debug').mockImplementation(() => {});
+    jest.spyOn(console, 'info').mockImplementation(() => {});
   });
 
   describe('buy', () => {
@@ -251,6 +252,14 @@ describe('buy', () => {
       });
 
       (smartCheckout as jest.Mock).mockResolvedValue(smartCheckoutResult);
+      (createBlockchainDataInstance as jest.Mock).mockReturnValue({
+        getToken: jest.fn().mockResolvedValue({
+          result: {
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            root_contract_address: INDEXER_ETH_ROOT_CONTRACT_ADDRESS,
+          },
+        }),
+      });
       (createOrderbookInstance as jest.Mock).mockReturnValue({
         getListing: jest.fn().mockResolvedValue({
           result: {
@@ -414,6 +423,14 @@ describe('buy', () => {
         });
 
         (smartCheckout as jest.Mock).mockResolvedValue(smartCheckoutResult);
+        (createBlockchainDataInstance as jest.Mock).mockReturnValue({
+          getToken: jest.fn().mockResolvedValue({
+            result: {
+              // eslint-disable-next-line @typescript-eslint/naming-convention
+              root_contract_address: INDEXER_ETH_ROOT_CONTRACT_ADDRESS,
+            },
+          }),
+        });
         (createOrderbookInstance as jest.Mock).mockReturnValue({
           getListing: jest.fn().mockResolvedValue({
             result: {
@@ -1553,7 +1570,13 @@ describe('buy', () => {
           }),
           fulfillOrder: fulfillOrderMock,
         });
-
+        (createBlockchainDataInstance as jest.Mock).mockReturnValue({
+          getToken: jest.fn().mockResolvedValue({
+            result: {
+              decimals: 6,
+            },
+          }),
+        });
         (signApprovalTransactions as jest.Mock).mockResolvedValue({
           type: SignTransactionStatusType.SUCCESS,
         });

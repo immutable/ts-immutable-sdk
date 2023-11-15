@@ -4,9 +4,8 @@ import {
   useCallback,
   useContext, useEffect, useMemo, useState,
 } from 'react';
-import { GasEstimateType } from '@imtbl/checkout-sdk';
+import { GasEstimateType, IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
 import { utils } from 'ethers';
-import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -193,7 +192,12 @@ export function WalletBalances() {
       // the UX -- e.g. show top up ETH view if needed.
       bridgeToL2GasCheck();
     })();
-  }, [checkout, walletAddress, network?.chainId, conversions]);
+  }, [
+    checkout,
+    walletAddress,
+    network?.chainId,
+    conversions?.size,
+  ]);
 
   const showAddCoins = useMemo(() => {
     if (!checkout) return false;

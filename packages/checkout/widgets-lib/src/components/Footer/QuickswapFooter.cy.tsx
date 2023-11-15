@@ -1,7 +1,7 @@
 import { onDarkBase, onLightBase } from '@biom3/design-tokens';
 import { BiomeCombinedProviders } from '@biom3/react';
 import { mount } from 'cypress/react18';
-import { WidgetTheme } from '@imtbl/checkout-widgets';
+import { WidgetTheme } from '@imtbl/checkout-sdk';
 import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
 import { cySmartGet } from '../../lib/testUtils';
 import { QuickswapFooter } from './QuickswapFooter';

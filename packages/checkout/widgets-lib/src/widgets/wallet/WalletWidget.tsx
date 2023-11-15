@@ -2,7 +2,7 @@ import { BiomeCombinedProviders } from '@biom3/react';
 import {
   useContext, useEffect, useMemo, useReducer,
 } from 'react';
-import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
+import { IMTBLWidgetEvents, WalletWidgetParams } from '@imtbl/checkout-sdk';
 import {
   initialWalletState,
   WalletActions,
@@ -31,11 +31,11 @@ import { text } from '../../resources/text/textConfig';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { widgetTheme } from '../../lib/theme';
 
-export interface WalletWidgetProps {
-  config: StrongCheckoutWidgetsConfig;
-}
+export type WalletWidgetInputs = WalletWidgetParams & {
+  config: StrongCheckoutWidgetsConfig
+};
 
-export function WalletWidget(props: WalletWidgetProps) {
+export function WalletWidget(props: WalletWidgetInputs) {
   const errorActionText = text.views[SharedViews.ERROR_VIEW].actionText;
   const loadingText = text.views[SharedViews.LOADING_VIEW].text;
   const {

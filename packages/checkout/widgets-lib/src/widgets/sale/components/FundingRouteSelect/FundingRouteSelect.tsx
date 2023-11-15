@@ -1,4 +1,5 @@
 import {
+  Body,
   Box,
   Button, Heading,
 } from '@biom3/react';
@@ -15,6 +16,9 @@ import { ViewActions, ViewContext } from '../../../../context/view-context/ViewC
 import { FundingRouteMenuItem } from '../FundingRouteMenuItem/FundingRouteMenuItem';
 import { FundingRouteDrawer } from '../FundingRouteSelectDrawer/FundingRouteDrawer';
 import { PurchaseMenuItem } from '../PurchaseMenuItem/PurchaseMenuItem';
+import { text } from '../../../../resources/text/textConfig';
+import { sendSaleWidgetCloseEvent } from '../../SaleWidgetEvents';
+import { EventTargetContext } from '../../../../context/event-target-context/EventTargetContext';
 
 type FundingRouteSelectProps = {
   fundingRoutes: FundingRoute[];
@@ -22,9 +26,11 @@ type FundingRouteSelectProps = {
 };
 
 export function FundingRouteSelect({ fundingRoutes, onFundingRouteSelected }: FundingRouteSelectProps) {
+  const textConfig = text.views[SaleWidgetViews.FUND_WITH_SMART_CHECKOUT];
   const [smartCheckoutDrawerVisible, setSmartCheckoutDrawerVisible] = useState(false);
   const [activeFundingRouteIndex, setActiveFundingRouteIndex] = useState(0);
   const { viewDispatch } = useContext(ViewContext);
+  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const onClickContinue = () => {
     onFundingRouteSelected(fundingRoutes[activeFundingRouteIndex]);
@@ -51,7 +57,7 @@ export function FundingRouteSelect({ fundingRoutes, onFundingRouteSelected }: Fu
   return (
     <SimpleLayout
       testId="funding-route-select"
-      header={<HeaderNavigation onCloseButtonClick={() => {}} />}
+      header={<HeaderNavigation onCloseButtonClick={() => sendSaleWidgetCloseEvent(eventTarget)} />}
       footer={<FooterLogo />}
     >
 
@@ -65,36 +71,38 @@ export function FundingRouteSelect({ fundingRoutes, onFundingRouteSelected }: Fu
           height: '100%',
         }}
       >
+
         <Heading size="small">
-          Pay with your
+          {textConfig.fundingRouteSelect.heading}
         </Heading>
 
         {fundingRoutes.length === 0
-          ? (
-            <Heading size="small">
-              No funding routes available
-            </Heading>
-          )
-          : (
+          ? [
+            <Body key="noRoutesAvailableText" size="small">
+              {textConfig.fundingRouteSelect.noRoutesAvailable}
+            </Body>,
+            <Button key="payWithCardButton" variant="tertiary">
+              {textConfig.fundingRouteSelect.payWithCard}
+            </Button>,
+          ]
+          : [
             <FundingRouteMenuItem
               data-testid="funding-route-select-selected-route"
               onClick={fundingRoutes.length > 1 ? onSmartCheckoutDropdownClick : () => {}}
               fundingRoute={fundingRoutes[activeFundingRouteIndex]}
               selected
               toggleVisible={fundingRoutes.length > 1}
-            />
-          ) }
+              key="selectedFundingRouteMenuItem"
+            />,
+            <PurchaseMenuItem key="purchaseMenuItem" fundingRoute={fundingRoutes[activeFundingRouteIndex]} />,
+            <Button key="continueButton" sx={{ mt: 'auto' }} variant="primary" onClick={onClickContinue}>
+              {textConfig.fundingRouteSelect.continue}
+            </Button>,
+            <Button key="payWithCardButton" variant="tertiary">
+              {textConfig.fundingRouteSelect.payWithCardInstead}
+            </Button>,
+          ] }
 
-        <PurchaseMenuItem />
-
-        <Button sx={{ mt: 'auto' }} variant="primary" onClick={onClickContinue}>
-          {/* {options.continue.text} */}
-          continue
-        </Button>
-        <Button variant="tertiary">
-          {/* {options.payWithCard.text} */}
-          pay with card
-        </Button>
       </Box>
       <FundingRouteDrawer
         visible={smartCheckoutDrawerVisible}

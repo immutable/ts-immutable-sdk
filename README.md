@@ -18,6 +18,7 @@ Table of contents
     - [Link packages to each other](#link-packages-to-each-other)
     - [Generate OpenAPI clients](#generate-openapi-clients)
     - [Building](#building)
+    - [API key and Publishable key](#API-key-and-Publishable-key)
     - [Linting](#linting)
       - [ESLint Tooling](#eslint-tooling)
       - [Exclude Lists](#exclude-lists)
@@ -120,6 +121,51 @@ If you run out of memory, set NODE_OPTIONS to limit Node's use of memory (this a
 ```sh
 export NODE_OPTIONS=--max-old-space-size=14366
 ```
+
+### API key and Publishable key
+
+You can mark the API key and/or publishable key as required fields or remove them from your SDK configuration:
+```ts
+// We use checkout sdk as an example.
+export interface CheckoutOverrides {
+  // The below marks CheckoutModuleConfiguration to have publishableKey field required and apiKey field omitted.
+  apiKey: "omit";
+  publishableKey: "required";
+}
+export interface CheckoutModuleConfiguration extends ModuleConfiguration<CheckoutOverrides> {}
+```
+
+`Api key` and `Publishable key` are meant to be added to request headers. 
+
+For `Api key`, it's done automatically by generated client. No action required.
+
+For `Publishable key`, we can do the following:
+
+```ts
+export class Checkout {
+  constructor(
+    config: CheckoutModuleConfiguration,
+  ) {
+    // imported from '@imtbl/config', addPublishableKeyToAxiosHeader
+    // adds x-immutable-publishable-key header to all axios requests
+    addPublishableKeyToAxiosHeader(config.baseConfig.publishableKey); 
+
+    // You can also remove these headers.
+    axios.defaults.headers.common['x-immutable-publishable-key'] = undefined;
+
+    // Or apply them to particular request methods
+    axios.defaults.headers.delete['x-immutable-publishable-key'] = undefined;
+
+    // Or you can save the config in the instance of this class and reference them in individual methods.
+  }
+}
+```
+
+> **Warning**
+> Please make sure your sdk still works properly after the step above. Because extra headers may make your request invalid in the infrastructure you use. e.g. cloudfront.
+
+#### Publishable key usage data
+Publishable key usage will be available in segment under event source `Onboarding - API - ${Dev|Sandbox|Prod}`. You can set up event destination (data lake/looker) together with appropriate filters to surface endpoint usages called by your sdk.
 
 ### Linting
 

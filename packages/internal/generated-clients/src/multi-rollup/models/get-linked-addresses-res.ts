@@ -25,6 +25,6 @@ export interface GetLinkedAddressesRes {
      * @type {Array<string>}
      * @memberof GetLinkedAddressesRes
      */
-    'linkedAddresses': Array<string>;
+    'linked_addresses': Array<string>;
 }
 

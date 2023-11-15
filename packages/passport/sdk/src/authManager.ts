@@ -9,12 +9,12 @@ import axios from 'axios';
 import DeviceCredentialsManager from 'storage/device_credentials_manager';
 import * as crypto from 'crypto';
 import jwt_decode from 'jwt-decode';
-import { isTokenExpired } from './token';
+import { isTokenExpired } from './utils/token';
 import { PassportErrorType, withPassportError } from './errors/passportError';
 import {
   PassportMetadata,
   User,
-  DeviceCodeReponse,
+  DeviceCodeResponse,
   DeviceConnectResponse,
   DeviceTokenResponse,
   DeviceErrorResponse,
@@ -106,9 +106,9 @@ export default class AuthManager {
     };
     if (passport?.imx_eth_address) {
       user.imx = {
-        ethAddress: passport?.imx_eth_address,
-        starkAddress: passport?.imx_stark_address,
-        userAdminAddress: passport?.imx_user_admin_address,
+        ethAddress: passport.imx_eth_address,
+        starkAddress: passport.imx_stark_address,
+        userAdminAddress: passport.imx_user_admin_address,
       };
     }
     if (passport?.zkevm_eth_address) {
@@ -132,11 +132,11 @@ export default class AuthManager {
         nickname: idTokenPayload.nickname,
       },
     };
-    if (idTokenPayload?.passport?.imx_eth_address) {
+    if (idTokenPayload?.passport.imx_eth_address) {
       user.imx = {
-        ethAddress: idTokenPayload?.passport?.imx_eth_address,
-        starkAddress: idTokenPayload?.passport?.imx_stark_address,
-        userAdminAddress: idTokenPayload?.passport?.imx_user_admin_address,
+        ethAddress: idTokenPayload.passport.imx_eth_address,
+        starkAddress: idTokenPayload.passport.imx_stark_address,
+        userAdminAddress: idTokenPayload.passport.imx_user_admin_address,
       };
     }
     if (idTokenPayload?.passport?.zkevm_eth_address) {
@@ -168,7 +168,7 @@ export default class AuthManager {
 
   public async loginWithDeviceFlow(): Promise<DeviceConnectResponse> {
     return withPassportError<DeviceConnectResponse>(async () => {
-      const response = await axios.post<DeviceCodeReponse>(
+      const response = await axios.post<DeviceCodeResponse>(
         `${this.config.authenticationDomain}/oauth/device/code`,
         {
           client_id: this.config.oidcConfiguration.clientId,

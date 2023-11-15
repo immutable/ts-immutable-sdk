@@ -2,7 +2,7 @@ import { Box } from '@biom3/react';
 import {
   useContext, useEffect, useMemo, useState,
 } from 'react';
-import { WidgetTheme } from '@imtbl/checkout-widgets';
+import { WidgetTheme } from '@imtbl/checkout-sdk';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { QuickswapFooter } from '../../../components/Footer/QuickswapFooter';

@@ -4,8 +4,9 @@ import {
 } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import {
+  BridgeWidgetParams,
   ChainId,
-  Checkout, CheckoutErrorType, GasEstimateType, TokenAmountEstimate,
+  Checkout, CheckoutErrorType, GasEstimateType, TokenAmountEstimate, WidgetTheme,
 } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
@@ -13,12 +14,9 @@ import { CompletionStatus, TokenBridge } from '@imtbl/bridge-sdk';
 import { BiomeCombinedProviders } from '@biom3/react';
 import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
-import {
-  BridgeWidget,
-  BridgeWidgetParams,
-} from './BridgeWidget';
+import { BridgeWidget } from './BridgeWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { IMX_ADDRESS_ZKEVM, WidgetTheme } from '../../lib';
+import { IMX_ADDRESS_ZKEVM } from '../../lib';
 import { text } from '../../resources/text/textConfig';
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
 import { ConnectionStatus } from '../../context/connect-loader-context/ConnectLoaderContext';
@@ -222,7 +220,7 @@ describe('Bridge Widget tests', () => {
         >
           <BridgeWidget
             config={config}
-            params={params}
+            {...params}
           />
         </ConnectLoaderTestComponent>,
       );
@@ -260,7 +258,7 @@ describe('Bridge Widget tests', () => {
         >
           <BridgeWidget
             config={config}
-            params={params}
+            {...params}
           />
         </ConnectLoaderTestComponent>,
       );
@@ -298,7 +296,7 @@ describe('Bridge Widget tests', () => {
         >
           <BridgeWidget
             config={config}
-            params={params}
+            {...params}
           />
         </ConnectLoaderTestComponent>,
       );
@@ -318,7 +316,7 @@ describe('Bridge Widget tests', () => {
         >
           <BridgeWidget
             config={config}
-            params={params}
+            {...params}
           />
         </ConnectLoaderTestComponent>,
       );
@@ -399,7 +397,7 @@ describe('Bridge Widget tests', () => {
               isSwapEnabled: true,
               isOnRampEnabled: true,
             }}
-            params={params}
+            {...params}
           />
         </ConnectLoaderTestComponent>,
       );
@@ -478,7 +476,7 @@ describe('Bridge Widget tests', () => {
                 isSwapEnabled: true,
                 isOnRampEnabled: true,
               }}
-              params={params}
+              {...params}
             />
           </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
@@ -529,7 +527,7 @@ describe('Bridge Widget tests', () => {
                 isSwapEnabled: true,
                 isOnRampEnabled: true,
               }}
-              params={params}
+              {...params}
             />
           </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
@@ -586,7 +584,7 @@ describe('Bridge Widget tests', () => {
                 isSwapEnabled: true,
                 isOnRampEnabled: true,
               }}
-              params={params}
+              {...params}
             />
           </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
@@ -640,7 +638,7 @@ describe('Bridge Widget tests', () => {
                 isSwapEnabled: true,
                 isOnRampEnabled: true,
               }}
-              params={params}
+              {...params}
             />
           </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
@@ -694,7 +692,7 @@ describe('Bridge Widget tests', () => {
                 isSwapEnabled: true,
                 isOnRampEnabled: true,
               }}
-              params={params}
+              {...params}
             />
           </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,

@@ -123,7 +123,7 @@ describe('quoteFetcher', () => {
   });
 
   beforeEach(() => {
-    jest.spyOn(console, 'debug').mockImplementation(() => {});
+    jest.spyOn(console, 'info').mockImplementation(() => {});
   });
 
   it('should fetch quotes', async () => {

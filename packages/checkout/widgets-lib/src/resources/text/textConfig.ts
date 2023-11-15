@@ -325,6 +325,20 @@ export const text = {
       loading: {
         checkingBalances: 'Crunching numbers',
       },
+      currency: {
+        usdEstimate: '≈ USD $',
+        fees: 'Fees',
+      },
+      fundingRouteDrawer: {
+        header: 'Available balance',
+      },
+      fundingRouteSelect: {
+        heading: 'Pay with your',
+        noRoutesAvailable: 'Insufficient coin balance. Please proceed with card instead.',
+        continue: 'Continue',
+        payWithCardInstead: "No thanks, I'll pay with card",
+        payWithCard: 'Pay with card',
+      },
     },
     [SaleWidgetViews.PAYMENT_METHODS]: {
       header: {
@@ -400,6 +414,12 @@ export const text = {
         [SaleErrorTypes.SMART_CHECKOUT_ERROR]: {
           description:
             'Unable to check your wallets balance. Please try again.',
+          primaryAction: 'Try again',
+          secondaryAction: 'Cancel',
+        },
+        [SaleErrorTypes.SMART_CHECKOUT_EXECUTE_ERROR]: {
+          description:
+            'Sorry, something went wrong while moving funds. Please try again.',
           primaryAction: 'Try again',
           secondaryAction: 'Cancel',
         },

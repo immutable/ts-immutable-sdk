@@ -40,7 +40,8 @@ export function NotEnoughImx({
             imageUrl={imxLogo}
             circularFrame
             sx={{
-              height: '100px',
+              height: '110px',
+              width: '64px',
             }}
           />
           <Heading

@@ -6,26 +6,34 @@ import {
   useMemo, useRef, useState,
 } from 'react';
 import {
-  FundWithSmartCheckoutSubViews, SaleWidgetViews,
+  FundWithSmartCheckoutSubViews,
+  SaleWidgetViews,
 } from '../../../context/view-context/SaleViewContextTypes';
 import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
-import { text as textConfig } from '../../../resources/text/textConfig';
+import { text } from '../../../resources/text/textConfig';
 import { LoadingView } from '../../../views/loading/LoadingView';
 import { FundingRouteExecute } from '../components/FundingRouteExecute/FundingRouteExecute';
 import { FundingRouteSelect } from '../components/FundingRouteSelect/FundingRouteSelect';
 import { useSaleContext } from '../context/SaleContextProvider';
+import { useSaleEvent } from '../hooks/useSaleEvents';
+import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
+import { smartCheckoutTokensList } from '../functions/smartCheckoutUtils';
 
 type FundWithSmartCheckoutProps = {
   subView: FundWithSmartCheckoutSubViews;
 };
 
 export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
+  const { sendPageView } = useSaleEvent();
   const { viewDispatch } = useContext(ViewContext);
-  const [selectedFundingRoute, setSelectedFundingRoute] = useState<FundingRoute | undefined>(undefined);
+  const [selectedFundingRoute, setSelectedFundingRoute] = useState<
+  FundingRoute | undefined
+  >(undefined);
   const [fundingRouteStepIndex, setFundingRouteStepIndex] = useState<number>(0);
-  const text = textConfig.views[SaleWidgetViews.FUND_WITH_SMART_CHECKOUT];
+  const textConfig = text.views[SaleWidgetViews.FUND_WITH_SMART_CHECKOUT];
 
-  const { querySmartCheckout, fundingRoutes } = useSaleContext();
+  const { querySmartCheckout, fundingRoutes, smartCheckoutResult } = useSaleContext();
+  const { cryptoFiatDispatch } = useContext(CryptoFiatContext);
 
   const smartCheckoutLoading = useRef(false);
 
@@ -43,6 +51,19 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
       }
     }
   }, [subView]);
+
+  useEffect(() => {
+    if (!cryptoFiatDispatch || !smartCheckoutResult) return;
+
+    const tokenSymbols = smartCheckoutTokensList(smartCheckoutResult);
+
+    cryptoFiatDispatch({
+      payload: {
+        type: CryptoFiatActions.SET_TOKEN_SYMBOLS,
+        tokenSymbols,
+      },
+    });
+  }, [cryptoFiatDispatch, smartCheckoutResult]);
 
   const fundingRouteStep = useMemo(() => {
     if (!selectedFundingRoute) {
@@ -73,18 +94,26 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
     }
   };
 
+  useEffect(
+    () => sendPageView(SaleWidgetViews.FUND_WITH_SMART_CHECKOUT, {
+      subView,
+      ...(!!fundingRouteStep && { fundingStep: fundingRouteStep.type }),
+    }),
+    [],
+  );
+
   return (
     <Box>
-      { subView === FundWithSmartCheckoutSubViews.INIT && (
-        <LoadingView loadingText={text.loading.checkingBalances} />
+      {subView === FundWithSmartCheckoutSubViews.INIT && (
+        <LoadingView loadingText={textConfig.loading.checkingBalances} />
       )}
-      { subView === FundWithSmartCheckoutSubViews.FUNDING_ROUTE_SELECT && (
+      {subView === FundWithSmartCheckoutSubViews.FUNDING_ROUTE_SELECT && (
         <FundingRouteSelect
           onFundingRouteSelected={onFundingRouteSelected}
           fundingRoutes={fundingRoutes}
         />
       )}
-      { subView === FundWithSmartCheckoutSubViews.FUNDING_ROUTE_EXECUTE && (
+      {subView === FundWithSmartCheckoutSubViews.FUNDING_ROUTE_EXECUTE && (
         <FundingRouteExecute
           onFundingRouteExecuted={onFundingRouteExecuted}
           fundingRouteStep={fundingRouteStep}

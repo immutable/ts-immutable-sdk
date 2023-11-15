@@ -2,17 +2,17 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
-import reportWebVitals from './reportWebVitals';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import ConnectUI from './components/ui/connect/connect';
 import WalletUI from './components/ui/wallet/wallet';
 import SwapUI from './components/ui/swap/swap';
 import BridgeUI from './components/ui/bridge/bridge';
-import { Marketplace } from './components/ui/marketplace-orchestrator';
-import { BiomeCombinedProviders } from '@biom3/react';
-import { onDarkBase } from '@biom3/design-tokens';
-import { PassportLoginCallback } from './components/ui/marketplace-orchestrator/PassportLoginCallback';
 import OnRampUI from "./components/ui/on-ramp/onRamp";
+import { BiomeCombinedProviders } from '@biom3/react';
+import { PassportLoginCallback } from './components/ui/marketplace-orchestrator/PassportLoginCallback';
+import { Marketplace } from './components/ui/marketplace-orchestrator';
+import { onDarkBase } from '@biom3/design-tokens';
+import { SaleUI } from './components/ui/sale/sale';
 
 const router = createBrowserRouter([
   {
@@ -40,6 +40,10 @@ const router = createBrowserRouter([
     element: <OnRampUI />,
   },
   {
+    path: '/sale',
+    element: <SaleUI />,
+  },
+  {
     path: '/marketplace-orchestrator',
     element: <BiomeCombinedProviders theme={{base: onDarkBase}}><Marketplace /></BiomeCombinedProviders>,
   },
@@ -57,8 +61,3 @@ root.render(
     <RouterProvider router={router} />
   </React.StrictMode>
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();

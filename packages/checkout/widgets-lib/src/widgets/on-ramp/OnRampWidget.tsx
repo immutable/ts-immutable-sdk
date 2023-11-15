@@ -3,9 +3,8 @@ import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
   useContext, useEffect, useMemo, useReducer, useState,
 } from 'react';
-import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
-import { Passport } from '@imtbl/passport';
-import { IMX_ADDRESS_ZKEVM, NATIVE, WidgetTheme } from '../../lib';
+import { IMTBLWidgetEvents, OnRampWidgetParams, WidgetTheme } from '@imtbl/checkout-sdk';
+import { IMX_ADDRESS_ZKEVM, NATIVE } from '../../lib';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
   SharedViews,
@@ -27,21 +26,13 @@ import { StatusView } from '../../components/Status/StatusView';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { OrderInProgress } from './views/OrderInProgress';
 
-export interface OnRampWidgetProps {
-  // eslint-disable-next-line react/no-unused-prop-types
-  params: OnRampWidgetParams;
-  config: StrongCheckoutWidgetsConfig;
-}
+export type OnRampWidgetInputs = OnRampWidgetParams & {
+  config: StrongCheckoutWidgetsConfig
+};
 
-export interface OnRampWidgetParams {
-  amount?: string;
-  contractAddress?: string;
-  passport?: Passport;
-}
-
-export function OnRampWidget(props: OnRampWidgetProps) {
-  const { config, params } = props;
-  const { passport, amount, contractAddress } = params;
+export function OnRampWidget({
+  amount, contractAddress, config,
+}: OnRampWidgetInputs) {
   const {
     theme, isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
   } = config;
@@ -145,7 +136,7 @@ export function OnRampWidget(props: OnRampWidgetProps) {
         && viewState.view.type !== OnRampWidgetViews.FAIL
         ) && (
         <OnRampMain
-          passport={passport}
+          passport={checkout?.passport}
           showIframe={showIframe}
           tokenAmount={viewState.view.data?.amount ?? amount}
           tokenAddress={

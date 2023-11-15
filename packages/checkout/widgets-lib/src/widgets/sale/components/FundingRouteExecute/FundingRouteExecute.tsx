@@ -1,7 +1,19 @@
-import { FundingStep, FundingStepType } from '@imtbl/checkout-sdk';
 import {
-  BridgeEventType, ConnectEventType, ConnectionSuccess, IMTBLWidgetEvents, SwapEventType,
-} from '@imtbl/checkout-widgets';
+  FundingStep,
+  FundingStepType,
+  BridgeEventType,
+  BridgeFailed,
+  BridgeSuccess,
+  BridgeWidgetParams,
+  ConnectEventType,
+  ConnectionSuccess,
+  ConnectTargetLayer,
+  IMTBLWidgetEvents,
+  SwapEventType,
+  SwapFailed,
+  SwapSuccess,
+  SwapWidgetParams,
+} from '@imtbl/checkout-sdk';
 import {
   useCallback,
   useContext,
@@ -16,13 +28,15 @@ import {
 } from '../../../../context/event-target-context/EventTargetContext';
 import { ConnectWidgetViews } from '../../../../context/view-context/ConnectViewContextTypes';
 import { SaleWidgetViews } from '../../../../context/view-context/SaleViewContextTypes';
-import { ConnectTargetLayer, getL1ChainId, getL2ChainId } from '../../../../lib/networkUtils';
+import { ViewActions, ViewContext } from '../../../../context/view-context/ViewContext';
+import { getL1ChainId, getL2ChainId } from '../../../../lib/networkUtils';
 import { text as textConfig } from '../../../../resources/text/textConfig';
 import { LoadingView } from '../../../../views/loading/LoadingView';
-import { BridgeWidget, BridgeWidgetParams } from '../../../bridge/BridgeWidget';
+import { BridgeWidget } from '../../../bridge/BridgeWidget';
 import { ConnectWidget } from '../../../connect/ConnectWidget';
-import { SwapWidget, SwapWidgetParams } from '../../../swap/SwapWidget';
+import { SwapWidget } from '../../../swap/SwapWidget';
 import { useSaleContext } from '../../context/SaleContextProvider';
+import { SaleErrorTypes } from '../../types';
 
 type FundingRouteExecuteProps = {
   fundingRouteStep?: FundingStep;
@@ -41,6 +55,7 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
   const {
     config, provider, checkout, fromContractAddress: requiredTokenAddress,
   } = useSaleContext();
+  const { viewDispatch } = useContext(ViewContext);
 
   const { connectLoaderDispatch } = useContext(ConnectLoaderContext);
   const text = textConfig.views[SaleWidgetViews.FUND_WITH_SMART_CHECKOUT];
@@ -51,25 +66,44 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
   const [view, setView] = useState<FundingRouteExecuteViews>(FundingRouteExecuteViews.LOADING);
   const nextView = useRef<FundingRouteExecuteViews | false>(false);
 
+  const stepSuccess = useRef<BridgeSuccess | SwapSuccess | undefined>(undefined);
+  const stepFailed = useRef<BridgeFailed | SwapFailed | undefined>(undefined);
+
   const [eventTargetState, eventTargetDispatch] = useReducer(eventTargetReducer, initialEventTargetState);
   const eventTargetReducerValues = useMemo(() => (
     { eventTargetState, eventTargetDispatch }), [eventTargetState, eventTargetDispatch]);
   const eventTarget = new EventTarget();
 
+  const sendFailEvent = (errorData?: any) => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: SaleWidgetViews.SALE_FAIL,
+          data: {
+            errorType: SaleErrorTypes.SMART_CHECKOUT_EXECUTE_ERROR,
+            errorData,
+          },
+        },
+      },
+    });
+  };
+
   const handleStep = useCallback(async (step: FundingStep) => {
     if (!checkout || !provider) {
-      return;
+      throw new Error('checkout or provider not available.');
     }
+
     const network = await checkout.getNetworkInfo({
       provider,
     });
 
     if (step.type === FundingStepType.BRIDGE) {
+      setBridgeParams({
+        fromContractAddress: step.fundingItem.token.address,
+        amount: step.fundingItem.fundsRequired.formattedAmount,
+      });
       if (network.chainId === getL1ChainId(checkout!.config)) {
-        setBridgeParams({
-          fromContractAddress: step.fundingItem.token.address,
-          amount: step.fundingItem.fundsRequired.formattedAmount,
-        });
         setView(FundingRouteExecuteViews.EXECUTE_BRIDGE);
         return;
       }
@@ -78,13 +112,12 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
       setView(FundingRouteExecuteViews.SWITCH_NETWORK_ETH);
     }
     if (step.type === FundingStepType.SWAP) {
+      setSwapParams({
+        amount: step.fundingItem.fundsRequired.formattedAmount,
+        fromContractAddress: step.fundingItem.token.address,
+        toContractAddress: requiredTokenAddress,
+      });
       if (network.chainId === getL2ChainId(checkout!.config)) {
-        setSwapParams({
-          amount: step.fundingItem.fundsRequired.formattedAmount,
-          fromContractAddress: step.fundingItem.token.address,
-          toContractAddress: requiredTokenAddress,
-        });
-
         setView(FundingRouteExecuteViews.EXECUTE_SWAP);
         return;
       }
@@ -98,44 +131,48 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
     if (!fundingRouteStep) {
       return;
     }
-    handleStep(fundingRouteStep);
+    try {
+      handleStep(fundingRouteStep);
+    } catch (err) {
+      sendFailEvent(err);
+    }
   }, [fundingRouteStep]);
+
+  const onCloseWidget = () => {
+    // Need to check SUCCESS first, as it's possible for widget to emit both FAILED and SUCCESS.
+    if (stepSuccess.current) {
+      stepSuccess.current = undefined;
+      stepFailed.current = undefined;
+      onFundingRouteExecuted();
+    } else {
+      sendFailEvent(stepFailed.current);
+    }
+  };
 
   const handleCustomEvent = (event) => {
     switch (event.detail.type) {
-      case BridgeEventType.SUCCESS: {
-        // ! Need to clarify behaviour here - wait for user to click or automatically move them on.
-        setTimeout(() => {
-          onFundingRouteExecuted();
-        }, 1000);
-        break;
-      }
-      case BridgeEventType.FAILURE: {
-        // const eventData = event.detail.data as BridgeFailed;
-        break;
-      }
-      case BridgeEventType.CLOSE_WIDGET: {
-        break;
-      }
+      case BridgeEventType.SUCCESS:
       case SwapEventType.SUCCESS: {
-        // const eventData = event.detail.data as SwapSuccess;
-        setTimeout(() => {
-          onFundingRouteExecuted();
-        }, 1000);
+        const successEvent = event.detail.data as (SwapSuccess | BridgeSuccess);
+        stepSuccess.current = successEvent;
         break;
       }
+      case BridgeEventType.FAILURE:
       case SwapEventType.FAILURE: {
-        // const eventData = event.detail.data as SwapFailed;
+        // On FAILURE, widget will prompt user to try again.
+        // We need to know if it failed though when they close the widget
+        const failureEvent = event.detail.data as (SwapFailed | BridgeFailed);
+        stepFailed.current = failureEvent;
         break;
       }
-      case SwapEventType.REJECTED: {
-        // const eventData = event.detail.data as SwapRejected;
-        break;
-      }
+      case BridgeEventType.CLOSE_WIDGET:
       case SwapEventType.CLOSE_WIDGET: {
+        onCloseWidget();
         break;
       }
+      case SwapEventType.REJECTED:
       default:
+        // Widgets internally handle all other than SUCCESS | FAILURE | CLOSE_WIDGET
         break;
     }
   };
@@ -156,9 +193,11 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
         }
         break;
       }
+      case ConnectEventType.FAILURE:
+      case ConnectEventType.CLOSE_WIDGET:
       default:
-        // eslint-disable-next-line no-console
-        console.log('invalid event');
+        onCloseWidget();
+        break;
     }
   };
 
@@ -189,36 +228,36 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
 
   return (
     <EventTargetContext.Provider value={eventTargetReducerValues}>
-      { view === FundingRouteExecuteViews.LOADING && (
+      {view === FundingRouteExecuteViews.LOADING && (
         <LoadingView loadingText={text.loading.checkingBalances} />
       )}
-      { view === FundingRouteExecuteViews.EXECUTE_BRIDGE && (
+      {view === FundingRouteExecuteViews.EXECUTE_BRIDGE && (
         <BridgeWidget
-          params={bridgeParams!}
+          {...bridgeParams!}
           config={config}
         />
       )}
-      { view === FundingRouteExecuteViews.EXECUTE_SWAP && (
+      {view === FundingRouteExecuteViews.EXECUTE_SWAP && (
         <SwapWidget
-          params={swapParams!}
+          {...swapParams!}
           config={config}
         />
       )}
-      { view === FundingRouteExecuteViews.SWITCH_NETWORK_ETH && (
+      {view === FundingRouteExecuteViews.SWITCH_NETWORK_ETH && (
         <ConnectWidget
           config={config}
-          params={{
-            targetLayer: ConnectTargetLayer.LAYER1, web3Provider: provider,
-          }}
+          targetLayer={ConnectTargetLayer.LAYER1}
+          web3Provider={provider}
+          checkout={checkout!}
           deepLink={ConnectWidgetViews.SWITCH_NETWORK}
         />
       )}
-      { view === FundingRouteExecuteViews.SWITCH_NETWORK_ZKEVM && (
+      {view === FundingRouteExecuteViews.SWITCH_NETWORK_ZKEVM && (
         <ConnectWidget
           config={config}
-          params={{
-            targetLayer: ConnectTargetLayer.LAYER2, web3Provider: provider,
-          }}
+          targetLayer={ConnectTargetLayer.LAYER2}
+          web3Provider={provider}
+          checkout={checkout!}
           deepLink={ConnectWidgetViews.SWITCH_NETWORK}
         />
       )}

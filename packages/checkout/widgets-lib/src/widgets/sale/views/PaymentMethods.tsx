@@ -1,7 +1,6 @@
 import { Banner, Box, Heading } from '@biom3/react';
 import { useContext, useEffect } from 'react';
 
-import { RoutingOutcomeType } from '@imtbl/checkout-sdk';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -14,24 +13,27 @@ import {
   ViewContext,
 } from '../../../context/view-context/ViewContext';
 
-import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
-import { sendSaleWidgetCloseEvent } from '../SaleWidgetEvents';
 import { PaymentOptions } from '../components/PaymentOptions';
 
 import { useSaleContext } from '../context/SaleContextProvider';
+import { useSaleEvent } from '../hooks/useSaleEvents';
 import { PaymentTypes } from '../types';
 
 export function PaymentMethods() {
   const text = { methods: textConfig.views[SaleWidgetViews.PAYMENT_METHODS] };
   const { viewState, viewDispatch } = useContext(ViewContext);
-  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
   const {
-    paymentMethod, setPaymentMethod, sign, smartCheckoutResult,
+    paymentMethod, setPaymentMethod, sign, disabledPaymentTypes,
   } = useSaleContext();
+  const { sendPageView, sendCloseEvent, sendSelectedPaymentMethod } = useSaleEvent();
 
   const handleOptionClick = (type: PaymentTypes) => setPaymentMethod(type);
 
   useEffect(() => {
+    if (paymentMethod) {
+      sendSelectedPaymentMethod(paymentMethod, SaleWidgetViews.PAYMENT_METHODS);
+    }
+
     if (paymentMethod === PaymentTypes.FIAT) {
       sign(paymentMethod, () => {
         viewDispatch({
@@ -79,29 +81,19 @@ export function PaymentMethods() {
     </Box>
   );
 
-  const disabledOptions = () => {
-    if (smartCheckoutResult?.sufficient) {
-      return [];
-    }
-    if (smartCheckoutResult?.router.routingOutcome.type === RoutingOutcomeType.NO_ROUTES_FOUND
-      || smartCheckoutResult?.router.routingOutcome.type === RoutingOutcomeType.NO_ROUTE_OPTIONS) {
-      return [PaymentTypes.CRYPTO];
-    }
-    return [];
-  };
+  useEffect(() => sendPageView(SaleWidgetViews.PAYMENT_METHODS), []);
 
   return (
     <SimpleLayout
       testId="payment-methods"
       header={(
         <HeaderNavigation
-          onCloseButtonClick={() => sendSaleWidgetCloseEvent(eventTarget)}
+          onCloseButtonClick={() => sendCloseEvent(SaleWidgetViews.PAYMENT_METHODS)}
         />
       )}
       footer={<FooterLogo />}
     >
       <Box
-        id="payment-methods-content"
         sx={{
           display: 'flex',
           flexDirection: 'column',
@@ -119,7 +111,7 @@ export function PaymentMethods() {
           {text.methods.header.heading}
         </Heading>
         <Box sx={{ paddingX: 'base.spacing.x2' }}>
-          <PaymentOptions disabledOptions={disabledOptions()} onClick={handleOptionClick} />
+          <PaymentOptions disabledOptions={disabledPaymentTypes} onClick={handleOptionClick} />
         </Box>
         {viewState.view.data?.showInsufficientCoinsBanner ? insufficientCoinsBanner : null}
       </Box>

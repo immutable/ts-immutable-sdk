@@ -1,20 +1,21 @@
 {
   "compilerOptions": {
+    "outDir": "./dist",
+    "rootDirs": ["src"],
     "target": "es2022",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true,
     "module": "esnext",
     "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "allowJs": false,
+    "removeComments": false,
+    "strict": true,
+    "forceConsistentCasingInFileNames": false,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "declaration": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
   },
-  "include": ["src", "babel.config.js"]
+  "include": ["src", "test/__mocks__/window.ts"],
+  "exclude": ["node_modules", "dist", "test"]
 }

@@ -1,18 +1,18 @@
 import {
   IMTBLWidgetEvents,
+  OrchestrationEvent,
   OrchestrationEventType,
   RequestBridgeEvent,
   RequestOnrampEvent,
   RequestSwapEvent,
-  WidgetEvent,
-} from '@imtbl/checkout-widgets';
+} from '@imtbl/checkout-sdk';
 
 function sendRequestOnrampEvent(
   eventTarget: Window | EventTarget,
   imtblWidgetEvent: IMTBLWidgetEvents,
   eventData: RequestOnrampEvent,
 ) {
-  const requestOnrampEvent = new CustomEvent<WidgetEvent<RequestOnrampEvent>>(
+  const requestOnrampEvent = new CustomEvent<OrchestrationEvent<OrchestrationEventType.REQUEST_ONRAMP>>(
     imtblWidgetEvent,
     {
       detail: {
@@ -32,7 +32,7 @@ function sendRequestSwapEvent(
   imtblWidgetEvent: IMTBLWidgetEvents,
   eventData: RequestSwapEvent,
 ) {
-  const requestSwapEvent = new CustomEvent<WidgetEvent<RequestSwapEvent>>(
+  const requestSwapEvent = new CustomEvent<OrchestrationEvent<OrchestrationEventType.REQUEST_SWAP>>(
     imtblWidgetEvent,
     {
       detail: {
@@ -52,7 +52,8 @@ function sendRequestBridgeEvent(
   imtblWidgetEvent: IMTBLWidgetEvents,
   eventData: RequestBridgeEvent,
 ) {
-  const requestBridgeEvent = new CustomEvent<WidgetEvent<RequestBridgeEvent>>(imtblWidgetEvent, {
+  // eslint-disable-next-line max-len
+  const requestBridgeEvent = new CustomEvent<OrchestrationEvent<OrchestrationEventType.REQUEST_BRIDGE>>(imtblWidgetEvent, {
     detail: {
       type: OrchestrationEventType.REQUEST_BRIDGE,
       data: eventData,

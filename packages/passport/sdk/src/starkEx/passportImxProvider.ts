@@ -12,6 +12,7 @@ import {
   NftTransferDetails,
   RegisterUserResponse,
   StarkSigner,
+  EthSigner,
   TokenAmount,
   UnsignedExchangeTransferRequest,
   UnsignedOrderRequest,
@@ -19,9 +20,12 @@ import {
 } from '@imtbl/core-sdk';
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 import { IMXProvider } from '@imtbl/provider';
+import AuthManager from 'authManager';
+import TypedEventEmitter from 'utils/typedEventEmitter';
+import { Web3Provider } from '@ethersproject/providers';
 import GuardianClient from '../guardian/guardian';
 import {
-  PassportEventMap, PassportEvents, User, UserImx,
+  PassportEventMap, PassportEvents, UserImx, User, IMXSigners,
 } from '../types';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import {
@@ -29,63 +33,134 @@ import {
 } from './workflows';
 import { ConfirmationScreen } from '../confirmation';
 import { PassportConfiguration } from '../config';
-import TypedEventEmitter from '../typedEventEmitter';
-import AuthManager from '../authManager';
+import registerOffchain from './workflows/registerOffchain';
+import MagicAdapter from '../magicAdapter';
+import { getStarkSigner } from './getStarkSigner';
 
-export interface PassportImxProviderInput {
+export interface PassportImxProviderOptions {
   authManager: AuthManager;
-  starkSigner: StarkSigner;
   immutableXClient: ImmutableXClient;
   confirmationScreen: ConfirmationScreen;
   config: PassportConfiguration;
   passportEventEmitter: TypedEventEmitter<PassportEventMap>;
+  magicAdapter: MagicAdapter;
 }
 
-type AuthenticatedUserSigner = {
+type AuthenticatedUserAndSigners = {
+  user: User;
+  starkSigner: StarkSigner;
+  ethSigner: EthSigner;
+};
+
+type RegisteredUserAndSigners = {
   user: UserImx;
   starkSigner: StarkSigner;
+  ethSigner: EthSigner;
 };
 
 export class PassportImxProvider implements IMXProvider {
   protected readonly authManager: AuthManager;
 
-  protected starkSigner?: StarkSigner;
-
-  protected readonly immutableXClient: ImmutableXClient;
+  private readonly immutableXClient: ImmutableXClient;
 
   protected readonly guardianClient: GuardianClient;
 
+  protected magicAdapter: MagicAdapter;
+
+  /**
+   * This property is set during initialisation and stores the signers in a promise.
+   * This property is not meant to be accessed directly, but through the
+   * `getAuthenticatedUserAndSigners` method.
+   * @see getAuthenticatedUserAndSigners
+   */
+  private signers: Promise<IMXSigners | undefined> | undefined;
+
+  private signerInitialisationError: unknown | undefined;
+
   constructor({
     authManager,
-    starkSigner,
     immutableXClient,
     confirmationScreen,
     config,
     passportEventEmitter,
-  }: PassportImxProviderInput) {
+    magicAdapter,
+  }: PassportImxProviderOptions) {
     this.authManager = authManager;
-    this.starkSigner = starkSigner;
     this.immutableXClient = immutableXClient;
     this.guardianClient = new GuardianClient({
       confirmationScreen,
       config,
     });
+    this.magicAdapter = magicAdapter;
+    this.initialiseSigners();
 
     passportEventEmitter.on(PassportEvents.LOGGED_OUT, this.handleLogout);
   }
 
   private handleLogout = (): void => {
-    this.starkSigner = undefined;
+    this.signers = undefined;
   };
 
-  protected async getAuthenticatedUserSigner(): Promise<AuthenticatedUserSigner> {
+  /**
+   * This method is called by the constructor and asynchronously initialises the signers.
+   * The signers are stored in a promise so that they can be retrieved by the provider
+   * when needed.
+   *
+   * If an error is thrown during initialisation, it is stored in the `signerInitialisationError`,
+   * so that it doesn't result in an unhandled promise rejection.
+   *
+   * This error is thrown when the signers are requested through:
+   * @see getAuthenticatedUserAndSigners
+   *
+   */
+  private async initialiseSigners(): Promise<void> {
+    const generateSigners = async (): Promise<IMXSigners> => {
+      const user = await this.authManager.getUser();
+      // The user will be present because the factory validates it
+      const magicRpcProvider = await this.magicAdapter.login(user!.idToken!);
+      const web3Provider = new Web3Provider(magicRpcProvider);
+
+      const ethSigner = web3Provider.getSigner();
+      const starkSigner = await getStarkSigner(ethSigner);
+
+      return { ethSigner, starkSigner };
+    };
+
+    // eslint-disable-next-line no-async-promise-executor
+    this.signers = new Promise(async (resolve) => {
+      try {
+        resolve(await generateSigners());
+      } catch (err) {
+        // Capture and store the initialization error
+        this.signerInitialisationError = err;
+        resolve(undefined);
+      }
+    });
+  }
+
+  protected async getAuthenticatedUserAndSigners(): Promise<AuthenticatedUserAndSigners> {
     const user = await this.authManager.getUser();
-    if (!user || this.starkSigner === undefined) {
+    if (!user || !this.signers) {
       throw new PassportError(
         'User has been logged out',
         PassportErrorType.NOT_LOGGED_IN_ERROR,
       );
     }
+
+    const signers = await this.signers;
+    // Throw the stored error if the signers failed to initialise
+    if (typeof signers === 'undefined') {
+      if (typeof this.signerInitialisationError !== 'undefined') {
+        throw this.signerInitialisationError;
+      }
+      throw new Error('Signers failed to initialise');
+    }
+
+    return { user, ...signers };
+  }
+
+  protected async getRegisteredImxUserAndSigners(): Promise<RegisteredUserAndSigners> {
+    const { user, starkSigner, ethSigner } = await this.getAuthenticatedUserAndSigners();
     const isUserImx = (oidcUser: User | null): oidcUser is UserImx => oidcUser?.imx !== undefined;
 
     if (!isUserImx(user)) {
@@ -95,11 +170,11 @@ export class PassportImxProvider implements IMXProvider {
       );
     }
 
-    return { user, starkSigner: this.starkSigner };
+    return { user, starkSigner, ethSigner };
   }
 
   async transfer(request: UnsignedTransferRequest): Promise<CreateTransferResponseV1> {
-    const { user, starkSigner } = await this.getAuthenticatedUserSigner();
+    const { user, starkSigner } = await this.getRegisteredImxUserAndSigners();
 
     return transfer({
       request,
@@ -110,17 +185,24 @@ export class PassportImxProvider implements IMXProvider {
     });
   }
 
-  // TODO: Remove once implemented
-  // eslint-disable-next-line class-methods-use-this
-  registerOffchain(): Promise<RegisterUserResponse> {
-    throw new PassportError(
-      'Operation not supported',
-      PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR,
+  async registerOffchain(): Promise<RegisterUserResponse> {
+    const { user, ethSigner, starkSigner } = await this.getAuthenticatedUserAndSigners();
+    return await registerOffchain(
+      ethSigner,
+      starkSigner,
+      user,
+      this.authManager,
+      this.immutableXClient.usersApi,
     );
   }
 
+  async isRegisteredOffchain(): Promise<boolean> {
+    const { user } = await this.getAuthenticatedUserAndSigners();
+    return !!user.imx;
+  }
+
   // TODO: Remove once implemented
-  // eslint-disable-next-line class-methods-use-this
+  // eslint-disable-next-line class-methods-use-this, @typescript-eslint/no-unused-vars
   isRegisteredOnchain(): Promise<boolean> {
     throw new PassportError(
       'Operation not supported',
@@ -129,7 +211,7 @@ export class PassportImxProvider implements IMXProvider {
   }
 
   async createOrder(request: UnsignedOrderRequest): Promise<CreateOrderResponse> {
-    const { user, starkSigner } = await this.getAuthenticatedUserSigner();
+    const { user, starkSigner } = await this.getRegisteredImxUserAndSigners();
 
     return createOrder({
       request,
@@ -143,7 +225,7 @@ export class PassportImxProvider implements IMXProvider {
   async cancelOrder(
     request: GetSignableCancelOrderRequest,
   ): Promise<CancelOrderResponse> {
-    const { user, starkSigner } = await this.getAuthenticatedUserSigner();
+    const { user, starkSigner } = await this.getRegisteredImxUserAndSigners();
 
     return cancelOrder({
       request,
@@ -155,7 +237,7 @@ export class PassportImxProvider implements IMXProvider {
   }
 
   async createTrade(request: GetSignableTradeRequest): Promise<CreateTradeResponse> {
-    const { user, starkSigner } = await this.getAuthenticatedUserSigner();
+    const { user, starkSigner } = await this.getRegisteredImxUserAndSigners();
 
     return createTrade({
       request,
@@ -169,7 +251,7 @@ export class PassportImxProvider implements IMXProvider {
   async batchNftTransfer(
     request: NftTransferDetails[],
   ): Promise<CreateTransferResponse> {
-    const { user, starkSigner } = await this.getAuthenticatedUserSigner();
+    const { user, starkSigner } = await this.getRegisteredImxUserAndSigners();
 
     return batchNftTransfer({
       request,
@@ -183,7 +265,7 @@ export class PassportImxProvider implements IMXProvider {
   async exchangeTransfer(
     request: UnsignedExchangeTransferRequest,
   ): Promise<CreateTransferResponseV1> {
-    const { user, starkSigner } = await this.getAuthenticatedUserSigner();
+    const { user, starkSigner } = await this.getRegisteredImxUserAndSigners();
 
     return exchangeTransfer({
       request,
@@ -226,8 +308,7 @@ export class PassportImxProvider implements IMXProvider {
   }
 
   async getAddress(): Promise<string> {
-    const { user } = await this.getAuthenticatedUserSigner();
-
+    const { user } = await this.getRegisteredImxUserAndSigners();
     return Promise.resolve(user.imx.ethAddress);
   }
 }

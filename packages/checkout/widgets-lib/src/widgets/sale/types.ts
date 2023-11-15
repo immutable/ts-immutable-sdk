@@ -1,12 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
-
-export type Item = {
-  productId: string;
-  qty: number;
-  name: string;
-  image: string;
-  description: string;
-};
+import { SaleItem } from '@imtbl/checkout-sdk';
 
 export enum PaymentTypes {
   CRYPTO = 'crypto',
@@ -53,7 +46,7 @@ export type SignResponse = {
 
 export type SignOrderInput = {
   provider: Web3Provider | undefined;
-  items: Item[];
+  items: SaleItem[];
   fromContractAddress: string;
   recipientAddress: string;
   env: string;
@@ -81,7 +74,7 @@ export type ExecuteOrderResponse = {
 };
 
 export enum SaleErrorTypes {
-  DEFAULT = 'DEFAULT',
+  DEFAULT = 'DEFAULT_ERROR',
   TRANSACTION_FAILED = 'TRANSACTION_FAILED',
   SERVICE_BREAKDOWN = 'SERVICE_BREAK_DOWN',
   TRANSAK_FAILED = 'TRANSAK_FAILED',
@@ -89,4 +82,9 @@ export enum SaleErrorTypes {
   WALLET_REJECTED = 'WALLET_REJECTED',
   WALLET_REJECTED_NO_FUNDS = 'WALLET_REJECTED_NO_FUNDS',
   SMART_CHECKOUT_ERROR = 'SMART_CHECKOUT_ERROR',
+  SMART_CHECKOUT_EXECUTE_ERROR = 'SMART_CHECKOUT_EXECUTE_ERROR',
+}
+
+export enum SmartCheckoutErrorTypes {
+  FRACTIONAL_BALANCE_BLOCKED = 'FRACTIONAL_BALANCE_BLOCKED',
 }

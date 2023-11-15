@@ -1,13 +1,12 @@
 import {
   WidgetEvent,
   BridgeEventType,
-  BridgeSuccess,
   IMTBLWidgetEvents,
-  BridgeFailed,
-} from '@imtbl/checkout-widgets';
+  WidgetType,
+} from '@imtbl/checkout-sdk';
 
 export const sendBridgeSuccessEvent = (eventTarget: Window | EventTarget, transactionHash: string) => {
-  const successEvent = new CustomEvent<WidgetEvent<BridgeSuccess>>(
+  const successEvent = new CustomEvent<WidgetEvent<WidgetType.BRIDGE, BridgeEventType.SUCCESS>>(
     IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT,
     {
       detail: {
@@ -24,7 +23,7 @@ export const sendBridgeSuccessEvent = (eventTarget: Window | EventTarget, transa
 };
 
 export const sendBridgeFailedEvent = (eventTarget: Window | EventTarget, reason: string) => {
-  const failedEvent = new CustomEvent<WidgetEvent<BridgeFailed>>(
+  const failedEvent = new CustomEvent<WidgetEvent<WidgetType.BRIDGE, BridgeEventType.FAILURE>>(
     IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT,
     {
       detail: {
@@ -42,7 +41,7 @@ export const sendBridgeFailedEvent = (eventTarget: Window | EventTarget, reason:
 };
 
 export function sendBridgeWidgetCloseEvent(eventTarget: Window | EventTarget) {
-  const closeWidgetEvent = new CustomEvent<WidgetEvent<any>>(
+  const closeWidgetEvent = new CustomEvent<WidgetEvent<WidgetType.BRIDGE, BridgeEventType.CLOSE_WIDGET>>(
     IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT,
     {
       detail: {

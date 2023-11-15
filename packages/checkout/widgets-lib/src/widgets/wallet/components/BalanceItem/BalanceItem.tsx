@@ -2,8 +2,7 @@ import { Heading, MenuItem } from '@biom3/react';
 import {
   useContext, useEffect, useMemo, useState,
 } from 'react';
-import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
-import { TokenFilterTypes, TokenInfo } from '@imtbl/checkout-sdk';
+import { IMTBLWidgetEvents, TokenFilterTypes, TokenInfo } from '@imtbl/checkout-sdk';
 import { ShowMenuItem } from './BalanceItemStyles';
 import { BalanceInfo } from '../../functions/tokenBalances';
 import { WalletContext } from '../../context/WalletContext';
@@ -104,8 +103,10 @@ export function BalanceItem({
               screen: 'WalletBalances',
               control: 'BalanceItem',
               controlType: 'Button',
-              tokenSymbol: balanceInfo.symbol,
-              tokenAddress: balanceInfo.address,
+              extras: {
+                tokenSymbol: balanceInfo.symbol,
+                tokenAddress: balanceInfo.address,
+              },
             });
           }}
         >
@@ -118,8 +119,10 @@ export function BalanceItem({
                 screen: 'WalletBalances',
                 control: 'AddTokens',
                 controlType: 'Button',
-                tokenSymbol: balanceInfo.symbol,
-                tokenAddress: balanceInfo.address,
+                extras: {
+                  tokenSymbol: balanceInfo.symbol,
+                  tokenAddress: balanceInfo.address,
+                },
               });
               orchestrationEvents.sendRequestOnrampEvent(
                 eventTarget,
@@ -143,8 +146,10 @@ export function BalanceItem({
                 screen: 'WalletBalances',
                 control: 'SwapTokens',
                 controlType: 'Button',
-                tokenSymbol: balanceInfo.symbol,
-                tokenAddress: balanceInfo.address,
+                extras: {
+                  tokenSymbol: balanceInfo.symbol,
+                  tokenAddress: balanceInfo.address,
+                },
               });
               orchestrationEvents.sendRequestSwapEvent(
                 eventTarget,
@@ -169,8 +174,10 @@ export function BalanceItem({
                 screen: 'WalletBalances',
                 control: 'MoveTokens',
                 controlType: 'Button',
-                tokenSymbol: balanceInfo.symbol,
-                tokenAddress: balanceInfo.address,
+                extras: {
+                  tokenSymbol: balanceInfo.symbol,
+                  tokenAddress: balanceInfo.address,
+                },
               });
               bridgeToL2OnClick(balanceInfo.address);
             }}
