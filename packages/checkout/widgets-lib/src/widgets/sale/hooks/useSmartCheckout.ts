@@ -1,18 +1,19 @@
 import { Web3Provider } from '@ethersproject/providers';
 import {
   Checkout,
+  SaleItem,
   SmartCheckoutResult,
 } from '@imtbl/checkout-sdk';
 import { useCallback, useState } from 'react';
-import { getGasEstimate, getItemRequirements, isUserFractionalBalanceBlocked } from '../functions/smartCheckoutUtils';
 import {
-  Item, SaleErrorTypes, SmartCheckoutError, SmartCheckoutErrorTypes,
+  SaleErrorTypes, SmartCheckoutError, SmartCheckoutErrorTypes,
 } from '../types';
+import { getGasEstimate, getItemRequirements, isUserFractionalBalanceBlocked } from '../functions/smartCheckoutUtils';
 
 type UseSmartCheckoutInput = {
   checkout: Checkout | undefined;
   provider: Web3Provider | undefined;
-  items: Item[],
+  items: SaleItem[],
   amount: string,
   contractAddress: string,
 };

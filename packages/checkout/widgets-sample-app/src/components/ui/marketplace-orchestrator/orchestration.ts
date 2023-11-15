@@ -1,4 +1,4 @@
-import { OrchestrationEventType } from "@imtbl/checkout-widgets";
+import { OrchestrationEventType } from "@imtbl/checkout-sdk";
 import { Dispatch, SetStateAction } from "react";
 import { WidgetState, hideAllWidgets } from "./WidgetProvider";
 

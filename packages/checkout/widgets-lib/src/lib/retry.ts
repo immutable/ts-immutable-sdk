@@ -1,3 +1,5 @@
+import { CheckoutErrorType } from '@imtbl/checkout-sdk';
+
 // eslint-disable-next-line no-promise-executor-return
 const sleep = (ms = 0) => ms && new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -18,6 +20,10 @@ export const retry = async <T>(
   try {
     return await fn();
   } catch (error: any) {
+    if (error.type === CheckoutErrorType.WEB3_PROVIDER_ERROR) {
+      // Returning out when underlying network has changed in the provider, not Blockscout error
+      return {} as T;
+    }
     if (currentRetries !== undefined) {
       if (currentRetries <= 0) {
         throw error;
@@ -26,8 +32,8 @@ export const retry = async <T>(
     }
 
     if (nonRetryable && nonRetryable(error)) throw error;
-  }
+    await sleep(retryIntervalMs);
 
-  await sleep(retryIntervalMs);
-  return retry(fn, { retries: currentRetries, retryIntervalMs, nonRetryable });
+    return retry(fn, { retries: currentRetries, retryIntervalMs, nonRetryable });
+  }
 };

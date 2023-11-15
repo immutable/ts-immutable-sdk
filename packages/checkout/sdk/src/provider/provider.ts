@@ -34,6 +34,10 @@ export async function createProvider(
       if (passport) {
         provider = new Web3Provider(passport.connectEvm());
       } else {
+        // eslint-disable-next-line no-console
+        console.error(
+          'WalletProviderName was PASSPORT but the passport instance was not provided to the Checkout constructor',
+        );
         throw new CheckoutError(
           'Passport not provided',
           CheckoutErrorType.DEFAULT_PROVIDER_ERROR,
@@ -46,6 +50,10 @@ export async function createProvider(
       break;
     }
     default:
+      // eslint-disable-next-line no-console
+      console.error(
+        'The WalletProviderName that was provided is not supported',
+      );
       throw new CheckoutError(
         'Provider not supported',
         CheckoutErrorType.DEFAULT_PROVIDER_ERROR,

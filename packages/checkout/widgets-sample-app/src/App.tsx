@@ -8,28 +8,27 @@ function App() {
         <p>Choose a widget from the list below</p>
         <br />
         <div>
-          <a href={'/connect'}>Connect Widget (React)</a> |{' '}
-          <a href={'/lib/examples/connect.html'}>Connect Widget (Static)</a>
+          <a href={'/connect'}>Connect Widget</a>
         </div>
         <br />
         <div>
-          <a href={'/wallet'}>Wallet Widget (React)</a> |{' '}
-          <a href={'/lib/examples/wallet.html'}>Wallet Widget (Static)</a>
+          <a href={'/wallet'}>Wallet Widget</a>
         </div>
         <br />
         <div>
-          <a href={'/swap'}>Swap Widget (React)</a> |{' '}
-          <a href={'/lib/examples/swap.html'}>Swap Widget (Static)</a>
+          <a href={'/swap'}>Swap Widget</a>
         </div>
         <br />
         <div>
-          <a href={'/bridge'}>Bridge Widget (React)</a> |{' '}
-          <a href={'/lib/examples/bridge.html'}>Bridge Widget (Static)</a>
+          <a href={'/bridge'}>Bridge Widget</a>
         </div>
         <br />
         <div>
-          <a href={'/on-ramp'}>On-ramp Widget (React)</a> |{' '}
-          <a href={'/lib/examples/onramp.html'}>OnRamp Widget (Static)</a>
+          <a href={'/on-ramp'}>On-ramp Widget</a>
+        </div>
+        <br />
+        <div>
+          <a href={'/sale?amount=0.01&fromContractAddress=0x21B51Ec6fB7654B7e59e832F9e9687f29dF94Fb8&environmentId=4dfc4bec-1867-49aa-ad35-d8a13b206c94'}>Sale Widget</a>
         </div>
         <br />
         <div>

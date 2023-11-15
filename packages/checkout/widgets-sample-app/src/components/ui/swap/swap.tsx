@@ -1,35 +1,35 @@
-import { WalletProviderName } from '@imtbl/checkout-sdk';
-import {
-  WidgetTheme,
-  SwapReact,
-  CheckoutWidgets,
-  CheckoutWidgetsConfig,
-  UpdateConfig,
-} from '@imtbl/checkout-widgets';
-import { Environment } from '@imtbl/config';
+import { Checkout, OrchestrationEventType, SwapEventType, SwapSuccess, WalletProviderName, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
+import { WidgetsFactory } from '@imtbl/checkout-widgets';
+import { useEffect, useMemo } from 'react';
 
+const SWAP_TARGET_ID = 'swap-target'
 function SwapUI() {
-  CheckoutWidgets({
-    theme: WidgetTheme.DARK,
-    environment: Environment.SANDBOX,
-  });
+  const checkout = useMemo(() => new Checkout(), []);
+  const factory = useMemo(() => new WidgetsFactory(checkout, {theme: WidgetTheme.DARK}), [checkout]);
+  const swap = useMemo(() => factory.create(WidgetType.SWAP),[factory]);
 
-  const widgetsConfig2: CheckoutWidgetsConfig = {
-    theme: WidgetTheme.DARK,
-    environment: Environment.SANDBOX,
-  };
-
-  UpdateConfig(widgetsConfig2);
+  const updateTheme = (theme: WidgetTheme) => swap.update({config: {theme}});
+  
+  useEffect(() => {
+    swap.mount(SWAP_TARGET_ID,{amount: '10', fromContractAddress: '0x0000000000000000000000000000000000001010', toContractAddress: "0xb95B75B4E4c09F04d5DA6349861BF1b6F163D78c"});
+    swap.addListener(SwapEventType.SUCCESS, (data: SwapSuccess) => {
+    })
+    swap.addListener(SwapEventType.FAILURE, (data: any) => {
+      console.log('FAILURE', data);
+    });
+    swap.addListener(SwapEventType.CLOSE_WIDGET, (data: any) => {
+      swap.unmount();
+    });
+  }, [swap])
 
   return (
-    <div className="Swap">
-      <h1 className="sample-heading">Checkout Swap (Web Component)</h1>
-      <SwapReact
-        walletProvider={WalletProviderName.METAMASK}
-        amount="50000000000000000000"
-        fromContractAddress="0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0"
-        toContractAddress=""
-      />
+    <div>
+      <h1 className="sample-heading">Checkout Swap</h1>
+      <div id={SWAP_TARGET_ID}></div>
+      <button onClick={() => swap.mount(SWAP_TARGET_ID)}>Mount</button>
+      <button onClick={() => swap.unmount()}>Unmount</button>
+      <button onClick={() => updateTheme(WidgetTheme.LIGHT)}>Light theme</button>
+      <button onClick={() => updateTheme(WidgetTheme.DARK)}>Dark theme</button>
     </div>
   );
 }

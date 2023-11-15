@@ -3,9 +3,8 @@ import {
   useCallback,
   useContext, useEffect, useMemo, useState,
 } from 'react';
-import { GasEstimateType } from '@imtbl/checkout-sdk';
+import { GasEstimateType, IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
 import { utils } from 'ethers';
-import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -95,7 +94,7 @@ export function WalletBalances() {
         },
       });
     })();
-  }, [checkout, cryptoFiatDispatch, network]);
+  }, [checkout, cryptoFiatDispatch, network?.chainId]);
 
   useEffect(() => {
     const setWalletAddressFromProvider = async () => {
@@ -191,7 +190,12 @@ export function WalletBalances() {
       });
       setBalancesLoading(false);
     })();
-  }, [checkout, provider, network, conversions]);
+  }, [
+    checkout,
+    provider,
+    network?.chainId,
+    conversions.size,
+  ]);
 
   const showAddCoins = useMemo(() => {
     if (!checkout || !network) return false;

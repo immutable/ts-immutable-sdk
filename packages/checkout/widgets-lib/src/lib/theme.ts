@@ -1,5 +1,5 @@
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
-import { WidgetTheme } from './types';
+import { WidgetTheme } from '@imtbl/checkout-sdk';
 
 export const widgetTheme = (theme: WidgetTheme): BaseTokens => (
   theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()

@@ -6,17 +6,26 @@ import {
   WalletProviderName,
 } from '@imtbl/checkout-sdk';
 import {
-  useContext, useState, useEffect, useCallback,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
 } from 'react';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
-import { ConnectContext, ConnectActions } from '../context/ConnectContext';
+import {
+  ConnectContext,
+  ConnectActions,
+} from '../context/ConnectContext';
 import { WalletItem } from './WalletItem';
 import {
   ViewContext,
   ViewActions,
   SharedViews,
 } from '../../../context/view-context/ViewContext';
-import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import {
+  UserJourney,
+  useAnalytics,
+} from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 export interface WalletListProps {
   walletFilterTypes?: WalletFilterTypes;
@@ -34,7 +43,7 @@ export function WalletList(props: WalletListProps) {
   const { track } = useAnalytics();
 
   const excludedWallets = useCallback(() => {
-    const passportWalletProvider = { walletProvider: WalletProviderName.PASSPORT };
+    const passportWalletProvider = { walletProviderName: WalletProviderName.PASSPORT };
     if (!excludeWallets && !passport) {
       return [passportWalletProvider];
     }
@@ -66,8 +75,7 @@ export function WalletList(props: WalletListProps) {
     if (checkout) {
       try {
         const providerResult = await checkout.createProvider({
-          walletProvider: walletProviderName,
-          passport,
+          walletProviderName,
         });
         const web3Provider = providerResult.provider;
 
@@ -115,7 +123,7 @@ export function WalletList(props: WalletListProps) {
         <WalletItem
           onWalletClick={onWalletClick}
           wallet={wallet}
-          key={wallet.name}
+          key={wallet.walletProviderName}
         />
       ))}
     </Box>

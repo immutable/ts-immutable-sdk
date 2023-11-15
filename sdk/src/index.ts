@@ -5,4 +5,3 @@ export * as passport from './passport';
 export * as orderbook from './orderbook';
 export * as provider from './provider';
 export * as checkoutSdk from './checkout_sdk';
-export * as checkoutWidgets from './checkout_widgets';
