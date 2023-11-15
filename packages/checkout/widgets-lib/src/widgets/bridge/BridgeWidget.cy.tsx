@@ -353,7 +353,7 @@ describe('Bridge Widget tests', () => {
         >
           <BridgeWidget
             config={config}
-            params={params}
+            {...params}
           />
         </ConnectLoaderTestComponent>,
       );
