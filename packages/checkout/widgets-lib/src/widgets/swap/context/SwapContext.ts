@@ -9,7 +9,7 @@ import { createContext } from 'react';
 
 export interface SwapState {
   exchange: Exchange | null;
-  walletProvider: WalletProviderName | null;
+  walletProviderName: WalletProviderName | null;
   network: NetworkInfo | null;
   tokenBalances: GetBalanceResult[];
   supportedTopUps: TopUpFeature | null;
@@ -24,7 +24,7 @@ export interface TopUpFeature {
 
 export const initialSwapState: SwapState = {
   exchange: null,
-  walletProvider: null,
+  walletProviderName: null,
   network: null,
   tokenBalances: [],
   supportedTopUps: null,
@@ -42,7 +42,7 @@ export interface SwapAction {
 
 type ActionPayload =
   | SetExchangePayload
-  | SetWalletProviderPayload
+  | SetWalletProviderNamePayload
   | SetNetworkPayload
   | SetSupportedTopUpPayload
   | SetTokenBalancesPayload
@@ -50,7 +50,7 @@ type ActionPayload =
 
 export enum SwapActions {
   SET_EXCHANGE = 'SET_EXCHANGE',
-  SET_WALLET_PROVIDER = 'SET_WALLET_PROVIDER',
+  SET_WALLET_PROVIDER_NAME = 'SET_WALLET_PROVIDER_NAME',
   SET_NETWORK = 'SET_NETWORK',
   SET_SUPPORTED_TOP_UPS = 'SET_SUPPORTED_TOP_UPS',
   SET_TOKEN_BALANCES = 'SET_TOKEN_BALANCES',
@@ -62,9 +62,9 @@ export interface SetExchangePayload {
   exchange: Exchange;
 }
 
-export interface SetWalletProviderPayload {
-  type: SwapActions.SET_WALLET_PROVIDER;
-  walletProvider: WalletProviderName;
+export interface SetWalletProviderNamePayload {
+  type: SwapActions.SET_WALLET_PROVIDER_NAME;
+  walletProviderName: WalletProviderName;
 }
 
 export interface SetNetworkPayload {
@@ -107,10 +107,10 @@ export const swapReducer: Reducer<SwapState, SwapAction> = (
         ...state,
         exchange: action.payload.exchange,
       };
-    case SwapActions.SET_WALLET_PROVIDER:
+    case SwapActions.SET_WALLET_PROVIDER_NAME:
       return {
         ...state,
-        walletProvider: action.payload.walletProvider,
+        walletProviderName: action.payload.walletProviderName,
       };
     case SwapActions.SET_NETWORK:
       return {

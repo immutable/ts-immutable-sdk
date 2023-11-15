@@ -1,4 +1,14 @@
-export { Checkout } from './Checkout';
+// Widgets
+import './widgets/definitions/global';
+
+export * from './widgets/definitions/events';
+export * from './widgets/definitions/types';
+export * from './widgets/definitions/parameters';
+export * from './widgets/definitions/configurations';
+
+// SDKs
+
+export { Checkout } from './sdk';
 export {
   ChainId,
   ChainName,
@@ -41,6 +51,7 @@ export type {
   ERC20ItemRequirement,
   ERC721Balance,
   ERC721ItemRequirement,
+  Fee,
   FeePercentage,
   FeeToken,
   FiatRampParams,
@@ -73,6 +84,7 @@ export type {
   NoRoutesFound,
   OnRampFundingStep,
   OrderFee,
+  OnRampProviderFees,
   RemoteConfiguration,
   RoutesFound,
   RoutingOutcome,
@@ -93,6 +105,7 @@ export type {
   SwapFundingStep,
   SwitchNetworkParams,
   SwitchNetworkResult,
+  TokenAmountEstimate,
   TokenBalance,
   TokenFilter,
   TokenInfo,
@@ -102,3 +115,4 @@ export type {
 } from './types';
 export type { ErrorType } from './errors';
 export { CheckoutErrorType } from './errors';
+export { CheckoutConfiguration } from './config';

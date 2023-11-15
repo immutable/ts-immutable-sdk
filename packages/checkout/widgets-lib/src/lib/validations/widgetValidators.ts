@@ -3,10 +3,10 @@ import { utils } from 'ethers';
 import { amountInputValidation } from './amountInputValidations';
 import { NATIVE } from '../constants';
 
-export function isValidWalletProvider(walletProvider: string | undefined) {
-  if (walletProvider === undefined) return true; // allow undefined as it may not be defined
-  if (walletProvider === '') return false;
-  return Object.values(WalletProviderName).includes(walletProvider as WalletProviderName);
+export function isValidWalletProvider(walletProviderName: string | undefined) {
+  if (walletProviderName === undefined) return true; // allow undefined as it may not be defined
+  if (walletProviderName === '') return false;
+  return Object.values(WalletProviderName).includes(walletProviderName as WalletProviderName);
 }
 
 export function isValidAmount(amount: string | undefined) {

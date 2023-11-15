@@ -1,4 +1,4 @@
-import { ChainId } from '@imtbl/checkout-sdk';
+import { ChainId, WalletProviderName } from '@imtbl/checkout-sdk';
 import {
   SetNetworkPayload,
   SwapActions,
@@ -7,6 +7,7 @@ import {
   SetSupportedTopUpPayload,
   TopUpFeature,
   SetTokenBalancesPayload,
+  SetWalletProviderNamePayload,
 } from './SwapContext';
 
 describe('WalletContext', () => {
@@ -89,5 +90,18 @@ describe('WalletContext', () => {
       isBridgeEnabled: false,
       isOnRampEnabled: false,
     });
+  });
+
+  it('should update state with wallet provider name when reducer called with SET_WALLET_PROVIDER_NAME action', () => {
+    const setWalletProviderNamePayload: SetWalletProviderNamePayload = {
+      type: SwapActions.SET_WALLET_PROVIDER_NAME,
+      walletProviderName: WalletProviderName.METAMASK,
+    };
+    expect(initialSwapState.network).toBeNull();
+    expect(initialSwapState.tokenBalances).toEqual([]);
+    const { walletProviderName } = swapReducer(initialSwapState, {
+      payload: setWalletProviderNamePayload,
+    });
+    expect(walletProviderName).toEqual(WalletProviderName.METAMASK);
   });
 });

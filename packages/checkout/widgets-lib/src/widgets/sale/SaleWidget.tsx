@@ -4,6 +4,8 @@ import {
 
 import { BiomeCombinedProviders } from '@biom3/react';
 
+import { SaleItem } from '@imtbl/checkout-sdk';
+import { Environment } from '@imtbl/config';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 import {
   SharedViews,
@@ -15,12 +17,9 @@ import {
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { text } from '../../resources/text/textConfig';
 import { LoadingView } from '../../views/loading/LoadingView';
-
-import { ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
 import { SaleWidgetViews } from '../../context/view-context/SaleViewContextTypes';
 import { widgetTheme } from '../../lib/theme';
 import { SaleContextProvider } from './context/SaleContextProvider';
-import { Item } from './types';
 import { FundWithSmartCheckout } from './views/FundWithSmartCheckout';
 import { PayWithCard } from './views/PayWithCard';
 import { PayWithCoins } from './views/PayWithCoins';
@@ -32,11 +31,9 @@ import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiat
 export interface SaleWidgetProps {
   config: StrongCheckoutWidgetsConfig;
   amount: string;
-  items: Item[];
+  items: SaleItem[];
   fromContractAddress: string;
-  env: string;
   environmentId: string;
-  connectLoaderParams?: ConnectLoaderParams;
 }
 
 export function SaleWidget(props: SaleWidgetProps) {
@@ -45,9 +42,7 @@ export function SaleWidget(props: SaleWidgetProps) {
     amount,
     items,
     fromContractAddress,
-    env,
     environmentId,
-    connectLoaderParams,
   } = props;
 
   const { connectLoaderState } = useContext(ConnectLoaderContext);
@@ -94,11 +89,11 @@ export function SaleWidget(props: SaleWidgetProps) {
             items,
             amount,
             fromContractAddress,
-            env,
+            env: checkout!.config.environment ?? Environment.SANDBOX,
             environmentId,
             provider,
             checkout,
-            passport: connectLoaderParams?.passport,
+            passport: checkout?.passport,
           }}
         >
           <CryptoFiatProvider environment={config.environment}>

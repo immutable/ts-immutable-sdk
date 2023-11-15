@@ -8,10 +8,7 @@ import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { text } from '../../../resources/text/textConfig';
 import { ConnectActions, ConnectContext } from '../context/ConnectContext';
-import {
-  ViewContext,
-  ViewActions,
-} from '../../../context/view-context/ViewContext';
+import { ViewContext, ViewActions } from '../../../context/view-context/ViewContext';
 import { getL2ChainId } from '../../../lib';
 import { ImmutablePlanetHero } from '../../../components/Hero/ImmutablePlanetHero';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';

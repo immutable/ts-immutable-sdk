@@ -31,7 +31,7 @@ describe('Bridge Form', () => {
     cryptoConversions = new Map<string, number>([['eth', 1800], ['imx', 0.75]]);
     bridgeState = {
       tokenBridge: new TokenBridge({}),
-      walletProvider: null,
+      walletProviderName: null,
       network: {
         chainId: ChainId.SEPOLIA,
         name: 'Sepolia',

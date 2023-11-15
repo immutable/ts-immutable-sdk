@@ -52,7 +52,7 @@ export class CheckoutConfiguration {
   // when building the project from source code.
   // This will be used to get around the lack of
   // Environment.DEVELOPMENT
-  readonly isDevelopment: boolean = process.env.CHECKOUT_DEV_MODE !== undefined;
+  readonly isDevelopment: boolean = process.env.CHECKOUT_DEV_MODE === 'true';
 
   readonly isProduction: boolean;
 

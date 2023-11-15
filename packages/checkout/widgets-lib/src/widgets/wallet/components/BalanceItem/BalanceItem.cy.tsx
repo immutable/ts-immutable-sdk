@@ -5,9 +5,9 @@ import {
   ChainName,
   Checkout,
   WalletProviderName,
+  IMTBLWidgetEvents,
 } from '@imtbl/checkout-sdk';
 import { cy } from 'local-cypress';
-import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import { Environment } from '@imtbl/config';
 import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
 import { WalletState } from '../../context/WalletContext';
@@ -35,7 +35,7 @@ describe('BalanceItem', () => {
 
   const baseWalletState: WalletState = {
     network: null,
-    walletProvider: WalletProviderName.METAMASK,
+    walletProviderName: WalletProviderName.METAMASK,
     tokenBalances: [],
     supportedTopUps: null,
   };

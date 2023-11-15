@@ -9,7 +9,7 @@ export async function getWalletAllowList(
   params: GetWalletAllowListParams,
 ): Promise<GetWalletAllowListResult> {
   const walletList: WalletInfo[] = [];
-  const excludedWalletProvider = params.exclude?.map((wp) => wp.walletProvider) ?? [];
+  const excludedWalletProvider = params.exclude?.map((wp) => wp.walletProviderName) ?? [];
 
   let walletProviderNames = Object.values(WalletProviderName);
   if (excludedWalletProvider.length !== 0) {
@@ -18,8 +18,7 @@ export async function getWalletAllowList(
 
   for (const value of walletProviderNames) {
     walletList.push({
-      walletProvider: value,
-      name: value,
+      walletProviderName: value,
     });
   }
 

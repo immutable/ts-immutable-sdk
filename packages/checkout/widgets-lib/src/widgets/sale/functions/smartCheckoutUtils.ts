@@ -86,8 +86,10 @@ export const fundingRouteFees = (
 
   let totalUsd: number = 0;
   for (const fee of fees) {
-    const feeUsd = calculateCryptoToFiat(fee.formattedAmount, fee.token!.symbol, conversions);
-    totalUsd += parseFloat(feeUsd);
+    if (fee.token) {
+      const feeUsd = calculateCryptoToFiat(fee.formattedAmount, fee.token.symbol, conversions);
+      totalUsd += parseFloat(feeUsd);
+    }
   }
   return formatFiatString(totalUsd);
 };

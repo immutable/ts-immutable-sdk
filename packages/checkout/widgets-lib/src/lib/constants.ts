@@ -1,6 +1,5 @@
 import { Environment } from '@imtbl/config';
-import { CheckoutErrorType, WalletProviderName } from '@imtbl/checkout-sdk';
-import { WidgetTheme } from './types';
+import { CheckoutErrorType, WalletProviderName, WidgetTheme } from '@imtbl/checkout-sdk';
 import { RetryType } from './retry';
 
 export const NATIVE = 'NATIVE';

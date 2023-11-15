@@ -49,7 +49,7 @@ describe('Approve ERC20 Onboarding', () => {
 
     initialSwapState = {
       exchange: null,
-      walletProvider: null,
+      walletProviderName: null,
       network: null,
       tokenBalances: [
         {

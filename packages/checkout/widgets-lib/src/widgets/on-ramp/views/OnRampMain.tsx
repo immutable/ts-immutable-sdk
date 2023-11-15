@@ -35,8 +35,7 @@ export function OnRampMain({
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const { header } = text.views[OnRampWidgetViews.ONRAMP];
-  const { viewState } = useContext(ViewContext);
-  const { viewDispatch } = useContext(ViewContext);
+  const { viewState, viewDispatch } = useContext(ViewContext);
   const [widgetUrl, setWidgetUrl] = useState<string>('');
 
   const isPassport = !!passport && (provider?.provider as any)?.isPassport;
@@ -210,9 +209,11 @@ export function OnRampMain({
 
     const domIframe:HTMLIFrameElement = document.getElementById(transakIframeId) as HTMLIFrameElement;
 
-    if (domIframe === undefined) return;
+    if (!domIframe) return;
 
     const handleTransakEvents = (event: any) => {
+      if (!domIframe) return;
+
       if (event.source === domIframe.contentWindow
         && event.origin.toLowerCase().includes(transakOrigin)) {
         trackSegmentEvents(event.data, userWalletAddress, userEmail);
@@ -220,11 +221,6 @@ export function OnRampMain({
       }
     };
     window.addEventListener('message', handleTransakEvents);
-
-    // eslint-disable-next-line consistent-return
-    return () => {
-      window.removeEventListener('message', handleTransakEvents);
-    };
   }, [checkout, provider, tokenAmount, tokenAddress, passport]);
 
   return (

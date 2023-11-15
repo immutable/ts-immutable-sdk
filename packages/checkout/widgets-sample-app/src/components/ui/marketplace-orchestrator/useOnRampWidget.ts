@@ -2,7 +2,7 @@ import {
   IMTBLWidgetEvents,
   OnRampEventType,
   OrchestrationEventType,
-} from '@imtbl/checkout-widgets';
+} from '@imtbl/checkout-sdk';
 import { useContext, useEffect } from 'react';
 import { WidgetContext, hideAllWidgets } from './WidgetProvider';
 import { handleOrchestrationEvent } from './orchestration';
