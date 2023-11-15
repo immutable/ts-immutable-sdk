@@ -64,7 +64,6 @@ import { CheckoutError, CheckoutErrorType } from './errors';
 import { AvailabilityService, availabilityService } from './availability';
 import { loadUnresolved } from './widgets/load';
 import { WidgetsInit } from './types/widgets';
-import { ZKEVM_NATIVE_TOKEN } from './env';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
@@ -461,23 +460,19 @@ export class Checkout {
    */
   public async createFiatRampUrl(params: FiatRampParams): Promise<string> {
     let tokenAmount;
-    let tokenSymbol;
+    let tokenSymbol = 'IMX';
     let email;
 
     const walletAddress = await params.web3Provider.getSigner().getAddress();
-    const isPassport = (params.web3Provider.provider as any)?.isPassport === true;
+    const isPassport = (params.web3Provider.provider as any)?.isPassport || false;
 
-    if (isPassport && params.passport !== undefined) {
+    if (isPassport && params.passport) {
       const userInfo = await params.passport.getUserInfo();
       email = userInfo?.email;
     }
 
     const tokenList = await tokens.getTokenAllowList(this.config, { type: TokenFilterTypes.ONRAMP });
-    const token = tokenList.tokens?.find((t) => {
-      if (network.isNativeToken(t.address) && network.isNativeToken(params.tokenAddress)) return true;
-      return t.address?.toLowerCase() === params.tokenAddress?.toLowerCase();
-    });
-
+    const token = tokenList.tokens?.find((t) => t.address?.toLowerCase() === params.tokenAddress?.toLowerCase());
     if (token) {
       tokenAmount = params.tokenAmount;
       tokenSymbol = token.symbol;
@@ -488,7 +483,7 @@ export class Checkout {
       isPassport,
       walletAddress,
       tokenAmount,
-      tokenSymbol: tokenSymbol ?? ZKEVM_NATIVE_TOKEN.symbol,
+      tokenSymbol,
       email,
     } as FiatRampWidgetParams);
   }

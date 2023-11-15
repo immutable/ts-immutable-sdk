@@ -11,9 +11,10 @@ export enum SaleEventType {
 
 /**
  * Represents a successful Sale transaction.
- * @property {Array} transactions - The executed transactions
+ * @property {Array} transactions -
  */
 export type SaleSuccess = {
+  /** The executed transactions */
   transactions: {
     method: string;
     hash: string | undefined;
@@ -23,13 +24,16 @@ export type SaleSuccess = {
 
 /**
  * Type representing a Sale Widget with type FAILURE.
- * @property {string} reason - The reason why the swap failed.
- * @property {number} timestamp - The timestamp of the failed swap.
- * @property {Array} transactions - The executed transactions
+ * @property {string} reason
+ * @property {number} timestamp
+ * @property {Array} transactions
  */
 export type SaleFailed = {
+  /** The reason why the swap failed. */
   reason: string;
+  /** The timestamp of the failed swap. */
   timestamp: number;
+  /** The executed transactions */
   transactions: {
     method: string;
     hash: string | undefined;
@@ -38,9 +42,10 @@ export type SaleFailed = {
 
 /**
  * Type representing a Sale Widget with type TRANSACTION_SUCCESS.
- * @property {Object} transactions - The executed transactions
+ * @property {Object} transactions
  */
 export type SaleTransactionSuccess = {
+  /** The executed transactions */
   transactions: {
     method: string;
     hash: string | undefined;

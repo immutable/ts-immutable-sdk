@@ -1,8 +1,9 @@
-export const lazyLoad = <T, Y = void>(promiseToAwait: () => Promise<Y>, initialiseFunction: () => T): Promise<T> => (
-  promiseToAwait().then(initialiseFunction)
-);
+export const lazyLoad = <T, Y = void>(
+  promiseToAwait: () => Promise<Y>,
+  initialiseFunction: (arg: Y) => Promise<T> | T,
+): Promise<T> => promiseToAwait().then(initialiseFunction);
 
-export const lazyDocumentReady = <T>(initialiseFunction: () => T): Promise<T> => {
+export const lazyDocumentReady = <T>(initialiseFunction: () => Promise<T> | T): Promise<T> => {
   const documentReadyPromise = () => new Promise<void>((resolve) => {
     if (window.document.readyState === 'complete') {
       resolve();

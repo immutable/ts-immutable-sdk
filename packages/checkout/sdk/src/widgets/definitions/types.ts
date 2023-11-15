@@ -176,22 +176,26 @@ export type WidgetEvent<T extends WidgetType, KEventName extends keyof WidgetEve
 /**
  * Represents an event emitted by a widget.
  * @template KEventName - The orchestration event name.
- * @property {KEventName} type - The type of the event.
- * @property {OrchestrationMapping[KEventName]} data - The data associated with the event.
+ * @property {KEventName} type
+ * @property {OrchestrationMapping[KEventName]} data
  */
 export type OrchestrationEvent<KEventName extends keyof OrchestrationMapping> = {
+  /** The type of the event. */
   type: KEventName,
+  /** The data associated with the event. */
   data: OrchestrationMapping[KEventName];
 };
 
 /**
  * Represents an event emitted by a widget.
  * @template KEventName - The provider event name.
- * @property {KEventName} type - The type of the event.
- * @property {ProviderEventMapping[KEventName]} data - The data associated with the event.
+ * @property {KEventName} type
+ * @property {ProviderEventMapping[KEventName]} data
  */
 export type ProviderEvent<KEventName extends keyof ProviderEventMapping> = {
+  /** The type of the event. */
   type: KEventName,
+  /** The data associated with the event. */
   data: ProviderEventMapping[KEventName];
 };
 
@@ -204,7 +208,7 @@ export interface IWidgetsFactory {
   create<T extends WidgetType>(type: T, props?: WidgetProperties<T>): Widget<T>;
   /**
    * Update the widgets provider instance.
-   * @param provider provider instantiate.
+   * @param provider the provider instance to update all widgets.
    */
   updateProvider(provider: Web3Provider): void;
 }
@@ -245,11 +249,11 @@ export interface Widget<T extends WidgetType> {
 
 /**
  * Represents the version of the Checkout Widgets to use defaults to (0.1.9-alpha)
- * @property {number} major - The major version of the widgets, must specify a major version even if it is 0.
- * @property {number | undefined} minor - The minor version of the widgets, leaving this blank will use the latest minor based on major
- * @property {number | undefined} patch - The patch version of the widgets, leaving this blank will use the latest minor based on minor
- * @property {'alpha' | undefined} prerelease - The prerelease version of the widgets, can only be 'alpha'. Do not use in production.
- * @property {number | undefined} build - The build version of the widgets. Do not use in production.
+ * @property {number} major
+ * @property {number | undefined} minor
+ * @property {number | undefined} patch
+ * @property {'alpha' | undefined} prerelease
+ * @property {number | undefined} build
  *
  * @example
  * { major: 0 } - use default version 0.1.9-alpha
@@ -258,27 +262,38 @@ export interface Widget<T extends WidgetType> {
  * { major: 1, minor: 2, patch: 3 } - use version 1.2.3 specifically
  */
 export type SemanticVersion = {
+  /** The major version of the widgets, must specify a major version even if it is 0. */
   major: number;
+  /** The minor version of the widgets, leaving this blank will use the latest minor based on major */
   minor?: number;
+  /** The patch version of the widgets, leaving this blank will use the latest minor based on minor */
   patch?: number;
+  /** The prerelease version of the widgets, can only be 'alpha'. Do not use in production. */
   prerelease?: 'alpha';
+  /** The build version of the widgets. Do not use in production. */
   build?: number;
 };
 
 /**
  * Represents the global configuration options for the Checkout Widgets.
- * @property {WidgetTheme | undefined} theme - The theme of the Checkout Widget (default: "DARK")
- * @property {Environment | undefined} environment - The environment configuration (default: "SANDBOX")
- * @property {SemanticVersion | undefined} version - The version of the checkout widgets js file to use (default: "0.1.x")
- * @property {boolean | undefined} isOnRampEnabled - Enable on-ramp top-up method (default: "true")
- * @property {boolean | undefined} isSwapEnabled - Enable swap top-up method (default: "true")
- * @property {boolean | undefined} isBridgeEnabled - Enable bridge top-up method (default: "true")
+ * @property {WidgetTheme | undefined} theme
+ * @property {Environment | undefined} environment
+ * @property {SemanticVersion | undefined} version
+ * @property {boolean | undefined} isOnRampEnabled
+ * @property {boolean | undefined} isSwapEnabled
+ * @property {boolean | undefined} isBridgeEnabled
  */
 export type CheckoutWidgetsConfig = {
+  /** The theme of the Checkout Widget (default: "DARK") */
   theme?: WidgetTheme;
+  /** The environment configuration (default: "SANDBOX") */
   environment?: Environment;
+  /** The version of the checkout widgets js file to use (default: "0.1.x") */
   version?: SemanticVersion;
+  /** Enable on-ramp top-up method (default: "true") */
   isOnRampEnabled?: boolean;
+  /** Enable swap top-up method (default: "true") */
   isSwapEnabled?: boolean;
+  /** Enable bridge top-up method (default: "true") */
   isBridgeEnabled?: boolean;
 };

@@ -1,9 +1,10 @@
 import { WidgetTheme } from './theme';
 
 /**
- * Represents the local configuration options for the Checkout Widgets.
- * @property {WidgetTheme | undefined} theme - The theme of the Checkout Widget (default: "DARK")
+ * Widget Configuration represents the shared configuration options for the Checkout Widgets.
+ * @property {WidgetTheme | undefined} theme
  */
 export type WidgetConfiguration = {
+  /** The theme of the Checkout Widget (default: "DARK") */
   theme?: WidgetTheme;
 };

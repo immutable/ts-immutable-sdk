@@ -9,18 +9,21 @@ export enum OnRampEventType {
 
 /**
  * Represents a successful on-ramp transaction.
- * @property {string} transactionHash - The transaction hash of the successful transaction.
+ * @property {string} transactionHash
  */
 export type OnRampSuccess = {
+  /** The transaction hash of the successful transaction. */
   transactionHash: string;
 };
 
 /**
  * Type representing a On-ramp Widget with type FAILURE.
- * @property {string} reason - The reason why the on-ramp failed.
- * @property {number} timestamp - The timestamp of the failed transaction.
+ * @property {string} reason
+ * @property {number} timestamp
  */
 export type OnRampFailed = {
+  /** The reason why the on-ramp failed. */
   reason: string;
+  /** The timestamp of the failed transaction. */
   timestamp: number;
 };

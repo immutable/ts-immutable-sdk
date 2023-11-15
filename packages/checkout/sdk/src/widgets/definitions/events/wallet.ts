@@ -11,13 +11,16 @@ export enum WalletEventType {
 
 /**
  * Represents an event that is triggered when the user switches the network in their wallet.
- * @property {string} network - The name of the network that the user switched to.
- * @property {number} chainId - The chain ID of the network that the user switched to.
- * @property {Web3Provider} provider - The Web3 provider object for the switched network.
+ * @property {string} network
+ * @property {number} chainId
+ * @property {Web3Provider} provider
  */
 export type WalletNetworkSwitch = {
+  /**  The name of the network that the user switched to. */
   network: string;
+  /**  The chain ID of the network that the user switched to. */
   chainId: number;
+  /** The Web3 provider object for the switched network. */
   provider: Web3Provider;
 };
 

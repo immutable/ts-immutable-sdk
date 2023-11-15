@@ -128,7 +128,7 @@ export function SwapWidget({
     });
   }, [viewDispatch]);
 
-  const loadBalances = async (): Promise<boolean> => {
+  const loadBalances = useCallback(async (): Promise<boolean> => {
     if (!checkout) throw new Error('loadBalances: missing checkout');
     if (!provider) throw new Error('loadBalances: missing provider');
 
@@ -142,6 +142,19 @@ export function SwapWidget({
         provider,
         allowTokenListType: TokenFilterTypes.SWAP,
       });
+      swapDispatch({
+        payload: {
+          type: SwapActions.SET_ALLOWED_TOKENS,
+          allowedTokens: tokensAndBalances.allowList.tokens,
+        },
+      });
+
+      swapDispatch({
+        payload: {
+          type: SwapActions.SET_TOKEN_BALANCES,
+          tokenBalances: tokensAndBalances.allowedBalances,
+        },
+      });
     } catch (err: any) {
       if (DEFAULT_BALANCE_RETRY_POLICY.nonRetryable!(err)) {
         showErrorView(err, loadBalances);
@@ -149,22 +162,8 @@ export function SwapWidget({
       }
     }
 
-    swapDispatch({
-      payload: {
-        type: SwapActions.SET_ALLOWED_TOKENS,
-        allowedTokens: tokensAndBalances.allowList.tokens,
-      },
-    });
-
-    swapDispatch({
-      payload: {
-        type: SwapActions.SET_TOKEN_BALANCES,
-        tokenBalances: tokensAndBalances.allowedBalances,
-      },
-    });
-
     return true;
-  };
+  }, [checkout, provider]);
 
   useEffect(() => {
     (async () => {
