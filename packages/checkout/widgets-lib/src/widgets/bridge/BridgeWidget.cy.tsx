@@ -335,6 +335,30 @@ describe('Bridge Widget tests', () => {
       cySmartGet('@getAllBalancesStub').should('have.been.called');
       cySmartGet('@getTokenAllowListStub').should('have.been.called');
     });
+
+    it('should show BridgeComingSoon for Passport users if trying to switch to L1', () => {
+      const params = {} as BridgeWidgetParams;
+      mount(
+        <ConnectLoaderTestComponent
+          initialStateOverride={{
+            ...connectLoaderState,
+            provider: {
+              ...mockProvider,
+              provider: {
+                isPassport: true,
+                request: async () => null,
+              },
+            } as unknown as Web3Provider,
+          }}
+        >
+          <BridgeWidget
+            config={config}
+            {...params}
+          />
+        </ConnectLoaderTestComponent>,
+      );
+      cySmartGet('bridge-coming-soon').should('be.visible');
+    });
   });
 
   describe('Bridge Submit', () => {
