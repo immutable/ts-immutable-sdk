@@ -133,6 +133,14 @@ export function WalletWidget(props: WalletWidgetInputs) {
       /** Fetch the user's balances based on their connected provider and correct network */
       setBalancesLoading(true);
 
+      /** Go to Wallet Balances view while it is still loading */
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: { type: WalletWidgetViews.WALLET_BALANCES },
+        },
+      });
+
       let balances: GetBalanceResult[] = [];
       try {
         balances = await getTokenBalances(checkout, provider, network.chainId);
@@ -153,13 +161,6 @@ export function WalletWidget(props: WalletWidgetInputs) {
         payload: {
           type: WalletActions.SET_NETWORK,
           network,
-        },
-      });
-
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: { type: WalletWidgetViews.WALLET_BALANCES },
         },
       });
     } catch (error: any) {

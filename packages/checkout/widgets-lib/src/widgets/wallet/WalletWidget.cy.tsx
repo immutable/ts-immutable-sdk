@@ -431,7 +431,7 @@ describe('WalletWidget tests', () => {
         cySmartGet('wallet-balances').should('be.visible');
       });
 
-      it.only('should show balances after getAllBalances failure', () => {
+      it('should show balances after getAllBalances failure', () => {
         getAllBalancesStub
           .rejects()
           .resolves({
