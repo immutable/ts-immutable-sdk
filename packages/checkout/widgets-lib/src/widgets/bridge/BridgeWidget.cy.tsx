@@ -6,7 +6,9 @@ import { mount } from 'cypress/react18';
 import {
   BridgeWidgetParams,
   ChainId,
-  Checkout, CheckoutErrorType, GasEstimateType, TokenAmountEstimate, WidgetTheme,
+  Checkout,
+  CheckoutErrorType,
+  GasEstimateType, TokenAmountEstimate, WidgetTheme,
 } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
@@ -16,7 +18,6 @@ import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { BridgeWidget } from './BridgeWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { IMX_ADDRESS_ZKEVM } from '../../lib';
 import { text } from '../../resources/text/textConfig';
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
 import { ConnectionStatus } from '../../context/connect-loader-context/ConnectLoaderContext';
@@ -116,7 +117,7 @@ describe('Bridge Widget tests', () => {
               name: 'ImmutableX',
               symbol: 'IMX',
               decimals: 18,
-              address: IMX_ADDRESS_ZKEVM,
+              address: '0ximxaddronl1',
               icon: '123',
             },
           },
@@ -141,7 +142,7 @@ describe('Bridge Widget tests', () => {
             name: 'ImmutableX',
             symbol: 'IMX',
             decimals: 18,
-            address: IMX_ADDRESS_ZKEVM,
+            address: '0ximxaddronl1',
           },
         ],
       });
@@ -245,7 +246,7 @@ describe('Bridge Widget tests', () => {
                 name: 'ImmutableX',
                 symbol: 'IMX',
                 decimals: 18,
-                address: IMX_ADDRESS_ZKEVM,
+                address: '0ximxaddronl1',
                 icon: '123',
               },
             },
@@ -264,7 +265,7 @@ describe('Bridge Widget tests', () => {
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet(`bridge-token-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).should('exist');
+      cySmartGet('bridge-token-coin-selector__option-imx-0ximxaddronl1').should('exist');
     });
 
     it('should show error screen after getAllBalances unrecoverable failure', () => {
@@ -281,7 +282,7 @@ describe('Bridge Widget tests', () => {
                 name: 'ImmutableX',
                 symbol: 'IMX',
                 decimals: 18,
-                address: IMX_ADDRESS_ZKEVM,
+                address: '0ximxaddronl1',
                 icon: '123',
               },
             },
@@ -305,7 +306,7 @@ describe('Bridge Widget tests', () => {
       cySmartGet('footer-button').click();
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet(`bridge-token-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).should('exist');
+      cySmartGet('bridge-token-coin-selector__option-imx-0ximxaddronl1').should('exist');
     });
 
     it('should set up bridge widget on mount', () => {
@@ -403,7 +404,7 @@ describe('Bridge Widget tests', () => {
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet(`bridge-token-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).click();
+      cySmartGet('bridge-token-coin-selector__option-imx-0ximxaddronl1').click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
       cySmartGet('bridge-amount-text__input').blur();
@@ -483,7 +484,7 @@ describe('Bridge Widget tests', () => {
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet(`bridge-token-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).click();
+      cySmartGet('bridge-token-coin-selector__option-imx-0ximxaddronl1').click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
       cySmartGet('bridge-amount-text__input').blur();
@@ -534,7 +535,7 @@ describe('Bridge Widget tests', () => {
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet(`bridge-token-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).click();
+      cySmartGet('bridge-token-coin-selector__option-imx-0ximxaddronl1').click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
       cySmartGet('bridge-amount-text__input').blur();
@@ -591,7 +592,7 @@ describe('Bridge Widget tests', () => {
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet(`bridge-token-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).click();
+      cySmartGet('bridge-token-coin-selector__option-imx-0ximxaddronl1').click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
       cySmartGet('bridge-amount-text__input').blur();
@@ -645,7 +646,7 @@ describe('Bridge Widget tests', () => {
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet(`bridge-token-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).click();
+      cySmartGet('bridge-token-coin-selector__option-imx-0ximxaddronl1').click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
       cySmartGet('bridge-amount-text__input').blur();
@@ -699,7 +700,7 @@ describe('Bridge Widget tests', () => {
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet(`bridge-token-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).click();
+      cySmartGet('bridge-token-coin-selector__option-imx-0ximxaddronl1').click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
       cySmartGet('bridge-amount-text__input').blur();

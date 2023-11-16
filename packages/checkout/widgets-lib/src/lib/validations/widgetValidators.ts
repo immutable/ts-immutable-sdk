@@ -1,7 +1,7 @@
 import { WalletProviderName } from '@imtbl/checkout-sdk';
 import { utils } from 'ethers';
 import { amountInputValidation } from './amountInputValidations';
-import { NATIVE } from '../constants';
+import { isNativeToken } from '../utils';
 
 export function isValidWalletProvider(walletProviderName: string | undefined) {
   if (walletProviderName === undefined) return true; // allow undefined as it may not be defined
@@ -19,8 +19,6 @@ export function isValidAmount(amount: string | undefined) {
 }
 
 export function isValidAddress(address: string | undefined) {
-  if (address === undefined) return false;
-  if (address === '') return true;
-  if (address === NATIVE || address === NATIVE.toLowerCase()) return true;
-  return utils.isAddress(address);
+  if (isNativeToken(address)) return true;
+  return utils.isAddress(address!);
 }

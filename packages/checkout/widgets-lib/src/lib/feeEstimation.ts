@@ -5,7 +5,8 @@ import {
   TokenInfo,
 } from '@imtbl/checkout-sdk';
 import { BigNumber, ethers } from 'ethers';
-import { IMX_ADDRESS_ZKEVM, IMX_TOKEN_SYMBOL } from './constants';
+import { IMX_TOKEN_SYMBOL } from './constants';
+import { isNativeToken } from './utils';
 
 const convertFeeToFiat = (
   fee: BigNumber | undefined,
@@ -16,7 +17,7 @@ const convertFeeToFiat = (
 
   if (fee && token) {
     const formattedAmount = ethers.utils.formatUnits(fee, token.decimals);
-    const tokenSymbol = token.address === IMX_ADDRESS_ZKEVM
+    const tokenSymbol = isNativeToken(token.address)
       ? IMX_TOKEN_SYMBOL
       : token.symbol;
     const gasFeeTokenConversion = conversions.get(

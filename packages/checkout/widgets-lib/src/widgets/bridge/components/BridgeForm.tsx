@@ -119,7 +119,7 @@ export function BridgeForm(props: BridgeFormProps) {
       if (defaultFromContractAddress) {
         setToken(
           tokenBalances.find(
-            (b) => (isNativeToken(b.token.address) && defaultFromContractAddress?.toLocaleUpperCase() === NATIVE)
+            (b) => (isNativeToken(b.token.address) && defaultFromContractAddress?.toLowerCase() === NATIVE)
             || (b.token.address?.toLowerCase() === defaultFromContractAddress?.toLowerCase()),
           ),
         );
@@ -352,7 +352,7 @@ export function BridgeForm(props: BridgeFormProps) {
                 approveTransaction: approvalTransaction,
                 transaction: unsignedBridgeTransaction,
                 bridgeFormInfo: {
-                  fromContractAddress: token.token?.address ?? '',
+                  fromContractAddress: isNativeToken(token?.token.address) ? NATIVE : token?.token.address ?? '',
                   fromAmount: amount,
                 },
               },
@@ -380,7 +380,7 @@ export function BridgeForm(props: BridgeFormProps) {
               token: token?.token!,
               transactionResponse,
               bridgeForm: {
-                fromContractAddress: token?.token.address ?? '',
+                fromContractAddress: isNativeToken(token?.token.address) ? NATIVE : token?.token.address ?? '',
                 fromAmount: amount,
               },
             },
@@ -389,6 +389,9 @@ export function BridgeForm(props: BridgeFormProps) {
       });
     } catch (err: any) {
       setLoading(false);
+
+      console.log('failed token:', token?.token.address);
+      console.log('is native?::', isNativeToken(token?.token.address) ? NATIVE : token?.token.address ?? '');
 
       if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
         setShowTxnRejectedState(true);
@@ -405,7 +408,7 @@ export function BridgeForm(props: BridgeFormProps) {
               type: BridgeWidgetViews.FAIL,
               reason: 'Transaction failed',
               data: {
-                fromContractAddress: token?.token.address ?? '',
+                fromContractAddress: isNativeToken(token?.token.address) ? NATIVE : token?.token.address ?? '',
                 fromAmount: amount,
               },
             },
