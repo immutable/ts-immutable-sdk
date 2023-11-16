@@ -152,7 +152,7 @@ export const bridgeRoute = async (
   if (!hasSufficientL1Eth(tokenBalanceResult, bridgeFeeEstimate.totalFees)) return undefined;
 
   const l1RepresentationResult = await fetchL1Representation(config, bridgeRequirement.l2address);
-  if (typeof l1RepresentationResult === undefined) return undefined;
+  if (!l1RepresentationResult) return undefined;
 
   // Ensure l1address is in the allowed token list
   const { l1address } = l1RepresentationResult as L1ToL2TokenAddressMapping;
