@@ -9,7 +9,7 @@ jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('RemoteConfig', () => {
-  const version:string = 'v2';
+  const version = 'v2';
 
   afterEach(() => {
     jest.clearAllMocks();
