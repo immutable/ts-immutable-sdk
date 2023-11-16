@@ -25,16 +25,16 @@ export const retry = async <T>(
   try {
     return await fn();
   } catch (error: any) {
+    if (nonRetryableSilently && nonRetryableSilently(error)) return undefined;
+
+    if (nonRetryable && nonRetryable(error)) throw error;
+
     if (currentRetries !== undefined) {
       if (currentRetries <= 0) {
         throw error;
       }
       currentRetries -= 1;
     }
-
-    if (nonRetryableSilently && nonRetryableSilently(error)) return undefined;
-
-    if (nonRetryable && nonRetryable(error)) throw error;
 
     await sleep(retryIntervalMs);
     return retry(fn, {
