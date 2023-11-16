@@ -202,11 +202,7 @@ export default class AuthManager {
         try {
           const tokenResponse = await this.getDeviceFlowToken(deviceCode);
           const user = AuthManager.mapDeviceTokenResponseToDomainUserModel(tokenResponse);
-
-          // Only persist credentials that contain the necessary data
-          if (user.imx?.ethAddress && user.imx?.starkAddress && user.imx?.userAdminAddress) {
-            this.deviceCredentialsManager.saveCredentials(tokenResponse);
-          }
+          this.deviceCredentialsManager.saveCredentials(tokenResponse);
 
           return user;
         } catch (error) {
@@ -292,11 +288,7 @@ export default class AuthManager {
 
       const tokenResponse = await this.getPKCEToken(authorizationCode, pkceData.verifier);
       const user = AuthManager.mapDeviceTokenResponseToDomainUserModel(tokenResponse);
-
-      // Only persist credentials that contain the necessary data
-      if (user.imx?.ethAddress && user.imx?.starkAddress && user.imx?.userAdminAddress) {
-        this.deviceCredentialsManager.saveCredentials(tokenResponse);
-      }
+      this.deviceCredentialsManager.saveCredentials(tokenResponse);
 
       return user;
     }, PassportErrorType.AUTHENTICATION_ERROR);
