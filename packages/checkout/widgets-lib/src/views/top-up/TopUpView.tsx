@@ -280,6 +280,7 @@ export function TopUpView({
             .sort((a, b) => Number(b.isAvailable) - Number(a.isAvailable))
             .map((element) => element.isEnabled && (
             <TopUpMenuItem
+              key={element.textConfig.heading.toLowerCase()}
               testId={element.testId}
               icon={element.icon as 'Wallet' | 'Coins' | 'Minting'}
               heading={element.textConfig.heading}
