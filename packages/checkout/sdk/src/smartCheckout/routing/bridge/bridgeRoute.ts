@@ -129,7 +129,6 @@ export const bridgeRoute = async (
   feeEstimates: Map<FundingStepType, FundingRouteFeeEstimate>,
 ): Promise<BridgeFundingStep | undefined> => {
   if (!availableRoutingOptions.bridge) return undefined;
-  if (bridgeRequirement.l2address === undefined || bridgeRequirement.l2address === '') return undefined;
   const chainId = getL1ChainId(config);
   const tokenBalanceResult = tokenBalanceResults.get(chainId);
   const l1provider = readOnlyProviders.get(chainId);
@@ -153,11 +152,10 @@ export const bridgeRoute = async (
   if (!hasSufficientL1Eth(tokenBalanceResult, bridgeFeeEstimate.totalFees)) return undefined;
 
   const l1RepresentationResult = await fetchL1Representation(config, bridgeRequirement.l2address);
-  // No mapping on L1 for this token
-  const { l1address } = l1RepresentationResult as L1ToL2TokenAddressMapping;
-  if (l1address === '') return undefined;
+  if (typeof l1RepresentationResult === undefined) return undefined;
 
   // Ensure l1address is in the allowed token list
+  const { l1address } = l1RepresentationResult as L1ToL2TokenAddressMapping;
   if (l1address === INDEXER_ETH_ROOT_CONTRACT_ADDRESS) {
     if (!allowedTokenList.find((token) => !('address' in token))) return undefined;
   } else if (!allowedTokenList.find((token) => token.address === l1address)) {
