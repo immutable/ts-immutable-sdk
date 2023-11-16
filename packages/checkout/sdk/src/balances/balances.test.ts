@@ -23,7 +23,7 @@ import {
   Blockscout,
   BlockscoutNativeTokenData, BlockscoutToken, BlockscoutTokens, BlockscoutTokenType,
 } from '../client';
-import { BLOCKSCOUT_CHAIN_URL_MAP, ERC20ABI, IMX_ADDRESS_ZKEVM } from '../env';
+import { BLOCKSCOUT_CHAIN_URL_MAP, ERC20ABI } from '../env';
 
 jest.mock('../tokens');
 jest.mock('../client');
@@ -367,7 +367,7 @@ describe('balances', () => {
           name: 'IMX',
           symbol: 'IMX',
           decimals: '18',
-          address: IMX_ADDRESS_ZKEVM,
+          address: '',
         } as BlockscoutNativeTokenData,
         value: '777777777777777777',
       } as BlockscoutToken);
@@ -412,7 +412,7 @@ describe('balances', () => {
           balance: BigNumber.from('777777777777777777'),
           formattedBalance: '0.777777777777777777',
           token: {
-            address: '0x0000000000000000000000000000000000001010',
+            address: '',
             decimals: 18,
             name: 'IMX',
             symbol: 'IMX',
@@ -431,7 +431,7 @@ describe('balances', () => {
           name: 'IMX',
           symbol: 'IMX',
           decimals: '18',
-          address: IMX_ADDRESS_ZKEVM,
+          address: '',
         } as BlockscoutNativeTokenData,
         value: '777777777777777777',
       } as BlockscoutToken);
@@ -465,7 +465,7 @@ describe('balances', () => {
           balance: BigNumber.from('777777777777777777'),
           formattedBalance: '0.777777777777777777',
           token: {
-            address: '0x0000000000000000000000000000000000001010',
+            address: '',
             decimals: 18,
             name: 'IMX',
             symbol: 'IMX',

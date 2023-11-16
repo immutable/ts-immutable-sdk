@@ -33,7 +33,6 @@ import { onRampRoute } from './onRamp';
 import { bridgeAndSwapRoute } from './bridgeAndSwap/bridgeAndSwapRoute';
 import { RoutingTokensAllowList } from '../allowList/types';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from './indexer/fetchL1Representation';
-import { IMX_ADDRESS_ZKEVM } from '../../env';
 
 jest.mock('./tokenBalances');
 jest.mock('./bridge/bridgeRoute');
@@ -306,7 +305,6 @@ describe('routingCalculator', () => {
               name: 'IMX',
               symbol: 'IMX',
               decimals: 18,
-              address: IMX_ADDRESS_ZKEVM,
             },
           },
         ],
@@ -460,7 +458,6 @@ describe('routingCalculator', () => {
               name: 'IMX',
               symbol: 'IMX',
               decimals: 18,
-              address: IMX_ADDRESS_ZKEVM,
             },
           },
         ],
@@ -622,7 +619,6 @@ describe('routingCalculator', () => {
               name: 'IMX',
               symbol: 'IMX',
               decimals: 18,
-              address: IMX_ADDRESS_ZKEVM,
             },
           },
         ],
@@ -782,7 +778,6 @@ describe('routingCalculator', () => {
               name: 'IMX',
               symbol: 'IMX',
               decimals: 18,
-              address: IMX_ADDRESS_ZKEVM,
             },
           },
         ],
@@ -1210,7 +1205,6 @@ describe('routingCalculator', () => {
                 name: 'IMX',
                 symbol: 'IMX',
                 decimals: 18,
-                address: IMX_ADDRESS_ZKEVM,
               },
             },
           ],
@@ -1268,7 +1262,6 @@ describe('routingCalculator', () => {
                 name: 'IMX',
                 symbol: 'IMX',
                 decimals: 18,
-                address: IMX_ADDRESS_ZKEVM,
               },
             },
           ],
@@ -1357,7 +1350,6 @@ describe('routingCalculator', () => {
                 name: 'IMX',
                 symbol: 'IMX',
                 decimals: 18,
-                address: IMX_ADDRESS_ZKEVM,
               },
             },
           ],
@@ -1447,7 +1439,6 @@ describe('routingCalculator', () => {
                 name: 'IMX',
                 symbol: 'IMX',
                 decimals: 18,
-                address: IMX_ADDRESS_ZKEVM,
               },
             },
           ],
@@ -1536,7 +1527,6 @@ describe('routingCalculator', () => {
                 name: 'IMX',
                 symbol: 'IMX',
                 decimals: 18,
-                address: IMX_ADDRESS_ZKEVM,
               },
             },
           ],
@@ -1640,7 +1630,6 @@ describe('routingCalculator', () => {
                 name: 'IMX',
                 symbol: 'IMX',
                 decimals: 18,
-                address: IMX_ADDRESS_ZKEVM,
               },
             },
           ],
@@ -1740,7 +1729,6 @@ describe('routingCalculator', () => {
             name: 'IMX',
             symbol: 'IMX',
             decimals: 18,
-            address: IMX_ADDRESS_ZKEVM,
           },
         },
       ],

@@ -3,7 +3,6 @@ import { CheckoutConfiguration } from '../../../config';
 import { createBlockchainDataInstance } from '../../../instance';
 import { ChainId } from '../../../types';
 import { fetchL1Representation } from './fetchL1Representation';
-import { IMX_ADDRESS_ZKEVM } from '../../../env';
 
 jest.mock('../../../instance');
 
@@ -32,7 +31,7 @@ describe('fetchL1Representation', () => {
   });
 
   it('should fetch L1 representation of NATIVE', async () => {
-    const requiredL2Address = IMX_ADDRESS_ZKEVM;
+    const requiredL2Address = '';
     (createBlockchainDataInstance as jest.Mock).mockReturnValue({
       getToken: jest.fn().mockResolvedValue({}),
     });
@@ -51,7 +50,7 @@ describe('fetchL1Representation', () => {
     expect(result).toEqual(
       {
         l1address: '0x2Fa06C6672dDCc066Ab04631192738799231dE4a',
-        l2address: '0x0000000000000000000000000000000000001010',
+        l2address: '',
       },
     );
     expect(createBlockchainDataInstance).not.toHaveBeenCalled();

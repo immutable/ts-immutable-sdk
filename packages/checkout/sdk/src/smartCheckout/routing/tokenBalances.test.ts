@@ -7,7 +7,6 @@ import { ChainId } from '../../types';
 import { getAllBalances } from '../../balances';
 import { CheckoutErrorType } from '../../errors';
 import { TokenBalanceResult } from './types';
-import { IMX_ADDRESS_ZKEVM } from '../../env';
 
 jest.mock('../../balances');
 jest.mock('../../config');
@@ -48,7 +47,6 @@ describe('tokenBalances', () => {
               name: 'IMX',
               symbol: 'IMX',
               decimals: 18,
-              address: IMX_ADDRESS_ZKEVM,
             },
           },
         ],
@@ -91,7 +89,6 @@ describe('tokenBalances', () => {
               name: 'IMX',
               symbol: 'IMX',
               decimals: 18,
-              address: IMX_ADDRESS_ZKEVM,
             },
           },
         ],
@@ -161,7 +158,6 @@ describe('tokenBalances', () => {
               name: 'IMX',
               symbol: 'IMX',
               decimals: 18,
-              address: IMX_ADDRESS_ZKEVM,
             },
           },
         ],
@@ -207,7 +203,6 @@ describe('tokenBalances', () => {
               name: 'IMX',
               symbol: 'IMX',
               decimals: 18,
-              address: IMX_ADDRESS_ZKEVM,
             },
           },
         ],

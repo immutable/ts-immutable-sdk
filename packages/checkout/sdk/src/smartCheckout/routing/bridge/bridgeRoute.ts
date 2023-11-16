@@ -15,14 +15,13 @@ import { CheckoutConfiguration, getL1ChainId } from '../../../config';
 import {
   TokenBalanceResult,
 } from '../types';
-import { BalanceRequirement } from '../../balanceCheck/types';
 import { getEthBalance } from './getEthBalance';
 import { getBridgeFeeEstimate } from './getBridgeFeeEstimate';
 import { estimateGasForBridgeApproval } from './estimateApprovalGas';
 import { CheckoutError, CheckoutErrorType } from '../../../errors';
 import { allowListCheckForBridge } from '../../allowList/allowListCheck';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS, fetchL1Representation } from '../indexer/fetchL1Representation';
-import { DEFAULT_TOKEN_DECIMALS, IMX_ADDRESS_ZKEVM } from '../../../env';
+import { DEFAULT_TOKEN_DECIMALS } from '../../../env';
 
 export const hasSufficientL1Eth = (
   tokenBalanceResult: TokenBalanceResult,
@@ -30,20 +29,6 @@ export const hasSufficientL1Eth = (
 ): boolean => {
   const balance = getEthBalance(tokenBalanceResult);
   return balance.gte(totalFees);
-};
-
-export const getTokenAddressFromRequirement = (
-  balanceRequirement: BalanceRequirement,
-): string => {
-  if (balanceRequirement.type === ItemType.NATIVE) {
-    return IMX_ADDRESS_ZKEVM;
-  }
-
-  if (balanceRequirement.type === ItemType.ERC20) {
-    return balanceRequirement.required.token.address ?? '';
-  }
-
-  return '';
 };
 
 export const getBridgeGasEstimate = async (

@@ -10,7 +10,6 @@ import {
 import { allowListCheckForOnRamp } from '../../allowList';
 import { onRampRoute } from './onRampRoute';
 import { BalanceERC20Requirement, BalanceERC721Requirement } from '../../balanceCheck/types';
-import { IMX_ADDRESS_ZKEVM } from '../../../env';
 
 jest.mock('../../allowList/allowListCheck');
 
@@ -29,7 +28,6 @@ describe('onRampRoute', () => {
           decimals: 18,
         },
         {
-          address: IMX_ADDRESS_ZKEVM,
           name: 'IMX',
           symbol: 'IMX',
           decimals: 18,
@@ -107,7 +105,6 @@ describe('onRampRoute', () => {
         balance: BigNumber.from(10),
         formattedBalance: '10',
         token: {
-          address: IMX_ADDRESS_ZKEVM,
           name: 'IMX',
           symbol: 'IMX',
           decimals: 18,
@@ -118,7 +115,6 @@ describe('onRampRoute', () => {
         balance: BigNumber.from(4),
         formattedBalance: '4',
         token: {
-          address: IMX_ADDRESS_ZKEVM,
           name: 'IMX',
           symbol: 'IMX',
           decimals: 18,
@@ -153,7 +149,6 @@ describe('onRampRoute', () => {
             formattedBalance: '4',
           },
           token: {
-            address: IMX_ADDRESS_ZKEVM,
             name: 'IMX',
             symbol: 'IMX',
             decimals: 18,

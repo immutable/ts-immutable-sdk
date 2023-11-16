@@ -5,8 +5,6 @@ import { NetworkDetails, NetworkMap } from '../types';
 
 export const ENV_DEVELOPMENT = 'development' as Environment;
 
-export const IMX_ADDRESS_ZKEVM = '0x0000000000000000000000000000000000001010';
-
 export const DEFAULT_TOKEN_DECIMALS = 18;
 
 export const NATIVE = 'native';
@@ -15,7 +13,6 @@ export const ZKEVM_NATIVE_TOKEN = {
   name: 'IMX',
   symbol: 'IMX',
   decimals: DEFAULT_TOKEN_DECIMALS,
-  address: IMX_ADDRESS_ZKEVM,
 };
 
 /**

@@ -206,4 +206,6 @@ export async function switchWalletNetwork(
   } as SwitchNetworkResult;
 }
 
-export const isNativeToken = (address: string | undefined): boolean => !address || address === NATIVE;
+export const isNativeToken = (
+  address: string | undefined,
+): boolean => !address || address.toLocaleLowerCase() === NATIVE;
