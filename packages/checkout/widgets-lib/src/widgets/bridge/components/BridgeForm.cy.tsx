@@ -8,6 +8,8 @@ import {
 import { TokenBridge } from '@imtbl/bridge-sdk';
 import { Environment } from '@imtbl/config';
 import { Web3Provider } from '@ethersproject/providers';
+import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
+import { StrongCheckoutWidgetsConfig } from 'lib/withDefaultWidgetConfig';
 import { BridgeWidgetTestComponent } from '../test-components/BridgeWidgetTestComponent';
 import { cyIntercept, cySmartGet } from '../../../lib/testUtils';
 import { BridgeForm } from './BridgeForm';
@@ -144,14 +146,16 @@ describe('Bridge Form', () => {
 
   it('should use name or name and address for option id', () => {
     mount(
-      <BridgeWidgetTestComponent
-        initialStateOverride={bridgeState}
-        cryptoConversionsOverride={cryptoConversions}
-      >
-        <BridgeForm
-          testId="bridge-form"
-        />
-      </BridgeWidgetTestComponent>,
+      <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <BridgeWidgetTestComponent
+          initialStateOverride={bridgeState}
+          cryptoConversionsOverride={cryptoConversions}
+        >
+          <BridgeForm
+            testId="bridge-form"
+          />
+        </BridgeWidgetTestComponent>
+      </CustomAnalyticsProvider>,
     );
 
     cySmartGet('bridge-token-select__target__defaultLabel').should('have.text', 'Select coin');
@@ -161,15 +165,17 @@ describe('Bridge Form', () => {
 
   it('should set token to the native token when native passed in as from token', () => {
     mount(
-      <BridgeWidgetTestComponent
-        initialStateOverride={bridgeState}
-        cryptoConversionsOverride={cryptoConversions}
-      >
-        <BridgeForm
-          testId="bridge-form"
-          defaultFromContractAddress={NATIVE}
-        />
-      </BridgeWidgetTestComponent>,
+      <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <BridgeWidgetTestComponent
+          initialStateOverride={bridgeState}
+          cryptoConversionsOverride={cryptoConversions}
+        >
+          <BridgeForm
+            testId="bridge-form"
+            defaultFromContractAddress={NATIVE}
+          />
+        </BridgeWidgetTestComponent>
+      </CustomAnalyticsProvider>,
     );
 
     cySmartGet('bridge-token-select__target__controlledLabel').should('have.text', 'ETH');
@@ -187,16 +193,18 @@ describe('Bridge Form', () => {
         unsignedTx: {},
       });
     mount(
-      <BridgeWidgetTestComponent
-        initialStateOverride={bridgeState}
-        cryptoConversionsOverride={cryptoConversions}
-      >
-        <BridgeForm
-          testId="bridge-form"
-          defaultFromContractAddress="0xF57E7E7c23978c3caec3c3548e3d615c346e79Ff"
-          defaultAmount="10"
-        />
-      </BridgeWidgetTestComponent>,
+      <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <BridgeWidgetTestComponent
+          initialStateOverride={bridgeState}
+          cryptoConversionsOverride={cryptoConversions}
+        >
+          <BridgeForm
+            testId="bridge-form"
+            defaultFromContractAddress="0xF57E7E7c23978c3caec3c3548e3d615c346e79Ff"
+            defaultAmount="10"
+          />
+        </BridgeWidgetTestComponent>
+      </CustomAnalyticsProvider>,
     );
 
     cySmartGet('bridge-token-select__target__controlledLabel').should('have.text', 'IMX');
@@ -236,18 +244,20 @@ describe('Bridge Form', () => {
         });
 
       mount(
-        <ConnectLoaderTestComponent
-          initialStateOverride={connectLoaderState}
-        >
-          <BridgeWidgetTestComponent
-            initialStateOverride={bridgeState}
-            cryptoConversionsOverride={cryptoConversions}
+        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <BridgeForm
-              testId="bridge-form"
-            />
-          </BridgeWidgetTestComponent>
-        </ConnectLoaderTestComponent>,
+            <BridgeWidgetTestComponent
+              initialStateOverride={bridgeState}
+              cryptoConversionsOverride={cryptoConversions}
+            >
+              <BridgeForm
+                testId="bridge-form"
+              />
+            </BridgeWidgetTestComponent>
+          </ConnectLoaderTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('bridge-token-select__target').click();
@@ -307,18 +317,20 @@ describe('Bridge Form', () => {
         });
 
       mount(
-        <ConnectLoaderTestComponent
-          initialStateOverride={connectLoaderState}
-        >
-          <BridgeWidgetTestComponent
-            initialStateOverride={bridgeState}
-            cryptoConversionsOverride={cryptoConversions}
+        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <BridgeForm
-              testId="bridge-form"
-            />
-          </BridgeWidgetTestComponent>
-        </ConnectLoaderTestComponent>,
+            <BridgeWidgetTestComponent
+              initialStateOverride={bridgeState}
+              cryptoConversionsOverride={cryptoConversions}
+            >
+              <BridgeForm
+                testId="bridge-form"
+              />
+            </BridgeWidgetTestComponent>
+          </ConnectLoaderTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('bridge-token-select__target').click();
@@ -368,18 +380,20 @@ describe('Bridge Form', () => {
         });
 
       mount(
-        <ConnectLoaderTestComponent
-          initialStateOverride={connectLoaderState}
-        >
-          <BridgeWidgetTestComponent
-            initialStateOverride={bridgeState}
-            cryptoConversionsOverride={cryptoConversions}
+        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <BridgeForm
-              testId="bridge-form"
-            />
-          </BridgeWidgetTestComponent>
-        </ConnectLoaderTestComponent>,
+            <BridgeWidgetTestComponent
+              initialStateOverride={bridgeState}
+              cryptoConversionsOverride={cryptoConversions}
+            >
+              <BridgeForm
+                testId="bridge-form"
+              />
+            </BridgeWidgetTestComponent>
+          </ConnectLoaderTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('bridge-token-select__target').click();
@@ -424,18 +438,20 @@ describe('Bridge Form', () => {
           });
 
         mount(
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <BridgeWidgetTestComponent
-              initialStateOverride={bridgeState}
-              cryptoConversionsOverride={cryptoConversions}
+          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+            <ConnectLoaderTestComponent
+              initialStateOverride={connectLoaderState}
             >
-              <BridgeForm
-                testId="bridge-form"
-              />
-            </BridgeWidgetTestComponent>
-          </ConnectLoaderTestComponent>,
+              <BridgeWidgetTestComponent
+                initialStateOverride={bridgeState}
+                cryptoConversionsOverride={cryptoConversions}
+              >
+                <BridgeForm
+                  testId="bridge-form"
+                />
+              </BridgeWidgetTestComponent>
+            </ConnectLoaderTestComponent>
+          </CustomAnalyticsProvider>,
         );
       });
 
@@ -525,20 +541,22 @@ describe('Bridge Form', () => {
           });
 
         mount(
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <BridgeWidgetTestComponent
-              initialStateOverride={bridgeStateWithoutETH}
-              cryptoConversionsOverride={cryptoConversions}
+          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+            <ConnectLoaderTestComponent
+              initialStateOverride={connectLoaderState}
             >
-              <BridgeForm
-                testId="bridge-form"
-                defaultAmount="0.1"
-                defaultFromContractAddress={imxAddress}
-              />
-            </BridgeWidgetTestComponent>
-          </ConnectLoaderTestComponent>,
+              <BridgeWidgetTestComponent
+                initialStateOverride={bridgeStateWithoutETH}
+                cryptoConversionsOverride={cryptoConversions}
+              >
+                <BridgeForm
+                  testId="bridge-form"
+                  defaultAmount="0.1"
+                  defaultFromContractAddress={imxAddress}
+                />
+              </BridgeWidgetTestComponent>
+            </ConnectLoaderTestComponent>
+          </CustomAnalyticsProvider>,
         );
 
         cySmartGet('bridge-form-button').click();
