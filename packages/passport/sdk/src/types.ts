@@ -115,7 +115,7 @@ export type TokenPayload = {
 };
 
 export type IdTokenPayload = {
-  passport: PassportMetadata;
+  passport?: PassportMetadata;
   email: string;
   nickname: string;
   aud: string;
