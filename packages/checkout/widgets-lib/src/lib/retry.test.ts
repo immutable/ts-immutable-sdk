@@ -61,4 +61,23 @@ describe('retry', () => {
     ).rejects.toThrow('nonRetryable error');
     expect(mockFn).toHaveBeenCalledTimes(4);
   });
+
+  it('should throw error based on nonRetryableSilently', async () => {
+    const mockFn = jest.fn()
+      .mockRejectedValueOnce(new Error('Failed 1st time'))
+      .mockRejectedValueOnce(new Error('Failed 2nd time'))
+      .mockRejectedValueOnce(new Error('Failed 3rd time'))
+      .mockRejectedValueOnce(new Error('nonRetryableSilently error'))
+      .mockRejectedValueOnce(new Error('nonRetryable error'))
+      .mockRejectedValueOnce(new Error('Failed 4th time'));
+
+    await expect(
+      retry(mockFn, {
+        retryIntervalMs: 1,
+        nonRetryable: (err: Error) => err.message.includes('nonRetryable error'),
+        nonRetryableSilently: (err: Error) => err.message.includes('nonRetryableSilently error'),
+      }),
+    ).resolves.toBe(undefined);
+    expect(mockFn).toHaveBeenCalledTimes(4);
+  });
 });

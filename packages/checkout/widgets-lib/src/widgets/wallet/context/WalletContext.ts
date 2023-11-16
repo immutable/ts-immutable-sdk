@@ -1,14 +1,14 @@
 import {
   WalletProviderName,
   NetworkInfo,
+  GetBalanceResult,
 } from '@imtbl/checkout-sdk';
 import { createContext } from 'react';
-import { BalanceInfo } from '../functions/tokenBalances';
 
 export interface WalletState {
   walletProviderName: WalletProviderName | null;
   network: NetworkInfo | null;
-  tokenBalances: BalanceInfo[];
+  tokenBalances: GetBalanceResult[];
   supportedTopUps: TopUpFeature | null;
 }
 
@@ -60,7 +60,7 @@ export interface SetSwitchNetworkPayload {
 
 export interface SetTokenBalancesPayload {
   type: WalletActions.SET_TOKEN_BALANCES;
-  tokenBalances: BalanceInfo[];
+  tokenBalances: GetBalanceResult[];
 }
 
 export interface SetSupportedTopUpPayload {

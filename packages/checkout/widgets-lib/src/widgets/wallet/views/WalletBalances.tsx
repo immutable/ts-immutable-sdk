@@ -1,10 +1,11 @@
 import { Box, MenuItem } from '@biom3/react';
 import {
-  useCallback,
   useContext, useEffect, useMemo, useState,
 } from 'react';
 import { GasEstimateType, IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
 import { utils } from 'ethers';
+import { fetchTokenSymbols } from 'lib/fetchTokenSymbols';
+import { CryptoFiatActions, CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -12,7 +13,7 @@ import { text } from '../../../resources/text/textConfig';
 import { TotalTokenBalance } from '../components/TotalTokenBalance/TotalTokenBalance';
 import { TokenBalanceList } from '../components/TokenBalanceList/TokenBalanceList';
 import { NetworkMenu } from '../components/NetworkMenu/NetworkMenu';
-import { WalletActions, WalletContext } from '../context/WalletContext';
+import { WalletContext } from '../context/WalletContext';
 import { sendWalletWidgetCloseEvent } from '../WalletWidgetEvents';
 import {
   walletBalanceOuterContainerStyles,
@@ -21,22 +22,15 @@ import {
   walletBalanceListContainerStyles,
 } from './WalletBalancesStyles';
 import { getL1ChainId, getL2ChainId } from '../../../lib/networkUtils';
-import {
-  CryptoFiatActions,
-  CryptoFiatContext,
-} from '../../../context/crypto-fiat-context/CryptoFiatContext';
-import { BalanceInfo, getTokenBalances } from '../functions/tokenBalances';
 import { WalletWidgetViews } from '../../../context/view-context/WalletViewContextTypes';
 import {
   SharedViews,
   ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
-import { fetchTokenSymbols } from '../../../lib/fetchTokenSymbols';
 import { NotEnoughGas } from '../../../components/NotEnoughGas/NotEnoughGas';
 import { isNativeToken } from '../../../lib/utils';
 import {
-  DEFAULT_BALANCE_RETRY_POLICY,
   DEFAULT_TOKEN_DECIMALS,
   ETH_TOKEN_SYMBOL,
   ZERO_BALANCE_STRING,
@@ -46,12 +40,20 @@ import { ConnectLoaderContext } from '../../../context/connect-loader-context/Co
 import { isPassportProvider } from '../../../lib/providerUtils';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { BalanceInfo, mapTokenBalancesWithConversions } from '../functions/tokenBalances';
 
-export function WalletBalances() {
+type WalletBalancesProps = {
+  balancesLoading: boolean;
+  setBalancesLoading: (balances: boolean) => void;
+};
+export function WalletBalances({
+  balancesLoading,
+  setBalancesLoading,
+}: WalletBalancesProps) {
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
-  const { walletState, walletDispatch } = useContext(WalletContext);
+  const { walletState } = useContext(WalletContext);
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const { viewDispatch } = useContext(ViewContext);
@@ -63,7 +65,6 @@ export function WalletBalances() {
     tokenBalances,
   } = walletState;
   const { conversions } = cryptoFiatState;
-  const [balancesLoading, setBalancesLoading] = useState(true);
   const [showNotEnoughGasDrawer, setShowNotEnoughGasDrawer] = useState(false);
   const [walletAddress, setWalletAddress] = useState('');
   const [insufficientFundsForBridgeToL2Gas, setInsufficientFundsForBridgeToL2Gas] = useState(false);
@@ -71,6 +72,11 @@ export function WalletBalances() {
   const showNetworkMenu = !isPassport;
 
   const { track, page } = useAnalytics();
+
+  const balanceInfos: BalanceInfo[] = useMemo(
+    () => mapTokenBalancesWithConversions(network?.chainId!, tokenBalances, conversions),
+    [tokenBalances, conversions, network?.chainId],
+  );
 
   useEffect(() => {
     page({
@@ -107,13 +113,13 @@ export function WalletBalances() {
   useEffect(() => {
     let totalAmount = 0.0;
 
-    tokenBalances.forEach((balance) => {
+    balanceInfos.forEach((balance) => {
       const fiatAmount = parseFloat(balance.fiatAmount);
       if (!Number.isNaN(fiatAmount)) totalAmount += fiatAmount;
     });
 
     setTotalFiatAmount(totalAmount);
-  }, [tokenBalances]);
+  }, [balanceInfos]);
 
   // Silently runs a gas check for bridge to L2
   // This is to prevent the user having to wait for the gas estimate to complete to use the UI
@@ -125,7 +131,7 @@ export function WalletBalances() {
       if (!network) return;
       if (network.chainId !== getL1ChainId(checkout.config)) return;
 
-      const ethBalance = tokenBalances
+      const ethBalance = balanceInfos
         .find((balance) => isNativeToken(balance.address) && balance.symbol === ETH_TOKEN_SYMBOL);
       if (!ethBalance) return;
 
@@ -153,49 +159,7 @@ export function WalletBalances() {
       }
     };
     bridgeToL2GasCheck();
-  }, [tokenBalances, checkout, network]);
-
-  const showErrorView = useCallback(() => {
-    viewDispatch({
-      payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: {
-          type: SharedViews.ERROR_VIEW,
-          error: new Error('Unable to fetch balances'),
-        },
-      },
-    });
-  }, [viewDispatch]);
-
-  useEffect(() => {
-    if (!checkout || !provider || !network || !conversions) return;
-    if (conversions.size <= 0) return; // Prevent unnecessary re-rendering
-
-    (async () => {
-      let balances: BalanceInfo[] = [];
-      try {
-        balances = await getTokenBalances(checkout, provider, network.chainId, conversions);
-      } catch (error: any) {
-        if (DEFAULT_BALANCE_RETRY_POLICY.nonRetryable!(error)) {
-          showErrorView();
-          return;
-        }
-      }
-
-      walletDispatch({
-        payload: {
-          type: WalletActions.SET_TOKEN_BALANCES,
-          tokenBalances: balances,
-        },
-      });
-      setBalancesLoading(false);
-    })();
-  }, [
-    checkout,
-    provider,
-    network?.chainId,
-    conversions.size,
-  ]);
+  }, [balanceInfos, checkout, network]);
 
   const showAddCoins = useMemo(() => {
     if (!checkout || !network) return false;
@@ -279,7 +243,7 @@ export function WalletBalances() {
             )}
             {!balancesLoading && (
               <TokenBalanceList
-                balanceInfoItems={tokenBalances}
+                balanceInfoItems={balanceInfos}
                 bridgeToL2OnClick={handleBridgeToL2OnClick}
               />
             )}
