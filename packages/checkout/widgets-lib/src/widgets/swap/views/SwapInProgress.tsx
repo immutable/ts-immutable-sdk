@@ -27,6 +27,9 @@ export function SwapInProgress({ transactionResponse, swapForm }: SwapInProgress
     page({
       userJourney: UserJourney.SWAP,
       screen: 'SwapInProgress',
+      extras: {
+        swapFormInfo: swapForm,
+      },
     });
   }, []);
 
