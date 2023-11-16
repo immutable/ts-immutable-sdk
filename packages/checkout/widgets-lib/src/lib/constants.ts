@@ -32,6 +32,7 @@ export const DEFAULT_BALANCE_RETRY_POLICY: RetryType = {
   retryIntervalMs: DEFAULT_RETRY_DELAY,
   retries: 60, // retry up to DEFAULT_RETRY_DELAY / 1000 minutes
   nonRetryable: (err: any) => err?.data?.code >= 500 || err.type === CheckoutErrorType.GET_ERC20_BALANCE_ERROR,
+  nonRetryableSilently: (err: any) => err.type === CheckoutErrorType.WEB3_PROVIDER_ERROR,
 };
 
 /**
