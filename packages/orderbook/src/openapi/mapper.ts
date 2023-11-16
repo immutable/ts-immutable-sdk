@@ -17,14 +17,14 @@ export function mapFromOpenApiOrder(order: OpenApiOrder): Order {
       return {
         type: 'ERC20',
         contractAddress: item.contract_address,
-        amount: item.start_amount,
+        amount: item.amount,
       };
     }
 
     if (item.item_type === 'NATIVE') {
       return {
         type: 'NATIVE',
-        amount: item.start_amount,
+        amount: item.amount,
       };
     }
 
@@ -77,14 +77,14 @@ export function mapFromOpenApiTrade(trade: OpenApiTrade): Trade {
       return {
         type: 'ERC20',
         contractAddress: item.contract_address,
-        amount: item.start_amount,
+        amount: item.amount,
       };
     }
 
     if (item.item_type === 'NATIVE') {
       return {
         type: 'NATIVE',
-        amount: item.start_amount,
+        amount: item.amount,
       };
     }
 

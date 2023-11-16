@@ -16,8 +16,8 @@ export function mapImmutableOrderToSeaportOrderComponents(
     switch (buyItem.item_type) {
       case 'NATIVE':
         return {
-          startAmount: buyItem.start_amount,
-          endAmount: buyItem.start_amount,
+          startAmount: buyItem.amount,
+          endAmount: buyItem.amount,
           itemType: ItemType.NATIVE,
           recipient: order.account_address,
           token: constants.AddressZero,
@@ -25,8 +25,8 @@ export function mapImmutableOrderToSeaportOrderComponents(
         };
       case 'ERC20':
         return {
-          startAmount: buyItem.start_amount,
-          endAmount: buyItem.start_amount,
+          startAmount: buyItem.amount,
+          endAmount: buyItem.amount,
           itemType: ItemType.ERC20,
           recipient: order.account_address,
           token: buyItem.contract_address! || constants.AddressZero,
