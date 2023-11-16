@@ -15,11 +15,10 @@ const mockGetSigner = jest.fn();
 
 const mockLogin = jest.fn();
 
-const mockLoginSilent = jest.fn();
-
+const mockForceUserRefresh = jest.fn();
 const mockAuthManager = {
-  loginSilent: mockLoginSilent,
   login: mockLogin,
+  forceUserRefresh: mockForceUserRefresh,
 } as unknown as AuthManager;
 
 const mockImmutableXClient = {
@@ -58,17 +57,13 @@ describe('registerOffchain', () => {
         mockUserImx.accessToken,
       );
 
-      expect(mockAuthManager.loginSilent).toHaveBeenCalledTimes(4);
-      expect(mockAuthManager.loginSilent).toHaveBeenNthCalledWith(1, { forceRefresh: true });
-      expect(mockAuthManager.loginSilent).toHaveBeenNthCalledWith(2, { forceRefresh: true });
-      expect(mockAuthManager.loginSilent).toHaveBeenNthCalledWith(3, { forceRefresh: true });
-      expect(mockAuthManager.loginSilent).toHaveBeenCalledWith({ forceRefresh: true });
+      expect(mockAuthManager.forceUserRefresh).toHaveBeenCalledTimes(4);
     });
   });
 
   describe('when registration is successful', () => {
     it('should register the user and return the transaction hash as a string', async () => {
-      mockLoginSilent.mockResolvedValue(mockUserImx);
+      mockForceUserRefresh.mockResolvedValue(mockUserImx);
 
       const txHash = await registerOffchain(
         mockEthSigner,
@@ -84,8 +79,7 @@ describe('registerOffchain', () => {
         starkSigner: mockStarkSigner,
         usersApi: mockImmutableXClient.usersApi,
       }, mockUserImx.accessToken);
-      expect(mockAuthManager.loginSilent).toHaveBeenCalledTimes(1);
-      expect(mockAuthManager.loginSilent).toHaveBeenCalledWith({ forceRefresh: true });
+      expect(mockAuthManager.forceUserRefresh).toHaveBeenCalledTimes(1);
     });
 
     describe('when registration fails due to a 409 conflict', () => {
@@ -95,9 +89,9 @@ describe('registerOffchain', () => {
         err.status = 409;
 
         (registerPassportStarkEx as jest.Mock).mockRejectedValue(err);
-        mockLoginSilent.mockResolvedValue(mockUserImx);
+        mockForceUserRefresh.mockResolvedValue(mockUserImx);
 
-        await registerOffchain(
+        const hash = await registerOffchain(
           mockEthSigner,
           mockStarkSigner,
           mockUserImx,
@@ -105,8 +99,8 @@ describe('registerOffchain', () => {
           mockImmutableXClient.usersApi,
         );
 
-        expect(mockAuthManager.loginSilent).toHaveBeenCalledTimes(1);
-        expect(mockAuthManager.loginSilent).toHaveBeenCalledWith({ forceRefresh: true });
+        expect(mockAuthManager.forceUserRefresh).toHaveBeenCalledTimes(1);
+        expect(hash).toEqual({ tx_hash: '' });
       });
     });
   });

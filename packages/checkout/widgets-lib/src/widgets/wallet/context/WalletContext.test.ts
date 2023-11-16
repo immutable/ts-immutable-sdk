@@ -1,4 +1,4 @@
-import { ChainId } from '@imtbl/checkout-sdk';
+import { ChainId, WalletProviderName } from '@imtbl/checkout-sdk';
 import {
   SetSwitchNetworkPayload,
   WalletActions,
@@ -7,6 +7,7 @@ import {
   SetSupportedTopUpPayload,
   TopUpFeature,
   SetTokenBalancesPayload,
+  SetWalletProviderNamePayload,
 } from './WalletContext';
 import { BalanceInfo } from '../functions/tokenBalances';
 
@@ -91,5 +92,18 @@ describe('WalletContext', () => {
       isOnRampEnabled: false,
       isSwapAvailable: true,
     });
+  });
+
+  it('should update wallet provider name when reducer called with SET_WALLET_PROVIDER_NAME action', () => {
+    const setWalletProviderNamePayload: SetWalletProviderNamePayload = {
+      type: WalletActions.SET_WALLET_PROVIDER_NAME,
+      walletProviderName: WalletProviderName.METAMASK,
+    };
+
+    expect(initialWalletState.walletProviderName).toEqual(null);
+    const { walletProviderName } = walletReducer(initialWalletState, {
+      payload: setWalletProviderNamePayload,
+    });
+    expect(walletProviderName).toEqual(WalletProviderName.METAMASK);
   });
 });

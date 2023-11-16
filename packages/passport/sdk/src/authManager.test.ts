@@ -1,12 +1,17 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { User as OidcUser, UserManager, WebStorageStateStore } from 'oidc-client-ts';
+import jwt_decode from 'jwt-decode';
+import DeviceCredentialsManager from 'storage/device_credentials_manager';
 import AuthManager from './authManager';
 import { PassportError, PassportErrorType } from './errors/passportError';
 import { PassportConfiguration } from './config';
 import { mockUser, mockUserImx, mockUserZkEvm } from './test/mocks';
 import { isTokenExpired } from './utils/token';
+import { DeviceTokenResponse } from './types';
 
 jest.mock('oidc-client-ts');
+jest.mock('storage/device_credentials_manager');
+jest.mock('jwt-decode');
 jest.mock('./utils/token');
 
 const baseConfig = new ImmutableConfiguration({
@@ -73,6 +78,8 @@ describe('AuthManager', () => {
   let mockGetUser: jest.Mock;
   let mockSigninSilent: jest.Mock;
   let mockSignoutSilent: jest.Mock;
+  let mockAreValid: jest.Mock;
+  let mockGetCredentials: jest.Mock;
 
   beforeEach(() => {
     mockSignIn = jest.fn();
@@ -81,6 +88,8 @@ describe('AuthManager', () => {
     mockGetUser = jest.fn();
     mockSigninSilent = jest.fn();
     mockSignoutSilent = jest.fn();
+    mockAreValid = jest.fn();
+    mockGetCredentials = jest.fn();
     (UserManager as jest.Mock).mockReturnValue({
       signinPopup: mockSignIn,
       signinPopupCallback: mockSigninPopupCallback,
@@ -88,6 +97,10 @@ describe('AuthManager', () => {
       signoutSilent: mockSignoutSilent,
       getUser: mockGetUser,
       signinSilent: mockSigninSilent,
+    });
+    (DeviceCredentialsManager as jest.Mock).mockReturnValue({
+      areValid: mockAreValid,
+      getCredentials: mockGetCredentials,
     });
     authManager = new AuthManager(config);
   });
@@ -249,35 +262,6 @@ describe('AuthManager', () => {
     });
   });
 
-  describe('loginSilent', () => {
-    it('should get the login user and return the domain model', async () => {
-      mockGetUser.mockReturnValue(mockOidcUser);
-      mockSigninSilent.mockResolvedValue(mockOidcUser);
-
-      const result = await authManager.loginSilent();
-
-      expect(result).toEqual(mockUser);
-    });
-
-    it('should return null if there is no existed user', async () => {
-      mockGetUser.mockReturnValue(null);
-
-      const result = await authManager.loginSilent();
-
-      expect(result).toBeNull();
-    });
-
-    it('should return null if user is returned', async () => {
-      mockGetUser.mockReturnValue(mockOidcExpiredUser);
-      (isTokenExpired as jest.Mock).mockReturnValue(true);
-      mockSigninSilent.mockResolvedValue(null);
-
-      const result = await authManager.loginSilent();
-
-      expect(result).toBeNull();
-    });
-  });
-
   describe('loginCallback', () => {
     it('should call login callback', async () => {
       await authManager.loginCallback();
@@ -333,19 +317,19 @@ describe('AuthManager', () => {
     });
   });
 
-  describe('getUser', () => {
-    describe('when forceRefresh is set to true', () => {
-      it('should call signinSilent and return the domain model', async () => {
-        mockSigninSilent.mockReturnValue(mockOidcUser);
+  describe('forceUserRefresh', () => {
+    it('should call signinSilent and return the domain model', async () => {
+      mockSigninSilent.mockReturnValue(mockOidcUser);
 
-        const result = await authManager.getUser({ forceRefresh: true });
+      const result = await authManager.forceUserRefresh();
 
-        expect(result).toEqual(mockUser);
-        expect(mockSigninSilent).toBeCalled();
-        expect(mockGetUser).not.toBeCalled();
-      });
+      expect(result).toEqual(mockUser);
+      expect(mockSigninSilent).toBeCalled();
+      expect(mockGetUser).not.toBeCalled();
     });
+  });
 
+  describe('getUser', () => {
     it('should retrieve the user from the userManager and return the domain model', async () => {
       mockGetUser.mockReturnValue(mockOidcUser);
       (isTokenExpired as jest.Mock).mockReturnValue(false);
@@ -392,21 +376,21 @@ describe('AuthManager', () => {
       expect(await authManager.getUser()).toBeNull();
     });
 
-    describe('when concurrent requests getUser are made', () => {
-      describe('when forceRefresh is set to true', () => {
+    describe('when concurrent requests forceUserRefresh are made', () => {
+      describe('when forceUserRefresh', () => {
         it('should only call refresh the token once', async () => {
           mockSigninSilent.mockReturnValue(mockOidcUser);
 
           await Promise.allSettled([
-            authManager.getUser({ forceRefresh: true }),
-            authManager.getUser({ forceRefresh: true }),
+            authManager.forceUserRefresh(),
+            authManager.forceUserRefresh(),
           ]);
 
           expect(mockSigninSilent).toBeCalledTimes(1);
         });
       });
 
-      describe('when forceRefresh is set to false and the user is expired', () => {
+      describe('when the user is expired', () => {
         it('should only call refresh the token once', async () => {
           mockGetUser.mockReturnValue(mockOidcExpiredUser);
           (isTokenExpired as jest.Mock).mockReturnValue(true);
@@ -418,6 +402,43 @@ describe('AuthManager', () => {
           ]);
 
           expect(mockSigninSilent).toBeCalledTimes(1);
+        });
+      });
+    });
+  });
+
+  describe('connectImxWithCredentials', () => {
+    describe('when the user has not registered for any rollup', () => {
+      it('should return a User', async () => {
+        mockAreValid.mockReturnValue(true);
+        (jwt_decode as jest.Mock).mockReturnValue({
+          email: mockUser.profile.email,
+          nickname: mockUser.profile.nickname,
+          aud: 'audience123',
+          sub: 'subject123',
+          exp: 1234567890,
+        });
+
+        const tokenResponse: DeviceTokenResponse = {
+          access_token: mockUser.accessToken,
+          refresh_token: mockUser.refreshToken,
+          id_token: mockUser.idToken!,
+          token_type: 'Bearer',
+          expires_in: 167222,
+        };
+
+        const result = await authManager.connectImxWithCredentials(tokenResponse);
+
+        expect(mockAreValid).toHaveBeenCalledWith(tokenResponse);
+        expect(result).toEqual({
+          idToken: mockUser.idToken,
+          accessToken: mockUser.accessToken,
+          refreshToken: mockUser.refreshToken,
+          profile: {
+            email: mockUser.profile.email,
+            nickname: mockUser.profile.nickname,
+            sub: 'subject123',
+          },
         });
       });
     });

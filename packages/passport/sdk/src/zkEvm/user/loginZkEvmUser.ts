@@ -26,7 +26,16 @@ export const loginZkEvmUser = async ({
   multiRollupApiClients,
   jsonRpcProvider,
 }: LoginZkEvmUserInput): Promise<LoginZkEvmUserOutput> => {
-  const user = await authManager.getUser() || await authManager.getUserDeviceFlow() || await authManager.login();
+  let user = null;
+  try {
+    user = await authManager.getUser();
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.warn('eth_requestAccounts` failed to retrieve a cached user session:', err);
+  }
+  if (!user) {
+    user = await authManager.getUserDeviceFlow() || await authManager.login();
+  }
   if (!user.idToken) {
     throw new Error('User is missing idToken');
   }

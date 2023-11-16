@@ -3,8 +3,8 @@ import {
   IMTBLWidgetEvents,
   OrchestrationEventType,
   WalletEventType,
-  WalletNetworkSwitchEvent,
-} from '@imtbl/checkout-widgets';
+  WalletNetworkSwitch,
+} from '@imtbl/checkout-sdk';
 import { useContext, useEffect, useState } from 'react';
 import { WidgetContext, hideAllWidgets } from './WidgetProvider';
 import { handleOrchestrationEvent } from './orchestration';
@@ -17,7 +17,7 @@ export function useWalletWidget(setWeb3Provider: (val: Web3Provider|undefined) =
     const handleWalletWidgetEvents = ((event: CustomEvent) => {
       switch (event.detail.type) {
         case WalletEventType.NETWORK_SWITCH: {
-          const eventData = event.detail.data as WalletNetworkSwitchEvent;
+          const eventData = event.detail.data as WalletNetworkSwitch;
           console.log(eventData.network);
           setWeb3Provider(eventData.provider);
           break;

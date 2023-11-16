@@ -13,13 +13,17 @@
     "passport": "prod",
     "orderbook": "prod",
     "provider": "prod",
-    "checkout_sdk": "prod",
-    "checkout_widgets": "prod"
+    "checkout_sdk": "prod"
   },
   "fileCopy": [
     {
-      "src": "../packages/checkout/widgets-lib/build/static/js/main.*.js",
-      "dest": "./dist/browser/checkout.js",
+      "src": "../packages/checkout/widgets-lib/dist/widgets.js",
+      "dest": "./dist/browser/checkout/widgets.js",
+      "stage": "prod"
+    },
+    {
+      "src": "../packages/checkout/sdk/dist/browser.js",
+      "dest": "./dist/browser/checkout/sdk.js",
       "stage": "prod"
     }
   ]

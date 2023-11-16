@@ -3,8 +3,7 @@ import {
 } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { BigNumber } from 'ethers';
-import { ChainId, ChainName } from '@imtbl/checkout-sdk';
-import { WidgetTheme } from '@imtbl/checkout-widgets';
+import { ChainId, ChainName, WidgetTheme } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { cyIntercept, cySmartGet } from '../../../lib/testUtils';
 import { SwapWidgetTestComponent } from '../test-components/SwapWidgetTestComponent';
@@ -25,7 +24,7 @@ describe('SwapCoins tests', () => {
     cryptoConversions = new Map<string, number>([['eth', 1800], ['imx', 0.75]]);
     const initialSwapState: SwapState = {
       exchange: null,
-      walletProvider: null,
+      walletProviderName: null,
       network: {
         name: ChainName.IMTBL_ZKEVM_TESTNET,
         chainId: ChainId.IMTBL_ZKEVM_TESTNET,

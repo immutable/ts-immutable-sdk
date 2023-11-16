@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "baseUrl": "./src",
+    "outDir": "./dist",
     "target": "es2022",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
@@ -14,9 +16,11 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
+    "declaration": true,
     "jsx": "react-jsx",
     "noImplicitAny": false,
     "experimentalDecorators": true
   },
-  "include": ["src", "babel.config.js"]
+  "include": ["src", "babel.config.js"],
+  "exclude": ["node_modules", "dist"]
 }

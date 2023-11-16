@@ -11,7 +11,7 @@ import registerPassportStarkEx from './registration';
 async function forceUserRefresh(authManager: AuthManager) {
   // User metadata is updated asynchronously. Poll userinfo endpoint until it is updated.
   await retryWithDelay<User | null>(async () => {
-    const user = await authManager.loginSilent({ forceRefresh: true }); // force refresh to get updated user info
+    const user = await authManager.forceUserRefresh(); // force refresh to get updated user info
     if (user?.imx) return user;
 
     return Promise.reject(new Error('user wallet addresses not exist'));

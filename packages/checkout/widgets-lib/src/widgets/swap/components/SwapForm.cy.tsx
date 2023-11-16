@@ -4,6 +4,7 @@ import { cy } from 'local-cypress';
 import { Web3Provider } from '@ethersproject/providers';
 import {
   ChainId, ChainName, Checkout, CheckoutErrorType,
+  WidgetTheme,
 } from '@imtbl/checkout-sdk';
 import { Exchange } from '@imtbl/dex-sdk';
 import { Environment } from '@imtbl/config';
@@ -21,7 +22,6 @@ import {
 } from '../../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
 import { IMX_ADDRESS_ZKEVM, NATIVE } from '../../../lib/constants';
 import { CustomAnalyticsProvider } from '../../../context/analytics-provider/CustomAnalyticsProvider';
-import { WidgetTheme } from '../../../lib';
 import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 
 describe('SwapForm', () => {

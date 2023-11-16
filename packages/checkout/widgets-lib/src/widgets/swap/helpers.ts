@@ -1,5 +1,4 @@
-import { TokenInfo } from '@imtbl/checkout-sdk';
-import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
+import { TokenInfo, IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
 import { text } from '../../resources/text/textConfig';
 import { SharedViews } from '../../context/view-context/ViewContext';
 import { orchestrationEvents } from '../../lib/orchestrationEvents';
