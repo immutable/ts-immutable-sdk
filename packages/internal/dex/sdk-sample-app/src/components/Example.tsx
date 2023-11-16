@@ -19,7 +19,7 @@ type mapping = {
 export function Example() {
   // Instead of hard-coding these tokens, you can optionally retrieve available tokens from the user's wallet
   const TEST_IMX_TOKEN = "0x1CcCa691501174B4A623CeDA58cC8f1a76dc3439";
-  const ZKWAT_TOKEN = "0x12739A8f1A8035F439092D016DAE19A2874F30d2";
+  const ZKCORE_TOKEN = "0x43566cAB87CC147C95e2895E7b972E19993520e4";
 
   const [ethereumAccount, setEthereumAccount] = useState<string | null>(null);
   const [isFetching, setIsFetching] = useState(false);
@@ -37,7 +37,7 @@ export function Example() {
   );
 
   const inputToken = TEST_IMX_TOKEN;
-  const outputToken = ZKWAT_TOKEN;
+  const outputToken = ZKCORE_TOKEN;
 
   useEffect(() => {
     // Get the symbols for the tokens that we want to swap so we can display this to the user
