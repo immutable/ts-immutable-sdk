@@ -20,7 +20,11 @@ import { getBridgeFeeEstimate } from './getBridgeFeeEstimate';
 import { estimateGasForBridgeApproval } from './estimateApprovalGas';
 import { CheckoutError, CheckoutErrorType } from '../../../errors';
 import { allowListCheckForBridge } from '../../allowList/allowListCheck';
-import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS, fetchL1Representation } from '../indexer/fetchL1Representation';
+import {
+  INDEXER_ETH_ROOT_CONTRACT_ADDRESS,
+  fetchL1Representation,
+  L1ToL2TokenAddressMapping,
+} from '../indexer/fetchL1Representation';
 import { DEFAULT_TOKEN_DECIMALS } from '../../../env';
 
 export const hasSufficientL1Eth = (
@@ -150,7 +154,7 @@ export const bridgeRoute = async (
 
   const l1RepresentationResult = await fetchL1Representation(config, bridgeRequirement.l2address);
   // No mapping on L1 for this token
-  const { l1address } = l1RepresentationResult;
+  const { l1address } = l1RepresentationResult as L1ToL2TokenAddressMapping;
   if (l1address === '') return undefined;
 
   // Ensure l1address is in the allowed token list

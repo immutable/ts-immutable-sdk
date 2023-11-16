@@ -751,6 +751,7 @@ describe('Connect', () => {
         tokens: [
           {
             decimals: 18,
+            symbol: 'IMX',
           } as TokenInfo,
           {
             name: 'Ethereum',
