@@ -20,7 +20,7 @@ export const TIMX_IMMUTABLE_TESTNET: ERC20 = {
 
 export const WIMX_IMMUTABLE_TESTNET: ERC20 = {
   chainId: IMMUTABLE_TESTNET_CHAIN_ID,
-  address: '0xAf7cf5D4Af0BFAa85d384d42b8D410762Ccbce69',
+  address: '0x1CcCa691501174B4A623CeDA58cC8f1a76dc3439',
   decimals: 18,
   symbol: 'WIMX',
   name: 'Wrapped Immutable Testnet Token',
@@ -28,6 +28,6 @@ export const WIMX_IMMUTABLE_TESTNET: ERC20 = {
 };
 
 export const IMMUTABLE_TESTNET_COMMON_ROUTING_TOKENS: ERC20[] = [
-  TIMX_IMMUTABLE_TESTNET,
+  // TIMX_IMMUTABLE_TESTNET,
   WIMX_IMMUTABLE_TESTNET,
 ];
