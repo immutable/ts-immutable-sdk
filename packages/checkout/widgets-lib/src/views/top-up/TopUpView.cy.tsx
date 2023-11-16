@@ -9,6 +9,7 @@ import {
 import { Environment } from '@imtbl/config';
 import { BigNumber } from 'ethers';
 import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
+import { UserJourney } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { TopUpView } from './TopUpView';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { orchestrationEvents } from '../../lib/orchestrationEvents';
@@ -39,6 +40,7 @@ describe('Top Up View', () => {
         <BiomeCombinedProviders>
           <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
             <TopUpView
+              analytics={{ userJourney: UserJourney.WALLET }}
               showOnrampOption
               showSwapOption
               showBridgeOption
@@ -58,6 +60,7 @@ describe('Top Up View', () => {
         <BiomeCombinedProviders>
           <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
             <TopUpView
+              analytics={{ userJourney: UserJourney.WALLET }}
               showOnrampOption={false}
               showSwapOption
               showBridgeOption
@@ -77,6 +80,7 @@ describe('Top Up View', () => {
         <BiomeCombinedProviders>
           <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
             <TopUpView
+              analytics={{ userJourney: UserJourney.WALLET }}
               showOnrampOption
               showSwapOption={false}
               showBridgeOption
@@ -96,6 +100,7 @@ describe('Top Up View', () => {
         <BiomeCombinedProviders>
           <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
             <TopUpView
+              analytics={{ userJourney: UserJourney.WALLET }}
               showOnrampOption
               showSwapOption
               showBridgeOption={false}
@@ -122,6 +127,7 @@ describe('Top Up View', () => {
             }}
           >
             <TopUpView
+              analytics={{ userJourney: UserJourney.WALLET }}
               showOnrampOption
               showSwapOption
               showBridgeOption={false}
@@ -142,6 +148,7 @@ describe('Top Up View', () => {
         <BiomeCombinedProviders>
           <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
             <TopUpView
+              analytics={{ userJourney: UserJourney.WALLET }}
               showOnrampOption
               showSwapOption
               showBridgeOption
@@ -167,6 +174,7 @@ describe('Top Up View', () => {
         <BiomeCombinedProviders>
           <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
             <TopUpView
+              analytics={{ userJourney: UserJourney.WALLET }}
               showOnrampOption
               showSwapOption
               showBridgeOption
@@ -196,6 +204,7 @@ describe('Top Up View', () => {
         <BiomeCombinedProviders>
           <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
             <TopUpView
+              analytics={{ userJourney: UserJourney.WALLET }}
               showOnrampOption
               showSwapOption
               showBridgeOption
@@ -228,6 +237,7 @@ describe('Top Up View', () => {
         <BiomeCombinedProviders>
           <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
             <TopUpView
+              analytics={{ userJourney: UserJourney.WALLET }}
               showOnrampOption
               showSwapOption
               showBridgeOption
@@ -267,6 +277,7 @@ describe('Top Up View', () => {
               initialStateOverride={connectLoaderState}
             >
               <TopUpView
+                analytics={{ userJourney: UserJourney.WALLET }}
                 showOnrampOption
                 showSwapOption
                 showBridgeOption
@@ -360,6 +371,7 @@ describe('Top Up View', () => {
             cryptoConversionsOverride={cryptoConversions}
           >
             <TopUpView
+              analytics={{ userJourney: UserJourney.WALLET }}
               showOnrampOption
               showSwapOption
               showBridgeOption
@@ -448,6 +460,7 @@ describe('Top Up View', () => {
             cryptoConversionsOverride={cryptoConversions}
           >
             <TopUpView
+              analytics={{ userJourney: UserJourney.WALLET }}
               showOnrampOption
               showSwapOption
               showBridgeOption
@@ -502,6 +515,7 @@ describe('Top Up View', () => {
             cryptoConversionsOverride={cryptoConversions}
           >
             <TopUpView
+              analytics={{ userJourney: UserJourney.WALLET }}
               showOnrampOption
               showSwapOption
               showBridgeOption
@@ -543,6 +557,7 @@ describe('Top Up View', () => {
           >
             <CryptoFiatProvider environment={Environment.SANDBOX}>
               <TopUpView
+                analytics={{ userJourney: UserJourney.WALLET }}
                 showOnrampOption
                 showSwapOption
                 showBridgeOption

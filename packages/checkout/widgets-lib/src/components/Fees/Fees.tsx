@@ -1,5 +1,6 @@
 import { Body, Box, ButtCon } from '@biom3/react';
 import { TokenInfo } from '@imtbl/checkout-sdk';
+import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { feeBoxStyles, feeContainerStyles } from './FeeStyles';
 import { formatZeroAmount, tokenValueFormat } from '../../lib/utils';
 import { FeesBreakdown } from '../FeesBreakdown/FeesBreakdown';
@@ -16,6 +17,8 @@ interface FeesProps {
 export function Fees({
   title, fiatPricePrefix, gasFeeValue, gasFeeToken, gasFeeFiatValue,
 }: FeesProps) {
+  const { track } = useAnalytics();
+
   if (!gasFeeValue) return <Box />;
 
   const formattedGasValue = formatZeroAmount(tokenValueFormat(gasFeeValue));
@@ -50,6 +53,14 @@ export function Fees({
             variant="tertiary"
             icon="ChevronExpand"
             iconVariant="bold"
+            onClick={() => {
+              track({
+                userJourney: UserJourney.SWAP,
+                screen: 'SwapCoins',
+                control: 'ViewFees',
+                controlType: 'Button',
+              });
+            }}
           />
         </FeesBreakdown>
         <Body size="medium" weight="regular">

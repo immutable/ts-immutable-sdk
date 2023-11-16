@@ -9,6 +9,8 @@ import {
 import {
   ReactNode, useContext, useEffect, useState,
 } from 'react';
+import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
+import { StandardAnalyticsControlTypes } from '@imtbl/react-analytics';
 import { FooterLogo } from '../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
@@ -46,6 +48,9 @@ interface TopUpViewProps {
   showBridgeOption: boolean,
   tokenAddress?: string,
   amount?: string,
+  analytics: {
+    userJourney: UserJourney
+  },
   onCloseButtonClick: () => void,
   onBackButtonClick?: () => void,
 }
@@ -59,16 +64,23 @@ export function TopUpView({
   showBridgeOption,
   tokenAddress,
   amount,
+  analytics,
   onCloseButtonClick,
   onBackButtonClick,
 }: TopUpViewProps) {
+  const { userJourney } = analytics;
+
   const { connectLoaderState } = useContext(ConnectLoaderContext);
+
   const { checkout, provider } = connectLoaderState;
   const { header, topUpOptions } = text.views[SharedViews.TOP_UP_VIEW];
   const { onramp, swap, bridge } = topUpOptions;
+
   const { viewDispatch } = useContext(ViewContext);
+
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { conversions, fiatSymbol } = cryptoFiatState;
+
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
   const loadingText = text.views[SharedViews.LOADING_VIEW].text;
 
@@ -81,7 +93,16 @@ export function TopUpView({
   const [isSwapAvailable, setIsSwapAvailable] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
 
+  const { page, track } = useAnalytics();
+
   const isPassport = isPassportProvider(provider);
+
+  useEffect(() => {
+    page({
+      userJourney,
+      screen: 'TopUp',
+    });
+  }, []);
 
   useEffect(() => {
     if (!cryptoFiatDispatch) return;
@@ -171,72 +192,100 @@ export function TopUpView({
     refreshFees();
   }, [checkout, conversions.size === 0]);
 
+  const localTrack = (control: string, extras: any, controlType: StandardAnalyticsControlTypes = 'Button') => {
+    track({
+      userJourney,
+      screen: 'TopUp',
+      control,
+      controlType,
+      extras,
+    });
+  };
+
   const onClickSwap = () => {
     if (widgetEvent === IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT) {
+      const data = {
+        toContractAddress: '',
+        fromAmount: '',
+        fromContractAddress: '',
+      };
+
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
             type: SwapWidgetViews.SWAP,
-            data: {
-              toContractAddress: '',
-              fromAmount: '',
-              fromContractAddress: '',
-            },
+            data,
           },
         },
       });
+      localTrack('Swap', { ...data, widgetEvent });
       return;
     }
-    orchestrationEvents.sendRequestSwapEvent(eventTarget, widgetEvent, {
+
+    const data = {
       fromTokenAddress: '',
       toTokenAddress: tokenAddress ?? '',
       amount: '',
-    });
+    };
+    orchestrationEvents.sendRequestSwapEvent(eventTarget, widgetEvent, data);
+    localTrack('Swap', { ...data, widgetEvent });
   };
 
   const onClickBridge = () => {
     if (widgetEvent === IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT) {
+      const data = {
+        fromContractAddress: '',
+        fromAmount: '',
+      };
+
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
             type: BridgeWidgetViews.BRIDGE,
-            data: {
-              fromContractAddress: '',
-              fromAmount: '',
-            },
+            data,
           },
         },
       });
+      localTrack('Bridge', { ...data, widgetEvent });
       return;
     }
-    orchestrationEvents.sendRequestBridgeEvent(eventTarget, widgetEvent, {
+
+    const data = {
       tokenAddress: '',
       amount: '',
-    });
+    };
+    orchestrationEvents.sendRequestBridgeEvent(eventTarget, widgetEvent, data);
+    localTrack('Bridge', { ...data, widgetEvent });
   };
 
   const onClickOnRamp = () => {
     if (widgetEvent === IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT) {
+      const data = {
+        contractAddress: '',
+        amount: '',
+      };
+
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
             type: OnRampWidgetViews.ONRAMP,
-            data: {
-              contractAddress: '',
-              amount: '',
-            },
+            data,
           },
         },
       });
+      localTrack('OnRamp', { ...data, widgetEvent });
       return;
     }
-    orchestrationEvents.sendRequestOnrampEvent(eventTarget, widgetEvent, {
+
+    const data = {
       tokenAddress: tokenAddress ?? '',
       amount: amount ?? '',
-    });
+    };
+    orchestrationEvents.sendRequestOnrampEvent(eventTarget, widgetEvent, data);
+    localTrack('OnRamp', { ...data, widgetEvent });
   };
 
   const renderFees = (fees: string, feesLoading: boolean): ReactNode => {
