@@ -17,7 +17,7 @@ export const CONTRACTS_FOR_CHAIN_ID: Record<number, ExchangeContracts> = {
     coreFactory: '0xb18c44b211065E69844FbA9AE146DA362104AfBf',
     quoterV2: '0x87854A7D4b9BaC3D37f4516A1Ac7F36fB5ad539f',
     peripheryRouter: '0x786ec643F231960D4C1A4E336990F8E7bF8f1277',
-    secondaryFee: '0x518bfba8eBa3ff3eC9F06Bfb3DdC9fA56F1c249a',
+    secondaryFee: '0x529548A15A108a5D1b98D5cAFd15e23C19A08EeB',
   },
 };
 
