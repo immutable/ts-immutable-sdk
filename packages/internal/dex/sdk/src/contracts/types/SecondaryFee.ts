@@ -150,14 +150,11 @@ export interface SecondaryFeeInterface extends utils.Interface {
     "multicall(bytes[])": FunctionFragment;
     "pause()": FunctionFragment;
     "paused()": FunctionFragment;
-    "peripheryPayments()": FunctionFragment;
     "renounceRole(bytes32,address)": FunctionFragment;
     "revokeRole(bytes32,address)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
-    "uniswapRouter()": FunctionFragment;
     "unpause()": FunctionFragment;
     "unwrapNativeToken(uint256)": FunctionFragment;
-    "wimx()": FunctionFragment;
     "withdrawFunds(address,address)": FunctionFragment;
   };
 
@@ -175,14 +172,11 @@ export interface SecondaryFeeInterface extends utils.Interface {
       | "multicall(bytes[])"
       | "pause"
       | "paused"
-      | "peripheryPayments"
       | "renounceRole"
       | "revokeRole"
       | "supportsInterface"
-      | "uniswapRouter"
       | "unpause"
       | "unwrapNativeToken"
-      | "wimx"
       | "withdrawFunds"
   ): FunctionFragment;
 
@@ -241,10 +235,6 @@ export interface SecondaryFeeInterface extends utils.Interface {
   encodeFunctionData(functionFragment: "pause", values?: undefined): string;
   encodeFunctionData(functionFragment: "paused", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "peripheryPayments",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "renounceRole",
     values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]
   ): string;
@@ -256,16 +246,11 @@ export interface SecondaryFeeInterface extends utils.Interface {
     functionFragment: "supportsInterface",
     values: [PromiseOrValue<BytesLike>]
   ): string;
-  encodeFunctionData(
-    functionFragment: "uniswapRouter",
-    values?: undefined
-  ): string;
   encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "unwrapNativeToken",
     values: [PromiseOrValue<BigNumberish>]
   ): string;
-  encodeFunctionData(functionFragment: "wimx", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "withdrawFunds",
     values: [PromiseOrValue<string>, PromiseOrValue<string>]
@@ -308,10 +293,6 @@ export interface SecondaryFeeInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "peripheryPayments",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "renounceRole",
     data: BytesLike
   ): Result;
@@ -320,16 +301,11 @@ export interface SecondaryFeeInterface extends utils.Interface {
     functionFragment: "supportsInterface",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "uniswapRouter",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "unwrapNativeToken",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "wimx", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "withdrawFunds",
     data: BytesLike
@@ -523,8 +499,6 @@ export interface SecondaryFee extends BaseContract {
 
     paused(overrides?: CallOverrides): Promise<[boolean]>;
 
-    peripheryPayments(overrides?: CallOverrides): Promise<[string]>;
-
     renounceRole(
       role: PromiseOrValue<BytesLike>,
       account: PromiseOrValue<string>,
@@ -542,8 +516,6 @@ export interface SecondaryFee extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    uniswapRouter(overrides?: CallOverrides): Promise<[string]>;
-
     unpause(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
@@ -552,8 +524,6 @@ export interface SecondaryFee extends BaseContract {
       amountMinimum: PromiseOrValue<BigNumberish>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
-
-    wimx(overrides?: CallOverrides): Promise<[string]>;
 
     withdrawFunds(
       to: PromiseOrValue<string>,
@@ -622,8 +592,6 @@ export interface SecondaryFee extends BaseContract {
 
   paused(overrides?: CallOverrides): Promise<boolean>;
 
-  peripheryPayments(overrides?: CallOverrides): Promise<string>;
-
   renounceRole(
     role: PromiseOrValue<BytesLike>,
     account: PromiseOrValue<string>,
@@ -641,8 +609,6 @@ export interface SecondaryFee extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  uniswapRouter(overrides?: CallOverrides): Promise<string>;
-
   unpause(
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
@@ -651,8 +617,6 @@ export interface SecondaryFee extends BaseContract {
     amountMinimum: PromiseOrValue<BigNumberish>,
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
-
-  wimx(overrides?: CallOverrides): Promise<string>;
 
   withdrawFunds(
     to: PromiseOrValue<string>,
@@ -719,8 +683,6 @@ export interface SecondaryFee extends BaseContract {
 
     paused(overrides?: CallOverrides): Promise<boolean>;
 
-    peripheryPayments(overrides?: CallOverrides): Promise<string>;
-
     renounceRole(
       role: PromiseOrValue<BytesLike>,
       account: PromiseOrValue<string>,
@@ -738,16 +700,12 @@ export interface SecondaryFee extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    uniswapRouter(overrides?: CallOverrides): Promise<string>;
-
     unpause(overrides?: CallOverrides): Promise<void>;
 
     unwrapNativeToken(
       amountMinimum: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    wimx(overrides?: CallOverrides): Promise<string>;
 
     withdrawFunds(
       to: PromiseOrValue<string>,
@@ -870,8 +828,6 @@ export interface SecondaryFee extends BaseContract {
 
     paused(overrides?: CallOverrides): Promise<BigNumber>;
 
-    peripheryPayments(overrides?: CallOverrides): Promise<BigNumber>;
-
     renounceRole(
       role: PromiseOrValue<BytesLike>,
       account: PromiseOrValue<string>,
@@ -889,8 +845,6 @@ export interface SecondaryFee extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    uniswapRouter(overrides?: CallOverrides): Promise<BigNumber>;
-
     unpause(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
@@ -899,8 +853,6 @@ export interface SecondaryFee extends BaseContract {
       amountMinimum: PromiseOrValue<BigNumberish>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
-
-    wimx(overrides?: CallOverrides): Promise<BigNumber>;
 
     withdrawFunds(
       to: PromiseOrValue<string>,
@@ -972,8 +924,6 @@ export interface SecondaryFee extends BaseContract {
 
     paused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    peripheryPayments(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     renounceRole(
       role: PromiseOrValue<BytesLike>,
       account: PromiseOrValue<string>,
@@ -991,8 +941,6 @@ export interface SecondaryFee extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    uniswapRouter(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     unpause(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
@@ -1001,8 +949,6 @@ export interface SecondaryFee extends BaseContract {
       amountMinimum: PromiseOrValue<BigNumberish>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
-
-    wimx(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     withdrawFunds(
       to: PromiseOrValue<string>,
