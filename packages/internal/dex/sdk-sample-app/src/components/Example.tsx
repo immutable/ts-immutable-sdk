@@ -20,12 +20,14 @@ type mapping = {
 
 const allTokens = [
   { symbol: 'IMX', address: 'native' },
+  { symbol: 'IMXEDGE', address: '0x0000000000000000000000000000000000001010' },
   { symbol: 'WIMX', address: '0x1CcCa691501174B4A623CeDA58cC8f1a76dc3439' },
   { symbol: 'zkTDR', address: '0x6531F7B9158d78Ca78b46799c4Fd65C2Af8Ae506' },
   { symbol: 'zkPSP', address: '0x88B35dF96CbEDF2946586147557F7D5D0CCE7e5c' },
   { symbol: 'zkWLT', address: '0x8A5b0470ee48248bEb7D1E745c1EbA0DCA77215e' },
   { symbol: 'zkSRE', address: '0x43566cAB87CC147C95e2895E7b972E19993520e4' },
   { symbol: 'zkCORE', address: '0x4B96E7b7eA673A996F140d5De411a97b7eab934E' },
+  { symbol: 'zkCATS', addreess: '0xaC953a0d7B67Fae17c87abf79f09D0f818AC66A2 '},
 ];
 
 const buildExchange = (secondaryFeeRecipient: string, secondaryFeePercentage: number) => {
