@@ -69,17 +69,6 @@ export class Passport {
     return this.passportImxProviderFactory.getProvider();
   }
 
-  /**
-   * @deprecated The method `loginWithDeviceFlowCallback` should be used in conjunction with `connectImx` instead.
-   */
-  public async connectImxDeviceFlow(
-    deviceCode: string,
-    interval: number,
-    timeoutMs?: number,
-  ): Promise<IMXProvider | null> {
-    return this.passportImxProviderFactory.getProviderWithDeviceFlow(deviceCode, interval, timeoutMs);
-  }
-
   public getPKCEAuthorizationUrl(): string {
     return this.authManager.getPKCEAuthorizationUrl();
   }
