@@ -5,8 +5,6 @@ import {
   TokenInfo,
 } from '@imtbl/checkout-sdk';
 import { BigNumber, ethers } from 'ethers';
-import { IMX_TOKEN_SYMBOL } from './constants';
-import { isNativeToken } from './utils';
 
 const convertFeeToFiat = (
   fee: BigNumber | undefined,
@@ -17,16 +15,13 @@ const convertFeeToFiat = (
 
   if (fee && token) {
     const formattedAmount = ethers.utils.formatUnits(fee, token.decimals);
-    const tokenSymbol = isNativeToken(token.address)
-      ? IMX_TOKEN_SYMBOL
-      : token.symbol;
     const gasFeeTokenConversion = conversions.get(
-      tokenSymbol.toLocaleLowerCase(),
+      token.symbol.toLocaleLowerCase(),
     );
     if (gasFeeTokenConversion) {
       const parsedAmount = parseFloat(formattedAmount);
       if (Number.isNaN(parsedAmount)) return feeAmountInFiat;
-      feeAmountInFiat = parseFloat(formattedAmount) * gasFeeTokenConversion;
+      feeAmountInFiat = parsedAmount * gasFeeTokenConversion;
     }
   }
 
@@ -95,7 +90,7 @@ export const getBridgeFeeEstimation = (
   const gasFeeAmount = gasFee.estimatedAmount;
   if (gasFeeAmount === undefined) return '-.--';
   const gasFeeToken = gasFee.token;
-  if (!gasFeeToken === undefined) return '-.--';
+  if (gasFeeToken === undefined) return '-.--';
 
   const gasFeeInFiat = convertFeeToFiat(gasFeeAmount, gasFeeToken, conversions);
   if (gasFeeInFiat < 0) return '-.--';
