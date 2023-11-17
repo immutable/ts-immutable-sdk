@@ -69,6 +69,9 @@ export class Passport {
     return this.passportImxProviderFactory.getProvider();
   }
 
+  /**
+   * @deprecated The method `loginWithDeviceFlowCallback` should be used in conjunction with `connectImx` instead.
+   */
   public async connectImxDeviceFlow(
     deviceCode: string,
     interval: number,
@@ -133,6 +136,15 @@ export class Passport {
     return this.authManager.loginWithDeviceFlow();
   }
 
+  public async loginWithDeviceFlowCallback(
+    deviceCode: string,
+    interval: number,
+    timeoutMs?: number,
+  ): Promise<UserProfile> {
+    const user = await this.authManager.loginWithDeviceFlowCallback(deviceCode, interval, timeoutMs);
+    return user?.profile;
+  }
+
   public async loginCallback(): Promise<void> {
     return this.authManager.loginCallback();
   }
@@ -143,6 +155,10 @@ export class Passport {
     // Code after this point is only executed if the logout mode is silent
     await this.magicAdapter.logout();
     this.passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
+  }
+
+  public async logoutDeviceFlow(): Promise<void> {
+    return this.authManager.removeUser();
   }
 
   /**

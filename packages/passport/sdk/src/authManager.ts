@@ -181,7 +181,7 @@ export default class AuthManager {
   }
 
   /* eslint-disable no-await-in-loop */
-  public async connectImxDeviceFlow(deviceCode: string, interval: number, timeoutMs?: number): Promise<User> {
+  public async loginWithDeviceFlowCallback(deviceCode: string, interval: number, timeoutMs?: number): Promise<User> {
     return withPassportError<User>(async () => {
       const startTime = Date.now();
       const loopCondition = true;
@@ -329,6 +329,10 @@ export default class AuthManager {
       },
       PassportErrorType.LOGOUT_ERROR,
     );
+  }
+
+  public async removeUser(): Promise<void> {
+    return this.userManager.removeUser();
   }
 
   public async logoutSilentCallback(url: string): Promise<void> {
