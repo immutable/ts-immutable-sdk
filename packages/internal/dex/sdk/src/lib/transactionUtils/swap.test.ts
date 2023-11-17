@@ -212,6 +212,30 @@ describe('getSwap', () => {
     });
   });
 
+  describe('with fees + EXACT_INPUT + native out', () => {
+    it('adds an unwrapNativeToken to the calldata', () => {
+      const quote = buildExactInputQuote(FUN_TEST_TOKEN, nativeTokenService.wrappedToken);
+      quote.amountOut.value = utils.parseEther('990');
+
+      const swap = getSwap(
+        quote.amountIn.token,
+        nativeTokenService.nativeToken,
+        quote,
+        makeAddr('fromAddress'),
+        slippagePercentage,
+        deadline,
+        makeAddr('routerContract'),
+        makeAddr('secondaryFeeContract'),
+        newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
+        [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
+      );
+
+      expectToBeDefined(swap.transaction.data);
+      const { unwrapTokenParams } = decodeMulticallExactInputSingleWithFees(swap.transaction.data);
+      expect(formatEther(unwrapTokenParams[0])).toEqual('961.165048543689320388'); // amountOut less 3% slippage (/103*100)
+    });
+  });
+
   describe('with EXACT_OUTPUT + native amount in', () => {
     it('sets the transaction value to the max amount in including slippage', () => {
       const originalTokenIn = nativeTokenService.nativeToken;
@@ -256,6 +280,29 @@ describe('getSwap', () => {
       );
 
       expect(swap.transaction.value).toEqual('0x00');
+    });
+  });
+
+  describe('with fees + EXACT_OUTPUT + native out', () => {
+    it('adds an unwrapNativeToken to the calldata', () => {
+      const quote = buildExactOutputQuote(FUN_TEST_TOKEN, nativeTokenService.wrappedToken);
+
+      const swap = getSwap(
+        quote.amountIn.token,
+        nativeTokenService.nativeToken,
+        quote,
+        makeAddr('fromAddress'),
+        slippagePercentage,
+        deadline,
+        makeAddr('routerContract'),
+        makeAddr('secondaryFeeContract'),
+        newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
+        [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
+      );
+
+      expectToBeDefined(swap.transaction.data);
+      const { unwrapTokenParams } = decodeMulticallExactOutputSingleWithFees(swap.transaction.data);
+      expect(formatEther(unwrapTokenParams[0])).toEqual(formatAmount(quote.amountOut));
     });
   });
 });
