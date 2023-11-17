@@ -8,7 +8,7 @@ import {
 import { createContext } from 'react';
 
 export interface BridgeState {
-  walletProvider: WalletProviderName | null;
+  walletProviderName: WalletProviderName | null;
   tokenBridge: TokenBridge | null;
   network: NetworkInfo | null;
   toNetwork: NetworkInfo | null;
@@ -17,7 +17,7 @@ export interface BridgeState {
 }
 
 export const initialBridgeState: BridgeState = {
-  walletProvider: null,
+  walletProviderName: null,
   tokenBridge: null,
   network: null,
   toNetwork: null,
@@ -35,7 +35,7 @@ export interface BridgeAction {
 }
 
 type ActionPayload =
-  | SetWalletProviderPayload
+  | SetWalletProviderNamePayload
   | SetTokenBridgePayload
   | SetNetworkPayload
   | SetToNetworkPayload
@@ -43,7 +43,7 @@ type ActionPayload =
   | SetAllowedTokensPayload;
 
 export enum BridgeActions {
-  SET_WALLET_PROVIDER = 'SET_WALLET_PROVIDER',
+  SET_WALLET_PROVIDER_NAME = 'SET_WALLET_PROVIDER_NAME',
   SET_TOKEN_BRIDGE = 'SET_TOKEN_BRIDGE',
   SET_NETWORK = 'SET_NETWORK',
   SET_TO_NETWORK = 'SET_TO_NETWORK',
@@ -51,9 +51,9 @@ export enum BridgeActions {
   SET_ALLOWED_TOKENS = 'SET_ALLOWED_TOKENS',
 }
 
-export interface SetWalletProviderPayload {
-  type: BridgeActions.SET_WALLET_PROVIDER;
-  walletProvider: WalletProviderName;
+export interface SetWalletProviderNamePayload {
+  type: BridgeActions.SET_WALLET_PROVIDER_NAME;
+  walletProviderName: WalletProviderName;
 }
 
 export interface SetTokenBridgePayload {
@@ -96,10 +96,10 @@ export const bridgeReducer: Reducer<BridgeState, BridgeAction> = (
   action: BridgeAction,
 ) => {
   switch (action.payload.type) {
-    case BridgeActions.SET_WALLET_PROVIDER:
+    case BridgeActions.SET_WALLET_PROVIDER_NAME:
       return {
         ...state,
-        walletProvider: action.payload.walletProvider,
+        walletProviderName: action.payload.walletProviderName,
       };
     case BridgeActions.SET_TOKEN_BRIDGE:
       return {

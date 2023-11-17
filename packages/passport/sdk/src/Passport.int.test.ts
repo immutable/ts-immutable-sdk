@@ -2,7 +2,7 @@ import { Magic } from 'magic-sdk';
 import { UserManager } from 'oidc-client-ts';
 import { TransactionRequest } from '@ethersproject/providers';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { mockValidIdToken } from './token.test';
+import { mockValidIdToken } from './utils/token.test';
 import { Passport } from './Passport';
 import { RequestArguments } from './zkEvm/types';
 import {
@@ -83,6 +83,7 @@ describe('Passport', () => {
       rpcProvider: {
         request: mockMagicRequest,
       },
+      preload: jest.fn(),
     }));
   });
 

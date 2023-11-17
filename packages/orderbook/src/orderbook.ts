@@ -5,7 +5,7 @@ import {
   OrderbookModuleConfiguration,
   OrderbookOverrides,
 } from './config/config';
-import { Fee as OpenApiFee } from './openapi/sdk';
+import { CancelOrdersResult, Fee as OpenApiFee } from './openapi/sdk';
 import {
   mapFromOpenApiOrder,
   mapFromOpenApiPage,
@@ -14,19 +14,24 @@ import {
 import { Seaport } from './seaport';
 import { SeaportLibFactory } from './seaport/seaport-lib-factory';
 import {
-  CancelOrderResponse,
+  ActionType,
+  CancelOrdersOnChainResponse,
   CreateListingParams,
   FeeType,
   FeeValue,
+  FulfillBulkOrdersResponse,
+  FulfillmentListing,
   FulfillOrderResponse,
   ListingResult,
   ListListingsParams,
   ListListingsResult,
   ListTradesParams,
   ListTradesResult,
-  OrderStatus,
+  OrderStatusName,
+  PrepareCancelOrdersResponse,
   PrepareListingParams,
   PrepareListingResponse,
+  SignablePurpose,
   TradeResult,
 } from './types';
 
@@ -213,7 +218,9 @@ export class Orderbook {
     ]);
 
     if (fulfillmentDataRes.result.unfulfillable_orders?.length > 0) {
-      throw new Error(`Unable to prepare fulfillment date: ${fulfillmentDataRes.result.unfulfillable_orders[0].reason}`);
+      throw new Error(
+        `Unable to prepare fulfillment date: ${fulfillmentDataRes.result.unfulfillable_orders[0].reason}`,
+      );
     } else if (fulfillmentDataRes.result.fulfillable_orders?.length !== 1) {
       throw new Error('unexpected fulfillable order result length');
     }
@@ -221,7 +228,7 @@ export class Orderbook {
     const extraData = fulfillmentDataRes.result.fulfillable_orders[0].extra_data;
     const orderResult = fulfillmentDataRes.result.fulfillable_orders[0].order;
 
-    if (orderResult.status !== OrderStatus.ACTIVE) {
+    if (orderResult.status.name !== OrderStatusName.ACTIVE) {
       throw new Error(
         `Cannot fulfil order that is not active. Current status: ${orderResult.status}`,
       );
@@ -230,39 +237,177 @@ export class Orderbook {
     return this.seaport.fulfillOrder(orderResult, takerAddress, extraData);
   }
 
+  async fulfillBulkOrders(
+    listings: Array<FulfillmentListing>,
+    takerAddress: string,
+  ): Promise<FulfillBulkOrdersResponse> {
+    const fulfillmentDataRes = await this.apiClient.fulfillmentData(
+      listings.map((listingRequest) => ({
+        order_id: listingRequest.listingId,
+        fees: listingRequest.takerFees.map((fee) => ({
+          amount: fee.amount,
+          fee_type:
+            FeeType.TAKER_ECOSYSTEM as unknown as OpenApiFee.fee_type.TAKER_ECOSYSTEM,
+          recipient: fee.recipient,
+        })),
+      })),
+    );
+
+    try {
+      return {
+        ...(await this.seaport.fulfillBulkOrders(
+          fulfillmentDataRes.result.fulfillable_orders,
+          takerAddress,
+        )),
+        fulfillableOrders: fulfillmentDataRes.result.fulfillable_orders.map(
+          (o) => mapFromOpenApiOrder(o.order),
+        ),
+        unfulfillableOrders: fulfillmentDataRes.result.unfulfillable_orders.map(
+          (o) => ({
+            orderId: o.order_id,
+            reason: o.reason,
+          }),
+        ),
+        sufficientBalance: true,
+      };
+    } catch (e: any) {
+      // if insufficient balance error, we return FulfillBulkOrdersInsufficientBalanceResponse
+      if (String(e).includes('The fulfiller does not have the balances needed to fulfill.')) {
+        return {
+          fulfillableOrders: fulfillmentDataRes.result.fulfillable_orders.map(
+            (o) => mapFromOpenApiOrder(o.order),
+          ),
+          unfulfillableOrders: fulfillmentDataRes.result.unfulfillable_orders.map(
+            (o) => ({
+              orderId: o.order_id,
+              reason: o.reason,
+            }),
+          ),
+          sufficientBalance: false,
+        };
+      }
+
+      // if some other error is thrown,
+      // there likely is a race condition of the original order validity
+      // we throw the error back out
+      throw e;
+    }
+  }
+
   /**
-   * Get an unsigned cancel order transaction. Orders can only be cancelled by
-   * the account that created them.
-   * @param {string} listingId - The listingId to cancel.
-   * @param {string} accountAddress - The address of the account cancelling the order.
-   * @return {CancelOrderResponse} The unsigned cancel order transaction
+   * Cancelling orders is a gasless alternative to on-chain cancellation exposed with
+   * `cancelOrdersOnChain`. For the orderbook to authenticate the cancellation, the creator
+   * of the orders must sign an EIP712 message containing the orderIds
+   * @param {string} orderIds - The orderIds to attempt to cancel.
+   * @return {PrepareCancelOrdersResponse} The signable action to cancel the orders.
    */
-  async cancelOrder(
-    listingId: string,
+  async prepareOrderCancellations(
+    orderIds: string[],
+  ): Promise<PrepareCancelOrdersResponse> {
+    const network = await this.orderbookConfig.provider.getNetwork();
+    const domain = {
+      name: 'imtbl-order-book',
+      chainId: network.chainId,
+      verifyingContract: this.orderbookConfig.seaportContractAddress,
+    };
+
+    const types = {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      CancelPayload: [
+        { name: 'orders', type: 'Order[]' },
+      ],
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      Order: [
+        { name: 'id', type: 'string' },
+      ],
+    };
+
+    const cancelMessage = {
+      orders: orderIds.map((id) => ({ id })),
+    };
+
+    return {
+      signableAction: {
+        purpose: SignablePurpose.OFF_CHAIN_CANCELLATION,
+        type: ActionType.SIGNABLE,
+        message: {
+          domain,
+          types,
+          value: cancelMessage,
+        },
+      },
+    };
+  }
+
+  /**
+   * Cancelling orders is a gasless alternative to on-chain cancellation exposed with
+   * `cancelOrdersOnChain`. Orders cancelled this way cannot be fulfilled and will be removed
+   * from the orderbook. If there is pending fulfillment data outstanding for the order, its
+   * cancellation will be pending until the fulfillment window has passed.
+   * `prepareOffchainOrderCancellations` can be used to get the signable action that is signed
+   * to get the signature required for this call.
+   * @param {string[]} orderIds - The orderIds to attempt to cancel.
+   * @param {string} accountAddress - The address of the account cancelling the orders.
+   * @param {string} accountAddress - The address of the account cancelling the orders.
+   * @return {CancelOrdersResult} The result of the off-chain cancellation request
+   */
+  async cancelOrders(
+    orderIds: string[],
     accountAddress: string,
-  ): Promise<CancelOrderResponse> {
-    const orderResult = await this.apiClient.getListing(listingId);
+    signature: string,
+  ): Promise<CancelOrdersResult> {
+    return this.apiClient.cancelOrders(
+      orderIds,
+      accountAddress,
+      signature,
+    );
+  }
 
-    if (
-      orderResult.result.status !== OrderStatus.ACTIVE
-      && orderResult.result.status !== OrderStatus.INACTIVE
-      && orderResult.result.status !== OrderStatus.PENDING
-    ) {
-      throw new Error(
-        `Cannot cancel order with status ${orderResult.result.status}`,
-      );
+  /**
+   * Get an unsigned order cancellation transaction. Orders can only be cancelled by
+   * the account that created them. All of the orders must be from the same seaport contract.
+   * If trying to cancel orders from multiple seaport contracts, group the orderIds by seaport
+   * contract and call this method for each group.
+   * @param {string[]} orderIds - The orderIds to cancel.
+   * @param {string} accountAddress - The address of the account cancelling the order.
+   * @return {CancelOrdersOnChainResponse} The unsigned cancel order action
+   */
+  async cancelOrdersOnChain(
+    orderIds: string[],
+    accountAddress: string,
+  ): Promise<CancelOrdersOnChainResponse> {
+    const orderResults = await Promise.all(orderIds.map((id) => this.apiClient.getListing(id)));
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const orderResult of orderResults) {
+      if (
+        orderResult.result.status.name !== OrderStatusName.ACTIVE
+        && orderResult.result.status.name !== OrderStatusName.INACTIVE
+        && orderResult.result.status.name !== OrderStatusName.PENDING
+      ) {
+        throw new Error(
+          `Cannot cancel order with status ${orderResult.result.status}`,
+        );
+      }
+
+      if (orderResult.result.account_address !== accountAddress.toLowerCase()) {
+        throw new Error(
+          `Only account ${orderResult.result.account_address} can cancel order ${orderResult.result.id}`,
+        );
+      }
     }
 
-    if (orderResult.result.account_address !== accountAddress.toLowerCase()) {
-      throw new Error(
-        `Only account ${orderResult.result.account_address} can cancel order ${listingId}`,
-      );
+    const orders = orderResults.map((orderResult) => orderResult.result);
+    const seaportAddresses = orders.map((o) => o.protocol_data.seaport_address);
+    const distinctSeaportAddresses = new Set(...[seaportAddresses]);
+    if (distinctSeaportAddresses.size !== 1) {
+      throw new Error('Cannot cancel multiple orders from different seaport contracts. Please group your orderIds accordingly');
     }
 
-    const cancelOrderTransaction = await this.seaport.cancelOrder(
-      orderResult.result,
+    const cancellationAction = await this.seaport.cancelOrders(
+      orders,
       accountAddress,
     );
-    return { unsignedCancelOrderTransaction: cancelOrderTransaction };
+    return { cancellationAction };
   }
 }

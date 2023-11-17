@@ -3,16 +3,20 @@ import {
 } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { BigNumber } from 'ethers';
-import { ChainId, ChainName } from '@imtbl/checkout-sdk';
-import { cySmartGet } from '../../../lib/testUtils';
+import { ChainId, ChainName, WidgetTheme } from '@imtbl/checkout-sdk';
+import { Environment } from '@imtbl/config';
+import { cyIntercept, cySmartGet } from '../../../lib/testUtils';
 import { SwapWidgetTestComponent } from '../test-components/SwapWidgetTestComponent';
 import { SwapCoins } from './SwapCoins';
 import { SwapState } from '../context/SwapContext';
 import { IMX_ADDRESS_ZKEVM } from '../../../lib';
+import { CustomAnalyticsProvider } from '../../../context/analytics-provider/CustomAnalyticsProvider';
+import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 
 describe('SwapCoins tests', () => {
   beforeEach(() => {
     cy.viewport('ipad-2');
+    cyIntercept();
   });
 
   let cryptoConversions;
@@ -20,7 +24,7 @@ describe('SwapCoins tests', () => {
     cryptoConversions = new Map<string, number>([['eth', 1800], ['imx', 0.75]]);
     const initialSwapState: SwapState = {
       exchange: null,
-      walletProvider: null,
+      walletProviderName: null,
       network: {
         name: ChainName.IMTBL_ZKEVM_TESTNET,
         chainId: ChainId.IMTBL_ZKEVM_TESTNET,
@@ -61,12 +65,14 @@ describe('SwapCoins tests', () => {
     };
 
     mount(
-      <SwapWidgetTestComponent
-        initialStateOverride={initialSwapState}
-        cryptoConversionsOverride={cryptoConversions}
-      >
-        <SwapCoins />
-      </SwapWidgetTestComponent>,
+      <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <SwapWidgetTestComponent
+          initialStateOverride={initialSwapState}
+          cryptoConversionsOverride={cryptoConversions}
+        >
+          <SwapCoins theme={WidgetTheme.LIGHT} />
+        </SwapWidgetTestComponent>
+      </CustomAnalyticsProvider>,
     );
   });
 

@@ -1,4 +1,5 @@
-import { ChainId } from '@imtbl/checkout-sdk';
+import { ChainId, GetBalanceResult, WalletProviderName } from '@imtbl/checkout-sdk';
+import { BigNumber } from '@ethersproject/bignumber';
 import {
   SetSwitchNetworkPayload,
   WalletActions,
@@ -7,8 +8,8 @@ import {
   SetSupportedTopUpPayload,
   TopUpFeature,
   SetTokenBalancesPayload,
+  SetWalletProviderNamePayload,
 } from './WalletContext';
-import { BalanceInfo } from '../functions/tokenBalances';
 
 describe('WalletContext', () => {
   it('should update state with network info and token balances when reducer called with SET_NETWORK action', () => {
@@ -47,12 +48,16 @@ describe('WalletContext', () => {
       type: WalletActions.SET_TOKEN_BALANCES,
       tokenBalances: [
         {
-          id: 'Ethereum-ETH',
-          symbol: 'ETH',
-          description: 'Ethereum',
-          balance: '1000000000000000000',
-          fiatAmount: '1800.00',
-        } as BalanceInfo,
+          balance: BigNumber.from('1000000000000000000'),
+          formattedBalance: '1',
+          token: {
+            name: 'Ethereum',
+            symbol: 'ETH',
+            address: '',
+            decimals: 18,
+            icon: '',
+          },
+        } as GetBalanceResult,
       ],
     };
 
@@ -62,12 +67,16 @@ describe('WalletContext', () => {
     });
     expect(tokenBalances).toEqual([
       {
-        id: 'Ethereum-ETH',
-        symbol: 'ETH',
-        description: 'Ethereum',
-        balance: '1000000000000000000',
-        fiatAmount: '1800.00',
-      } as BalanceInfo,
+        balance: BigNumber.from('1000000000000000000'),
+        formattedBalance: '1',
+        token: {
+          name: 'Ethereum',
+          symbol: 'ETH',
+          address: '',
+          decimals: 18,
+          icon: '',
+        },
+      },
     ]);
   });
 
@@ -89,6 +98,20 @@ describe('WalletContext', () => {
       isSwapEnabled: true,
       isBridgeEnabled: false,
       isOnRampEnabled: false,
+      isSwapAvailable: true,
     });
+  });
+
+  it('should update wallet provider name when reducer called with SET_WALLET_PROVIDER_NAME action', () => {
+    const setWalletProviderNamePayload: SetWalletProviderNamePayload = {
+      type: WalletActions.SET_WALLET_PROVIDER_NAME,
+      walletProviderName: WalletProviderName.METAMASK,
+    };
+
+    expect(initialWalletState.walletProviderName).toEqual(null);
+    const { walletProviderName } = walletReducer(initialWalletState, {
+      payload: setWalletProviderNamePayload,
+    });
+    expect(walletProviderName).toEqual(WalletProviderName.METAMASK);
   });
 });

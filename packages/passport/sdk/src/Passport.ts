@@ -1,6 +1,7 @@
 import { IMXProvider } from '@imtbl/provider';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { ImmutableXClient } from '@imtbl/immutablex-client';
+import { ChainName } from 'network/chains';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
 import { PassportImxProviderFactory } from './starkEx';
@@ -17,7 +18,7 @@ import {
 import { ConfirmationScreen } from './confirmation';
 import { ZkEvmProvider } from './zkEvm';
 import { Provider } from './zkEvm/types';
-import TypedEventEmitter from './typedEventEmitter';
+import TypedEventEmitter from './utils/typedEventEmitter';
 
 export class Passport {
   private readonly authManager: AuthManager;
@@ -57,16 +58,16 @@ export class Passport {
     });
   }
 
+  /**
+   * @deprecated The method `login` with an argument of `{ useCachedSession: true }` should be used in conjunction with
+   * `connectImx` instead.
+   */
   public async connectImxSilent(): Promise<IMXProvider | null> {
     return this.passportImxProviderFactory.getProviderSilent();
   }
 
   public async connectImx(): Promise<IMXProvider> {
     return this.passportImxProviderFactory.getProvider();
-  }
-
-  public async loginWithDeviceFlow(): Promise<DeviceConnectResponse> {
-    return this.authManager.loginWithDeviceFlow();
   }
 
   public async connectImxDeviceFlow(
@@ -109,6 +110,39 @@ export class Passport {
       confirmationScreen: this.confirmationScreen,
       multiRollupApiClients: this.multiRollupApiClients,
     });
+  }
+
+  /**
+   *
+   * Initiates the authorisation flow.
+   *
+   * @param options.useCachedSession = false - If true, and no active session exists, then the user will not be
+   * prompted to log in and the Promise will resolve with a null value.
+   * @returns {Promise<UserProfile | null>} the user profile if the user is logged in, otherwise null
+   */
+  public async login(options?: {
+    useCachedSession: boolean
+  }): Promise<UserProfile | null> {
+    const { useCachedSession = false } = options || {};
+    let user = null;
+    try {
+      user = await this.authManager.getUser();
+    } catch (error) {
+      if (useCachedSession) {
+        throw error;
+      }
+      // eslint-disable-next-line no-console
+      console.warn('login failed to retrieve a cached user session', error);
+    }
+    if (!user && !useCachedSession) {
+      user = await this.authManager.login();
+    }
+
+    return user ? user.profile : null;
+  }
+
+  public async loginWithDeviceFlow(): Promise<DeviceConnectResponse> {
+    return this.authManager.loginWithDeviceFlow();
   }
 
   public async loginCallback(): Promise<void> {
@@ -162,8 +196,9 @@ export class Passport {
     }
     const headers = { Authorization: `Bearer ${user.accessToken}` };
     const linkedAddressesResult = await this.multiRollupApiClients.passportApi.getLinkedAddresses({
+      chainName: ChainName.ETHEREUM,
       userId: user?.profile.sub,
     }, { headers });
-    return linkedAddressesResult.data.linkedAddresses;
+    return linkedAddressesResult.data.linked_addresses;
   }
 }

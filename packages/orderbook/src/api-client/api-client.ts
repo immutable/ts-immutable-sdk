@@ -6,6 +6,7 @@ import {
   OrdersService,
   ProtocolData,
   TradeResult,
+  CancelOrdersResult,
 } from 'openapi/sdk';
 import {
   CreateListingParams,
@@ -71,6 +72,21 @@ export class ImmutableApiClient {
     });
   }
 
+  async cancelOrders(
+    orderIds: string[],
+    accountAddress: string,
+    signature: string,
+  ): Promise<CancelOrdersResult> {
+    return this.orderbookService.cancelOrders({
+      chainName: this.chainName,
+      requestBody: {
+        account_address: accountAddress,
+        orders: orderIds,
+        signature,
+      },
+    });
+  }
+
   async createListing({
     orderHash,
     orderComponents,
@@ -105,7 +121,7 @@ export class ImmutableApiClient {
               === ItemType.NATIVE
                 ? 'NATIVE'
                 : 'ERC20',
-            start_amount: orderComponents.consideration[0].startAmount,
+            amount: orderComponents.consideration[0].startAmount,
             contract_address: orderComponents.consideration[0].token,
           },
         ],

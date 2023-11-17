@@ -6,7 +6,9 @@ import { SharedViews } from '../../context/view-context/ViewContext';
 import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
 import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextTypes';
-import { PrimaryRevenueWidgetViews } from '../../context/view-context/PrimaryRevenueViewContextTypes';
+import { SaleWidgetViews } from '../../context/view-context/SaleViewContextTypes';
+import { SaleErrorTypes, PaymentTypes } from '../../widgets/sale/types';
+import { ServiceType } from '../../views/error/serviceTypes';
 
 export const text = {
   views: {
@@ -65,6 +67,12 @@ export const text = {
       heading: "Something's gone wrong",
       body: ['You can try again or contact', 'support', 'for help.'],
       actionText: 'Try again',
+    },
+    [SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW]: {
+      heading: {
+        [ServiceType.SWAP]: 'Swapping is not available in your region',
+      },
+      body: 'We’re sorry we cannot provide this service in your region.',
     },
     [SharedViews.LOADING_VIEW]: {
       text: 'Loading',
@@ -297,48 +305,139 @@ export const text = {
           heading: 'Buy with card',
           caption: 'Google pay & Apple pay available. Minimum $5.',
           subcaption: 'Fees',
+          disabledCaption: '',
         },
         swap: {
           heading: 'Swap my coins',
           caption: 'Using the coins I have on the same network',
           subcaption: 'Fees',
+          disabledCaption: 'Not available in your region',
         },
         bridge: {
           heading: 'Move my coins',
           caption: 'From the coins I have on a different network',
           subcaption: 'Fees ',
+          disabledCaption: '',
         },
       },
     },
-    [PrimaryRevenueWidgetViews.PAYMENT_METHODS]: {
+    [SaleWidgetViews.FUND_WITH_SMART_CHECKOUT]: {
+      loading: {
+        checkingBalances: 'Crunching numbers',
+      },
+      currency: {
+        usdEstimate: '≈ USD $',
+        fees: 'Fees',
+      },
+      fundingRouteDrawer: {
+        header: 'Available balance',
+      },
+      fundingRouteSelect: {
+        heading: 'Pay with your',
+        noRoutesAvailable: 'Insufficient coin balance. Please proceed with card instead.',
+        continue: 'Continue',
+        payWithCardInstead: "No thanks, I'll pay with card",
+        payWithCard: 'Pay with card',
+      },
+    },
+    [SaleWidgetViews.PAYMENT_METHODS]: {
       header: {
         heading: 'How would you like to pay?',
       },
       options: {
-        [PrimaryRevenueWidgetViews.PAY_WITH_COINS]: {
+        [PaymentTypes.CRYPTO]: {
           heading: 'Coins',
           caption: 'Using the coins balance in your wallet',
+          disabledCaption: "We can't see enough coins in your balance",
         },
-        [PrimaryRevenueWidgetViews.PAY_WITH_CARD]: {
+        [PaymentTypes.FIAT]: {
           heading: 'Card',
           caption: 'GooglePay also available with Transak',
+          disabledCaption: undefined,
         },
       },
+      insufficientCoinsBanner: {
+        caption: 'Insufficient coin balance. Please proceed with card instead.',
+      },
+      loading: {
+        ready: 'Ready to purchase',
+        confirm: 'Confirm in your wallet',
+        processing: 'Processing purchase',
+      },
     },
-    [PrimaryRevenueWidgetViews.PAY_WITH_COINS]: {
+    [SaleWidgetViews.PAY_WITH_COINS]: {
       header: {
-        heading: 'Pay with your coins',
+        heading: 'Pay with your',
         caption: 'Using the coins balance in your wallet',
       },
       button: {
         buyNow: 'Buy now',
       },
     },
-    [PrimaryRevenueWidgetViews.PAY_WITH_CARD]: {
-      header: {
-        heading: 'Pay with card',
-        caption: 'Powered by Transak',
+    [SaleWidgetViews.PAY_WITH_CARD]: {
+      screenTitle: 'Pay with card',
+      loading: 'Taking you to Transak',
+    },
+    [SaleWidgetViews.SALE_FAIL]: {
+      errors: {
+        [SaleErrorTypes.TRANSACTION_FAILED]: {
+          description: 'Transaction failed',
+          primaryAction: 'Try again',
+          secondaryAction: 'View details',
+        },
+        [SaleErrorTypes.SERVICE_BREAKDOWN]: {
+          description:
+            "Sorry, we're unable to process your payment right now. Please try again in a few minutes.",
+          secondaryAction: 'Dismiss',
+        },
+        [SaleErrorTypes.TRANSAK_FAILED]: {
+          description: 'Sorry, something went wrong. Please try again.',
+          primaryAction: 'Try again',
+          secondaryAction: 'Dismiss',
+        },
+        [SaleErrorTypes.WALLET_FAILED]: {
+          description: "Sorry, we're unable to process this right now.",
+          primaryAction: 'Go back',
+          secondaryAction: 'Dismiss',
+        },
+        [SaleErrorTypes.WALLET_REJECTED_NO_FUNDS]: {
+          description: 'Sorry, something went wrong. Please try again.',
+          primaryAction: 'Go back',
+          secondaryAction: 'Dismiss',
+        },
+        [SaleErrorTypes.WALLET_REJECTED]: {
+          description:
+            "You'll need to approve the transaction in your wallet to proceed.",
+          primaryAction: 'Try again',
+          secondaryAction: 'Cancel',
+        },
+        [SaleErrorTypes.SMART_CHECKOUT_ERROR]: {
+          description:
+            'Unable to check your wallets balance. Please try again.',
+          primaryAction: 'Try again',
+          secondaryAction: 'Cancel',
+        },
+        [SaleErrorTypes.SMART_CHECKOUT_EXECUTE_ERROR]: {
+          description:
+            'Sorry, something went wrong while moving funds. Please try again.',
+          primaryAction: 'Try again',
+          secondaryAction: 'Cancel',
+        },
+        [SaleErrorTypes.DEFAULT]: {
+          description: 'Sorry, something went wrong. Please try again.',
+          primaryAction: 'Try again',
+          secondaryAction: 'Dismiss',
+        },
       },
+    },
+    [SaleWidgetViews.SALE_SUCCESS]: {
+      text: 'Order completed',
+      actionText: 'Continue',
+    },
+  },
+  footers: {
+    quickswapFooter: {
+      disclaimerText: 'Quickswap is a third party app. Immutable neither builds, owns, operates or deploys Quickswap. For further info, refer to Quickswap’s website.',
     },
   },
   wallets: {

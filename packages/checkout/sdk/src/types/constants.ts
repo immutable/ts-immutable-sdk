@@ -16,6 +16,18 @@ const ZKEVM_NATIVE_TOKEN = {
 };
 
 /**
+ * Base URL for the Immutable API based on the environment.
+ * @property {string} DEVELOPMENT - The base URL for the development environment.
+ * @property {string} SANDBOX - The base URL for the sandbox environment.
+ * @property {string} PRODUCTION - The base URL for the production environment.
+ */
+export const IMMUTABLE_API_BASE_URL = {
+  [ENV_DEVELOPMENT]: 'https://api.dev.immutable.com',
+  [Environment.SANDBOX]: 'https://api.sandbox.immutable.com',
+  [Environment.PRODUCTION]: 'https://api.immutable.com',
+};
+
+/**
  * Base URL for the checkout API based on the environment.
  * @property {string} DEVELOPMENT - The base URL for the development environment.
  * @property {string} SANDBOX - The base URL for the sandbox environment.
@@ -162,6 +174,14 @@ export const BLOCKSCOUT_CHAIN_URL_MAP: {
   [ChainId.IMTBL_ZKEVM_MAINNET]: {
     url: 'https://explorer.mainnet.immutable.com',
     nativeToken: PRODUCTION_CHAIN_ID_NETWORK_MAP.get(ChainId.IMTBL_ZKEVM_MAINNET)!.nativeCurrency,
+  },
+  [ChainId.SEPOLIA]: {
+    url: 'https://eth-sepolia.blockscout.com',
+    nativeToken: SANDBOX_CHAIN_ID_NETWORK_MAP.get(ChainId.SEPOLIA)!.nativeCurrency,
+  },
+  [ChainId.ETHEREUM]: {
+    url: 'https://eth.blockscout.com/',
+    nativeToken: PRODUCTION_CHAIN_ID_NETWORK_MAP.get(ChainId.ETHEREUM)!.nativeCurrency,
   },
 };
 

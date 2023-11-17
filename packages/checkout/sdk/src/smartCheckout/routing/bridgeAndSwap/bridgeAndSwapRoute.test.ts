@@ -163,7 +163,7 @@ describe('bridgeAndSwapRoute', () => {
           },
         ],
       } as Quote,
-      approval: undefined,
+      approval: null,
       swap: null,
     };
     const dexQuoteETH: DexQuote = {
@@ -194,22 +194,13 @@ describe('bridgeAndSwapRoute', () => {
           },
         ],
       } as Quote,
-      approval: undefined,
+      approval: null,
       swap: null,
     };
 
     dexQuotes.set('0xIMX', dexQuoteIMX);
     dexQuotes.set('0xETH', dexQuoteETH);
     return dexQuotes;
-  };
-
-  const getTestDexQuoteCache = (): Map<string, DexQuotes> => {
-    const dexQuoteCache = new Map<string, DexQuotes>([]);
-    const dexQuotes = getTestDexQuotes();
-
-    dexQuoteCache.set('0xYEET', dexQuotes);
-
-    return dexQuoteCache;
   };
 
   it('should return bridge and swap routes', async () => {
@@ -452,7 +443,6 @@ describe('bridgeAndSwapRoute', () => {
       readonlyProviders,
       availableRoutingOptions,
       insufficientRequirement,
-      getTestDexQuoteCache(),
       ownerAddress,
       feeEstimates,
       tokenBalances,
@@ -652,7 +642,6 @@ describe('bridgeAndSwapRoute', () => {
       readonlyProviders,
       availableRoutingOptions,
       insufficientRequirement,
-      getTestDexQuoteCache(),
       ownerAddress,
       feeEstimates,
       tokenBalances,

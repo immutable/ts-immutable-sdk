@@ -4,8 +4,9 @@ import { BigNumber } from 'ethers';
 import { ExternalProvider, TransactionRequest, Web3Provider } from '@ethersproject/providers';
 import { Checkout, CheckoutErrorType } from '@imtbl/checkout-sdk';
 import { Quote } from '@imtbl/dex-sdk';
+import { Environment } from '@imtbl/config';
 import { ApproveERC20Onboarding } from './ApproveERC20Onboarding';
-import { cySmartGet } from '../../../lib/testUtils';
+import { cyIntercept, cySmartGet } from '../../../lib/testUtils';
 import { text } from '../../../resources/text/textConfig';
 import {
   ApproveERC20SwapData,
@@ -18,6 +19,8 @@ import { ConnectLoaderState, ConnectionStatus } from '../../../context/connect-l
 import {
   ConnectLoaderTestComponent,
 } from '../../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
+import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
+import { CustomAnalyticsProvider } from '../../../context/analytics-provider/CustomAnalyticsProvider';
 
 describe('Approve ERC20 Onboarding', () => {
   let initialSwapState: SwapState;
@@ -33,6 +36,7 @@ describe('Approve ERC20 Onboarding', () => {
 
   beforeEach(() => {
     cy.viewport('ipad-2');
+    cyIntercept();
     sendTransactionStub = cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub');
 
     connectLoaderState = {
@@ -45,7 +49,7 @@ describe('Approve ERC20 Onboarding', () => {
 
     initialSwapState = {
       exchange: null,
-      walletProvider: null,
+      walletProviderName: null,
       network: null,
       tokenBalances: [
         {
@@ -96,13 +100,15 @@ describe('Approve ERC20 Onboarding', () => {
   describe('Approve Spending Step', () => {
     it('should request user to approve spending transaction on button click', () => {
       mount(
-        <ConnectLoaderTestComponent
-          initialStateOverride={connectLoaderState}
-        >
-          <SwapWidgetTestComponent initialStateOverride={initialSwapState}>
-            <ApproveERC20Onboarding data={mockApproveERC20Swap} />
-          </SwapWidgetTestComponent>
-        </ConnectLoaderTestComponent>,
+        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <SwapWidgetTestComponent initialStateOverride={initialSwapState}>
+              <ApproveERC20Onboarding data={mockApproveERC20Swap} />
+            </SwapWidgetTestComponent>
+          </ConnectLoaderTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('footer-button').click();
@@ -122,13 +128,15 @@ describe('Approve ERC20 Onboarding', () => {
       });
       const { approveSwap, approveSpending } = text.views[SwapWidgetViews.APPROVE_ERC20];
       mount(
-        <ConnectLoaderTestComponent
-          initialStateOverride={connectLoaderState}
-        >
-          <SwapWidgetTestComponent initialStateOverride={initialSwapState}>
-            <ApproveERC20Onboarding data={mockApproveERC20Swap} />
-          </SwapWidgetTestComponent>
-        </ConnectLoaderTestComponent>,
+        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <SwapWidgetTestComponent initialStateOverride={initialSwapState}>
+              <ApproveERC20Onboarding data={mockApproveERC20Swap} />
+            </SwapWidgetTestComponent>
+          </ConnectLoaderTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       // assert approve spending copy
@@ -152,18 +160,20 @@ describe('Approve ERC20 Onboarding', () => {
       });
       const { approveSwap, approveSpending } = text.views[SwapWidgetViews.APPROVE_ERC20];
       mount(
-        <ConnectLoaderTestComponent
-          initialStateOverride={
+        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <ConnectLoaderTestComponent
+            initialStateOverride={
             {
               ...connectLoaderState,
               provider: { ...mockProvider, provider: { isPassport: true } as ExternalProvider } as Web3Provider,
             }
           }
-        >
-          <SwapWidgetTestComponent initialStateOverride={initialSwapState}>
-            <ApproveERC20Onboarding data={mockApproveERC20Swap} />
-          </SwapWidgetTestComponent>
-        </ConnectLoaderTestComponent>,
+          >
+            <SwapWidgetTestComponent initialStateOverride={initialSwapState}>
+              <ApproveERC20Onboarding data={mockApproveERC20Swap} />
+            </SwapWidgetTestComponent>
+          </ConnectLoaderTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       // assert approve spending copy
@@ -182,13 +192,15 @@ describe('Approve ERC20 Onboarding', () => {
 
     it('should show correct approval spending hint (amount and symbol) in body', () => {
       mount(
-        <ConnectLoaderTestComponent
-          initialStateOverride={connectLoaderState}
-        >
-          <SwapWidgetTestComponent initialStateOverride={initialSwapState}>
-            <ApproveERC20Onboarding data={mockApproveERC20Swap} />
-          </SwapWidgetTestComponent>
-        </ConnectLoaderTestComponent>,
+        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <SwapWidgetTestComponent initialStateOverride={initialSwapState}>
+              <ApproveERC20Onboarding data={mockApproveERC20Swap} />
+            </SwapWidgetTestComponent>
+          </ConnectLoaderTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('simple-text-body__body').should('include.text', '0.5 IMX');
@@ -198,13 +210,15 @@ describe('Approve ERC20 Onboarding', () => {
       sendTransactionStub.rejects({ type: CheckoutErrorType.USER_REJECTED_REQUEST_ERROR });
       const { footer } = text.views[SwapWidgetViews.APPROVE_ERC20].approveSpending;
       mount(
-        <ConnectLoaderTestComponent
-          initialStateOverride={connectLoaderState}
-        >
-          <SwapWidgetTestComponent initialStateOverride={initialSwapState}>
-            <ApproveERC20Onboarding data={mockApproveERC20Swap} />
-          </SwapWidgetTestComponent>
-        </ConnectLoaderTestComponent>,
+        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <SwapWidgetTestComponent initialStateOverride={initialSwapState}>
+              <ApproveERC20Onboarding data={mockApproveERC20Swap} />
+            </SwapWidgetTestComponent>
+          </ConnectLoaderTestComponent>
+        </CustomAnalyticsProvider>,
       );
       cySmartGet('footer-button').should('have.text', footer.buttonText);
 
@@ -220,13 +234,15 @@ describe('Approve ERC20 Onboarding', () => {
         transactionResponse: { wait: () => Promise.resolve({ status: 1 }) },
       });
       mount(
-        <ConnectLoaderTestComponent
-          initialStateOverride={connectLoaderState}
-        >
-          <SwapWidgetTestComponent initialStateOverride={initialSwapState}>
-            <ApproveERC20Onboarding data={mockApproveERC20Swap} />
-          </SwapWidgetTestComponent>
-        </ConnectLoaderTestComponent>,
+        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <SwapWidgetTestComponent initialStateOverride={initialSwapState}>
+              <ApproveERC20Onboarding data={mockApproveERC20Swap} />
+            </SwapWidgetTestComponent>
+          </ConnectLoaderTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('footer-button').click();

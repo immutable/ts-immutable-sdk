@@ -20,6 +20,8 @@ export class BlockchainData {
 
   private readonly tokens: mr.TokensApi;
 
+  private readonly metadata: mr.MetadataApi;
+
   constructor(moduleConfig: BlockchainDataModuleConfiguration) {
     this.config = new BlockchainDataConfiguration(moduleConfig);
 
@@ -29,6 +31,7 @@ export class BlockchainData {
     this.nfts = new mr.NftsApi(this.config.apiConfig);
     this.nftOwners = new mr.NftOwnersApi(this.config.apiConfig);
     this.tokens = new mr.TokensApi(this.config.apiConfig);
+    this.metadata = new mr.MetadataApi(this.config.apiConfig);
   }
 
   /**
@@ -185,6 +188,23 @@ export class BlockchainData {
   }
 
   /**
+   * List All NFTs on a chain
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with a list of NFTs
+   * @throws {@link index.APIError}
+   */
+  public async listAllNFTs(
+    request: mr.NftsApiListAllNFTsRequest,
+  ): Promise<mr.ListNFTsResult> {
+    return await this.nfts
+      .listAllNFTs(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
+
+  /**
    * List NFT owners by token ID
    * @param request - the request object containing the parameters to be provided in the API request
    * @returns a promise that resolves with a list of NFT owners
@@ -195,6 +215,40 @@ export class BlockchainData {
   ): Promise<mr.ListNFTOwnersResult> {
     return await this.nftOwners
       .listNFTOwners(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
+
+  /**
+   * List NFT owners by contract address
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with a list of NFT owners
+   * @throws {@link index.APIError}
+   */
+  public async listNFTOwnersByContractAddress(
+    request: mr.NftOwnersApiListOwnersByContractAddressRequest,
+  ): Promise<mr.ListNFTOwnersResult> {
+    return await this.nftOwners
+      .listOwnersByContractAddress(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
+
+  /**
+   * List All NFT owners on a chain
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with a list of NFT owners
+   * @throws {@link index.APIError}
+   */
+  public async listAllNFTOwners(
+    request: mr.NftsApiListAllNFTOwnersRequest,
+  ): Promise<mr.ListNFTOwnersResult> {
+    return await this.nfts
+      .listAllNFTOwners(request)
       .then((res) => res.data)
       .catch((err) => {
         throw formatError(err);
@@ -229,6 +283,91 @@ export class BlockchainData {
   ): Promise<mr.GetTokenResult> {
     return await this.tokens
       .getERC20Token(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
+
+  /**
+   * Get metadata by ID
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with a single Metadata
+   * @throws {@link index.APIError}
+   */
+  public async getMetadata(
+    request: mr.MetadataApiGetMetadataRequest,
+  ): Promise<mr.GetMetadataResult> {
+    return await this.metadata
+      .getMetadata(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
+
+  /**
+   * List NFT Metadata by contract address
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with a list of Metadata
+   * @throws {@link index.APIError}
+   */
+  public async listNFTMetadataByContractAddress(
+    request: mr.MetadataApiListMetadataRequest,
+  ): Promise<mr.ListMetadataResult> {
+    return await this.metadata
+      .listMetadata(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
+
+  /**
+   * Refresh collection metadata
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with the updated collection
+   * @throws {@link index.APIError}
+   */
+  public async refreshCollectionMetadata(
+    request: mr.CollectionsApiRefreshCollectionMetadataRequest,
+  ): Promise<mr.RefreshCollectionMetadataResult> {
+    return await this.collections
+      .refreshCollectionMetadata(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
+
+  /**
+   * Refresh metadata for specific NFTs
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with the remaining rate limits
+   * @throws {@link index.APIError}
+   */
+  public async refreshNFTMetadata(
+    request: mr.MetadataApiRefreshNFTMetadataByTokenIDRequest,
+  ): Promise<mr.MetadataRefreshRateLimitResult> {
+    return await this.metadata
+      .refreshNFTMetadataByTokenID(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
+
+  /**
+   * Refresh metadata by ID. This will refresh metadata for all NFTs that reference the given metadata ID.
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with the remaining rate limits
+   * @throws {@link index.APIError}
+   */
+  public async refreshStackedMetadata(
+    request: mr.MetadataApiRefreshMetadataByIDRequest,
+  ): Promise<mr.MetadataRefreshRateLimitResult> {
+    return await this.metadata
+      .refreshMetadataByID(request)
       .then((res) => res.data)
       .catch((err) => {
         throw formatError(err);

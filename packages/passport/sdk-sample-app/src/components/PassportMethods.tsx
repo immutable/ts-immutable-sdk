@@ -9,6 +9,7 @@ function PassportMethods() {
   const { isLoading } = useStatusProvider();
   const {
     logout,
+    login,
     getIdToken,
     getAccessToken,
     getUserInfo,
@@ -18,6 +19,12 @@ function PassportMethods() {
   return (
     <CardStack title="Passport Methods">
       <Stack direction="horizontal" style={{ flexWrap: 'wrap' }} gap={3}>
+        <WorkflowButton
+          disabled={isLoading}
+          onClick={login}
+        >
+          Login
+        </WorkflowButton>
         <WorkflowButton
           disabled={isLoading}
           onClick={logout}

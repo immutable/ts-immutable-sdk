@@ -171,10 +171,10 @@ export default function GetAllowList(props: AllowListProps) {
       {resultWallet && !errorWallet && (
         <SuccessMessage>
           {resultWallet?.map((wallet) => (
-            <div key={wallet.name}>
+            <div key={wallet.walletProviderName}>
               <Box>
                 <img src={wallet.icon} />
-                {wallet.name}: {wallet.description}
+                {wallet.walletProviderName}: {wallet.description}
               </Box>
             </div>
           ))}

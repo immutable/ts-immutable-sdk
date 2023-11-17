@@ -7,7 +7,7 @@ import {
 import { BigNumber } from 'ethers';
 import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
-import { getTokenBalances } from './tokenBalances';
+import { getTokenBalances, mapTokenBalancesWithConversions } from './tokenBalances';
 
 describe('token balance tests', () => {
   it('should return balances for all tokens', async () => {
@@ -37,12 +37,16 @@ describe('token balance tests', () => {
     const checkout = new Checkout({
       baseConfig: { environment: Environment.PRODUCTION },
     });
+    const chainId = ChainId.SEPOLIA;
     jest.spyOn(checkout, 'getAllBalances').mockResolvedValue({ balances });
 
-    const actualResult = await getTokenBalances(
-      checkout,
-      mockProvider as unknown as Web3Provider,
-      ChainId.SEPOLIA,
+    const actualResult = mapTokenBalancesWithConversions(
+      chainId,
+      await getTokenBalances(
+        checkout,
+        mockProvider as unknown as Web3Provider,
+        chainId,
+      ),
       conversions,
     );
 
@@ -70,13 +74,17 @@ describe('token balance tests', () => {
     const checkout = new Checkout({
       baseConfig: { environment: Environment.PRODUCTION },
     });
+    const chainId = ChainId.SEPOLIA;
 
     const conversions = new Map<string, number>([]);
 
-    const actualResult = await getTokenBalances(
-      checkout,
-      null as unknown as Web3Provider,
-      ChainId.SEPOLIA,
+    const actualResult = mapTokenBalancesWithConversions(
+      chainId,
+      await getTokenBalances(
+        checkout,
+        null as unknown as Web3Provider,
+        chainId,
+      ),
       conversions,
     );
 

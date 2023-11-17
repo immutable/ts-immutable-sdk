@@ -7,17 +7,28 @@ export interface RetryType {
   retries?: number;
   // Condition in which the retry logic must exit although there are still retires
   nonRetryable?: (err: any) => boolean
+  // Condition in which the retry logic must exit without throwing an error although there are still retires
+  nonRetryableSilently?: (err: any) => boolean
 }
 
 export const retry = async <T>(
   fn: () => Promise<T> | T,
-  { retries, retryIntervalMs, nonRetryable }: RetryType,
-): Promise<T> => {
+  {
+    retries,
+    retryIntervalMs,
+    nonRetryable,
+    nonRetryableSilently,
+  }: RetryType,
+): Promise<T | undefined> => {
   let currentRetries = retries;
 
   try {
     return await fn();
   } catch (error: any) {
+    if (nonRetryableSilently && nonRetryableSilently(error)) return undefined;
+
+    if (nonRetryable && nonRetryable(error)) throw error;
+
     if (currentRetries !== undefined) {
       if (currentRetries <= 0) {
         throw error;
@@ -25,9 +36,12 @@ export const retry = async <T>(
       currentRetries -= 1;
     }
 
-    if (nonRetryable && nonRetryable(error)) throw error;
+    await sleep(retryIntervalMs);
+    return retry(fn, {
+      retries: currentRetries,
+      retryIntervalMs,
+      nonRetryable,
+      nonRetryableSilently,
+    });
   }
-
-  await sleep(retryIntervalMs);
-  return retry(fn, { retries: currentRetries, retryIntervalMs, nonRetryable });
 };

@@ -1,6 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { Box } from "@biom3/react";
-import { BridgeReact, ConnectReact, OnRampReact, SwapReact, WalletReact } from "@imtbl/checkout-widgets";
 import { ShowWidget } from './WidgetProvider';
 import { Passport } from '@imtbl/passport';
 
@@ -25,23 +24,6 @@ export const ImtblWidgets = ({
 }: ImtblWidgetsProps) => {
 
   return(
-    <Box>
-      {showConnect.show && (<ConnectReact passport={passport} />)}
-      {showWallet.show && (<WalletReact provider={web3Provider} passport={passport} />)}
-      {showSwap.show && (<SwapReact
-        provider={web3Provider}
-        passport={passport}
-        fromContractAddress={showSwap.data?.fromTokenAddress || ''}
-        toContractAddress={showSwap.data?.toTokenAddress || ''}
-        amount={showSwap.data?.amount || ''}/>
-        )}
-      {showBridge.show && (<BridgeReact
-        provider={web3Provider}
-        passport={passport}
-        fromContractAddress={showBridge.data?.tokenAddress || ''}
-        amount={showBridge.data?.amount || ''}
-      /> )}
-      {showOnRamp.show && (<OnRampReact provider={web3Provider} passport={passport} />)}
-    </Box>
+  <Box></Box>
   )
 }

@@ -66,7 +66,7 @@
     "dev": "vite",
     "prestart": "[ -f public/js/imtbl-checkout-widgets.js ] || { echo 'Error: checkout-widgets deps not found. Please run `npm run setup` first.' ; exit 1; }",
     "preview": "vite preview",
-    "setup": "npm run clean && yarn workspace @imtbl/checkout-widgets-lib build && yarn workspace @imtbl/checkout-widgets-lib dist:sdk && cp ../../../sdk/dist/browser/checkout.js public/js/imtbl-checkout-widgets.js",
+    "setup": "npm run clean && yarn workspace @imtbl/checkout-widgets build && cp ../../../sdk/dist/browser/checkout/widgets.js public/js/imtbl-checkout-widgets.js",
     "start": "storybook dev -p 6006"
   },
   "type": "module",

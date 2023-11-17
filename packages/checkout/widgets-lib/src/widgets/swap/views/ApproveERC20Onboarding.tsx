@@ -1,6 +1,6 @@
 import { Box } from '@biom3/react';
 import {
-  useCallback, useContext, useMemo, useState,
+  useCallback, useContext, useEffect, useMemo, useState,
 } from 'react';
 import { CheckoutErrorType, TokenInfo } from '@imtbl/checkout-sdk';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -22,6 +22,7 @@ import { isPassportProvider } from '../../../lib/providerUtils';
 import { SpendingCapHero } from '../../../components/Hero/SpendingCapHero';
 import { WalletApproveHero } from '../../../components/Hero/WalletApproveHero';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
+import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 export interface ApproveERC20Props {
   data: ApproveERC20SwapData;
@@ -44,6 +45,18 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
   // reject transaction flags
   const [rejectedSpending, setRejectedSpending] = useState(false);
   const [rejectedSwap, setRejectedSwap] = useState(false);
+
+  const { page, track } = useAnalytics();
+
+  useEffect(() => {
+    page({
+      userJourney: UserJourney.SWAP,
+      screen: 'ApproveERC20',
+      extras: {
+        swapFormInfo: data.swapFormInfo,
+      },
+    });
+  }, []);
 
   // Get symbol from swap info for approve amount text
   const fromToken = useMemo(
@@ -124,6 +137,12 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
 
   const handleApproveSpendingClick = useCallback(async () => {
     if (loading) return;
+    track({
+      userJourney: UserJourney.SWAP,
+      screen: 'ApproveERC20',
+      control: 'ApproveSpending',
+      controlType: 'Button',
+    });
     setLoading(true);
 
     if (!checkout || !provider) {
@@ -210,6 +229,12 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
 
   const handleApproveSwapClick = useCallback(async () => {
     if (loading) return;
+    track({
+      userJourney: UserJourney.SWAP,
+      screen: 'ApproveERC20',
+      control: 'ApproveSwap',
+      controlType: 'Button',
+    });
     setLoading(true);
 
     if (!checkout || !provider) {
@@ -293,7 +318,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
               onCloseButtonClick={() => sendSwapWidgetCloseEvent(eventTarget)}
               onBackButtonClick={goBackWithSwapData}
             />
-)}
+          )}
           floatHeader
           heroContent={showSwapTxnStep ? <WalletApproveHero /> : <SpendingCapHero />}
           footer={showSwapTxnStep ? approveSwapFooter : approveSpendingFooter}

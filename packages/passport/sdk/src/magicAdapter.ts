@@ -4,38 +4,55 @@ import { OpenIdExtension } from '@magic-ext/oidc';
 import { ethers } from 'ethers';
 import { PassportErrorType, withPassportError } from './errors/passportError';
 import { PassportConfiguration } from './config';
-import { Networks } from './types';
+import { lazyDocumentReady } from './utils/lazyLoad';
+
+type MagicClient = InstanceWithExtensions<SDKBase, [OpenIdExtension]>;
 
 export default class MagicAdapter {
   private readonly config: PassportConfiguration;
 
-  private magicClient?: InstanceWithExtensions<SDKBase, [OpenIdExtension]>;
+  private readonly lazyMagicClient?: Promise<MagicClient>;
 
   constructor(config: PassportConfiguration) {
     this.config = config;
+    if (typeof window !== 'undefined') {
+      this.lazyMagicClient = lazyDocumentReady<MagicClient>(() => {
+        const client = new Magic(this.config.magicPublishableApiKey, {
+          extensions: [new OpenIdExtension()],
+          network: this.config.network,
+        });
+        client.preload();
+        return client;
+      });
+    }
+  }
+
+  private get magicClient(): Promise<MagicClient> {
+    if (!this.lazyMagicClient) {
+      throw new Error('Cannot perform this action outside of the browser');
+    }
+
+    return this.lazyMagicClient;
   }
 
   async login(
     idToken: string,
-    network: Networks,
   ): Promise<ethers.providers.ExternalProvider> {
     return withPassportError<ethers.providers.ExternalProvider>(async () => {
-      this.magicClient = new Magic(this.config.magicPublishableApiKey, {
-        extensions: [new OpenIdExtension()],
-        network,
-      });
-      await this.magicClient.openid.loginWithOIDC({
+      const magicClient = await this.magicClient;
+      await magicClient.openid.loginWithOIDC({
         jwt: idToken,
         providerId: this.config.magicProviderId,
       });
 
-      return this.magicClient.rpcProvider as unknown as ethers.providers.ExternalProvider;
+      return magicClient.rpcProvider as unknown as ethers.providers.ExternalProvider;
     }, PassportErrorType.WALLET_CONNECTION_ERROR);
   }
 
   async logout() {
-    if (this.magicClient?.user) {
-      await this.magicClient.user.logout();
+    const magicClient = await this.magicClient;
+    if (magicClient.user) {
+      await magicClient.user.logout();
     }
   }
 }

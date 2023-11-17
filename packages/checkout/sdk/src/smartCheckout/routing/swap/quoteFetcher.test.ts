@@ -1,7 +1,7 @@
 import { Environment } from '@imtbl/config';
 import { BigNumber } from 'ethers';
 import {
-  TokenInfo,
+  Token,
   TransactionDetails,
   TransactionResponse,
 } from '@imtbl/dex-sdk';
@@ -29,18 +29,18 @@ describe('quoteFetcher', () => {
       quote: {
         amount: {
           value: BigNumber.from(quoteAmount),
-          token: {} as TokenInfo,
+          token: {} as Token,
         },
         amountWithMaxSlippage: {
           value: BigNumber.from(quoteAmount),
-          token: {} as TokenInfo,
+          token: {} as Token,
         },
         slippage: 0,
         fees: [
           {
             amount: {
               value: BigNumber.from(feeAmount),
-              token: {} as TokenInfo,
+              token: {} as Token,
             },
             recipient: '',
             basisPoints: 0,
@@ -53,7 +53,7 @@ describe('quoteFetcher', () => {
     if (swapGasFeeEstimate) {
       transactionResponse.swap.gasFeeEstimate = {
         value: BigNumber.from(swapGasFeeEstimate),
-        token: {} as TokenInfo,
+        token: {} as Token,
       };
     }
 
@@ -61,7 +61,7 @@ describe('quoteFetcher', () => {
       transactionResponse.approval = {
         gasFeeEstimate: {
           value: BigNumber.from(approvalGasFeeEstimate),
-          token: {} as TokenInfo,
+          token: {} as Token,
         },
       } as TransactionDetails;
     }
@@ -76,23 +76,23 @@ describe('quoteFetcher', () => {
     approval?: number,
   ) => {
     const dexQuote: DexQuote = {
-      approval: undefined,
+      approval: null,
       swap: null,
       quote: {
         amount: {
           value: BigNumber.from(quoteAmount),
-          token: {} as TokenInfo,
+          token: {} as Token,
         },
         amountWithMaxSlippage: {
           value: BigNumber.from(quoteAmount),
-          token: {} as TokenInfo,
+          token: {} as Token,
         },
         slippage: 0,
         fees: [
           {
             amount: {
               value: BigNumber.from(feeAmount),
-              token: {} as TokenInfo,
+              token: {} as Token,
             },
             recipient: '',
             basisPoints: 0,
@@ -104,14 +104,14 @@ describe('quoteFetcher', () => {
     if (swap) {
       dexQuote.swap = {
         value: BigNumber.from(swap),
-        token: {} as TokenInfo,
+        token: {} as Token,
       };
     }
 
     if (approval) {
       dexQuote.approval = {
         value: BigNumber.from(approval),
-        token: {} as TokenInfo,
+        token: {} as Token,
       };
     }
 
@@ -120,6 +120,10 @@ describe('quoteFetcher', () => {
 
   const config = new CheckoutConfiguration({
     baseConfig: { environment: Environment.SANDBOX },
+  });
+
+  beforeEach(() => {
+    jest.spyOn(console, 'info').mockImplementation(() => {});
   });
 
   it('should fetch quotes', async () => {
@@ -221,7 +225,7 @@ describe('quoteFetcher', () => {
     expect(quotes).toEqual(mockDexQuotes);
   });
 
-  it('should return empty map if dex errors', async () => {
+  it('should return empty map if creating instance errors', async () => {
     (createExchangeInstance as jest.Mock).mockRejectedValue({});
 
     const quotes = await quoteFetcher(
@@ -236,5 +240,84 @@ describe('quoteFetcher', () => {
     );
 
     expect(quotes).toEqual(new Map<string, DexQuote>([]));
+  });
+
+  it('should fetch quotes that resolved', async () => {
+    (createExchangeInstance as jest.Mock).mockReturnValue({
+      getUnsignedSwapTxFromAmountOut: jest.fn()
+        .mockResolvedValueOnce(
+          constructTransactionResponse(1, 2, 3, 4),
+        )
+        .mockRejectedValueOnce(
+          constructTransactionResponse(5, 6, 7, 8),
+        )
+        .mockResolvedValueOnce(
+          constructTransactionResponse(9, 10, 11, 12),
+        ),
+    });
+
+    const mockDexQuotes: DexQuotes = new Map<string, DexQuote>([]);
+    mockDexQuotes.set('0xERC20_1', constructDexQuote(1, 2, 3, 4));
+    mockDexQuotes.set('0xERC20_3', constructDexQuote(9, 10, 11, 12));
+
+    const quotes = await quoteFetcher(
+      config,
+      ChainId.IMTBL_ZKEVM_TESTNET,
+      '0xADDRESS',
+      {
+        address: '0xREQUIRED_ERC20',
+        amount: BigNumber.from(0),
+      },
+      ['0xERC20_1', '0xERC20_2', '0xERC20_3'],
+    );
+
+    expect(quotes).toEqual(mockDexQuotes);
+  });
+
+  it('should not fetch quote if swappable token matches required token', async () => {
+    const getUnsignedSwapTxFromAmountOut = jest.fn();
+    (createExchangeInstance as jest.Mock).mockReturnValue({
+      getUnsignedSwapTxFromAmountOut,
+    });
+
+    await quoteFetcher(
+      config,
+      ChainId.IMTBL_ZKEVM_TESTNET,
+      '0xADDRESS',
+      {
+        address: '0xREQUIRED_ERC20',
+        amount: BigNumber.from(0),
+      },
+      ['0xREQUIRED_ERC20'],
+    );
+
+    expect(getUnsignedSwapTxFromAmountOut).not.toBeCalled();
+  });
+
+  it('should fetch quote for tokens that do not match required token', async () => {
+    const getUnsignedSwapTxFromAmountOut = jest.fn()
+      .mockResolvedValue(
+        constructTransactionResponse(1, 2, 3, 4),
+      );
+    (createExchangeInstance as jest.Mock).mockReturnValue({
+      getUnsignedSwapTxFromAmountOut,
+    });
+
+    const mockDexQuotes: DexQuotes = new Map<string, DexQuote>([]);
+    mockDexQuotes.set('0xERC20_1', constructDexQuote(1, 2, 3, 4));
+
+    const quotes = await quoteFetcher(
+      config,
+      ChainId.IMTBL_ZKEVM_TESTNET,
+      '0xADDRESS',
+      {
+        address: '0xREQUIRED_ERC20',
+        amount: BigNumber.from(0),
+      },
+      ['0xREQUIRED_ERC20', '0xERC20_1'],
+    );
+
+    expect(quotes).toEqual(mockDexQuotes);
+    expect(getUnsignedSwapTxFromAmountOut).toBeCalledTimes(1);
   });
 });

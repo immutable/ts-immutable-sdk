@@ -3,19 +3,21 @@ import { ConnectWidgetView } from './ConnectViewContextTypes';
 import { WalletWidgetView } from './WalletViewContextTypes';
 import { PrefilledSwapForm, SwapWidgetView } from './SwapViewContextTypes';
 import { BridgeWidgetView, PrefilledBridgeForm } from './BridgeViewContextTypes';
-import { PrimaryRevenueWidgetView } from './PrimaryRevenueViewContextTypes';
+import { SaleWidgetView } from './SaleViewContextTypes';
 import { ViewType } from './ViewType';
 import { OnRampWidgetView } from './OnRampViewContextTypes';
 
 export enum SharedViews {
   LOADING_VIEW = 'LOADING_VIEW',
   ERROR_VIEW = 'ERROR_VIEW',
+  SERVICE_UNAVAILABLE_ERROR_VIEW = 'SERVICE_UNAVAILABLE_ERROR_VIEW',
   TOP_UP_VIEW = 'TOP_UP_VIEW',
 }
 
 export type SharedView =
 LoadingView
 | ErrorView
+| ServiceUnavailableErrorView
 | TopUpView;
 
 interface LoadingView extends ViewType {
@@ -26,6 +28,11 @@ export interface ErrorView extends ViewType {
   type: SharedViews.ERROR_VIEW;
   error: Error;
   tryAgain?: () => Promise<any>
+}
+
+export interface ServiceUnavailableErrorView extends ViewType {
+  type: SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW;
+  error: Error;
 }
 
 interface TopUpView extends ViewType {
@@ -41,7 +48,7 @@ export type View =
   | SwapWidgetView
   | BridgeWidgetView
   | OnRampWidgetView
-  | PrimaryRevenueWidgetView;
+  | SaleWidgetView;
 
 export interface ViewState {
   view: View;
@@ -100,6 +107,10 @@ export const viewReducer: Reducer<ViewState, ViewAction> = (
     case ViewActions.UPDATE_VIEW:
       // eslint-disable-next-line no-case-declarations
       const { view, currentViewData } = action.payload;
+      if (view.type === SharedViews.ERROR_VIEW) {
+        // eslint-disable-next-line no-console
+        console.error((view as ErrorView).error);
+      }
       // eslint-disable-next-line no-case-declarations
       const { history } = state;
       if (

@@ -17,7 +17,6 @@ import {
   BalanceNativeRequirement,
 } from '../../balanceCheck/types';
 import {
-  DexQuoteCache,
   TokenBalanceResult,
 } from '../types';
 import { BridgeRequirement, bridgeRoute } from '../bridge/bridgeRoute';
@@ -204,7 +203,6 @@ export const bridgeAndSwapRoute = async (
   readOnlyProviders: Map<ChainId, JsonRpcProvider>,
   availableRoutingOptions: AvailableRoutingOptions,
   insufficientRequirement: BalanceNativeRequirement | BalanceERC20Requirement,
-  dexQuoteCache: DexQuoteCache,
   ownerAddress: string,
   feeEstimates: Map<FundingStepType, FundingRouteFeeEstimate>,
   tokenBalances: Map<ChainId, TokenBalanceResult>,
@@ -240,7 +238,6 @@ export const bridgeAndSwapRoute = async (
   // Fetch all the dex quotes from the list of swappable tokens
   const dexQuotes = await getDexQuotes(
     config,
-    dexQuoteCache,
     ownerAddress,
     requiredTokenAddress as string,
     insufficientRequirement,
@@ -323,11 +320,11 @@ export const bridgeAndSwapRoute = async (
   const swapRoutes = await swapRoute(
     config,
     availableRoutingOptions,
-    dexQuoteCache,
     ownerAddress,
     insufficientRequirement,
     modifiedTokenBalances,
     swappableTokensAfterBridging,
+    balanceRequirements,
   );
   if (!swapRoutes) return [];
   const originalBalanceSwapRoutes = reapplyOriginalSwapBalances(

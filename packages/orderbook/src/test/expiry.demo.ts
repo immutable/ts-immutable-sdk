@@ -1,7 +1,7 @@
 import { Environment } from '@imtbl/config';
 import { Wallet } from 'ethers';
 import { log } from 'console';
-import { OrderStatus } from '../openapi/sdk/index';
+import { OrderStatusName } from 'openapi/sdk';
 import { Orderbook } from '../orderbook';
 import {
   deployTestToken,
@@ -73,7 +73,7 @@ describe('', () => {
     // Sign the EIP712 order message for the offerer. This is the signature that the order book API
     // stores and allows the fulfiller to fulfil the order, as long as they also have a valid
     // operator signature
-    const signatures = await actionAll(soonToExpireListing.actions, offerer, provider);
+    const signatures = await actionAll(soonToExpireListing.actions, offerer);
 
     log('Submitting order to orderbook API...');
     // Submit the order creation request to the order book API
@@ -87,12 +87,12 @@ describe('', () => {
     });
     log('Submitted order to orderbook API with expiry time set in the future');
 
-    await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.ACTIVE);
+    await waitForOrderToBeOfStatus(sdk, orderId, OrderStatusName.ACTIVE);
     log(
       `Listing ${orderId} is now ACTIVE, it will soon transition to EXPIRED, waiting...`,
     );
 
-    await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.EXPIRED);
+    await waitForOrderToBeOfStatus(sdk, orderId, OrderStatusName.EXPIRED);
     log(
       `Listing ${orderId} is now EXPIRED. Attempting to fulfill the expired listing...`,
     );

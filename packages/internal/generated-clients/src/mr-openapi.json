@@ -292,6 +292,30 @@
             }
           },
           {
+            "name": "contract_address",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "List of contract addresses to filter by",
+            "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
+          },
+          {
+            "name": "from_updated_at",
+            "in": "query",
+            "description": "Datetime to use as the oldest updated timestamp",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "2022-08-16T17:43:26.991388Z",
+              "format": "date-time"
+            }
+          },
+          {
             "name": "page_cursor",
             "in": "query",
             "description": "Encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
@@ -394,11 +418,11 @@
     "/v1/chains/{chain_name}/collections/{contract_address}/refresh-metadata": {
       "post": {
         "description": "Refresh collection metadata",
+        "summary": "Refresh collection metadata",
         "tags": [
           "collections"
         ],
         "operationId": "RefreshCollectionMetadata",
-        "summary": "Refresh collection metadata",
         "security": [
           {
             "ImmutableApiKey": [
@@ -619,11 +643,11 @@
     },
     "/v1/chains/{chain_name}/collections/{contract_address}/metadata/{metadata_id}": {
       "get": {
-        "description": "Get a single metadata by ID",
+        "description": "Get metadata by ID",
         "tags": [
           "metadata"
         ],
-        "summary": "Get a single metadata by ID",
+        "summary": "Get metadata by ID",
         "operationId": "GetMetadata",
         "parameters": [
           {
@@ -684,11 +708,99 @@
         }
       }
     },
+    "/v1/chains/{chain_name}/collections/{contract_address}/metadata": {
+      "get": {
+        "description": "Get a list of metadata by from the a given contract",
+        "tags": [
+          "metadata"
+        ],
+        "summary": "Get a list of metadata by from the a given contract",
+        "operationId": "ListMetadata",
+        "parameters": [
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            },
+            "examples": {
+              "testnet": {
+                "value": "imtbl-zkevm-testnet",
+                "summary": "Immutable zkEVM Public Testnet"
+              }
+            }
+          },
+          {
+            "name": "contract_address",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The address of metadata contract",
+            "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
+          },
+          {
+            "name": "from_updated_at",
+            "in": "query",
+            "description": "Datetime to use as the oldest updated timestamp",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "2022-08-16T17:43:26.991388Z",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "page_cursor",
+            "in": "query",
+            "description": "Encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageCursor"
+            }
+          },
+          {
+            "name": "page_size",
+            "description": "Maximum number of items to return",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageSize"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListMetadataResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
     "/v1/chains/{chain_name}/collections/{contract_address}/metadata/refresh-metadata": {
       "post": {
         "x-go-name": "RefreshMetadataByID",
         "operationId": "RefreshMetadataByID",
-        "description": "Refresh shared metadata for a collection",
+        "description": "Refresh stacked metadata",
+        "summary": "Refresh stacked metadata",
         "tags": [
           "metadata"
         ],
@@ -730,6 +842,16 @@
               },
               "imx-remaining-refreshes": {
                 "$ref": "#/components/headers/MetadataRefreshLimitRemaining"
+              },
+              "retry-after": {
+                "$ref": "#/components/headers/MetadataRefreshRetryAfter"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetadataRefreshRateLimitResult"
+                }
               }
             }
           },
@@ -746,7 +868,7 @@
             "$ref": "#/components/responses/NotFound"
           },
           "429": {
-            "$ref": "#/components/responses/TooManyRequests"
+            "$ref": "#/components/responses/TooManyMetadataRefreshes"
           },
           "500": {
             "$ref": "#/components/responses/InternalServerError"
@@ -786,6 +908,17 @@
                 "value": "imtbl-zkevm-testnet",
                 "summary": "Immutable zkEVM Public Testnet"
               }
+            }
+          },
+          {
+            "name": "from_updated_at",
+            "in": "query",
+            "description": "Datetime to use as the oldest updated timestamp",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "2022-08-16T17:43:26.991388Z",
+              "format": "date-time"
             }
           },
           {
@@ -1002,6 +1135,247 @@
         }
       }
     },
+    "/v1/chains/{chain_name}/nfts": {
+      "get": {
+        "description": "List all NFTs on a chain",
+        "tags": [
+          "nfts"
+        ],
+        "operationId": "ListAllNFTs",
+        "summary": "List all NFTs",
+        "parameters": [
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            },
+            "examples": {
+              "testnet": {
+                "value": "imtbl-zkevm-testnet",
+                "summary": "Immutable zkEVM Public Testnet"
+              }
+            }
+          },
+          {
+            "name": "from_updated_at",
+            "in": "query",
+            "description": "Datetime to use as the oldest updated timestamp",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "2022-08-16T17:43:26.991388Z",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "page_cursor",
+            "in": "query",
+            "description": "Encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageCursor"
+            }
+          },
+          {
+            "name": "page_size",
+            "description": "Maximum number of items to return",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageSize"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListNFTsResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/nft-owners": {
+      "get": {
+        "description": "List all NFT owners on a chain",
+        "tags": [
+          "nfts"
+        ],
+        "operationId": "ListAllNFTOwners",
+        "summary": "List all NFT owners",
+        "parameters": [
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            },
+            "examples": {
+              "testnet": {
+                "value": "imtbl-zkevm-testnet",
+                "summary": "Immutable zkEVM Public Testnet"
+              }
+            }
+          },
+          {
+            "name": "from_updated_at",
+            "in": "query",
+            "description": "Datetime to use as the oldest updated timestamp",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "2022-08-16T17:43:26.991388Z",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "page_cursor",
+            "in": "query",
+            "description": "Encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageCursor"
+            }
+          },
+          {
+            "name": "page_size",
+            "description": "Maximum number of items to return",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageSize"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListNFTOwnersResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/collections/{contract_address}/owners": {
+      "get": {
+        "description": "List owners by contract address",
+        "tags": [
+          "nft owners"
+        ],
+        "operationId": "ListOwnersByContractAddress",
+        "summary": "List owners by contract address",
+        "parameters": [
+          {
+            "name": "contract_address",
+            "in": "path",
+            "description": "The address of contract",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          },
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            },
+            "examples": {
+              "testnet": {
+                "value": "imtbl-zkevm-testnet",
+                "summary": "Immutable zkEVM Public Testnet"
+              }
+            }
+          },
+          {
+            "name": "from_updated_at",
+            "in": "query",
+            "description": "Datetime to use as the oldest updated timestamp",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "2022-08-16T17:43:26.991388Z",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "page_cursor",
+            "in": "query",
+            "description": "Encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageCursor"
+            }
+          },
+          {
+            "name": "page_size",
+            "description": "Maximum number of items to return",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageSize"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListCollectionOwnersResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
     "/v1/chains/{chain_name}/tokens": {
       "get": {
         "description": "List ERC20 tokens",
@@ -1018,6 +1392,17 @@
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/ChainName"
+            }
+          },
+          {
+            "name": "from_updated_at",
+            "in": "query",
+            "description": "Datetime to use as the oldest updated timestamp",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "2022-08-16T17:43:26.991388Z",
+              "format": "date-time"
             }
           },
           {
@@ -1165,6 +1550,159 @@
         }
       }
     },
+    "/v1/chains/{chain_name}/collections/{contract_address}/nfts/refresh-metadata": {
+      "post": {
+        "description": "Refresh NFT metadata",
+        "summary": "Refresh NFT metadata",
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "RefreshNFTMetadataByTokenID",
+        "security": [
+          {
+            "ImmutableApiKey": [
+              "refresh:metadata"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "contract_address",
+            "in": "path",
+            "description": "The address of contract",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          },
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "the request body",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshNFTMetadataByTokenIDRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "headers": {
+              "imx-refreshes-limit": {
+                "$ref": "#/components/headers/MetadataRefreshLimit"
+              },
+              "imx-refresh-limit-reset": {
+                "$ref": "#/components/headers/MetadataRefreshLimitReset"
+              },
+              "imx-remaining-refreshes": {
+                "$ref": "#/components/headers/MetadataRefreshLimitRemaining"
+              },
+              "retry-after": {
+                "$ref": "#/components/headers/MetadataRefreshRetryAfter"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetadataRefreshRateLimitResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorisedRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyMetadataRefreshes"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/orders/cancel": {
+      "post": {
+        "tags": [
+          "orders"
+        ],
+        "summary": "Cancel one or more orders",
+        "description": "Cancel one or more orders",
+        "operationId": "CancelOrders",
+        "parameters": [
+          {
+            "name": "chain_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelOrdersRequestBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Orders cancellation response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CancelOrdersResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorisedRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          },
+          "501": {
+            "$ref": "#/components/responses/NotImplementedError"
+          }
+        }
+      }
+    },
     "/v1/chains/{chain_name}/orders/listings": {
       "get": {
         "tags": [
@@ -1188,7 +1726,7 @@
             "description": "Order status to filter by",
             "required": false,
             "schema": {
-              "$ref": "#/components/schemas/OrderStatus"
+              "$ref": "#/components/schemas/OrderStatusName"
             }
           },
           {
@@ -1439,10 +1977,25 @@
                   "type": "object",
                   "properties": {
                     "result": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/FulfillmentDataResult"
-                      }
+                      "type": "object",
+                      "properties": {
+                        "fulfillable_orders": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/FulfillableOrder"
+                          }
+                        },
+                        "unfulfillable_orders": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/UnfulfillableOrder"
+                          }
+                        }
+                      },
+                      "required": [
+                        "fulfillable_orders",
+                        "unfulfillable_orders"
+                      ]
                     }
                   },
                   "required": [
@@ -1623,12 +2176,221 @@
         "tags": [
           "passport"
         ],
+        "operationId": "createCounterfactualAddressDeprecated",
+        "security": [
+          {
+            "BearerAuth": [
+              "transact"
+            ]
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCounterfactualAddressRequestDeprecated"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Counterfactual address created response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateCounterfactualAddressResDeprecated"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "TooManyRequestsError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError429"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicAPIError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/passport-mr/v1/users/{userId}/linked-addresses": {
+      "get": {
+        "summary": "Get Ethereum linked addresses for a user",
+        "description": "Get all the Ethereum linked addresses for a user based on its userId",
+        "tags": [
+          "passport"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "The user's userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "operationId": "getLinkedAddressesDeprecated",
+        "security": [
+          {
+            "BearerAuth": [
+              "openid"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User's list of linked addresses response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetLinkedAddressesResDeprecated"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "TooManyRequestsError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError429"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicAPIError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/passport/counterfactual-address": {
+      "post": {
+        "summary": "Create a counterfactual address",
+        "description": "Create a counterfactual address for a user based on their Ethereum address",
+        "tags": [
+          "passport"
+        ],
         "operationId": "createCounterfactualAddress",
         "security": [
           {
             "BearerAuth": [
               "transact"
             ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "chain_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            }
           }
         ],
         "requestBody": {
@@ -1715,7 +2477,7 @@
         }
       }
     },
-    "/passport-mr/v1/users/{userId}/linked-addresses": {
+    "/v1/chains/{chain_name}/passport/users/{user_id}/linked-addresses": {
       "get": {
         "summary": "Get Ethereum linked addresses for a user",
         "description": "Get all the Ethereum linked addresses for a user based on its userId",
@@ -1724,12 +2486,20 @@
         ],
         "parameters": [
           {
-            "name": "userId",
+            "name": "user_id",
             "in": "path",
             "description": "The user's userId",
             "required": true,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "chain_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
             }
           }
         ],
@@ -1827,7 +2597,7 @@
         "x-go-name": "ImmutableApiKey",
         "type": "apiKey",
         "in": "header",
-        "name": "X-Immutable-API-Key"
+        "name": "x-immutable-api-Key"
       }
     },
     "parameters": {
@@ -1907,12 +2677,46 @@
           }
         }
       },
+      "TooManyMetadataRefreshes": {
+        "description": "Too Many Metadata refreshes (429)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/APIError429"
+            }
+          }
+        },
+        "headers": {
+          "imx-refreshes-limit": {
+            "$ref": "#/components/headers/MetadataRefreshLimit"
+          },
+          "imx-refresh-limit-reset": {
+            "$ref": "#/components/headers/MetadataRefreshLimitReset"
+          },
+          "imx-remaining-refreshes": {
+            "$ref": "#/components/headers/MetadataRefreshLimitRemaining"
+          },
+          "retry-after": {
+            "$ref": "#/components/headers/MetadataRefreshRetryAfter"
+          }
+        }
+      },
       "InternalServerError": {
         "description": "Internal Server Error (500)",
         "content": {
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/APIError500"
+            }
+          }
+        }
+      },
+      "NotImplementedError": {
+        "description": "Not Implemented Error (501)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/APIError501"
             }
           }
         }
@@ -1933,6 +2737,12 @@
       },
       "MetadataRefreshLimitRemaining": {
         "description": "The number of refresh requests remaining in the current window.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "MetadataRefreshRetryAfter": {
+        "description": "The number of seconds until the next refresh request can be made.",
         "schema": {
           "type": "string"
         }
@@ -2558,6 +3368,25 @@
           "result"
         ]
       },
+      "ListMetadataResult": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "description": "List of metadata",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Metadata"
+            }
+          },
+          "page": {
+            "$ref": "#/components/schemas/Page"
+          }
+        },
+        "required": [
+          "result",
+          "page"
+        ]
+      },
       "Metadata": {
         "type": "object",
         "properties": {
@@ -2679,6 +3508,12 @@
             "example": "2022-08-16T17:43:26.991388Z",
             "description": "When the NFT was first indexed"
           },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2022-08-16T17:43:26.991388Z",
+            "description": "When the NFT owner was last updated"
+          },
           "metadata_synced_at": {
             "type": "string",
             "format": "date-time",
@@ -2741,6 +3576,7 @@
           "token_id",
           "contract_address",
           "indexed_at",
+          "updated_at",
           "metadata_synced_at",
           "name",
           "description",
@@ -2902,6 +3738,12 @@
             "type": "string",
             "description": "The quantity of owned tokens (uint256 as string)",
             "example": "1"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2022-08-16T17:43:26.991388Z",
+            "description": "When the NFT owner was last updated"
           }
         },
         "required": [
@@ -2910,6 +3752,48 @@
           "token_id",
           "account_address",
           "quantity"
+        ]
+      },
+      "NFTWithOwner": {
+        "type": "object",
+        "properties": {
+          "chain": {
+            "$ref": "#/components/schemas/Chain"
+          },
+          "contract_address": {
+            "type": "string",
+            "description": "The address of NFT contract",
+            "example": "0x5a019874f4fae314b0eaa4606be746366e661306"
+          },
+          "token_id": {
+            "type": "string",
+            "description": "An `uint256` token id as string",
+            "example": "1"
+          },
+          "account_address": {
+            "type": "string",
+            "description": "The account address of the owner of the NFT",
+            "example": "0x5a019874f4fae314b0eaa4606be746366e661306"
+          },
+          "quantity": {
+            "type": "string",
+            "description": "The quantity of owned tokens (uint256 as string)",
+            "example": "1"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2022-08-16T17:43:26.991388Z",
+            "description": "When the owner last changed for the given NFT"
+          }
+        },
+        "required": [
+          "chain",
+          "contract_address",
+          "token_id",
+          "account_address",
+          "quantity",
+          "updated_at"
         ]
       },
       "GetTokenResult": {
@@ -2932,6 +3816,25 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/NFTOwner"
+            }
+          },
+          "page": {
+            "$ref": "#/components/schemas/Page"
+          }
+        },
+        "required": [
+          "result",
+          "page"
+        ]
+      },
+      "ListCollectionOwnersResult": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "description": "List of NFT owners",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NFTWithOwner"
             }
           },
           "page": {
@@ -3108,7 +4011,6 @@
           }
         },
         "required": [
-          "token_id",
           "name",
           "description",
           "image",
@@ -3116,6 +4018,21 @@
           "animation_url",
           "youtube_url",
           "attributes"
+        ]
+      },
+      "RefreshNFTMetadataByTokenIDRequest": {
+        "type": "object",
+        "properties": {
+          "nft_metadata": {
+            "type": "array",
+            "description": "List of nft metadata to be refreshed",
+            "items": {
+              "$ref": "#/components/schemas/RefreshMetadataByTokenID"
+            }
+          }
+        },
+        "required": [
+          "nft_metadata"
         ]
       },
       "Token": {
@@ -3158,6 +4075,12 @@
             "description": "The name of token",
             "example": "Token A",
             "nullable": true
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2022-08-16T17:43:26.991388Z",
+            "description": "When the collection was last updated"
           }
         },
         "required": [
@@ -3167,7 +4090,8 @@
           "symbol",
           "decimals",
           "image_url",
-          "name"
+          "name",
+          "updated_at"
         ]
       },
       "CollectionMetadata": {
@@ -3254,6 +4178,29 @@
           "contract_address",
           "chain",
           "collection_metadata"
+        ]
+      },
+      "MetadataRefreshRateLimitResult": {
+        "type": "object",
+        "properties": {
+          "imx_refreshes_limit": {
+            "type": "string"
+          },
+          "imx_refresh_limit_reset": {
+            "type": "string"
+          },
+          "imx_remaining_refreshes": {
+            "type": "string"
+          },
+          "retry_after": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "imx_refreshes_limit",
+          "imx_refresh_limit_reset",
+          "imx_remaining_refreshes",
+          "retry_after"
         ]
       },
       "BasicAPIError": {
@@ -3490,7 +4437,7 @@
             "example": [
               {
                 "amount": "2250000000000000000",
-                "fee_type": "TAKER_MARKETPLACE",
+                "fee_type": "TAKER_ECOSYSTEM",
                 "recipient": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92233"
               }
             ],
@@ -3503,7 +4450,7 @@
           "fees"
         ]
       },
-      "FulfillmentDataResult": {
+      "FulfillableOrder": {
         "type": "object",
         "properties": {
           "extra_data": {
@@ -3516,6 +4463,25 @@
         "required": [
           "extra_data",
           "order"
+        ]
+      },
+      "UnfulfillableOrder": {
+        "type": "object",
+        "properties": {
+          "order_id": {
+            "type": "string",
+            "description": "OrderID for the requested but unfulfillable order",
+            "example": "7df3e99e-f7b3-459c-bef6-ffb66a18bb59"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Nullable string containing error reason if the signing is unsuccessful for the order",
+            "example": "Invalid order status INACTIVE for order 7df3e99e-f7b3-459c-bef6-ffb66a18bb59"
+          }
+        },
+        "required": [
+          "reason",
+          "order_id"
         ]
       },
       "NativeItem": {
@@ -3601,6 +4567,46 @@
           "token_id"
         ]
       },
+      "CancelOrdersRequestBody": {
+        "type": "object",
+        "properties": {
+          "account_address": {
+            "type": "string",
+            "description": "Address of the user initiating the cancel request",
+            "example": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+            "pattern": "^0x[a-fA-F0-9]{40}$"
+          },
+          "orders": {
+            "type": "array",
+            "description": "List of order ids proposed for cancellation",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true,
+            "minItems": 1,
+            "maxItems": 10
+          },
+          "signature": {
+            "type": "string",
+            "description": "Signature generated by the user for the specific cancellation request",
+            "example": "0x12345"
+          }
+        },
+        "required": [
+          "account_address",
+          "orders",
+          "signature"
+        ],
+        "example": {
+          "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+          "ids": [
+            "018a8c71-d7e4-e303-a2ef-318871ef7756",
+            "238a8c71-d7e4-e303-a2ef-318871ef7778",
+            "458a8c71-d7e4-e303-a2ef-318871ef7790"
+          ],
+          "signature": 291
+        }
+      },
       "CreateListingRequestBody": {
         "type": "object",
         "properties": {
@@ -3639,7 +4645,7 @@
             "minItems": 0,
             "maxItems": 2
           },
-          "end_time": {
+          "end_at": {
             "type": "string",
             "description": "Time after which the Order is considered expired",
             "format": "date-time",
@@ -3674,7 +4680,7 @@
             "description": "Digital signature generated by the user for the specific Order",
             "example": "0x"
           },
-          "start_time": {
+          "start_at": {
             "type": "string",
             "description": "Time after which Order is considered active",
             "format": "date-time",
@@ -3694,11 +4700,11 @@
           "fees": [
             {
               "amount": "2250000000000000000",
-              "fee_type": "MAKER_MARKETPLACE",
+              "fee_type": "MAKER_ECOSYSTEM",
               "recipient": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92233"
             }
           ],
-          "end_time": "2022-03-10T05:00:50.52Z",
+          "end_at": "2022-03-10T05:00:50.52Z",
           "protocol_data": {
             "order_type": "FULL_RESTRICTED",
             "zone_address": "0x12",
@@ -3715,7 +4721,7 @@
             }
           ],
           "signature": "0x",
-          "start_time": "2022-03-09T05:00:50.52Z"
+          "start_at": "2022-03-09T05:00:50.52Z"
         },
         "required": [
           "account_address",
@@ -3723,8 +4729,8 @@
           "buy",
           "sell",
           "fees",
-          "end_time",
-          "start_time",
+          "end_at",
+          "start_at",
           "protocol_data",
           "salt",
           "signature"
@@ -3745,8 +4751,8 @@
             "example": "ROYALTY",
             "enum": [
               "ROYALTY",
-              "MAKER_MARKETPLACE",
-              "TAKER_MARKETPLACE",
+              "MAKER_ECOSYSTEM",
+              "TAKER_ECOSYSTEM",
               "PROTOCOL"
             ]
           },
@@ -3802,13 +4808,13 @@
           "chain": {
             "$ref": "#/components/schemas/Chain"
           },
-          "create_time": {
+          "created_at": {
             "type": "string",
             "description": "Time the Order is created",
             "format": "date-time",
             "example": "2022-03-07T07:20:50.52Z"
           },
-          "end_time": {
+          "end_at": {
             "type": "string",
             "description": "Time after which the Order is considered expired",
             "format": "date-time",
@@ -3847,7 +4853,7 @@
             "description": "Digital signature generated by the user for the specific Order",
             "example": "0x"
           },
-          "start_time": {
+          "start_at": {
             "type": "string",
             "description": "Time after which Order is considered active",
             "format": "date-time",
@@ -3856,7 +4862,7 @@
           "status": {
             "$ref": "#/components/schemas/OrderStatus"
           },
-          "update_time": {
+          "updated_at": {
             "type": "string",
             "description": "Time the Order is last updated",
             "format": "date-time",
@@ -3877,8 +4883,8 @@
             "id": "eip155:11155111",
             "name": "sepolia"
           },
-          "create_time": "2022-03-07T07:20:50.52Z",
-          "end_time": "2022-03-10T05:00:50.52Z",
+          "created_at": "2022-03-07T07:20:50.52Z",
+          "end_at": "2022-03-10T05:00:50.52Z",
           "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
           "protocol_data": {
             "order_type": "FULL_RESTRICTED",
@@ -3896,9 +4902,11 @@
             }
           ],
           "signature": "0x",
-          "start_time": "2022-03-09T05:00:50.52Z",
-          "status": "ACTIVE",
-          "update_time": "2022-03-07T07:20:50.52Z"
+          "start_at": "2022-03-09T05:00:50.52Z",
+          "status": {
+            "value": "ACTIVE"
+          },
+          "updated_at": "2022-03-07T07:20:50.52Z"
         },
         "required": [
           "id",
@@ -3907,10 +4915,10 @@
           "sell",
           "fees",
           "chain",
-          "create_time",
-          "end_time",
-          "start_time",
-          "update_time",
+          "created_at",
+          "end_at",
+          "start_at",
+          "updated_at",
           "protocol_data",
           "salt",
           "signature",
@@ -4039,6 +5047,98 @@
           "blockchain_metadata"
         ]
       },
+      "CancelOrdersResult": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "$ref": "#/components/schemas/CancelOrdersResultData"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "example": {
+          "result": {
+            "successful_cancellations": [
+              "018a8c71-d7e4-e303-a2ef-318871ef7756",
+              "458a8c71-d7e4-e303-a2ef-318871ef7778"
+            ],
+            "pending_cancellations": [
+              "238a8c71-d7e4-e303-a2ef-318871ef7778",
+              "898a8c71-d7e4-e303-a2ef-318871ef7735"
+            ],
+            "failed_cancellations": [
+              {
+                "order": "458a8c71-d7e4-e303-a2ef-318871ef7790",
+                "reason_code": "ALREADY_FILLED"
+              },
+              {
+                "order": "338a8c71-d7e4-e303-a2ef-318871ef7342",
+                "reason_code": "ALREADY_FILLED"
+              }
+            ]
+          }
+        }
+      },
+      "CancelOrdersResultData": {
+        "type": "object",
+        "properties": {
+          "successful_cancellations": {
+            "type": "array",
+            "description": "Orders which were successfully cancelled",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 0,
+            "maxItems": 10
+          },
+          "pending_cancellations": {
+            "type": "array",
+            "description": "Orders which are marked for cancellation but the cancellation cannot be guaranteed",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 0,
+            "maxItems": 10
+          },
+          "failed_cancellations": {
+            "type": "array",
+            "description": "Orders which failed to be cancelled",
+            "items": {
+              "$ref": "#/components/schemas/FailedOrderCancellation"
+            },
+            "minItems": 0,
+            "maxItems": 10
+          }
+        },
+        "required": [
+          "successful_cancellations",
+          "pending_cancellations",
+          "failed_cancellations"
+        ]
+      },
+      "FailedOrderCancellation": {
+        "type": "object",
+        "properties": {
+          "order": {
+            "type": "string",
+            "description": "ID of the order which failed to be cancelled",
+            "example": "7df3e99e-f7b3-459c-bef6-ffb66a18bb59"
+          },
+          "reason_code": {
+            "type": "string",
+            "enum": [
+              "ALREADY_FILLED"
+            ],
+            "description": "Reason code indicating why the order failed to be cancelled",
+            "example": "ALREADY_FILLED"
+          }
+        },
+        "required": [
+          "order",
+          "reason_code"
+        ]
+      },
       "ListingResult": {
         "type": "object",
         "properties": {
@@ -4064,8 +5164,8 @@
               "id": "eip155:11155111",
               "name": "sepolia"
             },
-            "create_time": "2022-03-07T07:20:50.52Z",
-            "end_time": "2022-03-10T05:00:50.52Z",
+            "created_at": "2022-03-07T07:20:50.52Z",
+            "end_at": "2022-03-10T05:00:50.52Z",
             "id": "018792C9-4AD7-8EC4-4038-9E05C598534B",
             "protocol_data": {
               "order_type": "FULL_RESTRICTED",
@@ -4083,9 +5183,11 @@
               }
             ],
             "signature": "0x",
-            "start_time": "2022-03-09T05:00:50.52Z",
-            "status": "EXPIRED",
-            "update_time": "2022-03-07T07:20:50.52Z"
+            "start_at": "2022-03-09T05:00:50.52Z",
+            "status": {
+              "value": "EXPIRED"
+            },
+            "updated_at": "2022-03-07T07:20:50.52Z"
           }
         }
       },
@@ -4128,8 +5230,8 @@
                 "id": "eip155:11155111",
                 "name": "sepolia"
               },
-              "create_time": "2022-03-07T07:20:50.52Z",
-              "end_time": "2022-03-10T05:00:50.52Z",
+              "created_at": "2022-03-07T07:20:50.52Z",
+              "end_at": "2022-03-10T05:00:50.52Z",
               "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
               "protocol_data": {
                 "order_type": "FULL_RESTRICTED",
@@ -4147,9 +5249,11 @@
                 }
               ],
               "signature": "0x",
-              "start_time": "2022-03-09T05:00:50.52Z",
-              "status": "EXPIRED",
-              "update_time": "2022-03-07T07:20:50.52Z"
+              "start_at": "2022-03-09T05:00:50.52Z",
+              "status": {
+                "value": "EXPIRED"
+              },
+              "updated_at": "2022-03-07T07:20:50.52Z"
             },
             {
               "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
@@ -4165,8 +5269,8 @@
                 "id": "eip155:11155111",
                 "name": "sepolia"
               },
-              "create_time": "2022-03-07T07:20:50.52Z",
-              "end_time": "2022-03-10T05:00:50.52Z",
+              "created_at": "2022-03-07T07:20:50.52Z",
+              "end_at": "2022-03-10T05:00:50.52Z",
               "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
               "protocol_data": {
                 "counter": "1",
@@ -4184,9 +5288,11 @@
                 }
               ],
               "signature": "0x",
-              "start_time": "2022-03-09T05:00:50.52Z",
-              "status": "EXPIRED",
-              "update_time": "2022-03-07T07:20:50.52Z"
+              "start_at": "2022-03-09T05:00:50.52Z",
+              "status": {
+                "value": "EXPIRED"
+              },
+              "updated_at": "2022-03-07T07:20:50.52Z"
             }
           ]
         }
@@ -4216,7 +5322,7 @@
               "id": "eip155:11155111",
               "name": "sepolia"
             },
-            "create_time": "2022-03-07T07:20:50.52Z",
+            "created_at": "2022-03-07T07:20:50.52Z",
             "id": "018792C9-4AD7-8EC4-4038-9E05C598534B",
             "sell": [
               {
@@ -4228,7 +5334,7 @@
             "seller_address": "0x002b9B1cbf464782Df5d48870358FA6c09f1b19D",
             "maker_address": "0x002b9B1cbf464782Df5d48870358FA6c09f1b19D",
             "taker_address": "0xFC99a706C0D05B8C71E1fAAC91b3E1343aC34D40",
-            "update_time": "2022-03-07T07:20:50.52Z"
+            "updated_at": "2022-03-07T07:20:50.52Z"
           }
         }
       },
@@ -4271,7 +5377,7 @@
                 "id": "eip155:11155111",
                 "name": "sepolia"
               },
-              "create_time": "2022-03-07T07:20:50.52Z",
+              "created_at": "2022-03-07T07:20:50.52Z",
               "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
               "sell": [
                 {
@@ -4283,7 +5389,7 @@
               "seller_address": "0x002b9B1cbf464782Df5d48870358FA6c09f1b19D",
               "maker_address": "0x002b9B1cbf464782Df5d48870358FA6c09f1b19D",
               "taker_address": "0xFC99a706C0D05B8C71E1fAAC91b3E1343aC34D40",
-              "update_time": "2022-03-07T07:20:50.52Z"
+              "updated_at": "2022-03-07T07:20:50.52Z"
             },
             {
               "buy": [
@@ -4299,7 +5405,7 @@
                 "id": "eip155:11155111",
                 "name": "sepolia"
               },
-              "create_time": "2022-03-07T07:20:50.52Z",
+              "created_at": "2022-03-07T07:20:50.52Z",
               "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
               "sell": [
                 {
@@ -4311,22 +5417,161 @@
               "seller_address": "0xC73349c545C1D757eb650cDc463A2f6dF1Ec41cb",
               "maker_address": "0xC73349c545C1D757eb650cDc463A2f6dF1Ec41cb",
               "taker_address": "0x017406f3F27d507a1491976B7835CE5CD0fA647a",
-              "update_time": "2022-03-07T07:20:50.52Z"
+              "updated_at": "2022-03-07T07:20:50.52Z"
             }
           ]
         }
       },
       "OrderStatus": {
+        "description": "The Order status",
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/CancelledOrderStatus"
+          },
+          {
+            "$ref": "#/components/schemas/PendingOrderStatus"
+          },
+          {
+            "$ref": "#/components/schemas/ActiveOrderStatus"
+          },
+          {
+            "$ref": "#/components/schemas/InactiveOrderStatus"
+          },
+          {
+            "$ref": "#/components/schemas/FilledOrderStatus"
+          },
+          {
+            "$ref": "#/components/schemas/ExpiredOrderStatus"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "name",
+          "mapping": {
+            "CANCELLED": "#/components/schemas/CancelledOrderStatus",
+            "PENDING": "#/components/schemas/PendingOrderStatus",
+            "ACTIVE": "#/components/schemas/ActiveOrderStatus",
+            "INACTIVE": "#/components/schemas/InactiveOrderStatus",
+            "FILLED": "#/components/schemas/FilledOrderStatus",
+            "EXPIRED": "#/components/schemas/ExpiredOrderStatus"
+          }
+        }
+      },
+      "CancelledOrderStatus": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The order status",
+            "enum": [
+              "CANCELLED"
+            ]
+          },
+          "is_pending": {
+            "type": "boolean",
+            "description": "Whether the cancellation of the order is pending",
+            "example": false
+          },
+          "cancellation_type": {
+            "type": "string",
+            "description": "Whether the cancellation was done on-chain or off-chain",
+            "enum": [
+              "ON_CHAIN",
+              "OFF_CHAIN"
+            ],
+            "example": "ON_CHAIN"
+          }
+        },
+        "required": [
+          "name",
+          "is_pending",
+          "cancellation_type"
+        ]
+      },
+      "PendingOrderStatus": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The order status",
+            "enum": [
+              "PENDING"
+            ]
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "ActiveOrderStatus": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The order status",
+            "enum": [
+              "ACTIVE"
+            ]
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "InactiveOrderStatus": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The order status",
+            "enum": [
+              "INACTIVE"
+            ]
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "ExpiredOrderStatus": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "A terminal order status indicating that an order cannot be fulfilled due to expiry.",
+            "enum": [
+              "EXPIRED"
+            ]
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "FilledOrderStatus": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "A terminal order status indicating that an order has been fulfilled.",
+            "enum": [
+              "FILLED"
+            ]
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "OrderStatusName": {
         "type": "string",
         "description": "The Order status",
-        "example": "ACTIVE",
         "enum": [
           "PENDING",
           "ACTIVE",
           "INACTIVE",
           "FILLED",
-          "CANCELLED",
-          "EXPIRED"
+          "EXPIRED",
+          "CANCELLED"
         ]
       },
       "ProtocolData": {
@@ -4409,7 +5654,36 @@
           "log_index"
         ]
       },
-      "CreateCounterfactualAddressRequest": {
+      "APIError501": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasicAPIError"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "Error Code",
+                "enum": [
+                  "NOT_IMPLEMENTED_ERROR"
+                ],
+                "example": "NOT_IMPLEMENTED_ERROR"
+              },
+              "details": {
+                "type": "object",
+                "nullable": true,
+                "description": "Additional details to help resolve the error"
+              }
+            },
+            "required": [
+              "code",
+              "details"
+            ]
+          }
+        ]
+      },
+      "CreateCounterfactualAddressRequestDeprecated": {
         "type": "object",
         "required": [
           "ethereumAddress",
@@ -4429,7 +5703,27 @@
         },
         "additionalProperties": false
       },
-      "CreateCounterfactualAddressRes": {
+      "CreateCounterfactualAddressRequest": {
+        "type": "object",
+        "required": [
+          "ethereum_address",
+          "ethereum_signature"
+        ],
+        "properties": {
+          "ethereum_address": {
+            "description": "The user's UAK address",
+            "type": "string",
+            "maxLength": 42
+          },
+          "ethereum_signature": {
+            "description": "The signature generated with the UAK",
+            "type": "string",
+            "maxLength": 132
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateCounterfactualAddressResDeprecated": {
         "type": "object",
         "required": [
           "counterfactualAddress"
@@ -4442,13 +5736,45 @@
           }
         }
       },
-      "GetLinkedAddressesRes": {
+      "CreateCounterfactualAddressRes": {
+        "type": "object",
+        "required": [
+          "counterfactual_address"
+        ],
+        "properties": {
+          "counterfactual_address": {
+            "description": "The user's counterfactual address",
+            "type": "string",
+            "maxLength": 42
+          }
+        }
+      },
+      "GetLinkedAddressesResDeprecated": {
         "type": "object",
         "required": [
           "linkedAddresses"
         ],
         "properties": {
           "linkedAddresses": {
+            "type": "array",
+            "minItems": 0,
+            "description": "The user's list of linked addresses",
+            "items": {
+              "description": "The user's linked address",
+              "type": "string",
+              "pattern": "^0x[0-9a-fA-F]*$",
+              "maxLength": 42
+            }
+          }
+        }
+      },
+      "GetLinkedAddressesRes": {
+        "type": "object",
+        "required": [
+          "linked_addresses"
+        ],
+        "properties": {
+          "linked_addresses": {
             "type": "array",
             "minItems": 0,
             "description": "The user's list of linked addresses",

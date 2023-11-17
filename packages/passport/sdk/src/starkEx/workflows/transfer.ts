@@ -1,7 +1,6 @@
 import {
   CreateTransferResponse,
   CreateTransferResponseV1,
-  GetSignableTransferRequest,
   GetSignableTransferRequestV1,
   NftTransferDetails,
   SignableTransferDetails,
@@ -63,7 +62,8 @@ export async function transfer({
         { headers },
       );
 
-      await guardianClient.validate({
+      await guardianClient.evaluateImxTransaction({
+        user,
         payloadHash: signableResult.data.payload_hash,
       });
 
@@ -130,24 +130,19 @@ export async function batchNftTransfer({
         }),
       );
 
-      const getSignableTransferRequestV2: GetSignableTransferRequest = {
-        sender_ether_key: ethAddress,
-        signable_requests: signableRequests,
-      };
-
-      const headers = {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        Authorization: `Bearer ${user.accessToken}`,
-      };
-
+      const headers = { Authorization: `Bearer ${user.accessToken}` };
       const signableResult = await transfersApi.getSignableTransfer(
         {
-          getSignableTransferRequestV2,
+          getSignableTransferRequestV2: {
+            sender_ether_key: ethAddress,
+            signable_requests: signableRequests,
+          },
         },
         { headers },
       );
 
-      await guardianClient.validate({
+      await guardianClient.evaluateImxTransaction({
+        user,
         payloadHash: signableResult.data.signable_responses[0]?.payload_hash,
       });
 

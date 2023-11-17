@@ -54,6 +54,7 @@ export function NotEnoughGas({
             sx={{
               backgroundColor: 'white',
               height: '100px',
+              width: '64px',
               padding: '10px',
             }}
           />

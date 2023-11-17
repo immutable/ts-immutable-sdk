@@ -13,8 +13,9 @@
  */
 
 
-import globalAxios, { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
-import { Configuration } from '../configuration';
+import type { Configuration } from '../configuration';
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
@@ -214,32 +215,22 @@ export const ActivitiesApiFactory = function (configuration?: Configuration, bas
         /**
          * Get a single activity by ID
          * @summary Get a single activity by ID
-         * @param {string} chainName The name of chain
-         * @param {string} activityId The id of activity
+         * @param {ActivitiesApiGetActivityRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getActivity(chainName: string, activityId: string, options?: any): AxiosPromise<GetActivityResult> {
-            return localVarFp.getActivity(chainName, activityId, options).then((request) => request(axios, basePath));
+        getActivity(requestParameters: ActivitiesApiGetActivityRequest, options?: AxiosRequestConfig): AxiosPromise<GetActivityResult> {
+            return localVarFp.getActivity(requestParameters.chainName, requestParameters.activityId, options).then((request) => request(axios, basePath));
         },
         /**
          * List all activities
          * @summary List all activities
-         * @param {string} chainName The name of chain
-         * @param {string} [contractAddress] The contract address of NFT or ERC20 Token
-         * @param {string} [tokenId] An &#x60;uint256&#x60; token id as string
-         * @param {string} [accountAddress] The account address activity contains
-         * @param {ActivityType} [activityType] The activity type
-         * @param {string} [fromIndexedAt] From indexed at including given date
-         * @param {string} [toIndexedAt] To indexed at including given date
-         * @param {string} [transactionHash] The transaction hash of activity
-         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
-         * @param {number} [pageSize] Maximum number of items to return
+         * @param {ActivitiesApiListActivitiesRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listActivities(chainName: string, contractAddress?: string, tokenId?: string, accountAddress?: string, activityType?: ActivityType, fromIndexedAt?: string, toIndexedAt?: string, transactionHash?: string, pageCursor?: string, pageSize?: number, options?: any): AxiosPromise<ListActivitiesResult> {
-            return localVarFp.listActivities(chainName, contractAddress, tokenId, accountAddress, activityType, fromIndexedAt, toIndexedAt, transactionHash, pageCursor, pageSize, options).then((request) => request(axios, basePath));
+        listActivities(requestParameters: ActivitiesApiListActivitiesRequest, options?: AxiosRequestConfig): AxiosPromise<ListActivitiesResult> {
+            return localVarFp.listActivities(requestParameters.chainName, requestParameters.contractAddress, requestParameters.tokenId, requestParameters.accountAddress, requestParameters.activityType, requestParameters.fromIndexedAt, requestParameters.toIndexedAt, requestParameters.transactionHash, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -373,3 +364,4 @@ export class ActivitiesApi extends BaseAPI {
         return ActivitiesApiFp(this.configuration).listActivities(requestParameters.chainName, requestParameters.contractAddress, requestParameters.tokenId, requestParameters.accountAddress, requestParameters.activityType, requestParameters.fromIndexedAt, requestParameters.toIndexedAt, requestParameters.transactionHash, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 }
+

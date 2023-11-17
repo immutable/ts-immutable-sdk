@@ -37,3 +37,5 @@ export interface ActivityToken {
     'contract_address': string;
 }
 
+
+

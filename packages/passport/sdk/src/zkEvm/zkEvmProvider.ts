@@ -11,7 +11,7 @@ import {
 } from './types';
 import AuthManager from '../authManager';
 import MagicAdapter from '../magicAdapter';
-import TypedEventEmitter from '../typedEventEmitter';
+import TypedEventEmitter from '../utils/typedEventEmitter';
 import { PassportConfiguration } from '../config';
 import { ConfirmationScreen } from '../confirmation';
 import { PassportEventMap, PassportEvents, UserZkEvm } from '../types';
@@ -75,7 +75,18 @@ export class ZkEvmProvider implements Provider {
     this.magicAdapter = magicAdapter;
     this.config = config;
     this.confirmationScreen = confirmationScreen;
-    this.jsonRpcProvider = new JsonRpcProvider(this.config.zkEvmRpcUrl);
+
+    if (config.crossSdkBridgeEnabled) {
+      // JsonRpcProvider by default sets the referrer as "client".
+      // On Unreal 4 this errors as the browser used is expecting a valid URL.
+      this.jsonRpcProvider = new JsonRpcProvider({
+        url: this.config.zkEvmRpcUrl,
+        fetchOptions: { referrer: 'http://imtblgamesdk.local' },
+      });
+    } else {
+      this.jsonRpcProvider = new JsonRpcProvider(this.config.zkEvmRpcUrl);
+    }
+
     this.multiRollupApiClients = multiRollupApiClients;
     this.eventEmitter = new TypedEventEmitter<ProviderEventMap>();
 
@@ -113,6 +124,7 @@ export class ZkEvmProvider implements Provider {
           config: this.config,
           magicAdapter: this.magicAdapter,
           multiRollupApiClients: this.multiRollupApiClients,
+          jsonRpcProvider: this.jsonRpcProvider,
         });
 
         this.user = user;
@@ -123,9 +135,7 @@ export class ZkEvmProvider implements Provider {
           user: this.user,
         });
         this.guardianClient = new GuardianClient({
-          accessToken: this.user.accessToken,
           confirmationScreen: this.confirmationScreen,
-          imxEtherAddress: this.user.zkEvm.ethAddress,
           config: this.config,
         });
 

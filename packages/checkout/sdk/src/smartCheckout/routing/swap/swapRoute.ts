@@ -8,16 +8,81 @@ import {
   GetBalanceResult,
   IMX_ADDRESS_ZKEVM,
   ItemType,
+  SwapFees,
   SwapFundingStep,
+  TokenInfo,
 } from '../../../types';
-import { BalanceRequirement } from '../../balanceCheck/types';
-import { DexQuoteCache, TokenBalanceResult } from '../types';
-import { getOrSetQuotesFromCache } from './dexQuoteCache';
+import { BalanceCheckResult, BalanceRequirement } from '../../balanceCheck/types';
+import { TokenBalanceResult } from '../types';
+import { quoteFetcher } from './quoteFetcher';
+
+const constructFees = (
+  approvalGasFees: Amount | null | undefined,
+  swapGasFees: Amount | null,
+  swapFees: Fee[],
+): SwapFees => {
+  let approvalGasFeeAmount = BigNumber.from(0);
+  let approvalGasFeeFormatted = '0';
+  let approvalToken: TokenInfo | undefined;
+  if (approvalGasFees) {
+    approvalGasFeeAmount = approvalGasFees.value;
+    approvalGasFeeFormatted = utils.formatUnits(approvalGasFees.value, approvalGasFees.token.decimals);
+    approvalToken = {
+      name: approvalGasFees.token.name ?? '',
+      symbol: approvalGasFees.token.symbol ?? '',
+      address: approvalGasFees.token.address,
+      decimals: approvalGasFees.token.decimals,
+    };
+  }
+
+  let swapGasFeeAmount = BigNumber.from(0);
+  let swapGasFeeFormatted = '0';
+  let swapGasToken: TokenInfo | undefined;
+  if (swapGasFees) {
+    swapGasFeeAmount = swapGasFees.value;
+    swapGasFeeFormatted = utils.formatUnits(swapGasFees.value, swapGasFees.token.decimals);
+    swapGasToken = {
+      name: swapGasFees.token.name ?? '',
+      symbol: swapGasFees.token.symbol ?? '',
+      address: swapGasFees.token.address,
+      decimals: swapGasFees.token.decimals,
+    };
+  }
+
+  const fees = [];
+  for (const swapFee of swapFees) {
+    fees.push({
+      amount: swapFee.amount.value,
+      formattedAmount: utils.formatUnits(swapFee.amount.value, swapFee.amount.token.decimals),
+      token: {
+        name: swapFee.amount.token.name ?? '',
+        symbol: swapFee.amount.token.symbol ?? '',
+        address: swapFee.amount.token.address,
+        decimals: swapFee.amount.token.decimals,
+      },
+    });
+  }
+
+  return {
+    approvalGasFees: {
+      amount: approvalGasFeeAmount,
+      formattedAmount: approvalGasFeeFormatted,
+      token: approvalToken,
+    },
+    swapGasFees: {
+      amount: swapGasFeeAmount,
+      formattedAmount: swapGasFeeFormatted,
+      token: swapGasToken,
+    },
+    swapFees: fees,
+  };
+};
 
 export const constructSwapRoute = (
   chainId: ChainId,
   fundsRequired: BigNumber,
   userBalance: GetBalanceResult,
+  fees: SwapFees,
 ): SwapFundingStep => {
   const tokenAddress = userBalance.token.address;
 
@@ -44,21 +109,7 @@ export const constructSwapRoute = (
       },
       token: userBalance.token,
     },
-    // WT-1734 - Add fees
-    fees: {
-      approvalGasFees: {
-        amount: BigNumber.from(0),
-        formattedAmount: '0',
-      },
-      swapGasFees: {
-        amount: BigNumber.from(0),
-        formattedAmount: '0',
-      },
-      swapFees: [{
-        amount: BigNumber.from(0),
-        formattedAmount: '0',
-      }],
-    },
+    fees,
   };
 };
 
@@ -86,7 +137,7 @@ export const getRequiredToken = (
 type SufficientApprovalFees = { sufficient: boolean, approvalGasFee: BigNumber, approvalGasTokenAddress: string };
 export const checkUserCanCoverApprovalFees = (
   l2Balances: GetBalanceResult[],
-  approval: Amount | null | undefined,
+  approval: Amount | null,
 ): SufficientApprovalFees => {
   // Check if approval required
   if (!approval) return { sufficient: true, approvalGasFee: BigNumber.from(0), approvalGasTokenAddress: '' };
@@ -122,8 +173,9 @@ export const checkUserCanCoverApprovalFees = (
 
 export const checkUserCanCoverSwapFees = (
   l2Balances: GetBalanceResult[],
-  swapFees: Fee[],
   approvalFees: SufficientApprovalFees,
+  swapGasFees: Amount | null,
+  swapFees: Fee[],
   tokenBeingSwapped: { amount: BigNumber, address: string },
 ): boolean => {
   // Set up a map of token addresses to amounts for each of the swap fees
@@ -134,10 +186,20 @@ export const checkUserCanCoverSwapFees = (
     feeMap.set(approvalFees.approvalGasTokenAddress, approvalFees.approvalGasFee);
   }
 
+  // Add the swap gas fee to list of fees
+  if (swapGasFees) {
+    const fee = feeMap.get(swapGasFees.token.address);
+    if (fee) {
+      feeMap.set(swapGasFees.token.address, fee.add(swapGasFees.value));
+    } else {
+      feeMap.set(swapGasFees.token.address, swapGasFees.value);
+    }
+  }
+
   // Add the token being swapped to list of fees to ensure the user can cover the fee + the token swap
   if (tokenBeingSwapped) {
     const fee = feeMap.get(tokenBeingSwapped.address);
-    if (fee) { // Token being swapped is the same as approval token
+    if (fee) { // Token being swapped is the same as gas token
       feeMap.set(tokenBeingSwapped.address, fee.add(tokenBeingSwapped.amount));
     } else {
       feeMap.set(tokenBeingSwapped.address, tokenBeingSwapped.amount);
@@ -169,14 +231,62 @@ export const checkUserCanCoverSwapFees = (
   return true;
 };
 
+// The item for swapping may also be a balance requirement
+// for the action. Need to ensure that if the user does a swap
+// this token to cover the insufficient balance that the user
+// still has enough funds of this token to fulfill the balance
+// requirement.
+export const checkIfUserCanCoverRequirement = (
+  l2balance: BigNumber,
+  balanceRequirements: BalanceCheckResult,
+  quoteTokenAddress: string,
+  amountBeingSwapped: BigNumber,
+  approvalFees: SufficientApprovalFees,
+  swapFees: Fee[],
+): boolean => {
+  let remainingBalance = BigNumber.from(0);
+  let balanceRequirementToken = '';
+  let requirementExists = false;
+
+  balanceRequirements.balanceRequirements.forEach((requirement) => {
+    if (requirement.type === ItemType.NATIVE || requirement.type === ItemType.ERC20) {
+      if (requirement.required.token.address === quoteTokenAddress) {
+        balanceRequirementToken = requirement.required.token.address;
+        requirementExists = true;
+        // Get the balance that would remain if the requirement was removed from the users balance
+        remainingBalance = l2balance.sub(requirement.required.balance);
+      }
+    }
+  });
+
+  // No requirement exists matching this token so no need to check if user can cover requirement
+  if (!requirementExists) return true;
+
+  // Remove approval fees from the remainder if token matches as these need to be taken out to cover the swap
+  if (approvalFees.approvalGasTokenAddress === balanceRequirementToken) {
+    remainingBalance = remainingBalance.sub(approvalFees.approvalGasFee);
+  }
+
+  // Remove swap fees from the remainder if token matches as these need to be taken out to cover the swap
+  for (const swapFee of swapFees) {
+    if (swapFee.amount.token.address === balanceRequirementToken) {
+      remainingBalance = remainingBalance.sub(swapFee.amount.value);
+    }
+  }
+
+  // If the users current balance can cover the balance after fees + the amount
+  // that is going to be swapped from another item requirement then return true
+  return remainingBalance.gte(amountBeingSwapped);
+};
+
 export const swapRoute = async (
   config: CheckoutConfiguration,
   availableRoutingOptions: AvailableRoutingOptions,
-  dexQuoteCache: DexQuoteCache,
   walletAddress: string,
   balanceRequirement: BalanceRequirement,
   tokenBalanceResults: Map<ChainId, TokenBalanceResult>,
   swappableTokens: string[],
+  balanceRequirements: BalanceCheckResult,
 ): Promise<SwapFundingStep[]> => {
   const fundingSteps: SwapFundingStep[] = [];
   if (!availableRoutingOptions.swap) return fundingSteps;
@@ -191,9 +301,9 @@ export const swapRoute = async (
   const l2Balances = l2TokenBalanceResult.balances;
   if (l2Balances.length === 0) return fundingSteps;
 
-  const quotes = await getOrSetQuotesFromCache(
+  const quotes = await quoteFetcher(
     config,
-    dexQuoteCache,
+    getL2ChainId(config),
     walletAddress,
     requiredToken,
     swappableTokens,
@@ -220,21 +330,34 @@ export const swapRoute = async (
     // If user does not have enough to cover swap fees then continue
     if (!checkUserCanCoverSwapFees(
       l2Balances,
-      quote.quote.fees,
       approvalFees,
+      quote.swap,
+      quote.quote.fees,
       {
         amount: amountOfQuoteTokenRequired.value,
         address: quoteTokenAddress,
       },
     )) continue;
 
-    // User has sufficient funds to cover any approval and swap fees so use this token for the funding route
-    // Currently we are not prioritising any particular token so just taking the first sufficient token
+    if (!checkIfUserCanCoverRequirement(
+      userBalanceOfQuotedToken.balance,
+      balanceRequirements,
+      quoteTokenAddress,
+      amountOfQuoteTokenRequired.value,
+      approvalFees,
+      quote.quote.fees,
+    )) continue;
+
+    const fees = constructFees(quote.approval, quote.swap, quote.quote.fees);
+
+    // User has sufficient funds of this token to cover any gas fees, swap fees and balance requirements
+    // so add this token to the possible swap options
     fundingSteps.push(
       constructSwapRoute(
         chainId,
         amountOfQuoteTokenRequired.value,
         userBalanceOfQuotedToken,
+        fees,
       ),
     );
   }

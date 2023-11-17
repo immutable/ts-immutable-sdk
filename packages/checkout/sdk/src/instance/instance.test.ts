@@ -96,8 +96,8 @@ describe('instance', () => {
   });
 
   describe('createOrderbookInstance', () => {
-    it('should create an instance of Orderbook', async () => {
-      expect(await createOrderbookInstance(
+    it('should create an instance of Orderbook', () => {
+      expect(createOrderbookInstance(
         config,
       )).toBeInstanceOf(Orderbook);
     });

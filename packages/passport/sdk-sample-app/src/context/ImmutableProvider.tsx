@@ -6,12 +6,12 @@ import { Networks, Passport, PassportModuleConfiguration } from '@imtbl/passport
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 import {
-  audience,
-  logoutRedirectUri,
-  redirectUri,
-  silentLogoutRedirectUri,
-  logoutMode,
-  scope,
+  AUDIENCE,
+  LOGOUT_REDIRECT_URI,
+  REDIRECT_URI,
+  SILENT_LOGOUT_REDIRECT_URI,
+  LOGOUT_MODE,
+  SCOPE,
 } from '@/config';
 import { EnvironmentNames } from '@/types';
 import useLocalStorage from '@/hooks/useLocalStorage';
@@ -40,13 +40,14 @@ const getCoreSdkConfig = (environment: EnvironmentNames) => {
 
 const getPassportConfig = (environment: EnvironmentNames): PassportModuleConfiguration => {
   const sharedConfigurationValues = {
-    scope,
-    audience,
-    redirectUri,
-    logoutRedirectUri,
-    logoutMode,
+    scope: SCOPE,
+    audience: AUDIENCE,
+    redirectUri: REDIRECT_URI,
+    logoutMode: LOGOUT_MODE,
+    logoutRedirectUri: LOGOUT_MODE === 'silent'
+      ? SILENT_LOGOUT_REDIRECT_URI
+      : LOGOUT_REDIRECT_URI,
   };
-  sharedConfigurationValues.logoutRedirectUri = logoutMode === 'silent' ? silentLogoutRedirectUri : logoutRedirectUri;
 
   switch (environment) {
     case EnvironmentNames.PRODUCTION: {
@@ -103,12 +104,13 @@ const getPassportConfig = (environment: EnvironmentNames): PassportModuleConfigu
 };
 
 const ImmutableContext = createContext<{
-  passportClient?: Passport,
+  passportClient: Passport,
   coreSdkClient: ImmutableX,
   environment: EnvironmentNames,
   setEnvironment?:(environment: EnvironmentNames) => void;
 }>({
       coreSdkClient: new ImmutableX(getCoreSdkConfig(EnvironmentNames.DEV)),
+      passportClient: new Passport(getPassportConfig(EnvironmentNames.DEV)),
       environment: EnvironmentNames.DEV,
     });
 
@@ -122,7 +124,9 @@ export function ImmutableProvider({
   const [coreSdkClient, setCoreSdkClient] = useState<ImmutableX>(
     useContext(ImmutableContext).coreSdkClient,
   );
-  const [passportClient, setPassportClient] = useState<Passport>();
+  const [passportClient, setPassportClient] = useState<Passport>(
+    useContext(ImmutableContext).passportClient,
+  );
 
   useEffect(() => {
     setCoreSdkClient(new ImmutableX(getCoreSdkConfig(environment)));

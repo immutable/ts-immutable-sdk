@@ -18,6 +18,7 @@ import {
   BuyToken,
   SellResult,
   CheckoutStatus,
+  SmartCheckoutResult,
 } from '../../types';
 import * as instance from '../../instance';
 import { CheckoutConfiguration } from '../../config';
@@ -31,6 +32,7 @@ import {
 } from '../actions';
 import { SignTransactionStatusType } from '../actions/types';
 import { calculateFees } from '../fees/fees';
+import { measureAsyncExecution } from '../../utils/debugLogger';
 
 export const getERC721Requirement = (
   id: string,
@@ -74,7 +76,7 @@ export const sell = async (
 
   if (orders.length === 0) {
     throw new CheckoutError(
-      'No orders were parsed, must parse at least one order',
+      'No orders were provided to the orders array. Please provide at least one order.',
       CheckoutErrorType.PREPARE_ORDER_LISTING_ERROR,
     );
   }
@@ -90,25 +92,37 @@ export const sell = async (
       provider,
     );
 
-    decimals = await buyTokenContract.decimals();
+    decimals = await measureAsyncExecution<number>(
+      config,
+      'Time to get decimals of token contract for the buy token',
+      buyTokenContract.decimals(),
+    );
   }
 
   const buyTokenOrNative = getBuyToken(buyToken, decimals);
 
   try {
-    const walletAddress = await provider.getSigner().getAddress();
-    orderbook = await instance.createOrderbookInstance(config);
+    const walletAddress = await measureAsyncExecution<string>(
+      config,
+      'Time to get the address from the provider',
+      provider.getSigner().getAddress(),
+    );
+    orderbook = instance.createOrderbookInstance(config);
     const { seaportContractAddress } = orderbook.config();
     spenderAddress = seaportContractAddress;
-    listing = await orderbook.prepareListing({
-      makerAddress: walletAddress,
-      buy: buyTokenOrNative,
-      sell: {
-        type: ItemType.ERC721,
-        contractAddress: sellToken.collectionAddress,
-        tokenId: sellToken.id,
-      },
-    });
+    listing = await measureAsyncExecution<PrepareListingResponse>(
+      config,
+      'Time to prepare the listing from the orderbook',
+      orderbook.prepareListing({
+        makerAddress: walletAddress,
+        buy: buyTokenOrNative,
+        sell: {
+          type: ItemType.ERC721,
+          contractAddress: sellToken.collectionAddress,
+          tokenId: sellToken.id,
+        },
+      }),
+    );
   } catch (err: any) {
     throw new CheckoutError(
       'An error occurred while preparing the listing',
@@ -125,17 +139,21 @@ export const sell = async (
     getERC721Requirement(sellToken.id, sellToken.collectionAddress, spenderAddress),
   ];
 
-  const smartCheckoutResult = await smartCheckout(
+  const smartCheckoutResult = await measureAsyncExecution<SmartCheckoutResult>(
     config,
-    provider,
-    itemRequirements,
-    {
-      type: TransactionOrGasType.GAS,
-      gasToken: {
-        type: GasTokenType.NATIVE,
-        limit: BigNumber.from(constants.estimatedFulfillmentGasGwei),
+    'Total time running smart checkout',
+    smartCheckout(
+      config,
+      provider,
+      itemRequirements,
+      {
+        type: TransactionOrGasType.GAS,
+        gasToken: {
+          type: GasTokenType.NATIVE,
+          limit: BigNumber.from(constants.estimatedFulfillmentGasGwei),
+        },
       },
-    },
+    ),
   );
 
   if (smartCheckoutResult.sufficient) {
@@ -146,7 +164,7 @@ export const sell = async (
         status: CheckoutStatus.FAILED,
         transactionHash: approvalResult.transactionHash,
         reason: approvalResult.reason,
-        smartCheckoutResult: [smartCheckoutResult],
+        smartCheckoutResult,
       };
     }
 
@@ -210,12 +228,12 @@ export const sell = async (
     return {
       status: CheckoutStatus.SUCCESS,
       orderIds: [orderId],
-      smartCheckoutResult: [smartCheckoutResult],
+      smartCheckoutResult,
     };
   }
 
   return {
     status: CheckoutStatus.INSUFFICIENT_FUNDS,
-    smartCheckoutResult: [smartCheckoutResult],
+    smartCheckoutResult,
   };
 };

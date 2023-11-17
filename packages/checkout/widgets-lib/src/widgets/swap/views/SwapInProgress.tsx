@@ -10,6 +10,7 @@ import {
 } from '../../../context/view-context/SwapViewContextTypes';
 import { LoadingView } from '../../../views/loading/LoadingView';
 import { text } from '../../../resources/text/textConfig';
+import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 interface SwapInProgressProps {
   transactionResponse: TransactionResponse;
@@ -19,6 +20,18 @@ interface SwapInProgressProps {
 export function SwapInProgress({ transactionResponse, swapForm }: SwapInProgressProps) {
   const { viewDispatch } = useContext(ViewContext);
   const { IN_PROGRESS: { loading } } = text.views[SwapWidgetViews.SWAP];
+
+  const { page } = useAnalytics();
+
+  useEffect(() => {
+    page({
+      userJourney: UserJourney.SWAP,
+      screen: 'SwapInProgress',
+      extras: {
+        swapFormInfo: swapForm,
+      },
+    });
+  }, []);
 
   useEffect(() => {
     (async () => {

@@ -6,6 +6,7 @@ import {
 } from 'react';
 import {
   ChainId,
+  CheckoutErrorType,
   NetworkFilterTypes,
   NetworkInfo,
   SwitchNetworkParams,
@@ -28,10 +29,10 @@ import {
 } from '../../../../context/view-context/ViewContext';
 import { WalletWidgetViews } from '../../../../context/view-context/WalletViewContextTypes';
 import {
-  ConnectLoaderActions,
   ConnectLoaderContext,
 } from '../../../../context/connect-loader-context/ConnectLoaderContext';
 import { EventTargetContext } from '../../../../context/event-target-context/EventTargetContext';
+import { UserJourney, useAnalytics } from '../../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 const logoColour = {
   [ChainId.IMTBL_ZKEVM_DEVNET]: 'base.color.text.link.primary',
@@ -55,7 +56,7 @@ export interface NetworkMenuProps {
 }
 
 export function NetworkMenu({ setBalancesLoading }: NetworkMenuProps) {
-  const { connectLoaderState, connectLoaderDispatch } = useContext(ConnectLoaderContext);
+  const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
   const { checkout, provider } = connectLoaderState;
   const { viewDispatch } = useContext(ViewContext);
@@ -65,23 +66,28 @@ export function NetworkMenu({ setBalancesLoading }: NetworkMenuProps) {
   const [allowedNetworks, setNetworks] = useState<NetworkInfo[] | undefined>(
     [],
   );
+  const { track } = useAnalytics();
 
   const switchNetwork = useCallback(
     async (chainId: ChainId) => {
       if (!checkout || !provider || !network || network.chainId === chainId) return;
-      setBalancesLoading(true);
+      track({
+        userJourney: UserJourney.WALLET,
+        screen: 'WalletBalances',
+        control: 'SwitchNetwork',
+        controlType: 'Button',
+        extras: {
+          chainId,
+        },
+      });
+
       try {
         const switchNetworkResult = await checkout.switchNetwork({
           provider,
           chainId,
         } as SwitchNetworkParams);
-        connectLoaderDispatch({
-          payload: {
-            type: ConnectLoaderActions.SET_PROVIDER,
-            provider: switchNetworkResult.provider,
-          },
-        });
 
+        setBalancesLoading(true);
         walletDispatch({
           payload: {
             type: WalletActions.SET_NETWORK,
@@ -92,7 +98,7 @@ export function NetworkMenu({ setBalancesLoading }: NetworkMenuProps) {
         sendNetworkSwitchEvent(eventTarget, switchNetworkResult.provider, switchNetworkResult.network);
       } catch (err: any) {
         setBalancesLoading(false);
-        if (err.type === 'USER_REJECTED_REQUEST_ERROR') {
+        if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
           // ignore error
         } else {
           viewDispatch({

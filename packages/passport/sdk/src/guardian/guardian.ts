@@ -5,18 +5,17 @@ import { ConfirmationScreen } from '../confirmation';
 import { retryWithDelay } from '../network/retry';
 import { JsonRpcError, RpcErrorCode } from '../zkEvm/JsonRpcError';
 import { MetaTransaction, TypedDataPayload } from '../zkEvm/types';
-import { UserZkEvm } from '../types';
+import { UserImx, UserZkEvm } from '../types';
 import { PassportConfiguration } from '../config';
 
 export type GuardianClientParams = {
-  accessToken: string;
   confirmationScreen: ConfirmationScreen;
-  imxEtherAddress: string;
   config: PassportConfiguration;
 };
 
-export type GuardianValidateParams = {
+export type GuardianEvaluateImxTransactionParams = {
   payloadHash: string;
+  user: UserImx;
 };
 
 type GuardianEVMValidationParams = {
@@ -67,25 +66,14 @@ export default class GuardianClient {
 
   private readonly confirmationScreen: ConfirmationScreen;
 
-  // TODO: ID-977, make this rollup agnostic
-  private readonly imxEtherAddress: string;
-
   private readonly crossSdkBridgeEnabled: boolean;
 
-  constructor({
-    accessToken,
-    confirmationScreen,
-    imxEtherAddress,
-    config,
-  }: GuardianClientParams) {
-    const guardianConfiguration = new guardian.Configuration({ accessToken, basePath: config.imxPublicApiDomain });
+  constructor({ confirmationScreen, config }: GuardianClientParams) {
+    const guardianConfiguration = new guardian.Configuration({ basePath: config.imxPublicApiDomain });
     this.confirmationScreen = confirmationScreen;
-    this.transactionAPI = new guardian.TransactionsApi(
-      new guardian.Configuration(guardianConfiguration),
-    );
-    this.imxEtherAddress = imxEtherAddress;
     this.crossSdkBridgeEnabled = config.crossSdkBridgeEnabled;
     this.messageAPI = new guardian.MessagesApi(guardianConfiguration);
+    this.transactionAPI = new guardian.TransactionsApi(guardianConfiguration);
   }
 
   /**
@@ -119,16 +107,17 @@ export default class GuardianClient {
     return this.withConfirmationScreenTask()(task);
   }
 
-  public async validate({ payloadHash }: GuardianValidateParams): Promise<void> {
+  public async evaluateImxTransaction({ payloadHash, user }: GuardianEvaluateImxTransactionParams): Promise<void> {
     const finallyFn = () => {
       this.confirmationScreen.closeWindow();
     };
 
+    const headers = { Authorization: `Bearer ${user.accessToken}` };
     const transactionRes = await retryWithDelay(
       async () => this.transactionAPI.getTransactionByID({
         transactionID: payloadHash,
         chainType: 'starkex',
-      }),
+      }, { headers }),
       { finallyFn },
     );
 
@@ -136,14 +125,14 @@ export default class GuardianClient {
       throw new Error("Transaction doesn't exists");
     }
 
-    const evaluateStarkexRes = await this.transactionAPI.evaluateTransaction({
+    const evaluateImxRes = await this.transactionAPI.evaluateTransaction({
       id: payloadHash,
       transactionEvaluationRequest: {
         chainType: 'starkex',
       },
-    });
+    }, { headers });
 
-    const { confirmationRequired } = evaluateStarkexRes.data;
+    const { confirmationRequired } = evaluateImxRes.data;
     if (confirmationRequired) {
       if (this.crossSdkBridgeEnabled) {
         throw new Error(transactionRejectedCrossSdkBridgeError);
@@ -151,7 +140,7 @@ export default class GuardianClient {
 
       const confirmationResult = await this.confirmationScreen.requestConfirmation(
         payloadHash,
-        this.imxEtherAddress,
+        user.imx.ethAddress,
         TransactionApprovalRequestChainTypeEnum.Starkex,
       );
 
@@ -221,7 +210,7 @@ export default class GuardianClient {
     if (confirmationRequired && !!transactionId) {
       const confirmationResult = await this.confirmationScreen.requestConfirmation(
         transactionId,
-        this.imxEtherAddress,
+        user.zkEvm.ethAddress,
         TransactionApprovalRequestChainTypeEnum.Evm,
         chainId,
       );
@@ -260,6 +249,7 @@ export default class GuardianClient {
     if (confirmationRequired && !!messageId) {
       const confirmationResult = await this.confirmationScreen.requestMessageConfirmation(
         messageId,
+        user.zkEvm.ethAddress,
       );
 
       if (!confirmationResult.confirmed) {

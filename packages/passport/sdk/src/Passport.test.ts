@@ -7,7 +7,7 @@ import { ConfirmationScreen } from './confirmation';
 import { Passport } from './Passport';
 import { PassportImxProvider, PassportImxProviderFactory } from './starkEx';
 import { Networks, OidcConfiguration } from './types';
-import { mockUser, mockLinkedAddresses } from './test/mocks';
+import { mockUser, mockLinkedAddresses, mockUserImx } from './test/mocks';
 
 jest.mock('./authManager');
 jest.mock('./magicAdapter');
@@ -33,7 +33,6 @@ describe('Passport', () => {
   let confirmationLogoutMock: jest.Mock;
   let getUserMock: jest.Mock;
   let requestRefreshTokenMock: jest.Mock;
-  let loginSilentMock: jest.Mock;
   let getProviderMock: jest.Mock;
   let getProviderSilentMock: jest.Mock;
   let getLinkedAddressesMock: jest.Mock;
@@ -47,7 +46,6 @@ describe('Passport', () => {
     logoutMock = jest.fn();
     getUserMock = jest.fn();
     requestRefreshTokenMock = jest.fn();
-    loginSilentMock = jest.fn();
     getProviderMock = jest.fn();
     getProviderSilentMock = jest.fn();
     getLinkedAddressesMock = jest.fn();
@@ -56,7 +54,6 @@ describe('Passport', () => {
       loginCallback: loginCallbackMock,
       logout: logoutMock,
       getUser: getUserMock,
-      loginSilent: loginSilentMock,
       requestRefreshTokenAfterRegistration: requestRefreshTokenMock,
     });
     (ConfirmationScreen as jest.Mock).mockReturnValue({
@@ -231,20 +228,70 @@ describe('Passport', () => {
 
       const result = await passport.getLinkedAddresses();
 
-      expect(result).toEqual(mockLinkedAddresses.data.linkedAddresses);
+      expect(result).toEqual(mockLinkedAddresses.data.linked_addresses);
     });
 
     it('should return empty array if there is no linked addresses', async () => {
       getUserMock.mockReturnValue(mockUser);
       getLinkedAddressesMock.mockReturnValue({
         data: {
-          linkedAddresses: [],
+          linked_addresses: [],
         },
       });
 
       const result = await passport.getLinkedAddresses();
 
       expect(result).toHaveLength(0);
+    });
+  });
+
+  describe('login', () => {
+    it('should login silently if there is a user', async () => {
+      getUserMock.mockReturnValue(mockUserImx);
+      const user = await passport.login();
+
+      expect(getUserMock).toBeCalledTimes(1);
+      expect(authLoginMock).toBeCalledTimes(0);
+      expect(user).toEqual(mockUser.profile);
+    });
+
+    it('should login if login sliently returns error', async () => {
+      getUserMock.mockRejectedValue(new Error('Unknown or invalid refresh token.'));
+      authLoginMock.mockReturnValue(mockUserImx);
+      const user = await passport.login();
+
+      expect(getUserMock).toBeCalledTimes(1);
+      expect(authLoginMock).toBeCalledTimes(1);
+      expect(user).toEqual(mockUser.profile);
+    });
+
+    it('should login and get a user', async () => {
+      getUserMock.mockReturnValue(null);
+      authLoginMock.mockReturnValue(mockUserImx);
+      const user = await passport.login();
+
+      expect(getUserMock).toBeCalledTimes(1);
+      expect(authLoginMock).toBeCalledTimes(1);
+      expect(user).toEqual(mockUserImx.profile);
+    });
+
+    it('should only login silently if useCachedSession is true', async () => {
+      getUserMock.mockReturnValue(mockUserImx);
+      const user = await passport.login({ useCachedSession: true });
+
+      expect(getUserMock).toBeCalledTimes(1);
+      expect(authLoginMock).toBeCalledTimes(0);
+      expect(user).toEqual(mockUser.profile);
+    });
+
+    it('should throw error if useCachedSession is true and getUser returns error', async () => {
+      const error = new Error('Unknown or invalid refresh token.');
+      getUserMock.mockRejectedValue(error);
+      authLoginMock.mockReturnValue(mockUserImx);
+
+      await expect(passport.login({ useCachedSession: true })).rejects.toThrow(error);
+      expect(getUserMock).toBeCalledTimes(1);
+      expect(authLoginMock).toBeCalledTimes(0);
     });
   });
 });

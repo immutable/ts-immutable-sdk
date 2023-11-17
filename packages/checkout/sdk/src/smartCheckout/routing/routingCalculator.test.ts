@@ -1,7 +1,6 @@
 import { BigNumber, utils } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { JsonRpcProvider } from '@ethersproject/providers';
-import { TokenInfo } from '@imtbl/dex-sdk';
 import {
   getBridgeAndSwapFundingSteps,
   getSwapFundingSteps,
@@ -10,9 +9,6 @@ import {
 import { CheckoutConfiguration } from '../../config';
 import { getAllTokenBalances } from './tokenBalances';
 import {
-  DexQuote,
-  DexQuoteCache,
-  DexQuotes,
   TokenBalanceResult,
 } from './types';
 import { bridgeRoute } from './bridge/bridgeRoute';
@@ -51,123 +47,6 @@ jest.mock('./bridgeAndSwap/bridgeAndSwapRoute');
 describe('routingCalculator', () => {
   let config: CheckoutConfiguration;
 
-  const cache: DexQuoteCache = new Map<string, DexQuotes>(
-    [
-      [
-        '0xERC20_1',
-        new Map<string, DexQuote>([
-          ['0xERC20_2',
-            {
-              quote: {
-                amount: {
-                  value: BigNumber.from(1),
-                  token: {
-                    chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-                    name: 'ERC20_2',
-                    symbol: 'ERC20_2',
-                    decimals: 18,
-                    address: '0xERC20_2',
-                  } as TokenInfo,
-                },
-                amountWithMaxSlippage: {
-                  value: BigNumber.from(1),
-                  token: {} as TokenInfo,
-                },
-                slippage: 0,
-                fees: [
-                  {
-                    amount: {
-                      value: BigNumber.from(1),
-                      token: {
-                        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-                        name: 'IMX',
-                        symbol: 'IMX',
-                        decimals: 18,
-                        address: IMX_ADDRESS_ZKEVM,
-                      } as TokenInfo,
-                    },
-                    recipient: '',
-                    basisPoints: 0,
-                  },
-                ],
-              },
-              approval: {
-                value: BigNumber.from(1),
-                token: {
-                  chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-                  name: 'IMX',
-                  symbol: 'IMX',
-                  decimals: 18,
-                  address: IMX_ADDRESS_ZKEVM,
-                } as TokenInfo,
-              },
-              swap: {
-                value: BigNumber.from(1),
-                token: {} as TokenInfo,
-              },
-            },
-          ],
-        ]),
-      ],
-      [
-        '0xERC20_2',
-        new Map<string, DexQuote>([
-          ['0xERC20_1',
-            {
-              quote: {
-                amount: {
-                  value: BigNumber.from(2),
-                  token: {
-                    chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-                    name: 'ERC20_1',
-                    symbol: 'ERC20_1',
-                    decimals: 18,
-                    address: '0xERC20_1',
-                  } as TokenInfo,
-                },
-                amountWithMaxSlippage: {
-                  value: BigNumber.from(2),
-                  token: {} as TokenInfo,
-                },
-                slippage: 0,
-                fees: [
-                  {
-                    amount: {
-                      value: BigNumber.from(2),
-                      token: {
-                        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-                        name: 'IMX',
-                        symbol: 'IMX',
-                        decimals: 18,
-                        address: IMX_ADDRESS_ZKEVM,
-                      } as TokenInfo,
-                    },
-                    recipient: '',
-                    basisPoints: 0,
-                  },
-                ],
-              },
-              approval: {
-                value: BigNumber.from(2),
-                token: {
-                  chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-                  name: 'IMX',
-                  symbol: 'IMX',
-                  decimals: 18,
-                  address: IMX_ADDRESS_ZKEVM,
-                } as TokenInfo,
-              },
-              swap: {
-                value: BigNumber.from(2),
-                token: {} as TokenInfo,
-              },
-            },
-          ],
-        ]),
-      ],
-    ],
-  );
-
   const readonlyProviders = new Map<ChainId, JsonRpcProvider>([
     [ChainId.SEPOLIA, {} as JsonRpcProvider],
     [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
@@ -177,6 +56,7 @@ describe('routingCalculator', () => {
     config = new CheckoutConfiguration({
       baseConfig: { environment: Environment.SANDBOX },
     });
+    jest.spyOn(console, 'info').mockImplementation(() => {});
   });
 
   it('should return no options if no routing options are available', async () => {
@@ -337,21 +217,6 @@ describe('routingCalculator', () => {
         fundingRoutes: [{
           priority: 1,
           steps: [bridgeFundingStep],
-          // WT-1734 - Add fees
-          totalFees: {
-            gas: {
-              amount: BigNumber.from(0),
-              formattedAmount: '0',
-            },
-            other: {
-              amount: BigNumber.from(0),
-              formattedAmount: '0',
-            },
-            total: {
-              amount: BigNumber.from(0),
-              formattedAmount: '0',
-            },
-          },
         }],
       });
   });
@@ -470,21 +335,6 @@ describe('routingCalculator', () => {
           address: '0xERC20_2',
         },
       },
-      // WT-1734 - Add fees
-      fees: {
-        approvalGasFees: {
-          amount: BigNumber.from(0),
-          formattedAmount: '0',
-        },
-        swapGasFees: {
-          amount: BigNumber.from(0),
-          formattedAmount: '0',
-        },
-        swapFees: [{
-          amount: BigNumber.from(0),
-          formattedAmount: '0',
-        }],
-      },
     };
     (swapRoute as jest.Mock).mockResolvedValue([swapFundingStep]);
 
@@ -505,21 +355,6 @@ describe('routingCalculator', () => {
         fundingRoutes: [{
           priority: 1,
           steps: [swapFundingStep],
-          // WT-1734 - Add fees
-          totalFees: {
-            gas: {
-              amount: BigNumber.from(0),
-              formattedAmount: '0',
-            },
-            other: {
-              amount: BigNumber.from(0),
-              formattedAmount: '0',
-            },
-            total: {
-              amount: BigNumber.from(0),
-              formattedAmount: '0',
-            },
-          },
         }],
       });
   });
@@ -654,21 +489,6 @@ describe('routingCalculator', () => {
           address: '0xERC20_2',
         },
       },
-      // WT-1734 - Add fees
-      fees: {
-        approvalGasFees: {
-          amount: BigNumber.from(0),
-          formattedAmount: '0',
-        },
-        swapGasFees: {
-          amount: BigNumber.from(0),
-          formattedAmount: '0',
-        },
-        swapFees: [{
-          amount: BigNumber.from(0),
-          formattedAmount: '0',
-        }],
-      },
     };
 
     const swapFundingStep2 = {
@@ -691,21 +511,6 @@ describe('routingCalculator', () => {
           address: '0xERC20_3',
         },
       },
-      // WT-1734 - Add fees
-      fees: {
-        approvalGasFees: {
-          amount: BigNumber.from(0),
-          formattedAmount: '0',
-        },
-        swapGasFees: {
-          amount: BigNumber.from(0),
-          formattedAmount: '0',
-        },
-        swapFees: [{
-          amount: BigNumber.from(0),
-          formattedAmount: '0',
-        }],
-      },
     };
 
     (swapRoute as jest.Mock).mockResolvedValue([swapFundingStep1, swapFundingStep2]);
@@ -727,39 +532,9 @@ describe('routingCalculator', () => {
         fundingRoutes: [{
           priority: 1,
           steps: [swapFundingStep1],
-          // WT-1734 - Add fees
-          totalFees: {
-            gas: {
-              amount: BigNumber.from(0),
-              formattedAmount: '0',
-            },
-            other: {
-              amount: BigNumber.from(0),
-              formattedAmount: '0',
-            },
-            total: {
-              amount: BigNumber.from(0),
-              formattedAmount: '0',
-            },
-          },
         }, {
           priority: 1,
           steps: [swapFundingStep2],
-          // WT-1734 - Add fees
-          totalFees: {
-            gas: {
-              amount: BigNumber.from(0),
-              formattedAmount: '0',
-            },
-            other: {
-              amount: BigNumber.from(0),
-              formattedAmount: '0',
-            },
-            total: {
-              amount: BigNumber.from(0),
-              formattedAmount: '0',
-            },
-          },
         }],
       });
   });
@@ -1070,21 +845,6 @@ describe('routingCalculator', () => {
           address: '0xERC20_2',
         },
       },
-      // WT-1734 - Add fees
-      fees: {
-        approvalGasFees: {
-          amount: BigNumber.from(0),
-          formattedAmount: '0',
-        },
-        swapGasFees: {
-          amount: BigNumber.from(0),
-          formattedAmount: '0',
-        },
-        swapFees: [{
-          amount: BigNumber.from(0),
-          formattedAmount: '0',
-        }],
-      },
     };
     (swapRoute as jest.Mock).mockResolvedValue([swapFundingStep]);
 
@@ -1108,21 +868,6 @@ describe('routingCalculator', () => {
           address: '0xIMXL1',
         },
       },
-      // WT-1734 - Add fees
-      fees: {
-        approvalGasFees: {
-          amount: BigNumber.from(0),
-          formattedAmount: '0',
-        },
-        bridgeGasFees: {
-          amount: BigNumber.from(0),
-          formattedAmount: '0',
-        },
-        bridgeFees: [{
-          amount: BigNumber.from(0),
-          formattedAmount: '0',
-        }],
-      },
     };
     const swapImxFundingStep = {
       type: FundingStepType.SWAP,
@@ -1143,21 +888,6 @@ describe('routingCalculator', () => {
           decimals: 18,
           address: '0xIMX',
         },
-      },
-      // WT-1734 - Add fees
-      fees: {
-        approvalGasFees: {
-          amount: BigNumber.from(0),
-          formattedAmount: '0',
-        },
-        swapGasFees: {
-          amount: BigNumber.from(0),
-          formattedAmount: '0',
-        },
-        swapFees: [{
-          amount: BigNumber.from(0),
-          formattedAmount: '0',
-        }],
       },
     };
     (bridgeAndSwapRoute as jest.Mock).mockResolvedValue([
@@ -1184,41 +914,11 @@ describe('routingCalculator', () => {
         fundingRoutes: [
           {
             priority: 1,
-            steps: [bridgeFundingStep],
-            // WT-1734 - Add fees
-            totalFees: {
-              gas: {
-                amount: BigNumber.from(0),
-                formattedAmount: '0',
-              },
-              other: {
-                amount: BigNumber.from(0),
-                formattedAmount: '0',
-              },
-              total: {
-                amount: BigNumber.from(0),
-                formattedAmount: '0',
-              },
-            },
+            steps: [swapFundingStep],
           },
           {
             priority: 2,
-            steps: [swapFundingStep],
-            // WT-1734 - Add fees
-            totalFees: {
-              gas: {
-                amount: BigNumber.from(0),
-                formattedAmount: '0',
-              },
-              other: {
-                amount: BigNumber.from(0),
-                formattedAmount: '0',
-              },
-              total: {
-                amount: BigNumber.from(0),
-                formattedAmount: '0',
-              },
-            },
+            steps: [bridgeFundingStep],
           },
           {
             priority: 3,
@@ -1226,21 +926,6 @@ describe('routingCalculator', () => {
               bridgeImxFundingStep,
               swapImxFundingStep,
             ],
-            // WT-1734 - Add fees
-            totalFees: {
-              gas: {
-                amount: BigNumber.from(0),
-                formattedAmount: '0',
-              },
-              other: {
-                amount: BigNumber.from(0),
-                formattedAmount: '0',
-              },
-              total: {
-                amount: BigNumber.from(0),
-                formattedAmount: '0',
-              },
-            },
           },
         ],
       });
@@ -1470,21 +1155,6 @@ describe('routingCalculator', () => {
             address: '0xERC20_2',
           },
         },
-        // WT-1734 - Add fees
-        fees: {
-          approvalGasFees: {
-            amount: BigNumber.from(0),
-            formattedAmount: '0',
-          },
-          swapGasFees: {
-            amount: BigNumber.from(0),
-            formattedAmount: '0',
-          },
-          swapFees: [{
-            amount: BigNumber.from(0),
-            formattedAmount: '0',
-          }],
-        },
       };
       (swapRoute as jest.Mock).mockResolvedValue([swapFundingStep]);
 
@@ -1551,7 +1221,6 @@ describe('routingCalculator', () => {
         config,
         { swap: true },
         balanceRequirement,
-        cache,
         '0xADDRESS',
         balances,
         [
@@ -1568,6 +1237,10 @@ describe('routingCalculator', () => {
             address: '0xERC20_2',
           },
         ],
+        {
+          sufficient: false,
+          balanceRequirements: [balanceRequirement],
+        },
       );
 
       expect(swapFundingSteps).toEqual([swapFundingStep]);
@@ -1606,7 +1279,6 @@ describe('routingCalculator', () => {
         config,
         { swap: true },
         undefined,
-        cache,
         '0xADDRESS',
         balances,
         [
@@ -1623,6 +1295,10 @@ describe('routingCalculator', () => {
             address: '0xERC20_2',
           },
         ],
+        {
+          sufficient: false,
+          balanceRequirements: [],
+        },
       );
 
       expect(swapFundingSteps).toEqual([]);
@@ -1692,7 +1368,6 @@ describe('routingCalculator', () => {
         config,
         { swap: true },
         balanceRequirement,
-        cache,
         '0xADDRESS',
         balances,
         [
@@ -1709,6 +1384,10 @@ describe('routingCalculator', () => {
             address: '0xERC20_2',
           },
         ],
+        {
+          sufficient: false,
+          balanceRequirements: [balanceRequirement],
+        },
       );
 
       expect(swapFundingSteps).toEqual([]);
@@ -1779,7 +1458,6 @@ describe('routingCalculator', () => {
         config,
         { swap: true },
         balanceRequirement,
-        cache,
         '0xADDRESS',
         balances,
         [
@@ -1796,6 +1474,10 @@ describe('routingCalculator', () => {
             address: '0xERC20_2',
           },
         ],
+        {
+          sufficient: false,
+          balanceRequirements: [balanceRequirement],
+        },
       );
 
       expect(swapFundingSteps).toEqual([]);
@@ -1865,7 +1547,6 @@ describe('routingCalculator', () => {
         config,
         { swap: true },
         balanceRequirement,
-        cache,
         '0xADDRESS',
         balances,
         [
@@ -1882,6 +1563,10 @@ describe('routingCalculator', () => {
             address: '0xERC20_2',
           },
         ],
+        {
+          sufficient: false,
+          balanceRequirements: [balanceRequirement],
+        },
       );
 
       expect(swapFundingSteps).toEqual([]);
@@ -1966,10 +1651,13 @@ describe('routingCalculator', () => {
         config,
         { swap: true },
         balanceRequirement,
-        cache,
         '0xADDRESS',
         balances,
         [],
+        {
+          sufficient: false,
+          balanceRequirements: [balanceRequirement],
+        },
       );
 
       expect(swapFundingSteps).toEqual([]);
@@ -1977,7 +1665,6 @@ describe('routingCalculator', () => {
   });
 
   describe('getBridgeAndSwapFundingSteps', () => {
-    const dexQuoteCache = {} as DexQuoteCache;
     const insufficientRequirement = {
       type: ItemType.NATIVE,
       sufficient: false,
@@ -2091,7 +1778,6 @@ describe('routingCalculator', () => {
         readonlyProviders,
         { swap: true, bridge: true },
         undefined,
-        dexQuoteCache,
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
@@ -2107,7 +1793,6 @@ describe('routingCalculator', () => {
         readonlyProviders,
         { swap: true, bridge: true },
         insufficientRequirement,
-        dexQuoteCache,
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
@@ -2131,7 +1816,6 @@ describe('routingCalculator', () => {
         readonlyProviders,
         { swap: true, bridge: true },
         insufficientRequirement,
-        dexQuoteCache,
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
@@ -2154,7 +1838,6 @@ describe('routingCalculator', () => {
         readonlyProviders,
         { swap: true, bridge: true },
         insufficientRequirement,
-        dexQuoteCache,
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
@@ -2171,7 +1854,6 @@ describe('routingCalculator', () => {
         readonlyProviders,
         { swap: true, bridge: true },
         insufficientRequirement,
-        dexQuoteCache,
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
@@ -2196,7 +1878,6 @@ describe('routingCalculator', () => {
         readonlyProviders,
         { swap: true, bridge: true },
         insufficientRequirement,
-        dexQuoteCache,
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
@@ -2220,7 +1901,6 @@ describe('routingCalculator', () => {
         readonlyProviders,
         { swap: true, bridge: true },
         insufficientRequirement,
-        dexQuoteCache,
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
@@ -2240,7 +1920,6 @@ describe('routingCalculator', () => {
         {
           type: ItemType.ERC721,
         } as BalanceERC721Requirement,
-        dexQuoteCache,
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
@@ -2271,21 +1950,6 @@ describe('routingCalculator', () => {
             address: '0xIMXL1',
           },
         },
-        // WT-1734 - Add fees
-        fees: {
-          approvalGasFees: {
-            amount: BigNumber.from(0),
-            formattedAmount: '0',
-          },
-          bridgeGasFees: {
-            amount: BigNumber.from(0),
-            formattedAmount: '0',
-          },
-          bridgeFees: [{
-            amount: BigNumber.from(0),
-            formattedAmount: '0',
-          }],
-        },
       };
       const swapFundingStep = {
         type: FundingStepType.SWAP,
@@ -2307,21 +1971,6 @@ describe('routingCalculator', () => {
             address: '0xIMX',
           },
         },
-        // WT-1734 - Add fees
-        fees: {
-          approvalGasFees: {
-            amount: BigNumber.from(0),
-            formattedAmount: '0',
-          },
-          swapGasFees: {
-            amount: BigNumber.from(0),
-            formattedAmount: '0',
-          },
-          swapFees: [{
-            amount: BigNumber.from(0),
-            formattedAmount: '0',
-          }],
-        },
       };
       (bridgeAndSwapRoute as jest.Mock).mockResolvedValue([
         {
@@ -2337,7 +1986,6 @@ describe('routingCalculator', () => {
         readonlyProviders,
         { swap: true, bridge: true },
         insufficientRequirement,
-        dexQuoteCache,
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
@@ -2356,7 +2004,6 @@ describe('routingCalculator', () => {
         readonlyProviders,
         { bridge: true, swap: true },
         insufficientRequirement,
-        dexQuoteCache,
         '0xADDRESS',
         feeEstimates,
         tokenBalances,

@@ -19,7 +19,7 @@ import {
   TransactionPurpose,
 } from 'types';
 import { BigNumber, PopulatedTransaction, providers } from 'ethers';
-import { ProtocolData, Order, OrderStatus } from 'openapi/sdk';
+import { ProtocolData, Order, OrderStatusName } from 'openapi/sdk';
 import {
   EIP_712_ORDER_TYPE,
   ItemType,
@@ -389,7 +389,7 @@ describe('Seaport', () => {
 
       const immutableOrder: Order = {
         account_address: offerer,
-        buy: [{ item_type: 'NATIVE', start_amount: '100' }],
+        buy: [{ item_type: 'NATIVE', amount: '100' }],
         fees: [],
         chain: { id: '1', name: 'imtbl-zkevm-local' },
         created_at: new Date().toISOString(),
@@ -411,7 +411,7 @@ describe('Seaport', () => {
           },
         ],
         signature: randomAddress(),
-        status: OrderStatus.ACTIVE,
+        status: { name: OrderStatusName.ACTIVE },
         start_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
@@ -420,6 +420,11 @@ describe('Seaport', () => {
         const mockedSeaportJs = mock(SeaportLib);
         const mockedSeaportLibFactory = mock(SeaportLibFactory);
         const mockedProvider = mock(providers.JsonRpcProvider);
+        when(mockedProvider.getNetwork()).thenReturn(
+          Promise.resolve({
+            chainId: 0,
+          } as any),
+        );
 
         const exchangeTransactionMethods = mock<TransactionMethods<boolean>>();
         const exchangeAction = mock<ExchangeAction<any>>();

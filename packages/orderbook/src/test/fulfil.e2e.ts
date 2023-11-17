@@ -1,5 +1,5 @@
 import { Environment } from '@imtbl/config';
-import { OrderStatus } from 'openapi/sdk';
+import { OrderStatusName } from 'openapi/sdk';
 import { Orderbook } from 'orderbook';
 import { getLocalhostProvider } from './helpers/provider';
 import { getFulfillerWallet, getOffererWallet } from './helpers/signers';
@@ -40,7 +40,7 @@ describe('fulfil order', () => {
       },
     });
 
-    const signatures = await actionAll(listing.actions, offerer, provider);
+    const signatures = await actionAll(listing.actions, offerer);
 
     const {
       result: { id: orderId },
@@ -51,7 +51,7 @@ describe('fulfil order', () => {
       makerFees: [],
     });
 
-    await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.ACTIVE);
+    await waitForOrderToBeOfStatus(sdk, orderId, OrderStatusName.ACTIVE);
 
     const fulfillment = await sdk.fulfillOrder(
       orderId,
@@ -59,8 +59,8 @@ describe('fulfil order', () => {
       [],
     );
 
-    await actionAll(fulfillment.actions, fulfiller, provider);
+    await actionAll(fulfillment.actions, fulfiller);
 
-    await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.FILLED);
+    await waitForOrderToBeOfStatus(sdk, orderId, OrderStatusName.FILLED);
   }, 60_000);
 });

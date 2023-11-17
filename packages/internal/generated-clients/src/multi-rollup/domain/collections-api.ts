@@ -13,8 +13,9 @@
  */
 
 
-import globalAxios, { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
-import { Configuration } from '../configuration';
+import type { Configuration } from '../configuration';
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
@@ -72,7 +73,7 @@ export const CollectionsApiAxiosParamCreator = function (configuration?: Configu
             const localVarQueryParameter = {} as any;
 
 
-    
+
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -86,12 +87,14 @@ export const CollectionsApiAxiosParamCreator = function (configuration?: Configu
          * List all collections
          * @summary List all collections
          * @param {string} chainName The name of chain
+         * @param {Array<string>} [contractAddress] List of contract addresses to filter by
+         * @param {string} [fromUpdatedAt] Datetime to use as the oldest updated timestamp
          * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {number} [pageSize] Maximum number of items to return
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listCollections: async (chainName: string, pageCursor?: string, pageSize?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listCollections: async (chainName: string, contractAddress?: Array<string>, fromUpdatedAt?: string, pageCursor?: string, pageSize?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'chainName' is not null or undefined
             assertParamExists('listCollections', 'chainName', chainName)
             const localVarPath = `/v1/chains/{chain_name}/collections`
@@ -107,6 +110,16 @@ export const CollectionsApiAxiosParamCreator = function (configuration?: Configu
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
+            if (contractAddress) {
+                localVarQueryParameter['contract_address'] = contractAddress;
+            }
+
+            if (fromUpdatedAt !== undefined) {
+                localVarQueryParameter['from_updated_at'] = (fromUpdatedAt as any instanceof Date) ?
+                    (fromUpdatedAt as any).toISOString() :
+                    fromUpdatedAt;
+            }
+
             if (pageCursor !== undefined) {
                 localVarQueryParameter['page_cursor'] = pageCursor;
             }
@@ -116,7 +129,7 @@ export const CollectionsApiAxiosParamCreator = function (configuration?: Configu
             }
 
 
-    
+
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -164,7 +177,7 @@ export const CollectionsApiAxiosParamCreator = function (configuration?: Configu
             }
 
 
-    
+
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -205,10 +218,10 @@ export const CollectionsApiAxiosParamCreator = function (configuration?: Configu
             const localVarQueryParameter = {} as any;
 
             // authentication ImmutableApiKey required
-            await setApiKeyToObject(localVarHeaderParameter, "X-Immutable-API-Key", configuration)
+            await setApiKeyToObject(localVarHeaderParameter, "x-immutable-api-key", configuration)
 
 
-    
+
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -247,13 +260,15 @@ export const CollectionsApiFp = function(configuration?: Configuration) {
          * List all collections
          * @summary List all collections
          * @param {string} chainName The name of chain
+         * @param {Array<string>} [contractAddress] List of contract addresses to filter by
+         * @param {string} [fromUpdatedAt] Datetime to use as the oldest updated timestamp
          * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {number} [pageSize] Maximum number of items to return
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listCollections(chainName: string, pageCursor?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListCollectionsResult>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listCollections(chainName, pageCursor, pageSize, options);
+        async listCollections(chainName: string, contractAddress?: Array<string>, fromUpdatedAt?: string, pageCursor?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListCollectionsResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listCollections(chainName, contractAddress, fromUpdatedAt, pageCursor, pageSize, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -296,50 +311,42 @@ export const CollectionsApiFactory = function (configuration?: Configuration, ba
         /**
          * Get collection by contract address
          * @summary Get collection by contract address
-         * @param {string} contractAddress The address contract
-         * @param {string} chainName The name of chain
+         * @param {CollectionsApiGetCollectionRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getCollection(contractAddress: string, chainName: string, options?: any): AxiosPromise<GetCollectionResult> {
-            return localVarFp.getCollection(contractAddress, chainName, options).then((request) => request(axios, basePath));
+        getCollection(requestParameters: CollectionsApiGetCollectionRequest, options?: AxiosRequestConfig): AxiosPromise<GetCollectionResult> {
+            return localVarFp.getCollection(requestParameters.contractAddress, requestParameters.chainName, options).then((request) => request(axios, basePath));
         },
         /**
          * List all collections
          * @summary List all collections
-         * @param {string} chainName The name of chain
-         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
-         * @param {number} [pageSize] Maximum number of items to return
+         * @param {CollectionsApiListCollectionsRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listCollections(chainName: string, pageCursor?: string, pageSize?: number, options?: any): AxiosPromise<ListCollectionsResult> {
-            return localVarFp.listCollections(chainName, pageCursor, pageSize, options).then((request) => request(axios, basePath));
+        listCollections(requestParameters: CollectionsApiListCollectionsRequest, options?: AxiosRequestConfig): AxiosPromise<ListCollectionsResult> {
+            return localVarFp.listCollections(requestParameters.chainName, requestParameters.contractAddress, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
         },
         /**
          * List collections by NFT owner account address
          * @summary List collections by NFT owner
-         * @param {string} accountAddress Account address
-         * @param {string} chainName The name of chain
-         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
-         * @param {number} [pageSize] Maximum number of items to return
+         * @param {CollectionsApiListCollectionsByNFTOwnerRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listCollectionsByNFTOwner(accountAddress: string, chainName: string, pageCursor?: string, pageSize?: number, options?: any): AxiosPromise<ListCollectionsResult> {
-            return localVarFp.listCollectionsByNFTOwner(accountAddress, chainName, pageCursor, pageSize, options).then((request) => request(axios, basePath));
+        listCollectionsByNFTOwner(requestParameters: CollectionsApiListCollectionsByNFTOwnerRequest, options?: AxiosRequestConfig): AxiosPromise<ListCollectionsResult> {
+            return localVarFp.listCollectionsByNFTOwner(requestParameters.accountAddress, requestParameters.chainName, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
         },
         /**
          * Refresh collection metadata
          * @summary Refresh collection metadata
-         * @param {string} contractAddress The address contract
-         * @param {string} chainName The name of chain
-         * @param {RefreshCollectionMetadataRequest} refreshCollectionMetadataRequest The request body
+         * @param {CollectionsApiRefreshCollectionMetadataRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        refreshCollectionMetadata(contractAddress: string, chainName: string, refreshCollectionMetadataRequest: RefreshCollectionMetadataRequest, options?: any): AxiosPromise<RefreshCollectionMetadataResult> {
-            return localVarFp.refreshCollectionMetadata(contractAddress, chainName, refreshCollectionMetadataRequest, options).then((request) => request(axios, basePath));
+        refreshCollectionMetadata(requestParameters: CollectionsApiRefreshCollectionMetadataRequest, options?: AxiosRequestConfig): AxiosPromise<RefreshCollectionMetadataResult> {
+            return localVarFp.refreshCollectionMetadata(requestParameters.contractAddress, requestParameters.chainName, requestParameters.refreshCollectionMetadataRequest, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -377,6 +384,20 @@ export interface CollectionsApiListCollectionsRequest {
      * @memberof CollectionsApiListCollections
      */
     readonly chainName: string
+
+    /**
+     * List of contract addresses to filter by
+     * @type {Array<string>}
+     * @memberof CollectionsApiListCollections
+     */
+    readonly contractAddress?: Array<string>
+
+    /**
+     * Datetime to use as the oldest updated timestamp
+     * @type {string}
+     * @memberof CollectionsApiListCollections
+     */
+    readonly fromUpdatedAt?: string
 
     /**
      * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
@@ -484,7 +505,7 @@ export class CollectionsApi extends BaseAPI {
      * @memberof CollectionsApi
      */
     public listCollections(requestParameters: CollectionsApiListCollectionsRequest, options?: AxiosRequestConfig) {
-        return CollectionsApiFp(this.configuration).listCollections(requestParameters.chainName, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
+        return CollectionsApiFp(this.configuration).listCollections(requestParameters.chainName, requestParameters.contractAddress, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -511,3 +532,4 @@ export class CollectionsApi extends BaseAPI {
         return CollectionsApiFp(this.configuration).refreshCollectionMetadata(requestParameters.contractAddress, requestParameters.chainName, requestParameters.refreshCollectionMetadataRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
+

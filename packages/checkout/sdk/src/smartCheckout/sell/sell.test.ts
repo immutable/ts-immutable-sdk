@@ -42,6 +42,8 @@ describe('sell', () => {
     config = new CheckoutConfiguration({
       baseConfig: { environment: Environment.SANDBOX },
     });
+
+    jest.spyOn(console, 'info').mockImplementation(() => {});
   });
 
   describe('sell', () => {
@@ -90,7 +92,7 @@ describe('sell', () => {
           id: '1234',
         },
       });
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         config: jest.fn().mockReturnValue({
           seaportContractAddress,
         }),
@@ -154,10 +156,10 @@ describe('sell', () => {
       );
 
       expect(result).toEqual({
-        smartCheckoutResult: [{
+        smartCheckoutResult: {
           sufficient: true,
           transactionRequirements: [erc721TransactionRequirement],
-        }],
+        },
         status: CheckoutStatus.SUCCESS,
         orderIds: ['1234'],
       });
@@ -244,7 +246,7 @@ describe('sell', () => {
         ],
       });
       const mockCreateListing = jest.fn().mockResolvedValue({});
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         config: jest.fn().mockReturnValue({
           seaportContractAddress,
         }),
@@ -307,10 +309,10 @@ describe('sell', () => {
 
       expect(result).toEqual({
         status: CheckoutStatus.INSUFFICIENT_FUNDS,
-        smartCheckoutResult: [{
+        smartCheckoutResult: {
           sufficient: false,
           transactionRequirements: [erc721TransactionRequirement],
-        }],
+        },
       });
 
       expect(smartCheckout).toBeCalledWith(
@@ -371,7 +373,7 @@ describe('sell', () => {
         ],
       });
       const mockCreateListing = jest.fn().mockResolvedValue({});
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         config: jest.fn().mockReturnValue({
           seaportContractAddress,
         }),
@@ -432,10 +434,10 @@ describe('sell', () => {
       );
 
       expect(result).toEqual({
-        smartCheckoutResult: [{
+        smartCheckoutResult: {
           sufficient: true,
           transactionRequirements: [erc721TransactionRequirement],
-        }],
+        },
         status: CheckoutStatus.FAILED,
         transactionHash: '0xHASH',
         reason: 'Approval transaction failed and was reverted',
@@ -465,7 +467,7 @@ describe('sell', () => {
       const id = '0';
       const contractAddress = '0xERC721';
 
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         config: jest.fn().mockReturnValue({
           seaportContractAddress,
         }),
@@ -518,7 +520,7 @@ describe('sell', () => {
       const id = '0';
       const contractAddress = '0xERC721';
 
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         config: jest.fn().mockReturnValue({
           seaportContractAddress,
         }),
@@ -619,7 +621,7 @@ describe('sell', () => {
         ],
       });
       const mockCreateListing = jest.fn().mockResolvedValue({});
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         config: jest.fn().mockReturnValue({
           seaportContractAddress,
         }),
@@ -724,7 +726,7 @@ describe('sell', () => {
         ],
       });
       const mockCreateListing = jest.fn().mockResolvedValue({});
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         config: jest.fn().mockReturnValue({
           seaportContractAddress,
         }),
@@ -812,7 +814,7 @@ describe('sell', () => {
         ],
       });
       const mockCreateListing = jest.fn().mockResolvedValue({});
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         config: jest.fn().mockReturnValue({
           seaportContractAddress,
         }),
@@ -902,7 +904,7 @@ describe('sell', () => {
         ],
       });
       const mockCreateListing = jest.fn().mockResolvedValue({});
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         config: jest.fn().mockReturnValue({
           seaportContractAddress,
         }),
@@ -996,7 +998,7 @@ describe('sell', () => {
         ],
       });
       const mockCreateListing = jest.fn().mockRejectedValue(new Error('error from create listing'));
-      (createOrderbookInstance as jest.Mock).mockResolvedValue({
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
         config: jest.fn().mockReturnValue({
           seaportContractAddress,
         }),

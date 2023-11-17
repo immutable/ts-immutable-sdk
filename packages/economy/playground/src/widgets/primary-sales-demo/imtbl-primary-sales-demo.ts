@@ -86,7 +86,7 @@ export class PrimarySalesDemo extends LitElement {
   async connectCheckoutSDK() {
     if (this.checkoutSDK) {
       const resp = await this.checkoutSDK.createProvider({
-        walletProvider: WalletProviderName.METAMASK,
+        walletProviderName: WalletProviderName.METAMASK,
       });
 
       this.provider = resp.provider;

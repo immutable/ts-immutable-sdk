@@ -1,29 +1,32 @@
-import {
-  Body, Box, Heading,
-} from '@biom3/react';
-import {
-  IMTBLWidgetEvents,
-} from '@imtbl/checkout-widgets';
+import { Box, Heading } from '@biom3/react';
 import {
   ReactNode, useContext, useEffect, useState,
 } from 'react';
+import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
+import { StandardAnalyticsControlTypes } from '@imtbl/react-analytics';
 import {
-  GasEstimateBridgeToL2Result, GasEstimateSwapResult, GasEstimateType, OnRampProviderFees,
+  GasEstimateBridgeToL2Result,
+  GasEstimateType,
+  IMTBLWidgetEvents,
 } from '@imtbl/checkout-sdk';
+import { DEFAULT_TOKEN_SYMBOLS } from 'context/crypto-fiat-context/CryptoFiatProvider';
 import { FooterLogo } from '../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
-import { SharedViews, ViewActions, ViewContext } from '../../context/view-context/ViewContext';
-import { text } from '../../resources/text/textConfig';
 import {
-  orchestrationEvents,
-} from '../../lib/orchestrationEvents';
+  SharedViews,
+  ViewActions,
+  ViewContext,
+} from '../../context/view-context/ViewContext';
+import { text } from '../../resources/text/textConfig';
+import { orchestrationEvents } from '../../lib/orchestrationEvents';
 import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
-import { getBridgeFeeEstimation, getOnRampFeeEstimation, getSwapFeeEstimation } from '../../lib/feeEstimation';
+import {
+  getBridgeFeeEstimation,
+  getOnRampFeeEstimation,
+} from '../../lib/feeEstimation';
 import { CryptoFiatActions, CryptoFiatContext } from '../../context/crypto-fiat-context/CryptoFiatContext';
-import { useInterval } from '../../lib/hooks/useInterval';
-import { DEFAULT_TOKEN_SYMBOLS } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 import { isPassportProvider } from '../../lib/providerUtils';
 import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextTypes';
@@ -37,11 +40,12 @@ interface TopUpViewProps {
   showBridgeOption: boolean,
   tokenAddress?: string,
   amount?: string,
+  analytics: {
+    userJourney: UserJourney
+  },
   onCloseButtonClick: () => void,
   onBackButtonClick?: () => void,
 }
-
-const DEFAULT_FEE_REFRESH_INTERVAL = 30000;
 
 export function TopUpView({
   widgetEvent,
@@ -50,29 +54,42 @@ export function TopUpView({
   showBridgeOption,
   tokenAddress,
   amount,
+  analytics,
   onCloseButtonClick,
   onBackButtonClick,
 }: TopUpViewProps) {
+  const { userJourney } = analytics;
+
   const { connectLoaderState } = useContext(ConnectLoaderContext);
+
   const { checkout, provider } = connectLoaderState;
   const { header, topUpOptions } = text.views[SharedViews.TOP_UP_VIEW];
   const { onramp, swap, bridge } = topUpOptions;
+
   const { viewDispatch } = useContext(ViewContext);
+
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { conversions, fiatSymbol } = cryptoFiatState;
+
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const [onRampFeesPercentage, setOnRampFeesPercentage] = useState('-.--');
-  const [swapFeesInFiat, setSwapFeesInFiat] = useState('-.--');
+  const swapFeesInFiat = '0.05';
   const [bridgeFeesInFiat, setBridgeFeesInFiat] = useState('-.--');
-  const [loadingOnRampFees, setLoadingOnRampFees] = useState(false);
-  const [loadingSwapFees, setLoadingSwapFees] = useState(false);
-  const [loadingBridgeFees, setLoadingBridgeFees] = useState(false);
+  const [isSwapAvailable, setIsSwapAvailable] = useState(true);
+
+  const { page, track } = useAnalytics();
 
   const isPassport = isPassportProvider(provider);
 
   useEffect(() => {
-    if (!checkout) return;
+    page({
+      userJourney,
+      screen: 'TopUp',
+    });
+  }, []);
+
+  useEffect(() => {
     if (!cryptoFiatDispatch) return;
     cryptoFiatDispatch({
       payload: {
@@ -80,147 +97,170 @@ export function TopUpView({
         tokenSymbols: DEFAULT_TOKEN_SYMBOLS,
       },
     });
-  }, [checkout, cryptoFiatDispatch]);
+  }, [cryptoFiatDispatch]);
 
-  const refreshFees = async (silent: boolean = false) => {
-    if (!checkout) return;
-
-    if (!silent) {
-      setLoadingOnRampFees(true);
-      setLoadingSwapFees(true);
-      setLoadingBridgeFees(true);
-    }
-
-    try {
-      const [swapEstimate, bridgeEstimate, onRampFeesEstimate] = await Promise.all([
-        checkout.gasEstimate({
-          gasEstimateType: GasEstimateType.SWAP,
-        }),
-        checkout.gasEstimate({
-          gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-          isSpendingCapApprovalRequired: true,
-        }),
-        checkout.getExchangeFeeEstimate(),
-      ]);
-      const onRampFees = getOnRampFeeEstimation(
-        onRampFeesEstimate as OnRampProviderFees,
-      );
-      setOnRampFeesPercentage(onRampFees);
-      const swapFeeInFiat = getSwapFeeEstimation(
-        swapEstimate as GasEstimateSwapResult,
-        conversions,
-      );
-      setSwapFeesInFiat(swapFeeInFiat);
-      const bridgeFeeInFiat = getBridgeFeeEstimation(
-        bridgeEstimate as GasEstimateBridgeToL2Result,
-        conversions,
-      );
-      setBridgeFeesInFiat(bridgeFeeInFiat);
-    } catch {
-      setOnRampFeesPercentage('-.--');
-      setSwapFeesInFiat('-.--');
-      setBridgeFeesInFiat('-.--');
-    } finally {
-      setLoadingBridgeFees(false);
-      setLoadingSwapFees(false);
-      setLoadingOnRampFees(false);
-    }
-  };
-
-  // Silently refresh the quote
-  useInterval(() => refreshFees(true), DEFAULT_FEE_REFRESH_INTERVAL);
-
+  // Bridge fees estimation
   useEffect(() => {
     if (!checkout) return;
-    if (conversions.size === 0) return;
-    refreshFees();
-  }, [checkout, conversions.size === 0]);
+    (async () => {
+      const bridgeEstimate = await checkout.gasEstimate({
+        gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+        isSpendingCapApprovalRequired: true,
+      });
+
+      const est = getBridgeFeeEstimation(bridgeEstimate as GasEstimateBridgeToL2Result, conversions);
+      setBridgeFeesInFiat(est);
+    })();
+  }, [checkout !== undefined]);
+
+  // Onramp fees estimation
+  useEffect(() => {
+    if (!checkout) return;
+    (async () => {
+      const onRampFeesEstimate = await checkout.getExchangeFeeEstimate();
+      const onRampFees = getOnRampFeeEstimation(onRampFeesEstimate);
+      setOnRampFeesPercentage(onRampFees);
+    })();
+  }, [checkout !== undefined]);
+
+  // Check if swap is available
+  useEffect(() => {
+    if (!checkout) return;
+    (async () => {
+      setIsSwapAvailable(await checkout.isSwapAvailable());
+    })();
+  }, [checkout !== undefined]);
+
+  const localTrack = (control: string, extras: any, controlType: StandardAnalyticsControlTypes = 'Button') => {
+    track({
+      userJourney,
+      screen: 'TopUp',
+      control,
+      controlType,
+      extras,
+    });
+  };
 
   const onClickSwap = () => {
     if (widgetEvent === IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT) {
+      const data = {
+        toContractAddress: '',
+        fromAmount: '',
+        fromContractAddress: '',
+      };
+
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
             type: SwapWidgetViews.SWAP,
-            data: {
-              toContractAddress: '',
-              fromAmount: '',
-              fromContractAddress: '',
-            },
+            data,
           },
         },
       });
+      localTrack('Swap', { ...data, widgetEvent });
       return;
     }
-    orchestrationEvents.sendRequestSwapEvent(eventTarget, widgetEvent, {
+
+    const data = {
       fromTokenAddress: '',
       toTokenAddress: tokenAddress ?? '',
       amount: '',
-    });
+    };
+    orchestrationEvents.sendRequestSwapEvent(eventTarget, widgetEvent, data);
+    localTrack('Swap', { ...data, widgetEvent });
   };
 
   const onClickBridge = () => {
     if (widgetEvent === IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT) {
+      const data = {
+        fromContractAddress: '',
+        fromAmount: '',
+      };
+
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
             type: BridgeWidgetViews.BRIDGE,
-            data: {
-              fromContractAddress: '',
-              fromAmount: '',
-            },
+            data,
           },
         },
       });
+      localTrack('Bridge', { ...data, widgetEvent });
       return;
     }
-    orchestrationEvents.sendRequestBridgeEvent(eventTarget, widgetEvent, {
+
+    const data = {
       tokenAddress: '',
       amount: '',
-    });
+    };
+    orchestrationEvents.sendRequestBridgeEvent(eventTarget, widgetEvent, data);
+    localTrack('Bridge', { ...data, widgetEvent });
   };
 
   const onClickOnRamp = () => {
     if (widgetEvent === IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT) {
+      const data = {
+        contractAddress: '',
+        amount: '',
+      };
+
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
             type: OnRampWidgetViews.ONRAMP,
-            data: {
-              contractAddress: '',
-              amount: '',
-            },
+            data,
           },
         },
       });
+      localTrack('OnRamp', { ...data, widgetEvent });
       return;
     }
-    orchestrationEvents.sendRequestOnrampEvent(window, widgetEvent, {
+
+    const data = {
       tokenAddress: tokenAddress ?? '',
       amount: amount ?? '',
-    });
+    };
+    orchestrationEvents.sendRequestOnrampEvent(eventTarget, widgetEvent, data);
+    localTrack('OnRamp', { ...data, widgetEvent });
   };
 
-  const renderFees = (fees: string, feesLoading: boolean): ReactNode => {
-    if (feesLoading) {
-      return (
-        <Body size="xSmall" shimmer={1} testId="fees-shimmer" />
-      );
-    }
-    return ` ≈ $${fees} ${fiatSymbol.toLocaleUpperCase()}`;
-  };
+  const renderFees = (txt: string): ReactNode => (
+    <Box sx={{ fontSize: 'base.text.caption.small.regular.fontSize' }}>
+      {txt}
+    </Box>
+  );
 
-  const renderFeePercentage = (fees: string, feesLoading: boolean): ReactNode => {
-    if (feesLoading) {
-      return (
-        <Body size="xSmall" shimmer={1} testId="fee-percentage-shimmer" />
-      );
-    }
-    return ` ≈ ${fees}%`;
-  };
+  const topUpFeatures = [
+    {
+      testId: 'onramp',
+      icon: 'Wallet',
+      textConfig: onramp,
+      onClickEvent: onClickOnRamp,
+      fee: () => renderFees(`${onramp.subcaption} ≈ ${onRampFeesPercentage}%`),
+      isAvailable: true,
+      isEnabled: showOnrampOption,
+    }, {
+      testId: 'swap',
+      icon: 'Coins',
+      textConfig: swap,
+      onClickEvent: onClickSwap,
+      fee: () => renderFees(`${swap.subcaption} ≈ $${swapFeesInFiat} ${fiatSymbol.toUpperCase()}`),
+      isAvailable: isSwapAvailable,
+      isEnabled: showSwapOption,
+    },
+    {
+      testId: 'bridge',
+      icon: 'Minting',
+      textConfig: bridge,
+      onClickEvent: onClickBridge,
+      fee: () => renderFees(`${bridge.subcaption} ≈ $${bridgeFeesInFiat} ${fiatSymbol.toUpperCase()}`),
+      isAvailable: true,
+      isEnabled: showBridgeOption && !isPassport,
+    },
+  ];
 
   return (
     <SimpleLayout
@@ -230,47 +270,26 @@ export function TopUpView({
           onCloseButtonClick={onCloseButtonClick}
           showBack
         />
-      )}
-      footer={(
-        <FooterLogo />
-      )}
+        )}
+      footer={<FooterLogo />}
     >
       <Box sx={{ paddingX: 'base.spacing.x4', paddingY: 'base.spacing.x4' }}>
         <Heading size="small">{header.title}</Heading>
         <Box sx={{ paddingY: 'base.spacing.x4' }}>
-          {showOnrampOption && (
-          <TopUpMenuItem
-            testId="onramp"
-            icon="Wallet"
-            heading={onramp.heading}
-            caption={onramp.caption}
-            subcaption={onramp.subcaption}
-            onClick={onClickOnRamp}
-            renderFeeFunction={() => renderFeePercentage(onRampFeesPercentage, loadingOnRampFees)}
-          />
-          )}
-          {showSwapOption && (
+          {topUpFeatures
+            .sort((a, b) => Number(b.isAvailable) - Number(a.isAvailable))
+            .map((element) => element.isEnabled && (
             <TopUpMenuItem
-              testId="swap"
-              icon="Coins"
-              heading={swap.heading}
-              caption={swap.caption}
-              subcaption={swap.subcaption}
-              onClick={onClickSwap}
-              renderFeeFunction={() => renderFees(swapFeesInFiat, loadingSwapFees)}
+              key={element.textConfig.heading.toLowerCase()}
+              testId={element.testId}
+              icon={element.icon as 'Wallet' | 'Coins' | 'Minting'}
+              heading={element.textConfig.heading}
+              caption={!element.isAvailable ? element.textConfig.disabledCaption : element.textConfig.caption}
+              onClick={element.onClickEvent}
+              renderFeeFunction={element.fee}
+              isDisabled={!element.isAvailable}
             />
-          )}
-          {showBridgeOption && !isPassport && (
-            <TopUpMenuItem
-              testId="bridge"
-              icon="Minting"
-              heading={bridge.heading}
-              caption={bridge.caption}
-              subcaption={bridge.subcaption}
-              onClick={onClickBridge}
-              renderFeeFunction={() => renderFees(bridgeFeesInFiat, loadingBridgeFees)}
-            />
-          )}
+            ))}
         </Box>
       </Box>
     </SimpleLayout>

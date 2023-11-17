@@ -9,13 +9,15 @@ import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
 import { WalletContext, WalletState } from '../../context/WalletContext';
 import { text } from '../../../../resources/text/textConfig';
-import { cySmartGet } from '../../../../lib/testUtils';
+import { cyIntercept, cySmartGet } from '../../../../lib/testUtils';
 import { NetworkMenu } from './NetworkMenu';
 import { WalletWidgetViews } from '../../../../context/view-context/WalletViewContextTypes';
 import { ConnectionStatus } from '../../../../context/connect-loader-context/ConnectLoaderContext';
 import {
   ConnectLoaderTestComponent,
 } from '../../../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
+import { CustomAnalyticsProvider } from '../../../../context/analytics-provider/CustomAnalyticsProvider';
+import { StrongCheckoutWidgetsConfig } from '../../../../lib/withDefaultWidgetConfig';
 
 describe('Network Menu', () => {
   const connectLoaderState = {
@@ -41,16 +43,19 @@ describe('Network Menu', () => {
           },
         ],
       });
+    cyIntercept();
   });
 
   it('should have heading', () => {
     mount(
       <BiomeCombinedProviders>
-        <ConnectLoaderTestComponent
-          initialStateOverride={connectLoaderState}
-        >
-          <NetworkMenu setBalancesLoading={() => {}} />
-        </ConnectLoaderTestComponent>
+        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <NetworkMenu setBalancesLoading={() => {}} />
+          </ConnectLoaderTestComponent>
+        </CustomAnalyticsProvider>
       </BiomeCombinedProviders>,
     );
 
@@ -62,21 +67,23 @@ describe('Network Menu', () => {
   it('should have network buttons', () => {
     const walletState: WalletState = {
       network: null,
-      walletProvider: WalletProviderName.METAMASK,
+      walletProviderName: WalletProviderName.METAMASK,
       tokenBalances: [],
       supportedTopUps: null,
     };
     mount(
       <BiomeCombinedProviders>
-        <ConnectLoaderTestComponent
-          initialStateOverride={connectLoaderState}
-        >
-          <WalletContext.Provider
-            value={{ walletState, walletDispatch: () => {} }}
+        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <NetworkMenu setBalancesLoading={() => {}} />
-          </WalletContext.Provider>
-        </ConnectLoaderTestComponent>
+            <WalletContext.Provider
+              value={{ walletState, walletDispatch: () => {} }}
+            >
+              <NetworkMenu setBalancesLoading={() => {}} />
+            </WalletContext.Provider>
+          </ConnectLoaderTestComponent>
+        </CustomAnalyticsProvider>
       </BiomeCombinedProviders>,
     );
     cySmartGet('@getNetworkAllowListStub').should('have.been.called');
@@ -106,21 +113,23 @@ describe('Network Menu', () => {
         nativeCurrency: {} as unknown as TokenInfo,
         isSupported: false,
       },
-      walletProvider: WalletProviderName.METAMASK,
+      walletProviderName: WalletProviderName.METAMASK,
       tokenBalances: [],
       supportedTopUps: null,
     };
     mount(
       <BiomeCombinedProviders>
-        <ConnectLoaderTestComponent
-          initialStateOverride={connectLoaderState}
-        >
-          <WalletContext.Provider
-            value={{ walletState, walletDispatch: () => {} }}
+        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <NetworkMenu setBalancesLoading={() => {}} />
-          </WalletContext.Provider>
-        </ConnectLoaderTestComponent>
+            <WalletContext.Provider
+              value={{ walletState, walletDispatch: () => {} }}
+            >
+              <NetworkMenu setBalancesLoading={() => {}} />
+            </WalletContext.Provider>
+          </ConnectLoaderTestComponent>
+        </CustomAnalyticsProvider>
       </BiomeCombinedProviders>,
     );
 

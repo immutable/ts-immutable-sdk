@@ -1,5 +1,4 @@
 import { BigNumber } from 'ethers';
-import { FungibleToken } from '@imtbl/bridge-sdk';
 import { TokenInfo } from './tokenInfo';
 
 /**
@@ -24,12 +23,10 @@ export type GasEstimateParams = GasEstimateBridgeToL2Params | GasEstimateSwapPar
  * An interface representing the parameters for estimating gas for a bridge to L2 transaction {@link Checkout.gasEstimate}.
  * @param {GasEstimateType.BRIDGE_TO_L2} gasEstimateType - The type of gas estimate.
  * @param {boolean} isSpendingCapApprovalRequired - Whether or not spending cap approval is required.
- * @param {FungibleToken | undefined} tokenAddress - The address of the fungible token to use in the transaction.
  */
 export interface GasEstimateBridgeToL2Params {
   gasEstimateType: GasEstimateType.BRIDGE_TO_L2;
   isSpendingCapApprovalRequired: boolean;
-  tokenAddress?: FungibleToken;
 }
 
 /**

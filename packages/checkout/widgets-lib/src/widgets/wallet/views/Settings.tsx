@@ -1,5 +1,5 @@
 import { Box, Button } from '@biom3/react';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -11,6 +11,7 @@ import { settingsBoxStyle, settingsDisconnectButtonStyle } from './SettingsStyle
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import { isPassportProvider } from '../../../lib/providerUtils';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
+import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 export function Settings() {
   const { connectLoaderState } = useContext(ConnectLoaderContext);
@@ -19,6 +20,15 @@ export function Settings() {
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const isPassport = isPassportProvider(provider);
+
+  const { page } = useAnalytics();
+
+  useEffect(() => {
+    page({
+      userJourney: UserJourney.WALLET,
+      screen: 'Settings',
+    });
+  }, []);
 
   return (
     <SimpleLayout

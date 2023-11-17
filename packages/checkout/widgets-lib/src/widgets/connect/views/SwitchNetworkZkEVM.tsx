@@ -1,4 +1,6 @@
-import { useCallback, useContext, useState } from 'react';
+import {
+  useCallback, useContext, useEffect, useState,
+} from 'react';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../../components/Footer/FooterButton';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
@@ -6,12 +8,10 @@ import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { text } from '../../../resources/text/textConfig';
 import { ConnectActions, ConnectContext } from '../context/ConnectContext';
-import {
-  ViewContext,
-  ViewActions,
-} from '../../../context/view-context/ViewContext';
+import { ViewContext, ViewActions } from '../../../context/view-context/ViewContext';
 import { getL2ChainId } from '../../../lib';
 import { ImmutablePlanetHero } from '../../../components/Hero/ImmutablePlanetHero';
+import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 export function SwitchNetworkZkEVM() {
   const { viewDispatch } = useContext(ViewContext);
@@ -20,9 +20,24 @@ export function SwitchNetworkZkEVM() {
   const { heading, body, button } = text.views[ConnectWidgetViews.SWITCH_NETWORK].zkEVM;
 
   const [buttonText, setButtonText] = useState(button.text);
+  const { page, track } = useAnalytics();
+
+  useEffect(() => {
+    page({
+      userJourney: UserJourney.CONNECT,
+      screen: 'SwitchNetworkZkEVM',
+    });
+  }, []);
 
   const switchNetwork = useCallback(async () => {
     if (!provider || !checkout) return;
+
+    track({
+      userJourney: UserJourney.CONNECT,
+      screen: 'SwitchNetworkZkEVM',
+      control: 'Switch',
+      controlType: 'Button',
+    });
 
     try {
       const switchRes = await checkout.switchNetwork({

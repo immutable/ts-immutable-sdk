@@ -36,17 +36,23 @@ export enum CheckoutErrorType {
   BRIDGE_GAS_ESTIMATE_ERROR = 'BRIDGE_GAS_ESTIMATE_ERROR',
   ORDER_FEE_ERROR = 'ORDER_FEE_ERROR',
   ITEM_REQUIREMENTS_ERROR = 'ITEM_REQUIREMENTS_ERROR',
+  API_ERROR = 'API_ERROR',
+  ORDER_EXPIRED_ERROR = 'ORDER_EXPIRED_ERROR',
+  WIDGETS_SCRIPT_LOAD_ERROR = 'WIDGETS_SCRIPT_LOAD_ERROR',
 }
 
 /**
  * Represents an error object with a specific type, optional message, and optional data.
- * @property {CheckoutErrorType} type - The type of the error.
- * @property {string | undefined} [message] - The error message.
- * @property {Object.<string, string> | undefined} [data] - Additional data associated with the error.
+ * @property {CheckoutErrorType} type
+ * @property {string | undefined} [message]
+ * @property {Object.<string, string> | undefined} [data]
  */
 export type ErrorType = {
+  /** The type of the error. */
   type: CheckoutErrorType;
+  /** The error message. */
   message?: string;
+  /** Additional data associated with the error. */
   data?: { [key: string]: string };
 };
 

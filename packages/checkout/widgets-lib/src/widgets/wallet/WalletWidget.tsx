@@ -1,8 +1,11 @@
 import { BiomeCombinedProviders } from '@biom3/react';
 import {
-  useContext, useEffect, useMemo, useReducer,
+  useCallback,
+  useContext, useEffect, useMemo, useReducer, useState,
 } from 'react';
-import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
+import { GetBalanceResult, IMTBLWidgetEvents, WalletWidgetParams } from '@imtbl/checkout-sdk';
+import { DEFAULT_BALANCE_RETRY_POLICY } from 'lib';
+import { UserJourney } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import {
   initialWalletState,
   WalletActions,
@@ -30,23 +33,32 @@ import { ConnectLoaderContext } from '../../context/connect-loader-context/Conne
 import { text } from '../../resources/text/textConfig';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { widgetTheme } from '../../lib/theme';
+import { getTokenBalances } from './functions/tokenBalances';
 
-export interface WalletWidgetProps {
-  config: StrongCheckoutWidgetsConfig,
-}
+export type WalletWidgetInputs = WalletWidgetParams & {
+  config: StrongCheckoutWidgetsConfig
+};
 
-export function WalletWidget(props: WalletWidgetProps) {
+export function WalletWidget(props: WalletWidgetInputs) {
   const errorActionText = text.views[SharedViews.ERROR_VIEW].actionText;
   const loadingText = text.views[SharedViews.LOADING_VIEW].text;
-  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+  const {
+    eventTargetState: { eventTarget },
+  } = useContext(EventTargetContext);
 
   const {
     config: {
-      environment, theme, isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
+      environment,
+      theme,
+      isOnRampEnabled,
+      isSwapEnabled,
+      isBridgeEnabled,
     },
   } = props;
 
-  const { connectLoaderState: { checkout, provider } } = useContext(ConnectLoaderContext);
+  const {
+    connectLoaderState: { checkout, provider },
+  } = useContext(ConnectLoaderContext);
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
 
   const [walletState, walletDispatch] = useReducer(
@@ -64,19 +76,46 @@ export function WalletWidget(props: WalletWidgetProps) {
   );
   const themeReducerValue = useMemo(() => widgetTheme(theme), [theme]);
 
+  const [balancesLoading, setBalancesLoading] = useState(true);
+
   /* Set Config into WalletState */
   useEffect(() => {
-    walletDispatch({
+    (async () => {
+      if (!checkout) return;
+
+      let checkSwapAvailable;
+
+      try {
+        checkSwapAvailable = await checkout.isSwapAvailable();
+      } catch (err: any) {
+        checkSwapAvailable = false;
+      }
+
+      walletDispatch({
+        payload: {
+          type: WalletActions.SET_SUPPORTED_TOP_UPS,
+          supportedTopUps: {
+            isBridgeEnabled,
+            isSwapEnabled,
+            isOnRampEnabled,
+            isSwapAvailable: checkSwapAvailable,
+          },
+        },
+      });
+    })();
+  }, [isBridgeEnabled, isSwapEnabled, isOnRampEnabled, environment]);
+
+  const showErrorView = useCallback(() => {
+    viewDispatch({
       payload: {
-        type: WalletActions.SET_SUPPORTED_TOP_UPS,
-        supportedTopUps: {
-          isBridgeEnabled,
-          isSwapEnabled,
-          isOnRampEnabled,
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: SharedViews.ERROR_VIEW,
+          error: new Error('Unable to fetch balances'),
         },
       },
     });
-  }, [isBridgeEnabled, isSwapEnabled, isOnRampEnabled, environment]);
+  }, [viewDispatch]);
 
   const initialiseWallet = async () => {
     if (!checkout || !provider) return;
@@ -92,17 +131,37 @@ export function WalletWidget(props: WalletWidgetProps) {
         return;
       }
 
-      walletDispatch({
-        payload: {
-          type: WalletActions.SET_NETWORK,
-          network,
-        },
-      });
+      /** Fetch the user's balances based on their connected provider and correct network */
+      setBalancesLoading(true);
 
+      /** Go to Wallet Balances view while it is still loading */
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: { type: WalletWidgetViews.WALLET_BALANCES },
+        },
+      });
+
+      let balances: GetBalanceResult[] = [];
+      try {
+        balances = await getTokenBalances(checkout, provider, network.chainId);
+        walletDispatch({
+          payload: {
+            type: WalletActions.SET_TOKEN_BALANCES,
+            tokenBalances: balances,
+          },
+        });
+      } catch (error: any) {
+        if (DEFAULT_BALANCE_RETRY_POLICY.nonRetryable!(error)) {
+          showErrorView();
+          return;
+        }
+      }
+
+      walletDispatch({
+        payload: {
+          type: WalletActions.SET_NETWORK,
+          network,
         },
       });
     } catch (error: any) {
@@ -115,6 +174,9 @@ export function WalletWidget(props: WalletWidgetProps) {
           },
         },
       });
+    } finally {
+      /** always set balances loading false at the end  */
+      setBalancesLoading(false);
     }
   };
 
@@ -141,30 +203,31 @@ export function WalletWidget(props: WalletWidgetProps) {
         <CryptoFiatProvider environment={environment}>
           <WalletContext.Provider value={walletReducerValues}>
             {viewState.view.type === SharedViews.LOADING_VIEW && (
-            <LoadingView loadingText={loadingText} />
+              <LoadingView loadingText={loadingText} />
             )}
             {viewState.view.type === WalletWidgetViews.WALLET_BALANCES && (
-            <WalletBalances />
+              <WalletBalances balancesLoading={balancesLoading} setBalancesLoading={setBalancesLoading} />
             )}
             {viewState.view.type === WalletWidgetViews.SETTINGS && <Settings />}
             {viewState.view.type === WalletWidgetViews.COIN_INFO && (
-            <CoinInfo />
+              <CoinInfo />
             )}
             {viewState.view.type === SharedViews.ERROR_VIEW && (
-            <ErrorView
-              actionText={errorActionText}
-              onActionClick={errorAction}
-              onCloseClick={() => sendWalletWidgetCloseEvent(eventTarget)}
-            />
+              <ErrorView
+                actionText={errorActionText}
+                onActionClick={errorAction}
+                onCloseClick={() => sendWalletWidgetCloseEvent(eventTarget)}
+              />
             )}
             {viewState.view.type === SharedViews.TOP_UP_VIEW && (
-            <TopUpView
-              widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
-              showOnrampOption={isOnRampEnabled}
-              showSwapOption={isSwapEnabled}
-              showBridgeOption={isBridgeEnabled}
-              onCloseButtonClick={() => sendWalletWidgetCloseEvent(eventTarget)}
-            />
+              <TopUpView
+                analytics={{ userJourney: UserJourney.WALLET }}
+                widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
+                showOnrampOption={isOnRampEnabled}
+                showSwapOption={isSwapEnabled}
+                showBridgeOption={isBridgeEnabled}
+                onCloseButtonClick={() => sendWalletWidgetCloseEvent(eventTarget)}
+              />
             )}
           </WalletContext.Provider>
         </CryptoFiatProvider>

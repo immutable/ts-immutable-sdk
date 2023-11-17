@@ -3,6 +3,7 @@ import { BigNumber, Contract, utils } from 'ethers';
 import { HttpStatusCode } from 'axios';
 import {
   ChainId,
+  DEFAULT_TOKEN_DECIMALS,
   ERC20ABI,
   GetAllBalancesResult,
   GetBalanceResult,
@@ -14,12 +15,14 @@ import {
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 import { getNetworkInfo } from '../network';
 import { getTokenAllowList } from '../tokens';
-import { CheckoutConfiguration } from '../config';
+import { CheckoutConfiguration, getL1ChainId } from '../config';
 import {
   Blockscout,
+  BlockscoutToken,
   BlockscoutTokens,
   BlockscoutTokenType,
 } from '../client';
+import { measureAsyncExecution } from '../utils/debugLogger';
 
 export const getBalance = async (
   config: CheckoutConfiguration,
@@ -87,39 +90,50 @@ export async function getERC20Balance(
   );
 }
 
-// Blockscout client singleton
-let blockscoutClient: Blockscout;
+// Blockscout client singleton per chain id
+const blockscoutClientMap: Map<ChainId, Blockscout> = new Map();
+
+// This function is a utility function that can be used to reset the
+// blockscout map and therefore clear all the cache.
+export const resetBlockscoutClientMap = () => blockscoutClientMap.clear();
 
 export const getIndexerBalance = async (
   walletAddress: string,
   chainId: ChainId,
-  rename: TokenInfo[],
+  filterTokens: TokenInfo[],
 ): Promise<GetAllBalancesResult> => {
   // Shuffle the mapping of the tokens configuration so it is a hashmap
   // for faster access to tokens config objects.
-  const mapRename = Object.assign({}, ...(rename.map((t) => ({ [t.address || '']: t }))));
+  const shouldFilter = filterTokens.length > 0;
+  const mapFilterTokens = Object.assign({}, ...(filterTokens.map((t) => ({ [t.address || '']: t }))));
 
-  // Ensure singleton is present and match the selected chain
-  if (!blockscoutClient || blockscoutClient.chainId !== chainId) blockscoutClient = new Blockscout({ chainId });
+  // Get blockscout client for the given chain
+  let blockscoutClient = blockscoutClientMap.get(chainId);
+  if (!blockscoutClient) {
+    blockscoutClient = new Blockscout({ chainId });
+    blockscoutClientMap.set(chainId, blockscoutClient);
+  }
 
   // Hold the items in an array for post-fetching processing
-  const items = [];
+  const items: BlockscoutToken[] = [];
 
   const tokenType = BlockscoutTokenType.ERC20;
-  // Given that the widgets aren't yet designed to support pagination,
-  // fetch all the possible tokens associated to a given wallet address.
-  let resp: BlockscoutTokens | undefined;
-  try {
-    do {
+
+  const erc20Balances = async (client: Blockscout) => {
+    // Given that the widgets aren't yet designed to support pagination,
+    // fetch all the possible tokens associated to a given wallet address.
+    let resp: BlockscoutTokens | undefined;
+    try {
+      do {
       // eslint-disable-next-line no-await-in-loop
-      resp = await blockscoutClient.getTokensByWalletAddress({
-        walletAddress,
-        tokenType,
-        nextPage: resp?.next_page_params,
-      });
-      items.push(...resp.items);
-    } while (resp.next_page_params);
-  } catch (err: any) {
+        resp = await client.getTokensByWalletAddress({
+          walletAddress,
+          tokenType,
+          nextPage: resp?.next_page_params,
+        });
+        items.push(...resp.items);
+      } while (resp.next_page_params);
+    } catch (err: any) {
     // In case of a 404, the wallet is a new wallet that hasn't been indexed by
     // the Blockscout just yet. This happens when a wallet hasn't had any
     // activity on the chain. In this case, simply ignore the error and return
@@ -127,54 +141,66 @@ export const getIndexerBalance = async (
     // In case of a malformed wallet address, Blockscout returns a 422, which
     // means we are safe to assume that a 404 is a missing wallet due to inactivity
     // or simply an incorrect wallet address was provided.
-    if (err?.code !== HttpStatusCode.NotFound) {
-      throw new CheckoutError(
-        err.message || 'InternalServerError | getTokensByWalletAddress',
-        CheckoutErrorType.GET_INDEXER_BALANCE_ERROR,
-        err,
-      );
+      if (err?.code !== HttpStatusCode.NotFound) {
+        throw new CheckoutError(
+          err.message || 'InternalServerError | getTokensByWalletAddress',
+          CheckoutErrorType.GET_INDEXER_BALANCE_ERROR,
+          err,
+        );
+      }
     }
-  }
-
-  try {
-    const respNative = await blockscoutClient.getNativeTokenByWalletAddress({ walletAddress });
-    items.push(respNative);
-  } catch (err: any) {
-    // In case of a 404, the wallet is a new wallet that hasn't been indexed by
-    // the Blockscout just yet. This happens when a wallet hasn't had any
-    // activity on the chain. In this case, simply ignore the error and return
-    // no currencies.
-    // In case of a malformed wallet address, Blockscout returns a 422, which
-    // means we are safe to assume that a 404 is a missing wallet due to inactivity
-    // or simply an incorrect wallet address was provided.
-    if (err?.code !== HttpStatusCode.NotFound) {
-      throw new CheckoutError(
-        err.message || 'InternalServerError | getNativeTokenByWalletAddress',
-        CheckoutErrorType.GET_INDEXER_BALANCE_ERROR,
-        err,
-      );
-    }
-  }
-
-  return {
-    balances: items.map((item) => {
-      const tokenData = item.token || {};
-
-      const balance = BigNumber.from(item.value);
-
-      const renamed = (mapRename[tokenData.address] || {}) as TokenInfo;
-      const token = {
-        ...tokenData,
-        name: renamed.name ?? tokenData.name,
-        symbol: renamed.symbol ?? tokenData.symbol,
-        decimals: parseInt(tokenData.decimals, 10),
-      };
-
-      const formattedBalance = utils.formatUnits(item.value, token.decimals);
-
-      return { balance, formattedBalance, token } as GetBalanceResult;
-    }),
   };
+
+  const nativeBalances = async (client: Blockscout) => {
+    try {
+      const respNative = await client.getNativeTokenByWalletAddress({ walletAddress });
+      items.push(respNative);
+    } catch (err: any) {
+      // In case of a 404, the wallet is a new wallet that hasn't been indexed by
+      // the Blockscout just yet. This happens when a wallet hasn't had any
+      // activity on the chain. In this case, simply ignore the error and return
+      // no currencies.
+      // In case of a malformed wallet address, Blockscout returns a 422, which
+      // means we are safe to assume that a 404 is a missing wallet due to inactivity
+      // or simply an incorrect wallet address was provided.
+      if (err?.code !== HttpStatusCode.NotFound) {
+        throw new CheckoutError(
+          err.message || 'InternalServerError | getNativeTokenByWalletAddress',
+          CheckoutErrorType.GET_INDEXER_BALANCE_ERROR,
+          err,
+        );
+      }
+    }
+  };
+
+  // Promise all() rather than allSettled() so that the function can fail fast.
+  await Promise.all([
+    erc20Balances(blockscoutClient),
+    nativeBalances(blockscoutClient),
+  ]);
+
+  const balances: GetBalanceResult[] = [];
+  items.forEach((item) => {
+    if (shouldFilter && !mapFilterTokens[item.token.address]) return;
+
+    const tokenData = item.token || {};
+
+    const balance = BigNumber.from(item.value);
+
+    let decimals = parseInt(tokenData.decimals, 10);
+    if (Number.isNaN(decimals)) decimals = DEFAULT_TOKEN_DECIMALS;
+
+    const token = {
+      ...tokenData,
+      decimals,
+    };
+
+    const formattedBalance = utils.formatUnits(item.value, token.decimals);
+
+    balances.push({ balance, formattedBalance, token } as GetBalanceResult);
+  });
+
+  return { balances };
 };
 
 export const getBalances = async (
@@ -211,8 +237,11 @@ export const getAllBalances = async (
   config: CheckoutConfiguration,
   web3Provider: Web3Provider,
   walletAddress: string,
-  chainId: ChainId,
+  chainId?: ChainId,
 ): Promise<GetAllBalancesResult> => {
+  // eslint-disable-next-line no-param-reassign
+  chainId ||= await web3Provider.getSigner().getChainId();
+
   const { tokens } = await getTokenAllowList(
     config,
     {
@@ -233,11 +262,25 @@ export const getAllBalances = async (
   }
 
   if (flag && Blockscout.isChainSupported(chainId)) {
-    return await getIndexerBalance(walletAddress, chainId, tokens);
+    // This is a hack because the widgets are still using the tokens symbol
+    // to drive the conversions. If we remove all the token symbols from e.g. zkevm
+    // then we would not have fiat conversions.
+    // Please remove this hack once https://immutable.atlassian.net/browse/WT-1710
+    // is done.
+    const isL1Chain = getL1ChainId(config) === chainId;
+    return await measureAsyncExecution<GetAllBalancesResult>(
+      config,
+      `Time to fetch balances using blockscout for ${chainId}`,
+      getIndexerBalance(walletAddress, chainId, isL1Chain ? tokens : []),
+    );
   }
 
   // This fallback to use ERC20s calls which is a best effort solution
   // Fails in fetching data from the RCP calls might result in some
   // missing data.
-  return await getBalances(config, web3Provider, walletAddress, tokens);
+  return await measureAsyncExecution<GetBalancesResult>(
+    config,
+    `Time to fetch balances using RPC for ${chainId}`,
+    getBalances(config, web3Provider, walletAddress, tokens),
+  );
 };
