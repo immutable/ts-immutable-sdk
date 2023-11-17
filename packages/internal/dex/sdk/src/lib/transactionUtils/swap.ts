@@ -90,6 +90,7 @@ function buildSinglePoolSwapWithFees(
   amountOut: string,
   secondaryFees: SecondaryFee[],
   secondaryFeeContract: SecondaryFeeInterface,
+  tokenOut: Coin,
 ) {
   const secondaryFeeValues: ISecondaryFee.SecondaryFeeParamsStruct[] = secondaryFees.map((fee) => ({
     feeBasisPoints: fee.basisPoints,
@@ -132,7 +133,11 @@ function buildSinglePoolSwapWithFees(
     );
   }
 
-  // TODO: Add refundETH method when support is added in SecondaryFee contract
+  const shouldUnwrapTokens = isNative(tokenOut);
+  if (shouldUnwrapTokens) {
+    // Unwrap the output token if the user specified a native token as the output
+    calldatas.push(secondaryFeeContract.encodeFunctionData('unwrapNativeToken', [amountOut]));
+  }
 
   return calldatas;
 }
@@ -200,6 +205,7 @@ function buildMultiPoolSwapWithFees(
   amountOut: string,
   secondaryFees: SecondaryFee[],
   secondaryFeeContract: SecondaryFeeInterface,
+  tokenOut: Coin,
 ) {
   const path: string = encodeRouteToPath(route, trade.tradeType === Uniswap.TradeType.EXACT_OUTPUT);
 
@@ -238,7 +244,11 @@ function buildMultiPoolSwapWithFees(
     );
   }
 
-  // TODO: Add refundETH method when support is added in SecondaryFee contract
+  const shouldUnwrapTokens = isNative(tokenOut);
+  if (shouldUnwrapTokens) {
+    // Unwrap the output token if the user specified a native token as the output
+    calldatas.push(secondaryFeeContract.encodeFunctionData('unwrapNativeToken', [amountOut]));
+  }
 
   return calldatas;
 }
@@ -286,6 +296,7 @@ function buildSwapParameters(
         minimumAmountOut,
         secondaryFees,
         secondaryFeeContract,
+        tokenOut,
       );
     }
 
@@ -311,6 +322,7 @@ function buildSwapParameters(
       minimumAmountOut,
       secondaryFees,
       secondaryFeeContract,
+      tokenOut,
     );
   }
 
