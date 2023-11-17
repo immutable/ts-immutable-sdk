@@ -84,10 +84,9 @@ export function BridgeForm(props: BridgeFormProps) {
   // user rejects transaction
   const [showTxnRejectedState, setShowTxnRejectedState] = useState(false);
 
-  const formatTokenOptionsId = useCallback((symbol: string, address?: string) => {
-    if (!address) return symbol.toLowerCase();
-    return `${symbol.toLowerCase()}-${address.toLowerCase()}`;
-  }, []);
+  const formatTokenOptionsId = useCallback((symbol: string, address?: string) => (isNativeToken(address)
+    ? `${symbol.toLowerCase()}-${NATIVE}`
+    : `${symbol.toLowerCase()}-${address!.toLowerCase()}`), []);
 
   useEffect(() => {
     if (tokenBalances.length === 0) return;
@@ -160,14 +159,14 @@ export function BridgeForm(props: BridgeFormProps) {
 
     const approveRes: ApproveDepositBridgeResponse = await tokenBridge.getUnsignedApproveDepositBridgeTx({
       depositorAddress,
-      token: isNativeToken(token.token.address) ? NATIVE : token.token.address,
+      token: isNativeToken(token.token.address) ? NATIVE.toUpperCase() : token.token.address,
       depositAmount,
     });
 
     const bridgeTxn: BridgeDepositResponse = await tokenBridge.getUnsignedDepositTx({
       depositorAddress,
       recipientAddress: depositorAddress,
-      token: isNativeToken(token.token.address) ? NATIVE : token.token.address,
+      token: isNativeToken(token.token.address) ? NATIVE.toUpperCase() : token.token.address,
       depositAmount,
     });
 

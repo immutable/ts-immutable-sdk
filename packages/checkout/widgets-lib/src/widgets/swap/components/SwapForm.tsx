@@ -98,10 +98,9 @@ export function SwapForm({ data }: SwapFromProps) {
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { provider } = connectLoaderState;
 
-  const formatTokenOptionsId = useCallback((symbol: string, address?: string) => {
-    if (!address) return symbol.toLowerCase();
-    return `${symbol.toLowerCase()}-${address.toLowerCase()}`;
-  }, []);
+  const formatTokenOptionsId = useCallback((symbol: string, address?: string) => (isNativeToken(address)
+    ? `${symbol.toLowerCase()}-${NATIVE}`
+    : `${symbol.toLowerCase()}-${address!.toLowerCase()}`), []);
 
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { viewDispatch } = useContext(ViewContext);
@@ -166,10 +165,10 @@ export function SwapForm({ data }: SwapFromProps) {
 
       if (data?.fromContractAddress) {
         setFromToken(
-          allowedTokens.find((t) => (
-            isNativeToken(t.address) && data?.fromContractAddress?.toLowerCase() === NATIVE
-          )
-          || (t.address?.toLowerCase() === data?.fromContractAddress?.toLowerCase())),
+          allowedTokens.find((t) => (isNativeToken(t.address)
+              && data?.fromContractAddress?.toLowerCase() === NATIVE)
+              || t.address?.toLowerCase()
+                === data?.fromContractAddress?.toLowerCase()),
         );
         setFromBalance(
           tokenBalances.find(
