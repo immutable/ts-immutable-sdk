@@ -450,7 +450,7 @@ export function expectToBeDefined<T>(x: T): asserts x is NonNullable<T> {
 
 // expectToBeDefined ensures that x is a string, while
 // also narrowing its type.
-export function expectToBeString(x: string): asserts x is string {
+export function expectToBeString(x: unknown): asserts x is string {
   expect(typeof x).toBe('string');
 }
 

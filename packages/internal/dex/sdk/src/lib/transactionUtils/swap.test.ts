@@ -21,6 +21,7 @@ import {
   USDC_TEST_TOKEN,
   decodeMulticallExactInputWithFees,
   decodeMulticallExactOutputWithFees,
+  expectToBeString,
 } from 'test/utils';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import { Fees } from 'lib/fees';
@@ -162,6 +163,80 @@ describe('getSwap', () => {
 
       expectInstanceOf(BigNumber, swapParams.amountInMaximum);
       expect(utils.formatEther(swapParams.amountInMaximum)).toEqual('103.0');
+    });
+  });
+
+  describe('recipient', () => {
+    describe('without fees, and native out', () => {
+      it('sets the recipient as the uniswap router contract', () => {
+        const quote = buildExactInputQuote();
+
+        const swap = getSwap(
+          quote.amountIn.token,
+          nativeTokenService.nativeToken,
+          quote,
+          makeAddr('fromAddress'),
+          slippagePercentage,
+          deadline,
+          makeAddr('routerContract'),
+          makeAddr('secondaryFeeContract'),
+          newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
+          [],
+        );
+
+        expectToBeDefined(swap.transaction.data);
+        const { swapParams } = decodeMulticallExactInputSingleWithoutFees(swap.transaction.data);
+        expectToBeString(swapParams.recipient);
+        expect(swapParams.recipient.toLowerCase()).toEqual(makeAddr('routerContract'));
+      });
+    });
+
+    describe('when erc20 out', () => {
+      it('sets the recipient as the fromAddress', () => {
+        const quote = buildExactInputQuote();
+
+        const swap = getSwap(
+          quote.amountIn.token,
+          quote.amountOut.token,
+          quote,
+          makeAddr('fromAddress'),
+          slippagePercentage,
+          deadline,
+          makeAddr('routerContract'),
+          makeAddr('secondaryFeeContract'),
+          newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
+          [],
+        );
+
+        expectToBeDefined(swap.transaction.data);
+        const { swapParams } = decodeMulticallExactInputSingleWithoutFees(swap.transaction.data);
+        expectToBeString(swapParams.recipient);
+        expect(swapParams.recipient.toLowerCase()).toEqual(makeAddr('fromAddress'));
+      });
+    });
+
+    describe('with fees, and native out', () => {
+      it('sets the recipient as the secondary fee contract', () => {
+        const quote = buildExactInputQuote();
+
+        const swap = getSwap(
+          quote.amountIn.token,
+          nativeTokenService.nativeToken,
+          quote,
+          makeAddr('fromAddress'),
+          slippagePercentage,
+          deadline,
+          makeAddr('routerContract'),
+          makeAddr('secondaryFeeContract'),
+          newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
+          [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
+        );
+
+        expectToBeDefined(swap.transaction.data);
+        const { swapParams } = decodeMulticallExactInputSingleWithFees(swap.transaction.data);
+        expectToBeString(swapParams.recipient);
+        expect(swapParams.recipient.toLowerCase()).toEqual(makeAddr('secondaryFeeContract'));
+      });
     });
   });
 
