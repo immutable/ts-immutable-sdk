@@ -1,5 +1,5 @@
-import { Checkout, ConnectEventType, ConnectionSuccess, OnRampEventType, WalletEventType, WidgetTheme, WidgetType } from "@imtbl/checkout-sdk";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Checkout, OnRampEventType, WidgetTheme, WidgetType } from "@imtbl/checkout-sdk";
+import { useEffect, useMemo } from "react";
 import { WidgetsFactory } from "@imtbl/checkout-widgets";
 
 function OnRampUI() {

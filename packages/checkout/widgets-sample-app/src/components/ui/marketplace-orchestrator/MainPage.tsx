@@ -1,8 +1,6 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { Box, Button, Card, GridBox, Heading } from "@biom3/react";
+import { Box, Button, Heading } from "@biom3/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Passport } from '@imtbl/passport';
-import { passportConfig } from './passportConfig';
 import {  WidgetsFactory } from '@imtbl/checkout-widgets';
 import { Checkout,
   ConnectEventType,
@@ -18,17 +16,18 @@ import { Checkout,
   WalletNetworkSwitch,
   WidgetTheme, WidgetType, ProviderEventType, ProviderUpdated } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
+import {passport} from './passport';
+
+// Create one instance of Checkout and inject Passport
+const checkout = new Checkout({
+  baseConfig: {environment: Environment.SANDBOX},
+  isBridgeEnabled: true,
+  isSwapEnabled: true,
+  isOnRampEnabled: true,
+  passport,
+})
 
 export const MainPage = () => {
-  const passport = useMemo(() => new Passport(passportConfig), [passportConfig]);
-
-  const checkout = useMemo(() => new Checkout({
-    baseConfig: {environment: Environment.SANDBOX},
-    isBridgeEnabled: true,
-    isSwapEnabled: true,
-    isOnRampEnabled: true,
-    passport,
-  }), []);
   const widgetsFactory = useMemo(() => new WidgetsFactory(checkout, {theme: WidgetTheme.DARK}), [checkout]);
 
   const connectWidget = useMemo(() => widgetsFactory.create(WidgetType.CONNECT), [widgetsFactory]);
@@ -97,12 +96,6 @@ export const MainPage = () => {
     onRampWidget.mount('onramp-target')
   }, [onRampWidget, web3Provider])
 
-  const handleBuyClick = () => {
-    alert("you can buy now");
-  }
-
-  const cardKeys = useMemo(() => [140142,241916,345112,205410],[]);
-
   const logout = useCallback(async () => {
     await passport.logout();
   },[passport])
@@ -126,19 +119,6 @@ export const MainPage = () => {
           <div id="swap-target"></div>
           <div id="bridge-target"></div>
           <div id="onramp-target"></div>
-          {/* <Box sx={{display: 'flex', flexDirection: 'row', gap: 'base.spacing.x4', flexWrap: 'wrap'}}>
-              {cardKeys.map((val) => (
-                <Box key={val} sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
-                  <Card sx={{width: '240px', marginBottom: 'base.spacing.x2'}}>
-                  <Card.Title>Illuvitars</Card.Title>
-                  <Card.Caption>Illuvium</Card.Caption>
-                  <Card.FramedImage imageUrl="https://web-illuvium-static.s3.us-east-2.amazonaws.com/img/illuvitars/illuvitars_marketplace_icon.png" />
-                  <Card.AssetImage imageUrl={`https://api.illuvium-game.io/gamedata/illuvitars/portrait/${val}/render`} />
-                  </Card>
-                  <Button variant={doneSwap ? "primary" : "tertiary"} disabled={!doneSwap} onClick={handleBuyClick}>Buy</Button>
-                </Box>
-              ))}
-          </Box> */}
       </Box>
     </Box>
   );

@@ -1,11 +1,9 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import {
   Checkout,
-  ConnectTargetLayer,
   WidgetType,
   WidgetTheme,
-  Widget,
   ConnectEventType
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
