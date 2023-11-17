@@ -73,6 +73,7 @@ export function TextInputForm({
         onFocus={handleOnFocus}
         disabled={disabled}
         hideClearValueButton
+        sx={{ minWidth: 'base.spacing.x46' }}
       >
         {maxButtonClick && (
           <TextInput.Button
