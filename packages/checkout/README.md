@@ -27,11 +27,9 @@ The Immutable Checkout SDK provides both programatical and user interfaces for i
 │
 └───sdk-sample-app --> Sample app where the Checkout SDK is consumed
 │
-└───widgets --> Checkout Widgets
+└───widgets-lib --> Checkout widgets
 │
 └───widgets-sample-app --> Sample app where the Checkout Widgets are consumed
-│
-└───widgets-types --> Types package for using Widgets in TypeScript
 │
 └───README.md
 ```
@@ -42,10 +40,10 @@ The Immutable Checkout SDK provides both programatical and user interfaces for i
 
 CheckoutSDK has been built with and tested using the following dependencies.
 
-| Dependency | Version  |
-| ---------- | -------- |
-| Node       | v16.19.1 |
-| Yarn       | v3.5.0   |
+| Dependency | Version |
+| ---------- | ------- |
+| Node       | v16+    |
+| Yarn       | v3.5.0  |
 
 Node Module dependencies are still added to the package.json of each checkout module, however each module installs it's dependencies to a shared node_modules directory at the root level of the Unified SDK. This requires dependency versions to be aligned across all SDK submodules.
 
@@ -56,12 +54,14 @@ Once you've added a new dependency, or if it's your first time, go to the root l
 Running Checkout SDK in different modes:
 
 For local/development mode (uses immutable-devnet):
+
 ```
 cd sdk
 yarn start:dev
 ```
 
 For sandbox/production mode (uses immutable-testnet/mainnet based on config object):
+
 ```
 cd sdk
 yarn start
@@ -82,9 +82,10 @@ In another terminal run;
 cd sdk-sample-app
 yarn start
 ```
+
 Note: SDK sample app does not require mode settings.
 
-Now when you make changes in the SDK the parcel watcher will trigger a rebuild of the SDK and since the sample app is also being watched and one of it's dependencies has changed, it will also recompile and the change will automatically be pulled through.
+Now when you make changes in the SDK, Rollup will trigger a rebuild of the SDK and since the sample app is also being watched and one of it's dependencies has changed, it will also recompile and the change will automatically be pulled through.
 
 The best way to work on the SDK is to run the sample app and the sdk, then create buttons for the endpoint you're developing and use them to trigger SDK calls.
 
@@ -100,60 +101,47 @@ All jest tests within the SDK are run in the jsdom environment. To configure thi
 
 ## Widgets Development
 
-Running Widgets in different modes:
-
-For local development mode (uses `imtbl-checkout.js` from `localhost:3000`):
-```
-cd widgets
-yarn start:local
-```
-
-Otherwise, to use `imtbl-checkout.js` from CDN:
-```
-cd widgets
-yarn start
-```
-
-The Widgets rely on the Checkout SDK and the WidgetTypes which will both hot reload into the Widgets App in the same way as the Checkout SDK hot reloads into the SDK Sample App
-
-In one terminal run;
+The widgets-sample-app depends upon the widgets-lib, which in turn depends upon the sdk. To get started you will need to run `yarn start` in all three directories. This will enable hot reloading for all areas.
 
 ```
 cd sdk
 yarn start
 ```
 
-In another terminal run;
-
 ```
-cd widgets
+cd widgets-lib
 yarn start
 ```
 
-This will start up the Widgets App on `localhost:3001`. The landing page is a menu of the available widgets. This is the best place to work on your widget.
-
-If you want to test the input and output (events) of your widget, you will need to package the widgets app and install it into the sample app.
-
-In your terminal run;
-
 ```
-cd widgets
-yarn run build:dist
-
-cd ../widgets-sample-app
+cd widgets-sample-app
 yarn start
 ```
 
-If you want to test the WebViews in the Widgets Sample App, you will also need to have the widgets app running because they load through the iframe from there.
+When you develop locally, the widgets-sample-app installs and imports the widgets as an es module. `import { WidgetsFactory} from '@imtbl/checkout-widgets'` This helps local development with hot reloading. (it takes a lot longer to rebuild and minify a browser bundle).
 
-In another terminal run;
+In production however, the widgets-lib package is built as a browser bundle and is dynamically included in the DOM when you call `await checkout.widgets()`.
+
+To test this setup locally you will need to run
 
 ```
-cd widgets
-yarn run start
+cd sdk
+yarn start:local
 ```
 
-The WebViews will hot reload on change since they are being pulled from the Widgets App, but you will need to run the `build:dist` command in the widgets folder to get the widgets to compile and copy over to test the Web Components & Static versions. You shouldn't need to restart the Widgets Sample App, it should reload automatically when it detects the updated Widgets package being copied over.
+```
+cd widgets-lib
+yarn build:local
+```
+
+```
+cd widgets-sample-app
+yarn start
+```
+
+You will then need to make sure that you replace your creation of a `new WidgetsFactory()` with a call to `await checkout.widgets()` within the sample app. This will pull in the built widgets.js bundle dynamically, but from your local filesystem.
+
+In a production release, this script is loaded from a CDN. We are currently using `https://cdn.jsdelivr.net/npm/@imtbl/sdk/dist/browser/checkout/widgets.js`
 
 # Linting
 
@@ -161,7 +149,23 @@ Linting gets run across the project when you try to commit to your banch and it 
 
 # Running tests
 
-- Coming Soon &trade;
+Running jest tests
+
+```
+yarn test
+```
+
+Running cypress tests
+
+```
+yarn test:cypress:open
+```
+
+Running cypress tests (headless)
+
+```
+yarn test:cypress
+```
 
 # Release process
 
