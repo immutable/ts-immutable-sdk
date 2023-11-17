@@ -187,21 +187,24 @@ function decodeSwapRouterCall(calldata: utils.BytesLike, functionName: SwapRoute
 }
 
 export function decodeMulticallExactInputWithFees(data: utils.BytesLike) {
-  const decodedParams = decodeSecondaryFeeCall(data, 'exactInputWithSecondaryFee');
+  const [
+    exactInputParams,
+    unwrapTokenParams,
+  ] = decodeSecondaryFeeCall(data, 'exactInputWithSecondaryFee', 'unwrapNativeToken');
 
-  const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map((x: [string, number]) => ({
+  const secondaryFeeParams: SecondaryFee[] = exactInputParams[0].map((x: [string, number]) => ({
     recipient: x[0],
     basisPoints: x[1],
   }));
 
   const swapParams: IV3SwapRouter.ExactInputParamsStruct = {
-    path: decodedParams[1][0],
-    recipient: decodedParams[1][1],
-    amountIn: decodedParams[1][2],
-    amountOutMinimum: decodedParams[1][3],
+    path: exactInputParams[1][0],
+    recipient: exactInputParams[1][1],
+    amountIn: exactInputParams[1][2],
+    amountOutMinimum: exactInputParams[1][3],
   };
 
-  return { secondaryFeeParams, swapParams };
+  return { secondaryFeeParams, swapParams, unwrapTokenParams };
 }
 
 export function decodeMulticallExactInputWithoutFees(data: utils.BytesLike) {
@@ -218,21 +221,24 @@ export function decodeMulticallExactInputWithoutFees(data: utils.BytesLike) {
 }
 
 export function decodeMulticallExactOutputWithFees(data: utils.BytesLike) {
-  const decodedParams = decodeSecondaryFeeCall(data, 'exactOutputWithSecondaryFee');
+  const [
+    exactOutputParams,
+    unwrapTokenParams,
+  ] = decodeSecondaryFeeCall(data, 'exactOutputWithSecondaryFee', 'unwrapNativeToken');
 
-  const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map((x: [string, number]) => ({
+  const secondaryFeeParams: SecondaryFee[] = exactOutputParams[0].map((x: [string, number]) => ({
     recipient: x[0],
     basisPoints: x[1],
   }));
 
   const swapParams: IV3SwapRouter.ExactOutputParamsStruct = {
-    path: decodedParams[1][0],
-    recipient: decodedParams[1][1],
-    amountOut: decodedParams[1][2],
-    amountInMaximum: decodedParams[1][3],
+    path: exactOutputParams[1][0],
+    recipient: exactOutputParams[1][1],
+    amountOut: exactOutputParams[1][2],
+    amountInMaximum: exactOutputParams[1][3],
   };
 
-  return { secondaryFeeParams, swapParams };
+  return { secondaryFeeParams, swapParams, unwrapTokenParams };
 }
 
 export function decodeMulticallExactInputSingleWithFees(data: utils.BytesLike) {
