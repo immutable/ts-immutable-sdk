@@ -208,6 +208,13 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
         break;
       }
       case PASSPORT_FUNCTIONS.connectWithCredentials: {
+        /**
+         * The Unity SDK calls `checkStoredCredentials`, and if they exist, it passes those credentials to this
+         * function. As the device flow implementation now uses the same methods for storing & retrieving tokens as
+         * the web implementation, it's no longer necessary to pass any credentials to instantiate the provider.
+         *
+         * // TODO: Consolidate `connectWithCredentials` & `checkStoredCredentials` to one function
+         */
         const passportProvider = await passportClient?.connectImx();
         const success = setProvider(passportProvider);
         callbackToGame({

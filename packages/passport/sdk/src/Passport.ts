@@ -131,7 +131,7 @@ export class Passport {
     timeoutMs?: number,
   ): Promise<UserProfile> {
     const user = await this.authManager.loginWithDeviceFlowCallback(deviceCode, interval, timeoutMs);
-    return user?.profile;
+    return user.profile;
   }
 
   public async loginCallback(): Promise<void> {

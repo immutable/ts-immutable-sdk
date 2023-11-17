@@ -73,15 +73,6 @@ export class PassportImxProviderFactory {
     return this.createProviderInstance(user);
   }
 
-  public async getProviderWithDeviceFlow(
-    deviceCode: string,
-    interval: number,
-    timeoutMs?: number,
-  ): Promise<IMXProvider> {
-    const user = await this.authManager.loginWithDeviceFlowCallback(deviceCode, interval, timeoutMs);
-    return this.createProviderInstance(user);
-  }
-
   public async getProviderWithPKCEFlow(authorizationCode: string, state: string): Promise<IMXProvider> {
     const user = await this.authManager.connectImxPKCEFlow(authorizationCode, state);
     return this.createProviderInstance(user);

@@ -305,19 +305,6 @@ export default class AuthManager {
     return response.data;
   }
 
-  public async connectImxWithCredentials(tokenResponse: DeviceTokenResponse): Promise<User | null> { // TODO: Where / why is this used??
-    return withPassportError<User | null>(async () => {
-      const oidcUser = AuthManager.mapDeviceTokenResponseToOidcUser(tokenResponse);
-      await this.userManager.storeUser(oidcUser);
-
-      if (isTokenExpired(oidcUser)) {
-        return this.getUser();
-      }
-
-      return AuthManager.mapOidcUserToDomainModel(oidcUser);
-    }, PassportErrorType.AUTHENTICATION_ERROR);
-  }
-
   public async logout(): Promise<void> {
     return withPassportError<void>(
       async () => {

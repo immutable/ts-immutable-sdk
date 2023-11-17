@@ -1,12 +1,10 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { User as OidcUser, UserManager, WebStorageStateStore } from 'oidc-client-ts';
-import jwt_decode from 'jwt-decode';
 import AuthManager from './authManager';
 import { PassportError, PassportErrorType } from './errors/passportError';
 import { PassportConfiguration } from './config';
 import { mockUser, mockUserImx, mockUserZkEvm } from './test/mocks';
 import { isTokenExpired } from './utils/token';
-import { DeviceTokenResponse } from './types';
 
 jest.mock('jwt-decode');
 jest.mock('./utils/token');
@@ -402,62 +400,6 @@ describe('AuthManager', () => {
           expect(mockSigninSilent).toBeCalledTimes(1);
         });
       });
-    });
-  });
-
-  describe('connectImxWithCredentials', () => {
-    it('should call storeUser & return a domain model User ', async () => {
-      const profileData = {
-        email: mockUser.profile.email,
-        nickname: mockUser.profile.nickname,
-        sub: mockUser.profile.sub,
-        aud: 'audience123',
-        iss: 'https://auth.immutable.com/',
-        iat: 1234500000,
-        exp: 1234567890,
-        passport: {
-          ...imxProfileData,
-          ...zkEvmProfileData,
-        },
-      };
-      (jwt_decode as jest.Mock).mockReturnValue(profileData);
-
-      const tokenResponse: DeviceTokenResponse = {
-        access_token: mockUser.accessToken,
-        refresh_token: mockUser.refreshToken,
-        id_token: mockUser.idToken!,
-        token_type: 'Bearer',
-        expires_in: 167222,
-      };
-
-      const result = await authManager.connectImxWithCredentials(tokenResponse);
-
-      expect(mockStoreUser).toHaveBeenCalledWith(expect.objectContaining({
-        id_token: mockUser.idToken,
-        access_token: mockUser.accessToken,
-        refresh_token: mockUser.refreshToken,
-        profile: profileData,
-      }));
-
-      expect(result).toEqual(expect.objectContaining({
-        idToken: mockUser.idToken,
-        accessToken: mockUser.accessToken,
-        refreshToken: mockUser.refreshToken,
-        profile: {
-          sub: mockUser.profile.sub,
-          email: mockUser.profile.email,
-          nickname: mockUser.profile.nickname,
-        },
-        imx: {
-          ethAddress: imxProfileData.imx_eth_address,
-          starkAddress: imxProfileData.imx_stark_address,
-          userAdminAddress: imxProfileData.imx_user_admin_address,
-        },
-        zkEvm: {
-          ethAddress: zkEvmProfileData.zkevm_eth_address,
-          userAdminAddress: zkEvmProfileData.zkevm_user_admin_address,
-        },
-      }));
     });
   });
 });
