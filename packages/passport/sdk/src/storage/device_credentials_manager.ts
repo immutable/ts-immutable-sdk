@@ -2,7 +2,6 @@
 import { DeviceTokenResponse, TokenPayload, PKCEData } from 'types';
 import jwt_decode from 'jwt-decode';
 
-const keyCrendentials = 'passport_credentials';
 const KEY_PKCE_STATE = 'pkce_state';
 const KEY_PKCE_VERIFIER = 'pkce_verifier';
 const validCredentialsMinTtlSec = 3600; // 1 hour

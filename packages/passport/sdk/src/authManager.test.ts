@@ -1,7 +1,6 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { User as OidcUser, UserManager, WebStorageStateStore } from 'oidc-client-ts';
 import jwt_decode from 'jwt-decode';
-import DeviceCredentialsManager from 'storage/device_credentials_manager';
 import AuthManager from './authManager';
 import { PassportError, PassportErrorType } from './errors/passportError';
 import { PassportConfiguration } from './config';
@@ -9,10 +8,14 @@ import { mockUser, mockUserImx, mockUserZkEvm } from './test/mocks';
 import { isTokenExpired } from './utils/token';
 import { DeviceTokenResponse } from './types';
 
-jest.mock('oidc-client-ts');
-jest.mock('storage/device_credentials_manager');
 jest.mock('jwt-decode');
 jest.mock('./utils/token');
+jest.mock('oidc-client-ts', () => ({
+  ...jest.requireActual('oidc-client-ts'),
+  InMemoryWebStorage: jest.fn(),
+  UserManager: jest.fn(),
+  WebStorageStateStore: jest.fn(),
+}));
 
 const baseConfig = new ImmutableConfiguration({
   environment: Environment.SANDBOX,
@@ -78,8 +81,7 @@ describe('AuthManager', () => {
   let mockGetUser: jest.Mock;
   let mockSigninSilent: jest.Mock;
   let mockSignoutSilent: jest.Mock;
-  let mockAreValid: jest.Mock;
-  let mockGetCredentials: jest.Mock;
+  let mockStoreUser: jest.Mock;
 
   beforeEach(() => {
     mockSignIn = jest.fn();
@@ -88,8 +90,7 @@ describe('AuthManager', () => {
     mockGetUser = jest.fn();
     mockSigninSilent = jest.fn();
     mockSignoutSilent = jest.fn();
-    mockAreValid = jest.fn();
-    mockGetCredentials = jest.fn();
+    mockStoreUser = jest.fn();
     (UserManager as jest.Mock).mockReturnValue({
       signinPopup: mockSignIn,
       signinPopupCallback: mockSigninPopupCallback,
@@ -97,10 +98,7 @@ describe('AuthManager', () => {
       signoutSilent: mockSignoutSilent,
       getUser: mockGetUser,
       signinSilent: mockSigninSilent,
-    });
-    (DeviceCredentialsManager as jest.Mock).mockReturnValue({
-      areValid: mockAreValid,
-      getCredentials: mockGetCredentials,
+      storeUser: mockStoreUser,
     });
     authManager = new AuthManager(config);
   });
@@ -408,39 +406,58 @@ describe('AuthManager', () => {
   });
 
   describe('connectImxWithCredentials', () => {
-    describe('when the user has not registered for any rollup', () => {
-      it('should return a User', async () => {
-        mockAreValid.mockReturnValue(true);
-        (jwt_decode as jest.Mock).mockReturnValue({
+    it('should call storeUser & return a domain model User ', async () => {
+      const profileData = {
+        email: mockUser.profile.email,
+        nickname: mockUser.profile.nickname,
+        sub: mockUser.profile.sub,
+        aud: 'audience123',
+        iss: 'https://auth.immutable.com/',
+        iat: 1234500000,
+        exp: 1234567890,
+        passport: {
+          ...imxProfileData,
+          ...zkEvmProfileData,
+        },
+      };
+      (jwt_decode as jest.Mock).mockReturnValue(profileData);
+
+      const tokenResponse: DeviceTokenResponse = {
+        access_token: mockUser.accessToken,
+        refresh_token: mockUser.refreshToken,
+        id_token: mockUser.idToken!,
+        token_type: 'Bearer',
+        expires_in: 167222,
+      };
+
+      const result = await authManager.connectImxWithCredentials(tokenResponse);
+
+      expect(mockStoreUser).toHaveBeenCalledWith(expect.objectContaining({
+        id_token: mockUser.idToken,
+        access_token: mockUser.accessToken,
+        refresh_token: mockUser.refreshToken,
+        profile: profileData,
+      }));
+
+      expect(result).toEqual(expect.objectContaining({
+        idToken: mockUser.idToken,
+        accessToken: mockUser.accessToken,
+        refreshToken: mockUser.refreshToken,
+        profile: {
+          sub: mockUser.profile.sub,
           email: mockUser.profile.email,
           nickname: mockUser.profile.nickname,
-          aud: 'audience123',
-          sub: 'subject123',
-          exp: 1234567890,
-        });
-
-        const tokenResponse: DeviceTokenResponse = {
-          access_token: mockUser.accessToken,
-          refresh_token: mockUser.refreshToken,
-          id_token: mockUser.idToken!,
-          token_type: 'Bearer',
-          expires_in: 167222,
-        };
-
-        const result = await authManager.connectImxWithCredentials(tokenResponse);
-
-        expect(mockAreValid).toHaveBeenCalledWith(tokenResponse);
-        expect(result).toEqual({
-          idToken: mockUser.idToken,
-          accessToken: mockUser.accessToken,
-          refreshToken: mockUser.refreshToken,
-          profile: {
-            email: mockUser.profile.email,
-            nickname: mockUser.profile.nickname,
-            sub: 'subject123',
-          },
-        });
-      });
+        },
+        imx: {
+          ethAddress: imxProfileData.imx_eth_address,
+          starkAddress: imxProfileData.imx_stark_address,
+          userAdminAddress: imxProfileData.imx_user_admin_address,
+        },
+        zkEvm: {
+          ethAddress: zkEvmProfileData.zkevm_eth_address,
+          userAdminAddress: zkEvmProfileData.zkevm_user_admin_address,
+        },
+      }));
     });
   });
 });

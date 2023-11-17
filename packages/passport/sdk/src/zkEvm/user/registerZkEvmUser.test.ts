@@ -1,8 +1,6 @@
-import { ImmutableConfiguration } from '@imtbl/config';
 import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { signRaw } from '@imtbl/toolkit';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
-import { PassportConfiguration } from 'config';
 import { ChainName } from 'network/chains';
 import { registerZkEvmUser } from './registerZkEvmUser';
 import AuthManager from '../../authManager';
@@ -34,12 +32,6 @@ describe('registerZkEvmUser', () => {
   const ethereumAddress = '0x3082e7c88f1c8b4e24be4a75dee018ad362d84d4';
   const ethereumSignature = '0xcc63b10814e3ab4b2dff6762a6712e40c23db00c11f2c54bcc699babdbf1d2bc3096fec623da4784fafb7f6da65338d91e3c846ef52e856c2f5f86c4cf10790900';
   const accessToken = 'accessToken123';
-  const config = new PassportConfiguration({
-    baseConfig: {} as ImmutableConfiguration,
-    clientId: 'client123',
-    logoutRedirectUri: 'http://localhost:3000/logout',
-    redirectUri: 'http://localhost:3000/redirect',
-  });
 
   beforeEach(() => {
     jest.restoreAllMocks();
