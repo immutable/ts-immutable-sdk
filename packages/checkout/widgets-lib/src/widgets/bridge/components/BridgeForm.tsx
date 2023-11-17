@@ -390,9 +390,6 @@ export function BridgeForm(props: BridgeFormProps) {
     } catch (err: any) {
       setLoading(false);
 
-      console.log('failed token:', token?.token.address);
-      console.log('is native?::', isNativeToken(token?.token.address) ? NATIVE : token?.token.address ?? '');
-
       if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
         setShowTxnRejectedState(true);
         return;

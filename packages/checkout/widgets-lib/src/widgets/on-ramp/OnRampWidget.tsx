@@ -4,7 +4,7 @@ import {
   useContext, useEffect, useMemo, useReducer, useState,
 } from 'react';
 import { IMTBLWidgetEvents, OnRampWidgetParams, WidgetTheme } from '@imtbl/checkout-sdk';
-import { IMX_ADDRESS_ZKEVM, NATIVE } from '../../lib';
+import { NATIVE } from '../../lib';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
   SharedViews,
@@ -69,8 +69,8 @@ export function OnRampWidget({
       if (!network.isSupported) {
         return;
       }
-      const tknAddr = contractAddress?.toLocaleUpperCase() === NATIVE
-        ? IMX_ADDRESS_ZKEVM
+      const tknAddr = contractAddress?.toLocaleLowerCase() === NATIVE
+        ? NATIVE
         : contractAddress;
 
       setTokenAddress(tknAddr);
