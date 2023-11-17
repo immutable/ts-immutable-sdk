@@ -1,8 +1,12 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { ChainId, WalletProviderName } from '@imtbl/checkout-sdk';
+import {
+  ChainId,
+  WalletProviderName,
+} from '@imtbl/checkout-sdk';
 import {
   useContext, useState, useCallback, useMemo, useEffect,
 } from 'react';
+import { addProviderListenersForWidgetRoot } from 'lib';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../../components/Footer/FooterButton';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
@@ -12,18 +16,16 @@ import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { text } from '../../../resources/text/textConfig';
 import { ConnectContext, ConnectActions } from '../context/ConnectContext';
-import {
-  ViewContext,
-  ViewActions,
-} from '../../../context/view-context/ViewContext';
+import { ViewContext, ViewActions } from '../../../context/view-context/ViewContext';
 import { isMetaMaskProvider, isPassportProvider } from '../../../lib/providerUtils';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { identifyUser } from '../../../lib/analytics/identifyUser';
 
 export interface ReadyToConnectProps {
   targetChainId: ChainId;
+  allowedChains: ChainId[];
 }
-export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
+export function ReadyToConnect({ targetChainId, allowedChains }: ReadyToConnectProps) {
   const {
     connectState: { checkout, provider, sendCloseEvent },
     connectDispatch,
@@ -90,14 +92,21 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
 
   // eslint-disable-next-line @typescript-eslint/no-shadow
   const handleConnectViewUpdate = async (provider: Web3Provider) => {
-    if (await provider.getSigner().getChainId() !== targetChainId) {
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: { type: ConnectWidgetViews.SWITCH_NETWORK },
-        },
-      });
-      return;
+    // Skip checks for Passport. Passport will be shipped with the
+    // zkEVM network pre-configured and changes of networks are handled
+    // by the ConnectLoader.
+    // TODO: Remove this check when Passport has support for L1.
+    if (!isPassport) {
+      const chainId = await provider.getSigner().getChainId();
+      if (chainId !== targetChainId && !allowedChains?.includes(chainId)) {
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: { type: ConnectWidgetViews.SWITCH_NETWORK },
+          },
+        });
+        return;
+      }
     }
 
     viewDispatch({
@@ -125,6 +134,9 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
       const connectResult = await checkout.connect({
         provider,
       });
+
+      // Set up EIP-1193 provider event listeners for widget root instances
+      addProviderListenersForWidgetRoot(connectResult.provider);
 
       await identifyUser(identify, connectResult.provider);
 

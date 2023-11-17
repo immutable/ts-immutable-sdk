@@ -67,7 +67,7 @@ describe('Network Menu', () => {
   it('should have network buttons', () => {
     const walletState: WalletState = {
       network: null,
-      walletProvider: WalletProviderName.METAMASK,
+      walletProviderName: WalletProviderName.METAMASK,
       tokenBalances: [],
       supportedTopUps: null,
     };
@@ -113,7 +113,7 @@ describe('Network Menu', () => {
         nativeCurrency: {} as unknown as TokenInfo,
         isSupported: false,
       },
-      walletProvider: WalletProviderName.METAMASK,
+      walletProviderName: WalletProviderName.METAMASK,
       tokenBalances: [],
       supportedTopUps: null,
     };

@@ -14,7 +14,7 @@ import { PassportErrorType, withPassportError } from './errors/passportError';
 import {
   PassportMetadata,
   User,
-  DeviceCodeReponse,
+  DeviceCodeResponse,
   DeviceConnectResponse,
   DeviceTokenResponse,
   DeviceErrorResponse,
@@ -106,9 +106,9 @@ export default class AuthManager {
     };
     if (passport?.imx_eth_address) {
       user.imx = {
-        ethAddress: passport?.imx_eth_address,
-        starkAddress: passport?.imx_stark_address,
-        userAdminAddress: passport?.imx_user_admin_address,
+        ethAddress: passport.imx_eth_address,
+        starkAddress: passport.imx_stark_address,
+        userAdminAddress: passport.imx_user_admin_address,
       };
     }
     if (passport?.zkevm_eth_address) {
@@ -161,7 +161,7 @@ export default class AuthManager {
 
   public async loginWithDeviceFlow(): Promise<DeviceConnectResponse> {
     return withPassportError<DeviceConnectResponse>(async () => {
-      const response = await axios.post<DeviceCodeReponse>(
+      const response = await axios.post<DeviceCodeResponse>(
         `${this.config.authenticationDomain}/oauth/device/code`,
         {
           client_id: this.config.oidcConfiguration.clientId,
@@ -196,11 +196,7 @@ export default class AuthManager {
           const tokenResponse = await this.getDeviceFlowToken(deviceCode);
           const oidcUser = AuthManager.mapDeviceTokenResponseToOidcUser(tokenResponse);
           const user = AuthManager.mapOidcUserToDomainModel(oidcUser);
-
-          // Only persist credentials that contain the necessary data
-          if (user.imx?.ethAddress && user.imx?.starkAddress && user.imx?.userAdminAddress) {
-            await this.userManager.storeUser(oidcUser);
-          }
+          await this.userManager.storeUser(oidcUser);
 
           return user;
         } catch (error) {
@@ -287,11 +283,7 @@ export default class AuthManager {
       const tokenResponse = await this.getPKCEToken(authorizationCode, pkceData.verifier);
       const oidcUser = AuthManager.mapDeviceTokenResponseToOidcUser(tokenResponse);
       const user = AuthManager.mapOidcUserToDomainModel(oidcUser);
-
-      // Only persist credentials that contain the necessary data
-      if (user.imx?.ethAddress && user.imx?.starkAddress && user.imx?.userAdminAddress) {
-        await this.userManager.storeUser(oidcUser);
-      }
+      await this.userManager.storeUser(oidcUser);
 
       return user;
     }, PassportErrorType.AUTHENTICATION_ERROR);
@@ -319,7 +311,7 @@ export default class AuthManager {
       await this.userManager.storeUser(oidcUser);
 
       if (isTokenExpired(oidcUser)) {
-        return this.loginSilent();
+        return this.getUser();
       }
 
       return AuthManager.mapOidcUserToDomainModel(oidcUser);
@@ -343,35 +335,8 @@ export default class AuthManager {
     return this.userManager.signoutSilentCallback(url);
   }
 
-  public async loginSilent({ forceRefresh } = { forceRefresh: false }): Promise<User | null> {
-    // eslint-disable-next-line arrow-body-style
-    return withPassportError<User | null>(async () => {
-      return this.getUser({ forceRefresh });
-    }, PassportErrorType.SILENT_LOGIN_ERROR);
-  }
-
-  /**
-   * Get the user from the cache or refresh the token if it's expired.
-   * @param forceRefresh If set to true, force an HTTP call to the OIDC server's authorization endpoint. This call will
-   * throw an error if there's no refresh token.
-   */
-  private async getAuthenticatedUser({ forceRefresh = false }: { forceRefresh: boolean }): Promise<User | null> {
-    if (forceRefresh) {
-      return this.refreshTokenAndUpdatePromise();
-    }
-
-    const oidcUser = await this.userManager.getUser();
-    if (!oidcUser) return null;
-
-    if (!isTokenExpired(oidcUser)) {
-      return AuthManager.mapOidcUserToDomainModel(oidcUser);
-    }
-
-    if (oidcUser.refresh_token) {
-      return this.refreshTokenAndUpdatePromise();
-    }
-
-    return null;
+  public async forceUserRefresh() : Promise<User | null> {
+    return this.refreshTokenAndUpdatePromise();
   }
 
   /**
@@ -400,9 +365,24 @@ export default class AuthManager {
     return this.refreshingPromise;
   }
 
-  public async getUser({ forceRefresh } = { forceRefresh: false }): Promise<User | null> {
-    return withPassportError<User | null>(async () => (
-      this.getAuthenticatedUser({ forceRefresh })
-    ), PassportErrorType.NOT_LOGGED_IN_ERROR);
+  /**
+   * Get the user from the cache or refresh the token if it's expired.
+   * return null if there's no refresh token.
+   */
+  public async getUser(): Promise<User | null> {
+    return withPassportError<User | null>(async () => {
+      const oidcUser = await this.userManager.getUser();
+      if (!oidcUser) return null;
+
+      if (!isTokenExpired(oidcUser)) {
+        return AuthManager.mapOidcUserToDomainModel(oidcUser);
+      }
+
+      if (oidcUser.refresh_token) {
+        return this.refreshTokenAndUpdatePromise();
+      }
+
+      return null;
+    }, PassportErrorType.NOT_LOGGED_IN_ERROR);
   }
 }

@@ -16,7 +16,8 @@ const config: Config = {
   transform: {
     '^.+\\.(t|j)sx?$': '@swc/jest',
   },
-  transformIgnorePatterns: []
+  transformIgnorePatterns: [],
+  setupFiles: ['./test/__mocks__/window.ts'],
 };
 
 export default config;

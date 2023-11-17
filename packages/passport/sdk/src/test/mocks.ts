@@ -51,7 +51,7 @@ export const mockUserZkEvm: UserZkEvm = {
 
 export const mockLinkedAddresses = {
   data: {
-    linkedAddresses: [
+    linked_addresses: [
       '0x123',
       '0x456',
     ],

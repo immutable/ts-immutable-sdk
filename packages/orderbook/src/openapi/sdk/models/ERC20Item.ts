@@ -14,6 +14,6 @@ export type ERC20Item = {
   /**
    * A string representing the starting price at which the user is willing to sell the token. This value is provided in the smallest unit of the token (e.g., wei for Ethereum).
    */
-  start_amount: string;
+  amount: string;
 };
 

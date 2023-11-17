@@ -7,10 +7,11 @@ import {
   useState,
 } from 'react';
 import { BiomeCombinedProviders } from '@biom3/react';
-import { DexConfig, TokenFilterTypes } from '@imtbl/checkout-sdk';
+import {
+  DexConfig, TokenFilterTypes, IMTBLWidgetEvents, SwapWidgetParams,
+} from '@imtbl/checkout-sdk';
 import { ImmutableConfiguration } from '@imtbl/config';
 import { Exchange, ExchangeOverrides } from '@imtbl/dex-sdk';
-import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import { SwapCoins } from './views/SwapCoins';
 import { LoadingView } from '../../views/loading/LoadingView';
 import {
@@ -33,7 +34,7 @@ import {
 } from '../../context/view-context/SwapViewContextTypes';
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { DEFAULT_BALANCE_RETRY_POLICY } from '../../lib';
+import { DEFAULT_BALANCE_RETRY_POLICY, getL2ChainId } from '../../lib';
 import { StatusView } from '../../components/Status/StatusView';
 import { StatusType } from '../../components/Status/StatusType';
 import { text } from '../../resources/text/textConfig';
@@ -55,21 +56,17 @@ import {
 } from '../../lib/balance';
 import { widgetTheme } from '../../lib/theme';
 import { UserJourney, useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
-// import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
-// import { ServiceType } from '../../views/error/serviceTypes';
 
-export interface SwapWidgetProps {
-  params: SwapWidgetParams;
+export type SwapWidgetInputs = SwapWidgetParams & {
   config: StrongCheckoutWidgetsConfig;
-}
+};
 
-export interface SwapWidgetParams {
-  amount?: string;
-  fromContractAddress?: string;
-  toContractAddress?: string;
-}
-
-export function SwapWidget(props: SwapWidgetProps) {
+export function SwapWidget({
+  amount,
+  fromContractAddress,
+  toContractAddress,
+  config,
+}: SwapWidgetInputs) {
   const { success, failed, rejected } = text.views[SwapWidgetViews.SWAP];
   const loadingText = text.views[SharedViews.LOADING_VIEW].text;
   const { actionText } = text.views[SharedViews.ERROR_VIEW];
@@ -78,7 +75,6 @@ export function SwapWidget(props: SwapWidgetProps) {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
 
-  const { params, config } = props;
   const {
     environment,
     theme,
@@ -86,7 +82,6 @@ export function SwapWidget(props: SwapWidgetProps) {
     isSwapEnabled,
     isBridgeEnabled,
   } = config;
-  const { amount, fromContractAddress, toContractAddress } = params;
 
   const {
     connectLoaderState: { checkout, provider },
@@ -133,7 +128,7 @@ export function SwapWidget(props: SwapWidgetProps) {
     });
   }, [viewDispatch]);
 
-  const loadBalances = async (): Promise<boolean> => {
+  const loadBalances = useCallback(async (): Promise<boolean> => {
     if (!checkout) throw new Error('loadBalances: missing checkout');
     if (!provider) throw new Error('loadBalances: missing provider');
 
@@ -147,6 +142,19 @@ export function SwapWidget(props: SwapWidgetProps) {
         provider,
         allowTokenListType: TokenFilterTypes.SWAP,
       });
+      swapDispatch({
+        payload: {
+          type: SwapActions.SET_ALLOWED_TOKENS,
+          allowedTokens: tokensAndBalances.allowList.tokens,
+        },
+      });
+
+      swapDispatch({
+        payload: {
+          type: SwapActions.SET_TOKEN_BALANCES,
+          tokenBalances: tokensAndBalances.allowedBalances,
+        },
+      });
     } catch (err: any) {
       if (DEFAULT_BALANCE_RETRY_POLICY.nonRetryable!(err)) {
         showErrorView(err, loadBalances);
@@ -154,22 +162,8 @@ export function SwapWidget(props: SwapWidgetProps) {
       }
     }
 
-    swapDispatch({
-      payload: {
-        type: SwapActions.SET_ALLOWED_TOKENS,
-        allowedTokens: tokensAndBalances.allowList.tokens,
-      },
-    });
-
-    swapDispatch({
-      payload: {
-        type: SwapActions.SET_TOKEN_BALANCES,
-        tokenBalances: tokensAndBalances.allowedBalances,
-      },
-    });
-
     return true;
-  };
+  }, [checkout, provider]);
 
   useEffect(() => {
     (async () => {
@@ -177,9 +171,9 @@ export function SwapWidget(props: SwapWidgetProps) {
 
       const network = await checkout.getNetworkInfo({ provider });
 
-      // If the provider's network is not supported, return out of this and let the
+      // If the provider's network is not the correct network, return out of this and let the
       // connect loader handle the switch network functionality
-      if (!network.isSupported) return;
+      if (network.chainId !== getL2ChainId(checkout.config)) return;
 
       let overrides: ExchangeOverrides | undefined;
       try {
@@ -349,6 +343,7 @@ export function SwapWidget(props: SwapWidgetProps) {
             )}
             {viewState.view.type === SharedViews.TOP_UP_VIEW && (
               <TopUpView
+                analytics={{ userJourney: UserJourney.SWAP }}
                 widgetEvent={IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT}
                 showOnrampOption={isOnRampEnabled}
                 showSwapOption={isSwapEnabled}

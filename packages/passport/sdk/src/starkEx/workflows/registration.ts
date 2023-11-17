@@ -1,6 +1,5 @@
 import { signRaw } from '@imtbl/toolkit';
-import { UsersApi, WalletConnection } from '@imtbl/core-sdk';
-import { PassportErrorType, withPassportError } from '../../errors/passportError';
+import { RegisterUserResponse, UsersApi, WalletConnection } from '@imtbl/core-sdk';
 
 export type RegisterPassportParams = WalletConnection & {
   usersApi: UsersApi;
@@ -9,35 +8,33 @@ export type RegisterPassportParams = WalletConnection & {
 export default async function registerPassport(
   { ethSigner, starkSigner, usersApi }: RegisterPassportParams,
   authorization: string,
-): Promise<string> {
-  return withPassportError<string>(async () => {
-    const [userAddress, starkPublicKey] = await Promise.all([
-      ethSigner.getAddress(),
-      starkSigner.getAddress(),
-    ]);
+): Promise<RegisterUserResponse> {
+  const [userAddress, starkPublicKey] = await Promise.all([
+    ethSigner.getAddress(),
+    starkSigner.getAddress(),
+  ]);
 
-    const signableResult = await usersApi.getSignableRegistrationOffchain({
-      getSignableRegistrationRequest: {
-        ether_key: userAddress,
-        stark_key: starkPublicKey,
-      },
-    });
+  const signableResult = await usersApi.getSignableRegistrationOffchain({
+    getSignableRegistrationRequest: {
+      ether_key: userAddress,
+      stark_key: starkPublicKey,
+    },
+  });
 
-    const { signable_message: signableMessage, payload_hash: payloadHash } = signableResult.data;
-    const [ethSignature, starkSignature] = await Promise.all([
-      signRaw(signableMessage, ethSigner),
-      starkSigner.signMessage(payloadHash),
-    ]);
+  const { signable_message: signableMessage, payload_hash: payloadHash } = signableResult.data;
+  const [ethSignature, starkSignature] = await Promise.all([
+    signRaw(signableMessage, ethSigner),
+    starkSigner.signMessage(payloadHash),
+  ]);
 
-    const response = await usersApi.registerPassportUser({
-      authorization: `Bearer ${authorization}`,
-      registerPassportUserRequest: {
-        eth_signature: ethSignature,
-        ether_key: userAddress,
-        stark_signature: starkSignature,
-        stark_key: starkPublicKey,
-      },
-    });
-    return response.statusText;
-  }, PassportErrorType.USER_REGISTRATION_ERROR);
+  const response = await usersApi.registerPassportUser({
+    authorization: `Bearer ${authorization}`,
+    registerPassportUserRequest: {
+      eth_signature: ethSignature,
+      ether_key: userAddress,
+      stark_signature: starkSignature,
+      stark_key: starkPublicKey,
+    },
+  });
+  return response.data as RegisterUserResponse;
 }

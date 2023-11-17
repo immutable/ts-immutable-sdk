@@ -3,14 +3,14 @@ import { Box, MenuItem } from '@biom3/react';
 import { text } from '../../../resources/text/textConfig';
 
 export interface WalletProps {
-  onWalletClick: (walletProvider: WalletProviderName) => void;
+  onWalletClick: (walletProviderName: WalletProviderName) => void;
   wallet: WalletInfo;
 }
 export function WalletItem(props: WalletProps) {
   const { wallet, onWalletClick } = props;
   const { wallets } = text;
 
-  const walletText = wallets[wallet.walletProvider];
+  const walletText = wallets[wallet.walletProviderName];
   const logo = {
     [WalletProviderName.PASSPORT]: 'PassportSymbolOutlined',
     [WalletProviderName.METAMASK]: 'MetaMaskSymbol',
@@ -24,14 +24,14 @@ export function WalletItem(props: WalletProps) {
     <>
       {walletText && (
         <MenuItem
-          testId={`wallet-list-${wallet.walletProvider}`}
+          testId={`wallet-list-${wallet.walletProviderName}`}
           size="medium"
           emphasized
-          onClick={() => onWalletClick(wallet.walletProvider)}
+          onClick={() => onWalletClick(wallet.walletProviderName)}
           sx={{ marginBottom: 'base.spacing.x1' }}
         >
           <MenuItem.FramedLogo
-            logo={logo[wallet.walletProvider] as any}
+            logo={logo[wallet.walletProviderName] as any}
             sx={{
               minWidth: 'base.icon.size.500',
               padding: 'base.spacing.x1',
@@ -40,17 +40,17 @@ export function WalletItem(props: WalletProps) {
             }}
           />
           <MenuItem.Label size="medium">
-            {wallets[wallet.walletProvider].heading}
+            {wallets[wallet.walletProviderName].heading}
           </MenuItem.Label>
           <MenuItem.IntentIcon />
           <MenuItem.Caption>
-            {wallet.walletProvider === WalletProviderName.PASSPORT ? (
+            {wallet.walletProviderName === WalletProviderName.PASSPORT ? (
               <Box rc={<span />} sx={{ c: 'base.gradient.1' }}>
-                {wallets[wallet.walletProvider].accentText}
+                {wallets[wallet.walletProviderName].accentText}
               </Box>
             ) : null}
             {' '}
-            {wallets[wallet.walletProvider].description}
+            {wallets[wallet.walletProviderName].description}
           </MenuItem.Caption>
         </MenuItem>
       )}

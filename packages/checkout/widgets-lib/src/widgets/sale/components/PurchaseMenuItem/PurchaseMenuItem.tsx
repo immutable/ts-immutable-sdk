@@ -26,14 +26,17 @@ export function PurchaseMenuItem({ fundingRoute }: PurchaseMenuItemProps) {
     if (!cryptoFiatState.conversions) {
       return;
     }
-
-    setUsdPurchaseAmount(
-      calculateCryptoToFiat(
-        firstFundingStep.fundingItem.fundsRequired.formattedAmount,
-        firstFundingStep.fundingItem.token.symbol,
-        cryptoFiatState.conversions,
-      ),
-    );
+    try {
+      setUsdPurchaseAmount(
+        calculateCryptoToFiat(
+          firstFundingStep.fundingItem.fundsRequired.formattedAmount,
+          firstFundingStep.fundingItem.token.symbol,
+          cryptoFiatState.conversions,
+        ),
+      );
+    } catch {
+      setUsdPurchaseAmount(undefined);
+    }
   }, [cryptoFiatState, fundingRoute]);
 
   return (
@@ -41,7 +44,7 @@ export function PurchaseMenuItem({ fundingRoute }: PurchaseMenuItemProps) {
       emphasized
       testId="funding-route-purchase-item"
       size="medium"
-      key={firstItem.name}
+      key={firstItem?.name}
     >
       <MenuItem.FramedImage
         imageUrl={firstItem?.image}

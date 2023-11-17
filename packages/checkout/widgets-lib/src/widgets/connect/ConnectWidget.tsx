@@ -1,17 +1,18 @@
 /* eslint-disable react/jsx-no-constructed-context-values */
-
-import { Web3Provider } from '@ethersproject/providers';
-import { BiomeCombinedProviders } from '@biom3/react';
-import { Checkout } from '@imtbl/checkout-sdk';
-import {
+import React, {
   useContext, useMemo, useEffect, useReducer, useCallback,
 } from 'react';
-import { Passport } from '@imtbl/passport';
+import { BiomeCombinedProviders } from '@biom3/react';
+import {
+  ChainId,
+  Checkout, ConnectTargetLayer, ConnectWidgetParams,
+} from '@imtbl/checkout-sdk';
+import { Web3Provider } from '@ethersproject/providers';
 import {
   sendCloseWidgetEvent,
   sendConnectFailedEvent,
   sendConnectSuccessEvent,
-} from './ConnectWidgetEvents';
+} from './connectWidgetEvents';
 import {
   ConnectActions,
   ConnectContext,
@@ -34,7 +35,7 @@ import {
 import { StatusType } from '../../components/Status/StatusType';
 import { StatusView } from '../../components/Status/StatusView';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { ConnectTargetLayer, getTargetLayerChainId } from '../../lib';
+import { getTargetLayerChainId, sendProviderUpdatedEvent } from '../../lib';
 import { SwitchNetworkEth } from './views/SwitchNetworkEth';
 import { ErrorView } from '../../views/error/ErrorView';
 import { text } from '../../resources/text/textConfig';
@@ -43,23 +44,25 @@ import { widgetTheme } from '../../lib/theme';
 import { UserJourney, useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { identifyUser } from '../../lib/analytics/identifyUser';
 
-export interface ConnectWidgetProps {
-  params?: ConnectWidgetParams;
+export type ConnectWidgetInputs = ConnectWidgetParams & {
   config: StrongCheckoutWidgetsConfig
   deepLink?: ConnectWidgetViews;
   sendCloseEventOverride?: () => void;
-}
-
-export interface ConnectWidgetParams {
-  targetLayer?: ConnectTargetLayer
+  targetLayer?: ConnectTargetLayer;
+  allowedChains?: ChainId[];
+  checkout: Checkout;
   web3Provider?: Web3Provider;
-  passport?: Passport;
-}
+};
 
-export function ConnectWidget(props: ConnectWidgetProps) {
-  const { config, sendCloseEventOverride, params } = props;
-  const { targetLayer, web3Provider, passport } = params ?? {}; // nullish operator handles if params is undefined
-  const { deepLink = ConnectWidgetViews.CONNECT_WALLET } = props;
+export function ConnectWidget({
+  config,
+  sendCloseEventOverride,
+  web3Provider,
+  checkout,
+  targetLayer,
+  allowedChains,
+  deepLink = ConnectWidgetViews.CONNECT_WALLET,
+}: ConnectWidgetInputs) {
   const { environment, theme } = config;
 
   const errorText = text.views[SharedViews.ERROR_VIEW].actionText;
@@ -84,7 +87,6 @@ export function ConnectWidget(props: ConnectWidgetProps) {
 
   const networkToSwitchTo = targetLayer ?? ConnectTargetLayer.LAYER2;
 
-  const checkout = new Checkout({ baseConfig: { environment } });
   const targetChainId = getTargetLayerChainId(checkout.config, targetLayer ?? ConnectTargetLayer.LAYER2);
 
   const { identify, page } = useAnalytics();
@@ -100,23 +102,21 @@ export function ConnectWidget(props: ConnectWidgetProps) {
   }, [web3Provider]);
 
   useEffect(() => {
-    if (!passport) return;
-
-    connectDispatch({
-      payload: {
-        type: ConnectActions.SET_PASSPORT,
-        passport,
-      },
-    });
-  }, [passport]);
-
-  useEffect(() => {
     connectDispatch({
       payload: {
         type: ConnectActions.SET_CHECKOUT,
         checkout,
       },
     });
+
+    if (checkout.passport) {
+      connectDispatch({
+        payload: {
+          type: ConnectActions.SET_PASSPORT,
+          passport: checkout.passport,
+        },
+      });
+    }
 
     connectDispatch({
       payload: {
@@ -147,6 +147,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
       screen: 'ConnectSuccess',
     });
     await identifyUser(identify, provider);
+    sendProviderUpdatedEvent({ provider });
     sendConnectSuccessEvent(eventTarget, provider, walletProviderName ?? undefined);
   }, [provider, identify]);
 
@@ -156,31 +157,31 @@ export function ConnectWidget(props: ConnectWidgetProps) {
         <ConnectContext.Provider value={connectReducerValues}>
           <>
             {view.type === SharedViews.LOADING_VIEW && (
-              <LoadingView loadingText="Connecting" />
+              <LoadingView loadingText="Loading" />
             )}
             {view.type === ConnectWidgetViews.CONNECT_WALLET && (
-              <ConnectWallet />
+            <ConnectWallet />
             )}
             {view.type === ConnectWidgetViews.READY_TO_CONNECT && (
-              <ReadyToConnect targetChainId={targetChainId} />
+            <ReadyToConnect targetChainId={targetChainId} allowedChains={allowedChains ?? [targetChainId]} />
             )}
             {view.type === ConnectWidgetViews.SWITCH_NETWORK && networkToSwitchTo === ConnectTargetLayer.LAYER2 && (
-              <SwitchNetworkZkEVM />
+            <SwitchNetworkZkEVM />
             )}
             {view.type === ConnectWidgetViews.SWITCH_NETWORK && networkToSwitchTo === ConnectTargetLayer.LAYER1 && (
-              <SwitchNetworkEth />
+            <SwitchNetworkEth />
             )}
             {view.type === ConnectWidgetViews.SUCCESS && provider && (
-              <ConnectLoaderSuccess>
-                <StatusView
-                  statusText="Connection secure"
-                  actionText="Continue"
-                  onActionClick={() => sendCloseEvent()}
-                  onRenderEvent={handleConnectSuccess}
-                  statusType={StatusType.SUCCESS}
-                  testId="success-view"
-                />
-              </ConnectLoaderSuccess>
+            <ConnectLoaderSuccess>
+              <StatusView
+                statusText="Connection secure"
+                actionText="Continue"
+                onActionClick={() => sendCloseEvent()}
+                onRenderEvent={handleConnectSuccess}
+                statusType={StatusType.SUCCESS}
+                testId="success-view"
+              />
+            </ConnectLoaderSuccess>
             )}
             {((view.type === ConnectWidgetViews.SUCCESS && !provider)
             || view.type === SharedViews.ERROR_VIEW)

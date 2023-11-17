@@ -389,7 +389,7 @@ describe('Seaport', () => {
 
       const immutableOrder: Order = {
         account_address: offerer,
-        buy: [{ item_type: 'NATIVE', start_amount: '100' }],
+        buy: [{ item_type: 'NATIVE', amount: '100' }],
         fees: [],
         chain: { id: '1', name: 'imtbl-zkevm-local' },
         created_at: new Date().toISOString(),
@@ -420,6 +420,11 @@ describe('Seaport', () => {
         const mockedSeaportJs = mock(SeaportLib);
         const mockedSeaportLibFactory = mock(SeaportLibFactory);
         const mockedProvider = mock(providers.JsonRpcProvider);
+        when(mockedProvider.getNetwork()).thenReturn(
+          Promise.resolve({
+            chainId: 0,
+          } as any),
+        );
 
         const exchangeTransactionMethods = mock<TransactionMethods<boolean>>();
         const exchangeAction = mock<ExchangeAction<any>>();

@@ -1,19 +1,17 @@
-import { EthSigner, StarkSigner } from '@imtbl/core-sdk';
 import { ImmutableXClient } from '@imtbl/immutablex-client';
-import { Web3Provider } from '@ethersproject/providers';
-import registerPassportStarkEx from './workflows/registration';
-import { retryWithDelay } from '../network/retry';
-import { PassportError, PassportErrorType, withPassportError } from '../errors/passportError';
+import { IMXProvider } from '@imtbl/provider';
+import { PassportError, PassportErrorType } from '../errors/passportError';
 import { PassportConfiguration } from '../config';
 import AuthManager from '../authManager';
 import { ConfirmationScreen } from '../confirmation';
 import MagicAdapter from '../magicAdapter';
 import {
-  DeviceTokenResponse, PassportEventMap, User, UserImx,
+  DeviceTokenResponse,
+  PassportEventMap,
+  User,
 } from '../types';
-import { PassportImxProvider } from './passportImxProvider';
-import { getStarkSigner } from './getStarkSigner';
 import TypedEventEmitter from '../utils/typedEventEmitter';
+import { PassportImxProvider } from './passportImxProvider';
 
 export type PassportImxProviderFactoryInput = {
   authManager: AuthManager;
@@ -53,10 +51,10 @@ export class PassportImxProviderFactory {
     this.passportEventEmitter = passportEventEmitter;
   }
 
-  public async getProvider(): Promise<PassportImxProvider> {
+  public async getProvider(): Promise<IMXProvider> {
     let user = null;
     try {
-      user = await this.authManager.loginSilent();
+      user = await this.authManager.getUser();
     } catch (e) {
       // eslint-disable-next-line no-console
       console.warn(e);
@@ -67,8 +65,8 @@ export class PassportImxProviderFactory {
     return this.createProviderInstance(user);
   }
 
-  public async getProviderSilent(): Promise<PassportImxProvider | null> {
-    const user = await this.authManager.loginSilent();
+  public async getProviderSilent(): Promise<IMXProvider | null> {
+    const user = await this.authManager.getUser();
     if (!user) {
       return null;
     }
@@ -80,17 +78,17 @@ export class PassportImxProviderFactory {
     deviceCode: string,
     interval: number,
     timeoutMs?: number,
-  ): Promise<PassportImxProvider> {
+  ): Promise<IMXProvider> {
     const user = await this.authManager.connectImxDeviceFlow(deviceCode, interval, timeoutMs);
     return this.createProviderInstance(user);
   }
 
-  public async getProviderWithPKCEFlow(authorizationCode: string, state: string): Promise<PassportImxProvider> {
+  public async getProviderWithPKCEFlow(authorizationCode: string, state: string): Promise<IMXProvider> {
     const user = await this.authManager.connectImxPKCEFlow(authorizationCode, state);
     return this.createProviderInstance(user);
   }
 
-  public async getProviderWithCredentials(tokenResponse: DeviceTokenResponse): Promise<PassportImxProvider | null> {
+  public async getProviderWithCredentials(tokenResponse: DeviceTokenResponse): Promise<IMXProvider | null> {
     const user = await this.authManager.connectImxWithCredentials(tokenResponse);
     if (!user) {
       return null;
@@ -99,7 +97,7 @@ export class PassportImxProviderFactory {
     return this.createProviderInstance(user);
   }
 
-  private async createProviderInstance(user: User): Promise<PassportImxProvider> {
+  private async createProviderInstance(user: User): Promise<IMXProvider> {
     if (!user.idToken) {
       throw new PassportError(
         'Failed to initialise',
@@ -107,57 +105,13 @@ export class PassportImxProviderFactory {
       );
     }
 
-    const magicRpcProvider = await this.magicAdapter.login(user.idToken);
-    const web3Provider = new Web3Provider(
-      magicRpcProvider,
-    );
-    const ethSigner = web3Provider.getSigner();
-    const starkSigner = await getStarkSigner(ethSigner);
-
-    if (!user.imx?.ethAddress) {
-      await this.registerStarkEx(ethSigner, starkSigner, user.accessToken);
-      return new PassportImxProvider({
-        authManager: this.authManager,
-        starkSigner,
-        immutableXClient: this.immutableXClient,
-        confirmationScreen: this.confirmationScreen,
-        config: this.config,
-        passportEventEmitter: this.passportEventEmitter,
-      });
-    }
-
     return new PassportImxProvider({
+      config: this.config,
       authManager: this.authManager,
-      starkSigner,
       immutableXClient: this.immutableXClient,
       confirmationScreen: this.confirmationScreen,
-      config: this.config,
       passportEventEmitter: this.passportEventEmitter,
+      magicAdapter: this.magicAdapter,
     });
-  }
-
-  private async registerStarkEx(userAdminKeySigner: EthSigner, starkSigner: StarkSigner, jwt: string) {
-    return withPassportError<UserImx>(async () => {
-      await registerPassportStarkEx(
-        {
-          ethSigner: userAdminKeySigner,
-          starkSigner,
-          usersApi: this.immutableXClient.usersApi,
-        },
-        jwt,
-      );
-
-      // User metadata is updated asynchronously. Poll userinfo endpoint until it is updated.
-      const updatedUser = await retryWithDelay<User | null>(async () => {
-        const user = await this.authManager.loginSilent({ forceRefresh: true }); // force refresh to get updated user info
-        const metadataExists = !!user?.imx;
-        if (metadataExists) {
-          return user;
-        }
-        return Promise.reject(new Error('user wallet addresses not exist'));
-      });
-
-      return updatedUser as UserImx;
-    }, PassportErrorType.REFRESH_TOKEN_ERROR);
   }
 }

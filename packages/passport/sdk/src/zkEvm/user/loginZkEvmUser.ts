@@ -1,5 +1,5 @@
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
-import { ExternalProvider } from '@ethersproject/providers';
+import { ExternalProvider, JsonRpcProvider } from '@ethersproject/providers';
 import { registerZkEvmUser } from './registerZkEvmUser';
 import { UserZkEvm } from '../../types';
 import AuthManager from '../../authManager';
@@ -11,6 +11,7 @@ type LoginZkEvmUserInput = {
   config: PassportConfiguration;
   magicAdapter: MagicAdapter;
   multiRollupApiClients: MultiRollupApiClients;
+  jsonRpcProvider: JsonRpcProvider;
 };
 
 type LoginZkEvmUserOutput = {
@@ -22,8 +23,18 @@ export const loginZkEvmUser = async ({
   authManager,
   magicAdapter,
   multiRollupApiClients,
+  jsonRpcProvider,
 }: LoginZkEvmUserInput): Promise<LoginZkEvmUserOutput> => {
-  const user = await authManager.loginSilent() || await authManager.login();
+  let user = null;
+  try {
+    user = await authManager.getUser();
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.warn('eth_requestAccounts` failed to retrieve a cached user session:', err);
+  }
+  if (!user) {
+    user = await authManager.login();
+  }
   if (!user.idToken) {
     throw new Error('User is missing idToken');
   }
@@ -39,6 +50,7 @@ export const loginZkEvmUser = async ({
       magicProvider,
       multiRollupApiClients,
       accessToken: user.accessToken,
+      jsonRpcProvider,
     });
 
     return {
