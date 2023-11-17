@@ -122,7 +122,7 @@ When you develop locally, the widgets-sample-app installs and imports the widget
 
 In production however, the widgets-lib package is built as a browser bundle and is dynamically included in the DOM when you call `await checkout.widgets()`.
 
-To test this setup locally you will need to run
+To test this setup locally and force the widgets bundle to be loaded from `localhost` you will need to run
 
 ```
 cd sdk
