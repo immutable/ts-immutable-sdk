@@ -138,12 +138,7 @@ export declare namespace IV3SwapRouter {
 
 export interface SecondaryFeeInterface extends utils.Interface {
   functions: {
-    "BASIS_POINT_PRECISION()": FunctionFragment;
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
-    "FEE_BASIS_POINTS_MAXIMUM()": FunctionFragment;
-    "PAUSE()": FunctionFragment;
-    "UNPAUSE()": FunctionFragment;
-    "WITHDRAW()": FunctionFragment;
     "exactInputSingleWithSecondaryFee((address,uint256)[],(address,address,uint24,address,uint256,uint256,uint160))": FunctionFragment;
     "exactInputWithSecondaryFee((address,uint256)[],(bytes,address,uint256,uint256))": FunctionFragment;
     "exactOutputSingleWithSecondaryFee((address,uint256)[],(address,address,uint24,address,uint256,uint256,uint160))": FunctionFragment;
@@ -155,22 +150,20 @@ export interface SecondaryFeeInterface extends utils.Interface {
     "multicall(bytes[])": FunctionFragment;
     "pause()": FunctionFragment;
     "paused()": FunctionFragment;
+    "peripheryPayments()": FunctionFragment;
     "renounceRole(bytes32,address)": FunctionFragment;
     "revokeRole(bytes32,address)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "uniswapRouter()": FunctionFragment;
     "unpause()": FunctionFragment;
+    "unwrapNativeToken(uint256)": FunctionFragment;
+    "wimx()": FunctionFragment;
     "withdrawFunds(address,address)": FunctionFragment;
   };
 
   getFunction(
     nameOrSignatureOrTopic:
-      | "BASIS_POINT_PRECISION"
       | "DEFAULT_ADMIN_ROLE"
-      | "FEE_BASIS_POINTS_MAXIMUM"
-      | "PAUSE"
-      | "UNPAUSE"
-      | "WITHDRAW"
       | "exactInputSingleWithSecondaryFee"
       | "exactInputWithSecondaryFee"
       | "exactOutputSingleWithSecondaryFee"
@@ -182,29 +175,21 @@ export interface SecondaryFeeInterface extends utils.Interface {
       | "multicall(bytes[])"
       | "pause"
       | "paused"
+      | "peripheryPayments"
       | "renounceRole"
       | "revokeRole"
       | "supportsInterface"
       | "uniswapRouter"
       | "unpause"
+      | "unwrapNativeToken"
+      | "wimx"
       | "withdrawFunds"
   ): FunctionFragment;
 
   encodeFunctionData(
-    functionFragment: "BASIS_POINT_PRECISION",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "DEFAULT_ADMIN_ROLE",
     values?: undefined
   ): string;
-  encodeFunctionData(
-    functionFragment: "FEE_BASIS_POINTS_MAXIMUM",
-    values?: undefined
-  ): string;
-  encodeFunctionData(functionFragment: "PAUSE", values?: undefined): string;
-  encodeFunctionData(functionFragment: "UNPAUSE", values?: undefined): string;
-  encodeFunctionData(functionFragment: "WITHDRAW", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "exactInputSingleWithSecondaryFee",
     values: [
@@ -256,6 +241,10 @@ export interface SecondaryFeeInterface extends utils.Interface {
   encodeFunctionData(functionFragment: "pause", values?: undefined): string;
   encodeFunctionData(functionFragment: "paused", values?: undefined): string;
   encodeFunctionData(
+    functionFragment: "peripheryPayments",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "renounceRole",
     values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]
   ): string;
@@ -273,25 +262,19 @@ export interface SecondaryFeeInterface extends utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
   encodeFunctionData(
+    functionFragment: "unwrapNativeToken",
+    values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(functionFragment: "wimx", values?: undefined): string;
+  encodeFunctionData(
     functionFragment: "withdrawFunds",
     values: [PromiseOrValue<string>, PromiseOrValue<string>]
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "BASIS_POINT_PRECISION",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "DEFAULT_ADMIN_ROLE",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "FEE_BASIS_POINTS_MAXIMUM",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "PAUSE", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "UNPAUSE", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "WITHDRAW", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "exactInputSingleWithSecondaryFee",
     data: BytesLike
@@ -325,6 +308,10 @@ export interface SecondaryFeeInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "peripheryPayments",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "renounceRole",
     data: BytesLike
   ): Result;
@@ -339,12 +326,18 @@ export interface SecondaryFeeInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "unwrapNativeToken",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "wimx", data: BytesLike): Result;
+  decodeFunctionResult(
     functionFragment: "withdrawFunds",
     data: BytesLike
   ): Result;
 
   events: {
     "FeeTaken(address,address,address,uint256)": EventFragment;
+    "FeeTaken(address,address,uint256)": EventFragment;
     "Paused(address)": EventFragment;
     "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
     "RoleGranted(bytes32,address,address)": EventFragment;
@@ -352,7 +345,12 @@ export interface SecondaryFeeInterface extends utils.Interface {
     "Unpaused(address)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "FeeTaken"): EventFragment;
+  getEvent(
+    nameOrSignatureOrTopic: "FeeTaken(address,address,address,uint256)"
+  ): EventFragment;
+  getEvent(
+    nameOrSignatureOrTopic: "FeeTaken(address,address,uint256)"
+  ): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleAdminChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleGranted"): EventFragment;
@@ -360,18 +358,32 @@ export interface SecondaryFeeInterface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
 }
 
-export interface FeeTakenEventObject {
+export interface FeeTaken_address_address_address_uint256_EventObject {
   feeToken: string;
   feePayer: string;
   feeRecipient: string;
   feeAmount: BigNumber;
 }
-export type FeeTakenEvent = TypedEvent<
+export type FeeTaken_address_address_address_uint256_Event = TypedEvent<
   [string, string, string, BigNumber],
-  FeeTakenEventObject
+  FeeTaken_address_address_address_uint256_EventObject
 >;
 
-export type FeeTakenEventFilter = TypedEventFilter<FeeTakenEvent>;
+export type FeeTaken_address_address_address_uint256_EventFilter =
+  TypedEventFilter<FeeTaken_address_address_address_uint256_Event>;
+
+export interface FeeTaken_address_address_uint256_EventObject {
+  feePayer: string;
+  feeRecipient: string;
+  feeAmount: BigNumber;
+}
+export type FeeTaken_address_address_uint256_Event = TypedEvent<
+  [string, string, BigNumber],
+  FeeTaken_address_address_uint256_EventObject
+>;
+
+export type FeeTaken_address_address_uint256_EventFilter =
+  TypedEventFilter<FeeTaken_address_address_uint256_Event>;
 
 export interface PausedEventObject {
   account: string;
@@ -451,17 +463,7 @@ export interface SecondaryFee extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    BASIS_POINT_PRECISION(overrides?: CallOverrides): Promise<[BigNumber]>;
-
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
-
-    FEE_BASIS_POINTS_MAXIMUM(overrides?: CallOverrides): Promise<[number]>;
-
-    PAUSE(overrides?: CallOverrides): Promise<[string]>;
-
-    UNPAUSE(overrides?: CallOverrides): Promise<[string]>;
-
-    WITHDRAW(overrides?: CallOverrides): Promise<[string]>;
 
     exactInputSingleWithSecondaryFee(
       secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
@@ -521,6 +523,8 @@ export interface SecondaryFee extends BaseContract {
 
     paused(overrides?: CallOverrides): Promise<[boolean]>;
 
+    peripheryPayments(overrides?: CallOverrides): Promise<[string]>;
+
     renounceRole(
       role: PromiseOrValue<BytesLike>,
       account: PromiseOrValue<string>,
@@ -544,6 +548,13 @@ export interface SecondaryFee extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    unwrapNativeToken(
+      amountMinimum: PromiseOrValue<BigNumberish>,
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    wimx(overrides?: CallOverrides): Promise<[string]>;
+
     withdrawFunds(
       to: PromiseOrValue<string>,
       erc20: PromiseOrValue<string>,
@@ -551,17 +562,7 @@ export interface SecondaryFee extends BaseContract {
     ): Promise<ContractTransaction>;
   };
 
-  BASIS_POINT_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
-
   DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
-
-  FEE_BASIS_POINTS_MAXIMUM(overrides?: CallOverrides): Promise<number>;
-
-  PAUSE(overrides?: CallOverrides): Promise<string>;
-
-  UNPAUSE(overrides?: CallOverrides): Promise<string>;
-
-  WITHDRAW(overrides?: CallOverrides): Promise<string>;
 
   exactInputSingleWithSecondaryFee(
     secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
@@ -621,6 +622,8 @@ export interface SecondaryFee extends BaseContract {
 
   paused(overrides?: CallOverrides): Promise<boolean>;
 
+  peripheryPayments(overrides?: CallOverrides): Promise<string>;
+
   renounceRole(
     role: PromiseOrValue<BytesLike>,
     account: PromiseOrValue<string>,
@@ -644,6 +647,13 @@ export interface SecondaryFee extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  unwrapNativeToken(
+    amountMinimum: PromiseOrValue<BigNumberish>,
+    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  wimx(overrides?: CallOverrides): Promise<string>;
+
   withdrawFunds(
     to: PromiseOrValue<string>,
     erc20: PromiseOrValue<string>,
@@ -651,17 +661,7 @@ export interface SecondaryFee extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    BASIS_POINT_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
-
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
-
-    FEE_BASIS_POINTS_MAXIMUM(overrides?: CallOverrides): Promise<number>;
-
-    PAUSE(overrides?: CallOverrides): Promise<string>;
-
-    UNPAUSE(overrides?: CallOverrides): Promise<string>;
-
-    WITHDRAW(overrides?: CallOverrides): Promise<string>;
 
     exactInputSingleWithSecondaryFee(
       secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
@@ -719,6 +719,8 @@ export interface SecondaryFee extends BaseContract {
 
     paused(overrides?: CallOverrides): Promise<boolean>;
 
+    peripheryPayments(overrides?: CallOverrides): Promise<string>;
+
     renounceRole(
       role: PromiseOrValue<BytesLike>,
       account: PromiseOrValue<string>,
@@ -740,6 +742,13 @@ export interface SecondaryFee extends BaseContract {
 
     unpause(overrides?: CallOverrides): Promise<void>;
 
+    unwrapNativeToken(
+      amountMinimum: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    wimx(overrides?: CallOverrides): Promise<string>;
+
     withdrawFunds(
       to: PromiseOrValue<string>,
       erc20: PromiseOrValue<string>,
@@ -753,13 +762,12 @@ export interface SecondaryFee extends BaseContract {
       feePayer?: PromiseOrValue<string> | null,
       feeRecipient?: PromiseOrValue<string> | null,
       feeAmount?: null
-    ): FeeTakenEventFilter;
-    FeeTaken(
-      feeToken?: PromiseOrValue<string> | null,
+    ): FeeTaken_address_address_address_uint256_EventFilter;
+    "FeeTaken(address,address,uint256)"(
       feePayer?: PromiseOrValue<string> | null,
       feeRecipient?: PromiseOrValue<string> | null,
       feeAmount?: null
-    ): FeeTakenEventFilter;
+    ): FeeTaken_address_address_uint256_EventFilter;
 
     "Paused(address)"(account?: null): PausedEventFilter;
     Paused(account?: null): PausedEventFilter;
@@ -802,17 +810,7 @@ export interface SecondaryFee extends BaseContract {
   };
 
   estimateGas: {
-    BASIS_POINT_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
-
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
-
-    FEE_BASIS_POINTS_MAXIMUM(overrides?: CallOverrides): Promise<BigNumber>;
-
-    PAUSE(overrides?: CallOverrides): Promise<BigNumber>;
-
-    UNPAUSE(overrides?: CallOverrides): Promise<BigNumber>;
-
-    WITHDRAW(overrides?: CallOverrides): Promise<BigNumber>;
 
     exactInputSingleWithSecondaryFee(
       secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
@@ -872,6 +870,8 @@ export interface SecondaryFee extends BaseContract {
 
     paused(overrides?: CallOverrides): Promise<BigNumber>;
 
+    peripheryPayments(overrides?: CallOverrides): Promise<BigNumber>;
+
     renounceRole(
       role: PromiseOrValue<BytesLike>,
       account: PromiseOrValue<string>,
@@ -895,6 +895,13 @@ export interface SecondaryFee extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
+    unwrapNativeToken(
+      amountMinimum: PromiseOrValue<BigNumberish>,
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    wimx(overrides?: CallOverrides): Promise<BigNumber>;
+
     withdrawFunds(
       to: PromiseOrValue<string>,
       erc20: PromiseOrValue<string>,
@@ -903,23 +910,9 @@ export interface SecondaryFee extends BaseContract {
   };
 
   populateTransaction: {
-    BASIS_POINT_PRECISION(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     DEFAULT_ADMIN_ROLE(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
-
-    FEE_BASIS_POINTS_MAXIMUM(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    PAUSE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    UNPAUSE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    WITHDRAW(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     exactInputSingleWithSecondaryFee(
       secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
@@ -979,6 +972,8 @@ export interface SecondaryFee extends BaseContract {
 
     paused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    peripheryPayments(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     renounceRole(
       role: PromiseOrValue<BytesLike>,
       account: PromiseOrValue<string>,
@@ -1001,6 +996,13 @@ export interface SecondaryFee extends BaseContract {
     unpause(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
+
+    unwrapNativeToken(
+      amountMinimum: PromiseOrValue<BigNumberish>,
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    wimx(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     withdrawFunds(
       to: PromiseOrValue<string>,
