@@ -1,4 +1,3 @@
-import { BiomeCombinedProviders } from '@biom3/react';
 import {
   BridgeFundingStep,
   ChainId, FundingRoute, FundingStepType, ItemType, SwapFundingStep, WidgetTheme,
@@ -7,6 +6,7 @@ import { Environment } from '@imtbl/config';
 import { mount } from 'cypress/react18';
 import { BigNumber, utils } from 'ethers';
 import { cy, describe } from 'local-cypress';
+import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { CustomAnalyticsProvider } from '../../../../context/analytics-provider/CustomAnalyticsProvider';
 import { cyIntercept, cySmartGet } from '../../../../lib/testUtils';
 import { StrongCheckoutWidgetsConfig } from '../../../../lib/withDefaultWidgetConfig';
@@ -107,9 +107,9 @@ describe('FundingRouteSelect View', () => {
     beforeEach(() => {
       mount(
         <CustomAnalyticsProvider widgetConfig={config}>
-          <BiomeCombinedProviders>
+          <ViewContextTestComponent>
             <FundingRouteSelect fundingRoutes={fundingRoutes} onFundingRouteSelected={() => {}} />
-          </BiomeCombinedProviders>
+          </ViewContextTestComponent>
         </CustomAnalyticsProvider>,
 
       );
@@ -142,9 +142,9 @@ describe('FundingRouteSelect View', () => {
     beforeEach(() => {
       mount(
         <CustomAnalyticsProvider widgetConfig={config}>
-          <BiomeCombinedProviders>
+          <ViewContextTestComponent>
             <FundingRouteSelect fundingRoutes={fundingRoutes} onFundingRouteSelected={() => {}} />
-          </BiomeCombinedProviders>
+          </ViewContextTestComponent>
         </CustomAnalyticsProvider>,
 
       );

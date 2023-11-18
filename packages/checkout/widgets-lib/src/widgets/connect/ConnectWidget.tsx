@@ -2,7 +2,6 @@
 import React, {
   useContext, useMemo, useEffect, useReducer, useCallback,
 } from 'react';
-import { BiomeCombinedProviders } from '@biom3/react';
 import {
   ChainId,
   Checkout, ConnectTargetLayer, ConnectWidgetParams,
@@ -40,7 +39,6 @@ import { SwitchNetworkEth } from './views/SwitchNetworkEth';
 import { ErrorView } from '../../views/error/ErrorView';
 import { text } from '../../resources/text/textConfig';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
-import { widgetTheme } from '../../lib/theme';
 import { UserJourney, useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { identifyUser } from '../../lib/analytics/identifyUser';
 
@@ -63,7 +61,7 @@ export function ConnectWidget({
   allowedChains,
   deepLink = ConnectWidgetViews.CONNECT_WALLET,
 }: ConnectWidgetInputs) {
-  const { environment, theme } = config;
+  const { environment } = config;
 
   const errorText = text.views[SharedViews.ERROR_VIEW].actionText;
 
@@ -83,7 +81,6 @@ export function ConnectWidget({
     () => ({ viewState, viewDispatch }),
     [viewState, viewDispatch],
   );
-  const themeReducerValue = useMemo(() => widgetTheme(theme), [theme]);
 
   const networkToSwitchTo = targetLayer ?? ConnectTargetLayer.LAYER2;
 
@@ -152,26 +149,25 @@ export function ConnectWidget({
   }, [provider, identify]);
 
   return (
-    <BiomeCombinedProviders theme={{ base: themeReducerValue }}>
-      <ViewContext.Provider value={viewReducerValues}>
-        <ConnectContext.Provider value={connectReducerValues}>
-          <>
-            {view.type === SharedViews.LOADING_VIEW && (
-              <LoadingView loadingText="Loading" />
-            )}
-            {view.type === ConnectWidgetViews.CONNECT_WALLET && (
+    <ViewContext.Provider value={viewReducerValues}>
+      <ConnectContext.Provider value={connectReducerValues}>
+        <>
+          {view.type === SharedViews.LOADING_VIEW && (
+          <LoadingView loadingText="Loading" />
+          )}
+          {view.type === ConnectWidgetViews.CONNECT_WALLET && (
             <ConnectWallet />
-            )}
-            {view.type === ConnectWidgetViews.READY_TO_CONNECT && (
+          )}
+          {view.type === ConnectWidgetViews.READY_TO_CONNECT && (
             <ReadyToConnect targetChainId={targetChainId} allowedChains={allowedChains ?? [targetChainId]} />
-            )}
-            {view.type === ConnectWidgetViews.SWITCH_NETWORK && networkToSwitchTo === ConnectTargetLayer.LAYER2 && (
+          )}
+          {view.type === ConnectWidgetViews.SWITCH_NETWORK && networkToSwitchTo === ConnectTargetLayer.LAYER2 && (
             <SwitchNetworkZkEVM />
-            )}
-            {view.type === ConnectWidgetViews.SWITCH_NETWORK && networkToSwitchTo === ConnectTargetLayer.LAYER1 && (
+          )}
+          {view.type === ConnectWidgetViews.SWITCH_NETWORK && networkToSwitchTo === ConnectTargetLayer.LAYER1 && (
             <SwitchNetworkEth />
-            )}
-            {view.type === ConnectWidgetViews.SUCCESS && provider && (
+          )}
+          {view.type === ConnectWidgetViews.SUCCESS && provider && (
             <ConnectLoaderSuccess>
               <StatusView
                 statusText="Connection secure"
@@ -182,8 +178,8 @@ export function ConnectWidget({
                 testId="success-view"
               />
             </ConnectLoaderSuccess>
-            )}
-            {((view.type === ConnectWidgetViews.SUCCESS && !provider)
+          )}
+          {((view.type === ConnectWidgetViews.SUCCESS && !provider)
             || view.type === SharedViews.ERROR_VIEW)
               && (
                 <ErrorView
@@ -201,9 +197,8 @@ export function ConnectWidget({
                   onCloseClick={() => sendCloseEvent()}
                 />
               )}
-          </>
-        </ConnectContext.Provider>
-      </ViewContext.Provider>
-    </BiomeCombinedProviders>
+        </>
+      </ConnectContext.Provider>
+    </ViewContext.Provider>
   );
 }

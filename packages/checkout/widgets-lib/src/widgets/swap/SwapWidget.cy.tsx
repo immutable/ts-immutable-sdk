@@ -7,8 +7,8 @@ import {
 } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
-import { BiomeCombinedProviders } from '@biom3/react';
 import { Web3Provider } from '@ethersproject/providers';
+import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { SwapWidget } from './SwapWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
@@ -477,7 +477,7 @@ describe('SwapWidget tests', () => {
           .resolves(mockQuoteFromAmountIn);
 
         mount(
-          <BiomeCombinedProviders>
+          <ViewContextTestComponent>
             <CustomAnalyticsProvider widgetConfig={config}>
               <ConnectLoaderTestComponent
                 initialStateOverride={connectLoaderState}
@@ -485,7 +485,7 @@ describe('SwapWidget tests', () => {
                 <SwapWidget {...params} config={config} />
               </ConnectLoaderTestComponent>
             </CustomAnalyticsProvider>
-          </BiomeCombinedProviders>,
+          </ViewContextTestComponent>,
         );
       });
 

@@ -2,7 +2,6 @@ import {
   beforeEach, cy, describe, it,
 } from 'local-cypress';
 import { mount } from 'cypress/react18';
-import { BiomeCombinedProviders } from '@biom3/react';
 import {
   IMTBLWidgetEvents, Checkout, GasEstimateType, WalletProviderName,
 } from '@imtbl/checkout-sdk';
@@ -12,6 +11,7 @@ import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
 import { UserJourney } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
 import { StrongCheckoutWidgetsConfig } from 'lib/withDefaultWidgetConfig';
+import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { TopUpView } from './TopUpView';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { orchestrationEvents } from '../../lib/orchestrationEvents';
@@ -39,7 +39,7 @@ describe('Top Up View', () => {
   describe('TopUpView render', () => {
     it('should render the top up view', () => {
       mount(
-        <BiomeCombinedProviders>
+        <ViewContextTestComponent>
           <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
             <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
               <TopUpView
@@ -52,7 +52,7 @@ describe('Top Up View', () => {
               />
             </ConnectLoaderTestComponent>
           </CustomAnalyticsProvider>
-        </BiomeCombinedProviders>,
+        </ViewContextTestComponent>,
       );
       cySmartGet('menu-item-onramp').should('exist');
       cySmartGet('menu-item-swap').should('exist');
@@ -61,7 +61,7 @@ describe('Top Up View', () => {
 
     it('should hide onramp option', () => {
       mount(
-        <BiomeCombinedProviders>
+        <ViewContextTestComponent>
           <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
             <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
               <TopUpView
@@ -74,7 +74,7 @@ describe('Top Up View', () => {
               />
             </ConnectLoaderTestComponent>
           </CustomAnalyticsProvider>
-        </BiomeCombinedProviders>,
+        </ViewContextTestComponent>,
       );
       cySmartGet('menu-item-onramp').should('not.exist');
       cySmartGet('menu-item-swap').should('exist');
@@ -83,7 +83,7 @@ describe('Top Up View', () => {
 
     it('should hide swap option', () => {
       mount(
-        <BiomeCombinedProviders>
+        <ViewContextTestComponent>
           <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
             <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
               <TopUpView
@@ -96,7 +96,7 @@ describe('Top Up View', () => {
               />
             </ConnectLoaderTestComponent>
           </CustomAnalyticsProvider>
-        </BiomeCombinedProviders>,
+        </ViewContextTestComponent>,
       );
       cySmartGet('menu-item-onramp').should('exist');
       cySmartGet('menu-item-swap').should('not.exist');
@@ -105,7 +105,7 @@ describe('Top Up View', () => {
 
     it('should hide bridge option', () => {
       mount(
-        <BiomeCombinedProviders>
+        <ViewContextTestComponent>
           <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
             <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
               <TopUpView
@@ -118,7 +118,7 @@ describe('Top Up View', () => {
               />
             </ConnectLoaderTestComponent>
           </CustomAnalyticsProvider>
-        </BiomeCombinedProviders>,
+        </ViewContextTestComponent>,
       );
       cySmartGet('menu-item-onramp').should('exist');
       cySmartGet('menu-item-swap').should('exist');
@@ -127,7 +127,7 @@ describe('Top Up View', () => {
 
     it('should hide bridge option when provider is Passport', () => {
       mount(
-        <BiomeCombinedProviders>
+        <ViewContextTestComponent>
           <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
             <ConnectLoaderTestComponent
               initialStateOverride={{
@@ -147,7 +147,7 @@ describe('Top Up View', () => {
               />
             </ConnectLoaderTestComponent>
           </CustomAnalyticsProvider>
-        </BiomeCombinedProviders>,
+        </ViewContextTestComponent>,
       );
       cySmartGet('menu-item-onramp').should('exist');
       cySmartGet('menu-item-swap').should('exist');
@@ -157,7 +157,7 @@ describe('Top Up View', () => {
     it('should call close function when close button clicked', () => {
       const closeFunction = cy.stub().as('closeFunction');
       mount(
-        <BiomeCombinedProviders>
+        <ViewContextTestComponent>
           <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
             <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
               <TopUpView
@@ -170,7 +170,7 @@ describe('Top Up View', () => {
               />
             </ConnectLoaderTestComponent>
           </CustomAnalyticsProvider>
-        </BiomeCombinedProviders>,
+        </ViewContextTestComponent>,
       );
       cySmartGet('menu-item-onramp').should('exist');
       cySmartGet('menu-item-swap').should('exist');
@@ -185,7 +185,7 @@ describe('Top Up View', () => {
       );
 
       mount(
-        <BiomeCombinedProviders>
+        <ViewContextTestComponent>
           <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
             <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
               <TopUpView
@@ -200,7 +200,7 @@ describe('Top Up View', () => {
               />
             </ConnectLoaderTestComponent>
           </CustomAnalyticsProvider>
-        </BiomeCombinedProviders>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('menu-item-onramp').click();
@@ -217,7 +217,7 @@ describe('Top Up View', () => {
       cy.stub(orchestrationEvents, 'sendRequestSwapEvent').as('sendRequestSwapEventStub');
 
       mount(
-        <BiomeCombinedProviders>
+        <ViewContextTestComponent>
           <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
             <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
               <TopUpView
@@ -232,7 +232,7 @@ describe('Top Up View', () => {
               />
             </ConnectLoaderTestComponent>
           </CustomAnalyticsProvider>
-        </BiomeCombinedProviders>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('menu-item-swap').click();
@@ -252,7 +252,7 @@ describe('Top Up View', () => {
       );
 
       mount(
-        <BiomeCombinedProviders>
+        <ViewContextTestComponent>
           <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
             <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
               <TopUpView
@@ -267,7 +267,7 @@ describe('Top Up View', () => {
               />
             </ConnectLoaderTestComponent>
           </CustomAnalyticsProvider>
-        </BiomeCombinedProviders>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('menu-item-bridge').click();
@@ -292,7 +292,7 @@ describe('Top Up View', () => {
         cy.stub(orchestrationEvents, 'sendRequestSwapEvent').as('sendRequestSwapEventStub');
 
         mount(
-          <BiomeCombinedProviders>
+          <ViewContextTestComponent>
             <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
               <ConnectLoaderTestComponent
                 initialStateOverride={connectLoaderState}
@@ -309,7 +309,7 @@ describe('Top Up View', () => {
                 />
               </ConnectLoaderTestComponent>
             </CustomAnalyticsProvider>
-          </BiomeCombinedProviders>,
+          </ViewContextTestComponent>,
         );
 
         cySmartGet('menu-item-swap')

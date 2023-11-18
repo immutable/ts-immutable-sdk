@@ -1,7 +1,7 @@
 import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
-import { BiomeCombinedProviders } from '@biom3/react';
 import { Environment } from '@imtbl/config';
+import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { TokenBalanceList } from './TokenBalanceList';
 import { cyIntercept, cySmartGet } from '../../../../lib/testUtils';
 import { ZERO_BALANCE_STRING } from '../../../../lib';
@@ -16,14 +16,14 @@ describe('TokenBalanceList', () => {
 
   it('should say no tokens found if balance info items empty', () => {
     mount(
-      <BiomeCombinedProviders>
+      <ViewContextTestComponent>
         <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
           <TokenBalanceList
             balanceInfoItems={[]}
             bridgeToL2OnClick={() => {}}
           />
         </CustomAnalyticsProvider>
-      </BiomeCombinedProviders>,
+      </ViewContextTestComponent>,
     );
 
     cySmartGet('no-tokens-found').should('have.text', 'No tokens found');
@@ -31,7 +31,7 @@ describe('TokenBalanceList', () => {
 
   it('should show native token when balance is zero', () => {
     mount(
-      <BiomeCombinedProviders>
+      <ViewContextTestComponent>
         <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
           <TokenBalanceList
             balanceInfoItems={[
@@ -45,7 +45,7 @@ describe('TokenBalanceList', () => {
             bridgeToL2OnClick={() => {}}
           />
         </CustomAnalyticsProvider>
-      </BiomeCombinedProviders>,
+      </ViewContextTestComponent>,
     );
 
     cySmartGet('balance-item-IMX').should('exist');
@@ -53,7 +53,7 @@ describe('TokenBalanceList', () => {
 
   it('should show non-zero balances', () => {
     mount(
-      <BiomeCombinedProviders>
+      <ViewContextTestComponent>
         <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
           <TokenBalanceList
             balanceInfoItems={[
@@ -81,7 +81,7 @@ describe('TokenBalanceList', () => {
             bridgeToL2OnClick={() => {}}
           />
         </CustomAnalyticsProvider>
-      </BiomeCombinedProviders>,
+      </ViewContextTestComponent>,
     );
 
     cySmartGet('balance-item-IMX').should('exist');

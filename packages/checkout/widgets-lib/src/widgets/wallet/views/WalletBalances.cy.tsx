@@ -4,10 +4,10 @@ import {
 } from '@imtbl/checkout-sdk';
 import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
-import { BiomeCombinedProviders } from '@biom3/react';
 import { BigNumber } from 'ethers';
 import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
+import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { WalletBalances } from './WalletBalances';
 import { WalletContext, WalletState } from '../context/WalletContext';
 import { cyIntercept, cySmartGet } from '../../../lib/testUtils';
@@ -402,7 +402,7 @@ describe('WalletBalances', () => {
           },
         };
         mount(
-          <BiomeCombinedProviders>
+          <ViewContextTestComponent>
             <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
               <ConnectLoaderTestComponent
                 initialStateOverride={connectLoaderState}
@@ -414,7 +414,7 @@ describe('WalletBalances', () => {
                 </WalletContext.Provider>
               </ConnectLoaderTestComponent>
             </CustomAnalyticsProvider>
-          </BiomeCombinedProviders>,
+          </ViewContextTestComponent>,
         );
         cySmartGet('add-coins').should('exist');
       });
@@ -430,7 +430,7 @@ describe('WalletBalances', () => {
         },
       };
       mount(
-        <BiomeCombinedProviders>
+        <ViewContextTestComponent>
           <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
             <ConnectLoaderTestComponent
               initialStateOverride={connectLoaderState}
@@ -442,7 +442,7 @@ describe('WalletBalances', () => {
               </WalletContext.Provider>
             </ConnectLoaderTestComponent>
           </CustomAnalyticsProvider>
-        </BiomeCombinedProviders>,
+        </ViewContextTestComponent>,
       );
       cySmartGet('add-coins').should('not.exist');
     });
@@ -464,7 +464,7 @@ describe('WalletBalances', () => {
         },
       };
       mount(
-        <BiomeCombinedProviders>
+        <ViewContextTestComponent>
           <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
             <ConnectLoaderTestComponent
               initialStateOverride={connectLoaderState}
@@ -476,7 +476,7 @@ describe('WalletBalances', () => {
               </WalletContext.Provider>
             </ConnectLoaderTestComponent>
           </CustomAnalyticsProvider>
-        </BiomeCombinedProviders>,
+        </ViewContextTestComponent>,
       );
       cySmartGet('add-coins').should('not.exist');
     });

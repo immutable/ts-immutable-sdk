@@ -17,6 +17,7 @@ import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyt
 import { BiomeCombinedProviders } from '@biom3/react';
 import { widgetTheme } from 'lib/theme';
 import { isValidWalletProvider, isValidAmount, isValidAddress } from 'lib/validations/widgetValidators';
+import { BaseTokens } from '@biom3/design-tokens';
 import { BridgeComingSoon } from './views/BridgeComingSoon';
 import { sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
 import { BridgeWidget } from './BridgeWidget';
@@ -64,6 +65,8 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
   }
 
   protected render() {
+    if (!this.reactRoot) return;
+
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER1,
       walletProviderName: this.parameters.walletProviderName,
@@ -75,21 +78,17 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
     const showBridgeComingSoonScreen = isPassportProvider(this.web3Provider)
       || this.parameters.walletProviderName === WalletProviderName.PASSPORT;
 
-    if (!this.reactRoot) return;
-
-    const theme = widgetTheme(this.strongConfig().theme);
+    const themeBase: BaseTokens = widgetTheme(this.strongConfig().theme);
 
     this.reactRoot.render(
       <React.StrictMode>
-        <CustomAnalyticsProvider
-          widgetConfig={this.strongConfig()}
-        >
-          {showBridgeComingSoonScreen && (
-            <BiomeCombinedProviders theme={{ base: theme }}>
-              <BridgeComingSoon onCloseEvent={() => sendBridgeWidgetCloseEvent(window)} />
-            </BiomeCombinedProviders>
-          )}
-          {!showBridgeComingSoonScreen && (
+        <CustomAnalyticsProvider widgetConfig={this.strongConfig()}>
+          <BiomeCombinedProviders theme={{ base: themeBase }}>
+            {showBridgeComingSoonScreen && (
+            <BridgeComingSoon onCloseEvent={() => sendBridgeWidgetCloseEvent(window)} />
+
+            )}
+            {!showBridgeComingSoonScreen && (
             <ConnectLoader
               params={connectLoaderParams}
               closeEvent={() => sendBridgeWidgetCloseEvent(window)}
@@ -101,7 +100,9 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
                 config={this.strongConfig()}
               />
             </ConnectLoader>
-          )}
+            )}
+
+          </BiomeCombinedProviders>
         </CustomAnalyticsProvider>
       </React.StrictMode>,
     );

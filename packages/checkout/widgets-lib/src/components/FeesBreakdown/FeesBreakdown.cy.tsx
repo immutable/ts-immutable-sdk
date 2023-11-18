@@ -1,7 +1,7 @@
 import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
-import { BiomeCombinedProviders, Button } from '@biom3/react';
-import { onDarkBase } from '@biom3/design-tokens';
+import { Button } from '@biom3/react';
+import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { cySmartGet } from '../../lib/testUtils';
 import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
 import { FeesBreakdown } from './FeesBreakdown';
@@ -13,7 +13,7 @@ describe('FeesBreakdown', () => {
 
   it('should the total fees amount, even if there are no sub fees', () => {
     mount(
-      <BiomeCombinedProviders theme={{ base: onDarkBase }}>
+      <ViewContextTestComponent>
         <SimpleLayout>
           <FeesBreakdown fees={[]} totalAmount="IMX 1.0" totalFiatAmount="Approx USD $0.70">
             <Button testId="fee-button">
@@ -21,7 +21,7 @@ describe('FeesBreakdown', () => {
             </Button>
           </FeesBreakdown>
         </SimpleLayout>
-      </BiomeCombinedProviders>,
+      </ViewContextTestComponent>,
     );
     cySmartGet('fee-button').click();
     cySmartGet('bottomSheet__header').should('be.visible');
@@ -46,7 +46,7 @@ describe('FeesBreakdown', () => {
       },
     ];
     mount(
-      <BiomeCombinedProviders theme={{ base: onDarkBase }}>
+      <ViewContextTestComponent>
         <SimpleLayout>
           <FeesBreakdown fees={fees} totalAmount="IMX 1.0" totalFiatAmount="Approx USD $0.70">
             <Button testId="fee-button">
@@ -54,7 +54,7 @@ describe('FeesBreakdown', () => {
             </Button>
           </FeesBreakdown>
         </SimpleLayout>
-      </BiomeCombinedProviders>,
+      </ViewContextTestComponent>,
     );
     cySmartGet('fee-button').click();
     cySmartGet('fees-breakdown-content').should('be.visible');
