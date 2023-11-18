@@ -1,7 +1,4 @@
 import {
-  BiomeCombinedProviders,
-} from '@biom3/react';
-import {
   BridgeWidgetParams,
   NetworkFilterTypes, TokenFilterTypes,
 } from '@imtbl/checkout-sdk';
@@ -50,7 +47,6 @@ import { ApproveERC20BridgeOnboarding } from './views/ApproveERC20Bridge';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { GetAllowedBalancesResultType, getAllowedBalances } from '../../lib/balance';
-import { widgetTheme } from '../../lib/theme';
 import { isPassportProvider } from '../../lib/providerUtils';
 import { BridgeComingSoon } from './views/BridgeComingSoon';
 
@@ -63,7 +59,7 @@ export function BridgeWidget({
   fromContractAddress,
   config,
 }: BridgeWidgetInputs) {
-  const { environment, theme } = config;
+  const { environment } = config;
   const successText = text.views[BridgeWidgetViews.SUCCESS];
   const failText = text.views[BridgeWidgetViews.FAIL];
   const loadingText = text.views[SharedViews.LOADING_VIEW].text;
@@ -79,7 +75,6 @@ export function BridgeWidget({
 
   const viewReducerValues = useMemo(() => ({ viewState, viewDispatch }), [viewState, viewDispatch]);
   const bridgeReducerValues = useMemo(() => ({ bridgeState, bridgeDispatch }), [bridgeState, bridgeDispatch]);
-  const themeReducerValue = useMemo(() => widgetTheme(theme), [theme]);
 
   // Passport currently does not have an L1 representation and therefore there
   // is not need to show the bridge widget for Passport connected users.
@@ -217,88 +212,86 @@ export function BridgeWidget({
   }, [checkout, provider]);
 
   return (
-    <BiomeCombinedProviders theme={{ base: themeReducerValue }}>
-      <ViewContext.Provider value={viewReducerValues}>
-        <BridgeContext.Provider value={bridgeReducerValues}>
-          <CryptoFiatProvider environment={environment}>
-            {viewReducerValues.viewState.view.type === SharedViews.LOADING_VIEW && (
-              <LoadingView loadingText={loadingText} />
+    <ViewContext.Provider value={viewReducerValues}>
+      <BridgeContext.Provider value={bridgeReducerValues}>
+        <CryptoFiatProvider environment={environment}>
+          {viewReducerValues.viewState.view.type === SharedViews.LOADING_VIEW && (
+          <LoadingView loadingText={loadingText} />
+          )}
+          {viewReducerValues.viewState.view.type === BridgeWidgetViews.BRIDGE && (
+          <Bridge
+            amount={viewReducerValues.viewState.view.data?.fromAmount ?? amount}
+            fromContractAddress={viewReducerValues.viewState.view.data?.fromContractAddress ?? fromContractAddress}
+          />
+          )}
+          {viewReducerValues.viewState.view.type === BridgeWidgetViews.IN_PROGRESS && (
+          <MoveInProgress
+            token={viewReducerValues.viewState.view.data.token}
+            transactionResponse={viewReducerValues.viewState.view.data.transactionResponse}
+            bridgeForm={viewReducerValues.viewState.view.data.bridgeForm}
+          />
+          )}
+          {viewReducerValues.viewState.view.type === BridgeWidgetViews.APPROVE_ERC20 && (
+          <ApproveERC20BridgeOnboarding data={viewReducerValues.viewState.view.data} />
+          )}
+          {viewReducerValues.viewState.view.type === BridgeWidgetViews.SUCCESS && (
+          <StatusView
+            statusText={successText.text} // todo: move to text
+            actionText={successText.actionText}
+            onActionClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
+            onRenderEvent={() => sendBridgeSuccessEvent(
+              eventTarget,
+              (viewReducerValues.viewState.view as BridgeSuccessView).data.transactionHash,
             )}
-            {viewReducerValues.viewState.view.type === BridgeWidgetViews.BRIDGE && (
-              <Bridge
-                amount={viewReducerValues.viewState.view.data?.fromAmount ?? amount}
-                fromContractAddress={viewReducerValues.viewState.view.data?.fromContractAddress ?? fromContractAddress}
-              />
-            )}
-            {viewReducerValues.viewState.view.type === BridgeWidgetViews.IN_PROGRESS && (
-              <MoveInProgress
-                token={viewReducerValues.viewState.view.data.token}
-                transactionResponse={viewReducerValues.viewState.view.data.transactionResponse}
-                bridgeForm={viewReducerValues.viewState.view.data.bridgeForm}
-              />
-            )}
-            {viewReducerValues.viewState.view.type === BridgeWidgetViews.APPROVE_ERC20 && (
-              <ApproveERC20BridgeOnboarding data={viewReducerValues.viewState.view.data} />
-            )}
-            {viewReducerValues.viewState.view.type === BridgeWidgetViews.SUCCESS && (
-              <StatusView
-                statusText={successText.text} // todo: move to text
-                actionText={successText.actionText}
-                onActionClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
-                onRenderEvent={() => sendBridgeSuccessEvent(
-                  eventTarget,
-                  (viewReducerValues.viewState.view as BridgeSuccessView).data.transactionHash,
-                )}
-                statusType={StatusType.SUCCESS}
-                testId="success-view"
-              />
-            )}
-            {viewReducerValues.viewState.view.type === BridgeWidgetViews.FAIL && (
-              <StatusView
-                statusText={failText.text}
-                actionText={failText.actionText}
-                onActionClick={() => {
-                  if (viewState.view.type === BridgeWidgetViews.FAIL) {
-                    viewDispatch({
-                      payload: {
-                        type: ViewActions.UPDATE_VIEW,
-                        view: {
-                          type: BridgeWidgetViews.BRIDGE,
-                          data: viewState.view.data,
-                        },
-                      },
-                    });
-                  }
-                }}
-                onRenderEvent={() => sendBridgeFailedEvent(eventTarget, 'Transaction failed')}
-                onCloseClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
-                statusType={StatusType.FAILURE}
-                testId="fail-view"
-              />
-            )}
-            {viewReducerValues.viewState.view.type === SharedViews.ERROR_VIEW && (
-              <ErrorView
-                actionText={errorText.actionText}
-                onActionClick={async () => {
-                  setErrorViewLoading(true);
-                  const data = viewState.view as ErrorViewType;
+            statusType={StatusType.SUCCESS}
+            testId="success-view"
+          />
+          )}
+          {viewReducerValues.viewState.view.type === BridgeWidgetViews.FAIL && (
+          <StatusView
+            statusText={failText.text}
+            actionText={failText.actionText}
+            onActionClick={() => {
+              if (viewState.view.type === BridgeWidgetViews.FAIL) {
+                viewDispatch({
+                  payload: {
+                    type: ViewActions.UPDATE_VIEW,
+                    view: {
+                      type: BridgeWidgetViews.BRIDGE,
+                      data: viewState.view.data,
+                    },
+                  },
+                });
+              }
+            }}
+            onRenderEvent={() => sendBridgeFailedEvent(eventTarget, 'Transaction failed')}
+            onCloseClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
+            statusType={StatusType.FAILURE}
+            testId="fail-view"
+          />
+          )}
+          {viewReducerValues.viewState.view.type === SharedViews.ERROR_VIEW && (
+          <ErrorView
+            actionText={errorText.actionText}
+            onActionClick={async () => {
+              setErrorViewLoading(true);
+              const data = viewState.view as ErrorViewType;
 
-                  if (!data.tryAgain) {
-                    showBridgeView();
-                    setErrorViewLoading(false);
-                    return;
-                  }
+              if (!data.tryAgain) {
+                showBridgeView();
+                setErrorViewLoading(false);
+                return;
+              }
 
-                  if (await data.tryAgain()) showBridgeView();
-                  setErrorViewLoading(false);
-                }}
-                onCloseClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
-                errorEventActionLoading={errorViewLoading}
-              />
-            )}
-          </CryptoFiatProvider>
-        </BridgeContext.Provider>
-      </ViewContext.Provider>
-    </BiomeCombinedProviders>
+              if (await data.tryAgain()) showBridgeView();
+              setErrorViewLoading(false);
+            }}
+            onCloseClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
+            errorEventActionLoading={errorViewLoading}
+          />
+          )}
+        </CryptoFiatProvider>
+      </BridgeContext.Provider>
+    </ViewContext.Provider>
   );
 }

@@ -14,6 +14,9 @@ import { ConnectLoader, ConnectLoaderParams } from 'components/ConnectLoader/Con
 import { getL2ChainId } from 'lib';
 import { isValidAmount, isValidWalletProvider } from 'lib/validations/widgetValidators';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
+import { widgetTheme } from 'lib/theme';
+import { BaseTokens } from '@biom3/design-tokens';
+import { BiomeCombinedProviders } from '@biom3/react';
 import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
 import { SaleWidget } from './SaleWidget';
 
@@ -81,6 +84,8 @@ export class Sale extends Base<WidgetType.SALE> {
   }
 
   protected render() {
+    if (!this.reactRoot) return;
+
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER2,
       web3Provider: this.web3Provider,
@@ -90,26 +95,28 @@ export class Sale extends Base<WidgetType.SALE> {
       ],
     };
 
-    if (!this.reactRoot) return;
+    const themeBase: BaseTokens = widgetTheme(this.strongConfig().theme);
 
     this.reactRoot.render(
       <React.StrictMode>
         <CustomAnalyticsProvider widgetConfig={this.strongConfig()}>
-          <ConnectLoader
-            widgetConfig={this.strongConfig()}
-            params={connectLoaderParams}
-            closeEvent={() => {
-              sendSaleWidgetCloseEvent(window);
-            }}
-          >
-            <SaleWidget
-              config={this.strongConfig()}
-              amount={this.parameters.amount!}
-              items={this.parameters.items!}
-              fromContractAddress={this.parameters.fromContractAddress!}
-              environmentId={this.parameters.environmentId!}
-            />
-          </ConnectLoader>
+          <BiomeCombinedProviders theme={{ base: themeBase }}>
+            <ConnectLoader
+              widgetConfig={this.strongConfig()}
+              params={connectLoaderParams}
+              closeEvent={() => {
+                sendSaleWidgetCloseEvent(window);
+              }}
+            >
+              <SaleWidget
+                config={this.strongConfig()}
+                amount={this.parameters.amount!}
+                items={this.parameters.items!}
+                fromContractAddress={this.parameters.fromContractAddress!}
+                environmentId={this.parameters.environmentId!}
+              />
+            </ConnectLoader>
+          </BiomeCombinedProviders>
         </CustomAnalyticsProvider>
       </React.StrictMode>,
     );

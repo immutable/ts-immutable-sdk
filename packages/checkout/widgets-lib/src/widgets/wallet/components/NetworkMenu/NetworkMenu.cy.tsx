@@ -1,12 +1,12 @@
 import { mount } from 'cypress/react18';
 import React from 'react';
-import { BiomeCombinedProviders } from '@biom3/react';
 import { cy, it } from 'local-cypress';
 import {
   Checkout, WalletProviderName, TokenInfo, ChainId, ChainName,
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
+import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { WalletContext, WalletState } from '../../context/WalletContext';
 import { text } from '../../../../resources/text/textConfig';
 import { cyIntercept, cySmartGet } from '../../../../lib/testUtils';
@@ -48,7 +48,7 @@ describe('Network Menu', () => {
 
   it('should have heading', () => {
     mount(
-      <BiomeCombinedProviders>
+      <ViewContextTestComponent>
         <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
           <ConnectLoaderTestComponent
             initialStateOverride={connectLoaderState}
@@ -56,7 +56,7 @@ describe('Network Menu', () => {
             <NetworkMenu setBalancesLoading={() => {}} />
           </ConnectLoaderTestComponent>
         </CustomAnalyticsProvider>
-      </BiomeCombinedProviders>,
+      </ViewContextTestComponent>,
     );
 
     cySmartGet('network-heading').should(
@@ -72,7 +72,7 @@ describe('Network Menu', () => {
       supportedTopUps: null,
     };
     mount(
-      <BiomeCombinedProviders>
+      <ViewContextTestComponent>
         <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
           <ConnectLoaderTestComponent
             initialStateOverride={connectLoaderState}
@@ -84,7 +84,7 @@ describe('Network Menu', () => {
             </WalletContext.Provider>
           </ConnectLoaderTestComponent>
         </CustomAnalyticsProvider>
-      </BiomeCombinedProviders>,
+      </ViewContextTestComponent>,
     );
     cySmartGet('@getNetworkAllowListStub').should('have.been.called');
     cySmartGet('Ethereum-network-button').should('exist');
@@ -118,7 +118,7 @@ describe('Network Menu', () => {
       supportedTopUps: null,
     };
     mount(
-      <BiomeCombinedProviders>
+      <ViewContextTestComponent>
         <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
           <ConnectLoaderTestComponent
             initialStateOverride={connectLoaderState}
@@ -130,7 +130,7 @@ describe('Network Menu', () => {
             </WalletContext.Provider>
           </ConnectLoaderTestComponent>
         </CustomAnalyticsProvider>
-      </BiomeCombinedProviders>,
+      </ViewContextTestComponent>,
     );
 
     cySmartGet('ImmutablezkEVMTestnet-network-button').click();

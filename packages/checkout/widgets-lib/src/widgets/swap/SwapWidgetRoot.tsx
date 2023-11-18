@@ -13,7 +13,7 @@ import { Base } from 'widgets/BaseWidgetRoot';
 import { ConnectLoader, ConnectLoaderParams } from 'components/ConnectLoader/ConnectLoader';
 import { getL2ChainId } from 'lib';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
-import { BiomeCombinedProviders, BiomePortalIdProvider } from '@biom3/react';
+import { BiomeCombinedProviders } from '@biom3/react';
 import { isPassportProvider } from 'lib/providerUtils';
 import { ServiceUnavailableErrorView } from 'views/error/ServiceUnavailableErrorView';
 import { ServiceType } from 'views/error/serviceTypes';
@@ -92,6 +92,8 @@ export class Swap extends Base<WidgetType.SWAP> {
   }
 
   protected render() {
+    if (!this.reactRoot) return;
+
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER2,
       walletProviderName: this.parameters.walletProviderName,
@@ -106,8 +108,6 @@ export class Swap extends Base<WidgetType.SWAP> {
 
     const themeBase = widgetTheme(this.strongConfig().theme);
 
-    if (!this.reactRoot) return;
-
     this.checkout
       ?.isSwapAvailable()
       .then((available) => {
@@ -116,35 +116,33 @@ export class Swap extends Base<WidgetType.SWAP> {
       .finally(() => {
         this.reactRoot!.render(
           <React.StrictMode>
-            <BiomePortalIdProvider>
-              <CustomAnalyticsProvider widgetConfig={this.strongConfig()}>
+            <CustomAnalyticsProvider widgetConfig={this.strongConfig()}>
+              <BiomeCombinedProviders theme={{ base: themeBase }}>
                 {!isSwapAvailable && (
-                  <BiomeCombinedProviders theme={{ base: themeBase }}>
-                    <ServiceUnavailableErrorView
-                      service={ServiceType.SWAP}
-                      onCloseClick={() => sendSwapWidgetCloseEvent(window)}
-                      primaryActionText={
+                  <ServiceUnavailableErrorView
+                    service={ServiceType.SWAP}
+                    onCloseClick={() => sendSwapWidgetCloseEvent(window)}
+                    primaryActionText={
                         topUpOptions && topUpOptions?.length > 0
                           ? topUpOptions[0].text
                           : undefined
                       }
-                      onPrimaryButtonClick={
+                    onPrimaryButtonClick={
                         topUpOptions && topUpOptions?.length > 0
                           ? topUpOptions[0].action
                           : undefined
                       }
-                      secondaryActionText={
+                    secondaryActionText={
                         topUpOptions?.length === 2
                           ? topUpOptions[1].text
                           : undefined
                       }
-                      onSecondaryButtonClick={
+                    onSecondaryButtonClick={
                         topUpOptions?.length === 2
                           ? topUpOptions[1].action
                           : undefined
                       }
-                    />
-                  </BiomeCombinedProviders>
+                  />
                 )}
                 {isSwapAvailable && (
                   <ConnectLoader
@@ -160,8 +158,8 @@ export class Swap extends Base<WidgetType.SWAP> {
                     />
                   </ConnectLoader>
                 )}
-              </CustomAnalyticsProvider>
-            </BiomePortalIdProvider>
+              </BiomeCombinedProviders>
+            </CustomAnalyticsProvider>
           </React.StrictMode>,
         );
       });

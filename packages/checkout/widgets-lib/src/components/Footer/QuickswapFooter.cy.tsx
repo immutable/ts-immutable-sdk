@@ -1,7 +1,7 @@
 import { onDarkBase, onLightBase } from '@biom3/design-tokens';
-import { BiomeCombinedProviders } from '@biom3/react';
 import { mount } from 'cypress/react18';
 import { WidgetTheme } from '@imtbl/checkout-sdk';
+import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
 import { cySmartGet } from '../../lib/testUtils';
 import { QuickswapFooter } from './QuickswapFooter';
@@ -10,9 +10,9 @@ import { text } from '../../resources/text/textConfig';
 describe('Quickswap Footer', () => {
   it('should show the Quickswap logo', () => {
     mount(
-      <BiomeCombinedProviders theme={{ base: onLightBase }}>
+      <ViewContextTestComponent theme={onLightBase}>
         <SimpleLayout footer={<QuickswapFooter theme={WidgetTheme.LIGHT} />} />
-      </BiomeCombinedProviders>,
+      </ViewContextTestComponent>,
     );
 
     cySmartGet('quickswap-logo').should('be.visible');
@@ -20,9 +20,9 @@ describe('Quickswap Footer', () => {
 
   it('should show the disclaimer text', () => {
     mount(
-      <BiomeCombinedProviders theme={{ base: onDarkBase }}>
+      <ViewContextTestComponent theme={onDarkBase}>
         <SimpleLayout footer={<QuickswapFooter theme={WidgetTheme.DARK} />} />
-      </BiomeCombinedProviders>,
+      </ViewContextTestComponent>,
     );
 
     cySmartGet(

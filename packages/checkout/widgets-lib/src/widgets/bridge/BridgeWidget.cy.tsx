@@ -13,9 +13,9 @@ import {
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { CompletionStatus, TokenBridge } from '@imtbl/bridge-sdk';
-import { BiomeCombinedProviders } from '@biom3/react';
 import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
+import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { BridgeWidget } from './BridgeWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
@@ -504,7 +504,7 @@ describe('Bridge Widget tests', () => {
         });
 
       mount(
-        <BiomeCombinedProviders>
+        <ViewContextTestComponent>
           <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
             <ConnectLoaderTestComponent
               initialStateOverride={connectLoaderState}
@@ -521,7 +521,7 @@ describe('Bridge Widget tests', () => {
               />
             </ConnectLoaderTestComponent>
           </CustomAnalyticsProvider>
-        </BiomeCombinedProviders>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('bridge-token-select__target').click();
@@ -557,7 +557,7 @@ describe('Bridge Widget tests', () => {
         });
 
       mount(
-        <BiomeCombinedProviders>
+        <ViewContextTestComponent>
           <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
             <ConnectLoaderTestComponent
               initialStateOverride={connectLoaderState}
@@ -574,7 +574,7 @@ describe('Bridge Widget tests', () => {
               />
             </ConnectLoaderTestComponent>
           </CustomAnalyticsProvider>
-        </BiomeCombinedProviders>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('bridge-token-select__target').click();
@@ -616,7 +616,7 @@ describe('Bridge Widget tests', () => {
         });
 
       mount(
-        <BiomeCombinedProviders>
+        <ViewContextTestComponent>
           <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
             <ConnectLoaderTestComponent
               initialStateOverride={connectLoaderState}
@@ -633,7 +633,7 @@ describe('Bridge Widget tests', () => {
               />
             </ConnectLoaderTestComponent>
           </CustomAnalyticsProvider>
-        </BiomeCombinedProviders>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('bridge-token-select__target').click();
@@ -672,7 +672,7 @@ describe('Bridge Widget tests', () => {
         });
 
       mount(
-        <BiomeCombinedProviders>
+        <ViewContextTestComponent>
           <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
             <ConnectLoaderTestComponent
               initialStateOverride={connectLoaderState}
@@ -689,7 +689,7 @@ describe('Bridge Widget tests', () => {
               />
             </ConnectLoaderTestComponent>
           </CustomAnalyticsProvider>
-        </BiomeCombinedProviders>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('bridge-token-select__target').click();
@@ -728,7 +728,7 @@ describe('Bridge Widget tests', () => {
         .rejects({});
 
       mount(
-        <BiomeCombinedProviders>
+        <ViewContextTestComponent>
           <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
             <ConnectLoaderTestComponent
               initialStateOverride={connectLoaderState}
@@ -745,7 +745,7 @@ describe('Bridge Widget tests', () => {
               />
             </ConnectLoaderTestComponent>
           </CustomAnalyticsProvider>
-        </BiomeCombinedProviders>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('bridge-token-select__target').click();

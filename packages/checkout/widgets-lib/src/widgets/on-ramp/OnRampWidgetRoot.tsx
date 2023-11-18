@@ -13,7 +13,9 @@ import { ConnectLoader, ConnectLoaderParams } from 'components/ConnectLoader/Con
 import { getL1ChainId, getL2ChainId } from 'lib';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
 import { isValidAddress, isValidAmount } from 'lib/validations/widgetValidators';
-import { BiomePortalIdProvider } from '@biom3/react';
+import { BiomeCombinedProviders } from '@biom3/react';
+import { widgetTheme } from 'lib/theme';
+import { BaseTokens } from '@biom3/design-tokens';
 import { OnRampWidget } from './OnRampWidget';
 import { sendOnRampWidgetCloseEvent } from './OnRampWidgetEvents';
 
@@ -55,6 +57,8 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
   }
 
   protected render() {
+    if (!this.reactRoot) return;
+
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER2,
       walletProviderName: this.parameters.walletProviderName,
@@ -63,12 +67,12 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
       allowedChains: [getL1ChainId(this.checkout.config), getL2ChainId(this.checkout.config)],
     };
 
-    if (!this.reactRoot) return;
+    const themeBase: BaseTokens = widgetTheme(this.strongConfig().theme);
 
     this.reactRoot.render(
       <React.StrictMode>
-        <BiomePortalIdProvider>
-          <CustomAnalyticsProvider widgetConfig={this.strongConfig()}>
+        <CustomAnalyticsProvider widgetConfig={this.strongConfig()}>
+          <BiomeCombinedProviders theme={{ base: themeBase }}>
             <ConnectLoader
               widgetConfig={this.strongConfig()}
               params={connectLoaderParams}
@@ -80,8 +84,8 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
                 config={this.strongConfig()}
               />
             </ConnectLoader>
-          </CustomAnalyticsProvider>
-        </BiomePortalIdProvider>
+          </BiomeCombinedProviders>
+        </CustomAnalyticsProvider>
       </React.StrictMode>,
     );
   }
