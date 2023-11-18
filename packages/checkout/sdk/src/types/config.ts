@@ -5,18 +5,25 @@ import { TokenInfo } from './tokenInfo';
 import { ChainId } from './chains';
 
 export interface CheckoutOverrides {}
+
 /**
  * A type representing checkout SDK configurations.
- * @property {boolean} isOnRampEnabled - To enable on-ramp feature in Checkout sdk.
- * @property {boolean} isSwapEnabled - To enable swap feature in Checkout sdk.
- * @property {boolean} isBridgeEnabled - To enable bridge feature in Checkout sdk.
+ * @property {object} onramp - To enable on-ramp feature in Checkout sdk.
+ * @property {object} swap - To enable swap feature in Checkout sdk.
+ * @property {object} bridge - To enable bridge L1 to L2 feature in Checkout sdk.
  * @property {Passport} passport - To enable passport wallet with Checkout sdk.
 */
 export interface CheckoutModuleConfiguration extends ModuleConfiguration<CheckoutOverrides> {
-  isOnRampEnabled?: boolean,
-  isSwapEnabled?: boolean,
-  isBridgeEnabled?: boolean,
-  passport?: Passport
+  onramp?: {
+    enable: boolean;
+  };
+  swap?: {
+    enable: boolean;
+  };
+  bridge?: {
+    enable: boolean;
+  };
+  passport?: Passport;
 }
 
 /**
