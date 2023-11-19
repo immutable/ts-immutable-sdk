@@ -422,6 +422,21 @@ function createSwapParameters(
 const getTransactionValue = (tokenIn: Coin, maximumAmountIn: string) =>
   tokenIn.type === 'native' ? maximumAmountIn : zeroNativeCurrencyValue;
 
+const getSwapRecipient = (
+  tokenOut: Coin,
+  fromAddress: string,
+  routerContractAddress: string,
+  secondaryFeesContractAddress: string,
+  secondaryFees: SecondaryFee[],
+) => {
+  // Not native so send the tokens directly back to the caller.
+  if (!isNative(tokenOut)) return fromAddress;
+  // Native but no fees, send to the Uniswap Router
+  if (secondaryFees.length === 0) return routerContractAddress;
+  // Native and fees, send to the secondary fee contract
+  return secondaryFeesContractAddress;
+};
+
 export function getSwap(
   tokenIn: Coin,
   tokenOut: Coin,
@@ -434,7 +449,13 @@ export function getSwap(
   gasPrice: CoinAmount<Coin> | null,
   secondaryFees: SecondaryFee[],
 ): TransactionDetails {
-  const swapRecipient = isNative(tokenOut) ? routerContractAddress : fromAddress;
+  const swapRecipient = getSwapRecipient(
+    tokenOut,
+    fromAddress,
+    routerContractAddress,
+    secondaryFeesContractAddress,
+    secondaryFees,
+  );
 
   const { calldata, maximumAmountIn } = createSwapParameters(
     tokenIn,

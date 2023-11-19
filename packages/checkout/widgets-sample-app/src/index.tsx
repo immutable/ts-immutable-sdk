@@ -8,10 +8,8 @@ import WalletUI from './components/ui/wallet/wallet';
 import SwapUI from './components/ui/swap/swap';
 import BridgeUI from './components/ui/bridge/bridge';
 import OnRampUI from "./components/ui/on-ramp/onRamp";
-import { BiomeCombinedProviders } from '@biom3/react';
 import { PassportLoginCallback } from './components/ui/marketplace-orchestrator/PassportLoginCallback';
 import { Marketplace } from './components/ui/marketplace-orchestrator';
-import { onDarkBase } from '@biom3/design-tokens';
 import { SaleUI } from './components/ui/sale/sale';
 
 const router = createBrowserRouter([
@@ -45,7 +43,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/marketplace-orchestrator',
-    element: <BiomeCombinedProviders theme={{base: onDarkBase}}><Marketplace /></BiomeCombinedProviders>,
+    element: <Marketplace />
   },
   {
     path: '/marketplace-orchestrator/login/callback',

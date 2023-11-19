@@ -1,4 +1,4 @@
-import { Checkout, OrchestrationEventType, SwapEventType, SwapSuccess, WalletProviderName, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
+import { Checkout, SwapEventType, SwapSuccess, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
 import { WidgetsFactory } from '@imtbl/checkout-widgets';
 import { useEffect, useMemo } from 'react';
 
