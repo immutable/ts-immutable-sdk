@@ -51,6 +51,8 @@ import { ConnectLoaderContext } from '../../context/connect-loader-context/Conne
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { GetAllowedBalancesResultType, getAllowedBalances } from '../../lib/balance';
 import { widgetTheme } from '../../lib/theme';
+import { isPassportProvider } from '../../lib/providerUtils';
+import { BridgeComingSoon } from './views/BridgeComingSoon';
 
 export type BridgeWidgetInputs = BridgeWidgetParams & {
   config: StrongCheckoutWidgetsConfig,
@@ -67,23 +69,23 @@ export function BridgeWidget({
   const loadingText = text.views[SharedViews.LOADING_VIEW].text;
   const errorText = text.views[SharedViews.ERROR_VIEW];
 
-  const { connectLoaderState: { provider, checkout } } = useContext(ConnectLoaderContext);
-  const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
-  const [bridgeState, bridgeDispatch] = useReducer(bridgeReducer, initialBridgeState);
-
-  const viewReducerValues = useMemo(
-    () => ({ viewState, viewDispatch }),
-    [viewState, viewDispatch],
-  );
-  const bridgeReducerValues = useMemo(
-    () => ({ bridgeState, bridgeDispatch }),
-    [bridgeState, bridgeDispatch],
-  );
-  const themeReducerValue = useMemo(() => widgetTheme(theme), [theme]);
+  const { connectLoaderState: { checkout, provider } } = useContext(ConnectLoaderContext);
+  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const [errorViewLoading, setErrorViewLoading] = useState(false);
 
-  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+  const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
+  const [bridgeState, bridgeDispatch] = useReducer(bridgeReducer, initialBridgeState);
+
+  const viewReducerValues = useMemo(() => ({ viewState, viewDispatch }), [viewState, viewDispatch]);
+  const bridgeReducerValues = useMemo(() => ({ bridgeState, bridgeDispatch }), [bridgeState, bridgeDispatch]);
+  const themeReducerValue = useMemo(() => widgetTheme(theme), [theme]);
+
+  // Passport currently does not have an L1 representation and therefore there
+  // is not need to show the bridge widget for Passport connected users.
+  if (isPassportProvider(provider)) {
+    return <BridgeComingSoon onCloseEvent={() => sendBridgeWidgetCloseEvent(eventTarget)} />;
+  }
 
   const showErrorView = useCallback((error: any, tryAgain?: () => Promise<boolean>) => {
     viewDispatch({

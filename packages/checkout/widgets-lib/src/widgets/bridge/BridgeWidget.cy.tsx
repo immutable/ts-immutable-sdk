@@ -13,6 +13,7 @@ import { Environment } from '@imtbl/config';
 import { CompletionStatus, TokenBridge } from '@imtbl/bridge-sdk';
 import { BiomeCombinedProviders } from '@biom3/react';
 import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
+import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { BridgeWidget } from './BridgeWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
@@ -215,14 +216,16 @@ describe('Bridge Widget tests', () => {
     it('should show bridge widget on mount', () => {
       const params = {} as BridgeWidgetParams;
       mount(
-        <ConnectLoaderTestComponent
-          initialStateOverride={connectLoaderState}
-        >
-          <BridgeWidget
-            config={config}
-            {...params}
-          />
-        </ConnectLoaderTestComponent>,
+        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <BridgeWidget
+              config={config}
+              {...params}
+            />
+          </ConnectLoaderTestComponent>
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('bridge-view').should('exist');
@@ -253,14 +256,17 @@ describe('Bridge Widget tests', () => {
         });
 
       mount(
-        <ConnectLoaderTestComponent
-          initialStateOverride={connectLoaderState}
-        >
-          <BridgeWidget
-            config={config}
-            {...params}
-          />
-        </ConnectLoaderTestComponent>,
+        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <BridgeWidget
+              config={config}
+              {...params}
+            />
+          </ConnectLoaderTestComponent>
+
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('bridge-token-select__target').click();
@@ -291,14 +297,17 @@ describe('Bridge Widget tests', () => {
       const params = {} as BridgeWidgetParams;
 
       mount(
-        <ConnectLoaderTestComponent
-          initialStateOverride={connectLoaderState}
-        >
-          <BridgeWidget
-            config={config}
-            {...params}
-          />
-        </ConnectLoaderTestComponent>,
+        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <BridgeWidget
+              config={config}
+              {...params}
+            />
+          </ConnectLoaderTestComponent>
+
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('error-view').should('be.visible');
@@ -311,8 +320,36 @@ describe('Bridge Widget tests', () => {
     it('should set up bridge widget on mount', () => {
       const params = {} as BridgeWidgetParams;
       mount(
+        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <BridgeWidget
+              config={config}
+              {...params}
+            />
+          </ConnectLoaderTestComponent>
+
+        </CustomAnalyticsProvider>,
+      );
+      cySmartGet('@getAllBalancesStub').should('have.been.called');
+      cySmartGet('@getTokenAllowListStub').should('have.been.called');
+    });
+
+    it('should show BridgeComingSoon for Passport users if trying to switch to L1', () => {
+      const params = {} as BridgeWidgetParams;
+      mount(
         <ConnectLoaderTestComponent
-          initialStateOverride={connectLoaderState}
+          initialStateOverride={{
+            ...connectLoaderState,
+            provider: {
+              ...mockProvider,
+              provider: {
+                isPassport: true,
+                request: async () => null,
+              },
+            } as unknown as Web3Provider,
+          }}
         >
           <BridgeWidget
             config={config}
@@ -320,8 +357,7 @@ describe('Bridge Widget tests', () => {
           />
         </ConnectLoaderTestComponent>,
       );
-      cySmartGet('@getAllBalancesStub').should('have.been.called');
-      cySmartGet('@getTokenAllowListStub').should('have.been.called');
+      cySmartGet('bridge-coming-soon').should('be.visible');
     });
   });
 
@@ -386,20 +422,23 @@ describe('Bridge Widget tests', () => {
         }));
 
       mount(
-        <ConnectLoaderTestComponent
-          initialStateOverride={connectLoaderState}
-        >
-          <BridgeWidget
-            config={{
-              environment: Environment.SANDBOX,
-              theme: WidgetTheme.DARK,
-              isBridgeEnabled: true,
-              isSwapEnabled: true,
-              isOnRampEnabled: true,
-            }}
-            {...params}
-          />
-        </ConnectLoaderTestComponent>,
+        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <BridgeWidget
+              config={{
+                environment: Environment.SANDBOX,
+                theme: WidgetTheme.DARK,
+                isBridgeEnabled: true,
+                isSwapEnabled: true,
+                isOnRampEnabled: true,
+              }}
+              {...params}
+            />
+          </ConnectLoaderTestComponent>
+
+        </CustomAnalyticsProvider>,
       );
 
       cySmartGet('bridge-token-select__target').click();
@@ -465,20 +504,22 @@ describe('Bridge Widget tests', () => {
 
       mount(
         <BiomeCombinedProviders>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <BridgeWidget
-              config={{
-                environment: Environment.SANDBOX,
-                theme: WidgetTheme.DARK,
-                isBridgeEnabled: true,
-                isSwapEnabled: true,
-                isOnRampEnabled: true,
-              }}
-              {...params}
-            />
-          </ConnectLoaderTestComponent>
+          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+            <ConnectLoaderTestComponent
+              initialStateOverride={connectLoaderState}
+            >
+              <BridgeWidget
+                config={{
+                  environment: Environment.SANDBOX,
+                  theme: WidgetTheme.DARK,
+                  isBridgeEnabled: true,
+                  isSwapEnabled: true,
+                  isOnRampEnabled: true,
+                }}
+                {...params}
+              />
+            </ConnectLoaderTestComponent>
+          </CustomAnalyticsProvider>
         </BiomeCombinedProviders>,
       );
 
@@ -516,20 +557,22 @@ describe('Bridge Widget tests', () => {
 
       mount(
         <BiomeCombinedProviders>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <BridgeWidget
-              config={{
-                environment: Environment.SANDBOX,
-                theme: WidgetTheme.DARK,
-                isBridgeEnabled: true,
-                isSwapEnabled: true,
-                isOnRampEnabled: true,
-              }}
-              {...params}
-            />
-          </ConnectLoaderTestComponent>
+          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+            <ConnectLoaderTestComponent
+              initialStateOverride={connectLoaderState}
+            >
+              <BridgeWidget
+                config={{
+                  environment: Environment.SANDBOX,
+                  theme: WidgetTheme.DARK,
+                  isBridgeEnabled: true,
+                  isSwapEnabled: true,
+                  isOnRampEnabled: true,
+                }}
+                {...params}
+              />
+            </ConnectLoaderTestComponent>
+          </CustomAnalyticsProvider>
         </BiomeCombinedProviders>,
       );
 
@@ -573,20 +616,22 @@ describe('Bridge Widget tests', () => {
 
       mount(
         <BiomeCombinedProviders>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <BridgeWidget
-              config={{
-                environment: Environment.SANDBOX,
-                theme: WidgetTheme.DARK,
-                isBridgeEnabled: true,
-                isSwapEnabled: true,
-                isOnRampEnabled: true,
-              }}
-              {...params}
-            />
-          </ConnectLoaderTestComponent>
+          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+            <ConnectLoaderTestComponent
+              initialStateOverride={connectLoaderState}
+            >
+              <BridgeWidget
+                config={{
+                  environment: Environment.SANDBOX,
+                  theme: WidgetTheme.DARK,
+                  isBridgeEnabled: true,
+                  isSwapEnabled: true,
+                  isOnRampEnabled: true,
+                }}
+                {...params}
+              />
+            </ConnectLoaderTestComponent>
+          </CustomAnalyticsProvider>
         </BiomeCombinedProviders>,
       );
 
@@ -627,20 +672,22 @@ describe('Bridge Widget tests', () => {
 
       mount(
         <BiomeCombinedProviders>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <BridgeWidget
-              config={{
-                environment: Environment.SANDBOX,
-                theme: WidgetTheme.DARK,
-                isBridgeEnabled: true,
-                isSwapEnabled: true,
-                isOnRampEnabled: true,
-              }}
-              {...params}
-            />
-          </ConnectLoaderTestComponent>
+          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+            <ConnectLoaderTestComponent
+              initialStateOverride={connectLoaderState}
+            >
+              <BridgeWidget
+                config={{
+                  environment: Environment.SANDBOX,
+                  theme: WidgetTheme.DARK,
+                  isBridgeEnabled: true,
+                  isSwapEnabled: true,
+                  isOnRampEnabled: true,
+                }}
+                {...params}
+              />
+            </ConnectLoaderTestComponent>
+          </CustomAnalyticsProvider>
         </BiomeCombinedProviders>,
       );
 
@@ -681,20 +728,22 @@ describe('Bridge Widget tests', () => {
 
       mount(
         <BiomeCombinedProviders>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <BridgeWidget
-              config={{
-                environment: Environment.SANDBOX,
-                theme: WidgetTheme.DARK,
-                isBridgeEnabled: true,
-                isSwapEnabled: true,
-                isOnRampEnabled: true,
-              }}
-              {...params}
-            />
-          </ConnectLoaderTestComponent>
+          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+            <ConnectLoaderTestComponent
+              initialStateOverride={connectLoaderState}
+            >
+              <BridgeWidget
+                config={{
+                  environment: Environment.SANDBOX,
+                  theme: WidgetTheme.DARK,
+                  isBridgeEnabled: true,
+                  isSwapEnabled: true,
+                  isOnRampEnabled: true,
+                }}
+                {...params}
+              />
+            </ConnectLoaderTestComponent>
+          </CustomAnalyticsProvider>
         </BiomeCombinedProviders>,
       );
 

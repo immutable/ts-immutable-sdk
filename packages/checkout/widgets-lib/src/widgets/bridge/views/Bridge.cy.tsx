@@ -1,19 +1,28 @@
 import { mount } from 'cypress/react18';
 import { describe } from 'local-cypress';
+import { Environment } from '@imtbl/config';
+import { StrongCheckoutWidgetsConfig } from 'lib/withDefaultWidgetConfig';
+import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
 import { BridgeWidgetTestComponent } from '../test-components/BridgeWidgetTestComponent';
 import { Bridge } from './Bridge';
-import { cySmartGet } from '../../../lib/testUtils';
+import { cyIntercept, cySmartGet } from '../../../lib/testUtils';
 import { text } from '../../../resources/text/textConfig';
 import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
 
 describe('Bridge View', () => {
   const { header, content } = text.views[BridgeWidgetViews.BRIDGE];
 
+  beforeEach(() => {
+    cyIntercept();
+  });
+
   it('should render the bridge view', () => {
     mount(
-      <BridgeWidgetTestComponent>
-        <Bridge amount="" fromContractAddress="" />
-      </BridgeWidgetTestComponent>,
+      <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <BridgeWidgetTestComponent>
+          <Bridge amount="" fromContractAddress="" />
+        </BridgeWidgetTestComponent>
+      </CustomAnalyticsProvider>,
     );
 
     cySmartGet('bridge-view').should('exist');

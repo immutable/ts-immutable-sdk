@@ -389,7 +389,7 @@ describe('Seaport', () => {
 
       const immutableOrder: Order = {
         account_address: offerer,
-        buy: [{ item_type: 'NATIVE', start_amount: '100' }],
+        buy: [{ item_type: 'NATIVE', amount: '100' }],
         fees: [],
         chain: { id: '1', name: 'imtbl-zkevm-local' },
         created_at: new Date().toISOString(),

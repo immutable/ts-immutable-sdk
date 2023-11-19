@@ -4,6 +4,7 @@ import {
   useContext, useEffect, useMemo, useReducer, useState,
 } from 'react';
 import { IMTBLWidgetEvents, OnRampWidgetParams, WidgetTheme } from '@imtbl/checkout-sdk';
+import { UserJourney } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { IMX_ADDRESS_ZKEVM, NATIVE } from '../../lib';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
@@ -147,6 +148,7 @@ export function OnRampWidget({
 
         {viewState.view.type === SharedViews.TOP_UP_VIEW && (
           <TopUpView
+            analytics={{ userJourney: UserJourney.ON_RAMP }}
             widgetEvent={IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT}
             showOnrampOption={isOnRampEnabled}
             showSwapOption={isSwapEnabled}

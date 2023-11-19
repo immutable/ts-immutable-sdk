@@ -90,6 +90,7 @@ function buildSinglePoolSwapWithFees(
   amountOut: string,
   secondaryFees: SecondaryFee[],
   secondaryFeeContract: SecondaryFeeInterface,
+  tokenOut: Coin,
 ) {
   const secondaryFeeValues: ISecondaryFee.SecondaryFeeParamsStruct[] = secondaryFees.map((fee) => ({
     feeBasisPoints: fee.basisPoints,
@@ -132,7 +133,11 @@ function buildSinglePoolSwapWithFees(
     );
   }
 
-  // TODO: Add refundETH method when support is added in SecondaryFee contract
+  const shouldUnwrapTokens = isNative(tokenOut);
+  if (shouldUnwrapTokens) {
+    // Unwrap the output token if the user specified a native token as the output
+    calldatas.push(secondaryFeeContract.encodeFunctionData('unwrapNativeToken', [amountOut]));
+  }
 
   return calldatas;
 }
@@ -200,6 +205,7 @@ function buildMultiPoolSwapWithFees(
   amountOut: string,
   secondaryFees: SecondaryFee[],
   secondaryFeeContract: SecondaryFeeInterface,
+  tokenOut: Coin,
 ) {
   const path: string = encodeRouteToPath(route, trade.tradeType === Uniswap.TradeType.EXACT_OUTPUT);
 
@@ -238,7 +244,11 @@ function buildMultiPoolSwapWithFees(
     );
   }
 
-  // TODO: Add refundETH method when support is added in SecondaryFee contract
+  const shouldUnwrapTokens = isNative(tokenOut);
+  if (shouldUnwrapTokens) {
+    // Unwrap the output token if the user specified a native token as the output
+    calldatas.push(secondaryFeeContract.encodeFunctionData('unwrapNativeToken', [amountOut]));
+  }
 
   return calldatas;
 }
@@ -286,6 +296,7 @@ function buildSwapParameters(
         minimumAmountOut,
         secondaryFees,
         secondaryFeeContract,
+        tokenOut,
       );
     }
 
@@ -311,6 +322,7 @@ function buildSwapParameters(
       minimumAmountOut,
       secondaryFees,
       secondaryFeeContract,
+      tokenOut,
     );
   }
 
@@ -410,6 +422,21 @@ function createSwapParameters(
 const getTransactionValue = (tokenIn: Coin, maximumAmountIn: string) =>
   tokenIn.type === 'native' ? maximumAmountIn : zeroNativeCurrencyValue;
 
+const getSwapRecipient = (
+  tokenOut: Coin,
+  fromAddress: string,
+  routerContractAddress: string,
+  secondaryFeesContractAddress: string,
+  secondaryFees: SecondaryFee[],
+) => {
+  // Not native so send the tokens directly back to the caller.
+  if (!isNative(tokenOut)) return fromAddress;
+  // Native but no fees, send to the Uniswap Router
+  if (secondaryFees.length === 0) return routerContractAddress;
+  // Native and fees, send to the secondary fee contract
+  return secondaryFeesContractAddress;
+};
+
 export function getSwap(
   tokenIn: Coin,
   tokenOut: Coin,
@@ -422,7 +449,13 @@ export function getSwap(
   gasPrice: CoinAmount<Coin> | null,
   secondaryFees: SecondaryFee[],
 ): TransactionDetails {
-  const swapRecipient = isNative(tokenOut) ? routerContractAddress : fromAddress;
+  const swapRecipient = getSwapRecipient(
+    tokenOut,
+    fromAddress,
+    routerContractAddress,
+    secondaryFeesContractAddress,
+    secondaryFees,
+  );
 
   const { calldata, maximumAmountIn } = createSwapParameters(
     tokenIn,
