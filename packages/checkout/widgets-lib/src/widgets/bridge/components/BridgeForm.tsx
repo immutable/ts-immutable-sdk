@@ -499,13 +499,13 @@ export function BridgeForm(props: BridgeFormProps) {
         <TransactionRejected
           visible={showTxnRejectedState}
           showHeaderBar={false}
-          onCloseBottomSheet={() => setShowTxnRejectedState(false)}
+          onCloseDrawer={() => setShowTxnRejectedState(false)}
           onRetry={retrySubmitBridge}
         />
         <NotEnoughGas
           visible={showNotEnoughGasDrawer}
           showHeaderBar={false}
-          onCloseBottomSheet={() => setShowNotEnoughGasDrawer(false)}
+          onCloseDrawer={() => setShowNotEnoughGasDrawer(false)}
           walletAddress={walletAddress}
           showAdjustAmount={isNativeToken(token?.token.address)}
         />

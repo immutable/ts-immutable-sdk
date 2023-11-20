@@ -1,5 +1,5 @@
 import {
-  BottomSheet, Box, Divider,
+  Drawer, Box, Divider,
 } from '@biom3/react';
 import { feeItemContainerStyles, feesBreakdownContentStyles } from './FeesBreakdownStyles';
 import { FeeItem } from './FeeItem';
@@ -13,7 +13,7 @@ type Fee = {
 };
 
 type FeesBreakdownProps = {
-  onCloseBottomSheet?: () => void;
+  onCloseDrawer?: () => void;
   fees: Fee[];
   children?: any;
   visible?: boolean;
@@ -22,19 +22,19 @@ type FeesBreakdownProps = {
 };
 
 export function FeesBreakdown({
-  fees, children, onCloseBottomSheet, visible, totalFiatAmount, totalAmount,
+  fees, children, onCloseDrawer, visible, totalFiatAmount, totalAmount,
 }: FeesBreakdownProps) {
   return (
-    <BottomSheet
+    <Drawer
       headerBarTitle={text.drawers.feesBreakdown.heading}
       size="threeQuarter"
-      onCloseBottomSheet={onCloseBottomSheet}
+      onCloseDrawer={onCloseDrawer}
       visible={visible}
     >
-      <BottomSheet.Target>
+      <Drawer.Target>
         {children}
-      </BottomSheet.Target>
-      <BottomSheet.Content testId="fees-breakdown-content" sx={feesBreakdownContentStyles}>
+      </Drawer.Target>
+      <Drawer.Content testId="fees-breakdown-content" sx={feesBreakdownContentStyles}>
         <Box sx={feeItemContainerStyles}>
           <FeeItem
             key={text.drawers.feesBreakdown.total}
@@ -51,7 +51,7 @@ export function FeesBreakdown({
             }
         </Box>
         <FooterLogo />
-      </BottomSheet.Content>
-    </BottomSheet>
+      </Drawer.Content>
+    </Drawer>
   );
 }
