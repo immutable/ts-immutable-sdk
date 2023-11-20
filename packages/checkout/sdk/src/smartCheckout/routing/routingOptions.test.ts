@@ -42,9 +42,9 @@ describe('getAvailableRoutingOptions', () => {
   it('should return configured routing availability overrides if provided', async () => {
     const configWithOptions = new CheckoutConfiguration({
       baseConfig: { environment: Environment.SANDBOX },
-      isBridgeEnabled: false,
-      isOnRampEnabled: false,
-      isSwapEnabled: false,
+      bridge: { enable: false },
+      onRamp: { enable: false },
+      swap: { enable: false },
     });
 
     const routingOptions = await getAvailableRoutingOptions(configWithOptions, mockProvider);
