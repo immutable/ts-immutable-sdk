@@ -1,0 +1,10 @@
+node_modules/
+dist/
+docs/
+.parcel-cache/
+
+jest.config.js
+jest.setup.js
+coverage/
+
+index.js
