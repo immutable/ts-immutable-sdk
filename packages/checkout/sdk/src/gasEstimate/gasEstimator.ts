@@ -24,7 +24,8 @@ import {
 } from './bridgeGasEstimate';
 import * as instance from '../instance';
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../config';
-import { ERC20ABI, NATIVE } from '../env';
+import { ERC20ABI } from '../env';
+import { isNativeToken } from '../network';
 
 const DUMMY_WALLET_ADDRESS = '0x0000000000000000000000000000000000000001';
 const DEFAULT_TOKEN_DECIMALS = 18;
@@ -35,7 +36,7 @@ async function getTokenInfoByAddress(
   chainId: ChainId,
   provider: JsonRpcProvider,
 ): Promise<TokenInfo | undefined> {
-  if (tokenAddress.toLowerCase() === NATIVE) {
+  if (isNativeToken(tokenAddress)) {
     return config.networkMap.get(chainId)?.nativeCurrency;
   }
 

@@ -11,6 +11,7 @@ import { SwapCoins } from './SwapCoins';
 import { SwapState } from '../context/SwapContext';
 import { CustomAnalyticsProvider } from '../../../context/analytics-provider/CustomAnalyticsProvider';
 import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
+import { NATIVE } from '../../../lib';
 
 describe('SwapCoins tests', () => {
   beforeEach(() => {
@@ -57,7 +58,7 @@ describe('SwapCoins tests', () => {
           name: 'IMX',
           symbol: 'IMX',
           decimals: 18,
-          address: 'native',
+          address: NATIVE,
         },
       ],
     };
