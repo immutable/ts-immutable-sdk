@@ -12,7 +12,6 @@ import { CryptoFiat } from '@imtbl/cryptofiat';
 import { WalletWidget } from './WalletWidget';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { IMX_ADDRESS_ZKEVM } from '../../lib';
 import { text } from '../../resources/text/textConfig';
 import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
 import {
@@ -20,6 +19,7 @@ import {
 } from '../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
 import { ConnectionStatus } from '../../context/connect-loader-context/ConnectLoaderContext';
 import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
+import { NATIVE } from '../../lib';
 
 describe('WalletWidget tests', () => {
   beforeEach(() => {
@@ -406,7 +406,7 @@ describe('WalletWidget tests', () => {
                   name: 'ImmutableX',
                   symbol: 'IMX',
                   decimals: 18,
-                  address: IMX_ADDRESS_ZKEVM,
+                  address: NATIVE,
                   icon: '123',
                 },
               },

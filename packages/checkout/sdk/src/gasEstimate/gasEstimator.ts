@@ -25,6 +25,7 @@ import {
 import * as instance from '../instance';
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../config';
 import { ERC20ABI } from '../env';
+import { isNativeToken } from '../network';
 
 const DUMMY_WALLET_ADDRESS = '0x0000000000000000000000000000000000000001';
 const DEFAULT_TOKEN_DECIMALS = 18;
@@ -35,7 +36,7 @@ async function getTokenInfoByAddress(
   chainId: ChainId,
   provider: JsonRpcProvider,
 ): Promise<TokenInfo | undefined> {
-  if (tokenAddress === 'NATIVE') {
+  if (isNativeToken(tokenAddress)) {
     return config.networkMap.get(chainId)?.nativeCurrency;
   }
 
@@ -82,7 +83,7 @@ async function bridgeToL2GasEstimator(
     );
     gasFee.token = await getTokenInfoByAddress(
       config,
-      tokenAddress ?? (gasTokenAddress || 'NATIVE'),
+      tokenAddress ?? (gasTokenAddress),
       fromChainId,
       provider,
     );
@@ -142,28 +143,23 @@ async function swapGasEstimator(
       BigNumber.from(utils.parseUnits('1', DEFAULT_TOKEN_DECIMALS)),
     );
 
-    if (swap.gasFeeEstimate === null) {
+    if (!swap.gasFeeEstimate) {
       return {
         gasEstimateType: GasEstimateType.SWAP,
         gasFee: {},
       };
     }
 
-    let estimatedAmount;
-    if (swap.gasFeeEstimate.value) {
-      estimatedAmount = BigNumber.from(swap.gasFeeEstimate.value);
-    }
-
     return {
       gasEstimateType: GasEstimateType.SWAP,
       gasFee: {
-        estimatedAmount,
+        estimatedAmount: swap.gasFeeEstimate.value ? BigNumber.from(swap.gasFeeEstimate.value) : undefined,
         token: {
-          address: swap.gasFeeEstimate?.token.address,
-          symbol: swap.gasFeeEstimate?.token.symbol ?? '',
-          name: swap.gasFeeEstimate?.token.name ?? '',
+          address: swap.gasFeeEstimate.token.address,
+          symbol: swap.gasFeeEstimate.token.symbol ?? '',
+          name: swap.gasFeeEstimate.token.name ?? '',
           decimals:
-            swap.gasFeeEstimate?.token.decimals ?? DEFAULT_TOKEN_DECIMALS,
+            swap.gasFeeEstimate.token.decimals ?? DEFAULT_TOKEN_DECIMALS,
         },
       },
     };
