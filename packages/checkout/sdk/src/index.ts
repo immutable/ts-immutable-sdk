@@ -44,7 +44,6 @@ export type {
   CancelResultSuccess,
   CheckConnectionParams,
   CheckConnectionResult,
-  CheckoutModuleConfiguration,
   ConnectParams,
   ConnectResult,
   DexConfig,
