@@ -11,6 +11,8 @@ yarn playwright install
 
 Create a `.env` by copying the `.env.example` file and filling in the values.
 
+For VSCode, use the `../../../vscode.code-workspace` workspace to ensure intellisense works correctly.
+
 ## Testing
 
 Inside that directory, you can run several commands:
