@@ -15,15 +15,17 @@ jobs:
     - uses: actions/setup-node@v3
       with:
         node-version: 18
-    - name: move to ts-immutable-sample-folder
-      run: cd samples/apps/ts-immutable-sample
     - name: Install dependencies
+      working-directory: samples/apps/ts-immutable-sample
       run: npm install -g yarn && yarn
-    - name: Install Playwright Browsers
-      run: yarn playwright install --with-deps
+    # - name: Install Playwright Browsers
+    #   working-directory: samples/apps/ts-immutable-sample
+    #   run: yarn playwright install --with-deps
     - name: Run Unit tests
+      working-directory: samples/apps/ts-immutable-sample
       run: yarn test
     - name: Run Playwright tests
+      working-directory: samples/apps/ts-immutable-sample
       run: yarn playwright test
     - uses: actions/upload-artifact@v3
       if: always()

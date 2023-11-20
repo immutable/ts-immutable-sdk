@@ -1349,7 +1349,7 @@ __metadata:
 
 "@imtbl/sdk@file:../../../sdk::locator=ts-immutable-sample%40workspace%3A.":
   version: 0.0.0
-  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=dfebc9&locator=ts-immutable-sample%40workspace%3A."
+  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=bd5077&locator=ts-immutable-sample%40workspace%3A."
   dependencies:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
@@ -1387,7 +1387,7 @@ __metadata:
   peerDependencies:
     react: ^18.2.0
     react-dom: ^18.2.0
-  checksum: 6281d6d6118096ee3c4f451ef1d264b64156bbe8435c3c872e70d122437a27c55dcd02e449243d7f6ced0a0920373ff9a60222ea8a9790beb2c2785ddc4ab0ae
+  checksum: 5f7a754486456b7d593bf7da75a8190e8205163adbbf1fba5a87e4d1748d30f27196ee11a4260c70aa403eb5327b216ebbd7872158b891beebaf8e492e62a70c
   languageName: node
   linkType: hard
 
@@ -2074,7 +2074,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@parcel/core@npm:2.10.3":
+"@parcel/core@npm:2.10.3, @parcel/core@npm:^2.10.3":
   version: 2.10.3
   resolution: "@parcel/core@npm:2.10.3"
   dependencies:
@@ -11503,6 +11503,7 @@ __metadata:
   resolution: "ts-immutable-sample@workspace:."
   dependencies:
     "@imtbl/sdk": "file:../../../sdk"
+    "@parcel/core": ^2.10.3
     "@playwright/test": ^1.40.0
     "@swc/core": ^1.3.96
     "@swc/jest": ^0.2.29
