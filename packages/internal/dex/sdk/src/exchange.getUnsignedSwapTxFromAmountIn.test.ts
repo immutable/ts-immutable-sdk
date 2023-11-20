@@ -8,7 +8,7 @@ import { SecondaryFee } from 'types';
 import { Environment } from '@imtbl/config';
 import { Router, addAmount } from 'lib';
 import { PaymentsExtended, SwapRouter } from '@uniswap/router-sdk';
-import { IMMUTABLE_TESTNET_CHAIN_ID, TIMX_IMMUTABLE_TESTNET } from './constants';
+import { IMMUTABLE_TESTNET_CHAIN_ID } from './constants';
 import { Exchange } from './exchange';
 import {
   mockRouterImplementation,
@@ -80,7 +80,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   });
 
   describe('with the out-of-the-box minimal configuration', () => {
-    it('uses the edge tIMX as the gas token', async () => {
+    it('uses the native IMX as the gas token', async () => {
       const tokenIn = { ...USDC_TEST_TOKEN, chainId: IMMUTABLE_TESTNET_CHAIN_ID };
       const tokenOut = { ...WETH_TEST_TOKEN, chainId: IMMUTABLE_TESTNET_CHAIN_ID };
 
@@ -101,8 +101,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       );
 
       expectToBeDefined(result.swap.gasFeeEstimate);
-      expect(result.swap.gasFeeEstimate.token).toEqual(TIMX_IMMUTABLE_TESTNET);
-      expect(result.swap.gasFeeEstimate.token.address).toEqual('0x0000000000000000000000000000000000001010');
+      expect(result.swap.gasFeeEstimate.token.address).toEqual('');
     });
   });
 
