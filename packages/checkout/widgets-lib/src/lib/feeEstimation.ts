@@ -90,7 +90,7 @@ export const getBridgeFeeEstimation = (
   const gasFeeAmount = gasFee.estimatedAmount;
   if (gasFeeAmount === undefined) return '-.--';
   const gasFeeToken = gasFee.token;
-  if (gasFeeToken === undefined) return '-.--';
+ if (typeof gasFeeAmount === 'undefined') return '-.--';
 
   const gasFeeInFiat = convertFeeToFiat(gasFeeAmount, gasFeeToken, conversions);
   if (gasFeeInFiat < 0) return '-.--';
