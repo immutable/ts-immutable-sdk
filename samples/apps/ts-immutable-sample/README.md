@@ -2,6 +2,15 @@
 
 Used for cross-module testing and dog fooding.
 
+## Getting Started
+
+```bash
+yarn install
+yarn playwright install
+```
+
+Create a `.env` by copying the `.env.example` file and filling in the values.
+
 ## Testing
 
 Inside that directory, you can run several commands:
@@ -30,7 +39,7 @@ We suggest that you begin by typing:
 
 And check out the following files:
   - ./tests/example.spec.ts - Example end-to-end test
-  - ./tests-examples/demo-todo-app.spec.ts - Demo Todo App end-to-end tests
+  - ./tests/demo-todo-app.spec.ts - Demo Todo App end-to-end tests
   - ./playwright.config.ts - Playwright Test configuration
 
 Visit https://playwright.dev/docs/intro for more information. ✨
