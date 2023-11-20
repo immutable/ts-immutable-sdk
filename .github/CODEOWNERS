@@ -1,8 +1,8 @@
-/sdk @immutable/developer-experience
-/packages/immutablex_client @immutable/developer-experience
-/packages/config @immutable/developer-experience
-/packages/internal/analytics @immutable/developer-experience
-/packages/internal/generated-clients @immutable/developer-experience
+/sdk @immutable/sdk
+/packages/immutablex_client @immutable/sdk
+/packages/config @immutable/sdk
+/packages/internal/analytics @immutable/sdk
+/packages/internal/generated-clients @immutable/sdk
 /packages/internal/toolkit @immutable/wallets
 /packages/internal/cryptofiat @immutable/wallets
 /packages/internal/dex @immutable/tokens
@@ -13,3 +13,4 @@
 /packages/checkout/widgets-lib @immutable/wallets @immutable/primary-revenue
 /packages/economy @immutable/igs-frontend
 /packages/blockchain-data @immutable/assets
+/samples @immutable/sdk
