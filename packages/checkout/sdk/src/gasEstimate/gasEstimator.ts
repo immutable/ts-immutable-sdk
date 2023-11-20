@@ -152,7 +152,7 @@ async function swapGasEstimator(
     return {
       gasEstimateType: GasEstimateType.SWAP,
       gasFee: {
-        estimatedAmount: BigNumber.from(swap.gasFeeEstimate.value),
+        estimatedAmount: swap.gasFeeEstimate.value ? BigNumber.from(swap.gasFeeEstimate.value) : undefined,
         token: {
           address: swap.gasFeeEstimate.token.address,
           symbol: swap.gasFeeEstimate.token.symbol ?? '',

@@ -280,6 +280,7 @@ describe('SwapWidget tests', () => {
                 name: 'ImmutableX',
                 symbol: 'IMX',
                 decimals: 18,
+                address: NATIVE,
               },
             },
             {
@@ -472,8 +473,8 @@ describe('SwapWidget tests', () => {
       let fromAmountInStub;
       beforeEach(() => {
         fromAmountInStub = cy.stub(quotesProcessor, 'fromAmountIn')
-          .as('fromAmountInStub');
-        // .resolves(mockQuoteFromAmountIn);
+          .as('fromAmountInStub')
+          .resolves(mockQuoteFromAmountIn);
 
         mount(
           <BiomeCombinedProviders>
@@ -520,7 +521,6 @@ describe('SwapWidget tests', () => {
 
           cySmartGet('@fromAmountInStub').should('have.been.called');
           cySmartGet('@sendTransactionStub').should('have.been.calledOnce');
-          cy.wait(1000);
           cySmartGet('loading-view').should('be.visible');
           cy.wait(1000);
           cySmartGet('success-box').should('be.visible');
