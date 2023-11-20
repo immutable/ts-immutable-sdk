@@ -9,15 +9,6 @@ export const NATIVE_IMX_IMMUTABLE_TESTNET: Native = {
   type: 'native',
 };
 
-export const TIMX_IMMUTABLE_TESTNET: ERC20 = {
-  chainId: IMMUTABLE_TESTNET_CHAIN_ID,
-  address: '0x0000000000000000000000000000000000001010',
-  decimals: 18,
-  symbol: 'tIMX',
-  name: 'Immutable Testnet Token',
-  type: 'erc20',
-};
-
 export const WIMX_IMMUTABLE_TESTNET: ERC20 = {
   chainId: IMMUTABLE_TESTNET_CHAIN_ID,
   address: '0x1CcCa691501174B4A623CeDA58cC8f1a76dc3439',
