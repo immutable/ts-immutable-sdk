@@ -13,10 +13,14 @@ jobs:
     - uses: actions/setup-node@v3
       with:
         node-version: 18
+    - name: move to ts-immutable-sample-folder
+      run: cd samples/apps/ts-immutable-sample
     - name: Install dependencies
       run: npm install -g yarn && yarn
     - name: Install Playwright Browsers
       run: yarn playwright install --with-deps
+    - name: Run Unit tests
+      run: yarn test
     - name: Run Playwright tests
       run: yarn playwright test
     - uses: actions/upload-artifact@v3
