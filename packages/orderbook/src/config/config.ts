@@ -28,8 +28,8 @@ export function getOrderbookConfig(
   switch (environment) {
     case Environment.SANDBOX:
       return {
-        seaportContractAddress: '0x7Fb7Da6De152597830eD16361633e362A2F59410',
-        zoneContractAddress: '0x63441cBfBd15Dd8f5E92598E535661Ac5aCB808E',
+        seaportContractAddress: '0x2CFA8f64e1B49A2DF28532D1D30Cda45117cF778',
+        zoneContractAddress: '0x1Bb4Fb11Ba021Bd0104F0Ee8E5F5c728Bc83d7F1',
         apiEndpoint: 'https://api.sandbox.immutable.com',
         chainName: TESTNET_CHAIN_NAME,
         provider: new providers.JsonRpcProvider(
