@@ -43,7 +43,7 @@ describe('getAvailableRoutingOptions', () => {
     const configWithOptions = new CheckoutConfiguration({
       baseConfig: { environment: Environment.SANDBOX },
       bridge: { enable: false },
-      onramp: { enable: false },
+      onRamp: { enable: false },
       swap: { enable: false },
     });
 

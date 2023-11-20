@@ -79,7 +79,7 @@ export class CheckoutConfiguration {
 
     // Developer mode will super set any environment configuration
     this.isProduction = !this.isDevelopment && this.environment === Environment.PRODUCTION;
-    this.isOnRampEnabled = config.onramp?.enable ?? DEFAULT_ON_RAMP_ENABLED;
+    this.isOnRampEnabled = config.onRamp?.enable ?? DEFAULT_ON_RAMP_ENABLED;
     this.isSwapEnabled = config.swap?.enable ?? DEFAULT_SWAP_ENABLED;
     this.isBridgeEnabled = config.bridge?.enable ?? DEFAULT_BRIDGE_ENABLED;
 
