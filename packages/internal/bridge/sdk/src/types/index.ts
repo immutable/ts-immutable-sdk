@@ -94,11 +94,15 @@ export interface BridgeFeeResponse {
  * @property {string} depositorAddress - The address of the depositor.
  * @property {FungibleToken} token - The token to be approved.
  * @property {ethers.BigNumber} depositAmount - The amount to be approved for deposit.
+ * @property {string} sourceChainId - The chain ID of the source chain.
+ * @property {string} destinationChainId - The chain ID of the destination chain.
  */
 export interface ApproveDepositBridgeRequest {
   depositorAddress: Address;
   token: FungibleToken;
   depositAmount: ethers.BigNumber;
+  sourceChainId: string;
+  destinationChainId: string;
 }
 
 /**
@@ -118,9 +122,12 @@ export interface ApproveDepositBridgeResponse {
  * @property {ethers.BigNumber} depositAmount - The amount to be deposited.
  */
 export interface BridgeDepositRequest {
+  depositorAddress: Address;
   recipientAddress: Address;
   token: FungibleToken;
   depositAmount: ethers.BigNumber;
+  sourceChainId: string;
+  destinationChainId: string;
 }
 
 /**

@@ -5,6 +5,7 @@
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
+    "@axelar-network/axelarjs-sdk": "^0.13.6",
     "@imtbl/config": "0.0.0",
     "@jest/globals": "^29.5.0",
     "ethers": "^5.7.2"

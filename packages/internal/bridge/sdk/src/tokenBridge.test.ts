@@ -64,9 +64,11 @@ describe('Token Bridge', () => {
         depositorAddress: '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816',
         token: '0x2f14582947E292a2eCd20C430B46f2d27CFE213c',
         depositAmount,
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+        destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
       };
 
-      const result = await tokenBridge.getUnsignedApproveDepositBridgeTx(req);
+      const result = await tokenBridge.getUnsignedApproveBridgeTx(req);
       expect(result.unsignedTx).toBeDefined();
       expect(result.unsignedTx?.data).toBe('0xdata');
       expect(result.unsignedTx?.to).toBe(req.token);
@@ -86,19 +88,23 @@ describe('Token Bridge', () => {
         depositorAddress: '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816',
         token: '0x2f14582947E292a2eCd20C430B46f2d27CFE213c',
         depositAmount,
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+        destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
       };
 
-      const result = await tokenBridge.getUnsignedApproveDepositBridgeTx(req);
+      const result = await tokenBridge.getUnsignedApproveBridgeTx(req);
       expect(result.unsignedTx).toBeNull();
     });
 
     it('return null tx when the token is NATIVE', async () => {
       expect.assertions(1);
-      const result = await tokenBridge.getUnsignedApproveDepositBridgeTx(
+      const result = await tokenBridge.getUnsignedApproveBridgeTx(
         {
           token: 'NATIVE',
           depositorAddress: '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816',
           depositAmount: ethers.utils.parseUnits('0.01', 18),
+          sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+          destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
         },
       );
       expect(result.unsignedTx).toBeNull();
@@ -106,11 +112,13 @@ describe('Token Bridge', () => {
     it('throws an error when depositorAddress is not a valid address and the token is ERC20', async () => {
       expect.assertions(2);
       try {
-        await tokenBridge.getUnsignedApproveDepositBridgeTx(
+        await tokenBridge.getUnsignedApproveBridgeTx(
           {
             token: '0x1234567890123456789012345678901234567890',
             depositorAddress: 'invalidAddress',
             depositAmount: ethers.utils.parseUnits('0.01', 18),
+            sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+            destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
           },
         );
       } catch (error: any) {
@@ -121,10 +129,12 @@ describe('Token Bridge', () => {
     it('throws an error when depositorAddress is not a valid address and the token is NATIVE', async () => {
       expect.assertions(2);
       try {
-        await tokenBridge.getUnsignedApproveDepositBridgeTx({
+        await tokenBridge.getUnsignedApproveBridgeTx({
           token: 'NATIVE',
           depositorAddress: 'invalidAddress',
           depositAmount: ethers.utils.parseUnits('0.01', 18),
+          sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+          destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
         });
       } catch (error: any) {
         expect(error).toBeInstanceOf(BridgeError);
@@ -134,11 +144,13 @@ describe('Token Bridge', () => {
     it('throws an error when token is not a valid address', async () => {
       expect.assertions(2);
       try {
-        await tokenBridge.getUnsignedApproveDepositBridgeTx(
+        await tokenBridge.getUnsignedApproveBridgeTx(
           {
             token: 'invalidToken',
             depositorAddress: '0x1234567890123456789012345678901234567890',
             depositAmount: ethers.utils.parseUnits('0.01', 18),
+            sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+            destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
           },
         );
       } catch (error: any) {
@@ -149,11 +161,13 @@ describe('Token Bridge', () => {
     it('throws an error when depositAmount is less than or equal to 0 and token is ERC20', async () => {
       expect.assertions(2);
       try {
-        await tokenBridge.getUnsignedApproveDepositBridgeTx(
+        await tokenBridge.getUnsignedApproveBridgeTx(
           {
             token: '0x1234567890123456789012345678901234567890',
             depositorAddress: '0x1234567890123456789012345678901234567890',
             depositAmount: ethers.BigNumber.from(0),
+            sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+            destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
           },
         );
       } catch (error: any) {
@@ -164,11 +178,13 @@ describe('Token Bridge', () => {
     it('throws an error when depositAmount is less than or equal to 0 and token is NATIVE', async () => {
       expect.assertions(2);
       try {
-        await tokenBridge.getUnsignedApproveDepositBridgeTx(
+        await tokenBridge.getUnsignedApproveBridgeTx(
           {
             token: 'NATIVE',
             depositorAddress: '0x1234567890123456789012345678901234567890',
             depositAmount: ethers.BigNumber.from(0),
+            sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+            destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
           },
         );
       } catch (error: any) {
@@ -202,9 +218,12 @@ describe('Token Bridge', () => {
       const token = '0x2f14582947E292a2eCd20C430B46f2d27CFE213c';
       const depositAmount = ethers.utils.parseUnits('0.01', 18);
       const request: BridgeDepositRequest = {
-        depositAmount,
+        depositorAddress: recipientAddress,
         recipientAddress,
+        depositAmount,
         token,
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+        destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
       };
       const response: BridgeDepositResponse = await tokenBridge.getUnsignedDepositTx(request);
       expect(response.unsignedTx.to).toBe(
@@ -220,9 +239,12 @@ describe('Token Bridge', () => {
       const token = 'NATIVE';
       const depositAmount = ethers.utils.parseUnits('0.01', 18);
       const request: BridgeDepositRequest = {
-        depositAmount,
+        depositorAddress: recipientAddress,
         recipientAddress,
+        depositAmount,
         token,
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+        destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
       };
 
       const response: BridgeDepositResponse = await tokenBridge.getUnsignedDepositTx(request);
@@ -237,9 +259,12 @@ describe('Token Bridge', () => {
       const token = '2f14582947E292a2eCd20C430B46f2d27CFE213c';
       const depositAmount = ethers.utils.parseUnits('0.01', 18);
       const request: BridgeDepositRequest = {
-        depositAmount,
+        depositorAddress: recipientAddress,
         recipientAddress,
+        depositAmount,
         token,
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+        destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
       };
       const response: BridgeDepositResponse = await tokenBridge.getUnsignedDepositTx(request);
       expect(response.unsignedTx.to).toBe(
@@ -255,9 +280,12 @@ describe('Token Bridge', () => {
       const token = '0x2f14582947E292a2eCd20C430B46f2d27CFE213c';
       const depositAmount = ethers.utils.parseUnits('0.01', 18);
       const request: BridgeDepositRequest = {
-        depositAmount,
+        depositorAddress: recipientAddress,
         recipientAddress,
+        depositAmount,
         token,
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+        destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
       };
 
       await expect(async () => {
@@ -275,9 +303,12 @@ describe('Token Bridge', () => {
       const token = 'NATIVE';
       const depositAmount = ethers.utils.parseUnits('0.01', 18);
       const request: BridgeDepositRequest = {
-        depositAmount,
+        depositorAddress: recipientAddress,
         recipientAddress,
+        depositAmount,
         token,
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+        destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
       };
 
       await expect(async () => {
@@ -295,9 +326,12 @@ describe('Token Bridge', () => {
       const token = 'zzzzf14582947E292a2eCd20C430B46f2d27CFE213c';
       const depositAmount = ethers.utils.parseUnits('0.01', 18);
       const request: BridgeDepositRequest = {
-        depositAmount,
+        depositorAddress: recipientAddress,
         recipientAddress,
+        depositAmount,
         token,
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+        destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
       };
 
       await expect(async () => {
@@ -316,9 +350,12 @@ describe('Token Bridge', () => {
       const token = '0x2f14582947E292a2eCd20C430B46f2d27CFE213c';
       const depositAmount = ethers.utils.parseUnits('0', 18);
       const request: BridgeDepositRequest = {
-        depositAmount,
+        depositorAddress: recipientAddress,
         recipientAddress,
+        depositAmount,
         token,
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+        destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
       };
 
       await expect(async () => {
@@ -337,9 +374,12 @@ describe('Token Bridge', () => {
       const token = 'NATIVE';
       const depositAmount = ethers.utils.parseUnits('0', 18);
       const request: BridgeDepositRequest = {
-        depositAmount,
+        depositorAddress: recipientAddress,
         recipientAddress,
+        depositAmount,
         token,
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+        destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
       };
 
       await expect(async () => {
@@ -357,9 +397,12 @@ describe('Token Bridge', () => {
       const token = '0x2f14582947E292a2eCd20C430B46f2d27CFE213c';
       const depositAmount = ethers.utils.parseUnits('-1', 18);
       const request: BridgeDepositRequest = {
-        depositAmount,
+        depositorAddress: recipientAddress,
         recipientAddress,
+        depositAmount,
         token,
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+        destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
       };
 
       await expect(async () => {
@@ -377,9 +420,12 @@ describe('Token Bridge', () => {
       const token = 'NATIVE';
       const depositAmount = ethers.utils.parseUnits('-1', 18);
       const request: BridgeDepositRequest = {
-        depositAmount,
+        depositorAddress: recipientAddress,
         recipientAddress,
+        depositAmount,
         token,
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+        destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
       };
 
       await expect(async () => {

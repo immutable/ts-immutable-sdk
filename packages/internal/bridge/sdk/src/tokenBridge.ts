@@ -134,12 +134,18 @@ export class TokenBridge {
    *     console.error('Error:', error.message);
    *   });
    */
-  public async getUnsignedApproveDepositBridgeTx(
+  public async getUnsignedApproveBridgeTx(
     req: ApproveDepositBridgeRequest,
   ): Promise<ApproveDepositBridgeResponse> {
     this.validateChainConfiguration();
 
-    TokenBridge.validateDepositArgs(req.depositorAddress, req.depositAmount, req.token);
+    await this.validateDepositArgs(
+      req.depositorAddress,
+      req.depositAmount,
+      req.token,
+      req.sourceChainId,
+      req.destinationChainId,
+    );
 
     // If the token is NATIVE, no approval is required
     if (req.token === 'NATIVE') {
@@ -236,7 +242,13 @@ export class TokenBridge {
   ): Promise<BridgeDepositResponse> {
     this.validateChainConfiguration();
 
-    TokenBridge.validateDepositArgs(req.recipientAddress, req.depositAmount, req.token);
+    await this.validateDepositArgs(
+      req.depositorAddress,
+      req.depositAmount,
+      req.token,
+      req.sourceChainId,
+      req.destinationChainId,
+    );
 
     const rootERC20PredicateContract = await withBridgeError<ethers.Contract>(
       async () => {
@@ -823,10 +835,12 @@ export class TokenBridge {
     return parseInt(stateSyncEvent.args.id, 10);
   }
 
-  private static validateDepositArgs(
+  private async validateDepositArgs(
     depositorOrRecipientAddress: string,
     depositAmount: ethers.BigNumber,
     token: string,
+    sourceChainId: string,
+    destinationChainId: string,
   ) {
     if (!ethers.utils.isAddress(depositorOrRecipientAddress)) {
       throw new BridgeError(
@@ -847,6 +861,31 @@ export class TokenBridge {
     if (token !== 'NATIVE' && !ethers.utils.isAddress(token)) {
       throw new BridgeError(
         `token address ${token} is not a valid address`,
+        BridgeErrorType.INVALID_ADDRESS,
+      );
+    }
+    // If the token is not native, it must be a valid addressß
+    if (sourceChainId !== this.config.bridgeInstance.rootChainID.toString()
+      && sourceChainId !== this.config.bridgeInstance.childChainID.toString()) {
+      throw new BridgeError(
+        `the sourceChainId ${sourceChainId} is not a valid`,
+        BridgeErrorType.INVALID_ADDRESS,
+      );
+    }
+
+    // If the token is not native, it must be a valid address
+    if (destinationChainId !== this.config.bridgeInstance.rootChainID.toString()
+      && destinationChainId !== this.config.bridgeInstance.childChainID.toString()) {
+      throw new BridgeError(
+        `the destinationChainId ${destinationChainId} is not a valid`,
+        BridgeErrorType.INVALID_ADDRESS,
+      );
+    }
+
+    // If the token is not native, it must be a valid address
+    if (sourceChainId === destinationChainId.toString()) {
+      throw new BridgeError(
+        `the sourceChainId ${sourceChainId} cannot be the same as the destinationChainId ${destinationChainId}`,
         BridgeErrorType.INVALID_ADDRESS,
       );
     }
@@ -891,7 +930,7 @@ export class TokenBridge {
       async () => this.config.rootProvider.getNetwork(),
       BridgeErrorType.PROVIDER_ERROR,
     );
-    if (rootNetwork.chainId.toString() !== this.config.bridgeInstance.rootChainID) {
+    if (rootNetwork.chainId.toString() !== this.config.bridgeInstance.rootChainID.toString()) {
       throw new BridgeError(
         `Rootchain provider chainID ${rootNetwork.chainId} does not match expected chainID ${this.config.bridgeInstance.rootChainID}. ${errMessage}`,
         BridgeErrorType.UNSUPPORTED_ERROR,
@@ -899,7 +938,7 @@ export class TokenBridge {
     }
 
     const childNetwork = await this.config.childProvider.getNetwork();
-    if (childNetwork.chainId.toString() !== this.config.bridgeInstance.childChainID) {
+    if (childNetwork.chainId.toString() !== this.config.bridgeInstance.childChainID.toString()) {
       throw new BridgeError(
         `Childchain provider chainID ${childNetwork.chainId} does not match expected chainID ${this.config.bridgeInstance.childChainID}. ${errMessage}`,
         BridgeErrorType.UNSUPPORTED_ERROR,
