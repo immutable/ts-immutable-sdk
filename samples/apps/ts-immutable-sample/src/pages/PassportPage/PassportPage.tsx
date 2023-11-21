@@ -21,6 +21,9 @@ const PassportPage = () => {
   });
   console.log(passportInstance);
 
+  if (passportInstance !== undefined) {
+    throw new Error('Failed to Init Passport');
+  }
   return <h1>Passport</h1>;
 };
 
