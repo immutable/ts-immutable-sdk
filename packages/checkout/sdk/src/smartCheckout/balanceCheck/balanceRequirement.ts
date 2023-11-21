@@ -16,13 +16,15 @@ import {
   BalanceERC721Requirement,
   BalanceNativeRequirement,
 } from './types';
-import { DEFAULT_TOKEN_DECIMALS } from '../../env';
+import { DEFAULT_TOKEN_DECIMALS, NATIVE } from '../../env';
 import { isNativeToken } from '../../network';
 
 export const getTokensFromRequirements = (itemRequirements: ItemRequirement[]): TokenInfo[] => itemRequirements
   .map((itemRequirement) => {
     if (itemRequirement.type === ItemType.NATIVE) {
-      return {} as TokenInfo;
+      return {
+        address: NATIVE,
+      } as TokenInfo;
     }
 
     return {

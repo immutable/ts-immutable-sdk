@@ -24,7 +24,7 @@ import {
   getTokenBalanceRequirement,
   getTokensFromRequirements,
 } from './balanceRequirement';
-import { ERC721ABI } from '../../env';
+import { ERC721ABI, NATIVE } from '../../env';
 
 /**
  * Gets the balances for all NATIVE and ERC20 balance requirements.
@@ -38,11 +38,14 @@ const getTokenBalances = async (
   try {
     const tokenMap = new Map<string, TokenInfo>();
     getTokensFromRequirements(itemRequirements).forEach(
-      (item) => tokenMap.set((item.address || '').toLocaleLowerCase(), item),
+      (item) => {
+        if (!item.address) return;
+        tokenMap.set(item.address.toLocaleLowerCase(), item);
+      },
     );
     const { balances } = await getAllBalances(config, provider, ownerAddress);
     return balances.filter(
-      (balance) => tokenMap.get((balance.token.address || '').toLocaleLowerCase()),
+      (balance) => tokenMap.get((balance.token.address || NATIVE).toLocaleLowerCase()),
     ) as TokenBalance[];
   } catch (error: any) {
     throw new CheckoutError(
