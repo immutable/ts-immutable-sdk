@@ -18,13 +18,14 @@ jobs:
     - name: Install dependencies
       working-directory: samples/apps/ts-immutable-sample
       run: npm install -g yarn && yarn
-    # - name: Install Playwright Browsers
-    #   working-directory: samples/apps/ts-immutable-sample
-    #   run: yarn playwright install --with-deps
     - name: Run Unit tests
       working-directory: samples/apps/ts-immutable-sample
       run: yarn test
     - name: Run Playwright tests
+      env:
+        # Required for Firefox to run
+        # https://github.com/microsoft/playwright/issues/6500#issuecomment-838515115
+        HOME: /root
       working-directory: samples/apps/ts-immutable-sample
       run: yarn playwright test
     - uses: actions/upload-artifact@v3
