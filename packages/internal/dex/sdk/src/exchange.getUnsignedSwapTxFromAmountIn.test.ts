@@ -157,7 +157,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       expect(tx.swap.gasFeeEstimate.value).toEqual(TEST_TRANSACTION_GAS_USAGE.mul(TEST_GAS_PRICE));
       expect(tx.swap.gasFeeEstimate.token.chainId).toEqual(NATIVE_TEST_TOKEN.chainId);
-      expect(tx.swap.gasFeeEstimate.token.address).toEqual(''); // Default configuration is a native token for gas and not an ERC20
+      expect(tx.swap.gasFeeEstimate.token.address).toEqual('native'); // Default configuration is a native token for gas and not an ERC20
       expect(tx.swap.gasFeeEstimate.token.decimals).toEqual(NATIVE_TEST_TOKEN.decimals);
       expect(tx.swap.gasFeeEstimate.token.symbol).toEqual(NATIVE_TEST_TOKEN.symbol);
       expect(tx.swap.gasFeeEstimate.token.name).toEqual(NATIVE_TEST_TOKEN.name);
@@ -420,7 +420,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         BigNumber.from(1),
       );
 
-      expect(result.quote.amount.token.address).toEqual('');
+      expect(result.quote.amount.token.address).toEqual('native');
       expect(result.quote.amount.token.chainId).toEqual(nativeTokenService.nativeToken.chainId);
       expect(result.quote.amount.token.decimals).toEqual(nativeTokenService.nativeToken.decimals);
     });
@@ -765,7 +765,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expectToBeDefined(tx.approval?.gasFeeEstimate);
       expect(tx.approval.gasFeeEstimate.value).toEqual(TEST_GAS_PRICE.mul(APPROVE_GAS_ESTIMATE));
       expect(tx.approval.gasFeeEstimate.token.chainId).toEqual(NATIVE_TEST_TOKEN.chainId);
-      expect(tx.approval.gasFeeEstimate.token.address).toEqual('');
+      expect(tx.approval.gasFeeEstimate.token.address).toEqual('native');
       expect(tx.approval.gasFeeEstimate.token.decimals).toEqual(NATIVE_TEST_TOKEN.decimals);
       expect(tx.approval.gasFeeEstimate.token.symbol).toEqual(NATIVE_TEST_TOKEN.symbol);
       expect(tx.approval.gasFeeEstimate.token.name).toEqual(NATIVE_TEST_TOKEN.name);
