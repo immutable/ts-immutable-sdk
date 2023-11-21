@@ -23,7 +23,7 @@ import {
   Blockscout,
   BlockscoutNativeTokenData, BlockscoutToken, BlockscoutTokens, BlockscoutTokenType,
 } from '../client';
-import { BLOCKSCOUT_CHAIN_URL_MAP, ERC20ABI } from '../env';
+import { BLOCKSCOUT_CHAIN_URL_MAP, ERC20ABI, NATIVE } from '../env';
 
 jest.mock('../tokens');
 jest.mock('../client');
@@ -412,7 +412,7 @@ describe('balances', () => {
           balance: BigNumber.from('777777777777777777'),
           formattedBalance: '0.777777777777777777',
           token: {
-            address: '',
+            address: NATIVE,
             decimals: 18,
             name: 'IMX',
             symbol: 'IMX',
@@ -465,7 +465,7 @@ describe('balances', () => {
           balance: BigNumber.from('777777777777777777'),
           formattedBalance: '0.777777777777777777',
           token: {
-            address: '',
+            address: NATIVE,
             decimals: 18,
             name: 'IMX',
             symbol: 'IMX',

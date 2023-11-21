@@ -20,7 +20,7 @@ import {
   BlockscoutTokenType,
 } from '../client';
 import {
-  DEFAULT_TOKEN_DECIMALS, ERC20ABI,
+  DEFAULT_TOKEN_DECIMALS, ERC20ABI, NATIVE,
 } from '../env';
 import { measureAsyncExecution } from '../logger/debugLogger';
 
@@ -105,7 +105,10 @@ export const getIndexerBalance = async (
   // Shuffle the mapping of the tokens configuration so it is a hashmap
   // for faster access to tokens config objects.
   const shouldFilter = filterTokens.length > 0;
-  const mapFilterTokens = Object.assign({}, ...(filterTokens.map((t) => ({ [t.address || '']: t }))));
+  const mapFilterTokens = Object.assign(
+    {},
+    ...(filterTokens.map((t) => ({ [t.address || NATIVE]: t }))),
+  );
 
   // Get blockscout client for the given chain
   let blockscoutClient = blockscoutClientMap.get(chainId);
@@ -154,6 +157,7 @@ export const getIndexerBalance = async (
   const nativeBalances = async (client: Blockscout) => {
     try {
       const respNative = await client.getNativeTokenByWalletAddress({ walletAddress });
+      respNative.token.address ||= NATIVE;
       items.push(respNative);
     } catch (err: any) {
       // In case of a 404, the wallet is a new wallet that hasn't been indexed by
