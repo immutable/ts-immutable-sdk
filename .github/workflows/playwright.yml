@@ -24,7 +24,7 @@ jobs:
 
     - name: Install sample apps dependencies
       working-directory: samples/apps/ts-immutable-sample
-      run: yarn install
+      run: yarn install --ignore-scripts
 
     - name: Run Unit tests
       run: cd samples/apps/ts-immutable-sample && yarn test
