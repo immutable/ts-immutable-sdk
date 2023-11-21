@@ -7,6 +7,7 @@ import {
   getTokenBalanceRequirement,
   getTokensFromRequirements,
 } from './balanceRequirement';
+import { NATIVE } from '../../env';
 
 describe('balanceRequirement', () => {
   describe('getTokensFromRequirements', () => {
@@ -31,7 +32,9 @@ describe('balanceRequirement', () => {
       ];
 
       expect(getTokensFromRequirements(itemRequirements)).toEqual([
-        {},
+        {
+          address: NATIVE,
+        },
         {
           address: '0xERC20',
         },
