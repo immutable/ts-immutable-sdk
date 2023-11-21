@@ -42,7 +42,7 @@ describe('BalanceItem', () => {
       name: 'Immutable X',
       symbol: 'IMX',
       decimals: 18,
-      address: IMX_ADDRESS_ZKEVM,
+      address: NATIVE,
     },
   }];
 

@@ -454,7 +454,7 @@ describe('WalletWidget tests', () => {
                   name: 'ImmutableX',
                   symbol: 'IMX',
                   decimals: 18,
-                  address: IMX_ADDRESS_ZKEVM,
+                  address: NATIVE,
                   icon: '123',
                 },
               },
