@@ -22,13 +22,13 @@ import {
   RootTokenRequest,
   RootTokenResponse,
 } from 'types';
-import { ROOT_ERC20_PREDICATE } from 'contracts/ABIs/RootERC20Predicate';
+import { ROOT_ERC20_BRIDGE_FLOW_RATE } from 'contracts/ABIs/RootERC20BridgeFlowRate';
 import { ERC20 } from 'contracts/ABIs/ERC20';
 import { BridgeError, BridgeErrorType, withBridgeError } from 'errors';
 import { ROOT_STATE_SENDER } from 'contracts/ABIs/RootStateSender';
 import { CHILD_STATE_RECEIVER } from 'contracts/ABIs/ChildStateReceiver';
 import { getBlockNumberClosestToTimestamp } from 'lib/getBlockCloseToTimestamp';
-import { CHILD_ERC20_PREDICATE } from 'contracts/ABIs/ChildERC20Predicate';
+import { CHILD_ERC20_BRIDGE } from 'contracts/ABIs/ChildERC20Bridge';
 import { CHECKPOINT_MANAGER } from 'contracts/ABIs/CheckpointManager';
 import { decodeExtraData } from 'lib/decodeExtraData';
 import { L2_STATE_SENDER } from 'contracts/ABIs/L2StateSender';
@@ -254,7 +254,7 @@ export class TokenBridge {
       async () => {
         const contract = new ethers.Contract(
           this.config.bridgeContracts.rootChainERC20Predicate,
-          ROOT_ERC20_PREDICATE,
+          ROOT_ERC20_BRIDGE_FLOW_RATE,
         );
         return contract;
       },
@@ -428,7 +428,7 @@ export class TokenBridge {
       async () => {
         const rootERC20Predicate: ethers.Contract = new ethers.Contract(
           this.config.bridgeContracts.rootChainERC20Predicate,
-          ROOT_ERC20_PREDICATE,
+          ROOT_ERC20_BRIDGE_FLOW_RATE,
           this.config.rootProvider,
         );
         return await rootERC20Predicate.rootTokenToChildToken(reqTokenAddress);
@@ -536,7 +536,7 @@ export class TokenBridge {
       async () => {
         const contract = new ethers.Contract(
           this.config.bridgeContracts.childChainERC20Predicate,
-          CHILD_ERC20_PREDICATE,
+          CHILD_ERC20_BRIDGE,
         );
         return contract;
       },
