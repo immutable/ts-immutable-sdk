@@ -1,5 +1,5 @@
 import {
-  ChainId, ChainName, Checkout, IMTBLWidgetEvents, WidgetTheme,
+  ChainId, ChainName, Checkout, GasEstimateType, IMTBLWidgetEvents, WidgetTheme,
 } from '@imtbl/checkout-sdk';
 import {
   describe, it, cy,
@@ -294,6 +294,15 @@ describe('WalletWidget tests', () => {
           },
           gods: {
             usd: 0.8,
+          },
+        });
+
+      cy.stub(Checkout.prototype, 'gasEstimate')
+        .as('gasEstimateStub')
+        .resolves({
+          gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+          gasFee: {
+            estimatedAmount: BigNumber.from('10000000000000000'),
           },
         });
     });
