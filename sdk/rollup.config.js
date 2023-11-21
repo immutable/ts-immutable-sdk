@@ -40,7 +40,7 @@ const getFileBuild = (inputFilename) => [
   {
     input: `./src/${inputFilename}.ts`,
     output: {
-      dir: 'dist',
+      dir: './',
       format: 'es',
     },
     plugins: [
@@ -58,12 +58,13 @@ const getFileBuild = (inputFilename) => [
         preventAssignment: true,
         __SDK_VERSION__: pkg.version,
       }),
+      terser(),
     ],
   },
   {
     input: `./dist/types/${inputFilename}.d.ts`,
     output: {
-      file: `./dist/${inputFilename}.d.ts`,
+      file: `./${inputFilename}.d.ts`,
       format: 'es',
     },
     plugins: [
@@ -88,7 +89,7 @@ export default [
   {
     input: 'src/index.ts',
     output: {
-      file: 'dist/index.cjs',
+      file: './index.cjs',
       format: 'cjs',
     },
     plugins: [
@@ -97,14 +98,29 @@ export default [
       }),
       json(),
       commonJs(),
-      typescript(),
+      typescript({
+        declaration: true,
+        declarationDir: './dist/types/cjs',
+      }),
       replace({
         exclude: 'node_modules/**',
         preventAssignment: true,
         __SDK_VERSION__: pkg.version,
       }),
+      terser(),
     ],
   },
+  {
+    input: `./dist/types/cjs/index.d.ts`,
+    output: {
+      file: `./index.d.cts`
+    },
+    plugins: [
+      dts({
+        respectExternal: true,
+      }),
+    ],
+  },  
   // Browser Bundle
   {
     input: 'src/index.ts',

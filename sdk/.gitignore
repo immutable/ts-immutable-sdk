@@ -1,1 +1,8 @@
 workspace-packages.json
+
+*.js
+*.cjs
+*.d.ts
+*.d.cts
+*.map
+!rollup.config.js
