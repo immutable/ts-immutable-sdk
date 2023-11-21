@@ -277,8 +277,9 @@ describe('Token Bridge', () => {
         destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
       };
       const response: BridgeDepositResponse = await tokenBridge.getUnsignedDepositTx(request);
+
       expect(response.unsignedTx.to).toBe(
-        bridgeConfig.bridgeContracts.rootChainERC20BridgeFlowRate,
+        bridgeConfig.bridgeContracts.rootERC20BridgeFlowRate,
       );
       expect(response.unsignedTx.value).toBe(0);
       expect(response.unsignedTx.data).not.toBeNull();
@@ -299,7 +300,7 @@ describe('Token Bridge', () => {
       };
 
       const response: BridgeDepositResponse = await tokenBridge.getUnsignedDepositTx(request);
-      expect(response.unsignedTx.to).toBe(bridgeConfig.bridgeContracts.rootChainERC20BridgeFlowRate);
+      expect(response.unsignedTx.to).toBe(bridgeConfig.bridgeContracts.rootERC20BridgeFlowRate);
       expect(response.unsignedTx.value).toBe(depositAmount);
       expect(response.unsignedTx.data).not.toBeNull();
     });
@@ -319,7 +320,7 @@ describe('Token Bridge', () => {
       };
       const response: BridgeDepositResponse = await tokenBridge.getUnsignedDepositTx(request);
       expect(response.unsignedTx.to).toBe(
-        bridgeConfig.bridgeContracts.rootChainERC20BridgeFlowRate,
+        bridgeConfig.bridgeContracts.rootERC20BridgeFlowRate,
       );
       expect(response.unsignedTx.value).toBe(0);
       expect(response.unsignedTx.data).not.toBeNull();

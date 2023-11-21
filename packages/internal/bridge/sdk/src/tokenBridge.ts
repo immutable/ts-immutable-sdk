@@ -163,7 +163,7 @@ export class TokenBridge {
     const rootERC20PredicateAllowance: ethers.BigNumber = await withBridgeError<ethers.BigNumber>(() => erc20Contract
       .allowance(
         req.depositorAddress,
-        this.config.bridgeContracts.rootChainERC20BridgeFlowRate,
+        this.config.bridgeContracts.rootERC20BridgeFlowRate,
       ), BridgeErrorType.PROVIDER_ERROR);
 
     // If the allowance is greater than or equal to the deposit amount, no approval is required
@@ -180,7 +180,7 @@ export class TokenBridge {
     // Encode the approve function call data for the ERC20 contract
     const data: string = await withBridgeError<string>(async () => erc20Contract.interface
       .encodeFunctionData('approve', [
-        this.config.bridgeContracts.rootChainERC20BridgeFlowRate,
+        this.config.bridgeContracts.rootERC20BridgeFlowRate,
         approvalAmountRequired,
       ]), BridgeErrorType.INTERNAL_ERROR);
 
@@ -253,7 +253,7 @@ export class TokenBridge {
     const rootERC20PredicateContract = await withBridgeError<ethers.Contract>(
       async () => {
         const contract = new ethers.Contract(
-          this.config.bridgeContracts.rootChainERC20BridgeFlowRate,
+          this.config.bridgeContracts.rootERC20BridgeFlowRate,
           ROOT_ERC20_BRIDGE_FLOW_RATE,
         );
         return contract;
@@ -275,7 +275,7 @@ export class TokenBridge {
       return {
         unsignedTx: {
           data,
-          to: this.config.bridgeContracts.rootChainERC20BridgeFlowRate,
+          to: this.config.bridgeContracts.rootERC20BridgeFlowRate,
           value: req.depositAmount,
         },
       };
@@ -293,7 +293,7 @@ export class TokenBridge {
     return {
       unsignedTx: {
         data,
-        to: this.config.bridgeContracts.rootChainERC20BridgeFlowRate,
+        to: this.config.bridgeContracts.rootERC20BridgeFlowRate,
         value: 0,
       },
     };
@@ -427,7 +427,7 @@ export class TokenBridge {
     const childTokenAddress: string = await withBridgeError<string>(
       async () => {
         const rootERC20Predicate: ethers.Contract = new ethers.Contract(
-          this.config.bridgeContracts.rootChainERC20BridgeFlowRate,
+          this.config.bridgeContracts.rootERC20BridgeFlowRate,
           ROOT_ERC20_BRIDGE_FLOW_RATE,
           this.config.rootProvider,
         );
@@ -532,10 +532,10 @@ export class TokenBridge {
     TokenBridge.validateWithdrawArgs(req.recipientAddress, req.withdrawAmount, req.token);
 
     // Create a contract instance for interacting with the ChildERC20Predicate
-    const childERC20PredicateContract = await withBridgeError<ethers.Contract>(
+    const childERC20Bridge = await withBridgeError<ethers.Contract>(
       async () => {
         const contract = new ethers.Contract(
-          this.config.bridgeContracts.childChainERC20Bridge,
+          this.config.bridgeContracts.childERC20Bridge,
           CHILD_ERC20_BRIDGE,
         );
         return contract;
@@ -544,7 +544,7 @@ export class TokenBridge {
     );
 
     // Encode the withdrawTo function call data for the ERC20 contract
-    const data: string = await withBridgeError<string>(async () => childERC20PredicateContract.interface
+    const data: string = await withBridgeError<string>(async () => childERC20Bridge.interface
       .encodeFunctionData('withdrawTo', [
         req.token,
         req.recipientAddress,
@@ -555,7 +555,7 @@ export class TokenBridge {
     return {
       unsignedTx: {
         data,
-        to: this.config.bridgeContracts.childChainERC20Bridge,
+        to: this.config.bridgeContracts.childERC20Bridge,
         value: 0,
       },
     };
