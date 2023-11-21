@@ -54,7 +54,7 @@ export class PassportImxProviderFactory {
   public async getProvider(): Promise<IMXProvider> {
     let user = null;
     try {
-      user = await this.authManager.loginSilent();
+      user = await this.authManager.getUser();
     } catch (e) {
       // eslint-disable-next-line no-console
       console.warn(e);
@@ -66,7 +66,7 @@ export class PassportImxProviderFactory {
   }
 
   public async getProviderSilent(): Promise<IMXProvider | null> {
-    const user = await this.authManager.loginSilent();
+    const user = await this.authManager.getUser();
     if (!user) {
       return null;
     }

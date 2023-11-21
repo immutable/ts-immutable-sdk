@@ -80,13 +80,14 @@ export function NetworkMenu({ setBalancesLoading }: NetworkMenuProps) {
           chainId,
         },
       });
-      setBalancesLoading(true);
+
       try {
         const switchNetworkResult = await checkout.switchNetwork({
           provider,
           chainId,
         } as SwitchNetworkParams);
 
+        setBalancesLoading(true);
         walletDispatch({
           payload: {
             type: WalletActions.SET_NETWORK,

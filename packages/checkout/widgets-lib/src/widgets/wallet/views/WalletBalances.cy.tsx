@@ -49,6 +49,31 @@ describe('WalletBalances', () => {
   const cryptoConversions = new Map<string, number>([['eth', 1800], ['imx', 0.75]]);
 
   describe('balances', () => {
+    const balancesMock = [
+      {
+        balance: BigNumber.from('1000000000000000000'),
+        formattedBalance: '0.1',
+        token: {
+          name: 'ETH',
+          symbol: 'ETH',
+          decimals: 18,
+          address: '',
+          icon: '123',
+        },
+      },
+      {
+        balance: BigNumber.from('10000000000000'),
+        formattedBalance: '0.1',
+        token: {
+          name: 'ImmutableX',
+          symbol: 'IMX',
+          decimals: 18,
+          address: IMX_ADDRESS_ZKEVM,
+          icon: '123',
+        },
+      },
+    ];
+
     const baseWalletState: WalletState = {
       network: {
         chainId: ChainId.IMTBL_ZKEVM_TESTNET,
@@ -57,40 +82,11 @@ describe('WalletBalances', () => {
         isSupported: true,
       },
       walletProviderName: WalletProviderName.METAMASK,
-      tokenBalances: [],
+      tokenBalances: balancesMock,
       supportedTopUps: null,
     };
 
     it('should show balances', () => {
-      cy.stub(Checkout.prototype, 'getAllBalances')
-        .as('getAllBalances')
-        .resolves({
-          balances: [
-            {
-              balance: BigNumber.from('1000000000000000000'),
-              formattedBalance: '0.1',
-              token: {
-                name: 'ETH',
-                symbol: 'ETH',
-                decimals: 18,
-                address: '',
-                icon: '123',
-              },
-            },
-            {
-              balance: BigNumber.from('10000000000000'),
-              formattedBalance: '0.1',
-              token: {
-                name: 'ImmutableX',
-                symbol: 'IMX',
-                decimals: 18,
-                address: NATIVE,
-                icon: '123',
-              },
-            },
-          ],
-        });
-
       mount(
         <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
           <ConnectLoaderTestComponent
@@ -100,7 +96,7 @@ describe('WalletBalances', () => {
               initialStateOverride={baseWalletState}
               cryptoConversionsOverride={cryptoConversions}
             >
-              <WalletBalances />
+              <WalletBalances balancesLoading={false} setBalancesLoading={() => {}} />
             </WalletWidgetTestComponent>
           </ConnectLoaderTestComponent>
         </CustomAnalyticsProvider>,
@@ -111,8 +107,6 @@ describe('WalletBalances', () => {
     });
 
     it('should show shimmer while waiting for balances to load', () => {
-      cy.stub(Checkout.prototype, 'getAllBalances').as('getAllBalances').rejects();
-
       mount(
         <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
           <ConnectLoaderTestComponent
@@ -122,7 +116,7 @@ describe('WalletBalances', () => {
               initialStateOverride={baseWalletState}
               cryptoConversionsOverride={cryptoConversions}
             >
-              <WalletBalances />
+              <WalletBalances balancesLoading setBalancesLoading={() => {}} />
             </WalletWidgetTestComponent>
           </ConnectLoaderTestComponent>
         </CustomAnalyticsProvider>,
@@ -135,8 +129,6 @@ describe('WalletBalances', () => {
     });
 
     it('should not show shimmers once balances has loaded', () => {
-      cy.stub(Checkout.prototype, 'getAllBalances').as('getAllBalances');
-
       mount(
         <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
           <ConnectLoaderTestComponent
@@ -146,7 +138,7 @@ describe('WalletBalances', () => {
               initialStateOverride={baseWalletState}
               cryptoConversionsOverride={cryptoConversions}
             >
-              <WalletBalances />
+              <WalletBalances balancesLoading={false} setBalancesLoading={() => {}} />
             </WalletWidgetTestComponent>
           </ConnectLoaderTestComponent>
         </CustomAnalyticsProvider>,
@@ -158,72 +150,17 @@ describe('WalletBalances', () => {
       cySmartGet('total-token-balance-value__shimmer').should('not.exist');
     });
 
-    it('should show balances after getAllBalances failure', () => {
-      cy.stub(Checkout.prototype, 'getAllBalances')
-        .as('getAllBalances')
-        .rejects()
-        .resolves({
-          balances: [
-            {
-              balance: BigNumber.from('1000000000000000000'),
-              formattedBalance: '0.1',
-              token: {
-                name: 'ETH',
-                symbol: 'ETH',
-                decimals: 18,
-                address: '',
-                icon: '123',
-              },
-            },
-            {
-              balance: BigNumber.from('10000000000000'),
-              formattedBalance: '0.1',
-              token: {
-                name: 'ImmutableX',
-                symbol: 'IMX',
-                decimals: 18,
-                address: NATIVE,
-                icon: '123',
-              },
-            },
-          ],
-        });
-
-      mount(
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <WalletWidgetTestComponent
-              initialStateOverride={baseWalletState}
-              cryptoConversionsOverride={cryptoConversions}
-            >
-              <WalletBalances />
-            </WalletWidgetTestComponent>
-          </ConnectLoaderTestComponent>
-        </CustomAnalyticsProvider>,
-      );
-
-      cySmartGet('balance-item-IMX').should('exist');
-      cySmartGet('balance-item-ETH').should('exist');
-    });
-
     it('should show no balances', () => {
-      cy.stub(Checkout.prototype, 'getAllBalances')
-        .as('getAllBalancesStub')
-        .rejects({})
-        .resolves({ balances: [] });
-
       mount(
         <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
           <ConnectLoaderTestComponent
             initialStateOverride={connectLoaderState}
           >
             <WalletWidgetTestComponent
-              initialStateOverride={baseWalletState}
+              initialStateOverride={{ ...baseWalletState, tokenBalances: [] }}
               cryptoConversionsOverride={cryptoConversions}
             >
-              <WalletBalances />
+              <WalletBalances balancesLoading={false} setBalancesLoading={() => {}} />
             </WalletWidgetTestComponent>
           </ConnectLoaderTestComponent>
         </CustomAnalyticsProvider>,
@@ -234,6 +171,29 @@ describe('WalletBalances', () => {
   });
 
   describe('move coins gas check', () => {
+    const balanceMock = [
+      {
+        balance: BigNumber.from('10000000000000'),
+        formattedBalance: '0.1',
+        token: {
+          name: 'ImmutableX',
+          symbol: 'IMX',
+          decimals: 18,
+          address: IMX_ADDRESS_ZKEVM,
+          icon: '123',
+        },
+      },
+      {
+        balance: BigNumber.from('0'),
+        formattedBalance: '0.0',
+        token: {
+          name: 'eth',
+          symbol: 'ETH',
+          decimals: 18,
+          icon: '123',
+        },
+      },
+    ];
     const baseWalletState = {
       network: {
         chainId: ChainId.SEPOLIA,
@@ -242,38 +202,13 @@ describe('WalletBalances', () => {
         isSupported: true,
       },
       walletProviderName: WalletProviderName.METAMASK,
-      tokenBalances: [
-        {
-          id: 'eth',
-          balance: '0.0',
-          symbol: 'ETH',
-          fiatAmount: '0',
-        },
-      ],
+      tokenBalances: balanceMock,
       supportedTopUps: {
         isBridgeEnabled: true,
       },
     };
 
     it('should show not enough gas drawer when trying to bridge to L2 with 0 eth balance', () => {
-      cy.stub(Checkout.prototype, 'getAllBalances')
-        .as('getAllBalancesStub')
-        .resolves({
-          balances: [
-            {
-              balance: BigNumber.from('10000000000000'),
-              formattedBalance: '0.1',
-              token: {
-                name: 'ImmutableX',
-                symbol: 'IMX',
-                decimals: 18,
-                address: NATIVE,
-                icon: '123',
-              },
-            },
-          ],
-        });
-
       mount(
         <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
           <ConnectLoaderTestComponent
@@ -283,13 +218,13 @@ describe('WalletBalances', () => {
               initialStateOverride={baseWalletState}
               cryptoConversionsOverride={cryptoConversions}
             >
-              <WalletBalances />
+              <WalletBalances balancesLoading={false} setBalancesLoading={() => {}} />
             </WalletWidgetTestComponent>
           </ConnectLoaderTestComponent>
         </CustomAnalyticsProvider>,
       );
 
-      cySmartGet('token-menu').click();
+      cySmartGet('token-menu').first().click();
       cySmartGet('balance-item-move-option').click();
       cySmartGet('not-enough-gas-bottom-sheet').should('be.visible');
       cySmartGet('not-enough-gas-copy-address-button').should('be.visible');
@@ -308,23 +243,19 @@ describe('WalletBalances', () => {
           },
         });
 
-      cy.stub(Checkout.prototype, 'getAllBalances')
-        .as('getAllBalancesStub')
-        .resolves({
-          balances: [
-            {
-              balance: BigNumber.from('10000000000'),
-              formattedBalance: '0.001',
-              token: {
-                name: 'ETH',
-                symbol: 'ETH',
-                decimals: 18,
-                address: '',
-                icon: '123',
-              },
-            },
-          ],
-        });
+      const balancesMock = [
+        {
+          balance: BigNumber.from('10000000000'),
+          formattedBalance: '0.001',
+          token: {
+            name: 'ETH',
+            symbol: 'ETH',
+            decimals: 18,
+            address: '',
+            icon: '123',
+          },
+        },
+      ];
 
       const walletState: WalletState = {
         network: {
@@ -334,14 +265,7 @@ describe('WalletBalances', () => {
           isSupported: true,
         },
         walletProviderName: WalletProviderName.METAMASK,
-        tokenBalances: [
-          {
-            id: 'eth',
-            balance: '0.001',
-            symbol: 'ETH',
-            fiatAmount: '0',
-          },
-        ],
+        tokenBalances: balancesMock,
         supportedTopUps: {
           isBridgeEnabled: true,
         },
@@ -356,7 +280,7 @@ describe('WalletBalances', () => {
               initialStateOverride={walletState}
               cryptoConversionsOverride={cryptoConversions}
             >
-              <WalletBalances />
+              <WalletBalances balancesLoading={false} setBalancesLoading={() => {}} />
             </WalletWidgetTestComponent>
           </ConnectLoaderTestComponent>
         </CustomAnalyticsProvider>,
@@ -382,24 +306,6 @@ describe('WalletBalances', () => {
           },
         });
 
-      cy.stub(Checkout.prototype, 'getAllBalances')
-        .as('getAllBalancesStub')
-        .resolves({
-          balances: [
-            {
-              balance: BigNumber.from('1000000000000000'),
-              formattedBalance: '100',
-              token: {
-                name: 'ETH',
-                symbol: 'ETH',
-                decimals: 18,
-                address: 'NATIVE',
-                icon: '123',
-              },
-            },
-          ],
-        });
-
       const walletState: WalletState = {
         network: {
           chainId: ChainId.SEPOLIA,
@@ -410,11 +316,15 @@ describe('WalletBalances', () => {
         walletProviderName: WalletProviderName.METAMASK,
         tokenBalances: [
           {
-            id: 'eth',
-            balance: '100',
-            symbol: 'ETH',
-            fiatAmount: '0',
-            address: 'NATIVE',
+            balance: BigNumber.from('1000000000000000'),
+            formattedBalance: '100',
+            token: {
+              name: 'ETH',
+              symbol: 'ETH',
+              decimals: 18,
+              address: 'NATIVE',
+              icon: '123',
+            },
           },
         ],
         supportedTopUps: {
@@ -431,7 +341,7 @@ describe('WalletBalances', () => {
               initialStateOverride={walletState}
               cryptoConversionsOverride={cryptoConversions}
             >
-              <WalletBalances />
+              <WalletBalances balancesLoading={false} setBalancesLoading={() => {}} />
             </WalletWidgetTestComponent>
           </ConnectLoaderTestComponent>
         </CustomAnalyticsProvider>,
@@ -500,7 +410,7 @@ describe('WalletBalances', () => {
                 <WalletContext.Provider
                   value={{ walletState: testWalletState, walletDispatch: () => {} }}
                 >
-                  <WalletBalances />
+                  <WalletBalances balancesLoading={false} setBalancesLoading={() => {}} />
                 </WalletContext.Provider>
               </ConnectLoaderTestComponent>
             </CustomAnalyticsProvider>
@@ -528,7 +438,7 @@ describe('WalletBalances', () => {
               <WalletContext.Provider
                 value={{ walletState: testWalletState, walletDispatch: () => {} }}
               >
-                <WalletBalances />
+                <WalletBalances balancesLoading={false} setBalancesLoading={() => {}} />
               </WalletContext.Provider>
             </ConnectLoaderTestComponent>
           </CustomAnalyticsProvider>
@@ -562,7 +472,7 @@ describe('WalletBalances', () => {
               <WalletContext.Provider
                 value={{ walletState, walletDispatch: () => {} }}
               >
-                <WalletBalances />
+                <WalletBalances balancesLoading={false} setBalancesLoading={() => {}} />
               </WalletContext.Provider>
             </ConnectLoaderTestComponent>
           </CustomAnalyticsProvider>

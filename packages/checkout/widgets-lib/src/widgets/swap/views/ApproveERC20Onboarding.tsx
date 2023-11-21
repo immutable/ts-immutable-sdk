@@ -48,12 +48,13 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
 
   const { page, track } = useAnalytics();
 
-  // TODO WT-1795: review how to capture this event specifically for Approve Spending and then Approve Transaction
-  // https://immutable.atlassian.net/browse/WT-1795
   useEffect(() => {
     page({
       userJourney: UserJourney.SWAP,
       screen: 'ApproveERC20',
+      extras: {
+        swapFormInfo: data.swapFormInfo,
+      },
     });
   }, []);
 
@@ -317,7 +318,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
               onCloseButtonClick={() => sendSwapWidgetCloseEvent(eventTarget)}
               onBackButtonClick={goBackWithSwapData}
             />
-)}
+          )}
           floatHeader
           heroContent={showSwapTxnStep ? <WalletApproveHero /> : <SpendingCapHero />}
           footer={showSwapTxnStep ? approveSwapFooter : approveSpendingFooter}

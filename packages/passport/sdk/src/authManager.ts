@@ -132,7 +132,7 @@ export default class AuthManager {
         nickname: idTokenPayload.nickname,
       },
     };
-    if (idTokenPayload?.passport.imx_eth_address) {
+    if (idTokenPayload?.passport?.imx_eth_address) {
       user.imx = {
         ethAddress: idTokenPayload.passport.imx_eth_address,
         starkAddress: idTokenPayload.passport.imx_stark_address,
@@ -202,11 +202,7 @@ export default class AuthManager {
         try {
           const tokenResponse = await this.getDeviceFlowToken(deviceCode);
           const user = AuthManager.mapDeviceTokenResponseToDomainUserModel(tokenResponse);
-
-          // Only persist credentials that contain the necessary data
-          if (user.imx?.ethAddress && user.imx?.starkAddress && user.imx?.userAdminAddress) {
-            this.deviceCredentialsManager.saveCredentials(tokenResponse);
-          }
+          this.deviceCredentialsManager.saveCredentials(tokenResponse);
 
           return user;
         } catch (error) {
@@ -292,11 +288,7 @@ export default class AuthManager {
 
       const tokenResponse = await this.getPKCEToken(authorizationCode, pkceData.verifier);
       const user = AuthManager.mapDeviceTokenResponseToDomainUserModel(tokenResponse);
-
-      // Only persist credentials that contain the necessary data
-      if (user.imx?.ethAddress && user.imx?.starkAddress && user.imx?.userAdminAddress) {
-        this.deviceCredentialsManager.saveCredentials(tokenResponse);
-      }
+      this.deviceCredentialsManager.saveCredentials(tokenResponse);
 
       return user;
     }, PassportErrorType.AUTHENTICATION_ERROR);
@@ -374,23 +366,11 @@ export default class AuthManager {
     }, PassportErrorType.LOGOUT_ERROR);
   }
 
-  public async loginSilent({ forceRefresh } = { forceRefresh: false }): Promise<User | null> {
-    // eslint-disable-next-line arrow-body-style
-    return withPassportError<User | null>(async () => {
-      return this.getUser({ forceRefresh });
-    }, PassportErrorType.SILENT_LOGIN_ERROR);
-  }
-
   /**
    * Get the user from the cache or refresh the token if it's expired.
-   * @param forceRefresh If set to true, force an HTTP call to the OIDC server's authorization endpoint. This call will
-   * throw an error if there's no refresh token.
+   * return null if there's no refresh token.
    */
-  private async getAuthenticatedUser({ forceRefresh = false }: { forceRefresh: boolean }): Promise<User | null> {
-    if (forceRefresh) {
-      return this.refreshTokenAndUpdatePromise();
-    }
-
+  private async getAuthenticatedUser(): Promise<User | null> {
     const oidcUser = await this.userManager.getUser();
     if (!oidcUser) return null;
 
@@ -403,6 +383,10 @@ export default class AuthManager {
     }
 
     return null;
+  }
+
+  public async forceUserRefresh() : Promise<User | null> {
+    return this.refreshTokenAndUpdatePromise();
   }
 
   /**
@@ -431,9 +415,9 @@ export default class AuthManager {
     return this.refreshingPromise;
   }
 
-  public async getUser({ forceRefresh } = { forceRefresh: false }): Promise<User | null> {
+  public async getUser(): Promise<User | null> {
     return withPassportError<User | null>(async () => {
-      const user = await this.getAuthenticatedUser({ forceRefresh });
+      const user = await this.getAuthenticatedUser();
       if (user) return user;
 
       const deviceToken = this.deviceCredentialsManager.getCredentials();

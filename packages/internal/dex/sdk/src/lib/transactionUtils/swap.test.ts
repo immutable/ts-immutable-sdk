@@ -18,6 +18,10 @@ import {
   expectERC20,
   WIMX_TEST_TOKEN,
   formatEther,
+  USDC_TEST_TOKEN,
+  decodeMulticallExactInputWithFees,
+  decodeMulticallExactOutputWithFees,
+  expectToBeString,
 } from 'test/utils';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import { Fees } from 'lib/fees';
@@ -30,7 +34,7 @@ const gasEstimate = BigNumber.from(0);
 const slippagePercentage = 3;
 const deadline = 0;
 
-const buildRoute = (tokenIn: ERC20, tokenOut: ERC20) => {
+const buildSinglePoolRoute = (tokenIn: ERC20, tokenOut: ERC20) => {
   const uniswapTokenIn = erc20ToUniswapToken(tokenIn);
   const uniswapTokenOut = erc20ToUniswapToken(tokenOut);
   const pool = new Pool(
@@ -44,9 +48,32 @@ const buildRoute = (tokenIn: ERC20, tokenOut: ERC20) => {
   return new Route([pool], uniswapTokenIn, uniswapTokenOut);
 };
 
+const buildMultiPoolRoute = (tokenIn: ERC20, tokenMiddle: ERC20, tokenOut: ERC20) => {
+  const uniswapTokenIn = erc20ToUniswapToken(tokenIn);
+  const uniswapTokenMiddle = erc20ToUniswapToken(tokenMiddle);
+  const uniswapTokenOut = erc20ToUniswapToken(tokenOut);
+  const firstPool = new Pool(
+    uniswapTokenIn,
+    uniswapTokenMiddle,
+    10000,
+    '79625275426524748796330556128',
+    '10000000000000000',
+    100,
+  );
+  const secondPool = new Pool(
+    uniswapTokenMiddle,
+    uniswapTokenOut,
+    10000,
+    '79625275426524748796330556128',
+    '10000000000000000',
+    100,
+  );
+  return new Route([firstPool, secondPool], uniswapTokenIn, uniswapTokenOut);
+};
+
 const buildExactInputQuote = (tokenIn = IMX_TEST_TOKEN, tokenOut = FUN_TEST_TOKEN): QuoteResult => ({
   gasEstimate,
-  route: buildRoute(tokenIn, tokenOut),
+  route: buildSinglePoolRoute(tokenIn, tokenOut),
   amountIn: newAmountFromString('99', tokenIn),
   amountOut: newAmountFromString('990', tokenOut),
   tradeType: TradeType.EXACT_INPUT,
@@ -54,7 +81,31 @@ const buildExactInputQuote = (tokenIn = IMX_TEST_TOKEN, tokenOut = FUN_TEST_TOKE
 
 const buildExactOutputQuote = (tokenIn = IMX_TEST_TOKEN, tokenOut = FUN_TEST_TOKEN): QuoteResult => ({
   gasEstimate,
-  route: buildRoute(tokenIn, tokenOut),
+  route: buildSinglePoolRoute(tokenIn, tokenOut),
+  amountIn: newAmountFromString('100', tokenIn),
+  amountOut: newAmountFromString('1000', tokenOut),
+  tradeType: TradeType.EXACT_OUTPUT,
+});
+
+const buildMultiExactInputQuote = (
+  tokenIn = IMX_TEST_TOKEN,
+  tokenMiddle = WIMX_TEST_TOKEN,
+  tokenOut = FUN_TEST_TOKEN,
+): QuoteResult => ({
+  gasEstimate,
+  route: buildMultiPoolRoute(tokenIn, tokenMiddle, tokenOut),
+  amountIn: newAmountFromString('99', tokenIn),
+  amountOut: newAmountFromString('990', tokenOut),
+  tradeType: TradeType.EXACT_INPUT,
+});
+
+const buildMultiExactOutputQuote = (
+  tokenIn = IMX_TEST_TOKEN,
+  tokenMiddle = WIMX_TEST_TOKEN,
+  tokenOut = FUN_TEST_TOKEN,
+): QuoteResult => ({
+  gasEstimate,
+  route: buildMultiPoolRoute(tokenIn, tokenMiddle, tokenOut),
   amountIn: newAmountFromString('100', tokenIn),
   amountOut: newAmountFromString('1000', tokenOut),
   tradeType: TradeType.EXACT_OUTPUT,
@@ -112,6 +163,80 @@ describe('getSwap', () => {
 
       expectInstanceOf(BigNumber, swapParams.amountInMaximum);
       expect(utils.formatEther(swapParams.amountInMaximum)).toEqual('103.0');
+    });
+  });
+
+  describe('recipient', () => {
+    describe('without fees, and native out', () => {
+      it('sets the recipient as the uniswap router contract', () => {
+        const quote = buildExactInputQuote();
+
+        const swap = getSwap(
+          quote.amountIn.token,
+          nativeTokenService.nativeToken,
+          quote,
+          makeAddr('fromAddress'),
+          slippagePercentage,
+          deadline,
+          makeAddr('routerContract'),
+          makeAddr('secondaryFeeContract'),
+          newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
+          [],
+        );
+
+        expectToBeDefined(swap.transaction.data);
+        const { swapParams } = decodeMulticallExactInputSingleWithoutFees(swap.transaction.data);
+        expectToBeString(swapParams.recipient);
+        expect(swapParams.recipient.toLowerCase()).toEqual(makeAddr('routerContract'));
+      });
+    });
+
+    describe('when erc20 out', () => {
+      it('sets the recipient as the fromAddress', () => {
+        const quote = buildExactInputQuote();
+
+        const swap = getSwap(
+          quote.amountIn.token,
+          quote.amountOut.token,
+          quote,
+          makeAddr('fromAddress'),
+          slippagePercentage,
+          deadline,
+          makeAddr('routerContract'),
+          makeAddr('secondaryFeeContract'),
+          newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
+          [],
+        );
+
+        expectToBeDefined(swap.transaction.data);
+        const { swapParams } = decodeMulticallExactInputSingleWithoutFees(swap.transaction.data);
+        expectToBeString(swapParams.recipient);
+        expect(swapParams.recipient.toLowerCase()).toEqual(makeAddr('fromAddress'));
+      });
+    });
+
+    describe('with fees, and native out', () => {
+      it('sets the recipient as the secondary fee contract', () => {
+        const quote = buildExactInputQuote();
+
+        const swap = getSwap(
+          quote.amountIn.token,
+          nativeTokenService.nativeToken,
+          quote,
+          makeAddr('fromAddress'),
+          slippagePercentage,
+          deadline,
+          makeAddr('routerContract'),
+          makeAddr('secondaryFeeContract'),
+          newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
+          [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
+        );
+
+        expectToBeDefined(swap.transaction.data);
+        const { swapParams } = decodeMulticallExactInputSingleWithFees(swap.transaction.data);
+        expectToBeString(swapParams.recipient);
+        expect(swapParams.recipient.toLowerCase()).toEqual(makeAddr('secondaryFeeContract'));
+      });
     });
   });
 
@@ -212,6 +337,54 @@ describe('getSwap', () => {
     });
   });
 
+  describe('with fees + EXACT_INPUT + single pool + native out', () => {
+    it('adds an unwrapNativeToken to the calldata', () => {
+      const quote = buildExactInputQuote(FUN_TEST_TOKEN, nativeTokenService.wrappedToken);
+      quote.amountOut.value = utils.parseEther('990');
+
+      const swap = getSwap(
+        quote.amountIn.token,
+        nativeTokenService.nativeToken,
+        quote,
+        makeAddr('fromAddress'),
+        slippagePercentage,
+        deadline,
+        makeAddr('routerContract'),
+        makeAddr('secondaryFeeContract'),
+        newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
+        [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
+      );
+
+      expectToBeDefined(swap.transaction.data);
+      const { unwrapTokenParams } = decodeMulticallExactInputSingleWithFees(swap.transaction.data);
+      expect(formatEther(unwrapTokenParams[0])).toEqual('961.165048543689320388'); // amountOut less 3% slippage (/103*100)
+    });
+  });
+
+  describe('with fees + EXACT_INPUT + multi pool + native out', () => {
+    it('adds an unwrapNativeToken to the calldata', () => {
+      const quote = buildMultiExactInputQuote(FUN_TEST_TOKEN, USDC_TEST_TOKEN, nativeTokenService.wrappedToken);
+      quote.amountOut.value = utils.parseEther('990');
+
+      const swap = getSwap(
+        quote.amountIn.token,
+        nativeTokenService.nativeToken,
+        quote,
+        makeAddr('fromAddress'),
+        slippagePercentage,
+        deadline,
+        makeAddr('routerContract'),
+        makeAddr('secondaryFeeContract'),
+        newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
+        [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
+      );
+
+      expectToBeDefined(swap.transaction.data);
+      const { unwrapTokenParams } = decodeMulticallExactInputWithFees(swap.transaction.data);
+      expect(formatEther(unwrapTokenParams[0])).toEqual('961.165048543689320388'); // amountOut less 3% slippage (/103*100)
+    });
+  });
+
   describe('with EXACT_OUTPUT + native amount in', () => {
     it('sets the transaction value to the max amount in including slippage', () => {
       const originalTokenIn = nativeTokenService.nativeToken;
@@ -256,6 +429,52 @@ describe('getSwap', () => {
       );
 
       expect(swap.transaction.value).toEqual('0x00');
+    });
+  });
+
+  describe('with fees + EXACT_OUTPUT + single pool + native out', () => {
+    it('adds an unwrapNativeToken to the calldata', () => {
+      const quote = buildExactOutputQuote(FUN_TEST_TOKEN, nativeTokenService.wrappedToken);
+
+      const swap = getSwap(
+        quote.amountIn.token,
+        nativeTokenService.nativeToken,
+        quote,
+        makeAddr('fromAddress'),
+        slippagePercentage,
+        deadline,
+        makeAddr('routerContract'),
+        makeAddr('secondaryFeeContract'),
+        newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
+        [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
+      );
+
+      expectToBeDefined(swap.transaction.data);
+      const { unwrapTokenParams } = decodeMulticallExactOutputSingleWithFees(swap.transaction.data);
+      expect(formatEther(unwrapTokenParams[0])).toEqual(formatAmount(quote.amountOut));
+    });
+  });
+
+  describe('with fees + EXACT_OUTPUT + multi pool + native out', () => {
+    it('adds an unwrapNativeToken to the calldata', () => {
+      const quote = buildMultiExactOutputQuote(FUN_TEST_TOKEN, USDC_TEST_TOKEN, nativeTokenService.wrappedToken);
+
+      const swap = getSwap(
+        quote.amountIn.token,
+        nativeTokenService.nativeToken,
+        quote,
+        makeAddr('fromAddress'),
+        slippagePercentage,
+        deadline,
+        makeAddr('routerContract'),
+        makeAddr('secondaryFeeContract'),
+        newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
+        [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
+      );
+
+      expectToBeDefined(swap.transaction.data);
+      const { unwrapTokenParams } = decodeMulticallExactOutputWithFees(swap.transaction.data);
+      expect(formatEther(unwrapTokenParams[0])).toEqual(formatAmount(quote.amountOut));
     });
   });
 });
@@ -311,7 +530,7 @@ describe('adjustQuoteWithFees', () => {
       it('wraps it and uses it as the amountIn', () => {
         const quote: QuoteResult = {
           gasEstimate,
-          route: buildRoute(WIMX_TEST_TOKEN, FUN_TEST_TOKEN),
+          route: buildSinglePoolRoute(WIMX_TEST_TOKEN, FUN_TEST_TOKEN),
           amountIn: newAmountFromString('9', nativeTokenService.wrappedToken), // has been wrapped
           amountOut: newAmountFromString('1', FUN_TEST_TOKEN),
           tradeType: TradeType.EXACT_INPUT,
@@ -385,7 +604,7 @@ describe('adjustQuoteWithFees', () => {
       it('applies fees to the amountIn', () => {
         const quote: QuoteResult = {
           gasEstimate,
-          route: buildRoute(WIMX_TEST_TOKEN, FUN_TEST_TOKEN),
+          route: buildSinglePoolRoute(WIMX_TEST_TOKEN, FUN_TEST_TOKEN),
           amountIn: newAmountFromString('10', nativeTokenService.wrappedToken), // has been wrapped
           amountOut: newAmountFromString('1', FUN_TEST_TOKEN),
           tradeType: TradeType.EXACT_OUTPUT,

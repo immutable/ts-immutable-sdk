@@ -430,6 +430,61 @@ describe('WalletWidget tests', () => {
         cySmartGet('error-view').should('not.exist');
         cySmartGet('wallet-balances').should('be.visible');
       });
+
+      it('should show balances after getAllBalances failure', () => {
+        getAllBalancesStub
+          .rejects()
+          .resolves({
+            balances: [
+              {
+                balance: BigNumber.from('1000000000000000000'),
+                formattedBalance: '0.1',
+                token: {
+                  name: 'ETH',
+                  symbol: 'ETH',
+                  decimals: 18,
+                  address: '',
+                  icon: '123',
+                },
+              },
+              {
+                balance: BigNumber.from('10000000000000'),
+                formattedBalance: '0.1',
+                token: {
+                  name: 'ImmutableX',
+                  symbol: 'IMX',
+                  decimals: 18,
+                  address: IMX_ADDRESS_ZKEVM,
+                  icon: '123',
+                },
+              },
+            ],
+          });
+
+        const widgetConfig = {
+          theme: WidgetTheme.DARK,
+          environment: Environment.SANDBOX,
+          isBridgeEnabled: false,
+          isSwapEnabled: false,
+          isOnRampEnabled: false,
+        } as StrongCheckoutWidgetsConfig;
+
+        mount(
+          <CustomAnalyticsProvider widgetConfig={widgetConfig}>
+            <ConnectLoaderTestComponent
+              initialStateOverride={connectLoaderState}
+            >
+              <WalletWidget
+                config={widgetConfig}
+              />
+              ,
+            </ConnectLoaderTestComponent>
+          </CustomAnalyticsProvider>,
+        );
+
+        cySmartGet('balance-item-IMX').should('exist');
+        cySmartGet('balance-item-ETH').should('exist');
+      });
     });
 
     describe('WalletWidget settings', () => {

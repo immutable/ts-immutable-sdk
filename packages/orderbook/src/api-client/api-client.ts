@@ -121,7 +121,7 @@ export class ImmutableApiClient {
               === ItemType.NATIVE
                 ? 'NATIVE'
                 : 'ERC20',
-            start_amount: orderComponents.consideration[0].startAmount,
+            amount: orderComponents.consideration[0].startAmount,
             contract_address: orderComponents.consideration[0].token,
           },
         ],

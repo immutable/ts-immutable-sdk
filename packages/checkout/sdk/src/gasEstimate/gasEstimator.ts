@@ -1,11 +1,9 @@
 import {
   BigNumber,
   utils,
-  Contract,
   ethers,
 } from 'ethers';
-import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
-import { FungibleToken } from '@imtbl/bridge-sdk';
+import { Web3Provider } from '@ethersproject/providers';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import {
   ChainId,
@@ -16,7 +14,7 @@ import {
   GasEstimateSwapTokenConfig,
   GasEstimateTokenConfig,
   GasEstimateType,
-  TokenInfo,
+  TokenAmountEstimate,
 } from '../types';
 import {
   getBridgeEstimatedGas,
@@ -24,43 +22,15 @@ import {
 } from './bridgeGasEstimate';
 import * as instance from '../instance';
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../config';
-import { ERC20ABI } from '../env';
-import { isNativeToken } from '../network';
+import { BridgeFeeEstimateResult } from './bridgeGasEstimateType';
 
 const DUMMY_WALLET_ADDRESS = '0x0000000000000000000000000000000000000001';
 const DEFAULT_TOKEN_DECIMALS = 18;
-
-async function getTokenInfoByAddress(
-  config: CheckoutConfiguration,
-  tokenAddress: FungibleToken,
-  chainId: ChainId,
-  provider: JsonRpcProvider,
-): Promise<TokenInfo | undefined> {
-  if (isNativeToken(tokenAddress)) {
-    return config.networkMap.get(chainId)?.nativeCurrency;
-  }
-
-  const contract = new Contract(
-    tokenAddress,
-    JSON.stringify(ERC20ABI),
-    provider,
-  );
-  const name = await contract.name();
-  const symbol = await contract.symbol();
-  const decimals = await contract.decimals();
-  return {
-    name,
-    symbol,
-    decimals,
-    address: tokenAddress,
-  };
-}
 
 async function bridgeToL2GasEstimator(
   readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
   config: CheckoutConfiguration,
   isSpendingCapApprovalRequired: boolean,
-  tokenAddress?: FungibleToken,
 ): Promise<GasEstimateBridgeToL2Result> {
   const fromChainId = getL1ChainId(config);
   const toChainId = getL2ChainId(config);
@@ -69,7 +39,7 @@ async function bridgeToL2GasEstimator(
     'gasEstimateTokens',
   )) as GasEstimateTokenConfig;
 
-  const { gasTokenAddress, fromAddress } = gasEstimateTokensConfig[
+  const { fromAddress } = gasEstimateTokensConfig[
     fromChainId
   ].bridgeToL2Addresses as GasEstimateBridgeToL2TokenConfig;
 
@@ -77,37 +47,46 @@ async function bridgeToL2GasEstimator(
   if (!provider) throw new Error(`Missing JsonRpcProvider for chain id: ${fromChainId}`);
 
   try {
-    const gasFee = await getBridgeEstimatedGas(
-      provider as Web3Provider,
-      isSpendingCapApprovalRequired,
-    );
-    gasFee.token = await getTokenInfoByAddress(
-      config,
-      tokenAddress ?? (gasTokenAddress),
-      fromChainId,
-      provider,
-    );
+    let gasFees: TokenAmountEstimate = {};
+    const getGasFees = async () => {
+      gasFees = await getBridgeEstimatedGas(
+        provider as Web3Provider,
+        isSpendingCapApprovalRequired,
+      );
+      gasFees.token = config.networkMap.get(fromChainId)?.nativeCurrency;
+    };
 
-    const tokenBridge = await instance.createBridgeInstance(
-      fromChainId,
-      toChainId,
-      readOnlyProviders,
-      config,
-    );
+    let bridgeFees: BridgeFeeEstimateResult = {
+      bridgeFee: {},
+      bridgeable: false,
+    };
+    const getBridgeFees = async () => {
+      const tokenBridge = await instance.createBridgeInstance(
+        fromChainId,
+        toChainId,
+        readOnlyProviders,
+        config,
+      );
 
-    const { bridgeFee, bridgeable } = await getBridgeFeeEstimate(
-      tokenBridge,
-      fromAddress,
-    );
+      bridgeFees = await getBridgeFeeEstimate(
+        tokenBridge,
+        fromAddress,
+      );
+    };
+
+    await Promise.all([
+      getGasFees(),
+      getBridgeFees(),
+    ]);
 
     return {
       gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-      gasFee,
+      gasFee: gasFees,
       bridgeFee: {
-        estimatedAmount: bridgeFee?.estimatedAmount,
-        token: bridgeFee?.token,
+        estimatedAmount: bridgeFees.bridgeFee?.estimatedAmount,
+        token: bridgeFees.bridgeFee?.token,
       },
-      bridgeable,
+      bridgeable: bridgeFees.bridgeable,
     };
   } catch {
     // In the case of an error, just return an empty gas & bridge fee estimate
@@ -183,7 +162,6 @@ export async function gasEstimator(
         readOnlyProviders,
         config,
         params.isSpendingCapApprovalRequired,
-        params.tokenAddress,
       );
     case GasEstimateType.SWAP:
       return await swapGasEstimator(config);

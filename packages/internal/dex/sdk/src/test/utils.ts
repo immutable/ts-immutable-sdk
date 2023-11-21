@@ -162,17 +162,19 @@ type SecondaryFeeFunctionName =
   | 'exactInputSingleWithSecondaryFee'
   | 'exactOutputSingleWithSecondaryFee'
   | 'exactInputWithSecondaryFee'
-  | 'exactOutputWithSecondaryFee';
+  | 'exactOutputWithSecondaryFee'
+  | 'unwrapNativeToken';
 
 type SwapRouterFunctionName = 'exactInputSingle' | 'exactOutputSingle' | 'exactInput' | 'exactOutput';
 
-function decodeSecondaryFeeCall(calldata: utils.BytesLike, functionName: SecondaryFeeFunctionName) {
+function decodeSecondaryFeeCall(calldata: utils.BytesLike, ...functionNames: SecondaryFeeFunctionName[]) {
   const iface = SecondaryFee__factory.createInterface();
   const topLevelParams = iface.decodeFunctionData('multicall(uint256,bytes[])', calldata);
-  const data = topLevelParams.data[0];
-  if (typeof data !== 'string') throw new Error();
 
-  return iface.decodeFunctionData(functionName, data);
+  return functionNames.map((functionName, i) => {
+    const data = topLevelParams.data[i];
+    return typeof data === 'string' ? iface.decodeFunctionData(functionName, data) : [];
+  });
 }
 
 function decodeSwapRouterCall(calldata: utils.BytesLike, functionName: SwapRouterFunctionName) {
@@ -185,21 +187,24 @@ function decodeSwapRouterCall(calldata: utils.BytesLike, functionName: SwapRoute
 }
 
 export function decodeMulticallExactInputWithFees(data: utils.BytesLike) {
-  const decodedParams = decodeSecondaryFeeCall(data, 'exactInputWithSecondaryFee');
+  const [
+    exactInputParams,
+    unwrapTokenParams,
+  ] = decodeSecondaryFeeCall(data, 'exactInputWithSecondaryFee', 'unwrapNativeToken');
 
-  const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map((x: [string, number]) => ({
+  const secondaryFeeParams: SecondaryFee[] = exactInputParams[0].map((x: [string, number]) => ({
     recipient: x[0],
     basisPoints: x[1],
   }));
 
   const swapParams: IV3SwapRouter.ExactInputParamsStruct = {
-    path: decodedParams[1][0],
-    recipient: decodedParams[1][1],
-    amountIn: decodedParams[1][2],
-    amountOutMinimum: decodedParams[1][3],
+    path: exactInputParams[1][0],
+    recipient: exactInputParams[1][1],
+    amountIn: exactInputParams[1][2],
+    amountOutMinimum: exactInputParams[1][3],
   };
 
-  return { secondaryFeeParams, swapParams };
+  return { secondaryFeeParams, swapParams, unwrapTokenParams };
 }
 
 export function decodeMulticallExactInputWithoutFees(data: utils.BytesLike) {
@@ -216,63 +221,72 @@ export function decodeMulticallExactInputWithoutFees(data: utils.BytesLike) {
 }
 
 export function decodeMulticallExactOutputWithFees(data: utils.BytesLike) {
-  const decodedParams = decodeSecondaryFeeCall(data, 'exactOutputWithSecondaryFee');
+  const [
+    exactOutputParams,
+    unwrapTokenParams,
+  ] = decodeSecondaryFeeCall(data, 'exactOutputWithSecondaryFee', 'unwrapNativeToken');
 
-  const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map((x: [string, number]) => ({
+  const secondaryFeeParams: SecondaryFee[] = exactOutputParams[0].map((x: [string, number]) => ({
     recipient: x[0],
     basisPoints: x[1],
   }));
 
   const swapParams: IV3SwapRouter.ExactOutputParamsStruct = {
-    path: decodedParams[1][0],
-    recipient: decodedParams[1][1],
-    amountOut: decodedParams[1][2],
-    amountInMaximum: decodedParams[1][3],
+    path: exactOutputParams[1][0],
+    recipient: exactOutputParams[1][1],
+    amountOut: exactOutputParams[1][2],
+    amountInMaximum: exactOutputParams[1][3],
   };
 
-  return { secondaryFeeParams, swapParams };
+  return { secondaryFeeParams, swapParams, unwrapTokenParams };
 }
 
 export function decodeMulticallExactInputSingleWithFees(data: utils.BytesLike) {
-  const decodedParams = decodeSecondaryFeeCall(data, 'exactInputSingleWithSecondaryFee');
+  const [
+    exactInputParams,
+    unwrapTokenParams,
+  ] = decodeSecondaryFeeCall(data, 'exactInputSingleWithSecondaryFee', 'unwrapNativeToken');
 
-  const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map((x: [string, number]) => ({
+  const secondaryFeeParams: SecondaryFee[] = exactInputParams[0].map((x: [string, number]) => ({
     recipient: x[0],
     basisPoints: x[1],
   }));
 
   const swapParams: IV3SwapRouter.ExactInputSingleParamsStruct = {
-    tokenIn: decodedParams[1][0],
-    tokenOut: decodedParams[1][1],
-    fee: decodedParams[1][2],
-    recipient: decodedParams[1][3],
-    amountIn: decodedParams[1][4],
-    amountOutMinimum: decodedParams[1][5],
-    sqrtPriceLimitX96: decodedParams[1][6],
+    tokenIn: exactInputParams[1][0],
+    tokenOut: exactInputParams[1][1],
+    fee: exactInputParams[1][2],
+    recipient: exactInputParams[1][3],
+    amountIn: exactInputParams[1][4],
+    amountOutMinimum: exactInputParams[1][5],
+    sqrtPriceLimitX96: exactInputParams[1][6],
   };
 
-  return { secondaryFeeParams, swapParams };
+  return { secondaryFeeParams, swapParams, unwrapTokenParams };
 }
 
 export function decodeMulticallExactOutputSingleWithFees(data: utils.BytesLike) {
-  const decodedParams = decodeSecondaryFeeCall(data, 'exactOutputSingleWithSecondaryFee');
+  const [
+    exactOutputParams,
+    unwrapTokenParams,
+  ] = decodeSecondaryFeeCall(data, 'exactOutputSingleWithSecondaryFee', 'unwrapNativeToken');
 
-  const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map((x: [string, number]) => ({
+  const secondaryFeeParams: SecondaryFee[] = exactOutputParams[0].map((x: [string, number]) => ({
     recipient: x[0],
     basisPoints: x[1],
   }));
 
   const swapParams: IV3SwapRouter.ExactOutputSingleParamsStruct = {
-    tokenIn: decodedParams[1][0],
-    tokenOut: decodedParams[1][1],
-    fee: decodedParams[1][2],
-    recipient: decodedParams[1][3],
-    amountOut: decodedParams[1][4],
-    amountInMaximum: decodedParams[1][5],
-    sqrtPriceLimitX96: decodedParams[1][6],
+    tokenIn: exactOutputParams[1][0],
+    tokenOut: exactOutputParams[1][1],
+    fee: exactOutputParams[1][2],
+    recipient: exactOutputParams[1][3],
+    amountOut: exactOutputParams[1][4],
+    amountInMaximum: exactOutputParams[1][5],
+    sqrtPriceLimitX96: exactOutputParams[1][6],
   };
 
-  return { secondaryFeeParams, swapParams };
+  return { secondaryFeeParams, swapParams, unwrapTokenParams };
 }
 
 export function decodeMulticallExactInputSingleWithoutFees(data: utils.BytesLike) {
@@ -436,7 +450,7 @@ export function expectToBeDefined<T>(x: T): asserts x is NonNullable<T> {
 
 // expectToBeDefined ensures that x is a string, while
 // also narrowing its type.
-export function expectToBeString(x: string): asserts x is string {
+export function expectToBeString(x: unknown): asserts x is string {
   expect(typeof x).toBe('string');
 }
 
