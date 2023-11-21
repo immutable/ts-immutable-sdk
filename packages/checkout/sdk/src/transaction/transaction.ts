@@ -4,6 +4,15 @@ import { CheckoutError, CheckoutErrorType } from '../errors';
 import { SendTransactionResult } from '../types';
 import { GAS_OVERRIDES } from '../env';
 
+export const setTransactionGasLimits = (
+  transaction: TransactionRequest,
+): TransactionRequest => {
+  const rawTx = transaction;
+  rawTx.maxFeePerGas = GAS_OVERRIDES.maxFeePerGas;
+  rawTx.maxPriorityFeePerGas = GAS_OVERRIDES.maxPriorityFeePerGas;
+  return rawTx;
+};
+
 export const sendTransaction = async (
   web3Provider: Web3Provider,
   transaction: TransactionRequest,
@@ -11,9 +20,7 @@ export const sendTransaction = async (
   try {
     const signer = web3Provider.getSigner();
 
-    const rawTx = transaction;
-    rawTx.maxFeePerGas = GAS_OVERRIDES.maxFeePerGas;
-    rawTx.maxPriorityFeePerGas = GAS_OVERRIDES.maxPriorityFeePerGas;
+    const rawTx = setTransactionGasLimits(transaction);
     const transactionResponse = await signer.sendTransaction(rawTx);
 
     return {
