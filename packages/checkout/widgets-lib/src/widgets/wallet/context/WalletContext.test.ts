@@ -1,4 +1,5 @@
-import { ChainId, WalletProviderName } from '@imtbl/checkout-sdk';
+import { ChainId, GetBalanceResult, WalletProviderName } from '@imtbl/checkout-sdk';
+import { BigNumber } from '@ethersproject/bignumber';
 import {
   SetSwitchNetworkPayload,
   WalletActions,
@@ -9,7 +10,6 @@ import {
   SetTokenBalancesPayload,
   SetWalletProviderNamePayload,
 } from './WalletContext';
-import { BalanceInfo } from '../functions/tokenBalances';
 
 describe('WalletContext', () => {
   it('should update state with network info and token balances when reducer called with SET_NETWORK action', () => {
@@ -48,12 +48,16 @@ describe('WalletContext', () => {
       type: WalletActions.SET_TOKEN_BALANCES,
       tokenBalances: [
         {
-          id: 'Ethereum-ETH',
-          symbol: 'ETH',
-          description: 'Ethereum',
-          balance: '1000000000000000000',
-          fiatAmount: '1800.00',
-        } as BalanceInfo,
+          balance: BigNumber.from('1000000000000000000'),
+          formattedBalance: '1',
+          token: {
+            name: 'Ethereum',
+            symbol: 'ETH',
+            address: '',
+            decimals: 18,
+            icon: '',
+          },
+        } as GetBalanceResult,
       ],
     };
 
@@ -63,12 +67,16 @@ describe('WalletContext', () => {
     });
     expect(tokenBalances).toEqual([
       {
-        id: 'Ethereum-ETH',
-        symbol: 'ETH',
-        description: 'Ethereum',
-        balance: '1000000000000000000',
-        fiatAmount: '1800.00',
-      } as BalanceInfo,
+        balance: BigNumber.from('1000000000000000000'),
+        formattedBalance: '1',
+        token: {
+          name: 'Ethereum',
+          symbol: 'ETH',
+          address: '',
+          decimals: 18,
+          icon: '',
+        },
+      },
     ]);
   });
 

@@ -6,8 +6,8 @@
   "browser": "./dist/index.browser.js",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
-    "@0xsequence/abi": "^0.43.34",
-    "@0xsequence/config": "^0.43.34",
+    "@0xsequence/abi": "^1.4.3",
+    "@0xsequence/core": "^1.4.3",
     "@biom3/design-tokens": "0.2.4-beta",
     "@biom3/react": "^0.10.12",
     "@ethersproject/abi": "^5.7.0",
@@ -36,9 +36,6 @@
     "oidc-client-ts": "^2.2.1",
     "os-browserify": "^0.3.0",
     "pako": "^2.1.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.11.0",
     "stream-browserify": "^3.0.0",
     "stream-http": "^3.2.0",
     "url": "^0.11.0"

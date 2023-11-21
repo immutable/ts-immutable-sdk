@@ -126,10 +126,13 @@ export class Passport {
     const { useCachedSession = false } = options || {};
     let user = null;
     try {
-      user = await this.authManager.loginSilent();
+      user = await this.authManager.getUser();
     } catch (error) {
+      if (useCachedSession) {
+        throw error;
+      }
       // eslint-disable-next-line no-console
-      console.warn('loginSilent failed with error:', error);
+      console.warn('login failed to retrieve a cached user session', error);
     }
     if (!user && !useCachedSession) {
       user = await this.authManager.login();

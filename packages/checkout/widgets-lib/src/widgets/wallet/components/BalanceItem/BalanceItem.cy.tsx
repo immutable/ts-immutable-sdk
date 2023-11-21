@@ -6,13 +6,15 @@ import {
   Checkout,
   WalletProviderName,
   IMTBLWidgetEvents,
+  GetBalanceResult,
 } from '@imtbl/checkout-sdk';
 import { cy } from 'local-cypress';
 import { Environment } from '@imtbl/config';
 import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
+import { BigNumber } from 'ethers';
+import { BalanceInfo } from 'widgets/wallet/functions/tokenBalances';
 import { WalletState } from '../../context/WalletContext';
 import { BalanceItem } from './BalanceItem';
-import { BalanceInfo } from '../../functions/tokenBalances';
 import { cyIntercept, cySmartGet } from '../../../../lib/testUtils';
 import { WalletWidgetTestComponent } from '../../test-components/WalletWidgetTestComponent';
 import { orchestrationEvents } from '../../../../lib/orchestrationEvents';
@@ -33,10 +35,21 @@ describe('BalanceItem', () => {
     connectionStatus: ConnectionStatus.CONNECTED_WITH_NETWORK,
   };
 
+  const testTokenBalances: GetBalanceResult[] = [{
+    balance: BigNumber.from('21320000000000000000'),
+    formattedBalance: '21.32',
+    token: {
+      name: 'Immutable X',
+      symbol: 'IMX',
+      decimals: 18,
+      address: NATIVE,
+    },
+  }];
+
   const baseWalletState: WalletState = {
     network: null,
     walletProviderName: WalletProviderName.METAMASK,
-    tokenBalances: [],
+    tokenBalances: testTokenBalances,
     supportedTopUps: null,
   };
 
@@ -63,7 +76,7 @@ describe('BalanceItem', () => {
     mount(
       <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
         <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
-          <WalletWidgetTestComponent>
+          <WalletWidgetTestComponent initialStateOverride={baseWalletState}>
             <BalanceItem
               balanceInfo={testBalanceInfo}
               bridgeToL2OnClick={() => {}}
@@ -96,7 +109,7 @@ describe('BalanceItem', () => {
         },
         isSupported: true,
       },
-      tokenBalances: [testBalanceInfo],
+      tokenBalances: testTokenBalances,
       supportedTopUps: {
         isOnRampEnabled: true,
         isSwapEnabled: true,
@@ -134,7 +147,7 @@ describe('BalanceItem', () => {
         },
         isSupported: true,
       },
-      tokenBalances: [testBalanceInfo],
+      tokenBalances: testTokenBalances,
       supportedTopUps: {
         isOnRampEnabled: true,
         isSwapEnabled: true,
@@ -177,7 +190,7 @@ describe('BalanceItem', () => {
         },
         isSupported: true,
       },
-      tokenBalances: [testBalanceInfo],
+      tokenBalances: testTokenBalances,
       supportedTopUps: {
         isOnRampEnabled: true,
         isSwapEnabled: true,
@@ -231,7 +244,7 @@ describe('BalanceItem', () => {
         },
         isSupported: true,
       },
-      tokenBalances: [testBalanceInfo],
+      tokenBalances: testTokenBalances,
       supportedTopUps: {
         isOnRampEnabled: true,
         isSwapEnabled: true,
@@ -295,7 +308,7 @@ describe('BalanceItem', () => {
         },
         isSupported: true,
       },
-      tokenBalances: [testBalanceInfo, balanceInfoNotInAllowList],
+      tokenBalances: [],
       supportedTopUps: {
         isOnRampEnabled: true,
         isSwapEnabled: true,
@@ -338,7 +351,7 @@ describe('BalanceItem', () => {
         },
         isSupported: true,
       },
-      tokenBalances: [testBalanceInfo],
+      tokenBalances: testTokenBalances,
       supportedTopUps: {
         isOnRampEnabled: false,
         isSwapEnabled: true,
@@ -382,7 +395,7 @@ describe('BalanceItem', () => {
         },
         isSupported: true,
       },
-      tokenBalances: [testBalanceInfo],
+      tokenBalances: testTokenBalances,
       supportedTopUps: {
         isOnRampEnabled: true,
         isSwapEnabled: true,
@@ -435,7 +448,7 @@ describe('BalanceItem', () => {
         },
         isSupported: true,
       },
-      tokenBalances: [testBalanceInfo],
+      tokenBalances: testTokenBalances,
       supportedTopUps: {
         isOnRampEnabled: true,
         isSwapEnabled: true,

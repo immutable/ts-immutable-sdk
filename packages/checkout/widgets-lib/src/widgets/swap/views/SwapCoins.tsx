@@ -54,6 +54,12 @@ export function SwapCoins({
     page({
       userJourney: UserJourney.SWAP,
       screen: 'SwapCoins',
+      extras: {
+        fromAmount,
+        toAmount,
+        fromContractAddress,
+        toContractAddress,
+      },
     });
   }, []);
 

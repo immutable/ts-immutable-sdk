@@ -54,9 +54,9 @@ describe('PassportImxProvider', () => {
   const confirmationScreen = new ConfirmationScreen({} as PassportConfiguration);
 
   const mockAuthManager = {
-    loginSilent: jest.fn(),
     login: jest.fn(),
     getUser: jest.fn(),
+    forceUserRefresh: jest.fn(),
   };
 
   const mockStarkSigner = {
@@ -341,7 +341,7 @@ describe('PassportImxProvider', () => {
 
       mockAuthManager.login.mockResolvedValue(mockUser);
       magicAdapterMock.login.mockResolvedValue(magicProviderMock);
-      mockAuthManager.loginSilent.mockResolvedValue({ ...mockUser, imx: { ethAddress: '', starkAddress: '', userAdminAddress: '' } });
+      mockAuthManager.forceUserRefresh.mockResolvedValue({ ...mockUser, imx: { ethAddress: '', starkAddress: '', userAdminAddress: '' } });
 
       await passportImxProvider.registerOffchain();
 
@@ -350,8 +350,7 @@ describe('PassportImxProvider', () => {
         starkSigner: mockStarkSigner,
         usersApi: immutableXClient.usersApi,
       }, mockUserImx.accessToken);
-      expect(mockAuthManager.loginSilent).toHaveBeenCalledTimes(1);
-      expect(mockAuthManager.loginSilent).toHaveBeenCalledWith({ forceRefresh: true });
+      expect(mockAuthManager.forceUserRefresh).toHaveBeenCalledTimes(1);
     });
   });
 

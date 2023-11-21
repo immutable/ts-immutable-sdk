@@ -63,7 +63,7 @@ export class BlockchainDataConfiguration {
         }
         case Environment.PRODUCTION: {
           this.apiConfig = createAPIConfiguration({
-            basePath: 'https://indexer-mr.imtbl.com',
+            basePath: 'https://api.immutable.com',
             baseConfig,
           });
           break;
