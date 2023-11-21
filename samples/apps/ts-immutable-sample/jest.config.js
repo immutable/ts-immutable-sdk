@@ -13,6 +13,7 @@ const config = {
   moduleNameMapper: {
     "@imtbl/sdk/config": "<rootDir>/node_modules/@imtbl/sdk/dist/config",
     "@imtbl/sdk/passport": "<rootDir>/node_modules/@imtbl/sdk/dist/passport",
+    "@/lib/env": "<rootDir>/src/lib/env",
   },
   modulePathIgnorePatterns: ["<rootDir>/tests/", "<rootDir>/tests-examples"],
   transform: {
