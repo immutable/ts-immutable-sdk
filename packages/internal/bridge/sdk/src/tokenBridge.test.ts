@@ -192,6 +192,57 @@ describe('Token Bridge', () => {
         expect(error.type).toBe(BridgeErrorType.INVALID_AMOUNT);
       }
     });
+    it('throws an error when the sourceChainId is not one of the ones set in the initializer', async () => {
+      expect.assertions(2);
+      try {
+        await tokenBridge.getUnsignedApproveBridgeTx(
+          {
+            token: 'NATIVE',
+            depositorAddress: '0x1234567890123456789012345678901234567890',
+            depositAmount: ethers.utils.parseUnits('100', 18),
+            sourceChainId: '100',
+            destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+          },
+        );
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(BridgeError);
+        expect(error.type).toBe(BridgeErrorType.INVALID_SOURCE_CHAIN_ID);
+      }
+    });
+    it('throws an error when the destinationChainId is not one of the ones set in the initializer', async () => {
+      expect.assertions(2);
+      try {
+        await tokenBridge.getUnsignedApproveBridgeTx(
+          {
+            token: 'NATIVE',
+            depositorAddress: '0x1234567890123456789012345678901234567890',
+            depositAmount: ethers.utils.parseUnits('100', 18),
+            sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+            destinationChainId: '100',
+          },
+        );
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(BridgeError);
+        expect(error.type).toBe(BridgeErrorType.INVALID_DESTINATION_CHAIN_ID);
+      }
+    });
+    it('throws an error when the sourceChainId is the same as the  destinationChainId', async () => {
+      expect.assertions(2);
+      try {
+        await tokenBridge.getUnsignedApproveBridgeTx(
+          {
+            token: 'NATIVE',
+            depositorAddress: '0x1234567890123456789012345678901234567890',
+            depositAmount: ethers.utils.parseUnits('100', 18),
+            sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+            destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+          },
+        );
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(BridgeError);
+        expect(error.type).toBe(BridgeErrorType.CHAIN_IDS_MATCH);
+      }
+    });
   });
 
   describe('getUnsignedDepositTokenTx', () => {

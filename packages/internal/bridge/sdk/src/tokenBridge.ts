@@ -869,7 +869,7 @@ export class TokenBridge {
       && sourceChainId !== this.config.bridgeInstance.childChainID.toString()) {
       throw new BridgeError(
         `the sourceChainId ${sourceChainId} is not a valid`,
-        BridgeErrorType.INVALID_ADDRESS,
+        BridgeErrorType.INVALID_SOURCE_CHAIN_ID,
       );
     }
 
@@ -878,7 +878,7 @@ export class TokenBridge {
       && destinationChainId !== this.config.bridgeInstance.childChainID.toString()) {
       throw new BridgeError(
         `the destinationChainId ${destinationChainId} is not a valid`,
-        BridgeErrorType.INVALID_ADDRESS,
+        BridgeErrorType.INVALID_DESTINATION_CHAIN_ID,
       );
     }
 
@@ -886,7 +886,7 @@ export class TokenBridge {
     if (sourceChainId === destinationChainId.toString()) {
       throw new BridgeError(
         `the sourceChainId ${sourceChainId} cannot be the same as the destinationChainId ${destinationChainId}`,
-        BridgeErrorType.INVALID_ADDRESS,
+        BridgeErrorType.CHAIN_IDS_MATCH,
       );
     }
   }
