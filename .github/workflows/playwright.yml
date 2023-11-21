@@ -17,18 +17,18 @@ jobs:
         node-version: 18
 
     - name: Install root dependencies
-      run: yarn install --immutable
+      run: npm install -g yarn && yarn install --immutable
 
     - name: Install sample apps dependencies
       working-directory: samples/apps/ts-immutable-sample
-      run: npm install -g yarn && yarn
+      run: yarn install
 
     - name: Build SDK
       run: yarn build
 
     - name: Run Unit tests
-      working-directory: samples/apps/ts-immutable-sample
-      run: yarn test
+      run: cd samples/apps/ts-immutable-sample && yarn test
+      
     - name: Run Playwright tests
       env:
         # Required for Firefox to run
