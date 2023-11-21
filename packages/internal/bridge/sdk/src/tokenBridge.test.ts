@@ -227,7 +227,7 @@ describe('Token Bridge', () => {
       };
       const response: BridgeDepositResponse = await tokenBridge.getUnsignedDepositTx(request);
       expect(response.unsignedTx.to).toBe(
-        bridgeConfig.bridgeContracts.rootChainERC20Predicate,
+        bridgeConfig.bridgeContracts.rootChainERC20BridgeFlowRate,
       );
       expect(response.unsignedTx.value).toBe(0);
       expect(response.unsignedTx.data).not.toBeNull();
@@ -248,7 +248,7 @@ describe('Token Bridge', () => {
       };
 
       const response: BridgeDepositResponse = await tokenBridge.getUnsignedDepositTx(request);
-      expect(response.unsignedTx.to).toBe(bridgeConfig.bridgeContracts.rootChainERC20Predicate);
+      expect(response.unsignedTx.to).toBe(bridgeConfig.bridgeContracts.rootChainERC20BridgeFlowRate);
       expect(response.unsignedTx.value).toBe(depositAmount);
       expect(response.unsignedTx.data).not.toBeNull();
     });
@@ -268,7 +268,7 @@ describe('Token Bridge', () => {
       };
       const response: BridgeDepositResponse = await tokenBridge.getUnsignedDepositTx(request);
       expect(response.unsignedTx.to).toBe(
-        bridgeConfig.bridgeContracts.rootChainERC20Predicate,
+        bridgeConfig.bridgeContracts.rootChainERC20BridgeFlowRate,
       );
       expect(response.unsignedTx.value).toBe(0);
       expect(response.unsignedTx.data).not.toBeNull();

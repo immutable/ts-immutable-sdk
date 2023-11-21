@@ -27,11 +27,11 @@ export interface BridgeOverrides {
  * @property {Address} childChainStateReceiver - The address of the child chain state receiver contract.
  */
 export type BridgeContracts = {
-  rootChainERC20Predicate: Address;
+  rootChainERC20BridgeFlowRate: Address;
   rootChainStateSender: Address;
   rootChainCheckpointManager: Address;
   rootChainExitHelper: Address;
-  childChainERC20Predicate: Address;
+  childChainERC20Bridge: Address;
   childChainStateReceiver: Address;
 };
 
