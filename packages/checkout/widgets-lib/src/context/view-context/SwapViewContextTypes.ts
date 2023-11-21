@@ -1,5 +1,5 @@
 import { TransactionRequest, TransactionResponse } from '@ethersproject/providers';
-import { Quote } from '@imtbl/dex-sdk';
+import { deprecated } from '@imtbl/dex-sdk';
 import { ViewType } from './ViewType';
 
 export enum SwapWidgetViews {
@@ -56,7 +56,7 @@ interface SwapInProgressView extends ViewType {
 export interface ApproveERC20SwapData {
   approveTransaction: TransactionRequest;
   transaction: TransactionRequest;
-  info: Quote;
+  info: deprecated.Quote;
   swapFormInfo: PrefilledSwapForm;
 }
 export interface PrefilledSwapForm {

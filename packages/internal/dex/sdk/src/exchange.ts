@@ -13,29 +13,31 @@ import { Router } from './lib/router';
 import { getTokenDecimals, isValidNonZeroAddress, isValidTokenLiteral, newAmount, toPublicAmount } from './lib/utils';
 import {
   Coin,
-  CoinAmount,
   ERC20,
   ExchangeModuleConfiguration,
+  Native,
   Quote,
   SecondaryFee,
+  TransactionDetails,
   TransactionResponse,
 } from './types';
+import * as deprecated from './types/deprecated';
 import { getSwap, adjustQuoteWithFees } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
 
-const toPublicQuote = (
-  amount: CoinAmount<Coin>,
-  amountWithMaxSlippage: CoinAmount<Coin>,
-  slippage: number,
-  fees: Fees,
-): Quote => ({
-  amount: toPublicAmount(amount),
-  amountWithMaxSlippage: toPublicAmount(amountWithMaxSlippage),
-  slippage,
-  fees: fees.withAmounts().map((fee) => ({
+const toPublicQuote = (quote: Quote): deprecated.Quote => ({
+  amount: toPublicAmount(quote.amount),
+  amountWithMaxSlippage: toPublicAmount(quote.amountWithMaxSlippage),
+  slippage: quote.slippage,
+  fees: quote.fees.map((fee) => ({
     ...fee,
     amount: toPublicAmount(fee.amount),
   })),
+});
+
+const toPublicTxnDetails = (txnDetails: TransactionDetails): deprecated.TransactionDetails => ({
+  transaction: txnDetails.transaction,
+  gasFeeEstimate: txnDetails.gasFeeEstimate ? toPublicAmount(txnDetails.gasFeeEstimate) : null,
 });
 
 export class Exchange {
@@ -45,7 +47,7 @@ export class Exchange {
 
   private chainId: number;
 
-  private nativeToken: Coin;
+  private nativeToken: Native;
 
   private wrappedNativeToken: ERC20;
 
@@ -203,9 +205,54 @@ export class Exchange {
       ? await getApproval(this.provider, fromAddress, preparedApproval, gasPrice)
       : null;
 
-    const quote = toPublicQuote(quotedAmount, quotedAmountWithMaxSlippage, slippagePercent, fees);
+    const quote = {
+      amount: quotedAmount,
+      amountWithMaxSlippage: quotedAmountWithMaxSlippage,
+      slippage: slippagePercent,
+      fees: fees.withAmounts(),
+    };
 
     return { quote, approval, swap };
+  }
+
+  /**
+   * Get the unsigned swap transaction given the amount to sell.
+   * Includes quote details for the swap.
+   *
+   * @deprecated Use getUnsignedSwapTxFromAmountIn instead
+   * @param {string} fromAddress The public address that will sign and submit the transaction
+   * @param {string} tokenInAddress Token address or 'native' to sell
+   * @param {string} tokenOutAddress Token address or 'native' to buy
+   * @param {ethers.BigNumberish} amountIn Amount to sell in the smallest unit of the token-in
+   * @param {number} slippagePercent (optional) The percentage of slippage tolerance. Default = 0.1. Max = 50. Min = 0
+   * @param {number} maxHops (optional) Maximum hops allowed in optimal route. Default is 2
+   * @param {number} deadline (optional) Latest time swap can execute. Default is 15 minutes
+   * @return {deprecated.TransactionResponse} The result containing the unsigned transaction and details of the swap
+   */
+  public async getLegacyUnsignedSwapTxFromAmountIn(
+    fromAddress: string,
+    tokenInAddress: string,
+    tokenOutAddress: string,
+    amountIn: ethers.BigNumberish,
+    slippagePercent: number = DEFAULT_SLIPPAGE,
+    maxHops: number = DEFAULT_MAX_HOPS,
+    deadline: number = DEFAULT_DEADLINE,
+  ): Promise<deprecated.TransactionResponse> {
+    const response = await this.getUnsignedSwapTx(
+      fromAddress,
+      tokenInAddress,
+      tokenOutAddress,
+      ethers.BigNumber.from(amountIn),
+      slippagePercent,
+      maxHops,
+      deadline,
+      TradeType.EXACT_INPUT,
+    );
+    return {
+      approval: response.approval ? toPublicTxnDetails(response.approval) : null,
+      swap: toPublicTxnDetails(response.swap),
+      quote: toPublicQuote(response.quote),
+    };
   }
 
   /**
@@ -246,6 +293,46 @@ export class Exchange {
    * Get the unsigned swap transaction given the amount to buy.
    * Includes quote details for the swap.
    *
+   * @deprecated Use getUnsignedSwapTxFromAmountOut instead
+   * @param {string} fromAddress The public address that will sign and submit the transaction
+   * @param {string} tokenInAddress ERC20 contract address or 'native' to sell
+   * @param {string} tokenOutAddress ERC20 contract address or 'native' to buy
+   * @param {ethers.BigNumberish} amountOut Amount to buy in the smallest unit of the token-out
+   * @param {number} slippagePercent (optional) The percentage of slippage tolerance. Default = 0.1. Max = 50. Min = 0
+   * @param {number} maxHops (optional) Maximum hops allowed in optimal route. Default is 2
+   * @param {number} deadline (optional) Latest time swap can execute. Default is 15 minutes
+   * @return {deprecated.TransactionResponse} The result containing the unsigned transaction and details of the swap
+   */
+  public async getLegacyUnsignedSwapTxFromAmountOut(
+    fromAddress: string,
+    tokenInAddress: string,
+    tokenOutAddress: string,
+    amountOut: ethers.BigNumberish,
+    slippagePercent: number = DEFAULT_SLIPPAGE,
+    maxHops: number = DEFAULT_MAX_HOPS,
+    deadline: number = DEFAULT_DEADLINE,
+  ): Promise<deprecated.TransactionResponse> {
+    const response = await this.getUnsignedSwapTx(
+      fromAddress,
+      tokenInAddress,
+      tokenOutAddress,
+      ethers.BigNumber.from(amountOut),
+      slippagePercent,
+      maxHops,
+      deadline,
+      TradeType.EXACT_OUTPUT,
+    );
+    return {
+      approval: response.approval ? toPublicTxnDetails(response.approval) : null,
+      swap: toPublicTxnDetails(response.swap),
+      quote: toPublicQuote(response.quote),
+    };
+  }
+
+  /**
+   * Get the unsigned swap transaction given the amount to buy.
+   * Includes quote details for the swap.
+   *
    * @param {string} fromAddress The public address that will sign and submit the transaction
    * @param {string} tokenInAddress ERC20 contract address or 'native' to sell
    * @param {string} tokenOutAddress ERC20 contract address or 'native' to buy
@@ -264,7 +351,7 @@ export class Exchange {
     maxHops: number = DEFAULT_MAX_HOPS,
     deadline: number = DEFAULT_DEADLINE,
   ): Promise<TransactionResponse> {
-    return await this.getUnsignedSwapTx(
+    const response = await this.getUnsignedSwapTx(
       fromAddress,
       tokenInAddress,
       tokenOutAddress,
@@ -274,5 +361,6 @@ export class Exchange {
       deadline,
       TradeType.EXACT_OUTPUT,
     );
+    return response;
   }
 }

@@ -1,9 +1,7 @@
 import { Environment } from '@imtbl/config';
 import { BigNumber } from 'ethers';
 import {
-  Token,
-  TransactionDetails,
-  TransactionResponse,
+  deprecated,
 } from '@imtbl/dex-sdk';
 import { TransactionRequest } from '@ethersproject/providers';
 import { CheckoutConfiguration } from '../../../config';
@@ -20,8 +18,8 @@ describe('quoteFetcher', () => {
     feeAmount: number,
     swapGasFeeEstimate?: number,
     approvalGasFeeEstimate?: number,
-  ): TransactionResponse => {
-    const transactionResponse: TransactionResponse = {
+  ): deprecated.TransactionResponse => {
+    const transactionResponse: deprecated.TransactionResponse = {
       swap: {
         transaction: {} as TransactionRequest,
         gasFeeEstimate: null,
@@ -29,18 +27,18 @@ describe('quoteFetcher', () => {
       quote: {
         amount: {
           value: BigNumber.from(quoteAmount),
-          token: {} as Token,
+          token: {} as deprecated.Token,
         },
         amountWithMaxSlippage: {
           value: BigNumber.from(quoteAmount),
-          token: {} as Token,
+          token: {} as deprecated.Token,
         },
         slippage: 0,
         fees: [
           {
             amount: {
               value: BigNumber.from(feeAmount),
-              token: {} as Token,
+              token: {} as deprecated.Token,
             },
             recipient: '',
             basisPoints: 0,
@@ -53,7 +51,7 @@ describe('quoteFetcher', () => {
     if (swapGasFeeEstimate) {
       transactionResponse.swap.gasFeeEstimate = {
         value: BigNumber.from(swapGasFeeEstimate),
-        token: {} as Token,
+        token: {} as deprecated.Token,
       };
     }
 
@@ -61,9 +59,9 @@ describe('quoteFetcher', () => {
       transactionResponse.approval = {
         gasFeeEstimate: {
           value: BigNumber.from(approvalGasFeeEstimate),
-          token: {} as Token,
+          token: {} as deprecated.Token,
         },
-      } as TransactionDetails;
+      } as deprecated.TransactionDetails;
     }
 
     return transactionResponse;
@@ -81,18 +79,18 @@ describe('quoteFetcher', () => {
       quote: {
         amount: {
           value: BigNumber.from(quoteAmount),
-          token: {} as Token,
+          token: {} as deprecated.Token,
         },
         amountWithMaxSlippage: {
           value: BigNumber.from(quoteAmount),
-          token: {} as Token,
+          token: {} as deprecated.Token,
         },
         slippage: 0,
         fees: [
           {
             amount: {
               value: BigNumber.from(feeAmount),
-              token: {} as Token,
+              token: {} as deprecated.Token,
             },
             recipient: '',
             basisPoints: 0,
@@ -104,14 +102,14 @@ describe('quoteFetcher', () => {
     if (swap) {
       dexQuote.swap = {
         value: BigNumber.from(swap),
-        token: {} as Token,
+        token: {} as deprecated.Token,
       };
     }
 
     if (approval) {
       dexQuote.approval = {
         value: BigNumber.from(approval),
-        token: {} as Token,
+        token: {} as deprecated.Token,
       };
     }
 

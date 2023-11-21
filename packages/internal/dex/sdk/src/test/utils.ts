@@ -8,7 +8,8 @@ import { IV3SwapRouter } from 'contracts/types/SecondaryFee';
 import { PromiseOrValue } from 'contracts/types/common';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
 import { NativeTokenService } from 'lib/nativeTokenService';
-import { ExchangeModuleConfiguration, SecondaryFee, CoinAmount, Coin, ERC20, Native, Amount } from 'types';
+import { ExchangeModuleConfiguration, SecondaryFee, CoinAmount, Coin, ERC20, Native } from 'types';
+import { Amount } from 'types/deprecated';
 import { erc20ToUniswapToken, newAmount, Router, RoutingContracts } from '../lib';
 
 export const TEST_GAS_PRICE = BigNumber.from('1500000000'); // 1.5 gwei or 1500000000 wei
@@ -187,10 +188,11 @@ function decodeSwapRouterCall(calldata: utils.BytesLike, functionName: SwapRoute
 }
 
 export function decodeMulticallExactInputWithFees(data: utils.BytesLike) {
-  const [
-    exactInputParams,
-    unwrapTokenParams,
-  ] = decodeSecondaryFeeCall(data, 'exactInputWithSecondaryFee', 'unwrapNativeToken');
+  const [exactInputParams, unwrapTokenParams] = decodeSecondaryFeeCall(
+    data,
+    'exactInputWithSecondaryFee',
+    'unwrapNativeToken',
+  );
 
   const secondaryFeeParams: SecondaryFee[] = exactInputParams[0].map((x: [string, number]) => ({
     recipient: x[0],
@@ -221,10 +223,11 @@ export function decodeMulticallExactInputWithoutFees(data: utils.BytesLike) {
 }
 
 export function decodeMulticallExactOutputWithFees(data: utils.BytesLike) {
-  const [
-    exactOutputParams,
-    unwrapTokenParams,
-  ] = decodeSecondaryFeeCall(data, 'exactOutputWithSecondaryFee', 'unwrapNativeToken');
+  const [exactOutputParams, unwrapTokenParams] = decodeSecondaryFeeCall(
+    data,
+    'exactOutputWithSecondaryFee',
+    'unwrapNativeToken',
+  );
 
   const secondaryFeeParams: SecondaryFee[] = exactOutputParams[0].map((x: [string, number]) => ({
     recipient: x[0],
@@ -242,10 +245,11 @@ export function decodeMulticallExactOutputWithFees(data: utils.BytesLike) {
 }
 
 export function decodeMulticallExactInputSingleWithFees(data: utils.BytesLike) {
-  const [
-    exactInputParams,
-    unwrapTokenParams,
-  ] = decodeSecondaryFeeCall(data, 'exactInputSingleWithSecondaryFee', 'unwrapNativeToken');
+  const [exactInputParams, unwrapTokenParams] = decodeSecondaryFeeCall(
+    data,
+    'exactInputSingleWithSecondaryFee',
+    'unwrapNativeToken',
+  );
 
   const secondaryFeeParams: SecondaryFee[] = exactInputParams[0].map((x: [string, number]) => ({
     recipient: x[0],
@@ -266,10 +270,11 @@ export function decodeMulticallExactInputSingleWithFees(data: utils.BytesLike) {
 }
 
 export function decodeMulticallExactOutputSingleWithFees(data: utils.BytesLike) {
-  const [
-    exactOutputParams,
-    unwrapTokenParams,
-  ] = decodeSecondaryFeeCall(data, 'exactOutputSingleWithSecondaryFee', 'unwrapNativeToken');
+  const [exactOutputParams, unwrapTokenParams] = decodeSecondaryFeeCall(
+    data,
+    'exactOutputSingleWithSecondaryFee',
+    'unwrapNativeToken',
+  );
 
   const secondaryFeeParams: SecondaryFee[] = exactOutputParams[0].map((x: [string, number]) => ({
     recipient: x[0],

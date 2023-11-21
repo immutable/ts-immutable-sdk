@@ -1,4 +1,4 @@
-import { Amount, Quote } from '@imtbl/dex-sdk';
+import { deprecated } from '@imtbl/dex-sdk';
 import {
   ChainId,
   GetBalanceResult,
@@ -15,7 +15,7 @@ export type TokenBalances = Map<ChainId, TokenBalanceResult>;
 
 export type DexQuotes = Map<string, DexQuote>;
 export type DexQuote = {
-  quote: Quote,
-  approval: Amount | null,
-  swap: Amount | null,
+  quote: deprecated.Quote,
+  approval: deprecated.Amount | null,
+  swap: deprecated.Amount | null,
 };

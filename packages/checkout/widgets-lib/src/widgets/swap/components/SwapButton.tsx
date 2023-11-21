@@ -1,6 +1,6 @@
 import { Box, Button } from '@biom3/react';
 import { useContext, useState } from 'react';
-import { TransactionResponse } from '@imtbl/dex-sdk';
+import { deprecated } from '@imtbl/dex-sdk';
 import { CheckoutErrorType } from '@imtbl/checkout-sdk';
 import { text } from '../../../resources/text/textConfig';
 import { PrefilledSwapForm, SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
@@ -22,7 +22,7 @@ export interface SwapButtonProps {
   loading: boolean
   updateLoading: (value: boolean) => void
   validator: () => boolean
-  transaction: TransactionResponse | null;
+  transaction: deprecated.TransactionResponse | null;
   data?: SwapFormData;
   insufficientFundsForGas: boolean;
   openNotEnoughImxDrawer: () => void;

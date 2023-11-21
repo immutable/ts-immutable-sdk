@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { Environment } from '@imtbl/config';
-import { Fee, Token } from '@imtbl/dex-sdk';
+import { deprecated } from '@imtbl/dex-sdk';
 import { BigNumber, utils } from 'ethers';
 import { CheckoutConfiguration } from '../../../config';
 import { BalanceRequirement, BalanceCheckResult } from '../../balanceCheck/types';
@@ -46,11 +46,11 @@ describe('swapRoute', () => {
                 symbol: 'ERC20_2',
                 decimals: 18,
                 address: '0xERC20_2',
-              } as Token,
+              } as deprecated.Token,
             },
             amountWithMaxSlippage: {
               value: BigNumber.from(1),
-              token: {} as Token,
+              token: {} as deprecated.Token,
             },
             slippage: 0,
             fees: [
@@ -63,7 +63,7 @@ describe('swapRoute', () => {
                     symbol: 'IMX',
                     decimals: 18,
                     address: IMX_ADDRESS_ZKEVM,
-                  } as Token,
+                  } as deprecated.Token,
                 },
                 recipient: '',
                 basisPoints: 0,
@@ -78,7 +78,7 @@ describe('swapRoute', () => {
               symbol: 'IMX',
               decimals: 18,
               address: IMX_ADDRESS_ZKEVM,
-            } as Token,
+            } as deprecated.Token,
           },
           swap: {
             value: BigNumber.from(2),
@@ -88,7 +88,7 @@ describe('swapRoute', () => {
               symbol: 'IMX',
               decimals: 18,
               address: IMX_ADDRESS_ZKEVM,
-            } as Token,
+            } as deprecated.Token,
           },
         },
       ],
@@ -103,11 +103,11 @@ describe('swapRoute', () => {
                 symbol: 'ERC20_3',
                 decimals: 18,
                 address: '0xERC20_3',
-              } as Token,
+              } as deprecated.Token,
             },
             amountWithMaxSlippage: {
               value: BigNumber.from(1),
-              token: {} as Token,
+              token: {} as deprecated.Token,
             },
             slippage: 0,
             fees: [
@@ -120,7 +120,7 @@ describe('swapRoute', () => {
                     symbol: 'IMX',
                     decimals: 18,
                     address: IMX_ADDRESS_ZKEVM,
-                  } as Token,
+                  } as deprecated.Token,
                 },
                 recipient: '',
                 basisPoints: 0,
@@ -135,7 +135,7 @@ describe('swapRoute', () => {
               symbol: 'IMX',
               decimals: 18,
               address: IMX_ADDRESS_ZKEVM,
-            } as Token,
+            } as deprecated.Token,
           },
           swap: {
             value: BigNumber.from(2),
@@ -145,7 +145,7 @@ describe('swapRoute', () => {
               symbol: 'IMX',
               decimals: 18,
               address: IMX_ADDRESS_ZKEVM,
-            } as Token,
+            } as deprecated.Token,
           },
         },
       ],
@@ -1366,7 +1366,7 @@ describe('swapRoute', () => {
         },
       ];
 
-      const swapFees: Fee[] = [];
+      const swapFees: deprecated.Fee[] = [];
 
       const approvalFees = {
         sufficient: true,
@@ -1413,7 +1413,7 @@ describe('swapRoute', () => {
         },
       ];
 
-      const swapFees: Fee[] = [
+      const swapFees: deprecated.Fee[] = [
         {
           recipient: '',
           basisPoints: 0,
@@ -1475,7 +1475,7 @@ describe('swapRoute', () => {
         },
       ];
 
-      const swapFees: Fee[] = [
+      const swapFees: deprecated.Fee[] = [
         {
           recipient: '',
           basisPoints: 0,
@@ -1560,7 +1560,7 @@ describe('swapRoute', () => {
           },
         ];
 
-        const swapFees: Fee[] = [
+        const swapFees:deprecated.Fee[] = [
           {
             recipient: '',
             basisPoints: 0,
@@ -1651,7 +1651,7 @@ describe('swapRoute', () => {
         },
       ];
 
-      const swapFees: Fee[] = [];
+      const swapFees: deprecated.Fee[] = [];
 
       const approvalFees = {
         sufficient: true,
@@ -1698,7 +1698,7 @@ describe('swapRoute', () => {
         },
       ];
 
-      const swapFees: Fee[] = [
+      const swapFees: deprecated.Fee[] = [
         {
           recipient: '',
           basisPoints: 0,
@@ -1760,7 +1760,7 @@ describe('swapRoute', () => {
         },
       ];
 
-      const swapFees: Fee[] = [
+      const swapFees: deprecated.Fee[] = [
         {
           recipient: '',
           basisPoints: 0,
@@ -1822,7 +1822,7 @@ describe('swapRoute', () => {
         },
       ];
 
-      const swapFees: Fee[] = [
+      const swapFees: deprecated.Fee[] = [
         {
           recipient: '',
           basisPoints: 0,
@@ -1899,7 +1899,7 @@ describe('swapRoute', () => {
         approvalGasFee: BigNumber.from(5),
         approvalGasTokenAddress: '0xIMX',
       };
-      const swapFees: Fee[] = [];
+      const swapFees: deprecated.Fee[] = [];
       const l2balance = BigNumber.from(1);
       const canCoverRequirement = checkIfUserCanCoverRequirement(
         l2balance,
@@ -1940,7 +1940,7 @@ describe('swapRoute', () => {
         approvalGasFee: BigNumber.from(5),
         approvalGasTokenAddress: '0xIMX',
       };
-      const swapFees: Fee[] = [];
+      const swapFees: deprecated.Fee[] = [];
 
       const l2balance = BigNumber.from(25);
       const canCoverRequirement = checkIfUserCanCoverRequirement(
@@ -1985,7 +1985,7 @@ describe('swapRoute', () => {
           approvalGasFee: BigNumber.from(5),
           approvalGasTokenAddress: '0xERC20',
         };
-        const swapFees: Fee[] = [
+        const swapFees: deprecated.Fee[] = [
           {
             recipient: '0xRECIPIENT',
             basisPoints: 0,
@@ -2059,7 +2059,7 @@ describe('swapRoute', () => {
           approvalGasFee: BigNumber.from(5),
           approvalGasTokenAddress: '0xIMX',
         };
-        const swapFees: Fee[] = [];
+        const swapFees: deprecated.Fee[] = [];
 
         const l2balance = BigNumber.from(9);
         const canCoverRequirement = checkIfUserCanCoverRequirement(
@@ -2105,7 +2105,7 @@ describe('swapRoute', () => {
           approvalGasFee: BigNumber.from(5),
           approvalGasTokenAddress: '0xERC20',
         };
-        const swapFees: Fee[] = [
+        const swapFees: deprecated.Fee[] = [
           {
             recipient: '0xRECIPIENT',
             basisPoints: 0,

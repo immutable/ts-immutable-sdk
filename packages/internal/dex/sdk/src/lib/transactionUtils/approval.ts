@@ -4,8 +4,8 @@ import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
 import { ApproveError } from 'errors';
 import { ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
-import { isERC20Amount, toPublicAmount } from 'lib/utils';
-import { CoinAmount, Coin, ERC20 } from 'types';
+import { isERC20Amount } from 'lib/utils';
+import { CoinAmount, Coin, ERC20, Native } from 'types';
 import { SecondaryFee, TransactionDetails } from '../../types';
 import { calculateGasFee } from './gas';
 
@@ -137,7 +137,7 @@ export const getApproval = async (
   provider: JsonRpcProvider,
   ownerAddress: string,
   preparedApproval: PreparedApproval,
-  gasPrice: CoinAmount<Coin> | null,
+  gasPrice: CoinAmount<Native> | null,
 ): Promise<TransactionDetails | null> => {
   const approveTransaction = await getApproveTransaction(
     provider,
@@ -161,6 +161,6 @@ export const getApproval = async (
 
   return {
     transaction: approveTransaction,
-    gasFeeEstimate: gasFeeEstimate ? toPublicAmount(gasFeeEstimate) : null,
+    gasFeeEstimate,
   };
 };

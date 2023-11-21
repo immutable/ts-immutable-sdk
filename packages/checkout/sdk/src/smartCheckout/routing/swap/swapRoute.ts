@@ -1,5 +1,5 @@
 import { BigNumber, utils } from 'ethers';
-import { Amount, Fee } from '@imtbl/dex-sdk';
+import { deprecated } from '@imtbl/dex-sdk';
 import { CheckoutConfiguration, getL2ChainId } from '../../../config';
 import {
   AvailableRoutingOptions,
@@ -17,9 +17,9 @@ import { TokenBalanceResult } from '../types';
 import { quoteFetcher } from './quoteFetcher';
 
 const constructFees = (
-  approvalGasFees: Amount | null | undefined,
-  swapGasFees: Amount | null,
-  swapFees: Fee[],
+  approvalGasFees: deprecated.Amount | null | undefined,
+  swapGasFees: deprecated.Amount | null,
+  swapFees: deprecated.Fee[],
 ): SwapFees => {
   let approvalGasFeeAmount = BigNumber.from(0);
   let approvalGasFeeFormatted = '0';
@@ -137,7 +137,7 @@ export const getRequiredToken = (
 type SufficientApprovalFees = { sufficient: boolean, approvalGasFee: BigNumber, approvalGasTokenAddress: string };
 export const checkUserCanCoverApprovalFees = (
   l2Balances: GetBalanceResult[],
-  approval: Amount | null,
+  approval: deprecated.Amount | null,
 ): SufficientApprovalFees => {
   // Check if approval required
   if (!approval) return { sufficient: true, approvalGasFee: BigNumber.from(0), approvalGasTokenAddress: '' };
@@ -174,8 +174,8 @@ export const checkUserCanCoverApprovalFees = (
 export const checkUserCanCoverSwapFees = (
   l2Balances: GetBalanceResult[],
   approvalFees: SufficientApprovalFees,
-  swapGasFees: Amount | null,
-  swapFees: Fee[],
+  swapGasFees: deprecated.Amount | null,
+  swapFees: deprecated.Fee[],
   tokenBeingSwapped: { amount: BigNumber, address: string },
 ): boolean => {
   // Set up a map of token addresses to amounts for each of the swap fees
@@ -242,7 +242,7 @@ export const checkIfUserCanCoverRequirement = (
   quoteTokenAddress: string,
   amountBeingSwapped: BigNumber,
   approvalFees: SufficientApprovalFees,
-  swapFees: Fee[],
+  swapFees: deprecated.Fee[],
 ): boolean => {
   let remainingBalance = BigNumber.from(0);
   let balanceRequirementToken = '';

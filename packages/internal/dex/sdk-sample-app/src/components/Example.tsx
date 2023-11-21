@@ -245,12 +245,12 @@ export function Example() {
         <>
           <h3>
             Expected amount: {ethers.utils.formatEther(result.quote.amount.value)}{' '}
-            {`${addressToSymbolMapping[result.quote.amount.token.address]}`}
+            {result.quote.amount.token.type === 'erc20' ? addressToSymbolMapping[result.quote.amount.token.address] : 'Native IMX'}
           </h3>
           <h3>
             {tradeType === 'exactInput' ? 'Minimum' : 'Maximum'} amount:{' '}
             {ethers.utils.formatEther(result.quote.amountWithMaxSlippage.value)}{' '}
-            {`${addressToSymbolMapping[result.quote.amountWithMaxSlippage.token.address]}`}
+            {result.quote.amountWithMaxSlippage.token.type === 'erc20' ? addressToSymbolMapping[result.quote.amountWithMaxSlippage.token.address] : 'Native IMX'}
           </h3>
 
           <h3>Slippage: {result.quote.slippage}%</h3>

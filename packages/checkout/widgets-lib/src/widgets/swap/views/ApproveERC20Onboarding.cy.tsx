@@ -3,7 +3,7 @@ import { cy } from 'local-cypress';
 import { BigNumber } from 'ethers';
 import { ExternalProvider, TransactionRequest, Web3Provider } from '@ethersproject/providers';
 import { Checkout, CheckoutErrorType } from '@imtbl/checkout-sdk';
-import { Quote } from '@imtbl/dex-sdk';
+import { deprecated } from '@imtbl/dex-sdk';
 import { Environment } from '@imtbl/config';
 import { ApproveERC20Onboarding } from './ApproveERC20Onboarding';
 import { cyIntercept, cySmartGet } from '../../../lib/testUtils';
@@ -89,7 +89,7 @@ describe('Approve ERC20 Onboarding', () => {
         from: 'test-swap',
         to: 'test-swap',
       } as TransactionRequest,
-      info: {} as Quote,
+      info: {} as deprecated.Quote,
       swapFormInfo: {
         fromAmount: '0.5',
         fromContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',

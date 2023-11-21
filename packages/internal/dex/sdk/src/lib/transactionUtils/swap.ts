@@ -4,10 +4,10 @@ import * as Uniswap from '@uniswap/sdk-core';
 import { SecondaryFee__factory } from 'contracts/types';
 import { ISecondaryFee, SecondaryFeeInterface } from 'contracts/types/SecondaryFee';
 import { Fees } from 'lib/fees';
-import { isNative, toCurrencyAmount, toPublicAmount } from 'lib/utils';
+import { isNative, toCurrencyAmount } from 'lib/utils';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
 import { NativeTokenService, canUnwrapToken } from 'lib/nativeTokenService';
-import { Coin, CoinAmount } from 'types';
+import { Coin, CoinAmount, Native } from 'types';
 import { Interface } from 'ethers/lib/utils';
 import { SecondaryFee, TransactionDetails } from '../../types';
 import { calculateGasFee } from './gas';
@@ -446,7 +446,7 @@ export function getSwap(
   deadline: number,
   routerContractAddress: string,
   secondaryFeesContractAddress: string,
-  gasPrice: CoinAmount<Coin> | null,
+  gasPrice: CoinAmount<Native> | null,
   secondaryFees: SecondaryFee[],
 ): TransactionDetails {
   const swapRecipient = getSwapRecipient(
@@ -479,7 +479,7 @@ export function getSwap(
       value: transactionValue,
       from: fromAddress,
     },
-    gasFeeEstimate: gasFeeEstimate ? toPublicAmount(gasFeeEstimate) : null,
+    gasFeeEstimate,
   };
 }
 

@@ -1,7 +1,7 @@
 import { Environment } from '@imtbl/config';
 import { BigNumber } from 'ethers';
 import { JsonRpcProvider } from '@ethersproject/providers';
-import { Quote } from '@imtbl/dex-sdk';
+import { deprecated } from '@imtbl/dex-sdk';
 import { CheckoutConfiguration } from '../../../config';
 import {
   ChainId,
@@ -162,7 +162,7 @@ describe('bridgeAndSwapRoute', () => {
             basisPoints: 0,
           },
         ],
-      } as Quote,
+      } as deprecated.Quote,
       approval: null,
       swap: null,
     };
@@ -193,7 +193,7 @@ describe('bridgeAndSwapRoute', () => {
             basisPoints: 0,
           },
         ],
-      } as Quote,
+      } as deprecated.Quote,
       approval: null,
       swap: null,
     };

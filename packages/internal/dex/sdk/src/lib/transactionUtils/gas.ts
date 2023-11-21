@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers';
 import { JsonRpcProvider, FeeData } from '@ethersproject/providers';
 import { newAmount } from 'lib';
-import { CoinAmount, Coin } from 'types';
+import { CoinAmount, Native } from 'types';
 
 type EIP1559FeeData = {
   maxFeePerGas: BigNumber;
@@ -28,7 +28,10 @@ export const doesChainSupportEIP1559 = (fee: FeeData): fee is EIP1559FeeData => 
  * @returns {Amount | null} - The gas price in the smallest denomination of the chain's currency,
  *  or null if no gas price is available
  */
-export const fetchGasPrice = async (provider: JsonRpcProvider, nativeToken: Coin): Promise<CoinAmount<Coin> | null> => {
+export const fetchGasPrice = async (
+  provider: JsonRpcProvider,
+  nativeToken: Native,
+): Promise<CoinAmount<Native> | null> => {
   const feeData = await provider.getFeeData().catch(() => null);
   if (!feeData) return null;
 
@@ -46,6 +49,6 @@ export const fetchGasPrice = async (provider: JsonRpcProvider, nativeToken: Coin
  * @param {BigNumber} gasEstimate - The total gas units that will be used for the transaction
  * @returns - The cost of the transaction in the gas token's smallest denomination (e.g. WEI)
  */
-export const calculateGasFee = (gasPrice: CoinAmount<Coin>, gasEstimate: BigNumber): CoinAmount<Coin> =>
+export const calculateGasFee = (gasPrice: CoinAmount<Native>, gasEstimate: BigNumber): CoinAmount<Native> =>
   // eslint-disable-next-line implicit-arrow-linebreak
   newAmount(gasEstimate.mul(gasPrice.value), gasPrice.token);

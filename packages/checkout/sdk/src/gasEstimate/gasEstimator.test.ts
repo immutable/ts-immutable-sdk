@@ -1,6 +1,6 @@
 import { BigNumber, Contract, ethers } from 'ethers';
 import { Environment } from '@imtbl/config';
-import { Exchange, TransactionResponse } from '@imtbl/dex-sdk';
+import { Exchange, deprecated } from '@imtbl/dex-sdk';
 import { TokenBridge } from '@imtbl/bridge-sdk';
 import { gasEstimator } from './gasEstimator';
 import { CheckoutError, CheckoutErrorType } from '../errors';
@@ -80,7 +80,7 @@ describe('gasServiceEstimator', () => {
   describe('swap', () => {
     it('should return gas estimate for swap', async () => {
       (createExchangeInstance as jest.Mock).mockResolvedValue({
-        getUnsignedSwapTxFromAmountIn: jest.fn<Promise<TransactionResponse>, any[]>().mockResolvedValue({
+        getUnsignedSwapTxFromAmountIn: jest.fn<Promise<deprecated.TransactionResponse>, any[]>().mockResolvedValue({
           swap: {
             transaction: {} as any,
             gasFeeEstimate: {
@@ -115,7 +115,7 @@ describe('gasServiceEstimator', () => {
 
     it('should handle null gasFeeEstimate returned from the exchange', async () => {
       (createExchangeInstance as jest.Mock).mockResolvedValue({
-        getUnsignedSwapTxFromAmountIn: jest.fn<Promise<TransactionResponse>, any[]>().mockResolvedValue({
+        getUnsignedSwapTxFromAmountIn: jest.fn<Promise<deprecated.TransactionResponse>, any[]>().mockResolvedValue({
           swap: {
             transaction: {} as any,
             gasFeeEstimate: null,
@@ -139,7 +139,7 @@ describe('gasServiceEstimator', () => {
 
     it('should handle undefined amount returned from the exchange', async () => {
       (createExchangeInstance as jest.Mock).mockResolvedValue({
-        getUnsignedSwapTxFromAmountIn: jest.fn<Promise<TransactionResponse>, any[]>().mockResolvedValue({
+        getUnsignedSwapTxFromAmountIn: jest.fn<Promise<deprecated.TransactionResponse>, any[]>().mockResolvedValue({
           swap: {
             transaction: {} as any,
             gasFeeEstimate: {

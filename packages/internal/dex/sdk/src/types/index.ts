@@ -1,6 +1,8 @@
 import { ethers } from 'ethers';
 import { ModuleConfiguration } from '@imtbl/config';
 
+export * as deprecated from './deprecated';
+
 export type ExchangeContracts = {
   multicall: string;
   coreFactory: string;
@@ -23,7 +25,7 @@ export type Chain = {
   rpcUrl: string;
   contracts: ExchangeContracts;
   commonRoutingTokens: ERC20[];
-  nativeToken: Coin;
+  nativeToken: Native;
   wrappedNativeToken: ERC20;
 };
 
@@ -48,7 +50,7 @@ export type SecondaryFee = {
 export type Fee = {
   recipient: string;
   basisPoints: number;
-  amount: Amount;
+  amount: CoinAmount<Coin>;
 };
 
 /**
@@ -63,14 +65,14 @@ export type CoinAmount<T extends Coin> = {
 
 /**
  * Type representing a quote for a swap
- * @property {@link Amount} amount - The quoted amount with fees applied
- * @property {@link Amount} amountWithMaxSlippage - The quoted amount with the max slippage and fees applied
+ * @property {@link CoinAmount<Native>} amount - The quoted amount with fees applied
+ * @property {@link CoinAmount<Native>} amountWithMaxSlippage - The quoted amount with the max slippage and fees applied
  * @property {number} slippage - The slippage percentage used to calculate the quote
  * @property {@link Fee[]} fees - The secondary fees applied to the swap
  */
 export type Quote = {
-  amount: Amount;
-  amountWithMaxSlippage: Amount;
+  amount: CoinAmount<Coin>;
+  amountWithMaxSlippage: CoinAmount<Coin>;
   slippage: number;
   fees: Fee[];
 };
@@ -78,11 +80,11 @@ export type Quote = {
 /**
  * Type representing the details of a transaction
  * @property {@link ethers.providers.TransactionRequest} transaction - The unsigned transaction
- * @property {@link Amount | null} gasFeeEstimate - The gas fee estimate or null if it is not available
+ * @property {@link CoinAmount<Native> | null} gasFeeEstimate - The gas fee estimate or null if it is not available
  */
 export type TransactionDetails = {
   transaction: ethers.providers.TransactionRequest;
-  gasFeeEstimate: Amount | null;
+  gasFeeEstimate: CoinAmount<Native> | null;
 };
 
 /**
@@ -137,32 +139,6 @@ export type Native = {
 export type Coin = ERC20 | Native;
 
 /**
- * Type representing a token
- * @property {number} chainId - The chain ID
- * @property {string} address - The token address, or the empty string for the native token
- * @property {number} decimals - The token decimals
- * @property {string | undefined} symbol - The token symbol or undefined if it is not available
- * @property {string | undefined} name - The token name or undefined if it is not available
- */
-export type Token = {
-  chainId: number;
-  address: string;
-  decimals: number;
-  symbol?: string;
-  name?: string;
-};
-
-/**
- * Interface representing a token amount
- * @property {@link Token} token - The token
- * @property {@link ethers.BigNumber} value - The amount
- */
-export type Amount = {
-  token: Token;
-  value: ethers.BigNumber;
-};
-
-/**
  * Type representing the overrides for the {@link Exchange} module
  * @property {string} rpcURL - The RPC URL for the chain
  * @property {ExchangeContracts} exchangeContracts - The DEX contract addresses
@@ -174,7 +150,7 @@ export type ExchangeOverrides = {
   rpcURL: string;
   exchangeContracts: ExchangeContracts;
   commonRoutingTokens: ERC20[];
-  nativeToken: Coin;
+  nativeToken: Native;
   wrappedNativeToken: ERC20;
 };
 

@@ -115,7 +115,7 @@ async function swapGasEstimator(
     const exchange = await instance.createExchangeInstance(chainId, config);
 
     // Create a fake transaction to get the gas from the quote
-    const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
+    const { swap } = await exchange.getLegacyUnsignedSwapTxFromAmountIn(
       DUMMY_WALLET_ADDRESS,
       inAddress,
       outAddress,

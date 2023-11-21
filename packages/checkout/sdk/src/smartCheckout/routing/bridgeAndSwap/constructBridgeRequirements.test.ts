@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers';
-import { Token as DexTokenInfo } from '@imtbl/dex-sdk';
+import { deprecated } from '@imtbl/dex-sdk';
 import { DexQuote } from '../types';
 import {
   ChainId,
@@ -17,8 +17,8 @@ import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from '../indexer/fetchL1Representat
 
 describe('constructBridgeRequirements', () => {
   const constructDexQuote = (
-    swapTokenInfo: DexTokenInfo,
-    feesTokenInfo: DexTokenInfo,
+    swapTokenInfo: deprecated.Token,
+    feesTokenInfo: deprecated.Token,
     quoteAmount: number,
     slippageQuoteAmount: number,
     feeAmount: number,
@@ -69,7 +69,7 @@ describe('constructBridgeRequirements', () => {
   };
 
   it('should construct the bridge requirements', () => {
-    const swapTokenInfoA: DexTokenInfo = {
+    const swapTokenInfoA: deprecated.Token = {
       chainId: 1,
       address: '0xERC20A',
       decimals: 18,
@@ -77,7 +77,7 @@ describe('constructBridgeRequirements', () => {
       name: 'ERC20',
     };
 
-    const swapTokenInfoB: DexTokenInfo = {
+    const swapTokenInfoB: deprecated.Token = {
       chainId: ChainId.IMTBL_ZKEVM_TESTNET,
       address: '0xERC20B',
       decimals: 18,
@@ -85,7 +85,7 @@ describe('constructBridgeRequirements', () => {
       name: 'ERC20',
     };
 
-    const feesTokenInfo: DexTokenInfo = {
+    const feesTokenInfo: deprecated.Token = {
       chainId: ChainId.IMTBL_ZKEVM_TESTNET,
       address: '0xERC20',
       decimals: 18,
@@ -189,7 +189,7 @@ describe('constructBridgeRequirements', () => {
   });
 
   it('should handle native L1', () => {
-    const swapTokenETH: DexTokenInfo = {
+    const swapTokenETH: deprecated.Token = {
       chainId: ChainId.IMTBL_ZKEVM_TESTNET,
       address: '0xETH',
       decimals: 18,
@@ -197,7 +197,7 @@ describe('constructBridgeRequirements', () => {
       name: 'ETH',
     };
 
-    const feesTokenInfo: DexTokenInfo = {
+    const feesTokenInfo: deprecated.Token = {
       chainId: ChainId.IMTBL_ZKEVM_TESTNET,
       address: '0xIMX',
       decimals: 18,
@@ -272,7 +272,7 @@ describe('constructBridgeRequirements', () => {
   });
 
   it('should not return bridge requirement if not enough balance on l1', () => {
-    const swapTokenInfoA: DexTokenInfo = {
+    const swapTokenInfoA: deprecated.Token = {
       chainId: 1,
       address: '0xERC20A',
       decimals: 18,
@@ -280,7 +280,7 @@ describe('constructBridgeRequirements', () => {
       name: 'ERC20',
     };
 
-    const swapTokenInfoB: DexTokenInfo = {
+    const swapTokenInfoB: deprecated.Token = {
       chainId: ChainId.IMTBL_ZKEVM_TESTNET,
       address: '0xERC20B',
       decimals: 18,
@@ -288,7 +288,7 @@ describe('constructBridgeRequirements', () => {
       name: 'ERC20',
     };
 
-    const feesTokenInfo: DexTokenInfo = {
+    const feesTokenInfo: deprecated.Token = {
       chainId: ChainId.IMTBL_ZKEVM_TESTNET,
       address: '0xERC20',
       decimals: 18,
@@ -388,7 +388,7 @@ describe('constructBridgeRequirements', () => {
   });
 
   it('should add fees and balance requirement if they are same as token address and remove l2 balance', () => {
-    const swapTokenInfo: DexTokenInfo = {
+    const swapTokenInfo: deprecated.Token = {
       chainId: 1,
       address: '0xIMX',
       decimals: 18,
@@ -396,7 +396,7 @@ describe('constructBridgeRequirements', () => {
       name: '0xIMX',
     };
 
-    const feesTokenInfo: DexTokenInfo = {
+    const feesTokenInfo: deprecated.Token = {
       chainId: ChainId.IMTBL_ZKEVM_TESTNET,
       address: '0xIMX',
       decimals: 18,
@@ -481,7 +481,7 @@ describe('constructBridgeRequirements', () => {
   });
 
   it('should not return a requirement if amount to bridge is 0 due to sufficient l2 balance', () => {
-    const swapTokenInfo: DexTokenInfo = {
+    const swapTokenInfo: deprecated.Token = {
       chainId: 1,
       address: '0xL2',
       decimals: 18,
@@ -489,7 +489,7 @@ describe('constructBridgeRequirements', () => {
       name: '0xL2',
     };
 
-    const feesTokenInfo: DexTokenInfo = {
+    const feesTokenInfo: deprecated.Token = {
       chainId: ChainId.IMTBL_ZKEVM_TESTNET,
       address: '0xIMX',
       decimals: 18,

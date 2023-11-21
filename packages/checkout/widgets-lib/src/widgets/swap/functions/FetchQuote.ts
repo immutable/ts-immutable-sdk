@@ -1,5 +1,5 @@
 import {
-  Exchange, TransactionResponse,
+  Exchange, deprecated,
 } from '@imtbl/dex-sdk';
 import { BigNumber, utils } from 'ethers';
 import { Web3Provider } from '@ethersproject/providers';
@@ -11,9 +11,9 @@ const fromAmountIn = async (
   fromToken: TokenInfo,
   fromAmount: string,
   toToken: TokenInfo,
-): Promise<TransactionResponse> => {
+): Promise<deprecated.TransactionResponse> => {
   const address = await provider.getSigner().getAddress();
-  return exchange.getUnsignedSwapTxFromAmountIn(
+  return exchange.getLegacyUnsignedSwapTxFromAmountIn(
     address,
     fromToken.address || '',
     toToken.address || '',
@@ -27,9 +27,9 @@ const fromAmountOut = async (
   toToken: TokenInfo,
   toAmount: string,
   fromToken: TokenInfo,
-): Promise<TransactionResponse> => {
+): Promise<deprecated.TransactionResponse> => {
   const address = await provider.getSigner().getAddress();
-  return exchange.getUnsignedSwapTxFromAmountOut(
+  return exchange.getLegacyUnsignedSwapTxFromAmountOut(
     address,
     fromToken.address || '',
     toToken.address || '',

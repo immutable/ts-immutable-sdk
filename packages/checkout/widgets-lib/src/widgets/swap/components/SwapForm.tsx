@@ -7,7 +7,7 @@ import {
 } from '@biom3/react';
 import { BigNumber, utils } from 'ethers';
 import { TokenInfo } from '@imtbl/checkout-sdk';
-import { TransactionResponse } from '@imtbl/dex-sdk';
+import { deprecated } from '@imtbl/dex-sdk';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { text } from '../../../resources/text/textConfig';
 import { amountInputValidation as textInputValidator } from '../../../lib/validations/amountInputValidations';
@@ -129,7 +129,7 @@ export function SwapForm({ data }: SwapFromProps) {
   const [fromFiatValue, setFromFiatValue] = useState('');
 
   // Quote
-  const [quote, setQuote] = useState<TransactionResponse | null>(null);
+  const [quote, setQuote] = useState<deprecated.TransactionResponse | null>(null);
   const [gasFeeValue, setGasFeeValue] = useState<string>('');
   const [gasFeeToken, setGasFeeToken] = useState< TokenInfo | undefined>(undefined);
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');

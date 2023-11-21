@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers';
-import { TransactionResponse } from '@imtbl/dex-sdk';
+import { deprecated } from '@imtbl/dex-sdk';
 import { CheckoutConfiguration } from '../../../config';
 import * as instance from '../../../instance';
 import { ChainId } from '../../../types';
@@ -22,13 +22,13 @@ export const quoteFetcher = async (
 
   try {
     const exchange = await instance.createExchangeInstance(chainId, config);
-    const dexTransactionResponsePromises: Promise<TransactionResponse>[] = [];
+    const dexTransactionResponsePromises: Promise<deprecated.TransactionResponse>[] = [];
     const fromToken: string[] = [];
 
     // Create a quote for each swappable token
     for (const swappableToken of swappableTokens) {
       if (swappableToken === requiredToken.address) continue;
-      dexTransactionResponsePromises.push(exchange.getUnsignedSwapTxFromAmountOut(
+      dexTransactionResponsePromises.push(exchange.getLegacyUnsignedSwapTxFromAmountOut(
         walletAddress,
         swappableToken,
         requiredToken.address,
@@ -40,7 +40,7 @@ export const quoteFetcher = async (
 
     // Resolve all the quotes and link them back to the swappable token
     // The swappable token array is in the same position in the array as the quote in the promise array
-    const dexTransactionResponse = await measureAsyncExecution<PromiseSettledResult<TransactionResponse>[]>(
+    const dexTransactionResponse = await measureAsyncExecution<PromiseSettledResult<deprecated.TransactionResponse>[]>(
       config,
       'Time to resolve swap quotes from the dex',
       Promise.allSettled(dexTransactionResponsePromises),
