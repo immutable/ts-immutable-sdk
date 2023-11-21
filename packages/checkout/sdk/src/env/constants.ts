@@ -1,4 +1,5 @@
 import { Environment } from '@imtbl/config';
+import { BigNumber } from 'ethers';
 import { ChainId, ChainName } from '../types/chains';
 import { TokenInfo } from '../types/tokenInfo';
 import { NetworkDetails, NetworkMap } from '../types';
@@ -371,3 +372,10 @@ export const ERC721ABI = [
     type: 'function',
   },
 ];
+
+// Gas overrides -- Anti-spam mechanism for when the baseFee drops low
+// https://github.com/immutable/imx-docs/blob/main/docs/main/zkEVM/overview/gas-configuration.md
+export const GAS_OVERRIDES = {
+  maxFeePerGas: BigNumber.from(102e9),
+  maxPriorityFeePerGas: BigNumber.from(101e9),
+};
