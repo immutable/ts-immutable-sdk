@@ -83,6 +83,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
     it('uses the native IMX as the gas token', async () => {
       const tokenIn = { ...USDC_TEST_TOKEN, chainId: IMMUTABLE_TESTNET_CHAIN_ID };
       const tokenOut = { ...WETH_TEST_TOKEN, chainId: IMMUTABLE_TESTNET_CHAIN_ID };
+      const amountIn = addAmount(APPROVED_AMOUNT, newAmountFromString('1', USDC_TEST_TOKEN)); // Will trigger approval
 
       mockRouterImplementation({ pools: [createPool(tokenIn, tokenOut)] });
 
@@ -97,11 +98,13 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         makeAddr('fromAddress'),
         tokenIn.address,
         tokenOut.address,
-        BigNumber.from(1),
+        amountIn.value,
       );
 
       expectToBeDefined(result.swap.gasFeeEstimate);
-      expect(result.swap.gasFeeEstimate.token.address).toEqual('');
+      expectToBeDefined(result.approval?.gasFeeEstimate);
+      expect(result.swap.gasFeeEstimate.token.address).toEqual('native');
+      expect(result.approval.gasFeeEstimate.token.address).toEqual('native');
     });
   });
 
