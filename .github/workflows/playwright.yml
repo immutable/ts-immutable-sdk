@@ -15,16 +15,16 @@ jobs:
     - uses: actions/setup-node@v3
       with:
         node-version: 18
-        
+
     - name: Install root dependencies
       run: yarn install --immutable
 
-    - name: Build SDK
-      run: yarn build
-  
     - name: Install sample apps dependencies
       working-directory: samples/apps/ts-immutable-sample
       run: npm install -g yarn && yarn
+
+    - name: Build SDK
+      run: yarn build
 
     - name: Run Unit tests
       working-directory: samples/apps/ts-immutable-sample
