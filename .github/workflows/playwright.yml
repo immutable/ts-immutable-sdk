@@ -23,7 +23,7 @@ jobs:
       run: yarn build
 
     - name: Install sample apps dependencies
-      run: cd samples/apps/ts-immutable-sample && yarn install
+      run: cd samples/apps/ts-immutable-sample && yarn install --no-immutable
 
     - name: Run Unit tests
       run: cd samples/apps/ts-immutable-sample && yarn test
