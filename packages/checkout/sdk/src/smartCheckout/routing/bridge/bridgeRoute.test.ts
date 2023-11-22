@@ -6,7 +6,6 @@ import {
   bridgeRoute,
   getBridgeGasEstimate,
   hasSufficientL1Eth,
-  isNativeEth,
 } from './bridgeRoute';
 import { CheckoutConfiguration } from '../../../config';
 import {
@@ -117,6 +116,7 @@ describe('bridgeRoute', () => {
                   name: 'Ethereum',
                   symbol: 'ETH',
                   decimals: 18,
+                  address: 'native',
                 },
               },
             ],
@@ -152,7 +152,7 @@ describe('bridgeRoute', () => {
               name: 'Ethereum',
               symbol: 'ETH',
               decimals: 18,
-              address: undefined,
+              address: 'native',
             },
           },
           fees: {
@@ -990,20 +990,6 @@ describe('bridgeRoute', () => {
       expect(bridgeFeeEstimate).toEqual(bridgeRouteFeeEstimate);
       expect(getBridgeFeeEstimate).toHaveBeenCalledTimes(1);
       expect(feeEstimates).toEqual(new Map<FundingStepType, FundingRouteFeeEstimate>(feeEstimates));
-    });
-  });
-
-  describe('isNativeEth', () => {
-    it('should return true if address empty string', () => {
-      expect(isNativeEth('')).toBeTruthy();
-    });
-
-    it('should return true if address undefined', () => {
-      expect(isNativeEth(undefined)).toBeTruthy();
-    });
-
-    it('should return false if address exists', () => {
-      expect(isNativeEth('0xERC20')).toBeFalsy();
     });
   });
 });

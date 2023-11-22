@@ -10,7 +10,7 @@ import {
   TokenInfo,
 } from '../types';
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
-import { getNetworkInfo, isNativeToken } from '../network';
+import { getNetworkInfo } from '../network';
 import { getTokenAllowList } from '../tokens';
 import { CheckoutConfiguration, getL1ChainId } from '../config';
 import {
@@ -216,7 +216,7 @@ export const getBalances = async (
   const allBalancePromises: Promise<GetBalanceResult>[] = [];
   tokens
     .forEach((token: TokenInfo) => {
-      if (isNativeToken(token.address)) {
+      if (!token.address || token.address.toLocaleLowerCase() === NATIVE) {
         allBalancePromises.push(
           getBalance(config, web3Provider, walletAddress),
         );

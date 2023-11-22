@@ -1,22 +1,19 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber, Contract } from 'ethers';
 import {
+  ERC20Item,
   ERC721Balance,
-  ItemBalance,
-  TokenBalance,
   ERC721Item,
+  ItemBalance,
   ItemRequirement,
   ItemType,
-  TokenInfo,
   NativeItem,
-  ERC20Item,
+  TokenBalance,
+  TokenInfo,
 } from '../../types';
 import { getAllBalances } from '../../balances';
-import { CheckoutConfiguration } from '../../config';
-import {
-  BalanceCheckResult,
-  BalanceRequirement,
-} from './types';
+import { CheckoutConfiguration, getL2ChainId } from '../../config';
+import { BalanceCheckResult, BalanceRequirement } from './types';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { balanceAggregator } from '../aggregators/balanceAggregator';
 import {
@@ -43,7 +40,7 @@ const getTokenBalances = async (
         tokenMap.set(item.address.toLocaleLowerCase(), item);
       },
     );
-    const { balances } = await getAllBalances(config, provider, ownerAddress);
+    const { balances } = await getAllBalances(config, provider, ownerAddress, getL2ChainId(config));
     return balances.filter(
       (balance) => tokenMap.get((balance.token.address || NATIVE).toLocaleLowerCase()),
     ) as TokenBalance[];

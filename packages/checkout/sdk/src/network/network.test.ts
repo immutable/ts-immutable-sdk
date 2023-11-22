@@ -6,7 +6,6 @@ import { Environment } from '@imtbl/config';
 import {
   getNetworkAllowList,
   getNetworkInfo,
-  isNativeToken,
   switchWalletNetwork,
 } from './network';
 import {
@@ -23,7 +22,7 @@ import { CheckoutConfiguration } from '../config';
 import { RemoteConfigFetcher } from '../config/remoteConfigFetcher';
 import { getUnderlyingChainId } from '../provider/getUnderlyingProvider';
 import {
-  NATIVE, PRODUCTION_CHAIN_ID_NETWORK_MAP, SANDBOX_CHAIN_ID_NETWORK_MAP,
+  PRODUCTION_CHAIN_ID_NETWORK_MAP, SANDBOX_CHAIN_ID_NETWORK_MAP,
 } from '../env';
 
 let windowSpy: any;
@@ -499,28 +498,6 @@ describe('network functions', () => {
           },
         ],
       });
-    });
-  });
-
-  describe('isNativeToken', () => {
-    it('should return true if address is undefined', () => {
-      expect(isNativeToken(undefined)).toBeTruthy();
-    });
-
-    it('should return true if address is empty', () => {
-      expect(isNativeToken('')).toBeTruthy();
-    });
-
-    it('should return true if address is `native`', () => {
-      expect(isNativeToken(NATIVE)).toBeTruthy();
-    });
-
-    it('should return true if address is `NATIVE`', () => {
-      expect(isNativeToken('NATIVE')).toBeTruthy();
-    });
-
-    it('should return false if address is not NATIVE', () => {
-      expect(isNativeToken('0x123')).toBeFalsy();
     });
   });
 });

@@ -8,6 +8,7 @@ import {
   TokenInfo,
 } from '../types';
 import { CheckoutConfiguration, getL1ChainId } from '../config';
+import { NATIVE } from '../env';
 
 type TokenAllowListParams = {
   type: TokenFilterTypes;
@@ -52,3 +53,7 @@ export const getTokenAllowList = async (
     tokens: tokens.filter((token) => !exclude.map((e) => e.address).includes(token.address || '')) as TokenInfo[],
   };
 };
+
+export const isNativeToken = (
+  address: string | undefined,
+): boolean => !address || address.toLocaleLowerCase() === NATIVE;

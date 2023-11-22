@@ -2,7 +2,7 @@ import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../../conf
 import { createBlockchainDataInstance } from '../../../instance';
 import { NATIVE } from '../../../env';
 import { ChainId, ImxAddressConfig } from '../../../types';
-import { isNativeToken } from '../../../network';
+import { isNativeToken } from '../../../tokens';
 
 // If the root address evaluates to this then its ETH
 export const INDEXER_ETH_ROOT_CONTRACT_ADDRESS = '0x0000000000000000000000000000000000000001';
@@ -46,10 +46,16 @@ export const fetchL1Representation = async (
     contractAddress: l2address,
   });
 
+  // TODO: When bridge is ready we need to understand how L2 ETH will be mapped back to L1 ETH
   const l1address = tokenData.result.root_contract_address;
-  // TODO: Validate the L1 address for ETH
-  if (l1address === null) return undefined; // No L1 representation of this token
+  if (l1address === INDEXER_ETH_ROOT_CONTRACT_ADDRESS) {
+    return {
+      l1address: 'native',
+      l2address,
+    };
+  }
 
+  if (l1address === null) return undefined; // No L1 representation of this token
   return {
     l1address,
     l2address,
