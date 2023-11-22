@@ -21,9 +21,6 @@ import {passport} from './passport';
 // Create one instance of Checkout and inject Passport
 const checkout = new Checkout({
   baseConfig: {environment: Environment.SANDBOX},
-  isBridgeEnabled: true,
-  isSwapEnabled: true,
-  isOnRampEnabled: true,
   passport,
 })
 

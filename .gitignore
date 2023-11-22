@@ -1,6 +1,7 @@
 node_modules/
 dist/
 coverage/
+cache/
 .idea/
 .DS_Store
 .vscode
