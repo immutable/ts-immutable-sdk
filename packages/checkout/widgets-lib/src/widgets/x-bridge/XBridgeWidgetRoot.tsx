@@ -61,7 +61,11 @@ export class XBridge extends Base<WidgetType.BRIDGE> {
         <CustomAnalyticsProvider
           widgetConfig={this.strongConfig()}
         >
-          <XBridgeWidget checkout={this.checkout} config={this.strongConfig()} web3Provider={this.web3Provider} />
+          <XBridgeWidget
+            checkout={this.checkout}
+            config={this.strongConfig()}
+            web3Provider={this.web3Provider}
+          />
         </CustomAnalyticsProvider>
       </React.StrictMode>,
     );
