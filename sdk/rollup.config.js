@@ -119,6 +119,7 @@ export default [
         jsnext: true,
         main: true,
         browser: true,
+        preferBuiltins: false,
       }),
       nodePolyfills(),
       commonJs(),

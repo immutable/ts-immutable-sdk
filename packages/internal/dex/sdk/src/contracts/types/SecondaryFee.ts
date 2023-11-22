@@ -156,6 +156,7 @@ export interface SecondaryFeeInterface extends utils.Interface {
     "unpause()": FunctionFragment;
     "unwrapNativeToken(uint256)": FunctionFragment;
     "withdrawFunds(address,address)": FunctionFragment;
+    "withdrawFunds(address)": FunctionFragment;
   };
 
   getFunction(
@@ -177,7 +178,8 @@ export interface SecondaryFeeInterface extends utils.Interface {
       | "supportsInterface"
       | "unpause"
       | "unwrapNativeToken"
-      | "withdrawFunds"
+      | "withdrawFunds(address,address)"
+      | "withdrawFunds(address)"
   ): FunctionFragment;
 
   encodeFunctionData(
@@ -252,8 +254,12 @@ export interface SecondaryFeeInterface extends utils.Interface {
     values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
-    functionFragment: "withdrawFunds",
+    functionFragment: "withdrawFunds(address,address)",
     values: [PromiseOrValue<string>, PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "withdrawFunds(address)",
+    values: [PromiseOrValue<string>]
   ): string;
 
   decodeFunctionResult(
@@ -307,7 +313,11 @@ export interface SecondaryFeeInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "withdrawFunds",
+    functionFragment: "withdrawFunds(address,address)",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "withdrawFunds(address)",
     data: BytesLike
   ): Result;
 
@@ -525,9 +535,14 @@ export interface SecondaryFee extends BaseContract {
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
-    withdrawFunds(
+    "withdrawFunds(address,address)"(
       to: PromiseOrValue<string>,
       erc20: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    "withdrawFunds(address)"(
+      to: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
   };
@@ -618,9 +633,14 @@ export interface SecondaryFee extends BaseContract {
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  withdrawFunds(
+  "withdrawFunds(address,address)"(
     to: PromiseOrValue<string>,
     erc20: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  "withdrawFunds(address)"(
+    to: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -707,9 +727,14 @@ export interface SecondaryFee extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    withdrawFunds(
+    "withdrawFunds(address,address)"(
       to: PromiseOrValue<string>,
       erc20: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "withdrawFunds(address)"(
+      to: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
   };
@@ -854,9 +879,14 @@ export interface SecondaryFee extends BaseContract {
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
-    withdrawFunds(
+    "withdrawFunds(address,address)"(
       to: PromiseOrValue<string>,
       erc20: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    "withdrawFunds(address)"(
+      to: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
   };
@@ -950,9 +980,14 @@ export interface SecondaryFee extends BaseContract {
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
-    withdrawFunds(
+    "withdrawFunds(address,address)"(
       to: PromiseOrValue<string>,
       erc20: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "withdrawFunds(address)"(
+      to: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
   };
