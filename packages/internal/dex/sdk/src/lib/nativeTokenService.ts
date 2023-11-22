@@ -4,12 +4,9 @@ import { newAmount } from './utils';
 export const canUnwrapToken = (token: Coin): token is Native => token.type === 'native';
 
 export class NativeTokenService {
-  constructor(readonly nativeToken: Coin, readonly wrappedToken: ERC20) {}
+  constructor(readonly nativeToken: Native, readonly wrappedToken: ERC20) {}
 
-  wrapAmount(amount: CoinAmount<Coin>): CoinAmount<ERC20> {
-    if (!canUnwrapToken(amount.token)) {
-      throw new Error(`cannot wrap non-native token: ${amount.token.address}`);
-    }
+  wrapAmount(amount: CoinAmount<Native>): CoinAmount<ERC20> {
     return newAmount(amount.value, this.wrappedToken);
   }
 
