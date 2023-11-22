@@ -1,13 +1,17 @@
+import { Web3Provider } from '@ethersproject/providers';
 import { TokenBridge } from '@imtbl/bridge-sdk';
 import {
   WalletProviderName,
   GetBalanceResult,
   NetworkInfo,
   TokenInfo,
+  Checkout,
 } from '@imtbl/checkout-sdk';
 import { createContext } from 'react';
 
 export interface BridgeState {
+  checkout: Checkout;
+  web3Provider: Web3Provider | null;
   walletProviderName: WalletProviderName | null;
   tokenBridge: TokenBridge | null;
   network: NetworkInfo | null;
@@ -16,7 +20,8 @@ export interface BridgeState {
   allowedTokens: TokenInfo[];
 }
 
-export const initialBridgeState: BridgeState = {
+export const initialBridgeState: Omit<BridgeState, 'checkout'> = {
+  web3Provider: null,
   walletProviderName: null,
   tokenBridge: null,
   network: null,
@@ -83,7 +88,7 @@ export interface SetAllowedTokensPayload {
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const BridgeContext = createContext<BridgeContextState>({
-  bridgeState: initialBridgeState,
+  bridgeState: initialBridgeState as BridgeState,
   bridgeDispatch: () => {},
 });
 
