@@ -18,10 +18,12 @@ const packageJsonPath = path.join(__dirname, '..', 'package.json');
 const packageJsonData = fs.readFileSync(packageJsonPath, 'utf8');
 const packageJson = JSON.parse(packageJsonData);
 
+const files = ['dist', './index.d.ts', './index.js', './index.d.cts', './index.cjs'];
+
 const exports = {
   './package.json': './package.json',
   '.': {
-    imports: {
+    import: {
       types: './index.d.ts',
       default: './index.js',
     },
@@ -51,10 +53,13 @@ for (const moduleName in moduleData.modules) {
       types: typesPath,
       import: modulePath,
     };
+
+    files.push(modulePath, typesPath);
   }
 }
 
 packageJson.exports = exports;
+packageJson.files = files;
 
 // Write the updated package.json file
 fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));

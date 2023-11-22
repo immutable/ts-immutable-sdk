@@ -75,7 +75,7 @@
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "imports": {
+      "import": {
         "types": "./index.d.ts",
         "default": "./index.js"
       },
@@ -114,8 +114,25 @@
     }
   },
   "files": [
-    "./",
-    "dist"
+    "dist",
+    "./index.d.ts",
+    "./index.js",
+    "./index.d.cts",
+    "./index.cjs",
+    "./config.js",
+    "./config.d.ts",
+    "./blockchain_data.js",
+    "./blockchain_data.d.ts",
+    "./immutablex_client.js",
+    "./immutablex_client.d.ts",
+    "./passport.js",
+    "./passport.d.ts",
+    "./orderbook.js",
+    "./orderbook.d.ts",
+    "./provider.js",
+    "./provider.d.ts",
+    "./checkout_sdk.js",
+    "./checkout_sdk.d.ts"
   ],
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
   "license": "Apache-2.0",
