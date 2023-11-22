@@ -7,17 +7,17 @@ import { FormControlWrapper } from 'components/FormComponents/FormControlWrapper
 import { useContext, useState } from 'react';
 import { WalletItem } from 'widgets/connect/components/WalletItem';
 import { WalletProviderName, CheckoutErrorType } from '@imtbl/checkout-sdk';
-import { crossWalletWrapperStyles } from './CrossWalletFormStyles';
+import { brigdeWalletWrapperStyles } from './BridgeWalletFormStyles';
 import { XBridgeContext } from '../context/XBridgeContext';
 
-interface CrossWalletFormProps {
+interface BridgeWalletFormProps {
   testId: string;
 }
-export function CrossWalletForm({
+export function BridgeWalletForm({
   testId,
-}: CrossWalletFormProps) {
+}: BridgeWalletFormProps) {
   const { bridgeState: { checkout } } = useContext(XBridgeContext);
-  const { heading, from } = text.views[XBridgeWidgetViews.CROSS_WALLET_SELECTION];
+  const { heading, from } = text.views[XBridgeWidgetViews.BRIDGE_WALLET_SELECTION];
 
   const [fromWalletDrawerOpen, setFromWalletDrawerOpen] = useState(false);
 
@@ -63,7 +63,7 @@ export function CrossWalletForm({
   }
 
   return (
-    <Box sx={crossWalletWrapperStyles}>
+    <Box sx={brigdeWalletWrapperStyles}>
       <Heading
         testId={`${testId}-heading`}
         size="small"

@@ -435,7 +435,7 @@ export const text = {
       text: 'Order completed',
       actionText: 'Continue',
     },
-    [XBridgeWidgetViews.CROSS_WALLET_SELECTION]: {
+    [XBridgeWidgetViews.BRIDGE_WALLET_SELECTION]: {
       heading: 'Where would you like to move funds between?',
       from: {
         heading: 'From',

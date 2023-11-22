@@ -4,9 +4,9 @@ import { FooterLogo } from 'components/Footer/FooterLogo';
 import { useContext } from 'react';
 import { EventTargetContext } from 'context/event-target-context/EventTargetContext';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
-import { CrossWalletForm } from '../components/CrossWalletForm';
+import { BridgeWalletForm } from '../components/BridgeWalletForm';
 
-export function CrossWalletSelection() {
+export function BridgeWalletSelection() {
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
   return (
     <SimpleLayout
@@ -19,7 +19,7 @@ export function CrossWalletSelection() {
       )}
       footer={<FooterLogo />}
     >
-      <CrossWalletForm testId="cross-wallet-form" />
+      <BridgeWalletForm testId="cross-wallet-form" />
     </SimpleLayout>
   );
 }
