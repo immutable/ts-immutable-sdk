@@ -7,7 +7,7 @@ import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { BridgeForm } from '../components/BridgeForm';
 import { text } from '../../../resources/text/textConfig';
 import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
-import { BridgeActions, BridgeContext } from '../context/BridgeContext';
+import { BridgeActions, XBridgeContext } from '../context/XBridgeContext';
 import { useInterval } from '../../../lib/hooks/useInterval';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
@@ -22,7 +22,7 @@ export interface BridgeProps {
 
 export function Bridge({ amount, fromContractAddress }: BridgeProps) {
   const { header } = text.views[BridgeWidgetViews.BRIDGE];
-  const { bridgeDispatch } = useContext(BridgeContext);
+  const { bridgeDispatch } = useContext(XBridgeContext);
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);

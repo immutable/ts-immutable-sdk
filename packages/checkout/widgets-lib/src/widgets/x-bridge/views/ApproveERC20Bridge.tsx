@@ -17,7 +17,7 @@ import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { ImmutablePlanetHero } from '../../../components/Hero/ImmutablePlanetHero';
 import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { LoadingView } from '../../../views/loading/LoadingView';
-import { BridgeContext } from '../context/BridgeContext';
+import { XBridgeContext } from '../context/XBridgeContext';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import { WalletApproveHero } from '../../../components/Hero/WalletApproveHero';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
@@ -26,7 +26,7 @@ export interface ApproveERC20BridgeProps {
   data: ApproveERC20BridgeData;
 }
 export function ApproveERC20BridgeOnboarding({ data }: ApproveERC20BridgeProps) {
-  const { bridgeState: { allowedTokens } } = useContext(BridgeContext);
+  const { bridgeState: { allowedTokens } } = useContext(XBridgeContext);
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
   const { viewDispatch } = useContext(ViewContext);

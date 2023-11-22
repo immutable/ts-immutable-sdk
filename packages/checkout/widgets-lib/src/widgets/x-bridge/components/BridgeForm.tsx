@@ -10,7 +10,7 @@ import {
 import { ApproveDepositBridgeResponse, BridgeDepositResponse } from '@imtbl/bridge-sdk';
 import { BigNumber, utils } from 'ethers';
 import { amountInputValidation } from '../../../lib/validations/amountInputValidations';
-import { BridgeContext } from '../context/BridgeContext';
+import { XBridgeContext } from '../context/XBridgeContext';
 import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
 import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
@@ -48,7 +48,7 @@ export function BridgeForm(props: BridgeFormProps) {
       tokenBalances,
       allowedTokens,
     },
-  } = useContext(BridgeContext);
+  } = useContext(XBridgeContext);
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
 

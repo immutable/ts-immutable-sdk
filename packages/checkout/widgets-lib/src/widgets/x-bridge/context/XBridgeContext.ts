@@ -9,7 +9,7 @@ import {
 } from '@imtbl/checkout-sdk';
 import { createContext } from 'react';
 
-export interface BridgeState {
+export interface XBridgeState {
   checkout: Checkout;
   web3Provider: Web3Provider | null;
   walletProviderName: WalletProviderName | null;
@@ -20,7 +20,7 @@ export interface BridgeState {
   allowedTokens: TokenInfo[];
 }
 
-export const initialBridgeState: Omit<BridgeState, 'checkout'> = {
+export const initialXBridgeState: Omit<XBridgeState, 'checkout'> = {
   web3Provider: null,
   walletProviderName: null,
   tokenBridge: null,
@@ -30,8 +30,8 @@ export const initialBridgeState: Omit<BridgeState, 'checkout'> = {
   allowedTokens: [],
 };
 
-export interface BridgeContextState {
-  bridgeState: BridgeState;
+export interface XBridgeContextState {
+  bridgeState: XBridgeState;
   bridgeDispatch: React.Dispatch<BridgeAction>;
 }
 
@@ -87,17 +87,17 @@ export interface SetAllowedTokensPayload {
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export const BridgeContext = createContext<BridgeContextState>({
-  bridgeState: initialBridgeState as BridgeState,
+export const XBridgeContext = createContext<XBridgeContextState>({
+  bridgeState: { ...initialXBridgeState, checkout: {} as Checkout },
   bridgeDispatch: () => {},
 });
 
-BridgeContext.displayName = 'BridgeContext'; // help with debugging Context in browser
+XBridgeContext.displayName = 'XBridgeContext'; // help with debugging Context in browser
 
 export type Reducer<S, A> = (prevState: S, action: A) => S;
 
-export const bridgeReducer: Reducer<BridgeState, BridgeAction> = (
-  state: BridgeState,
+export const xBridgeReducer: Reducer<XBridgeState, BridgeAction> = (
+  state: XBridgeState,
   action: BridgeAction,
 ) => {
   switch (action.payload.type) {
