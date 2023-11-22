@@ -269,10 +269,12 @@ export class TokenBridge {
    *     console.error('Error:', error.message);
    *   });
    */
-  public async getUnsignedDepositTx(
+  public async getUnsignedBridgeTx(
     req: BridgeDepositRequest,
   ): Promise<BridgeDepositResponse> {
     this.validateChainConfiguration();
+
+    // @TODO check source & destination to determin which contract and methods to use
 
     await this.validateDepositArgs(
       req.depositorAddress,

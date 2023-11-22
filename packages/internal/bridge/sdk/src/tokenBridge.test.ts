@@ -276,7 +276,7 @@ describe('Token Bridge', () => {
         sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
         destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
       };
-      const response: BridgeDepositResponse = await tokenBridge.getUnsignedDepositTx(request);
+      const response: BridgeDepositResponse = await tokenBridge.getUnsignedBridgeTx(request);
 
       expect(response.unsignedTx.to).toBe(
         bridgeConfig.bridgeContracts.rootERC20BridgeFlowRate,
@@ -299,7 +299,7 @@ describe('Token Bridge', () => {
         destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
       };
 
-      const response: BridgeDepositResponse = await tokenBridge.getUnsignedDepositTx(request);
+      const response: BridgeDepositResponse = await tokenBridge.getUnsignedBridgeTx(request);
       expect(response.unsignedTx.to).toBe(bridgeConfig.bridgeContracts.rootERC20BridgeFlowRate);
       expect(response.unsignedTx.value).toBe(depositAmount);
       expect(response.unsignedTx.data).not.toBeNull();
@@ -318,7 +318,7 @@ describe('Token Bridge', () => {
         sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
         destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
       };
-      const response: BridgeDepositResponse = await tokenBridge.getUnsignedDepositTx(request);
+      const response: BridgeDepositResponse = await tokenBridge.getUnsignedBridgeTx(request);
       expect(response.unsignedTx.to).toBe(
         bridgeConfig.bridgeContracts.rootERC20BridgeFlowRate,
       );
@@ -341,7 +341,7 @@ describe('Token Bridge', () => {
       };
 
       await expect(async () => {
-        await tokenBridge.getUnsignedDepositTx(request);
+        await tokenBridge.getUnsignedBridgeTx(request);
       }).rejects.toThrow(
         new BridgeError(
           'address zzzz3095171469a0db24D9Fb9C789D62dF22BBAfa816 is not a valid address',
@@ -364,7 +364,7 @@ describe('Token Bridge', () => {
       };
 
       await expect(async () => {
-        await tokenBridge.getUnsignedDepositTx(request);
+        await tokenBridge.getUnsignedBridgeTx(request);
       }).rejects.toThrow(
         new BridgeError(
           'address zzzz3095171469a0db24D9Fb9C789D62dF22BBAfa816 is not a valid address',
@@ -387,7 +387,7 @@ describe('Token Bridge', () => {
       };
 
       await expect(async () => {
-        await tokenBridge.getUnsignedDepositTx(request);
+        await tokenBridge.getUnsignedBridgeTx(request);
       }).rejects.toThrow(
         new BridgeError(
           'token address zzzzf14582947E292a2eCd20C430B46f2d27CFE213c is not a valid address',
@@ -411,7 +411,7 @@ describe('Token Bridge', () => {
       };
 
       await expect(async () => {
-        await tokenBridge.getUnsignedDepositTx(request);
+        await tokenBridge.getUnsignedBridgeTx(request);
       }).rejects.toThrow(
         new BridgeError(
           'deposit amount 0 is invalid',
@@ -435,7 +435,7 @@ describe('Token Bridge', () => {
       };
 
       await expect(async () => {
-        await tokenBridge.getUnsignedDepositTx(request);
+        await tokenBridge.getUnsignedBridgeTx(request);
       }).rejects.toThrow(
         new BridgeError(
           'deposit amount 0 is invalid',
@@ -458,7 +458,7 @@ describe('Token Bridge', () => {
       };
 
       await expect(async () => {
-        await tokenBridge.getUnsignedDepositTx(request);
+        await tokenBridge.getUnsignedBridgeTx(request);
       }).rejects.toThrow(
         new BridgeError(
           'deposit amount -1000000000000000000 is invalid',
@@ -481,7 +481,7 @@ describe('Token Bridge', () => {
       };
 
       await expect(async () => {
-        await tokenBridge.getUnsignedDepositTx(request);
+        await tokenBridge.getUnsignedBridgeTx(request);
       }).rejects.toThrow(
         new BridgeError(
           'deposit amount -1000000000000000000 is invalid',
