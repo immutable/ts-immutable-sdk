@@ -17,12 +17,9 @@ import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyt
 import { BiomeCombinedProviders } from '@biom3/react';
 import { widgetTheme } from 'lib/theme';
 import { isValidWalletProvider, isValidAmount, isValidAddress } from 'lib/validations/widgetValidators';
-import { XBridgeWidget } from 'widgets/x-bridge/XBridgeWidget';
 import { BridgeComingSoon } from './views/BridgeComingSoon';
 import { sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
 import { BridgeWidget } from './BridgeWidget';
-
-const useCrossWalletBridgeComponent = process.env.CHECKOUT_X_WALLET_BRIDGE === 'true';
 
 export class Bridge extends Base<WidgetType.BRIDGE> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT;
@@ -87,12 +84,12 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
         <CustomAnalyticsProvider
           widgetConfig={this.strongConfig()}
         >
-          {!useCrossWalletBridgeComponent && showBridgeComingSoonScreen && (
+          {showBridgeComingSoonScreen && (
             <BiomeCombinedProviders theme={{ base: theme }}>
               <BridgeComingSoon onCloseEvent={() => sendBridgeWidgetCloseEvent(window)} />
             </BiomeCombinedProviders>
           )}
-          {!useCrossWalletBridgeComponent && !showBridgeComingSoonScreen && (
+          {!showBridgeComingSoonScreen && (
             <ConnectLoader
               params={connectLoaderParams}
               closeEvent={() => sendBridgeWidgetCloseEvent(window)}
@@ -106,7 +103,6 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
             </ConnectLoader>
           )}
 
-          {useCrossWalletBridgeComponent && <XBridgeWidget config={this.strongConfig()} />}
         </CustomAnalyticsProvider>
       </React.StrictMode>,
     );
