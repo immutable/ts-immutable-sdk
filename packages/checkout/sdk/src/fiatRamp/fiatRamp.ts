@@ -1,8 +1,9 @@
 import { ExchangeType } from '../types/fiatRamp';
 import {
-  OnRampConfig, OnRampProvider, OnRampProviderFees, TRANSAK_API_BASE_URL,
+  OnRampConfig, OnRampProvider, OnRampProviderFees,
 } from '../types';
 import { CheckoutConfiguration } from '../config';
+import { TRANSAK_API_BASE_URL } from '../env';
 
 export interface FiatRampWidgetParams {
   exchangeType: ExchangeType;

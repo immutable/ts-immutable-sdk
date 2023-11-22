@@ -7,6 +7,7 @@ import { CheckoutError, CheckoutErrorType } from '../../errors';
 import {
   SignTransactionResult, SignTransactionStatusType, SignedMessage, UnsignedMessage,
 } from './types';
+import { sendTransaction } from '../../transaction';
 
 export const signApprovalTransactions = async (
   provider: Web3Provider,
@@ -16,9 +17,9 @@ export const signApprovalTransactions = async (
 
   try {
     const response = await Promise.all(
-      approvalTransactions.map((transaction) => provider.getSigner().sendTransaction(transaction)),
+      approvalTransactions.map((transaction) => sendTransaction(provider, transaction)),
     );
-    receipts = await Promise.all(response.map((transaction) => transaction.wait()));
+    receipts = await Promise.all(response.map((transaction) => transaction.transactionResponse.wait()));
   } catch (err: any) {
     throw new CheckoutError(
       'An error occurred while executing the approval transaction',
@@ -52,9 +53,9 @@ export const signFulfillmentTransactions = async (
 
   try {
     const response = await Promise.all(fulfillmentTransactions.map(
-      (transaction) => provider.getSigner().sendTransaction(transaction),
+      (transaction) => sendTransaction(provider, transaction),
     ));
-    receipts = await Promise.all(response.map((transaction) => transaction.wait()));
+    receipts = await Promise.all(response.map((transaction) => transaction.transactionResponse.wait()));
   } catch (err: any) {
     throw new CheckoutError(
       'An error occurred while executing the fulfillment transaction',

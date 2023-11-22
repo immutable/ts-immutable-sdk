@@ -84,10 +84,9 @@ export function BridgeForm(props: BridgeFormProps) {
   // user rejects transaction
   const [showTxnRejectedState, setShowTxnRejectedState] = useState(false);
 
-  const formatTokenOptionsId = useCallback((symbol: string, address?: string) => {
-    if (!address) return symbol.toLowerCase();
-    return `${symbol.toLowerCase()}-${address.toLowerCase()}`;
-  }, []);
+  const formatTokenOptionsId = useCallback((symbol: string, address?: string) => (isNativeToken(address)
+    ? `${symbol.toLowerCase()}-${NATIVE}`
+    : `${symbol.toLowerCase()}-${address!.toLowerCase()}`), []);
 
   useEffect(() => {
     if (tokenBalances.length === 0) return;
@@ -119,7 +118,7 @@ export function BridgeForm(props: BridgeFormProps) {
       if (defaultFromContractAddress) {
         setToken(
           tokenBalances.find(
-            (b) => (isNativeToken(b.token.address) && defaultFromContractAddress?.toLocaleUpperCase() === NATIVE)
+            (b) => (isNativeToken(b.token.address) && defaultFromContractAddress?.toLowerCase() === NATIVE)
             || (b.token.address?.toLowerCase() === defaultFromContractAddress?.toLowerCase()),
           ),
         );
@@ -160,14 +159,14 @@ export function BridgeForm(props: BridgeFormProps) {
 
     const approveRes: ApproveDepositBridgeResponse = await tokenBridge.getUnsignedApproveDepositBridgeTx({
       depositorAddress,
-      token: isNativeToken(token.token.address) ? NATIVE : token.token.address,
+      token: isNativeToken(token.token.address) ? NATIVE.toUpperCase() : token.token.address,
       depositAmount,
     });
 
     const bridgeTxn: BridgeDepositResponse = await tokenBridge.getUnsignedDepositTx({
       depositorAddress,
       recipientAddress: depositorAddress,
-      token: isNativeToken(token.token.address) ? NATIVE : token.token.address,
+      token: isNativeToken(token.token.address) ? NATIVE.toUpperCase() : token.token.address,
       depositAmount,
     });
 
@@ -352,7 +351,7 @@ export function BridgeForm(props: BridgeFormProps) {
                 approveTransaction: approvalTransaction,
                 transaction: unsignedBridgeTransaction,
                 bridgeFormInfo: {
-                  fromContractAddress: token.token?.address ?? '',
+                  fromContractAddress: isNativeToken(token?.token.address) ? NATIVE : token?.token.address ?? '',
                   fromAmount: amount,
                 },
               },
@@ -380,7 +379,7 @@ export function BridgeForm(props: BridgeFormProps) {
               token: token?.token!,
               transactionResponse,
               bridgeForm: {
-                fromContractAddress: token?.token.address ?? '',
+                fromContractAddress: isNativeToken(token?.token.address) ? NATIVE : token?.token.address ?? '',
                 fromAmount: amount,
               },
             },
@@ -405,7 +404,7 @@ export function BridgeForm(props: BridgeFormProps) {
               type: BridgeWidgetViews.FAIL,
               reason: 'Transaction failed',
               data: {
-                fromContractAddress: token?.token.address ?? '',
+                fromContractAddress: isNativeToken(token?.token.address) ? NATIVE : token?.token.address ?? '',
                 fromAmount: amount,
               },
             },

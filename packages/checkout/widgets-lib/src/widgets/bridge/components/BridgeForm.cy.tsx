@@ -334,7 +334,7 @@ describe('Bridge Form', () => {
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet('bridge-token-coin-selector__option-eth').click();
+      cySmartGet('bridge-token-coin-selector__option-eth-native').click();
       cySmartGet('bridge-amount-text__input').type('0.1');
       cySmartGet('bridge-amount-text__input').blur();
 
@@ -346,14 +346,14 @@ describe('Bridge Form', () => {
       cySmartGet('@getUnsignedApproveDepositBridgeTxStub').should('have.been.calledOnce')
         .should('have.been.calledWith', {
           depositorAddress: '0x123',
-          token: NATIVE,
+          token: NATIVE.toUpperCase(),
           depositAmount: utils.parseUnits('0.1', 18),
         });
 
       cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce').should('have.been.calledWith', {
         depositorAddress: '0x123',
         recipientAddress: '0x123',
-        token: NATIVE,
+        token: NATIVE.toUpperCase(),
         depositAmount: utils.parseUnits('0.1', 18),
       });
     });
