@@ -216,7 +216,7 @@ export const getBalances = async (
   const allBalancePromises: Promise<GetBalanceResult>[] = [];
   tokens
     .forEach((token: TokenInfo) => {
-      if (!token.address || token.address === NATIVE) {
+      if (!token.address || token.address.toLocaleLowerCase() === NATIVE) {
         allBalancePromises.push(
           getBalance(config, web3Provider, walletAddress),
         );
