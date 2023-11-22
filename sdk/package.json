@@ -75,37 +75,42 @@
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "imports": {
+        "types": "./index.d.ts",
+        "default": "./index.js"
+      },
+      "require": {
+        "types": "./index.d.cts",
+        "default": "./index.cjs"
+      }
     },
     "./config": {
-      "types": "./dist/config.d.ts",
-      "import": "./dist/config.js"
+      "types": "./config.d.ts",
+      "import": "./config.js"
     },
     "./blockchain_data": {
-      "types": "./dist/blockchain_data.d.ts",
-      "import": "./dist/blockchain_data.js"
+      "types": "./blockchain_data.d.ts",
+      "import": "./blockchain_data.js"
     },
     "./immutablex_client": {
-      "types": "./dist/immutablex_client.d.ts",
-      "import": "./dist/immutablex_client.js"
+      "types": "./immutablex_client.d.ts",
+      "import": "./immutablex_client.js"
     },
     "./passport": {
-      "types": "./dist/passport.d.ts",
-      "import": "./dist/passport.js"
+      "types": "./passport.d.ts",
+      "import": "./passport.js"
     },
     "./orderbook": {
-      "types": "./dist/orderbook.d.ts",
-      "import": "./dist/orderbook.js"
+      "types": "./orderbook.d.ts",
+      "import": "./orderbook.js"
     },
     "./provider": {
-      "types": "./dist/provider.d.ts",
-      "import": "./dist/provider.js"
+      "types": "./provider.d.ts",
+      "import": "./provider.js"
     },
     "./checkout_sdk": {
-      "types": "./dist/checkout_sdk.d.ts",
-      "import": "./dist/checkout_sdk.js"
+      "types": "./checkout_sdk.d.ts",
+      "import": "./checkout_sdk.js"
     }
   },
   "files": [

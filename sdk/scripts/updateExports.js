@@ -1,3 +1,4 @@
+/* eslint-disable */
 import fs from 'fs';
 import path from 'path';
 
@@ -20,9 +21,14 @@ const packageJson = JSON.parse(packageJsonData);
 const exports = {
   './package.json': './package.json',
   '.': {
-    types: './dist/index.d.ts',
-    import: './dist/index.js',
-    require: './dist/index.cjs',
+    imports: {
+      types: './index.d.ts',
+      default: './index.js',
+    },
+    require: {
+      types: './index.d.cts',
+      default: './index.cjs',
+    }
   },
 };
 
@@ -38,8 +44,8 @@ for (const moduleName in moduleData.modules) {
     (releaseType !== 'alpha' && moduleReleaseType === 'prod')
   ) {
     const moduleExport = `./${moduleName}`;
-    const modulePath = `./dist/${moduleName}.js`;
-    const typesPath = `./dist/${moduleName}.d.ts`;
+    const modulePath = `./${moduleName}.js`;
+    const typesPath = `./${moduleName}.d.ts`;
 
     exports[moduleExport] = {
       types: typesPath,
