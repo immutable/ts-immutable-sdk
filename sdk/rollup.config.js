@@ -98,10 +98,7 @@ export default [
       }),
       json(),
       commonJs(),
-      typescript({
-        declaration: true,
-        declarationDir: './dist/types/cjs',
-      }),
+      typescript(),
       replace({
         exclude: 'node_modules/**',
         preventAssignment: true,
@@ -110,17 +107,6 @@ export default [
       terser(),
     ],
   },
-  {
-    input: `./dist/types/cjs/index.d.ts`,
-    output: {
-      file: `./index.d.cts`
-    },
-    plugins: [
-      dts({
-        respectExternal: true,
-      }),
-    ],
-  },  
   // Browser Bundle
   {
     input: 'src/index.ts',

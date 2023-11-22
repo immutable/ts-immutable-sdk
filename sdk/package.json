@@ -75,14 +75,9 @@
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "import": {
-        "types": "./index.d.ts",
-        "default": "./index.js"
-      },
-      "require": {
-        "types": "./index.d.cts",
-        "default": "./index.cjs"
-      }
+      "types": "./index.d.ts",
+      "import": "./index.js",
+      "require": "./index.cjs"
     },
     "./config": {
       "types": "./config.d.ts",
@@ -115,29 +110,13 @@
   },
   "files": [
     "dist",
-    "./index.d.ts",
-    "./index.js",
-    "./index.d.cts",
-    "./index.cjs",
-    "./config.js",
-    "./config.d.ts",
-    "./blockchain_data.js",
-    "./blockchain_data.d.ts",
-    "./immutablex_client.js",
-    "./immutablex_client.d.ts",
-    "./passport.js",
-    "./passport.d.ts",
-    "./orderbook.js",
-    "./orderbook.d.ts",
-    "./provider.js",
-    "./provider.d.ts",
-    "./checkout_sdk.js",
-    "./checkout_sdk.d.ts"
+    "*.js",
+    "*.d.ts"
   ],
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
   "license": "Apache-2.0",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
+  "main": "./index.cjs",
+  "module": "./index.js",
   "peerDependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
@@ -156,5 +135,5 @@
     "updateExports": "node scripts/updateExports.js"
   },
   "type": "module",
-  "types": "./dist/index.d.ts"
+  "types": "./index.d.ts"
 }
