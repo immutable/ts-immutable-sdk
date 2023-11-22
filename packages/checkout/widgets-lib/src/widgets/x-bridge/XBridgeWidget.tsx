@@ -3,6 +3,7 @@ import {
 } from '@biom3/react';
 import {
   BridgeWidgetParams,
+  Checkout,
   NetworkFilterTypes, TokenFilterTypes,
 } from '@imtbl/checkout-sdk';
 import {
@@ -25,6 +26,7 @@ import { HeaderNavigation } from 'components/Header/HeaderNavigation';
 import { FooterLogo } from 'components/Footer/FooterLogo';
 import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { CryptoFiatProvider } from 'context/crypto-fiat-context/CryptoFiatProvider';
+import { Web3Provider } from '@ethersproject/providers';
 import {
   DEFAULT_BALANCE_RETRY_POLICY,
   getL1ChainId,
@@ -38,9 +40,8 @@ import {
   viewReducer,
 } from '../../context/view-context/ViewContext';
 import {
-  BridgeActions, BridgeContext, bridgeReducer, initialBridgeState,
+  BridgeActions, BridgeContext, BridgeState, bridgeReducer, initialBridgeState,
 } from './context/BridgeContext';
-import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { GetAllowedBalancesResultType, getAllowedBalances } from '../../lib/balance';
 import { widgetTheme } from '../../lib/theme';
@@ -50,20 +51,23 @@ import { sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
 
 export type BridgeWidgetInputs = BridgeWidgetParams & {
   config: StrongCheckoutWidgetsConfig,
+  checkout: Checkout;
+  web3Provider?: Web3Provider;
 };
 
 export function XBridgeWidget({
+  checkout,
+  web3Provider,
   amount,
   fromContractAddress,
   config,
 }: BridgeWidgetInputs) {
+  const initialBridge = { ...initialBridgeState, checkout, web3Provider } as BridgeState;
   const { environment, theme } = config;
-
-  const { connectLoaderState: { checkout, provider } } = useContext(ConnectLoaderContext);
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
-  const [bridgeState, bridgeDispatch] = useReducer(bridgeReducer, initialBridgeState);
+  const [bridgeState, bridgeDispatch] = useReducer(bridgeReducer, initialBridge);
 
   const viewReducerValues = useMemo(() => ({ viewState, viewDispatch }), [viewState, viewDispatch]);
   const bridgeReducerValues = useMemo(() => ({ bridgeState, bridgeDispatch }), [bridgeState, bridgeDispatch]);
@@ -71,7 +75,7 @@ export function XBridgeWidget({
 
   // Passport currently does not have an L1 representation and therefore there
   // is not need to show the bridge widget for Passport connected users.
-  if (isPassportProvider(provider)) {
+  if (isPassportProvider(web3Provider)) {
     return <BridgeComingSoon onCloseEvent={() => sendBridgeWidgetCloseEvent(eventTarget)} />;
   }
 
@@ -99,7 +103,7 @@ export function XBridgeWidget({
 
   const loadBalances = async (): Promise<boolean> => {
     if (!checkout) throw new Error('loadBalances: missing checkout');
-    if (!provider) throw new Error('loadBalances: missing provider');
+    if (!web3Provider) throw new Error('loadBalances: missing provider');
 
     let tokensAndBalances: GetAllowedBalancesResultType = {
       allowList: { tokens: [] },
@@ -108,7 +112,7 @@ export function XBridgeWidget({
     try {
       tokensAndBalances = await getAllowedBalances({
         checkout,
-        provider,
+        provider: web3Provider,
         allowTokenListType: TokenFilterTypes.BRIDGE,
       });
     } catch (err: any) {
@@ -137,9 +141,9 @@ export function XBridgeWidget({
 
   useEffect(() => {
     const bridgetWidgetSetup = async () => {
-      if (!checkout || !provider) return;
+      if (!checkout || !web3Provider) return;
 
-      const getNetworkResult = await checkout.getNetworkInfo({ provider });
+      const getNetworkResult = await checkout.getNetworkInfo({ provider: web3Provider });
 
       /* If the provider's network is not supported, return out of this and let the
       connect loader handle the switch network functionality */
@@ -202,7 +206,7 @@ export function XBridgeWidget({
     };
 
     bridgetWidgetSetup();
-  }, [checkout, provider]);
+  }, [checkout, web3Provider]);
 
   return (
     <BiomeCombinedProviders theme={{ base: themeReducerValue }}>
