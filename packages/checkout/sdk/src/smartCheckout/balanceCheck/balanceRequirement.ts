@@ -17,7 +17,7 @@ import {
   BalanceNativeRequirement,
 } from './types';
 import { DEFAULT_TOKEN_DECIMALS, NATIVE } from '../../env';
-import { isNativeToken } from '../../network';
+import { isNativeToken } from '../../tokens';
 
 export const getTokensFromRequirements = (itemRequirements: ItemRequirement[]): TokenInfo[] => itemRequirements
   .map((itemRequirement) => {

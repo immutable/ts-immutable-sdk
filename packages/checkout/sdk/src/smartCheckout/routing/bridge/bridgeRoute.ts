@@ -21,11 +21,11 @@ import { estimateGasForBridgeApproval } from './estimateApprovalGas';
 import { CheckoutError, CheckoutErrorType } from '../../../errors';
 import { allowListCheckForBridge } from '../../allowList/allowListCheck';
 import {
-  INDEXER_ETH_ROOT_CONTRACT_ADDRESS,
   fetchL1Representation,
   L1ToL2TokenAddressMapping,
 } from '../indexer/fetchL1Representation';
 import { DEFAULT_TOKEN_DECIMALS } from '../../../env';
+import { isNativeToken } from '../../../tokens';
 
 export const hasSufficientL1Eth = (
   tokenBalanceResult: TokenBalanceResult,
@@ -109,11 +109,6 @@ const constructBridgeFundingRoute = (
   fees,
 });
 
-export const isNativeEth = (address: string | undefined): boolean => {
-  if (!address || address === '') return true;
-  return false;
-};
-
 export type BridgeRequirement = {
   amount: BigNumber;
   formattedAmount: string;
@@ -156,7 +151,7 @@ export const bridgeRoute = async (
 
   // Ensure l1address is in the allowed token list
   const { l1address } = l1RepresentationResult as L1ToL2TokenAddressMapping;
-  if (l1address === INDEXER_ETH_ROOT_CONTRACT_ADDRESS) {
+  if (isNativeToken(l1address)) {
     if (!allowedTokenList.find((token) => !('address' in token))) return undefined;
   } else if (!allowedTokenList.find((token) => token.address === l1address)) {
     return undefined;
@@ -174,9 +169,9 @@ export const bridgeRoute = async (
   let totalFees = bridgeFeeEstimate.bridgeFee.estimatedAmount;
 
   // If the L1 representation of the requirement is ETH then find the ETH balance and check if the balance covers the delta
-  if (l1address === INDEXER_ETH_ROOT_CONTRACT_ADDRESS) {
+  if (isNativeToken(l1address)) {
     const nativeETHBalance = tokenBalanceResult.balances
-      .find((balance) => isNativeEth(balance.token.address));
+      .find((balance) => isNativeToken(balance.token.address));
 
     if (bridgeFeeEstimate.gasFee.estimatedAmount) {
       totalFees = totalFees.add(bridgeFeeEstimate.gasFee.estimatedAmount);

@@ -14,7 +14,7 @@ import {
 import { BalanceCheckResult, BalanceRequirement } from '../../balanceCheck/types';
 import { TokenBalanceResult } from '../types';
 import { quoteFetcher } from './quoteFetcher';
-import { isNativeToken } from '../../../network';
+import { isNativeToken } from '../../../tokens';
 
 const constructFees = (
   approvalGasFees: Amount | null | undefined,

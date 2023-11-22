@@ -6,7 +6,7 @@ import {
 } from '../../../types';
 import { BalanceRequirement } from '../../balanceCheck/types';
 import { allowListCheckForOnRamp } from '../../allowList';
-import { isNativeToken } from '../../../network';
+import { isNativeToken } from '../../../tokens';
 
 export const onRampRoute = async (
   config: CheckoutConfiguration,

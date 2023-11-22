@@ -14,7 +14,6 @@ import {
 } from '../types';
 import { CheckoutConfiguration } from '../config';
 import { getUnderlyingChainId } from '../provider/getUnderlyingProvider';
-import { NATIVE } from '../env';
 
 const UNRECOGNISED_CHAIN_ERROR_CODE = 4902; // error code (MetaMask)
 
@@ -205,7 +204,3 @@ export async function switchWalletNetwork(
     provider: newProvider,
   } as SwitchNetworkResult;
 }
-
-export const isNativeToken = (
-  address: string | undefined,
-): boolean => !address || address.toLocaleLowerCase() === NATIVE;

@@ -228,20 +228,20 @@ describe('balances', () => {
         tokens: [
           {
             name: 'Immutable X',
-            address: '0xaddr',
+            address: '0xL1Address',
             symbol: 'IMX',
             decimals: 18,
           } as TokenInfo,
           {
             name: 'Matic',
-            address: '0xmaticAddr',
+            address: '0xmaticAddress',
             symbol: 'MATIC',
             decimals: '18',
           },
           {
-            name: 'NoAddress',
-            address: '',
-            symbol: 'NA',
+            name: 'Ethereum',
+            address: 'native',
+            symbol: 'ETH',
             decimals: 18,
           } as TokenInfo,
         ],
@@ -272,12 +272,12 @@ describe('balances', () => {
         .fn()
         .mockResolvedValueOnce('Immutable X')
         .mockResolvedValueOnce('Matic')
-        .mockResolvedValueOnce('NoAddress');
+        .mockResolvedValueOnce('Cats');
       symbolMock = jest
         .fn()
         .mockResolvedValueOnce('IMX')
         .mockResolvedValueOnce('MATIC')
-        .mockResolvedValueOnce('NA');
+        .mockResolvedValueOnce('zkCATS');
       (Contract as unknown as jest.Mock).mockReturnValue({
         balanceOf: balanceOfMock,
         decimals: decimalsMock,
@@ -286,7 +286,7 @@ describe('balances', () => {
       });
     });
 
-    it('should call getBalance and getERC20Balance functions', async () => {
+    it('should call getBalance and getERC20Balance functions with native and ERC20 tokens', async () => {
       const getAllBalancesResult = await getAllBalances(
         {
           remote: {
@@ -314,19 +314,10 @@ describe('balances', () => {
               balance: currentBalance,
               formattedBalance,
               token: {
-                name: ChainName.ETHEREUM,
-                symbol: 'ETH',
-                decimals: 18,
-              },
-            },
-            {
-              balance: currentBalance,
-              formattedBalance,
-              token: {
                 name: 'Immutable X',
                 symbol: 'IMX',
                 decimals: 18,
-                address: '0xaddr',
+                address: '0xL1Address',
               },
             },
             {
@@ -336,7 +327,16 @@ describe('balances', () => {
                 name: 'Matic',
                 symbol: 'MATIC',
                 decimals: 18,
-                address: '0xmaticAddr',
+                address: '0xmaticAddress',
+              },
+            },
+            {
+              balance: currentBalance,
+              formattedBalance,
+              token: {
+                name: ChainName.ETHEREUM,
+                symbol: 'ETH',
+                decimals: 18,
               },
             },
           ],
