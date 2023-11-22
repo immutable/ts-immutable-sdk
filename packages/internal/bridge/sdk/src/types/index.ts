@@ -72,13 +72,33 @@ export enum CompletionStatus {
 }
 
 /**
- * @typedef {Object} BridgeMethods
+ * @typedef {Object} bridgeMethods
+ * @property {string} DEPOSIT - The set of contract methods for depositing.
+ * @property {string} WITHDRAW - The set of contract methods for withdrawing.
+ */
+export const bridgeMethods = {
+  deposit: {
+    token: 'deposit',
+    tokenTo: 'depositTo',
+    native: 'depositETH',
+    nativeTo: 'depositToEth',
+  },
+  withdraw: {
+    token: 'withdraw',
+    tokenTo: 'withdrawTo',
+    native: 'withdrawIMX',
+    nativeTo: 'withdrawToIMX',
+  },
+};
+
+/**
+ * @typedef {Object} BridgeFeeMethods
  * @property {string} DEPOSIT - The transaction has been successfully synced.
  * @property {string} WITHDRAW - The transaction is still pending.
  * @property {string} MAP_TOKEN - The transaction has failed.
  * @property {string} FINALISE_WITHDRAWAL - Calculate gas .
  */
-export enum BridgeMethods {
+export enum BridgeFeeMethods {
   DEPOSIT = 'DEPOSIT',
   WITHDRAW = 'WITHDRAW',
   MAP_TOKEN = 'MAP_TOKEN',
@@ -117,7 +137,7 @@ export interface FeeData {
  * @property {FungibleToken} token - The token for which the bridge fee is being requested.
  */
 export interface BridgeFeeRequest {
-  method: BridgeMethods;
+  method: BridgeFeeMethods;
 }
 
 /**
@@ -164,11 +184,11 @@ export interface ApproveDepositBridgeResponse {
  * @property {FungibleToken} token - The token to be deposited.
  * @property {ethers.BigNumber} depositAmount - The amount to be deposited.
  */
-export interface BridgeDepositRequest {
-  depositorAddress: Address;
+export interface BridgeTxRequest {
+  senderAddress: Address;
   recipientAddress: Address;
   token: FungibleToken;
-  depositAmount: ethers.BigNumber;
+  amount: ethers.BigNumber;
   sourceChainId: string;
   destinationChainId: string;
 }
