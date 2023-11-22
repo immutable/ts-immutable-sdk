@@ -21,6 +21,9 @@ import {
   WaitForWithdrawalResponse,
   RootTokenRequest,
   RootTokenResponse,
+  BridgeMethods,
+  BridgeMethodsGasLimit,
+  FeeData,
 } from 'types';
 import { ROOT_ERC20_BRIDGE_FLOW_RATE } from 'contracts/ABIs/RootERC20BridgeFlowRate';
 import { ERC20 } from 'contracts/ABIs/ERC20';
@@ -34,6 +37,7 @@ import { decodeExtraData } from 'lib/decodeExtraData';
 import { L2_STATE_SENDER } from 'contracts/ABIs/L2StateSender';
 import { EXIT_HELPER } from 'contracts/ABIs/ExitHelper';
 import { CHILD_ERC20 } from 'contracts/ABIs/ChildERC20';
+import { getGasPriceInWei } from 'lib/gasPriceInWei';
 
 /**
  * Represents a token bridge, which manages asset transfers between two chains.
@@ -86,16 +90,42 @@ export class TokenBridge {
    */
   public async getFee(req: BridgeFeeRequest): Promise<BridgeFeeResponse> {
     this.validateChainConfiguration();
-    if (req.token !== 'NATIVE' && !ethers.utils.isAddress(req.token)) {
-      throw new BridgeError(
-        `token address ${req.token} is not a valid address`,
-        BridgeErrorType.INVALID_ADDRESS,
+
+    let sourceChainFee: ethers.BigNumber = ethers.BigNumber.from(0);
+    let destinationChainFee: ethers.BigNumber = ethers.BigNumber.from(0);
+
+    if (req.method === BridgeMethods.FINALISE_WITHDRAWAL) {
+      sourceChainFee = await TokenBridge.getGasEstimates(
+        this.config.rootProvider,
+        BridgeMethodsGasLimit.FINALISE_WITHDRAWAL,
+      );
+    } else {
+      sourceChainFee = await TokenBridge.getGasEstimates(
+        this.config.rootProvider,
+        BridgeMethodsGasLimit[`${req.method}_SOURCE`],
+      );
+      destinationChainFee = await TokenBridge.getGasEstimates(
+        this.config.rootProvider,
+        BridgeMethodsGasLimit[`${req.method}_DESTINATION`],
       );
     }
+
     return {
-      bridgeable: true,
-      feeAmount: ethers.BigNumber.from(0),
+      sourceChainFee,
+      destinationChainFee,
+      bridgeFee: ethers.BigNumber.from(1000), // @TODO will be the axelar fee
+      networkFee: ethers.BigNumber.from(0), // no network fee charged currently
     };
+  }
+
+  private static async getGasEstimates(
+    provider: ethers.providers.Provider,
+    txnGasLimitInWei: number,
+  ): Promise<ethers.BigNumber> {
+    const feeData: FeeData = await provider.getFeeData();
+    const gasPriceInWei = getGasPriceInWei(feeData);
+    if (!gasPriceInWei) return ethers.BigNumber.from(0);
+    return gasPriceInWei.mul(txnGasLimitInWei);
   }
 
   /**
@@ -864,6 +894,14 @@ export class TokenBridge {
         BridgeErrorType.INVALID_ADDRESS,
       );
     }
+
+    this.validateChainIds(sourceChainId, destinationChainId);
+  }
+
+  private async validateChainIds(
+    sourceChainId: string,
+    destinationChainId: string,
+  ) {
     // If the token is not native, it must be a valid addressß
     if (sourceChainId !== this.config.bridgeInstance.rootChainID.toString()
       && sourceChainId !== this.config.bridgeInstance.childChainID.toString()) {

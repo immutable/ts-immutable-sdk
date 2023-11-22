@@ -72,11 +72,52 @@ export enum CompletionStatus {
 }
 
 /**
+ * @typedef {Object} BridgeMethods
+ * @property {string} DEPOSIT - The transaction has been successfully synced.
+ * @property {string} WITHDRAW - The transaction is still pending.
+ * @property {string} MAP_TOKEN - The transaction has failed.
+ * @property {string} FINALISE_WITHDRAWAL - Calculate gas .
+ */
+export enum BridgeMethods {
+  DEPOSIT = 'DEPOSIT',
+  WITHDRAW = 'WITHDRAW',
+  MAP_TOKEN = 'MAP_TOKEN',
+  FINALISE_WITHDRAWAL = 'FINALISE_WITHDRAWAL',
+}
+
+/**
+ * @typedef {Object} BridgeMethodGas
+ * @property {string} DEPOSIT_SOURCE - The gas required to deposit to the bridge.
+ * @property {string} DEPOSIT_DESTINATION - The gas required to process the deposit on the destination chain.
+ * @property {string} WITHDRAW_SOURCE - The gas required to withdraw from the bridge.
+ * @property {string} WITHDRAW_DESTINATION - The gas required to process the withdrawal on the destination chain.
+ * @property {string} MAP_TOKEN_SOURCE - The gas required to request the mapping of a token on the bridge.
+ * @property {string} MAP_TOKEN_DESTINATION - The gas required to process the mapping of a token on the destination chain.
+ * @property {string} FINALISE_WITHDRAWAL - The gas required to finalise a withdrawal from the flow rate queue.
+ */
+export enum BridgeMethodsGasLimit { // @TODO test methods on chain and put correct values here
+  DEPOSIT_SOURCE = 500000,
+  DEPOSIT_DESTINATION = 100000,
+  WITHDRAW_SOURCE = 400000,
+  WITHDRAW_DESTINATION = 100000,
+  MAP_TOKEN_SOURCE = 300000,
+  MAP_TOKEN_DESTINATION = 100000,
+  FINALISE_WITHDRAWAL = 200000,
+}
+
+export interface FeeData {
+  lastBaseFeePerGas: null | ethers.BigNumber;
+  maxFeePerGas: null | ethers.BigNumber;
+  maxPriorityFeePerGas: null | ethers.BigNumber;
+  gasPrice: null | ethers.BigNumber;
+}
+
+/**
  * @typedef {Object} BridgeFeeRequest
  * @property {FungibleToken} token - The token for which the bridge fee is being requested.
  */
 export interface BridgeFeeRequest {
-  token: FungibleToken;
+  method: BridgeMethods;
 }
 
 /**
@@ -85,8 +126,10 @@ export interface BridgeFeeRequest {
  * @property {ethers.BigNumber} feeAmount - The fee amount for bridging the token.
  */
 export interface BridgeFeeResponse {
-  bridgeable: boolean;
-  feeAmount: ethers.BigNumber;
+  sourceChainFee: ethers.BigNumber,
+  destinationChainFee: ethers.BigNumber,
+  bridgeFee: ethers.BigNumber,
+  networkFee: ethers.BigNumber,
 }
 
 /**
