@@ -1,23 +1,19 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber, Contract } from 'ethers';
 import {
+  ERC20Item,
   ERC721Balance,
-  ItemBalance,
-  TokenBalance,
-  ERC721ABI,
   ERC721Item,
+  ItemBalance,
   ItemRequirement,
   ItemType,
-  TokenInfo,
   NativeItem,
-  ERC20Item,
+  TokenBalance,
+  TokenInfo,
 } from '../../types';
 import { getAllBalances } from '../../balances';
-import { CheckoutConfiguration } from '../../config';
-import {
-  BalanceCheckResult,
-  BalanceRequirement,
-} from './types';
+import { CheckoutConfiguration, getL2ChainId } from '../../config';
+import { BalanceCheckResult, BalanceRequirement } from './types';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { balanceAggregator } from '../aggregators/balanceAggregator';
 import {
@@ -25,6 +21,7 @@ import {
   getTokenBalanceRequirement,
   getTokensFromRequirements,
 } from './balanceRequirement';
+import { ERC721ABI, NATIVE } from '../../env';
 
 /**
  * Gets the balances for all NATIVE and ERC20 balance requirements.
@@ -38,11 +35,14 @@ const getTokenBalances = async (
   try {
     const tokenMap = new Map<string, TokenInfo>();
     getTokensFromRequirements(itemRequirements).forEach(
-      (item) => tokenMap.set((item.address || '').toLocaleLowerCase(), item),
+      (item) => {
+        if (!item.address) return;
+        tokenMap.set(item.address.toLocaleLowerCase(), item);
+      },
     );
-    const { balances } = await getAllBalances(config, provider, ownerAddress);
+    const { balances } = await getAllBalances(config, provider, ownerAddress, getL2ChainId(config));
     return balances.filter(
-      (balance) => tokenMap.get((balance.token.address || '').toLocaleLowerCase()),
+      (balance) => tokenMap.get((balance.token.address || NATIVE).toLocaleLowerCase()),
     ) as TokenBalance[];
   } catch (error: any) {
     throw new CheckoutError(

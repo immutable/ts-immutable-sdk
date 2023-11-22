@@ -1,4 +1,4 @@
-import { SDK_VERSION_MARKER } from '../lib/env';
+import { SDK_VERSION_MARKER } from '../env';
 import { loadUnresolved } from './load';
 
 describe('load', () => {

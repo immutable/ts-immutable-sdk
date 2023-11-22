@@ -2,13 +2,12 @@ import axios, { AxiosResponse } from 'axios';
 import { Environment } from '@imtbl/config';
 import {
   ChainId,
-  CHECKOUT_API_BASE_URL,
   ChainsTokensConfig,
-  ENV_DEVELOPMENT,
   RemoteConfiguration,
   ChainTokensConfig,
 } from '../types';
 import { CheckoutError, CheckoutErrorType } from '../errors';
+import { CHECKOUT_API_BASE_URL, ENV_DEVELOPMENT } from '../env';
 
 export type RemoteConfigParams = {
   isDevelopment: boolean;
@@ -23,6 +22,8 @@ export class RemoteConfigFetcher {
   private configCache: RemoteConfiguration | undefined;
 
   private tokensCache: ChainsTokensConfig | undefined;
+
+  private version: string = 'v1';
 
   constructor(params: RemoteConfigParams) {
     this.isDevelopment = params.isDevelopment;
@@ -58,7 +59,7 @@ export class RemoteConfigFetcher {
     if (this.configCache) return this.configCache;
 
     const response = await RemoteConfigFetcher.makeHttpRequest(
-      `${this.getEndpoint()}/v1/config`,
+      `${this.getEndpoint()}/${this.version}/config`,
     );
     this.configCache = response.data;
 
@@ -69,7 +70,7 @@ export class RemoteConfigFetcher {
     if (this.tokensCache) return this.tokensCache;
 
     const response = await RemoteConfigFetcher.makeHttpRequest(
-      `${this.getEndpoint()}/v1/config/tokens`,
+      `${this.getEndpoint()}/${this.version}/config/tokens`,
     );
     this.tokensCache = response.data;
 

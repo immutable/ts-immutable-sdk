@@ -17,9 +17,9 @@ import { ConnectionStatus } from '../../../context/connect-loader-context/Connec
 import {
   ConnectLoaderTestComponent,
 } from '../../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
-import { IMX_ADDRESS_ZKEVM } from '../../../lib';
 import { CustomAnalyticsProvider } from '../../../context/analytics-provider/CustomAnalyticsProvider';
 import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
+import { NATIVE } from '../../../lib';
 
 describe('WalletBalances', () => {
   beforeEach(() => {
@@ -68,7 +68,7 @@ describe('WalletBalances', () => {
           name: 'ImmutableX',
           symbol: 'IMX',
           decimals: 18,
-          address: IMX_ADDRESS_ZKEVM,
+          address: NATIVE,
           icon: '123',
         },
       },
@@ -179,7 +179,7 @@ describe('WalletBalances', () => {
           name: 'ImmutableX',
           symbol: 'IMX',
           decimals: 18,
-          address: IMX_ADDRESS_ZKEVM,
+          address: NATIVE,
           icon: '123',
         },
       },

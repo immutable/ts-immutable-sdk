@@ -55,8 +55,7 @@ export const filterSwappableTokensByBridgeableAddresses = (
   const filteredSwappableTokens: TokenInfo[] = [];
 
   for (const addresses of l1tol2Addresses) {
-    if (addresses.l1address === '') continue;
-    if (addresses.l2address === '') continue;
+    // TODO: Check for ETH (native) L1 in bridgeableTokens first
     if (!bridgeableTokens.includes(addresses.l1address)) continue;
     // Filter out the token that is required from the swappable tokens list
     if (addresses.l2address === requiredTokenAddress) continue;

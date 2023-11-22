@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { CheckoutConfiguration } from '../config';
 
 export const debugLogger = (config: CheckoutConfiguration, debugString: string, seconds: number) => {

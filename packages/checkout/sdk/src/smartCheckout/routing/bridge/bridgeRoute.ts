@@ -4,26 +4,28 @@ import {
   ChainId,
   FundingStepType,
   GetBalanceResult,
-  IMX_ADDRESS_ZKEVM,
   ItemType,
   AvailableRoutingOptions,
   BridgeRouteFeeEstimate,
   FundingRouteFeeEstimate,
   BridgeFees,
   TokenInfo,
-  DEFAULT_TOKEN_DECIMALS,
 } from '../../../types';
 import { CheckoutConfiguration, getL1ChainId } from '../../../config';
 import {
   TokenBalanceResult,
 } from '../types';
-import { BalanceRequirement } from '../../balanceCheck/types';
 import { getEthBalance } from './getEthBalance';
 import { getBridgeFeeEstimate } from './getBridgeFeeEstimate';
 import { estimateGasForBridgeApproval } from './estimateApprovalGas';
 import { CheckoutError, CheckoutErrorType } from '../../../errors';
 import { allowListCheckForBridge } from '../../allowList/allowListCheck';
-import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS, fetchL1Representation } from '../indexer/fetchL1Representation';
+import {
+  fetchL1Representation,
+  L1ToL2TokenAddressMapping,
+} from '../indexer/fetchL1Representation';
+import { DEFAULT_TOKEN_DECIMALS } from '../../../env';
+import { isNativeToken } from '../../../tokens';
 
 export const hasSufficientL1Eth = (
   tokenBalanceResult: TokenBalanceResult,
@@ -31,20 +33,6 @@ export const hasSufficientL1Eth = (
 ): boolean => {
   const balance = getEthBalance(tokenBalanceResult);
   return balance.gte(totalFees);
-};
-
-export const getTokenAddressFromRequirement = (
-  balanceRequirement: BalanceRequirement,
-): string => {
-  if (balanceRequirement.type === ItemType.NATIVE) {
-    return IMX_ADDRESS_ZKEVM;
-  }
-
-  if (balanceRequirement.type === ItemType.ERC20) {
-    return balanceRequirement.required.token.address ?? '';
-  }
-
-  return '';
 };
 
 export const getBridgeGasEstimate = async (
@@ -121,11 +109,6 @@ const constructBridgeFundingRoute = (
   fees,
 });
 
-export const isNativeEth = (address: string | undefined): boolean => {
-  if (!address || address === '') return true;
-  return false;
-};
-
 export type BridgeRequirement = {
   amount: BigNumber;
   formattedAmount: string;
@@ -141,7 +124,6 @@ export const bridgeRoute = async (
   feeEstimates: Map<FundingStepType, FundingRouteFeeEstimate>,
 ): Promise<BridgeFundingStep | undefined> => {
   if (!availableRoutingOptions.bridge) return undefined;
-  if (bridgeRequirement.l2address === undefined || bridgeRequirement.l2address === '') return undefined;
   const chainId = getL1ChainId(config);
   const tokenBalanceResult = tokenBalanceResults.get(chainId);
   const l1provider = readOnlyProviders.get(chainId);
@@ -165,12 +147,11 @@ export const bridgeRoute = async (
   if (!hasSufficientL1Eth(tokenBalanceResult, bridgeFeeEstimate.totalFees)) return undefined;
 
   const l1RepresentationResult = await fetchL1Representation(config, bridgeRequirement.l2address);
-  // No mapping on L1 for this token
-  const { l1address } = l1RepresentationResult;
-  if (l1address === '') return undefined;
+  if (!l1RepresentationResult) return undefined;
 
   // Ensure l1address is in the allowed token list
-  if (l1address === INDEXER_ETH_ROOT_CONTRACT_ADDRESS) {
+  const { l1address } = l1RepresentationResult as L1ToL2TokenAddressMapping;
+  if (isNativeToken(l1address)) {
     if (!allowedTokenList.find((token) => !('address' in token))) return undefined;
   } else if (!allowedTokenList.find((token) => token.address === l1address)) {
     return undefined;
@@ -188,9 +169,9 @@ export const bridgeRoute = async (
   let totalFees = bridgeFeeEstimate.bridgeFee.estimatedAmount;
 
   // If the L1 representation of the requirement is ETH then find the ETH balance and check if the balance covers the delta
-  if (l1address === INDEXER_ETH_ROOT_CONTRACT_ADDRESS) {
+  if (isNativeToken(l1address)) {
     const nativeETHBalance = tokenBalanceResult.balances
-      .find((balance) => isNativeEth(balance.token.address));
+      .find((balance) => isNativeToken(balance.token.address));
 
     if (bridgeFeeEstimate.gasFee.estimatedAmount) {
       totalFees = totalFees.add(bridgeFeeEstimate.gasFee.estimatedAmount);

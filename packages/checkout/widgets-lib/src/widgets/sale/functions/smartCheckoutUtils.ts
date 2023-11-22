@@ -6,7 +6,7 @@ import {
 } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import { parseUnits } from 'ethers/lib/utils';
-import { IMX_ADDRESS_ZKEVM, getL2ChainId } from '../../../lib';
+import { getL2ChainId, NATIVE } from '../../../lib';
 import { calculateCryptoToFiat, formatFiatString } from '../../../lib/utils';
 
 export const MAX_GAS_LIMIT = '30000000';
@@ -54,7 +54,7 @@ export const isUserFractionalBalanceBlocked = async (
   if (isPassport) {
     return false;
   }
-  const imxBalance = balanceResponse.balances.find((balance) => balance.token.address === IMX_ADDRESS_ZKEVM);
+  const imxBalance = balanceResponse.balances.find((balance) => balance.token.address === NATIVE);
   const imxBalanceAmount = imxBalance ? imxBalance.balance : BigNumber.from('0');
   if (imxBalanceAmount.gte(zero) && imxBalanceAmount.lt(BigNumber.from(MAX_GAS_LIMIT))) {
     return true;
