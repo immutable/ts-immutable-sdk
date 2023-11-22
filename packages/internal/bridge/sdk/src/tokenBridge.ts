@@ -110,6 +110,8 @@ export class TokenBridge {
       );
     }
 
+    // @TODO fetch axelar fee
+
     return {
       sourceChainFee,
       destinationChainFee,
@@ -280,7 +282,9 @@ export class TokenBridge {
       req.destinationChainId,
     );
 
-    const rootERC20PredicateContract = await withBridgeError<ethers.Contract>(
+    // @TODO fetch fees
+
+    const rootERC20BridgeFlowRate = await withBridgeError<ethers.Contract>(
       async () => {
         const contract = new ethers.Contract(
           this.config.bridgeContracts.rootERC20BridgeFlowRate,
@@ -293,20 +297,29 @@ export class TokenBridge {
 
     // Convert the addresses to correct format addresses (e.g. prepend 0x if not already)
     const receipient = ethers.utils.getAddress(req.recipientAddress);
+    const depositor = ethers.utils.getAddress(req.depositorAddress);
 
     // Handle return if it is a native token
     if (req.token === 'NATIVE') {
       // Encode the function data into a payload
-      const data = await withBridgeError<string>(async () => rootERC20PredicateContract.interface.encodeFunctionData(
-        'depositNativeTo',
-        [receipient],
-      ), BridgeErrorType.INTERNAL_ERROR);
+      let data: string;
+      if (receipient === depositor) {
+        data = await withBridgeError<string>(async () => rootERC20BridgeFlowRate.interface.encodeFunctionData(
+          'depositETH',
+          [req.depositAmount],
+        ), BridgeErrorType.INTERNAL_ERROR);
+      } else {
+        data = await withBridgeError<string>(async () => rootERC20BridgeFlowRate.interface.encodeFunctionData(
+          'depositToETH',
+          [receipient, req.depositAmount],
+        ), BridgeErrorType.INTERNAL_ERROR);
+      }
 
       return {
         unsignedTx: {
           data,
           to: this.config.bridgeContracts.rootERC20BridgeFlowRate,
-          value: req.depositAmount,
+          value: req.depositAmount, // @TODO make sure axelar fees are added to the value
         },
       };
     }
@@ -315,16 +328,23 @@ export class TokenBridge {
     const token = ethers.utils.getAddress(req.token);
 
     // Encode the function data into a payload
-    const data = await withBridgeError<string>(async () => rootERC20PredicateContract.interface.encodeFunctionData(
-      'depositTo',
-      [token, receipient, req.depositAmount],
-    ), BridgeErrorType.INTERNAL_ERROR);
-
+    let data: string;
+    if (receipient === depositor) {
+      data = await withBridgeError<string>(async () => rootERC20BridgeFlowRate.interface.encodeFunctionData(
+        'deposit',
+        [token, req.depositAmount],
+      ), BridgeErrorType.INTERNAL_ERROR);
+    } else {
+      data = await withBridgeError<string>(async () => rootERC20BridgeFlowRate.interface.encodeFunctionData(
+        'depositTo',
+        [token, receipient, req.depositAmount],
+      ), BridgeErrorType.INTERNAL_ERROR);
+    }
     return {
       unsignedTx: {
         data,
         to: this.config.bridgeContracts.rootERC20BridgeFlowRate,
-        value: 0,
+        value: 0, // @TODO make sure axelar fees are added to the value
       },
     };
   }
