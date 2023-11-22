@@ -339,6 +339,7 @@ export default class AuthManager {
       formUrlEncodedHeader,
     );
     const newTokenResponse = response.data;
+    this.deviceCredentialsManager.saveCredentials(newTokenResponse);
 
     return AuthManager.mapDeviceTokenResponseToDomainUserModel(newTokenResponse);
   }
@@ -399,10 +400,24 @@ export default class AuthManager {
     // eslint-disable-next-line no-async-promise-executor
     this.refreshingPromise = new Promise(async (resolve, reject) => {
       try {
-        const newOidcUser = await this.userManager.signinSilent();
-        if (newOidcUser) {
-          resolve(AuthManager.mapOidcUserToDomainModel(newOidcUser));
-          return;
+        if (this.config.crossSdkBridgeEnabled) {
+          const tokenResponse = this.checkStoredDeviceFlowCredentials();
+          if (tokenResponse) {
+            const refreshToken = tokenResponse?.refresh_token ?? null;
+            if (refreshToken) {
+              const newUser = await this.refreshToken(refreshToken);
+              if (newUser) {
+                resolve(newUser);
+                return;
+              }
+            }
+          }
+        } else {
+          const newOidcUser = await this.userManager.signinSilent();
+          if (newOidcUser) {
+            resolve(AuthManager.mapOidcUserToDomainModel(newOidcUser));
+            return;
+          }
         }
         resolve(null);
       } catch (err) {
