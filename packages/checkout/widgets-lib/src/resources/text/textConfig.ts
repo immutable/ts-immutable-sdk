@@ -1,5 +1,6 @@
 /* eslint-disable max-len */
 import { WalletProviderName } from '@imtbl/checkout-sdk';
+import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
 import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
 import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
 import { SharedViews } from '../../context/view-context/ViewContext';
@@ -433,6 +434,14 @@ export const text = {
     [SaleWidgetViews.SALE_SUCCESS]: {
       text: 'Order completed',
       actionText: 'Continue',
+    },
+    [XBridgeWidgetViews.CROSS_WALLET_SELECTION]: {
+      heading: 'Where would you like to move funds between?',
+      from: {
+        heading: 'From',
+        selectDefaultText: 'Select wallet and network',
+        walletSelectorHeading: 'From wallet',
+      },
     },
   },
   footers: {

@@ -1,5 +1,5 @@
 import {
-  BiomeCombinedProviders, Body,
+  BiomeCombinedProviders,
 } from '@biom3/react';
 import {
   BridgeWidgetParams,
@@ -21,12 +21,10 @@ import {
   TokenBridge,
 } from '@imtbl/bridge-sdk';
 import { StrongCheckoutWidgetsConfig } from 'lib/withDefaultWidgetConfig';
-import { SimpleLayout } from 'components/SimpleLayout/SimpleLayout';
-import { HeaderNavigation } from 'components/Header/HeaderNavigation';
-import { FooterLogo } from 'components/Footer/FooterLogo';
 import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { CryptoFiatProvider } from 'context/crypto-fiat-context/CryptoFiatProvider';
 import { Web3Provider } from '@ethersproject/providers';
+import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
 import {
   DEFAULT_BALANCE_RETRY_POLICY,
   getL1ChainId,
@@ -40,14 +38,15 @@ import {
   viewReducer,
 } from '../../context/view-context/ViewContext';
 import {
-  BridgeActions, BridgeContext, BridgeState, bridgeReducer, initialBridgeState,
-} from './context/BridgeContext';
+  BridgeActions, XBridgeContext, xBridgeReducer, initialXBridgeState,
+} from './context/XBridgeContext';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { GetAllowedBalancesResultType, getAllowedBalances } from '../../lib/balance';
 import { widgetTheme } from '../../lib/theme';
 import { isPassportProvider } from '../../lib/providerUtils';
 import { BridgeComingSoon } from './views/BridgeComingSoon';
 import { sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
+import { CrossWalletSelection } from './views/CrossWalletSelection';
 
 export type BridgeWidgetInputs = BridgeWidgetParams & {
   config: StrongCheckoutWidgetsConfig,
@@ -58,16 +57,17 @@ export type BridgeWidgetInputs = BridgeWidgetParams & {
 export function XBridgeWidget({
   checkout,
   web3Provider,
-  amount,
-  fromContractAddress,
   config,
 }: BridgeWidgetInputs) {
-  const initialBridge = { ...initialBridgeState, checkout, web3Provider } as BridgeState;
   const { environment, theme } = config;
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
-  const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
-  const [bridgeState, bridgeDispatch] = useReducer(bridgeReducer, initialBridge);
+  const [viewState, viewDispatch] = useReducer(
+    viewReducer,
+    { ...initialViewState, view: { type: XBridgeWidgetViews.CROSS_WALLET_SELECTION } },
+  );
+
+  const [bridgeState, bridgeDispatch] = useReducer(xBridgeReducer, { ...initialXBridgeState, checkout });
 
   const viewReducerValues = useMemo(() => ({ viewState, viewDispatch }), [viewState, viewDispatch]);
   const bridgeReducerValues = useMemo(() => ({ bridgeState, bridgeDispatch }), [bridgeState, bridgeDispatch]);
@@ -211,31 +211,13 @@ export function XBridgeWidget({
   return (
     <BiomeCombinedProviders theme={{ base: themeReducerValue }}>
       <ViewContext.Provider value={viewReducerValues}>
-        <BridgeContext.Provider value={bridgeReducerValues}>
+        <XBridgeContext.Provider value={bridgeReducerValues}>
           <CryptoFiatProvider environment={environment}>
-            <SimpleLayout
-              testId="bridge-view"
-              header={(
-                <HeaderNavigation
-                  title="Move"
-                  onCloseButtonClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
-                />
-                )}
-              footer={<FooterLogo />}
-            >
-              <Body>Hello from the X Wallet Bridge</Body>
-              <Body>
-                Params for amount are
-                {' '}
-                {amount}
-                and fromContractAddress
-                {' '}
-                {fromContractAddress}
-                {' '}
-              </Body>
-            </SimpleLayout>
+            {viewState.view.type === XBridgeWidgetViews.CROSS_WALLET_SELECTION && (
+              <CrossWalletSelection />
+            )}
           </CryptoFiatProvider>
-        </BridgeContext.Provider>
+        </XBridgeContext.Provider>
       </ViewContext.Provider>
     </BiomeCombinedProviders>
   );

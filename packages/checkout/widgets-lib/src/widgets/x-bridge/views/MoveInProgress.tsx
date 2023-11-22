@@ -11,7 +11,7 @@ import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { BridgeWidgetViews, PrefilledBridgeForm } from '../../../context/view-context/BridgeViewContextTypes';
 import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
-import { BridgeContext } from '../context/BridgeContext';
+import { XBridgeContext } from '../context/XBridgeContext';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 
 interface MoveInProgressProps {
@@ -29,7 +29,7 @@ export function MoveInProgress({ token, transactionResponse, bridgeForm }: MoveI
     bridgeState: {
       tokenBridge,
     },
-  } = useContext(BridgeContext);
+  } = useContext(XBridgeContext);
 
   useEffect(() => {
     if (!tokenBridge) return;
