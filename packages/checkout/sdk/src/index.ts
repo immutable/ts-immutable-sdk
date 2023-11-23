@@ -49,6 +49,8 @@ export type {
   CheckoutSwapConfiguration,
   ConnectParams,
   ConnectResult,
+  CreateProviderParams,
+  CreateProviderResult,
   DexConfig,
   ERC20ItemRequirement,
   ERC721Balance,
