@@ -157,13 +157,13 @@ export const subtractAmount = <T extends Coin>(a: CoinAmount<T>, b: CoinAmount<T
 /**
  * Converts our internal token type which could be ERC20 or Native
  * into a format consumable by Checkout. They require an address to be
- * present. We populate the address with empty string if it's Native.
+ * present. We populate the address with the string 'native' if it's Native.
  * If it's ERC20, we don't need to change it.
  */
 export const toPublicTokenType = (token: Coin): Token => {
   if (token.type === 'native') {
     return {
-      address: '',
+      address: 'native',
       chainId: token.chainId,
       decimals: token.decimals,
       symbol: token.symbol,

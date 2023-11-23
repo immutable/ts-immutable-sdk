@@ -702,13 +702,11 @@ describe('Connect', () => {
     });
 
     it(`should call fiatRampService.createWidgetUrl with correct params
-      when tokenAmount and tokenSymbol are provided`, async () => {
+      when tokenAmount and tokenAddress are provided`, async () => {
       getTokenAllowListResult = {
         tokens: [
           {
-            name: 'Immutable X',
             address: '0xaddr',
-            symbol: 'IMX',
             decimals: 18,
           } as TokenInfo,
           {
@@ -743,6 +741,49 @@ describe('Connect', () => {
         walletAddress: '0xADDRESS',
         tokenAmount: '10',
         tokenSymbol: 'ETH',
+        email: undefined,
+      });
+    });
+
+    it(`should call fiatRampService.createWidgetUrl with correct params
+      when only tokenAmount is provided`, async () => {
+      getTokenAllowListResult = {
+        tokens: [
+          {
+            decimals: 18,
+            symbol: 'IMX',
+          } as TokenInfo,
+          {
+            name: 'Ethereum',
+            address: '0xethAddr',
+            symbol: 'ETH',
+            decimals: 18,
+          } as TokenInfo,
+          {
+            name: 'Matic',
+            address: '0xmaticAddr',
+            symbol: 'MATIC',
+            decimals: '18',
+          },
+        ],
+      } as GetTokenAllowListResult;
+      (getTokenAllowList as jest.Mock).mockResolvedValue(getTokenAllowListResult);
+
+      const params: FiatRampParams = {
+        exchangeType: ExchangeType.ONRAMP,
+        web3Provider: mockProvider,
+        tokenAmount: '10',
+      };
+
+      await checkout.createFiatRampUrl(params);
+
+      expect(createWidgetUrlMock).toBeCalledTimes(1);
+      expect(createWidgetUrlMock).toBeCalledWith({
+        exchangeType: ExchangeType.ONRAMP,
+        isPassport: false,
+        walletAddress: '0xADDRESS',
+        tokenAmount: '10',
+        tokenSymbol: 'IMX',
         email: undefined,
       });
     });
