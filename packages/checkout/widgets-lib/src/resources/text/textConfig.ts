@@ -436,6 +436,7 @@ export const text = {
       actionText: 'Continue',
     },
     [XBridgeWidgetViews.BRIDGE_WALLET_SELECTION]: {
+      layoutHeading: 'Move',
       heading: 'Where would you like to move funds between?',
       from: {
         heading: 'From',

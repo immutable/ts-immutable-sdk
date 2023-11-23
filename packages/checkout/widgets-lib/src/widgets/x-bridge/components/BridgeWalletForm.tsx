@@ -5,10 +5,10 @@ import { text } from 'resources/text/textConfig';
 import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
 import { FormControlWrapper } from 'components/FormComponents/FormControlWrapper/FormControlWrapper';
 import { useContext, useState } from 'react';
-import { WalletItem } from 'widgets/connect/components/WalletItem';
 import { WalletProviderName, CheckoutErrorType } from '@imtbl/checkout-sdk';
 import { brigdeWalletWrapperStyles } from './BridgeWalletFormStyles';
 import { XBridgeContext } from '../context/XBridgeContext';
+import { BridgeWalletItem } from './BridgeWalletItem';
 
 interface BridgeWalletFormProps {
   testId: string;
@@ -94,15 +94,15 @@ export function BridgeWalletForm({
           </FormControlWrapper>
         </BottomSheet.Target>
         <BottomSheet.Content>
-          <WalletItem
-            onWalletClick={(name) => handleWalletConnection(name)}
-            wallet={{ walletProviderName: WalletProviderName.METAMASK }}
+          <BridgeWalletItem
             key={WalletProviderName.METAMASK}
+            walletProviderName={WalletProviderName.METAMASK}
+            onWalletClick={(name) => handleWalletConnection(name)}
           />
           {checkout.passport && (
-          <WalletItem
+          <BridgeWalletItem
             key={WalletProviderName.PASSPORT}
-            wallet={{ walletProviderName: WalletProviderName.PASSPORT }}
+            walletProviderName={WalletProviderName.PASSPORT}
             onWalletClick={(name) => handleWalletConnection(name)}
           />
           )}
