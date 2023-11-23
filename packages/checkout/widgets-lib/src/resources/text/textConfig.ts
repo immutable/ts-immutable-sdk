@@ -442,6 +442,7 @@ export const text = {
         heading: 'From',
         selectDefaultText: 'Select wallet and network',
         walletSelectorHeading: 'From wallet',
+        networkSelectorHeading: 'From network',
       },
     },
   },

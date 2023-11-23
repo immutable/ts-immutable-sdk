@@ -4,11 +4,15 @@ import {
 import { text } from 'resources/text/textConfig';
 import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
 import { FormControlWrapper } from 'components/FormComponents/FormControlWrapper/FormControlWrapper';
-import { useContext, useState } from 'react';
-import { WalletProviderName, CheckoutErrorType } from '@imtbl/checkout-sdk';
+import { useCallback, useContext, useState } from 'react';
+import {
+  WalletProviderName, CheckoutErrorType, ChainName, ChainId,
+} from '@imtbl/checkout-sdk';
+import { Web3Provider } from '@ethersproject/providers';
 import { brigdeWalletWrapperStyles } from './BridgeWalletFormStyles';
 import { XBridgeContext } from '../context/XBridgeContext';
 import { BridgeWalletItem } from './BridgeWalletItem';
+import { BridgeNetworkItem } from './BridgeNetworkItem';
 
 interface BridgeWalletFormProps {
   testId: string;
@@ -20,6 +24,12 @@ export function BridgeWalletForm({
   const { heading, from } = text.views[XBridgeWidgetViews.BRIDGE_WALLET_SELECTION];
 
   const [fromWalletDrawerOpen, setFromWalletDrawerOpen] = useState(false);
+  const [fromNetworkDrawerOpen, setFromNetworkDrawerOpen] = useState(false);
+
+  const [localWeb3Provider, setLocalWeb3Provider] = useState<Web3Provider>();
+  const [fromNetwork, setFromNetwork] = useState<ChainId>();
+
+  const isFromWalletAndNetworkSelected = localWeb3Provider !== undefined && fromNetwork !== undefined;
 
   async function handleWalletConnection(walletProviderName: WalletProviderName) {
     let provider;
@@ -57,10 +67,33 @@ export function BridgeWalletForm({
     }
 
     if (connected) {
+      setLocalWeb3Provider(provider);
       setFromWalletDrawerOpen(false);
-      // should then check / open from network drawer
+      setTimeout(() => setFromNetworkDrawerOpen(true), 500);
     }
   }
+
+  const handleNetworkSelection = useCallback(
+    async (chainId: ChainId) => {
+      if (!localWeb3Provider) return;
+      const currentNetwork = await localWeb3Provider?.getNetwork();
+      if (currentNetwork?.chainId === chainId) {
+        setFromNetworkDrawerOpen(false);
+        setFromNetwork(chainId);
+        return;
+      }
+
+      try {
+        const switchNetwork = await checkout.switchNetwork({ provider: localWeb3Provider, chainId });
+        setLocalWeb3Provider(switchNetwork.provider);
+        setFromNetworkDrawerOpen(false);
+        setFromNetwork(switchNetwork.network.chainId);
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [localWeb3Provider],
+  );
 
   return (
     <Box sx={brigdeWalletWrapperStyles}>
@@ -72,42 +105,81 @@ export function BridgeWalletForm({
       >
         {heading}
       </Heading>
-      <Heading size="xSmall" sx={{ paddingBottom: 'base.spacing.x2' }}>{from.heading}</Heading>
 
-      {/** FROM WALLET SELECTOR */}
-      <BottomSheet
-        headerBarTitle={from.walletSelectorHeading}
-        size="full"
-        onCloseBottomSheet={() => setFromWalletDrawerOpen(false)}
-        visible={fromWalletDrawerOpen}
-      >
-        <BottomSheet.Target>
-          <FormControlWrapper
-            testId={`${testId}-from-select-form-control`}
-            textAlign="left"
-          >
-            <Select
-              defaultLabel={from.selectDefaultText}
-              size="large"
-              targetClickOveride={() => setFromWalletDrawerOpen(true)}
+      {!isFromWalletAndNetworkSelected && (
+      <>
+        {/** From Wallet Selector */}
+        <Heading testId="" size="xSmall" sx={{ paddingBottom: 'base.spacing.x2' }}>{from.heading}</Heading>
+        <BottomSheet
+          headerBarTitle={from.walletSelectorHeading}
+          size="full"
+          onCloseBottomSheet={() => setFromWalletDrawerOpen(false)}
+          visible={fromWalletDrawerOpen}
+        >
+          <BottomSheet.Target>
+            <FormControlWrapper
+              testId={`${testId}-from-select-form-control`}
+              textAlign="left"
+            >
+              <Select
+                defaultLabel={from.selectDefaultText}
+                size="large"
+                targetClickOveride={() => setFromWalletDrawerOpen(true)}
+              />
+            </FormControlWrapper>
+          </BottomSheet.Target>
+          <BottomSheet.Content>
+            <BridgeWalletItem
+              key={WalletProviderName.METAMASK}
+              walletProviderName={WalletProviderName.METAMASK}
+              onWalletClick={(name) => handleWalletConnection(name)}
             />
-          </FormControlWrapper>
-        </BottomSheet.Target>
+            {checkout.passport && (
+            <BridgeWalletItem
+              key={WalletProviderName.PASSPORT}
+              walletProviderName={WalletProviderName.PASSPORT}
+              onWalletClick={(name) => handleWalletConnection(name)}
+            />
+            )}
+          </BottomSheet.Content>
+        </BottomSheet>
+      </>
+      )}
+
+      {/**
+       * From Network Selector.
+       * This must be kept outside of the conditional
+       * render so it can close properly on network
+       * selection success.
+       */}
+      <BottomSheet
+        headerBarTitle={from.networkSelectorHeading}
+        size="full"
+        onCloseBottomSheet={() => setFromNetworkDrawerOpen(false)}
+        visible={fromNetworkDrawerOpen}
+      >
         <BottomSheet.Content>
-          <BridgeWalletItem
-            key={WalletProviderName.METAMASK}
-            walletProviderName={WalletProviderName.METAMASK}
-            onWalletClick={(name) => handleWalletConnection(name)}
+          <BridgeNetworkItem
+            key={ChainName.IMTBL_ZKEVM_TESTNET}
+            chainName={ChainName.IMTBL_ZKEVM_TESTNET}
+            onNetworkClick={handleNetworkSelection}
+            chainId={ChainId.IMTBL_ZKEVM_TESTNET}
           />
-          {checkout.passport && (
-          <BridgeWalletItem
-            key={WalletProviderName.PASSPORT}
-            walletProviderName={WalletProviderName.PASSPORT}
-            onWalletClick={(name) => handleWalletConnection(name)}
+          <BridgeNetworkItem
+            key={ChainName.SEPOLIA}
+            chainName={ChainName.SEPOLIA}
+            onNetworkClick={handleNetworkSelection}
+            chainId={ChainId.SEPOLIA}
           />
-          )}
         </BottomSheet.Content>
       </BottomSheet>
+
+      {isFromWalletAndNetworkSelected && (
+        <Box>
+          <Heading>You have chosen wisely</Heading>
+        </Box>
+      )}
+
     </Box>
   );
 }
