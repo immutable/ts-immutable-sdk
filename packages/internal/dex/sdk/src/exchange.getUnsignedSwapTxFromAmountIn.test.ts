@@ -80,6 +80,47 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   });
 
   describe('with the out-of-the-box minimal configuration', () => {
+    it('refreshes the deadline for every call', async () => {
+      const params = setupSwapTxTest();
+
+      mockRouterImplementation(params);
+
+      const secondaryFees: SecondaryFee[] = [
+        { recipient: TEST_FEE_RECIPIENT, basisPoints: 100 }, // 1% Fee
+      ];
+
+      const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
+
+      const firstResponse = await exchange.getUnsignedSwapTxFromAmountIn(
+        params.fromAddress,
+        params.inputToken,
+        params.outputToken,
+        newAmountFromString('100', USDC_TEST_TOKEN).value,
+      );
+
+      expectToBeDefined(firstResponse.swap.transaction.data);
+      const { deadline: firstDeadline } = decodeMulticallExactInputSingleWithFees(firstResponse.swap.transaction.data);
+
+      // wait one second to ensure the deadline is different
+      await new Promise((resolve) => {
+        setTimeout(resolve, 1000);
+      });
+
+      const secondResponse = await exchange.getUnsignedSwapTxFromAmountIn(
+        params.fromAddress,
+        params.inputToken,
+        params.outputToken,
+        newAmountFromString('100', USDC_TEST_TOKEN).value,
+      );
+
+      expectToBeDefined(secondResponse.swap.transaction.data);
+      const { deadline: secondDeadline } = decodeMulticallExactInputSingleWithFees(
+        secondResponse.swap.transaction.data,
+      );
+
+      expect(secondDeadline.toBigInt()).toBeGreaterThan(firstDeadline.toBigInt());
+    });
+
     it('uses the native IMX as the gas token', async () => {
       const tokenIn = { ...USDC_TEST_TOKEN, chainId: IMMUTABLE_TESTNET_CHAIN_ID };
       const tokenOut = { ...WETH_TEST_TOKEN, chainId: IMMUTABLE_TESTNET_CHAIN_ID };

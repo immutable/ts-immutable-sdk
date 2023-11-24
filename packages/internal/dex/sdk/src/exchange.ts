@@ -11,7 +11,7 @@ import { NativeTokenService } from 'lib/nativeTokenService';
 import { DEFAULT_MAX_HOPS, DEFAULT_SLIPPAGE, MAX_MAX_HOPS, MIN_MAX_HOPS } from './constants';
 import { Router } from './lib/router';
 import {
-  getDefaultDeadline,
+  getDefaultDeadlineSeconds,
   getTokenDecimals,
   isValidNonZeroAddress,
   isValidTokenLiteral,
@@ -236,7 +236,7 @@ export class Exchange {
     amountIn: ethers.BigNumberish,
     slippagePercent: number = DEFAULT_SLIPPAGE,
     maxHops: number = DEFAULT_MAX_HOPS,
-    deadline: number = getDefaultDeadline(),
+    deadline: number = getDefaultDeadlineSeconds(),
   ): Promise<TransactionResponse> {
     return await this.getUnsignedSwapTx(
       fromAddress,
@@ -270,7 +270,7 @@ export class Exchange {
     amountOut: ethers.BigNumberish,
     slippagePercent: number = DEFAULT_SLIPPAGE,
     maxHops: number = DEFAULT_MAX_HOPS,
-    deadline: number = getDefaultDeadline(),
+    deadline: number = getDefaultDeadlineSeconds(),
   ): Promise<TransactionResponse> {
     return await this.getUnsignedSwapTx(
       fromAddress,

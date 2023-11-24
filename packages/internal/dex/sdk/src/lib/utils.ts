@@ -180,4 +180,4 @@ export const toPublicAmount = (amount: CoinAmount<Coin>): Amount => ({
   value: amount.value,
 });
 
-export const getDefaultDeadline = (): number => Math.floor(Date.now() / 1000) + DEFAULT_DEADLINE_SECONDS;
+export const getDefaultDeadlineSeconds = (): number => Math.floor(Date.now() / 1000) + DEFAULT_DEADLINE_SECONDS;
