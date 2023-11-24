@@ -131,7 +131,6 @@ export function BridgeWalletForm() {
   );
 
   const [walletItemLoading, setWalletItemLoading] = useState(false);
-
   return (
     <Box testId={testId} sx={brigdeWalletWrapperStyles}>
       <Heading
