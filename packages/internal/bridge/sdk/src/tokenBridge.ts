@@ -2,9 +2,6 @@ import { L2_STATE_SENDER_ADDRESS, NATIVE_TOKEN_BRIDGE_KEY } from 'constants/brid
 import { BridgeConfiguration } from 'config';
 import { ethers } from 'ethers';
 import {
-  ApproveDepositBridgeRequest,
-  ApproveDepositBridgeResponse,
-  BridgeDepositResponse,
   BridgeFeeRequest,
   BridgeFeeResponse,
   BridgeWithdrawRequest,
@@ -25,6 +22,9 @@ import {
   BridgeTxRequest,
   BridgeFeeMethods,
   bridgeMethods,
+  ApproveBridgeRequest,
+  ApproveBridgeResponse,
+  BridgeTxResponse,
 } from 'types';
 import { ROOT_ERC20_BRIDGE_FLOW_RATE } from 'contracts/ABIs/RootERC20BridgeFlowRate';
 import { ERC20 } from 'contracts/ABIs/ERC20';
@@ -168,13 +168,13 @@ export class TokenBridge {
    *   });
    */
   public async getUnsignedApproveBridgeTx(
-    req: ApproveDepositBridgeRequest,
-  ): Promise<ApproveDepositBridgeResponse> {
+    req: ApproveBridgeRequest,
+  ): Promise<ApproveBridgeResponse> {
     this.validateChainConfiguration();
 
     await this.validateDepositArgs(
-      req.depositorAddress,
-      req.depositAmount,
+      req.senderAddress,
+      req.amount,
       req.token,
       req.sourceChainId,
       req.destinationChainId,
@@ -195,18 +195,18 @@ export class TokenBridge {
     // Get the current approved allowance of the RootERC20Predicate
     const rootERC20PredicateAllowance: ethers.BigNumber = await withBridgeError<ethers.BigNumber>(() => erc20Contract
       .allowance(
-        req.depositorAddress,
+        req.senderAddress,
         this.config.bridgeContracts.rootERC20BridgeFlowRate,
       ), BridgeErrorType.PROVIDER_ERROR);
 
     // If the allowance is greater than or equal to the deposit amount, no approval is required
-    if (rootERC20PredicateAllowance.gte(req.depositAmount)) {
+    if (rootERC20PredicateAllowance.gte(req.amount)) {
       return {
         unsignedTx: null,
       };
     }
     // Calculate the amount of tokens that need to be approved for deposit
-    const approvalAmountRequired = req.depositAmount.sub(
+    const approvalAmountRequired = req.amount.sub(
       rootERC20PredicateAllowance,
     );
 
@@ -222,7 +222,7 @@ export class TokenBridge {
       data,
       to: req.token,
       value: 0,
-      from: req.depositorAddress,
+      from: req.senderAddress,
     };
 
     return {
@@ -272,7 +272,7 @@ export class TokenBridge {
    */
   public async getUnsignedBridgeTx(
     req: BridgeTxRequest,
-  ): Promise<BridgeDepositResponse> {
+  ): Promise<BridgeTxResponse> {
     this.validateChainConfiguration();
 
     // @TODO check source & destination to determin which contract and methods to use

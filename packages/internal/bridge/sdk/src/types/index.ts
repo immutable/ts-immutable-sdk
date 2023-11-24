@@ -153,37 +153,39 @@ export interface BridgeFeeResponse {
 }
 
 /**
- * @typedef {Object} ApproveDepositBridgeRequest
- * @property {string} depositorAddress - The address of the depositor.
+ * @typedef {Object} ApproveBridgeRequest
+ * @property {string} senderAddress - The address of the depositor.
  * @property {FungibleToken} token - The token to be approved.
- * @property {ethers.BigNumber} depositAmount - The amount to be approved for deposit.
+ * @property {ethers.BigNumber} amount - The amount to be approved for deposit.
  * @property {string} sourceChainId - The chain ID of the source chain.
  * @property {string} destinationChainId - The chain ID of the destination chain.
  */
-export interface ApproveDepositBridgeRequest {
-  depositorAddress: Address;
+export interface ApproveBridgeRequest {
+  senderAddress: Address;
   token: FungibleToken;
-  depositAmount: ethers.BigNumber;
+  amount: ethers.BigNumber;
   sourceChainId: string;
   destinationChainId: string;
 }
 
 /**
- * @typedef {Object} ApproveDepositBridgeResponse
+ * @typedef {Object} ApproveBridgeResponse
  * @property {ethers.providers.TransactionRequest | null} unsignedTx - The unsigned transaction for the token approval,
  * or null if no approval is required.
  */
-export interface ApproveDepositBridgeResponse {
+export interface ApproveBridgeResponse {
   unsignedTx: ethers.providers.TransactionRequest | null;
 }
 
 /**
- * @typedef {Object} BridgeDepositRequest
- * @property {Address} depositorAddress - The address of the depositor.
+ * @typedef {Object} BridgeTxRequest
+ * @property {Address} senderAddress - The address of the depositor.
  * @property {Address} recipientAddress - The address of the recipient.
  * @property {FungibleToken} token - The token to be deposited.
- * @property {ethers.BigNumber} depositAmount - The amount to be deposited.
- */
+ * @property {ethers.BigNumber} amount - The amount to be deposited.
+ * @property {string} sourceChainId - The chain ID of the source chain.
+ * @property {string} destinationChainId - The chain ID of the destination chain.
+*/
 export interface BridgeTxRequest {
   senderAddress: Address;
   recipientAddress: Address;
@@ -194,10 +196,10 @@ export interface BridgeTxRequest {
 }
 
 /**
- * @typedef {Object} BridgeDepositResponse
+ * @typedef {Object} BridgeTxResponse
  * @property {ethers.providers.TransactionRequest} unsignedTx - The unsigned transaction for the deposit.
  */
-export interface BridgeDepositResponse {
+export interface BridgeTxResponse {
   unsignedTx: ethers.providers.TransactionRequest;
 }
 

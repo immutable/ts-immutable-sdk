@@ -46,11 +46,11 @@ describe('config', () => {
       bridgeInstance: { rootChainID: 'eip155:789', childChainID: 'eip155:987' },
       overrides: {
         bridgeContracts: {
-          rootChainERC20Predicate: '0x',
+          rootERC20BridgeFlowRate: '0x',
           rootChainStateSender: '0x',
           rootChainCheckpointManager: '0x',
           rootChainExitHelper: '0x',
-          childChainERC20Predicate: '0x',
+          childERC20Bridge: '0x',
           childChainStateReceiver: '0x',
         },
       },
