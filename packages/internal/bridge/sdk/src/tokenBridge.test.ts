@@ -2,7 +2,7 @@ import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { TokenBridge } from 'tokenBridge';
 import { BridgeConfiguration } from 'config';
 import { ETH_SEPOLIA_TO_ZKEVM_DEVNET } from 'constants/bridges';
-import { BridgeTxRequest, BridgeTxResponse } from 'types';
+import { BridgeFeeMethods, BridgeTxRequest, BridgeTxResponse } from 'types';
 import { ethers } from 'ethers';
 import { BridgeError, BridgeErrorType } from 'errors';
 
@@ -25,7 +25,7 @@ describe('Token Bridge', () => {
     expect(bridge).toBeDefined();
   });
 
-  describe('getUnsignedApproveRootBridgeTx', () => {
+  describe('getFee', () => {
     let tokenBridge: TokenBridge;
     const mockERC20Contract = {
       allowance: jest.fn(),
@@ -52,7 +52,46 @@ describe('Token Bridge', () => {
     afterEach(() => {
       jest.clearAllMocks();
     });
-    it('returns the unsigned approval transaction when the allowance is less than the deposit amount', async () => {
+    it('returns the deposit fees', async () => {
+      expect.assertions(1);
+      const result = await tokenBridge.getFee(
+        {
+          method: BridgeFeeMethods.DEPOSIT,
+        },
+      );
+      console.log(result);
+      expect(result).toBeNull();
+    });
+  });
+
+  describe('getUnsignedApproveBridgeTx', () => {
+    let tokenBridge: TokenBridge;
+    const mockERC20Contract = {
+      allowance: jest.fn(),
+      interface: {
+        encodeFunctionData: jest.fn(),
+      },
+    };
+
+    beforeEach(() => {
+      const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
+      const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
+      const bridgeConfig = new BridgeConfiguration({
+        baseConfig: new ImmutableConfiguration({
+          environment: Environment.SANDBOX,
+        }),
+        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+        rootProvider: voidRootProvider,
+        childProvider: voidChildProvider,
+      });
+      jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20Contract as any);
+      tokenBridge = new TokenBridge(bridgeConfig);
+    });
+
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+    it('returns the unsigned approval transaction when allowance is less than deposit amount', async () => {
       expect.assertions(5);
       const allowance = ethers.utils.parseUnits('50', 18);
       const amount = ethers.utils.parseUnits('100', 18);
@@ -246,7 +285,7 @@ describe('Token Bridge', () => {
     });
   });
 
-  describe('getUnsignedDepositTokenTx', () => {
+  describe('getUnsignedBridgeTx', () => {
     const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
     const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
 
@@ -263,6 +302,23 @@ describe('Token Bridge', () => {
       });
       tokenBridge = new TokenBridge(bridgeConfig);
     });
+
+    // it('ERC20 token with valid arguments is successful', async () => {
+    //   expect.assertions(4);
+
+    //   const req = {
+    //     method: BridgeFeeMethods.DEPOSIT,
+    //   };
+
+    //   const response = await tokenBridge.getFee(req);
+
+    //   console.log(response);
+
+    //   expect(response.sourceChainFee).toBe(0);
+    //   expect(response.destinationChainFee).toBe(0);
+    //   expect(response.bridgeFee).toBe(0);
+    //   expect(response.networkFee).toBe(0);
+    // });
 
     it('ERC20 token with valid arguments is successful', async () => {
       expect.assertions(3);
@@ -491,4 +547,24 @@ describe('Token Bridge', () => {
       );
     });
   });
+
+  // describe('getFee', () => {
+  //   const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
+  //   const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
+
+  //   let tokenBridge: TokenBridge;
+  //   let bridgeConfig: BridgeConfiguration;
+  //   beforeEach(() => {
+  //     bridgeConfig = new BridgeConfiguration({
+  //       baseConfig: new ImmutableConfiguration({
+  //         environment: Environment.SANDBOX,
+  //       }),
+  //       bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+  //       rootProvider: voidRootProvider,
+  //       childProvider: voidChildProvider,
+  //     });
+  //     tokenBridge = new TokenBridge(bridgeConfig);
+  //   });
+
+  // });
 });

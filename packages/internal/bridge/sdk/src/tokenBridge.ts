@@ -1,3 +1,6 @@
+import {
+  AxelarQueryAPI, AxelarQueryAPIFeeResponse, CHAINS, Environment,
+} from '@axelar-network/axelarjs-sdk';
 import { L2_STATE_SENDER_ADDRESS, NATIVE_TOKEN_BRIDGE_KEY } from 'constants/bridges';
 import { BridgeConfiguration } from 'config';
 import { ethers } from 'ethers';
@@ -101,17 +104,29 @@ export class TokenBridge {
         BridgeMethodsGasLimit.FINALISE_WITHDRAWAL,
       );
     } else {
+      let sourceProvider:ethers.providers.Provider;
+      let destinationProvider:ethers.providers.Provider;
+
+      if (req.method === BridgeFeeMethods.WITHDRAW) {
+        sourceProvider = this.config.childProvider;
+        destinationProvider = this.config.rootProvider;
+      } else {
+        sourceProvider = this.config.rootProvider;
+        destinationProvider = this.config.childProvider;
+      }
+
       sourceChainFee = await TokenBridge.getGasEstimates(
-        this.config.rootProvider,
+        sourceProvider,
         BridgeMethodsGasLimit[`${req.method}_SOURCE`],
       );
       destinationChainFee = await TokenBridge.getGasEstimates(
-        this.config.rootProvider,
+        destinationProvider,
         BridgeMethodsGasLimit[`${req.method}_DESTINATION`],
       );
     }
 
     // @TODO fetch axelar fee
+    // this.calculateBridgeFee();
 
     return {
       sourceChainFee,
@@ -273,6 +288,7 @@ export class TokenBridge {
   public async getUnsignedBridgeTx(
     req: BridgeTxRequest,
   ): Promise<BridgeTxResponse> {
+    // console.log('getUnsignedBridgeTx');
     this.validateChainConfiguration();
 
     // @TODO check source & destination to determin which contract and methods to use
@@ -1031,10 +1047,18 @@ export class TokenBridge {
   private async validateChainConfiguration(): Promise<void> {
     const errMessage = 'Please upgrade to the latest version of the Bridge SDK or provide valid configuration';
 
+    // console.log('validateChainConfiguration this.config', this.config);
+
+    // const network = await this.config.rootProvider.getNetwork();
+    // console.log('validateChainConfiguration network', network);
+
     const rootNetwork = await withBridgeError<ethers.providers.Network>(
       async () => this.config.rootProvider.getNetwork(),
       BridgeErrorType.PROVIDER_ERROR,
     );
+
+    // console.log('after rootNetwork');
+
     if (rootNetwork.chainId.toString() !== this.config.bridgeInstance.rootChainID.toString()) {
       throw new BridgeError(
         `Rootchain provider chainID ${rootNetwork.chainId} does not match expected chainID ${this.config.bridgeInstance.rootChainID}. ${errMessage}`,
@@ -1043,11 +1067,40 @@ export class TokenBridge {
     }
 
     const childNetwork = await this.config.childProvider.getNetwork();
+
+    // console.log('after childNetwork');
+
     if (childNetwork.chainId.toString() !== this.config.bridgeInstance.childChainID.toString()) {
       throw new BridgeError(
         `Childchain provider chainID ${childNetwork.chainId} does not match expected chainID ${this.config.bridgeInstance.childChainID}. ${errMessage}`,
         BridgeErrorType.UNSUPPORTED_ERROR,
       );
     }
+  }
+
+  /**
+ * Calculate the gas amount for a transaction using axelarjs-sdk.
+ * @param {*} source - The source chain object.
+ * @param {*} destination - The destination chain object.
+ * @param {*} options - The options to pass to the estimateGasFee function.
+ *                      Available options are gas token symbol, gasLimit and gasMultiplier.
+ * @returns {number} - The gas amount.
+ */
+  // eslint-disable-next-line class-methods-use-this
+  private async calculateBridgeFee(
+    source:string,
+    destination:string,
+    options = {},
+  ): Promise<string | AxelarQueryAPIFeeResponse> {
+    const api = new AxelarQueryAPI({ environment: Environment.TESTNET });
+    const { gasLimit, gasMultiplier, symbol } = options;
+
+    return api.estimateGasFee(
+      CHAINS.TESTNET[source.toUpperCase()],
+      CHAINS.TESTNET[destination.toUpperCase()],
+      symbol || source.tokenSymbol,
+      gasLimit,
+      gasMultiplier,
+    );
   }
 }
