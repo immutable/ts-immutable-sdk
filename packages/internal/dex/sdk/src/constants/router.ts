@@ -1,7 +1,7 @@
 // 0.1% default slippage
 export const DEFAULT_SLIPPAGE = 0.1;
 
-// 15 minutes from the current Unix time
+// 15 minutes from the time the transaction was prepared
 export const DEFAULT_DEADLINE_SECONDS: number = 60 * 15;
 
 // most swaps will be able to resolve with 2 hops
