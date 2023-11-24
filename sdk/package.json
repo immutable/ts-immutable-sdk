@@ -103,9 +103,9 @@
       "types": "./dist/provider.d.ts",
       "import": "./dist/provider.js"
     },
-    "./checkout_sdk": {
-      "types": "./dist/checkout_sdk.d.ts",
-      "import": "./dist/checkout_sdk.js"
+    "./checkout": {
+      "types": "./dist/checkout.d.ts",
+      "import": "./dist/checkout.js"
     }
   },
   "files": [

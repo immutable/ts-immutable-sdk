@@ -13,7 +13,7 @@ import {
   tokenValueFormat,
 } from './utils';
 import {
-  DEFAULT_GT_ONE_TOKEN_FORMATTING_DECIMALS, DEFAULT_TOKEN_FORMATTING_DECIMALS, IMX_ADDRESS_ZKEVM, NATIVE,
+  DEFAULT_GT_ONE_TOKEN_FORMATTING_DECIMALS, DEFAULT_TOKEN_FORMATTING_DECIMALS, NATIVE,
 } from './constants';
 
 const checkout = new Checkout({
@@ -449,48 +449,16 @@ describe('utils', () => {
       expect(isNativeToken('')).toBeTruthy();
     });
 
-    it('should return true if address is NATIVE', () => {
+    it('should return true if address is `native`', () => {
       expect(isNativeToken(NATIVE)).toBeTruthy();
+    });
+
+    it('should return true if address is `NATIVE`', () => {
+      expect(isNativeToken('NATIVE')).toBeTruthy();
     });
 
     it('should return false if address is not NATIVE', () => {
       expect(isNativeToken('0x123')).toBeFalsy();
-    });
-
-    it('should return true if address is IMX and chainId is zkEVM devnet', () => {
-      expect(isNativeToken(IMX_ADDRESS_ZKEVM, ChainId.IMTBL_ZKEVM_DEVNET)).toBeTruthy();
-    });
-
-    it('should return true if address is IMX and chainId is zkEVM testnet', () => {
-      expect(isNativeToken(IMX_ADDRESS_ZKEVM, ChainId.IMTBL_ZKEVM_TESTNET)).toBeTruthy();
-    });
-
-    it('should return true if address is IMX and chainId is zkEVM mainnet', () => {
-      expect(isNativeToken(IMX_ADDRESS_ZKEVM, ChainId.IMTBL_ZKEVM_MAINNET)).toBeTruthy();
-    });
-
-    it('should return false if address is not IMX and chainId is zkEVM', () => {
-      expect(isNativeToken('0x123', ChainId.IMTBL_ZKEVM_TESTNET)).toBeFalsy();
-    });
-
-    it('should return false if address is empty and chainId is zkEVM', () => {
-      expect(isNativeToken('', ChainId.IMTBL_ZKEVM_TESTNET)).toBeFalsy();
-    });
-
-    it('should return false if address is NATIVE and chainId is zkEVM', () => {
-      expect(isNativeToken(NATIVE, ChainId.IMTBL_ZKEVM_TESTNET)).toBeFalsy();
-    });
-
-    it('should return false if address is IMX and chainId is not zkEVM', () => {
-      expect(isNativeToken(IMX_ADDRESS_ZKEVM, ChainId.SEPOLIA)).toBeFalsy();
-    });
-
-    it('should return true if address is empty and chainId is not zkEVM', () => {
-      expect(isNativeToken('', ChainId.SEPOLIA)).toBeTruthy();
-    });
-
-    it('should return true if address is NATIVE and chainId is not zkEVM', () => {
-      expect(isNativeToken(NATIVE, ChainId.SEPOLIA)).toBeTruthy();
     });
   });
 

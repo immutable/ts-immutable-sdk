@@ -7,7 +7,7 @@ import { Fees } from 'lib/fees';
 import { isNative, toCurrencyAmount, toPublicAmount } from 'lib/utils';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
 import { NativeTokenService, canUnwrapToken } from 'lib/nativeTokenService';
-import { Coin, CoinAmount } from 'types';
+import { Coin, CoinAmount, Native } from 'types';
 import { Interface } from 'ethers/lib/utils';
 import { SecondaryFee, TransactionDetails } from '../../types';
 import { calculateGasFee } from './gas';
@@ -422,6 +422,21 @@ function createSwapParameters(
 const getTransactionValue = (tokenIn: Coin, maximumAmountIn: string) =>
   tokenIn.type === 'native' ? maximumAmountIn : zeroNativeCurrencyValue;
 
+const getSwapRecipient = (
+  tokenOut: Coin,
+  fromAddress: string,
+  routerContractAddress: string,
+  secondaryFeesContractAddress: string,
+  secondaryFees: SecondaryFee[],
+) => {
+  // Not native so send the tokens directly back to the caller.
+  if (!isNative(tokenOut)) return fromAddress;
+  // Native but no fees, send to the Uniswap Router
+  if (secondaryFees.length === 0) return routerContractAddress;
+  // Native and fees, send to the secondary fee contract
+  return secondaryFeesContractAddress;
+};
+
 export function getSwap(
   tokenIn: Coin,
   tokenOut: Coin,
@@ -431,10 +446,16 @@ export function getSwap(
   deadline: number,
   routerContractAddress: string,
   secondaryFeesContractAddress: string,
-  gasPrice: CoinAmount<Coin> | null,
+  gasPrice: CoinAmount<Native> | null,
   secondaryFees: SecondaryFee[],
 ): TransactionDetails {
-  const swapRecipient = isNative(tokenOut) ? routerContractAddress : fromAddress;
+  const swapRecipient = getSwapRecipient(
+    tokenOut,
+    fromAddress,
+    routerContractAddress,
+    secondaryFeesContractAddress,
+    secondaryFees,
+  );
 
   const { calldata, maximumAmountIn } = createSwapParameters(
     tokenIn,

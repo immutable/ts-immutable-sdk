@@ -32,6 +32,8 @@ const PASSPORT_FUNCTIONS = {
   logout: 'logout',
   getEmail: 'getEmail',
   imx: {
+    isRegisteredOffchain: 'isRegisteredOffchain',
+    registerOffchain: 'registerOffchain',
     transfer: 'imxTransfer',
     batchNftTransfer: 'imxBatchNftTransfer',
   },
@@ -272,6 +274,30 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
           requestId,
           success: true,
           result: userProfile?.email,
+        });
+        break;
+      }
+      case PASSPORT_FUNCTIONS.imx.isRegisteredOffchain: {
+        console.log('PASSPORT_FUNCTIONS.imx.isRegisteredOffchain');
+        const registered = await providerInstance?.isRegisteredOffchain();
+        callbackToGame({
+          responseFor: fxName,
+          requestId,
+          success: true,
+          result: registered,
+        });
+        break;
+      }
+      case PASSPORT_FUNCTIONS.imx.registerOffchain: {
+        console.log('PASSPORT_FUNCTIONS.imx.registerOffchain');
+        const response = await providerInstance?.registerOffchain();
+        callbackToGame({
+          ...{
+            responseFor: fxName,
+            requestId,
+            success: response !== null && response !== undefined,
+          },
+          ...response,
         });
         break;
       }

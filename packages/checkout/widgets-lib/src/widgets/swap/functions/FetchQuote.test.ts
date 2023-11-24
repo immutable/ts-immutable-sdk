@@ -25,94 +25,115 @@ const overrides: any = {
 
 describe('QuotesProcessor', () => {
   describe('processQuotes', () => {
-    it('should call the unsigned swap transaction from amount in and get the quote', async () => {
-      const getUnsignedSwapTxFromAmountIn = jest.fn();
+    describe('fromAmountIn', () => {
+      let exchange: Exchange;
+      let getUnsignedSwapTxFromAmountIn: jest.Mock;
+      let provider: Web3Provider;
+      let toToken: TokenInfo;
+      let fromToken: TokenInfo;
+      let fromAmount: string;
 
-      const exchange = new Exchange({
-        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-        baseConfig: new ImmutableConfiguration({ environment: Environment.SANDBOX }),
-        overrides,
+      beforeEach(() => {
+        getUnsignedSwapTxFromAmountIn = jest.fn();
+
+        exchange = new Exchange({
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+          baseConfig: new ImmutableConfiguration({ environment: Environment.SANDBOX }),
+          overrides,
+        });
+
+        exchange.getUnsignedSwapTxFromAmountIn = getUnsignedSwapTxFromAmountIn;
+
+        provider = {
+          getSigner: () => ({
+            getAddress: async () => Promise.resolve('0x123'),
+          }),
+          provider: {
+            request: async () => null,
+          },
+        } as unknown as Web3Provider;
+
+        fromAmount = '100';
       });
 
-      exchange.getUnsignedSwapTxFromAmountIn = getUnsignedSwapTxFromAmountIn;
+      it('should call the unsigned swap transaction from amount in and get the quote', async () => {
+        fromToken = {
+          address: '0x124',
+          decimals: 18,
+          symbol: 'IMX',
+          name: 'Immutable X',
+        };
 
-      const provider = {
-        getSigner: () => ({
-          getAddress: async () => Promise.resolve('0x123'),
-        }),
-        provider: {
-          request: async () => null,
-        },
-      } as unknown as Web3Provider;
+        toToken = {
+          address: '0x125',
+          decimals: 20,
+          symbol: 'ETH',
+          name: 'Immutable X',
+        };
+        await quotesProcessor.fromAmountIn(exchange, provider, fromToken, fromAmount, toToken);
 
-      const fromToken: TokenInfo = {
-        address: '0x124',
-        decimals: 18,
-        symbol: 'IMX',
-        name: 'Immutable X',
-      };
-
-      const fromAmount = '100';
-      const toToken: TokenInfo = {
-        address: '0x125',
-        decimals: 20,
-        symbol: 'ETH',
-        name: 'Immutable X',
-      };
-
-      await quotesProcessor.fromAmountIn(exchange, provider, fromToken, fromAmount, toToken);
-
-      expect(getUnsignedSwapTxFromAmountIn).toHaveBeenCalledWith(
-        '0x123',
-        '0x124',
-        '0x125',
-        BigNumber.from(utils.parseUnits(fromAmount, fromToken.decimals)),
-      );
+        expect(getUnsignedSwapTxFromAmountIn).toHaveBeenCalledWith(
+          '0x123',
+          '0x124',
+          '0x125',
+          BigNumber.from(utils.parseUnits(fromAmount, fromToken.decimals)),
+        );
+      });
     });
 
-    it('should call the unsigned swap transaction from amount out and get the quote', async () => {
-      const getUnsignedSwapTxFromAmountOut = jest.fn();
+    describe('fromAmountOut', () => {
+      let exchange: Exchange;
+      let getUnsignedSwapTxFromAmountOut: jest.Mock;
+      let provider: Web3Provider;
+      let toToken: TokenInfo;
+      let fromToken: TokenInfo;
+      let toAmount: string;
 
-      const exchange = new Exchange({
-        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-        baseConfig: new ImmutableConfiguration({ environment: Environment.SANDBOX }),
-        overrides,
+      beforeEach(() => {
+        getUnsignedSwapTxFromAmountOut = jest.fn();
+        exchange = new Exchange({
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+          baseConfig: new ImmutableConfiguration({ environment: Environment.SANDBOX }),
+          overrides,
+        });
+        exchange.getUnsignedSwapTxFromAmountOut = getUnsignedSwapTxFromAmountOut;
+
+        provider = {
+          getSigner: () => ({
+            getAddress: async () => Promise.resolve('0x123'),
+          }),
+          provider: {
+            request: async () => null,
+          },
+        } as unknown as Web3Provider;
+
+        toAmount = '100';
       });
 
-      exchange.getUnsignedSwapTxFromAmountOut = getUnsignedSwapTxFromAmountOut;
+      it('should call the unsigned swap transaction from amount out and get the quote', async () => {
+        toToken = {
+          address: '0x125',
+          decimals: 20,
+          symbol: 'ETH',
+          name: 'Immutable X',
+        };
 
-      const provider = {
-        getSigner: () => ({
-          getAddress: async () => Promise.resolve('0x123'),
-        }),
-        provider: {
-          request: async () => null,
-        },
-      } as unknown as Web3Provider;
+        fromToken = {
+          address: '0x124',
+          decimals: 18,
+          symbol: 'IMX',
+          name: 'Immutable X',
+        };
 
-      const toAmount = '100';
-      const toToken: TokenInfo = {
-        address: '0x125',
-        decimals: 20,
-        symbol: 'ETH',
-        name: 'Immutable X',
-      };
+        await quotesProcessor.fromAmountOut(exchange, provider, toToken, toAmount, fromToken);
 
-      const fromToken: TokenInfo = {
-        address: '0x124',
-        decimals: 18,
-        symbol: 'IMX',
-        name: 'Immutable X',
-      };
-
-      await quotesProcessor.fromAmountOut(exchange, provider, toToken, toAmount, fromToken);
-
-      expect(getUnsignedSwapTxFromAmountOut).toHaveBeenCalledWith(
-        '0x123',
-        '0x124',
-        '0x125',
-        BigNumber.from(utils.parseUnits(toAmount, toToken.decimals)),
-      );
+        expect(getUnsignedSwapTxFromAmountOut).toHaveBeenCalledWith(
+          '0x123',
+          '0x124',
+          '0x125',
+          BigNumber.from(utils.parseUnits(toAmount, toToken.decimals)),
+        );
+      });
     });
   });
 });

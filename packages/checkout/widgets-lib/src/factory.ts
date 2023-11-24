@@ -13,6 +13,7 @@ import { OnRamp } from 'widgets/on-ramp/OnRampWidgetRoot';
 import { Wallet } from 'widgets/wallet/WalletWidgetRoot';
 import { Sale } from 'widgets/sale/SaleWidgetRoot';
 import { Web3Provider } from '@ethersproject/providers';
+import { XBridge } from 'widgets/x-bridge/XBridgeWidgetRoot';
 import {
   sendProviderUpdatedEvent,
   addProviderListenersForWidgetRoot,
@@ -22,6 +23,8 @@ export class WidgetsFactory implements IWidgetsFactory {
   private sdk: Checkout;
 
   private widgetConfig: WidgetConfiguration;
+
+  private useCrossWalletBridgeComponent: boolean = process.env.CHECKOUT_X_WALLET_BRIDGE === 'true';
 
   constructor(sdk: Checkout, widgetConfig: WidgetConfiguration) {
     this.sdk = sdk;
@@ -44,6 +47,12 @@ export class WidgetsFactory implements IWidgetsFactory {
         }) as Widget<WidgetType.CONNECT> as Widget<T>;
       }
       case WidgetType.BRIDGE: {
+        if (this.useCrossWalletBridgeComponent) {
+          return new XBridge(this.sdk, {
+            config: { ...this.widgetConfig, ...(config) },
+            provider,
+          }) as Widget<WidgetType.BRIDGE> as Widget<T>;
+        }
         return new Bridge(this.sdk, {
           config: { ...this.widgetConfig, ...(config) },
           provider,

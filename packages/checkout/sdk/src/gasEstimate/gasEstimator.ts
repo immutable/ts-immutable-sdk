@@ -122,28 +122,23 @@ async function swapGasEstimator(
       BigNumber.from(utils.parseUnits('1', DEFAULT_TOKEN_DECIMALS)),
     );
 
-    if (swap.gasFeeEstimate === null) {
+    if (!swap.gasFeeEstimate) {
       return {
         gasEstimateType: GasEstimateType.SWAP,
         gasFee: {},
       };
     }
 
-    let estimatedAmount;
-    if (swap.gasFeeEstimate.value) {
-      estimatedAmount = BigNumber.from(swap.gasFeeEstimate.value);
-    }
-
     return {
       gasEstimateType: GasEstimateType.SWAP,
       gasFee: {
-        estimatedAmount,
+        estimatedAmount: swap.gasFeeEstimate.value ? BigNumber.from(swap.gasFeeEstimate.value) : undefined,
         token: {
-          address: swap.gasFeeEstimate?.token.address,
-          symbol: swap.gasFeeEstimate?.token.symbol ?? '',
-          name: swap.gasFeeEstimate?.token.name ?? '',
+          address: swap.gasFeeEstimate.token.address,
+          symbol: swap.gasFeeEstimate.token.symbol ?? '',
+          name: swap.gasFeeEstimate.token.name ?? '',
           decimals:
-            swap.gasFeeEstimate?.token.decimals ?? DEFAULT_TOKEN_DECIMALS,
+            swap.gasFeeEstimate.token.decimals ?? DEFAULT_TOKEN_DECIMALS,
         },
       },
     };

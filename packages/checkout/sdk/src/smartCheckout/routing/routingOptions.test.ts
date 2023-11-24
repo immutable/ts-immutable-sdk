@@ -3,7 +3,7 @@ import { Environment } from '@imtbl/config';
 import { getAvailableRoutingOptions } from './routingOptions';
 import { CheckoutConfiguration } from '../../config';
 import * as geoBlocking from './geoBlocking';
-import { DEFAULT_BRIDGE_ENABLED, DEFAULT_ON_RAMP_ENABLED, DEFAULT_SWAP_ENABLED } from '../../types';
+import { DEFAULT_BRIDGE_ENABLED, DEFAULT_ON_RAMP_ENABLED, DEFAULT_SWAP_ENABLED } from '../../env';
 
 jest.mock('./geoBlocking');
 
@@ -42,9 +42,9 @@ describe('getAvailableRoutingOptions', () => {
   it('should return configured routing availability overrides if provided', async () => {
     const configWithOptions = new CheckoutConfiguration({
       baseConfig: { environment: Environment.SANDBOX },
-      isBridgeEnabled: false,
-      isOnRampEnabled: false,
-      isSwapEnabled: false,
+      bridge: { enable: false },
+      onRamp: { enable: false },
+      swap: { enable: false },
     });
 
     const routingOptions = await getAvailableRoutingOptions(configWithOptions, mockProvider);

@@ -16,6 +16,7 @@ import {
   CoinAmount,
   ERC20,
   ExchangeModuleConfiguration,
+  Native,
   Quote,
   SecondaryFee,
   TransactionResponse,
@@ -45,7 +46,7 @@ export class Exchange {
 
   private chainId: number;
 
-  private nativeToken: Coin;
+  private nativeToken: Native;
 
   private wrappedNativeToken: ERC20;
 

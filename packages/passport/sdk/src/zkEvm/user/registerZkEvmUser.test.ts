@@ -1,7 +1,7 @@
 import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { signRaw } from '@imtbl/toolkit';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
-import { ChainName } from 'network/chains';
+import { ChainId, ChainName } from 'network/chains';
 import { registerZkEvmUser } from './registerZkEvmUser';
 import AuthManager from '../../authManager';
 import { mockUser, mockUserZkEvm } from '../../test/mocks';
@@ -26,7 +26,7 @@ describe('registerZkEvmUser', () => {
   };
   const jsonRPCProvider = {
     ready: {
-      chainId: 13472,
+      chainId: ChainId.IMTBL_ZKEVM_TESTNET,
     },
   };
   const ethereumAddress = '0x3082e7c88f1c8b4e24be4a75dee018ad362d84d4';
