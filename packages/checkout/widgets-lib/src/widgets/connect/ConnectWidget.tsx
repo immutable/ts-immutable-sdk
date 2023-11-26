@@ -92,6 +92,7 @@ export function ConnectWidget({
   const { identify, page } = useAnalytics();
 
   useEffect(() => {
+    console.log('SDK::ConnectWidget::useEffect::web3Provider:', web3Provider);
     if (!web3Provider) return;
     connectDispatch({
       payload: {

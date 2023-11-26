@@ -2889,7 +2889,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ethersproject/providers@npm:5.7.2, @ethersproject/providers@npm:^5.0.0, @ethersproject/providers@npm:^5.7.2":
+"@ethersproject/providers@npm:5.7.2, @ethersproject/providers@npm:^5.0.0, @ethersproject/providers@npm:^5.5.0, @ethersproject/providers@npm:^5.7.2":
   version: 5.7.2
   resolution: "@ethersproject/providers@npm:5.7.2"
   dependencies:
@@ -3232,10 +3232,12 @@ __metadata:
   dependencies:
     "@biom3/design-tokens": 0.2.4-beta
     "@biom3/react": ^0.10.12
+    "@ethersproject/providers": ^5.5.0
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
     "@imtbl/passport": 0.0.0
+    "@ledgerhq/iframe-provider": "github:dreamoftrees/iframe-provider#eip-1193-support"
     "@svgr/webpack": ^8.0.1
     "@testing-library/jest-dom": ^5.16.5
     "@testing-library/react": ^13.4.0
@@ -4521,6 +4523,15 @@ __metadata:
   version: 3.4.0
   resolution: "@juggle/resize-observer@npm:3.4.0"
   checksum: 2505028c05cc2e17639fcad06218b1c4b60f932a4ebb4b41ab546ef8c157031ae377e3f560903801f6d01706dbefd4943b6c4704bf19ed86dfa1c62f1473a570
+  languageName: node
+  linkType: hard
+
+"@ledgerhq/iframe-provider@github:dreamoftrees/iframe-provider#eip-1193-support":
+  version: 0.4.2
+  resolution: "@ledgerhq/iframe-provider@https://github.com/dreamoftrees/iframe-provider.git#commit=ef5a8ad7cf23e04dfcd998527a10eee2dca40645"
+  dependencies:
+    eventemitter3: ^4.0.0
+  checksum: 601ebf8b818ad8641d1d1d6828d0d29272e105973086e701b148b28dc6d9ed04f12debb3a5062d478eed637ec13144455d339d708ac99ad7ed12792225a2405d
   languageName: node
   linkType: hard
 

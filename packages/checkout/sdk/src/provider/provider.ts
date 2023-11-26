@@ -28,6 +28,7 @@ export async function createProvider(
   walletProviderName: WalletProviderName,
   passport?: Passport,
 ): Promise<CreateProviderResult> {
+  console.log('SDK::createProvider()', walletProviderName, passport);
   let provider: Web3Provider | null = null;
   switch (walletProviderName) {
     case WalletProviderName.PASSPORT: {

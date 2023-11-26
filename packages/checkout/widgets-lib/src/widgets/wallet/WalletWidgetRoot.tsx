@@ -48,6 +48,7 @@ export class Wallet extends Base<WidgetType.WALLET> {
   }
 
   protected render() {
+    console.log('SDK::WalletWidgetRoot::render::this.web3Provider:', this.web3Provider);
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER2,
       walletProviderName: this.parameters?.walletProviderName,

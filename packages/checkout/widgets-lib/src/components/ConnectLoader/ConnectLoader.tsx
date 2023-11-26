@@ -58,7 +58,7 @@ export function ConnectLoader({
     allowedChains,
     web3Provider,
   } = params;
-
+  console.log('SDK::ConnectLoader::web3Provider', web3Provider);
   const [connectLoaderState, connectLoaderDispatch] = useReducer(
     connectLoaderReducer,
     { ...initialConnectLoaderState, checkout }, // set checkout instance here
@@ -120,6 +120,7 @@ export function ConnectLoader({
       }
 
       // todo: WT-1806 - Show a non-generic error view if the error is due to metamask not being installed
+      console.error('SDK::ConnectLoader::err', err);
       connectLoaderDispatch({
         payload: {
           type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
@@ -159,6 +160,7 @@ export function ConnectLoader({
     (async () => {
       if (!checkout) return;
 
+      console.log('SDK::ConnectLoader::useEffect::web3Provider', web3Provider);
       if (hasNoWalletProviderNameAndNoWeb3Provider(web3Provider)) return;
       if (await hasWalletProviderNameAndNoWeb3Provider(web3Provider)) return;
 
@@ -172,6 +174,7 @@ export function ConnectLoader({
         // TODO: handle all of the inner try catches with error handling
         // At this point the Web3Provider exists
         // This will bypass the wallet list screen
+        console.log('SDK::ConnectLoader::useEffect::isWalletConnected', web3Provider);
         const isConnected = (await isWalletConnected(web3Provider!));
         if (!isConnected) return;
 
@@ -184,6 +187,7 @@ export function ConnectLoader({
 
           // If unsupported network or current network is not in the allowed chains
           // then show the switch network screen
+          console.log('SDK::ConnectLoader::currentNetworkInfo', currentNetworkInfo);
           if (!currentNetworkInfo.isSupported || !allowedChains.includes(currentNetworkInfo.chainId)) {
             connectLoaderDispatch({
               payload: {
@@ -195,6 +199,7 @@ export function ConnectLoader({
             return;
           }
         } catch (err) {
+          console.error('SDK::ConnectLoader::err getNetworkInfo', err);
           return;
         }
 
@@ -203,6 +208,7 @@ export function ConnectLoader({
           // TODO: Identify user should be separated out into a use Effect with only the provider (from connect loader state) as dependency
           await identifyUser(identify, web3Provider!);
         } catch (err) {
+          console.error('SDK::ConnectLoader::err identifyUser', err);
           return;
         }
 
@@ -214,6 +220,7 @@ export function ConnectLoader({
           },
         });
       } catch (err: any) {
+        console.error('SDK::ConnectLoader::err all', err);
         connectLoaderDispatch({
           payload: {
             type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
@@ -226,6 +233,8 @@ export function ConnectLoader({
 
   return (
     <>
+      connectionStatus:
+      {connectionStatus}
       {(connectionStatus === ConnectionStatus.LOADING) && (
         <BiomeCombinedProviders theme={{ base: biomeTheme }}>
           <LoadingView loadingText="Loading" />
