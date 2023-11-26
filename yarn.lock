@@ -3814,7 +3814,7 @@ __metadata:
     typescript: ^4.9.5
     url: ^0.11.0
     variant-classnames: ^1.3.0
-    vite: ^4.3.5
+    vite: ^5.0.2
     vite-plugin-node-polyfills: ^0.8.2
   languageName: unknown
   linkType: soft
@@ -15818,7 +15818,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"esbuild@npm:^0.18.0, esbuild@npm:^0.18.10":
+"esbuild@npm:^0.18.0":
   version: 0.18.14
   resolution: "esbuild@npm:0.18.14"
   dependencies:
@@ -24863,7 +24863,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:^8.3.5, postcss@npm:^8.4.21, postcss@npm:^8.4.23, postcss@npm:^8.4.25, postcss@npm:^8.4.4":
+"postcss@npm:^8.3.5, postcss@npm:^8.4.21, postcss@npm:^8.4.23, postcss@npm:^8.4.4":
   version: 8.4.26
   resolution: "postcss@npm:8.4.26"
   dependencies:
@@ -26490,7 +26490,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rollup@npm:^2.25.0 || ^3.3.0, rollup@npm:^3.17.2, rollup@npm:^3.25.2":
+"rollup@npm:^2.25.0 || ^3.3.0, rollup@npm:^3.17.2":
   version: 3.26.3
   resolution: "rollup@npm:3.26.3"
   dependencies:
@@ -29795,46 +29795,6 @@ __metadata:
   peerDependencies:
     vite: ^2.0.0 || ^3.0.0 || ^4.0.0
   checksum: d4fa195a17ae080fd65b1aa90ce484360aa080f1574c9dafc5e136e6b3830bf92ce064824e6bd6e056f2a2cf70138841851425e28d664614bd1788d435a05dc8
-  languageName: node
-  linkType: hard
-
-"vite@npm:^4.3.5":
-  version: 4.4.4
-  resolution: "vite@npm:4.4.4"
-  dependencies:
-    esbuild: ^0.18.10
-    fsevents: ~2.3.2
-    postcss: ^8.4.25
-    rollup: ^3.25.2
-  peerDependencies:
-    "@types/node": ">= 14"
-    less: "*"
-    lightningcss: ^1.21.0
-    sass: "*"
-    stylus: "*"
-    sugarss: "*"
-    terser: ^5.4.0
-  dependenciesMeta:
-    fsevents:
-      optional: true
-  peerDependenciesMeta:
-    "@types/node":
-      optional: true
-    less:
-      optional: true
-    lightningcss:
-      optional: true
-    sass:
-      optional: true
-    stylus:
-      optional: true
-    sugarss:
-      optional: true
-    terser:
-      optional: true
-  bin:
-    vite: bin/vite.js
-  checksum: 51c208e53680fa46f7166e49b037625ae43d507f85f1fd3da7e290263bccb77d5f8c466fe82746285927620afeeff949ac3b8e1b6a7b4fe7bfe11419729256b4
   languageName: node
   linkType: hard
 
