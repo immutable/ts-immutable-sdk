@@ -1,5 +1,5 @@
 import {
-  Box, Button, Heading, OptionKey,
+  Box, Button, Heading, IMX_TOKEN_IMAGE_URL, MenuItem, OptionKey,
 } from '@biom3/react';
 import {
   CheckoutErrorType, GasEstimateBridgeToL2Result, GasEstimateType, GetBalanceResult,
@@ -21,7 +21,6 @@ import {
 } from '../../../lib/utils';
 import { SelectForm } from '../../../components/FormComponents/SelectForm/SelectForm';
 import { validateAmount, validateToken } from '../functions/BridgeFormValidator';
-import { Fees } from '../../../components/Fees/Fees';
 import {
   bridgeFormButtonContainerStyles,
   bridgeFormWrapperStyles,
@@ -55,7 +54,12 @@ export function BridgeForm(props: BridgeFormProps) {
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { viewDispatch } = useContext(ViewContext);
   const { testId, defaultAmount, defaultFromContractAddress } = props;
-  const { content, bridgeForm, fees } = text.views[BridgeWidgetViews.BRIDGE];
+  const {
+    xBridgeContent,
+    xBridgeFees,
+    content,
+    bridgeForm,
+  } = text.views[BridgeWidgetViews.BRIDGE];
 
   // Form state
   const [amount, setAmount] = useState<string>(defaultAmount || '');
@@ -69,8 +73,10 @@ export function BridgeForm(props: BridgeFormProps) {
 
   // Fee estimates & transactions
   const [isFetching, setIsFetching] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [estimates, setEstimates] = useState<GasEstimateBridgeToL2Result | undefined>(undefined);
   const [gasFee, setGasFee] = useState<string>('');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
   const [approvalTransaction, setApprovalTransaction] = useState<ApproveDepositBridgeResponse | undefined>(undefined);
   const [unsignedBridgeTransaction,
@@ -446,7 +452,7 @@ export function BridgeForm(props: BridgeFormProps) {
           weight="regular"
           sx={{ paddingBottom: 'base.spacing.x4' }}
         >
-          {content.title}
+          {xBridgeContent.title}
         </Heading>
         <Box sx={formInputsContainerStyles}>
           <SelectForm
@@ -476,14 +482,25 @@ export function BridgeForm(props: BridgeFormProps) {
             disabled={isFetching}
           />
         </Box>
-        {/** TODO: update here when we have the correct gas values from the estimator */}
-        <Fees
-          title={fees.title}
-          fiatPricePrefix={content.fiatPricePrefix}
-          gasFeeValue={gasFee}
-          gasFeeToken={estimates?.gasFee?.token}
-          gasFeeFiatValue={gasFeeFiatValue}
-        />
+        {/* todo: dynamically set values & add icon */}
+        {gasFee && (
+        <Box sx={{ paddingY: 'base.spacing.x2' }}>
+          <MenuItem emphasized size="small">
+            <MenuItem.Label>
+              {xBridgeFees.title}
+            </MenuItem.Label>
+            {/* todo: dynamically set icon between eth/imx */}
+            <MenuItem.PriceDisplay
+              // {gasFeeFiatValue}
+              fiatAmount="~ USD $5.50"
+              // {content.fiatPricePrefix} {gasFee}
+              price="IMX 1.23"
+              // {estimates?.gasFee?.token}
+              currencyImageUrl={IMX_TOKEN_IMAGE_URL}
+            />
+          </MenuItem>
+        </Box>
+        )}
       </Box>
       <Box sx={bridgeFormButtonContainerStyles}>
         <Button

@@ -41,6 +41,7 @@ export interface BridgeAction {
 
 type ActionPayload =
   | SetWalletProviderNamePayload
+  | SetProviderPayload
   | SetTokenBridgePayload
   | SetNetworkPayload
   | SetToNetworkPayload
@@ -49,6 +50,7 @@ type ActionPayload =
 
 export enum BridgeActions {
   SET_WALLET_PROVIDER_NAME = 'SET_WALLET_PROVIDER_NAME',
+  SET_PROVIDER = 'SET_PROVIDER',
   SET_TOKEN_BRIDGE = 'SET_TOKEN_BRIDGE',
   SET_NETWORK = 'SET_NETWORK',
   SET_TO_NETWORK = 'SET_TO_NETWORK',
@@ -59,6 +61,11 @@ export enum BridgeActions {
 export interface SetWalletProviderNamePayload {
   type: BridgeActions.SET_WALLET_PROVIDER_NAME;
   walletProviderName: WalletProviderName;
+}
+
+export interface SetProviderPayload {
+  type: BridgeActions.SET_PROVIDER;
+  web3Provider: Web3Provider;
 }
 
 export interface SetTokenBridgePayload {
@@ -105,6 +112,11 @@ export const xBridgeReducer: Reducer<XBridgeState, BridgeAction> = (
       return {
         ...state,
         walletProviderName: action.payload.walletProviderName,
+      };
+    case BridgeActions.SET_PROVIDER:
+      return {
+        ...state,
+        web3Provider: action.payload.web3Provider,
       };
     case BridgeActions.SET_TOKEN_BRIDGE:
       return {
