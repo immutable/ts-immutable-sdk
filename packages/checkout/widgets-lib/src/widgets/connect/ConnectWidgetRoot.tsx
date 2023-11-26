@@ -10,10 +10,11 @@ export class Connect extends Base<WidgetType.CONNECT> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT;
 
   protected getValidatedProperties(
-    { config }: WidgetProperties<WidgetType.CONNECT>,
+    { config, provider }: WidgetProperties<WidgetType.CONNECT>,
   ): WidgetProperties<WidgetType.CONNECT> {
     return {
       config,
+      provider,
     };
   }
 
@@ -23,7 +24,7 @@ export class Connect extends Base<WidgetType.CONNECT> {
 
   protected render() {
     if (!this.reactRoot) return;
-
+    console.log('SDK::ConnectWidgetRoot::render::this.web3Provider:', this.web3Provider);
     this.reactRoot.render(
       <React.StrictMode>
         <CustomAnalyticsProvider
@@ -32,6 +33,7 @@ export class Connect extends Base<WidgetType.CONNECT> {
           <ConnectWidget
             config={this.strongConfig()}
             checkout={this.checkout}
+            web3Provider={this.web3Provider}
           />
         </CustomAnalyticsProvider>
       </React.StrictMode>,
