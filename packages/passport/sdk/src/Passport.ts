@@ -139,15 +139,17 @@ export class Passport {
   }
 
   public async logout(): Promise<void> {
-    await this.authManager.logout();
     await this.confirmationScreen.logout();
+    await this.authManager.logout();
     // Code after this point is only executed if the logout mode is silent
     await this.magicAdapter.logout();
     this.passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
   }
 
   public async logoutDeviceFlow(): Promise<void> {
-    return this.authManager.removeUser();
+    await this.authManager.removeUser();
+    await this.magicAdapter.logout();
+    this.passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
   }
 
   /**
