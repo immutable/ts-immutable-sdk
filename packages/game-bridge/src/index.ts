@@ -23,12 +23,11 @@ const sdkVersionSha = '__SDK_VERSION_SHA__';
 const PASSPORT_FUNCTIONS = {
   init: 'init',
   connect: 'connect',
+  reconnect: 'reconnect',
   getPKCEAuthUrl: 'getPKCEAuthUrl',
   connectPKCE: 'connectPKCE',
   confirmCode: 'confirmCode',
-  connectWithCredentials: 'connectWithCredentials',
   getAddress: 'getAddress',
-  checkStoredCredentials: 'checkStoredCredentials',
   logout: 'logout',
   getEmail: 'getEmail',
   imx: {
@@ -172,6 +171,21 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
         });
         break;
       }
+      case PASSPORT_FUNCTIONS.reconnect: {
+        let success = false;
+        const userInfo = await passportClient?.login({ useCachedSession: true });
+        if (userInfo) {
+          const passportProvider = await passportClient?.connectImx();
+          success = setProvider(passportProvider);
+        }
+
+        callbackToGame({
+          responseFor: fxName,
+          requestId,
+          success,
+        });
+        break;
+      }
       case PASSPORT_FUNCTIONS.getPKCEAuthUrl: {
         const response = passportClient?.getPKCEAuthorizationUrl();
         callbackToGame({
@@ -209,23 +223,6 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
         });
         break;
       }
-      case PASSPORT_FUNCTIONS.connectWithCredentials: {
-        /**
-         * The gaming SDK calls `checkStoredCredentials`, and if they exist, it passes those credentials to this
-         * function. As the device flow implementation now uses the same methods for storing & retrieving tokens as
-         * the web implementation, it's no longer necessary to pass any credentials to instantiate the provider.
-         *
-         * // TODO: Consolidate `connectWithCredentials` & `checkStoredCredentials` to one function
-         */
-        const passportProvider = await passportClient?.connectImx();
-        const success = setProvider(passportProvider);
-        callbackToGame({
-          responseFor: fxName,
-          requestId,
-          success,
-        });
-        break;
-      }
       case PASSPORT_FUNCTIONS.zkEvm.connectEvm: {
         const zkEvmProvider = passportClient?.connectEvm();
         const success = setZkEvmProvider(zkEvmProvider);
@@ -243,18 +240,6 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
           requestId,
           success: true,
           result: address,
-        });
-        break;
-      }
-      case PASSPORT_FUNCTIONS.checkStoredCredentials: {
-        const idToken = await passportClient?.getIdToken();
-        const accessToken = await passportClient?.getAccessToken();
-        callbackToGame({
-          responseFor: fxName,
-          requestId,
-          success: true,
-          accessToken,
-          idToken,
         });
         break;
       }
