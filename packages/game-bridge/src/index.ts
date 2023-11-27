@@ -27,6 +27,8 @@ const PASSPORT_FUNCTIONS = {
   getPKCEAuthUrl: 'getPKCEAuthUrl',
   connectPKCE: 'connectPKCE',
   confirmCode: 'confirmCode',
+  getAccessToken: 'getAccessToken',
+  getIdToken: 'getIdToken',
   getAddress: 'getAddress',
   logout: 'logout',
   getEmail: 'getEmail',
@@ -230,6 +232,26 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
           responseFor: fxName,
           requestId,
           success,
+        });
+        break;
+      }
+      case PASSPORT_FUNCTIONS.getAccessToken: {
+        const accessToken = await passportClient?.getAccessToken();
+        callbackToGame({
+          responseFor: fxName,
+          requestId,
+          success: true,
+          result: accessToken,
+        });
+        break;
+      }
+      case PASSPORT_FUNCTIONS.getIdToken: {
+        const idToken = await passportClient?.getIdToken();
+        callbackToGame({
+          responseFor: fxName,
+          requestId,
+          success: true,
+          result: idToken,
         });
         break;
       }
