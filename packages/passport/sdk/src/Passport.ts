@@ -8,7 +8,6 @@ import { PassportImxProviderFactory } from './starkEx';
 import { PassportConfiguration } from './config';
 import {
   DeviceConnectResponse,
-  DeviceTokenResponse,
   Networks,
   PassportEventMap,
   PassportEvents,
@@ -70,31 +69,12 @@ export class Passport {
     return this.passportImxProviderFactory.getProvider();
   }
 
-  public async connectImxDeviceFlow(
-    deviceCode: string,
-    interval: number,
-    timeoutMs?: number,
-  ): Promise<IMXProvider | null> {
-    return this.passportImxProviderFactory.getProviderWithDeviceFlow(deviceCode, interval, timeoutMs);
-  }
-
   public getPKCEAuthorizationUrl(): string {
     return this.authManager.getPKCEAuthorizationUrl();
   }
 
   public async connectImxPKCEFlow(authorizationCode: string, state: string): Promise<IMXProvider | null> {
     return this.passportImxProviderFactory.getProviderWithPKCEFlow(authorizationCode, state);
-  }
-
-  /**
-   * @returns {boolean} the stored device flow credentials if they exist
-   */
-  public checkStoredDeviceFlowCredentials(): DeviceTokenResponse | null {
-    return this.authManager.checkStoredDeviceFlowCredentials();
-  }
-
-  public async connectImxWithCredentials(tokenResponse: DeviceTokenResponse): Promise<IMXProvider | null> {
-    return this.passportImxProviderFactory.getProviderWithCredentials(tokenResponse);
   }
 
   public connectEvm(): Provider {
@@ -145,14 +125,29 @@ export class Passport {
     return this.authManager.loginWithDeviceFlow();
   }
 
+  public async loginWithDeviceFlowCallback(
+    deviceCode: string,
+    interval: number,
+    timeoutMs?: number,
+  ): Promise<UserProfile> {
+    const user = await this.authManager.loginWithDeviceFlowCallback(deviceCode, interval, timeoutMs);
+    return user.profile;
+  }
+
   public async loginCallback(): Promise<void> {
     return this.authManager.loginCallback();
   }
 
   public async logout(): Promise<void> {
-    await this.authManager.logout();
     await this.confirmationScreen.logout();
+    await this.authManager.logout();
     // Code after this point is only executed if the logout mode is silent
+    await this.magicAdapter.logout();
+    this.passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
+  }
+
+  public async logoutDeviceFlow(): Promise<void> {
+    await this.authManager.removeUser();
     await this.magicAdapter.logout();
     this.passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
   }
@@ -165,17 +160,8 @@ export class Passport {
     return this.authManager.logoutSilentCallback(url);
   }
 
-  public async logoutDeviceFlow(): Promise<void> {
-    return this.authManager.logoutDeviceFlow();
-  }
-
   public async getUserInfo(): Promise<UserProfile | undefined> {
     const user = await this.authManager.getUser();
-    return user?.profile;
-  }
-
-  public async getUserInfoDeviceFlow(): Promise<UserProfile | undefined> {
-    const user = await this.authManager.getUserDeviceFlow();
     return user?.profile;
   }
 

@@ -16,7 +16,6 @@ describe('loginZkEvmUser', () => {
   const getUserMock = jest.fn();
   const authManager = {
     getUser: getUserMock,
-    getUserDeviceFlow: jest.fn(),
     login: jest.fn(),
   } as unknown as AuthManager;
   const magicProvider = {};
@@ -49,7 +48,6 @@ describe('loginZkEvmUser', () => {
       magicProvider,
     });
     expect(getUserMock).toHaveBeenCalledTimes(1);
-    expect(authManager.getUserDeviceFlow).toBeCalledTimes(0);
     expect(authManager.login).toBeCalledTimes(0);
     expect(registerZkEvmUser).toBeCalledTimes(0);
   });
@@ -70,7 +68,6 @@ describe('loginZkEvmUser', () => {
       magicProvider,
     });
     expect(getUserMock).toHaveBeenCalledTimes(1);
-    expect(authManager.getUserDeviceFlow).toBeCalledTimes(0);
     expect(authManager.login).toBeCalledTimes(0);
     expect(registerZkEvmUser).toBeCalledTimes(1);
   });
@@ -91,29 +88,7 @@ describe('loginZkEvmUser', () => {
       magicProvider,
     });
     expect(getUserMock).toHaveBeenCalledTimes(1);
-    expect(authManager.getUserDeviceFlow).toBeCalledTimes(1);
     expect(authManager.login).toBeCalledTimes(1);
-    expect(registerZkEvmUser).toBeCalledTimes(0);
-  });
-
-  it('should returns a user that has logged in with device flow', async () => {
-    getUserMock.mockResolvedValue(null);
-    (authManager.getUserDeviceFlow as unknown as jest.Mock).mockResolvedValue(mockUserZkEvm);
-    const result = await loginZkEvmUser({
-      authManager,
-      config,
-      magicAdapter,
-      multiRollupApiClients,
-      jsonRpcProvider: {} as JsonRpcProvider,
-    });
-
-    expect(result).toEqual({
-      user: mockUserZkEvm,
-      magicProvider,
-    });
-    expect(getUserMock).toHaveBeenCalledTimes(1);
-    expect(authManager.getUserDeviceFlow).toBeCalledTimes(1);
-    expect(authManager.login).toBeCalledTimes(0);
     expect(registerZkEvmUser).toBeCalledTimes(0);
   });
 });

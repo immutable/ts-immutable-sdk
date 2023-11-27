@@ -21,7 +21,6 @@ type LoginZkEvmUserOutput = {
 
 export const loginZkEvmUser = async ({
   authManager,
-  config,
   magicAdapter,
   multiRollupApiClients,
   jsonRpcProvider,
@@ -34,7 +33,7 @@ export const loginZkEvmUser = async ({
     console.warn('eth_requestAccounts` failed to retrieve a cached user session:', err);
   }
   if (!user) {
-    user = await authManager.getUserDeviceFlow() || await authManager.login();
+    user = await authManager.login();
   }
   if (!user.idToken) {
     throw new Error('User is missing idToken');
@@ -48,7 +47,6 @@ export const loginZkEvmUser = async ({
     // Generate counterfactual address and retrieve updated Auth0 user
     const userZkevm = await registerZkEvmUser({
       authManager,
-      config,
       magicProvider,
       multiRollupApiClients,
       accessToken: user.accessToken,
