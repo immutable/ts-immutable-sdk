@@ -29,7 +29,7 @@ const testId = 'bridge-wallet-form';
 
 export function BridgeWalletForm() {
   const { bridgeState: { checkout } } = useContext(XBridgeContext);
-  const { heading, from } = text.views[XBridgeWidgetViews.BRIDGE_WALLET_SELECTION];
+  const { heading, from, to } = text.views[XBridgeWidgetViews.BRIDGE_WALLET_SELECTION];
 
   const l1NetworkChainId = getL1ChainId(checkout.config);
   const l1NetworkName = getChainNameById(l1NetworkChainId);
@@ -39,14 +39,28 @@ export function BridgeWalletForm() {
   const [fromWalletDrawerOpen, setFromWalletDrawerOpen] = useState(false);
   const [fromNetworkDrawerOpen, setFromNetworkDrawerOpen] = useState(false);
 
-  const [localWeb3Provider, setLocalWeb3Provider] = useState<Web3Provider>();
+  const [fromWalletLocalWeb3Provider, setFromWalletLocalWeb3Provider] = useState<Web3Provider>();
   const [fromNetwork, setFromNetwork] = useState<ChainId>();
-  let localWalletProviderName = WalletProviderName.METAMASK;
-  if (isPassportProvider(localWeb3Provider)) {
-    localWalletProviderName = WalletProviderName.PASSPORT;
+
+  const [toWalletDrawerOpen, setToWalletDrawerOpen] = useState(false);
+  const [toWalletLocalWeb3Provider, setToWalletLocalWeb3Provider] = useState<Web3Provider>();
+  const [toNetwork, setToNetwork] = useState<ChainId>();
+
+  console.log('toWalletLocalWeb3Provider is: ', toWalletLocalWeb3Provider);
+  console.log('toNetwork is: ', toNetwork);
+
+  let fromWalletProviderName = WalletProviderName.METAMASK;
+  if (isPassportProvider(fromWalletLocalWeb3Provider)) {
+    fromWalletProviderName = WalletProviderName.PASSPORT;
   }
 
-  const isFromWalletAndNetworkSelected = localWeb3Provider !== undefined && fromNetwork !== undefined;
+  let toWalletProviderName = WalletProviderName.METAMASK;
+  if (isPassportProvider(toWalletLocalWeb3Provider)) {
+    toWalletProviderName = WalletProviderName.PASSPORT;
+  }
+
+  const isFromWalletAndNetworkSelected = fromWalletLocalWeb3Provider !== undefined && fromNetwork !== undefined;
+  const isToWalletAndNetworkSelected = toWalletLocalWeb3Provider !== undefined && toNetwork !== undefined;
 
   const handleWalletConnection = async (walletProviderName: WalletProviderName) => {
     let provider;
@@ -86,7 +100,7 @@ export function BridgeWalletForm() {
     }
 
     if (connected) {
-      setLocalWeb3Provider(provider);
+      setFromWalletLocalWeb3Provider(provider);
 
       /** if Passport skip from network selector */
       if (isPassportProvider(provider)) {
@@ -108,9 +122,9 @@ export function BridgeWalletForm() {
 
   const handleNetworkSelection = useCallback(
     async (chainId: ChainId) => {
-      if (!localWeb3Provider) return;
+      if (!fromWalletLocalWeb3Provider) return;
 
-      const currentNetwork = await localWeb3Provider?.getNetwork();
+      const currentNetwork = await fromWalletLocalWeb3Provider?.getNetwork();
       if (currentNetwork?.chainId === chainId) {
         setFromNetworkDrawerOpen(false);
         setFromNetwork(chainId);
@@ -118,8 +132,8 @@ export function BridgeWalletForm() {
       }
 
       try {
-        const switchNetwork = await checkout.switchNetwork({ provider: localWeb3Provider, chainId });
-        setLocalWeb3Provider(switchNetwork.provider);
+        const switchNetwork = await checkout.switchNetwork({ provider: fromWalletLocalWeb3Provider, chainId });
+        setFromWalletLocalWeb3Provider(switchNetwork.provider);
         setFromNetworkDrawerOpen(false);
         setFromNetwork(switchNetwork.network.chainId);
       } catch (err) {
@@ -127,8 +141,78 @@ export function BridgeWalletForm() {
         console.error(err);
       }
     },
-    [localWeb3Provider],
+    [fromWalletLocalWeb3Provider],
   );
+
+  const handleToWalletSelection = useCallback(async (selectedToWalletProviderName: WalletProviderName) => {
+    // if localWalletProviderName === MetaMask
+    // to options are
+    // MetaMask
+    // and
+
+    // if localWalletProviderName === Passport fromNetwork is zkEVM by default
+    // to options are
+    // MetaMask
+
+    // if from wallet and to wallet are different
+    // make a connection to the to wallet
+    // store it in localToWalletWeb3Provider
+
+    if (fromWalletProviderName !== selectedToWalletProviderName) {
+      // connect and save toWalletLocalWebProvider
+      // createProvider
+      // check if connceted
+      // connect
+
+      let toWalletProvider;
+      try {
+        const createResult = await checkout.createProvider({ walletProviderName: selectedToWalletProviderName });
+        toWalletProvider = createResult.provider;
+      } catch (error) {
+      // eslint-disable-next-line no-console
+        console.error(`Failed to create ${selectedToWalletProviderName} provider`);
+      }
+
+      // check if connected
+      let connected = false;
+      try {
+        const { isConnected } = await checkout.checkIsWalletConnected({ provider: toWalletProvider });
+        connected = isConnected;
+      } catch (err) {
+      // eslint-disable-next-line no-console
+        console.error(err);
+        throw err;
+      }
+
+      if (!connected) {
+      // try to connect
+        try {
+          const { provider: connectedProvider } = await checkout.connect({ provider: toWalletProvider });
+          toWalletProvider = connectedProvider;
+          connected = true;
+        } catch (err: any) {
+          if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
+          // eslint-disable-next-line no-console
+            console.log('User rejected request');
+          }
+          // eslint-disable-next-line no-console
+          console.error(err);
+        }
+      }
+
+      setToWalletLocalWeb3Provider(toWalletProvider);
+    } else {
+      console.log('setting toWallet provider to be the same as from wallet provider');
+      // toWalletLocalWeb3Provider is the same as fromWalletLocalWeb3Provider
+      setToWalletLocalWeb3Provider(fromWalletLocalWeb3Provider);
+    }
+
+    // toNetwork is always the opposite of fromNetwork
+    const theToNetwork = fromNetwork === l1NetworkChainId ? imtblZkEvmNetworkChainId : l1NetworkChainId;
+    setToNetwork(theToNetwork);
+
+    setToWalletDrawerOpen(false);
+  }, [fromWalletProviderName, fromNetwork]);
 
   const [walletItemLoading, setWalletItemLoading] = useState(false);
 
@@ -181,7 +265,7 @@ export function BridgeWalletForm() {
             loading={walletItemLoading}
             setLoading={setWalletItemLoading}
             walletProviderName={WalletProviderName.METAMASK}
-            onWalletClick={(name) => handleWalletConnection(name)}
+            onWalletClick={async (name) => await handleWalletConnection(name)}
           />
           {checkout.passport && (
             <BridgeWalletItem
@@ -219,7 +303,7 @@ export function BridgeWalletForm() {
             chainId={imtblZkEvmNetworkChainId}
           />
           {/** Show L1 option for Metamask only */}
-          {localWalletProviderName === WalletProviderName.METAMASK && (
+          {fromWalletProviderName === WalletProviderName.METAMASK && (
           <BridgeNetworkItem
             key={l1NetworkName}
             testId={testId}
@@ -237,16 +321,87 @@ export function BridgeWalletForm() {
        * hide the select and show the WalletNetworkButton
        */}
       {isFromWalletAndNetworkSelected && (
-        <WalletNetworkButton
-          testId={testId}
-          walletName={localWalletProviderName}
-          walletAddress="0x1234...4321"
-          chainId={fromNetwork}
-          onWalletClick={() => {
-            setFromWalletDrawerOpen(true);
-          }}
-          onNetworkClick={() => setFromNetworkDrawerOpen(true)}
-        />
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 'base.spacing.x10' }}>
+          <WalletNetworkButton
+            testId={testId}
+            walletName={fromWalletProviderName}
+            walletAddress="0x1234...4321"
+            chainId={fromNetwork}
+            onWalletClick={() => {
+              setFromWalletDrawerOpen(true);
+            }}
+            onNetworkClick={() => setFromNetworkDrawerOpen(true)}
+          />
+
+          {/** To Wallet Selector */}
+          <Box>
+            <Heading testId="" size="xSmall" sx={{ paddingBottom: 'base.spacing.x2' }}>{to.heading}</Heading>
+            <BottomSheet
+              headerBarTitle={to.walletSelectorHeading}
+              size="full"
+              onCloseBottomSheet={() => {
+                if (walletItemLoading) return;
+                setToWalletDrawerOpen(false);
+              }}
+              visible={toWalletDrawerOpen}
+            >
+              {!isToWalletAndNetworkSelected && (
+              <BottomSheet.Target>
+                <FormControlWrapper
+                  testId={`${testId}-to-wallet-form-control`}
+                  textAlign="left"
+                >
+                  <Select
+                    testId={`${testId}-to-wallet-select`}
+                    defaultLabel={to.selectDefaultText}
+                    size="large"
+                    targetClickOveride={() => setToWalletDrawerOpen(true)}
+                  />
+                </FormControlWrapper>
+              </BottomSheet.Target>
+              )}
+              <BottomSheet.Content sx={walletItemListStyles}>
+                <BridgeWalletItem
+                  key={WalletProviderName.METAMASK}
+                  testId={testId}
+                  loading={walletItemLoading}
+                  setLoading={setWalletItemLoading}
+                  walletProviderName={WalletProviderName.METAMASK}
+                  onWalletClick={async (name) => await handleToWalletSelection(name)}
+                />
+
+                {/** if passport has been configured in checkout
+                 * AND fromNetwork is L1
+                 * AND fromWallet is MetaMask
+                 * -> show Passport option */}
+                {checkout.passport
+                && fromNetwork === l1NetworkChainId
+                && fromWalletProviderName === WalletProviderName.METAMASK && (
+                <BridgeWalletItem
+                  key={WalletProviderName.PASSPORT}
+                  testId={testId}
+                  loading={walletItemLoading}
+                  setLoading={setWalletItemLoading}
+                  walletProviderName={WalletProviderName.PASSPORT}
+                  onWalletClick={async (name) => await handleToWalletSelection(name)}
+                />
+                )}
+              </BottomSheet.Content>
+            </BottomSheet>
+          </Box>
+        </Box>
+      )}
+      {isToWalletAndNetworkSelected && (
+      <WalletNetworkButton
+        testId={testId}
+        walletName={toWalletProviderName}
+        walletAddress="0x1234...4321"
+        chainId={toNetwork}
+        onWalletClick={() => {
+          setToWalletDrawerOpen(true);
+        }}
+        onNetworkClick={() => console.log('wrong')}
+      />
       )}
     </Box>
   );
