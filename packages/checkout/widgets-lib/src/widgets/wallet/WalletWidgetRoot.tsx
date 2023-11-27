@@ -11,11 +11,8 @@ import {
 import { Base } from 'widgets/BaseWidgetRoot';
 import { ConnectLoader, ConnectLoaderParams } from 'components/ConnectLoader/ConnectLoader';
 import { getL1ChainId, getL2ChainId } from 'lib';
-import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
 import { isValidWalletProvider } from 'lib/validations/widgetValidators';
-import { BiomeCombinedProviders } from '@biom3/react';
-import { widgetTheme } from 'lib/theme';
-import { BaseTokens } from '@biom3/design-tokens';
+import { WidgetContainer } from 'components/WidgetContainer/WidgetContainer';
 import { WalletWidget } from './WalletWidget';
 import { sendWalletWidgetCloseEvent } from './WalletWidgetEvents';
 
@@ -60,24 +57,18 @@ export class Wallet extends Base<WidgetType.WALLET> {
       allowedChains: [getL1ChainId(this.checkout.config), getL2ChainId(this.checkout.config)],
     };
 
-    const themeBase: BaseTokens = widgetTheme(this.strongConfig().theme);
-
     this.reactRoot.render(
-      <React.StrictMode>
-        <CustomAnalyticsProvider widgetConfig={this.strongConfig()}>
-          <BiomeCombinedProviders theme={{ base: themeBase }}>
-            <ConnectLoader
-              widgetConfig={this.strongConfig()}
-              params={connectLoaderParams}
-              closeEvent={() => sendWalletWidgetCloseEvent(window)}
-            >
-              <WalletWidget
-                config={this.strongConfig()}
-              />
-            </ConnectLoader>
-          </BiomeCombinedProviders>
-        </CustomAnalyticsProvider>
-      </React.StrictMode>,
+      <WidgetContainer id="wallet-container" config={this.strongConfig()}>
+        <ConnectLoader
+          widgetConfig={this.strongConfig()}
+          params={connectLoaderParams}
+          closeEvent={() => sendWalletWidgetCloseEvent(window)}
+        >
+          <WalletWidget
+            config={this.strongConfig()}
+          />
+        </ConnectLoader>
+      </WidgetContainer>,
     );
   }
 }

@@ -13,11 +13,8 @@ import { Base } from 'widgets/BaseWidgetRoot';
 import { ConnectLoader, ConnectLoaderParams } from 'components/ConnectLoader/ConnectLoader';
 import { getL1ChainId } from 'lib';
 import { isPassportProvider } from 'lib/providerUtils';
-import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
-import { BiomeCombinedProviders } from '@biom3/react';
-import { widgetTheme } from 'lib/theme';
 import { isValidWalletProvider, isValidAmount, isValidAddress } from 'lib/validations/widgetValidators';
-import { BaseTokens } from '@biom3/design-tokens';
+import { WidgetContainer } from 'components/WidgetContainer/WidgetContainer';
 import { BridgeComingSoon } from './views/BridgeComingSoon';
 import { sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
 import { BridgeWidget } from './BridgeWidget';
@@ -78,32 +75,26 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
     const showBridgeComingSoonScreen = isPassportProvider(this.web3Provider)
       || this.parameters.walletProviderName === WalletProviderName.PASSPORT;
 
-    const themeBase: BaseTokens = widgetTheme(this.strongConfig().theme);
-
     this.reactRoot.render(
-      <React.StrictMode>
-        <CustomAnalyticsProvider widgetConfig={this.strongConfig()}>
-          <BiomeCombinedProviders theme={{ base: themeBase }}>
-            {showBridgeComingSoonScreen && (
-            <BridgeComingSoon onCloseEvent={() => sendBridgeWidgetCloseEvent(window)} />
+      <WidgetContainer id="bridge-container" config={this.strongConfig()}>
+        {showBridgeComingSoonScreen && (
+        <BridgeComingSoon onCloseEvent={() => sendBridgeWidgetCloseEvent(window)} />
 
-            )}
-            {!showBridgeComingSoonScreen && (
-            <ConnectLoader
-              params={connectLoaderParams}
-              closeEvent={() => sendBridgeWidgetCloseEvent(window)}
-              widgetConfig={this.strongConfig()}
-            >
-              <BridgeWidget
-                amount={this.parameters.amount}
-                fromContractAddress={this.parameters.fromContractAddress}
-                config={this.strongConfig()}
-              />
-            </ConnectLoader>
-            )}
-          </BiomeCombinedProviders>
-        </CustomAnalyticsProvider>
-      </React.StrictMode>,
+        )}
+        {!showBridgeComingSoonScreen && (
+        <ConnectLoader
+          params={connectLoaderParams}
+          closeEvent={() => sendBridgeWidgetCloseEvent(window)}
+          widgetConfig={this.strongConfig()}
+        >
+          <BridgeWidget
+            amount={this.parameters.amount}
+            fromContractAddress={this.parameters.fromContractAddress}
+            config={this.strongConfig()}
+          />
+        </ConnectLoader>
+        )}
+      </WidgetContainer>,
     );
   }
 }

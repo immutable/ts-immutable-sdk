@@ -8,9 +8,9 @@ import {
   WidgetType,
 } from '@imtbl/checkout-sdk';
 import { Base } from 'widgets/BaseWidgetRoot';
-import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
 import { isValidWalletProvider, isValidAmount, isValidAddress } from 'lib/validations/widgetValidators';
 import { XBridgeWidget } from 'widgets/x-bridge/XBridgeWidget';
+import { WidgetContainer } from 'components/WidgetContainer/WidgetContainer';
 
 export class XBridge extends Base<WidgetType.BRIDGE> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT;
@@ -57,17 +57,13 @@ export class XBridge extends Base<WidgetType.BRIDGE> {
   protected render() {
     if (!this.reactRoot) return;
     this.reactRoot.render(
-      <React.StrictMode>
-        <CustomAnalyticsProvider
-          widgetConfig={this.strongConfig()}
-        >
-          <XBridgeWidget
-            checkout={this.checkout}
-            config={this.strongConfig()}
-            web3Provider={this.web3Provider}
-          />
-        </CustomAnalyticsProvider>
-      </React.StrictMode>,
+      <WidgetContainer id="xbridge-container" config={this.strongConfig()}>
+        <XBridgeWidget
+          checkout={this.checkout}
+          config={this.strongConfig()}
+          web3Provider={this.web3Provider}
+        />
+      </WidgetContainer>,
     );
   }
 }

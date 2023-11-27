@@ -11,11 +11,8 @@ import {
 import { Base } from 'widgets/BaseWidgetRoot';
 import { ConnectLoader, ConnectLoaderParams } from 'components/ConnectLoader/ConnectLoader';
 import { getL1ChainId, getL2ChainId } from 'lib';
-import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
 import { isValidAddress, isValidAmount } from 'lib/validations/widgetValidators';
-import { BiomeCombinedProviders } from '@biom3/react';
-import { widgetTheme } from 'lib/theme';
-import { BaseTokens } from '@biom3/design-tokens';
+import { WidgetContainer } from 'components/WidgetContainer/WidgetContainer';
 import { OnRampWidget } from './OnRampWidget';
 import { sendOnRampWidgetCloseEvent } from './OnRampWidgetEvents';
 
@@ -67,26 +64,20 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
       allowedChains: [getL1ChainId(this.checkout.config), getL2ChainId(this.checkout.config)],
     };
 
-    const themeBase: BaseTokens = widgetTheme(this.strongConfig().theme);
-
     this.reactRoot.render(
-      <React.StrictMode>
-        <CustomAnalyticsProvider widgetConfig={this.strongConfig()}>
-          <BiomeCombinedProviders theme={{ base: themeBase }}>
-            <ConnectLoader
-              widgetConfig={this.strongConfig()}
-              params={connectLoaderParams}
-              closeEvent={() => sendOnRampWidgetCloseEvent(window)}
-            >
-              <OnRampWidget
-                contractAddress={this.parameters.contractAddress}
-                amount={this.parameters.amount}
-                config={this.strongConfig()}
-              />
-            </ConnectLoader>
-          </BiomeCombinedProviders>
-        </CustomAnalyticsProvider>
-      </React.StrictMode>,
+      <WidgetContainer id="onramp-container" config={this.strongConfig()}>
+        <ConnectLoader
+          widgetConfig={this.strongConfig()}
+          params={connectLoaderParams}
+          closeEvent={() => sendOnRampWidgetCloseEvent(window)}
+        >
+          <OnRampWidget
+            contractAddress={this.parameters.contractAddress}
+            amount={this.parameters.amount}
+            config={this.strongConfig()}
+          />
+        </ConnectLoader>
+      </WidgetContainer>,
     );
   }
 }
