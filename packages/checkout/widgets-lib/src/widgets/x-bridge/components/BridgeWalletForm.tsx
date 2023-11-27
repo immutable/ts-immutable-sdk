@@ -13,12 +13,13 @@ import {
 import {
   WalletProviderName,
   CheckoutErrorType,
-  ChainName,
   ChainId,
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { isPassportProvider } from 'lib/providerUtils';
-import { brigdeWalletWrapperStyles, walletItemListStyles } from './BridgeWalletFormStyles';
+import { getL1ChainId, getL2ChainId } from 'lib';
+import { getChainNameById } from 'lib/chainName';
+import { bridgeHeadingStyles, brigdeWalletWrapperStyles, walletItemListStyles } from './BridgeWalletFormStyles';
 import { XBridgeContext } from '../context/XBridgeContext';
 import { BridgeWalletItem } from './BridgeWalletItem';
 import { BridgeNetworkItem } from './BridgeNetworkItem';
@@ -29,6 +30,11 @@ const testId = 'bridge-wallet-form';
 export function BridgeWalletForm() {
   const { bridgeState: { checkout } } = useContext(XBridgeContext);
   const { heading, from } = text.views[XBridgeWidgetViews.BRIDGE_WALLET_SELECTION];
+
+  const l1NetworkChainId = getL1ChainId(checkout.config);
+  const l1NetworkName = getChainNameById(l1NetworkChainId);
+  const imtblZkEvmNetworkChainId = getL2ChainId(checkout.config);
+  const imtblZkEvmNetworkName = getChainNameById(imtblZkEvmNetworkChainId);
 
   const [fromWalletDrawerOpen, setFromWalletDrawerOpen] = useState(false);
   const [fromNetworkDrawerOpen, setFromNetworkDrawerOpen] = useState(false);
@@ -82,9 +88,9 @@ export function BridgeWalletForm() {
     if (connected) {
       setLocalWeb3Provider(provider);
 
+      /** if Passport skip from network selector */
       if (isPassportProvider(provider)) {
-        /** if Passport skip network selector */
-        setFromNetwork(ChainId.IMTBL_ZKEVM_TESTNET); // TODO: handle per environment
+        setFromNetwork(imtblZkEvmNetworkChainId);
         setFromWalletDrawerOpen(false);
         return;
       }
@@ -103,6 +109,7 @@ export function BridgeWalletForm() {
   const handleNetworkSelection = useCallback(
     async (chainId: ChainId) => {
       if (!localWeb3Provider) return;
+
       const currentNetwork = await localWeb3Provider?.getNetwork();
       if (currentNetwork?.chainId === chainId) {
         setFromNetworkDrawerOpen(false);
@@ -124,19 +131,20 @@ export function BridgeWalletForm() {
   );
 
   const [walletItemLoading, setWalletItemLoading] = useState(false);
+
   return (
     <Box testId={testId} sx={brigdeWalletWrapperStyles}>
       <Heading
         testId={`${testId}-heading`}
         size="small"
         weight="regular"
-        sx={{ paddingTop: 'base.spacing.x10', paddingBottom: 'base.spacing.x4' }}
+        sx={bridgeHeadingStyles}
       >
         {heading}
       </Heading>
 
-      <Heading testId="" size="xSmall" sx={{ paddingBottom: 'base.spacing.x2' }}>{from.heading}</Heading>
       {/** From Wallet Selector */}
+      <Heading testId="" size="xSmall" sx={{ paddingBottom: 'base.spacing.x2' }}>{from.heading}</Heading>
       <BottomSheet
         headerBarTitle={from.walletSelectorHeading}
         size="full"
@@ -204,20 +212,20 @@ export function BridgeWalletForm() {
       >
         <BottomSheet.Content>
           <BridgeNetworkItem
-            key={ChainName.IMTBL_ZKEVM_TESTNET}
+            key={imtblZkEvmNetworkName}
             testId={testId}
-            chainName={ChainName.IMTBL_ZKEVM_TESTNET}
+            chainName={imtblZkEvmNetworkName}
             onNetworkClick={handleNetworkSelection}
-            chainId={ChainId.IMTBL_ZKEVM_TESTNET}
+            chainId={imtblZkEvmNetworkChainId}
           />
           {/** Show L1 option for Metamask only */}
           {localWalletProviderName === WalletProviderName.METAMASK && (
           <BridgeNetworkItem
-            key={ChainName.SEPOLIA}
+            key={l1NetworkName}
             testId={testId}
-            chainName={ChainName.SEPOLIA}
+            chainName={l1NetworkName}
             onNetworkClick={handleNetworkSelection}
-            chainId={ChainId.SEPOLIA}
+            chainId={l1NetworkChainId}
           />
           )}
 

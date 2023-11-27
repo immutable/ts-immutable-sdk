@@ -14,7 +14,6 @@ import {
   walletLogoStyles,
 } from './WalletNetworkButtonStyles';
 
-// todo: add corresponding network symbols
 const networkIcon = {
   [ChainId.IMTBL_ZKEVM_DEVNET]: 'Immutable',
   [ChainId.IMTBL_ZKEVM_MAINNET]: 'Immutable',

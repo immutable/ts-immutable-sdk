@@ -5,6 +5,11 @@ export const brigdeWalletWrapperStyles = {
   paddingX: 'base.spacing.x4',
 };
 
+export const bridgeHeadingStyles = {
+  paddingTop: 'base.spacing.x10',
+  paddingBottom: 'base.spacing.x4',
+};
+
 export const walletItemListStyles = {
   display: 'flex',
   flexDirection: 'column',
