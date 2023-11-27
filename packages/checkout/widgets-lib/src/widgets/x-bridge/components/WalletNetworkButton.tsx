@@ -55,7 +55,7 @@ export function WalletNetworkButton({
     >
       <Logo
         logo={walletLogo[walletName] as any}
-        sx={walletLogoStyles}
+        sx={walletLogoStyles(walletName)}
       />
       <Box sx={{
         display: 'flex',

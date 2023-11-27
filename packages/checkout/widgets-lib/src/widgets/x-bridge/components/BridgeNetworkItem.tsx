@@ -31,8 +31,9 @@ export function BridgeNetworkItem({
       }}
       sx={{ marginBottom: 'base.spacing.x1' }}
     >
-      <MenuItem.Icon
+      <MenuItem.FramedIcon
         icon={networkIcon[chainId] as any}
+        circularFrame
         sx={networkItemStyles(chainId)}
       />
       <MenuItem.Label size="medium">

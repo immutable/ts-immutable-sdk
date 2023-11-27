@@ -1,4 +1,4 @@
-import { ChainId } from '@imtbl/checkout-sdk';
+import { ChainId, WalletProviderName } from '@imtbl/checkout-sdk';
 
 export const logoColour = {
   [ChainId.IMTBL_ZKEVM_DEVNET]: 'base.color.text.link.primary',
@@ -25,11 +25,12 @@ export const walletButtonOuterStyles = {
   },
 };
 
-export const walletLogoStyles = {
+export const walletLogoStyles = (walletName: WalletProviderName) => ({
   width: 'base.icon.size.500',
+  padding: walletName === WalletProviderName.PASSPORT ? 'base.spacing.x1' : '',
   backgroundColor: 'base.color.translucent.standard.200',
   borderRadius: 'base.borderRadius.x2',
-};
+});
 
 export const walletCaptionStyles = { color: 'base.color.text.secondary' };
 

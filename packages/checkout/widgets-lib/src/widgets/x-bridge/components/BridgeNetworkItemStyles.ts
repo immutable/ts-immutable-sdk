@@ -9,9 +9,9 @@ const logoColour = {
 };
 
 export const networkItemStyles = (chainId: ChainId) => ({
-  fill: 'base.color.brand.2',
-  minWidth: 'base.icon.size.500',
-  padding: 'base.spacing.x2',
   backgroundColor: logoColour[chainId],
-  borderRadius: '50%',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  '& svg': {
+    fill: 'base.color.brand.2',
+  },
 });
