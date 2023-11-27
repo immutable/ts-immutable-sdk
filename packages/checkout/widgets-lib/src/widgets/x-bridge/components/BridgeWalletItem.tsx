@@ -7,7 +7,7 @@ import { walletItemLogoStyles } from './BridgeWalletItemStyles';
 export interface BridgeWalletProps {
   testId: string;
   walletProviderName: WalletProviderName
-  onWalletClick: (walletProviderName: WalletProviderName) => void;
+  onWalletClick: (walletProviderName: WalletProviderName) => Promise<void>;
   loading: boolean;
   setLoading: (loading:boolean) => void;
 }

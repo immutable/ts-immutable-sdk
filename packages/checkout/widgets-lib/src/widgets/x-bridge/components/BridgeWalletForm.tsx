@@ -31,38 +31,44 @@ export function BridgeWalletForm() {
   const { bridgeState: { checkout } } = useContext(XBridgeContext);
   const { heading, from, to } = text.views[XBridgeWidgetViews.BRIDGE_WALLET_SELECTION];
 
+  // calculating l1/l2 chains to work with based on Checkout environment
   const l1NetworkChainId = getL1ChainId(checkout.config);
   const l1NetworkName = getChainNameById(l1NetworkChainId);
   const imtblZkEvmNetworkChainId = getL2ChainId(checkout.config);
   const imtblZkEvmNetworkName = getChainNameById(imtblZkEvmNetworkChainId);
 
+  /** From wallet and from network local state */
   const [fromWalletDrawerOpen, setFromWalletDrawerOpen] = useState(false);
   const [fromNetworkDrawerOpen, setFromNetworkDrawerOpen] = useState(false);
-
   const [fromWalletLocalWeb3Provider, setFromWalletLocalWeb3Provider] = useState<Web3Provider>();
   const [fromNetwork, setFromNetwork] = useState<ChainId>();
 
+  /** To wallet local state */
   const [toWalletDrawerOpen, setToWalletDrawerOpen] = useState(false);
   const [toWalletLocalWeb3Provider, setToWalletLocalWeb3Provider] = useState<Web3Provider>();
   const [toNetwork, setToNetwork] = useState<ChainId>();
 
-  console.log('toWalletLocalWeb3Provider is: ', toWalletLocalWeb3Provider);
-  console.log('toNetwork is: ', toNetwork);
+  // state to show that a wallet item has been clicked and is loading
+  // disable all wallet buttons while this is loading
+  const [walletItemLoading, setWalletItemLoading] = useState(false);
 
-  let fromWalletProviderName = WalletProviderName.METAMASK;
-  if (isPassportProvider(fromWalletLocalWeb3Provider)) {
-    fromWalletProviderName = WalletProviderName.PASSPORT;
-  }
-
-  let toWalletProviderName = WalletProviderName.METAMASK;
-  if (isPassportProvider(toWalletLocalWeb3Provider)) {
-    toWalletProviderName = WalletProviderName.PASSPORT;
-  }
-
+  /* Derived state */
   const isFromWalletAndNetworkSelected = fromWalletLocalWeb3Provider !== undefined && fromNetwork !== undefined;
   const isToWalletAndNetworkSelected = toWalletLocalWeb3Provider !== undefined && toNetwork !== undefined;
+  const fromWalletProviderName = isPassportProvider(fromWalletLocalWeb3Provider)
+    ? WalletProviderName.PASSPORT
+    : WalletProviderName.METAMASK;
+  const toWalletProviderName = isPassportProvider(toWalletLocalWeb3Provider)
+    ? WalletProviderName.PASSPORT
+    : WalletProviderName.METAMASK;
 
-  const handleWalletConnection = async (walletProviderName: WalletProviderName) => {
+  /* --------------------------- */
+  /* --- Handling selections --- */
+  /* --------------------------- */
+  const handleFromWalletConnection = async (walletProviderName: WalletProviderName) => {
+    setToWalletLocalWeb3Provider(undefined);
+    setToNetwork(undefined);
+
     let provider;
     try {
       const createResult = await checkout.createProvider({ walletProviderName });
@@ -72,7 +78,6 @@ export function BridgeWalletForm() {
       console.error(`Failed to create ${walletProviderName} provider`);
     }
 
-    // check if connected
     let connected = false;
     try {
       const { isConnected } = await checkout.checkIsWalletConnected({ provider });
@@ -84,7 +89,6 @@ export function BridgeWalletForm() {
     }
 
     if (!connected) {
-      // try to connect
       try {
         const { provider: connectedProvider } = await checkout.connect({ provider });
         provider = connectedProvider;
@@ -102,7 +106,7 @@ export function BridgeWalletForm() {
     if (connected) {
       setFromWalletLocalWeb3Provider(provider);
 
-      /** if Passport skip from network selector */
+      /** if Passport skip from network selector and default to zkEVM */
       if (isPassportProvider(provider)) {
         setFromNetwork(imtblZkEvmNetworkChainId);
         setFromWalletDrawerOpen(false);
@@ -110,8 +114,9 @@ export function BridgeWalletForm() {
       }
 
       /**
-       * force the selection of network
-       * network by clearing the fromNetwork
+       * Force the selection of network
+       * by clearing the fromNetwork
+       * and opening the network drawer
        */
       setFromNetwork(undefined);
 
@@ -120,9 +125,11 @@ export function BridgeWalletForm() {
     }
   };
 
-  const handleNetworkSelection = useCallback(
+  const handleFromNetworkSelection = useCallback(
     async (chainId: ChainId) => {
       if (!fromWalletLocalWeb3Provider) return;
+      setToWalletLocalWeb3Provider(undefined);
+      setToNetwork(undefined);
 
       const currentNetwork = await fromWalletLocalWeb3Provider?.getNetwork();
       if (currentNetwork?.chainId === chainId) {
@@ -145,25 +152,12 @@ export function BridgeWalletForm() {
   );
 
   const handleToWalletSelection = useCallback(async (selectedToWalletProviderName: WalletProviderName) => {
-    // if localWalletProviderName === MetaMask
-    // to options are
-    // MetaMask
-    // and
-
-    // if localWalletProviderName === Passport fromNetwork is zkEVM by default
-    // to options are
-    // MetaMask
-
-    // if from wallet and to wallet are different
-    // make a connection to the to wallet
-    // store it in localToWalletWeb3Provider
-
-    if (fromWalletProviderName !== selectedToWalletProviderName) {
-      // connect and save toWalletLocalWebProvider
-      // createProvider
-      // check if connceted
-      // connect
-
+    if (fromWalletProviderName === selectedToWalletProviderName) {
+      // if same from wallet and to wallet, just use the existing fromWalletLocalWeb3Provider
+      setToWalletLocalWeb3Provider(fromWalletLocalWeb3Provider);
+    } else {
+      // from wallet and to wallet selections are different (e.g from MM to PP)
+      // make connection to separate wallet provider to use for the to address
       let toWalletProvider;
       try {
         const createResult = await checkout.createProvider({ walletProviderName: selectedToWalletProviderName });
@@ -173,7 +167,6 @@ export function BridgeWalletForm() {
         console.error(`Failed to create ${selectedToWalletProviderName} provider`);
       }
 
-      // check if connected
       let connected = false;
       try {
         const { isConnected } = await checkout.checkIsWalletConnected({ provider: toWalletProvider });
@@ -185,7 +178,6 @@ export function BridgeWalletForm() {
       }
 
       if (!connected) {
-      // try to connect
         try {
           const { provider: connectedProvider } = await checkout.connect({ provider: toWalletProvider });
           toWalletProvider = connectedProvider;
@@ -194,6 +186,8 @@ export function BridgeWalletForm() {
           if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
           // eslint-disable-next-line no-console
             console.log('User rejected request');
+            setWalletItemLoading(false);
+            return; // don't set anything if they reject
           }
           // eslint-disable-next-line no-console
           console.error(err);
@@ -201,10 +195,6 @@ export function BridgeWalletForm() {
       }
 
       setToWalletLocalWeb3Provider(toWalletProvider);
-    } else {
-      console.log('setting toWallet provider to be the same as from wallet provider');
-      // toWalletLocalWeb3Provider is the same as fromWalletLocalWeb3Provider
-      setToWalletLocalWeb3Provider(fromWalletLocalWeb3Provider);
     }
 
     // toNetwork is always the opposite of fromNetwork
@@ -213,8 +203,6 @@ export function BridgeWalletForm() {
 
     setToWalletDrawerOpen(false);
   }, [fromWalletProviderName, fromNetwork]);
-
-  const [walletItemLoading, setWalletItemLoading] = useState(false);
 
   return (
     <Box testId={testId} sx={brigdeWalletWrapperStyles}>
@@ -265,7 +253,7 @@ export function BridgeWalletForm() {
             loading={walletItemLoading}
             setLoading={setWalletItemLoading}
             walletProviderName={WalletProviderName.METAMASK}
-            onWalletClick={async (name) => await handleWalletConnection(name)}
+            onWalletClick={handleFromWalletConnection}
           />
           {checkout.passport && (
             <BridgeWalletItem
@@ -274,7 +262,7 @@ export function BridgeWalletForm() {
               loading={walletItemLoading}
               setLoading={setWalletItemLoading}
               walletProviderName={WalletProviderName.PASSPORT}
-              onWalletClick={async (name) => await handleWalletConnection(name)}
+              onWalletClick={handleFromWalletConnection}
             />
           )}
         </BottomSheet.Content>
@@ -299,7 +287,7 @@ export function BridgeWalletForm() {
             key={imtblZkEvmNetworkName}
             testId={testId}
             chainName={imtblZkEvmNetworkName}
-            onNetworkClick={handleNetworkSelection}
+            onNetworkClick={handleFromNetworkSelection}
             chainId={imtblZkEvmNetworkChainId}
           />
           {/** Show L1 option for Metamask only */}
@@ -308,7 +296,7 @@ export function BridgeWalletForm() {
             key={l1NetworkName}
             testId={testId}
             chainName={l1NetworkName}
-            onNetworkClick={handleNetworkSelection}
+            onNetworkClick={handleFromNetworkSelection}
             chainId={l1NetworkChainId}
           />
           )}
@@ -363,27 +351,24 @@ export function BridgeWalletForm() {
               <BottomSheet.Content sx={walletItemListStyles}>
                 <BridgeWalletItem
                   key={WalletProviderName.METAMASK}
-                  testId={testId}
+                  testId={`${testId}-to`}
                   loading={walletItemLoading}
                   setLoading={setWalletItemLoading}
                   walletProviderName={WalletProviderName.METAMASK}
-                  onWalletClick={async (name) => await handleToWalletSelection(name)}
+                  onWalletClick={handleToWalletSelection}
                 />
 
-                {/** if passport has been configured in checkout
-                 * AND fromNetwork is L1
-                 * AND fromWallet is MetaMask
-                 * -> show Passport option */}
+                {/** conditionally show To Passport option */}
                 {checkout.passport
                 && fromNetwork === l1NetworkChainId
                 && fromWalletProviderName === WalletProviderName.METAMASK && (
                 <BridgeWalletItem
                   key={WalletProviderName.PASSPORT}
-                  testId={testId}
+                  testId={`${testId}-to`}
                   loading={walletItemLoading}
                   setLoading={setWalletItemLoading}
                   walletProviderName={WalletProviderName.PASSPORT}
-                  onWalletClick={async (name) => await handleToWalletSelection(name)}
+                  onWalletClick={handleToWalletSelection}
                 />
                 )}
               </BottomSheet.Content>
@@ -400,7 +385,8 @@ export function BridgeWalletForm() {
         onWalletClick={() => {
           setToWalletDrawerOpen(true);
         }}
-        onNetworkClick={() => console.log('wrong')}
+        // eslint-disable-next-line no-console
+        onNetworkClick={() => console.log('this button currently does nothing...')}
       />
       )}
     </Box>
