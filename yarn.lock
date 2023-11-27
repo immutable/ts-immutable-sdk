@@ -3817,7 +3817,7 @@ __metadata:
     url: ^0.11.0
     variant-classnames: ^1.3.0
     vite: ^5.0.2
-    vite-plugin-node-polyfills: ^0.8.2
+    vite-plugin-node-polyfills: ^0.16.0
   languageName: unknown
   linkType: soft
 
@@ -6500,7 +6500,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rollup/plugin-inject@npm:^5.0.1, @rollup/plugin-inject@npm:^5.0.3":
+"@rollup/plugin-inject@npm:^5.0.1":
   version: 5.0.3
   resolution: "@rollup/plugin-inject@npm:5.0.3"
   dependencies:
@@ -29824,18 +29824,6 @@ __metadata:
   peerDependencies:
     vite: ^2.0.0 || ^3.0.0 || ^4.0.0
   checksum: c4b3767e29a7c95efccde7d8adeac7963fb9b30677d88e348eda1c1d407c0d821d58c9ea651cb5db0aa010c93fd1971d8b671fea2417edd15a707861be772861
-  languageName: node
-  linkType: hard
-
-"vite-plugin-node-polyfills@npm:^0.8.2":
-  version: 0.8.2
-  resolution: "vite-plugin-node-polyfills@npm:0.8.2"
-  dependencies:
-    "@rollup/plugin-inject": ^5.0.3
-    node-stdlib-browser: ^1.2.0
-  peerDependencies:
-    vite: ^2.0.0 || ^3.0.0 || ^4.0.0
-  checksum: d4fa195a17ae080fd65b1aa90ce484360aa080f1574c9dafc5e136e6b3830bf92ce064824e6bd6e056f2a2cf70138841851425e28d664614bd1788d435a05dc8
   languageName: node
   linkType: hard
 
