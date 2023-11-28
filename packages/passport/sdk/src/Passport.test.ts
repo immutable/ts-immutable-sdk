@@ -174,7 +174,7 @@ describe('Passport', () => {
   });
 
   describe('logoutDeviceFlow', () => {
-    it('should execute logoutDeviceFlow without error and return the endSessionEndpoint', async () => {
+    it('should execute logoutDeviceFlow without error and return the device flow end session endpoint', async () => {
       const endSessionEndpoint = 'https://test.com/logout';
       getDeviceFlowEndSessionEndpointMock.mockReturnValue(endSessionEndpoint);
 
