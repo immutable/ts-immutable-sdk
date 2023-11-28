@@ -30,7 +30,7 @@ export const getAllowedBalances = async ({
   chainId,
   allowZero = false,
   retryPolicy = DEFAULT_BALANCE_RETRY_POLICY,
-}: GetAllowedBalancesParamsType):Promise<GetAllowedBalancesResultType> => {
+}: GetAllowedBalancesParamsType):Promise<GetAllowedBalancesResultType | undefined> => {
   const currentChainId = chainId || (await checkout.getNetworkInfo({ provider })).chainId;
 
   const walletAddress = await provider.getSigner().getAddress();
@@ -42,6 +42,17 @@ export const getAllowedBalances = async ({
     }),
     { ...retryPolicy },
   );
+
+  // Why is this needed?
+  // getAllowedBalances has a retry logic, if the user changes network
+  // the retry holds the ref to the old provider causing an error due
+  // to the mismatch of chain id between what's held by the retry and
+  // what's currently set in the latest provider.
+  // Due to this error, the POLICY automatically returns undefined
+  // and this is backfilled with an empty object making the application
+  // believe that the wallet has no tokens.
+  // This is now handled in the Bridge and Swap widget.
+  if (tokenBalances === undefined) return undefined;
 
   const allowList = await checkout.getTokenAllowList({
     chainId: currentChainId,

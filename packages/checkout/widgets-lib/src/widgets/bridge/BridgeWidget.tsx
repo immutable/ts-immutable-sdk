@@ -108,7 +108,7 @@ export function BridgeWidget({
     if (!checkout) throw new Error('loadBalances: missing checkout');
     if (!provider) throw new Error('loadBalances: missing provider');
 
-    let tokensAndBalances: GetAllowedBalancesResultType = {
+    let tokensAndBalances: GetAllowedBalancesResultType | undefined = {
       allowList: { tokens: [] },
       allowedBalances: [],
     };
@@ -118,26 +118,29 @@ export function BridgeWidget({
         provider,
         allowTokenListType: TokenFilterTypes.BRIDGE,
       });
+
+      // Why? Check getAllowedBalances
+      if (tokensAndBalances === undefined) return false;
+
+      bridgeDispatch({
+        payload: {
+          type: BridgeActions.SET_ALLOWED_TOKENS,
+          allowedTokens: tokensAndBalances.allowList.tokens,
+        },
+      });
+
+      bridgeDispatch({
+        payload: {
+          type: BridgeActions.SET_TOKEN_BALANCES,
+          tokenBalances: tokensAndBalances.allowedBalances,
+        },
+      });
     } catch (err: any) {
       if (DEFAULT_BALANCE_RETRY_POLICY.nonRetryable!(err)) {
         showErrorView(err, loadBalances);
         return false;
       }
     }
-
-    bridgeDispatch({
-      payload: {
-        type: BridgeActions.SET_ALLOWED_TOKENS,
-        allowedTokens: tokensAndBalances.allowList.tokens,
-      },
-    });
-
-    bridgeDispatch({
-      payload: {
-        type: BridgeActions.SET_TOKEN_BALANCES,
-        tokenBalances: tokensAndBalances.allowedBalances,
-      },
-    });
 
     return true;
   };

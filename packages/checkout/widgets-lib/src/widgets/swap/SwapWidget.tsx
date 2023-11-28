@@ -129,7 +129,7 @@ export function SwapWidget({
     if (!checkout) throw new Error('loadBalances: missing checkout');
     if (!provider) throw new Error('loadBalances: missing provider');
 
-    let tokensAndBalances: GetAllowedBalancesResultType = {
+    let tokensAndBalances: GetAllowedBalancesResultType | undefined = {
       allowList: { tokens: [] },
       allowedBalances: [],
     };
@@ -139,6 +139,10 @@ export function SwapWidget({
         provider,
         allowTokenListType: TokenFilterTypes.SWAP,
       });
+
+      // Why? Check getAllowedBalances
+      if (tokensAndBalances === undefined) return false;
+
       swapDispatch({
         payload: {
           type: SwapActions.SET_ALLOWED_TOKENS,
