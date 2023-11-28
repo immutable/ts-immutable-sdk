@@ -4,6 +4,7 @@
   "dependencies": {
     "@imtbl/bridge-sdk": "0.0.0",
     "@imtbl/config": "0.0.0",
+    "dotenv": "^16.3.1",
     "ethers": "^5.7.2"
   },
   "devDependencies": {

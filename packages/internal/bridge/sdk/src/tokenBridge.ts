@@ -1,5 +1,5 @@
 import {
-  AxelarQueryAPI, AxelarQueryAPIFeeResponse, CHAINS, Environment,
+  AxelarQueryAPI, AxelarQueryAPIFeeResponse, Environment,
 } from '@axelar-network/axelarjs-sdk';
 import { L2_STATE_SENDER_ADDRESS, NATIVE_TOKEN_BRIDGE_KEY } from 'constants/bridges';
 import { BridgeConfiguration } from 'config';
@@ -55,7 +55,7 @@ export class TokenBridge {
   /**
    * Constructs a TokenBridge instance.
    *
-   * @param {BridgeConfiguration} config - The bridge configuration object.
+   * @param {BridgeConfiguration} config - The bridge configuration object.ƒ
    */
   constructor(config: BridgeConfiguration) {
     this.config = config;
@@ -93,10 +93,12 @@ export class TokenBridge {
    *   });
    */
   public async getFee(req: BridgeFeeRequest): Promise<BridgeFeeResponse> {
-    this.validateChainConfiguration();
+    await this.validateChainConfiguration();
 
     let sourceChainFee: ethers.BigNumber = ethers.BigNumber.from(0);
     let destinationChainFee: ethers.BigNumber = ethers.BigNumber.from(0);
+    const bridgeFee: ethers.BigNumber = ethers.BigNumber.from(1000);
+    const networkFee: ethers.BigNumber = ethers.BigNumber.from(0);
 
     if (req.method === BridgeFeeMethods.FINALISE_WITHDRAWAL) {
       sourceChainFee = await TokenBridge.getGasEstimates(
@@ -115,11 +117,11 @@ export class TokenBridge {
         destinationProvider = this.config.childProvider;
       }
 
-      sourceChainFee = await TokenBridge.getGasEstimates(
+      sourceChainFee = await this.getGasEstimates(
         sourceProvider,
         BridgeMethodsGasLimit[`${req.method}_SOURCE`],
       );
-      destinationChainFee = await TokenBridge.getGasEstimates(
+      destinationChainFee = await this.getGasEstimates(
         destinationProvider,
         BridgeMethodsGasLimit[`${req.method}_DESTINATION`],
       );
@@ -128,15 +130,19 @@ export class TokenBridge {
     // @TODO fetch axelar fee
     // this.calculateBridgeFee();
 
+    const totalFee: ethers.BigNumber = sourceChainFee.add(destinationChainFee).add(bridgeFee).add(networkFee);
+
     return {
       sourceChainFee,
       destinationChainFee,
-      bridgeFee: ethers.BigNumber.from(1000), // @TODO will be the axelar fee
-      networkFee: ethers.BigNumber.from(0), // no network fee charged currently
+      bridgeFee, // @TODO will be the axelar fee
+      networkFee, // no network fee charged currently
+      totalFee,
     };
   }
 
-  private static async getGasEstimates(
+  // eslint-disable-next-line class-methods-use-this
+  private async getGasEstimates(
     provider: ethers.providers.Provider,
     txnGasLimitInWei: number,
   ): Promise<ethers.BigNumber> {
@@ -185,7 +191,7 @@ export class TokenBridge {
   public async getUnsignedApproveBridgeTx(
     req: ApproveBridgeRequest,
   ): Promise<ApproveBridgeResponse> {
-    this.validateChainConfiguration();
+    await this.validateChainConfiguration();
 
     await this.validateDepositArgs(
       req.senderAddress,
@@ -289,7 +295,7 @@ export class TokenBridge {
     req: BridgeTxRequest,
   ): Promise<BridgeTxResponse> {
     // console.log('getUnsignedBridgeTx');
-    this.validateChainConfiguration();
+    await this.validateChainConfiguration();
 
     // @TODO check source & destination to determin which contract and methods to use
 
@@ -317,7 +323,7 @@ export class TokenBridge {
         BridgeErrorType.INTERNAL_ERROR,
       );
 
-      return this.getBridgeTx(
+      return TokenBridge.getBridgeTx(
         sender,
         receipient,
         req.amount,
@@ -339,7 +345,7 @@ export class TokenBridge {
       BridgeErrorType.INTERNAL_ERROR,
     );
 
-    return this.getBridgeTx(
+    return TokenBridge.getBridgeTx(
       sender,
       receipient,
       req.amount,
@@ -350,8 +356,7 @@ export class TokenBridge {
     );
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  private async getBridgeTx(
+  static async getBridgeTx(
     sender:string,
     recipient:string,
     amount:ethers.BigNumber,
@@ -440,7 +445,7 @@ export class TokenBridge {
   public async waitForDeposit(
     req: WaitForDepositRequest,
   ): Promise<WaitForDepositResponse> {
-    this.validateChainConfiguration();
+    await this.validateChainConfiguration();
     const rootTxReceipt = await withBridgeError<ethers.providers.TransactionReceipt>(
       async () => this.config.rootProvider.waitForTransaction(req.transactionHash, this.config.rootChainFinalityBlocks),
       BridgeErrorType.PROVIDER_ERROR,
@@ -523,7 +528,7 @@ export class TokenBridge {
  */
   public async getChildToken(req: ChildTokenRequest): Promise<ChildTokenResponse> {
   // Validate the chain configuration to ensure proper setup
-    this.validateChainConfiguration();
+    await this.validateChainConfiguration();
 
     // If the root token is native, use the native token key; otherwise, use the provided root token address
     const reqTokenAddress = (req.rootToken === 'NATIVE') ? NATIVE_TOKEN_BRIDGE_KEY : req.rootToken;
@@ -585,7 +590,7 @@ export class TokenBridge {
  */
   public async getRootToken(req: RootTokenRequest): Promise<RootTokenResponse> {
   // Validate the chain configuration to ensure proper setup
-    this.validateChainConfiguration();
+    await this.validateChainConfiguration();
 
     // Query the corresponding root token address using the child token contract
     const rootToken = await withBridgeError<string>(
@@ -639,7 +644,7 @@ export class TokenBridge {
     req: BridgeWithdrawRequest,
   ): Promise<BridgeWithdrawResponse> {
     // Ensure the configuration of chains is valid.
-    this.validateChainConfiguration();
+    await this.validateChainConfiguration();
 
     // Validate the recipient address, withdrawal amount, and token.
     TokenBridge.validateWithdrawArgs(req.recipientAddress, req.withdrawAmount, req.token);
@@ -704,7 +709,7 @@ export class TokenBridge {
     req:WaitForWithdrawalRequest,
   ): Promise<WaitForWithdrawalResponse> {
     // Ensure the configuration of chains is valid.
-    this.validateChainConfiguration();
+    await this.validateChainConfiguration();
 
     // Helper function to pause execution for a specified interval
     const pause = (): Promise<void> => new Promise((resolve) => {
@@ -784,7 +789,7 @@ export class TokenBridge {
    */
   public async getUnsignedExitTx(req: ExitRequest): Promise<ExitResponse> {
     // Ensure the configuration of chains is valid
-    this.validateChainConfiguration();
+    await this.validateChainConfiguration();
 
     // Fetch the receipt of the deposit transaction
     const txReceipt = await withBridgeError<ethers.providers.TransactionReceipt>(
@@ -1047,28 +1052,19 @@ export class TokenBridge {
   private async validateChainConfiguration(): Promise<void> {
     const errMessage = 'Please upgrade to the latest version of the Bridge SDK or provide valid configuration';
 
-    // console.log('validateChainConfiguration this.config', this.config);
-
-    // const network = await this.config.rootProvider.getNetwork();
-    // console.log('validateChainConfiguration network', network);
-
     const rootNetwork = await withBridgeError<ethers.providers.Network>(
       async () => this.config.rootProvider.getNetwork(),
       BridgeErrorType.PROVIDER_ERROR,
     );
 
-    // console.log('after rootNetwork');
-
-    if (rootNetwork.chainId.toString() !== this.config.bridgeInstance.rootChainID.toString()) {
+    if (rootNetwork!.chainId.toString() !== this.config.bridgeInstance.rootChainID.toString()) {
       throw new BridgeError(
-        `Rootchain provider chainID ${rootNetwork.chainId} does not match expected chainID ${this.config.bridgeInstance.rootChainID}. ${errMessage}`,
+        `Rootchain provider chainID ${rootNetwork!.chainId} does not match expected chainID ${this.config.bridgeInstance.rootChainID}. ${errMessage}`,
         BridgeErrorType.UNSUPPORTED_ERROR,
       );
     }
 
     const childNetwork = await this.config.childProvider.getNetwork();
-
-    // console.log('after childNetwork');
 
     if (childNetwork.chainId.toString() !== this.config.bridgeInstance.childChainID.toString()) {
       throw new BridgeError(
@@ -1090,15 +1086,15 @@ export class TokenBridge {
   private async calculateBridgeFee(
     source:string,
     destination:string,
-    options = {},
+    symbol: string,
+    gasLimit: string,
+    gasMultiplier: number,
   ): Promise<string | AxelarQueryAPIFeeResponse> {
     const api = new AxelarQueryAPI({ environment: Environment.TESTNET });
-    const { gasLimit, gasMultiplier, symbol } = options;
-
-    return api.estimateGasFee(
-      CHAINS.TESTNET[source.toUpperCase()],
-      CHAINS.TESTNET[destination.toUpperCase()],
-      symbol || source.tokenSymbol,
+    return await api.estimateGasFee(
+      'ethereum-sepolia',
+      'immutable',
+      symbol,
       gasLimit,
       gasMultiplier,
     );

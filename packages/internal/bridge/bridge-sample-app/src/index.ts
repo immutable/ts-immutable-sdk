@@ -1,15 +1,16 @@
 /* eslint-disable no-console */
+import {} from 'dotenv/config';
 import { ImmutableConfiguration, Environment } from '@imtbl/config';
 import { ethers } from 'ethers';
 import {
   TokenBridge,
   BridgeConfiguration,
   BridgeFeeRequest,
-  ApproveDepositBridgeRequest,
-  ApproveDepositBridgeResponse,
+  ApproveBridgeRequest,
+  ApproveBridgeResponse,
   BridgeFeeResponse,
-  BridgeDepositRequest,
-  BridgeDepositResponse,
+  BridgeTxRequest,
+  BridgeTxResponse,
   WaitForDepositRequest,
   WaitForDepositResponse,
   CompletionStatus,
@@ -19,6 +20,7 @@ import {
   ExitRequest,
   ETH_SEPOLIA_TO_ZKEVM_DEVNET,
   ETH_SEPOLIA_TO_ZKEVM_TESTNET,
+  BridgeFeeMethods,
 } from '@imtbl/bridge-sdk';
 
 /**
@@ -30,6 +32,9 @@ import {
  */
 async function depositAndWithdraw() {
   // Check and throw errors if required environment variables are not set
+
+  console.log('process.env', process.env)
+
   if (!process.env.ROOT_PROVIDER) {
     console.log(process.env.ROOT_PROVIDER);
     throw new Error('ROOT_PROVIDER not set');
@@ -92,24 +97,26 @@ async function depositAndWithdraw() {
   const tokenBridge = new TokenBridge(bridgeConfig);
 
   // Get the bridge fee and calculate the total deposit amount
-  const bridgeFeeReq: BridgeFeeRequest = { token: process.env.TOKEN_ADDRESS };
+  const bridgeFeeReq: BridgeFeeRequest = { method: BridgeFeeMethods.DEPOSIT };
   const bridgeFeeResponse: BridgeFeeResponse = await tokenBridge.getFee(
     bridgeFeeReq,
   );
   console.log(`Deposit token is ${process.env.TOKEN_ADDRESS}`)
 
   // Calculate the total deposit amount required to ensure the user gets the amount they expect on L2
-  const depositAmount = bridgeFeeResponse.feeAmount.add(depositAmountBeforeFee);
+  const depositAmount = bridgeFeeResponse.totalFee.add(depositAmountBeforeFee);
   console.log(`Deposit Amount inclusive of fees is ${depositAmount}`);
 
-  const approveReq: ApproveDepositBridgeRequest = {
-    depositorAddress: process.env.DEPOSITOR_ADDRESS,
+  const approveReq: ApproveBridgeRequest = {
+    senderAddress: process.env.DEPOSITOR_ADDRESS,
     token: process.env.TOKEN_ADDRESS,
-    depositAmount,
+    amount: depositAmount,
+    sourceChainId: rootChainProvider.network.chainId.toString(),
+    destinationChainId: childChainProvider.network.chainId.toString(),
   };
 
   // Get the unsigned approval transaction for the deposit
-  const approveResp: ApproveDepositBridgeResponse = await tokenBridge.getUnsignedApproveDepositBridgeTx(approveReq);
+  const approveResp: ApproveBridgeResponse = await tokenBridge.getUnsignedApproveBridgeTx(approveReq);
 
   // If approval is required, sign and send the approval transaction
   if (approveResp.unsignedTx) {
@@ -126,13 +133,16 @@ async function depositAndWithdraw() {
   }
 
   // Get the unsigned deposit transaction and send it on L1
-  const depositArgs: BridgeDepositRequest = {
+  const depositArgs: BridgeTxRequest = {
+    senderAddress: process.env.DEPOSITOR_ADDRESS,
     recipientAddress: process.env.RECIPIENT_ADDRESS,
     token: process.env.TOKEN_ADDRESS,
-    depositAmount,
+    amount: depositAmount,
+    sourceChainId: rootChainProvider.network.chainId.toString(),
+    destinationChainId: childChainProvider.network.chainId.toString(),
   };
 
-  const unsignedDepositResult: BridgeDepositResponse = await tokenBridge.getUnsignedDepositTx(depositArgs);
+  const unsignedDepositResult: BridgeTxResponse = await tokenBridge.getUnsignedBridgeTx(depositArgs);
   console.log('Sending Deposit Tx');
   // Sign and Send the signed transaction
 

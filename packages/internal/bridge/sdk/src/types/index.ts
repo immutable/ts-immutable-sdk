@@ -150,6 +150,7 @@ export interface BridgeFeeResponse {
   destinationChainFee: ethers.BigNumber,
   bridgeFee: ethers.BigNumber,
   networkFee: ethers.BigNumber,
+  totalFee: ethers.BigNumber,
 }
 
 /**
