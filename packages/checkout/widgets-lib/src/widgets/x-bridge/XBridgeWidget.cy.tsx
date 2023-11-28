@@ -99,7 +99,7 @@ describe('XBridgeWidget', () => {
         .should('exist');
     });
 
-    it.only('should not make getNetwork call if the from wallet provider is Passport', () => {
+    it('should not make getNetwork call if the from wallet provider is Passport', () => {
       cy.stub(Checkout.prototype, 'createProvider').returns({ provider: mockPassportProvider });
       cy.stub(Checkout.prototype, 'checkIsWalletConnected').resolves({ isConnected: false });
       cy.stub(Checkout.prototype, 'connect').resolves({ provider: mockPassportProvider });
