@@ -134,6 +134,12 @@ export function BridgeWalletForm() {
       if (!fromWalletLocalWeb3Provider) return;
       clearToWalletSelections();
 
+      if (isPassportProvider(fromWalletLocalWeb3Provider)) {
+        setFromNetworkDrawerOpen(false);
+        setFromNetwork(chainId);
+        return;
+      }
+
       const currentNetwork = await fromWalletLocalWeb3Provider?.getNetwork();
       if (currentNetwork?.chainId === chainId) {
         setFromNetworkDrawerOpen(false);

@@ -69,6 +69,7 @@ export function WalletNetworkButton({
         </Body>
       </Box>
       <Button
+        testId={`${testId}-network-${chainId}-button`}
         size="small"
         onClick={(e) => {
           // stop propogation so onWalletClick is not triggered
