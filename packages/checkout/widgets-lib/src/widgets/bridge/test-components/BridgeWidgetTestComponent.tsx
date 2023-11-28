@@ -1,5 +1,4 @@
 import React, { useCallback, useMemo, useReducer } from 'react';
-import { onLightBase } from '@biom3/design-tokens';
 import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import {
   initialBridgeState, BridgeContext, bridgeReducer, BridgeState,
@@ -36,7 +35,7 @@ export function BridgeWidgetTestComponent({ children, initialStateOverride, cryp
   ), [cryptoFiatState, cryptoFiatDispatch]);
 
   return (
-    <ViewContextTestComponent theme={onLightBase}>
+    <ViewContextTestComponent>
       <BridgeContext.Provider value={bridgeReducerValues}>
         <CryptoFiatContext.Provider value={cryptoFiatReducerValues as CryptoFiatContextState}>
           {children}

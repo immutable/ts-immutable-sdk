@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import { describe, it } from 'local-cypress';
 import { mount } from 'cypress/react18';
-import { onLightBase } from '@biom3/design-tokens';
 import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
+import { WidgetTheme } from '@imtbl/checkout-sdk';
 import { cySmartGet } from '../../lib/testUtils';
 import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from './HeaderNavigation';
@@ -105,7 +105,7 @@ describe('HeaderNavigation', () => {
   describe('HeaderNavigation styling', () => {
     it('should set solid background when configured', () => {
       mount(
-        <ViewContextTestComponent theme={onLightBase}>
+        <ViewContextTestComponent theme={WidgetTheme.LIGHT}>
           <SimpleLayout
             header={(
               <HeaderNavigation
@@ -127,7 +127,7 @@ describe('HeaderNavigation', () => {
 
     it('should set transparent background when configured', () => {
       mount(
-        <ViewContextTestComponent theme={onLightBase}>
+        <ViewContextTestComponent theme={WidgetTheme.LIGHT}>
           <SimpleLayout
             header={(
               <HeaderNavigation

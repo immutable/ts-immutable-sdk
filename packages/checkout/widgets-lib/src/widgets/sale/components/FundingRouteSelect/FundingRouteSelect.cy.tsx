@@ -124,7 +124,7 @@ describe('FundingRouteSelect View', () => {
     it('clicking should not open bottom sheet', () => {
       cySmartGet('funding-route-menu-item').click();
 
-      cySmartGet('bottomSheet').should('not.exist');
+      cySmartGet('Drawer__container').should('not.exist');
     });
   });
 
@@ -159,30 +159,30 @@ describe('FundingRouteSelect View', () => {
     it('clicking should open bottom sheet', () => {
       cySmartGet('funding-route-menu-item').click();
 
-      cySmartGet('bottomSheet').should('exist');
+      cySmartGet('Drawer__container').should('exist');
     });
 
     it('selecting an item inside the bottom sheet should change selected option', () => {
       cySmartGet('funding-route-menu-item').should('contain.text', 'ETH');
       cySmartGet('funding-route-menu-item').click();
 
-      cySmartGet('bottomSheet').should('exist');
-      cySmartGet('bottomSheet').find('[data-testId="funding-route-menu-item"]').should('have.length', 2);
-      cySmartGet('bottomSheet').find('[data-testId="funding-route-menu-item"]')
+      cySmartGet('Drawer__container').should('exist');
+      cySmartGet('Drawer__container').find('[data-testId="funding-route-menu-item"]').should('have.length', 2);
+      cySmartGet('Drawer__container').find('[data-testId="funding-route-menu-item"]')
         .eq(0).should('have.class', 'selected');
-      cySmartGet('bottomSheet').find('[data-testId="funding-route-menu-item"]')
+      cySmartGet('Drawer__container').find('[data-testId="funding-route-menu-item"]')
         .eq(1).should('not.have.class', 'selected');
-      cySmartGet('bottomSheet').find('[data-testId="funding-route-menu-item"]')
+      cySmartGet('Drawer__container').find('[data-testId="funding-route-menu-item"]')
         .eq(1).click();
 
-      cySmartGet('bottomSheet').should('not.exist');
+      cySmartGet('Drawer__container').should('not.exist');
 
       cySmartGet('funding-route-menu-item').should('contain.text', 'USDC');
 
       cySmartGet('funding-route-menu-item').click();
-      cySmartGet('bottomSheet').find('[data-testId="funding-route-menu-item"]')
+      cySmartGet('Drawer__container').find('[data-testId="funding-route-menu-item"]')
         .eq(0).should('not.have.class', 'selected');
-      cySmartGet('bottomSheet').find('[data-testId="funding-route-menu-item"]')
+      cySmartGet('Drawer__container').find('[data-testId="funding-route-menu-item"]')
         .eq(1).should('have.class', 'selected');
     });
   });

@@ -1,4 +1,3 @@
-import { onDarkBase, onLightBase } from '@biom3/design-tokens';
 import { mount } from 'cypress/react18';
 import { WidgetTheme } from '@imtbl/checkout-sdk';
 import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
@@ -10,7 +9,7 @@ import { text } from '../../resources/text/textConfig';
 describe('Quickswap Footer', () => {
   it('should show the Quickswap logo', () => {
     mount(
-      <ViewContextTestComponent theme={onLightBase}>
+      <ViewContextTestComponent theme={WidgetTheme.LIGHT}>
         <SimpleLayout footer={<QuickswapFooter theme={WidgetTheme.LIGHT} />} />
       </ViewContextTestComponent>,
     );
@@ -20,7 +19,7 @@ describe('Quickswap Footer', () => {
 
   it('should show the disclaimer text', () => {
     mount(
-      <ViewContextTestComponent theme={onDarkBase}>
+      <ViewContextTestComponent theme={WidgetTheme.DARK}>
         <SimpleLayout footer={<QuickswapFooter theme={WidgetTheme.DARK} />} />
       </ViewContextTestComponent>,
     );

@@ -24,8 +24,8 @@ describe('FeesBreakdown', () => {
       </ViewContextTestComponent>,
     );
     cySmartGet('fee-button').click();
-    cySmartGet('bottomSheet__header').should('be.visible');
-    cySmartGet('bottomSheet__header').should('have.text', 'Fee breakdown');
+    cySmartGet('Drawer__container__header').should('be.visible');
+    cySmartGet('Drawer__container__header').should('have.text', 'Fee breakdown');
     cySmartGet('fees-breakdown-content').should('be.visible');
     cySmartGet('fee-item-fees-total').should('be.visible');
     cySmartGet('fees-total__price').should('have.text', 'IMX 1.0');

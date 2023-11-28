@@ -1,16 +1,23 @@
 import React from 'react';
-import { BiomeCombinedProviders } from '@biom3/react';
-import { BaseTokens, onDarkBase } from '@biom3/design-tokens';
+import { WidgetContainer } from 'components/WidgetContainer/WidgetContainer';
+import { withDefaultWidgetConfigs } from 'lib/withDefaultWidgetConfig';
+import { WidgetTheme } from '@imtbl/checkout-sdk';
 
 export interface TestProps {
   children: React.ReactNode;
-  theme?: BaseTokens
+  theme?: WidgetTheme
 }
 
 export function ViewContextTestComponent({ children, theme }: TestProps) {
+  const config = withDefaultWidgetConfigs({
+    theme: theme ?? WidgetTheme.DARK,
+  });
   return (
-    <BiomeCombinedProviders theme={{ base: theme ?? onDarkBase }}>
+    <WidgetContainer
+      id="test"
+      config={config}
+    >
       {children}
-    </BiomeCombinedProviders>
+    </WidgetContainer>
   );
 }
