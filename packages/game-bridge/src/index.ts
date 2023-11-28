@@ -266,11 +266,12 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
         break;
       }
       case PASSPORT_FUNCTIONS.logout: {
-        await passportClient?.logoutDeviceFlow();
+        const deviceFlowEndSessionEndpoint = await passportClient?.logoutDeviceFlow();
         callbackToGame({
           responseFor: fxName,
           requestId,
           success: true,
+          result: deviceFlowEndSessionEndpoint,
         });
         break;
       }

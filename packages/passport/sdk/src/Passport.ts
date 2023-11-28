@@ -150,7 +150,7 @@ export class Passport {
    * Logs the user out of Passport when using device flow authentication.
    *
    * @returns {Promise<string>} The device flow end session endpoint. Consumers are responsible for
-   * opening this URL in the same browser that was used to log in.
+   * opening this URL in the same browser that was used to log the user in.
    */
   public async logoutDeviceFlow(): Promise<string> {
     await this.authManager.removeUser();
