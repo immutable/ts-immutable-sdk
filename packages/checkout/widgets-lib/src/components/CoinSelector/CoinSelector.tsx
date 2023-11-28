@@ -1,21 +1,22 @@
 import {
   Body,
-  BottomSheet, Box,
+  BottomSheet, Box, MenuItem,
 } from '@biom3/react';
 import { CoinSelectorOption, CoinSelectorOptionProps } from './CoinSelectorOption';
-import { selectOptionsContainerStyles } from './CoinSelectorStyles';
+import { selectOptionsContainerStyles, selectOptionsLoadingIconStyles } from './CoinSelectorStyles';
 import { text } from '../../resources/text/textConfig';
 
 type CoinSelectorProps = {
   onCloseBottomSheet?: () => void;
   heading: string;
   options: CoinSelectorOptionProps[];
+  optionsLoading?: boolean;
   children?: any;
   visible?: boolean;
 };
 
 export function CoinSelector({
-  heading, options, children, onCloseBottomSheet, visible,
+  heading, options, optionsLoading, children, onCloseBottomSheet, visible,
 }: CoinSelectorProps) {
   const { noCoins } = text.drawers.coinSelector;
   return (
@@ -25,8 +26,15 @@ export function CoinSelector({
       </BottomSheet.Target>
       <BottomSheet.Content>
         <Box sx={selectOptionsContainerStyles}>
-          {options.length === 0 && (<Body sx={{ padding: 'base.spacing.x4' }}>{noCoins}</Body>)}
-          {options.map(({
+          {optionsLoading && options.length === 0 && (
+            <Box sx={selectOptionsLoadingIconStyles}>
+              <MenuItem shimmer emphasized testId="balance-item-shimmer--1" />
+              <MenuItem shimmer emphasized testId="balance-item-shimmer--2" />
+              <MenuItem shimmer emphasized testId="balance-item-shimmer--3" />
+            </Box>
+          )}
+          {!optionsLoading && options.length === 0 && (<Body sx={{ padding: 'base.spacing.x4' }}>{noCoins}</Body>)}
+          {!optionsLoading && options.map(({
             onClick, icon, name, symbol, balance, id, testId,
           }) => (
             <CoinSelectorOption
