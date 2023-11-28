@@ -22,7 +22,7 @@ export function BridgeWalletSelection() {
       )}
       footer={<FooterLogo />}
     >
-      <BridgeWalletForm testId="cross-wallet-form" />
+      <BridgeWalletForm />
     </SimpleLayout>
   );
 }
