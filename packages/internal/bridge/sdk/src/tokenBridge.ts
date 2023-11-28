@@ -101,7 +101,7 @@ export class TokenBridge {
     const networkFee: ethers.BigNumber = ethers.BigNumber.from(0);
 
     if (req.method === BridgeFeeMethods.FINALISE_WITHDRAWAL) {
-      sourceChainFee = await TokenBridge.getGasEstimates(
+      sourceChainFee = await this.getGasEstimates(
         this.config.rootProvider,
         BridgeMethodsGasLimit.FINALISE_WITHDRAWAL,
       );
