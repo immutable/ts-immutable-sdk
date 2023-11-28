@@ -64,7 +64,6 @@ export function SwapCoins({
   }, []);
 
   useEffect(() => {
-    console.log(tokenBalances);
     if (hasZeroBalance(tokenBalances, IMX_TOKEN_SYMBOL)) {
       setShowNotEnoughImxDrawer(true);
     }
