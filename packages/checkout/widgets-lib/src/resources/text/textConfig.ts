@@ -450,7 +450,7 @@ export const text = {
         walletSelectorHeading: 'To wallet',
       },
       button: {
-        text: 'Review',
+        text: 'Next',
       },
     },
   },
