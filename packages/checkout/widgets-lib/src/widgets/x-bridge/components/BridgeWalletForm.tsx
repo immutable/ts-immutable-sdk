@@ -42,21 +42,21 @@ export function BridgeWalletForm() {
   /** From wallet and from network local state */
   const [fromWalletDrawerOpen, setFromWalletDrawerOpen] = useState(false);
   const [fromNetworkDrawerOpen, setFromNetworkDrawerOpen] = useState(false);
-  const [fromWalletLocalWeb3Provider, setFromWalletLocalWeb3Provider] = useState<Web3Provider>();
+  const [fromWalletWeb3Provider, setFromWalletWeb3Provider] = useState<Web3Provider>();
   const [fromNetwork, setFromNetwork] = useState<ChainId>();
 
   /** To wallet local state */
   const [toWalletDrawerOpen, setToWalletDrawerOpen] = useState(false);
-  const [toWalletLocalWeb3Provider, setToWalletLocalWeb3Provider] = useState<Web3Provider>();
+  const [toWalletWeb3Provider, setToWalletWeb3Provider] = useState<Web3Provider>();
   const [toNetwork, setToNetwork] = useState<ChainId>();
 
   /* Derived state */
-  const isFromWalletAndNetworkSelected = fromWalletLocalWeb3Provider !== undefined && fromNetwork !== undefined;
-  const isToWalletAndNetworkSelected = toWalletLocalWeb3Provider !== undefined && toNetwork !== undefined;
-  const fromWalletProviderName = isPassportProvider(fromWalletLocalWeb3Provider)
+  const isFromWalletAndNetworkSelected = fromWalletWeb3Provider !== undefined && fromNetwork !== undefined;
+  const isToWalletAndNetworkSelected = toWalletWeb3Provider !== undefined && toNetwork !== undefined;
+  const fromWalletProviderName = isPassportProvider(fromWalletWeb3Provider)
     ? WalletProviderName.PASSPORT
     : WalletProviderName.METAMASK;
-  const toWalletProviderName = isPassportProvider(toWalletLocalWeb3Provider)
+  const toWalletProviderName = isPassportProvider(toWalletWeb3Provider)
     ? WalletProviderName.PASSPORT
     : WalletProviderName.METAMASK;
   const showPassportToWalletOption = (checkout.passport !== undefined
@@ -67,7 +67,7 @@ export function BridgeWalletForm() {
   /* --- Handling selections --- */
   /* --------------------------- */
   function clearToWalletSelections() {
-    setToWalletLocalWeb3Provider(undefined);
+    setToWalletWeb3Provider(undefined);
     setToNetwork(undefined);
   }
 
@@ -108,7 +108,7 @@ export function BridgeWalletForm() {
     }
 
     if (connected) {
-      setFromWalletLocalWeb3Provider(provider);
+      setFromWalletWeb3Provider(provider);
 
       /** if Passport skip from network selector and default to zkEVM */
       if (isPassportProvider(provider)) {
@@ -131,16 +131,16 @@ export function BridgeWalletForm() {
 
   const handleFromNetworkSelection = useCallback(
     async (chainId: ChainId) => {
-      if (!fromWalletLocalWeb3Provider) return;
+      if (!fromWalletWeb3Provider) return;
       clearToWalletSelections();
 
-      if (isPassportProvider(fromWalletLocalWeb3Provider)) {
+      if (isPassportProvider(fromWalletWeb3Provider)) {
         setFromNetworkDrawerOpen(false);
         setFromNetwork(chainId);
         return;
       }
 
-      const currentNetwork = await fromWalletLocalWeb3Provider?.getNetwork();
+      const currentNetwork = await fromWalletWeb3Provider?.getNetwork();
       if (currentNetwork?.chainId === chainId) {
         setFromNetworkDrawerOpen(false);
         setFromNetwork(chainId);
@@ -148,8 +148,8 @@ export function BridgeWalletForm() {
       }
 
       try {
-        const switchNetwork = await checkout.switchNetwork({ provider: fromWalletLocalWeb3Provider, chainId });
-        setFromWalletLocalWeb3Provider(switchNetwork.provider);
+        const switchNetwork = await checkout.switchNetwork({ provider: fromWalletWeb3Provider, chainId });
+        setFromWalletWeb3Provider(switchNetwork.provider);
         setFromNetworkDrawerOpen(false);
         setFromNetwork(switchNetwork.network.chainId);
       } catch (err) {
@@ -157,13 +157,13 @@ export function BridgeWalletForm() {
         console.error(err);
       }
     },
-    [fromWalletLocalWeb3Provider],
+    [fromWalletWeb3Provider],
   );
 
   const handleToWalletSelection = useCallback(async (selectedToWalletProviderName: WalletProviderName) => {
     if (fromWalletProviderName === selectedToWalletProviderName) {
       // if same from wallet and to wallet, just use the existing fromWalletLocalWeb3Provider
-      setToWalletLocalWeb3Provider(fromWalletLocalWeb3Provider);
+      setToWalletWeb3Provider(fromWalletWeb3Provider);
     } else {
       // from wallet and to wallet selections are different (e.g from MM to PP)
       // make connection to separate wallet provider to use for the to address
@@ -202,7 +202,7 @@ export function BridgeWalletForm() {
         }
       }
 
-      setToWalletLocalWeb3Provider(toWalletProvider);
+      setToWalletWeb3Provider(toWalletProvider);
     }
 
     // toNetwork is always the opposite of fromNetwork
@@ -306,11 +306,12 @@ export function BridgeWalletForm() {
             walletName={toWalletProviderName}
             walletAddress="0x1234...4321"
             chainId={toNetwork}
+            disableNetworkButton
             onWalletClick={() => {
               setToWalletDrawerOpen(true);
             }}
             // eslint-disable-next-line no-console
-            onNetworkClick={() => console.log('this button currently does nothing...')}
+            onNetworkClick={() => {}}
           />
           <Button testId={`${testId}-button`} size="large">{button.text}</Button>
         </Box>
