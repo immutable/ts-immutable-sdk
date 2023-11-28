@@ -16,6 +16,11 @@ export function ViewContextTestComponent({ children, theme }: TestProps) {
     <WidgetContainer
       id="test"
       config={config}
+      globalSx={{
+        body: {
+          bg: 'base.color.neutral.800',
+        },
+      }}
     >
       {children}
     </WidgetContainer>
