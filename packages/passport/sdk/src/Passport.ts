@@ -151,7 +151,7 @@ export class Passport {
     await this.magicAdapter.logout();
     this.passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
 
-    return this.authManager.getEndSessionEndpoint();
+    return this.authManager.getDeviceFlowEndSessionEndpoint();
   }
 
   /**

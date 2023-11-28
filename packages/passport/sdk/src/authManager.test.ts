@@ -115,7 +115,8 @@ describe('AuthManager', () => {
           authorization_endpoint: `${config.authenticationDomain}/authorize`,
           token_endpoint: `${config.authenticationDomain}/oauth/token`,
           userinfo_endpoint: `${config.authenticationDomain}/userinfo`,
-          end_session_endpoint: `${config.authenticationDomain}/v2/logout`,
+          end_session_endpoint: `${config.authenticationDomain}/v2/logout`
+            + `?client_id=${config.oidcConfiguration.clientId}`,
         },
         popup_redirect_uri: config.oidcConfiguration.redirectUri,
         redirect_uri: config.oidcConfiguration.redirectUri,
@@ -149,7 +150,7 @@ describe('AuthManager', () => {
         expect(am).toBeDefined();
         expect(UserManager).toBeCalledWith(expect.objectContaining({
           metadata: expect.objectContaining({
-            end_session_endpoint: 'https://auth.immutable.com/v2/logout?returnTo=https%3A%2F%2Ftest.com%2Flogout%2Fcallback&client_id=11111',
+            end_session_endpoint: 'https://auth.immutable.com/v2/logout?client_id=11111&returnTo=https%3A%2F%2Ftest.com%2Flogout%2Fcallback',
           }),
         }));
       });
@@ -394,17 +395,17 @@ describe('AuthManager', () => {
     });
   });
 
-  describe('getEndSessionEndpoint', () => {
+  describe('getDeviceFlowEndSessionEndpoint', () => {
     describe('when a logoutRedirectUri is specified', () => {
       it('should set the endSessionEndpoint `returnTo` and `client_id` query string params', () => {
         const am = new AuthManager(getConfig({
           logoutRedirectUri: 'https://test.com/logout/callback',
         }));
 
-        const result = am.getEndSessionEndpoint();
+        const result = am.getDeviceFlowEndSessionEndpoint();
 
         expect(result).toEqual(
-          'https://auth.immutable.com/v2/logout?returnTo=https%3A%2F%2Ftest.com%2Flogout%2Fcallback&client_id=11111',
+          'https://auth.immutable.com/v2/logout?client_id=11111&returnTo=https%3A%2F%2Ftest.com%2Flogout%2Fcallback',
         );
       });
     });
@@ -413,7 +414,7 @@ describe('AuthManager', () => {
       it('should return the endSessionEndpoint without a `returnTo` or `client_id` query string params', () => {
         const am = new AuthManager(getConfig());
 
-        const result = am.getEndSessionEndpoint();
+        const result = am.getDeviceFlowEndSessionEndpoint();
 
         expect(result).toEqual('https://auth.immutable.com/v2/logout');
       });

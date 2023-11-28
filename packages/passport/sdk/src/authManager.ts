@@ -29,24 +29,16 @@ const formUrlEncodedHeader = {
   },
 };
 
-const getEndSessionEndpoint = ({
-  oidcConfiguration,
-  authenticationDomain,
-}: PassportConfiguration): string => {
-  let endSessionEndpoint = `${authenticationDomain}/v2/logout`;
-  if (oidcConfiguration.logoutRedirectUri) {
-    endSessionEndpoint += `?returnTo=${encodeURIComponent(oidcConfiguration.logoutRedirectUri)}`
-      + `&client_id=${oidcConfiguration.clientId}`;
-  }
-
-  return endSessionEndpoint;
-};
-
 const getAuthConfiguration = (config: PassportConfiguration): UserManagerSettings => {
   const { authenticationDomain, oidcConfiguration } = config;
 
   const store = typeof window !== 'undefined' ? window.localStorage : new InMemoryWebStorage();
   const userStore = new WebStorageStateStore({ store });
+
+  let endSessionEndpoint = `${authenticationDomain}/v2/logout?client_id=${oidcConfiguration.clientId}`;
+  if (oidcConfiguration.logoutRedirectUri) {
+    endSessionEndpoint += `&returnTo=${encodeURIComponent(oidcConfiguration.logoutRedirectUri)}`;
+  }
 
   const baseConfiguration: UserManagerSettings = {
     authority: authenticationDomain,
@@ -57,7 +49,7 @@ const getAuthConfiguration = (config: PassportConfiguration): UserManagerSetting
       authorization_endpoint: `${authenticationDomain}/authorize`,
       token_endpoint: `${authenticationDomain}/oauth/token`,
       userinfo_endpoint: `${authenticationDomain}/userinfo`,
-      end_session_endpoint: getEndSessionEndpoint(config),
+      end_session_endpoint: endSessionEndpoint,
     },
     mergeClaims: true,
     loadUserInfo: true,
@@ -331,8 +323,15 @@ export default class AuthManager {
     return this.userManager.removeUser();
   }
 
-  public getEndSessionEndpoint(): string {
-    return getEndSessionEndpoint(this.config);
+  public getDeviceFlowEndSessionEndpoint(): string {
+    const { authenticationDomain, oidcConfiguration } = this.config;
+    let endSessionEndpoint = `${authenticationDomain}/v2/logout`;
+    if (oidcConfiguration.logoutRedirectUri) {
+      endSessionEndpoint += `?client_id=${oidcConfiguration.clientId}`
+        + `&returnTo=${encodeURIComponent(oidcConfiguration.logoutRedirectUri)}`;
+    }
+
+    return endSessionEndpoint;
   }
 
   public async logoutSilentCallback(url: string): Promise<void> {
