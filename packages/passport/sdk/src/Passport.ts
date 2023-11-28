@@ -121,6 +121,10 @@ export class Passport {
     return user ? user.profile : null;
   }
 
+  public async loginCallback(): Promise<void> {
+    return this.authManager.loginCallback();
+  }
+
   public async loginWithDeviceFlow(): Promise<DeviceConnectResponse> {
     return this.authManager.loginWithDeviceFlow();
   }
@@ -134,10 +138,6 @@ export class Passport {
     return user.profile;
   }
 
-  public async loginCallback(): Promise<void> {
-    return this.authManager.loginCallback();
-  }
-
   public async logout(): Promise<void> {
     await this.confirmationScreen.logout();
     await this.authManager.logout();
@@ -146,10 +146,12 @@ export class Passport {
     this.passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
   }
 
-  public async logoutDeviceFlow(): Promise<void> {
+  public async logoutDeviceFlow(): Promise<string> {
     await this.authManager.removeUser();
     await this.magicAdapter.logout();
     this.passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
+
+    return this.authManager.getEndSessionEndpoint();
   }
 
   /**

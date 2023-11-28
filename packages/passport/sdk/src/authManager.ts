@@ -29,10 +29,22 @@ const formUrlEncodedHeader = {
   },
 };
 
-const getAuthConfiguration = ({
+const getEndSessionEndpoint = ({
   oidcConfiguration,
   authenticationDomain,
-}: PassportConfiguration): UserManagerSettings => {
+}: PassportConfiguration): string => {
+  let endSessionEndpoint = `${authenticationDomain}/v2/logout`;
+  if (oidcConfiguration.logoutRedirectUri) {
+    endSessionEndpoint += `?returnTo=${encodeURIComponent(oidcConfiguration.logoutRedirectUri)}`
+      + `&client_id=${oidcConfiguration.clientId}`;
+  }
+
+  return endSessionEndpoint;
+};
+
+const getAuthConfiguration = (config: PassportConfiguration): UserManagerSettings => {
+  const { authenticationDomain, oidcConfiguration } = config;
+
   const store = typeof window !== 'undefined' ? window.localStorage : new InMemoryWebStorage();
   const userStore = new WebStorageStateStore({ store });
 
@@ -45,10 +57,7 @@ const getAuthConfiguration = ({
       authorization_endpoint: `${authenticationDomain}/authorize`,
       token_endpoint: `${authenticationDomain}/oauth/token`,
       userinfo_endpoint: `${authenticationDomain}/userinfo`,
-      end_session_endpoint:
-        `${authenticationDomain}/v2/logout`
-        + `?returnTo=${encodeURIComponent(oidcConfiguration.logoutRedirectUri)}`
-        + `&client_id=${oidcConfiguration.clientId}`,
+      end_session_endpoint: getEndSessionEndpoint(config),
     },
     mergeClaims: true,
     loadUserInfo: true,
@@ -68,6 +77,17 @@ function wait(ms: number) {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
+}
+
+function base64URLEncode(str: Buffer) {
+  return str.toString('base64')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=/g, '');
+}
+
+function sha256(buffer: string) {
+  return crypto.createHash('sha256').update(buffer).digest();
 }
 
 export default class AuthManager {
@@ -239,23 +259,12 @@ export default class AuthManager {
     return response.data;
   }
 
-  private static base64URLEncode(str: Buffer) {
-    return str.toString('base64')
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=/g, '');
-  }
-
-  private static sha256(buffer: string) {
-    return crypto.createHash('sha256').update(buffer).digest();
-  }
-
   public getPKCEAuthorizationUrl(): string {
-    const verifier = AuthManager.base64URLEncode(crypto.randomBytes(32));
-    const challenge = AuthManager.base64URLEncode(AuthManager.sha256(verifier));
+    const verifier = base64URLEncode(crypto.randomBytes(32));
+    const challenge = base64URLEncode(sha256(verifier));
 
     // https://auth0.com/docs/secure/attack-protection/state-parameters
-    const state = AuthManager.base64URLEncode(crypto.randomBytes(32));
+    const state = base64URLEncode(crypto.randomBytes(32));
     this.deviceCredentialsManager.savePKCEData({ state, verifier });
 
     return `${this.config.authenticationDomain}/authorize?`
@@ -320,6 +329,10 @@ export default class AuthManager {
 
   public async removeUser(): Promise<void> {
     return this.userManager.removeUser();
+  }
+
+  public getEndSessionEndpoint(): string {
+    return getEndSessionEndpoint(this.config);
   }
 
   public async logoutSilentCallback(url: string): Promise<void> {

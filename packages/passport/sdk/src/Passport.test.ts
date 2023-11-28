@@ -28,6 +28,8 @@ describe('Passport', () => {
   let authLoginMock: jest.Mock;
   let loginCallbackMock: jest.Mock;
   let logoutMock: jest.Mock;
+  let removeUserMock: jest.Mock;
+  let getEndSessionEndpointMock: jest.Mock;
   let magicLoginMock: jest.Mock;
   let magicLogoutMock: jest.Mock;
   let confirmationLogoutMock: jest.Mock;
@@ -44,6 +46,8 @@ describe('Passport', () => {
     confirmationLogoutMock = jest.fn();
     magicLogoutMock = jest.fn();
     logoutMock = jest.fn();
+    removeUserMock = jest.fn();
+    getEndSessionEndpointMock = jest.fn();
     getUserMock = jest.fn();
     requestRefreshTokenMock = jest.fn();
     getProviderMock = jest.fn();
@@ -53,6 +57,8 @@ describe('Passport', () => {
       login: authLoginMock,
       loginCallback: loginCallbackMock,
       logout: logoutMock,
+      removeUser: removeUserMock,
+      getEndSessionEndpoint: getEndSessionEndpointMock,
       getUser: getUserMock,
       requestRefreshTokenAfterRegistration: requestRefreshTokenMock,
     });
@@ -162,8 +168,22 @@ describe('Passport', () => {
       await passport.logout();
 
       expect(logoutMock).toBeCalledTimes(1);
-      expect(confirmationLogoutMock).toBeCalledTimes(1);
       expect(magicLogoutMock).toBeCalledTimes(1);
+      expect(confirmationLogoutMock).toBeCalledTimes(1);
+    });
+  });
+
+  describe('logoutDeviceFlow', () => {
+    it('should execute logoutDeviceFlow without error and return the endSessionEndpoint', async () => {
+      const endSessionEndpoint = 'https://test.com/logout';
+      getEndSessionEndpointMock.mockReturnValue(endSessionEndpoint);
+
+      const result = await passport.logoutDeviceFlow();
+
+      expect(result).toEqual('https://test.com/logout');
+      expect(removeUserMock).toHaveBeenCalledTimes(1);
+      expect(magicLogoutMock).toHaveBeenCalledTimes(1);
+      expect(getEndSessionEndpointMock).toHaveBeenCalledTimes(1);
     });
   });
 

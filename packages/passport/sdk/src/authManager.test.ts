@@ -5,6 +5,7 @@ import { PassportError, PassportErrorType } from './errors/passportError';
 import { PassportConfiguration } from './config';
 import { mockUser, mockUserImx, mockUserZkEvm } from './test/mocks';
 import { isTokenExpired } from './utils/token';
+import { PassportModuleConfiguration } from './types';
 
 jest.mock('jwt-decode');
 jest.mock('./utils/token');
@@ -15,15 +16,14 @@ jest.mock('oidc-client-ts', () => ({
   WebStorageStateStore: jest.fn(),
 }));
 
-const baseConfig = new ImmutableConfiguration({
-  environment: Environment.SANDBOX,
-});
-const config = new PassportConfiguration({
-  baseConfig,
-  logoutRedirectUri: 'https://test.com',
+const getConfig = (values?: Partial<PassportModuleConfiguration>) => new PassportConfiguration({
+  baseConfig: new ImmutableConfiguration({
+    environment: Environment.SANDBOX,
+  }),
   clientId: '11111',
   redirectUri: 'https://test.com',
   scope: 'email profile',
+  ...values,
 });
 
 const commonOidcUser: OidcUser = {
@@ -98,74 +98,61 @@ describe('AuthManager', () => {
       signinSilent: mockSigninSilent,
       storeUser: mockStoreUser,
     });
-    authManager = new AuthManager(config);
+    authManager = new AuthManager(getConfig());
   });
 
   describe('constructor', () => {
-    it('should initialise AuthManager with a configuration containing audience params', () => {
-      const configWithAudience = new PassportConfiguration({
-        baseConfig,
-        logoutRedirectUri: 'https://test.com',
-        clientId: '11111',
-        redirectUri: 'https://test.com',
-        scope: 'email profile',
-        audience: 'audience',
-      });
-
-      // to work around new being used as a side effect, which would cause a lint failure
-      const am = new AuthManager(configWithAudience);
+    it('should initialise AuthManager with the correct default configuration', () => {
+      const config = getConfig();
+      const am = new AuthManager(config);
       expect(am).toBeDefined();
       expect(UserManager).toBeCalledWith({
-        authority: configWithAudience.authenticationDomain,
-        client_id: configWithAudience.oidcConfiguration.clientId,
+        authority: config.authenticationDomain,
+        client_id: config.oidcConfiguration.clientId,
         loadUserInfo: true,
         mergeClaims: true,
         metadata: {
-          authorization_endpoint: `${configWithAudience.authenticationDomain}/authorize`,
-          token_endpoint: `${configWithAudience.authenticationDomain}/oauth/token`,
-          userinfo_endpoint: `${configWithAudience.authenticationDomain}/userinfo`,
-          end_session_endpoint:
-            `${configWithAudience.authenticationDomain}/v2/logout`
-            + `?returnTo=${encodeURIComponent(
-              configWithAudience.oidcConfiguration.logoutRedirectUri,
-            )}`
-            + `&client_id=${configWithAudience.oidcConfiguration.clientId}`,
+          authorization_endpoint: `${config.authenticationDomain}/authorize`,
+          token_endpoint: `${config.authenticationDomain}/oauth/token`,
+          userinfo_endpoint: `${config.authenticationDomain}/userinfo`,
+          end_session_endpoint: `${config.authenticationDomain}/v2/logout`,
         },
-        popup_redirect_uri: configWithAudience.oidcConfiguration.redirectUri,
-        redirect_uri: configWithAudience.oidcConfiguration.redirectUri,
-        scope: configWithAudience.oidcConfiguration.scope,
+        popup_redirect_uri: config.oidcConfiguration.redirectUri,
+        redirect_uri: config.oidcConfiguration.redirectUri,
+        scope: config.oidcConfiguration.scope,
         userStore: expect.any(WebStorageStateStore),
-        extraQueryParams: {
-          audience: configWithAudience.oidcConfiguration.audience,
-        },
       });
     });
-  });
 
-  it('should initialise AuthManager with the correct default configuration', () => {
-    // to work around new being used as a side effect, which would cause a lint failure
-    const am = new AuthManager(config);
-    expect(am).toBeDefined();
-    expect(UserManager).toBeCalledWith({
-      authority: config.authenticationDomain,
-      client_id: config.oidcConfiguration.clientId,
-      loadUserInfo: true,
-      mergeClaims: true,
-      metadata: {
-        authorization_endpoint: `${config.authenticationDomain}/authorize`,
-        token_endpoint: `${config.authenticationDomain}/oauth/token`,
-        userinfo_endpoint: `${config.authenticationDomain}/userinfo`,
-        end_session_endpoint:
-          `${config.authenticationDomain}/v2/logout`
-          + `?returnTo=${encodeURIComponent(
-            config.oidcConfiguration.logoutRedirectUri,
-          )}`
-          + `&client_id=${config.oidcConfiguration.clientId}`,
-      },
-      popup_redirect_uri: config.oidcConfiguration.redirectUri,
-      redirect_uri: config.oidcConfiguration.redirectUri,
-      scope: config.oidcConfiguration.scope,
-      userStore: expect.any(WebStorageStateStore),
+    describe('when an audience is specified', () => {
+      it('should initialise AuthManager with a configuration containing audience params', () => {
+        const configWithAudience = getConfig({
+          audience: 'audience',
+        });
+        const am = new AuthManager(configWithAudience);
+        expect(am).toBeDefined();
+        expect(UserManager).toBeCalledWith(expect.objectContaining({
+          extraQueryParams: {
+            audience: configWithAudience.oidcConfiguration.audience,
+          },
+        }));
+      });
+    });
+
+    describe('when a logoutRedirectUri is specified', () => {
+      it('should set the endSessionEndpoint `returnTo` and `client_id` query string params', () => {
+        const configWithLogoutRedirectUri = getConfig({
+          logoutRedirectUri: 'https://test.com/logout/callback',
+        });
+
+        const am = new AuthManager(configWithLogoutRedirectUri);
+        expect(am).toBeDefined();
+        expect(UserManager).toBeCalledWith(expect.objectContaining({
+          metadata: expect.objectContaining({
+            end_session_endpoint: 'https://auth.immutable.com/v2/logout?returnTo=https%3A%2F%2Ftest.com%2Flogout%2Fcallback&client_id=11111',
+          }),
+        }));
+      });
     });
   });
 
@@ -268,8 +255,9 @@ describe('AuthManager', () => {
 
   describe('logout', () => {
     it('should call redirect logout if logout mode is redirect', async () => {
-      const configuration = { ...config };
-      configuration.oidcConfiguration.logoutMode = 'redirect';
+      const configuration = getConfig({
+        logoutMode: 'redirect',
+      });
       const manager = new AuthManager(configuration);
 
       await manager.logout();
@@ -278,8 +266,9 @@ describe('AuthManager', () => {
     });
 
     it('should call redirect logout if logout mode is not set', async () => {
-      const configuration = { ...config };
-      configuration.oidcConfiguration.logoutMode = undefined;
+      const configuration = getConfig({
+        logoutMode: undefined,
+      });
       const manager = new AuthManager(configuration);
 
       await manager.logout();
@@ -288,8 +277,9 @@ describe('AuthManager', () => {
     });
 
     it('should call silent logout if logout mode is silent', async () => {
-      const configuration = { ...config };
-      configuration.oidcConfiguration.logoutMode = 'silent';
+      const configuration = getConfig({
+        logoutMode: 'silent',
+      });
       const manager = new AuthManager(configuration);
 
       await manager.logout();
@@ -298,8 +288,9 @@ describe('AuthManager', () => {
     });
 
     it('should throw an error if user is failed to logout', async () => {
-      const configuration = { ...config };
-      configuration.oidcConfiguration.logoutMode = 'redirect';
+      const configuration = getConfig({
+        logoutMode: 'redirect',
+      });
       const manager = new AuthManager(configuration);
 
       mockSignoutRedirect.mockRejectedValue(new Error(mockErrorMsg));
@@ -399,6 +390,32 @@ describe('AuthManager', () => {
 
           expect(mockSigninSilent).toBeCalledTimes(1);
         });
+      });
+    });
+  });
+
+  describe('getEndSessionEndpoint', () => {
+    describe('when a logoutRedirectUri is specified', () => {
+      it('should set the endSessionEndpoint `returnTo` and `client_id` query string params', () => {
+        const am = new AuthManager(getConfig({
+          logoutRedirectUri: 'https://test.com/logout/callback',
+        }));
+
+        const result = am.getEndSessionEndpoint();
+
+        expect(result).toEqual(
+          'https://auth.immutable.com/v2/logout?returnTo=https%3A%2F%2Ftest.com%2Flogout%2Fcallback&client_id=11111',
+        );
+      });
+    });
+
+    describe('when no logoutRedirectUri is specified', () => {
+      it('should return the endSessionEndpoint without a `returnTo` or `client_id` query string params', () => {
+        const am = new AuthManager(getConfig());
+
+        const result = am.getEndSessionEndpoint();
+
+        expect(result).toEqual('https://auth.immutable.com/v2/logout');
       });
     });
   });
