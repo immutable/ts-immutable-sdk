@@ -48,6 +48,9 @@ export function Bridge({ amount, fromContractAddress }: BridgeProps) {
         retryPolicy: { retryIntervalMs: 0, retries: 0 },
       });
 
+      // Why? Check getAllowedBalances
+      if (tokensAndBalances === undefined) return;
+
       bridgeDispatch({
         payload: {
           type: BridgeActions.SET_TOKEN_BALANCES,

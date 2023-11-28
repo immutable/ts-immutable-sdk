@@ -30,7 +30,7 @@ export const getAllowedBalances = async ({
   chainId,
   allowZero = false,
   retryPolicy = DEFAULT_BALANCE_RETRY_POLICY,
-}: GetAllowedBalancesParamsType):Promise<GetAllowedBalancesResultType | undefined> => {
+}: GetAllowedBalancesParamsType): Promise<GetAllowedBalancesResultType | undefined> => {
   const currentChainId = chainId || (await checkout.getNetworkInfo({ provider })).chainId;
 
   const walletAddress = await provider.getSigner().getAddress();
@@ -62,7 +62,7 @@ export const getAllowedBalances = async ({
   const tokensAddresses = new Map();
   allowList.tokens.forEach((token) => tokensAddresses.set(token.address || NATIVE, true));
 
-  const allowedBalances = tokenBalances?.balances.filter((balance) => {
+  const allowedBalances = tokenBalances.balances.filter((balance) => {
     // Balance is <= 0 and it is not allow to have zeros
     if (balance.balance.lte(0) && !allowZero) return false;
 

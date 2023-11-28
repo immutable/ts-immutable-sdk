@@ -46,7 +46,7 @@ import { ErrorView } from '../../views/error/ErrorView';
 import { ApproveERC20BridgeOnboarding } from './views/ApproveERC20Bridge';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
-import { GetAllowedBalancesResultType, getAllowedBalances } from '../../lib/balance';
+import { getAllowedBalances } from '../../lib/balance';
 import { isPassportProvider } from '../../lib/providerUtils';
 import { BridgeComingSoon } from './views/BridgeComingSoon';
 
@@ -108,12 +108,8 @@ export function BridgeWidget({
     if (!checkout) throw new Error('loadBalances: missing checkout');
     if (!provider) throw new Error('loadBalances: missing provider');
 
-    let tokensAndBalances: GetAllowedBalancesResultType | undefined = {
-      allowList: { tokens: [] },
-      allowedBalances: [],
-    };
     try {
-      tokensAndBalances = await getAllowedBalances({
+      const tokensAndBalances = await getAllowedBalances({
         checkout,
         provider,
         allowTokenListType: TokenFilterTypes.BRIDGE,
