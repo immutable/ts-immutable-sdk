@@ -1,12 +1,11 @@
 import {
   BottomSheet,
   Box,
+  Button,
   Heading,
-  Select,
 } from '@biom3/react';
 import { text } from 'resources/text/textConfig';
 import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
-import { FormControlWrapper } from 'components/FormComponents/FormControlWrapper/FormControlWrapper';
 import {
   useCallback, useContext, useState,
 } from 'react';
@@ -19,17 +18,20 @@ import { Web3Provider } from '@ethersproject/providers';
 import { isPassportProvider } from 'lib/providerUtils';
 import { getL1ChainId, getL2ChainId } from 'lib';
 import { getChainNameById } from 'lib/chainName';
-import { bridgeHeadingStyles, brigdeWalletWrapperStyles, walletItemListStyles } from './BridgeWalletFormStyles';
+import { bridgeHeadingStyles, brigdeWalletWrapperStyles } from './BridgeWalletFormStyles';
 import { XBridgeContext } from '../context/XBridgeContext';
-import { BridgeWalletItem } from './BridgeWalletItem';
 import { BridgeNetworkItem } from './BridgeNetworkItem';
 import { WalletNetworkButton } from './WalletNetworkButton';
+import { FromWalletSelector } from './FromWalletSelector';
+import { ToWalletSelector } from './ToWalletSelector';
 
 const testId = 'bridge-wallet-form';
 
 export function BridgeWalletForm() {
   const { bridgeState: { checkout } } = useContext(XBridgeContext);
-  const { heading, from, to } = text.views[XBridgeWidgetViews.BRIDGE_WALLET_SELECTION];
+  const {
+    heading, from, to, button,
+  } = text.views[XBridgeWidgetViews.BRIDGE_WALLET_SELECTION];
 
   // calculating l1/l2 chains to work with based on Checkout environment
   const l1NetworkChainId = getL1ChainId(checkout.config);
@@ -48,10 +50,6 @@ export function BridgeWalletForm() {
   const [toWalletLocalWeb3Provider, setToWalletLocalWeb3Provider] = useState<Web3Provider>();
   const [toNetwork, setToNetwork] = useState<ChainId>();
 
-  // state to show that a wallet item has been clicked and is loading
-  // disable all wallet buttons while this is loading
-  const [walletItemLoading, setWalletItemLoading] = useState(false);
-
   /* Derived state */
   const isFromWalletAndNetworkSelected = fromWalletLocalWeb3Provider !== undefined && fromNetwork !== undefined;
   const isToWalletAndNetworkSelected = toWalletLocalWeb3Provider !== undefined && toNetwork !== undefined;
@@ -61,14 +59,20 @@ export function BridgeWalletForm() {
   const toWalletProviderName = isPassportProvider(toWalletLocalWeb3Provider)
     ? WalletProviderName.PASSPORT
     : WalletProviderName.METAMASK;
+  const showPassportToWalletOption = (checkout.passport !== undefined
+    && fromNetwork === l1NetworkChainId
+    && fromWalletProviderName === WalletProviderName.METAMASK);
 
   /* --------------------------- */
   /* --- Handling selections --- */
   /* --------------------------- */
-  const handleFromWalletConnection = async (walletProviderName: WalletProviderName) => {
+  function clearToWalletSelections() {
     setToWalletLocalWeb3Provider(undefined);
     setToNetwork(undefined);
+  }
 
+  const handleFromWalletConnection = async (walletProviderName: WalletProviderName) => {
+    clearToWalletSelections();
     let provider;
     try {
       const createResult = await checkout.createProvider({ walletProviderName });
@@ -128,8 +132,7 @@ export function BridgeWalletForm() {
   const handleFromNetworkSelection = useCallback(
     async (chainId: ChainId) => {
       if (!fromWalletLocalWeb3Provider) return;
-      setToWalletLocalWeb3Provider(undefined);
-      setToNetwork(undefined);
+      clearToWalletSelections();
 
       const currentNetwork = await fromWalletLocalWeb3Provider?.getNetwork();
       if (currentNetwork?.chainId === chainId) {
@@ -186,7 +189,6 @@ export function BridgeWalletForm() {
           if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
           // eslint-disable-next-line no-console
             console.log('User rejected request');
-            setWalletItemLoading(false);
             return; // don't set anything if they reject
           }
           // eslint-disable-next-line no-console
@@ -215,65 +217,45 @@ export function BridgeWalletForm() {
         {heading}
       </Heading>
 
-      {/** From Wallet Selector */}
       <Heading testId="" size="xSmall" sx={{ paddingBottom: 'base.spacing.x2' }}>{from.heading}</Heading>
-      <BottomSheet
-        headerBarTitle={from.walletSelectorHeading}
-        size="full"
-        onCloseBottomSheet={() => {
-          if (walletItemLoading) return;
-          setFromWalletDrawerOpen(false);
-        }}
-        visible={fromWalletDrawerOpen}
-      >
-        {/**
-         * Only remove BottomSheet Target if we have a localWeb3Provider (wallet)
-         * and fromNetwork selected.
-         */}
-        {!isFromWalletAndNetworkSelected
-          && (
-          <BottomSheet.Target>
-            <FormControlWrapper
-              testId={`${testId}-from-wallet-form-control`}
-              textAlign="left"
-            >
-              <Select
-                testId={`${testId}-from-wallet-select`}
-                defaultLabel={from.selectDefaultText}
-                size="large"
-                targetClickOveride={() => setFromWalletDrawerOpen(true)}
-              />
-            </FormControlWrapper>
-          </BottomSheet.Target>
-          )}
-        <BottomSheet.Content sx={walletItemListStyles}>
-          <BridgeWalletItem
-            key={WalletProviderName.METAMASK}
-            testId={testId}
-            loading={walletItemLoading}
-            setLoading={setWalletItemLoading}
-            walletProviderName={WalletProviderName.METAMASK}
-            onWalletClick={handleFromWalletConnection}
-          />
-          {checkout.passport && (
-            <BridgeWalletItem
-              key={WalletProviderName.PASSPORT}
-              testId={testId}
-              loading={walletItemLoading}
-              setLoading={setWalletItemLoading}
-              walletProviderName={WalletProviderName.PASSPORT}
-              onWalletClick={handleFromWalletConnection}
-            />
-          )}
-        </BottomSheet.Content>
-      </BottomSheet>
+      {/* Show the from wallet target (select box) if no selections have been made yet */}
+      <FromWalletSelector
+        testId={testId}
+        showFromWalletTarget={!isFromWalletAndNetworkSelected}
+        showDrawer={fromWalletDrawerOpen}
+        setShowDrawer={setFromWalletDrawerOpen}
+        onFromWalletClick={handleFromWalletConnection}
+      />
 
-      {/**
-       * From Network Selector.
-       * This must be kept outside of the conditional
-       * render so it can close properly on network
-       * selection success.
-       */}
+      {/* From selections have been made */}
+      {isFromWalletAndNetworkSelected && (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 'base.spacing.x10' }}>
+          <WalletNetworkButton
+            testId={testId}
+            walletName={fromWalletProviderName}
+            walletAddress="0x1234...4321"
+            chainId={fromNetwork}
+            onWalletClick={() => {
+              setFromWalletDrawerOpen(true);
+            }}
+            onNetworkClick={() => setFromNetworkDrawerOpen(true)}
+          />
+
+          <Box>
+            <Heading testId="" size="xSmall" sx={{ paddingBottom: 'base.spacing.x2' }}>{to.heading}</Heading>
+            <ToWalletSelector
+              testId={testId}
+              showToWalletTarget={!isToWalletAndNetworkSelected}
+              showDrawer={toWalletDrawerOpen}
+              setShowDrawer={setToWalletDrawerOpen}
+              showPassportOption={showPassportToWalletOption}
+              onToWalletClick={handleToWalletSelection}
+            />
+          </Box>
+        </Box>
+      )}
+
+      {/** From Network Selector, we programatically open this so there is no target */}
       <BottomSheet
         headerBarTitle={from.networkSelectorHeading}
         size="full"
@@ -304,90 +286,28 @@ export function BridgeWalletForm() {
         </BottomSheet.Content>
       </BottomSheet>
 
-      {/**
-       * When from wallet and from network are chosen
-       * hide the select and show the WalletNetworkButton
-       */}
-      {isFromWalletAndNetworkSelected && (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 'base.spacing.x10' }}>
+      {/* To wallet selection has been made  */}
+      {isToWalletAndNetworkSelected && (
+        <Box sx={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+        }}
+        >
           <WalletNetworkButton
             testId={testId}
-            walletName={fromWalletProviderName}
+            walletName={toWalletProviderName}
             walletAddress="0x1234...4321"
-            chainId={fromNetwork}
+            chainId={toNetwork}
             onWalletClick={() => {
-              setFromWalletDrawerOpen(true);
+              setToWalletDrawerOpen(true);
             }}
-            onNetworkClick={() => setFromNetworkDrawerOpen(true)}
+            // eslint-disable-next-line no-console
+            onNetworkClick={() => console.log('this button currently does nothing...')}
           />
-
-          {/** To Wallet Selector */}
-          <Box>
-            <Heading testId="" size="xSmall" sx={{ paddingBottom: 'base.spacing.x2' }}>{to.heading}</Heading>
-            <BottomSheet
-              headerBarTitle={to.walletSelectorHeading}
-              size="full"
-              onCloseBottomSheet={() => {
-                if (walletItemLoading) return;
-                setToWalletDrawerOpen(false);
-              }}
-              visible={toWalletDrawerOpen}
-            >
-              {!isToWalletAndNetworkSelected && (
-              <BottomSheet.Target>
-                <FormControlWrapper
-                  testId={`${testId}-to-wallet-form-control`}
-                  textAlign="left"
-                >
-                  <Select
-                    testId={`${testId}-to-wallet-select`}
-                    defaultLabel={to.selectDefaultText}
-                    size="large"
-                    targetClickOveride={() => setToWalletDrawerOpen(true)}
-                  />
-                </FormControlWrapper>
-              </BottomSheet.Target>
-              )}
-              <BottomSheet.Content sx={walletItemListStyles}>
-                <BridgeWalletItem
-                  key={WalletProviderName.METAMASK}
-                  testId={`${testId}-to`}
-                  loading={walletItemLoading}
-                  setLoading={setWalletItemLoading}
-                  walletProviderName={WalletProviderName.METAMASK}
-                  onWalletClick={handleToWalletSelection}
-                />
-
-                {/** conditionally show To Passport option */}
-                {checkout.passport
-                && fromNetwork === l1NetworkChainId
-                && fromWalletProviderName === WalletProviderName.METAMASK && (
-                <BridgeWalletItem
-                  key={WalletProviderName.PASSPORT}
-                  testId={`${testId}-to`}
-                  loading={walletItemLoading}
-                  setLoading={setWalletItemLoading}
-                  walletProviderName={WalletProviderName.PASSPORT}
-                  onWalletClick={handleToWalletSelection}
-                />
-                )}
-              </BottomSheet.Content>
-            </BottomSheet>
-          </Box>
+          <Button testId={`${testId}-button`} size="large">{button.text}</Button>
         </Box>
-      )}
-      {isToWalletAndNetworkSelected && (
-      <WalletNetworkButton
-        testId={testId}
-        walletName={toWalletProviderName}
-        walletAddress="0x1234...4321"
-        chainId={toNetwork}
-        onWalletClick={() => {
-          setToWalletDrawerOpen(true);
-        }}
-        // eslint-disable-next-line no-console
-        onNetworkClick={() => console.log('this button currently does nothing...')}
-      />
       )}
     </Box>
   );

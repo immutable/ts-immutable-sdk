@@ -449,6 +449,9 @@ export const text = {
         selectDefaultText: 'Select wallet and network',
         walletSelectorHeading: 'To wallet',
       },
+      button: {
+        text: 'Review',
+      },
     },
   },
   footers: {

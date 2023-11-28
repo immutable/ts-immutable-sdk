@@ -9,17 +9,15 @@ export interface BridgeWalletProps {
   walletProviderName: WalletProviderName
   onWalletClick: (walletProviderName: WalletProviderName) => Promise<void>;
   loading: boolean;
-  setLoading: (loading:boolean) => void;
 }
 export function BridgeWalletItem({
   testId,
   walletProviderName,
   onWalletClick,
   loading,
-  setLoading,
 }: BridgeWalletProps) {
   const { wallets } = text;
-  const [showLoadingSpinner, setShowLoadingSpinner] = useState(false);
+  const [showLoadingIcon, setShowLoadingIcon] = useState(false);
 
   const logo = {
     [WalletProviderName.PASSPORT]: 'PassportSymbolOutlined',
@@ -28,21 +26,17 @@ export function BridgeWalletItem({
 
   return (
     <MenuItem
-      testId={`${testId}-wallet-list-${walletProviderName.toLowerCase()}`}
+      testId={`${testId}-wallet-list-${walletProviderName}`}
       size="medium"
       emphasized
       onClick={async () => {
         if (loading) return;
-        setLoading(true);
-        setShowLoadingSpinner(true);
+        setShowLoadingIcon(true);
+        // let the parent handle errors
         try {
           await onWalletClick(walletProviderName);
-        } catch (err) {
-          // eslint-disable-next-line no-console
-          console.log(err);
         } finally {
-          setShowLoadingSpinner(true);
-          setLoading(false);
+          setShowLoadingIcon(false);
         }
       }}
     >
@@ -53,7 +47,7 @@ export function BridgeWalletItem({
       <MenuItem.Label size="medium">
         {wallets[walletProviderName].heading}
       </MenuItem.Label>
-      {showLoadingSpinner && (<MenuItem.StatefulButtCon state="loading" icon="Loading" />)}
+      {showLoadingIcon && (<MenuItem.StatefulButtCon state="loading" icon="Loading" />)}
     </MenuItem>
   );
 }
