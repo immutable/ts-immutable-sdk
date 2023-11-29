@@ -1,5 +1,5 @@
 import {
-  Box, Button, Heading, IMX_TOKEN_IMAGE_URL, MenuItem, OptionKey,
+  Box, Button, Heading, IMX_TOKEN_IMAGE_URL, MenuItem, OptionKey, ShimmerBox,
 } from '@biom3/react';
 import {
   GasEstimateBridgeToL2Result, GetBalanceResult,
@@ -373,35 +373,85 @@ export function BridgeForm(props: BridgeFormProps) {
         >
           {xBridgeContent.title}
         </Heading>
-        <Box sx={formInputsContainerStyles}>
-          <SelectForm
-            testId="bridge-token"
-            options={tokensOptions}
-            optionsLoading={isTokenBalancesLoading}
-            coinSelectorHeading={bridgeForm.from.selectorTitle}
-            selectedOption={selectedOption}
-            subtext={token
-              ? `${content.availableBalancePrefix} ${tokenValueFormat(token?.formattedBalance)}`
-              : ''}
-            textAlign="left"
-            errorMessage={tokenError}
-            onSelectChange={(option) => handleSelectTokenChange(option)}
-            disabled={isFetching}
-          />
-          <TextInputForm
-            testId="bridge-amount"
-            value={amount}
-            placeholder={bridgeForm.from.inputPlaceholder}
-            subtext={`${content.fiatPricePrefix} $${formatZeroAmount(amountFiatValue, true)}`}
-            validator={amountInputValidation}
-            onTextInputFocus={onTextInputFocus}
-            onTextInputChange={(value) => handleBridgeAmountChange(value)}
-            onTextInputBlur={(value) => handleAmountInputBlur(value)}
-            textAlign="right"
-            errorMessage={amountError}
-            disabled={isFetching}
-          />
-        </Box>
+        {isTokenBalancesLoading && (
+          <Box
+            sx={{
+              paddingTop: 'base.spacing.x4',
+            }}
+            rc={<div />}
+          >
+            <Box
+              sx={{
+                display: 'inline-block',
+                width: '43%',
+                height: '64px',
+                paddingRight: '2px',
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                WebkitMaskPosition: 'left center',
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                WebkitMaskRepeat: 'no-repeat',
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                WebkitMaskSize: 'contain',
+              }}
+              rc={<span />}
+            >
+              {/* <MenuItem shimmer emphasized testId="balance-item-shimmer--1" /> */}
+              <ShimmerBox
+                rc={<span />}
+              />
+            </Box>
+            <Box
+              sx={{
+                display: 'inline-block',
+                width: '57%',
+                height: '64px',
+                paddingLeft: '2px',
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                WebkitMaskPosition: 'left center',
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                WebkitMaskRepeat: 'no-repeat',
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                WebkitMaskSize: 'contain',
+              }}
+              rc={<span />}
+            >
+              <ShimmerBox
+                rc={<span />}
+              />
+            </Box>
+          </Box>
+        )}
+        {!isTokenBalancesLoading && (
+          <Box sx={formInputsContainerStyles}>
+            <SelectForm
+              testId="bridge-token"
+              options={tokensOptions}
+              optionsLoading={isTokenBalancesLoading}
+              coinSelectorHeading={bridgeForm.from.selectorTitle}
+              selectedOption={selectedOption}
+              subtext={token
+                ? `${content.availableBalancePrefix} ${tokenValueFormat(token?.formattedBalance)}`
+                : ''}
+              textAlign="left"
+              errorMessage={tokenError}
+              onSelectChange={(option) => handleSelectTokenChange(option)}
+              disabled={isFetching}
+            />
+            <TextInputForm
+              testId="bridge-amount"
+              value={amount}
+              placeholder={bridgeForm.from.inputPlaceholder}
+              subtext={`${content.fiatPricePrefix} $${formatZeroAmount(amountFiatValue, true)}`}
+              validator={amountInputValidation}
+              onTextInputFocus={onTextInputFocus}
+              onTextInputChange={(value) => handleBridgeAmountChange(value)}
+              onTextInputBlur={(value) => handleAmountInputBlur(value)}
+              textAlign="right"
+              errorMessage={amountError}
+              disabled={isFetching}
+            />
+          </Box>
+        )}
         {/* todo: dynamically set values & add icon */}
         {gasFee && (
           <Box sx={{ paddingY: 'base.spacing.x2' }}>
