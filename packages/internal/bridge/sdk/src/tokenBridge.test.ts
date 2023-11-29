@@ -1,10 +1,24 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { TokenBridge } from 'tokenBridge';
 import { BridgeConfiguration } from 'config';
 import { ETH_SEPOLIA_TO_ZKEVM_DEVNET } from 'constants/bridges';
-import { BridgeFeeMethods, BridgeTxRequest, BridgeTxResponse } from 'types';
+import { BridgeFeeActions, BridgeTxRequest, BridgeTxResponse } from 'types';
 import { ethers } from 'ethers';
 import { BridgeError, BridgeErrorType } from 'errors';
+
+jest.mock('@axelar-network/axelarjs-sdk', () => ({
+  AxelarQueryAPI: jest.fn().mockImplementation(() => ({
+    estimateGasFee: jest.fn().mockReturnValue({
+      executionFeeWithMultiplier: ethers.utils.parseUnits('0.0001', 18),
+    }),
+  })),
+  Environment: {
+    DEVNET: 'devnet',
+    TESTNET: 'testnet',
+    MAINNET: 'mainnet',
+  },
+}));
 
 describe('Token Bridge', () => {
   it('Constructor works correctly', async () => {
@@ -316,13 +330,14 @@ describe('Token Bridge', () => {
         token,
         sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
         destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+        gasMultiplier: 1.1,
       };
       const response: BridgeTxResponse = await tokenBridge.getUnsignedBridgeTx(request);
 
       expect(response.unsignedTx.to).toBe(
         bridgeConfig.bridgeContracts.rootERC20BridgeFlowRate,
       );
-      expect(response.unsignedTx.value).toBe(0);
+      expect(response.unsignedTx.value).toBe(ethers.utils.parseUnits('0.0001', 18).toString());
       expect(response.unsignedTx.data).not.toBeNull();
     });
 
@@ -338,11 +353,12 @@ describe('Token Bridge', () => {
         token,
         sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
         destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+        gasMultiplier: 1.1,
       };
 
       const response: BridgeTxResponse = await tokenBridge.getUnsignedBridgeTx(request);
       expect(response.unsignedTx.to).toBe(bridgeConfig.bridgeContracts.rootERC20BridgeFlowRate);
-      expect(response.unsignedTx.value).toBe(amount);
+      expect(response.unsignedTx.value).toBe(amount.add(ethers.utils.parseUnits('0.0001', 18)).toString());
       expect(response.unsignedTx.data).not.toBeNull();
     });
 
@@ -358,12 +374,13 @@ describe('Token Bridge', () => {
         token,
         sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
         destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+        gasMultiplier: 1.1,
       };
       const response: BridgeTxResponse = await tokenBridge.getUnsignedBridgeTx(request);
       expect(response.unsignedTx.to).toBe(
         bridgeConfig.bridgeContracts.rootERC20BridgeFlowRate,
       );
-      expect(response.unsignedTx.value).toBe(0);
+      expect(response.unsignedTx.value).toBe(ethers.utils.parseUnits('0.0001', 18).toString());
       expect(response.unsignedTx.data).not.toBeNull();
     });
   });
@@ -589,9 +606,13 @@ describe('Token Bridge', () => {
       expect.assertions(1);
       const result = await tokenBridge.getFee(
         {
-          method: BridgeFeeMethods.DEPOSIT,
+          action: BridgeFeeActions.DEPOSIT,
+          gasMultiplier: 1.1,
+          sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+          destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
         },
       );
+      console.log(result);
       expect(result).not.toBeNull();
     });
   });

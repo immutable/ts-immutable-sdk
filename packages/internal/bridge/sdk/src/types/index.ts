@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { ModuleConfiguration } from '@imtbl/config';
 import { ethers } from 'ethers';
 
@@ -91,14 +92,42 @@ export const bridgeMethods = {
   },
 };
 
+export interface AxelarChainDetails {
+  id: string,
+  symbol: string,
+}
+
+export const axelarChains:Record<string, AxelarChainDetails> = {
+  11155111: {
+    id: 'ethereum-sepolia',
+    symbol: 'ETH',
+  }, // ethereum testnet
+  1: {
+    id: 'ethereum',
+    symbol: 'ETH',
+  }, // ethereum mainnet
+  13473: {
+    id: 'immutable',
+    symbol: 'IMX',
+  }, // immutable zkevm devnet
+  13472: {
+    id: 'immutable',
+    symbol: 'IMX',
+  }, // immutable zkevm testnet
+  13371: {
+    id: 'immutable',
+    symbol: 'IMX',
+  }, // immutable zkevm mainnet
+};
+
 /**
- * @typedef {Object} BridgeFeeMethods
+ * @typedef {Object} BridgeFeeActions
  * @property {string} DEPOSIT - The transaction has been successfully synced.
  * @property {string} WITHDRAW - The transaction is still pending.
  * @property {string} MAP_TOKEN - The transaction has failed.
  * @property {string} FINALISE_WITHDRAWAL - Calculate gas .
  */
-export enum BridgeFeeMethods {
+export enum BridgeFeeActions {
   DEPOSIT = 'DEPOSIT',
   WITHDRAW = 'WITHDRAW',
   MAP_TOKEN = 'MAP_TOKEN',
@@ -134,10 +163,15 @@ export interface FeeData {
 
 /**
  * @typedef {Object} BridgeFeeRequest
- * @property {FungibleToken} token - The token for which the bridge fee is being requested.
+ * @property {BridgeFeeActions} method - The method for which the bridge fee is being requested.
+ * @property {string} sourceChainId - The chain ID of the source chain.
+ * @property {string} destinationChainId - The chain ID of the destination chain.
  */
 export interface BridgeFeeRequest {
-  method: BridgeFeeMethods;
+  action: BridgeFeeActions;
+  gasMultiplier: number;
+  sourceChainId: string;
+  destinationChainId: string;
 }
 
 /**
@@ -194,6 +228,7 @@ export interface BridgeTxRequest {
   amount: ethers.BigNumber;
   sourceChainId: string;
   destinationChainId: string;
+  gasMultiplier: number;
 }
 
 /**

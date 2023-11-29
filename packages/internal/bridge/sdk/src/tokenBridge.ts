@@ -1,7 +1,9 @@
 import {
   AxelarQueryAPI, AxelarQueryAPIFeeResponse, Environment,
 } from '@axelar-network/axelarjs-sdk';
-import { L2_STATE_SENDER_ADDRESS, NATIVE_TOKEN_BRIDGE_KEY } from 'constants/bridges';
+import {
+  ETH_MAINNET_TO_ZKEVM_MAINNET, ETH_SEPOLIA_TO_ZKEVM_TESTNET, L2_STATE_SENDER_ADDRESS, NATIVE_TOKEN_BRIDGE_KEY,
+} from 'constants/bridges';
 import { BridgeConfiguration } from 'config';
 import { ethers } from 'ethers';
 import {
@@ -23,11 +25,13 @@ import {
   BridgeMethodsGasLimit,
   FeeData,
   BridgeTxRequest,
-  BridgeFeeMethods,
+  BridgeFeeActions,
   bridgeMethods,
   ApproveBridgeRequest,
   ApproveBridgeResponse,
   BridgeTxResponse,
+  axelarChains,
+  AxelarChainDetails,
 } from 'types';
 import { ROOT_ERC20_BRIDGE_FLOW_RATE } from 'contracts/ABIs/RootERC20BridgeFlowRate';
 import { ERC20 } from 'contracts/ABIs/ERC20';
@@ -75,12 +79,12 @@ export class TokenBridge {
    *
    * @example
    * const feeRequest = {
-   *   token: '0x123456...', // token
+   *   method: 'WITHDRAW', // BridgeFeeActions
    * };
    *
    * @example
    * const feeRequest = {
-   *   token: 'NATIVE', // token
+   *   method: 'DEPOSIT', // BridgeFeeActions
    * };
    *
    * bridgeSdk.getFee(feeRequest)
@@ -97,10 +101,10 @@ export class TokenBridge {
 
     let sourceChainFee: ethers.BigNumber = ethers.BigNumber.from(0);
     let destinationChainFee: ethers.BigNumber = ethers.BigNumber.from(0);
-    const bridgeFee: ethers.BigNumber = ethers.BigNumber.from(1000);
+    let bridgeFee: ethers.BigNumber = ethers.BigNumber.from(0);
     const networkFee: ethers.BigNumber = ethers.BigNumber.from(0);
 
-    if (req.method === BridgeFeeMethods.FINALISE_WITHDRAWAL) {
+    if (req.action === BridgeFeeActions.FINALISE_WITHDRAWAL) {
       sourceChainFee = await this.getGasEstimates(
         this.config.rootProvider,
         BridgeMethodsGasLimit.FINALISE_WITHDRAWAL,
@@ -109,7 +113,8 @@ export class TokenBridge {
       let sourceProvider:ethers.providers.Provider;
       let destinationProvider:ethers.providers.Provider;
 
-      if (req.method === BridgeFeeMethods.WITHDRAW) {
+      const destinationGasLimit = BridgeMethodsGasLimit[`${req.action}_DESTINATION`];
+      if (req.action === BridgeFeeActions.WITHDRAW) {
         sourceProvider = this.config.childProvider;
         destinationProvider = this.config.rootProvider;
       } else {
@@ -119,23 +124,28 @@ export class TokenBridge {
 
       sourceChainFee = await this.getGasEstimates(
         sourceProvider,
-        BridgeMethodsGasLimit[`${req.method}_SOURCE`],
+        BridgeMethodsGasLimit[`${req.action}_SOURCE`],
       );
       destinationChainFee = await this.getGasEstimates(
         destinationProvider,
-        BridgeMethodsGasLimit[`${req.method}_DESTINATION`],
+        BridgeMethodsGasLimit[`${req.action}_DESTINATION`],
       );
+
+      bridgeFee = await this.calculateBridgeFee(
+        req.sourceChainId,
+        req.destinationChainId,
+        destinationGasLimit,
+        req.gasMultiplier,
+      );
+      console.log('bridgeFee', bridgeFee);
     }
 
-    // @TODO fetch axelar fee
-    // this.calculateBridgeFee();
-
-    const totalFee: ethers.BigNumber = sourceChainFee.add(destinationChainFee).add(bridgeFee).add(networkFee);
+    const totalFee: ethers.BigNumber = sourceChainFee.add(bridgeFee).add(networkFee);
 
     return {
       sourceChainFee,
       destinationChainFee,
-      bridgeFee, // @TODO will be the axelar fee
+      bridgeFee,
       networkFee, // no network fee charged currently
       totalFee,
     };
@@ -323,7 +333,7 @@ export class TokenBridge {
         BridgeErrorType.INTERNAL_ERROR,
       );
 
-      return TokenBridge.getBridgeTx(
+      return this.getBridgeTx(
         sender,
         receipient,
         req.amount,
@@ -331,6 +341,10 @@ export class TokenBridge {
         rootBridge,
         bridgeMethods.deposit,
         this.config.bridgeContracts.rootERC20BridgeFlowRate,
+        req.sourceChainId,
+        req.destinationChainId,
+        BridgeMethodsGasLimit.DEPOSIT_DESTINATION,
+        req.gasMultiplier,
       );
     }
 
@@ -345,7 +359,7 @@ export class TokenBridge {
       BridgeErrorType.INTERNAL_ERROR,
     );
 
-    return TokenBridge.getBridgeTx(
+    return this.getBridgeTx(
       sender,
       receipient,
       req.amount,
@@ -353,10 +367,14 @@ export class TokenBridge {
       childBridge,
       bridgeMethods.withdraw,
       this.config.bridgeContracts.childERC20Bridge,
+      req.sourceChainId,
+      req.destinationChainId,
+      BridgeMethodsGasLimit.WITHDRAW_DESTINATION,
+      req.gasMultiplier,
     );
   }
 
-  static async getBridgeTx(
+  private async getBridgeTx(
     sender:string,
     recipient:string,
     amount:ethers.BigNumber,
@@ -364,8 +382,17 @@ export class TokenBridge {
     contract:ethers.Contract,
     contractMethods: Record<string, string>,
     contractAddress: string,
+    sourceChainId: string,
+    destinationChainId: string,
+    destinationGasLimit: number,
+    gasMultiplier: number = 1.1,
   ) {
-    // @TODO fetch fees
+    const bridgeFee:ethers.BigNumber = await this.calculateBridgeFee(
+      sourceChainId,
+      destinationChainId,
+      destinationGasLimit,
+      gasMultiplier,
+    );
 
     // Handle return if it is a native token
     if (token === 'NATIVE') {
@@ -387,7 +414,7 @@ export class TokenBridge {
         unsignedTx: {
           data,
           to: contractAddress,
-          value: amount, // @TODO make sure axelar fees are added to the value
+          value: amount.add(bridgeFee).toString(),
         },
       };
     }
@@ -412,7 +439,7 @@ export class TokenBridge {
       unsignedTx: {
         data,
         to: contractAddress,
-        value: 0, // @TODO make sure axelar fees are added to the value
+        value: bridgeFee.toString(),
       },
     };
   }
@@ -1076,27 +1103,58 @@ export class TokenBridge {
 
   /**
  * Calculate the gas amount for a transaction using axelarjs-sdk.
- * @param {*} source - The source chain object.
- * @param {*} destination - The destination chain object.
- * @param {*} options - The options to pass to the estimateGasFee function.
- *                      Available options are gas token symbol, gasLimit and gasMultiplier.
- * @returns {number} - The gas amount.
+ * @param {*} source - The source chainId.
+ * @param {*} destination - The destination chainId.
+ * @param {*} gasLimit - The gas limit for the desired operation.
+ * @param {*} gasMultiplier - The gas multiplier to add buffer to the fees.
+ * @returns {ethers.BigNumber} - The Axelar Gas amount in the source chain currency.
  */
   // eslint-disable-next-line class-methods-use-this
   private async calculateBridgeFee(
     source:string,
     destination:string,
-    symbol: string,
-    gasLimit: string,
-    gasMultiplier: number,
-  ): Promise<string | AxelarQueryAPIFeeResponse> {
-    const api = new AxelarQueryAPI({ environment: Environment.TESTNET });
-    return await api.estimateGasFee(
-      'ethereum-sepolia',
-      'immutable',
-      symbol,
+    gasLimit: number,
+    gasMultiplier: number = 1.1,
+  ): Promise<ethers.BigNumber> {
+    const sourceAxelar:AxelarChainDetails = axelarChains[source];
+    const destinationAxelar:AxelarChainDetails = axelarChains[destination];
+
+    if (!sourceAxelar) {
+      throw new BridgeError(
+        `Source chainID ${source} can not be matched to an Axelar chain.`,
+        BridgeErrorType.UNSUPPORTED_ERROR,
+      );
+    }
+
+    if (!destinationAxelar) {
+      throw new BridgeError(
+        `Destination chainID ${destination} can not be matched to an Axelar chain.`,
+        BridgeErrorType.UNSUPPORTED_ERROR,
+      );
+    }
+
+    let axelarEnv:Environment;
+    if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
+      || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
+      axelarEnv = Environment.MAINNET;
+    } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
+      || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
+      axelarEnv = Environment.TESTNET;
+    } else {
+      axelarEnv = Environment.DEVNET;
+    }
+
+    const api = new AxelarQueryAPI({ environment: axelarEnv });
+    const estimateGasFeeResult:string | AxelarQueryAPIFeeResponse = await api.estimateGasFee(
+      sourceAxelar.id,
+      destinationAxelar.id,
+      sourceAxelar.symbol,
       gasLimit,
       gasMultiplier,
-    );
+    ) as AxelarQueryAPIFeeResponse;
+
+    console.log('estimateGasFee result', estimateGasFeeResult);
+
+    return ethers.BigNumber.from(estimateGasFeeResult.executionFeeWithMultiplier);
   }
 }
