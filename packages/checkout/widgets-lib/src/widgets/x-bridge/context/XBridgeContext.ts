@@ -18,6 +18,9 @@ export interface XBridgeState {
   toNetwork: NetworkInfo | null;
   tokenBalances: GetBalanceResult[];
   allowedTokens: TokenInfo[];
+  token: TokenInfo | null;
+  amount: string;
+  gasFee: string;
 }
 
 export const initialXBridgeState: Omit<XBridgeState, 'checkout'> = {
@@ -28,6 +31,9 @@ export const initialXBridgeState: Omit<XBridgeState, 'checkout'> = {
   toNetwork: null,
   tokenBalances: [],
   allowedTokens: [],
+  token: null,
+  amount: '0',
+  gasFee: '0',
 };
 
 export interface XBridgeContextState {
@@ -46,7 +52,8 @@ type ActionPayload =
   | SetNetworkPayload
   | SetToNetworkPayload
   | SetTokenBalancesPayload
-  | SetAllowedTokensPayload;
+  | SetAllowedTokensPayload
+  | SetTokenAndAmountPayload;
 
 export enum BridgeActions {
   SET_WALLET_PROVIDER_NAME = 'SET_WALLET_PROVIDER_NAME',
@@ -56,6 +63,7 @@ export enum BridgeActions {
   SET_TO_NETWORK = 'SET_TO_NETWORK',
   SET_TOKEN_BALANCES = 'SET_TOKEN_BALANCES',
   SET_ALLOWED_TOKENS = 'SET_ALLOWED_TOKENS',
+  SET_TOKEN_AND_AMOUNT = 'SET_TOKEN_AND_AMOUNT',
 }
 
 export interface SetWalletProviderNamePayload {
@@ -91,6 +99,13 @@ export interface SetTokenBalancesPayload {
 export interface SetAllowedTokensPayload {
   type: BridgeActions.SET_ALLOWED_TOKENS;
   allowedTokens: TokenInfo[];
+}
+
+export interface SetTokenAndAmountPayload {
+  type: BridgeActions.SET_TOKEN_AND_AMOUNT;
+  token: TokenInfo;
+  amount: string;
+  gasFee: string;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -142,6 +157,13 @@ export const xBridgeReducer: Reducer<XBridgeState, BridgeAction> = (
       return {
         ...state,
         allowedTokens: action.payload.allowedTokens,
+      };
+    case BridgeActions.SET_TOKEN_AND_AMOUNT:
+      return {
+        ...state,
+        token: action.payload.token,
+        amount: action.payload.amount,
+        gasFee: action.payload.gasFee,
       };
     default:
       return state;

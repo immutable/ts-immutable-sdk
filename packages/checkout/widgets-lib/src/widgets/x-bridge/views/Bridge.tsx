@@ -1,4 +1,9 @@
-import { useCallback, useContext } from 'react';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { TokenFilterTypes } from '@imtbl/checkout-sdk';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -24,6 +29,8 @@ export function Bridge({ amount, fromContractAddress }: BridgeProps) {
   const { bridgeState, bridgeDispatch } = useContext(XBridgeContext);
   const { checkout, web3Provider } = bridgeState;
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+  const [isTokenBalancesLoading, setIsTokenBalancesLoading] = useState(false);
+  const showBackButton = true;
 
   // This is used to refresh the balances after the Bridge widget
   // has been loaded so that processing transfers will be eventually
@@ -32,6 +39,7 @@ export function Bridge({ amount, fromContractAddress }: BridgeProps) {
     if (!checkout || !web3Provider) return;
 
     try {
+      setIsTokenBalancesLoading(true);
       const tokensAndBalances = await getAllowedBalances({
         checkout,
         provider: web3Provider,
@@ -42,6 +50,7 @@ export function Bridge({ amount, fromContractAddress }: BridgeProps) {
         retryPolicy: { retryIntervalMs: 0, retries: 0 },
       });
 
+      setIsTokenBalancesLoading(false);
       bridgeDispatch({
         payload: {
           type: BridgeActions.SET_TOKEN_BALANCES,
@@ -53,16 +62,23 @@ export function Bridge({ amount, fromContractAddress }: BridgeProps) {
       // and the logic will retry anyways.
     } catch (e: any) {
       // eslint-disable-next-line no-console
+      setIsTokenBalancesLoading(false);
       console.debug(e);
     }
   }, [checkout, web3Provider]);
   useInterval(refreshBalances, REFRESH_TOKENS_INTERVAL_MS);
+
+  useEffect(() => {
+    if (!checkout || !web3Provider) return;
+    refreshBalances();
+  }, [checkout, web3Provider]);
 
   return (
     <SimpleLayout
       testId="bridge-view"
       header={(
         <HeaderNavigation
+          showBack={showBackButton}
           title={header.title}
           onCloseButtonClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
         />
@@ -74,6 +90,7 @@ export function Bridge({ amount, fromContractAddress }: BridgeProps) {
         testId="bridge-form"
         defaultAmount={amount}
         defaultFromContractAddress={fromContractAddress}
+        isTokenBalancesLoading={isTokenBalancesLoading}
       />
     </SimpleLayout>
   );

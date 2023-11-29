@@ -23,7 +23,7 @@ export class RemoteConfigFetcher {
 
   private tokensCache: ChainsTokensConfig | undefined;
 
-  private version: string = 'v1';
+  private version: string = 'v2';
 
   constructor(params: RemoteConfigParams) {
     this.isDevelopment = params.isDevelopment;

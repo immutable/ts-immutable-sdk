@@ -80,6 +80,9 @@ export function XBridgeWidget({
             {viewState.view.type === XBridgeWidgetViews.BRIDGE_FORM && (
               <Bridge />
             )}
+            {viewState.view.type === XBridgeWidgetViews.BRIDGE_REVIEW && (
+              <BridgeWalletSelection />
+            )}
           </CryptoFiatProvider>
           {/* todo: remove this button thats being used to create a provider */}
           <Button onClick={connect}>Create a provider</Button>
