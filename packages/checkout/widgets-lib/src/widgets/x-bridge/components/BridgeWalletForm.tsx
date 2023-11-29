@@ -7,7 +7,7 @@ import {
 import { text } from 'resources/text/textConfig';
 import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
 import {
-  useCallback, useContext, useMemo, useState,
+  useCallback, useContext, useMemo, useRef, useState,
 } from 'react';
 import {
   WalletProviderName,
@@ -15,7 +15,7 @@ import {
   ChainId,
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
-import { isPassportProvider } from 'lib/providerUtils';
+import { isMetaMaskProvider, isPassportProvider } from 'lib/providerUtils';
 import { getL1ChainId, getL2ChainId } from 'lib';
 import { getChainNameById } from 'lib/chainName';
 import { bridgeHeadingStyles, brigdeWalletWrapperStyles } from './BridgeWalletFormStyles';
@@ -38,6 +38,9 @@ export function BridgeWalletForm() {
   const imtblZkEvmNetworkChainId = getL2ChainId(checkout.config);
   const imtblZkEvmNetworkName = getChainNameById(imtblZkEvmNetworkChainId);
 
+  /** provider map - saves on re-creating providers if to/from options are changed */
+  const providerCache = useRef(new Map<WalletProviderName, Web3Provider>());
+
   /** From wallet and from network local state */
   const [fromWalletDrawerOpen, setFromWalletDrawerOpen] = useState(false);
   const [fromNetworkDrawerOpen, setFromNetworkDrawerOpen] = useState(false);
@@ -52,6 +55,7 @@ export function BridgeWalletForm() {
   /* Derived state */
   const isFromWalletAndNetworkSelected = fromWalletWeb3Provider && fromNetwork;
   const isToWalletAndNetworkSelected = toWalletWeb3Provider && toNetwork;
+
   const fromWalletProviderName = useMemo(() => {
     if (!fromWalletWeb3Provider) return null;
     return isPassportProvider(fromWalletWeb3Provider)
@@ -85,38 +89,26 @@ export function BridgeWalletForm() {
     return options;
   }, [checkout, fromNetwork, fromWalletProviderName]);
 
-  /* --------------------------- */
-  /* --- Handling selections --- */
-  /* --------------------------- */
-  function clearToWalletSelections() {
-    setToWalletWeb3Provider(null);
-    setToNetwork(null);
-  }
-
-  const handleFromWalletConnection = useCallback(async (walletProviderName: WalletProviderName) => {
-    if (fromWalletProviderName === walletProviderName) {
-      setFromWalletDrawerOpen(false);
-      return;
-    }
-
-    clearToWalletSelections();
+  async function createProviderAndConnect(walletProviderName: WalletProviderName): Promise<Web3Provider | undefined> {
     let provider;
     try {
       const createResult = await checkout.createProvider({ walletProviderName });
       provider = createResult.provider;
+      providerCache.current.set(walletProviderName, provider);
     } catch (error) {
-      // eslint-disable-next-line no-console
+    // eslint-disable-next-line no-console
       console.error(`Failed to create ${walletProviderName} provider`);
+      throw error;
     }
 
     let connected = false;
     try {
       const { isConnected } = await checkout.checkIsWalletConnected({ provider });
       connected = isConnected;
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error(err);
-      throw err;
+    } catch (error) {
+    // eslint-disable-next-line no-console
+      console.error(error);
+      throw error;
     }
 
     if (!connected) {
@@ -124,37 +116,63 @@ export function BridgeWalletForm() {
         const { provider: connectedProvider } = await checkout.connect({ provider });
         provider = connectedProvider;
         connected = true;
-      } catch (err: any) {
-        if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
-          // eslint-disable-next-line no-console
+      } catch (error: any) {
+        if (error.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
+        // eslint-disable-next-line no-console
           console.log('User rejected request');
         }
         // eslint-disable-next-line no-console
-        console.error(err);
+        console.error(error);
+        throw error;
       }
     }
 
-    if (connected) {
-      setFromWalletWeb3Provider(provider);
+    return provider;
+  }
 
-      /** if Passport skip from network selector and default to zkEVM */
-      if (isPassportProvider(provider)) {
-        setFromNetwork(imtblZkEvmNetworkChainId);
-        setFromWalletDrawerOpen(false);
+  function clearToWalletSelections() {
+    setToWalletWeb3Provider(null);
+    setToNetwork(null);
+  }
+
+  /* --------------------------- */
+  /* --- Handling selections --- */
+  /* --------------------------- */
+  const handleFromWalletConnection = useCallback(async (walletProviderName: WalletProviderName) => {
+    if (fromWalletProviderName === walletProviderName) {
+      setFromWalletDrawerOpen(false);
+      return;
+    }
+
+    clearToWalletSelections();
+    let provider = providerCache.current.get(walletProviderName);
+    if (!provider) {
+      try {
+        provider = await createProviderAndConnect(walletProviderName);
+      } catch (error) {
         return;
       }
-
-      /**
-       * Force the selection of network
-       * by clearing the fromNetwork
-       * and opening the network drawer
-       */
-      setFromNetwork(null);
-
-      setFromWalletDrawerOpen(false);
-      setTimeout(() => setFromNetworkDrawerOpen(true), 500);
     }
-  }, [fromWalletProviderName]);
+
+    setFromWalletWeb3Provider(provider);
+
+    /** if Passport skip from network selector and default to zkEVM */
+    if (isPassportProvider(provider)) {
+      setFromNetwork(imtblZkEvmNetworkChainId);
+      setFromWalletDrawerOpen(false);
+      return;
+    }
+
+    /**
+     * Force the selection of network
+     * by clearing the fromNetwork
+     * and opening the network drawer
+     */
+    setFromNetwork(null);
+
+    setFromWalletDrawerOpen(false);
+    setTimeout(() => setFromNetworkDrawerOpen(true), 500);
+  }, [fromWalletProviderName, providerCache.current]);
 
   const handleFromNetworkSelection = useCallback(
     async (chainId: ChainId) => {
@@ -182,6 +200,11 @@ export function BridgeWalletForm() {
 
       try {
         const switchNetwork = await checkout.switchNetwork({ provider: fromWalletWeb3Provider, chainId });
+        if (isPassportProvider(switchNetwork.provider)) {
+          providerCache.current.set(WalletProviderName.PASSPORT, switchNetwork.provider);
+        } else if (isMetaMaskProvider(switchNetwork.provider)) {
+          providerCache.current.set(WalletProviderName.METAMASK, switchNetwork.provider);
+        }
         setFromWalletWeb3Provider(switchNetwork.provider);
         setFromNetworkDrawerOpen(false);
         setFromNetwork(switchNetwork.network.chainId);
@@ -190,7 +213,7 @@ export function BridgeWalletForm() {
         console.error(err);
       }
     },
-    [fromWalletWeb3Provider],
+    [fromWalletWeb3Provider, fromWalletProviderName, providerCache.current],
   );
 
   const handleToWalletSelection = useCallback(async (selectedToWalletProviderName: WalletProviderName) => {
@@ -198,42 +221,14 @@ export function BridgeWalletForm() {
       // if same from wallet and to wallet, just use the existing fromWalletLocalWeb3Provider
       setToWalletWeb3Provider(fromWalletWeb3Provider);
     } else {
-      // from wallet and to wallet selections are different (e.g from MM to PP)
-      // make connection to separate wallet provider to use for the to address
-      let toWalletProvider;
-      try {
-        const createResult = await checkout.createProvider({ walletProviderName: selectedToWalletProviderName });
-        toWalletProvider = createResult.provider;
-      } catch (error) {
-      // eslint-disable-next-line no-console
-        console.error(`Failed to create ${selectedToWalletProviderName} provider`);
-      }
-
-      let connected = false;
-      try {
-        const { isConnected } = await checkout.checkIsWalletConnected({ provider: toWalletProvider });
-        connected = isConnected;
-      } catch (err) {
-      // eslint-disable-next-line no-console
-        console.error(err);
-        throw err;
-      }
-
-      if (!connected) {
+      let toWalletProvider = providerCache.current.get(selectedToWalletProviderName);
+      if (!toWalletProvider) {
         try {
-          const { provider: connectedProvider } = await checkout.connect({ provider: toWalletProvider });
-          toWalletProvider = connectedProvider;
-          connected = true;
-        } catch (err: any) {
-          if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
-            // don't set anything if user rejects
-            return;
-          }
-          // eslint-disable-next-line no-console
-          console.error(err);
+          toWalletProvider = await createProviderAndConnect(selectedToWalletProviderName);
+        } catch (error) {
+          return;
         }
       }
-
       setToWalletWeb3Provider(toWalletProvider);
     }
 
