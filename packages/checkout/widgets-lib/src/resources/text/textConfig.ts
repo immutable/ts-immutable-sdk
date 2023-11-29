@@ -453,6 +453,23 @@ export const text = {
         text: 'Next',
       },
     },
+    [XBridgeWidgetViews.BRIDGE_REVIEW]: {
+      layoutHeading: 'Move',
+      heading: 'Ok, how does this look?',
+      from: {
+        amountHeading: 'Moving',
+        heading: 'From',
+      },
+      to: {
+        heading: 'To',
+      },
+      fees: {
+        heading: 'Gas fee',
+      },
+      footer: {
+        buttonText: 'Confirm move',
+      },
+    },
   },
   footers: {
     quickswapFooter: {
