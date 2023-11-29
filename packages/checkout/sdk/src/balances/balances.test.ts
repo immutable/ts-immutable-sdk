@@ -421,6 +421,66 @@ describe('balances', () => {
       ]);
     });
 
+    it('should call getIndexerBalance with undefined filterTokens', async () => {
+      getTokenAllowListMock = jest.fn().mockReturnValue({
+        tokens: [],
+      } as GetTokenAllowListResult);
+      (tokens.getTokenAllowList as jest.Mock).mockImplementation(
+        getTokenAllowListMock,
+      );
+
+      getTokensByWalletAddressMock = jest.fn().mockResolvedValue({
+        items: [
+          {
+            token: {
+              address: '0x65AA7a21B0f3ce9B478aAC3408fE75b423939b1F',
+              decimals: '18',
+              name: 'Ether',
+              symbol: 'ETH',
+              type: BlockscoutTokenType.ERC20,
+            },
+            value: '330000000000000000',
+          },
+        ],
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        next_page_params: null,
+      } as BlockscoutTokens);
+
+      getNativeTokenByWalletAddressMock = jest.fn().mockResolvedValue({
+        token: {
+          name: 'IMX',
+          symbol: 'IMX',
+          decimals: '18',
+          address: '',
+        } as BlockscoutNativeTokenData,
+        value: '777777777777777777',
+      } as BlockscoutToken);
+
+      (Blockscout as unknown as jest.Mock).mockReturnValue({
+        getTokensByWalletAddress: getTokensByWalletAddressMock,
+        getNativeTokenByWalletAddress: getNativeTokenByWalletAddressMock,
+      });
+
+      const getAllBalancesResult = await getAllBalances(
+        {
+          remote: {
+            getTokensConfig: () => ({
+              blockscout: true,
+            }),
+          },
+          networkMap: testCheckoutConfig.networkMap,
+        } as unknown as CheckoutConfiguration,
+        jest.fn() as unknown as Web3Provider,
+        'abc123',
+        ChainId.SEPOLIA, // L1 Chain chain will pass a filterTokens list
+      );
+
+      expect(getNativeTokenByWalletAddressMock).toHaveBeenCalledTimes(1);
+      expect(getTokensByWalletAddressMock).toHaveBeenCalledTimes(1);
+
+      expect(getAllBalancesResult.balances).toEqual([]);
+    });
+
     it('should call getIndexerBalance and return native balance on ERC20 404', async () => {
       getTokensByWalletAddressMock = jest.fn().mockRejectedValue(
         { code: HttpStatusCode.NotFound, message: 'not found' },
