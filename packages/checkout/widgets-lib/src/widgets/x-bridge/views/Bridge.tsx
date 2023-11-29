@@ -39,7 +39,6 @@ export function Bridge({ amount, fromContractAddress }: BridgeProps) {
     if (!checkout || !web3Provider) return;
 
     try {
-      setIsTokenBalancesLoading(true);
       const tokensAndBalances = await getAllowedBalances({
         checkout,
         provider: web3Provider,
@@ -50,7 +49,6 @@ export function Bridge({ amount, fromContractAddress }: BridgeProps) {
         retryPolicy: { retryIntervalMs: 0, retries: 0 },
       });
 
-      setIsTokenBalancesLoading(false);
       bridgeDispatch({
         payload: {
           type: BridgeActions.SET_TOKEN_BALANCES,
@@ -62,7 +60,6 @@ export function Bridge({ amount, fromContractAddress }: BridgeProps) {
       // and the logic will retry anyways.
     } catch (e: any) {
       // eslint-disable-next-line no-console
-      setIsTokenBalancesLoading(false);
       console.debug(e);
     }
   }, [checkout, web3Provider]);
@@ -70,7 +67,8 @@ export function Bridge({ amount, fromContractAddress }: BridgeProps) {
 
   useEffect(() => {
     if (!checkout || !web3Provider) return;
-    refreshBalances();
+    setIsTokenBalancesLoading(true);
+    refreshBalances().finally(() => setIsTokenBalancesLoading(false));
   }, [checkout, web3Provider]);
 
   return (
