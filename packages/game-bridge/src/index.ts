@@ -8,7 +8,6 @@ import { gameBridgeVersionCheck } from '@imtbl/version-check';
 const scope = 'openid offline_access profile email transact';
 const audience = 'platform_api';
 const redirectUri = 'https://localhost:3000/'; // Not required
-const logoutRedirectUri = 'https://localhost:3000/'; // Not required
 
 const keyFunctionName = 'fxName';
 const keyRequestId = 'requestId';
@@ -134,7 +133,7 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
             audience,
             scope,
             redirectUri: (redirect ?? redirectUri),
-            logoutRedirectUri,
+            logoutRedirectUri: request?.logoutRedirectUri,
             crossSdkBridgeEnabled: true,
           };
           passportClient = new passport.Passport(passportConfig);
