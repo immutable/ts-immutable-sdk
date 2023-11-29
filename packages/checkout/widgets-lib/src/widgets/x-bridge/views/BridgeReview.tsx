@@ -5,9 +5,12 @@ import { useContext } from 'react';
 import { EventTargetContext } from 'context/event-target-context/EventTargetContext';
 import { text } from 'resources/text/textConfig';
 import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
-import { Box, Button } from '@biom3/react';
+import {
+  Box, Button,
+} from '@biom3/react';
 import { ChainId, WalletProviderName } from '@imtbl/checkout-sdk';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
+
 import { BridgeReviewSummary } from '../components/BridgeReviewSummary';
 
 export function BridgeReview() {

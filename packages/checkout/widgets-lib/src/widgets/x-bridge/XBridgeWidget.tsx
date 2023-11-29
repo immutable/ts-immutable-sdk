@@ -19,6 +19,7 @@ import { XBridgeContext, xBridgeReducer, initialXBridgeState } from './context/X
 import { widgetTheme } from '../../lib/theme';
 import { BridgeWalletSelection } from './views/BridgeWalletSelection';
 import { BridgeReview } from './views/BridgeReview';
+import { ApproveWalletTx } from './views/ApproveWalletTx';
 
 export type BridgeWidgetInputs = BridgeWidgetParams & {
   config: StrongCheckoutWidgetsConfig,
@@ -35,7 +36,7 @@ export function XBridgeWidget({
 
   const [viewState, viewDispatch] = useReducer(
     viewReducer,
-    { ...initialViewState, view: { type: XBridgeWidgetViews.BRIDGE_REVIEW } },
+    { ...initialViewState, view: { type: XBridgeWidgetViews.BRIDGE_WALLET_SELECTION } },
   );
   const [bridgeState, bridgeDispatch] = useReducer(
     xBridgeReducer,
@@ -60,6 +61,9 @@ export function XBridgeWidget({
             )}
             {viewState.view.type === XBridgeWidgetViews.BRIDGE_REVIEW && (
               <BridgeReview />
+            )}
+            {viewState.view.type === XBridgeWidgetViews.APPROVE_TX && (
+              <ApproveWalletTx />
             )}
           </CryptoFiatProvider>
         </XBridgeContext.Provider>
