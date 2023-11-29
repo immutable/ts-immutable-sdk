@@ -3,9 +3,3 @@ export const selectOptionsContainerStyles = {
   flexDirection: 'column',
   gap: '2px',
 };
-
-export const selectOptionsLoadingIconStyles = {
-  display: 'flex',
-  flexDirection: 'column',
-  rowGap: 'base.spacing.x2',
-};

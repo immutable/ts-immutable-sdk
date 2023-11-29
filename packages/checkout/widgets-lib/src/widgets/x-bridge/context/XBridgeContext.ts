@@ -20,7 +20,6 @@ export interface XBridgeState {
   allowedTokens: TokenInfo[];
   token: TokenInfo | null;
   amount: string;
-  gasFee: string;
 }
 
 export const initialXBridgeState: Omit<XBridgeState, 'checkout'> = {
@@ -33,7 +32,6 @@ export const initialXBridgeState: Omit<XBridgeState, 'checkout'> = {
   allowedTokens: [],
   token: null,
   amount: '0',
-  gasFee: '0',
 };
 
 export interface XBridgeContextState {
@@ -105,7 +103,6 @@ export interface SetTokenAndAmountPayload {
   type: BridgeActions.SET_TOKEN_AND_AMOUNT;
   token: TokenInfo;
   amount: string;
-  gasFee: string;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -163,7 +160,6 @@ export const xBridgeReducer: Reducer<XBridgeState, BridgeAction> = (
         ...state,
         token: action.payload.token,
         amount: action.payload.amount,
-        gasFee: action.payload.gasFee,
       };
     default:
       return state;

@@ -1,5 +1,9 @@
 import {
-  Box, Button, Heading, IMX_TOKEN_IMAGE_URL, MenuItem, OptionKey, ShimmerBox,
+  Box,
+  Button,
+  Heading,
+  OptionKey,
+  ShimmerBox,
 } from '@biom3/react';
 import {
   GasEstimateBridgeToL2Result, GetBalanceResult,
@@ -8,6 +12,7 @@ import {
   useCallback, useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
 import { BigNumber, utils } from 'ethers';
+import { Fees } from 'components/Fees/Fees';
 import { amountInputValidation } from '../../../lib/validations/amountInputValidations';
 import { BridgeActions, XBridgeContext } from '../context/XBridgeContext';
 import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
@@ -27,7 +32,11 @@ import {
 } from './BridgeFormStyles';
 import { CoinSelectorOptionProps } from '../../../components/CoinSelector/CoinSelectorOption';
 import { useInterval } from '../../../lib/hooks/useInterval';
-import { DEFAULT_TOKEN_DECIMALS, DEFAULT_QUOTE_REFRESH_INTERVAL, NATIVE } from '../../../lib';
+import {
+  DEFAULT_TOKEN_DECIMALS,
+  DEFAULT_QUOTE_REFRESH_INTERVAL,
+  NATIVE,
+} from '../../../lib';
 import { swapButtonIconLoadingStyle } from '../../swap/components/SwapButtonStyles';
 import { TransactionRejected } from '../../../components/TransactionRejected/TransactionRejected';
 import { NotEnoughGas } from '../../../components/NotEnoughGas/NotEnoughGas';
@@ -335,7 +344,6 @@ export function BridgeForm(props: BridgeFormProps) {
         type: BridgeActions.SET_TOKEN_AND_AMOUNT,
         token: token.token,
         amount,
-        gasFee,
       },
     });
 
@@ -426,7 +434,6 @@ export function BridgeForm(props: BridgeFormProps) {
             <SelectForm
               testId="bridge-token"
               options={tokensOptions}
-              optionsLoading={isTokenBalancesLoading}
               coinSelectorHeading={bridgeForm.from.selectorTitle}
               selectedOption={selectedOption}
               subtext={token
@@ -452,25 +459,13 @@ export function BridgeForm(props: BridgeFormProps) {
             />
           </Box>
         )}
-        {/* todo: dynamically set values & add icon */}
-        {gasFee && (
-          <Box sx={{ paddingY: 'base.spacing.x2' }}>
-            <MenuItem emphasized size="small">
-              <MenuItem.Label>
-                {xBridgeFees.title}
-              </MenuItem.Label>
-              {/* todo: dynamically set icon between eth/imx */}
-              <MenuItem.PriceDisplay
-                // {gasFeeFiatValue}
-                fiatAmount="~ USD $5.50"
-                // {content.fiatPricePrefix} {gasFee}
-                price="IMX 1.23"
-                // {estimates?.gasFee?.token}
-                currencyImageUrl={IMX_TOKEN_IMAGE_URL}
-              />
-            </MenuItem>
-          </Box>
-        )}
+        <Fees
+          title={xBridgeFees.title}
+          fiatPricePrefix={content.fiatPricePrefix}
+          gasFeeValue={gasFee}
+          gasFeeToken={estimates?.gasFee?.token}
+          gasFeeFiatValue={gasFeeFiatValue}
+        />
       </Box>
       <Box sx={bridgeFormButtonContainerStyles}>
         <Button
