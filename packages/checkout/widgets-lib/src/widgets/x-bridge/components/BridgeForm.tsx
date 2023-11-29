@@ -31,9 +31,7 @@ import { DEFAULT_TOKEN_DECIMALS, DEFAULT_QUOTE_REFRESH_INTERVAL, NATIVE } from '
 import { swapButtonIconLoadingStyle } from '../../swap/components/SwapButtonStyles';
 import { TransactionRejected } from '../../../components/TransactionRejected/TransactionRejected';
 import { NotEnoughGas } from '../../../components/NotEnoughGas/NotEnoughGas';
-import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import { XBridgeWidgetViews } from '../../../context/view-context/XBridgeViewContextTypes';
-import { selectOptionsLoadingIconStyles } from '../../../components/CoinSelector/CoinSelectorStyles';
 
 interface BridgeFormProps {
   testId?: string;
@@ -48,10 +46,10 @@ export function BridgeForm(props: BridgeFormProps) {
     bridgeState: {
       tokenBalances,
       allowedTokens,
+      checkout,
+      web3Provider,
     },
   } = useContext(XBridgeContext);
-  const { connectLoaderState } = useContext(ConnectLoaderContext);
-  const { checkout, provider } = connectLoaderState;
 
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { viewDispatch } = useContext(ViewContext);
@@ -303,8 +301,8 @@ export function BridgeForm(props: BridgeFormProps) {
 
   useEffect(() => {
     (async () => {
-      if (!provider) return;
-      const address = await provider.getSigner().getAddress();
+      if (!web3Provider) return;
+      const address = await web3Provider.getSigner().getAddress();
       setWalletAddress((previous) => {
         if (previous !== '' && previous !== address) {
           setToken(undefined);
@@ -312,7 +310,7 @@ export function BridgeForm(props: BridgeFormProps) {
         return address;
       });
     })();
-  }, [provider, tokenBalances]);
+  }, [web3Provider, tokenBalances]);
 
   const bridgeFormValidator = useCallback((): boolean => {
     const validateTokenError = validateToken(token);
@@ -325,7 +323,7 @@ export function BridgeForm(props: BridgeFormProps) {
 
   const submitBridge = useCallback(async () => {
     if (!bridgeFormValidator()) return;
-    if (!checkout || !provider || !token) return;
+    if (!checkout || !web3Provider || !token) return;
 
     if (insufficientFundsForGas) {
       setShowNotEnoughGasDrawer(true);
@@ -351,7 +349,7 @@ export function BridgeForm(props: BridgeFormProps) {
     });
   }, [
     checkout,
-    provider,
+    web3Provider,
     bridgeFormValidator,
     insufficientFundsForGas,
     token]);
@@ -375,60 +373,53 @@ export function BridgeForm(props: BridgeFormProps) {
         >
           {xBridgeContent.title}
         </Heading>
-        {isTokenBalancesLoading && (
-          <Box sx={selectOptionsLoadingIconStyles}>
-            <MenuItem shimmer emphasized testId="balance-item-shimmer--1" />
-          </Box>
-        )}
-        {!isTokenBalancesLoading && (
-          <Box sx={formInputsContainerStyles}>
-            <SelectForm
-              testId="bridge-token"
-              options={tokensOptions}
-              optionsLoading={isTokenBalancesLoading}
-              coinSelectorHeading={bridgeForm.from.selectorTitle}
-              selectedOption={selectedOption}
-              subtext={token
-                ? `${content.availableBalancePrefix} ${tokenValueFormat(token?.formattedBalance)}`
-                : ''}
-              textAlign="left"
-              errorMessage={tokenError}
-              onSelectChange={(option) => handleSelectTokenChange(option)}
-              disabled={isFetching}
-            />
-            <TextInputForm
-              testId="bridge-amount"
-              value={amount}
-              placeholder={bridgeForm.from.inputPlaceholder}
-              subtext={`${content.fiatPricePrefix} $${formatZeroAmount(amountFiatValue, true)}`}
-              validator={amountInputValidation}
-              onTextInputFocus={onTextInputFocus}
-              onTextInputChange={(value) => handleBridgeAmountChange(value)}
-              onTextInputBlur={(value) => handleAmountInputBlur(value)}
-              textAlign="right"
-              errorMessage={amountError}
-              disabled={isFetching}
-            />
-          </Box>
-        )}
+        <Box sx={formInputsContainerStyles}>
+          <SelectForm
+            testId="bridge-token"
+            options={tokensOptions}
+            optionsLoading={isTokenBalancesLoading}
+            coinSelectorHeading={bridgeForm.from.selectorTitle}
+            selectedOption={selectedOption}
+            subtext={token
+              ? `${content.availableBalancePrefix} ${tokenValueFormat(token?.formattedBalance)}`
+              : ''}
+            textAlign="left"
+            errorMessage={tokenError}
+            onSelectChange={(option) => handleSelectTokenChange(option)}
+            disabled={isFetching}
+          />
+          <TextInputForm
+            testId="bridge-amount"
+            value={amount}
+            placeholder={bridgeForm.from.inputPlaceholder}
+            subtext={`${content.fiatPricePrefix} $${formatZeroAmount(amountFiatValue, true)}`}
+            validator={amountInputValidation}
+            onTextInputFocus={onTextInputFocus}
+            onTextInputChange={(value) => handleBridgeAmountChange(value)}
+            onTextInputBlur={(value) => handleAmountInputBlur(value)}
+            textAlign="right"
+            errorMessage={amountError}
+            disabled={isFetching}
+          />
+        </Box>
         {/* todo: dynamically set values & add icon */}
         {gasFee && (
-        <Box sx={{ paddingY: 'base.spacing.x2' }}>
-          <MenuItem emphasized size="small">
-            <MenuItem.Label>
-              {xBridgeFees.title}
-            </MenuItem.Label>
-            {/* todo: dynamically set icon between eth/imx */}
-            <MenuItem.PriceDisplay
-              // {gasFeeFiatValue}
-              fiatAmount="~ USD $5.50"
-              // {content.fiatPricePrefix} {gasFee}
-              price="IMX 1.23"
-              // {estimates?.gasFee?.token}
-              currencyImageUrl={IMX_TOKEN_IMAGE_URL}
-            />
-          </MenuItem>
-        </Box>
+          <Box sx={{ paddingY: 'base.spacing.x2' }}>
+            <MenuItem emphasized size="small">
+              <MenuItem.Label>
+                {xBridgeFees.title}
+              </MenuItem.Label>
+              {/* todo: dynamically set icon between eth/imx */}
+              <MenuItem.PriceDisplay
+                // {gasFeeFiatValue}
+                fiatAmount="~ USD $5.50"
+                // {content.fiatPricePrefix} {gasFee}
+                price="IMX 1.23"
+                // {estimates?.gasFee?.token}
+                currencyImageUrl={IMX_TOKEN_IMAGE_URL}
+              />
+            </MenuItem>
+          </Box>
         )}
       </Box>
       <Box sx={bridgeFormButtonContainerStyles}>

@@ -28,9 +28,9 @@ export function CoinSelector({
         <Box sx={selectOptionsContainerStyles}>
           {optionsLoading && options.length === 0 && (
             <Box sx={selectOptionsLoadingIconStyles}>
-              <MenuItem shimmer emphasized testId="balance-item-shimmer--1" />
-              <MenuItem shimmer emphasized testId="balance-item-shimmer--2" />
-              <MenuItem shimmer emphasized testId="balance-item-shimmer--3" />
+              <MenuItem shimmer emphasized size="small" testId="balance-item-shimmer--1" />
+              <MenuItem shimmer emphasized size="small" testId="balance-item-shimmer--2" />
+              <MenuItem shimmer emphasized size="small" testId="balance-item-shimmer--3" />
             </Box>
           )}
           {!optionsLoading && options.length === 0 && (<Body sx={{ padding: 'base.spacing.x4' }}>{noCoins}</Body>)}
