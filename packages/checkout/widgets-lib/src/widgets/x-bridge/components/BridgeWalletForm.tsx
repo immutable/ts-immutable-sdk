@@ -7,7 +7,7 @@ import {
 import { text } from 'resources/text/textConfig';
 import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
 import {
-  useCallback, useContext, useState,
+  useCallback, useContext, useMemo, useState,
 } from 'react';
 import {
   WalletProviderName,
@@ -22,8 +22,7 @@ import { bridgeHeadingStyles, brigdeWalletWrapperStyles } from './BridgeWalletFo
 import { XBridgeContext } from '../context/XBridgeContext';
 import { BridgeNetworkItem } from './BridgeNetworkItem';
 import { WalletNetworkButton } from './WalletNetworkButton';
-import { FromWalletSelector } from './FromWalletSelector';
-import { ToWalletSelector } from './ToWalletSelector';
+import { WalletSelector } from './WalletSelector';
 
 const testId = 'bridge-wallet-form';
 
@@ -59,9 +58,25 @@ export function BridgeWalletForm() {
   const toWalletProviderName = isPassportProvider(toWalletWeb3Provider)
     ? WalletProviderName.PASSPORT
     : WalletProviderName.METAMASK;
-  const showPassportToWalletOption = (checkout.passport !== undefined
-    && fromNetwork === l1NetworkChainId
-    && fromWalletProviderName === WalletProviderName.METAMASK);
+
+  const fromWalletSelectorOptions = useMemo(() => {
+    const options = [WalletProviderName.METAMASK];
+    if (checkout.passport) {
+      options.push(WalletProviderName.PASSPORT);
+    }
+    return options;
+  }, [checkout]);
+
+  const toWalletSelectorOptions = useMemo(() => {
+    const options = [WalletProviderName.METAMASK];
+
+    if (checkout.passport
+      && fromNetwork === l1NetworkChainId
+      && fromWalletProviderName === WalletProviderName.METAMASK) {
+      options.push(WalletProviderName.PASSPORT);
+    }
+    return options;
+  }, [checkout, fromNetwork, fromWalletProviderName]);
 
   /* --------------------------- */
   /* --- Handling selections --- */
@@ -225,12 +240,14 @@ export function BridgeWalletForm() {
 
       <Heading testId="" size="xSmall" sx={{ paddingBottom: 'base.spacing.x2' }}>{from.heading}</Heading>
       {/* Show the from wallet target (select box) if no selections have been made yet */}
-      <FromWalletSelector
+      <WalletSelector
         testId={testId}
-        showFromWalletTarget={!isFromWalletAndNetworkSelected}
+        type="from"
+        showWalletSelectorTarget={!isFromWalletAndNetworkSelected}
+        walletOptions={fromWalletSelectorOptions}
         showDrawer={fromWalletDrawerOpen}
         setShowDrawer={setFromWalletDrawerOpen}
-        onFromWalletClick={handleFromWalletConnection}
+        onWalletItemClick={handleFromWalletConnection}
       />
 
       {/* From selections have been made */}
@@ -249,13 +266,14 @@ export function BridgeWalletForm() {
 
           <Box>
             <Heading testId="" size="xSmall" sx={{ paddingBottom: 'base.spacing.x2' }}>{to.heading}</Heading>
-            <ToWalletSelector
+            <WalletSelector
               testId={testId}
-              showToWalletTarget={!isToWalletAndNetworkSelected}
+              type="to"
+              showWalletSelectorTarget={!isToWalletAndNetworkSelected}
+              walletOptions={toWalletSelectorOptions}
               showDrawer={toWalletDrawerOpen}
               setShowDrawer={setToWalletDrawerOpen}
-              showPassportOption={showPassportToWalletOption}
-              onToWalletClick={handleToWalletSelection}
+              onWalletItemClick={handleToWalletSelection}
             />
           </Box>
         </Box>
