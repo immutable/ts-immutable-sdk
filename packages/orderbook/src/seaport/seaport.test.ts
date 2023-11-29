@@ -388,8 +388,9 @@ describe('Seaport', () => {
       };
 
       const immutableOrder: Order = {
+        type: Order.type.LISTING,
         account_address: offerer,
-        buy: [{ item_type: 'NATIVE', amount: '100' }],
+        buy: [{ type: 'NATIVE', amount: '100' }],
         fees: [],
         chain: { id: '1', name: 'imtbl-zkevm-local' },
         created_at: new Date().toISOString(),
@@ -397,6 +398,7 @@ describe('Seaport', () => {
         id: '1',
         protocol_data: {
           order_type: ProtocolData.order_type.FULL_RESTRICTED,
+          order_hash: randomAddress(),
           zone_address: randomAddress(),
           seaport_address: randomAddress(),
           seaport_version: SEAPORT_CONTRACT_VERSION_V1_5,
@@ -405,7 +407,7 @@ describe('Seaport', () => {
         salt: '1',
         sell: [
           {
-            item_type: 'ERC721',
+            type: 'ERC721',
             contract_address: randomAddress(),
             token_id: '1',
           },

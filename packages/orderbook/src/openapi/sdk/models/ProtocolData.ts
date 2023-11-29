@@ -4,17 +4,21 @@
 
 export type ProtocolData = {
   /**
-   * The Order type
+   * Seaport order type
    */
   order_type: ProtocolData.order_type;
   /**
-   * Immutable zone address
+   * Seaport order hash
    */
-  zone_address: string;
+  order_hash: string;
   /**
    * big.Int or uint256 string for order counter
    */
   counter: string;
+  /**
+   * Immutable zone address
+   */
+  zone_address: string;
   /**
    * Immutable Seaport contract address
    */
@@ -28,7 +32,7 @@ export type ProtocolData = {
 export namespace ProtocolData {
 
   /**
-   * The Order type
+   * Seaport order type
    */
   export enum order_type {
     FULL_RESTRICTED = 'FULL_RESTRICTED',

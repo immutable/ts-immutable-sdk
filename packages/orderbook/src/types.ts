@@ -64,14 +64,14 @@ Parameters<typeof OrdersService.prototype.listTrades>[0],
 >;
 
 export enum FeeType {
-  MAKER_ECOSYSTEM = OpenapiFee.fee_type.MAKER_ECOSYSTEM,
-  TAKER_ECOSYSTEM = OpenapiFee.fee_type.TAKER_ECOSYSTEM,
-  PROTOCOL = OpenapiFee.fee_type.PROTOCOL,
-  ROYALTY = OpenapiFee.fee_type.ROYALTY,
+  MAKER_ECOSYSTEM = OpenapiFee.type.MAKER_ECOSYSTEM,
+  TAKER_ECOSYSTEM = OpenapiFee.type.TAKER_ECOSYSTEM,
+  PROTOCOL = OpenapiFee.type.PROTOCOL,
+  ROYALTY = OpenapiFee.type.ROYALTY,
 }
 
 export interface FeeValue {
-  recipient: string;
+  recipientAddress: string;
   amount: string;
 }
 
@@ -159,6 +159,7 @@ export interface CancelOrdersOnChainResponse {
 
 export interface Order {
   id: string;
+  type: 'LISTING';
   accountAddress: string;
   buy: (ERC20Item | NativeItem)[];
   sell: ERC721Item[];
@@ -179,6 +180,7 @@ export interface Order {
   endAt: string;
   protocolData: {
     orderType: 'FULL_RESTRICTED';
+    orderHash: string;
     zoneAddress: string;
     counter: string;
     seaportAddress: string;

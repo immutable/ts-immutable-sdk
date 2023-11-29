@@ -8,7 +8,6 @@ import type { ProtocolData } from './ProtocolData';
 
 export type CreateListingRequestBody = {
   account_address: string;
-  order_hash: string;
   /**
    * Buy item for listing should either be NATIVE or ERC20 item
    */

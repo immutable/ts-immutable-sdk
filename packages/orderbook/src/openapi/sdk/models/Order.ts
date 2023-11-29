@@ -41,8 +41,24 @@ export type Order = {
   start_at: string;
   status: OrderStatus;
   /**
+   * Order type
+   */
+  type: Order.type;
+  /**
    * Time the Order is last updated
    */
   updated_at: string;
 };
+
+export namespace Order {
+
+  /**
+   * Order type
+   */
+  export enum type {
+    LISTING = 'LISTING',
+  }
+
+
+}
 

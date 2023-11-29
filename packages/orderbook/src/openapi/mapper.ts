@@ -13,7 +13,7 @@ import {
 
 export function mapFromOpenApiOrder(order: OpenApiOrder): Order {
   const buyItems: (ERC20Item | NativeItem)[] = order.buy.map((item) => {
-    if (item.item_type === 'ERC20') {
+    if (item.type === 'ERC20') {
       return {
         type: 'ERC20',
         contractAddress: item.contract_address,
@@ -21,7 +21,7 @@ export function mapFromOpenApiOrder(order: OpenApiOrder): Order {
       };
     }
 
-    if (item.item_type === 'NATIVE') {
+    if (item.type === 'NATIVE') {
       return {
         type: 'NATIVE',
         amount: item.amount,
@@ -32,7 +32,7 @@ export function mapFromOpenApiOrder(order: OpenApiOrder): Order {
   });
 
   const sellItems: ERC721Item[] = order.sell.map((item) => {
-    if (item.item_type === 'ERC721') {
+    if (item.type === 'ERC721') {
       return {
         type: 'ERC721',
         contractAddress: item.contract_address,
@@ -45,20 +45,22 @@ export function mapFromOpenApiOrder(order: OpenApiOrder): Order {
 
   return {
     id: order.id,
+    type: order.type,
     accountAddress: order.account_address,
     buy: buyItems,
     sell: sellItems,
     fees: order.fees.map((fee) => ({
       amount: fee.amount,
-      recipient: fee.recipient,
-      type: fee.fee_type as unknown as FeeType,
+      recipientAddress: fee.recipient_address,
+      type: fee.type as unknown as FeeType,
     })),
     chain: order.chain,
     createdAt: order.created_at,
     endAt: order.end_at,
     protocolData: {
-      counter: order.protocol_data.counter,
       orderType: order.protocol_data.order_type,
+      orderHash: order.protocol_data.order_hash,
+      counter: order.protocol_data.counter,
       seaportAddress: order.protocol_data.seaport_address,
       seaportVersion: order.protocol_data.seaport_version,
       zoneAddress: order.protocol_data.zone_address,
@@ -73,7 +75,7 @@ export function mapFromOpenApiOrder(order: OpenApiOrder): Order {
 
 export function mapFromOpenApiTrade(trade: OpenApiTrade): Trade {
   const buyItems: (ERC20Item | NativeItem)[] = trade.buy.map((item) => {
-    if (item.item_type === 'ERC20') {
+    if (item.type === 'ERC20') {
       return {
         type: 'ERC20',
         contractAddress: item.contract_address,
@@ -81,7 +83,7 @@ export function mapFromOpenApiTrade(trade: OpenApiTrade): Trade {
       };
     }
 
-    if (item.item_type === 'NATIVE') {
+    if (item.type === 'NATIVE') {
       return {
         type: 'NATIVE',
         amount: item.amount,
@@ -92,7 +94,7 @@ export function mapFromOpenApiTrade(trade: OpenApiTrade): Trade {
   });
 
   const sellItems: ERC721Item[] = trade.sell.map((item) => {
-    if (item.item_type === 'ERC721') {
+    if (item.type === 'ERC721') {
       return {
         type: 'ERC721',
         contractAddress: item.contract_address,
@@ -110,8 +112,8 @@ export function mapFromOpenApiTrade(trade: OpenApiTrade): Trade {
     sell: sellItems,
     buyerFees: trade.buyer_fees.map((fee) => ({
       amount: fee.amount,
-      recipient: fee.recipient,
-      type: fee.fee_type as unknown as FeeType,
+      recipientAddress: fee.recipient_address,
+      type: fee.type as unknown as FeeType,
     })),
     chain: trade.chain,
     indexedAt: trade.indexed_at,
