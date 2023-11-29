@@ -1,27 +1,15 @@
+/* eslint-disable class-methods-use-this */
 import {
   AxelarQueryAPI, AxelarQueryAPIFeeResponse, Environment,
 } from '@axelar-network/axelarjs-sdk';
 import {
-  ETH_MAINNET_TO_ZKEVM_MAINNET, ETH_SEPOLIA_TO_ZKEVM_TESTNET, L2_STATE_SENDER_ADDRESS, NATIVE_TOKEN_BRIDGE_KEY,
+  ETH_MAINNET_TO_ZKEVM_MAINNET, ETH_SEPOLIA_TO_ZKEVM_TESTNET,
 } from 'constants/bridges';
 import { BridgeConfiguration } from 'config';
 import { ethers } from 'ethers';
 import {
   BridgeFeeRequest,
   BridgeFeeResponse,
-  BridgeWithdrawRequest,
-  BridgeWithdrawResponse,
-  ChildTokenRequest,
-  ChildTokenResponse,
-  CompletionStatus,
-  ExitRequest,
-  ExitResponse,
-  WaitForDepositRequest,
-  WaitForDepositResponse,
-  WaitForWithdrawalRequest,
-  WaitForWithdrawalResponse,
-  RootTokenRequest,
-  RootTokenResponse,
   BridgeMethodsGasLimit,
   FeeData,
   BridgeTxRequest,
@@ -32,19 +20,23 @@ import {
   BridgeTxResponse,
   axelarChains,
   AxelarChainDetails,
+  TokenMappingRequest,
+  TokenMappingResponse,
+  TxStatusRequest,
+  TxStatusResponse,
+  StatusResponse,
+  FlowRateInfoResponse,
+  PendingWithdrawalsRequest,
+  PendingWithdrawalsResponse,
+  FlowRateWithdrawRequest,
+  FlowRateWithdrawResponse,
+  AddGasRequest,
+  AddGasResponse,
 } from 'types';
 import { ROOT_ERC20_BRIDGE_FLOW_RATE } from 'contracts/ABIs/RootERC20BridgeFlowRate';
 import { ERC20 } from 'contracts/ABIs/ERC20';
 import { BridgeError, BridgeErrorType, withBridgeError } from 'errors';
-import { ROOT_STATE_SENDER } from 'contracts/ABIs/RootStateSender';
-import { CHILD_STATE_RECEIVER } from 'contracts/ABIs/ChildStateReceiver';
-import { getBlockNumberClosestToTimestamp } from 'lib/getBlockCloseToTimestamp';
 import { CHILD_ERC20_BRIDGE } from 'contracts/ABIs/ChildERC20Bridge';
-import { CHECKPOINT_MANAGER } from 'contracts/ABIs/CheckpointManager';
-import { decodeExtraData } from 'lib/decodeExtraData';
-import { L2_STATE_SENDER } from 'contracts/ABIs/L2StateSender';
-import { EXIT_HELPER } from 'contracts/ABIs/ExitHelper';
-import { CHILD_ERC20 } from 'contracts/ABIs/ChildERC20';
 import { getGasPriceInWei } from 'lib/gasPriceInWei';
 
 /**
@@ -137,7 +129,6 @@ export class TokenBridge {
         destinationGasLimit,
         req.gasMultiplier,
       );
-      console.log('bridgeFee', bridgeFee);
     }
 
     const totalFee: ethers.BigNumber = sourceChainFee.add(bridgeFee).add(networkFee);
@@ -343,7 +334,7 @@ export class TokenBridge {
         this.config.bridgeContracts.rootERC20BridgeFlowRate,
         req.sourceChainId,
         req.destinationChainId,
-        BridgeMethodsGasLimit.DEPOSIT_DESTINATION,
+        BridgeFeeActions.DEPOSIT,
         req.gasMultiplier,
       );
     }
@@ -369,7 +360,7 @@ export class TokenBridge {
       this.config.bridgeContracts.childERC20Bridge,
       req.sourceChainId,
       req.destinationChainId,
-      BridgeMethodsGasLimit.WITHDRAW_DESTINATION,
+      BridgeFeeActions.WITHDRAW,
       req.gasMultiplier,
     );
   }
@@ -384,15 +375,15 @@ export class TokenBridge {
     contractAddress: string,
     sourceChainId: string,
     destinationChainId: string,
-    destinationGasLimit: number,
+    action: BridgeFeeActions,
     gasMultiplier: number = 1.1,
   ) {
-    const bridgeFee:ethers.BigNumber = await this.calculateBridgeFee(
+    const fees:BridgeFeeResponse = await this.getFee({
+      action,
+      gasMultiplier,
       sourceChainId,
       destinationChainId,
-      destinationGasLimit,
-      gasMultiplier,
-    );
+    });
 
     // Handle return if it is a native token
     if (token === 'NATIVE') {
@@ -411,10 +402,11 @@ export class TokenBridge {
       }
 
       return {
+        fees,
         unsignedTx: {
           data,
           to: contractAddress,
-          value: amount.add(bridgeFee).toString(),
+          value: amount.add(fees.bridgeFee).toString(),
         },
       };
     }
@@ -436,548 +428,13 @@ export class TokenBridge {
       ), BridgeErrorType.INTERNAL_ERROR);
     }
     return {
+      fees,
       unsignedTx: {
         data,
         to: contractAddress,
-        value: bridgeFee.toString(),
+        value: fees.bridgeFee.toString(),
       },
     };
-  }
-
-  /**
-   * Waits for the deposit transaction to be confirmed and synced from the root chain to the child chain.
-   *
-   * @param {WaitForDepositRequest} req - The wait for request object containing the transaction hash.
-   * @returns {Promise<WaitForDepositResponse>} - A promise that resolves to an object containing the status of the deposit transaction.
-   * @throws {BridgeError} - If an error occurs during the transaction confirmation or state sync, a BridgeError will be
-   * thrown with a specific error type.
-   *
-   * Possible BridgeError types include:
-   * - PROVIDER_ERROR: An error occurred with the Ethereum provider during transaction confirmation or state synchronization.
-   * - TRANSACTION_REVERTED: The transaction on the root chain was reverted.
-   *
-   * @example
-   * const waitForRequest = {
-   *   transactionHash: '0x123456...', // Deposit transaction hash on the root chain
-   * };
-   *
-   * bridgeSdk.waitForDeposit(waitForRequest)
-   *   .then((waitForResponse) => {
-   *     console.log('Deposit Transaction Status:', waitForResponse.status);
-   *   })
-   *   .catch((error) => {
-   *     console.error('Error:', error.message);
-   *   });
-   */
-  public async waitForDeposit(
-    req: WaitForDepositRequest,
-  ): Promise<WaitForDepositResponse> {
-    await this.validateChainConfiguration();
-    const rootTxReceipt = await withBridgeError<ethers.providers.TransactionReceipt>(
-      async () => this.config.rootProvider.waitForTransaction(req.transactionHash, this.config.rootChainFinalityBlocks),
-      BridgeErrorType.PROVIDER_ERROR,
-    );
-
-    // Throw an error if the transaction was reverted
-    if (rootTxReceipt.status !== 1) {
-      throw new BridgeError(
-        `${rootTxReceipt.transactionHash} on rootchain was reverted`,
-        BridgeErrorType.TRANSACTION_REVERTED,
-      );
-    }
-
-    // Get the state sync ID from the transaction receipt
-    const stateSyncID = await withBridgeError<number>(
-      async () => this.getRootStateSyncID(rootTxReceipt),
-      BridgeErrorType.PROVIDER_ERROR,
-    );
-
-    // Get the block for the timestamp
-    const rootBlock: ethers.providers.Block = await withBridgeError<ethers.providers.Block>(
-      async () => await this.config.rootProvider.getBlock(rootTxReceipt.blockNumber),
-      BridgeErrorType.PROVIDER_ERROR,
-      `failed to query block ${rootTxReceipt.blockNumber} on rootchain`,
-    );
-
-    // Get the minimum block on childchain which corresponds with the timestamp on rootchain
-    const minBlockRange: number = await withBridgeError<number>(async () => getBlockNumberClosestToTimestamp(
-      this.config.childProvider,
-      rootBlock.timestamp,
-      this.config.blockTime,
-      this.config.clockInaccuracy,
-    ), BridgeErrorType.PROVIDER_ERROR);
-
-    // Get the upper bound for which we expect the StateSync event to occur
-    const maxBlockRange: number = minBlockRange + this.config.maxDepositBlockDelay;
-
-    // Poll till event observed
-    const result: CompletionStatus = await withBridgeError<CompletionStatus>(
-      async () => this.waitForChildStateSync(
-        stateSyncID,
-        this.config.pollInterval,
-        minBlockRange,
-        maxBlockRange,
-      ),
-      BridgeErrorType.PROVIDER_ERROR,
-    );
-
-    return {
-      status: result,
-    };
-  }
-
-  /**
- * Retrieves the corresponding child token address for a given root token address.
- * This function is used to map a root token to its child token in the context of a bridging system between chains.
- * If the token is native, a special key is used to represent it.
- *
- * @param {ChildTokenRequest} req - The request object containing the root token address or the string 'NATIVE'.
- * @returns {Promise<ChildTokenResponse>} - A promise that resolves to an object containing the child token address.
- * @throws {BridgeError} - If an error occurs during the query, a BridgeError will be thrown with a specific error type.
- *
- * Possible BridgeError types include:
- * - INVALID_ADDRESS: If the Ethereum address provided in the request is invalid.
- * - PROVIDER_ERROR: If there's an error in querying the getChildToken mapping.
- * - INTERNAL_ERROR: An unexpected error occurred during the execution.
- *
- * @example
- * const request = {
- *   rootToken: '0x123456...', // Root token address or 'NATIVE'
- * };
- *
- * bridgeSdk.getChildToken(request)
- *   .then((response) => {
- *     console.log(response.childToken); // Child token address
- *   })
- *   .catch((error) => {
- *     console.error('Error:', error.message);
- *   });
- */
-  public async getChildToken(req: ChildTokenRequest): Promise<ChildTokenResponse> {
-  // Validate the chain configuration to ensure proper setup
-    await this.validateChainConfiguration();
-
-    // If the root token is native, use the native token key; otherwise, use the provided root token address
-    const reqTokenAddress = (req.rootToken === 'NATIVE') ? NATIVE_TOKEN_BRIDGE_KEY : req.rootToken;
-
-    // Validate the request token address
-    if (!ethers.utils.isAddress(reqTokenAddress)) {
-      throw new BridgeError(
-        `token address ${reqTokenAddress} is not a valid address`,
-        BridgeErrorType.INVALID_ADDRESS,
-      );
-    }
-
-    // Create an instance of the root ERC20 predicate contract
-    const childTokenAddress: string = await withBridgeError<string>(
-      async () => {
-        const rootERC20Predicate: ethers.Contract = new ethers.Contract(
-          this.config.bridgeContracts.rootERC20BridgeFlowRate,
-          ROOT_ERC20_BRIDGE_FLOW_RATE,
-          this.config.rootProvider,
-        );
-        return await rootERC20Predicate.rootTokenToChildToken(reqTokenAddress);
-      },
-      BridgeErrorType.PROVIDER_ERROR,
-      'failed to query rootTokenToChildToken mapping',
-    );
-
-    // Return the child token address
-    return {
-      childToken: childTokenAddress,
-    };
-  }
-
-  /**
- * Retrieves the corresponding root token address for a given child token address.
- * This function is used to map a child token back to its root token in the context of a bridging system between chains.
- *
- * If the root token address matches the address designated for the native token, the method will return 'NATIVE'.
- *
- * @param {RootTokenRequest} req - The request object containing the child token address.
- * @returns {Promise<RootTokenResponse>} - A promise that resolves to an object containing the root token address.
- * @throws {BridgeError} - If an error occurs during the query, a BridgeError will be thrown with a specific error type.
- *
- * Possible BridgeError types include:
- * - PROVIDER_ERROR: If there's an error in querying the root token from the child token contract.
- * - INVALID_TOKEN: If the token being withdrawed is not a valid bridgeable token
- *
- * @example
- * const request = {
- *   childToken: '0x123456...', // Child token address
- * };
- *
- * bridgeSdk.getRootToken(request)
- *   .then((response) => {
- *     console.log(response.rootToken); // Outputs: 'NATIVE' or Root token address
- *   })
- *   .catch((error) => {
- *     console.error('Error:', error.message);
- *   });
- */
-  public async getRootToken(req: RootTokenRequest): Promise<RootTokenResponse> {
-  // Validate the chain configuration to ensure proper setup
-    await this.validateChainConfiguration();
-
-    // Query the corresponding root token address using the child token contract
-    const rootToken = await withBridgeError<string>(
-      async () => {
-        // Create an instance of the child token contract using the given child token address
-        const childToken: ethers.Contract = new ethers.Contract(req.childToken, CHILD_ERC20, this.config.childProvider);
-        return await childToken.rootToken();
-      },
-      BridgeErrorType.PROVIDER_ERROR,
-      'failed to query the root token from the child token contract',
-    );
-
-    // Check if the rootToken address is the designated native token address.
-    // If it is, return 'NATIVE'. Else, return the root token address.
-    return {
-      rootToken: (rootToken === NATIVE_TOKEN_BRIDGE_KEY) ? 'NATIVE' : rootToken,
-    };
-  }
-
-  /**
-   * Generates an unsigned transaction that a user can use to initiate a token withdrawal from the bridge.
-   * The user must sign and submit this transaction to execute the withdrawal.
-   *
-   * @param {BridgeWithdrawRequest} req - The withdrawal request object containing the necessary data for withdrawing tokens.
-   * @returns {Promise<BridgeWithdrawResponse>} - A promise that resolves to an object containing the unsigned transaction data.
-   *
-   * @throws {BridgeError} - If an error occurs during the generation of the unsigned transaction,
-   * a BridgeError will be thrown with a specific error type.
-   * Possible BridgeError types include:
-   * - INVALID_ADDRESS: The Ethereum address provided in the request is invalid. This could be the user's address or the token's address.
-   * - INVALID_AMOUNT: The withdrawal amount provided in the request is invalid (less than or equal to 0).
-   * - PROVIDER_ERROR: An error occurred when interacting with the Ethereum provider, likely due to a network or connectivity issue.
-   * - INTERNAL_ERROR: An unexpected error occurred during the execution, likely due to the bridge SDK implementation.
-   *
-   * @example
-   * const withdrawRequest = {
-   *   token: '0x123456...', // ERC20 token address
-   *   recipientAddress: '0xabcdef...', // Address to receive the withdrawn tokens
-   *   withdrawAmount: ethers.utils.parseUnits('100', 18), // Withdraw amount in wei
-   * };
-   *
-   * bridgeSdk.getUnsignedWithdrawTx(withdrawRequest)
-   *   .then((withdrawalResponse) => {
-   *     console.log(withdrawalResponse.unsignedTx);
-   *   })
-   *   .catch((error) => {
-   *     console.error('Error:', error.message);
-   *   });
-   */
-  public async getUnsignedWithdrawTx(
-    req: BridgeWithdrawRequest,
-  ): Promise<BridgeWithdrawResponse> {
-    // Ensure the configuration of chains is valid.
-    await this.validateChainConfiguration();
-
-    // Validate the recipient address, withdrawal amount, and token.
-    TokenBridge.validateWithdrawArgs(req.recipientAddress, req.withdrawAmount, req.token);
-
-    // Create a contract instance for interacting with the ChildERC20Predicate
-    const childERC20Bridge = await withBridgeError<ethers.Contract>(
-      async () => {
-        const contract = new ethers.Contract(
-          this.config.bridgeContracts.childERC20Bridge,
-          CHILD_ERC20_BRIDGE,
-        );
-        return contract;
-      },
-      BridgeErrorType.INTERNAL_ERROR,
-    );
-
-    // Encode the withdrawTo function call data for the ERC20 contract
-    const data: string = await withBridgeError<string>(async () => childERC20Bridge.interface
-      .encodeFunctionData('withdrawTo', [
-        req.token,
-        req.recipientAddress,
-        req.withdrawAmount,
-      ]), BridgeErrorType.INTERNAL_ERROR);
-
-    // Construct the unsigned transaction for the withdrawal
-    return {
-      unsignedTx: {
-        data,
-        to: this.config.bridgeContracts.childERC20Bridge,
-        value: 0,
-      },
-    };
-  }
-
-  /**
-   * Waits for the withdrawal transaction to be confirmed in the root chain by continuously
-   * polling until the transaction is included in a checkpoint.
-   * This function is intended to be used after executing a withdrawal transaction.
-   *
-   * @param {WaitForWithdrawalRequest} req - The request object containing the transaction hash of the withdrawal transaction.
-   * @returns {Promise<WaitForWithdrawalResponse>} - A promise that resolves to an empty object once the withdrawal
-   * transaction has been confirmed in the root chain.
-   *
-   * @throws {BridgeError} - If an error occurs during the waiting process, a BridgeError will be thrown with a specific error type.
-   * Possible BridgeError types include:
-   * - PROVIDER_ERROR: An error occurred when interacting with the Ethereum provider, likely due to a network or connectivity issue.
-   *
-   * @example
-   * const waitForWithdrawalRequest = {
-   *   transactionHash: '0x123456...', // Transaction hash of the withdrawal transaction
-   * };
-   *
-   * bridgeSdk.waitForWithdrawal(waitForWithdrawalRequest)
-   *   .then(() => {
-   *     console.log('Withdrawal transaction has been confirmed in the root chain.');
-   *   })
-   *   .catch((error) => {
-   *     console.error('Error:', error.message);
-   *   });
-   */
-  public async waitForWithdrawal(
-    req:WaitForWithdrawalRequest,
-  ): Promise<WaitForWithdrawalResponse> {
-    // Ensure the configuration of chains is valid.
-    await this.validateChainConfiguration();
-
-    // Helper function to pause execution for a specified interval
-    const pause = (): Promise<void> => new Promise((resolve) => {
-      setTimeout(resolve, this.config.pollInterval);
-    });
-
-    await withBridgeError<void>(async () => {
-      // Fetch the receipt of the withdrawal transaction
-      const transactionReceipt = await this.config.childProvider.getTransactionReceipt(req.transactionHash);
-
-      // Fetch the block in which the withdrawal transaction was included
-      const block = await this.config.childProvider.getBlock(transactionReceipt.blockNumber);
-
-      // Decode the extra data field from the block header
-      const decodedExtraData = decodeExtraData(block.extraData);
-
-      // Instantiate the checkpoint manager contract
-      const checkpointManager = new ethers.Contract(
-        this.config.bridgeContracts.rootChainCheckpointManager,
-        CHECKPOINT_MANAGER,
-        this.config.rootProvider,
-      );
-
-      // Recursive function to keep checking for the child deposit event
-      const waitForRootEpoch = async (): Promise<null> => {
-        // Fetch the current checkpoint epoch from the root chain
-        const currentEpoch = await checkpointManager.currentEpoch();
-
-        // If the current epoch is greater than or equal to the epoch number of the checkpoint in which
-        // the withdrawal transaction was included, the withdrawal has been confirmed in the root chain
-        if (currentEpoch >= decodedExtraData.checkpoint.epochNumber) {
-          return null;
-        }
-
-        // Pause execution for a specified interval before checking again
-        await pause();
-
-        // Recursive call
-        return waitForRootEpoch();
-      };
-
-      // Start waiting for the withdrawal transaction to be confirmed in the root chain
-      await waitForRootEpoch();
-    }, BridgeErrorType.PROVIDER_ERROR);
-
-    // Return an empty object once the withdrawal transaction has been confirmed in the root chain
-    return {};
-  }
-
-  /**
-   * Creates an unsigned exit transaction which, when executed, will exit the assets from the child chain to the root chain.
-   * This function should be used after a withdraw transaction has been executed on the child chain.
-   * It should only be executed after `waitForWithdrawal` has completed successfully.
-   *
-   * @param {ExitRequest} req - The request object containing the transaction hash of the withdraw transaction.
-   * @returns {Promise<ExitResponse>} - A promise that resolves to an object containing the unsigned exit transaction.
-   *
-   * @throws {BridgeError} - If an error occurs during the exit transaction creation process,
-   * a BridgeError will be thrown with a specific error type.
-   * Possible BridgeError types include:
-   * - PROVIDER_ERROR: An error occurred when interacting with the Ethereum provider, likely due to a network or connectivity issue.
-   * - INVALID_TRANSACTION: The deposit transaction is invalid or the L2StateSynced event log does not match the expected format.
-   * - INTERNAL_ERROR: An internal error occurred during the function call encoding process.
-   *
-   * @example
-   * const exitRequest = {
-   *   transactionHash: '0x123456...', // Transaction hash of the deposit transaction
-   * };
-   *
-   * bridgeSdk.getUnsignedExitTx(exitRequest)
-   *   .then((response) => {
-   *     console.log('Unsigned exit transaction:', response.unsignedTx);
-   *   })
-   *   .catch((error) => {
-   *     console.error('Error:', error.message);
-   *   });
-   */
-  public async getUnsignedExitTx(req: ExitRequest): Promise<ExitResponse> {
-    // Ensure the configuration of chains is valid
-    await this.validateChainConfiguration();
-
-    // Fetch the receipt of the deposit transaction
-    const txReceipt = await withBridgeError<ethers.providers.TransactionReceipt>(
-      async () => await this.config.childProvider.getTransactionReceipt(req.transactionHash),
-      BridgeErrorType.PROVIDER_ERROR,
-    );
-
-    // Filter out the StateSynced event log from the transaction receipt
-    const stateSenderLogs = txReceipt.logs.filter((log) => log.address.toLowerCase() === L2_STATE_SENDER_ADDRESS);
-    if (stateSenderLogs.length !== 1) {
-      throw new BridgeError(
-        `expected 1 log in tx ${txReceipt.transactionHash} from address ${L2_STATE_SENDER_ADDRESS}`,
-        BridgeErrorType.INVALID_TRANSACTION,
-      );
-    }
-
-    // Parse the StateSynced event log
-    const l2StateSyncEvent = await withBridgeError<ethers.utils.LogDescription>(async () => {
-      const l2StateSenderInterface = new ethers.utils.Interface(L2_STATE_SENDER);
-      const event = l2StateSenderInterface.parseLog(stateSenderLogs[0]);
-
-      // Throw an error if the event log doesn't match the expected format
-      if (event.signature !== 'L2StateSynced(uint256,address,address,bytes)') {
-        throw new Error(`expected L2StateSynced event in tx ${txReceipt.transactionHash}`);
-      }
-      return event;
-    }, BridgeErrorType.INVALID_TRANSACTION);
-
-    // Instantiate the exit helper contract
-    const exitHelper = await withBridgeError<ethers.Contract>(
-      async () => new ethers.Contract(
-        this.config.bridgeContracts.rootChainExitHelper,
-        EXIT_HELPER,
-        this.config.rootProvider,
-      ),
-      BridgeErrorType.PROVIDER_ERROR,
-    );
-
-    // Generate the exit proof
-    const exitProof = await withBridgeError<any>(
-      async () => (this.config.childProvider as ethers.providers.JsonRpcProvider)
-        .send('bridge_generateExitProof', [l2StateSyncEvent.args.id.toHexString()]),
-      BridgeErrorType.PROVIDER_ERROR,
-    );
-
-    // Encode the exit function call data
-    const encodedExitTx = await withBridgeError<string>(async () => {
-      const exitEventEncoded = ethers.utils.defaultAbiCoder.encode(
-        ['uint256', 'address', 'address', 'bytes'],
-        l2StateSyncEvent.args,
-      );
-      return exitHelper.interface.encodeFunctionData(
-        'exit',
-        [exitProof.Metadata.CheckpointBlock, exitProof.Metadata.LeafIndex, exitEventEncoded, exitProof.Data],
-      );
-    }, BridgeErrorType.INTERNAL_ERROR);
-
-    // Create the unsigned exit transaction
-    const unsignedTx: ethers.providers.TransactionRequest = {
-      data: encodedExitTx,
-      to: this.config.bridgeContracts.rootChainExitHelper,
-      value: 0,
-    };
-
-    // Return the unsigned exit transaction
-    return { unsignedTx };
-  }
-
-  private async waitForChildStateSync(
-    stateSyncID: number,
-    interval: number,
-    minBlockRange: number,
-    maxBlockRange: number,
-  ) : Promise<CompletionStatus> {
-    // Initialize the child state receiver contract
-    const childStateReceiver = new ethers.Contract(
-      this.config.bridgeContracts.childChainStateReceiver,
-      CHILD_STATE_RECEIVER,
-
-      this.config.childProvider,
-    );
-
-    // Create an event filter for the StateSyncResult event emitted by the contract
-    // This will be used to listen for specific instances of the event where the stateSyncID matches our expected ID
-    const eventFilter = childStateReceiver.filters.StateSyncResult(stateSyncID, null, null);
-
-    // Define a helper function that queries the blockchain for the StateSyncResult events that match our filter
-    // This function scans the block range from minBlockRange to maxBlockRange
-    const getEventsWithStateSyncID = async (): Promise<ethers.Event[]> => childStateReceiver
-      .queryFilter(
-        eventFilter,
-        minBlockRange,
-        maxBlockRange,
-      );
-
-    // Define a helper function that pauses execution of our program for a certain interval (in milliseconds)
-    // This is used to wait between checks for the StateSyncResult event on the blockchain
-    const pause = (): Promise<void> => new Promise((resolve) => {
-      setTimeout(resolve, interval);
-    });
-
-    // Define a recursive function that keeps checking the blockchain for our specific StateSyncResult event
-    // It calls the helper function getEventsWithStateSyncID() to get the list of matching events
-    // If it finds more than one matching event, it throws an error because we only expect one event with our specific stateSyncID
-    // If it finds exactly one matching event, it returns that event
-    // If it doesn't find any matching event, it waits for a while (using the pause() function) and then checks again (recursive call)
-    const checkForChildDepositEvent = async (): Promise<ethers.Event> => {
-      const events = await getEventsWithStateSyncID();
-      if (events.length > 1) {
-        throw new Error(`expected maximum of 1 events with statesync id ${stateSyncID} but found ${events.length}`);
-      }
-      if (events.length === 1) {
-        return events[0];
-      }
-
-      // Pause execution for a specified interval before checking again
-      await pause();
-
-      // Recursive call
-      return checkForChildDepositEvent();
-    };
-
-    // Call our recursive function and wait for it to find the StateSyncResult event
-    const childDepositEvent = await checkForChildDepositEvent();
-    // Perform some error checking on the event:
-    // - If there's no event, throw an error
-    // - If the event doesn't have arguments, throw an error
-    // - If the event's arguments don't include a status, throw an error
-    if (!childDepositEvent) throw new Error('failed to find child deposit event');
-    if (!childDepositEvent.args) throw new Error('child deposit event has no args');
-    if (childDepositEvent.args.status == null) throw new Error('child deposit event has no status');
-
-    // If the event's status argument is present, we consider that the state sync operation was successful
-    if (childDepositEvent.args.status) {
-      return CompletionStatus.SUCCESS;
-    }
-
-    // If not, we consider that the operation failed
-    return CompletionStatus.FAILED;
-  }
-
-  private async getRootStateSyncID(txReceipt: ethers.providers.TransactionReceipt): Promise<number> {
-    const stateSenderInterface = new ethers.utils.Interface(ROOT_STATE_SENDER);
-
-    // Get the StateSynced event log from the transaction receipt
-    const stateSenderLogs: ethers.providers.Log[] = txReceipt
-      .logs
-      .filter((log) => log.address.toLowerCase() === this.config.bridgeContracts.rootChainStateSender.toLowerCase());
-
-    if (stateSenderLogs.length !== 1) {
-      throw new Error(`expected at least 1 log in tx ${txReceipt.transactionHash}`);
-    }
-    const stateSyncEvent = stateSenderInterface.parseLog(stateSenderLogs[0]);
-
-    // Throw an error if the event log doesn't match the expected format
-    if (stateSyncEvent.signature !== 'StateSynced(uint256,address,address,bytes)') {
-      throw new Error(`expected state sync event in tx ${txReceipt.transactionHash}`);
-    }
-
-    // Return the state sync ID as a number
-    return parseInt(stateSyncEvent.args.id, 10);
   }
 
   private async validateDepositArgs(
@@ -1040,36 +497,6 @@ export class TokenBridge {
       throw new BridgeError(
         `the sourceChainId ${sourceChainId} cannot be the same as the destinationChainId ${destinationChainId}`,
         BridgeErrorType.CHAIN_IDS_MATCH,
-      );
-    }
-  }
-
-  private static validateWithdrawArgs(
-    withdrawerOrRecipientAddress: string,
-    withdrawAmount: ethers.BigNumber,
-    token: string,
-  ) {
-    // Validate the withdrawer address
-    if (!ethers.utils.isAddress(withdrawerOrRecipientAddress)) {
-      throw new BridgeError(
-        `withdrawer address ${withdrawerOrRecipientAddress} is not a valid address`,
-        BridgeErrorType.INVALID_ADDRESS,
-      );
-    }
-
-    // Validate the withdrawal amount. It cannot be zero or negative.
-    if (withdrawAmount.isNegative() || withdrawAmount.isZero()) {
-      throw new BridgeError(
-        `withdraw amount ${withdrawAmount.toString()} is invalid`,
-        BridgeErrorType.INVALID_AMOUNT,
-      );
-    }
-
-    // Check if the ERC20 Token is a valid address
-    if (!ethers.utils.isAddress(token)) {
-      throw new BridgeError(
-        `token address ${token} is not a valid address`,
-        BridgeErrorType.INVALID_ADDRESS,
       );
     }
   }
@@ -1156,5 +583,141 @@ export class TokenBridge {
     console.log('estimateGasFee result', estimateGasFeeResult);
 
     return ethers.BigNumber.from(estimateGasFeeResult.executionFeeWithMultiplier);
+  }
+
+  // STUBBED ENDPOINTS FOR PHASE 2 -------------------------------------------
+
+  /**
+ * Queries the status of a bridge transaction.
+ *
+ * @param {TokenMappingRequest} req - The request object containing the token, rootChainId and childChainId.
+ * @returns {Promise<TokenMappingResponse>} - A promise that resolves to an object containing the token mappings.
+ * @throws {BridgeError} - If an error occurs during the query, a BridgeError will be thrown with a specific error type.
+ * @dev this SDK method is currently stubbed
+ */
+  public async getTransactionStatus(req: TxStatusRequest): Promise<TxStatusResponse> {
+    console.log('stubbed response with req', req);
+    // Return the token mappings
+    return [{
+      status: StatusResponse.COMPLETE,
+      data: 'stubbed data',
+    }];
+  }
+
+  /**
+ * Queries for the information about which tokens are flowrated and how long the delay is.
+ *
+ * @param {void} - no params required.
+ * @returns {Promise<FlowRateInfoResponse>} - A promise that resolves to an object containing the flow rate information.
+ * @throws {BridgeError} - If an error occurs during the query, a BridgeError will be thrown with a specific error type.
+ * @dev this SDK method is currently stubbed
+ */
+  public async getFlowRateInfo(): Promise<FlowRateInfoResponse> {
+    console.log('stubbed response');
+    // Return the token mappings
+    return {
+      withdrawalQueueActivated: false,
+      withdrawalDelay: 86400,
+      tokens: {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        NATIVE: {
+          capacity: ethers.utils.parseUnits('10', 18).toString(),
+          depth: ethers.utils.parseUnits('10', 18).toString(),
+          refillTime: 1701227629,
+          refillRate: ethers.utils.parseUnits('10', 18).toString(),
+        },
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF': {
+          capacity: ethers.utils.parseUnits('10', 18).toString(),
+          depth: ethers.utils.parseUnits('10', 18).toString(),
+          refillTime: 1701227629,
+          refillRate: ethers.utils.parseUnits('10', 18).toString(),
+        },
+      },
+    };
+  }
+
+  /**
+ * Queries the status of a bridge transaction.
+ *
+ * @param {PendingWithdrawalsRequest} req - The request object containing the reciever address.
+ * @returns {Promise<PendingWithdrawalsResponse>} - A promise that resolves to an object containing the child token address.
+ * @throws {BridgeError} - If an error occurs during the query, a BridgeError will be thrown with a specific error type.
+ * @dev this SDK method is currently stubbed
+ */
+  public async getPendingWithdrawals(req: PendingWithdrawalsRequest): Promise<PendingWithdrawalsResponse> {
+    console.log('stubbed response with req', req);
+    return {
+      pending: [{
+        withdrawer: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
+        token: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+        amount: ethers.utils.parseUnits('1', 18).toString(),
+        timeoutStart: 1698502429,
+        timeoutEnd: 1701227629,
+      },
+      {
+        withdrawer: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
+        token: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+        amount: ethers.utils.parseUnits('2', 18).toString(),
+        timeoutStart: 1698416029,
+        timeoutEnd: 1698502429,
+      }],
+    };
+  }
+
+  /**
+ * Retrieves the unsigned flow rate withdrawal transaction
+ *
+ * @param {FlowRateWithdrawRequest} req - The request object containing the receiver address and pending withdrawal index.
+ * @returns {Promise<FlowRateWithdrawResponse>} - A promise that resolves to an object containing the unsigned transaction.
+ * @throws {BridgeError} - If an error occurs during the query, a BridgeError will be thrown with a specific error type.
+ * @dev this SDK method is currently stubbed
+ */
+  public async getFlowRateWithdrawTx(req:FlowRateWithdrawRequest): Promise<FlowRateWithdrawResponse> {
+    console.log('stubbed response with req', req);
+    return {
+      unsignedTx: {
+        data: 'stubbed flow rate withdrawal data',
+        to: '0x0',
+        value: 0,
+      },
+    };
+  }
+
+  /**
+ * Retrieves the unsigned transaction to top up the Axelar Gas.
+ *
+ * @param {AddGasRequest} req - The request object containing the root token address or the string 'NATIVE'.
+ * @returns {Promise<AddGasResponse>} - A promise that resolves to an object containing the child token address.
+ * @throws {BridgeError} - If an error occurs during the query, a BridgeError will be thrown with a specific error type.
+ * @dev this SDK method is currently stubbed
+ */
+  public async addGas(req: AddGasRequest): Promise<AddGasResponse> {
+    console.log('stubbed response with req', req);
+    return {
+      unsignedTx: {
+        data: 'stubbed add gas payment data',
+        to: '0x0',
+        value: 0,
+      },
+    };
+  }
+
+  /**
+ * Retrieves the corresponding token mappings for a given address.
+ * This function is used to map a root token to its child token in the context of a bridging system between chains.
+ * If the token is native, a special key is used to represent it.
+ *
+ * @param {TokenMappingRequest} req - The request object containing the root token address or the string 'NATIVE'.
+ * @returns {Promise<TokenMappingResponse>} - A promise that resolves to an object containing the child token address.
+ * @throws {BridgeError} - If an error occurs during the query, a BridgeError will be thrown with a specific error type.
+ * @dev this SDK method is currently stubbed
+ */
+  public async getTokenMapping(req: TokenMappingRequest): Promise<TokenMappingResponse> {
+    console.log('stubbed response with req', req);
+    return {
+      rootToken: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+      childToken: 'NATIVE',
+    };
   }
 }

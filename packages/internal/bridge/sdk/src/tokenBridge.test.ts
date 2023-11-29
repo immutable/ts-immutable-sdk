@@ -10,7 +10,7 @@ import { BridgeError, BridgeErrorType } from 'errors';
 jest.mock('@axelar-network/axelarjs-sdk', () => ({
   AxelarQueryAPI: jest.fn().mockImplementation(() => ({
     estimateGasFee: jest.fn().mockReturnValue({
-      executionFeeWithMultiplier: ethers.utils.parseUnits('0.0001', 18),
+      executionFeeWithMultiplier: ethers.utils.parseUnits('0.001', 18),
     }),
   })),
   Environment: {
@@ -300,6 +300,12 @@ describe('Token Bridge', () => {
     const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
     const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
 
+    const sourceChainFee:ethers.BigNumber = ethers.utils.parseUnits('0.000001', 18);
+    const destinationChainFee:ethers.BigNumber = ethers.utils.parseUnits('0.000001', 18);
+    const bridgeFee:ethers.BigNumber = ethers.utils.parseUnits('0.0001', 18);
+    const networkFee:ethers.BigNumber = ethers.BigNumber.from(0);
+    const totalFee:ethers.BigNumber = sourceChainFee.add(bridgeFee).add(networkFee);
+
     let tokenBridge: TokenBridge;
     let bridgeConfig: BridgeConfiguration;
     beforeEach(() => {
@@ -316,6 +322,14 @@ describe('Token Bridge', () => {
         .mockImplementation(async () => 'Valid');
       jest.spyOn(TokenBridge.prototype as any, 'validateChainConfiguration')
         .mockImplementation(async () => 'Valid');
+      jest.spyOn(TokenBridge.prototype as any, 'getFee')
+        .mockImplementation(async () => ({
+          sourceChainFee,
+          destinationChainFee,
+          bridgeFee,
+          networkFee,
+          totalFee,
+        }));
     });
 
     it('ERC20 token with valid arguments is successful', async () => {
@@ -418,6 +432,7 @@ describe('Token Bridge', () => {
         token,
         sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
         destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+        gasMultiplier: 1.1,
       };
 
       await expect(async () => {
@@ -441,6 +456,7 @@ describe('Token Bridge', () => {
         token,
         sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
         destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+        gasMultiplier: 1.1,
       };
 
       await expect(async () => {
@@ -464,6 +480,7 @@ describe('Token Bridge', () => {
         token,
         sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
         destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+        gasMultiplier: 1.1,
       };
 
       await expect(async () => {
@@ -488,6 +505,7 @@ describe('Token Bridge', () => {
         token,
         sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
         destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+        gasMultiplier: 1.1,
       };
 
       await expect(async () => {
@@ -512,6 +530,7 @@ describe('Token Bridge', () => {
         token,
         sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
         destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+        gasMultiplier: 1.1,
       };
 
       await expect(async () => {
@@ -535,6 +554,7 @@ describe('Token Bridge', () => {
         token,
         sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
         destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+        gasMultiplier: 1.1,
       };
 
       await expect(async () => {
@@ -558,6 +578,7 @@ describe('Token Bridge', () => {
         token,
         sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
         destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+        gasMultiplier: 1.1,
       };
 
       await expect(async () => {
@@ -580,6 +601,12 @@ describe('Token Bridge', () => {
       },
     };
 
+    const sourceChainFee:ethers.BigNumber = ethers.utils.parseUnits('0.000001', 18);
+    const destinationChainFee:ethers.BigNumber = ethers.utils.parseUnits('0.000001', 18);
+    const bridgeFee:ethers.BigNumber = ethers.utils.parseUnits('0.0001', 18);
+    const networkFee:ethers.BigNumber = ethers.BigNumber.from(0);
+    const totalFee:ethers.BigNumber = sourceChainFee.add(bridgeFee).add(networkFee);
+
     beforeEach(() => {
       const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
       const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
@@ -595,7 +622,9 @@ describe('Token Bridge', () => {
       jest.spyOn(TokenBridge.prototype as any, 'validateChainConfiguration')
         .mockImplementation(async () => 'Valid');
       jest.spyOn(TokenBridge.prototype as any, 'getGasEstimates')
-        .mockImplementation(async () => ethers.BigNumber.from(100));
+        .mockImplementation(async () => ethers.utils.parseUnits('0.000001', 18));
+      jest.spyOn(TokenBridge.prototype as any, 'calculateBridgeFee')
+        .mockImplementation(async () => ethers.utils.parseUnits('0.0001', 18));
       tokenBridge = new TokenBridge(bridgeConfig);
     });
 
@@ -603,7 +632,7 @@ describe('Token Bridge', () => {
       jest.clearAllMocks();
     });
     it('returns the deposit fees', async () => {
-      expect.assertions(1);
+      expect.assertions(6);
       const result = await tokenBridge.getFee(
         {
           action: BridgeFeeActions.DEPOSIT,
@@ -612,8 +641,13 @@ describe('Token Bridge', () => {
           destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
         },
       );
-      console.log(result);
+
       expect(result).not.toBeNull();
+      expect(result.sourceChainFee).toStrictEqual(sourceChainFee);
+      expect(result.destinationChainFee).toStrictEqual(destinationChainFee);
+      expect(result.bridgeFee).toStrictEqual(bridgeFee);
+      expect(result.networkFee).toStrictEqual(networkFee);
+      expect(result.totalFee).toStrictEqual(totalFee);
     });
   });
 });
