@@ -87,10 +87,8 @@ export function BridgeForm(props: BridgeFormProps) {
 
   // Fee estimates & transactions
   const [isFetching, setIsFetching] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [estimates, setEstimates] = useState<GasEstimateBridgeToL2Result | undefined>(undefined);
   const [gasFee, setGasFee] = useState<string>('');
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
   const [tokensOptions, setTokensOptions] = useState<CoinSelectorOptionProps[]>([]);
 
