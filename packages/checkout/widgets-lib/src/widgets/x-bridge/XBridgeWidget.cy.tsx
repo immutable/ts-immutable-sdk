@@ -15,12 +15,26 @@ describe('XBridgeWidget', () => {
   let getNetworkSepoliaStub;
   let mockMetaMaskProvider;
   let mockPassportProvider;
+  let createProviderStub;
+  let checkIsWalletConnectedStub;
+  let connectStub;
+  let switchNetworkStub;
 
   beforeEach(() => {
     cy.viewport('ipad-2');
     cyIntercept();
 
-    getNetworkSepoliaStub = cy.stub().resolves({ chainId: ChainId.SEPOLIA });
+    createProviderStub = cy.stub().as('createProviderStub');
+    checkIsWalletConnectedStub = cy.stub().as('checkIsWalletConnectedStub');
+    connectStub = cy.stub().as('connectStub');
+    switchNetworkStub = cy.stub().as('switchNetworkStub');
+
+    Checkout.prototype.createProvider = createProviderStub;
+    Checkout.prototype.checkIsWalletConnected = checkIsWalletConnectedStub;
+    Checkout.prototype.connect = connectStub;
+    Checkout.prototype.switchNetwork = switchNetworkStub;
+
+    getNetworkSepoliaStub = cy.stub().as('getNetworkSepoliaStub').resolves({ chainId: ChainId.SEPOLIA });
 
     getNetworkImmutableZkEVMStub = cy.stub().as('getNetworkImmutableZkEVMStub')
       .resolves({ chainId: ChainId.IMTBL_ZKEVM_TESTNET });
@@ -29,7 +43,7 @@ describe('XBridgeWidget', () => {
       provider: {
         isMetaMask: true,
       },
-      getNetwork: () => getNetworkSepoliaStub,
+      getNetwork: getNetworkSepoliaStub,
     };
 
     mockPassportProvider = {
@@ -53,12 +67,12 @@ describe('XBridgeWidget', () => {
   };
 
   describe('From wallet and network selector', () => {
-    it('should show from network selector and select MetaMask and ImmutablezkEVM', () => {
-      cy.stub(Checkout.prototype, 'createProvider').returns({ provider: mockMetaMaskProvider });
-      cy.stub(Checkout.prototype, 'checkIsWalletConnected').resolves({ isConnected: false });
-      cy.stub(Checkout.prototype, 'connect').resolves({ provider: mockMetaMaskProvider });
+    it('should show from wallet and network selector and select MetaMask and ImmutablezkEVM', () => {
+      createProviderStub.returns({ provider: mockMetaMaskProvider });
+      checkIsWalletConnectedStub.resolves({ isConnected: false });
+      connectStub.resolves({ provider: mockMetaMaskProvider });
 
-      cy.stub(Checkout.prototype, 'switchNetwork').resolves({
+      switchNetworkStub.resolves({
         provider: mockMetaMaskProvider,
         network: { chainId: ChainId.IMTBL_ZKEVM_TESTNET },
       } as SwitchNetworkResult);
@@ -79,10 +93,10 @@ describe('XBridgeWidget', () => {
         .should('exist');
     });
 
-    it('should show from network selector and select Passport, then ImmutablezkEVM is selected by default', () => {
-      cy.stub(Checkout.prototype, 'createProvider').returns({ provider: mockPassportProvider });
-      cy.stub(Checkout.prototype, 'checkIsWalletConnected').resolves({ isConnected: false });
-      cy.stub(Checkout.prototype, 'connect').resolves({ provider: mockPassportProvider });
+    it('should select from ImmutablezkEVM by default when selecting Passport', () => {
+      createProviderStub.returns({ provider: mockPassportProvider });
+      checkIsWalletConnectedStub.resolves({ isConnected: false });
+      connectStub.resolves({ provider: mockPassportProvider });
 
       mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
 
@@ -97,9 +111,9 @@ describe('XBridgeWidget', () => {
     });
 
     it('should not make getNetwork call if the from wallet provider is Passport', () => {
-      cy.stub(Checkout.prototype, 'createProvider').returns({ provider: mockPassportProvider });
-      cy.stub(Checkout.prototype, 'checkIsWalletConnected').resolves({ isConnected: false });
-      cy.stub(Checkout.prototype, 'connect').resolves({ provider: mockPassportProvider });
+      createProviderStub.returns({ provider: mockPassportProvider });
+      checkIsWalletConnectedStub.resolves({ isConnected: false });
+      connectStub.resolves({ provider: mockPassportProvider });
 
       mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
 
@@ -116,15 +130,47 @@ describe('XBridgeWidget', () => {
 
       cy.get('@getNetworkImmutableZkEVMStub').should('not.have.been.called');
     });
+
+    it('should not re-create from wallet web3provider if the from wallet selection is the same as existing', () => {
+      createProviderStub.returns({ provider: mockMetaMaskProvider });
+      checkIsWalletConnectedStub.resolves({ isConnected: false });
+      connectStub.resolves({ provider: mockMetaMaskProvider });
+
+      switchNetworkStub.resolves({
+        provider: mockMetaMaskProvider,
+        network: { chainId: ChainId.IMTBL_ZKEVM_TESTNET },
+      } as SwitchNetworkResult);
+
+      mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
+
+      cySmartGet('bridge-wallet-form-from-wallet-select__target').click();
+      cySmartGet(`bridge-wallet-form-from-wallet-list-${WalletProviderName.METAMASK}`).should('be.visible');
+      cySmartGet(`bridge-wallet-form-from-wallet-list-${WalletProviderName.PASSPORT}`).should('be.visible');
+
+      cySmartGet(`bridge-wallet-form-from-wallet-list-${WalletProviderName.METAMASK}`).click();
+
+      cySmartGet(`bridge-wallet-form-network-list-${ChainId.IMTBL_ZKEVM_TESTNET}`).should('be.visible');
+      cySmartGet(`bridge-wallet-form-network-list-${ChainId.SEPOLIA}`).should('be.visible');
+
+      cySmartGet(`bridge-wallet-form-network-list-${ChainId.IMTBL_ZKEVM_TESTNET}`).click();
+      cySmartGet(`bridge-wallet-form-${WalletProviderName.METAMASK}-${ChainId.IMTBL_ZKEVM_TESTNET}-button-wrapper`)
+        .should('exist');
+
+      // make same selection again in from wallet
+      cySmartGet(`bridge-wallet-form-${WalletProviderName.METAMASK}-${ChainId.IMTBL_ZKEVM_TESTNET}-button-wrapper`)
+        .click('left'); // had to specify left to click the wallet part
+
+      cySmartGet(`bridge-wallet-form-from-wallet-list-${WalletProviderName.METAMASK}`).click();
+    });
   });
 
   describe('To wallet selector', () => {
     it('should always show MetaMask in the to wallet selector', () => {
-      cy.stub(Checkout.prototype, 'createProvider').returns({ provider: mockMetaMaskProvider });
-      cy.stub(Checkout.prototype, 'checkIsWalletConnected').resolves({ isConnected: false });
-      cy.stub(Checkout.prototype, 'connect').resolves({ provider: mockMetaMaskProvider });
+      createProviderStub.returns({ provider: mockMetaMaskProvider });
+      checkIsWalletConnectedStub.resolves({ isConnected: false });
+      connectStub.resolves({ provider: mockMetaMaskProvider });
 
-      cy.stub(Checkout.prototype, 'switchNetwork').resolves({
+      switchNetworkStub.resolves({
         provider: mockMetaMaskProvider,
         network: { chainId: ChainId.IMTBL_ZKEVM_TESTNET },
       } as SwitchNetworkResult);
@@ -150,11 +196,11 @@ describe('XBridgeWidget', () => {
     });
 
     it('should show Passport in the to wallet list when, from wallet is MetaMask and from network is L1', () => {
-      cy.stub(Checkout.prototype, 'createProvider').returns({ provider: mockMetaMaskProvider });
-      cy.stub(Checkout.prototype, 'checkIsWalletConnected').resolves({ isConnected: false });
-      cy.stub(Checkout.prototype, 'connect').resolves({ provider: mockMetaMaskProvider });
+      createProviderStub.returns({ provider: mockMetaMaskProvider });
+      checkIsWalletConnectedStub.resolves({ isConnected: false });
+      connectStub.resolves({ provider: mockMetaMaskProvider });
 
-      cy.stub(Checkout.prototype, 'switchNetwork').resolves({
+      switchNetworkStub.resolves({
         provider: mockMetaMaskProvider,
         network: { chainId: ChainId.SEPOLIA },
       } as SwitchNetworkResult);
@@ -179,12 +225,16 @@ describe('XBridgeWidget', () => {
       cySmartGet('bridge-wallet-form-to-wallet-list-passport').should('be.visible');
     });
 
-    it('should clear to wallet selection when from wallet selection gets re-selected', () => {
-      cy.stub(Checkout.prototype, 'createProvider').returns({ provider: mockMetaMaskProvider });
-      cy.stub(Checkout.prototype, 'checkIsWalletConnected').resolves({ isConnected: false });
-      cy.stub(Checkout.prototype, 'connect').resolves({ provider: mockMetaMaskProvider });
+    it('should clear to wallet selection when from wallet selection changes wallets', () => {
+      createProviderStub.returns({ provider: mockMetaMaskProvider });
+      checkIsWalletConnectedStub.resolves({ isConnected: false });
+      connectStub
+        .onFirstCall()
+        .resolves({ provider: mockMetaMaskProvider })
+        .onSecondCall()
+        .resolves({ provider: mockPassportProvider });
 
-      cy.stub(Checkout.prototype, 'switchNetwork').resolves({
+      switchNetworkStub.resolves({
         provider: mockMetaMaskProvider,
         network: { chainId: ChainId.SEPOLIA },
       } as SwitchNetworkResult);
@@ -205,7 +255,49 @@ describe('XBridgeWidget', () => {
 
       cySmartGet(`bridge-wallet-form-${WalletProviderName.METAMASK}-${ChainId.SEPOLIA}-button-wrapper`)
         .click();
-      cySmartGet('bridge-wallet-form-from-wallet-list-metamask').click();
+      cySmartGet(`bridge-wallet-form-from-wallet-list-${WalletProviderName.PASSPORT}`).click();
+
+      cySmartGet('bridge-wallet-form-to-wallet-select__target').should('be.visible');
+    });
+
+    it('should clear to wallet selection when from wallet selection changes networks', () => {
+      createProviderStub.returns({ provider: mockMetaMaskProvider });
+      checkIsWalletConnectedStub.resolves({ isConnected: false });
+      connectStub
+        .as('connectStub')
+        .onFirstCall()
+        .resolves({ provider: mockMetaMaskProvider })
+        .onSecondCall()
+        .resolves({ provider: { ...mockMetaMaskProvider, getNetwork: getNetworkImmutableZkEVMStub } });
+
+      switchNetworkStub
+        .onFirstCall()
+        .resolves({
+          provider: mockMetaMaskProvider,
+          network: { chainId: ChainId.SEPOLIA },
+        } as SwitchNetworkResult);
+
+      mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
+
+      cySmartGet('bridge-wallet-form-from-wallet-select__target').click();
+      cySmartGet(`bridge-wallet-form-from-wallet-list-${WalletProviderName.METAMASK}`).click();
+      cySmartGet(`bridge-wallet-form-network-list-${ChainId.SEPOLIA}`).click();
+
+      cySmartGet('@createProviderStub').should('have.been.calledOnce');
+      cySmartGet('@checkIsWalletConnectedStub').should('have.been.calledOnce');
+      cySmartGet('@connectStub').should('have.been.calledOnce');
+
+      cySmartGet(`bridge-wallet-form-${WalletProviderName.METAMASK}-${ChainId.SEPOLIA}-button-wrapper`)
+        .should('exist');
+
+      cySmartGet('bridge-wallet-form-to-wallet-select__target').click();
+      cySmartGet('bridge-wallet-form-to-wallet-list-metamask').click();
+      cySmartGet(`bridge-wallet-form-${WalletProviderName.METAMASK}-${ChainId.IMTBL_ZKEVM_TESTNET}-button-wrapper`)
+        .should('exist');
+      cySmartGet('bridge-wallet-form-to-wallet-select__target').should('not.exist');
+
+      cySmartGet(`bridge-wallet-form-network-${ChainId.SEPOLIA}-button`)
+        .click();
       cySmartGet(`bridge-wallet-form-network-list-${ChainId.IMTBL_ZKEVM_TESTNET}`).click();
 
       cySmartGet('bridge-wallet-form-to-wallet-select__target').should('be.visible');
@@ -214,11 +306,11 @@ describe('XBridgeWidget', () => {
 
   describe('Next button', () => {
     it('should show when from and to wallet are selected', () => {
-      cy.stub(Checkout.prototype, 'createProvider').returns({ provider: mockMetaMaskProvider });
-      cy.stub(Checkout.prototype, 'checkIsWalletConnected').resolves({ isConnected: false });
-      cy.stub(Checkout.prototype, 'connect').resolves({ provider: mockMetaMaskProvider });
+      createProviderStub.returns({ provider: mockMetaMaskProvider });
+      checkIsWalletConnectedStub.resolves({ isConnected: false });
+      connectStub.resolves({ provider: mockMetaMaskProvider });
 
-      cy.stub(Checkout.prototype, 'switchNetwork').resolves({
+      switchNetworkStub.resolves({
         provider: mockMetaMaskProvider,
         network: { chainId: ChainId.IMTBL_ZKEVM_TESTNET },
       } as SwitchNetworkResult);
@@ -244,11 +336,11 @@ describe('XBridgeWidget', () => {
     });
 
     it('should not show when to wallet is not selected', () => {
-      cy.stub(Checkout.prototype, 'createProvider').returns({ provider: mockMetaMaskProvider });
-      cy.stub(Checkout.prototype, 'checkIsWalletConnected').resolves({ isConnected: false });
-      cy.stub(Checkout.prototype, 'connect').resolves({ provider: mockMetaMaskProvider });
+      createProviderStub.returns({ provider: mockMetaMaskProvider });
+      checkIsWalletConnectedStub.resolves({ isConnected: false });
+      connectStub.resolves({ provider: mockMetaMaskProvider });
 
-      cy.stub(Checkout.prototype, 'switchNetwork').resolves({
+      switchNetworkStub.resolves({
         provider: mockMetaMaskProvider,
         network: { chainId: ChainId.IMTBL_ZKEVM_TESTNET },
       } as SwitchNetworkResult);

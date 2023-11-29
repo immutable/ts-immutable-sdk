@@ -52,12 +52,19 @@ export function BridgeWalletForm() {
   /* Derived state */
   const isFromWalletAndNetworkSelected = fromWalletWeb3Provider && fromNetwork;
   const isToWalletAndNetworkSelected = toWalletWeb3Provider && toNetwork;
-  const fromWalletProviderName = isPassportProvider(fromWalletWeb3Provider)
-    ? WalletProviderName.PASSPORT
-    : WalletProviderName.METAMASK;
-  const toWalletProviderName = isPassportProvider(toWalletWeb3Provider)
-    ? WalletProviderName.PASSPORT
-    : WalletProviderName.METAMASK;
+  const fromWalletProviderName = useMemo(() => {
+    if (!fromWalletWeb3Provider) return null;
+    return isPassportProvider(fromWalletWeb3Provider)
+      ? WalletProviderName.PASSPORT
+      : WalletProviderName.METAMASK;
+  }, [fromWalletWeb3Provider]);
+
+  const toWalletProviderName = useMemo(() => {
+    if (!fromWalletWeb3Provider) return null;
+    return isPassportProvider(toWalletWeb3Provider)
+      ? WalletProviderName.PASSPORT
+      : WalletProviderName.METAMASK;
+  }, [toWalletWeb3Provider]);
 
   const fromWalletSelectorOptions = useMemo(() => {
     const options = [WalletProviderName.METAMASK];
@@ -86,7 +93,12 @@ export function BridgeWalletForm() {
     setToNetwork(null);
   }
 
-  const handleFromWalletConnection = async (walletProviderName: WalletProviderName) => {
+  const handleFromWalletConnection = useCallback(async (walletProviderName: WalletProviderName) => {
+    if (fromWalletProviderName === walletProviderName) {
+      setFromWalletDrawerOpen(false);
+      return;
+    }
+
     clearToWalletSelections();
     let provider;
     try {
@@ -142,11 +154,17 @@ export function BridgeWalletForm() {
       setFromWalletDrawerOpen(false);
       setTimeout(() => setFromNetworkDrawerOpen(true), 500);
     }
-  };
+  }, [fromWalletProviderName]);
 
   const handleFromNetworkSelection = useCallback(
     async (chainId: ChainId) => {
       if (!fromWalletWeb3Provider) return;
+
+      if (fromNetwork === chainId) {
+        setFromNetworkDrawerOpen(false);
+        return;
+      }
+
       clearToWalletSelections();
 
       if (isPassportProvider(fromWalletWeb3Provider)) {
@@ -208,9 +226,8 @@ export function BridgeWalletForm() {
           connected = true;
         } catch (err: any) {
           if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
-          // eslint-disable-next-line no-console
-            console.log('User rejected request');
-            return; // don't set anything if they reject
+            // don't set anything if user rejects
+            return;
           }
           // eslint-disable-next-line no-console
           console.error(err);
@@ -251,7 +268,7 @@ export function BridgeWalletForm() {
       />
 
       {/* From selections have been made */}
-      {isFromWalletAndNetworkSelected && (
+      {isFromWalletAndNetworkSelected && fromWalletProviderName && (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 'base.spacing.x10' }}>
           <WalletNetworkButton
             testId={testId}
@@ -311,7 +328,7 @@ export function BridgeWalletForm() {
       </BottomSheet>
 
       {/* To wallet selection has been made  */}
-      {isToWalletAndNetworkSelected && (
+      {isToWalletAndNetworkSelected && toWalletProviderName && (
         <Box sx={{
           flex: 1,
           display: 'flex',
