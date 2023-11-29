@@ -41,17 +41,17 @@ export function BridgeWalletForm() {
   /** From wallet and from network local state */
   const [fromWalletDrawerOpen, setFromWalletDrawerOpen] = useState(false);
   const [fromNetworkDrawerOpen, setFromNetworkDrawerOpen] = useState(false);
-  const [fromWalletWeb3Provider, setFromWalletWeb3Provider] = useState<Web3Provider>();
-  const [fromNetwork, setFromNetwork] = useState<ChainId>();
+  const [fromWalletWeb3Provider, setFromWalletWeb3Provider] = useState<Web3Provider | null>();
+  const [fromNetwork, setFromNetwork] = useState<ChainId | null>();
 
   /** To wallet local state */
   const [toWalletDrawerOpen, setToWalletDrawerOpen] = useState(false);
-  const [toWalletWeb3Provider, setToWalletWeb3Provider] = useState<Web3Provider>();
-  const [toNetwork, setToNetwork] = useState<ChainId>();
+  const [toWalletWeb3Provider, setToWalletWeb3Provider] = useState<Web3Provider | null>();
+  const [toNetwork, setToNetwork] = useState<ChainId | null>();
 
   /* Derived state */
-  const isFromWalletAndNetworkSelected = fromWalletWeb3Provider !== undefined && fromNetwork !== undefined;
-  const isToWalletAndNetworkSelected = toWalletWeb3Provider !== undefined && toNetwork !== undefined;
+  const isFromWalletAndNetworkSelected = fromWalletWeb3Provider && fromNetwork;
+  const isToWalletAndNetworkSelected = toWalletWeb3Provider && toNetwork;
   const fromWalletProviderName = isPassportProvider(fromWalletWeb3Provider)
     ? WalletProviderName.PASSPORT
     : WalletProviderName.METAMASK;
@@ -82,8 +82,8 @@ export function BridgeWalletForm() {
   /* --- Handling selections --- */
   /* --------------------------- */
   function clearToWalletSelections() {
-    setToWalletWeb3Provider(undefined);
-    setToNetwork(undefined);
+    setToWalletWeb3Provider(null);
+    setToNetwork(null);
   }
 
   const handleFromWalletConnection = async (walletProviderName: WalletProviderName) => {
@@ -137,7 +137,7 @@ export function BridgeWalletForm() {
        * by clearing the fromNetwork
        * and opening the network drawer
        */
-      setFromNetwork(undefined);
+      setFromNetwork(null);
 
       setFromWalletDrawerOpen(false);
       setTimeout(() => setFromNetworkDrawerOpen(true), 500);
@@ -238,7 +238,7 @@ export function BridgeWalletForm() {
         {heading}
       </Heading>
 
-      <Heading testId="" size="xSmall" sx={{ paddingBottom: 'base.spacing.x2' }}>{from.heading}</Heading>
+      <Heading size="xSmall" sx={{ paddingBottom: 'base.spacing.x2' }}>{from.heading}</Heading>
       {/* Show the from wallet target (select box) if no selections have been made yet */}
       <WalletSelector
         testId={testId}
@@ -265,7 +265,7 @@ export function BridgeWalletForm() {
           />
 
           <Box>
-            <Heading testId="" size="xSmall" sx={{ paddingBottom: 'base.spacing.x2' }}>{to.heading}</Heading>
+            <Heading size="xSmall" sx={{ paddingBottom: 'base.spacing.x2' }}>{to.heading}</Heading>
             <WalletSelector
               testId={testId}
               type="to"
@@ -323,7 +323,7 @@ export function BridgeWalletForm() {
             testId={testId}
             walletName={toWalletProviderName}
             walletAddress="0x1234...4321"
-            chainId={toNetwork}
+            chainId={toNetwork!}
             disableNetworkButton
             onWalletClick={() => {
               setToWalletDrawerOpen(true);
