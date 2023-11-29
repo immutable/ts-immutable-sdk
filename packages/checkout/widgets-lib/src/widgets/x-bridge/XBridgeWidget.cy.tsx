@@ -162,6 +162,78 @@ describe('XBridgeWidget', () => {
 
       cySmartGet(`bridge-wallet-form-from-wallet-list-${WalletProviderName.METAMASK}`).click();
     });
+
+    it('should only create and connect each provider maximum once', () => {
+      createProviderStub.returns({ provider: mockMetaMaskProvider });
+      checkIsWalletConnectedStub.resolves({ isConnected: false });
+      connectStub.resolves({ provider: mockMetaMaskProvider });
+
+      switchNetworkStub.resolves({
+        provider: mockMetaMaskProvider,
+        network: { chainId: ChainId.IMTBL_ZKEVM_TESTNET },
+      } as SwitchNetworkResult);
+
+      mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
+
+      cySmartGet('bridge-wallet-form-from-wallet-select__target').click();
+      cySmartGet(`bridge-wallet-form-from-wallet-list-${WalletProviderName.METAMASK}`).click();
+      cySmartGet(`bridge-wallet-form-network-list-${ChainId.IMTBL_ZKEVM_TESTNET}`).click();
+      cySmartGet(`bridge-wallet-form-${WalletProviderName.METAMASK}-${ChainId.IMTBL_ZKEVM_TESTNET}-button-wrapper`)
+        .should('exist');
+      cySmartGet('@createProviderStub').should('have.been.calledOnce');
+
+      cySmartGet('bridge-wallet-form-to-wallet-select__target').click();
+      cySmartGet('bridge-wallet-form-to-wallet-list-metamask').click();
+      cySmartGet(`bridge-wallet-form-${WalletProviderName.METAMASK}-${ChainId.SEPOLIA}-button-wrapper`);
+      // still should only be called once
+      cySmartGet('@createProviderStub').should('have.been.calledOnce');
+    });
+
+    it.only('should only create and connect each provider maximum once, Passport', () => {
+      createProviderStub
+        .onFirstCall()
+        .returns({ provider: mockMetaMaskProvider })
+        .onSecondCall()
+        .returns({ provider: mockPassportProvider });
+
+      checkIsWalletConnectedStub.resolves({ isConnected: false });
+      connectStub
+        .onFirstCall()
+        .returns({ provider: mockMetaMaskProvider })
+        .onSecondCall()
+        .returns({ provider: mockPassportProvider });
+
+      switchNetworkStub.resolves({
+        provider: mockMetaMaskProvider,
+        network: { chainId: ChainId.SEPOLIA },
+      } as SwitchNetworkResult);
+
+      mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
+
+      // Choose from Metamask
+      cySmartGet('bridge-wallet-form-from-wallet-select__target').click();
+      cySmartGet(`bridge-wallet-form-from-wallet-list-${WalletProviderName.METAMASK}`).click();
+      cySmartGet(`bridge-wallet-form-network-list-${ChainId.SEPOLIA}`).click();
+      cySmartGet(`bridge-wallet-form-${WalletProviderName.METAMASK}-${ChainId.SEPOLIA}-button-wrapper`)
+        .should('exist');
+
+      cySmartGet('@createProviderStub').should('have.been.calledOnce');
+
+      // Choose to Passport
+      cySmartGet('bridge-wallet-form-to-wallet-select__target').click();
+      cySmartGet('bridge-wallet-form-to-wallet-list-passport').click();
+      cySmartGet(`bridge-wallet-form-${WalletProviderName.PASSPORT}-${ChainId.IMTBL_ZKEVM_TESTNET}-button-wrapper`);
+
+      cySmartGet('@createProviderStub').should('have.been.calledTwice');
+
+      // change from wallet to Passport
+      cySmartGet(`bridge-wallet-form-${WalletProviderName.METAMASK}-${ChainId.SEPOLIA}-button-wrapper`)
+        .click('left');
+      cySmartGet(`bridge-wallet-form-from-wallet-list-${WalletProviderName.PASSPORT}`).click();
+
+      // still only called twice as Passport provider was cached
+      cySmartGet('@createProviderStub').should('have.been.calledTwice');
+    });
   });
 
   describe('To wallet selector', () => {
