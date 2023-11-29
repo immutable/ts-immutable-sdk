@@ -240,15 +240,15 @@ describe('XBridgeWidget', () => {
       cySmartGet('bridge-wallet-form-to-wallet-select__target').click();
       cySmartGet('bridge-wallet-form-to-wallet-list-metamask').click();
 
-      cySmartGet('bridge-wallet-form-button')
+      cySmartGet('bridge-wallet-form-submit-button')
         .should('be.visible')
-        .should('have.text', text.views.BRIDGE_WALLET_SELECTION.button.text);
+        .should('have.text', text.views.BRIDGE_WALLET_SELECTION.submitButton.text);
     });
 
     it('should not show when from wallet is not selected', () => {
       mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
 
-      cySmartGet('bridge-wallet-form-button').should('not.exist');
+      cySmartGet('bridge-wallet-form-submit-button').should('not.exist');
     });
 
     it('should not show when to wallet is not selected', () => {
@@ -268,7 +268,7 @@ describe('XBridgeWidget', () => {
       cySmartGet(`bridge-wallet-form-network-list-${ChainId.IMTBL_ZKEVM_TESTNET}`).click();
 
       cySmartGet('bridge-wallet-form-to-wallet-select__target').should('be.visible');
-      cySmartGet('bridge-wallet-form-button').should('not.exist');
+      cySmartGet('bridge-wallet-form-submit-button').should('not.exist');
     });
   });
 });

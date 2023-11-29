@@ -449,7 +449,7 @@ export const text = {
         selectDefaultText: 'Select wallet and network',
         walletSelectorHeading: 'To wallet',
       },
-      button: {
+      submitButton: {
         text: 'Next',
       },
     },

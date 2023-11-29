@@ -30,7 +30,7 @@ const testId = 'bridge-wallet-form';
 export function BridgeWalletForm() {
   const { bridgeState: { checkout } } = useContext(XBridgeContext);
   const {
-    heading, from, to, button,
+    heading, from, to, submitButton,
   } = text.views[XBridgeWidgetViews.BRIDGE_WALLET_SELECTION];
 
   // calculating l1/l2 chains to work with based on Checkout environment
@@ -313,7 +313,7 @@ export function BridgeWalletForm() {
             // eslint-disable-next-line no-console
             onNetworkClick={() => {}}
           />
-          <Button testId={`${testId}-button`} size="large">{button.text}</Button>
+          <Button testId={`${testId}-submit-button`} size="large">{submitButton.text}</Button>
         </Box>
       )}
     </Box>
