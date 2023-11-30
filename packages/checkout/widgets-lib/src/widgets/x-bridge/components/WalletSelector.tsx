@@ -25,8 +25,8 @@ export function WalletSelector({
   setShowDrawer,
   onWalletItemClick,
 }: WalletSelectorProps) {
-  const { to, from } = text.views[XBridgeWidgetViews.BRIDGE_WALLET_SELECTION];
-  const walletSelectorText = type === 'from' ? from : to;
+  const { toFormInput, fromFormInput } = text.views[XBridgeWidgetViews.BRIDGE_WALLET_SELECTION];
+  const walletSelectorText = type === 'from' ? fromFormInput : toFormInput;
   const [walletItemLoading, setWalletItemLoading] = useState(false);
 
   const handleWalletItemClick = async (name: WalletProviderName) => {

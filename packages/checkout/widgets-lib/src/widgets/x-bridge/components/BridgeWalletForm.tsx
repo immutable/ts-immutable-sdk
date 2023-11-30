@@ -7,7 +7,7 @@ import {
 import { text } from 'resources/text/textConfig';
 import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
 import {
-  useCallback, useContext, useMemo, useRef, useState,
+  useCallback, useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
 import {
   WalletProviderName,
@@ -19,7 +19,8 @@ import { isMetaMaskProvider, isPassportProvider } from 'lib/providerUtils';
 import { getL1ChainId, getL2ChainId } from 'lib';
 import { getChainNameById } from 'lib/chainName';
 import { ViewActions, ViewContext } from 'context/view-context/ViewContext';
-import { bridgeHeadingStyles, brigdeWalletWrapperStyles } from './BridgeWalletFormStyles';
+import { abbreviateAddress } from 'lib/addressUtils';
+import { bridgeHeadingStyles, brigdeWalletWrapperStyles, submitButtonWrapperStyles } from './BridgeWalletFormStyles';
 import { BridgeActions, XBridgeContext } from '../context/XBridgeContext';
 import { BridgeNetworkItem } from './BridgeNetworkItem';
 import { WalletNetworkButton } from './WalletNetworkButton';
@@ -28,10 +29,10 @@ import { WalletSelector } from './WalletSelector';
 const testId = 'bridge-wallet-form';
 
 export function BridgeWalletForm() {
-  const { bridgeState: { checkout }, bridgeDispatch } = useContext(XBridgeContext);
+  const { bridgeState: { checkout, from, to }, bridgeDispatch } = useContext(XBridgeContext);
   const { viewDispatch } = useContext(ViewContext);
   const {
-    heading, from, to, submitButton,
+    heading, fromFormInput, toFormInput, submitButton,
   } = text.views[XBridgeWidgetViews.BRIDGE_WALLET_SELECTION];
 
   // calculating l1/l2 chains to work with based on Checkout environment
@@ -48,11 +49,13 @@ export function BridgeWalletForm() {
   const [fromNetworkDrawerOpen, setFromNetworkDrawerOpen] = useState(false);
   const [fromWalletWeb3Provider, setFromWalletWeb3Provider] = useState<Web3Provider | null>();
   const [fromNetwork, setFromNetwork] = useState<ChainId | null>();
+  const [fromWalletAddress, setFromWalletAddress] = useState<string>('');
 
   /** To wallet local state */
   const [toWalletDrawerOpen, setToWalletDrawerOpen] = useState(false);
   const [toWalletWeb3Provider, setToWalletWeb3Provider] = useState<Web3Provider | null>();
   const [toNetwork, setToNetwork] = useState<ChainId | null>();
+  const [toWalletAddress, setToWalletAddress] = useState<string>('');
 
   /* Derived state */
   const isFromWalletAndNetworkSelected = fromWalletWeb3Provider && fromNetwork;
@@ -90,6 +93,19 @@ export function BridgeWalletForm() {
     }
     return options;
   }, [checkout, fromNetwork, fromWalletProviderName]);
+
+  useEffect(() => {
+    if (!from || !to) return;
+
+    // add local state from context values
+    // if user has clicked back button
+    setFromWalletWeb3Provider(from.web3Provider);
+    setFromWalletAddress(from.walletAddress);
+    setFromNetwork(from.network);
+    setToWalletWeb3Provider(to.web3Provider);
+    setToWalletAddress(to.walletAddress);
+    setToNetwork(to.network);
+  }, [from, to]);
 
   async function createProviderAndConnect(walletProviderName: WalletProviderName): Promise<Web3Provider | undefined> {
     let provider;
@@ -157,6 +173,8 @@ export function BridgeWalletForm() {
     }
 
     setFromWalletWeb3Provider(provider);
+    const address = await provider!.getSigner().getAddress();
+    setFromWalletAddress(address);
 
     /** if Passport skip from network selector and default to zkEVM */
     if (isPassportProvider(provider)) {
@@ -215,13 +233,21 @@ export function BridgeWalletForm() {
         console.error(err);
       }
     },
-    [fromWalletWeb3Provider, fromWalletProviderName, providerCache.current],
+    [
+      checkout,
+      fromWalletWeb3Provider,
+      fromWalletProviderName,
+      providerCache.current,
+      fromNetwork,
+    ],
   );
 
   const handleToWalletSelection = useCallback(async (selectedToWalletProviderName: WalletProviderName) => {
     if (fromWalletProviderName === selectedToWalletProviderName) {
       // if same from wallet and to wallet, just use the existing fromWalletLocalWeb3Provider
       setToWalletWeb3Provider(fromWalletWeb3Provider);
+      const address = await fromWalletWeb3Provider!.getSigner().getAddress();
+      setToWalletAddress(address);
     } else {
       let toWalletProvider = providerCache.current.get(selectedToWalletProviderName);
       if (!toWalletProvider) {
@@ -232,6 +258,8 @@ export function BridgeWalletForm() {
         }
       }
       setToWalletWeb3Provider(toWalletProvider);
+      const address = await toWalletProvider!.getSigner().getAddress();
+      setToWalletAddress(address);
     }
 
     // toNetwork is always the opposite of fromNetwork
@@ -239,7 +267,7 @@ export function BridgeWalletForm() {
     setToNetwork(theToNetwork);
 
     setToWalletDrawerOpen(false);
-  }, [fromWalletProviderName, fromNetwork]);
+  }, [fromWalletProviderName, fromNetwork, fromWalletWeb3Provider, providerCache.current]);
 
   const handleSubmitDetails = useCallback(
     () => {
@@ -257,12 +285,12 @@ export function BridgeWalletForm() {
           type: BridgeActions.SET_WALLETS_AND_NETWORKS,
           from: {
             web3Provider: fromWalletWeb3Provider,
-            walletAddress: '',
+            walletAddress: fromWalletAddress,
             network: fromNetwork,
           },
           to: {
             web3Provider: toWalletWeb3Provider,
-            walletAddress: '',
+            walletAddress: toWalletAddress,
             network: toNetwork,
           },
         },
@@ -278,8 +306,10 @@ export function BridgeWalletForm() {
     [
       fromWalletWeb3Provider,
       fromNetwork,
+      fromWalletAddress,
       toWalletWeb3Provider,
       toNetwork,
+      toWalletAddress,
     ],
   );
 
@@ -294,7 +324,7 @@ export function BridgeWalletForm() {
         {heading}
       </Heading>
 
-      <Heading size="xSmall" sx={{ paddingBottom: 'base.spacing.x2' }}>{from.heading}</Heading>
+      <Heading size="xSmall" sx={{ paddingBottom: 'base.spacing.x2' }}>{fromFormInput.heading}</Heading>
       {/* Show the from wallet target (select box) if no selections have been made yet */}
       <WalletSelector
         testId={testId}
@@ -312,7 +342,7 @@ export function BridgeWalletForm() {
           <WalletNetworkButton
             testId={testId}
             walletName={fromWalletProviderName}
-            walletAddress="0x1234...4321"
+            walletAddress={abbreviateAddress(fromWalletAddress)}
             chainId={fromNetwork}
             onWalletClick={() => {
               setFromWalletDrawerOpen(true);
@@ -321,7 +351,7 @@ export function BridgeWalletForm() {
           />
 
           <Box>
-            <Heading size="xSmall" sx={{ paddingBottom: 'base.spacing.x2' }}>{to.heading}</Heading>
+            <Heading size="xSmall" sx={{ paddingBottom: 'base.spacing.x2' }}>{toFormInput.heading}</Heading>
             <WalletSelector
               testId={testId}
               type="to"
@@ -337,7 +367,7 @@ export function BridgeWalletForm() {
 
       {/** From Network Selector, we programatically open this so there is no target */}
       <BottomSheet
-        headerBarTitle={from.networkSelectorHeading}
+        headerBarTitle={fromFormInput.networkSelectorHeading}
         size="full"
         onCloseBottomSheet={() => {
           setFromNetworkDrawerOpen(false);
@@ -378,7 +408,7 @@ export function BridgeWalletForm() {
           <WalletNetworkButton
             testId={testId}
             walletName={toWalletProviderName}
-            walletAddress="0x1234...4321"
+            walletAddress={abbreviateAddress(toWalletAddress)}
             chainId={toNetwork!}
             disableNetworkButton
             onWalletClick={() => {
@@ -387,13 +417,15 @@ export function BridgeWalletForm() {
             // eslint-disable-next-line no-console
             onNetworkClick={() => {}}
           />
-          <Button
-            testId={`${testId}-submit-button`}
-            size="large"
-            onClick={handleSubmitDetails}
-          >
-            {submitButton.text}
-          </Button>
+          <Box sx={submitButtonWrapperStyles}>
+            <Button
+              testId={`${testId}-submit-button`}
+              size="large"
+              onClick={handleSubmitDetails}
+            >
+              {submitButton.text}
+            </Button>
+          </Box>
         </Box>
       )}
     </Box>

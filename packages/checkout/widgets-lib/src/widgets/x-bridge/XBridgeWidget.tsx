@@ -39,7 +39,11 @@ export function XBridgeWidget({
 
   const [viewState, viewDispatch] = useReducer(
     viewReducer,
-    { ...initialViewState, view: { type: XBridgeWidgetViews.BRIDGE_WALLET_SELECTION } },
+    {
+      ...initialViewState,
+      view: { type: XBridgeWidgetViews.BRIDGE_WALLET_SELECTION },
+      history: [{ type: XBridgeWidgetViews.BRIDGE_WALLET_SELECTION }],
+    },
   );
   const [bridgeState, bridgeDispatch] = useReducer(
     xBridgeReducer,

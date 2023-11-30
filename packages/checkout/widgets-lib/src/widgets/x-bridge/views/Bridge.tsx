@@ -37,7 +37,6 @@ export function Bridge({ amount, fromContractAddress }: BridgeProps) {
   // reflected.
   const refreshBalances = useCallback(async () => {
     if (!checkout || !web3Provider) return;
-    console.log('in refresh balances');
     try {
       const tokensAndBalances = await getAllowedBalances({
         checkout,
@@ -48,7 +47,6 @@ export function Bridge({ amount, fromContractAddress }: BridgeProps) {
         // after REFRESH_TOKENS_INTERVAL_MS.
         retryPolicy: { retryIntervalMs: 0, retries: 0 },
       });
-      console.log('tokensAndBalances ', tokensAndBalances);
 
       bridgeDispatch({
         payload: {
@@ -68,7 +66,6 @@ export function Bridge({ amount, fromContractAddress }: BridgeProps) {
 
   useEffect(() => {
     if (!checkout || !web3Provider) return;
-    console.log('do we have a provider ', web3Provider);
     setIsTokenBalancesLoading(true);
     refreshBalances().finally(() => setIsTokenBalancesLoading(false));
   }, [checkout, web3Provider]);

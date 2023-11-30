@@ -445,13 +445,13 @@ export const text = {
     [XBridgeWidgetViews.BRIDGE_WALLET_SELECTION]: {
       layoutHeading: 'Move',
       heading: 'Where would you like to move funds between?',
-      from: {
+      fromFormInput: {
         heading: 'From',
         selectDefaultText: 'Select wallet and network',
         walletSelectorHeading: 'From wallet',
         networkSelectorHeading: 'From network',
       },
-      to: {
+      toFormInput: {
         heading: 'To',
         selectDefaultText: 'Select wallet and network',
         walletSelectorHeading: 'To wallet',
