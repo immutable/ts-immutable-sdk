@@ -3,7 +3,6 @@ import {
   Button,
   Heading,
   OptionKey,
-  ShimmerBox,
 } from '@biom3/react';
 import {
   GasEstimateBridgeToL2Result, GetBalanceResult,
@@ -41,6 +40,7 @@ import { swapButtonIconLoadingStyle } from '../../swap/components/SwapButtonStyl
 import { TransactionRejected } from '../../../components/TransactionRejected/TransactionRejected';
 import { NotEnoughGas } from '../../../components/NotEnoughGas/NotEnoughGas';
 import { XBridgeWidgetViews } from '../../../context/view-context/XBridgeViewContextTypes';
+import { TokenSelectShimmer } from './TokenSelectShimmer';
 
 interface BridgeFormProps {
   testId?: string;
@@ -384,52 +384,7 @@ export function BridgeForm(props: BridgeFormProps) {
           {xBridgeContent.title}
         </Heading>
         {isTokenBalancesLoading && (
-          <Box
-            sx={{
-              paddingTop: 'base.spacing.x4',
-            }}
-            rc={<div />}
-          >
-            <Box
-              sx={{
-                display: 'inline-block',
-                width: '43%',
-                height: '64px',
-                paddingRight: '2px',
-                // eslint-disable-next-line @typescript-eslint/naming-convention
-                WebkitMaskPosition: 'left center',
-                // eslint-disable-next-line @typescript-eslint/naming-convention
-                WebkitMaskRepeat: 'no-repeat',
-                // eslint-disable-next-line @typescript-eslint/naming-convention
-                WebkitMaskSize: 'contain',
-              }}
-              rc={<span />}
-            >
-              {/* <MenuItem shimmer emphasized testId="balance-item-shimmer--1" /> */}
-              <ShimmerBox
-                rc={<span />}
-              />
-            </Box>
-            <Box
-              sx={{
-                display: 'inline-block',
-                width: '57%',
-                height: '64px',
-                paddingLeft: '2px',
-                // eslint-disable-next-line @typescript-eslint/naming-convention
-                WebkitMaskPosition: 'left center',
-                // eslint-disable-next-line @typescript-eslint/naming-convention
-                WebkitMaskRepeat: 'no-repeat',
-                // eslint-disable-next-line @typescript-eslint/naming-convention
-                WebkitMaskSize: 'contain',
-              }}
-              rc={<span />}
-            >
-              <ShimmerBox
-                rc={<span />}
-              />
-            </Box>
-          </Box>
+          <TokenSelectShimmer sx={formInputsContainerStyles} />
         )}
         {!isTokenBalancesLoading && (
           <Box sx={formInputsContainerStyles}>
