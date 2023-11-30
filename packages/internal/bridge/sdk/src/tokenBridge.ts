@@ -203,7 +203,7 @@ export class TokenBridge {
     );
 
     // If the token is NATIVE, no approval is required
-    if (req.token === 'NATIVE') {
+    if (req.token.toUpperCase() === 'NATIVE') {
       return {
         unsignedTx: null,
       };
@@ -295,11 +295,7 @@ export class TokenBridge {
   public async getUnsignedBridgeTx(
     req: BridgeTxRequest,
   ): Promise<BridgeTxResponse> {
-    // console.log('getUnsignedBridgeTx');
     await this.validateChainConfiguration();
-
-    // @TODO check source & destination to determin which contract and methods to use
-
     await this.validateDepositArgs(
       req.token,
       req.senderAddress,
@@ -386,7 +382,7 @@ export class TokenBridge {
     });
 
     // Handle return if it is a native token
-    if (token === 'NATIVE') {
+    if (token.toUpperCase() === 'NATIVE') {
       // Encode the function data into a payload
       let data: string;
       if (sender === recipient) {
@@ -460,7 +456,7 @@ export class TokenBridge {
     }
 
     // If the token is not native, it must be a valid address
-    if (token !== 'NATIVE' && !ethers.utils.isAddress(token)) {
+    if (token.toUpperCase() !== 'NATIVE' && !ethers.utils.isAddress(token)) {
       throw new BridgeError(
         `token address ${token} is not a valid address`,
         BridgeErrorType.INVALID_ADDRESS,
@@ -579,8 +575,6 @@ export class TokenBridge {
       gasLimit,
       gasMultiplier,
     ) as AxelarQueryAPIFeeResponse;
-
-    console.log('estimateGasFee result', estimateGasFeeResult);
 
     return ethers.BigNumber.from(estimateGasFeeResult.executionFeeWithMultiplier);
   }
