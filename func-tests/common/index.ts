@@ -100,8 +100,6 @@ export function getProvider(
     return new AlchemyProvider(network, alchemyKey);
   }
 
-  console.log(`network is ${network}`);
-
   return new JsonRpcProvider(
     `https://eth-sepolia.g.alchemy.com/v2/${alchemyKey}`,
     {

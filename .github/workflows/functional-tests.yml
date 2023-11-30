@@ -1,9 +1,9 @@
 name: Functional Tests
 on:
   push:
-    branches: [ main, master, DX-2485/gherkin-tests ]
+    branches: [ main, DX-2485/gherkin-tests ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main ]
 jobs:
   test:
     timeout-minutes: 60
@@ -24,4 +24,12 @@ jobs:
       run: cd func-tests && yarn install --no-immutable
 
     - name: Run tests
+      env:
+        NETWORK: sepolia
+        TOKEN_ADDRESS: '0x2Fa06C6672dDCc066Ab04631192738799231dE4a'
+        ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
+        PRIVATE_KEY1: ${{ secrets.PRIVATE_KEY1 }}
+        STARK_PRIVATE_KEY1: ${{ secrets.STARK_PRIVATE_KEY1 }}
+        PRIVATE_KEY_BANKER: ${{ secrets.PRIVATE_KEY_BANKER }}
+        STARK_PRIVATE_KEY_BANKER: ${{ secrets.STARK_PRIVATE_KEY_BANKER }}
       run: cd func-tests && yarn test
