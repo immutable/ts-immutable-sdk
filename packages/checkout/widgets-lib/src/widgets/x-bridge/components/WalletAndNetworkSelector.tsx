@@ -20,20 +20,24 @@ import { getL1ChainId, getL2ChainId } from 'lib';
 import { getChainNameById } from 'lib/chainName';
 import { ViewActions, ViewContext } from 'context/view-context/ViewContext';
 import { abbreviateAddress } from 'lib/addressUtils';
-import { bridgeHeadingStyles, brigdeWalletWrapperStyles, submitButtonWrapperStyles } from './BridgeWalletFormStyles';
+import {
+  bridgeHeadingStyles,
+  brigdeWalletWrapperStyles,
+  submitButtonWrapperStyles,
+} from './WalletAndNetworkSelectorStyles';
 import { BridgeActions, XBridgeContext } from '../context/XBridgeContext';
-import { BridgeNetworkItem } from './BridgeNetworkItem';
+import { NetworkItem } from './NetworkItem';
 import { WalletNetworkButton } from './WalletNetworkButton';
-import { WalletSelector } from './WalletSelector';
+import { WalletDrawer } from './WalletDrawer';
 
-const testId = 'bridge-wallet-form';
+const testId = 'wallet-network-selector';
 
-export function BridgeWalletForm() {
+export function WalletAndNetworkSelector() {
   const { bridgeState: { checkout, from, to }, bridgeDispatch } = useContext(XBridgeContext);
   const { viewDispatch } = useContext(ViewContext);
   const {
     heading, fromFormInput, toFormInput, submitButton,
-  } = text.views[XBridgeWidgetViews.BRIDGE_WALLET_SELECTION];
+  } = text.views[XBridgeWidgetViews.WALLET_NETWORK_SECLECTION];
 
   // calculating l1/l2 chains to work with based on Checkout environment
   const l1NetworkChainId = getL1ChainId(checkout.config);
@@ -326,7 +330,7 @@ export function BridgeWalletForm() {
 
       <Heading size="xSmall" sx={{ paddingBottom: 'base.spacing.x2' }}>{fromFormInput.heading}</Heading>
       {/* Show the from wallet target (select box) if no selections have been made yet */}
-      <WalletSelector
+      <WalletDrawer
         testId={testId}
         type="from"
         showWalletSelectorTarget={!isFromWalletAndNetworkSelected}
@@ -352,7 +356,7 @@ export function BridgeWalletForm() {
 
           <Box>
             <Heading size="xSmall" sx={{ paddingBottom: 'base.spacing.x2' }}>{toFormInput.heading}</Heading>
-            <WalletSelector
+            <WalletDrawer
               testId={testId}
               type="to"
               showWalletSelectorTarget={!isToWalletAndNetworkSelected}
@@ -375,7 +379,7 @@ export function BridgeWalletForm() {
         visible={fromNetworkDrawerOpen}
       >
         <BottomSheet.Content>
-          <BridgeNetworkItem
+          <NetworkItem
             key={imtblZkEvmNetworkName}
             testId={testId}
             chainName={imtblZkEvmNetworkName}
@@ -384,7 +388,7 @@ export function BridgeWalletForm() {
           />
           {/** Show L1 option for Metamask only */}
           {fromWalletProviderName === WalletProviderName.METAMASK && (
-          <BridgeNetworkItem
+          <NetworkItem
             key={l1NetworkName}
             testId={testId}
             chainName={l1NetworkName}

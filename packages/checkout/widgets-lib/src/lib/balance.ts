@@ -42,7 +42,6 @@ export const getAllowedBalances = async ({
     }),
     { ...retryPolicy },
   );
-  console.log('getAllowedBalances', tokenBalances);
 
   const allowList = await checkout.getTokenAllowList({
     chainId: currentChainId,
@@ -59,5 +58,5 @@ export const getAllowedBalances = async ({
     return tokensAddresses.get(balance.token.address || NATIVE);
   }) ?? [];
 
-  return { allowList, allowedBalances: tokenBalances?.balances || [] };
+  return { allowList, allowedBalances };
 };

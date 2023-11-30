@@ -1,7 +1,7 @@
 import { ViewType } from './ViewType';
 
 export enum XBridgeWidgetViews {
-  BRIDGE_WALLET_SELECTION = 'BRIDGE_WALLET_SELECTION',
+  WALLET_NETWORK_SECLECTION = 'WALLET_NETWORK_SECLECTION',
   BRIDGE_FORM = 'BRIDGE_FORM',
   BRIDGE_REVIEW = 'BRIDGE_REVIEW',
 }
@@ -12,7 +12,7 @@ export type XBridgeWidgetView =
   | XBridgeReview;
 
 interface XBridgeCrossWalletSelection extends ViewType {
-  type: XBridgeWidgetViews.BRIDGE_WALLET_SELECTION,
+  type: XBridgeWidgetViews.WALLET_NETWORK_SECLECTION,
   data?: {}
 }
 

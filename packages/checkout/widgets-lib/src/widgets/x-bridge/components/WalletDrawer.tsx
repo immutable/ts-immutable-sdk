@@ -4,10 +4,10 @@ import { WalletProviderName } from '@imtbl/checkout-sdk';
 import { useState } from 'react';
 import { text } from 'resources/text/textConfig';
 import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
-import { BridgeWalletItem } from './BridgeWalletItem';
-import { walletItemListStyles } from './WalletSelectorStyles';
+import { WalletItem } from './WalletItem';
+import { walletItemListStyles } from './WalletDrawerStyles';
 
-interface WalletSelectorProps {
+interface WalletDrawerProps {
   testId: string;
   type: 'to' | 'from',
   showWalletSelectorTarget: boolean;
@@ -16,7 +16,7 @@ interface WalletSelectorProps {
   setShowDrawer: (show: boolean) => void;
   onWalletItemClick: (name: WalletProviderName) => Promise<void>;
 }
-export function WalletSelector({
+export function WalletDrawer({
   testId,
   type,
   walletOptions,
@@ -24,8 +24,8 @@ export function WalletSelector({
   showDrawer,
   setShowDrawer,
   onWalletItemClick,
-}: WalletSelectorProps) {
-  const { toFormInput, fromFormInput } = text.views[XBridgeWidgetViews.BRIDGE_WALLET_SELECTION];
+}: WalletDrawerProps) {
+  const { toFormInput, fromFormInput } = text.views[XBridgeWidgetViews.WALLET_NETWORK_SECLECTION];
   const walletSelectorText = type === 'from' ? fromFormInput : toFormInput;
   const [walletItemLoading, setWalletItemLoading] = useState(false);
 
@@ -69,7 +69,7 @@ export function WalletSelector({
           )}
       <BottomSheet.Content sx={walletItemListStyles}>
         {walletOptions.map((walletProviderName) => (
-          <BridgeWalletItem
+          <WalletItem
             key={walletProviderName}
             testId={`${testId}-${type}`}
             loading={walletItemLoading}

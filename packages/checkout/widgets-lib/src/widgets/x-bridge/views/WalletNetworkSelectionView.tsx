@@ -6,11 +6,11 @@ import { EventTargetContext } from 'context/event-target-context/EventTargetCont
 import { text } from 'resources/text/textConfig';
 import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
-import { BridgeWalletForm } from '../components/BridgeWalletForm';
+import { WalletAndNetworkSelector } from '../components/WalletAndNetworkSelector';
 
-export function BridgeWalletSelection() {
+export function WalletNetworkSelectionView() {
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
-  const { layoutHeading } = text.views[XBridgeWidgetViews.BRIDGE_WALLET_SELECTION];
+  const { layoutHeading } = text.views[XBridgeWidgetViews.WALLET_NETWORK_SECLECTION];
   return (
     <SimpleLayout
       testId="bridge-view"
@@ -22,7 +22,7 @@ export function BridgeWalletSelection() {
       )}
       footer={<FooterLogo />}
     >
-      <BridgeWalletForm />
+      <WalletAndNetworkSelector />
     </SimpleLayout>
   );
 }
