@@ -286,6 +286,20 @@ export function WalletAndNetworkSelector() {
 
       bridgeDispatch({
         payload: {
+          type: BridgeActions.SET_TOKEN_BALANCES,
+          tokenBalances: [],
+        },
+      });
+
+      bridgeDispatch({
+        payload: {
+          type: BridgeActions.SET_ALLOWED_TOKENS,
+          allowedTokens: [],
+        },
+      });
+
+      bridgeDispatch({
+        payload: {
           type: BridgeActions.SET_WALLETS_AND_NETWORKS,
           from: {
             web3Provider: fromWalletWeb3Provider,
