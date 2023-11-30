@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   Heading,
+  MenuItem,
   OptionKey,
 } from '@biom3/react';
 import {
@@ -11,7 +12,6 @@ import {
   useCallback, useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
 import { BigNumber, utils } from 'ethers';
-import { Fees } from 'components/Fees/Fees';
 import { amountInputValidation } from '../../../lib/validations/amountInputValidations';
 import { BridgeActions, XBridgeContext } from '../context/XBridgeContext';
 import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
@@ -414,13 +414,19 @@ export function BridgeForm(props: BridgeFormProps) {
             />
           </Box>
         )}
-        <Fees
-          title={xBridgeFees.title}
-          fiatPricePrefix={content.fiatPricePrefix}
-          gasFeeValue={gasFee}
-          gasFeeToken={estimates?.gasFee?.token}
-          gasFeeFiatValue={gasFeeFiatValue}
-        />
+        {gasFee && (
+          <Box sx={{ paddingY: 'base.spacing.x2' }}>
+            <MenuItem emphasized size="small">
+              <MenuItem.Label>
+                {xBridgeFees.title}
+              </MenuItem.Label>
+              <MenuItem.PriceDisplay
+                fiatAmount={`${xBridgeFees.fiatPricePrefix} ${gasFeeFiatValue}`}
+                price={`${estimates?.gasFee.token?.symbol} ${gasFee}`}
+              />
+            </MenuItem>
+          </Box>
+        )}
       </Box>
       <Box sx={bridgeFormButtonContainerStyles}>
         <Button

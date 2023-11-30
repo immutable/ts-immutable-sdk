@@ -208,6 +208,7 @@ export const text = {
       },
       xBridgeFees: {
         title: 'Gas Fee',
+        fiatPricePrefix: '~ USD',
       },
       content: {
         title: 'What would you like to move from Ethereum to Immutable zkEVM?',
@@ -219,7 +220,7 @@ export const text = {
           inputPlaceholder: '0',
           selectorTitle: 'What would you like to move?',
         },
-        buttonText: 'Move',
+        buttonText: 'Review',
       },
       fees: {
         title: 'Fees subtotal',
