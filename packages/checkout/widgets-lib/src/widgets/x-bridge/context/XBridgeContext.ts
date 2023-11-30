@@ -18,6 +18,8 @@ export interface XBridgeState {
   toNetwork: NetworkInfo | null;
   tokenBalances: GetBalanceResult[];
   allowedTokens: TokenInfo[];
+  token: TokenInfo | null;
+  amount: string;
 }
 
 export const initialXBridgeState: Omit<XBridgeState, 'checkout'> = {
@@ -28,6 +30,8 @@ export const initialXBridgeState: Omit<XBridgeState, 'checkout'> = {
   toNetwork: null,
   tokenBalances: [],
   allowedTokens: [],
+  token: null,
+  amount: '0',
 };
 
 export interface XBridgeContextState {
@@ -41,24 +45,33 @@ export interface BridgeAction {
 
 type ActionPayload =
   | SetWalletProviderNamePayload
+  | SetProviderPayload
   | SetTokenBridgePayload
   | SetNetworkPayload
   | SetToNetworkPayload
   | SetTokenBalancesPayload
-  | SetAllowedTokensPayload;
+  | SetAllowedTokensPayload
+  | SetTokenAndAmountPayload;
 
 export enum BridgeActions {
   SET_WALLET_PROVIDER_NAME = 'SET_WALLET_PROVIDER_NAME',
+  SET_PROVIDER = 'SET_PROVIDER',
   SET_TOKEN_BRIDGE = 'SET_TOKEN_BRIDGE',
   SET_NETWORK = 'SET_NETWORK',
   SET_TO_NETWORK = 'SET_TO_NETWORK',
   SET_TOKEN_BALANCES = 'SET_TOKEN_BALANCES',
   SET_ALLOWED_TOKENS = 'SET_ALLOWED_TOKENS',
+  SET_TOKEN_AND_AMOUNT = 'SET_TOKEN_AND_AMOUNT',
 }
 
 export interface SetWalletProviderNamePayload {
   type: BridgeActions.SET_WALLET_PROVIDER_NAME;
   walletProviderName: WalletProviderName;
+}
+
+export interface SetProviderPayload {
+  type: BridgeActions.SET_PROVIDER;
+  web3Provider: Web3Provider;
 }
 
 export interface SetTokenBridgePayload {
@@ -86,6 +99,12 @@ export interface SetAllowedTokensPayload {
   allowedTokens: TokenInfo[];
 }
 
+export interface SetTokenAndAmountPayload {
+  type: BridgeActions.SET_TOKEN_AND_AMOUNT;
+  token: TokenInfo;
+  amount: string;
+}
+
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const XBridgeContext = createContext<XBridgeContextState>({
   bridgeState: { ...initialXBridgeState, checkout: {} as Checkout },
@@ -105,6 +124,11 @@ export const xBridgeReducer: Reducer<XBridgeState, BridgeAction> = (
       return {
         ...state,
         walletProviderName: action.payload.walletProviderName,
+      };
+    case BridgeActions.SET_PROVIDER:
+      return {
+        ...state,
+        web3Provider: action.payload.web3Provider,
       };
     case BridgeActions.SET_TOKEN_BRIDGE:
       return {
@@ -130,6 +154,12 @@ export const xBridgeReducer: Reducer<XBridgeState, BridgeAction> = (
       return {
         ...state,
         allowedTokens: action.payload.allowedTokens,
+      };
+    case BridgeActions.SET_TOKEN_AND_AMOUNT:
+      return {
+        ...state,
+        token: action.payload.token,
+        amount: action.payload.amount,
       };
     default:
       return state;

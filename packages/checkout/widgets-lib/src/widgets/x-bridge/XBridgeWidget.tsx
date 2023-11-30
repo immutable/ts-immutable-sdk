@@ -15,9 +15,14 @@ import {
   initialViewState,
   viewReducer,
 } from '../../context/view-context/ViewContext';
-import { XBridgeContext, xBridgeReducer, initialXBridgeState } from './context/XBridgeContext';
+import {
+  XBridgeContext,
+  xBridgeReducer,
+  initialXBridgeState,
+} from './context/XBridgeContext';
 import { widgetTheme } from '../../lib/theme';
 import { BridgeWalletSelection } from './views/BridgeWalletSelection';
+import { Bridge } from './views/Bridge';
 
 export type BridgeWidgetInputs = BridgeWidgetParams & {
   config: StrongCheckoutWidgetsConfig,
@@ -56,6 +61,9 @@ export function XBridgeWidget({
           <CryptoFiatProvider environment={environment}>
             {viewState.view.type === XBridgeWidgetViews.BRIDGE_WALLET_SELECTION && (
               <BridgeWalletSelection />
+            )}
+            {viewState.view.type === XBridgeWidgetViews.BRIDGE_FORM && (
+              <Bridge />
             )}
           </CryptoFiatProvider>
         </XBridgeContext.Provider>

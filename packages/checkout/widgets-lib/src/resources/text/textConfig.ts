@@ -203,6 +203,13 @@ export const text = {
       header: {
         title: 'Move coins',
       },
+      xBridgeContent: {
+        title: 'How much would you like to move?',
+      },
+      xBridgeFees: {
+        title: 'Gas Fee',
+        fiatPricePrefix: '~ USD',
+      },
       content: {
         title: 'What would you like to move from Ethereum to Immutable zkEVM?',
         fiatPricePrefix: 'Approx USD',
@@ -213,7 +220,7 @@ export const text = {
           inputPlaceholder: '0',
           selectorTitle: 'What would you like to move?',
         },
-        buttonText: 'Move',
+        buttonText: 'Review',
       },
       fees: {
         title: 'Fees subtotal',
@@ -443,6 +450,14 @@ export const text = {
         selectDefaultText: 'Select wallet and network',
         walletSelectorHeading: 'From wallet',
         networkSelectorHeading: 'From network',
+      },
+      to: {
+        heading: 'To',
+        selectDefaultText: 'Select wallet and network',
+        walletSelectorHeading: 'To wallet',
+      },
+      submitButton: {
+        text: 'Next',
       },
     },
   },
