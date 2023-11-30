@@ -237,7 +237,7 @@ export interface BridgeTxRequest {
  * @property {ethers.providers.TransactionRequest} unsignedTx - The unsigned transaction for the deposit.
  */
 export interface BridgeTxResponse {
-  fees: BridgeFeeResponse,
+  feeData: BridgeFeeResponse,
   unsignedTx: ethers.providers.TransactionRequest;
 }
 

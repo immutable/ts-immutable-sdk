@@ -58,8 +58,7 @@ export class TokenBridge {
   }
 
   /**
-   * Retrieves the bridge fee for depositing a specific token, used to reimburse the bridge-relayer.
-   * It is clipped from the deposit amount.
+   * Retrieves the bridge fee for a specific token.
    *
    * @param {BridgeFeeRequest} req - The fee request object containing the token address for which the fee is required.
    * @returns {Promise<BridgeFeeResponse>} - A promise that resolves to an object containing the bridge fee for the specified
@@ -71,18 +70,27 @@ export class TokenBridge {
    *
    * @example
    * const feeRequest = {
-   *   method: 'WITHDRAW', // BridgeFeeActions
+   *   action: 'WITHDRAW', // BridgeFeeActions
+   *   gasMultiplier: 1.2, // Buffer to add to the gas estimate, 1.2 = 20% buffer
+   *   sourceChainId: '13371', // Immutable zkEVM
+   *   destinationChainId: '1' // Ethereum
    * };
    *
    * @example
    * const feeRequest = {
-   *   method: 'DEPOSIT', // BridgeFeeActions
+   *   action: 'DEPOSIT', // BridgeFeeActions
+   *   gasMultiplier: 1.2, // Buffer to add to the gas estimate, 1.2 = 20% buffer
+   *   sourceChainId: '1', // Ethereum
+   *   destinationChainId: '13371', // Immutable zkEVM
    * };
    *
    * bridgeSdk.getFee(feeRequest)
    *   .then((feeResponse) => {
-   *     console.log('Bridgeable:', feeResponse.bridgeable);
-   *     console.log('Fee Amount:', feeResponse.feeAmount.toString());
+   *     console.log('Source chain gas fee:', feeResponse.sourceChainFee);
+   *     console.log('Destination chain gas fee:', feeResponse.destinationChainFee);
+   *     console.log('Axelar bridge fee (includes destination execution):', feeResponse.bridgeFee);
+   *     console.log('Immutable fee:', feeResponse.networkFee);
+   *     console.log('Total Fees (sourceChainFee + bridgeFee + networkFee):', feeResponse.totalFee);
    *   })
    *   .catch((error) => {
    *     console.error('Error:', error.message);
@@ -154,13 +162,12 @@ export class TokenBridge {
   }
 
   /**
-   * Retrieves the unsigned approval transaction for a deposit to the bridge.
-   * Approval is required before depositing tokens to the bridge using
+   * Retrieves the unsigned approval transaction for deposit or withdrawal.
+   * Approval is required before depositing or withdrawing tokens to the bridge using
    *
-   * @param {ApproveBridgeRequest} req - The approve bridge request object containing the depositor address,
-   * token address, and deposit amount.
+   * @param {ApproveBridgeRequest} req - The approve bridge request object.
    * @returns {Promise<ApproveBridgeResponse>} - A promise that resolves to an object containing the unsigned
-   * approval transaction and a flag indicating if the approval is required.
+   * approval transaction or null if no approaval is required.
    * @throws {BridgeError} - If an error occurs during the transaction creation, a BridgeError will be thrown with a specific error type.
    *
    * Possible BridgeError types include:
@@ -171,15 +178,26 @@ export class TokenBridge {
    * - PROVIDER_ERROR: An error occurred while interacting with the Ethereum provider. This includes issues calling the ERC20 smart contract
    *
    * @example
-   * const approveRequest = {
-   *   depositorAddress: '0x123456...', // Depositor's Ethereum address
+   * const approveDepositRequest = {
+   *   senderAddress: '0x123456...', // Senders address
    *   token: '0xabcdef...', // ERC20 token address
-   *   depositAmount: ethers.utils.parseUnits('100', 18), // Deposit amount in token's smallest unit (e.g., wei for Ether)
+   *   amount: ethers.utils.parseUnits('100', 18), // amount being bridged in token's smallest unit (e.g., wei for Ether)
+   *   sourceChainId: '1', // Ethereum
+   *   destinationChainId: '13371', // Immutable zkEVM
    * };
    *
-   * bridgeSdk.getUnsignedApproveDepositBridgeTx(approveRequest)
+   * @example
+   * const approveWithdrawalRequest = {
+   *   senderAddress: '0x123456...', // Senders address
+   *   token: '0xabcdef...', // ERC20 token address
+   *   amount: ethers.utils.parseUnits('100', 18), // amount being bridged in token's smallest unit (e.g., wei for Ether)
+   *   sourceChainId: '13371', // Immutable zkEVM
+   *   destinationChainId: '1', // Ethereum
+   * };
+   *
+   * bridgeSdk.getUnsignedApproveBridgeTx(approveDepositRequest)
    *   .then((approveResponse) => {
-   *     if (approveResponse.unsignedTx) {
+   *     if (approveResponse.unsignedTx !== null) {
    *       // Send the unsigned approval transaction to the depositor to sign and send
    *     } else {
    *      // No approval is required
@@ -253,11 +271,11 @@ export class TokenBridge {
   }
 
   /**
-   * Generates an unsigned deposit transaction for a user to sign and submit to the bridge.
-   * Must be called after bridgeSdk.getUnsignedApproveDepositBridgeTx to ensure user has approved sufficient tokens for deposit.
+   * Generates an unsigned deposit or withdrawal transaction for a user to sign and submit to the bridge.
+   * Must be called after bridgeSdk.getUnsignedApproveBridgeTx to ensure user has approved sufficient tokens for deposit.
    *
-   * @param {BridgeDepositRequest} req - The deposit request object containing the required data for depositing tokens.
-   * @returns {Promise<BridgeDepositResponse>} - A promise that resolves to an object containing the unsigned transaction data.
+   * @param {BridgeTxRequest} req - The tx request object containing the required data for depositing or withdrawing tokens.
+   * @returns {Promise<BridgeTxResponse>} - A promise that resolves to an object containing the fee data and unsigned transaction data.
    * @throws {BridgeError} - If an error occurs during the generation of the unsigned transaction, a BridgeError
    * will be thrown with a specific error type.
    *
@@ -270,23 +288,52 @@ export class TokenBridge {
    *
    * @example
    * const depositERC20Request = {
+   *   senderAddress: '0x123456...', // Senders address
+   *   recipientAddress: '0x123456...', // Recipient address
    *   token: '0x123456...', // ERC20 token address
-   *   depositorAddress: '0xabcdef...', // User's wallet address
-   *   recipientAddress: '0x987654...', // Destination wallet address on the target chain
-   *   depositAmount: ethers.utils.parseUnits('100', 18), // Deposit amount in wei
+   *   amount: ethers.utils.parseUnits('100', 18), // Bridge amount in wei
+   *   sourceChainId: '1', // Ethereum
+   *   destinationChainId: '13371', // Immutable zkEVM
+   *   gasMultiplier: 1.2, // Buffer to add to the gas estimate, 1.2 = 20% buffer
    * };
    *
    * @example
    * const depositEtherTokenRequest = {
-   *   token: 'NATIVE',
-   *   depositorAddress: '0xabcdef...', // User's wallet address
-   *   recipientAddress: '0x987654...', // Destination wallet address on the target chain
-   *   depositAmount: ethers.utils.parseUnits('100', 18), // Deposit amount in wei
+   *   senderAddress: '0x123456...', // Senders address
+   *   recipientAddress: '0x123456...', // Recipient address
+   *   token: 'NATIVE', // The chain's native token
+   *   amount: ethers.utils.parseUnits('100', 18), // Bridge amount in wei
+   *   sourceChainId: '1', // Ethereum
+   *   destinationChainId: '13371', // Immutable zkEVM
+   *   gasMultiplier: 1.2, // Buffer to add to the gas estimate, 1.2 = 20% buffer
    * };
    *
-   * bridgeSdk.getUnsignedDepositTx(depositRequest)
+   * @example
+   * const withdrawERC20Request = {
+   *   senderAddress: '0x123456...', // Senders address
+   *   recipientAddress: '0x123456...', // Recipient address
+   *   token: '0x123456...', // ERC20 token address
+   *   amount: ethers.utils.parseUnits('100', 18), // Bridge amount in wei
+   *   sourceChainId: '13371', // Immutable zkEVM
+   *   destinationChainId: '1', // Ethereum
+   *   gasMultiplier: 1.2, // Buffer to add to the gas estimate, 1.2 = 20% buffer
+   * };
+   *
+   * @example
+   * const withdrawIMXTokenRequest = {
+   *   senderAddress: '0x123456...', // Senders address
+   *   recipientAddress: '0x123456...', // Recipient address
+   *   token: 'NATIVE', // The chain's native token
+   *   amount: ethers.utils.parseUnits('100', 18), // Bridge amount in wei
+   *   sourceChainId: '13371', // Immutable zkEVM
+   *   destinationChainId: '1', // Ethereum
+   *   gasMultiplier: 1.2, // Buffer to add to the gas estimate, 1.2 = 20% buffer
+   * };
+   *
+   * bridgeSdk.getUnsignedBridgeTx(depositERC20Request)
    *   .then((depositResponse) => {
-   *     console.log(depositResponse.unsignedTx);
+   *     console.log('Fee Data', depositResponse.feeData);
+   *     console.log('Unsigned Tx', depositResponse.unsignedTx);
    *   })
    *   .catch((error) => {
    *     console.error('Error:', error.message);
@@ -398,7 +445,7 @@ export class TokenBridge {
       }
 
       return {
-        fees,
+        feeData: fees,
         unsignedTx: {
           data,
           to: contractAddress,
@@ -424,7 +471,7 @@ export class TokenBridge {
       ), BridgeErrorType.INTERNAL_ERROR);
     }
     return {
-      fees,
+      feeData: fees,
       unsignedTx: {
         data,
         to: contractAddress,
