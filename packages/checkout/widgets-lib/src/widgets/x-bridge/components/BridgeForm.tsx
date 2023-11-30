@@ -422,7 +422,7 @@ export function BridgeForm(props: BridgeFormProps) {
               </MenuItem.Label>
               <MenuItem.PriceDisplay
                 fiatAmount={`${xBridgeFees.fiatPricePrefix} ${gasFeeFiatValue}`}
-                price={`${estimates?.gasFee.token?.symbol} ${gasFee}`}
+                price={`${estimates?.gasFee.token?.symbol} ${tokenValueFormat(gasFee)}`}
               />
             </MenuItem>
           </Box>
