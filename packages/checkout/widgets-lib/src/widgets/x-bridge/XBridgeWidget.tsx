@@ -65,9 +65,6 @@ export function XBridgeWidget({
             {viewState.view.type === XBridgeWidgetViews.BRIDGE_FORM && (
               <Bridge />
             )}
-            {viewState.view.type === XBridgeWidgetViews.BRIDGE_REVIEW && (
-              <BridgeWalletSelection />
-            )}
           </CryptoFiatProvider>
         </XBridgeContext.Provider>
       </ViewContext.Provider>
