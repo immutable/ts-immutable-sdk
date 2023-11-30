@@ -70,7 +70,7 @@ export const calculateFees = (
     if (currentFeeBn.gt(0)) {
       calculateFeesResult.push({
         amount: currentFeeBn.toString(),
-        recipient: orderFee.recipient,
+        recipientAddress: orderFee.recipient,
       });
     }
   }// for
