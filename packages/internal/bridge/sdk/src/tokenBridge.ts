@@ -128,7 +128,7 @@ export class TokenBridge {
       );
       destinationChainFee = await this.getGasEstimates(
         destinationProvider,
-        BridgeMethodsGasLimit[`${req.action}_DESTINATION`],
+        destinationGasLimit,
       );
 
       bridgeFee = await this.calculateBridgeFee(
