@@ -1,0 +1,27 @@
+name: Functional Tests
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 18
+
+    - name: Install root dependencies
+      run: npm install -g yarn && yarn install --immutable
+
+    - name: Build SDK
+      run: yarn build
+
+    - name: Install functional tests dependencies
+      run: cd func-tests && yarn install --no-immutable
+
+    - name: Run tests
+      run: cd func-tests && yarn test
