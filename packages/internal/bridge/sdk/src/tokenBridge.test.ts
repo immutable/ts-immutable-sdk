@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/dot-notation */
 /* eslint-disable @typescript-eslint/naming-convention */
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { TokenBridge } from 'tokenBridge';
@@ -48,6 +49,9 @@ describe('Token Bridge', () => {
       },
     };
 
+    const originalValidateDepositArgs = TokenBridge.prototype['validateDepositArgs'];
+    const originalValidateChainConfiguration = TokenBridge.prototype['validateChainConfiguration'];
+
     beforeEach(() => {
       const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
       const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
@@ -62,11 +66,15 @@ describe('Token Bridge', () => {
       jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20Contract as any);
       jest.spyOn(TokenBridge.prototype as any, 'validateChainConfiguration')
         .mockImplementation(async () => 'Valid');
+      jest.spyOn(TokenBridge.prototype as any, 'validateDepositArgs')
+        .mockImplementation(async () => 'Valid');
       tokenBridge = new TokenBridge(bridgeConfig);
     });
 
     afterEach(() => {
       jest.clearAllMocks();
+      TokenBridge.prototype['validateDepositArgs'] = originalValidateDepositArgs;
+      TokenBridge.prototype['validateChainConfiguration'] = originalValidateChainConfiguration;
     });
     it('returns the unsigned approval transaction when allowance is less than deposit amount', async () => {
       expect.assertions(5);
@@ -128,177 +136,13 @@ describe('Token Bridge', () => {
     });
   });
 
-  describe('these should actually test validateChainConfiguration not getUnsignedApproveBridgeTx ', () => {
-    let tokenBridge: TokenBridge;
-    const mockERC20Contract = {
-      allowance: jest.fn(),
-      interface: {
-        encodeFunctionData: jest.fn(),
-      },
-    };
-
-    beforeEach(() => {
-      const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
-      const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
-      const bridgeConfig = new BridgeConfiguration({
-        baseConfig: new ImmutableConfiguration({
-          environment: Environment.SANDBOX,
-        }),
-        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
-        rootProvider: voidRootProvider,
-        childProvider: voidChildProvider,
-      });
-      jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20Contract as any);
-      jest.spyOn(TokenBridge.prototype as any, 'validateChainConfiguration')
-        .mockImplementation(async () => 'Valid');
-      tokenBridge = new TokenBridge(bridgeConfig);
-    });
-
-    afterEach(() => {
-      jest.clearAllMocks();
-    });
-    it.skip('throws an error when senderAddress is not a valid address and the token is ERC20', async () => {
-      expect.assertions(2);
-      try {
-        await tokenBridge.getUnsignedApproveBridgeTx(
-          {
-            token: '0x1234567890123456789012345678901234567890',
-            senderAddress: 'invalidAddress',
-            amount: ethers.utils.parseUnits('0.01', 18),
-            sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
-            destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
-          },
-        );
-      } catch (error: any) {
-        expect(error).toBeInstanceOf(BridgeError);
-        expect(error.type).toBe(BridgeErrorType.INVALID_ADDRESS);
-      }
-    });
-    it.skip('throws an error when senderAddress is not a valid address and the token is NATIVE', async () => {
-      expect.assertions(2);
-      try {
-        await tokenBridge.getUnsignedApproveBridgeTx({
-          token: 'NATIVE',
-          senderAddress: 'invalidAddress',
-          amount: ethers.utils.parseUnits('0.01', 18),
-          sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
-          destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
-        });
-      } catch (error: any) {
-        expect(error).toBeInstanceOf(BridgeError);
-        expect(error.type).toBe(BridgeErrorType.INVALID_ADDRESS);
-      }
-    });
-    it.skip('throws an error when token is not a valid address', async () => {
-      expect.assertions(2);
-      try {
-        await tokenBridge.getUnsignedApproveBridgeTx(
-          {
-            token: 'invalidToken',
-            senderAddress: '0x1234567890123456789012345678901234567890',
-            amount: ethers.utils.parseUnits('0.01', 18),
-            sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
-            destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
-          },
-        );
-      } catch (error: any) {
-        expect(error).toBeInstanceOf(BridgeError);
-        expect(error.type).toBe(BridgeErrorType.INVALID_ADDRESS);
-      }
-    });
-    it.skip('throws an error when amount is less than or equal to 0 and token is ERC20', async () => {
-      expect.assertions(2);
-      try {
-        await tokenBridge.getUnsignedApproveBridgeTx(
-          {
-            token: '0x1234567890123456789012345678901234567890',
-            senderAddress: '0x1234567890123456789012345678901234567890',
-            amount: ethers.BigNumber.from(0),
-            sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
-            destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
-          },
-        );
-      } catch (error: any) {
-        expect(error).toBeInstanceOf(BridgeError);
-        expect(error.type).toBe(BridgeErrorType.INVALID_AMOUNT);
-      }
-    });
-    it.skip('throws an error when amount is less than or equal to 0 and token is NATIVE', async () => {
-      expect.assertions(2);
-      try {
-        await tokenBridge.getUnsignedApproveBridgeTx(
-          {
-            token: 'NATIVE',
-            senderAddress: '0x1234567890123456789012345678901234567890',
-            amount: ethers.BigNumber.from(0),
-            sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
-            destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
-          },
-        );
-      } catch (error: any) {
-        expect(error).toBeInstanceOf(BridgeError);
-        expect(error.type).toBe(BridgeErrorType.INVALID_AMOUNT);
-      }
-    });
-    it.skip('throws an error when the sourceChainId is not one of the ones set in the initializer', async () => {
-      expect.assertions(2);
-      try {
-        await tokenBridge.getUnsignedApproveBridgeTx(
-          {
-            token: 'NATIVE',
-            senderAddress: '0x1234567890123456789012345678901234567890',
-            amount: ethers.utils.parseUnits('100', 18),
-            sourceChainId: '100',
-            destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
-          },
-        );
-        console.log('after await');
-      } catch (error: any) {
-        console.log('after catch');
-
-        expect(error).toBeInstanceOf(BridgeError);
-        expect(error.type).toBe(BridgeErrorType.INVALID_SOURCE_CHAIN_ID);
-      }
-    });
-    it.skip('throws an error when the destinationChainId is not one of the ones set in the initializer', async () => {
-      expect.assertions(2);
-      try {
-        await tokenBridge.getUnsignedApproveBridgeTx(
-          {
-            token: 'NATIVE',
-            senderAddress: '0x1234567890123456789012345678901234567890',
-            amount: ethers.utils.parseUnits('100', 18),
-            sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
-            destinationChainId: '100',
-          },
-        );
-      } catch (error: any) {
-        expect(error).toBeInstanceOf(BridgeError);
-        expect(error.type).toBe(BridgeErrorType.INVALID_DESTINATION_CHAIN_ID);
-      }
-    });
-    it.skip('throws an error when the sourceChainId is the same as the  destinationChainId', async () => {
-      expect.assertions(2);
-      try {
-        await tokenBridge.getUnsignedApproveBridgeTx(
-          {
-            token: 'NATIVE',
-            senderAddress: '0x1234567890123456789012345678901234567890',
-            amount: ethers.utils.parseUnits('100', 18),
-            sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
-            destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
-          },
-        );
-      } catch (error: any) {
-        expect(error).toBeInstanceOf(BridgeError);
-        expect(error.type).toBe(BridgeErrorType.CHAIN_IDS_MATCH);
-      }
-    });
-  });
-
   describe('getUnsignedBridgeTx', () => {
     const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
     const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
+
+    const originalValidateDepositArgs = TokenBridge.prototype['validateDepositArgs'];
+    const originalValidateChainConfiguration = TokenBridge.prototype['validateChainConfiguration'];
+    const originalGetFee = TokenBridge.prototype['getFee'];
 
     const sourceChainFee:ethers.BigNumber = ethers.utils.parseUnits('0.000001', 18);
     const destinationChainFee:ethers.BigNumber = ethers.utils.parseUnits('0.000001', 18);
@@ -330,6 +174,12 @@ describe('Token Bridge', () => {
           networkFee,
           totalFee,
         }));
+    });
+    afterEach(() => {
+      jest.clearAllMocks();
+      TokenBridge.prototype['validateDepositArgs'] = originalValidateDepositArgs;
+      TokenBridge.prototype['validateChainConfiguration'] = originalValidateChainConfiguration;
+      TokenBridge.prototype['getFee'] = originalGetFee;
     });
 
     it('ERC20 token with valid arguments is successful', async () => {
@@ -399,14 +249,129 @@ describe('Token Bridge', () => {
     });
   });
 
-  describe('these should actually test validateDepositArgs not getUnsignedBridgeTx', () => {
-    const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
-    const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
-
+  describe('validateDepositArgs ', () => {
     let tokenBridge: TokenBridge;
-    let bridgeConfig: BridgeConfiguration;
+
+    const originalValidateChainIds = TokenBridge.prototype['validateChainIds'];
+
     beforeEach(() => {
-      bridgeConfig = new BridgeConfiguration({
+      const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
+      const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
+      const bridgeConfig = new BridgeConfiguration({
+        baseConfig: new ImmutableConfiguration({
+          environment: Environment.SANDBOX,
+        }),
+        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+        rootProvider: voidRootProvider,
+        childProvider: voidChildProvider,
+      });
+      jest.spyOn(TokenBridge.prototype as any, 'validateChainIds')
+        .mockImplementation(async () => 'Valid');
+      tokenBridge = new TokenBridge(bridgeConfig);
+    });
+
+    afterEach(() => {
+      jest.clearAllMocks();
+      TokenBridge.prototype['validateChainIds'] = originalValidateChainIds;
+    });
+    it('does not throw an error when everything setup correctly', async () => {
+      expect.assertions(0);
+      try {
+        await tokenBridge['validateDepositArgs'](
+          '0x1234567890123456789012345678901234567890',
+          '0x1234567890123456789012345678901234567890',
+          ethers.utils.parseUnits('0.01', 18),
+          ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+          ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+        );
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(BridgeError);
+        expect(error.type).toBe(BridgeErrorType.INVALID_ADDRESS);
+      }
+    });
+    it('throws an error when senderAddress is not a valid address and the token is ERC20', async () => {
+      expect.assertions(2);
+      try {
+        await tokenBridge['validateDepositArgs'](
+          '0x1234567890123456789012345678901234567890',
+          'invalidAddress',
+          ethers.utils.parseUnits('0.01', 18),
+          ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+          ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+        );
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(BridgeError);
+        expect(error.type).toBe(BridgeErrorType.INVALID_ADDRESS);
+      }
+    });
+    it('throws an error when senderAddress is not a valid address and the token is NATIVE', async () => {
+      expect.assertions(2);
+      try {
+        await tokenBridge['validateDepositArgs'](
+          'NATIVE',
+          'invalidAddress',
+          ethers.utils.parseUnits('0.01', 18),
+          ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+          ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+        );
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(BridgeError);
+        expect(error.type).toBe(BridgeErrorType.INVALID_ADDRESS);
+      }
+    });
+    it('throws an error when token is not a valid address', async () => {
+      expect.assertions(2);
+      try {
+        await tokenBridge['validateDepositArgs'](
+          'invalidToken',
+          '0x1234567890123456789012345678901234567890',
+          ethers.utils.parseUnits('0.01', 18),
+          ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+          ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+        );
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(BridgeError);
+        expect(error.type).toBe(BridgeErrorType.INVALID_ADDRESS);
+      }
+    });
+    it('throws an error when amount is less than or equal to 0 and token is ERC20', async () => {
+      expect.assertions(2);
+      try {
+        await tokenBridge['validateDepositArgs'](
+          '0x1234567890123456789012345678901234567890',
+          '0x1234567890123456789012345678901234567890',
+          ethers.BigNumber.from(0),
+          ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+          ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+        );
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(BridgeError);
+        expect(error.type).toBe(BridgeErrorType.INVALID_AMOUNT);
+      }
+    });
+    it('throws an error when amount is less than or equal to 0 and token is NATIVE', async () => {
+      expect.assertions(2);
+      try {
+        await tokenBridge['validateDepositArgs'](
+          'NATIVE',
+          '0x1234567890123456789012345678901234567890',
+          ethers.BigNumber.from(0),
+          ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+          ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+        );
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(BridgeError);
+        expect(error.type).toBe(BridgeErrorType.INVALID_AMOUNT);
+      }
+    });
+  });
+
+  describe('validateChainIds', () => {
+    let tokenBridge: TokenBridge;
+    beforeEach(() => {
+      const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
+      const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
+      const bridgeConfig = new BridgeConfiguration({
         baseConfig: new ImmutableConfiguration({
           environment: Environment.SANDBOX,
         }),
@@ -415,180 +380,143 @@ describe('Token Bridge', () => {
         childProvider: voidChildProvider,
       });
       tokenBridge = new TokenBridge(bridgeConfig);
-      jest.spyOn(TokenBridge.prototype as any, 'validateDepositArgs')
-        .mockImplementation(async () => 'Valid');
-      jest.spyOn(TokenBridge.prototype as any, 'validateChainConfiguration')
-        .mockImplementation(async () => 'Valid');
-    });
-    it.skip('ERC20 token with invalid receipient address fails', async () => {
-      expect.assertions(1);
-      const recipientAddress = 'zzzz3095171469a0db24D9Fb9C789D62dF22BBAfa816';
-      const token = '0x2f14582947E292a2eCd20C430B46f2d27CFE213c';
-      const amount = ethers.utils.parseUnits('0.01', 18);
-      const request: BridgeTxRequest = {
-        senderAddress: recipientAddress,
-        recipientAddress,
-        amount,
-        token,
-        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
-        destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
-        gasMultiplier: 1.1,
-      };
-
-      await expect(async () => {
-        await tokenBridge.getUnsignedBridgeTx(request);
-      }).rejects.toThrow(
-        new BridgeError(
-          'address zzzz3095171469a0db24D9Fb9C789D62dF22BBAfa816 is not a valid address',
-          BridgeErrorType.INVALID_ADDRESS,
-        ),
-      );
-    });
-    it.skip('NATIVE token with invalid receipient address fails', async () => {
-      expect.assertions(1);
-      const recipientAddress = 'zzzz3095171469a0db24D9Fb9C789D62dF22BBAfa816';
-      const token = 'NATIVE';
-      const amount = ethers.utils.parseUnits('0.01', 18);
-      const request: BridgeTxRequest = {
-        senderAddress: recipientAddress,
-        recipientAddress,
-        amount,
-        token,
-        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
-        destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
-        gasMultiplier: 1.1,
-      };
-
-      await expect(async () => {
-        await tokenBridge.getUnsignedBridgeTx(request);
-      }).rejects.toThrow(
-        new BridgeError(
-          'address zzzz3095171469a0db24D9Fb9C789D62dF22BBAfa816 is not a valid address',
-          BridgeErrorType.INVALID_ADDRESS,
-        ),
-      );
-    });
-    it.skip('ERC20 token with invalid token address fails', async () => {
-      expect.assertions(1);
-      const recipientAddress = '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816';
-      const token = 'zzzzf14582947E292a2eCd20C430B46f2d27CFE213c';
-      const amount = ethers.utils.parseUnits('0.01', 18);
-      const request: BridgeTxRequest = {
-        senderAddress: recipientAddress,
-        recipientAddress,
-        amount,
-        token,
-        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
-        destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
-        gasMultiplier: 1.1,
-      };
-
-      await expect(async () => {
-        await tokenBridge.getUnsignedBridgeTx(request);
-      }).rejects.toThrow(
-        new BridgeError(
-          'token address zzzzf14582947E292a2eCd20C430B46f2d27CFE213c is not a valid address',
-          BridgeErrorType.INVALID_ADDRESS,
-        ),
-      );
     });
 
-    it.skip('ERC20 token with 0 amount fails', async () => {
-      expect.assertions(1);
-      const recipientAddress = '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816';
-      const token = '0x2f14582947E292a2eCd20C430B46f2d27CFE213c';
-      const amount = ethers.utils.parseUnits('0', 18);
-      const request: BridgeTxRequest = {
-        senderAddress: recipientAddress,
-        recipientAddress,
-        amount,
-        token,
-        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
-        destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
-        gasMultiplier: 1.1,
-      };
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+    it('does not throw an error when everything setup correctly', async () => {
+      expect.assertions(0);
+      try {
+        await tokenBridge['validateChainIds'](
+          ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+          ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+        );
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(BridgeError);
+        expect(error.type).toBe(BridgeErrorType.INVALID_SOURCE_CHAIN_ID);
+      }
+    });
+    it('throws an error when the sourceChainId is not one of the ones set in the initializer', async () => {
+      expect.assertions(2);
+      try {
+        await tokenBridge['validateChainIds'](
+          '100',
+          ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+        );
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(BridgeError);
+        expect(error.type).toBe(BridgeErrorType.INVALID_SOURCE_CHAIN_ID);
+      }
+    });
+    it('throws an error when the destinationChainId is not one of the ones set in the initializer', async () => {
+      expect.assertions(2);
+      try {
+        await tokenBridge['validateChainIds'](
+          ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+          '100',
+        );
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(BridgeError);
+        expect(error.type).toBe(BridgeErrorType.INVALID_DESTINATION_CHAIN_ID);
+      }
+    });
+    it('throws an error when the sourceChainId is the same as the  destinationChainId', async () => {
+      expect.assertions(2);
+      try {
+        await tokenBridge['validateChainIds'](
+          ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+          ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+        );
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(BridgeError);
+        expect(error.type).toBe(BridgeErrorType.CHAIN_IDS_MATCH);
+      }
+    });
+  });
 
-      await expect(async () => {
-        await tokenBridge.getUnsignedBridgeTx(request);
-      }).rejects.toThrow(
-        new BridgeError(
-          'deposit amount 0 is invalid',
-          BridgeErrorType.INVALID_AMOUNT,
-        ),
-      );
+  describe('validateChainConfiguration', () => {
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+    it('does not throw an error when everything setup correctly', async () => {
+      const mockRootProvider = {
+        getNetwork: jest.fn().mockReturnValue({ chainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID }),
+      } as unknown as ethers.providers.Web3Provider;
+      const mockChildProvider = {
+        getNetwork: jest.fn().mockReturnValue({ chainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID }),
+      } as unknown as ethers.providers.Web3Provider;
+
+      const bridgeConfig = new BridgeConfiguration({
+        baseConfig: new ImmutableConfiguration({
+          environment: Environment.SANDBOX,
+        }),
+        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+        rootProvider: mockRootProvider,
+        childProvider: mockChildProvider,
+      });
+      const tokenBridge:TokenBridge = new TokenBridge(bridgeConfig);
+
+      expect.assertions(0);
+      try {
+        await tokenBridge['validateChainConfiguration']();
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(BridgeError);
+        expect(error.type).toBe(BridgeErrorType.UNSUPPORTED_ERROR);
+      }
+    });
+    it('throws an error when the rootProvider chainId is not the one set in the config', async () => {
+      const mockRootProvider = {
+        getNetwork: jest.fn().mockReturnValue({ chainId: 100 }),
+      } as unknown as ethers.providers.Web3Provider;
+      const mockChildProvider = {
+        getNetwork: jest.fn().mockReturnValue({ chainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID }),
+      } as unknown as ethers.providers.Web3Provider;
+
+      const bridgeConfig = new BridgeConfiguration({
+        baseConfig: new ImmutableConfiguration({
+          environment: Environment.SANDBOX,
+        }),
+        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+        rootProvider: mockRootProvider,
+        childProvider: mockChildProvider,
+      });
+      const tokenBridge:TokenBridge = new TokenBridge(bridgeConfig);
+
+      expect.assertions(2);
+      try {
+        await tokenBridge['validateChainConfiguration']();
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(BridgeError);
+        expect(error.type).toBe(BridgeErrorType.UNSUPPORTED_ERROR);
+      }
     });
 
-    it.skip('NATIVE token with 0 amount fails', async () => {
-      expect.assertions(1);
-      const recipientAddress = '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816';
-      const token = 'NATIVE';
-      const amount = ethers.utils.parseUnits('0', 18);
-      const request: BridgeTxRequest = {
-        senderAddress: recipientAddress,
-        recipientAddress,
-        amount,
-        token,
-        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
-        destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
-        gasMultiplier: 1.1,
-      };
+    it('throws an error when the childProvider chainId is not the one set in the config', async () => {
+      const mockRootProvider = {
+        getNetwork: jest.fn().mockReturnValue({ chainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID }),
+      } as unknown as ethers.providers.Web3Provider;
+      const mockChildProvider = {
+        getNetwork: jest.fn().mockReturnValue({ chainId: '100' }),
+      } as unknown as ethers.providers.Web3Provider;
 
-      await expect(async () => {
-        await tokenBridge.getUnsignedBridgeTx(request);
-      }).rejects.toThrow(
-        new BridgeError(
-          'deposit amount 0 is invalid',
-          BridgeErrorType.INVALID_AMOUNT,
-        ),
-      );
-    });
-    it.skip('ERC20 token with negative amount fails', async () => {
-      expect.assertions(1);
-      const recipientAddress = '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816';
-      const token = '0x2f14582947E292a2eCd20C430B46f2d27CFE213c';
-      const amount = ethers.utils.parseUnits('-1', 18);
-      const request: BridgeTxRequest = {
-        senderAddress: recipientAddress,
-        recipientAddress,
-        amount,
-        token,
-        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
-        destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
-        gasMultiplier: 1.1,
-      };
+      const bridgeConfig = new BridgeConfiguration({
+        baseConfig: new ImmutableConfiguration({
+          environment: Environment.SANDBOX,
+        }),
+        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+        rootProvider: mockRootProvider,
+        childProvider: mockChildProvider,
+      });
+      const tokenBridge:TokenBridge = new TokenBridge(bridgeConfig);
 
-      await expect(async () => {
-        await tokenBridge.getUnsignedBridgeTx(request);
-      }).rejects.toThrow(
-        new BridgeError(
-          'deposit amount -1000000000000000000 is invalid',
-          BridgeErrorType.INVALID_AMOUNT,
-        ),
-      );
-    });
-    it.skip('NATIVE token with negative amount fails', async () => {
-      expect.assertions(1);
-      const recipientAddress = '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816';
-      const token = 'NATIVE';
-      const amount = ethers.utils.parseUnits('-1', 18);
-      const request: BridgeTxRequest = {
-        senderAddress: recipientAddress,
-        recipientAddress,
-        amount,
-        token,
-        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
-        destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
-        gasMultiplier: 1.1,
-      };
-
-      await expect(async () => {
-        await tokenBridge.getUnsignedBridgeTx(request);
-      }).rejects.toThrow(
-        new BridgeError(
-          'deposit amount -1000000000000000000 is invalid',
-          BridgeErrorType.INVALID_AMOUNT,
-        ),
-      );
+      expect.assertions(2);
+      try {
+        await tokenBridge['validateChainConfiguration']();
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(BridgeError);
+        expect(error.type).toBe(BridgeErrorType.UNSUPPORTED_ERROR);
+      }
     });
   });
 
@@ -600,6 +528,10 @@ describe('Token Bridge', () => {
         encodeFunctionData: jest.fn(),
       },
     };
+
+    const originalValidateDepositArgs = TokenBridge.prototype['validateDepositArgs'];
+    const originalGetGasEstimates = TokenBridge.prototype['getGasEstimates'];
+    const originalCalculateBridgeFee = TokenBridge.prototype['calculateBridgeFee'];
 
     const sourceChainFee:ethers.BigNumber = ethers.utils.parseUnits('0.000001', 18);
     const destinationChainFee:ethers.BigNumber = ethers.utils.parseUnits('0.000001', 18);
@@ -630,6 +562,9 @@ describe('Token Bridge', () => {
 
     afterEach(() => {
       jest.clearAllMocks();
+      TokenBridge.prototype['validateDepositArgs'] = originalValidateDepositArgs;
+      TokenBridge.prototype['getGasEstimates'] = originalGetGasEstimates;
+      TokenBridge.prototype['calculateBridgeFee'] = originalCalculateBridgeFee;
     });
     it('returns the deposit fees', async () => {
       expect.assertions(6);
@@ -648,6 +583,65 @@ describe('Token Bridge', () => {
       expect(result.bridgeFee).toStrictEqual(bridgeFee);
       expect(result.networkFee).toStrictEqual(networkFee);
       expect(result.totalFee).toStrictEqual(totalFee);
+    });
+  });
+
+  describe('calculateBridgeFee', () => {
+    let tokenBridge: TokenBridge;
+    beforeEach(() => {
+      const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
+      const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
+      const bridgeConfig = new BridgeConfiguration({
+        baseConfig: new ImmutableConfiguration({
+          environment: Environment.SANDBOX,
+        }),
+        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+        rootProvider: voidRootProvider,
+        childProvider: voidChildProvider,
+      });
+      tokenBridge = new TokenBridge(bridgeConfig);
+    });
+
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+    it('returns the bridge fee when no errors', async () => {
+      expect.assertions(1);
+      const bridgeFee = await tokenBridge['calculateBridgeFee'](
+        ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+        ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+        500,
+        1.1,
+      );
+      expect(bridgeFee).toStrictEqual(ethers.utils.parseUnits('0.001', 18));
+    });
+    it('throws an error when the sourceChainId can not be matched to an Axlear chainId', async () => {
+      expect.assertions(2);
+      try {
+        await tokenBridge['calculateBridgeFee'](
+          '100',
+          ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+          500,
+          1.1,
+        );
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(BridgeError);
+        expect(error.type).toBe(BridgeErrorType.AXELAR_CHAIN_NOT_FOUND);
+      }
+    });
+    it('throws an error when the destinationChainId can not be matched to an Axlear chainId', async () => {
+      expect.assertions(2);
+      try {
+        await tokenBridge['calculateBridgeFee'](
+          ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+          '100',
+          500,
+          1.1,
+        );
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(BridgeError);
+        expect(error.type).toBe(BridgeErrorType.AXELAR_CHAIN_NOT_FOUND);
+      }
     });
   });
 });

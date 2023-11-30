@@ -195,9 +195,9 @@ export class TokenBridge {
     await this.validateChainConfiguration();
 
     await this.validateDepositArgs(
+      req.token,
       req.senderAddress,
       req.amount,
-      req.token,
       req.sourceChainId,
       req.destinationChainId,
     );
@@ -301,9 +301,9 @@ export class TokenBridge {
     // @TODO check source & destination to determin which contract and methods to use
 
     await this.validateDepositArgs(
+      req.token,
       req.senderAddress,
       req.amount,
-      req.token,
       req.sourceChainId,
       req.destinationChainId,
     );
@@ -438,9 +438,9 @@ export class TokenBridge {
   }
 
   private async validateDepositArgs(
+    token: string,
     senderOrRecipientAddress: string,
     amount: ethers.BigNumber,
-    token: string,
     sourceChainId: string,
     destinationChainId: string,
   ) {
@@ -474,7 +474,7 @@ export class TokenBridge {
     sourceChainId: string,
     destinationChainId: string,
   ) {
-    // If the token is not native, it must be a valid addressß
+    // If the token is not native, it must be a valid address
     if (sourceChainId !== this.config.bridgeInstance.rootChainID.toString()
       && sourceChainId !== this.config.bridgeInstance.childChainID.toString()) {
       throw new BridgeError(
@@ -549,14 +549,14 @@ export class TokenBridge {
     if (!sourceAxelar) {
       throw new BridgeError(
         `Source chainID ${source} can not be matched to an Axelar chain.`,
-        BridgeErrorType.UNSUPPORTED_ERROR,
+        BridgeErrorType.AXELAR_CHAIN_NOT_FOUND,
       );
     }
 
     if (!destinationAxelar) {
       throw new BridgeError(
         `Destination chainID ${destination} can not be matched to an Axelar chain.`,
-        BridgeErrorType.UNSUPPORTED_ERROR,
+        BridgeErrorType.AXELAR_CHAIN_NOT_FOUND,
       );
     }
 
