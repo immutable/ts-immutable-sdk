@@ -84,6 +84,9 @@ export function BridgeForm(props: BridgeFormProps) {
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const hasSetDefaultState = useRef(false);
+  const tokenBalanceSubtext = token
+    ? `${content.availableBalancePrefix} ${tokenValueFormat(token?.formattedBalance)}`
+    : '';
 
   // Fee estimates & transactions
   const [isFetching, setIsFetching] = useState(false);
@@ -435,9 +438,7 @@ export function BridgeForm(props: BridgeFormProps) {
               options={tokensOptions}
               coinSelectorHeading={bridgeForm.from.selectorTitle}
               selectedOption={selectedOption}
-              subtext={token
-                ? `${content.availableBalancePrefix} ${tokenValueFormat(token?.formattedBalance)}`
-                : ''}
+              subtext={tokenBalanceSubtext}
               textAlign="left"
               errorMessage={tokenError}
               onSelectChange={(option) => handleSelectTokenChange(option)}
