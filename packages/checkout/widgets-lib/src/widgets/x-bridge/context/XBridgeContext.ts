@@ -3,19 +3,24 @@ import { TokenBridge } from '@imtbl/bridge-sdk';
 import {
   WalletProviderName,
   GetBalanceResult,
-  NetworkInfo,
   TokenInfo,
   Checkout,
+  ChainId,
 } from '@imtbl/checkout-sdk';
 import { createContext } from 'react';
 
+export type WalletAndNetworkDetails = {
+  web3Provider: Web3Provider;
+  walletAddress: string;
+  network: ChainId;
+};
 export interface XBridgeState {
   checkout: Checkout;
   web3Provider: Web3Provider | null;
   walletProviderName: WalletProviderName | null;
+  from: WalletAndNetworkDetails | null;
+  to: WalletAndNetworkDetails | null;
   tokenBridge: TokenBridge | null;
-  network: NetworkInfo | null;
-  toNetwork: NetworkInfo | null;
   tokenBalances: GetBalanceResult[];
   allowedTokens: TokenInfo[];
   token: TokenInfo | null;
@@ -25,9 +30,9 @@ export interface XBridgeState {
 export const initialXBridgeState: Omit<XBridgeState, 'checkout'> = {
   web3Provider: null,
   walletProviderName: null,
+  from: null,
+  to: null,
   tokenBridge: null,
-  network: null,
-  toNetwork: null,
   tokenBalances: [],
   allowedTokens: [],
   token: null,
@@ -47,18 +52,16 @@ type ActionPayload =
   | SetWalletProviderNamePayload
   | SetProviderPayload
   | SetTokenBridgePayload
-  | SetNetworkPayload
-  | SetToNetworkPayload
   | SetTokenBalancesPayload
   | SetAllowedTokensPayload
-  | SetTokenAndAmountPayload;
+  | SetTokenAndAmountPayload
+  | SetWalletsAndNetworksPayload;
 
 export enum BridgeActions {
+  SET_WALLETS_AND_NETWORKS = 'SET_WALLETS_AND_NETWORKS',
   SET_WALLET_PROVIDER_NAME = 'SET_WALLET_PROVIDER_NAME',
   SET_PROVIDER = 'SET_PROVIDER',
   SET_TOKEN_BRIDGE = 'SET_TOKEN_BRIDGE',
-  SET_NETWORK = 'SET_NETWORK',
-  SET_TO_NETWORK = 'SET_TO_NETWORK',
   SET_TOKEN_BALANCES = 'SET_TOKEN_BALANCES',
   SET_ALLOWED_TOKENS = 'SET_ALLOWED_TOKENS',
   SET_TOKEN_AND_AMOUNT = 'SET_TOKEN_AND_AMOUNT',
@@ -79,14 +82,10 @@ export interface SetTokenBridgePayload {
   tokenBridge: TokenBridge;
 }
 
-export interface SetNetworkPayload {
-  type: BridgeActions.SET_NETWORK;
-  network: NetworkInfo;
-}
-
-export interface SetToNetworkPayload {
-  type: BridgeActions.SET_TO_NETWORK;
-  toNetwork: NetworkInfo;
+export interface SetWalletsAndNetworksPayload {
+  type: BridgeActions.SET_WALLETS_AND_NETWORKS;
+  from: WalletAndNetworkDetails;
+  to: WalletAndNetworkDetails;
 }
 
 export interface SetTokenBalancesPayload {
@@ -120,6 +119,12 @@ export const xBridgeReducer: Reducer<XBridgeState, BridgeAction> = (
   action: BridgeAction,
 ) => {
   switch (action.payload.type) {
+    case BridgeActions.SET_WALLETS_AND_NETWORKS:
+      return {
+        ...state,
+        from: action.payload.from,
+        to: action.payload.to,
+      };
     case BridgeActions.SET_WALLET_PROVIDER_NAME:
       return {
         ...state,
@@ -134,16 +139,6 @@ export const xBridgeReducer: Reducer<XBridgeState, BridgeAction> = (
       return {
         ...state,
         tokenBridge: action.payload.tokenBridge,
-      };
-    case BridgeActions.SET_NETWORK:
-      return {
-        ...state,
-        network: action.payload.network,
-      };
-    case BridgeActions.SET_TO_NETWORK:
-      return {
-        ...state,
-        toNetwork: action.payload.toNetwork,
       };
     case BridgeActions.SET_TOKEN_BALANCES:
       return {

@@ -18,8 +18,9 @@ import { Web3Provider } from '@ethersproject/providers';
 import { isMetaMaskProvider, isPassportProvider } from 'lib/providerUtils';
 import { getL1ChainId, getL2ChainId } from 'lib';
 import { getChainNameById } from 'lib/chainName';
+import { ViewActions, ViewContext } from 'context/view-context/ViewContext';
 import { bridgeHeadingStyles, brigdeWalletWrapperStyles } from './BridgeWalletFormStyles';
-import { XBridgeContext } from '../context/XBridgeContext';
+import { BridgeActions, XBridgeContext } from '../context/XBridgeContext';
 import { BridgeNetworkItem } from './BridgeNetworkItem';
 import { WalletNetworkButton } from './WalletNetworkButton';
 import { WalletSelector } from './WalletSelector';
@@ -27,7 +28,8 @@ import { WalletSelector } from './WalletSelector';
 const testId = 'bridge-wallet-form';
 
 export function BridgeWalletForm() {
-  const { bridgeState: { checkout } } = useContext(XBridgeContext);
+  const { bridgeState: { checkout }, bridgeDispatch } = useContext(XBridgeContext);
+  const { viewDispatch } = useContext(ViewContext);
   const {
     heading, from, to, submitButton,
   } = text.views[XBridgeWidgetViews.BRIDGE_WALLET_SELECTION];
@@ -239,6 +241,48 @@ export function BridgeWalletForm() {
     setToWalletDrawerOpen(false);
   }, [fromWalletProviderName, fromNetwork]);
 
+  const handleSubmitDetails = useCallback(
+    () => {
+      if (!fromWalletWeb3Provider || !fromNetwork || !toWalletWeb3Provider || !toNetwork) return;
+
+      bridgeDispatch({
+        payload: {
+          type: BridgeActions.SET_PROVIDER,
+          web3Provider: fromWalletWeb3Provider,
+        },
+      });
+
+      bridgeDispatch({
+        payload: {
+          type: BridgeActions.SET_WALLETS_AND_NETWORKS,
+          from: {
+            web3Provider: fromWalletWeb3Provider,
+            walletAddress: '',
+            network: fromNetwork,
+          },
+          to: {
+            web3Provider: toWalletWeb3Provider,
+            walletAddress: '',
+            network: toNetwork,
+          },
+        },
+      });
+
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: { type: XBridgeWidgetViews.BRIDGE_FORM },
+        },
+      });
+    },
+    [
+      fromWalletWeb3Provider,
+      fromNetwork,
+      toWalletWeb3Provider,
+      toNetwork,
+    ],
+  );
+
   return (
     <Box testId={testId} sx={brigdeWalletWrapperStyles}>
       <Heading
@@ -343,7 +387,13 @@ export function BridgeWalletForm() {
             // eslint-disable-next-line no-console
             onNetworkClick={() => {}}
           />
-          <Button testId={`${testId}-submit-button`} size="large">{submitButton.text}</Button>
+          <Button
+            testId={`${testId}-submit-button`}
+            size="large"
+            onClick={handleSubmitDetails}
+          >
+            {submitButton.text}
+          </Button>
         </Box>
       )}
     </Box>

@@ -74,6 +74,9 @@ export function BridgeForm(props: BridgeFormProps) {
     content,
     bridgeForm,
   } = text.views[BridgeWidgetViews.BRIDGE];
+  // const { bridgeState: { from, to } } = useContext(XBridgeContext);
+  // // console.log('from, ', from);
+  // // console.log('to, ', to);
 
   // Form state
   const [amount, setAmount] = useState<string>(defaultAmount || '');
