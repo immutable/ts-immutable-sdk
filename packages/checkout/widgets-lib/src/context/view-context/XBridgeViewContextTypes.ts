@@ -4,14 +4,12 @@ export enum XBridgeWidgetViews {
   BRIDGE_WALLET_SELECTION = 'BRIDGE_WALLET_SELECTION',
   BRIDGE_FORM = 'BRIDGE_FORM',
   BRIDGE_REVIEW = 'BRIDGE_REVIEW',
-  APPROVE_TX = 'APPROVE_TX',
 }
 
 export type XBridgeWidgetView =
   | XBridgeCrossWalletSelection
   | XBridgeForm
-  | XBridgeReview
-  | XBridgeApproveTx;
+  | XBridgeReview;
 
 interface XBridgeCrossWalletSelection extends ViewType {
   type: XBridgeWidgetViews.BRIDGE_WALLET_SELECTION,
@@ -25,10 +23,5 @@ interface XBridgeForm extends ViewType {
 
 interface XBridgeReview extends ViewType {
   type: XBridgeWidgetViews.BRIDGE_REVIEW,
-  data?: {}
-}
-
-interface XBridgeApproveTx extends ViewType {
-  type: XBridgeWidgetViews.APPROVE_TX,
   data?: {}
 }

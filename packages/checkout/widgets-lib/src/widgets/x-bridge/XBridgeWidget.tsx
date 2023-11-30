@@ -24,7 +24,6 @@ import { widgetTheme } from '../../lib/theme';
 import { BridgeWalletSelection } from './views/BridgeWalletSelection';
 import { Bridge } from './views/Bridge';
 import { BridgeReview } from './views/BridgeReview';
-import { ApproveWalletTx } from './views/ApproveWalletTx';
 
 export type BridgeWidgetInputs = BridgeWidgetParams & {
   config: StrongCheckoutWidgetsConfig,
@@ -69,9 +68,6 @@ export function XBridgeWidget({
             )}
             {viewState.view.type === XBridgeWidgetViews.BRIDGE_REVIEW && (
               <BridgeReview />
-            )}
-            {viewState.view.type === XBridgeWidgetViews.APPROVE_TX && (
-              <ApproveWalletTx />
             )}
           </CryptoFiatProvider>
         </XBridgeContext.Provider>

@@ -477,14 +477,6 @@ export const text = {
         buttonText: 'Confirm move',
       },
     },
-    [XBridgeWidgetViews.APPROVE_TX]: {
-      heading: 'Approve the transaction in your wallet',
-      body: 'Follow the prompts in your wallets pop up to confirm',
-      footer: {
-        buttonText: 'Okay',
-        retryText: 'Try again',
-      },
-    },
   },
   footers: {
     quickswapFooter: {
