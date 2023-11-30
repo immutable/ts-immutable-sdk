@@ -9,17 +9,17 @@ defineFeature(feature, (test) => {
     const sharedState = new StepSharedState();
     const registration = new Registration(sharedState);
 
-    given(/^A new Eth wallet "(.*)"$/, (addressVar) => {
-      registration.addNewWallet(addressVar);
+    given(/^A new Eth wallet "(.*)"$/, async (addressVar) => {
+      await registration.addNewWallet(addressVar);
     });
-    and(/^"(.*)" is registered$/, (addressVar) => {
-      registration.register(addressVar);
+    and(/^"(.*)" is registered$/, async (addressVar) => {
+      await registration.register(addressVar);
     });
     // given(/^banker is registered$/, () => {
     //   registration.registerBanker();
     // });
-    then(/^user "(.*)" should be available through api$/, (addressVar) => {
-      registration.checkUserRegistrationOffchain(addressVar);
+    then(/^user "(.*)" should be available through api$/, async (addressVar) => {
+      await registration.checkUserRegistrationOffchain(addressVar);
     });
   });
 });
