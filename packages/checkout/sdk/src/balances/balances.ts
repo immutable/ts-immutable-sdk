@@ -100,14 +100,14 @@ export const resetBlockscoutClientMap = () => blockscoutClientMap.clear();
 export const getIndexerBalance = async (
   walletAddress: string,
   chainId: ChainId,
-  filterTokens: TokenInfo[],
+  filterTokens: TokenInfo[] | undefined,
 ): Promise<GetAllBalancesResult> => {
   // Shuffle the mapping of the tokens configuration so it is a hashmap
   // for faster access to tokens config objects.
-  const shouldFilter = filterTokens.length > 0;
+  const shouldFilter = filterTokens !== undefined;
   const mapFilterTokens = Object.assign(
     {},
-    ...(filterTokens.map((t) => ({ [t.address || NATIVE]: t }))),
+    ...((filterTokens ?? []).map((t) => ({ [t.address || NATIVE]: t }))),
   );
 
   // Get blockscout client for the given chain
@@ -274,7 +274,7 @@ export const getAllBalances = async (
     return await measureAsyncExecution<GetAllBalancesResult>(
       config,
       `Time to fetch balances using blockscout for ${chainId}`,
-      getIndexerBalance(walletAddress, chainId, isL1Chain ? tokens : []),
+      getIndexerBalance(walletAddress, chainId, isL1Chain ? tokens : undefined),
     );
   }
 

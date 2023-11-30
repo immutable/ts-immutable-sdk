@@ -66,6 +66,8 @@ export class OrdersService {
     status,
     sellItemContractAddress,
     buyItemContractAddress,
+    accountAddress,
+    sellItemMetadataId,
     sellItemTokenId,
     fromUpdatedAt,
     pageSize,
@@ -86,6 +88,14 @@ export class OrdersService {
      * Buy item contract address to filter by
      */
     buyItemContractAddress?: string,
+    /**
+     * The account address of the user who created the listing
+     */
+    accountAddress?: string,
+    /**
+     * The metadata_id of the sell item
+     */
+    sellItemMetadataId?: string,
     /**
      * Sell item token identifier to filter by
      */
@@ -121,6 +131,8 @@ export class OrdersService {
         'status': status,
         'sell_item_contract_address': sellItemContractAddress,
         'buy_item_contract_address': buyItemContractAddress,
+        'account_address': accountAddress,
+        'sell_item_metadata_id': sellItemMetadataId,
         'sell_item_token_id': sellItemTokenId,
         'from_updated_at': fromUpdatedAt,
         'page_size': pageSize,

@@ -32,6 +32,7 @@ interface WalletNetworkButtonProps {
   walletName: WalletProviderName;
   walletAddress: string;
   chainId: ChainId;
+  disableNetworkButton?: boolean;
   onWalletClick: (e) => void;
   onNetworkClick: (e) => void;
 }
@@ -40,6 +41,7 @@ export function WalletNetworkButton({
   walletName,
   walletAddress,
   chainId,
+  disableNetworkButton = false,
   onWalletClick,
   onNetworkClick,
 }: WalletNetworkButtonProps) {
@@ -69,7 +71,9 @@ export function WalletNetworkButton({
         </Body>
       </Box>
       <Button
+        testId={`${testId}-network-${chainId}-button`}
         size="small"
+        disabled={disableNetworkButton}
         onClick={(e) => {
           // stop propogation so onWalletClick is not triggered
           e.stopPropagation();
