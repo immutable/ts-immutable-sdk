@@ -1,6 +1,7 @@
 import {
   Body,
-  BottomSheet, Box,
+  BottomSheet,
+  Box,
 } from '@biom3/react';
 import { CoinSelectorOption, CoinSelectorOptionProps } from './CoinSelectorOption';
 import { selectOptionsContainerStyles } from './CoinSelectorStyles';

@@ -38,7 +38,7 @@ export function CryptoFiatProvider({ environment, children }: CryptoFiatProvider
   }, []);
 
   useEffect(() => {
-    if (!cryptoFiat || tokenSymbols.length === 0 || !fiatSymbol) return;
+    if (!cryptoFiat || !fiatSymbol) return;
 
     (async () => {
       const conversions = await getCryptoToFiatConversion(
