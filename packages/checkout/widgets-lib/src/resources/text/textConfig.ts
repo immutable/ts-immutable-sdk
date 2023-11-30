@@ -444,6 +444,14 @@ export const text = {
         walletSelectorHeading: 'From wallet',
         networkSelectorHeading: 'From network',
       },
+      to: {
+        heading: 'To',
+        selectDefaultText: 'Select wallet and network',
+        walletSelectorHeading: 'To wallet',
+      },
+      submitButton: {
+        text: 'Next',
+      },
     },
   },
   footers: {
