@@ -37,7 +37,6 @@ export function Bridge({ amount, fromContractAddress }: BridgeProps) {
   // reflected.
   const refreshBalances = useCallback(async () => {
     if (!checkout || !web3Provider) return;
-
     try {
       const tokensAndBalances = await getAllowedBalances({
         checkout,

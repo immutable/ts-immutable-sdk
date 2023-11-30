@@ -21,7 +21,7 @@ import {
   initialXBridgeState,
 } from './context/XBridgeContext';
 import { widgetTheme } from '../../lib/theme';
-import { BridgeWalletSelection } from './views/BridgeWalletSelection';
+import { WalletNetworkSelectionView } from './views/WalletNetworkSelectionView';
 import { Bridge } from './views/Bridge';
 
 export type BridgeWidgetInputs = BridgeWidgetParams & {
@@ -39,7 +39,11 @@ export function XBridgeWidget({
 
   const [viewState, viewDispatch] = useReducer(
     viewReducer,
-    { ...initialViewState, view: { type: XBridgeWidgetViews.BRIDGE_WALLET_SELECTION } },
+    {
+      ...initialViewState,
+      view: { type: XBridgeWidgetViews.WALLET_NETWORK_SECLECTION },
+      history: [{ type: XBridgeWidgetViews.WALLET_NETWORK_SECLECTION }],
+    },
   );
   const [bridgeState, bridgeDispatch] = useReducer(
     xBridgeReducer,
@@ -59,8 +63,8 @@ export function XBridgeWidget({
       <ViewContext.Provider value={viewReducerValues}>
         <XBridgeContext.Provider value={bridgeReducerValues}>
           <CryptoFiatProvider environment={environment}>
-            {viewState.view.type === XBridgeWidgetViews.BRIDGE_WALLET_SELECTION && (
-              <BridgeWalletSelection />
+            {viewState.view.type === XBridgeWidgetViews.WALLET_NETWORK_SECLECTION && (
+              <WalletNetworkSelectionView />
             )}
             {viewState.view.type === XBridgeWidgetViews.BRIDGE_FORM && (
               <Bridge />

@@ -44,6 +44,9 @@ describe('XBridgeWidget', () => {
         isMetaMask: true,
       },
       getNetwork: getNetworkSepoliaStub,
+      getSigner: () => ({
+        getAddress: () => Promise.resolve('0x1234567890123456789012345678901234567890'),
+      }),
     };
 
     mockPassportProvider = {
@@ -51,6 +54,9 @@ describe('XBridgeWidget', () => {
         isPassport: true,
       },
       getNetwork: getNetworkImmutableZkEVMStub,
+      getSigner: () => ({
+        getAddress: () => Promise.resolve('0x1234567890123456789012345678901234567890'),
+      }),
     };
   });
 
@@ -79,17 +85,17 @@ describe('XBridgeWidget', () => {
 
       mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
 
-      cySmartGet('bridge-wallet-form-from-wallet-select__target').click();
-      cySmartGet(`bridge-wallet-form-from-wallet-list-${WalletProviderName.METAMASK}`).should('be.visible');
-      cySmartGet(`bridge-wallet-form-from-wallet-list-${WalletProviderName.PASSPORT}`).should('be.visible');
+      cySmartGet('wallet-network-selector-from-wallet-select__target').click();
+      cySmartGet(`wallet-network-selector-from-wallet-list-${WalletProviderName.METAMASK}`).should('be.visible');
+      cySmartGet(`wallet-network-selector-from-wallet-list-${WalletProviderName.PASSPORT}`).should('be.visible');
 
-      cySmartGet('bridge-wallet-form-from-wallet-list-metamask').click();
+      cySmartGet('wallet-network-selector-from-wallet-list-metamask').click();
 
-      cySmartGet(`bridge-wallet-form-network-list-${ChainId.IMTBL_ZKEVM_TESTNET}`).should('be.visible');
-      cySmartGet(`bridge-wallet-form-network-list-${ChainId.SEPOLIA}`).should('be.visible');
+      cySmartGet(`wallet-network-selector-network-list-${ChainId.IMTBL_ZKEVM_TESTNET}`).should('be.visible');
+      cySmartGet(`wallet-network-selector-network-list-${ChainId.SEPOLIA}`).should('be.visible');
 
-      cySmartGet(`bridge-wallet-form-network-list-${ChainId.IMTBL_ZKEVM_TESTNET}`).click();
-      cySmartGet(`bridge-wallet-form-${WalletProviderName.METAMASK}-${ChainId.IMTBL_ZKEVM_TESTNET}-button-wrapper`)
+      cySmartGet(`wallet-network-selector-network-list-${ChainId.IMTBL_ZKEVM_TESTNET}`).click();
+      cySmartGet(`wallet-network-selector-${WalletProviderName.METAMASK}-${ChainId.IMTBL_ZKEVM_TESTNET}-button-wrapper`)
         .should('exist');
     });
 
@@ -100,13 +106,13 @@ describe('XBridgeWidget', () => {
 
       mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
 
-      cySmartGet('bridge-wallet-form-from-wallet-select__target').click();
-      cySmartGet(`bridge-wallet-form-from-wallet-list-${WalletProviderName.METAMASK}`).should('be.visible');
-      cySmartGet(`bridge-wallet-form-from-wallet-list-${WalletProviderName.PASSPORT}`).should('be.visible');
+      cySmartGet('wallet-network-selector-from-wallet-select__target').click();
+      cySmartGet(`wallet-network-selector-from-wallet-list-${WalletProviderName.METAMASK}`).should('be.visible');
+      cySmartGet(`wallet-network-selector-from-wallet-list-${WalletProviderName.PASSPORT}`).should('be.visible');
 
-      cySmartGet(`bridge-wallet-form-from-wallet-list-${WalletProviderName.METAMASK}`).click();
+      cySmartGet(`wallet-network-selector-from-wallet-list-${WalletProviderName.METAMASK}`).click();
 
-      cySmartGet(`bridge-wallet-form-${WalletProviderName.PASSPORT}-${ChainId.IMTBL_ZKEVM_TESTNET}-button-wrapper`)
+      cySmartGet(`wallet-network-selector-${WalletProviderName.PASSPORT}-${ChainId.IMTBL_ZKEVM_TESTNET}-button-wrapper`)
         .should('exist');
     });
 
@@ -117,16 +123,16 @@ describe('XBridgeWidget', () => {
 
       mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
 
-      cySmartGet('bridge-wallet-form-from-wallet-select__target').click();
-      cySmartGet(`bridge-wallet-form-from-wallet-list-${WalletProviderName.METAMASK}`).should('be.visible');
-      cySmartGet(`bridge-wallet-form-from-wallet-list-${WalletProviderName.PASSPORT}`).should('be.visible');
+      cySmartGet('wallet-network-selector-from-wallet-select__target').click();
+      cySmartGet(`wallet-network-selector-from-wallet-list-${WalletProviderName.METAMASK}`).should('be.visible');
+      cySmartGet(`wallet-network-selector-from-wallet-list-${WalletProviderName.PASSPORT}`).should('be.visible');
 
-      cySmartGet(`bridge-wallet-form-from-wallet-list-${WalletProviderName.PASSPORT}`).click();
+      cySmartGet(`wallet-network-selector-from-wallet-list-${WalletProviderName.PASSPORT}`).click();
 
-      cySmartGet(`bridge-wallet-form-${WalletProviderName.PASSPORT}-${ChainId.IMTBL_ZKEVM_TESTNET}-button-wrapper`)
+      cySmartGet(`wallet-network-selector-${WalletProviderName.PASSPORT}-${ChainId.IMTBL_ZKEVM_TESTNET}-button-wrapper`)
         .should('exist');
-      cySmartGet(`bridge-wallet-form-network-${ChainId.IMTBL_ZKEVM_TESTNET}-button`).click();
-      cySmartGet(`bridge-wallet-form-network-list-${ChainId.IMTBL_ZKEVM_TESTNET}`).click();
+      cySmartGet(`wallet-network-selector-network-${ChainId.IMTBL_ZKEVM_TESTNET}-button`).click();
+      cySmartGet(`wallet-network-selector-network-list-${ChainId.IMTBL_ZKEVM_TESTNET}`).click();
 
       cy.get('@getNetworkImmutableZkEVMStub').should('not.have.been.called');
     });
@@ -143,24 +149,24 @@ describe('XBridgeWidget', () => {
 
       mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
 
-      cySmartGet('bridge-wallet-form-from-wallet-select__target').click();
-      cySmartGet(`bridge-wallet-form-from-wallet-list-${WalletProviderName.METAMASK}`).should('be.visible');
-      cySmartGet(`bridge-wallet-form-from-wallet-list-${WalletProviderName.PASSPORT}`).should('be.visible');
+      cySmartGet('wallet-network-selector-from-wallet-select__target').click();
+      cySmartGet(`wallet-network-selector-from-wallet-list-${WalletProviderName.METAMASK}`).should('be.visible');
+      cySmartGet(`wallet-network-selector-from-wallet-list-${WalletProviderName.PASSPORT}`).should('be.visible');
 
-      cySmartGet(`bridge-wallet-form-from-wallet-list-${WalletProviderName.METAMASK}`).click();
+      cySmartGet(`wallet-network-selector-from-wallet-list-${WalletProviderName.METAMASK}`).click();
 
-      cySmartGet(`bridge-wallet-form-network-list-${ChainId.IMTBL_ZKEVM_TESTNET}`).should('be.visible');
-      cySmartGet(`bridge-wallet-form-network-list-${ChainId.SEPOLIA}`).should('be.visible');
+      cySmartGet(`wallet-network-selector-network-list-${ChainId.IMTBL_ZKEVM_TESTNET}`).should('be.visible');
+      cySmartGet(`wallet-network-selector-network-list-${ChainId.SEPOLIA}`).should('be.visible');
 
-      cySmartGet(`bridge-wallet-form-network-list-${ChainId.IMTBL_ZKEVM_TESTNET}`).click();
-      cySmartGet(`bridge-wallet-form-${WalletProviderName.METAMASK}-${ChainId.IMTBL_ZKEVM_TESTNET}-button-wrapper`)
+      cySmartGet(`wallet-network-selector-network-list-${ChainId.IMTBL_ZKEVM_TESTNET}`).click();
+      cySmartGet(`wallet-network-selector-${WalletProviderName.METAMASK}-${ChainId.IMTBL_ZKEVM_TESTNET}-button-wrapper`)
         .should('exist');
 
       // make same selection again in from wallet
-      cySmartGet(`bridge-wallet-form-${WalletProviderName.METAMASK}-${ChainId.IMTBL_ZKEVM_TESTNET}-button-wrapper`)
+      cySmartGet(`wallet-network-selector-${WalletProviderName.METAMASK}-${ChainId.IMTBL_ZKEVM_TESTNET}-button-wrapper`)
         .click('left'); // had to specify left to click the wallet part
 
-      cySmartGet(`bridge-wallet-form-from-wallet-list-${WalletProviderName.METAMASK}`).click();
+      cySmartGet(`wallet-network-selector-from-wallet-list-${WalletProviderName.METAMASK}`).click();
     });
 
     it('should only create and connect each provider maximum once', () => {
@@ -175,21 +181,21 @@ describe('XBridgeWidget', () => {
 
       mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
 
-      cySmartGet('bridge-wallet-form-from-wallet-select__target').click();
-      cySmartGet(`bridge-wallet-form-from-wallet-list-${WalletProviderName.METAMASK}`).click();
-      cySmartGet(`bridge-wallet-form-network-list-${ChainId.IMTBL_ZKEVM_TESTNET}`).click();
-      cySmartGet(`bridge-wallet-form-${WalletProviderName.METAMASK}-${ChainId.IMTBL_ZKEVM_TESTNET}-button-wrapper`)
+      cySmartGet('wallet-network-selector-from-wallet-select__target').click();
+      cySmartGet(`wallet-network-selector-from-wallet-list-${WalletProviderName.METAMASK}`).click();
+      cySmartGet(`wallet-network-selector-network-list-${ChainId.IMTBL_ZKEVM_TESTNET}`).click();
+      cySmartGet(`wallet-network-selector-${WalletProviderName.METAMASK}-${ChainId.IMTBL_ZKEVM_TESTNET}-button-wrapper`)
         .should('exist');
       cySmartGet('@createProviderStub').should('have.been.calledOnce');
 
-      cySmartGet('bridge-wallet-form-to-wallet-select__target').click();
-      cySmartGet('bridge-wallet-form-to-wallet-list-metamask').click();
-      cySmartGet(`bridge-wallet-form-${WalletProviderName.METAMASK}-${ChainId.SEPOLIA}-button-wrapper`);
+      cySmartGet('wallet-network-selector-to-wallet-select__target').click();
+      cySmartGet('wallet-network-selector-to-wallet-list-metamask').click();
+      cySmartGet(`wallet-network-selector-${WalletProviderName.METAMASK}-${ChainId.SEPOLIA}-button-wrapper`);
       // still should only be called once
       cySmartGet('@createProviderStub').should('have.been.calledOnce');
     });
 
-    it.only('should only create and connect each provider maximum once, Passport', () => {
+    it('should only create and connect each provider maximum once, Passport', () => {
       createProviderStub
         .onFirstCall()
         .returns({ provider: mockMetaMaskProvider })
@@ -211,28 +217,66 @@ describe('XBridgeWidget', () => {
       mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
 
       // Choose from Metamask
-      cySmartGet('bridge-wallet-form-from-wallet-select__target').click();
-      cySmartGet(`bridge-wallet-form-from-wallet-list-${WalletProviderName.METAMASK}`).click();
-      cySmartGet(`bridge-wallet-form-network-list-${ChainId.SEPOLIA}`).click();
-      cySmartGet(`bridge-wallet-form-${WalletProviderName.METAMASK}-${ChainId.SEPOLIA}-button-wrapper`)
+      cySmartGet('wallet-network-selector-from-wallet-select__target').click();
+      cySmartGet(`wallet-network-selector-from-wallet-list-${WalletProviderName.METAMASK}`).click();
+      cySmartGet(`wallet-network-selector-network-list-${ChainId.SEPOLIA}`).click();
+      cySmartGet(`wallet-network-selector-${WalletProviderName.METAMASK}-${ChainId.SEPOLIA}-button-wrapper`)
         .should('exist');
 
       cySmartGet('@createProviderStub').should('have.been.calledOnce');
 
       // Choose to Passport
-      cySmartGet('bridge-wallet-form-to-wallet-select__target').click();
-      cySmartGet('bridge-wallet-form-to-wallet-list-passport').click();
-      cySmartGet(`bridge-wallet-form-${WalletProviderName.PASSPORT}-${ChainId.IMTBL_ZKEVM_TESTNET}-button-wrapper`);
+      cySmartGet('wallet-network-selector-to-wallet-select__target').click();
+      cySmartGet('wallet-network-selector-to-wallet-list-passport').click();
+      // eslint-disable-next-line max-len
+      cySmartGet(`wallet-network-selector-${WalletProviderName.PASSPORT}-${ChainId.IMTBL_ZKEVM_TESTNET}-button-wrapper`);
 
       cySmartGet('@createProviderStub').should('have.been.calledTwice');
 
       // change from wallet to Passport
-      cySmartGet(`bridge-wallet-form-${WalletProviderName.METAMASK}-${ChainId.SEPOLIA}-button-wrapper`)
+      cySmartGet(`wallet-network-selector-${WalletProviderName.METAMASK}-${ChainId.SEPOLIA}-button-wrapper`)
         .click('left');
-      cySmartGet(`bridge-wallet-form-from-wallet-list-${WalletProviderName.PASSPORT}`).click();
+      cySmartGet(`wallet-network-selector-from-wallet-list-${WalletProviderName.PASSPORT}`).click();
 
       // still only called twice as Passport provider was cached
       cySmartGet('@createProviderStub').should('have.been.calledTwice');
+    });
+
+    it('should correctly select from wallet and address when from wallet changes', () => {
+      createProviderStub
+        .onFirstCall()
+        .returns({ provider: mockPassportProvider })
+        .onSecondCall()
+        .returns({ provider: mockMetaMaskProvider });
+
+      checkIsWalletConnectedStub.resolves({ isConnected: false });
+      connectStub
+        .onFirstCall()
+        .returns({ provider: mockPassportProvider })
+        .onSecondCall()
+        .returns({ provider: mockMetaMaskProvider });
+
+      switchNetworkStub.resolves({
+        provider: mockMetaMaskProvider,
+        network: { chainId: ChainId.IMTBL_ZKEVM_TESTNET },
+      } as SwitchNetworkResult);
+
+      mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
+
+      // Choose from Passport
+      cySmartGet('wallet-network-selector-from-wallet-select__target').click();
+      cySmartGet(`wallet-network-selector-from-wallet-list-${WalletProviderName.PASSPORT}`).click();
+      cySmartGet(`wallet-network-selector-${WalletProviderName.PASSPORT}-${ChainId.IMTBL_ZKEVM_TESTNET}-button-wrapper`)
+        .should('exist');
+
+      // Then change from wallet MetaMask
+      cySmartGet(`wallet-network-selector-${WalletProviderName.PASSPORT}-${ChainId.IMTBL_ZKEVM_TESTNET}-button-wrapper`)
+        .click('left');
+      cySmartGet(`wallet-network-selector-from-wallet-list-${WalletProviderName.METAMASK}`).click();
+      cySmartGet(`wallet-network-selector-network-list-${ChainId.IMTBL_ZKEVM_TESTNET}`).click();
+
+      cySmartGet(`wallet-network-selector-${WalletProviderName.METAMASK}-${ChainId.IMTBL_ZKEVM_TESTNET}-button-wrapper`)
+        .should('exist');
     });
   });
 
@@ -249,22 +293,22 @@ describe('XBridgeWidget', () => {
 
       mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
 
-      cySmartGet('bridge-wallet-form-from-wallet-select__target').click();
-      cySmartGet('bridge-wallet-form-from-wallet-list-metamask').should('be.visible');
-      cySmartGet('bridge-wallet-form-from-wallet-list-passport').should('be.visible');
+      cySmartGet('wallet-network-selector-from-wallet-select__target').click();
+      cySmartGet('wallet-network-selector-from-wallet-list-metamask').should('be.visible');
+      cySmartGet('wallet-network-selector-from-wallet-list-passport').should('be.visible');
 
-      cySmartGet('bridge-wallet-form-from-wallet-list-metamask').click();
+      cySmartGet('wallet-network-selector-from-wallet-list-metamask').click();
 
-      cySmartGet(`bridge-wallet-form-network-list-${ChainId.IMTBL_ZKEVM_TESTNET}`).should('be.visible');
-      cySmartGet(`bridge-wallet-form-network-list-${ChainId.SEPOLIA}`).should('be.visible');
+      cySmartGet(`wallet-network-selector-network-list-${ChainId.IMTBL_ZKEVM_TESTNET}`).should('be.visible');
+      cySmartGet(`wallet-network-selector-network-list-${ChainId.SEPOLIA}`).should('be.visible');
 
-      cySmartGet(`bridge-wallet-form-network-list-${ChainId.IMTBL_ZKEVM_TESTNET}`).click();
-      cySmartGet(`bridge-wallet-form-${WalletProviderName.METAMASK}-${ChainId.IMTBL_ZKEVM_TESTNET}-button-wrapper`)
+      cySmartGet(`wallet-network-selector-network-list-${ChainId.IMTBL_ZKEVM_TESTNET}`).click();
+      cySmartGet(`wallet-network-selector-${WalletProviderName.METAMASK}-${ChainId.IMTBL_ZKEVM_TESTNET}-button-wrapper`)
         .should('exist');
 
-      cySmartGet('bridge-wallet-form-to-wallet-select__target').click();
-      cySmartGet('bridge-wallet-form-to-wallet-list-metamask').should('be.visible');
-      cySmartGet('bridge-wallet-form-to-wallet-list-passport').should('not.exist');
+      cySmartGet('wallet-network-selector-to-wallet-select__target').click();
+      cySmartGet('wallet-network-selector-to-wallet-list-metamask').should('be.visible');
+      cySmartGet('wallet-network-selector-to-wallet-list-passport').should('not.exist');
     });
 
     it('should show Passport in the to wallet list when, from wallet is MetaMask and from network is L1', () => {
@@ -279,22 +323,22 @@ describe('XBridgeWidget', () => {
 
       mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
 
-      cySmartGet('bridge-wallet-form-from-wallet-select__target').click();
-      cySmartGet('bridge-wallet-form-from-wallet-list-metamask').should('be.visible');
-      cySmartGet('bridge-wallet-form-from-wallet-list-passport').should('be.visible');
+      cySmartGet('wallet-network-selector-from-wallet-select__target').click();
+      cySmartGet('wallet-network-selector-from-wallet-list-metamask').should('be.visible');
+      cySmartGet('wallet-network-selector-from-wallet-list-passport').should('be.visible');
 
-      cySmartGet('bridge-wallet-form-from-wallet-list-metamask').click();
+      cySmartGet('wallet-network-selector-from-wallet-list-metamask').click();
 
-      cySmartGet(`bridge-wallet-form-network-list-${ChainId.IMTBL_ZKEVM_TESTNET}`).should('be.visible');
-      cySmartGet(`bridge-wallet-form-network-list-${ChainId.SEPOLIA}`).should('be.visible');
+      cySmartGet(`wallet-network-selector-network-list-${ChainId.IMTBL_ZKEVM_TESTNET}`).should('be.visible');
+      cySmartGet(`wallet-network-selector-network-list-${ChainId.SEPOLIA}`).should('be.visible');
 
-      cySmartGet(`bridge-wallet-form-network-list-${ChainId.SEPOLIA}`).click();
-      cySmartGet(`bridge-wallet-form-${WalletProviderName.METAMASK}-${ChainId.SEPOLIA}-button-wrapper`)
+      cySmartGet(`wallet-network-selector-network-list-${ChainId.SEPOLIA}`).click();
+      cySmartGet(`wallet-network-selector-${WalletProviderName.METAMASK}-${ChainId.SEPOLIA}-button-wrapper`)
         .should('exist');
 
-      cySmartGet('bridge-wallet-form-to-wallet-select__target').click();
-      cySmartGet('bridge-wallet-form-to-wallet-list-metamask').should('be.visible');
-      cySmartGet('bridge-wallet-form-to-wallet-list-passport').should('be.visible');
+      cySmartGet('wallet-network-selector-to-wallet-select__target').click();
+      cySmartGet('wallet-network-selector-to-wallet-list-metamask').should('be.visible');
+      cySmartGet('wallet-network-selector-to-wallet-list-passport').should('be.visible');
     });
 
     it('should clear to wallet selection when from wallet selection changes wallets', () => {
@@ -313,23 +357,23 @@ describe('XBridgeWidget', () => {
 
       mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
 
-      cySmartGet('bridge-wallet-form-from-wallet-select__target').click();
-      cySmartGet('bridge-wallet-form-from-wallet-list-metamask').click();
-      cySmartGet(`bridge-wallet-form-network-list-${ChainId.SEPOLIA}`).click();
-      cySmartGet(`bridge-wallet-form-${WalletProviderName.METAMASK}-${ChainId.SEPOLIA}-button-wrapper`)
+      cySmartGet('wallet-network-selector-from-wallet-select__target').click();
+      cySmartGet('wallet-network-selector-from-wallet-list-metamask').click();
+      cySmartGet(`wallet-network-selector-network-list-${ChainId.SEPOLIA}`).click();
+      cySmartGet(`wallet-network-selector-${WalletProviderName.METAMASK}-${ChainId.SEPOLIA}-button-wrapper`)
         .should('exist');
 
-      cySmartGet('bridge-wallet-form-to-wallet-select__target').click();
-      cySmartGet('bridge-wallet-form-to-wallet-list-metamask').click();
-      cySmartGet(`bridge-wallet-form-${WalletProviderName.METAMASK}-${ChainId.IMTBL_ZKEVM_TESTNET}-button-wrapper`)
+      cySmartGet('wallet-network-selector-to-wallet-select__target').click();
+      cySmartGet('wallet-network-selector-to-wallet-list-metamask').click();
+      cySmartGet(`wallet-network-selector-${WalletProviderName.METAMASK}-${ChainId.IMTBL_ZKEVM_TESTNET}-button-wrapper`)
         .should('exist');
-      cySmartGet('bridge-wallet-form-to-wallet-select__target').should('not.exist');
+      cySmartGet('wallet-network-selector-to-wallet-select__target').should('not.exist');
 
-      cySmartGet(`bridge-wallet-form-${WalletProviderName.METAMASK}-${ChainId.SEPOLIA}-button-wrapper`)
+      cySmartGet(`wallet-network-selector-${WalletProviderName.METAMASK}-${ChainId.SEPOLIA}-button-wrapper`)
         .click();
-      cySmartGet(`bridge-wallet-form-from-wallet-list-${WalletProviderName.PASSPORT}`).click();
+      cySmartGet(`wallet-network-selector-from-wallet-list-${WalletProviderName.PASSPORT}`).click();
 
-      cySmartGet('bridge-wallet-form-to-wallet-select__target').should('be.visible');
+      cySmartGet('wallet-network-selector-to-wallet-select__target').should('be.visible');
     });
 
     it('should clear to wallet selection when from wallet selection changes networks', () => {
@@ -351,28 +395,28 @@ describe('XBridgeWidget', () => {
 
       mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
 
-      cySmartGet('bridge-wallet-form-from-wallet-select__target').click();
-      cySmartGet(`bridge-wallet-form-from-wallet-list-${WalletProviderName.METAMASK}`).click();
-      cySmartGet(`bridge-wallet-form-network-list-${ChainId.SEPOLIA}`).click();
+      cySmartGet('wallet-network-selector-from-wallet-select__target').click();
+      cySmartGet(`wallet-network-selector-from-wallet-list-${WalletProviderName.METAMASK}`).click();
+      cySmartGet(`wallet-network-selector-network-list-${ChainId.SEPOLIA}`).click();
 
       cySmartGet('@createProviderStub').should('have.been.calledOnce');
       cySmartGet('@checkIsWalletConnectedStub').should('have.been.calledOnce');
       cySmartGet('@connectStub').should('have.been.calledOnce');
 
-      cySmartGet(`bridge-wallet-form-${WalletProviderName.METAMASK}-${ChainId.SEPOLIA}-button-wrapper`)
+      cySmartGet(`wallet-network-selector-${WalletProviderName.METAMASK}-${ChainId.SEPOLIA}-button-wrapper`)
         .should('exist');
 
-      cySmartGet('bridge-wallet-form-to-wallet-select__target').click();
-      cySmartGet('bridge-wallet-form-to-wallet-list-metamask').click();
-      cySmartGet(`bridge-wallet-form-${WalletProviderName.METAMASK}-${ChainId.IMTBL_ZKEVM_TESTNET}-button-wrapper`)
+      cySmartGet('wallet-network-selector-to-wallet-select__target').click();
+      cySmartGet('wallet-network-selector-to-wallet-list-metamask').click();
+      cySmartGet(`wallet-network-selector-${WalletProviderName.METAMASK}-${ChainId.IMTBL_ZKEVM_TESTNET}-button-wrapper`)
         .should('exist');
-      cySmartGet('bridge-wallet-form-to-wallet-select__target').should('not.exist');
+      cySmartGet('wallet-network-selector-to-wallet-select__target').should('not.exist');
 
-      cySmartGet(`bridge-wallet-form-network-${ChainId.SEPOLIA}-button`)
+      cySmartGet(`wallet-network-selector-network-${ChainId.SEPOLIA}-button`)
         .click();
-      cySmartGet(`bridge-wallet-form-network-list-${ChainId.IMTBL_ZKEVM_TESTNET}`).click();
+      cySmartGet(`wallet-network-selector-network-list-${ChainId.IMTBL_ZKEVM_TESTNET}`).click();
 
-      cySmartGet('bridge-wallet-form-to-wallet-select__target').should('be.visible');
+      cySmartGet('wallet-network-selector-to-wallet-select__target').should('be.visible');
     });
   });
 
@@ -389,22 +433,22 @@ describe('XBridgeWidget', () => {
 
       mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
 
-      cySmartGet('bridge-wallet-form-from-wallet-select__target').click();
-      cySmartGet('bridge-wallet-form-from-wallet-list-metamask').click();
-      cySmartGet(`bridge-wallet-form-network-list-${ChainId.IMTBL_ZKEVM_TESTNET}`).click();
+      cySmartGet('wallet-network-selector-from-wallet-select__target').click();
+      cySmartGet('wallet-network-selector-from-wallet-list-metamask').click();
+      cySmartGet(`wallet-network-selector-network-list-${ChainId.IMTBL_ZKEVM_TESTNET}`).click();
 
-      cySmartGet('bridge-wallet-form-to-wallet-select__target').click();
-      cySmartGet('bridge-wallet-form-to-wallet-list-metamask').click();
+      cySmartGet('wallet-network-selector-to-wallet-select__target').click();
+      cySmartGet('wallet-network-selector-to-wallet-list-metamask').click();
 
-      cySmartGet('bridge-wallet-form-submit-button')
+      cySmartGet('wallet-network-selector-submit-button')
         .should('be.visible')
-        .should('have.text', text.views.BRIDGE_WALLET_SELECTION.submitButton.text);
+        .should('have.text', text.views.WALLET_NETWORK_SECLECTION.submitButton.text);
     });
 
     it('should not show when from wallet is not selected', () => {
       mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
 
-      cySmartGet('bridge-wallet-form-submit-button').should('not.exist');
+      cySmartGet('wallet-network-selector-submit-button').should('not.exist');
     });
 
     it('should not show when to wallet is not selected', () => {
@@ -419,12 +463,34 @@ describe('XBridgeWidget', () => {
 
       mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
 
-      cySmartGet('bridge-wallet-form-from-wallet-select__target').click();
-      cySmartGet('bridge-wallet-form-from-wallet-list-metamask').click();
-      cySmartGet(`bridge-wallet-form-network-list-${ChainId.IMTBL_ZKEVM_TESTNET}`).click();
+      cySmartGet('wallet-network-selector-from-wallet-select__target').click();
+      cySmartGet('wallet-network-selector-from-wallet-list-metamask').click();
+      cySmartGet(`wallet-network-selector-network-list-${ChainId.IMTBL_ZKEVM_TESTNET}`).click();
 
-      cySmartGet('bridge-wallet-form-to-wallet-select__target').should('be.visible');
-      cySmartGet('bridge-wallet-form-submit-button').should('not.exist');
+      cySmartGet('wallet-network-selector-to-wallet-select__target').should('be.visible');
+      cySmartGet('wallet-network-selector-submit-button').should('not.exist');
+    });
+
+    it('should go to bridge from', () => {
+      createProviderStub.returns({ provider: mockMetaMaskProvider });
+      checkIsWalletConnectedStub.resolves({ isConnected: false });
+      connectStub.resolves({ provider: mockMetaMaskProvider });
+
+      switchNetworkStub.resolves({
+        provider: mockMetaMaskProvider,
+        network: { chainId: ChainId.IMTBL_ZKEVM_TESTNET },
+      } as SwitchNetworkResult);
+
+      mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
+
+      cySmartGet('wallet-network-selector-from-wallet-select__target').click();
+      cySmartGet('wallet-network-selector-from-wallet-list-metamask').click();
+      cySmartGet(`wallet-network-selector-network-list-${ChainId.IMTBL_ZKEVM_TESTNET}`).click();
+
+      cySmartGet('wallet-network-selector-to-wallet-select__target').click();
+      cySmartGet('wallet-network-selector-to-wallet-list-metamask').click();
+      cySmartGet('wallet-network-selector-submit-button').click();
+      cySmartGet('bridge-form').should('be.visible');
     });
   });
 });
