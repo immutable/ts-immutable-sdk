@@ -219,6 +219,7 @@ export function BridgeForm(props: BridgeFormProps) {
     }
   };
 
+  // TODO: rename uses of ETH to native token
   const insufficientFundsForGas = useMemo(() => {
     const ethBalance = tokenBalances
       .find((balance) => isNativeToken(balance.token.address));
