@@ -59,11 +59,14 @@ const main = () => {
           const srcDirectory = path.dirname(sourceFile);
           const chunkFiles = fs.readdirSync(srcDirectory);
           chunkFiles.forEach((chunkFile) => {
-            // Skip copying the original file and only copy chunks
-            if (chunkFile !== path.basename(sourceFile)) {
-              const chunkSrcPath = path.join(srcDirectory, chunkFile);
-              const chunkDestPath = path.join(directoryPath, chunkFile);
-              fs.copyFileSync(chunkSrcPath, chunkDestPath);
+            // Check if the file is a .js file
+            if (path.extname(chunkFile) === '.js') {
+              // Skip copying the original file and only copy .js chunks
+              if (chunkFile !== path.basename(sourceFile)) {
+                const chunkSrcPath = path.join(srcDirectory, chunkFile);
+                const chunkDestPath = path.join(directoryPath, chunkFile);
+                fs.copyFileSync(chunkSrcPath, chunkDestPath);
+              }
             }
           });
         }
