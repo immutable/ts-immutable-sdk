@@ -98,6 +98,7 @@ export class TokenBridge {
    */
   public async getFee(req: BridgeFeeRequest): Promise<BridgeFeeResponse> {
     await this.validateChainConfiguration();
+    await this.validateChainIds(req.sourceChainId, req.destinationChainId);
 
     let sourceChainFee: ethers.BigNumber = ethers.BigNumber.from(0);
     let destinationChainFee: ethers.BigNumber = ethers.BigNumber.from(0);
