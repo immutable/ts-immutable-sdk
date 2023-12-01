@@ -90,7 +90,8 @@ export const getTokenBalanceRequirement = (
   // Get the requirements related balance
   if (itemRequirement.type === ItemType.ERC20) {
     itemBalanceResult = balances.find((balance) => {
-      return (balance as TokenBalance).token?.address === itemRequirement.contractAddress;
+      // return (balance as TokenBalance).token?.address === itemRequirement.contractAddress;
+      return (balance as TokenBalance).token?.address?.toLowerCase() === itemRequirement.contractAddress;
     });
   } else if (itemRequirement.type === ItemType.NATIVE) {
     itemBalanceResult = balances.find((balance) => {
