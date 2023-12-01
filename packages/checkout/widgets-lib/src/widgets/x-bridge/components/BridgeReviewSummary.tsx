@@ -40,12 +40,12 @@ interface BridgeReviewSummaryProps {
   testId?: string;
   fromAmount?: string;
   fromFiatAmount?: string;
-  fromAddress?: string;
+  fromAddress: string | null;
   fromWalletProviderName?: WalletProviderName;
-  fromChainId?: ChainId;
-  toAddress?: string;
+  fromNetwork?: ChainId | null;
+  toAddress: string | null;
   toWalletProviderName?: WalletProviderName;
-  toChainId?: ChainId;
+  toNetwork?: ChainId | null;
   gasEstimate?: string;
   gasFiatEstimate?: string;
 }
@@ -56,10 +56,10 @@ export function BridgeReviewSummary({
   fromFiatAmount,
   fromAddress,
   fromWalletProviderName,
-  fromChainId,
+  fromNetwork,
   toAddress,
   toWalletProviderName,
-  toChainId,
+  toNetwork,
   gasEstimate,
   gasFiatEstimate,
 }: BridgeReviewSummaryProps) {
@@ -113,10 +113,10 @@ export function BridgeReviewSummary({
           {' '}
           {fromAddress}
         </MenuItem.Label>
-        {fromChainId && (
+        {fromNetwork && (
           <MenuItem.IntentIcon
-            icon={networkIcon[fromChainId] as any}
-            sx={networkIconStyles(fromChainId)}
+            icon={networkIcon[fromNetwork] as any}
+            sx={networkIconStyles(fromNetwork)}
           />
         )}
       </MenuItem>
@@ -143,10 +143,10 @@ export function BridgeReviewSummary({
           {' '}
           {toAddress}
         </MenuItem.Label>
-        {toChainId && (
+        {toNetwork && (
           <MenuItem.IntentIcon
-            icon={networkIcon[toChainId] as any}
-            sx={networkIconStyles(toChainId)}
+            icon={networkIcon[toNetwork] as any}
+            sx={networkIconStyles(toNetwork)}
           />
         )}
       </MenuItem>
