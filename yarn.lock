@@ -3436,7 +3436,6 @@ __metadata:
     react-app-rewired: ^2.2.1
     react-scripts: 5.0.1
     rollup: ^3.17.2
-    rollup-plugin-rename: ^1.0.1
     rollup-plugin-svg: ^2.0.0
     rollup-plugin-visualizer: ^5.9.3
     stream-browserify: ^3.0.0
@@ -16771,7 +16770,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"estree-walker@npm:^2.0.1, estree-walker@npm:^2.0.2":
+"estree-walker@npm:^2.0.2":
   version: 2.0.2
   resolution: "estree-walker@npm:2.0.2"
   checksum: 6151e6f9828abe2259e57f5fd3761335bb0d2ebd76dc1a01048ccee22fabcfef3c0859300f6d83ff0d1927849368775ec5a6d265dde2f6de5a1be1721cd94efc
@@ -26940,17 +26939,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rollup-plugin-rename@npm:^1.0.1":
-  version: 1.0.1
-  resolution: "rollup-plugin-rename@npm:1.0.1"
-  dependencies:
-    "@rollup/pluginutils": ^3.1.0
-    estree-walker: ^2.0.1
-    magic-string: ^0.25.7
-  checksum: 187ea2dc3c252c3bc3767bb6ae4d3e979e635211efce8c901923db6633f1b0ccaaa813ddf83115fd7a4085463a9ec1db7b44012d4e51e6876411e5f7262be663
-  languageName: node
-  linkType: hard
-
 "rollup-plugin-svg@npm:^2.0.0":
   version: 2.0.0
   resolution: "rollup-plugin-svg@npm:2.0.0"
@@ -29448,17 +29436,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@latest, tslib@npm:^2.0.0, tslib@npm:^2.0.1, tslib@npm:^2.0.3, tslib@npm:^2.1.0, tslib@npm:^2.4.0, tslib@npm:^2.4.1":
-  version: 2.6.2
-  resolution: "tslib@npm:2.6.2"
-  checksum: 329ea56123005922f39642318e3d1f0f8265d1e7fcb92c633e0809521da75eeaca28d2cf96d7248229deb40e5c19adf408259f4b9640afd20d13aecc1430f3ad
-  languageName: node
-  linkType: hard
-
 "tslib@npm:^1.13.0, tslib@npm:^1.8.1":
   version: 1.14.1
   resolution: "tslib@npm:1.14.1"
   checksum: dbe628ef87f66691d5d2959b3e41b9ca0045c3ee3c7c7b906cc1e328b39f199bb1ad9e671c39025bd56122ac57dfbf7385a94843b1cc07c60a4db74795829acd
+  languageName: node
+  linkType: hard
+
+"tslib@npm:^2.0.0, tslib@npm:^2.0.1, tslib@npm:^2.0.3, tslib@npm:^2.1.0, tslib@npm:^2.4.0, tslib@npm:^2.4.1, tslib@npm:latest":
+  version: 2.6.2
+  resolution: "tslib@npm:2.6.2"
+  checksum: 329ea56123005922f39642318e3d1f0f8265d1e7fcb92c633e0809521da75eeaca28d2cf96d7248229deb40e5c19adf408259f4b9640afd20d13aecc1430f3ad
   languageName: node
   linkType: hard
 
