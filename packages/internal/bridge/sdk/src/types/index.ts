@@ -254,7 +254,6 @@ export interface TxStatusRequest extends Array<TxStatusRequestItem> {}
  */
 export interface TxStatusRequestItem {
   transactionHash: string;
-  sourceChainId: string;
 }
 
 /**
@@ -269,6 +268,7 @@ export interface TxStatusResponse extends Array<TxStatusResponseItem> {}
  * @property {string} sourceChainId - The source chainId.
  */
 export interface TxStatusResponseItem {
+  transactionHash: string;
   status: StatusResponse;
   data: any;
 }

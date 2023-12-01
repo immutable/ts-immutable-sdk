@@ -655,6 +655,7 @@ export class TokenBridge {
     console.log('stubbed response with req', req);
     // Return the token mappings
     return [{
+      transactionHash: '0x1234....',
       status: StatusResponse.COMPLETE,
       data: 'stubbed data',
     }];
