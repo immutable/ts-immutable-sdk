@@ -630,6 +630,13 @@ export class TokenBridge {
       );
     }
 
+    if (!estimateGasFeeResult.executionFeeWithMultiplier) {
+      throw new BridgeError(
+        `Axelar Gas didn't return the executionFeeWithMultiplier: ${estimateGasFeeResult.executionFeeWithMultiplier}`,
+        BridgeErrorType.AXELAR_GAS_ESTIMATE_FAILED,
+      );
+    }
+
     return ethers.BigNumber.from(estimateGasFeeResult.executionFeeWithMultiplier);
   }
 
