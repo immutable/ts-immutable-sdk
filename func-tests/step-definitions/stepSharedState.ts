@@ -1,43 +1,71 @@
 import { Wallet } from '@ethersproject/wallet';
-import {
-  Config,
-  CreateWithdrawalResponse,
-  CreateTransferResponseV1,
-  Balance,
-  CreateTransferResponse,
-  MintResultDetails,
-  WalletConnection,
-  UnsignedOrderRequest,
-  createStarkSigner,
-  NftprimarytransactionCreateResponse,
-  // NftsecondarytransactionCreateResponse,
-} from '@imtbl/core-sdk';
+// import {
+// Config,
+// CreateWithdrawalResponse,
+// CreateTransferResponseV1,
+// Balance,
+// CreateTransferResponse,
+// MintResultDetails,
+// WalletConnection,
+// UnsignedOrderRequest,
+// NftprimarytransactionCreateResponse,
+// NftsecondarytransactionCreateResponse,
+// } from '@imtbl/core-sdk';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { ethers } from 'ethers';
+import { imxClientCreateStarkSigner, ImxClientWalletConnection } from '@imtbl/sdk/immutablex_client';
+import { Environment, ImmutableConfiguration } from '@imtbl/sdk/config';
 import { env, getProvider } from '../common';
 import genericErc20Abi from '../abi/ERC20.json';
 
 const provider = getProvider(env.network, env.alchemyApiKey);
 
-export const configuration = Config.SANDBOX;
+// export const configuration = Config.SANDBOX;
+export const configuration = new ImmutableConfiguration({ environment: Environment.SANDBOX });
+
+/**
+ * Generate a ethSigner/starkSigner object from a private key.
+ */
+const generateWalletConnection = async (
+  privateKey: string,
+  starkPrivateKey: string,
+  rpcProvider: JsonRpcProvider,
+): Promise<ImxClientWalletConnection> => {
+  if (!privateKey) {
+    throw new Error('PrivateKey required!');
+  }
+
+  // L1 credentials
+  const ethSigner = new Wallet(privateKey).connect(rpcProvider);
+
+  // L2 credentials
+  const starkSigner = imxClientCreateStarkSigner(starkPrivateKey);
+
+  return {
+    ethSigner,
+    starkSigner,
+  };
+};
 
 export class StepSharedState {
-  private minter?: WalletConnection;
+  private minter?: ImxClientWalletConnection;
 
-  private banker?: WalletConnection;
+  private banker?: ImxClientWalletConnection;
 
   users: {
-    [key: string]: WalletConnection;
+    [key: string]: ImxClientWalletConnection;
   } = {};
 
   nfts: {
     [key: string]: {
       type: {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         MINTABLE_ERC721: 'MINTABLE_ERC721';
       };
       data: {
         id: string;
         blueprint: string;
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         token_address: string;
         royalties: {
           recipient: string;
@@ -47,11 +75,11 @@ export class StepSharedState {
     };
   } = {};
 
-  orders: {
-    [key: string]: UnsignedOrderRequest & {
-      orderId: number;
-    };
-  } = {};
+  // orders: {
+  //   [key: string]: UnsignedOrderRequest & {
+  //     orderId: number;
+  //   };
+  // } = {};
 
   trades: {
     [key: string]: {
@@ -61,29 +89,29 @@ export class StepSharedState {
   } = {};
 
   // Todo: define token type
-  tokens: { [key: string]: MintResultDetails } = {};
+  // tokens: { [key: string]: MintResultDetails } = {};
 
-  transfers: { [key: string]: CreateTransferResponseV1 } = {};
+  // transfers: { [key: string]: CreateTransferResponseV1 } = {};
 
-  exchangeTransfers: { [key: string]: CreateTransferResponseV1 } = {};
+  // exchangeTransfers: { [key: string]: CreateTransferResponseV1 } = {};
 
-  nftPrimaryTransaction: { [key: string]: NftprimarytransactionCreateResponse } = {};
+  // nftPrimaryTransaction: { [key: string]: NftprimarytransactionCreateResponse } = {};
 
-  transferV2: { [key: string]: CreateTransferResponse } = {};
+  // transferV2: { [key: string]: CreateTransferResponse } = {};
 
-  balances: { [key: string]: Balance } = {};
+  // balances: { [key: string]: Balance } = {};
 
-  bankerBalances: { [key: string]: Balance } = {};
+  // bankerBalances: { [key: string]: Balance } = {};
 
-  burns: { [key: string]: CreateTransferResponseV1 } = {};
+  // burns: { [key: string]: CreateTransferResponseV1 } = {};
 
-  withdrawals: { [key: string]: CreateWithdrawalResponse } = {};
+  // withdrawals: { [key: string]: CreateWithdrawalResponse } = {};
 
   // nftSecondaryTransactions: {
   //   [key: string]: NftsecondarytransactionCreateResponse
   // } = {};
 
-  public async getMinter(): Promise<WalletConnection> {
+  public async getMinter(): Promise<ImxClientWalletConnection> {
     if (this.minter !== undefined) {
       return this.minter;
     }
@@ -98,7 +126,7 @@ export class StepSharedState {
     return this.minter;
   }
 
-  public async getBanker(): Promise<WalletConnection> {
+  public async getBanker(): Promise<ImxClientWalletConnection> {
     if (this.banker !== undefined) {
       return this.banker;
     }
@@ -115,7 +143,7 @@ export class StepSharedState {
     return this.banker;
   }
 
-  public getTokenAddress(symbol: string): string {
+  static getTokenAddress(symbol: string): string {
     const tokenAddresses = [
       {
         symbol: 'ETH',
@@ -130,12 +158,12 @@ export class StepSharedState {
         tokenAddress: '0x1facdd0165489f373255a90304650e15481b2c85', // IMX address in goerli
       },
     ];
-    const token = tokenAddresses.find((token) => token.symbol === symbol);
+    const token = tokenAddresses.find((t) => t.symbol === symbol);
     return token?.tokenAddress || '';
   }
 
-  public getTokenContract(symbol: string) {
-    const tokenAddress = this.getTokenAddress(symbol);
+  static getTokenContract(symbol: string) {
+    const tokenAddress = StepSharedState.getTokenAddress(symbol);
     const contract = new ethers.Contract(
       tokenAddress,
       genericErc20Abi,
@@ -144,31 +172,7 @@ export class StepSharedState {
     return contract;
   }
 
-  public getProvider() {
+  static getProvider() {
     return provider;
   }
 }
-
-/**
- * Generate a ethSigner/starkSigner object from a private key.
- */
-const generateWalletConnection = async (
-  privateKey: string,
-  starkPrivateKey: string,
-  provider: JsonRpcProvider,
-): Promise<WalletConnection> => {
-  if (!privateKey) {
-    throw new Error('PrivateKey required!');
-  }
-
-  // L1 credentials
-  const ethSigner = new Wallet(privateKey).connect(provider);
-
-  // L2 credentials
-  const starkSigner = createStarkSigner(starkPrivateKey);
-
-  return {
-    ethSigner,
-    starkSigner,
-  };
-};

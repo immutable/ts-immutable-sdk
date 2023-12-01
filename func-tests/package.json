@@ -2,6 +2,7 @@
   "name": "func-tests",
   "packageManager": "yarn@3.6.1",
   "devDependencies": {
+    "@swc/jest": "^0.2.29",
     "@types/node": "^20.10.1",
     "husky": "^8.0.0",
     "jest": "^29.7.0",
@@ -21,6 +22,7 @@
     "@ethersproject/providers": "^5.7.2",
     "@ethersproject/wallet": "^5.7.0",
     "@imtbl/core-sdk": "^2.4.1",
+    "@imtbl/sdk": "file:../sdk",
     "dotenv": "^16.3.1"
   }
 }
