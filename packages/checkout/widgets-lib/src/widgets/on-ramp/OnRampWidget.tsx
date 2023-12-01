@@ -31,7 +31,7 @@ export type OnRampWidgetInputs = OnRampWidgetParams & {
   config: StrongCheckoutWidgetsConfig
 };
 
-export function OnRampWidget({
+export default function OnRampWidget({
   amount, contractAddress, config,
 }: OnRampWidgetInputs) {
   const {

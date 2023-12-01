@@ -58,7 +58,7 @@ export type BridgeWidgetInputs = BridgeWidgetParams & {
   config: StrongCheckoutWidgetsConfig,
 };
 
-export function BridgeWidget({
+export default function BridgeWidget({
   amount,
   fromContractAddress,
   config,

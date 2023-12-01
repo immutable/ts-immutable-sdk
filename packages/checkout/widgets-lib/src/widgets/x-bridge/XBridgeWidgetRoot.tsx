@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import {
   BridgeWidgetParams,
   IMTBLWidgetEvents,
@@ -10,7 +10,8 @@ import {
 import { Base } from 'widgets/BaseWidgetRoot';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
 import { isValidWalletProvider, isValidAmount, isValidAddress } from 'lib/validations/widgetValidators';
-import { XBridgeWidget } from 'widgets/x-bridge/XBridgeWidget';
+
+const XBridgeWidget = React.lazy(() => import('./XBridgeWidget'));
 
 export class XBridge extends Base<WidgetType.BRIDGE> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT;
@@ -61,11 +62,13 @@ export class XBridge extends Base<WidgetType.BRIDGE> {
         <CustomAnalyticsProvider
           widgetConfig={this.strongConfig()}
         >
-          <XBridgeWidget
-            checkout={this.checkout}
-            config={this.strongConfig()}
-            web3Provider={this.web3Provider}
-          />
+          <Suspense fallback={<div>Loading..</div>}>
+            <XBridgeWidget
+              checkout={this.checkout}
+              config={this.strongConfig()}
+              web3Provider={this.web3Provider}
+            />
+          </Suspense>
         </CustomAnalyticsProvider>
       </React.StrictMode>,
     );

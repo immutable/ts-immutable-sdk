@@ -61,7 +61,7 @@ export type SwapWidgetInputs = SwapWidgetParams & {
   config: StrongCheckoutWidgetsConfig;
 };
 
-export function SwapWidget({
+export default function SwapWidget({
   amount,
   fromContractAddress,
   toContractAddress,

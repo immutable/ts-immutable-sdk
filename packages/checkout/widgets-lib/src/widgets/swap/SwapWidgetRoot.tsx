@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import {
   ConnectTargetLayer,
   IMTBLWidgetEvents,
@@ -21,7 +21,8 @@ import { isValidAddress, isValidAmount, isValidWalletProvider } from 'lib/valida
 import { widgetTheme } from 'lib/theme';
 import { topUpBridgeOption, topUpOnRampOption } from './helpers';
 import { sendSwapWidgetCloseEvent } from './SwapWidgetEvents';
-import { SwapWidget } from './SwapWidget';
+
+const SwapWidget = React.lazy(() => import('./SwapWidget'));
 
 export class Swap extends Base<WidgetType.SWAP> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT;
@@ -152,12 +153,14 @@ export class Swap extends Base<WidgetType.SWAP> {
                     widgetConfig={this.strongConfig()}
                     closeEvent={() => sendSwapWidgetCloseEvent(window)}
                   >
-                    <SwapWidget
-                      fromContractAddress={this.parameters.fromContractAddress}
-                      toContractAddress={this.parameters.toContractAddress}
-                      amount={this.parameters.amount}
-                      config={this.strongConfig()}
-                    />
+                    <Suspense fallback={<div>Loading..</div>}>
+                      <SwapWidget
+                        fromContractAddress={this.parameters.fromContractAddress}
+                        toContractAddress={this.parameters.toContractAddress}
+                        amount={this.parameters.amount}
+                        config={this.strongConfig()}
+                      />
+                    </Suspense>
                   </ConnectLoader>
                 )}
               </CustomAnalyticsProvider>

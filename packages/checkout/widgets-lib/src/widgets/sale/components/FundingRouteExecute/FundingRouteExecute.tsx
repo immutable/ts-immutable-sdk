@@ -32,9 +32,9 @@ import { ViewActions, ViewContext } from '../../../../context/view-context/ViewC
 import { getL1ChainId, getL2ChainId } from '../../../../lib/networkUtils';
 import { text as textConfig } from '../../../../resources/text/textConfig';
 import { LoadingView } from '../../../../views/loading/LoadingView';
-import { BridgeWidget } from '../../../bridge/BridgeWidget';
-import { ConnectWidget } from '../../../connect/ConnectWidget';
-import { SwapWidget } from '../../../swap/SwapWidget';
+import BridgeWidget from '../../../bridge/BridgeWidget';
+import ConnectWidget from '../../../connect/ConnectWidget';
+import SwapWidget from '../../../swap/SwapWidget';
 import { useSaleContext } from '../../context/SaleContextProvider';
 import { SaleErrorTypes } from '../../types';
 

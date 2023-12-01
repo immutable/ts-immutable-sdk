@@ -36,7 +36,7 @@ export interface SaleWidgetProps {
   environmentId: string;
 }
 
-export function SaleWidget(props: SaleWidgetProps) {
+export default function SaleWidget(props: SaleWidgetProps) {
   const {
     config,
     amount,

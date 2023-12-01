@@ -12,7 +12,7 @@ import { Environment } from '@imtbl/config';
 import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
 import { Passport } from '@imtbl/passport';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
-import { ConnectWidget } from './ConnectWidget';
+import ConnectWidget from './ConnectWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 

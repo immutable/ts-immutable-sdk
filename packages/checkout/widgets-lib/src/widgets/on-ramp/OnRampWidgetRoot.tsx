@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import {
   ConnectTargetLayer,
   IMTBLWidgetEvents,
@@ -14,8 +14,9 @@ import { getL1ChainId, getL2ChainId } from 'lib';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
 import { isValidAddress, isValidAmount } from 'lib/validations/widgetValidators';
 import { BiomePortalIdProvider } from '@biom3/react';
-import { OnRampWidget } from './OnRampWidget';
 import { sendOnRampWidgetCloseEvent } from './OnRampWidgetEvents';
+
+const OnRampWidget = React.lazy(() => import('./OnRampWidget'));
 
 export class OnRamp extends Base<WidgetType.ONRAMP> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT;
@@ -74,11 +75,13 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
               params={connectLoaderParams}
               closeEvent={() => sendOnRampWidgetCloseEvent(window)}
             >
-              <OnRampWidget
-                contractAddress={this.parameters.contractAddress}
-                amount={this.parameters.amount}
-                config={this.strongConfig()}
-              />
+              <Suspense fallback={<div>Loading..</div>}>
+                <OnRampWidget
+                  contractAddress={this.parameters.contractAddress}
+                  amount={this.parameters.amount}
+                  config={this.strongConfig()}
+                />
+              </Suspense>
             </ConnectLoader>
           </CustomAnalyticsProvider>
         </BiomePortalIdProvider>

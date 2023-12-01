@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import {
   BridgeWidgetParams,
   ConnectTargetLayer,
@@ -19,7 +19,8 @@ import { widgetTheme } from 'lib/theme';
 import { isValidWalletProvider, isValidAmount, isValidAddress } from 'lib/validations/widgetValidators';
 import { BridgeComingSoon } from './views/BridgeComingSoon';
 import { sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
-import { BridgeWidget } from './BridgeWidget';
+
+const BridgeWidget = React.lazy(() => import('./BridgeWidget'));
 
 export class Bridge extends Base<WidgetType.BRIDGE> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT;
@@ -95,11 +96,13 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
               closeEvent={() => sendBridgeWidgetCloseEvent(window)}
               widgetConfig={this.strongConfig()}
             >
-              <BridgeWidget
-                amount={this.parameters.amount}
-                fromContractAddress={this.parameters.fromContractAddress}
-                config={this.strongConfig()}
-              />
+              <Suspense fallback={<div>Loading..</div>}>
+                <BridgeWidget
+                  amount={this.parameters.amount}
+                  fromContractAddress={this.parameters.fromContractAddress}
+                  config={this.strongConfig()}
+                />
+              </Suspense>
             </ConnectLoader>
           )}
 

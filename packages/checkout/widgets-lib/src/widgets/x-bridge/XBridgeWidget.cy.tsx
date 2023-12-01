@@ -7,7 +7,7 @@ import {
 import { Environment } from '@imtbl/config';
 import { StrongCheckoutWidgetsConfig } from 'lib/withDefaultWidgetConfig';
 import { Passport } from '@imtbl/passport';
-import { XBridgeWidget } from './XBridgeWidget';
+import XBridgeWidget from './XBridgeWidget';
 import { text } from '../../resources/text/textConfig';
 
 describe('XBridgeWidget', () => {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import {
   ConnectTargetLayer,
   IMTBLWidgetEvents,
@@ -15,7 +15,8 @@ import { getL2ChainId } from 'lib';
 import { isValidAmount, isValidWalletProvider } from 'lib/validations/widgetValidators';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
 import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
-import { SaleWidget } from './SaleWidget';
+
+const SaleWidget = React.lazy(() => import('./SaleWidget'));
 
 export class Sale extends Base<WidgetType.SALE> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_SALE_WIDGET_EVENT;
@@ -102,13 +103,15 @@ export class Sale extends Base<WidgetType.SALE> {
               sendSaleWidgetCloseEvent(window);
             }}
           >
-            <SaleWidget
-              config={this.strongConfig()}
-              amount={this.parameters.amount!}
-              items={this.parameters.items!}
-              fromContractAddress={this.parameters.fromContractAddress!}
-              environmentId={this.parameters.environmentId!}
-            />
+            <Suspense fallback={<div>Loading..</div>}>
+              <SaleWidget
+                config={this.strongConfig()}
+                amount={this.parameters.amount!}
+                items={this.parameters.items!}
+                fromContractAddress={this.parameters.fromContractAddress!}
+                environmentId={this.parameters.environmentId!}
+              />
+            </Suspense>
           </ConnectLoader>
         </CustomAnalyticsProvider>
       </React.StrictMode>,
