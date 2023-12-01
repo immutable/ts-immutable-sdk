@@ -1,6 +1,6 @@
 import { ChainId, ChainName } from '@imtbl/checkout-sdk';
 import { MenuItem } from '@biom3/react';
-import { networkItemStyles } from './BridgeNetworkItemStyles';
+import { networkItemStyles } from './NetworkItemStyles';
 
 const networkIcon = {
   [ChainId.IMTBL_ZKEVM_DEVNET]: 'Immutable',
@@ -15,7 +15,7 @@ export interface BridgeNetworkProps {
   chainName: ChainName
   onNetworkClick: (chainId: ChainId) => Promise<void>;
 }
-export function BridgeNetworkItem({
+export function NetworkItem({
   testId,
   chainId,
   chainName,
