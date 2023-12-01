@@ -621,7 +621,14 @@ export class TokenBridge {
       sourceAxelar.symbol,
       gasLimit,
       gasMultiplier,
-    ) as AxelarQueryAPIFeeResponse;
+    );
+
+    if (typeof estimateGasFeeResult === 'string') {
+      throw new BridgeError(
+        `Estimating Axelar Gas failed with the reason: ${estimateGasFeeResult}`,
+        BridgeErrorType.AXELAR_GAS_ESTIMATE_FAILED,
+      );
+    }
 
     return ethers.BigNumber.from(estimateGasFeeResult.executionFeeWithMultiplier);
   }
