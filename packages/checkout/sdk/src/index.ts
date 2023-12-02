@@ -1,4 +1,8 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+import { CheckoutApi } from './client';
+
 // Widgets
+
 import './widgets/definitions/global';
 
 export * from './widgets/definitions/events';
@@ -120,4 +124,5 @@ export type {
 export type { ErrorType } from './errors';
 export { CheckoutErrorType } from './errors';
 export { CheckoutConfiguration } from './config';
-export { CHECKOUT_API_BASE_URL } from './env';
+
+export const Clients = { CheckoutApi };
