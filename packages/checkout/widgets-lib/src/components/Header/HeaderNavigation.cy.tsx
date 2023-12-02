@@ -49,7 +49,7 @@ describe('HeaderNavigation', () => {
           <SimpleLayout
             header={(
               <HeaderNavigation
-                rightSlot={(
+                rightActions={(
                   <ButtCon
                     icon="SettingsCog"
                     sx={ButtonNavigationStyles()}

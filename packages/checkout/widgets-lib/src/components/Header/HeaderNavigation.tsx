@@ -12,7 +12,7 @@ export interface HeaderNavigationProps {
   transparent?: boolean;
   onBackButtonClick?: () => void;
   onCloseButtonClick?: () => void;
-  rightSlot?: ReactNode;
+  rightActions?: ReactNode;
 }
 
 export function HeaderNavigation({
@@ -21,7 +21,7 @@ export function HeaderNavigation({
   transparent = false,
   onBackButtonClick,
   onCloseButtonClick,
-  rightSlot,
+  rightActions,
 }: HeaderNavigationProps) {
   const { viewDispatch } = useContext(ViewContext);
 
@@ -61,7 +61,7 @@ export function HeaderNavigation({
         {title}
       </AppHeaderBar.Title>
       <AppHeaderBar.RightHandButtons>
-        {rightSlot}
+        {rightActions}
         {onCloseButtonClick && (
           <ButtCon
             iconVariant="bold"

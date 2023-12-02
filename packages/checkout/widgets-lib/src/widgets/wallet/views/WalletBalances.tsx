@@ -205,7 +205,7 @@ export function WalletBalances({
       header={(
         <HeaderNavigation
           title={header.title}
-          rightSlot={(
+          rightActions={(
             <ButtCon
               icon="SettingsCog"
               sx={ButtonNavigationStyles()}
