@@ -539,7 +539,7 @@ export class TokenBridge {
       );
     }
 
-    // If the token is not native, it must be a valid address
+    // The source chain and destination chain should not be the same
     if (sourceChainId === destinationChainId) {
       throw new BridgeError(
         `the sourceChainId ${sourceChainId} cannot be the same as the destinationChainId ${destinationChainId}`,
