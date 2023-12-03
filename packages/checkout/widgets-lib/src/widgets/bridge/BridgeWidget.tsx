@@ -46,6 +46,7 @@ import { ErrorView } from '../../views/error/ErrorView';
 import { text } from '../../resources/text/textConfig';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { sendBridgeFailedEvent, sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
+import { Transactions } from '../../components/Transactions/Index';
 
 export type BridgeWidgetInputs = BridgeWidgetParams & {
   config: StrongCheckoutWidgetsConfig,
@@ -193,6 +194,9 @@ export function BridgeWidget({
               approveTransaction={viewState.view.approveTransaction}
               transaction={viewState.view.transaction}
             />
+          )}
+          {viewState.view.type === XBridgeWidgetViews.TRANSACTIONS && (
+            <Transactions />
           )}
           {viewState.view.type === SharedViews.ERROR_VIEW && (
             <ErrorView

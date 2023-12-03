@@ -446,6 +446,24 @@ export const text = {
       body1: (symbol: string) => `Less than 3 mins until your ${symbol} lands on zkEVM.`,
       body2: 'You can close this window, the transaction will be reflected in your wallet once complete.',
     },
+    [XBridgeWidgetViews.TRANSACTIONS]: {
+      layoutHeading: 'Transaction status',
+      status: {
+        inProgress: {
+          heading: 'In Progress',
+        },
+        finished: {
+          heading: 'Finished',
+        },
+        actionRequired: {
+          heading: 'Action Required',
+          claim: 'Claim',
+          claimBanner: 'Claim your coins to finish your withdrawal.',
+          topup: 'Review & sign',
+          toptupBanner: 'Add gas to complete this move.',
+        },
+      },
+    },
   },
   footers: {
     quickswapFooter: {
