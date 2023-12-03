@@ -51,7 +51,7 @@ export class TokenBridge {
   /**
    * Constructs a TokenBridge instance.
    *
-   * @param {BridgeConfiguration} config - The bridge configuration object.ƒ
+   * @param {BridgeConfiguration} config - The bridge configuration object.
    */
   constructor(config: BridgeConfiguration) {
     this.config = config;
