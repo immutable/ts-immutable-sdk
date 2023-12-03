@@ -517,8 +517,8 @@ export class TokenBridge {
     sourceChainId: string,
     destinationChainId: string,
   ) {
-    const isSourceChainRootOrChildChain = sourceChainId !== this.config.bridgeInstance.rootChainID.toString()
-      && sourceChainId !== this.config.bridgeInstance.childChainID.toString();
+    const isSourceChainRootOrChildChain = sourceChainId === this.config.bridgeInstance.rootChainID
+      || sourceChainId === this.config.bridgeInstance.childChainID;
 
     // The source chain must be one of either the configured root chain or the configured child chain
     if (!isSourceChainRootOrChildChain) {
@@ -528,9 +528,11 @@ export class TokenBridge {
       );
     }
 
+    const isDestinationChainRootOrChildChain = destinationChainId === this.config.bridgeInstance.rootChainID
+      || destinationChainId === this.config.bridgeInstance.childChainID;
+
     // If the token is not native, it must be a valid address
-    if (destinationChainId !== this.config.bridgeInstance.rootChainID.toString()
-      && destinationChainId !== this.config.bridgeInstance.childChainID.toString()) {
+    if (!isDestinationChainRootOrChildChain) {
       throw new BridgeError(
         `the destinationChainId ${destinationChainId} is not a valid`,
         BridgeErrorType.INVALID_DESTINATION_CHAIN_ID,
@@ -538,7 +540,7 @@ export class TokenBridge {
     }
 
     // If the token is not native, it must be a valid address
-    if (sourceChainId === destinationChainId.toString()) {
+    if (sourceChainId === destinationChainId) {
       throw new BridgeError(
         `the sourceChainId ${sourceChainId} cannot be the same as the destinationChainId ${destinationChainId}`,
         BridgeErrorType.CHAIN_IDS_MATCH,
@@ -556,7 +558,7 @@ export class TokenBridge {
       BridgeErrorType.PROVIDER_ERROR,
     );
 
-    if (rootNetwork!.chainId.toString() !== this.config.bridgeInstance.rootChainID.toString()) {
+    if (rootNetwork!.chainId.toString() !== this.config.bridgeInstance.rootChainID) {
       throw new BridgeError(
         `Rootchain provider chainID ${rootNetwork!.chainId} does not match expected chainID ${this.config.bridgeInstance.rootChainID}. ${errMessage}`,
         BridgeErrorType.UNSUPPORTED_ERROR,
@@ -565,7 +567,7 @@ export class TokenBridge {
 
     const childNetwork = await this.config.childProvider.getNetwork();
 
-    if (childNetwork.chainId.toString() !== this.config.bridgeInstance.childChainID.toString()) {
+    if (childNetwork.chainId.toString() !== this.config.bridgeInstance.childChainID) {
       throw new BridgeError(
         `Childchain provider chainID ${childNetwork.chainId} does not match expected chainID ${this.config.bridgeInstance.childChainID}. ${errMessage}`,
         BridgeErrorType.UNSUPPORTED_ERROR,
