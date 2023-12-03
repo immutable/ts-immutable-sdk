@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@biom3/design-tokens": "0.2.9",
-    "@biom3/react": "^0.19.6",
+    "@biom3/react": "^0.19.11",
     "@imtbl/blockchain-data": "0.0.0",
     "@imtbl/passport": "0.0.0",
     "@imtbl/sdk": "0.0.0",
