@@ -6,6 +6,7 @@ import { BridgeWidgetView, PrefilledBridgeForm } from './BridgeViewContextTypes'
 import { SaleWidgetView } from './SaleViewContextTypes';
 import { ViewType } from './ViewType';
 import { OnRampWidgetView } from './OnRampViewContextTypes';
+import { XBridgeWidgetView } from './XBridgeViewContextTypes';
 
 export enum SharedViews {
   LOADING_VIEW = 'LOADING_VIEW',
@@ -48,7 +49,8 @@ export type View =
   | SwapWidgetView
   | BridgeWidgetView
   | OnRampWidgetView
-  | SaleWidgetView;
+  | SaleWidgetView
+  | XBridgeWidgetView;
 
 export interface ViewState {
   view: View;

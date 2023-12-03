@@ -3,7 +3,6 @@
     "sdk/",
     "packages/blockchain-data/sdk/",
     "packages/checkout/sdk/",
-    "packages/checkout/widgets/",
     "packages/config/",
     "packages/economy/sdk/",
     "packages/immutablex_client/",

@@ -8,7 +8,6 @@ import { gameBridgeVersionCheck } from '@imtbl/version-check';
 const scope = 'openid offline_access profile email transact';
 const audience = 'platform_api';
 const redirectUri = 'https://localhost:3000/'; // Not required
-const logoutRedirectUri = 'https://localhost:3000/'; // Not required
 
 const keyFunctionName = 'fxName';
 const keyRequestId = 'requestId';
@@ -23,12 +22,13 @@ const sdkVersionSha = '__SDK_VERSION_SHA__';
 const PASSPORT_FUNCTIONS = {
   init: 'init',
   connect: 'connect',
+  reconnect: 'reconnect',
   getPKCEAuthUrl: 'getPKCEAuthUrl',
   connectPKCE: 'connectPKCE',
   confirmCode: 'confirmCode',
-  connectWithCredentials: 'connectWithCredentials',
+  getAccessToken: 'getAccessToken',
+  getIdToken: 'getIdToken',
   getAddress: 'getAddress',
-  checkStoredCredentials: 'checkStoredCredentials',
   logout: 'logout',
   getEmail: 'getEmail',
   imx: {
@@ -133,7 +133,7 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
             audience,
             scope,
             redirectUri: (redirect ?? redirectUri),
-            logoutRedirectUri,
+            logoutRedirectUri: request?.logoutRedirectUri,
             crossSdkBridgeEnabled: true,
           };
           passportClient = new passport.Passport(passportConfig);
@@ -172,6 +172,21 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
         });
         break;
       }
+      case PASSPORT_FUNCTIONS.reconnect: {
+        let success = false;
+        const userInfo = await passportClient?.login({ useCachedSession: true });
+        if (userInfo) {
+          const passportProvider = await passportClient?.connectImx();
+          success = setProvider(passportProvider);
+        }
+
+        callbackToGame({
+          responseFor: fxName,
+          requestId,
+          success,
+        });
+        break;
+      }
       case PASSPORT_FUNCTIONS.getPKCEAuthUrl: {
         const response = passportClient?.getPKCEAuthorizationUrl();
         callbackToGame({
@@ -195,30 +210,12 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
       }
       case PASSPORT_FUNCTIONS.confirmCode: {
         const request = JSON.parse(data);
-        const passportProvider = await passportClient?.connectImxDeviceFlow(
+        await passportClient?.loginWithDeviceFlowCallback(
           request.deviceCode,
           request.interval,
           request.timeoutMs ?? null,
         );
-        const success = setProvider(passportProvider);
-        callbackToGame({
-          responseFor: fxName,
-          requestId,
-          success,
-        });
-        break;
-      }
-      case PASSPORT_FUNCTIONS.connectWithCredentials: {
-        const credentials = JSON.parse(data);
-        /* eslint-disable @typescript-eslint/naming-convention */
-        const passportProvider = await passportClient?.connectImxWithCredentials({
-          access_token: credentials.accessToken,
-          refresh_token: credentials.refreshToken,
-          id_token: credentials.idToken,
-          token_type: credentials.tokenType,
-          expires_in: credentials.expiresIn,
-        });
-        /* eslint-enable @typescript-eslint/naming-convention */
+        const passportProvider = await passportClient?.connectImx();
         const success = setProvider(passportProvider);
         callbackToGame({
           responseFor: fxName,
@@ -237,6 +234,26 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
         });
         break;
       }
+      case PASSPORT_FUNCTIONS.getAccessToken: {
+        const accessToken = await passportClient?.getAccessToken();
+        callbackToGame({
+          responseFor: fxName,
+          requestId,
+          success: true,
+          result: accessToken,
+        });
+        break;
+      }
+      case PASSPORT_FUNCTIONS.getIdToken: {
+        const idToken = await passportClient?.getIdToken();
+        callbackToGame({
+          responseFor: fxName,
+          requestId,
+          success: true,
+          result: idToken,
+        });
+        break;
+      }
       case PASSPORT_FUNCTIONS.getAddress: {
         const address = await providerInstance?.getAddress();
         callbackToGame({
@@ -247,31 +264,18 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
         });
         break;
       }
-      case PASSPORT_FUNCTIONS.checkStoredCredentials: {
-        const credentials = passportClient?.checkStoredDeviceFlowCredentials();
-        callbackToGame({
-          responseFor: fxName,
-          requestId,
-          success: true,
-          accessToken: credentials?.access_token,
-          refreshToken: credentials?.refresh_token,
-          idToken: credentials?.id_token,
-          tokenType: credentials?.token_type,
-          expiresIn: credentials?.expires_in,
-        });
-        break;
-      }
       case PASSPORT_FUNCTIONS.logout: {
-        await passportClient?.logoutDeviceFlow();
+        const deviceFlowEndSessionEndpoint = await passportClient?.logoutDeviceFlow();
         callbackToGame({
           responseFor: fxName,
           requestId,
           success: true,
+          result: deviceFlowEndSessionEndpoint,
         });
         break;
       }
       case PASSPORT_FUNCTIONS.getEmail: {
-        const userProfile = await passportClient?.getUserInfoDeviceFlow();
+        const userProfile = await passportClient?.getUserInfo();
         callbackToGame({
           responseFor: fxName,
           requestId,

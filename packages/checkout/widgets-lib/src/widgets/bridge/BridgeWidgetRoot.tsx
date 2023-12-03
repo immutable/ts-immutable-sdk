@@ -102,6 +102,7 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
               />
             </ConnectLoader>
           )}
+
         </CustomAnalyticsProvider>
       </React.StrictMode>,
     );

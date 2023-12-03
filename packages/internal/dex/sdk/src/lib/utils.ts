@@ -3,6 +3,7 @@ import * as Uniswap from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
 import { ProviderCallError } from 'errors';
 import { Amount, Coin, CoinAmount, ERC20, Native, Token } from 'types';
+import { DEFAULT_DEADLINE_SECONDS } from 'constants/router';
 
 export const quoteReturnMapping: { [signature: string]: string[] } = {
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -157,13 +158,13 @@ export const subtractAmount = <T extends Coin>(a: CoinAmount<T>, b: CoinAmount<T
 /**
  * Converts our internal token type which could be ERC20 or Native
  * into a format consumable by Checkout. They require an address to be
- * present. We populate the address with empty string if it's Native.
+ * present. We populate the address with the string 'native' if it's Native.
  * If it's ERC20, we don't need to change it.
  */
 export const toPublicTokenType = (token: Coin): Token => {
   if (token.type === 'native') {
     return {
-      address: '',
+      address: 'native',
       chainId: token.chainId,
       decimals: token.decimals,
       symbol: token.symbol,
@@ -178,3 +179,5 @@ export const toPublicAmount = (amount: CoinAmount<Coin>): Amount => ({
   token: toPublicTokenType(amount.token),
   value: amount.value,
 });
+
+export const getDefaultDeadlineSeconds = (): number => Math.floor(Date.now() / 1000) + DEFAULT_DEADLINE_SECONDS;

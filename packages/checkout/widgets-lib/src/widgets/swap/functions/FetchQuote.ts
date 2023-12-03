@@ -15,8 +15,8 @@ const fromAmountIn = async (
   const address = await provider.getSigner().getAddress();
   return exchange.getUnsignedSwapTxFromAmountIn(
     address,
-    fromToken.address || '',
-    toToken.address || '',
+    fromToken.address as string,
+    toToken.address as string,
     BigNumber.from(utils.parseUnits(fromAmount, fromToken.decimals)),
   );
 };
@@ -31,8 +31,8 @@ const fromAmountOut = async (
   const address = await provider.getSigner().getAddress();
   return exchange.getUnsignedSwapTxFromAmountOut(
     address,
-    fromToken.address || '',
-    toToken.address || '',
+    fromToken.address as string,
+    toToken.address as string,
     BigNumber.from(utils.parseUnits(toAmount, toToken.decimals)),
   );
 };

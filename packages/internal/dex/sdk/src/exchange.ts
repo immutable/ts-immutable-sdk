@@ -8,14 +8,22 @@ import { getOurQuoteReqAmount, prepareUserQuote } from 'lib/transactionUtils/get
 import { Fees } from 'lib/fees';
 import { SecondaryFee__factory } from 'contracts/types';
 import { NativeTokenService } from 'lib/nativeTokenService';
-import { DEFAULT_DEADLINE, DEFAULT_MAX_HOPS, DEFAULT_SLIPPAGE, MAX_MAX_HOPS, MIN_MAX_HOPS } from './constants';
+import { DEFAULT_MAX_HOPS, DEFAULT_SLIPPAGE, MAX_MAX_HOPS, MIN_MAX_HOPS } from './constants';
 import { Router } from './lib/router';
-import { getTokenDecimals, isValidNonZeroAddress, isValidTokenLiteral, newAmount, toPublicAmount } from './lib/utils';
+import {
+  getDefaultDeadlineSeconds,
+  getTokenDecimals,
+  isValidNonZeroAddress,
+  isValidTokenLiteral,
+  newAmount,
+  toPublicAmount,
+} from './lib/utils';
 import {
   Coin,
   CoinAmount,
   ERC20,
   ExchangeModuleConfiguration,
+  Native,
   Quote,
   SecondaryFee,
   TransactionResponse,
@@ -45,7 +53,7 @@ export class Exchange {
 
   private chainId: number;
 
-  private nativeToken: Coin;
+  private nativeToken: Native;
 
   private wrappedNativeToken: ERC20;
 
@@ -228,7 +236,7 @@ export class Exchange {
     amountIn: ethers.BigNumberish,
     slippagePercent: number = DEFAULT_SLIPPAGE,
     maxHops: number = DEFAULT_MAX_HOPS,
-    deadline: number = DEFAULT_DEADLINE,
+    deadline: number = getDefaultDeadlineSeconds(),
   ): Promise<TransactionResponse> {
     return await this.getUnsignedSwapTx(
       fromAddress,
@@ -262,7 +270,7 @@ export class Exchange {
     amountOut: ethers.BigNumberish,
     slippagePercent: number = DEFAULT_SLIPPAGE,
     maxHops: number = DEFAULT_MAX_HOPS,
-    deadline: number = DEFAULT_DEADLINE,
+    deadline: number = getDefaultDeadlineSeconds(),
   ): Promise<TransactionResponse> {
     return await this.getUnsignedSwapTx(
       fromAddress,

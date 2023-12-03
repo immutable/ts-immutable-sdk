@@ -11,8 +11,8 @@ import {
   BridgeConfig,
   ChainId,
   DexConfig,
-  IMX_ADDRESS_ZKEVM,
-  OnRampConfig, OnRampProvider,
+  OnRampConfig,
+  OnRampProvider,
   OnRampProviderConfig,
 } from '../../types';
 import { TokenBalanceResult } from '../routing/types';
@@ -54,7 +54,6 @@ describe('allowListCheck', () => {
 
     dexConfig = {
       tokens: [{
-        address: IMX_ADDRESS_ZKEVM,
         decimals: 18,
         symbol: 'IMX',
         name: 'IMX',
@@ -71,7 +70,6 @@ describe('allowListCheck', () => {
       [OnRampProvider.TRANSAK]: {
         publishableApiKey: '',
         tokens: [{
-          address: IMX_ADDRESS_ZKEVM,
           decimals: 18,
           symbol: 'IMX',
           name: 'IMX',
@@ -87,7 +85,6 @@ describe('allowListCheck', () => {
             balance: BigNumber.from(10),
             formattedBalance: '10',
             token: {
-              address: IMX_ADDRESS_ZKEVM,
               decimals: 18,
               symbol: 'IMX',
               name: 'IMX',
@@ -128,7 +125,6 @@ describe('allowListCheck', () => {
       const allowList = await allowListCheck(config, balances, availableRoutingOptions);
       expect(allowList).toEqual({
         swap: [{
-          address: IMX_ADDRESS_ZKEVM,
           decimals: 18,
           symbol: 'IMX',
           name: 'IMX',
@@ -140,7 +136,6 @@ describe('allowListCheck', () => {
         }],
         onRamp: {
           [OnRampProvider.TRANSAK]: [{
-            address: IMX_ADDRESS_ZKEVM,
             decimals: 18,
             symbol: 'IMX',
             name: 'IMX',
@@ -172,7 +167,6 @@ describe('allowListCheck', () => {
         bridge: [],
         onRamp: {},
         swap: [{
-          address: IMX_ADDRESS_ZKEVM,
           decimals: 18,
           symbol: 'IMX',
           name: 'IMX',
@@ -188,7 +182,6 @@ describe('allowListCheck', () => {
         bridge: [],
         onRamp: {
           [OnRampProvider.TRANSAK]: [{
-            address: IMX_ADDRESS_ZKEVM,
             decimals: 18,
             symbol: 'IMX',
             name: 'IMX',
@@ -314,7 +307,6 @@ describe('allowListCheck', () => {
     it('should return swap allowlist', async () => {
       const result = await allowListCheckForSwap(config, balances, { swap: true });
       expect(result).toEqual([{
-        address: IMX_ADDRESS_ZKEVM,
         decimals: 18,
         symbol: 'IMX',
         name: 'IMX',
@@ -360,7 +352,6 @@ describe('allowListCheck', () => {
       const result = await allowListCheckForOnRamp(config, { onRamp: true });
       expect(result).toEqual({
         [OnRampProvider.TRANSAK]: [{
-          address: IMX_ADDRESS_ZKEVM,
           decimals: 18,
           symbol: 'IMX',
           name: 'IMX',

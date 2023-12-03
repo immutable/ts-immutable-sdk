@@ -22,9 +22,9 @@ import { ConnectionStatus } from '../../../../context/connect-loader-context/Con
 import {
   ConnectLoaderTestComponent,
 } from '../../../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
-import { IMX_ADDRESS_ZKEVM } from '../../../../lib';
 import { CustomAnalyticsProvider } from '../../../../context/analytics-provider/CustomAnalyticsProvider';
 import { StrongCheckoutWidgetsConfig } from '../../../../lib/withDefaultWidgetConfig';
+import { NATIVE } from '../../../../lib';
 
 describe('BalanceItem', () => {
   const connectLoaderState = {
@@ -42,7 +42,7 @@ describe('BalanceItem', () => {
       name: 'Immutable X',
       symbol: 'IMX',
       decimals: 18,
-      address: IMX_ADDRESS_ZKEVM,
+      address: NATIVE,
     },
   }];
 
@@ -58,7 +58,7 @@ describe('BalanceItem', () => {
     id: '1',
     symbol: 'IMX',
     balance: '21.32',
-    address: IMX_ADDRESS_ZKEVM,
+    address: NATIVE,
     description: 'some description',
   };
 
@@ -105,7 +105,7 @@ describe('BalanceItem', () => {
           name: 'IMX',
           symbol: 'IMX',
           decimals: 18,
-          address: IMX_ADDRESS_ZKEVM,
+          address: NATIVE,
         },
         isSupported: true,
       },
@@ -228,7 +228,7 @@ describe('BalanceItem', () => {
             name: 'tIMX',
             symbol: 'tIMX',
             decimals: 18,
-            address: IMX_ADDRESS_ZKEVM,
+            address: NATIVE,
           },
         ],
       });
@@ -284,7 +284,7 @@ describe('BalanceItem', () => {
             name: 'tIMX',
             symbol: 'tIMX',
             decimals: 18,
-            address: IMX_ADDRESS_ZKEVM,
+            address: NATIVE,
           },
         ],
       });
@@ -432,7 +432,7 @@ describe('BalanceItem', () => {
             name: 'tIMX',
             symbol: 'tIMX',
             decimals: 18,
-            address: IMX_ADDRESS_ZKEVM,
+            address: NATIVE,
           },
         ],
       });
@@ -518,7 +518,7 @@ describe('BalanceItem', () => {
               name: 'tIMX',
               symbol: 'tIMX',
               decimals: 18,
-              address: IMX_ADDRESS_ZKEVM,
+              address: NATIVE,
             },
           ],
         });
@@ -567,7 +567,7 @@ describe('BalanceItem', () => {
         IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
         {
           toTokenAddress: '',
-          fromTokenAddress: IMX_ADDRESS_ZKEVM,
+          fromTokenAddress: NATIVE,
           amount: '',
         },
       );
@@ -596,7 +596,7 @@ describe('BalanceItem', () => {
         window,
         IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
         {
-          tokenAddress: IMX_ADDRESS_ZKEVM,
+          tokenAddress: NATIVE,
           amount: '',
         },
       );
