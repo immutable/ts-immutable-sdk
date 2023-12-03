@@ -50,7 +50,7 @@ export class TokenBridge {
   /**
    * Constructs a TokenBridge instance.
    *
-   * @param {BridgeConfiguration} config - The bridge configuration object.ƒ
+   * @param {BridgeConfiguration} config - The bridge configuration object.
    */
   constructor(config: BridgeConfiguration) {
     this.config = config;
@@ -517,9 +517,11 @@ export class TokenBridge {
     sourceChainId: string,
     destinationChainId: string,
   ) {
-    // If the token is not native, it must be a valid address
-    if (sourceChainId !== this.config.bridgeInstance.rootChainID.toString()
-      && sourceChainId !== this.config.bridgeInstance.childChainID.toString()) {
+    const isSourceChainRootOrChildChain = sourceChainId !== this.config.bridgeInstance.rootChainID.toString()
+      && sourceChainId !== this.config.bridgeInstance.childChainID.toString()
+     
+     // The source chain must be one of either the configured root chain or the configured child chain
+    if (!isSourceChainRootOrChildChain) {
       throw new BridgeError(
         `the sourceChainId ${sourceChainId} is not a valid`,
         BridgeErrorType.INVALID_SOURCE_CHAIN_ID,
