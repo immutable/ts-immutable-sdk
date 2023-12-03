@@ -64,11 +64,6 @@ export class BridgeConfiguration {
    * @property {BridgeContracts} bridgeContracts - The configuration of the contracts associated with the bridge.
    * @property {ethers.providers.Provider} rootProvider - The Ethereum provider for the root chain.
    * @property {ethers.providers.Provider} childProvider - The Ethereum provider for the child chain.
-   * @property {number} blockTime - The approximate block time
-   * @property {number} pollInterval - The time to wait between polls to the blockchain
-   * @property {number} maxDepositBlockDelay - The maximum number of blocks it should take on child chain for deposit to be observed
-   * @property {number} clockInaccuracy - The maximum number of seconds of inaccuracy of blockchain timestamps
-   * @property {number} rootChainFinalityBlocks - The number of blocks to wait for on the rootchain before accepting finality
   */
   public baseConfig: ImmutableConfiguration;
 
@@ -79,16 +74,6 @@ export class BridgeConfiguration {
   public rootProvider: ethers.providers.Provider;
 
   public childProvider: ethers.providers.Provider;
-
-  public blockTime: number;
-
-  public pollInterval: number;
-
-  public maxDepositBlockDelay: number;
-
-  public clockInaccuracy: number;
-
-  public rootChainFinalityBlocks: number;
 
   /**
    * Constructs a BridgeConfiguration instance.
@@ -106,18 +91,6 @@ export class BridgeConfiguration {
     this.bridgeInstance = bridgeInstance;
     this.rootProvider = rootProvider;
     this.childProvider = childProvider;
-
-    // Does not need to be exact, just approximate
-    this.blockTime = 12;
-    // How frequently we poll the childchain for StateSync events
-    this.pollInterval = 5 * 1000; // 5 seconds
-    // The upper bound of the block range we poll for StateSync events
-    this.maxDepositBlockDelay = 250;
-    // Assume that the clock timestamp is at most 900 seconds inaccurate, see for more ->
-    // https://github.com/ethereum/wiki/blob/c02254611f218f43cbb07517ca8e5d00fd6d6d75/Block-Protocol-2.0.md
-    this.clockInaccuracy = 900;
-    // How many blocks to wait for on the root chain before accepting rootchain finality
-    this.rootChainFinalityBlocks = 3;
 
     if (overrides) {
       this.bridgeContracts = overrides.bridgeContracts;

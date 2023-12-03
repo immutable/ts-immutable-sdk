@@ -518,9 +518,9 @@ export class TokenBridge {
     destinationChainId: string,
   ) {
     const isSourceChainRootOrChildChain = sourceChainId !== this.config.bridgeInstance.rootChainID.toString()
-      && sourceChainId !== this.config.bridgeInstance.childChainID.toString()
-     
-     // The source chain must be one of either the configured root chain or the configured child chain
+      && sourceChainId !== this.config.bridgeInstance.childChainID.toString();
+
+    // The source chain must be one of either the configured root chain or the configured child chain
     if (!isSourceChainRootOrChildChain) {
       throw new BridgeError(
         `the sourceChainId ${sourceChainId} is not a valid`,
