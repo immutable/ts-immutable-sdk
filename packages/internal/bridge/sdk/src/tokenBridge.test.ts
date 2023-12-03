@@ -144,11 +144,11 @@ describe('Token Bridge', () => {
     const originalValidateChainConfiguration = TokenBridge.prototype['validateChainConfiguration'];
     const originalGetFee = TokenBridge.prototype['getFee'];
 
-    const sourceChainFee:ethers.BigNumber = ethers.utils.parseUnits('0.000001', 18);
-    const destinationChainFee:ethers.BigNumber = ethers.utils.parseUnits('0.000001', 18);
+    const sourceChainGas:ethers.BigNumber = ethers.utils.parseUnits('0.000001', 18);
+    const destinationChainGas:ethers.BigNumber = ethers.utils.parseUnits('0.000001', 18);
     const bridgeFee:ethers.BigNumber = ethers.utils.parseUnits('0.0001', 18);
-    const networkFee:ethers.BigNumber = ethers.BigNumber.from(0);
-    const totalFee:ethers.BigNumber = sourceChainFee.add(bridgeFee).add(networkFee);
+    const imtblFee:ethers.BigNumber = ethers.BigNumber.from(0);
+    const totalFees:ethers.BigNumber = sourceChainGas.add(bridgeFee).add(imtblFee);
 
     let tokenBridge: TokenBridge;
     let bridgeConfig: BridgeConfiguration;
@@ -168,11 +168,11 @@ describe('Token Bridge', () => {
         .mockImplementation(async () => 'Valid');
       jest.spyOn(TokenBridge.prototype as any, 'getFee')
         .mockImplementation(async () => ({
-          sourceChainFee,
-          destinationChainFee,
+          sourceChainGas,
+          destinationChainGas,
           bridgeFee,
-          networkFee,
-          totalFee,
+          imtblFee,
+          totalFees,
         }));
     });
     afterEach(() => {
@@ -533,11 +533,11 @@ describe('Token Bridge', () => {
     const originalGetGasEstimates = TokenBridge.prototype['getGasEstimates'];
     const originalCalculateBridgeFee = TokenBridge.prototype['calculateBridgeFee'];
 
-    const sourceChainFee:ethers.BigNumber = ethers.utils.parseUnits('0.000001', 18);
-    const destinationChainFee:ethers.BigNumber = ethers.utils.parseUnits('0.000001', 18);
+    const sourceChainGas:ethers.BigNumber = ethers.utils.parseUnits('0.000001', 18);
+    const destinationChainGas:ethers.BigNumber = ethers.utils.parseUnits('0.000001', 18);
     const bridgeFee:ethers.BigNumber = ethers.utils.parseUnits('0.0001', 18);
-    const networkFee:ethers.BigNumber = ethers.BigNumber.from(0);
-    const totalFee:ethers.BigNumber = sourceChainFee.add(bridgeFee).add(networkFee);
+    const imtblFee:ethers.BigNumber = ethers.BigNumber.from(0);
+    const totalFees:ethers.BigNumber = sourceChainGas.add(bridgeFee).add(imtblFee);
 
     beforeEach(() => {
       const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
@@ -578,11 +578,11 @@ describe('Token Bridge', () => {
       );
 
       expect(result).not.toBeNull();
-      expect(result.sourceChainFee).toStrictEqual(sourceChainFee);
-      expect(result.destinationChainFee).toStrictEqual(destinationChainFee);
+      expect(result.sourceChainGas).toStrictEqual(sourceChainGas);
+      expect(result.destinationChainGas).toStrictEqual(destinationChainGas);
       expect(result.bridgeFee).toStrictEqual(bridgeFee);
-      expect(result.networkFee).toStrictEqual(networkFee);
-      expect(result.totalFee).toStrictEqual(totalFee);
+      expect(result.imtblFee).toStrictEqual(imtblFee);
+      expect(result.totalFees).toStrictEqual(totalFees);
     });
   });
 

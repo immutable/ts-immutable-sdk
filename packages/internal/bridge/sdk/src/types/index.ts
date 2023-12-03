@@ -134,15 +134,25 @@ export interface BridgeFeeRequest {
 
 /**
  * @typedef {Object} BridgeFeeResponse
- * @property {boolean} bridgeable - Indicates whether the token can be bridged or not.
- * @property {ethers.BigNumber} feeAmount - The fee amount for bridging the token.
+ * @property {ethers.BigNumber} sourceChainGas - Gas cost to send tokens to the bridge contract on the source chain.
+ * - priced in the source chain's native token.
+ * @property {ethers.BigNumber} destinationChainGas - Gas cost to issue bridged tokens on the destination chain.
+ * - priced in the destination chain's native token.
+ * @property {ethers.BigNumber} bridgeFee - Fee charged by Axelar to validate the bridge event and
+ * issue the tokens on the destination chain (includes destinationChainGas).
+ * - priced in the source chain's native token.
+ * @property {ethers.BigNumber} imtblFee - The fee charged by Immutable to facilitate the bridge.
+ * - priced in the source chain's native token.
+ * @property {ethers.BigNumber} totalFees - The total fees the user will be charged which is;
+ * sourceChainGas + bridgeFee (axelarFee + destinationChainGas) + imtblFee.
+ * - priced in the source chain's native token.
  */
 export interface BridgeFeeResponse {
-  sourceChainFee: ethers.BigNumber,
-  destinationChainFee: ethers.BigNumber,
+  sourceChainGas: ethers.BigNumber,
+  destinationChainGas: ethers.BigNumber,
   bridgeFee: ethers.BigNumber,
-  networkFee: ethers.BigNumber,
-  totalFee: ethers.BigNumber,
+  imtblFee: ethers.BigNumber,
+  totalFees: ethers.BigNumber,
 }
 
 /**

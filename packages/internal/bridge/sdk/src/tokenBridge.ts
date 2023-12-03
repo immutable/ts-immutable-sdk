@@ -99,13 +99,13 @@ export class TokenBridge {
     await this.validateChainConfiguration();
     await this.validateChainIds(req.sourceChainId, req.destinationChainId);
 
-    let sourceChainFee: ethers.BigNumber = ethers.BigNumber.from(0);
-    let destinationChainFee: ethers.BigNumber = ethers.BigNumber.from(0);
+    let sourceChainGas: ethers.BigNumber = ethers.BigNumber.from(0);
+    let destinationChainGas: ethers.BigNumber = ethers.BigNumber.from(0);
     let bridgeFee: ethers.BigNumber = ethers.BigNumber.from(0);
-    const networkFee: ethers.BigNumber = ethers.BigNumber.from(0);
+    const imtblFee: ethers.BigNumber = ethers.BigNumber.from(0);
 
     if (req.action === BridgeFeeActions.FINALISE_WITHDRAWAL) {
-      sourceChainFee = await this.getGasEstimates(
+      sourceChainGas = await this.getGasEstimates(
         this.config.rootProvider,
         BridgeMethodsGasLimit.FINALISE_WITHDRAWAL,
       );
@@ -122,11 +122,11 @@ export class TokenBridge {
         destinationProvider = this.config.childProvider;
       }
 
-      sourceChainFee = await this.getGasEstimates(
+      sourceChainGas = await this.getGasEstimates(
         sourceProvider,
         BridgeMethodsGasLimit[`${req.action}_SOURCE`],
       );
-      destinationChainFee = await this.getGasEstimates(
+      destinationChainGas = await this.getGasEstimates(
         destinationProvider,
         destinationGasLimit,
       );
@@ -139,14 +139,14 @@ export class TokenBridge {
       );
     }
 
-    const totalFee: ethers.BigNumber = sourceChainFee.add(bridgeFee).add(networkFee);
+    const totalFees: ethers.BigNumber = sourceChainGas.add(bridgeFee).add(imtblFee);
 
     return {
-      sourceChainFee,
-      destinationChainFee,
+      sourceChainGas,
+      destinationChainGas,
       bridgeFee,
-      networkFee, // no network fee charged currently
-      totalFee,
+      imtblFee, // no network fee charged currently
+      totalFees,
     };
   }
 
