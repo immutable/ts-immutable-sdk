@@ -2222,29 +2222,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.19.6":
-  version: 0.19.7
-  resolution: "@biom3/react@npm:0.19.7"
-  dependencies:
-    "@biom3/design-tokens": "*"
-    "@emotion/css": ^11.11.2
-    "@emotion/react": ^11.11.1
-    "@rive-app/react-canvas": ^4.5.0
-    buffer: ^6.0.3
-    csstype: ^3.1.2
-    framer-motion: ^10.12.12
-    lodash.debounce: ^4.0.8
-    lodash.get: ^4.4.2
-    lodash.isequal: ^4.5.0
-    lodash.throttle: ^4.1.1
-    react: ^18.2.0
-    react-dom: ^18.2.0
-    react-is: ^18.2.0
-    ts-deepmerge: ^6.2.0
-  checksum: aabcbc74c10ec5aeddffdfe805691db60d4a279dc714f54c28f67fd183c363a459496959728516a4c6d25d5da996655582a0f9943e3eeb0c1db1604e9d29f2b5
-  languageName: node
-  linkType: hard
-
 "@chevrotain/types@npm:^9.1.0":
   version: 9.1.0
   resolution: "@chevrotain/types@npm:9.1.0"
@@ -3767,7 +3744,7 @@ __metadata:
   resolution: "@imtbl/economy-building-blocks-playground@workspace:packages/internal/economy-building-blocks/playground"
   dependencies:
     "@biom3/design-tokens": 0.2.9
-    "@biom3/react": ^0.19.6
+    "@biom3/react": ^0.19.11
     "@imtbl/blockchain-data": 0.0.0
     "@imtbl/passport": 0.0.0
     "@imtbl/sdk": 0.0.0
