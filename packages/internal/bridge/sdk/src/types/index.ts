@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { ModuleConfiguration } from '@imtbl/config';
 import { ethers } from 'ethers';
 
@@ -21,6 +20,16 @@ export interface BridgeOverrides {
 }
 
 /**
+ * @typedef {Object} AxelarChainDetails
+ * @property {string} id - The ChainId of the network.
+ * @property {string} symbol - The Symbol of the native token.
+ */
+export interface AxelarChainDetails {
+  id: string,
+  symbol: string,
+}
+
+/**
  * @typedef {Object} BridgeContracts
  * @property {Address} rootChainERC20Predicate - The address of the root chain ERC20 predicate contract.
  * @property {Address} rootChainStateSender - The address of the root chain state sender contract.
@@ -29,11 +38,8 @@ export interface BridgeOverrides {
  */
 export type BridgeContracts = {
   rootERC20BridgeFlowRate: Address;
-  rootChainStateSender: Address;
-  rootChainCheckpointManager: Address;
-  rootChainExitHelper: Address;
   childERC20Bridge: Address;
-  childChainStateReceiver: Address;
+  wrappedIMX: Address;
 };
 
 /**
@@ -71,54 +77,6 @@ export enum CompletionStatus {
   PENDING = 'PENDING',
   FAILED = 'FAILED',
 }
-
-/**
- * @typedef {Object} bridgeMethods
- * @property {string} DEPOSIT - The set of contract methods for depositing.
- * @property {string} WITHDRAW - The set of contract methods for withdrawing.
- */
-export const bridgeMethods = {
-  deposit: {
-    token: 'deposit',
-    tokenTo: 'depositTo',
-    native: 'depositETH',
-    nativeTo: 'depositToEth',
-  },
-  withdraw: {
-    token: 'withdraw',
-    tokenTo: 'withdrawTo',
-    native: 'withdrawIMX',
-    nativeTo: 'withdrawToIMX',
-  },
-};
-
-export interface AxelarChainDetails {
-  id: string,
-  symbol: string,
-}
-
-export const axelarChains:Record<string, AxelarChainDetails> = {
-  11155111: {
-    id: 'ethereum-sepolia',
-    symbol: 'ETH',
-  }, // ethereum testnet
-  1: {
-    id: 'ethereum',
-    symbol: 'ETH',
-  }, // ethereum mainnet
-  13473: {
-    id: 'immutable',
-    symbol: 'IMX',
-  }, // immutable zkevm devnet
-  13472: {
-    id: 'immutable',
-    symbol: 'IMX',
-  }, // immutable zkevm testnet
-  13371: {
-    id: 'immutable',
-    symbol: 'IMX',
-  }, // immutable zkevm mainnet
-};
 
 /**
  * @typedef {Object} BridgeFeeActions
@@ -243,9 +201,11 @@ export interface BridgeTxResponse {
 
 /**
  * @typedef {Object} TxStatusRequest
- * @property {Array<TxStatusRequestItem>} - The status items to be queried.
+ * @property {Array<TxStatusRequestItem>} transactions - The transaction items to query the status for.
  */
-export interface TxStatusRequest extends Array<TxStatusRequestItem> {}
+export interface TxStatusRequest {
+  transactions: Array<TxStatusRequestItem>
+}
 
 /**
  * @typedef {Object} TxStatusRequestItem
@@ -253,14 +213,16 @@ export interface TxStatusRequest extends Array<TxStatusRequestItem> {}
  * @property {string} sourceChainId - The source chainId.
  */
 export interface TxStatusRequestItem {
-  transactionHash: string;
+  txHash: string;
 }
 
 /**
  * @typedef {Object} TxStatusResponse
- * @property {Array<TxStatusResponseItem>} - The status items to be queried.
+ * @property {Array<TxStatusResponseItem>} transactions - The status items of the requested transactions.
  */
-export interface TxStatusResponse extends Array<TxStatusResponseItem> {}
+export interface TxStatusResponse {
+  transactions: Array<TxStatusResponseItem>
+}
 
 /**
  * @typedef {Object} TxStatusResponseItem
@@ -280,6 +242,14 @@ export enum StatusResponse {
   ERROR = 'ERROR',
   NOT_ENOUGH_GAS = 'NOT_ENOUGH_GAS',
   FLOW_RATE_CONTROLLED = 'FLOW_RATE_CONTROLLED',
+}
+
+/**
+ * @typedef {Object} FlowRateInfoRequest
+ * @property {FungibleToken} token - Optional param to filter the flowRate info by. If not specified info for all tokens will be returned.
+*/
+export interface FlowRateInfoRequest {
+  token?: FungibleToken;
 }
 
 /**
@@ -326,6 +296,7 @@ export interface PendingWithdrawalsResponse {
 }
 
 export interface PendingWithdrawals {
+  canWithdraw: boolean,
   withdrawer: Address,
   token: FungibleToken,
   amount: string,
@@ -381,10 +352,10 @@ export interface TokenMappingRequest {
 
 /**
  * @typedef {Object} TokenMappingResponse
- * @property {Address} rootToken - The address of the corresponding token on the root chain.
- * @property {Address} childToken - The address of the corresponding token on the child chain.
+ * @property {FungibleToken} rootToken - The address of the corresponding token on the root chain.
+ * @property {FungibleToken} childToken - The address of the corresponding token on the child chain.
  */
 export interface TokenMappingResponse {
   rootToken: FungibleToken;
-  childToken: Address;
+  childToken: FungibleToken;
 }

@@ -52,6 +52,11 @@ export const CHILD_ERC20_BRIDGE = [
   },
   {
     inputs: [],
+    name: 'InsufficientIMX',
+    type: 'error',
+  },
+  {
+    inputs: [],
     name: 'InsufficientValue',
     type: 'error',
   },
@@ -64,26 +69,6 @@ export const CHILD_ERC20_BRIDGE = [
       },
     ],
     name: 'InvalidData',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'InvalidRootChain',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'InvalidRootERC20BridgeAdaptor',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'InvalidSourceAddress',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'InvalidSourceChain',
     type: 'error',
   },
   {
@@ -434,6 +419,25 @@ export const CHILD_ERC20_BRIDGE = [
     inputs: [
       {
         indexed: true,
+        internalType: 'address',
+        name: 'depositor',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'PrivilegedDeposit',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
         internalType: 'bytes32',
         name: 'role',
         type: 'bytes32',
@@ -502,44 +506,6 @@ export const CHILD_ERC20_BRIDGE = [
       },
     ],
     name: 'RoleRevoked',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: 'string',
-        name: 'oldRootBridgeAdaptor',
-        type: 'string',
-      },
-      {
-        indexed: false,
-        internalType: 'string',
-        name: 'newRootBridgeAdaptor',
-        type: 'string',
-      },
-    ],
-    name: 'RootBridgeAdaptorUpdated',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'depositor',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
-    ],
-    name: 'TreasuryDeposit',
     type: 'event',
   },
   {
@@ -648,7 +614,7 @@ export const CHILD_ERC20_BRIDGE = [
   },
   {
     inputs: [],
-    name: 'TREASURY_MANAGER_ROLE',
+    name: 'PRIVILEGED_DEPOSITOR_ROLE',
     outputs: [
       {
         internalType: 'bytes32',
@@ -687,10 +653,10 @@ export const CHILD_ERC20_BRIDGE = [
   },
   {
     inputs: [],
-    name: 'bridgeAdaptor',
+    name: 'childBridgeAdaptor',
     outputs: [
       {
-        internalType: 'contract IChildERC20BridgeAdaptor',
+        internalType: 'contract IChildBridgeAdaptor',
         name: '',
         type: 'address',
       },
@@ -850,6 +816,11 @@ export const CHILD_ERC20_BRIDGE = [
           },
           {
             internalType: 'address',
+            name: 'initialDepositor',
+            type: 'address',
+          },
+          {
+            internalType: 'address',
             name: 'treasuryManager',
             type: 'address',
           },
@@ -864,19 +835,9 @@ export const CHILD_ERC20_BRIDGE = [
         type: 'address',
       },
       {
-        internalType: 'string',
-        name: 'newRootERC20BridgeAdaptor',
-        type: 'string',
-      },
-      {
         internalType: 'address',
         name: 'newChildTokenTemplate',
         type: 'address',
-      },
-      {
-        internalType: 'string',
-        name: 'newRootChain',
-        type: 'string',
       },
       {
         internalType: 'address',
@@ -896,16 +857,6 @@ export const CHILD_ERC20_BRIDGE = [
   },
   {
     inputs: [
-      {
-        internalType: 'string',
-        name: 'messageSourceChain',
-        type: 'string',
-      },
-      {
-        internalType: 'string',
-        name: 'sourceAddress',
-        type: 'string',
-      },
       {
         internalType: 'bytes',
         name: 'data',
@@ -935,6 +886,13 @@ export const CHILD_ERC20_BRIDGE = [
       },
     ],
     stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'privilegedDeposit',
+    outputs: [],
+    stateMutability: 'payable',
     type: 'function',
   },
   {
@@ -1014,32 +972,6 @@ export const CHILD_ERC20_BRIDGE = [
   },
   {
     inputs: [],
-    name: 'rootChain',
-    outputs: [
-      {
-        internalType: 'string',
-        name: '',
-        type: 'string',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'rootERC20BridgeAdaptor',
-    outputs: [
-      {
-        internalType: 'string',
-        name: '',
-        type: 'string',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
     name: 'rootIMXToken',
     outputs: [
       {
@@ -1091,13 +1023,6 @@ export const CHILD_ERC20_BRIDGE = [
   },
   {
     inputs: [],
-    name: 'treasuryDeposit',
-    outputs: [],
-    stateMutability: 'payable',
-    type: 'function',
-  },
-  {
-    inputs: [],
     name: 'unpause',
     outputs: [],
     stateMutability: 'nonpayable',
@@ -1112,19 +1037,6 @@ export const CHILD_ERC20_BRIDGE = [
       },
     ],
     name: 'updateChildBridgeAdaptor',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'string',
-        name: 'newRootBridgeAdaptor',
-        type: 'string',
-      },
-    ],
-    name: 'updateRootBridgeAdaptor',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',

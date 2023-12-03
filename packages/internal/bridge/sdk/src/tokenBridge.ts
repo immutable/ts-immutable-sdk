@@ -3,7 +3,7 @@ import {
   AxelarQueryAPI, AxelarQueryAPIFeeResponse, Environment,
 } from '@axelar-network/axelarjs-sdk';
 import {
-  ETH_MAINNET_TO_ZKEVM_MAINNET, ETH_SEPOLIA_TO_ZKEVM_TESTNET,
+  ETH_MAINNET_TO_ZKEVM_MAINNET, ETH_SEPOLIA_TO_ZKEVM_TESTNET, axelarChains, bridgeMethods,
 } from 'constants/bridges';
 import { BridgeConfiguration } from 'config';
 import { ethers } from 'ethers';
@@ -14,11 +14,9 @@ import {
   FeeData,
   BridgeTxRequest,
   BridgeFeeActions,
-  bridgeMethods,
   ApproveBridgeRequest,
   ApproveBridgeResponse,
   BridgeTxResponse,
-  axelarChains,
   AxelarChainDetails,
   TokenMappingRequest,
   TokenMappingResponse,
@@ -32,6 +30,7 @@ import {
   FlowRateWithdrawResponse,
   AddGasRequest,
   AddGasResponse,
+  FlowRateInfoRequest,
 } from 'types';
 import { ROOT_ERC20_BRIDGE_FLOW_RATE } from 'contracts/ABIs/RootERC20BridgeFlowRate';
 import { ERC20 } from 'contracts/ABIs/ERC20';
@@ -654,11 +653,18 @@ export class TokenBridge {
   public async getTransactionStatus(req: TxStatusRequest): Promise<TxStatusResponse> {
     console.log('stubbed response with req', req);
     // Return the token mappings
-    return [{
-      transactionHash: '0x1234....',
-      status: StatusResponse.COMPLETE,
-      data: 'stubbed data',
-    }];
+    return {
+      transactions: [{
+        transactionHash: '0x1234....',
+        status: StatusResponse.COMPLETE,
+        data: 'stubbed data',
+      }, {
+        transactionHash: '0xABCD....',
+        status: StatusResponse.PROCESSING,
+        data: 'stubbed data',
+      }],
+
+    };
   }
 
   /**
@@ -669,8 +675,8 @@ export class TokenBridge {
  * @throws {BridgeError} - If an error occurs during the query, a BridgeError will be thrown with a specific error type.
  * @dev this SDK method is currently stubbed
  */
-  public async getFlowRateInfo(): Promise<FlowRateInfoResponse> {
-    console.log('stubbed response');
+  public async getFlowRateInfo(req: FlowRateInfoRequest = {}): Promise<FlowRateInfoResponse> {
+    console.log('stubbed response with req', req);
     // Return the token mappings
     return {
       withdrawalQueueActivated: false,
@@ -706,6 +712,7 @@ export class TokenBridge {
     console.log('stubbed response with req', req);
     return {
       pending: [{
+        canWithdraw: true,
         withdrawer: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
         token: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
         amount: ethers.utils.parseUnits('1', 18).toString(),
@@ -713,6 +720,7 @@ export class TokenBridge {
         timeoutEnd: 1701227629,
       },
       {
+        canWithdraw: false,
         withdrawer: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
         token: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
         amount: ethers.utils.parseUnits('2', 18).toString(),

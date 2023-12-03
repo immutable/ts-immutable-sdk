@@ -77,11 +77,6 @@ export const ROOT_ERC20_BRIDGE_FLOW_RATE = [
     type: 'error',
   },
   {
-    inputs: [],
-    name: 'InvalidChildERC20BridgeAdaptor',
-    type: 'error',
-  },
-  {
     inputs: [
       {
         internalType: 'string',
@@ -95,16 +90,6 @@ export const ROOT_ERC20_BRIDGE_FLOW_RATE = [
   {
     inputs: [],
     name: 'InvalidRefillRate',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'InvalidSourceAddress',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'InvalidSourceChain',
     type: 'error',
   },
   {
@@ -228,25 +213,6 @@ export const ROOT_ERC20_BRIDGE_FLOW_RATE = [
     anonymous: false,
     inputs: [],
     name: 'AutoActivatedWithdrawalQueue',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: 'string',
-        name: 'oldChildBridgeAdaptor',
-        type: 'string',
-      },
-      {
-        indexed: false,
-        internalType: 'string',
-        name: 'newChildBridgeAdaptor',
-        type: 'string',
-      },
-    ],
-    name: 'ChildBridgeAdaptorUpdated',
     type: 'event',
   },
   {
@@ -1023,32 +989,6 @@ export const ROOT_ERC20_BRIDGE_FLOW_RATE = [
   },
   {
     inputs: [],
-    name: 'childBridgeAdaptor',
-    outputs: [
-      {
-        internalType: 'string',
-        name: '',
-        type: 'string',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'childChain',
-    outputs: [
-      {
-        internalType: 'string',
-        name: '',
-        type: 'string',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
     name: 'childERC20Bridge',
     outputs: [
       {
@@ -1518,53 +1458,48 @@ export const ROOT_ERC20_BRIDGE_FLOW_RATE = [
           },
         ],
         internalType: 'struct IRootERC20Bridge.InitializationRoles',
-        name: '',
+        name: 'newRoles',
         type: 'tuple',
       },
       {
         internalType: 'address',
-        name: '',
+        name: 'newRootBridgeAdaptor',
         type: 'address',
       },
       {
         internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-      {
-        internalType: 'string',
-        name: '',
-        type: 'string',
-      },
-      {
-        internalType: 'address',
-        name: '',
+        name: 'newChildERC20Bridge',
         type: 'address',
       },
       {
         internalType: 'address',
-        name: '',
+        name: 'newChildTokenTemplate',
         type: 'address',
       },
       {
         internalType: 'address',
-        name: '',
+        name: 'newRootIMXToken',
         type: 'address',
       },
       {
-        internalType: 'string',
-        name: '',
-        type: 'string',
+        internalType: 'address',
+        name: 'newRootWETHToken',
+        type: 'address',
       },
       {
         internalType: 'uint256',
-        name: '',
+        name: 'newImxCumulativeDepositLimit',
         type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: 'rateAdmin',
+        type: 'address',
       },
     ],
     name: 'initialize',
     outputs: [],
-    stateMutability: 'pure',
+    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
@@ -1598,58 +1533,43 @@ export const ROOT_ERC20_BRIDGE_FLOW_RATE = [
           },
         ],
         internalType: 'struct IRootERC20Bridge.InitializationRoles',
-        name: 'newRoles',
+        name: '',
         type: 'tuple',
       },
       {
         internalType: 'address',
-        name: 'newRootBridgeAdaptor',
+        name: '',
         type: 'address',
       },
       {
         internalType: 'address',
-        name: 'newChildERC20Bridge',
-        type: 'address',
-      },
-      {
-        internalType: 'string',
-        name: 'newChildBridgeAdaptor',
-        type: 'string',
-      },
-      {
-        internalType: 'address',
-        name: 'newChildTokenTemplate',
+        name: '',
         type: 'address',
       },
       {
         internalType: 'address',
-        name: 'newRootIMXToken',
+        name: '',
         type: 'address',
       },
       {
         internalType: 'address',
-        name: 'newRootWETHToken',
+        name: '',
         type: 'address',
       },
       {
-        internalType: 'string',
-        name: 'newChildChain',
-        type: 'string',
+        internalType: 'address',
+        name: '',
+        type: 'address',
       },
       {
         internalType: 'uint256',
-        name: 'newImxCumulativeDepositLimit',
+        name: '',
         type: 'uint256',
-      },
-      {
-        internalType: 'address',
-        name: 'rateAdmin',
-        type: 'address',
       },
     ],
     name: 'initialize',
     outputs: [],
-    stateMutability: 'nonpayable',
+    stateMutability: 'pure',
     type: 'function',
   },
   {
@@ -1692,16 +1612,6 @@ export const ROOT_ERC20_BRIDGE_FLOW_RATE = [
   },
   {
     inputs: [
-      {
-        internalType: 'string',
-        name: 'messageSourceChain',
-        type: 'string',
-      },
-      {
-        internalType: 'string',
-        name: 'sourceAddress',
-        type: 'string',
-      },
       {
         internalType: 'bytes',
         name: 'data',
@@ -1826,7 +1736,7 @@ export const ROOT_ERC20_BRIDGE_FLOW_RATE = [
     name: 'rootBridgeAdaptor',
     outputs: [
       {
-        internalType: 'contract IRootERC20BridgeAdaptor',
+        internalType: 'contract IRootBridgeAdaptor',
         name: '',
         type: 'address',
       },
@@ -1942,19 +1852,6 @@ export const ROOT_ERC20_BRIDGE_FLOW_RATE = [
   {
     inputs: [],
     name: 'unpause',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'string',
-        name: 'newChildBridgeAdaptor',
-        type: 'string',
-      },
-    ],
-    name: 'updateChildBridgeAdaptor',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
