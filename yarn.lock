@@ -2199,6 +2199,29 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@biom3/react@npm:^0.19.11":
+  version: 0.19.11
+  resolution: "@biom3/react@npm:0.19.11"
+  dependencies:
+    "@biom3/design-tokens": "*"
+    "@emotion/css": ^11.11.2
+    "@emotion/react": ^11.11.1
+    "@rive-app/react-canvas": ^4.5.0
+    buffer: ^6.0.3
+    csstype: ^3.1.2
+    framer-motion: ^10.12.12
+    lodash.debounce: ^4.0.8
+    lodash.get: ^4.4.2
+    lodash.isequal: ^4.5.0
+    lodash.throttle: ^4.1.1
+    react: ^18.2.0
+    react-dom: ^18.2.0
+    react-is: ^18.2.0
+    ts-deepmerge: ^6.2.0
+  checksum: 51c507bd9f07b3f22a7ed45a2e230e8b2dd5a7c684bb4cae110993eb1d20541b179f7ee22b87dee6e8065e1ab43a19ea56f80262fdf9c5fefc060bf3289b5664
+  languageName: node
+  linkType: hard
+
 "@biom3/react@npm:^0.19.6":
   version: 0.19.7
   resolution: "@biom3/react@npm:0.19.7"
@@ -3490,7 +3513,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-sdk-sample-app@workspace:packages/checkout/sdk-sample-app"
   dependencies:
-    "@biom3/react": ^0.19.6
+    "@biom3/react": ^0.19.11
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
@@ -3563,7 +3586,7 @@ __metadata:
   resolution: "@imtbl/checkout-widgets-sample-app@workspace:packages/checkout/widgets-sample-app"
   dependencies:
     "@biom3/design-tokens": 0.2.9
-    "@biom3/react": ^0.19.6
+    "@biom3/react": ^0.19.11
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
@@ -3592,7 +3615,7 @@ __metadata:
   resolution: "@imtbl/checkout-widgets@workspace:packages/checkout/widgets-lib"
   dependencies:
     "@biom3/design-tokens": 0.2.9
-    "@biom3/react": ^0.19.6
+    "@biom3/react": ^0.19.11
     "@ethersproject/providers": ^5.7.2
     "@imtbl/bridge-sdk": 0.0.0
     "@imtbl/checkout-sdk": 0.0.0
@@ -3994,7 +4017,7 @@ __metadata:
   resolution: "@imtbl/passport-sdk-sample-app@workspace:packages/passport/sdk-sample-app"
   dependencies:
     "@biom3/design-tokens": 0.2.9
-    "@biom3/react": ^0.19.6
+    "@biom3/react": ^0.19.11
     "@imtbl/config": 0.0.0
     "@imtbl/core-sdk": ^2.4.0
     "@imtbl/immutablex-client": 0.0.0
@@ -4115,8 +4138,8 @@ __metadata:
   dependencies:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
-    "@biom3/design-tokens": 0.2.4-beta
-    "@biom3/react": ^0.10.12
+    "@biom3/design-tokens": 0.2.9
+    "@biom3/react": ^0.19.11
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/abstract-signer": ^5.7.0
     "@ethersproject/providers": ^5.7.2
@@ -26703,7 +26726,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "sample-app@workspace:packages/provider/src/sample-app"
   dependencies:
-    "@biom3/react": ^0.19.6
+    "@biom3/react": ^0.19.11
     "@imtbl/core-sdk": ^2.4.0
     "@imtbl/sdk": 0.0.0
     "@svgr/webpack": ^8.0.1

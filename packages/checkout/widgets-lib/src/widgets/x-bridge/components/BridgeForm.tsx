@@ -462,7 +462,7 @@ export function BridgeForm(props: BridgeFormProps) {
           },
         ]}
         visible={showFeeBreakdown}
-        onCloseBottomSheet={() => setShowFeeBreakdown(false)}
+        onCloseDrawer={() => setShowFeeBreakdown(false)}
       />
       <Box sx={bridgeFormButtonContainerStyles}>
         <Button
