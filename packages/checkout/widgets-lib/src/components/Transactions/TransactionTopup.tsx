@@ -43,7 +43,15 @@ export function TransactionTopup({ key }: { key: string }) {
             top: 'base.spacing.x2',
           }}
         />
-        <Body size="xSmall" sx={{ flexGrow: '1' }}>{topup.banner.heading}</Body>
+        <Box sx={{ flexDirection: 'column', display: 'flex', flexGrow: '1' }}>
+          <Body
+            size="xSmall"
+            sx={{ fontWeight: 'base.text.body.small.bold.fontWeight' }}
+          >
+            {topup.banner.heading}
+          </Body>
+          <Body size="xSmall">{topup.banner.body}</Body>
+        </Box>
         <Button variant="secondary" size="small">{topup.action}</Button>
       </Box>
     </Box>

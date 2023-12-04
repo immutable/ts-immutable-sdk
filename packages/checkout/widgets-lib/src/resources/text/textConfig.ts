@@ -461,14 +461,16 @@ export const text = {
           action: 'Claim',
           stepInfo: 'Waiting on claim - paused',
           banner: {
-            heading: 'Claim your coins to finish this move.',
+            heading: 'Move was paused',
+            body: 'Claim your coins to complete this move',
           },
         },
         topup: {
           action: 'Review & sign',
           stepInfo: 'Waiting on gas - paused',
           banner: {
-            heading: 'Add gas to complete this move.',
+            heading: 'Gas has spiked',
+            body: 'Pay the difference to complete this move',
           },
         },
         actionRequired: {
