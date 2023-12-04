@@ -2,7 +2,7 @@ import { GenericIMXProvider, ProviderConfiguration } from '@imtbl/sdk/provider';
 import { parseUnits } from '@ethersproject/units';
 import { repeatCheck30, repeatCheck300 } from 'common';
 import { strict as assert } from 'assert';
-import { ETHToken, ImmutableXClient, ImxClientModuleConfiguration } from '@imtbl/sdk/immutablex_client';
+import { ImmutableXClient, ImxClientModuleConfiguration } from '@imtbl/sdk/immutablex_client';
 import { configuration, StepSharedState } from './stepSharedState';
 
 export class Withdrawal {
@@ -37,13 +37,9 @@ export class Withdrawal {
     ethAmount: string,
   ) {
     const user = this.stepSharedState.users[userVar];
-    const providerInstance = new GenericIMXProvider(this.providerConfig, user.ethSigner, user.starkSigner);
+    const provider = new GenericIMXProvider(this.providerConfig, user.ethSigner, user.starkSigner);
     const ethAmountInWei = parseUnits(ethAmount);
-    const result = await providerInstance.prepareWithdrawal({ type: 'ETH', amount: ethAmountInWei.toString() });
-    // const result = await this.client.prepareWithdrawal(user, {
-    //   type: 'ETH',
-    //   amount: parseUnits(ethAmount, 18).toString(),
-    // });
+    const result = await provider.prepareWithdrawal({ type: 'ETH', amount: ethAmountInWei.toString() });
 
     this.stepSharedState.withdrawals[withdrawalName] = result;
     return result;
@@ -90,9 +86,8 @@ export class Withdrawal {
   public async completeEthWithdrawal(userVar: string) {
     const user = this.stepSharedState.users[userVar];
     const starkAddress = await user.starkSigner.getAddress();
-    const providerInstance = new GenericIMXProvider(this.providerConfig, user.ethSigner, user.starkSigner);
-    const token : ETHToken = { type: 'ETH' } as ETHToken;
-    const result = await providerInstance.completeWithdrawal(starkAddress, token);
+    const provider = new GenericIMXProvider(this.providerConfig, user.ethSigner, user.starkSigner);
+    const result = await provider.completeWithdrawal(starkAddress, { type: 'ETH' });
     // eslint-disable-next-line no-console
     console.log(`Eth withdrawal transaction complete. txHash: ${result.hash}`);
   }
