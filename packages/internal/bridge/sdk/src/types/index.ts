@@ -190,6 +190,7 @@ export interface ApproveBridgeRequest {
  * or null if no approval is required.
  */
 export interface ApproveBridgeResponse {
+  contractToApprove: string | null,
   unsignedTx: ethers.providers.TransactionRequest | null;
 }
 

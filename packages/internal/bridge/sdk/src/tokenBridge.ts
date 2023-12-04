@@ -1,7 +1,7 @@
 /* eslint-disable class-methods-use-this */
-import {
-  AxelarQueryAPI, AxelarQueryAPIFeeResponse, Environment,
-} from '@axelar-network/axelarjs-sdk';
+// import {
+//   AxelarQueryAPI, AxelarQueryAPIFeeResponse, Environment,
+// } from '@axelar-network/axelarjs-sdk';
 import {
   ETH_MAINNET_TO_ZKEVM_MAINNET, ETH_SEPOLIA_TO_ZKEVM_TESTNET, axelarChains, bridgeMethods,
 } from 'constants/bridges';
@@ -100,6 +100,13 @@ export class TokenBridge {
     await this.validateChainConfiguration();
     await this.validateChainIds(req.sourceChainId, req.destinationChainId);
 
+    if (req.action === BridgeFeeActions.MAP_TOKEN && req.sourceChainId !== this.config.bridgeInstance.rootChainID) {
+      throw new BridgeError(
+        `Mapping tokens from ${req.sourceChainId} to destination ${req.destinationChainId} is not supported`,
+        BridgeErrorType.UNSUPPORTED_ERROR,
+      );
+    }
+
     let sourceChainGas: ethers.BigNumber = ethers.BigNumber.from(0);
     let destinationChainGas: ethers.BigNumber = ethers.BigNumber.from(0);
     let bridgeFee: ethers.BigNumber = ethers.BigNumber.from(0);
@@ -120,15 +127,15 @@ export class TokenBridge {
         BridgeMethodsGasLimit[`${req.action}_SOURCE`],
       );
 
-      const bridgeFees:CalculateBridgeFeeResponse = await this.calculateBridgeFee(
+      const bridgeFees = await this.calculateBridgeFee(
         req.sourceChainId,
         req.destinationChainId,
         BridgeMethodsGasLimit[`${req.action}_DESTINATION`],
         req.gasMultiplier,
       );
-
       validatorFee = bridgeFees.validatorFee;
       destinationChainGas = bridgeFees.executionFee;
+
       bridgeFee = validatorFee.add(destinationChainGas);
     }
 
@@ -217,37 +224,49 @@ export class TokenBridge {
     // If the token is NATIVE, no approval is required
     if (req.token.toUpperCase() === 'NATIVE') {
       return {
+        contractToApprove: null,
         unsignedTx: null,
       };
     }
 
+    let sourceProvider:ethers.providers.Provider;
+    let sourceBridgeAddress: string;
+    if (req.sourceChainId === this.config.bridgeInstance.rootChainID) {
+      sourceProvider = this.config.rootProvider;
+      sourceBridgeAddress = this.config.bridgeContracts.rootERC20BridgeFlowRate;
+    } else {
+      sourceProvider = this.config.childProvider;
+      sourceBridgeAddress = this.config.bridgeContracts.childERC20Bridge;
+    }
+
     const erc20Contract: ethers.Contract = await withBridgeError<ethers.Contract>(
-      async () => new ethers.Contract(req.token, ERC20, this.config.rootProvider),
+      async () => new ethers.Contract(req.token, ERC20, sourceProvider),
       BridgeErrorType.PROVIDER_ERROR,
     );
 
     // Get the current approved allowance of the RootERC20Predicate
-    const rootERC20PredicateAllowance: ethers.BigNumber = await withBridgeError<ethers.BigNumber>(() => erc20Contract
+    const allowance: ethers.BigNumber = await withBridgeError<ethers.BigNumber>(() => erc20Contract
       .allowance(
         req.senderAddress,
-        this.config.bridgeContracts.rootERC20BridgeFlowRate,
+        sourceBridgeAddress,
       ), BridgeErrorType.PROVIDER_ERROR);
 
     // If the allowance is greater than or equal to the deposit amount, no approval is required
-    if (rootERC20PredicateAllowance.gte(req.amount)) {
+    if (allowance.gte(req.amount)) {
       return {
+        contractToApprove: null,
         unsignedTx: null,
       };
     }
     // Calculate the amount of tokens that need to be approved for deposit
     const approvalAmountRequired = req.amount.sub(
-      rootERC20PredicateAllowance,
+      allowance,
     );
 
     // Encode the approve function call data for the ERC20 contract
     const data: string = await withBridgeError<string>(async () => erc20Contract.interface
       .encodeFunctionData('approve', [
-        this.config.bridgeContracts.rootERC20BridgeFlowRate,
+        sourceBridgeAddress,
         approvalAmountRequired,
       ]), BridgeErrorType.INTERNAL_ERROR);
 
@@ -260,6 +279,7 @@ export class TokenBridge {
     };
 
     return {
+      contractToApprove: sourceBridgeAddress,
       unsignedTx,
     };
   }
@@ -549,7 +569,7 @@ export class TokenBridge {
 
     const rootNetwork = await withBridgeError<ethers.providers.Network>(
       async () => this.config.rootProvider.getNetwork(),
-      BridgeErrorType.PROVIDER_ERROR,
+      BridgeErrorType.ROOT_PROVIDER_ERROR,
     );
 
     if (rootNetwork!.chainId.toString() !== this.config.bridgeInstance.rootChainID) {
@@ -559,7 +579,10 @@ export class TokenBridge {
       );
     }
 
-    const childNetwork = await this.config.childProvider.getNetwork();
+    const childNetwork = await withBridgeError<ethers.providers.Network>(
+      async () => this.config.childProvider.getNetwork(),
+      BridgeErrorType.CHILD_PROVIDER_ERROR,
+    );
 
     if (childNetwork.chainId.toString() !== this.config.bridgeInstance.childChainID) {
       throw new BridgeError(
@@ -601,25 +624,33 @@ export class TokenBridge {
       );
     }
 
-    let axelarEnv:Environment;
-    if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
-      || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
-      axelarEnv = Environment.MAINNET;
-    } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
-      || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
-      axelarEnv = Environment.TESTNET;
-    } else {
-      axelarEnv = Environment.DEVNET;
-    }
+    // let axelarEnv:Environment;
+    // if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
+    //   || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
+    //   axelarEnv = Environment.MAINNET;
+    // } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
+    //   || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
+    //   axelarEnv = Environment.TESTNET;
+    // } else {
+    //   axelarEnv = Environment.DEVNET;
+    // }
 
-    const api = new AxelarQueryAPI({ environment: axelarEnv });
-    const estimateGasFeeResult:string | AxelarQueryAPIFeeResponse = await api.estimateGasFee(
-      sourceAxelar.id,
-      destinationAxelar.id,
-      sourceAxelar.symbol,
-      gasLimit,
+    // const api = new AxelarQueryAPI({ environment: axelarEnv });
+    // const estimateGasFeeResult:string | AxelarQueryAPIFeeResponse = await api.estimateGasFee(
+    //   sourceAxelar.id,
+    //   destinationAxelar.id,
+    //   sourceAxelar.symbol,
+    //   gasLimit,
+    //   gasMultiplier,
+    // );
+
+    const estimateGasFeeResult = {
+      baseFee: '1000',
+      executionFeeWithMultiplier: '100000000',
       gasMultiplier,
-    );
+      mainnetRootChainId: ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID,
+      testnetRootChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+    };
 
     if (typeof estimateGasFeeResult === 'string') {
       throw new BridgeError(

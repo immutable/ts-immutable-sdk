@@ -16,8 +16,11 @@ export async function setupForBridge() {
       if (!process.env.RECIPIENT_ADDRESS) {
         throw new Error('RECIPIENT_ADDRESS not set');
       }
-      if (!process.env.TOKEN_ADDRESS) {
-        throw new Error('TOKEN_ADDRESS not set');
+      if (!process.env.SEPOLIA_TOKEN_ADDRESS) {
+        throw new Error('SEPOLIA_TOKEN_ADDRESS not set');
+      }
+      if (!process.env.ZKEVM_TESTNET_TOKEN_ADDRESS) {
+        throw new Error('ZKEVM_TESTNET_TOKEN_ADDRESS not set');
       }
       if (!process.env.DEPOSIT_AMOUNT) {
         throw new Error('DEPOSIT_AMOUNT not set');
@@ -30,10 +33,10 @@ export async function setupForBridge() {
     
       // Create providers for root and child chains
       const rootProvider = new ethers.providers.JsonRpcProvider(
-        process.env.ROOT_PROVIDER,
+        process.env.ROOT_PROVIDER_RPC,
       );
       const childProvider = new ethers.providers.JsonRpcProvider(
-        process.env.CHILD_PROVIDER,
+        process.env.CHILD_PROVIDER_RPC,
       );
     
       // Create a wallet instance to simulate the user's wallet
@@ -53,7 +56,8 @@ export async function setupForBridge() {
         childProvider,
         depositor: process.env.DEPOSITOR_ADDRESS,
         recipient: process.env.RECIPIENT_ADDRESS,
-        token: process.env.TOKEN_ADDRESS,
+        sepoliaToken: process.env.SEPOLIA_TOKEN_ADDRESS,
+        zkevmTestnetToken: process.env.ZKEVM_TESTNET_TOKEN_ADDRESS,
         amount,
         rootWallet,
         childWallet,
