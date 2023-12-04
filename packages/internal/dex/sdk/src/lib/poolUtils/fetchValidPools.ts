@@ -85,7 +85,7 @@ export const fetchValidPools = async (
     ) as [BigNumber];
 
     const zeroPrice = poolSlot0.sqrtPriceX96.isZero();
-    const zeroLiquidity: boolean = poolLiquidity[0].isZero();
+    const zeroLiquidity = poolLiquidity[0].isZero();
 
     // If there is no price or no liquidity in the pool then we do not want to consider
     // it for swapping

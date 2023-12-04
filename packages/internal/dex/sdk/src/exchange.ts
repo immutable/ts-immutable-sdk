@@ -78,11 +78,7 @@ export class Exchange {
 
     this.provider = new ethers.providers.JsonRpcProvider(config.chain.rpcUrl);
 
-    this.router = new Router(this.provider, config.chain.commonRoutingTokens, {
-      multicallAddress: config.chain.contracts.multicall,
-      factoryAddress: config.chain.contracts.coreFactory,
-      quoterAddress: config.chain.contracts.quoterV2,
-    });
+    this.router = new Router(this.provider, config.chain.commonRoutingTokens, config.chain.contracts);
   }
 
   private static validate(

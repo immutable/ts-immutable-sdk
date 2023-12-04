@@ -1,11 +1,15 @@
 import { Route, SwapQuoter } from '@uniswap/v3-sdk';
 import { TradeType, Token } from '@uniswap/sdk-core';
-import { BigNumber, ethers } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 import { ProviderCallError } from 'errors';
 import { CoinAmount, ERC20 } from 'types';
 import { multicallMultipleCallDataSingContract, MulticallResponse } from './multicall';
 import {
-  newAmount, quoteReturnMapping, toCurrencyAmount, uniswapTokenToERC20,
+  ERROR_STRING_FUNCTION_SIGNATURE,
+  newAmount,
+  quoteReturnMapping,
+  toCurrencyAmount,
+  uniswapTokenToERC20,
 } from './utils';
 import { Multicall } from '../contracts/types';
 
@@ -14,7 +18,7 @@ const gasEstimateIndex = 3;
 
 export type QuoteResult = {
   route: Route<Token, Token>;
-  gasEstimate: ethers.BigNumber
+  gasEstimate: BigNumber;
   amountIn: CoinAmount<ERC20>;
   amountOut: CoinAmount<ERC20>;
   tradeType: TradeType;
@@ -28,18 +32,15 @@ export async function getQuotesForRoutes(
   tradeType: TradeType,
 ): Promise<QuoteResult[]> {
   const callData = routes.map(
-    (route) => SwapQuoter.quoteCallParameters(route, toCurrencyAmount(amountSpecified), tradeType, {
-      useQuoterV2: true,
-    }).calldata,
+    (route) =>
+      SwapQuoter.quoteCallParameters(route, toCurrencyAmount(amountSpecified), tradeType, {
+        useQuoterV2: true,
+      }).calldata,
   );
 
   let quoteResults: MulticallResponse;
   try {
-    quoteResults = await multicallMultipleCallDataSingContract(
-      multicallContract,
-      callData,
-      quoterContractAddress,
-    );
+    quoteResults = await multicallMultipleCallDataSingContract(multicallContract, callData, quoterContractAddress);
   } catch (e) {
     const message = e instanceof Error ? e.message : 'Unknown Error';
     throw new ProviderCallError(`failed multicall: ${message}`);
@@ -62,11 +63,18 @@ export async function getQuotesForRoutes(
       continue;
     }
 
+    if (quoteResults.returnData[i].returnData.startsWith(ERROR_STRING_FUNCTION_SIGNATURE)) {
+      const content = `0x${quoteResults.returnData[i].returnData.substring(10)}`;
+      const decodedError = utils.defaultAbiCoder.decode(['string'], content);
+      // eslint-disable-next-line no-console
+      console.warn({ decodedError });
+      // Quote reverted, so don't include it in results
+      // eslint-disable-next-line no-continue
+      continue;
+    }
+
     try {
-      const decodedQuoteResult = ethers.utils.defaultAbiCoder.decode(
-        returnTypes,
-        quoteResults.returnData[i].returnData,
-      );
+      const decodedQuoteResult = utils.defaultAbiCoder.decode(returnTypes, quoteResults.returnData[i].returnData);
 
       if (decodedQuoteResult) {
         // The 0th element in each decoded data is going to be the amountOut or amountIn.
@@ -80,14 +88,16 @@ export async function getQuotesForRoutes(
           route: routes[i],
           amountIn: tradeType === TradeType.EXACT_INPUT ? amountSpecified : newAmount(quoteAmount, input),
           amountOut: tradeType === TradeType.EXACT_INPUT ? newAmount(quoteAmount, output) : amountSpecified,
-          gasEstimate: ethers.BigNumber.from(decodedQuoteResult[gasEstimateIndex]),
+          gasEstimate: BigNumber.from(decodedQuoteResult[gasEstimateIndex]),
           tradeType,
         });
       }
-    } catch {
+    } catch (e) {
       // Failed to get the quote for this particular route
       // Other quotes for routes may still succeed, so do nothing
       // and continue processing
+      // eslint-disable-next-line no-console
+      console.warn(e);
     }
   }
 
