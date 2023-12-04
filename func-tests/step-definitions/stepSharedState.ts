@@ -15,6 +15,8 @@ import { JsonRpcProvider } from '@ethersproject/providers';
 import { ethers } from 'ethers';
 import { imxClientCreateStarkSigner, ImxClientWalletConnection } from '@imtbl/sdk/immutablex_client';
 import { Environment, ImmutableConfiguration } from '@imtbl/sdk/config';
+import { GetBalanceResult } from '@imtbl/sdk/checkout_sdk';
+import { Balance, Config, CreateWithdrawalResponse, WalletConnection } from '@imtbl/core-sdk';
 import { env, getProvider } from '../common';
 import genericErc20Abi from '../abi/ERC20.json';
 
@@ -22,6 +24,7 @@ const provider = getProvider(env.network, env.alchemyApiKey);
 
 // export const configuration = Config.SANDBOX;
 export const configuration = new ImmutableConfiguration({ environment: Environment.SANDBOX });
+export const oldConfig = Config.SANDBOX;
 
 /**
  * Generate a ethSigner/starkSigner object from a private key.
@@ -50,30 +53,30 @@ const generateWalletConnection = async (
 export class StepSharedState {
   private minter?: ImxClientWalletConnection;
 
-  private banker?: ImxClientWalletConnection;
+  private banker?: WalletConnection;
 
   users: {
     [key: string]: ImxClientWalletConnection;
   } = {};
 
-  nfts: {
-    [key: string]: {
-      type: {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        MINTABLE_ERC721: 'MINTABLE_ERC721';
-      };
-      data: {
-        id: string;
-        blueprint: string;
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        token_address: string;
-        royalties: {
-          recipient: string;
-          percentage: number;
-        }[];
-      };
-    };
-  } = {};
+  // nfts: {
+  //   [key: string]: {
+  //     type: {
+  //       // eslint-disable-next-line @typescript-eslint/naming-convention
+  //       MINTABLE_ERC721: 'MINTABLE_ERC721';
+  //     };
+  //     data: {
+  //       id: string;
+  //       blueprint: string;
+  //       // eslint-disable-next-line @typescript-eslint/naming-convention
+  //       token_address: string;
+  //       royalties: {
+  //         recipient: string;
+  //         percentage: number;
+  //       }[];
+  //     };
+  //   };
+  // } = {};
 
   // orders: {
   //   [key: string]: UnsignedOrderRequest & {
@@ -101,30 +104,30 @@ export class StepSharedState {
 
   // balances: { [key: string]: Balance } = {};
 
-  // bankerBalances: { [key: string]: Balance } = {};
+  bankerBalances: { [key: string]: Balance } = {};
 
   // burns: { [key: string]: CreateTransferResponseV1 } = {};
 
-  // withdrawals: { [key: string]: CreateWithdrawalResponse } = {};
+  withdrawals: { [key: string]: CreateWithdrawalResponse } = {};
 
   // nftSecondaryTransactions: {
   //   [key: string]: NftsecondarytransactionCreateResponse
   // } = {};
 
-  public async getMinter(): Promise<ImxClientWalletConnection> {
-    if (this.minter !== undefined) {
-      return this.minter;
-    }
-    const privateKey = env.privateKey1;
-    const walletConnection = await generateWalletConnection(
-      privateKey,
-      env.starkPrivateKey1,
-      provider,
-    );
+  // public async getMinter(): Promise<ImxClientWalletConnection> {
+  //   if (this.minter !== undefined) {
+  //     return this.minter;
+  //   }
+  //   const privateKey = env.privateKey1;
+  //   const walletConnection = await generateWalletConnection(
+  //     privateKey,
+  //     env.starkPrivateKey1,
+  //     provider,
+  //   );
 
-    this.minter = walletConnection;
-    return this.minter;
-  }
+  //   this.minter = walletConnection;
+  //   return this.minter;
+  // }
 
   public async getBanker(): Promise<ImxClientWalletConnection> {
     if (this.banker !== undefined) {

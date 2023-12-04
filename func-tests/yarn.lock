@@ -1223,7 +1223,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ethersproject/units@npm:5.7.0":
+"@ethersproject/units@npm:5.7.0, @ethersproject/units@npm:^5.7.0":
   version: 5.7.0
   resolution: "@ethersproject/units@npm:5.7.0"
   dependencies:
@@ -1313,7 +1313,7 @@ __metadata:
 
 "@imtbl/sdk@file:../sdk::locator=func-tests%40workspace%3A.":
   version: 0.0.0
-  resolution: "@imtbl/sdk@file:../sdk#../sdk::hash=da4113&locator=func-tests%40workspace%3A."
+  resolution: "@imtbl/sdk@file:../sdk#../sdk::hash=00cd64&locator=func-tests%40workspace%3A."
   dependencies:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
@@ -1351,7 +1351,7 @@ __metadata:
   peerDependencies:
     react: ^18.2.0
     react-dom: ^18.2.0
-  checksum: bea57e6cfffb19fd52f35d558e8ce5494bb22b595dbfb6fd1faf8dbfa83edb10ed4a6231d171037b95b8a3d620295155b5e2fdf09747a029c1eb35f793dc2d02
+  checksum: 5287f2974256f1f343cf36f57d0253969a2083ca781c0745b22fa979a796a4beefc4b5aa2334a346b7a6784390358329ca8f96351895c2be65bad854d420e99d
   languageName: node
   linkType: hard
 
@@ -6108,6 +6108,7 @@ __metadata:
   resolution: "func-tests@workspace:."
   dependencies:
     "@ethersproject/providers": ^5.7.2
+    "@ethersproject/units": ^5.7.0
     "@ethersproject/wallet": ^5.7.0
     "@imtbl/core-sdk": ^2.4.1
     "@imtbl/sdk": "file:../sdk"
