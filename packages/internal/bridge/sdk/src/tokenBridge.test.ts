@@ -11,7 +11,8 @@ import { BridgeError, BridgeErrorType } from 'errors';
 jest.mock('@axelar-network/axelarjs-sdk', () => ({
   AxelarQueryAPI: jest.fn().mockImplementation(() => ({
     estimateGasFee: jest.fn().mockReturnValue({
-      executionFeeWithMultiplier: ethers.utils.parseUnits('0.001', 18),
+      executionFeeWithMultiplier: ethers.utils.parseUnits('0.0001', 18),
+      baseFee: ethers.utils.parseUnits('0.001', 18),
     }),
   })),
   Environment: {
@@ -535,7 +536,8 @@ describe('Token Bridge', () => {
 
     const sourceChainGas:ethers.BigNumber = ethers.utils.parseUnits('0.000001', 18);
     const destinationChainGas:ethers.BigNumber = ethers.utils.parseUnits('0.000001', 18);
-    const bridgeFee:ethers.BigNumber = ethers.utils.parseUnits('0.0001', 18);
+    const validatorFee:ethers.BigNumber = ethers.utils.parseUnits('0.0001', 18);
+    const bridgeFee:ethers.BigNumber = destinationChainGas.add(validatorFee);
     const imtblFee:ethers.BigNumber = ethers.BigNumber.from(0);
     const totalFees:ethers.BigNumber = sourceChainGas.add(bridgeFee).add(imtblFee);
 
@@ -556,7 +558,10 @@ describe('Token Bridge', () => {
       jest.spyOn(TokenBridge.prototype as any, 'getGasEstimates')
         .mockImplementation(async () => ethers.utils.parseUnits('0.000001', 18));
       jest.spyOn(TokenBridge.prototype as any, 'calculateBridgeFee')
-        .mockImplementation(async () => ethers.utils.parseUnits('0.0001', 18));
+        .mockImplementation(async () => ({
+          validatorFee,
+          executionFee: destinationChainGas,
+        }));
       tokenBridge = new TokenBridge(bridgeConfig);
     });
 
@@ -567,7 +572,7 @@ describe('Token Bridge', () => {
       TokenBridge.prototype['calculateBridgeFee'] = originalCalculateBridgeFee;
     });
     it('returns the deposit fees', async () => {
-      expect.assertions(6);
+      expect.assertions(7);
       const result = await tokenBridge.getFee(
         {
           action: BridgeFeeActions.DEPOSIT,
@@ -580,6 +585,7 @@ describe('Token Bridge', () => {
       expect(result).not.toBeNull();
       expect(result.sourceChainGas).toStrictEqual(sourceChainGas);
       expect(result.destinationChainGas).toStrictEqual(destinationChainGas);
+      expect(result.validatorFee).toStrictEqual(validatorFee);
       expect(result.bridgeFee).toStrictEqual(bridgeFee);
       expect(result.imtblFee).toStrictEqual(imtblFee);
       expect(result.totalFees).toStrictEqual(totalFees);
@@ -606,14 +612,15 @@ describe('Token Bridge', () => {
       jest.clearAllMocks();
     });
     it('returns the bridge fee when no errors', async () => {
-      expect.assertions(1);
+      expect.assertions(2);
       const bridgeFee = await tokenBridge['calculateBridgeFee'](
         ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
         ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
         500,
         1.1,
       );
-      expect(bridgeFee).toStrictEqual(ethers.utils.parseUnits('0.001', 18));
+      expect(bridgeFee.executionFee).toStrictEqual(ethers.utils.parseUnits('0.0001', 18));
+      expect(bridgeFee.validatorFee).toStrictEqual(ethers.utils.parseUnits('0.001', 18));
     });
     it('throws an error when the sourceChainId can not be matched to an Axlear chainId', async () => {
       expect.assertions(2);
