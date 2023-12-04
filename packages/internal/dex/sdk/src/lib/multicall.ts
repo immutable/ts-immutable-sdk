@@ -1,14 +1,22 @@
 import { BigNumber } from 'ethers';
 import { Interface } from '@ethersproject/abi';
 import {
-  Multicall,
   UniswapInterfaceMulticall,
 } from '../contracts/types/Multicall';
 import { UniswapV3Pool__factory } from '../contracts/types';
 
+export interface Multicall {
+  callStatic: {
+    multicall(
+      calls: UniswapInterfaceMulticall.CallStruct[],
+    ): Promise<MulticallResponse>;
+  }
+}
+
 const DEFAULT_GAS_QUOTE = 2_000_000;
 
 type Address = string;
+
 export type SingleContractCallOptions = {
   gasRequired: number;
 };
