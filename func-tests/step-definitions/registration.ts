@@ -43,8 +43,6 @@ export class Registration {
     baseConfig: configuration,
   });
 
-  // client = new ImmutableX(configuration);
-
   public async addNewWallet(addressVar: string) {
     // L1 credentials
     const ethSigner = Wallet.createRandom().connect(provider);
@@ -72,33 +70,20 @@ export class Registration {
     };
   }
 
-  // public async registerBanker() {
-  //   const banker = await this.stepSharedState.getBanker();
+  public async registerBanker() {
+    const banker = await this.stepSharedState.getBanker();
+    const providerInstance = new GenericIMXProvider(this.providerConfig, banker.ethSigner, banker.starkSigner);
+    await providerInstance.registerOffchain();
+    return {
+      address: await banker.ethSigner.getAddress(),
+    };
+  }
 
-  //   await this.client.registerOffchain(banker);
-
-  //   return {
-  //     address: await banker.ethSigner.getAddress(),
-  //   };
-  // }
-
-  // @then(
-  //   'user {string} should be available through api',
-  //   undefined,
-  //   5 * 60 * 1000,
-  // )
   public async checkUserRegistrationOffchain(addressVar: string) {
     const user = this.stepSharedState.users[addressVar];
 
     const providerInstance = new GenericIMXProvider(this.providerConfig, user.ethSigner, user.starkSigner);
     const registered = await providerInstance.isRegisteredOffchain();
     assert.equal(registered, true);
-
-    // const userAddress = await user.ethSigner.getAddress();
-    // const userStarkAddress = await user.starkSigner.getAddress();
-    // await repeatCheck20(async () => {
-    //   const response = await this.client.getUser(userAddress);
-    //   assert.equal(response.accounts![0], userStarkAddress);
-    // });
   }
 }

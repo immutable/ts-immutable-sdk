@@ -1,5 +1,4 @@
 import { defineFeature, loadFeature } from 'jest-cucumber';
-import { provider } from '@imtbl/sdk';
 import { Registration } from './registration';
 import { StepSharedState } from './stepSharedState';
 
