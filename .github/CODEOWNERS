@@ -13,3 +13,4 @@
 /packages/checkout/widgets-lib @immutable/wallets @immutable/primary-revenue
 /packages/economy @immutable/igs-frontend
 /packages/blockchain-data @immutable/assets
+/samples @immutable/sdk
