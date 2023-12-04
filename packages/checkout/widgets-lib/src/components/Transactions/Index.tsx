@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { HeaderNavigation } from 'components/Header/HeaderNavigation';
 import { SimpleLayout } from 'components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from 'components/Footer/FooterLogo';
@@ -6,12 +5,9 @@ import { useContext, useState } from 'react';
 import { EventTargetContext } from 'context/event-target-context/EventTargetContext';
 import { text } from 'resources/text/textConfig';
 import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
-import { ButtonNavigationStyles } from 'components/Header/HeaderStyles';
 import {
-  Box, ButtCon, Link, MenuItem, ShimmerBox,
+  Box, Link, MenuItem,
 } from '@biom3/react';
-import { SharedViews, ViewActions, ViewContext } from 'context/view-context/ViewContext';
-import { useInterval } from 'lib/hooks/useInterval';
 import { isPassportProvider } from 'lib/providerUtils';
 import { sendBridgeWidgetCloseEvent } from '../../widgets/x-bridge/BridgeWidgetEvents';
 import { XBridgeContext } from '../../widgets/x-bridge/context/XBridgeContext';
@@ -21,8 +17,6 @@ import { Shimmer } from './Shimmer';
 import { transactionsListStyle } from './indexStyles';
 
 export function Transactions() {
-  const { viewDispatch } = useContext(ViewContext);
-
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
   const { layoutHeading, passportDashboard } = text.views[XBridgeWidgetViews.TRANSACTIONS];
 
@@ -49,9 +43,7 @@ export function Transactions() {
       footer={<FooterLogo />}
     >
       <Box sx={{ px: 'base.spacing.x4' }}>
-        <Box
-          sx={transactionsListStyle(isPassport)}
-        >
+        <Box sx={transactionsListStyle(isPassport)}>
           {loading ? <Shimmer /> : (
             <>
               <TransactionsActionRequired />
@@ -64,10 +56,7 @@ export function Transactions() {
           <MenuItem.Label sx={{ fontWeight: 'normal' }}>
             {passportDashboard}
             {' '}
-            <Link
-              size="small"
-              rc={<a href="https://passport.immutable.com" />}
-            >
+            <Link size="small" rc={<a href="https://passport.immutable.com" />}>
               Passport
             </Link>
           </MenuItem.Label>
