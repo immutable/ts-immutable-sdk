@@ -112,14 +112,8 @@ export class TokenBridge {
         BridgeMethodsGasLimit.FINALISE_WITHDRAWAL,
       );
     } else {
-      let sourceProvider:ethers.providers.Provider;
-
-      const destinationGasLimit = BridgeMethodsGasLimit[`${req.action}_DESTINATION`];
-      if (req.action === BridgeFeeActions.WITHDRAW) {
-        sourceProvider = this.config.childProvider;
-      } else {
-        sourceProvider = this.config.rootProvider;
-      }
+      const sourceProvider:ethers.providers.Provider = (req.action === BridgeFeeActions.WITHDRAW)
+        ? this.config.childProvider : this.config.rootProvider;
 
       sourceChainGas = await this.getGasEstimates(
         sourceProvider,
@@ -129,7 +123,7 @@ export class TokenBridge {
       const bridgeFees:CalculateBridgeFeeResponse = await this.calculateBridgeFee(
         req.sourceChainId,
         req.destinationChainId,
-        destinationGasLimit,
+        BridgeMethodsGasLimit[`${req.action}_DESTINATION`],
         req.gasMultiplier,
       );
 
