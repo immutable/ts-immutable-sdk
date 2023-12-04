@@ -39,9 +39,9 @@ const logo = {
   [WalletProviderName.METAMASK]: 'MetaMaskSymbol',
 };
 
-export function BridgeReviewSummary() {
-  const testId = 'bridge-review-summary';
+const testId = 'bridge-review-summary';
 
+export function BridgeReviewSummary() {
   const {
     heading, fromLabel, toLabel, fees, fiatPricePrefix,
   } = text.views[XBridgeWidgetViews.BRIDGE_REVIEW];
