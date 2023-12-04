@@ -23,6 +23,7 @@ import {
 import { widgetTheme } from '../../lib/theme';
 import { WalletNetworkSelectionView } from './views/WalletNetworkSelectionView';
 import { Bridge } from './views/Bridge';
+import { BridgeReview } from './views/BridgeReview';
 
 export type BridgeWidgetInputs = BridgeWidgetParams & {
   config: StrongCheckoutWidgetsConfig,
@@ -68,6 +69,9 @@ export function XBridgeWidget({
             )}
             {viewState.view.type === XBridgeWidgetViews.BRIDGE_FORM && (
               <Bridge />
+            )}
+            {viewState.view.type === XBridgeWidgetViews.BRIDGE_REVIEW && (
+              <BridgeReview />
             )}
           </CryptoFiatProvider>
         </XBridgeContext.Provider>
