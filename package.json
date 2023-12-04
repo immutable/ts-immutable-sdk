@@ -30,6 +30,9 @@
     "*": "yarn scan:secrets",
     "*.{js,jsx,ts,tsx}": "eslint"
   },
+  "overrides": {
+    "@openzeppelin/contracts": "3.4.2-solc-0.7"
+  },
   "packageManager": "yarn@3.6.1",
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
