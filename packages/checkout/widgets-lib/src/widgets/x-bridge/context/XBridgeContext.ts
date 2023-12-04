@@ -37,7 +37,6 @@ export const initialXBridgeState: Omit<XBridgeState, 'checkout'> = {
   allowedTokens: [],
   token: null,
   amount: '0',
-
 };
 
 export interface XBridgeContextState {
