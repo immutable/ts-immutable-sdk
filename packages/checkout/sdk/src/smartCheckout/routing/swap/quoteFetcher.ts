@@ -4,7 +4,7 @@ import { CheckoutConfiguration } from '../../../config';
 import * as instance from '../../../instance';
 import { ChainId } from '../../../types';
 import { DexQuote, DexQuotes } from '../types';
-import { measureAsyncExecution } from '../../../utils/debugLogger';
+import { measureAsyncExecution } from '../../../logger/debugLogger';
 
 export const quoteFetcher = async (
   config: CheckoutConfiguration,

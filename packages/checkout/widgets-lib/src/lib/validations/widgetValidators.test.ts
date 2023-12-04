@@ -87,9 +87,9 @@ describe('widget validators', () => {
       expect(result).toBeTruthy();
     });
 
-    it('should return false if address is undefined', () => {
+    it('should return true if address is undefined', () => {
       const result = isValidAddress(undefined);
-      expect(result).toBeFalsy();
+      expect(result).toBeTruthy();
     });
   });
 });

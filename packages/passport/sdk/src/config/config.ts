@@ -60,7 +60,6 @@ export class PassportConfiguration {
   }: PassportModuleConfiguration) {
     validateConfiguration(oidcConfiguration, [
       'clientId',
-      'logoutRedirectUri',
       'redirectUri',
     ]);
     this.oidcConfiguration = oidcConfiguration;

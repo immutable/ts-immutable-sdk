@@ -5,18 +5,41 @@ import { TokenInfo } from './tokenInfo';
 import { ChainId } from './chains';
 
 export interface CheckoutOverrides {}
+
+interface CheckoutFeatureConfiguration {
+  enable: boolean;
+}
+
+/**
+ * A type representing the on-ramp configurations for the checkout SDK.
+ * @property {boolean} enable - To enable on-ramp feature in Checkout sdk.
+*/
+export interface CheckoutOnRampConfiguration extends CheckoutFeatureConfiguration {}
+
+/**
+ * A type representing the swap configurations for the checkout SDK.
+ * @property {boolean} enable - To enable swap feature in Checkout sdk.
+*/
+export interface CheckoutSwapConfiguration extends CheckoutFeatureConfiguration {}
+
+/**
+ * A type representing the bridge configurations for the checkout SDK.
+ * @property {boolean} enable - To enable bridge feature in Checkout sdk.
+*/
+export interface CheckoutBridgeConfiguration extends CheckoutFeatureConfiguration {}
+
 /**
  * A type representing checkout SDK configurations.
- * @property {boolean} isOnRampEnabled - To enable on-ramp feature in Checkout sdk.
- * @property {boolean} isSwapEnabled - To enable swap feature in Checkout sdk.
- * @property {boolean} isBridgeEnabled - To enable bridge feature in Checkout sdk.
- * @property {Passport} passport - To enable passport wallet with Checkout sdk.
+ * @property {CheckoutOnRampConfiguration} onRamp - To configure the on-ramp feature.
+ * @property {CheckoutSwapConfiguration} swap - To configure the swap feature.
+ * @property {CheckoutBridgeConfiguration} bridge - To configure the bridge feature.
+ * @property {Passport} passport - To enable passport wallet integration.
 */
 export interface CheckoutModuleConfiguration extends ModuleConfiguration<CheckoutOverrides> {
-  isOnRampEnabled?: boolean,
-  isSwapEnabled?: boolean,
-  isBridgeEnabled?: boolean,
-  passport?: Passport
+  onRamp?: CheckoutOnRampConfiguration;
+  swap?: CheckoutSwapConfiguration;
+  bridge?: CheckoutBridgeConfiguration;
+  passport?: Passport;
 }
 
 /**

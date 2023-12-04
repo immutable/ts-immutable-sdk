@@ -15,7 +15,7 @@ export type ExchangeContracts = {
  * @property {string} rpcUrl - The RPC URL for the chain
  * @property {@link ExchangeContracts} contracts - The DEX contract addresses
  * @property {@link ERC20[]} commonRoutingTokens - The tokens used to find available pools for a swap
- * @property {@link Coin} nativeToken - The native token of the chain
+ * @property {@link Native} nativeToken - The native token of the chain
  * @property {@link ERC20} wrappedNativeToken - The wrapped native token of the chain
  */
 export type Chain = {
@@ -23,7 +23,7 @@ export type Chain = {
   rpcUrl: string;
   contracts: ExchangeContracts;
   commonRoutingTokens: ERC20[];
-  nativeToken: Coin;
+  nativeToken: Native;
   wrappedNativeToken: ERC20;
 };
 
@@ -167,14 +167,14 @@ export type Amount = {
  * @property {string} rpcURL - The RPC URL for the chain
  * @property {ExchangeContracts} exchangeContracts - The DEX contract addresses
  * @property {ERC20[]} commonRoutingTokens - The tokens used to find available pools for a swap
- * @property {Coin} nativeToken - The native token of the chain
+ * @property {Native} nativeToken - The native token of the chain
  * @property {ERC20} wrappedNativeToken - The wrapped native token of the chain
  */
 export type ExchangeOverrides = {
   rpcURL: string;
   exchangeContracts: ExchangeContracts;
   commonRoutingTokens: ERC20[];
-  nativeToken: Coin;
+  nativeToken: Native;
   wrappedNativeToken: ERC20;
 };
 

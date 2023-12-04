@@ -1,11 +1,7 @@
-import { Passport } from "@imtbl/passport";
-import { useEffect, useMemo } from "react";
-import { passportConfig } from "./passportConfig";
+import { useEffect } from "react";
+import { passport } from "./passport";
 
 export function PassportLoginCallback() {
-
-  const passport = useMemo(() => new Passport(passportConfig), []);
-
   useEffect(() => {
       passport?.loginCallback();
   }, [passport])

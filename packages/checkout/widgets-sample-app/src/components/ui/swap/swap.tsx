@@ -1,4 +1,4 @@
-import { Checkout, OrchestrationEventType, SwapEventType, SwapSuccess, WalletProviderName, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
+import { Checkout, SwapEventType, SwapSuccess, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
 import { WidgetsFactory } from '@imtbl/checkout-widgets';
 import { useEffect, useMemo } from 'react';
 
@@ -11,7 +11,7 @@ function SwapUI() {
   const updateTheme = (theme: WidgetTheme) => swap.update({config: {theme}});
   
   useEffect(() => {
-    swap.mount(SWAP_TARGET_ID,{amount: '10', fromContractAddress: '0x0000000000000000000000000000000000001010', toContractAddress: "0xb95B75B4E4c09F04d5DA6349861BF1b6F163D78c"});
+    swap.mount(SWAP_TARGET_ID,{amount: '10', fromContractAddress: 'native', toContractAddress: "0xb95B75B4E4c09F04d5DA6349861BF1b6F163D78c"});
     swap.addListener(SwapEventType.SUCCESS, (data: SwapSuccess) => {
     })
     swap.addListener(SwapEventType.FAILURE, (data: any) => {

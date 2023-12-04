@@ -4,9 +4,8 @@ import { Checkout } from '../sdk';
 import {
   ChainId,
   CheckoutModuleConfiguration,
-  PRODUCTION_CHAIN_ID_NETWORK_MAP,
-  SANDBOX_CHAIN_ID_NETWORK_MAP,
 } from '../types';
+import { PRODUCTION_CHAIN_ID_NETWORK_MAP, SANDBOX_CHAIN_ID_NETWORK_MAP } from '../env';
 
 describe('config', () => {
   describe('CheckoutConfiguration class', () => {

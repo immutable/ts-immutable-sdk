@@ -9,7 +9,7 @@ function BridgeUI() {
   const bridge = useMemo(() => factory.create(WidgetType.BRIDGE),[factory]);
   
   useEffect(() => {
-    bridge.mount(BRIDGE_TARGET_ID, {amount: '10'});
+    bridge.mount(BRIDGE_TARGET_ID, {amount: '10', fromContractAddress:'NATIVE'});
     bridge.addListener(BridgeEventType.SUCCESS, (data: any) => {
       console.log('SUCCESS', data);
     });

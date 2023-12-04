@@ -13,17 +13,17 @@ import {
   WalletProviderName,
   WalletAction,
   NetworkFilterTypes,
-  PRODUCTION_CHAIN_ID_NETWORK_MAP,
   ChainName,
   NetworkInfo,
-  SANDBOX_CHAIN_ID_NETWORK_MAP,
-  IMX_ADDRESS_ZKEVM,
 } from '../types';
 import { createProvider } from '../provider';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { CheckoutConfiguration } from '../config';
 import { RemoteConfigFetcher } from '../config/remoteConfigFetcher';
 import { getUnderlyingChainId } from '../provider/getUnderlyingProvider';
+import {
+  PRODUCTION_CHAIN_ID_NETWORK_MAP, SANDBOX_CHAIN_ID_NETWORK_MAP,
+} from '../env';
 
 let windowSpy: any;
 const providerMock = {
@@ -49,7 +49,6 @@ const zkevmNetworkInfo = {
     name: 'IMX',
     symbol: 'IMX',
     decimals: 18,
-    address: IMX_ADDRESS_ZKEVM,
   },
 };
 
@@ -473,7 +472,6 @@ describe('network functions', () => {
               name: 'IMX',
               symbol: 'IMX',
               decimals: 18,
-              address: IMX_ADDRESS_ZKEVM,
             },
           },
         ],

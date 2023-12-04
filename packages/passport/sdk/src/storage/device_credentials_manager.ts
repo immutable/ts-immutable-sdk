@@ -2,28 +2,11 @@
 import { DeviceTokenResponse, TokenPayload, PKCEData } from 'types';
 import jwt_decode from 'jwt-decode';
 
-const keyCrendentials = 'passport_credentials';
 const KEY_PKCE_STATE = 'pkce_state';
 const KEY_PKCE_VERIFIER = 'pkce_verifier';
 const validCredentialsMinTtlSec = 3600; // 1 hour
 
 export default class DeviceCredentialsManager {
-  public saveCredentials(tokenResponse: DeviceTokenResponse) {
-    if (this.areValid(tokenResponse)) {
-      localStorage.setItem(keyCrendentials, JSON.stringify(tokenResponse));
-    } else {
-      throw Error('Invalid credentials.');
-    }
-  }
-
-  public getCredentials(): DeviceTokenResponse | null {
-    const credentialsJson = localStorage.getItem(keyCrendentials);
-    if (credentialsJson) {
-      return JSON.parse(credentialsJson);
-    }
-    return null;
-  }
-
   public areValid(tokenResponse: DeviceTokenResponse): boolean {
     if (tokenResponse) {
       const accessTokenValid = this.isTokenValid(tokenResponse.access_token);
@@ -42,10 +25,6 @@ export default class DeviceCredentialsManager {
     } catch (error) {
       return false;
     }
-  }
-
-  public clearCredentials() {
-    localStorage.removeItem(keyCrendentials);
   }
 
   public savePKCEData(data: PKCEData) {

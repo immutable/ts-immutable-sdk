@@ -1,8 +1,6 @@
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { BigNumber } from '@ethersproject/bignumber';
-import {
-  expectToBeDefined, NATIVE_TEST_TOKEN, TEST_CHAIN_ID, TEST_RPC_URL,
-} from 'test/utils';
+import { expectToBeDefined, NATIVE_TEST_TOKEN, TEST_CHAIN_ID, TEST_RPC_URL } from 'test/utils';
 import { newAmount } from 'lib/utils';
 import { calculateGasFee, fetchGasPrice } from './gas';
 
@@ -25,19 +23,14 @@ describe('calculateGasFee', () => {
 describe('fetchGasPrice', () => {
   describe('when no fee data is returned', () => {
     it('should return null', async () => {
-      (JsonRpcProvider as unknown as jest.Mock).mockImplementation(
-        () => ({
-          getFeeData: async () => ({
-            maxFeePerGas: null,
-            gasPrice: null,
-          }),
+      (JsonRpcProvider as unknown as jest.Mock).mockImplementation(() => ({
+        getFeeData: async () => ({
+          maxFeePerGas: null,
+          gasPrice: null,
         }),
-      ) as unknown as JsonRpcProvider;
+      })) as unknown as JsonRpcProvider;
 
-      const provider = new JsonRpcProvider(
-        TEST_RPC_URL,
-        TEST_CHAIN_ID,
-      );
+      const provider = new JsonRpcProvider(TEST_RPC_URL, TEST_CHAIN_ID);
 
       const gasFeeEstimate = await fetchGasPrice(provider, NATIVE_TEST_TOKEN);
 
@@ -49,24 +42,20 @@ describe('fetchGasPrice', () => {
     it('should return the gasPrice', async () => {
       const gasPrice = BigNumber.from('1500000000'); // 1.5 gwei or 1500000000 wei
 
-      (JsonRpcProvider as unknown as jest.Mock).mockImplementation(
-        () => ({
-          getFeeData: async () => ({
-            maxFeePerGas: null,
-            gasPrice,
-          }),
+      (JsonRpcProvider as unknown as jest.Mock).mockImplementation(() => ({
+        getFeeData: async () => ({
+          maxFeePerGas: null,
+          gasPrice,
         }),
-      ) as unknown as JsonRpcProvider;
+      })) as unknown as JsonRpcProvider;
 
-      const provider = new JsonRpcProvider(
-        TEST_RPC_URL,
-        TEST_CHAIN_ID,
-      );
+      const provider = new JsonRpcProvider(TEST_RPC_URL, TEST_CHAIN_ID);
 
       const gasFeeEstimate = await fetchGasPrice(provider, NATIVE_TEST_TOKEN);
 
       expectToBeDefined(gasFeeEstimate);
       expect(gasFeeEstimate.value.toString()).toEqual('1500000000');
+      expect(gasFeeEstimate.token.type).toEqual('native');
     });
   });
 
@@ -75,24 +64,20 @@ describe('fetchGasPrice', () => {
       const maxFeePerGas = BigNumber.from('2500000000'); // 2.5 gwei or 2500000000 wei
       const maxPriorityFeePerGas = BigNumber.from('500000000'); // 0.5 gwei or 500000000 wei
 
-      (JsonRpcProvider as unknown as jest.Mock).mockImplementation(
-        () => ({
-          getFeeData: async () => ({
-            maxFeePerGas,
-            maxPriorityFeePerGas,
-            gasPrice: null,
-          }),
+      (JsonRpcProvider as unknown as jest.Mock).mockImplementation(() => ({
+        getFeeData: async () => ({
+          maxFeePerGas,
+          maxPriorityFeePerGas,
+          gasPrice: null,
         }),
-      ) as unknown as JsonRpcProvider;
+      })) as unknown as JsonRpcProvider;
 
-      const provider = new JsonRpcProvider(
-        TEST_RPC_URL,
-        TEST_CHAIN_ID,
-      );
+      const provider = new JsonRpcProvider(TEST_RPC_URL, TEST_CHAIN_ID);
 
       const gasFeeEstimate = await fetchGasPrice(provider, NATIVE_TEST_TOKEN);
       expectToBeDefined(gasFeeEstimate);
       expect(gasFeeEstimate.value.toString()).toEqual('3000000000');
+      expect(gasFeeEstimate.token.type).toEqual('native');
     });
   });
 });
