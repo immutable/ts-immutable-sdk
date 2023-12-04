@@ -15,6 +15,7 @@ import { TransactionsInProgress } from './SectionInProgress';
 import { TransactionsActionRequired } from './SectionActionRequired';
 import { Shimmer } from './Shimmer';
 import { transactionsListStyle } from './indexStyles';
+import { EmptyStateNotConnected } from './EmptyStateNotConnected';
 
 export function Transactions() {
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
@@ -23,7 +24,7 @@ export function Transactions() {
   const { bridgeState } = useContext(XBridgeContext);
   const { web3Provider } = bridgeState;
 
-  const isPassport = true || isPassportProvider(web3Provider);
+  const isPassport = isPassportProvider(web3Provider);
 
   const [loading, setLoading] = useState(true);
 
@@ -43,14 +44,20 @@ export function Transactions() {
       footer={<FooterLogo />}
     >
       <Box sx={{ px: 'base.spacing.x4' }}>
-        <Box sx={transactionsListStyle(isPassport)}>
-          {loading ? <Shimmer /> : (
-            <>
-              <TransactionsActionRequired />
-              <TransactionsInProgress />
-            </>
-          )}
-        </Box>
+        {
+          !web3Provider
+            ? <EmptyStateNotConnected />
+            : (
+              <Box sx={transactionsListStyle(isPassport)}>
+                {loading ? <Shimmer /> : (
+                  <>
+                    <TransactionsActionRequired />
+                    <TransactionsInProgress />
+                  </>
+                )}
+              </Box>
+            )
+        }
         {isPassport && (
         <MenuItem emphasized>
           <MenuItem.Label sx={{ fontWeight: 'normal' }}>

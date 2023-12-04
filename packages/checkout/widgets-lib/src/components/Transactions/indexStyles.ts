@@ -11,5 +11,6 @@ export const transactionsListStyle = (showExternalLink: boolean) => {
     h: `${height}px`,
     overflowY: 'scroll',
     mb: 'base.spacing.x2',
+    w: '100%',
   };
 };

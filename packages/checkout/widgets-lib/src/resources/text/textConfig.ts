@@ -476,6 +476,11 @@ export const text = {
         actionRequired: {
           heading: 'Action Required',
         },
+        emptyState: {
+          notConnected: {
+            body: 'Connect your wallet to view the transactions',
+          },
+        },
       },
     },
   },
