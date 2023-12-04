@@ -137,22 +137,35 @@ export interface BridgeFeeRequest {
  * @property {ethers.BigNumber} sourceChainGas - Gas cost to send tokens to the bridge contract on the source chain.
  * - priced in the source chain's native token.
  * @property {ethers.BigNumber} destinationChainGas - Gas cost to issue bridged tokens on the destination chain.
- * - priced in the destination chain's native token.
- * @property {ethers.BigNumber} bridgeFee - Fee charged by Axelar to validate the bridge event and
- * issue the tokens on the destination chain (includes destinationChainGas).
+ * - priced in the source chain's native token.
+ * @property {ethers.BigNumber} validatorFee - Fee charged by Axelar to validate and parse the bridge message.
+ * - priced in the source chain's native token.
+ * @property {ethers.BigNumber} bridgeFee - destinationChainGas + validatorFee.
+ * This will be added to the tx.value of the bridge transaction and forwarded to the Axelar Gas Service contract.
  * - priced in the source chain's native token.
  * @property {ethers.BigNumber} imtblFee - The fee charged by Immutable to facilitate the bridge.
  * - priced in the source chain's native token.
  * @property {ethers.BigNumber} totalFees - The total fees the user will be charged which is;
- * sourceChainGas + bridgeFee (axelarFee + destinationChainGas) + imtblFee.
+ * sourceChainGas + validatorFee + destinationChainGas + imtblFee.
  * - priced in the source chain's native token.
  */
 export interface BridgeFeeResponse {
   sourceChainGas: ethers.BigNumber,
   destinationChainGas: ethers.BigNumber,
+  validatorFee: ethers.BigNumber,
   bridgeFee: ethers.BigNumber,
   imtblFee: ethers.BigNumber,
   totalFees: ethers.BigNumber,
+}
+
+/**
+ * @typedef {Object} CalculateBridgeFeeResponse
+ * @property {ethers.BigNumber} validatorFee - Fee charged by Axelar to validate and parse the bridge message.
+ * @property {ethers.BigNumber} executionFee - Gas cost to issue bridged tokens on the destination chain.
+ */
+export interface CalculateBridgeFeeResponse {
+  validatorFee: ethers.BigNumber;
+  executionFee: ethers.BigNumber;
 }
 
 /**

@@ -31,6 +31,7 @@ import {
   AddGasRequest,
   AddGasResponse,
   FlowRateInfoRequest,
+  CalculateBridgeFeeResponse,
 } from 'types';
 import { ROOT_ERC20_BRIDGE_FLOW_RATE } from 'contracts/ABIs/RootERC20BridgeFlowRate';
 import { ERC20 } from 'contracts/ABIs/ERC20';
@@ -102,6 +103,7 @@ export class TokenBridge {
     let sourceChainGas: ethers.BigNumber = ethers.BigNumber.from(0);
     let destinationChainGas: ethers.BigNumber = ethers.BigNumber.from(0);
     let bridgeFee: ethers.BigNumber = ethers.BigNumber.from(0);
+    let validatorFee: ethers.BigNumber = ethers.BigNumber.from(0);
     const imtblFee: ethers.BigNumber = ethers.BigNumber.from(0);
 
     if (req.action === BridgeFeeActions.FINALISE_WITHDRAWAL) {
@@ -111,32 +113,29 @@ export class TokenBridge {
       );
     } else {
       let sourceProvider:ethers.providers.Provider;
-      let destinationProvider:ethers.providers.Provider;
 
       const destinationGasLimit = BridgeMethodsGasLimit[`${req.action}_DESTINATION`];
       if (req.action === BridgeFeeActions.WITHDRAW) {
         sourceProvider = this.config.childProvider;
-        destinationProvider = this.config.rootProvider;
       } else {
         sourceProvider = this.config.rootProvider;
-        destinationProvider = this.config.childProvider;
       }
 
       sourceChainGas = await this.getGasEstimates(
         sourceProvider,
         BridgeMethodsGasLimit[`${req.action}_SOURCE`],
       );
-      destinationChainGas = await this.getGasEstimates(
-        destinationProvider,
-        destinationGasLimit,
-      );
 
-      bridgeFee = await this.calculateBridgeFee(
+      const bridgeFees:CalculateBridgeFeeResponse = await this.calculateBridgeFee(
         req.sourceChainId,
         req.destinationChainId,
         destinationGasLimit,
         req.gasMultiplier,
       );
+
+      validatorFee = bridgeFees.validatorFee;
+      destinationChainGas = bridgeFees.executionFee;
+      bridgeFee = validatorFee.add(destinationChainGas);
     }
 
     const totalFees: ethers.BigNumber = sourceChainGas.add(bridgeFee).add(imtblFee);
@@ -144,6 +143,7 @@ export class TokenBridge {
     return {
       sourceChainGas,
       destinationChainGas,
+      validatorFee,
       bridgeFee,
       imtblFee, // no network fee charged currently
       totalFees,
@@ -589,7 +589,7 @@ export class TokenBridge {
     destination:string,
     gasLimit: number,
     gasMultiplier: number = 1.1,
-  ): Promise<ethers.BigNumber> {
+  ): Promise<CalculateBridgeFeeResponse> {
     const sourceAxelar:AxelarChainDetails = axelarChains[source];
     const destinationAxelar:AxelarChainDetails = axelarChains[destination];
 
@@ -641,7 +641,10 @@ export class TokenBridge {
       );
     }
 
-    return ethers.BigNumber.from(estimateGasFeeResult.executionFeeWithMultiplier);
+    return {
+      validatorFee: ethers.BigNumber.from(estimateGasFeeResult.baseFee),
+      executionFee: ethers.BigNumber.from(estimateGasFeeResult.executionFeeWithMultiplier),
+    };
   }
 
   // STUBBED ENDPOINTS FOR PHASE 2 -------------------------------------------
