@@ -24,6 +24,7 @@ import { widgetTheme } from '../../lib/theme';
 import { WalletNetworkSelectionView } from './views/WalletNetworkSelectionView';
 import { Bridge } from './views/Bridge';
 import { BridgeReview } from './views/BridgeReview';
+import { MoveInProgress } from './views/MoveInProgress';
 
 export type BridgeWidgetInputs = BridgeWidgetParams & {
   config: StrongCheckoutWidgetsConfig,
@@ -42,8 +43,8 @@ export function XBridgeWidget({
     viewReducer,
     {
       ...initialViewState,
-      view: { type: XBridgeWidgetViews.WALLET_NETWORK_SECLECTION },
-      history: [{ type: XBridgeWidgetViews.WALLET_NETWORK_SECLECTION }],
+      view: { type: XBridgeWidgetViews.IN_PROGRESS },
+      history: [{ type: XBridgeWidgetViews.IN_PROGRESS }],
     },
   );
   const [bridgeState, bridgeDispatch] = useReducer(
@@ -72,6 +73,9 @@ export function XBridgeWidget({
             )}
             {viewState.view.type === XBridgeWidgetViews.BRIDGE_REVIEW && (
               <BridgeReview />
+            )}
+            {viewState.view.type === XBridgeWidgetViews.IN_PROGRESS && (
+              <MoveInProgress />
             )}
           </CryptoFiatProvider>
         </XBridgeContext.Provider>

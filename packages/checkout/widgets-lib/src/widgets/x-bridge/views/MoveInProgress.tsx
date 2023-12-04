@@ -1,87 +1,73 @@
-import { TokenInfo } from '@imtbl/checkout-sdk';
-import { TransactionResponse } from '@ethersproject/providers';
-import { useContext, useEffect } from 'react';
-import { CompletionStatus, WaitForDepositResponse } from '@imtbl/bridge-sdk';
+import { useContext } from 'react';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
-import { BridgeHero } from '../../../components/Hero/BridgeHero';
+import { RocketHero } from '../../../components/Hero/RocketHero';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { text } from '../../../resources/text/textConfig';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
-import { BridgeWidgetViews, PrefilledBridgeForm } from '../../../context/view-context/BridgeViewContextTypes';
-import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
-import { XBridgeContext } from '../context/XBridgeContext';
+import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 
-interface MoveInProgressProps {
-  token: TokenInfo,
-  transactionResponse: TransactionResponse,
-  bridgeForm: PrefilledBridgeForm,
-}
-
-export function MoveInProgress({ token, transactionResponse, bridgeForm }: MoveInProgressProps) {
-  const { viewDispatch } = useContext(ViewContext);
+export function MoveInProgress() {
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
-  const { heading, body1, body2 } = text.views[BridgeWidgetViews.IN_PROGRESS];
-  const {
-    bridgeState: {
-      tokenBridge,
-    },
-  } = useContext(XBridgeContext);
+  const { heading, body2 } = text.views[BridgeWidgetViews.IN_PROGRESS];
+  // const {
+  //   bridgeState: {},
+  // } = useContext(XBridgeContext);
 
-  useEffect(() => {
-    if (!tokenBridge) return;
+  // useEffect(() => {
+  //   if (!tokenBridge) return;
 
-    (async () => {
-      try {
-        const receipt = await transactionResponse.wait();
+  //   (async () => {
+  //     try {
+  //       const receipt = await transactionResponse.wait();
 
-        if (receipt.status === 1) {
-          const bridgeResult: WaitForDepositResponse = await tokenBridge.waitForDeposit({
-            transactionHash: receipt.transactionHash,
-          });
+  //       if (receipt.status === 1) {
+  //         const bridgeResult: WaitForDepositResponse = await tokenBridge.waitForDeposit({
+  //           transactionHash: receipt.transactionHash,
+  //         });
 
-          if (bridgeResult.status === CompletionStatus.SUCCESS) {
-            viewDispatch({
-              payload: {
-                type: ViewActions.UPDATE_VIEW,
-                view: {
-                  type: BridgeWidgetViews.SUCCESS,
-                  data: {
-                    transactionHash: receipt.transactionHash,
-                  },
-                },
-              },
-            });
-            return;
-          }
-        }
+  //         if (bridgeResult.status === CompletionStatus.SUCCESS) {
+  //           viewDispatch({
+  //             payload: {
+  //               type: ViewActions.UPDATE_VIEW,
+  //               view: {
+  //                 type: BridgeWidgetViews.SUCCESS,
+  //                 data: {
+  //                   transactionHash: receipt.transactionHash,
+  //                 },
+  //               },
+  //             },
+  //           });
+  //           return;
+  //         }
+  //       }
 
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: {
-              type: BridgeWidgetViews.FAIL,
-              data: bridgeForm,
-            },
-          },
-        });
-      } catch (err) {
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: {
-              type: BridgeWidgetViews.FAIL,
-              data: bridgeForm,
-              reason: 'Transaction failed',
-            },
-          },
-        });
-      }
-    })();
-  }, [transactionResponse, tokenBridge]);
+  //       viewDispatch({
+  //         payload: {
+  //           type: ViewActions.UPDATE_VIEW,
+  //           view: {
+  //             type: BridgeWidgetViews.FAIL,
+  //             data: bridgeForm,
+  //           },
+  //         },
+  //       });
+  //     } catch (err) {
+  //       viewDispatch({
+  //         payload: {
+  //           type: ViewActions.UPDATE_VIEW,
+  //           view: {
+  //             type: BridgeWidgetViews.FAIL,
+  //             data: bridgeForm,
+  //             reason: 'Transaction failed',
+  //           },
+  //         },
+  //       });
+  //     }
+  //   })();
+  // }, [transactionResponse, tokenBridge]);
 
   return (
     <SimpleLayout
@@ -95,13 +81,10 @@ export function MoveInProgress({ token, transactionResponse, bridgeForm }: MoveI
       footer={(
         <FooterLogo />
       )}
-      heroContent={<BridgeHero />}
+      heroContent={<RocketHero />}
       floatHeader
     >
       <SimpleTextBody heading={heading}>
-        {body1(token?.symbol)}
-        <br />
-        <br />
         {body2}
       </SimpleTextBody>
     </SimpleLayout>
