@@ -460,6 +460,24 @@ export const text = {
         text: 'Next',
       },
     },
+    [XBridgeWidgetViews.BRIDGE_REVIEW]: {
+      layoutHeading: 'Move',
+      heading: 'Ok, how does this look?',
+      fromLabel: {
+        amountHeading: 'Moving',
+        heading: 'From',
+      },
+      toLabel: {
+        heading: 'To',
+      },
+      fees: {
+        heading: 'Gas fee',
+      },
+      footer: {
+        buttonText: 'Confirm move',
+      },
+      fiatPricePrefix: '~ USD $',
+    },
   },
   footers: {
     quickswapFooter: {
