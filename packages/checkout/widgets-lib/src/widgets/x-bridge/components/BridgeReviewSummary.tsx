@@ -1,10 +1,16 @@
 import { text } from 'resources/text/textConfig';
+import { useContext, useMemo } from 'react';
 import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
 import {
   Body,
   Box, Heading, Icon, MenuItem,
 } from '@biom3/react';
 import { ChainId, WalletProviderName } from '@imtbl/checkout-sdk';
+import { abbreviateAddress } from 'lib/addressUtils';
+import { CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext';
+import { isPassportProvider } from 'lib/providerUtils';
+import { calculateCryptoToFiat } from 'lib/utils';
+import { Web3Provider } from '@ethersproject/providers';
 import { networkIconStyles } from './WalletNetworkButtonStyles';
 import {
   arrowIconStyles,
@@ -16,6 +22,7 @@ import {
   topMenuItemStyles,
   walletLogoStyles,
 } from './BridgeReviewSummaryStyles';
+import { XBridgeContext } from '../context/XBridgeContext';
 
 const networkIcon = {
   [ChainId.IMTBL_ZKEVM_DEVNET]: 'Immutable',
@@ -30,42 +37,50 @@ const logo = {
   [WalletProviderName.METAMASK]: 'MetaMaskSymbol',
 };
 
-const currencyImageUrl = {
-  usdc: 'https://design-system.immutable.com/hosted-for-ds/currency-icons/currency--usdc.svg',
-  eth: 'https://design-system.immutable.com/hosted-for-ds/currency-icons/currency--eth.svg',
-  imx: 'https://design-system.immutable.com/hosted-for-ds/currency-icons/currency--imx.svg',
-};
+export function BridgeReviewSummary() {
+  const testId = 'bridge-review-summary';
 
-interface BridgeReviewSummaryProps {
-  testId?: string;
-  fromAmount?: string;
-  fromFiatAmount?: string;
-  fromAddress: string | null;
-  fromWalletProviderName?: WalletProviderName;
-  fromNetwork?: ChainId | null;
-  toAddress: string | null;
-  toWalletProviderName?: WalletProviderName;
-  toNetwork?: ChainId | null;
-  gasEstimate?: string;
-  gasFiatEstimate?: string;
-}
-
-export function BridgeReviewSummary({
-  testId,
-  fromAmount,
-  fromFiatAmount,
-  fromAddress,
-  fromWalletProviderName,
-  fromNetwork,
-  toAddress,
-  toWalletProviderName,
-  toNetwork,
-  gasEstimate,
-  gasFiatEstimate,
-}: BridgeReviewSummaryProps) {
   const {
-    heading, from, to, fees,
+    heading, fromLabel, toLabel, fees, fiatPricePrefix,
   } = text.views[XBridgeWidgetViews.BRIDGE_REVIEW];
+
+  const {
+    bridgeState: {
+      from,
+      to,
+      token,
+      amount,
+    },
+  } = useContext(XBridgeContext);
+
+  const { cryptoFiatState } = useContext(CryptoFiatContext);
+
+  const walletProviderName = (provider: Web3Provider | undefined) => (isPassportProvider(provider)
+    ? WalletProviderName.PASSPORT
+    : WalletProviderName.METAMASK);
+
+  const fromAmount = useMemo(() => (token?.symbol ? `${token?.symbol} ${amount}` : `${amount}`), [token, amount]);
+  const fromFiatAmount = useMemo(() => {
+    if (!amount || !token) return '';
+    return calculateCryptoToFiat(amount, token.symbol, cryptoFiatState.conversions);
+  }, [token, amount]);
+  const fromAddress = useMemo(() => {
+    if (!from) return '-';
+    return from.walletAddress;
+  }, [from]);
+
+  const fromWalletProviderName = useMemo(() => walletProviderName(from?.web3Provider), [from]);
+  const fromNetwork = useMemo(() => from && from.network, [from]);
+
+  const toAddress = useMemo(() => {
+    if (!to) return '-';
+    return to.walletAddress;
+  }, [to]);
+  const toWalletProviderName = useMemo(() => walletProviderName(to?.web3Provider), [to]);
+  const toNetwork = useMemo(() => to?.network, [to]);
+
+  const gasEstimate = 'ETH 0.007984';
+  const gasFiatEstimate = '15.00';
 
   return (
     <Box testId={testId} sx={bridgeReviewWrapperStyles}>
@@ -86,14 +101,13 @@ export function BridgeReviewSummary({
         sx={topMenuItemStyles}
       >
         <MenuItem.Label size="small" sx={{ marginBottom: 'base.spacing.x4', fontWeight: 'bold' }}>
-          {from.amountHeading}
+          {fromLabel.amountHeading}
         </MenuItem.Label>
         <MenuItem.Caption />
         <MenuItem.PriceDisplay
           use={<Heading size="xSmall" weight="light" />}
           price={fromAmount ?? '-'}
-          fiatAmount={fromFiatAmount}
-          currencyImageUrl={currencyImageUrl.usdc}
+          fiatAmount={`${fiatPricePrefix}${fromFiatAmount}`}
         />
       </MenuItem>
       <MenuItem
@@ -109,9 +123,16 @@ export function BridgeReviewSummary({
           />
         )}
         <MenuItem.Label>
-          <strong>{from.heading}</strong>
+          <strong>{fromLabel.heading}</strong>
           {' '}
-          {fromAddress}
+          <Body
+            size="small"
+            sx={{
+              color: 'base.color.text.secondary',
+            }}
+          >
+            {abbreviateAddress(fromAddress ?? '')}
+          </Body>
         </MenuItem.Label>
         {fromNetwork && (
           <MenuItem.IntentIcon
@@ -139,9 +160,16 @@ export function BridgeReviewSummary({
           />
         )}
         <MenuItem.Label>
-          <strong>{to.heading}</strong>
+          <strong>{toLabel.heading}</strong>
           {' '}
-          {toAddress}
+          <Body
+            size="small"
+            sx={{
+              color: 'base.color.text.secondary',
+            }}
+          >
+            {abbreviateAddress(toAddress ?? '')}
+          </Body>
         </MenuItem.Label>
         {toNetwork && (
           <MenuItem.IntentIcon
@@ -165,8 +193,7 @@ export function BridgeReviewSummary({
         <MenuItem.PriceDisplay
           use={<Body size="xSmall" />}
           price={gasEstimate ?? '-'}
-          fiatAmount={`~ ${gasFiatEstimate}`}
-          currencyImageUrl={currencyImageUrl.eth}
+          fiatAmount={`${fiatPricePrefix}${gasFiatEstimate}`}
         />
       </MenuItem>
     </Box>

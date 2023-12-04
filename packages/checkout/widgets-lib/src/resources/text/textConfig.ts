@@ -463,11 +463,11 @@ export const text = {
     [XBridgeWidgetViews.BRIDGE_REVIEW]: {
       layoutHeading: 'Move',
       heading: 'Ok, how does this look?',
-      from: {
+      fromLabel: {
         amountHeading: 'Moving',
         heading: 'From',
       },
-      to: {
+      toLabel: {
         heading: 'To',
       },
       fees: {
@@ -476,6 +476,7 @@ export const text = {
       footer: {
         buttonText: 'Confirm move',
       },
+      fiatPricePrefix: '~ USD $',
     },
   },
   footers: {
