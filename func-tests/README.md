@@ -21,6 +21,11 @@ Functional tests using Cucumber and Gherkin
 
 By default, all tests that do not have the `@skip` tag are run. In other words, the tag filter is set to `not @skip`. You can see this in the [.env.sandbox](.env.sandbox) file.
 
-You can change the tag filter on the command line: `TAGS="@registration" yarn test`
+You can change the tag filter on the command line: `TAGS="<tag-expression>" yarn test`, or more permanently, by editing your .env file directly.
 
-Or, more permanently, by editing your .env file directly.
+Examples of `<tag-expression>`:
+
+* `@registration` - only run tests with the `@registration` tag
+* `not @registration` - run all tests except those with the `@registration` tag
+
+**Tip:** To focus on a single test, add the `@only` tag to the relevant scenario, and set the tag expression to match.
