@@ -5,7 +5,7 @@ import { Withdrawal } from './withdrawal';
 import { DepositEth } from './deposit';
 import { Transfer } from './transfer';
 
-const feature = loadFeature('features/withdrawal.feature');
+const feature = loadFeature('features/withdrawal.feature',{tagFilter: process.env.TAGS});
 
 defineFeature(feature, (test) => {
   test('Withdraw ETH', ({
@@ -46,18 +46,18 @@ defineFeature(feature, (test) => {
       await withdrawal.checkWithdrawableEthStatus(withdrawalVar, statusVar);
     });
   });
-  // test('Complete withdraw ETH', ({ given, and, then }) => {
-  //   const sharedState = new StepSharedState();
-  //   const registration = new Registration(sharedState);
-  //   const withdrawal = new Withdrawal(sharedState);
-  //   given(/^A new Eth wallet "(.*)"$/, async (addressVar) => {
-  //     await registration.addNewWallet(addressVar);
-  //   });
-  //   and(/^"(.*)" is registered$/, async (addressVar) => {
-  //     await registration.register(addressVar);
-  //   });
-  //   then(/^user "(.*)" completes withdrawal of ETH$/, async (addressVar) => {
-  //     await withdrawal.completeEthWithdrawal(addressVar);
-  //   });
-  // });
+  test('Complete withdraw ETH', ({ given, and, then }) => {
+    const sharedState = new StepSharedState();
+    const registration = new Registration(sharedState);
+    const withdrawal = new Withdrawal(sharedState);
+    given(/^A new Eth wallet "(.*)"$/, async (addressVar) => {
+      await registration.addNewWallet(addressVar);
+    });
+    and(/^"(.*)" is registered$/, async (addressVar) => {
+      await registration.register(addressVar);
+    });
+    then(/^user "(.*)" completes withdrawal of ETH$/, async (addressVar) => {
+      await withdrawal.completeEthWithdrawal(addressVar);
+    });
+  });
 });

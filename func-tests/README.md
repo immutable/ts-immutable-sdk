@@ -12,4 +12,15 @@ Functional tests using Cucumber and Gherkin
 
 ## Running the tests
 
-`yarn test`
+1. Copy the .env.sandbox file to .env
+2. `yarn test`
+
+**Note:** Certain tests are skipped on CI because of the time they take to run. 
+
+## Filtering tests
+
+By default, all tests that do not have the `@skip` tag are run. In other words, the tag filter is set to `not @skip`. You can see this in the [.env.sandbox](.env.sandbox) file.
+
+You can change the tag filter on the command line: `TAGS="@registration" yarn test`
+
+Or, more permanently, by editing your .env file directly.

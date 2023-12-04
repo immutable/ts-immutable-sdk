@@ -2,7 +2,7 @@ import { defineFeature, loadFeature } from 'jest-cucumber';
 import { Registration } from './registration';
 import { StepSharedState } from './stepSharedState';
 
-const feature = loadFeature('features/registration.feature');
+const feature = loadFeature('features/registration.feature',{tagFilter: process.env.TAGS});
 
 defineFeature(feature, (test) => {
   test('Registration', ({ given, and, then }) => {
