@@ -36,11 +36,11 @@ Feature: Withdrawal
     When user "user1" prepare withdrawal "withdrawal1" of ETH "0.00001"
     Then ETH withdrawal "withdrawal1" should be in "success" status
 
-  # @withdrawal @withdrawalETH @onchain @ethSignature @completeEthWithdrawal
-  # Scenario: Complete withdraw ETH
-  #   Given A new Eth wallet "user1"
-  #   And "user1" is registered
-  #   Then user "user1" completes withdrawal of ETH
+  @withdrawal @withdrawalETH @onchain @ethSignature @completeEthWithdrawal @skip
+  Scenario: Complete withdraw ETH
+    Given A new Eth wallet "user1"
+    And "user1" is registered
+    Then user "user1" completes withdrawal of ETH
 
 
   # @withdrawal @completeWithdrawalNFT
