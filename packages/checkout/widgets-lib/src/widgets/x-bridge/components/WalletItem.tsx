@@ -2,20 +2,20 @@ import { WalletProviderName } from '@imtbl/checkout-sdk';
 import { MenuItem } from '@biom3/react';
 import { useState } from 'react';
 import { text } from '../../../resources/text/textConfig';
-import { walletItemLogoStyles } from './BridgeWalletItemStyles';
+import { walletItemLogoStyles } from './WalletItemStyles';
 
-export interface BridgeWalletProps {
+export interface WalletItemProps {
   testId: string;
   walletProviderName: WalletProviderName
   onWalletClick: (walletProviderName: WalletProviderName) => Promise<void>;
   loading: boolean;
 }
-export function BridgeWalletItem({
+export function WalletItem({
   testId,
   walletProviderName,
   onWalletClick,
   loading,
-}: BridgeWalletProps) {
+}: WalletItemProps) {
   const { wallets } = text;
   const [showLoadingIcon, setShowLoadingIcon] = useState(false);
 
