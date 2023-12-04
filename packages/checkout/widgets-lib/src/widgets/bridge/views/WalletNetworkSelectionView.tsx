@@ -6,20 +6,16 @@ import { EventTargetContext } from 'context/event-target-context/EventTargetCont
 import { text } from 'resources/text/textConfig';
 import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { ButtonNavigationStyles } from 'components/Header/HeaderStyles';
-import { Box, ButtCon } from '@biom3/react';
+import { ButtCon } from '@biom3/react';
 import { ViewActions, ViewContext } from 'context/view-context/ViewContext';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
 import { WalletAndNetworkSelector } from '../components/WalletAndNetworkSelector';
-import { BridgeContext } from '../context/BridgeContext';
 
 export function WalletNetworkSelectionView() {
   const { viewDispatch } = useContext(ViewContext);
 
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
   const { layoutHeading } = text.views[BridgeWidgetViews.WALLET_NETWORK_SELECTION];
-
-  const { bridgeState } = useContext(BridgeContext);
-  const { web3Provider } = bridgeState;
 
   return (
     <SimpleLayout
@@ -28,7 +24,7 @@ export function WalletNetworkSelectionView() {
         <HeaderNavigation
           title={layoutHeading}
           onCloseButtonClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
-          rightActions={web3Provider ? (
+          rightActions={(
             <ButtCon
               icon="Minting"
               sx={ButtonNavigationStyles()}
@@ -42,7 +38,7 @@ export function WalletNetworkSelectionView() {
               }}
               testId="settings-button"
             />
-          ) : <Box />}
+          )}
         />
       )}
       footer={<FooterLogo />}

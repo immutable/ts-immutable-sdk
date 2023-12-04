@@ -8,25 +8,28 @@ import { text } from 'resources/text/textConfig';
 import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
 import { ButtonNavigationStyles } from 'components/Header/HeaderStyles';
 import {
-  Box, ButtCon, MenuItem, ShimmerBox,
+  Box, ButtCon, Link, MenuItem, ShimmerBox,
 } from '@biom3/react';
 import { SharedViews, ViewActions, ViewContext } from 'context/view-context/ViewContext';
 import { useInterval } from 'lib/hooks/useInterval';
+import { isPassportProvider } from 'lib/providerUtils';
 import { sendBridgeWidgetCloseEvent } from '../../widgets/x-bridge/BridgeWidgetEvents';
 import { XBridgeContext } from '../../widgets/x-bridge/context/XBridgeContext';
-import { TransactionsInProgress } from './InProgress';
-import { TransactionsFinished } from './Finished';
-import { TransactionsActionRequired } from './ActionRequired';
+import { TransactionsInProgress } from './SectionInProgress';
+import { TransactionsActionRequired } from './SectionActionRequired';
 import { Shimmer } from './Shimmer';
+import { transactionsListStyle } from './indexStyles';
 
 export function Transactions() {
   const { viewDispatch } = useContext(ViewContext);
 
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
-  const { layoutHeading } = text.views[XBridgeWidgetViews.TRANSACTIONS];
+  const { layoutHeading, passportDashboard } = text.views[XBridgeWidgetViews.TRANSACTIONS];
 
   const { bridgeState } = useContext(XBridgeContext);
   const { web3Provider } = bridgeState;
+
+  const isPassport = true || isPassportProvider(web3Provider);
 
   const [loading, setLoading] = useState(true);
 
@@ -47,27 +50,29 @@ export function Transactions() {
     >
       <Box sx={{ px: 'base.spacing.x4' }}>
         <Box
-          sx={{
-            backgroundColor: 'base.color.neutral.800',
-            px: 'base.spacing.x4',
-            pt: 'base.spacing.x5',
-            borderRadius: 'base.borderRadius.x6',
-            h: '486px',
-            overflowY: 'scroll',
-          }}
+          sx={transactionsListStyle(isPassport)}
         >
-          {
-            loading
-              ? <Shimmer />
-              : (
-                <>
-                  <TransactionsActionRequired />
-                  <TransactionsInProgress />
-                  <TransactionsFinished />
-                </>
-              )
-}
+          {loading ? <Shimmer /> : (
+            <>
+              <TransactionsActionRequired />
+              <TransactionsInProgress />
+            </>
+          )}
         </Box>
+        {isPassport && (
+        <MenuItem emphasized>
+          <MenuItem.Label sx={{ fontWeight: 'normal' }}>
+            {passportDashboard}
+            {' '}
+            <Link
+              size="small"
+              rc={<a href="https://passport.immutable.com" />}
+            >
+              Passport
+            </Link>
+          </MenuItem.Label>
+        </MenuItem>
+        )}
       </Box>
     </SimpleLayout>
   );

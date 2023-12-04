@@ -447,20 +447,32 @@ export const text = {
       body2: 'You can close this window, the transaction will be reflected in your wallet once complete.',
     },
     [XBridgeWidgetViews.TRANSACTIONS]: {
-      layoutHeading: 'Transaction status',
+      layoutHeading: 'In progress',
+      passportDashboard: 'View the full transaction history in your',
       status: {
         inProgress: {
           heading: 'In Progress',
+          stepInfo: 'Sent - arriving in ≈',
         },
         finished: {
           heading: 'Finished',
         },
+        claim: {
+          action: 'Claim',
+          stepInfo: 'Waiting on claim - paused',
+          banner: {
+            heading: 'Claim your coins to finish this move.',
+          },
+        },
+        topup: {
+          action: 'Review & sign',
+          stepInfo: 'Waiting on gas - paused',
+          banner: {
+            heading: 'Add gas to complete this move.',
+          },
+        },
         actionRequired: {
           heading: 'Action Required',
-          claim: 'Claim',
-          claimBanner: 'Claim your coins to finish your withdrawal.',
-          topup: 'Review & sign',
-          toptupBanner: 'Add gas to complete this move.',
         },
       },
     },
