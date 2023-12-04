@@ -1,21 +1,36 @@
 import { strict as assert } from 'assert';
 import { formatEther, parseEther } from '@ethersproject/units';
-import { ImmutableX } from '@imtbl/core-sdk';
-import { StepSharedState, configuration, oldConfig } from './stepSharedState';
-import { repeatCheck600, waitForTransactionResponse } from '../common';
+import { ImmutableXClient, ImxClientModuleConfiguration } from '@imtbl/sdk/immutablex_client';
+import { GenericIMXProvider, ProviderConfiguration } from '@imtbl/sdk/provider';
+import { StepSharedState, configuration } from './stepSharedState';
+import {
+  env, getProvider, repeatCheck600, waitForTransactionResponse,
+} from '../common';
 
 // @binding([StepSharedState])
 export class DepositEth {
   constructor(protected stepSharedState: StepSharedState) {}
 
-  client = new ImmutableX(oldConfig);
+  config: ImxClientModuleConfiguration = {
+    baseConfig: { environment: configuration.environment },
+  };
+
+  provider = getProvider(env.network, env.alchemyApiKey);
+
+  providerConfig = new ProviderConfiguration({
+    baseConfig: configuration,
+  });
+
+  // client = new ImmutableX(oldConfig);
+  client = new ImmutableXClient(this.config);
 
   // @when('banker deposits {string} eth', undefined, 120 * 1000)
   public async bankerDepositEth(amount: string) {
     // TODO: need to make sure this addressVar has ETH on L1 to deposit
     const banker = await this.stepSharedState.getBanker();
+    const providerInstance = new GenericIMXProvider(this.providerConfig, banker.ethSigner, banker.starkSigner);
 
-    const transactionResponse = await this.client.deposit(banker.ethSigner, {
+    const transactionResponse = await providerInstance.deposit({
       type: 'ETH',
       amount: parseEther(amount).toString(),
     });
@@ -34,6 +49,7 @@ export class DepositEth {
   public async recordBankerBalance(bankerBalanceVar: string) {
     const banker = await this.stepSharedState.getBanker();
     const ownerAddress = await banker.ethSigner.getAddress();
+
     const response = await this.client.getBalance({
       owner: ownerAddress,
       address: StepSharedState.getTokenAddress('ETH'),
@@ -50,7 +66,6 @@ export class DepositEth {
       address: StepSharedState.getTokenAddress('ETH'),
     });
     this.stepSharedState.bankerBalances[bankerBalanceVar] = response;
-    // @ts-ignore
     assert.ok(parseEther(response.balance!).gte(parseEther(amount)));
   }
 
@@ -75,7 +90,6 @@ export class DepositEth {
         owner: bankerAddress,
         address: StepSharedState.getTokenAddress('ETH'),
       });
-      // @ts-ignore
       assert.equal(response.balance!, expected.toString());
     });
   }

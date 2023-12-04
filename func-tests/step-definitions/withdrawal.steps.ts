@@ -39,7 +39,7 @@ defineFeature(feature, (test) => {
 
     when(/^user "(.*)" prepare withdrawal "(.*)" of ETH "(.*)"$/, async (addressVar, withdrawalVar, ethVar) => {
       const response = await withdrawal.prepareEthWithdrawal(addressVar, withdrawalVar, ethVar);
-      console.log("withdrawal:",response);
+      expect(response.withdrawal_id).toBeGreaterThan(0);
     });
 
     then(/^ETH withdrawal "(.*)" should be in "(.*)" status$/, async (withdrawalVar, statusVar) => {

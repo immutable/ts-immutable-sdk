@@ -1,12 +1,21 @@
-import { ImmutableX } from '@imtbl/core-sdk';
-import { configuration, oldConfig, StepSharedState } from './stepSharedState';
 import { parseEther } from '@ethersproject/units';
+import { ImxClientModuleConfiguration } from '@imtbl/sdk/immutablex_client';
+import { GenericIMXProvider, ProviderConfiguration } from '@imtbl/sdk/provider';
+import { env, getProvider } from 'common';
+import { configuration, StepSharedState } from './stepSharedState';
 
-// @binding([StepSharedState])
 export class Transfer {
   constructor(protected stepSharedState: StepSharedState) {}
 
-  client = new ImmutableX(oldConfig);
+  config: ImxClientModuleConfiguration = {
+    baseConfig: { environment: configuration.environment },
+  };
+
+  provider = getProvider(env.network, env.alchemyApiKey);
+
+  providerConfig = new ProviderConfiguration({
+    baseConfig: configuration,
+  });
 
   // @given('banker transfer {string} eth to {string}', undefined, 10000)
   public async transferFromBanker(amount: string, userVar: string) {
@@ -16,12 +25,14 @@ export class Transfer {
         userVar
       ].ethSigner.getAddress();
 
-      return await this.client.transfer(banker, {
+      const providerInstance = new GenericIMXProvider(this.providerConfig, banker.ethSigner, banker.starkSigner);
+      return await providerInstance.transfer({
         type: 'ETH',
         amount: parseEther(amount).toString(),
-        receiver: receiver,
+        receiver,
       });
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.log(e);
       throw e;
     }

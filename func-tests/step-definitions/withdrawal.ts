@@ -1,16 +1,18 @@
-import { ETHToken, ImmutableX } from '@imtbl/core-sdk';
 import { GenericIMXProvider, ProviderConfiguration } from '@imtbl/sdk/provider';
-import { configuration, oldConfig, StepSharedState } from './stepSharedState';
 import { parseUnits } from '@ethersproject/units';
 import { repeatCheck30, repeatCheck300 } from 'common';
 import { strict as assert } from 'assert';
+import { ETHToken, ImmutableXClient, ImxClientModuleConfiguration } from '@imtbl/sdk/immutablex_client';
+import { configuration, StepSharedState } from './stepSharedState';
+
 export class Withdrawal {
   constructor(protected stepSharedState: StepSharedState) {}
 
   providerConfig = new ProviderConfiguration({
     baseConfig: configuration,
   });
-  client = new ImmutableX(oldConfig);
+
+  // client = new ImmutableX(oldConfig);
 
   // @when('user {string} prepare withdrawal of NFT {string}', undefined, 30000)
   // public async prepareWithdrawal(userVar: string, nftVar: string) {
@@ -37,11 +39,11 @@ export class Withdrawal {
     const user = this.stepSharedState.users[userVar];
     const providerInstance = new GenericIMXProvider(this.providerConfig, user.ethSigner, user.starkSigner);
     const ethAmountInWei = parseUnits(ethAmount);
-    // const result = await providerInstance.prepareWithdrawal({ type: 'ETH', amount: ethAmountInWei.toString() });
-    const result = await this.client.prepareWithdrawal(user, {
-      type: 'ETH',
-      amount: parseUnits(ethAmount, 18).toString(),
-    });
+    const result = await providerInstance.prepareWithdrawal({ type: 'ETH', amount: ethAmountInWei.toString() });
+    // const result = await this.client.prepareWithdrawal(user, {
+    //   type: 'ETH',
+    //   amount: parseUnits(ethAmount, 18).toString(),
+    // });
 
     this.stepSharedState.withdrawals[withdrawalName] = result;
     return result;
@@ -72,10 +74,13 @@ export class Withdrawal {
     status: string,
   ) {
     const id = this.stepSharedState.withdrawals[withdrawalName].withdrawal_id!;
-    const repeatCheckFunction =
-      status === 'withdrawable' ? repeatCheck300 : repeatCheck30;
+    const repeatCheckFunction = status === 'withdrawable' ? repeatCheck300 : repeatCheck30;
+    const config: ImxClientModuleConfiguration = {
+      baseConfig: { environment: configuration.environment },
+    };
+    const client = new ImmutableXClient(config);
     await repeatCheckFunction(async () => {
-      const withdrawal = await this.client.getWithdrawal({
+      const withdrawal = await client.getWithdrawal({
         id: id.toString(),
       });
       assert.equal(withdrawal.status, status);
@@ -88,6 +93,7 @@ export class Withdrawal {
     const providerInstance = new GenericIMXProvider(this.providerConfig, user.ethSigner, user.starkSigner);
     const token : ETHToken = { type: 'ETH' } as ETHToken;
     const result = await providerInstance.completeWithdrawal(starkAddress, token);
+    // eslint-disable-next-line no-console
     console.log(`Eth withdrawal transaction complete. txHash: ${result.hash}`);
   }
 
