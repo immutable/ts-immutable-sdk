@@ -5,6 +5,8 @@ import { ProviderCallError } from 'errors';
 import { Amount, Coin, CoinAmount, ERC20, Native, Token } from 'types';
 import { DEFAULT_DEADLINE_SECONDS } from 'constants/router';
 
+export const ERROR_STRING_FUNCTION_SIGNATURE = '0x08c379a0';
+
 export const quoteReturnMapping: { [signature: string]: string[] } = {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   '0xcdca1753': ['uint256', 'uint160[]', 'uint32[]', 'uint256'],

@@ -10,9 +10,9 @@ import { ERC20Pair } from './poolUtils/generateERC20Pairs';
 import { Multicall, Multicall__factory } from '../contracts/types';
 
 export type RoutingContracts = {
-  multicallAddress: string;
-  factoryAddress: string;
-  quoterAddress: string;
+  multicall: string;
+  coreFactory: string;
+  quoterV2: string;
 };
 
 export class Router {
@@ -36,7 +36,7 @@ export class Router {
   ): Promise<QuoteResult> {
     const [tokenIn, tokenOut] = this.determineERC20InAndERC20Out(tradeType, amountSpecified, otherToken);
 
-    const multicallContract = Multicall__factory.connect(this.routingContracts.multicallAddress, this.provider);
+    const multicallContract = Multicall__factory.connect(this.routingContracts.multicall, this.provider);
     const erc20Pair: ERC20Pair = [tokenIn, tokenOut];
 
     // Get all pools and use these to get all possible routes.
@@ -44,7 +44,7 @@ export class Router {
       multicallContract,
       erc20Pair,
       this.routingTokens,
-      this.routingContracts.factoryAddress,
+      this.routingContracts.coreFactory,
     );
 
     const noValidPools = pools.length === 0;
@@ -74,7 +74,7 @@ export class Router {
   ): Promise<QuoteResult> {
     const quotes = await getQuotesForRoutes(
       multicallContract,
-      this.routingContracts.quoterAddress,
+      this.routingContracts.quoterV2,
       routes,
       amountSpecified,
       tradeType,
