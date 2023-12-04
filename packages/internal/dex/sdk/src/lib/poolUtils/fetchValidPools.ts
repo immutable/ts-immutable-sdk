@@ -3,7 +3,7 @@ import { BigNumber } from 'ethers';
 import { ProviderCallError } from 'errors';
 import { erc20ToUniswapToken } from 'lib/utils';
 import { ERC20 } from 'types';
-import { MulticallResponse, multicallSingleCallDataMultipleContracts } from '../multicall';
+import { MulticallResponse, multicallContracts } from '../multicall';
 import { generatePossiblePoolsFromERC20Pair } from './generatePossiblePoolsFromERC20Pairs';
 import { ERC20Pair } from './generateERC20Pairs';
 import { Multicall, UniswapV3Pool__factory } from '../../contracts/types';
@@ -19,8 +19,13 @@ export type Slot0 = {
   feeProtocol: number;
   unlocked: boolean;
 };
-const liquidityFuncString = 'liquidity';
+
+const poolInterface = UniswapV3Pool__factory.createInterface();
 const slot0FuncString = 'slot0';
+const liquidityFuncString = 'liquidity';
+const slot0CallData = poolInterface.encodeFunctionData(slot0FuncString);
+const liquidityCallData = poolInterface.encodeFunctionData(liquidityFuncString);
+
 const noDataResult = '0x';
 
 // TODO: Split into fetchPools and filterPools methods
@@ -44,14 +49,14 @@ export const fetchValidPools = async (
   let liquidityResults: MulticallResponse;
   try {
     [slot0Results, liquidityResults] = await Promise.all([
-      multicallSingleCallDataMultipleContracts(
+      multicallContracts(
         multicallContract,
-        slot0FuncString,
+        slot0CallData,
         poolAddresses,
       ),
-      multicallSingleCallDataMultipleContracts(
+      multicallContracts(
         multicallContract,
-        liquidityFuncString,
+        liquidityCallData,
         poolAddresses,
       ),
     ]);
@@ -79,6 +84,7 @@ export const fetchValidPools = async (
       slot0FuncString,
       slot0s[index].returnData,
     ) as unknown as Slot0;
+
     const poolLiquidity = uniswapV3Pool.decodeFunctionResult(
       liquidityFuncString,
       liquidities[index].returnData,

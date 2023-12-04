@@ -4,8 +4,8 @@ import { keccak256 } from '@ethersproject/solidity';
 import { defaultAbiCoder } from '@ethersproject/abi';
 import { Contract } from '@ethersproject/contracts';
 import {
-  multicallSingleCallDataMultipleContracts,
-  multicallMultipleCallDataSingContract,
+  multicallContracts,
+  multicallContract,
 } from './multicall';
 import {
   IMX_TEST_TOKEN,
@@ -86,13 +86,13 @@ describe('multicallSingleCallDataMultipleContracts', () => {
         TEST_RPC_URL,
         TEST_CHAIN_ID,
       );
-      const multicallContract = Multicall__factory.connect(
+      const multicall = Multicall__factory.connect(
         TEST_MULTICALL_ADDRESS,
         provider,
       );
 
-      const result = await multicallSingleCallDataMultipleContracts(
-        multicallContract,
+      const result = await multicallContracts(
+        multicall,
         token0,
         addresses,
       );
@@ -171,13 +171,13 @@ describe('multicallMultipleCallDataSingContract', () => {
         TEST_RPC_URL,
         TEST_CHAIN_ID,
       );
-      const multicallContract = Multicall__factory.connect(
+      const multicall = Multicall__factory.connect(
         TEST_MULTICALL_ADDRESS,
         provider,
       );
 
-      const result = await multicallMultipleCallDataSingContract(
-        multicallContract,
+      const result = await multicallContract(
+        multicall,
         testCallData,
         addrToken0,
       );

@@ -1,14 +1,10 @@
 import { BigNumber } from 'ethers';
-import { Interface } from '@ethersproject/abi';
-import {
-  Multicall,
-  UniswapInterfaceMulticall,
-} from '../contracts/types/Multicall';
-import { UniswapV3Pool__factory } from '../contracts/types';
+import { Multicall, UniswapInterfaceMulticall } from '../contracts/types/Multicall';
 
-const DEFAULT_GAS_QUOTE = 2_000_000;
+const DEFAULT_GAS_QUOTE = 23_000_000;
 
 type Address = string;
+
 export type SingleContractCallOptions = {
   gasRequired: number;
 };
@@ -18,64 +14,29 @@ export type MulticallResponse = {
   returnData: UniswapInterfaceMulticall.ResultStructOutput[];
 };
 
-// TODO: Better description of function and args
-export async function multicallSingleCallDataMultipleContracts(
+export const multicallContracts = (
   multicallContract: Multicall,
-  functionName: string,
+  callData: string,
   addresses: Address[],
-): Promise<MulticallResponse> {
-  // Encode args - generate calldata for contract
-  const contractIFace = UniswapV3Pool__factory.createInterface();
-  // TODO: fix used before defined error
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
-  const callData = getCallData(functionName, contractIFace);
-
-  const calls: UniswapInterfaceMulticall.CallStruct[] = [];
-
-  if (callData) {
-    addresses.forEach((address) => {
-      if (address) {
-        calls.push({
-          target: address,
-          callData,
-          gasLimit: BigNumber.from('1000000'),
-        });
-      }
-    });
-  }
-
-  return multicallContract.callStatic.multicall(calls);
-}
-
-// TODO: Better description of function and args
-export async function multicallMultipleCallDataSingContract(
-  multicallContract: Multicall,
-  calldata: string[],
-  address: Address,
-  options?: SingleContractCallOptions,
-): Promise<MulticallResponse> {
-  // Create call objects
-  const calls = new Array<UniswapInterfaceMulticall.CallStruct>(calldata.length);
-  // TODO: use object.keys of something similar to avoid iterating over
-  // entire object prototype
-  // eslint-disable-next-line no-restricted-syntax, guard-for-in
-  for (const i in calldata) {
-    calls[i] = {
+): Promise<MulticallResponse> =>
+  multicallContract.callStatic.multicall(
+    addresses.map((address) => ({
       target: address,
-      callData: calldata[i],
+      callData,
+      gasLimit: BigNumber.from('1000000'),
+    })),
+  );
+
+export const multicallContract = (
+  multicall: Multicall,
+  callDatas: string[],
+  target: Address,
+  options?: SingleContractCallOptions,
+): Promise<MulticallResponse> =>
+  multicall.callStatic.multicall(
+    callDatas.map((callData) => ({
+      target,
+      callData,
       gasLimit: options?.gasRequired ?? DEFAULT_GAS_QUOTE,
-    };
-  }
-
-  return multicallContract.callStatic.multicall(calls);
-}
-
-const getCallData = (
-  methodName: string,
-  contractInterface: Interface | null | undefined,
-): string | undefined => {
-  // Create ethers function fragment
-  const fragment = contractInterface?.getFunction(methodName);
-
-  return fragment ? contractInterface?.encodeFunctionData(fragment) : undefined;
-};
+    })),
+  );

@@ -4,6 +4,7 @@ import { WIMX_IMMUTABLE_TESTNET } from 'constants/tokens';
 import { IMMUTABLE_TESTNET_CHAIN_ID } from 'constants/chains';
 import { providers, utils } from 'ethers';
 import { newAmountFromString } from 'test/utils';
+import { QuoterV2__factory } from 'contracts/types';
 import { Router } from './router';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -30,6 +31,31 @@ describe('router', () => {
       const router = new Router(provider, config.commonRoutingTokens, config.contracts);
       const quoteResult = await router.findOptimalRoute(amountSpecified, WIMX_IMMUTABLE_TESTNET, TradeType.EXACT_INPUT);
       expect(utils.formatEther(quoteResult.amountOut.value)).toEqual('7089.43335507464515036');
+    });
+
+    it.skip('calls quoteExactInputSingle directly', async () => {
+      const config = SUPPORTED_SANDBOX_CHAINS[IMMUTABLE_TESTNET_CHAIN_ID];
+      const provider = new providers.JsonRpcProvider(config.rpcUrl, config.chainId);
+
+      const q = QuoterV2__factory.connect(config.contracts.quoterV2, provider);
+      const data = q.interface.encodeFunctionData('quoteExactInputSingle', [
+        {
+          amountIn: utils.parseEther('20700000'),
+          tokenIn: zkWAT.address,
+          tokenOut: WIMX_IMMUTABLE_TESTNET.address,
+          fee: 100,
+          sqrtPriceLimitX96: 0,
+        },
+      ]);
+      const res = await provider.call({
+        to: config.contracts.quoterV2,
+        data,
+      });
+      const { amountOut } = q.interface.decodeFunctionResult(
+        'quoteExactInputSingle',
+        res,
+      );
+      expect(utils.formatEther(amountOut)).toEqual('516.580710655537430041');
     });
   });
 });

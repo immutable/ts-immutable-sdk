@@ -3,7 +3,7 @@ import { TradeType, Token } from '@uniswap/sdk-core';
 import { BigNumber, utils } from 'ethers';
 import { ProviderCallError } from 'errors';
 import { CoinAmount, ERC20 } from 'types';
-import { multicallMultipleCallDataSingContract, MulticallResponse } from './multicall';
+import { multicallContract, MulticallResponse } from './multicall';
 import {
   ERROR_STRING_FUNCTION_SIGNATURE,
   newAmount,
@@ -25,7 +25,7 @@ export type QuoteResult = {
 };
 
 export async function getQuotesForRoutes(
-  multicallContract: Multicall,
+  multicall: Multicall,
   quoterContractAddress: string,
   routes: Route<Token, Token>[],
   amountSpecified: CoinAmount<ERC20>,
@@ -40,7 +40,7 @@ export async function getQuotesForRoutes(
 
   let quoteResults: MulticallResponse;
   try {
-    quoteResults = await multicallMultipleCallDataSingContract(multicallContract, callData, quoterContractAddress);
+    quoteResults = await multicallContract(multicall, callData, quoterContractAddress);
   } catch (e) {
     const message = e instanceof Error ? e.message : 'Unknown Error';
     throw new ProviderCallError(`failed multicall: ${message}`);
@@ -67,7 +67,7 @@ export async function getQuotesForRoutes(
       const content = `0x${quoteResults.returnData[i].returnData.substring(10)}`;
       const decodedError = utils.defaultAbiCoder.decode(['string'], content);
       // eslint-disable-next-line no-console
-      console.warn({ decodedError });
+      console.warn({ i, decodedError, callData: callData[i], pools: routes[i].pools });
       // Quote reverted, so don't include it in results
       // eslint-disable-next-line no-continue
       continue;
