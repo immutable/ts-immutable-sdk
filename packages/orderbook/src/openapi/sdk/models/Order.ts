@@ -25,6 +25,7 @@ export type Order = {
    * Global Order identifier
    */
   id: string;
+  order_hash: string;
   protocol_data: ProtocolData;
   /**
    * A random value added to the create Order request

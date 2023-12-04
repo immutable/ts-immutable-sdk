@@ -178,9 +178,9 @@ export interface Order {
    * Time after which the Order is expired
    */
   endAt: string;
+  orderHash: string;
   protocolData: {
     orderType: 'FULL_RESTRICTED';
-    orderHash: string;
     zoneAddress: string;
     counter: string;
     seaportAddress: string;

@@ -8,10 +8,6 @@ export type ProtocolData = {
    */
   order_type: ProtocolData.order_type;
   /**
-   * Seaport order hash
-   */
-  order_hash: string;
-  /**
    * big.Int or uint256 string for order counter
    */
   counter: string;

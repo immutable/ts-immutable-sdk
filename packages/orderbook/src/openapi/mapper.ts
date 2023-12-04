@@ -57,9 +57,9 @@ export function mapFromOpenApiOrder(order: OpenApiOrder): Order {
     chain: order.chain,
     createdAt: order.created_at,
     endAt: order.end_at,
+    orderHash: order.order_hash,
     protocolData: {
       orderType: order.protocol_data.order_type,
-      orderHash: order.protocol_data.order_hash,
       counter: order.protocol_data.counter,
       seaportAddress: order.protocol_data.seaport_address,
       seaportVersion: order.protocol_data.seaport_version,

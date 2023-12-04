@@ -396,9 +396,9 @@ describe('Seaport', () => {
         created_at: new Date().toISOString(),
         end_at: new Date().toISOString(),
         id: '1',
+        order_hash: randomAddress(),
         protocol_data: {
           order_type: ProtocolData.order_type.FULL_RESTRICTED,
-          order_hash: randomAddress(),
           zone_address: randomAddress(),
           seaport_address: randomAddress(),
           seaport_version: SEAPORT_CONTRACT_VERSION_V1_5,
