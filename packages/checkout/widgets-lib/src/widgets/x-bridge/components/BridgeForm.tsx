@@ -155,6 +155,9 @@ export function BridgeForm(props: BridgeFormProps) {
   ]);
 
   useEffect(() => {
+    // This useEffect is for populating the form
+    // with values from context when the user
+    // has selected the back button from the review screen
     if (!amount || !token) return;
     setFormAmount(amount);
     for (let i = 0; i < tokenBalances.length; i++) {
