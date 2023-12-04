@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import {} from 'dotenv/config';
+import 'dotenv/config';
 import { ImmutableConfiguration, Environment } from '@imtbl/config';
 import { ethers } from 'ethers';
 import {
@@ -11,16 +11,8 @@ import {
   BridgeFeeResponse,
   BridgeTxRequest,
   BridgeTxResponse,
-  WaitForDepositRequest,
-  WaitForDepositResponse,
   CompletionStatus,
-  BridgeWithdrawRequest,
-  WaitForWithdrawalRequest,
-  WaitForWithdrawalResponse,
-  ExitRequest,
-  ETH_SEPOLIA_TO_ZKEVM_DEVNET,
   ETH_SEPOLIA_TO_ZKEVM_TESTNET,
-  BridgeFeeMethods,
 } from '@imtbl/bridge-sdk';
 
 /**
@@ -36,10 +28,10 @@ async function depositAndWithdraw() {
   console.log('process.env', process.env)
 
   if (!process.env.ROOT_PROVIDER) {
-    console.log(process.env.ROOT_PROVIDER);
+    console.log(process.env.ROOT_PROVIDER_RPC);
     throw new Error('ROOT_PROVIDER not set');
   }
-  if (!process.env.CHILD_PROVIDER) {
+  if (!process.env.CHILD_PROVIDER_RPC) {
     throw new Error('CHILD_PROVIDER not set');
   }
   if (!process.env.PRIVATE_KEY) {

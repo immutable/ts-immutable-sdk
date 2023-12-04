@@ -19,6 +19,7 @@
   "scripts": {
     "build": "",
     "deposit": "ts-node --esm ./src/index.ts",
+    "fees": "ts-node --esm ./src/fees.ts",
     "lint": "eslint ./src --ext .ts --max-warnings=0"
   },
   "type": "module"

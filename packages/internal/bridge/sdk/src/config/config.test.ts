@@ -47,11 +47,8 @@ describe('config', () => {
       overrides: {
         bridgeContracts: {
           rootERC20BridgeFlowRate: '0x',
-          rootChainStateSender: '0x',
-          rootChainCheckpointManager: '0x',
-          rootChainExitHelper: '0x',
           childERC20Bridge: '0x',
-          childChainStateReceiver: '0x',
+          wrappedIMX: '0x',
         },
       },
       rootProvider: voidRootProvider,

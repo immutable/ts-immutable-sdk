@@ -5,5 +5,5 @@ export * from './config/index';
 export * from './types/index';
 export * from './contracts/ABIs/ERC20';
 export * from './contracts/ABIs/RootERC20BridgeFlowRate';
-export * from './contracts/ABIs/ChildStateReceiver';
-export * from './contracts/ABIs/RootStateSender';
+export * from './contracts/ABIs/ChildERC20Bridge';
+export * from './contracts/ABIs/ChildERC20';
