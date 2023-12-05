@@ -96,11 +96,36 @@ export class TokenBridge {
    */
   public async getFee(req: BridgeFeeRequest): Promise<BridgeFeeResponse> {
     await this.validateChainConfiguration();
-    await this.validateChainIds(req.sourceChainId, req.destinationChainId);
+
+    if (req.action !== BridgeFeeActions.FINALISE_WITHDRAWAL) {
+      await this.validateChainIds(req.sourceChainId, req.destinationChainId);
+    }
 
     if (req.action === BridgeFeeActions.MAP_TOKEN && req.sourceChainId !== this.config.bridgeInstance.rootChainID) {
       throw new BridgeError(
         `Mapping tokens from ${req.sourceChainId} to destination ${req.destinationChainId} is not supported`,
+        BridgeErrorType.UNSUPPORTED_ERROR,
+      );
+    }
+
+    if (req.action === BridgeFeeActions.DEPOSIT && req.sourceChainId !== this.config.bridgeInstance.rootChainID) {
+      throw new BridgeError(
+        `Deposit must be from the root chain (${this.config.bridgeInstance.rootChainID}) to the child chain (${this.config.bridgeInstance.childChainID})`,
+        BridgeErrorType.UNSUPPORTED_ERROR,
+      );
+    }
+
+    if (req.action === BridgeFeeActions.WITHDRAW && req.sourceChainId !== this.config.bridgeInstance.childChainID) {
+      throw new BridgeError(
+        `Withdraw must be from the child chain (${this.config.bridgeInstance.childChainID}) to the root chain (${this.config.bridgeInstance.rootChainID})`,
+        BridgeErrorType.UNSUPPORTED_ERROR,
+      );
+    }
+
+    if (req.action === BridgeFeeActions.FINALISE_WITHDRAWAL
+      && req.sourceChainId !== this.config.bridgeInstance.rootChainID) {
+      throw new BridgeError(
+        `Finalised withdrawals must be on the root chain (${this.config.bridgeInstance.rootChainID})`,
         BridgeErrorType.UNSUPPORTED_ERROR,
       );
     }

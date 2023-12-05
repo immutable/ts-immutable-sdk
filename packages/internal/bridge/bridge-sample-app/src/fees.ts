@@ -51,8 +51,8 @@ async function getBridgeFees() {
   const withdrawReq: BridgeFeeRequest = {
     action: BridgeFeeActions.WITHDRAW,
     gasMultiplier: 1.1,
-    sourceChainId: ETH_SEPOLIA_CHAIN_ID,
-    destinationChainId: ZKEVM_TESTNET_CHAIN_ID,
+    sourceChainId: ZKEVM_TESTNET_CHAIN_ID,
+    destinationChainId: ETH_SEPOLIA_CHAIN_ID,
   }
 
   console.log('withdrawReq', withdrawReq)
@@ -66,9 +66,7 @@ async function getBridgeFees() {
 
   const finalizeReq: BridgeFeeRequest = {
     action: BridgeFeeActions.FINALISE_WITHDRAWAL,
-    gasMultiplier: 1.1,
     sourceChainId: ETH_SEPOLIA_CHAIN_ID,
-    destinationChainId: ZKEVM_TESTNET_CHAIN_ID,
   }
 
   console.log('finalizeReq', finalizeReq)
