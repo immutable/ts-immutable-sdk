@@ -449,7 +449,7 @@ describe('XBridgeWidget', () => {
 
       cySmartGet('wallet-network-selector-submit-button')
         .should('be.visible')
-        .should('have.text', text.views.WALLET_NETWORK_SECLECTION.submitButton.text);
+        .should('have.text', text.views.WALLET_NETWORK_SELECTION.submitButton.text);
     });
 
     it('should not show when from wallet is not selected', () => {
