@@ -6,23 +6,27 @@ import { EventTargetContext } from 'context/event-target-context/EventTargetCont
 import { text } from 'resources/text/textConfig';
 import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
-import { WalletAndNetworkSelector } from '../components/WalletAndNetworkSelector';
 
-export function WalletNetworkSelectionView() {
+import { BridgeReviewSummary } from '../components/BridgeReviewSummary';
+
+export function BridgeReview() {
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
-  const { layoutHeading } = text.views[XBridgeWidgetViews.WALLET_NETWORK_SELECTION];
+
+  const { layoutHeading } = text.views[XBridgeWidgetViews.BRIDGE_REVIEW];
+
   return (
     <SimpleLayout
-      testId="bridge-view"
+      testId="bridge-review"
       header={(
         <HeaderNavigation
+          showBack
           title={layoutHeading}
           onCloseButtonClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
         />
       )}
       footer={<FooterLogo />}
     >
-      <WalletAndNetworkSelector />
+      <BridgeReviewSummary />
     </SimpleLayout>
   );
 }

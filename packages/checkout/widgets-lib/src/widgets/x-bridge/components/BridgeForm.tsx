@@ -12,10 +12,10 @@ import {
   useCallback, useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
 import { BigNumber, utils } from 'ethers';
+import { FeesBreakdown } from 'components/FeesBreakdown/FeesBreakdown';
 import { amountInputValidation } from '../../../lib/validations/amountInputValidations';
 import { BridgeActions, XBridgeContext } from '../context/XBridgeContext';
 import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
-import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
 import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { text } from '../../../resources/text/textConfig';
 import { TextInputForm } from '../../../components/FormComponents/TextInputForm/TextInputForm';
@@ -28,6 +28,7 @@ import {
   bridgeFormButtonContainerStyles,
   bridgeFormWrapperStyles,
   formInputsContainerStyles,
+  gasAmountHeadingStyles,
 } from './BridgeFormStyles';
 import { CoinSelectorOptionProps } from '../../../components/CoinSelector/CoinSelectorOption';
 import { useInterval } from '../../../lib/hooks/useInterval';
@@ -57,6 +58,8 @@ export function BridgeForm(props: BridgeFormProps) {
       allowedTokens,
       checkout,
       web3Provider,
+      amount,
+      token,
     },
   } = useContext(XBridgeContext);
 
@@ -69,23 +72,22 @@ export function BridgeForm(props: BridgeFormProps) {
     isTokenBalancesLoading,
   } = props;
   const {
-    xBridgeContent,
-    xBridgeFees,
+    fees,
     content,
     bridgeForm,
-  } = text.views[BridgeWidgetViews.BRIDGE];
+  } = text.views[XBridgeWidgetViews.BRIDGE_FORM];
 
   // Form state
-  const [amount, setAmount] = useState<string>(defaultAmount || '');
+  const [formAmount, setFormAmount] = useState<string>(defaultAmount || '');
   const [amountError, setAmountError] = useState<string>('');
-  const [token, setToken] = useState<GetBalanceResult | undefined>();
+  const [formToken, setFormToken] = useState<GetBalanceResult | undefined>();
   const [tokenError, setTokenError] = useState<string>('');
   const [amountFiatValue, setAmountFiatValue] = useState<string>('');
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const hasSetDefaultState = useRef(false);
-  const tokenBalanceSubtext = token
-    ? `${content.availableBalancePrefix} ${tokenValueFormat(token?.formattedBalance)}`
+  const tokenBalanceSubtext = formToken
+    ? `${content.availableBalancePrefix} ${tokenValueFormat(formToken?.formattedBalance)}`
     : '';
 
   // Fee estimates & transactions
@@ -94,6 +96,7 @@ export function BridgeForm(props: BridgeFormProps) {
   const [gasFee, setGasFee] = useState<string>('');
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
   const [tokensOptions, setTokensOptions] = useState<CoinSelectorOptionProps[]>([]);
+  const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
 
   // Not enough ETH to cover gas
   const [showNotEnoughGasDrawer, setShowNotEnoughGasDrawer] = useState(false);
@@ -106,6 +109,9 @@ export function BridgeForm(props: BridgeFormProps) {
     if (!address) return symbol.toLowerCase();
     return `${symbol.toLowerCase()}-${address.toLowerCase()}`;
   }, []);
+
+  const gasFiatAmount = `${fees.fiatPricePrefix} ${gasFeeFiatValue}`;
+  const gasTokenAmount = `${estimates?.gasFee.token?.symbol} ${tokenValueFormat(gasFee)}`;
 
   useEffect(() => {
     if (tokenBalances.length === 0) return;
@@ -135,7 +141,7 @@ export function BridgeForm(props: BridgeFormProps) {
     if (!hasSetDefaultState.current) {
       hasSetDefaultState.current = true;
       if (defaultFromContractAddress) {
-        setToken(
+        setFormToken(
           tokenBalances.find(
             (b) => (isNativeToken(b.token.address) && defaultFromContractAddress?.toLocaleUpperCase() === NATIVE)
             || (b.token.address?.toLowerCase() === defaultFromContractAddress?.toLowerCase()),
@@ -148,23 +154,36 @@ export function BridgeForm(props: BridgeFormProps) {
     cryptoFiatState.conversions,
     defaultFromContractAddress,
     hasSetDefaultState.current,
-    setToken,
-    setTokensOptions,
     formatTokenOptionsId,
     formatZeroAmount,
   ]);
 
+  useEffect(() => {
+    // This useEffect is for populating the form
+    // with values from context when the user
+    // has selected the back button from the review screen
+    if (!amount || !token) return;
+    setFormAmount(amount);
+    for (let i = 0; i < tokenBalances.length; i++) {
+      const balance = tokenBalances[i];
+      if (balance.token.address === token.address) {
+        setFormToken(balance);
+        break;
+      }
+    }
+  }, [amount, token, tokenBalances]);
+
   const selectedOption = useMemo(
-    () => (token && token.token
-      ? formatTokenOptionsId(token.token.symbol, token.token.address)
+    () => (formToken && formToken.token
+      ? formatTokenOptionsId(formToken.token.symbol, formToken.token.address)
       : undefined),
-    [token, tokenBalances, cryptoFiatState.conversions, formatTokenOptionsId],
+    [formToken, tokenBalances, cryptoFiatState.conversions, formatTokenOptionsId],
   );
 
   const canFetchEstimates = (): boolean => {
-    if (Number.isNaN(parseFloat(amount))) return false;
-    if (parseFloat(amount) <= 0) return false;
-    if (!token) return false;
+    if (Number.isNaN(parseFloat(formAmount))) return false;
+    if (parseFloat(formAmount) <= 0) return false;
+    if (!formToken) return false;
     if (isFetching) return false;
     return true;
   };
@@ -230,14 +249,14 @@ export function BridgeForm(props: BridgeFormProps) {
       return true;
     }
 
-    const tokenIsEth = isNativeToken(token?.token.address);
+    const tokenIsEth = isNativeToken(formToken?.token.address);
     const gasAmount = utils.parseEther(gasFee.length !== 0 ? gasFee : '0');
-    const additionalAmount = tokenIsEth && !Number.isNaN(parseFloat(amount))
-      ? utils.parseEther(amount)
+    const additionalAmount = tokenIsEth && !Number.isNaN(parseFloat(formAmount))
+      ? utils.parseEther(formAmount)
       : BigNumber.from('0');
 
     return gasAmount.add(additionalAmount).gt(ethBalance.balance);
-  }, [gasFee, tokenBalances, token, amount]);
+  }, [gasFee, tokenBalances, formToken, formAmount]);
 
   // Silently refresh the quote
   useInterval(() => fetchEstimates(true), DEFAULT_QUOTE_REFRESH_INTERVAL);
@@ -245,39 +264,39 @@ export function BridgeForm(props: BridgeFormProps) {
   useEffect(() => {
     if (editing) return;
     (async () => await fetchEstimates())();
-  }, [amount, token, editing]);
+  }, [formAmount, formToken, editing]);
 
   const onTextInputFocus = () => {
     setEditing(true);
   };
 
   const handleBridgeAmountChange = (value: string) => {
-    setAmount(value);
+    setFormAmount(value);
     if (amountError) {
-      const validateAmountError = validateAmount(value, token?.formattedBalance);
+      const validateAmountError = validateAmount(value, formToken?.formattedBalance);
       setAmountError(validateAmountError);
     }
 
-    if (!token) return;
+    if (!formToken) return;
     setAmountFiatValue(calculateCryptoToFiat(
       value,
-      token.token.symbol,
+      formToken.token.symbol,
       cryptoFiatState.conversions,
     ));
   };
 
   const handleAmountInputBlur = (value: string) => {
     setEditing(false);
-    setAmount(value);
+    setFormAmount(value);
     if (amountError) {
-      const validateAmountError = validateAmount(value, token?.formattedBalance);
+      const validateAmountError = validateAmount(value, formToken?.formattedBalance);
       setAmountError(validateAmountError);
     }
 
-    if (!token) return;
+    if (!formToken) return;
     setAmountFiatValue(calculateCryptoToFiat(
       value,
-      token.token.symbol,
+      formToken.token.symbol,
       cryptoFiatState.conversions,
     ));
   };
@@ -286,7 +305,7 @@ export function BridgeForm(props: BridgeFormProps) {
     const selected = tokenBalances.find((t) => value === formatTokenOptionsId(t.token.symbol, t.token.address));
     if (!selected) return;
 
-    setToken(selected);
+    setFormToken(selected);
     setTokenError('');
   };
 
@@ -300,15 +319,15 @@ export function BridgeForm(props: BridgeFormProps) {
   }, [cryptoFiatDispatch, allowedTokens]);
 
   useEffect(() => {
-    if (!amount) return;
-    if (!token) return;
+    if (!formAmount) return;
+    if (!formToken) return;
 
     setAmountFiatValue(calculateCryptoToFiat(
-      amount,
-      token.token.symbol,
+      formAmount,
+      formToken.token.symbol,
       cryptoFiatState.conversions,
     ));
-  }, [amount, token]);
+  }, [formAmount, formToken]);
 
   useEffect(() => {
     (async () => {
@@ -316,7 +335,7 @@ export function BridgeForm(props: BridgeFormProps) {
       const address = await web3Provider.getSigner().getAddress();
       setWalletAddress((previous) => {
         if (previous !== '' && previous !== address) {
-          setToken(undefined);
+          setFormToken(undefined);
         }
         return address;
       });
@@ -324,17 +343,17 @@ export function BridgeForm(props: BridgeFormProps) {
   }, [web3Provider, tokenBalances]);
 
   const bridgeFormValidator = useCallback((): boolean => {
-    const validateTokenError = validateToken(token);
-    const validateAmountError = validateAmount(amount, token?.formattedBalance);
+    const validateTokenError = validateToken(formToken);
+    const validateAmountError = validateAmount(formAmount, formToken?.formattedBalance);
     if (validateTokenError) setTokenError(validateTokenError);
     if (validateAmountError) setAmountError(validateAmountError);
     if (validateTokenError || validateAmountError) return false;
     return true;
-  }, [token, amount, setTokenError, setAmountError]);
+  }, [formToken, formAmount, setTokenError, setAmountError]);
 
   const submitBridge = useCallback(async () => {
     if (!bridgeFormValidator()) return;
-    if (!checkout || !web3Provider || !token) return;
+    if (!checkout || !web3Provider || !formToken) return;
 
     if (insufficientFundsForGas) {
       setShowNotEnoughGasDrawer(true);
@@ -344,8 +363,8 @@ export function BridgeForm(props: BridgeFormProps) {
     bridgeDispatch({
       payload: {
         type: BridgeActions.SET_TOKEN_AND_AMOUNT,
-        token: token.token,
-        amount,
+        token: formToken.token,
+        amount: formAmount,
       },
     });
 
@@ -362,7 +381,7 @@ export function BridgeForm(props: BridgeFormProps) {
     web3Provider,
     bridgeFormValidator,
     insufficientFundsForGas,
-    token]);
+    formToken]);
 
   const retrySubmitBridge = async () => {
     setShowTxnRejectedState(false);
@@ -381,7 +400,7 @@ export function BridgeForm(props: BridgeFormProps) {
           weight="regular"
           sx={{ paddingBottom: 'base.spacing.x4' }}
         >
-          {xBridgeContent.title}
+          {content.title}
         </Heading>
         {isTokenBalancesLoading && (
           <TokenSelectShimmer sx={formInputsContainerStyles} />
@@ -401,7 +420,7 @@ export function BridgeForm(props: BridgeFormProps) {
             />
             <TextInputForm
               testId="bridge-amount"
-              value={amount}
+              value={formAmount}
               placeholder={bridgeForm.from.inputPlaceholder}
               subtext={`${content.fiatPricePrefix} $${formatZeroAmount(amountFiatValue, true)}`}
               validator={amountInputValidation}
@@ -417,17 +436,34 @@ export function BridgeForm(props: BridgeFormProps) {
         {gasFee && (
           <Box sx={{ paddingY: 'base.spacing.x2' }}>
             <MenuItem emphasized size="small">
-              <MenuItem.Label>
-                {xBridgeFees.title}
+              <MenuItem.Label sx={gasAmountHeadingStyles}>
+                {fees.title}
               </MenuItem.Label>
               <MenuItem.PriceDisplay
-                fiatAmount={`${xBridgeFees.fiatPricePrefix} ${gasFeeFiatValue}`}
+                fiatAmount={`${fees.fiatPricePrefix} ${gasFeeFiatValue}`}
                 price={`${estimates?.gasFee.token?.symbol} ${tokenValueFormat(gasFee)}`}
+              />
+              <MenuItem.StatefulButtCon
+                icon="ChevronExpand"
+                onClick={() => setShowFeeBreakdown(true)}
               />
             </MenuItem>
           </Box>
         )}
       </Box>
+      <FeesBreakdown
+        totalFiatAmount={gasFiatAmount}
+        totalAmount={gasTokenAmount}
+        fees={[
+          {
+            label: text.drawers.feesBreakdown.fees.gas.label,
+            fiatAmount: gasFiatAmount,
+            amount: gasTokenAmount,
+          },
+        ]}
+        visible={showFeeBreakdown}
+        onCloseBottomSheet={() => setShowFeeBreakdown(false)}
+      />
       <Box sx={bridgeFormButtonContainerStyles}>
         <Button
           testId={`${testId}-button`}
@@ -451,7 +487,7 @@ export function BridgeForm(props: BridgeFormProps) {
           showHeaderBar={false}
           onCloseBottomSheet={() => setShowNotEnoughGasDrawer(false)}
           walletAddress={walletAddress}
-          showAdjustAmount={isNativeToken(token?.token.address)}
+          showAdjustAmount={isNativeToken(formToken?.token.address)}
         />
       </Box>
     </Box>

@@ -25,7 +25,7 @@ export function WalletDrawer({
   setShowDrawer,
   onWalletItemClick,
 }: WalletDrawerProps) {
-  const { toFormInput, fromFormInput } = text.views[XBridgeWidgetViews.WALLET_NETWORK_SECLECTION];
+  const { toFormInput, fromFormInput } = text.views[XBridgeWidgetViews.WALLET_NETWORK_SELECTION];
   const walletSelectorText = type === 'from' ? fromFormInput : toFormInput;
   const [walletItemLoading, setWalletItemLoading] = useState(false);
 
@@ -52,7 +52,7 @@ export function WalletDrawer({
       visible={showDrawer}
     >
       {showWalletSelectorTarget
-          && (
+        && (
           <BottomSheet.Target>
             <FormControlWrapper
               testId={`${testId}-${type}-wallet-form-control`}
@@ -66,7 +66,7 @@ export function WalletDrawer({
               />
             </FormControlWrapper>
           </BottomSheet.Target>
-          )}
+        )}
       <BottomSheet.Content sx={walletItemListStyles}>
         {walletOptions.map((walletProviderName) => (
           <WalletItem
