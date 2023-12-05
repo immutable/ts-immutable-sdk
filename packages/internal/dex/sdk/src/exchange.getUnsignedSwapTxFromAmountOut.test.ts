@@ -1,4 +1,4 @@
-import { JsonRpcProvider } from '@ethersproject/providers';
+import { JsonRpcProvider, JsonRpcBatchProvider } from '@ethersproject/providers';
 import { Contract } from '@ethersproject/contracts';
 import { BigNumber } from '@ethersproject/bignumber';
 import { ethers } from 'ethers';
@@ -67,7 +67,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       paused: jest.fn().mockResolvedValue(false),
     }));
 
-    (JsonRpcProvider as unknown as jest.Mock).mockImplementation(() => ({
+    (JsonRpcBatchProvider as unknown as jest.Mock).mockImplementation(() => ({
       getFeeData: async () => ({
         maxFeePerGas: null,
         gasPrice: TEST_GAS_PRICE,
