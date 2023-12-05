@@ -5,13 +5,13 @@ import {
   useState,
 } from 'react';
 import { TokenFilterTypes } from '@imtbl/checkout-sdk';
+import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { BridgeForm } from '../components/BridgeForm';
 import { text } from '../../../resources/text/textConfig';
-import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
 import { BridgeActions, XBridgeContext } from '../context/XBridgeContext';
 import { useInterval } from '../../../lib/hooks/useInterval';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
@@ -25,7 +25,7 @@ export interface BridgeProps {
 }
 
 export function Bridge({ amount, fromContractAddress }: BridgeProps) {
-  const { header } = text.views[BridgeWidgetViews.BRIDGE];
+  const { header } = text.views[XBridgeWidgetViews.BRIDGE_FORM];
   const { bridgeState, bridgeDispatch } = useContext(XBridgeContext);
   const { checkout, web3Provider } = bridgeState;
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);

@@ -17,3 +17,8 @@ export const bridgeFormButtonContainerStyles = {
   paddingY: 'base.spacing.x6',
   paddingX: 'base.spacing.x4',
 };
+
+export const gasAmountHeadingStyles = {
+  marginBottom: 'base.spacing.x4',
+  color: 'base.color.text.secondary',
+};
