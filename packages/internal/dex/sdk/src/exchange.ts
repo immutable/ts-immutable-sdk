@@ -6,7 +6,7 @@ import { fetchGasPrice } from 'lib/transactionUtils/gas';
 import { getApproval, prepareApproval } from 'lib/transactionUtils/approval';
 import { getOurQuoteReqAmount, prepareUserQuote } from 'lib/transactionUtils/getQuote';
 import { Fees } from 'lib/fees';
-import { SecondaryFee__factory } from 'contracts/types';
+import { Multicall__factory, SecondaryFee__factory } from 'contracts/types';
 import { NativeTokenService } from 'lib/nativeTokenService';
 import { DEFAULT_MAX_HOPS, DEFAULT_SLIPPAGE, MAX_MAX_HOPS, MIN_MAX_HOPS } from './constants';
 import { Router } from './lib/router';
@@ -47,7 +47,7 @@ const toPublicQuote = (
 });
 
 export class Exchange {
-  private provider: ethers.providers.JsonRpcProvider;
+  private provider: ethers.providers.JsonRpcBatchProvider;
 
   private router: Router;
 
@@ -76,13 +76,15 @@ export class Exchange {
     this.routerContractAddress = config.chain.contracts.peripheryRouter;
     this.secondaryFeeContractAddress = config.chain.contracts.secondaryFee;
 
-    this.provider = new ethers.providers.JsonRpcProvider(config.chain.rpcUrl);
+    this.provider = new ethers.providers.JsonRpcBatchProvider(config.chain.rpcUrl);
+    const multicallContract = Multicall__factory.connect(config.chain.contracts.multicall, this.provider);
 
-    this.router = new Router(this.provider, config.chain.commonRoutingTokens, {
-      multicallAddress: config.chain.contracts.multicall,
-      factoryAddress: config.chain.contracts.coreFactory,
-      quoterAddress: config.chain.contracts.quoterV2,
-    });
+    this.router = new Router(
+      this.provider,
+      multicallContract,
+      config.chain.commonRoutingTokens,
+      config.chain.contracts,
+    );
   }
 
   private static validate(

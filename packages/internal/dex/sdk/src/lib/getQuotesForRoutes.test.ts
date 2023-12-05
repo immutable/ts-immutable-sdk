@@ -4,7 +4,7 @@ import {
 import { TradeType } from '@uniswap/sdk-core';
 import { BigNumber, utils } from 'ethers';
 import { ProviderCallError } from 'errors';
-import { getQuotesForRoutes } from './getQuotesForRoutes';
+import { getQuotesForRoutes, Provider } from './getQuotesForRoutes';
 import {
   IMX_TEST_TOKEN,
   TEST_QUOTER_ADDRESS,
@@ -13,7 +13,6 @@ import {
   newAmountFromString,
 } from '../test/utils';
 import { erc20ToUniswapToken, newAmount } from './utils';
-import { Multicall } from './multicall';
 
 const UNISWAP_IMX = erc20ToUniswapToken(IMX_TEST_TOKEN);
 const UNISWAP_WETH = erc20ToUniswapToken(WETH_TEST_TOKEN);
@@ -36,10 +35,10 @@ const types = [
   'uint256', // gasEstimate
 ];
 
-const buildMulticallContract = (multicall: jest.Mock): Multicall => ({ callStatic: { multicall } });
+const buildProvider = (send: jest.Mock): Provider => ({ send });
 
 describe('getQuotesForRoutes', () => {
-  it('uses a suitable gas limit', async () => {
+  it('makes an eth_call against the provider', async () => {
     const expectedAmountOut = utils.parseEther('1000');
     const expectedGasEstimate = '100000';
 
@@ -50,18 +49,10 @@ describe('getQuotesForRoutes', () => {
       expectedGasEstimate,
     ]);
 
-    const multicallContract = buildMulticallContract(
-      jest.fn().mockResolvedValue({
-        returnData: [
-          {
-            returnData,
-          },
-        ],
-      }),
-    );
+    const provider = buildProvider(jest.fn().mockResolvedValueOnce(returnData));
 
     const quoteResults = await getQuotesForRoutes(
-      multicallContract,
+      provider,
       TEST_QUOTER_ADDRESS,
       [route],
       newAmountFromString('1', WETH_TEST_TOKEN),
@@ -69,29 +60,28 @@ describe('getQuotesForRoutes', () => {
     );
 
     expect(quoteResults).toHaveLength(1);
-    expect(multicallContract.callStatic.multicall).toHaveBeenCalledWith([{
+    expect(provider.send).toHaveBeenCalledWith('eth_call', [{
       // eslint-disable-next-line max-len
-      callData: expect.any(String),
-      gasLimit: 2000000,
-      target: TEST_QUOTER_ADDRESS,
-    }]);
+      data: '0xc6a5026a0000000000000000000000004f062a3eaec3730560ab89b5ce5ac0ab2c5517ae00000000000000000000000072958b06abdf2701ace6ceb3ce0b8b1ce11e08510000000000000000000000000000000000000000000000000de0b6b3a764000000000000000000000000000000000000000000000000000000000000000027100000000000000000000000000000000000000000000000000000000000000000',
+      to: '0x9B323E56215aAdcD4f45a6Be660f287DE154AFC5',
+    }, 'latest']);
   });
 
   describe('when multicall fails', () => {
     it('should throw ProviderCallError', async () => {
-      const mockedMulticallContract = buildMulticallContract(
+      const provider = buildProvider(
         jest.fn().mockRejectedValue(new ProviderCallError('an rpc error message')),
       );
 
       const amount = newAmount(BigNumber.from('123123'), WETH_TEST_TOKEN);
 
       await expect(getQuotesForRoutes(
-        mockedMulticallContract,
+        provider,
         TEST_QUOTER_ADDRESS,
         [route],
         amount,
         TradeType.EXACT_INPUT,
-      )).rejects.toThrow(new ProviderCallError('failed multicall: an rpc error message'));
+      )).rejects.toThrow(new ProviderCallError('an rpc error message'));
     });
   });
 
@@ -107,19 +97,13 @@ describe('getQuotesForRoutes', () => {
         expectedGasEstimate,
       ]);
 
-      const multicallContract = buildMulticallContract(
-        jest.fn().mockResolvedValue({
-          returnData: [
-            {
-              returnData,
-            },
-          ],
-        }),
+      const provider = buildProvider(
+        jest.fn().mockResolvedValue(returnData),
       );
 
       const amount = newAmount(BigNumber.from('123123'), WETH_TEST_TOKEN);
       const amountOutReceived = await getQuotesForRoutes(
-        multicallContract,
+        provider,
         TEST_QUOTER_ADDRESS,
         [route],
         amount,
@@ -152,22 +136,13 @@ describe('getQuotesForRoutes', () => {
         expectedGasEstimate2,
       ]);
 
-      const multicallContract = buildMulticallContract(
-        jest.fn().mockResolvedValueOnce({
-          returnData: [
-            {
-              returnData: returnData1,
-            },
-            {
-              returnData: returnData2,
-            },
-          ],
-        }),
+      const provider = buildProvider(
+        jest.fn().mockResolvedValueOnce(returnData1).mockResolvedValueOnce(returnData2),
       );
 
       const amount = newAmount(BigNumber.from('123123'), WETH_TEST_TOKEN);
       const amountOutReceived = await getQuotesForRoutes(
-        multicallContract,
+        provider,
         TEST_QUOTER_ADDRESS,
         [route, route],
         amount,
