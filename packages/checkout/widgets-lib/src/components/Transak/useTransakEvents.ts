@@ -90,7 +90,7 @@ export const useTransakEvents = (props: UseTransakEventsProps) => {
   const onLoad = () => {
     if (onFailedToLoad === undefined) return;
 
-    if (timeout.current !== undefined && !initialised) {
+    if (timeout.current === undefined && !initialised) {
       timeout.current = setTimeout(() => {
         if (!initialised) onFailedToLoad();
       }, failedToLoadTimeout);
