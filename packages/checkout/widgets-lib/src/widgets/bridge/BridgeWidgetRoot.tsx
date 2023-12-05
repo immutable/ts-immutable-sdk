@@ -76,25 +76,27 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
       || this.parameters.walletProviderName === WalletProviderName.PASSPORT;
 
     this.reactRoot.render(
-      <WidgetContainer id="bridge-container" config={this.strongConfig()}>
-        {showBridgeComingSoonScreen && (
-        <BridgeComingSoon onCloseEvent={() => sendBridgeWidgetCloseEvent(window)} />
+      <React.StrictMode>
+        <WidgetContainer id="bridge-container" config={this.strongConfig()}>
+          {showBridgeComingSoonScreen && (
+          <BridgeComingSoon onCloseEvent={() => sendBridgeWidgetCloseEvent(window)} />
 
-        )}
-        {!showBridgeComingSoonScreen && (
-        <ConnectLoader
-          params={connectLoaderParams}
-          closeEvent={() => sendBridgeWidgetCloseEvent(window)}
-          widgetConfig={this.strongConfig()}
-        >
-          <BridgeWidget
-            amount={this.parameters.amount}
-            fromContractAddress={this.parameters.fromContractAddress}
-            config={this.strongConfig()}
-          />
-        </ConnectLoader>
-        )}
-      </WidgetContainer>,
+          )}
+          {!showBridgeComingSoonScreen && (
+          <ConnectLoader
+            params={connectLoaderParams}
+            closeEvent={() => sendBridgeWidgetCloseEvent(window)}
+            widgetConfig={this.strongConfig()}
+          >
+            <BridgeWidget
+              amount={this.parameters.amount}
+              fromContractAddress={this.parameters.fromContractAddress}
+              config={this.strongConfig()}
+            />
+          </ConnectLoader>
+          )}
+        </WidgetContainer>
+      </React.StrictMode>,
     );
   }
 }

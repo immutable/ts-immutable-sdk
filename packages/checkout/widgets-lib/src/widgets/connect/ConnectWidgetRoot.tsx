@@ -25,12 +25,14 @@ export class Connect extends Base<WidgetType.CONNECT> {
     if (!this.reactRoot) return;
 
     this.reactRoot.render(
-      <WidgetContainer id="connect-container" config={this.strongConfig()}>
-        <ConnectWidget
-          config={this.strongConfig()}
-          checkout={this.checkout}
-        />
-      </WidgetContainer>,
+      <React.StrictMode>
+        <WidgetContainer id="connect-container" config={this.strongConfig()}>
+          <ConnectWidget
+            config={this.strongConfig()}
+            checkout={this.checkout}
+          />
+        </WidgetContainer>
+      </React.StrictMode>,
     );
   }
 }

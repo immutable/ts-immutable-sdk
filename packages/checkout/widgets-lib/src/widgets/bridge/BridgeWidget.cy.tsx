@@ -14,7 +14,6 @@ import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { CompletionStatus, TokenBridge } from '@imtbl/bridge-sdk';
 import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
-import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
 import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { BridgeWidget } from './BridgeWidget';
@@ -217,7 +216,7 @@ describe('Bridge Widget tests', () => {
     it('should show bridge widget on mount', () => {
       const params = {} as BridgeWidgetParams;
       mount(
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <ViewContextTestComponent>
           <ConnectLoaderTestComponent
             initialStateOverride={connectLoaderState}
           >
@@ -226,7 +225,7 @@ describe('Bridge Widget tests', () => {
               {...params}
             />
           </ConnectLoaderTestComponent>
-        </CustomAnalyticsProvider>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('bridge-view').should('exist');
@@ -257,7 +256,7 @@ describe('Bridge Widget tests', () => {
         });
 
       mount(
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <ViewContextTestComponent>
           <ConnectLoaderTestComponent
             initialStateOverride={connectLoaderState}
           >
@@ -267,7 +266,7 @@ describe('Bridge Widget tests', () => {
             />
           </ConnectLoaderTestComponent>
 
-        </CustomAnalyticsProvider>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('bridge-token-select__target').click();
@@ -298,7 +297,7 @@ describe('Bridge Widget tests', () => {
       const params = {} as BridgeWidgetParams;
 
       mount(
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <ViewContextTestComponent>
           <ConnectLoaderTestComponent
             initialStateOverride={connectLoaderState}
           >
@@ -308,7 +307,7 @@ describe('Bridge Widget tests', () => {
             />
           </ConnectLoaderTestComponent>
 
-        </CustomAnalyticsProvider>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('error-view').should('be.visible');
@@ -321,7 +320,7 @@ describe('Bridge Widget tests', () => {
     it('should set up bridge widget on mount', () => {
       const params = {} as BridgeWidgetParams;
       mount(
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <ViewContextTestComponent>
           <ConnectLoaderTestComponent
             initialStateOverride={connectLoaderState}
           >
@@ -331,7 +330,7 @@ describe('Bridge Widget tests', () => {
             />
           </ConnectLoaderTestComponent>
 
-        </CustomAnalyticsProvider>,
+        </ViewContextTestComponent>,
       );
       cySmartGet('@getAllBalancesStub').should('have.been.called');
       cySmartGet('@getTokenAllowListStub').should('have.been.called');
@@ -423,7 +422,7 @@ describe('Bridge Widget tests', () => {
         }));
 
       mount(
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <ViewContextTestComponent>
           <ConnectLoaderTestComponent
             initialStateOverride={connectLoaderState}
           >
@@ -439,7 +438,7 @@ describe('Bridge Widget tests', () => {
             />
           </ConnectLoaderTestComponent>
 
-        </CustomAnalyticsProvider>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('bridge-token-select__target').click();
@@ -505,7 +504,7 @@ describe('Bridge Widget tests', () => {
 
       mount(
         <ViewContextTestComponent>
-          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <ViewContextTestComponent>
             <ConnectLoaderTestComponent
               initialStateOverride={connectLoaderState}
             >
@@ -520,7 +519,7 @@ describe('Bridge Widget tests', () => {
                 {...params}
               />
             </ConnectLoaderTestComponent>
-          </CustomAnalyticsProvider>
+          </ViewContextTestComponent>
         </ViewContextTestComponent>,
       );
 
@@ -558,7 +557,7 @@ describe('Bridge Widget tests', () => {
 
       mount(
         <ViewContextTestComponent>
-          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <ViewContextTestComponent>
             <ConnectLoaderTestComponent
               initialStateOverride={connectLoaderState}
             >
@@ -573,7 +572,7 @@ describe('Bridge Widget tests', () => {
                 {...params}
               />
             </ConnectLoaderTestComponent>
-          </CustomAnalyticsProvider>
+          </ViewContextTestComponent>
         </ViewContextTestComponent>,
       );
 
@@ -617,7 +616,7 @@ describe('Bridge Widget tests', () => {
 
       mount(
         <ViewContextTestComponent>
-          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <ViewContextTestComponent>
             <ConnectLoaderTestComponent
               initialStateOverride={connectLoaderState}
             >
@@ -632,7 +631,7 @@ describe('Bridge Widget tests', () => {
                 {...params}
               />
             </ConnectLoaderTestComponent>
-          </CustomAnalyticsProvider>
+          </ViewContextTestComponent>
         </ViewContextTestComponent>,
       );
 
@@ -673,7 +672,7 @@ describe('Bridge Widget tests', () => {
 
       mount(
         <ViewContextTestComponent>
-          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <ViewContextTestComponent>
             <ConnectLoaderTestComponent
               initialStateOverride={connectLoaderState}
             >
@@ -688,7 +687,7 @@ describe('Bridge Widget tests', () => {
                 {...params}
               />
             </ConnectLoaderTestComponent>
-          </CustomAnalyticsProvider>
+          </ViewContextTestComponent>
         </ViewContextTestComponent>,
       );
 
@@ -729,7 +728,7 @@ describe('Bridge Widget tests', () => {
 
       mount(
         <ViewContextTestComponent>
-          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <ViewContextTestComponent>
             <ConnectLoaderTestComponent
               initialStateOverride={connectLoaderState}
             >
@@ -744,7 +743,7 @@ describe('Bridge Widget tests', () => {
                 {...params}
               />
             </ConnectLoaderTestComponent>
-          </CustomAnalyticsProvider>
+          </ViewContextTestComponent>
         </ViewContextTestComponent>,
       );
 

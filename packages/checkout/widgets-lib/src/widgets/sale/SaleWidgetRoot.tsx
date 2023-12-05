@@ -93,23 +93,25 @@ export class Sale extends Base<WidgetType.SALE> {
     };
 
     this.reactRoot.render(
-      <WidgetContainer id="sale-container" config={this.strongConfig()}>
-        <ConnectLoader
-          widgetConfig={this.strongConfig()}
-          params={connectLoaderParams}
-          closeEvent={() => {
-            sendSaleWidgetCloseEvent(window);
-          }}
-        >
-          <SaleWidget
-            config={this.strongConfig()}
-            amount={this.parameters.amount!}
-            items={this.parameters.items!}
-            fromContractAddress={this.parameters.fromContractAddress!}
-            environmentId={this.parameters.environmentId!}
-          />
-        </ConnectLoader>
-      </WidgetContainer>,
+      <React.StrictMode>
+        <WidgetContainer id="sale-container" config={this.strongConfig()}>
+          <ConnectLoader
+            widgetConfig={this.strongConfig()}
+            params={connectLoaderParams}
+            closeEvent={() => {
+              sendSaleWidgetCloseEvent(window);
+            }}
+          >
+            <SaleWidget
+              config={this.strongConfig()}
+              amount={this.parameters.amount!}
+              items={this.parameters.items!}
+              fromContractAddress={this.parameters.fromContractAddress!}
+              environmentId={this.parameters.environmentId!}
+            />
+          </ConnectLoader>
+        </WidgetContainer>
+      </React.StrictMode>,
     );
   }
 }

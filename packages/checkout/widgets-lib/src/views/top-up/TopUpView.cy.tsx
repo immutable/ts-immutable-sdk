@@ -253,20 +253,18 @@ describe('Top Up View', () => {
 
       mount(
         <ViewContextTestComponent>
-          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-            <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
-              <TopUpView
-                analytics={{ userJourney: UserJourney.WALLET }}
-                showOnrampOption
-                showSwapOption
-                showBridgeOption
-                widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
-                tokenAddress="0x123"
-                amount="10"
-                onCloseButtonClick={() => {}}
-              />
-            </ConnectLoaderTestComponent>
-          </CustomAnalyticsProvider>
+          <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
+            <TopUpView
+              analytics={{ userJourney: UserJourney.WALLET }}
+              showOnrampOption
+              showSwapOption
+              showBridgeOption
+              widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
+              tokenAddress="0x123"
+              amount="10"
+              onCloseButtonClick={() => {}}
+            />
+          </ConnectLoaderTestComponent>
         </ViewContextTestComponent>,
       );
 
@@ -313,7 +311,7 @@ describe('Top Up View', () => {
         );
 
         cySmartGet('menu-item-swap')
-          .should('have.css', 'background-color', 'rgba(255, 255, 255, 0.48)');
+          .should('have.css', 'background-color', 'rgba(243, 243, 243, 0.04)');
       });
     });
   });
@@ -507,23 +505,21 @@ describe('Top Up View', () => {
         .rejects();
 
       mount(
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-          <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
-            <WalletWidgetTestComponent
-              initialStateOverride={baseWalletState}
-              cryptoConversionsOverride={cryptoConversions}
-            >
-              <TopUpView
-                analytics={{ userJourney: UserJourney.WALLET }}
-                showOnrampOption
-                showSwapOption
-                showBridgeOption
-                widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
-                onCloseButtonClick={() => {}}
-              />
-            </WalletWidgetTestComponent>
-          </ConnectLoaderTestComponent>
-        </CustomAnalyticsProvider>,
+        <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
+          <WalletWidgetTestComponent
+            initialStateOverride={baseWalletState}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <TopUpView
+              analytics={{ userJourney: UserJourney.WALLET }}
+              showOnrampOption
+              showSwapOption
+              showBridgeOption
+              widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
+              onCloseButtonClick={() => {}}
+            />
+          </WalletWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('menu-item-caption-bridge').contains('$-.-- USD');

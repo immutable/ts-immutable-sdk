@@ -23,18 +23,16 @@ export function WidgetContainer({
   const portalId = usePortalId();
 
   return (
-    <React.StrictMode>
-      <CustomAnalyticsProvider widgetConfig={config}>
-        <BiomeCombinedProviders
-          globalSx={globalSx}
-          theme={{ base: themeBase }}
-          drawerContainerId={`${id}${portalId}`}
-        >
-          <Box sx={containerStyles} id={`${id}${portalId}`}>
-            {children}
-          </Box>
-        </BiomeCombinedProviders>
-      </CustomAnalyticsProvider>
-    </React.StrictMode>
+    <CustomAnalyticsProvider widgetConfig={config}>
+      <BiomeCombinedProviders
+        globalSx={globalSx}
+        theme={{ base: themeBase }}
+        drawerContainerId={`${id}${portalId}`}
+      >
+        <Box sx={containerStyles} id={`${id}${portalId}`}>
+          {children}
+        </Box>
+      </BiomeCombinedProviders>
+    </CustomAnalyticsProvider>
   );
 }

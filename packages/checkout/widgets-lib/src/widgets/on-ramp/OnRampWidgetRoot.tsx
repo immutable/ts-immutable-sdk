@@ -65,19 +65,21 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
     };
 
     this.reactRoot.render(
-      <WidgetContainer id="onramp-container" config={this.strongConfig()}>
-        <ConnectLoader
-          widgetConfig={this.strongConfig()}
-          params={connectLoaderParams}
-          closeEvent={() => sendOnRampWidgetCloseEvent(window)}
-        >
-          <OnRampWidget
-            contractAddress={this.parameters.contractAddress}
-            amount={this.parameters.amount}
-            config={this.strongConfig()}
-          />
-        </ConnectLoader>
-      </WidgetContainer>,
+      <React.StrictMode>
+        <WidgetContainer id="onramp-container" config={this.strongConfig()}>
+          <ConnectLoader
+            widgetConfig={this.strongConfig()}
+            params={connectLoaderParams}
+            closeEvent={() => sendOnRampWidgetCloseEvent(window)}
+          >
+            <OnRampWidget
+              contractAddress={this.parameters.contractAddress}
+              amount={this.parameters.amount}
+              config={this.strongConfig()}
+            />
+          </ConnectLoader>
+        </WidgetContainer>
+      </React.StrictMode>,
     );
   }
 }

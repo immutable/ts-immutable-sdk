@@ -58,17 +58,19 @@ export class Wallet extends Base<WidgetType.WALLET> {
     };
 
     this.reactRoot.render(
-      <WidgetContainer id="wallet-container" config={this.strongConfig()}>
-        <ConnectLoader
-          widgetConfig={this.strongConfig()}
-          params={connectLoaderParams}
-          closeEvent={() => sendWalletWidgetCloseEvent(window)}
-        >
-          <WalletWidget
-            config={this.strongConfig()}
-          />
-        </ConnectLoader>
-      </WidgetContainer>,
+      <React.StrictMode>
+        <WidgetContainer id="wallet-container" config={this.strongConfig()}>
+          <ConnectLoader
+            widgetConfig={this.strongConfig()}
+            params={connectLoaderParams}
+            closeEvent={() => sendWalletWidgetCloseEvent(window)}
+          >
+            <WalletWidget
+              config={this.strongConfig()}
+            />
+          </ConnectLoader>
+        </WidgetContainer>
+      </React.StrictMode>,
     );
   }
 }

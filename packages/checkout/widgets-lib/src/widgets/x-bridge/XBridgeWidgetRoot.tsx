@@ -57,13 +57,15 @@ export class XBridge extends Base<WidgetType.BRIDGE> {
   protected render() {
     if (!this.reactRoot) return;
     this.reactRoot.render(
-      <WidgetContainer id="xbridge-container" config={this.strongConfig()}>
-        <XBridgeWidget
-          checkout={this.checkout}
-          config={this.strongConfig()}
-          web3Provider={this.web3Provider}
-        />
-      </WidgetContainer>,
+      <React.StrictMode>
+        <WidgetContainer id="xbridge-container" config={this.strongConfig()}>
+          <XBridgeWidget
+            checkout={this.checkout}
+            config={this.strongConfig()}
+            web3Provider={this.web3Provider}
+          />
+        </WidgetContainer>
+      </React.StrictMode>,
     );
   }
 }

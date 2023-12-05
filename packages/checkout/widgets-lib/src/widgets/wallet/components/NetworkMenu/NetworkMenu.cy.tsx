@@ -16,8 +16,6 @@ import { ConnectionStatus } from '../../../../context/connect-loader-context/Con
 import {
   ConnectLoaderTestComponent,
 } from '../../../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
-import { CustomAnalyticsProvider } from '../../../../context/analytics-provider/CustomAnalyticsProvider';
-import { StrongCheckoutWidgetsConfig } from '../../../../lib/withDefaultWidgetConfig';
 
 describe('Network Menu', () => {
   const connectLoaderState = {
@@ -49,13 +47,11 @@ describe('Network Menu', () => {
   it('should have heading', () => {
     mount(
       <ViewContextTestComponent>
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <NetworkMenu setBalancesLoading={() => {}} />
-          </ConnectLoaderTestComponent>
-        </CustomAnalyticsProvider>
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <NetworkMenu setBalancesLoading={() => {}} />
+        </ConnectLoaderTestComponent>
       </ViewContextTestComponent>,
     );
 
@@ -73,17 +69,15 @@ describe('Network Menu', () => {
     };
     mount(
       <ViewContextTestComponent>
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <WalletContext.Provider
+            value={{ walletState, walletDispatch: () => {} }}
           >
-            <WalletContext.Provider
-              value={{ walletState, walletDispatch: () => {} }}
-            >
-              <NetworkMenu setBalancesLoading={() => {}} />
-            </WalletContext.Provider>
-          </ConnectLoaderTestComponent>
-        </CustomAnalyticsProvider>
+            <NetworkMenu setBalancesLoading={() => {}} />
+          </WalletContext.Provider>
+        </ConnectLoaderTestComponent>
       </ViewContextTestComponent>,
     );
     cySmartGet('@getNetworkAllowListStub').should('have.been.called');
@@ -119,17 +113,15 @@ describe('Network Menu', () => {
     };
     mount(
       <ViewContextTestComponent>
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <WalletContext.Provider
+            value={{ walletState, walletDispatch: () => {} }}
           >
-            <WalletContext.Provider
-              value={{ walletState, walletDispatch: () => {} }}
-            >
-              <NetworkMenu setBalancesLoading={() => {}} />
-            </WalletContext.Provider>
-          </ConnectLoaderTestComponent>
-        </CustomAnalyticsProvider>
+            <NetworkMenu setBalancesLoading={() => {}} />
+          </WalletContext.Provider>
+        </ConnectLoaderTestComponent>
       </ViewContextTestComponent>,
     );
 
