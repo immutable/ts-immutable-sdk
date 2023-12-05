@@ -112,11 +112,10 @@ export class ImmutableApiClient {
     return this.orderbookService.createListing({
       chainName: this.chainName,
       requestBody: {
-        order_hash: orderHash,
         account_address: orderComponents.offerer,
         buy: [
           {
-            item_type:
+            type:
               Number(orderComponents.consideration[0].itemType)
               === ItemType.NATIVE
                 ? 'NATIVE'
@@ -127,12 +126,13 @@ export class ImmutableApiClient {
         ],
         fees: makerFees.map((x) => ({
           amount: x.amount,
-          fee_type: FeeType.MAKER_ECOSYSTEM as unknown as Fee.fee_type,
-          recipient: x.recipient,
+          type: FeeType.MAKER_ECOSYSTEM as unknown as Fee.type,
+          recipient_address: x.recipientAddress,
         })),
         end_at: new Date(
           parseInt(`${orderComponents.endTime.toString()}000`, 10),
         ).toISOString(),
+        order_hash: orderHash,
         protocol_data: {
           order_type: ProtocolData.order_type.FULL_RESTRICTED,
           zone_address: orderComponents.zone,
@@ -145,7 +145,7 @@ export class ImmutableApiClient {
           {
             contract_address: orderComponents.offer[0].token,
             token_id: orderComponents.offer[0].identifierOrCriteria,
-            item_type: 'ERC721',
+            type: 'ERC721',
           },
         ],
         signature: orderSignature,

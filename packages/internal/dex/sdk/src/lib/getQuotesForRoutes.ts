@@ -3,7 +3,7 @@ import { TradeType, Token } from '@uniswap/sdk-core';
 import { BigNumber, utils } from 'ethers';
 import { ProviderCallError } from 'errors';
 import { CoinAmount, ERC20 } from 'types';
-import { multicallMultipleCallDataSingContract, MulticallResponse } from './multicall';
+import { Multicall, multicallMultipleCallDataSingContract, MulticallResponse } from './multicall';
 import {
   ERROR_STRING_FUNCTION_SIGNATURE,
   newAmount,
@@ -11,7 +11,6 @@ import {
   toCurrencyAmount,
   uniswapTokenToERC20,
 } from './utils';
-import { Multicall } from '../contracts/types';
 
 const amountIndex = 0;
 const gasEstimateIndex = 3;

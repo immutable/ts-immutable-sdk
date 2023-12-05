@@ -89,7 +89,7 @@ describe('', () => {
       orderSignature: signatures[0],
       makerFees: [{
         amount: '1',
-        recipient: offerer.address,
+        recipientAddress: offerer.address,
       }],
     });
 
@@ -102,7 +102,7 @@ describe('', () => {
       fulfiller.address,
       [{
         amount: '1',
-        recipient: offerer.address,
+        recipientAddress: offerer.address,
       }],
     );
 

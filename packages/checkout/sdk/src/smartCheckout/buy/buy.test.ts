@@ -169,7 +169,7 @@ describe('buy', () => {
         '0xADDRESS',
         [
           {
-            recipient: '0xFEERECIPIENT',
+            recipientAddress: '0xFEERECIPIENT',
             amount: '25000000000000000',
           },
         ],
@@ -337,7 +337,7 @@ describe('buy', () => {
         '0xADDRESS',
         [
           {
-            recipient: '0xFEERECIPIENT',
+            recipientAddress: '0xFEERECIPIENT',
             amount: '25000000000000000',
           },
         ],
@@ -1224,7 +1224,7 @@ describe('buy', () => {
         }],
         expectedTakerFee: [
           {
-            recipient: '0xFEERECIPIENT',
+            recipientAddress: '0xFEERECIPIENT',
             amount: '25000000000000000',
           },
         ],
@@ -1237,7 +1237,7 @@ describe('buy', () => {
         }],
         expectedTakerFee: [
           {
-            recipient: '0xFEERECIPIENT',
+            recipientAddress: '0xFEERECIPIENT',
             amount: '100000000000000000',
           },
         ],
@@ -1260,11 +1260,11 @@ describe('buy', () => {
         }],
         expectedTakerFee: [
           {
-            recipient: '0xFEERECIPIENT',
+            recipientAddress: '0xFEERECIPIENT',
             amount: '100000000000000000',
           },
           {
-            recipient: '0xFEERECIPIENT',
+            recipientAddress: '0xFEERECIPIENT',
             amount: '100000000000000000',
           },
         ],
@@ -1287,11 +1287,11 @@ describe('buy', () => {
         }],
         expectedTakerFee: [
           {
-            recipient: '0xFEERECIPIENT',
+            recipientAddress: '0xFEERECIPIENT',
             amount: '100000000000000000',
           },
           {
-            recipient: '0xFEERECIPIENT',
+            recipientAddress: '0xFEERECIPIENT',
             amount: '100000000000000000',
           },
         ],
@@ -1419,7 +1419,7 @@ describe('buy', () => {
         }],
         expectedTakerFee: [
           {
-            recipient: '0xFEERECIPIENT',
+            recipientAddress: '0xFEERECIPIENT',
             amount: '25000',
           },
         ],
@@ -1432,7 +1432,7 @@ describe('buy', () => {
         }],
         expectedTakerFee: [
           {
-            recipient: '0xFEERECIPIENT',
+            recipientAddress: '0xFEERECIPIENT',
             amount: '100000',
           },
         ],
@@ -1455,11 +1455,11 @@ describe('buy', () => {
         }],
         expectedTakerFee: [
           {
-            recipient: '0xFEERECIPIENT',
+            recipientAddress: '0xFEERECIPIENT',
             amount: '100000',
           },
           {
-            recipient: '0xFEERECIPIENT',
+            recipientAddress: '0xFEERECIPIENT',
             amount: '100000',
           },
         ],
@@ -1482,11 +1482,11 @@ describe('buy', () => {
         }],
         expectedTakerFee: [
           {
-            recipient: '0xFEERECIPIENT',
+            recipientAddress: '0xFEERECIPIENT',
             amount: '100000',
           },
           {
-            recipient: '0xFEERECIPIENT',
+            recipientAddress: '0xFEERECIPIENT',
             amount: '100000',
           },
         ],

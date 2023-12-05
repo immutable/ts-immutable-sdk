@@ -210,9 +210,9 @@ export class Orderbook {
         order_id: listingId,
         fees: takerFees.map((fee) => ({
           amount: fee.amount,
-          fee_type:
-            FeeType.TAKER_ECOSYSTEM as unknown as OpenApiFee.fee_type.TAKER_ECOSYSTEM,
-          recipient: fee.recipient,
+          type:
+            FeeType.TAKER_ECOSYSTEM as unknown as OpenApiFee.type.TAKER_ECOSYSTEM,
+          recipient_address: fee.recipientAddress,
         })),
       },
     ]);
@@ -246,9 +246,9 @@ export class Orderbook {
         order_id: listingRequest.listingId,
         fees: listingRequest.takerFees.map((fee) => ({
           amount: fee.amount,
-          fee_type:
-            FeeType.TAKER_ECOSYSTEM as unknown as OpenApiFee.fee_type.TAKER_ECOSYSTEM,
-          recipient: fee.recipient,
+          type:
+            FeeType.TAKER_ECOSYSTEM as unknown as OpenApiFee.type.TAKER_ECOSYSTEM,
+          recipient_address: fee.recipientAddress,
         })),
       })),
     );
