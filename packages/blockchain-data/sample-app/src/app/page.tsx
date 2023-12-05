@@ -58,41 +58,6 @@ const endpointDomains = {
         },
       ],
       pathParams: [],
-      // buildURL: function (pathValues, queryValues) {
-      //   // TODO replace url construction with native methods: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams/URLSearchParams
-      //   let url = `${apiURL}/chains/${chainName}/activities`;
-
-      //   // Apply filters
-      //   if (Object.keys(queryValues).length > 0) {
-      //     Object.keys(queryValues).map((key) => {
-      //       url += `${separator(url)}${key}=${queryValues[key]}`;
-      //     });
-      //   }
-
-      //   return url;
-      // },
-      // renderData: function (data) {
-      //   console.log("renderData::ListActivities", data);
-      //   const loader = document.getElementById("loader");
-      //   loader.remove();
-
-      //   const content = document.getElementById("content");
-
-      //   const tableBody = createActivityTable(content);
-      //   tableBody.innerHTML = "";
-
-      //   let activities = data.result;
-      //   activities_details = {};
-
-      //   activities.forEach(function (result) {
-      //     activities_details[result.id] = result.details;
-      //     createActivityRow(result, tableBody);
-      //   });
-
-      //   new Promise((r) => setTimeout(r, 500)).then(() => {
-      //     setupModal();
-      //   });
-      // },
     },
     {
       name: 'getActivity',
@@ -105,33 +70,6 @@ const endpointDomains = {
           type: 'text',
         },
       ],
-      // buildURL: function (pathValues, queryValues) {
-      //   if (!pathValues["activity_id"]) {
-      //     throw new Error("Please enter an activity_id");
-      //   }
-      //   const chainName = "sepolia";
-      //   return `https://api.dev.immutable.com/v1/chains/${chainName}/activities/${pathValues["activity_id"]}`;
-      // },
-      // renderData: function (data) {
-      //   console.log("renderData::GetActivityByID", data);
-      //   const loader = document.getElementById("loader");
-      //   loader.remove();
-
-      //   const content = document.getElementById("content");
-
-      //   const tableBody = createActivityTable(content);
-      //   tableBody.innerHTML = "";
-
-      //   const { result } = data;
-      //   activities_details = {};
-      //   activities_details[result.id] = result.details;
-
-      //   createActivityRow(result, tableBody);
-
-      //   new Promise((r) => setTimeout(r, 500)).then(() => {
-      //     setupModal();
-      //   });
-      // },
     },
   ],
   chains: [
@@ -140,29 +78,6 @@ const endpointDomains = {
       paginated: true,
       queryParams: [],
       pathParams: [],
-      // buildURL: function (pathValues, queryValues) {
-      //   let url = `${apiURL}/chains`;
-
-      //   // Apply filters
-      //   if (Object.keys(queryValues).length > 0) {
-      //     Object.keys(queryValues).map((key) => {
-      //       url += `${separator(url)}${key}=${queryValues[key]}`;
-      //     });
-      //   }
-
-      //   return url;
-      // },
-      // renderData: function (data) {
-      //   console.log("ListChains", data);
-      //   const loader = document.getElementById("loader");
-      //   loader.remove();
-
-      //   const content = document.getElementById("content");
-
-      //   const pre = document.createElement("pre");
-      //   pre.innerHTML = JSON.stringify(data, null, 2);
-      //   content.appendChild(pre);
-      // },
     },
   ],
   collections: [
@@ -171,29 +86,6 @@ const endpointDomains = {
       paginated: true,
       queryParams: [],
       pathParams: [],
-      // buildURL: function (pathValues, queryValues) {
-      //   let url = `${apiURL}/chains/${chainName}/collections`;
-
-      //   // Apply filters
-      //   if (Object.keys(queryValues).length > 0) {
-      //     Object.keys(queryValues).map((key) => {
-      //       url += `${separator(url)}${key}=${queryValues[key]}`;
-      //     });
-      //   }
-
-      //   return url;
-      // },
-      // renderData: function (data) {
-      //   console.log("ListCollections", data);
-      //   const loader = document.getElementById("loader");
-      //   loader.remove();
-
-      //   const content = document.getElementById("content");
-
-      //   const pre = document.createElement("pre");
-      //   pre.innerHTML = JSON.stringify(data, null, 2);
-      //   content.appendChild(pre);
-      // },
     },
     {
       name: 'getCollection',
@@ -206,24 +98,6 @@ const endpointDomains = {
           type: 'text',
         },
       ],
-      // buildURL: function (pathValues, queryValues) {
-      //   if (!pathValues["contract_address"]) {
-      //     throw new Error("Please enter a contract_address");
-      //   }
-
-      //   return `${apiURL}/chains/${chainName}/collections/${pathValues["contract_address"]}`;
-      // },
-      // renderData: function (data) {
-      //   console.log("GetCollectionsByAddress", data);
-      //   const loader = document.getElementById("loader");
-      //   loader.remove();
-
-      //   const content = document.getElementById("content");
-
-      //   const pre = document.createElement("pre");
-      //   pre.innerHTML = JSON.stringify(data, null, 2);
-      //   content.appendChild(pre);
-      // },
     },
   ],
   nfts: [
@@ -243,27 +117,6 @@ const endpointDomains = {
           type: 'text',
         },
       ],
-      // buildURL: function (pathValues, queryValues) {
-      //   if (!pathValues["contract_address"]) {
-      //     throw new Error("Please enter a contract_address");
-      //   }
-      //   if (!pathValues["token_id"]) {
-      //     throw new Error("Please enter a token_id");
-      //   }
-      //   const chainName = "sepolia";
-      //   return `https://api.dev.immutable.com/v1/chains/${chainName}/collections/${pathValues["contract_address"]}/nfts/${pathValues["token_id"]}`;
-      // },
-      // renderData: function (data) {
-      //   console.log("GetNFTByTokenID", data);
-      //   const loader = document.getElementById("loader");
-      //   loader.remove();
-
-      //   const content = document.getElementById("content");
-
-      //   const pre = document.createElement("pre");
-      //   pre.innerHTML = JSON.stringify(data, null, 2);
-      //   content.appendChild(pre);
-      // },
     },
     {
       name: 'listNFTs',
@@ -276,33 +129,6 @@ const endpointDomains = {
           type: 'text',
         },
       ],
-      // buildURL: function (pathValues, queryValues) {
-      //   if (!pathValues["contract_address"]) {
-      //     throw new Error("Please enter a contract_address");
-      //   }
-
-      //   let url = `${apiURL}/chains/${chainName}/collections/${pathValues["contract_address"]}/nfts`;
-
-      //   // Apply filters
-      //   if (Object.keys(queryValues).length > 0) {
-      //     Object.keys(queryValues).map((key) => {
-      //       url += `${separator(url)}${key}=${queryValues[key]}`;
-      //     });
-      //   }
-
-      //   return url;
-      // },
-      // renderData: function (data) {
-      //   console.log("ListNFTsByContractAddress", data);
-      //   const loader = document.getElementById("loader");
-      //   loader.remove();
-
-      //   const content = document.getElementById("content");
-
-      //   const pre = document.createElement("pre");
-      //   pre.innerHTML = JSON.stringify(data, null, 2);
-      //   content.appendChild(pre);
-      // },
     },
     {
       name: 'listNFTsByAccountAddress',
@@ -321,37 +147,6 @@ const endpointDomains = {
           type: 'text',
         },
       ],
-      // buildURL: function (pathValues, queryValues) {
-      //   if (!pathValues["account_address"]) {
-      //     throw new Error("Please enter an account_address");
-      //   }
-
-      //   let url = `${apiURL}/chains/${chainName}/accounts/${pathValues["account_address"]}/nfts`;
-
-      //   // Apply filters
-      //   const separator = function () {
-      //     return url.includes("?") ? "&" : "?";
-      //   };
-
-      //   if (Object.keys(queryValues).length > 0) {
-      //     Object.keys(queryValues).map((key) => {
-      //       url += `${separator()}${key}=${queryValues[key]}`;
-      //     });
-      //   }
-
-      //   return url;
-      // },
-      // renderData: function (data) {
-      //   console.log("ListNFTsByAccountAddress", data);
-      //   const loader = document.getElementById("loader");
-      //   loader.remove();
-
-      //   const content = document.getElementById("content");
-
-      //   const pre = document.createElement("pre");
-      //   pre.innerHTML = JSON.stringify(data, null, 2);
-      //   content.appendChild(pre);
-      // },
     },
   ],
   'nft Owners': [
@@ -371,36 +166,6 @@ const endpointDomains = {
           type: 'text',
         },
       ],
-      // buildURL: function (pathValues, queryValues) {
-      //   if (!pathValues["contract_address"]) {
-      //     throw new Error("Please enter a contract_address");
-      //   }
-      //   if (!pathValues["token_id"]) {
-      //     throw new Error("Please enter a token_id");
-      //   }
-
-      //   let url = `${apiURL}/chains/${chainName}/collections/${pathValues["contract_address"]}/nfts/${pathValues["token_id"]}/owners`;
-
-      //   // Apply filters
-      //   if (Object.keys(queryValues).length > 0) {
-      //     Object.keys(queryValues).map((key) => {
-      //       url += `${separator(url)}${key}=${queryValues[key]}`;
-      //     });
-      //   }
-
-      //   return url;
-      // },
-      // renderData: function (data) {
-      //   console.log("ListOwnersByTokenID", data);
-      //   const loader = document.getElementById("loader");
-      //   loader.remove();
-
-      //   const content = document.getElementById("content");
-
-      //   const pre = document.createElement("pre");
-      //   pre.innerHTML = JSON.stringify(data, null, 2);
-      //   content.appendChild(pre);
-      // },
     },
   ],
 };
@@ -414,15 +179,10 @@ export default function Home() {
     async function getData() {
       const environment = Environment.SANDBOX;
 
-      const API_URL = 'https://api.dev.immutable.com';
-
       const config: BlockchainDataModuleConfiguration = {
         baseConfig: new ImmutableConfiguration({
           environment,
         }),
-        overrides: {
-          basePath: API_URL,
-        },
       };
 
       const client = new BlockchainData(config);
