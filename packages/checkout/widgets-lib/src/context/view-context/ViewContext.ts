@@ -73,11 +73,12 @@ export interface ViewAction {
   payload: ViewActionPayload;
 }
 
-type ViewActionPayload = UpdateViewPayload | GoBackPayload;
+type ViewActionPayload = UpdateViewPayload | GoBackPayload | GoBackToPayload;
 
 export enum ViewActions {
   UPDATE_VIEW = 'UPDATE_VIEW',
   GO_BACK = 'GO_BACK',
+  GO_BACK_TO = 'GO_BACK_TO',
 }
 
 export interface UpdateViewPayload {
@@ -88,6 +89,11 @@ export interface UpdateViewPayload {
 
 export interface GoBackPayload {
   type: ViewActions.GO_BACK;
+}
+
+export interface GoBackToPayload {
+  type: ViewActions.GO_BACK_TO;
+  view: View;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -106,18 +112,16 @@ export const viewReducer: Reducer<ViewState, ViewAction> = (
 ) => {
   // TODO consider using if statements instead of switch
   switch (action.payload.type) {
-    case ViewActions.UPDATE_VIEW:
-      // eslint-disable-next-line no-case-declarations
+    case ViewActions.UPDATE_VIEW: {
       const { view, currentViewData } = action.payload;
       if (view.type === SharedViews.ERROR_VIEW) {
         // eslint-disable-next-line no-console
         console.error((view as ErrorView).error);
       }
-      // eslint-disable-next-line no-case-declarations
       const { history } = state;
       if (
         history.length === 0
-        || history[history.length - 1].type !== view.type
+      || history[history.length - 1].type !== view.type
       ) {
         // currentViewData should only be set on the current view before updating
         if (currentViewData) {
@@ -132,15 +136,44 @@ export const viewReducer: Reducer<ViewState, ViewAction> = (
         view,
         history,
       };
-    case ViewActions.GO_BACK:
+    }
+    case ViewActions.GO_BACK: {
       if (state.history.length <= 1) return { ...state };
-      // eslint-disable-next-line no-case-declarations
       const updatedHistory = state.history.slice(0, -1);
       return {
         ...state,
         history: updatedHistory,
         view: updatedHistory[updatedHistory.length - 1],
       };
+    }
+    case ViewActions.GO_BACK_TO: {
+      if (state.history.length <= 1) return { ...state };
+      /**
+       * loop through the history backwards until we find the view
+       * that we want to go back to. Set the updated history and the current view in state
+       */
+      const { history } = state;
+      const updatedHistory = [...history]; // make a copy
+      let matchFound = false;
+      for (let i = history.length - 1; i >= 0; i--) {
+        if (state.history[i].type === action.payload.view.type) {
+          matchFound = true;
+          break;
+        }
+        updatedHistory.pop();
+      }
+
+      if (!matchFound) {
+        return { ...state };
+      }
+
+      return {
+        ...state,
+        history: updatedHistory,
+        view: updatedHistory[updatedHistory.length - 1],
+      };
+    }
+
     default:
       return state;
   }

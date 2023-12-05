@@ -7,173 +7,270 @@ import {
   UpdateViewPayload,
   SharedViews,
 } from './ViewContext';
+import { XBridgeWidgetViews } from './XBridgeViewContextTypes';
 
 describe('view-context', () => {
-  it('should update view and history with correct view when reducer called with UPDATE_VIEW action', () => {
-    const updateViewPayload: UpdateViewPayload = {
-      type: ViewActions.UPDATE_VIEW,
-      view: {
-        type: ConnectWidgetViews.READY_TO_CONNECT,
-      },
-    };
-
-    expect(initialViewState).toEqual({
-      view: {
-        type: SharedViews.LOADING_VIEW,
-      },
-      history: [],
-    });
-
-    const state = viewReducer(initialViewState, { payload: updateViewPayload });
-    expect(state).toEqual({
-      view: {
-        type: ConnectWidgetViews.READY_TO_CONNECT,
-      },
-      history: [{ type: ConnectWidgetViews.READY_TO_CONNECT }],
-    });
-  });
-
-  it('should not add view to history if view is the current view when reducer called with UPDATE_VIEW action', () => {
-    const state = viewReducer(
-      {
-        view: {
-          type: ConnectWidgetViews.CONNECT_WALLET,
-        },
-        history: [{ type: ConnectWidgetViews.CONNECT_WALLET }],
-      },
-      {
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: ConnectWidgetViews.CONNECT_WALLET,
-          },
-        },
-      },
-    );
-
-    expect(state).toEqual({
-      view: {
-        type: ConnectWidgetViews.CONNECT_WALLET,
-      },
-      history: [
-        {
-          type: ConnectWidgetViews.CONNECT_WALLET,
-        },
-      ],
-    });
-  });
-
-  it('should add view to history if view is not the current view when reducer called with UPDATE_VIEW action', () => {
-    const state = viewReducer(
-      {
-        view: {
-          type: ConnectWidgetViews.CONNECT_WALLET,
-        },
-        history: [{ type: ConnectWidgetViews.CONNECT_WALLET }],
-      },
-      {
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: ConnectWidgetViews.READY_TO_CONNECT,
-          },
-        },
-      },
-    );
-
-    expect(state).toEqual({
-      view: {
-        type: ConnectWidgetViews.READY_TO_CONNECT,
-      },
-      history: [
-        { type: ConnectWidgetViews.CONNECT_WALLET },
-        { type: ConnectWidgetViews.READY_TO_CONNECT },
-      ],
-    });
-  });
-
-  it('should add currentViewData to the existing view before pushing a new view', () => {
-    const state = viewReducer(
-      {
-        view: {
-          type: ConnectWidgetViews.CONNECT_WALLET,
-        },
-        history: [{ type: ConnectWidgetViews.CONNECT_WALLET }],
-      },
-      {
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: ConnectWidgetViews.READY_TO_CONNECT,
-          },
-          currentViewData: {
-            tokenAddress: '0xsomeTestAddress',
-          },
-        },
-      },
-    );
-
-    expect(state).toEqual({
-      view: {
-        type: ConnectWidgetViews.READY_TO_CONNECT,
-      },
-      history: [
-        { type: ConnectWidgetViews.CONNECT_WALLET, data: { tokenAddress: '0xsomeTestAddress' } },
-        { type: ConnectWidgetViews.READY_TO_CONNECT },
-      ],
-    });
-  });
-
-  it('should update view to previous history when reducer called with GO_BACK action', () => {
-    const state = viewReducer(
-      {
+  describe('UPDATE_VIEW', () => {
+    it('should update view and history with correct view when reducer called with UPDATE_VIEW action', () => {
+      const updateViewPayload: UpdateViewPayload = {
+        type: ViewActions.UPDATE_VIEW,
         view: {
           type: ConnectWidgetViews.READY_TO_CONNECT,
         },
-        history: [
-          { type: ConnectWidgetViews.READY_TO_CONNECT },
-          { type: ConnectWidgetViews.CONNECT_WALLET },
-          { type: ConnectWidgetViews.SUCCESS },
-        ],
-      },
-      {
-        payload: {
-          type: ViewActions.GO_BACK,
+      };
+
+      expect(initialViewState).toEqual({
+        view: {
+          type: SharedViews.LOADING_VIEW,
         },
-      },
-    );
+        history: [],
+      });
 
-    expect(state).toEqual({
-      view: {
-        type: ConnectWidgetViews.CONNECT_WALLET,
-      },
-      history: [
-        { type: ConnectWidgetViews.READY_TO_CONNECT },
-        { type: ConnectWidgetViews.CONNECT_WALLET },
-      ],
-    });
-  });
-
-  it('should not change state if reducer called with GO_BACK action and only one item in history', () => {
-    const state = viewReducer(
-      {
+      const state = viewReducer(initialViewState, { payload: updateViewPayload });
+      expect(state).toEqual({
         view: {
           type: ConnectWidgetViews.READY_TO_CONNECT,
         },
         history: [{ type: ConnectWidgetViews.READY_TO_CONNECT }],
-      },
-      { payload: { type: ViewActions.GO_BACK } },
-    );
+      });
+    });
 
-    expect(state).toEqual({
-      view: {
-        type: ConnectWidgetViews.READY_TO_CONNECT,
-      },
-      history: [
+    it('should not add view to history if view is the current view when reducer called with UPDATE_VIEW action', () => {
+      const state = viewReducer(
         {
+          view: {
+            type: ConnectWidgetViews.CONNECT_WALLET,
+          },
+          history: [{ type: ConnectWidgetViews.CONNECT_WALLET }],
+        },
+        {
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: {
+              type: ConnectWidgetViews.CONNECT_WALLET,
+            },
+          },
+        },
+      );
+
+      expect(state).toEqual({
+        view: {
+          type: ConnectWidgetViews.CONNECT_WALLET,
+        },
+        history: [
+          {
+            type: ConnectWidgetViews.CONNECT_WALLET,
+          },
+        ],
+      });
+    });
+
+    it('should add view to history if view is not the current view when reducer called with UPDATE_VIEW action', () => {
+      const state = viewReducer(
+        {
+          view: {
+            type: ConnectWidgetViews.CONNECT_WALLET,
+          },
+          history: [{ type: ConnectWidgetViews.CONNECT_WALLET }],
+        },
+        {
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: {
+              type: ConnectWidgetViews.READY_TO_CONNECT,
+            },
+          },
+        },
+      );
+
+      expect(state).toEqual({
+        view: {
           type: ConnectWidgetViews.READY_TO_CONNECT,
         },
-      ],
+        history: [
+          { type: ConnectWidgetViews.CONNECT_WALLET },
+          { type: ConnectWidgetViews.READY_TO_CONNECT },
+        ],
+      });
+    });
+    it('should add currentViewData to the existing view before pushing a new view', () => {
+      const state = viewReducer(
+        {
+          view: {
+            type: ConnectWidgetViews.CONNECT_WALLET,
+          },
+          history: [{ type: ConnectWidgetViews.CONNECT_WALLET }],
+        },
+        {
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: {
+              type: ConnectWidgetViews.READY_TO_CONNECT,
+            },
+            currentViewData: {
+              tokenAddress: '0xsomeTestAddress',
+            },
+          },
+        },
+      );
+
+      expect(state).toEqual({
+        view: {
+          type: ConnectWidgetViews.READY_TO_CONNECT,
+        },
+        history: [
+          { type: ConnectWidgetViews.CONNECT_WALLET, data: { tokenAddress: '0xsomeTestAddress' } },
+          { type: ConnectWidgetViews.READY_TO_CONNECT },
+        ],
+      });
+    });
+  });
+
+  describe('GO_BACK', () => {
+    it('should update view to previous history when reducer called with GO_BACK action', () => {
+      const state = viewReducer(
+        {
+          view: {
+            type: ConnectWidgetViews.READY_TO_CONNECT,
+          },
+          history: [
+            { type: ConnectWidgetViews.READY_TO_CONNECT },
+            { type: ConnectWidgetViews.CONNECT_WALLET },
+            { type: ConnectWidgetViews.SUCCESS },
+          ],
+        },
+        {
+          payload: {
+            type: ViewActions.GO_BACK,
+          },
+        },
+      );
+
+      expect(state).toEqual({
+        view: {
+          type: ConnectWidgetViews.CONNECT_WALLET,
+        },
+        history: [
+          { type: ConnectWidgetViews.READY_TO_CONNECT },
+          { type: ConnectWidgetViews.CONNECT_WALLET },
+        ],
+      });
+    });
+
+    it('should not change state if reducer called with GO_BACK action and only one item in history', () => {
+      const state = viewReducer(
+        {
+          view: {
+            type: ConnectWidgetViews.READY_TO_CONNECT,
+          },
+          history: [{ type: ConnectWidgetViews.READY_TO_CONNECT }],
+        },
+        { payload: { type: ViewActions.GO_BACK } },
+      );
+
+      expect(state).toEqual({
+        view: {
+          type: ConnectWidgetViews.READY_TO_CONNECT,
+        },
+        history: [
+          {
+            type: ConnectWidgetViews.READY_TO_CONNECT,
+          },
+        ],
+      });
+    });
+  });
+
+  describe('GO_BACK_TO', () => {
+    it('should go back to the first entry in the history with the specified view type', () => {
+      const state = viewReducer(
+        {
+          view: {
+            type: XBridgeWidgetViews.BRIDGE_FAILURE,
+          },
+          history: [
+            { type: XBridgeWidgetViews.WALLET_NETWORK_SELECTION },
+            { type: XBridgeWidgetViews.BRIDGE_FORM },
+            { type: XBridgeWidgetViews.BRIDGE_REVIEW },
+            { type: XBridgeWidgetViews.IN_PROGRESS },
+            { type: XBridgeWidgetViews.BRIDGE_FAILURE },
+          ],
+        },
+        { payload: { type: ViewActions.GO_BACK_TO, view: { type: XBridgeWidgetViews.BRIDGE_REVIEW } } },
+      );
+
+      expect(state).toEqual({
+        view: {
+          type: XBridgeWidgetViews.BRIDGE_REVIEW,
+        },
+        history: [
+          { type: XBridgeWidgetViews.WALLET_NETWORK_SELECTION },
+          { type: XBridgeWidgetViews.BRIDGE_FORM },
+          { type: XBridgeWidgetViews.BRIDGE_REVIEW },
+        ],
+      });
+    });
+
+    it('should go back to the first entry in history if the view appears multiple times', () => {
+      const state = viewReducer(
+        {
+          view: {
+            type: XBridgeWidgetViews.BRIDGE_FAILURE,
+          },
+          history: [
+            { type: XBridgeWidgetViews.WALLET_NETWORK_SELECTION },
+            { type: XBridgeWidgetViews.BRIDGE_REVIEW },
+            { type: XBridgeWidgetViews.BRIDGE_FORM },
+            { type: XBridgeWidgetViews.BRIDGE_REVIEW },
+            { type: XBridgeWidgetViews.IN_PROGRESS },
+            { type: XBridgeWidgetViews.BRIDGE_FAILURE },
+          ],
+        },
+        { payload: { type: ViewActions.GO_BACK_TO, view: { type: XBridgeWidgetViews.BRIDGE_REVIEW } } },
+      );
+
+      expect(state).toEqual({
+        view: {
+          type: XBridgeWidgetViews.BRIDGE_REVIEW,
+        },
+        history: [
+          { type: XBridgeWidgetViews.WALLET_NETWORK_SELECTION },
+          { type: XBridgeWidgetViews.BRIDGE_REVIEW },
+          { type: XBridgeWidgetViews.BRIDGE_FORM },
+          { type: XBridgeWidgetViews.BRIDGE_REVIEW },
+        ],
+      });
+    });
+
+    it('should NOT go back to the entry in the history if it is not found', () => {
+      const state = viewReducer(
+        {
+          view: {
+            type: XBridgeWidgetViews.BRIDGE_FAILURE,
+          },
+          history: [
+            { type: XBridgeWidgetViews.WALLET_NETWORK_SELECTION },
+            { type: XBridgeWidgetViews.BRIDGE_FORM },
+            { type: XBridgeWidgetViews.BRIDGE_REVIEW },
+            { type: XBridgeWidgetViews.IN_PROGRESS },
+            { type: XBridgeWidgetViews.BRIDGE_FAILURE },
+          ],
+        },
+        { payload: { type: ViewActions.GO_BACK_TO, view: { type: SharedViews.LOADING_VIEW } } },
+      );
+
+      expect(state).toEqual({
+        view: {
+          type: XBridgeWidgetViews.BRIDGE_FAILURE,
+        },
+        history: [
+          { type: XBridgeWidgetViews.WALLET_NETWORK_SELECTION },
+          { type: XBridgeWidgetViews.BRIDGE_FORM },
+          { type: XBridgeWidgetViews.BRIDGE_REVIEW },
+          { type: XBridgeWidgetViews.IN_PROGRESS },
+          { type: XBridgeWidgetViews.BRIDGE_FAILURE },
+        ],
+      });
     });
   });
 });

@@ -1,0 +1,10 @@
+{
+  "folders": [
+    {
+      "path": "."
+    },
+    {
+      "path": "samples/apps/ts-immutable-sample"
+    }
+  ]
+}

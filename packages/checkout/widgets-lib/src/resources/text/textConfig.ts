@@ -442,7 +442,7 @@ export const text = {
       text: 'Order completed',
       actionText: 'Continue',
     },
-    [XBridgeWidgetViews.WALLET_NETWORK_SECLECTION]: {
+    [XBridgeWidgetViews.WALLET_NETWORK_SELECTION]: {
       layoutHeading: 'Move',
       heading: 'Where would you like to move funds between?',
       fromFormInput: {
@@ -459,6 +459,28 @@ export const text = {
       submitButton: {
         text: 'Next',
       },
+    },
+    [XBridgeWidgetViews.BRIDGE_REVIEW]: {
+      layoutHeading: 'Move',
+      heading: 'Ok, how does this look?',
+      fromLabel: {
+        amountHeading: 'Moving',
+        heading: 'From',
+      },
+      toLabel: {
+        heading: 'To',
+      },
+      fees: {
+        heading: 'Gas fee',
+      },
+      submitButton: {
+        buttonText: 'Confirm move',
+      },
+      fiatPricePrefix: '~ USD $',
+    },
+    [XBridgeWidgetViews.BRIDGE_FAILURE]: {
+      statusText: 'Transaction failed',
+      actionText: 'Review & Try again',
     },
   },
   footers: {

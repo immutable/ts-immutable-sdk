@@ -5,8 +5,7 @@ import { CryptoFiatConvertParams, CryptoFiatConvertReturn } from 'types';
 
 const CHECKOUT_API_BASE_URL = {
   [Environment.SANDBOX]: 'https://checkout-api.sandbox.immutable.com',
-  // TODO: https://immutable.atlassian.net/browse/WT-1425
-  [Environment.PRODUCTION]: 'https://checkout-api.sandbox.immutable.com',
+  [Environment.PRODUCTION]: 'https://checkout-api.immutable.com',
 };
 
 const DEFAULT_FIAT_SYMBOL = 'usd';
