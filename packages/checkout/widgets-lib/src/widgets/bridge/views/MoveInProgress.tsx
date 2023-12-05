@@ -8,7 +8,6 @@ import { BridgeHero } from '../../../components/Hero/BridgeHero';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { text } from '../../../resources/text/textConfig';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
-import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { BridgeWidgetViews, PrefilledBridgeForm } from '../../../context/view-context/BridgeViewContextTypes';
 import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { BridgeContext } from '../context/BridgeContext';
@@ -91,9 +90,6 @@ export function MoveInProgress({ token, transactionResponse, bridgeForm }: MoveI
           transparent
           onCloseButtonClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
         />
-      )}
-      footer={(
-        <FooterLogo />
       )}
       heroContent={<BridgeHero />}
       floatHeader

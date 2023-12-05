@@ -8,6 +8,7 @@ import {
   heroContentStyle,
   responsiveStyles,
 } from './SimpleLayoutStyles';
+import { FooterLogo } from '../Footer/FooterLogo';
 
 export interface SimpleLayoutProps {
   header?: React.ReactNode;
@@ -17,6 +18,7 @@ export interface SimpleLayoutProps {
   testId?: string;
   floatHeader?: boolean;
   footerBackgroundColor?: string;
+  footerBrand?: boolean;
 }
 
 export function SimpleLayout({
@@ -27,6 +29,7 @@ export function SimpleLayout({
   testId,
   floatHeader = false,
   footerBackgroundColor,
+  footerBrand = true,
 }: SimpleLayoutProps) {
   return (
     <Box sx={responsiveStyles}>
@@ -46,6 +49,9 @@ export function SimpleLayout({
             <Box sx={bodyStyle}>
               {children}
             </Box>
+          )}
+          {footerBrand && (
+            <FooterLogo />
           )}
         </Box>
         {footer && (

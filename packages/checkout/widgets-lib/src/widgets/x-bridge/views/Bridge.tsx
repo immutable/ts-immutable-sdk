@@ -9,7 +9,6 @@ import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
-import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { BridgeForm } from '../components/BridgeForm';
 import { text } from '../../../resources/text/textConfig';
 import { BridgeActions, XBridgeContext } from '../context/XBridgeContext';
@@ -80,7 +79,6 @@ export function Bridge({ amount, fromContractAddress }: BridgeProps) {
           onCloseButtonClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
         />
       )}
-      footer={<FooterLogo />}
     >
       <BridgeForm
         testId="bridge-form"

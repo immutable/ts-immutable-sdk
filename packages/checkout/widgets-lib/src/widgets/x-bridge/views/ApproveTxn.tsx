@@ -22,7 +22,6 @@ import { WalletApproveHero } from '../../../components/Hero/WalletApproveHero';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { isNativeToken } from '../../../lib/utils';
 import { XBridgeWidgetViews } from '../../../context/view-context/XBridgeViewContextTypes';
-import { FooterLogo } from '../../../components/Footer/FooterLogo';
 
 export interface ApproveTxnProps {
   data: ApproveTxnData;
@@ -221,7 +220,6 @@ export function ApproveTxn({ data }: ApproveTxnProps) {
                   onActionClick={handleApproveBridgeClick}
                 />
               )}
-              <FooterLogo />
             </Box>
           )}
         >

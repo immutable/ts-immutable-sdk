@@ -5,7 +5,6 @@ import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
 import { CenteredBoxContent } from '../CenteredBoxContent/CenteredBoxContent';
 import { StatusBox } from './StatusBox';
 import { StatusType } from './StatusType';
-import { FooterLogo } from '../Footer/FooterLogo';
 import { statusContainerStyles } from './StatusViewStyles';
 import { HeaderNavigation } from '../Header/HeaderNavigation';
 
@@ -50,7 +49,6 @@ export function StatusView({
 
   return (
     <SimpleLayout
-      footer={<FooterLogo />}
       header={<HeaderNavigation onCloseButtonClick={onCloseClick} />}
       floatHeader
     >

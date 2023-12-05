@@ -3,7 +3,6 @@ import { TokenFilterTypes } from '@imtbl/checkout-sdk';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
-import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { BridgeForm } from '../components/BridgeForm';
 import { text } from '../../../resources/text/textConfig';
 import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
@@ -69,7 +68,6 @@ export function Bridge({ amount, fromContractAddress }: BridgeProps) {
           onCloseButtonClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
         />
       )}
-      footer={<FooterLogo />}
       footerBackgroundColor="base.color.translucent.emphasis.200"
     >
       <BridgeForm

@@ -1,7 +1,6 @@
 import { Banner, Box, Heading } from '@biom3/react';
 import { useContext, useEffect } from 'react';
 
-import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { FundWithSmartCheckoutSubViews, SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
@@ -91,7 +90,6 @@ export function PaymentMethods() {
           onCloseButtonClick={() => sendCloseEvent(SaleWidgetViews.PAYMENT_METHODS)}
         />
       )}
-      footer={<FooterLogo />}
     >
       <Box
         sx={{

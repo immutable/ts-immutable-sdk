@@ -5,7 +5,6 @@ import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { WithCard } from '../components/WithCard';
 import { useSaleContext } from '../context/SaleContextProvider';
-import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 import { useSaleEvent } from '../hooks/useSaleEvents';
 import { SaleErrorTypes } from '../types';
@@ -103,7 +102,7 @@ export function PayWithCard() {
           />
         )
       }
-      footer={<FooterLogo hideLogo={initialised} />}
+      footerBrand={!initialised}
     >
       <Box
         style={{

@@ -6,7 +6,6 @@ import { GasEstimateType, IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
 import { utils } from 'ethers';
 import { fetchTokenSymbols } from 'lib/fetchTokenSymbols';
 import { CryptoFiatActions, CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext';
-import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { text } from '../../../resources/text/textConfig';
@@ -223,7 +222,6 @@ export function WalletBalances({
           onCloseButtonClick={() => sendWalletWidgetCloseEvent(eventTarget)}
         />
       )}
-      footer={<FooterLogo />}
     >
       <Box
         sx={walletBalanceOuterContainerStyles}

@@ -1,6 +1,5 @@
 import { Box, Button } from '@biom3/react';
 import { useContext, useEffect } from 'react';
-import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { text } from '../../../resources/text/textConfig';
@@ -40,7 +39,6 @@ export function Settings() {
           onCloseButtonClick={() => sendWalletWidgetCloseEvent(eventTarget)}
         />
       )}
-      footer={<FooterLogo />}
     >
       <Box
         sx={settingsBoxStyle}
