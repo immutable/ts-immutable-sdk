@@ -1,28 +1,33 @@
 import {
   FeeAmount, Pool, Route, TickMath,
 } from '@uniswap/v3-sdk';
-import { Token, TradeType } from '@uniswap/sdk-core';
-import {
-  BigNumber, Contract, providers, utils,
-} from 'ethers';
+import { TradeType } from '@uniswap/sdk-core';
+import { BigNumber, utils } from 'ethers';
 import { ProviderCallError } from 'errors';
 import { getQuotesForRoutes } from './getQuotesForRoutes';
 import {
   IMX_TEST_TOKEN,
-  TEST_CHAIN_ID,
-  TEST_MULTICALL_ADDRESS,
   TEST_QUOTER_ADDRESS,
-  TEST_RPC_URL,
   WETH_TEST_TOKEN,
   formatAmount,
+  newAmountFromString,
 } from '../test/utils';
-import { Multicall__factory } from '../contracts/types';
 import { erc20ToUniswapToken, newAmount } from './utils';
-
-jest.mock('@ethersproject/contracts');
+import { Multicall } from './multicall';
 
 const UNISWAP_IMX = erc20ToUniswapToken(IMX_TEST_TOKEN);
 const UNISWAP_WETH = erc20ToUniswapToken(WETH_TEST_TOKEN);
+
+const pool = new Pool(
+  UNISWAP_WETH,
+  UNISWAP_IMX,
+  FeeAmount.HIGH,
+  TickMath.getSqrtRatioAtTick(100),
+  1000,
+  100,
+);
+
+const route = new Route([pool], UNISWAP_WETH, UNISWAP_IMX);
 
 const types = [
   'uint256', // amountOut/amountIn
@@ -31,51 +36,59 @@ const types = [
   'uint256', // gasEstimate
 ];
 
+const buildMulticallContract = (multicall: jest.Mock): Multicall => ({ callStatic: { multicall } });
+
 describe('getQuotesForRoutes', () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  let mockedMulticallContract: jest.Mock;
+  it('uses a suitable gas limit', async () => {
+    const expectedAmountOut = utils.parseEther('1000');
+    const expectedGasEstimate = '100000';
+
+    const returnData = utils.defaultAbiCoder.encode(types, [
+      expectedAmountOut,
+      '100',
+      '1',
+      expectedGasEstimate,
+    ]);
+
+    const multicallContract = buildMulticallContract(
+      jest.fn().mockResolvedValue({
+        returnData: [
+          {
+            returnData,
+          },
+        ],
+      }),
+    );
+
+    const quoteResults = await getQuotesForRoutes(
+      multicallContract,
+      TEST_QUOTER_ADDRESS,
+      [route],
+      newAmountFromString('1', WETH_TEST_TOKEN),
+      TradeType.EXACT_INPUT,
+    );
+
+    expect(quoteResults).toHaveLength(1);
+    expect(multicallContract.callStatic.multicall).toHaveBeenCalledWith([{
+      // eslint-disable-next-line max-len
+      callData: expect.any(String),
+      gasLimit: 2000000,
+      target: TEST_QUOTER_ADDRESS,
+    }]);
+  });
 
   describe('when multicall fails', () => {
     it('should throw ProviderCallError', async () => {
-      mockedMulticallContract = (
-        Contract as unknown as jest.Mock
-      ).mockImplementationOnce(() => ({
-        callStatic: {
-          multicall: jest.fn().mockRejectedValue(new ProviderCallError('an rpc error message')),
-        },
-      }));
-
-      const provider = new providers.JsonRpcProvider(
-        TEST_RPC_URL,
-        TEST_CHAIN_ID,
+      const mockedMulticallContract = buildMulticallContract(
+        jest.fn().mockRejectedValue(new ProviderCallError('an rpc error message')),
       );
-      const multicallContract = Multicall__factory.connect(
-        TEST_MULTICALL_ADDRESS,
-        provider,
-      );
-
-      const dummyRoutes: Route<Token, Token>[] = [];
-      const arbitraryTick = 100;
-      const sqrtPriceAtTick = TickMath.getSqrtRatioAtTick(arbitraryTick);
-      // Since we will be mocking the multicall, routes doesn't matter,
-      // as long as the length is correct.
-      const pool0 = new Pool(
-        UNISWAP_WETH,
-        UNISWAP_IMX,
-        FeeAmount.HIGH,
-        sqrtPriceAtTick,
-        1000,
-        arbitraryTick,
-      );
-      dummyRoutes.push(new Route([pool0], UNISWAP_WETH, UNISWAP_IMX));
-      dummyRoutes.push(new Route([pool0], UNISWAP_WETH, UNISWAP_IMX));
 
       const amount = newAmount(BigNumber.from('123123'), WETH_TEST_TOKEN);
 
       await expect(getQuotesForRoutes(
-        multicallContract,
+        mockedMulticallContract,
         TEST_QUOTER_ADDRESS,
-        dummyRoutes,
+        [route],
         amount,
         TradeType.EXACT_INPUT,
       )).rejects.toThrow(new ProviderCallError('failed multicall: an rpc error message'));
@@ -87,58 +100,28 @@ describe('getQuotesForRoutes', () => {
       const expectedAmountOut = utils.parseEther('1000');
       const expectedGasEstimate = '100000';
 
-      const encoded = utils.defaultAbiCoder.encode(types, [
+      const returnData = utils.defaultAbiCoder.encode(types, [
         expectedAmountOut,
         '100',
         '1',
         expectedGasEstimate,
       ]);
 
-      const mockReturnData = {
-        returnData: [
-          {
-            returnData: encoded,
-          },
-        ],
-      };
-
-      mockedMulticallContract = (
-        Contract as unknown as jest.Mock
-      ).mockImplementationOnce(() => ({
-        callStatic: {
-          multicall: jest.fn().mockResolvedValueOnce(mockReturnData),
-        },
-      }));
-
-      const dummyRoutes: Route<Token, Token>[] = [];
-      const arbitraryTick = 100;
-      const sqrtPriceAtTick = TickMath.getSqrtRatioAtTick(arbitraryTick);
-      // Since we will be mocking the multicall, routes doesn't matter,
-      // as long as the length is correct.
-      const pool0 = new Pool(
-        UNISWAP_WETH,
-        UNISWAP_IMX,
-        FeeAmount.HIGH,
-        sqrtPriceAtTick,
-        1000,
-        arbitraryTick,
-      );
-      dummyRoutes.push(new Route([pool0], UNISWAP_WETH, UNISWAP_IMX));
-
-      const provider = new providers.JsonRpcProvider(
-        TEST_RPC_URL,
-        TEST_CHAIN_ID,
-      );
-      const multicallContract = Multicall__factory.connect(
-        TEST_MULTICALL_ADDRESS,
-        provider,
+      const multicallContract = buildMulticallContract(
+        jest.fn().mockResolvedValue({
+          returnData: [
+            {
+              returnData,
+            },
+          ],
+        }),
       );
 
       const amount = newAmount(BigNumber.from('123123'), WETH_TEST_TOKEN);
       const amountOutReceived = await getQuotesForRoutes(
         multicallContract,
         TEST_QUOTER_ADDRESS,
-        dummyRoutes,
+        [route],
         amount,
         TradeType.EXACT_INPUT,
       );
@@ -156,68 +139,37 @@ describe('getQuotesForRoutes', () => {
       const expectedGasEstimate1 = '100000';
       const expectedGasEstimate2 = '200000';
 
-      const encoded1 = utils.defaultAbiCoder.encode(types, [
+      const returnData1 = utils.defaultAbiCoder.encode(types, [
         expectedAmountOut1,
         '100',
         '1',
         expectedGasEstimate1,
       ]);
-      const encoded2 = utils.defaultAbiCoder.encode(types, [
+      const returnData2 = utils.defaultAbiCoder.encode(types, [
         expectedAmountOut2,
         '100',
         '1',
         expectedGasEstimate2,
       ]);
 
-      const mockReturnData = {
-        returnData: [
-          {
-            returnData: encoded1,
-          },
-          {
-            returnData: encoded2,
-          },
-        ],
-      };
-
-      mockedMulticallContract = (
-        Contract as unknown as jest.Mock
-      ).mockImplementationOnce(() => ({
-        callStatic: {
-          multicall: jest.fn().mockResolvedValueOnce(mockReturnData),
-        },
-      }));
-
-      const dummyRoutes: Route<Token, Token>[] = [];
-      const arbitraryTick = 100;
-      const sqrtPriceAtTick = TickMath.getSqrtRatioAtTick(arbitraryTick);
-      // Since we will be mocking the multicall, routes doesn't matter,
-      // as long as the length is correct.
-      const pool0 = new Pool(
-        UNISWAP_WETH,
-        UNISWAP_IMX,
-        FeeAmount.HIGH,
-        sqrtPriceAtTick,
-        1000,
-        arbitraryTick,
-      );
-      dummyRoutes.push(new Route([pool0], UNISWAP_WETH, UNISWAP_IMX));
-      dummyRoutes.push(new Route([pool0], UNISWAP_WETH, UNISWAP_IMX));
-
-      const provider = new providers.JsonRpcProvider(
-        TEST_RPC_URL,
-        TEST_CHAIN_ID,
-      );
-      const multicallContract = Multicall__factory.connect(
-        TEST_MULTICALL_ADDRESS,
-        provider,
+      const multicallContract = buildMulticallContract(
+        jest.fn().mockResolvedValueOnce({
+          returnData: [
+            {
+              returnData: returnData1,
+            },
+            {
+              returnData: returnData2,
+            },
+          ],
+        }),
       );
 
       const amount = newAmount(BigNumber.from('123123'), WETH_TEST_TOKEN);
       const amountOutReceived = await getQuotesForRoutes(
         multicallContract,
         TEST_QUOTER_ADDRESS,
-        dummyRoutes,
+        [route, route],
         amount,
         TradeType.EXACT_INPUT,
       );
