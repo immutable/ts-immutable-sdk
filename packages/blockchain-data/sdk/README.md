@@ -1,3 +1,5 @@
 # Blockchain Data
 
-Wrapper functions for interacting with Immutable blockchain data APIs.
+This package consists of wrapper functions for interacting with Immutable Blockchain Data APIs.
+
+[Read more about the Blockchain Data APIs](https://docs.immutable.com/docs/zkEVM/products/blockchain-data).
