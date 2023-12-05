@@ -1,5 +1,10 @@
 import { text } from 'resources/text/textConfig';
-import { useContext, useMemo, useState } from 'react';
+import {
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from 'react';
 import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
 import {
   Body,
@@ -26,6 +31,7 @@ import {
   walletLogoStyles,
 } from './BridgeReviewSummaryStyles';
 import { XBridgeContext } from '../context/XBridgeContext';
+import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 
 const networkIcon = {
   [ChainId.IMTBL_ZKEVM_DEVNET]: 'Immutable',
@@ -43,6 +49,7 @@ const logo = {
 const testId = 'bridge-review-summary';
 
 export function BridgeReviewSummary() {
+  const { viewDispatch } = useContext(ViewContext);
   const {
     heading, fromLabel, toLabel, fees, fiatPricePrefix, submitButton,
   } = text.views[XBridgeWidgetViews.BRIDGE_REVIEW];
@@ -88,6 +95,20 @@ export function BridgeReviewSummary() {
     console.log('fetch gas estimate');
   };
   useInterval(() => fetchGasEstimate(), DEFAULT_QUOTE_REFRESH_INTERVAL);
+
+  const submitBridge = useCallback(async () => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: XBridgeWidgetViews.APPROVE_TXN,
+          data: {
+            approveTransaction: {},
+          },
+        },
+      },
+    });
+  }, [viewDispatch]);
 
   // Fetch on useInterval interval when available
   const gasEstimate = 'ETH 0.007984';
@@ -228,6 +249,7 @@ export function BridgeReviewSummary() {
         <Button
           size="large"
           sx={{ width: '100%' }}
+          onClick={submitBridge}
         >
           {submitButton.buttonText}
         </Button>

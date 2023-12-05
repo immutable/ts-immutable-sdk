@@ -1,6 +1,9 @@
 import { Box } from '@biom3/react';
 import {
-  useCallback, useContext, useMemo, useState,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
 } from 'react';
 import { CheckoutErrorType, TokenInfo } from '@imtbl/checkout-sdk';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -10,7 +13,6 @@ import { FooterButton } from '../../../components/Footer/FooterButton';
 import { text } from '../../../resources/text/textConfig';
 import {
   ApproveERC20BridgeData,
-  BridgeWidgetViews,
   PrefilledBridgeForm,
 } from '../../../context/view-context/BridgeViewContextTypes';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
@@ -79,7 +81,7 @@ export function ApproveTxn({ data }: ApproveTxnProps) {
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
-            type: BridgeWidgetViews.FAIL,
+            type: XBridgeWidgetViews.BRIDGE_FAILURE,
             data: bridgeFormData,
           },
         },
@@ -93,7 +95,7 @@ export function ApproveTxn({ data }: ApproveTxnProps) {
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
-            type: BridgeWidgetViews.FAIL,
+            type: XBridgeWidgetViews.BRIDGE_FAILURE,
             reason: 'Transaction failed',
             data: bridgeFormData,
           },
@@ -124,18 +126,18 @@ export function ApproveTxn({ data }: ApproveTxnProps) {
     // Approvals as required
     if (data.approveTransaction.unsignedTx) {
       try {
+        setApprovalSpendingTxnLoading(true);
         const approveSpendingResult = await checkout.sendTransaction({
           provider: from.web3Provider,
           transaction: data.approveTransaction.unsignedTx,
         });
-        setApprovalSpendingTxnLoading(true);
         const approvalReceipt = await approveSpendingResult.transactionResponse.wait();
         if (approvalReceipt.status !== 1) {
           viewDispatch({
             payload: {
               type: ViewActions.UPDATE_VIEW,
               view: {
-                type: XBridgeWidgetViews.FAIL,
+                type: XBridgeWidgetViews.BRIDGE_FAILURE,
                 data: {},
                 // data: data.bridgeFormInfo as unknown as PrefilledBridgeForm,
               },
@@ -144,6 +146,7 @@ export function ApproveTxn({ data }: ApproveTxnProps) {
           return;
         }
       } catch (err: any) {
+        setApprovalSpendingTxnLoading(false);
         if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
           setRejectedBridge(true);
         } else {
@@ -167,7 +170,7 @@ export function ApproveTxn({ data }: ApproveTxnProps) {
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
-            type: BridgeWidgetViews.IN_PROGRESS,
+            type: XBridgeWidgetViews.IN_PROGRESS,
             data: {
               token: bridgeToken!,
               transactionResponse: sendResult.transactionResponse,
@@ -210,13 +213,15 @@ export function ApproveTxn({ data }: ApproveTxnProps) {
           heroContent={<WalletApproveHero />}
           footer={(
             <Box sx={{ width: '100%', flexDirection: 'column' }}>
-              <FooterButton
-                loading={approvalSpendingTxnLoading}
-                actionText={rejectedBridge
-                  ? footer.retryText
-                  : footer.buttonText}
-                onActionClick={handleApproveBridgeClick}
-              />
+              {!approvalSpendingTxnLoading && (
+                <FooterButton
+                  loading={approvalSpendingTxnLoading}
+                  actionText={rejectedBridge
+                    ? footer.retryText
+                    : footer.buttonText}
+                  onActionClick={handleApproveBridgeClick}
+                />
+              )}
               <FooterLogo />
             </Box>
           )}
