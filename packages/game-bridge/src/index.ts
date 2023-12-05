@@ -285,7 +285,6 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
         break;
       }
       case PASSPORT_FUNCTIONS.imx.isRegisteredOffchain: {
-        console.log('PASSPORT_FUNCTIONS.imx.isRegisteredOffchain');
         const registered = await providerInstance?.isRegisteredOffchain();
         callbackToGame({
           responseFor: fxName,
@@ -296,13 +295,12 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
         break;
       }
       case PASSPORT_FUNCTIONS.imx.registerOffchain: {
-        console.log('PASSPORT_FUNCTIONS.imx.registerOffchain');
         const response = await providerInstance?.registerOffchain();
         callbackToGame({
           ...{
             responseFor: fxName,
             requestId,
-            success: response !== null && response !== undefined,
+            success: true,
           },
           ...response,
         });
@@ -315,7 +313,7 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
           ...{
             responseFor: fxName,
             requestId,
-            success: response !== null && response !== undefined,
+            success: true,
           },
           ...response,
         });
@@ -328,7 +326,7 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
           ...{
             responseFor: fxName,
             requestId,
-            success: response !== null && response !== undefined,
+            success: true,
             result: response,
           },
           ...response,
