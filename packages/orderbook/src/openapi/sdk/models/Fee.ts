@@ -10,11 +10,11 @@ export type Fee = {
   /**
    * Fee type
    */
-  fee_type: Fee.fee_type;
+  type: Fee.type;
   /**
    * Wallet address of fee recipient
    */
-  recipient: string;
+  recipient_address: string;
 };
 
 export namespace Fee {
@@ -22,7 +22,7 @@ export namespace Fee {
   /**
    * Fee type
    */
-  export enum fee_type {
+  export enum type {
     ROYALTY = 'ROYALTY',
     MAKER_ECOSYSTEM = 'MAKER_ECOSYSTEM',
     TAKER_ECOSYSTEM = 'TAKER_ECOSYSTEM',

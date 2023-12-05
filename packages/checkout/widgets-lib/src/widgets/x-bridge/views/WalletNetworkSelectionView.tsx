@@ -10,7 +10,7 @@ import { WalletAndNetworkSelector } from '../components/WalletAndNetworkSelector
 
 export function WalletNetworkSelectionView() {
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
-  const { layoutHeading } = text.views[XBridgeWidgetViews.WALLET_NETWORK_SECLECTION];
+  const { layoutHeading } = text.views[XBridgeWidgetViews.WALLET_NETWORK_SELECTION];
   return (
     <SimpleLayout
       testId="bridge-view"

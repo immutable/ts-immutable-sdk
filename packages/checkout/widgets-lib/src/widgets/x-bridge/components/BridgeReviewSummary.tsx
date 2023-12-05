@@ -3,7 +3,7 @@ import { useContext, useMemo } from 'react';
 import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
 import {
   Body,
-  Box, Heading, Icon, MenuItem,
+  Box, Button, Heading, Icon, MenuItem,
 } from '@biom3/react';
 import { ChainId, WalletProviderName } from '@imtbl/checkout-sdk';
 import { abbreviateAddress } from 'lib/addressUtils';
@@ -43,7 +43,7 @@ const testId = 'bridge-review-summary';
 
 export function BridgeReviewSummary() {
   const {
-    heading, fromLabel, toLabel, fees, fiatPricePrefix,
+    heading, fromLabel, toLabel, fees, fiatPricePrefix, submitButton,
   } = text.views[XBridgeWidgetViews.BRIDGE_REVIEW];
 
   const {
@@ -205,6 +205,23 @@ export function BridgeReviewSummary() {
           fiatAmount={`${fiatPricePrefix}${gasFiatEstimate}`}
         />
       </MenuItem>
+      <Box
+        sx={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-end',
+          paddingY: 'base.spacing.x6',
+          width: '100%',
+        }}
+      >
+        <Button
+          size="large"
+          sx={{ width: '100%' }}
+        >
+          {submitButton.buttonText}
+        </Button>
+      </Box>
     </Box>
   );
 }
