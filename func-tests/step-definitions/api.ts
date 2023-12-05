@@ -18,7 +18,6 @@ export class Trading {
     baseConfig: configuration,
   });
 
-  // client = new ImmutableX(configuration);
   client = new ImmutableXClient(this.config);
 
   // @then('api should show that {string} owns the NFT {string}', undefined, 20000)
@@ -134,28 +133,24 @@ export class Trading {
   //   });
   // }
 
-  // @then(
-  //   'api should show that order {string} status is {string}',
-  //   undefined,
-  //   5 * 60 * 1000,
-  // )
-  // public async checkOrderStatus(orderVar: string, status: string) {
-  //   const order = this.stepSharedState.orders[orderVar];
-  //   console.log(`check order: ${order.orderId}`);
-  //   await repeatCheck20(
-  //     async () => {
-  //       const orderDetails = await this.client.getOrderV3({
-  //         id: order.orderId.toString(),
-  //       });
-  //       console.log(
-  //         `check Details Status: ${orderDetails.status}`,
-  //         `Status Input: ${status}`,
-  //       );
-  //       return orderDetails;
-  //     },
-  //     order => order.status === status,
-  //   );
-  // }
+  // @then('api should show that order {string} status is {string}')
+  public async checkOrderStatus(orderVar: string, status: string) {
+    const order = this.stepSharedState.orders[orderVar];
+    console.log(`check order: ${order.orderId}`);
+    await repeatCheck20(
+      async () => {
+        const orderDetails = await this.client.getOrder({
+          id: order.orderId.toString(),
+        });
+        console.log(
+          `check Details Status: ${orderDetails.status}`,
+          `Status Input: ${status}`,
+        );
+        return orderDetails;
+      },
+      order => order.status === status,
+    );
+  }
 
   // @then(
   //   'api should show that asset {string} belongs to banker',

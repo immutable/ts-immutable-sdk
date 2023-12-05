@@ -30,7 +30,7 @@ export const env = {
   // privateKey2: getEnv('PRIVATE_KEY2'),
   privateKeyBanker: getEnv('PRIVATE_KEY_BANKER'),
   starkPrivateKeyBanker: getEnv('STARK_PRIVATE_KEY_BANKER'),
-  // tokenAddress: getEnv('TOKEN_ADDRESS'),
+  tokenAddress: getEnv('TOKEN_ADDRESS'),
   // moonpayWebhookKey: getEnv('MOONPAY_WEBHOOK_KEY'),
   // starkExBatchSize: parseInt(getEnv('STARKEX_BATCH_SIZE'), 10),
   // unregisteredUserPrivateKey: getEnv('UNREGISTERED_USER_PRIVATE_KEY'),
