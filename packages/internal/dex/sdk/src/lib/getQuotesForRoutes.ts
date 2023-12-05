@@ -34,12 +34,12 @@ export async function getQuotesForRoutes(
     }).calldata,
   );
 
-  const promise = await Promise.allSettled(callDatas.map((data) =>
+  const promises = await Promise.allSettled(callDatas.map((data) =>
     provider.send('eth_call', [
       { to: quoterContractAddress, data }, 'latest',
     ])));
 
-  const decodedQuoteResults = promise.reduce((quoteResults, promiseResult, i) => {
+  const decodedQuoteResults = promises.reduce((quoteResults, promiseResult, i) => {
     if (promiseResult.status === 'rejected') return quoteResults;
 
     const functionSig = callDatas[i].substring(0, 10);

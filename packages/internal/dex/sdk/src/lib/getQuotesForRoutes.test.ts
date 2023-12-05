@@ -67,21 +67,53 @@ describe('getQuotesForRoutes', () => {
     }, 'latest']);
   });
 
-  describe('when multicall fails', () => {
-    it('should throw ProviderCallError', async () => {
+  describe('when all calls in the batch fail', () => {
+    it('returns no quote results', async () => {
       const provider = buildProvider(
         jest.fn().mockRejectedValue(new ProviderCallError('an rpc error message')),
       );
 
       const amount = newAmount(BigNumber.from('123123'), WETH_TEST_TOKEN);
 
-      await expect(getQuotesForRoutes(
+      const quoteResults = await getQuotesForRoutes(
         provider,
         TEST_QUOTER_ADDRESS,
         [route],
         amount,
         TradeType.EXACT_INPUT,
-      )).rejects.toThrow(new ProviderCallError('an rpc error message'));
+      );
+      expect(quoteResults).toHaveLength(0);
+    });
+  });
+
+  describe('when one call of two in the batch fail', () => {
+    it('returns one quote results', async () => {
+      const expectedAmountOut = utils.parseEther('1000');
+      const expectedGasEstimate = '100000';
+
+      const returnData = utils.defaultAbiCoder.encode(types, [
+        expectedAmountOut,
+        '100',
+        '1',
+        expectedGasEstimate,
+      ]);
+
+      const provider = buildProvider(
+        jest.fn()
+          .mockRejectedValueOnce(new ProviderCallError('an rpc error message'))
+          .mockResolvedValueOnce(returnData),
+      );
+
+      const amount = newAmount(BigNumber.from('123123'), WETH_TEST_TOKEN);
+
+      const quoteResults = await getQuotesForRoutes(
+        provider,
+        TEST_QUOTER_ADDRESS,
+        [route, route],
+        amount,
+        TradeType.EXACT_INPUT,
+      );
+      expect(quoteResults).toHaveLength(1);
     });
   });
 
