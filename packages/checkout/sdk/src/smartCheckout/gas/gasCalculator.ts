@@ -5,7 +5,7 @@ import {
 } from '../../types';
 import { InsufficientERC20, InsufficientERC721 } from '../allowance/types';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
-import { getGasPriceInWei } from '../../utils/gasPriceInWei';
+import { getGasPriceInWei } from '../../gasEstimate';
 
 export const estimateGas = async (
   provider: Web3Provider,

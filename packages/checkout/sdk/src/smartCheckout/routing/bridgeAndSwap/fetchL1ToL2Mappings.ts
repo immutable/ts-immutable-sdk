@@ -6,8 +6,8 @@ export const fetchL1ToL2Mappings = async (
   config: CheckoutConfiguration,
   swappableTokens: TokenInfo[],
 ): Promise<L1ToL2TokenAddressMapping[]> => {
-  const l1tol2addressMappingPromises = swappableTokens.map(
-    (token) => fetchL1Representation(config, token.address ?? ''),
-  );
-  return await Promise.all(l1tol2addressMappingPromises);
+  const l1tol2addressMappingPromises = swappableTokens
+    .map((token) => fetchL1Representation(config, token.address ?? ''));
+  const mappings = await Promise.all(l1tol2addressMappingPromises);
+  return mappings.filter((mapping) => mapping !== undefined) as L1ToL2TokenAddressMapping[];
 };

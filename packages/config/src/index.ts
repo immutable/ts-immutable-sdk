@@ -22,7 +22,6 @@ export class ImmutableConfiguration {
 
 const API_KEY_PREFIX = 'sk_imapik-';
 const PUBLISHABLE_KEY_PREFIX = 'pk_imapik-';
-const PUBLISHABLE_KEY_LENGTH = 30;
 
 export const addApiKeyToAxiosHeader = (apiKey: string) => {
   if (!apiKey.startsWith(API_KEY_PREFIX)) {
@@ -32,7 +31,7 @@ export const addApiKeyToAxiosHeader = (apiKey: string) => {
 };
 
 export const addPublishableKeyToAxiosHeader = (publishableKey: string) => {
-  if (!publishableKey.startsWith(PUBLISHABLE_KEY_PREFIX) || publishableKey.length !== PUBLISHABLE_KEY_LENGTH) {
+  if (!publishableKey.startsWith(PUBLISHABLE_KEY_PREFIX)) {
     throw new Error(
       'Invalid Publishable key. Create your Publishable key in Immutable developer hub.'
       + ' https://hub.immutable.com',

@@ -1,5 +1,6 @@
 /* eslint-disable max-len */
 import { WalletProviderName } from '@imtbl/checkout-sdk';
+import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
 import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
 import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
 import { SharedViews } from '../../context/view-context/ViewContext';
@@ -202,6 +203,13 @@ export const text = {
       header: {
         title: 'Move coins',
       },
+      xBridgeContent: {
+        title: 'How much would you like to move?',
+      },
+      xBridgeFees: {
+        title: 'Gas Fee',
+        fiatPricePrefix: '~ USD',
+      },
       content: {
         title: 'What would you like to move from Ethereum to Immutable zkEVM?',
         fiatPricePrefix: 'Approx USD',
@@ -212,7 +220,7 @@ export const text = {
           inputPlaceholder: '0',
           selectorTitle: 'What would you like to move?',
         },
-        buttonText: 'Move',
+        buttonText: 'Review',
       },
       fees: {
         title: 'Fees subtotal',
@@ -433,6 +441,42 @@ export const text = {
     [SaleWidgetViews.SALE_SUCCESS]: {
       text: 'Order completed',
       actionText: 'Continue',
+    },
+    [XBridgeWidgetViews.WALLET_NETWORK_SECLECTION]: {
+      layoutHeading: 'Move',
+      heading: 'Where would you like to move funds between?',
+      fromFormInput: {
+        heading: 'From',
+        selectDefaultText: 'Select wallet and network',
+        walletSelectorHeading: 'From wallet',
+        networkSelectorHeading: 'From network',
+      },
+      toFormInput: {
+        heading: 'To',
+        selectDefaultText: 'Select wallet and network',
+        walletSelectorHeading: 'To wallet',
+      },
+      submitButton: {
+        text: 'Next',
+      },
+    },
+    [XBridgeWidgetViews.BRIDGE_REVIEW]: {
+      layoutHeading: 'Move',
+      heading: 'Ok, how does this look?',
+      fromLabel: {
+        amountHeading: 'Moving',
+        heading: 'From',
+      },
+      toLabel: {
+        heading: 'To',
+      },
+      fees: {
+        heading: 'Gas fee',
+      },
+      footer: {
+        buttonText: 'Confirm move',
+      },
+      fiatPricePrefix: '~ USD $',
     },
   },
   footers: {

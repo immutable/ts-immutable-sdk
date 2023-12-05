@@ -3,7 +3,7 @@ import { FactoryInstance } from 'types';
 export const ZKEVM_DEVNET_CHAIN_ID = '13473';
 export const ZKEVM_DEVNET_FACTORY_ADDRESS = '0xTODO';
 
-export const ZKEVM_TESTNET_CHAIN_ID = '13472';
+export const ZKEVM_TESTNET_CHAIN_ID = '13473';
 export const ZKEVM_TESTNET_FACTORY_ADDRESS = '0xTODO';
 
 export const ZKEVM_MAINNET_CHAIN_ID = '13371';

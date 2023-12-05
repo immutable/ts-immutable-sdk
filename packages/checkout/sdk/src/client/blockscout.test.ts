@@ -1,14 +1,12 @@
 /* eslint @typescript-eslint/naming-convention: off */
 import axios, { HttpStatusCode } from 'axios';
-import {
-  BLOCKSCOUT_CHAIN_URL_MAP,
-  ChainId, IMX_ADDRESS_ZKEVM,
-} from '../types';
 import { Blockscout } from './blockscout';
 import {
   BlockscoutError,
   BlockscoutTokenType,
 } from './blockscoutType';
+import { BLOCKSCOUT_CHAIN_URL_MAP } from '../env';
+import { ChainId } from '../types';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -55,7 +53,7 @@ describe('Blockscout', () => {
               },
               {
                 token: {
-                  address: IMX_ADDRESS_ZKEVM,
+                  address: '',
                   circulating_market_cap: '639486814.4877648',
                   decimals: '18',
                   exchange_rate: '0.568914',
@@ -260,7 +258,7 @@ describe('Blockscout', () => {
       );
 
       expect(resp.value).toEqual('55290000000000000000');
-      expect(resp.token.address).toEqual(IMX_ADDRESS_ZKEVM);
+      expect(resp.token.address).toEqual('');
 
       expect(mockedAxios.get).toHaveBeenNthCalledWith(
         1,

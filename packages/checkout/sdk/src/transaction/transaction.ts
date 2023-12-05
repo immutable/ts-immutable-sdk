@@ -2,15 +2,26 @@ import { ethers } from 'ethers';
 import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { SendTransactionResult } from '../types';
+import { GAS_OVERRIDES } from '../env';
+
+export const setTransactionGasLimits = (
+  transaction: TransactionRequest,
+): TransactionRequest => {
+  const rawTx = transaction;
+  rawTx.maxFeePerGas = GAS_OVERRIDES.maxFeePerGas;
+  rawTx.maxPriorityFeePerGas = GAS_OVERRIDES.maxPriorityFeePerGas;
+  return rawTx;
+};
 
 export const sendTransaction = async (
   web3Provider: Web3Provider,
   transaction: TransactionRequest,
 ): Promise<SendTransactionResult> => {
   try {
-    const transactionResponse = await web3Provider
-      .getSigner()
-      .sendTransaction(transaction);
+    const signer = web3Provider.getSigner();
+
+    const rawTx = setTransactionGasLimits(transaction);
+    const transactionResponse = await signer.sendTransaction(rawTx);
 
     return {
       transactionResponse,
