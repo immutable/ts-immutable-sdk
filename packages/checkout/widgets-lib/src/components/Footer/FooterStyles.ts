@@ -4,8 +4,7 @@ export const footerButtonStyles = {
   flexDirection: 'row',
   justifyContent: 'flex-end',
   alignItems: 'center',
-  paddingX: 'base.spacing.x4',
-  paddingY: 'base.spacing.x6',
+  padding: 'base.spacing.x4',
 };
 
 export const footerLogoStyles = {

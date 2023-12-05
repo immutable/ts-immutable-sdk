@@ -57,13 +57,15 @@ export function StatusView({
           <StatusBox statusText={statusText} statusType={statusType} iconStyles={statusIconStyles} />
         </CenteredBoxContent>
 
-        {actionText && onActionClick && (
-          <Box
-            sx={{
-              paddingX: 'base.spacing.x4',
-              paddingBottom: 'base.spacing.x2',
-            }}
-          >
+        <Box
+          sx={{
+            padding: 'base.spacing.x4',
+            gap: 'base.spacing.x2',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          {actionText && onActionClick && (
             <Button
               sx={{ width: '100%' }}
               testId="status-action-button"
@@ -73,16 +75,8 @@ export function StatusView({
             >
               {actionText}
             </Button>
-          </Box>
-        )}
-
-        {secondaryActionText && onSecondaryActionClick && (
-          <Box
-            sx={{
-              paddingX: 'base.spacing.x4',
-              paddingBottom: 'base.spacing.x4',
-            }}
-          >
+          )}
+          {secondaryActionText && onSecondaryActionClick && (
             <Button
               sx={{ width: '100%' }}
               testId="status-action-button"
@@ -92,8 +86,8 @@ export function StatusView({
             >
               {secondaryActionText}
             </Button>
-          </Box>
-        )}
+          )}
+        </Box>
       </Box>
     </SimpleLayout>
   );

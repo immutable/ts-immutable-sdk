@@ -242,7 +242,7 @@ export function BridgeReviewSummary() {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'flex-end',
-          paddingY: 'base.spacing.x6',
+          paddingY: 'base.spacing.x4',
           width: '100%',
         }}
       >
