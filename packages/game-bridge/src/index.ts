@@ -188,7 +188,7 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
         break;
       }
       case PASSPORT_FUNCTIONS.getPKCEAuthUrl: {
-        const response = passportClient?.getPKCEAuthorizationUrl();
+        const response = passportClient?.loginWithPKCEFlow();
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -199,7 +199,8 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
       }
       case PASSPORT_FUNCTIONS.connectPKCE: {
         const request = JSON.parse(data);
-        const passportProvider = await passportClient?.connectImxPKCEFlow(request.authorizationCode, request.state);
+        await passportClient?.loginWithPKCEFlowCallback(request.authorizationCode, request.state);
+        const passportProvider = await passportClient?.connectImx();
         const success = setProvider(passportProvider);
         callbackToGame({
           responseFor: fxName,
