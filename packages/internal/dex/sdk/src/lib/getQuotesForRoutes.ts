@@ -39,8 +39,8 @@ export async function getQuotesForRoutes(
       { to: quoterContractAddress, data }, 'latest',
     ])));
 
-  const decodedQuoteResults = promise.reduce((acc, result, i) => {
-    if (result.status === 'rejected') return acc;
+  const decodedQuoteResults = promise.reduce((quoteResults, promiseResult, i) => {
+    if (promiseResult.status === 'rejected') return quoteResults;
 
     const functionSig = callDatas[i].substring(0, 10);
     const returnTypes = quoteReturnMapping[functionSig];
@@ -48,15 +48,15 @@ export async function getQuotesForRoutes(
       throw new Error('No quoting function signature found');
     }
 
-    if (result.value === '0x') {
+    if (promiseResult.value === '0x') {
       // There is no quote result for the swap using this route, so don't include it in results
-      return acc;
+      return quoteResults;
     }
 
     try {
       const decodedQuoteResult = utils.defaultAbiCoder.decode(
         returnTypes,
-        result.value,
+        promiseResult.value,
       );
 
       if (decodedQuoteResult) {
@@ -67,7 +67,7 @@ export async function getQuotesForRoutes(
         const input = uniswapTokenToERC20(routes[i].input);
         const output = uniswapTokenToERC20(routes[i].output);
 
-        acc.push({
+        quoteResults.push({
           route: routes[i],
           amountIn: tradeType === TradeType.EXACT_INPUT ? amountSpecified : newAmount(quoteAmount, input),
           amountOut: tradeType === TradeType.EXACT_INPUT ? newAmount(quoteAmount, output) : amountSpecified,
@@ -81,7 +81,7 @@ export async function getQuotesForRoutes(
       // and continue processing
     }
 
-    return acc;
+    return quoteResults;
   }, new Array<QuoteResult>());
 
   return decodedQuoteResults;
