@@ -8,6 +8,9 @@ sdk/scripts/
 # test configs
 jest.*.js
 
+# readmes
+*.md
+
 # sample apps
 **sample-app**/
 **playground**/
