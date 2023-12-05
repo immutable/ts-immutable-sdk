@@ -651,9 +651,16 @@ export class TokenBridge {
       );
     }
 
-    return {
-      bridgeFee: ethers.BigNumber.from(axiosResponse.data),
-    };
+    try {
+      return {
+        bridgeFee: ethers.BigNumber.from(`${axiosResponse.data}`),
+      };
+    } catch (err) {
+      throw new BridgeError(
+        `Estimating Axelar Gas failed with the reason: ${err}`,
+        BridgeErrorType.AXELAR_GAS_ESTIMATE_FAILED,
+      );
+    }
   }
 
   // STUBBED ENDPOINTS FOR PHASE 2 -------------------------------------------
