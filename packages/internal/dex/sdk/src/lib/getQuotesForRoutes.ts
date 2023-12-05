@@ -34,19 +34,21 @@ export async function getQuotesForRoutes(
     }).calldata,
   );
 
-  const returnDatas: string[] = await Promise.all(callDatas.map((data) =>
+  const promise = await Promise.allSettled(callDatas.map((data) =>
     provider.send('eth_call', [
       { to: quoterContractAddress, data }, 'latest',
     ])));
 
-  const decodedQuoteResults = returnDatas.reduce((acc, returnData, i) => {
+  const decodedQuoteResults = promise.reduce((acc, result, i) => {
+    if (result.status === 'rejected') return acc;
+
     const functionSig = callDatas[i].substring(0, 10);
     const returnTypes = quoteReturnMapping[functionSig];
     if (!returnTypes) {
       throw new Error('No quoting function signature found');
     }
 
-    if (returnData === '0x') {
+    if (result.value === '0x') {
       // There is no quote result for the swap using this route, so don't include it in results
       return acc;
     }
@@ -54,7 +56,7 @@ export async function getQuotesForRoutes(
     try {
       const decodedQuoteResult = utils.defaultAbiCoder.decode(
         returnTypes,
-        returnData,
+        result.value,
       );
 
       if (decodedQuoteResult) {
