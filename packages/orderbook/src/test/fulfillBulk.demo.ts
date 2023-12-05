@@ -100,7 +100,7 @@ describe('', () => {
       orderSignature: signatures1[0],
       makerFees: [{
         amount: '1',
-        recipient: offerer.address,
+        recipientAddress: offerer.address,
       }],
     });
 
@@ -112,7 +112,7 @@ describe('', () => {
       orderSignature: signatures2[0],
       makerFees: [{
         amount: '1',
-        recipient: offerer.address,
+        recipientAddress: offerer.address,
       }],
     });
 
@@ -128,14 +128,14 @@ describe('', () => {
           listingId: orderId1,
           takerFees: [{
             amount: '1',
-            recipient: offerer.address,
+            recipientAddress: offerer.address,
           }],
         },
         {
           listingId: orderId2,
           takerFees: [{
             amount: '1',
-            recipient: offerer.address,
+            recipientAddress: offerer.address,
           }],
         },
       ],
@@ -154,14 +154,14 @@ describe('', () => {
           listingId: orderId1,
           takerFees: [{
             amount: '1',
-            recipient: offerer.address,
+            recipientAddress: offerer.address,
           }],
         },
         {
           listingId: orderId2,
           takerFees: [{
             amount: '1',
-            recipient: offerer.address,
+            recipientAddress: offerer.address,
           }],
         },
       ],
