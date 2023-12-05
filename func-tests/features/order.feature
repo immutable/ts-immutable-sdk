@@ -61,18 +61,18 @@ Feature: Order
 
   #   When "buyer" creates buy order "buyOrder" of "minted" NFT to buy for "0.00001" eth using v3 api should fail with 'not allowed to create a buy order for an asset without a matching listing'
 
-  # @order @buyorder @ethSignature @port
-  # Scenario: Create Buy Order (V3) - Asset with sell order
-  #   # setup seller
-  #   Given A new Eth wallet "seller"
-  #   And "seller" is registered
-  #   And randomly L2 mint to "seller" of "minted"
-  #   And NFT "minted" should be available through api
-  #   # setup 'potential buyer'
-  #   And A new Eth wallet "buyer"
-  #   And "buyer" is registered
-  #   And banker is registered
-  #   And banker transfer "0.000022" eth to "buyer"
+  @order @buyorder @ethSignature @skip
+  Scenario: Create Buy Order (V3) - Asset with sell order
+    # setup seller
+    Given A new Eth wallet "seller"
+    And "seller" is registered
+    And randomly L2 mint to "seller" of "minted"
+    And NFT "minted" should be available through api
+    # setup 'potential buyer'
+    And A new Eth wallet "buyer"
+    And "buyer" is registered
+    And banker is registered
+    And banker transfer "0.000022" eth to "buyer"
 
   #   When "seller" creates sell order "sellOrder" of "minted" NFT to sell for "0.0002" eth using v3 api
   #   # neeeds to be at least 10% of the sell order
