@@ -32,4 +32,5 @@ jobs:
         STARK_PRIVATE_KEY1: ${{ secrets.STARK_PRIVATE_KEY1 }}
         PRIVATE_KEY_BANKER: ${{ secrets.PRIVATE_KEY_BANKER }}
         STARK_PRIVATE_KEY_BANKER: ${{ secrets.STARK_PRIVATE_KEY_BANKER }}
+        TAGS: 'not @skip'
       run: cd func-tests && yarn test
