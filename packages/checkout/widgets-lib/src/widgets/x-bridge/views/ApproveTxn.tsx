@@ -12,8 +12,7 @@ import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
 import { FooterButton } from '../../../components/Footer/FooterButton';
 import { text } from '../../../resources/text/textConfig';
 import {
-  ApproveERC20BridgeData,
-  PrefilledBridgeForm,
+  ApproveTxnData,
 } from '../../../context/view-context/BridgeViewContextTypes';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
@@ -26,7 +25,7 @@ import { XBridgeWidgetViews } from '../../../context/view-context/XBridgeViewCon
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 
 export interface ApproveTxnProps {
-  data: ApproveERC20BridgeData;
+  data: ApproveTxnData;
 }
 export function ApproveTxn({ data }: ApproveTxnProps) {
   const { bridgeState } = useContext(XBridgeContext);
@@ -75,14 +74,14 @@ export function ApproveTxn({ data }: ApproveTxnProps) {
     });
   }, [viewDispatch]);
 
-  const handleExceptions = (err, bridgeFormData:PrefilledBridgeForm) => {
+  const handleExceptions = (err) => {
     if (err.type === CheckoutErrorType.UNPREDICTABLE_GAS_LIMIT) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
             type: XBridgeWidgetViews.BRIDGE_FAILURE,
-            data: bridgeFormData,
+            data,
           },
         },
       });
@@ -96,8 +95,9 @@ export function ApproveTxn({ data }: ApproveTxnProps) {
           type: ViewActions.UPDATE_VIEW,
           view: {
             type: XBridgeWidgetViews.BRIDGE_FAILURE,
-            reason: 'Transaction failed',
-            data: bridgeFormData,
+            data: {
+              reason: 'Transaction failed',
+            },
           },
         },
       });
@@ -138,19 +138,18 @@ export function ApproveTxn({ data }: ApproveTxnProps) {
               type: ViewActions.UPDATE_VIEW,
               view: {
                 type: XBridgeWidgetViews.BRIDGE_FAILURE,
-                data: {},
-                // data: data.bridgeFormInfo as unknown as PrefilledBridgeForm,
+                data,
               },
             },
           });
           return;
         }
-      } catch (err: any) {
+      } catch (error: any) {
         setApprovalSpendingTxnLoading(false);
-        if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
+        if (error.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
           setRejectedBridge(true);
         } else {
-          handleExceptions(err, {});
+          handleExceptions(error);
         }
       }
     }
@@ -178,11 +177,11 @@ export function ApproveTxn({ data }: ApproveTxnProps) {
           },
         },
       });
-    } catch (err: any) {
-      if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
+    } catch (error: any) {
+      if (error.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
         setRejectedBridge(true);
       } else {
-        handleExceptions(err, {});
+        handleExceptions(error);
       }
     }
   }, [
