@@ -8,66 +8,15 @@ import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
+import { XBridgeContext } from '../context/XBridgeContext';
 
 export function MoveInProgress() {
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const { heading, body2 } = text.views[BridgeWidgetViews.IN_PROGRESS];
-  // const {
-  //   bridgeState: {},
-  // } = useContext(XBridgeContext);
-
-  // useEffect(() => {
-  //   if (!tokenBridge) return;
-
-  //   (async () => {
-  //     try {
-  //       const receipt = await transactionResponse.wait();
-
-  //       if (receipt.status === 1) {
-  //         const bridgeResult: WaitForDepositResponse = await tokenBridge.waitForDeposit({
-  //           transactionHash: receipt.transactionHash,
-  //         });
-
-  //         if (bridgeResult.status === CompletionStatus.SUCCESS) {
-  //           viewDispatch({
-  //             payload: {
-  //               type: ViewActions.UPDATE_VIEW,
-  //               view: {
-  //                 type: BridgeWidgetViews.SUCCESS,
-  //                 data: {
-  //                   transactionHash: receipt.transactionHash,
-  //                 },
-  //               },
-  //             },
-  //           });
-  //           return;
-  //         }
-  //       }
-
-  //       viewDispatch({
-  //         payload: {
-  //           type: ViewActions.UPDATE_VIEW,
-  //           view: {
-  //             type: BridgeWidgetViews.FAIL,
-  //             data: bridgeForm,
-  //           },
-  //         },
-  //       });
-  //     } catch (err) {
-  //       viewDispatch({
-  //         payload: {
-  //           type: ViewActions.UPDATE_VIEW,
-  //           view: {
-  //             type: BridgeWidgetViews.FAIL,
-  //             data: bridgeForm,
-  //             reason: 'Transaction failed',
-  //           },
-  //         },
-  //       });
-  //     }
-  //   })();
-  // }, [transactionResponse, tokenBridge]);
+  const {
+    bridgeState: { checkout },
+  } = useContext(XBridgeContext);
 
   return (
     <SimpleLayout
@@ -81,7 +30,7 @@ export function MoveInProgress() {
       footer={(
         <FooterLogo />
       )}
-      heroContent={<RocketHero />}
+      heroContent={<RocketHero environment={checkout.config.environment} />}
       floatHeader
     >
       <SimpleTextBody heading={heading}>

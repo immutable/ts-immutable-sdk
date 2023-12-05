@@ -1,11 +1,22 @@
-/* eslint-disable max-len */
 import { Box } from '@biom3/react';
 import { Fit, Layout, useRive } from '@rive-app/react-canvas';
+import { Environment } from '@imtbl/config';
 import { heroBackGroundStyles, heroImageStyles } from './HeroImageStyles';
 
-export function RocketHero() {
+const rocketHeroUrl = {
+  [Environment.PRODUCTION]: 'https://checkout-api.immutable.com/v1/blob/img/rocket.riv',
+  [Environment.SANDBOX]: 'https://checkout-cdn.sandbox.immutable.com/v1/blob/img/rocket.riv',
+};
+
+interface RocketHeroProps {
+  environment: Environment
+}
+
+export function RocketHero({
+  environment,
+}: RocketHeroProps) {
   const { RiveComponent } = useRive({
-    src: 'https://checkout-cdn.sandbox.immutable.com/v1/blob/img/rocket.riv',
+    src: rocketHeroUrl[environment],
     autoplay: true,
     layout: new Layout({ fit: Fit.Cover }),
   });
