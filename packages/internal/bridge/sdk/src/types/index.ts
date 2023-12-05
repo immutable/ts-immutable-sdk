@@ -121,12 +121,61 @@ export interface FeeData {
 
 /**
  * @typedef {Object} BridgeFeeRequest
+ * @dev Union type of DepositFeeRequest|WithdrawFeeRequest|FinaliseFeeRequest|MapTokenFeeRequest
+ * ensures the correct params are supplied when trying to calculate the fees
+ */
+export type BridgeFeeRequest = DepositFeeRequest
+| WithdrawFeeRequest
+| FinaliseFeeRequest
+| MapTokenFeeRequest;
+
+/**
+ * @typedef {Object} DepositFeeRequest
  * @property {BridgeFeeActions} method - The method for which the bridge fee is being requested.
+ * @property {number} gasMultiplier - How much buffer to add to the gas fee.
  * @property {string} sourceChainId - The chain ID of the source chain.
  * @property {string} destinationChainId - The chain ID of the destination chain.
  */
-export interface BridgeFeeRequest {
-  action: BridgeFeeActions;
+export interface DepositFeeRequest {
+  action: BridgeFeeActions.DEPOSIT,
+  gasMultiplier: number;
+  sourceChainId: string;
+  destinationChainId: string;
+}
+
+/**
+ * @typedef {Object} WithdrawFeeRequest
+ * @property {BridgeFeeActions} method - The method for which the bridge fee is being requested.
+ * @property {number} gasMultiplier - How much buffer to add to the gas fee.
+ * @property {string} sourceChainId - The chain ID of the source chain.
+ * @property {string} destinationChainId - The chain ID of the destination chain.
+ */
+export interface WithdrawFeeRequest {
+  action: BridgeFeeActions.WITHDRAW,
+  gasMultiplier: number;
+  sourceChainId: string;
+  destinationChainId: string;
+}
+
+/**
+ * @typedef {Object} FinaliseFeeRequest
+ * @property {BridgeFeeActions} method - The method for which the bridge fee is being requested.
+ * @property {string} sourceChainId - The chain ID of the source chain.
+ */
+export interface FinaliseFeeRequest {
+  action: BridgeFeeActions.FINALISE_WITHDRAWAL,
+  sourceChainId: string;
+}
+
+/**
+ * @typedef {Object} MapTokenFeeRequest
+ * @property {BridgeFeeActions} method - The method for which the bridge fee is being requested.
+ * @property {number} gasMultiplier - How much buffer to add to the gas fee.
+ * @property {string} sourceChainId - The chain ID of the source chain.
+ * @property {string} destinationChainId - The chain ID of the destination chain.
+ */
+export interface MapTokenFeeRequest {
+  action: BridgeFeeActions.MAP_TOKEN,
   gasMultiplier: number;
   sourceChainId: string;
   destinationChainId: string;
