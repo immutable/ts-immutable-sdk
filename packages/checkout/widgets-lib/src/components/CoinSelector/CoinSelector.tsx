@@ -1,6 +1,6 @@
 import {
   Body,
-  Drawer, 
+  Drawer,
   Box,
 } from '@biom3/react';
 import { CoinSelectorOption, CoinSelectorOptionProps } from './CoinSelectorOption';
