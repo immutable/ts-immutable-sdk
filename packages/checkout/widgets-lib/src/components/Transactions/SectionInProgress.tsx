@@ -4,6 +4,7 @@ import {
 import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
 import { text } from 'resources/text/textConfig';
 import { TransactionInProgress } from './TransactionInProgress';
+import { containerStyles } from './sectionStyles';
 
 export function TransactionsInProgress() {
   const { status: { inProgress } } = text.views[XBridgeWidgetViews.TRANSACTIONS];
@@ -11,7 +12,7 @@ export function TransactionsInProgress() {
   return (
     <>
       <Divider size="xSmall">{inProgress.heading}</Divider>
-      <Box sx={{ pt: 'base.spacing.x3', pb: 'base.spacing.x8' }}>
+      <Box sx={containerStyles}>
         {
         [1, 2].map((id) => (
           <TransactionInProgress key={id.toString()} />

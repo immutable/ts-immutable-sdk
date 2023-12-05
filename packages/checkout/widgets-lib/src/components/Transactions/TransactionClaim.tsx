@@ -3,24 +3,21 @@ import {
   Body,
   Box,
   Button,
+  Divider,
   MenuItem,
 } from '@biom3/react';
 import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
 import { text } from 'resources/text/textConfig';
+import {
+  actionsBadgeStyles, actionsContainerStyles, actionsLayoutStyles, containerStyles,
+} from './transactionStyles';
 
 export function TransactionClaim({ key }: { key: string }) {
   const { status: { claim } } = text.views[XBridgeWidgetViews.TRANSACTIONS];
 
   return (
-    <Box sx={{
-      px: 'base.spacing.x2',
-      pt: 'base.spacing.x2',
-      bg: 'base.color.neutral.700',
-      borderRadius: 'base.borderRadius.x8',
-      mt: 'base.spacing.x1',
-    }}
-    >
-      <MenuItem key={key} emphasized size="small">
+    <Box sx={containerStyles}>
+      <MenuItem key={key} size="small">
         <MenuItem.FramedIcon icon="Coins" circularFrame />
         <MenuItem.Label>
           zkTKN
@@ -31,32 +28,19 @@ export function TransactionClaim({ key }: { key: string }) {
           price="-1835.1234"
         />
       </MenuItem>
-      <Box sx={{
-        py: 'base.spacing.x4',
-        px: 'base.spacing.x1',
-        d: 'flex',
-        position: 'relative',
-      }}
-      >
-        <Badge
-          isAnimated
-          variant="attention"
-          sx={{
-            position: 'absolute',
-            right: '0',
-            top: 'base.spacing.x2',
-          }}
-        />
-        <Box sx={{ flexDirection: 'column', display: 'flex', flexGrow: '1' }}>
-          <Body
-            size="xSmall"
-            sx={{ fontWeight: 'base.text.body.small.bold.fontWeight' }}
-          >
+      <Divider size="xSmall" sx={{ mt: 'base.spacing.x2' }} />
+      <Box sx={actionsContainerStyles}>
+        <Box sx={actionsLayoutStyles}>
+          <Body size="xSmall" sx={{ color: 'base.color.text.secondary' }}>
             {claim.banner.heading}
           </Body>
-          <Body size="xSmall">{claim.banner.body}</Body>
         </Box>
-        <Button variant="secondary" size="small">{claim.action}</Button>
+        <Button variant="primary" size="small">{claim.action}</Button>
+        <Badge
+          isAnimated
+          variant="fatal"
+          sx={actionsBadgeStyles}
+        />
       </Box>
     </Box>
   );
