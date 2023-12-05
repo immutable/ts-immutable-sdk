@@ -7,10 +7,10 @@ export default {
   input: './src/index.ts',
   output: {
     dir: 'dist',
-    banner: `import path from 'path';
-import { fileURLToPath } from 'url';
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);`,
+//     banner: `import path from 'path';
+// import { fileURLToPath } from 'url';
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);`,
   },
   plugins: [
     json(),

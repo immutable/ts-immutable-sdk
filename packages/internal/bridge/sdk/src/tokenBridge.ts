@@ -1,9 +1,7 @@
 /* eslint-disable class-methods-use-this */
-// import {
-//   AxelarQueryAPI, AxelarQueryAPIFeeResponse, Environment,
-// } from '@axelar-network/axelarjs-sdk';
+import axios, { AxiosResponse } from 'axios';
 import {
-  ETH_MAINNET_TO_ZKEVM_MAINNET, ETH_SEPOLIA_TO_ZKEVM_TESTNET, axelarChains, bridgeMethods,
+  ETH_MAINNET_TO_ZKEVM_MAINNET, ETH_SEPOLIA_TO_ZKEVM_TESTNET, axelarAPIEndpoints, axelarChains, bridgeMethods,
 } from 'constants/bridges';
 import { BridgeConfiguration } from 'config';
 import { ethers } from 'ethers';
@@ -108,9 +106,7 @@ export class TokenBridge {
     }
 
     let sourceChainGas: ethers.BigNumber = ethers.BigNumber.from(0);
-    let destinationChainGas: ethers.BigNumber = ethers.BigNumber.from(0);
     let bridgeFee: ethers.BigNumber = ethers.BigNumber.from(0);
-    let validatorFee: ethers.BigNumber = ethers.BigNumber.from(0);
     const imtblFee: ethers.BigNumber = ethers.BigNumber.from(0);
 
     if (req.action === BridgeFeeActions.FINALISE_WITHDRAWAL) {
@@ -127,24 +123,20 @@ export class TokenBridge {
         BridgeMethodsGasLimit[`${req.action}_SOURCE`],
       );
 
-      const bridgeFees = await this.calculateBridgeFee(
+      const feeResult = await this.calculateBridgeFee(
         req.sourceChainId,
         req.destinationChainId,
         BridgeMethodsGasLimit[`${req.action}_DESTINATION`],
         req.gasMultiplier,
       );
-      validatorFee = bridgeFees.validatorFee;
-      destinationChainGas = bridgeFees.executionFee;
 
-      bridgeFee = validatorFee.add(destinationChainGas);
+      bridgeFee = feeResult.bridgeFee;
     }
 
     const totalFees: ethers.BigNumber = sourceChainGas.add(bridgeFee).add(imtblFee);
 
     return {
       sourceChainGas,
-      destinationChainGas,
-      validatorFee,
       bridgeFee,
       imtblFee, // no network fee charged currently
       totalFees,
@@ -624,51 +616,43 @@ export class TokenBridge {
       );
     }
 
-    // let axelarEnv:Environment;
-    // if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
-    //   || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
-    //   axelarEnv = Environment.MAINNET;
-    // } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
-    //   || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
-    //   axelarEnv = Environment.TESTNET;
-    // } else {
-    //   axelarEnv = Environment.DEVNET;
-    // }
-
-    // const api = new AxelarQueryAPI({ environment: axelarEnv });
-    // const estimateGasFeeResult:string | AxelarQueryAPIFeeResponse = await api.estimateGasFee(
-    //   sourceAxelar.id,
-    //   destinationAxelar.id,
-    //   sourceAxelar.symbol,
-    //   gasLimit,
-    //   gasMultiplier,
-    // );
-
-    const estimateGasFeeResult = {
-      baseFee: '1000',
-      executionFeeWithMultiplier: '100000000',
-      gasMultiplier,
-      mainnetRootChainId: ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID,
-      testnetRootChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
-    };
-
-    if (typeof estimateGasFeeResult === 'string') {
-      throw new BridgeError(
-        `Estimating Axelar Gas failed with the reason: ${estimateGasFeeResult}`,
-        BridgeErrorType.AXELAR_GAS_ESTIMATE_FAILED,
-      );
+    let axelarApiEndpoint:string;
+    if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
+      || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
+      axelarApiEndpoint = axelarAPIEndpoints.mainnet;
+    } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
+      || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
+      axelarApiEndpoint = axelarAPIEndpoints.testnet;
+    } else {
+      axelarApiEndpoint = axelarAPIEndpoints.devnet;
     }
 
-    if (!estimateGasFeeResult.executionFeeWithMultiplier) {
+    let axiosResponse:AxiosResponse;
+
+    const estimateGasReq = {
+      method: 'estimateGasFee',
+      sourceChain: sourceAxelar.id,
+      destinationChain: destinationAxelar.id,
+      symbol: sourceAxelar.symbol,
+      gasLimit,
+      gasMultiplier,
+    };
+
+    try {
+      axiosResponse = await axios.post(axelarApiEndpoint, estimateGasReq);
+    } catch (error: any) {
+      axiosResponse = error.response;
+    }
+
+    if (axiosResponse.data.error) {
       throw new BridgeError(
-        `Axelar Gas didn't return the executionFeeWithMultiplier: ${estimateGasFeeResult.executionFeeWithMultiplier}`,
+        `Estimating Axelar Gas failed with the reason: ${axiosResponse.data.message}`,
         BridgeErrorType.AXELAR_GAS_ESTIMATE_FAILED,
       );
     }
 
     return {
-      validatorFee: ethers.BigNumber.from(estimateGasFeeResult.baseFee),
-      executionFee: ethers.BigNumber.from(estimateGasFeeResult.executionFeeWithMultiplier),
+      bridgeFee: ethers.BigNumber.from(axiosResponse.data),
     };
   }
 

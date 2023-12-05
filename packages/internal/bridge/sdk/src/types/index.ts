@@ -151,8 +151,6 @@ export interface BridgeFeeRequest {
  */
 export interface BridgeFeeResponse {
   sourceChainGas: ethers.BigNumber,
-  destinationChainGas: ethers.BigNumber,
-  validatorFee: ethers.BigNumber,
   bridgeFee: ethers.BigNumber,
   imtblFee: ethers.BigNumber,
   totalFees: ethers.BigNumber,
@@ -164,8 +162,7 @@ export interface BridgeFeeResponse {
  * @property {ethers.BigNumber} executionFee - Gas cost to issue bridged tokens on the destination chain.
  */
 export interface CalculateBridgeFeeResponse {
-  validatorFee: ethers.BigNumber;
-  executionFee: ethers.BigNumber;
+  bridgeFee: ethers.BigNumber;
 }
 
 /**

@@ -61,6 +61,15 @@ export const ETH_MAINNET_TO_ZKEVM_MAINNET: BridgeInstance = {
 };
 
 /**
+ * @typedef {Object} axelarAPIEndpoints - API endpoints for the testnet & mainnet Axelar environment configurations
+ */
+export const axelarAPIEndpoints:Record<string, string> = {
+  testnet: 'https://testnet.api.gmp.axelarscan.io',
+  mainnet: 'https://api.gmp.axelarscan.io',
+  devnet: '',
+};
+
+/**
  * @typedef {Object} axelarChains
  * @property {AxelarChainDetails} [chainId] - Mapping of the ChainId to the Axelar chain id string and symbol.
  */

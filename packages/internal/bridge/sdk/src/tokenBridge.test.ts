@@ -22,6 +22,12 @@ jest.mock('@axelar-network/axelarjs-sdk', () => ({
   },
 }));
 
+jest.mock('axios', () => ({
+  post: jest.fn().mockReturnValue({
+    data: '100000000',
+  }),
+}));
+
 describe('Token Bridge', () => {
   it('Constructor works correctly', async () => {
     const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
@@ -559,8 +565,7 @@ describe('Token Bridge', () => {
         .mockImplementation(async () => ethers.utils.parseUnits('0.000001', 18));
       jest.spyOn(TokenBridge.prototype as any, 'calculateBridgeFee')
         .mockImplementation(async () => ({
-          validatorFee,
-          executionFee: destinationChainGas,
+          bridgeFee,
         }));
       tokenBridge = new TokenBridge(bridgeConfig);
     });
@@ -572,7 +577,7 @@ describe('Token Bridge', () => {
       TokenBridge.prototype['calculateBridgeFee'] = originalCalculateBridgeFee;
     });
     it('returns the deposit fees', async () => {
-      expect.assertions(7);
+      expect.assertions(5);
       const result = await tokenBridge.getFee(
         {
           action: BridgeFeeActions.DEPOSIT,
@@ -584,8 +589,6 @@ describe('Token Bridge', () => {
 
       expect(result).not.toBeNull();
       expect(result.sourceChainGas).toStrictEqual(sourceChainGas);
-      expect(result.destinationChainGas).toStrictEqual(destinationChainGas);
-      expect(result.validatorFee).toStrictEqual(validatorFee);
       expect(result.bridgeFee).toStrictEqual(bridgeFee);
       expect(result.imtblFee).toStrictEqual(imtblFee);
       expect(result.totalFees).toStrictEqual(totalFees);
@@ -612,15 +615,14 @@ describe('Token Bridge', () => {
       jest.clearAllMocks();
     });
     it('returns the bridge fee when no errors', async () => {
-      expect.assertions(2);
-      const bridgeFee = await tokenBridge['calculateBridgeFee'](
+      expect.assertions(1);
+      const feeResult = await tokenBridge['calculateBridgeFee'](
         ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
         ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
         500,
         1.1,
       );
-      expect(bridgeFee.executionFee).toStrictEqual(ethers.utils.parseUnits('0.0001', 18));
-      expect(bridgeFee.validatorFee).toStrictEqual(ethers.utils.parseUnits('0.001', 18));
+      expect(feeResult.bridgeFee).toStrictEqual(ethers.BigNumber.from('100000000'));
     });
     it('throws an error when the sourceChainId can not be matched to an Axlear chainId', async () => {
       expect.assertions(2);
