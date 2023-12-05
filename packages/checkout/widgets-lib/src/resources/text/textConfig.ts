@@ -203,13 +203,6 @@ export const text = {
       header: {
         title: 'Move coins',
       },
-      xBridgeContent: {
-        title: 'How much would you like to move?',
-      },
-      xBridgeFees: {
-        title: 'Gas Fee',
-        fiatPricePrefix: '~ USD',
-      },
       content: {
         title: 'What would you like to move from Ethereum to Immutable zkEVM?',
         fiatPricePrefix: 'Approx USD',
@@ -458,6 +451,27 @@ export const text = {
       },
       submitButton: {
         text: 'Next',
+      },
+    },
+    [XBridgeWidgetViews.BRIDGE_FORM]: {
+      header: {
+        title: 'Move coins',
+      },
+      fees: {
+        title: 'Gas Fee',
+        fiatPricePrefix: '~ USD $',
+      },
+      content: {
+        title: 'How much would you like to move?',
+        fiatPricePrefix: 'Approx USD',
+        availableBalancePrefix: 'Available',
+      },
+      bridgeForm: {
+        from: {
+          inputPlaceholder: '0',
+          selectorTitle: 'What would you like to move?',
+        },
+        buttonText: 'Review',
       },
     },
     [XBridgeWidgetViews.BRIDGE_REVIEW]: {
