@@ -3,7 +3,7 @@ import { ImxClientModuleConfiguration } from '@imtbl/sdk/immutablex_client';
 import { GenericIMXProvider, ProviderConfiguration } from '@imtbl/sdk/provider';
 import { env, getProvider } from 'common';
 import { configuration, StepSharedState } from './stepSharedState';
-
+ 
 export class Transfer {
   constructor(protected stepSharedState: StepSharedState) {}
 
@@ -40,23 +40,20 @@ export class Transfer {
 
   // cleanup - transfer eth back to banker
   // @then('{string} transfer {string} eth to banker', undefined, 10000)
-  // public async transferToBanker(userVar: string, amount: string) {
-  //   const sender = this.stepSharedState.users[userVar];
-  //   const banker = await this.stepSharedState.getBanker();
-  //   const bankerAddress = await banker.ethSigner.getAddress();
+  public async transferToBanker(userVar: string, amount: string) {
+    const sender = this.stepSharedState.users[userVar];
+    const banker = await this.stepSharedState.getBanker();
+    const bankerAddress = await banker.ethSigner.getAddress();
+    const providerInstance = new GenericIMXProvider(this.providerConfig, sender.ethSigner, sender.starkSigner);
 
-  //   return await this.client.transfer(sender, {
-  //     type: 'ETH',
-  //     amount: parseEther(amount).toString(),
-  //     receiver: bankerAddress,
-  //   });
-  // }
+    return await providerInstance.transfer({
+      type: 'ETH',
+      amount: parseEther(amount).toString(),
+      receiver: bankerAddress,
+    });
+  }
 
-  // @when(
-  //   '{string} creates transfer {string} of {string} NFT to {string}',
-  //   undefined,
-  //   20000,
-  // )
+  // @when('{string} creates transfer {string} of {string} NFT to {string}')
   // public async transferNFT(
   //   userVar: string,
   //   transferVar: string,
@@ -110,31 +107,29 @@ export class Transfer {
   //   };
   // }
 
-  // @when(
-  //   '{string} creates transfer {string} of {string} ETH to {string}',
-  //   undefined,
-  //   20000,
-  // )
-  // public async transferETH(
-  //   userVar: string,
-  //   transferVar: string,
-  //   amount: string,
-  //   receiverVar: string,
-  // ) {
-  //   const sender = this.stepSharedState.users[userVar];
-  //   const receiver = this.stepSharedState.users[receiverVar];
-  //   const receiverAddress = await receiver.ethSigner.getAddress();
+  // @when('{string} creates transfer {string} of {string} ETH to {string}')
+  public async transferETH(
+    userVar: string,
+    transferVar: string,
+    amount: string,
+    receiverVar: string,
+  ) {
+    const sender = this.stepSharedState.users[userVar];
+    const receiver = this.stepSharedState.users[receiverVar];
+    const receiverAddress = await receiver.ethSigner.getAddress();
+    const providerInstance = new GenericIMXProvider(this.providerConfig, sender.ethSigner, sender.starkSigner);
 
-  //   const response = await this.client.transfer(sender, {
-  //     type: 'ETH',
-  //     amount: parseEther(amount).toString(),
-  //     receiver: receiverAddress,
-  //   });
-  //   this.stepSharedState.transfers[transferVar] = {
-  //     sent_signature: response.sent_signature,
-  //     status: response.status,
-  //     time: response.time,
-  //     transfer_id: response.transfer_id,
-  //   };
-  // }
+    const response = await providerInstance.transfer({
+      type: 'ETH',
+      amount: parseEther(amount).toString(),
+      receiver: receiverAddress,
+    });
+    console.log(response);
+    this.stepSharedState.transfers[transferVar] = {
+      sent_signature: response.sent_signature,
+      status: response.status,
+      time: response.time,
+      transfer_id: response.transfer_id,
+    };
+  }
 }

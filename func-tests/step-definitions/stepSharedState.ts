@@ -3,7 +3,7 @@ import { JsonRpcProvider } from '@ethersproject/providers';
 import { ethers } from 'ethers';
 import { imxClientCreateStarkSigner, ImxClientWalletConnection } from '@imtbl/sdk/immutablex_client';
 import { Environment, ImmutableConfiguration } from '@imtbl/sdk/config';
-import { Balance, CreateWithdrawalResponse } from '@imtbl/core-sdk';
+import { Balance, CreateTransferResponseV1, CreateWithdrawalResponse } from '@imtbl/core-sdk';
 import { env, getProvider } from '../common';
 import genericErc20Abi from '../abi/ERC20.json';
 
@@ -81,7 +81,7 @@ export class StepSharedState {
   // Todo: define token type
   // tokens: { [key: string]: MintResultDetails } = {};
 
-  // transfers: { [key: string]: CreateTransferResponseV1 } = {};
+  transfers: { [key: string]: CreateTransferResponseV1 } = {};
 
   // exchangeTransfers: { [key: string]: CreateTransferResponseV1 } = {};
 
@@ -119,7 +119,7 @@ export class StepSharedState {
   public async getBanker(): Promise<ImxClientWalletConnection> {
     if (this.banker !== undefined) {
       return this.banker;
-    }
+    } 
 
     const privateKey = env.privateKeyBanker;
     const walletConnection = await generateWalletConnection(
