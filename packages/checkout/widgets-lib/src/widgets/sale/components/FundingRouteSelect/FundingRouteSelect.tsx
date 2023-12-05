@@ -19,6 +19,7 @@ import { PurchaseMenuItem } from '../PurchaseMenuItem/PurchaseMenuItem';
 import { text } from '../../../../resources/text/textConfig';
 import { sendSaleWidgetCloseEvent } from '../../SaleWidgetEvents';
 import { EventTargetContext } from '../../../../context/event-target-context/EventTargetContext';
+import { useSaleContext } from '../../context/SaleContextProvider';
 
 type FundingRouteSelectProps = {
   fundingRoutes: FundingRoute[];
@@ -31,6 +32,7 @@ export function FundingRouteSelect({ fundingRoutes, onFundingRouteSelected }: Fu
   const [activeFundingRouteIndex, setActiveFundingRouteIndex] = useState(0);
   const { viewDispatch } = useContext(ViewContext);
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+  const { goBackToPaymentMethods } = useSaleContext();
 
   const onClickContinue = () => {
     onFundingRouteSelected(fundingRoutes[activeFundingRouteIndex]);
@@ -98,7 +100,7 @@ export function FundingRouteSelect({ fundingRoutes, onFundingRouteSelected }: Fu
             <Button key="continueButton" sx={{ mt: 'auto' }} variant="primary" onClick={onClickContinue}>
               {textConfig.fundingRouteSelect.continue}
             </Button>,
-            <Button key="payWithCardButton" variant="tertiary">
+            <Button key="payWithCardButton" variant="tertiary" onClick={() => goBackToPaymentMethods()}>
               {textConfig.fundingRouteSelect.payWithCardInstead}
             </Button>,
           ] }
