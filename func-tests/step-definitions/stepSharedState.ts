@@ -95,7 +95,7 @@ export class StepSharedState {
 
   bankerBalances: { [key: string]: Balance } = {};
 
-  // burns: { [key: string]: CreateTransferResponseV1 } = {};
+  burns: { [key: string]: CreateTransferResponseV1 } = {};
 
   withdrawals: { [key: string]: CreateWithdrawalResponse } = {};
 

@@ -40,16 +40,16 @@ export class Trading {
   //   undefined,
   //   5 * 60 * 1000,
   // )
-  // public async checkAssetStatus(assetVar: string, status: string) {
-  //   const token = this.stepSharedState.nfts[assetVar];
-  //   await repeatCheck20(async () => {
-  //     const asset = await this.client.getAsset({
-  //       tokenAddress: token.data.token_address,
-  //       tokenId: token.data.id,
-  //     });
-  //     assert.equal(asset.status, status);
-  //   });
-  // }
+  public async checkAssetStatus(assetVar: string, status: string) {
+    const token = this.stepSharedState.nfts[assetVar];
+    await repeatCheck20(async () => {
+      const asset = await this.client.getAsset({
+        tokenAddress: token.data.token_address,
+        tokenId: token.data.id,
+      });
+      assert.equal(asset.status, status);
+    });
+  }
 
   // @then(
   //   'api should show that {string} balance is {string} ETH',
@@ -106,16 +106,16 @@ export class Trading {
   //   undefined,
   //   5 * 60 * 1000,
   // )
-  // public async checkBurn(burnVar: string) {
-  //   const burn = this.stepSharedState.burns[burnVar];
-  //   console.log(`check burn: ${burn.transfer_id}`);
-  //   await repeatCheck20(async () => {
-  //     const burnDetails = await this.client.getTransfer({
-  //       id: burn.transfer_id!.toString(),
-  //     });
-  //     assert.equal(burnDetails.transaction_id, burn.transfer_id);
-  //   });
-  // }
+  public async checkBurn(burnVar: string) {
+    const burn = this.stepSharedState.burns[burnVar];
+    console.log(`check burn: ${burn.transfer_id}`);
+    await repeatCheck20(async () => {
+      const burnDetails = await this.client.getTransfer({
+        id: burn.transfer_id!.toString(),
+      });
+      assert.equal(burnDetails.transaction_id, burn.transfer_id);
+    });
+  }
 
   // @then(
   //   'order {string} should be available through api',

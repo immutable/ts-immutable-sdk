@@ -1,6 +1,6 @@
 Feature: Minting
 
-  @minting @core-sdk @only
+  @minting @core-sdk
   Scenario: Minting
     Given A new Eth wallet "wallet"
     And "wallet" is registered
