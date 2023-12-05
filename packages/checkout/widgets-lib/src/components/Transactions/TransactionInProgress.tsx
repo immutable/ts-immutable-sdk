@@ -1,25 +1,35 @@
-import { MenuItem } from '@biom3/react';
 import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
 import { text } from 'resources/text/textConfig';
+import { ChainId } from '@imtbl/checkout-sdk';
+import { TransactionItem } from './TransactionItem';
 
 export function TransactionInProgress({ key }: { key: string }) {
   const { status: { inProgress } } = text.views[XBridgeWidgetViews.TRANSACTIONS];
 
+  console.log(key);
+
   return (
-    <MenuItem key={key} emphasized size="small" sx={{ mt: 'base.spacing.x1' }}>
-      <MenuItem.FramedIcon icon="Coins" circularFrame />
-      <MenuItem.Label>
-        zkTKN
-      </MenuItem.Label>
-      <MenuItem.Caption>
-        {inProgress.stepInfo}
-        {' '}
-        10 mins
-      </MenuItem.Caption>
-      <MenuItem.PriceDisplay
+    <>
+      <TransactionItem
+        key={key}
+        label="zkTKN"
+        caption={`${inProgress.stepInfo} 10 mins`}
         fiatAmount="USD $12345.12"
-        price="+1835.1234"
+        amount="+1835.1234"
+        fromChain={ChainId.IMTBL_ZKEVM_TESTNET}
+        toChain={ChainId.SEPOLIA}
+        l1ToL2
       />
-    </MenuItem>
+      <TransactionItem
+        key={key}
+        label="zkTKN"
+        caption={`${inProgress.stepInfo} 10 mins`}
+        fiatAmount="USD $12345.12"
+        amount="+1835.1234"
+        fromChain={ChainId.IMTBL_ZKEVM_TESTNET}
+        toChain={ChainId.SEPOLIA}
+        action={() => {}}
+      />
+    </>
   );
 }

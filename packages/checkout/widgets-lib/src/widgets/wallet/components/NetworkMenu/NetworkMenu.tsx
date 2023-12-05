@@ -11,6 +11,7 @@ import {
   NetworkInfo,
   SwitchNetworkParams,
 } from '@imtbl/checkout-sdk';
+import { logoColour, networkIcon } from 'lib';
 import { WalletContext } from '../../context/WalletContext';
 import { text } from '../../../../resources/text/textConfig';
 import { sendNetworkSwitchEvent } from '../../WalletWidgetEvents';
@@ -33,23 +34,6 @@ import {
 } from '../../../../context/connect-loader-context/ConnectLoaderContext';
 import { EventTargetContext } from '../../../../context/event-target-context/EventTargetContext';
 import { UserJourney, useAnalytics } from '../../../../context/analytics-provider/SegmentAnalyticsProvider';
-
-const logoColour = {
-  [ChainId.IMTBL_ZKEVM_DEVNET]: 'base.color.text.link.primary',
-  [ChainId.IMTBL_ZKEVM_TESTNET]: 'base.color.text.link.primary',
-  [ChainId.IMTBL_ZKEVM_MAINNET]: 'base.color.text.link.primary',
-  [ChainId.ETHEREUM]: 'base.color.accent.5',
-  [ChainId.SEPOLIA]: 'base.color.accent.5',
-};
-
-// todo: add corresponding network symbols
-const networkIcon = {
-  [ChainId.IMTBL_ZKEVM_DEVNET]: 'Immutable',
-  [ChainId.IMTBL_ZKEVM_MAINNET]: 'Immutable',
-  [ChainId.IMTBL_ZKEVM_TESTNET]: 'Immutable',
-  [ChainId.ETHEREUM]: 'EthToken',
-  [ChainId.SEPOLIA]: 'EthToken',
-};
 
 export interface NetworkMenuProps {
   setBalancesLoading: (loading: boolean) => void;

@@ -13,11 +13,7 @@ export function TransactionsInProgress() {
     <>
       <Divider size="xSmall">{inProgress.heading}</Divider>
       <Box sx={containerStyles}>
-        {
-        [1, 2].map((id) => (
-          <TransactionInProgress key={id.toString()} />
-        ))
-      }
+        <TransactionInProgress key="1" />
       </Box>
     </>
   );
