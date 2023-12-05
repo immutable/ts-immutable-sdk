@@ -13,7 +13,7 @@ export function mapImmutableOrderToSeaportOrderComponents(
   zoneAddress: string,
 ): { orderComponents: OrderComponents, tips: Array<TipInputItem> } {
   const considerationItems: ConsiderationItem[] = order.buy.map((buyItem) => {
-    switch (buyItem.item_type) {
+    switch (buyItem.type) {
       case 'NATIVE':
         return {
           startAmount: buyItem.amount,
@@ -47,10 +47,10 @@ export function mapImmutableOrderToSeaportOrderComponents(
   const fees: TipInputItem[] = order.fees.map((fee) => ({
     amount: fee.amount,
     itemType:
-      order.buy[0].item_type === 'ERC20' ? ItemType.ERC20 : ItemType.NATIVE,
-    recipient: fee.recipient,
+      order.buy[0].type === 'ERC20' ? ItemType.ERC20 : ItemType.NATIVE,
+    recipient: fee.recipient_address,
     token:
-      order.buy[0].item_type === 'ERC20'
+      order.buy[0].type === 'ERC20'
         ? order.buy[0].contract_address!
         : constants.AddressZero,
     identifierOrCriteria: '0',
