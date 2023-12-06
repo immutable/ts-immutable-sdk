@@ -144,9 +144,6 @@ describe('Token Bridge', () => {
   });
 
   describe('getUnsignedBridgeTx', () => {
-    const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
-    const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
-
     const originalValidateDepositArgs = TokenBridge.prototype['validateDepositArgs'];
     const originalValidateChainConfiguration = TokenBridge.prototype['validateChainConfiguration'];
     const originalGetFee = TokenBridge.prototype['getFee'];
@@ -160,13 +157,21 @@ describe('Token Bridge', () => {
     let tokenBridge: TokenBridge;
     let bridgeConfig: BridgeConfiguration;
     beforeEach(() => {
+      const mockRootProvider = {
+        getNetwork: jest.fn().mockReturnValue({ chainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID }),
+        getCode: jest.fn().mockReturnValue('0x'),
+      } as unknown as ethers.providers.Web3Provider;
+      const mockChildProvider = {
+        getNetwork: jest.fn().mockReturnValue({ chainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID }),
+        getCode: jest.fn().mockReturnValue('0x'),
+      } as unknown as ethers.providers.Web3Provider;
       bridgeConfig = new BridgeConfiguration({
         baseConfig: new ImmutableConfiguration({
           environment: Environment.SANDBOX,
         }),
         bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
-        rootProvider: voidRootProvider,
-        childProvider: voidChildProvider,
+        rootProvider: mockRootProvider,
+        childProvider: mockChildProvider,
       });
       tokenBridge = new TokenBridge(bridgeConfig);
       jest.spyOn(TokenBridge.prototype as any, 'validateDepositArgs')
