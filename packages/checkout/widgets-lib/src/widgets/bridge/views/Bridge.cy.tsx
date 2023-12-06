@@ -1,8 +1,6 @@
 import { mount } from 'cypress/react18';
 import { describe } from 'local-cypress';
-import { Environment } from '@imtbl/config';
-import { StrongCheckoutWidgetsConfig } from 'lib/withDefaultWidgetConfig';
-import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
+import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { BridgeWidgetTestComponent } from '../test-components/BridgeWidgetTestComponent';
 import { Bridge } from './Bridge';
 import { cyIntercept, cySmartGet } from '../../../lib/testUtils';
@@ -18,11 +16,11 @@ describe('Bridge View', () => {
 
   it('should render the bridge view', () => {
     mount(
-      <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+      <ViewContextTestComponent>
         <BridgeWidgetTestComponent>
           <Bridge amount="" fromContractAddress="" />
         </BridgeWidgetTestComponent>
-      </CustomAnalyticsProvider>,
+      </ViewContextTestComponent>,
     );
 
     cySmartGet('bridge-view').should('exist');

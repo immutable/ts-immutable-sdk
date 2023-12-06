@@ -1,3 +1,11 @@
+# Blockain data sample app
+
+This sample app was created to demonstrate an example of using the Blockchain Data package, as well as for internal testing. It is not part of the published NPM package.
+
+[Read more about the Blockchain Data APIs](https://docs.immutable.com/docs/zkEVM/products/blockchain-data).
+
+# Boilerplate
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started

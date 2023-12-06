@@ -1,4 +1,4 @@
-import { JsonRpcProvider } from '@ethersproject/providers';
+import { JsonRpcProvider, JsonRpcBatchProvider } from '@ethersproject/providers';
 import { Contract } from '@ethersproject/contracts';
 import { BigNumber } from '@ethersproject/bignumber';
 import { InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError, NoRoutesAvailableError } from 'errors';
@@ -41,6 +41,9 @@ import {
   TEST_FROM_ADDRESS,
   expectToBeString,
   decodeMulticallExactInputWithoutFees,
+  buildBlock,
+  TEST_MAX_PRIORITY_FEE_PER_GAS,
+  TEST_BASE_FEE,
 } from './test/utils';
 
 jest.mock('@ethersproject/providers');
@@ -58,7 +61,7 @@ jest.mock('./lib/utils', () => ({
 
 const HIGHER_SLIPPAGE = 0.2;
 const APPROVED_AMOUNT = newAmountFromString('1', USDC_TEST_TOKEN);
-const APPROVE_GAS_ESTIMATE = BigNumber.from('100000');
+const APPROVE_GAS_ESTIMATE = BigNumber.from('100000'); // gas units
 
 describe('getUnsignedSwapTxFromAmountIn', () => {
   let erc20Contract: jest.Mock<any, any, any>;
@@ -71,11 +74,19 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
     }));
 
     (JsonRpcProvider as unknown as jest.Mock).mockImplementation(() => ({
-      getFeeData: async () => ({
-        maxFeePerGas: null,
-        gasPrice: TEST_GAS_PRICE,
-      }),
       connect: jest.fn().mockResolvedValue(erc20Contract),
+    })) as unknown as JsonRpcProvider;
+
+    (JsonRpcBatchProvider as unknown as jest.Mock).mockImplementation(() => ({
+      getBlock: async () => buildBlock({ baseFeePerGas: BigNumber.from(TEST_BASE_FEE) }),
+      send: jest.fn().mockImplementation(async (method) => {
+        switch (method) {
+          case 'eth_maxPriorityFeePerGas':
+            return BigNumber.from(TEST_MAX_PRIORITY_FEE_PER_GAS);
+          default:
+            throw new Error('Method not implemented');
+        }
+      }),
     })) as unknown as JsonRpcProvider;
   });
 

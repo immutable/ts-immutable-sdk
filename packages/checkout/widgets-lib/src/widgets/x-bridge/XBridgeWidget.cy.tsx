@@ -8,6 +8,7 @@ import { Environment } from '@imtbl/config';
 import { StrongCheckoutWidgetsConfig } from 'lib/withDefaultWidgetConfig';
 import { Passport } from '@imtbl/passport';
 import { BigNumber } from 'ethers';
+import { WidgetContainer } from 'components/WidgetContainer/WidgetContainer';
 import { XBridgeWidget } from './XBridgeWidget';
 import { text } from '../../resources/text/textConfig';
 
@@ -22,6 +23,7 @@ describe('XBridgeWidget', () => {
   let switchNetworkStub;
   let getNetworkInfoStub;
   let getAllBalancesStub;
+  let sendTransactionStub;
 
   beforeEach(() => {
     cy.viewport('ipad-2');
@@ -33,6 +35,7 @@ describe('XBridgeWidget', () => {
     switchNetworkStub = cy.stub().as('switchNetworkStub');
     getNetworkInfoStub = cy.stub().as('getNetworkInfoStub');
     getAllBalancesStub = cy.stub().as('getAllBalancesStub');
+    sendTransactionStub = cy.stub().as('sendTransaction');
 
     Checkout.prototype.createProvider = createProviderStub;
     Checkout.prototype.checkIsWalletConnected = checkIsWalletConnectedStub;
@@ -40,6 +43,7 @@ describe('XBridgeWidget', () => {
     Checkout.prototype.switchNetwork = switchNetworkStub;
     Checkout.prototype.getNetworkInfo = getNetworkInfoStub;
     Checkout.prototype.getAllBalances = getAllBalancesStub;
+    Checkout.prototype.sendTransaction = sendTransactionStub;
 
     getNetworkSepoliaStub = cy.stub().as('getNetworkSepoliaStub').resolves({ chainId: ChainId.SEPOLIA });
 
@@ -71,6 +75,7 @@ describe('XBridgeWidget', () => {
     baseConfig: { environment: Environment.SANDBOX },
     passport: {} as any as Passport,
   });
+
   const widgetConfig: StrongCheckoutWidgetsConfig = {
     theme: WidgetTheme.DARK,
     environment: Environment.SANDBOX,
@@ -90,7 +95,11 @@ describe('XBridgeWidget', () => {
         network: { chainId: ChainId.IMTBL_ZKEVM_TESTNET },
       } as SwitchNetworkResult);
 
-      mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
+      mount(
+        <WidgetContainer id="test" config={widgetConfig}>
+          <XBridgeWidget checkout={checkout} config={widgetConfig} />
+        </WidgetContainer>,
+      );
 
       cySmartGet('wallet-network-selector-from-wallet-select__target').click();
       cySmartGet(`wallet-network-selector-from-wallet-list-${WalletProviderName.METAMASK}`).should('be.visible');
@@ -111,7 +120,11 @@ describe('XBridgeWidget', () => {
       checkIsWalletConnectedStub.resolves({ isConnected: false });
       connectStub.resolves({ provider: mockPassportProvider });
 
-      mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
+      mount(
+        <WidgetContainer id="test" config={widgetConfig}>
+          <XBridgeWidget checkout={checkout} config={widgetConfig} />
+        </WidgetContainer>,
+      );
 
       cySmartGet('wallet-network-selector-from-wallet-select__target').click();
       cySmartGet(`wallet-network-selector-from-wallet-list-${WalletProviderName.METAMASK}`).should('be.visible');
@@ -128,7 +141,11 @@ describe('XBridgeWidget', () => {
       checkIsWalletConnectedStub.resolves({ isConnected: false });
       connectStub.resolves({ provider: mockPassportProvider });
 
-      mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
+      mount(
+        <WidgetContainer id="test" config={widgetConfig}>
+          <XBridgeWidget checkout={checkout} config={widgetConfig} />
+        </WidgetContainer>,
+      );
 
       cySmartGet('wallet-network-selector-from-wallet-select__target').click();
       cySmartGet(`wallet-network-selector-from-wallet-list-${WalletProviderName.METAMASK}`).should('be.visible');
@@ -154,7 +171,11 @@ describe('XBridgeWidget', () => {
         network: { chainId: ChainId.IMTBL_ZKEVM_TESTNET },
       } as SwitchNetworkResult);
 
-      mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
+      mount(
+        <WidgetContainer id="test" config={widgetConfig}>
+          <XBridgeWidget checkout={checkout} config={widgetConfig} />
+        </WidgetContainer>,
+      );
 
       cySmartGet('wallet-network-selector-from-wallet-select__target').click();
       cySmartGet(`wallet-network-selector-from-wallet-list-${WalletProviderName.METAMASK}`).should('be.visible');
@@ -186,7 +207,11 @@ describe('XBridgeWidget', () => {
         network: { chainId: ChainId.IMTBL_ZKEVM_TESTNET },
       } as SwitchNetworkResult);
 
-      mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
+      mount(
+        <WidgetContainer id="test" config={widgetConfig}>
+          <XBridgeWidget checkout={checkout} config={widgetConfig} />
+        </WidgetContainer>,
+      );
 
       cySmartGet('wallet-network-selector-from-wallet-select__target').click();
       cySmartGet(`wallet-network-selector-from-wallet-list-${WalletProviderName.METAMASK}`).click();
@@ -221,7 +246,11 @@ describe('XBridgeWidget', () => {
         network: { chainId: ChainId.SEPOLIA },
       } as SwitchNetworkResult);
 
-      mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
+      mount(
+        <WidgetContainer id="test" config={widgetConfig}>
+          <XBridgeWidget checkout={checkout} config={widgetConfig} />
+        </WidgetContainer>,
+      );
 
       // Choose from Metamask
       cySmartGet('wallet-network-selector-from-wallet-select__target').click();
@@ -268,7 +297,11 @@ describe('XBridgeWidget', () => {
         network: { chainId: ChainId.IMTBL_ZKEVM_TESTNET },
       } as SwitchNetworkResult);
 
-      mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
+      mount(
+        <WidgetContainer id="test" config={widgetConfig}>
+          <XBridgeWidget checkout={checkout} config={widgetConfig} />
+        </WidgetContainer>,
+      );
 
       // Choose from Passport
       cySmartGet('wallet-network-selector-from-wallet-select__target').click();
@@ -298,7 +331,11 @@ describe('XBridgeWidget', () => {
         network: { chainId: ChainId.IMTBL_ZKEVM_TESTNET },
       } as SwitchNetworkResult);
 
-      mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
+      mount(
+        <WidgetContainer id="test" config={widgetConfig}>
+          <XBridgeWidget checkout={checkout} config={widgetConfig} />
+        </WidgetContainer>,
+      );
 
       cySmartGet('wallet-network-selector-from-wallet-select__target').click();
       cySmartGet('wallet-network-selector-from-wallet-list-metamask').should('be.visible');
@@ -328,7 +365,11 @@ describe('XBridgeWidget', () => {
         network: { chainId: ChainId.SEPOLIA },
       } as SwitchNetworkResult);
 
-      mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
+      mount(
+        <WidgetContainer id="test" config={widgetConfig}>
+          <XBridgeWidget checkout={checkout} config={widgetConfig} />
+        </WidgetContainer>,
+      );
 
       cySmartGet('wallet-network-selector-from-wallet-select__target').click();
       cySmartGet('wallet-network-selector-from-wallet-list-metamask').should('be.visible');
@@ -362,7 +403,11 @@ describe('XBridgeWidget', () => {
         network: { chainId: ChainId.SEPOLIA },
       } as SwitchNetworkResult);
 
-      mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
+      mount(
+        <WidgetContainer id="test" config={widgetConfig}>
+          <XBridgeWidget checkout={checkout} config={widgetConfig} />
+        </WidgetContainer>,
+      );
 
       cySmartGet('wallet-network-selector-from-wallet-select__target').click();
       cySmartGet('wallet-network-selector-from-wallet-list-metamask').click();
@@ -400,7 +445,11 @@ describe('XBridgeWidget', () => {
           network: { chainId: ChainId.SEPOLIA },
         } as SwitchNetworkResult);
 
-      mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
+      mount(
+        <WidgetContainer id="test" config={widgetConfig}>
+          <XBridgeWidget checkout={checkout} config={widgetConfig} />
+        </WidgetContainer>,
+      );
 
       cySmartGet('wallet-network-selector-from-wallet-select__target').click();
       cySmartGet(`wallet-network-selector-from-wallet-list-${WalletProviderName.METAMASK}`).click();
@@ -438,7 +487,11 @@ describe('XBridgeWidget', () => {
         network: { chainId: ChainId.IMTBL_ZKEVM_TESTNET },
       } as SwitchNetworkResult);
 
-      mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
+      mount(
+        <WidgetContainer id="test" config={widgetConfig}>
+          <XBridgeWidget checkout={checkout} config={widgetConfig} />
+        </WidgetContainer>,
+      );
 
       cySmartGet('wallet-network-selector-from-wallet-select__target').click();
       cySmartGet('wallet-network-selector-from-wallet-list-metamask').click();
@@ -453,7 +506,11 @@ describe('XBridgeWidget', () => {
     });
 
     it('should not show when from wallet is not selected', () => {
-      mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
+      mount(
+        <WidgetContainer id="test" config={widgetConfig}>
+          <XBridgeWidget checkout={checkout} config={widgetConfig} />
+        </WidgetContainer>,
+      );
 
       cySmartGet('wallet-network-selector-submit-button').should('not.exist');
     });
@@ -468,7 +525,11 @@ describe('XBridgeWidget', () => {
         network: { chainId: ChainId.IMTBL_ZKEVM_TESTNET },
       } as SwitchNetworkResult);
 
-      mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
+      mount(
+        <WidgetContainer id="test" config={widgetConfig}>
+          <XBridgeWidget checkout={checkout} config={widgetConfig} />
+        </WidgetContainer>,
+      );
 
       cySmartGet('wallet-network-selector-from-wallet-select__target').click();
       cySmartGet('wallet-network-selector-from-wallet-list-metamask').click();
@@ -488,7 +549,11 @@ describe('XBridgeWidget', () => {
         network: { chainId: ChainId.IMTBL_ZKEVM_TESTNET },
       } as SwitchNetworkResult);
 
-      mount(<XBridgeWidget checkout={checkout} config={widgetConfig} />);
+      mount(
+        <WidgetContainer id="test" config={widgetConfig}>
+          <XBridgeWidget checkout={checkout} config={widgetConfig} />
+        </WidgetContainer>,
+      );
 
       cySmartGet('wallet-network-selector-from-wallet-select__target').click();
       cySmartGet('wallet-network-selector-from-wallet-list-metamask').click();
@@ -528,7 +593,14 @@ describe('XBridgeWidget', () => {
           },
         ],
       });
-
+      sendTransactionStub.resolves({
+        hash: '0x1234567890',
+        transactionResponse: {
+          wait: cy.stub().resolves({
+            status: 1,
+          }),
+        },
+      });
       switchNetworkStub.resolves({
         provider: mockMetaMaskProvider,
         network: { chainId: ChainId.IMTBL_ZKEVM_TESTNET },
@@ -553,9 +625,14 @@ describe('XBridgeWidget', () => {
       cySmartGet('bridge-review-summary-from-amount__priceDisplay__price').should('have.text', 'IMX 1');
       cySmartGet('bridge-review-summary-from-amount__priceDisplay__fiatAmount').should('have.text', '~ USD $1.50');
       cySmartGet('bridge-review-summary-gas-amount__priceDisplay__price').should('have.text', 'ETH 0.007984');
-      cySmartGet('bridge-review-summary-gas-amount__priceDisplay__fiatAmount').should('have.text', '~ USD $15.00');
+      cySmartGet('bridge-review-summary-gas-amount__priceDisplay__fiatAmount').should('have.text', '~ USD $15.97');
       cySmartGet('bridge-review-summary-from-address__label').should('include.text', '0x0987...4321');
       cySmartGet('bridge-review-summary-to-address__label').should('include.text', '0x1234...7890');
+      cySmartGet('bridge-review-summary__submit-button').click();
+
+      // Approvals screen
+      cySmartGet('wallet-approve-hero').should('be.visible');
+      cySmartGet('footer-button').click();
     });
   });
 });

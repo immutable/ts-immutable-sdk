@@ -1,6 +1,6 @@
 import {
   Body,
-  BottomSheet, Box, Button, DuoCon, Heading,
+  Drawer, Box, Button, DuoCon, Heading,
 } from '@biom3/react';
 import {
   transactionRejectedContainerStyles,
@@ -11,26 +11,26 @@ import {
 import { text } from '../../resources/text/textConfig';
 
 type TransactionRejectedProps = {
-  onCloseBottomSheet?: () => void;
+  onCloseDrawer?: () => void;
   visible?: boolean;
   showHeaderBar?: boolean;
   onRetry: () => void
 };
 
 export function TransactionRejected({
-  onCloseBottomSheet, visible, showHeaderBar, onRetry,
+  onCloseDrawer, visible, showHeaderBar, onRetry,
 }: TransactionRejectedProps) {
   const { content, buttons } = text.drawers.transactionFailed;
 
   return (
-    <BottomSheet
+    <Drawer
       headerBarTitle={undefined}
       size="full"
-      onCloseBottomSheet={onCloseBottomSheet}
+      onCloseDrawer={onCloseDrawer}
       visible={visible}
       showHeaderBar={showHeaderBar}
     >
-      <BottomSheet.Content>
+      <Drawer.Content>
         <Box sx={transactionRejectedContainerStyles}>
           <DuoCon
             icon="Information"
@@ -58,14 +58,14 @@ export function TransactionRejected({
             <Button
               sx={actionButtonStyles}
               variant="tertiary"
-              onClick={onCloseBottomSheet}
+              onClick={onCloseDrawer}
               testId="transaction-rejected-cancel-button"
             >
               {buttons.cancel}
             </Button>
           </Box>
         </Box>
-      </BottomSheet.Content>
-    </BottomSheet>
+      </Drawer.Content>
+    </Drawer>
   );
 }

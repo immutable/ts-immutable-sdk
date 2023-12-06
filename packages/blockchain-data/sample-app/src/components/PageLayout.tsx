@@ -17,17 +17,6 @@ export const PageLayout: React.FC<Props> = ({ children }) => {
           height={48}
           priority
         />
-        <div className="flex items-center space-x-4">
-          <a className="cursor-pointer hover:underline" href="/">
-            BlockchainData
-          </a>
-          <a
-            className="cursor-pointer hover:underline"
-            href="/erc721-permissioned-mintable"
-          >
-            ERC721
-          </a>
-        </div>
       </div>
 
       {children}

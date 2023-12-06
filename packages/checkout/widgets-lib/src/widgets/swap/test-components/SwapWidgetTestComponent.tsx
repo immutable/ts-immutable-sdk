@@ -1,5 +1,5 @@
-import { BiomeCombinedProviders } from '@biom3/react';
 import React, { useCallback, useMemo, useReducer } from 'react';
+import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import {
   initialSwapState, SwapContext, swapReducer, SwapState,
 } from '../context/SwapContext';
@@ -35,12 +35,12 @@ export function SwapWidgetTestComponent({ children, initialStateOverride, crypto
   ), [cryptoFiatState, cryptoFiatDispatch]);
 
   return (
-    <BiomeCombinedProviders>
+    <ViewContextTestComponent>
       <SwapContext.Provider value={swapReducerValues}>
         <CryptoFiatContext.Provider value={cryptoFiatReducerValues as CryptoFiatContextState}>
           {children}
         </CryptoFiatContext.Provider>
       </SwapContext.Provider>
-    </BiomeCombinedProviders>
+    </ViewContextTestComponent>
   );
 }

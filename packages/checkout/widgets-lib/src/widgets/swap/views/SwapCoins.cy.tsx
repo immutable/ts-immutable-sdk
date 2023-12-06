@@ -4,13 +4,10 @@ import {
 import { mount } from 'cypress/react18';
 import { BigNumber } from 'ethers';
 import { ChainId, ChainName, WidgetTheme } from '@imtbl/checkout-sdk';
-import { Environment } from '@imtbl/config';
 import { cyIntercept, cySmartGet } from '../../../lib/testUtils';
 import { SwapWidgetTestComponent } from '../test-components/SwapWidgetTestComponent';
 import { SwapCoins } from './SwapCoins';
 import { SwapState } from '../context/SwapContext';
-import { CustomAnalyticsProvider } from '../../../context/analytics-provider/CustomAnalyticsProvider';
-import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 import { NATIVE } from '../../../lib';
 
 describe('SwapCoins tests', () => {
@@ -64,14 +61,12 @@ describe('SwapCoins tests', () => {
     };
 
     mount(
-      <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-        <SwapWidgetTestComponent
-          initialStateOverride={initialSwapState}
-          cryptoConversionsOverride={cryptoConversions}
-        >
-          <SwapCoins theme={WidgetTheme.LIGHT} />
-        </SwapWidgetTestComponent>
-      </CustomAnalyticsProvider>,
+      <SwapWidgetTestComponent
+        initialStateOverride={initialSwapState}
+        cryptoConversionsOverride={cryptoConversions}
+      >
+        <SwapCoins theme={WidgetTheme.LIGHT} />
+      </SwapWidgetTestComponent>,
     );
   });
 

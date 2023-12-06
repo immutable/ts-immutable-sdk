@@ -12,10 +12,10 @@ import {
   useCallback, useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
 import { BigNumber, utils } from 'ethers';
+import { FeesBreakdown } from 'components/FeesBreakdown/FeesBreakdown';
 import { amountInputValidation } from '../../../lib/validations/amountInputValidations';
 import { BridgeActions, XBridgeContext } from '../context/XBridgeContext';
 import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
-import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
 import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { text } from '../../../resources/text/textConfig';
 import { TextInputForm } from '../../../components/FormComponents/TextInputForm/TextInputForm';
@@ -28,6 +28,7 @@ import {
   bridgeFormButtonContainerStyles,
   bridgeFormWrapperStyles,
   formInputsContainerStyles,
+  gasAmountHeadingStyles,
 } from './BridgeFormStyles';
 import { CoinSelectorOptionProps } from '../../../components/CoinSelector/CoinSelectorOption';
 import { useInterval } from '../../../lib/hooks/useInterval';
@@ -71,11 +72,10 @@ export function BridgeForm(props: BridgeFormProps) {
     isTokenBalancesLoading,
   } = props;
   const {
-    xBridgeContent,
-    xBridgeFees,
+    fees,
     content,
     bridgeForm,
-  } = text.views[BridgeWidgetViews.BRIDGE];
+  } = text.views[XBridgeWidgetViews.BRIDGE_FORM];
 
   // Form state
   const [formAmount, setFormAmount] = useState<string>(defaultAmount || '');
@@ -96,6 +96,7 @@ export function BridgeForm(props: BridgeFormProps) {
   const [gasFee, setGasFee] = useState<string>('');
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
   const [tokensOptions, setTokensOptions] = useState<CoinSelectorOptionProps[]>([]);
+  const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
 
   // Not enough ETH to cover gas
   const [showNotEnoughGasDrawer, setShowNotEnoughGasDrawer] = useState(false);
@@ -108,6 +109,9 @@ export function BridgeForm(props: BridgeFormProps) {
     if (!address) return symbol.toLowerCase();
     return `${symbol.toLowerCase()}-${address.toLowerCase()}`;
   }, []);
+
+  const gasFiatAmount = `${fees.fiatPricePrefix} ${gasFeeFiatValue}`;
+  const gasTokenAmount = `${estimates?.gasFee.token?.symbol} ${tokenValueFormat(gasFee)}`;
 
   useEffect(() => {
     if (tokenBalances.length === 0) return;
@@ -396,7 +400,7 @@ export function BridgeForm(props: BridgeFormProps) {
           weight="regular"
           sx={{ paddingBottom: 'base.spacing.x4' }}
         >
-          {xBridgeContent.title}
+          {content.title}
         </Heading>
         {isTokenBalancesLoading && (
           <TokenSelectShimmer sx={formInputsContainerStyles} />
@@ -432,17 +436,34 @@ export function BridgeForm(props: BridgeFormProps) {
         {gasFee && (
           <Box sx={{ paddingY: 'base.spacing.x2' }}>
             <MenuItem emphasized size="small">
-              <MenuItem.Label>
-                {xBridgeFees.title}
+              <MenuItem.Label sx={gasAmountHeadingStyles}>
+                {fees.title}
               </MenuItem.Label>
               <MenuItem.PriceDisplay
-                fiatAmount={`${xBridgeFees.fiatPricePrefix} ${gasFeeFiatValue}`}
+                fiatAmount={`${fees.fiatPricePrefix} ${gasFeeFiatValue}`}
                 price={`${estimates?.gasFee.token?.symbol} ${tokenValueFormat(gasFee)}`}
+              />
+              <MenuItem.StatefulButtCon
+                icon="ChevronExpand"
+                onClick={() => setShowFeeBreakdown(true)}
               />
             </MenuItem>
           </Box>
         )}
       </Box>
+      <FeesBreakdown
+        totalFiatAmount={gasFiatAmount}
+        totalAmount={gasTokenAmount}
+        fees={[
+          {
+            label: text.drawers.feesBreakdown.fees.gas.label,
+            fiatAmount: gasFiatAmount,
+            amount: gasTokenAmount,
+          },
+        ]}
+        visible={showFeeBreakdown}
+        onCloseDrawer={() => setShowFeeBreakdown(false)}
+      />
       <Box sx={bridgeFormButtonContainerStyles}>
         <Button
           testId={`${testId}-button`}
@@ -458,13 +479,13 @@ export function BridgeForm(props: BridgeFormProps) {
         <TransactionRejected
           visible={showTxnRejectedState}
           showHeaderBar={false}
-          onCloseBottomSheet={() => setShowTxnRejectedState(false)}
+          onCloseDrawer={() => setShowTxnRejectedState(false)}
           onRetry={retrySubmitBridge}
         />
         <NotEnoughGas
           visible={showNotEnoughGasDrawer}
           showHeaderBar={false}
-          onCloseBottomSheet={() => setShowNotEnoughGasDrawer(false)}
+          onCloseDrawer={() => setShowNotEnoughGasDrawer(false)}
           walletAddress={walletAddress}
           showAdjustAmount={isNativeToken(formToken?.token.address)}
         />
