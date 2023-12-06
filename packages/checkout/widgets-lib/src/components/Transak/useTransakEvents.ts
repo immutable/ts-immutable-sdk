@@ -78,7 +78,7 @@ export const useTransakEvents = (props: UseTransakEventsProps) => {
   const [initialised, setInitialsed] = useState<boolean>(false);
   const failedToLoadTimeout = failedToLoadTimeoutInMs || FAILED_TO_LOAD_TIMEOUT_IN_MS;
 
-  const timeout = useRef<NodeJS.Timeout | undefined>(undefined);
+  const timeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const onInit = (data: Record<string, unknown>) => {
     setInitialsed(true);
