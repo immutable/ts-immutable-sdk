@@ -13,7 +13,7 @@ import { erc20ToUniswapToken, newAmount, Router, RoutingContracts } from '../lib
 
 export const TEST_BASE_FEE = BigNumber.from('49'); // 49 wei
 export const TEST_MAX_PRIORITY_FEE_PER_GAS = BigNumber.from('10000000000'); // 10 gwei
-export const TEST_GAS_PRICE = BigNumber.from('10000000098');
+export const TEST_GAS_PRICE = BigNumber.from('10000000098'); // TEST_MAX_PRIORITY_FEE_PER_GAS + 2 * TEST_BASE_FEE
 export const TEST_TRANSACTION_GAS_USAGE = BigNumber.from('200000'); // 200,000 gas units
 
 export const TEST_CHAIN_ID = 999;
