@@ -84,8 +84,8 @@ export interface SetTokenBridgePayload {
 
 export interface SetWalletsAndNetworksPayload {
   type: BridgeActions.SET_WALLETS_AND_NETWORKS;
-  from: WalletAndNetworkDetails;
-  to: WalletAndNetworkDetails;
+  from: WalletAndNetworkDetails | null;
+  to: WalletAndNetworkDetails | null;
 }
 
 export interface SetTokenBalancesPayload {
@@ -100,7 +100,7 @@ export interface SetAllowedTokensPayload {
 
 export interface SetTokenAndAmountPayload {
   type: BridgeActions.SET_TOKEN_AND_AMOUNT;
-  token: TokenInfo;
+  token: TokenInfo | null;
   amount: string;
 }
 

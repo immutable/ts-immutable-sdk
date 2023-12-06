@@ -10,15 +10,17 @@ import {
   Body,
   Box, Button, Heading, Icon, MenuItem,
 } from '@biom3/react';
-import { ChainId, WalletProviderName } from '@imtbl/checkout-sdk';
+import { ChainId, GasEstimateBridgeToL2Result, WalletProviderName } from '@imtbl/checkout-sdk';
 import { abbreviateAddress } from 'lib/addressUtils';
 import { CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext';
 import { isPassportProvider } from 'lib/providerUtils';
 import { calculateCryptoToFiat } from 'lib/utils';
 import { Web3Provider } from '@ethersproject/providers';
-import { DEFAULT_QUOTE_REFRESH_INTERVAL } from 'lib';
+import { DEFAULT_QUOTE_REFRESH_INTERVAL, DEFAULT_TOKEN_DECIMALS, getL1ChainId } from 'lib';
 import { useInterval } from 'lib/hooks/useInterval';
 import { FeesBreakdown } from 'components/FeesBreakdown/FeesBreakdown';
+import { BridgeFeeActions } from '@imtbl/bridge-sdk';
+import { utils } from 'ethers';
 import { networkIconStyles } from './WalletNetworkButtonStyles';
 import {
   arrowIconStyles,
@@ -56,6 +58,8 @@ export function BridgeReviewSummary() {
 
   const {
     bridgeState: {
+      checkout,
+      tokenBridge,
       from,
       to,
       token,
@@ -65,6 +69,10 @@ export function BridgeReviewSummary() {
 
   const { cryptoFiatState } = useContext(CryptoFiatContext);
   const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
+
+  const [estimates, setEstimates] = useState<GasEstimateBridgeToL2Result | undefined>(undefined);
+  const [gasFee, setGasFee] = useState<string>('');
+  const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
 
   const walletProviderName = (provider: Web3Provider | undefined) => (isPassportProvider(provider)
     ? WalletProviderName.PASSPORT
@@ -90,10 +98,43 @@ export function BridgeReviewSummary() {
   const toWalletProviderName = useMemo(() => walletProviderName(to?.web3Provider), [to]);
   const toNetwork = useMemo(() => to?.network, [to]);
 
-  const fetchGasEstimate = () => {
+  const fetchGasEstimate = useCallback(async () => {
     // eslint-disable-next-line no-console
     console.log('fetch gas estimate');
-  };
+
+    const bridgeFeeAction = from?.network === getL1ChainId(checkout.config)
+      ? BridgeFeeActions.DEPOSIT
+      : BridgeFeeActions.WITHDRAW;
+
+    console.log(bridgeFeeAction);
+
+    const gasEstimate = await tokenBridge!.getFee({
+      action: bridgeFeeAction,
+      gasMultiplier: 2,
+      sourceChainId: from?.network.toString(),
+      destinationChainId: to?.network.toString(),
+    });
+
+    const gasEstimateResult = {
+      gasFee: {
+        estimatedAmount: gasEstimate.totalFees,
+        token: checkout.config.networkMap.get(from!.network)?.nativeCurrency,
+      },
+    } as GasEstimateBridgeToL2Result;
+
+    setEstimates(gasEstimateResult);
+    const estimatedAmount = utils.formatUnits(
+      gasEstimateResult?.gasFee?.estimatedAmount || 0,
+      DEFAULT_TOKEN_DECIMALS,
+    );
+
+    setGasFee(estimatedAmount);
+    setGasFeeFiatValue(calculateCryptoToFiat(
+      estimatedAmount,
+      gasEstimateResult.gasFee?.token?.symbol || '',
+      cryptoFiatState.conversions,
+    ));
+  }, [checkout, tokenBridge]);
   useInterval(() => fetchGasEstimate(), DEFAULT_QUOTE_REFRESH_INTERVAL);
 
   const submitBridge = useCallback(async () => {
@@ -109,14 +150,6 @@ export function BridgeReviewSummary() {
       },
     });
   }, [viewDispatch]);
-
-  // Fetch on useInterval interval when available
-  const gasEstimate = 'ETH 0.007984';
-  const gasFiatEstimate = calculateCryptoToFiat(
-    '0.007984',
-    'ETH',
-    cryptoFiatState.conversions,
-  );
 
   return (
     <Box testId={testId} sx={bridgeReviewWrapperStyles}>
@@ -228,8 +261,8 @@ export function BridgeReviewSummary() {
         </MenuItem.Label>
         <MenuItem.PriceDisplay
           use={<Body size="xSmall" />}
-          price={gasEstimate ?? '-'}
-          fiatAmount={`${fiatPricePrefix}${gasFiatEstimate}`}
+          price={`${estimates?.gasFee.token?.symbol} ${gasFee}` ?? '-'}
+          fiatAmount={`${fiatPricePrefix}${gasFeeFiatValue}`}
         />
         <MenuItem.StatefulButtCon
           icon="ChevronExpand"

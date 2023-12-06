@@ -13,6 +13,7 @@ import {
 } from 'react';
 import { BigNumber, utils } from 'ethers';
 import { FeesBreakdown } from 'components/FeesBreakdown/FeesBreakdown';
+import { BridgeFeeActions } from '@imtbl/bridge-sdk';
 import { amountInputValidation } from '../../../lib/validations/amountInputValidations';
 import { BridgeActions, XBridgeContext } from '../context/XBridgeContext';
 import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
@@ -36,6 +37,7 @@ import {
   DEFAULT_TOKEN_DECIMALS,
   DEFAULT_QUOTE_REFRESH_INTERVAL,
   NATIVE,
+  getL1ChainId,
 } from '../../../lib';
 import { swapButtonIconLoadingStyle } from '../../swap/components/SwapButtonStyles';
 import { TransactionRejected } from '../../../components/TransactionRejected/TransactionRejected';
@@ -54,10 +56,13 @@ export function BridgeForm(props: BridgeFormProps) {
   const {
     bridgeDispatch,
     bridgeState: {
+      tokenBridge,
       tokenBalances,
       allowedTokens,
       checkout,
       web3Provider,
+      from,
+      to,
       amount,
       token,
     },
@@ -144,7 +149,7 @@ export function BridgeForm(props: BridgeFormProps) {
         setFormToken(
           tokenBalances.find(
             (b) => (isNativeToken(b.token.address) && defaultFromContractAddress?.toLocaleUpperCase() === NATIVE)
-            || (b.token.address?.toLowerCase() === defaultFromContractAddress?.toLowerCase()),
+              || (b.token.address?.toLowerCase() === defaultFromContractAddress?.toLowerCase()),
           ),
         );
       }
@@ -171,6 +176,14 @@ export function BridgeForm(props: BridgeFormProps) {
         break;
       }
     }
+
+    bridgeDispatch({
+      payload: {
+        type: BridgeActions.SET_TOKEN_AND_AMOUNT,
+        token: null,
+        amount: '',
+      },
+    });
   }, [amount, token, tokenBalances]);
 
   const selectedOption = useMemo(
@@ -185,6 +198,8 @@ export function BridgeForm(props: BridgeFormProps) {
     if (parseFloat(formAmount) <= 0) return false;
     if (!formToken) return false;
     if (isFetching) return false;
+    if (!from) return false;
+    if (!to) return false;
     return true;
   };
 
@@ -202,23 +217,30 @@ export function BridgeForm(props: BridgeFormProps) {
     // Prevent silently fetching and set a new fee estimate
     // if the user has updated and the widget is already
     // fetching or the user is updating the inputs.
-    // if ((silently && (loading || editing)) || !checkout) return;
+    if ((silently && (loading || editing)) || !checkout) return;
 
-    // TODO: Implement the gas estimate
-    // const gasEstimateResult = await checkout.gasEstimate({
-    //   gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-    //   isSpendingCapApprovalRequired: !!transactions?.approveRes?.unsignedTx,
-    // }) as GasEstimateBridgeToL2Result;
+    const bridgeFeeAction = from?.network === getL1ChainId(checkout.config)
+      ? BridgeFeeActions.DEPOSIT
+      : BridgeFeeActions.WITHDRAW;
+
+    console.log(bridgeFeeAction);
+
+    const gasEstimate = await tokenBridge!.getFee({
+      action: bridgeFeeAction,
+      gasMultiplier: 1.1,
+      sourceChainId: from?.network.toString(),
+      destinationChainId: to?.network.toString(),
+    });
+
+    // console.log('sourceChainGas', utils.formatUnits(gasEstimate.sourceChainGas));
+    // console.log('imtblFee', utils.formatUnits(gasEstimate.imtblFee));
+    // console.log('bridgeFee', utils.formatUnits(gasEstimate.bridgeFee));
+    console.log('totalFees', utils.formatUnits(gasEstimate.totalFees));
 
     const gasEstimateResult = {
       gasFee: {
-        estimatedAmount: BigNumber.from(100),
-        token: {
-          address: 'native',
-          decimals: 18,
-          name: 'IMX',
-          symbol: 'IMX',
-        },
+        estimatedAmount: gasEstimate.totalFees,
+        token: checkout.config.networkMap.get(from!.network)?.nativeCurrency,
       },
     } as GasEstimateBridgeToL2Result;
 
@@ -243,9 +265,9 @@ export function BridgeForm(props: BridgeFormProps) {
 
   // TODO: rename uses of ETH to native token
   const insufficientFundsForGas = useMemo(() => {
-    const ethBalance = tokenBalances
+    const nativeTokenBalance = tokenBalances
       .find((balance) => isNativeToken(balance.token.address));
-    if (!ethBalance) {
+    if (!nativeTokenBalance) {
       return true;
     }
 
@@ -255,7 +277,7 @@ export function BridgeForm(props: BridgeFormProps) {
       ? utils.parseEther(formAmount)
       : BigNumber.from('0');
 
-    return gasAmount.add(additionalAmount).gt(ethBalance.balance);
+    return gasAmount.add(additionalAmount).gt(nativeTokenBalance.balance);
   }, [gasFee, tokenBalances, formToken, formAmount]);
 
   // Silently refresh the quote
@@ -263,6 +285,7 @@ export function BridgeForm(props: BridgeFormProps) {
 
   useEffect(() => {
     if (editing) return;
+    console.log('fetching as amount or token has changed');
     (async () => await fetchEstimates())();
   }, [formAmount, formToken, editing]);
 

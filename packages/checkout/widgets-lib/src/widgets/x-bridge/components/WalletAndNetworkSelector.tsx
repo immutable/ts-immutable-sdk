@@ -109,6 +109,14 @@ export function WalletAndNetworkSelector() {
     setToWalletWeb3Provider(to.web3Provider);
     setToWalletAddress(to.walletAddress);
     setToNetwork(to.network);
+
+    bridgeDispatch({
+      payload: {
+        type: BridgeActions.SET_WALLETS_AND_NETWORKS,
+        from: null,
+        to: null,
+      },
+    });
   }, [from, to]);
 
   async function createProviderAndConnect(walletProviderName: WalletProviderName): Promise<Web3Provider | undefined> {

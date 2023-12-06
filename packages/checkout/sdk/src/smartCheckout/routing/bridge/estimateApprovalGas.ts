@@ -1,7 +1,7 @@
 import { BigNumber, ethers } from 'ethers';
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../../config';
 import { ChainId } from '../../../types';
-import * as instance from '../../../instance';
+// import * as instance from '../../../instance';
 import { CheckoutError, CheckoutErrorType } from '../../../errors';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from '../indexer/fetchL1Representation';
 
@@ -16,21 +16,31 @@ export const estimateApprovalGas = async (
   depositAmount: BigNumber,
 ): Promise<BigNumber> => {
   try {
-    const tokenBridge = await instance.createBridgeInstance(
+    // const tokenBridge = await instance.createBridgeInstance(
+    //   fromChainId,
+    //   toChainId,
+    //   readOnlyProviders,
+    //   config,
+    // );
+    console.log('estimateApprovalGas', {
+      config,
+      readOnlyProviders,
+      l1provider,
+      depositorAddress,
       fromChainId,
       toChainId,
-      readOnlyProviders,
-      config,
-    );
-
-    const { unsignedTx } = await tokenBridge.getUnsignedApproveDepositBridgeTx({
-      depositorAddress,
       token,
       depositAmount,
     });
 
-    if (unsignedTx === null) return BigNumber.from(0);
-    return await l1provider.estimateGas(unsignedTx);
+    // const { unsignedTx } = await tokenBridge.getUnsignedApproveDepositBridgeTx({
+    //   depositorAddress,
+    //   token,
+    //   depositAmount,
+    // });
+
+    // if (unsignedTx === null) return BigNumber.from(0);
+    return BigNumber.from('1000000000000'); // await l1provider.estimateGas(unsignedTx);
   } catch (err: any) {
     throw new CheckoutError(
       'Error occurred while attempting ot estimate gas for approval transaction',

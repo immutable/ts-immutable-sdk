@@ -12,7 +12,7 @@ import {
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 import { getNetworkInfo } from '../network';
 import { getTokenAllowList } from '../tokens';
-import { CheckoutConfiguration, getL1ChainId } from '../config';
+import { CheckoutConfiguration } from '../config';
 import {
   Blockscout,
   BlockscoutToken,
@@ -270,11 +270,11 @@ export const getAllBalances = async (
     // then we would not have fiat conversions.
     // Please remove this hack once https://immutable.atlassian.net/browse/WT-1710
     // is done.
-    const isL1Chain = getL1ChainId(config) === chainId;
+    // const isL1Chain = getL1ChainId(config) === chainId;
     return await measureAsyncExecution<GetAllBalancesResult>(
       config,
       `Time to fetch balances using blockscout for ${chainId}`,
-      getIndexerBalance(walletAddress, chainId, isL1Chain ? tokens : undefined),
+      getIndexerBalance(walletAddress, chainId, undefined), // isL1Chain ? tokens :
     );
   }
 

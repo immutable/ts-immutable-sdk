@@ -14,10 +14,19 @@ import {
 } from 'react';
 import { StrongCheckoutWidgetsConfig } from 'lib/withDefaultWidgetConfig';
 import { CryptoFiatProvider } from 'context/crypto-fiat-context/CryptoFiatProvider';
-import { Web3Provider } from '@ethersproject/providers';
+import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
 import { StatusView } from 'components/Status/StatusView';
 import { StatusType } from 'components/Status/StatusType';
+import { ImmutableConfiguration } from '@imtbl/config';
+import {
+  BridgeConfiguration,
+  ETH_MAINNET_TO_ZKEVM_MAINNET,
+  ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+  ETH_SEPOLIA_TO_ZKEVM_TESTNET,
+  TokenBridge,
+} from '@imtbl/bridge-sdk';
+import { getL1ChainId, getL2ChainId } from 'lib';
 import {
   ViewActions,
   ViewContext,
@@ -67,12 +76,36 @@ export function XBridgeWidget({
       history: [{ type: XBridgeWidgetViews.WALLET_NETWORK_SELECTION }],
     },
   );
+
   const [bridgeState, bridgeDispatch] = useReducer(
     xBridgeReducer,
     {
       ...initialXBridgeState,
       checkout,
       web3Provider: web3Provider ?? null,
+      tokenBridge: (() => {
+        let bridgeInstance = ETH_SEPOLIA_TO_ZKEVM_TESTNET;
+        if (checkout.config.isDevelopment) bridgeInstance = ETH_SEPOLIA_TO_ZKEVM_DEVNET;
+        if (checkout.config.isProduction) bridgeInstance = ETH_MAINNET_TO_ZKEVM_MAINNET;
+
+        // Root provider is always L1
+        const rootProvider = new JsonRpcProvider(
+          checkout.config.networkMap.get(getL1ChainId(checkout.config))?.rpcUrls[0],
+        );
+
+        // Child provider is always L2
+        const childProvider = new JsonRpcProvider(
+          checkout.config.networkMap.get(getL2ChainId(checkout.config))?.rpcUrls[0],
+        );
+        const bridgeConfiguration = new BridgeConfiguration({
+          baseConfig: new ImmutableConfiguration({ environment: checkout.config.environment }),
+          bridgeInstance,
+          rootProvider,
+          childProvider,
+        });
+
+        return new TokenBridge(bridgeConfiguration);
+      })(),
     },
   );
 
