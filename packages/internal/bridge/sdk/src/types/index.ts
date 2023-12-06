@@ -386,26 +386,6 @@ export interface FlowRateWithdrawResponse {
 }
 
 /**
- * @typedef {Object} AddGasRequest
- * @property {string} transactionHash - The hash of the bridge transaction on the source chain for which to add gas to.
- * @property {string} sourceChainId - The source chainId
- * @property {string} amount - The amount of gas to add in the smallest unit of the source chain native token.
- */
-export interface AddGasRequest {
-  transactionHash: string;
-  sourceChainId: string;
-  amount: string;
-}
-
-/**
- * @typedef {Object} AddGasResponse
- * @property {ethers.providers.TransactionRequest} unsignedTx - The unsigned transaction for the adding more gas.
- */
-export interface AddGasResponse {
-  unsignedTx: ethers.providers.TransactionRequest;
-}
-
-/**
  * @typedef {Object} TokenMappingRequest
  * @property {FungibleToken} rootToken - The token on the root chain for which the corresponding token on the child chain is required.
  */

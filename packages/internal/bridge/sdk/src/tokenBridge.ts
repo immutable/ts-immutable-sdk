@@ -26,8 +26,6 @@ import {
   PendingWithdrawalsResponse,
   FlowRateWithdrawRequest,
   FlowRateWithdrawResponse,
-  AddGasRequest,
-  AddGasResponse,
   FlowRateInfoRequest,
   CalculateBridgeFeeResponse,
 } from 'types';
@@ -832,25 +830,6 @@ export class TokenBridge {
     return {
       unsignedTx: {
         data: 'stubbed flow rate withdrawal data',
-        to: '0x0',
-        value: 0,
-      },
-    };
-  }
-
-  /**
- * Retrieves the unsigned transaction to top up the Axelar Gas.
- *
- * @param {AddGasRequest} req - The request object containing the root token address or the string 'NATIVE'.
- * @returns {Promise<AddGasResponse>} - A promise that resolves to an object containing the child token address.
- * @throws {BridgeError} - If an error occurs during the query, a BridgeError will be thrown with a specific error type.
- * @dev this SDK method is currently stubbed
- */
-  public async addGas(req: AddGasRequest): Promise<AddGasResponse> {
-    console.log('stubbed response with req', req);
-    return {
-      unsignedTx: {
-        data: 'stubbed add gas payment data',
         to: '0x0',
         value: 0,
       },
