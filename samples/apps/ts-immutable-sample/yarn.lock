@@ -1349,7 +1349,7 @@ __metadata:
 
 "@imtbl/sdk@file:../../../sdk::locator=ts-immutable-sample%40workspace%3A.":
   version: 0.0.0
-  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=bd5077&locator=ts-immutable-sample%40workspace%3A."
+  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=49f46d&locator=ts-immutable-sample%40workspace%3A."
   dependencies:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
@@ -1387,7 +1387,7 @@ __metadata:
   peerDependencies:
     react: ^18.2.0
     react-dom: ^18.2.0
-  checksum: 5f7a754486456b7d593bf7da75a8190e8205163adbbf1fba5a87e4d1748d30f27196ee11a4260c70aa403eb5327b216ebbd7872158b891beebaf8e492e62a70c
+  checksum: 958bddf209356ef9200caef2b684730dd95b462fd4b90e4ecf8e48d534c5db66015fb5537288ff2b7facf49d0c7878bec771534f5c1260a4579d9321cc5276a9
   languageName: node
   linkType: hard
 
@@ -1970,13 +1970,6 @@ __metadata:
     ethers: ^5.7.2
     merkletreejs: ^0.3.10
   checksum: 02dec110c85899ec758a19e3de32635da025b28950d220cc57a3ea9c9297105aa72682dee9d5854e1aa51050a433caf214ce909e1162cf0177dc37a70ae26bd4
-  languageName: node
-  linkType: hard
-
-"@openzeppelin/contracts@npm:3.4.1-solc-0.7-2":
-  version: 3.4.1-solc-0.7-2
-  resolution: "@openzeppelin/contracts@npm:3.4.1-solc-0.7-2"
-  checksum: 3608a4065f65946117caa543ef72477ce637bd5cc4f4853303b5f5b6c26516f8b50898ea3a8486e2877689cae81453ce22c72c8624c77c363c63f019b4086ffa
   languageName: node
   linkType: hard
 

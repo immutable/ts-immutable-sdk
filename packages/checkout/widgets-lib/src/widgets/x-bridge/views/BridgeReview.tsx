@@ -6,12 +6,10 @@ import { EventTargetContext } from 'context/event-target-context/EventTargetCont
 import { text } from 'resources/text/textConfig';
 import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
-
 import { BridgeReviewSummary } from '../components/BridgeReviewSummary';
 
 export function BridgeReview() {
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
-
   const { layoutHeading } = text.views[XBridgeWidgetViews.BRIDGE_REVIEW];
 
   return (
@@ -24,7 +22,7 @@ export function BridgeReview() {
           onCloseButtonClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
         />
       )}
-      footer={<FooterLogo />}
+      footer={(<FooterLogo />)}
     >
       <BridgeReviewSummary />
     </SimpleLayout>

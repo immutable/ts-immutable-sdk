@@ -1,4 +1,4 @@
-import { JsonRpcProvider } from '@ethersproject/providers';
+import { JsonRpcProvider, JsonRpcBatchProvider } from '@ethersproject/providers';
 import { Contract } from '@ethersproject/contracts';
 import { BigNumber } from '@ethersproject/bignumber';
 import { InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError, NoRoutesAvailableError } from 'errors';
@@ -71,11 +71,14 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
     }));
 
     (JsonRpcProvider as unknown as jest.Mock).mockImplementation(() => ({
+      connect: jest.fn().mockResolvedValue(erc20Contract),
+    })) as unknown as JsonRpcProvider;
+
+    (JsonRpcBatchProvider as unknown as jest.Mock).mockImplementation(() => ({
       getFeeData: async () => ({
         maxFeePerGas: null,
         gasPrice: TEST_GAS_PRICE,
       }),
-      connect: jest.fn().mockResolvedValue(erc20Contract),
     })) as unknown as JsonRpcProvider;
   });
 
