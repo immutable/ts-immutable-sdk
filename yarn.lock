@@ -2222,6 +2222,29 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@biom3/react@npm:^0.19.13":
+  version: 0.19.13
+  resolution: "@biom3/react@npm:0.19.13"
+  dependencies:
+    "@biom3/design-tokens": "*"
+    "@emotion/css": ^11.11.2
+    "@emotion/react": ^11.11.1
+    "@rive-app/react-canvas": ^4.5.0
+    buffer: ^6.0.3
+    csstype: ^3.1.2
+    framer-motion: ^10.12.12
+    lodash.debounce: ^4.0.8
+    lodash.get: ^4.4.2
+    lodash.isequal: ^4.5.0
+    lodash.throttle: ^4.1.1
+    react: ^18.2.0
+    react-dom: ^18.2.0
+    react-is: ^18.2.0
+    ts-deepmerge: ^6.2.0
+  checksum: fb9216823c3dc44b5dec21f83d908ca033cfbc07e83d55d4f4fc0346c5d9b3686979a67438ddb5d55673280b2708ab502a863b95897b0cbba45147d6b83eb649
+  languageName: node
+  linkType: hard
+
 "@chevrotain/types@npm:^9.1.0":
   version: 9.1.0
   resolution: "@chevrotain/types@npm:9.1.0"
@@ -3592,7 +3615,7 @@ __metadata:
   resolution: "@imtbl/checkout-widgets@workspace:packages/checkout/widgets-lib"
   dependencies:
     "@biom3/design-tokens": 0.2.9
-    "@biom3/react": ^0.19.11
+    "@biom3/react": ^0.19.13
     "@ethersproject/providers": ^5.7.2
     "@imtbl/bridge-sdk": 0.0.0
     "@imtbl/checkout-sdk": 0.0.0
