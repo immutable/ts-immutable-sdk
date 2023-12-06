@@ -409,6 +409,7 @@ export class TokenBridge {
         req.sourceChainId,
         req.destinationChainId,
         BridgeFeeActions.DEPOSIT,
+        this.config.rootProvider,
         req.gasMultiplier,
       );
     }
@@ -435,8 +436,38 @@ export class TokenBridge {
       req.sourceChainId,
       req.destinationChainId,
       BridgeFeeActions.WITHDRAW,
+      this.config.childProvider,
       req.gasMultiplier,
     );
+  }
+
+  private async checkReceiver(
+    provider: ethers.providers.Provider,
+    address: string,
+  ): Promise<boolean> {
+    const ABI = ['function receive()'];
+
+    const bytecode = await provider.getCode(address);
+
+    // No code : "0x" then the address is not a contract so it is a valid receiver.
+    if (bytecode.length <= 2) return true;
+
+    const contract = new ethers.Contract(address, ABI, provider);
+
+    try {
+      // try to estimate gas for the receive function, if it works it exists
+      await contract.estimateGas.receive();
+      return true;
+    } catch {
+      try {
+        // if receive fails, try to estimate this way which will work if a fallback function is present
+        await provider.estimateGas({ to: address });
+        return true;
+      } catch {
+        // no receive or fallback
+        return false;
+      }
+    }
   }
 
   private async getBridgeTx(
@@ -450,14 +481,24 @@ export class TokenBridge {
     sourceChainId: string,
     destinationChainId: string,
     action: BridgeFeeActions,
+    provider: ethers.providers.Provider,
     gasMultiplier: number = 1.1,
-  ) {
+  ): Promise<BridgeTxResponse> {
     const fees:BridgeFeeResponse = await this.getFee({
       action,
       gasMultiplier,
       sourceChainId,
       destinationChainId,
     });
+
+    const canReceive:boolean = await this.checkReceiver(provider, recipient);
+
+    if (!canReceive) {
+      throw new BridgeError(
+        `address ${recipient} is not a valid receipient`,
+        BridgeErrorType.INVALID_RECIPIENT,
+      );
+    }
 
     // Handle return if it is a native token
     if (token.toUpperCase() === 'NATIVE') {
@@ -508,7 +549,7 @@ export class TokenBridge {
         to: contractAddress,
         value: fees.bridgeFee.toString(),
       },
-    };
+    } as BridgeTxResponse;
   }
 
   private async validateDepositArgs(
