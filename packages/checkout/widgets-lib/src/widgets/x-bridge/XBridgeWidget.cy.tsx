@@ -22,6 +22,7 @@ describe('XBridgeWidget', () => {
   let switchNetworkStub;
   let getNetworkInfoStub;
   let getAllBalancesStub;
+  let sendTransactionStub;
 
   beforeEach(() => {
     cy.viewport('ipad-2');
@@ -33,6 +34,7 @@ describe('XBridgeWidget', () => {
     switchNetworkStub = cy.stub().as('switchNetworkStub');
     getNetworkInfoStub = cy.stub().as('getNetworkInfoStub');
     getAllBalancesStub = cy.stub().as('getAllBalancesStub');
+    sendTransactionStub = cy.stub().as('sendTransaction');
 
     Checkout.prototype.createProvider = createProviderStub;
     Checkout.prototype.checkIsWalletConnected = checkIsWalletConnectedStub;
@@ -40,6 +42,7 @@ describe('XBridgeWidget', () => {
     Checkout.prototype.switchNetwork = switchNetworkStub;
     Checkout.prototype.getNetworkInfo = getNetworkInfoStub;
     Checkout.prototype.getAllBalances = getAllBalancesStub;
+    Checkout.prototype.sendTransaction = sendTransactionStub;
 
     getNetworkSepoliaStub = cy.stub().as('getNetworkSepoliaStub').resolves({ chainId: ChainId.SEPOLIA });
 
@@ -528,7 +531,14 @@ describe('XBridgeWidget', () => {
           },
         ],
       });
-
+      sendTransactionStub.resolves({
+        hash: '0x1234567890',
+        transactionResponse: {
+          wait: cy.stub().resolves({
+            status: 1,
+          }),
+        },
+      });
       switchNetworkStub.resolves({
         provider: mockMetaMaskProvider,
         network: { chainId: ChainId.IMTBL_ZKEVM_TESTNET },
