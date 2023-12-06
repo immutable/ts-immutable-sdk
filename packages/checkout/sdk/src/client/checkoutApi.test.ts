@@ -37,10 +37,10 @@ describe('CheckoutApi', () => {
       };
       mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
-      const type = TransactionType.BRIDGE;
+      const txType = TransactionType.BRIDGE;
       const fromAddress = '0x1234567890';
       const client = new CheckoutApi({ env: Environment.SANDBOX });
-      const resp = await client.getTransactions({ fromAddress, type });
+      const resp = await client.getTransactions({ fromAddress, txType });
 
       // should not contain native token data
       expect(resp.result.length).toEqual(1);
@@ -52,7 +52,7 @@ describe('CheckoutApi', () => {
 
       expect(mockedAxios.get).toHaveBeenNthCalledWith(
         1,
-        `${client.url}/v1/transaction&from_address=${fromAddress}?type=${type}`,
+        `${client.url}/v1/transactions?from_address=${fromAddress}&tx_type=${txType}`,
       );
     });
 
@@ -66,17 +66,17 @@ describe('CheckoutApi', () => {
       };
       mockedAxios.get.mockResolvedValue(mockResponse);
 
-      const type = TransactionType.BRIDGE;
+      const txType = TransactionType.BRIDGE;
       const fromAddress = '0x1234567890';
       const client = new CheckoutApi({ env: Environment.SANDBOX, ttl: 60 });
-      const precache = await client.getTransactions({ fromAddress, type });
-      const cached = await client.getTransactions({ fromAddress, type });
+      const precache = await client.getTransactions({ fromAddress, txType });
+      const cached = await client.getTransactions({ fromAddress, txType });
 
       expect(cached).toEqual(precache);
 
       expect(mockedAxios.get).toHaveBeenNthCalledWith(
         1,
-        `${client.url}/v1/transaction&from_address=${fromAddress}?type=${type}`,
+        `${client.url}/v1/transactions?from_address=${fromAddress}&tx_type=${txType}`,
       );
     });
 
@@ -90,17 +90,17 @@ describe('CheckoutApi', () => {
       };
       mockedAxios.get.mockResolvedValue(mockResponse);
 
-      const type = TransactionType.BRIDGE;
+      const txType = TransactionType.BRIDGE;
       const fromAddress = '0x1234567890';
       const client = new CheckoutApi({ env: Environment.SANDBOX });
-      const precache = await client.getTransactions({ fromAddress, type });
-      const cached = await client.getTransactions({ fromAddress, type });
+      const precache = await client.getTransactions({ fromAddress, txType });
+      const cached = await client.getTransactions({ fromAddress, txType });
 
       expect(cached).toEqual(precache);
 
       expect(mockedAxios.get).toHaveBeenNthCalledWith(
         2,
-        `${client.url}/v1/transaction&from_address=${fromAddress}?type=${type}`,
+        `${client.url}/v1/transactions?from_address=${fromAddress}&tx_type=${txType}`,
       );
     });
 
@@ -112,11 +112,11 @@ describe('CheckoutApi', () => {
       };
       mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
-      const type = TransactionType.BRIDGE;
+      const txType = TransactionType.BRIDGE;
       const fromAddress = '0x1234567890';
       const client = new CheckoutApi({ env: Environment.SANDBOX });
       try {
-        await client.getTransactions({ fromAddress, type });
+        await client.getTransactions({ fromAddress, txType });
       } catch (error: any) {
         expect(CheckoutApi.isHttpError(error)).toBe(true);
         expect((error as AxiosError).code).toEqual(HttpStatusCode.BadRequest);
@@ -132,11 +132,11 @@ describe('CheckoutApi', () => {
       };
       mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
-      const type = TransactionType.BRIDGE;
+      const txType = TransactionType.BRIDGE;
       const fromAddress = '0x1234567890';
       const client = new CheckoutApi({ env: Environment.SANDBOX });
       try {
-        await client.getTransactions({ fromAddress, type });
+        await client.getTransactions({ fromAddress, txType });
       } catch (error: any) {
         expect(CheckoutApi.isHttpError(error)).toBe(true);
         expect((error as AxiosError).code).toEqual(HttpStatusCode.InternalServerError);
@@ -147,11 +147,11 @@ describe('CheckoutApi', () => {
     it('throws', async () => {
       mockedAxios.get.mockRejectedValueOnce('error');
 
-      const type = TransactionType.BRIDGE;
+      const txType = TransactionType.BRIDGE;
       const fromAddress = '0x1234567890';
       const client = new CheckoutApi({ env: Environment.SANDBOX });
       try {
-        await client.getTransactions({ fromAddress, type });
+        await client.getTransactions({ fromAddress, txType });
       } catch (error: any) {
         expect(CheckoutApi.isHttpError(error)).toBe(true);
         expect((error as AxiosError).code).toEqual(HttpStatusCode.InternalServerError);

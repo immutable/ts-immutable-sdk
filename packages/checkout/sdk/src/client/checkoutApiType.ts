@@ -19,7 +19,7 @@ export type BlockchainMetadata = {
 };
 
 export type Transaction = {
-  type: TransactionType
+  tx_type: TransactionType
   details: TransactionDetails
   blockchain_metadata: BlockchainMetadata
   updated_at: string

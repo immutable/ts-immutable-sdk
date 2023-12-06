@@ -1,7 +1,8 @@
-import axios, { AxiosError, AxiosResponse, HttpStatusCode } from 'axios';
+import axios, { AxiosError, HttpStatusCode } from 'axios';
 import { Environment } from '@imtbl/config';
 import { CHECKOUT_API_BASE_URL } from '@imtbl/checkout-sdk/src/env';
 import { TransactionType, Transactions } from './checkoutApiType';
+import { ENV_DEVELOPMENT } from '../env';
 
 type CacheData = {
   data: any,
@@ -9,7 +10,7 @@ type CacheData = {
 };
 
 type GetTransactions = {
-  type: TransactionType,
+  txType: TransactionType,
   fromAddress: string,
 };
 
@@ -27,10 +28,6 @@ export class CheckoutApi {
 
   private cacheMap: { [key: string]: CacheData };
 
-  private static async makeHttpRequest(url: string): Promise<AxiosResponse> {
-    return axios.get(url);
-  }
-
   private setCache(key: string, data: any) {
     this.cacheMap[key] = { data, ttl: new Date().getTime() + this.ttl * 1000 };
   }
@@ -47,7 +44,7 @@ export class CheckoutApi {
    * @param ttl cache TTL
    */
   constructor(params: {
-    env: Environment;
+    env: Environment | typeof ENV_DEVELOPMENT;
     ttl?: number
   }) {
     this.env = params.env;
@@ -64,21 +61,21 @@ export class CheckoutApi {
   public static isHttpError = (err: any): boolean => 'code' in err;
 
   /**
-   * getNativeTokenByWalletAddress fetches a list of blockchain transactions.
-   * @param type transaction type
+   * getTransactions fetches a list of blockchain transactions.
+   * @param txType transaction type
    * @param fromAddress transactions executed from address
    */
   public async getTransactions(params: GetTransactions): Promise<Transactions> {
-    const { type, fromAddress } = params;
+    const { txType, fromAddress } = params;
 
     try {
-      const url = `${this.url}/v1/transaction&from_address=${fromAddress}?type=${type}`;
+      const url = `${this.url}/v1/transactions?from_address=${fromAddress}&tx_type=${txType}`;
 
       // Cache response data to prevent unnecessary requests
       const cached = this.getCache(url);
       if (cached) return Promise.resolve(cached);
 
-      const response = await CheckoutApi.makeHttpRequest(url);
+      const response = await axios.get(url);
       if (response.status >= 400) {
         return Promise.reject({
           code: response.status,

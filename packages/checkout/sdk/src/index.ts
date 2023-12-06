@@ -13,6 +13,7 @@ export * from './widgets/definitions/configurations';
 // SDKs
 
 export { Checkout } from './sdk';
+
 export {
   ChainId,
   ChainName,
@@ -29,6 +30,7 @@ export {
   WalletFilterTypes,
   WalletProviderName,
 } from './types';
+
 export type {
   AllowedNetworkConfig,
   AvailableRoutingOptions,
@@ -121,8 +123,18 @@ export type {
   WalletFilter,
   WalletInfo,
 } from './types';
+
 export type { ErrorType } from './errors';
+
 export { CheckoutErrorType } from './errors';
 export { CheckoutConfiguration } from './config';
 
-export const Clients = { CheckoutApi };
+export type {
+  TransactionType,
+  Transactions,
+  TransactionDetails,
+  BlockchainMetadata,
+  Transaction,
+} from './client';
+
+export const ServiceClients = { CheckoutApi };
