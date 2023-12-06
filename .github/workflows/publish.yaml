@@ -108,7 +108,7 @@ jobs:
       - name: Pre Release Step
         if: contains(github.event.inputs.release_type, 'alpha')
         id: pre_release
-        uses: JS-DevTools/npm-publish@v1
+        uses: JS-DevTools/npm-publish@v3
         with:
           token: ${{ secrets.PLATFORM_SA_NPM_TOKEN }}
           access: public
