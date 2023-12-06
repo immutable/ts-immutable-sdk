@@ -21,3 +21,9 @@ const { approval, quote, swap } = exchange.getUnsignedSwapTxFromAmountIn(
   inputAmount,
 );
 ```
+
+The returned values are:
+
+- `approval`: The approval transaction that needs to be signed and sent to the blockchain before the swap transaction.
+- `quote`: The quote information that details the swap.
+- `swap`: The swap transaction that needs to be signed and sent to the blockchain after the approval transaction.
