@@ -2,6 +2,8 @@ import { Environment } from '@imtbl/config';
 import { CheckoutErrorType, WalletProviderName, WidgetTheme } from '@imtbl/checkout-sdk';
 import { RetryType } from './retry';
 
+export const ENV_DEVELOPMENT = 'development' as Environment;
+
 export const NATIVE = 'native';
 
 export const DEFAULT_TOKEN_DECIMALS = 18;
@@ -67,3 +69,12 @@ export const DEFAULT_BRIDGE_ENABLED = true;
  * Checkout Widget default refresh quote interval
  */
 export const DEFAULT_QUOTE_REFRESH_INTERVAL = 30000;
+
+/**
+ * Base URL for the checkout CDN based on the environment.
+ */
+export const CHECKOUT_CDN_BASE_URL = {
+  [ENV_DEVELOPMENT]: 'https://checkout-api.dev.immutable.com',
+  [Environment.SANDBOX]: 'https://checkout-api.sandbox.immutable.com',
+  [Environment.PRODUCTION]: 'https://checkout-api.immutable.com',
+};
