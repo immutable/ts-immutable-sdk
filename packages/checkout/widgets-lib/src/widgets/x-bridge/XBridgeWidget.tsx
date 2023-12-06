@@ -80,11 +80,13 @@ export function XBridgeWidget({
   const bridgeReducerValues = useMemo(() => ({ bridgeState, bridgeDispatch }), [bridgeState, bridgeDispatch]);
   const themeReducerValue = useMemo(() => widgetTheme(theme), [theme]);
 
-  const showBridgeView = useCallback(() => {
+  const goBackToReview = useCallback(() => {
     viewDispatch({
       payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: { type: XBridgeWidgetViews.WALLET_NETWORK_SELECTION },
+        type: ViewActions.GO_BACK_TO,
+        view: {
+          type: XBridgeWidgetViews.BRIDGE_REVIEW,
+        },
       },
     });
   }, [viewDispatch]);
@@ -133,12 +135,12 @@ export function XBridgeWidget({
                   const data = viewState.view as ErrorViewType;
 
                   if (!data.tryAgain) {
-                    showBridgeView();
+                    goBackToReview();
                     setErrorViewLoading(false);
                     return;
                   }
 
-                  if (await data.tryAgain()) showBridgeView();
+                  if (await data.tryAgain()) goBackToReview();
                   setErrorViewLoading(false);
                 }}
                 onCloseClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
