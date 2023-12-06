@@ -190,11 +190,9 @@ export function ApproveTransaction({ data }: ApproveTransactionProps) {
     from,
     showErrorView,
     viewDispatch,
-    setRejectedBridge,
     data.transaction,
     data.approveTransaction,
     actionDisabled,
-    setActionDisabled,
   ]);
 
   return (
