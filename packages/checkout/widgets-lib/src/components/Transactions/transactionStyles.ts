@@ -6,21 +6,22 @@ export const containerStyles = {
 };
 
 export const actionsContainerStyles = {
-  py: 'base.spacing.x4',
-  px: 'base.spacing.x3',
+  pt: 'base.spacing.x3',
+  pb: 'base.spacing.x2',
+  px: 'base.spacing.x4',
   d: 'flex',
   position: 'relative',
 };
 
 export const actionsLayoutStyles = {
-  flexDirection: 'column',
   display: 'flex',
   flexGrow: '1',
-  justifyContent: 'center',
+  alignItems: 'center',
+  gap: 'base.spacing.x1',
 };
 
 export const actionsBadgeStyles = {
   position: 'absolute',
-  right: 'base.spacing.x1',
+  right: 'base.spacing.x2',
   top: 'base.spacing.x2',
 };

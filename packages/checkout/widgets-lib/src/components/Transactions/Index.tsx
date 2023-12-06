@@ -10,7 +10,6 @@ import { isPassportProvider } from 'lib/providerUtils';
 import { sendBridgeWidgetCloseEvent } from '../../widgets/x-bridge/BridgeWidgetEvents';
 import { XBridgeContext } from '../../widgets/x-bridge/context/XBridgeContext';
 import { TransactionsInProgress } from './SectionInProgress';
-import { TransactionsActionRequired } from './SectionActionRequired';
 import { Shimmer } from './Shimmer';
 import { transactionsListStyle } from './indexStyles';
 import { EmptyStateNotConnected } from './EmptyStateNotConnected';
@@ -24,7 +23,7 @@ export function Transactions() {
 
   const isPassport = isPassportProvider(web3Provider);
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   // Simulate loading
   setTimeout(() => setLoading(false), 1000);
@@ -49,7 +48,7 @@ export function Transactions() {
               <Box sx={transactionsListStyle(isPassport)}>
                 {loading ? <Shimmer /> : (
                   <>
-                    <TransactionsActionRequired />
+                    {/* <TransactionsActionRequired /> */}
                     <TransactionsInProgress />
                   </>
                 )}
