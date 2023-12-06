@@ -1,5 +1,5 @@
 import { TradeType } from '@uniswap/sdk-core';
-import { BigNumber, BigNumberish, utils } from 'ethers';
+import { BigNumber, BigNumberish, utils, providers } from 'ethers';
 import { Pool, Route, TickMath } from '@uniswap/v3-sdk';
 import { SwapRouter } from '@uniswap/router-sdk';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
@@ -11,7 +11,9 @@ import { NativeTokenService } from 'lib/nativeTokenService';
 import { ExchangeModuleConfiguration, SecondaryFee, CoinAmount, Coin, ERC20, Native, Amount } from 'types';
 import { erc20ToUniswapToken, newAmount, Router, RoutingContracts } from '../lib';
 
-export const TEST_GAS_PRICE = BigNumber.from('1500000000'); // 1.5 gwei or 1500000000 wei
+export const TEST_BASE_FEE = BigNumber.from('49'); // 49 wei
+export const TEST_MAX_PRIORITY_FEE_PER_GAS = BigNumber.from('10000000000'); // 10 gwei
+export const TEST_GAS_PRICE = BigNumber.from('10000000098');
 export const TEST_TRANSACTION_GAS_USAGE = BigNumber.from('200000'); // 200,000 gas units
 
 export const TEST_CHAIN_ID = 999;
@@ -519,3 +521,20 @@ export function newAmountFromString<T extends Coin>(amount: string, token: T): C
   const bn = utils.parseUnits(amount, token.decimals);
   return newAmount(bn, token);
 }
+
+export const buildBlock = ({ baseFeePerGas }: { baseFeePerGas: BigNumber | null }): providers.Block => ({
+  baseFeePerGas,
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  _difficulty: BigNumber.from('0'),
+  difficulty: 0,
+  extraData: '',
+  gasLimit: BigNumber.from('0'),
+  gasUsed: BigNumber.from('0'),
+  hash: '',
+  miner: '',
+  nonce: '',
+  number: 0,
+  parentHash: '',
+  timestamp: 0,
+  transactions: [],
+});

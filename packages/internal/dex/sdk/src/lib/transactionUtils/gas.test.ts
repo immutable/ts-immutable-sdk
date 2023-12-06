@@ -1,25 +1,8 @@
-import { expectToBeDefined, formatAmount, NATIVE_TEST_TOKEN } from 'test/utils';
+import { buildBlock, expectToBeDefined, formatAmount, NATIVE_TEST_TOKEN } from 'test/utils';
 import { newAmount } from 'lib/utils';
 import { BigNumber, providers } from 'ethers';
 import { IMMUTABLE_TESTNET_RPC_URL, IMMUTABLE_TESTNET_CHAIN_ID } from 'constants/chains';
 import { calculateGasFee, fetchGasPrice } from './gas';
-
-const buildBlock = ({ baseFeePerGas }: { baseFeePerGas: BigNumber | null }): providers.Block => ({
-  baseFeePerGas,
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  _difficulty: BigNumber.from('0'),
-  difficulty: 0,
-  extraData: '',
-  gasLimit: BigNumber.from('0'),
-  gasUsed: BigNumber.from('0'),
-  hash: '',
-  miner: '',
-  nonce: '',
-  number: 0,
-  parentHash: '',
-  timestamp: 0,
-  transactions: [],
-});
 
 describe('calculateGasFee', () => {
   describe('when given a price and gas used', () => {
