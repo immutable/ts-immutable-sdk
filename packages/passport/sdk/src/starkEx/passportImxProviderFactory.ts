@@ -6,7 +6,6 @@ import AuthManager from '../authManager';
 import { ConfirmationScreen } from '../confirmation';
 import MagicAdapter from '../magicAdapter';
 import {
-  DeviceTokenResponse,
   PassportEventMap,
   User,
 } from '../types';
@@ -74,26 +73,8 @@ export class PassportImxProviderFactory {
     return this.createProviderInstance(user);
   }
 
-  public async getProviderWithDeviceFlow(
-    deviceCode: string,
-    interval: number,
-    timeoutMs?: number,
-  ): Promise<IMXProvider> {
-    const user = await this.authManager.connectImxDeviceFlow(deviceCode, interval, timeoutMs);
-    return this.createProviderInstance(user);
-  }
-
   public async getProviderWithPKCEFlow(authorizationCode: string, state: string): Promise<IMXProvider> {
     const user = await this.authManager.connectImxPKCEFlow(authorizationCode, state);
-    return this.createProviderInstance(user);
-  }
-
-  public async getProviderWithCredentials(tokenResponse: DeviceTokenResponse): Promise<IMXProvider | null> {
-    const user = await this.authManager.connectImxWithCredentials(tokenResponse);
-    if (!user) {
-      return null;
-    }
-
     return this.createProviderInstance(user);
   }
 

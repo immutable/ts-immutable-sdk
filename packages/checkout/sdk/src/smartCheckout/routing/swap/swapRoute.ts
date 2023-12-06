@@ -6,7 +6,6 @@ import {
   ChainId,
   FundingStepType,
   GetBalanceResult,
-  IMX_ADDRESS_ZKEVM,
   ItemType,
   SwapFees,
   SwapFundingStep,
@@ -15,6 +14,7 @@ import {
 import { BalanceCheckResult, BalanceRequirement } from '../../balanceCheck/types';
 import { TokenBalanceResult } from '../types';
 import { quoteFetcher } from './quoteFetcher';
+import { isNativeToken } from '../../../tokens';
 
 const constructFees = (
   approvalGasFees: Amount | null | undefined,
@@ -87,7 +87,7 @@ export const constructSwapRoute = (
   const tokenAddress = userBalance.token.address;
 
   let type = ItemType.ERC20;
-  if (tokenAddress === IMX_ADDRESS_ZKEVM) {
+  if (isNativeToken(tokenAddress)) {
     type = ItemType.NATIVE;
   }
 
@@ -113,6 +113,20 @@ export const constructSwapRoute = (
   };
 };
 
+export const isBalanceRequirementTokenValid = (
+  balanceRequirement: BalanceRequirement,
+): boolean => {
+  if (balanceRequirement.type === ItemType.ERC20) {
+    return !!balanceRequirement.required.token.address;
+  }
+
+  if (balanceRequirement.type === ItemType.NATIVE) {
+    return isNativeToken(balanceRequirement.required.token.address);
+  }
+
+  return false;
+};
+
 export const getRequiredToken = (
   balanceRequirement: BalanceRequirement,
 ): { address: string, amount: BigNumber } => {
@@ -121,11 +135,10 @@ export const getRequiredToken = (
 
   switch (balanceRequirement.type) {
     case ItemType.ERC20:
-      address = balanceRequirement.required.token.address ?? '';
+      address = balanceRequirement.required.token.address!;
       amount = balanceRequirement.delta.balance;
       break;
     case ItemType.NATIVE:
-      address = IMX_ADDRESS_ZKEVM;
       amount = balanceRequirement.delta.balance;
       break;
     default: break;
@@ -155,7 +168,12 @@ export const checkUserCanCoverApprovalFees = (
   }
 
   // Find the users balance of the approval token
-  const l2BalanceOfApprovalToken = l2Balances.find((balance) => balance.token.address === approvalGasTokenAddress);
+  const l2BalanceOfApprovalToken = l2Balances.find(
+    (balance) => (
+      isNativeToken(balance.token.address) && isNativeToken(approvalGasTokenAddress))
+    || balance.token.address === approvalGasTokenAddress,
+  );
+
   if (!l2BalanceOfApprovalToken) return { sufficient: false, approvalGasFee, approvalGasTokenAddress };
 
   // If the user does not have enough of the token to cover approval fees then return sufficient false
@@ -182,7 +200,7 @@ export const checkUserCanCoverSwapFees = (
   const feeMap = new Map<string, BigNumber>();
 
   // Add the approval fee to list of fees
-  if (approvalFees.approvalGasTokenAddress !== '') {
+  if (approvalFees.approvalGasFee.gt(BigNumber.from(0))) {
     feeMap.set(approvalFees.approvalGasTokenAddress, approvalFees.approvalGasFee);
   }
 
@@ -219,7 +237,11 @@ export const checkUserCanCoverSwapFees = (
   // Go through the map and for each token address check if the user has enough balance to cover the fee
   for (const [tokenAddress, fee] of feeMap.entries()) {
     if (fee === BigNumber.from(0)) continue;
-    const l2BalanceOfFeeToken = l2Balances.find((balance) => balance.token.address === tokenAddress);
+    const l2BalanceOfFeeToken = l2Balances.find(
+      (balance) => (
+        isNativeToken(balance.token.address) && isNativeToken(tokenAddress))
+        || balance.token.address === tokenAddress,
+    );
     if (!l2BalanceOfFeeToken) {
       return false;
     }
@@ -291,9 +313,9 @@ export const swapRoute = async (
   const fundingSteps: SwapFundingStep[] = [];
   if (!availableRoutingOptions.swap) return fundingSteps;
   if (swappableTokens.length === 0) return fundingSteps;
+  if (!isBalanceRequirementTokenValid(balanceRequirement)) return fundingSteps;
 
   const requiredToken = getRequiredToken(balanceRequirement);
-  if (requiredToken.address === '') return fundingSteps;
 
   const chainId = getL2ChainId(config);
   const l2TokenBalanceResult = tokenBalanceResults.get(chainId);

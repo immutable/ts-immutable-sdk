@@ -15,6 +15,7 @@ interface TokenBalanceListProps {
   balanceInfoItems: BalanceInfo[];
   bridgeToL2OnClick: (address?: string) => void;
 }
+
 export function TokenBalanceList({
   balanceInfoItems,
   bridgeToL2OnClick,

@@ -3,6 +3,13 @@ node_modules/
 # build folders
 dist/
 docs/
+sdk/scripts/
+
+# test configs
+jest.*.js
+
+# Readmes
+**/*.md
 
 # sample apps
 **sample-app**/

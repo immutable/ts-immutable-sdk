@@ -6,16 +6,24 @@ import { fetchGasPrice } from 'lib/transactionUtils/gas';
 import { getApproval, prepareApproval } from 'lib/transactionUtils/approval';
 import { getOurQuoteReqAmount, prepareUserQuote } from 'lib/transactionUtils/getQuote';
 import { Fees } from 'lib/fees';
-import { SecondaryFee__factory } from 'contracts/types';
+import { Multicall__factory, SecondaryFee__factory } from 'contracts/types';
 import { NativeTokenService } from 'lib/nativeTokenService';
-import { DEFAULT_DEADLINE, DEFAULT_MAX_HOPS, DEFAULT_SLIPPAGE, MAX_MAX_HOPS, MIN_MAX_HOPS } from './constants';
+import { DEFAULT_MAX_HOPS, DEFAULT_SLIPPAGE, MAX_MAX_HOPS, MIN_MAX_HOPS } from './constants';
 import { Router } from './lib/router';
-import { getTokenDecimals, isValidNonZeroAddress, isValidTokenLiteral, newAmount, toPublicAmount } from './lib/utils';
+import {
+  getDefaultDeadlineSeconds,
+  getTokenDecimals,
+  isValidNonZeroAddress,
+  isValidTokenLiteral,
+  newAmount,
+  toPublicAmount,
+} from './lib/utils';
 import {
   Coin,
   CoinAmount,
   ERC20,
   ExchangeModuleConfiguration,
+  Native,
   Quote,
   SecondaryFee,
   TransactionResponse,
@@ -39,13 +47,15 @@ const toPublicQuote = (
 });
 
 export class Exchange {
-  private provider: ethers.providers.JsonRpcProvider;
+  private provider: ethers.providers.StaticJsonRpcProvider;
+
+  private batchProvider: ethers.providers.JsonRpcBatchProvider;
 
   private router: Router;
 
   private chainId: number;
 
-  private nativeToken: Coin;
+  private nativeToken: Native;
 
   private wrappedNativeToken: ERC20;
 
@@ -68,13 +78,24 @@ export class Exchange {
     this.routerContractAddress = config.chain.contracts.peripheryRouter;
     this.secondaryFeeContractAddress = config.chain.contracts.secondaryFee;
 
-    this.provider = new ethers.providers.JsonRpcProvider(config.chain.rpcUrl);
+    this.provider = new ethers.providers.StaticJsonRpcProvider({
+      url: config.chain.rpcUrl,
+      skipFetchSetup: true,
+    }, config.chain.chainId);
 
-    this.router = new Router(this.provider, config.chain.commonRoutingTokens, {
-      multicallAddress: config.chain.contracts.multicall,
-      factoryAddress: config.chain.contracts.coreFactory,
-      quoterAddress: config.chain.contracts.quoterV2,
-    });
+    this.batchProvider = new ethers.providers.JsonRpcBatchProvider({
+      url: config.chain.rpcUrl,
+      skipFetchSetup: true,
+    }, config.chain.chainId);
+
+    const multicallContract = Multicall__factory.connect(config.chain.contracts.multicall, this.provider);
+
+    this.router = new Router(
+      this.batchProvider,
+      multicallContract,
+      config.chain.commonRoutingTokens,
+      config.chain.contracts,
+    );
   }
 
   private static validate(
@@ -94,12 +115,12 @@ export class Exchange {
     assert(slippagePercent >= 0, new InvalidSlippageError('slippage percent must be greater than or equal to 0'));
   }
 
-  private async getSecondaryFees() {
+  private async getSecondaryFees(provider: ethers.providers.JsonRpcBatchProvider) {
     if (this.secondaryFees.length === 0) {
       return [];
     }
 
-    const secondaryFeeContract = SecondaryFee__factory.connect(this.secondaryFeeContractAddress, this.provider);
+    const secondaryFeeContract = SecondaryFee__factory.connect(this.secondaryFeeContractAddress, provider);
 
     if (await secondaryFeeContract.paused()) {
       // Do not use secondary fees if the contract is paused
@@ -135,11 +156,14 @@ export class Exchange {
     Exchange.validate(tokenInLiteral, tokenOutLiteral, maxHops, slippagePercent, fromAddress);
 
     // get the decimals of the tokens that will be swapped
-    const [tokenInDecimals, tokenOutDecimals, secondaryFees] = await Promise.all([
-      getTokenDecimals(tokenInLiteral, this.provider, this.nativeToken),
-      getTokenDecimals(tokenOutLiteral, this.provider, this.nativeToken),
-      this.getSecondaryFees(),
-    ]);
+    const promises = [
+      getTokenDecimals(tokenInLiteral, this.batchProvider, this.nativeToken),
+      getTokenDecimals(tokenOutLiteral, this.batchProvider, this.nativeToken),
+      this.getSecondaryFees(this.batchProvider),
+      fetchGasPrice(this.batchProvider, this.nativeToken),
+    ] as const;
+
+    const [tokenInDecimals, tokenOutDecimals, secondaryFees, gasPrice] = await Promise.all(promises);
 
     const tokenIn = this.parseTokenLiteral(tokenInLiteral, tokenInDecimals);
     const tokenOut = this.parseTokenLiteral(tokenOutLiteral, tokenOutDecimals);
@@ -155,15 +179,12 @@ export class Exchange {
     const ourQuoteReqAmount = getOurQuoteReqAmount(amountSpecified, fees, tradeType, this.nativeTokenService);
 
     // Quotes will always use ERC20s. If the user-specified token is Native, we use the Wrapped Native Token pool
-    const [ourQuote, gasPrice] = await Promise.all([
-      this.router.findOptimalRoute(
-        ourQuoteReqAmount,
-        this.nativeTokenService.maybeWrapToken(otherToken),
-        tradeType,
-        maxHops,
-      ),
-      fetchGasPrice(this.provider, this.nativeToken),
-    ]);
+    const ourQuote = await this.router.findOptimalRoute(
+      ourQuoteReqAmount,
+      this.nativeTokenService.maybeWrapToken(otherToken),
+      tradeType,
+      maxHops,
+    );
 
     const adjustedQuote = adjustQuoteWithFees(ourQuote, amountSpecified, fees, this.nativeTokenService);
 
@@ -228,7 +249,7 @@ export class Exchange {
     amountIn: ethers.BigNumberish,
     slippagePercent: number = DEFAULT_SLIPPAGE,
     maxHops: number = DEFAULT_MAX_HOPS,
-    deadline: number = DEFAULT_DEADLINE,
+    deadline: number = getDefaultDeadlineSeconds(),
   ): Promise<TransactionResponse> {
     return await this.getUnsignedSwapTx(
       fromAddress,
@@ -262,7 +283,7 @@ export class Exchange {
     amountOut: ethers.BigNumberish,
     slippagePercent: number = DEFAULT_SLIPPAGE,
     maxHops: number = DEFAULT_MAX_HOPS,
-    deadline: number = DEFAULT_DEADLINE,
+    deadline: number = getDefaultDeadlineSeconds(),
   ): Promise<TransactionResponse> {
     return await this.getUnsignedSwapTx(
       fromAddress,

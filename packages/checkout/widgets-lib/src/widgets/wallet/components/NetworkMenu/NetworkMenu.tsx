@@ -11,7 +11,7 @@ import {
   NetworkInfo,
   SwitchNetworkParams,
 } from '@imtbl/checkout-sdk';
-import { WalletActions, WalletContext } from '../../context/WalletContext';
+import { WalletContext } from '../../context/WalletContext';
 import { text } from '../../../../resources/text/textConfig';
 import { sendNetworkSwitchEvent } from '../../WalletWidgetEvents';
 import {
@@ -82,18 +82,12 @@ export function NetworkMenu({ setBalancesLoading }: NetworkMenuProps) {
       });
 
       try {
+        setBalancesLoading(true);
+
         const switchNetworkResult = await checkout.switchNetwork({
           provider,
           chainId,
         } as SwitchNetworkParams);
-
-        setBalancesLoading(true);
-        walletDispatch({
-          payload: {
-            type: WalletActions.SET_NETWORK,
-            network: switchNetworkResult.network,
-          },
-        });
 
         sendNetworkSwitchEvent(eventTarget, switchNetworkResult.provider, switchNetworkResult.network);
       } catch (err: any) {

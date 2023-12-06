@@ -6,7 +6,7 @@
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "devDependencies": {
     "@actions/core": "^1.10.1",
-    "@release-it-plugins/workspaces": "^3.2.0",
+    "@release-it-plugins/workspaces": "^4.0.0",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
     "eslint": "^8.40.0",
@@ -16,7 +16,7 @@
     "husky": "^8.0.3",
     "lint-staged": "^13.2.0",
     "node-gyp": "^9.3.1",
-    "release-it": "^15.10.1",
+    "release-it": "^16.1.3",
     "syncpack": "^9.8.4",
     "typedoc": "^0.24.8",
     "wsrun": "^5.2.4"
@@ -30,11 +30,15 @@
     "*": "yarn scan:secrets",
     "*.{js,jsx,ts,tsx}": "eslint"
   },
+  "overrides": {
+    "@openzeppelin/contracts": "3.4.2-solc-0.7"
+  },
   "packageManager": "yarn@3.6.1",
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "resolutions": {
-    "@biom3/design-tokens": "0.2.4-beta"
+    "@biom3/design-tokens": "0.2.4-beta",
+    "@openzeppelin/contracts": "3.4.2-solc-0.7"
   },
   "scripts": {
     "build": "NODE_OPTIONS=--max-old-space-size=14366 wsrun -y 4 -p @imtbl/sdk -p @imtbl/checkout-widgets-lib -e -r --serial build && yarn syncpack:format && yarn wsrun -p @imtbl/sdk -a -m copyBrowserBundles",
@@ -52,40 +56,46 @@
     "test": "wsrun --exclude-missing -e test",
     "test:checkout:cypress": "wsrun -p @imtbl/checkout-widgets-lib --exclude-missing -e test:cypress",
     "test:checkout:sdk:coverage": "wsrun -p @imtbl/checkout-sdk --exclude-missing -e test:coverage",
+    "test:samples": "cd samples/apps/ts-immutable-sample && yarn test && yarn test:e2e",
     "test:vpn": "RUN_VPN_TESTS=1 wsrun --exclude-missing -e test",
     "typecheck": "wsrun --exclude-missing typecheck"
   },
-  "workspaces": [
-    "sdk",
-    "packages/config",
-    "packages/immutablex_client",
-    "packages/passport/sdk",
-    "packages/passport/sdk-sample-app",
-    "packages/provider",
-    "packages/provider/src/sample-app",
-    "packages/orderbook",
-    "packages/internal/version-check",
-    "packages/internal/contracts",
-    "packages/internal/toolkit",
-    "packages/internal/cryptofiat",
-    "packages/internal/dex/sdk",
-    "packages/internal/dex/sdk-sample-app",
-    "packages/internal/bridge/sdk",
-    "packages/internal/factory/sdk",
-    "packages/internal/factory/factory-sample-app",
-    "packages/internal/generated-clients",
-    "packages/internal/guardian",
-    "packages/internal/bridge/bridge-sample-app",
-    "packages/checkout/sdk",
-    "packages/checkout/sdk-sample-app",
-    "packages/checkout/widgets-sample-app",
-    "packages/checkout/widgets-lib",
-    "packages/economy/sdk",
-    "packages/economy/playground",
-    "packages/economy/services",
-    "packages/blockchain-data/sdk",
-    "packages/blockchain-data/sample-app",
-    "packages/game-bridge",
-    "packages/internal/economy-building-blocks/playground"
-  ]
+  "workspaces": {
+    "packages": [
+      "sdk",
+      "packages/config",
+      "packages/immutablex_client",
+      "packages/passport/sdk",
+      "packages/passport/sdk-sample-app",
+      "packages/provider",
+      "packages/provider/src/sample-app",
+      "packages/orderbook",
+      "packages/internal/version-check",
+      "packages/internal/contracts",
+      "packages/internal/toolkit",
+      "packages/internal/cryptofiat",
+      "packages/internal/dex/sdk",
+      "packages/internal/dex/sdk-sample-app",
+      "packages/internal/bridge/sdk",
+      "packages/internal/factory/sdk",
+      "packages/internal/factory/factory-sample-app",
+      "packages/internal/generated-clients",
+      "packages/internal/guardian",
+      "packages/internal/bridge/bridge-sample-app",
+      "packages/checkout/sdk",
+      "packages/checkout/sdk-sample-app",
+      "packages/checkout/widgets-sample-app",
+      "packages/checkout/widgets-lib",
+      "packages/economy/sdk",
+      "packages/economy/playground",
+      "packages/economy/services",
+      "packages/blockchain-data/sdk",
+      "packages/blockchain-data/sample-app",
+      "packages/game-bridge",
+      "packages/internal/economy-building-blocks/playground"
+    ],
+    "nohoist": [
+      "samples/**"
+    ]
+  }
 }

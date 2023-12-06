@@ -21,6 +21,7 @@ export function FooterButton({
       <Button
         testId="footer-button"
         size="large"
+        sx={{ width: '100%' }}
         variant="secondary"
         disabled={loading}
         onClick={onActionClick}

@@ -1,11 +1,11 @@
 /* eslint-disable arrow-body-style */
 import { BigNumber, utils } from 'ethers';
 import {
-  DEFAULT_TOKEN_DECIMALS,
   ERC20Item,
   ERC721Balance,
   ERC721Item,
-  IMX_ADDRESS_ZKEVM, ItemBalance, ItemRequirement,
+  ItemBalance,
+  ItemRequirement,
   ItemType,
   NativeItem,
   TokenBalance,
@@ -16,12 +16,14 @@ import {
   BalanceERC721Requirement,
   BalanceNativeRequirement,
 } from './types';
+import { DEFAULT_TOKEN_DECIMALS, NATIVE } from '../../env';
+import { isNativeToken } from '../../tokens';
 
 export const getTokensFromRequirements = (itemRequirements: ItemRequirement[]): TokenInfo[] => itemRequirements
   .map((itemRequirement) => {
     if (itemRequirement.type === ItemType.NATIVE) {
       return {
-        address: IMX_ADDRESS_ZKEVM,
+        address: NATIVE,
       } as TokenInfo;
     }
 
@@ -92,8 +94,7 @@ export const getTokenBalanceRequirement = (
     });
   } else if (itemRequirement.type === ItemType.NATIVE) {
     itemBalanceResult = balances.find((balance) => {
-      return (balance as TokenBalance).token?.address === ''
-        || (balance as TokenBalance).token?.address === IMX_ADDRESS_ZKEVM;
+      return isNativeToken((balance as TokenBalance).token?.address);
     });
   }
 
@@ -124,7 +125,6 @@ export const getTokenBalanceRequirement = (
           name,
           symbol,
           decimals: DEFAULT_TOKEN_DECIMALS,
-          address: IMX_ADDRESS_ZKEVM,
         },
       };
     }

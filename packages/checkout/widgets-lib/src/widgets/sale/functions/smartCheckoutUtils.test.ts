@@ -4,7 +4,7 @@ import {
   Checkout, FundingRoute, FundingStepType, RoutingOutcomeType, SmartCheckoutResult,
 } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
-import { IMX_ADDRESS_ZKEVM } from '../../../lib';
+import { NATIVE } from '../../../lib';
 import {
   MAX_GAS_LIMIT, fundingRouteFees,
   isUserFractionalBalanceBlocked, smartCheckoutTokensList,
@@ -62,7 +62,7 @@ describe('isUserFractionalBalanceBlocked', () => {
           {
             balance: BigNumber.from(MAX_GAS_LIMIT),
             token: {
-              address: IMX_ADDRESS_ZKEVM,
+              address: NATIVE,
               decimals: 18,
               name: 'IMX',
               symbol: 'IMX',
