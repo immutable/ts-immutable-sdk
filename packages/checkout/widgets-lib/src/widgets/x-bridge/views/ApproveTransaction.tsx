@@ -151,6 +151,8 @@ export function ApproveTransaction({ data }: ApproveTransactionProps) {
         } else {
           handleExceptions(error);
         }
+      } finally {
+        setActionDisabled(false);
       }
     }
 
@@ -183,6 +185,8 @@ export function ApproveTransaction({ data }: ApproveTransactionProps) {
       } else {
         handleExceptions(error);
       }
+    } finally {
+      setActionDisabled(false);
     }
   }, [
     checkout,
