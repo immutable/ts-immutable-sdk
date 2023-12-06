@@ -183,7 +183,7 @@ export function BridgeReviewSummary() {
         },
       },
     });
-  }, [viewDispatch]);
+  }, [viewDispatch, approveTransaction, transaction]);
 
   return (
     <Box testId={testId} sx={bridgeReviewWrapperStyles}>
