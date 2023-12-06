@@ -1,6 +1,6 @@
 Feature: Order
   # skip because the test is failing
-  @order @sellorder @ethSignature @skip
+  @order @sellorder @ethSignature
   Scenario: Create Sell Order without existing sell order
     Given A new Eth wallet "seller"
     And "seller" is registered
@@ -61,7 +61,7 @@ Feature: Order
 
   #   When "buyer" creates buy order "buyOrder" of "minted" NFT to buy for "0.00001" eth using v3 api should fail with 'not allowed to create a buy order for an asset without a matching listing'
 
-  @order @buyorder @ethSignature @skip
+  @order @buyorder @ethSignature
   Scenario: Create Buy Order (V3) - Asset with sell order
     # setup seller
     Given A new Eth wallet "seller"
