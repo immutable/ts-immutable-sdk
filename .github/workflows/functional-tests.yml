@@ -26,7 +26,7 @@ jobs:
     - name: Run tests
       env:
         NETWORK: sepolia
-        TOKEN_ADDRESS: '0x2Fa06C6672dDCc066Ab04631192738799231dE4a'
+        TOKEN_ADDRESS: '0xfA5539fBEd27887EEbb2515672D80412D1A3ADa3'
         ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
         PRIVATE_KEY1: ${{ secrets.PRIVATE_KEY1 }}
         STARK_PRIVATE_KEY1: ${{ secrets.STARK_PRIVATE_KEY1 }}
