@@ -24,10 +24,7 @@ Before contributing, please make sure you have read and understood the instructi
 There are two primary ways to test the Passport SDK locally: installing it to a local project, or using the `sdk-sample-app` project provided as part of this repository.
 
 ### Using the sample app
-The quickest and easiest way to test changes to the Passport SDK is using the `sdk-sample-app`, located next to this project. To test your changes, you can follow these instructions:
-1. Build your changes. You can do this with `yarn workspace @imtbl/passport build`
-2. Run the sample app. You can do this with `yarn workspace @imtbl/passport-sdk-sample-app dev`
-The sample app should now be running at `localhost:3000`. For further instructions or error handling, consult the README in the sample app's project directory.
+The quickest and easiest way to test changes to the Passport SDK is using the `sdk-sample-app`, located next to this project. For details on how to install and run the sample app, please refer to the README in the project directory.
 
 ### Installing to a local project
 If you need to test changes to the Passport SDK in the specific context of your own application, or if the changes are otherwise not possible to test within the limited capability of the sample app, you can do so using your package manager with these instructions:
