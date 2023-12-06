@@ -34,16 +34,14 @@ export function ApproveTransaction({ data }: ApproveTransactionProps) {
     from,
   } = bridgeState;
   const { viewDispatch } = useContext(ViewContext);
-  const { loading, content, footer } = text.views[XBridgeWidgetViews.APPROVE_TRANSACTION];
+  const { loadingView, content, footer } = text.views[XBridgeWidgetViews.APPROVE_TRANSACTION];
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   // Local state
   const [actionDisabled, setActionDisabled] = useState(false);
-  const [approvalTxnLoading, setApprovalTxnLoading] = useState(false);
-  const [approvalSpendingTxnLoading, setApprovalSpendingTxnLoading] = useState(false);
+  const [txProcessing, setTxProcessing] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [rejectedBridge, setRejectedBridge] = useState(false);
-
-  console.log('data', data);
 
   // Get symbol from swap info for approve amount text
   const bridgeToken = useMemo(
@@ -116,6 +114,7 @@ export function ApproveTransaction({ data }: ApproveTransactionProps) {
   };
 
   const handleApproveBridgeClick = useCallback(async () => {
+    let bridgeRejected = false;
     if (!checkout || !from?.web3Provider || !data.transaction) {
       showErrorView();
       return;
@@ -126,7 +125,7 @@ export function ApproveTransaction({ data }: ApproveTransactionProps) {
     // Approvals as required
     if (data.approveTransaction.unsignedTx) {
       try {
-        setApprovalSpendingTxnLoading(true);
+        setTxProcessing(true);
         const approveSpendingResult = await checkout.sendTransaction({
           provider: from.web3Provider,
           transaction: data.approveTransaction.unsignedTx,
@@ -145,9 +144,10 @@ export function ApproveTransaction({ data }: ApproveTransactionProps) {
           return;
         }
       } catch (error: any) {
-        setApprovalSpendingTxnLoading(false);
+        setTxProcessing(false);
         if (error.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
           setRejectedBridge(true);
+          bridgeRejected = true;
         } else {
           handleExceptions(error);
         }
@@ -157,16 +157,16 @@ export function ApproveTransaction({ data }: ApproveTransactionProps) {
     }
 
     try {
+      if (bridgeRejected) return;
+      setTxProcessing(true);
       const sendResult = await checkout.sendTransaction({
         provider: from.web3Provider,
         transaction: data.transaction.unsignedTx,
       });
 
-      setApprovalTxnLoading(true);
+      setLoading(true);
       await sendResult.transactionResponse.wait();
 
-      setActionDisabled(false);
-      setApprovalSpendingTxnLoading(false);
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -186,6 +186,8 @@ export function ApproveTransaction({ data }: ApproveTransactionProps) {
         handleExceptions(error);
       }
     } finally {
+      setLoading(false);
+      setTxProcessing(false);
       setActionDisabled(false);
     }
   }, [
@@ -200,8 +202,8 @@ export function ApproveTransaction({ data }: ApproveTransactionProps) {
 
   return (
     <>
-      {approvalTxnLoading && (<LoadingView loadingText={loading.text} showFooterLogo />)}
-      {!approvalTxnLoading && (
+      {loading && (<LoadingView loadingText={loadingView.text} showFooterLogo />)}
+      {!loading && (
         <SimpleLayout
           header={(
             <HeaderNavigation
@@ -215,15 +217,13 @@ export function ApproveTransaction({ data }: ApproveTransactionProps) {
           heroContent={<WalletApproveHero />}
           footer={(
             <Box sx={{ width: '100%', flexDirection: 'column' }}>
-              {!approvalSpendingTxnLoading && (
-                <FooterButton
-                  loading={approvalSpendingTxnLoading}
-                  actionText={rejectedBridge
-                    ? footer.retryText
-                    : footer.buttonText}
-                  onActionClick={handleApproveBridgeClick}
-                />
-              )}
+              <FooterButton
+                loading={txProcessing}
+                actionText={rejectedBridge
+                  ? footer.retryText
+                  : footer.buttonText}
+                onActionClick={handleApproveBridgeClick}
+              />
               <FooterLogo />
             </Box>
           )}

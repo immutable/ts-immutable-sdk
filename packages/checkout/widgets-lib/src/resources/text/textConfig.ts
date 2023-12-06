@@ -505,7 +505,7 @@ export const text = {
         buttonText: 'Okay',
         retryText: 'Try again',
       },
-      loading: {
+      loadingView: {
         text: 'Initiating move',
       },
     },
