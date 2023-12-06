@@ -13,7 +13,7 @@ In order to effectively develop and test the Passport SDK, it is recommended you
 3. [Yarn](https://www.npmjs.com/package/yarn).
 
 ## How do I contribute?
-Community contributions are always welcome! Before contributing however, please make sure you have read and understood the instructions in the `README` file at the root of the repository. Once you have done this and made your change, ensure you have also done the following:
+Before contributing, please make sure you have read and understood the instructions in the `README` file at the root of the repository. Once you have done this and made your change, ensure you have also done the following:
 1. Manually tested your changes to check they're functioning as expected (see the "Testing locally" section below).
 2. Updated any relevant test files to reflect your changes.
 3. Ensured all automated tests are passing - you can confirm this by running `yarn workspace @imtbl/passport test`
