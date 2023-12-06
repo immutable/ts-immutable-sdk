@@ -11,7 +11,6 @@ import {
   setupSwapTxTest,
   TEST_ROUTER_ADDRESS,
   TEST_DEX_CONFIGURATION,
-  TEST_GAS_PRICE,
   TEST_FEE_RECIPIENT,
   TEST_SECONDARY_FEE_ADDRESS,
   decodeMulticallExactOutputSingleWithFees,
@@ -36,6 +35,9 @@ import {
   expectToBeString,
   refundETHFunctionSignature,
   NATIVE_TEST_TOKEN,
+  buildBlock,
+  TEST_BASE_FEE,
+  TEST_MAX_PRIORITY_FEE_PER_GAS,
 } from './test/utils';
 
 jest.mock('@ethersproject/providers');
@@ -68,9 +70,14 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
     }));
 
     (JsonRpcBatchProvider as unknown as jest.Mock).mockImplementation(() => ({
-      getFeeData: async () => ({
-        maxFeePerGas: null,
-        gasPrice: TEST_GAS_PRICE,
+      getBlock: async () => buildBlock({ baseFeePerGas: BigNumber.from(TEST_BASE_FEE) }),
+      send: jest.fn().mockImplementation(async (method) => {
+        switch (method) {
+          case 'eth_maxPriorityFeePerGas':
+            return BigNumber.from(TEST_MAX_PRIORITY_FEE_PER_GAS); // 10 gwei
+          default:
+            throw new Error('Method not implemented');
+        }
       }),
     })) as unknown as JsonRpcProvider;
   });

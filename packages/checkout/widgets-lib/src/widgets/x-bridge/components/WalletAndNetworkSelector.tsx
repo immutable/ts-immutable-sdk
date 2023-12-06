@@ -1,5 +1,5 @@
 import {
-  BottomSheet,
+  Drawer,
   Box,
   Button,
   Heading,
@@ -384,15 +384,15 @@ export function WalletAndNetworkSelector() {
       )}
 
       {/** From Network Selector, we programatically open this so there is no target */}
-      <BottomSheet
+      <Drawer
         headerBarTitle={fromFormInput.networkSelectorHeading}
         size="full"
-        onCloseBottomSheet={() => {
+        onCloseDrawer={() => {
           setFromNetworkDrawerOpen(false);
         }}
         visible={fromNetworkDrawerOpen}
       >
-        <BottomSheet.Content>
+        <Drawer.Content>
           <NetworkItem
             key={imtblZkEvmNetworkName}
             testId={testId}
@@ -411,8 +411,8 @@ export function WalletAndNetworkSelector() {
             />
           )}
 
-        </BottomSheet.Content>
-      </BottomSheet>
+        </Drawer.Content>
+      </Drawer>
 
       {/* To wallet selection has been made  */}
       {isToWalletAndNetworkSelected && toWalletProviderName && (

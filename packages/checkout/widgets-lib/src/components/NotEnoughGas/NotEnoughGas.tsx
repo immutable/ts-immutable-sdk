@@ -1,6 +1,6 @@
 import {
   Body,
-  BottomSheet, Box, Button, FramedImage, Heading, Logo,
+  Drawer, Box, Button, FramedImage, Heading, Logo,
 } from '@biom3/react';
 import { useCallback, useState } from 'react';
 import {
@@ -13,7 +13,7 @@ import {
 import { text } from '../../resources/text/textConfig';
 
 type NotEnoughGasProps = {
-  onCloseBottomSheet?: () => void;
+  onCloseDrawer?: () => void;
   visible?: boolean;
   showHeaderBar?: boolean;
   walletAddress: string;
@@ -21,7 +21,7 @@ type NotEnoughGasProps = {
 };
 
 export function NotEnoughGas({
-  onCloseBottomSheet, visible, showHeaderBar, walletAddress, showAdjustAmount,
+  onCloseDrawer, visible, showHeaderBar, walletAddress, showAdjustAmount,
 }: NotEnoughGasProps) {
   const { content, buttons } = text.drawers.notEnoughGas;
 
@@ -39,14 +39,14 @@ export function NotEnoughGas({
   }, [walletAddress]);
 
   return (
-    <BottomSheet
+    <Drawer
       headerBarTitle={undefined}
       size="full"
-      onCloseBottomSheet={onCloseBottomSheet}
+      onCloseDrawer={onCloseDrawer}
       visible={visible}
       showHeaderBar={showHeaderBar}
     >
-      <BottomSheet.Content>
+      <Drawer.Content>
         <Box testId="not-enough-gas-bottom-sheet" sx={containerStyles}>
           <FramedImage
             imageUrl="https://design-system.immutable.com/hosted-for-ds/currency-icons/currency--eth.svg"
@@ -74,7 +74,7 @@ export function NotEnoughGas({
               testId="not-enough-gas-adjust-amount-button"
               sx={actionButtonStyles}
               variant="tertiary"
-              onClick={onCloseBottomSheet}
+              onClick={onCloseDrawer}
             >
               {buttons.adjustAmount}
             </Button>
@@ -91,7 +91,7 @@ export function NotEnoughGas({
             <Button
               sx={actionButtonStyles}
               variant="tertiary"
-              onClick={onCloseBottomSheet}
+              onClick={onCloseDrawer}
               testId="not-enough-gas-cancel-button"
             >
               {buttons.cancel}
@@ -105,7 +105,7 @@ export function NotEnoughGas({
             />
           </Box>
         </Box>
-      </BottomSheet.Content>
-    </BottomSheet>
+      </Drawer.Content>
+    </Drawer>
   );
 }

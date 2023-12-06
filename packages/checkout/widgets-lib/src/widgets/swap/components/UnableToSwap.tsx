@@ -1,5 +1,5 @@
 import {
-  Body, BottomSheet, Box, Button, Heading, Icon, Logo,
+  Body, Drawer, Box, Button, Heading, Icon, Logo,
 } from '@biom3/react';
 import {
   containerStyles,
@@ -13,20 +13,20 @@ import { text } from '../../../resources/text/textConfig';
 
 type UnableToSwapProps = {
   visible: boolean;
-  onCloseBottomSheet: () => void;
+  onCloseDrawer: () => void;
 };
 
-export function UnableToSwap({ visible, onCloseBottomSheet }: UnableToSwapProps) {
+export function UnableToSwap({ visible, onCloseDrawer }: UnableToSwapProps) {
   const { heading, body, buttons } = text.drawers.unableToSwap;
 
   return (
-    <BottomSheet
+    <Drawer
       size="full"
-      onCloseBottomSheet={onCloseBottomSheet}
+      onCloseDrawer={onCloseDrawer}
       visible={visible}
       showHeaderBar={false}
     >
-      <BottomSheet.Content>
+      <Drawer.Content>
         <Box testId="unable-to-swap-bottom-sheet" sx={containerStyles}>
           <Icon
             icon="Alert"
@@ -48,7 +48,7 @@ export function UnableToSwap({ visible, onCloseBottomSheet }: UnableToSwapProps)
             <Button
               sx={actionButtonStyles}
               variant="tertiary"
-              onClick={onCloseBottomSheet}
+              onClick={onCloseDrawer}
               testId="unable-to-swap-cancel-button"
             >
               {buttons.cancel}
@@ -62,7 +62,7 @@ export function UnableToSwap({ visible, onCloseBottomSheet }: UnableToSwapProps)
             />
           </Box>
         </Box>
-      </BottomSheet.Content>
-    </BottomSheet>
+      </Drawer.Content>
+    </Drawer>
   );
 }

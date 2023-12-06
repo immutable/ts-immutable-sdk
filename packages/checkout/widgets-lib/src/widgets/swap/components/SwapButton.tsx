@@ -170,7 +170,7 @@ export function SwapButton({
       <TransactionRejected
         visible={showTxnRejectedState}
         showHeaderBar={false}
-        onCloseBottomSheet={() => setShowTxnRejectedState(false)}
+        onCloseDrawer={() => setShowTxnRejectedState(false)}
         onRetry={() => {
           sendTransaction();
           setShowTxnRejectedState(false);
