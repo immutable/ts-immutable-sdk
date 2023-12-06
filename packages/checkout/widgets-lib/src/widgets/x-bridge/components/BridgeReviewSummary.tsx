@@ -101,7 +101,7 @@ export function BridgeReviewSummary() {
       payload: {
         type: ViewActions.UPDATE_VIEW,
         view: {
-          type: XBridgeWidgetViews.APPROVE_TXN,
+          type: XBridgeWidgetViews.APPROVE_TRANSACTION,
           data: {
             approveTransaction: {},
           },

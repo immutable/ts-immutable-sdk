@@ -496,7 +496,7 @@ export const text = {
       statusText: 'Transaction failed',
       actionText: 'Review & Try again',
     },
-    [XBridgeWidgetViews.APPROVE_TXN]: {
+    [XBridgeWidgetViews.APPROVE_TRANSACTION]: {
       content: {
         heading: 'Approve the transaction in your wallet',
         body: 'Follow the prompts in your wallet popup to confirm.',

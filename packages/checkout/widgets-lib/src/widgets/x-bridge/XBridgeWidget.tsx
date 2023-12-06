@@ -36,7 +36,7 @@ import { WalletNetworkSelectionView } from './views/WalletNetworkSelectionView';
 import { Bridge } from './views/Bridge';
 import { BridgeReview } from './views/BridgeReview';
 import { MoveInProgress } from './views/MoveInProgress';
-import { ApproveTxn } from './views/ApproveTxn';
+import { ApproveTransaction } from './views/ApproveTransaction';
 import { ErrorView } from '../../views/error/ErrorView';
 import { sendBridgeWidgetCloseEvent } from '../bridge/BridgeWidgetEvents';
 import { text } from '../../resources/text/textConfig';
@@ -124,8 +124,8 @@ export function XBridgeWidget({
                 statusType={StatusType.FAILURE}
               />
             )}
-            {viewState.view.type === XBridgeWidgetViews.APPROVE_TXN && (
-              <ApproveTxn data={viewReducerValues.viewState.view.data} />
+            {viewState.view.type === XBridgeWidgetViews.APPROVE_TRANSACTION && (
+              <ApproveTransaction data={viewReducerValues.viewState.view.data} />
             )}
             {viewState.view.type === SharedViews.ERROR_VIEW && (
               <ErrorView

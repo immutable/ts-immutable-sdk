@@ -27,7 +27,7 @@ import { FooterLogo } from '../../../components/Footer/FooterLogo';
 export interface ApproveTxnProps {
   data: ApproveTxnData;
 }
-export function ApproveTxn({ data }: ApproveTxnProps) {
+export function ApproveTransaction({ data }: ApproveTxnProps) {
   const { bridgeState } = useContext(XBridgeContext);
   const {
     checkout,
@@ -36,7 +36,7 @@ export function ApproveTxn({ data }: ApproveTxnProps) {
     from,
   } = bridgeState;
   const { viewDispatch } = useContext(ViewContext);
-  const { loading, content, footer } = text.views[XBridgeWidgetViews.APPROVE_TXN];
+  const { loading, content, footer } = text.views[XBridgeWidgetViews.APPROVE_TRANSACTION];
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   // Local state
@@ -191,6 +191,7 @@ export function ApproveTxn({ data }: ApproveTxnProps) {
     viewDispatch,
     setRejectedBridge,
     data.transaction,
+    data.approveTransaction,
     actionDisabled,
     setActionDisabled,
   ]);

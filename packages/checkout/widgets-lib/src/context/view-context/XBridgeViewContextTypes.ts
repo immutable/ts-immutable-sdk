@@ -6,7 +6,7 @@ export enum XBridgeWidgetViews {
   BRIDGE_REVIEW = 'BRIDGE_REVIEW',
   IN_PROGRESS = 'IN_PROGRESS',
   BRIDGE_FAILURE = 'BRIDGE_FAILURE',
-  APPROVE_TXN = 'APPROVE_TXN',
+  APPROVE_TRANSACTION = 'APPROVE_TRANSACTION',
 }
 
 export type XBridgeWidgetView =
@@ -43,6 +43,6 @@ interface XBridgeFailure extends ViewType {
 }
 
 interface XBridgeApproveTxn extends ViewType {
-  type: XBridgeWidgetViews.APPROVE_TXN,
+  type: XBridgeWidgetViews.APPROVE_TRANSACTION,
   data?: {}
 }
