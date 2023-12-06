@@ -26,6 +26,7 @@ const allTokens: Token[] = [
   { symbol: 'zkWLT', address: '0x8A5b0470ee48248bEb7D1E745c1EbA0DCA77215e' },
   { symbol: 'zkSRE', address: '0x43566cAB87CC147C95e2895E7b972E19993520e4' },
   { symbol: 'zkCORE', address: '0x4B96E7b7eA673A996F140d5De411a97b7eab934E' },
+  { symbol: 'zkWAT', address: '0xaC953a0d7B67Fae17c87abf79f09D0f818AC66A2' },
 ];
 
 const buildExchange = (secondaryFeeRecipient: string, secondaryFeePercentage: number) => {
