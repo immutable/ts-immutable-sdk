@@ -11,9 +11,6 @@ import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
 import { FooterButton } from '../../../components/Footer/FooterButton';
 import { text } from '../../../resources/text/textConfig';
-import {
-  ApproveTransactionData,
-} from '../../../context/view-context/BridgeViewContextTypes';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { LoadingView } from '../../../views/loading/LoadingView';
@@ -21,7 +18,7 @@ import { XBridgeContext } from '../context/XBridgeContext';
 import { WalletApproveHero } from '../../../components/Hero/WalletApproveHero';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { isNativeToken } from '../../../lib/utils';
-import { XBridgeWidgetViews } from '../../../context/view-context/XBridgeViewContextTypes';
+import { ApproveTransactionData, XBridgeWidgetViews } from '../../../context/view-context/XBridgeViewContextTypes';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 
 export interface ApproveTransactionProps {
@@ -45,6 +42,8 @@ export function ApproveTransaction({ data }: ApproveTransactionProps) {
   const [approvalTxnLoading, setApprovalTxnLoading] = useState(false);
   const [approvalSpendingTxnLoading, setApprovalSpendingTxnLoading] = useState(false);
   const [rejectedBridge, setRejectedBridge] = useState(false);
+
+  console.log('data', data);
 
   // Get symbol from swap info for approve amount text
   const bridgeToken = useMemo(

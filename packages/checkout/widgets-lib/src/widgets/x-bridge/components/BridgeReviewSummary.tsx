@@ -77,7 +77,7 @@ export function BridgeReviewSummary() {
   const [gasFee, setGasFee] = useState<string>('');
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [approvalTransaction, setApprovalTransaction] = useState<ApproveBridgeResponse | undefined>(undefined);
+  const [approveTransaction, setApproveTransaction] = useState<ApproveBridgeResponse | undefined>(undefined);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [transaction, setTransaction] = useState<BridgeTxResponse | undefined>(undefined);
 
@@ -130,7 +130,7 @@ export function BridgeReviewSummary() {
     console.log('unsignedApproveTransaction', unsignedApproveTransaction);
     console.log('unsignedTransaction', unsignedTransaction);
 
-    setApprovalTransaction(unsignedApproveTransaction);
+    setApproveTransaction(unsignedApproveTransaction);
     setTransaction(unsignedTransaction);
 
     // todo: add approval gas fees
@@ -170,13 +170,15 @@ export function BridgeReviewSummary() {
   }, []);
 
   const submitBridge = useCallback(async () => {
+    if (!approveTransaction || !transaction) return;
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
         view: {
           type: XBridgeWidgetViews.APPROVE_TRANSACTION,
           data: {
-            approveTransaction: {},
+            approveTransaction,
+            transaction,
           },
         },
       },

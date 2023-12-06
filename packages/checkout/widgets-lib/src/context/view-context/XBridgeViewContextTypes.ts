@@ -1,3 +1,4 @@
+import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
 import { ViewType } from './ViewType';
 
 export enum XBridgeWidgetViews {
@@ -44,5 +45,10 @@ interface XBridgeFailure extends ViewType {
 
 interface XBridgeApproveTransaction extends ViewType {
   type: XBridgeWidgetViews.APPROVE_TRANSACTION,
-  data?: {}
+  data: ApproveTransactionData
+}
+
+export interface ApproveTransactionData {
+  approveTransaction: ApproveBridgeResponse;
+  transaction: BridgeTxResponse;
 }
