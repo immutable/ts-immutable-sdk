@@ -12,7 +12,7 @@ import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
 import { FooterButton } from '../../../components/Footer/FooterButton';
 import { text } from '../../../resources/text/textConfig';
 import {
-  ApproveTxnData,
+  ApproveTransactionData,
 } from '../../../context/view-context/BridgeViewContextTypes';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
@@ -24,11 +24,11 @@ import { isNativeToken } from '../../../lib/utils';
 import { XBridgeWidgetViews } from '../../../context/view-context/XBridgeViewContextTypes';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 
-export interface ApproveTxnProps {
-  data: ApproveTxnData;
+export interface ApproveTransactionProps {
+  data: ApproveTransactionData;
 }
 
-export function ApproveTransaction({ data }: ApproveTxnProps) {
+export function ApproveTransaction({ data }: ApproveTransactionProps) {
   const { bridgeState } = useContext(XBridgeContext);
   const {
     checkout,

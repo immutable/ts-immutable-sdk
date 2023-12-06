@@ -15,7 +15,7 @@ export type XBridgeWidgetView =
   | XBridgeReview
   | XBridgeInProgress
   | XBridgeFailure
-  | XBridgeApproveTxn;
+  | XBridgeApproveTransaction;
 
 interface XBridgeCrossWalletSelection extends ViewType {
   type: XBridgeWidgetViews.WALLET_NETWORK_SELECTION,
@@ -42,7 +42,7 @@ interface XBridgeFailure extends ViewType {
   data?: {}
 }
 
-interface XBridgeApproveTxn extends ViewType {
+interface XBridgeApproveTransaction extends ViewType {
   type: XBridgeWidgetViews.APPROVE_TRANSACTION,
   data?: {}
 }

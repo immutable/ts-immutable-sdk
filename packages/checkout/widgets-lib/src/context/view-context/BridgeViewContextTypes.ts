@@ -66,7 +66,7 @@ export interface PrefilledBridgeForm {
   fromContractAddress: string;
 }
 
-export interface ApproveTxnData {
+export interface ApproveTransactionData {
   approveTransaction: ApproveDepositBridgeResponse;
   transaction: BridgeDepositResponse;
 }
