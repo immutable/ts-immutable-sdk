@@ -150,7 +150,7 @@ export class PassportImxProvider implements IMXProvider {
     const signers = await this.signers;
     // Throw the stored error if the signers failed to initialise
     if (typeof signers === 'undefined') {
-      if (typeof this.signerInitialisationError !== 'undefined') {
+      if (!this.signerInitialisationError) {
         throw this.signerInitialisationError;
       }
       throw new Error('Signers failed to initialise');
