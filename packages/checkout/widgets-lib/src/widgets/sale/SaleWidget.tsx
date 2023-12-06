@@ -2,8 +2,6 @@ import {
   useCallback, useContext, useEffect, useMemo, useReducer, useRef,
 } from 'react';
 
-import { BiomeCombinedProviders } from '@biom3/react';
-
 import { SaleItem } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
@@ -81,48 +79,46 @@ export function SaleWidget(props: SaleWidgetProps) {
   }, [checkout, provider]);
 
   return (
-    <BiomeCombinedProviders theme={{ base: biomeTheme }}>
-      <ViewContext.Provider value={viewReducerValues}>
-        <SaleContextProvider
-          value={{
-            config,
-            items,
-            amount,
-            fromContractAddress,
-            env: checkout!.config.environment ?? Environment.SANDBOX,
-            environmentId,
-            provider,
-            checkout,
-            passport: checkout?.passport,
-          }}
-        >
-          <CryptoFiatProvider environment={config.environment}>
+    <ViewContext.Provider value={viewReducerValues}>
+      <SaleContextProvider
+        value={{
+          config,
+          items,
+          amount,
+          fromContractAddress,
+          env: checkout!.config.environment ?? Environment.SANDBOX,
+          environmentId,
+          provider,
+          checkout,
+          passport: checkout?.passport,
+        }}
+      >
+        <CryptoFiatProvider environment={config.environment}>
 
-            {viewState.view.type === SharedViews.LOADING_VIEW && (
+          {viewState.view.type === SharedViews.LOADING_VIEW && (
             <LoadingView loadingText={loadingText} />
-            )}
-            {viewState.view.type === SaleWidgetViews.PAYMENT_METHODS && (
+          )}
+          {viewState.view.type === SaleWidgetViews.PAYMENT_METHODS && (
             <PaymentMethods />
-            )}
-            {viewState.view.type === SaleWidgetViews.PAY_WITH_CARD && (
+          )}
+          {viewState.view.type === SaleWidgetViews.PAY_WITH_CARD && (
             <PayWithCard />
-            )}
-            {viewState.view.type === SaleWidgetViews.PAY_WITH_COINS && (
+          )}
+          {viewState.view.type === SaleWidgetViews.PAY_WITH_COINS && (
             <PayWithCoins />
-            )}
-            {viewState.view.type === SaleWidgetViews.SALE_FAIL && (
+          )}
+          {viewState.view.type === SaleWidgetViews.SALE_FAIL && (
             <SaleErrorView biomeTheme={biomeTheme} errorType={viewState.view.data?.errorType} />
-            )}
-            {viewState.view.type === SaleWidgetViews.SALE_SUCCESS && provider && (
+          )}
+          {viewState.view.type === SaleWidgetViews.SALE_SUCCESS && provider && (
             <SaleSuccessView data={viewState.view.data} />
-            )}
-            {viewState.view.type === SaleWidgetViews.FUND_WITH_SMART_CHECKOUT && (
+          )}
+          {viewState.view.type === SaleWidgetViews.FUND_WITH_SMART_CHECKOUT && (
             <FundWithSmartCheckout subView={viewState.view.subView} />
-            )}
-          </CryptoFiatProvider>
+          )}
+        </CryptoFiatProvider>
 
-        </SaleContextProvider>
-      </ViewContext.Provider>
-    </BiomeCombinedProviders>
+      </SaleContextProvider>
+    </ViewContext.Provider>
   );
 }

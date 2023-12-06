@@ -5,10 +5,10 @@ import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { Environment } from '@imtbl/config';
 import { Web3Provider } from '@ethersproject/providers';
+import { WidgetContainer } from 'components/WidgetContainer/WidgetContainer';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { ConnectLoader, ConnectLoaderParams } from './ConnectLoader';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 
 describe('ConnectLoader', () => {
   const config: StrongCheckoutWidgetsConfig = {
@@ -36,7 +36,7 @@ describe('ConnectLoader', () => {
       checkout,
     } as ConnectLoaderParams;
     mount(
-      <CustomAnalyticsProvider widgetConfig={config}>
+      <WidgetContainer id="test" config={config}>
         <ConnectLoader
           widgetConfig={config}
           params={params}
@@ -45,7 +45,7 @@ describe('ConnectLoader', () => {
           <div id="inner-widget">Inner Widget</div>
         </ConnectLoader>
         ,
-      </CustomAnalyticsProvider>,
+      </WidgetContainer>,
     );
     cySmartGet('wallet-list-metamask').should('be.visible');
     cy.get('#inner-widget').should('not.exist');
@@ -73,7 +73,7 @@ describe('ConnectLoader', () => {
       });
 
     mount(
-      <CustomAnalyticsProvider widgetConfig={config}>
+      <WidgetContainer id="test" config={config}>
         <ConnectLoader
           widgetConfig={config}
           params={params}
@@ -81,7 +81,7 @@ describe('ConnectLoader', () => {
         >
           <div id="inner-widget">Inner Widget</div>
         </ConnectLoader>
-      </CustomAnalyticsProvider>,
+      </WidgetContainer>,
     );
 
     cySmartGet('footer-button').should('have.text', 'Ready to connect');
@@ -132,7 +132,7 @@ describe('ConnectLoader', () => {
       });
 
     mount(
-      <CustomAnalyticsProvider widgetConfig={config}>
+      <WidgetContainer id="test" config={config}>
         <ConnectLoader
           widgetConfig={config}
           params={params}
@@ -140,7 +140,7 @@ describe('ConnectLoader', () => {
         >
           <div id="inner-widget">Inner Widget</div>
         </ConnectLoader>
-      </CustomAnalyticsProvider>,
+      </WidgetContainer>,
     );
 
     cySmartGet('switch-network-view').should('be.visible');
@@ -216,7 +216,7 @@ describe('ConnectLoader', () => {
       });
 
     mount(
-      <CustomAnalyticsProvider widgetConfig={config}>
+      <WidgetContainer id="test" config={config}>
         <ConnectLoader
           widgetConfig={config}
           params={params}
@@ -224,8 +224,7 @@ describe('ConnectLoader', () => {
         >
           <div id="inner-widget">Inner Widget</div>
         </ConnectLoader>
-        ,
-      </CustomAnalyticsProvider>,
+      </WidgetContainer>,
     );
 
     cySmartGet('footer-button').click();
@@ -289,7 +288,7 @@ describe('ConnectLoader', () => {
       });
 
     mount(
-      <CustomAnalyticsProvider widgetConfig={config}>
+      <WidgetContainer id="test" config={config}>
         <ConnectLoader
           widgetConfig={config}
           params={params}
@@ -297,7 +296,7 @@ describe('ConnectLoader', () => {
         >
           <div id="inner-widget">Inner Widget</div>
         </ConnectLoader>
-      </CustomAnalyticsProvider>,
+      </WidgetContainer>,
     );
 
     cy.get('#inner-widget').should('be.visible');
@@ -359,7 +358,7 @@ describe('ConnectLoader', () => {
   //       });
 
   //     mount(
-  //       <CustomAnalyticsProvider widgetConfig={config}>
+  //       <WidgetContainer id="test" config={config}>
   //         <ConnectLoader
   //           widgetConfig={config}
   //           params={params}
@@ -367,7 +366,7 @@ describe('ConnectLoader', () => {
   //         >
   //           <div id="inner-widget">Inner Widget</div>
   //         </ConnectLoader>
-  //       </CustomAnalyticsProvider>,
+  //       </WidgetContainer>,
   //     );
 
   //     cy.get('#inner-widget').should('be.visible');

@@ -1,6 +1,5 @@
-import { onDarkBase } from '@biom3/design-tokens';
-import { BiomeCombinedProviders } from '@biom3/react';
 import { mount } from 'cypress/react18';
+import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { LoadingView } from './LoadingView';
 import { cySmartGet } from '../../lib/testUtils';
 
@@ -8,9 +7,9 @@ describe('LoadingView', () => {
   it('should show the loading spinner with text and no footer logo', () => {
     const testLoadingText = 'Loading the view';
     mount(
-      <BiomeCombinedProviders theme={{ base: onDarkBase }}>
+      <ViewContextTestComponent>
         <LoadingView loadingText={testLoadingText} />
-      </BiomeCombinedProviders>,
+      </ViewContextTestComponent>,
     );
 
     cySmartGet('loading-box').should('exist');
@@ -20,9 +19,9 @@ describe('LoadingView', () => {
   it('should show the loading spinner with text and footer logo', () => {
     const testLoadingText = 'Loading the view';
     mount(
-      <BiomeCombinedProviders theme={{ base: onDarkBase }}>
+      <ViewContextTestComponent>
         <LoadingView loadingText={testLoadingText} showFooterLogo />
-      </BiomeCombinedProviders>,
+      </ViewContextTestComponent>,
     );
 
     cySmartGet('loading-box').should('exist');

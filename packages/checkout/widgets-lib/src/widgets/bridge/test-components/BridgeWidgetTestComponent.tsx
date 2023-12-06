@@ -1,6 +1,5 @@
-import { BiomeCombinedProviders } from '@biom3/react';
 import React, { useCallback, useMemo, useReducer } from 'react';
-import { onLightBase } from '@biom3/design-tokens';
+import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import {
   initialBridgeState, BridgeContext, bridgeReducer, BridgeState,
 } from '../context/BridgeContext';
@@ -36,12 +35,12 @@ export function BridgeWidgetTestComponent({ children, initialStateOverride, cryp
   ), [cryptoFiatState, cryptoFiatDispatch]);
 
   return (
-    <BiomeCombinedProviders theme={{ base: onLightBase }}>
+    <ViewContextTestComponent>
       <BridgeContext.Provider value={bridgeReducerValues}>
         <CryptoFiatContext.Provider value={cryptoFiatReducerValues as CryptoFiatContextState}>
           {children}
         </CryptoFiatContext.Provider>
       </BridgeContext.Provider>
-    </BiomeCombinedProviders>
+    </ViewContextTestComponent>
   );
 }

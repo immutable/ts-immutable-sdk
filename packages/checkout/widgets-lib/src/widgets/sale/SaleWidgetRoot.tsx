@@ -13,7 +13,7 @@ import { Base } from 'widgets/BaseWidgetRoot';
 import { ConnectLoader, ConnectLoaderParams } from 'components/ConnectLoader/ConnectLoader';
 import { getL2ChainId } from 'lib';
 import { isValidAmount, isValidWalletProvider } from 'lib/validations/widgetValidators';
-import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
+import { WidgetContainer } from 'components/WidgetContainer/WidgetContainer';
 import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
 import { SaleWidget } from './SaleWidget';
 
@@ -81,6 +81,8 @@ export class Sale extends Base<WidgetType.SALE> {
   }
 
   protected render() {
+    if (!this.reactRoot) return;
+
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER2,
       web3Provider: this.web3Provider,
@@ -90,11 +92,9 @@ export class Sale extends Base<WidgetType.SALE> {
       ],
     };
 
-    if (!this.reactRoot) return;
-
     this.reactRoot.render(
       <React.StrictMode>
-        <CustomAnalyticsProvider widgetConfig={this.strongConfig()}>
+        <WidgetContainer id="sale-container" config={this.strongConfig()}>
           <ConnectLoader
             widgetConfig={this.strongConfig()}
             params={connectLoaderParams}
@@ -110,7 +110,7 @@ export class Sale extends Base<WidgetType.SALE> {
               environmentId={this.parameters.environmentId!}
             />
           </ConnectLoader>
-        </CustomAnalyticsProvider>
+        </WidgetContainer>
       </React.StrictMode>,
     );
   }
