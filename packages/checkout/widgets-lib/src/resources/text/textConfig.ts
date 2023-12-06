@@ -496,6 +496,19 @@ export const text = {
       statusText: 'Transaction failed',
       actionText: 'Review & Try again',
     },
+    [XBridgeWidgetViews.APPROVE_TRANSACTION]: {
+      content: {
+        heading: 'Approve the transaction in your wallet',
+        body: 'Follow the prompts in your wallet popup to confirm.',
+      },
+      footer: {
+        buttonText: 'Okay',
+        retryText: 'Try again',
+      },
+      loading: {
+        text: 'Initiating move',
+      },
+    },
   },
   footers: {
     quickswapFooter: {

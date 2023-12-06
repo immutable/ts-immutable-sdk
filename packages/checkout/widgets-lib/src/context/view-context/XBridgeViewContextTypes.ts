@@ -6,6 +6,7 @@ export enum XBridgeWidgetViews {
   BRIDGE_REVIEW = 'BRIDGE_REVIEW',
   IN_PROGRESS = 'IN_PROGRESS',
   BRIDGE_FAILURE = 'BRIDGE_FAILURE',
+  APPROVE_TRANSACTION = 'APPROVE_TRANSACTION',
 }
 
 export type XBridgeWidgetView =
@@ -13,7 +14,8 @@ export type XBridgeWidgetView =
   | XBridgeForm
   | XBridgeReview
   | XBridgeInProgress
-  | XBridgeFailure;
+  | XBridgeFailure
+  | XBridgeApproveTransaction;
 
 interface XBridgeCrossWalletSelection extends ViewType {
   type: XBridgeWidgetViews.WALLET_NETWORK_SELECTION,
@@ -37,5 +39,10 @@ interface XBridgeInProgress extends ViewType {
 
 interface XBridgeFailure extends ViewType {
   type: XBridgeWidgetViews.BRIDGE_FAILURE,
+  data?: {}
+}
+
+interface XBridgeApproveTransaction extends ViewType {
+  type: XBridgeWidgetViews.APPROVE_TRANSACTION,
   data?: {}
 }
