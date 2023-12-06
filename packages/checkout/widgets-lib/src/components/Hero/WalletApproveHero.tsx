@@ -4,7 +4,7 @@ import { heroBackGroundStyles, heroImageBottomAlign, heroImageStyles } from './H
 
 export function WalletApproveHero() {
   return (
-    <Box sx={{ ...heroBackGroundStyles, background: 'base.color.translucent.emphasis.100' }}>
+    <Box testId="wallet-approve-hero" sx={{ ...heroBackGroundStyles, background: 'base.color.translucent.emphasis.100' }}>
       <Box sx={{ ...heroImageStyles, ...heroImageBottomAlign }}>
         <svg width="430" height="305" viewBox="0 0 430 305" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M227.517 171.325L182.178 85.6034C181.033 83.4446 179.583 82.3652 178.156 82.3652C175.711 82.3652 174.322 84.1157 172.863 86.6218L137.285 164.056L183.689 253.776L227.522 171.32L227.517 171.325Z" fill="black" stroke="black" strokeWidth="0.469297" strokeLinecap="round" strokeLinejoin="round" />
