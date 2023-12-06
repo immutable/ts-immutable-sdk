@@ -2,15 +2,37 @@
 
 The SDK for the zkEVM Order Book
 
-## OpenAPI SDK
-
-All content in src/openapi/sdk is generated from order-book-mr in engine. It can be replaced at any time
-
 ## Getting Started
+
+### Configuration
+
+Initializing the SDK can be achieved by specifying the target environment in the constructor:
+
+```
+new Orderbook({
+  baseConfig: {
+    environment: Environment.SANDBOX,
+  },
+})
+```
 
 ### Demo Script
 
-There is a demo script that is currently run with `yarn run:demo`. It relies on the same `.env` explained in the `E2E` section below.
+There are a number a demo scripts. Check the package.json for entries that following this pattern: `yarn run:demo*`. These scripts rely on an `.env` file that specifies the following properties:
+
+```
+ACCOUNT_1=
+ACCOUNT_2=
+RPC_ENDPOINT=
+ORDERBOOK_MR_API_URL=
+SEAPORT_CONTRACT_ADDRESS=
+ZONE_CONTRACT_ADDRESS=
+```
+
+* ACCOUNT_1 and ACCOUNT_2 are private keys for funded accounts to be used in the demo scripts
+* RPC_ENDPOINT is the target zkEVM environment's RPC URL
+* ORDERBOOK_MR_API_URL is the exposed URL for the API
+* SEAPORT_CONTRACT_ADDRESS and ZONE_CONTRACT_ADDRESS depend on the address of the deployed contracts
 
 ### Testing
 #### Unit Tests
@@ -19,22 +41,10 @@ There is a demo script that is currently run with `yarn run:demo`. It relies on 
 
 #### E2E Tests
 
-The E2E tests are run agains the docker-compose stack that can be spun up from `imx-engine/services/order-book-mr`. They are not run on CI.
+`yarn test:e2e`
 
-1. From `imx-engine/services/order-book-mr`, run `./local/start.sh`
-2. Populate a .env file at `ts-immutable-sdk/packages/orderbook/.env` with the following values.
-    ```
-    ACCOUNT_1=
-    ACCOUNT_2=
-    LOCAL_RPC_ENDPOINT=
-    ORDERBOOK_MR_API_URL=
-    SEAPORT_CONTRACT_ADDRESS=
-    ZONE_CONTRACT_ADDRESS=
-    ```
+The E2E tests rely on the `.env` explained in the demo script section above.
 
-    * ACCOUNT_1 and ACCOUNT_2 are private keys from the local hardhat container that can be any different key available at the start of the log
-    * LOCAL_RPC_ENDPOINT is the hardhat container URL, usually http://0.0.0.0:8545
-    * ORDERBOOK_MR_API_URL is the exposed URL from the API container, usually http://127.0.0.1:8070
-    * SEAPORT_CONTRACT_ADDRESS and ZONE_CONTRACT_ADDRESS can be read from the output of `./local/start.sh`
+## OpenAPI SDK
 
-3. Run the E2Es with `yarn test:e2e`
+All content in src/openapi/sdk is auto-generated.
