@@ -2199,7 +2199,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.19.13":
+"@biom3/react@npm:^0.19.11, @biom3/react@npm:^0.19.13":
   version: 0.19.13
   resolution: "@biom3/react@npm:0.19.13"
   dependencies:
@@ -3744,7 +3744,7 @@ __metadata:
   resolution: "@imtbl/economy-building-blocks-playground@workspace:packages/internal/economy-building-blocks/playground"
   dependencies:
     "@biom3/design-tokens": 0.2.9
-    "@biom3/react": ^0.19.13
+    "@biom3/react": ^0.19.11
     "@imtbl/blockchain-data": 0.0.0
     "@imtbl/passport": 0.0.0
     "@imtbl/sdk": 0.0.0
@@ -3994,7 +3994,7 @@ __metadata:
   resolution: "@imtbl/passport-sdk-sample-app@workspace:packages/passport/sdk-sample-app"
   dependencies:
     "@biom3/design-tokens": 0.2.9
-    "@biom3/react": ^0.19.13
+    "@biom3/react": ^0.19.11
     "@imtbl/config": 0.0.0
     "@imtbl/core-sdk": ^2.4.0
     "@imtbl/immutablex-client": 0.0.0
@@ -4116,7 +4116,7 @@ __metadata:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
     "@biom3/design-tokens": 0.2.9
-    "@biom3/react": ^0.19.13
+    "@biom3/react": ^0.19.11
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/abstract-signer": ^5.7.0
     "@ethersproject/providers": ^5.7.2
