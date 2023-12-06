@@ -4,21 +4,16 @@
       <img src="https://cdn.dribbble.com/users/1299339/screenshots/7133657/media/837237d447d36581ebd59ec36d30daea.gif" width="280"/>
     </a>
   </p>
-  <h1>Immutable Unified TypeScript SDK</h1>
+  <h1>Welcome to Immutable Unified TypeScript SDK</h1>
 </div>
 
 ## Documentation
 
-See our [developer documentation](https://docs.immutable.com) for information on building on Immutable.
+[Typescript SDK Official Starting guide](https://docs.immutable.com/sdk-docs/ts-immutable-sdk/overview/)
 
-See our rollup API references for more information on our APIs.
-
+Checkout our API references for more information.
 - [Immutable X API Reference](https://docs.immutable.com/x/reference)
-- [Immutable zkEVM API Reference](https://docs.immutable.com/zkevm/reference)
-
-### Examples
-
-- For examples, please view them on our [documentation website](https://docs.immutable.com/sdk-docs/ts-immutable-sdk/overview/).
+- [Immutable zkEVM API Reference](https://docs.immutable.com/zkevm/api/reference)
 
 ## Installation
 
@@ -27,6 +22,9 @@ npm install @imtbl/sdk
 # or
 yarn add @imtbl/sdk
 ```
+## Disclaimer for Alpha Releases
+
+Please note that alpha releases are still in development and may contain bugs or breaking changes. Please do not use these versions as we do not intend to support them.
 
 ## Changelog
 
@@ -34,7 +32,7 @@ yarn add @imtbl/sdk
 
 #### Changed (breaking)
 
-##### The `connectImx` method no longer registers users on Immutable X 
+##### The `connectImx` method no longer registers users on Immutable X
 
 This method was previously responsible for automatically [registering a user](https://docs.immutable.com/docs/x/how-to-register-users/)
 the first time they connect to Immutable X.

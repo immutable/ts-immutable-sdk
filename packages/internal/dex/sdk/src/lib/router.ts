@@ -1,29 +1,29 @@
-import { ethers } from 'ethers';
 import { Token, TradeType } from '@uniswap/sdk-core';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import { NoRoutesAvailableError } from 'errors';
 import { CoinAmount, ERC20 } from 'types';
+import { providers } from 'ethers';
 import { erc20ToUniswapToken, poolEquals, uniswapTokenToERC20 } from './utils';
 import { getQuotesForRoutes, QuoteResult } from './getQuotesForRoutes';
 import { fetchValidPools } from './poolUtils/fetchValidPools';
 import { ERC20Pair } from './poolUtils/generateERC20Pairs';
-import { Multicall, Multicall__factory } from '../contracts/types';
+import type { Multicall } from '../contracts/types';
 
 export type RoutingContracts = {
-  multicallAddress: string;
-  factoryAddress: string;
-  quoterAddress: string;
+  multicall: string;
+  coreFactory: string;
+  quoterV2: string;
 };
 
 export class Router {
-  public provider: ethers.providers.JsonRpcProvider;
-
-  public routingTokens: ERC20[];
-
-  public routingContracts: RoutingContracts;
-
-  constructor(provider: ethers.providers.JsonRpcProvider, routingTokens: ERC20[], routingContracts: RoutingContracts) {
+  constructor(
+    public provider: providers.JsonRpcBatchProvider,
+    public multicallContract: Multicall,
+    public routingTokens: ERC20[],
+    public routingContracts: RoutingContracts,
+  ) {
     this.provider = provider;
+    this.multicallContract = multicallContract;
     this.routingTokens = routingTokens;
     this.routingContracts = routingContracts;
   }
@@ -36,15 +36,14 @@ export class Router {
   ): Promise<QuoteResult> {
     const [tokenIn, tokenOut] = this.determineERC20InAndERC20Out(tradeType, amountSpecified, otherToken);
 
-    const multicallContract = Multicall__factory.connect(this.routingContracts.multicallAddress, this.provider);
     const erc20Pair: ERC20Pair = [tokenIn, tokenOut];
 
     // Get all pools and use these to get all possible routes.
     const pools = await fetchValidPools(
-      multicallContract,
+      this.multicallContract,
       erc20Pair,
       this.routingTokens,
-      this.routingContracts.factoryAddress,
+      this.routingContracts.coreFactory,
     );
 
     const noValidPools = pools.length === 0;
@@ -63,18 +62,17 @@ export class Router {
     }
 
     // Get the best quote from all of the given routes
-    return await this.getBestQuoteFromRoutes(multicallContract, routes, amountSpecified, tradeType);
+    return await this.getBestQuoteFromRoutes(routes, amountSpecified, tradeType);
   }
 
   private async getBestQuoteFromRoutes(
-    multicallContract: Multicall,
     routes: Route<Token, Token>[],
     amountSpecified: CoinAmount<ERC20>,
     tradeType: TradeType,
   ): Promise<QuoteResult> {
     const quotes = await getQuotesForRoutes(
-      multicallContract,
-      this.routingContracts.quoterAddress,
+      this.provider,
+      this.routingContracts.quoterV2,
       routes,
       amountSpecified,
       tradeType,

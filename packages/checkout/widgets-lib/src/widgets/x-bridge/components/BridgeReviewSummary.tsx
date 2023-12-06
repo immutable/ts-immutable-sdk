@@ -1,9 +1,14 @@
 import { text } from 'resources/text/textConfig';
-import { useContext, useMemo } from 'react';
+import {
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from 'react';
 import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
 import {
   Body,
-  Box, Heading, Icon, MenuItem,
+  Box, Button, Heading, Icon, MenuItem,
 } from '@biom3/react';
 import { ChainId, WalletProviderName } from '@imtbl/checkout-sdk';
 import { abbreviateAddress } from 'lib/addressUtils';
@@ -13,6 +18,7 @@ import { calculateCryptoToFiat } from 'lib/utils';
 import { Web3Provider } from '@ethersproject/providers';
 import { DEFAULT_QUOTE_REFRESH_INTERVAL } from 'lib';
 import { useInterval } from 'lib/hooks/useInterval';
+import { FeesBreakdown } from 'components/FeesBreakdown/FeesBreakdown';
 import { networkIconStyles } from './WalletNetworkButtonStyles';
 import {
   arrowIconStyles,
@@ -25,6 +31,7 @@ import {
   walletLogoStyles,
 } from './BridgeReviewSummaryStyles';
 import { XBridgeContext } from '../context/XBridgeContext';
+import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 
 const networkIcon = {
   [ChainId.IMTBL_ZKEVM_DEVNET]: 'Immutable',
@@ -42,8 +49,9 @@ const logo = {
 const testId = 'bridge-review-summary';
 
 export function BridgeReviewSummary() {
+  const { viewDispatch } = useContext(ViewContext);
   const {
-    heading, fromLabel, toLabel, fees, fiatPricePrefix,
+    heading, fromLabel, toLabel, fees, fiatPricePrefix, submitButton,
   } = text.views[XBridgeWidgetViews.BRIDGE_REVIEW];
 
   const {
@@ -56,6 +64,7 @@ export function BridgeReviewSummary() {
   } = useContext(XBridgeContext);
 
   const { cryptoFiatState } = useContext(CryptoFiatContext);
+  const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
 
   const walletProviderName = (provider: Web3Provider | undefined) => (isPassportProvider(provider)
     ? WalletProviderName.PASSPORT
@@ -87,9 +96,27 @@ export function BridgeReviewSummary() {
   };
   useInterval(() => fetchGasEstimate(), DEFAULT_QUOTE_REFRESH_INTERVAL);
 
+  const submitBridge = useCallback(async () => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: XBridgeWidgetViews.APPROVE_TRANSACTION,
+          data: {
+            approveTransaction: {},
+          },
+        },
+      },
+    });
+  }, [viewDispatch]);
+
   // Fetch on useInterval interval when available
   const gasEstimate = 'ETH 0.007984';
-  const gasFiatEstimate = '15.00';
+  const gasFiatEstimate = calculateCryptoToFiat(
+    '0.007984',
+    'ETH',
+    cryptoFiatState.conversions,
+  );
 
   return (
     <Box testId={testId} sx={bridgeReviewWrapperStyles}>
@@ -204,7 +231,43 @@ export function BridgeReviewSummary() {
           price={gasEstimate ?? '-'}
           fiatAmount={`${fiatPricePrefix}${gasFiatEstimate}`}
         />
+        <MenuItem.StatefulButtCon
+          icon="ChevronExpand"
+          onClick={() => setShowFeeBreakdown(true)}
+        />
       </MenuItem>
+      <Box
+        sx={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-end',
+          paddingY: 'base.spacing.x6',
+          width: '100%',
+        }}
+      >
+        <Button
+          size="large"
+          sx={{ width: '100%' }}
+          onClick={submitBridge}
+          testId={`${testId}__submit-button`}
+        >
+          {submitButton.buttonText}
+        </Button>
+      </Box>
+      <FeesBreakdown
+        totalFiatAmount={`${fiatPricePrefix}${gasFiatEstimate}`}
+        totalAmount={gasEstimate}
+        fees={[
+          {
+            label: text.drawers.feesBreakdown.fees.gas.label,
+            fiatAmount: `${fiatPricePrefix}${gasFiatEstimate}`,
+            amount: gasEstimate,
+          },
+        ]}
+        visible={showFeeBreakdown}
+        onCloseBottomSheet={() => setShowFeeBreakdown(false)}
+      />
     </Box>
   );
 }

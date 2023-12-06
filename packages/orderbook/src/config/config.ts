@@ -1,8 +1,6 @@
 import { Environment } from '@imtbl/config';
 import { providers } from 'ethers';
 
-export const LOCAL_CHAIN_NAME = 'imtbl-zkevm-local';
-export const DEVNET_CHAIN_NAME = 'imtbl-zkevm-devnet';
 export const TESTNET_CHAIN_NAME = 'imtbl-zkevm-testnet';
 export const MAINNET_CHAIN_NAME = 'imtbl-zkevm-mainnet';
 
@@ -28,8 +26,8 @@ export function getOrderbookConfig(
   switch (environment) {
     case Environment.SANDBOX:
       return {
-        seaportContractAddress: '0x2CFA8f64e1B49A2DF28532D1D30Cda45117cF778',
-        zoneContractAddress: '0x1Bb4Fb11Ba021Bd0104F0Ee8E5F5c728Bc83d7F1',
+        seaportContractAddress: '0x3A0C2Ba54D6CBd3121F01b96dFd20e99D1696C9D',
+        zoneContractAddress: '0x2EA937879beeF3393853A74Ad62F9ad7DA0B9E81',
         apiEndpoint: 'https://api.sandbox.immutable.com',
         chainName: TESTNET_CHAIN_NAME,
         provider: new providers.JsonRpcProvider(

@@ -203,13 +203,6 @@ export const text = {
       header: {
         title: 'Move coins',
       },
-      xBridgeContent: {
-        title: 'How much would you like to move?',
-      },
-      xBridgeFees: {
-        title: 'Gas Fee',
-        fiatPricePrefix: '~ USD',
-      },
       content: {
         title: 'What would you like to move from Ethereum to Immutable zkEVM?',
         fiatPricePrefix: 'Approx USD',
@@ -442,7 +435,7 @@ export const text = {
       text: 'Order completed',
       actionText: 'Continue',
     },
-    [XBridgeWidgetViews.WALLET_NETWORK_SECLECTION]: {
+    [XBridgeWidgetViews.WALLET_NETWORK_SELECTION]: {
       layoutHeading: 'Move',
       heading: 'Where would you like to move funds between?',
       fromFormInput: {
@@ -460,6 +453,27 @@ export const text = {
         text: 'Next',
       },
     },
+    [XBridgeWidgetViews.BRIDGE_FORM]: {
+      header: {
+        title: 'Move coins',
+      },
+      fees: {
+        title: 'Gas Fee',
+        fiatPricePrefix: '~ USD $',
+      },
+      content: {
+        title: 'How much would you like to move?',
+        fiatPricePrefix: 'Approx USD',
+        availableBalancePrefix: 'Available',
+      },
+      bridgeForm: {
+        from: {
+          inputPlaceholder: '0',
+          selectorTitle: 'What would you like to move?',
+        },
+        buttonText: 'Review',
+      },
+    },
     [XBridgeWidgetViews.BRIDGE_REVIEW]: {
       layoutHeading: 'Move',
       heading: 'Ok, how does this look?',
@@ -473,10 +487,27 @@ export const text = {
       fees: {
         heading: 'Gas fee',
       },
-      footer: {
+      submitButton: {
         buttonText: 'Confirm move',
       },
       fiatPricePrefix: '~ USD $',
+    },
+    [XBridgeWidgetViews.BRIDGE_FAILURE]: {
+      statusText: 'Transaction failed',
+      actionText: 'Review & Try again',
+    },
+    [XBridgeWidgetViews.APPROVE_TRANSACTION]: {
+      content: {
+        heading: 'Approve the transaction in your wallet',
+        body: 'Follow the prompts in your wallet popup to confirm.',
+      },
+      footer: {
+        buttonText: 'Okay',
+        retryText: 'Try again',
+      },
+      loading: {
+        text: 'Initiating move',
+      },
     },
   },
   footers: {
