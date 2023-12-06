@@ -16,7 +16,11 @@ new Orderbook({
 })
 ```
 
-### Demo Script
+### Usage
+
+The `*.demo.ts` and `*.e2e.ts` files in the `./test` folder have a number of practical examples of how the SDK is used for placing, fulfilling and cancelling listings.
+
+### Demo Scripts
 
 There are a number a demo scripts. Check the package.json for entries that following this pattern: `yarn run:demo*`. These scripts rely on an `.env` file that specifies the following properties:
 
