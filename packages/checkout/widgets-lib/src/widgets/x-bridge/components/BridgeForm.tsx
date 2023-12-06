@@ -26,6 +26,7 @@ import {
 import { SelectForm } from '../../../components/FormComponents/SelectForm/SelectForm';
 import { validateAmount, validateToken } from '../functions/BridgeFormValidator';
 import {
+  bridgeButtonIconLoadingStyle,
   bridgeFormButtonContainerStyles,
   bridgeFormWrapperStyles,
   formInputsContainerStyles,
@@ -39,7 +40,6 @@ import {
   NATIVE,
   getL1ChainId,
 } from '../../../lib';
-import { swapButtonIconLoadingStyle } from '../../swap/components/SwapButtonStyles';
 import { TransactionRejected } from '../../../components/TransactionRejected/TransactionRejected';
 import { NotEnoughGas } from '../../../components/NotEnoughGas/NotEnoughGas';
 import { XBridgeWidgetViews } from '../../../context/view-context/XBridgeViewContextTypes';
@@ -496,7 +496,7 @@ export function BridgeForm(props: BridgeFormProps) {
           size="large"
         >
           {loading ? (
-            <Button.Icon icon="Loading" sx={swapButtonIconLoadingStyle} />
+            <Button.Icon icon="Loading" sx={bridgeButtonIconLoadingStyle} />
           ) : bridgeForm.buttonText}
         </Button>
         <TransactionRejected

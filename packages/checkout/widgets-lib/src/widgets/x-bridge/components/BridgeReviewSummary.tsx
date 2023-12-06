@@ -17,16 +17,17 @@ import { CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext
 import { isPassportProvider } from 'lib/providerUtils';
 import { calculateCryptoToFiat, tokenValueFormat } from 'lib/utils';
 import { Web3Provider } from '@ethersproject/providers';
-import { DEFAULT_QUOTE_REFRESH_INTERVAL, DEFAULT_TOKEN_DECIMALS, getL1ChainId } from 'lib';
+import { DEFAULT_QUOTE_REFRESH_INTERVAL, DEFAULT_TOKEN_DECIMALS } from 'lib';
 import { useInterval } from 'lib/hooks/useInterval';
 import { FeesBreakdown } from 'components/FeesBreakdown/FeesBreakdown';
-import { BridgeFeeActions } from '@imtbl/bridge-sdk';
+import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
 import { utils } from 'ethers';
 import { networkIconStyles } from './WalletNetworkButtonStyles';
 import {
   arrowIconStyles,
   arrowIconWrapperStyles,
   bottomMenuItemStyles,
+  bridgeButtonIconLoadingStyle,
   bridgeReviewHeadingStyles,
   bridgeReviewWrapperStyles,
   gasAmountHeadingStyles,
@@ -71,9 +72,14 @@ export function BridgeReviewSummary() {
   const { cryptoFiatState } = useContext(CryptoFiatContext);
   const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
 
+  const [loading, setLoading] = useState(false);
   const [estimates, setEstimates] = useState<GasEstimateBridgeToL2Result | undefined>(undefined);
   const [gasFee, setGasFee] = useState<string>('');
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [approvalTransaction, setApprovalTransaction] = useState<ApproveBridgeResponse | undefined>(undefined);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [transaction, setTransaction] = useState<BridgeTxResponse | undefined>(undefined);
 
   const walletProviderName = (provider: Web3Provider | undefined) => (isPassportProvider(provider)
     ? WalletProviderName.PASSPORT
@@ -102,14 +108,6 @@ export function BridgeReviewSummary() {
   const fetchGasEstimate = useCallback(async () => {
     if (!tokenBridge || !amount || !from || !to || !token) return;
 
-    // eslint-disable-next-line no-console
-    console.log('fetch gas estimate');
-
-    const bridgeFeeAction = from?.network === getL1ChainId(checkout.config)
-      ? BridgeFeeActions.DEPOSIT
-      : BridgeFeeActions.WITHDRAW;
-    console.log(bridgeFeeAction);
-
     const [unsignedApproveTransaction, unsignedTransaction] = await Promise.all([
       tokenBridge!.getUnsignedApproveBridgeTx({
         senderAddress: fromAddress,
@@ -131,6 +129,9 @@ export function BridgeReviewSummary() {
 
     console.log('unsignedApproveTransaction', unsignedApproveTransaction);
     console.log('unsignedTransaction', unsignedTransaction);
+
+    setApprovalTransaction(unsignedApproveTransaction);
+    setTransaction(unsignedTransaction);
 
     // todo: add approval gas fees
 
@@ -161,7 +162,11 @@ export function BridgeReviewSummary() {
   useInterval(() => fetchGasEstimate(), DEFAULT_QUOTE_REFRESH_INTERVAL);
 
   useEffect(() => {
-    (async () => await fetchGasEstimate())();
+    (async () => {
+      setLoading(true);
+      await fetchGasEstimate();
+      setLoading(false);
+    })();
   }, []);
 
   const submitBridge = useCallback(async () => {
@@ -274,6 +279,7 @@ export function BridgeReviewSummary() {
           />
         )}
       </MenuItem>
+      {gasFee && (
       <MenuItem
         testId={`${testId}-gas-amount`}
         size="small"
@@ -296,6 +302,7 @@ export function BridgeReviewSummary() {
           onClick={() => setShowFeeBreakdown(true)}
         />
       </MenuItem>
+      )}
       <Box
         sx={{
           flex: 1,
@@ -310,19 +317,22 @@ export function BridgeReviewSummary() {
           size="large"
           sx={{ width: '100%' }}
           onClick={submitBridge}
+          disabled={loading}
           testId={`${testId}__submit-button`}
         >
-          {submitButton.buttonText}
+          {loading ? (
+            <Button.Icon icon="Loading" sx={bridgeButtonIconLoadingStyle} />
+          ) : submitButton.buttonText}
         </Button>
       </Box>
       <FeesBreakdown
-        totalFiatAmount={`${fiatPricePrefix}${gasFiatEstimate}`}
-        totalAmount={gasEstimate}
+        totalFiatAmount={`${fiatPricePrefix}${gasFeeFiatValue}`}
+        totalAmount={gasFee}
         fees={[
           {
             label: text.drawers.feesBreakdown.fees.gas.label,
-            fiatAmount: `${fiatPricePrefix}${gasFiatEstimate}`,
-            amount: gasEstimate,
+            fiatAmount: `${fiatPricePrefix}${gasFeeFiatValue}`,
+            amount: gasFee,
           },
         ]}
         visible={showFeeBreakdown}
