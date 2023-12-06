@@ -250,6 +250,7 @@ export function BridgeReviewSummary() {
           size="large"
           sx={{ width: '100%' }}
           onClick={submitBridge}
+          testId={`${testId}__submit-button`}
         >
           {submitButton.buttonText}
         </Button>

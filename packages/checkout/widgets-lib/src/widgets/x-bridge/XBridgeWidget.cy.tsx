@@ -553,9 +553,14 @@ describe('XBridgeWidget', () => {
       cySmartGet('bridge-review-summary-from-amount__priceDisplay__price').should('have.text', 'IMX 1');
       cySmartGet('bridge-review-summary-from-amount__priceDisplay__fiatAmount').should('have.text', '~ USD $1.50');
       cySmartGet('bridge-review-summary-gas-amount__priceDisplay__price').should('have.text', 'ETH 0.007984');
-      cySmartGet('bridge-review-summary-gas-amount__priceDisplay__fiatAmount').should('have.text', '~ USD $15.00');
+      cySmartGet('bridge-review-summary-gas-amount__priceDisplay__fiatAmount').should('have.text', '~ USD $15.97');
       cySmartGet('bridge-review-summary-from-address__label').should('include.text', '0x0987...4321');
       cySmartGet('bridge-review-summary-to-address__label').should('include.text', '0x1234...7890');
+      cySmartGet('bridge-review-summary__submit-button').click();
+
+      // Approvals screen
+      cySmartGet('wallet-approve-hero').should('be.visible');
+      cySmartGet('footer-button').click();
     });
   });
 });

@@ -27,6 +27,7 @@ import { FooterLogo } from '../../../components/Footer/FooterLogo';
 export interface ApproveTxnProps {
   data: ApproveTxnData;
 }
+
 export function ApproveTransaction({ data }: ApproveTxnProps) {
   const { bridgeState } = useContext(XBridgeContext);
   const {
