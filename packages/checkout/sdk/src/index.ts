@@ -12,7 +12,6 @@ export { Checkout } from './sdk';
 export {
   ChainId,
   ChainName,
-  CHECKOUT_API_BASE_URL,
   CheckoutStatus,
   ExchangeType,
   FundingStepType,
@@ -50,6 +49,8 @@ export type {
   CheckoutSwapConfiguration,
   ConnectParams,
   ConnectResult,
+  CreateProviderParams,
+  CreateProviderResult,
   DexConfig,
   ERC20ItemRequirement,
   ERC721Balance,
@@ -119,3 +120,4 @@ export type {
 export type { ErrorType } from './errors';
 export { CheckoutErrorType } from './errors';
 export { CheckoutConfiguration } from './config';
+export { CHECKOUT_API_BASE_URL } from './env';

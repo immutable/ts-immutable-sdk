@@ -1,6 +1,6 @@
 import {
   Body,
-  BottomSheet, Box, Button, FramedImage, Heading, Logo,
+  Drawer, Box, Button, FramedImage, Heading, Logo,
 } from '@biom3/react';
 import {
   containerStyles,
@@ -15,12 +15,12 @@ type NotEnoughImxProps = {
   visible: boolean;
   showAdjustAmount: boolean;
   hasZeroImx: boolean;
-  onCloseBottomSheet?: () => void;
+  onCloseDrawer?: () => void;
   onAddCoinsClick: () => void;
 };
 
 export function NotEnoughImx({
-  visible, showAdjustAmount, hasZeroImx, onCloseBottomSheet, onAddCoinsClick,
+  visible, showAdjustAmount, hasZeroImx, onCloseDrawer, onAddCoinsClick,
 }: NotEnoughImxProps) {
   const { content, buttons } = text.drawers.notEnoughImx;
   const { noImx, insufficientImx } = content;
@@ -28,13 +28,13 @@ export function NotEnoughImx({
   const imxLogo = 'https://design-system.immutable.com/hosted-for-ds/currency-icons/currency--imx.svg';
 
   return (
-    <BottomSheet
+    <Drawer
       size="full"
-      onCloseBottomSheet={onCloseBottomSheet}
+      onCloseDrawer={onCloseDrawer}
       visible={visible}
       showHeaderBar={false}
     >
-      <BottomSheet.Content>
+      <Drawer.Content>
         <Box testId="not-enough-gas-bottom-sheet" sx={containerStyles}>
           <FramedImage
             imageUrl={imxLogo}
@@ -60,7 +60,7 @@ export function NotEnoughImx({
                 testId="not-enough-gas-adjust-amount-button"
                 sx={actionButtonStyles}
                 variant="tertiary"
-                onClick={onCloseBottomSheet}
+                onClick={onCloseDrawer}
               >
                 {buttons.adjustAmount}
               </Button>
@@ -76,7 +76,7 @@ export function NotEnoughImx({
             <Button
               sx={actionButtonStyles}
               variant="tertiary"
-              onClick={onCloseBottomSheet}
+              onClick={onCloseDrawer}
               testId="not-enough-gas-cancel-button"
             >
               {buttons.cancel}
@@ -90,7 +90,7 @@ export function NotEnoughImx({
             />
           </Box>
         </Box>
-      </BottomSheet.Content>
-    </BottomSheet>
+      </Drawer.Content>
+    </Drawer>
   );
 }

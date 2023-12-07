@@ -2,8 +2,6 @@ import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
 import { BigNumber, Contract } from 'ethers';
 import {
-  DEFAULT_TOKEN_DECIMALS,
-  IMX_ADDRESS_ZKEVM,
   ItemRequirement,
   ItemType,
 } from '../../types';
@@ -11,6 +9,7 @@ import { balanceCheck } from './balanceCheck';
 import { CheckoutConfiguration } from '../../config';
 import { getAllBalances } from '../../balances';
 import { BalanceCheckResult } from './types';
+import { DEFAULT_TOKEN_DECIMALS } from '../../env';
 
 jest.mock('../../balances');
 jest.mock('ethers', () => ({
@@ -57,7 +56,6 @@ describe('balanceCheck', () => {
                 name: '',
                 symbol: '',
                 decimals: 18,
-                address: IMX_ADDRESS_ZKEVM,
               },
             },
           ],
@@ -85,7 +83,6 @@ describe('balanceCheck', () => {
                 name: 'IMX',
                 symbol: 'IMX',
                 decimals: 18,
-                address: IMX_ADDRESS_ZKEVM,
               },
             },
           ],
@@ -115,7 +112,6 @@ describe('balanceCheck', () => {
                   name: 'IMX',
                   symbol: 'IMX',
                   decimals: 18,
-                  address: IMX_ADDRESS_ZKEVM,
                 },
               },
             },
@@ -276,7 +272,6 @@ describe('balanceCheck', () => {
               balance: BigNumber.from(0),
               formattedBalance: '0',
               token: {
-                address: IMX_ADDRESS_ZKEVM,
                 decimals: DEFAULT_TOKEN_DECIMALS,
                 name: '',
                 symbol: '',
@@ -291,7 +286,6 @@ describe('balanceCheck', () => {
               balance: BigNumber.from(2),
               formattedBalance: '0.000000000000000002',
               token: {
-                address: IMX_ADDRESS_ZKEVM,
                 decimals: DEFAULT_TOKEN_DECIMALS,
                 name: '',
                 symbol: '',
@@ -363,7 +357,6 @@ describe('balanceCheck', () => {
               name: '',
               symbol: '',
               decimals: 18,
-              address: IMX_ADDRESS_ZKEVM,
             },
           },
           {
@@ -433,7 +426,6 @@ describe('balanceCheck', () => {
               name: '',
               symbol: '',
               decimals: 18,
-              address: IMX_ADDRESS_ZKEVM,
             },
           },
         ],
@@ -458,7 +450,6 @@ describe('balanceCheck', () => {
               balance: BigNumber.from(1),
               formattedBalance: '0.000000000000000001',
               token: {
-                address: IMX_ADDRESS_ZKEVM,
                 decimals: 18,
                 name: '',
                 symbol: '',
@@ -476,7 +467,6 @@ describe('balanceCheck', () => {
                 name: '',
                 symbol: '',
                 decimals: 18,
-                address: IMX_ADDRESS_ZKEVM,
               },
             },
             sufficient: false,

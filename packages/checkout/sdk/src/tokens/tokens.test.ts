@@ -1,8 +1,9 @@
 import { Environment } from '@imtbl/config';
 import { ChainId, TokenFilterTypes } from '../types';
-import { getTokenAllowList } from './tokens';
+import { getTokenAllowList, isNativeToken } from './tokens';
 import { RemoteConfigFetcher } from '../config/remoteConfigFetcher';
 import { CheckoutConfiguration } from '../config';
+import { NATIVE } from '../env';
 
 jest.mock('../config/remoteConfigFetcher');
 
@@ -206,6 +207,28 @@ describe('token related functions', () => {
           tokens: testcase.result,
         });
       });
+    });
+  });
+
+  describe('isNativeToken', () => {
+    it('should return true if address is undefined', () => {
+      expect(isNativeToken(undefined)).toBeTruthy();
+    });
+
+    it('should return true if address is empty', () => {
+      expect(isNativeToken('')).toBeTruthy();
+    });
+
+    it('should return true if address is `native`', () => {
+      expect(isNativeToken(NATIVE)).toBeTruthy();
+    });
+
+    it('should return true if address is `NATIVE`', () => {
+      expect(isNativeToken('NATIVE')).toBeTruthy();
+    });
+
+    it('should return false if address is not NATIVE', () => {
+      expect(isNativeToken('0x123')).toBeFalsy();
     });
   });
 });

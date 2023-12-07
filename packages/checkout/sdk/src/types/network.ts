@@ -1,6 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { ChainId } from './chains';
 import { NetworkInfo } from './networkInfo';
+import { TokenInfo } from './tokenInfo';
 
 /**
  * Interface representing the parameters for {@link Checkout.switchNetwork}.
@@ -63,3 +64,13 @@ export enum NetworkFilterTypes {
 export interface NetworkFilter {
   chainId: ChainId;
 }
+
+export type NetworkDetails = {
+  chainIdHex: string;
+  chainName: string;
+  rpcUrls: string[];
+  nativeCurrency: TokenInfo;
+  blockExplorerUrls?: string[];
+};
+
+export type NetworkMap = Map<ChainId, NetworkDetails>;

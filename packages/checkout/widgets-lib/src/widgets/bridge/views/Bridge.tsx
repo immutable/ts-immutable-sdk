@@ -17,7 +17,7 @@ const REFRESH_TOKENS_INTERVAL_MS = 10000;
 
 export interface BridgeProps {
   amount: string | undefined;
-  fromContractAddress: string | undefined;
+  fromContractAddress?: string;
 }
 
 export function Bridge({ amount, fromContractAddress }: BridgeProps) {

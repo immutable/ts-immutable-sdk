@@ -19,7 +19,7 @@ describe.only('orderbook fees', () => {
 
     expect(result).toEqual([{
       amount: '250000000000000000',
-      recipient: '0x222',
+      recipientAddress: '0x222',
     }]);
   });
 
@@ -61,7 +61,7 @@ describe.only('orderbook fees', () => {
 
     expect(result).toEqual([{
       amount: '1000000',
-      recipient: '0x222',
+      recipientAddress: '0x222',
     }]);
   });
 
@@ -90,7 +90,7 @@ describe.only('orderbook fees', () => {
 
     expect(result).toEqual([{
       amount: '12500000000000000',
-      recipient: '0x222',
+      recipientAddress: '0x222',
     }]);
   });
 
@@ -109,10 +109,10 @@ describe.only('orderbook fees', () => {
 
     expect(result).toEqual([{
       amount: '250000000000000000',
-      recipient: '0x222',
+      recipientAddress: '0x222',
     }, {
       amount: '500000000000000000',
-      recipient: '0x333',
+      recipientAddress: '0x333',
     }]);
   });
 
@@ -131,10 +131,10 @@ describe.only('orderbook fees', () => {
 
     expect(result).toEqual([{
       amount: '7000000000000000000',
-      recipient: '0x222',
+      recipientAddress: '0x222',
     }, {
       amount: '3000000000000000000',
-      recipient: '0x333',
+      recipientAddress: '0x333',
     }]);
   });
 
@@ -173,7 +173,7 @@ describe.only('orderbook fees', () => {
 
     expect(result).toEqual([{
       amount: '1000000000000000000',
-      recipient: '0x222',
+      recipientAddress: '0x222',
     }]);
   });
 
@@ -189,7 +189,7 @@ describe.only('orderbook fees', () => {
 
     expect(result).toEqual([{
       amount: '100000000000000000',
-      recipient: '0x222',
+      recipientAddress: '0x222',
     }]);
   });
 
@@ -208,10 +208,10 @@ describe.only('orderbook fees', () => {
 
     expect(result).toEqual([{
       amount: '1000000000000000000',
-      recipient: '0x222',
+      recipientAddress: '0x222',
     }, {
       amount: '500000000000000000',
-      recipient: '0x333',
+      recipientAddress: '0x333',
     }]);
   });
 
@@ -253,10 +253,10 @@ describe.only('orderbook fees', () => {
 
     expect(result).toEqual([{
       amount: '250000000000000000',
-      recipient: '0x222',
+      recipientAddress: '0x222',
     }, {
       amount: '500000000000000000',
-      recipient: '0x333',
+      recipientAddress: '0x333',
     }]);
   });
 

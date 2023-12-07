@@ -3,12 +3,9 @@ import { BigNumber, Contract, utils } from 'ethers';
 import { HttpStatusCode } from 'axios';
 import {
   ChainId,
-  DEFAULT_TOKEN_DECIMALS,
-  ERC20ABI,
   GetAllBalancesResult,
   GetBalanceResult,
   GetBalancesResult,
-  IMX_ADDRESS_ZKEVM,
   TokenFilterTypes,
   TokenInfo,
 } from '../types';
@@ -22,7 +19,10 @@ import {
   BlockscoutTokens,
   BlockscoutTokenType,
 } from '../client';
-import { measureAsyncExecution } from '../utils/debugLogger';
+import {
+  DEFAULT_TOKEN_DECIMALS, ERC20ABI, NATIVE,
+} from '../env';
+import { measureAsyncExecution } from '../logger/debugLogger';
 
 export const getBalance = async (
   config: CheckoutConfiguration,
@@ -100,12 +100,15 @@ export const resetBlockscoutClientMap = () => blockscoutClientMap.clear();
 export const getIndexerBalance = async (
   walletAddress: string,
   chainId: ChainId,
-  filterTokens: TokenInfo[],
+  filterTokens: TokenInfo[] | undefined,
 ): Promise<GetAllBalancesResult> => {
   // Shuffle the mapping of the tokens configuration so it is a hashmap
   // for faster access to tokens config objects.
-  const shouldFilter = filterTokens.length > 0;
-  const mapFilterTokens = Object.assign({}, ...(filterTokens.map((t) => ({ [t.address || '']: t }))));
+  const shouldFilter = filterTokens !== undefined;
+  const mapFilterTokens = Object.assign(
+    {},
+    ...((filterTokens ?? []).map((t) => ({ [t.address || NATIVE]: t }))),
+  );
 
   // Get blockscout client for the given chain
   let blockscoutClient = blockscoutClientMap.get(chainId);
@@ -154,6 +157,7 @@ export const getIndexerBalance = async (
   const nativeBalances = async (client: Blockscout) => {
     try {
       const respNative = await client.getNativeTokenByWalletAddress({ walletAddress });
+      respNative.token.address ||= NATIVE;
       items.push(respNative);
     } catch (err: any) {
       // In case of a 404, the wallet is a new wallet that hasn't been indexed by
@@ -212,14 +216,13 @@ export const getBalances = async (
   const allBalancePromises: Promise<GetBalanceResult>[] = [];
   tokens
     .forEach((token: TokenInfo) => {
-      // Check for NATIVE token
-      if (!token.address || token.address === IMX_ADDRESS_ZKEVM) {
+      if (!token.address || token.address.toLocaleLowerCase() === NATIVE) {
         allBalancePromises.push(
           getBalance(config, web3Provider, walletAddress),
         );
       } else {
         allBalancePromises.push(
-          getERC20Balance(web3Provider, walletAddress, token.address),
+          getERC20Balance(web3Provider, walletAddress, token.address!),
         );
       }
     });
@@ -271,7 +274,7 @@ export const getAllBalances = async (
     return await measureAsyncExecution<GetAllBalancesResult>(
       config,
       `Time to fetch balances using blockscout for ${chainId}`,
-      getIndexerBalance(walletAddress, chainId, isL1Chain ? tokens : []),
+      getIndexerBalance(walletAddress, chainId, isL1Chain ? tokens : undefined),
     );
   }
 

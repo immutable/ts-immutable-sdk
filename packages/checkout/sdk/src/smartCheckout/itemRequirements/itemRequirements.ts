@@ -1,7 +1,6 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { utils } from 'ethers';
 import {
-  ERC20ABI,
   ERC20Item,
   ERC20ItemRequirement,
   ERC721Item,
@@ -12,6 +11,7 @@ import {
   NativeItemRequirement,
 } from '../../types';
 import { getTokenContract } from '../../instance';
+import { ERC20ABI } from '../../env';
 
 export async function getItemRequirementsFromRequirements(
   provider: Web3Provider,

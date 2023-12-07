@@ -11,9 +11,8 @@ import {
 import { Base } from 'widgets/BaseWidgetRoot';
 import { ConnectLoader, ConnectLoaderParams } from 'components/ConnectLoader/ConnectLoader';
 import { getL1ChainId, getL2ChainId } from 'lib';
-import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
 import { isValidWalletProvider } from 'lib/validations/widgetValidators';
-import { BiomePortalIdProvider } from '@biom3/react';
+import { WidgetContainer } from 'components/WidgetContainer/WidgetContainer';
 import { WalletWidget } from './WalletWidget';
 import { sendWalletWidgetCloseEvent } from './WalletWidgetEvents';
 
@@ -48,6 +47,8 @@ export class Wallet extends Base<WidgetType.WALLET> {
   }
 
   protected render() {
+    if (!this.reactRoot) return;
+
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER2,
       walletProviderName: this.parameters?.walletProviderName,
@@ -56,23 +57,19 @@ export class Wallet extends Base<WidgetType.WALLET> {
       allowedChains: [getL1ChainId(this.checkout.config), getL2ChainId(this.checkout.config)],
     };
 
-    if (!this.reactRoot) return;
-
     this.reactRoot.render(
       <React.StrictMode>
-        <BiomePortalIdProvider>
-          <CustomAnalyticsProvider widgetConfig={this.strongConfig()}>
-            <ConnectLoader
-              widgetConfig={this.strongConfig()}
-              params={connectLoaderParams}
-              closeEvent={() => sendWalletWidgetCloseEvent(window)}
-            >
-              <WalletWidget
-                config={this.strongConfig()}
-              />
-            </ConnectLoader>
-          </CustomAnalyticsProvider>
-        </BiomePortalIdProvider>
+        <WidgetContainer id="wallet-container" config={this.strongConfig()}>
+          <ConnectLoader
+            widgetConfig={this.strongConfig()}
+            params={connectLoaderParams}
+            closeEvent={() => sendWalletWidgetCloseEvent(window)}
+          >
+            <WalletWidget
+              config={this.strongConfig()}
+            />
+          </ConnectLoader>
+        </WidgetContainer>
       </React.StrictMode>,
     );
   }

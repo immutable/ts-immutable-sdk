@@ -2,8 +2,8 @@ import React from 'react';
 import {
   ConnectWidgetParams, IMTBLWidgetEvents, WidgetProperties, WidgetType,
 } from '@imtbl/checkout-sdk';
+import { WidgetContainer } from 'components/WidgetContainer/WidgetContainer';
 import { ConnectWidget } from './ConnectWidget';
-import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 import { Base } from '../BaseWidgetRoot';
 
 export class Connect extends Base<WidgetType.CONNECT> {
@@ -26,14 +26,12 @@ export class Connect extends Base<WidgetType.CONNECT> {
 
     this.reactRoot.render(
       <React.StrictMode>
-        <CustomAnalyticsProvider
-          widgetConfig={this.strongConfig()}
-        >
+        <WidgetContainer id="connect-container" config={this.strongConfig()}>
           <ConnectWidget
             config={this.strongConfig()}
             checkout={this.checkout}
           />
-        </CustomAnalyticsProvider>
+        </WidgetContainer>
       </React.StrictMode>,
     );
   }

@@ -6,18 +6,18 @@ import { mount } from 'cypress/react18';
 import {
   BridgeWidgetParams,
   ChainId,
-  Checkout, CheckoutErrorType, GasEstimateType, TokenAmountEstimate, WidgetTheme,
+  Checkout,
+  CheckoutErrorType,
+  GasEstimateType, TokenAmountEstimate, WidgetTheme,
 } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { CompletionStatus, TokenBridge } from '@imtbl/bridge-sdk';
-import { BiomeCombinedProviders } from '@biom3/react';
 import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
-import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
+import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { BridgeWidget } from './BridgeWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { IMX_ADDRESS_ZKEVM } from '../../lib';
 import { text } from '../../resources/text/textConfig';
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
 import { ConnectionStatus } from '../../context/connect-loader-context/ConnectLoaderContext';
@@ -117,7 +117,7 @@ describe('Bridge Widget tests', () => {
               name: 'ImmutableX',
               symbol: 'IMX',
               decimals: 18,
-              address: IMX_ADDRESS_ZKEVM,
+              address: '0ximxaddronl1',
               icon: '123',
             },
           },
@@ -142,7 +142,7 @@ describe('Bridge Widget tests', () => {
             name: 'ImmutableX',
             symbol: 'IMX',
             decimals: 18,
-            address: IMX_ADDRESS_ZKEVM,
+            address: '0ximxaddronl1',
           },
         ],
       });
@@ -216,7 +216,7 @@ describe('Bridge Widget tests', () => {
     it('should show bridge widget on mount', () => {
       const params = {} as BridgeWidgetParams;
       mount(
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <ViewContextTestComponent>
           <ConnectLoaderTestComponent
             initialStateOverride={connectLoaderState}
           >
@@ -225,7 +225,7 @@ describe('Bridge Widget tests', () => {
               {...params}
             />
           </ConnectLoaderTestComponent>
-        </CustomAnalyticsProvider>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('bridge-view').should('exist');
@@ -248,7 +248,7 @@ describe('Bridge Widget tests', () => {
                 name: 'ImmutableX',
                 symbol: 'IMX',
                 decimals: 18,
-                address: IMX_ADDRESS_ZKEVM,
+                address: '0ximxaddronl1',
                 icon: '123',
               },
             },
@@ -256,7 +256,7 @@ describe('Bridge Widget tests', () => {
         });
 
       mount(
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <ViewContextTestComponent>
           <ConnectLoaderTestComponent
             initialStateOverride={connectLoaderState}
           >
@@ -266,11 +266,11 @@ describe('Bridge Widget tests', () => {
             />
           </ConnectLoaderTestComponent>
 
-        </CustomAnalyticsProvider>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet(`bridge-token-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).should('exist');
+      cySmartGet('bridge-token-coin-selector__option-imx-0ximxaddronl1').should('exist');
     });
 
     it('should show error screen after getAllBalances unrecoverable failure', () => {
@@ -287,7 +287,7 @@ describe('Bridge Widget tests', () => {
                 name: 'ImmutableX',
                 symbol: 'IMX',
                 decimals: 18,
-                address: IMX_ADDRESS_ZKEVM,
+                address: '0ximxaddronl1',
                 icon: '123',
               },
             },
@@ -297,7 +297,7 @@ describe('Bridge Widget tests', () => {
       const params = {} as BridgeWidgetParams;
 
       mount(
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <ViewContextTestComponent>
           <ConnectLoaderTestComponent
             initialStateOverride={connectLoaderState}
           >
@@ -307,20 +307,20 @@ describe('Bridge Widget tests', () => {
             />
           </ConnectLoaderTestComponent>
 
-        </CustomAnalyticsProvider>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('error-view').should('be.visible');
       cySmartGet('footer-button').click();
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet(`bridge-token-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).should('exist');
+      cySmartGet('bridge-token-coin-selector__option-imx-0ximxaddronl1').should('exist');
     });
 
     it('should set up bridge widget on mount', () => {
       const params = {} as BridgeWidgetParams;
       mount(
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <ViewContextTestComponent>
           <ConnectLoaderTestComponent
             initialStateOverride={connectLoaderState}
           >
@@ -330,7 +330,7 @@ describe('Bridge Widget tests', () => {
             />
           </ConnectLoaderTestComponent>
 
-        </CustomAnalyticsProvider>,
+        </ViewContextTestComponent>,
       );
       cySmartGet('@getAllBalancesStub').should('have.been.called');
       cySmartGet('@getTokenAllowListStub').should('have.been.called');
@@ -422,7 +422,7 @@ describe('Bridge Widget tests', () => {
         }));
 
       mount(
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <ViewContextTestComponent>
           <ConnectLoaderTestComponent
             initialStateOverride={connectLoaderState}
           >
@@ -438,11 +438,11 @@ describe('Bridge Widget tests', () => {
             />
           </ConnectLoaderTestComponent>
 
-        </CustomAnalyticsProvider>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet(`bridge-token-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).click();
+      cySmartGet('bridge-token-coin-selector__option-imx-0ximxaddronl1').click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
       cySmartGet('bridge-amount-text__input').blur();
@@ -503,8 +503,8 @@ describe('Bridge Widget tests', () => {
         });
 
       mount(
-        <BiomeCombinedProviders>
-          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <ViewContextTestComponent>
+          <ViewContextTestComponent>
             <ConnectLoaderTestComponent
               initialStateOverride={connectLoaderState}
             >
@@ -519,12 +519,12 @@ describe('Bridge Widget tests', () => {
                 {...params}
               />
             </ConnectLoaderTestComponent>
-          </CustomAnalyticsProvider>
-        </BiomeCombinedProviders>,
+          </ViewContextTestComponent>
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet(`bridge-token-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).click();
+      cySmartGet('bridge-token-coin-selector__option-imx-0ximxaddronl1').click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
       cySmartGet('bridge-amount-text__input').blur();
@@ -556,8 +556,8 @@ describe('Bridge Widget tests', () => {
         });
 
       mount(
-        <BiomeCombinedProviders>
-          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <ViewContextTestComponent>
+          <ViewContextTestComponent>
             <ConnectLoaderTestComponent
               initialStateOverride={connectLoaderState}
             >
@@ -572,12 +572,12 @@ describe('Bridge Widget tests', () => {
                 {...params}
               />
             </ConnectLoaderTestComponent>
-          </CustomAnalyticsProvider>
-        </BiomeCombinedProviders>,
+          </ViewContextTestComponent>
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet(`bridge-token-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).click();
+      cySmartGet('bridge-token-coin-selector__option-imx-0ximxaddronl1').click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
       cySmartGet('bridge-amount-text__input').blur();
@@ -615,8 +615,8 @@ describe('Bridge Widget tests', () => {
         });
 
       mount(
-        <BiomeCombinedProviders>
-          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <ViewContextTestComponent>
+          <ViewContextTestComponent>
             <ConnectLoaderTestComponent
               initialStateOverride={connectLoaderState}
             >
@@ -631,12 +631,12 @@ describe('Bridge Widget tests', () => {
                 {...params}
               />
             </ConnectLoaderTestComponent>
-          </CustomAnalyticsProvider>
-        </BiomeCombinedProviders>,
+          </ViewContextTestComponent>
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet(`bridge-token-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).click();
+      cySmartGet('bridge-token-coin-selector__option-imx-0ximxaddronl1').click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
       cySmartGet('bridge-amount-text__input').blur();
@@ -671,8 +671,8 @@ describe('Bridge Widget tests', () => {
         });
 
       mount(
-        <BiomeCombinedProviders>
-          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <ViewContextTestComponent>
+          <ViewContextTestComponent>
             <ConnectLoaderTestComponent
               initialStateOverride={connectLoaderState}
             >
@@ -687,12 +687,12 @@ describe('Bridge Widget tests', () => {
                 {...params}
               />
             </ConnectLoaderTestComponent>
-          </CustomAnalyticsProvider>
-        </BiomeCombinedProviders>,
+          </ViewContextTestComponent>
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet(`bridge-token-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).click();
+      cySmartGet('bridge-token-coin-selector__option-imx-0ximxaddronl1').click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
       cySmartGet('bridge-amount-text__input').blur();
@@ -727,8 +727,8 @@ describe('Bridge Widget tests', () => {
         .rejects({});
 
       mount(
-        <BiomeCombinedProviders>
-          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <ViewContextTestComponent>
+          <ViewContextTestComponent>
             <ConnectLoaderTestComponent
               initialStateOverride={connectLoaderState}
             >
@@ -743,12 +743,12 @@ describe('Bridge Widget tests', () => {
                 {...params}
               />
             </ConnectLoaderTestComponent>
-          </CustomAnalyticsProvider>
-        </BiomeCombinedProviders>,
+          </ViewContextTestComponent>
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet(`bridge-token-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).click();
+      cySmartGet('bridge-token-coin-selector__option-imx-0ximxaddronl1').click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
       cySmartGet('bridge-amount-text__input').blur();

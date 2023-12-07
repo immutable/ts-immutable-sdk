@@ -1,18 +1,19 @@
 import { Environment } from '@imtbl/config';
-import { ChainId, ChainName } from './chains';
-import { TokenInfo } from './tokenInfo';
+import { BigNumber } from 'ethers';
+import { ChainId, ChainName } from '../types/chains';
+import { TokenInfo } from '../types/tokenInfo';
+import { NetworkDetails, NetworkMap } from '../types';
 
 export const ENV_DEVELOPMENT = 'development' as Environment;
 
-export const IMX_ADDRESS_ZKEVM = '0x0000000000000000000000000000000000001010';
-
 export const DEFAULT_TOKEN_DECIMALS = 18;
 
-const ZKEVM_NATIVE_TOKEN = {
+export const NATIVE = 'native';
+
+export const ZKEVM_NATIVE_TOKEN = {
   name: 'IMX',
   symbol: 'IMX',
   decimals: DEFAULT_TOKEN_DECIMALS,
-  address: IMX_ADDRESS_ZKEVM,
 };
 
 /**
@@ -58,16 +59,6 @@ export const TRANSAK_API_BASE_URL = {
   [Environment.SANDBOX]: 'https://global-stg.transak.com',
   [Environment.PRODUCTION]: 'https://global.transak.com/',
 };
-
-type NetworkDetails = {
-  chainIdHex: string;
-  chainName: string;
-  rpcUrls: string[];
-  nativeCurrency: TokenInfo;
-  blockExplorerUrls?: string[];
-};
-
-export type NetworkMap = Map<ChainId, NetworkDetails>;
 
 export const PRODUCTION_CHAIN_ID_NETWORK_MAP: NetworkMap = new Map<
 ChainId,
@@ -381,3 +372,10 @@ export const ERC721ABI = [
     type: 'function',
   },
 ];
+
+// Gas overrides -- Anti-spam mechanism for when the baseFee drops low
+// https://github.com/immutable/imx-docs/blob/main/docs/main/zkEVM/overview/gas-configuration.md
+export const GAS_OVERRIDES = {
+  maxFeePerGas: BigNumber.from(102e9),
+  maxPriorityFeePerGas: BigNumber.from(101e9),
+};

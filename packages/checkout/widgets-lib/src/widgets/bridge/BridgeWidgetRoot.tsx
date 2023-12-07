@@ -13,10 +13,8 @@ import { Base } from 'widgets/BaseWidgetRoot';
 import { ConnectLoader, ConnectLoaderParams } from 'components/ConnectLoader/ConnectLoader';
 import { getL1ChainId } from 'lib';
 import { isPassportProvider } from 'lib/providerUtils';
-import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
-import { BiomeCombinedProviders } from '@biom3/react';
-import { widgetTheme } from 'lib/theme';
 import { isValidWalletProvider, isValidAmount, isValidAddress } from 'lib/validations/widgetValidators';
+import { WidgetContainer } from 'components/WidgetContainer/WidgetContainer';
 import { BridgeComingSoon } from './views/BridgeComingSoon';
 import { sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
 import { BridgeWidget } from './BridgeWidget';
@@ -64,6 +62,8 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
   }
 
   protected render() {
+    if (!this.reactRoot) return;
+
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER1,
       walletProviderName: this.parameters.walletProviderName,
@@ -75,34 +75,27 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
     const showBridgeComingSoonScreen = isPassportProvider(this.web3Provider)
       || this.parameters.walletProviderName === WalletProviderName.PASSPORT;
 
-    if (!this.reactRoot) return;
-
-    const theme = widgetTheme(this.strongConfig().theme);
-
     this.reactRoot.render(
       <React.StrictMode>
-        <CustomAnalyticsProvider
-          widgetConfig={this.strongConfig()}
-        >
+        <WidgetContainer id="bridge-container" config={this.strongConfig()}>
           {showBridgeComingSoonScreen && (
-            <BiomeCombinedProviders theme={{ base: theme }}>
-              <BridgeComingSoon onCloseEvent={() => sendBridgeWidgetCloseEvent(window)} />
-            </BiomeCombinedProviders>
+          <BridgeComingSoon onCloseEvent={() => sendBridgeWidgetCloseEvent(window)} />
+
           )}
           {!showBridgeComingSoonScreen && (
-            <ConnectLoader
-              params={connectLoaderParams}
-              closeEvent={() => sendBridgeWidgetCloseEvent(window)}
-              widgetConfig={this.strongConfig()}
-            >
-              <BridgeWidget
-                amount={this.parameters.amount}
-                fromContractAddress={this.parameters.fromContractAddress}
-                config={this.strongConfig()}
-              />
-            </ConnectLoader>
+          <ConnectLoader
+            params={connectLoaderParams}
+            closeEvent={() => sendBridgeWidgetCloseEvent(window)}
+            widgetConfig={this.strongConfig()}
+          >
+            <BridgeWidget
+              amount={this.parameters.amount}
+              fromContractAddress={this.parameters.fromContractAddress}
+              config={this.strongConfig()}
+            />
+          </ConnectLoader>
           )}
-        </CustomAnalyticsProvider>
+        </WidgetContainer>
       </React.StrictMode>,
     );
   }

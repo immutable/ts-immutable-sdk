@@ -14,26 +14,18 @@
     ]
   },
   "dependencies": {
-    "@biom3/design-tokens": "0.2.4-beta",
-    "@biom3/react": "^0.10.12",
+    "@biom3/design-tokens": "0.2.9",
+    "@biom3/react": "^0.19.13",
     "@imtbl/checkout-sdk": "0.0.0",
     "@imtbl/checkout-widgets": "0.0.0",
     "@imtbl/config": "0.0.0",
     "@imtbl/passport": "0.0.0",
-    "assert": "^2.0.0",
-    "buffer": "^6.0.3",
-    "crypto-browserify": "^3.12.0",
-    "https-browserify": "^1.0.0",
-    "os-browserify": "^0.3.0",
+    "jsbi": "^3.2.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.11.0",
-    "stream-browserify": "^3.0.0",
-    "stream-http": "^3.2.0",
-    "url": "^0.11.0"
+    "react-router-dom": "^6.11.0"
   },
   "devDependencies": {
-    "@svgr/webpack": "^8.0.1",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -41,16 +33,16 @@
     "@types/node": "^18.14.2",
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
-    "react-app-rewired": "^2.2.1",
-    "react-scripts": "5.0.1",
+    "@vitejs/plugin-react": "^4.2.0",
     "typescript": "^4.9.5",
+    "vite": "^5.0.2",
+    "vite-plugin-node-polyfills": "^0.16.0",
     "web-vitals": "^2.1.4"
   },
   "private": true,
   "scripts": {
-    "build": "GENERATE_SOURCEMAP=false react-app-rewired build",
-    "eject": "react-app-rewired eject",
-    "start": "GENERATE_SOURCEMAP=false react-app-rewired start",
-    "test": "react-app-rewired test --passWithNoTests"
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "start": "vite"
   }
 }

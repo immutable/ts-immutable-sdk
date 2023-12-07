@@ -1,4 +1,4 @@
-import { JsonRpcProvider } from '@ethersproject/providers';
+import { JsonRpcProvider, JsonRpcBatchProvider } from '@ethersproject/providers';
 import { Contract } from '@ethersproject/contracts';
 import { BigNumber } from '@ethersproject/bignumber';
 import { InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError, NoRoutesAvailableError } from 'errors';
@@ -41,6 +41,9 @@ import {
   TEST_FROM_ADDRESS,
   expectToBeString,
   decodeMulticallExactInputWithoutFees,
+  buildBlock,
+  TEST_MAX_PRIORITY_FEE_PER_GAS,
+  TEST_BASE_FEE,
 } from './test/utils';
 
 jest.mock('@ethersproject/providers');
@@ -58,7 +61,7 @@ jest.mock('./lib/utils', () => ({
 
 const HIGHER_SLIPPAGE = 0.2;
 const APPROVED_AMOUNT = newAmountFromString('1', USDC_TEST_TOKEN);
-const APPROVE_GAS_ESTIMATE = BigNumber.from('100000');
+const APPROVE_GAS_ESTIMATE = BigNumber.from('100000'); // gas units
 
 describe('getUnsignedSwapTxFromAmountIn', () => {
   let erc20Contract: jest.Mock<any, any, any>;
@@ -71,18 +74,68 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
     }));
 
     (JsonRpcProvider as unknown as jest.Mock).mockImplementation(() => ({
-      getFeeData: async () => ({
-        maxFeePerGas: null,
-        gasPrice: TEST_GAS_PRICE,
-      }),
       connect: jest.fn().mockResolvedValue(erc20Contract),
+    })) as unknown as JsonRpcProvider;
+
+    (JsonRpcBatchProvider as unknown as jest.Mock).mockImplementation(() => ({
+      getBlock: async () => buildBlock({ baseFeePerGas: BigNumber.from(TEST_BASE_FEE) }),
+      send: jest.fn().mockImplementation(async (method) => {
+        switch (method) {
+          case 'eth_maxPriorityFeePerGas':
+            return BigNumber.from(TEST_MAX_PRIORITY_FEE_PER_GAS);
+          default:
+            throw new Error('Method not implemented');
+        }
+      }),
     })) as unknown as JsonRpcProvider;
   });
 
   describe('with the out-of-the-box minimal configuration', () => {
+    it('refreshes the deadline for every call', async () => {
+      const params = setupSwapTxTest();
+
+      mockRouterImplementation(params);
+
+      const secondaryFees: SecondaryFee[] = [
+        { recipient: TEST_FEE_RECIPIENT, basisPoints: 100 }, // 1% Fee
+      ];
+
+      const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
+
+      const firstResponse = await exchange.getUnsignedSwapTxFromAmountIn(
+        params.fromAddress,
+        params.inputToken,
+        params.outputToken,
+        newAmountFromString('100', USDC_TEST_TOKEN).value,
+      );
+
+      expectToBeDefined(firstResponse.swap.transaction.data);
+      const { deadline: firstDeadline } = decodeMulticallExactInputSingleWithFees(firstResponse.swap.transaction.data);
+
+      // wait one second to ensure the deadline is different
+      await new Promise((resolve) => {
+        setTimeout(resolve, 1000);
+      });
+
+      const secondResponse = await exchange.getUnsignedSwapTxFromAmountIn(
+        params.fromAddress,
+        params.inputToken,
+        params.outputToken,
+        newAmountFromString('100', USDC_TEST_TOKEN).value,
+      );
+
+      expectToBeDefined(secondResponse.swap.transaction.data);
+      const { deadline: secondDeadline } = decodeMulticallExactInputSingleWithFees(
+        secondResponse.swap.transaction.data,
+      );
+
+      expect(secondDeadline.toBigInt()).toBeGreaterThan(firstDeadline.toBigInt());
+    });
+
     it('uses the native IMX as the gas token', async () => {
       const tokenIn = { ...USDC_TEST_TOKEN, chainId: IMMUTABLE_TESTNET_CHAIN_ID };
       const tokenOut = { ...WETH_TEST_TOKEN, chainId: IMMUTABLE_TESTNET_CHAIN_ID };
+      const amountIn = addAmount(APPROVED_AMOUNT, newAmountFromString('1', USDC_TEST_TOKEN)); // Will trigger approval
 
       mockRouterImplementation({ pools: [createPool(tokenIn, tokenOut)] });
 
@@ -97,11 +150,13 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         makeAddr('fromAddress'),
         tokenIn.address,
         tokenOut.address,
-        BigNumber.from(1),
+        amountIn.value,
       );
 
       expectToBeDefined(result.swap.gasFeeEstimate);
-      expect(result.swap.gasFeeEstimate.token.address).toEqual('');
+      expectToBeDefined(result.approval?.gasFeeEstimate);
+      expect(result.swap.gasFeeEstimate.token.address).toEqual('native');
+      expect(result.approval.gasFeeEstimate.token.address).toEqual('native');
     });
   });
 
@@ -157,7 +212,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       expect(tx.swap.gasFeeEstimate.value).toEqual(TEST_TRANSACTION_GAS_USAGE.mul(TEST_GAS_PRICE));
       expect(tx.swap.gasFeeEstimate.token.chainId).toEqual(NATIVE_TEST_TOKEN.chainId);
-      expect(tx.swap.gasFeeEstimate.token.address).toEqual(''); // Default configuration is a native token for gas and not an ERC20
+      expect(tx.swap.gasFeeEstimate.token.address).toEqual('native'); // Default configuration is a native token for gas and not an ERC20
       expect(tx.swap.gasFeeEstimate.token.decimals).toEqual(NATIVE_TEST_TOKEN.decimals);
       expect(tx.swap.gasFeeEstimate.token.symbol).toEqual(NATIVE_TEST_TOKEN.symbol);
       expect(tx.swap.gasFeeEstimate.token.name).toEqual(NATIVE_TEST_TOKEN.name);
@@ -420,7 +475,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         BigNumber.from(1),
       );
 
-      expect(result.quote.amount.token.address).toEqual('');
+      expect(result.quote.amount.token.address).toEqual('native');
       expect(result.quote.amount.token.chainId).toEqual(nativeTokenService.nativeToken.chainId);
       expect(result.quote.amount.token.decimals).toEqual(nativeTokenService.nativeToken.decimals);
     });
@@ -765,7 +820,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expectToBeDefined(tx.approval?.gasFeeEstimate);
       expect(tx.approval.gasFeeEstimate.value).toEqual(TEST_GAS_PRICE.mul(APPROVE_GAS_ESTIMATE));
       expect(tx.approval.gasFeeEstimate.token.chainId).toEqual(NATIVE_TEST_TOKEN.chainId);
-      expect(tx.approval.gasFeeEstimate.token.address).toEqual('');
+      expect(tx.approval.gasFeeEstimate.token.address).toEqual('native');
       expect(tx.approval.gasFeeEstimate.token.decimals).toEqual(NATIVE_TEST_TOKEN.decimals);
       expect(tx.approval.gasFeeEstimate.token.symbol).toEqual(NATIVE_TEST_TOKEN.symbol);
       expect(tx.approval.gasFeeEstimate.token.name).toEqual(NATIVE_TEST_TOKEN.name);

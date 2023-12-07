@@ -3,7 +3,7 @@ import { JsonRpcProvider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import { getAllTokenBalances } from './tokenBalances';
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../config';
-import { ChainId, IMX_ADDRESS_ZKEVM } from '../../types';
+import { ChainId } from '../../types';
 import { getAllBalances } from '../../balances';
 import { CheckoutErrorType } from '../../errors';
 import { TokenBalanceResult } from './types';
@@ -47,7 +47,6 @@ describe('tokenBalances', () => {
               name: 'IMX',
               symbol: 'IMX',
               decimals: 18,
-              address: IMX_ADDRESS_ZKEVM,
             },
           },
         ],
@@ -90,7 +89,6 @@ describe('tokenBalances', () => {
               name: 'IMX',
               symbol: 'IMX',
               decimals: 18,
-              address: IMX_ADDRESS_ZKEVM,
             },
           },
         ],
@@ -160,7 +158,6 @@ describe('tokenBalances', () => {
               name: 'IMX',
               symbol: 'IMX',
               decimals: 18,
-              address: IMX_ADDRESS_ZKEVM,
             },
           },
         ],
@@ -206,7 +203,6 @@ describe('tokenBalances', () => {
               name: 'IMX',
               symbol: 'IMX',
               decimals: 18,
-              address: IMX_ADDRESS_ZKEVM,
             },
           },
         ],

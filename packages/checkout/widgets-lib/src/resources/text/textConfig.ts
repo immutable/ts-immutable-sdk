@@ -1,5 +1,6 @@
 /* eslint-disable max-len */
 import { WalletProviderName } from '@imtbl/checkout-sdk';
+import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
 import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
 import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
 import { SharedViews } from '../../context/view-context/ViewContext';
@@ -212,7 +213,7 @@ export const text = {
           inputPlaceholder: '0',
           selectorTitle: 'What would you like to move?',
         },
-        buttonText: 'Move',
+        buttonText: 'Review',
       },
       fees: {
         title: 'Fees subtotal',
@@ -433,6 +434,80 @@ export const text = {
     [SaleWidgetViews.SALE_SUCCESS]: {
       text: 'Order completed',
       actionText: 'Continue',
+    },
+    [XBridgeWidgetViews.WALLET_NETWORK_SELECTION]: {
+      layoutHeading: 'Move',
+      heading: 'Where would you like to move funds between?',
+      fromFormInput: {
+        heading: 'From',
+        selectDefaultText: 'Select wallet and network',
+        walletSelectorHeading: 'From wallet',
+        networkSelectorHeading: 'From network',
+      },
+      toFormInput: {
+        heading: 'To',
+        selectDefaultText: 'Select wallet and network',
+        walletSelectorHeading: 'To wallet',
+      },
+      submitButton: {
+        text: 'Next',
+      },
+    },
+    [XBridgeWidgetViews.BRIDGE_FORM]: {
+      header: {
+        title: 'Move coins',
+      },
+      fees: {
+        title: 'Gas Fee',
+        fiatPricePrefix: '~ USD $',
+      },
+      content: {
+        title: 'How much would you like to move?',
+        fiatPricePrefix: 'Approx USD',
+        availableBalancePrefix: 'Available',
+      },
+      bridgeForm: {
+        from: {
+          inputPlaceholder: '0',
+          selectorTitle: 'What would you like to move?',
+        },
+        buttonText: 'Review',
+      },
+    },
+    [XBridgeWidgetViews.BRIDGE_REVIEW]: {
+      layoutHeading: 'Move',
+      heading: 'Ok, how does this look?',
+      fromLabel: {
+        amountHeading: 'Moving',
+        heading: 'From',
+      },
+      toLabel: {
+        heading: 'To',
+      },
+      fees: {
+        heading: 'Gas fee',
+      },
+      submitButton: {
+        buttonText: 'Confirm move',
+      },
+      fiatPricePrefix: '~ USD $',
+    },
+    [XBridgeWidgetViews.BRIDGE_FAILURE]: {
+      statusText: 'Transaction failed',
+      actionText: 'Review & Try again',
+    },
+    [XBridgeWidgetViews.APPROVE_TRANSACTION]: {
+      content: {
+        heading: 'Approve the transaction in your wallet',
+        body: 'Follow the prompts in your wallet popup to confirm.',
+      },
+      footer: {
+        buttonText: 'Okay',
+        retryText: 'Try again',
+      },
+      loading: {
+        text: 'Initiating move',
+      },
     },
   },
   footers: {

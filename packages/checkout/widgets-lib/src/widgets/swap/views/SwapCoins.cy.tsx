@@ -4,14 +4,11 @@ import {
 import { mount } from 'cypress/react18';
 import { BigNumber } from 'ethers';
 import { ChainId, ChainName, WidgetTheme } from '@imtbl/checkout-sdk';
-import { Environment } from '@imtbl/config';
 import { cyIntercept, cySmartGet } from '../../../lib/testUtils';
 import { SwapWidgetTestComponent } from '../test-components/SwapWidgetTestComponent';
 import { SwapCoins } from './SwapCoins';
 import { SwapState } from '../context/SwapContext';
-import { IMX_ADDRESS_ZKEVM } from '../../../lib';
-import { CustomAnalyticsProvider } from '../../../context/analytics-provider/CustomAnalyticsProvider';
-import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
+import { NATIVE } from '../../../lib';
 
 describe('SwapCoins tests', () => {
   beforeEach(() => {
@@ -43,7 +40,6 @@ describe('SwapCoins tests', () => {
             name: 'IMX',
             symbol: 'IMX',
             decimals: 18,
-            address: IMX_ADDRESS_ZKEVM,
           },
         },
       ],
@@ -59,20 +55,18 @@ describe('SwapCoins tests', () => {
           name: 'IMX',
           symbol: 'IMX',
           decimals: 18,
-          address: IMX_ADDRESS_ZKEVM,
+          address: NATIVE,
         },
       ],
     };
 
     mount(
-      <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-        <SwapWidgetTestComponent
-          initialStateOverride={initialSwapState}
-          cryptoConversionsOverride={cryptoConversions}
-        >
-          <SwapCoins theme={WidgetTheme.LIGHT} />
-        </SwapWidgetTestComponent>
-      </CustomAnalyticsProvider>,
+      <SwapWidgetTestComponent
+        initialStateOverride={initialSwapState}
+        cryptoConversionsOverride={cryptoConversions}
+      >
+        <SwapCoins theme={WidgetTheme.LIGHT} />
+      </SwapWidgetTestComponent>,
     );
   });
 
@@ -102,11 +96,11 @@ describe('SwapCoins tests', () => {
 
   it('should show token balances list in from select', () => {
     cySmartGet('fromTokenInputs-select-form-select__target').click();
-    cySmartGet(`fromTokenInputs-select-form-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`)
+    cySmartGet('fromTokenInputs-select-form-coin-selector__option-imx-native')
       .should('be.visible');
     cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
       .should('not.exist');
-    cySmartGet(`fromTokenInputs-select-form-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`)
+    cySmartGet('fromTokenInputs-select-form-coin-selector__option-imx-native')
       .click();
     cySmartGet('fromTokenInputs-select-form-select__target')
       .find('span')
@@ -117,7 +111,7 @@ describe('SwapCoins tests', () => {
     cySmartGet('toTokenInputs-select-form-select__target').click();
     cySmartGet('toTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
       .should('be.visible');
-    cySmartGet(`toTokenInputs-select-form-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).should('be.visible');
+    cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').should('be.visible');
     cySmartGet('toTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
       .click();
     cySmartGet('toTokenInputs-select-form-select__target')

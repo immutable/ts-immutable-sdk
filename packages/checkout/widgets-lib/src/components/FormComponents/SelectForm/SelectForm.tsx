@@ -53,7 +53,7 @@ export function SelectForm({
         heading={coinSelectorHeading}
         options={coinSelectorOptions}
         visible={coinSelectorOpen}
-        onCloseBottomSheet={() => setCoinSelectorOpen(false)}
+        onCloseDrawer={() => setCoinSelectorOpen(false)}
       />
       <FormControlWrapper
         testId={`${testId}-select-control`}

@@ -1,12 +1,13 @@
 import { BigNumber } from 'ethers';
 import {
-  ERC20Item, ERC721Item, IMX_ADDRESS_ZKEVM, ItemBalance, ItemRequirement, ItemType, NativeItem,
+  ERC20Item, ERC721Item, ItemBalance, ItemRequirement, ItemType, NativeItem,
 } from '../../types';
 import {
   getERC721BalanceRequirement,
   getTokenBalanceRequirement,
   getTokensFromRequirements,
 } from './balanceRequirement';
+import { NATIVE } from '../../env';
 
 describe('balanceRequirement', () => {
   describe('getTokensFromRequirements', () => {
@@ -32,7 +33,7 @@ describe('balanceRequirement', () => {
 
       expect(getTokensFromRequirements(itemRequirements)).toEqual([
         {
-          address: IMX_ADDRESS_ZKEVM,
+          address: NATIVE,
         },
         {
           address: '0xERC20',
@@ -151,7 +152,6 @@ describe('balanceRequirement', () => {
             name: 'IMX',
             symbol: 'IMX',
             decimals: 18,
-            address: IMX_ADDRESS_ZKEVM,
           },
         },
       ];
@@ -172,7 +172,6 @@ describe('balanceRequirement', () => {
             name: 'IMX',
             symbol: 'IMX',
             decimals: 18,
-            address: IMX_ADDRESS_ZKEVM,
           },
         },
         current: {
@@ -183,7 +182,6 @@ describe('balanceRequirement', () => {
             name: 'IMX',
             symbol: 'IMX',
             decimals: 18,
-            address: IMX_ADDRESS_ZKEVM,
           },
         },
       });
@@ -257,7 +255,6 @@ describe('balanceRequirement', () => {
             name: 'IMX',
             symbol: 'IMX',
             decimals: 18,
-            address: IMX_ADDRESS_ZKEVM,
           },
         },
         {
@@ -289,7 +286,6 @@ describe('balanceRequirement', () => {
             name: 'IMX',
             symbol: 'IMX',
             decimals: 18,
-            address: IMX_ADDRESS_ZKEVM,
           },
         },
         current: {
@@ -300,7 +296,6 @@ describe('balanceRequirement', () => {
             name: 'IMX',
             symbol: 'IMX',
             decimals: 18,
-            address: IMX_ADDRESS_ZKEVM,
           },
         },
       });

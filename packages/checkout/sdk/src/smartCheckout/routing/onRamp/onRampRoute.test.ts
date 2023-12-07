@@ -4,7 +4,6 @@ import { CheckoutConfiguration } from '../../../config';
 import {
   ChainId,
   FundingStepType,
-  IMX_ADDRESS_ZKEVM,
   ItemType,
   OnRampProvider,
 } from '../../../types';
@@ -29,7 +28,6 @@ describe('onRampRoute', () => {
           decimals: 18,
         },
         {
-          address: IMX_ADDRESS_ZKEVM,
           name: 'IMX',
           symbol: 'IMX',
           decimals: 18,
@@ -107,7 +105,6 @@ describe('onRampRoute', () => {
         balance: BigNumber.from(10),
         formattedBalance: '10',
         token: {
-          address: IMX_ADDRESS_ZKEVM,
           name: 'IMX',
           symbol: 'IMX',
           decimals: 18,
@@ -118,7 +115,6 @@ describe('onRampRoute', () => {
         balance: BigNumber.from(4),
         formattedBalance: '4',
         token: {
-          address: IMX_ADDRESS_ZKEVM,
           name: 'IMX',
           symbol: 'IMX',
           decimals: 18,
@@ -153,7 +149,6 @@ describe('onRampRoute', () => {
             formattedBalance: '4',
           },
           token: {
-            address: IMX_ADDRESS_ZKEVM,
             name: 'IMX',
             symbol: 'IMX',
             decimals: 18,

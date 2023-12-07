@@ -8,8 +8,8 @@
   "dependencies": {
     "@0xsequence/abi": "^1.4.3",
     "@0xsequence/core": "^1.4.3",
-    "@biom3/design-tokens": "0.2.4-beta",
-    "@biom3/react": "^0.10.12",
+    "@biom3/design-tokens": "0.2.9",
+    "@biom3/react": "^0.19.13",
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/abstract-signer": "^5.7.0",
     "@ethersproject/providers": "^5.7.2",
@@ -103,9 +103,9 @@
       "types": "./dist/provider.d.ts",
       "import": "./dist/provider.js"
     },
-    "./checkout_sdk": {
-      "types": "./dist/checkout_sdk.d.ts",
-      "import": "./dist/checkout_sdk.js"
+    "./checkout": {
+      "types": "./dist/checkout.d.ts",
+      "import": "./dist/checkout.js"
     }
   },
   "files": [
@@ -115,11 +115,18 @@
   "license": "Apache-2.0",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
+  "overrides": {
+    "@openzeppelin/contracts": "3.4.2-solc-0.7"
+  },
   "peerDependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "repository": "immutable/ts-immutable-sdk.git",
+  "resolutions": {
+    "@biom3/design-tokens": "0.2.9",
+    "@openzeppelin/contracts": "3.4.2-solc-0.7"
+  },
   "scripts": {
     "build": "yarn packageList && yarn updateDependencies && yarn regenModules && rm -rf dist && NODE_ENV=production rollup --config rollup.config.js && rm -rf dist/types",
     "build:only": "rm -rf dist && NODE_ENV=production rollup --config rollup.config.js && rm -rf dist/types",

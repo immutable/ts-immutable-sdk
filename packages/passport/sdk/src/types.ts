@@ -48,7 +48,7 @@ export enum Networks {
 
 export interface OidcConfiguration {
   clientId: string;
-  logoutRedirectUri: string;
+  logoutRedirectUri?: string;
   logoutMode?: 'redirect' | 'silent';
   redirectUri: string;
   scope?: string;
@@ -121,6 +121,8 @@ export type IdTokenPayload = {
   aud: string;
   sub: string;
   exp: number;
+  iss: string;
+  iat: number;
 };
 
 export type DeviceErrorResponse = {
