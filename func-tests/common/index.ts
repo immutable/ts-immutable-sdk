@@ -19,22 +19,22 @@ export function getEnv(name: string, defaultValue?: string): string {
 
 export const env = {
   network: getEnv('NETWORK'),
-  alchemyApiKey: getEnv('ALCHEMY_API_KEY'),
+  alchemyApiKey: getEnv('TEST_ALCHEMY_API_KEY'),
   // client: {
   //   publicApiUrl: getEnv('PUBLIC_API_URL'),
-  //   starkContractAddress: getEnv('STARK_CONTRACT_ADDRESS'),
-  //   registrationContractAddress: getEnv('REGISTRATION_CONTRACT_ADDRESS'),
+  //   starkContractAddress: getEnv('TEST_STARK_CONTRACT_ADDRESS'),
+  //   registrationContractAddress: getEnv('TEST_REGISTRATION_CONTRACT_ADDRESS'),
   // },
-  privateKey1: getEnv('PRIVATE_KEY1'),
-  starkPrivateKey1: getEnv('STARK_PRIVATE_KEY1'),
-  // privateKey2: getEnv('PRIVATE_KEY2'),
-  privateKeyBanker: getEnv('PRIVATE_KEY_BANKER'),
-  starkPrivateKeyBanker: getEnv('STARK_PRIVATE_KEY_BANKER'),
-  tokenAddress: getEnv('TOKEN_ADDRESS'),
+  privateKey1: getEnv('TEST_PRIVATE_KEY1'),
+  starkPrivateKey1: getEnv('TEST_STARK_PRIVATE_KEY1'),
+  // privateKey2: getEnv('TEST_PRIVATE_KEY2'),
+  privateKeyBanker: getEnv('TEST_PRIVATE_KEY_BANKER'),
+  starkPrivateKeyBanker: getEnv('TEST_STARK_PRIVATE_KEY_BANKER'),
+  tokenAddress: getEnv('TEST_TOKEN_ADDRESS'),
   // moonpayWebhookKey: getEnv('MOONPAY_WEBHOOK_KEY'),
-  // starkExBatchSize: parseInt(getEnv('STARKEX_BATCH_SIZE'), 10),
-  // unregisteredUserPrivateKey: getEnv('UNREGISTERED_USER_PRIVATE_KEY'),
-  // unregisteredUserStarkPrivateKey: getEnv('UNREGISTERED_USER_STARK_PRIVATE_KEY'),
+  // starkExBatchSize: parseInt(getEnv('TEST_STARKEX_BATCH_SIZE'), 10),
+  // unregisteredUserPrivateKey: getEnv('TEST_UNREGISTERED_USER_PRIVATE_KEY'),
+  // unregisteredUserStarkPrivateKey: getEnv('TEST_UNREGISTERED_USER_STARK_PRIVATE_KEY'),
 };
 
 export const waitForTransactionResponse = async (

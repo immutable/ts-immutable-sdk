@@ -4,7 +4,7 @@ Feature: Withdrawal
   # Scenario: Withdraw NFT
   #   Given A new Eth wallet "user1"
   #   And "user1" is registered
-  #   # TODO(shineli): We assume a contract has been registered and it"s address minter and its private key (PRIVATE_KEY1) have been set in the .env file
+  #   # TODO(shineli): We assume a contract has been registered and it"s address minter and its private key (TEST_PRIVATE_KEY1) have been set in the .env file
   #   # well need to cover that as test as well later on.
   #   And randomly L2 mint to "user1" of "minted"
   #   And NFT "minted" should be available through api
@@ -19,7 +19,7 @@ Feature: Withdrawal
   # Scenario: Withdraw NFT
   #   Given A new Eth wallet "user1"
   #   And "user1" is registered
-  #   # TODO(shineli): We assume a contract has been registered and it"s address minter and its private key (PRIVATE_KEY1) have been set in the .env file
+  #   # TODO(shineli): We assume a contract has been registered and it"s address minter and its private key (TEST_PRIVATE_KEY1) have been set in the .env file
   #   # well need to cover that as test as well later on.
   #   And randomly L2 mint to "user1" of "minted"
   #   And NFT "minted" should be available through api
