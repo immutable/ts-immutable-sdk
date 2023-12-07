@@ -110,7 +110,7 @@ jobs:
         id: pre_release
         uses: JS-DevTools/npm-publish@v3
         with:
-          token: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
+          token: ${{ secrets.TS_IMMUTABLE_SDK_NPM_TOKEN }}
           access: public
           package: ./sdk/package.json
           tag: ${{ contains(github.event.inputs.release_type, 'alpha') && 'alpha' }}
@@ -118,7 +118,7 @@ jobs:
 
       - name: Authenticate NPM
         if: contains(github.event.inputs.release_type, 'release')
-        run: npm config set //registry.npmjs.org/:_authToken ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
+        run: npm config set //registry.npmjs.org/:_authToken ${{ secrets.TS_IMMUTABLE_SDK_NPM_TOKEN }}
 
       - name: Release
         id: npm_release
