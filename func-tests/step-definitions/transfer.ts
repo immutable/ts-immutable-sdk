@@ -119,17 +119,22 @@ export class Transfer {
     const receiverAddress = await receiver.ethSigner.getAddress();
     const providerInstance = new GenericIMXProvider(this.providerConfig, sender.ethSigner, sender.starkSigner);
 
-    const response = await providerInstance.transfer({
-      type: 'ETH',
-      amount: parseEther(amount).toString(),
-      receiver: receiverAddress,
-    });
-    console.log(response);
-    this.stepSharedState.transfers[transferVar] = {
-      sent_signature: response.sent_signature,
-      status: response.status,
-      time: response.time,
-      transfer_id: response.transfer_id,
-    };
+    console.log('receiver address', receiverAddress);
+    try {
+      const response = await providerInstance.transfer({
+        type: 'ETH',
+        amount: parseEther(amount).toString(),
+        receiver: receiverAddress,
+      });
+      console.log(response);
+      this.stepSharedState.transfers[transferVar] = {
+        sent_signature: response.sent_signature,
+        status: response.status,
+        time: response.time,
+        transfer_id: response.transfer_id,
+      };          
+    } catch (error) {
+      console.log('error', error);      
+    } 
   }
 }
