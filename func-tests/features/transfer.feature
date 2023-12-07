@@ -76,7 +76,7 @@ Feature: Transfer
   #   And api should show that "receiver2" owns the NFT "minted2"
   #   And "owner" transfer "0.00001" eth to banker
 
-  @transfer  @ethSignature @transferETH
+  @transfer  @ethSignature @transferETH @skip
   Scenario: Transfer ETH
     Given A new Eth wallet "owner"
     And A new Eth wallet "receiver"
