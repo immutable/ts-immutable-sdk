@@ -14,9 +14,9 @@ export const totalTokenBalanceValueStyle = {
 };
 
 export const coinInfoButtonStyle = {
-  width: 'base.icon.size.250',
   height: 'base.icon.size.250',
+  width: 'base.icon.size.250',
+  minWidth: 'base.icon.size.250',
   fill: 'base.color.accent.4',
   cursor: 'pointer',
-  borderRadius: '50%',
 };

@@ -1,7 +1,4 @@
 import {
-  BiomeCombinedProviders,
-} from '@biom3/react';
-import {
   BridgeWidgetParams,
   Checkout,
 } from '@imtbl/checkout-sdk';
@@ -31,7 +28,6 @@ import {
   xBridgeReducer,
   initialXBridgeState,
 } from './context/XBridgeContext';
-import { widgetTheme } from '../../lib/theme';
 import { WalletNetworkSelectionView } from './views/WalletNetworkSelectionView';
 import { Bridge } from './views/Bridge';
 import { BridgeReview } from './views/BridgeReview';
@@ -53,7 +49,7 @@ export function XBridgeWidget({
   web3Provider,
   config,
 }: BridgeWidgetInputs) {
-  const { environment, theme } = config;
+  const { environment } = config;
   const [errorViewLoading, setErrorViewLoading] = useState(false);
   const errorText = text.views[SharedViews.ERROR_VIEW];
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
@@ -78,7 +74,6 @@ export function XBridgeWidget({
 
   const viewReducerValues = useMemo(() => ({ viewState, viewDispatch }), [viewState, viewDispatch]);
   const bridgeReducerValues = useMemo(() => ({ bridgeState, bridgeDispatch }), [bridgeState, bridgeDispatch]);
-  const themeReducerValue = useMemo(() => widgetTheme(theme), [theme]);
 
   const goBackToReview = useCallback(() => {
     viewDispatch({
@@ -92,64 +87,62 @@ export function XBridgeWidget({
   }, [viewDispatch]);
 
   return (
-    <BiomeCombinedProviders theme={{ base: themeReducerValue }}>
-      <ViewContext.Provider value={viewReducerValues}>
-        <XBridgeContext.Provider value={bridgeReducerValues}>
-          <CryptoFiatProvider environment={environment}>
-            {viewState.view.type === XBridgeWidgetViews.WALLET_NETWORK_SELECTION && (
-              <WalletNetworkSelectionView />
-            )}
-            {viewState.view.type === XBridgeWidgetViews.BRIDGE_FORM && (
-              <Bridge />
-            )}
-            {viewState.view.type === XBridgeWidgetViews.BRIDGE_REVIEW && (
-              <BridgeReview />
-            )}
-            {viewState.view.type === XBridgeWidgetViews.IN_PROGRESS && (
-              <MoveInProgress />
-            )}
-            {viewState.view.type === XBridgeWidgetViews.BRIDGE_FAILURE && (
-              <StatusView
-                testId="bridge-fail"
-                statusText={bridgeFailureText.statusText}
-                actionText={bridgeFailureText.actionText}
-                onActionClick={() => {
-                  viewDispatch({
-                    payload: {
-                      type: ViewActions.GO_BACK_TO,
-                      view: { type: XBridgeWidgetViews.BRIDGE_REVIEW },
-                    },
-                  });
-                }}
-                statusType={StatusType.FAILURE}
-              />
-            )}
-            {viewState.view.type === XBridgeWidgetViews.APPROVE_TRANSACTION && (
-              <ApproveTransaction data={viewReducerValues.viewState.view.data} />
-            )}
-            {viewState.view.type === SharedViews.ERROR_VIEW && (
-              <ErrorView
-                actionText={errorText.actionText}
-                onActionClick={async () => {
-                  setErrorViewLoading(true);
-                  const data = viewState.view as ErrorViewType;
+    <ViewContext.Provider value={viewReducerValues}>
+      <XBridgeContext.Provider value={bridgeReducerValues}>
+        <CryptoFiatProvider environment={environment}>
+          {viewState.view.type === XBridgeWidgetViews.WALLET_NETWORK_SELECTION && (
+            <WalletNetworkSelectionView />
+          )}
+          {viewState.view.type === XBridgeWidgetViews.BRIDGE_FORM && (
+            <Bridge />
+          )}
+          {viewState.view.type === XBridgeWidgetViews.BRIDGE_REVIEW && (
+            <BridgeReview />
+          )}
+          {viewState.view.type === XBridgeWidgetViews.IN_PROGRESS && (
+            <MoveInProgress />
+          )}
+          {viewState.view.type === XBridgeWidgetViews.BRIDGE_FAILURE && (
+            <StatusView
+              testId="bridge-fail"
+              statusText={bridgeFailureText.statusText}
+              actionText={bridgeFailureText.actionText}
+              onActionClick={() => {
+                viewDispatch({
+                  payload: {
+                    type: ViewActions.GO_BACK_TO,
+                    view: { type: XBridgeWidgetViews.BRIDGE_REVIEW },
+                  },
+                });
+              }}
+              statusType={StatusType.FAILURE}
+            />
+          )}
+          {viewState.view.type === XBridgeWidgetViews.APPROVE_TRANSACTION && (
+            <ApproveTransaction data={viewReducerValues.viewState.view.data} />
+          )}
+          {viewState.view.type === SharedViews.ERROR_VIEW && (
+            <ErrorView
+              actionText={errorText.actionText}
+              onActionClick={async () => {
+                setErrorViewLoading(true);
+                const data = viewState.view as ErrorViewType;
 
-                  if (!data.tryAgain) {
-                    goBackToReview();
-                    setErrorViewLoading(false);
-                    return;
-                  }
-
-                  if (await data.tryAgain()) goBackToReview();
+                if (!data.tryAgain) {
+                  goBackToReview();
                   setErrorViewLoading(false);
-                }}
-                onCloseClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
-                errorEventActionLoading={errorViewLoading}
-              />
-            )}
-          </CryptoFiatProvider>
-        </XBridgeContext.Provider>
-      </ViewContext.Provider>
-    </BiomeCombinedProviders>
+                  return;
+                }
+
+                if (await data.tryAgain()) goBackToReview();
+                setErrorViewLoading(false);
+              }}
+              onCloseClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
+              errorEventActionLoading={errorViewLoading}
+            />
+          )}
+        </CryptoFiatProvider>
+      </XBridgeContext.Provider>
+    </ViewContext.Provider>
   );
 }
