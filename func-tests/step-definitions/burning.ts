@@ -1,14 +1,15 @@
-import { ImmutableX, UnsignedTransferRequest } from '@imtbl/core-sdk';
-import { configuration, StepSharedState } from './stepSharedState';
+import { UnsignedTransferRequest } from '@imtbl/core-sdk';
 import { ImmutableXClient, ImxClientModuleConfiguration } from '@imtbl/sdk/immutablex_client';
 import { GenericIMXProvider, ProviderConfiguration } from '@imtbl/sdk/provider';
+import { configuration, StepSharedState } from './stepSharedState';
 
-// @binding([StepSharedState])
 export class Burning {
   constructor(protected stepSharedState: StepSharedState) {}
+
   config: ImxClientModuleConfiguration = {
     baseConfig: { environment: configuration.environment },
   };
+
   providerConfig = new ProviderConfiguration({
     baseConfig: configuration,
   });
@@ -31,8 +32,8 @@ export class Burning {
       type: 'ERC721',
       receiver: burnAddress,
     };
-    const provider = new GenericIMXProvider(this.providerConfig, userWalletConnection.ethSigner, userWalletConnection.starkSigner);
+    const imxProvider = new GenericIMXProvider(this.providerConfig, userWalletConnection.ethSigner, userWalletConnection.starkSigner);
 
-    this.stepSharedState.burns[burnVar] = await provider.transfer(burnRequest);
+    this.stepSharedState.burns[burnVar] = await imxProvider.transfer(burnRequest);
   }
 }

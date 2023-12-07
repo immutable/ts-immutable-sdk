@@ -28,9 +28,9 @@ export class DepositEth {
   public async bankerDepositEth(amount: string) {
     // TODO: need to make sure this addressVar has ETH on L1 to deposit
     const banker = await this.stepSharedState.getBanker();
-    const providerInstance = new GenericIMXProvider(this.providerConfig, banker.ethSigner, banker.starkSigner);
+    const imxProvider = new GenericIMXProvider(this.providerConfig, banker.ethSigner, banker.starkSigner);
 
-    const transactionResponse = await providerInstance.deposit({
+    const transactionResponse = await imxProvider.deposit({
       type: 'ETH',
       amount: parseEther(amount).toString(),
     });
@@ -66,6 +66,10 @@ export class DepositEth {
       address: StepSharedState.getTokenAddress('ETH'),
     });
     this.stepSharedState.bankerBalances[bankerBalanceVar] = response;
+    if (parseEther(response.balance!).lt(parseEther(amount))) {
+      console.log('Banker balance', response.balance);
+      console.log('Amount', amount);
+    }
     assert.ok(parseEther(response.balance!).gte(parseEther(amount)));
   }
 

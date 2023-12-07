@@ -50,7 +50,7 @@ const initRequest = 'init';
 const initRequestId = '1';
 
 let passportClient: passport.Passport;
-let providerInstance: provider.IMXProvider;
+let imxProvider: provider.IMXProvider;
 let zkEvmProviderInstance: passport.Provider;
 
 declare global {
@@ -90,7 +90,7 @@ const callbackToGame = (data: object) => {
 
 const setProvider = (passportProvider: provider.IMXProvider | null): boolean => {
   if (passportProvider !== null && passportProvider !== undefined) {
-    providerInstance = passportProvider;
+    imxProvider = passportProvider;
     console.log('IMX provider set');
     return true;
   }
@@ -238,7 +238,7 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
         break;
       }
       case PASSPORT_FUNCTIONS.getAddress: {
-        const address = await providerInstance?.getAddress();
+        const address = await imxProvider?.getAddress();
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -282,7 +282,7 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
       }
       case PASSPORT_FUNCTIONS.imx.isRegisteredOffchain: {
         console.log('PASSPORT_FUNCTIONS.imx.isRegisteredOffchain');
-        const registered = await providerInstance?.isRegisteredOffchain();
+        const registered = await imxProvider?.isRegisteredOffchain();
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -293,7 +293,7 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
       }
       case PASSPORT_FUNCTIONS.imx.registerOffchain: {
         console.log('PASSPORT_FUNCTIONS.imx.registerOffchain');
-        const response = await providerInstance?.registerOffchain();
+        const response = await imxProvider?.registerOffchain();
         callbackToGame({
           ...{
             responseFor: fxName,
@@ -306,7 +306,7 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
       }
       case PASSPORT_FUNCTIONS.imx.transfer: {
         const unsignedTransferRequest = JSON.parse(data);
-        const response = await providerInstance?.transfer(unsignedTransferRequest);
+        const response = await imxProvider?.transfer(unsignedTransferRequest);
         callbackToGame({
           ...{
             responseFor: fxName,
@@ -319,7 +319,7 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
       }
       case PASSPORT_FUNCTIONS.imx.batchNftTransfer: {
         const nftTransferDetails = JSON.parse(data);
-        const response = await providerInstance?.batchNftTransfer(nftTransferDetails);
+        const response = await imxProvider?.batchNftTransfer(nftTransferDetails);
         callbackToGame({
           ...{
             responseFor: fxName,

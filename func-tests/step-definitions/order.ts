@@ -45,8 +45,8 @@ export class Order {
         fees: [],
       };
 
-      const provider = new GenericIMXProvider(this.providerConfig, seller.ethSigner, seller.starkSigner);
-      const createOrderResponse = await provider.createOrder(order);
+      const imxProvider = new GenericIMXProvider(this.providerConfig, seller.ethSigner, seller.starkSigner);
+      const createOrderResponse = await imxProvider.createOrder(order);
 
       this.stepSharedState.orders[orderVar] = {
         ...order,
@@ -65,8 +65,8 @@ export class Order {
   ) {
     const seller = this.stepSharedState.users[sellerVar];
     const order = this.stepSharedState.orders[sellOrderVar];
-    const provider = new GenericIMXProvider(this.providerConfig, seller.ethSigner, seller.starkSigner);
+    const imxProvider = new GenericIMXProvider(this.providerConfig, seller.ethSigner, seller.starkSigner);
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    await provider.cancelOrder({ order_id: order.orderId });
+    await imxProvider.cancelOrder({ order_id: order.orderId });
   }
 }

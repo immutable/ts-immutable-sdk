@@ -61,19 +61,19 @@ export class Registration {
   public async register(addressVar: string) {
     const user = this.stepSharedState.users[addressVar];
 
-    const providerInstance = new GenericIMXProvider(this.providerConfig, user.ethSigner, user.starkSigner);
-    await providerInstance.registerOffchain();
+    const imxProvider = new GenericIMXProvider(this.providerConfig, user.ethSigner, user.starkSigner);
+    await imxProvider.registerOffchain();
 
     return {
-      address: await providerInstance.getAddress(),
+      address: await imxProvider.getAddress(),
       starkPublicKey: await user.starkSigner.getAddress(),
     };
   }
 
   public async registerBanker() {
     const banker = await this.stepSharedState.getBanker();
-    const providerInstance = new GenericIMXProvider(this.providerConfig, banker.ethSigner, banker.starkSigner);
-    await providerInstance.registerOffchain();
+    const imxProvider = new GenericIMXProvider(this.providerConfig, banker.ethSigner, banker.starkSigner);
+    await imxProvider.registerOffchain();
     return {
       address: await banker.ethSigner.getAddress(),
     };
@@ -82,8 +82,8 @@ export class Registration {
   public async checkUserRegistrationOffchain(addressVar: string) {
     const user = this.stepSharedState.users[addressVar];
 
-    const providerInstance = new GenericIMXProvider(this.providerConfig, user.ethSigner, user.starkSigner);
-    const registered = await providerInstance.isRegisteredOffchain();
+    const imxProvider = new GenericIMXProvider(this.providerConfig, user.ethSigner, user.starkSigner);
+    const registered = await imxProvider.isRegisteredOffchain();
     assert.equal(registered, true);
   }
 }

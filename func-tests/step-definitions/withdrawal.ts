@@ -37,9 +37,9 @@ export class Withdrawal {
     ethAmount: string,
   ) {
     const user = this.stepSharedState.users[userVar];
-    const provider = new GenericIMXProvider(this.providerConfig, user.ethSigner, user.starkSigner);
+    const imxProvider = new GenericIMXProvider(this.providerConfig, user.ethSigner, user.starkSigner);
     const ethAmountInWei = parseUnits(ethAmount);
-    const result = await provider.prepareWithdrawal({ type: 'ETH', amount: ethAmountInWei.toString() });
+    const result = await imxProvider.prepareWithdrawal({ type: 'ETH', amount: ethAmountInWei.toString() });
 
     this.stepSharedState.withdrawals[withdrawalName] = result;
     return result;
@@ -86,8 +86,8 @@ export class Withdrawal {
   public async completeEthWithdrawal(userVar: string) {
     const user = this.stepSharedState.users[userVar];
     const starkAddress = await user.starkSigner.getAddress();
-    const provider = new GenericIMXProvider(this.providerConfig, user.ethSigner, user.starkSigner);
-    const result = await provider.completeWithdrawal(starkAddress, { type: 'ETH' });
+    const imxProvider = new GenericIMXProvider(this.providerConfig, user.ethSigner, user.starkSigner);
+    const result = await imxProvider.completeWithdrawal(starkAddress, { type: 'ETH' });
     // eslint-disable-next-line no-console
     console.log(`Eth withdrawal transaction complete. txHash: ${result.hash}`);
   }

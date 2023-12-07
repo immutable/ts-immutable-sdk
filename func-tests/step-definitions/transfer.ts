@@ -25,8 +25,8 @@ export class Transfer {
         userVar
       ].ethSigner.getAddress();
 
-      const providerInstance = new GenericIMXProvider(this.providerConfig, banker.ethSigner, banker.starkSigner);
-      return await providerInstance.transfer({
+      const imxProvider = new GenericIMXProvider(this.providerConfig, banker.ethSigner, banker.starkSigner);
+      return await imxProvider.transfer({
         type: 'ETH',
         amount: parseEther(amount).toString(),
         receiver,
@@ -44,9 +44,9 @@ export class Transfer {
     const sender = this.stepSharedState.users[userVar];
     const banker = await this.stepSharedState.getBanker();
     const bankerAddress = await banker.ethSigner.getAddress();
-    const providerInstance = new GenericIMXProvider(this.providerConfig, sender.ethSigner, sender.starkSigner);
+    const imxProvider = new GenericIMXProvider(this.providerConfig, sender.ethSigner, sender.starkSigner);
 
-    return await providerInstance.transfer({
+    return await imxProvider.transfer({
       type: 'ETH',
       amount: parseEther(amount).toString(),
       receiver: bankerAddress,
@@ -117,11 +117,11 @@ export class Transfer {
     const sender = this.stepSharedState.users[userVar];
     const receiver = this.stepSharedState.users[receiverVar];
     const receiverAddress = await receiver.ethSigner.getAddress();
-    const providerInstance = new GenericIMXProvider(this.providerConfig, sender.ethSigner, sender.starkSigner);
+    const imxProvider = new GenericIMXProvider(this.providerConfig, sender.ethSigner, sender.starkSigner);
 
     console.log('receiver address', receiverAddress);
     try {
-      const response = await providerInstance.transfer({
+      const response = await imxProvider.transfer({
         type: 'ETH',
         amount: parseEther(amount).toString(),
         receiver: receiverAddress,
