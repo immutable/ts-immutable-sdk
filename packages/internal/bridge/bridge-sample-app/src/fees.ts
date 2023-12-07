@@ -77,38 +77,6 @@ async function getBridgeFees() {
   } catch(err) {
     console.log('finalizeErr', err);
   }
-
-  const mapTokenReq: BridgeFeeRequest = {
-    action: BridgeFeeActions.MAP_TOKEN,
-    gasMultiplier: 1.1,
-    sourceChainId: ETH_SEPOLIA_CHAIN_ID,
-    destinationChainId: ZKEVM_TESTNET_CHAIN_ID,
-  }
-
-  console.log('mapTokenReq', mapTokenReq)
-
-  try {
-    const mapTokenRes: BridgeFeeResponse = await tokenBridge.getFee(mapTokenReq);
-    console.log('mapTokenRes', mapTokenRes);
-  } catch(err) {
-    console.log('mapTokenErr', err);
-  }
-
-  const mapTokenInvalidReq: BridgeFeeRequest = {
-    action: BridgeFeeActions.MAP_TOKEN,
-    gasMultiplier: 1.1,
-    sourceChainId: ZKEVM_TESTNET_CHAIN_ID,
-    destinationChainId: ETH_SEPOLIA_CHAIN_ID,
-  }
-
-  console.log('mapTokenInvalidReq', mapTokenInvalidReq)
-
-  try {
-    const mapTokenInvalidRes: BridgeFeeResponse = await tokenBridge.getFee(mapTokenInvalidReq);
-    console.log('mapTokenInvalidRes', mapTokenInvalidRes);
-  } catch(err) {
-    console.log('mapTokenInvalidErr', err);
-  }
 }
 
 (async () => {

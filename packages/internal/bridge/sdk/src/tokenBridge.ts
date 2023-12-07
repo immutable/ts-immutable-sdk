@@ -99,13 +99,6 @@ export class TokenBridge {
       await this.validateChainIds(req.sourceChainId, req.destinationChainId);
     }
 
-    if (req.action === BridgeFeeActions.MAP_TOKEN && req.sourceChainId !== this.config.bridgeInstance.rootChainID) {
-      throw new BridgeError(
-        `Mapping tokens from ${req.sourceChainId} to destination ${req.destinationChainId} is not supported`,
-        BridgeErrorType.UNSUPPORTED_ERROR,
-      );
-    }
-
     if (req.action === BridgeFeeActions.DEPOSIT && req.sourceChainId !== this.config.bridgeInstance.rootChainID) {
       throw new BridgeError(
         `Deposit must be from the root chain (${this.config.bridgeInstance.rootChainID}) to the child chain (${this.config.bridgeInstance.childChainID})`,
