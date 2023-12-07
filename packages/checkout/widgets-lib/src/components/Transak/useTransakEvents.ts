@@ -11,7 +11,7 @@ import {
 } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 
 const TRANSAK_ORIGIN = 'transak.com';
-const FAILED_TO_LOAD_TIMEOUT_IN_MS = 5000;
+const FAILED_TO_LOAD_TIMEOUT_IN_MS = 10000;
 
 export type TransakEventHandlers = {
   onInit?: (data: Record<string, unknown>) => void;
@@ -78,18 +78,19 @@ export const useTransakEvents = (props: UseTransakEventsProps) => {
   const [initialised, setInitialsed] = useState<boolean>(false);
   const failedToLoadTimeout = failedToLoadTimeoutInMs || FAILED_TO_LOAD_TIMEOUT_IN_MS;
 
-  const timeout = useRef<NodeJS.Timeout | number>(0);
+  const timeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const onInit = (data: Record<string, unknown>) => {
     setInitialsed(true);
     clearTimeout(timeout.current);
+    timeout.current = undefined;
     props.onInit?.(data);
   };
 
   const onLoad = () => {
     if (onFailedToLoad === undefined) return;
 
-    if (!initialised) {
+    if (timeout.current === undefined && !initialised) {
       timeout.current = setTimeout(() => {
         if (!initialised) onFailedToLoad();
       }, failedToLoadTimeout);
