@@ -25,7 +25,6 @@ jobs:
 
     - name: Run tests
       env:
-        TAGS: 'not @skip'
         NETWORK: sepolia
         ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
         PUBLIC_API_URL: 'https://api.sandbox.x.immutable.com/v1'
@@ -39,4 +38,4 @@ jobs:
         PRIVATE_KEY_BANKER: ${{ secrets.PRIVATE_KEY_BANKER }}
         STARK_PRIVATE_KEY_BANKER: ${{ secrets.STARK_PRIVATE_KEY_BANKER }}
         STARKEX_BATCH_SIZE: 500
-      run: cd func-tests && yarn test
+      run: cd func-tests && yarn test:ci

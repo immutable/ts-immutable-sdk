@@ -12,10 +12,10 @@ Functional tests using Cucumber and Gherkin
 
 ## Running the tests
 
-1. Copy the .env.sandbox file to .env
-2. `yarn test`
+1. Copy the .env.dev file to .env (CI runs against sandbox)
+2. Run the tests: `yarn test`
 
-**Note:** Certain tests are skipped on CI because of the time they take to run. 
+**Note:** Certain tests are skipped on CI because of the time they take to run. To run only these, use `yarn test:ci`
 
 ## Filtering tests
 
