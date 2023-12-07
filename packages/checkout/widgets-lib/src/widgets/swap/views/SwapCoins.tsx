@@ -110,7 +110,7 @@ export function SwapCoins({
               },
             });
           }}
-          onCloseBottomSheet={() => {
+          onCloseDrawer={() => {
             setShowNotEnoughImxDrawer(false);
           }}
         />

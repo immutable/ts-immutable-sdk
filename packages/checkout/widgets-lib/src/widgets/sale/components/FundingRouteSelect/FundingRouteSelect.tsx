@@ -47,7 +47,7 @@ export function FundingRouteSelect({ fundingRoutes, onFundingRouteSelected }: Fu
     });
   };
 
-  const closeBottomSheet = (selectedFundingRouteIndex: number) => {
+  const closeDrawer = (selectedFundingRouteIndex: number) => {
     setActiveFundingRouteIndex(selectedFundingRouteIndex);
     setSmartCheckoutDrawerVisible(false);
   };
@@ -108,7 +108,7 @@ export function FundingRouteSelect({ fundingRoutes, onFundingRouteSelected }: Fu
       </Box>
       <FundingRouteDrawer
         visible={smartCheckoutDrawerVisible}
-        onCloseBottomSheet={closeBottomSheet}
+        onCloseDrawer={closeDrawer}
         fundingRoutes={fundingRoutes}
         activeFundingRouteIndex={activeFundingRouteIndex}
       />
