@@ -4,6 +4,8 @@ Internal package that provides functionality around quoting and execution of swa
 
 ## Usage
 
+### Initialize the exchange
+
 ```ts
 const configuration = {
   chainId: IMMUTABLE_TESTNET_CHAIN_ID,
@@ -13,12 +15,29 @@ const configuration = {
 };
 
 const exchange = new Exchange(configuration);
+```
+
+### Get a quote and transactions for an Exact Input swap.
+
+```ts
 
 const { approval, quote, swap } = exchange.getUnsignedSwapTxFromAmountIn(
-  fromAddress,
+  recipientAddress,
   tokenInAddress,
   tokenOutAddress,
-  inputAmount,
+  requestedAmountIn,
+);
+```
+
+### Get a quote and transactions for an Exact Output swap.
+
+```ts
+
+const { approval, quote, swap } = exchange.getUnsignedSwapTxFromAmountOut(
+  recipientAddress,
+  tokenInAddress,
+  tokenOutAddress,
+  requestedAmountOut,
 );
 ```
 
