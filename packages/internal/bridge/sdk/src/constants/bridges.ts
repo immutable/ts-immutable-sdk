@@ -106,12 +106,12 @@ export const bridgeMethods = {
     token: 'deposit',
     tokenTo: 'depositTo',
     native: 'depositETH',
-    nativeTo: 'depositToEth',
+    nativeTo: 'depositToETH',
   },
   withdraw: {
     token: 'withdraw',
     tokenTo: 'withdrawTo',
     native: 'withdrawIMX',
-    nativeTo: 'withdrawToIMX',
+    nativeTo: 'withdrawIMXTo',
   },
 };

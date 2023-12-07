@@ -82,13 +82,11 @@ export enum CompletionStatus {
  * @typedef {Object} BridgeFeeActions
  * @property {string} DEPOSIT - The transaction has been successfully synced.
  * @property {string} WITHDRAW - The transaction is still pending.
- * @property {string} MAP_TOKEN - The transaction has failed.
  * @property {string} FINALISE_WITHDRAWAL - Calculate gas .
  */
 export enum BridgeFeeActions {
   DEPOSIT = 'DEPOSIT',
   WITHDRAW = 'WITHDRAW',
-  MAP_TOKEN = 'MAP_TOKEN',
   FINALISE_WITHDRAWAL = 'FINALISE_WITHDRAWAL',
 }
 
@@ -98,17 +96,13 @@ export enum BridgeFeeActions {
  * @property {string} DEPOSIT_DESTINATION - The gas required to process the deposit on the destination chain.
  * @property {string} WITHDRAW_SOURCE - The gas required to withdraw from the bridge.
  * @property {string} WITHDRAW_DESTINATION - The gas required to process the withdrawal on the destination chain.
- * @property {string} MAP_TOKEN_SOURCE - The gas required to request the mapping of a token on the bridge.
- * @property {string} MAP_TOKEN_DESTINATION - The gas required to process the mapping of a token on the destination chain.
  * @property {string} FINALISE_WITHDRAWAL - The gas required to finalise a withdrawal from the flow rate queue.
  */
 export enum BridgeMethodsGasLimit { // @TODO test methods on chain and put correct values here
-  DEPOSIT_SOURCE = 500000,
+  DEPOSIT_SOURCE = 700000,
   DEPOSIT_DESTINATION = 100000,
-  WITHDRAW_SOURCE = 400000,
+  WITHDRAW_SOURCE = 700000,
   WITHDRAW_DESTINATION = 100000,
-  MAP_TOKEN_SOURCE = 300000,
-  MAP_TOKEN_DESTINATION = 100000,
   FINALISE_WITHDRAWAL = 200000,
 }
 
@@ -126,8 +120,7 @@ export interface FeeData {
  */
 export type BridgeFeeRequest = DepositFeeRequest
 | WithdrawFeeRequest
-| FinaliseFeeRequest
-| MapTokenFeeRequest;
+| FinaliseFeeRequest;
 
 /**
  * @typedef {Object} DepositFeeRequest
@@ -165,20 +158,6 @@ export interface WithdrawFeeRequest {
 export interface FinaliseFeeRequest {
   action: BridgeFeeActions.FINALISE_WITHDRAWAL,
   sourceChainId: string;
-}
-
-/**
- * @typedef {Object} MapTokenFeeRequest
- * @property {BridgeFeeActions} method - The method for which the bridge fee is being requested.
- * @property {number} gasMultiplier - How much buffer to add to the gas fee.
- * @property {string} sourceChainId - The chain ID of the source chain.
- * @property {string} destinationChainId - The chain ID of the destination chain.
- */
-export interface MapTokenFeeRequest {
-  action: BridgeFeeActions.MAP_TOKEN,
-  gasMultiplier: number;
-  sourceChainId: string;
-  destinationChainId: string;
 }
 
 /**
