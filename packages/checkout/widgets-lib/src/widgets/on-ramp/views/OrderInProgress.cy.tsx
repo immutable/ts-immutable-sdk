@@ -1,6 +1,6 @@
-import { BiomeCombinedProviders } from '@biom3/react';
 import { mount } from 'cypress/react18';
 import { cy, describe } from 'local-cypress';
+import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { cySmartGet } from '../../../lib/testUtils';
 import { text } from '../../../resources/text/textConfig';
 import { OnRampWidgetViews } from '../../../context/view-context/OnRampViewContextTypes';
@@ -15,9 +15,9 @@ describe('OrderInProgress View', () => {
 
   it('should render the OrderInProgress view', () => {
     mount(
-      <BiomeCombinedProviders>
+      <ViewContextTestComponent>
         <OrderInProgress />
-      </BiomeCombinedProviders>,
+      </ViewContextTestComponent>,
     );
 
     cySmartGet('order-in-progress-view').should('exist');

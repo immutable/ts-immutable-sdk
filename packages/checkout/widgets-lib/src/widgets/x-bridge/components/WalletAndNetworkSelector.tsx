@@ -1,5 +1,5 @@
 import {
-  BottomSheet,
+  Drawer,
   Box,
   Button,
   Heading,
@@ -37,7 +37,7 @@ export function WalletAndNetworkSelector() {
   const { viewDispatch } = useContext(ViewContext);
   const {
     heading, fromFormInput, toFormInput, submitButton,
-  } = text.views[XBridgeWidgetViews.WALLET_NETWORK_SECLECTION];
+  } = text.views[XBridgeWidgetViews.WALLET_NETWORK_SELECTION];
 
   // calculating l1/l2 chains to work with based on Checkout environment
   const l1NetworkChainId = getL1ChainId(checkout.config);
@@ -118,7 +118,7 @@ export function WalletAndNetworkSelector() {
       provider = createResult.provider;
       providerCache.current.set(walletProviderName, provider);
     } catch (error) {
-    // eslint-disable-next-line no-console
+      // eslint-disable-next-line no-console
       console.error(`Failed to create ${walletProviderName} provider`);
       throw error;
     }
@@ -128,7 +128,7 @@ export function WalletAndNetworkSelector() {
       const { isConnected } = await checkout.checkIsWalletConnected({ provider });
       connected = isConnected;
     } catch (error) {
-    // eslint-disable-next-line no-console
+      // eslint-disable-next-line no-console
       console.error(error);
       throw error;
     }
@@ -140,7 +140,7 @@ export function WalletAndNetworkSelector() {
         connected = true;
       } catch (error: any) {
         if (error.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
-        // eslint-disable-next-line no-console
+          // eslint-disable-next-line no-console
           console.log('User rejected request');
         }
         // eslint-disable-next-line no-console
@@ -384,15 +384,15 @@ export function WalletAndNetworkSelector() {
       )}
 
       {/** From Network Selector, we programatically open this so there is no target */}
-      <BottomSheet
+      <Drawer
         headerBarTitle={fromFormInput.networkSelectorHeading}
         size="full"
-        onCloseBottomSheet={() => {
+        onCloseDrawer={() => {
           setFromNetworkDrawerOpen(false);
         }}
         visible={fromNetworkDrawerOpen}
       >
-        <BottomSheet.Content>
+        <Drawer.Content>
           <NetworkItem
             key={imtblZkEvmNetworkName}
             testId={testId}
@@ -402,17 +402,17 @@ export function WalletAndNetworkSelector() {
           />
           {/** Show L1 option for Metamask only */}
           {fromWalletProviderName === WalletProviderName.METAMASK && (
-          <NetworkItem
-            key={l1NetworkName}
-            testId={testId}
-            chainName={l1NetworkName}
-            onNetworkClick={handleFromNetworkSelection}
-            chainId={l1NetworkChainId}
-          />
+            <NetworkItem
+              key={l1NetworkName}
+              testId={testId}
+              chainName={l1NetworkName}
+              onNetworkClick={handleFromNetworkSelection}
+              chainId={l1NetworkChainId}
+            />
           )}
 
-        </BottomSheet.Content>
-      </BottomSheet>
+        </Drawer.Content>
+      </Drawer>
 
       {/* To wallet selection has been made  */}
       {isToWalletAndNetworkSelected && toWalletProviderName && (
@@ -433,7 +433,7 @@ export function WalletAndNetworkSelector() {
               setToWalletDrawerOpen(true);
             }}
             // eslint-disable-next-line no-console
-            onNetworkClick={() => {}}
+            onNetworkClick={() => { }}
           />
           <Box sx={submitButtonWrapperStyles}>
             <Button

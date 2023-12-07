@@ -22,8 +22,6 @@ import { ConnectionStatus } from '../../../../context/connect-loader-context/Con
 import {
   ConnectLoaderTestComponent,
 } from '../../../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
-import { CustomAnalyticsProvider } from '../../../../context/analytics-provider/CustomAnalyticsProvider';
-import { StrongCheckoutWidgetsConfig } from '../../../../lib/withDefaultWidgetConfig';
 import { NATIVE } from '../../../../lib';
 
 describe('BalanceItem', () => {
@@ -74,16 +72,14 @@ describe('BalanceItem', () => {
 
   it('should show balance details', () => {
     mount(
-      <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-        <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
-          <WalletWidgetTestComponent initialStateOverride={baseWalletState}>
-            <BalanceItem
-              balanceInfo={testBalanceInfo}
-              bridgeToL2OnClick={() => {}}
-            />
-          </WalletWidgetTestComponent>
-        </ConnectLoaderTestComponent>
-      </CustomAnalyticsProvider>,
+      <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
+        <WalletWidgetTestComponent initialStateOverride={baseWalletState}>
+          <BalanceItem
+            balanceInfo={testBalanceInfo}
+            bridgeToL2OnClick={() => {}}
+          />
+        </WalletWidgetTestComponent>
+      </ConnectLoaderTestComponent>,
     );
 
     cySmartGet('balance-item-IMX').should('include.text', 'IMX');
@@ -119,16 +115,14 @@ describe('BalanceItem', () => {
     };
 
     mount(
-      <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-        <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
-          <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-            <BalanceItem
-              balanceInfo={testBalanceInfo}
-              bridgeToL2OnClick={() => {}}
-            />
-          </WalletWidgetTestComponent>
-        </ConnectLoaderTestComponent>
-      </CustomAnalyticsProvider>,
+      <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
+        <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+          <BalanceItem
+            balanceInfo={testBalanceInfo}
+            bridgeToL2OnClick={() => {}}
+          />
+        </WalletWidgetTestComponent>
+      </ConnectLoaderTestComponent>,
     );
 
     cySmartGet('token-menu').should('exist');
@@ -157,17 +151,15 @@ describe('BalanceItem', () => {
     };
 
     mount(
-      <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-        <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
-          <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-            <BalanceItem
-              balanceInfo={testBalanceInfo}
-              bridgeToL2OnClick={() => {}}
-            />
-          </WalletWidgetTestComponent>
-          ,
-        </ConnectLoaderTestComponent>
-      </CustomAnalyticsProvider>,
+      <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
+        <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+          <BalanceItem
+            balanceInfo={testBalanceInfo}
+            bridgeToL2OnClick={() => {}}
+          />
+        </WalletWidgetTestComponent>
+        ,
+      </ConnectLoaderTestComponent>,
     );
 
     cySmartGet('token-menu').should('exist');
@@ -200,16 +192,14 @@ describe('BalanceItem', () => {
     };
 
     mount(
-      <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-        <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
-          <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-            <BalanceItem
-              balanceInfo={testBalanceInfo}
-              bridgeToL2OnClick={() => {}}
-            />
-          </WalletWidgetTestComponent>
-        </ConnectLoaderTestComponent>
-      </CustomAnalyticsProvider>,
+      <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
+        <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+          <BalanceItem
+            balanceInfo={testBalanceInfo}
+            bridgeToL2OnClick={() => {}}
+          />
+        </WalletWidgetTestComponent>
+      </ConnectLoaderTestComponent>,
     );
 
     cySmartGet('token-menu').should('exist');
@@ -253,17 +243,15 @@ describe('BalanceItem', () => {
     };
 
     mount(
-      <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-        <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
-          <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-            <BalanceItem
-              balanceInfo={testBalanceInfo}
-              bridgeToL2OnClick={() => {}}
-            />
-          </WalletWidgetTestComponent>
-          ,
-        </ConnectLoaderTestComponent>
-      </CustomAnalyticsProvider>,
+      <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
+        <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+          <BalanceItem
+            balanceInfo={testBalanceInfo}
+            bridgeToL2OnClick={() => {}}
+          />
+        </WalletWidgetTestComponent>
+        ,
+      </ConnectLoaderTestComponent>,
     );
 
     cySmartGet('token-menu').should('exist');
@@ -317,17 +305,15 @@ describe('BalanceItem', () => {
     };
 
     mount(
-      <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-        <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
-          <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-            <BalanceItem
-              balanceInfo={balanceInfoNotInAllowList}
-              bridgeToL2OnClick={() => {}}
-            />
-          </WalletWidgetTestComponent>
-          ,
-        </ConnectLoaderTestComponent>
-      </CustomAnalyticsProvider>,
+      <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
+        <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+          <BalanceItem
+            balanceInfo={balanceInfoNotInAllowList}
+            bridgeToL2OnClick={() => {}}
+          />
+        </WalletWidgetTestComponent>
+        ,
+      </ConnectLoaderTestComponent>,
     );
 
     cySmartGet('token-menu').should('exist');
@@ -361,17 +347,15 @@ describe('BalanceItem', () => {
     };
 
     mount(
-      <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-        <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
-          <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-            <BalanceItem
-              balanceInfo={testBalanceInfo}
-              bridgeToL2OnClick={() => {}}
-            />
-          </WalletWidgetTestComponent>
-          ,
-        </ConnectLoaderTestComponent>
-      </CustomAnalyticsProvider>,
+      <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
+        <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+          <BalanceItem
+            balanceInfo={testBalanceInfo}
+            bridgeToL2OnClick={() => {}}
+          />
+        </WalletWidgetTestComponent>
+        ,
+      </ConnectLoaderTestComponent>,
     );
 
     cySmartGet('token-menu').should('exist');
@@ -404,16 +388,14 @@ describe('BalanceItem', () => {
     };
 
     mount(
-      <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-        <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
-          <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-            <BalanceItem
-              balanceInfo={testBalanceInfo}
-              bridgeToL2OnClick={() => {}}
-            />
-          </WalletWidgetTestComponent>
-        </ConnectLoaderTestComponent>
-      </CustomAnalyticsProvider>,
+      <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
+        <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+          <BalanceItem
+            balanceInfo={testBalanceInfo}
+            bridgeToL2OnClick={() => {}}
+          />
+        </WalletWidgetTestComponent>
+      </ConnectLoaderTestComponent>,
     );
     cySmartGet('token-menu').should('exist');
     cySmartGet('token-menu').click();
@@ -457,23 +439,21 @@ describe('BalanceItem', () => {
     };
 
     mount(
-      <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-        <ConnectLoaderTestComponent
-          initialStateOverride={{
-            ...connectLoaderState,
-            provider: {
-              provider: { isPassport: true } as any as ExternalProvider,
-            } as Web3Provider,
-          }}
-        >
-          <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-            <BalanceItem
-              balanceInfo={testBalanceInfo}
-              bridgeToL2OnClick={() => {}}
-            />
-          </WalletWidgetTestComponent>
-        </ConnectLoaderTestComponent>
-      </CustomAnalyticsProvider>,
+      <ConnectLoaderTestComponent
+        initialStateOverride={{
+          ...connectLoaderState,
+          provider: {
+            provider: { isPassport: true } as any as ExternalProvider,
+          } as Web3Provider,
+        }}
+      >
+        <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+          <BalanceItem
+            balanceInfo={testBalanceInfo}
+            bridgeToL2OnClick={() => {}}
+          />
+        </WalletWidgetTestComponent>
+      </ConnectLoaderTestComponent>,
     );
     cySmartGet('token-menu').should('exist');
     cySmartGet('token-menu').click();
@@ -492,16 +472,14 @@ describe('BalanceItem', () => {
       },
     };
     mount(
-      <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-        <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
-          <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-            <BalanceItem
-              balanceInfo={testBalanceInfo}
-              bridgeToL2OnClick={() => {}}
-            />
-          </WalletWidgetTestComponent>
-        </ConnectLoaderTestComponent>
-      </CustomAnalyticsProvider>,
+      <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
+        <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+          <BalanceItem
+            balanceInfo={testBalanceInfo}
+            bridgeToL2OnClick={() => {}}
+          />
+        </WalletWidgetTestComponent>
+      </ConnectLoaderTestComponent>,
     );
 
     cySmartGet('token-menu').should('not.exist');
@@ -545,16 +523,14 @@ describe('BalanceItem', () => {
 
     it('should emit sendRequestSwapEvent when swap menu button is clicked', () => {
       mount(
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-          <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
-            <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-              <BalanceItem
-                balanceInfo={testBalanceInfo}
-                bridgeToL2OnClick={() => {}}
-              />
-            </WalletWidgetTestComponent>
-          </ConnectLoaderTestComponent>
-        </CustomAnalyticsProvider>,
+        <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
+          <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+            <BalanceItem
+              balanceInfo={testBalanceInfo}
+              bridgeToL2OnClick={() => {}}
+            />
+          </WalletWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('token-menu').should('exist');
@@ -575,16 +551,14 @@ describe('BalanceItem', () => {
 
     it('should emit sendRequestOnrampEvent when add menu button is clicked', () => {
       mount(
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-          <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
-            <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-              <BalanceItem
-                balanceInfo={testBalanceInfo}
-                bridgeToL2OnClick={() => {}}
-              />
-            </WalletWidgetTestComponent>
-          </ConnectLoaderTestComponent>
-        </CustomAnalyticsProvider>,
+        <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
+          <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+            <BalanceItem
+              balanceInfo={testBalanceInfo}
+              bridgeToL2OnClick={() => {}}
+            />
+          </WalletWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('token-menu').should('exist');
