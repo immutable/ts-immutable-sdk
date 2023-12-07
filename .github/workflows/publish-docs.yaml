@@ -24,7 +24,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: immutable/imx-docs
-          token: ${{ secrets.READONLY_CLONE_GITHUB_TOKEN }}
+          token: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
           path: imx-docs
           ref: main
 
