@@ -93,7 +93,10 @@ const tokenValueFormatDecimals = (s: string, numDecimals: number): string => {
   return parseFloat(s.substring(0, pointIndex + numDecimals + 1)).toFixed(numDecimals);
 };
 
-export const tokenValueFormat = (s: Number | string): string => {
+export const tokenValueFormat = (
+  s: Number | string,
+  maxDecimals: number = DEFAULT_TOKEN_FORMATTING_DECIMALS,
+): string => {
   const asString = s.toString();
 
   // Only float numbers will be handled by this function
@@ -104,7 +107,19 @@ export const tokenValueFormat = (s: Number | string): string => {
   // 1. The number provided starts with "." (e.g. ".012")
   // 2. The number starts with 0 (e.g. "0.234")
   if (asString[0] === '.' || parseInt(asString[0], 10) === 0) {
-    return tokenValueFormatDecimals(asString, DEFAULT_TOKEN_FORMATTING_DECIMALS);
+    let formattedValue = tokenValueFormatDecimals(asString, DEFAULT_TOKEN_FORMATTING_DECIMALS);
+    if (parseFloat(formattedValue) === 0) {
+      // Ensure we return a value greater than 0
+      let formattedDecimals = DEFAULT_TOKEN_FORMATTING_DECIMALS;
+      while ((formattedValue[formattedValue.length - 1] || '') === '0' && formattedDecimals <= maxDecimals) {
+        formattedDecimals += 1;
+        formattedValue = tokenValueFormatDecimals(asString, formattedDecimals);
+        if ((formattedValue[formattedValue.length - 1] || '') !== '0') {
+          break;
+        }
+      }
+    }
+    return formattedValue;
   }
 
   // In case the number is greater than 1 then the formatting will look slightly different.

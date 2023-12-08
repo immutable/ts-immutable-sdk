@@ -276,10 +276,13 @@ export function SwapForm({ data }: SwapFromProps) {
 
       setToAmount(
         formatZeroAmount(
-          tokenValueFormat(utils.formatUnits(
-            result.quote.amount.value,
+          tokenValueFormat(
+            utils.formatUnits(
+              result.quote.amount.value,
+              result.quote.amount.token.decimals,
+            ),
             result.quote.amount.token.decimals,
-          )),
+          ),
         ),
       );
 
