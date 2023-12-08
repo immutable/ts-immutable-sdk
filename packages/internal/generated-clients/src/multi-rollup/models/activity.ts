@@ -57,6 +57,12 @@ export interface Activity {
      */
     'details': ActivityDetails;
     /**
+     * The time activity was updated at
+     * @type {string}
+     * @memberof Activity
+     */
+    'updated_at': string;
+    /**
      * The time activity was indexed
      * @type {string}
      * @memberof Activity
