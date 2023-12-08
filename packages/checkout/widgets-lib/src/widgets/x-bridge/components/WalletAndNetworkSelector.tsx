@@ -189,7 +189,6 @@ export function WalletAndNetworkSelector() {
     try {
       const createResult = await checkout.createProvider({ walletProviderName });
       provider = createResult.provider;
-      // providerCache.current.set(walletProviderName, provider);
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error(`Failed to create ${walletProviderName} provider`);
@@ -235,7 +234,7 @@ export function WalletAndNetworkSelector() {
   /* --------------------------- */
   const handleFromWalletConnection = useCallback(async (walletProviderName: WalletProviderName) => {
     clearToWalletSelections();
-    let provider;// = providerCache.current.get(walletProviderName);
+    let provider;
     if (!provider) {
       try {
         provider = await createProviderAndConnect(walletProviderName);
@@ -269,7 +268,7 @@ export function WalletAndNetworkSelector() {
 
     setFromWalletDrawerOpen(false);
     setTimeout(() => setFromNetworkDrawerOpen(true), 500);
-  }, [fromWalletProviderName/* providerCache.current */]);
+  }, [fromWalletProviderName]);
 
   const handleFromNetworkSelection = useCallback(
     async (chainId: ChainId) => {
@@ -298,11 +297,6 @@ export function WalletAndNetworkSelector() {
       let switchNetwork;
       try {
         switchNetwork = await checkout.switchNetwork({ provider: fromWalletWeb3Provider, chainId });
-        // if (isPassportProvider(switchNetwork.provider)) {
-        //   providerCache.current.set(WalletProviderName.PASSPORT, switchNetwork.provider);
-        // } else if (isMetaMaskProvider(switchNetwork.provider)) {
-        //   providerCache.current.set(WalletProviderName.METAMASK, switchNetwork.provider);
-        // }
         setFromWalletWeb3Provider(switchNetwork.provider);
         setFromNetworkDrawerOpen(false);
         setFromNetwork(switchNetwork.network.chainId);
@@ -320,7 +314,6 @@ export function WalletAndNetworkSelector() {
       checkout,
       fromWalletWeb3Provider,
       fromWalletProviderName,
-      // providerCache.current,
       fromNetwork,
     ],
   );
