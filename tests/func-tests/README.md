@@ -7,7 +7,7 @@ Functional tests using Cucumber and Gherkin
 1. Open the repository root folder in VS Code
 2. Install dependencies: `yarn` (husky needs `node_modules` at the repo root to run)
 3. Build the SDK: `yarn build`
-4. cd into `func-tests`
+4. cd into `tests/func-tests`
 5. Install dependencies: `yarn` (this also configures husky)
 
 ## Running the tests
@@ -19,7 +19,7 @@ Functional tests using Cucumber and Gherkin
 
 ## Filtering tests
 
-By default, all tests that do not have the `@skip` tag are run. In other words, the tag filter is set to `not @skip`. You can see this in the [.env.sandbox](.env.sandbox) file.
+By default, all tests that do not have the `@skip` tag are run. In other words, the tag filter is set to `not @skip`. 
 
 You can change the tag filter on the command line: `TAGS="<tag-expression>" yarn test`, or more permanently, by editing your .env file directly.
 
