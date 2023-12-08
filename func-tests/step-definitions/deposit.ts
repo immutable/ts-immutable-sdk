@@ -39,10 +39,14 @@ export class DepositEth {
   }
 
   // @given('banker has at least {string} eth balance on L1')
-  public async checkBankerL1Balance(amount: string) {
+  public async checkBankerL1Balance(amountEth: string) {
     const banker = await this.stepSharedState.getBanker();
     const onChainBalance = await banker.ethSigner.getBalance();
-    assert.ok(onChainBalance.gte(parseEther(amount)));
+    if (onChainBalance.lt(parseEther(amountEth))) {
+      console.log('Banker balance', onChainBalance.toString());
+      console.log('Amount', parseEther(amountEth).toString());
+    }
+    assert.ok(onChainBalance.gte(parseEther(amountEth)));
   }
 
   // @given('banker has L2 balance of {string}')
