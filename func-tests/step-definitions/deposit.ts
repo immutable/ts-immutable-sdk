@@ -71,8 +71,7 @@ export class DepositEth {
     });
     this.stepSharedState.bankerBalances[bankerBalanceVar] = response;
     if (parseEther(response.balance!).lt(parseEther(amount))) {
-      console.log('Banker balance', response.balance);
-      console.log('Amount', amount);
+      console.log('Banker address', ownerAddress, 'Banker balance:', response.balance, 'amount:', amount);
     }
     assert.ok(parseEther(response.balance!).gte(parseEther(amount)));
   }
