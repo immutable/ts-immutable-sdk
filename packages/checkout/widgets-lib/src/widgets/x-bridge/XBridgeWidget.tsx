@@ -3,11 +3,13 @@ import {
 } from '@biom3/react';
 import {
   BridgeWidgetParams,
+  ChainId,
   Checkout,
 } from '@imtbl/checkout-sdk';
 import {
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useReducer,
   useState,
@@ -39,6 +41,7 @@ import {
   XBridgeContext,
   xBridgeReducer,
   initialXBridgeState,
+  BridgeActions,
 } from './context/XBridgeContext';
 import { widgetTheme } from '../../lib/theme';
 import { WalletNetworkSelectionView } from './views/WalletNetworkSelectionView';
@@ -82,7 +85,6 @@ export function XBridgeWidget({
     {
       ...initialXBridgeState,
       checkout,
-      web3Provider: web3Provider ?? null,
       tokenBridge: (() => {
         let bridgeInstance = ETH_SEPOLIA_TO_ZKEVM_TESTNET;
         if (checkout.config.isDevelopment) bridgeInstance = ETH_SEPOLIA_TO_ZKEVM_DEVNET;
@@ -123,6 +125,48 @@ export function XBridgeWidget({
       },
     });
   }, [viewDispatch]);
+
+  useEffect(() => {
+    (async () => {
+      if (web3Provider) {
+        const currentChain = (await web3Provider?.getNetwork())?.chainId;
+        const currentAddress = await web3Provider?.getSigner().getAddress();
+        if (
+          (!Object.values(ChainId).includes(currentChain as ChainId)
+            || (bridgeState.from && currentAddress !== bridgeState.from.walletAddress))
+          && viewState.view.type !== XBridgeWidgetViews.WALLET_NETWORK_SELECTION
+        ) {
+          bridgeDispatch({
+            payload: {
+              type: BridgeActions.SET_WALLETS_AND_NETWORKS,
+              from: null,
+              to: null,
+            },
+          });
+          bridgeDispatch({
+            payload: {
+              type: BridgeActions.SET_TOKEN_AND_AMOUNT,
+              amount: '',
+              token: null,
+            },
+          });
+          viewDispatch({
+            payload: {
+              type: ViewActions.GO_BACK_TO,
+              view: { type: XBridgeWidgetViews.WALLET_NETWORK_SELECTION },
+            },
+          });
+        } else {
+          bridgeDispatch({
+            payload: {
+              type: BridgeActions.SET_PROVIDER,
+              web3Provider,
+            },
+          });
+        }
+      }
+    })();
+  }, [web3Provider]);
 
   return (
     <BiomeCombinedProviders theme={{ base: themeReducerValue }}>

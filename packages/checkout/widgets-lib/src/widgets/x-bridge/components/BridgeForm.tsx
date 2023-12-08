@@ -6,7 +6,9 @@ import {
   OptionKey,
 } from '@biom3/react';
 import {
-  GasEstimateBridgeToL2Result, GetBalanceResult,
+  GasEstimateBridgeToL2Result,
+  GasEstimateType,
+  GetBalanceResult,
 } from '@imtbl/checkout-sdk';
 import {
   useCallback, useContext, useEffect, useMemo, useRef, useState,
@@ -223,8 +225,6 @@ export function BridgeForm(props: BridgeFormProps) {
       ? BridgeFeeActions.DEPOSIT
       : BridgeFeeActions.WITHDRAW;
 
-    console.log(bridgeFeeAction);
-
     const gasEstimate = await tokenBridge!.getFee({
       action: bridgeFeeAction,
       gasMultiplier: 1.1,
@@ -232,21 +232,24 @@ export function BridgeForm(props: BridgeFormProps) {
       destinationChainId: to?.network.toString(),
     });
 
-    // console.log('sourceChainGas', utils.formatUnits(gasEstimate.sourceChainGas));
-    // console.log('imtblFee', utils.formatUnits(gasEstimate.imtblFee));
-    // console.log('bridgeFee', utils.formatUnits(gasEstimate.bridgeFee));
-    console.log('totalFees', utils.formatUnits(gasEstimate.totalFees));
+    const gasEstimateResult = {
+      gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+      fees: {
+        totalFees: gasEstimate.totalFees,
+      },
+      token: checkout.config.networkMap.get(from!.network)?.nativeCurrency,
+    } as GasEstimateBridgeToL2Result;
 
-    setEstimates(gasEstimate);
+    setEstimates(gasEstimateResult);
     const estimatedAmount = utils.formatUnits(
-      gasEstimate?.fees?.totalFees || 0,
+      gasEstimateResult?.fees?.totalFees || 0,
       DEFAULT_TOKEN_DECIMALS,
     );
 
     setGasFee(estimatedAmount);
     setGasFeeFiatValue(calculateCryptoToFiat(
       estimatedAmount,
-      gasEstimate.gasFee?.token?.symbol || '',
+      gasEstimateResult?.token?.symbol || '',
       cryptoFiatState.conversions,
     ));
 
@@ -278,7 +281,6 @@ export function BridgeForm(props: BridgeFormProps) {
 
   useEffect(() => {
     if (editing) return;
-    console.log('fetching as amount or token has changed');
     (async () => await fetchEstimates())();
   }, [formAmount, formToken, editing]);
 
@@ -451,7 +453,7 @@ export function BridgeForm(props: BridgeFormProps) {
         )}
         {gasFee && (
           <Box sx={{ paddingY: 'base.spacing.x2' }}>
-            <MenuItem emphasized size="small">
+            <MenuItem testId="bridge-gas-fee" emphasized size="small">
               <MenuItem.Label sx={gasAmountHeadingStyles}>
                 {fees.title}
               </MenuItem.Label>

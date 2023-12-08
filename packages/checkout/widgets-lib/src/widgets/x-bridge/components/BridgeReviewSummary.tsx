@@ -75,7 +75,7 @@ export function BridgeReviewSummary() {
   const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
 
   const [loading, setLoading] = useState(false);
-  const [estimates, setEstimates] = useState<GasEstimateBridgeToL2Result | undefined>(undefined);
+  const [estimates, setEstimates] = useState<any | undefined>(undefined);
   const [gasFee, setGasFee] = useState<string>('');
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -128,9 +128,6 @@ export function BridgeReviewSummary() {
         gasMultiplier: 1.1,
       }),
     ]);
-
-    console.log('unsignedApproveTransaction', unsignedApproveTransaction);
-    console.log('unsignedTransaction', unsignedTransaction);
 
     setApproveTransaction(unsignedApproveTransaction);
     setTransaction(unsignedTransaction);
@@ -285,28 +282,28 @@ export function BridgeReviewSummary() {
         )}
       </MenuItem>
       {gasFee && (
-      <MenuItem
-        testId={`${testId}-gas-amount`}
-        size="small"
-        emphasized
-        sx={bottomMenuItemStyles}
-      >
-        <MenuItem.Label
+        <MenuItem
+          testId={`${testId}-gas-amount`}
           size="small"
-          sx={gasAmountHeadingStyles}
+          emphasized
+          sx={bottomMenuItemStyles}
         >
-          {fees.heading}
-        </MenuItem.Label>
-        <MenuItem.PriceDisplay
-          use={<Body size="xSmall" />}
-          price={`${estimates?.token?.symbol} ${tokenValueFormat(gasFee)}` ?? '-'}
-          fiatAmount={`${fiatPricePrefix}${gasFeeFiatValue}`}
-        />
-        <MenuItem.StatefulButtCon
-          icon="ChevronExpand"
-          onClick={() => setShowFeeBreakdown(true)}
-        />
-      </MenuItem>
+          <MenuItem.Label
+            size="small"
+            sx={gasAmountHeadingStyles}
+          >
+            {fees.heading}
+          </MenuItem.Label>
+          <MenuItem.PriceDisplay
+            use={<Body size="xSmall" />}
+            price={`${estimates?.token?.symbol} ${tokenValueFormat(gasFee)}` ?? '-'}
+            fiatAmount={`${fiatPricePrefix}${gasFeeFiatValue}`}
+          />
+          <MenuItem.StatefulButtCon
+            icon="ChevronExpand"
+            onClick={() => setShowFeeBreakdown(true)}
+          />
+        </MenuItem>
       )}
       <Box
         sx={{

@@ -74,7 +74,7 @@ export interface SetWalletProviderNamePayload {
 
 export interface SetProviderPayload {
   type: BridgeActions.SET_PROVIDER;
-  web3Provider: Web3Provider;
+  web3Provider: Web3Provider | null;
 }
 
 export interface SetTokenBridgePayload {
