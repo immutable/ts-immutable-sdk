@@ -8,6 +8,7 @@ import {
 } from '@imtbl/checkout-sdk';
 import { Exchange } from '@imtbl/dex-sdk';
 import { Environment } from '@imtbl/config';
+import { SinonStub } from 'cypress/types/sinon';
 import { cyIntercept, cySmartGet } from '../../../lib/testUtils';
 import { SwapWidgetTestComponent } from '../test-components/SwapWidgetTestComponent';
 import { SwapForm } from './SwapForm';
@@ -427,62 +428,50 @@ describe('SwapForm', () => {
   });
 
   describe('when to fetch a quote', () => {
+    let fromAmountInStub: SinonStub;
+
     beforeEach(() => {
-      cy.stub(quotesProcessor, 'fromAmountIn')
-        .as('fromAmountInStub')
-        .resolves({
-          quote: {
-            amount: {
-              token: {
-                name: 'Ethereum',
-                symbol: 'ETH',
-                decimals: 18,
-                address: '0xf57e7e7c23978c3caec3c3548e3d615c346e79ff',
-              },
-              value: BigNumber.from('112300000000000012'),
+      fromAmountInStub = cy.stub(quotesProcessor, 'fromAmountIn')
+        .as('fromAmountInStub');
+      fromAmountInStub.resolves({
+        quote: {
+          amount: {
+            token: {
+              name: 'Ethereum',
+              symbol: 'ETH',
+              decimals: 18,
+              address: '0xf57e7e7c23978c3caec3c3548e3d615c346e79ff',
             },
-            amountWithMaxSlippage: {
-              token: {
-                name: 'ImmutableX',
-                symbol: 'IMX',
-                decimals: 18,
-                address: '',
-              },
-              value: BigNumber.from('112300000000000032'),
-            },
-            slippage: 10,
+            value: BigNumber.from('112300000000000012'),
           },
-          swap: {
-            gasFeeEstimate: {
-              token: {
-                name: 'ImmutableX',
-                symbol: 'IMX',
-                decimals: 18,
-                address: '',
-              },
-              value: BigNumber.from('112300000000000045'),
+          amountWithMaxSlippage: {
+            token: {
+              name: 'ImmutableX',
+              symbol: 'IMX',
+              decimals: 18,
+              address: '',
             },
-            transaction: {
-              to: 'toSwapAddress',
-              from: 'fromSwapAddress',
-            },
+            value: BigNumber.from('112300000000000032'),
           },
-          approval: {
-            gasFeeEstimate: {
-              token: {
-                name: 'ImmutableX',
-                symbol: 'IMX',
-                decimals: 18,
-                address: '',
-              },
-              amount: BigNumber.from('112300000000000045'),
+          slippage: 10,
+        },
+        swap: {
+          gasFeeEstimate: {
+            token: {
+              name: 'ImmutableX',
+              symbol: 'IMX',
+              decimals: 18,
+              address: '',
             },
-            transaction: {
-              to: 'toApprovalAddress',
-              from: 'fromApprovalAddress',
-            },
+            value: BigNumber.from('112300000000000045'),
           },
-        });
+          transaction: {
+            to: 'toSwapAddress',
+            from: 'fromSwapAddress',
+          },
+        },
+        approval: {},
+      });
     });
 
     it('should only fetch a quote when from token and to token are selected and swap amount has value', () => {
@@ -706,6 +695,113 @@ describe('SwapForm', () => {
       cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').trigger('change');
       cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').blur();
       cySmartGet('@fromAmountInStub').should('have.been.called');
+    });
+
+    it('should add swap and approval fees into single total gas when approval required', () => {
+      // Override from quote to include approval
+      fromAmountInStub.resolves({
+        quote: {
+          amount: {
+            token: {
+              name: 'Ethereum',
+              symbol: 'ETH',
+              decimals: 18,
+              address: '0xf57e7e7c23978c3caec3c3548e3d615c346e79ff',
+            },
+            value: BigNumber.from('112300000000000012'),
+          },
+          amountWithMaxSlippage: {
+            token: {
+              name: 'ImmutableX',
+              symbol: 'IMX',
+              decimals: 18,
+              address: '',
+            },
+            value: BigNumber.from('112300000000000032'),
+          },
+          slippage: 10,
+        },
+        swap: {
+          gasFeeEstimate: {
+            token: {
+              name: 'ImmutableX',
+              symbol: 'IMX',
+              decimals: 18,
+              address: '',
+            },
+            value: BigNumber.from('112300000000000045'),
+          },
+          transaction: {
+            to: 'toSwapAddress',
+            from: 'fromSwapAddress',
+          },
+        },
+        approval: {
+          gasFeeEstimate: {
+            token: {
+              name: 'ImmutableX',
+              symbol: 'IMX',
+              decimals: 18,
+              address: '',
+            },
+            value: BigNumber.from('112300000000000045'),
+          },
+          transaction: {
+            to: 'toApprovalAddress',
+            from: 'fromApprovalAddress',
+          },
+        },
+      });
+
+      mount(
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <SwapWidgetTestComponent
+            initialStateOverride={testSwapState}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <SwapCoins theme={WidgetTheme.LIGHT} />
+          </SwapWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
+      );
+
+      cySmartGet('fromTokenInputs-select-form-select__target').click();
+      cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
+        .click();
+      cySmartGet('toTokenInputs-select-form-select__target').click();
+      cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
+      cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').trigger('change');
+      cySmartGet('fromTokenInputs-text-form-text__input').blur();
+      cySmartGet('@fromAmountInStub').should('have.been.called');
+
+      const params = [
+        // exchange
+        {},
+        // provider
+        {},
+        // fromToken
+        {
+          name: 'Ethereum',
+          symbol: 'ETH',
+          decimals: 18,
+          address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+        },
+        // fromAmount
+        '0.01',
+        // toToken
+        {
+          name: 'ImmutableX',
+          symbol: 'IMX',
+          decimals: 18,
+          address: NATIVE,
+        },
+      ];
+      cySmartGet('@fromAmountInStub').should('have.been.calledWith', ...params);
+
+      const staticText = text.views[SwapWidgetViews.SWAP];
+      cySmartGet('fee_description_gas').should('have.text', '≈ IMX 0.224600');
+      cySmartGet('fee_description_gas_fiat').should('have.text', `${staticText.content.fiatPricePrefix} $0.17`);
     });
   });
 

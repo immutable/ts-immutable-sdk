@@ -248,8 +248,12 @@ export function SwapForm({ data }: SwapFromProps) {
       if (silently && (loading || editing)) return;
 
       const estimate = result.swap.gasFeeEstimate;
+      let gasFeeTotal = BigNumber.from(estimate?.value || 0);
+      if (result.approval?.gasFeeEstimate) {
+        gasFeeTotal = gasFeeTotal.add(result.approval.gasFeeEstimate.value);
+      }
       const gasFee = utils.formatUnits(
-        estimate?.value || 0,
+        gasFeeTotal,
         DEFAULT_TOKEN_DECIMALS,
       );
       const estimateToken = estimate?.token;
@@ -312,8 +316,12 @@ export function SwapForm({ data }: SwapFromProps) {
       if (silently && (loading || editing)) return;
 
       const estimate = result.swap.gasFeeEstimate;
+      let gasFeeTotal = BigNumber.from(estimate?.value || 0);
+      if (result.approval?.gasFeeEstimate) {
+        gasFeeTotal = gasFeeTotal.add(result.approval.gasFeeEstimate.value);
+      }
       const gasFee = utils.formatUnits(
-        estimate?.value || 0,
+        gasFeeTotal,
         DEFAULT_TOKEN_DECIMALS,
       );
       const estimateToken = estimate?.token;
