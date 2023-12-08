@@ -42,6 +42,7 @@ import {
   expectToBeString,
   decodeMulticallExactInputWithoutFees,
   buildBlock,
+  refundETHFunctionSignature,
   TEST_MAX_PRIORITY_FEE_PER_GAS,
   TEST_BASE_FEE,
 } from './test/utils';
@@ -433,6 +434,44 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       expect(result.approval).toBeNull();
     });
+
+    it('should include a call to refundETH as the final step of the multicall calldata', async () => {
+      mockRouterImplementation({
+        pools: [createPool(nativeTokenService.wrappedToken, FUN_TEST_TOKEN)],
+      });
+
+      const swapRouterInterface = SwapRouter.INTERFACE;
+      const paymentsInterface = PaymentsExtended.INTERFACE;
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+
+      // Sell 100 native tokens for X amount of FUN where the exchange rate is 1 token-in : 10 token-out
+      // Route is WIMX > FUN
+      const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
+        TEST_FROM_ADDRESS,
+        'native',
+        FUN_TEST_TOKEN.address,
+        newAmountFromString('100', nativeTokenService.nativeToken).value,
+        3, // 3 % slippage
+      );
+
+      expectToBeDefined(swap.transaction.data);
+      expectToBeDefined(swap.transaction.value);
+      const calldata = swap.transaction.data.toString();
+
+      const topLevelParams = swapRouterInterface.decodeFunctionData('multicall(uint256,bytes[])', calldata);
+
+      expect(topLevelParams.data.length).toBe(2); // expect that there are two calls in the multicall
+      const swapTransactionCalldata = topLevelParams.data[0];
+      const refundETHTransactionCalldata = topLevelParams.data[1];
+
+      expectToBeString(swapTransactionCalldata);
+      expectToBeString(refundETHTransactionCalldata);
+
+      const decodedRefundEthTx = paymentsInterface.decodeFunctionData('refundETH', refundETHTransactionCalldata);
+
+      expect(topLevelParams.data[1]).toEqual(refundETHFunctionSignature);
+      expect(decodedRefundEthTx.length).toEqual(0); // expect that the refundETH call has no parameters
+    });
   });
 
   describe('with a single pool and a native token out', () => {
@@ -583,6 +622,49 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   });
 
   describe('with multiple pools', () => {
+    describe('with a native token in', () => {
+      it('should include a call to refundETH as the final step of the multicall calldata', async () => {
+        mockRouterImplementation({
+          pools: [
+            createPool(nativeTokenService.wrappedToken, USDC_TEST_TOKEN),
+            createPool(USDC_TEST_TOKEN, FUN_TEST_TOKEN),
+          ],
+        });
+
+        const swapRouterInterface = SwapRouter.INTERFACE;
+        const paymentsInterface = PaymentsExtended.INTERFACE;
+        const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+
+        // Sell 100 native tokens for X amount of FUN where the exchange rate is 1 token-in : 10 token-out
+        // Route is WIMX > USDC > FUN
+        const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
+          TEST_FROM_ADDRESS,
+          'native',
+          FUN_TEST_TOKEN.address,
+          newAmountFromString('100', nativeTokenService.nativeToken).value,
+          3, // 3 % slippage
+        );
+
+        expectToBeDefined(swap.transaction.data);
+        expectToBeDefined(swap.transaction.value);
+        const calldata = swap.transaction.data.toString();
+
+        const topLevelParams = swapRouterInterface.decodeFunctionData('multicall(uint256,bytes[])', calldata);
+
+        expect(topLevelParams.data.length).toBe(2); // expect that there are two calls in the multicall
+        const swapTransactionCalldata = topLevelParams.data[0];
+        const refundETHTransactionCalldata = topLevelParams.data[1];
+
+        expectToBeString(swapTransactionCalldata);
+        expectToBeString(refundETHTransactionCalldata);
+
+        const decodedRefundEthTx = paymentsInterface.decodeFunctionData('refundETH', refundETHTransactionCalldata);
+
+        expect(topLevelParams.data[1]).toEqual(refundETHFunctionSignature);
+        expect(decodedRefundEthTx.length).toEqual(0); // expect that the refundETH call has no parameters
+      });
+    });
+
     describe('with a native token out', () => {
       it('should specify the Router contract as the recipient of the swap function call', async () => {
         mockRouterImplementation({
