@@ -13,17 +13,18 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import { APIError429AllOf } from './apierror429-all-of';
-// May contain unused imports in some cases
-// @ts-ignore
-import { BasicAPIError } from './basic-apierror';
 
 /**
- * @type APIError429
+ * 
  * @export
+ * @interface RefreshMetadataByIDAllOf
  */
-export type APIError429 = APIError429AllOf & BasicAPIError;
-
+export interface RefreshMetadataByIDAllOf {
+    /**
+     * Metadata ID in UUIDv4 format
+     * @type {string}
+     * @memberof RefreshMetadataByIDAllOf
+     */
+    'metadata_id': string;
+}
 
