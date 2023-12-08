@@ -20,7 +20,6 @@
     "@magic-ext/oidc": "^4.2.0",
     "@metamask/detect-provider": "^2.0.0",
     "@opensea/seaport-js": "2.0.7",
-    "@rollup/plugin-replace": "^5.0.5",
     "@uniswap/router-sdk": "^1.4.0",
     "@uniswap/sdk-core": "^3.0.1",
     "@uniswap/v3-sdk": "^3.9.0",
