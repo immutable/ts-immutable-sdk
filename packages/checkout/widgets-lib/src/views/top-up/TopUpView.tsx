@@ -105,10 +105,9 @@ export function TopUpView({
     (async () => {
       const bridgeEstimate = await checkout.gasEstimate({
         gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-        isSpendingCapApprovalRequired: true,
       });
 
-      const est = getBridgeFeeEstimation(bridgeEstimate as GasEstimateBridgeToL2Result, conversions);
+      const est = await getBridgeFeeEstimation(bridgeEstimate as GasEstimateBridgeToL2Result, conversions);
       setBridgeFeesInFiat(est);
     })();
   }, [checkout !== undefined]);

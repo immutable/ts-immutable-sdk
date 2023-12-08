@@ -11,7 +11,9 @@ import {
   Body,
   Box, Button, Heading, Icon, MenuItem,
 } from '@biom3/react';
-import { ChainId, GasEstimateBridgeToL2Result, WalletProviderName } from '@imtbl/checkout-sdk';
+import {
+  ChainId, GasEstimateBridgeToL2Result, GasEstimateType, WalletProviderName,
+} from '@imtbl/checkout-sdk';
 import { abbreviateAddress } from 'lib/addressUtils';
 import { CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext';
 import { isPassportProvider } from 'lib/providerUtils';
@@ -140,22 +142,23 @@ export function BridgeReviewSummary() {
     const { totalFees } = transactionFeeData;
 
     const gasEstimateResult = {
-      gasFee: {
-        estimatedAmount: totalFees,
-        token: checkout.config.networkMap.get(from!.network)?.nativeCurrency,
+      gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+      fees: {
+        totalFees,
       },
+      token: checkout.config.networkMap.get(from!.network)?.nativeCurrency,
     } as GasEstimateBridgeToL2Result;
 
     setEstimates(gasEstimateResult);
     const estimatedAmount = utils.formatUnits(
-      gasEstimateResult?.gasFee?.estimatedAmount || 0,
+      gasEstimateResult?.fees.totalFees || 0,
       DEFAULT_TOKEN_DECIMALS,
     );
 
     setGasFee(estimatedAmount);
     setGasFeeFiatValue(calculateCryptoToFiat(
       estimatedAmount,
-      gasEstimateResult.gasFee?.token?.symbol || '',
+      gasEstimateResult?.token?.symbol || '',
       cryptoFiatState.conversions,
     ));
   }, [checkout, tokenBridge]);
@@ -296,7 +299,7 @@ export function BridgeReviewSummary() {
         </MenuItem.Label>
         <MenuItem.PriceDisplay
           use={<Body size="xSmall" />}
-          price={`${estimates?.gasFee.token?.symbol} ${tokenValueFormat(gasFee)}` ?? '-'}
+          price={`${estimates?.token?.symbol} ${tokenValueFormat(gasFee)}` ?? '-'}
           fiatAmount={`${fiatPricePrefix}${gasFeeFiatValue}`}
         />
         <MenuItem.StatefulButtCon

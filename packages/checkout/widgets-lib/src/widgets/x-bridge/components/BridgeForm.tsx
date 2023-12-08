@@ -116,7 +116,7 @@ export function BridgeForm(props: BridgeFormProps) {
   }, []);
 
   const gasFiatAmount = `${fees.fiatPricePrefix} ${gasFeeFiatValue}`;
-  const gasTokenAmount = `${estimates?.gasFee.token?.symbol} ${tokenValueFormat(gasFee)}`;
+  const gasTokenAmount = `${estimates?.token?.symbol} ${tokenValueFormat(gasFee)}`;
 
   useEffect(() => {
     if (tokenBalances.length === 0) return;
@@ -237,23 +237,16 @@ export function BridgeForm(props: BridgeFormProps) {
     // console.log('bridgeFee', utils.formatUnits(gasEstimate.bridgeFee));
     console.log('totalFees', utils.formatUnits(gasEstimate.totalFees));
 
-    const gasEstimateResult = {
-      gasFee: {
-        estimatedAmount: gasEstimate.totalFees,
-        token: checkout.config.networkMap.get(from!.network)?.nativeCurrency,
-      },
-    } as GasEstimateBridgeToL2Result;
-
-    setEstimates(gasEstimateResult);
+    setEstimates(gasEstimate);
     const estimatedAmount = utils.formatUnits(
-      gasEstimateResult?.gasFee?.estimatedAmount || 0,
+      gasEstimate?.fees?.totalFees || 0,
       DEFAULT_TOKEN_DECIMALS,
     );
 
     setGasFee(estimatedAmount);
     setGasFeeFiatValue(calculateCryptoToFiat(
       estimatedAmount,
-      gasEstimateResult.gasFee?.token?.symbol || '',
+      gasEstimate.gasFee?.token?.symbol || '',
       cryptoFiatState.conversions,
     ));
 
@@ -464,7 +457,7 @@ export function BridgeForm(props: BridgeFormProps) {
               </MenuItem.Label>
               <MenuItem.PriceDisplay
                 fiatAmount={`${fees.fiatPricePrefix} ${gasFeeFiatValue}`}
-                price={`${estimates?.gasFee.token?.symbol} ${tokenValueFormat(gasFee)}`}
+                price={`${estimates?.token?.symbol} ${tokenValueFormat(gasFee)}`}
               />
               <MenuItem.StatefulButtCon
                 icon="ChevronExpand"
