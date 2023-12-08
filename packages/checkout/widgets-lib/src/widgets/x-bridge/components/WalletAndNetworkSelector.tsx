@@ -253,7 +253,6 @@ export function WalletAndNetworkSelector() {
       setFromNetwork(imtblZkEvmNetworkChainId);
       setFromWalletDrawerOpen(false);
       // send newly created provider up to widget root level
-      console.log('sending provider updated event for widgets');
       addProviderListenersForWidgetRoot(provider);
       sendProviderUpdatedEvent({
         provider,
@@ -289,7 +288,6 @@ export function WalletAndNetworkSelector() {
         setFromNetworkDrawerOpen(false);
         setFromNetwork(chainId);
         // send newly created provider up to widget root level
-        console.log('sending provider updated event for widgets');
         addProviderListenersForWidgetRoot(fromWalletWeb3Provider);
         sendProviderUpdatedEvent({
           provider: fromWalletWeb3Provider,
@@ -309,7 +307,6 @@ export function WalletAndNetworkSelector() {
         setFromNetworkDrawerOpen(false);
         setFromNetwork(switchNetwork.network.chainId);
         // send newly created provider up to widget root level
-        console.log('sending provider updated event for widgets');
         addProviderListenersForWidgetRoot(switchNetwork.provider);
         sendProviderUpdatedEvent({
           provider: switchNetwork.provider,
