@@ -17,21 +17,14 @@
 /**
  * 
  * @export
- * @interface ActiveOrderStatus
+ * @interface ChainWithDetailsAllOf
  */
-export interface ActiveOrderStatus {
+export interface ChainWithDetailsAllOf {
     /**
-     * The order status that indicates an order can be fulfilled.
+     * URL for RPC node
      * @type {string}
-     * @memberof ActiveOrderStatus
+     * @memberof ChainWithDetailsAllOf
      */
-    'name': ActiveOrderStatusNameEnum;
+    'rpc_url': string | null;
 }
-
-export const ActiveOrderStatusNameEnum = {
-    Active: 'ACTIVE'
-} as const;
-
-export type ActiveOrderStatusNameEnum = typeof ActiveOrderStatusNameEnum[keyof typeof ActiveOrderStatusNameEnum];
-
 

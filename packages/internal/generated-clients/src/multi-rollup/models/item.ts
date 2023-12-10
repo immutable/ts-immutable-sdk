@@ -15,6 +15,9 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import { ERC1155Item } from './erc1155-item';
+// May contain unused imports in some cases
+// @ts-ignore
 import { ERC20Item } from './erc20-item';
 // May contain unused imports in some cases
 // @ts-ignore
@@ -27,6 +30,6 @@ import { NativeItem } from './native-item';
  * @type Item
  * @export
  */
-export type Item = { item_type: 'ERC20' } & ERC20Item | { item_type: 'ERC721' } & ERC721Item | { item_type: 'NATIVE' } & NativeItem;
+export type Item = { type: 'ERC1155' } & ERC1155Item | { type: 'ERC20' } & ERC20Item | { type: 'ERC721' } & ERC721Item | { type: 'NATIVE' } & NativeItem;
 
 
