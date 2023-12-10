@@ -11,9 +11,6 @@ import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
 import { FooterButton } from '../../../components/Footer/FooterButton';
 import { text } from '../../../resources/text/textConfig';
-import {
-  ApproveTxnData,
-} from '../../../context/view-context/BridgeViewContextTypes';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { LoadingView } from '../../../views/loading/LoadingView';
@@ -22,9 +19,10 @@ import { WalletApproveHero } from '../../../components/Hero/WalletApproveHero';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { isNativeToken } from '../../../lib/utils';
 import { XBridgeWidgetViews } from '../../../context/view-context/XBridgeViewContextTypes';
+import { ApproveTransactionData } from '../../../context/view-context/BridgeViewContextTypes';
 
 export interface ApproveTxnProps {
-  data: ApproveTxnData;
+  data: ApproveTransactionData;
 }
 export function ApproveTxn({ data }: ApproveTxnProps) {
   const { bridgeState } = useContext(XBridgeContext);
@@ -35,7 +33,7 @@ export function ApproveTxn({ data }: ApproveTxnProps) {
     from,
   } = bridgeState;
   const { viewDispatch } = useContext(ViewContext);
-  const { loading, content, footer } = text.views[XBridgeWidgetViews.APPROVE_TXN];
+  const { loading, content, footer } = text.views[XBridgeWidgetViews.APPROVE_TRANSACTION];
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   // Local state
