@@ -23,9 +23,6 @@ export function Fees({
 
   const formattedGasValue = formatZeroAmount(tokenValueFormat(gasFeeValue));
   const gasTokenSymbol = gasFeeToken?.symbol;
-  const formattedTotalValue = gasTokenSymbol
-    ? `${gasTokenSymbol} ${formattedGasValue}`
-    : formattedGasValue;
 
   return (
     <Box sx={feeContainerStyles}>
@@ -39,13 +36,13 @@ export function Fees({
       >
         <FeesBreakdown
           totalFiatAmount={`${fiatPricePrefix} $${gasFeeFiatValue}`}
-          totalAmount={formattedTotalValue}
+          totalAmount={formattedGasValue}
           tokenSymbol={gasFeeToken?.symbol ?? ''}
           fees={[
             {
               label: text.drawers.feesBreakdown.fees.gas.label,
               fiatAmount: `${fiatPricePrefix} $${gasFeeFiatValue}`,
-              amount: formattedTotalValue,
+              amount: formattedGasValue,
             },
           ]}
         >
