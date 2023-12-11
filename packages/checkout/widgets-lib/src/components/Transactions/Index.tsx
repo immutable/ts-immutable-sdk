@@ -1,41 +1,76 @@
 import { HeaderNavigation } from 'components/Header/HeaderNavigation';
 import { SimpleLayout } from 'components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from 'components/Footer/FooterLogo';
-import { useContext, useMemo, useState } from 'react';
+import {
+  useCallback,
+  useContext, useEffect, useMemo, useState,
+} from 'react';
 import { EventTargetContext } from 'context/event-target-context/EventTargetContext';
 import { text } from 'resources/text/textConfig';
 import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
 import { Box, Link, MenuItem } from '@biom3/react';
 import { isPassportProvider } from 'lib/providerUtils';
 import { Web3Provider } from '@ethersproject/providers';
+import { Checkout, GetBalanceResult, TokenInfo } from '@imtbl/checkout-sdk';
 import { sendBridgeWidgetCloseEvent } from '../../widgets/x-bridge/BridgeWidgetEvents';
-import { XBridgeContext } from '../../widgets/x-bridge/context/XBridgeContext';
 import { TransactionsInProgress } from './SectionInProgress';
 import { Shimmer } from './Shimmer';
 import { transactionsListStyle } from './indexStyles';
 import { EmptyStateNotConnected } from './EmptyStateNotConnected';
 
 type TransactionsProps = {
-  globalWeb3Provider: Web3Provider | undefined
+  provider: Web3Provider | undefined
+  checkout: Checkout
 };
 
-export function Transactions({ globalWeb3Provider }: TransactionsProps) {
+export function Transactions({ provider, checkout }: TransactionsProps) {
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
-  const { bridgeState: { web3Provider } } = useContext(XBridgeContext);
 
   const { layoutHeading, passportDashboard } = text.views[XBridgeWidgetViews.TRANSACTIONS];
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [knownTokens, setKnownTokens] = useState<TokenInfo[] | undefined>(undefined);
 
-  const providerForTransactions = useMemo(
-    () => web3Provider ?? globalWeb3Provider,
-    [web3Provider, globalWeb3Provider],
-  );
+  const chains = useMemo(() => Array.from(checkout.config.networkMap.keys()), []);
 
-  const isPassport = isPassportProvider(providerForTransactions);
+  const walletAddress = useCallback(async () => await provider?.getSigner().getAddress(), [provider]);
+  const isPassport = isPassportProvider(provider);
 
-  // Simulate loading
-  setTimeout(() => setLoading(false), 1000);
+  const getBalanceByChainID = async (web3provider: Web3Provider, chain: number) => {
+    const address = await walletAddress();
+    const data = await checkout.getAllBalances({
+      provider: web3provider,
+      walletAddress: address!,
+      chainId: chain,
+    });
+    return data.balances;
+  };
+
+  const allTokens = useCallback(async () => {
+    if (!checkout || !provider || !walletAddress || !chains) return [];
+
+    const promises: Promise<GetBalanceResult[]>[] = [];
+    chains.forEach((chain) => promises.push(getBalanceByChainID(provider, chain)));
+
+    const allBalances = await Promise.allSettled(promises);
+
+    const values: GetBalanceResult[] = [];
+    allBalances.forEach((b) => {
+      if (b.status === 'fulfilled') values.push(...b.value);
+    });
+
+    return values.map((v) => v.token);
+  }, [checkout, provider, walletAddress, chains]);
+
+  useEffect(() => {
+    (async () => {
+      const tokens = await allTokens();
+      setKnownTokens(tokens);
+      setLoading(false);
+    })();
+  }, [walletAddress, chains]);
+
+  useEffect(() => console.log(knownTokens), [knownTokens]);
 
   return (
     <SimpleLayout
@@ -51,7 +86,7 @@ export function Transactions({ globalWeb3Provider }: TransactionsProps) {
     >
       <Box sx={{ px: 'base.spacing.x4' }}>
         {
-          !providerForTransactions
+          !provider
             ? <EmptyStateNotConnected />
             : (
               <Box sx={transactionsListStyle(isPassport)}>

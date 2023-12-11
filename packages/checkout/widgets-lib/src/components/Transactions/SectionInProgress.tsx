@@ -13,7 +13,7 @@ export function TransactionsInProgress() {
     <>
       <Divider size="xSmall">{inProgress.heading}</Divider>
       <Box sx={containerStyles}>
-        <TransactionInProgress key="1" />
+        <TransactionInProgress />
       </Box>
     </>
   );

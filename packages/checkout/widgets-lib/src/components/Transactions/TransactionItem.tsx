@@ -16,7 +16,6 @@ import { containerStyles } from './transactionItemStyles';
 import { actionsBadgeStyles, actionsContainerStyles, actionsLayoutStyles } from './transactionStyles';
 
 type TransactionItemProps = {
-  key: string
   label: string
   caption: string
   fiatAmount: string
@@ -28,7 +27,6 @@ type TransactionItemProps = {
 };
 
 export function TransactionItem({
-  key,
   label,
   caption,
   fiatAmount,
@@ -79,7 +77,7 @@ export function TransactionItem({
         }}
       >
         <Accordion.TargetLeftSlot>
-          <MenuItem key={key} size="xSmall">
+          <MenuItem size="xSmall">
             <MenuItem.FramedIcon icon="Coins" circularFrame />
             <MenuItem.Label>
               {label}
