@@ -15,15 +15,28 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { APIError429AllOf } from './apierror429-all-of';
+import { NFTWithBalance } from './nftwith-balance';
 // May contain unused imports in some cases
 // @ts-ignore
-import { BasicAPIError } from './basic-apierror';
+import { Page } from './page';
 
 /**
- * @type APIError429
+ * 
  * @export
+ * @interface ListNFTsByOwnerResult
  */
-export type APIError429 = APIError429AllOf & BasicAPIError;
-
+export interface ListNFTsByOwnerResult {
+    /**
+     * List of nfts by owner
+     * @type {Array<NFTWithBalance>}
+     * @memberof ListNFTsByOwnerResult
+     */
+    'result': Array<NFTWithBalance>;
+    /**
+     * 
+     * @type {Page}
+     * @memberof ListNFTsByOwnerResult
+     */
+    'page': Page;
+}
 

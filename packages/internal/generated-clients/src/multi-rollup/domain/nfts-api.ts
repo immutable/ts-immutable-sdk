@@ -30,7 +30,7 @@ import { APIError500 } from '../models';
 // @ts-ignore
 import { GetNFTResult } from '../models';
 // @ts-ignore
-import { ListNFTOwnersResult } from '../models';
+import { ListNFTsByOwnerResult } from '../models';
 // @ts-ignore
 import { ListNFTsResult } from '../models';
 /**
@@ -69,59 +69,6 @@ export const NftsApiAxiosParamCreator = function (configuration?: Configuration)
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * List all NFT owners on a chain
-         * @summary List all NFT owners
-         * @param {string} chainName The name of chain
-         * @param {string} fromUpdatedAt Datetime to use as the oldest updated timestamp
-         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
-         * @param {number} [pageSize] Maximum number of items to return
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        listAllNFTOwners: async (chainName: string, fromUpdatedAt: string, pageCursor?: string, pageSize?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'chainName' is not null or undefined
-            assertParamExists('listAllNFTOwners', 'chainName', chainName)
-            // verify required parameter 'fromUpdatedAt' is not null or undefined
-            assertParamExists('listAllNFTOwners', 'fromUpdatedAt', fromUpdatedAt)
-            const localVarPath = `/v1/chains/{chain_name}/nft-owners`
-                .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            if (fromUpdatedAt !== undefined) {
-                localVarQueryParameter['from_updated_at'] = (fromUpdatedAt as any instanceof Date) ?
-                    (fromUpdatedAt as any).toISOString() :
-                    fromUpdatedAt;
-            }
-
-            if (pageCursor !== undefined) {
-                localVarQueryParameter['page_cursor'] = pageCursor;
-            }
-
-            if (pageSize !== undefined) {
-                localVarQueryParameter['page_size'] = pageSize;
-            }
 
 
     
@@ -317,20 +264,6 @@ export const NftsApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * List all NFT owners on a chain
-         * @summary List all NFT owners
-         * @param {string} chainName The name of chain
-         * @param {string} fromUpdatedAt Datetime to use as the oldest updated timestamp
-         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
-         * @param {number} [pageSize] Maximum number of items to return
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async listAllNFTOwners(chainName: string, fromUpdatedAt: string, pageCursor?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListNFTOwnersResult>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listAllNFTOwners(chainName, fromUpdatedAt, pageCursor, pageSize, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
          * List all NFTs on a chain
          * @summary List all NFTs
          * @param {string} chainName The name of chain
@@ -370,7 +303,7 @@ export const NftsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listNFTsByAccountAddress(accountAddress: string, chainName: string, contractAddress?: string, pageCursor?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListNFTsResult>> {
+        async listNFTsByAccountAddress(accountAddress: string, chainName: string, contractAddress?: string, pageCursor?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListNFTsByOwnerResult>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listNFTsByAccountAddress(accountAddress, chainName, contractAddress, pageCursor, pageSize, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -393,16 +326,6 @@ export const NftsApiFactory = function (configuration?: Configuration, basePath?
          */
         getNFT(requestParameters: NftsApiGetNFTRequest, options?: AxiosRequestConfig): AxiosPromise<GetNFTResult> {
             return localVarFp.getNFT(requestParameters.contractAddress, requestParameters.tokenId, requestParameters.chainName, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * List all NFT owners on a chain
-         * @summary List all NFT owners
-         * @param {NftsApiListAllNFTOwnersRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        listAllNFTOwners(requestParameters: NftsApiListAllNFTOwnersRequest, options?: AxiosRequestConfig): AxiosPromise<ListNFTOwnersResult> {
-            return localVarFp.listAllNFTOwners(requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
         },
         /**
          * List all NFTs on a chain
@@ -431,7 +354,7 @@ export const NftsApiFactory = function (configuration?: Configuration, basePath?
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listNFTsByAccountAddress(requestParameters: NftsApiListNFTsByAccountAddressRequest, options?: AxiosRequestConfig): AxiosPromise<ListNFTsResult> {
+        listNFTsByAccountAddress(requestParameters: NftsApiListNFTsByAccountAddressRequest, options?: AxiosRequestConfig): AxiosPromise<ListNFTsByOwnerResult> {
             return localVarFp.listNFTsByAccountAddress(requestParameters.accountAddress, requestParameters.chainName, requestParameters.contractAddress, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
         },
     };
@@ -463,41 +386,6 @@ export interface NftsApiGetNFTRequest {
      * @memberof NftsApiGetNFT
      */
     readonly chainName: string
-}
-
-/**
- * Request parameters for listAllNFTOwners operation in NftsApi.
- * @export
- * @interface NftsApiListAllNFTOwnersRequest
- */
-export interface NftsApiListAllNFTOwnersRequest {
-    /**
-     * The name of chain
-     * @type {string}
-     * @memberof NftsApiListAllNFTOwners
-     */
-    readonly chainName: string
-
-    /**
-     * Datetime to use as the oldest updated timestamp
-     * @type {string}
-     * @memberof NftsApiListAllNFTOwners
-     */
-    readonly fromUpdatedAt: string
-
-    /**
-     * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
-     * @type {string}
-     * @memberof NftsApiListAllNFTOwners
-     */
-    readonly pageCursor?: string
-
-    /**
-     * Maximum number of items to return
-     * @type {number}
-     * @memberof NftsApiListAllNFTOwners
-     */
-    readonly pageSize?: number
 }
 
 /**
@@ -636,18 +524,6 @@ export class NftsApi extends BaseAPI {
      */
     public getNFT(requestParameters: NftsApiGetNFTRequest, options?: AxiosRequestConfig) {
         return NftsApiFp(this.configuration).getNFT(requestParameters.contractAddress, requestParameters.tokenId, requestParameters.chainName, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * List all NFT owners on a chain
-     * @summary List all NFT owners
-     * @param {NftsApiListAllNFTOwnersRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof NftsApi
-     */
-    public listAllNFTOwners(requestParameters: NftsApiListAllNFTOwnersRequest, options?: AxiosRequestConfig) {
-        return NftsApiFp(this.configuration).listAllNFTOwners(requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

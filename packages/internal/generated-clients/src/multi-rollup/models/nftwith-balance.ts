@@ -20,86 +20,98 @@ import { Chain } from './chain';
 /**
  * 
  * @export
- * @interface NFT
+ * @interface NFTWithBalance
  */
-export interface NFT {
+export interface NFTWithBalance {
     /**
      * 
      * @type {Chain}
-     * @memberof NFT
+     * @memberof NFTWithBalance
      */
     'chain': Chain;
     /**
      * An `uint256` token id as string
      * @type {string}
-     * @memberof NFT
+     * @memberof NFTWithBalance
      */
     'token_id': string;
     /**
      * The contract address of the NFT
      * @type {string}
-     * @memberof NFT
+     * @memberof NFTWithBalance
      */
     'contract_address': string;
     /**
+     * The contract type of the NFT
+     * @type {string}
+     * @memberof NFTWithBalance
+     */
+    'contract_type': string;
+    /**
      * When the NFT was first indexed
      * @type {string}
-     * @memberof NFT
+     * @memberof NFTWithBalance
      */
     'indexed_at': string;
     /**
      * When the NFT owner was last updated
      * @type {string}
-     * @memberof NFT
+     * @memberof NFTWithBalance
      */
     'updated_at': string;
     /**
      * When NFT metadata was last synced
      * @type {string}
-     * @memberof NFT
+     * @memberof NFTWithBalance
      */
     'metadata_synced_at': string | null;
     /**
      * The id of the metadata of this NFT
      * @type {string}
-     * @memberof NFT
+     * @memberof NFTWithBalance
      */
     'metadata_id'?: string | null;
     /**
      * The name of the NFT
      * @type {string}
-     * @memberof NFT
+     * @memberof NFTWithBalance
      */
     'name': string | null;
     /**
      * The description of the NFT
      * @type {string}
-     * @memberof NFT
+     * @memberof NFTWithBalance
      */
     'description': string | null;
     /**
      * The image url of the NFT
      * @type {string}
-     * @memberof NFT
+     * @memberof NFTWithBalance
      */
     'image': string | null;
     /**
      * The external website link of NFT
      * @type {string}
-     * @memberof NFT
+     * @memberof NFTWithBalance
      */
     'external_link': string | null;
     /**
      * The animation url of the NFT
      * @type {string}
-     * @memberof NFT
+     * @memberof NFTWithBalance
      */
     'animation_url': string | null;
     /**
      * The youtube URL of NFT
      * @type {string}
-     * @memberof NFT
+     * @memberof NFTWithBalance
      */
     'youtube_url': string | null;
+    /**
+     * The balance of NFT in the account
+     * @type {string}
+     * @memberof NFTWithBalance
+     */
+    'balance': string;
 }
 
