@@ -35,6 +35,41 @@ export { ListCollectionOwnersResult } from '../models';
 export { ListNFTOwnersResult } from '../models';
 
 /**
+ * Request parameters for listAllNFTOwners operation in NftOwnersApi.
+ * @export
+ * @interface ListAllNFTOwnersRequest
+ */
+export interface ListAllNFTOwnersRequest {
+    /**
+     * The name of chain
+     * @type {string}
+     * @memberof ListAllNFTOwners
+     */
+    readonly chainName: string
+
+    /**
+     * Datetime to use as the oldest updated timestamp
+     * @type {string}
+     * @memberof ListAllNFTOwners
+     */
+    readonly fromUpdatedAt?: string
+
+    /**
+     * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
+     * @type {string}
+     * @memberof ListAllNFTOwners
+     */
+    readonly pageCursor?: string
+
+    /**
+     * Maximum number of items to return
+     * @type {number}
+     * @memberof ListAllNFTOwners
+     */
+    readonly pageSize?: number
+}
+
+/**
  * Request parameters for listNFTOwners operation in NftOwnersApi.
  * @export
  * @interface ListNFTOwnersRequest

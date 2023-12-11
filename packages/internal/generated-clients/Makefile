@@ -36,6 +36,7 @@ generate-mr-api-client:
 	rm -rf src/multi-rollup && \
     mkdir src/multi-rollup && \
 	docker run --rm -v $(shell pwd):/app openapitools/openapi-generator-cli:v7.0.1 generate \
+    --inline-schema-options REFACTOR_ALLOF_INLINE_SCHEMAS=true \
     -i ./app/src/mr-openapi.json \
     -g typescript-axios \
     -o /app/src/multi-rollup \

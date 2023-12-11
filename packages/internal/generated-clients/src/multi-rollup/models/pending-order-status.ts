@@ -21,11 +21,23 @@
  */
 export interface PendingOrderStatus {
     /**
-     * The order status
+     * The order status that indicates the order is yet to be active due to various reasons.
      * @type {string}
      * @memberof PendingOrderStatus
      */
     'name': PendingOrderStatusNameEnum;
+    /**
+     * Whether the order has been evaluated after its creation
+     * @type {boolean}
+     * @memberof PendingOrderStatus
+     */
+    'evaluated': boolean;
+    /**
+     * Whether the order has reached its specified start time
+     * @type {boolean}
+     * @memberof PendingOrderStatus
+     */
+    'started': boolean;
 }
 
 export const PendingOrderStatusNameEnum = {

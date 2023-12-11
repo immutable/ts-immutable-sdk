@@ -1,8 +1,5 @@
 import { mr } from '@imtbl/generated-clients';
-import {
-  BlockchainDataConfiguration,
-  BlockchainDataModuleConfiguration,
-} from './config';
+import { BlockchainDataConfiguration, BlockchainDataModuleConfiguration, } from './config';
 import { formatError } from './utils/formatErrors';
 
 export class BlockchainData {
@@ -45,6 +42,23 @@ export class BlockchainData {
   ): Promise<mr.ListActivitiesResult> {
     return await this.activities
       .listActivities(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
+
+  /**
+   * List activities sorted by updated_at timestamp ascending, useful for time based data replication
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with a list of activities
+   * @throws {@link index.APIError}
+   */
+  public async listActivityHistory(
+    request: mr.ActivitiesApiListActivityHistoryRequest
+  ): Promise<mr.ListActivitiesResult> {
+    return await this.activities
+      .listActivityHistory(request)
       .then((res) => res.data)
       .catch((err) => {
         throw formatError(err);
@@ -120,7 +134,7 @@ export class BlockchainData {
   }
 
   /**
-   * Get collection by contract address
+   * Get a collection by contract address
    * @param request - the request object containing the parameters to be provided in the API request
    * @returns a promise that resolves with a single collection
    * @throws {@link index.APIError}
@@ -245,9 +259,9 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async listAllNFTOwners(
-    request: mr.NftsApiListAllNFTOwnersRequest,
+    request: mr.NftOwnersApiListNFTOwnersRequest,
   ): Promise<mr.ListNFTOwnersResult> {
-    return await this.nfts
+    return await this.nftOwners
       .listAllNFTOwners(request)
       .then((res) => res.data)
       .catch((err) => {
@@ -317,6 +331,23 @@ export class BlockchainData {
   ): Promise<mr.ListMetadataResult> {
     return await this.metadata
       .listMetadata(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
+
+  /**
+   * List NFT Metadata by chain
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with a list of Metadata
+   * @throws {@link index.APIError}
+   */
+  public async listNFTMetadataByChain(
+    request: mr.MetadataApiListMetadataForChainRequest,
+  ): Promise<mr.ListMetadataResult> {
+    return await this.metadata
+      .listMetadataForChain(request)
       .then((res) => res.data)
       .catch((err) => {
         throw formatError(err);

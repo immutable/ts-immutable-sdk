@@ -17,21 +17,14 @@
 /**
  * 
  * @export
- * @interface ActiveOrderStatus
+ * @interface RefreshMetadataByIDAllOf
  */
-export interface ActiveOrderStatus {
+export interface RefreshMetadataByIDAllOf {
     /**
-     * The order status that indicates an order can be fulfilled.
+     * Metadata ID in UUIDv4 format
      * @type {string}
-     * @memberof ActiveOrderStatus
+     * @memberof RefreshMetadataByIDAllOf
      */
-    'name': ActiveOrderStatusNameEnum;
+    'metadata_id': string;
 }
-
-export const ActiveOrderStatusNameEnum = {
-    Active: 'ACTIVE'
-} as const;
-
-export type ActiveOrderStatusNameEnum = typeof ActiveOrderStatusNameEnum[keyof typeof ActiveOrderStatusNameEnum];
-
 
