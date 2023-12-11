@@ -26,6 +26,10 @@ describe('CheckoutApi', () => {
                   from_chain: 'imtbl-zkevm-testnet',
                   contract_address: '0x8a90cab2b38dba80c64b7734e58ee1db38b8992e',
                   amount: '100000000000000000',
+                  from_token_address: 'native',
+                  to_address: '0x1e8dc77bed0da06621e819fa0afb59d50f76cfdf',
+                  to_chain: 'sepolia',
+                  to_token_address: '0x60466acb9e525ae1e9978fd14197c8c419ba65e6',
                 },
                 blockchain_metadata: {
                   transaction_hash: '0x68d9eac5e3b3c3580404989a4030c948a78e1b07b2b5ea5688d8c38a6c61c93e',

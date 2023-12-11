@@ -8,10 +8,13 @@ export type Transactions = {
 };
 
 export type TransactionDetails = {
+  amount: string
   from_address: string
   from_chain: string
-  contract_address: string
-  amount: string
+  from_token_address: string
+  to_address: string
+  to_chain: string
+  to_token_address: string
 };
 
 export type BlockchainMetadata = {
