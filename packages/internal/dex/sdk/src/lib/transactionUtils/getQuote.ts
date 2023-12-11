@@ -60,5 +60,5 @@ export function getOurQuoteReqAmount(
 
   fees.addAmount(amountSpecified);
 
-  return nativeTokenService.maybeWrapAmount(fees.amountLessFees());
+  return nativeTokenService.maybeWrapAmount(fees.amountWithFeesApplied());
 }

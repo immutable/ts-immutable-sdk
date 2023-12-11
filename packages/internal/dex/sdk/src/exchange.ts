@@ -174,7 +174,7 @@ export class Exchange {
 
     const amountSpecified = newAmount(amount, tokenSpecified);
 
-    const fees = new Fees(secondaryFees, tokenIn);
+    const fees = new Fees(secondaryFees, tokenIn, tradeType);
 
     const ourQuoteReqAmount = getOurQuoteReqAmount(amountSpecified, fees, tradeType, this.nativeTokenService);
 
