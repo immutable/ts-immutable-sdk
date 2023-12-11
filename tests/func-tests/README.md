@@ -29,3 +29,7 @@ Examples of `<tag-expression>`:
 * `not @registration` - run all tests except those with the `@registration` tag
 
 **Tip:** To focus on a single test, add the `@only` tag to the relevant scenario, and set the tag expression to match.
+
+## Tests that take long
+
+Please add the `@slow` tag to any tests that take longer than a few minutes to run. These tests will be skipped on CI.

@@ -14,7 +14,7 @@
   },
   "scripts": {
     "test": "jest",
-    "test:ci": "TAGS=\"not @skip\" jest",
+    "test:ci": "TAGS=\"not @skip and not @slow\" jest",
     "postinstall": "cd ../.. && husky install",
     "prepack": "pinst --disable",
     "postpack": "pinst --enable"

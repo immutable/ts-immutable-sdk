@@ -3,7 +3,7 @@ Feature: Deposit
   # Port across ETH tests 
 
   # This test can take up to 10 minutes, so skip it on CI
-  @deposit @onchain @core-sdk @skip
+  @deposit @onchain @core-sdk @slow
   Scenario: Deposit Eth
     Given banker has at least "1" eth balance on L1
     And banker has L2 balance of "bankerBalance"
