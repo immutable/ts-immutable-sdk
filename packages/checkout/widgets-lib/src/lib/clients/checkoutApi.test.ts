@@ -24,7 +24,6 @@ describe('CheckoutApi', () => {
                 details: {
                   from_address: '0x1234567890',
                   from_chain: 'imtbl-zkevm-testnet',
-                  contract_address: '0x8a90cab2b38dba80c64b7734e58ee1db38b8992e',
                   amount: '100000000000000000',
                   from_token_address: 'native',
                   to_address: '0x1e8dc77bed0da06621e819fa0afb59d50f76cfdf',
