@@ -5,7 +5,6 @@ import {
   TransactionResponse,
 } from '@ethersproject/providers';
 
-// todo: move to common
 export function getEnv(name: string, defaultValue?: string): string {
   const value = process.env[name];
 
