@@ -1,34 +1,34 @@
-import { ethers } from 'ethers';
-import { useState } from 'react';
-import { Exchange, TransactionDetails, TransactionResponse } from '@imtbl/dex-sdk';
-import { configuration } from '../config';
-import { ConnectAccount } from './ConnectAccount';
-import { AmountInput, AmountOutput } from './AmountInput';
-import { SecondaryFeeInput } from './SecondaryFeeInput';
-import { FeeBreakdown } from './FeeBreakdown';
+import { ethers } from "ethers";
+import { useState } from "react";
+import { Exchange, TransactionDetails, TransactionResponse } from "@imtbl/dex-sdk";
+import { configuration } from "../config";
+import { ConnectAccount } from "./ConnectAccount";
+import { AmountInput, AmountOutput } from "./AmountInput";
+import { SecondaryFeeInput } from "./SecondaryFeeInput";
+import { FeeBreakdown } from "./FeeBreakdown";
 
 type Token = {
   symbol: string;
   address: string;
 };
 
-type TradeType = 'exactInput' | 'exactOutput';
+type TradeType = "exactInput" | "exactOutput";
 
 type mapping = {
   [address: string]: string;
 };
 
 const allTokens: Token[] = [
-  { symbol: 'IMX', address: 'native' },
-  { symbol: 'WIMX', address: '0x1CcCa691501174B4A623CeDA58cC8f1a76dc3439' },
-  { symbol: 'zkTDR', address: '0x6531F7B9158d78Ca78b46799c4Fd65C2Af8Ae506' },
-  { symbol: 'zkPSP', address: '0x88B35dF96CbEDF2946586147557F7D5D0CCE7e5c' },
-  { symbol: 'zkWLT', address: '0x8A5b0470ee48248bEb7D1E745c1EbA0DCA77215e' },
-  { symbol: 'zkSRE', address: '0x43566cAB87CC147C95e2895E7b972E19993520e4' },
-  { symbol: 'zkCORE', address: '0x4B96E7b7eA673A996F140d5De411a97b7eab934E' },
-  { symbol: 'zkWAT', address: '0xaC953a0d7B67Fae17c87abf79f09D0f818AC66A2' },
-  { symbol: 'zkCATS', address: '0xb95B75B4E4c09F04d5DA6349861BF1b6F163D78c' },
-  { symbol: 'zkYEET', address: '0x8AC26EfCbf5D700b37A27aA00E6934e6904e7B8e' },
+  { symbol: "IMX", address: "native" },
+  { symbol: "WIMX", address: "0x1CcCa691501174B4A623CeDA58cC8f1a76dc3439" },
+  { symbol: "zkTDR", address: "0x6531F7B9158d78Ca78b46799c4Fd65C2Af8Ae506" },
+  { symbol: "zkPSP", address: "0x88B35dF96CbEDF2946586147557F7D5D0CCE7e5c" },
+  { symbol: "zkWLT", address: "0x8A5b0470ee48248bEb7D1E745c1EbA0DCA77215e" },
+  { symbol: "zkSRE", address: "0x43566cAB87CC147C95e2895E7b972E19993520e4" },
+  { symbol: "zkCORE", address: "0x4B96E7b7eA673A996F140d5De411a97b7eab934E" },
+  { symbol: "zkWAT", address: "0xaC953a0d7B67Fae17c87abf79f09D0f818AC66A2" },
+  { symbol: "zkCATS", address: "0xb95B75B4E4c09F04d5DA6349861BF1b6F163D78c" },
+  { symbol: "zkYEET", address: "0x8AC26EfCbf5D700b37A27aA00E6934e6904e7B8e" },
 ];
 
 const buildExchange = (secondaryFeeRecipient: string, secondaryFeePercentage: number) => {
@@ -50,16 +50,16 @@ const buildExchange = (secondaryFeeRecipient: string, secondaryFeePercentage: nu
 export function Example() {
   const [ethereumAccount, setEthereumAccount] = useState<string | null>(null);
   const [isFetching, setIsFetching] = useState(false);
-  const [inputAmount, setInputAmount] = useState<string>('0');
-  const [outputAmount, setOutputAmount] = useState<string>('0');
+  const [inputAmount, setInputAmount] = useState<string>("0");
+  const [outputAmount, setOutputAmount] = useState<string>("0");
   const [swapTransaction, setSwapTransaction] = useState<ethers.providers.TransactionReceipt | null>(null);
   const [approved, setApproved] = useState<boolean>(false);
   const [result, setResult] = useState<TransactionResponse | null>();
   const [error, setError] = useState<string | null>(null);
-  const [secondaryFeeRecipient, setSecondaryFeeRecipient] = useState<string>('');
+  const [secondaryFeeRecipient, setSecondaryFeeRecipient] = useState<string>("");
   const [secondaryFeePercentage, setFeePercentage] = useState<number>(0);
 
-  const [tradeType, setTradeType] = useState<TradeType>('exactInput');
+  const [tradeType, setTradeType] = useState<TradeType>("exactInput");
   const [inputToken, setInputToken] = useState<Token>(allTokens[0]);
   const [outputToken, setOutputToken] = useState<Token>(allTokens[1]);
 
@@ -80,7 +80,7 @@ export function Example() {
       const exchange = buildExchange(secondaryFeeRecipient, secondaryFeePercentage);
 
       const txn =
-        tradeType === 'exactInput'
+        tradeType === "exactInput"
           ? await exchange.getUnsignedSwapTxFromAmountIn(
               ethereumAccount,
               tokenInAddress,
@@ -100,7 +100,7 @@ export function Example() {
         setApproved(true);
       }
     } catch (e) {
-      const message = e instanceof Error ? e.message : 'Unknown Error';
+      const message = e instanceof Error ? e.message : "Unknown Error";
       setError(`Error fetching quote: ${message}`);
       setResult(null);
     }
@@ -124,7 +124,7 @@ export function Example() {
         await provider.waitForTransaction(approveReceipt.hash, 1);
         setApproved(true);
       } catch (e) {
-        const message = e instanceof Error ? e.message : 'Unknown Error';
+        const message = e instanceof Error ? e.message : "Unknown Error";
         alert(message);
         setIsFetching(false);
         return;
@@ -141,7 +141,7 @@ export function Example() {
       setIsFetching(false);
       setSwapTransaction(tx);
     } catch (e) {
-      const message = e instanceof Error ? e.message : 'Unknown Error';
+      const message = e instanceof Error ? e.message : "Unknown Error";
       alert(message);
       setIsFetching(false);
       setSwapTransaction(null);
@@ -150,10 +150,10 @@ export function Example() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <h3 style={{ marginBottom: '12px' }}>Your wallet address: {ethereumAccount}</h3>
+    <div style={{ display: "flex", flexDirection: "column" }}>
+      <h3 style={{ marginBottom: "12px" }}>Your wallet address: {ethereumAccount}</h3>
 
-      <div style={{ display: 'flex', flexDirection: 'row' }}>
+      <div style={{ display: "flex", flexDirection: "row" }}>
         <div style={{ width: 150 }}>
           <h3>Swap Type</h3>
         </div>
@@ -173,7 +173,7 @@ export function Example() {
         </div>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'row' }}>
+      <div style={{ display: "flex", flexDirection: "row" }}>
         <div style={{ width: 150 }}>
           <h3>Input Token:</h3>
         </div>
@@ -199,7 +199,7 @@ export function Example() {
         </div>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'row' }}>
+      <div style={{ display: "flex", flexDirection: "row" }}>
         <div style={{ width: 150 }}>
           <h3>Output Token:</h3>
         </div>
@@ -228,10 +228,10 @@ export function Example() {
       <hr className="my-4" />
 
       <SecondaryFeeInput setSecondaryFeeRecipient={setSecondaryFeeRecipient} setFeePercentage={setFeePercentage} />
-      {tradeType === 'exactInput' && inputToken && (
+      {tradeType === "exactInput" && inputToken && (
         <AmountInput tokenSymbol={inputToken.symbol} setAmount={setInputAmount} />
       )}
-      {tradeType === 'exactOutput' && outputToken && (
+      {tradeType === "exactOutput" && outputToken && (
         <AmountOutput tokenSymbol={outputToken.symbol} setAmount={setOutputAmount} />
       )}
 
@@ -250,12 +250,12 @@ export function Example() {
       {result && (
         <>
           <h3>
-            Expected amount: {ethers.utils.formatEther(result.quote.amount.value)}{' '}
+            Expected amount: {ethers.utils.formatEther(result.quote.amount.value)}{" "}
             {`${addressToSymbolMapping[result.quote.amount.token.address]}`}
           </h3>
           <h3>
-            {tradeType === 'exactInput' ? 'Minimum' : 'Maximum'} amount:{' '}
-            {ethers.utils.formatEther(result.quote.amountWithMaxSlippage.value)}{' '}
+            {tradeType === "exactInput" ? "Minimum" : "Maximum"} amount:{" "}
+            {ethers.utils.formatEther(result.quote.amountWithMaxSlippage.value)}{" "}
             {`${addressToSymbolMapping[result.quote.amountWithMaxSlippage.token.address]}`}
           </h3>
 
@@ -277,12 +277,12 @@ export function Example() {
               onClick={() => performSwap(result)}
               disabled={isFetching}
             >
-              {approved ? 'Swap' : 'Approve'}
+              {approved ? "Swap" : "Approve"}
             </button>
             {isFetching && <h3>loading...</h3>}
             {swapTransaction && (
               <>
-                <h3 style={{ marginTop: '12px' }}>
+                <h3 style={{ marginTop: "12px" }}>
                   Swap successful! Check your metamask to see updated token balances
                 </h3>
                 <a
@@ -302,10 +302,10 @@ export function Example() {
 }
 
 const showGasEstimate = (txn: TransactionDetails) =>
-  txn.gasFeeEstimate ? `${ethers.utils.formatEther(txn.gasFeeEstimate.value)} IMX` : 'No gas estimate available';
+  txn.gasFeeEstimate ? `${ethers.utils.formatEther(txn.gasFeeEstimate.value)} IMX` : "No gas estimate available";
 
 const showGasUnitsEstimate = (txn: TransactionDetails) =>
-  txn.gasUnitsEstimate ? `${txn.gasUnitsEstimate.toNumber().toLocaleString()} units` : 'No gas estimate available';
+  txn.gasUnitsEstimate ? `${txn.gasUnitsEstimate.toNumber().toLocaleString()} units` : "No gas estimate available";
 
 const ErrorMessage = ({ message }: { message: string }) => {
   return (
