@@ -67,9 +67,12 @@ function buildSinglePoolSwap(
     );
   }
 
-  const shouldRefundNativeTokens = trade.tradeType === Uniswap.TradeType.EXACT_OUTPUT && isNative(tokenIn);
+  const shouldRefundNativeTokens = isNative(tokenIn);
   if (shouldRefundNativeTokens) {
-    // Refund ETH if the input token is native and the swap is exact output
+    // Refund ETH if the input token is native.
+    // In some cases, the user may have specified an input amount that is greater than what
+    // the liqudiity of the pool can provide.
+    // To account for this case, always call `refundETH` to refund any excess native tokens.
     calldatas.push(paymentsContract.encodeFunctionData('refundETH'));
   }
 
@@ -182,9 +185,12 @@ function buildMultiPoolSwap(
     );
   }
 
-  const shouldRefundNativeTokens = trade.tradeType === Uniswap.TradeType.EXACT_OUTPUT && isNative(tokenIn);
+  const shouldRefundNativeTokens = isNative(tokenIn);
   if (shouldRefundNativeTokens) {
-    // Refund ETH if the input token is native and the swap is exact output
+    // Refund ETH if the input token is native.
+    // In some cases, the user may have specified an input amount that is greater than what
+    // the liqudiity of the pool can provide.
+    // To account for this case, always call `refundETH` to refund any excess native tokens.
     calldatas.push(paymentsContract.encodeFunctionData('refundETH'));
   }
 

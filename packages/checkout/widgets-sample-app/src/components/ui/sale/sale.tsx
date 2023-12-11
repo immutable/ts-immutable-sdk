@@ -17,25 +17,11 @@ const defaultPassportConfig = {
 
 const defaultItems: SaleItem[] = [
   {
-    productId: 'P0001',
+    productId: '645',
     qty: 3,
-    name: 'Bulbasaur',
-    image: 'https://pokemon-nfts.s3.ap-southeast-2.amazonaws.com/images/1.png',
-    description: 'Bulbasaur',
-  },
-  {
-    productId: 'P0002',
-    qty: 2,
-    name: 'Ivyasaur',
-    image: 'https://pokemon-nfts.s3.ap-southeast-2.amazonaws.com/images/2.png',
-    description: 'Ivyasaur',
-  },
-  {
-    productId: 'P0003',
-    qty: 1,
-    name: 'Venusaur',
-    image: 'https://pokemon-nfts.s3.ap-southeast-2.amazonaws.com/images/3.png',
-    description: 'Venusaur',
+    name: 'Landorus',
+    image: 'https://pokemon-nfts.mystagingwebsite.com/wp-content/uploads/2023/11/645-300x300.png',
+    description: 'Landorus',
   },
 ];
 

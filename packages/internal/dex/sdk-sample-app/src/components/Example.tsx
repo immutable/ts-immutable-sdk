@@ -27,6 +27,8 @@ const allTokens: Token[] = [
   { symbol: 'zkSRE', address: '0x43566cAB87CC147C95e2895E7b972E19993520e4' },
   { symbol: 'zkCORE', address: '0x4B96E7b7eA673A996F140d5De411a97b7eab934E' },
   { symbol: 'zkWAT', address: '0xaC953a0d7B67Fae17c87abf79f09D0f818AC66A2' },
+  { symbol: 'zkCATS', address: '0xb95B75B4E4c09F04d5DA6349861BF1b6F163D78c' },
+  { symbol: 'zkYEET', address: '0x8AC26EfCbf5D700b37A27aA00E6934e6904e7B8e' },
 ];
 
 const buildExchange = (secondaryFeeRecipient: string, secondaryFeePercentage: number) => {
@@ -157,6 +159,7 @@ export function Example() {
         </div>
         <div>
           <select
+            className='dark:bg-slate-800'
             value={tradeType}
             onChange={(e) => {
               setTradeType(e.target.value as TradeType);
@@ -176,6 +179,7 @@ export function Example() {
         </div>
         <div>
           <select
+            className='dark:bg-slate-800'
             value={inputToken.address}
             onChange={(e) => {
               setInputToken({
@@ -201,6 +205,7 @@ export function Example() {
         </div>
         <div>
           <select
+            className='dark:bg-slate-800'
             value={outputToken.address}
             onChange={(e) => {
               setOutputToken({
@@ -220,7 +225,7 @@ export function Example() {
         </div>
       </div>
 
-      <hr className="my-4" />
+      <hr className='my-4' />
 
       <SecondaryFeeInput setSecondaryFeeRecipient={setSecondaryFeeRecipient} setFeePercentage={setFeePercentage} />
       {tradeType === 'exactInput' && inputToken && (
@@ -232,15 +237,14 @@ export function Example() {
 
       {inputToken && outputToken && (
         <button
-          className="disabled:opacity-50 mt-2 py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
+          className='disabled:opacity-50 mt-2 py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75'
           onClick={() => getQuote(inputToken.address, outputToken.address)}
-          disabled={isFetching}
-        >
+          disabled={isFetching}>
           Get Quote
         </button>
       )}
 
-      <hr className="my-4" />
+      <hr className='my-4' />
       {error && <ErrorMessage message={error} />}
       {result && (
         <>
@@ -268,10 +272,9 @@ export function Example() {
 
           <>
             <button
-              className="disabled:opacity-50 mt-2 py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
+              className='disabled:opacity-50 mt-2 py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75'
               onClick={() => performSwap(result)}
-              disabled={isFetching}
-            >
+              disabled={isFetching}>
               {approved ? 'Swap' : 'Approve'}
             </button>
             {isFetching && <h3>loading...</h3>}
@@ -281,10 +284,9 @@ export function Example() {
                   Swap successful! Check your metamask to see updated token balances
                 </h3>
                 <a
-                  className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+                  className='underline text-blue-600 hover:text-blue-800 visited:text-purple-600'
                   href={`https://explorer.testnet.immutable.com/tx/${swapTransaction.transactionHash}`}
-                  target="_blank"
-                >
+                  target='_blank'>
                   Transaction
                 </a>
               </>
