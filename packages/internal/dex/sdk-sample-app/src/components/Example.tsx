@@ -109,7 +109,7 @@ export function Example() {
   const performSwap = async (result: TransactionResponse) => {
     setSwapTransaction(null);
     setIsFetching(true);
-    const provider = new ethers.providers.Web3Provider((window as any).ethereum)
+    const provider = new ethers.providers.Web3Provider((window as any).ethereum);
     const signer = provider.getSigner();
 
     // Approve the ERC20 spend
@@ -161,7 +161,7 @@ export function Example() {
             onChange={(e) => {
               setTradeType(e.target.value as TradeType);
               setResult(null);
-              setSwapTransaction(null)
+              setSwapTransaction(null);
             }}
           >
             <option>exactInput</option>
@@ -183,7 +183,7 @@ export function Example() {
                 symbol: addressToSymbolMapping[e.target.value],
               });
               setResult(null);
-              setSwapTransaction(null)
+              setSwapTransaction(null);
             }}
           >
             {allTokens.map((token) => (
@@ -208,7 +208,7 @@ export function Example() {
                 symbol: addressToSymbolMapping[e.target.value],
               });
               setResult(null);
-              setSwapTransaction(null)
+              setSwapTransaction(null);
             }}
           >
             {allTokens.map((token) => (
@@ -255,8 +255,14 @@ export function Example() {
           </h3>
 
           <h3>Slippage: {result.quote.slippage}%</h3>
-          {result.approval && <h3>Approval Gas Estimate: {showGasEstimate(result.approval)}</h3>}
-          <h3>Swap Gas estimate: {showGasEstimate(result.swap)}</h3>
+          {result.approval && (
+            <>
+              <h3>Approval Gas Estimate: {showGasEstimate(result.approval)}</h3>
+              <h3>Approval Gas Units Estimate: {showGasUnitsEstimate(result.approval)}</h3>
+            </>
+          )}
+          <h3>Swap Gas Fee estimate: {showGasEstimate(result.swap)}</h3>
+          <h3>Swap Gas Units estimate: {showGasUnitsEstimate(result.swap)}</h3>
 
           <FeeBreakdown fees={result.quote.fees} addressMap={addressToSymbolMapping} />
 
@@ -292,6 +298,9 @@ export function Example() {
 
 const showGasEstimate = (txn: TransactionDetails) =>
   txn.gasFeeEstimate ? `${ethers.utils.formatEther(txn.gasFeeEstimate.value)} IMX` : 'No gas estimate available';
+
+const showGasUnitsEstimate = (txn: TransactionDetails) =>
+  txn.gasUnitsEstimate ? `${txn.gasUnitsEstimate.toNumber().toLocaleString()} units` : 'No gas estimate available';
 
 const ErrorMessage = ({ message }: { message: string }) => {
   return (

@@ -1,4 +1,4 @@
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import { ModuleConfiguration } from '@imtbl/config';
 
 export type ExchangeContracts = {
@@ -78,11 +78,13 @@ export type Quote = {
 /**
  * Type representing the details of a transaction
  * @property {@link ethers.providers.TransactionRequest} transaction - The unsigned transaction
- * @property {@link Amount | null} gasFeeEstimate - The gas fee estimate or null if it is not available
+ * @property {@link Amount | null} gasFeeEstimate - An estimate of the total gas costs for the transaction if available
+ * @property {@link BigNumber | null} gasUnitsEstimate - An estimate of the gas units required for the transaction if available
  */
 export type TransactionDetails = {
   transaction: ethers.providers.TransactionRequest;
   gasFeeEstimate: Amount | null;
+  gasUnitsEstimate: BigNumber | null;
 };
 
 /**

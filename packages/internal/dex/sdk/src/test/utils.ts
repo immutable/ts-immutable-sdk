@@ -451,7 +451,7 @@ export function mockRouterImplementation(params: MockParams) {
         amountIn,
         amountOut,
         tradeType,
-        gasEstimate: TEST_TRANSACTION_GAS_USAGE,
+        gasUnitsEstimate: TEST_TRANSACTION_GAS_USAGE,
       };
 
       return trade;
