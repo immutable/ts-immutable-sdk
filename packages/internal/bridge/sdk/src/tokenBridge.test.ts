@@ -8,20 +8,6 @@ import { BridgeFeeActions, BridgeTxRequest, BridgeTxResponse } from 'types';
 import { ethers } from 'ethers';
 import { BridgeError, BridgeErrorType } from 'errors';
 
-jest.mock('@axelar-network/axelarjs-sdk', () => ({
-  AxelarQueryAPI: jest.fn().mockImplementation(() => ({
-    estimateGasFee: jest.fn().mockReturnValue({
-      executionFeeWithMultiplier: ethers.utils.parseUnits('0.0001', 18),
-      baseFee: ethers.utils.parseUnits('0.001', 18),
-    }),
-  })),
-  Environment: {
-    DEVNET: 'devnet',
-    TESTNET: 'testnet',
-    MAINNET: 'mainnet',
-  },
-}));
-
 jest.mock('axios', () => ({
   post: jest.fn().mockReturnValue({
     data: '100000000',
