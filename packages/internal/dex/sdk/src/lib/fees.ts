@@ -49,10 +49,10 @@ export class Fees {
   }
 
   private getFeeAmount(fee: SecondaryFee): BigNumber {
-    if (this.tradeType === TradeType.EXACT_INPUT) {
-      return this.amount.value.mul(fee.basisPoints).div(BASIS_POINT_PRECISION);
-    }
+    const divisor = this.tradeType === TradeType.EXACT_INPUT ?
+      BASIS_POINT_PRECISION :
+      BASIS_POINT_PRECISION - fee.basisPoints;
 
-    return this.amount.value.mul(fee.basisPoints).div(BASIS_POINT_PRECISION - fee.basisPoints);
+    return this.amount.value.mul(fee.basisPoints).div(divisor);
   }
 }
