@@ -12,9 +12,7 @@ export default [{
       json(),
       commonjs(),
       nodeResolve(),
-      typescript({
-        exclude: [],
-      }),
+      typescript(),
     ],
   },
   {
@@ -26,9 +24,7 @@ export default [{
       json(),
       commonjs(),
       nodeResolve({ browser: true }), 
-      typescript({
-        exclude: [],
-      }),
+      typescript(),
     ],
   }
 ];
