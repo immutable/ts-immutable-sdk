@@ -193,7 +193,10 @@ describe('view-context', () => {
             { type: XBridgeWidgetViews.WALLET_NETWORK_SELECTION },
             { type: XBridgeWidgetViews.BRIDGE_FORM },
             { type: XBridgeWidgetViews.BRIDGE_REVIEW },
-            { type: XBridgeWidgetViews.IN_PROGRESS },
+            {
+              type: XBridgeWidgetViews.IN_PROGRESS,
+              transactionHash: '',
+            },
             {
               type: XBridgeWidgetViews.BRIDGE_FAILURE,
               reason: 'Transaction failed',
@@ -227,7 +230,10 @@ describe('view-context', () => {
             { type: XBridgeWidgetViews.BRIDGE_REVIEW },
             { type: XBridgeWidgetViews.BRIDGE_FORM },
             { type: XBridgeWidgetViews.BRIDGE_REVIEW },
-            { type: XBridgeWidgetViews.IN_PROGRESS },
+            {
+              type: XBridgeWidgetViews.IN_PROGRESS,
+              transactionHash: '',
+            },
             {
               type: XBridgeWidgetViews.BRIDGE_FAILURE,
               reason: 'Transaction failed',
@@ -261,7 +267,10 @@ describe('view-context', () => {
             { type: XBridgeWidgetViews.WALLET_NETWORK_SELECTION },
             { type: XBridgeWidgetViews.BRIDGE_FORM },
             { type: XBridgeWidgetViews.BRIDGE_REVIEW },
-            { type: XBridgeWidgetViews.IN_PROGRESS },
+            {
+              type: XBridgeWidgetViews.IN_PROGRESS,
+              transactionHash: '',
+            },
             {
               type: XBridgeWidgetViews.BRIDGE_FAILURE,
               reason: 'Transaction failed',
@@ -280,7 +289,10 @@ describe('view-context', () => {
           { type: XBridgeWidgetViews.WALLET_NETWORK_SELECTION },
           { type: XBridgeWidgetViews.BRIDGE_FORM },
           { type: XBridgeWidgetViews.BRIDGE_REVIEW },
-          { type: XBridgeWidgetViews.IN_PROGRESS },
+          {
+            type: XBridgeWidgetViews.IN_PROGRESS,
+            transactionHash: '',
+          },
           {
             type: XBridgeWidgetViews.BRIDGE_FAILURE,
             reason: 'Transaction failed',
