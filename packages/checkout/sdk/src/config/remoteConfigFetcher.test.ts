@@ -3,7 +3,10 @@ import { Environment } from '@imtbl/config';
 import { ChainId } from '../types';
 import { RemoteConfigFetcher } from './remoteConfigFetcher';
 import { CheckoutError, CheckoutErrorType } from '../errors';
-import { CHECKOUT_API_BASE_URL, ENV_DEVELOPMENT } from '../env';
+import {
+  CHECKOUT_CDN_BASE_URL,
+  ENV_DEVELOPMENT,
+} from '../env';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -56,7 +59,7 @@ describe('RemoteConfig', () => {
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
         expect(mockedAxios.get).toHaveBeenNthCalledWith(
           1,
-          `${CHECKOUT_API_BASE_URL[env]}/${version}/config`,
+          `${CHECKOUT_CDN_BASE_URL[env]}/${version}/config`,
         );
       });
 
@@ -169,7 +172,7 @@ describe('RemoteConfig', () => {
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
         expect(mockedAxios.get).toHaveBeenNthCalledWith(
           1,
-          `${CHECKOUT_API_BASE_URL[env as Environment]}/${version}/config/tokens`,
+          `${CHECKOUT_CDN_BASE_URL[env as Environment]}/${version}/config/tokens`,
         );
       });
 

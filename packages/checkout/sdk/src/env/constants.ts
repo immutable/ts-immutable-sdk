@@ -29,12 +29,12 @@ export const IMMUTABLE_API_BASE_URL = {
 };
 
 /**
- * Base URL for the checkout API based on the environment.
+ * Base URL for the checkout CDN based on the environment.
  * @property {string} DEVELOPMENT - The base URL for the development environment.
  * @property {string} SANDBOX - The base URL for the sandbox environment.
  * @property {string} PRODUCTION - The base URL for the production environment.
  */
-export const CHECKOUT_API_BASE_URL = {
+export const CHECKOUT_CDN_BASE_URL = {
   [ENV_DEVELOPMENT]: 'https://checkout-api.dev.immutable.com',
   [Environment.SANDBOX]: 'https://checkout-api.sandbox.immutable.com',
   [Environment.PRODUCTION]: 'https://checkout-api.immutable.com',
