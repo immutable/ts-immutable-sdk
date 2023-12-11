@@ -330,6 +330,7 @@ export function BridgeReviewSummary() {
       <FeesBreakdown
         totalFiatAmount={`${fiatPricePrefix}${gasFeeFiatValue}`}
         totalAmount={gasFee}
+        tokenSymbol={estimates?.token?.symbol || ''}
         fees={[
           {
             label: text.drawers.feesBreakdown.fees.gas.label,

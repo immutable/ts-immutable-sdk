@@ -2,10 +2,9 @@ import { Box } from '@biom3/react';
 import {
   useCallback,
   useContext,
-  useMemo,
   useState,
 } from 'react';
-import { CheckoutErrorType, TokenInfo } from '@imtbl/checkout-sdk';
+import { CheckoutErrorType } from '@imtbl/checkout-sdk';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
@@ -17,7 +16,6 @@ import { LoadingView } from '../../../views/loading/LoadingView';
 import { XBridgeContext } from '../context/XBridgeContext';
 import { WalletApproveHero } from '../../../components/Hero/WalletApproveHero';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
-import { isNativeToken } from '../../../lib/utils';
 import { ApproveTransactionData, XBridgeWidgetViews } from '../../../context/view-context/XBridgeViewContextTypes';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 
@@ -29,8 +27,6 @@ export function ApproveTransaction({ data }: ApproveTransactionProps) {
   const { bridgeState } = useContext(XBridgeContext);
   const {
     checkout,
-    allowedTokens,
-    token,
     from,
   } = bridgeState;
   const { viewDispatch } = useContext(ViewContext);
@@ -42,14 +38,6 @@ export function ApproveTransaction({ data }: ApproveTransactionProps) {
   const [txProcessing, setTxProcessing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [rejectedBridge, setRejectedBridge] = useState(false);
-
-  // Get symbol from swap info for approve amount text
-  const bridgeToken = useMemo(
-    () => allowedTokens.find(
-      (allowedToken: TokenInfo) => allowedToken.address === token?.address || isNativeToken(allowedToken.address),
-    ),
-    [allowedTokens, token],
-  );
 
   // Common error view function
   const showErrorView = useCallback(() => {
@@ -79,7 +67,7 @@ export function ApproveTransaction({ data }: ApproveTransactionProps) {
           type: ViewActions.UPDATE_VIEW,
           view: {
             type: XBridgeWidgetViews.BRIDGE_FAILURE,
-            data,
+            reason: 'Unpredictable gas limit',
           },
         },
       });
@@ -88,14 +76,15 @@ export function ApproveTransaction({ data }: ApproveTransactionProps) {
     if (err.type === CheckoutErrorType.TRANSACTION_FAILED
       || err.type === CheckoutErrorType.INSUFFICIENT_FUNDS
       || (err.receipt && err.receipt.status === 0)) {
+      let reason = 'Transaction failed';
+      if (err.type === CheckoutErrorType.INSUFFICIENT_FUNDS) reason = 'Insufficient funds';
+      if (err.receipt && err.receipt.status === 0) reason = 'Transaction failed to settle on chain';
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
             type: XBridgeWidgetViews.BRIDGE_FAILURE,
-            data: {
-              reason: 'Transaction failed',
-            },
+            reason,
           },
         },
       });
@@ -137,7 +126,7 @@ export function ApproveTransaction({ data }: ApproveTransactionProps) {
               type: ViewActions.UPDATE_VIEW,
               view: {
                 type: XBridgeWidgetViews.BRIDGE_FAILURE,
-                data,
+                reason: 'Transaction failed to settle on chain',
               },
             },
           });
@@ -165,17 +154,27 @@ export function ApproveTransaction({ data }: ApproveTransactionProps) {
       });
 
       setLoading(true);
-      await sendResult.transactionResponse.wait();
+      const receipt = await sendResult.transactionResponse.wait();
+
+      if (receipt.status === 0) {
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: {
+              type: XBridgeWidgetViews.BRIDGE_FAILURE,
+              reason: 'Approval transaction failed to settle on chain',
+            },
+          },
+        });
+        return;
+      }
 
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
             type: XBridgeWidgetViews.IN_PROGRESS,
-            data: {
-              token: bridgeToken!,
-              transactionResponse: sendResult.transactionResponse,
-            },
+            transactionHash: receipt.transactionHash,
           },
         },
       });

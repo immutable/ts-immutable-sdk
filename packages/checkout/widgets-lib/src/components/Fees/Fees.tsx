@@ -40,6 +40,7 @@ export function Fees({
         <FeesBreakdown
           totalFiatAmount={`${fiatPricePrefix} $${gasFeeFiatValue}`}
           totalAmount={formattedTotalValue}
+          tokenSymbol={gasFeeToken?.symbol ?? ''}
           fees={[
             {
               label: text.drawers.feesBreakdown.fees.gas.label,

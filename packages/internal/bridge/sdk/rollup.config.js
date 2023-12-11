@@ -15,7 +15,7 @@ export default {
   plugins: [
     json(),
     commonjs(),
-    nodeResolve({ browser: true}), 
+    nodeResolve({ browser: true }), 
     typescript({
       exclude: [],
     }),

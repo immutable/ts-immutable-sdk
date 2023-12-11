@@ -47,9 +47,9 @@ import { BridgeReview } from './views/BridgeReview';
 import { MoveInProgress } from './views/MoveInProgress';
 import { ApproveTransaction } from './views/ApproveTransaction';
 import { ErrorView } from '../../views/error/ErrorView';
-import { sendBridgeWidgetCloseEvent } from '../bridge/BridgeWidgetEvents';
 import { text } from '../../resources/text/textConfig';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
+import { sendBridgeFailedEvent, sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
 
 export type BridgeWidgetInputs = BridgeWidgetParams & {
   config: StrongCheckoutWidgetsConfig,
@@ -170,7 +170,9 @@ export function XBridgeWidget({
               <BridgeReview />
             )}
             {viewState.view.type === XBridgeWidgetViews.IN_PROGRESS && (
-              <MoveInProgress />
+              <MoveInProgress
+                transactionHash={viewState.view.data.transactionHash}
+              />
             )}
             {viewState.view.type === XBridgeWidgetViews.BRIDGE_FAILURE && (
               <StatusView
@@ -179,6 +181,7 @@ export function XBridgeWidget({
                 actionText={bridgeFailureText.actionText}
                 onActionClick={goBackToReview}
                 statusType={StatusType.FAILURE}
+                onRenderEvent={() => sendBridgeFailedEvent(eventTarget, viewState.view.data.reason)}
               />
             )}
             {viewState.view.type === XBridgeWidgetViews.APPROVE_TRANSACTION && (

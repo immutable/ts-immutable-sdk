@@ -117,7 +117,6 @@ export function BridgeForm(props: BridgeFormProps) {
   }, []);
 
   const gasFiatAmount = `${fees.fiatPricePrefix} ${gasFeeFiatValue}`;
-  const gasTokenAmount = `${estimates?.token?.symbol} ${tokenValueFormat(gasFee)}`;
 
   useEffect(() => {
     if (tokenBalances.length === 0) return;
@@ -470,12 +469,13 @@ export function BridgeForm(props: BridgeFormProps) {
       </Box>
       <FeesBreakdown
         totalFiatAmount={gasFiatAmount}
-        totalAmount={gasTokenAmount}
+        totalAmount={gasFee}
+        tokenSymbol={estimates?.token?.symbol ?? ''}
         fees={[
           {
             label: text.drawers.feesBreakdown.fees.gas.label,
             fiatAmount: gasFiatAmount,
-            amount: gasTokenAmount,
+            amount: gasFee,
           },
         ]}
         visible={showFeeBreakdown}
