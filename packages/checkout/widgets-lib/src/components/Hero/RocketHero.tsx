@@ -4,7 +4,7 @@ import { Environment } from '@imtbl/config';
 import { heroBackGroundStyles, heroImageStyles } from './HeroImageStyles';
 
 const rocketHeroUrl = {
-  [Environment.PRODUCTION]: 'https://checkout-api.immutable.com/v1/blob/img/rocket.riv',
+  [Environment.PRODUCTION]: 'https://checkout-cdn.immutable.com/v1/blob/img/rocket.riv',
   [Environment.SANDBOX]: 'https://checkout-cdn.sandbox.immutable.com/v1/blob/img/rocket.riv',
 };
 

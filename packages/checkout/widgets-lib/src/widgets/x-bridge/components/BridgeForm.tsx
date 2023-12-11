@@ -62,7 +62,6 @@ export function BridgeForm(props: BridgeFormProps) {
       tokenBalances,
       allowedTokens,
       checkout,
-      web3Provider,
       from,
       to,
       amount,
@@ -349,8 +348,8 @@ export function BridgeForm(props: BridgeFormProps) {
 
   useEffect(() => {
     (async () => {
-      if (!web3Provider) return;
-      const address = await web3Provider.getSigner().getAddress();
+      if (!from?.web3Provider) return;
+      const address = await from.web3Provider.getSigner().getAddress();
       setWalletAddress((previous) => {
         if (previous !== '' && previous !== address) {
           setFormToken(undefined);
@@ -358,7 +357,7 @@ export function BridgeForm(props: BridgeFormProps) {
         return address;
       });
     })();
-  }, [web3Provider, tokenBalances]);
+  }, [from?.web3Provider, tokenBalances]);
 
   const bridgeFormValidator = useCallback((): boolean => {
     const validateTokenError = validateToken(formToken);
@@ -371,7 +370,7 @@ export function BridgeForm(props: BridgeFormProps) {
 
   const submitBridge = useCallback(async () => {
     if (!bridgeFormValidator()) return;
-    if (!checkout || !web3Provider || !formToken) return;
+    if (!checkout || !from?.web3Provider || !formToken) return;
 
     if (insufficientFundsForGas) {
       setShowNotEnoughGasDrawer(true);
@@ -396,7 +395,7 @@ export function BridgeForm(props: BridgeFormProps) {
     });
   }, [
     checkout,
-    web3Provider,
+    from?.web3Provider,
     bridgeFormValidator,
     insufficientFundsForGas,
     formToken]);

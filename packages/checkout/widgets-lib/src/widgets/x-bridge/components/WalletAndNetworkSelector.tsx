@@ -7,7 +7,7 @@ import {
 import { text } from 'resources/text/textConfig';
 import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
 import {
-  useCallback, useContext, useEffect, useMemo, useState,
+  useCallback, useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
 import {
   WalletProviderName,
@@ -16,10 +16,7 @@ import {
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { isPassportProvider } from 'lib/providerUtils';
-import {
-  addProviderListenersForWidgetRoot,
-  getL1ChainId, getL2ChainId, sendProviderUpdatedEvent,
-} from 'lib';
+import { getL1ChainId, getL2ChainId } from 'lib';
 import { getChainNameById } from 'lib/chainName';
 import { ViewActions, ViewContext } from 'context/view-context/ViewContext';
 import { abbreviateAddress } from 'lib/addressUtils';
@@ -38,7 +35,7 @@ const testId = 'wallet-network-selector';
 export function WalletAndNetworkSelector() {
   const {
     bridgeState: {
-      checkout, web3Provider, from, to,
+      checkout, from, to,
     }, bridgeDispatch,
   } = useContext(XBridgeContext);
   const { viewDispatch } = useContext(ViewContext);
@@ -51,6 +48,8 @@ export function WalletAndNetworkSelector() {
   const l1NetworkName = getChainNameById(l1NetworkChainId);
   const imtblZkEvmNetworkChainId = getL2ChainId(checkout.config);
   const imtblZkEvmNetworkName = getChainNameById(imtblZkEvmNetworkChainId);
+
+  const passportCache = useRef<Web3Provider>();
 
   /** From wallet and from network local state */
   const [fromWalletDrawerOpen, setFromWalletDrawerOpen] = useState(false);
@@ -102,67 +101,6 @@ export function WalletAndNetworkSelector() {
     return options;
   }, [checkout, fromNetwork, fromWalletProviderName]);
 
-  /**
- * This function is used to clear everything
- * and send the user back to the wallet and network selection screen.
- * It clears local state including the provider cache, and clears the
- * bridge context state to do with wallets, networks, token and amount.
- * This is used for when a user manually changes their network in MetaMask
- * we need to make sure everything is cleared and they start again.
- */
-  const resetEntireBridgeWalletAndNetworkState = useCallback(() => {
-    setFromWalletWeb3Provider(null);
-    setFromNetwork(null);
-    setFromWalletAddress('');
-    setToWalletWeb3Provider(null);
-    setToNetwork(null);
-    setToWalletAddress('');
-    bridgeDispatch({
-      payload: {
-        type: BridgeActions.SET_WALLETS_AND_NETWORKS,
-        from: null,
-        to: null,
-      },
-    });
-    bridgeDispatch({
-      payload: {
-        type: BridgeActions.SET_TOKEN_AND_AMOUNT,
-        amount: '',
-        token: null,
-      },
-    });
-    viewDispatch({
-      payload: {
-        type: ViewActions.GO_BACK_TO,
-        view: { type: XBridgeWidgetViews.WALLET_NETWORK_SELECTION },
-      },
-    });
-  }, []);
-
-  useEffect(() => {
-    // auto-filling from wallet web3provider with the injected web3provider
-    (async () => {
-      if (web3Provider) {
-        let currentChain: number | undefined;
-        let address;
-        try {
-          currentChain = (await web3Provider?.getNetwork())?.chainId;
-          address = await web3Provider!.getSigner().getAddress();
-        } catch (err) {
-          // skipping error here
-        }
-
-        if (Object.values(ChainId).includes(currentChain as ChainId)) {
-          setFromWalletWeb3Provider(web3Provider);
-          setFromNetwork(currentChain as ChainId);
-          setFromWalletAddress(address);
-        } else {
-          resetEntireBridgeWalletAndNetworkState();
-        }
-      }
-    })();
-  }, [web3Provider]);
-
   useEffect(() => {
     if (!from || !to) return;
 
@@ -185,10 +123,13 @@ export function WalletAndNetworkSelector() {
   }, [from, to]);
 
   async function createProviderAndConnect(walletProviderName: WalletProviderName): Promise<Web3Provider | undefined> {
-    let provider;
+    let provider: Web3Provider;
     try {
       const createResult = await checkout.createProvider({ walletProviderName });
       provider = createResult.provider;
+      if (walletProviderName === WalletProviderName.PASSPORT) {
+        passportCache.current = provider;
+      }
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error(`Failed to create ${walletProviderName} provider`);
@@ -235,6 +176,9 @@ export function WalletAndNetworkSelector() {
   const handleFromWalletConnection = useCallback(async (walletProviderName: WalletProviderName) => {
     clearToWalletSelections();
     let provider;
+    if (walletProviderName === WalletProviderName.PASSPORT && passportCache.current) {
+      provider = passportCache.current;
+    }
     if (!provider) {
       try {
         provider = await createProviderAndConnect(walletProviderName);
@@ -251,24 +195,19 @@ export function WalletAndNetworkSelector() {
     if (isPassportProvider(provider)) {
       setFromNetwork(imtblZkEvmNetworkChainId);
       setFromWalletDrawerOpen(false);
-      // send newly created provider up to widget root level
-      addProviderListenersForWidgetRoot(provider);
-      sendProviderUpdatedEvent({
-        provider,
-      });
       return;
     }
 
     /**
-   * Force the selection of network
-   * by clearing the fromNetwork
-   * and opening the network drawer
-   */
+     * Force the selection of network
+     * by clearing the fromNetwork
+     * and opening the network drawer
+     */
     setFromNetwork(null);
 
     setFromWalletDrawerOpen(false);
     setTimeout(() => setFromNetworkDrawerOpen(true), 500);
-  }, [fromWalletProviderName]);
+  }, [fromWalletProviderName, passportCache.current]);
 
   const handleFromNetworkSelection = useCallback(
     async (chainId: ChainId) => {
@@ -286,11 +225,6 @@ export function WalletAndNetworkSelector() {
       if (currentNetwork?.chainId === chainId) {
         setFromNetworkDrawerOpen(false);
         setFromNetwork(chainId);
-        // send newly created provider up to widget root level
-        addProviderListenersForWidgetRoot(fromWalletWeb3Provider);
-        sendProviderUpdatedEvent({
-          provider: fromWalletWeb3Provider,
-        });
         return;
       }
 
@@ -300,11 +234,6 @@ export function WalletAndNetworkSelector() {
         setFromWalletWeb3Provider(switchNetwork.provider);
         setFromNetworkDrawerOpen(false);
         setFromNetwork(switchNetwork.network.chainId);
-        // send newly created provider up to widget root level
-        addProviderListenersForWidgetRoot(switchNetwork.provider);
-        sendProviderUpdatedEvent({
-          provider: switchNetwork.provider,
-        });
       } catch (err) {
         // eslint-disable-next-line no-console
         console.error(err);
@@ -325,7 +254,10 @@ export function WalletAndNetworkSelector() {
       const address = await fromWalletWeb3Provider!.getSigner().getAddress();
       setToWalletAddress(address);
     } else {
-      let toWalletProvider; // = providerCache.current.get(selectedToWalletProviderName);
+      let toWalletProvider;
+      if (selectedToWalletProviderName === WalletProviderName.PASSPORT && passportCache.current) {
+        toWalletProvider = passportCache.current;
+      }
       if (!toWalletProvider) {
         try {
           toWalletProvider = await createProviderAndConnect(selectedToWalletProviderName);
@@ -347,19 +279,12 @@ export function WalletAndNetworkSelector() {
     fromWalletProviderName,
     fromNetwork,
     fromWalletWeb3Provider,
-    // providerCache.current
+    passportCache.current,
   ]);
 
   const handleSubmitDetails = useCallback(
     () => {
       if (!fromWalletWeb3Provider || !fromNetwork || !toWalletWeb3Provider || !toNetwork) return;
-
-      bridgeDispatch({
-        payload: {
-          type: BridgeActions.SET_PROVIDER,
-          web3Provider: fromWalletWeb3Provider,
-        },
-      });
 
       bridgeDispatch({
         payload: {
