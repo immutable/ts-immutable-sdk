@@ -1,7 +1,7 @@
 import { JsonRpcProvider, JsonRpcBatchProvider } from '@ethersproject/providers';
 import { Contract } from '@ethersproject/contracts';
 import { BigNumber } from '@ethersproject/bignumber';
-import { ethers, utils } from 'ethers';
+import { ethers } from 'ethers';
 import { ERC20__factory } from 'contracts/types';
 import { SwapRouter, PaymentsExtended } from '@uniswap/router-sdk';
 import { SecondaryFee } from './types';
@@ -98,7 +98,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        utils.parseEther('1000'),
+        newAmountFromString('1000', WETH_TEST_TOKEN).value,
         3, // 3% Slippage
       );
 
