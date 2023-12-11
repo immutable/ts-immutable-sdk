@@ -2,13 +2,12 @@ import { mount } from 'cypress/react18';
 import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
 import { cySmartGet } from '../../lib/testUtils';
-import { FooterLogo } from './FooterLogo';
 
 describe('Footer Logo', () => {
   it('should show the immutable logo', () => {
     mount(
       <ViewContextTestComponent>
-        <SimpleLayout footer={<FooterLogo />} />
+        <SimpleLayout />
       </ViewContextTestComponent>,
     );
 
@@ -18,7 +17,7 @@ describe('Footer Logo', () => {
   it('should hide the logo when configured', () => {
     mount(
       <ViewContextTestComponent>
-        <SimpleLayout footer={<FooterLogo hideLogo />} />
+        <SimpleLayout footerBrand={false} />
       </ViewContextTestComponent>,
     );
 

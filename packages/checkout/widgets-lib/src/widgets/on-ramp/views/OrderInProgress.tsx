@@ -5,7 +5,6 @@ import { sendOnRampWidgetCloseEvent } from '../OnRampWidgetEvents';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
-import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { SpendingCapHero } from '../../../components/Hero/SpendingCapHero';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 
@@ -21,9 +20,6 @@ export function OrderInProgress() {
           transparent
           onCloseButtonClick={() => sendOnRampWidgetCloseEvent(eventTarget)}
         />
-      )}
-      footer={(
-        <FooterLogo />
       )}
       heroContent={<SpendingCapHero />}
       floatHeader

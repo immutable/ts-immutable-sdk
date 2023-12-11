@@ -5,7 +5,6 @@ import {
 } from '@biom3/react';
 import { FundingRoute } from '@imtbl/checkout-sdk';
 import { useContext, useState } from 'react';
-import { FooterLogo } from '../../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../../components/SimpleLayout/SimpleLayout';
 import {
@@ -60,7 +59,6 @@ export function FundingRouteSelect({ fundingRoutes, onFundingRouteSelected }: Fu
     <SimpleLayout
       testId="funding-route-select"
       header={<HeaderNavigation onCloseButtonClick={() => sendSaleWidgetCloseEvent(eventTarget)} />}
-      footer={<FooterLogo />}
     >
 
       <Box

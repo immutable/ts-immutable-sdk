@@ -233,6 +233,7 @@ export function OnRampMain({
             onCloseButtonClick={() => sendOnRampWidgetCloseEvent(eventTarget)}
           />
         )}
+        footerBrand={false}
         footerBackgroundColor="base.color.translucent.emphasis.200"
       >
         <Box sx={containerStyle(showIframe)}>

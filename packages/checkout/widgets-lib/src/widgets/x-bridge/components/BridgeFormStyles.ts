@@ -14,8 +14,7 @@ export const formInputsContainerStyles = {
 export const bridgeFormButtonContainerStyles = {
   display: 'flex',
   flexDirection: 'column',
-  paddingY: 'base.spacing.x6',
-  paddingX: 'base.spacing.x4',
+  padding: 'base.spacing.x4',
 };
 
 export const gasAmountHeadingStyles = {

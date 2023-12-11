@@ -1,6 +1,5 @@
 import { useContext, useEffect } from 'react';
 import { Link } from '@biom3/react';
-import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { text } from '../../../resources/text/textConfig';
@@ -34,7 +33,6 @@ export function CoinInfo() {
     <SimpleLayout
       testId="coin-info"
       header={<HeaderNavigation showBack transparent />}
-      footer={<FooterLogo />}
       heroContent={<IMXCoinsHero />}
       floatHeader
     >

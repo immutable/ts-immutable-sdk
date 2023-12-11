@@ -10,7 +10,6 @@ import {
   IMTBLWidgetEvents,
 } from '@imtbl/checkout-sdk';
 import { DEFAULT_TOKEN_SYMBOLS } from 'context/crypto-fiat-context/CryptoFiatProvider';
-import { FooterLogo } from '../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
 import {
@@ -271,7 +270,6 @@ export function TopUpView({
           showBack
         />
         )}
-      footer={<FooterLogo />}
     >
       <Box sx={{ paddingX: 'base.spacing.x4', paddingY: 'base.spacing.x4' }}>
         <Heading size="small">{header.title}</Heading>

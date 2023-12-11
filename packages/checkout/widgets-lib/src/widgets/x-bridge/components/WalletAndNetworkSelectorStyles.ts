@@ -13,5 +13,5 @@ export const bridgeHeadingStyles = {
 export const submitButtonWrapperStyles = {
   display: 'flex',
   flexDirection: 'column',
-  paddingY: 'base.spacing.x6',
+  paddingY: 'base.spacing.x4',
 };

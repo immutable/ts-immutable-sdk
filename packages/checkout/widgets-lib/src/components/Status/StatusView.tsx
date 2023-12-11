@@ -5,7 +5,6 @@ import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
 import { CenteredBoxContent } from '../CenteredBoxContent/CenteredBoxContent';
 import { StatusBox } from './StatusBox';
 import { StatusType } from './StatusType';
-import { FooterLogo } from '../Footer/FooterLogo';
 import { statusContainerStyles } from './StatusViewStyles';
 import { HeaderNavigation } from '../Header/HeaderNavigation';
 
@@ -50,7 +49,6 @@ export function StatusView({
 
   return (
     <SimpleLayout
-      footer={<FooterLogo />}
       header={<HeaderNavigation onCloseButtonClick={onCloseClick} />}
       floatHeader
     >
@@ -59,13 +57,15 @@ export function StatusView({
           <StatusBox statusText={statusText} statusType={statusType} iconStyles={statusIconStyles} />
         </CenteredBoxContent>
 
-        {actionText && onActionClick && (
-          <Box
-            sx={{
-              paddingX: 'base.spacing.x4',
-              paddingBottom: 'base.spacing.x2',
-            }}
-          >
+        <Box
+          sx={{
+            padding: 'base.spacing.x4',
+            gap: 'base.spacing.x2',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          {actionText && onActionClick && (
             <Button
               sx={{ width: '100%' }}
               testId="status-action-button"
@@ -75,16 +75,8 @@ export function StatusView({
             >
               {actionText}
             </Button>
-          </Box>
-        )}
-
-        {secondaryActionText && onSecondaryActionClick && (
-          <Box
-            sx={{
-              paddingX: 'base.spacing.x4',
-              paddingBottom: 'base.spacing.x4',
-            }}
-          >
+          )}
+          {secondaryActionText && onSecondaryActionClick && (
             <Button
               sx={{ width: '100%' }}
               testId="status-action-button"
@@ -94,8 +86,8 @@ export function StatusView({
             >
               {secondaryActionText}
             </Button>
-          </Box>
-        )}
+          )}
+        </Box>
       </Box>
     </SimpleLayout>
   );
