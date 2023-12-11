@@ -42,7 +42,7 @@ export const waitForTransactionResponse = async (
   const txId = response.hash;
   console.log('Waiting for transaction', {
     txId,
-    etherscanLink: `https://goerli.etherscan.io/tx/${txId}`,
+    etherscanLink: `https://sepolia.etherscan.io/tx/${txId}`,
     alchemyLink: `https://dashboard.alchemyapi.io/mempool/eth-goerli/tx/${txId}`,
   });
   const receipt = await response.wait();
