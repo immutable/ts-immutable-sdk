@@ -619,7 +619,7 @@ describe('adjustQuoteWithFees', () => {
         };
         const userSpecifiedAmountOut = quote.amountOut;
 
-        const fees = tenPercentFees(NATIVE_TEST_TOKEN, TradeType.EXACT_OUTPUT);
+        const fees = tenPercentFees(NATIVE_TEST_TOKEN, quote.tradeType);
         const preparedSwap = adjustQuoteWithFees(quote, userSpecifiedAmountOut, fees, nativeTokenService);
 
         expectERC20(preparedSwap.amountIn.token, nativeTokenService.wrappedToken.address);
