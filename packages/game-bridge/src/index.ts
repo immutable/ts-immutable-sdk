@@ -21,11 +21,14 @@ const sdkVersionSha = '__SDK_VERSION_SHA__';
 
 const PASSPORT_FUNCTIONS = {
   init: 'init',
-  connect: 'connect',
+  initDeviceFlow: 'initDeviceFlow',
+  relogin: 'relogin',
   reconnect: 'reconnect',
   getPKCEAuthUrl: 'getPKCEAuthUrl',
+  loginPKCE: 'loginPKCE',
   connectPKCE: 'connectPKCE',
-  confirmCode: 'confirmCode',
+  loginConfirmCode: 'loginConfirmCode',
+  connectConfirmCode: 'connectConfirmCode',
   getAccessToken: 'getAccessToken',
   getIdToken: 'getIdToken',
   getAddress: 'getAddress',
@@ -50,8 +53,8 @@ const initRequest = 'init';
 const initRequestId = '1';
 
 let passportClient: passport.Passport;
-let providerInstance: provider.IMXProvider;
-let zkEvmProviderInstance: passport.Provider;
+let providerInstance: provider.IMXProvider | null;
+let zkEvmProviderInstance: passport.Provider | null;
 
 declare global {
   interface Window {
@@ -98,14 +101,28 @@ const setProvider = (passportProvider: provider.IMXProvider | null): boolean => 
   return false;
 };
 
+const getProvider = (): provider.IMXProvider => {
+  if (providerInstance == null) {
+    throw new Error('No IMX provider');
+  }
+  return providerInstance;
+};
+
 const setZkEvmProvider = (zkEvmProvider: passport.Provider | null): boolean => {
   if (zkEvmProvider !== null && zkEvmProvider !== undefined) {
     zkEvmProviderInstance = zkEvmProvider;
-    console.log('ZkEvm provider set');
+    console.log('zkEvm provider set');
     return true;
   }
-  console.log('No ZkEvm provider');
+  console.log('No zkEvm provider');
   return false;
+};
+
+const getZkEvmProvider = (): passport.Provider => {
+  if (zkEvmProviderInstance == null) {
+    throw new Error('No zkEvm provider');
+  }
+  return zkEvmProviderInstance;
 };
 
 window.callFunction = async (jsonData: string) => { // eslint-disable-line no-unused-vars
@@ -159,7 +176,7 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
         gameBridgeVersionCheck(versionCheckParams);
         break;
       }
-      case PASSPORT_FUNCTIONS.connect: {
+      case PASSPORT_FUNCTIONS.initDeviceFlow: {
         const response = await passportClient?.loginWithDeviceFlow();
         callbackToGame({
           responseFor: fxName,
@@ -172,18 +189,28 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
         });
         break;
       }
-      case PASSPORT_FUNCTIONS.reconnect: {
-        let success = false;
+      case PASSPORT_FUNCTIONS.relogin: {
         const userInfo = await passportClient?.login({ useCachedSession: true });
-        if (userInfo) {
-          const passportProvider = await passportClient?.connectImx();
-          success = setProvider(passportProvider);
-        }
-
         callbackToGame({
           responseFor: fxName,
           requestId,
-          success,
+          success: true,
+          result: userInfo !== null,
+        });
+        break;
+      }
+      case PASSPORT_FUNCTIONS.reconnect: {
+        let providerSet = false;
+        const userInfo = await passportClient?.login({ useCachedSession: true });
+        if (userInfo) {
+          const passportProvider = await passportClient?.connectImx();
+          providerSet = setProvider(passportProvider);
+        }
+        callbackToGame({
+          responseFor: fxName,
+          requestId,
+          success: true,
+          result: providerSet,
         });
         break;
       }
@@ -197,19 +224,44 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
         });
         break;
       }
+      case PASSPORT_FUNCTIONS.loginPKCE: {
+        const request = JSON.parse(data);
+        await passportClient?.loginWithPKCEFlowCallback(request.authorizationCode, request.state);
+        callbackToGame({
+          responseFor: fxName,
+          requestId,
+          success: true,
+        });
+        break;
+      }
       case PASSPORT_FUNCTIONS.connectPKCE: {
         const request = JSON.parse(data);
         await passportClient?.loginWithPKCEFlowCallback(request.authorizationCode, request.state);
         const passportProvider = await passportClient?.connectImx();
-        const success = setProvider(passportProvider);
+        const providerSet = setProvider(passportProvider);
         callbackToGame({
           responseFor: fxName,
           requestId,
-          success,
+          success: true,
+          result: providerSet,
         });
         break;
       }
-      case PASSPORT_FUNCTIONS.confirmCode: {
+      case PASSPORT_FUNCTIONS.loginConfirmCode: {
+        const request = JSON.parse(data);
+        await passportClient?.loginWithDeviceFlowCallback(
+          request.deviceCode,
+          request.interval,
+          request.timeoutMs ?? null,
+        );
+        callbackToGame({
+          responseFor: fxName,
+          requestId,
+          success: true,
+        });
+        break;
+      }
+      case PASSPORT_FUNCTIONS.connectConfirmCode: {
         const request = JSON.parse(data);
         await passportClient?.loginWithDeviceFlowCallback(
           request.deviceCode,
@@ -217,21 +269,23 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
           request.timeoutMs ?? null,
         );
         const passportProvider = await passportClient?.connectImx();
-        const success = setProvider(passportProvider);
+        const providerSet = setProvider(passportProvider);
         callbackToGame({
           responseFor: fxName,
           requestId,
-          success,
+          success: true,
+          result: providerSet,
         });
         break;
       }
       case PASSPORT_FUNCTIONS.zkEvm.connectEvm: {
         const zkEvmProvider = passportClient?.connectEvm();
-        const success = setZkEvmProvider(zkEvmProvider);
+        const providerSet = setZkEvmProvider(zkEvmProvider);
         callbackToGame({
           responseFor: fxName,
           requestId,
-          success,
+          success: true,
+          result: providerSet,
         });
         break;
       }
@@ -256,7 +310,7 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
         break;
       }
       case PASSPORT_FUNCTIONS.getAddress: {
-        const address = await providerInstance?.getAddress();
+        const address = await getProvider().getAddress();
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -267,6 +321,8 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
       }
       case PASSPORT_FUNCTIONS.logout: {
         const deviceFlowEndSessionEndpoint = await passportClient?.logoutDeviceFlow();
+        providerInstance = null;
+        zkEvmProviderInstance = null;
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -286,7 +342,7 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
         break;
       }
       case PASSPORT_FUNCTIONS.imx.isRegisteredOffchain: {
-        const registered = await providerInstance?.isRegisteredOffchain();
+        const registered = await getProvider().isRegisteredOffchain();
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -296,7 +352,7 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
         break;
       }
       case PASSPORT_FUNCTIONS.imx.registerOffchain: {
-        const response = await providerInstance?.registerOffchain();
+        const response = await getProvider().registerOffchain();
         callbackToGame({
           ...{
             responseFor: fxName,
@@ -309,7 +365,7 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
       }
       case PASSPORT_FUNCTIONS.imx.transfer: {
         const unsignedTransferRequest = JSON.parse(data);
-        const response = await providerInstance?.transfer(unsignedTransferRequest);
+        const response = await getProvider().transfer(unsignedTransferRequest);
         callbackToGame({
           ...{
             responseFor: fxName,
@@ -322,7 +378,7 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
       }
       case PASSPORT_FUNCTIONS.imx.batchNftTransfer: {
         const nftTransferDetails = JSON.parse(data);
-        const response = await providerInstance?.batchNftTransfer(nftTransferDetails);
+        const response = await getProvider().batchNftTransfer(nftTransferDetails);
         callbackToGame({
           ...{
             responseFor: fxName,
@@ -336,7 +392,7 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
       }
       case PASSPORT_FUNCTIONS.zkEvm.sendTransaction: {
         const transaction = JSON.parse(data);
-        const transactionHash = await zkEvmProviderInstance.request({
+        const transactionHash = await getZkEvmProvider().request({
           method: 'eth_sendTransaction',
           params: [transaction],
         });
@@ -349,7 +405,7 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
         break;
       }
       case PASSPORT_FUNCTIONS.zkEvm.requestAccounts: {
-        const result = await zkEvmProviderInstance.request({
+        const result = await getZkEvmProvider().request({
           method: 'eth_requestAccounts',
         });
         callbackToGame({
@@ -362,7 +418,7 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
       }
       case PASSPORT_FUNCTIONS.zkEvm.getBalance: {
         const request = JSON.parse(data);
-        const result = await zkEvmProviderInstance.request({
+        const result = await getZkEvmProvider().request({
           method: 'eth_getBalance',
           params: [request.address, request.blockNumberOrTag],
         });
