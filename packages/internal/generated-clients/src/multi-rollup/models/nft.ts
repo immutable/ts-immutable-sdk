@@ -101,11 +101,5 @@ export interface NFT {
      * @memberof NFT
      */
     'youtube_url': string | null;
-    /**
-     * The id of mint activity of this NFT
-     * @type {string}
-     * @memberof NFT
-     */
-    'mint_activity_id': string | null;
 }
 

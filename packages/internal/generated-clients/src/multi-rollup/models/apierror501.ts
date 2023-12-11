@@ -15,12 +15,15 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import { APIError501AllOf } from './apierror501-all-of';
+// May contain unused imports in some cases
+// @ts-ignore
 import { BasicAPIError } from './basic-apierror';
 
 /**
  * @type APIError501
  * @export
  */
-export type APIError501 = BasicAPIError;
+export type APIError501 = APIError501AllOf & BasicAPIError;
 
 

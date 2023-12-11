@@ -1,7 +1,7 @@
 import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
-import { BiomeCombinedProviders, Button } from '@biom3/react';
-import { onDarkBase } from '@biom3/design-tokens';
+import { Button } from '@biom3/react';
+import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { cySmartGet } from '../../lib/testUtils';
 import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
 import { FeesBreakdown } from './FeesBreakdown';
@@ -13,7 +13,7 @@ describe('FeesBreakdown', () => {
 
   it('should the total fees amount, even if there are no sub fees', () => {
     mount(
-      <BiomeCombinedProviders theme={{ base: onDarkBase }}>
+      <ViewContextTestComponent>
         <SimpleLayout>
           <FeesBreakdown fees={[]} totalAmount="1.0" totalFiatAmount="Approx USD $0.70" tokenSymbol="IMX">
             <Button testId="fee-button">
@@ -21,11 +21,11 @@ describe('FeesBreakdown', () => {
             </Button>
           </FeesBreakdown>
         </SimpleLayout>
-      </BiomeCombinedProviders>,
+      </ViewContextTestComponent>,
     );
     cySmartGet('fee-button').click();
-    cySmartGet('bottomSheet__header').should('be.visible');
-    cySmartGet('bottomSheet__header').should('have.text', 'Fee breakdown');
+    cySmartGet('Drawer__container__header').should('be.visible');
+    cySmartGet('Drawer__container__header').should('have.text', 'Fee breakdown');
     cySmartGet('fees-breakdown-content').should('be.visible');
     cySmartGet('fee-item-fees-total').should('be.visible');
     cySmartGet('fees-total__price').should('have.text', 'IMX 1');
@@ -46,7 +46,7 @@ describe('FeesBreakdown', () => {
       },
     ];
     mount(
-      <BiomeCombinedProviders theme={{ base: onDarkBase }}>
+      <ViewContextTestComponent>
         <SimpleLayout>
           <FeesBreakdown fees={fees} totalAmount="1.0" totalFiatAmount="Approx USD $0.70" tokenSymbol="IMX">
             <Button testId="fee-button">
@@ -54,7 +54,7 @@ describe('FeesBreakdown', () => {
             </Button>
           </FeesBreakdown>
         </SimpleLayout>
-      </BiomeCombinedProviders>,
+      </ViewContextTestComponent>,
     );
     cySmartGet('fee-button').click();
     cySmartGet('fees-breakdown-content').should('be.visible');

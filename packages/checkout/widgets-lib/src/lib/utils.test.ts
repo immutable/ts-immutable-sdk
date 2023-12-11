@@ -435,8 +435,20 @@ describe('utils', () => {
       expect(tokenValueFormat('0.0000012')).toEqual('0.000001');
     });
 
-    it(`should format to maximum of ${DEFAULT_TOKEN_FORMATTING_DECIMALS} decimal places`, () => {
-      expect(tokenValueFormat('0.0000001')).toEqual('0.000000');
+    it(`should format to default maximum of ${DEFAULT_TOKEN_FORMATTING_DECIMALS} decimal places`, () => {
+      expect(tokenValueFormat('0.00000012345')).toEqual('0.000000');
+    });
+
+    it('should format to custom maximum decimal places of 3', () => {
+      expect(tokenValueFormat('0.00000012345', 3)).toEqual('0.000');
+    });
+
+    it('should format to custom maximum decimal places of 18', () => {
+      expect(tokenValueFormat('0.000000000000000000', 18)).toEqual('0.000000000000000000');
+    });
+
+    it('should format to first non zero digit before maximum decimal places of 18', () => {
+      expect(tokenValueFormat('0.0000000012345', 18)).toEqual('0.000000001');
     });
   });
 

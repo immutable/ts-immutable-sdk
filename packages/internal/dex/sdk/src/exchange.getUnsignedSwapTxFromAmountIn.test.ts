@@ -41,6 +41,10 @@ import {
   TEST_FROM_ADDRESS,
   expectToBeString,
   decodeMulticallExactInputWithoutFees,
+  buildBlock,
+  refundETHFunctionSignature,
+  TEST_MAX_PRIORITY_FEE_PER_GAS,
+  TEST_BASE_FEE,
 } from './test/utils';
 
 jest.mock('@ethersproject/providers');
@@ -58,7 +62,7 @@ jest.mock('./lib/utils', () => ({
 
 const HIGHER_SLIPPAGE = 0.2;
 const APPROVED_AMOUNT = newAmountFromString('1', USDC_TEST_TOKEN);
-const APPROVE_GAS_ESTIMATE = BigNumber.from('100000');
+const APPROVE_GAS_ESTIMATE = BigNumber.from('100000'); // gas units
 
 describe('getUnsignedSwapTxFromAmountIn', () => {
   let erc20Contract: jest.Mock<any, any, any>;
@@ -75,9 +79,14 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
     })) as unknown as JsonRpcProvider;
 
     (JsonRpcBatchProvider as unknown as jest.Mock).mockImplementation(() => ({
-      getFeeData: async () => ({
-        maxFeePerGas: null,
-        gasPrice: TEST_GAS_PRICE,
+      getBlock: async () => buildBlock({ baseFeePerGas: BigNumber.from(TEST_BASE_FEE) }),
+      send: jest.fn().mockImplementation(async (method) => {
+        switch (method) {
+          case 'eth_maxPriorityFeePerGas':
+            return BigNumber.from(TEST_MAX_PRIORITY_FEE_PER_GAS);
+          default:
+            throw new Error('Method not implemented');
+        }
       }),
     })) as unknown as JsonRpcProvider;
   });
@@ -425,6 +434,44 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       expect(result.approval).toBeNull();
     });
+
+    it('should include a call to refundETH as the final step of the multicall calldata', async () => {
+      mockRouterImplementation({
+        pools: [createPool(nativeTokenService.wrappedToken, FUN_TEST_TOKEN)],
+      });
+
+      const swapRouterInterface = SwapRouter.INTERFACE;
+      const paymentsInterface = PaymentsExtended.INTERFACE;
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+
+      // Sell 100 native tokens for X amount of FUN where the exchange rate is 1 token-in : 10 token-out
+      // Route is WIMX > FUN
+      const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
+        TEST_FROM_ADDRESS,
+        'native',
+        FUN_TEST_TOKEN.address,
+        newAmountFromString('100', nativeTokenService.nativeToken).value,
+        3, // 3 % slippage
+      );
+
+      expectToBeDefined(swap.transaction.data);
+      expectToBeDefined(swap.transaction.value);
+      const calldata = swap.transaction.data.toString();
+
+      const topLevelParams = swapRouterInterface.decodeFunctionData('multicall(uint256,bytes[])', calldata);
+
+      expect(topLevelParams.data.length).toBe(2); // expect that there are two calls in the multicall
+      const swapTransactionCalldata = topLevelParams.data[0];
+      const refundETHTransactionCalldata = topLevelParams.data[1];
+
+      expectToBeString(swapTransactionCalldata);
+      expectToBeString(refundETHTransactionCalldata);
+
+      const decodedRefundEthTx = paymentsInterface.decodeFunctionData('refundETH', refundETHTransactionCalldata);
+
+      expect(topLevelParams.data[1]).toEqual(refundETHFunctionSignature);
+      expect(decodedRefundEthTx.length).toEqual(0); // expect that the refundETH call has no parameters
+    });
   });
 
   describe('with a single pool and a native token out', () => {
@@ -575,6 +622,49 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   });
 
   describe('with multiple pools', () => {
+    describe('with a native token in', () => {
+      it('should include a call to refundETH as the final step of the multicall calldata', async () => {
+        mockRouterImplementation({
+          pools: [
+            createPool(nativeTokenService.wrappedToken, USDC_TEST_TOKEN),
+            createPool(USDC_TEST_TOKEN, FUN_TEST_TOKEN),
+          ],
+        });
+
+        const swapRouterInterface = SwapRouter.INTERFACE;
+        const paymentsInterface = PaymentsExtended.INTERFACE;
+        const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+
+        // Sell 100 native tokens for X amount of FUN where the exchange rate is 1 token-in : 10 token-out
+        // Route is WIMX > USDC > FUN
+        const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
+          TEST_FROM_ADDRESS,
+          'native',
+          FUN_TEST_TOKEN.address,
+          newAmountFromString('100', nativeTokenService.nativeToken).value,
+          3, // 3 % slippage
+        );
+
+        expectToBeDefined(swap.transaction.data);
+        expectToBeDefined(swap.transaction.value);
+        const calldata = swap.transaction.data.toString();
+
+        const topLevelParams = swapRouterInterface.decodeFunctionData('multicall(uint256,bytes[])', calldata);
+
+        expect(topLevelParams.data.length).toBe(2); // expect that there are two calls in the multicall
+        const swapTransactionCalldata = topLevelParams.data[0];
+        const refundETHTransactionCalldata = topLevelParams.data[1];
+
+        expectToBeString(swapTransactionCalldata);
+        expectToBeString(refundETHTransactionCalldata);
+
+        const decodedRefundEthTx = paymentsInterface.decodeFunctionData('refundETH', refundETHTransactionCalldata);
+
+        expect(topLevelParams.data[1]).toEqual(refundETHFunctionSignature);
+        expect(decodedRefundEthTx.length).toEqual(0); // expect that the refundETH call has no parameters
+      });
+    });
+
     describe('with a native token out', () => {
       it('should specify the Router contract as the recipient of the swap function call', async () => {
         mockRouterImplementation({

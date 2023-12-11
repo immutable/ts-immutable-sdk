@@ -58,5 +58,5 @@ export const getAllowedBalances = async ({
     return tokensAddresses.get(balance.token.address || NATIVE);
   }) ?? [];
 
-  return { allowList, allowedBalances: tokenBalances!.balances };
+  return { allowList, allowedBalances };
 };

@@ -339,7 +339,7 @@ export function BridgeReviewSummary() {
           },
         ]}
         visible={showFeeBreakdown}
-        onCloseBottomSheet={() => setShowFeeBreakdown(false)}
+        onCloseDrawer={() => setShowFeeBreakdown(false)}
       />
     </Box>
   );

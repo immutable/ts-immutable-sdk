@@ -1,5 +1,5 @@
 import {
-  BottomSheet, Box, Divider,
+  Drawer, Box, Divider,
 } from '@biom3/react';
 import { tokenValueFormat } from 'lib/utils';
 import { feeItemContainerStyles, feesBreakdownContentStyles } from './FeesBreakdownStyles';
@@ -14,7 +14,7 @@ type Fee = {
 };
 
 type FeesBreakdownProps = {
-  onCloseBottomSheet?: () => void;
+  onCloseDrawer?: () => void;
   fees: Fee[];
   children?: any;
   visible?: boolean;
@@ -26,23 +26,23 @@ type FeesBreakdownProps = {
 export function FeesBreakdown({
   fees,
   children,
-  onCloseBottomSheet,
   visible,
+  onCloseDrawer,
   totalFiatAmount,
   totalAmount,
   tokenSymbol,
 }: FeesBreakdownProps) {
   return (
-    <BottomSheet
+    <Drawer
       headerBarTitle={text.drawers.feesBreakdown.heading}
       size="threeQuarter"
-      onCloseBottomSheet={onCloseBottomSheet}
+      onCloseDrawer={onCloseDrawer}
       visible={visible}
     >
-      <BottomSheet.Target>
+      <Drawer.Target>
         {children}
-      </BottomSheet.Target>
-      <BottomSheet.Content testId="fees-breakdown-content" sx={feesBreakdownContentStyles}>
+      </Drawer.Target>
+      <Drawer.Content testId="fees-breakdown-content" sx={feesBreakdownContentStyles}>
         <Box sx={feeItemContainerStyles}>
           <FeeItem
             key={text.drawers.feesBreakdown.total}
@@ -54,19 +54,19 @@ export function FeesBreakdown({
           />
           <Divider size="xSmall" />
           {
-              fees.map(({ label, amount, fiatAmount }) => (
-                <FeeItem
-                  key={label}
-                  label={label}
-                  amount={tokenValueFormat(amount)}
-                  fiatAmount={fiatAmount}
-                  tokenSymbol={tokenSymbol}
-                />
-              ))
-            }
+            fees.map(({ label, amount, fiatAmount }) => (
+              <FeeItem
+                key={label}
+                label={label}
+                amount={tokenValueFormat(amount)}
+                fiatAmount={fiatAmount}
+                tokenSymbol={tokenSymbol}
+              />
+            ))
+          }
         </Box>
         <FooterLogo />
-      </BottomSheet.Content>
-    </BottomSheet>
+      </Drawer.Content>
+    </Drawer>
   );
 }

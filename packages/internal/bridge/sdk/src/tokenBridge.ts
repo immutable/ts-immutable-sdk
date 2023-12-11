@@ -731,6 +731,7 @@ export class TokenBridge {
  * @dev this SDK method is currently stubbed
  */
   public async getTransactionStatus(req: TxStatusRequest): Promise<TxStatusResponse> {
+    // eslint-disable-next-line no-console
     console.log('stubbed response with req', req);
     // Return the token mappings
     return {
@@ -756,6 +757,7 @@ export class TokenBridge {
  * @dev this SDK method is currently stubbed
  */
   public async getFlowRateInfo(req: FlowRateInfoRequest = {}): Promise<FlowRateInfoResponse> {
+    // eslint-disable-next-line no-console
     console.log('stubbed response with req', req);
     // Return the token mappings
     return {
@@ -789,6 +791,7 @@ export class TokenBridge {
  * @dev this SDK method is currently stubbed
  */
   public async getPendingWithdrawals(req: PendingWithdrawalsRequest): Promise<PendingWithdrawalsResponse> {
+    // eslint-disable-next-line no-console
     console.log('stubbed response with req', req);
     return {
       pending: [{
@@ -819,6 +822,7 @@ export class TokenBridge {
  * @dev this SDK method is currently stubbed
  */
   public async getFlowRateWithdrawTx(req:FlowRateWithdrawRequest): Promise<FlowRateWithdrawResponse> {
+    // eslint-disable-next-line no-console
     console.log('stubbed response with req', req);
     return {
       unsignedTx: {
@@ -840,6 +844,7 @@ export class TokenBridge {
  * @dev this SDK method is currently stubbed
  */
   public async getTokenMapping(req: TokenMappingRequest): Promise<TokenMappingResponse> {
+    // eslint-disable-next-line no-console
     console.log('stubbed response with req', req);
     return {
       rootToken: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',

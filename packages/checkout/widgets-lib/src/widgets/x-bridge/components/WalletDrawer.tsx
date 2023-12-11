@@ -1,4 +1,4 @@
-import { BottomSheet, Select } from '@biom3/react';
+import { Drawer, Select } from '@biom3/react';
 import { FormControlWrapper } from 'components/FormComponents/FormControlWrapper/FormControlWrapper';
 import { WalletProviderName } from '@imtbl/checkout-sdk';
 import { useState } from 'react';
@@ -42,18 +42,18 @@ export function WalletDrawer({
   };
 
   return (
-    <BottomSheet
+    <Drawer
       headerBarTitle={walletSelectorText.walletSelectorHeading}
       size="full"
-      onCloseBottomSheet={() => {
+      onCloseDrawer={() => {
         if (walletItemLoading) return;
         setShowDrawer(false);
       }}
       visible={showDrawer}
     >
       {showWalletSelectorTarget
-        && (
-          <BottomSheet.Target>
+          && (
+          <Drawer.Target>
             <FormControlWrapper
               testId={`${testId}-${type}-wallet-form-control`}
               textAlign="left"
@@ -65,9 +65,9 @@ export function WalletDrawer({
                 targetClickOveride={() => setShowDrawer(true)}
               />
             </FormControlWrapper>
-          </BottomSheet.Target>
-        )}
-      <BottomSheet.Content sx={walletItemListStyles}>
+          </Drawer.Target>
+          )}
+      <Drawer.Content sx={walletItemListStyles}>
         {walletOptions.map((walletProviderName) => (
           <WalletItem
             key={walletProviderName}
@@ -77,7 +77,7 @@ export function WalletDrawer({
             onWalletClick={handleWalletItemClick}
           />
         ))}
-      </BottomSheet.Content>
-    </BottomSheet>
+      </Drawer.Content>
+    </Drawer>
   );
 }

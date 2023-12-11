@@ -21,7 +21,8 @@
  */
 
 export const CollectionContractType = {
-    Erc721: 'ERC721'
+    Erc721: 'ERC721',
+    Erc1155: 'ERC1155'
 } as const;
 
 export type CollectionContractType = typeof CollectionContractType[keyof typeof CollectionContractType];

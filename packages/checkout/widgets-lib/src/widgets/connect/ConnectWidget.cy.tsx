@@ -11,10 +11,10 @@ import { mount } from 'cypress/react18';
 import { Environment } from '@imtbl/config';
 import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
 import { Passport } from '@imtbl/passport';
+import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { ConnectWidget } from './ConnectWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 
 describe('ConnectWidget tests', () => {
   const config: StrongCheckoutWidgetsConfig = {
@@ -51,9 +51,9 @@ describe('ConnectWidget tests', () => {
     const checkout = new Checkout({ baseConfig: { environment: Environment.SANDBOX } });
 
     mount(
-      <CustomAnalyticsProvider widgetConfig={config}>
+      <ViewContextTestComponent>
         <ConnectWidget config={config} checkout={checkout} {...props} web3Provider={mockWeb3Provider} />
-      </CustomAnalyticsProvider>,
+      </ViewContextTestComponent>,
     );
   };
 
@@ -86,12 +86,12 @@ describe('ConnectWidget tests', () => {
     const checkout = new Checkout({ baseConfig: { environment: Environment.SANDBOX }, passport: testPassportInstance });
 
     mount(
-      <CustomAnalyticsProvider widgetConfig={config}>
+      <ViewContextTestComponent>
         <ConnectWidget
           config={config}
           checkout={checkout}
         />
-      </CustomAnalyticsProvider>,
+      </ViewContextTestComponent>,
     );
   };
 
@@ -321,7 +321,7 @@ describe('ConnectWidget tests', () => {
         const checkout = new Checkout({ baseConfig: { environment: Environment.SANDBOX } });
 
         mount(
-          <CustomAnalyticsProvider widgetConfig={config}>
+          <ViewContextTestComponent>
             <ConnectWidget
               config={config}
               checkout={checkout}
@@ -329,7 +329,7 @@ describe('ConnectWidget tests', () => {
               targetLayer={ConnectTargetLayer.LAYER2}
               allowedChains={[ChainId.IMTBL_ZKEVM_TESTNET, ChainId.SEPOLIA]}
             />
-          </CustomAnalyticsProvider>,
+          </ViewContextTestComponent>,
         );
 
         cySmartGet('wallet-list-metamask').click();
@@ -508,40 +508,6 @@ describe('ConnectWidget tests', () => {
           },
         });
     });
-
-    it('should show BridgeComingSoon for Passport users if trying to switch to L1', () => {
-      cy.stub(Checkout.prototype, 'getNetworkInfo')
-        .as('getNetworkInfoStub')
-        .resolves({
-          name: ChainName.IMTBL_ZKEVM_TESTNET,
-          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-        });
-
-      const passportProvider = mockPassportProvider('resolve');
-      const testPassportInstance = {
-        connectEvm: cy.stub().as('connectEvmStub').returns(passportProvider),
-      } as any as Passport;
-      const checkout = new Checkout(
-        {
-          baseConfig: { environment: Environment.SANDBOX },
-          passport: testPassportInstance,
-        },
-      );
-
-      mount(
-        <CustomAnalyticsProvider widgetConfig={config}>
-          <ConnectWidget
-            targetLayer={ConnectTargetLayer.LAYER1}
-            checkout={checkout}
-            config={config}
-          />
-        </CustomAnalyticsProvider>,
-      );
-      cySmartGet('wallet-list-passport').click();
-      cySmartGet('footer-button').click();
-
-      cySmartGet('bridge-coming-soon').should('be.visible');
-    });
   });
 
   describe('Error Connecting', () => {
@@ -555,13 +521,13 @@ describe('ConnectWidget tests', () => {
       const checkout = new Checkout({ baseConfig: { environment: Environment.SANDBOX } });
 
       mount(
-        <CustomAnalyticsProvider widgetConfig={config}>
+        <ViewContextTestComponent>
           <ConnectWidget
             {...props}
             checkout={checkout}
             config={config}
           />
-        </CustomAnalyticsProvider>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('wallet-list-metamask').click();
