@@ -270,7 +270,7 @@ export default class AuthManager {
       + `&audience=${this.config.oidcConfiguration.audience}`;
   }
 
-  public async connectImxPKCEFlow(authorizationCode: string, state: string): Promise<User> {
+  public async loginWithPKCEFlowCallback(authorizationCode: string, state: string): Promise<User> {
     return withPassportError<User>(async () => {
       const pkceData = this.deviceCredentialsManager.getPKCEData();
       if (!pkceData) {

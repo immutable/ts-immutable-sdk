@@ -22,7 +22,7 @@ import { APIError500 } from '../models';
 // @ts-ignore
 import { GetNFTResult } from '../models';
 // @ts-ignore
-import { ListNFTOwnersResult } from '../models';
+import { ListNFTsByOwnerResult } from '../models';
 // @ts-ignore
 import { ListNFTsResult } from '../models';
 // @ts-ignore
@@ -34,7 +34,7 @@ export { APIError500 } from '../models';
 // @ts-ignore
 export { GetNFTResult } from '../models';
 // @ts-ignore
-export { ListNFTOwnersResult } from '../models';
+export { ListNFTsByOwnerResult } from '../models';
 // @ts-ignore
 export { ListNFTsResult } from '../models';
 
@@ -64,41 +64,6 @@ export interface GetNFTRequest {
      * @memberof GetNFT
      */
     readonly chainName: string
-}
-
-/**
- * Request parameters for listAllNFTOwners operation in NftsApi.
- * @export
- * @interface ListAllNFTOwnersRequest
- */
-export interface ListAllNFTOwnersRequest {
-    /**
-     * The name of chain
-     * @type {string}
-     * @memberof ListAllNFTOwners
-     */
-    readonly chainName: string
-
-    /**
-     * Datetime to use as the oldest updated timestamp
-     * @type {string}
-     * @memberof ListAllNFTOwners
-     */
-    readonly fromUpdatedAt: string
-
-    /**
-     * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
-     * @type {string}
-     * @memberof ListAllNFTOwners
-     */
-    readonly pageCursor?: string
-
-    /**
-     * Maximum number of items to return
-     * @type {number}
-     * @memberof ListAllNFTOwners
-     */
-    readonly pageSize?: number
 }
 
 /**

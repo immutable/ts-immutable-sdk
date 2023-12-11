@@ -64,9 +64,9 @@ function Header() {
     <AppHeaderBar size="small" contentAlign="left">
       <AppHeaderBar.LeftLogo logo="ImmutableSymbol" />
       <AppHeaderBar.Title>Economy Mechanics Playground</AppHeaderBar.Title>
-      <AppHeaderBar.RightHandButtons>
+      <AppHeaderBar.RightSlot>
         {renderRightSide()}
-      </AppHeaderBar.RightHandButtons>
+      </AppHeaderBar.RightSlot>
     </AppHeaderBar>
   );
 }

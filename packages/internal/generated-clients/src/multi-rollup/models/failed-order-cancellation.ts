@@ -35,7 +35,7 @@ export interface FailedOrderCancellation {
 }
 
 export const FailedOrderCancellationReasonCodeEnum = {
-    AlreadyFilled: 'ALREADY_FILLED'
+    Filled: 'FILLED'
 } as const;
 
 export type FailedOrderCancellationReasonCodeEnum = typeof FailedOrderCancellationReasonCodeEnum[keyof typeof FailedOrderCancellationReasonCodeEnum];

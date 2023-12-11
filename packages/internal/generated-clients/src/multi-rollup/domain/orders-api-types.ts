@@ -218,11 +218,32 @@ export interface ListListingsRequest {
     readonly buyItemContractAddress?: string
 
     /**
+     * The account address of the user who created the listing
+     * @type {string}
+     * @memberof ListListings
+     */
+    readonly accountAddress?: string
+
+    /**
+     * The metadata_id of the sell item
+     * @type {string}
+     * @memberof ListListings
+     */
+    readonly sellItemMetadataId?: string
+
+    /**
      * Sell item token identifier to filter by
      * @type {string}
      * @memberof ListListings
      */
     readonly sellItemTokenId?: string
+
+    /**
+     * From updated at including given date
+     * @type {string}
+     * @memberof ListListings
+     */
+    readonly fromUpdatedAt?: string
 
     /**
      * Maximum number of orders to return per page
@@ -272,6 +293,13 @@ export interface ListTradesRequest {
      * @memberof ListTrades
      */
     readonly accountAddress?: string
+
+    /**
+     * From indexed at including given date
+     * @type {string}
+     * @memberof ListTrades
+     */
+    readonly fromIndexedAt?: string
 
     /**
      * Maximum number of trades to return per page
