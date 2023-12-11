@@ -18,6 +18,7 @@
   "private": true,
   "scripts": {
     "build": "",
+    "mapToken": "ts-node --esm ./src/mapToken.ts",
     "deposit": "ts-node --esm ./src/deposit.ts",
     "withdraw": "ts-node --esm ./src/withdraw.ts",
     "fees": "ts-node --esm ./src/fees.ts",
