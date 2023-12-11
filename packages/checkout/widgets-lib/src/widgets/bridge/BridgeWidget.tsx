@@ -196,7 +196,7 @@ export function BridgeWidget({
             />
           )}
           {viewState.view.type === XBridgeWidgetViews.TRANSACTIONS && (
-            <Transactions />
+            <Transactions globalWeb3Provider={web3Provider} />
           )}
           {viewState.view.type === SharedViews.ERROR_VIEW && (
             <ErrorView
