@@ -6,7 +6,6 @@ import {
   WidgetConfiguration,
   WidgetProperties,
 } from '@imtbl/checkout-sdk';
-import { Bridge } from 'widgets/bridge/BridgeWidgetRoot';
 import { Connect } from 'widgets/connect/ConnectWidgetRoot';
 import { Swap } from 'widgets/swap/SwapWidgetRoot';
 import { OnRamp } from 'widgets/on-ramp/OnRampWidgetRoot';
@@ -23,8 +22,6 @@ export class WidgetsFactory implements IWidgetsFactory {
   private sdk: Checkout;
 
   private widgetConfig: WidgetConfiguration;
-
-  private useCrossWalletBridgeComponent: boolean = process.env.CHECKOUT_X_WALLET_BRIDGE === 'true';
 
   constructor(sdk: Checkout, widgetConfig: WidgetConfiguration) {
     this.sdk = sdk;
@@ -47,13 +44,7 @@ export class WidgetsFactory implements IWidgetsFactory {
         }) as Widget<WidgetType.CONNECT> as Widget<T>;
       }
       case WidgetType.BRIDGE: {
-        if (this.useCrossWalletBridgeComponent) {
-          return new XBridge(this.sdk, {
-            config: { ...this.widgetConfig, ...(config) },
-            provider,
-          }) as Widget<WidgetType.BRIDGE> as Widget<T>;
-        }
-        return new Bridge(this.sdk, {
+        return new XBridge(this.sdk, {
           config: { ...this.widgetConfig, ...(config) },
           provider,
         }) as Widget<WidgetType.BRIDGE> as Widget<T>;

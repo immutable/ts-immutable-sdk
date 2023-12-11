@@ -4,7 +4,7 @@
   "dependencies": {
     "@imtbl/bridge-sdk": "0.0.0",
     "@imtbl/config": "0.0.0",
-    "dotenv": "^16.3.1",
+    "dotenv": "^16.0.3",
     "ethers": "^5.7.2"
   },
   "devDependencies": {
@@ -17,13 +17,13 @@
   },
   "private": true,
   "scripts": {
-    "build": "",
-    "deposit": "ts-node --esm ./src/deposit.ts",
-    "withdraw": "ts-node --esm ./src/withdraw.ts",
-    "fees": "ts-node --esm ./src/fees.ts",
     "approval": "ts-node --esm ./src/approval.ts",
     "bridge": "ts-node --esm ./src/bridge.ts",
-    "lint": "eslint ./src --ext .ts --max-warnings=0"
+    "build": "",
+    "deposit": "ts-node --esm ./src/deposit.ts",
+    "fees": "ts-node --esm ./src/fees.ts",
+    "lint": "eslint ./src --ext .ts --max-warnings=0",
+    "withdraw": "ts-node --esm ./src/withdraw.ts"
   },
   "type": "module"
 }

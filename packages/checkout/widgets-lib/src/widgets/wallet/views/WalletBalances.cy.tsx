@@ -238,8 +238,8 @@ describe('WalletBalances', () => {
         .as('gasEstimateStub')
         .resolves({
           gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-          gasFee: {
-            estimatedAmount: BigNumber.from('10000000000000000'),
+          fees: {
+            totalFees: BigNumber.from('10000000000000000'),
           },
         });
 
