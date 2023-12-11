@@ -8,7 +8,7 @@ import { openPopupCenter } from './popup';
 import { PassportConfiguration } from '../config';
 
 const CONFIRMATION_WINDOW_TITLE = 'Confirm this transaction';
-const CONFIRMATION_WINDOW_HEIGHT = 380;
+const CONFIRMATION_WINDOW_HEIGHT = 720;
 const CONFIRMATION_WINDOW_WIDTH = 480;
 const CONFIRMATION_WINDOW_CLOSED_POLLING_DURATION = 1000;
 
