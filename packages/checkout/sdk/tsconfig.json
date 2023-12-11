@@ -16,6 +16,6 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
   },
-  "include": ["src", "test/__mocks__/window.ts"],
+  "include": ["src", "test/__mocks__/window.ts", "../widgets-lib/src/lib/clients/checkoutApi.test.ts", "../widgets-lib/src/lib/clients/checkoutApi.ts", "../widgets-lib/src/lib/clients/checkoutApiType.ts"],
   "exclude": ["node_modules", "dist", "test"]
 }

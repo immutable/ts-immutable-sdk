@@ -1,8 +1,4 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-import { CheckoutApi } from './client';
-
 // Widgets
-
 import './widgets/definitions/global';
 
 export * from './widgets/definitions/events';
@@ -13,6 +9,8 @@ export * from './widgets/definitions/configurations';
 // SDKs
 
 export { Checkout } from './sdk';
+
+export { IMMUTABLE_API_BASE_URL } from './env';
 
 export {
   ChainId,
@@ -128,13 +126,3 @@ export type { ErrorType } from './errors';
 
 export { CheckoutErrorType } from './errors';
 export { CheckoutConfiguration } from './config';
-
-export type {
-  TransactionType,
-  Transactions,
-  TransactionDetails,
-  BlockchainMetadata,
-  Transaction,
-} from './client';
-
-export const ServiceClients = { CheckoutApi };

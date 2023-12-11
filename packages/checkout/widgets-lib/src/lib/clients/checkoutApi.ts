@@ -1,8 +1,8 @@
 import axios, { AxiosError, HttpStatusCode } from 'axios';
 import { Environment } from '@imtbl/config';
-import { CHECKOUT_API_BASE_URL } from '@imtbl/checkout-sdk/src/env';
+import { ENV_DEVELOPMENT } from 'lib/constants';
+import { IMMUTABLE_API_BASE_URL } from '@imtbl/checkout-sdk';
 import { TransactionType, Transactions } from './checkoutApiType';
-import { ENV_DEVELOPMENT } from '../env';
 
 type CacheData = {
   data: any,
@@ -14,7 +14,7 @@ type GetTransactions = {
   fromAddress: string,
 };
 
-const CACHE_DATA_TTL = 0; // seconds
+const CACHE_DATA_TTL = 60; // seconds
 
 /**
  * Checkout API class provides a client abstraction for the Checkout API.
@@ -48,7 +48,7 @@ export class CheckoutApi {
     ttl?: number
   }) {
     this.env = params.env;
-    this.url = CHECKOUT_API_BASE_URL[this.env];
+    this.url = `${IMMUTABLE_API_BASE_URL[this.env]}/checkout`;
 
     this.cacheMap = {};
     this.ttl = params.ttl !== undefined ? params.ttl : CACHE_DATA_TTL;
