@@ -71,7 +71,7 @@ describe('CheckoutApi', () => {
 
       const txType = TransactionType.BRIDGE;
       const fromAddress = '0x1234567890';
-      const client = new CheckoutApi({ env: Environment.SANDBOX, ttl: 60 });
+      const client = new CheckoutApi({ env: Environment.SANDBOX });
       const precache = await client.getTransactions({ fromAddress, txType });
       const cached = await client.getTransactions({ fromAddress, txType });
 
@@ -95,7 +95,7 @@ describe('CheckoutApi', () => {
 
       const txType = TransactionType.BRIDGE;
       const fromAddress = '0x1234567890';
-      const client = new CheckoutApi({ env: Environment.SANDBOX });
+      const client = new CheckoutApi({ env: Environment.SANDBOX, ttl: 0 });
       const precache = await client.getTransactions({ fromAddress, txType });
       const cached = await client.getTransactions({ fromAddress, txType });
 
