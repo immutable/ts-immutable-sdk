@@ -18,12 +18,15 @@
 import { NFTMetadataAttribute } from './nftmetadata-attribute';
 // May contain unused imports in some cases
 // @ts-ignore
+import { RefreshMetadataByIDAllOf } from './refresh-metadata-by-idall-of';
+// May contain unused imports in some cases
+// @ts-ignore
 import { RefreshableNFTAttributes } from './refreshable-nftattributes';
 
 /**
  * @type RefreshMetadataByID
  * @export
  */
-export type RefreshMetadataByID = RefreshableNFTAttributes;
+export type RefreshMetadataByID = RefreshMetadataByIDAllOf & RefreshableNFTAttributes;
 
 

@@ -1,7 +1,6 @@
-import { BiomeCombinedProviders } from '@biom3/react';
 import React, { useCallback, useMemo, useReducer } from 'react';
-import { onLightBase } from '@biom3/design-tokens';
 import { Checkout } from '@imtbl/checkout-sdk';
+import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import {
   initialXBridgeState,
   XBridgeContext,
@@ -45,12 +44,12 @@ export function XBridgeWidgetTestComponent({ children, initialStateOverride, cry
   ), [cryptoFiatState, cryptoFiatDispatch]);
 
   return (
-    <BiomeCombinedProviders theme={{ base: onLightBase }}>
+    <ViewContextTestComponent>
       <XBridgeContext.Provider value={bridgeReducerValues}>
         <CryptoFiatContext.Provider value={cryptoFiatReducerValues as CryptoFiatContextState}>
           {children}
         </CryptoFiatContext.Provider>
       </XBridgeContext.Provider>
-    </BiomeCombinedProviders>
+    </ViewContextTestComponent>
   );
 }

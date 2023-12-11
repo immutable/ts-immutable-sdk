@@ -1,5 +1,5 @@
 import {
-  BottomSheet,
+  Drawer,
 } from '@biom3/react';
 import { FundingRoute } from '@imtbl/checkout-sdk';
 import { FundingRouteMenuItem } from '../FundingRouteMenuItem/FundingRouteMenuItem';
@@ -8,29 +8,29 @@ import { SaleWidgetViews } from '../../../../context/view-context/SaleViewContex
 
 type FundingRouteDrawerProps = {
   visible: boolean;
-  onCloseBottomSheet: (selectedFundingRouteIndex: number) => void;
+  onCloseDrawer: (selectedFundingRouteIndex: number) => void;
   fundingRoutes: FundingRoute[];
   activeFundingRouteIndex: number;
 };
 
 export function FundingRouteDrawer({
-  visible, onCloseBottomSheet, fundingRoutes, activeFundingRouteIndex,
+  visible, onCloseDrawer, fundingRoutes, activeFundingRouteIndex,
 }:
 FundingRouteDrawerProps) {
   const textConfig = text.views[SaleWidgetViews.FUND_WITH_SMART_CHECKOUT];
   const onClickMenuItem = (selectedFundingRouteIndex: number) => {
-    onCloseBottomSheet(selectedFundingRouteIndex);
+    onCloseDrawer(selectedFundingRouteIndex);
   };
 
   return (
-    <BottomSheet
+    <Drawer
       size="full"
-      onCloseBottomSheet={() => onCloseBottomSheet(activeFundingRouteIndex)}
+      onCloseDrawer={() => onCloseDrawer(activeFundingRouteIndex)}
       visible={visible}
       showHeaderBar
       headerBarTitle={textConfig.fundingRouteDrawer.header}
     >
-      <BottomSheet.Content>
+      <Drawer.Content>
         {fundingRoutes.map((fundingRoute: FundingRoute, i: number) => (
           <FundingRouteMenuItem
             onClick={() => onClickMenuItem(i)}
@@ -40,7 +40,7 @@ FundingRouteDrawerProps) {
             size="medium"
           />
         ))}
-      </BottomSheet.Content>
-    </BottomSheet>
+      </Drawer.Content>
+    </Drawer>
   );
 }

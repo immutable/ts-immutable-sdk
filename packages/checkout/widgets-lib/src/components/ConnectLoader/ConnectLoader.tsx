@@ -1,4 +1,3 @@
-import { BiomeCombinedProviders } from '@biom3/react';
 import { Web3Provider } from '@ethersproject/providers';
 import {
   ChainId,
@@ -8,13 +7,11 @@ import {
   CheckoutErrorType,
 
 } from '@imtbl/checkout-sdk';
-import { BaseTokens } from '@biom3/design-tokens';
 import React, {
   useEffect,
   useMemo,
   useReducer,
 } from 'react';
-import { widgetTheme } from 'lib/theme';
 import { ErrorView } from 'views/error/ErrorView';
 import {
   ConnectLoaderActions,
@@ -72,8 +69,6 @@ export function ConnectLoader({
   } = connectLoaderState;
 
   const networkToSwitchTo = targetLayer ?? ConnectTargetLayer.LAYER2;
-
-  const biomeTheme: BaseTokens = widgetTheme(widgetConfig.theme);
 
   const { identify } = useAnalytics();
 
@@ -227,9 +222,7 @@ export function ConnectLoader({
   return (
     <>
       {(connectionStatus === ConnectionStatus.LOADING) && (
-        <BiomeCombinedProviders theme={{ base: biomeTheme }}>
-          <LoadingView loadingText="Loading" />
-        </BiomeCombinedProviders>
+      <LoadingView loadingText="Loading" />
       )}
       <ConnectLoaderContext.Provider value={connectLoaderReducerValues}>
         {(connectionStatus === ConnectionStatus.NOT_CONNECTED_NO_PROVIDER
@@ -249,20 +242,18 @@ export function ConnectLoader({
         {connectionStatus === ConnectionStatus.CONNECTED_WITH_NETWORK && (children)}
       </ConnectLoaderContext.Provider>
       {connectionStatus === ConnectionStatus.ERROR && (
-        <BiomeCombinedProviders theme={{ base: biomeTheme }}>
-          <ErrorView
-            onCloseClick={closeEvent}
-            onActionClick={() => {
-              connectLoaderDispatch({
-                payload: {
-                  type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
-                  connectionStatus: ConnectionStatus.NOT_CONNECTED,
-                },
-              });
-            }}
-            actionText="Try Again"
-          />
-        </BiomeCombinedProviders>
+      <ErrorView
+        onCloseClick={closeEvent}
+        onActionClick={() => {
+          connectLoaderDispatch({
+            payload: {
+              type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
+              connectionStatus: ConnectionStatus.NOT_CONNECTED,
+            },
+          });
+        }}
+        actionText="Try Again"
+      />
       )}
     </>
   );

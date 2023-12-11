@@ -21,7 +21,7 @@
  */
 export interface ActiveOrderStatus {
     /**
-     * The order status
+     * The order status that indicates an order can be fulfilled.
      * @type {string}
      * @memberof ActiveOrderStatus
      */

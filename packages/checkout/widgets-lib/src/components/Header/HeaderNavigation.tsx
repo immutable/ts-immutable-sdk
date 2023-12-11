@@ -62,7 +62,7 @@ export function HeaderNavigation({
       <AppHeaderBar.Title testId="header-title" size="small">
         {title}
       </AppHeaderBar.Title>
-      <AppHeaderBar.RightHandButtons>
+      <AppHeaderBar.RightSlot>
         {showSettings && onSettingsClick && (
           <ButtCon
             icon="SettingsCog"
@@ -81,7 +81,7 @@ export function HeaderNavigation({
             testId="close-button"
           />
         )}
-      </AppHeaderBar.RightHandButtons>
+      </AppHeaderBar.RightSlot>
     </AppHeaderBar>
   );
 }

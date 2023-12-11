@@ -5,7 +5,6 @@ import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContex
 import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
 import { SharedViews } from '../../context/view-context/ViewContext';
 import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
-import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
 import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextTypes';
 import { SaleWidgetViews } from '../../context/view-context/SaleViewContextTypes';
 import { SaleErrorTypes, PaymentTypes } from '../../widgets/sale/types';
@@ -198,78 +197,6 @@ export const text = {
           text: 'Approving spending cap',
         },
       },
-    },
-    [BridgeWidgetViews.BRIDGE]: {
-      header: {
-        title: 'Move coins',
-      },
-      content: {
-        title: 'What would you like to move from Ethereum to Immutable zkEVM?',
-        fiatPricePrefix: 'Approx USD',
-        availableBalancePrefix: 'Available',
-      },
-      bridgeForm: {
-        from: {
-          inputPlaceholder: '0',
-          selectorTitle: 'What would you like to move?',
-        },
-        buttonText: 'Review',
-      },
-      fees: {
-        title: 'Fees subtotal',
-      },
-      validation: {
-        noAmountInputted: 'Please input amount',
-        insufficientBalance: 'Insufficient balance',
-        noTokenSelected: 'Select a coin to move',
-      },
-    },
-    [BridgeWidgetViews.IN_PROGRESS]: {
-      heading: 'Move in progress',
-      body1: (symbol: string) => `Less than 3 mins until your ${symbol} lands on zkEVM.`,
-      body2:
-        'You can close this window, the transaction will be reflected in your wallet once complete.',
-    },
-    [BridgeWidgetViews.APPROVE_ERC20]: {
-      approveBridge: {
-        content: {
-          heading: "Now you'll just need to approve the transaction",
-          body: 'Follow the prompts in MetaMask.',
-        },
-        footer: {
-          buttonText: 'Okay',
-          retryText: 'Try again',
-        },
-      },
-      approveSpending: {
-        content: {
-          heading: "You'll be asked to set a spending cap for this transaction",
-          body: [
-            'Input at least',
-            'for this transaction and future transactions, then follow the prompts.',
-          ],
-        },
-        footer: {
-          buttonText: 'Got it',
-          retryText: 'Try again',
-        },
-        loading: {
-          text: 'Approving spending cap',
-        },
-      },
-    },
-    [BridgeWidgetViews.SUCCESS]: {
-      text: 'Success',
-      actionText: 'Continue',
-    },
-    [BridgeWidgetViews.FAIL]: {
-      text: 'Transaction failed',
-      actionText: 'Review & Try again',
-    },
-    [BridgeWidgetViews.BRIDGE_COMING_SOON]: {
-      heading: 'Coming soon',
-      body: "Moving funds across networks currently isn't supported for Passport.",
-      actionText: 'Dismiss',
     },
     [OnRampWidgetViews.ONRAMP]: {
       header: {
@@ -473,6 +400,11 @@ export const text = {
         },
         buttonText: 'Review',
       },
+      validation: {
+        noAmountInputted: 'Please input amount',
+        insufficientBalance: 'Insufficient balance',
+        noTokenSelected: 'Select a coin to move',
+      },
     },
     [XBridgeWidgetViews.BRIDGE_REVIEW]: {
       layoutHeading: 'Move',
@@ -505,9 +437,14 @@ export const text = {
         buttonText: 'Okay',
         retryText: 'Try again',
       },
-      loading: {
+      loadingView: {
         text: 'Initiating move',
       },
+    },
+    [XBridgeWidgetViews.IN_PROGRESS]: {
+      heading: 'Move in progress',
+      body1: (symbol: string) => `Less than 3 mins until your ${symbol} lands on zkEVM.`,
+      body2: 'You can close this window, the transaction will be reflected in your wallet once complete.',
     },
   },
   footers: {

@@ -19,6 +19,7 @@ import {
   useContext,
   useEffect, useMemo, useReducer, useRef, useState,
 } from 'react';
+import { XBridgeWidget } from 'widgets/x-bridge/XBridgeWidget';
 import {
   ConnectLoaderActions,
   ConnectLoaderContext,
@@ -32,7 +33,6 @@ import { ViewActions, ViewContext } from '../../../../context/view-context/ViewC
 import { getL1ChainId, getL2ChainId } from '../../../../lib/networkUtils';
 import { text as textConfig } from '../../../../resources/text/textConfig';
 import { LoadingView } from '../../../../views/loading/LoadingView';
-import { BridgeWidget } from '../../../bridge/BridgeWidget';
 import { ConnectWidget } from '../../../connect/ConnectWidget';
 import { SwapWidget } from '../../../swap/SwapWidget';
 import { useSaleContext } from '../../context/SaleContextProvider';
@@ -232,9 +232,10 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
         <LoadingView loadingText={text.loading.checkingBalances} />
       )}
       {view === FundingRouteExecuteViews.EXECUTE_BRIDGE && (
-        <BridgeWidget
+        <XBridgeWidget
           {...bridgeParams!}
           config={config}
+          checkout={checkout!}
         />
       )}
       {view === FundingRouteExecuteViews.EXECUTE_SWAP && (

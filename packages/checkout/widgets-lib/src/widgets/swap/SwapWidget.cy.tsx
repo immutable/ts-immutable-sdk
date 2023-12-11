@@ -7,8 +7,8 @@ import {
 } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
-import { BiomeCombinedProviders } from '@biom3/react';
 import { Web3Provider } from '@ethersproject/providers';
+import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { SwapWidget } from './SwapWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
@@ -19,7 +19,6 @@ import { ConnectionStatus } from '../../context/connect-loader-context/ConnectLo
 import {
   ConnectLoaderTestComponent,
 } from '../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
-import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 import { NATIVE } from '../../lib';
 
 describe('SwapWidget tests', () => {
@@ -122,17 +121,14 @@ describe('SwapWidget tests', () => {
         });
 
       mount(
-        <CustomAnalyticsProvider widgetConfig={config}>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <SwapWidget
-              {...params}
-              config={config}
-            />
-          </ConnectLoaderTestComponent>
-          ,
-        </CustomAnalyticsProvider>,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <SwapWidget
+            {...params}
+            config={config}
+          />
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('not-enough-gas-bottom-sheet').should('be.visible');
@@ -162,17 +158,14 @@ describe('SwapWidget tests', () => {
         });
 
       mount(
-        <CustomAnalyticsProvider widgetConfig={config}>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <SwapWidget
-              {...params}
-              config={config}
-            />
-          </ConnectLoaderTestComponent>
-          ,
-        </CustomAnalyticsProvider>,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <SwapWidget
+            {...params}
+            config={config}
+          />
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('not-enough-gas-bottom-sheet').should('be.visible');
@@ -202,17 +195,14 @@ describe('SwapWidget tests', () => {
         });
 
       mount(
-        <CustomAnalyticsProvider widgetConfig={config}>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <SwapWidget
-              {...params}
-              config={config}
-            />
-          </ConnectLoaderTestComponent>
-          ,
-        </CustomAnalyticsProvider>,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <SwapWidget
+            {...params}
+            config={config}
+          />
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('not-enough-gas-bottom-sheet').should('not.exist');
@@ -237,17 +227,14 @@ describe('SwapWidget tests', () => {
         });
 
       mount(
-        <CustomAnalyticsProvider widgetConfig={config}>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <SwapWidget
-              {...params}
-              config={config}
-            />
-          </ConnectLoaderTestComponent>
-          ,
-        </CustomAnalyticsProvider>,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <SwapWidget
+            {...params}
+            config={config}
+          />
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('not-enough-gas-add-imx-button').click();
@@ -299,17 +286,14 @@ describe('SwapWidget tests', () => {
 
     it('should show swap widget on mount', () => {
       mount(
-        <CustomAnalyticsProvider widgetConfig={config}>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <SwapWidget
-              {...params}
-              config={config}
-            />
-          </ConnectLoaderTestComponent>
-          ,
-        </CustomAnalyticsProvider>,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <SwapWidget
+            {...params}
+            config={config}
+          />
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').should('be.visible');
@@ -335,17 +319,14 @@ describe('SwapWidget tests', () => {
         });
 
       mount(
-        <CustomAnalyticsProvider widgetConfig={config}>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <SwapWidget
-              config={config}
-              {...params}
-            />
-          </ConnectLoaderTestComponent>
-          ,
-        </CustomAnalyticsProvider>,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <SwapWidget
+            config={config}
+            {...params}
+          />
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
@@ -373,17 +354,12 @@ describe('SwapWidget tests', () => {
         });
 
       mount(
-        <CustomAnalyticsProvider widgetConfig={config}>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <SwapWidget
-              config={config}
-              {...params}
-            />
-          </ConnectLoaderTestComponent>
-          ,
-        </CustomAnalyticsProvider>,
+        <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
+          <SwapWidget
+            config={config}
+            {...params}
+          />
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('error-view').should('be.visible');
@@ -396,16 +372,14 @@ describe('SwapWidget tests', () => {
 
     it('should set fromTokens to user balances filtered by the token allow list', () => {
       mount(
-        <CustomAnalyticsProvider widgetConfig={config}>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <SwapWidget
-              config={config}
-              {...params}
-            />
-          </ConnectLoaderTestComponent>
-        </CustomAnalyticsProvider>,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <SwapWidget
+            config={config}
+            {...params}
+          />
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
@@ -477,15 +451,13 @@ describe('SwapWidget tests', () => {
           .resolves(mockQuoteFromAmountIn);
 
         mount(
-          <BiomeCombinedProviders>
-            <CustomAnalyticsProvider widgetConfig={config}>
-              <ConnectLoaderTestComponent
-                initialStateOverride={connectLoaderState}
-              >
-                <SwapWidget {...params} config={config} />
-              </ConnectLoaderTestComponent>
-            </CustomAnalyticsProvider>
-          </BiomeCombinedProviders>,
+          <ViewContextTestComponent>
+            <ConnectLoaderTestComponent
+              initialStateOverride={connectLoaderState}
+            >
+              <SwapWidget {...params} config={config} />
+            </ConnectLoaderTestComponent>
+          </ViewContextTestComponent>,
         );
       });
 

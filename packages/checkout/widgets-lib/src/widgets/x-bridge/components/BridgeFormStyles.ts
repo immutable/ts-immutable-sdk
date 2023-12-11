@@ -22,3 +22,7 @@ export const gasAmountHeadingStyles = {
   marginBottom: 'base.spacing.x4',
   color: 'base.color.text.secondary',
 };
+
+export const bridgeButtonIconLoadingStyle = {
+  width: 'base.icon.size.400',
+};
