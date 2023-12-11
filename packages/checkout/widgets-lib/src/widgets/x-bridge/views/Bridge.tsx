@@ -21,10 +21,10 @@ const REFRESH_TOKENS_INTERVAL_MS = 10000;
 
 export interface BridgeProps {
   amount?: string;
-  fromContractAddress?: string;
+  contractAddress?: string;
 }
 
-export function Bridge({ amount, fromContractAddress }: BridgeProps) {
+export function Bridge({ amount, contractAddress }: BridgeProps) {
   const { header } = text.views[XBridgeWidgetViews.BRIDGE_FORM];
   const { bridgeState, bridgeDispatch } = useContext(XBridgeContext);
   const { checkout, from } = bridgeState;
@@ -85,7 +85,7 @@ export function Bridge({ amount, fromContractAddress }: BridgeProps) {
       <BridgeForm
         testId="bridge-form"
         defaultAmount={amount}
-        defaultFromContractAddress={fromContractAddress}
+        defaultFromContractAddress={contractAddress}
         isTokenBalancesLoading={isTokenBalancesLoading}
       />
     </SimpleLayout>

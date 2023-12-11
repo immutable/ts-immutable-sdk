@@ -57,6 +57,8 @@ export function XBridgeWidget({
   checkout,
   web3Provider,
   config,
+  amount,
+  contractAddress,
 }: BridgeWidgetInputs) {
   const { environment } = config;
   const errorText = text.views[SharedViews.ERROR_VIEW];
@@ -158,7 +160,7 @@ export function XBridgeWidget({
             <WalletNetworkSelectionView />
           )}
           {viewState.view.type === XBridgeWidgetViews.BRIDGE_FORM && (
-            <Bridge />
+            <Bridge amount={amount} contractAddress={contractAddress} />
           )}
           {viewState.view.type === XBridgeWidgetViews.BRIDGE_REVIEW && (
             <BridgeReview />

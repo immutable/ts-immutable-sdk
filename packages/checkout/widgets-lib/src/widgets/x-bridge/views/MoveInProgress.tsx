@@ -5,7 +5,7 @@ import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { RocketHero } from '../../../components/Hero/RocketHero';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { text } from '../../../resources/text/textConfig';
-import { sendBridgeSuccessEvent, sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
+import { sendBridgeTransactionSentEvent, sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { XBridgeContext } from '../context/XBridgeContext';
@@ -23,7 +23,7 @@ export function MoveInProgress({ transactionHash }: MoveInProgressProps) {
   } = useContext(XBridgeContext);
 
   useEffect(() => {
-    sendBridgeSuccessEvent(
+    sendBridgeTransactionSentEvent(
       eventTarget,
       transactionHash,
     );
