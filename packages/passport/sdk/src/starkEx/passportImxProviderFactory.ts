@@ -73,11 +73,6 @@ export class PassportImxProviderFactory {
     return this.createProviderInstance(user);
   }
 
-  public async getProviderWithPKCEFlow(authorizationCode: string, state: string): Promise<IMXProvider> {
-    const user = await this.authManager.connectImxPKCEFlow(authorizationCode, state);
-    return this.createProviderInstance(user);
-  }
-
   private async createProviderInstance(user: User): Promise<IMXProvider> {
     if (!user.idToken) {
       throw new PassportError(

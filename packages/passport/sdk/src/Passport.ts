@@ -69,14 +69,6 @@ export class Passport {
     return this.passportImxProviderFactory.getProvider();
   }
 
-  public getPKCEAuthorizationUrl(): string {
-    return this.authManager.getPKCEAuthorizationUrl();
-  }
-
-  public async connectImxPKCEFlow(authorizationCode: string, state: string): Promise<IMXProvider | null> {
-    return this.passportImxProviderFactory.getProviderWithPKCEFlow(authorizationCode, state);
-  }
-
   public connectEvm(): Provider {
     if (this.config.network === Networks.PRODUCTION) {
       throw new Error('EVM is not supported on production network');
@@ -135,6 +127,15 @@ export class Passport {
     timeoutMs?: number,
   ): Promise<UserProfile> {
     const user = await this.authManager.loginWithDeviceFlowCallback(deviceCode, interval, timeoutMs);
+    return user.profile;
+  }
+
+  public loginWithPKCEFlow(): string {
+    return this.authManager.getPKCEAuthorizationUrl();
+  }
+
+  public async loginWithPKCEFlowCallback(authorizationCode: string, state: string): Promise<UserProfile> {
+    const user = await this.authManager.loginWithPKCEFlowCallback(authorizationCode, state);
     return user.profile;
   }
 

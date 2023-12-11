@@ -17,21 +17,14 @@
 /**
  * 
  * @export
- * @interface ActiveOrderStatus
+ * @interface RefreshMetadataByTokenIDAllOf
  */
-export interface ActiveOrderStatus {
+export interface RefreshMetadataByTokenIDAllOf {
     /**
-     * The order status that indicates an order can be fulfilled.
+     * An `uint256` token id as string
      * @type {string}
-     * @memberof ActiveOrderStatus
+     * @memberof RefreshMetadataByTokenIDAllOf
      */
-    'name': ActiveOrderStatusNameEnum;
+    'token_id': string;
 }
-
-export const ActiveOrderStatusNameEnum = {
-    Active: 'ACTIVE'
-} as const;
-
-export type ActiveOrderStatusNameEnum = typeof ActiveOrderStatusNameEnum[keyof typeof ActiveOrderStatusNameEnum];
-
 

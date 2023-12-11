@@ -28,6 +28,8 @@ import { APIError401 } from '../models';
 // @ts-ignore
 import { APIError403 } from '../models';
 // @ts-ignore
+import { APIError404 } from '../models';
+// @ts-ignore
 import { APIError429 } from '../models';
 // @ts-ignore
 import { APIError500 } from '../models';
@@ -41,6 +43,8 @@ import { CreateCounterfactualAddressRequestDeprecated } from '../models';
 import { CreateCounterfactualAddressRes } from '../models';
 // @ts-ignore
 import { CreateCounterfactualAddressResDeprecated } from '../models';
+// @ts-ignore
+import { GetContractAbiRes } from '../models';
 // @ts-ignore
 import { GetLinkedAddressesRes } from '../models';
 // @ts-ignore
@@ -129,6 +133,58 @@ export const PassportApiAxiosParamCreator = function (configuration?: Configurat
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(createCounterfactualAddressRequestDeprecated, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Get a contract abi by contract address and method id
+         * @summary Get a contract abi
+         * @param {string} chainName 
+         * @param {string} contractAddress contract address
+         * @param {string} methodId method id
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getContractAbi: async (chainName: string, contractAddress: string, methodId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'chainName' is not null or undefined
+            assertParamExists('getContractAbi', 'chainName', chainName)
+            // verify required parameter 'contractAddress' is not null or undefined
+            assertParamExists('getContractAbi', 'contractAddress', contractAddress)
+            // verify required parameter 'methodId' is not null or undefined
+            assertParamExists('getContractAbi', 'methodId', methodId)
+            const localVarPath = `/v1/chains/{chain_name}/passport/transaction-metadata`
+                .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (contractAddress !== undefined) {
+                localVarQueryParameter['contract_address'] = contractAddress;
+            }
+
+            if (methodId !== undefined) {
+                localVarQueryParameter['method_id'] = methodId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -249,6 +305,19 @@ export const PassportApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Get a contract abi by contract address and method id
+         * @summary Get a contract abi
+         * @param {string} chainName 
+         * @param {string} contractAddress contract address
+         * @param {string} methodId method id
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getContractAbi(chainName: string, contractAddress: string, methodId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetContractAbiRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getContractAbi(chainName, contractAddress, methodId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * Get all the Ethereum linked addresses for a user based on its userId
          * @summary Get Ethereum linked addresses for a user
          * @param {string} userId The user\&#39;s userId
@@ -300,6 +369,16 @@ export const PassportApiFactory = function (configuration?: Configuration, baseP
          */
         createCounterfactualAddressDeprecated(requestParameters: PassportApiCreateCounterfactualAddressDeprecatedRequest, options?: AxiosRequestConfig): AxiosPromise<CreateCounterfactualAddressResDeprecated> {
             return localVarFp.createCounterfactualAddressDeprecated(requestParameters.createCounterfactualAddressRequestDeprecated, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get a contract abi by contract address and method id
+         * @summary Get a contract abi
+         * @param {PassportApiGetContractAbiRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getContractAbi(requestParameters: PassportApiGetContractAbiRequest, options?: AxiosRequestConfig): AxiosPromise<GetContractAbiRes> {
+            return localVarFp.getContractAbi(requestParameters.chainName, requestParameters.contractAddress, requestParameters.methodId, options).then((request) => request(axios, basePath));
         },
         /**
          * Get all the Ethereum linked addresses for a user based on its userId
@@ -357,6 +436,34 @@ export interface PassportApiCreateCounterfactualAddressDeprecatedRequest {
      * @memberof PassportApiCreateCounterfactualAddressDeprecated
      */
     readonly createCounterfactualAddressRequestDeprecated: CreateCounterfactualAddressRequestDeprecated
+}
+
+/**
+ * Request parameters for getContractAbi operation in PassportApi.
+ * @export
+ * @interface PassportApiGetContractAbiRequest
+ */
+export interface PassportApiGetContractAbiRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof PassportApiGetContractAbi
+     */
+    readonly chainName: string
+
+    /**
+     * contract address
+     * @type {string}
+     * @memberof PassportApiGetContractAbi
+     */
+    readonly contractAddress: string
+
+    /**
+     * method id
+     * @type {string}
+     * @memberof PassportApiGetContractAbi
+     */
+    readonly methodId: string
 }
 
 /**
@@ -423,6 +530,18 @@ export class PassportApi extends BaseAPI {
      */
     public createCounterfactualAddressDeprecated(requestParameters: PassportApiCreateCounterfactualAddressDeprecatedRequest, options?: AxiosRequestConfig) {
         return PassportApiFp(this.configuration).createCounterfactualAddressDeprecated(requestParameters.createCounterfactualAddressRequestDeprecated, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get a contract abi by contract address and method id
+     * @summary Get a contract abi
+     * @param {PassportApiGetContractAbiRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PassportApi
+     */
+    public getContractAbi(requestParameters: PassportApiGetContractAbiRequest, options?: AxiosRequestConfig) {
+        return PassportApiFp(this.configuration).getContractAbi(requestParameters.chainName, requestParameters.contractAddress, requestParameters.methodId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

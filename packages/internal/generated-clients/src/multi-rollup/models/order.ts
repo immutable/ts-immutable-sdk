@@ -79,6 +79,12 @@ export interface Order {
     'id': string;
     /**
      * 
+     * @type {string}
+     * @memberof Order
+     */
+    'order_hash': string;
+    /**
+     * 
      * @type {ProtocolData}
      * @memberof Order
      */
@@ -114,10 +120,23 @@ export interface Order {
      */
     'status': OrderStatus;
     /**
+     * Order type
+     * @type {string}
+     * @memberof Order
+     */
+    'type': OrderTypeEnum;
+    /**
      * Time the Order is last updated
      * @type {string}
      * @memberof Order
      */
     'updated_at': string;
 }
+
+export const OrderTypeEnum = {
+    Listing: 'LISTING'
+} as const;
+
+export type OrderTypeEnum = typeof OrderTypeEnum[keyof typeof OrderTypeEnum];
+
 
