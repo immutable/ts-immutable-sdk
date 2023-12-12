@@ -2199,9 +2199,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.19.13":
-  version: 0.19.13
-  resolution: "@biom3/react@npm:0.19.13"
+"@biom3/react@npm:^0.19.22":
+  version: 0.19.22
+  resolution: "@biom3/react@npm:0.19.22"
   dependencies:
     "@biom3/design-tokens": "*"
     "@emotion/css": ^11.11.2
@@ -2210,6 +2210,7 @@ __metadata:
     buffer: ^6.0.3
     csstype: ^3.1.2
     framer-motion: ^10.12.12
+    localstorage-slim: ^2.7.0
     lodash.debounce: ^4.0.8
     lodash.get: ^4.4.2
     lodash.isequal: ^4.5.0
@@ -2218,7 +2219,7 @@ __metadata:
     react-dom: ^18.2.0
     react-is: ^18.2.0
     ts-deepmerge: ^6.2.0
-  checksum: fb9216823c3dc44b5dec21f83d908ca033cfbc07e83d55d4f4fc0346c5d9b3686979a67438ddb5d55673280b2708ab502a863b95897b0cbba45147d6b83eb649
+  checksum: 2805f7ea8b4e9b61f98a29b903acaf65d36a16f9adee3cc116a9084f58f351331d4a493ddc722738fa470db2458908407d8355a653ab06dbf8a827f45f84df43
   languageName: node
   linkType: hard
 
@@ -3493,7 +3494,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-sdk-sample-app@workspace:packages/checkout/sdk-sample-app"
   dependencies:
-    "@biom3/react": ^0.19.13
+    "@biom3/react": ^0.19.22
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
@@ -3566,7 +3567,7 @@ __metadata:
   resolution: "@imtbl/checkout-widgets-sample-app@workspace:packages/checkout/widgets-sample-app"
   dependencies:
     "@biom3/design-tokens": 0.2.9
-    "@biom3/react": ^0.19.13
+    "@biom3/react": ^0.19.22
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
@@ -3595,7 +3596,7 @@ __metadata:
   resolution: "@imtbl/checkout-widgets@workspace:packages/checkout/widgets-lib"
   dependencies:
     "@biom3/design-tokens": 0.2.9
-    "@biom3/react": ^0.19.13
+    "@biom3/react": ^0.19.22
     "@ethersproject/providers": ^5.7.2
     "@imtbl/bridge-sdk": 0.0.0
     "@imtbl/checkout-sdk": 0.0.0
@@ -3747,7 +3748,7 @@ __metadata:
   resolution: "@imtbl/economy-building-blocks-playground@workspace:packages/internal/economy-building-blocks/playground"
   dependencies:
     "@biom3/design-tokens": 0.2.9
-    "@biom3/react": ^0.19.13
+    "@biom3/react": ^0.19.22
     "@imtbl/blockchain-data": 0.0.0
     "@imtbl/passport": 0.0.0
     "@imtbl/sdk": 0.0.0
@@ -3997,7 +3998,7 @@ __metadata:
   resolution: "@imtbl/passport-sdk-sample-app@workspace:packages/passport/sdk-sample-app"
   dependencies:
     "@biom3/design-tokens": 0.2.9
-    "@biom3/react": ^0.19.13
+    "@biom3/react": ^0.19.22
     "@imtbl/config": 0.0.0
     "@imtbl/core-sdk": ^2.4.0
     "@imtbl/immutablex-client": 0.0.0
@@ -4119,7 +4120,7 @@ __metadata:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
     "@biom3/design-tokens": 0.2.9
-    "@biom3/react": ^0.19.13
+    "@biom3/react": ^0.19.22
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/abstract-signer": ^5.7.0
     "@ethersproject/providers": ^5.7.2
@@ -21559,6 +21560,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"localstorage-slim@npm:^2.7.0":
+  version: 2.7.0
+  resolution: "localstorage-slim@npm:2.7.0"
+  checksum: eaa52251005baca503d28818dcde89c3c4e72c3617497a3bf2f990636c92a1f112c4a67d8eba8a2b70e40c994abe791df5043983e67585455c74d1e0fee58986
+  languageName: node
+  linkType: hard
+
 "locate-path@npm:^3.0.0":
   version: 3.0.0
   resolution: "locate-path@npm:3.0.0"
@@ -26707,7 +26715,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "sample-app@workspace:packages/provider/src/sample-app"
   dependencies:
-    "@biom3/react": ^0.19.13
+    "@biom3/react": ^0.19.22
     "@imtbl/core-sdk": ^2.4.0
     "@imtbl/sdk": 0.0.0
     "@svgr/webpack": ^8.0.1
