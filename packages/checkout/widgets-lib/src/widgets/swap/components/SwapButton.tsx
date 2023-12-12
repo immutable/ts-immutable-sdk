@@ -2,7 +2,7 @@ import { Box, Button } from '@biom3/react';
 import { useContext, useState } from 'react';
 import { TransactionResponse } from '@imtbl/dex-sdk';
 import { CheckoutErrorType } from '@imtbl/checkout-sdk';
-import { text } from '../../../resources/text/textConfig';
+import { useTranslation } from 'react-i18next';
 import { PrefilledSwapForm, SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import {
   ViewContext,
@@ -31,11 +31,11 @@ export interface SwapButtonProps {
 export function SwapButton({
   loading, updateLoading, validator, transaction, data, insufficientFundsForGas, openNotEnoughImxDrawer,
 }: SwapButtonProps) {
+  const { t } = useTranslation();
   const [showTxnRejectedState, setShowTxnRejectedState] = useState(false);
   const { viewDispatch } = useContext(ViewContext);
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
-  const { buttonText } = text.views[SwapWidgetViews.SWAP].swapForm;
   const { track } = useAnalytics();
   const sendTransaction = async () => {
     const isValid = validator();
@@ -165,7 +165,7 @@ export function SwapButton({
       >
         {loading ? (
           <Button.Icon icon="Loading" sx={swapButtonIconLoadingStyle} />
-        ) : buttonText}
+        ) : t('views.SWAP.swapForm.buttonText')}
       </Button>
       <TransactionRejected
         visible={showTxnRejectedState}

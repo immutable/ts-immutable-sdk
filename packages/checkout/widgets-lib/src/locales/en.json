@@ -162,10 +162,7 @@
         "content": {
           "metamask": {
             "heading": "You'll be asked to set a spending cap for this transaction",
-            "body": [
-              "Input at least",
-              "for this transaction and future transactions, then follow the prompts."
-            ]
+            "body": "Input at least {{amount}} for this transaction and future transactions, then follow the prompts."
           },
           "passport": {
             "heading": "You'll be asked to approve a spending cap for this transaction",

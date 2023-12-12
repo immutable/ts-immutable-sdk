@@ -50,385 +50,385 @@
       }
     },
     "ERROR_VIEW": {
-      "heading": "Something's gone wrong",
-      "body": ["You can try again or contact", "support", "for help."],
-      "actionText": "Try again"
+      "heading": "何かがうまくいかない",
+      "body": ["もう一度やってみるか、", "サポート", "に連絡して助けを求めることができます。"],
+      "actionText": "もう一度試す"
     },
     "SERVICE_UNAVAILABLE_ERROR_VIEW": {
       "heading": {
-        "swap": "Swapping is not available in your region"
+        "swap": "お使いの地域ではスワッピングは利用できません"
       },
-      "body": "We’re sorry we cannot provide this service in your region."
+      "body": "お使いの地域ではこのサービスを提供できないことをお詫び申し上げます。"
     },
     "LOADING_VIEW": {
-      "text": "Loading"
+      "text": "読み込み中"
     },
     "WALLET_BALANCES": {
       "header": {
-        "title": "Wallet"
+        "title": "ウォレット"
       },
       "networkStatus": {
-        "heading": "Network"
+        "heading": "ネットワーク"
       },
       "totalTokenBalance": {
-        "heading": "Coins",
-        "totalHeading": "Value"
+        "heading": "コイン",
+        "totalHeading": "価値"
       },
       "tokenBalancesList": {
-        "noTokensFound": "No tokens found"
+        "noTokensFound": "トークンが見つかりません"
       }
     },
     "SETTINGS": {
       "header": {
-        "title": "Settings"
+        "title": "設定"
       },
       "disconnectButton": {
-        "label": "Disconnect Wallet"
+        "label": "ウォレットを切断"
       }
     },
     "COIN_INFO": {
       "metamask": {
-        "heading": "Coins and collectibles are native to networks",
-        "body": "You can switch networks to add coins or move them from one network to another"
+        "heading": "コインとコレクティブルはネットワーク固有です",
+        "body": "コインを追加したり、ネットワーク間でコインを移動したりするには、ネットワークを切り替えることができます"
       },
       "passport": {
-        "heading": "Coins and collectibles are native to networks",
-        "body1": "This network is called Immutable zkEVM. If you have other coins in your Passport and can’t see them here, they might be on another network. ",
-        "body2": " for more info.",
-        "linkText": "Visit our FAQs"
+        "heading": "コインとコレクティブルはネットワーク固有です",
+        "body1": "このネットワークはImmutable zkEVMと呼ばれます。Passportに他のコインがあり、ここに表示されない場合、それらは別のネットワークにあるかもしれません。",
+        "body2": "詳細については、",
+        "linkText": "FAQをご覧ください"
       }
     },
     "SWAP": {
       "header": {
-        "title": "Swap coins"
+        "title": "コインをスワップ"
       },
       "content": {
-        "title": "What would you like to swap?",
-        "fiatPricePrefix": "Approx USD",
-        "availableBalancePrefix": "Available"
+        "title": "何をスワップしたいですか？",
+        "fiatPricePrefix": "約USD",
+        "availableBalancePrefix": "利用可能"
       },
       "swapForm": {
         "from": {
-          "label": "From",
+          "label": "出金元",
           "inputPlaceholder": "0",
-          "selectorTitle": "What would you like to swap from?"
+          "selectorTitle": "何からスワップしたいですか？"
         },
         "to": {
-          "label": "To",
+          "label": "宛先",
           "inputPlaceholder": "0",
-          "selectorTitle": "What would you like to swap to?"
+          "selectorTitle": "何にスワップしたいですか？"
         },
-        "buttonText": "Swap"
+        "buttonText": "スワップ"
       },
       "fees": {
-        "title": "Fees total"
+        "title": "手数料合計"
       },
       "validation": {
-        "noAmountInputted": "Please input amount",
-        "insufficientBalance": "Insufficient balance",
-        "noFromTokenSelected": "Select a coin to swap",
-        "noToTokenSelected": "Select a coin to receive"
+        "noAmountInputted": "金額を入力してください",
+        "insufficientBalance": "残高不足",
+        "noFromTokenSelected": "スワップするコインを選択してください",
+        "noToTokenSelected": "受け取るコインを選択してください"
       },
       "success": {
-        "text": "Success",
-        "actionText": "Continue"
+        "text": "成功",
+        "actionText": "続行"
       },
       "failed": {
-        "text": "Transaction rejected",
-        "actionText": "Try again"
+        "text": "トランザクションが拒否されました",
+        "actionText": "もう一度試す"
       },
       "rejected": {
-        "text": "Price surge",
-        "actionText": "Review & try again"
+        "text": "価格が急騰しています",
+        "actionText": "レビューしてもう一度試す"
       },
       "IN_PROGRESS": {
         "loading": {
-          "text": "Swap in progress"
+          "text": "スワップ進行中"
         }
       }
     },
     "APPROVE_ERC20": {
       "approveSwap": {
         "content": {
-          "heading": "Now you'll just need to confirm the transaction",
-          "body": "Follow the prompts in your wallet."
+          "heading": "これでトランザクションを承認する必要があります",
+          "body": "ウォレットのプロンプトに従ってください。"
         },
         "footer": {
-          "buttonText": "Okay",
-          "retryText": "Try again"
+          "buttonText": "はい",
+          "retryText": "もう一度試す"
         }
       },
       "approveSpending": {
         "content": {
           "metamask": {
-            "heading": "You'll be asked to set a spending cap for this transaction",
+            "heading": "このトランザクションのために支出上限を設定するように求められます",
             "body": [
-              "Input at least",
-              "for this transaction and future transactions, then follow the prompts."
+              "少なくとも入力してください",
+              "このトランザクションおよび将来のトランザクションのために、その後、プロンプトに従ってください。"
             ]
           },
           "passport": {
-            "heading": "You'll be asked to approve a spending cap for this transaction",
-            "body": "Follow the prompts in your wallet to approve the spending cap."
+            "heading": "このトランザクションのために支出上限を承認するように求められます",
+            "body": "ウォレットのプロンプトに従って支出上限を承認してください。"
           }
         },
         "footer": {
-          "buttonText": "Got it",
-          "retryText": "Try again"
+          "buttonText": "了解",
+          "retryText": "もう一度試す"
         },
         "loading": {
-          "text": "Approving spending cap"
+          "text": "支出上限を承認しています"
         }
       }
     },
     "ONRAMP": {
       "header": {
-        "title": "Add coins"
+        "title": "コインを追加"
       },
-      "initialLoadingText": "Taking you to Transak",
+      "initialLoadingText": "Transakに移動しています",
       "IN_PROGRESS_LOADING": {
         "loading": {
-          "text": "Transak is processing your order"
+          "text": "Transakが注文を処理しています"
         }
       },
       "IN_PROGRESS": {
         "content": {
-          "heading": "Order in progress",
-          "body1": "You’ll receive an email from Transak when complete. This can take up to 3 mins.",
-          "body2": "You can close this window, the transaction will be reflected in your wallet once complete."
+          "heading": "注文進行中",
+          "body1": "完了するとTransakからメールが届きます。これには最大3分かかる場合があります。",
+          "body2": "このウィンドウを閉じても、トランザクションは完了次第ウォレットに反映されます。"
         }
       },
       "SUCCESS": {
-        "text": "Coins are on the way",
-        "actionText": "Done"
+        "text": "コインが途中にあります",
+        "actionText": "完了"
       },
       "FAIL": {
-        "text": "Transaction failed",
-        "actionText": "Try again"
+        "text": "トランザクションが失敗しました",
+        "actionText": "もう一度試す"
       }
     },
     "TOP_UP_VIEW": {
       "header": {
-        "title": "How would you like to add coins?"
+        "title": "どのようにしてコインを追加しますか？"
       },
       "topUpOptions": {
         "onramp": {
-          "heading": "Buy with card",
-          "caption": "Google pay & Apple pay available. Minimum $5.",
-          "subcaption": "Fees",
+          "heading": "カードで購入",
+          "caption": "Google PayおよびApple Payが利用可能です。最低$5。",
+          "subcaption": "手数料",
           "disabledCaption": ""
         },
         "swap": {
-          "heading": "Swap my coins",
-          "caption": "Using the coins I have on the same network",
-          "subcaption": "Fees",
-          "disabledCaption": "Not available in your region"
+          "heading": "コインをスワップ",
+          "caption": "同じネットワーク上の自分のコインを使用して",
+          "subcaption": "手数料",
+          "disabledCaption": "お使いの地域では利用できません"
         },
         "bridge": {
-          "heading": "Move my coins",
-          "caption": "From the coins I have on a different network",
-          "subcaption": "Fees ",
+          "heading": "コインを移動",
+          "caption": "異なるネットワーク上の自分のコインから",
+          "subcaption": "手数料 ",
           "disabledCaption": ""
         }
       }
     },
     "FUND_WITH_SMART_CHECKOUT": {
       "loading": {
-        "checkingBalances": "Crunching numbers"
+        "checkingBalances": "数値を計算しています"
       },
       "currency": {
         "usdEstimate": "≈ USD $",
-        "fees": "Fees"
+        "fees": "手数料"
       },
       "fundingRouteDrawer": {
-        "header": "Available balance"
+        "header": "利用可能な残高"
       },
       "fundingRouteSelect": {
-        "heading": "Pay with your",
-        "noRoutesAvailable": "Insufficient coin balance. Please proceed with card instead.",
-        "continue": "Continue",
-        "payWithCardInstead": "No thanks, I'll pay with card",
-        "payWithCard": "Pay with card"
+        "heading": "で支払う",
+        "noRoutesAvailable": "コインの残高が不足しています。代わりにカードで続行してください。",
+        "continue": "続行",
+        "payWithCardInstead": "いいえ、カードで支払います",
+        "payWithCard": "カードで支払う"
       }
     },
     "PAYMENT_METHODS": {
       "header": {
-        "heading": "How would you like to pay?"
+        "heading": "どのようにして支払いますか？"
       },
       "options": {
         "CRYPTO": {
-          "heading": "Coins",
-          "caption": "Using the coins balance in your wallet",
-          "disabledCaption": "We can't see enough coins in your balance"
+          "heading": "コイン",
+          "caption": "ウォレットのコイン残高を使用して",
+          "disabledCaption": "残高に十分なコインが見当たりません"
         },
         "FIAT": {
-          "heading": "Card",
-          "caption": "GooglePay also available with Transak",
+          "heading": "カード",
+          "caption": "GooglePayもTransakで利用可能",
           "disabledCaption": null
         }
       },
       "insufficientCoinsBanner": {
-        "caption": "Insufficient coin balance. Please proceed with card instead."
+        "caption": "コイン残高が不足しています。カードを使用してください。"
       },
       "loading": {
-        "ready": "Ready to purchase",
-        "confirm": "Confirm in your wallet",
-        "processing": "Processing purchase"
+        "ready": "購入の準備ができました",
+        "confirm": "ウォレットで確認してください",
+        "processing": "購入処理中"
       }
     },
     "PAY_WITH_COINS": {
       "header": {
-        "heading": "Pay with your",
-        "caption": "Using the coins balance in your wallet"
+        "heading": "あなたので支払う",
+        "caption": "ウォレットのコイン残高を使用して"
       },
       "button": {
-        "buyNow": "Buy now"
+        "buyNow": "今すぐ購入"
       }
     },
     "PAY_WITH_CARD": {
-      "screenTitle": "Pay with card",
-      "loading": "Taking you to Transak"
+      "screenTitle": "カードで支払う",
+      "loading": "Transakに移動しています"
     },
     "SALE_FAIL": {
       "errors": {
         "TRANSACTION_FAILED": {
-          "description": "Transaction failed",
-          "primaryAction": "Try again",
-          "secondaryAction": "View details"
+          "description": "トランザクションが失敗しました",
+          "primaryAction": "もう一度試す",
+          "secondaryAction": "詳細を表示"
         },
         "SERVICE_BREAKDOWN": {
-          "description": "Sorry, we're unable to process your payment right now. Please try again in a few minutes.",
-          "secondaryAction": "Dismiss"
+          "description": "申し訳ありませんが、現在お支払いを処理できません。数分後にもう一度お試しください。",
+          "secondaryAction": "閉じる"
         },
         "TRANSAK_FAILED": {
-          "description": "Sorry, something went wrong. Please try again.",
-          "primaryAction": "Try again",
-          "secondaryAction": "Dismiss"
+          "description": "申し訳ありませんが、何かがうまくいかなかったようです。もう一度お試しください。",
+          "primaryAction": "もう一度試す",
+          "secondaryAction": "閉じる"
         },
         "WALLET_FAILED": {
-          "description": "Sorry, we're unable to process this right now.",
-          "primaryAction": "Go back",
-          "secondaryAction": "Dismiss"
+          "description": "申し訳ありませんが、現在これを処理できません。",
+          "primaryAction": "戻る",
+          "secondaryAction": "閉じる"
         },
         "WALLET_REJECTED_NO_FUNDS": {
-          "description": "Sorry, something went wrong. Please try again.",
-          "primaryAction": "Go back",
-          "secondaryAction": "Dismiss"
+          "description": "申し訳ありませんが、何かがうまくいかなかったようです。もう一度お試しください。",
+          "primaryAction": "戻る",
+          "secondaryAction": "閉じる"
         },
         "WALLET_REJECTED": {
-          "description": "You'll need to approve the transaction in your wallet to proceed.",
-          "primaryAction": "Try again",
-          "secondaryAction": "Cancel"
+          "description": "取引を承認するには、ウォレットで承認する必要があります。",
+          "primaryAction": "もう一度試す",
+          "secondaryAction": "キャンセル"
         },
         "SMART_CHECKOUT_ERROR": {
-          "description": "Unable to check your wallets balance. Please try again.",
-          "primaryAction": "Try again",
-          "secondaryAction": "Cancel"
+          "description": "ウォレットの残高を確認できません。もう一度お試しください。",
+          "primaryAction": "もう一度試す",
+          "secondaryAction": "キャンセル"
         },
         "SMART_CHECKOUT_EXECUTE_ERROR": {
-          "description": "Sorry, something went wrong while moving funds. Please try again.",
-          "primaryAction": "Try again",
-          "secondaryAction": "Cancel"
+          "description": "資金を移動する際に何かがうまくいかなかったようです。もう一度お試しください。",
+          "primaryAction": "もう一度試す",
+          "secondaryAction": "キャンセル"
         },
         "DEFAULT": {
-          "description": "Sorry, something went wrong. Please try again.",
-          "primaryAction": "Try again",
-          "secondaryAction": "Dismiss"
+          "description": "申し訳ありませんが、何かがうまくいかなかったようです。もう一度お試しください。",
+          "primaryAction": "もう一度試す",
+          "secondaryAction": "閉じる"
         }
       }
     },
     "SALE_SUCCESS": {
-      "text": "Order completed",
-      "actionText": "Continue"
+      "text": "注文が完了しました",
+      "actionText": "続行"
     },
     "WALLET_NETWORK_SELECTION": {
-      "layoutHeading": "Move",
-      "heading": "Where would you like to move funds between?",
+      "layoutHeading": "移動",
+      "heading": "どこに資金を移動させたいですか？",
       "fromFormInput": {
         "heading": "From",
-        "selectDefaultText": "Select wallet and network",
+        "selectDefaultText": "ウォレットとネットワークを選択",
         "walletSelectorHeading": "From wallet",
         "networkSelectorHeading": "From network"
       },
       "toFormInput": {
         "heading": "To",
-        "selectDefaultText": "Select wallet and network",
+        "selectDefaultText": "ウォレットとネットワークを選択",
         "walletSelectorHeading": "To wallet"
       },
       "submitButton": {
-        "text": "Next"
+        "text": "次へ"
       }
     },
     "BRIDGE_FORM": {
       "header": {
-        "title": "Move coins"
+        "title": "コインを移動"
       },
       "fees": {
-        "title": "Gas Fee",
+        "title": "ガス手数料",
         "fiatPricePrefix": "~ USD $"
       },
       "content": {
-        "title": "How much would you like to move?",
-        "fiatPricePrefix": "Approx USD",
-        "availableBalancePrefix": "Available"
+        "title": "いくら移動しますか？",
+        "fiatPricePrefix": "約USD",
+        "availableBalancePrefix": "利用可能"
       },
       "bridgeForm": {
         "from": {
           "inputPlaceholder": "0",
-          "selectorTitle": "What would you like to move?"
+          "selectorTitle": "移動するコインを選択"
         },
-        "buttonText": "Review"
+        "buttonText": "確認"
       },
       "validation": {
-        "noAmountInputted": "Please input amount",
-        "insufficientBalance": "Insufficient balance",
-        "noTokenSelected": "Select a coin to move"
+        "noAmountInputted": "金額を入力してください",
+        "insufficientBalance": "残高が不足しています",
+        "noTokenSelected": "移動するコインを選択してください"
       }
     },
     "BRIDGE_REVIEW": {
-      "layoutHeading": "Move",
-      "heading": "Ok, how does this look?",
+      "layoutHeading": "移動",
+      "heading": "これはどう見えますか？",
       "fromLabel": {
-        "amountHeading": "Moving",
+        "amountHeading": "移動中",
         "heading": "From"
       },
       "toLabel": {
         "heading": "To"
       },
       "fees": {
-        "heading": "Gas fee"
+        "heading": "ガス手数料"
       },
       "submitButton": {
-        "buttonText": "Confirm move"
+        "buttonText": "移動を確認"
       },
       "fiatPricePrefix": "~ USD $"
     },
     "BRIDGE_FAILURE": {
-      "statusText": "Transaction failed",
-      "actionText": "Review & Try again"
+      "statusText": "トランザクションが失敗しました",
+      "actionText": "再確認してもう一度試す"
     },
     "APPROVE_TRANSACTION": {
       "content": {
-        "heading": "Approve the transaction in your wallet",
-        "body": "Follow the prompts in your wallet popup to confirm."
+        "heading": "ウォレットでトランザクションを承認してください",
+        "body": "ウォレットのポップアップで表示されるプロンプトに従って承認してください。"
       },
       "footer": {
-        "buttonText": "Okay",
-        "retryText": "Try again"
+        "buttonText": "OK",
+        "retryText": "もう一度試す"
       },
       "loadingView": {
-        "text": "Initiating move"
+        "text": "移動を開始しています"
       }
     },
     "IN_PROGRESS": {
-      "heading": "Move in progress",
-      "body1": "Less than 3 mins until your ${symbol} lands on zkEVM.",
-      "body2": "You can close this window, the transaction will be reflected in your wallet once complete."
+      "heading": "移動進行中",
+      "body1": "あなたの${symbol}がzkEVMに着陸するまで3分未満。",
+      "body2": "このウィンドウを閉じても、トランザクションは完了したらウォレットに反映されます。"
     }
   },
   "footers": {
     "quickswapFooter": {
-      "disclaimerText": "Quickswap is a third party app. Immutable neither builds, owns, operates or deploys Quickswap. For further info, refer to Quickswap’s website."
+      "disclaimerText": "Quickswapはサードパーティアプリケーションです。ImmutableはQuickswapをビルド、所有、運営、デプロイしていません。詳細については、Quickswapのウェブサイトを参照してください。"
     }
   },
   "wallets": {
@@ -444,65 +444,65 @@
   },
   "drawers": {
     "feesBreakdown": {
-      "heading": "Fee breakdown",
-      "total": "Fees total",
+      "heading": "手数料の内訳",
+      "total": "総手数料",
       "fees": {
         "gas": {
-          "label": "Gas fee"
+          "label": "ガス手数料"
         }
       }
     },
     "transactionFailed": {
       "content": {
-        "heading1": "We’ll need you to confirm in your",
-        "heading2": "wallet before proceeding",
-        "body1": "When the MetaMask pop up appears, be sure to",
-        "body2": "sign the transaction"
+        "heading1": "続行する前に、",
+        "heading2": "ウォレットで確認が必要です",
+        "body1": "MetaMaskのポップアップが表示されたら、",
+        "body2": "トランザクションに署名してください"
       },
       "buttons": {
-        "retry": "Got it",
-        "cancel": "Dismiss"
+        "retry": "了解",
+        "cancel": "閉じる"
       }
     },
     "coinSelector": {
       "option": {
-        "fiatPricePrefix": "Approx USD $"
+        "fiatPricePrefix": "約USD $"
       },
-      "noCoins": "You have no available coins to select in your wallet."
+      "noCoins": "ウォレットで選択できるコインがありません。"
     },
     "notEnoughGas": {
       "content": {
-        "heading": "Balance too low",
-        "body": "You're ETH balance is too low to cover the gas fee on this move. You could transfer more ETH into your wallet using MetaMask directly."
+        "heading": "残高が低すぎます",
+        "body": "この移動のガス手数料をカバーするには、ETH残高が不足しています。MetaMaskを使用して直接ウォレットにETHを送金することができます。"
       },
       "buttons": {
-        "adjustAmount": "Adjust amount",
-        "copyAddress": "Copy wallet address",
-        "cancel": "Dismiss"
+        "adjustAmount": "金額を調整",
+        "copyAddress": "ウォレットアドレスをコピー",
+        "cancel": "閉じる"
       }
     },
     "notEnoughImx": {
       "content": {
         "noImx": {
-          "heading": "You'll need IMX coins to swap",
-          "body": "Swap fees are paid in IMX coins, so you'll need to add this before you can swap"
+          "heading": "IMXコインが必要です",
+          "body": "スワップ手数料はIMXコインで支払われるため、スワップする前にこれを追加する必要があります。"
         },
         "insufficientImx": {
-          "heading": "You'll need more IMX coins",
-          "body": "In order to cover the fees for the amount specified, you'll need to add more IMX coins"
+          "heading": "IMXコインが不足しています",
+          "body": "指定された金額の手数料をカバーするためには、IMXコインを追加する必要があります。"
         }
       },
       "buttons": {
-        "adjustAmount": "Adjust amount",
-        "addMoreImx": "Add IMX coins",
-        "cancel": "Dismiss"
+        "adjustAmount": "金額を調整",
+        "addMoreImx": "IMXコインを追加",
+        "cancel": "閉じる"
       }
     },
     "unableToSwap": {
-      "heading": "Unable to swap this coin",
-      "body": "This coin pairing isn't available to swap right now. Try another selection.",
+      "heading": "このコインはスワップできません",
+      "body": "このコインのペアは現在スワップできません。別の選択肢を試してください。",
       "buttons": {
-        "cancel": "Dismiss"
+        "cancel": "閉じる"
       }
     }
   }
