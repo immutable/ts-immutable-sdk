@@ -1,4 +1,5 @@
 import { BigNumber } from 'ethers';
+import { BridgeFeeResponse } from '@imtbl/bridge-sdk';
 import { TokenInfo } from './tokenInfo';
 
 /**
@@ -22,11 +23,9 @@ export type GasEstimateParams = GasEstimateBridgeToL2Params | GasEstimateSwapPar
 /**
  * An interface representing the parameters for estimating gas for a bridge to L2 transaction {@link Checkout.gasEstimate}.
  * @param {GasEstimateType.BRIDGE_TO_L2} gasEstimateType - The type of gas estimate.
- * @param {boolean} isSpendingCapApprovalRequired - Whether or not spending cap approval is required.
  */
 export interface GasEstimateBridgeToL2Params {
   gasEstimateType: GasEstimateType.BRIDGE_TO_L2;
-  isSpendingCapApprovalRequired: boolean;
 }
 
 /**
@@ -42,29 +41,32 @@ export interface GasEstimateSwapParams {
  * An interface representing the result of a gas estimate for a swap transaction {@link Checkout.gasEstimate}.
  * @interface GasEstimateSwapResult
  * @property {GasEstimateType.SWAP} gasEstimateType - The type of gas estimate, which is always "SWAP".
- * @property {TokenAmountEstimate} gasFee - The estimated gas fee for the swap transaction.
+ * @property {TokenAmountEstimate} fees - The estimated gas fee for the swap transaction.
  */
 export interface GasEstimateSwapResult {
   gasEstimateType: GasEstimateType.SWAP,
-  gasFee: TokenAmountEstimate,
+  fees: TokenAmountEstimate,
 }
 
 /**
  * An interface representing the result of a gas estimate for a bridge to L2 transaction {@link Checkout.gasEstimate}.
  * @interface GasEstimateBridgeToL2Result
  * @property {GasEstimateType.BRIDGE_TO_L2} gasEstimateType - The type of gas estimate.
- * @property {TokenAmountEstimate} gasFee - The estimated gas fee for the transaction.
- * @property {TokenAmountEstimate} bridgeFee - The estimated bridge fee for the transaction.
- * @property {boolean} bridgeable - A boolean indicating whether the transaction is bridgeable.
+ * @property {BridgeFeeResponse} fees - The estimated fees for the transaction.
+ * @property {TokenInfo | undefined} token - The gas token information.
  */
 export interface GasEstimateBridgeToL2Result {
   gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-  gasFee: TokenAmountEstimate;
-  bridgeFee: TokenAmountEstimate;
-  bridgeable: boolean;
+  fees: BridgeFeeResponse;
+  token?: TokenInfo;
 }
+/**
+ * An interface representing the estimated fees.
+ * @property {BigNumber | undefined} totalFees - The estimated fees for the transaction.
+ * @property {TokenInfo | undefined} token - The gas token information.
+ */
 
 export interface TokenAmountEstimate {
-  estimatedAmount?: BigNumber;
+  totalFees?: BigNumber;
   token?: TokenInfo;
 }

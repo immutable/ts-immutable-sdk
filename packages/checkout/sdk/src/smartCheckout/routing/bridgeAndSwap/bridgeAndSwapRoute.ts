@@ -5,8 +5,6 @@ import {
   AvailableRoutingOptions,
   BridgeFundingStep,
   ChainId,
-  FundingRouteFeeEstimate,
-  FundingStepType,
   GetBalanceResult,
   SwapFundingStep,
   TokenInfo,
@@ -203,7 +201,6 @@ export const bridgeAndSwapRoute = async (
   availableRoutingOptions: AvailableRoutingOptions,
   insufficientRequirement: BalanceNativeRequirement | BalanceERC20Requirement,
   ownerAddress: string,
-  feeEstimates: Map<FundingStepType, FundingRouteFeeEstimate>,
   tokenBalances: Map<ChainId, TokenBalanceResult>,
   bridgeableTokens: string[],
   swappableTokens: TokenInfo[],
@@ -265,11 +262,9 @@ export const bridgeAndSwapRoute = async (
       bridgeRoute(
         config,
         readOnlyProviders,
-        ownerAddress,
         availableRoutingOptions,
         bridgeRequirement,
         tokenBalances,
-        feeEstimates,
       ),
     );
     bridgeableRequirementsMap.set(bridgeRequirement.l2address, {

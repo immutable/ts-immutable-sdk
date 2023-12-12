@@ -50,10 +50,10 @@ describe('instance', () => {
       ],
     ]);
 
-    it('should create an instance of TokenBridge', async () => {
+    it('should create an instance of TokenBridge', () => {
       const fromChainId = ChainId.SEPOLIA;
       const toChainId = ChainId.IMTBL_ZKEVM_TESTNET;
-      const bridge = await createBridgeInstance(
+      const bridge = createBridgeInstance(
         fromChainId,
         toChainId,
         readOnlyProviders,
@@ -62,22 +62,22 @@ describe('instance', () => {
       expect(bridge).toBeInstanceOf(TokenBridge);
     });
 
-    it('should throw an error if unsupported root chain provider', async () => {
+    it('should throw an error if unsupported root chain provider', () => {
       const fromChainId = 123 as ChainId;
       const toChainId = ChainId.SEPOLIA;
 
-      await expect(
-        createBridgeInstance(fromChainId, toChainId, readOnlyProviders, config),
-      ).rejects.toThrowError('Chain:123 is not a supported chain');
+      expect(
+        () => createBridgeInstance(fromChainId, toChainId, readOnlyProviders, config),
+      ).toThrowError('Chain:123 is not a supported chain');
     });
 
-    it('should throw an error if unsupported child chain provider', async () => {
+    it('should throw an error if unsupported child chain provider', () => {
       const fromChainId = ChainId.IMTBL_ZKEVM_TESTNET;
       const toChainId = 123 as ChainId;
 
-      await expect(
-        createBridgeInstance(fromChainId, toChainId, readOnlyProviders, config),
-      ).rejects.toThrowError('Chain:123 is not a supported chain');
+      expect(
+        () => createBridgeInstance(fromChainId, toChainId, readOnlyProviders, config),
+      ).toThrowError('Chain:123 is not a supported chain');
     });
   });
 

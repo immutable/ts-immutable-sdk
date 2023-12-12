@@ -187,13 +187,20 @@ describe('view-context', () => {
         {
           view: {
             type: XBridgeWidgetViews.BRIDGE_FAILURE,
+            reason: 'Transaction failed',
           },
           history: [
             { type: XBridgeWidgetViews.WALLET_NETWORK_SELECTION },
             { type: XBridgeWidgetViews.BRIDGE_FORM },
             { type: XBridgeWidgetViews.BRIDGE_REVIEW },
-            { type: XBridgeWidgetViews.IN_PROGRESS },
-            { type: XBridgeWidgetViews.BRIDGE_FAILURE },
+            {
+              type: XBridgeWidgetViews.IN_PROGRESS,
+              transactionHash: '',
+            },
+            {
+              type: XBridgeWidgetViews.BRIDGE_FAILURE,
+              reason: 'Transaction failed',
+            },
           ],
         },
         { payload: { type: ViewActions.GO_BACK_TO, view: { type: XBridgeWidgetViews.BRIDGE_REVIEW } } },
@@ -216,14 +223,21 @@ describe('view-context', () => {
         {
           view: {
             type: XBridgeWidgetViews.BRIDGE_FAILURE,
+            reason: 'Transaction failed',
           },
           history: [
             { type: XBridgeWidgetViews.WALLET_NETWORK_SELECTION },
             { type: XBridgeWidgetViews.BRIDGE_REVIEW },
             { type: XBridgeWidgetViews.BRIDGE_FORM },
             { type: XBridgeWidgetViews.BRIDGE_REVIEW },
-            { type: XBridgeWidgetViews.IN_PROGRESS },
-            { type: XBridgeWidgetViews.BRIDGE_FAILURE },
+            {
+              type: XBridgeWidgetViews.IN_PROGRESS,
+              transactionHash: '',
+            },
+            {
+              type: XBridgeWidgetViews.BRIDGE_FAILURE,
+              reason: 'Transaction failed',
+            },
           ],
         },
         { payload: { type: ViewActions.GO_BACK_TO, view: { type: XBridgeWidgetViews.BRIDGE_REVIEW } } },
@@ -247,13 +261,20 @@ describe('view-context', () => {
         {
           view: {
             type: XBridgeWidgetViews.BRIDGE_FAILURE,
+            reason: 'Transaction failed',
           },
           history: [
             { type: XBridgeWidgetViews.WALLET_NETWORK_SELECTION },
             { type: XBridgeWidgetViews.BRIDGE_FORM },
             { type: XBridgeWidgetViews.BRIDGE_REVIEW },
-            { type: XBridgeWidgetViews.IN_PROGRESS },
-            { type: XBridgeWidgetViews.BRIDGE_FAILURE },
+            {
+              type: XBridgeWidgetViews.IN_PROGRESS,
+              transactionHash: '',
+            },
+            {
+              type: XBridgeWidgetViews.BRIDGE_FAILURE,
+              reason: 'Transaction failed',
+            },
           ],
         },
         { payload: { type: ViewActions.GO_BACK_TO, view: { type: SharedViews.LOADING_VIEW } } },
@@ -262,13 +283,20 @@ describe('view-context', () => {
       expect(state).toEqual({
         view: {
           type: XBridgeWidgetViews.BRIDGE_FAILURE,
+          reason: 'Transaction failed',
         },
         history: [
           { type: XBridgeWidgetViews.WALLET_NETWORK_SELECTION },
           { type: XBridgeWidgetViews.BRIDGE_FORM },
           { type: XBridgeWidgetViews.BRIDGE_REVIEW },
-          { type: XBridgeWidgetViews.IN_PROGRESS },
-          { type: XBridgeWidgetViews.BRIDGE_FAILURE },
+          {
+            type: XBridgeWidgetViews.IN_PROGRESS,
+            transactionHash: '',
+          },
+          {
+            type: XBridgeWidgetViews.BRIDGE_FAILURE,
+            reason: 'Transaction failed',
+          },
         ],
       });
     });

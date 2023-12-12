@@ -5,7 +5,6 @@ import { Quote } from '@imtbl/dex-sdk';
 import { CheckoutConfiguration } from '../../../config';
 import {
   ChainId,
-  FundingRouteFeeEstimate,
   FundingStepType,
   ItemType,
   TokenInfo,
@@ -42,32 +41,6 @@ describe('bridgeAndSwapRoute', () => {
     bridge: true,
     swap: true,
   };
-
-  const feeEstimates = new Map<FundingStepType, FundingRouteFeeEstimate>([
-    [
-      FundingStepType.BRIDGE,
-      {
-        type: FundingStepType.BRIDGE,
-        gasFee: {
-          estimatedAmount: BigNumber.from(1),
-          token: {
-            name: 'Ethereum',
-            symbol: 'ETH',
-            decimals: 18,
-          },
-        },
-        bridgeFee: {
-          estimatedAmount: BigNumber.from(1),
-          token: {
-            name: 'Ethereum',
-            symbol: 'ETH',
-            decimals: 18,
-          },
-        },
-        totalFees: BigNumber.from(2),
-      },
-    ],
-  ]);
 
   const tokenBalances = new Map<ChainId, TokenBalanceResult>([
     [ChainId.IMTBL_ZKEVM_TESTNET, {
@@ -444,7 +417,6 @@ describe('bridgeAndSwapRoute', () => {
       availableRoutingOptions,
       insufficientRequirement,
       ownerAddress,
-      feeEstimates,
       tokenBalances,
       bridgeableTokens,
       swappableTokens,
@@ -643,7 +615,6 @@ describe('bridgeAndSwapRoute', () => {
       availableRoutingOptions,
       insufficientRequirement,
       ownerAddress,
-      feeEstimates,
       tokenBalances,
       bridgeableTokens,
       swappableTokens,
