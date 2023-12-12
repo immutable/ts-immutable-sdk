@@ -351,21 +351,13 @@ describe('Top Up View', () => {
         .onFirstCall()
         .resolves({
           gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-          gasFee: {
-            estimatedAmount: BigNumber.from(1000000000000000),
-            token: {
-              name: 'Ethereum',
-              symbol: 'ETH',
-              decimals: 18,
-            },
+          fees: {
+            totalFees: BigNumber.from(1000000000000000),
           },
-          bridgeFee: {
-            estimatedAmount: BigNumber.from(1000000000000000),
-            token: {
-              name: 'Ethereum',
-              symbol: 'ETH',
-              decimals: 18,
-            },
+          token: {
+            name: 'Ethereum',
+            symbol: 'ETH',
+            decimals: 18,
           },
         });
 
@@ -397,7 +389,7 @@ describe('Top Up View', () => {
       cySmartGet('menu-item-caption-bridge').contains(
         'From the coins I have on a different network',
       );
-      cySmartGet('menu-item-caption-bridge').contains('$4.00 USD');
+      cySmartGet('menu-item-caption-bridge').contains('$2.00 USD');
 
       cySmartGet('menu-item-caption-onramp').contains(
         'Google pay & Apple pay available. Minimum $5.',
@@ -429,21 +421,13 @@ describe('Top Up View', () => {
         .as('gasEstimateStub')
         .resolves({
           gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-          gasFee: {
-            estimatedAmount: BigNumber.from(100000000000000),
-            token: {
-              name: 'Ethereum',
-              symbol: 'ETH',
-              decimals: 18,
-            },
+          fees: {
+            totalFees: BigNumber.from(100000000000000),
           },
-          bridgeFee: {
-            estimatedAmount: BigNumber.from(100000000000000),
-            token: {
-              name: 'Ethereum',
-              symbol: 'ETH',
-              decimals: 18,
-            },
+          token: {
+            name: 'Ethereum',
+            symbol: 'ETH',
+            decimals: 18,
           },
         });
 
@@ -474,7 +458,7 @@ describe('Top Up View', () => {
       cySmartGet('menu-item-caption-bridge').contains(
         'From the coins I have on a different network',
       );
-      cySmartGet('menu-item-caption-bridge').contains('$0.40 USD');
+      cySmartGet('menu-item-caption-bridge').contains('$0.20 USD');
 
       cySmartGet('menu-item-caption-onramp').contains(
         'Google pay & Apple pay available. Minimum $5.',

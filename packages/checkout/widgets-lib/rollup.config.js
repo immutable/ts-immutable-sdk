@@ -10,7 +10,6 @@ const defaultPlugin = [
   replace({
     preventAssignment: true,
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
-    'process.env.CHECKOUT_X_WALLET_BRIDGE': JSON.stringify(process.env.CHECKOUT_X_WALLET_BRIDGE || 'false'),
   }),
   typescript()
 ]
