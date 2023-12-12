@@ -170,18 +170,29 @@ export function XBridgeWidget({
               transactionHash={viewState.view.transactionHash}
             />
           )}
-          {viewState.view.type === XBridgeWidgetViews.BRIDGE_FAILURE && (
-            <StatusView
-              testId="bridge-fail"
-              statusText={bridgeFailureText.statusText}
-              actionText={bridgeFailureText.actionText}
-              onActionClick={goBackToReview}
-              statusType={StatusType.FAILURE}
-              onRenderEvent={() => sendBridgeFailedEvent(eventTarget, viewState.view.data.reason)}
-            />
-          )}
+          {viewState.view.type === XBridgeWidgetViews.BRIDGE_FAILURE
+            && (
+              <StatusView
+                testId="bridge-fail"
+                statusText={bridgeFailureText.statusText}
+                actionText={bridgeFailureText.actionText}
+                onActionClick={goBackToReview}
+                statusType={StatusType.FAILURE}
+                onRenderEvent={() => {
+                  let reason = '';
+                  if (viewState.view.type === XBridgeWidgetViews.BRIDGE_FAILURE) {
+                    reason = viewState.view.reason;
+                  }
+                  sendBridgeFailedEvent(eventTarget, reason);
+                }}
+              />
+            )}
+
           {viewState.view.type === XBridgeWidgetViews.APPROVE_TRANSACTION && (
-            <ApproveTransaction data={viewReducerValues.viewState.view.data} />
+            <ApproveTransaction
+              approveTransaction={viewState.view.approveTransaction}
+              transaction={viewState.view.transaction}
+            />
           )}
           {viewState.view.type === SharedViews.ERROR_VIEW && (
             <ErrorView

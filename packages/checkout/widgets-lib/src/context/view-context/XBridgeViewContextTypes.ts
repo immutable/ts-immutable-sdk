@@ -42,10 +42,6 @@ interface XBridgeFailure extends ViewType {
 
 interface XBridgeApproveTransaction extends ViewType {
   type: XBridgeWidgetViews.APPROVE_TRANSACTION,
-  data: ApproveTransactionData
-}
-
-export interface ApproveTransactionData {
   approveTransaction: ApproveBridgeResponse;
   transaction: BridgeTxResponse;
 }

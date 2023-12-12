@@ -5,6 +5,7 @@ import {
   useState,
 } from 'react';
 import { CheckoutErrorType } from '@imtbl/checkout-sdk';
+import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
@@ -16,14 +17,15 @@ import { LoadingView } from '../../../views/loading/LoadingView';
 import { XBridgeContext } from '../context/XBridgeContext';
 import { WalletApproveHero } from '../../../components/Hero/WalletApproveHero';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
-import { ApproveTransactionData, XBridgeWidgetViews } from '../../../context/view-context/XBridgeViewContextTypes';
+import { XBridgeWidgetViews } from '../../../context/view-context/XBridgeViewContextTypes';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 
 export interface ApproveTransactionProps {
-  data: ApproveTransactionData;
+  approveTransaction: ApproveBridgeResponse;
+  transaction: BridgeTxResponse;
 }
 
-export function ApproveTransaction({ data }: ApproveTransactionProps) {
+export function ApproveTransaction({ approveTransaction, transaction }: ApproveTransactionProps) {
   const { bridgeState } = useContext(XBridgeContext);
   const {
     checkout,
@@ -104,7 +106,7 @@ export function ApproveTransaction({ data }: ApproveTransactionProps) {
 
   const handleApproveBridgeClick = useCallback(async () => {
     let bridgeRejected = false;
-    if (!checkout || !from?.web3Provider || !data.transaction) {
+    if (!checkout || !from?.web3Provider || !transaction) {
       showErrorView();
       return;
     }
@@ -112,12 +114,12 @@ export function ApproveTransaction({ data }: ApproveTransactionProps) {
     setActionDisabled(true);
 
     // Approvals as required
-    if (data.approveTransaction.unsignedTx) {
+    if (approveTransaction.unsignedTx) {
       try {
         setTxProcessing(true);
         const approveSpendingResult = await checkout.sendTransaction({
           provider: from.web3Provider,
-          transaction: data.approveTransaction.unsignedTx,
+          transaction: approveTransaction.unsignedTx,
         });
         const approvalReceipt = await approveSpendingResult.transactionResponse.wait();
         if (approvalReceipt.status !== 1) {
@@ -150,7 +152,7 @@ export function ApproveTransaction({ data }: ApproveTransactionProps) {
       setTxProcessing(true);
       const sendResult = await checkout.sendTransaction({
         provider: from.web3Provider,
-        transaction: data.transaction.unsignedTx,
+        transaction: transaction.unsignedTx,
       });
 
       setLoading(true);
@@ -194,8 +196,8 @@ export function ApproveTransaction({ data }: ApproveTransactionProps) {
     from,
     showErrorView,
     viewDispatch,
-    data.transaction,
-    data.approveTransaction,
+    transaction,
+    approveTransaction,
     actionDisabled,
   ]);
 

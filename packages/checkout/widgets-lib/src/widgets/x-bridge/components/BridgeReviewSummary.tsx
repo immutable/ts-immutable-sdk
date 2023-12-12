@@ -176,10 +176,8 @@ export function BridgeReviewSummary() {
         type: ViewActions.UPDATE_VIEW,
         view: {
           type: XBridgeWidgetViews.APPROVE_TRANSACTION,
-          data: {
-            approveTransaction,
-            transaction,
-          },
+          approveTransaction,
+          transaction,
         },
       },
     });
