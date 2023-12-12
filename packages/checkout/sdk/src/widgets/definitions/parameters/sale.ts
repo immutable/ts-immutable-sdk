@@ -19,6 +19,7 @@ export type SaleWidgetParams = {
   items?: SaleItem[];
   /** The wallet provider name to default to if no web3Provider is passed */
   walletProviderName?: WalletProviderName;
+  language?: 'en' | 'ja';
 };
 
 /**

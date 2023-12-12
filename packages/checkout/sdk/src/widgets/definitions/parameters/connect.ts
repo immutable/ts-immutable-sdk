@@ -4,4 +4,5 @@ export enum ConnectTargetLayer {
 }
 
 export type ConnectWidgetParams = {
+  language?: 'en' | 'ja';
 };

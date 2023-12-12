@@ -42,6 +42,8 @@ function ConnectUI() {
       <div id={CONNECT_TARGET_ID}></div>
       <button onClick={() => connect?.mount(CONNECT_TARGET_ID)}>Mount</button>
       <button onClick={() => connect?.unmount()}>Unmount</button>
+      <button onClick={() => connect?.update({ config: { language: 'en'}})}>Set Language: EN</button>
+      <button onClick={() => connect?.update({ config: { language: 'ja'}})}>Set Language: JA</button>
     </div>
   );
 }

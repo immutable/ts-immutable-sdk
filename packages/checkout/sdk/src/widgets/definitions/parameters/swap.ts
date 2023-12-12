@@ -16,4 +16,5 @@ export type SwapWidgetParams = {
   toTokenAddress?: string;
   /** The wallet provider name to use for the swap widget */
   walletProviderName?: WalletProviderName;
+  language?: 'en' | 'ja';
 };

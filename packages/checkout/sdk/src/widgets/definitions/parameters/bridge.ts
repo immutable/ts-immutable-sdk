@@ -14,4 +14,5 @@ export type BridgeWidgetParams = {
   amount?: string;
   /** The wallet provider name to use for the bridge widget */
   walletProviderName?: WalletProviderName;
+  language?: 'en' | 'ja';
 };

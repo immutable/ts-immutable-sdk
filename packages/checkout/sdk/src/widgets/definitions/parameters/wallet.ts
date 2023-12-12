@@ -7,5 +7,6 @@ import { WalletProviderName } from '../../../types';
  */
 export type WalletWidgetParams = {
   /** The wallet provider name to use for the wallet widget */
-  walletProviderName?: WalletProviderName
+  walletProviderName?: WalletProviderName;
+  language?: 'en' | 'ja';
 };

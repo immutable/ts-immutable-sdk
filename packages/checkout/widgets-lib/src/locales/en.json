@@ -429,12 +429,12 @@
     }
   },
   "wallets": {
-    "PASSPORT": {
+    "passport": {
       "heading": "Immutable Passport",
       "accentText": "Recommended",
       "description": "digital wallet and identity"
     },
-    "METAMASK": {
+    "metamask": {
       "heading": "MetaMask",
       "description": "Digital wallet for accessing blockchain applications and web3"
     }

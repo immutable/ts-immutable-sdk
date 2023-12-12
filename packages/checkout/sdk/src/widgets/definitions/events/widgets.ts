@@ -26,3 +26,7 @@ export enum ProviderEventType {
 export type ProviderUpdated = {
   provider: Web3Provider;
 };
+
+export type LanguageChanged = {
+  language: 'en' | 'ja';
+};
