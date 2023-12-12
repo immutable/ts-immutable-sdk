@@ -7,7 +7,6 @@ import {
   SignResponse,
   SignOrderInput,
   PaymentTypes,
-
   SignedOrderProduct,
   SignOrderError,
   ExecuteOrderResponse,
@@ -99,7 +98,7 @@ const toSignedProduct = (
   currency,
   collectionAddress: product.detail[0]?.collection_address,
   amount: product.detail.map(({ amount }) => amount),
-  tokenId: product.detail.map(({ token_id: tokenId }) => Number(tokenId)),
+  tokenId: product.detail.map(({ token_id: tokenId }) => tokenId),
 });
 
 const toSignResponse = (
@@ -171,7 +170,10 @@ export const useSignOrder = (input: SignOrderInput) => {
   });
 
   const setExecuteTransactions = (transaction: ExecutedTransaction) => {
-    setExecuteResponse((prev) => ({ ...prev, transactions: [...prev.transactions, transaction] }));
+    setExecuteResponse((prev) => ({
+      ...prev,
+      transactions: [...prev.transactions, transaction],
+    }));
   };
 
   const setExecuteDone = () => setExecuteResponse((prev) => ({ ...prev, done: true }));
