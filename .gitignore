@@ -13,6 +13,7 @@ cache/
 *version.properties
 
 .pnp.*
+.yarn/
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
