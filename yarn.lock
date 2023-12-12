@@ -2199,7 +2199,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:0.19.22, @biom3/react@npm:^0.19.22":
+"@biom3/react@npm:^0.19.22":
   version: 0.19.22
   resolution: "@biom3/react@npm:0.19.22"
   dependencies:
@@ -3567,7 +3567,7 @@ __metadata:
   resolution: "@imtbl/checkout-widgets-sample-app@workspace:packages/checkout/widgets-sample-app"
   dependencies:
     "@biom3/design-tokens": 0.2.9
-    "@biom3/react": 0.19.22
+    "@biom3/react": ^0.19.22
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
@@ -3596,7 +3596,7 @@ __metadata:
   resolution: "@imtbl/checkout-widgets@workspace:packages/checkout/widgets-lib"
   dependencies:
     "@biom3/design-tokens": 0.2.9
-    "@biom3/react": 0.19.22
+    "@biom3/react": ^0.19.22
     "@ethersproject/providers": ^5.7.2
     "@imtbl/bridge-sdk": 0.0.0
     "@imtbl/checkout-sdk": 0.0.0
