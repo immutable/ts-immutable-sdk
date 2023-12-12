@@ -3,7 +3,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import {
   BridgeEventType,
   BridgeFailed,
-  BridgeSuccess,
+  BridgeTransactionSent,
   ConnectEventType,
   ConnectionFailed,
   ConnectionSuccess,
@@ -138,7 +138,7 @@ export type WidgetEventData = {
   } & OrchestrationMapping & ProviderEventMapping
 
   [WidgetType.BRIDGE]: {
-    [BridgeEventType.SUCCESS]: BridgeSuccess,
+    [BridgeEventType.TRANSACTION_SENT]: BridgeTransactionSent,
     [BridgeEventType.FAILURE]: BridgeFailed,
     [BridgeEventType.CLOSE_WIDGET]: {}
   } & OrchestrationMapping & ProviderEventMapping,

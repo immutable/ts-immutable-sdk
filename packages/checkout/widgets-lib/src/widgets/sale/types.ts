@@ -13,7 +13,7 @@ export type SignedOrderProduct = {
   name: string;
   description: string;
   amount: number[];
-  tokenId: number[];
+  tokenId: string[];
   currency: string;
   collectionAddress: string;
 };
@@ -70,7 +70,7 @@ export type ExecutedTransaction = {
 
 export type ExecuteOrderResponse = {
   done: boolean;
-  transactions:ExecutedTransaction[]
+  transactions: ExecutedTransaction[];
 };
 
 export enum SaleErrorTypes {

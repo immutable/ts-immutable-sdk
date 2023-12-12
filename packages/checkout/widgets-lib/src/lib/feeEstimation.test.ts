@@ -40,8 +40,8 @@ describe('feeEstimation', () => {
     it('should get the swap fee estimation', () => {
       const swapFee = {
         gasEstimateType: GasEstimateType.SWAP,
-        gasFee: {
-          estimatedAmount: BigNumber.from(100000000000000),
+        fees: {
+          totalFees: BigNumber.from(100000000000000),
           token: {
             name: 'Ethereum',
             symbol: 'ETH',
@@ -57,7 +57,7 @@ describe('feeEstimation', () => {
     it('should return -.-- if no gasFeeAmount', () => {
       const swapFee = {
         gasEstimateType: GasEstimateType.SWAP,
-        gasFee: {
+        fees: {
           token: {
             name: 'Ethereum',
             symbol: 'ETH',
@@ -73,8 +73,8 @@ describe('feeEstimation', () => {
     it('should return -.-- if no gasFeeToken', () => {
       const swapFee = {
         gasEstimateType: GasEstimateType.SWAP,
-        gasFee: {
-          estimatedAmount: BigNumber.from(100000000000000),
+        fees: {
+          totalFees: BigNumber.from(100000000000000),
         },
       } as GasEstimateSwapResult;
       const conversions: Map<string, number> = new Map([['eth', 1800]]);
@@ -85,8 +85,8 @@ describe('feeEstimation', () => {
     it('should return -.-- if no conversion for token available', () => {
       const swapFee = {
         gasEstimateType: GasEstimateType.SWAP,
-        gasFee: {
-          estimatedAmount: BigNumber.from(100000000000000),
+        fees: {
+          totalFees: BigNumber.from(100000000000000),
           token: {
             name: 'Immutable X',
             symbol: 'IMX',
@@ -104,45 +104,28 @@ describe('feeEstimation', () => {
     it('should get the swap fee estimation', () => {
       const bridgeFees = {
         gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-        gasFee: {
-          estimatedAmount: BigNumber.from(100000000000000),
-          token: {
-            name: 'Ethereum',
-            symbol: 'ETH',
-            decimals: 18,
-          },
+        fees: {
+          totalFees: BigNumber.from(100000000000000),
         },
-        bridgeFee: {
-          estimatedAmount: BigNumber.from(100000000000000),
-          token: {
-            name: 'Ethereum',
-            symbol: 'ETH',
-            decimals: 18,
-          },
+        token: {
+          name: 'Ethereum',
+          symbol: 'ETH',
+          decimals: 18,
         },
       } as GasEstimateBridgeToL2Result;
       const conversions: Map<string, number> = new Map([['eth', 1800]]);
 
-      expect(getBridgeFeeEstimation(bridgeFees, conversions)).toEqual('0.36');
+      expect(getBridgeFeeEstimation(bridgeFees, conversions)).toEqual('0.18');
     });
 
     it('should return -.-- if no gasFee', () => {
       const bridgeFees = {
         gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-        gasFee: {
-          token: {
-            name: 'Ethereum',
-            symbol: 'ETH',
-            decimals: 18,
-          },
-        },
-        bridgeFee: {
-          estimatedAmount: BigNumber.from(100000000000000),
-          token: {
-            name: 'Ethereum',
-            symbol: 'ETH',
-            decimals: 18,
-          },
+        fees: {},
+        token: {
+          name: 'Ethereum',
+          symbol: 'ETH',
+          decimals: 18,
         },
       } as GasEstimateBridgeToL2Result;
       const conversions: Map<string, number> = new Map([['eth', 1800]]);
@@ -153,16 +136,8 @@ describe('feeEstimation', () => {
     it('should return -.-- if no gasFeeToken', () => {
       const bridgeFees = {
         gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-        gasFee: {
-          estimatedAmount: BigNumber.from(100000000000000),
-        },
-        bridgeFee: {
-          estimatedAmount: BigNumber.from(100000000000000),
-          token: {
-            name: 'Ethereum',
-            symbol: 'ETH',
-            decimals: 18,
-          },
+        fees: {
+          totalFees: BigNumber.from(100000000000000),
         },
       } as GasEstimateBridgeToL2Result;
       const conversions: Map<string, number> = new Map([['eth', 1800]]);
@@ -173,24 +148,16 @@ describe('feeEstimation', () => {
     it('should return -.-- if no conversion for token', () => {
       const bridgeFees = {
         gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-        gasFee: {
-          estimatedAmount: BigNumber.from(100000000000000),
-          token: {
-            name: 'Immutable X',
-            symbol: 'IMX',
-            decimals: 18,
-          },
+        fees: {
+          totalFees: BigNumber.from(100000000000000),
         },
-        bridgeFee: {
-          estimatedAmount: BigNumber.from(100000000000000),
-          token: {
-            name: 'Ethereum',
-            symbol: 'ETH',
-            decimals: 18,
-          },
+        token: {
+          name: 'Ethereum',
+          symbol: 'ETH',
+          decimals: 18,
         },
       } as GasEstimateBridgeToL2Result;
-      const conversions: Map<string, number> = new Map([['eth', 1800]]);
+      const conversions: Map<string, number> = new Map([['eth', 0]]);
 
       expect(getBridgeFeeEstimation(bridgeFees, conversions)).toEqual('-.--');
     });
@@ -200,21 +167,13 @@ describe('feeEstimation', () => {
     it('should return fee using gas fee when bridge fee is zero', () => {
       const bridgeFees = {
         gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-        gasFee: {
-          estimatedAmount: BigNumber.from(100000000000000),
-          token: {
-            name: 'Ethereum',
-            symbol: 'ETH',
-            decimals: 18,
-          },
+        fees: {
+          totalFees: BigNumber.from(100000000000000),
         },
-        bridgeFee: {
-          estimatedAmount: BigNumber.from(0),
-          token: {
-            name: 'Ethereum',
-            symbol: 'ETH',
-            decimals: 18,
-          },
+        token: {
+          name: 'Ethereum',
+          symbol: 'ETH',
+          decimals: 18,
         },
       } as GasEstimateBridgeToL2Result;
       const conversions: Map<string, number> = new Map([['eth', 1800]]);
@@ -225,15 +184,14 @@ describe('feeEstimation', () => {
     it('should return fee using gas fee when bridge fee missing', () => {
       const bridgeFees = {
         gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-        gasFee: {
-          estimatedAmount: BigNumber.from(100000000000000),
-          token: {
-            name: 'Ethereum',
-            symbol: 'ETH',
-            decimals: 18,
-          },
+        fees: {
+          totalFees: BigNumber.from(100000000000000),
         },
-        bridgeFee: {},
+        token: {
+          name: 'Ethereum',
+          symbol: 'ETH',
+          decimals: 18,
+        },
       } as GasEstimateBridgeToL2Result;
       const conversions: Map<string, number> = new Map([['eth', 1800]]);
 

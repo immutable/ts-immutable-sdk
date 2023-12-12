@@ -74,7 +74,7 @@ export const DEFAULT_QUOTE_REFRESH_INTERVAL = 30000;
  * Base URL for the checkout CDN based on the environment.
  */
 export const CHECKOUT_CDN_BASE_URL = {
-  [ENV_DEVELOPMENT]: 'https://checkout-api.dev.immutable.com',
-  [Environment.SANDBOX]: 'https://checkout-api.sandbox.immutable.com',
-  [Environment.PRODUCTION]: 'https://checkout-api.immutable.com',
+  [ENV_DEVELOPMENT]: 'https://checkout-cdn.dev.immutable.com',
+  [Environment.SANDBOX]: 'https://checkout-cdn.sandbox.immutable.com',
+  [Environment.PRODUCTION]: 'https://checkout-cdn.immutable.com',
 };

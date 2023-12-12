@@ -2,57 +2,44 @@ import { Box } from '@biom3/react';
 import {
   useCallback,
   useContext,
-  useMemo,
   useState,
 } from 'react';
-import { CheckoutErrorType, TokenInfo } from '@imtbl/checkout-sdk';
+import { CheckoutErrorType } from '@imtbl/checkout-sdk';
+import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
 import { FooterButton } from '../../../components/Footer/FooterButton';
 import { text } from '../../../resources/text/textConfig';
-import {
-  ApproveTransactionData,
-} from '../../../context/view-context/BridgeViewContextTypes';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { LoadingView } from '../../../views/loading/LoadingView';
 import { XBridgeContext } from '../context/XBridgeContext';
 import { WalletApproveHero } from '../../../components/Hero/WalletApproveHero';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
-import { isNativeToken } from '../../../lib/utils';
 import { XBridgeWidgetViews } from '../../../context/view-context/XBridgeViewContextTypes';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 
 export interface ApproveTransactionProps {
-  data: ApproveTransactionData;
+  approveTransaction: ApproveBridgeResponse;
+  transaction: BridgeTxResponse;
 }
 
-export function ApproveTransaction({ data }: ApproveTransactionProps) {
+export function ApproveTransaction({ approveTransaction, transaction }: ApproveTransactionProps) {
   const { bridgeState } = useContext(XBridgeContext);
   const {
     checkout,
-    allowedTokens,
-    token,
     from,
   } = bridgeState;
   const { viewDispatch } = useContext(ViewContext);
-  const { loading, content, footer } = text.views[XBridgeWidgetViews.APPROVE_TRANSACTION];
+  const { loadingView, content, footer } = text.views[XBridgeWidgetViews.APPROVE_TRANSACTION];
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   // Local state
   const [actionDisabled, setActionDisabled] = useState(false);
-  const [approvalTxnLoading, setApprovalTxnLoading] = useState(false);
-  const [approvalSpendingTxnLoading, setApprovalSpendingTxnLoading] = useState(false);
+  const [txProcessing, setTxProcessing] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [rejectedBridge, setRejectedBridge] = useState(false);
-
-  // Get symbol from swap info for approve amount text
-  const bridgeToken = useMemo(
-    () => allowedTokens.find(
-      (allowedToken: TokenInfo) => allowedToken.address === token?.address || isNativeToken(allowedToken.address),
-    ),
-    [allowedTokens, token],
-  );
 
   // Common error view function
   const showErrorView = useCallback(() => {
@@ -82,7 +69,7 @@ export function ApproveTransaction({ data }: ApproveTransactionProps) {
           type: ViewActions.UPDATE_VIEW,
           view: {
             type: XBridgeWidgetViews.BRIDGE_FAILURE,
-            data,
+            reason: 'Unpredictable gas limit',
           },
         },
       });
@@ -91,14 +78,15 @@ export function ApproveTransaction({ data }: ApproveTransactionProps) {
     if (err.type === CheckoutErrorType.TRANSACTION_FAILED
       || err.type === CheckoutErrorType.INSUFFICIENT_FUNDS
       || (err.receipt && err.receipt.status === 0)) {
+      let reason = 'Transaction failed';
+      if (err.type === CheckoutErrorType.INSUFFICIENT_FUNDS) reason = 'Insufficient funds';
+      if (err.receipt && err.receipt.status === 0) reason = 'Transaction failed to settle on chain';
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
             type: XBridgeWidgetViews.BRIDGE_FAILURE,
-            data: {
-              reason: 'Transaction failed',
-            },
+            reason,
           },
         },
       });
@@ -117,7 +105,8 @@ export function ApproveTransaction({ data }: ApproveTransactionProps) {
   };
 
   const handleApproveBridgeClick = useCallback(async () => {
-    if (!checkout || !from?.web3Provider || !data.transaction) {
+    let bridgeRejected = false;
+    if (!checkout || !from?.web3Provider || !transaction) {
       showErrorView();
       return;
     }
@@ -125,12 +114,12 @@ export function ApproveTransaction({ data }: ApproveTransactionProps) {
     setActionDisabled(true);
 
     // Approvals as required
-    if (data.approveTransaction.unsignedTx) {
+    if (approveTransaction.unsignedTx) {
       try {
-        setApprovalSpendingTxnLoading(true);
+        setTxProcessing(true);
         const approveSpendingResult = await checkout.sendTransaction({
           provider: from.web3Provider,
-          transaction: data.approveTransaction.unsignedTx,
+          transaction: approveTransaction.unsignedTx,
         });
         const approvalReceipt = await approveSpendingResult.transactionResponse.wait();
         if (approvalReceipt.status !== 1) {
@@ -139,42 +128,55 @@ export function ApproveTransaction({ data }: ApproveTransactionProps) {
               type: ViewActions.UPDATE_VIEW,
               view: {
                 type: XBridgeWidgetViews.BRIDGE_FAILURE,
-                data,
+                reason: 'Transaction failed to settle on chain',
               },
             },
           });
           return;
         }
       } catch (error: any) {
-        setApprovalSpendingTxnLoading(false);
+        setTxProcessing(false);
         if (error.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
           setRejectedBridge(true);
+          bridgeRejected = true;
         } else {
           handleExceptions(error);
         }
+      } finally {
+        setActionDisabled(false);
       }
     }
 
     try {
+      if (bridgeRejected) return;
+      setTxProcessing(true);
       const sendResult = await checkout.sendTransaction({
         provider: from.web3Provider,
-        transaction: data.transaction.unsignedTx,
+        transaction: transaction.unsignedTx,
       });
 
-      setApprovalTxnLoading(true);
-      await sendResult.transactionResponse.wait();
+      setLoading(true);
+      const receipt = await sendResult.transactionResponse.wait();
 
-      setActionDisabled(false);
-      setApprovalSpendingTxnLoading(false);
+      if (receipt.status === 0) {
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: {
+              type: XBridgeWidgetViews.BRIDGE_FAILURE,
+              reason: 'Approval transaction failed to settle on chain',
+            },
+          },
+        });
+        return;
+      }
+
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
             type: XBridgeWidgetViews.IN_PROGRESS,
-            data: {
-              token: bridgeToken!,
-              transactionResponse: sendResult.transactionResponse,
-            },
+            transactionHash: receipt.transactionHash,
           },
         },
       });
@@ -184,21 +186,25 @@ export function ApproveTransaction({ data }: ApproveTransactionProps) {
       } else {
         handleExceptions(error);
       }
+    } finally {
+      setLoading(false);
+      setTxProcessing(false);
+      setActionDisabled(false);
     }
   }, [
     checkout,
     from,
     showErrorView,
     viewDispatch,
-    data.transaction,
-    data.approveTransaction,
+    transaction,
+    approveTransaction,
     actionDisabled,
   ]);
 
   return (
     <>
-      {approvalTxnLoading && (<LoadingView loadingText={loading.text} showFooterLogo />)}
-      {!approvalTxnLoading && (
+      {loading && (<LoadingView loadingText={loadingView.text} showFooterLogo />)}
+      {!loading && (
         <SimpleLayout
           header={(
             <HeaderNavigation
@@ -212,15 +218,13 @@ export function ApproveTransaction({ data }: ApproveTransactionProps) {
           heroContent={<WalletApproveHero />}
           footer={(
             <Box sx={{ width: '100%', flexDirection: 'column' }}>
-              {!approvalSpendingTxnLoading && (
-                <FooterButton
-                  loading={approvalSpendingTxnLoading}
-                  actionText={rejectedBridge
-                    ? footer.retryText
-                    : footer.buttonText}
-                  onActionClick={handleApproveBridgeClick}
-                />
-              )}
+              <FooterButton
+                loading={txProcessing}
+                actionText={rejectedBridge
+                  ? footer.retryText
+                  : footer.buttonText}
+                onActionClick={handleApproveBridgeClick}
+              />
               <FooterLogo />
             </Box>
           )}

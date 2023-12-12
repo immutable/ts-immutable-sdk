@@ -1,3 +1,4 @@
+import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
 import { ViewType } from './ViewType';
 
 export enum XBridgeWidgetViews {
@@ -19,30 +20,28 @@ export type XBridgeWidgetView =
 
 interface XBridgeCrossWalletSelection extends ViewType {
   type: XBridgeWidgetViews.WALLET_NETWORK_SELECTION,
-  data?: {}
 }
 
 interface XBridgeForm extends ViewType {
   type: XBridgeWidgetViews.BRIDGE_FORM,
-  data?: {}
 }
 
 interface XBridgeReview extends ViewType {
   type: XBridgeWidgetViews.BRIDGE_REVIEW,
-  data?: {}
 }
 
 interface XBridgeInProgress extends ViewType {
   type: XBridgeWidgetViews.IN_PROGRESS,
-  data?: {}
+  transactionHash: string,
 }
 
 interface XBridgeFailure extends ViewType {
   type: XBridgeWidgetViews.BRIDGE_FAILURE,
-  data?: {}
+  reason: string;
 }
 
 interface XBridgeApproveTransaction extends ViewType {
   type: XBridgeWidgetViews.APPROVE_TRANSACTION,
-  data?: {}
+  approveTransaction: ApproveBridgeResponse;
+  transaction: BridgeTxResponse;
 }

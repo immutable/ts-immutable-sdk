@@ -14,7 +14,6 @@ import {
 import { bridgeRoute } from './bridge/bridgeRoute';
 import {
   ChainId,
-  FundingRouteFeeEstimate,
   FundingStepType,
   ItemType,
   RoutingOutcomeType,
@@ -1754,7 +1753,7 @@ describe('routingCalculator', () => {
         address: '0xERC20_2',
       }],
     };
-    const feeEstimates = new Map<FundingStepType, FundingRouteFeeEstimate>();
+
     const balanceRequirements: BalanceCheckResult = {
       sufficient: false,
       balanceRequirements: [insufficientRequirement],
@@ -1769,7 +1768,6 @@ describe('routingCalculator', () => {
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
-        feeEstimates,
         balanceRequirements,
       );
       expect(result).toEqual([]);
@@ -1784,7 +1782,6 @@ describe('routingCalculator', () => {
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
-        feeEstimates,
         balanceRequirements,
       );
       expect(result).toEqual([]);
@@ -1807,7 +1804,6 @@ describe('routingCalculator', () => {
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
-        feeEstimates,
         balanceRequirements,
       );
       expect(result).toEqual([]);
@@ -1829,7 +1825,6 @@ describe('routingCalculator', () => {
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
-        feeEstimates,
         balanceRequirements,
       );
       expect(result).toEqual([]);
@@ -1845,7 +1840,6 @@ describe('routingCalculator', () => {
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
-        feeEstimates,
         balanceRequirements,
       );
       expect(result).toEqual([]);
@@ -1869,7 +1863,6 @@ describe('routingCalculator', () => {
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
-        feeEstimates,
         balanceRequirements,
       );
       expect(result).toEqual([]);
@@ -1892,7 +1885,6 @@ describe('routingCalculator', () => {
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
-        feeEstimates,
         balanceRequirements,
       );
       expect(result).toEqual([]);
@@ -1911,7 +1903,6 @@ describe('routingCalculator', () => {
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
-        feeEstimates,
         balanceRequirements,
       );
       expect(result).toEqual([]);
@@ -1977,7 +1968,6 @@ describe('routingCalculator', () => {
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
-        feeEstimates,
         balanceRequirements,
       );
       expect(result)
@@ -1993,7 +1983,6 @@ describe('routingCalculator', () => {
         { bridge: true, swap: true },
         insufficientRequirement,
         '0xADDRESS',
-        feeEstimates,
         tokenBalances,
         ['0xERC20_1', INDEXER_ETH_ROOT_CONTRACT_ADDRESS],
         [

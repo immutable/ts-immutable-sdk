@@ -45,10 +45,10 @@ export class XBridge extends Base<WidgetType.BRIDGE> {
       validatedParams.amount = '';
     }
 
-    if (!isValidAddress(params.fromContractAddress)) {
+    if (!isValidAddress(params.contractAddress)) {
       // eslint-disable-next-line no-console
-      console.warn('[IMTBL]: invalid "fromContractAddress" widget input');
-      validatedParams.fromContractAddress = '';
+      console.warn('[IMTBL]: invalid "contractAddress" widget input');
+      validatedParams.contractAddress = '';
     }
 
     return validatedParams;
@@ -63,6 +63,9 @@ export class XBridge extends Base<WidgetType.BRIDGE> {
             checkout={this.checkout}
             config={this.strongConfig()}
             web3Provider={this.web3Provider}
+            contractAddress={this.parameters.contractAddress}
+            amount={this.parameters.amount}
+            walletProviderName={this.parameters.walletProviderName}
           />
         </WidgetContainer>
       </React.StrictMode>,

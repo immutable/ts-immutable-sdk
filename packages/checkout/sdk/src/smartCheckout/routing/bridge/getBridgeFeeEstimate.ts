@@ -1,47 +1,38 @@
 import { BigNumber, ethers } from 'ethers';
-import { gasEstimator } from '../../../gasEstimate';
+import { BridgeFeeActions, BridgeFeeResponse } from '@imtbl/bridge-sdk';
 import {
-  GasEstimateType,
-  GasEstimateBridgeToL2Result,
   ChainId,
-  BridgeRouteFeeEstimate,
-  FundingStepType,
 } from '../../../types';
 import { CheckoutConfiguration } from '../../../config';
 import { CheckoutError, CheckoutErrorType } from '../../../errors';
+import * as instance from '../../../instance';
 
 export const getBridgeFeeEstimate = async (
   config: CheckoutConfiguration,
   readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
-): Promise<BridgeRouteFeeEstimate> => {
+  fromChainId: ChainId,
+  toChainId: ChainId,
+): Promise<BridgeFeeResponse & { approvalGas: BigNumber; }> => {
+  const bridge = instance.createBridgeInstance(
+    fromChainId,
+    toChainId,
+    readOnlyProviders,
+    config,
+  );
+
   try {
-    const estimate = await gasEstimator(
+    const fee = await bridge.getFee(
       {
-        gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-        isSpendingCapApprovalRequired: false,
+        action: BridgeFeeActions.DEPOSIT,
+        gasMultiplier: 1.1,
+        sourceChainId: fromChainId.toString(),
+        destinationChainId: toChainId.toString(),
       },
-      readOnlyProviders,
-      config,
-    ) as GasEstimateBridgeToL2Result;
+    );
 
-    const gasEstimate = estimate.gasFee.estimatedAmount;
-    const bridgeFee = estimate.bridgeFee.estimatedAmount;
-    let totalFees = BigNumber.from(0);
-    if (gasEstimate) totalFees = totalFees.add(gasEstimate);
-    if (bridgeFee) totalFees = totalFees.add(bridgeFee);
+    fee.approvalGas = BigNumber.from(0);
 
-    return {
-      type: FundingStepType.BRIDGE,
-      gasFee: {
-        estimatedAmount: gasEstimate ?? BigNumber.from(0),
-        token: estimate.gasFee.token,
-      },
-      bridgeFee: {
-        estimatedAmount: bridgeFee ?? BigNumber.from(0),
-        token: estimate.bridgeFee.token,
-      },
-      totalFees,
-    };
+    return fee;
   } catch (err: any) {
     throw new CheckoutError(
       'Error estimating gas for bridge',

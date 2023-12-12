@@ -5,7 +5,7 @@ import { ChainId, ImxAddressConfig } from '../../../types';
 import { isNativeToken } from '../../../tokens';
 
 // If the root address evaluates to this then its ETH
-export const INDEXER_ETH_ROOT_CONTRACT_ADDRESS = '0x0000000000000000000000000000000000000001';
+export const INDEXER_ETH_ROOT_CONTRACT_ADDRESS = '0x0000000000000000000000000000000000000eee';
 
 const getIndexerChainName = (chainId: ChainId): string => {
   if (chainId === ChainId.IMTBL_ZKEVM_MAINNET) return 'imtbl-zkevm-mainnet';

@@ -21,13 +21,13 @@ const REFRESH_TOKENS_INTERVAL_MS = 10000;
 
 export interface BridgeProps {
   amount?: string;
-  fromContractAddress?: string;
+  contractAddress?: string;
 }
 
-export function Bridge({ amount, fromContractAddress }: BridgeProps) {
+export function Bridge({ amount, contractAddress }: BridgeProps) {
   const { header } = text.views[XBridgeWidgetViews.BRIDGE_FORM];
   const { bridgeState, bridgeDispatch } = useContext(XBridgeContext);
-  const { checkout, web3Provider } = bridgeState;
+  const { checkout, from } = bridgeState;
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
   const [isTokenBalancesLoading, setIsTokenBalancesLoading] = useState(false);
   const showBackButton = true;
@@ -36,11 +36,11 @@ export function Bridge({ amount, fromContractAddress }: BridgeProps) {
   // has been loaded so that processing transfers will be eventually
   // reflected.
   const refreshBalances = useCallback(async () => {
-    if (!checkout || !web3Provider) return;
+    if (!checkout || !from?.web3Provider) return;
     try {
       const tokensAndBalances = await getAllowedBalances({
         checkout,
-        provider: web3Provider,
+        provider: from.web3Provider,
         allowTokenListType: TokenFilterTypes.BRIDGE,
         // Skip retry given that in this case it is not needed;
         // refreshBalances will be, automatically, called again
@@ -61,14 +61,14 @@ export function Bridge({ amount, fromContractAddress }: BridgeProps) {
       // eslint-disable-next-line no-console
       console.debug(e);
     }
-  }, [checkout, web3Provider]);
+  }, [checkout, from?.web3Provider]);
   useInterval(refreshBalances, REFRESH_TOKENS_INTERVAL_MS);
 
   useEffect(() => {
-    if (!checkout || !web3Provider) return;
+    if (!checkout || !from?.web3Provider) return;
     setIsTokenBalancesLoading(true);
     refreshBalances().finally(() => setIsTokenBalancesLoading(false));
-  }, [checkout, web3Provider]);
+  }, [checkout, from?.web3Provider]);
 
   return (
     <SimpleLayout
@@ -85,7 +85,7 @@ export function Bridge({ amount, fromContractAddress }: BridgeProps) {
       <BridgeForm
         testId="bridge-form"
         defaultAmount={amount}
-        defaultFromContractAddress={fromContractAddress}
+        defaultFromContractAddress={contractAddress}
         isTokenBalancesLoading={isTokenBalancesLoading}
       />
     </SimpleLayout>
