@@ -11,7 +11,7 @@ export interface StatusViewProps {
 const status = {
   [StatusType.SUCCESS]: 'TickWithCircle',
   [StatusType.WARNING]: 'Shield',
-  [StatusType.FAILURE]: 'CloseWithCircle',
+  [StatusType.FAILURE]: 'Close', // TODO: revert back to CloseWithCircle when fixed in BIOME https://immutable.atlassian.net/browse/WT-1987
   [StatusType.INFORMATION]: 'InformationCircle',
 };
 
