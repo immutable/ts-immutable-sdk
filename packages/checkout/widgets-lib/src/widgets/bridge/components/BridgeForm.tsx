@@ -271,7 +271,7 @@ export function BridgeForm(props: BridgeFormProps) {
     }
 
     const tokenIsNative = isNativeToken(formToken?.token.address);
-    const gasAmount = utils.parseEther(gasFee.length !== 0 ? gasFee : '0');
+    const gasAmount = utils.parseUnits(gasFee.length !== 0 ? gasFee : '0');
     const additionalAmount = tokenIsNative && !Number.isNaN(parseFloat(formAmount))
       ? utils.parseUnits(formAmount)
       : BigNumber.from('0');
