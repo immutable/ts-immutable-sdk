@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable class-methods-use-this */
 import axios, { AxiosResponse } from 'axios';
 import {
@@ -34,6 +35,8 @@ import { ERC20 } from 'contracts/ABIs/ERC20';
 import { BridgeError, BridgeErrorType, withBridgeError } from 'errors';
 import { CHILD_ERC20_BRIDGE } from 'contracts/ABIs/ChildERC20Bridge';
 import { getGasPriceInWei } from 'lib/gasPriceInWei';
+import { GMPStatusResponse } from 'types/axelar';
+import { queryTransactionStatus } from 'lib/gmpRecovery';
 
 /**
  * Represents a token bridge, which manages asset transfers between two chains.
@@ -272,11 +275,13 @@ export class TokenBridge {
     );
 
     // Encode the approve function call data for the ERC20 contract
-    const data: string = await withBridgeError<string>(async () => erc20Contract.interface
-      .encodeFunctionData('approve', [
+    const data: string = await withBridgeError<string>(
+      async () => erc20Contract.approve(
         sourceBridgeAddress,
         approvalAmountRequired,
-      ]), BridgeErrorType.INTERNAL_ERROR);
+      ),
+      BridgeErrorType.INTERNAL_ERROR,
+    );
 
     // Create the unsigned transaction for the approval
     const unsignedTx: ethers.providers.TransactionRequest = {
@@ -641,6 +646,20 @@ export class TokenBridge {
     }
   }
 
+  private getAxelarEndpoint(source:string) {
+    let axelarAPIEndpoint:string;
+    if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
+      || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
+      axelarAPIEndpoint = axelarAPIEndpoints.mainnet;
+    } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
+      || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
+      axelarAPIEndpoint = axelarAPIEndpoints.testnet;
+    } else {
+      axelarAPIEndpoint = axelarAPIEndpoints.devnet;
+    }
+    return axelarAPIEndpoint;
+  }
+
   /**
  * Calculate the gas amount for a transaction using axelarjs-sdk.
  * @param {*} source - The source chainId.
@@ -673,16 +692,7 @@ export class TokenBridge {
       );
     }
 
-    let axelarApiEndpoint:string;
-    if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
-      || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
-      axelarApiEndpoint = axelarAPIEndpoints.mainnet;
-    } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
-      || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
-      axelarApiEndpoint = axelarAPIEndpoints.testnet;
-    } else {
-      axelarApiEndpoint = axelarAPIEndpoints.devnet;
-    }
+    const axelarAPIEndpoint:string = this.getAxelarEndpoint(source);
 
     let axiosResponse:AxiosResponse;
 
@@ -696,7 +706,7 @@ export class TokenBridge {
     };
 
     try {
-      axiosResponse = await axios.post(axelarApiEndpoint, estimateGasReq);
+      axiosResponse = await axios.post(axelarAPIEndpoint, estimateGasReq);
     } catch (error: any) {
       axiosResponse = error.response;
     }
@@ -731,8 +741,20 @@ export class TokenBridge {
  * @dev this SDK method is currently stubbed
  */
   public async getTransactionStatus(req: TxStatusRequest): Promise<TxStatusResponse> {
-    // eslint-disable-next-line no-console
     console.log('stubbed response with req', req);
+
+    const axelarAPIEndpoint:string = this.getAxelarEndpoint(req.sourceChainId);
+
+    const statusPromises:Array<Promise<GMPStatusResponse>> = [];
+    for (const transaction of req.transactions) {
+      statusPromises.push(queryTransactionStatus(axelarAPIEndpoint, transaction.txHash));
+    }
+
+    const statusResponses = await Promise.all(statusPromises);
+
+    console.log('statusResponses');
+    console.log(statusResponses);
+
     // Return the token mappings
     return {
       transactions: [{

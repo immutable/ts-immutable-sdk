@@ -37,20 +37,12 @@ async function mapToken() {
     throw new Error('AXELAR_API_URL not set');
   }
 
-  if (!process.env.ROOT_BRIDGE_ADDRESS) {
-    throw new Error('ROOT_BRIDGE_ADDRESS not set');
-  }
-
-  if (!process.env.CHILD_BRIDGE_ADDRESS) {
-    throw new Error('CHILD_BRIDGE_ADDRESS not set');
-  }
-
   let axelarAPI: string = process.env.AXELAR_API_URL;
   let rootCustomTokenAddress: string = process.env.ROOT_TOKEN_TO_MAP;
   let childCustomToken: ethers.Contract;
 
-  const rootBridge: ethers.Contract = getContract("RootERC20BridgeFlowRate", process.env.ROOT_BRIDGE_ADDRESS, params.rootProvider);
-  const childBridge: ethers.Contract = getContract("ChildERC20Bridge", process.env.CHILD_BRIDGE_ADDRESS, params.childProvider);
+  const rootBridge: ethers.Contract = getContract("RootERC20BridgeFlowRate", params.rootBridgeAddress, params.rootProvider);
+  const childBridge: ethers.Contract = getContract("ChildERC20Bridge", params.childBridgeAddress, params.childProvider);
 
   let childTokenAddress = await childBridge.rootTokenToChildToken(rootCustomTokenAddress);
 

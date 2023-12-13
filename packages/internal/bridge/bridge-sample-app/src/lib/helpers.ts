@@ -7,7 +7,11 @@ export function delay(time: number) {
 
 export async function waitForReceipt(txHash: string, provider: providers.JsonRpcProvider) {
     let receipt;
+    console.log("Wait until receipt... tx hash: ", txHash);
+    let attempt = 0;
     while (receipt == null) {
+        attempt++;
+        console.log('waiting for receipt attempt: ', attempt);
         receipt = await provider.getTransactionReceipt(txHash)
         await delay(1000);
     }
@@ -44,10 +48,13 @@ export async function waitUntilSucceed(axelarURL: string, txHash: any) {
     if (axelarURL == "skip") {
         return;
     }
-    console.log("Wait until succeed... tx hash: ", txHash)
+    console.log("Wait until succeed... tx hash: ", txHash);
+    let attempt = 0;
     let response;
     let req = '{"method": "searchGMP", "txHash": "' + txHash + '"}'
     while (true) {
+        attempt++;
+        console.log('waiting for success attempt: ', attempt);
         response = await fetch(axelarURL, {
             method: 'POST',
             body: req,

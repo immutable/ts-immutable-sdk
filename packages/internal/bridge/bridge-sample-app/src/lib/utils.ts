@@ -25,6 +25,13 @@ export async function setupForBridge() {
       if (!process.env.DEPOSIT_AMOUNT) {
         throw new Error('DEPOSIT_AMOUNT not set');
       }
+      if (!process.env.ROOT_BRIDGE_ADDRESS) {
+        throw new Error('ROOT_BRIDGE_ADDRESS not set');
+      }
+    
+      if (!process.env.CHILD_BRIDGE_ADDRESS) {
+        throw new Error('CHILD_BRIDGE_ADDRESS not set');
+      }
       // Parse deposit amount from environment variable
       const amount = ethers.utils.parseUnits(
         process.env.DEPOSIT_AMOUNT,
@@ -61,5 +68,7 @@ export async function setupForBridge() {
         amount,
         rootWallet,
         childWallet,
+        rootBridgeAddress:  process.env.ROOT_BRIDGE_ADDRESS,
+        childBridgeAddress: process.env.CHILD_BRIDGE_ADDRESS,
       }
 }

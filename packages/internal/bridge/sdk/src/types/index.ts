@@ -247,16 +247,17 @@ export interface BridgeTxResponse {
 
 /**
  * @typedef {Object} TxStatusRequest
+ * @property {string} sourceChainId - The chain ID of the source chain.
  * @property {Array<TxStatusRequestItem>} transactions - The transaction items to query the status for.
  */
 export interface TxStatusRequest {
   transactions: Array<TxStatusRequestItem>
+  sourceChainId: string;
 }
 
 /**
  * @typedef {Object} TxStatusRequestItem
  * @property {string} transactionHash - The transaction hash on the source chain of the bridge transaction.
- * @property {string} sourceChainId - The source chainId.
  */
 export interface TxStatusRequestItem {
   txHash: string;
