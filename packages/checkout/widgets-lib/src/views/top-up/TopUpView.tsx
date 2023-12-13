@@ -122,7 +122,7 @@ export function TopUpView({
       const onRampFees = getOnRampFeeEstimation(onRampFeesEstimate);
       setOnRampFeesPercentage(onRampFees);
     })();
-  }, [checkout]);
+  }, [checkout !== undefined]);
 
   // Check if swap is available
   useEffect(() => {
