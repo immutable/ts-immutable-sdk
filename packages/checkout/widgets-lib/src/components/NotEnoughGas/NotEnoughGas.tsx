@@ -20,6 +20,7 @@ type NotEnoughGasProps = {
   showAdjustAmount: boolean;
   tokenSymbol: string;
   onCloseDrawer?: () => void;
+  onAddCoinsClick?: () => void;
 };
 
 export function NotEnoughGas({
@@ -29,6 +30,7 @@ export function NotEnoughGas({
   walletAddress,
   showAdjustAmount,
   tokenSymbol,
+  onAddCoinsClick,
 }:
 NotEnoughGasProps) {
   const { content, buttons } = text.drawers.notEnoughGas;
@@ -101,15 +103,30 @@ NotEnoughGasProps) {
                 {buttons.adjustAmount}
               </Button>
             )}
-            <Button
-              testId="not-enough-gas-copy-address-button"
-              sx={actionButtonStyles}
-              variant="tertiary"
-              onClick={handleCopy}
-            >
-              {buttons.copyAddress}
-              <Button.Icon icon={isCopied ? 'Tick' : 'CopyText'} />
-            </Button>
+            {
+              tokenSymbol === ETH_TOKEN_SYMBOL
+                ? (
+                  <Button
+                    testId="not-enough-gas-copy-address-button"
+                    sx={actionButtonStyles}
+                    variant="tertiary"
+                    onClick={handleCopy}
+                  >
+                    {buttons.copyAddress}
+                    <Button.Icon icon={isCopied ? 'Tick' : 'CopyText'} />
+                  </Button>
+                )
+                : (
+                  <Button
+                    testId="not-enough-gas-add-imx-button"
+                    sx={actionButtonStyles}
+                    variant="tertiary"
+                    onClick={onAddCoinsClick}
+                  >
+                    {buttons.addMoreImx}
+                  </Button>
+                )
+            }
             <Button
               sx={actionButtonStyles}
               variant="tertiary"

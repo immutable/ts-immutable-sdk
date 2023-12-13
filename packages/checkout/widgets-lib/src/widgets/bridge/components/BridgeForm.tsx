@@ -18,7 +18,11 @@ import { FeesBreakdown } from 'components/FeesBreakdown/FeesBreakdown';
 import { BridgeFeeActions } from '@imtbl/bridge-sdk';
 import { amountInputValidation } from '../../../lib/validations/amountInputValidations';
 import { BridgeActions, BridgeContext } from '../context/BridgeContext';
-import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import {
+  ViewActions,
+  ViewContext,
+  SharedViews,
+} from '../../../context/view-context/ViewContext';
 import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { text } from '../../../resources/text/textConfig';
 import { TextInputForm } from '../../../components/FormComponents/TextInputForm/TextInputForm';
@@ -511,6 +515,16 @@ export function BridgeForm(props: BridgeFormProps) {
               ? ETH_TOKEN_SYMBOL
               : IMX_TOKEN_SYMBOL
           }
+          onAddCoinsClick={() => {
+            viewDispatch({
+              payload: {
+                type: ViewActions.UPDATE_VIEW,
+                view: {
+                  type: SharedViews.TOP_UP_VIEW,
+                },
+              },
+            });
+          }}
         />
       </Box>
     </Box>

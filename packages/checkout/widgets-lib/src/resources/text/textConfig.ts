@@ -503,6 +503,7 @@ export const text = {
       buttons: {
         adjustAmount: 'Adjust amount',
         copyAddress: 'Copy wallet address',
+        addMoreImx: 'Add IMX coins',
         cancel: 'Dismiss',
       },
     },

@@ -213,6 +213,8 @@ export function BridgeWidget({
             <TopUpView
               analytics={{ userJourney: UserJourney.BRIDGE }}
               widgetEvent={IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT}
+              checkout={checkout}
+              provider={web3Provider}
               showOnrampOption={isOnRampEnabled}
               showSwapOption={isSwapEnabled}
               showBridgeOption={isBridgeEnabled}
