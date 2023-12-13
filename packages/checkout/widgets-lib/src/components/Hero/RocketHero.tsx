@@ -15,6 +15,7 @@ export function RocketHero({
     src: `${CHECKOUT_CDN_BASE_URL[environment]}/v1/blob/img/rocket.riv`,
     autoplay: true,
     layout: new Layout({ fit: Fit.Cover }),
+    stateMachines: 'State Machine 1',
   });
 
   return (
