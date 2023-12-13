@@ -93,7 +93,7 @@ const callbackToGame = (data: object) => {
 
 const setProvider = (passportProvider: provider.IMXProvider | null): boolean => {
   if (passportProvider !== null && passportProvider !== undefined) {
-    imxProvider = passportProvider;
+    providerInstance = passportProvider;
     console.log('IMX provider set');
     return true;
   }
