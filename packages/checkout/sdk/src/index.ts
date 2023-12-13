@@ -9,6 +9,9 @@ export * from './widgets/definitions/configurations';
 // SDKs
 
 export { Checkout } from './sdk';
+
+export { IMMUTABLE_API_BASE_URL } from './env';
+
 export {
   ChainId,
   ChainName,
@@ -25,6 +28,7 @@ export {
   WalletFilterTypes,
   WalletProviderName,
 } from './types';
+
 export type {
   AllowedNetworkConfig,
   AvailableRoutingOptions,
@@ -117,7 +121,8 @@ export type {
   WalletFilter,
   WalletInfo,
 } from './types';
+
 export type { ErrorType } from './errors';
+
 export { CheckoutErrorType } from './errors';
 export { CheckoutConfiguration } from './config';
-export { CHECKOUT_API_BASE_URL } from './env';
