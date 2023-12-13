@@ -17,7 +17,7 @@ import { BigNumber, utils } from 'ethers';
 import { FeesBreakdown } from 'components/FeesBreakdown/FeesBreakdown';
 import { BridgeFeeActions } from '@imtbl/bridge-sdk';
 import { amountInputValidation } from '../../../lib/validations/amountInputValidations';
-import { BridgeActions, XBridgeContext } from '../context/XBridgeContext';
+import { BridgeActions, BridgeContext } from '../context/BridgeContext';
 import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { text } from '../../../resources/text/textConfig';
@@ -44,7 +44,7 @@ import {
 } from '../../../lib';
 import { TransactionRejected } from '../../../components/TransactionRejected/TransactionRejected';
 import { NotEnoughGas } from '../../../components/NotEnoughGas/NotEnoughGas';
-import { XBridgeWidgetViews } from '../../../context/view-context/XBridgeViewContextTypes';
+import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
 import { TokenSelectShimmer } from './TokenSelectShimmer';
 
 interface BridgeFormProps {
@@ -67,7 +67,7 @@ export function BridgeForm(props: BridgeFormProps) {
       amount,
       token,
     },
-  } = useContext(XBridgeContext);
+  } = useContext(BridgeContext);
 
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { viewDispatch } = useContext(ViewContext);
@@ -81,7 +81,7 @@ export function BridgeForm(props: BridgeFormProps) {
     fees,
     content,
     bridgeForm,
-  } = text.views[XBridgeWidgetViews.BRIDGE_FORM];
+  } = text.views[BridgeWidgetViews.BRIDGE_FORM];
 
   // Form state
   const [formAmount, setFormAmount] = useState<string>(defaultAmount || '');
@@ -388,7 +388,7 @@ export function BridgeForm(props: BridgeFormProps) {
       payload: {
         type: ViewActions.UPDATE_VIEW,
         view: {
-          type: XBridgeWidgetViews.BRIDGE_REVIEW,
+          type: BridgeWidgetViews.BRIDGE_REVIEW,
         },
       },
     });

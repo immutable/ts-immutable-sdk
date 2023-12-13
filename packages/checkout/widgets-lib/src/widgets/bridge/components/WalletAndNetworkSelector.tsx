@@ -5,7 +5,7 @@ import {
   Heading,
 } from '@biom3/react';
 import { text } from 'resources/text/textConfig';
-import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
+import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import {
   useCallback, useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
@@ -25,7 +25,7 @@ import {
   brigdeWalletWrapperStyles,
   submitButtonWrapperStyles,
 } from './WalletAndNetworkSelectorStyles';
-import { BridgeActions, XBridgeContext } from '../context/XBridgeContext';
+import { BridgeActions, BridgeContext } from '../context/BridgeContext';
 import { NetworkItem } from './NetworkItem';
 import { WalletNetworkButton } from './WalletNetworkButton';
 import { WalletDrawer } from './WalletDrawer';
@@ -37,11 +37,11 @@ export function WalletAndNetworkSelector() {
     bridgeState: {
       checkout, from, to,
     }, bridgeDispatch,
-  } = useContext(XBridgeContext);
+  } = useContext(BridgeContext);
   const { viewDispatch } = useContext(ViewContext);
   const {
     heading, fromFormInput, toFormInput, submitButton,
-  } = text.views[XBridgeWidgetViews.WALLET_NETWORK_SELECTION];
+  } = text.views[BridgeWidgetViews.WALLET_NETWORK_SELECTION];
 
   // calculating l1/l2 chains to work with based on Checkout environment
   const l1NetworkChainId = getL1ChainId(checkout.config);
@@ -319,7 +319,7 @@ export function WalletAndNetworkSelector() {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
-          view: { type: XBridgeWidgetViews.BRIDGE_FORM },
+          view: { type: BridgeWidgetViews.BRIDGE_FORM },
         },
       });
     },

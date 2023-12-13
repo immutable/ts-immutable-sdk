@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import { WalletProviderName } from '@imtbl/checkout-sdk';
-import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
+import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
 import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
 import { SharedViews } from '../../context/view-context/ViewContext';
@@ -362,7 +362,7 @@ export const text = {
       text: 'Order completed',
       actionText: 'Continue',
     },
-    [XBridgeWidgetViews.WALLET_NETWORK_SELECTION]: {
+    [BridgeWidgetViews.WALLET_NETWORK_SELECTION]: {
       layoutHeading: 'Move',
       heading: 'Where would you like to move funds between?',
       fromFormInput: {
@@ -380,7 +380,7 @@ export const text = {
         text: 'Next',
       },
     },
-    [XBridgeWidgetViews.BRIDGE_FORM]: {
+    [BridgeWidgetViews.BRIDGE_FORM]: {
       header: {
         title: 'Move coins',
       },
@@ -406,7 +406,7 @@ export const text = {
         noTokenSelected: 'Select a coin to move',
       },
     },
-    [XBridgeWidgetViews.BRIDGE_REVIEW]: {
+    [BridgeWidgetViews.BRIDGE_REVIEW]: {
       layoutHeading: 'Move',
       heading: 'Ok, how does this look?',
       fromLabel: {
@@ -424,11 +424,11 @@ export const text = {
       },
       fiatPricePrefix: '~ USD $',
     },
-    [XBridgeWidgetViews.BRIDGE_FAILURE]: {
+    [BridgeWidgetViews.BRIDGE_FAILURE]: {
       statusText: 'Transaction failed',
       actionText: 'Review & Try again',
     },
-    [XBridgeWidgetViews.APPROVE_TRANSACTION]: {
+    [BridgeWidgetViews.APPROVE_TRANSACTION]: {
       content: {
         heading: 'Approve the transaction in your wallet',
         body: 'Follow the prompts in your wallet popup to confirm.',
@@ -441,7 +441,7 @@ export const text = {
         text: 'Initiating move',
       },
     },
-    [XBridgeWidgetViews.IN_PROGRESS]: {
+    [BridgeWidgetViews.IN_PROGRESS]: {
       heading: 'Move in progress',
       body1: (symbol: string) => `Less than 3 mins until your ${symbol} lands on zkEVM.`,
       body2: 'You can close this window, the transaction will be reflected in your wallet once complete.',

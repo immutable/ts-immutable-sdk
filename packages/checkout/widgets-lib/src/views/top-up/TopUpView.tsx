@@ -10,7 +10,7 @@ import {
   IMTBLWidgetEvents,
 } from '@imtbl/checkout-sdk';
 import { DEFAULT_TOKEN_SYMBOLS } from 'context/crypto-fiat-context/CryptoFiatProvider';
-import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
+import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { FooterLogo } from '../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
@@ -181,7 +181,7 @@ export function TopUpView({
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
-            type: XBridgeWidgetViews.WALLET_NETWORK_SELECTION,
+            type: BridgeWidgetViews.WALLET_NETWORK_SELECTION,
             data,
           },
         },

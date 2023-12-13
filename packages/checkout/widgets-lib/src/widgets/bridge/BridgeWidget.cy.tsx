@@ -10,11 +10,11 @@ import { Passport } from '@imtbl/passport';
 import { BigNumber } from 'ethers';
 import { TokenBridge } from '@imtbl/bridge-sdk';
 import { WidgetContainer } from 'components/WidgetContainer/WidgetContainer';
-import { XBridgeWidget } from './XBridgeWidget';
+import { BridgeWidget } from './BridgeWidget';
 import { text } from '../../resources/text/textConfig';
 
 type CypressStub = Cypress.Agent<sinon.SinonStub<any[], any>>;
-describe('XBridgeWidget', () => {
+describe('BridgeWidget', () => {
   // Checkout stubs
   let getNetworkImmutableZkEVMStub;
   let getNetworkSepoliaStub;
@@ -119,7 +119,7 @@ describe('XBridgeWidget', () => {
 
       mount(
         <WidgetContainer id="test" config={widgetConfig}>
-          <XBridgeWidget checkout={checkout} config={widgetConfig} />
+          <BridgeWidget checkout={checkout} config={widgetConfig} />
         </WidgetContainer>,
       );
 
@@ -144,7 +144,7 @@ describe('XBridgeWidget', () => {
 
       mount(
         <WidgetContainer id="test" config={widgetConfig}>
-          <XBridgeWidget checkout={checkout} config={widgetConfig} />
+          <BridgeWidget checkout={checkout} config={widgetConfig} />
         </WidgetContainer>,
       );
 
@@ -165,7 +165,7 @@ describe('XBridgeWidget', () => {
 
       mount(
         <WidgetContainer id="test" config={widgetConfig}>
-          <XBridgeWidget checkout={checkout} config={widgetConfig} />
+          <BridgeWidget checkout={checkout} config={widgetConfig} />
         </WidgetContainer>,
       );
 
@@ -204,7 +204,7 @@ describe('XBridgeWidget', () => {
 
       mount(
         <WidgetContainer id="test" config={widgetConfig}>
-          <XBridgeWidget checkout={checkout} config={widgetConfig} />
+          <BridgeWidget checkout={checkout} config={widgetConfig} />
         </WidgetContainer>,
       );
 
@@ -238,7 +238,7 @@ describe('XBridgeWidget', () => {
 
       mount(
         <WidgetContainer id="test" config={widgetConfig}>
-          <XBridgeWidget checkout={checkout} config={widgetConfig} />
+          <BridgeWidget checkout={checkout} config={widgetConfig} />
         </WidgetContainer>,
       );
 
@@ -272,7 +272,7 @@ describe('XBridgeWidget', () => {
 
       mount(
         <WidgetContainer id="test" config={widgetConfig}>
-          <XBridgeWidget checkout={checkout} config={widgetConfig} />
+          <BridgeWidget checkout={checkout} config={widgetConfig} />
         </WidgetContainer>,
       );
 
@@ -310,7 +310,7 @@ describe('XBridgeWidget', () => {
 
       mount(
         <WidgetContainer id="test" config={widgetConfig}>
-          <XBridgeWidget checkout={checkout} config={widgetConfig} />
+          <BridgeWidget checkout={checkout} config={widgetConfig} />
         </WidgetContainer>,
       );
 
@@ -352,7 +352,7 @@ describe('XBridgeWidget', () => {
 
       mount(
         <WidgetContainer id="test" config={widgetConfig}>
-          <XBridgeWidget checkout={checkout} config={widgetConfig} />
+          <BridgeWidget checkout={checkout} config={widgetConfig} />
         </WidgetContainer>,
       );
 
@@ -394,7 +394,7 @@ describe('XBridgeWidget', () => {
 
       mount(
         <WidgetContainer id="test" config={widgetConfig}>
-          <XBridgeWidget checkout={checkout} config={widgetConfig} />
+          <BridgeWidget checkout={checkout} config={widgetConfig} />
         </WidgetContainer>,
       );
 
@@ -413,7 +413,7 @@ describe('XBridgeWidget', () => {
     it('should not show when from wallet is not selected', () => {
       mount(
         <WidgetContainer id="test" config={widgetConfig}>
-          <XBridgeWidget checkout={checkout} config={widgetConfig} />
+          <BridgeWidget checkout={checkout} config={widgetConfig} />
         </WidgetContainer>,
       );
 
@@ -432,7 +432,7 @@ describe('XBridgeWidget', () => {
 
       mount(
         <WidgetContainer id="test" config={widgetConfig}>
-          <XBridgeWidget checkout={checkout} config={widgetConfig} />
+          <BridgeWidget checkout={checkout} config={widgetConfig} />
         </WidgetContainer>,
       );
 
@@ -456,7 +456,7 @@ describe('XBridgeWidget', () => {
 
       mount(
         <WidgetContainer id="test" config={widgetConfig}>
-          <XBridgeWidget checkout={checkout} config={widgetConfig} />
+          <BridgeWidget checkout={checkout} config={widgetConfig} />
         </WidgetContainer>,
       );
 
@@ -539,7 +539,7 @@ describe('XBridgeWidget', () => {
 
       mount(
         <WidgetContainer id="test" config={widgetConfig}>
-          <XBridgeWidget checkout={checkout} config={widgetConfig} />
+          <BridgeWidget checkout={checkout} config={widgetConfig} />
         </WidgetContainer>,
       );
 
@@ -647,7 +647,7 @@ describe('XBridgeWidget', () => {
 
       mount(
         <WidgetContainer id="test" config={widgetConfig}>
-          <XBridgeWidget checkout={checkout} config={widgetConfig} />
+          <BridgeWidget checkout={checkout} config={widgetConfig} />
         </WidgetContainer>,
       );
 

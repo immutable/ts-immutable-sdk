@@ -2,7 +2,7 @@ import { createContext } from 'react';
 import { ConnectWidgetView } from './ConnectViewContextTypes';
 import { WalletWidgetView } from './WalletViewContextTypes';
 import { PrefilledSwapForm, SwapWidgetView } from './SwapViewContextTypes';
-import { XBridgeWidgetView } from './XBridgeViewContextTypes';
+import { BridgeWidgetView } from './BridgeViewContextTypes';
 import { SaleWidgetView } from './SaleViewContextTypes';
 import { ViewType } from './ViewType';
 import { OnRampWidgetView } from './OnRampViewContextTypes';
@@ -47,7 +47,7 @@ export type View =
   | SwapWidgetView
   | OnRampWidgetView
   | SaleWidgetView
-  | XBridgeWidgetView;
+  | BridgeWidgetView;
 
 export interface ViewState {
   view: View;

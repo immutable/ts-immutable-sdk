@@ -6,7 +6,7 @@ import {
   useState,
   useEffect,
 } from 'react';
-import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
+import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import {
   Body,
   Box, Button, Heading, Icon, MenuItem,
@@ -36,7 +36,7 @@ import {
   topMenuItemStyles,
   walletLogoStyles,
 } from './BridgeReviewSummaryStyles';
-import { XBridgeContext } from '../context/XBridgeContext';
+import { BridgeContext } from '../context/BridgeContext';
 import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 
 const networkIcon = {
@@ -58,7 +58,7 @@ export function BridgeReviewSummary() {
   const { viewDispatch } = useContext(ViewContext);
   const {
     heading, fromLabel, toLabel, fees, fiatPricePrefix, submitButton,
-  } = text.views[XBridgeWidgetViews.BRIDGE_REVIEW];
+  } = text.views[BridgeWidgetViews.BRIDGE_REVIEW];
 
   const {
     bridgeState: {
@@ -69,7 +69,7 @@ export function BridgeReviewSummary() {
       token,
       amount,
     },
-  } = useContext(XBridgeContext);
+  } = useContext(BridgeContext);
 
   const { cryptoFiatState } = useContext(CryptoFiatContext);
   const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
@@ -175,7 +175,7 @@ export function BridgeReviewSummary() {
       payload: {
         type: ViewActions.UPDATE_VIEW,
         view: {
-          type: XBridgeWidgetViews.APPROVE_TRANSACTION,
+          type: BridgeWidgetViews.APPROVE_TRANSACTION,
           approveTransaction,
           transaction,
         },

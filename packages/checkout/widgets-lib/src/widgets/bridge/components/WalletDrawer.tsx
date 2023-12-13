@@ -3,7 +3,7 @@ import { FormControlWrapper } from 'components/FormComponents/FormControlWrapper
 import { WalletProviderName } from '@imtbl/checkout-sdk';
 import { useState } from 'react';
 import { text } from 'resources/text/textConfig';
-import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
+import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { WalletItem } from './WalletItem';
 import { walletItemListStyles } from './WalletDrawerStyles';
 
@@ -25,7 +25,7 @@ export function WalletDrawer({
   setShowDrawer,
   onWalletItemClick,
 }: WalletDrawerProps) {
-  const { toFormInput, fromFormInput } = text.views[XBridgeWidgetViews.WALLET_NETWORK_SELECTION];
+  const { toFormInput, fromFormInput } = text.views[BridgeWidgetViews.WALLET_NETWORK_SELECTION];
   const walletSelectorText = type === 'from' ? fromFormInput : toFormInput;
   const [walletItemLoading, setWalletItemLoading] = useState(false);
 

@@ -5,14 +5,14 @@ import {
   useState,
 } from 'react';
 import { TokenFilterTypes } from '@imtbl/checkout-sdk';
-import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
+import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { BridgeForm } from '../components/BridgeForm';
 import { text } from '../../../resources/text/textConfig';
-import { BridgeActions, XBridgeContext } from '../context/XBridgeContext';
+import { BridgeActions, BridgeContext } from '../context/BridgeContext';
 import { useInterval } from '../../../lib/hooks/useInterval';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { getAllowedBalances } from '../../../lib/balance';
@@ -25,8 +25,8 @@ export interface BridgeProps {
 }
 
 export function Bridge({ amount, contractAddress }: BridgeProps) {
-  const { header } = text.views[XBridgeWidgetViews.BRIDGE_FORM];
-  const { bridgeState, bridgeDispatch } = useContext(XBridgeContext);
+  const { header } = text.views[BridgeWidgetViews.BRIDGE_FORM];
+  const { bridgeState, bridgeDispatch } = useContext(BridgeContext);
   const { checkout, from } = bridgeState;
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
   const [isTokenBalancesLoading, setIsTokenBalancesLoading] = useState(false);
