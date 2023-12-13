@@ -114,7 +114,7 @@ export function BridgeReviewSummary() {
       tokenBridge!.getUnsignedApproveBridgeTx({
         senderAddress: fromAddress,
         token: token?.address,
-        amount: utils.parseUnits(amount, DEFAULT_TOKEN_DECIMALS),
+        amount: utils.parseUnits(amount, token.decimals),
         sourceChainId: from?.network.toString(),
         destinationChainId: to?.network.toString(),
       }),
@@ -122,7 +122,7 @@ export function BridgeReviewSummary() {
         senderAddress: fromAddress,
         recipientAddress: toAddress,
         token: token?.address,
-        amount: utils.parseUnits(amount, DEFAULT_TOKEN_DECIMALS),
+        amount: utils.parseUnits(amount, token.decimals),
         sourceChainId: from?.network.toString(),
         destinationChainId: to?.network.toString(),
         gasMultiplier: 1.1,
