@@ -41,6 +41,8 @@ import {
   DEFAULT_QUOTE_REFRESH_INTERVAL,
   NATIVE,
   getL1ChainId,
+  IMX_TOKEN_SYMBOL,
+  ETH_TOKEN_SYMBOL,
 } from '../../../lib';
 import { TransactionRejected } from '../../../components/TransactionRejected/TransactionRejected';
 import { NotEnoughGas } from '../../../components/NotEnoughGas/NotEnoughGas';
@@ -257,7 +259,6 @@ export function BridgeForm(props: BridgeFormProps) {
     }
   };
 
-  // TODO: rename uses of ETH to native token
   const insufficientFundsForGas = useMemo(() => {
     const nativeTokenBalance = tokenBalances
       .find((balance) => isNativeToken(balance.token.address));
@@ -265,10 +266,10 @@ export function BridgeForm(props: BridgeFormProps) {
       return true;
     }
 
-    const tokenIsEth = isNativeToken(formToken?.token.address);
+    const tokenIsNative = isNativeToken(formToken?.token.address);
     const gasAmount = utils.parseEther(gasFee.length !== 0 ? gasFee : '0');
-    const additionalAmount = tokenIsEth && !Number.isNaN(parseFloat(formAmount))
-      ? utils.parseEther(formAmount)
+    const additionalAmount = tokenIsNative && !Number.isNaN(parseFloat(formAmount))
+      ? utils.parseUnits(formAmount)
       : BigNumber.from('0');
 
     return gasAmount.add(additionalAmount).gt(nativeTokenBalance.balance);
@@ -505,6 +506,11 @@ export function BridgeForm(props: BridgeFormProps) {
           onCloseDrawer={() => setShowNotEnoughGasDrawer(false)}
           walletAddress={walletAddress}
           showAdjustAmount={isNativeToken(formToken?.token.address)}
+          tokenSymbol={
+            from?.network === getL1ChainId(checkout?.config)
+              ? ETH_TOKEN_SYMBOL
+              : IMX_TOKEN_SYMBOL
+          }
         />
       </Box>
     </Box>

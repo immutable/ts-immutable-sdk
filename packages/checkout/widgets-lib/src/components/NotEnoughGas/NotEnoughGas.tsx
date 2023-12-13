@@ -3,6 +3,7 @@ import {
   Drawer, Box, Button, FramedImage, Heading, Logo,
 } from '@biom3/react';
 import { useCallback, useState } from 'react';
+import { ETH_TOKEN_SYMBOL } from 'lib';
 import {
   containerStyles,
   contentTextStyles,
@@ -13,16 +14,23 @@ import {
 import { text } from '../../resources/text/textConfig';
 
 type NotEnoughGasProps = {
-  onCloseDrawer?: () => void;
   visible?: boolean;
   showHeaderBar?: boolean;
   walletAddress: string;
   showAdjustAmount: boolean;
+  tokenSymbol: string;
+  onCloseDrawer?: () => void;
 };
 
 export function NotEnoughGas({
-  onCloseDrawer, visible, showHeaderBar, walletAddress, showAdjustAmount,
-}: NotEnoughGasProps) {
+  onCloseDrawer,
+  visible,
+  showHeaderBar,
+  walletAddress,
+  showAdjustAmount,
+  tokenSymbol,
+}:
+NotEnoughGasProps) {
   const { content, buttons } = text.drawers.notEnoughGas;
 
   const [isCopied, setIsCopied] = useState(false);
@@ -49,14 +57,25 @@ export function NotEnoughGas({
       <Drawer.Content>
         <Box testId="not-enough-gas-bottom-sheet" sx={containerStyles}>
           <FramedImage
-            imageUrl="https://design-system.immutable.com/hosted-for-ds/currency-icons/currency--eth.svg"
+            imageUrl={
+              tokenSymbol === 'ETH'
+              // eslint-disable-next-line max-len
+                ? 'https://design-system.immutable.com/hosted-for-ds/currency-icons/currency--eth.svg' : 'https://design-system.immutable.com/hosted-for-ds/currency-icons/currency--imx.svg'
+            }
             circularFrame
-            sx={{
-              backgroundColor: 'white',
-              height: '100px',
-              width: '64px',
-              padding: '10px',
-            }}
+            sx={
+              tokenSymbol === ETH_TOKEN_SYMBOL
+                ? {
+                  backgroundColor: 'white',
+                  height: '100px',
+                  width: '64px',
+                  padding: '10px',
+                }
+                : {
+                  height: '110px',
+                  width: '64px',
+                }
+            }
           />
           <Heading
             size="small"
@@ -66,18 +85,21 @@ export function NotEnoughGas({
             {content.heading}
           </Heading>
           <Body sx={contentTextStyles}>
-            {content.body}
+            {
+              `${content.body1} ${tokenSymbol} ${content.body2} 
+              ${tokenSymbol === ETH_TOKEN_SYMBOL ? content.eth : content.imx}`
+            }
           </Body>
           <Box sx={actionButtonContainerStyles}>
             {showAdjustAmount && (
-            <Button
-              testId="not-enough-gas-adjust-amount-button"
-              sx={actionButtonStyles}
-              variant="tertiary"
-              onClick={onCloseDrawer}
-            >
-              {buttons.adjustAmount}
-            </Button>
+              <Button
+                testId="not-enough-gas-adjust-amount-button"
+                sx={actionButtonStyles}
+                variant="tertiary"
+                onClick={onCloseDrawer}
+              >
+                {buttons.adjustAmount}
+              </Button>
             )}
             <Button
               testId="not-enough-gas-copy-address-button"
