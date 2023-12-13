@@ -111,9 +111,9 @@ const buildMultiExactOutputQuote = (
   tradeType: TradeType.EXACT_OUTPUT,
 });
 
-const tenPercentFees = (tokenIn: Coin): Fees =>
+const tenPercentFees = (tokenIn: Coin, tradeType: TradeType): Fees =>
   // eslint-disable-next-line implicit-arrow-linebreak
-  new Fees([{ recipient: TEST_FEE_RECIPIENT, basisPoints: 1000 }], tokenIn);
+  new Fees([{ recipient: TEST_FEE_RECIPIENT, basisPoints: 1000 }], tokenIn, tradeType);
 
 describe('getSwap', () => {
   describe('without fees', () => {
@@ -488,7 +488,7 @@ describe('adjustQuoteWithFees', () => {
       const preparedSwap = adjustQuoteWithFees(
         quote,
         userSpecifiedAmountIn,
-        new Fees([], userSpecifiedAmountIn.token),
+        new Fees([], userSpecifiedAmountIn.token, quote.tradeType),
         nativeTokenService,
       );
 
@@ -502,7 +502,7 @@ describe('adjustQuoteWithFees', () => {
       const preparedSwap = adjustQuoteWithFees(
         quote,
         userSpecifiedAmountIn,
-        new Fees([], userSpecifiedAmountIn.token),
+        new Fees([], userSpecifiedAmountIn.token, quote.tradeType),
         nativeTokenService,
       );
 
@@ -517,7 +517,11 @@ describe('adjustQuoteWithFees', () => {
         const preparedSwap = adjustQuoteWithFees(
           quote,
           userSpecifiedAmountIn,
-          new Fees([{ recipient: TEST_FEE_RECIPIENT, basisPoints: 1000 }], userSpecifiedAmountIn.token), // 1% fee
+          new Fees(
+            [{ recipient: TEST_FEE_RECIPIENT, basisPoints: 1000 }],
+            userSpecifiedAmountIn.token,
+            quote.tradeType,
+          ), // 1% fee
           nativeTokenService,
         );
 
@@ -540,7 +544,7 @@ describe('adjustQuoteWithFees', () => {
         const preparedSwap = adjustQuoteWithFees(
           quote,
           userSpecifiedAmountIn,
-          new Fees([], userSpecifiedAmountIn.token),
+          new Fees([], userSpecifiedAmountIn.token, quote.tradeType),
           nativeTokenService,
         );
 
@@ -558,7 +562,7 @@ describe('adjustQuoteWithFees', () => {
       const preparedSwap = adjustQuoteWithFees(
         quote,
         userSpecifiedAmountOut,
-        new Fees([], quote.amountIn.token),
+        new Fees([], quote.amountIn.token, quote.tradeType),
         nativeTokenService,
       );
 
@@ -573,7 +577,7 @@ describe('adjustQuoteWithFees', () => {
       const preparedSwap = adjustQuoteWithFees(
         quote,
         userSpecifiedAmountOut,
-        new Fees([], quote.amountIn.token),
+        new Fees([], quote.amountIn.token, quote.tradeType),
         nativeTokenService,
       );
 
@@ -590,11 +594,15 @@ describe('adjustQuoteWithFees', () => {
         const preparedSwap = adjustQuoteWithFees(
           quote,
           userSpecifiedAmountOut,
-          new Fees([{ recipient: TEST_FEE_RECIPIENT, basisPoints: 1000 }], quote.amountIn.token), // 10% fee
+          new Fees(
+            [{ recipient: TEST_FEE_RECIPIENT, basisPoints: 1000 }],
+            quote.amountIn.token,
+            quote.tradeType,
+          ), // 10% fee
           nativeTokenService,
         );
 
-        expect(formatAmount(preparedSwap.amountIn)).toEqual('110.0'); // quotedAmount + 1% fee
+        expect(formatAmount(preparedSwap.amountIn)).toEqual('111.111111111111111111'); // quotedAmount + 1% fee
         expect(formatAmount(preparedSwap.amountOut)).toEqual(formatAmount(quote.amountOut));
       });
     });
@@ -611,11 +619,11 @@ describe('adjustQuoteWithFees', () => {
         };
         const userSpecifiedAmountOut = quote.amountOut;
 
-        const fees = tenPercentFees(NATIVE_TEST_TOKEN);
+        const fees = tenPercentFees(NATIVE_TEST_TOKEN, quote.tradeType);
         const preparedSwap = adjustQuoteWithFees(quote, userSpecifiedAmountOut, fees, nativeTokenService);
 
         expectERC20(preparedSwap.amountIn.token, nativeTokenService.wrappedToken.address);
-        expect(formatAmount(preparedSwap.amountIn)).toEqual('11.0');
+        expect(formatAmount(preparedSwap.amountIn)).toEqual('11.111111111111111111');
 
         expectERC20(preparedSwap.amountOut.token, FUN_TEST_TOKEN.address);
         expect(formatAmount(preparedSwap.amountOut)).toEqual('1.0');
