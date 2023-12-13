@@ -183,10 +183,10 @@ export function SwapForm({ data }: SwapFromProps) {
         );
       }
 
-      if (shouldSetToAddress(data?.toContractAddress, data?.fromTokenAddress)) {
+      if (shouldSetToAddress(data?.toTokenAddress, data?.fromTokenAddress)) {
         setToToken(allowedTokens.find((t) => (
-          isNativeToken(t.address) && data?.toContractAddress?.toLowerCase() === NATIVE
-        ) || (t.address?.toLowerCase() === data?.toContractAddress?.toLowerCase())));
+          isNativeToken(t.address) && data?.toTokenAddress?.toLowerCase() === NATIVE
+        ) || (t.address?.toLowerCase() === data?.toTokenAddress?.toLowerCase())));
       }
     }
   }, [
@@ -194,7 +194,7 @@ export function SwapForm({ data }: SwapFromProps) {
     allowedTokens,
     cryptoFiatState.conversions,
     data?.fromTokenAddress,
-    data?.toContractAddress,
+    data?.toTokenAddress,
     hasSetDefaultState.current,
     setFromToken,
     setFromBalance,
@@ -737,7 +737,7 @@ export function SwapForm({ data }: SwapFromProps) {
           fromTokenSymbol: fromToken?.symbol,
           fromTokenAddress: fromToken?.address,
           toTokenSymbol: toToken?.symbol,
-          toContractAddress: toToken?.address,
+          toTokenAddress: toToken?.address,
         }}
         insufficientFundsForGas={insufficientFundsForGas}
         openNotEnoughImxDrawer={openNotEnoughImxDrawer}
@@ -756,7 +756,7 @@ export function SwapForm({ data }: SwapFromProps) {
               currentViewData: {
                 fromTokenAddress: fromToken?.address ?? '',
                 fromAmount,
-                toContractAddress: toToken?.address ?? '',
+                toTokenAddress: toToken?.address ?? '',
               },
             },
           });

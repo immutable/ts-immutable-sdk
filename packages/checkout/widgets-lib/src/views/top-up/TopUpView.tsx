@@ -143,7 +143,7 @@ export function TopUpView({
   const onClickSwap = () => {
     if (widgetEvent === IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT) {
       const data = {
-        toContractAddress: '',
+        toTokenAddress: '',
         fromAmount: '',
         fromTokenAddress: '',
       };

@@ -115,7 +115,7 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
       setSwapParams({
         amount: step.fundingItem.fundsRequired.formattedAmount,
         fromTokenAddress: step.fundingItem.token.address,
-        toContractAddress: requiredTokenAddress,
+        toTokenAddress: requiredTokenAddress,
       });
       if (network.chainId === getL2ChainId(checkout!.config)) {
         setView(FundingRouteExecuteViews.EXECUTE_SWAP);

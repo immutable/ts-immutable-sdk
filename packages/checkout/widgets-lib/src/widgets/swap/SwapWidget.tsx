@@ -59,7 +59,7 @@ export type SwapWidgetInputs = SwapWidgetParams & {
 export function SwapWidget({
   amount,
   fromTokenAddress,
-  toContractAddress,
+  toTokenAddress,
   config,
 }: SwapWidgetInputs) {
   const { success, failed, rejected } = text.views[SwapWidgetViews.SWAP];
@@ -220,8 +220,8 @@ export function SwapWidget({
                   viewState.view.data?.fromTokenAddress
                   ?? fromTokenAddress
                 }
-            toContractAddress={
-                  viewState.view.data?.toContractAddress ?? toContractAddress
+            toTokenAddress={
+                  viewState.view.data?.toTokenAddress ?? toTokenAddress
                 }
           />
           )}

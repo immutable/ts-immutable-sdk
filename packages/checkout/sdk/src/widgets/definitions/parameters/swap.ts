@@ -4,7 +4,7 @@ import { WalletProviderName } from '../../../types';
  * Swap Widget parameters
  * @property {string | undefined} amount
  * @property {string | undefined} fromTokenAddress
- * @property {string | undefined} toContractAddress
+ * @property {string | undefined} toTokenAddress
  * @property {WalletProviderName | undefined} walletProviderName
  */
 export type SwapWidgetParams = {
@@ -13,7 +13,7 @@ export type SwapWidgetParams = {
   /** The contract address of the token to swap from */
   fromTokenAddress?: string;
   /** The contract address of the token to swap to */
-  toContractAddress?: string;
+  toTokenAddress?: string;
   /** The wallet provider name to use for the swap widget */
   walletProviderName?: WalletProviderName;
 };

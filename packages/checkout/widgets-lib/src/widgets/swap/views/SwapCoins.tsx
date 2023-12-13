@@ -23,7 +23,7 @@ export interface SwapCoinsProps {
   fromAmount?: string;
   toAmount?: string;
   fromTokenAddress?: string;
-  toContractAddress?: string;
+  toTokenAddress?: string;
 }
 
 export function SwapCoins({
@@ -31,7 +31,7 @@ export function SwapCoins({
   fromAmount,
   toAmount,
   fromTokenAddress,
-  toContractAddress,
+  toTokenAddress,
 }: SwapCoinsProps) {
   const { header } = text.views[SwapWidgetViews.SWAP];
   const { viewState, viewDispatch } = useContext(ViewContext);
@@ -58,7 +58,7 @@ export function SwapCoins({
         fromAmount,
         toAmount,
         fromTokenAddress,
-        toContractAddress,
+        toTokenAddress,
       },
     });
   }, []);
@@ -93,7 +93,7 @@ export function SwapCoins({
           fromAmount,
           toAmount,
           fromTokenAddress,
-          toContractAddress,
+          toTokenAddress,
         }}
         />
         <NotEnoughImx
