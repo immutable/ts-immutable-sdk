@@ -153,7 +153,7 @@ export const useSignOrder = (input: SignOrderInput) => {
   const {
     provider,
     items,
-    fromContractAddress,
+    fromTokenAddress,
     recipientAddress,
     env,
     environmentId,
@@ -237,7 +237,7 @@ export const useSignOrder = (input: SignOrderInput) => {
           recipient_address: recipientAddress,
           payment_type: paymentType,
           currency_filter: SignCurrencyFilter.CONTRACT_ADDRESS,
-          currency_value: fromContractAddress,
+          currency_value: fromTokenAddress,
           products: items.map((item) => ({
             product_id: item.productId,
             quantity: item.qty,
@@ -267,7 +267,7 @@ export const useSignOrder = (input: SignOrderInput) => {
       }
       return undefined;
     },
-    [items, fromContractAddress, recipientAddress, environmentId, env, provider],
+    [items, fromTokenAddress, recipientAddress, environmentId, env, provider],
   );
 
   const execute = async (

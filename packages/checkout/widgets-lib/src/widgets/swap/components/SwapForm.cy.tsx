@@ -122,7 +122,7 @@ describe('SwapForm', () => {
           cryptoConversionsOverride={cryptoConversions}
         >
           <SwapForm data={{
-            fromContractAddress: NATIVE,
+            fromTokenAddress: NATIVE,
           }}
           />
         </SwapWidgetTestComponent>,
@@ -156,7 +156,7 @@ describe('SwapForm', () => {
           cryptoConversionsOverride={cryptoConversions}
         >
           <SwapForm data={{
-            fromContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+            fromTokenAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
           }}
           />
         </SwapWidgetTestComponent>,
@@ -190,7 +190,7 @@ describe('SwapForm', () => {
           cryptoConversionsOverride={cryptoConversions}
         >
           <SwapForm data={{
-            fromContractAddress: NATIVE,
+            fromTokenAddress: NATIVE,
             toContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
           }}
           />
@@ -210,7 +210,7 @@ describe('SwapForm', () => {
           cryptoConversionsOverride={cryptoConversions}
         >
           <SwapForm data={{
-            fromContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+            fromTokenAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
             toContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
           }}
           />

@@ -66,7 +66,7 @@ export const MainPage = () => {
     })
     walletWidget.addListener(OrchestrationEventType.REQUEST_SWAP, (data: RequestSwapEvent) => {
       walletWidget.unmount();
-      swapWidget.mount('swap-target', { fromContractAddress: data.fromTokenAddress, amount: data.amount });
+      swapWidget.mount('swap-target', { fromTokenAddress: data.fromTokenAddress, amount: data.amount });
     })
     walletWidget.addListener(OrchestrationEventType.REQUEST_ONRAMP, (data: RequestOnrampEvent) => {
       walletWidget.unmount();

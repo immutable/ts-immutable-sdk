@@ -145,7 +145,7 @@ export function TopUpView({
       const data = {
         toContractAddress: '',
         fromAmount: '',
-        fromContractAddress: '',
+        fromTokenAddress: '',
       };
 
       viewDispatch({
@@ -173,7 +173,7 @@ export function TopUpView({
   const onClickBridge = () => {
     if (widgetEvent === IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT) {
       const data = {
-        fromContractAddress: '',
+        fromTokenAddress: '',
         fromAmount: '',
       };
 

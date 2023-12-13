@@ -46,7 +46,7 @@ export function SwapButton({
       control: 'Swap',
       controlType: 'Button',
       extras: {
-        swapFromAddress: data?.fromContractAddress,
+        swapFromAddress: data?.fromTokenAddress,
         swapFromAmount: data?.fromAmount,
         swapFromTokenSymbol: data?.fromTokenSymbol,
         swapToAddress: data?.toContractAddress,
@@ -68,7 +68,7 @@ export function SwapButton({
       updateLoading(true);
       const prefilledSwapData:PrefilledSwapForm = {
         fromAmount: data?.fromAmount || '',
-        fromContractAddress: data?.fromContractAddress || '',
+        fromTokenAddress: data?.fromTokenAddress || '',
         toContractAddress: data?.toContractAddress || '',
       };
 

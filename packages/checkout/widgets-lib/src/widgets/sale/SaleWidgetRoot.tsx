@@ -71,10 +71,10 @@ export class Sale extends Base<WidgetType.SALE> {
       validatedParams.environmentId = '';
     }
 
-    if (!params.fromContractAddress) {
+    if (!params.fromTokenAddress) {
       // eslint-disable-next-line no-console
-      console.warn('[IMTBL]: invalid "fromContractAddress" widget input');
-      validatedParams.fromContractAddress = '';
+      console.warn('[IMTBL]: invalid "fromTokenAddress" widget input');
+      validatedParams.fromTokenAddress = '';
     }
 
     return validatedParams;
@@ -106,7 +106,7 @@ export class Sale extends Base<WidgetType.SALE> {
               config={this.strongConfig()}
               amount={this.parameters.amount!}
               items={this.parameters.items!}
-              fromContractAddress={this.parameters.fromContractAddress!}
+              fromTokenAddress={this.parameters.fromTokenAddress!}
               environmentId={this.parameters.environmentId!}
             />
           </ConnectLoader>

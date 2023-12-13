@@ -61,6 +61,6 @@ export interface ApproveERC20SwapData {
 }
 export interface PrefilledSwapForm {
   fromAmount: string;
-  fromContractAddress: string;
+  fromTokenAddress: string;
   toContractAddress: string;
 }
