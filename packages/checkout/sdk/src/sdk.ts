@@ -229,7 +229,7 @@ export class Checkout {
       params.provider,
     );
 
-    if (!params.contractAddress || params.contractAddress === '') {
+    if (!params.tokenAddress || params.tokenAddress === '') {
       return await balances.getBalance(
         this.config,
         web3Provider,
@@ -239,7 +239,7 @@ export class Checkout {
     return await balances.getERC20Balance(
       web3Provider,
       params.walletAddress,
-      params.contractAddress,
+      params.tokenAddress,
     );
   }
 

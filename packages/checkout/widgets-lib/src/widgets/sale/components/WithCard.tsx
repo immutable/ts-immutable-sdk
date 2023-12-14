@@ -65,7 +65,7 @@ export function WithCard(props: WithCardProps) {
       calldata={executeTxn.rawData}
       cryptoCurrencyCode={signResponse.order.currency.name}
       estimatedGasLimit={executeTxn.gasEstimate}
-      smartContractAddress={executeTxn.contractAddress}
+      smartContractAddress={executeTxn.tokenAddress}
       partnerOrderId={executeTxn.params.reference}
       onInit={onInit}
       onOpen={onOpen}

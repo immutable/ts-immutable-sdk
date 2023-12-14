@@ -62,15 +62,15 @@ export const MainPage = () => {
   useEffect(() => {
     walletWidget.addListener(OrchestrationEventType.REQUEST_BRIDGE, (eventData: RequestBridgeEvent) => {
       walletWidget.unmount();
-      bridgeWidget.mount('bridge-target', { contractAddress: eventData.tokenAddress, amount: eventData.amount });
+      bridgeWidget.mount('bridge-target', { tokenAddress: eventData.tokenAddress, amount: eventData.amount });
     })
     walletWidget.addListener(OrchestrationEventType.REQUEST_SWAP, (data: RequestSwapEvent) => {
       walletWidget.unmount();
-      swapWidget.mount('swap-target', { fromContractAddress: data.fromTokenAddress, amount: data.amount });
+      swapWidget.mount('swap-target', { fromTokenAddress: data.fromTokenAddress, amount: data.amount });
     })
     walletWidget.addListener(OrchestrationEventType.REQUEST_ONRAMP, (data: RequestOnrampEvent) => {
       walletWidget.unmount();
-      onRampWidget.mount('onramp-target', { contractAddress: data.tokenAddress, amount: data.amount });
+      onRampWidget.mount('onramp-target', { tokenAddress: data.tokenAddress, amount: data.amount });
     })
     bridgeWidget.addListener(OrchestrationEventType.REQUEST_SWAP, () => {
       bridgeWidget.unmount();

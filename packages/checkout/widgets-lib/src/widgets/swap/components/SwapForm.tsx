@@ -166,35 +166,35 @@ export function SwapForm({ data }: SwapFromProps) {
     if (!hasSetDefaultState.current) {
       hasSetDefaultState.current = true;
 
-      if (data?.fromContractAddress) {
+      if (data?.fromTokenAddress) {
         setFromToken(
           allowedTokens.find((t) => (isNativeToken(t.address)
-              && data?.fromContractAddress?.toLowerCase() === NATIVE)
+              && data?.fromTokenAddress?.toLowerCase() === NATIVE)
               || t.address?.toLowerCase()
-                === data?.fromContractAddress?.toLowerCase()),
+                === data?.fromTokenAddress?.toLowerCase()),
         );
         setFromBalance(
           tokenBalances.find(
             (t) => (
               isNativeToken(t.token.address)
-                && data?.fromContractAddress?.toLowerCase() === NATIVE)
-              || (t.token.address?.toLowerCase() === data?.fromContractAddress?.toLowerCase()),
+                && data?.fromTokenAddress?.toLowerCase() === NATIVE)
+              || (t.token.address?.toLowerCase() === data?.fromTokenAddress?.toLowerCase()),
           )?.formattedBalance ?? '',
         );
       }
 
-      if (shouldSetToAddress(data?.toContractAddress, data?.fromContractAddress)) {
+      if (shouldSetToAddress(data?.toTokenAddress, data?.fromTokenAddress)) {
         setToToken(allowedTokens.find((t) => (
-          isNativeToken(t.address) && data?.toContractAddress?.toLowerCase() === NATIVE
-        ) || (t.address?.toLowerCase() === data?.toContractAddress?.toLowerCase())));
+          isNativeToken(t.address) && data?.toTokenAddress?.toLowerCase() === NATIVE
+        ) || (t.address?.toLowerCase() === data?.toTokenAddress?.toLowerCase())));
       }
     }
   }, [
     tokenBalances,
     allowedTokens,
     cryptoFiatState.conversions,
-    data?.fromContractAddress,
-    data?.toContractAddress,
+    data?.fromTokenAddress,
+    data?.toTokenAddress,
     hasSetDefaultState.current,
     setFromToken,
     setFromBalance,
@@ -735,9 +735,9 @@ export function SwapForm({ data }: SwapFromProps) {
           fromAmount,
           toAmount,
           fromTokenSymbol: fromToken?.symbol,
-          fromContractAddress: fromToken?.address,
+          fromTokenAddress: fromToken?.address,
           toTokenSymbol: toToken?.symbol,
-          toContractAddress: toToken?.address,
+          toTokenAddress: toToken?.address,
         }}
         insufficientFundsForGas={insufficientFundsForGas}
         openNotEnoughImxDrawer={openNotEnoughImxDrawer}
@@ -754,9 +754,9 @@ export function SwapForm({ data }: SwapFromProps) {
                 type: SharedViews.TOP_UP_VIEW,
               },
               currentViewData: {
-                fromContractAddress: fromToken?.address ?? '',
+                fromTokenAddress: fromToken?.address ?? '',
                 fromAmount,
-                toContractAddress: toToken?.address ?? '',
+                toTokenAddress: toToken?.address ?? '',
               },
             },
           });

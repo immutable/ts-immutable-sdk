@@ -7,12 +7,12 @@ import { TokenInfo } from './tokenInfo';
  * Interface representing the parameters for {@link Checkout.getBalance}.
  * @property {Web3Provider} provider - The provider used to get the balance.
  * @property {string} walletAddress - The wallet address.
- * @property {string | undefined} contractAddress - The contract address of the token.
+ * @property {string | undefined} tokenAddress - The contract address of the token.
  */
 export interface GetBalanceParams {
   provider: Web3Provider;
   walletAddress: string;
-  contractAddress?: string;
+  tokenAddress?: string;
 }
 
 /**

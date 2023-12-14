@@ -122,7 +122,7 @@ describe('SwapForm', () => {
           cryptoConversionsOverride={cryptoConversions}
         >
           <SwapForm data={{
-            fromContractAddress: NATIVE,
+            fromTokenAddress: NATIVE,
           }}
           />
         </SwapWidgetTestComponent>,
@@ -139,7 +139,7 @@ describe('SwapForm', () => {
           cryptoConversionsOverride={cryptoConversions}
         >
           <SwapForm data={{
-            toContractAddress: NATIVE,
+            toTokenAddress: NATIVE,
           }}
           />
         </SwapWidgetTestComponent>,
@@ -156,7 +156,7 @@ describe('SwapForm', () => {
           cryptoConversionsOverride={cryptoConversions}
         >
           <SwapForm data={{
-            fromContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+            fromTokenAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
           }}
           />
         </SwapWidgetTestComponent>,
@@ -173,7 +173,7 @@ describe('SwapForm', () => {
           cryptoConversionsOverride={cryptoConversions}
         >
           <SwapForm data={{
-            toContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+            toTokenAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
           }}
           />
         </SwapWidgetTestComponent>,
@@ -190,8 +190,8 @@ describe('SwapForm', () => {
           cryptoConversionsOverride={cryptoConversions}
         >
           <SwapForm data={{
-            fromContractAddress: NATIVE,
-            toContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+            fromTokenAddress: NATIVE,
+            toTokenAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
           }}
           />
         </SwapWidgetTestComponent>,
@@ -210,8 +210,8 @@ describe('SwapForm', () => {
           cryptoConversionsOverride={cryptoConversions}
         >
           <SwapForm data={{
-            fromContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-            toContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+            fromTokenAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+            toTokenAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
           }}
           />
         </SwapWidgetTestComponent>,
@@ -449,7 +449,7 @@ describe('SwapForm', () => {
               name: 'ImmutableX',
               symbol: 'IMX',
               decimals: 18,
-              address: '',
+              address: NATIVE,
             },
             value: BigNumber.from('112300000000000032'),
           },
@@ -461,7 +461,7 @@ describe('SwapForm', () => {
               name: 'ImmutableX',
               symbol: 'IMX',
               decimals: 18,
-              address: '',
+              address: NATIVE,
             },
             value: BigNumber.from('112300000000000045'),
           },
@@ -715,7 +715,7 @@ describe('SwapForm', () => {
               name: 'ImmutableX',
               symbol: 'IMX',
               decimals: 18,
-              address: '',
+              address: NATIVE,
             },
             value: BigNumber.from('112300000000000032'),
           },
@@ -727,7 +727,7 @@ describe('SwapForm', () => {
               name: 'ImmutableX',
               symbol: 'IMX',
               decimals: 18,
-              address: '',
+              address: NATIVE,
             },
             value: BigNumber.from('112300000000000045'),
           },
@@ -742,7 +742,7 @@ describe('SwapForm', () => {
               name: 'ImmutableX',
               symbol: 'IMX',
               decimals: 18,
-              address: '',
+              address: NATIVE,
             },
             value: BigNumber.from('112300000000000045'),
           },

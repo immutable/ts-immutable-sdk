@@ -30,7 +30,7 @@ export type OnRampWidgetInputs = OnRampWidgetParams & {
 };
 
 export function OnRampWidget({
-  amount, contractAddress, config,
+  amount, tokenAddress, config,
 }: OnRampWidgetInputs) {
   const {
     isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
@@ -40,7 +40,7 @@ export function OnRampWidget({
 
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
-  const [tokenAddress, setTokenAddress] = useState(contractAddress);
+  const [tknAddr, setTknAddr] = useState(tokenAddress);
 
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
@@ -64,11 +64,11 @@ export function OnRampWidget({
       if (!network.isSupported) {
         return;
       }
-      const tknAddr = contractAddress?.toLocaleLowerCase() === NATIVE
+      const address = tknAddr?.toLocaleLowerCase() === NATIVE
         ? NATIVE
-        : contractAddress;
+        : tokenAddress;
 
-      setTokenAddress(tknAddr);
+      setTknAddr(address);
     })();
   }, [checkout, provider, viewDispatch]);
 
@@ -134,7 +134,7 @@ export function OnRampWidget({
           showIframe={showIframe}
           tokenAmount={viewState.view.data?.amount ?? amount}
           tokenAddress={
-            viewState.view.data?.contractAddress ?? tokenAddress
+            viewState.view.data?.tokenAddress ?? tknAddr
           }
         />
       )}
