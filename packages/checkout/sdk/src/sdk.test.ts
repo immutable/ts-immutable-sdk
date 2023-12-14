@@ -599,7 +599,7 @@ describe('Connect', () => {
       provider,
       itemRequirements: [{
         type: ItemType.ERC20,
-        tokenAddress: '0xNOADDRESS',
+        contractAddress: '0xNOADDRESS',
         spenderAddress: '0xSPENDER',
         amount: '1.5',
       }],

@@ -161,6 +161,7 @@ export function BridgeWidget({
           )}
           {viewState.view.type === BridgeWidgetViews.BRIDGE_FORM && (
             <Bridge amount={amount} tokenAddress={tokenAddress} />
+          )}
           {viewState.view.type === BridgeWidgetViews.BRIDGE_REVIEW && (
             <BridgeReview />
           )}

@@ -11,11 +11,11 @@ import { calculateCryptoToFiat, formatFiatString } from '../../../lib/utils';
 
 export const MAX_GAS_LIMIT = '30000000';
 
-export const getItemRequirements = (amount: string, spenderAddress: string, tokenAddress: string)
+export const getItemRequirements = (amount: string, spenderAddress: string, contractAddress: string)
 : ERC20ItemRequirement[] => [
   {
     type: ItemType.ERC20,
-    tokenAddress,
+    contractAddress,
     spenderAddress,
     amount,
   },
