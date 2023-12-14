@@ -10,6 +10,8 @@ import {
   actionButtonStyles,
   actionButtonContainerStyles,
   logoContainerStyles,
+  ethLogoStyles,
+  imxLogoStyles,
 } from './NotEnoughGasStyles';
 import { text } from '../../resources/text/textConfig';
 
@@ -37,6 +39,11 @@ NotEnoughGasProps) {
 
   const [isCopied, setIsCopied] = useState(false);
 
+  const ethLogo = 'https://design-system.immutable.com/hosted-for-ds/currency-icons/currency--eth.svg';
+  const imxLogo = 'https://design-system.immutable.com/hosted-for-ds/currency-icons/currency--imx.svg';
+  const heading = tokenSymbol === ETH_TOKEN_SYMBOL ? `${content.eth.heading}` : `${content.imx.heading}`;
+  const body = tokenSymbol === ETH_TOKEN_SYMBOL ? `${content.eth.body}` : `${content.imx.body}`;
+
   const handleCopy = useCallback(() => {
     if (walletAddress && walletAddress !== '') {
       navigator.clipboard.writeText(walletAddress);
@@ -59,35 +66,19 @@ NotEnoughGasProps) {
       <Drawer.Content>
         <Box testId="not-enough-gas-bottom-sheet" sx={containerStyles}>
           <FramedImage
-            imageUrl={
-              tokenSymbol === 'ETH'
-              // eslint-disable-next-line max-len
-                ? 'https://design-system.immutable.com/hosted-for-ds/currency-icons/currency--eth.svg' : 'https://design-system.immutable.com/hosted-for-ds/currency-icons/currency--imx.svg'
-            }
+            imageUrl={tokenSymbol === 'ETH' ? ethLogo : imxLogo}
             circularFrame
-            sx={
-              tokenSymbol === ETH_TOKEN_SYMBOL
-                ? {
-                  backgroundColor: 'white',
-                  height: '100px',
-                  width: '64px',
-                  padding: '10px',
-                }
-                : {
-                  height: '110px',
-                  width: '64px',
-                }
-            }
+            sx={tokenSymbol === ETH_TOKEN_SYMBOL ? ethLogoStyles : imxLogoStyles}
           />
           <Heading
             size="small"
             sx={contentTextStyles}
             testId="not-enough-gas-heading"
           >
-            {tokenSymbol === ETH_TOKEN_SYMBOL ? `${content.eth.heading}` : `${content.imx.heading}`}
+            {heading}
           </Heading>
           <Body sx={contentTextStyles}>
-            {tokenSymbol === ETH_TOKEN_SYMBOL ? `${content.eth.body}` : `${content.imx.body}`}
+            {body}
           </Body>
           <Box sx={actionButtonContainerStyles}>
             {showAdjustAmount && (
