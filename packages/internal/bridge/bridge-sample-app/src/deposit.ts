@@ -55,7 +55,7 @@ async function deposit() {
   }
 
   const approvalReq: ApproveBridgeRequest = {
-    senderAddress: params.depositor,
+    senderAddress: params.sender,
     token: params.sepoliaToken,
     amount: params.amount,
     sourceChainId: ETH_SEPOLIA_CHAIN_ID,
@@ -70,6 +70,7 @@ async function deposit() {
     console.log('approvalRes', approvalRes);
   } catch(err) {
     console.log('approvalErr', err);
+    return
   }
 
   if (approvalRes!.unsignedTx) {
@@ -99,7 +100,7 @@ async function deposit() {
   }
 
   const depositReq: BridgeTxRequest = {
-    senderAddress: params.depositor,
+    senderAddress: params.sender,
     recipientAddress: params.recipient,
     token: params.sepoliaToken,
     amount: params.amount,
@@ -115,6 +116,7 @@ async function deposit() {
     console.log('depositRes', depositRes);
   } catch(err) {
     console.log('depositErr', err);
+    return
   }
 
   if (!depositRes!.unsignedTx) {

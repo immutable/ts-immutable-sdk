@@ -32,7 +32,7 @@ async function getApprovalTxs() {
     const tokenBridge = new TokenBridge(bridgeConfig);
 
     const depositReq: ApproveBridgeRequest = {
-      senderAddress: params.depositor,
+      senderAddress: params.sender,
       token: params.sepoliaToken,
       amount: params.amount,
       sourceChainId: ETH_SEPOLIA_CHAIN_ID,
@@ -49,7 +49,7 @@ async function getApprovalTxs() {
     }
 
     const depositNativeReq: ApproveBridgeRequest = {
-      senderAddress: params.depositor,
+      senderAddress: params.sender,
       token: 'NATIVE',
       amount: params.amount,
       sourceChainId: ETH_SEPOLIA_CHAIN_ID,
@@ -66,7 +66,7 @@ async function getApprovalTxs() {
     }
 
     const withdrawReq: ApproveBridgeRequest = {
-      senderAddress: params.depositor,
+      senderAddress: params.sender,
       token: params.zkevmTestnetToken,
       amount: params.amount,
       sourceChainId: ZKEVM_TESTNET_CHAIN_ID,
@@ -83,7 +83,7 @@ async function getApprovalTxs() {
     }
 
     const withdrawNativeReq: ApproveBridgeRequest = {
-      senderAddress: params.depositor,
+      senderAddress: params.sender,
       token: 'NATIVE',
       amount: params.amount,
       sourceChainId: ZKEVM_TESTNET_CHAIN_ID,

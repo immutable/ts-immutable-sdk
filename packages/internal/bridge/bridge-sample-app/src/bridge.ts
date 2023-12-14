@@ -34,7 +34,7 @@ async function getBridgeTxs() {
     const tokenBridge = new TokenBridge(bridgeConfig);
 
     const depositReq: BridgeTxRequest = {
-      senderAddress: params.depositor,
+      senderAddress: params.sender,
       recipientAddress: params.recipient,
       token: params.sepoliaToken,
       amount: params.amount,
@@ -53,7 +53,7 @@ async function getBridgeTxs() {
     }
 
     const depositNativeReq: BridgeTxRequest = {
-      senderAddress: params.depositor,
+      senderAddress: params.sender,
       recipientAddress: params.recipient,
       token: 'NATIVE',
       amount: params.amount,
@@ -72,7 +72,7 @@ async function getBridgeTxs() {
     }
 
     const withdrawReq: BridgeTxRequest = {
-      senderAddress: params.depositor,
+      senderAddress: params.sender,
       recipientAddress: params.recipient,
       token: params.sepoliaToken,
       amount: params.amount,
@@ -91,7 +91,7 @@ async function getBridgeTxs() {
     }
 
     const withdrawNativeReq: BridgeTxRequest = {
-      senderAddress: params.depositor,
+      senderAddress: params.sender,
       recipientAddress: params.recipient,
       token: 'NATIVE',
       amount: params.amount,

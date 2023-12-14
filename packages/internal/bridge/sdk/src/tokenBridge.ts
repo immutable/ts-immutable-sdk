@@ -242,6 +242,8 @@ export class TokenBridge {
       req.destinationChainId,
     );
 
+    console.log('after validation');
+
     // If the token is NATIVE, no approval is required
     if (req.token.toUpperCase() === 'NATIVE') {
       return {
@@ -265,6 +267,8 @@ export class TokenBridge {
       BridgeErrorType.PROVIDER_ERROR,
     );
 
+    console.log('before allowance');
+
     // Get the current approved allowance of the RootERC20Predicate
     const allowance: ethers.BigNumber = await withBridgeError<ethers.BigNumber>(() => erc20Contract
       .allowance(
@@ -284,6 +288,10 @@ export class TokenBridge {
       allowance,
     );
 
+    console.log('before approve');
+    console.log('sourceBridgeAddress', sourceBridgeAddress);
+    console.log('approvalAmountRequired', approvalAmountRequired);
+
     // Encode the approve function call data for the ERC20 contract
     const data: string = await withBridgeError<string>(
       async () => erc20Contract.approve(
@@ -292,6 +300,8 @@ export class TokenBridge {
       ),
       BridgeErrorType.INTERNAL_ERROR,
     );
+
+    console.log('after approve');
 
     // Create the unsigned transaction for the approval
     const unsignedTx: ethers.providers.TransactionRequest = {

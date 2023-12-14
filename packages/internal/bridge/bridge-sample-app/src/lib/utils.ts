@@ -10,8 +10,8 @@ export async function setupForBridge() {
       if (!process.env.PRIVATE_KEY) {
         throw new Error('PRIVATE_KEY not set');
       }
-      if (!process.env.DEPOSITOR_ADDRESS) {
-        throw new Error('DEPOSITOR_ADDRESS not set');
+      if (!process.env.SENDER_ADDRESS) {
+        throw new Error('SENDER_ADDRESS not set');
       }
       if (!process.env.RECIPIENT_ADDRESS) {
         throw new Error('RECIPIENT_ADDRESS not set');
@@ -22,11 +22,11 @@ export async function setupForBridge() {
       if (!process.env.ZKEVM_TESTNET_TOKEN_ADDRESS) {
         throw new Error('ZKEVM_TESTNET_TOKEN_ADDRESS not set');
       }
-      if (!process.env.DEPOSIT_AMOUNT) {
-        throw new Error('DEPOSIT_AMOUNT not set');
+      if (!process.env.SEND_AMOUNT) {
+        throw new Error('SEND_AMOUNT not set');
       }
-      if (!process.env.DEPOSIT_DECIMALS) {
-        throw new Error('DEPOSIT_DECIMALS not set');
+      if (!process.env.SEND_DECIMALS) {
+        throw new Error('SEND_DECIMALS not set');
       }
       if (!process.env.ROOT_BRIDGE_ADDRESS) {
         throw new Error('ROOT_BRIDGE_ADDRESS not set');
@@ -36,8 +36,8 @@ export async function setupForBridge() {
       }
       // Parse deposit amount from environment variable
       const amount = ethers.utils.parseUnits(
-        process.env.DEPOSIT_AMOUNT,
-        process.env.DEPOSIT_DECIMALS,
+        process.env.SEND_AMOUNT,
+        process.env.SEND_DECIMALS,
       );
     
       // Create providers for root and child chains
@@ -63,7 +63,7 @@ export async function setupForBridge() {
       return {
         rootProvider,
         childProvider,
-        depositor: process.env.DEPOSITOR_ADDRESS,
+        sender: process.env.SENDER_ADDRESS,
         recipient: process.env.RECIPIENT_ADDRESS,
         sepoliaToken: process.env.SEPOLIA_TOKEN_ADDRESS,
         zkevmTestnetToken: process.env.ZKEVM_TESTNET_TOKEN_ADDRESS,
