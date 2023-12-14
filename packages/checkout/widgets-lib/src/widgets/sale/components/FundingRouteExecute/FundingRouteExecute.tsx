@@ -100,7 +100,7 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
 
     if (step.type === FundingStepType.BRIDGE) {
       setBridgeParams({
-        contractAddress: step.fundingItem.token.address,
+        tokenAddress: step.fundingItem.token.address,
         amount: step.fundingItem.fundsRequired.formattedAmount,
       });
       if (network.chainId === getL1ChainId(checkout!.config)) {

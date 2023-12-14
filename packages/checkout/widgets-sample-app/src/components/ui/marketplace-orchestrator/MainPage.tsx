@@ -62,7 +62,7 @@ export const MainPage = () => {
   useEffect(() => {
     walletWidget.addListener(OrchestrationEventType.REQUEST_BRIDGE, (eventData: RequestBridgeEvent) => {
       walletWidget.unmount();
-      bridgeWidget.mount('bridge-target', { contractAddress: eventData.tokenAddress, amount: eventData.amount });
+      bridgeWidget.mount('bridge-target', { tokenAddress: eventData.tokenAddress, amount: eventData.amount });
     })
     walletWidget.addListener(OrchestrationEventType.REQUEST_SWAP, (data: RequestSwapEvent) => {
       walletWidget.unmount();
@@ -70,7 +70,7 @@ export const MainPage = () => {
     })
     walletWidget.addListener(OrchestrationEventType.REQUEST_ONRAMP, (data: RequestOnrampEvent) => {
       walletWidget.unmount();
-      onRampWidget.mount('onramp-target', { contractAddress: data.tokenAddress, amount: data.amount });
+      onRampWidget.mount('onramp-target', { tokenAddress: data.tokenAddress, amount: data.amount });
     })
   }, [walletWidget, bridgeWidget, onRampWidget, swapWidget]);
 

@@ -28,7 +28,7 @@ export type SignedOrder = {
 };
 
 export type SignedTransaction = {
-  contractAddress: string;
+  tokenAddress: string;
   gasEstimate: number;
   methodCall: string;
   params: {

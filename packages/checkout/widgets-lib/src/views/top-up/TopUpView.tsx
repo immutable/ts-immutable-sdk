@@ -201,7 +201,7 @@ export function TopUpView({
   const onClickOnRamp = () => {
     if (widgetEvent === IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT) {
       const data = {
-        contractAddress: '',
+        tokenAddress: '',
         amount: '',
       };
 

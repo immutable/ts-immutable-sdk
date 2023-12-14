@@ -136,7 +136,7 @@ const toSignResponse = (
       totalAmount: Number(order.total_amount),
     },
     transactions: transactions.map((transaction) => ({
-      contractAddress: transaction.contract_address,
+      tokenAddress: transaction.contract_address,
       gasEstimate: transaction.gas_estimate,
       methodCall: transaction.method_call,
       params: {
@@ -284,7 +284,7 @@ export const useSignOrder = (input: SignOrderInput) => {
     const execTransactions: ExecutedTransaction[] = [];
     for (const transaction of signData.transactions) {
       const {
-        contractAddress: to,
+        tokenAddress: to,
         rawData: data,
         methodCall: method,
         gasEstimate,

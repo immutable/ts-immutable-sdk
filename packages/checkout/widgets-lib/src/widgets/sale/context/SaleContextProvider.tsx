@@ -254,7 +254,7 @@ export function SaleContextProvider(props: {
     checkout,
     items,
     amount,
-    contractAddress: fromTokenAddress,
+    tokenAddress: fromTokenAddress,
   });
 
   useEffect(() => {

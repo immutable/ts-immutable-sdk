@@ -137,7 +137,7 @@ describe('Connect', () => {
     await checkout.getBalance({
       provider,
       walletAddress: '0x123',
-      contractAddress: '0x456',
+      tokenAddress: '0x456',
     } as GetBalanceParams);
 
     expect(getBalance).toBeCalledTimes(0);
@@ -599,7 +599,7 @@ describe('Connect', () => {
       provider,
       itemRequirements: [{
         type: ItemType.ERC20,
-        contractAddress: '0xNOADDRESS',
+        tokenAddress: '0xNOADDRESS',
         spenderAddress: '0xSPENDER',
         amount: '1.5',
       }],
