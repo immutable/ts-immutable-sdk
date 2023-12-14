@@ -4,7 +4,8 @@ import { Passport } from '@imtbl/passport';
 import { TokenInfo } from './tokenInfo';
 import { ChainId } from './chains';
 
-export interface CheckoutOverrides {}
+export interface CheckoutOverrides {
+}
 
 interface CheckoutFeatureConfiguration {
   enable: boolean;
@@ -34,12 +35,14 @@ export interface CheckoutBridgeConfiguration extends CheckoutFeatureConfiguratio
  * @property {CheckoutSwapConfiguration} swap - To configure the swap feature.
  * @property {CheckoutBridgeConfiguration} bridge - To configure the bridge feature.
  * @property {Passport} passport - To enable passport wallet integration.
+ * @property {string} publishableKey - To identify your integration for tracking and analytics purposes.
 */
 export interface CheckoutModuleConfiguration extends ModuleConfiguration<CheckoutOverrides> {
   onRamp?: CheckoutOnRampConfiguration;
   swap?: CheckoutSwapConfiguration;
   bridge?: CheckoutBridgeConfiguration;
   passport?: Passport;
+  publishableKey?: string;
 }
 
 /**

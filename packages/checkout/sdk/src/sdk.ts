@@ -1,7 +1,7 @@
 /* eslint-disable class-methods-use-this */
 import { Web3Provider } from '@ethersproject/providers';
 import { ethers } from 'ethers';
-import { Environment } from '@imtbl/config';
+import { addPublishableKeyToAxiosHeader, Environment } from '@imtbl/config';
 import { Passport } from '@imtbl/passport';
 import * as balances from './balances';
 import * as tokens from './tokens';
@@ -99,6 +99,10 @@ export class Checkout {
     this.readOnlyProviders = new Map<ChainId, ethers.providers.JsonRpcProvider>();
     this.availability = availabilityService(this.config.isDevelopment, this.config.isProduction);
     this.passport = config.passport;
+
+    if (config.baseConfig?.publishableKey) {
+      addPublishableKeyToAxiosHeader(config.baseConfig.publishableKey);
+    }
   }
 
   /**
