@@ -58,7 +58,7 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
     if (!this.reactRoot) return;
     this.reactRoot.render(
       <React.StrictMode>
-        <WidgetContainer id="xbridge-container" config={this.strongConfig()}>
+        <WidgetContainer id="bridge-container" config={this.strongConfig()}>
           <BridgeWidget
             checkout={this.checkout}
             config={this.strongConfig()}
