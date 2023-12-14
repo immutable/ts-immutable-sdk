@@ -39,7 +39,7 @@ export { ListTokensResult } from '../models';
  * @export
  * @interface GetERC20TokenRequest
  */
-export interface GetERC20TokenRequest {
+export interface GetERC20TokenRequestParams {
     /**
      * The address of contract
      * @type {string}
@@ -60,7 +60,7 @@ export interface GetERC20TokenRequest {
  * @export
  * @interface ListERC20TokensRequest
  */
-export interface ListERC20TokensRequest {
+export interface ListERC20TokensRequestParams {
     /**
      * The name of chain
      * @type {string}

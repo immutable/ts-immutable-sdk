@@ -43,7 +43,7 @@ export { ListActivitiesResult } from '../models';
  * @export
  * @interface GetActivityRequest
  */
-export interface GetActivityRequest {
+export interface GetActivityRequestParams {
     /**
      * The name of chain
      * @type {string}
@@ -64,7 +64,7 @@ export interface GetActivityRequest {
  * @export
  * @interface ListActivitiesRequest
  */
-export interface ListActivitiesRequest {
+export interface ListActivitiesRequestParams {
     /**
      * The name of chain
      * @type {string}
@@ -127,7 +127,7 @@ export interface ListActivitiesRequest {
  * @export
  * @interface ListActivityHistoryRequest
  */
-export interface ListActivityHistoryRequest {
+export interface ListActivityHistoryRequestParams {
     /**
      * The name of chain
      * @type {string}

@@ -43,7 +43,7 @@ export { ListNFTsResult } from '../models';
  * @export
  * @interface GetNFTRequest
  */
-export interface GetNFTRequest {
+export interface GetNFTRequestParams {
     /**
      * The address of NFT contract
      * @type {string}
@@ -71,7 +71,7 @@ export interface GetNFTRequest {
  * @export
  * @interface ListAllNFTsRequest
  */
-export interface ListAllNFTsRequest {
+export interface ListAllNFTsRequestParams {
     /**
      * The name of chain
      * @type {string}
@@ -106,7 +106,7 @@ export interface ListAllNFTsRequest {
  * @export
  * @interface ListNFTsRequest
  */
-export interface ListNFTsRequest {
+export interface ListNFTsRequestParams {
     /**
      * Contract address
      * @type {string}
@@ -148,7 +148,7 @@ export interface ListNFTsRequest {
  * @export
  * @interface ListNFTsByAccountAddressRequest
  */
-export interface ListNFTsByAccountAddressRequest {
+export interface ListNFTsByAccountAddressRequestParams {
     /**
      * Account address
      * @type {string}
