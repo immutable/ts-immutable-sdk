@@ -1,13 +1,6 @@
 /* eslint-disable no-console */
 import 'dotenv/config';
 import { ethers } from "ethers";
-import { ImmutableConfiguration, Environment } from '@imtbl/config';
-
-import { 
-    TokenBridge, 
-    BridgeConfiguration, 
-    ETH_SEPOLIA_TO_ZKEVM_TESTNET,
-} from '@imtbl/bridge-sdk';
 
 // @ts-ignore
 import { setupForBridge } from './lib/utils.ts';
@@ -17,17 +10,6 @@ import {delay, getContract, waitForReceipt, waitUntilSucceed} from './lib/helper
 async function mapToken() {
 
   const params = await setupForBridge();
-
-  const bridgeConfig = new BridgeConfiguration({
-    baseConfig: new ImmutableConfiguration({
-      environment: Environment.SANDBOX,
-    }),
-    bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
-    rootProvider: params.rootProvider,
-    childProvider: params.childProvider,
-  });
-
-  const tokenBridge = new TokenBridge(bridgeConfig);
 
   if (!process.env.ROOT_TOKEN_TO_MAP) {
     throw new Error('ROOT_TOKEN_TO_MAP not set');

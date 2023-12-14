@@ -15,6 +15,7 @@ import {
     BridgeTxResponse,
     TxStatusResponse,
     TxStatusRequest,
+    StatusResponse,
 } from '@imtbl/bridge-sdk';
 
 // @ts-ignore
@@ -151,11 +152,16 @@ async function deposit() {
     }]
   }
 
-  for(let i=0; i<100; i++) {
+  let complete:boolean = false;
+  let attempts = 0;
+  while(!complete) {
+    attempts++;
     const txStatusRes: TxStatusResponse = await tokenBridge.getTransactionStatus(txStatusReq);
-    console.log('txStatusRes attempt ', i+1);
-    console.log(util.inspect(txStatusRes, {showHidden: false, depth: null, colors: true}))
-
+    console.log(`TxStatusResponse attempt: ${attempts}`);
+    console.log(util.inspect(txStatusRes, {showHidden: false, depth: null, colors: true}));
+    if (txStatusRes.transactions[0].status === StatusResponse.COMPLETE) {
+      complete = true;
+    }
     await delay(10000);
   }
   

@@ -21,6 +21,7 @@
     "bridge": "ts-node --esm ./src/bridge.ts",
     "build": "",
     "deposit": "ts-node --esm ./src/deposit.ts",
+    "status": "ts-node --esm ./src/status.ts",
     "fees": "ts-node --esm ./src/fees.ts",
     "lint": "eslint ./src --ext .ts --max-warnings=0",
     "withdraw": "ts-node --esm ./src/withdraw.ts"
