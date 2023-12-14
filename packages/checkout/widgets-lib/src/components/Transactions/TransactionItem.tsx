@@ -7,6 +7,7 @@ import {
   Divider,
   Icon,
   MenuItem,
+  Link,
 } from '@biom3/react';
 import { ChainId } from '@imtbl/checkout-sdk';
 import { logoColour, networkIcon, networkName } from 'lib';
@@ -16,7 +17,11 @@ import {
 
 type TransactionItemProps = {
   label: string
-  caption: string
+  details: {
+    text: string,
+    link: string,
+    hash: string,
+  }
   fiatAmount: string
   amount: string
   fromChain: ChainId
@@ -26,7 +31,7 @@ type TransactionItemProps = {
 
 export function TransactionItem({
   label,
-  caption,
+  details,
   fiatAmount,
   amount,
   fromChain,
@@ -84,7 +89,12 @@ export function TransactionItem({
               {label}
             </MenuItem.Label>
             <MenuItem.Caption>
-              {caption}
+              <Link
+                size="xSmall"
+                rc={<a target="_blank" href={`${details.link}${details.hash}`} rel="noreferrer" />}
+              >
+                {details.text}
+              </Link>
             </MenuItem.Caption>
             <MenuItem.PriceDisplay
               fiatAmount={fiatAmount}

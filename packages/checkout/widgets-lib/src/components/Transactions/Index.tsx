@@ -15,7 +15,7 @@ import {
   Checkout, GetBalanceResult, TokenInfo, WalletProviderName,
 } from '@imtbl/checkout-sdk';
 import { sendBridgeWidgetCloseEvent } from '../../widgets/bridge/BridgeWidgetEvents';
-import { TransactionsInProgress } from './SectionInProgress';
+import { TransactionsInProgress } from './TransactionsInProgress';
 import { Shimmer } from './Shimmer';
 import { transactionsListStyle } from './indexStyles';
 import { EmptyStateNotConnected } from './EmptyStateNotConnected';
@@ -100,7 +100,7 @@ export function Transactions({ checkout }: TransactionsProps) {
             ? <EmptyStateNotConnected />
             : (
               <Box sx={transactionsListStyle(isPassport)}>
-                {loading ? <Shimmer /> : <TransactionsInProgress />}
+                {loading ? <Shimmer /> : <TransactionsInProgress checkout={checkout} />}
               </Box>
             )
         }

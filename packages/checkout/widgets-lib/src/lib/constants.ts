@@ -78,3 +78,12 @@ export const CHECKOUT_CDN_BASE_URL = {
   [Environment.SANDBOX]: 'https://checkout-cdn.sandbox.immutable.com',
   [Environment.PRODUCTION]: 'https://checkout-cdn.immutable.com',
 };
+
+/**
+ * URL for axelar scan based on the environment
+ */
+export const AXELAR_SCAN_URL = {
+  [ENV_DEVELOPMENT]: 'https://testnet.axelarscan.io/gmp/',
+  [Environment.SANDBOX]: 'https://testnet.axelarscan.io/gmp/',
+  [Environment.PRODUCTION]: 'https://axelarscan.io/gmp/',
+};
