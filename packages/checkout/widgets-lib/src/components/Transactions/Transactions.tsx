@@ -17,7 +17,7 @@ import {
 import { sendBridgeWidgetCloseEvent } from '../../widgets/bridge/BridgeWidgetEvents';
 import { TransactionsInProgress } from './TransactionsInProgress';
 import { Shimmer } from './Shimmer';
-import { transactionsListStyle } from './indexStyles';
+import { transactionsListStyle } from './TransactionsStyles';
 import { EmptyStateNotConnected } from './EmptyStateNotConnected';
 
 type TransactionsProps = {

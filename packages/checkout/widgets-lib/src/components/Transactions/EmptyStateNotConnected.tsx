@@ -2,7 +2,7 @@
 import { Body, Box, Button } from '@biom3/react';
 import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { text } from 'resources/text/textConfig';
-import { transactionsListStyle } from './indexStyles';
+import { transactionsListStyle } from './TransactionsStyles';
 
 export function EmptyStateNotConnected() {
   const { status: { emptyState } } = text.views[BridgeWidgetViews.TRANSACTIONS];

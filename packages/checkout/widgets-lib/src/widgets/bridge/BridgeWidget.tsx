@@ -24,7 +24,7 @@ import {
   TokenBridge,
 } from '@imtbl/bridge-sdk';
 import { getL1ChainId, getL2ChainId } from 'lib';
-import { Transactions } from 'components/Transactions/Index';
+import { Transactions } from 'components/Transactions/Transactions';
 import {
   ViewActions,
   ViewContext,
