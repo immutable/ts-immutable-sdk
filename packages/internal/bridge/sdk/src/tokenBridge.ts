@@ -2,7 +2,14 @@
 /* eslint-disable class-methods-use-this */
 import axios, { AxiosResponse } from 'axios';
 import {
-  ETH_MAINNET_TO_ZKEVM_MAINNET, ETH_SEPOLIA_TO_ZKEVM_TESTNET, axelarAPIEndpoints, axelarChains, bridgeMethods,
+  ETH_MAINNET_TO_ZKEVM_MAINNET,
+  ETH_SEPOLIA_TO_ZKEVM_TESTNET,
+  ZKEVM_DEVNET_CHAIN_ID,
+  ZKEVM_MAINNET_CHAIN_ID,
+  ZKEVM_TESTNET_CHAIN_ID,
+  axelarAPIEndpoints,
+  axelarChains,
+  bridgeMethods,
 } from 'constants/bridges';
 import { BridgeConfiguration } from 'config';
 import { ethers } from 'ethers';
@@ -29,13 +36,16 @@ import {
   FlowRateWithdrawResponse,
   FlowRateInfoRequest,
   CalculateBridgeFeeResponse,
+  Address,
+  RootBridgePendingWithdrawal,
+  TxStatusResponseItem,
 } from 'types';
 import { ROOT_ERC20_BRIDGE_FLOW_RATE } from 'contracts/ABIs/RootERC20BridgeFlowRate';
 import { ERC20 } from 'contracts/ABIs/ERC20';
 import { BridgeError, BridgeErrorType, withBridgeError } from 'errors';
 import { CHILD_ERC20_BRIDGE } from 'contracts/ABIs/ChildERC20Bridge';
 import { getGasPriceInWei } from 'lib/gasPriceInWei';
-import { GMPStatusResponse } from 'types/axelar';
+import { GMPStatus, GMPStatusResponse, GasPaidStatus } from 'types/axelar';
 import { queryTransactionStatus } from 'lib/gmpRecovery';
 
 /**
@@ -730,44 +740,166 @@ export class TokenBridge {
     }
   }
 
-  // STUBBED ENDPOINTS FOR PHASE 2 -------------------------------------------
-
   /**
  * Queries the status of a bridge transaction.
  *
- * @param {TokenMappingRequest} req - The request object containing the token, rootChainId and childChainId.
- * @returns {Promise<TokenMappingResponse>} - A promise that resolves to an object containing the token mappings.
+ * @param {TxStatusRequest} req - The request object containing an array of transactions to query.
+ * @returns {Promise<TxStatusResponse>} - A promise that resolves to an array of transaction statuses.
  * @throws {BridgeError} - If an error occurs during the query, a BridgeError will be thrown with a specific error type.
- * @dev this SDK method is currently stubbed
  */
   public async getTransactionStatus(req: TxStatusRequest): Promise<TxStatusResponse> {
-    console.log('stubbed response with req', req);
-
     const axelarAPIEndpoint:string = this.getAxelarEndpoint(req.sourceChainId);
+
+    const txStatusResponse:TxStatusResponse = {
+      transactions: [],
+    };
+
+    const abiCoder = new ethers.utils.AbiCoder();
 
     const statusPromises:Array<Promise<GMPStatusResponse>> = [];
     for (const transaction of req.transactions) {
       statusPromises.push(queryTransactionStatus(axelarAPIEndpoint, transaction.txHash));
     }
 
-    const statusResponses = await Promise.all(statusPromises);
+    let statusResponses:Array<GMPStatusResponse>;
+    try {
+      statusResponses = await Promise.all(statusPromises);
+    } catch (err) {
+      throw new BridgeError(
+        `Failed to fetch the Axelar Status with the reason: ${err}`,
+        BridgeErrorType.AXELAR_GAS_ESTIMATE_FAILED,
+      );
+    }
 
-    console.log('statusResponses');
-    console.log(statusResponses);
+    const unpaidGasStatus = [GasPaidStatus.GAS_UNPAID, GasPaidStatus.GAS_PAID_NOT_ENOUGH_GAS];
 
-    // Return the token mappings
-    return {
-      transactions: [{
-        transactionHash: '0x1234....',
-        status: StatusResponse.COMPLETE,
-        data: 'stubbed data',
-      }, {
-        transactionHash: '0xABCD....',
-        status: StatusResponse.PROCESSING,
-        data: 'stubbed data',
-      }],
+    const isWithdraw = [
+      ZKEVM_DEVNET_CHAIN_ID,
+      ZKEVM_TESTNET_CHAIN_ID,
+      ZKEVM_MAINNET_CHAIN_ID].includes(req.sourceChainId);
 
-    };
+    let rootBridge:ethers.Contract;
+    if (isWithdraw) {
+      rootBridge = await withBridgeError<ethers.Contract>(
+        async () => {
+          const contract = new ethers.Contract(
+            this.config.bridgeContracts.rootERC20BridgeFlowRate,
+            ROOT_ERC20_BRIDGE_FLOW_RATE,
+          );
+          return contract;
+        },
+        BridgeErrorType.INTERNAL_ERROR,
+      );
+    }
+
+    const flowRatePromises:Array<Promise<any>> = [];
+    const flowRatePromisesReceivers: Array<Address> = [];
+
+    for (let i = 0, l = statusResponses.length; i < l; i++) {
+      let metaStatus: StatusResponse;
+
+      // consolodate axelar statuses to our own simplified metaStatus
+      switch (statusResponses[i].status) {
+        case GMPStatus.CANNOT_FETCH_STATUS:
+          metaStatus = StatusResponse.PENDING;
+          break;
+        case GMPStatus.SRC_GATEWAY_CALLED:
+        case GMPStatus.DEST_GATEWAY_APPROVED:
+        case GMPStatus.DEST_EXECUTING:
+        case GMPStatus.SRC_GATEWAY_CONFIRMED:
+        case GMPStatus.APPROVING:
+          metaStatus = StatusResponse.PROCESSING;
+          break;
+        case GMPStatus.NOT_EXECUTED:
+          metaStatus = StatusResponse.RETRY;
+          break;
+        case GMPStatus.NOT_EXECUTED_WITHOUT_GAS_PAID:
+        case GMPStatus.INSUFFICIENT_FEE:
+          metaStatus = StatusResponse.NOT_ENOUGH_GAS;
+          break;
+        case GMPStatus.DEST_EXECUTED:
+          metaStatus = StatusResponse.COMPLETE;
+          break;
+        default:
+          metaStatus = StatusResponse.ERROR;
+      }
+      if (statusResponses[i].gasPaidInfo) {
+        if (unpaidGasStatus.includes(statusResponses[i].gasPaidInfo!.status)) {
+          metaStatus = StatusResponse.NOT_ENOUGH_GAS;
+        }
+      }
+
+      let txItem = {
+        txHash: req.transactions[i].txHash,
+        status: metaStatus,
+        data: {
+          gmpResponse: statusResponses[i].status,
+        },
+      } as TxStatusResponseItem;
+
+      let decodedData;
+      if (statusResponses[i]?.callTx?.returnValues?.payload) {
+        decodedData = abiCoder.decode(
+          ['bytes32', 'address', 'address', 'address', 'uint256'],
+          statusResponses[i].callTx.returnValues.payload,
+        );
+        txItem = {
+          ...txItem,
+          token: decodedData[1],
+          sender: decodedData[2],
+          receiver: decodedData[3],
+          amount: decodedData[4],
+        };
+      }
+
+      let flowRatePromiseIndex: number = -1;
+      if (metaStatus === StatusResponse.COMPLETE
+        && isWithdraw && txItem.receiver) {
+        // consolodate the calls we have to make to the flow rate by receiver
+        if (!flowRatePromisesReceivers.includes(txItem.receiver)) {
+          flowRatePromises.push(rootBridge!.getPendingWithdrawals(txItem.receiver));
+          flowRatePromisesReceivers.push(txItem.receiver);
+          flowRatePromiseIndex = flowRatePromisesReceivers.length - 1;
+        } else {
+          flowRatePromiseIndex = flowRatePromisesReceivers.findIndex((el) => el === txItem.receiver);
+          txItem.data.flowRatePromiseIndex = flowRatePromiseIndex;
+        }
+      }
+
+      txStatusResponse.transactions.push(txItem);
+    }// for
+
+    let flowRateResponses:Array<Array<RootBridgePendingWithdrawal>> = [];
+    if (flowRatePromises.length > 0) {
+      try {
+        flowRateResponses = await Promise.all(flowRatePromises);
+      } catch (err) {
+        throw new BridgeError(
+          `Failed to fetch the Flow Rate statuses with the reason: ${err}`,
+          BridgeErrorType.AXELAR_GAS_ESTIMATE_FAILED,
+        );
+      }
+    }
+
+    for (const txStatusRes of txStatusResponse.transactions) {
+      if (txStatusRes.data.flowRatePromiseIndex !== -1 && flowRateResponses[txStatusRes.data.flowRatePromiseIndex]) {
+        const flowRatedTx = flowRateResponses[txStatusRes.data.flowRatePromiseIndex].find((el) => (
+          el.amount === txStatusRes.amount.toString()
+          && el.token === txStatusRes.token
+          && el.withdrawer === txStatusRes.sender
+        ));
+        if (flowRatedTx) {
+          txStatusRes.status = StatusResponse.FLOW_RATE_CONTROLLED;
+          txStatusRes.data = {
+            timestamp: flowRatedTx.timestamp,
+          };
+        }
+      }
+      delete txStatusRes.data.flowRatePromiseIndex;
+    }
+
+    // Return the tx status response
+    return txStatusResponse;
   }
 
   /**

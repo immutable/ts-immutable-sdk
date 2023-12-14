@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import 'dotenv/config';
 import { ethers } from "ethers";
+import util from 'util';
 import { ImmutableConfiguration, Environment } from '@imtbl/config';
 import { 
     TokenBridge, 
@@ -77,16 +78,6 @@ async function deposit() {
     console.log('approvalNonce', approvalNonce);
     console.log('approvalGasPrice', approvalGasPrice);
 
-    // let feeData = await params.rootProvider.getFeeData();
-
-    // console.log('feeData');
-    // console.log(feeData);
-
-    // if (feeData.maxPriorityFeePerGas && feeData.lastBaseFeePerGas) {
-    //   approvalRes!.unsignedTx.maxPriorityFeePerGas = feeData.maxPriorityFeePerGas
-    //   approvalRes!.unsignedTx.maxFeePerGas = feeData.maxPriorityFeePerGas.add(feeData.lastBaseFeePerGas).mul(2); 
-    // }
-
     approvalRes!.unsignedTx.gasLimit = 1000000;
     approvalRes!.unsignedTx.nonce = approvalNonce;
     approvalRes!.unsignedTx.gasPrice = approvalGasPrice.mul(2);
@@ -159,15 +150,15 @@ async function deposit() {
       txHash: sendDepositRes.hash
     }]
   }
-  const txStatusRes: TxStatusResponse = await tokenBridge.getTransactionStatus(txStatusReq);
 
-  for(let i=0; i<1000; i++) {
+  for(let i=0; i<100; i++) {
+    const txStatusRes: TxStatusResponse = await tokenBridge.getTransactionStatus(txStatusReq);
     console.log('txStatusRes attempt ', i+1);
-    console.log(txStatusRes);
+    console.log(util.inspect(txStatusRes, {showHidden: false, depth: null, colors: true}))
+
     await delay(10000);
   }
   
-
 }
 
 (async () => {

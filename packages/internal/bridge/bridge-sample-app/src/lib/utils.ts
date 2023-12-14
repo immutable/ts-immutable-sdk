@@ -25,17 +25,19 @@ export async function setupForBridge() {
       if (!process.env.DEPOSIT_AMOUNT) {
         throw new Error('DEPOSIT_AMOUNT not set');
       }
+      if (!process.env.DEPOSIT_DECIMALS) {
+        throw new Error('DEPOSIT_DECIMALS not set');
+      }
       if (!process.env.ROOT_BRIDGE_ADDRESS) {
         throw new Error('ROOT_BRIDGE_ADDRESS not set');
       }
-    
       if (!process.env.CHILD_BRIDGE_ADDRESS) {
         throw new Error('CHILD_BRIDGE_ADDRESS not set');
       }
       // Parse deposit amount from environment variable
       const amount = ethers.utils.parseUnits(
         process.env.DEPOSIT_AMOUNT,
-        18,
+        process.env.DEPOSIT_DECIMALS,
       );
     
       // Create providers for root and child chains
