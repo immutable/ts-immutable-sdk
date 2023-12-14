@@ -1,14 +1,22 @@
 import {
   BridgeWidgetParams,
-  NetworkFilterTypes, TokenFilterTypes,
+  Checkout,
+  IMTBLWidgetEvents,
 } from '@imtbl/checkout-sdk';
 import {
   useCallback,
   useContext,
-  useEffect, useMemo, useReducer, useState,
+  useEffect,
+  useMemo,
+  useReducer,
 } from 'react';
+import { StrongCheckoutWidgetsConfig } from 'lib/withDefaultWidgetConfig';
+import { CryptoFiatProvider } from 'context/crypto-fiat-context/CryptoFiatProvider';
+import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
+import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
+import { StatusView } from 'components/Status/StatusView';
+import { StatusType } from 'components/Status/StatusType';
 import { ImmutableConfiguration } from '@imtbl/config';
-import { ethers } from 'ethers';
 import {
   BridgeConfiguration,
   ETH_MAINNET_TO_ZKEVM_MAINNET,
@@ -16,279 +24,202 @@ import {
   ETH_SEPOLIA_TO_ZKEVM_TESTNET,
   TokenBridge,
 } from '@imtbl/bridge-sdk';
-import { StrongCheckoutWidgetsConfig } from 'lib/withDefaultWidgetConfig';
+import { getL1ChainId, getL2ChainId } from 'lib';
+import { UserJourney } from 'context/analytics-provider/SegmentAnalyticsProvider';
+import { TopUpView } from 'views/top-up/TopUpView';
 import {
-  DEFAULT_BALANCE_RETRY_POLICY,
-  getL1ChainId,
-  getL2ChainId,
-} from '../../lib';
-import {
-  ErrorView as ErrorViewType,
-  SharedViews,
   ViewActions,
   ViewContext,
   initialViewState,
   viewReducer,
+  SharedViews,
 } from '../../context/view-context/ViewContext';
 import {
-  BridgeActions, BridgeContext, bridgeReducer, initialBridgeState,
+  BridgeContext,
+  bridgeReducer,
+  initialBridgeState,
+  BridgeActions,
 } from './context/BridgeContext';
-import { LoadingView } from '../../views/loading/LoadingView';
-import { sendBridgeFailedEvent, sendBridgeSuccessEvent, sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
-import { BridgeSuccessView, BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
+import { WalletNetworkSelectionView } from './views/WalletNetworkSelectionView';
 import { Bridge } from './views/Bridge';
-import { StatusType } from '../../components/Status/StatusType';
-import { StatusView } from '../../components/Status/StatusView';
-import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
+import { BridgeReview } from './views/BridgeReview';
 import { MoveInProgress } from './views/MoveInProgress';
-import { text } from '../../resources/text/textConfig';
+import { ApproveTransaction } from './views/ApproveTransaction';
 import { ErrorView } from '../../views/error/ErrorView';
-import { ApproveERC20BridgeOnboarding } from './views/ApproveERC20Bridge';
-import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
+import { text } from '../../resources/text/textConfig';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
-import { GetAllowedBalancesResultType, getAllowedBalances } from '../../lib/balance';
-import { isPassportProvider } from '../../lib/providerUtils';
-import { BridgeComingSoon } from './views/BridgeComingSoon';
+import { sendBridgeFailedEvent, sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
 
 export type BridgeWidgetInputs = BridgeWidgetParams & {
   config: StrongCheckoutWidgetsConfig,
+  checkout: Checkout;
+  web3Provider?: Web3Provider;
 };
 
 export function BridgeWidget({
-  amount,
-  fromContractAddress,
+  checkout,
+  web3Provider,
   config,
+  amount,
+  contractAddress,
 }: BridgeWidgetInputs) {
-  const { environment } = config;
-  const successText = text.views[BridgeWidgetViews.SUCCESS];
-  const failText = text.views[BridgeWidgetViews.FAIL];
-  const loadingText = text.views[SharedViews.LOADING_VIEW].text;
+  const {
+    environment,
+    isOnRampEnabled,
+    isSwapEnabled,
+    isBridgeEnabled,
+  } = config;
   const errorText = text.views[SharedViews.ERROR_VIEW];
-
-  const { connectLoaderState: { checkout, provider } } = useContext(ConnectLoaderContext);
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+  const bridgeFailureText = text.views[BridgeWidgetViews.BRIDGE_FAILURE];
 
-  const [errorViewLoading, setErrorViewLoading] = useState(false);
+  const [viewState, viewDispatch] = useReducer(
+    viewReducer,
+    {
+      ...initialViewState,
+      view: { type: BridgeWidgetViews.WALLET_NETWORK_SELECTION },
+      history: [{ type: BridgeWidgetViews.WALLET_NETWORK_SELECTION }],
+    },
+  );
 
-  const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
-  const [bridgeState, bridgeDispatch] = useReducer(bridgeReducer, initialBridgeState);
+  const [bridgeState, bridgeDispatch] = useReducer(
+    bridgeReducer,
+    {
+      ...initialBridgeState,
+      checkout,
+      web3Provider: web3Provider ?? null,
+      tokenBridge: (() => {
+        let bridgeInstance = ETH_SEPOLIA_TO_ZKEVM_TESTNET;
+        if (checkout.config.isDevelopment) bridgeInstance = ETH_SEPOLIA_TO_ZKEVM_DEVNET;
+        if (checkout.config.isProduction) bridgeInstance = ETH_MAINNET_TO_ZKEVM_MAINNET;
+
+        // Root provider is always L1
+        const rootProvider = new JsonRpcProvider(
+          checkout.config.networkMap.get(getL1ChainId(checkout.config))?.rpcUrls[0],
+        );
+
+        // Child provider is always L2
+        const childProvider = new JsonRpcProvider(
+          checkout.config.networkMap.get(getL2ChainId(checkout.config))?.rpcUrls[0],
+        );
+        const bridgeConfiguration = new BridgeConfiguration({
+          baseConfig: new ImmutableConfiguration({ environment: checkout.config.environment }),
+          bridgeInstance,
+          rootProvider,
+          childProvider,
+        });
+
+        return new TokenBridge(bridgeConfiguration);
+      })(),
+    },
+  );
 
   const viewReducerValues = useMemo(() => ({ viewState, viewDispatch }), [viewState, viewDispatch]);
   const bridgeReducerValues = useMemo(() => ({ bridgeState, bridgeDispatch }), [bridgeState, bridgeDispatch]);
 
-  // Passport currently does not have an L1 representation and therefore there
-  // is not need to show the bridge widget for Passport connected users.
-  if (isPassportProvider(provider)) {
-    return <BridgeComingSoon onCloseEvent={() => sendBridgeWidgetCloseEvent(eventTarget)} />;
-  }
-
-  const showErrorView = useCallback((error: any, tryAgain?: () => Promise<boolean>) => {
+  const goBackToWalletNetworkSelector = useCallback(() => {
+    bridgeDispatch({
+      payload: {
+        type: BridgeActions.SET_WALLETS_AND_NETWORKS,
+        from: null,
+        to: null,
+      },
+    });
+    bridgeDispatch({
+      payload: {
+        type: BridgeActions.SET_TOKEN_AND_AMOUNT,
+        amount: '',
+        token: null,
+      },
+    });
     viewDispatch({
       payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: {
-          type: SharedViews.ERROR_VIEW,
-          tryAgain,
-          error,
-        },
+        type: ViewActions.GO_BACK_TO,
+        view: { type: BridgeWidgetViews.WALLET_NETWORK_SELECTION },
       },
     });
   }, [viewDispatch]);
 
-  const showBridgeView = useCallback(() => {
+  const goBackToReview = useCallback(() => {
     viewDispatch({
       payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: { type: BridgeWidgetViews.BRIDGE },
+        type: ViewActions.GO_BACK_TO,
+        view: { type: BridgeWidgetViews.BRIDGE_REVIEW },
       },
     });
   }, [viewDispatch]);
-
-  const loadBalances = async (): Promise<boolean> => {
-    if (!checkout) throw new Error('loadBalances: missing checkout');
-    if (!provider) throw new Error('loadBalances: missing provider');
-
-    let tokensAndBalances: GetAllowedBalancesResultType = {
-      allowList: { tokens: [] },
-      allowedBalances: [],
-    };
-    try {
-      tokensAndBalances = await getAllowedBalances({
-        checkout,
-        provider,
-        allowTokenListType: TokenFilterTypes.BRIDGE,
-      });
-    } catch (err: any) {
-      if (DEFAULT_BALANCE_RETRY_POLICY.nonRetryable!(err)) {
-        showErrorView(err, loadBalances);
-        return false;
-      }
-    }
-
-    bridgeDispatch({
-      payload: {
-        type: BridgeActions.SET_ALLOWED_TOKENS,
-        allowedTokens: tokensAndBalances.allowList.tokens,
-      },
-    });
-
-    bridgeDispatch({
-      payload: {
-        type: BridgeActions.SET_TOKEN_BALANCES,
-        tokenBalances: tokensAndBalances.allowedBalances,
-      },
-    });
-
-    return true;
-  };
 
   useEffect(() => {
-    const bridgetWidgetSetup = async () => {
-      if (!checkout || !provider) return;
-
-      const getNetworkResult = await checkout.getNetworkInfo({ provider });
-
-      /* If the provider's network is not supported, return out of this and let the
-      connect loader handle the switch network functionality */
-      if (!getNetworkResult.isSupported) {
-        return;
-      }
-
+    (async () => {
       bridgeDispatch({
         payload: {
-          type: BridgeActions.SET_NETWORK,
-          network: getNetworkResult,
+          type: BridgeActions.SET_PROVIDER,
+          web3Provider: web3Provider ?? null,
         },
       });
-
-      const rootProvider = new ethers.providers.JsonRpcProvider(
-        checkout.config.networkMap.get(getL1ChainId(checkout.config))?.rpcUrls[0],
-      );
-
-      const toChainId = getL2ChainId(checkout.config);
-
-      const childProvider = new ethers.providers.JsonRpcProvider(
-        checkout.config.networkMap.get(toChainId)?.rpcUrls[0],
-      );
-
-      let bridgeInstance = ETH_SEPOLIA_TO_ZKEVM_TESTNET;
-      if (checkout.config.isDevelopment) bridgeInstance = ETH_SEPOLIA_TO_ZKEVM_DEVNET;
-      if (checkout.config.isProduction) bridgeInstance = ETH_MAINNET_TO_ZKEVM_MAINNET;
-
-      bridgeDispatch({
-        payload: {
-          type: BridgeActions.SET_TOKEN_BRIDGE,
-          tokenBridge: new TokenBridge(new BridgeConfiguration({
-            baseConfig: new ImmutableConfiguration(config),
-            bridgeInstance,
-            rootProvider,
-            childProvider,
-          })),
-        },
-      });
-
-      const allowedBridgingNetworks = await checkout.getNetworkAllowList({
-        type: NetworkFilterTypes.ALL,
-      });
-
-      const toNetwork = allowedBridgingNetworks.networks.find(
-        (network) => network.chainId === toChainId,
-      );
-      if (toNetwork) {
-        bridgeDispatch({
-          payload: {
-            type: BridgeActions.SET_TO_NETWORK,
-            toNetwork,
-          },
-        });
-      }
-
-      if (!await loadBalances()) return;
-
-      showBridgeView();
-    };
-
-    bridgetWidgetSetup();
-  }, [checkout, provider]);
+    })();
+  }, [web3Provider]);
 
   return (
     <ViewContext.Provider value={viewReducerValues}>
       <BridgeContext.Provider value={bridgeReducerValues}>
         <CryptoFiatProvider environment={environment}>
-          {viewReducerValues.viewState.view.type === SharedViews.LOADING_VIEW && (
-          <LoadingView loadingText={loadingText} />
+          {viewState.view.type === BridgeWidgetViews.WALLET_NETWORK_SELECTION && (
+            <WalletNetworkSelectionView />
           )}
-          {viewReducerValues.viewState.view.type === BridgeWidgetViews.BRIDGE && (
-          <Bridge
-            amount={viewReducerValues.viewState.view.data?.fromAmount ?? amount}
-            fromContractAddress={viewReducerValues.viewState.view.data?.fromContractAddress ?? fromContractAddress}
-          />
+          {viewState.view.type === BridgeWidgetViews.BRIDGE_FORM && (
+            <Bridge amount={amount} contractAddress={contractAddress} />
           )}
-          {viewReducerValues.viewState.view.type === BridgeWidgetViews.IN_PROGRESS && (
-          <MoveInProgress
-            token={viewReducerValues.viewState.view.data.token}
-            transactionResponse={viewReducerValues.viewState.view.data.transactionResponse}
-            bridgeForm={viewReducerValues.viewState.view.data.bridgeForm}
-          />
+          {viewState.view.type === BridgeWidgetViews.BRIDGE_REVIEW && (
+            <BridgeReview />
           )}
-          {viewReducerValues.viewState.view.type === BridgeWidgetViews.APPROVE_ERC20 && (
-          <ApproveERC20BridgeOnboarding data={viewReducerValues.viewState.view.data} />
+          {viewState.view.type === BridgeWidgetViews.IN_PROGRESS && (
+            <MoveInProgress
+              transactionHash={viewState.view.transactionHash}
+            />
           )}
-          {viewReducerValues.viewState.view.type === BridgeWidgetViews.SUCCESS && (
-          <StatusView
-            statusText={successText.text} // todo: move to text
-            actionText={successText.actionText}
-            onActionClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
-            onRenderEvent={() => sendBridgeSuccessEvent(
-              eventTarget,
-              (viewReducerValues.viewState.view as BridgeSuccessView).data.transactionHash,
+          {viewState.view.type === BridgeWidgetViews.BRIDGE_FAILURE
+            && (
+              <StatusView
+                testId="bridge-fail"
+                statusText={bridgeFailureText.statusText}
+                actionText={bridgeFailureText.actionText}
+                onActionClick={goBackToReview}
+                statusType={StatusType.FAILURE}
+                onRenderEvent={() => {
+                  let reason = '';
+                  if (viewState.view.type === BridgeWidgetViews.BRIDGE_FAILURE) {
+                    reason = viewState.view.reason;
+                  }
+                  sendBridgeFailedEvent(eventTarget, reason);
+                }}
+              />
             )}
-            statusType={StatusType.SUCCESS}
-            testId="success-view"
-          />
-          )}
-          {viewReducerValues.viewState.view.type === BridgeWidgetViews.FAIL && (
-          <StatusView
-            statusText={failText.text}
-            actionText={failText.actionText}
-            onActionClick={() => {
-              if (viewState.view.type === BridgeWidgetViews.FAIL) {
-                viewDispatch({
-                  payload: {
-                    type: ViewActions.UPDATE_VIEW,
-                    view: {
-                      type: BridgeWidgetViews.BRIDGE,
-                      data: viewState.view.data,
-                    },
-                  },
-                });
-              }
-            }}
-            onRenderEvent={() => sendBridgeFailedEvent(eventTarget, 'Transaction failed')}
-            onCloseClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
-            statusType={StatusType.FAILURE}
-            testId="fail-view"
-          />
-          )}
-          {viewReducerValues.viewState.view.type === SharedViews.ERROR_VIEW && (
-          <ErrorView
-            actionText={errorText.actionText}
-            onActionClick={async () => {
-              setErrorViewLoading(true);
-              const data = viewState.view as ErrorViewType;
 
-              if (!data.tryAgain) {
-                showBridgeView();
-                setErrorViewLoading(false);
-                return;
-              }
-
-              if (await data.tryAgain()) showBridgeView();
-              setErrorViewLoading(false);
-            }}
-            onCloseClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
-            errorEventActionLoading={errorViewLoading}
-          />
+          {viewState.view.type === BridgeWidgetViews.APPROVE_TRANSACTION && (
+            <ApproveTransaction
+              approveTransaction={viewState.view.approveTransaction}
+              transaction={viewState.view.transaction}
+            />
+          )}
+          {viewState.view.type === SharedViews.ERROR_VIEW && (
+            <ErrorView
+              actionText={errorText.actionText}
+              onActionClick={goBackToWalletNetworkSelector}
+              onCloseClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
+            />
+          )}
+          {viewState.view.type === SharedViews.TOP_UP_VIEW && (
+            <TopUpView
+              analytics={{ userJourney: UserJourney.BRIDGE }}
+              widgetEvent={IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT}
+              checkout={checkout}
+              provider={web3Provider}
+              showOnrampOption={isOnRampEnabled}
+              showSwapOption={isSwapEnabled}
+              showBridgeOption={isBridgeEnabled}
+              onCloseButtonClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
+            />
           )}
         </CryptoFiatProvider>
       </BridgeContext.Provider>

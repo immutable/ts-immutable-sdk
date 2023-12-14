@@ -3,15 +3,15 @@
  */
 export enum BridgeEventType {
   CLOSE_WIDGET = 'close-widget',
-  SUCCESS = 'success',
   FAILURE = 'failure',
+  TRANSACTION_SENT = 'transaction-sent',
 }
 
 /**
  * Represents a successful bridge transaction.
  * @property {string} transactionHash
  */
-export type BridgeSuccess = {
+export type BridgeTransactionSent = {
   /** The hash of the successful transaction. */
   transactionHash: string;
 };

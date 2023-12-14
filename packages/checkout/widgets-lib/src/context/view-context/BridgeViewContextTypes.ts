@@ -1,72 +1,47 @@
-import { TransactionResponse } from '@ethersproject/providers';
-import {
-  ApproveDepositBridgeResponse,
-  BridgeDepositResponse,
-} from '@imtbl/bridge-sdk';
-import { TokenInfo } from '@imtbl/checkout-sdk';
+import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
 import { ViewType } from './ViewType';
 
 export enum BridgeWidgetViews {
-  BRIDGE = 'BRIDGE',
+  WALLET_NETWORK_SELECTION = 'WALLET_NETWORK_SELECTION',
+  BRIDGE_FORM = 'BRIDGE_FORM',
+  BRIDGE_REVIEW = 'BRIDGE_REVIEW',
   IN_PROGRESS = 'IN_PROGRESS',
-  SUCCESS = 'SUCCESS',
-  FAIL = 'FAIL',
-  ERROR = 'ERROR',
-  APPROVE_ERC20 = 'APPROVE_ERC20_BRIDGE',
-  BRIDGE_COMING_SOON = 'BRIDGE_COMING_SOON',
+  BRIDGE_FAILURE = 'BRIDGE_FAILURE',
+  APPROVE_TRANSACTION = 'APPROVE_TRANSACTION',
 }
 
 export type BridgeWidgetView =
-  | BridgeView
-  | BridgeInProgressView
-  | BridgeSuccessView
-  | BridgeFailView
-  | BridgeApproveERC20View;
+  | BridgeCrossWalletSelection
+  | BridgeForm
+  | BridgeReview
+  | BridgeInProgress
+  | BridgeFailure
+  | BridgeApproveTransaction;
 
-interface BridgeView extends ViewType {
-  type: BridgeWidgetViews.BRIDGE;
-  data?: PrefilledBridgeForm;
+interface BridgeCrossWalletSelection extends ViewType {
+  type: BridgeWidgetViews.WALLET_NETWORK_SELECTION,
 }
 
-export interface BridgeSuccessView {
-  type: BridgeWidgetViews.SUCCESS;
-  data: {
-    transactionHash: string;
-  };
+interface BridgeForm extends ViewType {
+  type: BridgeWidgetViews.BRIDGE_FORM,
 }
 
-interface BridgeApproveERC20View extends ViewType {
-  type: BridgeWidgetViews.APPROVE_ERC20;
-  data: ApproveERC20BridgeData;
+interface BridgeReview extends ViewType {
+  type: BridgeWidgetViews.BRIDGE_REVIEW,
 }
 
-interface BridgeFailView extends ViewType {
-  type: BridgeWidgetViews.FAIL;
-  data: PrefilledBridgeForm;
-  reason?: string;
+interface BridgeInProgress extends ViewType {
+  type: BridgeWidgetViews.IN_PROGRESS,
+  transactionHash: string,
 }
 
-interface BridgeInProgressView extends ViewType {
-  type: BridgeWidgetViews.IN_PROGRESS;
-  data: {
-    token: TokenInfo;
-    transactionResponse: TransactionResponse;
-    bridgeForm: PrefilledBridgeForm;
-  };
+interface BridgeFailure extends ViewType {
+  type: BridgeWidgetViews.BRIDGE_FAILURE,
+  reason: string;
 }
 
-export interface ApproveERC20BridgeData {
-  approveTransaction: ApproveDepositBridgeResponse;
-  transaction: BridgeDepositResponse;
-  bridgeFormInfo: PrefilledBridgeForm;
-}
-
-export interface PrefilledBridgeForm {
-  fromAmount: string;
-  fromContractAddress: string;
-}
-
-export interface ApproveTransactionData {
-  approveTransaction: ApproveDepositBridgeResponse;
-  transaction: BridgeDepositResponse;
+interface BridgeApproveTransaction extends ViewType {
+  type: BridgeWidgetViews.APPROVE_TRANSACTION,
+  approveTransaction: ApproveBridgeResponse;
+  transaction: BridgeTxResponse;
 }
