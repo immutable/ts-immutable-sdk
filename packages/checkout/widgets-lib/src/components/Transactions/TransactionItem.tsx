@@ -9,11 +9,10 @@ import {
   MenuItem,
 } from '@biom3/react';
 import { ChainId } from '@imtbl/checkout-sdk';
-import { text } from 'resources/text/textConfig';
-import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
 import { logoColour, networkIcon, networkName } from 'lib';
-import { containerStyles } from './transactionItemStyles';
-import { actionsBadgeStyles, actionsContainerStyles, actionsLayoutStyles } from './transactionStyles';
+import {
+  containerStyles, actionsBadgeStyles, actionsContainerStyles, actionsLayoutStyles,
+} from './transactionItemStyles';
 
 type TransactionItemProps = {
   label: string
@@ -22,8 +21,7 @@ type TransactionItemProps = {
   amount: string
   fromChain: ChainId
   toChain: ChainId
-  l1ToL2?: boolean
-  action?: () => void
+  // action: () => void
 };
 
 export function TransactionItem({
@@ -33,10 +31,13 @@ export function TransactionItem({
   amount,
   fromChain,
   toChain,
-  l1ToL2,
-  action,
+  // action
 }: TransactionItemProps) {
-  const { status: { claim } } = text.views[XBridgeWidgetViews.TRANSACTIONS];
+  // The action prop is designed for injecting the action to perform
+  // in case of flow-rate. Keeping this code here even if it isn't currently
+  // use for future reference.
+  // https://immutable.atlassian.net/browse/WT-2007
+  const action = undefined;
 
   return (
     <Box sx={action ? containerStyles : {}}>
@@ -50,10 +51,10 @@ export function TransactionItem({
               sx={{ fill: 'base.color.status.fatal.bright', w: 'base.icon.size.200' }}
             />
             <Body size="xSmall" sx={{ color: 'base.color.text.secondary' }}>
-              {claim.banner.heading}
+              Action heading
             </Body>
           </Box>
-          <Button variant="primary" size="small">{claim.action}</Button>
+          <Button variant="primary" size="small">Action</Button>
           <Badge
             isAnimated
             variant="fatal"
@@ -76,7 +77,7 @@ export function TransactionItem({
           },
         }}
       >
-        <Accordion.TargetLeftSlot>
+        <Accordion.TargetLeftSlot sx={{ pr: 'base.spacing.x2' }}>
           <MenuItem size="xSmall">
             <MenuItem.FramedIcon icon="Coins" circularFrame />
             <MenuItem.Label>
@@ -135,7 +136,7 @@ export function TransactionItem({
             </Box>
             <Box sx={{ flexGrow: '1' }} />
             <Icon
-              icon={l1ToL2 ? 'ArrowForward' : 'ArrowBackward'}
+              icon="ArrowForward"
               sx={{
                 w: 'base.icon.size.250',
                 fill: 'base.color.brand.4',

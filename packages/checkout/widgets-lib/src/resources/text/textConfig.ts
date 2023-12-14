@@ -446,33 +446,13 @@ export const text = {
       body1: (symbol: string) => `Less than 3 mins until your ${symbol} lands on zkEVM.`,
       body2: 'You can close this window, the transaction will be reflected in your wallet once complete.',
     },
-    [XBridgeWidgetViews.TRANSACTIONS]: {
+    [BridgeWidgetViews.TRANSACTIONS]: {
       layoutHeading: 'In progress',
       passportDashboard: 'View the full transaction history in your',
       status: {
         inProgress: {
           heading: 'In Progress',
-          stepInfo: 'Sent - arriving in ≈',
-        },
-        finished: {
-          heading: 'Finished',
-        },
-        claim: {
-          action: 'Claim',
-          stepInfo: 'Waiting on claim - paused',
-          banner: {
-            heading: 'Claim your Coins',
-          },
-        },
-        topup: {
-          action: 'Review & sign',
-          stepInfo: 'Waiting on gas - paused',
-          banner: {
-            heading: 'Add gas to complete this move',
-          },
-        },
-        actionRequired: {
-          heading: 'Action Required',
+          stepInfo: 'View Details',
         },
         emptyState: {
           notConnected: {
@@ -480,6 +460,7 @@ export const text = {
           },
         },
       },
+      fiatPricePrefix: '~ USD $',
     },
   },
   footers: {

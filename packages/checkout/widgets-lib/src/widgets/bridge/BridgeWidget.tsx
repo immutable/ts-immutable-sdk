@@ -24,6 +24,7 @@ import {
   TokenBridge,
 } from '@imtbl/bridge-sdk';
 import { getL1ChainId, getL2ChainId } from 'lib';
+import { Transactions } from 'components/Transactions/Index';
 import {
   ViewActions,
   ViewContext,
@@ -46,7 +47,6 @@ import { ErrorView } from '../../views/error/ErrorView';
 import { text } from '../../resources/text/textConfig';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { sendBridgeFailedEvent, sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
-import { Transactions } from './views/Transactions';
 
 export type BridgeWidgetInputs = BridgeWidgetParams & {
   config: StrongCheckoutWidgetsConfig,
@@ -195,8 +195,8 @@ export function BridgeWidget({
               transaction={viewState.view.transaction}
             />
           )}
-          {viewState.view.type === XBridgeWidgetViews.TRANSACTIONS && (
-            <Transactions globalWeb3Provider={web3Provider} />
+          {viewState.view.type === BridgeWidgetViews.TRANSACTIONS && (
+            <Transactions checkout={checkout} />
           )}
           {viewState.view.type === SharedViews.ERROR_VIEW && (
             <ErrorView

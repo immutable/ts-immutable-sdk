@@ -1,6 +1,4 @@
-import {
-  Box, MenuItem, ShimmerBox,
-} from '@biom3/react';
+import { Box, MenuItem, ShimmerBox } from '@biom3/react';
 
 export function Shimmer() {
   return (

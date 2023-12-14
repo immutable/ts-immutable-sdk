@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Body, Box, Button } from '@biom3/react';
-import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
+import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { text } from 'resources/text/textConfig';
 import { transactionsListStyle } from './indexStyles';
 
 export function EmptyStateNotConnected() {
-  const { status: { emptyState } } = text.views[XBridgeWidgetViews.TRANSACTIONS];
+  const { status: { emptyState } } = text.views[BridgeWidgetViews.TRANSACTIONS];
 
   return (
     <Box sx={{
