@@ -140,14 +140,16 @@ export function OnRampWidget({
       )}
 
       {viewState.view.type === SharedViews.TOP_UP_VIEW && (
-      <TopUpView
-        analytics={{ userJourney: UserJourney.ON_RAMP }}
-        widgetEvent={IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT}
-        showOnrampOption={isOnRampEnabled}
-        showSwapOption={isSwapEnabled}
-        showBridgeOption={isBridgeEnabled}
-        onCloseButtonClick={() => sendOnRampWidgetCloseEvent(eventTarget)}
-      />
+        <TopUpView
+          analytics={{ userJourney: UserJourney.ON_RAMP }}
+          widgetEvent={IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT}
+          checkout={checkout}
+          provider={provider}
+          showOnrampOption={isOnRampEnabled}
+          showSwapOption={isSwapEnabled}
+          showBridgeOption={isBridgeEnabled}
+          onCloseButtonClick={() => sendOnRampWidgetCloseEvent(eventTarget)}
+        />
       )}
     </ViewContext.Provider>
   );

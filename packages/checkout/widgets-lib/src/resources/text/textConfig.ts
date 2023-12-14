@@ -494,12 +494,19 @@ export const text = {
     },
     notEnoughGas: {
       content: {
-        heading: 'Balance too low',
-        body: "You're ETH balance is too low to cover the gas fee on this move. You could transfer more ETH into your wallet using MetaMask directly.",
+        eth: {
+          heading: 'Balance too low',
+          body: 'Your ETH balance is too low to cover the gas fee on this move. You could transfer more ETH into your wallet using MetaMask directly.',
+        },
+        imx: {
+          heading: "You'll need more IMX coins",
+          body: "In order to cover the fees for the amount specified, you'll need to add more IMX coins.",
+        },
       },
       buttons: {
         adjustAmount: 'Adjust amount',
         copyAddress: 'Copy wallet address',
+        addMoreImx: 'Add IMX coins',
         cancel: 'Dismiss',
       },
     },
