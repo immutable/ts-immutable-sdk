@@ -84,13 +84,10 @@ NotEnoughGasProps) {
             sx={contentTextStyles}
             testId="not-enough-gas-heading"
           >
-            {content.heading}
+            {tokenSymbol === ETH_TOKEN_SYMBOL ? `${content.eth.heading}` : `${content.imx.heading}`}
           </Heading>
           <Body sx={contentTextStyles}>
-            {
-              `${content.body1} ${tokenSymbol} ${content.body2} 
-              ${tokenSymbol === ETH_TOKEN_SYMBOL ? content.eth : content.imx}`
-            }
+            {tokenSymbol === ETH_TOKEN_SYMBOL ? `${content.eth.body}` : `${content.imx.body}`}
           </Body>
           <Box sx={actionButtonContainerStyles}>
             {showAdjustAmount && (
