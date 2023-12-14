@@ -2,27 +2,27 @@ import React, { useCallback, useMemo, useReducer } from 'react';
 import { Checkout } from '@imtbl/checkout-sdk';
 import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import {
-  initialXBridgeState,
-  XBridgeContext,
-  XBridgeState,
-  xBridgeReducer,
-} from '../context/XBridgeContext';
+  initialBridgeState,
+  BridgeContext,
+  BridgeState,
+  bridgeReducer,
+} from '../context/BridgeContext';
 import {
   CryptoFiatContext, CryptoFiatContextState, CryptoFiatState, FiatSymbols,
 } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 
 export interface TestProps {
   children: React.ReactNode;
-  initialStateOverride?: XBridgeState;
+  initialStateOverride?: BridgeState;
   cryptoConversionsOverride?: Map<string, number>;
 }
 
-export function XBridgeWidgetTestComponent({ children, initialStateOverride, cryptoConversionsOverride }: TestProps) {
+export function BridgeWidgetTestComponent({ children, initialStateOverride, cryptoConversionsOverride }: TestProps) {
   const [bridgeState, bridgeDispatch] = useReducer(
-    xBridgeReducer,
+    bridgeReducer,
     initialStateOverride
       ? { ...initialStateOverride, checkout: {} as Checkout }
-      : { ...initialXBridgeState, checkout: {} as Checkout },
+      : { ...initialBridgeState, checkout: {} as Checkout },
   );
 
   const bridgeReducerValues = useMemo(
@@ -45,11 +45,11 @@ export function XBridgeWidgetTestComponent({ children, initialStateOverride, cry
 
   return (
     <ViewContextTestComponent>
-      <XBridgeContext.Provider value={bridgeReducerValues}>
+      <BridgeContext.Provider value={bridgeReducerValues}>
         <CryptoFiatContext.Provider value={cryptoFiatReducerValues as CryptoFiatContextState}>
           {children}
         </CryptoFiatContext.Provider>
-      </XBridgeContext.Provider>
+      </BridgeContext.Provider>
     </ViewContextTestComponent>
   );
 }

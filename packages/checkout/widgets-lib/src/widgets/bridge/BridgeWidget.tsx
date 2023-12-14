@@ -12,7 +12,7 @@ import {
 import { StrongCheckoutWidgetsConfig } from 'lib/withDefaultWidgetConfig';
 import { CryptoFiatProvider } from 'context/crypto-fiat-context/CryptoFiatProvider';
 import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
-import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
+import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { StatusView } from 'components/Status/StatusView';
 import { StatusType } from 'components/Status/StatusType';
 import { ImmutableConfiguration } from '@imtbl/config';
@@ -32,11 +32,11 @@ import {
   SharedViews,
 } from '../../context/view-context/ViewContext';
 import {
-  XBridgeContext,
-  xBridgeReducer,
-  initialXBridgeState,
+  BridgeContext,
+  bridgeReducer,
+  initialBridgeState,
   BridgeActions,
-} from './context/XBridgeContext';
+} from './context/BridgeContext';
 import { WalletNetworkSelectionView } from './views/WalletNetworkSelectionView';
 import { Bridge } from './views/Bridge';
 import { BridgeReview } from './views/BridgeReview';
@@ -53,7 +53,7 @@ export type BridgeWidgetInputs = BridgeWidgetParams & {
   web3Provider?: Web3Provider;
 };
 
-export function XBridgeWidget({
+export function BridgeWidget({
   checkout,
   web3Provider,
   config,
@@ -63,21 +63,21 @@ export function XBridgeWidget({
   const { environment } = config;
   const errorText = text.views[SharedViews.ERROR_VIEW];
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
-  const bridgeFailureText = text.views[XBridgeWidgetViews.BRIDGE_FAILURE];
+  const bridgeFailureText = text.views[BridgeWidgetViews.BRIDGE_FAILURE];
 
   const [viewState, viewDispatch] = useReducer(
     viewReducer,
     {
       ...initialViewState,
-      view: { type: XBridgeWidgetViews.WALLET_NETWORK_SELECTION },
-      history: [{ type: XBridgeWidgetViews.WALLET_NETWORK_SELECTION }],
+      view: { type: BridgeWidgetViews.WALLET_NETWORK_SELECTION },
+      history: [{ type: BridgeWidgetViews.WALLET_NETWORK_SELECTION }],
     },
   );
 
   const [bridgeState, bridgeDispatch] = useReducer(
-    xBridgeReducer,
+    bridgeReducer,
     {
-      ...initialXBridgeState,
+      ...initialBridgeState,
       checkout,
       web3Provider: web3Provider ?? null,
       tokenBridge: (() => {
@@ -127,7 +127,7 @@ export function XBridgeWidget({
     viewDispatch({
       payload: {
         type: ViewActions.GO_BACK_TO,
-        view: { type: XBridgeWidgetViews.WALLET_NETWORK_SELECTION },
+        view: { type: BridgeWidgetViews.WALLET_NETWORK_SELECTION },
       },
     });
   }, [viewDispatch]);
@@ -136,7 +136,7 @@ export function XBridgeWidget({
     viewDispatch({
       payload: {
         type: ViewActions.GO_BACK_TO,
-        view: { type: XBridgeWidgetViews.BRIDGE_REVIEW },
+        view: { type: BridgeWidgetViews.BRIDGE_REVIEW },
       },
     });
   }, [viewDispatch]);
@@ -154,23 +154,23 @@ export function XBridgeWidget({
 
   return (
     <ViewContext.Provider value={viewReducerValues}>
-      <XBridgeContext.Provider value={bridgeReducerValues}>
+      <BridgeContext.Provider value={bridgeReducerValues}>
         <CryptoFiatProvider environment={environment}>
-          {viewState.view.type === XBridgeWidgetViews.WALLET_NETWORK_SELECTION && (
+          {viewState.view.type === BridgeWidgetViews.WALLET_NETWORK_SELECTION && (
             <WalletNetworkSelectionView />
           )}
-          {viewState.view.type === XBridgeWidgetViews.BRIDGE_FORM && (
+          {viewState.view.type === BridgeWidgetViews.BRIDGE_FORM && (
             <Bridge amount={amount} contractAddress={contractAddress} />
           )}
-          {viewState.view.type === XBridgeWidgetViews.BRIDGE_REVIEW && (
+          {viewState.view.type === BridgeWidgetViews.BRIDGE_REVIEW && (
             <BridgeReview />
           )}
-          {viewState.view.type === XBridgeWidgetViews.IN_PROGRESS && (
+          {viewState.view.type === BridgeWidgetViews.IN_PROGRESS && (
             <MoveInProgress
               transactionHash={viewState.view.transactionHash}
             />
           )}
-          {viewState.view.type === XBridgeWidgetViews.BRIDGE_FAILURE
+          {viewState.view.type === BridgeWidgetViews.BRIDGE_FAILURE
             && (
               <StatusView
                 testId="bridge-fail"
@@ -180,7 +180,7 @@ export function XBridgeWidget({
                 statusType={StatusType.FAILURE}
                 onRenderEvent={() => {
                   let reason = '';
-                  if (viewState.view.type === XBridgeWidgetViews.BRIDGE_FAILURE) {
+                  if (viewState.view.type === BridgeWidgetViews.BRIDGE_FAILURE) {
                     reason = viewState.view.reason;
                   }
                   sendBridgeFailedEvent(eventTarget, reason);
@@ -188,7 +188,7 @@ export function XBridgeWidget({
               />
             )}
 
-          {viewState.view.type === XBridgeWidgetViews.APPROVE_TRANSACTION && (
+          {viewState.view.type === BridgeWidgetViews.APPROVE_TRANSACTION && (
             <ApproveTransaction
               approveTransaction={viewState.view.approveTransaction}
               transaction={viewState.view.transaction}
@@ -202,7 +202,7 @@ export function XBridgeWidget({
             />
           )}
         </CryptoFiatProvider>
-      </XBridgeContext.Provider>
+      </BridgeContext.Provider>
     </ViewContext.Provider>
   );
 }

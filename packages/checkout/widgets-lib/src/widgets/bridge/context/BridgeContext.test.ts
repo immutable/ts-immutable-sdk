@@ -1,7 +1,7 @@
 import { Checkout, WalletProviderName } from '@imtbl/checkout-sdk';
 import {
-  BridgeActions, SetWalletProviderNamePayload, initialXBridgeState, xBridgeReducer,
-} from './XBridgeContext';
+  BridgeActions, SetWalletProviderNamePayload, initialBridgeState, bridgeReducer,
+} from './BridgeContext';
 
 describe('BridgeContext', () => {
   it('should update wallet provider name when reducer called with SET_WALLET_PROVIDER_NAME action', () => {
@@ -11,10 +11,10 @@ describe('BridgeContext', () => {
     };
 
     const checkout = {} as Checkout;
-    const bridgeState = { ...initialXBridgeState, checkout };
+    const bridgeState = { ...initialBridgeState, checkout };
 
-    expect(initialXBridgeState.walletProviderName).toEqual(null);
-    const { walletProviderName } = xBridgeReducer(bridgeState, {
+    expect(initialBridgeState.walletProviderName).toEqual(null);
+    const { walletProviderName } = bridgeReducer(bridgeState, {
       payload: setWalletProviderNamePayload,
     });
     expect(walletProviderName).toEqual(WalletProviderName.METAMASK);

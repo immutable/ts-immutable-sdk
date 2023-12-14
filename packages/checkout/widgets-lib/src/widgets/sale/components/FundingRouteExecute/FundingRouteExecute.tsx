@@ -19,7 +19,7 @@ import {
   useContext,
   useEffect, useMemo, useReducer, useRef, useState,
 } from 'react';
-import { XBridgeWidget } from 'widgets/x-bridge/XBridgeWidget';
+import { BridgeWidget } from 'widgets/bridge/BridgeWidget';
 import {
   ConnectLoaderActions,
   ConnectLoaderContext,
@@ -232,7 +232,7 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
         <LoadingView loadingText={text.loading.checkingBalances} />
       )}
       {view === FundingRouteExecuteViews.EXECUTE_BRIDGE && (
-        <XBridgeWidget
+        <BridgeWidget
           {...bridgeParams!}
           config={config}
           checkout={checkout!}

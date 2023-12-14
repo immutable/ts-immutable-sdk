@@ -1,5 +1,5 @@
 import { useContext, useEffect } from 'react';
-import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
+import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { RocketHero } from '../../../components/Hero/RocketHero';
@@ -8,7 +8,7 @@ import { text } from '../../../resources/text/textConfig';
 import { sendBridgeTransactionSentEvent, sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
-import { XBridgeContext } from '../context/XBridgeContext';
+import { BridgeContext } from '../context/BridgeContext';
 
 export interface MoveInProgressProps {
   transactionHash: string;
@@ -17,10 +17,10 @@ export interface MoveInProgressProps {
 export function MoveInProgress({ transactionHash }: MoveInProgressProps) {
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
-  const { heading, body2 } = text.views[XBridgeWidgetViews.IN_PROGRESS];
+  const { heading, body2 } = text.views[BridgeWidgetViews.IN_PROGRESS];
   const {
     bridgeState: { checkout },
-  } = useContext(XBridgeContext);
+  } = useContext(BridgeContext);
 
   useEffect(() => {
     sendBridgeTransactionSentEvent(

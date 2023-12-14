@@ -14,10 +14,10 @@ import { text } from '../../../resources/text/textConfig';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { LoadingView } from '../../../views/loading/LoadingView';
-import { XBridgeContext } from '../context/XBridgeContext';
+import { BridgeContext } from '../context/BridgeContext';
 import { WalletApproveHero } from '../../../components/Hero/WalletApproveHero';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
-import { XBridgeWidgetViews } from '../../../context/view-context/XBridgeViewContextTypes';
+import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 
 export interface ApproveTransactionProps {
@@ -26,13 +26,13 @@ export interface ApproveTransactionProps {
 }
 
 export function ApproveTransaction({ approveTransaction, transaction }: ApproveTransactionProps) {
-  const { bridgeState } = useContext(XBridgeContext);
+  const { bridgeState } = useContext(BridgeContext);
   const {
     checkout,
     from,
   } = bridgeState;
   const { viewDispatch } = useContext(ViewContext);
-  const { loadingView, content, footer } = text.views[XBridgeWidgetViews.APPROVE_TRANSACTION];
+  const { loadingView, content, footer } = text.views[BridgeWidgetViews.APPROVE_TRANSACTION];
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   // Local state
@@ -68,7 +68,7 @@ export function ApproveTransaction({ approveTransaction, transaction }: ApproveT
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
-            type: XBridgeWidgetViews.BRIDGE_FAILURE,
+            type: BridgeWidgetViews.BRIDGE_FAILURE,
             reason: 'Unpredictable gas limit',
           },
         },
@@ -85,7 +85,7 @@ export function ApproveTransaction({ approveTransaction, transaction }: ApproveT
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
-            type: XBridgeWidgetViews.BRIDGE_FAILURE,
+            type: BridgeWidgetViews.BRIDGE_FAILURE,
             reason,
           },
         },
@@ -127,7 +127,7 @@ export function ApproveTransaction({ approveTransaction, transaction }: ApproveT
             payload: {
               type: ViewActions.UPDATE_VIEW,
               view: {
-                type: XBridgeWidgetViews.BRIDGE_FAILURE,
+                type: BridgeWidgetViews.BRIDGE_FAILURE,
                 reason: 'Transaction failed to settle on chain',
               },
             },
@@ -163,7 +163,7 @@ export function ApproveTransaction({ approveTransaction, transaction }: ApproveT
           payload: {
             type: ViewActions.UPDATE_VIEW,
             view: {
-              type: XBridgeWidgetViews.BRIDGE_FAILURE,
+              type: BridgeWidgetViews.BRIDGE_FAILURE,
               reason: 'Approval transaction failed to settle on chain',
             },
           },
@@ -175,7 +175,7 @@ export function ApproveTransaction({ approveTransaction, transaction }: ApproveT
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
-            type: XBridgeWidgetViews.IN_PROGRESS,
+            type: BridgeWidgetViews.IN_PROGRESS,
             transactionHash: receipt.transactionHash,
           },
         },

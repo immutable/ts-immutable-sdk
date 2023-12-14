@@ -9,10 +9,10 @@ import {
 } from '@imtbl/checkout-sdk';
 import { Base } from 'widgets/BaseWidgetRoot';
 import { isValidWalletProvider, isValidAmount, isValidAddress } from 'lib/validations/widgetValidators';
-import { XBridgeWidget } from 'widgets/x-bridge/XBridgeWidget';
+import { BridgeWidget } from 'widgets/bridge/BridgeWidget';
 import { WidgetContainer } from 'components/WidgetContainer/WidgetContainer';
 
-export class XBridge extends Base<WidgetType.BRIDGE> {
+export class Bridge extends Base<WidgetType.BRIDGE> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT;
 
   protected getValidatedProperties(
@@ -58,8 +58,8 @@ export class XBridge extends Base<WidgetType.BRIDGE> {
     if (!this.reactRoot) return;
     this.reactRoot.render(
       <React.StrictMode>
-        <WidgetContainer id="xbridge-container" config={this.strongConfig()}>
-          <XBridgeWidget
+        <WidgetContainer id="bridge-container" config={this.strongConfig()}>
+          <BridgeWidget
             checkout={this.checkout}
             config={this.strongConfig()}
             web3Provider={this.web3Provider}

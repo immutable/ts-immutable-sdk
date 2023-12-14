@@ -14,7 +14,7 @@ export type WalletAndNetworkDetails = {
   walletAddress: string;
   network: ChainId;
 };
-export interface XBridgeState {
+export interface BridgeState {
   checkout: Checkout;
   web3Provider: Web3Provider | null;
   walletProviderName: WalletProviderName | null;
@@ -27,7 +27,7 @@ export interface XBridgeState {
   amount: string;
 }
 
-export const initialXBridgeState: Omit<XBridgeState, 'checkout'> = {
+export const initialBridgeState: Omit<BridgeState, 'checkout'> = {
   web3Provider: null,
   walletProviderName: null,
   from: null,
@@ -39,8 +39,8 @@ export const initialXBridgeState: Omit<XBridgeState, 'checkout'> = {
   amount: '0',
 };
 
-export interface XBridgeContextState {
-  bridgeState: XBridgeState;
+export interface BridgeContextState {
+  bridgeState: BridgeState;
   bridgeDispatch: React.Dispatch<BridgeAction>;
 }
 
@@ -105,17 +105,17 @@ export interface SetTokenAndAmountPayload {
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export const XBridgeContext = createContext<XBridgeContextState>({
-  bridgeState: { ...initialXBridgeState, checkout: {} as Checkout },
+export const BridgeContext = createContext<BridgeContextState>({
+  bridgeState: { ...initialBridgeState, checkout: {} as Checkout },
   bridgeDispatch: () => {},
 });
 
-XBridgeContext.displayName = 'XBridgeContext'; // help with debugging Context in browser
+BridgeContext.displayName = 'BridgeContext'; // help with debugging Context in browser
 
 export type Reducer<S, A> = (prevState: S, action: A) => S;
 
-export const xBridgeReducer: Reducer<XBridgeState, BridgeAction> = (
-  state: XBridgeState,
+export const bridgeReducer: Reducer<BridgeState, BridgeAction> = (
+  state: BridgeState,
   action: BridgeAction,
 ) => {
   switch (action.payload.type) {
