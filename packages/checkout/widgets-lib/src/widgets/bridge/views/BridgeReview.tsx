@@ -4,13 +4,13 @@ import { FooterLogo } from 'components/Footer/FooterLogo';
 import { useContext } from 'react';
 import { EventTargetContext } from 'context/event-target-context/EventTargetContext';
 import { text } from 'resources/text/textConfig';
-import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
+import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
 import { BridgeReviewSummary } from '../components/BridgeReviewSummary';
 
 export function BridgeReview() {
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
-  const { layoutHeading } = text.views[XBridgeWidgetViews.BRIDGE_REVIEW];
+  const { layoutHeading } = text.views[BridgeWidgetViews.BRIDGE_REVIEW];
 
   return (
     <SimpleLayout

@@ -1,11 +1,10 @@
 /* eslint-disable max-len */
 import { WalletProviderName } from '@imtbl/checkout-sdk';
-import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
+import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
 import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
 import { SharedViews } from '../../context/view-context/ViewContext';
 import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
-import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
 import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextTypes';
 import { SaleWidgetViews } from '../../context/view-context/SaleViewContextTypes';
 import { SaleErrorTypes, PaymentTypes } from '../../widgets/sale/types';
@@ -199,78 +198,6 @@ export const text = {
         },
       },
     },
-    [BridgeWidgetViews.BRIDGE]: {
-      header: {
-        title: 'Move coins',
-      },
-      content: {
-        title: 'What would you like to move from Ethereum to Immutable zkEVM?',
-        fiatPricePrefix: 'Approx USD',
-        availableBalancePrefix: 'Available',
-      },
-      bridgeForm: {
-        from: {
-          inputPlaceholder: '0',
-          selectorTitle: 'What would you like to move?',
-        },
-        buttonText: 'Review',
-      },
-      fees: {
-        title: 'Fees subtotal',
-      },
-      validation: {
-        noAmountInputted: 'Please input amount',
-        insufficientBalance: 'Insufficient balance',
-        noTokenSelected: 'Select a coin to move',
-      },
-    },
-    [BridgeWidgetViews.IN_PROGRESS]: {
-      heading: 'Move in progress',
-      body1: (symbol: string) => `Less than 3 mins until your ${symbol} lands on zkEVM.`,
-      body2:
-        'You can close this window, the transaction will be reflected in your wallet once complete.',
-    },
-    [BridgeWidgetViews.APPROVE_ERC20]: {
-      approveBridge: {
-        content: {
-          heading: "Now you'll just need to approve the transaction",
-          body: 'Follow the prompts in MetaMask.',
-        },
-        footer: {
-          buttonText: 'Okay',
-          retryText: 'Try again',
-        },
-      },
-      approveSpending: {
-        content: {
-          heading: "You'll be asked to set a spending cap for this transaction",
-          body: [
-            'Input at least',
-            'for this transaction and future transactions, then follow the prompts.',
-          ],
-        },
-        footer: {
-          buttonText: 'Got it',
-          retryText: 'Try again',
-        },
-        loading: {
-          text: 'Approving spending cap',
-        },
-      },
-    },
-    [BridgeWidgetViews.SUCCESS]: {
-      text: 'Success',
-      actionText: 'Continue',
-    },
-    [BridgeWidgetViews.FAIL]: {
-      text: 'Transaction failed',
-      actionText: 'Review & Try again',
-    },
-    [BridgeWidgetViews.BRIDGE_COMING_SOON]: {
-      heading: 'Coming soon',
-      body: "Moving funds across networks currently isn't supported for Passport.",
-      actionText: 'Dismiss',
-    },
     [OnRampWidgetViews.ONRAMP]: {
       header: {
         title: 'Add coins',
@@ -435,7 +362,7 @@ export const text = {
       text: 'Order completed',
       actionText: 'Continue',
     },
-    [XBridgeWidgetViews.WALLET_NETWORK_SELECTION]: {
+    [BridgeWidgetViews.WALLET_NETWORK_SELECTION]: {
       layoutHeading: 'Move',
       heading: 'Where would you like to move funds between?',
       fromFormInput: {
@@ -453,7 +380,7 @@ export const text = {
         text: 'Next',
       },
     },
-    [XBridgeWidgetViews.BRIDGE_FORM]: {
+    [BridgeWidgetViews.BRIDGE_FORM]: {
       header: {
         title: 'Move coins',
       },
@@ -473,8 +400,13 @@ export const text = {
         },
         buttonText: 'Review',
       },
+      validation: {
+        noAmountInputted: 'Please input amount',
+        insufficientBalance: 'Insufficient balance',
+        noTokenSelected: 'Select a coin to move',
+      },
     },
-    [XBridgeWidgetViews.BRIDGE_REVIEW]: {
+    [BridgeWidgetViews.BRIDGE_REVIEW]: {
       layoutHeading: 'Move',
       heading: 'Ok, how does this look?',
       fromLabel: {
@@ -492,11 +424,11 @@ export const text = {
       },
       fiatPricePrefix: '~ USD $',
     },
-    [XBridgeWidgetViews.BRIDGE_FAILURE]: {
+    [BridgeWidgetViews.BRIDGE_FAILURE]: {
       statusText: 'Transaction failed',
       actionText: 'Review & Try again',
     },
-    [XBridgeWidgetViews.APPROVE_TRANSACTION]: {
+    [BridgeWidgetViews.APPROVE_TRANSACTION]: {
       content: {
         heading: 'Approve the transaction in your wallet',
         body: 'Follow the prompts in your wallet popup to confirm.',
@@ -505,9 +437,14 @@ export const text = {
         buttonText: 'Okay',
         retryText: 'Try again',
       },
-      loading: {
+      loadingView: {
         text: 'Initiating move',
       },
+    },
+    [BridgeWidgetViews.IN_PROGRESS]: {
+      heading: 'Move in progress',
+      body1: (symbol: string) => `Less than 3 mins until your ${symbol} lands on zkEVM.`,
+      body2: 'You can close this window, the transaction will be reflected in your wallet once complete.',
     },
   },
   footers: {
@@ -557,12 +494,19 @@ export const text = {
     },
     notEnoughGas: {
       content: {
-        heading: 'Balance too low',
-        body: "You're ETH balance is too low to cover the gas fee on this move. You could transfer more ETH into your wallet using MetaMask directly.",
+        eth: {
+          heading: 'Balance too low',
+          body: 'Your ETH balance is too low to cover the gas fee on this move. You could transfer more ETH into your wallet using MetaMask directly.',
+        },
+        imx: {
+          heading: "You'll need more IMX coins",
+          body: "In order to cover the fees for the amount specified, you'll need to add more IMX coins.",
+        },
       },
       buttons: {
         adjustAmount: 'Adjust amount',
         copyAddress: 'Copy wallet address',
+        addMoreImx: 'Add IMX coins',
         cancel: 'Dismiss',
       },
     },

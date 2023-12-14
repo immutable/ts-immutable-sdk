@@ -258,7 +258,10 @@ export function SwapForm({ data }: SwapFromProps) {
       );
       const estimateToken = estimate?.token;
 
-      const gasToken = allowedTokens.find((token) => token.symbol === estimateToken?.symbol);
+      const gasToken = allowedTokens.find(
+        (token) => token.address?.toLocaleLowerCase() === estimateToken?.address?.toLocaleLowerCase(),
+      );
+
       setQuote(result);
       setGasFeeValue(gasFee);
       setGasFeeToken({

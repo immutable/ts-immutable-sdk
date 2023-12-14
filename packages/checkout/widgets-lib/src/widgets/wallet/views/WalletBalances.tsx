@@ -141,18 +141,17 @@ export function WalletBalances({
       }
 
       try {
-        const { gasFee } = await checkout.gasEstimate({
+        const { fees } = await checkout.gasEstimate({
           gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-          isSpendingCapApprovalRequired: false,
         });
 
-        if (!gasFee.estimatedAmount) {
+        if (!fees.totalFees) {
           setInsufficientFundsForBridgeToL2Gas(false);
           return;
         }
 
         setInsufficientFundsForBridgeToL2Gas(
-          gasFee.estimatedAmount.gt(utils.parseUnits(ethBalance.balance, DEFAULT_TOKEN_DECIMALS)),
+          fees.totalFees.gt(utils.parseUnits(ethBalance.balance, DEFAULT_TOKEN_DECIMALS)),
         );
       } catch {
         setInsufficientFundsForBridgeToL2Gas(false);
@@ -265,6 +264,7 @@ export function WalletBalances({
           onCloseDrawer={() => setShowNotEnoughGasDrawer(false)}
           walletAddress={walletAddress}
           showAdjustAmount={false}
+          tokenSymbol={ETH_TOKEN_SYMBOL}
         />
       </Box>
     </SimpleLayout>

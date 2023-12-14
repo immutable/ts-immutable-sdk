@@ -6,6 +6,7 @@ export interface FeeItemProps {
   label: string;
   amount: string;
   fiatAmount: string;
+  tokenSymbol: string;
 }
 
 export function FeeItem({
@@ -13,6 +14,7 @@ export function FeeItem({
   label,
   amount,
   fiatAmount,
+  tokenSymbol,
 }: FeeItemProps) {
   const key = label.toLowerCase().replace(' ', '-');
 
@@ -27,7 +29,7 @@ export function FeeItem({
       <PriceDisplay
         testId={key}
         sx={feeItemPriceDisplayStyles}
-        price={amount}
+        price={`${tokenSymbol} ${amount}`}
         fiatAmount={fiatAmount}
       />
     </Box>

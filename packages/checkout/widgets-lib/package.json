@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@biom3/design-tokens": "0.2.9",
-    "@biom3/react": "^0.19.13",
+    "@biom3/react": "^0.19.22",
     "@ethersproject/providers": "^5.7.2",
     "@imtbl/bridge-sdk": "0.0.0",
     "@imtbl/checkout-sdk": "0.0.0",
@@ -77,7 +77,6 @@
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "lint:fix": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0 --fix",
     "start": "rollup --config rollup.config.js --watch",
-    "start:xbridge": "CHECKOUT_X_WALLET_BRIDGE=true && yarn start",
     "test": "jest test --passWithNoTests",
     "test:cypress": "NODE_ENV=test cypress run --component --headless",
     "test:cypress:open": "NODE_ENV=test cypress open --component --browser electron",
