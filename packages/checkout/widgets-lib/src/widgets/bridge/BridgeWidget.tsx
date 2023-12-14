@@ -61,7 +61,7 @@ export function BridgeWidget({
   web3Provider,
   config,
   amount,
-  contractAddress,
+  tokenAddress,
 }: BridgeWidgetInputs) {
   const {
     environment,
@@ -168,7 +168,7 @@ export function BridgeWidget({
             <WalletNetworkSelectionView />
           )}
           {viewState.view.type === BridgeWidgetViews.BRIDGE_FORM && (
-            <Bridge amount={amount} contractAddress={contractAddress} />
+            <Bridge amount={amount} tokenAddress={tokenAddress} />
           )}
           {viewState.view.type === BridgeWidgetViews.BRIDGE_REVIEW && (
             <BridgeReview />

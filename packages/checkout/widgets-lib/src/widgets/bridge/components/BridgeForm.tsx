@@ -56,7 +56,7 @@ import { TokenSelectShimmer } from './TokenSelectShimmer';
 interface BridgeFormProps {
   testId?: string;
   defaultAmount?: string;
-  defaultFromContractAddress?: string;
+  defaultTokenAddress?: string;
   isTokenBalancesLoading?: boolean;
 }
 
@@ -80,7 +80,7 @@ export function BridgeForm(props: BridgeFormProps) {
   const {
     testId,
     defaultAmount,
-    defaultFromContractAddress,
+    defaultTokenAddress,
     isTokenBalancesLoading,
   } = props;
   const {
@@ -151,11 +151,11 @@ export function BridgeForm(props: BridgeFormProps) {
 
     if (!hasSetDefaultState.current) {
       hasSetDefaultState.current = true;
-      if (defaultFromContractAddress) {
+      if (defaultTokenAddress) {
         setFormToken(
           tokenBalances.find(
-            (b) => (isNativeToken(b.token.address) && defaultFromContractAddress?.toLocaleUpperCase() === NATIVE)
-              || (b.token.address?.toLowerCase() === defaultFromContractAddress?.toLowerCase()),
+            (b) => (isNativeToken(b.token.address) && defaultTokenAddress?.toLocaleUpperCase() === NATIVE)
+              || (b.token.address?.toLowerCase() === defaultTokenAddress?.toLowerCase()),
           ),
         );
       }
@@ -163,7 +163,7 @@ export function BridgeForm(props: BridgeFormProps) {
   }, [
     tokenBalances,
     cryptoFiatState.conversions,
-    defaultFromContractAddress,
+    defaultTokenAddress,
     hasSetDefaultState.current,
     formatTokenOptionsId,
     formatZeroAmount,

@@ -22,16 +22,16 @@ export interface SwapCoinsProps {
   theme: WidgetTheme;
   fromAmount?: string;
   toAmount?: string;
-  fromContractAddress?: string;
-  toContractAddress?: string;
+  fromTokenAddress?: string;
+  toTokenAddress?: string;
 }
 
 export function SwapCoins({
   theme,
   fromAmount,
   toAmount,
-  fromContractAddress,
-  toContractAddress,
+  fromTokenAddress,
+  toTokenAddress,
 }: SwapCoinsProps) {
   const { header } = text.views[SwapWidgetViews.SWAP];
   const { viewState, viewDispatch } = useContext(ViewContext);
@@ -57,8 +57,8 @@ export function SwapCoins({
       extras: {
         fromAmount,
         toAmount,
-        fromContractAddress,
-        toContractAddress,
+        fromTokenAddress,
+        toTokenAddress,
       },
     });
   }, []);
@@ -92,8 +92,8 @@ export function SwapCoins({
         <SwapForm data={{
           fromAmount,
           toAmount,
-          fromContractAddress,
-          toContractAddress,
+          fromTokenAddress,
+          toTokenAddress,
         }}
         />
         <NotEnoughImx

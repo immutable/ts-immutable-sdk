@@ -46,10 +46,10 @@ export function SwapButton({
       control: 'Swap',
       controlType: 'Button',
       extras: {
-        swapFromAddress: data?.fromContractAddress,
+        swapFromAddress: data?.fromTokenAddress,
         swapFromAmount: data?.fromAmount,
         swapFromTokenSymbol: data?.fromTokenSymbol,
-        swapToAddress: data?.toContractAddress,
+        swapToAddress: data?.toTokenAddress,
         swapToAmount: data?.toAmount,
         swapToTokenSymbol: data?.toTokenSymbol,
         isSwapFormValid: isValid,
@@ -68,8 +68,8 @@ export function SwapButton({
       updateLoading(true);
       const prefilledSwapData:PrefilledSwapForm = {
         fromAmount: data?.fromAmount || '',
-        fromContractAddress: data?.fromContractAddress || '',
-        toContractAddress: data?.toContractAddress || '',
+        fromTokenAddress: data?.fromTokenAddress || '',
+        toTokenAddress: data?.toTokenAddress || '',
       };
 
       if (transaction.approval) {

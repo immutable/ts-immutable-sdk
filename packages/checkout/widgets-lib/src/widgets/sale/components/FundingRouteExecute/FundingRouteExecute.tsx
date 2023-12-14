@@ -53,7 +53,7 @@ enum FundingRouteExecuteViews {
 
 export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }: FundingRouteExecuteProps) {
   const {
-    config, provider, checkout, fromContractAddress: requiredTokenAddress,
+    config, provider, checkout, fromTokenAddress: requiredTokenAddress,
   } = useSaleContext();
   const { viewDispatch } = useContext(ViewContext);
 
@@ -100,7 +100,7 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
 
     if (step.type === FundingStepType.BRIDGE) {
       setBridgeParams({
-        contractAddress: step.fundingItem.token.address,
+        tokenAddress: step.fundingItem.token.address,
         amount: step.fundingItem.fundsRequired.formattedAmount,
       });
       if (network.chainId === getL1ChainId(checkout!.config)) {
@@ -114,8 +114,8 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
     if (step.type === FundingStepType.SWAP) {
       setSwapParams({
         amount: step.fundingItem.fundsRequired.formattedAmount,
-        fromContractAddress: step.fundingItem.token.address,
-        toContractAddress: requiredTokenAddress,
+        fromTokenAddress: step.fundingItem.token.address,
+        toTokenAddress: requiredTokenAddress,
       });
       if (network.chainId === getL2ChainId(checkout!.config)) {
         setView(FundingRouteExecuteViews.EXECUTE_SWAP);

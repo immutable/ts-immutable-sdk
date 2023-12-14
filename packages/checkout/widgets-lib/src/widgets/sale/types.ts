@@ -28,7 +28,7 @@ export type SignedOrder = {
 };
 
 export type SignedTransaction = {
-  contractAddress: string;
+  tokenAddress: string;
   gasEstimate: number;
   methodCall: string;
   params: {
@@ -47,7 +47,7 @@ export type SignResponse = {
 export type SignOrderInput = {
   provider: Web3Provider | undefined;
   items: SaleItem[];
-  fromContractAddress: string;
+  fromTokenAddress: string;
   recipientAddress: string;
   env: string;
   environmentId: string;

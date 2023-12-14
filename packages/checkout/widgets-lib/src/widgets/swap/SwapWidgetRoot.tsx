@@ -53,16 +53,16 @@ export class Swap extends Base<WidgetType.SWAP> {
       validatedParams.amount = '';
     }
 
-    if (!isValidAddress(params.fromContractAddress)) {
+    if (!isValidAddress(params.fromTokenAddress)) {
       // eslint-disable-next-line no-console
-      console.warn('[IMTBL]: invalid "fromContractAddress" widget input');
-      validatedParams.fromContractAddress = '';
+      console.warn('[IMTBL]: invalid "fromTokenAddress" widget input');
+      validatedParams.fromTokenAddress = '';
     }
 
-    if (!isValidAddress(params.toContractAddress)) {
+    if (!isValidAddress(params.toTokenAddress)) {
       // eslint-disable-next-line no-console
-      console.warn('[IMTBL]: invalid "toContractAddress" widget input');
-      validatedParams.toContractAddress = '';
+      console.warn('[IMTBL]: invalid "toTokenAddress" widget input');
+      validatedParams.toTokenAddress = '';
     }
 
     return validatedParams;
@@ -146,8 +146,8 @@ export class Swap extends Base<WidgetType.SWAP> {
                 closeEvent={() => sendSwapWidgetCloseEvent(window)}
               >
                 <SwapWidget
-                  fromContractAddress={this.parameters.fromContractAddress}
-                  toContractAddress={this.parameters.toContractAddress}
+                  fromTokenAddress={this.parameters.fromTokenAddress}
+                  toTokenAddress={this.parameters.toTokenAddress}
                   amount={this.parameters.amount}
                   config={this.strongConfig()}
                 />

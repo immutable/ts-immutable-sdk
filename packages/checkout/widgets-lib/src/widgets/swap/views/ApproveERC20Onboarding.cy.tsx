@@ -92,7 +92,7 @@ describe('Approve ERC20 Onboarding', () => {
       info: {} as Quote,
       swapFormInfo: {
         fromAmount: '0.5',
-        fromContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+        fromTokenAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
       } as PrefilledSwapForm,
     };
   });
