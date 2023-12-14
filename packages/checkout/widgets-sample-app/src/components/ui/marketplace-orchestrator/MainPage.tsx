@@ -72,6 +72,14 @@ export const MainPage = () => {
       walletWidget.unmount();
       onRampWidget.mount('onramp-target', { contractAddress: data.tokenAddress, amount: data.amount });
     })
+    bridgeWidget.addListener(OrchestrationEventType.REQUEST_SWAP, () => {
+      bridgeWidget.unmount();
+      swapWidget.mount('swap-target');
+    });
+    bridgeWidget.addListener(OrchestrationEventType.REQUEST_ONRAMP, () => {
+      bridgeWidget.unmount();
+      onRampWidget.mount('onramp-target');
+    });
   }, [walletWidget, bridgeWidget, onRampWidget, swapWidget]);
 
   // button click functions to open/close widgets
