@@ -1,0 +1,506 @@
+{
+  "views": {
+    "CONNECT_WALLET": {
+      "body": {
+        "heading": "지갑 연결",
+        "content": "구매, 판매, 거래 및 코인과 수집품을 저장하려면 디지털 지갑을 연결하거나 만들어야 합니다."
+      }
+    },
+    "READY_TO_CONNECT": {
+      "header": {
+        "title": "연결 준비됨"
+      },
+      "metamask": {
+        "body": {
+          "heading": "MetaMask에서 팝업을 확인하세요",
+          "content": "MetaMask 팝업의 안내에 따라 연결하세요"
+        },
+        "footer": {
+          "buttonText1": "연결 준비됨",
+          "buttonText2": "다시 시도"
+        }
+      },
+      "passport": {
+        "body": {
+          "heading": "Immutable Passport로 연결",
+          "content": "Immutable Passport와 연결하기 위한 안내를 따르세요"
+        },
+        "footer": {
+          "buttonText1": "계속",
+          "buttonText2": "다시 시도"
+        }
+      }
+    },
+    "SWITCH_NETWORK": {
+      "eth": {
+        "heading": "코인을 옮기려면 Sepolia 네트워크로 전환해야 합니다",
+        "body": "MetaMask에서 네트워크 전환을 요청받게 됩니다. 필요할 때 다시 전환할 수 있습니다.",
+        "button": {
+          "text": "전환 준비됨",
+          "retryText": "다시 시도"
+        }
+      },
+      "zkEVM": {
+        "heading": "Immutable zkEVM 네트워크로 전환하라는 요청을 받게 됩니다",
+        "body": "MetaMask 팝업에서 '승인'을 선택하고 전환하세요. 처음이라면 MetaMask에서 네트워크 추가를 요구할 수도 있습니다.",
+        "button": {
+          "text": "전환 준비됨",
+          "retryText": "다시 시도"
+        }
+      }
+    },
+    "ERROR_VIEW": {
+      "heading": "문제가 발생했습니다",
+      "body": ["다시 시도하거나", "지원팀에", "도움을 요청하세요."],
+      "actionText": "다시 시도"
+    },
+    "SERVICE_UNAVAILABLE_ERROR_VIEW": {
+      "heading": {
+        "swap": "당신의 지역에서는 교환이 가능하지 않습니다"
+      },
+      "body": "당신의 지역에서 이 서비스를 제공할 수 없어 죄송합니다."
+    },
+    "LOADING_VIEW": {
+      "text": "로딩 중"
+    },
+    "WALLET_BALANCES": {
+      "header": {
+        "title": "지갑"
+      },
+      "networkStatus": {
+        "heading": "네트워크"
+      },
+      "totalTokenBalance": {
+        "heading": "코인",
+        "totalHeading": "가치"
+      },
+      "tokenBalancesList": {
+        "noTokensFound": "토큰을 찾을 수 없습니다"
+      }
+    },
+    "SETTINGS": {
+      "header": {
+        "title": "설정"
+      },
+      "disconnectButton": {
+        "label": "지갑 연결 해제"
+      }
+    },
+    "COIN_INFO": {
+      "metamask": {
+        "heading": "코인과 수집품은 네트워크에 기반을 두고 있습니다",
+        "body": "네트워크를 전환하여 코인을 추가하거나 다른 네트워크로 옮길 수 있습니다"
+      },
+      "passport": {
+        "heading": "코인과 수집품은 네트워크에 기반을 두고 있습니다",
+        "body1": "이 네트워크는 Immutable zkEVM입니다. Passport에 다른 코인이 있고 여기서 볼 수 없다면 다른 네트워크에 있을 수 있습니다.",
+        "body2": " 자세한 정보를 위해 우리의 FAQ를 방문하세요.",
+        "linkText": "FAQ 방문하기"
+      }
+    },
+    "SWAP": {
+      "header": {
+        "title": "코인 교환"
+      },
+      "content": {
+        "title": "무엇을 교환하고 싶으신가요?",
+        "fiatPricePrefix": "약 USD",
+        "availableBalancePrefix": "사용 가능"
+      },
+      "swapForm": {
+        "from": {
+          "label": "From",
+          "inputPlaceholder": "0",
+          "selectorTitle": "무엇을 교환하고 싶으신가요?"
+        },
+        "to": {
+          "label": "To",
+          "inputPlaceholder": "0",
+          "selectorTitle": "무엇을 받으시겠습니까?"
+        },
+        "buttonText": "교환"
+      },
+      "fees": {
+        "title": "수수료 총액"
+      },
+      "validation": {
+        "noAmountInputted": "금액을 입력해 주세요",
+        "insufficientBalance": "잔고가 부족합니다",
+        "noFromTokenSelected": "교환할 코인을 선택하세요",
+        "noToTokenSelected": "받을 코인을 선택하세요"
+      },
+      "success": {
+        "text": "성공",
+        "actionText": "계속하기"
+      },
+      "failed": {
+        "text": "거래 거절됨",
+        "actionText": "다시 시도"
+      },
+      "rejected": {
+        "text": "가격 급등",
+        "actionText": "검토하고 다시 시도하세요"
+      },
+      "IN_PROGRESS": {
+        "loading": {
+          "text": "교환 진행 중"
+        }
+      }
+    },
+    "APPROVE_ERC20": {
+      "approveSwap": {
+        "content": {
+          "heading": "이제 거래를 확인하기만 하면 됩니다",
+          "body": "지갑의 안내를 따르세요."
+        },
+        "footer": {
+          "buttonText": "확인",
+          "retryText": "다시 시도"
+        }
+      },
+      "approveSpending": {
+        "content": {
+          "metamask": {
+            "heading": "이 거래에 대한 지출 한도를 설정하라는 요청을 받게 될 것입니다",
+            "body": "이 거래 및 향후 거래를 위해 최소 {{amount}}을 입력한 후, 안내를 따르세요."
+          },
+          "passport": {
+            "heading": "이 거래에 대한 지출 한도 승인을 받게 됩니다",
+            "body": "지출 한도를 승인하기 위해 지갑의 안내를 따르세요."
+          }
+        },
+        "footer": {
+          "buttonText": "알겠습니다",
+          "retryText": "다시 시도"
+        },
+        "loading": {
+          "text": "지출 한도 승인 중"
+        }
+      }
+    },
+    "ONRAMP": {
+      "header": {
+        "title": "코인 추가"
+      },
+      "initialLoadingText": "Transak으로 이동하는 중",
+      "IN_PROGRESS_LOADING": {
+        "loading": {
+          "text": "Transak가 주문을 처리 중입니다"
+        }
+      },
+      "IN_PROGRESS": {
+        "content": {
+          "heading": "주문 진행 중",
+          "body1": "완료되면 Transak에서 이메일을 받게 됩니다. 최대 3분이 소요될 수 있습니다.",
+          "body2": "이 창을 닫을 수 있으며, 완료되면 거래가 지갑에 반영됩니다."
+        }
+      },
+      "SUCCESS": {
+        "text": "코인이 도착하는 중입니다",
+        "actionText": "완료"
+      },
+      "FAIL": {
+        "text": "거래 실패",
+        "actionText": "다시 시도"
+      }
+    },
+    "TOP_UP_VIEW": {
+      "header": {
+        "title": "코인을 추가하시겠습니까?"
+      },
+      "topUpOptions": {
+        "onramp": {
+          "heading": "카드로 구매",
+          "caption": "Google Pay 및 Apple Pay 사용 가능. 최소 $5.",
+          "subcaption": "수수료",
+          "disabledCaption": ""
+        },
+        "swap": {
+          "heading": "내 코인 교환",
+          "caption": "동일 네트워크 내에서 내가 가진 코인을 이용하여",
+          "subcaption": "수수료",
+          "disabledCaption": "귀하의 지역에서 사용할 수 없습니다"
+        },
+        "bridge": {
+          "heading": "내 코인 이동",
+          "caption": "다른 네트워크에서 가진 코인을 이동하여",
+          "subcaption": "수수료",
+          "disabledCaption": ""
+        }
+      }
+    },
+    "FUND_WITH_SMART_CHECKOUT": {
+      "loading": {
+        "checkingBalances": "숫자를 계산하는 중"
+      },
+      "currency": {
+        "usdEstimate": "≈ USD $",
+        "fees": "수수료"
+      },
+      "fundingRouteDrawer": {
+        "header": "사용 가능한 잔액"
+      },
+      "fundingRouteSelect": {
+        "heading": "Pay with your",
+        "noRoutesAvailable": "코인 잔액이 부족합니다. 대신 카드로 진행하세요.",
+        "continue": "계속",
+        "payWithCardInstead": "괜찮습니다, 카드로 결제할게요",
+        "payWithCard": "카드로 결제하기"
+      }
+    },
+    "PAYMENT_METHODS": {
+      "header": {
+        "heading": "어떤 방법으로 결제하시겠습니까?"
+      },
+      "options": {
+        "CRYPTO": {
+          "heading": "코인",
+          "caption": "지갑에 있는 코인 잔액을 이용하여",
+          "disabledCaption": "지갑의 충분한 코인을 볼 수 없습니다"
+        },
+        "FIAT": {
+          "heading": "카드",
+          "caption": "Transak에서 GooglePay도 이용 가능합니다",
+          "disabledCaption": ""
+        }
+      },
+      "insufficientCoinsBanner": {
+        "caption": "코인 잔액이 부족합니다. 대신 카드로 진행하세요."
+      },
+      "loading": {
+        "ready": "구매 준비됨",
+        "confirm": "지갑에서 확인하세요",
+        "processing": "구매 처리 중"
+      }
+    },
+    "PAY_WITH_COINS": {
+      "header": {
+        "heading": "코인으로 결제",
+        "caption": "지갑에 있는 코인 잔액을 이용하여"
+      },
+      "button": {
+        "buyNow": "지금 구매"
+      }
+    },
+    "PAY_WITH_CARD": {
+      "screenTitle": "카드로 결제",
+      "loading": "Transak으로 이동하는 중"
+    },
+    "SALE_FAIL": {
+      "errors": {
+        "TRANSACTION_FAILED": {
+          "description": "거래 실패",
+          "primaryAction": "다시 시도",
+          "secondaryAction": "세부 정보 보기"
+        },
+        "SERVICE_BREAKDOWN": {
+          "description": "죄송합니다, 현재 지불 처리가 불가능합니다. 몇 분 후에 다시 시도하세요.",
+          "secondaryAction": "닫기"
+        },
+        "TRANSAK_FAILED": {
+          "description": "죄송합니다, 문제가 발생했습니다. 다시 시도하세요.",
+          "primaryAction": "다시 시도",
+          "secondaryAction": "닫기"
+        },
+        "WALLET_FAILED": {
+          "description": "죄송합니다, 지금은 이를 처리할 수 없습니다.",
+          "primaryAction": "돌아가기",
+          "secondaryAction": "닫기"
+        },
+        "WALLET_REJECTED_NO_FUNDS": {
+          "description": "죄송합니다, 문제가 발생했습니다. 다시 시도하세요.",
+          "primaryAction": "돌아가기",
+          "secondaryAction": "닫기"
+        },
+        "WALLET_REJECTED": {
+          "description": "거래를 진행하려면 지갑에서 거래 승인이 필요합니다.",
+          "primaryAction": "다시 시도",
+          "secondaryAction": "취소"
+        },
+        "SMART_CHECKOUT_ERROR": {
+          "description": "지갑 잔액을 확인할 수 없습니다. 다시 시도하세요.",
+          "primaryAction": "다시 시도",
+          "secondaryAction": "취소"
+        },
+        "SMART_CHECKOUT_EXECUTE_ERROR": {
+          "description": "죄송합니다, 자금 이동 중 문제가 발생했습니다. 다시 시도하세요.",
+          "primaryAction": "다시 시도",
+          "secondaryAction": "취소"
+        },
+        "DEFAULT": {
+          "description": "죄송합니다, 문제가 발생했습니다. 다시 시도하세요.",
+          "primaryAction": "다시 시도",
+          "secondaryAction": "닫기"
+        }
+      }
+    },
+    "SALE_SUCCESS": {
+      "text": "주문 완료",
+      "actionText": "계속"
+    },
+    "WALLET_NETWORK_SELECTION": {
+      "layoutHeading": "이동",
+      "heading": "자금을 어디에서 어디로 이동하시겠습니까?",
+      "fromFormInput": {
+        "heading": "From",
+        "selectDefaultText": "지갑과 네트워크를 선택하세요",
+        "walletSelectorHeading": "지갑에서",
+        "networkSelectorHeading": "네트워크에서"
+      },
+      "toFormInput": {
+        "heading": "To",
+        "selectDefaultText": "지갑과 네트워크를 선택하세요",
+        "walletSelectorHeading": "지갑으로"
+      },
+      "submitButton": {
+        "text": "다음"
+      }
+    },
+    "BRIDGE_FORM": {
+      "header": {
+        "title": "코인 이동"
+      },
+      "fees": {
+        "title": "가스 요금",
+        "fiatPricePrefix": "~ USD $"
+      },
+      "content": {
+        "title": "얼마나 많이 이동하시겠습니까?",
+        "fiatPricePrefix": "약 USD",
+        "availableBalancePrefix": "사용 가능"
+      },
+      "bridgeForm": {
+        "from": {
+          "inputPlaceholder": "0",
+          "selectorTitle": "무엇을 이동하고 싶으신가요?"
+        },
+        "buttonText": "검토"
+      },
+      "validation": {
+        "noAmountInputted": "금액을 입력해 주세요",
+        "insufficientBalance": "잔고가 부족합니다",
+        "noTokenSelected": "이동할 코인을 선택하세요"
+      }
+    },
+    "BRIDGE_REVIEW": {
+      "layoutHeading": "이동",
+      "heading": "이렇게 보이면 괜찮으십니까?",
+      "fromLabel": {
+        "amountHeading": "이동 중",
+        "heading": "From"
+      },
+      "toLabel": {
+        "heading": "To"
+      },
+      "fees": {
+        "heading": "가스 요금"
+      },
+      "submitButton": {
+        "buttonText": "이동 확인"
+      },
+      "fiatPricePrefix": "~ USD $"
+    },
+    "BRIDGE_FAILURE": {
+      "statusText": "거래 실패",
+      "actionText": "검토하고 다시 시도하세요"
+    },
+    "APPROVE_TRANSACTION": {
+      "content": {
+        "heading": "지갑에서 거래 승인",
+        "body": "지갑 팝업의 안내를 따라 확인하세요."
+      },
+      "footer": {
+        "buttonText": "확인",
+        "retryText": "다시 시도"
+      },
+      "loadingView": {
+        "text": "이동 시작 중"
+      }
+    },
+    "IN_PROGRESS": {
+      "heading": "이동 중",
+      "body1": "3분 미만으로 당신의 ${symbol}이 zkEVM에 도착합니다.",
+      "body2": "이 창을 닫아도 됩니다. 거래가 완료되면 지갑에 반영될 것입니다."
+    }
+  },
+  "footers": {
+    "quickswapFooter": {
+      "disclaimerText": "Quickswap는 타사 앱입니다. Immutable은 Quickswap를 만들거나 소유하거나 운영하거나 배포하지 않습니다. 자세한 정보는 Quickswap의 웹사이트를 참조하십시오."
+    }
+  },
+  "wallets": {
+    "passport": {
+      "heading": "Immutable Passport",
+      "accentText": "추천",
+      "description": "디지털 지갑 및 신원"
+    },
+    "metamask": {
+      "heading": "메타마스크",
+      "description": "블록체인 애플리케이션 및 웹3에 액세스하기 위한 디지털 지갑"
+    }
+  },
+  "drawers": {
+    "feesBreakdown": {
+      "heading": "수수료 내역",
+      "total": "수수료 총액",
+      "fees": {
+        "gas": {
+          "label": "가스 수수료"
+        }
+      }
+    },
+    "transactionFailed": {
+      "content": {
+        "heading1": "계속하기 전에 지갑에서 확인이 필요합니다",
+        "heading2": "지갑 확인 필요",
+        "body1": "MetaMask 팝업이 나타날 때 거래에",
+        "body2": "서명을 꼭 하십시오"
+      },
+      "buttons": {
+        "retry": "알겠습니다",
+        "cancel": "취소"
+      }
+    },
+    "coinSelector": {
+      "option": {
+        "fiatPricePrefix": "대략 USD $"
+      },
+      "noCoins": "지갑에 선택 가능한 코인이 없습니다."
+    },
+    "notEnoughGas": {
+      "content": {
+        "heading": "잔액이 너무 낮습니다",
+        "body": "이 이동에 필요한 가스 수수료를 충당하기에 ETH 잔액이 너무 낮습니다. MetaMask를 직접 사용하여 지갑에 ETH를 더 이전할 수 있습니다."
+      },
+      "buttons": {
+        "adjustAmount": "금액 조정",
+        "copyAddress": "지갑 주소 복사",
+        "cancel": "취소"
+      }
+    },
+    "notEnoughImx": {
+      "content": {
+        "noImx": {
+          "heading": "IMX 코인이 필요합니다",
+          "body": "교환 수수료는 IMX 코인으로 지불되므로 교환 전에 이를 추가해야 합니다"
+        },
+        "insufficientImx": {
+          "heading": "더 많은 IMX 코인이 필요합니다",
+          "body": "지정된 금액의 수수료를 충당하기 위해 더 많은 IMX 코인을 추가해야 합니다"
+        }
+      },
+      "buttons": {
+        "adjustAmount": "금액 조정",
+        "addMoreImx": "IMX 코인 추가",
+        "cancel": "취소"
+      }
+    },
+    "unableToSwap": {
+      "heading": "해당 코인 교환 불가",
+      "body": "지금은 이 코인 페어를 교환할 수 없습니다. 다른 선택을 시도해보세요.",
+      "buttons": {
+        "cancel": "취소"
+      }
+    }
+  }
+}

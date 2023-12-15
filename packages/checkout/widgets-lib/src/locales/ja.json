@@ -264,7 +264,7 @@
         "FIAT": {
           "heading": "カード",
           "caption": "GooglePayもTransakで利用可能",
-          "disabledCaption": null
+          "disabledCaption": ""
         }
       },
       "insufficientCoinsBanner": {
