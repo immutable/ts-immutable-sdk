@@ -87,3 +87,12 @@ export const AXELAR_SCAN_URL = {
   [Environment.SANDBOX]: 'https://testnet.axelarscan.io/gmp/',
   [Environment.PRODUCTION]: 'https://axelarscan.io/gmp/',
 };
+
+/**
+ * URL for passport based on environment
+ */
+export const PASSPORT_URL = {
+  [ENV_DEVELOPMENT]: 'https://passport.sandbox.immutable.com/',
+  [Environment.SANDBOX]: 'https://passport.sandbox.immutable.com/',
+  [Environment.PRODUCTION]: 'https://passport.immutable.com/',
+};

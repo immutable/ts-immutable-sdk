@@ -8,7 +8,7 @@ import {
 import { EventTargetContext } from 'context/event-target-context/EventTargetContext';
 import { text } from 'resources/text/textConfig';
 import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
-import { Box, Link, MenuItem } from '@biom3/react';
+import { Box } from '@biom3/react';
 import { isPassportProvider } from 'lib/providerUtils';
 import { Web3Provider } from '@ethersproject/providers';
 import {
@@ -17,8 +17,14 @@ import {
 import { sendBridgeWidgetCloseEvent } from '../../widgets/bridge/BridgeWidgetEvents';
 import { TransactionsInProgress } from './TransactionsInProgress';
 import { Shimmer } from './Shimmer';
-import { transactionsListStyle } from './TransactionsStyles';
+import {
+  supportBoxContainerStyle,
+  transactionsContainerStyle,
+  transactionsListContainerStyle,
+  transactionsListStyle,
+} from './TransactionsStyles';
 import { EmptyStateNotConnected } from './EmptyStateNotConnected';
+import { SupportMessage } from './SupportMessage';
 
 type TransactionsProps = {
   checkout: Checkout
@@ -27,7 +33,7 @@ type TransactionsProps = {
 export function Transactions({ checkout }: TransactionsProps) {
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
-  const { layoutHeading, passportDashboard } = text.views[BridgeWidgetViews.TRANSACTIONS];
+  const { layoutHeading } = text.views[BridgeWidgetViews.TRANSACTIONS];
 
   const [loading, setLoading] = useState(true);
   const [knownTokens, setKnownTokens] = useState<TokenInfo[] | undefined>(undefined);
@@ -94,26 +100,31 @@ export function Transactions({ checkout }: TransactionsProps) {
       )}
       footer={<FooterLogo />}
     >
-      <Box sx={{ px: 'base.spacing.x4' }}>
-        {
-          !provider
-            ? <EmptyStateNotConnected />
-            : (
-              <Box sx={transactionsListStyle(isPassport)}>
-                {loading ? <Shimmer /> : <TransactionsInProgress checkout={checkout} />}
-              </Box>
-            )
-        }
-        {isPassport && (
-        <MenuItem emphasized>
-          <MenuItem.Label sx={{ fontWeight: 'normal' }}>
-            {passportDashboard}
-            {' '}
-            <Link size="small" rc={<a href="https://passport.immutable.com" />}>
-              Passport
-            </Link>
-          </MenuItem.Label>
-        </MenuItem>
+      <Box
+        sx={transactionsContainerStyle}
+      >
+        <Box
+          sx={transactionsListContainerStyle}
+        >
+          {
+            !provider
+              ? <EmptyStateNotConnected />
+              : (
+                <Box sx={transactionsListStyle(isPassport)}>
+                  {loading ? <Shimmer /> : <TransactionsInProgress checkout={checkout} />}
+                </Box>
+              )
+          }
+        </Box>
+        {provider && (
+          <Box
+            sx={supportBoxContainerStyle}
+          >
+            <SupportMessage
+              checkout={checkout}
+              isPassport={isPassport}
+            />
+          </Box>
         )}
       </Box>
     </SimpleLayout>

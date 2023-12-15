@@ -1,7 +1,22 @@
-export const transactionsListStyle = (showExternalLink: boolean) => {
-  let height = 486;
+export const transactionsContainerStyle = {
+  px: 'base.spacing.x4',
+  display: 'flex',
+  flexDirection: 'column',
+  height: '100%',
+};
 
-  if (showExternalLink) height -= 80;
+export const transactionsListContainerStyle = {
+  flexGrow: '1',
+  flexShrink: '0',
+  flexBasis: '0',
+};
+
+export const transactionsListStyle = (showPassportLink: boolean) => {
+  let height = 440;
+
+  if (showPassportLink) {
+    height -= 20;
+  }
 
   return {
     backgroundColor: 'base.color.neutral.800',
@@ -9,8 +24,13 @@ export const transactionsListStyle = (showExternalLink: boolean) => {
     pt: 'base.spacing.x5',
     borderRadius: 'base.borderRadius.x6',
     h: `${height}px`,
-    overflowY: 'scroll',
-    mb: 'base.spacing.x2',
     w: '100%',
+    overflowY: 'scroll',
   };
+};
+
+export const supportBoxContainerStyle = {
+  flexGrow: '0',
+  flexShrink: '1',
+  mt: 'base.spacing.x2',
 };

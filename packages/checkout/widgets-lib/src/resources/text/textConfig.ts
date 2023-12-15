@@ -461,6 +461,16 @@ export const text = {
         },
       },
       fiatPricePrefix: '~ USD $',
+      support: {
+        body1: 'Need help?',
+        body2: ' Contact ',
+        body3: 'support',
+        supportLink: 'https://support.immutable.com/en/',
+        passport: {
+          body1: 'Or view completed transactions in your ',
+          body2: 'Passport',
+        },
+      },
     },
   },
   footers: {
