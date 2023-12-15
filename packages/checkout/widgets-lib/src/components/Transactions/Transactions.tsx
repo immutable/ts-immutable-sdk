@@ -12,7 +12,8 @@ import { Box } from '@biom3/react';
 import { isPassportProvider } from 'lib/providerUtils';
 import { Web3Provider } from '@ethersproject/providers';
 import {
-  Checkout, GetBalanceResult, TokenInfo, WalletProviderName,
+  ChainId,
+  Checkout, TokenInfo, WalletProviderName,
 } from '@imtbl/checkout-sdk';
 import { sendBridgeWidgetCloseEvent } from '../../widgets/bridge/BridgeWidgetEvents';
 import { TransactionsInProgress } from './TransactionsInProgress';
@@ -36,7 +37,8 @@ export function Transactions({ checkout }: TransactionsProps) {
   const { layoutHeading } = text.views[BridgeWidgetViews.TRANSACTIONS];
 
   const [loading, setLoading] = useState(true);
-  const [knownTokens, setKnownTokens] = useState<TokenInfo[] | undefined>(undefined);
+
+  const [knownTokenMap, setKnownTokenMap] = useState<Map<ChainId, TokenInfo[]> | undefined>(undefined);
 
   const [provider, setProvider] = useState<Web3Provider | undefined>(undefined);
 
@@ -45,30 +47,41 @@ export function Transactions({ checkout }: TransactionsProps) {
   const walletAddress = useCallback(async () => await provider?.getSigner().getAddress(), [provider]);
   const isPassport = isPassportProvider(provider);
 
-  const getBalanceByChainID = async (web3provider: Web3Provider, chain: number) => {
-    const address = await walletAddress();
-    const data = await checkout.getAllBalances({
-      provider: web3provider,
-      walletAddress: address!,
-      chainId: chain,
-    });
-    return data.balances;
-  };
+  // const getBalanceByChainID = async (web3provider: Web3Provider, chain: number) => {
+  //   const address = await walletAddress();
+  //   const data = await checkout.getAllBalances({
+  //     provider: web3provider,
+  //     walletAddress: address!,
+  //     chainId: chain,
+  //   });
+  //   return data.balances;
+  // };
 
   const allTokens = useCallback(async () => {
-    if (!checkout || !provider || !walletAddress || !chains) return [];
+    const tokenMap: Map<ChainId, TokenInfo[]> = new Map();
 
-    const promises: Promise<GetBalanceResult[]>[] = [];
-    chains.forEach((chain) => promises.push(getBalanceByChainID(provider, chain)));
+    if (!checkout || !provider || !walletAddress || !chains) return tokenMap;
 
-    const allBalances = await Promise.allSettled(promises);
+    await Promise.all(chains.map(async (chain) => {
+      const allowedTokens = (await checkout.config.remote.getTokensConfig(chain)).allowed;
+      if (allowedTokens) {
+        const tokens: TokenInfo[] = [];
+        tokens.push(...allowedTokens);
+        tokenMap.set(chain, tokens);
+      }
+    }));
 
-    const values: GetBalanceResult[] = [];
-    allBalances.forEach((b) => {
-      if (b.status === 'fulfilled') values.push(...b.value);
-    });
+    // const promises: Promise<GetBalanceResult[]>[] = [];
+    // chains.forEach((chain) => promises.push(getBalanceByChainID(provider, chain)));
+    //
+    // const allBalances = await Promise.allSettled(promises);
+    //
+    // const values: GetBalanceResult[] = [];
+    // allBalances.forEach((b) => {
+    //   if (b.status === 'fulfilled') values.push(...b.value);
+    // });
 
-    return values.map((v) => v.token);
+    return tokenMap;
   }, [checkout, provider, walletAddress, chains]);
 
   useEffect(() => {
@@ -81,12 +94,12 @@ export function Transactions({ checkout }: TransactionsProps) {
   useEffect(() => {
     (async () => {
       const tokens = await allTokens();
-      setKnownTokens(tokens);
+      setKnownTokenMap(tokens);
       setLoading(false);
     })();
   }, [walletAddress, chains]);
 
-  useEffect(() => console.log(knownTokens), [knownTokens]);
+  useEffect(() => console.log(knownTokenMap), [knownTokenMap]);
 
   return (
     <SimpleLayout
