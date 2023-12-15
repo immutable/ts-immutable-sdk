@@ -3,6 +3,7 @@ export const bridgeFormWrapperStyles = {
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-between',
+  paddingTop: 'base.spacing.x10',
 };
 
 export const formInputsContainerStyles = {
