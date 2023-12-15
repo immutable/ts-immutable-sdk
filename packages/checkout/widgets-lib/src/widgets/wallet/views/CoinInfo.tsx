@@ -1,5 +1,6 @@
-import { useContext, useEffect } from 'react';
+import { useCallback, useContext, useEffect } from 'react';
 import { Link } from '@biom3/react';
+import { ViewActions, ViewContext } from 'context/view-context/ViewContext';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -14,6 +15,7 @@ import { UserJourney, useAnalytics } from '../../../context/analytics-provider/S
 
 export function CoinInfo() {
   const { connectLoaderState: { provider } } = useContext(ConnectLoaderContext);
+  const { viewDispatch } = useContext(ViewContext);
   const coinInfoText = text.views[WalletWidgetViews.COIN_INFO];
   const isPassport = isPassportProvider(provider);
   const { heading, body } = coinInfoText.metamask;
@@ -30,10 +32,28 @@ export function CoinInfo() {
     });
   }, []);
 
+  const onBackButtonClick = useCallback(() => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: WalletWidgetViews.WALLET_BALANCES,
+          data: {},
+        },
+      },
+    });
+  }, [viewDispatch]);
+
   return (
     <SimpleLayout
       testId="coin-info"
-      header={<HeaderNavigation showBack transparent />}
+      header={(
+        <HeaderNavigation
+          showBack
+          transparent
+          onBackButtonClick={onBackButtonClick}
+        />
+      )}
       footer={<FooterLogo />}
       heroContent={<IMXCoinsHero />}
       floatHeader
