@@ -12,23 +12,23 @@ ROOT_PROVIDER_RPC=https://1rpc.io/sepolia
 # RPC URL for child chain, i.e. L2
 CHILD_PROVIDER_RPC=https://rpc.testnet.immutable.com
 # Private key of the depositor
-PRIVATE_KEY=
-# Address of the depositor
-DEPOSITOR_ADDRESS=
+PRIVATE_KEY=XXX
+# Address of the sender
+SENDER_ADDRESS=0xEac347177DbA4a190B632C7d9b8da2AbfF57c772
 # Address of the desired recipient on L2
-RECIPIENT_ADDRESS=
+RECIPIENT_ADDRESS=0xEac347177DbA4a190B632C7d9b8da2AbfF57c772
 # Token address to be deposited
 SEPOLIA_TOKEN_ADDRESS=0x40b87d235A5B010a20A241F15797C9debf1ecd01
 # Token address to be withdawn
-ZKEVM_TESTNET_TOKEN_ADDRESS=0xaC953a0d7B67Fae17c87abf79f09D0f818AC66A2
+ZKEVM_TESTNET_TOKEN_ADDRESS=0x3B2d8A1931736Fc321C24864BceEe981B11c3c57
 # Depsit amount (amount will be multiplied by 10^18)
-DEPOSIT_AMOUNT=0.001
+SEND_AMOUNT=0.001
 # Deposit token decimals
-DEPOSIT_DECIMALS=6
+SEND_DECIMALS=6
 # Address of the root bridge 
-ROOT_BRIDGE_ADDRESS=0x8d4528775a4406Def316DC2b450eE539750F8FAA
+ROOT_BRIDGE_ADDRESS=0x0D3C59c779Fd552C27b23F723E80246c840100F5
 # Address of the child bridge
-CHILD_BRIDGE_ADDRESS=0xb0f971e2d11A4D410148af51b170D64E725c0bB9
+CHILD_BRIDGE_ADDRESS=0x0D3C59c779Fd552C27b23F723E80246c840100F5
 
 # MAP TOKEN ----------------------------------------------------------------
 
@@ -40,9 +40,9 @@ AXELAR_API_URL=https://testnet.api.gmp.axelarscan.io
 # STATUS -------------------------------------------------------------------
 
 # Transaction hash to check the status of
-STATUS_TX_HASH=0x5c192bf2b3be59de3a69877f6c71fd0affe6e1a1c05a75f51d4a60692001d8f3
+STATUS_TX_HASH=0x89d9a95ccdb7d4370f86fd9a6680d141367e5c24b2d111ec1fc6c87037ecfddb
 # Chain ID of the source chain where the bridge tx to check originated from
-STATUS_SOURCE_CHAIN_ID=11155111
+STATUS_SOURCE_CHAIN_ID=13473
 ```
 
 The params under `SDK METHOD TESTS` are required to run the smoke tests.
