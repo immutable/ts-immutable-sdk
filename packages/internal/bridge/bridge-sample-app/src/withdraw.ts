@@ -102,10 +102,10 @@ async function withdraw() {
   const withdrawReq: BridgeTxRequest = {
     senderAddress: params.sender,
     recipientAddress: params.recipient,
-    token: params.sepoliaToken,
+    token: params.zkevmTestnetToken,
     amount: params.amount,
-    sourceChainId: ETH_SEPOLIA_CHAIN_ID,
-    destinationChainId: ZKEVM_TESTNET_CHAIN_ID,
+    sourceChainId: ZKEVM_TESTNET_CHAIN_ID,
+    destinationChainId: ETH_SEPOLIA_CHAIN_ID,
     gasMultiplier: 1.1,
   }
 
@@ -124,6 +124,8 @@ async function withdraw() {
     return
   }
 
+  console.log()
+
   const withdrawNonce = await params.childWallet.getTransactionCount();
   const withdrawGasPrice = await params.childProvider.getGasPrice();
 
@@ -135,6 +137,9 @@ async function withdraw() {
 
   console.log('withdrawRes.unsignedTx');
   console.log(withdrawRes!.unsignedTx);
+
+  console.log('gasPrice', withdrawRes!.unsignedTx!.gasPrice!.toString())
+  console.log('value', withdrawRes!.unsignedTx!.value!.toString())
 
   console.log('signing withdraw');
   const withdrawTxSig = await params.childWallet.signTransaction(withdrawRes!.unsignedTx);

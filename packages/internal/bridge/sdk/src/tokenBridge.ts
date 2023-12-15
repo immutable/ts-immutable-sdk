@@ -152,12 +152,15 @@ export class TokenBridge {
         BridgeMethodsGasLimit[`${req.action}_SOURCE`],
       );
 
+      console.log('sourceChainGas', sourceChainGas.toString());
+
       const feeResult = await this.calculateBridgeFee(
         req.sourceChainId,
         req.destinationChainId,
         BridgeMethodsGasLimit[`${req.action}_DESTINATION`],
         req.gasMultiplier,
       );
+      console.log('feeResult', feeResult.bridgeFee.toString());
 
       bridgeFee = feeResult.bridgeFee;
     }
@@ -297,6 +300,7 @@ export class TokenBridge {
       to: req.token,
       value: 0,
       from: req.senderAddress,
+      chainId: parseInt(req.sourceChainId, 10),
     };
 
     return {
@@ -526,6 +530,7 @@ export class TokenBridge {
           data,
           to: contractAddress,
           value: amount.add(fees.bridgeFee).toString(),
+          chainId: parseInt(sourceChainId, 10),
         },
       };
     }
@@ -552,6 +557,7 @@ export class TokenBridge {
         data,
         to: contractAddress,
         value: fees.bridgeFee.toString(),
+        chainId: parseInt(sourceChainId, 10),
       },
     } as BridgeTxResponse;
   }
@@ -726,6 +732,8 @@ export class TokenBridge {
       );
     }
 
+    console.log('axiosResponse.data', axiosResponse.data);
+
     try {
       return {
         bridgeFee: ethers.BigNumber.from(`${axiosResponse.data}`),
@@ -850,12 +858,14 @@ export class TokenBridge {
         };
       }
 
+      console.log('txItem.receiver', txItem.receiver);
+
       let flowRatePromiseIndex: number = -1;
       if (metaStatus === StatusResponse.COMPLETE
         && isWithdraw && txItem.receiver) {
         // consolodate the calls we have to make to the flow rate by receiver
         if (!flowRatePromisesReceivers.includes(txItem.receiver)) {
-          flowRatePromises.push(rootBridge!.getPendingWithdrawals(txItem.receiver));
+          flowRatePromises.push(rootBridge!.getPendingWithdrawals(txItem.receiver, [0]));
           flowRatePromisesReceivers.push(txItem.receiver);
           flowRatePromiseIndex = flowRatePromisesReceivers.length - 1;
         } else {
@@ -874,7 +884,7 @@ export class TokenBridge {
       } catch (err) {
         throw new BridgeError(
           `Failed to fetch the Flow Rate statuses with the reason: ${err}`,
-          BridgeErrorType.AXELAR_GAS_ESTIMATE_FAILED,
+          BridgeErrorType.FLOW_RATE_ERROR,
         );
       }
     }
