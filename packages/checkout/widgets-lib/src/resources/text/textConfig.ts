@@ -471,6 +471,9 @@ export const text = {
           body2: 'Passport',
         },
       },
+      walletSelection: {
+        heading: 'Choose a wallet to view',
+      },
     },
   },
   footers: {

@@ -9,11 +9,13 @@ import { EventTargetContext } from 'context/event-target-context/EventTargetCont
 import { text } from 'resources/text/textConfig';
 import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { Box } from '@biom3/react';
-import { isPassportProvider } from 'lib/providerUtils';
+import { createAndConnectToProvider, isPassportProvider } from 'lib/providerUtils';
 import { Web3Provider } from '@ethersproject/providers';
 import {
   ChainId,
-  Checkout, TokenInfo, WalletProviderName,
+  Checkout,
+  TokenInfo,
+  WalletProviderName,
 } from '@imtbl/checkout-sdk';
 import { sendBridgeWidgetCloseEvent } from '../../widgets/bridge/BridgeWidgetEvents';
 import { TransactionsInProgress } from './TransactionsInProgress';
@@ -86,13 +88,6 @@ export function Transactions({ checkout }: TransactionsProps) {
 
   useEffect(() => {
     (async () => {
-      const p = await checkout.createProvider({ walletProviderName: WalletProviderName.METAMASK });
-      setProvider(p.provider);
-    })();
-  }, []);
-
-  useEffect(() => {
-    (async () => {
       const tokens = await allTokens();
       setKnownTokenMap(tokens);
       setLoading(false);
@@ -100,6 +95,20 @@ export function Transactions({ checkout }: TransactionsProps) {
   }, [walletAddress, chains]);
 
   useEffect(() => console.log(knownTokenMap), [knownTokenMap]);
+
+  const updateAndConnectProvider = useCallback(async (
+    walletProviderName: WalletProviderName,
+  ) => {
+    let web3Provider: Web3Provider;
+    try {
+      web3Provider = await createAndConnectToProvider(checkout, walletProviderName);
+      setProvider(web3Provider);
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(error);
+      throw error;
+    }
+  }, [checkout]);
 
   return (
     <SimpleLayout
@@ -121,10 +130,17 @@ export function Transactions({ checkout }: TransactionsProps) {
         >
           {
             !provider
-              ? <EmptyStateNotConnected />
+              ? (
+                <EmptyStateNotConnected
+                  checkout={checkout}
+                  updateProvider={updateAndConnectProvider}
+                />
+              )
               : (
                 <Box sx={transactionsListStyle(isPassport)}>
-                  {loading ? <Shimmer /> : <TransactionsInProgress checkout={checkout} />}
+                  {loading
+                    ? <Shimmer />
+                    : <TransactionsInProgress checkout={checkout} />}
                 </Box>
               )
           }

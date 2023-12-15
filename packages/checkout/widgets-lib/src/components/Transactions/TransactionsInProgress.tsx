@@ -10,7 +10,7 @@ import { TransactionItem } from './TransactionItem';
 import { containerStyles } from './transactionItemStyles';
 
 type TransactionsInProgressProps = {
-  checkout: Checkout
+  checkout: Checkout,
 };
 
 export function TransactionsInProgress({ checkout }: TransactionsInProgressProps) {
